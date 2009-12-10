@@ -95,6 +95,17 @@ void TissueSimulationWithNutrientsAssembler<DIM>::IncrementInterpolatedQuantitie
     mLinearInUCoeffInSourceTerm += phiI * this->mpEllipticPde->ComputeLinearInUCoeffInSourceTermAtNode(*pNode);
 }
 
+template<unsigned DIM>
+void TissueSimulationWithNutrientsAssembler<DIM>::InitialiseForSolve(Vec initialSolution)
+{
+    // linear system created here
+    BaseClassType::InitialiseForSolve(initialSolution);
+    
+    this->mpLinearSystem->SetMatrixIsSymmetric(true);
+}
+    
+
+
 /**
  * Helper structure that defines typedefs specifying where in the
  * hierarchy of assembler classes various methods are defined, so

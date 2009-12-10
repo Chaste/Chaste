@@ -116,6 +116,14 @@ protected:
      */
     void IncrementInterpolatedQuantities(double phiI, const Node<DIM>* pNode);
 
+    /**
+     * Create the linear system object if it hasn't been already.
+     * Can use an initial solution as PETSc template, or base it on the mesh size.
+     * 
+     * @param initialSolution an initial guess
+     */
+    void InitialiseForSolve(Vec initialSolution);
+
 public:
 
     /**
