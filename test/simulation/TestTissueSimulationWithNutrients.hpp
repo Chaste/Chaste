@@ -276,21 +276,21 @@ public:
         OutputFileHandler handler("TissueSimulationWithOxygen", false);
         std::string results_dir = handler.GetOutputDirectoryFullPath() + "results_from_time_0";
        
-        NumericFileComparison comp_nut(results_dir + "/results.viznutrient", "notforrelease_cancer/test/data/TissueSimulationWithOxygen/results.viznutrient");
+        NumericFileComparison comp_nut(results_dir + "/results.viznutrient", "notforrelease_cell_based/test/data/TissueSimulationWithOxygen/results.viznutrient");
         TS_ASSERT(comp_nut.CompareFiles());
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "/results.viznutrient notforrelease_cancer/test/data/TissueSimulationWithOxygen/results.viznutrient").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "/results.viznutrient notforrelease_cell_based/test/data/TissueSimulationWithOxygen/results.viznutrient").c_str()), 0);
 
-        NumericFileComparison comp_ele(results_dir + "/results.vizelements", "notforrelease_cancer/test/data/TissueSimulationWithOxygen/results.vizelements");
+        NumericFileComparison comp_ele(results_dir + "/results.vizelements", "notforrelease_cell_based/test/data/TissueSimulationWithOxygen/results.vizelements");
         TS_ASSERT(comp_ele.CompareFiles());
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "/results.vizelements notforrelease_cancer/test/data/TissueSimulationWithOxygen/results.vizelements").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "/results.vizelements notforrelease_cell_based/test/data/TissueSimulationWithOxygen/results.vizelements").c_str()), 0);
 
-        NumericFileComparison comp_nodes(results_dir + "/results.viznodes", "notforrelease_cancer/test/data/TissueSimulationWithOxygen/results.viznodes");
+        NumericFileComparison comp_nodes(results_dir + "/results.viznodes", "notforrelease_cell_based/test/data/TissueSimulationWithOxygen/results.viznodes");
         TS_ASSERT(comp_nodes.CompareFiles(1e-15));
 
-        NumericFileComparison comp_celltypes(results_dir + "/results.vizcelltypes", "notforrelease_cancer/test/data/TissueSimulationWithOxygen/results.vizcelltypes");
+        NumericFileComparison comp_celltypes(results_dir + "/results.vizcelltypes", "notforrelease_cell_based/test/data/TissueSimulationWithOxygen/results.vizcelltypes");
         TS_ASSERT(comp_celltypes.CompareFiles(1e-15));
 
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "/results.vizsetup notforrelease_cancer/test/data/TissueSimulationWithOxygen/results.vizsetup").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "/results.vizsetup notforrelease_cell_based/test/data/TissueSimulationWithOxygen/results.vizsetup").c_str()), 0);
     }
 
 
@@ -468,10 +468,10 @@ public:
         // Work out where the previous test wrote its files
         OutputFileHandler handler("TestSpheroidStatistics", false);
         std::string areas_results_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/tissueareas.dat";
-        TS_ASSERT_EQUALS(system(("diff " + areas_results_file + " notforrelease_cancer/test/data/TestSpheroidStatistics/Areas.dat").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + areas_results_file + " notforrelease_cell_based/test/data/TestSpheroidStatistics/Areas.dat").c_str()), 0);
 
         std::string dist_results_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/radial_dist.dat";
-        TS_ASSERT_EQUALS(system(("diff " + dist_results_file + " notforrelease_cancer/test/data/TestSpheroidStatistics/radial_dist.dat").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + dist_results_file + " notforrelease_cell_based/test/data/TestSpheroidStatistics/radial_dist.dat").c_str()), 0);
 
         // Coverage
         TS_ASSERT_THROWS_NOTHING(simulator.WriteAverageRadialNutrientDistribution(SimulationTime::Instance()->GetTime(),5));
