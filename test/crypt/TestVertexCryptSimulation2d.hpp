@@ -39,9 +39,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "VertexCryptBoundaryForce.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "StochasticDurationGenerationBasedCellCycleModel.hpp"
-#include "StochasticDurationGenerationBasedCellCycleModelCellsGenerator.hpp"
 #include "SimpleWntCellCycleModel.hpp"
-#include "SimpleWntCellCycleModelCellsGenerator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "SloughingCellKiller.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
@@ -348,11 +346,51 @@ public:
         unsigned crypt_height = 25;
         HoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true, true);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
-        
-        // Set up cells
+
+        // Create cells
         std::vector<TissueCell> cells;
-        StochasticDurationGenerationBasedCellCycleModelCellsGenerator<2> cells_generator;
-        cells_generator.GenerateForVertexCrypt(cells, *p_mesh, std::vector<unsigned>(), true, 1.0,4.0,8.0,12.0);
+        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
+        {
+            double birth_time = - RandomNumberGenerator::Instance()->ranf()*
+                                 ( TissueConfig::Instance()->GetTransitCellG1Duration()
+                                    + TissueConfig::Instance()->GetSG2MDuration() );
+
+            CellProliferativeType cell_type;
+            unsigned generation;
+
+            // Cells 0 1 2 3 4 and 5 are stem cells
+            if (elem_index<crypt_width)
+            {
+                cell_type = STEM;
+                generation = 0;
+            }
+            // Cells 0 1 2 3 4 and 5 are stem cells
+            else if ((elem_index>=crypt_width) && (elem_index<5*crypt_width))
+            {
+                cell_type = TRANSIT;
+                generation = 1;
+            }
+            else if ((elem_index>=5*crypt_width) && (elem_index<10*crypt_width))
+            {
+                cell_type = TRANSIT;
+                generation = 2;
+            }
+            else if ((elem_index>=10*crypt_width) && (elem_index<15*crypt_width))
+            {
+                cell_type = TRANSIT;
+                generation = 3;
+            }
+            else
+            {
+                cell_type = DIFFERENTIATED;
+                generation = 3;
+            }
+
+            TissueCell cell(cell_type, HEALTHY, new StochasticDurationGenerationBasedCellCycleModel());
+            cell.SetBirthTime(birth_time);
+            static_cast<StochasticDurationGenerationBasedCellCycleModel*>(cell.GetCellCycleModel())->SetGeneration(generation);
+            cells.push_back(cell);
+        }
 
         // Create tissue
         VertexBasedTissue<2> crypt(*p_mesh, cells);
@@ -390,11 +428,18 @@ public:
         HoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true, true);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
-
-       // Set up cells
+        // Create cells
         std::vector<TissueCell> cells;
-        SimpleWntCellCycleModelCellsGenerator<2> cells_generator;
-        cells_generator.GenerateForVertexCrypt(cells, *p_mesh, std::vector<unsigned>(), true);
+        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
+        {
+            double birth_time = - RandomNumberGenerator::Instance()->ranf()*
+                                 ( TissueConfig::Instance()->GetTransitCellG1Duration()
+                                    + TissueConfig::Instance()->GetSG2MDuration() );
+
+            TissueCell cell(TRANSIT, HEALTHY, new SimpleWntCellCycleModel(2));
+            cell.SetBirthTime(birth_time);
+            cells.push_back(cell);
+        }
 
         // Create tissue
         VertexBasedTissue<2> crypt(*p_mesh, cells);
