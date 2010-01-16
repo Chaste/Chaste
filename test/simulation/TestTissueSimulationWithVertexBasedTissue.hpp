@@ -251,7 +251,7 @@ public:
             double birth_time = 0.0 - elem_index;
 
             // Cell should divide at time t=0.5
-            if (elem_index==12)
+            if (elem_index==12) //(elem_index==6 ||elem_index==7 || elem_index==8 || elem_index==11 ||elem_index==12 || elem_index==13 ||elem_index==16 ||elem_index==17 || elem_index==18)
             {
                  cell_type = STEM;
                 birth_time = -23.5;

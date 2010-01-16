@@ -122,6 +122,14 @@ public:
         // Node 12 is in elements 0 and 1 and 5
         temp_list.insert(5u);
         TS_ASSERT_EQUALS(p_mesh->GetNode(12)->rGetContainingElementIndices(), temp_list);
+        
+        // The bottom row of nodes should be boundary nodes 
+        TS_ASSERT(p_mesh->GetNode(0)->IsBoundaryNode());
+        TS_ASSERT(p_mesh->GetNode(1)->IsBoundaryNode());
+        TS_ASSERT(p_mesh->GetNode(2)->IsBoundaryNode());
+        TS_ASSERT(p_mesh->GetNode(3)->IsBoundaryNode());
+        
+        // \TODO Also test the rest of the nodes for boundary
     }
 
     void TestCylindrical2dVertexMeshGenerator()
@@ -157,6 +165,13 @@ public:
         // The flat bottomed periodic mesh should have the same number of elements and nodes
         TS_ASSERT_EQUALS(p_flat_cylindrical_mesh->GetNumElements(), 16u);
         TS_ASSERT_EQUALS(p_flat_cylindrical_mesh->GetNumNodes(), 36u);
+        
+        // The bottom rov of nodes should be boundary nodes 
+        TS_ASSERT(p_flat_cylindrical_mesh->GetNode(0)->IsBoundaryNode());
+        TS_ASSERT(p_flat_cylindrical_mesh->GetNode(1)->IsBoundaryNode());
+        TS_ASSERT(p_flat_cylindrical_mesh->GetNode(2)->IsBoundaryNode());
+        TS_ASSERT(p_flat_cylindrical_mesh->GetNode(3)->IsBoundaryNode());
+        TS_ASSERT(!p_flat_cylindrical_mesh->GetNode(4)->IsBoundaryNode());
 
         // Create a vertex mesh writer with cylindrical mesh
         VertexMeshWriter<2,2> vertex_mesh_writer_2("TestFlatCylindrical2dVertexMesh", "flat_cylindrical_vertex_mesh");

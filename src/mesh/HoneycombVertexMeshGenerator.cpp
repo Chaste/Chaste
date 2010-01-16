@@ -64,19 +64,24 @@ HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsA
                 // Flat bottom to cylindrical mesh
                 for (unsigned i=0; i<=numElementsAcross-1; i++)
                 {
-                    Node<2>* p_node = new Node<2>(node_index, false, i, 0.0);
+                    Node<2>* p_node = new Node<2>(node_index, true, i, 0.0);
                     nodes.push_back(p_node);
                     node_index++;
                 }
             }
+            /*
+             * On each interior row we have numElementsAcross+1 nodes. On the first second, penultimate,
+             *  and last rows all nodes are boundary nodes. On other rows no nodes are boundary nodes.
+             */
             else
             {
                 for (unsigned i=0; i<=numElementsAcross-1; i++)
                 {
                     double x_coord = ((j%4 == 0)||(j%4 == 3)) ? i+0.5 : i;
                     double y_coord = (1.5*j - 0.5*(j%2))*0.5/sqrt(3);
+                    bool is_boundary_node = (j==0 || j==1 || j==2*numElementsUp || j==2*numElementsUp+1) ? true : false;
     
-                    Node<2>* p_node = new Node<2>(node_index, false, x_coord, y_coord);
+                    Node<2>* p_node = new Node<2>(node_index, is_boundary_node , x_coord, y_coord);
                     nodes.push_back(p_node);
                     node_index++;
                 }

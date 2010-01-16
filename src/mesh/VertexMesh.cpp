@@ -837,6 +837,7 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElementMap)
                         {
                             if (ElementIncludesPoint(p_current_node->rGetLocation(), other_iter->GetIndex()))
                             {
+//                                TRACE("*****************************Overlap******************************");
                                 MoveOverlappingNodeOntoEdgeOfElement(p_current_node, other_iter->GetIndex());
                             }
                         }
@@ -1568,9 +1569,15 @@ unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(VertexE
         {
             intersection = position_b - 2*mCellRearrangementThreshold*a_to_b/norm_2(a_to_b);
         }
-
+        
+        bool is_boundary = false;
+        if (p_node_A->IsBoundaryNode() && p_node_B->IsBoundaryNode())
+        {
+            is_boundary = true;
+        }
+        
         // Add a new node to the mesh at the location of the intersection
-        unsigned new_node_global_index = this->AddNode(new Node<SPACE_DIM>(0, false, intersection[0], intersection[1]));
+        unsigned new_node_global_index = this->AddNode(new Node<SPACE_DIM>(0, is_boundary, intersection[0], intersection[1]));
         nodes_added++;
 
         // Now make sure node is added to neighbouring elements
@@ -1810,16 +1817,24 @@ bool VertexMesh<ELEMENT_DIM, SPACE_DIM>::ElementIncludesPoint(const c_vector<dou
     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(elementIndex);
     unsigned num_nodes = p_element->GetNumNodes();
 
+    // Remap the origin to the first vertex to allow alternative distance metrics to be used in subclasses 
+    c_vector<double, SPACE_DIM> first_vertex = p_element->GetNodeLocation(0);
+    
+    c_vector<double, SPACE_DIM> test_point =  GetVectorFromAtoB(first_vertex,rTestPoint);
+
     // Loop over edges of the element
     for (unsigned local_index=0; local_index<num_nodes; local_index++)
     {
+        
         // Get the end points of this edge
-        c_vector<double, SPACE_DIM> vertexA = p_element->GetNodeLocation(local_index);
-        c_vector<double, SPACE_DIM> vertexB = p_element->GetNodeLocation((local_index+1)%num_nodes);
+        // Remap to the origin to allow alternative distance metrics to be used in subclasses
+        c_vector<double, SPACE_DIM> vertexA = GetVectorFromAtoB(first_vertex, p_element->GetNodeLocation(local_index));
+        c_vector<double, SPACE_DIM> vertexB = GetVectorFromAtoB(first_vertex, p_element->GetNodeLocation((local_index+1)%num_nodes));
+
 
         // Check if this edge crosses the ray running out horizontally (increasing x, fixed y) from the test point
-        c_vector<double, SPACE_DIM> vector_a_to_point = GetVectorFromAtoB(vertexA, rTestPoint);
-        c_vector<double, SPACE_DIM> vector_b_to_point = GetVectorFromAtoB(vertexB, rTestPoint);
+        c_vector<double, SPACE_DIM> vector_a_to_point = GetVectorFromAtoB(vertexA, test_point);
+        c_vector<double, SPACE_DIM> vector_b_to_point = GetVectorFromAtoB(vertexB, test_point);
         c_vector<double, SPACE_DIM> vector_a_to_b = GetVectorFromAtoB(vertexA, vertexB);
 
         // Pathological case - test point coincides with vertexA or vertexB
@@ -1843,9 +1858,11 @@ bool VertexMesh<ELEMENT_DIM, SPACE_DIM>::ElementIncludesPoint(const c_vector<dou
         /// \todo Need to carefully check all pathological cases (see #933)
 
         // Non-pathological case
-        if ( (vertexA[1] > rTestPoint[1]) != (vertexB[1] > rTestPoint[1]) )
+        // A and B on different sides of the line y = test_point[1]
+        if ( (vertexA[1] > test_point[1]) != (vertexB[1] > test_point[1]) )
         {
-            if (rTestPoint[0] < vertexA[0] + vector_a_to_b[0]*vector_a_to_point[1]/vector_a_to_b[1])
+            // intersection of y=test_point[1] and vector_a_to_b is on the Right of test_point
+            if (test_point[0] < vertexA[0] + vector_a_to_b[0]*vector_a_to_point[1]/vector_a_to_b[1])
             {
                 element_includes_point = !element_includes_point;
             }

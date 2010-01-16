@@ -1923,6 +1923,7 @@ public:
         TS_ASSERT_EQUALS(*(neighbours_not_in_elem2.begin()), 3u);
     }
 
+    //\TODO include boundary nodes in the tests
     void TestDivideEdge()
     {
         /*
@@ -2142,11 +2143,11 @@ public:
 
     void TestDivideVertexElementGivenAxisOfDivision() throw(Exception)
     {
-        // Make five nodes
+        // Make five nodes, 0, 1 and 2 are boundary nodes
         std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, false, 1.0, -2.0));
-        nodes.push_back(new Node<2>(1, false, 1.0, 2.0));
-        nodes.push_back(new Node<2>(2, false, -1.0, 2.0));
+        nodes.push_back(new Node<2>(0, true, 1.0, -2.0));
+        nodes.push_back(new Node<2>(1, true, 1.0, 2.0));
+        nodes.push_back(new Node<2>(2, true, -1.0, 2.0));
         nodes.push_back(new Node<2>(3, false, -1.0, -2.0));
         nodes.push_back(new Node<2>(4, false, 0.0, 3.0));
 
@@ -2210,7 +2211,16 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(1), 1u);
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(2), 2u);
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(3), 6u);
-
+        
+        //Test boundary nodes updated
+        TS_ASSERT(vertex_mesh.GetNode(0)->IsBoundaryNode());
+        TS_ASSERT(vertex_mesh.GetNode(1)->IsBoundaryNode());
+        TS_ASSERT(vertex_mesh.GetNode(2)->IsBoundaryNode());
+        TS_ASSERT(!vertex_mesh.GetNode(3)->IsBoundaryNode());
+        TS_ASSERT(!vertex_mesh.GetNode(4)->IsBoundaryNode());
+        TS_ASSERT(vertex_mesh.GetNode(5)->IsBoundaryNode());
+        TS_ASSERT(!vertex_mesh.GetNode(6)->IsBoundaryNode());
+        
         // Test ownership of the new nodes
         std::set<unsigned> expected_elements_containing_node_5;
         expected_elements_containing_node_5.insert(0);
@@ -2817,7 +2827,7 @@ public:
          * a square and triangle sat on top of a rectangle.
          */
 
-        // Make nodes
+        // Make all nodes boundary nodes
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
         nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
@@ -2881,6 +2891,8 @@ public:
         TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(2), 6u);
         TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(3), 2u);
         TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(4), 3u);
+        
+        //Other elements remain the same so get a void
     }
 
     void TestBoundaryNodes()
