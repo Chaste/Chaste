@@ -44,7 +44,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "PetscSetupAndFinalize.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "ReplicatableVector.hpp"
-#include "../../global/test/NumericFileComparison.hpp"
+#include "NumericFileComparison.hpp"
 
 class SimplePdeForTesting : public AbstractLinearEllipticPde<2,2>
 {
