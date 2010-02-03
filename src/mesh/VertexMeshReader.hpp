@@ -144,7 +144,7 @@ public:
     unsigned GetNumFaces() const;
 
     /**
-     * Returns a vector of the nodes of each face in turn (synonym of GetNextEdgeData()).
+     * Returns a vector of the nodes of each face in turn.
      */
     ElementData GetNextFaceData();
 
