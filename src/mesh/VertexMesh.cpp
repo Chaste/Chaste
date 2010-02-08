@@ -28,6 +28,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "VertexMesh.hpp"
 #include "RandomNumberGenerator.hpp"
+#include "UblasCustomFunctions.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh(std::vector<Node<SPACE_DIM>*> nodes,
@@ -1901,7 +1902,7 @@ unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocalIndexForElementEdgeClosestT
         c_vector<double, SPACE_DIM> edge_ab_unit_vector = vector_a_to_b/norm_2(vector_a_to_b);
         double distance_parallel_to_edge = inner_prod(vector_a_to_point, edge_ab_unit_vector);
 
-        double squared_distance_normal_to_edge = pow(norm_2(vector_a_to_point), 2) - pow(distance_parallel_to_edge, 2);
+        double squared_distance_normal_to_edge = SmallPow(norm_2(vector_a_to_point), 2) - SmallPow(distance_parallel_to_edge, 2);
 
         if (squared_distance_normal_to_edge < min_squared_distance)
         {

@@ -27,6 +27,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "VertexCryptBoundaryForce.hpp"
+#include "UblasCustomFunctions.hpp"
 
 template<unsigned DIM>
 VertexCryptBoundaryForce<DIM>::VertexCryptBoundaryForce(double forceStrength)
@@ -60,7 +61,7 @@ void VertexCryptBoundaryForce<DIM>::AddForceContribution(std::vector<c_vector<do
         if (y < 0.0)
         {
             c_vector<double, DIM> boundary_force = zero_vector<double>(DIM);
-            boundary_force[1] = mForceStrength*pow(y, 2.0);
+            boundary_force[1] = mForceStrength*SmallPow(y, 2);
 
             rForces[node_iter->GetIndex()] += boundary_force;
         }
