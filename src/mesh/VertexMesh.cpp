@@ -553,6 +553,10 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::DeleteElementPriorToReMesh(unsigned ind
             p_node->MarkAsDeleted();
             mDeletedNodeIndices.push_back(p_node->GetIndex());
         }
+        
+        // mark all the nodes contained in the removed element as boundary nodes
+        p_node->SetAsBoundaryNode(true);
+        
     }
 
     // Mark this element as deleted
@@ -1382,6 +1386,27 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* pNodeA,
                  mElements[*it]->DeleteNode(nodeA_local_index);
             }
         }
+    }
+    
+    //Sort out boundary nodes 
+    if (pNodeA->IsBoundaryNode() || pNodeB->IsBoundaryNode())
+    {
+	    if (pNodeA->GetNumContainingElements()==3)
+	    {
+	    	pNodeA->SetAsBoundaryNode(false);
+	    }
+	    else
+	    {
+	    	pNodeA->SetAsBoundaryNode(true);
+	    }
+	    if (pNodeB->GetNumContainingElements()==3)
+	    {
+	    	pNodeB->SetAsBoundaryNode(false);
+	    }
+	    else
+	    {
+	    	pNodeB->SetAsBoundaryNode(true);
+	    }
     }
 }
 

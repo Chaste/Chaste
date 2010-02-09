@@ -473,6 +473,61 @@ public:
         WntConcentration<2>::Destroy();
     }
 
+	/** Longer Wnt based simulation
+     */
+    void noTestWntBasedCryptSimulation() throw (Exception)
+    {
+        // Create mesh
+        unsigned crypt_width = 10;
+        unsigned crypt_height = 20;
+        HoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true, true);
+        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+
+        // Create cells
+        std::vector<TissueCell> cells;
+        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
+        {
+            double birth_time = - RandomNumberGenerator::Instance()->ranf()*
+                                 ( TissueConfig::Instance()->GetTransitCellG1Duration()
+                                    + TissueConfig::Instance()->GetSG2MDuration() );
+
+            TissueCell cell(TRANSIT, HEALTHY, new SimpleWntCellCycleModel(2));
+            cell.SetBirthTime(birth_time);
+            cells.push_back(cell);
+        }
+
+        // Create tissue
+        VertexBasedTissue<2> crypt(*p_mesh, cells);
+
+        // Set up Wnt gradient
+        WntConcentration<2>::Instance()->SetType(LINEAR);
+        WntConcentration<2>::Instance()->SetTissue(crypt);
+
+        // Create force law
+        NagaiHondaForce<2> force_law;
+        std::vector<AbstractForce<2>*> force_collection;
+        force_collection.push_back(&force_law);
+
+        // Create crypt simulation from tissue and force law
+        VertexCryptSimulation2d simulator(crypt, force_collection);
+        simulator.SetSamplingTimestepMultiple(100);
+        simulator.SetEndTime(50.0);
+        simulator.SetOutputDirectory("TestWntBasedVertexCryptSimulation");
+
+        // Make crypt shorter for sloughing
+        TissueConfig::Instance()->SetCryptLength(20.0);
+        SloughingCellKiller<2> sloughing_cell_killer(&crypt);
+        simulator.AddCellKiller(&sloughing_cell_killer);
+
+        // Run simulation
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+
+        // Tidy up
+        WntConcentration<2>::Destroy();
+    }
+
+
+
     /**
      * Test that archiving a crypt simulation correctly archives its mesh.
      */
