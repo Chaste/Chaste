@@ -250,11 +250,11 @@ public:
             CellProliferativeType cell_type = DIFFERENTIATED;
             double birth_time = 0.0 - elem_index;
 
-            // Cell should divide at time t=0.5
+            // Cell should divide at time t=0.05
             if (elem_index==12) //(elem_index==6 ||elem_index==7 || elem_index==8 || elem_index==11 ||elem_index==12 || elem_index==13 ||elem_index==16 ||elem_index==17 || elem_index==18)
             {
                  cell_type = STEM;
-                birth_time = -23.5;
+                birth_time = -23.95;
             }
 
             TissueCell cell(cell_type, HEALTHY, new FixedDurationGenerationBasedCellCycleModel());
@@ -278,7 +278,7 @@ public:
         TissueSimulation<2> simulator(tissue, force_collection);
         simulator.SetOutputDirectory("TestVertexMonolayerWithCellBirth");
         simulator.SetSamplingTimestepMultiple(100);
-        simulator.SetEndTime(1.0);
+        simulator.SetEndTime(0.1);
 
         // Run simulation
         simulator.Solve();
@@ -382,10 +382,10 @@ public:
         // Set up tissue simulation
         TissueSimulation<2> simulator(tissue, force_collection);
         simulator.SetOutputDirectory("TestVertexMonolayerWithCellDeath");
-        simulator.SetEndTime(4.5); // Any longer and cell needs to T2 Swap \todo implement T2 Swaps
+        simulator.SetEndTime(1.0); // Any longer and cell needs to T2 Swap \todo implement T2 Swaps
 
         // Longer appoptosis time so cells shrink over a longer time
-        TissueConfig::Instance()->SetApoptosisTime(1.5);
+        TissueConfig::Instance()->SetApoptosisTime(0.5);
 
         // Create a cell killer and pass in to simulation (note we must account for element index changes following each kill)
         TargetedCellKiller cell0_killer(&tissue, 0);    // element on the bottom boundary

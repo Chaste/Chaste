@@ -235,7 +235,7 @@ public:
     void TestCryptWithNoBirth() throw (Exception)
     {
         // Create mesh
-        HoneycombVertexMeshGenerator generator(6, 12, true);
+        HoneycombVertexMeshGenerator generator(4, 6, true);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
@@ -291,10 +291,10 @@ public:
 
             CellProliferativeType cell_type;
 
-            // Cell 1 should divide at time t=0.5
+            // Cell 1 should divide at time t=0.05
             if (elem_index==0)
             {
-                birth_time = -23.5;
+                birth_time = -23.95;
                 cell_type = STEM;
             }
             // Cells 2 3 and 4 should divide at later times
@@ -323,8 +323,8 @@ public:
 
         // Create crypt simulation from tissue and force law
         VertexCryptSimulation2d simulator(crypt, force_collection);
-        simulator.SetSamplingTimestepMultiple(1);
-        simulator.SetEndTime(1.0);
+        simulator.SetSamplingTimestepMultiple(10);
+        simulator.SetEndTime(0.1);
         simulator.SetOutputDirectory("TestVertexCryptWithBirth");
 
         // Make crypt shorter for sloughing
@@ -425,8 +425,8 @@ public:
     void TestShortWntBasedCryptSimulation() throw (Exception)
     {
         // Create mesh
-        unsigned crypt_width = 18;
-        unsigned crypt_height = 25;
+        unsigned crypt_width = 6;
+        unsigned crypt_height = 10;
         HoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true, true);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
@@ -458,11 +458,11 @@ public:
         // Create crypt simulation from tissue and force law
         VertexCryptSimulation2d simulator(crypt, force_collection);
         simulator.SetSamplingTimestepMultiple(50);
-        simulator.SetEndTime(0.5);
+        simulator.SetEndTime(0.1);
         simulator.SetOutputDirectory("TestShortWntBasedCryptSimulation");
 
         // Make crypt shorter for sloughing
-        TissueConfig::Instance()->SetCryptLength(20.0);
+        TissueConfig::Instance()->SetCryptLength(10.0);
         SloughingCellKiller<2> sloughing_cell_killer(&crypt);
         simulator.AddCellKiller(&sloughing_cell_killer);
 
