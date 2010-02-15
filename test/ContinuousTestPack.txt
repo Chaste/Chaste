@@ -1,4 +1,5 @@
 cell/TestCellCycleModelsNotForRelease.hpp
+crypt/TestCellsGeneratorForVertex.hpp
 crypt/TestCryptProjectionStatistics.hpp
 crypt/TestCylindrical2dVertexMesh.hpp
 crypt/TestVertexCryptSimulation2d.hpp
