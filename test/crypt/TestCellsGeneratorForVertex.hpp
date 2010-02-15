@@ -33,9 +33,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "FixedDurationGenerationBasedCellCycleModelCellsGeneratorForVertex.hpp"
 #include "SimpleWntCellCycleModelCellsGeneratorForVertex.hpp"
 #include "StochasticDurationGenerationBasedCellCycleModelCellsGeneratorForVertex.hpp"
-//#include "StochasticWntCellCycleModelCellsGenerator.hpp"
-//#include "TysonNovakCellCycleModelCellsGenerator.hpp"
-//#include "WntCellCycleModelCellsGenerator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "TrianglesMeshReader.hpp"
 
@@ -49,33 +46,6 @@ class TestCellsGeneratorForVertex : public AbstractCellBasedTestSuite
 {
 public:
 
-//    void TestFixedDurationGenerationBasedCellCycleModelCellsGeneratorGenerateBasic() throw(Exception)
-//    {
-//        // Create mesh
-//        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
-//        TetrahedralMesh<2,2> mesh;
-//        mesh.ConstructFromMeshReader(mesh_reader);
-//
-//        // Create mesh
-//        unsigned crypt_width = 2;
-//        unsigned crypt_height = 2;
-//        HoneycombVertexMeshGenerator mesh_generator(crypt_width, crypt_height, true);
-//        Cylindrical2dVertexMesh* p_mesh = mesh_generator.GetCylindricalMesh();
-//
-//        // Create cells
-//        std::vector<TissueCell> cells;
-//        FixedDurationGenerationBasedCellCycleModelCellsGenerator<2> cells_generator;
-//        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
-//
-//        // Test that cells were generated correctly
-//        TS_ASSERT_EQUALS(cells.size(), mesh.GetNumNodes());
-//
-//        for (unsigned i=0; i<cells.size(); i++)
-//        {
-//            TS_ASSERT_DELTA(cells[i].GetBirthTime(), -(double)(i), 1e-9);
-//        }
-//    }
-    
     void TestFixedAndStochasticDurationGenerationBasedCellCycleModelCellsGeneratorForVertexGenerateForVertexCrypt() throw(Exception)
     {
         // Create mesh
