@@ -38,8 +38,14 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "NagaiHondaForce.hpp"
 #include "VertexCryptBoundaryForce.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
-#include "StochasticDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedDurationGenerationBasedCellCycleModelCellsGeneratorForVertex.hpp"
+
 #include "SimpleWntCellCycleModel.hpp"
+#include "SimpleWntCellCycleModelCellsGeneratorForVertex.hpp"
+
+#include "StochasticDurationGenerationBasedCellCycleModel.hpp"
+#include "StochasticDurationGenerationBasedCellCycleModelCellsGeneratorForVertex.hpp"
+
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "SloughingCellKiller.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
@@ -111,25 +117,16 @@ public:
     void TestBoundaryConditionsAtCryptBase() throw (Exception)
     {
         // Create mesh
-        HoneycombVertexMeshGenerator generator(6, 6, true);
+        unsigned crypt_width = 4;
+        unsigned crypt_height = 6;
+        HoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
-        // Set parameters
-        TissueConfig::Instance()->SetMaxTransitGenerations(UINT_MAX);
-
-        // Create cells
+        // Set up cells
         std::vector<TissueCell> cells;
-        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
-        {
-            double birth_time = -RandomNumberGenerator::Instance()->ranf()*
-                                ( TissueConfig::Instance()->GetTransitCellG1Duration()
-                                    + TissueConfig::Instance()->GetSG2MDuration() );
-
-            TissueCell cell(TRANSIT, HEALTHY, new StochasticDurationGenerationBasedCellCycleModel());
-            cell.SetBirthTime(birth_time);
-            cells.push_back(cell);
-        }
-
+        FixedDurationGenerationBasedCellCycleModelCellsGeneratorForVertex<2> cells_generator;
+        cells_generator.GenerateForVertexCrypt(cells, *p_mesh, std::vector<unsigned>(), true);
+        
         // Create tissue
         VertexBasedTissue<2> tissue(*p_mesh, cells);
 
@@ -161,7 +158,7 @@ public:
         {
             c_vector<double, 2> node_location = simulator.rGetTissue().GetNode(node_index)->rGetLocation();
 
-            TS_ASSERT_DELTA(node_location[0], old_node_locations[node_index][0] +   node_index*0.01*0.01, 1e-9);
+            TS_ASSERT_DELTA(node_location[0], old_node_locations[node_index][0] + node_index*0.01*0.01, 1e-9);
 
             if (old_node_locations[node_index][1] > 0.0)
             {
@@ -177,25 +174,16 @@ public:
     void TestUsingJiggledBottomSurface()
     {
         // Create mesh
-        HoneycombVertexMeshGenerator generator(4, 4, true);
+        unsigned crypt_width = 4;
+        unsigned crypt_height = 6;
+        HoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
-
-        // Set parameters
-        TissueConfig::Instance()->SetMaxTransitGenerations(UINT_MAX);
 
         // Create cells
         std::vector<TissueCell> cells;
-        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
-        {
-            double birth_time = -RandomNumberGenerator::Instance()->ranf()*
-                                ( TissueConfig::Instance()->GetTransitCellG1Duration()
-                                    + TissueConfig::Instance()->GetSG2MDuration() );
-
-            TissueCell cell(TRANSIT, HEALTHY, new StochasticDurationGenerationBasedCellCycleModel());
-            cell.SetBirthTime(birth_time);
-            cells.push_back(cell);
-        }
-
+        FixedDurationGenerationBasedCellCycleModelCellsGeneratorForVertex<2> cells_generator;
+        cells_generator.GenerateForVertexCrypt(cells, *p_mesh, std::vector<unsigned>(), true);
+        
         // Create tissue
         VertexBasedTissue<2> crypt(*p_mesh, cells);
 
@@ -209,6 +197,7 @@ public:
 
         simulator.SetOutputDirectory("VertexCrypt2DJiggledBottomCells");
         simulator.SetEndTime(0.01);
+        simulator.SetSamplingTimestepMultiple(50);
         simulator.UseJiggledBottomCells();
 
         // Move the first node (which should be on y=0) down a bit
@@ -235,25 +224,19 @@ public:
     void TestCryptWithNoBirth() throw (Exception)
     {
         // Create mesh
-        HoneycombVertexMeshGenerator generator(4, 6, true);
+        unsigned crypt_width = 4;
+        unsigned crypt_height = 6;
+        HoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
-        // Create cells
+        // Create cells, all differentiated
         std::vector<TissueCell> cells;
-        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
-        {
-            double birth_time = -RandomNumberGenerator::Instance()->ranf()*
-                                ( TissueConfig::Instance()->GetTransitCellG1Duration()
-                                    + TissueConfig::Instance()->GetSG2MDuration() );
-
-            TissueCell cell(DIFFERENTIATED, HEALTHY, new StochasticDurationGenerationBasedCellCycleModel());
-            cell.SetBirthTime(birth_time);
-            cells.push_back(cell);
-        }
+        FixedDurationGenerationBasedCellCycleModelCellsGeneratorForVertex<2> cells_generator;
+        cells_generator.GenerateForVertexCrypt(cells, *p_mesh, std::vector<unsigned>(), true, 0.0, 0.0, 0.0, 0.0);
 
         // Create tissue
         VertexBasedTissue<2> crypt(*p_mesh, cells);
-
+        
         // Create force law
         NagaiHondaForce<2> force_law;
         std::vector<AbstractForce<2>*> force_collection;
@@ -262,10 +245,11 @@ public:
         // Create crypt simulation from tissue and force law
         VertexCryptSimulation2d simulator(crypt, force_collection);
         simulator.SetEndTime(0.1);
+        simulator.SetSamplingTimestepMultiple(50);
+        
         simulator.SetOutputDirectory("TestVertexCryptWithNoBirth");
 
-        SloughingCellKiller<2> sloughing_cell_killer(&crypt, false);
-        simulator.AddCellKiller(&sloughing_cell_killer);
+        // No cell killer
 
         // Run simulation
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
@@ -280,39 +264,19 @@ public:
         // Create mesh
         HoneycombVertexMeshGenerator generator(4, 6, true);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
-
-        // Create cells
+        
+        // Create cells, bottom row are STEM rest are DIFFERENTIATED. 
         std::vector<TissueCell> cells;
-        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
-        {
-            double birth_time = - RandomNumberGenerator::Instance()->ranf()*
-                                 ( TissueConfig::Instance()->GetTransitCellG1Duration()
-                                    + TissueConfig::Instance()->GetSG2MDuration() );
-
-            CellProliferativeType cell_type;
-
-            // Cell 1 should divide at time t=0.05
-            if (elem_index==0)
-            {
-                birth_time = -23.95;
-                cell_type = STEM;
-            }
-            // Cells 2 3 and 4 should divide at later times
-            else if ((elem_index==1)||(elem_index==2)||(elem_index==3))
-            {
-                birth_time = -15.5 - 2.0*(double)elem_index;
-                cell_type = STEM;
-            }
-            else
-            {
-                cell_type = DIFFERENTIATED;
-            }
-
-            TissueCell cell(cell_type, HEALTHY, new FixedDurationGenerationBasedCellCycleModel());
-            cell.SetBirthTime(birth_time);
-            cells.push_back(cell);
-        }
-
+        FixedDurationGenerationBasedCellCycleModelCellsGeneratorForVertex<2> cells_generator;
+        cells_generator.GenerateForVertexCrypt(cells, *p_mesh, std::vector<unsigned>(), true, 0.8,0.8,0.8,0.8);
+        
+        // Cell 1 should divide at time t=0.05
+        cells[0].SetBirthTime(-23.95);
+		// Cell 2-4 should divide later        
+		cells[1].SetBirthTime(-23.0);
+		cells[2].SetBirthTime(-22.0);
+		cells[3].SetBirthTime(-21.0);
+		
         // Create tissue
         VertexBasedTissue<2> crypt(*p_mesh, cells);
 
@@ -323,16 +287,15 @@ public:
 
         // Create crypt simulation from tissue and force law
         VertexCryptSimulation2d simulator(crypt, force_collection);
-        simulator.SetSamplingTimestepMultiple(10);
+        simulator.SetSamplingTimestepMultiple(50);
         simulator.SetEndTime(0.1);
         simulator.SetOutputDirectory("TestVertexCryptWithBirth");
 
         // Make crypt shorter for sloughing
         TissueConfig::Instance()->SetCryptLength(5.0);
-
-        SloughingCellKiller<2> sloughing_cell_killer(&crypt);
+		SloughingCellKiller<2> sloughing_cell_killer(&crypt);
         simulator.AddCellKiller(&sloughing_cell_killer);
-
+		
         // Run simulation
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
     }
@@ -344,55 +307,15 @@ public:
     void noTestCryptSimulationLong() throw (Exception)
     {
         // Create mesh
-        unsigned crypt_width = 18;
-        unsigned crypt_height = 25;
+        unsigned crypt_width = 10;
+        unsigned crypt_height = 20;
         HoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true, true);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
         std::vector<TissueCell> cells;
-        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
-        {
-            double birth_time = - RandomNumberGenerator::Instance()->ranf()*
-                                 ( TissueConfig::Instance()->GetTransitCellG1Duration()
-                                    + TissueConfig::Instance()->GetSG2MDuration() );
-
-            CellProliferativeType cell_type;
-            unsigned generation;
-
-            // Cells 0 1 2 3 4 and 5 are stem cells
-            if (elem_index<crypt_width)
-            {
-                cell_type = STEM;
-                generation = 0;
-            }
-            // Cells 0 1 2 3 4 and 5 are stem cells
-            else if ((elem_index>=crypt_width) && (elem_index<5*crypt_width))
-            {
-                cell_type = TRANSIT;
-                generation = 1;
-            }
-            else if ((elem_index>=5*crypt_width) && (elem_index<10*crypt_width))
-            {
-                cell_type = TRANSIT;
-                generation = 2;
-            }
-            else if ((elem_index>=10*crypt_width) && (elem_index<15*crypt_width))
-            {
-                cell_type = TRANSIT;
-                generation = 3;
-            }
-            else
-            {
-                cell_type = DIFFERENTIATED;
-                generation = 3;
-            }
-
-            TissueCell cell(cell_type, HEALTHY, new StochasticDurationGenerationBasedCellCycleModel());
-            cell.SetBirthTime(birth_time);
-            static_cast<StochasticDurationGenerationBasedCellCycleModel*>(cell.GetCellCycleModel())->SetGeneration(generation);
-            cells.push_back(cell);
-        }
+        StochasticDurationGenerationBasedCellCycleModelCellsGeneratorForVertex<2> cells_generator;
+        cells_generator.GenerateForVertexCrypt(cells, *p_mesh, std::vector<unsigned>(), true);
 
         // Create tissue
         VertexBasedTissue<2> crypt(*p_mesh, cells);
@@ -425,24 +348,16 @@ public:
     void TestShortWntBasedCryptSimulation() throw (Exception)
     {
         // Create mesh
-        unsigned crypt_width = 6;
-        unsigned crypt_height = 10;
+        unsigned crypt_width = 4;
+        unsigned crypt_height = 6;
         HoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true, true);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
         std::vector<TissueCell> cells;
-        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
-        {
-            double birth_time = - RandomNumberGenerator::Instance()->ranf()*
-                                 ( TissueConfig::Instance()->GetTransitCellG1Duration()
-                                    + TissueConfig::Instance()->GetSG2MDuration() );
-
-            TissueCell cell(TRANSIT, HEALTHY, new SimpleWntCellCycleModel(2));
-            cell.SetBirthTime(birth_time);
-            cells.push_back(cell);
-        }
-
+        SimpleWntCellCycleModelCellsGeneratorForVertex<2> cells_generator;
+        cells_generator.GenerateForVertexCrypt(cells, *p_mesh, std::vector<unsigned>(), true);
+        
         // Create tissue
         VertexBasedTissue<2> crypt(*p_mesh, cells);
 
@@ -475,7 +390,7 @@ public:
 
 	/** Longer Wnt based simulation
      */
-    void noTestWntBasedCryptSimulation() throw (Exception)
+    void noTestWntBasedCryptSimulationLong() throw (Exception)
     {
         // Create mesh
         unsigned crypt_width = 10;
@@ -485,17 +400,9 @@ public:
 
         // Create cells
         std::vector<TissueCell> cells;
-        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
-        {
-            double birth_time = - RandomNumberGenerator::Instance()->ranf()*
-                                 ( TissueConfig::Instance()->GetTransitCellG1Duration()
-                                    + TissueConfig::Instance()->GetSG2MDuration() );
-
-            TissueCell cell(TRANSIT, HEALTHY, new SimpleWntCellCycleModel(2));
-            cell.SetBirthTime(birth_time);
-            cells.push_back(cell);
-        }
-
+        SimpleWntCellCycleModelCellsGeneratorForVertex<2> cells_generator;
+        cells_generator.GenerateForVertexCrypt(cells, *p_mesh, std::vector<unsigned>(), true);   
+        
         // Create tissue
         VertexBasedTissue<2> crypt(*p_mesh, cells);
 
@@ -510,9 +417,9 @@ public:
 
         // Create crypt simulation from tissue and force law
         VertexCryptSimulation2d simulator(crypt, force_collection);
-        simulator.SetSamplingTimestepMultiple(100);
+        simulator.SetSamplingTimestepMultiple(50);
         simulator.SetEndTime(50.0);
-        simulator.SetOutputDirectory("TestWntBasedVertexCryptSimulation");
+        simulator.SetOutputDirectory("TestLongWntBasedVertexCryptSimulation");
 
         // Make crypt shorter for sloughing
         TissueConfig::Instance()->SetCryptLength(20.0);
@@ -526,107 +433,22 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-
-
-    /**
-     * Test that archiving a crypt simulation correctly archives its mesh.
-     */
-    void TestMeshSurvivesSaveLoad() throw (Exception)
-    {
-        // Create mesh
-        HoneycombVertexMeshGenerator generator(6, 12, true);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
-
-        // Create cells
-        std::vector<TissueCell> cells;
-        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
-        {
-            double birth_time = -RandomNumberGenerator::Instance()->ranf()*
-                                ( TissueConfig::Instance()->GetTransitCellG1Duration()
-                                    + TissueConfig::Instance()->GetSG2MDuration() );
-
-            TissueCell cell(STEM, HEALTHY, new StochasticDurationGenerationBasedCellCycleModel());
-            cell.SetBirthTime(birth_time);
-            cells.push_back(cell);
-        }
-
-        // Create tissue
-        VertexBasedTissue<2> crypt(*p_mesh, cells);
-
-        // Create force law
-        NagaiHondaForce<2> force_law;
-        std::vector<AbstractForce<2>*> force_collection;
-        force_collection.push_back(&force_law);
-
-        // Create crypt simulation from tissue and force law
-        VertexCryptSimulation2d simulator(crypt, force_collection);
-        simulator.SetOutputDirectory("VertexCrypt2DMeshArchive");
-        simulator.SetEndTime(0.1);
-
-        /*
-         * Memory leak (unconditional jump) without the following line. The
-         * archiver assumes that a Solve has been called and simulation time
-         * has been set up properly. In this test it hasn't, so we need this
-         * to avoid a memory leak.
-         */
-        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(0.1, 100);
-
-        // Save
-        TissueSimulationArchiver<2, VertexCryptSimulation2d>::Save(&simulator);
-
-        // Load
-        VertexCryptSimulation2d* p_simulator;
-        p_simulator = TissueSimulationArchiver<2, VertexCryptSimulation2d>::Load("VertexCrypt2DMeshArchive", 0.0);
-
-        // Create an identical mesh for comparison purposes
-        Cylindrical2dVertexMesh* p_mesh2 = generator.GetCylindricalMesh();
-
-        // Compare meshes
-        VertexMesh<2,2>& r_mesh = (static_cast<VertexBasedTissue<2>*>(&(p_simulator->rGetTissue())))->rGetMesh();
-        CompareMeshes(p_mesh2, &r_mesh);
-
-        // Tidy up
-        delete p_simulator;
-    }
-
     /**
      * Test a crypt simulation with a boundary force on the crypt base.
      * \todo see #1100
      */
     void TestCryptSimulationWithBoundaryForce() throw (Exception)
     {
-        // Set end time
-        double end_time = 0.01;
-
         // Create mesh
-        HoneycombVertexMeshGenerator generator(6, 8, true, true);
+        unsigned crypt_width = 4;
+        unsigned crypt_height = 6;
+        HoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
-        // Create cells
+        // Create cells, bottom row are STEM rest are DIFFERENTIATED. 
         std::vector<TissueCell> cells;
-        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
-        {
-            double birth_time = - RandomNumberGenerator::Instance()->ranf()*
-                                 ( TissueConfig::Instance()->GetTransitCellG1Duration()
-                                    + TissueConfig::Instance()->GetSG2MDuration() );
-
-            CellProliferativeType cell_type;
-
-            // Cells 0, 1, 2 and 3 are stem cells
-            if (elem_index < 6)
-            {
-                birth_time = - 2.0*(double)elem_index;
-                cell_type = STEM;
-            }
-            else
-            {
-                cell_type = DIFFERENTIATED;
-            }
-
-            TissueCell cell(cell_type, HEALTHY, new StochasticDurationGenerationBasedCellCycleModel());
-            cell.SetBirthTime(birth_time);
-            cells.push_back(cell);
-        }
+		StochasticDurationGenerationBasedCellCycleModelCellsGeneratorForVertex<2> cells_generator;
+        cells_generator.GenerateForVertexCrypt(cells, *p_mesh, std::vector<unsigned>(), true, 0.8,0.8,0.8,0.8);
 
         // Create tissue
         VertexBasedTissue<2> crypt(*p_mesh, cells);
@@ -643,19 +465,16 @@ public:
 
         // Create crypt simulation from tissue and force law
         VertexCryptSimulation2d simulator(crypt, force_collection);
-        simulator.SetSamplingTimestepMultiple(2);
+        simulator.SetSamplingTimestepMultiple(50);
+        double end_time = 0.1;
         simulator.SetEndTime(end_time);
         simulator.SetOutputDirectory("TestVertexCryptWithBoundaryForce");
 
         // Make crypt shorter for sloughing
-        TissueConfig::Instance()->SetCryptLength(8.0);
-
+        TissueConfig::Instance()->SetCryptLength(6.0);
         SloughingCellKiller<2> sloughing_cell_killer(&crypt);
         simulator.AddCellKiller(&sloughing_cell_killer);
-
-        //Make sure output directory is empty
-        OutputFileHandler file_handler(simulator.GetOutputDirectory(), true);
-
+        
         // Run simulation
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
 
@@ -666,6 +485,60 @@ public:
         delete p_simulator;
     }
 
+    /**
+     * Test that archiving a crypt simulation correctly archives its mesh.
+     */
+    void TestMeshSurvivesSaveLoad() throw (Exception)
+    {
+        // Create mesh
+        unsigned crypt_width = 4;
+        unsigned crypt_height = 6;
+        HoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true);
+        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+
+        // Create cells
+        std::vector<TissueCell> cells;
+        StochasticDurationGenerationBasedCellCycleModelCellsGeneratorForVertex<2> cells_generator;
+        cells_generator.GenerateForVertexCrypt(cells, *p_mesh, std::vector<unsigned>(), true);
+        
+        // Create tissue
+        VertexBasedTissue<2> crypt(*p_mesh, cells);
+
+        // Create force law
+        NagaiHondaForce<2> force_law;
+        std::vector<AbstractForce<2>*> force_collection;
+        force_collection.push_back(&force_law);
+
+        // Create crypt simulation from tissue and force law
+        VertexCryptSimulation2d simulator(crypt, force_collection);
+        simulator.SetOutputDirectory("VertexCrypt2DArchive");
+        simulator.SetEndTime(0.1);
+
+        /*
+         * Memory leak (unconditional jump) without the following line. The
+         * archiver assumes that a Solve has been called and simulation time
+         * has been set up properly. In this test it hasn't, so we need this
+         * to avoid a memory leak.
+         */
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(0.1, 100);
+
+        // Save
+        TissueSimulationArchiver<2, VertexCryptSimulation2d>::Save(&simulator);
+
+        // Load
+        VertexCryptSimulation2d* p_simulator;
+        p_simulator = TissueSimulationArchiver<2, VertexCryptSimulation2d>::Load("VertexCrypt2DArchive", 0.0);
+
+        // Create an identical mesh for comparison purposes
+        Cylindrical2dVertexMesh* p_mesh2 = generator.GetCylindricalMesh();
+
+        // Compare meshes
+        VertexMesh<2,2>& r_mesh = (static_cast<VertexBasedTissue<2>*>(&(p_simulator->rGetTissue())))->rGetMesh();
+        CompareMeshes(p_mesh2, &r_mesh);
+
+        // Tidy up
+        delete p_simulator;
+    }
 };
 
 #endif /*TESTVERTEXCRYPTSIMULATION2D_HPP_*/
