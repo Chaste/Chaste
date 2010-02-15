@@ -1220,9 +1220,9 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetAreaOfElement(2), 0.3, 1e-6);
         TS_ASSERT_DELTA(vertex_mesh.GetPerimeterOfElement(2), 1.2+0.2*sqrt(41.0), 1e-6);
 
-        // Perform a T1 swap on nodes 4 and 5
+        // Perform a T1 swap on nodes 5 and 4. Note: this way round to ensure coverage of boundary node tracking.
         VertexElementMap map(vertex_mesh.GetNumElements());
-        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5), map);
+        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4), map);
 
         // Test moved nodes are in the correct place
         TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.6, 1e-8);
@@ -1270,7 +1270,8 @@ public:
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
         }
         
-        /* Note: the above and the following setup is tested TestReMeshForT1Swaps().
+        /* Note: the above and the following setup is also tested in TestReMeshForT1Swaps().
+         * This test ensures coverage
          * 
          * |\   /|  
          * | \ / |
