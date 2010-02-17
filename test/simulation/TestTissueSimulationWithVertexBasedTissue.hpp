@@ -277,7 +277,7 @@ public:
         // Set up tissue simulation
         TissueSimulation<2> simulator(tissue, force_collection);
         simulator.SetOutputDirectory("TestVertexMonolayerWithCellBirth");
-        simulator.SetSamplingTimestepMultiple(100);
+        simulator.SetSamplingTimestepMultiple(50);
         simulator.SetEndTime(0.1);
 
         // Run simulation
@@ -293,7 +293,7 @@ public:
         TS_ASSERT_EQUALS(new_num_cells, old_num_cells+1);
     }
 
-    void noTestVertexMonolayerLong() throw (Exception)
+    void TestVertexMonolayerLong() throw (Exception)
     {
         // Create a simple 2D VertexMesh
         HoneycombVertexMeshGenerator generator(3, 3);
@@ -303,7 +303,7 @@ public:
         std::vector<TissueCell> cells;
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
-            CellProliferativeType cell_type = TRANSIT;
+            CellProliferativeType cell_type = STEM;
 
             double birth_time = - RandomNumberGenerator::Instance()->ranf()*
                                  ( TissueConfig::Instance()->GetTransitCellG1Duration()
@@ -326,11 +326,11 @@ public:
         // Set up tissue simulation
         TissueSimulation<2> simulator(tissue, force_collection);
         simulator.SetOutputDirectory("TestVertexMonolayerLong");
-        simulator.SetSamplingTimestepMultiple(100);
-        simulator.SetEndTime(30.0); // at 35.6 a void forms and need to deal with this!!
+        simulator.SetSamplingTimestepMultiple(50);
+        simulator.SetEndTime(50.0); // at 35.6 a void forms and need to deal with this!!
 
         // Adjust Max Generations so cells keep proliferating
-        TissueConfig::Instance()->SetMaxTransitGenerations(8u);
+        TissueConfig::Instance()->SetMaxTransitGenerations(5u);
 
         // Run simulation
         simulator.Solve();

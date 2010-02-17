@@ -125,7 +125,7 @@ public:
         // Set up cells
         std::vector<TissueCell> cells;
         FixedDurationGenerationBasedCellCycleModelCellsGeneratorForVertex<2> cells_generator;
-        cells_generator.GenerateForVertexCrypt(cells, *p_mesh, std::vector<unsigned>(), true);
+        cells_generator.GenerateForVertexCrypt(cells, *p_mesh, true);
         
         // Create tissue
         VertexBasedTissue<2> tissue(*p_mesh, cells);
@@ -182,7 +182,7 @@ public:
         // Create cells
         std::vector<TissueCell> cells;
         FixedDurationGenerationBasedCellCycleModelCellsGeneratorForVertex<2> cells_generator;
-        cells_generator.GenerateForVertexCrypt(cells, *p_mesh, std::vector<unsigned>(), true);
+        cells_generator.GenerateForVertexCrypt(cells, *p_mesh, true);
         
         // Create tissue
         VertexBasedTissue<2> crypt(*p_mesh, cells);
@@ -232,7 +232,7 @@ public:
         // Create cells, all differentiated
         std::vector<TissueCell> cells;
         FixedDurationGenerationBasedCellCycleModelCellsGeneratorForVertex<2> cells_generator;
-        cells_generator.GenerateForVertexCrypt(cells, *p_mesh, std::vector<unsigned>(), true, 0.0, 0.0, 0.0, 0.0);
+        cells_generator.GenerateForVertexCrypt(cells, *p_mesh, true, 0.0, 0.0, 0.0, 0.0);
 
         // Create tissue
         VertexBasedTissue<2> crypt(*p_mesh, cells);
@@ -268,7 +268,7 @@ public:
         // Create cells, bottom row are STEM rest are DIFFERENTIATED. 
         std::vector<TissueCell> cells;
         FixedDurationGenerationBasedCellCycleModelCellsGeneratorForVertex<2> cells_generator;
-        cells_generator.GenerateForVertexCrypt(cells, *p_mesh, std::vector<unsigned>(), true, 0.8,0.8,0.8,0.8);
+        cells_generator.GenerateForVertexCrypt(cells, *p_mesh, true, 0.8,0.8,0.8,0.8);
         
         // Cell 1 should divide at time t=0.05
         cells[0].SetBirthTime(-23.95);
@@ -315,7 +315,7 @@ public:
         // Create cells
         std::vector<TissueCell> cells;
         StochasticDurationGenerationBasedCellCycleModelCellsGeneratorForVertex<2> cells_generator;
-        cells_generator.GenerateForVertexCrypt(cells, *p_mesh, std::vector<unsigned>(), true);
+        cells_generator.GenerateForVertexCrypt(cells, *p_mesh, true);
 
         // Create tissue
         VertexBasedTissue<2> crypt(*p_mesh, cells);
@@ -356,7 +356,7 @@ public:
         // Create cells
         std::vector<TissueCell> cells;
         SimpleWntCellCycleModelCellsGeneratorForVertex<2> cells_generator;
-        cells_generator.GenerateForVertexCrypt(cells, *p_mesh, std::vector<unsigned>(), true);
+        cells_generator.GenerateForVertexCrypt(cells, *p_mesh, true);
         
         // Create tissue
         VertexBasedTissue<2> crypt(*p_mesh, cells);
@@ -401,7 +401,7 @@ public:
         // Create cells
         std::vector<TissueCell> cells;
         SimpleWntCellCycleModelCellsGeneratorForVertex<2> cells_generator;
-        cells_generator.GenerateForVertexCrypt(cells, *p_mesh, std::vector<unsigned>(), true);   
+        cells_generator.GenerateForVertexCrypt(cells, *p_mesh, true);   
         
         // Create tissue
         VertexBasedTissue<2> crypt(*p_mesh, cells);
@@ -448,7 +448,7 @@ public:
         // Create cells, bottom row are STEM rest are DIFFERENTIATED. 
         std::vector<TissueCell> cells;
 		StochasticDurationGenerationBasedCellCycleModelCellsGeneratorForVertex<2> cells_generator;
-        cells_generator.GenerateForVertexCrypt(cells, *p_mesh, std::vector<unsigned>(), true, 0.8,0.8,0.8,0.8);
+        cells_generator.GenerateForVertexCrypt(cells, *p_mesh, true, 0.8,0.8,0.8,0.8);
 
         // Create tissue
         VertexBasedTissue<2> crypt(*p_mesh, cells);
@@ -499,7 +499,7 @@ public:
         // Create cells
         std::vector<TissueCell> cells;
         StochasticDurationGenerationBasedCellCycleModelCellsGeneratorForVertex<2> cells_generator;
-        cells_generator.GenerateForVertexCrypt(cells, *p_mesh, std::vector<unsigned>(), true);
+        cells_generator.GenerateForVertexCrypt(cells, *p_mesh, true);
         
         // Create tissue
         VertexBasedTissue<2> crypt(*p_mesh, cells);

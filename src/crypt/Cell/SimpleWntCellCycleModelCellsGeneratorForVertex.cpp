@@ -54,7 +54,6 @@ double SimpleWntCellCycleModelCellsGeneratorForVertex<DIM>::GetTypicalStemCellCy
 template<unsigned DIM>
 void SimpleWntCellCycleModelCellsGeneratorForVertex<DIM>::GenerateForVertexCrypt(std::vector<TissueCell>& rCells,
                                  VertexMesh<2,2>& rMesh,
-                                 const std::vector<unsigned> locationIndices,
                                  bool randomBirthTimes,
                                  double y0,
                                  double y1,
@@ -68,7 +67,7 @@ void SimpleWntCellCycleModelCellsGeneratorForVertex<DIM>::GenerateForVertexCrypt
 
     RandomNumberGenerator* p_random_num_gen = RandomNumberGenerator::Instance();
 
-    unsigned num_cells = locationIndices.empty() ? rMesh.GetNumElements() : locationIndices.size();
+    unsigned num_cells = rMesh.GetNumElements();
     
 
     AbstractCellCycleModel* p_cell_cycle_model = NULL;
@@ -83,19 +82,8 @@ void SimpleWntCellCycleModelCellsGeneratorForVertex<DIM>::GenerateForVertexCrypt
         CellProliferativeType cell_type;
         unsigned generation;
 
-        double y = 0.0;
-        if (!locationIndices.empty())
-        {
-            if ( std::find(locationIndices.begin(), locationIndices.end(), i) != locationIndices.end() )
-            {
-                y = rMesh.GetCentroidOfElement(i)[1];
-            }
-        }
-        else
-        {
-            y = rMesh.GetCentroidOfElement(i)[1];
-        }
-
+        double y = rMesh.GetCentroidOfElement(i)[1];
+        
         p_cell_cycle_model = CreateCellCycleModel();
         typical_transit_cycle_time = this->GetTypicalTransitCellCycleTime();
         typical_stem_cycle_time = GetTypicalStemCellCycleTime();
@@ -150,17 +138,7 @@ void SimpleWntCellCycleModelCellsGeneratorForVertex<DIM>::GenerateForVertexCrypt
 
         cell.SetBirthTime(birth_time);
 
-        if (!locationIndices.empty())
-        {
-            if ( std::find(locationIndices.begin(), locationIndices.end(), i) != locationIndices.end() )
-            {
-                rCells.push_back(cell);
-            }
-        }
-        else
-        {
-            rCells.push_back(cell);
-        }
+        rCells.push_back(cell);
     }
 }
 
