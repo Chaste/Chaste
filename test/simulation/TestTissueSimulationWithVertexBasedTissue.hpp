@@ -293,7 +293,7 @@ public:
         TS_ASSERT_EQUALS(new_num_cells, old_num_cells+1);
     }
 
-    void TestVertexMonolayerLong() throw (Exception)
+    void noTestVertexMonolayerLong() throw (Exception)
     {
         // Create a simple 2D VertexMesh
         HoneycombVertexMeshGenerator generator(3, 3);
