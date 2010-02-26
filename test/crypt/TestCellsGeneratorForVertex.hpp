@@ -53,19 +53,19 @@ public:
         unsigned crypt_height = 6;
         HoneycombVertexMeshGenerator mesh_generator(crypt_width, crypt_height, true);
         Cylindrical2dVertexMesh* p_mesh = mesh_generator.GetCylindricalMesh();
-        
-        
+
+
         double y0 = 1.0;
         double y1 = 2.0;
         double y2 = 3.0;
         double y3 = 4.0;
 
-		// Create cells
+        // Create cells
         std::vector<TissueCell> fixed_cells, stochastic_cells;
         FixedDurationGenerationBasedCellCycleModelCellsGeneratorForVertex<2> fixed_cells_generator;
         fixed_cells_generator.GenerateForVertexCrypt(fixed_cells, *p_mesh, true, y0, y1, y2,y3 );
 
-		StochasticDurationGenerationBasedCellCycleModelCellsGeneratorForVertex<2> stochastic_cells_generator;
+        StochasticDurationGenerationBasedCellCycleModelCellsGeneratorForVertex<2> stochastic_cells_generator;
         stochastic_cells_generator.GenerateForVertexCrypt(stochastic_cells, *p_mesh, true, y0, y1, y2,y3 );
 
 
@@ -106,7 +106,7 @@ public:
             }
         }
     }
-    
+
 
     void TestSimpleWntCellCycleModelCellsGeneratorForVertexGenerateForVertexCrypt() throw(Exception)
     {
@@ -115,7 +115,7 @@ public:
         unsigned crypt_height = 6;
         HoneycombVertexMeshGenerator mesh_generator(crypt_width, crypt_height, true);
         Cylindrical2dVertexMesh* p_mesh = mesh_generator.GetCylindricalMesh();
-        
+
         // Create cells
         std::vector<TissueCell> cells;
         SimpleWntCellCycleModelCellsGeneratorForVertex<2> cells_generator;

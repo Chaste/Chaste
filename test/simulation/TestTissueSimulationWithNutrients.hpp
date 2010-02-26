@@ -275,7 +275,7 @@ public:
         // Work out where one of the previous tests wrote its files
         OutputFileHandler handler("TissueSimulationWithOxygen", false);
         std::string results_dir = handler.GetOutputDirectoryFullPath() + "results_from_time_0";
-       
+
         NumericFileComparison comp_nut(results_dir + "/results.viznutrient", "notforrelease_cell_based/test/data/TissueSimulationWithOxygen/results.viznutrient");
         TS_ASSERT(comp_nut.CompareFiles());
         TS_ASSERT_EQUALS(system(("diff " + results_dir + "/results.viznutrient notforrelease_cell_based/test/data/TissueSimulationWithOxygen/results.viznutrient").c_str()), 0);

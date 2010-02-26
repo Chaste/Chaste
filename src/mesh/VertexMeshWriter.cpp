@@ -74,7 +74,7 @@ VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::~VertexMeshWriter()
     }
 
     delete mpIters;
-        
+
     if(mpNodeMap)
     {
         delete mpNodeMap;
@@ -94,16 +94,16 @@ std::vector<double> VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextNode()
     {
         std::vector<double> coords(SPACE_DIM);
 
-        assert(this->mNumNodes==mpMesh->GetNumNodes());       
+        assert(this->mNumNodes==mpMesh->GetNumNodes());
 
         // get the node coords using the node iterator (so to skip deleted nodes etc)
         for (unsigned j=0; j<SPACE_DIM; j++)
         {
             coords[j] = (*(mpIters->pNodeIter))->GetPoint()[j];
         }
-        
+
         ++(*(mpIters->pNodeIter));
-        
+
         return coords;
     }
     else
@@ -117,7 +117,7 @@ ElementData VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextElement()
 {
     if(mpMesh)
     {
-        assert(this->mNumElements==mpMesh->GetNumElements()); 
+        assert(this->mNumElements==mpMesh->GetNumElements());
 
         ElementData elem_data;
         elem_data.NodeIndices.resize((*(mpIters->pElemIter))->GetNumNodes());
@@ -127,10 +127,10 @@ ElementData VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextElement()
             elem_data.NodeIndices[j] = mpMesh->IsMeshChanging() ? mpNodeMap->GetNewIndex(old_index) : old_index;
         }
 // \todo: set attribute
-        
+
         ++(*(mpIters->pElemIter));
-        
-        return elem_data;    
+
+        return elem_data;
     }
     else
     {
@@ -251,13 +251,13 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(VertexMesh<EL
     mpMesh = &rMesh;
     this->mNumNodes = mpMesh->GetNumNodes();
     this->mNumElements = mpMesh->GetNumElements();
-    
+
     typedef typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator NodeIterType;
     mpIters->pNodeIter = new NodeIterType(mpMesh->GetNodeIteratorBegin());
 
     typedef typename VertexMesh<ELEMENT_DIM,SPACE_DIM>::VertexElementIterator ElemIterType;
     mpIters->pElemIter = new ElemIterType(mpMesh->GetElementIteratorBegin());
-    
+
     // Set up node map if we might have deleted nodes
     mNodeMapCurrentIndex = 0;
     if (mpMesh->IsMeshChanging())
@@ -267,7 +267,7 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(VertexMesh<EL
         {
             mpNodeMap->SetNewIndex(it->GetIndex(), mNodeMapCurrentIndex++);
         }
-    }   
+    }
 
     WriteFiles();
 }

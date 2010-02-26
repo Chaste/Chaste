@@ -78,7 +78,7 @@ public:
 
     /**
      * Default constructor.
-     * 
+     *
      * @param width the width (circumference) of the mesh
      * @param nodes vector of pointers to nodes
      * @param vertexElements vector of pointers to VertexElements

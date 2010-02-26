@@ -439,10 +439,10 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), num_old_nodes);
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), num_old_elements-1);
     }
-     
+
     void TestCylindricalElementIncludesPointAndGetLocalIndexForElementEdgeClosestToPoint()
     {
-        // Set up a simple cylindrical mesh with one triangular element 
+        // Set up a simple cylindrical mesh with one triangular element
 
         // Make 3 nodes
         std::vector<Node<2>*> nodes;
@@ -456,7 +456,7 @@ public:
 
         // Make mesh
         Cylindrical2dVertexMesh mesh(10.0, nodes, elements);
-        
+
         TS_ASSERT_DELTA(mesh.GetAreaOfElement(0), 4.0, 1e-10);
 
         // Make some test points and test ElementIncludesPoint()

@@ -50,7 +50,7 @@ c_vector<double, 2> Cylindrical2dVertexMesh::GetVectorFromAtoB(const c_vector<do
 
     c_vector<double, 2> vector = rLocation2 - rLocation1;
     vector[0] = fmod(vector[0], mWidth);
-    
+
     // If the points are more than halfway around the cylinder apart, measure the other way
     if (vector[0] > mWidth/2.0)
     {

@@ -80,14 +80,14 @@ HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsA
                     double x_coord = ((j%4 == 0)||(j%4 == 3)) ? i+0.5 : i;
                     double y_coord = (1.5*j - 0.5*(j%2))*0.5/sqrt(3);
                     bool is_boundary_node = (j==0 || j==1 || j==2*numElementsUp || j==2*numElementsUp+1) ? true : false;
-    
+
                     Node<2>* p_node = new Node<2>(node_index, is_boundary_node , x_coord, y_coord);
                     nodes.push_back(p_node);
                     node_index++;
                 }
             }
         }
-    
+
         /*
          * Create the elements. The array node_indices contains the
          * global node indices from bottom, going anticlockwise.
@@ -97,14 +97,14 @@ HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsA
             for (unsigned i=0; i<numElementsAcross; i++)
             {
                 element_index = j*numElementsAcross + i;
-    
+
                 node_indices[0] = 2*j*(numElementsAcross) + i + 1*(j%2==1);
                 node_indices[1] = node_indices[0] + numElementsAcross + 1*(j%2==0);
                 node_indices[2] = node_indices[0] + 2*numElementsAcross + 1*(j%2==0);
                 node_indices[3] = node_indices[0] + 3*numElementsAcross;
                 node_indices[4] = node_indices[0] + 2*numElementsAcross - 1*(j%2==1);
                 node_indices[5] = node_indices[0] + numElementsAcross - 1*(j%2==1);
-    
+
                 if (i==numElementsAcross-1) // on far right
                 {
                     node_indices[0] -= numElementsAcross*(j%2==1);
@@ -112,7 +112,7 @@ HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsA
                     node_indices[2] -= numElementsAcross;
                     node_indices[3] -= numElementsAcross*(j%2==1);
                 }
-    
+
                 std::vector<Node<2>*> element_nodes;
                 for (unsigned k=0; k<6; k++)
                 {
@@ -122,7 +122,7 @@ HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsA
                 elements.push_back(p_element);
             }
         }
-    
+
         // If the mesh has an imposed flat bottom delete unnessesary nodes
         if (isFlatBottom)
         {
@@ -139,7 +139,7 @@ HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsA
     else
     {
         // Create the nodes, row by row, from the bottom up
-    
+
         // On the first row we have numElementsAcross nodes, all of which are boundary nodes
         for (unsigned i=0; i<numElementsAcross; i++)
         {
@@ -147,7 +147,7 @@ HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsA
             nodes.push_back(p_node);
             node_index++;
         }
-    
+
         /*
          * On each interior row we have numElementsAcross+1 nodes. On the second and penultimate
          * row all nodes are boundary nodes. On other rows the first and last nodes only
@@ -160,13 +160,13 @@ HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsA
                 double x_coord = ((j%4 == 0)||(j%4 == 3)) ? i+0.5 : i;
                 double y_coord = (1.5*j - 0.5*(j%2))*0.5/sqrt(3);
                 bool is_boundary_node = (j==1 || j==2*numElementsUp || i==0 || i==numElementsAcross) ? true : false;
-    
+
                 Node<2>* p_node = new Node<2>(node_index, is_boundary_node, x_coord, y_coord);
                 nodes.push_back(p_node);
                 node_index++;
             }
         }
-    
+
         /*
          * On the last row we have numElementsAcross nodes, all of which are boundary nodes.
          */
@@ -180,7 +180,7 @@ HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsA
         for (unsigned i=1; i<numElementsAcross; i++)
         {
             double x_coord = (((2*numElementsUp+1)%4 == 0)||((2*numElementsUp+1)%4 == 3)) ? i+0.5 : i;
-    
+
             Node<2>* p_node = new Node<2>(node_index, true, x_coord, y_coord);
             nodes.push_back(p_node);
             node_index++;
@@ -191,7 +191,7 @@ HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsA
             nodes.push_back(p_node);
             node_index++;
         }
-    
+
         /*
          * Create the elements. The array node_indices contains the
          * global node indices from bottom, going anticlockwise.
@@ -213,19 +213,19 @@ HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsA
                 node_indices[3] = node_indices[2] + numElementsAcross + 1*(j%2==1 && j<numElementsUp-1);
                 node_indices[4] = node_indices[2] - 1;
                 node_indices[5] = node_indices[1] - 1;
-    
+
                 std::vector<Node<2>*> element_nodes;
                 for (unsigned k=0; k<6; k++)
                 {
                    element_nodes.push_back(nodes[node_indices[k]]);
                 }
-    
+
                 element_index = j*numElementsAcross + i;
                 VertexElement<2,2>* p_element = new VertexElement<2,2>(element_index, element_nodes);
                 elements.push_back(p_element);
             }
         }
-    
+
         mpMesh = new VertexMesh<2,2>(nodes, elements, cellRearrangementThreshold, edgeDivisionThreshold, t2Threshold);
     }
 }

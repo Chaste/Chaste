@@ -910,7 +910,7 @@ public:
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
-            
+
             // Restore the tissue
             (*p_arch) >> *p_simulation_time;
             VertexBasedTissue<2>* p_tissue;

@@ -98,7 +98,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetElement(10)->GetNodeGlobalIndex(3), 41u);
         TS_ASSERT_EQUALS(p_mesh->GetElement(10)->GetNodeGlobalIndex(4), 35u);
         TS_ASSERT_EQUALS(p_mesh->GetElement(10)->GetNodeGlobalIndex(5), 29u);
-  
+
         // Element 14 contains nodes 27, 34, 40, 45, 39 and 33
         TS_ASSERT_EQUALS(p_mesh->GetElement(14)->GetNumNodes(), 6u);
         TS_ASSERT_EQUALS(p_mesh->GetElement(14)->GetNodeGlobalIndex(0), 27u);
@@ -122,13 +122,13 @@ public:
         // Node 12 is in elements 0 and 1 and 5
         temp_list.insert(5u);
         TS_ASSERT_EQUALS(p_mesh->GetNode(12)->rGetContainingElementIndices(), temp_list);
-        
-        // The bottom row of nodes should be boundary nodes 
+
+        // The bottom row of nodes should be boundary nodes
         TS_ASSERT(p_mesh->GetNode(0)->IsBoundaryNode());
         TS_ASSERT(p_mesh->GetNode(1)->IsBoundaryNode());
         TS_ASSERT(p_mesh->GetNode(2)->IsBoundaryNode());
         TS_ASSERT(p_mesh->GetNode(3)->IsBoundaryNode());
-        
+
         // \TODO Also test the rest of the nodes for boundary
     }
 
@@ -139,7 +139,7 @@ public:
         // Coverage
         TS_ASSERT_THROWS_THIS(generator.GetMesh(),
                               "A cylindrical mesh was created but a normal mesh is being requested.");
-        
+
         // Create periodic mesh
         Cylindrical2dVertexMesh* p_cylindrical_mesh = generator.GetCylindricalMesh();
 
@@ -165,8 +165,8 @@ public:
         // The flat bottomed periodic mesh should have the same number of elements and nodes
         TS_ASSERT_EQUALS(p_flat_cylindrical_mesh->GetNumElements(), 16u);
         TS_ASSERT_EQUALS(p_flat_cylindrical_mesh->GetNumNodes(), 36u);
-        
-        // The bottom rov of nodes should be boundary nodes 
+
+        // The bottom rov of nodes should be boundary nodes
         TS_ASSERT(p_flat_cylindrical_mesh->GetNode(0)->IsBoundaryNode());
         TS_ASSERT(p_flat_cylindrical_mesh->GetNode(1)->IsBoundaryNode());
         TS_ASSERT(p_flat_cylindrical_mesh->GetNode(2)->IsBoundaryNode());

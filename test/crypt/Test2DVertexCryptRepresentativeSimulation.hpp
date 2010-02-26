@@ -56,7 +56,7 @@ public:
     {
         // Set start time
         SimulationTime::Instance()->SetStartTime(0.0);
-        
+
         // Create mesh
         unsigned crypt_width = 18;
         unsigned crypt_height = 25;

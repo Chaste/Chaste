@@ -68,7 +68,7 @@ void SimpleWntCellCycleModelCellsGeneratorForVertex<DIM>::GenerateForVertexCrypt
     RandomNumberGenerator* p_random_num_gen = RandomNumberGenerator::Instance();
 
     unsigned num_cells = rMesh.GetNumElements();
-    
+
 
     AbstractCellCycleModel* p_cell_cycle_model = NULL;
     double typical_transit_cycle_time;
@@ -83,7 +83,7 @@ void SimpleWntCellCycleModelCellsGeneratorForVertex<DIM>::GenerateForVertexCrypt
         unsigned generation;
 
         double y = rMesh.GetCentroidOfElement(i)[1];
-        
+
         p_cell_cycle_model = CreateCellCycleModel();
         typical_transit_cycle_time = this->GetTypicalTransitCellCycleTime();
         typical_stem_cycle_time = GetTypicalStemCellCycleTime();

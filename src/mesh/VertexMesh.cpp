@@ -44,7 +44,7 @@ VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh(std::vector<Node<SPACE_DIM>*> nod
     assert(edgeDivisionThreshold > 0.0);
     assert(t2Threshold > 0.0);
 
-    // Reset member variables and clear mNodes and mElements 
+    // Reset member variables and clear mNodes and mElements
     Clear();
 
     // Populate mNodes and mElements
@@ -553,10 +553,10 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::DeleteElementPriorToReMesh(unsigned ind
             p_node->MarkAsDeleted();
             mDeletedNodeIndices.push_back(p_node->GetIndex());
         }
-        
-        // mark all the nodes contained in the removed element as boundary nodes
+
+        // Mark all the nodes contained in the removed element as boundary nodes
         p_node->SetAsBoundaryNode(true);
-        
+
     }
 
     // Mark this element as deleted
@@ -784,7 +784,7 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElementMap)
                              ++it)
                         {
                             ///\todo this magic number needs to be investigated.
-                            if (this->GetElement(*it)->GetNumNodes() <= 3)//&&(this->GetAreaOfElement(*it) < 2.0*GetT2Threshold())) 
+                            if (this->GetElement(*it)->GetNumNodes() <= 3)//&&(this->GetAreaOfElement(*it) < 2.0*GetT2Threshold()))
                             {
                                 triangular_element = true;
                             }
@@ -1035,14 +1035,14 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>* pNode
                      * In this case, one node is contained in one element and
                      * the other node is contained in three elements:
                      *
-                     *    A   B 
-                     * 
+                     *    A   B
+                     *
                      *  empty   /
                      *         / (3)
                      * ---o---o-----   (element number in brackets)
                      *  (1)    \ (2)
                      *          \
-                     * 
+                     *
                      * We perform a node merge in this case.
                      */
                     PerformNodeMerge(pNodeA, pNodeB);
@@ -1155,11 +1155,11 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>* pNode
                              * We perform a node merge in this case.
                              */
                             PerformNodeMerge(pNodeA, pNodeB);
-    
+
                             // Remove the deleted node and re-index
                             RemoveDeletedNodes();
                             break;
-                        }              
+                        }
                         default:
                             NEVER_REACHED;
                     }
@@ -1387,26 +1387,26 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* pNodeA,
             }
         }
     }
-    
-    //Sort out boundary nodes 
+
+    // Sort out boundary nodes
     if (pNodeA->IsBoundaryNode() || pNodeB->IsBoundaryNode())
     {
-	    if (pNodeA->GetNumContainingElements()==3)
-	    {
-	    	pNodeA->SetAsBoundaryNode(false);
-	    }
-	    else
-	    {
-	    	pNodeA->SetAsBoundaryNode(true);
-	    }
-	    if (pNodeB->GetNumContainingElements()==3)
-	    {
-	    	pNodeB->SetAsBoundaryNode(false);
-	    }
-	    else
-	    {
-	    	pNodeB->SetAsBoundaryNode(true);
-	    }
+        if (pNodeA->GetNumContainingElements()==3)
+        {
+            pNodeA->SetAsBoundaryNode(false);
+        }
+        else
+        {
+            pNodeA->SetAsBoundaryNode(true);
+        }
+        if (pNodeB->GetNumContainingElements()==3)
+        {
+            pNodeB->SetAsBoundaryNode(false);
+        }
+        else
+        {
+            pNodeB->SetAsBoundaryNode(true);
+        }
     }
 }
 
@@ -1595,13 +1595,13 @@ unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(VertexE
         {
             intersection = position_b - 2*mCellRearrangementThreshold*a_to_b/norm_2(a_to_b);
         }
-        
+
         bool is_boundary = false;
         if (p_node_A->IsBoundaryNode() && p_node_B->IsBoundaryNode())
         {
             is_boundary = true;
         }
-        
+
         // Add a new node to the mesh at the location of the intersection
         unsigned new_node_global_index = this->AddNode(new Node<SPACE_DIM>(0, is_boundary, intersection[0], intersection[1]));
         nodes_added++;
@@ -1843,15 +1843,15 @@ bool VertexMesh<ELEMENT_DIM, SPACE_DIM>::ElementIncludesPoint(const c_vector<dou
     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(elementIndex);
     unsigned num_nodes = p_element->GetNumNodes();
 
-    // Remap the origin to the first vertex to allow alternative distance metrics to be used in subclasses 
+    // Remap the origin to the first vertex to allow alternative distance metrics to be used in subclasses
     c_vector<double, SPACE_DIM> first_vertex = p_element->GetNodeLocation(0);
-    
+
     c_vector<double, SPACE_DIM> test_point =  GetVectorFromAtoB(first_vertex,rTestPoint);
 
     // Loop over edges of the element
     for (unsigned local_index=0; local_index<num_nodes; local_index++)
     {
-        
+
         // Get the end points of this edge
         // Remap to the origin to allow alternative distance metrics to be used in subclasses
         c_vector<double, SPACE_DIM> vertexA = GetVectorFromAtoB(first_vertex, p_element->GetNodeLocation(local_index));

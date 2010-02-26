@@ -598,7 +598,7 @@ void TissueSimulationWithNutrients<DIM>::WriteAverageRadialNutrientDistribution(
          cell_iter != this->mrTissue.End();
          ++cell_iter)
     {
-       centre += (this->mrTissue.GetLocationOfCellCentre(*cell_iter)) / num_nodes_as_double; 
+       centre += (this->mrTissue.GetLocationOfCellCentre(*cell_iter)) / num_nodes_as_double;
     }
 
     // Calculate the distance between each node and the centre of the tissue, as well as the maximum of these

@@ -100,10 +100,10 @@ void TissueSimulationWithNutrientsAssembler<DIM>::InitialiseForSolve(Vec initial
 {
     // linear system created here
     BaseClassType::InitialiseForSolve(initialSolution);
-    
+
     this->mpLinearSystem->SetMatrixIsSymmetric(true);
 }
-    
+
 
 
 /**

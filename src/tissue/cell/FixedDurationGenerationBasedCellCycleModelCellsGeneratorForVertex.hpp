@@ -35,8 +35,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 /**
  * A helper class for generating a vector of cells with
  * SimpleWntCellCycleModels for a given vertex mesh.
- * 
- * \todo this should be added to the AbstractCellsGenerator class when 
+ *
+ * \todo this should be added to the AbstractCellsGenerator class when
  * vertex models are added to the main code.
  */
 template<unsigned DIM>
@@ -79,7 +79,7 @@ public:
      * @param y3  below this line cells are generation 3 (defaults to 4.0)
      * @param initialiseCells  whether to initialise the cell cycle models as each
      *   cell is created
-     * 
+     *
      * \todo this should be refactored with GenerateForCrypt in AbstractCellsGenerator when Vertex code is released
      */
     void GenerateForVertexCrypt(std::vector<TissueCell>& rCells,
