@@ -160,3 +160,8 @@ void NagaiHondaForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM
 template class NagaiHondaForce<1>;
 template class NagaiHondaForce<2>;
 template class NagaiHondaForce<3>;
+
+
+// Serialization for Boost >= 1.36
+#include "SerializationExportWrapperForCpp.hpp"
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(NagaiHondaForce)

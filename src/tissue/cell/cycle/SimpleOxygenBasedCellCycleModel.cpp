@@ -165,3 +165,8 @@ unsigned SimpleOxygenBasedCellCycleModel::GetDimension()
     return mDimension;
 }
 
+
+
+// Serialization for Boost >= 1.36
+#include "SerializationExportWrapperForCpp.hpp"
+CHASTE_CLASS_EXPORT(SimpleOxygenBasedCellCycleModel)

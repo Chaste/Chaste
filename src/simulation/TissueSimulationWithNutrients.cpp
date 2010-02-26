@@ -664,3 +664,8 @@ void TissueSimulationWithNutrients<DIM>::WriteAverageRadialNutrientDistribution(
 template class TissueSimulationWithNutrients<1>;
 template class TissueSimulationWithNutrients<2>;
 template class TissueSimulationWithNutrients<3>;
+
+
+// Serialization for Boost >= 1.36
+#include "SerializationExportWrapperForCpp.hpp"
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(TissueSimulationWithNutrients)

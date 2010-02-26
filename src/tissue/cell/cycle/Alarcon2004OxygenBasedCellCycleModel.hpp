@@ -40,10 +40,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CellwiseData.hpp"
 #include "Exception.hpp"
 
-
-// Needs to be included last
-#include <boost/serialization/export.hpp>
-
 /**
  *  Oxygen-dependent cell cycle model.
  *
@@ -161,7 +157,7 @@ public:
 };
 
 // Declare identifier for the serializer
-#include "TemplatedExport.hpp"
+#include "SerializationExportWrapper.hpp"
 CHASTE_CLASS_EXPORT(Alarcon2004OxygenBasedCellCycleModel)
 
 

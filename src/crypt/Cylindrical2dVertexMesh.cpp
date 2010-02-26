@@ -189,3 +189,8 @@ c_vector<double, 2> Cylindrical2dVertexMesh::GetCentroidOfElement(unsigned index
 
     return centroid;
 }
+
+
+// Serialization for Boost >= 1.36
+#include "SerializationExportWrapperForCpp.hpp"
+CHASTE_CLASS_EXPORT(Cylindrical2dVertexMesh)

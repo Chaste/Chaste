@@ -516,3 +516,8 @@ void VertexBasedTissue<DIM>::GenerateCellResultsAndWriteToFiles()
 template class VertexBasedTissue<1>;
 template class VertexBasedTissue<2>;
 template class VertexBasedTissue<3>;
+
+
+// Serialization for Boost >= 1.36
+#include "SerializationExportWrapperForCpp.hpp"
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(VertexBasedTissue)

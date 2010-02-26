@@ -33,9 +33,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "VertexMesh.hpp"
 
-#include <boost/serialization/export.hpp>// at end of includes
-
-
 /**
  * A subclass of VertexMesh<2,2> for a rectangular mesh with
  * periodic left and right boundaries, representing a cylindrical geometry.
@@ -161,7 +158,7 @@ public:
      c_vector<double, 2> GetCentroidOfElement(unsigned index);
 };
 
-#include "TemplatedExport.hpp"
+#include "SerializationExportWrapper.hpp"
 CHASTE_CLASS_EXPORT(Cylindrical2dVertexMesh)
 
 #endif /*CYLINDRICAL2DVERTEXMESH_HPP_*/

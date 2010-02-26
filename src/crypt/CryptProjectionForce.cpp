@@ -277,3 +277,8 @@ void CryptProjectionForce::AddForceContribution(std::vector<c_vector<double,2> >
         }
     }
 }
+
+
+// Serialization for Boost >= 1.36
+#include "SerializationExportWrapperForCpp.hpp"
+CHASTE_CLASS_EXPORT(CryptProjectionForce)

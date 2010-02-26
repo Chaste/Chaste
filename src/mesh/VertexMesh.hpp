@@ -35,11 +35,9 @@ class VertexMeshWriter;
 #include <iostream>
 #include <map>
 #include <algorithm>
-#include <climits>
 
-
+#include <climits> // Work around Boost bug
 #include <boost/serialization/access.hpp>
-#include <boost/serialization/export.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/split_member.hpp>
@@ -690,7 +688,7 @@ public:
     };
 };
 
-#include "TemplatedExport.hpp"
+#include "SerializationExportWrapper.hpp"
 EXPORT_TEMPLATE_CLASS_ALL_DIMS(VertexMesh);
 
 

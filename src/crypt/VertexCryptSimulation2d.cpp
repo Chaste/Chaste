@@ -116,3 +116,8 @@ void VertexCryptSimulation2d::ApplyTissueBoundaryConditions(const std::vector< c
         assert(p_node->rGetLocation()[1] >= 0.0);
     }
 }
+
+
+// Serialization for Boost >= 1.36
+#include "SerializationExportWrapperForCpp.hpp"
+CHASTE_CLASS_EXPORT(VertexCryptSimulation2d)

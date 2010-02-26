@@ -81,3 +81,8 @@ double VertexCryptBoundaryForce<DIM>::GetForceStrength() const
 template class VertexCryptBoundaryForce<1>;
 template class VertexCryptBoundaryForce<2>;
 template class VertexCryptBoundaryForce<3>;
+
+
+// Serialization for Boost >= 1.36
+#include "SerializationExportWrapperForCpp.hpp"
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(VertexCryptBoundaryForce)

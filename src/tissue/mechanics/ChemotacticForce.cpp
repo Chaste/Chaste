@@ -88,3 +88,8 @@ void ChemotacticForce<DIM>::AddForceContribution(std::vector<c_vector<double, DI
 template class ChemotacticForce<1>;
 template class ChemotacticForce<2>;
 template class ChemotacticForce<3>;
+
+
+// Serialization for Boost >= 1.36
+#include "SerializationExportWrapperForCpp.hpp"
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(ChemotacticForce)

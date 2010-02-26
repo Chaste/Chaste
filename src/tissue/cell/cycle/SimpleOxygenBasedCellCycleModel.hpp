@@ -123,7 +123,7 @@ public:
 };
 
 // Declare identifier for the serializer
-#include "TemplatedExport.hpp"
+#include "SerializationExportWrapper.hpp"
 CHASTE_CLASS_EXPORT(SimpleOxygenBasedCellCycleModel)
 
 

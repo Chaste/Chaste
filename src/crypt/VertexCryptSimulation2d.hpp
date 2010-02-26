@@ -34,9 +34,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "TissueSimulation.hpp"
 #include "VertexBasedTissue.hpp"
 
-// Needs to be included last
-#include <boost/serialization/export.hpp>
-
 
 /**
  * A 2D vertex-based crypt simulation object.
@@ -130,7 +127,7 @@ public :
 
 
 // Declare identifier for the serializer
-#include "TemplatedExport.hpp"
+#include "SerializationExportWrapper.hpp"
 CHASTE_CLASS_EXPORT(VertexCryptSimulation2d)
 
 namespace boost

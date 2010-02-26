@@ -74,3 +74,8 @@ void OxygenBasedCellKiller<SPACE_DIM>::TestAndLabelCellsForApoptosisOrDeath()
 template class OxygenBasedCellKiller<1>;
 template class OxygenBasedCellKiller<2>;
 template class OxygenBasedCellKiller<3>;
+
+
+// Serialization for Boost >= 1.36
+#include "SerializationExportWrapperForCpp.hpp"
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(OxygenBasedCellKiller)
