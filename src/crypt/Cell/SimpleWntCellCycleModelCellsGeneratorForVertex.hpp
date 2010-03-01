@@ -68,10 +68,6 @@ public:
      * @param rMesh  The crypt mesh (A VERTEX MESH)
      * @param randomBirthTimes  Whether to assign the cells random birth times
      *    (this can be expensive computationally with ODE models)
-     * @param y0  below this line cells are generation 0 (defaults to 0.3)
-     * @param y1  below this line cells are generation 1 (defaults to 2.0)
-     * @param y2  below this line cells are generation 2 (defaults to 3.0)
-     * @param y3  below this line cells are generation 3 (defaults to 4.0)
      * @param initialiseCells  whether to initialise the cell cycle models as each
      *   cell is created
      *
@@ -80,10 +76,6 @@ public:
     void GenerateForVertexCrypt(std::vector<TissueCell>& rCells,
                                   VertexMesh<2,2>& rMesh,
                                   bool randomBirthTimes,
-                                  double y0 = 0.3,
-                                  double y1 = 2.0,
-                                  double y2 = 3.0,
-                                  double y3 = 4.0,
                                   bool initialiseCells = false);
 };
 

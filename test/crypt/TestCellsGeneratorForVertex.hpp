@@ -63,10 +63,10 @@ public:
         // Create cells
         std::vector<TissueCell> fixed_cells, stochastic_cells;
         FixedDurationGenerationBasedCellCycleModelCellsGeneratorForVertex<2> fixed_cells_generator;
-        fixed_cells_generator.GenerateForVertexCrypt(fixed_cells, *p_mesh, true, y0, y1, y2,y3 );
+        fixed_cells_generator.GenerateForVertexCrypt(fixed_cells, *p_mesh, true, y0, y1, y2, y3, true);
 
         StochasticDurationGenerationBasedCellCycleModelCellsGeneratorForVertex<2> stochastic_cells_generator;
-        stochastic_cells_generator.GenerateForVertexCrypt(stochastic_cells, *p_mesh, true, y0, y1, y2,y3 );
+        stochastic_cells_generator.GenerateForVertexCrypt(stochastic_cells, *p_mesh, true, y0, y1, y2, y3, true);
 
 
         TS_ASSERT_EQUALS(fixed_cells.size(), p_mesh->GetNumElements());
@@ -119,14 +119,10 @@ public:
         // Create cells
         std::vector<TissueCell> cells;
         SimpleWntCellCycleModelCellsGeneratorForVertex<2> cells_generator;
-        cells_generator.GenerateForVertexCrypt(cells, *p_mesh, false);
+        cells_generator.GenerateForVertexCrypt(cells, *p_mesh, true, true);
 
         // Test that cells were generated correctly
         TS_ASSERT_EQUALS(cells.size(), p_mesh->GetNumElements());
-        for (unsigned i=0; i<cells.size(); i++)
-        {
-            TS_ASSERT_DELTA(cells[i].GetBirthTime(), 0.0, 1e-9);
-        }
     }
 };
 

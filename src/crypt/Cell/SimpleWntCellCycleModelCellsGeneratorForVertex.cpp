@@ -55,10 +55,6 @@ template<unsigned DIM>
 void SimpleWntCellCycleModelCellsGeneratorForVertex<DIM>::GenerateForVertexCrypt(std::vector<TissueCell>& rCells,
                                  VertexMesh<2,2>& rMesh,
                                  bool randomBirthTimes,
-                                 double y0,
-                                 double y1,
-                                 double y2,
-                                 double y3,
                                  bool initialiseCells)
 {
     #define COVERAGE_IGNORE
@@ -80,10 +76,7 @@ void SimpleWntCellCycleModelCellsGeneratorForVertex<DIM>::GenerateForVertexCrypt
     for (unsigned i=0; i<rMesh.GetNumElements(); i++)
     {
         CellProliferativeType cell_type;
-        unsigned generation;
-
-        double y = rMesh.GetCentroidOfElement(i)[1];
-
+        
         p_cell_cycle_model = CreateCellCycleModel();
         typical_transit_cycle_time = this->GetTypicalTransitCellCycleTime();
         typical_stem_cycle_time = GetTypicalStemCellCycleTime();
@@ -94,42 +87,9 @@ void SimpleWntCellCycleModelCellsGeneratorForVertex<DIM>::GenerateForVertexCrypt
             birth_time = -p_random_num_gen->ranf();
         }
 
-        if (y <= y0)
-        {
-            cell_type = STEM;
-            generation = 0;
-            birth_time *= typical_stem_cycle_time; // hours
-        }
-        else if (y < y1)
-        {
-            cell_type = TRANSIT;
-            generation = 1;
-            birth_time *= typical_transit_cycle_time; // hours
-        }
-        else if (y < y2)
-        {
-            cell_type = TRANSIT;
-            generation = 2;
-            birth_time *= typical_transit_cycle_time; // hours
-        }
-        else if (y < y3)
-        {
-            cell_type = TRANSIT;
-            generation = 3;
-            birth_time *= typical_transit_cycle_time; // hours
-        }
-        else
-        {
-            cell_type = AbstractCellsGenerator<DIM>::CellsCanDifferentiate() ? DIFFERENTIATED : TRANSIT;
-            generation = 4;
-            birth_time *= typical_transit_cycle_time; // hours
-        }
-
-        if (dynamic_cast<AbstractSimpleGenerationBasedCellCycleModel*>(p_cell_cycle_model))
-        {
-            static_cast<AbstractSimpleGenerationBasedCellCycleModel*>(p_cell_cycle_model)->SetGeneration(generation);
-        }
-
+        cell_type = TRANSIT;
+        birth_time *= typical_transit_cycle_time; // hours
+        
         TissueCell cell(cell_type, HEALTHY, p_cell_cycle_model);
         if (initialiseCells)
         {
