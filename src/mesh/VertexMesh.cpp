@@ -842,7 +842,6 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElementMap)
                         {
                             if (ElementIncludesPoint(p_current_node->rGetLocation(), other_iter->GetIndex()))
                             {
-//                                TRACE("*****************************Overlap******************************");
                                 MoveOverlappingNodeOntoEdgeOfElement(p_current_node, other_iter->GetIndex());
                             }
                         }
@@ -1851,12 +1850,10 @@ bool VertexMesh<ELEMENT_DIM, SPACE_DIM>::ElementIncludesPoint(const c_vector<dou
     // Loop over edges of the element
     for (unsigned local_index=0; local_index<num_nodes; local_index++)
     {
-
         // Get the end points of this edge
         // Remap to the origin to allow alternative distance metrics to be used in subclasses
         c_vector<double, SPACE_DIM> vertexA = GetVectorFromAtoB(first_vertex, p_element->GetNodeLocation(local_index));
         c_vector<double, SPACE_DIM> vertexB = GetVectorFromAtoB(first_vertex, p_element->GetNodeLocation((local_index+1)%num_nodes));
-
 
         // Check if this edge crosses the ray running out horizontally (increasing x, fixed y) from the test point
         c_vector<double, SPACE_DIM> vector_a_to_point = GetVectorFromAtoB(vertexA, test_point);
