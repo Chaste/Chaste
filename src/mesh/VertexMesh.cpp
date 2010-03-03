@@ -29,6 +29,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "VertexMesh.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "UblasCustomFunctions.hpp"
+#include "Debug.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh(std::vector<Node<SPACE_DIM>*> nodes,
@@ -842,6 +843,7 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElementMap)
                         {
                             if (ElementIncludesPoint(p_current_node->rGetLocation(), other_iter->GetIndex()))
                             {
+//                                TRACE("*****************************Overlap******************************");
                                 MoveOverlappingNodeOntoEdgeOfElement(p_current_node, other_iter->GetIndex());
                             }
                         }
@@ -954,6 +956,28 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>* pNode
                    std::inserter(temp_set, temp_set.begin()));
     all_indices.swap(temp_set); // temp_set will be deleted
 
+//PRINT_VARIABLE(SimulationTime::Instance()->GetTime());
+//
+//PRINT_VARIABLES(pNodeA->GetIndex(),pNodeB->GetIndex());
+//PRINT_3_VARIABLES(nodeA_elem_indices.size(),nodeB_elem_indices.size(),all_indices.size());
+//
+//PRINT_VARIABLE(nodeA_elem_indices.size());
+//   	for (std::set<unsigned>::const_iterator it = nodeA_elem_indices.begin();
+//    	   it != nodeA_elem_indices.end();
+//         ++it)
+//    {
+//PRINT_VARIABLE(*it);
+//    }
+//         
+//PRINT_VARIABLE(nodeB_elem_indices.size());
+//
+//   	for (std::set<unsigned>::const_iterator it = nodeB_elem_indices.begin();
+//         it != nodeB_elem_indices.end();
+//         ++it)
+//    {
+//PRINT_VARIABLE(*it);
+//    }
+         
     if ((nodeA_elem_indices.size()>3) || (nodeB_elem_indices.size()>3))
     {
         /*
@@ -993,19 +1017,36 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>* pNode
             {
                 if (nodeA_elem_indices.size()==2 && nodeB_elem_indices.size()==2)
                 {
-                    /*
-                     * In this case, each node is contained in two elements, so the nodes
-                     * lie on an internal edge:
-                     *
-                     *    A   B
-                     * ---o---o---
-                     *
-                     * We merge the nodes in this case.
-                     */
-                     PerformNodeMerge(pNodeA, pNodeB);
-
-                     // Remove the deleted node and re-index
-                     RemoveDeletedNodes();
+					if (pNodeA->IsBoundaryNode() || pNodeB->IsBoundaryNode())
+					{
+						/*
+		                 * In this case, the node configuration looks like:
+		                 *
+		                 *   \   /
+		                 *    \ / Node A
+		                 * (1) |   (2)      (element number in brackets)
+		                 *    / \ Node B
+		                 *   /   \
+		                 *
+		                 * We perform a Type 1 swap and seperate the elements in this case.
+		                 */
+		                 PerformT1Swap(pNodeA, pNodeB,all_indices);
+					}
+					else
+					{
+	                    /*
+	                     * In this case, each node is contained in two elements, so the nodes
+	                     * lie on an internal edge:
+	                     *
+	                     *    A   B
+	                     * ---o---o---
+	                     *
+	                     * We merge the nodes in this case.
+	                     */
+	                    PerformNodeMerge(pNodeA, pNodeB);
+	                    // Remove the deleted node and re-index
+	                    RemoveDeletedNodes();
+					}
                 }
                 else
                 {
@@ -1100,10 +1141,14 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>* pNode
                     unsigned node_alpha_local_index_before = (node_alpha_local_index+1)%temp;
                     unsigned node_alpha_local_index_after = (node_alpha_local_index+temp-1)%temp;
 
+//PRINT_VARIABLE(p_element->GetIndex())   
+
                     // Get pointers to these nodes and assert one of them is p_node_beta
                     Node<SPACE_DIM>* p_node1 = p_element->GetNode(node_alpha_local_index_before);
                     Node<SPACE_DIM>* p_node2 = p_element->GetNode(node_alpha_local_index_after);
                     assert(p_node1 == p_node_beta || p_node2 == p_node_beta);
+
+//PRINT_VARIABLES(p_node1->GetIndex(),p_node2->GetIndex());
 
                     // Get whichever of the nodes is NOT p_node_beta, call it node gamma
                     Node<SPACE_DIM>* p_node_gamma = (p_node1 == p_node_beta) ? p_node2 : p_node1;
@@ -1111,6 +1156,32 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>* pNode
                     // Get the set of elements containing nodes beta and gamma
                     std::set<unsigned> node_beta_elem_indices = p_node_beta->rGetContainingElementIndices();
                     std::set<unsigned> node_gamma_elem_indices = p_node_gamma->rGetContainingElementIndices();
+
+//PRINT_VARIABLES(p_node_alpha->GetIndex(),node_alpha_elem_indices.size());
+//   	for (std::set<unsigned>::const_iterator it = node_alpha_elem_indices.begin();
+//    	   it != node_alpha_elem_indices.end();
+//         ++it)
+//    {
+//PRINT_VARIABLE(*it);
+//    }
+//
+//
+//PRINT_VARIABLES(p_node_beta->GetIndex(),node_beta_elem_indices.size());
+//   	for (std::set<unsigned>::const_iterator it = node_beta_elem_indices.begin();
+//    	   it != node_beta_elem_indices.end();
+//         ++it)
+//    {
+//PRINT_VARIABLE(*it);
+//    }
+//         
+//PRINT_VARIABLES(p_node_gamma->GetIndex(),node_gamma_elem_indices.size());
+//
+//   	for (std::set<unsigned>::const_iterator it = node_gamma_elem_indices.begin();
+//         it != node_gamma_elem_indices.end();
+//         ++it)
+//    {
+//PRINT_VARIABLE(*it);
+//    }
 
                     // Form the set intersection
                     std::set<unsigned> intersection_indices, temp_set2;
@@ -1407,6 +1478,23 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* pNodeA,
             pNodeB->SetAsBoundaryNode(true);
         }
     }
+    
+//    // Check that neither node lies inside the elements not containing it
+//    for (std::set<unsigned>::const_iterator it = rElementsContainingNodes.begin();
+//         it != rElementsContainingNodes.end();
+//         ++it)
+//    {
+//        if (nodeA_elem_indices.find(*it) == nodeA_elem_indices.end()) // not in nodeA_elem_indices so element 3
+//        {
+//TRACE("nodeA");
+//    		assert(!ElementIncludesPoint(pNodeA->rGetLocation(), *it));
+//        }
+//    	if (nodeB_elem_indices.find(*it) == nodeB_elem_indices.end()) // not in nodeA_elem_indices so element 3
+//        {
+//TRACE("nodeB");
+//    		assert(!ElementIncludesPoint(pNodeB->rGetLocation(), *it));
+//        }
+//    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -1850,10 +1938,12 @@ bool VertexMesh<ELEMENT_DIM, SPACE_DIM>::ElementIncludesPoint(const c_vector<dou
     // Loop over edges of the element
     for (unsigned local_index=0; local_index<num_nodes; local_index++)
     {
+
         // Get the end points of this edge
         // Remap to the origin to allow alternative distance metrics to be used in subclasses
         c_vector<double, SPACE_DIM> vertexA = GetVectorFromAtoB(first_vertex, p_element->GetNodeLocation(local_index));
         c_vector<double, SPACE_DIM> vertexB = GetVectorFromAtoB(first_vertex, p_element->GetNodeLocation((local_index+1)%num_nodes));
+
 
         // Check if this edge crosses the ray running out horizontally (increasing x, fixed y) from the test point
         c_vector<double, SPACE_DIM> vector_a_to_point = GetVectorFromAtoB(vertexA, test_point);
