@@ -37,7 +37,7 @@ class VertexMeshWriter;
 #include <algorithm>
 
 #include <climits> // Work around Boost bug
-#include <boost/serialization/access.hpp>
+#include "ChasteSerialization.hpp"
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/split_member.hpp>

@@ -28,7 +28,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #ifndef CYLINDRICAL2DVERTEXMESH_HPP_
 #define CYLINDRICAL2DVERTEXMESH_HPP_
 
-#include <boost/serialization/access.hpp>
+#include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
 #include "VertexMesh.hpp"

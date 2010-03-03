@@ -28,7 +28,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #ifndef ALARCON2004OXYGENBASEDCELLCYCLEMODEL_HPP_
 #define ALARCON2004OXYGENBASEDCELLCYCLEMODEL_HPP_
 
-#include <boost/serialization/access.hpp>
+#include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
 #include <cfloat>

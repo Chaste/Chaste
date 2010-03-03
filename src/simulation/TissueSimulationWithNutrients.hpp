@@ -29,7 +29,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #define TISSUESIMULATIONWITHNUTRIENTS_HPP_
 
 #include <map>
-#include <boost/serialization/access.hpp>
+#include "ChasteSerialization.hpp"
 
 #include "TissueSimulation.hpp"
 
