@@ -1386,7 +1386,7 @@ public:
     }
 
 	// This tests both PerformT1Swap and IdentifySwapType
-    void TestPerformT1SwapToSeperate() throw(Exception)
+    void TestPerformT1SwapToSeparate() throw(Exception)
     {
         /* This tests the following setup
          * 
