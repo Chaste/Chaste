@@ -29,6 +29,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "VertexMesh.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "UblasCustomFunctions.hpp"
+#include "Debug.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh(std::vector<Node<SPACE_DIM>*> nodes,
@@ -2090,6 +2091,7 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::MoveOverlappingNodeOntoEdgeOfElement(No
 		// Find the nodes contained in elements containing the intersecting node
 		std::set<unsigned>::const_iterator it = elements_containing_intersecting_node.begin();
     	VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element_1 = GetElement(*it);
+    	it++;
 		VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element_2 = GetElement(*it);
 
 		unsigned local_index_1 = p_element_1->GetNodeLocalIndex(pNode->GetIndex());
@@ -2098,7 +2100,7 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::MoveOverlappingNodeOntoEdgeOfElement(No
 		unsigned local_index_2 = p_element_2->GetNodeLocalIndex(pNode->GetIndex());
 		unsigned next_node_2 = p_element_2->GetNodeGlobalIndex((local_index_2 + 1)%(p_element_2->GetNumNodes()));
 		unsigned previous_node_2 = p_element_2->GetNodeGlobalIndex((local_index_2 + p_element_2->GetNumNodes() - 1)%(p_element_2->GetNumNodes()));
-		
+
 		if (next_node_1 == previous_node_2)
 		{
 			p_element_1->AddNode((local_index_1 + p_element_1->GetNumNodes() - 1)%(p_element_1->GetNumNodes()), this->mNodes[new_node_2_global_index]);
