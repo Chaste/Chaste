@@ -2805,7 +2805,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNode(4)->GetIndex(), 5u);
 
         // Test locations of new nodes
-        TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[0], -0.009+2*mesh.GetCellRearrangementThreshold(), 1e-4);
+        TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[0], -0.009+1.5*mesh.GetCellRearrangementThreshold(), 1e-4);
         TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[1], 0.0, 1e-4);
         TS_ASSERT_DELTA(mesh.GetNode(7)->rGetLocation()[0], 0.0, 1e-4);
         TS_ASSERT_DELTA(mesh.GetNode(7)->rGetLocation()[1], 1.0, 1e-4);
@@ -2863,7 +2863,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNode(5)->GetIndex(), 7u);
 
         // Test locations of new nodes
-        TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[0], 0.009-2*mesh.GetCellRearrangementThreshold(), 1e-4);
+        TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[0], 0.009-1.5*mesh.GetCellRearrangementThreshold(), 1e-4);
         TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[1], 0.0, 1e-4);
         TS_ASSERT_DELTA(mesh.GetNode(7)->rGetLocation()[0], 0.0, 1e-4);
         TS_ASSERT_DELTA(mesh.GetNode(7)->rGetLocation()[1], 1.0, 1e-4);

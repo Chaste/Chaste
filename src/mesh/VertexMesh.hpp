@@ -65,6 +65,11 @@ protected:
     /** The minimum distance apart that two nodes in the mesh can be without causing element rearrangement. */
     double mCellRearrangementThreshold;
 
+    /** The ratio between the minimum distance apart that two nodes in the mesh can be without causing element 
+     *  rearrangement and their seperation after remeshing. 
+     */
+    double mCellRearrangementRatio;
+
     /** The maximum distance apart that neighbouring nodes in the mesh can be without the edge being divided. */
     double mEdgeDivisionThreshold;
 
@@ -200,6 +205,7 @@ protected:
     {
         archive & boost::serialization::base_object<AbstractMesh<ELEMENT_DIM,SPACE_DIM> >(*this);
         archive & mCellRearrangementThreshold;
+        archive & mCellRearrangementRatio;
         archive & mEdgeDivisionThreshold;
         archive & mT2Threshold;
         archive & mDeletedNodeIndices;
@@ -223,6 +229,7 @@ protected:
     {
         archive & boost::serialization::base_object<AbstractMesh<ELEMENT_DIM,SPACE_DIM> >(*this);
         archive & mCellRearrangementThreshold;
+        archive & mCellRearrangementRatio;
         archive & mEdgeDivisionThreshold;
         archive & mT2Threshold;
         archive & mDeletedNodeIndices;

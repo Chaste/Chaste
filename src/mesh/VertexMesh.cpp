@@ -37,6 +37,7 @@ VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh(std::vector<Node<SPACE_DIM>*> nod
                                                double edgeDivisionThreshold,
                                                double t2Threshold)
     : mCellRearrangementThreshold(cellRearrangementThreshold),
+      mCellRearrangementRatio(1.5),
       mEdgeDivisionThreshold(edgeDivisionThreshold),
       mT2Threshold(t2Threshold)
 {
@@ -77,6 +78,7 @@ VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh(std::vector<Node<SPACE_DIM>*> nod
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh()
     : mCellRearrangementThreshold(0.01), // Overwritten as soon as archiving is complete
+      mCellRearrangementRatio(1.5), // Overwritten as soon as archiving is complete
       mEdgeDivisionThreshold(DBL_MAX), // Overwritten as soon as archiving is complete
       mT2Threshold(0.001) // Overwritten as soon as archiving is complete
 {
@@ -1298,14 +1300,14 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* pNodeA,
      * Compute the locations of two new nodes C, D, placed on either side of the
      * edge E_old formed by nodes current_node and anticlockwise_node, such
      * that the edge E_new formed by the new nodes is the perpendicular bisector
-     * of E_old, with |E_new| 'just larger' than mThresholdDistance.
+     * of E_old, with |E_new| 'just larger' (mCellRearrangementRatio) than mThresholdDistance.
      */
 
     // Find the sets of elements containing nodes A and B
     std::set<unsigned> nodeA_elem_indices = pNodeA->rGetContainingElementIndices();
     std::set<unsigned> nodeB_elem_indices = pNodeB->rGetContainingElementIndices();
 
-    double distance_between_nodes_CD = 1.5*mCellRearrangementThreshold; //this was 2*mCellRearrangementThreshold;
+    double distance_between_nodes_CD = mCellRearrangementRatio*mCellRearrangementThreshold;
 
     c_vector<double, SPACE_DIM> nodeA_location = pNodeA->rGetLocation();
     c_vector<double, SPACE_DIM> nodeB_location = pNodeB->rGetLocation();
@@ -1599,18 +1601,18 @@ unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(VertexE
 
         /*
          * If then new node is too close to one of the edge nodes, then reposition it
-         * a distance 2*mCellRearrangementThreshold further along the edge.
+         * a distance mCellRearrangementRatio*mCellRearrangementThreshold further along the edge.
          */
         c_vector<double, SPACE_DIM> a_to_intersection = this->GetVectorFromAtoB(position_a, intersection);
         if (norm_2(a_to_intersection) < mCellRearrangementThreshold)
         {
-            intersection = position_a + 2*mCellRearrangementThreshold*a_to_b/norm_2(a_to_b);
+            intersection = position_a + mCellRearrangementRatio*mCellRearrangementThreshold*a_to_b/norm_2(a_to_b);
         }
 
         c_vector<double, SPACE_DIM> b_to_intersection = this->GetVectorFromAtoB(position_b, intersection);
         if (norm_2(b_to_intersection) < mCellRearrangementThreshold)
         {
-            intersection = position_b - 2*mCellRearrangementThreshold*a_to_b/norm_2(a_to_b);
+            intersection = position_b - mCellRearrangementRatio*mCellRearrangementThreshold*a_to_b/norm_2(a_to_b);
         }
 
         bool is_boundary = false;
@@ -2013,9 +2015,9 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::MoveOverlappingNodeOntoEdgeOfElement(No
 		c_vector<double, SPACE_DIM> intersection = vertexA + edge_ab_unit_vector*inner_prod(vector_a_to_point, edge_ab_unit_vector);
 	    
 	    // Move original node 
-	    pNode->rGetModifiableLocation() = intersection + 1.5*mCellRearrangementThreshold*edge_ab_unit_vector;
+	    pNode->rGetModifiableLocation() = intersection + mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
 
-	    c_vector<double, SPACE_DIM> new_node_location = intersection - 1.5*mCellRearrangementThreshold*edge_ab_unit_vector;
+	    c_vector<double, SPACE_DIM> new_node_location = intersection - mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
 
 		// Add new node whic will always be a boundary node 
 		unsigned new_node_global_index = this->AddNode(new Node<SPACE_DIM>(0, true, new_node_location[0], new_node_location[1]));
@@ -2073,8 +2075,8 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::MoveOverlappingNodeOntoEdgeOfElement(No
 	    pNode->rGetModifiableLocation() = intersection;
 	    pNode->SetAsBoundaryNode(false);
 
-	    c_vector<double, SPACE_DIM> new_node_1_location = intersection - 1.5*mCellRearrangementThreshold*edge_ab_unit_vector;
-		c_vector<double, SPACE_DIM> new_node_2_location = intersection + 1.5*mCellRearrangementThreshold*edge_ab_unit_vector;
+	    c_vector<double, SPACE_DIM> new_node_1_location = intersection - mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
+		c_vector<double, SPACE_DIM> new_node_2_location = intersection + mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
 		
 		// Add new nodes which will always be boundary nodes 
 		unsigned new_node_1_global_index = this->AddNode(new Node<SPACE_DIM>(0, true, new_node_1_location[0], new_node_1_location[1]));
