@@ -65,8 +65,8 @@ protected:
     /** The minimum distance apart that two nodes in the mesh can be without causing element rearrangement. */
     double mCellRearrangementThreshold;
 
-    /** The ratio between the minimum distance apart that two nodes in the mesh can be without causing element 
-     *  rearrangement and their seperation after remeshing. 
+    /** The ratio between the minimum distance apart that two nodes in the mesh can be without causing element
+     *  rearrangement and their seperation after remeshing.
      */
     double mCellRearrangementRatio;
 
@@ -159,7 +159,7 @@ protected:
 
     /**
      * Called by ReMesh(). Moves a node, which has been found to overlap an element,
-     * back onto the edge of that element and associates it with the element and adds 
+     * back onto the edge of that element and associates it with the element and adds
      * new nodes to maitain three elemets a node.
      *
      * @param pNode pointer to the node
