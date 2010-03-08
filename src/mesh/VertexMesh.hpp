@@ -159,12 +159,13 @@ protected:
 
     /**
      * Called by ReMesh(). Moves a node, which has been found to overlap an element,
-     * back onto the edge of that element and associates it with the element.
+     * back onto the edge of that element and associates it with the element and adds 
+     * new nodes to maitain three elemets a node.
      *
      * @param pNode pointer to the node
      * @param elementIndex global index of the element in the mesh
      */
-    void MoveOverlappingNodeOntoEdgeOfElement(Node<SPACE_DIM>* pNode, unsigned elementIndex);
+    void PerformT3Swap(Node<SPACE_DIM>* pNode, unsigned elementIndex);
 
     /**
      * Solve node mapping method. This overridden method is required

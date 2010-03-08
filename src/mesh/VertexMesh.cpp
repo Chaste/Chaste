@@ -844,7 +844,7 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElementMap)
                         {
                             if (ElementIncludesPoint(p_current_node->rGetLocation(), other_iter->GetIndex()))
                             {
-                                MoveOverlappingNodeOntoEdgeOfElement(p_current_node, other_iter->GetIndex());
+                                PerformT3Swap(p_current_node, other_iter->GetIndex());
                             }
                         }
                     }
@@ -1960,7 +1960,7 @@ unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocalIndexForElementEdgeClosestT
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexMesh<ELEMENT_DIM, SPACE_DIM>::MoveOverlappingNodeOntoEdgeOfElement(Node<SPACE_DIM>* pNode, unsigned elementIndex)
+void VertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* pNode, unsigned elementIndex)
 {
     // Make sure that we are in the correct dimension - this code will be eliminated at compile time
     #define COVERAGE_IGNORE
@@ -1968,127 +1968,115 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::MoveOverlappingNodeOntoEdgeOfElement(No
     assert(ELEMENT_DIM == SPACE_DIM);
     #undef COVERAGE_IGNORE
 
-
 	//check pNode is a boundary node
 	assert(pNode->IsBoundaryNode());
 	
     // Store the index of the elements containing the intersecting node
 	std::set<unsigned> elements_containing_intersecting_node = pNode->rGetContainingElementIndices();
+
+	// Get the local index of the node in the intersected element after which the new node is to be added
+    unsigned node_A_local_index = GetLocalIndexForElementEdgeClosestToPoint(pNode->rGetLocation(), elementIndex);
+	
+	// Get current node location
+    c_vector<double, SPACE_DIM> node_location = pNode->rGetModifiableLocation();
+
+    // Get element
+    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(elementIndex);
+    unsigned num_nodes = p_element->GetNumNodes();
+	
+	/*
+     * Get the nodes at either end of the edge to be divided
+     */
+    unsigned vertexA_index = p_element->GetNodeGlobalIndex(node_A_local_index);
+    unsigned vertexB_index = p_element->GetNodeGlobalIndex((node_A_local_index+1)%num_nodes);
+
+	/*
+     * Get the nodes at either end of the edge to be divided and calculate intersection 
+     */
+    c_vector<double, SPACE_DIM> vertexA = p_element->GetNodeLocation(node_A_local_index);
+    c_vector<double, SPACE_DIM> vertexB = p_element->GetNodeLocation((node_A_local_index+1)%num_nodes);
+    c_vector<double, SPACE_DIM> vector_a_to_point = this->GetVectorFromAtoB(vertexA, node_location);
+    c_vector<double, SPACE_DIM> vector_a_to_b = this->GetVectorFromAtoB(vertexA, vertexB);
+    c_vector<double, SPACE_DIM> edge_ab_unit_vector = vector_a_to_b/norm_2(vector_a_to_b);
+	c_vector<double, SPACE_DIM> intersection = vertexA + edge_ab_unit_vector*inner_prod(vector_a_to_point, edge_ab_unit_vector);
     
 	if (pNode->GetNumContainingElements() == 1)
 	{
-		/*
-		 *  From          To  
-		 *   ____        _______
-		 *                 / \   
-		 *    /\          /   \
-		 *   /  \
-		 * 
-		 */
-		
-		// Store the index of the element containing the intersecting node
+		// Get the index of the element containing the intersecting node
 		unsigned intersecting_element_index = *elements_containing_intersecting_node.begin();
-		 
-		// Get the local index of the node in the intersected element after which the new node is to be added
-	    unsigned node_A_local_index = GetLocalIndexForElementEdgeClosestToPoint(pNode->rGetLocation(), elementIndex);
-
-		// Get current node location
-	    c_vector<double, SPACE_DIM> node_location = pNode->rGetModifiableLocation();
-	
-	    // Get element
-	    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(elementIndex);
-	    unsigned num_nodes = p_element->GetNumNodes();
-	    
-	    /*
-	     * Get the nodes at either end of the edge to be divided
-	     * 
-	     * The edge goes from vertexA--vertexB to vertexA--new_node--pNode--vertexB 
-	     */
-	    c_vector<double, SPACE_DIM> vertexA = p_element->GetNodeLocation(node_A_local_index);
-	    c_vector<double, SPACE_DIM> vertexB = p_element->GetNodeLocation((node_A_local_index+1)%num_nodes);
-	
-	    c_vector<double, SPACE_DIM> vector_a_to_point = this->GetVectorFromAtoB(vertexA, node_location);
-	    c_vector<double, SPACE_DIM> vector_a_to_b = this->GetVectorFromAtoB(vertexA, vertexB);
-	
-	    c_vector<double, SPACE_DIM> edge_ab_unit_vector = vector_a_to_b/norm_2(vector_a_to_b);
+		
+		// Get element
+	    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_intersecting_element = GetElement(intersecting_element_index);
+	   
+		unsigned local_index = p_intersecting_element->GetNodeLocalIndex(pNode->GetIndex());
+		unsigned next_node = p_intersecting_element->GetNodeGlobalIndex((local_index + 1)%(p_intersecting_element->GetNumNodes()));
+		unsigned previous_node = p_intersecting_element->GetNodeGlobalIndex((local_index + p_intersecting_element->GetNumNodes() - 1)%(p_intersecting_element->GetNumNodes()));
+		
+		// Check to see if the nodes adjacent to the intersecting node are contained in the intersected element VertexA and VertexB
+		if (next_node == vertexA_index || previous_node == vertexA_index || next_node == vertexB_index || previous_node == vertexB_index)
+		{
+			/*
+			 *  From          To  
+			 *   _             _
+			 *    |  <---       |  
+			 *    |  /\         |\   
+			 *    | /  \        | \
+			 *   _|/____\      _|__\
+			 *  
+			 */
 			
-		c_vector<double, SPACE_DIM> intersection = vertexA + edge_ab_unit_vector*inner_prod(vector_a_to_point, edge_ab_unit_vector);
-	    
-	    // Move original node 
-	    pNode->rGetModifiableLocation() = intersection + mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
+			/*
+			 *  The edge goes from vertexA--vertexB to vertexA--pNode--vertexB
+			 */
+		    // Move original node 
+		    pNode->rGetModifiableLocation() = intersection;
+		
+		    // Add the moved nodes to the element (this also updates the node)
+		    GetElement(elementIndex)->AddNode(node_A_local_index, pNode);
+		    		 
+			// Check the nodes are updated correctly		 
+			assert(pNode->GetNumContainingElements() == 2);
+		}	
+		else
+		{
+			/*
+			 *  From          To  
+			 *   ____        _______
+			 *                 / \   
+			 *    /\   ^      /   \
+			 *   /  \  |
+			 * 
+			 */
+		    
+			 /*
+			  *  The edge goes from vertexA--vertexB to vertexA--new_node--pNode--vertexB
+			  */ 
 
-	    c_vector<double, SPACE_DIM> new_node_location = intersection - mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
-
-		// Add new node whic will always be a boundary node 
-		unsigned new_node_global_index = this->AddNode(new Node<SPACE_DIM>(0, true, new_node_location[0], new_node_location[1]));
+		    // Move original node 
+		    pNode->rGetModifiableLocation() = intersection + mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
 	
-	    // Add the moved and new nodes to the element (this also updates the node)
-	    GetElement(elementIndex)->AddNode(node_A_local_index, pNode);
-	    GetElement(elementIndex)->AddNode(node_A_local_index, this->mNodes[new_node_global_index]);
-		 
-	    // Add the new node to the original element contiang pNode (this also updates the node)
-		GetElement(intersecting_element_index)->AddNode(GetElement(intersecting_element_index)->GetNodeLocalIndex(pNode->GetIndex()), this->mNodes[new_node_global_index]);
-				 
-		// Check the nodes are updated correctly		 
-		assert(pNode->GetNumContainingElements() == 2);
-		assert(this->mNodes[new_node_global_index]->GetNumContainingElements() == 2);
-	}
+		    c_vector<double, SPACE_DIM> new_node_location = intersection - mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
+	
+			// Add new node whic will always be a boundary node 
+			unsigned new_node_global_index = this->AddNode(new Node<SPACE_DIM>(0, true, new_node_location[0], new_node_location[1]));
+		
+		    // Add the moved and new nodes to the element (this also updates the node)
+		    GetElement(elementIndex)->AddNode(node_A_local_index, pNode);
+		    GetElement(elementIndex)->AddNode(node_A_local_index, this->mNodes[new_node_global_index]);
+			 
+		    // Add the new node to the original element contiang pNode (this also updates the node)
+			GetElement(intersecting_element_index)->AddNode(GetElement(intersecting_element_index)->GetNodeLocalIndex(pNode->GetIndex()), this->mNodes[new_node_global_index]);
+					 
+			// Check the nodes are updated correctly		 
+			assert(pNode->GetNumContainingElements() == 2);
+			assert(this->mNodes[new_node_global_index]->GetNumContainingElements() == 2);
+		        
+			}
+		    
+	    
+    	}
 	else if (pNode->GetNumContainingElements() == 2)
 	{
-		/*
-		 *  From          To  
-		 *   _____         _______
-		 *                  / | \   
-		 *    /|\          /  |  \
-		 *   / | \
-		 * 
-		 */ 
-	    // Store the index of the element containing the intersecting node
-		std::set<unsigned> elements_containing_intersecting_node = pNode->rGetContainingElementIndices();
-		 
-		// Get the local index of the node in the intersected element after which the new nodes are is to be added
-	    unsigned node_A_local_index = GetLocalIndexForElementEdgeClosestToPoint(pNode->rGetLocation(), elementIndex);
-
-		// Get current node location
-	    c_vector<double, SPACE_DIM> node_location = pNode->rGetModifiableLocation();
-	
-	    // Get element
-	    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(elementIndex);
-	    unsigned num_nodes = p_element->GetNumNodes();
-	    
-	    /*
-	     * Get the nodes at either end of the edge to be divided
-	     * 
-	     * The edge goes from vertexA--vertexB to vertexA--new_node_1--pNode--new_node_2--vertexB 
-	     */
-	    c_vector<double, SPACE_DIM> vertexA = p_element->GetNodeLocation(node_A_local_index);
-	    c_vector<double, SPACE_DIM> vertexB = p_element->GetNodeLocation((node_A_local_index+1)%num_nodes);
-	
-	    c_vector<double, SPACE_DIM> vector_a_to_point = this->GetVectorFromAtoB(vertexA, node_location);
-	    c_vector<double, SPACE_DIM> vector_a_to_b = this->GetVectorFromAtoB(vertexA, vertexB);
-	
-	    c_vector<double, SPACE_DIM> edge_ab_unit_vector = vector_a_to_b/norm_2(vector_a_to_b);
-			
-		c_vector<double, SPACE_DIM> intersection = vertexA + edge_ab_unit_vector*inner_prod(vector_a_to_point, edge_ab_unit_vector);
-	    
-	    // Move original node and change to non boundary node
-	    pNode->rGetModifiableLocation() = intersection;
-	    pNode->SetAsBoundaryNode(false);
-
-	    c_vector<double, SPACE_DIM> new_node_1_location = intersection - mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
-		c_vector<double, SPACE_DIM> new_node_2_location = intersection + mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
-		
-		// Add new nodes which will always be boundary nodes 
-		unsigned new_node_1_global_index = this->AddNode(new Node<SPACE_DIM>(0, true, new_node_1_location[0], new_node_1_location[1]));
-		unsigned new_node_2_global_index = this->AddNode(new Node<SPACE_DIM>(0, true, new_node_2_location[0], new_node_2_location[1]));
-	    
-	    // Add the moved and new nodes to the element (this also updates the node)
-	    GetElement(elementIndex)->AddNode(node_A_local_index, this->mNodes[new_node_2_global_index]);
-	    GetElement(elementIndex)->AddNode(node_A_local_index, pNode);
-	    GetElement(elementIndex)->AddNode(node_A_local_index, this->mNodes[new_node_1_global_index]);
-		 
-	    // Add the new nodes to the original elements contiang pNode (this also updates the node)
-
 		// Find the nodes contained in elements containing the intersecting node
 		std::set<unsigned>::const_iterator it = elements_containing_intersecting_node.begin();
     	VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element_1 = GetElement(*it);
@@ -2102,23 +2090,150 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::MoveOverlappingNodeOntoEdgeOfElement(No
 		unsigned next_node_2 = p_element_2->GetNodeGlobalIndex((local_index_2 + 1)%(p_element_2->GetNumNodes()));
 		unsigned previous_node_2 = p_element_2->GetNodeGlobalIndex((local_index_2 + p_element_2->GetNumNodes() - 1)%(p_element_2->GetNumNodes()));
 
-		if (next_node_1 == previous_node_2)
+		// Check to see if the nodes adjacent to the intersecting node are contained in the intersected element VertexA and VertexB
+		if (next_node_1 == vertexA_index || previous_node_1 == vertexA_index || next_node_2 == vertexA_index || previous_node_2 == vertexA_index)
 		{
-			p_element_1->AddNode((local_index_1 + p_element_1->GetNumNodes() - 1)%(p_element_1->GetNumNodes()), this->mNodes[new_node_2_global_index]);
-			p_element_2->AddNode(local_index_2, this->mNodes[new_node_1_global_index]);
+			/*
+			 *  From          To  
+			 *   _ B              _ B
+			 *    |   <---         |
+			 *    |   /|\          |\
+			 *    |  / | \         | \   
+			 *    | /  |  \        |\ \
+			 *   _|/___|___\      _|_\_\
+			 *   A                  A
+			 */
+			
+			/*
+			 *  The edge goes from vertexA--vertexB to vertexA--pNode--new_node--vertexB
+			 */
+			 
+		    // Move original node and change to non boundary node
+		    pNode->rGetModifiableLocation() = intersection - 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
+			pNode->SetAsBoundaryNode(false);
+		
+		 	c_vector<double, SPACE_DIM> new_node_location = intersection + 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
+	
+			// Add new node which will always be a boundary node 
+			unsigned new_node_global_index = this->AddNode(new Node<SPACE_DIM>(0, true, new_node_location[0], new_node_location[1]));
+		
+		    // Add the moved nodes to the element (this also updates the node)
+		    GetElement(elementIndex)->AddNode(node_A_local_index, this->mNodes[new_node_global_index]);
+			GetElement(elementIndex)->AddNode(node_A_local_index, pNode);
+		    
+		    // Add the new nodes to the original elements contiang pNode (this also updates the node)
+			if (next_node_1 == previous_node_2)
+			{
+				p_element_1->AddNode((local_index_1 + p_element_1->GetNumNodes() - 1)%(p_element_1->GetNumNodes()), this->mNodes[new_node_global_index]);
+			}
+			else
+			{
+				assert(next_node_2 == previous_node_1);
+				
+				p_element_2->AddNode((local_index_2 + p_element_2->GetNumNodes() - 1)%(p_element_2->GetNumNodes()), this->mNodes[new_node_global_index]);
+			}
+	
+			
+			// Check the nodes are updated correctly		 
+			assert(pNode->GetNumContainingElements() == 3);
+			assert(this->mNodes[new_node_global_index]->GetNumContainingElements() == 2);
 		}
+		else if (next_node_1 == vertexB_index || previous_node_1 == vertexB_index || next_node_2 == vertexB_index || previous_node_2 == vertexB_index)
+		{
+			/*
+			 *  From          To  
+			 *   _B_________      _B____
+			 *    |\   |   /       | / /
+			 *    | \  |  /        |/ /
+			 *    |  \ | /         | /   
+			 *    |   \|/          |/
+			 *   _|   <---        _|
+			 *    A            
+			 */
+			
+			/*
+			 *  The edge goes from vertexA--vertexB to vertexA--new_node--pNode--vertexB
+			 */
+			 
+		    // Move original node and change to non boundary node
+		    pNode->rGetModifiableLocation() = intersection + 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
+		    pNode->SetAsBoundaryNode(false);
+		    
+		 	c_vector<double, SPACE_DIM> new_node_location = intersection - 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
+	
+			// Add new node which will always be a boundary node 
+			unsigned new_node_global_index = this->AddNode(new Node<SPACE_DIM>(0, true, new_node_location[0], new_node_location[1]));
+		    
+		    // Add the moved nodes to the element (this also updates the node)
+		    GetElement(elementIndex)->AddNode(node_A_local_index, pNode);
+		    GetElement(elementIndex)->AddNode(node_A_local_index, this->mNodes[new_node_global_index]);
+			
+		    // Add the new nodes to the original elements contiang pNode (this also updates the node)
+			if (next_node_1 == previous_node_2)
+			{
+				p_element_2->AddNode(local_index_2, this->mNodes[new_node_global_index]);
+			}
+			else
+			{
+				assert(next_node_2 == previous_node_1);
+				
+				p_element_1->AddNode(local_index_1, this->mNodes[new_node_global_index]);
+			}
+				
+			// Check the nodes are updated correctly		 
+			assert(pNode->GetNumContainingElements() == 3);
+			assert(this->mNodes[new_node_global_index]->GetNumContainingElements() == 2);
+		}	
 		else
 		{
-			assert(next_node_2 == previous_node_1);
+			/*
+			 *  From          To  
+			 *   _____         _______
+			 *                  / | \   
+			 *    /|\   ^      /  |  \
+			 *   / | \  |
+			 * 
+			 */ 
+			 
+			/*
+			 *  The edge goes from vertexA--vertexB to vertexA--new_node_1--pNode--new_node_2--vertexB
+			 */	
+		    
+		    // Move original node and change to non boundary node
+		    pNode->rGetModifiableLocation() = intersection;
+		    pNode->SetAsBoundaryNode(false);
+	
+		    c_vector<double, SPACE_DIM> new_node_1_location = intersection - mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
+			c_vector<double, SPACE_DIM> new_node_2_location = intersection + mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
 			
-			p_element_1->AddNode(local_index_1, this->mNodes[new_node_1_global_index]);
-			p_element_2->AddNode((local_index_2 + p_element_2->GetNumNodes() - 1)%(p_element_2->GetNumNodes()), this->mNodes[new_node_2_global_index]);
+			// Add new nodes which will always be boundary nodes 
+			unsigned new_node_1_global_index = this->AddNode(new Node<SPACE_DIM>(0, true, new_node_1_location[0], new_node_1_location[1]));
+			unsigned new_node_2_global_index = this->AddNode(new Node<SPACE_DIM>(0, true, new_node_2_location[0], new_node_2_location[1]));
+		    
+		    // Add the moved and new nodes to the element (this also updates the node)
+		    GetElement(elementIndex)->AddNode(node_A_local_index, this->mNodes[new_node_2_global_index]);
+		    GetElement(elementIndex)->AddNode(node_A_local_index, pNode);
+		    GetElement(elementIndex)->AddNode(node_A_local_index, this->mNodes[new_node_1_global_index]);
+			 
+		    // Add the new nodes to the original elements contiang pNode (this also updates the node)
+			if (next_node_1 == previous_node_2)
+			{
+				p_element_1->AddNode((local_index_1 + p_element_1->GetNumNodes() - 1)%(p_element_1->GetNumNodes()), this->mNodes[new_node_2_global_index]);
+				p_element_2->AddNode(local_index_2, this->mNodes[new_node_1_global_index]);
+			}
+			else
+			{
+				assert(next_node_2 == previous_node_1);
+				
+				p_element_1->AddNode(local_index_1, this->mNodes[new_node_1_global_index]);
+				p_element_2->AddNode((local_index_2 + p_element_2->GetNumNodes() - 1)%(p_element_2->GetNumNodes()), this->mNodes[new_node_2_global_index]);
+			}
+	
+			// Check the nodes are updated correctly		 
+			assert(pNode->GetNumContainingElements() == 3);
+			assert(this->mNodes[new_node_1_global_index]->GetNumContainingElements() == 2);
+			assert(this->mNodes[new_node_2_global_index]->GetNumContainingElements() == 2);
 		}
-
-		// Check the nodes are updated correctly		 
-		assert(pNode->GetNumContainingElements() == 3);
-		assert(this->mNodes[new_node_1_global_index]->GetNumContainingElements() == 2);
-		assert(this->mNodes[new_node_2_global_index]->GetNumContainingElements() == 2);
 	}
 	else
 	{
