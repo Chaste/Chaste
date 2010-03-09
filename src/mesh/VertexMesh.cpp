@@ -820,37 +820,51 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElementMap)
 
         // areas and perimeters of elements are sorted in PerformT1Swap() method
 
-        // Check that no nodes have overlapped elements
-        /// \todo Only need to check this next bit if the element/node is on the boundary (see #933 and #943)
-        for (typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator elem_iter = GetElementIteratorBegin();
-             elem_iter != GetElementIteratorEnd();
-             ++elem_iter)
+        
+        // Restart check after each T3Swap as elements are changed 
+        // \todo dont need to do this at present as # of elements crrently stays the same but will need this when tracking voids
+        recheck_mesh = true;
+        while (recheck_mesh == true)
         {
-            unsigned num_nodes = elem_iter->GetNumNodes();
-
-            // Loop over element vertices
-            for (unsigned local_index=0; local_index<num_nodes; local_index++)
-            {
-                // Find locations of current node and anticlockwise node
-                Node<SPACE_DIM>* p_current_node = elem_iter->GetNode(local_index);
-
-                if (p_current_node->IsBoundaryNode())
+            recheck_mesh = false;
+        
+	        // Check that no nodes have overlapped elements
+	        /// \todo Only need to check this next bit if the element/node is on the boundary (see #933 and #943)
+	        for (typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator elem_iter = GetElementIteratorBegin();
+	             elem_iter != GetElementIteratorEnd();
+	             ++elem_iter)
+	        {
+	            unsigned num_nodes = elem_iter->GetNumNodes();
+	
+	            if (!recheck_mesh)
                 {
-                    for (typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator other_iter = GetElementIteratorBegin();
-                         other_iter != GetElementIteratorEnd();
-                         ++other_iter)
-                    {
-                        if (other_iter != elem_iter)
-                        {
-                            if (ElementIncludesPoint(p_current_node->rGetLocation(), other_iter->GetIndex()))
-                            {
-                                PerformT3Swap(p_current_node, other_iter->GetIndex());
-                            }
-                        }
-                    }
+                	// Loop over element vertices
+		            for (unsigned local_index=0; local_index<num_nodes; local_index++)
+		            {
+		                // Find locations of current node and anticlockwise node
+		                Node<SPACE_DIM>* p_current_node = elem_iter->GetNode(local_index);
+		
+		                if (p_current_node->IsBoundaryNode())
+		                {
+		                    for (typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator other_iter = GetElementIteratorBegin();
+		                         other_iter != GetElementIteratorEnd();
+		                         ++other_iter)
+		                    {
+		                        if (other_iter != elem_iter)
+		                        {
+		                            if (ElementIncludesPoint(p_current_node->rGetLocation(), other_iter->GetIndex()))
+		                            {
+		                                PerformT3Swap(p_current_node, other_iter->GetIndex());
+		                                recheck_mesh = true;
+		                                break;
+		                            }
+		                        }
+		                    }
+		                }
+		            }
                 }
-            }
-        }
+	        }
+	    }
     }
     else // 3D
     {
@@ -859,6 +873,7 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElementMap)
         #undef COVERAGE_IGNORE
         /// \todo put code for remeshing in 3D here - see #866 and the paper doi:10.1016/j.jtbi.2003.10.001
     }
+
 }
 
 
@@ -1929,7 +1944,7 @@ unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocalIndexForElementEdgeClosestT
     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(elementIndex);
     unsigned num_nodes = p_element->GetNumNodes();
 
-    double min_squared_distance = DBL_MAX;
+    double min_squared_normal_distance = DBL_MAX;
     unsigned min_distance_edge_index = UINT_MAX;
 
     // Loop over edges of the element
@@ -1946,14 +1961,16 @@ unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocalIndexForElementEdgeClosestT
         double distance_parallel_to_edge = inner_prod(vector_a_to_point, edge_ab_unit_vector);
 
         double squared_distance_normal_to_edge = SmallPow(norm_2(vector_a_to_point), 2) - SmallPow(distance_parallel_to_edge, 2);
-
-        if (squared_distance_normal_to_edge < min_squared_distance)
+		
+		// Make sure node is within the confines of the edge and is the nearest edge to the node \this breks for convex elements         
+        if (squared_distance_normal_to_edge < min_squared_normal_distance && 
+        	distance_parallel_to_edge >=0 && 
+        	distance_parallel_to_edge <= norm_2(vector_a_to_b))
         {
-            min_squared_distance = squared_distance_normal_to_edge;
+            min_squared_normal_distance = squared_distance_normal_to_edge;
             min_distance_edge_index = local_index;
         }
     }
-
     return min_distance_edge_index;
 }
 
@@ -1989,6 +2006,11 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* pNode, u
     unsigned vertexA_index = p_element->GetNodeGlobalIndex(node_A_local_index);
     unsigned vertexB_index = p_element->GetNodeGlobalIndex((node_A_local_index+1)%num_nodes);
 
+
+    // Check these nodes are also boundary nodes
+    assert(this->mNodes[vertexA_index]->IsBoundaryNode());
+	assert(this->mNodes[vertexB_index]->IsBoundaryNode());
+	
     /*
      * Get the nodes at either end of the edge to be divided and calculate intersection
      */
@@ -2052,9 +2074,9 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* pNode, u
              */
 
             // Move original node
-            pNode->rGetModifiableLocation() = intersection + mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
+            pNode->rGetModifiableLocation() = intersection + 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
 
-            c_vector<double, SPACE_DIM> new_node_location = intersection - mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
+            c_vector<double, SPACE_DIM> new_node_location = intersection - 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
 
             // Add new node whic will always be a boundary node
             unsigned new_node_global_index = this->AddNode(new Node<SPACE_DIM>(0, true, new_node_location[0], new_node_location[1]));
