@@ -2017,10 +2017,32 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* pNode, u
     c_vector<double, SPACE_DIM> vertexA = p_element->GetNodeLocation(node_A_local_index);
     c_vector<double, SPACE_DIM> vertexB = p_element->GetNodeLocation((node_A_local_index+1)%num_nodes);
     c_vector<double, SPACE_DIM> vector_a_to_point = this->GetVectorFromAtoB(vertexA, node_location);
+    
     c_vector<double, SPACE_DIM> vector_a_to_b = this->GetVectorFromAtoB(vertexA, vertexB);
+    
+    if (norm_2(vector_a_to_b) < 2.0*mCellRearrangementRatio*mCellRearrangementRatio*mCellRearrangementThreshold)
+    {
+    	EXCEPTION("Trying to merge a node onto an edge which is too small.");
+    }
+    
     c_vector<double, SPACE_DIM> edge_ab_unit_vector = vector_a_to_b/norm_2(vector_a_to_b);
     c_vector<double, SPACE_DIM> intersection = vertexA + edge_ab_unit_vector*inner_prod(vector_a_to_point, edge_ab_unit_vector);
 
+	/*
+	 * If the intersection is within mCellRearrangementRatio^2*mCellRearangementThreshold of vertexA or vertexB move it  
+	 * mCellRearrangementRatio^2*mCellRearrangementThreshold away.
+	 * 
+	 * Note: this distance so that there is always enough room for new nodes (if necessary).
+	 */
+    if (norm_2(intersection - vertexA) < mCellRearrangementRatio*mCellRearrangementRatio*mCellRearrangementThreshold)
+    {
+        intersection = vertexA + mCellRearrangementRatio*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
+    }
+    if (norm_2(intersection - vertexB) < mCellRearrangementRatio*mCellRearrangementRatio*mCellRearrangementThreshold)
+    {
+        intersection = vertexB - mCellRearrangementRatio*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
+    }
+	
     if (pNode->GetNumContainingElements() == 1)
     {
         // Get the index of the element containing the intersecting node

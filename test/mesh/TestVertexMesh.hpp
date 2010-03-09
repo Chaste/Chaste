@@ -38,7 +38,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "VertexMeshWriter.hpp"
 #include "VertexMesh.hpp"
 #include "ArchiveOpener.hpp"
-#include "Debug.hpp"
 
 class TestVertexMesh : public CxxTest::TestSuite
 {
@@ -3391,7 +3390,54 @@ public:
         TS_ASSERT_THROWS_THIS(vertex_mesh.ReMesh(), "Trying to merge a node, contained in more than 2 elements, into another element, this is not possible with the vertex mesh.");
         
         
-        //\todo add test for convex element?
+        /* Create a rectangualar and a triangular node to test interscting on an
+         * edge that is too small
+         * 
+         *            
+         *  ______  /|   
+         * |      |/ | <--- 
+         * |______|\ |
+         *          \|
+         *       
+         *
+         */
+        nodes.clear();
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, true, 1.0, 0.1));
+        nodes.push_back(new Node<2>(3, true, 0.0, 0.1));
+        nodes.push_back(new Node<2>(4, true, 0.99, 0.05));
+        nodes.push_back(new Node<2>(5, true, 2.0, 0.0));
+        nodes.push_back(new Node<2>(6, true, 2.0, 0.1));
+
+        nodes_in_element0.clear();
+        nodes_in_element0.push_back(nodes[0]);
+        nodes_in_element0.push_back(nodes[1]);
+        nodes_in_element0.push_back(nodes[2]);
+        nodes_in_element0.push_back(nodes[3]);
+
+        nodes_in_element1.clear();
+        nodes_in_element1.push_back(nodes[5]);
+        nodes_in_element1.push_back(nodes[6]);
+        nodes_in_element1.push_back(nodes[4]);
+        
+        // Make elements
+        elements.clear();
+        elements.push_back(new VertexElement<2,2>(0, nodes_in_element0));
+        elements.push_back(new VertexElement<2,2>(1, nodes_in_element1));
+        
+        // Make mesh
+        VertexMesh<2,2> vertex_mesh_2(nodes, elements);
+        vertex_mesh_2.SetCellRearrangementThreshold(1.0);// Threshold distance set to ease calculations.
+        
+        TS_ASSERT_EQUALS(vertex_mesh_2.GetNumNodes(), 7u);
+        TS_ASSERT_EQUALS(vertex_mesh_2.GetNumElements(), 2u);
+
+        // Call remesh which in turn calls PerformT3Swap
+        TS_ASSERT_THROWS_THIS(vertex_mesh_2.ReMesh(), "Trying to merge a node onto an edge which is too small.");
+        
+        
+        
     }
 
     void TestT3SwapForNeighboringElements()
@@ -3604,18 +3650,18 @@ public:
 		TS_ASSERT_DELTA(vertex_mesh.GetNode(16)->rGetLocation()[1], 1.0, 1e-4);
 		TS_ASSERT_DELTA(vertex_mesh.GetNode(17)->rGetLocation()[0], 0.0, 1e-4);
 		TS_ASSERT_DELTA(vertex_mesh.GetNode(17)->rGetLocation()[1], 0.45, 1e-4);
-		TS_ASSERT_DELTA(vertex_mesh.GetNode(23)->rGetLocation()[0], 4.45, 1e-4);
+		TS_ASSERT_DELTA(vertex_mesh.GetNode(23)->rGetLocation()[0], 4.95, 1e-4);
 		TS_ASSERT_DELTA(vertex_mesh.GetNode(23)->rGetLocation()[1], 0.0, 1e-4);
-		TS_ASSERT_DELTA(vertex_mesh.GetNode(27)->rGetLocation()[0], 5.55, 1e-4);
+		TS_ASSERT_DELTA(vertex_mesh.GetNode(27)->rGetLocation()[0], 5.25, 1e-4);
 		TS_ASSERT_DELTA(vertex_mesh.GetNode(27)->rGetLocation()[1], 0.0, 1e-4);
 		TS_ASSERT_DELTA(vertex_mesh.GetNode(29)->rGetLocation()[0], 6.0, 1e-4);
-		TS_ASSERT_DELTA(vertex_mesh.GetNode(29)->rGetLocation()[1], 0.5, 1e-4);
-		TS_ASSERT_DELTA(vertex_mesh.GetNode(32)->rGetLocation()[0], 5.55, 1e-4);
+		TS_ASSERT_DELTA(vertex_mesh.GetNode(29)->rGetLocation()[1], 0.85, 1e-4);
+		TS_ASSERT_DELTA(vertex_mesh.GetNode(32)->rGetLocation()[0], 5.05, 1e-4);
 		TS_ASSERT_DELTA(vertex_mesh.GetNode(32)->rGetLocation()[1], 1.0, 1e-4);
-		TS_ASSERT_DELTA(vertex_mesh.GetNode(33)->rGetLocation()[0], 4.45, 1e-4);
+		TS_ASSERT_DELTA(vertex_mesh.GetNode(33)->rGetLocation()[0], 4.75, 1e-4);
 		TS_ASSERT_DELTA(vertex_mesh.GetNode(33)->rGetLocation()[1], 1.0, 1e-4);
 		TS_ASSERT_DELTA(vertex_mesh.GetNode(37)->rGetLocation()[0], 4.0, 1e-4);
-		TS_ASSERT_DELTA(vertex_mesh.GetNode(37)->rGetLocation()[1], 0.5, 1e-4);
+		TS_ASSERT_DELTA(vertex_mesh.GetNode(37)->rGetLocation()[1], 0.15, 1e-4);
 		
 		//Test Added Nodes
 		TS_ASSERT_DELTA(vertex_mesh.GetNode(38)->rGetLocation()[0], 0.0, 1e-4);
@@ -3630,13 +3676,13 @@ public:
 		TS_ASSERT_DELTA(vertex_mesh.GetNode(42)->rGetLocation()[1], 1.0, 1e-4);
 		TS_ASSERT_DELTA(vertex_mesh.GetNode(43)->rGetLocation()[0], 0.4, 1e-4);
 		TS_ASSERT_DELTA(vertex_mesh.GetNode(43)->rGetLocation()[1], 1.0, 1e-4);
-		TS_ASSERT_DELTA(vertex_mesh.GetNode(44)->rGetLocation()[0], 4.55, 1e-4);
+		TS_ASSERT_DELTA(vertex_mesh.GetNode(44)->rGetLocation()[0], 5.05, 1e-4);
 		TS_ASSERT_DELTA(vertex_mesh.GetNode(44)->rGetLocation()[1], 0.0, 1e-4);
-		TS_ASSERT_DELTA(vertex_mesh.GetNode(45)->rGetLocation()[0], 5.45, 1e-4);
+		TS_ASSERT_DELTA(vertex_mesh.GetNode(45)->rGetLocation()[0], 5.15, 1e-4);
 		TS_ASSERT_DELTA(vertex_mesh.GetNode(45)->rGetLocation()[1], 0.0, 1e-4);
-		TS_ASSERT_DELTA(vertex_mesh.GetNode(46)->rGetLocation()[0], 5.45, 1e-4);
+		TS_ASSERT_DELTA(vertex_mesh.GetNode(46)->rGetLocation()[0], 4.95, 1e-4);
 		TS_ASSERT_DELTA(vertex_mesh.GetNode(46)->rGetLocation()[1], 1.0, 1e-4);
-		TS_ASSERT_DELTA(vertex_mesh.GetNode(47)->rGetLocation()[0], 4.55, 1e-4);
+		TS_ASSERT_DELTA(vertex_mesh.GetNode(47)->rGetLocation()[0], 4.85, 1e-4);
 		TS_ASSERT_DELTA(vertex_mesh.GetNode(47)->rGetLocation()[1], 1.0, 1e-4);
 		
         // Test elements have correct nodes (1st Block)
