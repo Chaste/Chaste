@@ -1084,21 +1084,110 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>* pNode
                     // Remove the deleted node and re-index
                     RemoveDeletedNodes();
                 }
+                //\todo use the fact that both nodes are boundary nodes here
                 else if (nodeA_elem_indices.size()==2 && nodeB_elem_indices.size()==2)
                 {
-                    /*
-                     * In this case, the node configuration looks like:
-                     *
-                     *     A  B                  A  B
-                     *   \ empty/              \      /
-                     *    \    /                \(1) /
-                     * (3) o--o (1)  or      (2) o--o (3)    (element number in brackets)
-                     *    / (2)\                /    \
-                     *   /      \              /empty \
-                     *
-                     * We perform a Type 1 swap in this case.
-                     */
-                    PerformT1Swap(pNodeA, pNodeB, all_indices);
+                	// element in nodeA_elem_indices which is not in nodeB_elem_indices contains a shared node with the element in nodeA_elem_indices which is not in nodeB_elem_indices. 
+                	 
+				    std::set<unsigned> element_A_not_B, temp_set;
+				    std::set_difference(all_indices.begin(), all_indices.end(),
+				                   	   nodeB_elem_indices.begin(), nodeB_elem_indices.end(),
+				                       std::inserter(temp_set, temp_set.begin()));
+				    element_A_not_B.swap(temp_set);
+				    
+                	//Should only be one such element
+                	assert(element_A_not_B.size()==1);
+                	  
+                	std::set<unsigned> element_B_not_A;
+				    std::set_difference(all_indices.begin(), all_indices.end(),
+				                   	   nodeA_elem_indices.begin(), nodeA_elem_indices.end(),
+				                       std::inserter(temp_set, temp_set.begin()));
+				    element_B_not_A.swap(temp_set);
+				    				    
+				    //Should only be one such element
+                	assert(element_B_not_A.size()==1);
+                	
+                	
+                    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element_A_not_B = mElements[*element_A_not_B.begin()];
+                	VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element_B_not_A = mElements[*element_B_not_A.begin()];
+                	
+			        unsigned local_index_1 = p_element_A_not_B->GetNodeLocalIndex(pNodeA->GetIndex());
+			        unsigned next_node_1 = p_element_A_not_B->GetNodeGlobalIndex((local_index_1 + 1)%(p_element_A_not_B->GetNumNodes()));
+			        unsigned previous_node_1 = p_element_A_not_B->GetNodeGlobalIndex((local_index_1 + p_element_A_not_B->GetNumNodes() - 1)%(p_element_A_not_B->GetNumNodes()));
+			        unsigned local_index_2 = p_element_B_not_A->GetNodeLocalIndex(pNodeB->GetIndex());
+			        unsigned next_node_2 = p_element_B_not_A->GetNodeGlobalIndex((local_index_2 + 1)%(p_element_B_not_A->GetNumNodes()));
+			        unsigned previous_node_2 = p_element_B_not_A->GetNodeGlobalIndex((local_index_2 + p_element_B_not_A->GetNumNodes() - 1)%(p_element_B_not_A->GetNumNodes()));
+
+					if (next_node_1 == previous_node_2 || next_node_2 == previous_node_1)
+         	        {
+	                    /*
+	                     * In this case, the node configuration looks like:
+	                     *
+	                     *     A  B                  A  B
+	                     *      /\                 \      /
+	                     *     /v \                 \(1) /
+	                     * (3) o--o (1)  or      (2) o--o (3)    (element number in brackets, v is a void)
+	                     *    / (2)\                 \v /               
+	                     *   /      \                 \/
+	                     *
+	                     * We perform a T3 way merge, removing the void.
+	                     */
+						unsigned nodeC_index;
+						if (next_node_1 == previous_node_2 && next_node_2 != previous_node_1)
+						{
+							nodeC_index = next_node_1;
+						}
+						else if (next_node_2 == previous_node_1 && next_node_1 != previous_node_2)
+						{
+							nodeC_index = next_node_2;
+						}
+						else
+						{
+						 	assert(next_node_1 == previous_node_2 && next_node_2 == previous_node_1);
+						 	EXCEPTION("Triangular element next to triangular void, not implemented yet.");	
+						}
+						
+						Node<SPACE_DIM>* p_nodeC = this->mNodes[nodeC_index];
+						                     
+						// \todo this should be a helper method "PerformVoidRemoval(pNodeA, pNodeB, p_nodeC)";
+
+					    unsigned nodeA_index = pNodeA->GetIndex();
+					    unsigned nodeB_index = pNodeB->GetIndex();
+
+						c_vector<double, SPACE_DIM> nodes_midpoint = pNodeA->rGetLocation() + this->GetVectorFromAtoB(pNodeA->rGetLocation(), pNodeB->rGetLocation())/3.0
+																							+ this->GetVectorFromAtoB(pNodeA->rGetLocation(), p_nodeC->rGetLocation())/3.0;
+    										
+					    Node<SPACE_DIM>*  p_low_node_A_B = (nodeA_index < nodeB_index) ? pNodeA : pNodeB; // Node with the lowest index out of A and B
+					    Node<SPACE_DIM>*  p_low_node = (p_low_node_A_B->GetIndex() < nodeC_index) ? p_low_node_A_B : p_nodeC; // Node with the lowest index out of A, B and C.
+					    PerformNodeMerge(pNodeA,pNodeB);
+					    PerformNodeMerge(p_low_node_A_B,p_nodeC);
+
+					    c_vector<double, SPACE_DIM>& r_low_node_location = p_low_node->rGetModifiableLocation();
+
+     					r_low_node_location = nodes_midpoint;
+     					
+   					    // Sort out boundary nodes
+    			        p_low_node->SetAsBoundaryNode(false);
+
+					    // Remove the deleted nodes and re-index
+                        RemoveDeletedNodes();
+                    }
+                    else
+                    {
+				        /*
+	                     * In this case, the node configuration looks like:
+	                     *
+	                     *     A  B                  A  B
+	                     *   \ empty/              \      /
+	                     *    \    /                \(1) /
+	                     * (3) o--o (1)  or      (2) o--o (3)    (element number in brackets)
+	                     *    / (2)\                /    \
+	                     *   /      \              /empty \
+	                     *
+	                     * We perform a Type 1 swap in this case.
+	                     */
+	                    PerformT1Swap(pNodeA, pNodeB, all_indices);
+                    }
                 }
                 else
                 {
@@ -1599,6 +1688,11 @@ unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(VertexE
         Node<SPACE_DIM>* p_node_A = pElement->GetNode((intersecting_nodes[i]+nodes_added)%pElement->GetNumNodes());
         Node<SPACE_DIM>* p_node_B = pElement->GetNode((intersecting_nodes[i]+nodes_added+1)%pElement->GetNumNodes());
 
+        // Find the indices of the elements owned by each node on the edge into which one new node will be inserted
+        std::set<unsigned> elems_containing_node_A = p_node_A->rGetContainingElementIndices();
+        std::set<unsigned> elems_containing_node_B = p_node_B->rGetContainingElementIndices();
+
+
         c_vector<double, SPACE_DIM> position_a = p_node_A->rGetLocation();
         c_vector<double, SPACE_DIM> position_b = p_node_B->rGetLocation();
 
@@ -1630,10 +1724,23 @@ unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(VertexE
             intersection = position_b - mCellRearrangementRatio*mCellRearrangementThreshold*a_to_b/norm_2(a_to_b);
         }
 
+
+		/*
+		 * The new node is boundary node if the 2 nodes are bounary nodes and the elements dont look like 
+		 *   ___A___
+		 *  |   |   |
+		 *  |___|___|
+		 *      B
+		 */
         bool is_boundary = false;
         if (p_node_A->IsBoundaryNode() && p_node_B->IsBoundaryNode())
         {
-            is_boundary = true;
+        	if (elems_containing_node_A.size() !=2 || 
+        		elems_containing_node_B.size() !=2 ||
+        		elems_containing_node_A != elems_containing_node_B)
+            {
+            	is_boundary = true;
+            }
         }
 
         // Add a new node to the mesh at the location of the intersection
@@ -1642,16 +1749,12 @@ unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(VertexE
 
         // Now make sure node is added to neighbouring elements
 
-        // Find the indices of the elements owned by each node on the edge into which one new node will be inserted
-        std::set<unsigned> elems_containing_node1 = p_node_A->rGetContainingElementIndices();
-        std::set<unsigned> elems_containing_node2 = p_node_B->rGetContainingElementIndices();
-
         // Find common elements
         std::set<unsigned> shared_elements;
-        std::set_intersection(elems_containing_node1.begin(),
-                              elems_containing_node1.end(),
-                              elems_containing_node2.begin(),
-                              elems_containing_node2.end(),
+        std::set_intersection(elems_containing_node_A.begin(),
+                              elems_containing_node_A.end(),
+                              elems_containing_node_B.begin(),
+                              elems_containing_node_B.end(),
                               std::inserter(shared_elements, shared_elements.begin()));
 
         // Iterate over common elements
