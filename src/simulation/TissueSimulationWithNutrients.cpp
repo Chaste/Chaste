@@ -592,14 +592,14 @@ void TissueSimulationWithNutrients<DIM>::WriteAverageRadialNutrientDistribution(
 
     // Calculate the centre of the tissue
     c_vector<double,DIM> centre = zero_vector<double>(DIM);
-    double num_nodes_as_double = (double) this->mrTissue.GetNumNodes();
 
     for (typename AbstractTissue<DIM>::Iterator cell_iter = this->mrTissue.Begin();
          cell_iter != this->mrTissue.End();
          ++cell_iter)
     {
-       centre += (this->mrTissue.GetLocationOfCellCentre(*cell_iter)) / num_nodes_as_double;
+       centre += (this->mrTissue.GetLocationOfCellCentre(*cell_iter));
     }
+    centre /= ((double) this->mrTissue.GetNumNodes());
 
     // Calculate the distance between each node and the centre of the tissue, as well as the maximum of these
     std::map<double, TissueCell*> distance_cell_map;
