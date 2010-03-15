@@ -34,7 +34,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "TissueSimulationArchiver.hpp"
 
 #include "VertexCryptSimulation2d.hpp"
-#include "HoneycombVertexMeshGenerator.hpp"
+#include "CylindricalHoneycombVertexMeshGenerator.hpp"
 #include "NagaiHondaForce.hpp"
 #include "VertexCryptBoundaryForce.hpp"
 #include "SimpleWntCellCycleModel.hpp"
@@ -60,7 +60,7 @@ public:
         // Create mesh
         unsigned crypt_width = 18;
         unsigned crypt_height = 25;
-        HoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true, true);
+        CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells

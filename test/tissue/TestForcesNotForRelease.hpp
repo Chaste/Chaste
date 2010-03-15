@@ -712,7 +712,7 @@ public:
     void TestVertexCryptBoundaryForce() throw (Exception)
     {
         // Create a simple 2D VertexMesh
-        HoneycombVertexMeshGenerator generator(5, 5, false, false, 0.1, 0.5);
+        HoneycombVertexMeshGenerator generator(5, 5, false, 0.1, 0.5);
         VertexMesh<2,2>* p_mesh = generator.GetMesh();
 
         // Translate mesh so that some points are below y=0

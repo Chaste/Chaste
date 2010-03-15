@@ -33,7 +33,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
-#include "HoneycombVertexMeshGenerator.hpp"
+#include "CylindricalHoneycombVertexMeshGenerator.hpp"
 #include "Cylindrical2dVertexMesh.hpp"
 #include "VertexMeshWriter.hpp"
 #include "ArchiveOpener.hpp"
@@ -45,7 +45,7 @@ public:
     void TestEachNodeIsContainedInAtLeastOneElement()
     {
         // Create mesh
-        HoneycombVertexMeshGenerator generator(18, 25, true, true);
+        CylindricalHoneycombVertexMeshGenerator generator(18, 25, true);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         for (unsigned node_index=0; node_index<p_mesh->GetNumNodes(); node_index++)
@@ -60,7 +60,7 @@ public:
     void TestMeshGetWidth()
     {
         // Create mesh
-        HoneycombVertexMeshGenerator generator(4, 4, true);
+        CylindricalHoneycombVertexMeshGenerator generator(4, 4);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Test GetWidthExtremes() method
@@ -84,7 +84,7 @@ public:
     void TestGetVectorFromAtoB() throw (Exception)
     {
         // Create mesh
-        HoneycombVertexMeshGenerator generator(4, 4, true);
+        CylindricalHoneycombVertexMeshGenerator generator(4, 4);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         c_vector<double, 2> node18_location = p_mesh->GetNode(18)->rGetLocation();
@@ -113,7 +113,7 @@ public:
     void TestSetNodeLocationForCylindricalMesh() throw (Exception)
     {
         // Create mesh
-        HoneycombVertexMeshGenerator generator(4, 4, true);
+        CylindricalHoneycombVertexMeshGenerator generator(4, 4);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Move one of the nodes to near the periodic boundary
@@ -142,7 +142,7 @@ public:
     void TestAddNodeAndReMesh() throw (Exception)
     {
         // Create mesh
-        HoneycombVertexMeshGenerator generator(6, 6, true);
+        CylindricalHoneycombVertexMeshGenerator generator(6, 6);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 84u);
@@ -198,7 +198,7 @@ public:
     void TestElementAreaPerimeterCentroidAndMoments()
     {
         // Create mesh
-        HoneycombVertexMeshGenerator generator(4, 4, true);
+        CylindricalHoneycombVertexMeshGenerator generator(4, 4);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 40u);
@@ -236,7 +236,7 @@ public:
     void TestDivideElementAlongGivenAxis()
     {
         // Create mesh
-        HoneycombVertexMeshGenerator generator(4, 4, true);
+        CylindricalHoneycombVertexMeshGenerator generator(4, 4);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 16u);
@@ -312,7 +312,7 @@ public:
         // Create mesh
         unsigned num_cells_across = 4;
         unsigned num_cells_up = 7;
-        HoneycombVertexMeshGenerator generator(num_cells_across, num_cells_up, true);
+        CylindricalHoneycombVertexMeshGenerator generator(num_cells_across, num_cells_up);
         AbstractMesh<2,2>* const p_saved_mesh = generator.GetCylindricalMesh();
 
         double crypt_width = num_cells_across;
@@ -400,7 +400,7 @@ public:
         // Create mesh
         unsigned num_cells_across = 6;
         unsigned num_cells_up = 12;
-        HoneycombVertexMeshGenerator generator(num_cells_across, num_cells_up, true);
+        CylindricalHoneycombVertexMeshGenerator generator(num_cells_across, num_cells_up);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Remesh
@@ -419,7 +419,7 @@ public:
         // Create mesh
         unsigned num_cells_across = 6;
         unsigned num_cells_up = 12;
-        HoneycombVertexMeshGenerator generator(num_cells_across, num_cells_up, true);
+        CylindricalHoneycombVertexMeshGenerator generator(num_cells_across, num_cells_up);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         unsigned num_old_nodes = p_mesh->GetNumNodes();

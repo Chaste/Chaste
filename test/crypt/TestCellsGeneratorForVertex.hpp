@@ -33,7 +33,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "FixedDurationGenerationBasedCellCycleModelCellsGeneratorForVertex.hpp"
 #include "SimpleWntCellCycleModelCellsGeneratorForVertex.hpp"
 #include "StochasticDurationGenerationBasedCellCycleModelCellsGeneratorForVertex.hpp"
-#include "HoneycombVertexMeshGenerator.hpp"
+#include "CylindricalHoneycombVertexMeshGenerator.hpp"
 #include "TrianglesMeshReader.hpp"
 
 #include "AbstractCellBasedTestSuite.hpp"
@@ -51,7 +51,7 @@ public:
         // Create mesh
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
-        HoneycombVertexMeshGenerator mesh_generator(crypt_width, crypt_height, true);
+        CylindricalHoneycombVertexMeshGenerator mesh_generator(crypt_width, crypt_height);
         Cylindrical2dVertexMesh* p_mesh = mesh_generator.GetCylindricalMesh();
 
 
@@ -113,7 +113,7 @@ public:
         // Create mesh
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
-        HoneycombVertexMeshGenerator mesh_generator(crypt_width, crypt_height, true);
+        CylindricalHoneycombVertexMeshGenerator mesh_generator(crypt_width, crypt_height);
         Cylindrical2dVertexMesh* p_mesh = mesh_generator.GetCylindricalMesh();
 
         // Create cells

@@ -46,7 +46,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "StochasticDurationGenerationBasedCellCycleModel.hpp"
 #include "StochasticDurationGenerationBasedCellCycleModelCellsGeneratorForVertex.hpp"
 
-#include "HoneycombVertexMeshGenerator.hpp"
+#include "CylindricalHoneycombVertexMeshGenerator.hpp"
 #include "SloughingCellKiller.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "CellBasedEventHandler.hpp"
@@ -119,7 +119,7 @@ public:
         // Create mesh
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
-        HoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true);
+        CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Set up cells
@@ -176,7 +176,7 @@ public:
         // Create mesh
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
-        HoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true);
+        CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
@@ -226,7 +226,7 @@ public:
         // Create mesh
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
-        HoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true);
+        CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells, all differentiated
@@ -262,7 +262,7 @@ public:
     void TestCryptWithBirth() throw (Exception)
     {
         // Create mesh
-        HoneycombVertexMeshGenerator generator(4, 6, true);
+        CylindricalHoneycombVertexMeshGenerator generator(4, 6);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells, bottom row are STEM rest are DIFFERENTIATED.
@@ -309,7 +309,7 @@ public:
         // Create mesh
         unsigned crypt_width = 10;
         unsigned crypt_height = 20;
-        HoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true, true);
+        CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
@@ -350,7 +350,7 @@ public:
         // Create mesh
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
-        HoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true, true);
+        CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
@@ -395,7 +395,7 @@ public:
         // Create mesh
         unsigned crypt_width = 10;
         unsigned crypt_height = 20;
-        HoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true, true);
+        CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
@@ -442,7 +442,7 @@ public:
         // Create mesh
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
-        HoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true);
+        CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells, bottom row are STEM rest are DIFFERENTIATED.
@@ -493,7 +493,7 @@ public:
         // Create mesh
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
-        HoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true);
+        CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells

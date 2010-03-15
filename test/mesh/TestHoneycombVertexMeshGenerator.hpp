@@ -35,6 +35,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <boost/archive/text_iarchive.hpp>
 
 #include "HoneycombVertexMeshGenerator.hpp"
+#include "CylindricalHoneycombVertexMeshGenerator.hpp"
 
 class TestHoneycombVertexMeshGenerator : public CxxTest::TestSuite
 {
@@ -43,10 +44,6 @@ public:
     void TestVertexMeshGenerator() throw(Exception)
     {
         HoneycombVertexMeshGenerator generator(5, 3);
-
-        // Coverage
-        TS_ASSERT_THROWS_THIS(generator.GetCylindricalMesh(),
-                              "A normal mesh was created but a cylindrical mesh is being requested.");
 
         // Create mesh
         VertexMesh<2,2>* p_mesh = generator.GetMesh();
@@ -134,11 +131,11 @@ public:
 
     void TestCylindrical2dVertexMeshGenerator()
     {
-        HoneycombVertexMeshGenerator generator(4, 4, true);
+        CylindricalHoneycombVertexMeshGenerator generator(4, 4);
 
         // Coverage
-        TS_ASSERT_THROWS_THIS(generator.GetMesh(),
-                              "A cylindrical mesh was created but a normal mesh is being requested.");
+        //TS_ASSERT_THROWS_THIS(generator.GetMesh(),
+        //                      "A cylindrical mesh was created but a normal mesh is being requested.");
 
         // Create periodic mesh
         Cylindrical2dVertexMesh* p_cylindrical_mesh = generator.GetCylindricalMesh();
@@ -159,14 +156,14 @@ public:
         TS_ASSERT_EQUALS(system(("diff " + results_file2 + " notforrelease_cell_based/test/data/TestCylindrical2dVertexMesh/cylindrical_vertex_mesh.cell").c_str()), 0);
 
         // Create periodic mesh with flat bottom
-        HoneycombVertexMeshGenerator generator3(4, 4, true, true);
+        CylindricalHoneycombVertexMeshGenerator generator3(4, 4, true);
         Cylindrical2dVertexMesh* p_flat_cylindrical_mesh = generator3.GetCylindricalMesh();
 
         // The flat bottomed periodic mesh should have the same number of elements and nodes
         TS_ASSERT_EQUALS(p_flat_cylindrical_mesh->GetNumElements(), 16u);
         TS_ASSERT_EQUALS(p_flat_cylindrical_mesh->GetNumNodes(), 36u);
 
-        // The bottom rov of nodes should be boundary nodes
+        // The bottom row of nodes should be boundary nodes
         TS_ASSERT(p_flat_cylindrical_mesh->GetNode(0)->IsBoundaryNode());
         TS_ASSERT(p_flat_cylindrical_mesh->GetNode(1)->IsBoundaryNode());
         TS_ASSERT(p_flat_cylindrical_mesh->GetNode(2)->IsBoundaryNode());
