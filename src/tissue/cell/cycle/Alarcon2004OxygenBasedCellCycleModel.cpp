@@ -73,6 +73,12 @@ void Alarcon2004OxygenBasedCellCycleModel::ResetForDivision()
     }
 }
 
+void Alarcon2004OxygenBasedCellCycleModel::SetDimension(unsigned dimension)
+{
+	mDimension = dimension;
+}
+
+
 AbstractCellCycleModel* Alarcon2004OxygenBasedCellCycleModel::CreateCellCycleModel()
 {
     return new Alarcon2004OxygenBasedCellCycleModel(*this);
