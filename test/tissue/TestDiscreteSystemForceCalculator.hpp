@@ -37,6 +37,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "HoneycombMeshGenerator.hpp"
 #include "DiscreteSystemForceCalculator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModelCellsGenerator.hpp"
+#include "CellsGenerator.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 
@@ -141,7 +142,7 @@ public:
         HoneycombMeshGenerator mesh_generator(7, 5, 0, false, 2.0);
         MutableMesh<2,2>* p_mesh = mesh_generator.GetMesh();
 
-        FixedDurationGenerationBasedCellCycleModelCellsGenerator<2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         std::vector<TissueCell> cells;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
@@ -210,7 +211,7 @@ public:
         HoneycombMeshGenerator mesh_generator(7, 5, 0, false, 2.0);
         MutableMesh<2,2>* p_mesh = mesh_generator.GetMesh();
 
-        FixedDurationGenerationBasedCellCycleModelCellsGenerator<2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         std::vector<TissueCell> cells;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 

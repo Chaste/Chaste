@@ -35,7 +35,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CellwiseNutrientSinkPde.hpp"
 #include "AveragedSinksPde.hpp"
 #include "HoneycombMeshGenerator.hpp"
-#include "FixedDurationGenerationBasedCellCycleModelCellsGenerator.hpp"
+#include "CellsGenerator.hpp"
+#include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 
 class TestNutrientPdes : public AbstractCellBasedTestSuite
@@ -66,7 +67,7 @@ public:
         HoneycombMeshGenerator generator(5, 5, 0, false);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
         std::vector<TissueCell> cells;
-        FixedDurationGenerationBasedCellCycleModelCellsGenerator<2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         // Make one cell apoptotic
@@ -102,7 +103,7 @@ public:
         HoneycombMeshGenerator generator(5, 5, 0, false);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
         std::vector<TissueCell> cells;
-        FixedDurationGenerationBasedCellCycleModelCellsGenerator<2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
         MeshBasedTissue<2> tissue(*p_mesh, cells);
 

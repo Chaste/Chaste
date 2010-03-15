@@ -37,7 +37,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "MeshBasedTissueWithGhostNodes.hpp"
 #include "CellwiseDataGradient.hpp"
-#include "FixedDurationGenerationBasedCellCycleModelCellsGenerator.hpp"
+#include "CellsGenerator.hpp"
+#include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "TrianglesMeshReader.hpp"
 
@@ -58,7 +59,7 @@ public:
 
         // Create a tissue
         std::vector<TissueCell> cells;
-        FixedDurationGenerationBasedCellCycleModelCellsGenerator<2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
         MeshBasedTissue<2> tissue(mesh,cells);
 
@@ -97,7 +98,7 @@ public:
 
         // Create a tissue
         std::vector<TissueCell> cells;
-        FixedDurationGenerationBasedCellCycleModelCellsGenerator<2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
         MeshBasedTissue<2> tissue(mesh,cells);
 
@@ -190,7 +191,7 @@ public:
 
         // Set up cells
         std::vector<TissueCell> cells;
-        FixedDurationGenerationBasedCellCycleModelCellsGenerator<2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, cell_location_indices.size());
 
         // Create a tissue
