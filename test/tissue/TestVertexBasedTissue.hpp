@@ -866,7 +866,7 @@ public:
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, num_steps+1);
 
             // Create mesh
-            VertexMeshReader<2,2> mesh_reader("notforrelease_cell_based/test/data/TestVertexMesh/vertex_mesh");
+            VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/vertex_mesh");
             VertexMesh<2,2> mesh;
             mesh.ConstructFromMeshReader(mesh_reader);
 
