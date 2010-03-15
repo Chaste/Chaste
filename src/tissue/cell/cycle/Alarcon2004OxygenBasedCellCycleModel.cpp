@@ -31,7 +31,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 RungeKutta4IvpOdeSolver Alarcon2004OxygenBasedCellCycleModel::msSolver;
 
 Alarcon2004OxygenBasedCellCycleModel::Alarcon2004OxygenBasedCellCycleModel(const Alarcon2004OxygenBasedCellCycleModel& rOtherModel)
-    : AbstractOdeBasedCellCycleModel(rOtherModel),
+    : AbstractOdeBasedCellCycleModelWithStoppingEvent(rOtherModel),
       mDimension(rOtherModel.mDimension)
 {
     if (rOtherModel.mpOdeSystem != NULL)
@@ -42,7 +42,7 @@ Alarcon2004OxygenBasedCellCycleModel::Alarcon2004OxygenBasedCellCycleModel(const
 
 
 Alarcon2004OxygenBasedCellCycleModel::Alarcon2004OxygenBasedCellCycleModel()
-    : AbstractOdeBasedCellCycleModel()
+    : AbstractOdeBasedCellCycleModelWithStoppingEvent()
 {
 }
 
@@ -61,7 +61,7 @@ Alarcon2004OxygenBasedCellCycleModel::Alarcon2004OxygenBasedCellCycleModel(const
 
 void Alarcon2004OxygenBasedCellCycleModel::ResetForDivision()
 {
-    AbstractOdeBasedCellCycleModel::ResetForDivision();
+	AbstractOdeBasedCellCycleModelWithStoppingEvent::ResetForDivision();
     assert(mpOdeSystem!=NULL);
 
     // This model needs the protein concentrations and phase resetting to G0/G1.
@@ -152,11 +152,6 @@ double Alarcon2004OxygenBasedCellCycleModel::GetOdeStopTime()
 {
     assert(msSolver.StoppingEventOccurred());
     return msSolver.GetStoppingTime();
-}
-
-void Alarcon2004OxygenBasedCellCycleModel::SetDimension(unsigned dimension)
-{
-    mDimension = dimension;
 }
 
 unsigned Alarcon2004OxygenBasedCellCycleModel::GetDimension()

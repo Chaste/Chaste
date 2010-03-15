@@ -33,7 +33,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include <cfloat>
 
-#include "AbstractOdeBasedCellCycleModel.hpp"
+#include "AbstractOdeBasedCellCycleModelWithStoppingEvent.hpp"
 #include "Alarcon2004OxygenBasedCellCycleOdeSystem.hpp"
 #include "RungeKutta4IvpOdeSolver.hpp"
 #include "BackwardEulerIvpOdeSolver.hpp"
@@ -50,7 +50,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
  * SolveOdeToTime() and GetDivideTime() methods involve instances of
  * CellwiseData<2>.
  */
-class Alarcon2004OxygenBasedCellCycleModel : public AbstractOdeBasedCellCycleModel
+class Alarcon2004OxygenBasedCellCycleModel : public AbstractOdeBasedCellCycleModelWithStoppingEvent
 {
     friend class boost::serialization::access;
 
@@ -70,7 +70,7 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         assert(mpOdeSystem!=NULL);
-        archive & boost::serialization::base_object<AbstractOdeBasedCellCycleModel>(*this);
+        archive & boost::serialization::base_object<AbstractOdeBasedCellCycleModelWithStoppingEvent>(*this);
         // Reference can be read or written into once mpOdeSystem has been set up
         // mpOdeSystem isn't set up by the first constructor, but is by the second
         // which is now utilised by the load_construct at the bottom of this file.
