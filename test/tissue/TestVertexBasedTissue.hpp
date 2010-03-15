@@ -1015,7 +1015,9 @@ public:
         std::vector<TissueCell> cells;
         for (unsigned i=0; i<vertex_mesh.GetNumElements(); i++)
         {
-            TissueCell cell(DIFFERENTIATED, HEALTHY, new WntCellCycleModel(2));
+        	WntCellCycleModel* p_cell_cycle_model = new WntCellCycleModel;
+        	p_cell_cycle_model->SetDimension(2);
+            TissueCell cell(DIFFERENTIATED, HEALTHY, p_cell_cycle_model);
             double birth_time = 0.0 - i;
             cell.SetBirthTime(birth_time);
             cells.push_back(cell);

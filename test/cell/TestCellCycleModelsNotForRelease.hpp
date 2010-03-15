@@ -67,7 +67,8 @@ public:
         CellwiseData<2>::Instance()->SetConstantDataForTesting(oxygen_concentration);
 
         // Create cell cycle model and associated cell
-        Alarcon2004OxygenBasedCellCycleModel* p_cell_model = new Alarcon2004OxygenBasedCellCycleModel(2);
+        Alarcon2004OxygenBasedCellCycleModel* p_cell_model = new Alarcon2004OxygenBasedCellCycleModel();
+        p_cell_model->SetDimension(2);
         TissueCell cell(STEM, HEALTHY, p_cell_model);
 
         // Coverage of cell cycle model copying without an ODE system set up
@@ -100,7 +101,8 @@ public:
 
         // For coverage, create a 1D model
         CellwiseData<1>::Instance()->SetConstantDataForTesting(oxygen_concentration);
-        Alarcon2004OxygenBasedCellCycleModel* p_cell_model3 = new Alarcon2004OxygenBasedCellCycleModel(1);
+        Alarcon2004OxygenBasedCellCycleModel* p_cell_model3 = new Alarcon2004OxygenBasedCellCycleModel();
+        p_cell_model3->SetDimension(1);
         TissueCell cell3(STEM, HEALTHY, p_cell_model3);
         cell3.InitialiseCellCycleModel();
 
@@ -558,7 +560,8 @@ public:
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 2);
 
             // Create cell cycle model and associated cell
-            Alarcon2004OxygenBasedCellCycleModel* p_cell_model = new Alarcon2004OxygenBasedCellCycleModel(3);
+            Alarcon2004OxygenBasedCellCycleModel* p_cell_model = new Alarcon2004OxygenBasedCellCycleModel();
+			p_cell_model->SetDimension(3u);
             TissueCell cell(STEM, HEALTHY, p_cell_model);
 
             cell.InitialiseCellCycleModel();

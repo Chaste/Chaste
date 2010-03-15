@@ -85,7 +85,7 @@ public:
      *
      * @param dimension the spatial dimension (needed by the templated class CellwiseData)
      */
-    Alarcon2004OxygenBasedCellCycleModel(unsigned dimension);
+    Alarcon2004OxygenBasedCellCycleModel();
 
     /**
      * Copy constructor.
@@ -148,11 +148,20 @@ public:
     double GetOdeStopTime();
 
     /**
+	 * Set the spatial dimension.
+	 *
+	 * @param dimension
+	 */
+    void SetDimension(unsigned dimension);
+
+    /**
      * Get the spatial dimension.
      *
      * @return mDimension
      */
     unsigned GetDimension();
+
+
 
 };
 

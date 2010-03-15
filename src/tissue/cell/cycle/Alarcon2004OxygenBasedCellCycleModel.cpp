@@ -41,9 +41,8 @@ Alarcon2004OxygenBasedCellCycleModel::Alarcon2004OxygenBasedCellCycleModel(const
 }
 
 
-Alarcon2004OxygenBasedCellCycleModel::Alarcon2004OxygenBasedCellCycleModel(unsigned dimension)
-    : AbstractOdeBasedCellCycleModel(),
-      mDimension(dimension)
+Alarcon2004OxygenBasedCellCycleModel::Alarcon2004OxygenBasedCellCycleModel()
+    : AbstractOdeBasedCellCycleModel()
 {
 }
 
@@ -153,6 +152,11 @@ double Alarcon2004OxygenBasedCellCycleModel::GetOdeStopTime()
 {
     assert(msSolver.StoppingEventOccurred());
     return msSolver.GetStoppingTime();
+}
+
+void Alarcon2004OxygenBasedCellCycleModel::SetDimension(unsigned dimension)
+{
+    mDimension = dimension;
 }
 
 unsigned Alarcon2004OxygenBasedCellCycleModel::GetDimension()
