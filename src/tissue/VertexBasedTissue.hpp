@@ -29,7 +29,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #define VERTEXBASEDTISSUE_HPP_
 
 #include "AbstractTissue.hpp"
-#include "VertexMesh.hpp"
+#include "MutableVertexMesh.hpp"
 #include "ArchiveLocationInfo.hpp"
 
 #include <climits> // work around boost bug
@@ -44,7 +44,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
  * A facade class encapsulating a vertex-based 'tissue'.
  *
  * Contains a group of cells and maintains the associations
- * between TissueCells and elements in the VertexMesh.
+ * between TissueCells and elements in the MutableVertexMesh.
  *
  */
 template<unsigned DIM>
@@ -53,7 +53,7 @@ class VertexBasedTissue : public AbstractTissue<DIM>
 private:
 
     /** Vertex-based mesh associated with the tissue. */
-    VertexMesh<DIM, DIM>& mrMesh;
+    MutableVertexMesh<DIM, DIM>& mrMesh;
 
     /** A cache of where the results are going (used for VTK writer). */
     std::string mDirPath;
@@ -102,13 +102,13 @@ public:
      * There must be precisely one TissueCell for each VertexElement in
      * the mesh.
      *
-     * @param rMesh reference to a VertexMesh
+     * @param rMesh reference to a
      * @param rCells reference to a vector of TissueCells
      * @param deleteMesh set to true if you want the tissue to free the mesh memory on destruction
      * @param validate whether to validate the tissue when it is created (defaults to true)
      * @param locationIndices an optional vector of location indices that correspond to real cells
      */
-    VertexBasedTissue(VertexMesh<DIM, DIM>& rMesh,
+    VertexBasedTissue(MutableVertexMesh<DIM, DIM>& rMesh,
                       const std::vector<TissueCell>& rCells,
                       bool deleteMesh=false,
                       bool validate=true,
@@ -119,7 +119,7 @@ public:
      *
      * @param rMesh a vertex mesh.
      */
-    VertexBasedTissue(VertexMesh<DIM, DIM>& rMesh);
+    VertexBasedTissue(MutableVertexMesh<DIM, DIM>& rMesh);
 
     /**
      * Destructor, which frees any memory allocated by the constructor.
@@ -149,12 +149,12 @@ public:
     /**
      * @return reference to  mrMesh.
      */
-    VertexMesh<DIM, DIM>& rGetMesh();
+    MutableVertexMesh<DIM, DIM>& rGetMesh();
 
     /**
      * @return const reference to mrMesh (used in archiving).
      */
-    const VertexMesh<DIM, DIM>& rGetMesh() const;
+    const MutableVertexMesh<DIM, DIM>& rGetMesh() const;
 
     /**
      * Get a particular VertexElement.
@@ -329,7 +329,7 @@ inline void save_construct_data(
     Archive & ar, const VertexBasedTissue<DIM> * t, const BOOST_PFTO unsigned int file_version)
 {
     // Save data required to construct instance
-    const VertexMesh<DIM,DIM>* p_mesh = &(t->rGetMesh());
+    const MutableVertexMesh<DIM,DIM>* p_mesh = &(t->rGetMesh());
     ar & p_mesh;
 }
 
@@ -342,7 +342,7 @@ inline void load_construct_data(
     Archive & ar, VertexBasedTissue<DIM> * t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
-    VertexMesh<DIM,DIM>* p_mesh;
+    MutableVertexMesh<DIM,DIM>* p_mesh;
     ar >> p_mesh;
 
     // Invoke inplace constructor to initialise instance

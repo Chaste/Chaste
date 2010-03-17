@@ -72,7 +72,7 @@ public:
     /**
      * @return a honeycomb mesh based on a 2D plane.
      */
-    VertexMesh<2,2>* GetMesh();
+    MutableVertexMesh<2,2>* GetMesh();
 
     /**
      * @return a honeycomb mesh with cylindrical boundaries.

@@ -33,7 +33,7 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(double width,
                                                  double cellRearrangementThreshold,
                                                  double edgeDivisionThreshold,
                                                  double t2Threshold)
-    : VertexMesh<2,2>(nodes, vertexElements, cellRearrangementThreshold, edgeDivisionThreshold, t2Threshold),
+    : MutableVertexMesh<2,2>(nodes, vertexElements, cellRearrangementThreshold, edgeDivisionThreshold, t2Threshold),
       mWidth(width)
 {
     // ReMesh to remove any deleted nodes and relabel
@@ -80,7 +80,7 @@ void Cylindrical2dVertexMesh::SetNode(unsigned nodeIndex, ChastePoint<2> point)
     }
 
     // Update the node's location
-    VertexMesh<2,2>::SetNode(nodeIndex, point);
+    MutableVertexMesh<2,2>::SetNode(nodeIndex, point);
 }
 
 double Cylindrical2dVertexMesh::GetWidth(const unsigned& rDimension) const
@@ -100,7 +100,7 @@ double Cylindrical2dVertexMesh::GetWidth(const unsigned& rDimension) const
 
 unsigned Cylindrical2dVertexMesh::AddNode(Node<2>* pNewNode)
 {
-    unsigned node_index = VertexMesh<2,2>::AddNode(pNewNode);
+    unsigned node_index = MutableVertexMesh<2,2>::AddNode(pNewNode);
 
     // If necessary move it to be back on the cylinder
     ChastePoint<2> new_node_point = pNewNode->GetPoint();

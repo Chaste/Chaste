@@ -30,7 +30,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "VertexMeshWriter.hpp"
 
 template<unsigned DIM>
-VertexBasedTissue<DIM>::VertexBasedTissue(VertexMesh<DIM, DIM>& rMesh,
+VertexBasedTissue<DIM>::VertexBasedTissue(MutableVertexMesh<DIM, DIM>& rMesh,
                                           const std::vector<TissueCell>& rCells,
                                           bool deleteMesh,
                                           bool validate,
@@ -49,7 +49,7 @@ VertexBasedTissue<DIM>::VertexBasedTissue(VertexMesh<DIM, DIM>& rMesh,
 
 
 template<unsigned DIM>
-VertexBasedTissue<DIM>::VertexBasedTissue(VertexMesh<DIM, DIM>& rMesh)
+VertexBasedTissue<DIM>::VertexBasedTissue(MutableVertexMesh<DIM, DIM>& rMesh)
              : mrMesh(rMesh)
 {
     this->mTissueContainsMesh = true;
@@ -128,14 +128,14 @@ double VertexBasedTissue<DIM>::GetAdhesionParameter(Node<DIM>* pNodeA, Node<DIM>
 
 
 template<unsigned DIM>
-VertexMesh<DIM, DIM>& VertexBasedTissue<DIM>::rGetMesh()
+MutableVertexMesh<DIM, DIM>& VertexBasedTissue<DIM>::rGetMesh()
 {
     return mrMesh;
 }
 
 
 template<unsigned DIM>
-const VertexMesh<DIM, DIM>& VertexBasedTissue<DIM>::rGetMesh() const
+const MutableVertexMesh<DIM, DIM>& VertexBasedTissue<DIM>::rGetMesh() const
 {
     return mrMesh;
 }

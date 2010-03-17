@@ -617,7 +617,7 @@ public:
 
         double cell_swap_threshold = 0.01;
         double edge_division_threshold = 2.0;
-        VertexMesh<2,2> mesh(nodes, elements, cell_swap_threshold, edge_division_threshold);
+        MutableVertexMesh<2,2> mesh(nodes, elements, cell_swap_threshold, edge_division_threshold);
 
         // Set up the cell
         std::vector<TissueCell> cells;
@@ -713,7 +713,7 @@ public:
     {
         // Create a simple 2D VertexMesh
         HoneycombVertexMeshGenerator generator(5, 5, false, 0.1, 0.5);
-        VertexMesh<2,2>* p_mesh = generator.GetMesh();
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
         // Translate mesh so that some points are below y=0
         p_mesh->Translate(0.0, -3.0);

@@ -98,9 +98,9 @@ public:
 
     void TestSolveThrowsNothing() throw (Exception)
     {
-        // Create a simple 2D VertexMesh
+        // Create a simple 2D MutableVertexMesh
         HoneycombVertexMeshGenerator generator(6, 6);
-        VertexMesh<2,2>* p_mesh = generator.GetMesh();
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
         // Set up cells, one for each VertexElement. Give each cell
         // a birth time of -elem_index, so its age is elem_index
@@ -149,7 +149,7 @@ public:
 
         double cell_swap_threshold = 0.01;
         double edge_division_threshold = 2.0;
-        VertexMesh<2,2> mesh(nodes, elements, cell_swap_threshold, edge_division_threshold);
+        MutableVertexMesh<2,2> mesh(nodes, elements, cell_swap_threshold, edge_division_threshold);
 
         // Set up cells, one for each VertexElement. Give each cell
         // a birth time of 0
@@ -192,9 +192,9 @@ public:
      */
     void TestSimpleVertexMonolayerWithCellBirth() throw (Exception)
     {
-        // Create a simple 2D VertexMesh with only one cell
+        // Create a simple 2D MutableVertexMesh with only one cell
         HoneycombVertexMeshGenerator generator(1, 1);
-        VertexMesh<2,2>* p_mesh = generator.GetMesh();
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
         p_mesh->SetEdgeDivisionThreshold(0.5);
 
         // Set up cell.
@@ -238,9 +238,9 @@ public:
 
     void TestVertexMonolayerWithCellBirth() throw (Exception)
     {
-        // Create a simple 2D VertexMesh
+        // Create a simple 2D MutableVertexMesh
         HoneycombVertexMeshGenerator generator(5, 5);
-        VertexMesh<2,2>* p_mesh = generator.GetMesh();
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
         // Set up cells, one for each VertexElement. Give each cell
         // a birth time of -elem_index, so its age is elem_index
@@ -295,9 +295,9 @@ public:
 
     void noTestVertexMonolayerLong() throw (Exception)
     {
-        // Create a simple 2D VertexMesh
+        // Create a simple 2D MutableVertexMesh
         HoneycombVertexMeshGenerator generator(3, 3);
-        VertexMesh<2,2>* p_mesh = generator.GetMesh();
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
         // Set up cells, one for each VertexElement.
         std::vector<TissueCell> cells;
@@ -344,9 +344,9 @@ public:
          * vertex simulations, so set the apoptosis time to something large.
          */
 
-        // Create a simple 2D VertexMesh
+        // Create a simple 2D MutableVertexMesh
         HoneycombVertexMeshGenerator generator(5, 5);
-        VertexMesh<2,2>* p_mesh = generator.GetMesh();
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
         p_mesh->SetCellRearrangementThreshold(0.2);
         p_mesh->SetT2Threshold(sqrt(3.0)/1000.0); // so T2Swaps once it becomes a triangle
 
@@ -423,7 +423,7 @@ public:
         std::vector<VertexElement<2,2>*> elements;
         elements.push_back(new VertexElement<2,2>(0, nodes));
 
-        VertexMesh<2,2> mesh(nodes, elements);
+        MutableVertexMesh<2,2> mesh(nodes, elements);
         mesh.SetCellRearrangementThreshold(0.1);
 
         // Set up cells, one for each VertexElement
@@ -478,9 +478,9 @@ public:
         // Set end time
         double end_time = 0.1;
 
-        // Create a simple 2D VertexMesh
+        // Create a simple 2D MutableVertexMesh
         HoneycombVertexMeshGenerator generator(6, 6);
-        VertexMesh<2,2>* p_mesh = generator.GetMesh();
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
         // Set up cells, one for each VertexElement. Give each cell
         // a birth time of -elem_index, so its age is elem_index

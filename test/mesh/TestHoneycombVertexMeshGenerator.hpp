@@ -46,7 +46,7 @@ public:
         HoneycombVertexMeshGenerator generator(5, 3);
 
         // Create mesh
-        VertexMesh<2,2>* p_mesh = generator.GetMesh();
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 15u);
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 46u);

@@ -140,7 +140,7 @@ CylindricalHoneycombVertexMeshGenerator::CylindricalHoneycombVertexMeshGenerator
 //}
 
 
-VertexMesh<2,2>* CylindricalHoneycombVertexMeshGenerator::GetMesh()
+MutableVertexMesh<2,2>* CylindricalHoneycombVertexMeshGenerator::GetMesh()
 {
     EXCEPTION("A cylindrical mesh was created but a normal mesh is being requested.");
     return mpMesh; //Not really

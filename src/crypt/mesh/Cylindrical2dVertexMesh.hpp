@@ -31,17 +31,17 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "VertexMesh.hpp"
+#include "MutableVertexMesh.hpp"
 
 /**
- * A subclass of VertexMesh<2,2> for a rectangular mesh with
+ * A subclass of MutableVertexMesh<2,2> for a rectangular mesh with
  * periodic left and right boundaries, representing a cylindrical geometry.
  *
  * The class works by overriding calls such as ReMesh() and
  * GetVectorFromAtoB() so that simulation classes can treat this
  * class in exactly the same way as a MutableMesh<2,2>.
  */
-class Cylindrical2dVertexMesh : public VertexMesh<2,2>
+class Cylindrical2dVertexMesh : public MutableVertexMesh<2,2>
 {
     friend class TestCylindrical2dVertexMesh;
 
@@ -65,7 +65,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<VertexMesh<2,2> >(*this);
+        archive & boost::serialization::base_object<MutableVertexMesh<2,2> >(*this);
         archive & mWidth;
     }
 

@@ -51,7 +51,7 @@ private:
      * so its age is elem_index.
      */
     template<unsigned DIM>
-    std::vector<TissueCell> SetUpCells(VertexMesh<DIM,DIM>& rMesh)
+    std::vector<TissueCell> SetUpCells(MutableVertexMesh<DIM,DIM>& rMesh)
     {
         std::vector<TissueCell> cells;
         for (unsigned i=0; i<rMesh.GetNumElements(); i++)
@@ -71,7 +71,7 @@ public:
     {
         // Create a simple 2D VertexMesh
         HoneycombVertexMeshGenerator generator(5, 3);
-        VertexMesh<2,2>* p_mesh = generator.GetMesh();
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
         // Set up cells
         std::vector<TissueCell> cells = SetUpCells(*p_mesh);
@@ -113,7 +113,7 @@ public:
     {
         // Create a simple vertex-based mesh
         HoneycombVertexMeshGenerator generator(3, 3);
-        VertexMesh<2,2>* p_mesh = generator.GetMesh();
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
         // Set up cells, one for each element.
         // Give each a birth time of -element_index, so the age = element_index.
@@ -185,7 +185,7 @@ public:
 
         // Create mesh
         HoneycombVertexMeshGenerator generator(3, 3);
-        VertexMesh<2,2>* p_mesh = generator.GetMesh();
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
         // Set up cells
         std::vector<TissueCell> cells;
@@ -299,7 +299,7 @@ public:
 
         // Create mesh
         HoneycombVertexMeshGenerator generator(3, 3);
-        VertexMesh<2,2>* p_mesh = generator.GetMesh();
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
         // Set up cells
         std::vector<TissueCell> cells;
@@ -358,7 +358,7 @@ public:
 
         // Create a simple vertex-based mesh
         HoneycombVertexMeshGenerator generator(4, 6);
-        VertexMesh<2,2>* p_mesh = generator.GetMesh();
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
         // Set up cells
         std::vector<TissueCell> cells = SetUpCells(*p_mesh);
@@ -403,7 +403,7 @@ public:
         vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_2));
 
         // Make a vertex mesh
-        VertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 5u);
@@ -510,7 +510,7 @@ public:
         std::vector<VertexElement<2,2>*> vertex_elements;
         vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem));
 
-        VertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
 
         // Create a cell
         std::vector<TissueCell> cells;
@@ -567,7 +567,7 @@ public:
     {
         // Create a mesh with 9 elements
         HoneycombVertexMeshGenerator generator(3, 3);
-        VertexMesh<2,2>* p_mesh = generator.GetMesh();
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
         // Set up cells, one for each VertexElement. Give each cell
         // a birth time of -elem_index, so its age is elem_index
@@ -693,7 +693,7 @@ public:
     {
         // Create a simple vertex-based mesh
         HoneycombVertexMeshGenerator generator(4, 6);
-        VertexMesh<2,2>* p_mesh = generator.GetMesh();
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
         p_mesh->GetElement(5)->MarkAsDeleted();
 
         // Set up cells
@@ -727,7 +727,7 @@ public:
 
         // Create a simple vertex-based mesh
         HoneycombVertexMeshGenerator generator(4, 6);
-        VertexMesh<2,2>* p_mesh = generator.GetMesh();
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
         // Set up cells
         std::vector<TissueCell> cells = SetUpCells(*p_mesh);
@@ -796,7 +796,7 @@ public:
 
         // Create a simple vertex-based mesh
         HoneycombVertexMeshGenerator generator(4, 6);
-        VertexMesh<2,2>* p_mesh = generator.GetMesh();
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
         // Set up cells
         std::vector<TissueCell> cells = SetUpCells(*p_mesh);
@@ -867,7 +867,7 @@ public:
 
             // Create mesh
             VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/vertex_mesh");
-            VertexMesh<2,2> mesh;
+            MutableVertexMesh<2,2> mesh;
             mesh.ConstructFromMeshReader(mesh_reader);
 
             // Set up cells
@@ -943,7 +943,7 @@ public:
     {
         // Create a simple 2D VertexMesh
         HoneycombVertexMeshGenerator generator(5, 3);
-        VertexMesh<2,2>* p_mesh = generator.GetMesh();
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
         // Set up cells
         std::vector<TissueCell> cells = SetUpCells(*p_mesh);
@@ -1009,7 +1009,7 @@ public:
         vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_2));
 
         // Make a vertex mesh
-        VertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
 
         // Create cells
         std::vector<TissueCell> cells;
