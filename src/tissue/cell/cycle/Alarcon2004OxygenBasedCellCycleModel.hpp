@@ -87,7 +87,6 @@ private:
     template<class Archive>
 	void load(Archive & archive, const unsigned int version)
     {
-    	std::cout << "okay3 \n" << std::flush;
     	// The ODE system is set up by the archiving constructor, so we can set the mutation state
     	// here.  This is a horrible hack, but avoids having to regenerate test archives...
     	assert(mpOdeSystem);
@@ -95,7 +94,6 @@ private:
         boost::shared_ptr<AbstractCellMutationState> p_mutation_state;
         archive & p_mutation_state;
         static_cast<Alarcon2004OxygenBasedCellCycleOdeSystem*>(mpOdeSystem)->SetMutationState(p_mutation_state);
-        std::cout << "okay4 \n" << std::flush;
     }
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 
@@ -124,7 +122,7 @@ public:
      */
     Alarcon2004OxygenBasedCellCycleModel(const std::vector<double>& rParentProteinConcentrations,
 										 const unsigned& rDimension,
-										 boost::shared_ptr<AbstractCellMutationState> pMutationState=boost::shared_ptr<AbstractCellMutationState>());
+										 boost::shared_ptr<AbstractCellMutationState> pMutationState);
 
     /**
      * Resets the oxygen-based model to the start of the cell cycle

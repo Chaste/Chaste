@@ -48,11 +48,12 @@ Alarcon2004OxygenBasedCellCycleOdeSystem::Alarcon2004OxygenBasedCellCycleOdeSyst
      */
     Init(); // set up parameters
 
-    assert( pMutationState->IsType<WildTypeCellMutationState>()
-    		|| pMutationState->IsType<LabelledCellMutationState>() );
-
     // parameter values taken from the Alarcon et al. (2004) paper
-    if (pMutationState->IsType<WildTypeCellMutationState>())    // normal cells
+	if (!pMutationState)
+	{
+		// do nothing
+	}
+	else if (pMutationState->IsType<WildTypeCellMutationState>())    // normal cells
     {
         ma1 = 0.05;
         mc1 = 0.1;

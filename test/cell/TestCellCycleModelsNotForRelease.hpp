@@ -578,7 +578,7 @@ public:
     }
 
 
-    void TEMPORARILYDONTTestArchiveAlarcon2004OxygenBasedCellCycleModels()
+    void TestArchiveAlarcon2004OxygenBasedCellCycleModels()
     {
         // Set up
         TissueConfig::Instance()->SetHepaOneParameters();

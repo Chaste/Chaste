@@ -53,7 +53,7 @@ Alarcon2004OxygenBasedCellCycleModel::Alarcon2004OxygenBasedCellCycleModel(const
     mDimension = rDimension;
     mpOdeSystem = new Alarcon2004OxygenBasedCellCycleOdeSystem(rParentProteinConcentrations[5], pMutationState);
 
-    // Set the model to be the same as the parent cell.
+    // Set the model to be the same as the parent cell
     mpOdeSystem->rGetStateVariables() = rParentProteinConcentrations;
 }
 
