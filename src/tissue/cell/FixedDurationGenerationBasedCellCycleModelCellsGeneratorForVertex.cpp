@@ -155,6 +155,4 @@ void FixedDurationGenerationBasedCellCycleModelCellsGeneratorForVertex<DIM>::Gen
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////
 
-//template class SimpleWntCellCycleModelCellsGenerator<1>;
 template class FixedDurationGenerationBasedCellCycleModelCellsGeneratorForVertex<2>;
-//template class SimpleWntCellCycleModelCellsGenerator<3>;

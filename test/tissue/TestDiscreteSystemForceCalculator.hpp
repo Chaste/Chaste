@@ -36,7 +36,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CryptSimulation2d.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "DiscreteSystemForceCalculator.hpp"
-#include "FixedDurationGenerationBasedCellCycleModelCellsGenerator.hpp"
+#include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "CellsGenerator.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
@@ -53,7 +53,7 @@ public:
         MutableMesh<2,2>* p_mesh = mesh_generator.GetMesh();
         std::vector<unsigned> location_indices = mesh_generator.GetCellLocationIndices();
 
-        FixedDurationGenerationBasedCellCycleModelCellsGenerator<2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel,2> cells_generator;
         std::vector<TissueCell> cells;
         cells_generator.GenerateGivenLocationIndices(cells, location_indices);
 

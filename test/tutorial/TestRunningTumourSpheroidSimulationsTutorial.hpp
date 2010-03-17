@@ -121,14 +121,19 @@ public:
          * a {{{CellsGenerator}}} class, but do it manually, in a loop. First,
          * define the cells vector. */
         std::vector<TissueCell> cells;
-        /* then loop over the nodes... */
+
+        /* This line defines a mutation state to be used for all cells, of type
+         * `WildTypeCellMutationState` (i.e. 'healthy')
+         */
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+
+        /* Now loop over the nodes... */
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            /*.. then create a cell, and giving a particular cell cycle model
-             * - {{{SimpleOxygenBasedCellCycleModel}}}.  The cell cycle model is
-             * parameterised by the dimension of the problem. */
-        	SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
+            /*.. then create a cell, giving it a particular cell cycle model
+             * - {{{SimpleOxygenBasedCellCycleModel}}}. The dimension needs to be
+             * set on the cell cycle model before being passed to the cell. */
+        	SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel;
         	p_model->SetDimension(2);
             TissueCell cell(STEM, p_state, p_model);
 

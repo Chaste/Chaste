@@ -28,10 +28,11 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "SimpleWntCellCycleModelCellsGeneratorForVertex.hpp"
 #include "WildTypeCellMutationState.hpp"
 
+
 template<unsigned DIM>
 AbstractCellCycleModel* SimpleWntCellCycleModelCellsGeneratorForVertex<DIM>::CreateCellCycleModel()
 {
-	SimpleWntCellCycleModel* p_model = new SimpleWntCellCycleModel();
+	SimpleWntCellCycleModel* p_model = new SimpleWntCellCycleModel;
 	p_model->SetDimension(DIM);
     return p_model;
 }

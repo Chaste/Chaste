@@ -131,10 +131,11 @@ public:
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(3.0, 3);
 
-        SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
+        SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel;
         p_model->SetDimension(2);
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         TissueCell cell(STEM, p_state, p_model);
+
         cell.InitialiseCellCycleModel();
 
         // Set up constant oxygen_concentration
@@ -182,12 +183,12 @@ public:
         oxygen_concentration.push_back(1.0);
         CellwiseData<2>::Instance()->SetConstantDataForTesting(oxygen_concentration);
 
-        TS_ASSERT_THROWS_NOTHING(SimpleOxygenBasedCellCycleModel model());
+        TS_ASSERT_THROWS_NOTHING(SimpleOxygenBasedCellCycleModel model);
 
         // Create cell cycle model
-        SimpleOxygenBasedCellCycleModel* p_hepa_one_model = new SimpleOxygenBasedCellCycleModel();
+        SimpleOxygenBasedCellCycleModel* p_hepa_one_model = new SimpleOxygenBasedCellCycleModel;
+        SimpleOxygenBasedCellCycleModel* p_diff_model = new SimpleOxygenBasedCellCycleModel;
         p_hepa_one_model->SetDimension(2);
-        SimpleOxygenBasedCellCycleModel* p_diff_model = new SimpleOxygenBasedCellCycleModel();
         p_diff_model->SetDimension(2);
 
         // Create cell
@@ -220,6 +221,7 @@ public:
         TS_ASSERT_EQUALS(hepa_one_cell.ReadyToDivide(), true);
         TissueCell hepa_one_cell2 = hepa_one_cell.Divide();
         SimpleOxygenBasedCellCycleModel* p_hepa_one_model2 = static_cast <SimpleOxygenBasedCellCycleModel*>(hepa_one_cell2.GetCellCycleModel());
+
         TS_ASSERT_EQUALS(p_hepa_one_model2->ReadyToDivide(), false);
         TS_ASSERT_EQUALS(p_hepa_one_model2->GetCurrentCellCyclePhase(), M_PHASE);
 
@@ -230,7 +232,7 @@ public:
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(2.0*TissueConfig::Instance()->GetCriticalHypoxicDuration(), num_steps);
 
         // Create a cell with a simple oxygen-based cell cycle model
-        SimpleOxygenBasedCellCycleModel* p_cell_model = new SimpleOxygenBasedCellCycleModel();
+        SimpleOxygenBasedCellCycleModel* p_cell_model = new SimpleOxygenBasedCellCycleModel;
         p_cell_model->SetDimension(2);
         TissueCell apoptotic_cell(STEM, p_state, p_cell_model);
 
@@ -257,9 +259,11 @@ public:
 
         // For coverage, create a 1D model
         CellwiseData<1>::Instance()->SetConstantDataForTesting(oxygen_concentration);
-        SimpleOxygenBasedCellCycleModel* p_cell_model1d = new SimpleOxygenBasedCellCycleModel();
+
+        SimpleOxygenBasedCellCycleModel* p_cell_model1d = new SimpleOxygenBasedCellCycleModel;
         p_cell_model1d->SetDimension(1);
         TissueCell cell1d(STEM, p_state, p_cell_model1d);
+
         cell1d.InitialiseCellCycleModel();
 
         TS_ASSERT_EQUALS(p_cell_model1d->ReadyToDivide(), false);
@@ -269,9 +273,11 @@ public:
 
         // For coverage, create a 3D model
         CellwiseData<3>::Instance()->SetConstantDataForTesting(oxygen_concentration);
-        SimpleOxygenBasedCellCycleModel* p_cell_model3d = new SimpleOxygenBasedCellCycleModel();
+
+        SimpleOxygenBasedCellCycleModel* p_cell_model3d = new SimpleOxygenBasedCellCycleModel;
         p_cell_model3d->SetDimension(3);
         TissueCell cell3d(STEM, p_state, p_cell_model3d);
+
         cell3d.InitialiseCellCycleModel();
 
         TS_ASSERT_EQUALS(p_cell_model3d->ReadyToDivide(), false);
@@ -407,10 +413,12 @@ public:
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(3.0, 3);
 
-        StochasticOxygenBasedCellCycleModel* p_model = new StochasticOxygenBasedCellCycleModel();
+
+        StochasticOxygenBasedCellCycleModel* p_model = new StochasticOxygenBasedCellCycleModel;
         p_model->SetDimension(2);
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         TissueCell cell(STEM, p_state, p_model);
+
         cell.InitialiseCellCycleModel();
 
         // Set up constant oxygen_concentration
@@ -458,13 +466,16 @@ public:
         oxygen_concentration.push_back(1.0);
         CellwiseData<2>::Instance()->SetConstantDataForTesting(oxygen_concentration);
 
-        TS_ASSERT_THROWS_NOTHING(StochasticOxygenBasedCellCycleModel model());
+        TS_ASSERT_THROWS_NOTHING(StochasticOxygenBasedCellCycleModel model);
 
         // Create cell cycle model
-        StochasticOxygenBasedCellCycleModel* p_hepa_one_model = new StochasticOxygenBasedCellCycleModel();
+
+        StochasticOxygenBasedCellCycleModel* p_hepa_one_model = new StochasticOxygenBasedCellCycleModel;
         p_hepa_one_model->SetDimension(2);
-        StochasticOxygenBasedCellCycleModel* p_diff_model = new StochasticOxygenBasedCellCycleModel();
+        StochasticOxygenBasedCellCycleModel* p_diff_model = new StochasticOxygenBasedCellCycleModel;
         p_diff_model->SetDimension(2);
+
+
 
         // Create cell
         TissueCell hepa_one_cell(STEM, p_state, p_hepa_one_model);
@@ -510,9 +521,10 @@ public:
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(2.0*TissueConfig::Instance()->GetCriticalHypoxicDuration(), num_steps);
 
         // Create a cell with a simple oxygen-based cell cycle model
-        StochasticOxygenBasedCellCycleModel* p_cell_model = new StochasticOxygenBasedCellCycleModel();
+        StochasticOxygenBasedCellCycleModel* p_cell_model = new StochasticOxygenBasedCellCycleModel;
         p_cell_model->SetDimension(2);
         TissueCell apoptotic_cell(STEM, p_state, p_cell_model);
+
         apoptotic_cell.InitialiseCellCycleModel();
 
         // Set up constant oxygen_concentration
@@ -538,9 +550,11 @@ public:
 
         // For coverage, create a 1D model
         CellwiseData<1>::Instance()->SetConstantDataForTesting(oxygen_concentration);
-        StochasticOxygenBasedCellCycleModel* p_cell_model1d = new StochasticOxygenBasedCellCycleModel();
+
+        StochasticOxygenBasedCellCycleModel* p_cell_model1d = new StochasticOxygenBasedCellCycleModel;
         p_cell_model1d->SetDimension(1);
         TissueCell cell1d(STEM, p_state, p_cell_model1d);
+
         cell1d.InitialiseCellCycleModel();
 
         TS_ASSERT_EQUALS(p_cell_model1d->ReadyToDivide(), false);
@@ -550,9 +564,11 @@ public:
 
         // For coverage, create a 3D model
         CellwiseData<3>::Instance()->SetConstantDataForTesting(oxygen_concentration);
-        StochasticOxygenBasedCellCycleModel* p_cell_model3d = new StochasticOxygenBasedCellCycleModel();
+
+        StochasticOxygenBasedCellCycleModel* p_cell_model3d = new StochasticOxygenBasedCellCycleModel;
         p_cell_model3d->SetDimension(3);
         TissueCell cell3d(STEM, p_state, p_cell_model3d);
+
         cell3d.InitialiseCellCycleModel();
 
         TS_ASSERT_EQUALS(p_cell_model3d->ReadyToDivide(), false);
@@ -658,7 +674,7 @@ public:
             SimulationTime* p_simulation_time = SimulationTime::Instance();
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(2.0, 4);
 
-            SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
+            SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel;
             p_model->SetDimension(1);
 
             p_simulation_time->IncrementTimeOneStep();
@@ -678,7 +694,7 @@ public:
             p_simulation_time->SetStartTime(0.0);
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
-            SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
+            SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel;
             p_model->SetDimension(2);
             p_model->SetBirthTime(-2.0);
 
@@ -766,7 +782,7 @@ public:
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(2.0, 4);
 
             // Create cell cycle model and associated cell
-            StochasticOxygenBasedCellCycleModel* p_cell_model = new StochasticOxygenBasedCellCycleModel();
+            StochasticOxygenBasedCellCycleModel* p_cell_model = new StochasticOxygenBasedCellCycleModel;
             p_cell_model->SetDimension(3);
             boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
             TissueCell cell(STEM, p_state, p_cell_model);

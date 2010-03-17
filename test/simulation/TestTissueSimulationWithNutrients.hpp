@@ -406,7 +406,7 @@ public:
         	SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
         	p_model->SetDimension(2);
             TissueCell cell(STEM, p_state, p_model);
-            cell.SetBirthTime(-0.1);
+        	cell.SetBirthTime(-0.1);
 
             // Label three neighbouring cells as apoptotic
             if (i==12 || i==13 || i==17)
