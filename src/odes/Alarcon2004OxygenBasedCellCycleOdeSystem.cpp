@@ -27,11 +27,12 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 */
 #include "Alarcon2004OxygenBasedCellCycleOdeSystem.hpp"
 #include "CellwiseOdeSystemInformation.hpp"
+#include "WildTypeCellMutationState.hpp"
+#include "LabelledCellMutationState.hpp"
 
-
-Alarcon2004OxygenBasedCellCycleOdeSystem::Alarcon2004OxygenBasedCellCycleOdeSystem(double oxygenConcentration, const CryptCellMutationState& rMutationState)
+Alarcon2004OxygenBasedCellCycleOdeSystem::Alarcon2004OxygenBasedCellCycleOdeSystem(double oxygenConcentration, boost::shared_ptr<AbstractCellMutationState> pMutationState)
     : AbstractOdeSystem(6),
-      mMutationState(rMutationState)
+      mpMutationState(pMutationState)
 {
     mpSystemInfo.reset(new CellwiseOdeSystemInformation<Alarcon2004OxygenBasedCellCycleOdeSystem>);
 
@@ -47,10 +48,11 @@ Alarcon2004OxygenBasedCellCycleOdeSystem::Alarcon2004OxygenBasedCellCycleOdeSyst
      */
     Init(); // set up parameters
 
-    assert(rMutationState == HEALTHY || rMutationState == LABELLED);
+    assert( pMutationState->IsType<WildTypeCellMutationState>()
+    		|| pMutationState->IsType<LabelledCellMutationState>() );
 
     // parameter values taken from the Alarcon et al. (2004) paper
-    if (mMutationState == HEALTHY)    // normal cells
+    if (pMutationState->IsType<WildTypeCellMutationState>())    // normal cells
     {
         ma1 = 0.05;
         mc1 = 0.1;
@@ -70,9 +72,9 @@ Alarcon2004OxygenBasedCellCycleOdeSystem::Alarcon2004OxygenBasedCellCycleOdeSyst
     SetInitialConditionsComponent(5, oxygenConcentration);
 }
 
-void Alarcon2004OxygenBasedCellCycleOdeSystem::SetMutationState(const CryptCellMutationState& rMutationState)
+void Alarcon2004OxygenBasedCellCycleOdeSystem::SetMutationState(boost::shared_ptr<AbstractCellMutationState> pMutationState)
 {
-    mMutationState = rMutationState;
+    mpMutationState = pMutationState;
 }
 
 Alarcon2004OxygenBasedCellCycleOdeSystem::~Alarcon2004OxygenBasedCellCycleOdeSystem()
@@ -125,10 +127,11 @@ void Alarcon2004OxygenBasedCellCycleOdeSystem::EvaluateYDerivatives(double time,
     dx = ((1 + mb3*u)*(1-x))/(mJ3 + 1 - x) - (mb4*mass*x*y)/(mJ4 + x);
     dy = ma4 -(ma1 + ma2*x + ma3*z)*y;
 
-    assert(mMutationState == HEALTHY || mMutationState == LABELLED);
+    assert( mpMutationState->IsType<WildTypeCellMutationState>()
+    		|| mpMutationState->IsType<LabelledCellMutationState>() );
 
     // Parameter values taken from the Alarcon et al. (2004) paper
-    if (mMutationState == HEALTHY)    // normal cells
+    if (mpMutationState->IsType<WildTypeCellMutationState>())    // normal cells
     {
         dz = mc1*(1 - mass/mMstar) - mc2*oxygen_concentration*z/(mB + oxygen_concentration);
     }
@@ -149,9 +152,9 @@ void Alarcon2004OxygenBasedCellCycleOdeSystem::EvaluateYDerivatives(double time,
     rDY[5] = 0.0; // do not change the oxygen concentration
 }
 
-CryptCellMutationState& Alarcon2004OxygenBasedCellCycleOdeSystem::rGetMutationState()
+boost::shared_ptr<AbstractCellMutationState> Alarcon2004OxygenBasedCellCycleOdeSystem::GetMutationState()
 {
-    return mMutationState;
+    return mpMutationState;
 }
 
 bool Alarcon2004OxygenBasedCellCycleOdeSystem::CalculateStoppingEvent(double time, const std::vector<double>& rY)

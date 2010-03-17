@@ -29,6 +29,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "ChemotacticForce.hpp"
 #include "CellwiseDataGradient.hpp"
+#include "LabelledCellMutationState.hpp"
 
 template<unsigned DIM>
 ChemotacticForce<DIM>::ChemotacticForce()
@@ -59,8 +60,9 @@ void ChemotacticForce<DIM>::AddForceContribution(std::vector<c_vector<double, DI
          cell_iter != rTissue.End();
          ++cell_iter)
     {
-        // Only LABELLED cells move chemotactically
-        if (cell_iter->GetMutationState() == LABELLED)
+        // Only labelled cells move chemotactically
+    	boost::shared_ptr<AbstractCellMutationState> p_state = cell_iter->GetMutationState();
+        if (p_state->IsType<LabelledCellMutationState>())
         {
             unsigned node_global_index = rTissue.GetLocationIndexUsingCell(*cell_iter);
 

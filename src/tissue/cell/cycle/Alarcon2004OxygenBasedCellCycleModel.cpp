@@ -31,8 +31,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 RungeKutta4IvpOdeSolver Alarcon2004OxygenBasedCellCycleModel::msSolver;
 
 Alarcon2004OxygenBasedCellCycleModel::Alarcon2004OxygenBasedCellCycleModel(const Alarcon2004OxygenBasedCellCycleModel& rOtherModel)
-    : AbstractOdeBasedCellCycleModelWithStoppingEvent(rOtherModel),
-      mDimension(rOtherModel.mDimension)
+    : AbstractOdeBasedCellCycleModelWithStoppingEvent(rOtherModel)
 {
     if (rOtherModel.mpOdeSystem != NULL)
     {
@@ -48,11 +47,11 @@ Alarcon2004OxygenBasedCellCycleModel::Alarcon2004OxygenBasedCellCycleModel()
 
 
 Alarcon2004OxygenBasedCellCycleModel::Alarcon2004OxygenBasedCellCycleModel(const std::vector<double>& rParentProteinConcentrations,
-                                                                           const CryptCellMutationState& rMutationState,
-                                                                           const unsigned& rDimension)
+                                                                           const unsigned& rDimension,
+                                                                           boost::shared_ptr<AbstractCellMutationState> pMutationState)
 {
     mDimension = rDimension;
-    mpOdeSystem = new Alarcon2004OxygenBasedCellCycleOdeSystem(rParentProteinConcentrations[5], rMutationState);
+    mpOdeSystem = new Alarcon2004OxygenBasedCellCycleOdeSystem(rParentProteinConcentrations[5], pMutationState);
 
     // Set the model to be the same as the parent cell.
     mpOdeSystem->rGetStateVariables() = rParentProteinConcentrations;
@@ -72,12 +71,6 @@ void Alarcon2004OxygenBasedCellCycleModel::ResetForDivision()
         mpOdeSystem->rGetStateVariables()[i] = init_conds[i];
     }
 }
-
-void Alarcon2004OxygenBasedCellCycleModel::SetDimension(unsigned dimension)
-{
-	mDimension = dimension;
-}
-
 
 AbstractCellCycleModel* Alarcon2004OxygenBasedCellCycleModel::CreateCellCycleModel()
 {
@@ -159,12 +152,6 @@ double Alarcon2004OxygenBasedCellCycleModel::GetOdeStopTime()
     assert(msSolver.StoppingEventOccurred());
     return msSolver.GetStoppingTime();
 }
-
-unsigned Alarcon2004OxygenBasedCellCycleModel::GetDimension()
-{
-    return mDimension;
-}
-
 
 
 // Serialization for Boost >= 1.36

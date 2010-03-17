@@ -26,12 +26,14 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
 #include "SimpleWntCellCycleModelCellsGeneratorForVertex.hpp"
-
+#include "WildTypeCellMutationState.hpp"
 
 template<unsigned DIM>
 AbstractCellCycleModel* SimpleWntCellCycleModelCellsGeneratorForVertex<DIM>::CreateCellCycleModel()
 {
-    return new SimpleWntCellCycleModel(DIM);
+	SimpleWntCellCycleModel* p_model = new SimpleWntCellCycleModel();
+	p_model->SetDimension(DIM);
+    return p_model;
 }
 
 
@@ -72,11 +74,11 @@ void SimpleWntCellCycleModelCellsGeneratorForVertex<DIM>::GenerateForVertexCrypt
 
     rCells.clear();
     rCells.reserve(num_cells);
-
+    boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
     for (unsigned i=0; i<rMesh.GetNumElements(); i++)
     {
         CellProliferativeType cell_type;
-        
+
         p_cell_cycle_model = CreateCellCycleModel();
         typical_transit_cycle_time = this->GetTypicalTransitCellCycleTime();
         typical_stem_cycle_time = GetTypicalStemCellCycleTime();
@@ -89,8 +91,8 @@ void SimpleWntCellCycleModelCellsGeneratorForVertex<DIM>::GenerateForVertexCrypt
 
         cell_type = TRANSIT;
         birth_time *= typical_transit_cycle_time; // hours
-        
-        TissueCell cell(cell_type, HEALTHY, p_cell_cycle_model);
+
+        TissueCell cell(cell_type, p_state, p_cell_cycle_model);
         if (initialiseCells)
         {
             cell.InitialiseCellCycleModel();

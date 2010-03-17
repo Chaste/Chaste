@@ -30,6 +30,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
+#include <boost/serialization/split_member.hpp>
+#include <boost/serialization/shared_ptr.hpp>
 
 #include <cfloat>
 
@@ -38,10 +40,11 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "RungeKutta4IvpOdeSolver.hpp"
 #include "BackwardEulerIvpOdeSolver.hpp"
 #include "CellwiseData.hpp"
+#include "AbstractCellMutationState.hpp"
 #include "Exception.hpp"
 
 /**
- *  Oxygen-dependent cell cycle model.
+ * Oxygen-dependent cell cycle model.
  *
  * Note that this class uses C++'s default copying semantics, and so
  * doesn't implement a copy constructor or operator=.
@@ -52,38 +55,54 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
  */
 class Alarcon2004OxygenBasedCellCycleModel : public AbstractOdeBasedCellCycleModelWithStoppingEvent
 {
-    friend class boost::serialization::access;
-
 private:
 
     /**
-     * Fourth-order Runge Kutta solver for ODE system.
+     * Fourth-order Runge-Kutta solver for ODE system.
      */
     static RungeKutta4IvpOdeSolver msSolver;
 
+    /** Needed for serialization. */
+    friend class boost::serialization::access;
     /**
-     * The spatial dimension (needed by the templated class CellwiseData).
+     * Archive the cell cycle model and ODE system.
+     *
+     * @param archive the archive
+     * @param version the archive version
      */
-    unsigned mDimension;
-
     template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
+    void save(Archive & archive, const unsigned int version) const
     {
-        assert(mpOdeSystem!=NULL);
+        assert(mpOdeSystem);
         archive & boost::serialization::base_object<AbstractOdeBasedCellCycleModelWithStoppingEvent>(*this);
-        // Reference can be read or written into once mpOdeSystem has been set up
-        // mpOdeSystem isn't set up by the first constructor, but is by the second
-        // which is now utilised by the load_construct at the bottom of this file.
-        archive & static_cast<Alarcon2004OxygenBasedCellCycleOdeSystem*>(mpOdeSystem)->rGetMutationState();
-        archive & mDimension;
+        boost::shared_ptr<AbstractCellMutationState> p_mutation_state = static_cast<Alarcon2004OxygenBasedCellCycleOdeSystem*>(mpOdeSystem)->GetMutationState();
+        archive & p_mutation_state;
     }
+    /**
+     * Load the cell cycle model and ODE system from archive.
+     *
+     * @param archive the archive
+     * @param version the archive version
+     */
+    template<class Archive>
+	void load(Archive & archive, const unsigned int version)
+    {
+    	std::cout << "okay3 \n" << std::flush;
+    	// The ODE system is set up by the archiving constructor, so we can set the mutation state
+    	// here.  This is a horrible hack, but avoids having to regenerate test archives...
+    	assert(mpOdeSystem);
+        archive & boost::serialization::base_object<AbstractOdeBasedCellCycleModelWithStoppingEvent>(*this);
+        boost::shared_ptr<AbstractCellMutationState> p_mutation_state;
+        archive & p_mutation_state;
+        static_cast<Alarcon2004OxygenBasedCellCycleOdeSystem*>(mpOdeSystem)->SetMutationState(p_mutation_state);
+        std::cout << "okay4 \n" << std::flush;
+    }
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
 
 public:
 
     /**
      * Default constructor, variables are set by abstract classes.
-     *
-     * @param dimension the spatial dimension (needed by the templated class CellwiseData)
      */
     Alarcon2004OxygenBasedCellCycleModel();
 
@@ -96,18 +115,16 @@ public:
      */
     Alarcon2004OxygenBasedCellCycleModel(const Alarcon2004OxygenBasedCellCycleModel& rOtherModel);
 
-
-
     /**
      * A private constructor for archiving.
      *
      * @param rParentProteinConcentrations a std::vector of doubles of the protein concentrations (see WntCellCycleOdeSystem)
-     * @param rMutationState the mutation state of the cell (used by ODEs)
+     * @param pMutationState the mutation state of the cell (used by ODEs)
      * @param rDimension the spatial dimension
      */
     Alarcon2004OxygenBasedCellCycleModel(const std::vector<double>& rParentProteinConcentrations,
-                                         const CryptCellMutationState& rMutationState,
-                                         const unsigned& rDimension);
+										 const unsigned& rDimension,
+										 boost::shared_ptr<AbstractCellMutationState> pMutationState=boost::shared_ptr<AbstractCellMutationState>());
 
     /**
      * Resets the oxygen-based model to the start of the cell cycle
@@ -146,23 +163,6 @@ public:
      * @return the stopping event time
      */
     double GetOdeStopTime();
-
-    /**
-	 * Set the spatial dimension.
-	 *
-	 * @param dimension
-	 */
-    void SetDimension(unsigned dimension);
-
-    /**
-     * Get the spatial dimension.
-     *
-     * @return mDimension
-     */
-    unsigned GetDimension();
-
-
-
 };
 
 // Declare identifier for the serializer
@@ -204,10 +204,10 @@ inline void load_construct_data(
     {
         state_vars.push_back(0.0);
     }
-    CryptCellMutationState mutation_state = HEALTHY;
+    boost::shared_ptr<AbstractCellMutationState> p_state;
     unsigned dimension = UINT_MAX;
 
-    ::new(t)Alarcon2004OxygenBasedCellCycleModel(state_vars, mutation_state, dimension);
+    ::new(t)Alarcon2004OxygenBasedCellCycleModel(state_vars, dimension, p_state);
 }
 }
 } // namespace ...

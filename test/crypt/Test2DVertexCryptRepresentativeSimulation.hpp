@@ -40,6 +40,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "SimpleWntCellCycleModel.hpp"
 #include "SloughingCellKiller.hpp"
 #include "CellBasedEventHandler.hpp"
+#include "WildTypeCellMutationState.hpp"
 
 /**
  * This class consists of a single test, in which a 2D vertex model
@@ -65,13 +66,14 @@ public:
 
         // Create cells
         std::vector<TissueCell> cells;
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
             double birth_time = - RandomNumberGenerator::Instance()->ranf()*
                                  ( TissueConfig::Instance()->GetTransitCellG1Duration()
                                     + TissueConfig::Instance()->GetSG2MDuration() );
 
-            TissueCell cell(TRANSIT, HEALTHY, new SimpleWntCellCycleModel(2));
+            TissueCell cell(TRANSIT, p_state, new SimpleWntCellCycleModel(2));
             cell.SetBirthTime(birth_time);
             cells.push_back(cell);
         }

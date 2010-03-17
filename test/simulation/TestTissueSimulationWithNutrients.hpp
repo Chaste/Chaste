@@ -46,6 +46,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "ReplicatableVector.hpp"
 #include "NumericFileComparison.hpp"
+#include "WildTypeCellMutationState.hpp"
 
 class SimplePdeForTesting : public AbstractLinearEllipticPde<2,2>
 {
@@ -114,10 +115,13 @@ public:
 
         // Set up cells
         std::vector<TissueCell> cells;
-
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            TissueCell cell(STEM, HEALTHY, new SimpleOxygenBasedCellCycleModel(2));
+        	SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
+        	p_model->SetDimension(2);
+            TissueCell cell(STEM, p_state, p_model);
+
             double birth_time = -RandomNumberGenerator::Instance()->ranf()*
                                     (TissueConfig::Instance()->GetHepaOneCellG1Duration()
                                     +TissueConfig::Instance()->GetSG2MDuration());
@@ -209,10 +213,12 @@ public:
 
         // Set up cells
         std::vector<TissueCell> cells;
-
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            TissueCell cell(STEM, HEALTHY, new SimpleOxygenBasedCellCycleModel(2));
+        	SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
+        	p_model->SetDimension(2);
+            TissueCell cell(STEM, p_state, p_model);
             double birth_time = -1.0 - ( (double) i/p_mesh->GetNumNodes() )*
                                     (TissueConfig::Instance()->GetHepaOneCellG1Duration()
                                     +TissueConfig::Instance()->GetSG2MDuration());
@@ -309,10 +315,12 @@ public:
 
         // Set up cells
         std::vector<TissueCell> cells;
-
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            TissueCell cell(STEM, HEALTHY, new SimpleOxygenBasedCellCycleModel(2));
+        	SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
+        	p_model->SetDimension(2);
+            TissueCell cell(STEM, p_state, p_model);
             double birth_time = -1.0 - ( (double) i/p_mesh->GetNumNodes() )*
                                     (TissueConfig::Instance()->GetHepaOneCellG1Duration()
                                     +TissueConfig::Instance()->GetSG2MDuration());
@@ -392,9 +400,12 @@ public:
 
         // Set up cells
         std::vector<TissueCell> cells;
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            TissueCell cell(STEM, HEALTHY, new SimpleOxygenBasedCellCycleModel(2));
+        	SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
+        	p_model->SetDimension(2);
+            TissueCell cell(STEM, p_state, p_model);
             cell.SetBirthTime(-0.1);
 
             // Label three neighbouring cells as apoptotic
@@ -496,9 +507,12 @@ public:
 
         // Set up cells
         std::vector<TissueCell> cells;
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            TissueCell cell(STEM, HEALTHY, new SimpleOxygenBasedCellCycleModel(2));
+        	SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
+        	p_model->SetDimension(2);
+            TissueCell cell(STEM, p_state, p_model);
             double birth_time = -RandomNumberGenerator::Instance()->ranf()*
                                     (TissueConfig::Instance()->GetHepaOneCellG1Duration()
                                     +TissueConfig::Instance()->GetSG2MDuration());
@@ -650,10 +664,12 @@ public:
 
         // Set up cells
         std::vector<TissueCell> cells;
-
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            TissueCell cell(STEM, HEALTHY, new SimpleOxygenBasedCellCycleModel(2));
+        	SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
+        	p_model->SetDimension(2);
+            TissueCell cell(STEM, p_state, p_model);
             double birth_time = -RandomNumberGenerator::Instance()->ranf()*
                                     (TissueConfig::Instance()->GetHepaOneCellG1Duration()
                                     +TissueConfig::Instance()->GetSG2MDuration());
@@ -725,10 +741,12 @@ public:
 
         // Set up cells
         std::vector<TissueCell> cells;
-
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            TissueCell cell(STEM, HEALTHY, new SimpleOxygenBasedCellCycleModel(2));
+        	SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
+        	p_model->SetDimension(2);
+            TissueCell cell(STEM, p_state, p_model);
             double birth_time = -1.0 - ( (double) i/p_mesh->GetNumNodes() )*
                                             (TissueConfig::Instance()->GetHepaOneCellG1Duration()
                                              +TissueConfig::Instance()->GetSG2MDuration());
@@ -828,10 +846,12 @@ public:
 
         // Set up cells
         std::vector<TissueCell> cells;
-
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            TissueCell cell(STEM, HEALTHY, new SimpleOxygenBasedCellCycleModel(2));
+        	SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
+        	p_model->SetDimension(2);
+            TissueCell cell(STEM, p_state, p_model);
             double birth_time = -1.0 - ( (double) i/p_mesh->GetNumNodes() )*
                                     (TissueConfig::Instance()->GetHepaOneCellG1Duration()
                                     +TissueConfig::Instance()->GetSG2MDuration());

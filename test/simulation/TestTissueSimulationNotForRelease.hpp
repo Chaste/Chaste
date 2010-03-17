@@ -43,7 +43,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CryptProjectionForce.hpp"
 #include "MeshBasedTissueWithGhostNodes.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
-
+#include "WildTypeCellMutationState.hpp"
 
 /**
  *  Note: Most tests of TissueSimulation are in TestCryptSimulation2d
@@ -105,9 +105,12 @@ public:
 
         // To start off with, set up all cells to be of type TRANSIT
         std::vector<TissueCell> cells;
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<location_indices.size(); i++)
         {
-            TissueCell cell(TRANSIT, HEALTHY, new SimpleWntCellCycleModel(2));
+        	SimpleWntCellCycleModel* p_model = new SimpleWntCellCycleModel();
+        	p_model->SetDimension(2);
+            TissueCell cell(TRANSIT, p_state, p_model);
             cell.InitialiseCellCycleModel();
             double birth_time = - RandomNumberGenerator::Instance()->ranf()*
                                   ( p_params->GetTransitCellG1Duration()
@@ -176,9 +179,10 @@ public:
 
         // Set up cells so that cell 10 divides at time t=0.5, cell 9 at time t=1.5, etc
         std::vector<TissueCell> cells;
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            TissueCell cell(STEM, HEALTHY, new FixedDurationGenerationBasedCellCycleModel());
+            TissueCell cell(STEM, p_state, new FixedDurationGenerationBasedCellCycleModel());
             double birth_time = -13.5 - i;
             cell.SetBirthTime(birth_time);
             cells.push_back(cell);

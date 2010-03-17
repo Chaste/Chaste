@@ -42,6 +42,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "VertexMeshWriter.hpp"
+#include "WildTypeCellMutationState.hpp"
 
 /**
  * Simple cell killer which at the fisrt timestep kills any cell
@@ -105,9 +106,10 @@ public:
         // Set up cells, one for each VertexElement. Give each cell
         // a birth time of -elem_index, so its age is elem_index
         std::vector<TissueCell> cells;
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
-            TissueCell cell(DIFFERENTIATED, HEALTHY, new FixedDurationGenerationBasedCellCycleModel());
+            TissueCell cell(DIFFERENTIATED, p_state, new FixedDurationGenerationBasedCellCycleModel());
             double birth_time = 0.0 - elem_index;
             cell.SetBirthTime(birth_time);
             cells.push_back(cell);
@@ -154,12 +156,13 @@ public:
         // Set up cells, one for each VertexElement. Give each cell
         // a birth time of 0
         std::vector<TissueCell> cells;
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned elem_index=0; elem_index<mesh.GetNumElements(); elem_index++)
         {
             CellProliferativeType cell_type = DIFFERENTIATED;
             double birth_time = -1.0;
 
-            TissueCell cell(cell_type, HEALTHY, new FixedDurationGenerationBasedCellCycleModel());
+            TissueCell cell(cell_type, p_state, new FixedDurationGenerationBasedCellCycleModel());
             cell.SetBirthTime(birth_time);
             cells.push_back(cell);
         }
@@ -199,10 +202,11 @@ public:
 
         // Set up cell.
         std::vector<TissueCell> cells;
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         CellProliferativeType cell_type = TRANSIT;
-        double birth_time = -20.0; // Divides Straight Away
+        double birth_time = -20.0; // divides straight away
 
-        TissueCell cell(cell_type, HEALTHY, new FixedDurationGenerationBasedCellCycleModel());
+        TissueCell cell(cell_type, p_state, new FixedDurationGenerationBasedCellCycleModel());
         cell.SetBirthTime(birth_time);
         cells.push_back(cell);
 
@@ -245,6 +249,7 @@ public:
         // Set up cells, one for each VertexElement. Give each cell
         // a birth time of -elem_index, so its age is elem_index
         std::vector<TissueCell> cells;
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
             CellProliferativeType cell_type = DIFFERENTIATED;
@@ -253,11 +258,11 @@ public:
             // Cell should divide at time t=0.05
             if (elem_index==12) //(elem_index==6 ||elem_index==7 || elem_index==8 || elem_index==11 ||elem_index==12 || elem_index==13 ||elem_index==16 ||elem_index==17 || elem_index==18)
             {
-                 cell_type = STEM;
+                cell_type = STEM;
                 birth_time = -23.95;
             }
 
-            TissueCell cell(cell_type, HEALTHY, new FixedDurationGenerationBasedCellCycleModel());
+            TissueCell cell(cell_type, p_state, new FixedDurationGenerationBasedCellCycleModel());
             cell.SetBirthTime(birth_time);
             cells.push_back(cell);
         }
@@ -299,8 +304,9 @@ public:
         HoneycombVertexMeshGenerator generator(3, 3);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
-        // Set up cells, one for each VertexElement.
+        // Set up cells, one for each VertexElement
         std::vector<TissueCell> cells;
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
             CellProliferativeType cell_type = STEM;
@@ -310,7 +316,7 @@ public:
                                     + TissueConfig::Instance()->GetSG2MDuration() );
 
 
-            TissueCell cell(cell_type, HEALTHY, new StochasticDurationGenerationBasedCellCycleModel());
+            TissueCell cell(cell_type, p_state, new StochasticDurationGenerationBasedCellCycleModel());
             cell.SetBirthTime(birth_time);
             cells.push_back(cell);
         }
@@ -353,10 +359,11 @@ public:
         // Set up cells, one for each VertexElement. Give each cell
         // a birth time of -elem_index, so its age is elem_index
         std::vector<TissueCell> cells;
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
             double birth_time = 0.0 - elem_index;
-            TissueCell cell(DIFFERENTIATED, HEALTHY, new FixedDurationGenerationBasedCellCycleModel());
+            TissueCell cell(DIFFERENTIATED, p_state, new FixedDurationGenerationBasedCellCycleModel());
             cell.SetBirthTime(birth_time);
 
             if (elem_index==18)
@@ -428,12 +435,13 @@ public:
 
         // Set up cells, one for each VertexElement
         std::vector<TissueCell> cells;
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned elem_index=0; elem_index<mesh.GetNumElements(); elem_index++)
         {
             CellProliferativeType cell_type = DIFFERENTIATED;
             double birth_time = -1.0;
 
-            TissueCell cell(cell_type, HEALTHY, new FixedDurationGenerationBasedCellCycleModel());
+            TissueCell cell(cell_type, p_state, new FixedDurationGenerationBasedCellCycleModel());
             cell.SetBirthTime(birth_time);
             cells.push_back(cell);
         }
@@ -485,9 +493,10 @@ public:
         // Set up cells, one for each VertexElement. Give each cell
         // a birth time of -elem_index, so its age is elem_index
         std::vector<TissueCell> cells;
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
-            TissueCell cell(DIFFERENTIATED, HEALTHY, new FixedDurationGenerationBasedCellCycleModel());
+            TissueCell cell(DIFFERENTIATED, p_state, new FixedDurationGenerationBasedCellCycleModel());
             double birth_time = 0.0 - elem_index;
             cell.SetBirthTime(birth_time);
             cells.push_back(cell);

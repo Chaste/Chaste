@@ -28,10 +28,9 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "SimpleOxygenBasedCellCycleModel.hpp"
 #include "RandomNumberGenerator.hpp"
 
-SimpleOxygenBasedCellCycleModel::SimpleOxygenBasedCellCycleModel(unsigned dimension)
+SimpleOxygenBasedCellCycleModel::SimpleOxygenBasedCellCycleModel()
     : mTimeSpentInG1Phase(0.0),
-      mCurrentHypoxicDuration(0.0),
-      mDimension(dimension)
+      mCurrentHypoxicDuration(0.0)
 {
     mCurrentHypoxiaOnsetTime = SimulationTime::Instance()->GetTime();
 }
@@ -159,12 +158,6 @@ void SimpleOxygenBasedCellCycleModel::UpdateHypoxicDuration()
         mCurrentHypoxiaOnsetTime = SimulationTime::Instance()->GetTime();
     }
 }
-
-unsigned SimpleOxygenBasedCellCycleModel::GetDimension()
-{
-    return mDimension;
-}
-
 
 
 // Serialization for Boost >= 1.36

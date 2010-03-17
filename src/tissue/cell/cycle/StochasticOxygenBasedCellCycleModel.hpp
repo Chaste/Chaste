@@ -61,7 +61,6 @@ private:
         archive & mTimeSpentInG1Phase;
         archive & mCurrentHypoxicDuration;
         archive & mCurrentHypoxiaOnsetTime;
-        archive & mDimension;
     }
 
     /**
@@ -85,11 +84,6 @@ private:
     double mCurrentHypoxiaOnsetTime;
 
     /**
-     * The spatial dimension (needed by the templated class CellwiseData).
-     */
-    unsigned mDimension;
-
-    /**
      * Stochastically set the G2 duration.  Called on cell creation at
      * the start of a simulation, and for both parent and daughter
      * cells at cell division.
@@ -100,10 +94,8 @@ public:
 
     /**
      * Constructor.
-     *
-     * @param dimension the spatial dimension (needed by the templated class CellwiseData)
      */
-    StochasticOxygenBasedCellCycleModel(unsigned dimension);
+    StochasticOxygenBasedCellCycleModel();
 
     /**
      * Overridden InitialiseDaughterCell() method.
@@ -151,53 +143,10 @@ public:
      * this cell cycle model.
      */
     AbstractCellCycleModel* CreateCellCycleModel();
-
-    /**
-     * Get the spatial dimension.
-     *
-     * @return mDimension
-     */
-    unsigned GetDimension();
 };
 
 // Declare identifier for the serializer
 #include "SerializationExportWrapper.hpp"
 CHASTE_CLASS_EXPORT(StochasticOxygenBasedCellCycleModel)
-
-
-namespace boost
-{
-namespace serialization
-{
-/**
- * Allow us to not need a default constructor, by specifying how Boost should
- * instantiate a StochasticOxygenBasedCellCycleModel instance.
- */
-template<class Archive>
-inline void save_construct_data(
-    Archive & ar, const StochasticOxygenBasedCellCycleModel * t, const unsigned int file_version)
-{
-}
-
-/**
- * Allow us to not need a default constructor, by specifying how Boost should
- * instantiate a StochasticOxygenBasedCellCycleModel instance.
- */
-template<class Archive>
-inline void load_construct_data(
-    Archive & ar, StochasticOxygenBasedCellCycleModel * t, const unsigned int file_version)
-{
-    /**
-     * Invoke inplace constructor to initialise an instance of StochasticOxygenBasedCellCycleModel.
-     * It doesn't actually matter what values we pass to our standard constructor,
-     * provided they are valid parameter values, since the state loaded later
-     * from the archive will overwrite their effect in this case.
-     */
-
-    unsigned dimension = UINT_MAX;
-    ::new(t)StochasticOxygenBasedCellCycleModel(dimension);
-}
-}
-} // namespace ...
 
 #endif /*STOCHASTICOXYGENBASEDCELLCYCLEMODEL_HPP_*/

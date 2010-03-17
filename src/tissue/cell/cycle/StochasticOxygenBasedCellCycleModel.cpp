@@ -74,10 +74,9 @@ double StochasticOxygenBasedCellCycleModel::GetG2Duration()
 }
 
 
-StochasticOxygenBasedCellCycleModel::StochasticOxygenBasedCellCycleModel(unsigned dimension)
+StochasticOxygenBasedCellCycleModel::StochasticOxygenBasedCellCycleModel()
     : mTimeSpentInG1Phase(0.0),
-      mCurrentHypoxicDuration(0.0),
-      mDimension(dimension)
+      mCurrentHypoxicDuration(0.0)
 {
     mCurrentHypoxiaOnsetTime = SimulationTime::Instance()->GetTime();
 }
@@ -203,13 +202,6 @@ void StochasticOxygenBasedCellCycleModel::UpdateHypoxicDuration()
         mCurrentHypoxiaOnsetTime = SimulationTime::Instance()->GetTime();
     }
 }
-
-
-unsigned StochasticOxygenBasedCellCycleModel::GetDimension()
-{
-    return mDimension;
-}
-
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

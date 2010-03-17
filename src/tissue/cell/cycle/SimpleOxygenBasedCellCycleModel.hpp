@@ -55,7 +55,6 @@ private:
         archive & mTimeSpentInG1Phase;
         archive & mCurrentHypoxicDuration;
         archive & mCurrentHypoxiaOnsetTime;
-        archive & mDimension;
     }
 
     /**
@@ -73,19 +72,12 @@ private:
      */
     double mCurrentHypoxiaOnsetTime;
 
-    /**
-     * The spatial dimension (needed by the templated class CellwiseData).
-     */
-    unsigned mDimension;
-
 public:
 
     /**
      * Constructor.
-     *
-     * @param dimension the spatial dimension (needed by the templated class CellwiseData)
      */
-    SimpleOxygenBasedCellCycleModel(unsigned dimension);
+    SimpleOxygenBasedCellCycleModel();
 
     /**
      * Overridden UpdateCellCyclePhase() method.
@@ -113,53 +105,10 @@ public:
      * this cell cycle model.
      */
     AbstractCellCycleModel* CreateCellCycleModel();
-
-    /**
-     * Get the spatial dimension.
-     *
-     * @return mDimension
-     */
-    unsigned GetDimension();
 };
 
 // Declare identifier for the serializer
 #include "SerializationExportWrapper.hpp"
 CHASTE_CLASS_EXPORT(SimpleOxygenBasedCellCycleModel)
-
-
-namespace boost
-{
-namespace serialization
-{
-/**
- * Allow us to not need a default constructor, by specifying how Boost should
- * instantiate a SimpleOxygenBasedCellCycleModel instance.
- */
-template<class Archive>
-inline void save_construct_data(
-    Archive & ar, const SimpleOxygenBasedCellCycleModel * t, const unsigned int file_version)
-{
-}
-
-/**
- * Allow us to not need a default constructor, by specifying how Boost should
- * instantiate a SimpleOxygenBasedCellCycleModel instance.
- */
-template<class Archive>
-inline void load_construct_data(
-    Archive & ar, SimpleOxygenBasedCellCycleModel * t, const unsigned int file_version)
-{
-    /**
-     * Invoke inplace constructor to initialise an instance of SimpleOxygenBasedCellCycleModel.
-     * It doesn't actually matter what values we pass to our standard constructor,
-     * provided they are valid parameter values, since the state loaded later
-     * from the archive will overwrite their effect in this case.
-     */
-
-    unsigned dimension = UINT_MAX;
-    ::new(t)SimpleOxygenBasedCellCycleModel(dimension);
-}
-}
-} // namespace ...
 
 #endif /*SIMPLEOXYGENBASEDCELLCYCLEMODEL_HPP_*/

@@ -81,6 +81,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "GeneralisedLinearSpringForce.hpp"
 #include "OxygenBasedCellKiller.hpp"
 #include "CellwiseNutrientSinkPde.hpp"
+#include "WildTypeCellMutationState.hpp"
 /* !PetscSetupAndFinalize.hpp must be included in all tests which use Petsc. This is
  * a suite of data structures and routines that are used in the finite element
  * PDE solvers, which is how we solve the nutrient PDE(s).
@@ -121,12 +122,15 @@ public:
          * define the cells vector. */
         std::vector<TissueCell> cells;
         /* then loop over the nodes... */
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             /*.. then create a cell, and giving a particular cell cycle model
              * - {{{SimpleOxygenBasedCellCycleModel}}}.  The cell cycle model is
              * parameterised by the dimension of the problem. */
-            TissueCell cell(STEM, HEALTHY, new SimpleOxygenBasedCellCycleModel(2));
+        	SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
+        	p_model->SetDimension(2);
+            TissueCell cell(STEM, p_state, p_model);
 
             /* We now define a random birth time, chosen from [-T,0], where
              * T = t,,1,, + t,,2,,, where t,,1,, is a parameter representing the G,,1,, duration

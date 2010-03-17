@@ -31,14 +31,11 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <cmath>
 
 #include "AbstractOdeSystem.hpp"
-#include "CryptCellMutationStates.hpp"
+#include "AbstractCellMutationState.hpp"
 
 /**
  * Represents the Alarcon et al. (2004) system of ODEs (see ticket #461).
  * [doi:10.1016/j.jtbi.2004.04.016]
- *
- * Here the cell mutation state HEALTHY corresponds to a 'normal' state, while
- * LABELLED corresponds to a 'cancer' state.
  *
  * The variables are
  *
@@ -93,7 +90,7 @@ private:
     double myThreshold;
 
     /** The mutation state of the cell associated with this cell cycle model. */
-    CryptCellMutationState mMutationState;
+    boost::shared_ptr<AbstractCellMutationState> mpMutationState;
 
 public:
 
@@ -101,9 +98,9 @@ public:
      * Constructor.
      *
      * @param oxygenConcentration is a non-dimensional oxygen concentration value between 0 and 1.
-     * @param rMutationState affects the ODE system and is given by CryptCellMutationStates.hpp
+     * @param pMutationState affects the ODE system
      */
-    Alarcon2004OxygenBasedCellCycleOdeSystem(double oxygenConcentration, const CryptCellMutationState& rMutationState);
+    Alarcon2004OxygenBasedCellCycleOdeSystem(double oxygenConcentration, boost::shared_ptr<AbstractCellMutationState> pMutationState);
 
     /**
      * Destructor.
@@ -121,17 +118,16 @@ public:
      * This should be called by the relevant cell cycle model before any solving
      * of the ODE system (as it is used to evaluate the Y derivatives).
      *
-     * @param rMutationState the mutation state
+     * @param pMutationState the mutation state
      */
-    void SetMutationState(const CryptCellMutationState& rMutationState);
+    void SetMutationState(boost::shared_ptr<AbstractCellMutationState> pMutationState);
 
     /**
      * Called by the archive function on the cell cycle model.
      *
-     * @return mMutationState the mutation state of the cell defined by
-     * CryptCellMutationStates.hpp
+     * @return #mpMutationState
      */
-    CryptCellMutationState& rGetMutationState();
+    boost::shared_ptr<AbstractCellMutationState> GetMutationState();
 
     /**
      * Compute the RHS of the Alarcon et al. (2004) system of ODEs.

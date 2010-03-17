@@ -42,7 +42,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "MeshBasedTissueWithGhostNodes.hpp"
 #include "WntConcentration.hpp"
-
+#include "WildTypeCellMutationState.hpp"
 
 class TestCryptProjectionStatistics : public AbstractCellBasedTestSuite
 {
@@ -77,10 +77,12 @@ public:
         p_mesh->Translate(-width_of_mesh/2,-height_of_mesh/2);
 
         std::vector<TissueCell> cells;
-
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<location_indices.size(); i++)
         {
-            TissueCell cell(TRANSIT, HEALTHY, new SimpleWntCellCycleModel(2));
+        	SimpleWntCellCycleModel* p_model = new SimpleWntCellCycleModel();
+        	p_model->SetDimension(2);
+            TissueCell cell(TRANSIT, p_state, p_model);
             cell.InitialiseCellCycleModel();
             double birth_time = - RandomNumberGenerator::Instance()->ranf()*
                                   (p_params->GetTransitCellG1Duration()

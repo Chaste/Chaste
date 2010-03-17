@@ -28,6 +28,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "VertexBasedTissue.hpp"
 #include "VertexMeshWriter.hpp"
+#include "WildTypeCellMutationState.hpp"
 
 template<unsigned DIM>
 VertexBasedTissue<DIM>::VertexBasedTissue(MutableVertexMesh<DIM, DIM>& rMesh,
@@ -80,7 +81,8 @@ double VertexBasedTissue<DIM>::GetDampingConstant(unsigned nodeIndex)
          iter != containing_elements.end();
          ++iter)
     {
-        if (this->rGetCellUsingLocationIndex(*iter).GetMutationState() == HEALTHY)
+    	boost::shared_ptr<AbstractCellMutationState> p_state = this->rGetCellUsingLocationIndex(*iter).GetMutationState();
+        if (p_state->IsType<WildTypeCellMutationState>())
         {
             average_damping_constant += TissueConfig::Instance()->GetDampingConstantNormal()*temp;
         }

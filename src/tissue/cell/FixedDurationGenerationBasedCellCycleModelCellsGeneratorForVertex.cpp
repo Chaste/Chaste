@@ -26,7 +26,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
 #include "FixedDurationGenerationBasedCellCycleModelCellsGeneratorForVertex.hpp"
-
+#include "WildTypeCellMutationState.hpp"
 
 template<unsigned DIM>
 AbstractCellCycleModel* FixedDurationGenerationBasedCellCycleModelCellsGeneratorForVertex<DIM>::CreateCellCycleModel()
@@ -83,7 +83,7 @@ void FixedDurationGenerationBasedCellCycleModelCellsGeneratorForVertex<DIM>::Gen
 
     rCells.clear();
     rCells.reserve(num_cells);
-
+    boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
     for (unsigned i=0; i<rMesh.GetNumElements(); i++)
     {
         CellProliferativeType cell_type;
@@ -137,7 +137,7 @@ void FixedDurationGenerationBasedCellCycleModelCellsGeneratorForVertex<DIM>::Gen
             static_cast<AbstractSimpleGenerationBasedCellCycleModel*>(p_cell_cycle_model)->SetGeneration(generation);
         }
 
-        TissueCell cell(cell_type, HEALTHY, p_cell_cycle_model);
+        TissueCell cell(cell_type, p_state, p_cell_cycle_model);
         if (initialiseCells)
         {
             cell.InitialiseCellCycleModel();
