@@ -30,9 +30,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include <cxxtest/TestSuite.h>
 
-#include "FixedDurationGenerationBasedCellCycleModelCellsGeneratorForVertex.hpp"
-#include "SimpleWntCellCycleModelCellsGeneratorForVertex.hpp"
-#include "StochasticDurationGenerationBasedCellCycleModelCellsGeneratorForVertex.hpp"
+#include "CryptCellsGenerator.hpp"
+#include "SimpleWntCellCycleModel.hpp"
 #include "CylindricalHoneycombVertexMeshGenerator.hpp"
 #include "TrianglesMeshReader.hpp"
 
@@ -46,14 +45,13 @@ class TestCellsGeneratorForVertex : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestFixedAndStochasticDurationGenerationBasedCellCycleModelCellsGeneratorForVertexGenerateForVertexCrypt() throw(Exception)
+    void TestCryptCellsGeneratorWithStochasticDurationGenerationBasedCellCycleModelAndVertexMesh() throw(Exception)
     {
         // Create mesh
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
         CylindricalHoneycombVertexMeshGenerator mesh_generator(crypt_width, crypt_height);
         Cylindrical2dVertexMesh* p_mesh = mesh_generator.GetCylindricalMesh();
-
 
         double y0 = 1.0;
         double y1 = 2.0;
@@ -62,12 +60,11 @@ public:
 
         // Create cells
         std::vector<TissueCell> fixed_cells, stochastic_cells;
-        FixedDurationGenerationBasedCellCycleModelCellsGeneratorForVertex<2> fixed_cells_generator;
-        fixed_cells_generator.GenerateForVertexCrypt(fixed_cells, *p_mesh, true, y0, y1, y2, y3, true);
+        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> fixed_cells_generator;
+        fixed_cells_generator.Generate(fixed_cells, p_mesh, std::vector<unsigned>(), true, y0, y1, y2, y3, true);
 
-        StochasticDurationGenerationBasedCellCycleModelCellsGeneratorForVertex<2> stochastic_cells_generator;
-        stochastic_cells_generator.GenerateForVertexCrypt(stochastic_cells, *p_mesh, true, y0, y1, y2, y3, true);
-
+        CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> stochastic_cells_generator;
+        stochastic_cells_generator.Generate(stochastic_cells, p_mesh, std::vector<unsigned>(), true, y0, y1, y2, y3, true);
 
         TS_ASSERT_EQUALS(fixed_cells.size(), p_mesh->GetNumElements());
         TS_ASSERT_EQUALS(stochastic_cells.size(), p_mesh->GetNumElements());
@@ -108,7 +105,7 @@ public:
     }
 
 
-    void TestSimpleWntCellCycleModelCellsGeneratorForVertexGenerateForVertexCrypt() throw(Exception)
+    void TestCryptCellsGeneratorWithSimpleWntCellCycleModelAndVertexMesh() throw(Exception)
     {
         // Create mesh
         unsigned crypt_width = 4;
@@ -118,10 +115,10 @@ public:
 
         // Create cells
         std::vector<TissueCell> cells;
-        SimpleWntCellCycleModelCellsGeneratorForVertex<2> cells_generator;
-        cells_generator.GenerateForVertexCrypt(cells, *p_mesh, true, true);
+        CryptCellsGenerator<SimpleWntCellCycleModel> cells_generator;
+        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, true);
 
-        // Test that cells were generated correctly
+        // Test that the correct number cells was generated
         TS_ASSERT_EQUALS(cells.size(), p_mesh->GetNumElements());
     }
 };
