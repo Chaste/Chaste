@@ -28,7 +28,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "VertexBasedTissue.hpp"
 #include "VertexMeshWriter.hpp"
-#include "WildTypeCellMutationState.hpp"
 
 template<unsigned DIM>
 VertexBasedTissue<DIM>::VertexBasedTissue(MutableVertexMesh<DIM, DIM>& rMesh,

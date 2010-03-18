@@ -33,6 +33,10 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "AbstractOdeSystem.hpp"
 #include "AbstractCellMutationState.hpp"
 
+// Needed here to avoid serialization errors (on Boost<1.37)
+#include "WildTypeCellMutationState.hpp"
+#include "LabelledCellMutationState.hpp"
+
 /**
  * Represents the Alarcon et al. (2004) system of ODEs (see ticket #461).
  * [doi:10.1016/j.jtbi.2004.04.016]

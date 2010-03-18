@@ -27,8 +27,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 */
 #include "Alarcon2004OxygenBasedCellCycleOdeSystem.hpp"
 #include "CellwiseOdeSystemInformation.hpp"
-#include "WildTypeCellMutationState.hpp"
-#include "LabelledCellMutationState.hpp"
 
 Alarcon2004OxygenBasedCellCycleOdeSystem::Alarcon2004OxygenBasedCellCycleOdeSystem(double oxygenConcentration, boost::shared_ptr<AbstractCellMutationState> pMutationState)
     : AbstractOdeSystem(6),

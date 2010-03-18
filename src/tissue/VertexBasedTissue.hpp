@@ -32,13 +32,13 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "MutableVertexMesh.hpp"
 #include "ArchiveLocationInfo.hpp"
 
-#include <climits> // work around boost bug
-
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/set.hpp>
 #include <boost/serialization/vector.hpp>
 
+// Needed here to avoid serialization errors (on Boost<1.37)
+#include "WildTypeCellMutationState.hpp"
 
 /**
  * A facade class encapsulating a vertex-based 'tissue'.

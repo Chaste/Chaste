@@ -29,7 +29,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "ChemotacticForce.hpp"
 #include "CellwiseDataGradient.hpp"
-#include "LabelledCellMutationState.hpp"
 
 template<unsigned DIM>
 ChemotacticForce<DIM>::ChemotacticForce()
