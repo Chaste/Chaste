@@ -109,7 +109,7 @@ public:
      * @param locationIndices an optional vector of location indices that correspond to real cells
      */
     VertexBasedTissue(MutableVertexMesh<DIM, DIM>& rMesh,
-                      const std::vector<TissueCell>& rCells,
+                      std::vector<TissueCell>& rCells,
                       bool deleteMesh=false,
                       bool validate=true,
                       const std::vector<unsigned> locationIndices=std::vector<unsigned>());

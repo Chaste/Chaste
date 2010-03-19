@@ -83,11 +83,12 @@ public:
         std::vector<TissueCell> cells = SetUpCells(*p_mesh);
 
         // Create tissue
+        unsigned num_cells = cells.size();
         VertexBasedTissue<2> tissue(*p_mesh, cells);
 
         // Test we have the correct number of cells and elements
         TS_ASSERT_EQUALS(tissue.GetNumElements(), p_mesh->GetNumElements());
-        TS_ASSERT_EQUALS(tissue.rGetCells().size(), cells.size());
+        TS_ASSERT_EQUALS(tissue.rGetCells().size(), num_cells);
 
         unsigned counter = 0;
 
@@ -137,7 +138,8 @@ public:
 
         // This should throw an exception as the number of cells
         // does not equal the number of elements
-        TS_ASSERT_THROWS_THIS(VertexBasedTissue<2> tissue(*p_mesh, cells),
+        std::vector<TissueCell> cells_copy(cells);
+        TS_ASSERT_THROWS_THIS(VertexBasedTissue<2> tissue(*p_mesh, cells_copy),
                 "Element 8 does not appear to have a cell associated with it");
 
         TissueCell cell(STEM, p_state, new FixedDurationGenerationBasedCellCycleModel());
@@ -147,7 +149,8 @@ public:
         cell_location_indices.push_back(p_mesh->GetNumElements()-1);
 
         // This should pass as the number of cells equals the number of elements
-        TS_ASSERT_THROWS_NOTHING(VertexBasedTissue<2> tissue(*p_mesh, cells));
+        std::vector<TissueCell> cells_copy2(cells);
+        TS_ASSERT_THROWS_NOTHING(VertexBasedTissue<2> tissue(*p_mesh, cells_copy2));
 
         // Create tissue
         VertexBasedTissue<2> tissue(*p_mesh, cells);
