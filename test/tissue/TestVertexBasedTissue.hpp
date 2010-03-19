@@ -823,11 +823,11 @@ public:
         VertexBasedTissue<2> tissue(*p_mesh, cells);
 
         // For coverage of WriteResultsToFiles()
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
-        boost::shared_ptr<AbstractCellMutationState> p_labelled(new LabelledCellMutationState);
-        boost::shared_ptr<AbstractCellMutationState> p_apc1(new ApcOneHitCellMutationState);
-        boost::shared_ptr<AbstractCellMutationState> p_apc2(new ApcTwoHitCellMutationState);
-        boost::shared_ptr<AbstractCellMutationState> p_bcat1(new BetaCateninOneHitCellMutationState);
+        boost::shared_ptr<AbstractCellMutationState> p_state(tissue.GetMutationRegistry()->Get<WildTypeCellMutationState>());
+        boost::shared_ptr<AbstractCellMutationState> p_labelled(tissue.GetMutationRegistry()->Get<LabelledCellMutationState>());
+        boost::shared_ptr<AbstractCellMutationState> p_apc1(tissue.GetMutationRegistry()->Get<ApcOneHitCellMutationState>());
+        boost::shared_ptr<AbstractCellMutationState> p_apc2(tissue.GetMutationRegistry()->Get<ApcTwoHitCellMutationState>());
+        boost::shared_ptr<AbstractCellMutationState> p_bcat1(tissue.GetMutationRegistry()->Get<BetaCateninOneHitCellMutationState>());
         tissue.rGetCellUsingLocationIndex(0).SetCellProliferativeType(TRANSIT);
         tissue.rGetCellUsingLocationIndex(0).SetMutationState(p_labelled);
         tissue.rGetCellUsingLocationIndex(1).SetCellProliferativeType(DIFFERENTIATED);
