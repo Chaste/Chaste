@@ -59,7 +59,7 @@ private:
     std::vector<TissueCell> SetUpCells(MutableVertexMesh<DIM,DIM>& rMesh)
     {
         std::vector<TissueCell> cells;
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellMutationState> p_state(CellMutationStateRegistry::Instance()->Get<WildTypeCellMutationState>());
         for (unsigned i=0; i<rMesh.GetNumElements(); i++)
         {
             TissueCell cell(DIFFERENTIATED, p_state, new FixedDurationGenerationBasedCellCycleModel());
