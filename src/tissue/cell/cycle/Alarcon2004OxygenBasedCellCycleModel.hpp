@@ -203,7 +203,7 @@ inline void load_construct_data(
         state_vars.push_back(0.0);
     }
     boost::shared_ptr<AbstractCellMutationState> p_state;
-    unsigned dimension = UINT_MAX;
+    unsigned dimension = 1;
 
     ::new(t)Alarcon2004OxygenBasedCellCycleModel(state_vars, dimension, p_state);
 }
