@@ -134,8 +134,8 @@ public:
         CylindricalHoneycombVertexMeshGenerator generator(4, 4);
 
         // Coverage
-        //TS_ASSERT_THROWS_THIS(generator.GetMesh(),
-        //                      "A cylindrical mesh was created but a normal mesh is being requested.");
+        TS_ASSERT_THROWS_THIS(generator.GetMesh(),
+                              "A cylindrical mesh was created but a normal mesh is being requested.");
 
         // Create periodic mesh
         Cylindrical2dVertexMesh* p_cylindrical_mesh = generator.GetCylindricalMesh();
