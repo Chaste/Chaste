@@ -686,6 +686,8 @@ public:
 
             output_arch << static_cast<const SimpleOxygenBasedCellCycleModel&>(*p_model);
 
+            // Tidy up
+            delete p_model;
             SimulationTime::Destroy();
         }
 
@@ -713,6 +715,7 @@ public:
             TS_ASSERT_DELTA(p_model->GetAge(), 1.5, 1e-12);
 
             // Tidy up
+            delete p_model;
             CellwiseData<1>::Destroy();
         }
     }
