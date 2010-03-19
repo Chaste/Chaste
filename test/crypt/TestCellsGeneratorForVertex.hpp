@@ -37,10 +37,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "AbstractCellBasedTestSuite.hpp"
 
-/**
- * This class contains tests for methods on classes
- * inheriting from AbstractCellsGenerator.
- */
+
 class TestCellsGeneratorForVertex : public AbstractCellBasedTestSuite
 {
 public:
