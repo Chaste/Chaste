@@ -1039,8 +1039,8 @@ public:
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<vertex_mesh.GetNumElements(); i++)
         {
-        	WntCellCycleModel* p_cell_cycle_model = new WntCellCycleModel;
-        	p_cell_cycle_model->SetDimension(2);
+            WntCellCycleModel* p_cell_cycle_model = new WntCellCycleModel;
+            p_cell_cycle_model->SetDimension(2);
             TissueCell cell(DIFFERENTIATED, p_state, p_cell_cycle_model);
             double birth_time = 0.0 - i;
             cell.SetBirthTime(birth_time);

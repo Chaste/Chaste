@@ -60,7 +60,7 @@ Alarcon2004OxygenBasedCellCycleModel::Alarcon2004OxygenBasedCellCycleModel(const
 
 void Alarcon2004OxygenBasedCellCycleModel::ResetForDivision()
 {
-	AbstractOdeBasedCellCycleModelWithStoppingEvent::ResetForDivision();
+    AbstractOdeBasedCellCycleModelWithStoppingEvent::ResetForDivision();
     assert(mpOdeSystem!=NULL);
 
     // This model needs the protein concentrations and phase resetting to G0/G1.

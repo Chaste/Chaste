@@ -133,8 +133,8 @@ public:
             /*.. then create a cell, giving it a particular cell cycle model
              * - {{{SimpleOxygenBasedCellCycleModel}}}. The dimension needs to be
              * set on the cell cycle model before being passed to the cell. */
-        	SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel;
-        	p_model->SetDimension(2);
+            SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel;
+            p_model->SetDimension(2);
             TissueCell cell(STEM, p_state, p_model);
 
             /* We now define a random birth time, chosen from [-T,0], where

@@ -60,7 +60,7 @@ void ChemotacticForce<DIM>::AddForceContribution(std::vector<c_vector<double, DI
          ++cell_iter)
     {
         // Only labelled cells move chemotactically
-    	boost::shared_ptr<AbstractCellMutationState> p_state = cell_iter->GetMutationState();
+        boost::shared_ptr<AbstractCellMutationState> p_state = cell_iter->GetMutationState();
         if (p_state->IsType<LabelledCellMutationState>())
         {
             unsigned node_global_index = rTissue.GetLocationIndexUsingCell(*cell_iter);

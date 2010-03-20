@@ -118,8 +118,8 @@ public:
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-        	SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
-        	p_model->SetDimension(2);
+            SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
+            p_model->SetDimension(2);
             TissueCell cell(STEM, p_state, p_model);
 
             double birth_time = -RandomNumberGenerator::Instance()->ranf()*
@@ -216,8 +216,8 @@ public:
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-        	SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
-        	p_model->SetDimension(2);
+            SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
+            p_model->SetDimension(2);
             TissueCell cell(STEM, p_state, p_model);
             double birth_time = -1.0 - ( (double) i/p_mesh->GetNumNodes() )*
                                     (TissueConfig::Instance()->GetHepaOneCellG1Duration()
@@ -318,8 +318,8 @@ public:
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-        	SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
-        	p_model->SetDimension(2);
+            SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
+            p_model->SetDimension(2);
             TissueCell cell(STEM, p_state, p_model);
             double birth_time = -1.0 - ( (double) i/p_mesh->GetNumNodes() )*
                                     (TissueConfig::Instance()->GetHepaOneCellG1Duration()
@@ -403,10 +403,10 @@ public:
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-        	SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
-        	p_model->SetDimension(2);
+            SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
+            p_model->SetDimension(2);
             TissueCell cell(STEM, p_state, p_model);
-        	cell.SetBirthTime(-0.1);
+            cell.SetBirthTime(-0.1);
 
             // Label three neighbouring cells as apoptotic
             if (i==12 || i==13 || i==17)
@@ -510,8 +510,8 @@ public:
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-        	SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
-        	p_model->SetDimension(2);
+            SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
+            p_model->SetDimension(2);
             TissueCell cell(STEM, p_state, p_model);
             double birth_time = -RandomNumberGenerator::Instance()->ranf()*
                                     (TissueConfig::Instance()->GetHepaOneCellG1Duration()
@@ -667,8 +667,8 @@ public:
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-        	SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
-        	p_model->SetDimension(2);
+            SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
+            p_model->SetDimension(2);
             TissueCell cell(STEM, p_state, p_model);
             double birth_time = -RandomNumberGenerator::Instance()->ranf()*
                                     (TissueConfig::Instance()->GetHepaOneCellG1Duration()
@@ -744,8 +744,8 @@ public:
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-        	SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
-        	p_model->SetDimension(2);
+            SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
+            p_model->SetDimension(2);
             TissueCell cell(STEM, p_state, p_model);
             double birth_time = -1.0 - ( (double) i/p_mesh->GetNumNodes() )*
                                             (TissueConfig::Instance()->GetHepaOneCellG1Duration()
@@ -849,8 +849,8 @@ public:
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-        	SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
-        	p_model->SetDimension(2);
+            SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
+            p_model->SetDimension(2);
             TissueCell cell(STEM, p_state, p_model);
             double birth_time = -1.0 - ( (double) i/p_mesh->GetNumNodes() )*
                                     (TissueConfig::Instance()->GetHepaOneCellG1Duration()

@@ -597,9 +597,9 @@ public:
 
             // Create cell cycle model and associated cell
             Alarcon2004OxygenBasedCellCycleModel* p_cell_model = new Alarcon2004OxygenBasedCellCycleModel();
-			p_cell_model->SetDimension(3);
+            p_cell_model->SetDimension(3);
 
-			boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+            boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
             TissueCell cell(STEM, p_state, p_cell_model);
 
             cell.InitialiseCellCycleModel();

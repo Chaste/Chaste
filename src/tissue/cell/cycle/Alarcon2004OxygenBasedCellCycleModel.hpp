@@ -85,11 +85,11 @@ private:
      * @param version the archive version
      */
     template<class Archive>
-	void load(Archive & archive, const unsigned int version)
+    void load(Archive & archive, const unsigned int version)
     {
-    	// The ODE system is set up by the archiving constructor, so we can set the mutation state
-    	// here.  This is a horrible hack, but avoids having to regenerate test archives...
-    	assert(mpOdeSystem);
+        // The ODE system is set up by the archiving constructor, so we can set the mutation state
+        // here.  This is a horrible hack, but avoids having to regenerate test archives...
+        assert(mpOdeSystem);
         archive & boost::serialization::base_object<AbstractOdeBasedCellCycleModelWithStoppingEvent>(*this);
         boost::shared_ptr<AbstractCellMutationState> p_mutation_state;
         archive & p_mutation_state;
@@ -121,8 +121,8 @@ public:
      * @param rDimension the spatial dimension
      */
     Alarcon2004OxygenBasedCellCycleModel(const std::vector<double>& rParentProteinConcentrations,
-										 const unsigned& rDimension,
-										 boost::shared_ptr<AbstractCellMutationState> pMutationState);
+                                         const unsigned& rDimension,
+                                         boost::shared_ptr<AbstractCellMutationState> pMutationState);
 
     /**
      * Resets the oxygen-based model to the start of the cell cycle

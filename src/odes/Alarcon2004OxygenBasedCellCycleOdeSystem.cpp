@@ -47,11 +47,11 @@ Alarcon2004OxygenBasedCellCycleOdeSystem::Alarcon2004OxygenBasedCellCycleOdeSyst
     Init(); // set up parameters
 
     // parameter values taken from the Alarcon et al. (2004) paper
-	if (!pMutationState)
-	{
-		// do nothing
-	}
-	else if (pMutationState->IsType<WildTypeCellMutationState>())    // normal cells
+    if (!pMutationState)
+    {
+        // do nothing
+    }
+    else if (pMutationState->IsType<WildTypeCellMutationState>())    // normal cells
     {
         ma1 = 0.05;
         mc1 = 0.1;
@@ -127,7 +127,7 @@ void Alarcon2004OxygenBasedCellCycleOdeSystem::EvaluateYDerivatives(double time,
     dy = ma4 -(ma1 + ma2*x + ma3*z)*y;
 
     assert( mpMutationState->IsType<WildTypeCellMutationState>()
-    		|| mpMutationState->IsType<LabelledCellMutationState>() );
+            || mpMutationState->IsType<LabelledCellMutationState>() );
 
     // Parameter values taken from the Alarcon et al. (2004) paper
     if (mpMutationState->IsType<WildTypeCellMutationState>())    // normal cells

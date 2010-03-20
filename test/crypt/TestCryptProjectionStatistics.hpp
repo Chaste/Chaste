@@ -80,8 +80,8 @@ public:
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<location_indices.size(); i++)
         {
-        	SimpleWntCellCycleModel* p_model = new SimpleWntCellCycleModel;
-        	p_model->SetDimension(2);
+            SimpleWntCellCycleModel* p_model = new SimpleWntCellCycleModel;
+            p_model->SetDimension(2);
             TissueCell cell(TRANSIT, p_state, p_model);
 
             cell.InitialiseCellCycleModel();
