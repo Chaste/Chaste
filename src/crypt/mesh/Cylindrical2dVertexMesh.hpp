@@ -72,7 +72,9 @@ private:
     /**
      * Constructor - used for serialization only
      */
-    Cylindrical2dVertexMesh(){};
+    Cylindrical2dVertexMesh()
+    {
+    }
 
 public:
 
