@@ -477,14 +477,6 @@ void VertexBasedTissue<DIM>::GenerateCellResultsAndWriteToFiles()
         cell_type_counter[i] = 0;
     }
 
-    // Set up cell mutation state counter
-    unsigned num_mutation_states = this->mCellMutationStateCount.size();
-    std::vector<unsigned> cell_mutation_state_counter(num_mutation_states);
-    for (unsigned i=0; i<num_mutation_states; i++)
-    {
-        cell_mutation_state_counter[i] = 0;
-    }
-
     // Set up cell cycle phase counter
     unsigned num_cell_cycle_phases = this->mCellCyclePhaseCount.size();
     std::vector<unsigned> cell_cycle_phase_counter(num_cell_cycle_phases);
@@ -497,15 +489,10 @@ void VertexBasedTissue<DIM>::GenerateCellResultsAndWriteToFiles()
          cell_iter != this->End();
          ++cell_iter)
     {
-        this->GenerateCellResults(this->GetLocationIndexUsingCell(*cell_iter),
-                                  cell_type_counter,
-                                  cell_mutation_state_counter,
-                                  cell_cycle_phase_counter);
+        this->GenerateCellResults(this->GetLocationIndexUsingCell(*cell_iter), cell_type_counter, cell_cycle_phase_counter);
     }
 
-    this->WriteCellResultsToFiles(cell_type_counter,
-                                  cell_mutation_state_counter,
-                                  cell_cycle_phase_counter);
+    this->WriteCellResultsToFiles(cell_type_counter, cell_cycle_phase_counter);
 }
 
 
