@@ -333,7 +333,7 @@ public:
         TissueSimulation<2> simulator(tissue, force_collection);
         simulator.SetOutputDirectory("TestVertexMonolayerLong");
         simulator.SetSamplingTimestepMultiple(50);
-        simulator.SetEndTime(50.0); // at 35.6 a void forms and need to deal with this!!
+        simulator.SetEndTime(100.0); // at 35.6 a void forms and need to deal with this!!
 
         // Adjust Max Generations so cells keep proliferating
         TissueConfig::Instance()->SetMaxTransitGenerations(5u);

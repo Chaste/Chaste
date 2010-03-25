@@ -259,8 +259,20 @@ void VertexBasedTissue<DIM>::UpdateNodeLocations(const std::vector< c_vector<dou
         // Get damping constant for node
         double damping_const = this->GetDampingConstant(node_index);
 
+		//Get displacement
+		c_vector<double, DIM> displacement = dt*rNodeForces[node_index]/damping_const;
+		
+		
+//		// if the displacement is larger than the rearangement threshold then shorten it to stop nodes moving into neighboring elements. 
+//		if (norm_2(displacement) > mrMesh.GetCellRearrangementThreshold())
+//		{
+//			TRACE("Node moved more than mesh rearangement threshold: reduce timestep.");
+//			PRINT_VARIABLE(SimulationTime::Instance()->GetTime());
+//			displacement *= mrMesh.GetCellRearrangementThreshold()*norm_2(displacement);
+//		}
+
         // Get new node location
-        c_vector<double, DIM> new_node_location = this->GetNode(node_index)->rGetLocation() + dt*rNodeForces[node_index]/damping_const;
+        c_vector<double, DIM> new_node_location = this->GetNode(node_index)->rGetLocation() + displacement;
 
         // Create ChastePoint for new node location
         ChastePoint<DIM> new_point(new_node_location);
