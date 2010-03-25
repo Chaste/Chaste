@@ -209,12 +209,12 @@ TissueCell* VertexBasedTissue<DIM>::AddCell(TissueCell& rNewCell, const c_vector
     if ( norm_2(rCellDivisionVector) < DBL_EPSILON )
     {
         // If the cell division vector is the default zero vector, divide the element along the short axis
-        new_element_index = mrMesh.DivideElementAlongShortAxis(p_element);
+        new_element_index = mrMesh.DivideElementAlongShortAxis(p_element, true);
     }
     else
     {
         // If the cell division vector has any non-zero component, divide the element along this axis
-        new_element_index = mrMesh.DivideElementAlongGivenAxis(p_element, rCellDivisionVector);
+        new_element_index = mrMesh.DivideElementAlongGivenAxis(p_element, rCellDivisionVector, true);
     }
 
     // Associate the new cell with the element
@@ -259,17 +259,17 @@ void VertexBasedTissue<DIM>::UpdateNodeLocations(const std::vector< c_vector<dou
         // Get damping constant for node
         double damping_const = this->GetDampingConstant(node_index);
 
-		//Get displacement
-		c_vector<double, DIM> displacement = dt*rNodeForces[node_index]/damping_const;
-		
-		
-//		// if the displacement is larger than the rearangement threshold then shorten it to stop nodes moving into neighboring elements. 
-//		if (norm_2(displacement) > mrMesh.GetCellRearrangementThreshold())
-//		{
-//			TRACE("Node moved more than mesh rearangement threshold: reduce timestep.");
-//			PRINT_VARIABLE(SimulationTime::Instance()->GetTime());
-//			displacement *= mrMesh.GetCellRearrangementThreshold()*norm_2(displacement);
-//		}
+        //Get displacement
+        c_vector<double, DIM> displacement = dt*rNodeForces[node_index]/damping_const;
+
+
+//        // if the displacement is larger than the rearangement threshold then shorten it to stop nodes moving into neighboring elements.
+//        if (norm_2(displacement) > mrMesh.GetCellRearrangementThreshold())
+//        {
+//            TRACE("Node moved more than mesh rearangement threshold: reduce timestep.");
+//            PRINT_VARIABLE(SimulationTime::Instance()->GetTime());
+//            displacement *= mrMesh.GetCellRearrangementThreshold()*norm_2(displacement);
+//        }
 
         // Get new node location
         c_vector<double, DIM> new_node_location = this->GetNode(node_index)->rGetLocation() + displacement;

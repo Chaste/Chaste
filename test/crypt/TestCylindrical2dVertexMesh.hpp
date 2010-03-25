@@ -247,7 +247,7 @@ public:
         axis_of_division(1) = 1.0/sqrt(2.0);
 
         //Divide non periodic element
-        unsigned new_element_index = p_mesh->DivideElementAlongGivenAxis(p_mesh->GetElement(2), axis_of_division);
+        unsigned new_element_index = p_mesh->DivideElementAlongGivenAxis(p_mesh->GetElement(2), axis_of_division, true);
 
         TS_ASSERT_EQUALS(new_element_index, 16u);
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 17u);
@@ -275,7 +275,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetElement(16)->GetNode(4)->GetIndex(), 41u);
 
         // Divide periodic element
-        new_element_index = p_mesh->DivideElementAlongGivenAxis(p_mesh->GetElement(3), axis_of_division);
+        new_element_index = p_mesh->DivideElementAlongGivenAxis(p_mesh->GetElement(3), axis_of_division, true);
 
         TS_ASSERT_EQUALS(new_element_index, 17u);
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 18u);
