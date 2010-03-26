@@ -25,26 +25,25 @@ You should have received a copy of the GNU Lesser General Public License
 along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
-#ifndef CYLINDRICALHONEYCOMBVERTEXMESHGENERATOR_HPP_
-#define CYLINDRICALHONEYCOMBVERTEXMESHGENERATOR_HPP_
+#ifndef HONEYCOMBMUTABLEVERTEXMESHGENERATOR_HPP_
+#define HONEYCOMBMUTABLEVERTEXMESHGENERATOR_HPP_
 
 #include <cmath>
 #include <vector>
 
-#include "Cylindrical2dVertexMesh.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
-
+#include "MutableVertexMesh.hpp"
 /**
  *  Generator of honeycomb meshes, used as starting points for many simulations.
  *
  *  This class takes in options such as width, height, number of ghost nodes
- *  and generates a honeycomb mesh (with equal distance between nodes).
+ *  and generates a honeycomb mesh (with equal distance between nodes), and ghost
+ *  node information when requested.
  *
  *  NOTE: the user should delete the mesh after use to manage memory.
  */
-class CylindricalHoneycombVertexMeshGenerator : HoneycombVertexMeshGenerator
+class HoneycombMutableVertexMeshGenerator : HoneycombVertexMeshGenerator
 {
-
 public:
 
     /**
@@ -57,22 +56,22 @@ public:
      * @param edgeDivisionThreshold the maximum threshold distance for edge division (defaults to DBL_MAX)
      * @param t2Threshold the maximum threshold distance for Type 2 swaps (defaults to 0.001)
      */
-    CylindricalHoneycombVertexMeshGenerator(unsigned numElementsAcross,
-                                 unsigned numElementsUp,
-                                 bool isFlatBottom=false,
-                                 double cellRearrangementThreshold=0.01,
-                                 double edgeDivisionThreshold=DBL_MAX,
-                                 double t2Threshold=0.001);
-
+    HoneycombMutableVertexMeshGenerator(unsigned numElementsAcross,
+                    		            unsigned numElementsUp,
+                                        bool isFlatBottom=false,
+                                        double cellRearrangementThreshold=0.01,
+                                        double edgeDivisionThreshold=DBL_MAX,
+                                        double t2Threshold=0.001);
+        
     /**
-     * @return a honeycomb mesh based on a 2D plane.
+     * @return a mutable honeycomb mesh based on a 2D plane.
      */
-    VertexMesh<2,2>* GetMesh();
-
+    virtual VertexMesh<2,2>* GetMesh();
+    
     /**
-     * @return a honeycomb mesh with cylindrical boundaries.
+     * @return a mutable honeycomb mesh based on a 2D plane.
      */
-    Cylindrical2dVertexMesh* GetCylindricalMesh();
+    virtual MutableVertexMesh<2,2>* GetMutableMesh();
 };
 
-#endif /*CYLINDRICALHONEYCOMBVERTEXMESHGENERATOR_HPP_*/
+#endif /*HONEYCOMBMUTABLEVERTEXMESHGENERATOR_HPP_*/

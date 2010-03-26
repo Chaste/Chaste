@@ -41,7 +41,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "WelikyOsterForce.hpp"
 #include "AbstractCellKiller.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
-#include "HoneycombVertexMeshGenerator.hpp"
+#include "HoneycombMutableVertexMeshGenerator.hpp"
 #include "VertexMeshWriter.hpp"
 #include "WildTypeCellMutationState.hpp"
 
@@ -101,8 +101,8 @@ public:
     void TestSolveThrowsNothing() throw (Exception)
     {
         // Create a simple 2D MutableVertexMesh
-        HoneycombVertexMeshGenerator generator(6, 6);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        HoneycombMutableVertexMeshGenerator generator(6, 6);
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
 
         // Set up cells, one for each VertexElement. Give each cell
         // a birth time of -elem_index, so its age is elem_index
@@ -251,8 +251,8 @@ void TestSingleCellRelaxationWelikyOster() throw (Exception)
     void TestSimpleVertexMonolayerWithCellBirth() throw (Exception)
     {
         // Create a simple 2D MutableVertexMesh with only one cell
-        HoneycombVertexMeshGenerator generator(1, 1);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        HoneycombMutableVertexMeshGenerator generator(1, 1);
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
         p_mesh->SetEdgeDivisionThreshold(0.5);
 
         // Set up cell.
@@ -298,8 +298,8 @@ void TestSingleCellRelaxationWelikyOster() throw (Exception)
     void TestVertexMonolayerWithCellBirth() throw (Exception)
     {
         // Create a simple 2D MutableVertexMesh
-        HoneycombVertexMeshGenerator generator(5, 5);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        HoneycombMutableVertexMeshGenerator generator(5, 5);
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
 
         // Set up cells, one for each VertexElement. Give each cell
         // a birth time of -elem_index, so its age is elem_index
@@ -356,8 +356,8 @@ void TestSingleCellRelaxationWelikyOster() throw (Exception)
     void noTestVertexMonolayerLong() throw (Exception)
     {
         // Create a simple 2D MutableVertexMesh
-        HoneycombVertexMeshGenerator generator(3, 3);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        HoneycombMutableVertexMeshGenerator generator(3, 3);
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
 
         // Set up cells, one for each VertexElement
         std::vector<TissueCell> cells;
@@ -406,8 +406,8 @@ void TestSingleCellRelaxationWelikyOster() throw (Exception)
          */
 
         // Create a simple 2D MutableVertexMesh
-        HoneycombVertexMeshGenerator generator(5, 5);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        HoneycombMutableVertexMeshGenerator generator(5, 5);
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
         p_mesh->SetCellRearrangementThreshold(0.2);
         p_mesh->SetT2Threshold(sqrt(3.0)/1000.0); // so T2Swaps once it becomes a triangle
 
@@ -542,8 +542,8 @@ void TestSingleCellRelaxationWelikyOster() throw (Exception)
         double end_time = 0.1;
 
         // Create a simple 2D MutableVertexMesh
-        HoneycombVertexMeshGenerator generator(6, 6);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        HoneycombMutableVertexMeshGenerator generator(6, 6);
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
 
         // Set up cells, one for each VertexElement. Give each cell
         // a birth time of -elem_index, so its age is elem_index

@@ -4,6 +4,9 @@ crypt/TestCryptProjectionStatistics.hpp
 crypt/TestCylindrical2dVertexMesh.hpp
 crypt/TestVertexCryptSimulation2d.hpp
 mesh/TestHoneycombVertexMeshGenerator.hpp
+mesh/TestMutableVertexMesh.hpp
+mesh/TestMutableVertexMeshReMesh.hpp
+mesh/TestVertexMeshWriterForMutable.hpp
 odes/TestAlarcon2004OxygenBasedCellCycleOdeSystem.hpp
 simulation/TestNutrientPdes.hpp
 simulation/TestTissueSimulationNotForRelease.hpp

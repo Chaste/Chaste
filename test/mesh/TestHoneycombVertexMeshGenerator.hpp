@@ -34,19 +34,23 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
-#include "HoneycombVertexMeshGenerator.hpp"
+#include "HoneycombMutableVertexMeshGenerator.hpp"
 #include "CylindricalHoneycombVertexMeshGenerator.hpp"
 
 class TestHoneycombVertexMeshGenerator : public CxxTest::TestSuite
 {
 public:
 
-    void TestVertexMeshGenerator() throw(Exception)
+    void TestMutableVertexMeshGenerator() throw(Exception)
     {
-        HoneycombVertexMeshGenerator generator(5, 3);
+        HoneycombMutableVertexMeshGenerator generator(5, 3);
+
+        // Coverage
+        TS_ASSERT_THROWS_THIS(generator.GetMesh(),
+                              "A mutable mesh was created but a normal mesh is being requested.");
 
         // Create mesh
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 15u);
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 46u);

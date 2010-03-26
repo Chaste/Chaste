@@ -36,7 +36,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "MeshBasedTissueWithGhostNodes.hpp"
 #include "HoneycombMeshGenerator.hpp"
-#include "HoneycombVertexMeshGenerator.hpp"
+#include "HoneycombMutableVertexMeshGenerator.hpp"
 #include "LinearSpringWithVariableSpringConstantsForce.hpp"
 #include "ChemotacticForce.hpp"
 #include "CellwiseDataGradient.hpp"
@@ -783,8 +783,8 @@ void TestWelikyOsterForceMethods() throw (Exception)
     void TestVertexCryptBoundaryForce() throw (Exception)
     {
         // Create a simple 2D VertexMesh
-        HoneycombVertexMeshGenerator generator(5, 5, false, 0.1, 0.5);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        HoneycombMutableVertexMeshGenerator generator(5, 5, false, 0.1, 0.5);
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
 
         // Translate mesh so that some points are below y=0
         p_mesh->Translate(0.0, -3.0);
