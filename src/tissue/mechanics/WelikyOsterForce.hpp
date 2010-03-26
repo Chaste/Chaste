@@ -25,8 +25,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
-#ifndef NAGAIHONDAFORCE_HPP_
-#define NAGAIHONDAFORCE_HPP_
+#ifndef WELIKYOSTERFORCE_HPP_
+#define WELIKYOSTERFORCE_HPP_
 
 
 #include "ChasteSerialization.hpp"
@@ -40,7 +40,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
  * A force class for use in vertex-based tissue simulations
  */
 template<unsigned DIM>
-class NagaiHondaForce  : public AbstractForce<DIM>
+class WelikyOsterForce  : public AbstractForce<DIM>
 {
 friend class TestForcesNotForRelease;
 
@@ -60,18 +60,18 @@ public:
     /**
      * Constructor.
      */
-    NagaiHondaForce();
+    WelikyOsterForce();
 
     /**
      * Destructor.
      */
-    ~NagaiHondaForce();
+    ~WelikyOsterForce();
 
     /**
      * Overridden AddForceContribution() method.
      *
      * Calculates the force on each node in the vertex-based tissue based on the 
-     * Nagai Honda model .
+     * Weliky Oster model.
      *
      * @param rForces reference to vector of forces on nodes
      * @param rTissue reference to the tissue
@@ -84,6 +84,6 @@ public:
 
 #include "SerializationExportWrapper.hpp"
 
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(NagaiHondaForce)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(WelikyOsterForce)
 
-#endif /*NAGAIHONDAFORCE_HPP_*/
+#endif /*WELIKYOSTERFORCE_HPP_*/

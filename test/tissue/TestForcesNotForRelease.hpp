@@ -42,6 +42,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CellwiseDataGradient.hpp"
 #include "CryptProjectionForce.hpp"
 #include "NagaiHondaForce.hpp"
+#include "WelikyOsterForce.hpp"
 #include "VertexCryptBoundaryForce.hpp"
 #include "VertexBasedTissue.hpp"
 #include "WntConcentration.hpp"
@@ -721,6 +722,63 @@ public:
             TS_ASSERT_DELTA(node_forces[i][1], -apoptotic_force_magnitude*sin(angles[i]), 1e-4);
         }
     }
+
+void TestWelikyOsterForceMethods() throw (Exception)
+    {
+        // Construct a 2D vertex mesh consisting of a single element
+        std::vector<Node<2>*> nodes;
+        unsigned num_nodes = 20;
+        std::vector<double> angles = std::vector<double>(num_nodes);
+
+        for (unsigned i=0; i<num_nodes; i++)
+        {
+            angles[i] = M_PI+2.0*M_PI*(double)(i)/(double)(num_nodes);
+            nodes.push_back(new Node<2>(i, false, cos(angles[i]), sin(angles[i])));
+        }
+
+        std::vector<VertexElement<2,2>*> elements;
+        elements.push_back(new VertexElement<2,2>(0, nodes));
+
+        double cell_swap_threshold = 0.01;
+        double edge_division_threshold = 2.0;
+        MutableVertexMesh<2,2> mesh(nodes, elements, cell_swap_threshold, edge_division_threshold);
+
+        // Set up the cell
+        std::vector<TissueCell> cells;
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        TissueCell cell(DIFFERENTIATED, p_state, new FixedDurationGenerationBasedCellCycleModel());
+        cell.SetBirthTime(-1.0);
+        cells.push_back(cell);
+
+        // Create tissue
+        VertexBasedTissue<2> tissue(mesh, cells);
+        tissue.InitialiseCells();
+
+        // Create a force system
+        WelikyOsterForce<2> force;
+
+        // Initialise a vector of new node forces
+        std::vector<c_vector<double, 2> > node_forces;
+        node_forces.reserve(tissue.GetNumNodes());
+
+        for (unsigned i=0; i<tissue.GetNumNodes(); i++)
+        {
+            node_forces.push_back(zero_vector<double>(2));
+        }
+
+        force.AddForceContribution(node_forces, tissue);
+
+        // The force on each node should be radially inward, with the same magnitude for all nodes
+        double force_magnitude = norm_2(node_forces[0]);
+
+        for (unsigned i=0; i<num_nodes; i++)
+        {
+            TS_ASSERT_DELTA(norm_2(node_forces[i]), force_magnitude, 1e-4);
+            TS_ASSERT_DELTA(node_forces[i][0], -force_magnitude*cos(angles[i]), 1e-4);
+            TS_ASSERT_DELTA(node_forces[i][1], -force_magnitude*sin(angles[i]), 1e-4);
+        }
+    }
+
 
     void TestVertexCryptBoundaryForce() throw (Exception)
     {

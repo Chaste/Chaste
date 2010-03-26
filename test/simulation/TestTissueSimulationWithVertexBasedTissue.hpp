@@ -38,6 +38,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "StochasticDurationGenerationBasedCellCycleModel.hpp"
 #include "VertexBasedTissue.hpp"
 #include "NagaiHondaForce.hpp"
+#include "WelikyOsterForce.hpp"
 #include "AbstractCellKiller.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
@@ -185,6 +186,60 @@ public:
 
         // Test relaxes to circle (can be more stringent with more nodes and more time)
         TS_ASSERT_DELTA(tissue.rGetMesh().GetAreaOfElement(0), 1.0, 0.05);
+        TS_ASSERT_DELTA(tissue.rGetMesh().GetPerimeterOfElement(0), 3.5449077, 0.1);
+    }
+
+
+void TestSingleCellRelaxationWelikyOster() throw (Exception)
+    {
+        // Construct a 2D vertex mesh consisting of a single element
+        std::vector<Node<2>*> nodes;
+        unsigned num_nodes = 20;
+        for (unsigned i=0; i<num_nodes; i++)
+        {
+            double theta = M_PI+2.0*M_PI*(double)(i)/(double)(num_nodes);
+            nodes.push_back(new Node<2>(i, false, cos(theta), sin(theta)));
+        }
+
+        std::vector<VertexElement<2,2>*> elements;
+        elements.push_back(new VertexElement<2,2>(0, nodes));
+
+        double cell_swap_threshold = 0.01;
+        double edge_division_threshold = 2.0;
+        MutableVertexMesh<2,2> mesh(nodes, elements, cell_swap_threshold, edge_division_threshold);
+
+        // Set up cells, one for each VertexElement. Give each cell
+        // a birth time of 0
+        std::vector<TissueCell> cells;
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        for (unsigned elem_index=0; elem_index<mesh.GetNumElements(); elem_index++)
+        {
+            CellProliferativeType cell_type = DIFFERENTIATED;
+            double birth_time = -1.0;
+
+            TissueCell cell(cell_type, p_state, new FixedDurationGenerationBasedCellCycleModel());
+            cell.SetBirthTime(birth_time);
+            cells.push_back(cell);
+        }
+
+        // Create tissue
+        VertexBasedTissue<2> tissue(mesh, cells);
+
+        // Create a force system
+        WelikyOsterForce<2> force;
+        std::vector<AbstractForce<2>* > force_collection;
+        force_collection.push_back(&force);
+
+        // Set up tissue simulation
+        TissueSimulation<2> simulator(tissue, force_collection);
+        simulator.SetOutputDirectory("TestSingleCellRelaxationWelikyOster");
+        simulator.SetEndTime(1.0);
+
+        // Run simulation
+        simulator.Solve();
+
+        // Test relaxes to circle (can be more stringent with more nodes and more time)
+        TS_ASSERT_DELTA(tissue.rGetMesh().GetAreaOfElement(0), 1.0, 0.1);
         TS_ASSERT_DELTA(tissue.rGetMesh().GetPerimeterOfElement(0), 3.5449077, 0.1);
     }
 
