@@ -46,9 +46,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 /**
  * Oxygen-dependent cell cycle model.
  *
- * Note that this class uses C++'s default copying semantics, and so
- * doesn't implement a copy constructor or operator=.
- *
  * Note also that this model currently only works in 2D, since the
  * SolveOdeToTime() and GetDivideTime() methods involve instances of
  * CellwiseData<2>.
