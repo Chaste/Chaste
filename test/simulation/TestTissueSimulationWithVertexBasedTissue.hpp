@@ -135,7 +135,6 @@ public:
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
     }
 
-
     void TestSingleCellRelaxation() throw (Exception)
     {
         // Construct a 2D vertex mesh consisting of a single element
@@ -189,8 +188,7 @@ public:
         TS_ASSERT_DELTA(tissue.rGetMesh().GetPerimeterOfElement(0), 3.5449077, 0.1);
     }
 
-
-void TestSingleCellRelaxationWelikyOster() throw (Exception)
+    void TestSingleCellRelaxationWelikyOster() throw (Exception)
     {
         // Construct a 2D vertex mesh consisting of a single element
         std::vector<Node<2>*> nodes;
@@ -396,7 +394,6 @@ void TestSingleCellRelaxationWelikyOster() throw (Exception)
         // Run simulation
         simulator.Solve();
     }
-
 
     void TestVertexMonolayerWithCellDeath() throw (Exception)
     {

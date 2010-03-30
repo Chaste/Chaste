@@ -368,7 +368,7 @@ public:
         TS_ASSERT_EQUALS(basic_vertex_mesh.GetNumElements(), 1u);
         TS_ASSERT_EQUALS(basic_vertex_mesh.GetNumNodes(), 4u);
 
-        // Divide element using two given nodes
+        // Divide element using two given nodes, putting the original element below the new element
         unsigned new_element_index = basic_vertex_mesh.DivideElement(basic_vertex_mesh.GetElement(0), 2, 0, true);
 
         TS_ASSERT_EQUALS(new_element_index, 1u);
@@ -390,6 +390,49 @@ public:
         new_element_index = basic_vertex_mesh.DivideElement(basic_vertex_mesh.GetElement(1), 2, 3, true);
 
         TS_ASSERT_EQUALS(new_element_index, 0u);
+    }
+
+    void TestDivideVertexElementAbove() throw(Exception)
+    {
+        // Make four nodes
+        std::vector<Node<2>*> basic_nodes;
+        basic_nodes.push_back(new Node<2>(0, false, 2.0, -1.0));
+        basic_nodes.push_back(new Node<2>(1, false, 2.0, 1.0));
+        basic_nodes.push_back(new Node<2>(2, false, -2.0, 1.0));
+        basic_nodes.push_back(new Node<2>(3, false, -2.0, -1.0));
+
+        // Make one rectangular element out of these nodes. Ordering for coverage.
+        std::vector<Node<2>*> nodes_elem;
+        nodes_elem.push_back(basic_nodes[2]);
+        nodes_elem.push_back(basic_nodes[3]);
+        nodes_elem.push_back(basic_nodes[0]);
+        nodes_elem.push_back(basic_nodes[1]);
+
+        std::vector<VertexElement<2,2>*> basic_vertex_elements;
+        basic_vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem));
+
+        // Make a vertex mesh
+        MutableVertexMesh<2,2> basic_vertex_mesh(basic_nodes, basic_vertex_elements);
+
+        TS_ASSERT_EQUALS(basic_vertex_mesh.GetNumElements(), 1u);
+        TS_ASSERT_EQUALS(basic_vertex_mesh.GetNumNodes(), 4u);
+
+        // Divide element using two given nodes, putting the original element above the new element
+        unsigned new_element_index = basic_vertex_mesh.DivideElement(basic_vertex_mesh.GetElement(0), 2, 0, false);
+
+        TS_ASSERT_EQUALS(new_element_index, 1u);
+        TS_ASSERT_EQUALS(basic_vertex_mesh.GetNumElements(), 2u);
+
+        // Test elements have correct nodes
+        TS_ASSERT_EQUALS(basic_vertex_mesh.GetElement(0)->GetNumNodes(), 3u);
+        TS_ASSERT_EQUALS(basic_vertex_mesh.GetElement(0)->GetNode(0)->GetIndex(), 2u);
+        TS_ASSERT_EQUALS(basic_vertex_mesh.GetElement(0)->GetNode(1)->GetIndex(), 0u);
+        TS_ASSERT_EQUALS(basic_vertex_mesh.GetElement(0)->GetNode(2)->GetIndex(), 1u);
+
+        TS_ASSERT_EQUALS(basic_vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
+        TS_ASSERT_EQUALS(basic_vertex_mesh.GetElement(1)->GetNode(0)->GetIndex(), 2u);
+        TS_ASSERT_EQUALS(basic_vertex_mesh.GetElement(1)->GetNode(1)->GetIndex(), 3u);
+        TS_ASSERT_EQUALS(basic_vertex_mesh.GetElement(1)->GetNode(2)->GetIndex(), 0u);
     }
 
     // This also tests that boundary nodes are updated on element division

@@ -119,17 +119,20 @@ public:
 
     void TestChemotacticForceArchiving() throw (Exception)
     {
+        // Set up
         OutputFileHandler handler("archive", false);    // don't erase contents of folder
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "chemotaxis_spring_system.arch";
 
         {
+            // Create mesh
             TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
-
             MutableMesh<2,2> mesh;
             mesh.ConstructFromMeshReader(mesh_reader);
 
-            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
+            // SimulationTime is usually set up by a TissueSimulation
+            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
+            // Create cells
             std::vector<TissueCell> cells;
             boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
             TissueCell cell(STEM, p_state, new FixedDurationGenerationBasedCellCycleModel());
@@ -139,32 +142,44 @@ public:
                 cells.push_back(cell);
             }
 
+            // Create tissue
             MeshBasedTissue<2> tissue(mesh,cells);
+
+            // Create force
             ChemotacticForce<2> chemotactic_force;
 
+            // Change the value of a TissueConfig member
+            TS_ASSERT_DELTA(TissueConfig::Instance()->GetStemCellG1Duration(), 14.0, 1e-6);
+            TissueConfig::Instance()->SetStemCellG1Duration(17.68);
+            TS_ASSERT_DELTA(TissueConfig::Instance()->GetStemCellG1Duration(), 17.68, 1e-6);
+
+            // Serialize force (and hence TissueConfig) via pointer
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
-
-            // Serialize via pointer
+            
             ChemotacticForce<2>* const p_chemotactic_force = &chemotactic_force;
-
             output_arch << p_chemotactic_force;
+
+            // Tidy up
+            TissueConfig::Instance()->Reset();
         }
 
         {
+            // Check TissueConfig is reset
+            TS_ASSERT_DELTA(TissueConfig::Instance()->GetStemCellG1Duration(), 14.0, 1e-6);
+
             ArchiveLocationInfo::SetMeshPathname("mesh/test/data/", "square_2_elements");
 
             // Create an input archive
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
 
+            // Restore force (and hence TissueConfig) from the archive
             ChemotacticForce<2>* p_chemotactic_force;
-
-            // Restore from the archive
             input_arch >> p_chemotactic_force;
 
-            /// \todo This currently doesn't test anything as ChemotacticForce has no member data.
-            ///       Either find something to test, or remove this archiving test.
+            // Check TissueConfig has been correctly archived
+            TS_ASSERT_DELTA(TissueConfig::Instance()->GetStemCellG1Duration(), 17.68, 1e-6);
 
             // Tidy up
             delete p_chemotactic_force;
@@ -214,7 +229,8 @@ public:
 
         // Create a tissue
         MeshBasedTissue<2> tissue(*p_mesh, cells);
-        tissue.MarkSpring(tissue.rGetCellUsingLocationIndex(4), tissue.rGetCellUsingLocationIndex(5));
+        std::set<TissueCell*> cell_pair_4_5 = tissue.CreateCellPair(tissue.rGetCellUsingLocationIndex(4), tissue.rGetCellUsingLocationIndex(5));
+        tissue.MarkSpring(cell_pair_4_5);
 
         // Create a spring system with crypt surface z = 2*r
         p_params->SetCryptProjectionParameterA(2.0);
@@ -300,7 +316,7 @@ public:
         TS_ASSERT_DELTA(force_on_spring[0], 0.0, 1e-4);
         TS_ASSERT_DELTA(force_on_spring[1], 0.0, 1e-4);
 
-        tissue.UnmarkSpring(tissue.rGetCellUsingLocationIndex(4), tissue.rGetCellUsingLocationIndex(5));
+        tissue.UnmarkSpring(cell_pair_4_5);
 
         // For coverage, test force calculation for a pair of neighbouring apoptotic cells
         tissue.rGetCellUsingLocationIndex(6).StartApoptosis();
@@ -388,7 +404,8 @@ public:
 
         // Create a tissue
         MeshBasedTissue<2> tissue(*p_mesh, cells);
-        tissue.MarkSpring(tissue.rGetCellUsingLocationIndex(4), tissue.rGetCellUsingLocationIndex(5));
+        std::set<TissueCell*> cell_pair_4_5 = tissue.CreateCellPair(tissue.rGetCellUsingLocationIndex(4), tissue.rGetCellUsingLocationIndex(5));
+        tissue.MarkSpring(cell_pair_4_5);
 
         WntConcentration<2>::Instance()->SetType(RADIAL);
         WntConcentration<2>::Instance()->SetTissue(tissue);
@@ -723,7 +740,7 @@ public:
         }
     }
 
-void TestWelikyOsterForceMethods() throw (Exception)
+    void TestWelikyOsterForceMethods() throw (Exception)
     {
         // Construct a 2D vertex mesh consisting of a single element
         std::vector<Node<2>*> nodes;
@@ -779,6 +796,82 @@ void TestWelikyOsterForceMethods() throw (Exception)
         }
     }
 
+    void TestArchivingWelikyOsterForce() throw (Exception)
+    {
+        OutputFileHandler handler("archive", false);    // don't erase contents of folder
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "weliky_oster.arch";
+
+        {
+            // Construct a 2D vertex mesh consisting of a single element
+            std::vector<Node<2>*> nodes;
+            unsigned num_nodes = 20;
+            std::vector<double> angles = std::vector<double>(num_nodes);
+    
+            for (unsigned i=0; i<num_nodes; i++)
+            {
+                angles[i] = M_PI+2.0*M_PI*(double)(i)/(double)(num_nodes);
+                nodes.push_back(new Node<2>(i, false, cos(angles[i]), sin(angles[i])));
+            }
+    
+            std::vector<VertexElement<2,2>*> elements;
+            elements.push_back(new VertexElement<2,2>(0, nodes));
+    
+            double cell_swap_threshold = 0.01;
+            double edge_division_threshold = 2.0;
+            MutableVertexMesh<2,2> mesh(nodes, elements, cell_swap_threshold, edge_division_threshold);
+    
+            // Set up the cell
+            std::vector<TissueCell> cells;
+            boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+            TissueCell cell(DIFFERENTIATED, p_state, new FixedDurationGenerationBasedCellCycleModel());
+            cell.SetBirthTime(-1.0);
+            cells.push_back(cell);
+    
+            // Create tissue
+            VertexBasedTissue<2> tissue(mesh, cells);
+            tissue.InitialiseCells();
+    
+            // Create a force system
+            WelikyOsterForce<2> force;
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Change the value of a TissueConfig member
+            TS_ASSERT_DELTA(TissueConfig::Instance()->GetTransitCellG1Duration(), 2.0, 1e-6);
+            TissueConfig::Instance()->SetTransitCellG1Duration(15.3);
+            TS_ASSERT_DELTA(TissueConfig::Instance()->GetTransitCellG1Duration(), 15.3, 1e-6);
+
+            // Serialize via pointer
+            WelikyOsterForce<2>* const p_force = &force;
+            output_arch << p_force;
+
+            // Tidy up
+            TissueConfig::Instance()->Reset();
+        }
+
+        {
+            // Check TissueConfig is reset
+            TS_ASSERT_DELTA(TissueConfig::Instance()->GetTransitCellG1Duration(), 2.0, 1e-6);
+
+//            ArchiveLocationInfo::SetMeshPathname("mesh/test/data/", "square_2_elements");
+
+            // Create an input archive
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            WelikyOsterForce<2>* p_force;
+
+            // Restore from the archive
+            input_arch >> p_force;
+
+            // Check TissueConfig has been correctly archived
+            TS_ASSERT_DELTA(TissueConfig::Instance()->GetTransitCellG1Duration(), 15.3, 1e-6);
+
+            // Tidy up
+            delete p_force;
+        }
+    }
 
     void TestVertexCryptBoundaryForce() throw (Exception)
     {

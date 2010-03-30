@@ -157,16 +157,16 @@ c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nod
          * The spring rest length increases from a predefined small parameter
          * to a normal rest length of 1.0, over a period of one hour.
          */
-        if (p_static_cast_tissue->IsMarkedSpring(r_cell_A, r_cell_B))
+        std::set<TissueCell*> cell_pair = p_static_cast_tissue->CreateCellPair(r_cell_A, r_cell_B);
+        if (p_static_cast_tissue->IsMarkedSpring(cell_pair))
         {
             double lambda = p_config->GetDivisionRestingSpringLength();
             rest_length = lambda + (1.0 - lambda) * ageA/m_duration;
         }
-
         if (ageA+SimulationTime::Instance()->GetTimeStep() >= m_duration)
         {
             // This spring is about to go out of scope
-            p_static_cast_tissue->UnmarkSpring(r_cell_A, r_cell_B);
+            p_static_cast_tissue->UnmarkSpring(cell_pair);
         }
     }
 
