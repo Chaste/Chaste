@@ -43,7 +43,7 @@ NagaiHondaForce<DIM>::~NagaiHondaForce()
 
 template<unsigned DIM>
 void NagaiHondaForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
-                                                       AbstractTissue<DIM>& rTissue)
+                                                AbstractTissue<DIM>& rTissue)
 {
     // Helper instance of TissueConfig
     TissueConfig* p_params = TissueConfig::Instance();

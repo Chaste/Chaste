@@ -136,7 +136,7 @@ public:
         statistics.LabelSPhaseCells();
 
         std::vector<TissueCell*> test_section2 = statistics.GetCryptSection();
-        std::vector<bool> labelled_cells = statistics.GetWhetherCryptSectionCellsAreLabelled(test_section2);
+        std::vector<bool> labelled_cells = statistics.AreCryptSectionCellsLabelled(test_section2);
 
         TS_ASSERT_EQUALS(test_section2.size(), labelled_cells.size());
 

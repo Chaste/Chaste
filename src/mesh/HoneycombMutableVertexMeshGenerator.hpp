@@ -57,17 +57,17 @@ public:
      * @param t2Threshold the maximum threshold distance for Type 2 swaps (defaults to 0.001)
      */
     HoneycombMutableVertexMeshGenerator(unsigned numElementsAcross,
-                    		            unsigned numElementsUp,
+                                        unsigned numElementsUp,
                                         bool isFlatBottom=false,
                                         double cellRearrangementThreshold=0.01,
                                         double edgeDivisionThreshold=DBL_MAX,
                                         double t2Threshold=0.001);
-        
+
     /**
      * @return a mutable honeycomb mesh based on a 2D plane.
      */
     virtual VertexMesh<2,2>* GetMesh();
-    
+
     /**
      * @return a mutable honeycomb mesh based on a 2D plane.
      */

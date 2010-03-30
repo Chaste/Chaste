@@ -236,7 +236,7 @@ c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nod
 }
 
 void CryptProjectionForce::AddForceContribution(std::vector<c_vector<double,2> >& rForces,
-                                                        AbstractTissue<2>& rTissue)
+                                                AbstractTissue<2>& rTissue)
 {
     // First work out the 3D location of each cell
     UpdateNode3dLocationMap(rTissue);

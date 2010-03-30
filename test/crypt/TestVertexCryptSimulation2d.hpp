@@ -426,10 +426,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    /**
-     * Test a crypt simulation with a boundary force on the crypt base.
-     * \todo see #1100
-     */
+    // Test a crypt simulation with a boundary force on the crypt base.
     void TestCryptSimulationWithBoundaryForce() throw (Exception)
     {
         // Create mesh

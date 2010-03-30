@@ -50,7 +50,7 @@ double ChemotacticForce<DIM>::GetChemotacticForceMagnitude(const double concentr
 
 template<unsigned DIM>
 void ChemotacticForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
-                                                    AbstractTissue<DIM>& rTissue)
+                                                 AbstractTissue<DIM>& rTissue)
 {
     CellwiseDataGradient<DIM> gradients;
     gradients.SetupGradients();

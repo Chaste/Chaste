@@ -241,11 +241,7 @@ public:
         TS_ASSERT_DELTA(tissue.rGetMesh().GetPerimeterOfElement(0), 3.5449077, 0.1);
     }
 
-    /*
-     * In this test edges can divide if they become too long.
-     * \todo This isn't dealt with by ReMesh() so will fall
-     * over at later times when a T1 swap occurs (see #1110)
-     */
+    // In this test edges can divide if they become too long.
     void TestSimpleVertexMonolayerWithCellBirth() throw (Exception)
     {
         // Create a simple 2D MutableVertexMesh with only one cell
@@ -441,7 +437,7 @@ public:
         // Set up tissue simulation
         TissueSimulation<2> simulator(tissue, force_collection);
         simulator.SetOutputDirectory("TestVertexMonolayerWithCellDeath");
-        simulator.SetEndTime(1.0); // Any longer and cell needs to T2 Swap \todo implement T2 Swaps
+        simulator.SetEndTime(1.0);
 
         // Longer appoptosis time so cells shrink over a longer time
         TissueConfig::Instance()->SetApoptosisTime(0.5);

@@ -59,7 +59,7 @@ c_vector<double, 2> VertexCryptSimulation2d::CalculateCellDivisionVector(TissueC
 {
     c_vector<double, 2> axis_of_division = zero_vector<double>(2);
 
-    ///\todo We don't need to prescribe how 'stem' cells divide if Wnt is present - or do we? (see #1099)
+    // We don't need to prescribe how 'stem' cells divide if Wnt is present
     bool is_wnt_included = WntConcentration<2>::Instance()->IsWntSetUp();
     if (!is_wnt_included)
     {
@@ -95,15 +95,14 @@ void VertexCryptSimulation2d::ApplyTissueBoundaryConditions(const std::vector< c
              * to y=0, so any node whose old hieght was close to zero is moved back
              * to zero.
              */
-            if ( rOldLocations[node_index][1] < DBL_EPSILON )
+            if (rOldLocations[node_index][1] < DBL_EPSILON)
             {
-                // Return node to old location
-//                node_iter->rGetModifiableLocation()[0] = old_node_location[0]; ///\todo let the node slide? (see #1099)
+                // Return node to its old height, but allow it to slide left or right
                 p_node->rGetModifiableLocation()[1] = rOldLocations[node_index][1];
             }
         }
+
         // Any node that has moved below the bottom of the crypt must be moved back up
-        ///\todo Either do this, or use the 'no-flux' force law (see #1062 and #1100)
         if (p_node->rGetLocation()[1] < 0.0)
         {
             p_node->rGetModifiableLocation()[1] = 0.0;

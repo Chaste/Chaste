@@ -156,7 +156,7 @@ public:
             // Serialize force (and hence TissueConfig) via pointer
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
-            
+
             ChemotacticForce<2>* const p_chemotactic_force = &chemotactic_force;
             output_arch << p_chemotactic_force;
 
@@ -806,31 +806,31 @@ public:
             std::vector<Node<2>*> nodes;
             unsigned num_nodes = 20;
             std::vector<double> angles = std::vector<double>(num_nodes);
-    
+
             for (unsigned i=0; i<num_nodes; i++)
             {
                 angles[i] = M_PI+2.0*M_PI*(double)(i)/(double)(num_nodes);
                 nodes.push_back(new Node<2>(i, false, cos(angles[i]), sin(angles[i])));
             }
-    
+
             std::vector<VertexElement<2,2>*> elements;
             elements.push_back(new VertexElement<2,2>(0, nodes));
-    
+
             double cell_swap_threshold = 0.01;
             double edge_division_threshold = 2.0;
             MutableVertexMesh<2,2> mesh(nodes, elements, cell_swap_threshold, edge_division_threshold);
-    
+
             // Set up the cell
             std::vector<TissueCell> cells;
             boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
             TissueCell cell(DIFFERENTIATED, p_state, new FixedDurationGenerationBasedCellCycleModel());
             cell.SetBirthTime(-1.0);
             cells.push_back(cell);
-    
+
             // Create tissue
             VertexBasedTissue<2> tissue(mesh, cells);
             tissue.InitialiseCells();
-    
+
             // Create a force system
             WelikyOsterForce<2> force;
 

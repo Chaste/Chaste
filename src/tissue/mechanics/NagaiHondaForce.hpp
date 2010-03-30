@@ -70,7 +70,7 @@ public:
     /**
      * Overridden AddForceContribution() method.
      *
-     * Calculates the force on each node in the vertex-based tissue based on the 
+     * Calculates the force on each node in the vertex-based tissue based on the
      * Nagai Honda model .
      *
      * @param rForces reference to vector of forces on nodes

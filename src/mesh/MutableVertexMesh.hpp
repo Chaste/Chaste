@@ -179,10 +179,10 @@ public:
      * @param t2Threshold the maximum threshold distance for Type 2 swaps (defaults to 0.001)
      */
     MutableVertexMesh(std::vector<Node<SPACE_DIM>*> nodes,
-               std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*> vertexElements,
-               double cellRearrangementThreshold=0.01,
-               double edgeDivisionThreshold=DBL_MAX,
-               double t2Threshold=0.001);
+                      std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*> vertexElements,
+                      double cellRearrangementThreshold=0.01,
+                      double edgeDivisionThreshold=DBL_MAX,
+                      double t2Threshold=0.001);
 
     /**
      * Default constructor for use by serializer.

@@ -30,11 +30,11 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 
 HoneycombMutableVertexMeshGenerator::HoneycombMutableVertexMeshGenerator(unsigned numElementsAcross,
-                			                                             unsigned numElementsUp,
-                              				                             bool isFlatBottom,
-                                            			                 double cellRearrangementThreshold,
-                                                          			     double edgeDivisionThreshold,
-                                                           				 double t2Threshold)
+                                                                         unsigned numElementsUp,
+                                                                           bool isFlatBottom,
+                                                                         double cellRearrangementThreshold,
+                                                                           double edgeDivisionThreshold,
+                                                                            double t2Threshold)
 {
     assert(numElementsAcross > 0);
     assert(numElementsUp > 0);

@@ -111,18 +111,6 @@ public :
      * @param rOldLocations the node locations at the previous time step
      */
     void ApplyTissueBoundaryConditions(const std::vector<c_vector<double,2> >& rOldLocations);
-
-    /*
-     * \todo Consider whether we need to code up the following members and methods which are present in CryptSimulation2d:
-     *       out_stream mBetaCatResultsFile;
-     *       void SetupWriteBetaCatenin();
-     *       void WriteBetaCatenin(double time);
-     *       void SetupSolve();
-     *       void PostSolve();
-     *       void AfterSolve();
-     * See also #923.
-     */
-
 };
 
 
