@@ -37,7 +37,9 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 
 /**
- * A force class for use in vertex-based tissue simulations
+ * A force class for use in vertex-based tissue simulations, based on a mechanical
+ * model proposed by T. Nagai and H. Honda ("A dynamic cell model for the formation
+ * of epithelial tissues", Philosophical Magazine Part B 81:699-719).
  */
 template<unsigned DIM>
 class NagaiHondaForce  : public AbstractForce<DIM>

@@ -71,7 +71,7 @@ void ChemotacticForce<DIM>::AddForceContribution(std::vector<c_vector<double, DI
 
             double force_magnitude = GetChemotacticForceMagnitude(nutrient_concentration, magnitude_of_gradient);
 
-            // force +=  chi * gradC/|gradC|
+            // force += chi * gradC/|gradC|
             if (magnitude_of_gradient > 0)
             {
                 rForces[node_global_index] += (force_magnitude/magnitude_of_gradient)*r_gradient;
