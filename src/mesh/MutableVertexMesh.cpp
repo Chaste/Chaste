@@ -949,7 +949,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformNodeMerge(Node<SPACE_DIM>
          ++it)
     {
         // Find the local index of the high-index node in this element
-        unsigned hi_node_local_index =  this->mElements[*it]->GetNodeLocalIndex(hi_node_index);
+        unsigned hi_node_local_index = this->mElements[*it]->GetNodeLocalIndex(hi_node_index);
         assert(hi_node_local_index < UINT_MAX); // this element should contain the high-index node
 
         /*
@@ -1059,7 +1059,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
              * in anticlockwise direction.
              */
 
-            unsigned nodeB_local_index =  this->mElements[*it]->GetNodeLocalIndex(pNodeB->GetIndex());
+            unsigned nodeB_local_index = this->mElements[*it]->GetNodeLocalIndex(pNodeB->GetIndex());
             assert(nodeB_local_index < UINT_MAX); // this element should contain node B
 
             this->mElements[*it]->AddNode(nodeB_local_index, pNodeA);
@@ -1075,7 +1075,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
              * Locate local index of node A in element then add node B after
              * in anticlockwise direction.
              */
-            unsigned nodeA_local_index =  this->mElements[*it]->GetNodeLocalIndex(pNodeA->GetIndex());
+            unsigned nodeA_local_index = this->mElements[*it]->GetNodeLocalIndex(pNodeA->GetIndex());
             assert(nodeA_local_index < UINT_MAX); // this element should contain node A
             this->mElements[*it]->AddNode(nodeA_local_index, pNodeB);
         }
@@ -1091,10 +1091,10 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
              * identify the element, if nodeB_index > nodeA_index then element 4
              * and if nodeA_index > nodeB_index then element 2
              */
-            unsigned nodeA_local_index =  this->mElements[*it]->GetNodeLocalIndex(pNodeA->GetIndex());
+            unsigned nodeA_local_index = this->mElements[*it]->GetNodeLocalIndex(pNodeA->GetIndex());
             assert(nodeA_local_index < UINT_MAX); // this element should contain node A
 
-            unsigned nodeB_local_index =  this->mElements[*it]->GetNodeLocalIndex(pNodeB->GetIndex());
+            unsigned nodeB_local_index = this->mElements[*it]->GetNodeLocalIndex(pNodeB->GetIndex());
             assert(nodeB_local_index < UINT_MAX); // this element should contain node B
 
             unsigned nodeB_local_index_plus_one = (nodeB_local_index + 1)%(this->mElements[*it]->GetNumNodes());
