@@ -212,6 +212,319 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::SetNode(unsigned nodeIndex, Chas
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement, c_vector<double, SPACE_DIM> axisOfDivision,
+                                                                                bool placeOriginalElementBelow)
+{
+    // Make sure that we are in the correct dimension - this code will be eliminated at compile time
+    #define COVERAGE_IGNORE
+    assert(SPACE_DIM == 2); // only works in 2D at present
+    assert(ELEMENT_DIM == SPACE_DIM);
+    #undef COVERAGE_IGNORE
+
+    // Get the centroid of the element
+    c_vector<double, SPACE_DIM> centroid = GetCentroidOfElement(pElement->GetIndex());
+
+    // Create a vector perpendicular to the axis of division
+    c_vector<double, SPACE_DIM> perp_axis;
+    perp_axis(0) = -axisOfDivision(1);
+    perp_axis(1) = axisOfDivision(0);
+
+    /*
+     * Find which edges the axis of division crosses by finding any node
+     * that lies on the opposite side of the axis of division to its next
+     * neighbour.
+     */
+    unsigned num_nodes = pElement->GetNumNodes();
+    std::vector<unsigned> intersecting_nodes;
+    for (unsigned i=0; i<num_nodes; i++)
+    {
+        bool is_current_node_on_left = (inner_prod(GetVectorFromAtoB(pElement->GetNodeLocation(i), centroid), perp_axis) >= 0);
+        bool is_next_node_on_left = (inner_prod(GetVectorFromAtoB(pElement->GetNodeLocation((i+1)%num_nodes), centroid), perp_axis) >= 0);
+
+        if (is_current_node_on_left != is_next_node_on_left)
+        {
+            intersecting_nodes.push_back(i);
+        }
+    }
+
+    // If the axis of division does not cross two edges then we cannot proceed
+    if (intersecting_nodes.size() != 2)
+    {
+        EXCEPTION("Cannot proceed with element division: the given axis of division does not cross two edges of the element");
+    }
+
+    std::vector<unsigned> division_node_global_indices;
+    unsigned nodes_added = 0;
+
+    // Find the intersections between the axis of division and the element edges
+    for (unsigned i=0; i<intersecting_nodes.size(); i++)
+    {
+        /*
+         * Get pointers to the nodes forming the edge into which one new node will be inserted.
+         *
+         * Note that when we use the first entry of intersecting_nodes to add a node,
+         * we change the local index of the second entry of intersecting_nodes in
+         * pElement, so must account for this by moving one entry further on.
+         */
+        Node<SPACE_DIM>* p_node_A = pElement->GetNode((intersecting_nodes[i]+nodes_added)%pElement->GetNumNodes());
+        Node<SPACE_DIM>* p_node_B = pElement->GetNode((intersecting_nodes[i]+nodes_added+1)%pElement->GetNumNodes());
+
+        // Find the indices of the elements owned by each node on the edge into which one new node will be inserted
+        std::set<unsigned> elems_containing_node_A = p_node_A->rGetContainingElementIndices();
+        std::set<unsigned> elems_containing_node_B = p_node_B->rGetContainingElementIndices();
+
+
+        c_vector<double, SPACE_DIM> position_a = p_node_A->rGetLocation();
+        c_vector<double, SPACE_DIM> position_b = p_node_B->rGetLocation();
+
+        c_vector<double, SPACE_DIM> a_to_b = GetVectorFromAtoB(position_a, position_b);
+
+        // Find the location of the intersection
+        double determinant = a_to_b[0]*axisOfDivision[1] - a_to_b[1]*axisOfDivision[0];
+
+        c_vector<double, SPACE_DIM> moved_centroid = position_a + GetVectorFromAtoB(position_a, centroid); // allow for periodicity
+
+        double alpha = (moved_centroid[0]*a_to_b[1] - position_a[0]*a_to_b[1]
+                        -moved_centroid[1]*a_to_b[0] + position_a[1]*a_to_b[0])/determinant;
+
+        c_vector<double, SPACE_DIM> intersection = moved_centroid + alpha*axisOfDivision;
+
+        /*
+         * If then new node is too close to one of the edge nodes, then reposition it
+         * a distance mCellRearrangementRatio*mCellRearrangementThreshold further along the edge.
+         */
+        c_vector<double, SPACE_DIM> a_to_intersection = this->GetVectorFromAtoB(position_a, intersection);
+        if (norm_2(a_to_intersection) < mCellRearrangementThreshold)
+        {
+            intersection = position_a + mCellRearrangementRatio*mCellRearrangementThreshold*a_to_b/norm_2(a_to_b);
+        }
+
+        c_vector<double, SPACE_DIM> b_to_intersection = this->GetVectorFromAtoB(position_b, intersection);
+        if (norm_2(b_to_intersection) < mCellRearrangementThreshold)
+        {
+            intersection = position_b - mCellRearrangementRatio*mCellRearrangementThreshold*a_to_b/norm_2(a_to_b);
+        }
+
+
+        /*
+         * The new node is boundary node if the 2 nodes are bounary nodes and the elements dont look like
+         *   ___A___
+         *  |   |   |
+         *  |___|___|
+         *      B
+         */
+        bool is_boundary = false;
+        if (p_node_A->IsBoundaryNode() && p_node_B->IsBoundaryNode())
+        {
+            if (elems_containing_node_A.size() !=2 ||
+                elems_containing_node_B.size() !=2 ||
+                elems_containing_node_A != elems_containing_node_B)
+            {
+                is_boundary = true;
+            }
+        }
+
+        // Add a new node to the mesh at the location of the intersection
+        unsigned new_node_global_index = this->AddNode(new Node<SPACE_DIM>(0, is_boundary, intersection[0], intersection[1]));
+        nodes_added++;
+
+        // Now make sure node is added to neighbouring elements
+
+        // Find common elements
+        std::set<unsigned> shared_elements;
+        std::set_intersection(elems_containing_node_A.begin(),
+                              elems_containing_node_A.end(),
+                              elems_containing_node_B.begin(),
+                              elems_containing_node_B.end(),
+                              std::inserter(shared_elements, shared_elements.begin()));
+
+        // Iterate over common elements
+        for (std::set<unsigned>::iterator iter = shared_elements.begin();
+             iter != shared_elements.end();
+             ++iter)
+        {
+            // Find which node has the lower local index in this element
+            unsigned local_indexA = this->GetElement(*iter)->GetNodeLocalIndex(p_node_A->GetIndex());
+            unsigned local_indexB = this->GetElement(*iter)->GetNodeLocalIndex(p_node_B->GetIndex());
+
+            unsigned index = local_indexB;
+            if (local_indexB > local_indexA)
+            {
+                index = local_indexA;
+            }
+            if ((local_indexA == 0) && (local_indexB == this->GetElement(*iter)->GetNumNodes()-1))
+            {
+                index = local_indexB;
+            }
+            if ((local_indexB == 0) && (local_indexA == this->GetElement(*iter)->GetNumNodes()-1))
+            {
+                index = local_indexA;
+            }
+            // Add new node to this element
+            this->GetElement(*iter)->AddNode(index, this->GetNode(new_node_global_index));
+        }
+        // Store index of new node
+        division_node_global_indices.push_back(new_node_global_index);
+
+    }
+
+    // Now call DivideElement() to divide the element using the new nodes
+    unsigned new_element_index = DivideElement(pElement,
+                                               pElement->GetNodeLocalIndex(division_node_global_indices[0]),
+                                               pElement->GetNodeLocalIndex(division_node_global_indices[1]),
+                                               placeOriginalElementBelow);
+    return new_element_index;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongShortAxis(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
+                                                                                bool placeOriginalElementBelow)
+{
+    // Make sure that we are in the correct dimension - this code will be eliminated at compile time
+    #define COVERAGE_IGNORE
+    assert(SPACE_DIM == 2); // only works in 2D at present
+    assert(ELEMENT_DIM == SPACE_DIM);
+    #undef COVERAGE_IGNORE
+
+    // Find the short axis of the element
+    c_vector<double, SPACE_DIM> short_axis = GetShortAxisOfElement(pElement->GetIndex());
+
+    unsigned new_element_index = DivideElementAlongGivenAxis(pElement, short_axis, placeOriginalElementBelow);
+    return new_element_index;
+}
+
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
+                                                                  unsigned nodeAIndex,
+                                                                  unsigned nodeBIndex,
+                                                                  bool placeOriginalElementBelow)
+{
+    // Make sure that we are in the correct dimension - this code will be eliminated at compile time
+    #define COVERAGE_IGNORE
+    assert(SPACE_DIM == 2); // only works in 2D at present
+    assert(ELEMENT_DIM == SPACE_DIM);
+    #undef COVERAGE_IGNORE
+
+    // Sort nodeA and nodeB such that nodeBIndex > nodeAindex
+    assert(nodeBIndex != nodeAIndex);
+
+    unsigned node1_index = (nodeAIndex < nodeBIndex) ? nodeAIndex : nodeBIndex; // low index
+    unsigned node2_index = (nodeAIndex < nodeBIndex) ? nodeBIndex : nodeAIndex; // high index
+
+    // Store the number of nodes in the element (this changes when nodes are deleted from the element)
+    unsigned num_nodes = pElement->GetNumNodes();
+
+    // Copy the nodes in this element
+    std::vector<Node<SPACE_DIM>*> nodes_elem;
+    for (unsigned i=0; i<num_nodes; i++)
+    {
+        nodes_elem.push_back(pElement->GetNode(i));
+    }
+
+    // Get the index of the new element
+    unsigned new_element_index;
+    if (mDeletedElementIndices.empty())
+    {
+        new_element_index = this->mElements.size();
+    }
+    else
+    {
+        new_element_index = mDeletedElementIndices.back();
+        mDeletedElementIndices.pop_back();
+        delete this->mElements[new_element_index];
+    }
+
+    // Add the new element to the mesh
+    AddElement(new VertexElement<ELEMENT_DIM,SPACE_DIM>(new_element_index, nodes_elem));
+
+    /**
+     * Remove the correct nodes from each element. If placeOriginalElementBelow is true,
+     * place the original element below (in the y direction) the new element; otherwise,
+     * place it above.
+     */
+
+    /// Find lowest element \todo this could be more efficient
+    double height_midpoint_1 = 0.0;
+    double height_midpoint_2 = 0.0;
+    unsigned counter_1 = 0;
+    unsigned counter_2 = 0;
+
+    for (unsigned i=0; i<num_nodes; i++)
+    {
+        if (i>=node1_index && i<=node2_index)
+        {
+            height_midpoint_1 += pElement->GetNode(i)->rGetLocation()[1];
+            counter_1++;
+        }
+        if (i<=node1_index || i>=node2_index)
+        {
+            height_midpoint_2 += pElement->GetNode(i)->rGetLocation()[1];
+            counter_2++;
+        }
+    }
+    height_midpoint_1 /= (double)counter_1;
+    height_midpoint_2 /= (double)counter_2;
+
+    for (unsigned i=num_nodes; i>0; i--)
+    {
+        if (i-1 < node1_index || i-1 > node2_index)
+        {
+            if (height_midpoint_1 < height_midpoint_2)
+            {
+                if (placeOriginalElementBelow)
+                {
+                    pElement->DeleteNode(i-1);
+                }
+                else
+                {
+                    this->mElements[new_element_index]->DeleteNode(i-1);
+                }
+            }
+            else
+            {
+                if (placeOriginalElementBelow)
+                {
+                    this->mElements[new_element_index]->DeleteNode(i-1);
+                }
+                else
+                {
+                    pElement->DeleteNode(i-1);
+                }
+            }
+        }
+        else if (i-1 > node1_index && i-1 < node2_index)
+        {
+            if (height_midpoint_1 < height_midpoint_2)
+            {
+                if (placeOriginalElementBelow)
+                {
+                    this->mElements[new_element_index]->DeleteNode(i-1);
+                }
+                else
+                {
+                    pElement->DeleteNode(i-1);
+                }
+            }
+            else
+            {
+                if (placeOriginalElementBelow)
+                {
+                    pElement->DeleteNode(i-1);
+                }
+                else
+                {
+                    this->mElements[new_element_index]->DeleteNode(i-1);
+                }
+            }
+        }
+    }
+
+    return new_element_index;
+}
+
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DeleteElementPriorToReMesh(unsigned index)
 {
     #define COVERAGE_IGNORE
@@ -1237,318 +1550,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEM
      {
         EXCEPTION("One of the neighbours of a small triangular element is also a triangle - dealing with this has not been implemented yet");
      }
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement, c_vector<double, SPACE_DIM> axisOfDivision,
-                                                                                bool placeOriginalElementBelow)
-{
-    // Make sure that we are in the correct dimension - this code will be eliminated at compile time
-    #define COVERAGE_IGNORE
-    assert(SPACE_DIM == 2); // only works in 2D at present
-    assert(ELEMENT_DIM == SPACE_DIM);
-    #undef COVERAGE_IGNORE
-
-    // Get the centroid of the element
-    c_vector<double, SPACE_DIM> centroid = GetCentroidOfElement(pElement->GetIndex());
-
-    // Create a vector perpendicular to the axis of division
-    c_vector<double, SPACE_DIM> perp_axis;
-    perp_axis(0) = -axisOfDivision(1);
-    perp_axis(1) = axisOfDivision(0);
-
-    /*
-     * Find which edges the axis of division crosses by finding any node
-     * that lies on the opposite side of the axis of division to its next
-     * neighbour.
-     */
-    unsigned num_nodes = pElement->GetNumNodes();
-    std::vector<unsigned> intersecting_nodes;
-    for (unsigned i=0; i<num_nodes; i++)
-    {
-        bool is_current_node_on_left = (inner_prod(GetVectorFromAtoB(pElement->GetNodeLocation(i), centroid), perp_axis) >= 0);
-        bool is_next_node_on_left = (inner_prod(GetVectorFromAtoB(pElement->GetNodeLocation((i+1)%num_nodes), centroid), perp_axis) >= 0);
-
-        if (is_current_node_on_left != is_next_node_on_left)
-        {
-            intersecting_nodes.push_back(i);
-        }
-    }
-
-    // If the axis of division does not cross two edges then we cannot proceed
-    if (intersecting_nodes.size() != 2)
-    {
-        EXCEPTION("Cannot proceed with element division: the given axis of division does not cross two edges of the element");
-    }
-
-    std::vector<unsigned> division_node_global_indices;
-    unsigned nodes_added = 0;
-
-    // Find the intersections between the axis of division and the element edges
-    for (unsigned i=0; i<intersecting_nodes.size(); i++)
-    {
-        /*
-         * Get pointers to the nodes forming the edge into which one new node will be inserted.
-         *
-         * Note that when we use the first entry of intersecting_nodes to add a node,
-         * we change the local index of the second entry of intersecting_nodes in
-         * pElement, so must account for this by moving one entry further on.
-         */
-        Node<SPACE_DIM>* p_node_A = pElement->GetNode((intersecting_nodes[i]+nodes_added)%pElement->GetNumNodes());
-        Node<SPACE_DIM>* p_node_B = pElement->GetNode((intersecting_nodes[i]+nodes_added+1)%pElement->GetNumNodes());
-
-        // Find the indices of the elements owned by each node on the edge into which one new node will be inserted
-        std::set<unsigned> elems_containing_node_A = p_node_A->rGetContainingElementIndices();
-        std::set<unsigned> elems_containing_node_B = p_node_B->rGetContainingElementIndices();
-
-
-        c_vector<double, SPACE_DIM> position_a = p_node_A->rGetLocation();
-        c_vector<double, SPACE_DIM> position_b = p_node_B->rGetLocation();
-
-        c_vector<double, SPACE_DIM> a_to_b = GetVectorFromAtoB(position_a, position_b);
-
-        // Find the location of the intersection
-        double determinant = a_to_b[0]*axisOfDivision[1] - a_to_b[1]*axisOfDivision[0];
-
-        c_vector<double, SPACE_DIM> moved_centroid = position_a + GetVectorFromAtoB(position_a, centroid); // allow for periodicity
-
-        double alpha = (moved_centroid[0]*a_to_b[1] - position_a[0]*a_to_b[1]
-                        -moved_centroid[1]*a_to_b[0] + position_a[1]*a_to_b[0])/determinant;
-
-        c_vector<double, SPACE_DIM> intersection = moved_centroid + alpha*axisOfDivision;
-
-        /*
-         * If then new node is too close to one of the edge nodes, then reposition it
-         * a distance mCellRearrangementRatio*mCellRearrangementThreshold further along the edge.
-         */
-        c_vector<double, SPACE_DIM> a_to_intersection = this->GetVectorFromAtoB(position_a, intersection);
-        if (norm_2(a_to_intersection) < mCellRearrangementThreshold)
-        {
-            intersection = position_a + mCellRearrangementRatio*mCellRearrangementThreshold*a_to_b/norm_2(a_to_b);
-        }
-
-        c_vector<double, SPACE_DIM> b_to_intersection = this->GetVectorFromAtoB(position_b, intersection);
-        if (norm_2(b_to_intersection) < mCellRearrangementThreshold)
-        {
-            intersection = position_b - mCellRearrangementRatio*mCellRearrangementThreshold*a_to_b/norm_2(a_to_b);
-        }
-
-
-        /*
-         * The new node is boundary node if the 2 nodes are bounary nodes and the elements dont look like
-         *   ___A___
-         *  |   |   |
-         *  |___|___|
-         *      B
-         */
-        bool is_boundary = false;
-        if (p_node_A->IsBoundaryNode() && p_node_B->IsBoundaryNode())
-        {
-            if (elems_containing_node_A.size() !=2 ||
-                elems_containing_node_B.size() !=2 ||
-                elems_containing_node_A != elems_containing_node_B)
-            {
-                is_boundary = true;
-            }
-        }
-
-        // Add a new node to the mesh at the location of the intersection
-        unsigned new_node_global_index = this->AddNode(new Node<SPACE_DIM>(0, is_boundary, intersection[0], intersection[1]));
-        nodes_added++;
-
-        // Now make sure node is added to neighbouring elements
-
-        // Find common elements
-        std::set<unsigned> shared_elements;
-        std::set_intersection(elems_containing_node_A.begin(),
-                              elems_containing_node_A.end(),
-                              elems_containing_node_B.begin(),
-                              elems_containing_node_B.end(),
-                              std::inserter(shared_elements, shared_elements.begin()));
-
-        // Iterate over common elements
-        for (std::set<unsigned>::iterator iter = shared_elements.begin();
-             iter != shared_elements.end();
-             ++iter)
-        {
-            // Find which node has the lower local index in this element
-            unsigned local_indexA = this->GetElement(*iter)->GetNodeLocalIndex(p_node_A->GetIndex());
-            unsigned local_indexB = this->GetElement(*iter)->GetNodeLocalIndex(p_node_B->GetIndex());
-
-            unsigned index = local_indexB;
-            if (local_indexB > local_indexA)
-            {
-                index = local_indexA;
-            }
-            if ((local_indexA == 0) && (local_indexB == this->GetElement(*iter)->GetNumNodes()-1))
-            {
-                index = local_indexB;
-            }
-            if ((local_indexB == 0) && (local_indexA == this->GetElement(*iter)->GetNumNodes()-1))
-            {
-                index = local_indexA;
-            }
-            // Add new node to this element
-            this->GetElement(*iter)->AddNode(index, this->GetNode(new_node_global_index));
-        }
-        // Store index of new node
-        division_node_global_indices.push_back(new_node_global_index);
-
-    }
-
-    // Now call DivideElement() to divide the element using the new nodes
-    unsigned new_element_index = DivideElement(pElement,
-                                               pElement->GetNodeLocalIndex(division_node_global_indices[0]),
-                                               pElement->GetNodeLocalIndex(division_node_global_indices[1]),
-                                               placeOriginalElementBelow);
-    return new_element_index;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongShortAxis(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
-                                                                                bool placeOriginalElementBelow)
-{
-    // Make sure that we are in the correct dimension - this code will be eliminated at compile time
-    #define COVERAGE_IGNORE
-    assert(SPACE_DIM == 2); // only works in 2D at present
-    assert(ELEMENT_DIM == SPACE_DIM);
-    #undef COVERAGE_IGNORE
-
-    // Find the short axis of the element
-    c_vector<double, SPACE_DIM> short_axis = GetShortAxisOfElement(pElement->GetIndex());
-
-    unsigned new_element_index = DivideElementAlongGivenAxis(pElement, short_axis, placeOriginalElementBelow);
-    return new_element_index;
-}
-
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
-                                                                  unsigned nodeAIndex,
-                                                                  unsigned nodeBIndex,
-                                                                  bool placeOriginalElementBelow)
-{
-    // Make sure that we are in the correct dimension - this code will be eliminated at compile time
-    #define COVERAGE_IGNORE
-    assert(SPACE_DIM == 2); // only works in 2D at present
-    assert(ELEMENT_DIM == SPACE_DIM);
-    #undef COVERAGE_IGNORE
-
-    // Sort nodeA and nodeB such that nodeBIndex > nodeAindex
-    assert(nodeBIndex != nodeAIndex);
-
-    unsigned node1_index = (nodeAIndex < nodeBIndex) ? nodeAIndex : nodeBIndex; // low index
-    unsigned node2_index = (nodeAIndex < nodeBIndex) ? nodeBIndex : nodeAIndex; // high index
-
-    // Store the number of nodes in the element (this changes when nodes are deleted from the element)
-    unsigned num_nodes = pElement->GetNumNodes();
-
-    // Copy the nodes in this element
-    std::vector<Node<SPACE_DIM>*> nodes_elem;
-    for (unsigned i=0; i<num_nodes; i++)
-    {
-        nodes_elem.push_back(pElement->GetNode(i));
-    }
-
-    // Get the index of the new element
-    unsigned new_element_index;
-    if (mDeletedElementIndices.empty())
-    {
-        new_element_index = this->mElements.size();
-    }
-    else
-    {
-        new_element_index = mDeletedElementIndices.back();
-        mDeletedElementIndices.pop_back();
-        delete this->mElements[new_element_index];
-    }
-
-    // Add the new element to the mesh
-    AddElement(new VertexElement<ELEMENT_DIM,SPACE_DIM>(new_element_index, nodes_elem));
-
-    /**
-     * Remove the correct nodes from each element. If placeOriginalElementBelow is true,
-     * place the original element below (in the y direction) the new element; otherwise,
-     * place it above.
-     */
-
-    /// Find lowest element \todo this could be more efficient
-    double height_midpoint_1 = 0.0;
-    double height_midpoint_2 = 0.0;
-    unsigned counter_1 = 0;
-    unsigned counter_2 = 0;
-
-    for (unsigned i=0; i<num_nodes; i++)
-    {
-        if (i>=node1_index && i<=node2_index)
-        {
-            height_midpoint_1 += pElement->GetNode(i)->rGetLocation()[1];
-            counter_1++;
-        }
-        if (i<=node1_index || i>=node2_index)
-        {
-            height_midpoint_2 += pElement->GetNode(i)->rGetLocation()[1];
-            counter_2++;
-        }
-    }
-    height_midpoint_1 /= (double)counter_1;
-    height_midpoint_2 /= (double)counter_2;
-
-    for (unsigned i=num_nodes; i>0; i--)
-    {
-        if (i-1 < node1_index || i-1 > node2_index)
-        {
-            if (height_midpoint_1 < height_midpoint_2)
-            {
-                if (placeOriginalElementBelow)
-                {
-                    pElement->DeleteNode(i-1);
-                }
-                else
-                {
-                    this->mElements[new_element_index]->DeleteNode(i-1);
-                }
-            }
-            else
-            {
-                if (placeOriginalElementBelow)
-                {
-                    this->mElements[new_element_index]->DeleteNode(i-1);
-                }
-                else
-                {
-                    pElement->DeleteNode(i-1);
-                }
-            }
-        }
-        else if (i-1 > node1_index && i-1 < node2_index)
-        {
-            if (height_midpoint_1 < height_midpoint_2)
-            {
-                if (placeOriginalElementBelow)
-                {
-                    this->mElements[new_element_index]->DeleteNode(i-1);
-                }
-                else
-                {
-                    pElement->DeleteNode(i-1);
-                }
-            }
-            else
-            {
-                if (placeOriginalElementBelow)
-                {
-                    pElement->DeleteNode(i-1);
-                }
-                else
-                {
-                    this->mElements[new_element_index]->DeleteNode(i-1);
-                }
-            }
-        }
-    }
-
-    return new_element_index;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
