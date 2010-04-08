@@ -50,7 +50,7 @@ CylindricalHoneycombVertexMeshGenerator::CylindricalHoneycombVertexMeshGenerator
     unsigned element_index;
 
     assert(numElementsAcross > 1);
-    assert(numElementsAcross%2==0); // numElementsAcross must be even for cylindrical meshes ///\todo why?
+    assert(numElementsAcross%2==0); // numElementsAcross must be even for cylindrical meshes
 
     // Create the nodes
     for (unsigned j=0; j<=2*numElementsUp+1; j++)
