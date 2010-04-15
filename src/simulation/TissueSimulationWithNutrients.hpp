@@ -84,7 +84,7 @@ private :
     /**
      *  File that the nutrient values are written out to.
      */
-    out_stream mpNutrientResultsFile;
+    out_stream mpVizNutrientResultsFile;
 
     /**
      *  File that the average radial nutrient distribution is written out to.

@@ -107,7 +107,7 @@ void TissueSimulationWithNutrients<DIM>::WriteVisualizerSetupFile()
         if (dynamic_cast<AbstractTwoBodyInteractionForce<DIM>*>(this->mForceCollection[i]))
         {
             double cutoff = (static_cast<AbstractTwoBodyInteractionForce<DIM>*>(this->mForceCollection[i]))->GetCutoffPoint();
-            *(this->mpSetupFile) << "Cutoff\t" << cutoff << "\n";
+            *(this->mpVizSetupFile) << "Cutoff\t" << cutoff << "\n";
         }
     }
 }
@@ -133,8 +133,8 @@ void TissueSimulationWithNutrients<DIM>::SetupWriteNutrient()
     OutputFileHandler output_file_handler(this->mSimulationOutputDirectory+"/", false);
     if (PetscTools::AmMaster())
     {
-        mpNutrientResultsFile = output_file_handler.OpenOutputFile("results.viznutrient");
-        *this->mpSetupFile << "Nutrient \n";
+        mpVizNutrientResultsFile = output_file_handler.OpenOutputFile("results.viznutrient");
+        *this->mpVizSetupFile << "Nutrient \n";
         if (mWriteAverageRadialNutrientResults)
         {
             mpAverageRadialNutrientResultsFile = output_file_handler.OpenOutputFile("radial_dist.dat");
@@ -245,7 +245,7 @@ void TissueSimulationWithNutrients<DIM>::AfterSolve()
     if (this->mrTissue.Begin() != this->mrTissue.End() // if there are any cells
     && PetscTools::AmMaster())
     {
-        mpNutrientResultsFile->close();
+        mpVizNutrientResultsFile->close();
 
         if (mWriteAverageRadialNutrientResults)
         {
@@ -555,25 +555,25 @@ void TissueSimulationWithNutrients<DIM>::WriteNutrient(double time)
         // Since there are no ghost nodes, the number of nodes must equal the number of real cells
         assert(this->mrTissue.GetNumNodes()==this->mrTissue.GetNumRealCells());
 
-        (*mpNutrientResultsFile) << time << "\t";
+        (*mpVizNutrientResultsFile) << time << "\t";
 
         for (typename AbstractTissue<DIM>::Iterator cell_iter = this->mrTissue.Begin();
              cell_iter != this->mrTissue.End();
              ++cell_iter)
         {
             unsigned global_index = this->mrTissue.GetLocationIndexUsingCell(*cell_iter);
-            (*mpNutrientResultsFile) << global_index << " ";
+            (*mpVizNutrientResultsFile) << global_index << " ";
 
             const c_vector<double,DIM>& position = this->mrTissue.GetLocationOfCellCentre(*cell_iter);
             for (unsigned i=0; i<DIM; i++)
             {
-                (*mpNutrientResultsFile) << position[i] << " ";
+                (*mpVizNutrientResultsFile) << position[i] << " ";
             }
 
             double nutrient = CellwiseData<DIM>::Instance()->GetValue(*cell_iter);
-            (*mpNutrientResultsFile) << nutrient << " ";
+            (*mpVizNutrientResultsFile) << nutrient << " ";
         }
-        (*mpNutrientResultsFile) << "\n";
+        (*mpVizNutrientResultsFile) << "\n";
     }
 }
 

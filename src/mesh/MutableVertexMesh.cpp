@@ -216,10 +216,8 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
                                                                                 bool placeOriginalElementBelow)
 {
     // Make sure that we are in the correct dimension - this code will be eliminated at compile time
-    #define COVERAGE_IGNORE
     assert(SPACE_DIM == 2); // only works in 2D at present
     assert(ELEMENT_DIM == SPACE_DIM);
-    #undef COVERAGE_IGNORE
 
     // Get the centroid of the element
     c_vector<double, SPACE_DIM> centroid = GetCentroidOfElement(pElement->GetIndex());
@@ -381,10 +379,8 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongShortAxis(
                                                                                 bool placeOriginalElementBelow)
 {
     // Make sure that we are in the correct dimension - this code will be eliminated at compile time
-    #define COVERAGE_IGNORE
     assert(SPACE_DIM == 2); // only works in 2D at present
     assert(ELEMENT_DIM == SPACE_DIM);
-    #undef COVERAGE_IGNORE
 
     // Find the short axis of the element
     c_vector<double, SPACE_DIM> short_axis = GetShortAxisOfElement(pElement->GetIndex());
@@ -401,10 +397,8 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(VertexElement<
                                                                   bool placeOriginalElementBelow)
 {
     // Make sure that we are in the correct dimension - this code will be eliminated at compile time
-    #define COVERAGE_IGNORE
     assert(SPACE_DIM == 2); // only works in 2D at present
     assert(ELEMENT_DIM == SPACE_DIM);
-    #undef COVERAGE_IGNORE
 
     // Sort nodeA and nodeB such that nodeBIndex > nodeAindex
     assert(nodeBIndex != nodeAIndex);
@@ -527,9 +521,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(VertexElement<
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DeleteElementPriorToReMesh(unsigned index)
 {
-    #define COVERAGE_IGNORE
     assert(SPACE_DIM == 2);
-    #undef COVERAGE_IGNORE
 
     // Mark any nodes that are contained only in this element as deleted
     for (unsigned i=0; i<this->mElements[index]->GetNumNodes(); i++)
@@ -569,7 +561,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideEdge(Node<SPACE_DIM>* pNod
                           std::inserter(shared_elements, shared_elements.begin()));
 
     // Check that the nodes have a common edge
-    assert(shared_elements.size() > 0);
+    assert(!shared_elements.empty());
 
     // Create a new node (position is not important as it will be changed)
     Node<SPACE_DIM>* p_new_node = new Node<SPACE_DIM>(GetNumNodes(), false, 0.0, 0.0);
@@ -613,10 +605,8 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodesAndElements(VertexElementMap& rElementMap)
 {
     // Make sure that we are in the correct dimension - this code will be eliminated at compile time
-    #define COVERAGE_IGNORE
     assert(SPACE_DIM==2 || SPACE_DIM==3);
     assert(ELEMENT_DIM == SPACE_DIM);
-    #undef COVERAGE_IGNORE
 
     // Make sure the map is big enough
     rElementMap.Resize(this->GetNumAllElements());
@@ -680,10 +670,8 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElementMap)
 {
     // Make sure that we are in the correct dimension - this code will be eliminated at compile time
-    #define COVERAGE_IGNORE
     assert(SPACE_DIM==2 || SPACE_DIM==3);
     assert(ELEMENT_DIM == SPACE_DIM);
-    #undef COVERAGE_IGNORE
 
     if (SPACE_DIM==2)
     {
@@ -875,10 +863,8 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB, VertexElementMap& rElementMap)
 {
     // Make sure that we are in the correct dimension - this code will be eliminated at compile time
-    #define COVERAGE_IGNORE
     assert(SPACE_DIM == 2); // this method only works in 2D at present
     assert(ELEMENT_DIM == SPACE_DIM);
-    #undef COVERAGE_IGNORE
 
     // Find the sets of elements containing nodes A and B
     std::set<unsigned> nodeA_elem_indices = pNodeA->rGetContainingElementIndices();
@@ -1286,14 +1272,12 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformNodeMerge(Node<SPACE_DIM>
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* pNodeA,
-                                                       Node<SPACE_DIM>* pNodeB,
-                                                       std::set<unsigned>& rElementsContainingNodes)
+                                                              Node<SPACE_DIM>* pNodeB,
+                                                              std::set<unsigned>& rElementsContainingNodes)
 {
     // Make sure that we are in the correct dimension - this code will be eliminated at compile time
-    #define COVERAGE_IGNORE
     assert(SPACE_DIM == 2); // only works in 2D at present
     assert(ELEMENT_DIM == SPACE_DIM);
-    #undef COVERAGE_IGNORE
 
     /*
      * Restructure elements - remember to update nodes and elements.
@@ -1458,10 +1442,8 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEMENT_DIM,SPACE_DIM>& rElement)
 {
    // Make sure that we are in the correct dimension - this code will be eliminated at compile time
-    #define COVERAGE_IGNORE
     assert(SPACE_DIM == 2); // only works in 2D at present
     assert(ELEMENT_DIM == SPACE_DIM);
-    #undef COVERAGE_IGNORE
 
     /* For removing a small triangle
      *
@@ -1556,10 +1538,8 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* pNode, unsigned elementIndex)
 {
     // Make sure that we are in the correct dimension - this code will be eliminated at compile time
-    #define COVERAGE_IGNORE
     assert(SPACE_DIM == 2); // only works in 2D at present
     assert(ELEMENT_DIM == SPACE_DIM);
-    #undef COVERAGE_IGNORE
 
     // Check pNode is a boundary node
     assert(pNode->IsBoundaryNode());

@@ -113,16 +113,16 @@ double VertexBasedTissue<DIM>::GetAdhesionParameter(Node<DIM>* pNodeA, Node<DIM>
                           std::inserter(shared_elements, shared_elements.begin()));
 
     // Check that the nodes have a common edge
-    assert(shared_elements.size() > 0);
+    assert(!shared_elements.empty());
 
     // If the edge corresponds to a single element, then the cell is on the boundary
     if (shared_elements.size() == 1)
     {
-        adhesion_parameter = TissueConfig::Instance()->GetCellBoundaryAdhesionEnergyParameter();
+        adhesion_parameter = TissueConfig::Instance()->GetNagaiHondaCellBoundaryAdhesionEnergyParameter();
     }
     else
     {
-        adhesion_parameter = TissueConfig::Instance()->GetCellCellAdhesionEnergyParameter();
+        adhesion_parameter = TissueConfig::Instance()->GetNagaiHondaCellCellAdhesionEnergyParameter();
     }
     return adhesion_parameter;
 }
@@ -402,7 +402,7 @@ void VertexBasedTissue<DIM>::WriteResultsToFiles()
     SimulationTime* p_time = SimulationTime::Instance();
 
     // Write element data to file
-    *mpElementFile << p_time->GetTime() << "\t";
+    *mpVizElementsFile << p_time->GetTime() << "\t";
 
     // Loop over cells and find associated elements so in the same order as the cells in output files
     for (std::list<TissueCell>::iterator cell_iter = this->mCells.begin();
@@ -412,16 +412,16 @@ void VertexBasedTissue<DIM>::WriteResultsToFiles()
         unsigned elem_index = this->GetLocationIndexUsingCell(*cell_iter);
 
         // First write the number of Nodes belonging to this VertexElement
-        *mpElementFile <<  mrMesh.GetElement(elem_index)->GetNumNodes() << " ";
+        *mpVizElementsFile <<  mrMesh.GetElement(elem_index)->GetNumNodes() << " ";
 
         // Then write the global index of each Node in this element
         unsigned num_nodes_in_this_element = mrMesh.GetElement(elem_index)->GetNumNodes();
         for (unsigned i=0; i<num_nodes_in_this_element; i++)
         {
-            *mpElementFile << mrMesh.GetElement(elem_index)->GetNodeGlobalIndex(i) << " ";
+            *mpVizElementsFile << mrMesh.GetElement(elem_index)->GetNodeGlobalIndex(i) << " ";
         }
     }
-    *mpElementFile << "\n";
+    *mpVizElementsFile << "\n";
 
 #ifdef CHASTE_VTK
     VertexMeshWriter<DIM, DIM> mesh_writer(mDirPath, "results", false);
@@ -452,7 +452,7 @@ void VertexBasedTissue<DIM>::CreateOutputFiles(const std::string& rDirectory, bo
     AbstractTissue<DIM>::CreateOutputFiles(rDirectory, cleanOutputDirectory);
 
     OutputFileHandler output_file_handler(rDirectory, cleanOutputDirectory);
-    mpElementFile = output_file_handler.OpenOutputFile("results.vizelements");
+    mpVizElementsFile = output_file_handler.OpenOutputFile("results.vizelements");
     mDirPath = rDirectory;
 #ifdef CHASTE_VTK
     mpVtkMetaFile = output_file_handler.OpenOutputFile("results.pvd");
@@ -467,7 +467,7 @@ template<unsigned DIM>
 void VertexBasedTissue<DIM>::CloseOutputFiles()
 {
     AbstractTissue<DIM>::CloseOutputFiles();
-    mpElementFile->close();
+    mpVizElementsFile->close();
 #ifdef CHASTE_VTK
     *mpVtkMetaFile << "    </Collection>\n";
     *mpVtkMetaFile << "</VTKFile>\n";

@@ -54,7 +54,7 @@ private:
     double mEpsilon;
 
     /** The file that the results of CalculateExtremalNormalForces. */
-    out_stream mpStressResultsFile;
+    out_stream mpVizStressResultsFile;
 
     /**
      * Given a node index, returns the set of neighbouring node indices.

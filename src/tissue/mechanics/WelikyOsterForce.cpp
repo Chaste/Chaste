@@ -45,9 +45,7 @@ void WelikyOsterForce<DIM>::AddForceContribution(std::vector<c_vector<double, DI
                                                  AbstractTissue<DIM>& rTissue)
 {
     // Make sure that we are in the correct dimension - this code will be eliminated at compile time
-    #define COVERAGE_IGNORE
     assert(DIM == 2); // this method only works in 2D at present
-    #undef COVERAGE_IGNORE
 
     // Helper instance of TissueConfig
     TissueConfig* p_params = TissueConfig::Instance();

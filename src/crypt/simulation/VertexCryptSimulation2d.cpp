@@ -51,7 +51,7 @@ void VertexCryptSimulation2d::UseJiggledBottomCells()
 
 void VertexCryptSimulation2d::WriteVisualizerSetupFile()
 {
-    *mpSetupFile << "MeshWidth\t" << mpStaticCastTissue->rGetMesh().GetWidth(0u) << "\n";
+    *mpVizSetupFile << "MeshWidth\t" << mpStaticCastTissue->rGetMesh().GetWidth(0u) << "\n";
 }
 
 

@@ -578,7 +578,7 @@ public:
         // Add force contributions
         for (std::vector<AbstractForce<2>* >::iterator iter = forces.begin();
              iter != forces.end();
-             iter++)
+             ++iter)
         {
              (*iter)->AddForceContribution(node_forces, tissue);
         }
@@ -613,7 +613,7 @@ public:
         // Add force contributions
         for (std::vector<AbstractForce<2>* >::iterator iter = forces.begin();
              iter != forces.end();
-             iter++)
+             ++iter)
         {
              (*iter)->AddForceContribution(new_node_forces, tissue);
         }

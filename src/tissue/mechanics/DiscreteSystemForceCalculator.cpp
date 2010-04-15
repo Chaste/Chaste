@@ -87,9 +87,9 @@ void DiscreteSystemForceCalculator::WriteResultsToFile(std::string simulationOut
     std::string results_directory = simulationOutputDirectory + "/results_from_time_" + time_string.str();
 
     OutputFileHandler output_file_handler2(results_directory+"/", false);
-    mpStressResultsFile = output_file_handler2.OpenOutputFile("results.vizstress");
+    mpVizStressResultsFile = output_file_handler2.OpenOutputFile("results.vizstress");
 
-    (*mpStressResultsFile) <<  time << "\t";
+    (*mpVizStressResultsFile) <<  time << "\t";
 
     double global_index;
     double x;
@@ -111,11 +111,11 @@ void DiscreteSystemForceCalculator::WriteResultsToFile(std::string simulationOut
         minimum = extremal_normal_forces[0][i];
         maximum = extremal_normal_forces[1][i];
 
-        (*mpStressResultsFile) << global_index << " " << x << " " << y << " " << minimum << " " << maximum << " ";
+        (*mpVizStressResultsFile) << global_index << " " << x << " " << y << " " << minimum << " " << maximum << " ";
     }
 
-    (*mpStressResultsFile) << "\n";
-    mpStressResultsFile->close();
+    (*mpVizStressResultsFile) << "\n";
+    mpVizStressResultsFile->close();
 }
 
 
@@ -158,8 +158,8 @@ std::vector<double> DiscreteSystemForceCalculator::CalculateFtAndFn(unsigned ind
     c_vector<double,2> unit_vec_between_nodes(2);
 
     for (std::set<unsigned>::iterator iter = neighbouring_node_indices.begin();
-        iter != neighbouring_node_indices.end();
-        iter++)
+         iter != neighbouring_node_indices.end();
+         ++iter)
     {
         // The method GetAngleBetweenNodes() returns an angle in the range (-pi,pi]
         alpha = r_mesh.GetAngleBetweenNodes(index, *iter);
@@ -175,7 +175,7 @@ std::vector<double> DiscreteSystemForceCalculator::CalculateFtAndFn(unsigned ind
             // Iterate over vector of forces present and add up forces between nodes
             for (std::vector<AbstractTwoBodyInteractionForce<2>*>::iterator force_iter = mForceCollection.begin();
                  force_iter != mForceCollection.end();
-                 force_iter++)
+                 ++force_iter)
             {
                force_between_nodes += (*force_iter)->CalculateForceBetweenNodes(index, *iter, mrTissue);
             }
@@ -208,8 +208,8 @@ std::vector<double> DiscreteSystemForceCalculator::GetSamplingAngles(unsigned in
     unsigned i=0;
 
     for (std::set<unsigned>::iterator iter = neighbouring_node_indices.begin();
-        iter != neighbouring_node_indices.end();
-        iter++)
+         iter != neighbouring_node_indices.end();
+         ++iter)
     {
         // The method GetAngleBetweenNodes() returns an angle in the range (-pi,pi]
         double alpha = r_mesh.GetAngleBetweenNodes(index, *iter);

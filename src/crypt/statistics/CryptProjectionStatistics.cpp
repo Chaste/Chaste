@@ -82,8 +82,8 @@ std::vector<TissueCell*> CryptProjectionStatistics::GetCryptSection(double angle
     // Copy to a vector
     std::vector<TissueCell*> ordered_cells;
     for (std::list<std::pair<TissueCell*, double> >::iterator iter = cells_list.begin();
-        iter!=cells_list.end();
-        iter++)
+         iter != cells_list.end();
+         ++iter)
     {
         ordered_cells.push_back(iter->first);
     }

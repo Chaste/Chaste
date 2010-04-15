@@ -99,7 +99,7 @@ void NagaiHondaForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM
             double cell_target_area = p_tissue->GetTargetAreaOfCell(p_tissue->rGetCellUsingLocationIndex(element_index));
 
             // Add the force contribution from this cell's deformation energy (note the minus sign)
-            deformation_contribution -= 2*p_params->GetDeformationEnergyParameter()*(element_area - cell_target_area)*element_area_gradient;
+            deformation_contribution -= 2*p_params->GetNagaiHondaDeformationEnergyParameter()*(element_area - cell_target_area)*element_area_gradient;
 
             /******** End of deformation force calculation *************/
 
@@ -113,7 +113,7 @@ void NagaiHondaForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM
             double cell_target_perimeter = 2*sqrt(M_PI*cell_target_area);
 
             // Add the force contribution from this cell's membrane surface tension (note the minus sign)
-            membrane_surface_tension_contribution -= 2*p_params->GetMembraneSurfaceEnergyParameter()*(element_perimeter - cell_target_perimeter)*element_perimeter_gradient;
+            membrane_surface_tension_contribution -= 2*p_params->GetNagaiHondaMembraneSurfaceEnergyParameter()*(element_perimeter - cell_target_perimeter)*element_perimeter_gradient;
 
             /******** End of membrane force calculation **********/
 

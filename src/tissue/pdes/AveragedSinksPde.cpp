@@ -77,7 +77,7 @@ double AveragedSinksPde<DIM>::ComputeConstantInUSourceTerm(const ChastePoint<DIM
 template<unsigned DIM>
 double AveragedSinksPde<DIM>::ComputeLinearInUCoeffInSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement) // now takes in element
 {
-    assert(mCellDensityOnCoarseElements.size() > 0);
+    assert(!mCellDensityOnCoarseElements.empty());
     return mCoefficient*mCellDensityOnCoarseElements[pElement->GetIndex()];
 }
 

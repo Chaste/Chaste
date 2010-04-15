@@ -68,7 +68,7 @@ private:
     bool mDeleteMesh;
 
     /** Results file for elements. */
-    out_stream mpElementFile;
+    out_stream mpVizElementsFile;
 
     friend class boost::serialization::access;
     /**
