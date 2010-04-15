@@ -106,10 +106,10 @@ public:
         Alarcon2004OxygenBasedCellCycleOdeSystem cancer_system2(oxygen_concentration, p_labelled);
 
         std::vector<double> normal_derivs2(initial_conditions.size());
-        normal_system2.SetInitialConditionsComponent(2, 0.1);
+        normal_system2.SetInitialCondition(2, 0.1);
 
         std::vector<double> cancer_derivs2(initial_conditions.size());
-        cancer_system2.SetInitialConditionsComponent(2, 0.1);
+        cancer_system2.SetInitialCondition(2, 0.1);
 
         std::vector<double> initial_conditions2 = normal_system2.GetInitialConditions();
 
