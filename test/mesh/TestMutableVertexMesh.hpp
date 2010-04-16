@@ -392,17 +392,17 @@ public:
         TS_ASSERT_EQUALS(new_element_index, 0u);
     }
 
-	void TestDivideVertexElementGivenNodesForCoverage() throw(Exception)
+    void TestDivideVertexElementGivenNodesForCoverage() throw(Exception)
     {
-    	
-    	/*
-    	 * Divide a square element like so 
-    	 *   ___      ___
-    	 *  |   |    |  /|
-    	 *  |   | -> | / |
-    	 *  |___|    |/__|
-    	 */
-    	
+
+        /*
+         * Divide a square element like so
+         *   ___      ___
+         *  |   |    |  /|
+         *  |   | -> | / |
+         *  |___|    |/__|
+         */
+
         // Make four nodes
         std::vector<Node<2>*> basic_nodes;
         basic_nodes.push_back(new Node<2>(0, false, 0.0, 1.0));
