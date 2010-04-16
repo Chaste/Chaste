@@ -1171,8 +1171,8 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 4u);
 
         // Test merged node is in the correct place
-        TS_ASSERT_DELTA(vertex_mesh.GetNode(3)->rGetLocation()[0], 0.4999, 1e-4);
-        TS_ASSERT_DELTA(vertex_mesh.GetNode(3)->rGetLocation()[1], 0.2496, 1e-4);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(3)->rGetLocation()[0], 0.4999, 1e-3);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(3)->rGetLocation()[1], 0.2496, 1e-3);
 
         // Test elements have correct nodes
         // note nodes are renumbered as element 0 is deleted
