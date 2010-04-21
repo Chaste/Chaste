@@ -875,7 +875,7 @@ public:
     // just checks that the cells are correctly archived.
     void TestArchivingVertexBasedTissue() throw(Exception)
     {
-        std::string archive_dir = "archive";
+        FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "vertex_tissue.arch";
         // The following line is required because the loading of a tissue
         // is usually called by the method TissueSimulation::Load()

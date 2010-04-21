@@ -305,7 +305,7 @@ public:
 
     void TestArchiving() throw (Exception)
     {
-        std::string archive_dir = "archive";
+        FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "cylindrical_vertex_mesh_base.arch";
         ArchiveLocationInfo::SetMeshFilename("cylindrical_vertex_mesh");
 
