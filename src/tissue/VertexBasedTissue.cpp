@@ -420,13 +420,88 @@ void VertexBasedTissue<DIM>::WriteResultsToFiles()
     time << p_time->GetTimeStepsElapsed();
 
     std::vector<double> cell_types;
-    for (typename VertexMesh<DIM,DIM>::VertexElementIterator iter = mrMesh.GetElementIteratorBegin();
-             iter != mrMesh.GetElementIteratorEnd();
-             ++iter)
+    std::vector<double> cell_ancestors;
+    std::vector<double> cell_mutation_states;
+    std::vector<double> cell_ages;
+    std::vector<double> cell_cycle_phases;
+    std::vector<double> cell_areas;
+
+    // Loop over Voronoi elements
+    for (typename VertexMesh<DIM,DIM>::VertexElementIterator elem_iter = mrMesh.GetElementIteratorBegin();
+         elem_iter != mrMesh.GetElementIteratorEnd();
+         ++elem_iter)
     {
-        cell_types.push_back(this->mLocationCellMap[iter->GetIndex()]->GetCellProliferativeType());
+        // Get index of this element in the Voronoi tessellation mesh
+        unsigned elem_index = elem_iter->GetIndex();
+
+        // Get the cell corresponding to this element
+        TissueCell* p_cell = this->mLocationCellMap[elem_index];
+
+        if (TissueConfig::Instance()->GetOutputCellAncestors())
+        {
+            unsigned ancestor_index = (p_cell->GetAncestor() == UNSIGNED_UNSET) ? -1 : p_cell->GetAncestor();
+            cell_ancestors.push_back(ancestor_index);
+        }
+        if (TissueConfig::Instance()->GetOutputCellProliferativeTypes())
+        {
+            unsigned cell_type = p_cell->GetCellProliferativeType();
+            cell_types.push_back(cell_type);
+        }
+        if (TissueConfig::Instance()->GetOutputCellMutationStates())
+        {
+            unsigned mutation_state = p_cell->GetMutationState()->GetColour();
+            cell_mutation_states.push_back(mutation_state);
+        }
+        if (TissueConfig::Instance()->GetOutputCellAges())
+        {
+            double age = p_cell->GetAge();
+            cell_ages.push_back(age); 
+        }
+        if (TissueConfig::Instance()->GetOutputCellCyclePhases())
+        {
+            unsigned cycle_phase = p_cell->GetCellCycleModel()->GetCurrentCellCyclePhase();
+            cell_cycle_phases.push_back(cycle_phase);
+        }
+        if (TissueConfig::Instance()->GetOutputCellAreas())
+        {
+            double cell_area;
+            if (DIM==2)
+            {
+                cell_area = mrMesh.GetAreaOfElement(elem_index);
+            }
+            else // DIM==3
+            {
+                cell_area = mrMesh.GetVolumeOfElement(elem_index);
+            }
+            cell_areas.push_back(cell_area);
+        }
     }
-    mesh_writer.AddCellData("Cell types", cell_types);
+
+    if (TissueConfig::Instance()->GetOutputCellProliferativeTypes())
+    {
+        mesh_writer.AddCellData("Cell types", cell_types);
+    }
+    if (TissueConfig::Instance()->GetOutputCellAncestors())
+    {
+        mesh_writer.AddCellData("Ancestors", cell_ancestors);
+    }
+    if (TissueConfig::Instance()->GetOutputCellMutationStates())
+    {
+        mesh_writer.AddCellData("Mutation states", cell_mutation_states);
+    }
+    if (TissueConfig::Instance()->GetOutputCellAges())
+    {
+        mesh_writer.AddCellData("Ages", cell_ages);
+    }
+    if (TissueConfig::Instance()->GetOutputCellCyclePhases())
+    {
+        mesh_writer.AddCellData("Cycle phases", cell_cycle_phases);
+    }
+    if (TissueConfig::Instance()->GetOutputCellAreas())
+    {
+        mesh_writer.AddCellData("Cell areas", cell_areas);
+    }
+
     mesh_writer.WriteVtkUsingMesh(mrMesh, time.str());
     *mpVtkMetaFile << "        <DataSet timestep=\"";
     *mpVtkMetaFile << p_time->GetTimeStepsElapsed();
@@ -462,10 +537,8 @@ void VertexBasedTissue<DIM>::CloseOutputFiles()
 #ifdef CHASTE_VTK
     *mpVtkMetaFile << "    </Collection>\n";
     *mpVtkMetaFile << "</VTKFile>\n";
-
     mpVtkMetaFile->close();
 #endif //CHASTE_VTK
-
 }
 
 
