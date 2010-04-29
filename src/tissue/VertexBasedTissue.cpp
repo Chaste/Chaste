@@ -462,7 +462,7 @@ void VertexBasedTissue<DIM>::WriteResultsToFiles()
             unsigned cycle_phase = p_cell->GetCellCycleModel()->GetCurrentCellCyclePhase();
             cell_cycle_phases.push_back(cycle_phase);
         }
-        if (TissueConfig::Instance()->GetOutputCellAreas())
+        if (TissueConfig::Instance()->GetOutputCellVolumes())
         {
             double cell_area;
             if (DIM==2)
@@ -497,7 +497,7 @@ void VertexBasedTissue<DIM>::WriteResultsToFiles()
     {
         mesh_writer.AddCellData("Cycle phases", cell_cycle_phases);
     }
-    if (TissueConfig::Instance()->GetOutputCellAreas())
+    if (TissueConfig::Instance()->GetOutputCellVolumes())
     {
         mesh_writer.AddCellData("Cell areas", cell_areas);
     }
