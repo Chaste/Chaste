@@ -439,17 +439,17 @@ void VertexBasedTissue<DIM>::WriteResultsToFiles()
 
         if (TissueConfig::Instance()->GetOutputCellAncestors())
         {
-            unsigned ancestor_index = (p_cell->GetAncestor() == UNSIGNED_UNSET) ? -1 : p_cell->GetAncestor();
+            double ancestor_index = (p_cell->GetAncestor() == UNSIGNED_UNSET) ? -1 : p_cell->GetAncestor();
             cell_ancestors.push_back(ancestor_index);
         }
         if (TissueConfig::Instance()->GetOutputCellProliferativeTypes())
         {
-            unsigned cell_type = p_cell->GetCellProliferativeType();
+            double cell_type = p_cell->GetCellProliferativeType();
             cell_types.push_back(cell_type);
         }
         if (TissueConfig::Instance()->GetOutputCellMutationStates())
         {
-            unsigned mutation_state = p_cell->GetMutationState()->GetColour();
+            double mutation_state = p_cell->GetMutationState()->GetColour();
             cell_mutation_states.push_back(mutation_state);
         }
         if (TissueConfig::Instance()->GetOutputCellAges())
@@ -459,7 +459,7 @@ void VertexBasedTissue<DIM>::WriteResultsToFiles()
         }
         if (TissueConfig::Instance()->GetOutputCellCyclePhases())
         {
-            unsigned cycle_phase = p_cell->GetCellCycleModel()->GetCurrentCellCyclePhase();
+            double cycle_phase = p_cell->GetCellCycleModel()->GetCurrentCellCyclePhase();
             cell_cycle_phases.push_back(cycle_phase);
         }
         if (TissueConfig::Instance()->GetOutputCellVolumes())
