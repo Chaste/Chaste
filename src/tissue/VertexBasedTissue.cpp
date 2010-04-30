@@ -439,7 +439,7 @@ void VertexBasedTissue<DIM>::WriteResultsToFiles()
 
         if (TissueConfig::Instance()->GetOutputCellAncestors())
         {
-            double ancestor_index = (p_cell->GetAncestor() == UNSIGNED_UNSET) ? -1 : p_cell->GetAncestor();
+            double ancestor_index = (p_cell->GetAncestor() == UNSIGNED_UNSET) ? (-1.0) : (double)p_cell->GetAncestor();
             cell_ancestors.push_back(ancestor_index);
         }
         if (TissueConfig::Instance()->GetOutputCellProliferativeTypes())
