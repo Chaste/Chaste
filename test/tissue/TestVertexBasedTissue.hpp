@@ -847,6 +847,7 @@ public:
         TissueConfig::Instance()->SetOutputCellCyclePhases(true);
         TissueConfig::Instance()->SetOutputCellAncestors(true);
         TissueConfig::Instance()->SetOutputCellAges(true);
+        TissueConfig::Instance()->SetOutputCellVolumes(true);
 
         TS_ASSERT_THROWS_NOTHING(tissue.CreateOutputFiles(output_directory, false));
 
