@@ -98,43 +98,6 @@ private:
 
 public:
 
-    void TestSolveThrowsNothing() throw (Exception)
-    {
-        // Create a simple 2D MutableVertexMesh
-        HoneycombMutableVertexMeshGenerator generator(6, 6);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
-
-        // Set up cells, one for each VertexElement. Give each cell
-        // a birth time of -elem_index, so its age is elem_index
-        std::vector<TissueCell> cells;
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
-        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
-        {
-            TissueCell cell(DIFFERENTIATED, p_state, new FixedDurationGenerationBasedCellCycleModel());
-            double birth_time = 0.0 - elem_index;
-            cell.SetBirthTime(birth_time);
-            cells.push_back(cell);
-        }
-
-        // Create tissue
-        VertexBasedTissue<2> tissue(*p_mesh, cells);
-
-        // Create a force system
-        NagaiHondaForce<2> force;
-        std::vector<AbstractForce<2>* > force_collection;
-        force_collection.push_back(&force);
-
-        // Set up tissue simulation
-        TissueSimulation<2> simulator(tissue, force_collection);
-        simulator.SetOutputDirectory("TestSolveThrowsNothing");
-        simulator.SetEndTime(0.1);
-
-        TS_ASSERT_DELTA(simulator.GetDt(), 0.002, 1e-12);
-
-        // Run simulation
-        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
-    }
-
     void TestSingleCellRelaxation() throw (Exception)
     {
         // Construct a 2D vertex mesh consisting of a single element
@@ -347,50 +310,6 @@ public:
         TS_ASSERT_EQUALS(new_num_cells, old_num_cells+1);
     }
 
-    void noTestVertexMonolayerLong() throw (Exception)
-    {
-        // Create a simple 2D MutableVertexMesh
-        HoneycombMutableVertexMeshGenerator generator(3, 3);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
-
-        // Set up cells, one for each VertexElement
-        std::vector<TissueCell> cells;
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
-        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
-        {
-            CellProliferativeType cell_type = STEM;
-
-            double birth_time = - RandomNumberGenerator::Instance()->ranf()*
-                                 ( TissueConfig::Instance()->GetTransitCellG1Duration()
-                                    + TissueConfig::Instance()->GetSG2MDuration() );
-
-
-            TissueCell cell(cell_type, p_state, new StochasticDurationGenerationBasedCellCycleModel());
-            cell.SetBirthTime(birth_time);
-            cells.push_back(cell);
-        }
-
-        // Create tissue
-        VertexBasedTissue<2> tissue(*p_mesh, cells);
-
-        // Create a force system
-        NagaiHondaForce<2> force;
-        std::vector<AbstractForce<2>* > force_collection;
-        force_collection.push_back(&force);
-
-        // Set up tissue simulation
-        TissueSimulation<2> simulator(tissue, force_collection);
-        simulator.SetOutputDirectory("TestVertexMonolayerLong");
-        simulator.SetSamplingTimestepMultiple(50);
-        simulator.SetEndTime(100.0); // at 35.6 a void forms and need to deal with this!!
-
-        // Adjust Max Generations so cells keep proliferating
-        TissueConfig::Instance()->SetMaxTransitGenerations(5u);
-
-        // Run simulation
-        simulator.Solve();
-    }
-
     void TestVertexMonolayerWithCellDeath() throw (Exception)
     {
         /*
@@ -563,8 +482,10 @@ public:
         simulator.SetOutputDirectory("TestTissueSimulationWithVertexBasedTissueSaveAndLoad");
         simulator.SetEndTime(end_time);
 
+        TS_ASSERT_DELTA(simulator.GetDt(), 0.002, 1e-12);
+
         // Run simulation
-        simulator.Solve();
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
 
         TissueSimulationArchiver<2, TissueSimulation<2> >::Save(&simulator);
 
