@@ -356,10 +356,7 @@ public:
         // Set up tissue simulation
         TissueSimulation<2> simulator(tissue, force_collection);
         simulator.SetOutputDirectory("TestVertexMonolayerWithCellDeath");
-        simulator.SetEndTime(1.0);
-
-        // Longer appoptosis time so cells shrink over a longer time
-        TissueConfig::Instance()->SetApoptosisTime(0.5);
+        simulator.SetEndTime(0.3);
 
         // Create a cell killer and pass in to simulation (note we must account for element index changes following each kill)
         TargetedCellKiller cell0_killer(&tissue, 0);    // element on the bottom boundary
