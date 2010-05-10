@@ -471,7 +471,9 @@ void VertexBasedTissue<DIM>::WriteResultsToFiles()
             }
             else // DIM==3
             {
-                cell_area = mrMesh.GetVolumeOfElement(elem_index);
+                NEVER_REACHED;
+                ///\todo #348 Fix VTK coverage
+                //cell_area = mrMesh.GetVolumeOfElement(elem_index);
             }
             cell_areas.push_back(cell_area);
         }
