@@ -35,7 +35,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "HoneycombMutableVertexMeshGenerator.hpp"
 #include "VertexMeshWriter.hpp"
-#include "VtkWriter.hpp"
+#include "VtkMeshWriter.hpp"
 #include "VertexMeshReader.hpp"
 
 class TestVertexMeshWriterForMutable : public CxxTest::TestSuite
