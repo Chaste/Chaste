@@ -125,7 +125,7 @@ c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nod
     // two nodes located a distance apart greater than mUseCutoffPoint
     if (this->mUseCutoffPoint)
     {
-        if (distance_between_nodes >= p_config->GetMechanicsCutOffLength())
+        if (distance_between_nodes >= p_config->GetMeinekeMechanicsCutOffLength())
         {
             // Return zero (2D projected) force
             return zero_vector<double>(2);
@@ -160,7 +160,7 @@ c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nod
         std::set<TissueCell*> cell_pair = p_static_cast_tissue->CreateCellPair(r_cell_A, r_cell_B);
         if (p_static_cast_tissue->IsMarkedSpring(cell_pair))
         {
-            double lambda = p_config->GetDivisionRestingSpringLength();
+            double lambda = p_config->GetMeinekeDivisionRestingSpringLength();
             rest_length = lambda + (1.0 - lambda) * ageA/m_duration;
         }
         if (ageA+SimulationTime::Instance()->GetTimeStep() >= m_duration)
@@ -208,7 +208,7 @@ c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nod
     multiplication_factor *= VariableSpringConstantMultiplicationFactor(nodeAGlobalIndex, nodeBGlobalIndex, rTissue, is_closer_than_rest_length);
 
     // Calculate the 3D force between the two points
-    c_vector<double,3> force_between_nodes = multiplication_factor * p_config->GetSpringStiffness() * unit_difference * (distance_between_nodes - rest_length);
+    c_vector<double,3> force_between_nodes = multiplication_factor * p_config->GetMeinekeSpringStiffness() * unit_difference * (distance_between_nodes - rest_length);
 
     // Calculate an outward normal unit vector to the tangent plane of the crypt surface at the 3D point corresponding to node B
     c_vector<double,3> outward_normal_unit_vector;

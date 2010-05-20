@@ -29,6 +29,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "MutableVertexMesh.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "UblasCustomFunctions.hpp"
+#include "Debug.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::MutableVertexMesh(std::vector<Node<SPACE_DIM>*> nodes,
@@ -1537,7 +1538,11 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEM
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* pNode, unsigned elementIndex)
 {
-    // Make sure that we are in the correct dimension - this code will be eliminated at compile time
+
+	TRACE("T3Swap");
+	PRINT_2_VARIABLES(elementIndex,pNode->GetIndex());
+
+	// Make sure that we are in the correct dimension - this code will be eliminated at compile time
     assert(SPACE_DIM == 2); // only works in 2D at present
     assert(ELEMENT_DIM == SPACE_DIM);
 
@@ -1563,6 +1568,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
     unsigned vertexA_index = p_element->GetNodeGlobalIndex(node_A_local_index);
     unsigned vertexB_index = p_element->GetNodeGlobalIndex((node_A_local_index+1)%num_nodes);
 
+    PRINT_2_VARIABLES(vertexA_index,vertexB_index);
 
     // Check these nodes are also boundary nodes
     assert(this->mNodes[vertexA_index]->IsBoundaryNode());
