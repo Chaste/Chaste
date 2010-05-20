@@ -1563,8 +1563,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
     unsigned vertexA_index = p_element->GetNodeGlobalIndex(node_A_local_index);
     unsigned vertexB_index = p_element->GetNodeGlobalIndex((node_A_local_index+1)%num_nodes);
 
-    PRINT_2_VARIABLES(vertexA_index,vertexB_index);
-
     // Check these nodes are also boundary nodes
     assert(this->mNodes[vertexA_index]->IsBoundaryNode());
     assert(this->mNodes[vertexB_index]->IsBoundaryNode());
