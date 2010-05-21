@@ -142,13 +142,13 @@ public:
     unsigned AddNode(Node<2>* pNewNode);
 
     /**
-     * Overridden GetAreaOfElement() method.
+     * Overridden GetVolumeOfElement() method.
      *
      * @param index  the global index of a specified vertex element
      *
      * @return the area of the element
      */
-    double GetAreaOfElement(unsigned index);
+    double GetVolumeOfElement(unsigned index);
 
     /**
      * Overridden GetCentroidOfElement() method.

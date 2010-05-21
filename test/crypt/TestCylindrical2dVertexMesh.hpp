@@ -203,11 +203,11 @@ public:
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 40u);
 
-        // Test area and perimeter calculations for  all  elements
+        // Test area and perimeter calculations for all elements
         for (unsigned i=0; i<p_mesh->GetNumElements(); i++)
         {
-            TS_ASSERT_DELTA(p_mesh->GetAreaOfElement(i), 0.8660, 1e-4);
-            TS_ASSERT_DELTA(p_mesh->GetPerimeterOfElement(i), 3.4641, 1e-4);
+            TS_ASSERT_DELTA(p_mesh->GetVolumeOfElement(i), 0.8660, 1e-4);
+            TS_ASSERT_DELTA(p_mesh->GetSurfaceAreaOfElement(i), 3.4641, 1e-4);
         }
 
         // Test centroid calculations for non-periodic element
@@ -457,7 +457,7 @@ public:
         // Make mesh
         Cylindrical2dVertexMesh mesh(10.0, nodes, elements);
 
-        TS_ASSERT_DELTA(mesh.GetAreaOfElement(0), 4.0, 1e-10);
+        TS_ASSERT_DELTA(mesh.GetVolumeOfElement(0), 4.0, 1e-10);
 
         // Make some test points and test ElementIncludesPoint()
 

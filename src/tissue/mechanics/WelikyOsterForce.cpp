@@ -68,7 +68,7 @@ void WelikyOsterForce<DIM>::AddForceContribution(std::vector<c_vector<double, DI
         /******** Start of deformation force calculation ********/
 
         // Compute the area of this element
-        double element_area = p_tissue->rGetMesh().GetAreaOfElement(element_index);
+        double element_area = p_tissue->rGetMesh().GetVolumeOfElement(element_index);
 
         double deformation_coefficient = p_params->GetWelikyOsterAreaParameter()/element_area;
 
@@ -78,7 +78,7 @@ void WelikyOsterForce<DIM>::AddForceContribution(std::vector<c_vector<double, DI
         /******** Start of membrane force calculation ***********/
 
         // Compute the perimeter of the element
-        double element_perimeter = p_tissue->rGetMesh().GetPerimeterOfElement(element_index);
+        double element_perimeter = p_tissue->rGetMesh().GetSurfaceAreaOfElement(element_index);
 
         double membrane_surface_tension_coefficient = p_params->GetWelikyOsterPerimeterParameter()*element_perimeter;
 

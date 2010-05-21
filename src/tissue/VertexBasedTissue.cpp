@@ -424,7 +424,7 @@ void VertexBasedTissue<DIM>::WriteResultsToFiles()
     std::vector<double> cell_mutation_states;
     std::vector<double> cell_ages;
     std::vector<double> cell_cycle_phases;
-    std::vector<double> cell_areas;
+    std::vector<double> cell_volumes;
 
     // Loop over Voronoi elements
     for (typename VertexMesh<DIM,DIM>::VertexElementIterator elem_iter = mrMesh.GetElementIteratorBegin();
@@ -464,18 +464,8 @@ void VertexBasedTissue<DIM>::WriteResultsToFiles()
         }
         if (TissueConfig::Instance()->GetOutputCellVolumes())
         {
-            double cell_area;
-            if (DIM==2)
-            {
-                cell_area = mrMesh.GetAreaOfElement(elem_index);
-            }
-            else // DIM==3
-            {
-                NEVER_REACHED;
-                ///\todo #348 Fix VTK coverage
-                //cell_area = mrMesh.GetVolumeOfElement(elem_index);
-            }
-            cell_areas.push_back(cell_area);
+            double cell_volume = mrMesh.GetVolumeOfElement(elem_index);
+            cell_volumes.push_back(cell_volume);
         }
     }
 
@@ -501,7 +491,7 @@ void VertexBasedTissue<DIM>::WriteResultsToFiles()
     }
     if (TissueConfig::Instance()->GetOutputCellVolumes())
     {
-        mesh_writer.AddCellData("Cell areas", cell_areas);
+        mesh_writer.AddCellData("Cell volumes", cell_volumes);
     }
 
     mesh_writer.WriteVtkUsingMesh(mrMesh, time.str());

@@ -92,7 +92,7 @@ void NagaiHondaForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM
             /******** Start of deformation force calculation ********/
 
             // Compute the area of this element and its gradient at this node
-            double element_area = p_tissue->rGetMesh().GetAreaOfElement(*iter);
+            double element_area = p_tissue->rGetMesh().GetVolumeOfElement(*iter);
             c_vector<double, DIM> element_area_gradient = p_tissue->rGetMesh().GetAreaGradientOfElementAtNode(p_element, local_index);
 
             // Get the target area of the cell
@@ -106,7 +106,7 @@ void NagaiHondaForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM
             /******** Start of membrane force calculation ***********/
 
             // Compute the perimeter of the element and its gradient at this node
-            double element_perimeter = p_tissue->rGetMesh().GetPerimeterOfElement(*iter);
+            double element_perimeter = p_tissue->rGetMesh().GetSurfaceAreaOfElement(*iter);
             c_vector<double, DIM> element_perimeter_gradient = p_tissue->rGetMesh().GetPerimeterGradientOfElementAtNode(p_element, local_index);
 
             // Get the target perimeter of the cell

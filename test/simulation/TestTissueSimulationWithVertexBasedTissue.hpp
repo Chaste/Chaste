@@ -147,8 +147,8 @@ public:
         simulator.Solve();
 
         // Test relaxes to circle (can be more stringent with more nodes and more time)
-        TS_ASSERT_DELTA(tissue.rGetMesh().GetAreaOfElement(0), 1.0, 0.05);
-        TS_ASSERT_DELTA(tissue.rGetMesh().GetPerimeterOfElement(0), 3.5449077, 0.1);
+        TS_ASSERT_DELTA(tissue.rGetMesh().GetVolumeOfElement(0), 1.0, 0.05);
+        TS_ASSERT_DELTA(tissue.rGetMesh().GetSurfaceAreaOfElement(0), 3.5449077, 0.1);
     }
 
     void TestSingleCellRelaxationWelikyOster() throw (Exception)
@@ -200,8 +200,8 @@ public:
         simulator.Solve();
 
         // Test relaxes to circle (can be more stringent with more nodes and more time)
-        TS_ASSERT_DELTA(tissue.rGetMesh().GetAreaOfElement(0), 1.0, 0.1);
-        TS_ASSERT_DELTA(tissue.rGetMesh().GetPerimeterOfElement(0), 3.5449077, 0.1);
+        TS_ASSERT_DELTA(tissue.rGetMesh().GetVolumeOfElement(0), 1.0, 0.1);
+        TS_ASSERT_DELTA(tissue.rGetMesh().GetSurfaceAreaOfElement(0), 3.5449077, 0.1);
     }
 
     // In this test edges can divide if they become too long.
@@ -427,8 +427,8 @@ public:
         simulator.Solve();
 
         // Test relaxes to circle (can be more stringent with more nodes and more time)
-        TS_ASSERT_DELTA(tissue.rGetMesh().GetAreaOfElement(0), 1.0, 1e-1);
-        TS_ASSERT_DELTA(tissue.rGetMesh().GetPerimeterOfElement(0), 3.5449077, 1e-1);
+        TS_ASSERT_DELTA(tissue.rGetMesh().GetVolumeOfElement(0), 1.0, 1e-1);
+        TS_ASSERT_DELTA(tissue.rGetMesh().GetSurfaceAreaOfElement(0), 3.5449077, 1e-1);
 
         TissueCell& r_cell = simulator.rGetTissue().rGetCellUsingLocationIndex(0);
         r_cell.StartApoptosis(false);
@@ -438,8 +438,8 @@ public:
         // Run simulation
         simulator.Solve();
 
-        TS_ASSERT_DELTA(tissue.rGetMesh().GetAreaOfElement(0), 0.0068, 1e-4);
-        TS_ASSERT_DELTA(tissue.rGetMesh().GetPerimeterOfElement(0), 0.3783, 1e-3);
+        TS_ASSERT_DELTA(tissue.rGetMesh().GetVolumeOfElement(0), 0.0068, 1e-4);
+        TS_ASSERT_DELTA(tissue.rGetMesh().GetSurfaceAreaOfElement(0), 0.3783, 1e-3);
     }
 
     /**

@@ -160,7 +160,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNumElements() const
 
 //\todo deal with boundary elements in vertex meshes.
 //template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-//unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNumBoundaryElements() const
+//unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNumBoundaryElements() const
 //{
 //    return mBoundaryElements.size();
 //}
@@ -704,7 +704,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
                          * Perform T2 swaps where necesary
                          * Check there are only 3 nodes and the element is small enough
                          */
-                        if (GetAreaOfElement(elem_iter->GetIndex()) < GetT2Threshold())
+                        if (GetVolumeOfElement(elem_iter->GetIndex()) < GetT2Threshold())
                         {
                             PerformT2Swap(*elem_iter);
                             // Now remove the deleted nodes (if we don't do this then the search for T1Swap causes errors)
@@ -760,7 +760,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
                              ++it)
                         {
                             ///\todo this magic number needs to be investigated.
-                            if (this->GetElement(*it)->GetNumNodes() <= 3)//&&(this->GetAreaOfElement(*it) < 2.0*GetT2Threshold()))
+                            if (this->GetElement(*it)->GetNumNodes() <= 3)//&&(this->GetVolumeOfElement(*it) < 2.0*GetT2Threshold()))
                             {
                                 triangular_element = true;
                             }

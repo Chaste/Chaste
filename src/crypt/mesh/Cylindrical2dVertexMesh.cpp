@@ -109,7 +109,7 @@ unsigned Cylindrical2dVertexMesh::AddNode(Node<2>* pNewNode)
     return node_index;
 }
 
-double Cylindrical2dVertexMesh::GetAreaOfElement(unsigned index)
+double Cylindrical2dVertexMesh::GetVolumeOfElement(unsigned index)
 {
     VertexElement<2, 2>* p_element = GetElement(index);
 
@@ -179,7 +179,7 @@ c_vector<double, 2> Cylindrical2dVertexMesh::GetCentroidOfElement(unsigned index
         temp_centroid_y += (transformed_current_node[1]+transformed_anticlockwise_node[1])*(transformed_current_node[0]*transformed_anticlockwise_node[1]-transformed_current_node[1]*transformed_anticlockwise_node[0]);
     }
 
-    double vertex_area = GetAreaOfElement(index);
+    double vertex_area = GetVolumeOfElement(index);
     double centroid_coefficient = 1.0/(6.0*vertex_area);
 
     transformed_centroid(0) = centroid_coefficient*temp_centroid_x;
