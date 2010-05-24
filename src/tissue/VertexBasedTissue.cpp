@@ -374,8 +374,7 @@ double VertexBasedTissue<DIM>::GetTargetAreaOfCell(const TissueCell& rCell)
     }
     else
     {
-        // In the case of a proliferating cell, the target area increases
-        // linearly from A/2 to A over the course of the G1 phase
+        // The target area of a proliferating cell increases linearly from A/2 to A over the course of the G1 phase
         if (cell_age < g1_duration)
         {
             cell_target_area *= 0.5*(1 + cell_age/g1_duration);
@@ -384,6 +383,7 @@ double VertexBasedTissue<DIM>::GetTargetAreaOfCell(const TissueCell& rCell)
 
     return cell_target_area;
 }
+
 
 template<unsigned DIM>
 void VertexBasedTissue<DIM>::WriteResultsToFiles()
@@ -419,12 +419,13 @@ void VertexBasedTissue<DIM>::WriteResultsToFiles()
     std::stringstream time;
     time << p_time->GetTimeStepsElapsed();
 
-    std::vector<double> cell_types;
-    std::vector<double> cell_ancestors;
-    std::vector<double> cell_mutation_states;
-    std::vector<double> cell_ages;
-    std::vector<double> cell_cycle_phases;
-    std::vector<double> cell_volumes;
+    unsigned num_elements = mrMesh.GetNumElements();
+    std::vector<double> cell_types(num_elements);
+    std::vector<double> cell_ancestors(num_elements);
+    std::vector<double> cell_mutation_states(num_elements);
+    std::vector<double> cell_ages(num_elements);
+    std::vector<double> cell_cycle_phases(num_elements);
+    std::vector<double> cell_volumes(num_elements);
 
     // Loop over Voronoi elements
     for (typename VertexMesh<DIM,DIM>::VertexElementIterator elem_iter = mrMesh.GetElementIteratorBegin();
@@ -455,7 +456,7 @@ void VertexBasedTissue<DIM>::WriteResultsToFiles()
         if (TissueConfig::Instance()->GetOutputCellAges())
         {
             double age = p_cell->GetAge();
-            cell_ages.push_back(age); 
+            cell_ages.push_back(age);
         }
         if (TissueConfig::Instance()->GetOutputCellCyclePhases())
         {
