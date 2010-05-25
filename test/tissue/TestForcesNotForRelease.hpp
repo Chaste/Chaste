@@ -691,7 +691,7 @@ public:
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(0.25, 2);
 
         // Set the cell to be necrotic
-        tissue.rGetCellUsingLocationIndex(0).StartApoptosis();//SetCellProliferativeType(APOPTOTIC);
+        tissue.rGetCellUsingLocationIndex(0).StartApoptosis();
 
         double initial_apoptotic_target_area = tissue.GetTargetAreaOfCell(tissue.rGetCellUsingLocationIndex(0));
 

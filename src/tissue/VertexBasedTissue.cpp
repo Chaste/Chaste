@@ -366,7 +366,7 @@ double VertexBasedTissue<DIM>::GetTargetAreaOfCell(const TissueCell& rCell)
         g1_duration = TissueConfig::Instance()->GetTransitCellG1Duration();
     }
 
-    if (rCell.GetCellProliferativeType() == APOPTOTIC)
+    if (rCell.GetMutationState()->IsType<ApoptoticCellMutationState>())
     {
         // Age of cell when apoptosis begins
         if (rCell.GetStartOfApoptosisTime() - rCell.GetBirthTime() < g1_duration)
