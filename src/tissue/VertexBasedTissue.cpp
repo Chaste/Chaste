@@ -262,6 +262,17 @@ void VertexBasedTissue<DIM>::UpdateNodeLocations(const std::vector< c_vector<dou
         //Get displacement
         c_vector<double, DIM> displacement = dt*rNodeForces[node_index]/damping_const;
 
+        /*
+         * If this displacement is greater than the cell rearrangement threshold then this could
+		 * result in nodes appearing in the middle of other elements which would be bad. If this occurs
+		 * we restrict the motion to the cell rearrangement threshold and warn the user to use a smaller timesstep?
+		 */
+        if (norm_2(displacement)>0.5*mrMesh.GetCellRearrangementThreshold())
+        {
+		//\TODO output warning to say to use a smaller time step TRACE("Use a smaller timestep")
+        	//displacement *= 0.5*mrMesh.GetCellRearrangementThreshold()/norm_2(displacement);
+        }
+
         // Get new node location
         c_vector<double, DIM> new_node_location = this->GetNode(node_index)->rGetLocation() + displacement;
 

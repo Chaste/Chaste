@@ -2060,29 +2060,29 @@ public:
         nodes.push_back(new Node<2>(4, true, 1.5, 0.0));
         nodes.push_back(new Node<2>(5, true, 2.0, 0.0));
         nodes.push_back(new Node<2>(6, true, 1.5, 0.5));
-        nodes.push_back(new Node<2>(7, true, -0.1, 0.0));
+        nodes.push_back(new Node<2>(7, true, -1.0, 0.0));
         nodes.push_back(new Node<2>(8, true, -0.5, 0.5));
 
         std::vector<Node<2>*> nodes_in_element0;
-        nodes_in_element0.push_back(nodes[0]);
-        nodes_in_element0.push_back(nodes[1]);
-        nodes_in_element0.push_back(nodes[2]);
-        nodes_in_element0.push_back(nodes[3]);
+		nodes_in_element0.push_back(nodes[0]);
+		nodes_in_element0.push_back(nodes[1]);
+		nodes_in_element0.push_back(nodes[2]);
+		nodes_in_element0.push_back(nodes[3]);
 
-        std::vector<Node<2>*> nodes_in_element1;
-        nodes_in_element1.push_back(nodes[1]);
-        nodes_in_element1.push_back(nodes[4]);
-        nodes_in_element1.push_back(nodes[6]);
+		std::vector<Node<2>*> nodes_in_element1;
+		nodes_in_element1.push_back(nodes[1]);
+		nodes_in_element1.push_back(nodes[4]);
+		nodes_in_element1.push_back(nodes[6]);
 
-        std::vector<Node<2>*> nodes_in_element2;
-        nodes_in_element2.push_back(nodes[4]);
-        nodes_in_element2.push_back(nodes[5]);
-        nodes_in_element2.push_back(nodes[6]);
+		std::vector<Node<2>*> nodes_in_element2;
+		nodes_in_element2.push_back(nodes[4]);
+		nodes_in_element2.push_back(nodes[5]);
+		nodes_in_element2.push_back(nodes[6]);
 
-        std::vector<Node<2>*> nodes_in_element3;
-        nodes_in_element3.push_back(nodes[7]);
-        nodes_in_element3.push_back(nodes[0]);
-        nodes_in_element3.push_back(nodes[8]);
+		std::vector<Node<2>*> nodes_in_element3;
+		nodes_in_element3.push_back(nodes[7]);
+		nodes_in_element3.push_back(nodes[0]);
+		nodes_in_element3.push_back(nodes[8]);
 
         // Make elements
         std::vector<VertexElement<2,2>*> elements;
@@ -2174,8 +2174,152 @@ public:
         }
     }
 
+
+    void noTestT3SwapForNeighboringElementsWithTwoCommonNodes()
+	{
+		/*
+		 * Make a small mesh consisting of 4 elements:
+		 * a square and 2 quadrilaterals and a triangles.
+		 *        _____
+		 *       |     |
+		 *     /\|     |/|\
+		 *    /__|_____|_|_\
+		 *
+		 */
+
+		// Make all nodes boundary nodes
+		std::vector<Node<2>*> nodes;
+		nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+		nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+		nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
+		nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
+		nodes.push_back(new Node<2>(4, true, 1.5, 0.0));
+		nodes.push_back(new Node<2>(5, true, 2.0, 0.0));
+		nodes.push_back(new Node<2>(6, true, 1.5, 0.5));
+		nodes.push_back(new Node<2>(7, true, -1.0, 0.0));
+		nodes.push_back(new Node<2>(8, true, -0.5, 0.5));
+		nodes.push_back(new Node<2>(9, true, 1.0, 0.25));
+		nodes.push_back(new Node<2>(10, true, 0.0, 0.25));
+
+		std::vector<Node<2>*> nodes_in_element0;
+		nodes_in_element0.push_back(nodes[0]);
+		nodes_in_element0.push_back(nodes[1]);
+		nodes_in_element0.push_back(nodes[9]);
+		nodes_in_element0.push_back(nodes[2]);
+		nodes_in_element0.push_back(nodes[3]);
+		nodes_in_element0.push_back(nodes[10]);
+
+		std::vector<Node<2>*> nodes_in_element1;
+		nodes_in_element1.push_back(nodes[1]);
+		nodes_in_element1.push_back(nodes[4]);
+		nodes_in_element1.push_back(nodes[6]);
+		nodes_in_element1.push_back(nodes[9]);
+
+		std::vector<Node<2>*> nodes_in_element2;
+		nodes_in_element2.push_back(nodes[4]);
+		nodes_in_element2.push_back(nodes[5]);
+		nodes_in_element2.push_back(nodes[6]);
+
+		std::vector<Node<2>*> nodes_in_element3;
+		nodes_in_element3.push_back(nodes[7]);
+		nodes_in_element3.push_back(nodes[0]);
+		nodes_in_element3.push_back(nodes[10]);
+		nodes_in_element3.push_back(nodes[8]);
+
+		// Make elements
+		std::vector<VertexElement<2,2>*> elements;
+		elements.push_back(new VertexElement<2,2>(0, nodes_in_element0));
+		elements.push_back(new VertexElement<2,2>(1, nodes_in_element1));
+		elements.push_back(new VertexElement<2,2>(2, nodes_in_element2));
+		elements.push_back(new VertexElement<2,2>(3, nodes_in_element3));
+
+		// Make mesh
+		MutableVertexMesh<2,2> mesh(nodes, elements);
+		mesh.SetCellRearrangementThreshold(0.1*1.0/1.5);// Threshold distance set to ease calculations.
+
+		// Node 6 and 8 are close to, but not overlapping, an edge of element 0
+		TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(mesh.GetNode(6)->rGetLocation(), 0), false);
+		TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(mesh.GetNode(8)->rGetLocation(), 0), false);
+
+		// Move node 6 to the left so that it overlaps element 0
+		ChastePoint<2> point = mesh.GetNode(6)->GetPoint();
+		point.SetCoordinate(0u, 0.9);
+		mesh.SetNode(6, point);
+
+		TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[0], 0.9, 1e-4);
+		TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[1], 0.5, 1e-4);
+
+		TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(mesh.GetNode(6)->rGetLocation(), 0), true);
+		TS_ASSERT_EQUALS(mesh.GetLocalIndexForElementEdgeClosestToPoint(mesh.GetNode(6)->rGetLocation(), 0), 2u);
+
+		// Move node 8 to the right so that it overlaps element 0
+		point.SetCoordinate(0u, 0.1);
+		mesh.SetNode(8, point);
+
+		TS_ASSERT_DELTA(mesh.GetNode(8)->rGetLocation()[0], 0.1, 1e-4);
+		TS_ASSERT_DELTA(mesh.GetNode(8)->rGetLocation()[1], 0.5, 1e-4);
+
+		TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(mesh.GetNode(8)->rGetLocation(), 0), true);
+		TS_ASSERT_EQUALS(mesh.GetLocalIndexForElementEdgeClosestToPoint(mesh.GetNode(8)->rGetLocation(), 0), 4u);
+
+		// Call method to update mesh in this situation
+		mesh.ReMesh();//MoveOverlappingNodeOntoEdgeOfElement(mesh.GetNode(6), 0);
+
+		// Check that node 6 has been moved onto the edge a new node has been created and both added to elements 0 and 1
+		TS_ASSERT_EQUALS(mesh.GetNumElements(), 4u);
+		TS_ASSERT_EQUALS(mesh.GetNumNodes(), 10u);
+
+
+		// Test locations of moved and new nodes (11 is the next free node when 6 is merged)
+		TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[0], 1.0, 1e-4);
+		TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[1], 0.45, 1e-4);
+		TS_ASSERT_DELTA(mesh.GetNode(11)->rGetLocation()[0], 1.0, 1e-4);
+		TS_ASSERT_DELTA(mesh.GetNode(11)->rGetLocation()[1], 0.55, 1e-4);
+
+		TS_ASSERT_DELTA(mesh.GetNode(8)->rGetLocation()[0], 0.0, 1e-4);
+		TS_ASSERT_DELTA(mesh.GetNode(8)->rGetLocation()[1], 0.5, 1e-4);
+
+		// Test elements have correct nodes
+		TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNumNodes(), 7u);
+		TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(0), 0u);
+		TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(1), 1u);
+		TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(2), 6u);
+		TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(3), 11u);
+		TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(4), 2u);
+		TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(5), 3u);
+		TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(6), 8u);
+
+
+		TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNumNodes(), 3u);
+		TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(0), 1u);
+		TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(1), 4u);
+		TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(2), 6u);
+
+		TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNumNodes(), 4u);
+		TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNodeGlobalIndex(0), 4u);
+		TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNodeGlobalIndex(1), 5u);
+		TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNodeGlobalIndex(2), 11u);
+		TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNodeGlobalIndex(3), 6u);
+
+		TS_ASSERT_EQUALS(mesh.GetElement(3)->GetNumNodes(), 3u);
+		TS_ASSERT_EQUALS(mesh.GetElement(3)->GetNodeGlobalIndex(0), 7u);
+		TS_ASSERT_EQUALS(mesh.GetElement(3)->GetNodeGlobalIndex(1), 0u);
+		TS_ASSERT_EQUALS(mesh.GetElement(3)->GetNodeGlobalIndex(2), 8u);
+
+		// Test boundary property of nodes. All are boundary nodes except node 6.
+		for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+		{
+			bool expected_boundary_node = true;
+			if (i==6)
+			{
+				expected_boundary_node = false;
+			}
+			TS_ASSERT_EQUALS(mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
+		}
+	}
+
    /**
-     * This tests the ReMesh method for preforming T3Swaps, In this test we read in a vertex mesh
+     * This tests the ReMesh method for performing T3Swaps, In this test we read in a vertex mesh
      * that contains several nodes that are inside other elements.
      *
      *     ____
@@ -2517,14 +2661,14 @@ public:
     {
 
         /*
-         * 3 elementswith a central void
+         * 3 elements with a central void
          *           _________
          *          |        /|
-         *         |/|\___/| |
-         *         |\|/   \| |
+         *          |/|\___/| |
+         *          |\|/   \| |
          *          |________\|
          *
-         * The 2 central trinagles are voids
+         * The 2 central triangles are voids
          */
 
         // Make 11 nodes to assign to three elements
