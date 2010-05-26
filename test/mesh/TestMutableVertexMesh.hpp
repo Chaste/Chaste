@@ -674,7 +674,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(2), 3u);
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(3), 7u);
 
-        //Test boundary nodes updated
+        // Test boundary nodes updated
         TS_ASSERT_EQUALS(vertex_mesh.GetNode(0)->IsBoundaryNode(), true);
         TS_ASSERT_EQUALS(vertex_mesh.GetNode(1)->IsBoundaryNode(), true);
         TS_ASSERT_EQUALS(vertex_mesh.GetNode(2)->IsBoundaryNode(), true);
@@ -697,6 +697,95 @@ public:
         expected_elements_containing_node_7.insert(2);
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNode(7)->rGetContainingElementIndices(), expected_elements_containing_node_7);
+    }
+
+    void TestDeleteElementWithBoundaryNodes() throw(Exception)
+    {
+
+        /*
+         * This test checks node 'boundaryness' when a boundary element is deleted.
+         *  ____       ____
+         * | /  |     |    |
+         * |/   | --> |    |
+         * |    |     |    |
+         * |____|     |____|
+         *
+         */
+
+        // Create nodes
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 0.5, 0.0));
+        nodes.push_back(new Node<2>(2, true, 1.0, 0.0));
+        nodes.push_back(new Node<2>(3, true, 1.0, 1.0));
+        nodes.push_back(new Node<2>(4, true, 0.5, 1.0));
+        nodes.push_back(new Node<2>(5, true, 0.0, 1.0));
+        nodes.push_back(new Node<2>(6, true, 0.0, 0.5));
+        nodes.push_back(new Node<2>(7, false, 0.4, 0.6));
+
+        // Create elements
+        std::vector<Node<2>*> nodes_elem_0;
+        nodes_elem_0.push_back(nodes[0]);
+        nodes_elem_0.push_back(nodes[1]);
+        nodes_elem_0.push_back(nodes[2]);
+        nodes_elem_0.push_back(nodes[3]);
+        nodes_elem_0.push_back(nodes[4]);
+        nodes_elem_0.push_back(nodes[7]);
+        nodes_elem_0.push_back(nodes[6]);
+
+        std::vector<Node<2>*> nodes_elem_1;
+        nodes_elem_1.push_back(nodes[6]);
+        nodes_elem_1.push_back(nodes[7]);
+        nodes_elem_1.push_back(nodes[4]);
+        nodes_elem_1.push_back(nodes[5]);
+
+        std::vector<VertexElement<2,2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
+
+        // Create mesh
+        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+
+        // Test mesh has correct numbers of elements and nodes
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 8u);
+
+        // Test correct nodes are boundary nodes
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(0)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(1)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(2)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(3)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(4)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(5)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(6)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(7)->IsBoundaryNode(), false);
+
+        // Delete smaller element
+        vertex_mesh.DeleteElementPriorToReMesh(1);
+
+        // Test mesh has correct numbers of elements and nodes
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 1u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 7u);
+
+        // Test ownership
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 7u);
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(0), 0u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(1), 1u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(2), 2u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(3), 3u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(4), 4u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(5), 7u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(6), 6u);
+
+        // Test correct nodes are boundary nodes
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(0)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(1)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(2)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(3)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(4)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(5)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(6)->IsBoundaryNode(), true);
     }
 
     /**
