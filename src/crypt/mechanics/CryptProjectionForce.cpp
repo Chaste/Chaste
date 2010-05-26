@@ -267,7 +267,7 @@ void CryptProjectionForce::AddForceContribution(std::vector<c_vector<double,2> >
              cell_iter != rTissue.End();
              ++cell_iter)
         {
-            if (cell_iter->GetCellProliferativeType()==STEM)
+            if (cell_iter->GetCellCycleModel()->GetCellProliferativeType()==STEM)
             {
                 c_vector<double, 2> wnt_chemotactic_force = wnt_chemotaxis_strength*WntConcentration<2>::Instance()->GetWntGradient(*cell_iter);
                 unsigned index = rTissue.GetLocationIndexUsingCell(*cell_iter);

@@ -73,9 +73,11 @@ public:
                                  ( TissueConfig::Instance()->GetTransitCellG1Duration()
                                     + TissueConfig::Instance()->GetSG2MDuration() );
 
-            SimpleWntCellCycleModel* p_temp=new SimpleWntCellCycleModel;
+            SimpleWntCellCycleModel* p_model = new SimpleWntCellCycleModel;
             p_temp->SetDimension(2);
-            TissueCell cell(TRANSIT, p_state, p_temp);
+            p_model->SetCellProliferativeType(TRANSIT);
+
+            TissueCell cell(p_state, p_model);
             cell.SetBirthTime(birth_time);
             cells.push_back(cell);
         }

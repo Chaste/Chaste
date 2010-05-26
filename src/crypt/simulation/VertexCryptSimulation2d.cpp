@@ -64,7 +64,7 @@ c_vector<double, 2> VertexCryptSimulation2d::CalculateCellDivisionVector(TissueC
     if (!is_wnt_included)
     {
         WntConcentration<2>::Destroy();
-        if (rParentCell.GetCellProliferativeType() == STEM)
+        if (rParentCell.GetCellCycleModel()->GetCellProliferativeType() == STEM)
         {
             axis_of_division(0) = 1.0;
             axis_of_division(1) = 0.0;

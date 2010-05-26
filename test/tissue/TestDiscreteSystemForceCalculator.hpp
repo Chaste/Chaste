@@ -80,7 +80,7 @@ public:
 
         std::set<unsigned> neighbouring_node_indices = calculator.GetNeighbouringNodeIndices(node_index);
 
-        TS_ASSERT(neighbouring_node_indices==expected_node_indices);
+        TS_ASSERT(neighbouring_node_indices == expected_node_indices);
 
         // Test CalculateFtAndFn
         double spring_stiffness = TissueConfig::Instance()->GetMeinekeSpringStiffness();

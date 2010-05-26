@@ -82,7 +82,9 @@ public:
         {
             SimpleWntCellCycleModel* p_model = new SimpleWntCellCycleModel;
             p_model->SetDimension(2);
-            TissueCell cell(TRANSIT, p_state, p_model);
+            p_model->SetCellProliferativeType(TRANSIT);
+
+            TissueCell cell(p_state, p_model);
 
             cell.InitialiseCellCycleModel();
             double birth_time = - RandomNumberGenerator::Instance()->ranf()*

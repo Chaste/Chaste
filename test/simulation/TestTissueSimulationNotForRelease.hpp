@@ -110,8 +110,11 @@ public:
         {
             SimpleWntCellCycleModel* p_model = new SimpleWntCellCycleModel();
             p_model->SetDimension(2);
-            TissueCell cell(TRANSIT, p_state, p_model);
+            p_model->SetCellProliferativeType(TRANSIT);
+
+            TissueCell cell(p_state, p_model);
             cell.InitialiseCellCycleModel();
+
             double birth_time = - RandomNumberGenerator::Instance()->ranf()*
                                   ( p_params->GetTransitCellG1Duration()
                                    +p_params->GetSG2MDuration());
@@ -182,9 +185,14 @@ public:
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            TissueCell cell(STEM, p_state, new FixedDurationGenerationBasedCellCycleModel());
+            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            p_model->SetCellProliferativeType(STEM);
+
+            TissueCell cell(p_state, p_model);
+
             double birth_time = -13.5 - i;
             cell.SetBirthTime(birth_time);
+
             cells.push_back(cell);
         }
 

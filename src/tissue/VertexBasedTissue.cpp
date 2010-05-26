@@ -269,7 +269,7 @@ void VertexBasedTissue<DIM>::UpdateNodeLocations(const std::vector< c_vector<dou
 		 */
         if (norm_2(displacement)>0.5*mrMesh.GetCellRearrangementThreshold())
         {
-		//\TODO output warning to say to use a smaller time step TRACE("Use a smaller timestep")
+		///\todo output warning to say to use a smaller time step TRACE("Use a smaller timestep")
         	//displacement *= 0.5*mrMesh.GetCellRearrangementThreshold()/norm_2(displacement);
         }
 
@@ -413,14 +413,17 @@ void VertexBasedTissue<DIM>::WriteResultsToFiles()
     {
         unsigned elem_index = this->GetLocationIndexUsingCell(*cell_iter);
 
+        VertexElement<DIM, DIM>* p_element = mrMesh.GetElement(elem_index);
+
+        unsigned num_nodes_in_element = p_element->GetNumNodes();
+
         // First write the number of Nodes belonging to this VertexElement
-        *mpVizElementsFile <<  mrMesh.GetElement(elem_index)->GetNumNodes() << " ";
+        *mpVizElementsFile << num_nodes_in_element << " ";
 
         // Then write the global index of each Node in this element
-        unsigned num_nodes_in_this_element = mrMesh.GetElement(elem_index)->GetNumNodes();
-        for (unsigned i=0; i<num_nodes_in_this_element; i++)
+        for (unsigned i=0; i<num_nodes_in_element; i++)
         {
-            *mpVizElementsFile << mrMesh.GetElement(elem_index)->GetNodeGlobalIndex(i) << " ";
+            *mpVizElementsFile << p_element->GetNodeGlobalIndex(i) << " ";
         }
     }
     *mpVizElementsFile << "\n";
@@ -456,7 +459,7 @@ void VertexBasedTissue<DIM>::WriteResultsToFiles()
         }
         if (TissueConfig::Instance()->GetOutputCellProliferativeTypes())
         {
-            double cell_type = p_cell->GetCellProliferativeType();
+            double cell_type = p_cell->GetCellCycleModel()->GetCellProliferativeType();
             cell_types.push_back(cell_type);
         }
         if (TissueConfig::Instance()->GetOutputCellMutationStates())

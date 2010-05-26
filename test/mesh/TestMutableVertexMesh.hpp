@@ -567,13 +567,13 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(3), 6u);
 
         //Test boundary nodes updated
-        TS_ASSERT(vertex_mesh.GetNode(0)->IsBoundaryNode());
-        TS_ASSERT(vertex_mesh.GetNode(1)->IsBoundaryNode());
-        TS_ASSERT(vertex_mesh.GetNode(2)->IsBoundaryNode());
-        TS_ASSERT(!vertex_mesh.GetNode(3)->IsBoundaryNode());
-        TS_ASSERT(!vertex_mesh.GetNode(4)->IsBoundaryNode());
-        TS_ASSERT(vertex_mesh.GetNode(5)->IsBoundaryNode());
-        TS_ASSERT(!vertex_mesh.GetNode(6)->IsBoundaryNode());
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(0)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(1)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(2)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(3)->IsBoundaryNode(), false);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(4)->IsBoundaryNode(), false);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(5)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(6)->IsBoundaryNode(), false);
 
         // Test ownership of the new nodes
         std::set<unsigned> expected_elements_containing_node_5;
@@ -675,14 +675,14 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(3), 7u);
 
         //Test boundary nodes updated
-        TS_ASSERT(vertex_mesh.GetNode(0)->IsBoundaryNode());
-        TS_ASSERT(vertex_mesh.GetNode(1)->IsBoundaryNode());
-        TS_ASSERT(vertex_mesh.GetNode(2)->IsBoundaryNode());
-        TS_ASSERT(vertex_mesh.GetNode(3)->IsBoundaryNode());
-        TS_ASSERT(vertex_mesh.GetNode(4)->IsBoundaryNode());
-        TS_ASSERT(vertex_mesh.GetNode(5)->IsBoundaryNode());
-        TS_ASSERT(!vertex_mesh.GetNode(6)->IsBoundaryNode());
-        TS_ASSERT(vertex_mesh.GetNode(7)->IsBoundaryNode());
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(0)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(1)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(2)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(3)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(4)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(5)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(6)->IsBoundaryNode(), false);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(7)->IsBoundaryNode(), true);
 
         // Test ownership of the new nodes
         std::set<unsigned> expected_elements_containing_node_6;

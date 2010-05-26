@@ -1521,7 +1521,7 @@ public:
         TS_ASSERT_DELTA(mesh.GetNode(4)->rGetLocation()[1], 0.0, 1e-8);
     }
 
-    //\TODO include boundary nodes in the tests
+    ///\todo include boundary nodes in the tests
     void TestDivideEdge()
     {
         /*

@@ -125,12 +125,12 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNode(12)->rGetContainingElementIndices(), temp_list);
 
         // The bottom row of nodes should be boundary nodes
-        TS_ASSERT(p_mesh->GetNode(0)->IsBoundaryNode());
-        TS_ASSERT(p_mesh->GetNode(1)->IsBoundaryNode());
-        TS_ASSERT(p_mesh->GetNode(2)->IsBoundaryNode());
-        TS_ASSERT(p_mesh->GetNode(3)->IsBoundaryNode());
+        TS_ASSERT_EQUALS(p_mesh->GetNode(0)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(p_mesh->GetNode(1)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(p_mesh->GetNode(2)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(p_mesh->GetNode(3)->IsBoundaryNode(), true);
 
-        // \TODO Also test the rest of the nodes for boundary
+        ///\todo Also test the rest of the nodes for boundary
     }
 
     void TestCylindrical2dVertexMeshGenerator()
@@ -168,11 +168,11 @@ public:
         TS_ASSERT_EQUALS(p_flat_cylindrical_mesh->GetNumNodes(), 36u);
 
         // The bottom row of nodes should be boundary nodes
-        TS_ASSERT(p_flat_cylindrical_mesh->GetNode(0)->IsBoundaryNode());
-        TS_ASSERT(p_flat_cylindrical_mesh->GetNode(1)->IsBoundaryNode());
-        TS_ASSERT(p_flat_cylindrical_mesh->GetNode(2)->IsBoundaryNode());
-        TS_ASSERT(p_flat_cylindrical_mesh->GetNode(3)->IsBoundaryNode());
-        TS_ASSERT(!p_flat_cylindrical_mesh->GetNode(4)->IsBoundaryNode());
+        TS_ASSERT_EQUALS(p_flat_cylindrical_mesh->GetNode(0)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(p_flat_cylindrical_mesh->GetNode(1)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(p_flat_cylindrical_mesh->GetNode(2)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(p_flat_cylindrical_mesh->GetNode(3)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(p_flat_cylindrical_mesh->GetNode(4)->IsBoundaryNode(), false);
 
         // Create a vertex mesh writer with cylindrical mesh
         VertexMeshWriter<2,2> vertex_mesh_writer_2("TestFlatCylindrical2dVertexMesh", "flat_cylindrical_vertex_mesh");
