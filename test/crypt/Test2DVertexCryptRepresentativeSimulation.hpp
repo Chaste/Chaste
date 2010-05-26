@@ -74,7 +74,7 @@ public:
                                     + TissueConfig::Instance()->GetSG2MDuration() );
 
             SimpleWntCellCycleModel* p_model = new SimpleWntCellCycleModel;
-            p_temp->SetDimension(2);
+            p_model->SetDimension(2);
             p_model->SetCellProliferativeType(TRANSIT);
 
             TissueCell cell(p_state, p_model);
