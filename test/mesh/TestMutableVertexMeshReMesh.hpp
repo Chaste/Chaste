@@ -2808,6 +2808,132 @@ public:
         TS_ASSERT_THROWS_THIS(vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(6), vertex_mesh.GetNode(7), map_2),
                               "Triangular element next to triangular void, not implemented yet.");
     }
+
+    void TestT3SwapWithConcaveElements()
+   	{
+   		/*
+   		 * Make a small mesh consisting of 2 elements:
+   		 * a rectangle sat upon an l shape (so concave)
+   		 *     ______       _______
+   		 *    |____|/      |_ _ | /
+   		 *    | |____  --> | |_\|/_
+   		 *    |______|     |_______|
+   		 *
+   		 */
+
+   		// Make all nodes boundary nodes
+   		std::vector<Node<2>*> nodes;
+   		nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+   		nodes.push_back(new Node<2>(1, true, 2.0, 0.0));
+   		nodes.push_back(new Node<2>(2, true, 2.0, 1.0));
+   		nodes.push_back(new Node<2>(3, true, 1.0, 1.0));
+   		nodes.push_back(new Node<2>(4, true, 1.0, 2.0));
+   		nodes.push_back(new Node<2>(5, true, 0.0, 2.0));
+   		nodes.push_back(new Node<2>(6, true, 2.0, 2.0));
+   		nodes.push_back(new Node<2>(7, true, 2.0, 3.0));
+   		nodes.push_back(new Node<2>(8, true, 0.0, 3.0));
+   		nodes.push_back(new Node<2>(9, true, 3.0, 3.0));
+
+   		std::vector<Node<2>*> nodes_in_element0;
+   		nodes_in_element0.push_back(nodes[0]);
+   		nodes_in_element0.push_back(nodes[1]);
+   		nodes_in_element0.push_back(nodes[2]);
+   		nodes_in_element0.push_back(nodes[3]);
+   		nodes_in_element0.push_back(nodes[4]);
+   		nodes_in_element0.push_back(nodes[5]);
+
+   		std::vector<Node<2>*> nodes_in_element1;
+   		nodes_in_element1.push_back(nodes[5]);
+   		nodes_in_element1.push_back(nodes[4]);
+   		nodes_in_element1.push_back(nodes[6]);
+   		nodes_in_element1.push_back(nodes[7]);
+   		nodes_in_element1.push_back(nodes[8]);
+
+   		std::vector<Node<2>*> nodes_in_element2;
+   		nodes_in_element2.push_back(nodes[7]);
+   		nodes_in_element2.push_back(nodes[6]);
+   		nodes_in_element2.push_back(nodes[9]);
+
+   		// Make elements
+   		std::vector<VertexElement<2,2>*> elements;
+   		elements.push_back(new VertexElement<2,2>(0, nodes_in_element0));
+   		elements.push_back(new VertexElement<2,2>(1, nodes_in_element1));
+   		elements.push_back(new VertexElement<2,2>(2, nodes_in_element2));
+
+   		// Make mesh
+   		MutableVertexMesh<2,2> mesh(nodes, elements);
+   		mesh.SetCellRearrangementThreshold(0.1*1.0/1.5);// Threshold distance set to ease calculations.
+
+   		// Move node 6  so that it overlaps element 0
+   		ChastePoint<2> point = mesh.GetNode(6)->GetPoint();
+   		point.SetCoordinate(0u, 1.5);
+   		point.SetCoordinate(1u, 0.9);
+   		mesh.SetNode(6, point);
+
+   		TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[0], 1.5, 1e-4);
+   		TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[1], 0.9, 1e-4);
+
+   		TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(mesh.GetNode(6)->rGetLocation(), 0), true);
+   		TS_ASSERT_EQUALS(mesh.GetLocalIndexForElementEdgeClosestToPoint(mesh.GetNode(6)->rGetLocation(), 0), 2u);
+
+   		// Call method to update mesh in this situation
+   		mesh.ReMesh();//MoveOverlappingNodeOntoEdgeOfElement(mesh.GetNode(6), 0);
+
+   		// Check that node 6 has been moved onto the edge a new node has been created and both added to elements 0 and 1
+   		TS_ASSERT_EQUALS(mesh.GetNumElements(), 3u);
+   		TS_ASSERT_EQUALS(mesh.GetNumNodes(), 12u);
+
+
+   		// Test locations of moved and new nodes (10 and 11 are the next free node when 6 is merged)
+   		TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[0], 1.5, 1e-4);
+   		TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[1], 1.0, 1e-4);
+   		TS_ASSERT_DELTA(mesh.GetNode(10)->rGetLocation()[0], 1.6, 1e-4);
+   		TS_ASSERT_DELTA(mesh.GetNode(10)->rGetLocation()[1], 1.0, 1e-4);
+   		TS_ASSERT_DELTA(mesh.GetNode(11)->rGetLocation()[0], 1.4, 1e-4);
+   		TS_ASSERT_DELTA(mesh.GetNode(11)->rGetLocation()[1], 1.0, 1e-4);
+
+
+   		// Test elements have correct nodes
+   		TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNumNodes(), 9u);
+   		TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(0), 0u);
+   		TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(1), 1u);
+   		TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(2), 2u);
+   		TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(3), 10u);
+   		TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(4), 6u);
+   		TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(5), 11u);
+   		TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(6), 3u);
+   		TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(7), 4u);
+   		TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(8), 5u);
+
+
+   		TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNumNodes(), 6u);
+   		TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(0), 5u);
+   		TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(1), 4u);
+   		TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(2), 11u);
+   		TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(3), 6u);
+   		TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(4), 7u);
+   		TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(5), 8u);
+
+   		TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNumNodes(), 4u);
+   		TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNodeGlobalIndex(0), 7u);
+   		TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNodeGlobalIndex(1), 6u);
+   		TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNodeGlobalIndex(2), 10u);
+   		TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNodeGlobalIndex(3), 9u);
+
+
+
+   		// Test boundary property of nodes. All are boundary nodes.
+   		for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+   		{
+   			bool expected_boundary_node = true;
+			if (i==6)
+			{
+				expected_boundary_node = false;
+			}
+			TS_ASSERT_EQUALS(mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
+   		}
+   	}
+
 };
 
 #endif /*TESTMUTABLEVERTEXMESHREMESH_HPP_*/
