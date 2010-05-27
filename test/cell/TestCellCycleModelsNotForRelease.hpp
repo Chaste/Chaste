@@ -184,6 +184,7 @@ public:
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(2.0, 4);
 
             StochasticDivisionRuleCellCycleModel model(true);
+            model.SetCellProliferativeType(STEM);
 
             p_simulation_time->IncrementTimeOneStep();
 
@@ -214,6 +215,7 @@ public:
 
             // Check that archiving worked correctly
             TS_ASSERT_EQUALS(model.GetCurrentCellCyclePhase(), M_PHASE);
+            TS_ASSERT_EQUALS(model.GetCellProliferativeType(), STEM);
             TS_ASSERT_EQUALS(model.DividedSymmetrically(), true);
 
             TS_ASSERT_DELTA(model.GetBirthTime(), -1.0, 1e-12);
