@@ -343,6 +343,44 @@ public:
         delete p_replaced_vertex_element;
     }
 
+    void TestDeletingNodes() throw (Exception)
+	{
+		// Make a simple vertex mesh
+		std::vector<Node<2>*> nodes;
+		nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+		nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
+		nodes.push_back(new Node<2>(2, false, 1.5, 1.0));
+		nodes.push_back(new Node<2>(3, false, 1.0, 2.0));
+		nodes.push_back(new Node<2>(4, false, 0.0, 1.0));
+		nodes.push_back(new Node<2>(5, false, 2.0, 0.0));
+		nodes.push_back(new Node<2>(6, false, 2.0, 3.0));
+
+		std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
+		nodes_elem_0.push_back(nodes[0]);
+		nodes_elem_0.push_back(nodes[1]);
+		nodes_elem_0.push_back(nodes[2]);
+		nodes_elem_0.push_back(nodes[3]);
+		nodes_elem_0.push_back(nodes[4]);
+
+		nodes_elem_1.push_back(nodes[2]);
+		nodes_elem_1.push_back(nodes[5]);
+		nodes_elem_1.push_back(nodes[6]);
+
+		std::vector<VertexElement<2,2>*> elements;
+		elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
+		elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
+
+		MutableVertexMesh<2,2> mesh(nodes, elements);
+
+		TS_ASSERT_EQUALS(mesh.GetNumNodes(), 7u);
+		TS_ASSERT_EQUALS(mesh.GetNumElements(), 2u);
+
+		mesh.DeleteElementPriorToReMesh(0);
+
+		TS_ASSERT_EQUALS(mesh.GetNumNodes(), 3u);
+		TS_ASSERT_EQUALS(mesh.GetNumElements(), 1u);
+	}
+
     void TestDivideVertexElementGivenNodes() throw(Exception)
     {
         // Make four nodes
