@@ -46,7 +46,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "WildTypeCellMutationState.hpp"
 
 /**
- * Simple cell killer which at the fisrt timestep kills any cell
+ * Simple cell killer which at the first timestep kills any cell
  * whose corresponding location index is a given number.
  *
  * For testing purposes.
@@ -316,6 +316,65 @@ public:
         TS_ASSERT_EQUALS(new_num_cells, old_num_cells+1);
     }
 
+    void noTestVertexMonolayerWithVoid() throw (Exception)
+    {
+        // Create a simple 2D MutableVertexMesh
+        HoneycombMutableVertexMeshGenerator generator(3, 3);
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
+
+        // create a hole in the mesh
+        p_mesh->DeleteElementPriorToReMesh(0);
+        p_mesh->DeleteElementPriorToReMesh(4);
+        p_mesh->DeleteElementPriorToReMesh(6);
+
+        p_mesh->ReMesh();
+
+        // Set up cells, one for each VertexElement. Give each cell
+        // a birth time of -elem_index-19, so its age is elem_index+19, so the first cell divides straight away.
+        std::vector<TissueCell> cells;
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
+        {
+        	FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            p_model->SetCellProliferativeType(STEM);
+
+            TissueCell cell(p_state, p_model);
+            double birth_time;
+            birth_time = -(double)elem_index -19.0;
+            cell.SetBirthTime(birth_time);
+            cells.push_back(cell);
+        }
+
+        // Create tissue
+        VertexBasedTissue<2> tissue(*p_mesh, cells);
+
+        // Create a force system
+        NagaiHondaForce<2> force;
+        std::vector<AbstractForce<2>* > force_collection;
+        force_collection.push_back(&force);
+
+        // Set up tissue simulation
+        TissueSimulation<2> simulator(tissue, force_collection);
+        simulator.SetOutputDirectory("TestVertexMonolayerWithVoid");
+        simulator.SetEndTime(30.0);
+
+        ////////////////////////////////////////////
+        /// Strange setup to speed up simulation ///
+        ////////////////////////////////////////////
+        p_mesh->SetCellRearrangementThreshold(0.05);
+        simulator.SetDt(0.1);
+        ////////////////////////////////////////////
+
+        // Run simulation
+        simulator.Solve();
+
+        // Check that void has been removed and vertices are in the correct position
+        TS_ASSERT_EQUALS(simulator.rGetTissue().GetNumNodes(),82u);
+        TS_ASSERT_EQUALS((static_cast<VertexBasedTissue<2>*>(&(simulator.rGetTissue())))->GetNumElements(),36u);
+        TS_ASSERT_EQUALS(simulator.rGetTissue().GetNumRealCells(),36u);
+
+    }
+
     void TestVertexMonolayerWithCellDeath() throw (Exception)
     {
         /*
@@ -451,6 +510,80 @@ public:
         TS_ASSERT_DELTA(tissue.rGetMesh().GetVolumeOfElement(0), 0.0068, 1e-4);
         TS_ASSERT_DELTA(tissue.rGetMesh().GetSurfaceAreaOfElement(0), 0.3783, 1e-3);
     }
+
+
+    /*
+     * This test is to stress test the vertex simulations by creating a massive monolayer,
+     * it would also be useful for benchmarking.
+     *
+     * In order to work the mesh archiving must support boundary nodes, see #1076
+     */
+    void noTestVertexStressTest() throw (Exception)
+    {
+        double start_time=0.0;
+    	double end_time=100.0;
+        std::string output_directory = "StressTestVertex";
+
+    	// Create a simple 2D MutableVertexMesh
+        HoneycombMutableVertexMeshGenerator generator(3, 3);
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
+
+        // Set up cells, one for each VertexElement. Give each cell
+        // a birth time of -elem_index, so its age is elem_index
+        std::vector<TissueCell> cells;
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
+        {
+			StochasticDurationGenerationBasedCellCycleModel* p_model = new StochasticDurationGenerationBasedCellCycleModel();
+			p_model->SetCellProliferativeType(STEM);
+
+			TissueCell cell(p_state, p_model);
+			double birth_time = -(double)elem_index;
+			cell.SetBirthTime(birth_time);
+			cells.push_back(cell);
+		}
+
+        // Create tissue
+        VertexBasedTissue<2> tissue(*p_mesh, cells);
+
+        // Create a force system
+        NagaiHondaForce<2> force;
+        std::vector<AbstractForce<2>* > force_collection;
+        force_collection.push_back(&force);
+
+        // Set up tissue simulation
+        TissueSimulation<2> simulator(tissue, force_collection);
+
+        simulator.SetOutputDirectory(output_directory);
+        simulator.SetSamplingTimestepMultiple(50);
+
+        simulator.SetEndTime(end_time);
+
+        // Run simulation
+        simulator.Solve();
+
+        //archive now and then reload
+
+        // Save simulation in steady state
+        TissueSimulationArchiver<2, TissueSimulation<2> >::Save(&simulator);
+
+        //Now save and reload to find where it breaks!
+        for (int i=0; i<40; i++)
+        {
+        	start_time = end_time;
+        	end_time = end_time + 10.0;
+
+        	TissueSimulation<2>* p_simulator = TissueSimulationArchiver<2, TissueSimulation<2> >::Load(output_directory,start_time);
+			p_simulator->SetDt(0.002);
+			p_simulator->SetSamplingTimestepMultiple(50);
+			p_simulator->SetEndTime(end_time);
+			p_simulator->Solve();
+
+			TissueSimulationArchiver<2, TissueSimulation<2> >::Save(p_simulator);
+			delete p_simulator;
+        }
+    }
+
 
     /**
      * Test archiving of a TissueSimulation that uses a VertexBasedTissue.

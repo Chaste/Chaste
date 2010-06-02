@@ -158,7 +158,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNumElements() const
     return this->mElements.size() - mDeletedElementIndices.size();
 }
 
-//\todo deal with boundary elements in vertex meshes.
+//\todo deal with boundary elements in vertex meshes #1392.
 //template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 //unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNumBoundaryElements() const
 //{
@@ -215,7 +215,8 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement, c_vector<double, SPACE_DIM> axisOfDivision,
                                                                                 bool placeOriginalElementBelow)
 {
-    // Make sure that we are in the correct dimension - this code will be eliminated at compile time
+
+	// Make sure that we are in the correct dimension - this code will be eliminated at compile time
     assert(SPACE_DIM == 2); // only works in 2D at present
     assert(ELEMENT_DIM == SPACE_DIM);
 
@@ -274,38 +275,50 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
 
         c_vector<double, SPACE_DIM> position_a = p_node_A->rGetLocation();
         c_vector<double, SPACE_DIM> position_b = p_node_B->rGetLocation();
-
         c_vector<double, SPACE_DIM> a_to_b = GetVectorFromAtoB(position_a, position_b);
 
-        // Find the location of the intersection
-        double determinant = a_to_b[0]*axisOfDivision[1] - a_to_b[1]*axisOfDivision[0];
 
-        c_vector<double, SPACE_DIM> moved_centroid = position_a + GetVectorFromAtoB(position_a, centroid); // allow for periodicity
+        c_vector<double, SPACE_DIM> intersection;
 
-        double alpha = (moved_centroid[0]*a_to_b[1] - position_a[0]*a_to_b[1]
-                        -moved_centroid[1]*a_to_b[0] + position_a[1]*a_to_b[0])/determinant;
-
-        c_vector<double, SPACE_DIM> intersection = moved_centroid + alpha*axisOfDivision;
-
-        /*
-         * If then new node is too close to one of the edge nodes, then reposition it
-         * a distance mCellRearrangementRatio*mCellRearrangementThreshold further along the edge.
-         */
-        c_vector<double, SPACE_DIM> a_to_intersection = this->GetVectorFromAtoB(position_a, intersection);
-        if (norm_2(a_to_intersection) < mCellRearrangementThreshold)
+        if (norm_2(a_to_b)< 2.0*mCellRearrangementRatio*mCellRearrangementThreshold)
         {
-            intersection = position_a + mCellRearrangementRatio*mCellRearrangementThreshold*a_to_b/norm_2(a_to_b);
+        	// should be a warning see #1394
+        	//TRACE("Edge is too small for normal division, putting node in the middle of a and b, there may be T1Swaps straight away.") // \TODO or should we move a and b apart, it may interfere with neighboring edges?
+        	intersection = position_a + 0.5*a_to_b;
+        }
+        else
+        {
+            // Find the location of the intersection
+            double determinant = a_to_b[0]*axisOfDivision[1] - a_to_b[1]*axisOfDivision[0];
+
+            c_vector<double, SPACE_DIM> moved_centroid = position_a + GetVectorFromAtoB(position_a, centroid); // allow for periodicity and other metrics
+
+            double alpha = (moved_centroid[0]*a_to_b[1] - position_a[0]*a_to_b[1]
+                            -moved_centroid[1]*a_to_b[0] + position_a[1]*a_to_b[0])/determinant;
+
+            intersection = moved_centroid + alpha*axisOfDivision;
+
+        	/*
+			 * If then new node is too close to one of the edge nodes, then reposition it
+			 * a distance mCellRearrangementRatio*mCellRearrangementThreshold further along the edge.
+			 */
+			c_vector<double, SPACE_DIM> a_to_intersection = this->GetVectorFromAtoB(position_a, intersection);
+			if (norm_2(a_to_intersection) < mCellRearrangementThreshold)
+			{
+				intersection = position_a + mCellRearrangementRatio*mCellRearrangementThreshold*a_to_b/norm_2(a_to_b);
+			}
+
+			c_vector<double, SPACE_DIM> b_to_intersection = this->GetVectorFromAtoB(position_b, intersection);
+			if (norm_2(b_to_intersection) < mCellRearrangementThreshold)
+			{
+				assert(norm_2(a_to_intersection) > mCellRearrangementThreshold); // to prevent moving intersection back to original position
+
+				intersection = position_b - mCellRearrangementRatio*mCellRearrangementThreshold*a_to_b/norm_2(a_to_b);
+			}
         }
 
-        c_vector<double, SPACE_DIM> b_to_intersection = this->GetVectorFromAtoB(position_b, intersection);
-        if (norm_2(b_to_intersection) < mCellRearrangementThreshold)
-        {
-            intersection = position_b - mCellRearrangementRatio*mCellRearrangementThreshold*a_to_b/norm_2(a_to_b);
-        }
-
-
         /*
-         * The new node is boundary node if the 2 nodes are bounary nodes and the elements dont look like
+         * The new node is boundary node if the 2 nodes are boundary nodes and the elements don't look like
          *   ___A___
          *  |   |   |
          *  |___|___|
@@ -363,7 +376,6 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
         }
         // Store index of new node
         division_node_global_indices.push_back(new_node_global_index);
-
     }
 
     // Now call DivideElement() to divide the element using the new nodes
@@ -669,7 +681,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodes()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElementMap)
 {
-    // Make sure that we are in the correct dimension - this code will be eliminated at compile time
+	// Make sure that we are in the correct dimension - this code will be eliminated at compile time
     assert(SPACE_DIM==2 || SPACE_DIM==3);
     assert(ELEMENT_DIM == SPACE_DIM);
 
@@ -1292,7 +1304,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
                                                               Node<SPACE_DIM>* pNodeB,
                                                               std::set<unsigned>& rElementsContainingNodes)
 {
-    // Make sure that we are in the correct dimension - this code will be eliminated at compile time
+	// Make sure that we are in the correct dimension - this code will be eliminated at compile time
     assert(SPACE_DIM == 2); // only works in 2D at present
     assert(ELEMENT_DIM == SPACE_DIM);
 
@@ -1333,6 +1345,31 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
     std::set<unsigned> nodeA_elem_indices = pNodeA->rGetContainingElementIndices();
     std::set<unsigned> nodeB_elem_indices = pNodeB->rGetContainingElementIndices();
 
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//for (std::set<unsigned>::const_iterator elem_iter = rElementsContainingNodes.begin();
+//	 elem_iter != rElementsContainingNodes.end();
+//	 elem_iter++)
+//
+//{
+//	TRACE("Containing element");
+//
+//	VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element_intersection = this->GetElement(*elem_iter);
+//	PRINT_VARIABLE(p_element_intersection->GetIndex());
+//
+//	for (unsigned node_index = 0;
+//		 node_index < p_element_intersection->GetNumNodes();
+//		 node_index++)
+//	{
+//		PRINT_3_VARIABLES(p_element_intersection->GetNodeGlobalIndex(node_index),
+//						  p_element_intersection->GetNode(node_index)->IsBoundaryNode(),
+//						  p_element_intersection->GetNodeLocation(node_index));
+//	}
+//}
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
     double distance_between_nodes_CD = mCellRearrangementRatio*mCellRearrangementThreshold;
 
     c_vector<double, SPACE_DIM> nodeA_location = pNodeA->rGetLocation();
@@ -1342,6 +1379,11 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
     c_vector<double, SPACE_DIM> perpendicular_vector;
     perpendicular_vector(0) = -a_to_b(1);
     perpendicular_vector(1) = a_to_b(0);
+
+    if(norm_2(a_to_b)<1e-10) //\TODO this is a magic number think of something better.
+    {
+    	EXCEPTION("Nodes are too close together, this shouldn't happen");
+    }
 
     c_vector<double, SPACE_DIM> c_to_d = distance_between_nodes_CD / norm_2(a_to_b) * perpendicular_vector;
     c_vector<double, SPACE_DIM> nodeC_location = nodeA_location + 0.5*a_to_b - 0.5*c_to_d;
@@ -1458,7 +1500,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEMENT_DIM,SPACE_DIM>& rElement)
 {
-   // Make sure that we are in the correct dimension - this code will be eliminated at compile time
+	// Make sure that we are in the correct dimension - this code will be eliminated at compile time
     assert(SPACE_DIM == 2); // only works in 2D at present
     assert(ELEMENT_DIM == SPACE_DIM);
 
@@ -1574,15 +1616,58 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = this->GetElement(elementIndex);
     unsigned num_nodes = p_element->GetNumNodes();
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//    TRACE("intersecting node");
+//    PRINT_2_VARIABLES(pNode->GetIndex(),node_location);
+//
+//
+//	for (std::set<unsigned>::const_iterator elem_iter = elements_containing_intersecting_node.begin();
+//		 elem_iter != elements_containing_intersecting_node.end();
+//		 elem_iter++)
+//
+//	{
+//		TRACE("intersecting element");
+//
+//		VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element_intersection = this->GetElement(*elem_iter);
+//		PRINT_VARIABLE(p_element_intersection->GetIndex());
+//
+//		for (unsigned node_index = 0;
+//			 node_index < p_element_intersection->GetNumNodes();
+//			 node_index++)
+//		{
+//			PRINT_3_VARIABLES(p_element_intersection->GetNodeGlobalIndex(node_index),
+//							  p_element_intersection->GetNode(node_index)->IsBoundaryNode(),
+//							  p_element_intersection->GetNodeLocation(node_index));
+//		}
+//	}
+//	TRACE("intersected element");
+//	PRINT_VARIABLE(p_element->GetIndex());
+//	for (unsigned node_index = 0;
+//		 node_index < p_element->GetNumNodes();
+//		 node_index++)
+//	{
+//		PRINT_3_VARIABLES(p_element->GetNodeGlobalIndex(node_index),
+//						  p_element->GetNode(node_index)->IsBoundaryNode(),
+//						  p_element->GetNodeLocation(node_index));
+//	}
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
     /*
      * Get the nodes at either end of the edge to be divided
      */
     unsigned vertexA_index = p_element->GetNodeGlobalIndex(node_A_local_index);
     unsigned vertexB_index = p_element->GetNodeGlobalIndex((node_A_local_index+1)%num_nodes);
 
-    // Check these nodes are also boundary nodes
-    assert(this->mNodes[vertexA_index]->IsBoundaryNode());
-    assert(this->mNodes[vertexB_index]->IsBoundaryNode());
+    // Check these nodes are also boundary nodes if this fails then the elements have become concave and you need a smaller timestep
+    if (!this->mNodes[vertexA_index]->IsBoundaryNode() || !this->mNodes[vertexB_index]->IsBoundaryNode())
+    {
+    	EXCEPTION("A boundary node has intersected a non boundary edge, this is because the boundary element has become concave you need to rerun the simulation with a smaller timestep to prevent this.");
+    }
 
     /*
      * Get the nodes at either end of the edge to be divided and calculate intersection
@@ -1595,7 +1680,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
 
     if (norm_2(vector_a_to_b) < 2.0*mCellRearrangementRatio*mCellRearrangementRatio*mCellRearrangementThreshold)
     {
-        //EXCEPTION("Trying to merge a node onto an edge which is too small."); //\todo this needs more testing
+        // This should be a warning see #1394
+    	//EXCEPTION("Trying to merge a node onto an edge which is too small."); //\todo this needs more testing
         c_vector<double, SPACE_DIM> centre_a_and_b = 0.5*vertexA + 0.5*vertexB; //\TODO check this works for cylindrical
 
         c_vector<double, SPACE_DIM> new_vertexA =  centre_a_and_b  - mCellRearrangementRatio*mCellRearrangementRatio*mCellRearrangementThreshold*vector_a_to_b/norm_2(vector_a_to_b);
@@ -1622,7 +1708,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
 
     if (pNode->GetNumContainingElements() == 1)
     {
-        // Get the index of the element containing the intersecting node
+    	// Get the index of the element containing the intersecting node
         unsigned intersecting_element_index = *elements_containing_intersecting_node.begin();
 
         // Get element
@@ -1772,7 +1858,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
     }
     else if (pNode->GetNumContainingElements() == 2)
     {
-
 		// Find the nodes contained in elements containing the intersecting node
         std::set<unsigned>::const_iterator it = elements_containing_intersecting_node.begin();
         VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element_intersection_1 = this->GetElement(*it);
@@ -1790,7 +1875,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
         if ((next_node_1 == vertexA_index || previous_node_1 == vertexA_index || next_node_2 == vertexA_index || previous_node_2 == vertexA_index) &&
        		(next_node_1 == vertexB_index || previous_node_1 == vertexB_index || next_node_2 == vertexB_index || previous_node_2 == vertexB_index))
         {
-
         	/*
         	 * Here we have
         	 *        __
@@ -1917,7 +2001,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
 
 						p_element_intersection_2->AddNode((local_index_2 + p_element_intersection_2->GetNumNodes() - 1)%(p_element_intersection_2->GetNumNodes()), this->mNodes[new_node_global_index]);
 					}
-
 
 					// Check the nodes are updated correctly
 					assert(pNode->GetNumContainingElements() == 3);
@@ -2120,7 +2203,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
 					NEVER_REACHED;
 				}
 			}
-
 			else
 			{
 				/*
