@@ -842,11 +842,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
 
                         if (p_current_node->IsBoundaryNode())
                         {
-                        	if (recheck_mesh)
-							{
-								break; //to break out of node loop
-							}
-
                         	for (typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator other_iter = this->GetElementIteratorBegin();
                                  other_iter != this->GetElementIteratorEnd();
                                  ++other_iter)
@@ -1345,31 +1340,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
     std::set<unsigned> nodeA_elem_indices = pNodeA->rGetContainingElementIndices();
     std::set<unsigned> nodeB_elem_indices = pNodeB->rGetContainingElementIndices();
 
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//for (std::set<unsigned>::const_iterator elem_iter = rElementsContainingNodes.begin();
-//	 elem_iter != rElementsContainingNodes.end();
-//	 elem_iter++)
-//
-//{
-//	TRACE("Containing element");
-//
-//	VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element_intersection = this->GetElement(*elem_iter);
-//	PRINT_VARIABLE(p_element_intersection->GetIndex());
-//
-//	for (unsigned node_index = 0;
-//		 node_index < p_element_intersection->GetNumNodes();
-//		 node_index++)
-//	{
-//		PRINT_3_VARIABLES(p_element_intersection->GetNodeGlobalIndex(node_index),
-//						  p_element_intersection->GetNode(node_index)->IsBoundaryNode(),
-//						  p_element_intersection->GetNodeLocation(node_index));
-//	}
-//}
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
     double distance_between_nodes_CD = mCellRearrangementRatio*mCellRearrangementThreshold;
 
     c_vector<double, SPACE_DIM> nodeA_location = pNodeA->rGetLocation();
@@ -1666,7 +1636,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
     // Check these nodes are also boundary nodes if this fails then the elements have become concave and you need a smaller timestep
     if (!this->mNodes[vertexA_index]->IsBoundaryNode() || !this->mNodes[vertexB_index]->IsBoundaryNode())
     {
-    	EXCEPTION("A boundary node has intersected a non boundary edge, this is because the boundary element has become concave you need to rerun the simulation with a smaller timestep to prevent this.");
+    	EXCEPTION("A boundary node has intersected a non boundary edge, this is because the boundary element has become concave you need to rerun the simulation with a smaller time step to prevent this.");
     }
 
     /*
@@ -1678,32 +1648,53 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
 
     c_vector<double, SPACE_DIM> vector_a_to_b = this->GetVectorFromAtoB(vertexA, vertexB);
 
-    if (norm_2(vector_a_to_b) < 2.0*mCellRearrangementRatio*mCellRearrangementRatio*mCellRearrangementThreshold)
-    {
-        // This should be a warning see #1394
-    	//EXCEPTION("Trying to merge a node onto an edge which is too small."); //\todo this needs more testing
-        c_vector<double, SPACE_DIM> centre_a_and_b = 0.5*vertexA + 0.5*vertexB; //\TODO check this works for cylindrical
-
-        c_vector<double, SPACE_DIM> new_vertexA =  centre_a_and_b  - mCellRearrangementRatio*mCellRearrangementRatio*mCellRearrangementThreshold*vector_a_to_b/norm_2(vector_a_to_b);
-		c_vector<double, SPACE_DIM> new_vertexB =  centre_a_and_b  + mCellRearrangementRatio*mCellRearrangementRatio*mCellRearrangementThreshold*vector_a_to_b/norm_2(vector_a_to_b);
-    }
 
     c_vector<double, SPACE_DIM> edge_ab_unit_vector = vector_a_to_b/norm_2(vector_a_to_b);
     c_vector<double, SPACE_DIM> intersection = vertexA + edge_ab_unit_vector*inner_prod(vector_a_to_point, edge_ab_unit_vector);
+
+    /*
+     * If the edge is shorter than 4.0*mCellRearrangementRatio*mCellRearangementThreshold move vertexA and vertexB
+     * 4.0*mCellRearrangementRatio*mCellRearrangementThreshold apart. \TODO investigate if moving A and B causes other issues with nearby nodes.
+     *
+     * Note: this distance so that there is always enough room for new nodes (if necessary)
+     * \TODO currently this assumes a worst case scenario of 3 nodes between A and B could be less movement for other cases.
+     */
+    if (norm_2(vector_a_to_b) < 4.0*mCellRearrangementRatio*mCellRearrangementThreshold)
+    {
+        // This should be a warning see #1394
+       	//TRACE("Trying to merge a node onto an edge which is too small.");
+        c_vector<double, SPACE_DIM> centre_a_and_b = vertexA + 0.5*vector_a_to_b;
+
+        vertexA =  centre_a_and_b  - 2.0*mCellRearrangementRatio*mCellRearrangementThreshold*vector_a_to_b/norm_2(vector_a_to_b);
+        ChastePoint<SPACE_DIM> vertex_A_point(vertexA);
+        SetNode(p_element->GetNodeGlobalIndex(node_A_local_index), vertex_A_point);
+
+        vertexB =  centre_a_and_b  + 2.0*mCellRearrangementRatio*mCellRearrangementThreshold*vector_a_to_b/norm_2(vector_a_to_b);
+        ChastePoint<SPACE_DIM> vertex_B_point(vertexB);
+        SetNode(p_element->GetNodeGlobalIndex((node_A_local_index+1)%num_nodes), vertex_B_point);
+
+        // Reset distances
+        vector_a_to_b = this->GetVectorFromAtoB(vertexA, vertexB);
+        edge_ab_unit_vector = vector_a_to_b/norm_2(vector_a_to_b);
+
+        // reset the intersection to the middle to allow enough room for new nodes
+   	    intersection = centre_a_and_b;
+    }
 
     /*
      * If the intersection is within mCellRearrangementRatio^2*mCellRearangementThreshold of vertexA or vertexB move it
      * mCellRearrangementRatio^2*mCellRearrangementThreshold away.
      *
      * Note: this distance so that there is always enough room for new nodes (if necessary).
+     * \TODO currently this assumes a worst case scenario of 3 nodes between A and B could be less movement for other cases.
      */
-    if (norm_2(intersection - vertexA) < mCellRearrangementRatio*mCellRearrangementRatio*mCellRearrangementThreshold)
+    if (norm_2(intersection - vertexA) < 2.0*mCellRearrangementRatio*mCellRearrangementThreshold)
     {
-        intersection = vertexA + mCellRearrangementRatio*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
+        intersection = vertexA + 2.0*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
     }
-    if (norm_2(intersection - vertexB) < mCellRearrangementRatio*mCellRearrangementRatio*mCellRearrangementThreshold)
+    if (norm_2(intersection - vertexB) < 2.0*mCellRearrangementRatio*mCellRearrangementThreshold)
     {
-        intersection = vertexB - mCellRearrangementRatio*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
+        intersection = vertexB - 2.0*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
     }
 
     if (pNode->GetNumContainingElements() == 1)
