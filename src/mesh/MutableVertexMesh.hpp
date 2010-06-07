@@ -61,7 +61,7 @@ protected:
     /**
      * The ratio between the minimum distance apart that two nodes in the mesh can be without causing element
      * rearrangement and their separation after remeshing.
-     * 
+     *
      * \todo Set as a magic number in the constructor (#1406)
      */
     double mCellRearrangementRatio;
