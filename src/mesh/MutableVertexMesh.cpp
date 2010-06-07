@@ -37,7 +37,7 @@ MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::MutableVertexMesh(std::vector<Node<SP
                                                double edgeDivisionThreshold,
                                                double t2Threshold)
     : mCellRearrangementThreshold(cellRearrangementThreshold),
-      mCellRearrangementRatio(1.5),
+      mCellRearrangementRatio(1.5), ///\todo Magic number (#1406)
       mEdgeDivisionThreshold(edgeDivisionThreshold),
       mT2Threshold(t2Threshold)
 {
