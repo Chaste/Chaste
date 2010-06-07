@@ -64,7 +64,7 @@ private:
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(DIFFERENTIATED);
-    
+
             TissueCell cell(p_state, p_model);
             double birth_time = 0.0 - i;
             cell.SetBirthTime(birth_time);
@@ -472,7 +472,7 @@ public:
 
         TissueCell cell0 = tissue.rGetCellUsingLocationIndex(0);
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
-        
+
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         p_model->SetCellProliferativeType(STEM);
         TissueCell new_cell(p_state, p_model);
@@ -921,9 +921,7 @@ public:
     }
 
 
-    // At the moment the tissue cannot be properly archived since the mesh cannot be. This test
-    // just checks that the cells are correctly archived.
-    void TestArchivingVertexBasedTissue() throw(Exception)
+    void TestArchiving2dVertexBasedTissue() throw(Exception)
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "vertex_tissue.arch";
@@ -931,17 +929,17 @@ public:
         // is usually called by the method TissueSimulation::Load()
         ArchiveLocationInfo::SetMeshFilename("vertex_mesh");
 
+        // Create mesh
+        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/vertex_mesh");
+        MutableVertexMesh<2,2> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+
         // Archive tissue
         {
             // Need to set up time
             unsigned num_steps = 10;
             SimulationTime* p_simulation_time = SimulationTime::Instance();
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, num_steps+1);
-
-            // Create mesh
-            VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/vertex_mesh");
-            MutableVertexMesh<2,2> mesh;
-            mesh.ConstructFromMeshReader(mesh_reader);
 
             // Set up cells
             std::vector<TissueCell> cells = SetUpCells(mesh);
@@ -989,11 +987,14 @@ public:
             VertexBasedTissue<2>* p_tissue;
             (*p_arch) >> p_tissue;
 
+            // Check the tissue has been restored correctly
+            TS_ASSERT_EQUALS(p_tissue->rGetCells().size(), 2u);
+
             // Cells have been given birth times of 0, -1, -2, -3, -4.
             // this checks that individual cells and their models are archived.
             unsigned counter = 0;
-            for (AbstractTissue<2>::Iterator cell_iter=p_tissue->Begin();
-                 cell_iter!=p_tissue->End();
+            for (AbstractTissue<2>::Iterator cell_iter = p_tissue->Begin();
+                 cell_iter != p_tissue->End();
                  ++cell_iter)
             {
                 TS_ASSERT_DELTA(cell_iter->GetAge(), (double)(counter), 1e-7);
@@ -1003,8 +1004,45 @@ public:
             // Check the simulation time has been restored (through the cell)
             TS_ASSERT_EQUALS(p_simulation_time->GetTime(), 0.0);
 
-            // Check the tissue has been restored
-            TS_ASSERT_EQUALS(p_tissue->rGetCells().size(), 2u);
+            // Check the mesh has been restored correctly
+            TS_ASSERT_EQUALS(p_tissue->rGetMesh().GetNumNodes(), 7u);
+            TS_ASSERT_EQUALS(p_tissue->rGetMesh().GetNumElements(), 2u);
+            TS_ASSERT_EQUALS(p_tissue->rGetMesh().GetNumFaces(), 0u);
+
+            // Compare the loaded mesh against the original
+            MutableVertexMesh<2,2>& loaded_mesh = p_tissue->rGetMesh();
+
+            TS_ASSERT_EQUALS(mesh.GetNumNodes(), loaded_mesh.GetNumNodes());
+
+            for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
+            {
+                Node<2>* p_node = mesh.GetNode(node_index);
+                Node<2>* p_node2 = loaded_mesh.GetNode(node_index);
+
+                TS_ASSERT_EQUALS(p_node->IsDeleted(), p_node2->IsDeleted());
+                TS_ASSERT_EQUALS(p_node->GetIndex(), p_node2->GetIndex());
+
+                TS_ASSERT_EQUALS(p_node->IsBoundaryNode(), p_node2->IsBoundaryNode());
+
+                for (unsigned dimension=0; dimension<2; dimension++)
+                {
+                    TS_ASSERT_DELTA(p_node->rGetLocation()[dimension], p_node2->rGetLocation()[dimension], 1e-4);
+                }
+            }
+
+            TS_ASSERT_EQUALS(mesh.GetNumElements(), loaded_mesh.GetNumElements());
+
+            for (unsigned elem_index=0; elem_index < mesh.GetNumElements(); elem_index++)
+            {
+                TS_ASSERT_EQUALS(mesh.GetElement(elem_index)->GetNumNodes(),
+                                 loaded_mesh.GetElement(elem_index)->GetNumNodes());
+
+                for (unsigned local_index=0; local_index<mesh.GetElement(elem_index)->GetNumNodes(); local_index++)
+                {
+                    TS_ASSERT_EQUALS(mesh.GetElement(elem_index)->GetNodeGlobalIndex(local_index),
+                                     loaded_mesh.GetElement(elem_index)->GetNodeGlobalIndex(local_index));
+                }
+            }
 
             // Tidy up
             delete p_tissue;

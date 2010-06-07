@@ -264,13 +264,13 @@ void VertexBasedTissue<DIM>::UpdateNodeLocations(const std::vector< c_vector<dou
 
         /*
          * If this displacement is greater than the cell rearrangement threshold then this could
-		 * result in nodes appearing in the middle of other elements which would be bad. If this occurs
-		 * we restrict the motion to the cell rearrangement threshold and warn the user to use a smaller timesstep? see #1376
-		 */
+         * result in nodes appearing in the middle of other elements which would be bad. If this occurs
+         * we restrict the motion to the cell rearrangement threshold and warn the user to use a smaller timesstep? see #1376
+         */
         if (norm_2(displacement)>0.5*mrMesh.GetCellRearrangementThreshold())
         {
-		///\todo output warning to say to use a smaller time step TRACE("Use a smaller timestep") #1394
-        	//displacement *= 0.5*mrMesh.GetCellRearrangementThreshold()/norm_2(displacement);
+        ///\todo output warning to say to use a smaller time step TRACE("Use a smaller timestep") #1394
+            //displacement *= 0.5*mrMesh.GetCellRearrangementThreshold()/norm_2(displacement);
         }
 
         // Get new node location

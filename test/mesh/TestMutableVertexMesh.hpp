@@ -344,42 +344,42 @@ public:
     }
 
     void TestDeletingNodes() throw (Exception)
-	{
-		// Make a simple vertex mesh
-		std::vector<Node<2>*> nodes;
-		nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
-		nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
-		nodes.push_back(new Node<2>(2, false, 1.5, 1.0));
-		nodes.push_back(new Node<2>(3, false, 1.0, 2.0));
-		nodes.push_back(new Node<2>(4, false, 0.0, 1.0));
-		nodes.push_back(new Node<2>(5, false, 2.0, 0.0));
-		nodes.push_back(new Node<2>(6, false, 2.0, 3.0));
+    {
+        // Make a simple vertex mesh
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, false, 1.5, 1.0));
+        nodes.push_back(new Node<2>(3, false, 1.0, 2.0));
+        nodes.push_back(new Node<2>(4, false, 0.0, 1.0));
+        nodes.push_back(new Node<2>(5, false, 2.0, 0.0));
+        nodes.push_back(new Node<2>(6, false, 2.0, 3.0));
 
-		std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
-		nodes_elem_0.push_back(nodes[0]);
-		nodes_elem_0.push_back(nodes[1]);
-		nodes_elem_0.push_back(nodes[2]);
-		nodes_elem_0.push_back(nodes[3]);
-		nodes_elem_0.push_back(nodes[4]);
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
+        nodes_elem_0.push_back(nodes[0]);
+        nodes_elem_0.push_back(nodes[1]);
+        nodes_elem_0.push_back(nodes[2]);
+        nodes_elem_0.push_back(nodes[3]);
+        nodes_elem_0.push_back(nodes[4]);
 
-		nodes_elem_1.push_back(nodes[2]);
-		nodes_elem_1.push_back(nodes[5]);
-		nodes_elem_1.push_back(nodes[6]);
+        nodes_elem_1.push_back(nodes[2]);
+        nodes_elem_1.push_back(nodes[5]);
+        nodes_elem_1.push_back(nodes[6]);
 
-		std::vector<VertexElement<2,2>*> elements;
-		elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-		elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
+        std::vector<VertexElement<2,2>*> elements;
+        elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
+        elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
 
-		MutableVertexMesh<2,2> mesh(nodes, elements);
+        MutableVertexMesh<2,2> mesh(nodes, elements);
 
-		TS_ASSERT_EQUALS(mesh.GetNumNodes(), 7u);
-		TS_ASSERT_EQUALS(mesh.GetNumElements(), 2u);
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 7u);
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), 2u);
 
-		mesh.DeleteElementPriorToReMesh(0);
+        mesh.DeleteElementPriorToReMesh(0);
 
-		TS_ASSERT_EQUALS(mesh.GetNumNodes(), 3u);
-		TS_ASSERT_EQUALS(mesh.GetNumElements(), 1u);
-	}
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 3u);
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), 1u);
+    }
 
     void TestDivideVertexElementGivenNodes() throw(Exception)
     {
@@ -1119,86 +1119,86 @@ public:
     }
 
     void TestDivideVertexElementGivenAxisOfDivisionWithShortEdge() throw(Exception)
-	{
-		// Make five nodes, 0, 1 and 2 are boundary nodes
-		std::vector<Node<2>*> nodes;
-		nodes.push_back(new Node<2>(0, true, 1.0, -0.1));
-		nodes.push_back(new Node<2>(1, true, 1.0, 0.12));
-		nodes.push_back(new Node<2>(2, true, -1.0, 3.0));
-		nodes.push_back(new Node<2>(3, true, -1.0, -3.0));
+    {
+        // Make five nodes, 0, 1 and 2 are boundary nodes
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 1.0, -0.1));
+        nodes.push_back(new Node<2>(1, true, 1.0, 0.12));
+        nodes.push_back(new Node<2>(2, true, -1.0, 3.0));
+        nodes.push_back(new Node<2>(3, true, -1.0, -3.0));
 
-		// Make a rectangular element out of nodes 0,1,2,3
-		std::vector<Node<2>*> nodes_elem_0;
-		nodes_elem_0.push_back(nodes[0]);
-		nodes_elem_0.push_back(nodes[1]);
-		nodes_elem_0.push_back(nodes[2]);
-		nodes_elem_0.push_back(nodes[3]);
+        // Make a rectangular element out of nodes 0,1,2,3
+        std::vector<Node<2>*> nodes_elem_0;
+        nodes_elem_0.push_back(nodes[0]);
+        nodes_elem_0.push_back(nodes[1]);
+        nodes_elem_0.push_back(nodes[2]);
+        nodes_elem_0.push_back(nodes[3]);
 
-		std::vector<VertexElement<2,2>*> vertex_elements;
-		vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
+        std::vector<VertexElement<2,2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
 
-		// Make a vertex mesh
-		MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
-		vertex_mesh.SetCellRearrangementThreshold(0.09);// Threshold distance set to ease calculations.
+        // Make a vertex mesh
+        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        vertex_mesh.SetCellRearrangementThreshold(0.09);// Threshold distance set to ease calculations.
 
-		TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 1u);
-		TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 4u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 1u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 4u);
 
-		c_vector<double, 2> axis_of_division;
-		axis_of_division(0) = 1.0;
-		axis_of_division(1) = 0.0;
+        c_vector<double, 2> axis_of_division;
+        axis_of_division(0) = 1.0;
+        axis_of_division(1) = 0.0;
 
-		// Divide element 0 along given axis
-		unsigned new_element_index = vertex_mesh.DivideElementAlongGivenAxis(vertex_mesh.GetElement(0), axis_of_division, true);
+        // Divide element 0 along given axis
+        unsigned new_element_index = vertex_mesh.DivideElementAlongGivenAxis(vertex_mesh.GetElement(0), axis_of_division, true);
 
-		TS_ASSERT_EQUALS(new_element_index, vertex_mesh.GetNumElements()-1);
+        TS_ASSERT_EQUALS(new_element_index, vertex_mesh.GetNumElements()-1);
 
-		TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
-		TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
 
-		// Now test the position of new nodes 4 is at the midpoint of 0 and 1 as 0-1 is less than the threshold distance
-		TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 1.0, 1e-8);
-		TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[1], 0.01, 1e-8);
+        // Now test the position of new nodes 4 is at the midpoint of 0 and 1 as 0-1 is less than the threshold distance
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 1.0, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[1], 0.01, 1e-8);
 
-		TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], -1.0, 1e-8);
-		TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.00345123, 1e-8); // height of centroid of original element
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], -1.0, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.00345123, 1e-8); // height of centroid of original element
 
-		// Now test the nodes in each element
-		TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
-		TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 4u);
+        // Now test the nodes in each element
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 4u);
 
-		TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(0), 0u);
-		TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(1), 4u);
-		TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(2), 5u);
-		TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(3), 3u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(0), 0u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(1), 4u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(2), 5u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(3), 3u);
 
-		TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(0), 4u);
-		TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(1), 1u);
-		TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(2), 2u);
-		TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(3), 5u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(0), 4u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(1), 1u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(2), 2u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(3), 5u);
 
 
-		//Test boundary nodes updated
-		TS_ASSERT_EQUALS(vertex_mesh.GetNode(0)->IsBoundaryNode(), true);
-		TS_ASSERT_EQUALS(vertex_mesh.GetNode(1)->IsBoundaryNode(), true);
-		TS_ASSERT_EQUALS(vertex_mesh.GetNode(2)->IsBoundaryNode(), true);
-		TS_ASSERT_EQUALS(vertex_mesh.GetNode(3)->IsBoundaryNode(), true);
-		TS_ASSERT_EQUALS(vertex_mesh.GetNode(4)->IsBoundaryNode(), true);
-		TS_ASSERT_EQUALS(vertex_mesh.GetNode(5)->IsBoundaryNode(), true);
+        //Test boundary nodes updated
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(0)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(1)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(2)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(3)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(4)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(5)->IsBoundaryNode(), true);
 
-		// Test ownership of the new nodes
-		std::set<unsigned> expected_elements_containing_node_4;
-		expected_elements_containing_node_4.insert(0);
-		expected_elements_containing_node_4.insert(1);
+        // Test ownership of the new nodes
+        std::set<unsigned> expected_elements_containing_node_4;
+        expected_elements_containing_node_4.insert(0);
+        expected_elements_containing_node_4.insert(1);
 
-		TS_ASSERT_EQUALS(vertex_mesh.GetNode(4)->rGetContainingElementIndices(), expected_elements_containing_node_4);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(4)->rGetContainingElementIndices(), expected_elements_containing_node_4);
 
-		std::set<unsigned> expected_elements_containing_node_5;
-		expected_elements_containing_node_5.insert(0);
-		expected_elements_containing_node_5.insert(1);
+        std::set<unsigned> expected_elements_containing_node_5;
+        expected_elements_containing_node_5.insert(0);
+        expected_elements_containing_node_5.insert(1);
 
-		TS_ASSERT_EQUALS(vertex_mesh.GetNode(5)->rGetContainingElementIndices(), expected_elements_containing_node_5);
-	}
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(5)->rGetContainingElementIndices(), expected_elements_containing_node_5);
+    }
 
 };
 

@@ -852,7 +852,7 @@ public:
             boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(DIFFERENTIATED);
-    
+
             TissueCell cell(p_state, p_model);
             cell.SetBirthTime(-1.0);
             cells.push_back(cell);

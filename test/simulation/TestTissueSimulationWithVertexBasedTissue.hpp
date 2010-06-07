@@ -279,7 +279,7 @@ public:
 
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(cell_type);
-    
+
             TissueCell cell(p_state, p_model);
             cell.SetBirthTime(birth_time);
             cells.push_back(cell);
@@ -335,7 +335,7 @@ public:
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
-        	FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(STEM);
 
             TissueCell cell(p_state, p_model);
@@ -516,15 +516,15 @@ public:
      * This test is to stress test the vertex simulations by creating a massive monolayer,
      * it would also be useful for benchmarking.
      *
-     * In order to work the mesh archiving must support boundary nodes, see #1076
+     * \todo In order to work the mesh archiving must support boundary nodes, see #1076
      */
     void noTestVertexStressTest() throw (Exception)
     {
         double start_time=0.0;
-    	double end_time=100.0;
+        double end_time=100.0;
         std::string output_directory = "StressTestVertex";
 
-    	// Create a simple 2D MutableVertexMesh
+        // Create a simple 2D MutableVertexMesh
         HoneycombMutableVertexMeshGenerator generator(3, 3);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
 
@@ -534,14 +534,14 @@ public:
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
-			StochasticDurationGenerationBasedCellCycleModel* p_model = new StochasticDurationGenerationBasedCellCycleModel();
-			p_model->SetCellProliferativeType(STEM);
+            StochasticDurationGenerationBasedCellCycleModel* p_model = new StochasticDurationGenerationBasedCellCycleModel();
+            p_model->SetCellProliferativeType(STEM);
 
-			TissueCell cell(p_state, p_model);
-			double birth_time = -(double)elem_index;
-			cell.SetBirthTime(birth_time);
-			cells.push_back(cell);
-		}
+            TissueCell cell(p_state, p_model);
+            double birth_time = -(double)elem_index;
+            cell.SetBirthTime(birth_time);
+            cells.push_back(cell);
+        }
 
         // Create tissue
         VertexBasedTissue<2> tissue(*p_mesh, cells);
@@ -570,17 +570,17 @@ public:
         //Now save and reload to find where it breaks!
         for (int i=0; i<40; i++)
         {
-        	start_time = end_time;
-        	end_time = end_time + 10.0;
+            start_time = end_time;
+            end_time = end_time + 10.0;
 
-        	TissueSimulation<2>* p_simulator = TissueSimulationArchiver<2, TissueSimulation<2> >::Load(output_directory,start_time);
-			p_simulator->SetDt(0.002);
-			p_simulator->SetSamplingTimestepMultiple(50);
-			p_simulator->SetEndTime(end_time);
-			p_simulator->Solve();
+            TissueSimulation<2>* p_simulator = TissueSimulationArchiver<2, TissueSimulation<2> >::Load(output_directory,start_time);
+            p_simulator->SetDt(0.002);
+            p_simulator->SetSamplingTimestepMultiple(50);
+            p_simulator->SetEndTime(end_time);
+            p_simulator->Solve();
 
-			TissueSimulationArchiver<2, TissueSimulation<2> >::Save(p_simulator);
-			delete p_simulator;
+            TissueSimulationArchiver<2, TissueSimulation<2> >::Save(p_simulator);
+            delete p_simulator;
         }
     }
 
@@ -605,7 +605,7 @@ public:
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(DIFFERENTIATED);
-            
+
             TissueCell cell(p_state, p_model);
             double birth_time = 0.0 - elem_index;
             cell.SetBirthTime(birth_time);
