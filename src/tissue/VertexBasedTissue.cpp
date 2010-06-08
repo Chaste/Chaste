@@ -96,39 +96,6 @@ double VertexBasedTissue<DIM>::GetDampingConstant(unsigned nodeIndex)
 
 
 template<unsigned DIM>
-double VertexBasedTissue<DIM>::GetAdhesionParameter(Node<DIM>* pNodeA, Node<DIM>* pNodeB)
-{
-    double adhesion_parameter;
-
-    // Find the indices of the elements owned by each node
-    std::set<unsigned> elements_containing_nodeA = pNodeA->rGetContainingElementIndices();
-    std::set<unsigned> elements_containing_nodeB = pNodeB->rGetContainingElementIndices();
-
-    // Find common elements
-    std::set<unsigned> shared_elements;
-    std::set_intersection(elements_containing_nodeA.begin(),
-                          elements_containing_nodeA.end(),
-                          elements_containing_nodeB.begin(),
-                          elements_containing_nodeB.end(),
-                          std::inserter(shared_elements, shared_elements.begin()));
-
-    // Check that the nodes have a common edge
-    assert(!shared_elements.empty());
-
-    // If the edge corresponds to a single element, then the cell is on the boundary
-    if (shared_elements.size() == 1)
-    {
-        adhesion_parameter = TissueConfig::Instance()->GetNagaiHondaCellBoundaryAdhesionEnergyParameter();
-    }
-    else
-    {
-        adhesion_parameter = TissueConfig::Instance()->GetNagaiHondaCellCellAdhesionEnergyParameter();
-    }
-    return adhesion_parameter;
-}
-
-
-template<unsigned DIM>
 MutableVertexMesh<DIM, DIM>& VertexBasedTissue<DIM>::rGetMesh()
 {
     return mrMesh;

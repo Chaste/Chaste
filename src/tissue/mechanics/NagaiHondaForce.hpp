@@ -81,6 +81,17 @@ public:
     void AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
                               AbstractTissue<DIM>& rTissue);
 
+    /**
+     * Get the adhesion parameter for the edge between two given nodes.
+     *
+     * \todo This method should be changed/overridden if we require differential adhesion
+     *
+     * @param pNodeA one node
+     * @param pNodeB the other node
+     *
+     * @return the adhesion parameter for this edge.
+     */
+    double GetAdhesionParameter(Node<DIM>* pNodeA, Node<DIM>* pNodeB);
 };
 
 

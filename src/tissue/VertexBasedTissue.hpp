@@ -135,18 +135,6 @@ public:
     double GetDampingConstant(unsigned nodeIndex);
 
     /**
-     * Get the adhesion parameter for the edge between two given nodes.
-     *
-     * \todo This method should be changed/overridden if we require differential adhesion
-     *
-     * @param pNodeA one node
-     * @param pNodeB the other node
-     *
-     * @return the adhesion parameter for this edge.
-     */
-    double GetAdhesionParameter(Node<DIM>* pNodeA, Node<DIM>* pNodeB);
-
-    /**
      * @return reference to  mrMesh.
      */
     MutableVertexMesh<DIM, DIM>& rGetMesh();

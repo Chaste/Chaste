@@ -129,8 +129,8 @@ void NagaiHondaForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM
             Node<DIM>* p_next_node = p_element->GetNode(next_node_local_index);
 
             // Compute the adhesion parameter for each of these edges
-            double previous_edge_adhesion_parameter = p_tissue->GetAdhesionParameter(p_previous_node, p_current_node);
-            double next_edge_adhesion_parameter = p_tissue->GetAdhesionParameter(p_current_node, p_next_node);
+            double previous_edge_adhesion_parameter = GetAdhesionParameter(p_previous_node, p_current_node);
+            double next_edge_adhesion_parameter = GetAdhesionParameter(p_current_node, p_next_node);
 
             // Compute the gradient of the edge of the cell ending in this node
             c_vector<double, DIM> previous_edge_gradient = p_tissue->rGetMesh().GetPreviousEdgeGradientOfElementAtNode(p_element, local_index);
@@ -150,6 +150,39 @@ void NagaiHondaForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM
 
         rForces[node_index] += force_on_node;
     }
+}
+
+
+template<unsigned DIM>
+double NagaiHondaForce<DIM>::GetAdhesionParameter(Node<DIM>* pNodeA, Node<DIM>* pNodeB)
+{
+    double adhesion_parameter;
+
+    // Find the indices of the elements owned by each node
+    std::set<unsigned> elements_containing_nodeA = pNodeA->rGetContainingElementIndices();
+    std::set<unsigned> elements_containing_nodeB = pNodeB->rGetContainingElementIndices();
+
+    // Find common elements
+    std::set<unsigned> shared_elements;
+    std::set_intersection(elements_containing_nodeA.begin(),
+                          elements_containing_nodeA.end(),
+                          elements_containing_nodeB.begin(),
+                          elements_containing_nodeB.end(),
+                          std::inserter(shared_elements, shared_elements.begin()));
+
+    // Check that the nodes have a common edge
+    assert(!shared_elements.empty());
+
+    // If the edge corresponds to a single element, then the cell is on the boundary
+    if (shared_elements.size() == 1)
+    {
+        adhesion_parameter = TissueConfig::Instance()->GetNagaiHondaCellBoundaryAdhesionEnergyParameter();
+    }
+    else
+    {
+        adhesion_parameter = TissueConfig::Instance()->GetNagaiHondaCellCellAdhesionEnergyParameter();
+    }
+    return adhesion_parameter;
 }
 
 
