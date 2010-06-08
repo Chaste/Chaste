@@ -930,7 +930,7 @@ public:
         ArchiveLocationInfo::SetMeshFilename("vertex_mesh");
 
         // Create mesh
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/vertex_mesh");
+        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d");
         MutableVertexMesh<2,2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
