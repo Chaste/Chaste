@@ -61,8 +61,6 @@ protected:
     /**
      * The ratio between the minimum distance apart that two nodes in the mesh can be without causing element
      * rearrangement and their separation after remeshing.
-     *
-     * \todo Set as a magic number in the constructor (#1406)
      */
     double mCellRearrangementRatio;
 
@@ -173,18 +171,23 @@ public:
 
     /**
      * Default constructor.
+     * 
+     * \todo store default values for mCellRearrangementThreshold etc in TissueConfig? (#1406)
      *
      * @param nodes vector of pointers to nodes
      * @param vertexElements vector of pointers to VertexElements
      * @param cellRearrangementThreshold the minimum threshold distance for element rearrangment (defaults to 0.01)
      * @param edgeDivisionThreshold the maximum threshold distance for edge division (defaults to DBL_MAX)
      * @param t2Threshold the maximum threshold distance for Type 2 swaps (defaults to 0.001)
+     * @param cellRearrangementRatio ratio between the minimum threshold distance for element 
+     *                                rearrangment node separation after remeshing (defaults to 1.5)
      */
     MutableVertexMesh(std::vector<Node<SPACE_DIM>*> nodes,
                       std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*> vertexElements,
                       double cellRearrangementThreshold=0.01,
                       double edgeDivisionThreshold=DBL_MAX,
-                      double t2Threshold=0.001);
+                      double t2Threshold=0.001,
+                      double cellRearrangementRatio=1.5);
 
     /**
      * Default constructor for use by serializer.
@@ -218,6 +221,13 @@ public:
     void SetT2Threshold(double t2Threshold);
 
     /**
+     * Set method for mCellRearrangementRatio.
+     *
+     * @param cellRearrangementThreshold
+     */
+    void SetCellRearrangementRatio(double cellRearrangementRatio);
+
+    /**
      *  Move the node with a particular index to a new point in space.
      *
       * @param nodeIndex the index of the node to be moved
@@ -239,6 +249,11 @@ public:
      * @return mT2Threshold
      */
     double GetT2Threshold() const;
+
+    /**
+     * @return mCellRearrangementRatio
+     */
+    double GetCellRearrangementRatio() const;
 
     /**
      * @return the number of Nodes in the mesh.

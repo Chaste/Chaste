@@ -1215,6 +1215,7 @@ public:
         p_mutable_mesh->SetCellRearrangementThreshold(0.54);
         p_mutable_mesh->SetEdgeDivisionThreshold(17.3);
         p_mutable_mesh->SetT2Threshold(0.012);
+        p_mutable_mesh->SetCellRearrangementRatio(1.6);
 
         AbstractMesh<2,2>* const p_mesh = p_mutable_mesh;
 
@@ -1263,6 +1264,7 @@ public:
             TS_ASSERT_DELTA(p_mesh_loaded->GetEdgeDivisionThreshold(), 17.3, 1e-6);
             TS_ASSERT_DELTA(p_mesh_original->GetT2Threshold(), 0.012, 1e-6);
             TS_ASSERT_DELTA(p_mesh_loaded->GetT2Threshold(), 0.012, 1e-6);
+            TS_ASSERT_DELTA(p_mesh_loaded->GetCellRearrangementRatio(), 1.6, 1e-6);
 
             // Compare the loaded mesh against the original
 

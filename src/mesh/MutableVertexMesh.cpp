@@ -35,9 +35,10 @@ MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::MutableVertexMesh(std::vector<Node<SP
                                                std::vector<VertexElement<ELEMENT_DIM,SPACE_DIM>*> vertexElements,
                                                double cellRearrangementThreshold,
                                                double edgeDivisionThreshold,
-                                               double t2Threshold)
+                                               double t2Threshold,
+                                               double cellRearrangementRatio)
     : mCellRearrangementThreshold(cellRearrangementThreshold),
-      mCellRearrangementRatio(1.5), ///\todo Magic number (#1406)
+      mCellRearrangementRatio(cellRearrangementRatio),
       mEdgeDivisionThreshold(edgeDivisionThreshold),
       mT2Threshold(t2Threshold)
 {
@@ -115,6 +116,13 @@ double MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetT2Threshold() const
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetCellRearrangementRatio() const
+{
+    return mCellRearrangementRatio;
+}
+
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::SetCellRearrangementThreshold(double cellRearrangementThreshold)
 {
     mCellRearrangementThreshold = cellRearrangementThreshold;
@@ -132,6 +140,13 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::SetT2Threshold(double t2Threshold)
 {
     mT2Threshold = t2Threshold;
+}
+
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::SetCellRearrangementRatio(double cellRearrangementRatio)
+{
+    mCellRearrangementRatio = cellRearrangementRatio;
 }
 
 
