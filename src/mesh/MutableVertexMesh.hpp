@@ -223,7 +223,7 @@ public:
     /**
      * Set method for mCellRearrangementRatio.
      *
-     * @param cellRearrangementThreshold
+     * @param cellRearrangementRatio
      */
     void SetCellRearrangementRatio(double cellRearrangementRatio);
 
