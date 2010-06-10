@@ -297,9 +297,9 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
 
         if (norm_2(a_to_b)< 2.0*mCellRearrangementRatio*mCellRearrangementThreshold)
         {
-            // should be a warning see #1394
-            //TRACE("Edge is too small for normal division, putting node in the middle of a and b, there may be T1Swaps straight away.") // \TODO or should we move a and b apart, it may interfere with neighboring edges?
-            intersection = position_a + 0.5*a_to_b;
+        	// should be a warning see #1394
+        	//TRACE("Edge is too small for normal division, putting node in the middle of a and b, there may be T1Swaps straight away.") // \TODO or should we move a and b apart, it may interfere with neighboring edges? see #1399
+        	intersection = position_a + 0.5*a_to_b;
         }
         else
         {
@@ -1672,7 +1672,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
      * 4.0*mCellRearrangementRatio*mCellRearrangementThreshold apart. \TODO investigate if moving A and B causes other issues with nearby nodes.
      *
      * Note: this distance so that there is always enough room for new nodes (if necessary)
-     * \TODO currently this assumes a worst case scenario of 3 nodes between A and B could be less movement for other cases.
+     * \TODO currently this assumes a worst case scenario of 3 nodes between A and B could be less movement for other cases. #1399
      */
     if (norm_2(vector_a_to_b) < 4.0*mCellRearrangementRatio*mCellRearrangementThreshold)
     {
