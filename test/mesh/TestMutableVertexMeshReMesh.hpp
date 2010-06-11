@@ -33,7 +33,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "VertexMeshWriter.hpp"
 #include "MutableVertexMesh.hpp"
-#include "Debug.hpp"
 
 class TestMutableVertexMeshReMesh : public CxxTest::TestSuite
 {

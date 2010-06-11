@@ -84,13 +84,13 @@ public:
 
         // Set up cellwise data and associate it with the tissue
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumNodesAndVars(p_mesh->GetNumNodes(), 1);
-        p_data->SetTissue(tissue);
+        p_data->SetNumCellsAndVars(tissue.GetNumRealCells(), 1);
+        p_data->SetTissue(&tissue);
 
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             double x = p_mesh->GetNode(i)->rGetLocation()[0];
-            p_data->SetValue(x/50.0, p_mesh->GetNode(i));
+            p_data->SetValue(x/50.0, p_mesh->GetNode(i)->GetIndex());
         }
 
         ChemotacticForce<2> chemotactic_force;

@@ -31,7 +31,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 template<unsigned DIM>
 c_vector<double, DIM>& CellwiseDataGradient<DIM>::rGetGradient(unsigned nodeIndex)
 {
-    assert( !(CellwiseData<DIM>::Instance()->rGetTissue().IsGhostNode(nodeIndex)) );
     return mGradients[nodeIndex];
 }
 
@@ -39,11 +38,11 @@ c_vector<double, DIM>& CellwiseDataGradient<DIM>::rGetGradient(unsigned nodeInde
 template<unsigned DIM>
 void CellwiseDataGradient<DIM>::SetupGradients()
 {
-    MeshBasedTissue<DIM>& r_tissue = CellwiseData<DIM>::Instance()->rGetTissue();
-    TetrahedralMesh<DIM,DIM>& r_mesh = r_tissue.rGetMesh();
+    MeshBasedTissue<DIM>* p_tissue = static_cast<MeshBasedTissue<DIM>*>(&(CellwiseData<DIM>::Instance()->rGetTissue()));
+    TetrahedralMesh<DIM,DIM>& r_mesh = p_tissue->rGetMesh();
 
     // Initialise gradients size
-    unsigned num_nodes = r_tissue.rGetMesh().GetNumNodes();
+    unsigned num_nodes = p_tissue->GetNumNodes();
     mGradients.resize(num_nodes, zero_vector<double>(DIM));
 
     // The constant gradients at each element
@@ -73,14 +72,14 @@ void CellwiseDataGradient<DIM>::SetupGradients()
             unsigned node_global_index = r_elem.GetNodeGlobalIndex(node_index);
 
             // Check whether ghost element
-            if (r_tissue.IsGhostNode(node_global_index) == true)
+            if (p_tissue->IsGhostNode(node_global_index) == true)
             {
                 is_ghost_element = true;
                 break;
             }
 
             // If no ghost element, get nutrient concentration
-            TissueCell& r_cell = r_tissue.rGetCellUsingLocationIndex(node_global_index);
+            TissueCell& r_cell = p_tissue->rGetCellUsingLocationIndex(node_global_index);
             double nutrient_concentration = CellwiseData<DIM>::Instance()->GetValue(r_cell, 0);
 
             // Interpolate gradient
@@ -103,23 +102,23 @@ void CellwiseDataGradient<DIM>::SetupGradients()
     }
 
     // Divide to obtain average gradient
-    for (typename AbstractTissue<DIM>::Iterator cell_iter = r_tissue.Begin();
-         cell_iter != r_tissue.End();
+    for (typename AbstractTissue<DIM>::Iterator cell_iter = p_tissue->Begin();
+         cell_iter != p_tissue->End();
          ++cell_iter)
     {
-        unsigned node_global_index = r_tissue.GetLocationIndexUsingCell(*cell_iter);
+        unsigned node_global_index = p_tissue->GetLocationIndexUsingCell(*cell_iter);
 
-        if  (!num_real_elems_for_node[node_global_index]>0)
+        if (!num_real_elems_for_node[node_global_index] > 0)
         {
             // The node is a real node which is not in any real element
             // but should be connected to some cells (if more than one cell in mesh)
-            Node<DIM>& this_node = *(r_tissue.GetNodeCorrespondingToCell(*cell_iter));
+            Node<DIM>& this_node = *(p_tissue->GetNodeCorrespondingToCell(*cell_iter));
 
             mGradients[node_global_index] = zero_vector<double>(DIM);
             unsigned num_real_adjacent_nodes = 0;
 
             // Get all the adjacent nodes which correspond to real cells
-            std::set < Node<DIM>* > real_adjacent_nodes;
+            std::set<Node<DIM>*> real_adjacent_nodes;
             real_adjacent_nodes.clear();
 
             // First loop over containing elements
@@ -134,14 +133,14 @@ void CellwiseDataGradient<DIM>::SetupGradients()
                     unsigned adjacent_node_global_index = r_adjacent_elem.GetNodeGlobalIndex(local_node_index);
 
                     // If not a ghost node and not the node we started with
-                    if ( r_tissue.IsGhostNode(adjacent_node_global_index)==false && adjacent_node_global_index != node_global_index )
+                    if ( p_tissue->IsGhostNode(adjacent_node_global_index)==false && adjacent_node_global_index != node_global_index )
                     {
 
                         // Calculate the contribution of gradient from this node
                         Node<DIM>& adjacent_node = *(r_mesh.GetNode(adjacent_node_global_index));
 
                         double this_cell_concentration = CellwiseData<DIM>::Instance()->GetValue(*cell_iter, 0);
-                        TissueCell& adjacent_cell = r_tissue.rGetCellUsingLocationIndex(adjacent_node_global_index);
+                        TissueCell& adjacent_cell = p_tissue->rGetCellUsingLocationIndex(adjacent_node_global_index);
                         double adjacent_cell_concentration = CellwiseData<DIM>::Instance()->GetValue(adjacent_cell, 0);
 
                         c_vector<double, DIM> gradient_contribution = zero_vector<double>(DIM);

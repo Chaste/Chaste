@@ -38,6 +38,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "HoneycombMutableVertexMeshGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "WntCellCycleModel.hpp"
+#include "CellwiseData.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "ArchiveOpener.hpp"
 #include "WildTypeCellMutationState.hpp"
@@ -1179,6 +1180,230 @@ public:
         TS_ASSERT_DELTA(wnt_at_cell1, 2.0/3.0, 1e-4);
     }
 
+    ///\todo When vertex models are released, move this test into TestCellwiseData (see also #1419)
+    void TestCellwiseDataWithVertexBasedTissue() throw(Exception)
+    {
+        // Make some nodes
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, false, 2.0, -1.0));
+        nodes.push_back(new Node<2>(1, false, 2.0, 1.0));
+        nodes.push_back(new Node<2>(2, false, -2.0, 1.0));
+        nodes.push_back(new Node<2>(3, false, -2.0, -1.0));
+        nodes.push_back(new Node<2>(4, false, 0.0, 2.0));
+
+        // Make a rectangular element out of nodes 0,1,2,3
+        std::vector<Node<2>*> nodes_elem_1;
+        nodes_elem_1.push_back(nodes[0]);
+        nodes_elem_1.push_back(nodes[1]);
+        nodes_elem_1.push_back(nodes[2]);
+        nodes_elem_1.push_back(nodes[3]);
+
+        // Make a triangular element out of nodes 1,4,2
+        std::vector<Node<2>*> nodes_elem_2;
+        nodes_elem_2.push_back(nodes[1]);
+        nodes_elem_2.push_back(nodes[4]);
+        nodes_elem_2.push_back(nodes[2]);
+
+        std::vector<VertexElement<2,2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_2));
+
+        // Make a vertex mesh
+        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+
+        // Create cells
+        std::vector<TissueCell> cells;
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        for (unsigned i=0; i<vertex_mesh.GetNumElements(); i++)
+        {
+            WntCellCycleModel* p_cell_cycle_model = new WntCellCycleModel;
+            p_cell_cycle_model->SetDimension(2);
+            p_cell_cycle_model->SetCellProliferativeType(DIFFERENTIATED);
+
+            TissueCell cell(p_state, p_cell_cycle_model);
+            double birth_time = 0.0 - i;
+            cell.SetBirthTime(birth_time);
+            cells.push_back(cell);
+        }
+
+        // Create tissue
+        VertexBasedTissue<2> tissue(vertex_mesh, cells);
+
+        TS_ASSERT_EQUALS(CellwiseData<2>::Instance()->IsSetUp(), false);
+
+        // One variable tests
+
+        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
+
+        TS_ASSERT_EQUALS(CellwiseData<2>::Instance()->IsSetUp(), false);
+        TS_ASSERT_THROWS_THIS(p_data->SetTissue(&tissue),"SetTissue must be called after SetNumCellsAndVars()");
+
+        p_data->SetNumCellsAndVars(tissue.GetNumRealCells(), 1);
+
+        TS_ASSERT_EQUALS(CellwiseData<2>::Instance()->IsSetUp(), false);
+
+        p_data->SetTissue(&tissue);
+
+        TS_ASSERT_EQUALS(CellwiseData<2>::Instance()->IsSetUp(), true);
+
+        p_data->SetValue(1.23, tissue.GetElement(0)->GetIndex());
+        AbstractTissue<2>::Iterator cell_iter = tissue.Begin();
+        TS_ASSERT_DELTA(p_data->GetValue(*cell_iter), 1.23, 1e-12);
+
+        p_data->SetValue(2.23, tissue.GetElement(1)->GetIndex());
+        ++cell_iter;
+        TS_ASSERT_DELTA(p_data->GetValue(*cell_iter), 2.23, 1e-12);
+
+        // Test ReallocateMemory method
+
+        // Add a new cell by dividing element 0 along the axis (1,0)
+        c_vector<double,2> cell_division_axis;
+        cell_division_axis[0] = 1.0;
+        cell_division_axis[1] = 0.0;
+
+        FixedDurationGenerationBasedCellCycleModel* p_model2 = new FixedDurationGenerationBasedCellCycleModel();
+        p_model2->SetCellProliferativeType(STEM);
+        TissueCell new_cell(p_state, p_model2);
+        new_cell.SetBirthTime(-1.0);
+
+        tissue.AddCell(new_cell, cell_division_axis, &(*cell_iter));
+
+        TS_ASSERT_THROWS_NOTHING(p_data->ReallocateMemory());
+
+        // Coverage
+        std::vector<double> constant_value;
+        constant_value.push_back(1.579);
+        p_data->SetConstantDataForTesting(constant_value);
+
+        for (AbstractTissue<2>::Iterator cell_iter = tissue.Begin();
+             cell_iter != tissue.End();
+             ++cell_iter)
+        {
+            TS_ASSERT_DELTA(p_data->GetValue(*cell_iter), 1.579, 1e-12);
+        }
+
+        p_data->Destroy();
+
+        TS_ASSERT_EQUALS(CellwiseData<2>::Instance()->IsSetUp(), false);
+
+        // Two variable tests
+
+        p_data = CellwiseData<2>::Instance();
+
+        p_data->SetNumCellsAndVars(tissue.GetNumRealCells(), 2);
+        p_data->SetTissue(&tissue);
+
+        TS_ASSERT_THROWS_THIS(p_data->SetNumCellsAndVars(tissue.GetNumRealCells(), 1),"SetNumCellsAndVars() must be called before setting the Tissue (and after a Destroy)");
+        TS_ASSERT_EQUALS(CellwiseData<2>::Instance()->IsSetUp(), true);
+
+        p_data->SetValue(3.23, tissue.GetElement(0)->GetIndex(), 1);
+        AbstractTissue<2>::Iterator cell_iter2 = tissue.Begin();
+
+        TS_ASSERT_DELTA(p_data->GetValue(*cell_iter2, 1), 3.23, 1e-12);
+
+        p_data->SetValue(4.23, tissue.GetElement(1)->GetIndex(), 1);
+        ++cell_iter2;
+
+        TS_ASSERT_DELTA(p_data->GetValue(*cell_iter2, 1), 4.23, 1e-12);
+
+        // Other values should have been initialised to zero
+        ++cell_iter2;
+        TS_ASSERT_DELTA(p_data->GetValue(*cell_iter2, 0), 0.0, 1e-12);
+
+        // Tidy up
+        CellwiseData<2>::Destroy();
+    }
+
+    ///\todo When vertex models are released, move this test into TestCellwiseData (see also #1419)
+    void TestArchiveCellwiseDataWithVertexBasedTissue()
+    {
+        FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
+        std::string archive_file = "vertex_cellwise.arch";
+        // The following line is required because the loading of a tissue
+        // is usually called by the method TissueSimulation::Load()
+        ArchiveLocationInfo::SetMeshFilename("vertex_cellwise");
+
+        // Create mesh
+        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d");
+        MutableVertexMesh<2,2> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        // Need to set up time
+        unsigned num_steps = 10;
+        SimulationTime* p_simulation_time = SimulationTime::Instance();
+        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, num_steps+1);
+
+        // Set up cells
+        std::vector<TissueCell> cells = SetUpCells(mesh);
+
+        // Create tissue
+        VertexBasedTissue<2>* const p_tissue = new VertexBasedTissue<2>(mesh, cells);
+
+        // Cells have been given birth times of 0 and -1.
+        // Loop over them to run to time 0.0;
+        for (AbstractTissue<2>::Iterator cell_iter = p_tissue->Begin();
+             cell_iter != p_tissue->End();
+             ++cell_iter)
+        {
+            cell_iter->ReadyToDivide();
+        }
+
+        {
+            // Set up the data store
+            CellwiseData<2>* p_data = CellwiseData<2>::Instance();
+            p_data->SetNumCellsAndVars(p_tissue->GetNumRealCells(), 1);
+            p_data->SetTissue(p_tissue);
+
+            // Put some data in
+            unsigned i=0;
+            for (AbstractTissue<2>::Iterator cell_iter = p_tissue->Begin();
+                 cell_iter != p_tissue->End();
+                 ++cell_iter)
+            {
+                p_data->SetValue((double) i, p_tissue->GetLocationIndexUsingCell(*cell_iter), 0);
+                i++;
+            }
+
+            TS_ASSERT_EQUALS(p_data->IsSetUp(), true);
+
+            // Create output archive
+            ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
+
+            // Write to the archive
+            (*p_arch) << static_cast<const CellwiseData<2>&>(*CellwiseData<2>::Instance());
+
+            CellwiseData<2>::Destroy();
+        }
+
+        {
+            CellwiseData<2>* p_data = CellwiseData<2>::Instance();
+
+            // Create an input archive
+            ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
+
+            (*p_arch) >> *p_data;
+
+            // Check the data
+            TS_ASSERT_EQUALS(CellwiseData<2>::Instance()->IsSetUp(), true);
+            TS_ASSERT_EQUALS(p_data->IsSetUp(), true);
+
+            // We will have constructed a new tissue on load, so use the new tissue
+            AbstractTissue<2>& tissue = p_data->rGetTissue();
+
+            for (AbstractTissue<2>::Iterator cell_iter = tissue.Begin();
+                 cell_iter != tissue.End();
+                 ++cell_iter)
+            {
+                TS_ASSERT_DELTA(p_data->GetValue(*cell_iter, 0u), (double) tissue.GetLocationIndexUsingCell(*cell_iter), 1e-12);
+            }
+
+            // Tidy up
+            CellwiseData<2>::Destroy();
+            delete (&tissue);
+        }
+    }
 };
 
 #endif /*TESTVERTEXBASEDTISSUE_HPP_*/

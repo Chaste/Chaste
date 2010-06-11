@@ -400,13 +400,12 @@ void VertexBasedTissue<DIM>::WriteResultsToFiles()
     std::stringstream time;
     time << p_time->GetTimeStepsElapsed();
 
-    unsigned num_elements = mrMesh.GetNumElements();
-    std::vector<double> cell_types(num_elements);
-    std::vector<double> cell_ancestors(num_elements);
-    std::vector<double> cell_mutation_states(num_elements);
-    std::vector<double> cell_ages(num_elements);
-    std::vector<double> cell_cycle_phases(num_elements);
-    std::vector<double> cell_volumes(num_elements);
+    std::vector<double> cell_types;
+    std::vector<double> cell_ancestors;
+    std::vector<double> cell_mutation_states;
+    std::vector<double> cell_ages;
+    std::vector<double> cell_cycle_phases;
+    std::vector<double> cell_volumes;
 
     // Loop over Voronoi elements
     for (typename VertexMesh<DIM,DIM>::VertexElementIterator elem_iter = mrMesh.GetElementIteratorBegin();

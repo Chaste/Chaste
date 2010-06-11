@@ -61,17 +61,17 @@ public:
         std::vector<TissueCell> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
-        MeshBasedTissue<2> tissue(mesh,cells);
+        MeshBasedTissue<2> tissue(mesh, cells);
 
         // Set up data: C(x,y) = x^2
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumNodesAndVars(mesh.GetNumNodes(), 1);
-        p_data->SetTissue(tissue);
+        p_data->SetNumCellsAndVars(tissue.GetNumRealCells(), 1);
+        p_data->SetTissue(&tissue);
 
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
-            p_data->SetValue(x*x, mesh.GetNode(i));
+            p_data->SetValue(x*x, mesh.GetNode(i)->GetIndex());
         }
 
         CellwiseDataGradient<2> gradient;
@@ -100,18 +100,18 @@ public:
         std::vector<TissueCell> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
-        MeshBasedTissue<2> tissue(mesh,cells);
+        MeshBasedTissue<2> tissue(mesh, cells);
 
         //////////////////////////////////
         // C(x,y) = const
         //////////////////////////////////
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumNodesAndVars(mesh.GetNumNodes(), 1);
-        p_data->SetTissue(tissue);
+        p_data->SetNumCellsAndVars(tissue.GetNumRealCells(), 1);
+        p_data->SetTissue(&tissue);
 
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            p_data->SetValue(1.0, mesh.GetNode(i));
+            p_data->SetValue(1.0, mesh.GetNode(i)->GetIndex());
         }
 
         CellwiseDataGradient<2> gradient;
@@ -131,7 +131,7 @@ public:
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
-            p_data->SetValue(x-y, mesh.GetNode(i));
+            p_data->SetValue(x-y, mesh.GetNode(i)->GetIndex());
         }
 
         // Check gradient
@@ -149,7 +149,7 @@ public:
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
-            p_data->SetValue(x*x - y*y, mesh.GetNode(i));
+            p_data->SetValue(x*x - y*y, mesh.GetNode(i)->GetIndex());
         }
 
         // Check gradient - here there is some numerical error
@@ -199,8 +199,8 @@ public:
 
         // Create an instance of CellwiseData and associate it with the tissue
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumNodesAndVars(mesh.GetNumNodes(), 1);
-        p_data->SetTissue(tissue);
+        p_data->SetNumCellsAndVars(tissue.GetNumNodes(), 1);
+        p_data->SetTissue(&tissue);
 
         //////////////////////////////////
         // C(x,y) = x^2 - y^2
@@ -211,11 +211,11 @@ public:
             double y = mesh.GetNode(i)->rGetLocation()[1];
             if (mesh.GetNode(i)->IsBoundaryNode())
             {
-                p_data->SetValue(DBL_MAX, mesh.GetNode(i));
+                p_data->SetValue(DBL_MAX, mesh.GetNode(i)->GetIndex());
             }
             else
             {
-                p_data->SetValue(x*x - y*y, mesh.GetNode(i));
+                p_data->SetValue(x*x - y*y, mesh.GetNode(i)->GetIndex());
             }
         }
 
@@ -229,27 +229,27 @@ public:
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
 
-            if ( !mesh.GetNode(i)->IsBoundaryNode() ) // ie not ghost
+            if ( !(mesh.GetNode(i)->IsBoundaryNode()) ) // i.e. not ghost
             {
-                int x_corner=0;
+                int x_corner = 0;
 
                 // Work out if on left or right
-                if (x==0.03125)
+                if (x == 0.03125)
                 {
                     x_corner = -1;
                 }
-                if (x==1.96875)
+                if (x == 1.96875)
                 {
                     x_corner = 1;
                 }
                 int y_corner=0;
 
                 // Work out if on top or bottom
-                if (y==0.03125)
+                if (y == 0.03125)
                 {
                     y_corner = -1;
                 }
-                if (y==1.96875)
+                if (y == 1.96875)
                 {
                     y_corner = 1;
                 }
@@ -257,16 +257,16 @@ public:
                 switch (x_corner*y_corner)
                 {
                     case 1: // bottom left or top right
-                        TS_ASSERT_DELTA( gradient.rGetGradient(i)(0),  0.0, 1e-9);
-                        TS_ASSERT_DELTA( gradient.rGetGradient(i)(1),  0.0, 1e-9);
+                        TS_ASSERT_DELTA(gradient.rGetGradient(i)(0),  0.0, 1e-9);
+                        TS_ASSERT_DELTA(gradient.rGetGradient(i)(1),  0.0, 1e-9);
                         break;
                     case -1: // bottom right or top left
-                        TS_ASSERT_DELTA( gradient.rGetGradient(i)(0),  2.0, 1e-9);
-                        TS_ASSERT_DELTA( gradient.rGetGradient(i)(1), -2.0, 1e-9);
+                        TS_ASSERT_DELTA(gradient.rGetGradient(i)(0),  2.0, 1e-9);
+                        TS_ASSERT_DELTA(gradient.rGetGradient(i)(1), -2.0, 1e-9);
                         break;
                     case 0: // otherwise
-                        TS_ASSERT_DELTA( gradient.rGetGradient(i)(0),  2*x, 0.3);
-                        TS_ASSERT_DELTA( gradient.rGetGradient(i)(1), -2*y, 0.3);
+                        TS_ASSERT_DELTA(gradient.rGetGradient(i)(0),  2*x, 0.3);
+                        TS_ASSERT_DELTA(gradient.rGetGradient(i)(1), -2*y, 0.3);
                         break;
                     default:
                         break;
