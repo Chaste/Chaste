@@ -925,10 +925,10 @@ public:
     void TestArchiving2dVertexBasedTissue() throw(Exception)
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
-        std::string archive_file = "vertex_tissue.arch";
+        std::string archive_file = "vertex_tissue_2d.arch";
         // The following line is required because the loading of a tissue
         // is usually called by the method TissueSimulation::Load()
-        ArchiveLocationInfo::SetMeshFilename("vertex_mesh");
+        ArchiveLocationInfo::SetMeshFilename("vertex_mesh_2d");
 
         // Create mesh
         VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d");
@@ -1019,6 +1019,207 @@ public:
             {
                 Node<2>* p_node = mesh.GetNode(node_index);
                 Node<2>* p_node2 = loaded_mesh.GetNode(node_index);
+
+                TS_ASSERT_EQUALS(p_node->IsDeleted(), p_node2->IsDeleted());
+                TS_ASSERT_EQUALS(p_node->GetIndex(), p_node2->GetIndex());
+
+                TS_ASSERT_EQUALS(p_node->IsBoundaryNode(), p_node2->IsBoundaryNode());
+
+                for (unsigned dimension=0; dimension<2; dimension++)
+                {
+                    TS_ASSERT_DELTA(p_node->rGetLocation()[dimension], p_node2->rGetLocation()[dimension], 1e-4);
+                }
+            }
+
+            TS_ASSERT_EQUALS(mesh.GetNumElements(), loaded_mesh.GetNumElements());
+
+            for (unsigned elem_index=0; elem_index < mesh.GetNumElements(); elem_index++)
+            {
+                TS_ASSERT_EQUALS(mesh.GetElement(elem_index)->GetNumNodes(),
+                                 loaded_mesh.GetElement(elem_index)->GetNumNodes());
+
+                for (unsigned local_index=0; local_index<mesh.GetElement(elem_index)->GetNumNodes(); local_index++)
+                {
+                    TS_ASSERT_EQUALS(mesh.GetElement(elem_index)->GetNodeGlobalIndex(local_index),
+                                     loaded_mesh.GetElement(elem_index)->GetNodeGlobalIndex(local_index));
+                }
+            }
+
+            // Tidy up
+            delete p_tissue;
+        }
+    }
+
+
+    void TestArchiving3dVertexBasedTissue() throw(Exception)
+    {
+        // Create mutable vertex mesh
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, false, 1.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(2, false, 0.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(3, false, 0.0, 0.0, 1.0));
+        nodes.push_back(new Node<3>(4, false, 1.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(5, false, 0.0, 1.0, 1.0));
+        nodes.push_back(new Node<3>(6, false, 1.0, 0.0, 1.0));
+        nodes.push_back(new Node<3>(7, false, 1.0, 1.0, 1.0));
+        nodes.push_back(new Node<3>(8, false, 0.5, 0.5, 1.5));
+
+        std::vector<std::vector<Node<3>*> > nodes_faces(10);
+        nodes_faces[0].push_back(nodes[0]);
+        nodes_faces[0].push_back(nodes[2]);
+        nodes_faces[0].push_back(nodes[4]);
+        nodes_faces[0].push_back(nodes[1]);
+        nodes_faces[1].push_back(nodes[4]);
+        nodes_faces[1].push_back(nodes[7]);
+        nodes_faces[1].push_back(nodes[5]);
+        nodes_faces[1].push_back(nodes[2]);
+        nodes_faces[2].push_back(nodes[7]);
+        nodes_faces[2].push_back(nodes[6]);
+        nodes_faces[2].push_back(nodes[1]);
+        nodes_faces[2].push_back(nodes[4]);
+        nodes_faces[3].push_back(nodes[0]);
+        nodes_faces[3].push_back(nodes[3]);
+        nodes_faces[3].push_back(nodes[5]);
+        nodes_faces[3].push_back(nodes[2]);
+        nodes_faces[4].push_back(nodes[1]);
+        nodes_faces[4].push_back(nodes[6]);
+        nodes_faces[4].push_back(nodes[3]);
+        nodes_faces[4].push_back(nodes[0]);
+        nodes_faces[5].push_back(nodes[7]);
+        nodes_faces[5].push_back(nodes[6]);
+        nodes_faces[5].push_back(nodes[3]);
+        nodes_faces[5].push_back(nodes[5]);
+        nodes_faces[6].push_back(nodes[6]);
+        nodes_faces[6].push_back(nodes[7]);
+        nodes_faces[6].push_back(nodes[8]);
+        nodes_faces[7].push_back(nodes[6]);
+        nodes_faces[7].push_back(nodes[8]);
+        nodes_faces[7].push_back(nodes[3]);
+        nodes_faces[8].push_back(nodes[3]);
+        nodes_faces[8].push_back(nodes[8]);
+        nodes_faces[8].push_back(nodes[5]);
+        nodes_faces[9].push_back(nodes[5]);
+        nodes_faces[9].push_back(nodes[8]);
+        nodes_faces[9].push_back(nodes[7]);
+
+        std::vector<VertexElement<2,3>*> faces;
+        for (unsigned i=0; i<10; i++)
+        {
+            faces.push_back(new VertexElement<2,3>(i, nodes_faces[i]));
+        }
+
+        std::vector<VertexElement<2,3>*> faces_element_0, faces_element_1;
+        std::vector<bool> orientations_0, orientations_1;
+        for (unsigned i=0; i<6; i++)
+        {
+            faces_element_0.push_back(faces[i]);
+            orientations_0.push_back(true);
+        }
+        for (unsigned i=6; i<10; i++)
+        {
+            faces_element_1.push_back(faces[i]);
+            orientations_1.push_back(true);
+        }
+        faces_element_1.push_back(faces[5]);
+        orientations_1.push_back(false);
+
+        std::vector<VertexElement<3,3>*> elements;
+        elements.push_back(new VertexElement<3,3>(0, faces_element_0, orientations_0));
+        elements.push_back(new VertexElement<3,3>(1, faces_element_1, orientations_1));
+
+        MutableVertexMesh<3,3> mesh(nodes, elements);
+
+        FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
+        std::string archive_file = "vertex_tissue_3d.arch";
+        // The following line is required because the loading of a tissue
+        // is usually called by the method TissueSimulation::Load()
+        ArchiveLocationInfo::SetMeshFilename("vertex_mesh");
+
+        // Archive tissue
+        {
+            // Need to set up time
+            unsigned num_steps = 10;
+            SimulationTime* p_simulation_time = SimulationTime::Instance();
+            p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, num_steps+1);
+
+            // Set up cells
+            std::vector<TissueCell> cells = SetUpCells(mesh);
+
+            // Create tissue
+            VertexBasedTissue<3>* const p_tissue = new VertexBasedTissue<3>(mesh, cells);
+
+            // Cells have been given birth times of 0 and -1.
+            // Loop over them to run to time 0.0;
+            for (AbstractTissue<3>::Iterator cell_iter = p_tissue->Begin();
+                 cell_iter != p_tissue->End();
+                 ++cell_iter)
+            {
+                cell_iter->ReadyToDivide();
+            }
+
+            // Create output archive
+            ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
+
+            // Write the tissue to the archive
+            (*p_arch) << static_cast<const SimulationTime&> (*p_simulation_time);
+            (*p_arch) << p_tissue;
+
+            // Tidy up
+            SimulationTime::Destroy();
+            delete p_tissue;
+        }
+
+        // Restore tissue
+        {
+            // Need to set up time
+            unsigned num_steps = 10;
+            SimulationTime* p_simulation_time = SimulationTime::Instance();
+            p_simulation_time->SetStartTime(0.0);
+            p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, num_steps+1);
+            p_simulation_time->IncrementTimeOneStep();
+
+            // Create an input archive
+            ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
+
+            // Restore the tissue
+            (*p_arch) >> *p_simulation_time;
+            VertexBasedTissue<3>* p_tissue;
+            (*p_arch) >> p_tissue;
+
+            // Check the tissue has been restored correctly
+            TS_ASSERT_EQUALS(p_tissue->rGetCells().size(), 2u);
+
+            // Cells have been given birth times of 0, -1, -2, -3, -4.
+            // this checks that individual cells and their models are archived.
+            unsigned counter = 0;
+            for (AbstractTissue<3>::Iterator cell_iter = p_tissue->Begin();
+                 cell_iter != p_tissue->End();
+                 ++cell_iter)
+            {
+                TS_ASSERT_DELTA(cell_iter->GetAge(), (double)(counter), 1e-7);
+                counter++;
+            }
+
+            // Check the simulation time has been restored (through the cell)
+            TS_ASSERT_EQUALS(p_simulation_time->GetTime(), 0.0);
+
+            // Check the mesh has been restored correctly
+            TS_ASSERT_EQUALS(p_tissue->rGetMesh().GetNumNodes(), 9u);
+            TS_ASSERT_EQUALS(p_tissue->rGetMesh().GetNumElements(), 2u);
+            TS_ASSERT_EQUALS(p_tissue->rGetMesh().GetNumFaces(), 10u);
+
+            // Compare the loaded mesh against the original
+            MutableVertexMesh<3,3>& loaded_mesh = p_tissue->rGetMesh();
+
+            TS_ASSERT_EQUALS(mesh.GetNumNodes(), loaded_mesh.GetNumNodes());
+
+            for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
+            {
+                Node<3>* p_node = mesh.GetNode(node_index);
+                Node<3>* p_node2 = loaded_mesh.GetNode(node_index);
 
                 TS_ASSERT_EQUALS(p_node->IsDeleted(), p_node2->IsDeleted());
                 TS_ASSERT_EQUALS(p_node->GetIndex(), p_node2->GetIndex());
