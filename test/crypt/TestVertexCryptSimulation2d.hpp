@@ -528,6 +528,164 @@ public:
         // Tidy up
         delete p_simulator;
     }
+
+    void TestStandardResultForArchivingTestsBelow() throw (Exception)
+    {
+        // Create mesh
+        unsigned crypt_width = 4;
+        unsigned crypt_height = 6;
+        CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
+        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+
+        // Create cells
+        std::vector<TissueCell> cells;
+        CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
+        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+
+        // Create tissue
+        VertexBasedTissue<2> crypt(*p_mesh, cells);
+
+        // We have a Wnt Gradient - but not Wnt dependent cells
+        // so that the test runs quickly, but we test archiving of it!
+        WntConcentration<2>::Instance()->SetType(LINEAR);
+        WntConcentration<2>::Instance()->SetTissue(crypt);
+
+        // Create force law
+        NagaiHondaForce<2> force_law;
+        std::vector<AbstractForce<2>*> force_collection;
+        force_collection.push_back(&force_law);
+
+        // Create crypt simulation from tissue and force law
+        VertexCryptSimulation2d simulator(crypt, force_collection);
+        simulator.SetOutputDirectory("VertexCrypt2DPeriodicStandardResult");
+        simulator.SetEndTime(0.25);
+
+        // Create cell killer and pass in to crypt simulation
+        SloughingCellKiller<2> sloughing_cell_killer(&crypt, true);
+        simulator.AddCellKiller(&sloughing_cell_killer);
+
+        // Run simulation
+        simulator.Solve();
+
+        // Test the locations of a few nodes
+        std::vector<double> node_4_location = simulator.GetNodeLocation(4);
+        TS_ASSERT_DELTA(node_4_location[0], 0.0021, 1e-4);
+        TS_ASSERT_DELTA(node_4_location[1], 0.1516, 1e-4);
+
+        std::vector<double> node_5_location = simulator.GetNodeLocation(5);
+        TS_ASSERT_DELTA(node_5_location[0], 0.9721, 1e-4);
+        TS_ASSERT_DELTA(node_5_location[1], 0.1437, 1e-4);
+
+        // Test the Wnt concentration result
+        WntConcentration<2>* p_wnt = WntConcentration<2>::Instance();
+        TS_ASSERT_DELTA(p_wnt->GetWntLevel(crypt.rGetCellUsingLocationIndex(2)), 0.9757, 1e-4);
+        TS_ASSERT_DELTA(p_wnt->GetWntLevel(crypt.rGetCellUsingLocationIndex(3)), 0.9743, 1e-4);
+
+        // Tidy up
+        WntConcentration<2>::Destroy();
+    }
+
+    // Testing Save
+    void TestSave() throw (Exception)
+    {
+        // Create mesh
+        unsigned crypt_width = 4;
+        unsigned crypt_height = 6;
+        CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
+        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+
+        // Create cells
+        std::vector<TissueCell> cells;
+        CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
+        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+
+        // Create tissue
+        VertexBasedTissue<2> crypt(*p_mesh, cells);
+
+        // Create an instance of a Wnt concentration
+        WntConcentration<2>::Instance()->SetType(LINEAR);
+        WntConcentration<2>::Instance()->SetTissue(crypt);
+
+        // Create force law
+        NagaiHondaForce<2> force_law;
+        std::vector<AbstractForce<2>*> force_collection;
+        force_collection.push_back(&force_law);
+
+        // Create crypt simulation from tissue and force law
+        VertexCryptSimulation2d simulator(crypt, force_collection);
+        simulator.SetOutputDirectory("VertexCrypt2DPeriodicSaveAndLoad");
+
+        // Our full end time is 0.25, here we run until 0.1 then load and run more below.
+        simulator.SetEndTime(0.1);
+
+        // Create cell killer and pass in to crypt simulation
+        SloughingCellKiller<2> sloughing_cell_killer(&crypt, true);
+        simulator.AddCellKiller(&sloughing_cell_killer);
+
+        // Run simulation
+        simulator.Solve();
+
+        // Save the results
+        TissueSimulationArchiver<2, VertexCryptSimulation2d>::Save(&simulator);
+
+        // Tidy up
+        WntConcentration<2>::Destroy();
+    }
+
+
+    // Testing Load (based on previous two tests)
+    void TestLoad() throw (Exception)
+    {
+        // Load the simulation from the TestSave method above and
+        // run it from 0.1 to 0.2
+        VertexCryptSimulation2d* p_simulator1;
+
+        WntConcentration<2>::Instance();   // Make sure there is no existing Wnt Gradient before load
+        WntConcentration<2>::Destroy();
+
+        p_simulator1 = TissueSimulationArchiver<2, VertexCryptSimulation2d>::Load("VertexCrypt2DPeriodicSaveAndLoad", 0.1);
+        p_simulator1->SetEndTime(0.2);
+        p_simulator1->Solve();
+
+        // Get mesh
+        MutableVertexMesh<2,2>& r_mesh1 = (static_cast<VertexBasedTissue<2>*>(&(p_simulator1->rGetTissue())))->rGetMesh();
+
+        // Save then reload, compare meshes either side
+        TissueSimulationArchiver<2, VertexCryptSimulation2d>::Save(p_simulator1);
+
+        VertexCryptSimulation2d* p_simulator2 = TissueSimulationArchiver<2, VertexCryptSimulation2d>::Load("VertexCrypt2DPeriodicSaveAndLoad", 0.2);
+        MutableVertexMesh<2,2>& r_mesh2 = (static_cast<VertexBasedTissue<2>*>(&(p_simulator2->rGetTissue())))->rGetMesh();
+
+        CompareMeshes(&r_mesh1, &r_mesh2);
+
+        // Run a bit further...
+        p_simulator2->SetEndTime(0.25);
+
+        // Run simulation
+        p_simulator2->Solve();
+
+        // Test the locations of a few nodes
+        std::vector<double> node_4_location = p_simulator2->GetNodeLocation(4);
+        TS_ASSERT_DELTA(node_4_location[0], 0.0021, 1e-4);
+        TS_ASSERT_DELTA(node_4_location[1], 0.1516, 1e-4);
+
+        std::vector<double> node_5_location = p_simulator2->GetNodeLocation(5);
+        TS_ASSERT_DELTA(node_5_location[0], 0.9721, 1e-4);
+        TS_ASSERT_DELTA(node_5_location[1], 0.1437, 1e-4);
+
+        // Test Wnt concentration was set up correctly
+        TS_ASSERT_EQUALS(WntConcentration<2>::Instance()->IsWntSetUp(), true);
+
+        // Test the Wnt concentration result
+        WntConcentration<2>* p_wnt = WntConcentration<2>::Instance();
+        TS_ASSERT_DELTA(p_wnt->GetWntLevel(p_simulator2->rGetTissue().rGetCellUsingLocationIndex(2)), 0.9757, 1e-4);
+        TS_ASSERT_DELTA(p_wnt->GetWntLevel(p_simulator2->rGetTissue().rGetCellUsingLocationIndex(3)), 0.9743, 1e-4);
+
+        // Tidy up
+        delete p_simulator1;
+        delete p_simulator2;
+        WntConcentration<2>::Destroy();
+    }
 };
 
 #endif /*TESTVERTEXCRYPTSIMULATION2D_HPP_*/
