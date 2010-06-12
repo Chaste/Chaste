@@ -60,6 +60,29 @@ MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::MutableVertexMesh(std::vector<Node<SP
         VertexElement<ELEMENT_DIM,SPACE_DIM>* p_temp_vertex_element = vertexElements[elem_index];
         this->mElements.push_back(p_temp_vertex_element);
     }
+    // In 3D, populate mFaces
+    if (SPACE_DIM == 3)
+    {
+        // Use a std::set to keep track of which faces have been added to mFaces
+        std::set<unsigned> faces_counted;
+
+        // Loop over mElements
+        for (unsigned elem_index=0; elem_index<this->mElements.size(); elem_index++)
+        {
+            // Loop over faces of this element
+            for (unsigned face_index=0; face_index<this->mElements[elem_index]->GetNumFaces(); face_index++)
+            {
+                VertexElement<ELEMENT_DIM-1, SPACE_DIM>* p_face = this->mElements[elem_index]->GetFace(face_index);
+
+                // If this face is not already contained in mFaces, add it, and update faces_counted
+                if (faces_counted.find(p_face->GetIndex()) == faces_counted.end())
+                {
+                    this->mFaces.push_back(p_face);
+                    faces_counted.insert(p_face->GetIndex());
+                }
+            }
+        }
+    }
 
     // Register elements with nodes
     for (unsigned index=0; index<this->mElements.size(); index++)

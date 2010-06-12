@@ -41,6 +41,107 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 class TestMutableVertexMesh : public CxxTest::TestSuite
 {
+private:
+
+    MutableVertexMesh<3,3>* ConstructCubeAndPyramidMesh()
+    {
+        // Make 8 nodes to assign to a cube and a pyramid element
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, false, 1.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(2, false, 0.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(3, false, 0.0, 0.0, 1.0));
+        nodes.push_back(new Node<3>(4, false, 1.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(5, false, 0.0, 1.0, 1.0));
+        nodes.push_back(new Node<3>(6, false, 1.0, 0.0, 1.0));
+        nodes.push_back(new Node<3>(7, false, 1.0, 1.0, 1.0));
+        nodes.push_back(new Node<3>(8, false, 0.5, 0.5, 1.5));
+
+        std::vector<std::vector<Node<3>*> > nodes_faces(10);
+
+        // Make 6 square faces out of these nodes
+        nodes_faces[0].push_back(nodes[0]);
+        nodes_faces[0].push_back(nodes[2]);
+        nodes_faces[0].push_back(nodes[4]);
+        nodes_faces[0].push_back(nodes[1]);
+
+        nodes_faces[1].push_back(nodes[4]);
+        nodes_faces[1].push_back(nodes[7]);
+        nodes_faces[1].push_back(nodes[5]);
+        nodes_faces[1].push_back(nodes[2]);
+
+        nodes_faces[2].push_back(nodes[7]);
+        nodes_faces[2].push_back(nodes[6]);
+        nodes_faces[2].push_back(nodes[1]);
+        nodes_faces[2].push_back(nodes[4]);
+
+        nodes_faces[3].push_back(nodes[0]);
+        nodes_faces[3].push_back(nodes[3]);
+        nodes_faces[3].push_back(nodes[5]);
+        nodes_faces[3].push_back(nodes[2]);
+
+        nodes_faces[4].push_back(nodes[1]);
+        nodes_faces[4].push_back(nodes[6]);
+        nodes_faces[4].push_back(nodes[3]);
+        nodes_faces[4].push_back(nodes[0]);
+
+        nodes_faces[5].push_back(nodes[7]);
+        nodes_faces[5].push_back(nodes[6]);
+        nodes_faces[5].push_back(nodes[3]);
+        nodes_faces[5].push_back(nodes[5]);
+
+        // Make 4 triangular faces out of these nodes
+        nodes_faces[6].push_back(nodes[6]);
+        nodes_faces[6].push_back(nodes[7]);
+        nodes_faces[6].push_back(nodes[8]);
+
+        nodes_faces[7].push_back(nodes[6]);
+        nodes_faces[7].push_back(nodes[8]);
+        nodes_faces[7].push_back(nodes[3]);
+
+        nodes_faces[8].push_back(nodes[3]);
+        nodes_faces[8].push_back(nodes[8]);
+        nodes_faces[8].push_back(nodes[5]);
+
+        nodes_faces[9].push_back(nodes[5]);
+        nodes_faces[9].push_back(nodes[8]);
+        nodes_faces[9].push_back(nodes[7]);
+
+        // Make the faces
+        std::vector<VertexElement<2,3>*> faces;
+
+        for (unsigned i=0; i<10; i++)
+        {
+            faces.push_back(new VertexElement<2,3>(i, nodes_faces[i]));
+        }
+
+        // Make the elements
+        std::vector<VertexElement<2,3>*> faces_element_0, faces_element_1;
+        std::vector<bool> orientations_0, orientations_1;
+
+        // Cube element
+        for (unsigned i=0; i<6; i++)
+        {
+            faces_element_0.push_back(faces[i]);
+            orientations_0.push_back(true);
+        }
+
+        // Pyramid element
+        for (unsigned i=6; i<10; i++)
+        {
+            faces_element_1.push_back(faces[i]);
+            orientations_1.push_back(true);
+        }
+        faces_element_1.push_back(faces[5]);
+        orientations_1.push_back(false);
+
+        std::vector<VertexElement<3,3>*> elements;
+        elements.push_back(new VertexElement<3,3>(0, faces_element_0, orientations_0));
+        elements.push_back(new VertexElement<3,3>(1, faces_element_1, orientations_1));
+
+        return new MutableVertexMesh<3,3>(nodes, elements);
+    }
+
 public:
 
     void TestMutableVertexElementIterator() throw (Exception)
@@ -164,6 +265,72 @@ public:
         TS_ASSERT_EQUALS(basic_vertex_mesh.SolveNodeMapping(0), 0u);
         TS_ASSERT_EQUALS(basic_vertex_mesh.SolveElementMapping(0), 0u);
         TS_ASSERT_EQUALS(basic_vertex_mesh.SolveBoundaryElementMapping(0), 0u);
+    }
+
+    void TestBasic3dMutableVertexMesh()
+    {
+        MutableVertexMesh<3,3>* p_mesh = ConstructCubeAndPyramidMesh();
+
+        // Set/get parameter values
+        p_mesh->SetCellRearrangementThreshold(0.1);
+        p_mesh->SetEdgeDivisionThreshold(5.1);
+        p_mesh->SetT2Threshold(0.01);
+        p_mesh->SetCellRearrangementRatio(1.6);
+
+        TS_ASSERT_DELTA(p_mesh->GetCellRearrangementThreshold(), 0.1, 1e-6);
+        TS_ASSERT_DELTA(p_mesh->GetEdgeDivisionThreshold(), 5.1, 1e-6);
+        TS_ASSERT_DELTA(p_mesh->GetT2Threshold(), 0.01, 1e-6);
+        TS_ASSERT_DELTA(p_mesh->GetCellRearrangementRatio(), 1.6, 1e-6);
+
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 9u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumFaces(), 10u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumAllElements(), 2u);
+
+        // Test the location of one of the nodes
+        Node<3>* p_node_2 = p_mesh->GetNode(2);
+        TS_ASSERT_DELTA(p_node_2->rGetLocation()[0], 0.0, 1e-3);
+        TS_ASSERT_DELTA(p_node_2->rGetLocation()[1], 1.0, 1e-3);
+        TS_ASSERT_DELTA(p_node_2->rGetLocation()[2], 0.0, 1e-3);
+
+        // Test a couple of the elements
+        VertexElement<3,3>* p_element_0 = p_mesh->GetElement(0);
+        TS_ASSERT_EQUALS(p_element_0->GetNumNodes(), 8u);
+        TS_ASSERT_EQUALS(p_element_0->GetNumFaces(), 6u);
+
+        VertexElement<3,3>* p_element_1 = p_mesh->GetElement(1);
+        TS_ASSERT_EQUALS(p_element_1->GetNumNodes(), 5u);
+        TS_ASSERT_EQUALS(p_element_1->GetNumFaces(), 5u);
+
+        // Check that the nodes know which elements they are in
+        std::set<unsigned> temp_list1;
+        temp_list1.insert(0);
+
+        // Nodes 0, 1, 2 and 4 are only in element 0
+        TS_ASSERT_EQUALS(p_mesh->GetNode(0)->rGetContainingElementIndices(), temp_list1);
+        TS_ASSERT_EQUALS(p_mesh->GetNode(1)->rGetContainingElementIndices(), temp_list1);
+        TS_ASSERT_EQUALS(p_mesh->GetNode(2)->rGetContainingElementIndices(), temp_list1);
+        TS_ASSERT_EQUALS(p_mesh->GetNode(4)->rGetContainingElementIndices(), temp_list1);
+
+        // Node 3, 5, 6 and 7 are in elements 0 and 1
+        temp_list1.insert(1u);
+        TS_ASSERT_EQUALS(p_mesh->GetNode(3)->rGetContainingElementIndices(), temp_list1);
+        TS_ASSERT_EQUALS(p_mesh->GetNode(5)->rGetContainingElementIndices(), temp_list1);
+        TS_ASSERT_EQUALS(p_mesh->GetNode(6)->rGetContainingElementIndices(), temp_list1);
+        TS_ASSERT_EQUALS(p_mesh->GetNode(7)->rGetContainingElementIndices(), temp_list1);
+
+        // Node 8 is only in element 1
+        std::set<unsigned> temp_list2;
+        temp_list2.insert(1u);
+        TS_ASSERT_EQUALS(p_mesh->GetNode(8)->rGetContainingElementIndices(), temp_list2);
+
+        // Coverage
+        TS_ASSERT_EQUALS(p_mesh->SolveNodeMapping(0), 0u);
+        TS_ASSERT_EQUALS(p_mesh->SolveElementMapping(0), 0u);
+        TS_ASSERT_EQUALS(p_mesh->SolveBoundaryElementMapping(0), 0u);
+
+        // Tidy up
+        delete p_mesh;
     }
 
     void TestMeshConstructionFromMeshReader()
@@ -1205,7 +1372,7 @@ public:
         // Set archiving location
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "mutable_vertex_2d.arch";
-        ArchiveLocationInfo::SetMeshFilename("mutable_vertex");
+        ArchiveLocationInfo::SetMeshFilename("mutable_vertex_2d");
 
         // Create mesh
         HoneycombMutableVertexMeshGenerator generator(5, 3);
@@ -1305,7 +1472,117 @@ public:
         }
     }
 
-    ///\todo Create a 3D archiving test (#1377)
+    void TestArchive3dMutableVertexMesh()
+    {
+        // Set archiving location
+        FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
+        std::string archive_file = "mutable_vertex_3d.arch";
+        ArchiveLocationInfo::SetMeshFilename("mutable_vertex_3d");
+
+        // Create mesh
+        MutableVertexMesh<3,3>* p_mutable_mesh = ConstructCubeAndPyramidMesh();
+
+        // Set member variables
+        p_mutable_mesh->SetCellRearrangementThreshold(0.54);
+        p_mutable_mesh->SetEdgeDivisionThreshold(17.3);
+        p_mutable_mesh->SetT2Threshold(0.012);
+        p_mutable_mesh->SetCellRearrangementRatio(1.6);
+
+        AbstractMesh<3,3>* const p_mesh = p_mutable_mesh;
+
+        /*
+         * You need the const above to stop a BOOST_STATIC_ASSERTION failure.
+         * This is because the serialization library only allows you to save tracked
+         * objects while the compiler considers them const, to prevent the objects
+         * changing during the save, and so object tracking leading to wrong results.
+         *
+         * E.g. A is saved once via pointer, then changed, then saved again. The second
+         * save notes that A was saved before, so doesn't write its data again, and the
+         * change is lost.
+         */
+
+        // Create an output archive
+        {
+            TS_ASSERT_EQUALS((static_cast<MutableVertexMesh<3,3>*>(p_mesh))->GetNumNodes(), 9u);
+            TS_ASSERT_EQUALS((static_cast<MutableVertexMesh<3,3>*>(p_mesh))->GetNumElements(), 2u);
+            TS_ASSERT_EQUALS((static_cast<MutableVertexMesh<3,3>*>(p_mesh))->GetNumFaces(), 10u);
+
+            // Create output archive
+            ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
+
+            // We have to serialize via a pointer here, or the derived class information is lost
+            (*p_arch) << p_mesh;
+        }
+
+        {
+            // De-serialize and compare
+            AbstractMesh<3,3>* p_mesh2;
+
+            // Create an input archive
+            ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
+
+            // Restore from the archive
+            (*p_arch) >> p_mesh2;
+
+            MutableVertexMesh<3,3>* p_mesh_original = static_cast<MutableVertexMesh<3,3>*>(p_mesh);
+            MutableVertexMesh<3,3>* p_mesh_loaded = static_cast<MutableVertexMesh<3,3>*>(p_mesh2);
+
+            // Compare the loaded mesh against the original
+
+            TS_ASSERT_EQUALS(p_mesh_original->GetNumNodes(), p_mesh_loaded->GetNumNodes());
+
+            for (unsigned node_index=0; node_index<p_mesh_original->GetNumNodes(); node_index++)
+            {
+                Node<3>* p_node = p_mesh_original->GetNode(node_index);
+                Node<3>* p_node2 = p_mesh_loaded->GetNode(node_index);
+
+                TS_ASSERT_EQUALS(p_node->IsDeleted(), p_node2->IsDeleted());
+                TS_ASSERT_EQUALS(p_node->GetIndex(), p_node2->GetIndex());
+
+                TS_ASSERT_EQUALS(p_node->IsBoundaryNode(), p_node2->IsBoundaryNode());
+
+                for (unsigned dimension=0; dimension<3; dimension++)
+                {
+                    TS_ASSERT_DELTA(p_node->rGetLocation()[dimension], p_node2->rGetLocation()[dimension], 1e-4);
+                }
+            }
+
+            TS_ASSERT_EQUALS(p_mesh_original->GetNumElements(), p_mesh_loaded->GetNumElements());
+
+            for (unsigned elem_index=0; elem_index < p_mesh_original->GetNumElements(); elem_index++)
+            {
+                TS_ASSERT_EQUALS(p_mesh_original->GetElement(elem_index)->GetNumNodes(),
+                                 p_mesh_loaded->GetElement(elem_index)->GetNumNodes());
+
+                TS_ASSERT_EQUALS(p_mesh_original->GetElement(elem_index)->GetNumFaces(),
+                                 p_mesh_loaded->GetElement(elem_index)->GetNumFaces());
+
+                for (unsigned local_index=0; local_index<p_mesh_original->GetElement(elem_index)->GetNumNodes(); local_index++)
+                {
+                    TS_ASSERT_EQUALS(p_mesh_original->GetElement(elem_index)->GetNodeGlobalIndex(local_index),
+                                     p_mesh_loaded->GetElement(elem_index)->GetNodeGlobalIndex(local_index));
+                }
+            }
+
+            TS_ASSERT_DELTA(p_mesh_loaded->GetCellRearrangementThreshold(), 0.54, 1e-6);
+            TS_ASSERT_DELTA(p_mesh_loaded->GetEdgeDivisionThreshold(), 17.3, 1e-6);
+            TS_ASSERT_DELTA(p_mesh_loaded->GetT2Threshold(), 0.012, 1e-6);
+            TS_ASSERT_DELTA(p_mesh_loaded->GetCellRearrangementRatio(), 1.6, 1e-6);
+
+            TS_ASSERT_DELTA(p_mesh_original->GetCellRearrangementThreshold(), 0.54, 1e-6);
+            TS_ASSERT_DELTA(p_mesh_original->GetEdgeDivisionThreshold(), 17.3, 1e-6);
+            TS_ASSERT_DELTA(p_mesh_original->GetT2Threshold(), 0.012, 1e-6);
+            TS_ASSERT_DELTA(p_mesh_original->GetCellRearrangementRatio(), 1.6, 1e-6);
+
+            // Tidy up
+            delete p_mesh_loaded;
+        }
+        
+        delete p_mesh;
+    }
+
 };
 
 #endif /*TESTMUTABLEVERTEXMESH_HPP_*/
