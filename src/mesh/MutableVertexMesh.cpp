@@ -320,8 +320,9 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
 
         if (norm_2(a_to_b)< 2.0*mCellRearrangementRatio*mCellRearrangementThreshold)
         {
-        	// should be a warning see #1394
-        	//TRACE("Edge is too small for normal division, putting node in the middle of a and b, there may be T1Swaps straight away.") // \TODO or should we move a and b apart, it may interfere with neighboring edges? see #1399
+        	///\todo This should be a warning (see #1394)
+            ///\todo or should we move a and b apart, it may interfere with neighboring edges? (see #1399)
+        	// TRACE("Edge is too small for normal division, putting node in the middle of a and b, there may be T1Swaps straight away.")
         	intersection = position_a + 0.5*a_to_b;
         }
         else
@@ -488,7 +489,8 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(VertexElement<
      * place it above.
      */
 
-    /// Find lowest element \todo this could be more efficient
+    // Find lowest element
+    ///\todo this could be more efficient
     double height_midpoint_1 = 0.0;
     double height_midpoint_2 = 0.0;
     unsigned counter_1 = 0;
@@ -788,7 +790,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
                     {
                         // Find locations of current node and anticlockwise node
                         Node<SPACE_DIM>* p_current_node = elem_iter->GetNode(local_index);
-                        unsigned local_index_plus_one = (local_index+1)%new_num_nodes; /// \todo Should use iterators to tidy this up
+                        unsigned local_index_plus_one = (local_index+1)%new_num_nodes; /// \todo use iterators to tidy this up
                         Node<SPACE_DIM>* p_anticlockwise_node = elem_iter->GetNode(local_index_plus_one);
 
                         // Find distance between nodes
@@ -809,7 +811,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
                              it != all_elements.end();
                              ++it)
                         {
-                            ///\todo this magic number needs to be investigated.
+                            ///\todo this magic number needs to be investigated
                             if (this->GetElement(*it)->GetNumNodes() <= 3)//&&(this->GetVolumeOfElement(*it) < 2.0*GetT2Threshold()))
                             {
                                 triangular_element = true;
@@ -853,7 +855,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
             recheck_mesh = false;
 
             // Check that no nodes have overlapped elements
-            /// \todo Only need to check this next bit if the element/node is on the boundary (see #933 and #943)
+            /// \todo Only need to check this next bit if the element/node is on the boundary (see #1263)
             for (typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator elem_iter = this->GetElementIteratorBegin();
                  elem_iter != this->GetElementIteratorEnd();
                  ++elem_iter)
@@ -866,7 +868,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
                     for (unsigned local_index=0; local_index<num_nodes; local_index++)
                     {
                         /*
-                         *\TODO use method extraction to make this more readable i.e. make the central
+                         *\todo use method extraction to make this more readable i.e. make the central
                          * brake a return in a separate method containing all the nested loops/statements.
                          */
                         if (recheck_mesh)
@@ -1053,7 +1055,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                     // Remove the deleted node and re-index
                     RemoveDeletedNodes();
                 }
-                //\todo use the fact that both nodes are boundary nodes here
+                ///\todo use the fact that both nodes are boundary nodes here (#1263)
                 else if (nodeA_elem_indices.size()==2 && nodeB_elem_indices.size()==2)
                 {
                     // element in nodeA_elem_indices which is not in nodeB_elem_indices contains a shared node with the element in nodeA_elem_indices which is not in nodeB_elem_indices.
@@ -1118,7 +1120,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
 
                         Node<SPACE_DIM>* p_nodeC = this->mNodes[nodeC_index];
 
-                        // \todo this should be a helper method "PerformVoidRemoval(pNodeA, pNodeB, p_nodeC)";
+                        ///\todo this should be a helper method "PerformVoidRemoval(pNodeA, pNodeB, p_nodeC)";
 
                         unsigned nodeA_index = pNodeA->GetIndex();
                         unsigned nodeB_index = pNodeB->GetIndex();
@@ -1126,16 +1128,16 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                         c_vector<double, SPACE_DIM> nodes_midpoint = pNodeA->rGetLocation() + this->GetVectorFromAtoB(pNodeA->rGetLocation(), pNodeB->rGetLocation())/3.0
                                                                                             + this->GetVectorFromAtoB(pNodeA->rGetLocation(), p_nodeC->rGetLocation())/3.0;
 
-                        Node<SPACE_DIM>*  p_low_node_A_B = (nodeA_index < nodeB_index) ? pNodeA : pNodeB; // Node with the lowest index out of A and B
-                        Node<SPACE_DIM>*  p_low_node = (p_low_node_A_B->GetIndex() < nodeC_index) ? p_low_node_A_B : p_nodeC; // Node with the lowest index out of A, B and C.
+                        Node<SPACE_DIM>* p_low_node_A_B = (nodeA_index < nodeB_index) ? pNodeA : pNodeB; // Node with the lowest index out of A and B
+                        Node<SPACE_DIM>* p_low_node = (p_low_node_A_B->GetIndex() < nodeC_index) ? p_low_node_A_B : p_nodeC; // Node with the lowest index out of A, B and C.
                         PerformNodeMerge(pNodeA,pNodeB);
                         PerformNodeMerge(p_low_node_A_B,p_nodeC);
 
                         c_vector<double, SPACE_DIM>& r_low_node_location = p_low_node->rGetModifiableLocation();
 
-                         r_low_node_location = nodes_midpoint;
+                        r_low_node_location = nodes_midpoint;
 
-                           // Sort out boundary nodes
+                        // Sort out boundary nodes
                         p_low_node->SetAsBoundaryNode(false);
 
                         // Remove the deleted nodes and re-index
@@ -1388,7 +1390,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
     perpendicular_vector(0) = -a_to_b(1);
     perpendicular_vector(1) = a_to_b(0);
 
-    if(norm_2(a_to_b)<1e-10) //\TODO this is a magic number think of something better.
+    if (norm_2(a_to_b) < 1e-10) ///\todo this is a magic number - think of something better
     {
         EXCEPTION("Nodes are too close together, this shouldn't happen");
     }
@@ -1692,15 +1694,15 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
 
     /*
      * If the edge is shorter than 4.0*mCellRearrangementRatio*mCellRearangementThreshold move vertexA and vertexB
-     * 4.0*mCellRearrangementRatio*mCellRearrangementThreshold apart. \TODO investigate if moving A and B causes other issues with nearby nodes.
+     * 4.0*mCellRearrangementRatio*mCellRearrangementThreshold apart. \todo investigate if moving A and B causes other issues with nearby nodes.
      *
      * Note: this distance so that there is always enough room for new nodes (if necessary)
-     * \TODO currently this assumes a worst case scenario of 3 nodes between A and B could be less movement for other cases. #1399
+     * \todo currently this assumes a worst case scenario of 3 nodes between A and B could be less movement for other cases. #1399
      */
     if (norm_2(vector_a_to_b) < 4.0*mCellRearrangementRatio*mCellRearrangementThreshold)
     {
-        // This should be a warning see #1394
-           //TRACE("Trying to merge a node onto an edge which is too small.");
+        ///\todo This should be a warning (see #1394)
+        // TRACE("Trying to merge a node onto an edge which is too small.");
         c_vector<double, SPACE_DIM> centre_a_and_b = vertexA + 0.5*vector_a_to_b;
 
         vertexA =  centre_a_and_b  - 2.0*mCellRearrangementRatio*mCellRearrangementThreshold*vector_a_to_b/norm_2(vector_a_to_b);
@@ -1715,8 +1717,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
         vector_a_to_b = this->GetVectorFromAtoB(vertexA, vertexB);
         edge_ab_unit_vector = vector_a_to_b/norm_2(vector_a_to_b);
 
-        // reset the intersection to the middle to allow enough room for new nodes
-           intersection = centre_a_and_b;
+        // Reset the intersection to the middle to allow enough room for new nodes
+        intersection = centre_a_and_b;
     }
 
     /*
@@ -1724,7 +1726,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
      * mCellRearrangementRatio^2*mCellRearrangementThreshold away.
      *
      * Note: this distance so that there is always enough room for new nodes (if necessary).
-     * \TODO currently this assumes a worst case scenario of 3 nodes between A and B could be less movement for other cases.
+     * \todo currently this assumes a worst case scenario of 3 nodes between A and B could be less movement for other cases.
      */
     if (norm_2(intersection - vertexA) < 2.0*mCellRearrangementRatio*mCellRearrangementThreshold)
     {
