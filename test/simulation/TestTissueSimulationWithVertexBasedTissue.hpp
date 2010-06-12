@@ -627,20 +627,38 @@ public:
 
         TS_ASSERT_DELTA(simulator.GetDt(), 0.002, 1e-12);
 
-        // Run simulation
+        // Run and save simulation
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
 
         TissueSimulationArchiver<2, TissueSimulation<2> >::Save(&simulator);
 
+        TS_ASSERT_EQUALS(simulator.rGetTissue().GetNumRealCells(), 36u);
+        TS_ASSERT_EQUALS(simulator.rGetTissue().GetNumNodes(), 96u);
+        TS_ASSERT_EQUALS((static_cast<VertexBasedTissue<2>*>(&(simulator.rGetTissue())))->GetNumElements(), 36u);
+
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 0.1, 1e-9);
+        TissueCell cell = simulator.rGetTissue().rGetCellUsingLocationIndex(23);
+        TS_ASSERT_DELTA(cell.GetAge(), 23.1, 1e-4);
+
+        SimulationTime::Destroy();
+        SimulationTime::Instance()->SetStartTime(0.0);
+
+        // Load simulation
         TissueSimulation<2>* p_simulator
             = TissueSimulationArchiver<2, TissueSimulation<2> >::Load("TestTissueSimulationWithVertexBasedTissueSaveAndLoad", end_time);
 
         p_simulator->SetEndTime(0.2);
 
+        TS_ASSERT_EQUALS(p_simulator->rGetTissue().GetNumRealCells(), 36u);
+        TS_ASSERT_EQUALS(p_simulator->rGetTissue().GetNumNodes(), 96u);
+        TS_ASSERT_EQUALS((static_cast<VertexBasedTissue<2>*>(&(p_simulator->rGetTissue())))->GetNumElements(), 36u);
+
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 0.1, 1e-9);
+        TissueCell cell2 = p_simulator->rGetTissue().rGetCellUsingLocationIndex(23);
+        TS_ASSERT_DELTA(cell2.GetAge(), 23.1, 1e-4);
+
         // Run simulation
         TS_ASSERT_THROWS_NOTHING(p_simulator->Solve());
-
-        /// \todo add further tests (see #821 and #862)
 
         // Tidy up
         delete p_simulator;
