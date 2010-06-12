@@ -1355,7 +1355,7 @@ public:
             p_data->SetTissue(p_tissue);
 
             // Put some data in
-            unsigned i=0;
+            unsigned i = 0;
             for (AbstractTissue<2>::Iterator cell_iter = p_tissue->Begin();
                  cell_iter != p_tissue->End();
                  ++cell_iter)
@@ -1374,6 +1374,7 @@ public:
             (*p_arch) << static_cast<const CellwiseData<2>&>(*CellwiseData<2>::Instance());
 
             CellwiseData<2>::Destroy();
+            delete p_tissue;
         }
 
         {
