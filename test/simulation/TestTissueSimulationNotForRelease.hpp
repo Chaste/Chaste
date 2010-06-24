@@ -95,11 +95,9 @@ public:
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
-        c_vector<double,2> width_extremes = p_mesh->GetWidthExtremes(0u);
-        c_vector<double,2> height_extremes = p_mesh->GetWidthExtremes(1u);
-
-        double width_of_mesh = (num_cells_width/(num_cells_width+2.0*thickness_of_ghost_layer))*(width_extremes[1] - width_extremes[0]);
-        double height_of_mesh = (num_cells_depth/(num_cells_depth+2.0*thickness_of_ghost_layer))*(height_extremes[1] - height_extremes[0]);
+        ChasteCuboid<2> bounding_box=p_mesh->CalculateBoundingBox();
+        double width_of_mesh = (num_cells_width/(num_cells_width+2.0*thickness_of_ghost_layer))*(bounding_box.GetWidth(0));
+        double height_of_mesh = (num_cells_depth/(num_cells_depth+2.0*thickness_of_ghost_layer))*(bounding_box.GetWidth(1));
 
         p_mesh->Translate(-width_of_mesh/2, -height_of_mesh/2);
 

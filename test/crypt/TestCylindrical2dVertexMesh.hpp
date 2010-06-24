@@ -63,15 +63,12 @@ public:
         CylindricalHoneycombVertexMeshGenerator generator(4, 4);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
-        // Test GetWidthExtremes() method
-        c_vector<double,2> width_extremes = p_mesh->GetWidthExtremes(0u);
-        c_vector<double,2> height_extremes = p_mesh->GetWidthExtremes(1u);
-
-        TS_ASSERT_DELTA(width_extremes[0], 0.0000, 1e-4);
-        TS_ASSERT_DELTA(width_extremes[1], 3.5, 1e-4); // \todo this should really be 4 as mesh is periodic
-
-        TS_ASSERT_DELTA(height_extremes[0], 0.0000, 1e-4);
-        TS_ASSERT_DELTA(height_extremes[1], 13.0*0.5/sqrt(3), 1e-4);
+        // Test CalculateBoundingBox() method
+        ChasteCuboid<2> bounds=p_mesh->CalculateBoundingBox();
+        TS_ASSERT_DELTA(bounds.rGetUpperCorner()[0], 3.5,              1e-4);// \todo this should really be 4 as mesh is periodic
+        TS_ASSERT_DELTA(bounds.rGetUpperCorner()[1], 13.0*0.5/sqrt(3), 1e-4);
+        TS_ASSERT_DELTA(bounds.rGetLowerCorner()[0], 0.0,    1e-4);
+        TS_ASSERT_DELTA(bounds.rGetLowerCorner()[1], 0.0,    1e-4);
 
         // Test GetWidth() method
         double width = p_mesh->GetWidth(0);
