@@ -34,6 +34,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
+#include "CellwiseData.hpp"
 #include "VertexBasedTissue.hpp"
 #include "HoneycombMutableVertexMeshGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
@@ -879,6 +880,20 @@ public:
         TissueConfig::Instance()->SetOutputCellAges(true);
         TissueConfig::Instance()->SetOutputCellVolumes(true);
 
+        // Coverage of writing CellwiseData to VTK
+        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
+        p_data->SetNumCellsAndVars(tissue.GetNumRealCells(), 2);
+        p_data->SetTissue(&tissue);
+        for (unsigned var=0; var<2; var++)
+        {
+            for (AbstractTissue<2>::Iterator cell_iter = tissue.Begin();
+                 cell_iter != tissue.End();
+                 ++cell_iter)
+            {
+                p_data->SetValue((double) 3.0*var, tissue.GetLocationIndexUsingCell(*cell_iter), var);
+            }
+        }
+
         std::string output_directory = "TestVertexBasedTissueOutputWriters";
         OutputFileHandler output_file_handler(output_directory, false);
 
@@ -919,6 +934,9 @@ public:
 
         // For coverage
         TS_ASSERT_THROWS_NOTHING(tissue.WriteResultsToFiles());
+
+        // Tidy up
+        CellwiseData<2>::Destroy();
     }
 
 

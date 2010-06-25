@@ -27,6 +27,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "VertexBasedTissue.hpp"
+#include "CellwiseData.hpp"
 #include "VertexMeshWriter.hpp"
 
 template<unsigned DIM>
@@ -400,53 +401,77 @@ void VertexBasedTissue<DIM>::WriteResultsToFiles()
     std::stringstream time;
     time << p_time->GetTimeStepsElapsed();
 
-    std::vector<double> cell_types;
-    std::vector<double> cell_ancestors;
-    std::vector<double> cell_mutation_states;
-    std::vector<double> cell_ages;
-    std::vector<double> cell_cycle_phases;
-    std::vector<double> cell_volumes;
+    unsigned num_elements = mrMesh.GetNumElements();
+    std::vector<double> cell_types(num_elements);
+    std::vector<double> cell_ancestors(num_elements);
+    std::vector<double> cell_mutation_states(num_elements);
+    std::vector<double> cell_ages(num_elements);
+    std::vector<double> cell_cycle_phases(num_elements);
+    std::vector<double> cell_volumes(num_elements);
+    std::vector<std::vector<double> > cellwise_data;
 
-    // Loop over Voronoi elements
+    if (CellwiseData<DIM>::Instance()->IsSetUp())
+    {
+        CellwiseData<DIM>* p_data = CellwiseData<DIM>::Instance();
+        unsigned num_variables = p_data->GetNumVariables();
+        for (unsigned var=0; var<num_variables; var++)
+        {
+            std::vector<double> cellwise_data_var(num_elements);
+            cellwise_data.push_back(cellwise_data_var);
+        }
+    }
+
+    // Loop over vertex elements
     for (typename VertexMesh<DIM,DIM>::VertexElementIterator elem_iter = mrMesh.GetElementIteratorBegin();
          elem_iter != mrMesh.GetElementIteratorEnd();
          ++elem_iter)
     {
-        // Get index of this element in the Voronoi tessellation mesh
+        // Get index of this element in the vertex mesh
         unsigned elem_index = elem_iter->GetIndex();
 
         // Get the cell corresponding to this element
         TissueCell* p_cell = this->mLocationCellMap[elem_index];
+        assert(p_cell);
 
         if (TissueConfig::Instance()->GetOutputCellAncestors())
         {
             double ancestor_index = (p_cell->GetAncestor() == UNSIGNED_UNSET) ? (-1.0) : (double)p_cell->GetAncestor();
-            cell_ancestors.push_back(ancestor_index);
+            cell_ancestors[elem_index] = ancestor_index;
         }
         if (TissueConfig::Instance()->GetOutputCellProliferativeTypes())
         {
             double cell_type = p_cell->GetCellCycleModel()->GetCellProliferativeType();
-            cell_types.push_back(cell_type);
+            cell_types[elem_index] = cell_type;
         }
         if (TissueConfig::Instance()->GetOutputCellMutationStates())
         {
             double mutation_state = p_cell->GetMutationState()->GetColour();
-            cell_mutation_states.push_back(mutation_state);
+            cell_mutation_states[elem_index] = mutation_state;
         }
         if (TissueConfig::Instance()->GetOutputCellAges())
         {
             double age = p_cell->GetAge();
-            cell_ages.push_back(age);
+            cell_ages[elem_index] = age;
         }
         if (TissueConfig::Instance()->GetOutputCellCyclePhases())
         {
             double cycle_phase = p_cell->GetCellCycleModel()->GetCurrentCellCyclePhase();
-            cell_cycle_phases.push_back(cycle_phase);
+            cell_cycle_phases[elem_index] = cycle_phase;
         }
         if (TissueConfig::Instance()->GetOutputCellVolumes())
         {
             double cell_volume = mrMesh.GetVolumeOfElement(elem_index);
-            cell_volumes.push_back(cell_volume);
+            cell_volumes[elem_index] = cell_volume;
+        }
+        if (CellwiseData<DIM>::Instance()->IsSetUp())
+        {
+            CellwiseData<DIM>* p_data = CellwiseData<DIM>::Instance();
+            unsigned num_variables = p_data->GetNumVariables();
+
+            for (unsigned var=0; var<num_variables; var++)
+            {
+                cellwise_data[var][elem_index] = p_data->GetValue(*p_cell, var);
+            }
         }
     }
 
@@ -473,6 +498,16 @@ void VertexBasedTissue<DIM>::WriteResultsToFiles()
     if (TissueConfig::Instance()->GetOutputCellVolumes())
     {
         mesh_writer.AddCellData("Cell volumes", cell_volumes);
+    }
+    if (CellwiseData<DIM>::Instance()->IsSetUp())
+    {
+        for (unsigned var=0; var<cellwise_data.size(); var++)
+        {
+            std::stringstream data_name;
+            data_name << "Cellwise data " << var;
+            std::vector<double> cellwise_data_var = cellwise_data[var];
+            mesh_writer.AddCellData(data_name.str(), cellwise_data_var);
+        }
     }
 
     mesh_writer.WriteVtkUsingMesh(mrMesh, time.str());
