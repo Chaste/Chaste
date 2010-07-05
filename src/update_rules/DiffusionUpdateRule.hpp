@@ -1,0 +1,110 @@
+/*
+
+Copyright (C) University of Oxford, 2005-2010
+
+University of Oxford means the Chancellor, Masters and Scholars of the
+University of Oxford, having an administrative office at Wellington
+Square, Oxford OX1 2JD, UK.
+
+This file is part of Chaste.
+
+Chaste is free software: you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License as published
+by the Free Software Foundation, either version 2.1 of the License, or
+(at your option) any later version.
+
+Chaste is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details. The offer of Chaste under the terms of the
+License is subject to the License being interpreted in accordance with
+English Law and subject to any action against the University of Oxford
+being under the jurisdiction of the English Courts.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Chaste. If not, see <http://www.gnu.org/licenses/>.
+
+*/
+
+#ifndef DIFFUSIONUPDATERULE_HPP_
+#define DIFFUSIONUPDATERULE_HPP_
+
+#include "ChasteSerialization.hpp"
+#include <boost/serialization/base_object.hpp>
+
+#include "AbstractUpdateRule.hpp"
+#include "RandomNumberGenerator.hpp"
+
+/**
+ * An update rule class to model diffusion on the lattice.
+ * 
+ * A diffusion coefficient (defaulting to 1.0) is passed into the constructor. 
+ * At each time step, a uniform random number r_i is generated for each cell i; 
+ * if r_i > D*dt, where D denotes the diffusion coefficient and dt denotes the 
+ * time step, then the cell is moved to a random free neighbouring site (if there 
+ * are no free neighbouring sites, then the cell is not moved). 
+ */
+template<unsigned DIM>
+class DiffusionUpdateRule : public AbstractUpdateRule<DIM>
+{
+
+private:
+
+    /** Diffusion constant. */
+    double mDiffusionConstant;
+
+    /** Needed for serialization. */
+    friend class boost::serialization::access;
+    /**
+     * Serialize the object and its member variables.
+     *
+     * @param archive the archive
+     * @param version the current version of this class
+     */
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+        // If Archive is an output archive, then '&' resolves to '<<'
+        // If Archive is an input archive, then '&' resolves to '>>'
+        archive & boost::serialization::base_object<AbstractUpdateRule<DIM> >(*this);
+        archive & mDiffusionConstant;
+    }
+
+public :
+
+    /**
+     * Constructor.
+     *
+     * @param diffusionConstant the diffusion constant (defaults to 1.0)
+     */
+    DiffusionUpdateRule(double diffusionConstant=1.0);
+
+    /**
+     * Destructor.
+     */
+    ~DiffusionUpdateRule();
+
+    /**
+     * Overridden GetNewLocationOfCell() method.
+     *
+     * This randomly moves the cell in one of the possible directions defined by the tissue method
+     * GetNeighbouringNodeIndices().
+     *
+     * @param currentLocationIndex the current location index corresponding to a cell
+     * @param rTissue reference to the tissue
+     * @param dt simulation time step, used to calculate the probability of movement
+     *
+     * @return the new location index of the cell
+     */
+    unsigned GetNewLocationOfCell(unsigned currentLocationIndex,
+                                  LatticeBasedTissue<DIM>& rTissue,
+                                  double dt);
+
+    /** @return mDiffusionConstant */
+    double GetDiffusionConstant();
+};
+
+#include "SerializationExportWrapper.hpp"
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(DiffusionUpdateRule)
+
+#endif /*DIFFUSIONUPDATERULE_HPP_*/
