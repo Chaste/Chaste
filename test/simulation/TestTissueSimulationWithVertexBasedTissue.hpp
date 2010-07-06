@@ -383,7 +383,7 @@ public:
          */
 
         // Create a simple 2D MutableVertexMesh
-        HoneycombMutableVertexMeshGenerator generator(5, 5);
+        HoneycombMutableVertexMeshGenerator generator(5,5);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
         p_mesh->SetCellRearrangementThreshold(0.2);
         p_mesh->SetT2Threshold(sqrt(3.0)/1000.0); // so T2Swaps once it becomes a triangle
@@ -401,11 +401,10 @@ public:
             double birth_time = 0.0 - elem_index;
             cell.SetBirthTime(birth_time);
 
-            if (elem_index==18)
+            if (elem_index==13)
             {
                 cell.StartApoptosis(false);
             }
-
             cells.push_back(cell);
         }
 
@@ -427,9 +426,9 @@ public:
         simulator.SetEndTime(0.3);
 
         // Create a cell killer and pass in to simulation (note we must account for element index changes following each kill)
-        TargetedCellKiller cell0_killer(&tissue, 0);    // element on the bottom boundary
-        TargetedCellKiller cell2_killer(&tissue, 2);    // element in the interior
-        TargetedCellKiller cell12_killer(&tissue, 12);  // element on the corner boundary
+        TargetedCellKiller cell0_killer(&tissue, 0);    // element on the SW corner
+        TargetedCellKiller cell2_killer(&tissue, 2);    // element on the S boundary
+        TargetedCellKiller cell12_killer(&tissue, 12);  // element on the interior
 
         simulator.AddCellKiller(&cell0_killer);
         simulator.AddCellKiller(&cell2_killer);

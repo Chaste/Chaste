@@ -29,6 +29,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "MutableVertexMesh.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "UblasCustomFunctions.hpp"
+#include "Warnings.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::MutableVertexMesh(std::vector<Node<SPACE_DIM>*> nodes,
@@ -320,7 +321,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
 
         if (norm_2(a_to_b)< 2.0*mCellRearrangementRatio*mCellRearrangementThreshold)
         {
-        	///\todo This should be a warning (see #1394)
+        	WARNING("Edge is too small for normal division, putting node in the middle of a and b, there may be T1Swaps straight away.");
             ///\todo or should we move a and b apart, it may interfere with neighboring edges? (see #1399)
         	// TRACE("Edge is too small for normal division, putting node in the middle of a and b, there may be T1Swaps straight away.")
         	intersection = position_a + 0.5*a_to_b;
@@ -780,7 +781,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
                     unsigned new_num_nodes = num_nodes;
 
                     /*
-                     *  Perform T1 swaps and divide edges where necesary
+                     *  Perform T1 swaps and divide edges where necessary
                      *  Check there are > 3 nodes in both elements that contain the pair of nodes
                      *  and the edges are small enough
                      */
@@ -804,7 +805,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
                                        elements_of_node_b.begin(), elements_of_node_b.end(),
                                        std::inserter(all_elements, all_elements.begin()));
 
-                        // Track if either node is in a trinagular element.
+                        // Track if either node is in a triangular element.
                         bool triangular_element = false;
 
                         for (std::set<unsigned>::const_iterator it = all_elements.begin();
@@ -873,7 +874,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
                          */
                         if (recheck_mesh)
                         {
-                            break; //to break out of element vertices loop as vertices may of been deleted so num_nodes could of changed.
+                            break; //to break out of element vertices loop as vertices may have been deleted so num_nodes could have changed.
                         }
 
                         Node<SPACE_DIM>* p_current_node = elem_iter->GetNode(local_index);
@@ -1453,7 +1454,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
              */
 
             /*
-             * Locate local index of nodeA and nodeB and use the oredering to
+             * Locate local index of nodeA and nodeB and use the ordering to
              * identify the element, if nodeB_index > nodeA_index then element 4
              * and if nodeA_index > nodeB_index then element 2
              */
@@ -1701,8 +1702,9 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
      */
     if (norm_2(vector_a_to_b) < 4.0*mCellRearrangementRatio*mCellRearrangementThreshold)
     {
-        ///\todo This should be a warning (see #1394)
-        // TRACE("Trying to merge a node onto an edge which is too small.");
+
+    	WARNING("Trying to merge a node onto an edge which is too small.");
+        
         c_vector<double, SPACE_DIM> centre_a_and_b = vertexA + 0.5*vector_a_to_b;
 
         vertexA =  centre_a_and_b  - 2.0*mCellRearrangementRatio*mCellRearrangementThreshold*vector_a_to_b/norm_2(vector_a_to_b);
@@ -2265,7 +2267,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                 this->GetElement(elementIndex)->AddNode(node_A_local_index, pNode);
                 this->GetElement(elementIndex)->AddNode(node_A_local_index, this->mNodes[new_node_1_global_index]);
 
-                // Add the new nodes to the original elements contiang pNode (this also updates the node)
+                // Add the new nodes to the original elements containing pNode (this also updates the node)
                 if (next_node_1 == previous_node_2)
                 {
                     p_element_intersection_1->AddNode((local_index_1 + p_element_intersection_1->GetNumNodes() - 1)%(p_element_intersection_1->GetNumNodes()), this->mNodes[new_node_2_global_index]);
