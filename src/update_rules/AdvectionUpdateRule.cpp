@@ -53,35 +53,35 @@ AdvectionUpdateRule<DIM>::~AdvectionUpdateRule()
  * read in.
  */
 template<unsigned DIM>
-unsigned AdvectionUpdateRule<DIM>::GetNewLocationOfCell(unsigned currentLocationIndex,
+unsigned AdvectionUpdateRule<DIM>::GetNewLocationOfCell(unsigned CurrentLocationIndex,
                                                          LatticeBasedTissue<DIM>& rTissue,
                                                          double dt)
 {
     assert(DIM == 2); // this method only works in 2D at present
 
     // Make sure we have a cell at this node
-    if (rTissue.IsEmptySite(currentLocationIndex))
+    if (rTissue.IsEmptySite(CurrentLocationIndex))
     {
         EXCEPTION("There is no cell at the current location.");
     }
 
     double probability_of_moving = dt*mAdvectionSpeed;
 
-    unsigned new_location_index = currentLocationIndex;
+    unsigned new_location_index = CurrentLocationIndex;
 
     if (RandomNumberGenerator::Instance()->ranf() < probability_of_moving)
     {
-        unsigned flow_induced_new_index = currentLocationIndex;
+        unsigned flow_induced_new_index = CurrentLocationIndex;
         double width = rTissue.rGetMesh().GetWidth(0);
         unsigned nodes_across = (unsigned)width + 1;
         double height = rTissue.rGetMesh().GetWidth(1);
         unsigned nodes_up = (unsigned)height + 1;
 
         // Work out whether this node lies on any edge of the mesh
-        bool on_south_edge = (currentLocationIndex < nodes_across);
-        bool on_north_edge = (currentLocationIndex > nodes_up*(nodes_across - 1)-1);
-        bool on_west_edge = (currentLocationIndex%nodes_across == 0);
-        bool on_east_edge = (currentLocationIndex%nodes_across == nodes_across - 1);
+        bool on_south_edge = (CurrentLocationIndex < nodes_across);
+        bool on_north_edge = (CurrentLocationIndex > nodes_up*(nodes_across - 1)-1);
+        bool on_west_edge = (CurrentLocationIndex%nodes_across == 0);
+        bool on_east_edge = (CurrentLocationIndex%nodes_across == nodes_across - 1);
 
         ///\todo This could probably be made much more efficient
         switch (mAdvectionDirection)

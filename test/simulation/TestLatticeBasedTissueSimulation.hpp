@@ -374,7 +374,7 @@ public:
         mesh.ConstructRectangularMesh(6, 6, true); // 7*7 nodes
 
         // Create a single cell in the centre of the mesh
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);       
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         p_model->SetCellProliferativeType(DIFFERENTIATED);
         TissueCell cell(p_state, p_model);
@@ -388,7 +388,7 @@ public:
         // Create tissue
         LatticeBasedTissue<2> tissue(mesh, cells, real_node_indices);
 
-        // Create multiple advection update rules, one for each firection 
+        // Create multiple advection update rules, one for each firection
         std::vector<AbstractUpdateRule<2>*> update_rule_collection;
         AdvectionUpdateRule<2> update_rule_0(0, 1.0);
         AdvectionUpdateRule<2> update_rule_1(1, 1.0);
@@ -413,9 +413,9 @@ public:
 
         /*
          * Set the time step to be large enough to guarantee that the cell moves
-         * according to each of the update rules at each time step (and hence 
+         * according to each of the update rules at each time step (and hence
          * remains at its original location).
-         */ 
+         */
         simulator.SetDt(2.0);
 
         simulator.SetEndTime(10.0);
@@ -474,7 +474,7 @@ public:
         TS_ASSERT_DELTA(cell_location[1], 3.000, 1e-4);
     }
 
-        
+
     void TestStandardResultForArchivingTestsBelow() throw (Exception)
     {
         TissueConfig::Instance()->SetOutputCellCyclePhases(true);
@@ -542,9 +542,9 @@ public:
         OutputFileHandler handler("LatticeBasedStandardResult", false);
         std::string results_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/cellcyclephases.dat";
 
-        NumericFileComparison comp(results_file, "projects/LatticeBased/test/data/CellCyclePhaseOutput/cellcyclephases.dat");
+        NumericFileComparison comp(results_file, "notforrelease_cell_based/test/data/LatticeBasedCellCyclePhaseOutput/cellcyclephases.dat");
         TS_ASSERT(comp.CompareFiles());
-        TS_ASSERT_EQUALS(system(("diff " + results_file + " projects/LatticeBased/test/data/CellCyclePhaseOutput/cellcyclephases.dat").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_file + " notforrelease_cell_based/test/data/LatticeBasedCellCyclePhaseOutput/cellcyclephases.dat").c_str()), 0);
     }
 
     // Testing Save
