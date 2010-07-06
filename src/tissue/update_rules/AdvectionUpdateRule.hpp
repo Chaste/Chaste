@@ -110,11 +110,11 @@ public :
      * This moves the cell in the prescribed direction mAdvectionDirection to its nearest neighbour if this is free, with a
      * probability that scales to ensure that the average speed is mAdvectionSpeed
      *
-     * @param CurrentLocationIndex reference to vector of forces on nodes
+     * @param currentLocationIndex reference to vector of forces on nodes
      * @param rTissue reference to the tissue
      * @param dt timestep of the simulation to calculate probability of movement in current timestep
      */
-    unsigned GetNewLocationOfCell(unsigned CurrentLocationIndex,
+    unsigned GetNewLocationOfCell(unsigned currentLocationIndex,
                                   LatticeBasedTissue<DIM>& rTissue,
                                   double dt);
 
