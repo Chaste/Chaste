@@ -1322,7 +1322,7 @@ public:
         // This also tests IdentifySwapType
 
         // Load mesh
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/vertex_remesh_T1");
+        VertexMeshReader<2,2> mesh_reader("notforrelease_cell_based/test/data/TestMutableVertexMesh/vertex_remesh_T1");
         MutableVertexMesh<2,2> vertex_mesh;
 
         vertex_mesh.ConstructFromMeshReader(mesh_reader);
@@ -1351,8 +1351,8 @@ public:
         std::string results_file2 = handler.GetOutputDirectoryFullPath() + "vertex_remesh_T1.cell";
 
         // To ignore the provenance data we only go as far as
-        TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" " + results_file1 + " mesh/test/data/TestVertexMesh/vertex_remesh_T1_after_remesh.node").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" " + results_file2 + " mesh/test/data/TestVertexMesh/vertex_remesh_T1_after_remesh.cell").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" " + results_file1 + " notforrelease_cell_based/test/data/TestMutableVertexMesh/vertex_remesh_T1_after_remesh.node").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" " + results_file2 + " notforrelease_cell_based/test/data/TestMutableVertexMesh/vertex_remesh_T1_after_remesh.cell").c_str()), 0);
     }
 
     /**
@@ -1366,7 +1366,7 @@ public:
         // This also tests IdentifySwapType
 
         // Load in mesh
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/vertex_merge_mesh_all");
+        VertexMeshReader<2,2> mesh_reader("notforrelease_cell_based/test/data/TestMutableVertexMesh/vertex_merge_mesh_all");
         MutableVertexMesh<2,2> vertex_mesh;
         vertex_mesh.ConstructFromMeshReader(mesh_reader);
         vertex_mesh.SetCellRearrangementThreshold(0.1);
@@ -2523,7 +2523,7 @@ public:
         // This also tests IdentifySwapType
 
         // Load mesh
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/vertex_remesh_T3");
+        VertexMeshReader<2,2> mesh_reader("notforrelease_cell_based/test/data/TestMutableVertexMesh/vertex_remesh_T3");
         MutableVertexMesh<2,2> vertex_mesh;
 
         vertex_mesh.ConstructFromMeshReader(mesh_reader);
@@ -2550,8 +2550,8 @@ public:
         std::string results_file2 = handler.GetOutputDirectoryFullPath() + "vertex_remesh_T3.cell";
 
         // To ignore the provenance data we only go as far as
-        TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" " + results_file1 + " mesh/test/data/TestVertexMesh/vertex_remesh_T3_after_remesh.node").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" " + results_file2 + " mesh/test/data/TestVertexMesh/vertex_remesh_T3_after_remesh.cell").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" " + results_file1 + " notforrelease_cell_based/test/data/TestMutableVertexMesh/vertex_remesh_T3_after_remesh.node").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" " + results_file2 + " notforrelease_cell_based/test/data/TestMutableVertexMesh/vertex_remesh_T3_after_remesh.cell").c_str()), 0);
     }
 
     void TestReMeshForRemovingVoids() throw(Exception)
