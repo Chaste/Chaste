@@ -132,6 +132,7 @@ void LatticeBasedTissueSimulation<DIM>::UpdateCellLocations()
     }
 }
 
+///\todo Much of this code can probably merged with TissueSimulation::Solve()
 template<unsigned DIM>
 void LatticeBasedTissueSimulation<DIM>::Solve()
 {
@@ -243,7 +244,7 @@ void LatticeBasedTissueSimulation<DIM>::Solve()
 
         //////////////////////////////////////////
         // PostSolve, which may be implemented by
-        // child classes (eg to solve nutrient pdes)
+        // child classes (eg to solve PDEs)
         //////////////////////////////////////////
         this->PostSolve();
 

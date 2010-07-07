@@ -78,14 +78,14 @@ void CellwiseDataGradient<DIM>::SetupGradients()
                 break;
             }
 
-            // If no ghost element, get nutrient concentration
+            // If no ghost element, get PDE solution
             TissueCell& r_cell = p_tissue->rGetCellUsingLocationIndex(node_global_index);
-            double nutrient_concentration = CellwiseData<DIM>::Instance()->GetValue(r_cell, 0);
+            double pde_solution = CellwiseData<DIM>::Instance()->GetValue(r_cell, 0);
 
             // Interpolate gradient
             for (unsigned i=0; i<DIM; i++)
             {
-                gradients_on_elements[elem_index](i) += nutrient_concentration* grad_phi(i, node_index);
+                gradients_on_elements[elem_index](i) += pde_solution* grad_phi(i, node_index);
             }
         }
 
