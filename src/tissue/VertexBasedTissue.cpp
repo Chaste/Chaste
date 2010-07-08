@@ -30,6 +30,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CellwiseData.hpp"
 #include "VertexMeshWriter.hpp"
 
+#include "Warnings.hpp"
+
 template<unsigned DIM>
 VertexBasedTissue<DIM>::VertexBasedTissue(MutableVertexMesh<DIM, DIM>& rMesh,
                                           std::vector<TissueCell>& rCells,
@@ -237,8 +239,8 @@ void VertexBasedTissue<DIM>::UpdateNodeLocations(const std::vector< c_vector<dou
          */
         if (norm_2(displacement)>0.5*mrMesh.GetCellRearrangementThreshold())
         {
-        ///\todo output warning to say to use a smaller time step TRACE("Use a smaller timestep") #1394
-            //displacement *= 0.5*mrMesh.GetCellRearrangementThreshold()/norm_2(displacement);
+        	//WARNING("Use a smaller timestep");
+        	//displacement *= 0.5*mrMesh.GetCellRearrangementThreshold()/norm_2(displacement);
         }
 
         // Get new node location
@@ -269,7 +271,7 @@ void VertexBasedTissue<DIM>::Update(bool hasHadBirthsOrDeaths)
 
     if (!element_map.IsIdentityMap())
     {
-        // Fix up the mappings between TissueCells and VertexElements
+    	// Fix up the mappings between TissueCells and VertexElements
         std::map<TissueCell*, unsigned> old_map = this->mCellLocationMap;
 
         this->mCellLocationMap.clear();
@@ -281,14 +283,29 @@ void VertexBasedTissue<DIM>::Update(bool hasHadBirthsOrDeaths)
         {
             // This shouldn't ever happen, as the cell vector only contains living cells
             unsigned old_elem_index = old_map[&(*cell_iter)];
-            assert(!element_map.IsDeleted(old_elem_index));
-            unsigned new_elem_index = element_map.GetNewIndex(old_elem_index);
 
-            this->mLocationCellMap[new_elem_index] = &(*cell_iter);
-            this->mCellLocationMap[&(*cell_iter)] = new_elem_index;
+            if (element_map.IsDeleted(old_elem_index))
+            {
+            	/*\todo this is a kludge to remove the cell once a T2Swap occurs this is not included in the dead cells counter.
+            	 * This should be included in the RemoveDeadCells method so the death is counted
+            	 */
+            	WARNING("Cell removed due to T2Swap this is not counted in the dead cells counter");
+            	cell_iter = this->mCells.erase(cell_iter);
+            	--cell_iter;
+            }
+            else
+            {
+				unsigned new_elem_index = element_map.GetNewIndex(old_elem_index);
+
+				this->mLocationCellMap[new_elem_index] = &(*cell_iter);
+				this->mCellLocationMap[&(*cell_iter)] = new_elem_index;
+            }
         }
     }
-    // Check that each VertexElement has a TissueCell associated with it in the updated tissue
+
+    element_map.ResetToIdentity();
+
+    // Check that each VertexElement has only one TissueCell associated with it in the updated tissue
     Validate();
 }
 
@@ -296,22 +313,30 @@ void VertexBasedTissue<DIM>::Update(bool hasHadBirthsOrDeaths)
 template<unsigned DIM>
 void VertexBasedTissue<DIM>::Validate()
 {
-    std::vector<bool> validated_element = std::vector<bool>(this->GetNumElements(), false);
+	// Check each element has only one cell attached.
+    std::vector<unsigned> validated_element = std::vector<unsigned>(this->GetNumElements(), 0);
 
     for (typename AbstractTissue<DIM>::Iterator cell_iter = this->Begin();
          cell_iter != this->End();
          ++cell_iter)
     {
         unsigned elem_index = GetLocationIndexUsingCell(*cell_iter);
-        validated_element[elem_index] = true;
+        validated_element[elem_index]++;
     }
 
     for (unsigned i=0; i<validated_element.size(); i++)
     {
-        if (!validated_element[i])
+        if (validated_element[i] == 0)
         {
             std::stringstream ss;
             ss << "Element " << i << " does not appear to have a cell associated with it";
+            EXCEPTION(ss.str());
+        }
+
+        if (validated_element[i] > 1)
+        {
+            std::stringstream ss;
+            ss << "Element " << i << " appears to have " << validated_element[i] << " cells associated with it";
             EXCEPTION(ss.str());
         }
     }

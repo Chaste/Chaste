@@ -45,6 +45,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "VertexMeshWriter.hpp"
 #include "WildTypeCellMutationState.hpp"
 
+#include "Warnings.hpp"
+
 /**
  * Simple cell killer which at the first timestep kills any cell
  * whose corresponding location index is a given number.
@@ -316,6 +318,10 @@ public:
         TS_ASSERT_EQUALS(new_num_cells, old_num_cells+1);
     }
 
+
+    /*
+     * This test will fail with the larger timestep unless the movement is restricted to less than mCellRearangementThreshold.
+     */
     void noTestVertexMonolayerWithVoid() throw (Exception)
     {
         // Create a simple 2D MutableVertexMesh
@@ -361,8 +367,8 @@ public:
         ////////////////////////////////////////////
         /// Strange setup to speed up simulation ///
         ////////////////////////////////////////////
-        p_mesh->SetCellRearrangementThreshold(0.05);
-        simulator.SetDt(0.1);
+//        p_mesh->SetCellRearrangementThreshold(0.05);
+//        simulator.SetDt(0.1);
         ////////////////////////////////////////////
 
         // Run simulation
@@ -436,15 +442,18 @@ public:
 
         // Run simulation
         simulator.Solve();
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Cell removed due to T2Swap this is not counted in the dead cells counter");
 
-        // Check that cell 8 has died
+        // Check that cell 8 has now been removed.
         unsigned new_num_nodes = simulator.rGetTissue().GetNumNodes();
         unsigned new_num_elements = (static_cast<VertexBasedTissue<2>*>(&(simulator.rGetTissue())))->GetNumElements();
         unsigned new_num_cells = simulator.rGetTissue().GetNumRealCells();
 
         TS_ASSERT_EQUALS(new_num_nodes, old_num_nodes-6);
         TS_ASSERT_EQUALS(new_num_elements, old_num_elements-4);
-        TS_ASSERT_EQUALS(new_num_cells, old_num_cells-3); //\todo this should match with the elements
+        TS_ASSERT_EQUALS(new_num_cells, old_num_cells-4)
+
+        Warnings::QuietDestroy();
     }
 
     void TestSingleCellRelaxationAndApoptosis() throw (Exception)

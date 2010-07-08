@@ -670,7 +670,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodesAndElements(Ve
     {
         if (this->mElements[i]->IsDeleted())
         {
-            delete this->mElements[i];
+        	delete this->mElements[i];
+            rElementMap.SetDeleted(i);
         }
         else
         {

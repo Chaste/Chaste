@@ -123,81 +123,84 @@ public:
 
     void TestValidate() throw (Exception)
     {
-        // Create a simple vertex-based mesh
-        HoneycombMutableVertexMeshGenerator generator(3, 3);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
+    	{
+    		// Create a simple vertex-based mesh
 
-        // Set up cells, one for each element.
-        // Give each a birth time of -element_index, so the age = element_index.
-        std::vector<TissueCell> cells;
-        std::vector<unsigned> cell_location_indices;
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
-        for (unsigned i=0; i<p_mesh->GetNumElements()-1; i++)
-        {
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-            p_model->SetCellProliferativeType(STEM);
+			HoneycombMutableVertexMeshGenerator generator(3, 3);
+			MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
 
-            TissueCell cell(p_state, p_model);
+			// Set up cells, one for each element.
+			// Give each a birth time of -element_index, so the age = element_index.
+			std::vector<TissueCell> cells;
+			std::vector<unsigned> cell_location_indices;
+			boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+			for (unsigned i=0; i<p_mesh->GetNumElements()-1; i++)
+			{
+				FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+				p_model->SetCellProliferativeType(STEM);
 
-            double birth_time = 0.0 - i;
-            cell.SetBirthTime(birth_time);
+				TissueCell cell(p_state, p_model);
 
-            cells.push_back(cell);
-            cell_location_indices.push_back(i);
-        }
+				double birth_time = 0.0 - i;
+				cell.SetBirthTime(birth_time);
 
-        // This should throw an exception as the number of cells
-        // does not equal the number of elements
-        std::vector<TissueCell> cells_copy(cells);
-        TS_ASSERT_THROWS_THIS(VertexBasedTissue<2> tissue(*p_mesh, cells_copy),
-                "Element 8 does not appear to have a cell associated with it");
+				cells.push_back(cell);
+				cell_location_indices.push_back(i);
+			}
 
-        FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-        p_model->SetCellProliferativeType(STEM);
+			// This should throw an exception as the number of cells
+			// does not equal the number of elements
+			std::vector<TissueCell> cells_copy(cells);
+			TS_ASSERT_THROWS_THIS(VertexBasedTissue<2> tissue(*p_mesh, cells_copy),
+					"Element 8 does not appear to have a cell associated with it");
 
-        TissueCell cell(p_state, p_model);
+			FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+			p_model->SetCellProliferativeType(STEM);
 
-        double birth_time = 0.0 - p_mesh->GetNumElements()-1;
-        cell.SetBirthTime(birth_time);
+			TissueCell cell(p_state, p_model);
 
-        cells.push_back(cell);
-        cell_location_indices.push_back(p_mesh->GetNumElements()-1);
+			double birth_time = 0.0 - p_mesh->GetNumElements()-1;
+			cell.SetBirthTime(birth_time);
 
-        // This should pass as the number of cells equals the number of elements
-        std::vector<TissueCell> cells_copy2(cells);
-        TS_ASSERT_THROWS_NOTHING(VertexBasedTissue<2> tissue(*p_mesh, cells_copy2));
+			cells.push_back(cell);
+			cell_location_indices.push_back(p_mesh->GetNumElements()-1);
 
-        // Create tissue
-        VertexBasedTissue<2> tissue(*p_mesh, cells);
+			// This should pass as the number of cells equals the number of elements
+			std::vector<TissueCell> cells_copy2(cells);
+			TS_ASSERT_THROWS_NOTHING(VertexBasedTissue<2> tissue(*p_mesh, cells_copy2));
 
-        // Check correspondence between elements and cells
+			// Create tissue
+			VertexBasedTissue<2> tissue(*p_mesh, cells);
 
-        for (VertexMesh<2,2>::VertexElementIterator iter = p_mesh->GetElementIteratorBegin();
-             iter != p_mesh->GetElementIteratorEnd();
-             ++iter)
-        {
-            std::set<unsigned> expected_node_indices;
-            unsigned expected_index = iter->GetIndex();
+			// Check correspondence between elements and cells
 
-            for (unsigned i=0; i<iter->GetNumNodes(); i++)
-            {
-                expected_node_indices.insert(iter->GetNodeGlobalIndex(i));
-            }
+			for (VertexMesh<2,2>::VertexElementIterator iter = p_mesh->GetElementIteratorBegin();
+				 iter != p_mesh->GetElementIteratorEnd();
+				 ++iter)
+			{
+				std::set<unsigned> expected_node_indices;
+				unsigned expected_index = iter->GetIndex();
 
-            std::set<unsigned> actual_node_indices;
-            unsigned elem_index = iter->GetIndex();
-            TissueCell& r_cell = tissue.rGetCellUsingLocationIndex(elem_index);
-            VertexElement<2,2>* p_actual_element = tissue.GetElementCorrespondingToCell(r_cell);
-            unsigned actual_index = p_actual_element->GetIndex();
+				for (unsigned i=0; i<iter->GetNumNodes(); i++)
+				{
+					expected_node_indices.insert(iter->GetNodeGlobalIndex(i));
+				}
 
-            for (unsigned i=0; i<p_actual_element->GetNumNodes(); i++)
-            {
-                actual_node_indices.insert(p_actual_element->GetNodeGlobalIndex(i));
-            }
+				std::set<unsigned> actual_node_indices;
+				unsigned elem_index = iter->GetIndex();
+				TissueCell& r_cell = tissue.rGetCellUsingLocationIndex(elem_index);
+				VertexElement<2,2>* p_actual_element = tissue.GetElementCorrespondingToCell(r_cell);
+				unsigned actual_index = p_actual_element->GetIndex();
 
-            TS_ASSERT_EQUALS(actual_index, expected_index);
-            TS_ASSERT_EQUALS(actual_node_indices, expected_node_indices);
-        }
+				for (unsigned i=0; i<p_actual_element->GetNumNodes(); i++)
+				{
+					actual_node_indices.insert(p_actual_element->GetNodeGlobalIndex(i));
+				}
+
+				TS_ASSERT_EQUALS(actual_index, expected_index);
+				TS_ASSERT_EQUALS(actual_node_indices, expected_node_indices);
+			}
+		}
     }
 
 
