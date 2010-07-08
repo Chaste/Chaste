@@ -762,6 +762,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
                         {
                             PerformT2Swap(*elem_iter);
                             // Now remove the deleted nodes (if we don't do this then the search for T1Swap causes errors)
+
                             RemoveDeletedNodesAndElements(rElementMap);
                             recheck_mesh = true;
                             break;
@@ -843,7 +844,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
                 }
             }
         }
-
         // ... end of element rearrangement code
 
         // areas and perimeters of elements are sorted in PerformT1Swap() method
@@ -913,7 +913,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
         #undef COVERAGE_IGNORE
         /// \todo put code for remeshing in 3D here - see #866 and the paper doi:10.1016/j.jtbi.2003.10.001
     }
-
 }
 
 
@@ -1544,65 +1543,70 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEM
      *
      */
 
-     // Assert that the triangle element has only three nodes (!)
+    // Assert that the triangle element has only three nodes (!)
+    assert(rElement.GetNumNodes() == 3u);
 
-     assert(rElement.GetNumNodes() == 3u);
+    bool is_node_on_boundary = false;
+	for (unsigned i=0; i<3; i++)
+	{
+		if (rElement.GetNode(i)->IsBoundaryNode())
+		{
+			is_node_on_boundary= true;
+		}
+	}
 
-     c_vector<double, SPACE_DIM>& new_node_location = rElement.GetNode(0)->rGetModifiableLocation();
-     new_node_location = GetCentroidOfElement(rElement.GetIndex());
+    // Create new node at centroid of element which will be a boundary node if any of the existing nodes was on the boundary.
+    c_vector<double, SPACE_DIM> new_node_location = GetCentroidOfElement(rElement.GetIndex());
+    unsigned new_node_global_index = this->AddNode(new Node<SPACE_DIM>(GetNumNodes(), new_node_location, is_node_on_boundary));
+    Node<SPACE_DIM>* p_new_node = this->GetNode(new_node_global_index);
 
-     c_vector<unsigned, 3> neighbouring_elem_nums;
+    std::set<unsigned> neighbouring_elements;
 
-     for (unsigned i=0; i<3; i++)
-     {
-         std::set<unsigned> elements_of_node_a = rElement.GetNode((i+1)%3)->rGetContainingElementIndices();
-         std::set<unsigned> elements_of_node_b = rElement.GetNode((i+2)%3)->rGetContainingElementIndices();
+    for (unsigned i=0; i<3; i++)
+    {
+    	Node<SPACE_DIM>* p_node_a = rElement.GetNode((i+1)%3);
+    	Node<SPACE_DIM>* p_node_b = rElement.GetNode((i+2)%3);
 
-         std::set<unsigned> common_elements;
-         std::set_intersection(elements_of_node_a.begin(), elements_of_node_a.end(),
-                                elements_of_node_b.begin(), elements_of_node_b.end(),
-                                std::inserter(common_elements, common_elements.begin()));
+        std::set<unsigned> elements_of_node_a = p_node_a->rGetContainingElementIndices();
+        std::set<unsigned> elements_of_node_b = p_node_b->rGetContainingElementIndices();
 
-         assert(common_elements.size() == 2u);
-         common_elements.erase(rElement.GetIndex());
-         assert(common_elements.size() == 1u);
+        std::set<unsigned> common_elements;
 
-         neighbouring_elem_nums(i) = *(common_elements.begin());
-     }
+        std::set_intersection( elements_of_node_a.begin(), elements_of_node_a.end(),
+                               elements_of_node_b.begin(), elements_of_node_b.end(),
+                               std::inserter(common_elements, common_elements.begin()));
 
-     // Extract the neighbouring elements
-     VertexElement<ELEMENT_DIM,SPACE_DIM>* p_neighbouring_element_0 = this->GetElement(neighbouring_elem_nums(0));
-     VertexElement<ELEMENT_DIM,SPACE_DIM>* p_neighbouring_element_1 = this->GetElement(neighbouring_elem_nums(1));
-     VertexElement<ELEMENT_DIM,SPACE_DIM>* p_neighbouring_element_2 = this->GetElement(neighbouring_elem_nums(2));
+        assert(common_elements.size() <= 2u);
+        common_elements.erase(rElement.GetIndex());
 
-     // Need to check that none of the neighbouring elements are triangles
-     if (    (p_neighbouring_element_0->GetNumNodes() > 3u)
-         && (p_neighbouring_element_1->GetNumNodes() > 3u)
-         && (p_neighbouring_element_2->GetNumNodes() > 3u) )
-     {
-         // Neighbour 0 - replace node 1 with node 0, delete node 2
-         p_neighbouring_element_0->ReplaceNode(rElement.GetNode(1), rElement.GetNode(0));
-         p_neighbouring_element_0->DeleteNode(p_neighbouring_element_0->GetNodeLocalIndex(rElement.GetNodeGlobalIndex(2)));
+        if(common_elements.size() == 1u) // there is a neighbouring element
+        {
+			VertexElement<ELEMENT_DIM,SPACE_DIM>* p_neighbouring_element = this->GetElement(*(common_elements.begin()));
 
-         // Neighbour 1 - delete node 2
-         p_neighbouring_element_1->DeleteNode(p_neighbouring_element_1->GetNodeLocalIndex(rElement.GetNodeGlobalIndex(2)));
+			if (p_neighbouring_element->GetNumNodes() < 4u)
+			{
+				EXCEPTION("One of the neighbours of a small triangular element is also a triangle - dealing with this has not been implemented yet");
+			}
 
-         // Neighbour 2 - delete node 1
-         p_neighbouring_element_2->DeleteNode(p_neighbouring_element_2->GetNodeLocalIndex(rElement.GetNodeGlobalIndex(1)));
+			p_neighbouring_element-> ReplaceNode(p_node_a, p_new_node);
+			p_neighbouring_element->DeleteNode(p_neighbouring_element->GetNodeLocalIndex(p_node_b->GetIndex()));
+        }
+        else
+        {
+        	assert( (p_node_a->IsBoundaryNode()) && (p_node_b->IsBoundaryNode()) );
+        }
+    }
 
-         // Also have to mark pElement, pElement->GetNode(1), pElement->GetNode(2) as deleted.
-         mDeletedNodeIndices.push_back(rElement.GetNodeGlobalIndex(1));
-         mDeletedNodeIndices.push_back(rElement.GetNodeGlobalIndex(2));
-         rElement.GetNode(1)->MarkAsDeleted();
-         rElement.GetNode(2)->MarkAsDeleted();
+    // Also have to mark pElement, pElement->GetNode(0), pElement->GetNode(1), and pElement->GetNode(2) as deleted.
+    mDeletedNodeIndices.push_back(rElement.GetNodeGlobalIndex(0));
+    mDeletedNodeIndices.push_back(rElement.GetNodeGlobalIndex(1));
+	mDeletedNodeIndices.push_back(rElement.GetNodeGlobalIndex(2));
+	rElement.GetNode(0)->MarkAsDeleted();
+	rElement.GetNode(1)->MarkAsDeleted();
+	rElement.GetNode(2)->MarkAsDeleted();
 
-         mDeletedElementIndices.push_back(rElement.GetIndex());
-         rElement.MarkAsDeleted();
-     }
-     else
-     {
-        EXCEPTION("One of the neighbours of a small triangular element is also a triangle - dealing with this has not been implemented yet");
-     }
+	mDeletedElementIndices.push_back(rElement.GetIndex());
+	rElement.MarkAsDeleted();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -1705,7 +1709,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
     {
 
     	WARNING("Trying to merge a node onto an edge which is too small.");
-        
+
         c_vector<double, SPACE_DIM> centre_a_and_b = vertexA + 0.5*vector_a_to_b;
 
         vertexA =  centre_a_and_b  - 2.0*mCellRearrangementRatio*mCellRearrangementThreshold*vector_a_to_b/norm_2(vector_a_to_b);

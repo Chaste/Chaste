@@ -34,6 +34,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "VertexMeshWriter.hpp"
 #include "MutableVertexMesh.hpp"
 
+#include "Warnings.hpp"
+
 class TestMutableVertexMeshReMesh : public CxxTest::TestSuite
 {
 public:
@@ -1017,6 +1019,8 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(4)->GetNode(2)->GetIndex(), 7u);
 
         vertex_mesh.SetT2Threshold(0.1); //T2 threshold larger so swap does occur
+        //vertexElement<2,2>* p_element_4 = vertex_mesh.GetElement(4);
+        //vertex_mesh.PerformT2Swap(*p_element_4);
         vertex_mesh.ReMesh();
 
         /*
@@ -1033,8 +1037,9 @@ public:
          */
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(),4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumAllElements(),4u); // Elements are deleted not just marked for deletion.
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumAllElements(),4u); // Elements are deleted not just marked for deletion, as calling ReMesh().
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(),6u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumAllNodes(),6u); // Nodes are deleted not just marked for deletion, as calling ReMesh().
 
         // Test nodes are merged in the correct place
         TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.0, 1e-3);
@@ -1068,14 +1073,25 @@ public:
     {
         // Make 6 nodes to assign to four elements
         std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
-        nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
-        nodes.push_back(new Node<2>(2, false, 0.5, 0.5));
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, true, 0.5, 0.5));
         nodes.push_back(new Node<2>(3, false, 0.4, 0.25));
         nodes.push_back(new Node<2>(4, false, 0.6, 0.25));
         nodes.push_back(new Node<2>(5, false, 0.5, 0.3));
 
-        // Make one triangular and three trapezium elements out of these nodes
+        /*
+        *  Make three trapezium elements with a central triangular element out of these nodes
+        *
+        *      /|\
+        *     / | \
+        *    /  |  \
+        *   /2 /_\ 1\   Triangular element is element zero
+        *  / _/   \_ \
+        * /_/___3___\_\
+        *
+        */
+
 
         // Triangle element
         std::vector<Node<2>*> nodes_elem_0;
@@ -1112,8 +1128,6 @@ public:
 
         // Make a vertex mesh
         MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
-        vertex_mesh.SetCellRearrangementThreshold(0.1);// Threshold distance set to ease calculations.
-        vertex_mesh.SetT2Threshold(0.01);
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 4u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
@@ -1126,16 +1140,180 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 4u);
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumAllElements(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumAllNodes(), 6u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumAllNodes(), 7u);
 
         for (unsigned j=1; j<4; j++)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNumNodes(), 3u);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNode(0)->GetIndex(), j%3);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNode(1)->GetIndex(), (j+1)%3);
-            TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNode(2)->GetIndex(), 3u);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNode(2)->GetIndex(), 6u);
+        }
+
+        // Test boundary property of nodes. All are boundary nodes except node 3.
+        for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
+        {
+            bool expected_boundary_node = true;
+            if (i==3)
+            {
+                expected_boundary_node = false;
+            }
+            TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
         }
     }
+
+    void TestPerformT2SwapWithBoundaryNodes() throw(Exception)
+    {
+    	{
+			// Make 6 nodes to assign to three elements
+			std::vector<Node<2>*> nodes;
+			nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+			nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+			nodes.push_back(new Node<2>(2, true, 0.5, 0.5));
+			nodes.push_back(new Node<2>(3, true, 0.4, 0.25));
+			nodes.push_back(new Node<2>(4, true, 0.6, 0.25));
+			nodes.push_back(new Node<2>(5, false, 0.5, 0.3));
+
+			/*
+			*  Make two trapezium elements with a central triangular element out of these nodes
+			*
+			*      /|\
+			*     / | \
+			*    /  |  \
+			*   /2 /_\ 1\   Triangular element is element zero
+			*  / _/   \_ \
+			* /_/       \_\
+			*
+			*/
+
+
+			// Triangle element
+			std::vector<Node<2>*> nodes_elem_0;
+			nodes_elem_0.push_back(nodes[3]);
+			nodes_elem_0.push_back(nodes[4]);
+			nodes_elem_0.push_back(nodes[5]);
+
+			// Trapezium
+			std::vector<Node<2>*> nodes_elem_1;
+			nodes_elem_1.push_back(nodes[1]);
+			nodes_elem_1.push_back(nodes[2]);
+			nodes_elem_1.push_back(nodes[5]);
+			nodes_elem_1.push_back(nodes[4]);
+
+			// Trapezium
+			std::vector<Node<2>*> nodes_elem_2;
+			nodes_elem_2.push_back(nodes[2]);
+			nodes_elem_2.push_back(nodes[0]);
+			nodes_elem_2.push_back(nodes[3]);
+			nodes_elem_2.push_back(nodes[5]);
+
+
+			std::vector<VertexElement<2,2>*> vertex_elements;
+			vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
+			vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
+			vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
+
+			// Make a vertex mesh
+			MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+
+			TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 3u);
+			TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
+
+			// Perform a T2 swap on the middle triangle element
+			VertexElement<2,2>* p_element_0 = vertex_mesh.GetElement(0);
+			vertex_mesh.PerformT2Swap(*p_element_0);
+
+			TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
+			TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 4u);
+
+			TS_ASSERT_EQUALS(vertex_mesh.GetNumAllElements(), 3u);
+			TS_ASSERT_EQUALS(vertex_mesh.GetNumAllNodes(), 7u);
+
+			for (unsigned j=1; j<3; j++)
+			{
+				TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNumNodes(), 3u);
+				TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNode(0)->GetIndex(), j%3);
+				TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNode(1)->GetIndex(), (j+1)%3);
+				TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNode(2)->GetIndex(), 6u);
+			}
+
+			// Test boundary property of nodes. All are boundary nodes.
+			for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
+			{
+				TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), true);
+			}
+    	}
+
+    	{
+			// Make 5 nodes to assign to two elements
+			std::vector<Node<2>*> nodes;
+			nodes.push_back(new Node<2>(0, true, 1.0, 0.0));
+			nodes.push_back(new Node<2>(1, true, 0.5, 0.5));
+			nodes.push_back(new Node<2>(2, true, 0.4, 0.25));
+			nodes.push_back(new Node<2>(3, true, 0.6, 0.25));
+			nodes.push_back(new Node<2>(4, true, 0.5, 0.3));
+
+			/*
+			*  Make one trapezium element with a central triangular element out of these nodes
+			*
+			*       |\
+			*       | \
+			*       |  \
+			*      /_\ 1\   Triangular element is element zero
+			*         \_ \
+			*           \_\
+			*
+			*/
+
+
+			// Triangle element
+			std::vector<Node<2>*> nodes_elem_0;
+			nodes_elem_0.push_back(nodes[2]);
+			nodes_elem_0.push_back(nodes[3]);
+			nodes_elem_0.push_back(nodes[4]);
+
+			// Trapezium
+			std::vector<Node<2>*> nodes_elem_1;
+			nodes_elem_1.push_back(nodes[0]);
+			nodes_elem_1.push_back(nodes[1]);
+			nodes_elem_1.push_back(nodes[4]);
+			nodes_elem_1.push_back(nodes[3]);
+
+			std::vector<VertexElement<2,2>*> vertex_elements;
+			vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
+			vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
+
+			// Make a vertex mesh
+			MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+
+			TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
+			TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 5u);
+
+			// Perform a T2 swap on the middle triangle element
+			VertexElement<2,2>* p_element_0 = vertex_mesh.GetElement(0);
+			vertex_mesh.PerformT2Swap(*p_element_0);
+
+			TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 1u);
+			TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 3u);
+
+			TS_ASSERT_EQUALS(vertex_mesh.GetNumAllElements(), 2u);
+			TS_ASSERT_EQUALS(vertex_mesh.GetNumAllNodes(), 6u);
+
+
+		    TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
+			TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(0)->GetIndex(), 0u);
+			TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(1)->GetIndex(), 1u);
+			TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(2)->GetIndex(), 5u);
+
+			// Test boundary property of nodes. All are boundary nodes.
+			for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
+			{
+				TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), true);
+			}
+    	}
+
+    }
+
 
     void TestT2SwapsDontOccurWithTriangularNeighbours() throw(Exception)
     {
@@ -2135,9 +2313,12 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 8u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 3u);
 
-        // Call PerformT3Swap \todo # should return a warning #1394
-        // Note we don't call ReMesh as this would also perfomrm T1Swaps.
+        // Call PerformT3Swap
+        // Note we don't call ReMesh as this would also perform T1Swaps.
         vertex_mesh.PerformT3Swap(vertex_mesh.GetNode(4), 0u);
+
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Trying to merge a node onto an edge which is too small.");
+        Warnings::QuietDestroy();
 
         // Check that node 4 has been moved onto the edge and a new node has been created and both added to elements 0 and 1
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 3u);
