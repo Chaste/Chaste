@@ -389,10 +389,10 @@ public:
          */
 
         // Create a simple 2D MutableVertexMesh
-        HoneycombMutableVertexMeshGenerator generator(5,5);
+        HoneycombMutableVertexMeshGenerator generator(4,4);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
-        p_mesh->SetCellRearrangementThreshold(0.2);
-        p_mesh->SetT2Threshold(sqrt(3.0)/1000.0); // so T2Swaps once it becomes a triangle
+        p_mesh->SetCellRearrangementThreshold(0.1);
+        p_mesh->SetT2Threshold(1.0); // so T2Swaps once it becomes a triangle
 
         // Set up cells, one for each VertexElement. Give each cell
         // a birth time of -elem_index, so its age is elem_index
@@ -407,10 +407,16 @@ public:
             double birth_time = 0.0 - elem_index;
             cell.SetBirthTime(birth_time);
 
-            if (elem_index==13)
+            if (elem_index==6)
             {
                 cell.StartApoptosis(false);
             }
+
+            if (elem_index==14)
+			{
+				cell.StartApoptosis(true);
+			}
+
             cells.push_back(cell);
         }
 
@@ -429,29 +435,30 @@ public:
         // Set up tissue simulation
         TissueSimulation<2> simulator(tissue, force_collection);
         simulator.SetOutputDirectory("TestVertexMonolayerWithCellDeath");
-        simulator.SetEndTime(0.3);
-
+        simulator.SetEndTime(0.5);
+        
         // Create a cell killer and pass in to simulation (note we must account for element index changes following each kill)
         TargetedCellKiller cell0_killer(&tissue, 0);    // element on the SW corner
         TargetedCellKiller cell2_killer(&tissue, 2);    // element on the S boundary
-        TargetedCellKiller cell12_killer(&tissue, 12);  // element on the interior
+        TargetedCellKiller cell9_killer(&tissue, 9);  // element on the interior
 
         simulator.AddCellKiller(&cell0_killer);
         simulator.AddCellKiller(&cell2_killer);
-        simulator.AddCellKiller(&cell12_killer);
+        simulator.AddCellKiller(&cell9_killer);
 
         // Run simulation
         simulator.Solve();
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Cell removed due to T2Swap this is not counted in the dead cells counter");
 
-        // Check that cell 8 has now been removed.
+        // Check that cells 6 and 14 have now been removed.
         unsigned new_num_nodes = simulator.rGetTissue().GetNumNodes();
         unsigned new_num_elements = (static_cast<VertexBasedTissue<2>*>(&(simulator.rGetTissue())))->GetNumElements();
         unsigned new_num_cells = simulator.rGetTissue().GetNumRealCells();
 
-        TS_ASSERT_EQUALS(new_num_nodes, old_num_nodes-6);
-        TS_ASSERT_EQUALS(new_num_elements, old_num_elements-4);
-        TS_ASSERT_EQUALS(new_num_cells, old_num_cells-4);
+        TS_ASSERT_EQUALS(new_num_nodes, old_num_nodes-7);	// Due to the cells on the boundary that get killed and the apoptotic cell that does a T2 swap
+        TS_ASSERT_EQUALS(new_num_elements, old_num_elements-5);
+        TS_ASSERT_EQUALS(new_num_cells, old_num_cells-5);
+        TS_ASSERT_EQUALS(new_num_cells, new_num_elements);
 
         Warnings::QuietDestroy();
     }
@@ -515,8 +522,8 @@ public:
         // Run simulation
         simulator.Solve();
 
-        TS_ASSERT_DELTA(tissue.rGetMesh().GetVolumeOfElement(0), 0.0068, 1e-4);
-        TS_ASSERT_DELTA(tissue.rGetMesh().GetSurfaceAreaOfElement(0), 0.3783, 1e-3);
+        TS_ASSERT_DELTA(tissue.rGetMesh().GetVolumeOfElement(0), 0.5098, 1e-4);
+        TS_ASSERT_DELTA(tissue.rGetMesh().GetSurfaceAreaOfElement(0), 2.5417, 1e-3);
     }
 
 

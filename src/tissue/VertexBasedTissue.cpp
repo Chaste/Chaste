@@ -29,7 +29,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "VertexBasedTissue.hpp"
 #include "CellwiseData.hpp"
 #include "VertexMeshWriter.hpp"
-
 #include "Warnings.hpp"
 
 template<unsigned DIM>
@@ -368,7 +367,7 @@ double VertexBasedTissue<DIM>::GetTargetAreaOfCell(const TissueCell& rCell)
         }
 
         // The target area of an apoptotic cell decreases linearly to zero (and past it negative)
-        cell_target_area = cell_target_area - cell_target_area/(TissueConfig::Instance()->GetApoptosisTime())*(SimulationTime::Instance()->GetTime()-rCell.GetStartOfApoptosisTime());
+        cell_target_area = cell_target_area - 0.5*cell_target_area/(TissueConfig::Instance()->GetApoptosisTime())*(SimulationTime::Instance()->GetTime()-rCell.GetStartOfApoptosisTime());
 
         // Don't allow a negative target area
         if (cell_target_area < 0)
@@ -404,20 +403,32 @@ void VertexBasedTissue<DIM>::WriteResultsToFiles()
          cell_iter != this->mCells.end();
          ++cell_iter)
     {
-        unsigned elem_index = this->GetLocationIndexUsingCell(*cell_iter);
+    	unsigned elem_index = this->GetLocationIndexUsingCell(*cell_iter);
 
-        VertexElement<DIM, DIM>* p_element = mrMesh.GetElement(elem_index);
+    	// Hack that covers the case where the element is associated with a cell that has just been killed (#1129)
+		bool elem_corresponds_to_dead_cell = false;
 
-        unsigned num_nodes_in_element = p_element->GetNumNodes();
+		if (this->mLocationCellMap[elem_index])
+		{
+			elem_corresponds_to_dead_cell = this->mLocationCellMap[elem_index]->IsDead();
+		}
 
-        // First write the number of Nodes belonging to this VertexElement
-        *mpVizElementsFile << num_nodes_in_element << " ";
+		// Write node data to file
+		if ( !(GetElement(elem_index)->IsDeleted()) && !elem_corresponds_to_dead_cell)
+		{
+			VertexElement<DIM, DIM>* p_element = mrMesh.GetElement(elem_index);
 
-        // Then write the global index of each Node in this element
-        for (unsigned i=0; i<num_nodes_in_element; i++)
-        {
-            *mpVizElementsFile << p_element->GetNodeGlobalIndex(i) << " ";
-        }
+			unsigned num_nodes_in_element = p_element->GetNumNodes();
+
+			// First write the number of Nodes belonging to this VertexElement
+			*mpVizElementsFile << num_nodes_in_element << " ";
+
+			// Then write the global index of each Node in this element
+			for (unsigned i=0; i<num_nodes_in_element; i++)
+			{
+				*mpVizElementsFile << p_element->GetNodeGlobalIndex(i) << " ";
+			}
+		}
     }
     *mpVizElementsFile << "\n";
 
