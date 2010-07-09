@@ -201,6 +201,39 @@ public:
 				TS_ASSERT_EQUALS(actual_node_indices, expected_node_indices);
 			}
 		}
+
+
+    	{
+			// Create a simple vertex-based mesh
+
+			HoneycombMutableVertexMeshGenerator generator(3, 3);
+			MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
+
+			// Set up cells, one for each element.
+			// Give each a birth time of -element_index, so the age = element_index.
+			std::vector<TissueCell> cells;
+			std::vector<unsigned> cell_location_indices;
+			boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+			for (unsigned i=0; i<p_mesh->GetNumElements()+1; i++)
+			{
+				FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+				p_model->SetCellProliferativeType(STEM);
+
+				TissueCell cell(p_state, p_model);
+
+				double birth_time = 0.0 - i;
+				cell.SetBirthTime(birth_time);
+
+				cells.push_back(cell);
+				cell_location_indices.push_back(i%p_mesh->GetNumElements());		// Element 0 will have 2 cells
+			}
+
+			// This should throw an exception as the number of cells
+			// does not equal the number of elements
+			TS_ASSERT_THROWS_THIS(VertexBasedTissue<2> tissue(*p_mesh, cells, false, true, cell_location_indices),
+					"Element 0 appears to have 2 cells associated with it");
+		}
+
     }
 
 
