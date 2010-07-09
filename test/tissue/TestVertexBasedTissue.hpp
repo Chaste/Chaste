@@ -242,7 +242,7 @@ public:
         double apoptosis_time = TissueConfig::Instance()->GetApoptosisTime();
 
         SimulationTime* p_simulation_time = SimulationTime::Instance();
-        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.5*apoptosis_time, 3);
+        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(3.0*apoptosis_time, 3);
 
         // Create mesh
         HoneycombMutableVertexMeshGenerator generator(3, 3);
@@ -322,7 +322,7 @@ public:
         double actual_area_4_after_dt = tissue.GetTargetAreaOfCell(cell_4);
 
         // The target areas of cells 1 and 4 should have halved
-        expected_area_0 = TissueConfig::Instance()->GetMatureCellTargetArea()*0.5*(1.0 + 0.5*apoptosis_time/2.0);
+        expected_area_0 = TissueConfig::Instance()->GetMatureCellTargetArea()*0.5*(1.0 + 0.5*apoptosis_time);
 
         TS_ASSERT_DELTA(actual_area_0_after_dt, expected_area_0, 1e-12);
         TS_ASSERT_DELTA(actual_area_1_after_dt, 0.5*expected_area_1, 1e-12);
