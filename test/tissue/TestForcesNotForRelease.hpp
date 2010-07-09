@@ -760,6 +760,78 @@ public:
         }
     }
 
+    // This test contains cells of 2 mutation types, wildtype and labelled type,
+    // on a larger mesh so that we can test interaction of 2 cells with labelled types.
+    // It asserts that neighboring cells have the correct adhesion parameter for difference
+    // pairs of nodes.
+	void TestNagaiHondaForceForCellsWithTwoMutationTypes() throw (Exception)
+	{
+		TissueConfig::Instance()->SetOutputCellMutationStates(true);
+
+		// Create a simple 2D MutableVertexMesh with four cells
+		HoneycombMutableVertexMeshGenerator generator(2, 2);
+		MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
+
+		// Set up cells.
+		std::vector<TissueCell> cells;
+		boost::shared_ptr<AbstractCellMutationState> p_state1(new WildTypeCellMutationState);
+		boost::shared_ptr<AbstractCellMutationState> p_state2(new LabelledCellMutationState);
+
+		for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
+		{
+			FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+			p_model->SetCellProliferativeType(TRANSIT);
+
+			if (elem_index == 0 || elem_index == 1)
+			{
+				TissueCell cell1(p_state2, p_model);
+				double birth_time = -2.0;
+				cell1.SetBirthTime(birth_time);
+				TS_ASSERT_EQUALS(cell1.GetMutationState()->IsType<LabelledCellMutationState>(), true);
+				cells.push_back(cell1);
+			}
+			else
+			{
+				TissueCell cell(p_state1, p_model);
+				double birth_time = -2.0;
+				cell.SetBirthTime(birth_time);
+				cell.SetMutationState(p_state1);
+				TS_ASSERT_EQUALS(cell.GetMutationState()->IsType<WildTypeCellMutationState>(), true);
+				cells.push_back(cell);
+			}
+		}
+		// Create tissue
+		VertexBasedTissue<2> tissue(*p_mesh, cells);
+
+		// Create a force system
+		NagaiHondaForce<2> force;
+		std::vector<AbstractForce<2>* > force_collection;
+		force_collection.push_back(&force);
+
+		// check mutation state
+		TS_ASSERT_EQUALS(cells[0].GetMutationState()->IsType<LabelledCellMutationState>(), true);
+		TS_ASSERT_EQUALS(cells[1].GetMutationState()->IsType<LabelledCellMutationState>(), true);
+		TS_ASSERT_EQUALS(cells[2].GetMutationState()->IsType<WildTypeCellMutationState>(), true);
+		TS_ASSERT_EQUALS(cells[3].GetMutationState()->IsType<WildTypeCellMutationState>(), true);
+		TS_ASSERT_EQUALS((tissue.rGetCellUsingLocationIndex(3)).GetMutationState()->IsType<LabelledCellMutationState>(), false);
+		// 2 wildtypes
+		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(9), p_mesh->GetNode(12), tissue), 0u);
+		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(12), p_mesh->GetNode(9), tissue), 0u);
+		// wildtype and labelled
+		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(6), p_mesh->GetNode(8), tissue), 2u);
+		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(8), p_mesh->GetNode(6), tissue), 2u);
+		// 2 labelled
+		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(3), p_mesh->GetNode(6), tissue), 1u);
+		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(6), p_mesh->GetNode(3), tissue), 1u);
+
+		TS_ASSERT_DELTA(force.GetAdhesionParameter(p_mesh->GetNode(9), p_mesh->GetNode(12),
+				force.GetCombinationCellTypes(p_mesh->GetNode(9), p_mesh->GetNode(12), tissue)), 1.0, 1e-4);
+		TS_ASSERT_DELTA(force.GetAdhesionParameter(p_mesh->GetNode(6), p_mesh->GetNode(8),
+				force.GetCombinationCellTypes(p_mesh->GetNode(6), p_mesh->GetNode(8), tissue)), 1.5, 1e-4);
+		TS_ASSERT_DELTA(force.GetAdhesionParameter(p_mesh->GetNode(3), p_mesh->GetNode(6),
+				force.GetCombinationCellTypes(p_mesh->GetNode(3), p_mesh->GetNode(6), tissue)), 2.0, 1e-4);
+	}
+
     void TestWelikyOsterForceMethods() throw (Exception)
     {
         // Construct a 2D vertex mesh consisting of a single element

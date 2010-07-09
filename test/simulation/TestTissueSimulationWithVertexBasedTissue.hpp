@@ -44,6 +44,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "HoneycombMutableVertexMeshGenerator.hpp"
 #include "VertexMeshWriter.hpp"
 #include "WildTypeCellMutationState.hpp"
+//#include "LabelledCellMutationState.hpp"
 
 #include "Warnings.hpp"
 
@@ -256,6 +257,73 @@ public:
         TS_ASSERT_EQUALS(new_num_elements, old_num_elements+1);
         TS_ASSERT_EQUALS(new_num_cells, old_num_cells+1);
     }
+
+    // This test visualizing cells of 2 mutation types, wildtype and labelled type.
+    // It asserts that neighboring cells have the correct adhesion parameter for difference
+    // pairs of nodes.
+	void TestSimpleVertexMonolayerWithTwoMutationTypes() throw (Exception)
+	{
+		TissueConfig::Instance()->SetOutputCellMutationStates(true);
+
+		// Create a simple 2D MutableVertexMesh with only four cells
+		HoneycombMutableVertexMeshGenerator generator(2, 2);
+		MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
+
+		// Set up cell.
+		std::vector<TissueCell> cells;
+		boost::shared_ptr<AbstractCellMutationState> p_state1(new WildTypeCellMutationState);
+		boost::shared_ptr<AbstractCellMutationState> p_state2(new LabelledCellMutationState);
+
+		for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
+		{
+			FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+			p_model->SetCellProliferativeType(TRANSIT);
+
+			if (elem_index == 0)
+			{
+				TissueCell cell1(p_state2, p_model);
+				double birth_time = -2.0;
+				cell1.SetBirthTime(birth_time);
+				TS_ASSERT_EQUALS(cell1.GetMutationState()->IsType<LabelledCellMutationState>(), true);
+				cells.push_back(cell1);
+			}
+			else
+			{
+				TissueCell cell(p_state1, p_model);
+				double birth_time = -2.0;
+				cell.SetBirthTime(birth_time);
+				cells.push_back(cell);
+			}
+		}
+		// Create tissue
+		VertexBasedTissue<2> tissue(*p_mesh, cells);
+
+		// Create a force system
+		NagaiHondaForce<2> force;
+		std::vector<AbstractForce<2>* > force_collection;
+		force_collection.push_back(&force);
+
+		// Set up tissue simulation
+		TissueSimulation<2> simulator(tissue, force_collection);
+		simulator.SetOutputDirectory("TestSimpleVertexMonolayerWithTwoMutationStates");
+		simulator.SetEndTime(1.0);
+
+		// Run simulation
+		simulator.Solve();
+		TS_ASSERT_DELTA(force.GetAdhesionParameter(p_mesh->GetNode(3), p_mesh->GetNode(6), 2), 1.5, 1e-4);
+		TS_ASSERT_DELTA(force.GetAdhesionParameter(p_mesh->GetNode(6), p_mesh->GetNode(3), 2), 1.5, 1e-4);
+		TS_ASSERT_DELTA(force.GetAdhesionParameter(p_mesh->GetNode(9), p_mesh->GetNode(12), 0), 1.0, 1e-4);
+
+		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(3), p_mesh->GetNode(6), tissue), 2u);
+		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(6), p_mesh->GetNode(3), tissue), 2u);
+		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(9), p_mesh->GetNode(12), tissue), 0u);
+
+		TS_ASSERT_EQUALS(p_mesh->GetNode(13)->IsBoundaryNode(), true);
+		TS_ASSERT_EQUALS(p_mesh->GetNumElements(),4u);
+		TS_ASSERT_EQUALS(p_state2->GetColour(), 5u);
+		TS_ASSERT_EQUALS(p_state1->GetColour(), 0u);
+		TS_ASSERT_EQUALS(cells[0].GetMutationState()->IsType<LabelledCellMutationState>(), true);
+	}
 
     void TestVertexMonolayerWithCellBirth() throw (Exception)
     {

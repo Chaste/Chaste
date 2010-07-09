@@ -128,9 +128,18 @@ void NagaiHondaForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM
             unsigned next_node_local_index = (local_index+1)%(p_element->GetNumNodes());
             Node<DIM>* p_next_node = p_element->GetNode(next_node_local_index);
 
+            // Determine combinationCellTypes (0: both cells sharing edge are wild types, 1: both cells sharing edge are labelled,
+            // 2: one of the cells sharing the edge is wild type and the other is labelled, 99: otherwise)
+            unsigned combinationCellTypesPreviousEdge = GetCombinationCellTypes(p_previous_node, p_current_node, rTissue);
+            unsigned combinationCellTypesNextEdge = GetCombinationCellTypes(p_current_node, p_next_node, rTissue);
+
             // Compute the adhesion parameter for each of these edges
-            double previous_edge_adhesion_parameter = GetAdhesionParameter(p_previous_node, p_current_node);
-            double next_edge_adhesion_parameter = GetAdhesionParameter(p_current_node, p_next_node);
+            double previous_edge_adhesion_parameter = GetAdhesionParameter(p_previous_node, p_current_node, combinationCellTypesPreviousEdge);
+            double next_edge_adhesion_parameter = GetAdhesionParameter(p_current_node, p_next_node, combinationCellTypesNextEdge);
+
+//            // Compute the adhesion parameter for each of these edges
+//            double previous_edge_adhesion_parameter = GetAdhesionParameter(p_previous_node, p_current_node);
+//            double next_edge_adhesion_parameter = GetAdhesionParameter(p_current_node, p_next_node);
 
             // Compute the gradient of the edge of the cell ending in this node
             c_vector<double, DIM> previous_edge_gradient = p_tissue->rGetMesh().GetPreviousEdgeGradientOfElementAtNode(p_element, local_index);
@@ -184,8 +193,126 @@ double NagaiHondaForce<DIM>::GetAdhesionParameter(Node<DIM>* pNodeA, Node<DIM>* 
     }
     return adhesion_parameter;
 }
+template<unsigned DIM>
+double NagaiHondaForce<DIM>::GetAdhesionParameter(Node<DIM>* pNodeA, Node<DIM>* pNodeB, unsigned combinationCellType)
+{
+       double adhesion_parameter;
 
+        // Find the indices of the elements owned by each node
+        std::set<unsigned> elements_containing_nodeA = pNodeA->rGetContainingElementIndices();
+        std::set<unsigned> elements_containing_nodeB = pNodeB->rGetContainingElementIndices();
 
+        // Find common elements
+        std::set<unsigned> shared_elements;
+        std::set_intersection(elements_containing_nodeA.begin(),
+                              elements_containing_nodeA.end(),
+                              elements_containing_nodeB.begin(),
+                              elements_containing_nodeB.end(),
+                              std::inserter(shared_elements, shared_elements.begin()));
+
+        // Check that the nodes have a common edge
+        assert(!shared_elements.empty());
+
+        // If the edge corresponds to a single element, then the cell is on the boundary
+        if (shared_elements.size() == 1)
+        {
+            adhesion_parameter = TissueConfig::Instance()->GetNagaiHondaCellBoundaryAdhesionEnergyParameter();
+        }
+        else
+        {
+            if (combinationCellType == 0) // if both cells are Wildtype (Mutation State)
+            {
+                adhesion_parameter = TissueConfig::Instance()->GetNagaiHondaCellCellAdhesionEnergyParameter(); // Value of 1.0 in TissueConfig, but 0.01 the Nagai & Honda paper
+            }
+            else if (combinationCellType == 1) // if both cells are Labelled (Mutation State)
+            {
+                adhesion_parameter = 2.0;
+            }
+            else if (combinationCellType == 2) // if one cell is Labelled and the other WildType (Mutation State)
+            {
+                adhesion_parameter = 1.5;
+            }
+            else // if else (if combinationCellType = 99)
+            {
+            	adhesion_parameter = TissueConfig::Instance()->GetNagaiHondaCellCellAdhesionEnergyParameter();
+            }
+        }
+        return adhesion_parameter;
+}
+
+template<unsigned DIM>
+unsigned NagaiHondaForce<DIM>::GetCombinationCellTypes(Node<DIM>* pNodeA, Node<DIM>* pNodeB,
+        AbstractTissue<DIM>& rTissue)
+{
+       unsigned combinationCellType = 99;
+
+        // Find the indices of the elements owned by each node
+        std::set<unsigned> elements_containing_nodeA = pNodeA->rGetContainingElementIndices();
+        std::set<unsigned> elements_containing_nodeB = pNodeB->rGetContainingElementIndices();
+
+        // Find common elements
+        std::set<unsigned> shared_elements;
+        std::set_intersection(elements_containing_nodeA.begin(),
+                              elements_containing_nodeA.end(),
+                              elements_containing_nodeB.begin(),
+                              elements_containing_nodeB.end(),
+                              std::inserter(shared_elements, shared_elements.begin()));
+
+        // Check that the nodes have a common edge
+        assert(!shared_elements.empty());
+
+        unsigned element_index1;
+        unsigned element_index2;
+        boost::shared_ptr<AbstractCellMutationState> mutationStateCell1;
+        boost::shared_ptr<AbstractCellMutationState> mutationStateCell2;
+
+        if (shared_elements.size() == 2)
+        {
+
+        	unsigned count = 1;
+            for (typename std::set<unsigned>::iterator shrd_elem_iter = shared_elements.begin();
+            	             shrd_elem_iter != shared_elements.end();
+            	             ++shrd_elem_iter)
+            {
+                 if (count == 1)
+                 {
+                	 element_index1 = *shrd_elem_iter;
+                 }
+                 else if (count == 2)
+                 {
+                   	 element_index2 = *shrd_elem_iter;
+                 }
+                 count=count+1;
+            }
+
+           	TissueCell cell1 = rTissue.rGetCellUsingLocationIndex(element_index1);
+            TissueCell cell2 = rTissue.rGetCellUsingLocationIndex(element_index2);
+
+            if (cell1.GetMutationState()->IsType<LabelledCellMutationState>())
+            {
+                if (cell2.GetMutationState()->IsType<LabelledCellMutationState>())
+                {
+                    combinationCellType = 1;
+                }
+                else if (cell2.GetMutationState()->IsType<WildTypeCellMutationState>())
+                {
+                    combinationCellType = 2;
+                }
+            }
+            else if (cell1.GetMutationState()->IsType<WildTypeCellMutationState>())
+            {
+                if (cell2.GetMutationState()->IsType<WildTypeCellMutationState>())
+                {
+                    combinationCellType = 0;
+                }
+                else if (cell2.GetMutationState()->IsType<LabelledCellMutationState>())
+                {
+                    combinationCellType = 2;
+                }
+            }
+        }
+        return combinationCellType;
+}
 /////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////

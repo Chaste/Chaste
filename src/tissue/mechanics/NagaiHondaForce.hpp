@@ -35,6 +35,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "AbstractForce.hpp"
 #include "VertexBasedTissue.hpp"
 
+#include <iostream>
 
 /**
  * A force class for use in vertex-based tissue simulations, based on a mechanical
@@ -84,14 +85,42 @@ public:
     /**
      * Get the adhesion parameter for the edge between two given nodes.
      *
-     * \todo This method should be changed/overridden if we require differential adhesion
-     *
      * @param pNodeA one node
      * @param pNodeB the other node
      *
      * @return the adhesion parameter for this edge.
      */
     double GetAdhesionParameter(Node<DIM>* pNodeA, Node<DIM>* pNodeB);
+
+    /**
+     * Get the adhesion parameter for the edge between two given nodes.
+     *
+     * \todo We now are only testing 2 mutation states.  This method could be extended
+     * to handle any number of mutation states.  One possibility is to have a method to set
+     * a dictionary, where given a pair of cell types, the dictionary returns
+     * a corresponding adhesion parameter value.
+     *
+     * @param pNodeA one node
+     * @param pNodeB the other node
+     * @param combinationCellType is 0 if the associated 2 cells with a shared edge are wildtype;
+     * 1 if these cells are both labelled; 2 if one is wildtype and the other is labelled
+     *
+     * @return the adhesion parameter for this edge.
+     */
+    double GetAdhesionParameter(Node<DIM>* pNodeA, Node<DIM>* pNodeB, unsigned combinationCellType);
+
+    /**
+         * Get the combinationCellType is 0 if the associated 2 cells with a shared edge are wildtype;
+     * 1 if these cells are both labelled; 2 if one is wildtype and the other is labelled
+     *
+     * @param pNodeA one node
+     * @param pNodeB the other node
+     * @param p_tissue reference to the tissue
+     *
+     * @return the combinationCellType for this edge.
+     */
+    unsigned GetCombinationCellTypes(Node<DIM>* pNodeA, Node<DIM>* pNodeB,
+    		AbstractTissue<DIM>& rTissue);
 };
 
 
