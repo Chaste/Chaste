@@ -213,7 +213,7 @@ public:
         // Create a simple 2D MutableVertexMesh with only one cell
         HoneycombMutableVertexMeshGenerator generator(1, 1);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
-        p_mesh->SetEdgeDivisionThreshold(0.5);
+        p_mesh->SetEdgeDivisionThreshold(0.5); // See ticket # 1477
 
         // Set up cell.
         std::vector<TissueCell> cells;
@@ -451,7 +451,7 @@ public:
 
         TS_ASSERT_EQUALS(new_num_nodes, old_num_nodes-6);
         TS_ASSERT_EQUALS(new_num_elements, old_num_elements-4);
-        TS_ASSERT_EQUALS(new_num_cells, old_num_cells-4)
+        TS_ASSERT_EQUALS(new_num_cells, old_num_cells-4);
 
         Warnings::QuietDestroy();
     }
