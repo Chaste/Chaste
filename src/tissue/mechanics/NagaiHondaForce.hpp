@@ -79,8 +79,7 @@ public:
      * @param rForces reference to vector of forces on nodes
      * @param rTissue reference to the tissue
      */
-    void AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
-                              AbstractTissue<DIM>& rTissue);
+    void AddForceContribution(std::vector<c_vector<double, DIM> >& rForces, AbstractTissue<DIM>& rTissue);
 
     /**
      * Get the adhesion parameter for the edge between two given nodes.
@@ -110,17 +109,16 @@ public:
     double GetAdhesionParameter(Node<DIM>* pNodeA, Node<DIM>* pNodeB, unsigned combinationCellType);
 
     /**
-         * Get the combinationCellType is 0 if the associated 2 cells with a shared edge are wildtype;
+     * Get the combinationCellType is 0 if the associated 2 cells with a shared edge are wildtype;
      * 1 if these cells are both labelled; 2 if one is wildtype and the other is labelled
      *
      * @param pNodeA one node
      * @param pNodeB the other node
-     * @param p_tissue reference to the tissue
+     * @param rTissue reference to the tissue
      *
      * @return the combinationCellType for this edge.
      */
-    unsigned GetCombinationCellTypes(Node<DIM>* pNodeA, Node<DIM>* pNodeB,
-    		AbstractTissue<DIM>& rTissue);
+    unsigned GetCombinationCellTypes(Node<DIM>* pNodeA, Node<DIM>* pNodeB, AbstractTissue<DIM>& rTissue);
 };
 
 
