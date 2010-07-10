@@ -261,8 +261,8 @@ unsigned NagaiHondaForce<DIM>::GetCombinationCellTypes(Node<DIM>* pNodeA, Node<D
         // Check that the nodes have a common edge
         assert(!shared_elements.empty());
 
-        unsigned element_index1;
-        unsigned element_index2;
+        unsigned element_index1 = UNSIGNED_UNSET;
+        unsigned element_index2 = UNSIGNED_UNSET;
         boost::shared_ptr<AbstractCellMutationState> mutationStateCell1;
         boost::shared_ptr<AbstractCellMutationState> mutationStateCell2;
 
