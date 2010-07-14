@@ -32,7 +32,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <set>
 #include <string>
 
-#include "UblasIncludes.hpp"
+#include "UblasVectorInclude.hpp"
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
