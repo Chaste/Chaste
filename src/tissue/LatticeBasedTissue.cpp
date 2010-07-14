@@ -28,6 +28,15 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "LatticeBasedTissue.hpp"
 
+#include <cassert>
+#include <algorithm>
+
+#include "Exception.hpp"
+#include "RandomNumberGenerator.hpp"
+#include "TissueConfig.hpp"
+#include "SimulationTime.hpp"
+
+
 template<unsigned DIM>
 LatticeBasedTissue<DIM>::LatticeBasedTissue(TetrahedralMesh<DIM, DIM>& rMesh,
                                             std::vector<TissueCell>& rCells,

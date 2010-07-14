@@ -33,7 +33,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractUpdateRule.hpp"
-#include "RandomNumberGenerator.hpp"
+#include "LatticeBasedTissue.hpp"
 
 /**
  * An update rule class to model uniform steady advection. This class is

@@ -28,6 +28,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "DiffusionUpdateRule.hpp"
 
+#include "RandomNumberGenerator.hpp"
+
 template<unsigned DIM>
 DiffusionUpdateRule<DIM>::DiffusionUpdateRule(double diffusionConstant)
     : AbstractUpdateRule<DIM>(),

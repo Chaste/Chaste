@@ -31,6 +31,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
 #include "LatticeBasedTissue.hpp"
+#include "TissueConfig.hpp"
 
 /**
  * An abstract force class.

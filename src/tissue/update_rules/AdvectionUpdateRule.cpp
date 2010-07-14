@@ -28,6 +28,9 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "AdvectionUpdateRule.hpp"
 
+#include "Exception.hpp"
+#include "RandomNumberGenerator.hpp"
+
 template<unsigned DIM>
 AdvectionUpdateRule<DIM>::AdvectionUpdateRule(unsigned advectionDirection, double advectionSpeed)
     : AbstractUpdateRule<DIM>(),

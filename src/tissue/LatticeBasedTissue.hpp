@@ -28,11 +28,14 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #ifndef LATTICEBASEDTISSUE_HPP_
 #define LATTICEBASEDTISSUE_HPP_
 
-#include "ArchiveLocationInfo.hpp"
+#include <vector>
+#include <set>
+#include <string>
+
+#include "UblasIncludes.hpp"
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
-#include <boost/serialization/set.hpp>
 #include <boost/serialization/vector.hpp>
 
 // Needed here to avoid serialization errors (on Boost<1.37)
@@ -40,11 +43,9 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "AbstractTissue.hpp"
 #include "TetrahedralMesh.hpp"
-#include "Exception.hpp"
-#include "TrianglesMeshWriter.hpp"
-#include "CellBasedEventHandler.hpp"
-#include "RandomNumberGenerator.hpp"
-#include <cmath>
+#include "TissueCell.hpp"
+#include "Node.hpp"
+#include "ChastePoint.hpp"
 
 /**
  * A facade class encapsulating a lattice-based 'tissue'
