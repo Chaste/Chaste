@@ -1312,6 +1312,8 @@ public:
         HoneycombMutableVertexMeshGenerator generator(5, 3);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
 
+        p_mesh->SetCellRearrangementThreshold(0.1); // larger threshold so motion is unihibited see #1376
+
         // Set up cells
         std::vector<TissueCellPtr> cells = SetUpCells(*p_mesh);
 

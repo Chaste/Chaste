@@ -43,6 +43,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "SloughingCellKiller.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "CellBasedEventHandler.hpp"
+#include "Warnings.hpp"
 
 class TestVertexCryptSimulation2d : public AbstractCellBasedTestSuite
 {
@@ -114,6 +115,8 @@ public:
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
+        p_mesh->SetCellRearrangementThreshold(0.1); // larger threshold so motion is unihibited see #1376
+
         // Set up cells
         std::vector<TissueCellPtr> cells;
         CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
@@ -161,6 +164,10 @@ public:
                 TS_ASSERT_DELTA(node_location[1], old_node_locations[node_index][1], 1e-9);
             }
         }
+
+        //Test Warnings
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
+        Warnings::QuietDestroy();
     }
 
     void TestUsingJiggledBottomSurface()
@@ -208,6 +215,11 @@ public:
         // The node should have been pulled up, but not above y=0. However it should
         // then been moved to above y=0 by the jiggling
         TS_ASSERT_LESS_THAN(0.0, crypt.GetNode(0)->rGetLocation()[1]);
+
+        //Test Warnings \TODO this should be only one warning see #1394
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 136u);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
+        Warnings::QuietDestroy();
     }
 
     /**
@@ -245,6 +257,11 @@ public:
 
         // Run simulation
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+
+        //Test Warnings \TODO this should be only one warning see #1394
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 972u);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
+        Warnings::QuietDestroy();
     }
 
     /**
@@ -290,6 +307,11 @@ public:
 
         // Run simulation
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+
+        //Test Warnings \TODO this should be only one warning see #1394
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 971u);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
+        Warnings::QuietDestroy();
     }
 
     /**
@@ -330,6 +352,11 @@ public:
 
         // Run simulation
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+
+        //Test Warnings \TODO this should be only one warning see #1394
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u); // Number not known
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
+        Warnings::QuietDestroy();
     }
 
     /**
@@ -376,6 +403,11 @@ public:
         // Run simulation
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
 
+        //Test Warnings \TODO this should be only one warning see #1394
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 761u);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
+        Warnings::QuietDestroy();
+
         // Tidy up
         WntConcentration<2>::Destroy();
     }
@@ -420,6 +452,11 @@ public:
 
         // Run simulation
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+
+        //Test Warnings \TODO this should be only one warning see #1394
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u); // Number not known.
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
+        Warnings::QuietDestroy();
 
         // Tidy up
         WntConcentration<2>::Destroy();
@@ -472,6 +509,11 @@ public:
         VertexCryptSimulation2d* p_simulator;
         p_simulator = TissueSimulationArchiver<2, VertexCryptSimulation2d>::Load("TestVertexCryptWithBoundaryForce", end_time);
         delete p_simulator;
+
+        //Test Warnings \TODO this should be only one warning see #1394
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 968u);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
+        Warnings::QuietDestroy();
     }
 
     /**
@@ -525,6 +567,10 @@ public:
         VertexMesh<2,2>& r_mesh = (static_cast<VertexBasedTissue<2>*>(&(p_simulator->rGetTissue())))->rGetMesh();
         CompareMeshes(p_mesh2, &r_mesh);
 
+        //Test Warnings
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
+        Warnings::QuietDestroy();
+
         // Tidy up
         delete p_simulator;
     }
@@ -569,17 +615,22 @@ public:
 
         // Test the locations of a few nodes
         std::vector<double> node_4_location = simulator.GetNodeLocation(4);
-        TS_ASSERT_DELTA(node_4_location[0], 0.0021, 1e-4);
-        TS_ASSERT_DELTA(node_4_location[1], 0.1516, 1e-4);
+        TS_ASSERT_DELTA(node_4_location[0], 3.9992, 1e-4);
+        TS_ASSERT_DELTA(node_4_location[1], 0.1757, 1e-4);
 
         std::vector<double> node_5_location = simulator.GetNodeLocation(5);
-        TS_ASSERT_DELTA(node_5_location[0], 0.9721, 1e-4);
-        TS_ASSERT_DELTA(node_5_location[1], 0.1437, 1e-4);
+        TS_ASSERT_DELTA(node_5_location[0], 0.9755, 1e-4);
+        TS_ASSERT_DELTA(node_5_location[1], 0.1715, 1e-4);
 
         // Test the Wnt concentration result
         WntConcentration<2>* p_wnt = WntConcentration<2>::Instance();
-        TS_ASSERT_DELTA(p_wnt->GetWntLevel(crypt.GetCellUsingLocationIndex(2)), 0.9757, 1e-4);
-        TS_ASSERT_DELTA(p_wnt->GetWntLevel(crypt.GetCellUsingLocationIndex(3)), 0.9743, 1e-4);
+        TS_ASSERT_DELTA(p_wnt->GetWntLevel(crypt.GetCellUsingLocationIndex(2)), 0.9748, 1e-4);
+        TS_ASSERT_DELTA(p_wnt->GetWntLevel(crypt.GetCellUsingLocationIndex(3)), 0.9736, 1e-4);
+
+        //Test Warnings \TODO this should be only one warning see #1394
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1178u);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
+        Warnings::QuietDestroy();
 
         // Tidy up
         WntConcentration<2>::Destroy();
@@ -628,6 +679,11 @@ public:
         // Save the results
         TissueSimulationArchiver<2, VertexCryptSimulation2d>::Save(&simulator);
 
+        //Test Warnings \TODO this should be only one warning see #1394
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 905u);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
+        Warnings::QuietDestroy();
+
         // Tidy up
         WntConcentration<2>::Destroy();
     }
@@ -666,20 +722,25 @@ public:
 
         // Test the locations of a few nodes
         std::vector<double> node_4_location = p_simulator2->GetNodeLocation(4);
-        TS_ASSERT_DELTA(node_4_location[0], 0.0021, 1e-4);
-        TS_ASSERT_DELTA(node_4_location[1], 0.1516, 1e-4);
+        TS_ASSERT_DELTA(node_4_location[0], 3.9992, 1e-4);
+        TS_ASSERT_DELTA(node_4_location[1], 0.1757, 1e-4);
 
         std::vector<double> node_5_location = p_simulator2->GetNodeLocation(5);
-        TS_ASSERT_DELTA(node_5_location[0], 0.9721, 1e-4);
-        TS_ASSERT_DELTA(node_5_location[1], 0.1437, 1e-4);
+        TS_ASSERT_DELTA(node_5_location[0], 0.9755, 1e-4);
+        TS_ASSERT_DELTA(node_5_location[1], 0.1715, 1e-4);
 
         // Test Wnt concentration was set up correctly
         TS_ASSERT_EQUALS(WntConcentration<2>::Instance()->IsWntSetUp(), true);
 
         // Test the Wnt concentration result
         WntConcentration<2>* p_wnt = WntConcentration<2>::Instance();
-        TS_ASSERT_DELTA(p_wnt->GetWntLevel(p_simulator2->rGetTissue().GetCellUsingLocationIndex(2)), 0.9757, 1e-4);
-        TS_ASSERT_DELTA(p_wnt->GetWntLevel(p_simulator2->rGetTissue().GetCellUsingLocationIndex(3)), 0.9743, 1e-4);
+        TS_ASSERT_DELTA(p_wnt->GetWntLevel(p_simulator2->rGetTissue().GetCellUsingLocationIndex(2)), 0.9748, 1e-4);
+        TS_ASSERT_DELTA(p_wnt->GetWntLevel(p_simulator2->rGetTissue().GetCellUsingLocationIndex(3)), 0.9736, 1e-4);
+
+        //Test Warnings \TODO this should be only one warning see #1394
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 273u);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
+        Warnings::QuietDestroy();
 
         // Tidy up
         delete p_simulator1;
