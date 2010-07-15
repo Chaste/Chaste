@@ -804,7 +804,7 @@ public:
 		VertexBasedTissue<2> tissue(*p_mesh, cells);
 
 		// Create a force system
-		NagaiHondaForce<2> force;
+		NagaiHondaForce<2> force(true);
 		std::vector<AbstractForce<2>* > force_collection;
 		force_collection.push_back(&force);
 

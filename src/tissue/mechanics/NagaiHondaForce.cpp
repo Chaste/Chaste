@@ -29,8 +29,9 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 
 template<unsigned DIM>
-NagaiHondaForce<DIM>::NagaiHondaForce()
-   : AbstractForce<DIM>()
+NagaiHondaForce<DIM>::NagaiHondaForce(bool usingDifferentialAdhesion)
+   : AbstractForce<DIM>(),
+     mUsingDifferentialAdhesion(usingDifferentialAdhesion)
 {
 }
 
@@ -128,18 +129,23 @@ void NagaiHondaForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM
             unsigned next_node_local_index = (local_index+1)%(p_element->GetNumNodes());
             Node<DIM>* p_next_node = p_element->GetNode(next_node_local_index);
 
-            // Determine combinationCellTypes (0: both cells sharing edge are wild types, 1: both cells sharing edge are labelled,
-            // 2: one of the cells sharing the edge is wild type and the other is labelled, 99: otherwise)
-            unsigned combinationCellTypesPreviousEdge = GetCombinationCellTypes(p_previous_node, p_current_node, rTissue);
-            unsigned combinationCellTypesNextEdge = GetCombinationCellTypes(p_current_node, p_next_node, rTissue);
 
             // Compute the adhesion parameter for each of these edges
-            double previous_edge_adhesion_parameter = GetAdhesionParameter(p_previous_node, p_current_node, combinationCellTypesPreviousEdge);
-            double next_edge_adhesion_parameter = GetAdhesionParameter(p_current_node, p_next_node, combinationCellTypesNextEdge);
+            double previous_edge_adhesion_parameter = GetAdhesionParameter(p_previous_node, p_current_node);
+            double next_edge_adhesion_parameter = GetAdhesionParameter(p_current_node, p_next_node);
 
-//            // Compute the adhesion parameter for each of these edges
-//            double previous_edge_adhesion_parameter = GetAdhesionParameter(p_previous_node, p_current_node);
-//            double next_edge_adhesion_parameter = GetAdhesionParameter(p_current_node, p_next_node);
+			// if using differneital adhesion then adjust adhesion parameters.
+            if (mUsingDifferentialAdhesion)
+            {
+				// Determine combinationCellTypes (0: both cells sharing edge are wild types, 1: both cells sharing edge are labelled,
+				// 2: one of the cells sharing the edge is wild type and the other is labelled, 99: otherwise)
+				unsigned combinationCellTypesPreviousEdge = GetCombinationCellTypes(p_previous_node, p_current_node, rTissue);
+				unsigned combinationCellTypesNextEdge = GetCombinationCellTypes(p_current_node, p_next_node, rTissue);
+
+				// Compute the adhesion parameter for each of these edges
+				previous_edge_adhesion_parameter = GetAdhesionParameter(p_previous_node, p_current_node, combinationCellTypesPreviousEdge);
+				next_edge_adhesion_parameter = GetAdhesionParameter(p_current_node, p_next_node, combinationCellTypesNextEdge);
+            }
 
             // Compute the gradient of the edge of the cell ending in this node
             c_vector<double, DIM> previous_edge_gradient = p_tissue->rGetMesh().GetPreviousEdgeGradientOfElementAtNode(p_element, local_index);

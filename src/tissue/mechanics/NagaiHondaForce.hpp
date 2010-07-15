@@ -49,6 +49,8 @@ friend class TestForcesNotForRelease;
 
 private:
 
+	bool mUsingDifferentialAdhesion;
+
     friend class boost::serialization::access;
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
@@ -56,14 +58,17 @@ private:
         // If Archive is an output archive, then '&' resolves to '<<'
         // If Archive is an input archive, then '&' resolves to '>>'
         archive & boost::serialization::base_object<AbstractForce<DIM> >(*this);
+        archive & mUsingDifferentialAdhesion;
     }
 
 public:
 
     /**
      * Constructor.
+     *
+     * @param usingDifferentialAdhesion whether to use differential adhesion between cells defaults to false
      */
-    NagaiHondaForce();
+    NagaiHondaForce(bool usingDifferentialAdhesion=false);
 
     /**
      * Destructor.
