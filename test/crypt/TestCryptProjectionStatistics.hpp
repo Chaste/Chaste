@@ -74,7 +74,7 @@ public:
 
         p_mesh->Translate(-width_of_mesh/2,-height_of_mesh/2);
 
-        std::vector<TissueCell> cells;
+        std::vector<TissueCellPtr> cells;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<location_indices.size(); i++)
         {
@@ -82,14 +82,14 @@ public:
             p_model->SetDimension(2);
             p_model->SetCellProliferativeType(TRANSIT);
 
-            TissueCell cell(p_state, p_model);
+            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
 
-            cell.InitialiseCellCycleModel();
+            p_cell->InitialiseCellCycleModel();
             double birth_time = - RandomNumberGenerator::Instance()->ranf()*
                                   (p_params->GetTransitCellG1Duration()
                                     + p_params->GetSG2MDuration());
-            cell.SetBirthTime(birth_time);
-            cells.push_back(cell);
+            p_cell->SetBirthTime(birth_time);
+            cells.push_back(p_cell);
         }
 
         // Make a tissue
@@ -101,7 +101,7 @@ public:
 
         CryptProjectionStatistics statistics(crypt);
 
-        std::vector< TissueCell* > test_section = statistics.GetCryptSection(M_PI/2.0);
+        std::vector<TissueCellPtr> test_section = statistics.GetCryptSection(M_PI/2.0);
 
         // Test the cells are correct
         TS_ASSERT_EQUALS(test_section.size(), 10u);
@@ -110,7 +110,7 @@ public:
 
         for (unsigned i=0; i<test_section.size(); i++)
         {
-            TS_ASSERT_EQUALS(crypt.GetLocationIndexUsingCell(*test_section[i]), expected_indices[i]);
+            TS_ASSERT_EQUALS(crypt.GetLocationIndexUsingCell(test_section[i]), expected_indices[i]);
         }
 
         // Create the force law and pass in to a std::list
@@ -135,7 +135,7 @@ public:
 
         statistics.LabelSPhaseCells();
 
-        std::vector<TissueCell*> test_section2 = statistics.GetCryptSection();
+        std::vector<TissueCellPtr> test_section2 = statistics.GetCryptSection();
         std::vector<bool> labelled_cells = statistics.AreCryptSectionCellsLabelled(test_section2);
 
         TS_ASSERT_EQUALS(test_section2.size(), labelled_cells.size());
@@ -143,7 +143,7 @@ public:
         // Five of these cells are labelled - at nodes 207, 208, 232, 254 and 255
         for (unsigned i=0; i<test_section2.size(); i++)
         {
-            unsigned node_index = crypt.GetLocationIndexUsingCell(*test_section2[i]);
+            unsigned node_index = crypt.GetLocationIndexUsingCell(test_section2[i]);
 
             if (node_index == 207u || node_index == 208u || node_index == 232u || node_index == 254u || node_index == 255u)
             {

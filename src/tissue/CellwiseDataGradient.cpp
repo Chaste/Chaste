@@ -79,8 +79,8 @@ void CellwiseDataGradient<DIM>::SetupGradients()
             }
 
             // If no ghost element, get PDE solution
-            TissueCell& r_cell = p_tissue->rGetCellUsingLocationIndex(node_global_index);
-            double pde_solution = CellwiseData<DIM>::Instance()->GetValue(r_cell, 0);
+            TissueCellPtr p_cell = p_tissue->GetCellUsingLocationIndex(node_global_index);
+            double pde_solution = CellwiseData<DIM>::Instance()->GetValue(p_cell, 0);
 
             // Interpolate gradient
             for (unsigned i=0; i<DIM; i++)
@@ -140,12 +140,12 @@ void CellwiseDataGradient<DIM>::SetupGradients()
                         Node<DIM>& adjacent_node = *(r_mesh.GetNode(adjacent_node_global_index));
 
                         double this_cell_concentration = CellwiseData<DIM>::Instance()->GetValue(*cell_iter, 0);
-                        TissueCell& adjacent_cell = p_tissue->rGetCellUsingLocationIndex(adjacent_node_global_index);
-                        double adjacent_cell_concentration = CellwiseData<DIM>::Instance()->GetValue(adjacent_cell, 0);
+                        TissueCellPtr p_adjacent_cell = p_tissue->GetCellUsingLocationIndex(adjacent_node_global_index);
+                        double adjacent_cell_concentration = CellwiseData<DIM>::Instance()->GetValue(p_adjacent_cell, 0);
 
                         c_vector<double, DIM> gradient_contribution = zero_vector<double>(DIM);
 
-                        if (fabs(this_cell_concentration-adjacent_cell_concentration) > 100*DBL_EPSILON )
+                        if (fabs(this_cell_concentration-adjacent_cell_concentration) > 100*DBL_EPSILON)
                         {
                             c_vector<double, DIM> edge_vector = r_mesh.GetVectorFromAtoB(this_node.rGetLocation(), adjacent_node.rGetLocation());
                             double norm_edge_vector = norm_2(edge_vector);
@@ -154,7 +154,7 @@ void CellwiseDataGradient<DIM>::SetupGradients()
                                                         / (norm_edge_vector * norm_edge_vector);
                         }
 
-                        mGradients[node_global_index]+=gradient_contribution;
+                        mGradients[node_global_index] += gradient_contribution;
                         num_real_adjacent_nodes++;
                     }
                 }

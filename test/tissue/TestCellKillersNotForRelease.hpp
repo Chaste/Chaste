@@ -72,7 +72,7 @@ public:
         double radius = 0.4;
 
         // Create cells
-        std::vector<TissueCell> cells;
+        std::vector<TissueCellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 

@@ -65,7 +65,7 @@ public:
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
-        std::vector<TissueCell> cells;
+        std::vector<TissueCellPtr> cells;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
@@ -77,9 +77,9 @@ public:
             p_model->SetDimension(2);
             p_model->SetCellProliferativeType(TRANSIT);
 
-            TissueCell cell(p_state, p_model);
-            cell.SetBirthTime(birth_time);
-            cells.push_back(cell);
+            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            p_cell->SetBirthTime(birth_time);
+            cells.push_back(p_cell);
         }
 
         // Create tissue

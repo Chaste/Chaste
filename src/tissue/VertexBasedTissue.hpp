@@ -44,7 +44,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
  * A facade class encapsulating a vertex-based 'tissue'.
  *
  * Contains a group of cells and maintains the associations
- * between TissueCells and elements in the MutableVertexMesh.
+ * between TissueCellPtrs and elements in the MutableVertexMesh.
  *
  */
 template<unsigned DIM>
@@ -90,7 +90,7 @@ private:
 
     /**
      * Check the consistency of internal data structures.
-     * Each VertexElement must have a TissueCell associated with it.
+     * Each VertexElement must have a TissueCellPtr associated with it.
      */
     void Validate();
 
@@ -99,17 +99,17 @@ public:
     /**
      * Create a new tissue facade from a mesh and collection of cells.
      *
-     * There must be precisely one TissueCell for each VertexElement in
+     * There must be precisely one TissueCellPtr for each VertexElement in
      * the mesh.
      *
      * @param rMesh reference to a
-     * @param rCells reference to a vector of TissueCells
+     * @param rCells reference to a vector of TissueCellPtrs
      * @param deleteMesh set to true if you want the tissue to free the mesh memory on destruction
      * @param validate whether to validate the tissue when it is created (defaults to true)
      * @param locationIndices an optional vector of location indices that correspond to real cells
      */
     VertexBasedTissue(MutableVertexMesh<DIM, DIM>& rMesh,
-                      std::vector<TissueCell>& rCells,
+                      std::vector<TissueCellPtr>& rCells,
                       bool deleteMesh=false,
                       bool validate=true,
                       const std::vector<unsigned> locationIndices=std::vector<unsigned>());
@@ -173,11 +173,11 @@ public:
      *       for a VertexTissue (for example, there is no guarantee of convexity so the
      *       centre of mass may lie outside the element)
      *
-     * @param rCell the cell
+     * @param pCell the cell
      *
      * @return the location of the centre of mass of the element corresponding to this cell.
      */
-    c_vector<double, DIM> GetLocationOfCellCentre(TissueCell& rCell);
+    c_vector<double, DIM> GetLocationOfCellCentre(TissueCellPtr pCell);
 
     /**
      * Overridden GetNode() method.
@@ -217,26 +217,26 @@ public:
     void SetNode(unsigned index, ChastePoint<DIM>& rNewLocation);
 
     /**
-     * Get a pointer to the element corresponding to a given TissueCell.
+     * Get a pointer to the element corresponding to a given TissueCellPtr.
      *
-     * @param rCell the cell
+     * @param pCell the cell
      *
      * @return pointer to the element.
      */
-    VertexElement<DIM, DIM>* GetElementCorrespondingToCell(TissueCell& rCell);
+    VertexElement<DIM, DIM>* GetElementCorrespondingToCell(TissueCellPtr pCell);
 
     /**
      * Overridden AddCell() method.
      *
      * Add a new cell to the tissue.
      *
-     * @param rNewCell  the cell to add
+     * @param pNewCell  the cell to add
      * @param rCellDivisionVector  if this vector has any non-zero component, then it is used as the axis
      *     along which the parent cell divides
      * @param pParentCell pointer to a parent cell (if required)
      * @returns address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
      */
-    TissueCell* AddCell(TissueCell& rNewCell, const c_vector<double,DIM>& rCellDivisionVector, TissueCell* pParentCell=NULL);
+    TissueCellPtr AddCell(TissueCellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, TissueCellPtr pParentCell=TissueCellPtr());
 
     /**
      * Remove all cells labelled as dead.
@@ -252,15 +252,15 @@ public:
     /**
      * Overridden IsCellAssociatedWithADeletedLocation() method.
      *
-     * @param rCell the cell
+     * @param pCell the cell
      * @return whether a given cell is associated with a deleted element.
      */
-    bool IsCellAssociatedWithADeletedLocation(TissueCell& rCell);
+    bool IsCellAssociatedWithADeletedLocation(TissueCellPtr pCell);
 
     /**
      * Remove the VertexElements which have been marked as deleted, perform
      * any cell rearrangements if required, and update the correspondence
-     * with TissueCells.
+     * with TissueCellPtrs.
      *
      * @param hasHadBirthsOrDeaths - a bool saying whether tissue has had Births Or Deaths
      * not needed in this tissue class
@@ -273,10 +273,10 @@ public:
      * at A for the rest of the cell cycle, where A denotes the TissueConfig
      * member variable mMatureCellTargetArea.
      *
-     * @param rCell the cell
+     * @param pCell the cell
      * @return the cell's target area
      */
-    double GetTargetAreaOfCell(const TissueCell& rCell);
+    double GetTargetAreaOfCell(const TissueCellPtr pCell);
 
     /**
      * Overridden CreateOutputFiles() method.

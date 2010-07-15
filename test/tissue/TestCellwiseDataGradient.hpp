@@ -58,7 +58,7 @@ public:
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Create a tissue
-        std::vector<TissueCell> cells;
+        std::vector<TissueCellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
         MeshBasedTissue<2> tissue(mesh, cells);
@@ -97,7 +97,7 @@ public:
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Create a tissue
-        std::vector<TissueCell> cells;
+        std::vector<TissueCellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
         MeshBasedTissue<2> tissue(mesh, cells);
@@ -190,7 +190,7 @@ public:
         }
 
         // Set up cells
-        std::vector<TissueCell> cells;
+        std::vector<TissueCellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, cell_location_indices.size());
 

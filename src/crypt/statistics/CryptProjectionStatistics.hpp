@@ -63,7 +63,7 @@ public:
      *
      * @param angle  The angle between the crypt section and the x axis in the projection
      */
-    std::vector<TissueCell*> GetCryptSection(double angle = DBL_MAX);
+    std::vector<TissueCellPtr> GetCryptSection(double angle = DBL_MAX);
 
 };
 

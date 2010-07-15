@@ -92,9 +92,9 @@ private:
      * then used by the VertexBasedTissue method AddCell() as the axis along
      * which the cell divides.
      *
-     * @param rParentCell the parent cell
+     * @param pParentCell the parent cell
      */
-    c_vector<double, DIM> CalculateCellDivisionVector(TissueCell& rParentCell);
+    c_vector<double, DIM> CalculateCellDivisionVector(TissueCellPtr pParentCell);
 
     /**
      * Move each cell to a new lattice site for this timestep by calling the

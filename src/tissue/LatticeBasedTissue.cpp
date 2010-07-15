@@ -39,7 +39,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 template<unsigned DIM>
 LatticeBasedTissue<DIM>::LatticeBasedTissue(TetrahedralMesh<DIM, DIM>& rMesh,
-                                            std::vector<TissueCell>& rCells,
+                                            std::vector<TissueCellPtr>& rCells,
                                             const std::vector<unsigned> locationIndices,
                                             bool onlyUseNearestNeighboursForDivision,
                                             bool useVonNeumannNeighbourhoods,
@@ -176,19 +176,19 @@ unsigned LatticeBasedTissue<DIM>::GetNumNodes()
 }
 
 template<unsigned DIM>
-TissueCell* LatticeBasedTissue<DIM>::AddCell(TissueCell& rNewCell, const c_vector<double,DIM>& rCellDivisionVector, TissueCell* pParentCell)
+TissueCellPtr LatticeBasedTissue<DIM>::AddCell(TissueCellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, TissueCellPtr pParentCell)
 {
     ///\todo This method could probably be made more efficient (#1411)
 
     // Add rNewCell to mCells
-    this->mCells.push_back(rNewCell);
-    TissueCell* p_created_cell = &(this->mCells.back());
+    this->mCells.push_back(pNewCell);
+    TissueCellPtr p_created_cell = this->mCells.back();
 
     // Temporarily provide a location index for the new cell
-    this->mCellLocationMap[p_created_cell] = UINT_MAX;
+    this->mCellLocationMap[p_created_cell.get()] = UINT_MAX;
 
     // Get the location index corresponding to the parent cell
-    unsigned parent_index = this->mCellLocationMap[pParentCell];
+    unsigned parent_index = this->mCellLocationMap[pParentCell.get()];
 
     unsigned degree_upper_bound;         // Maximum degree which to explore to
 
@@ -251,7 +251,7 @@ TissueCell* LatticeBasedTissue<DIM>::AddCell(TissueCell& rNewCell, const c_vecto
             }
             for (unsigned i=degree-1; i>0; i--)
             {
-                TissueCell* p_current_cell = this->mLocationCellMap[indices[i-1]];
+                TissueCellPtr p_current_cell = this->mLocationCellMap[indices[i-1]];
                 assert(p_current_cell);
 
                 MoveCell(p_current_cell, indices[i]);
@@ -607,18 +607,18 @@ unsigned LatticeBasedTissue<DIM>::RemoveDeadCells()
 {
     unsigned num_removed = 0;
 
-    for (std::list<TissueCell>::iterator cell_iter = this->mCells.begin();
+    for (std::list<TissueCellPtr>::iterator cell_iter = this->mCells.begin();
          cell_iter != this->mCells.end();
          ++cell_iter)
     {
-        if (cell_iter->IsDead())
+        if ((*cell_iter)->IsDead())
         {
             // Get the index of the node corresponding to this cell
             unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
 
             // Set this node to be an empty site
             this->mIsEmptySite[node_index] = true;
-            this->mCellLocationMap.erase(&(*cell_iter));
+            this->mCellLocationMap.erase((*cell_iter).get());
             this->mLocationCellMap.erase(node_index);
 
             // Erase cell and update counter
@@ -649,7 +649,7 @@ void LatticeBasedTissue<DIM>::Validate()
          cell_iter != this->End();
          ++cell_iter)
     {
-        unsigned node_index = this->mCellLocationMap[&(*cell_iter)];
+        unsigned node_index = this->mCellLocationMap[(*cell_iter).get()];
 
         // If the node attached to this cell is labelled as an empty site, then throw an error
         if (mIsEmptySite[node_index])
@@ -809,16 +809,16 @@ void LatticeBasedTissue<DIM>::GenerateCellResultsAndWriteToFiles()
 }
 
 template<unsigned DIM>
-bool LatticeBasedTissue<DIM>::IsCellAssociatedWithADeletedLocation(TissueCell& rCell)
+bool LatticeBasedTissue<DIM>::IsCellAssociatedWithADeletedLocation(TissueCellPtr pCell)
 {
     return false;
 }
 
 template<unsigned DIM>
-void LatticeBasedTissue<DIM>::MoveCell(TissueCell* pCell, unsigned newLocationIndex)
+void LatticeBasedTissue<DIM>::MoveCell(TissueCellPtr pCell, unsigned newLocationIndex)
 {
     // Get the current location index corresponding to this cell
-    unsigned current_location_index = this->mCellLocationMap[pCell];
+    unsigned current_location_index = this->mCellLocationMap[pCell.get()];
 
     if (current_location_index != newLocationIndex)
     {
@@ -830,7 +830,7 @@ void LatticeBasedTissue<DIM>::MoveCell(TissueCell* pCell, unsigned newLocationIn
         this->mLocationCellMap[newLocationIndex] = pCell;
 
         // Update this cell to correspond to the new location index
-        this->mCellLocationMap[pCell] = newLocationIndex;
+        this->mCellLocationMap[pCell.get()] = newLocationIndex;
 
         // If this cell is not a new cell...
         if (current_location_index != UINT_MAX)
@@ -853,9 +853,9 @@ void LatticeBasedTissue<DIM>::UpdateNodeLocations(const std::vector< c_vector<do
 }
 
 template<unsigned DIM>
-c_vector<double, DIM> LatticeBasedTissue<DIM>::GetLocationOfCellCentre(TissueCell& rCell)
+c_vector<double, DIM> LatticeBasedTissue<DIM>::GetLocationOfCellCentre(TissueCellPtr pCell)
 {
-    unsigned node_index = this->mCellLocationMap[&rCell];
+    unsigned node_index = this->mCellLocationMap[pCell.get()];
     c_vector<double, DIM> node_location = this->GetNode(node_index)->rGetLocation();
     return node_location;
 }

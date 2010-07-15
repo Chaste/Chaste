@@ -127,7 +127,7 @@ public:
      * There must be precisely 1 cell for each node of the mesh.
      *
      * @param rMesh a mutable tetrahedral mesh
-     * @param rCells TissueCells corresponding to the nodes of the mesh
+     * @param rCells TissueCellPtrs corresponding to the nodes of the mesh
      * @param locationIndices an optional vector of location indices that correspond to real cells
      * @param onlyUseNearestNeighboursForDivision whether to only search the immediate neighbours
      *            for division (defaults to false)
@@ -137,7 +137,7 @@ public:
      * @param validate whether to validate the tissue (defaults to false)
      */
     LatticeBasedTissue(TetrahedralMesh<DIM, DIM>& rMesh,
-                       std::vector<TissueCell>& rCells,
+                       std::vector<TissueCellPtr>& rCells,
                        const std::vector<unsigned> locationIndices=std::vector<unsigned>(),
                        bool onlyUseNearestNeighboursForDivision=false,
                        bool useVonNeumannNeighbourhoods=false,
@@ -242,13 +242,13 @@ public:
      *
      * If there are no free sites in any direction, currently the code throws an exception.
      *
-     * @param rNewCell  the cell to add
+     * @param pNewCell  the cell to add
      * @param rCellDivisionVector  the position in space at which to put it
      * @param pParentCell pointer to a parent cell, if required (defaults to NULL)
      *
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
      */
-    virtual TissueCell* AddCell(TissueCell& rNewCell, const c_vector<double,DIM>& rCellDivisionVector, TissueCell* pParentCell=NULL);
+    virtual TissueCellPtr AddCell(TissueCellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, TissueCellPtr pParentCell=TissueCellPtr());
 
     /**
      * Locate the sites neighbouring a site (this version is a Moore neighbourhood).
@@ -376,12 +376,12 @@ public:
      *
      * Here we don't allow deleted nodes so this always returns false.
      *
-     * @param rCell the cell
+     * @param pCell the cell
      *
      * @return whether a given cell is associated with a deleted
      *         node (cell-centre models) or element (vertex models).
      */
-    bool IsCellAssociatedWithADeletedLocation(TissueCell& rCell);
+    bool IsCellAssociatedWithADeletedLocation(TissueCellPtr pCell);
 
     /**
      * Method to update the location of a particular cell
@@ -389,7 +389,7 @@ public:
      * @param pCell the cell to move
      * @param newLocationIndex the location to move the cell to
      */
-    void MoveCell(TissueCell* pCell, unsigned newLocationIndex);
+    void MoveCell(TissueCellPtr pCell, unsigned newLocationIndex);
 
 ///////////////////// Extra Methods not needed from Abstract Tissue ///////////////////
 
@@ -411,11 +411,11 @@ public:
     /**
      * Find where a given cell is in space.
      *
-     * @param rCell the cell
+     * @param pCell the cell
      *
      * @return the location of the cell
      */
-    c_vector<double, DIM> GetLocationOfCellCentre(TissueCell& rCell);
+    c_vector<double, DIM> GetLocationOfCellCentre(TissueCellPtr pCell);
 
     /**
      * Add a new node to the tissue.

@@ -64,7 +64,7 @@ LatticeBasedTissueSimulation<DIM>::~LatticeBasedTissueSimulation()
 }
 
 template<unsigned DIM>
-c_vector<double, DIM> LatticeBasedTissueSimulation<DIM>::CalculateCellDivisionVector(TissueCell& rParentCell)
+c_vector<double, DIM> LatticeBasedTissueSimulation<DIM>::CalculateCellDivisionVector(TissueCellPtr pParentCell)
 {
     c_vector<double, DIM> axis_of_division = zero_vector<double>(DIM);
     return axis_of_division;
@@ -87,19 +87,19 @@ void LatticeBasedTissueSimulation<DIM>::UpdateCellLocations()
         // Randomly permute cells
         if (mIterateRandomlyOverCells)
         {
-            std::vector<TissueCell*> cells_vector;
+            std::vector<TissueCellPtr> cells_vector;
             for (typename AbstractTissue<DIM>::Iterator cell_iter = this->mrTissue.Begin();
                  cell_iter != this->mrTissue.End();
                  ++cell_iter)
             {
-                cells_vector.push_back(&(*cell_iter));
+                cells_vector.push_back(*cell_iter);
             }
             std::random_shuffle(cells_vector.begin(), cells_vector.end());
 
             for (unsigned i=0; i<cells_vector.size(); i++)
             {
                 // Get index of the node associated with cell
-                unsigned current_location_index = this->mrTissue.GetLocationIndexUsingCell(*cells_vector[i]);
+                unsigned current_location_index = this->mrTissue.GetLocationIndexUsingCell(cells_vector[i]);
 
                 assert(mpStaticCastTissue->IsEmptySite(current_location_index) == false);
 
@@ -126,7 +126,7 @@ void LatticeBasedTissueSimulation<DIM>::UpdateCellLocations()
                 unsigned new_location_index = (*update_iter)->GetNewLocationOfCell(current_location_index, *mpStaticCastTissue, this->GetDt());
 
                 // Update the location index of the cell and free the old site
-                mpStaticCastTissue->MoveCell(&(*cell_iter), new_location_index);
+                mpStaticCastTissue->MoveCell(*cell_iter, new_location_index);
             }
         }
     }

@@ -60,15 +60,15 @@ void NagaiHondaForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM
         /*
          * The force on this Node is given by the gradient of the total free
          * energy of the Tissue, evaluated at the position of the vertex. This
-         * free energy is the sum of the free energies of all TissueCells in
-         * the tissue. The free energy of each TissueCell is comprised of three
+         * free energy is the sum of the free energies of all TissueCellPtrs in
+         * the tissue. The free energy of each TissueCellPtr is comprised of three
          * parts - a cell deformation energy, a membrane surface tension energy
          * and an adhesion energy.
          *
          * Note that since the movement of this Node only affects the free energy
-         * of the three TissueCells containing it, we can just consider the
+         * of the three TissueCellPtrs containing it, we can just consider the
          * contributions to the free energy gradient from each of these three
-         * TissueCells.
+         * TissueCellPtrs.
          */
 
         c_vector<double, DIM> deformation_contribution = zero_vector<double>(DIM);
@@ -97,7 +97,7 @@ void NagaiHondaForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM
             c_vector<double, DIM> element_area_gradient = p_tissue->rGetMesh().GetAreaGradientOfElementAtNode(p_element, local_index);
 
             // Get the target area of the cell
-            double cell_target_area = p_tissue->GetTargetAreaOfCell(p_tissue->rGetCellUsingLocationIndex(element_index));
+            double cell_target_area = p_tissue->GetTargetAreaOfCell(p_tissue->GetCellUsingLocationIndex(element_index));
 
             // Add the force contribution from this cell's deformation energy (note the minus sign)
             deformation_contribution -= 2*p_params->GetNagaiHondaDeformationEnergyParameter()*(element_area - cell_target_area)*element_area_gradient;
@@ -291,27 +291,27 @@ unsigned NagaiHondaForce<DIM>::GetCombinationCellTypes(Node<DIM>* pNodeA, Node<D
                  count=count+1;
             }
 
-           	TissueCell cell1 = rTissue.rGetCellUsingLocationIndex(element_index1);
-            TissueCell cell2 = rTissue.rGetCellUsingLocationIndex(element_index2);
+           	TissueCellPtr p_cell1 = rTissue.GetCellUsingLocationIndex(element_index1);
+            TissueCellPtr p_cell2 = rTissue.GetCellUsingLocationIndex(element_index2);
 
-            if (cell1.GetMutationState()->IsType<LabelledCellMutationState>())
+            if (p_cell1->GetMutationState()->IsType<LabelledCellMutationState>())
             {
-                if (cell2.GetMutationState()->IsType<LabelledCellMutationState>())
+                if (p_cell2->GetMutationState()->IsType<LabelledCellMutationState>())
                 {
                     combinationCellType = 1;
                 }
-                else if (cell2.GetMutationState()->IsType<WildTypeCellMutationState>())
+                else if (p_cell2->GetMutationState()->IsType<WildTypeCellMutationState>())
                 {
                     combinationCellType = 2;
                 }
             }
-            else if (cell1.GetMutationState()->IsType<WildTypeCellMutationState>())
+            else if (p_cell1->GetMutationState()->IsType<WildTypeCellMutationState>())
             {
-                if (cell2.GetMutationState()->IsType<WildTypeCellMutationState>())
+                if (p_cell2->GetMutationState()->IsType<WildTypeCellMutationState>())
                 {
                     combinationCellType = 0;
                 }
-                else if (cell2.GetMutationState()->IsType<LabelledCellMutationState>())
+                else if (p_cell2->GetMutationState()->IsType<LabelledCellMutationState>())
                 {
                     combinationCellType = 2;
                 }

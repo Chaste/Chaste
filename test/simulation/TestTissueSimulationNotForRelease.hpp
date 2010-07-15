@@ -102,7 +102,7 @@ public:
         p_mesh->Translate(-width_of_mesh/2, -height_of_mesh/2);
 
         // To start off with, set up all cells to be of type TRANSIT
-        std::vector<TissueCell> cells;
+        std::vector<TissueCellPtr> cells;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<location_indices.size(); i++)
         {
@@ -110,14 +110,14 @@ public:
             p_model->SetDimension(2);
             p_model->SetCellProliferativeType(TRANSIT);
 
-            TissueCell cell(p_state, p_model);
-            cell.InitialiseCellCycleModel();
+            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            p_cell->InitialiseCellCycleModel();
 
             double birth_time = - RandomNumberGenerator::Instance()->ranf()*
                                   ( p_params->GetTransitCellG1Duration()
                                    +p_params->GetSG2MDuration());
-            cell.SetBirthTime(birth_time);
-            cells.push_back(cell);
+            p_cell->SetBirthTime(birth_time);
+            cells.push_back(p_cell);
         }
 
         // Make a tissue
@@ -160,8 +160,8 @@ public:
 
         // Test the Wnt concentration result
         WntConcentration<2>* p_wnt = WntConcentration<2>::Instance();
-        TS_ASSERT_DELTA(p_wnt->GetWntLevel(crypt.rGetCellUsingLocationIndex(329)), 0.8753, 1e-3);
-        TS_ASSERT_DELTA(p_wnt->GetWntLevel(crypt.rGetCellUsingLocationIndex(494)), 0.9175, 1e-3);
+        TS_ASSERT_DELTA(p_wnt->GetWntLevel(crypt.GetCellUsingLocationIndex(329)), 0.8753, 1e-3);
+        TS_ASSERT_DELTA(p_wnt->GetWntLevel(crypt.GetCellUsingLocationIndex(494)), 0.9175, 1e-3);
 
         // Tidy up
         WntConcentration<2>::Destroy();
@@ -179,19 +179,19 @@ public:
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Set up cells so that cell 10 divides at time t=0.5, cell 9 at time t=1.5, etc
-        std::vector<TissueCell> cells;
+        std::vector<TissueCellPtr> cells;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(STEM);
 
-            TissueCell cell(p_state, p_model);
+            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
 
             double birth_time = -13.5 - i;
-            cell.SetBirthTime(birth_time);
+            p_cell->SetBirthTime(birth_time);
 
-            cells.push_back(cell);
+            cells.push_back(p_cell);
         }
 
         // Create a tissue

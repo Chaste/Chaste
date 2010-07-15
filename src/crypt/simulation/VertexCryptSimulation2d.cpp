@@ -55,7 +55,7 @@ void VertexCryptSimulation2d::WriteVisualizerSetupFile()
 }
 
 
-c_vector<double, 2> VertexCryptSimulation2d::CalculateCellDivisionVector(TissueCell& rParentCell)
+c_vector<double, 2> VertexCryptSimulation2d::CalculateCellDivisionVector(TissueCellPtr pParentCell)
 {
     c_vector<double, 2> axis_of_division = zero_vector<double>(2);
 
@@ -64,7 +64,7 @@ c_vector<double, 2> VertexCryptSimulation2d::CalculateCellDivisionVector(TissueC
     if (!is_wnt_included)
     {
         WntConcentration<2>::Destroy();
-        if (rParentCell.GetCellCycleModel()->GetCellProliferativeType() == STEM)
+        if (pParentCell->GetCellCycleModel()->GetCellProliferativeType() == STEM)
         {
             axis_of_division(0) = 1.0;
             axis_of_division(1) = 0.0;

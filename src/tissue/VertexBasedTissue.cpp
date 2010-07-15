@@ -33,7 +33,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 template<unsigned DIM>
 VertexBasedTissue<DIM>::VertexBasedTissue(MutableVertexMesh<DIM, DIM>& rMesh,
-                                          std::vector<TissueCell>& rCells,
+                                          std::vector<TissueCellPtr>& rCells,
                                           bool deleteMesh,
                                           bool validate,
                                           const std::vector<unsigned> locationIndices)
@@ -82,7 +82,7 @@ double VertexBasedTissue<DIM>::GetDampingConstant(unsigned nodeIndex)
          iter != containing_elements.end();
          ++iter)
     {
-        boost::shared_ptr<AbstractCellMutationState> p_state = this->rGetCellUsingLocationIndex(*iter).GetMutationState();
+        boost::shared_ptr<AbstractCellMutationState> p_state = this->GetCellUsingLocationIndex(*iter)->GetMutationState();
         if (p_state->IsType<WildTypeCellMutationState>())
         {
             average_damping_constant += TissueConfig::Instance()->GetDampingConstantNormal()*temp;
@@ -126,9 +126,9 @@ unsigned VertexBasedTissue<DIM>::GetNumNodes()
 
 
 template<unsigned DIM>
-c_vector<double, DIM> VertexBasedTissue<DIM>::GetLocationOfCellCentre(TissueCell& rCell)
+c_vector<double, DIM> VertexBasedTissue<DIM>::GetLocationOfCellCentre(TissueCellPtr pCell)
 {
-    return mrMesh.GetCentroidOfElement(this->mCellLocationMap[&rCell]);
+    return mrMesh.GetCentroidOfElement(this->mCellLocationMap[pCell.get()]);
 }
 
 
@@ -154,9 +154,9 @@ void VertexBasedTissue<DIM>::SetNode(unsigned nodeIndex, ChastePoint<DIM>& rNewL
 
 
 template<unsigned DIM>
-VertexElement<DIM, DIM>* VertexBasedTissue<DIM>::GetElementCorrespondingToCell(TissueCell& rCell)
+VertexElement<DIM, DIM>* VertexBasedTissue<DIM>::GetElementCorrespondingToCell(TissueCellPtr pCell)
 {
-    return mrMesh.GetElement(this->mCellLocationMap[&rCell]);
+    return mrMesh.GetElement(this->mCellLocationMap[pCell.get()]);
 }
 
 
@@ -168,14 +168,14 @@ unsigned VertexBasedTissue<DIM>::GetNumElements()
 
 
 template<unsigned DIM>
-TissueCell* VertexBasedTissue<DIM>::AddCell(TissueCell& rNewCell, const c_vector<double,DIM>& rCellDivisionVector, TissueCell* pParentCell)
+TissueCellPtr VertexBasedTissue<DIM>::AddCell(TissueCellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, TissueCellPtr pParentCell)
 {
     // Get the element associated with this cell
-    VertexElement<DIM, DIM>* p_element = GetElementCorrespondingToCell(*pParentCell);
+    VertexElement<DIM, DIM>* p_element = GetElementCorrespondingToCell(pParentCell);
 
     // Divide the element
     unsigned new_element_index;
-    if ( norm_2(rCellDivisionVector) < DBL_EPSILON )
+    if (norm_2(rCellDivisionVector) < DBL_EPSILON)
     {
         // If the cell division vector is the default zero vector, divide the element along the short axis
         new_element_index = mrMesh.DivideElementAlongShortAxis(p_element, true);
@@ -187,12 +187,12 @@ TissueCell* VertexBasedTissue<DIM>::AddCell(TissueCell& rNewCell, const c_vector
     }
 
     // Associate the new cell with the element
-    this->mCells.push_back(rNewCell);
+    this->mCells.push_back(pNewCell);
 
     // Update location cell map
-    TissueCell* p_created_cell = &(this->mCells.back());
+    TissueCellPtr p_created_cell = this->mCells.back();
     this->mLocationCellMap[new_element_index] = p_created_cell;
-    this->mCellLocationMap[p_created_cell] = new_element_index;
+    this->mCellLocationMap[p_created_cell.get()] = new_element_index;
     return p_created_cell;
 }
 
@@ -202,15 +202,15 @@ unsigned VertexBasedTissue<DIM>::RemoveDeadCells()
 {
     unsigned num_removed = 0;
 
-    for (std::list<TissueCell>::iterator it = this->mCells.begin();
+    for (std::list<TissueCellPtr>::iterator it = this->mCells.begin();
          it != this->mCells.end();
          ++it)
     {
-        if (it->IsDead())
+        if ((*it)->IsDead())
         {
             // Remove the element from the mesh
             num_removed++;
-            mrMesh.DeleteElementPriorToReMesh(this->mCellLocationMap[&(*it)]);
+            mrMesh.DeleteElementPriorToReMesh(this->mCellLocationMap[(*it).get()]);
             it = this->mCells.erase(it);
             --it;
         }
@@ -255,9 +255,9 @@ void VertexBasedTissue<DIM>::UpdateNodeLocations(const std::vector< c_vector<dou
 
 
 template<unsigned DIM>
-bool VertexBasedTissue<DIM>::IsCellAssociatedWithADeletedLocation(TissueCell& rCell)
+bool VertexBasedTissue<DIM>::IsCellAssociatedWithADeletedLocation(TissueCellPtr pCell)
 {
-    return GetElementCorrespondingToCell(rCell)->IsDeleted();;
+    return GetElementCorrespondingToCell(pCell)->IsDeleted();;
 }
 
 
@@ -270,18 +270,18 @@ void VertexBasedTissue<DIM>::Update(bool hasHadBirthsOrDeaths)
 
     if (!element_map.IsIdentityMap())
     {
-    	// Fix up the mappings between TissueCells and VertexElements
+    	// Fix up the mappings between TissueCellPtrs and VertexElements
         std::map<TissueCell*, unsigned> old_map = this->mCellLocationMap;
 
         this->mCellLocationMap.clear();
         this->mLocationCellMap.clear();
 
-        for (std::list<TissueCell>::iterator cell_iter = this->mCells.begin();
+        for (std::list<TissueCellPtr>::iterator cell_iter = this->mCells.begin();
              cell_iter != this->mCells.end();
              ++cell_iter)
         {
             // This shouldn't ever happen, as the cell vector only contains living cells
-            unsigned old_elem_index = old_map[&(*cell_iter)];
+            unsigned old_elem_index = old_map[(*cell_iter).get()];
 
             if (element_map.IsDeleted(old_elem_index))
             {
@@ -296,15 +296,15 @@ void VertexBasedTissue<DIM>::Update(bool hasHadBirthsOrDeaths)
             {
 				unsigned new_elem_index = element_map.GetNewIndex(old_elem_index);
 
-				this->mLocationCellMap[new_elem_index] = &(*cell_iter);
-				this->mCellLocationMap[&(*cell_iter)] = new_elem_index;
+				this->mLocationCellMap[new_elem_index] = *cell_iter;
+				this->mCellLocationMap[(*cell_iter).get()] = new_elem_index;
             }
         }
     }
 
     element_map.ResetToIdentity();
 
-    // Check that each VertexElement has only one TissueCell associated with it in the updated tissue
+    // Check that each VertexElement has only one TissueCellPtr associated with it in the updated tissue
     Validate();
 }
 
@@ -343,13 +343,13 @@ void VertexBasedTissue<DIM>::Validate()
 
 
 template<unsigned DIM>
-double VertexBasedTissue<DIM>::GetTargetAreaOfCell(const TissueCell& rCell)
+double VertexBasedTissue<DIM>::GetTargetAreaOfCell(const TissueCellPtr pCell)
 {
     // Get target area A of a healthy cell in S, G2 or M phase
     double cell_target_area = TissueConfig::Instance()->GetMatureCellTargetArea();
 
-    double cell_age = rCell.GetAge();
-    double g1_duration = rCell.GetCellCycleModel()->GetG1Duration();
+    double cell_age = pCell->GetAge();
+    double g1_duration = pCell->GetCellCycleModel()->GetG1Duration();
 
     // If the cell is differentiated then its G1 duration is infinite
     if (g1_duration == DBL_MAX) // don't use magic number, compare to DBL_MAX
@@ -358,16 +358,16 @@ double VertexBasedTissue<DIM>::GetTargetAreaOfCell(const TissueCell& rCell)
         g1_duration = TissueConfig::Instance()->GetTransitCellG1Duration();
     }
 
-    if (rCell.GetMutationState()->IsType<ApoptoticCellMutationState>())
+    if (pCell->GetMutationState()->IsType<ApoptoticCellMutationState>())
     {
         // Age of cell when apoptosis begins
-        if (rCell.GetStartOfApoptosisTime() - rCell.GetBirthTime() < g1_duration)
+        if (pCell->GetStartOfApoptosisTime() - pCell->GetBirthTime() < g1_duration)
         {
-            cell_target_area *= 0.5*(1 + (rCell.GetStartOfApoptosisTime() - rCell.GetBirthTime())/g1_duration);
+            cell_target_area *= 0.5*(1 + (pCell->GetStartOfApoptosisTime() - pCell->GetBirthTime())/g1_duration);
         }
 
         // The target area of an apoptotic cell decreases linearly to zero (and past it negative)
-        cell_target_area = cell_target_area - 0.5*cell_target_area/(TissueConfig::Instance()->GetApoptosisTime())*(SimulationTime::Instance()->GetTime()-rCell.GetStartOfApoptosisTime());
+        cell_target_area = cell_target_area - 0.5*cell_target_area/(TissueConfig::Instance()->GetApoptosisTime())*(SimulationTime::Instance()->GetTime()-pCell->GetStartOfApoptosisTime());
 
         // Don't allow a negative target area
         if (cell_target_area < 0)
@@ -399,7 +399,7 @@ void VertexBasedTissue<DIM>::WriteResultsToFiles()
     *mpVizElementsFile << p_time->GetTime() << "\t";
 
     // Loop over cells and find associated elements so in the same order as the cells in output files
-    for (std::list<TissueCell>::iterator cell_iter = this->mCells.begin();
+    for (std::list<TissueCellPtr>::iterator cell_iter = this->mCells.begin();
          cell_iter != this->mCells.end();
          ++cell_iter)
     {
@@ -466,7 +466,7 @@ void VertexBasedTissue<DIM>::WriteResultsToFiles()
         unsigned elem_index = elem_iter->GetIndex();
 
         // Get the cell corresponding to this element
-        TissueCell* p_cell = this->mLocationCellMap[elem_index];
+        TissueCellPtr p_cell = this->mLocationCellMap[elem_index];
         assert(p_cell);
 
         if (TissueConfig::Instance()->GetOutputCellAncestors())
@@ -506,7 +506,7 @@ void VertexBasedTissue<DIM>::WriteResultsToFiles()
 
             for (unsigned var=0; var<num_variables; var++)
             {
-                cellwise_data[var][elem_index] = p_data->GetValue(*p_cell, var);
+                cellwise_data[var][elem_index] = p_data->GetValue(p_cell, var);
             }
         }
     }

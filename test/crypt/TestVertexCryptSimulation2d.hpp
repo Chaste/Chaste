@@ -115,7 +115,7 @@ public:
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Set up cells
-        std::vector<TissueCell> cells;
+        std::vector<TissueCellPtr> cells;
         CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
@@ -172,7 +172,7 @@ public:
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
-        std::vector<TissueCell> cells;
+        std::vector<TissueCellPtr> cells;
         CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
@@ -222,7 +222,7 @@ public:
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells, all differentiated
-        std::vector<TissueCell> cells;
+        std::vector<TissueCellPtr> cells;
         CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 0.0, 0.0, 0.0, 0.0);
 
@@ -258,16 +258,16 @@ public:
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells, bottom row are STEM rest are DIFFERENTIATED.
-        std::vector<TissueCell> cells;
+        std::vector<TissueCellPtr> cells;
         CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 0.8,0.8,0.8,0.8);
 
         // Cell 1 should divide at time t=0.05
-        cells[0].SetBirthTime(-23.95);
+        cells[0]->SetBirthTime(-23.95);
         // Cell 2-4 should divide later
-        cells[1].SetBirthTime(-23.0);
-        cells[2].SetBirthTime(-22.0);
-        cells[3].SetBirthTime(-21.0);
+        cells[1]->SetBirthTime(-23.0);
+        cells[2]->SetBirthTime(-22.0);
+        cells[3]->SetBirthTime(-21.0);
 
         // Create tissue
         VertexBasedTissue<2> crypt(*p_mesh, cells);
@@ -305,7 +305,7 @@ public:
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
-        std::vector<TissueCell> cells;
+        std::vector<TissueCellPtr> cells;
         CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
@@ -346,7 +346,7 @@ public:
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
-        std::vector<TissueCell> cells;
+        std::vector<TissueCellPtr> cells;
         CryptCellsGenerator<SimpleWntCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
@@ -391,7 +391,7 @@ public:
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
-        std::vector<TissueCell> cells;
+        std::vector<TissueCellPtr> cells;
         CryptCellsGenerator<SimpleWntCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
@@ -435,7 +435,7 @@ public:
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells, bottom row are STEM rest are DIFFERENTIATED.
-        std::vector<TissueCell> cells;
+        std::vector<TissueCellPtr> cells;
         CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 0.8, 0.8, 0.8, 0.8);
 
@@ -486,7 +486,7 @@ public:
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
-        std::vector<TissueCell> cells;
+        std::vector<TissueCellPtr> cells;
         CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
@@ -538,7 +538,7 @@ public:
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
-        std::vector<TissueCell> cells;
+        std::vector<TissueCellPtr> cells;
         CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
@@ -578,8 +578,8 @@ public:
 
         // Test the Wnt concentration result
         WntConcentration<2>* p_wnt = WntConcentration<2>::Instance();
-        TS_ASSERT_DELTA(p_wnt->GetWntLevel(crypt.rGetCellUsingLocationIndex(2)), 0.9757, 1e-4);
-        TS_ASSERT_DELTA(p_wnt->GetWntLevel(crypt.rGetCellUsingLocationIndex(3)), 0.9743, 1e-4);
+        TS_ASSERT_DELTA(p_wnt->GetWntLevel(crypt.GetCellUsingLocationIndex(2)), 0.9757, 1e-4);
+        TS_ASSERT_DELTA(p_wnt->GetWntLevel(crypt.GetCellUsingLocationIndex(3)), 0.9743, 1e-4);
 
         // Tidy up
         WntConcentration<2>::Destroy();
@@ -595,7 +595,7 @@ public:
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
-        std::vector<TissueCell> cells;
+        std::vector<TissueCellPtr> cells;
         CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
@@ -678,8 +678,8 @@ public:
 
         // Test the Wnt concentration result
         WntConcentration<2>* p_wnt = WntConcentration<2>::Instance();
-        TS_ASSERT_DELTA(p_wnt->GetWntLevel(p_simulator2->rGetTissue().rGetCellUsingLocationIndex(2)), 0.9757, 1e-4);
-        TS_ASSERT_DELTA(p_wnt->GetWntLevel(p_simulator2->rGetTissue().rGetCellUsingLocationIndex(3)), 0.9743, 1e-4);
+        TS_ASSERT_DELTA(p_wnt->GetWntLevel(p_simulator2->rGetTissue().GetCellUsingLocationIndex(2)), 0.9757, 1e-4);
+        TS_ASSERT_DELTA(p_wnt->GetWntLevel(p_simulator2->rGetTissue().GetCellUsingLocationIndex(3)), 0.9743, 1e-4);
 
         // Tidy up
         delete p_simulator1;

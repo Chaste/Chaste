@@ -77,9 +77,9 @@ private :
      * then used by the VertexBasedTissue method AddCell() as the axis along
      * which the cell divides.
      *
-     * @param rParentCell the parent cell
+     * @param pParentCell the parent cell
      */
-    c_vector<double, 2> CalculateCellDivisionVector(TissueCell& rParentCell);
+    c_vector<double, 2> CalculateCellDivisionVector(TissueCellPtr pParentCell);
 
 public :
 

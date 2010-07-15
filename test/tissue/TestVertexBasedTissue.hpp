@@ -58,19 +58,19 @@ private:
      * so its age is elem_index.
      */
     template<unsigned DIM>
-    std::vector<TissueCell> SetUpCells(MutableVertexMesh<DIM,DIM>& rMesh)
+    std::vector<TissueCellPtr> SetUpCells(MutableVertexMesh<DIM,DIM>& rMesh)
     {
-        std::vector<TissueCell> cells;
+        std::vector<TissueCellPtr> cells;
         boost::shared_ptr<AbstractCellMutationState> p_state(CellMutationStateRegistry::Instance()->Get<WildTypeCellMutationState>());
         for (unsigned i=0; i<rMesh.GetNumElements(); i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(DIFFERENTIATED);
 
-            TissueCell cell(p_state, p_model);
+            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
             double birth_time = 0.0 - i;
-            cell.SetBirthTime(birth_time);
-            cells.push_back(cell);
+            p_cell->SetBirthTime(birth_time);
+            cells.push_back(p_cell);
         }
         return cells;
     }
@@ -85,7 +85,7 @@ public:
         MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
 
         // Set up cells
-        std::vector<TissueCell> cells = SetUpCells(*p_mesh);
+        std::vector<TissueCellPtr> cells = SetUpCells(*p_mesh);
 
         // Create tissue
         unsigned num_cells = cells.size();
@@ -131,7 +131,7 @@ public:
 
 			// Set up cells, one for each element.
 			// Give each a birth time of -element_index, so the age = element_index.
-			std::vector<TissueCell> cells;
+			std::vector<TissueCellPtr> cells;
 			std::vector<unsigned> cell_location_indices;
 			boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
 			for (unsigned i=0; i<p_mesh->GetNumElements()-1; i++)
@@ -139,34 +139,34 @@ public:
 				FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
 				p_model->SetCellProliferativeType(STEM);
 
-				TissueCell cell(p_state, p_model);
+				TissueCellPtr p_cell(new TissueCell(p_state, p_model));
 
 				double birth_time = 0.0 - i;
-				cell.SetBirthTime(birth_time);
+				p_cell->SetBirthTime(birth_time);
 
-				cells.push_back(cell);
+				cells.push_back(p_cell);
 				cell_location_indices.push_back(i);
 			}
 
 			// This should throw an exception as the number of cells
 			// does not equal the number of elements
-			std::vector<TissueCell> cells_copy(cells);
+			std::vector<TissueCellPtr> cells_copy(cells);
 			TS_ASSERT_THROWS_THIS(VertexBasedTissue<2> tissue(*p_mesh, cells_copy),
 					"Element 8 does not appear to have a cell associated with it");
 
 			FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
 			p_model->SetCellProliferativeType(STEM);
 
-			TissueCell cell(p_state, p_model);
+			TissueCellPtr p_cell(new TissueCell(p_state, p_model));
 
 			double birth_time = 0.0 - p_mesh->GetNumElements()-1;
-			cell.SetBirthTime(birth_time);
+			p_cell->SetBirthTime(birth_time);
 
-			cells.push_back(cell);
+			cells.push_back(p_cell);
 			cell_location_indices.push_back(p_mesh->GetNumElements()-1);
 
 			// This should pass as the number of cells equals the number of elements
-			std::vector<TissueCell> cells_copy2(cells);
+			std::vector<TissueCellPtr> cells_copy2(cells);
 			TS_ASSERT_THROWS_NOTHING(VertexBasedTissue<2> tissue(*p_mesh, cells_copy2));
 
 			// Create tissue
@@ -188,8 +188,8 @@ public:
 
 				std::set<unsigned> actual_node_indices;
 				unsigned elem_index = iter->GetIndex();
-				TissueCell& r_cell = tissue.rGetCellUsingLocationIndex(elem_index);
-				VertexElement<2,2>* p_actual_element = tissue.GetElementCorrespondingToCell(r_cell);
+				TissueCellPtr p_cell = tissue.GetCellUsingLocationIndex(elem_index);
+				VertexElement<2,2>* p_actual_element = tissue.GetElementCorrespondingToCell(p_cell);
 				unsigned actual_index = p_actual_element->GetIndex();
 
 				for (unsigned i=0; i<p_actual_element->GetNumNodes(); i++)
@@ -211,7 +211,7 @@ public:
 
 			// Set up cells, one for each element.
 			// Give each a birth time of -element_index, so the age = element_index.
-			std::vector<TissueCell> cells;
+			std::vector<TissueCellPtr> cells;
 			std::vector<unsigned> cell_location_indices;
 			boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
 			for (unsigned i=0; i<p_mesh->GetNumElements()+1; i++)
@@ -219,12 +219,12 @@ public:
 				FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
 				p_model->SetCellProliferativeType(STEM);
 
-				TissueCell cell(p_state, p_model);
+				TissueCellPtr p_cell(new TissueCell(p_state, p_model));
 
 				double birth_time = 0.0 - i;
-				cell.SetBirthTime(birth_time);
+				p_cell->SetBirthTime(birth_time);
 
-				cells.push_back(cell);
+				cells.push_back(p_cell);
 				cell_location_indices.push_back(i%p_mesh->GetNumElements());		// Element 0 will have 2 cells
 			}
 
@@ -249,7 +249,7 @@ public:
         MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
 
         // Set up cells
-        std::vector<TissueCell> cells;
+        std::vector<TissueCellPtr> cells;
         std::vector<unsigned> cell_location_indices;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<p_mesh->GetNumElements(); i++)
@@ -263,11 +263,11 @@ public:
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(cell_type);
 
-            TissueCell cell(p_state, p_model);
+            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
             double birth_time = 0.0 - 2*i;
-            cell.SetBirthTime(birth_time);
+            p_cell->SetBirthTime(birth_time);
 
-            cells.push_back(cell);
+            cells.push_back(p_cell);
             cell_location_indices.push_back(i);
         }
 
@@ -281,7 +281,7 @@ public:
              ++iter)
         {
             unsigned elem_index = iter->GetIndex();
-            TissueCell cell = tissue.rGetCellUsingLocationIndex(elem_index);
+            TissueCellPtr p_cell = tissue.GetCellUsingLocationIndex(elem_index);
             double expected_area = TissueConfig::Instance()->GetMatureCellTargetArea();
 
             if (elem_index!=4 && elem_index<=7u)
@@ -289,22 +289,22 @@ public:
                 expected_area *= 0.5*(1 + ((double)elem_index)/7.0);
             }
 
-            double actual_area = tissue.GetTargetAreaOfCell(cell);
+            double actual_area = tissue.GetTargetAreaOfCell(p_cell);
 
             TS_ASSERT_DELTA(actual_area, expected_area, 1e-12);
         }
 
-        TissueCell cell_0 = tissue.rGetCellUsingLocationIndex(0);
-        TissueCell cell_1 = tissue.rGetCellUsingLocationIndex(1);
-        TissueCell cell_4 = tissue.rGetCellUsingLocationIndex(4);
+        TissueCellPtr p_cell_0 = tissue.GetCellUsingLocationIndex(0);
+        TissueCellPtr p_cell_1 = tissue.GetCellUsingLocationIndex(1);
+        TissueCellPtr p_cell_4 = tissue.GetCellUsingLocationIndex(4);
 
         // Make cell 1 and 4 undergo apoptosis
-        cell_1.StartApoptosis();
-        cell_4.StartApoptosis();
+        p_cell_1->StartApoptosis();
+        p_cell_4->StartApoptosis();
 
-        double actual_area_0 = tissue.GetTargetAreaOfCell(cell_0);
-        double actual_area_1 = tissue.GetTargetAreaOfCell(cell_1);
-        double actual_area_4 = tissue.GetTargetAreaOfCell(cell_4);
+        double actual_area_0 = tissue.GetTargetAreaOfCell(p_cell_0);
+        double actual_area_1 = tissue.GetTargetAreaOfCell(p_cell_1);
+        double actual_area_4 = tissue.GetTargetAreaOfCell(p_cell_4);
 
         double expected_area_0 = 0.5;
         double expected_area_1 = TissueConfig::Instance()->GetMatureCellTargetArea()*0.5*(1.0 + 1.0/7.0);
@@ -317,9 +317,9 @@ public:
         // Run for one time step
         p_simulation_time->IncrementTimeOneStep();
 
-        double actual_area_0_after_dt = tissue.GetTargetAreaOfCell(cell_0);
-        double actual_area_1_after_dt = tissue.GetTargetAreaOfCell(cell_1);
-        double actual_area_4_after_dt = tissue.GetTargetAreaOfCell(cell_4);
+        double actual_area_0_after_dt = tissue.GetTargetAreaOfCell(p_cell_0);
+        double actual_area_1_after_dt = tissue.GetTargetAreaOfCell(p_cell_1);
+        double actual_area_4_after_dt = tissue.GetTargetAreaOfCell(p_cell_4);
 
         // The target areas of cells 1 and 4 should have halved
         expected_area_0 = TissueConfig::Instance()->GetMatureCellTargetArea()*0.5*(1.0 + 0.5*apoptosis_time);
@@ -329,14 +329,14 @@ public:
         TS_ASSERT_DELTA(actual_area_4_after_dt, 0.5*expected_area_4, 1e-12);
 
         // Make cell 0 undergo apoptosis
-        cell_0.StartApoptosis();
+        p_cell_0->StartApoptosis();
 
         // Now run on for a further time step
         p_simulation_time->IncrementTimeOneStep();
 
-        double actual_area_0_after_2dt = tissue.GetTargetAreaOfCell(cell_0);
-        double actual_area_1_after_2dt = tissue.GetTargetAreaOfCell(cell_1);
-        double actual_area_4_after_2dt = tissue.GetTargetAreaOfCell(cell_4);
+        double actual_area_0_after_2dt = tissue.GetTargetAreaOfCell(p_cell_0);
+        double actual_area_1_after_2dt = tissue.GetTargetAreaOfCell(p_cell_1);
+        double actual_area_4_after_2dt = tissue.GetTargetAreaOfCell(p_cell_4);
 
         // Cells 1 and 4 should now have zero target area and the target area of cell 0 should have halved
         TS_ASSERT_DELTA(actual_area_0_after_2dt, 0.5*expected_area_0, 1e-12);
@@ -346,9 +346,9 @@ public:
         // Now run on for even further, for coverage
         p_simulation_time->IncrementTimeOneStep();
 
-        double actual_area_0_after_3dt = tissue.GetTargetAreaOfCell(cell_0);
-        double actual_area_1_after_3dt = tissue.GetTargetAreaOfCell(cell_1);
-        double actual_area_4_after_3dt = tissue.GetTargetAreaOfCell(cell_4);
+        double actual_area_0_after_3dt = tissue.GetTargetAreaOfCell(p_cell_0);
+        double actual_area_1_after_3dt = tissue.GetTargetAreaOfCell(p_cell_1);
+        double actual_area_4_after_3dt = tissue.GetTargetAreaOfCell(p_cell_4);
 
         // All apoptotic cells should now have zero target area
         TS_ASSERT_DELTA(actual_area_0_after_3dt, 0.0, 1e-12);
@@ -366,7 +366,7 @@ public:
         MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
 
         // Set up cells
-        std::vector<TissueCell> cells;
+        std::vector<TissueCellPtr> cells;
         std::vector<unsigned> cell_location_indices;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         boost::shared_ptr<AbstractCellMutationState> p_labelled(new LabelledCellMutationState);
@@ -378,18 +378,18 @@ public:
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(STEM);
 
-            TissueCell cell(p_state, p_model);
+            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
 
             double birth_time = 0.0 - i;
-            cell.SetBirthTime(birth_time);
+            p_cell->SetBirthTime(birth_time);
 
-            cells.push_back(cell);
+            cells.push_back(p_cell);
             cell_location_indices.push_back(i);
         }
-        cells[0].SetMutationState(p_apc1);
-        cells[6].SetMutationState(p_apc2);
-        cells[7].SetMutationState(p_bcat1);
-        cells[8].SetMutationState(p_labelled);
+        cells[0]->SetMutationState(p_apc1);
+        cells[6]->SetMutationState(p_apc2);
+        cells[7]->SetMutationState(p_bcat1);
+        cells[8]->SetMutationState(p_labelled);
 
         // Create tissue
         VertexBasedTissue<2> tissue(*p_mesh, cells);
@@ -435,7 +435,7 @@ public:
         MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
 
         // Set up cells
-        std::vector<TissueCell> cells = SetUpCells(*p_mesh);
+        std::vector<TissueCellPtr> cells = SetUpCells(*p_mesh);
 
         // Create tissue
         VertexBasedTissue<2> tissue(*p_mesh, cells);
@@ -483,7 +483,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 5u);
 
         // Create cells
-        std::vector<TissueCell> cells = SetUpCells(vertex_mesh);
+        std::vector<TissueCellPtr> cells = SetUpCells(vertex_mesh);
 
         // Create tissue
         VertexBasedTissue<2> tissue(vertex_mesh, cells);
@@ -491,12 +491,12 @@ public:
         // For coverage, test GetLocationOfCellCentre()
 
         // Cell 0 is a rectangle with centre of mass (0,0)
-        c_vector<double, 2> cell0_location = tissue.GetLocationOfCellCentre(tissue.rGetCellUsingLocationIndex(0));
+        c_vector<double, 2> cell0_location = tissue.GetLocationOfCellCentre(tissue.GetCellUsingLocationIndex(0));
         TS_ASSERT_DELTA(cell0_location[0], 0.0, 1e-4);
         TS_ASSERT_DELTA(cell0_location[1], 0.0, 1e-4);
 
         // Cell 1 is a triangle with centre of mass (0,4/3)
-        c_vector<double, 2> cell1_location = tissue.GetLocationOfCellCentre(tissue.rGetCellUsingLocationIndex(1));
+        c_vector<double, 2> cell1_location = tissue.GetLocationOfCellCentre(tissue.GetCellUsingLocationIndex(1));
         TS_ASSERT_DELTA(cell1_location[0], 0.0, 1e-4);
         TS_ASSERT_DELTA(cell1_location[1], 4.0/3.0, 1e-4);
 
@@ -508,15 +508,15 @@ public:
 
         c_vector<double,2> cell_division_vector = zero_vector<double>(2);
 
-        TissueCell cell0 = tissue.rGetCellUsingLocationIndex(0);
+        TissueCellPtr p_cell0 = tissue.GetCellUsingLocationIndex(0);
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
 
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         p_model->SetCellProliferativeType(STEM);
-        TissueCell new_cell(p_state, p_model);
-        new_cell.SetBirthTime(-1);
+        TissueCellPtr p_temp_cell(new TissueCell(p_state, p_model));
+        p_temp_cell->SetBirthTime(-1);
 
-        TissueCell* p_new_cell = tissue.AddCell(new_cell, cell_division_vector, &cell0);
+        TissueCellPtr p_new_cell = tissue.AddCell(p_temp_cell, cell_division_vector, p_cell0);
 
         // Check that the new cell was successfully added to the tissue
         TS_ASSERT_EQUALS(tissue.GetNumNodes(), old_num_nodes+2);
@@ -566,7 +566,7 @@ public:
         TS_ASSERT_EQUALS(tissue.GetNode(6)->rGetContainingElementIndices(), expected_elements_containing_node_6);
 
         // Check the index of the new cell
-        TS_ASSERT_EQUALS(tissue.GetLocationIndexUsingCell(*p_new_cell), old_num_elements);
+        TS_ASSERT_EQUALS(tissue.GetLocationIndexUsingCell(p_new_cell), old_num_elements);
     }
 
 
@@ -590,14 +590,14 @@ public:
         MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
 
         // Create a cell
-        std::vector<TissueCell> cells;
+        std::vector<TissueCellPtr> cells;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         p_model->SetCellProliferativeType(DIFFERENTIATED);
 
-        TissueCell cell(p_state, p_model);
-        cell.SetBirthTime(-20.0);
-        cells.push_back(cell);
+        TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+        p_cell->SetBirthTime(-20.0);
+        cells.push_back(p_cell);
 
         // Create tissue
         VertexBasedTissue<2> tissue(vertex_mesh, cells);
@@ -614,10 +614,10 @@ public:
 
         FixedDurationGenerationBasedCellCycleModel* p_model2 = new FixedDurationGenerationBasedCellCycleModel();
         p_model2->SetCellProliferativeType(STEM);
-        TissueCell new_cell(p_state, p_model2);
-        new_cell.SetBirthTime(-1.0);
+        TissueCellPtr p_temp_cell(new TissueCell(p_state, p_model2));
+        p_temp_cell->SetBirthTime(-1.0);
 
-        TissueCell* p_new_cell = tissue.AddCell(new_cell, cell_division_axis, &cell);
+        TissueCellPtr p_new_cell = tissue.AddCell(p_temp_cell, cell_division_axis, p_cell);
 
         // Check that the new cell was successfully added to the tissue
         TS_ASSERT_EQUALS(tissue.GetNumNodes(), 6u);
@@ -643,7 +643,7 @@ public:
         TS_ASSERT_EQUALS(tissue.GetNode(5)->rGetContainingElementIndices(), expected_elements_containing_node_5);
 
         // Check the index of the new cell
-        TS_ASSERT_EQUALS(tissue.GetLocationIndexUsingCell(*p_new_cell), 1u);
+        TS_ASSERT_EQUALS(tissue.GetLocationIndexUsingCell(p_new_cell), 1u);
     }
 
     void TestAddCellWithHoneycombMesh() throw (Exception)
@@ -654,7 +654,7 @@ public:
 
         // Set up cells, one for each VertexElement. Give each cell
         // a birth time of -elem_index, so its age is elem_index
-        std::vector<TissueCell> cells;
+        std::vector<TissueCellPtr> cells;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
@@ -671,9 +671,9 @@ public:
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(cell_type);
 
-            TissueCell cell(p_state, p_model);
-            cell.SetBirthTime(birth_time);
-            cells.push_back(cell);
+            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            p_cell->SetBirthTime(birth_time);
+            cells.push_back(p_cell);
         }
 
         // Create tissue
@@ -688,15 +688,15 @@ public:
 
         // Add a new cell by dividing cell 4
 
-        tissue.rGetCellUsingLocationIndex(4).ReadyToDivide();
-        TissueCell& cell4 = tissue.rGetCellUsingLocationIndex(4);
+        tissue.GetCellUsingLocationIndex(4)->ReadyToDivide();
+        TissueCellPtr p_cell4 = tissue.GetCellUsingLocationIndex(4);
 
-        TissueCell new_cell = tissue.rGetCellUsingLocationIndex(4).Divide();
+        TissueCellPtr p_new_cell = tissue.GetCellUsingLocationIndex(4)->Divide();
 
         c_vector<double, 2> new_location = zero_vector<double>(2);
 
         // Add new cell to the tissue
-        tissue.AddCell(new_cell, new_location, &cell4);
+        tissue.AddCell(p_new_cell, new_location, p_cell4);
 
         // Check that the new cell was successfully added to the tissue
         TS_ASSERT_EQUALS(tissue.GetNumNodes(), old_num_nodes+2);
@@ -784,7 +784,7 @@ public:
         p_mesh->GetElement(5)->MarkAsDeleted();
 
         // Set up cells
-        std::vector<TissueCell> cells = SetUpCells(*p_mesh);
+        std::vector<TissueCellPtr> cells = SetUpCells(*p_mesh);
 
         // Create tissue but do not try to validate
         VertexBasedTissue<2> tissue(*p_mesh, cells, false, false);
@@ -817,8 +817,8 @@ public:
         MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
 
         // Set up cells
-        std::vector<TissueCell> cells = SetUpCells(*p_mesh);
-        cells[5].StartApoptosis();
+        std::vector<TissueCellPtr> cells = SetUpCells(*p_mesh);
+        cells[5]->StartApoptosis();
 
         // Create tissue
         VertexBasedTissue<2> tissue(*p_mesh, cells);
@@ -886,7 +886,7 @@ public:
         MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
 
         // Set up cells
-        std::vector<TissueCell> cells = SetUpCells(*p_mesh);
+        std::vector<TissueCellPtr> cells = SetUpCells(*p_mesh);
 
         // Create tissue
         VertexBasedTissue<2> tissue(*p_mesh, cells);
@@ -899,14 +899,14 @@ public:
         boost::shared_ptr<AbstractCellMutationState> p_bcat1(tissue.GetMutationRegistry()->Get<BetaCateninOneHitCellMutationState>());
         boost::shared_ptr<AbstractCellMutationState> p_apoptotic_state(tissue.GetMutationRegistry()->Get<ApoptoticCellMutationState>());
 
-        tissue.rGetCellUsingLocationIndex(0).GetCellCycleModel()->SetCellProliferativeType(TRANSIT);
-        tissue.rGetCellUsingLocationIndex(0).SetMutationState(p_labelled);
-        tissue.rGetCellUsingLocationIndex(1).GetCellCycleModel()->SetCellProliferativeType(DIFFERENTIATED);
-        tissue.rGetCellUsingLocationIndex(1).SetMutationState(p_apc1);
-        tissue.rGetCellUsingLocationIndex(2).SetMutationState(p_apc2);
-        tissue.rGetCellUsingLocationIndex(3).SetMutationState(p_bcat1);
-        tissue.rGetCellUsingLocationIndex(4).SetMutationState(p_apoptotic_state);
-        tissue.rGetCellUsingLocationIndex(5).GetCellCycleModel()->SetCellProliferativeType(STEM);
+        tissue.GetCellUsingLocationIndex(0)->GetCellCycleModel()->SetCellProliferativeType(TRANSIT);
+        tissue.GetCellUsingLocationIndex(0)->SetMutationState(p_labelled);
+        tissue.GetCellUsingLocationIndex(1)->GetCellCycleModel()->SetCellProliferativeType(DIFFERENTIATED);
+        tissue.GetCellUsingLocationIndex(1)->SetMutationState(p_apc1);
+        tissue.GetCellUsingLocationIndex(2)->SetMutationState(p_apc2);
+        tissue.GetCellUsingLocationIndex(3)->SetMutationState(p_bcat1);
+        tissue.GetCellUsingLocationIndex(4)->SetMutationState(p_apoptotic_state);
+        tissue.GetCellUsingLocationIndex(5)->GetCellCycleModel()->SetCellProliferativeType(STEM);
         tissue.SetCellAncestorsToLocationIndices();
 
         TissueConfig::Instance()->SetOutputCellMutationStates(true);
@@ -997,7 +997,7 @@ public:
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, num_steps+1);
 
             // Set up cells
-            std::vector<TissueCell> cells = SetUpCells(mesh);
+            std::vector<TissueCellPtr> cells = SetUpCells(mesh);
 
             // Create tissue
             VertexBasedTissue<2>* const p_tissue = new VertexBasedTissue<2>(mesh, cells);
@@ -1198,7 +1198,7 @@ public:
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, num_steps+1);
 
             // Set up cells
-            std::vector<TissueCell> cells = SetUpCells(mesh);
+            std::vector<TissueCellPtr> cells = SetUpCells(mesh);
 
             // Create tissue
             VertexBasedTissue<3>* const p_tissue = new VertexBasedTissue<3>(mesh, cells);
@@ -1313,7 +1313,7 @@ public:
         MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
 
         // Set up cells
-        std::vector<TissueCell> cells = SetUpCells(*p_mesh);
+        std::vector<TissueCellPtr> cells = SetUpCells(*p_mesh);
 
         // Create tissue
         VertexBasedTissue<2> tissue(*p_mesh, cells);
@@ -1379,7 +1379,7 @@ public:
         MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
 
         // Create cells
-        std::vector<TissueCell> cells;
+        std::vector<TissueCellPtr> cells;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<vertex_mesh.GetNumElements(); i++)
         {
@@ -1387,10 +1387,10 @@ public:
             p_cell_cycle_model->SetDimension(2);
             p_cell_cycle_model->SetCellProliferativeType(DIFFERENTIATED);
 
-            TissueCell cell(p_state, p_cell_cycle_model);
+            TissueCellPtr p_cell(new TissueCell(p_state, p_cell_cycle_model));
             double birth_time = 0.0 - i;
-            cell.SetBirthTime(birth_time);
-            cells.push_back(cell);
+            p_cell->SetBirthTime(birth_time);
+            cells.push_back(p_cell);
         }
 
         // Create tissue
@@ -1422,8 +1422,8 @@ public:
         p_wnt = WntConcentration<2>::Instance();
         TS_ASSERT_EQUALS(p_wnt->IsWntSetUp(), true); // set up again
 
-        double wnt_at_cell0 = p_wnt->GetWntLevel(tissue.rGetCellUsingLocationIndex(0));
-        double wnt_at_cell1 = p_wnt->GetWntLevel(tissue.rGetCellUsingLocationIndex(1));
+        double wnt_at_cell0 = p_wnt->GetWntLevel(tissue.GetCellUsingLocationIndex(0));
+        double wnt_at_cell1 = p_wnt->GetWntLevel(tissue.GetCellUsingLocationIndex(1));
 
         // We have set the top of the tissue to be 4, so the WntConcentration should decrease linearly
         // up the tissue, from one at height 0 to zero at height 4.
@@ -1467,7 +1467,7 @@ public:
         MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
 
         // Create cells
-        std::vector<TissueCell> cells;
+        std::vector<TissueCellPtr> cells;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<vertex_mesh.GetNumElements(); i++)
         {
@@ -1475,10 +1475,10 @@ public:
             p_cell_cycle_model->SetDimension(2);
             p_cell_cycle_model->SetCellProliferativeType(DIFFERENTIATED);
 
-            TissueCell cell(p_state, p_cell_cycle_model);
+            TissueCellPtr p_cell(new TissueCell(p_state, p_cell_cycle_model));
             double birth_time = 0.0 - i;
-            cell.SetBirthTime(birth_time);
-            cells.push_back(cell);
+            p_cell->SetBirthTime(birth_time);
+            cells.push_back(p_cell);
         }
 
         // Create tissue
@@ -1518,10 +1518,10 @@ public:
 
         FixedDurationGenerationBasedCellCycleModel* p_model2 = new FixedDurationGenerationBasedCellCycleModel();
         p_model2->SetCellProliferativeType(STEM);
-        TissueCell new_cell(p_state, p_model2);
-        new_cell.SetBirthTime(-1.0);
+        TissueCellPtr p_new_cell(new TissueCell(p_state, p_model2));
+        p_new_cell->SetBirthTime(-1.0);
 
-        tissue.AddCell(new_cell, cell_division_axis, &(*cell_iter));
+        tissue.AddCell(p_new_cell, cell_division_axis, *cell_iter);
 
         TS_ASSERT_THROWS_NOTHING(p_data->ReallocateMemory());
 
@@ -1589,7 +1589,7 @@ public:
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, num_steps+1);
 
         // Set up cells
-        std::vector<TissueCell> cells = SetUpCells(mesh);
+        std::vector<TissueCellPtr> cells = SetUpCells(mesh);
 
         // Create tissue
         VertexBasedTissue<2>* const p_tissue = new VertexBasedTissue<2>(mesh, cells);

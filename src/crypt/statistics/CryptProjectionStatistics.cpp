@@ -32,7 +32,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
  * This global function is to allow the list of cells in to be compared in
  * terms of their y-value and std::list.sort() to be called
  */
-bool CellsRadiusComparison(const std::pair<TissueCell*, double> lhs, const std::pair<TissueCell*, double> rhs)
+bool CellsRadiusComparison(const std::pair<TissueCellPtr, double> lhs, const std::pair<TissueCellPtr, double> rhs)
 {
     return lhs.second < rhs.second;
 }
@@ -49,7 +49,7 @@ bool CryptProjectionStatistics::CellIsInSection(double angle, const c_vector<dou
     return (distance_between_cell_and_line <= widthOfSection);
 }
 
-std::vector<TissueCell*> CryptProjectionStatistics::GetCryptSection(double angle)
+std::vector<TissueCellPtr> CryptProjectionStatistics::GetCryptSection(double angle)
 {
     if (angle == DBL_MAX)
     {
@@ -58,7 +58,7 @@ std::vector<TissueCell*> CryptProjectionStatistics::GetCryptSection(double angle
 
     assert(angle>=-M_PI && angle<=M_PI);
 
-    std::list<std::pair<TissueCell*, double> > cells_list; // the second entry is the radius (needed for sorting)
+    std::list<std::pair<TissueCellPtr, double> > cells_list; // the second entry is the radius (needed for sorting)
 
 
     // Loop over cells and add to the store if they are within a cell's radius of the
@@ -71,7 +71,7 @@ std::vector<TissueCell*> CryptProjectionStatistics::GetCryptSection(double angle
         if ( CellIsInSection(angle, mrCrypt.GetLocationOfCellCentre(*cell_iter)) )
         {
             // Set up a pair, equal to (cell,r) and insert
-            std::pair<TissueCell*, double> pair(&(*cell_iter), norm_2(mrCrypt.GetLocationOfCellCentre(*cell_iter)));
+            std::pair<TissueCellPtr, double> pair(*cell_iter, norm_2(mrCrypt.GetLocationOfCellCentre(*cell_iter)));
             cells_list.push_back(pair);
         }
     }
@@ -80,8 +80,8 @@ std::vector<TissueCell*> CryptProjectionStatistics::GetCryptSection(double angle
     cells_list.sort(CellsRadiusComparison);
 
     // Copy to a vector
-    std::vector<TissueCell*> ordered_cells;
-    for (std::list<std::pair<TissueCell*, double> >::iterator iter = cells_list.begin();
+    std::vector<TissueCellPtr> ordered_cells;
+    for (std::list<std::pair<TissueCellPtr, double> >::iterator iter = cells_list.begin();
          iter != cells_list.end();
          ++iter)
     {

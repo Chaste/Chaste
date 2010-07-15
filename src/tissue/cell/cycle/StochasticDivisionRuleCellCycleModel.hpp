@@ -91,7 +91,7 @@ public:
     /**
      * Overridden ResetForDivision() method.
      *
-     * Should only be called by the TissueCell Divide() method.
+     * Should only be called by the TissueCellPtr Divide() method.
      */
     void ResetForDivision();
 

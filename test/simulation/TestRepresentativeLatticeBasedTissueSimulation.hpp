@@ -66,7 +66,7 @@ public:
          TissueConfig::Instance()->SetMaxTransitGenerations(UINT_MAX);
          boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
 
-         std::vector<TissueCell> cells;
+         std::vector<TissueCellPtr> cells;
          std::vector<unsigned> real_node_indices;
           for(unsigned i = 0; i < 9; i++)
          {
@@ -76,10 +76,10 @@ public:
                                   (TissueConfig::Instance()->GetStemCellG1Duration()
                                       + TissueConfig::Instance()->GetSG2MDuration() );
 
-             TissueCell cell(p_state, p_model);
-        	 cell.SetBirthTime(birth_time);
+             TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+        	 p_cell->SetBirthTime(birth_time);
 
-        	 cells.push_back(cell);
+        	 cells.push_back(p_cell);
         	 real_node_indices.push_back(21 * (9 + i/3) + 9 + i%3);
          }
 

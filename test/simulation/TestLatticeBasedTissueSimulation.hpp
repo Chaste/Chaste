@@ -104,15 +104,15 @@ public:
 
         FixedDurationGenerationBasedCellCycleModel* p_model_1 = new FixedDurationGenerationBasedCellCycleModel();
         p_model_1->SetCellProliferativeType(DIFFERENTIATED);
-        TissueCell cell_1(p_state, p_model_1);
+        TissueCellPtr p_cell_1(new TissueCell(p_state, p_model_1));
 
         FixedDurationGenerationBasedCellCycleModel* p_model_2 = new FixedDurationGenerationBasedCellCycleModel();
         p_model_2->SetCellProliferativeType(DIFFERENTIATED);
-        TissueCell cell_2(p_state, p_model_2);
+        TissueCellPtr p_cell_2(new TissueCell(p_state, p_model_2));
 
-        std::vector<TissueCell> cells;
-        cells.push_back(cell_1);
-        cells.push_back(cell_2);
+        std::vector<TissueCellPtr> cells;
+        cells.push_back(p_cell_1);
+        cells.push_back(p_cell_2);
 
         std::vector<unsigned> real_node_indices;
         real_node_indices.push_back(47);
@@ -162,11 +162,11 @@ public:
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         p_model->SetCellProliferativeType(TRANSIT);
-        TissueCell cell(p_state, p_model);
-        cell.SetBirthTime(-13.5);
+        TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+        p_cell->SetBirthTime(-13.5);
 
-        std::vector<TissueCell> cells;
-        cells.push_back(cell);
+        std::vector<TissueCellPtr> cells;
+        cells.push_back(p_cell);
 
         std::vector<unsigned> real_node_indices;
         real_node_indices.push_back(220);
@@ -197,7 +197,7 @@ public:
         mesh.ConstructRectangularMesh(49, 49, true); // 50*50 nodes
 
         // Create cells
-        std::vector<TissueCell> cells;
+        std::vector<TissueCellPtr> cells;
         std::vector<unsigned> real_node_indices;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         unsigned num_cells = 100;
@@ -205,8 +205,8 @@ public:
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(DIFFERENTIATED);
-            TissueCell cell(p_state, p_model);
-            cells.push_back(cell);
+            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            cells.push_back(p_cell);
 
             real_node_indices.push_back(i);
         }
@@ -238,7 +238,7 @@ public:
         mesh.ConstructRectangularMesh(19, 19, true); // 50*50 nodes
 
         // Create cells
-        std::vector<TissueCell> cells;
+        std::vector<TissueCellPtr> cells;
         std::vector<unsigned> real_node_indices;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         unsigned num_cells = 100;
@@ -246,8 +246,8 @@ public:
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(DIFFERENTIATED);
-            TissueCell cell(p_state, p_model);
-            cells.push_back(cell);
+            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            cells.push_back(p_cell);
 
             real_node_indices.push_back(i);
         }
@@ -283,7 +283,7 @@ public:
         mesh.ConstructRectangularMesh(19, 19, true); // 50*50 nodes
 
         // Create cells
-        std::vector<TissueCell> cells;
+        std::vector<TissueCellPtr> cells;
         std::vector<unsigned> real_node_indices;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         unsigned num_cells = 50;
@@ -291,9 +291,9 @@ public:
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(STEM);
-            TissueCell cell(p_state, p_model);
-            cell.SetBirthTime(-RandomNumberGenerator::Instance()->ranf());
-            cells.push_back(cell);
+            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            p_cell->SetBirthTime(-RandomNumberGenerator::Instance()->ranf());
+            cells.push_back(p_cell);
 
             real_node_indices.push_back(i);
         }
@@ -325,7 +325,7 @@ public:
         mesh.ConstructRectangularMesh(49, 49, true); // 50*50 nodes
 
         // Create cells
-        std::vector<TissueCell> cells;
+        std::vector<TissueCellPtr> cells;
         unsigned num_cells = 6;
 
         std::vector<unsigned> real_node_indices;
@@ -342,9 +342,9 @@ public:
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(STEM);
-            TissueCell cell(p_state, p_model);
-            cell.SetBirthTime(-RandomNumberGenerator::Instance()->ranf());
-            cells.push_back(cell);
+            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            p_cell->SetBirthTime(-RandomNumberGenerator::Instance()->ranf());
+            cells.push_back(p_cell);
         }
 
         // Create a tissue
@@ -377,10 +377,10 @@ public:
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         p_model->SetCellProliferativeType(DIFFERENTIATED);
-        TissueCell cell(p_state, p_model);
+        TissueCellPtr p_cell(new TissueCell(p_state, p_model));
 
-        std::vector<TissueCell> cells;
-        cells.push_back(cell);
+        std::vector<TissueCellPtr> cells;
+        cells.push_back(p_cell);
 
         std::vector<unsigned> real_node_indices;
         real_node_indices.push_back(24);
@@ -440,10 +440,10 @@ public:
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         p_model->SetCellProliferativeType(STEM);
-        TissueCell cell(p_state, p_model);
+        TissueCellPtr p_cell(new TissueCell(p_state, p_model));
 
-        std::vector<TissueCell> cells;
-        cells.push_back(cell);
+        std::vector<TissueCellPtr> cells;
+        cells.push_back(p_cell);
 
         std::vector<unsigned> real_node_indices;
         real_node_indices.push_back(0);
@@ -484,7 +484,7 @@ public:
         mesh.ConstructRectangularMesh(49, 49, true); // 50*50 nodes
 
         // Create cells
-        std::vector<TissueCell> cells;
+        std::vector<TissueCellPtr> cells;
         std::vector<unsigned> real_node_indices;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         unsigned num_cells = 100;
@@ -492,8 +492,8 @@ public:
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(STEM);
-            TissueCell cell(p_state, p_model);
-            cells.push_back(cell);
+            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            cells.push_back(p_cell);
 
             real_node_indices.push_back(i);
         }
@@ -557,7 +557,7 @@ public:
         mesh.ConstructRectangularMesh(49, 49, true); // 50*50 nodes
 
         // Create cells
-        std::vector<TissueCell> cells;
+        std::vector<TissueCellPtr> cells;
         std::vector<unsigned> real_node_indices;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         unsigned num_cells = 100;
@@ -565,8 +565,8 @@ public:
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(STEM);
-            TissueCell cell(p_state, p_model);
-            cells.push_back(cell);
+            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            cells.push_back(p_cell);
 
             real_node_indices.push_back(i);
         }
