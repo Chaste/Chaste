@@ -334,12 +334,10 @@ public:
         Warnings::QuietDestroy();
     }
 
-
-
-
-    // This test will fail with the larger timestep unless the movement is restricted to less than mCellRearangementThreshold.
+    // This test uses a larger timestep to run faster.
     void TestVertexMonolayerWithVoid() throw (Exception)
     {
+
         // Create a simple 2D MutableVertexMesh
         HoneycombMutableVertexMeshGenerator generator(3, 3);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
@@ -387,6 +385,10 @@ public:
         simulator.SetDt(0.1);
         ////////////////////////////////////////////
 
+        //Set up logfile so we can track T1Swaps make sure to close the logfile at the end of the test
+        LogFile* p_log_file = LogFile::Instance();
+        p_log_file->Set(1, "TestVertexMonolayerWithVoid", "log.txt");
+
         // Run simulation
         simulator.Solve();
 
@@ -399,6 +401,8 @@ public:
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
         Warnings::QuietDestroy();
+
+        LogFile::Close();
     }
 
     void TestVertexMonolayerWithCellDeath() throw (Exception)

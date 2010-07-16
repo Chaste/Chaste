@@ -30,6 +30,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "RandomNumberGenerator.hpp"
 #include "UblasCustomFunctions.hpp"
 #include "Warnings.hpp"
+#include "LogFile.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::MutableVertexMesh(std::vector<Node<SPACE_DIM>*> nodes,
@@ -1314,9 +1315,13 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
                                                               Node<SPACE_DIM>* pNodeB,
                                                               std::set<unsigned>& rElementsContainingNodes)
 {
-    // Make sure that we are in the correct dimension - this code will be eliminated at compile time
+
+	// Make sure that we are in the correct dimension - this code will be eliminated at compile time
     assert(SPACE_DIM == 2); // only works in 2D at present
     assert(ELEMENT_DIM == SPACE_DIM);
+
+    //Add information on T1Swaps to LOG, The log needs to be setup to use this.
+	LOG(1, "\n T1Swap ocured \t Vertex " << pNodeA->GetIndex() << "\t" <<  pNodeA->rGetLocation()[0] << "\t" << pNodeA->rGetLocation()[1] << "\t Vertex " << pNodeB->GetIndex() << "\t" << pNodeB->rGetLocation()[0] << "\t" << pNodeB->rGetLocation()[1] << "\n");
 
     /*
      * Restructure elements - remember to update nodes and elements.
