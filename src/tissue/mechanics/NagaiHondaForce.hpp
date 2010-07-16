@@ -49,7 +49,7 @@ friend class TestForcesNotForRelease;
 
 private:
 
-	bool mUsingDifferentialAdhesion;
+    bool mUsingDifferentialAdhesion; /**< Whether we are using differential adhesion between cells (set in constructor)*/
 
     friend class boost::serialization::access;
     template<class Archive>
@@ -66,7 +66,7 @@ public:
     /**
      * Constructor.
      *
-     * @param usingDifferentialAdhesion whether to use differential adhesion between cells defaults to false
+     * @param usingDifferentialAdhesion whether to use differential adhesion between cells.  Defaults to false
      */
     NagaiHondaForce(bool usingDifferentialAdhesion=false);
 
