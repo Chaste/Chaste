@@ -221,7 +221,7 @@ double NagaiHondaForce<DIM>::GetAdhesionParameter(Node<DIM>* pNodeA, Node<DIM>* 
         assert(!shared_elements.empty());
 
         // If the edge corresponds to a single element, then the cell is on the boundary
-        if (shared_elements.size() == 1) // \TODO This appears to be combinationCellType 99 and should probably be different for each mutation.
+        if (shared_elements.size() == 1) ///\todo This appears to be combinationCellType 99 and should probably be different for each mutation.
         {
             adhesion_parameter = TissueConfig::Instance()->GetNagaiHondaCellBoundaryAdhesionEnergyParameter();
         }
@@ -241,7 +241,8 @@ double NagaiHondaForce<DIM>::GetAdhesionParameter(Node<DIM>* pNodeA, Node<DIM>* 
             }
             else //
             {
-            	// Shouldn't reach here as all cells should have mutations defied for differential adhesion. \TODO make a warning to say this and test it
+            	// Shouldn't reach here as all cells should have mutations defied for differential adhesion.
+            	///\todo make a warning to say this and test it
             	NEVER_REACHED;
             }
         }

@@ -115,7 +115,8 @@ public:
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
-        p_mesh->SetCellRearrangementThreshold(0.1); // larger threshold so motion is unihibited see #1376
+        // Impose a larger cell rearrangement threshold so that motion is uninhibited (see #1376)
+        p_mesh->SetCellRearrangementThreshold(0.1);
 
         // Set up cells
         std::vector<TissueCellPtr> cells;
@@ -165,7 +166,7 @@ public:
             }
         }
 
-        //Test Warnings
+        // Test Warnings
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
         Warnings::QuietDestroy();
     }
@@ -216,9 +217,10 @@ public:
         // then been moved to above y=0 by the jiggling
         TS_ASSERT_LESS_THAN(0.0, crypt.GetNode(0)->rGetLocation()[1]);
 
-        //Test Warnings \TODO this should be only one warning see #1394
+        // Test Warnings
+        ///\todo this should be only one warning (see #1394)
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 136u);
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
         Warnings::QuietDestroy();
     }
 
@@ -258,9 +260,10 @@ public:
         // Run simulation
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
 
-        //Test Warnings \TODO this should be only one warning see #1394
+        // Test Warnings
+        ///\todo this should be only one warning (see #1394)
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 972u);
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
         Warnings::QuietDestroy();
     }
 
@@ -308,7 +311,8 @@ public:
         // Run simulation
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
 
-        //Test Warnings \TODO this should be only one warning see #1394
+        // Test Warnings
+        ///\todo this should be only one warning (see #1394)
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 971u);
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
         Warnings::QuietDestroy();
@@ -353,9 +357,10 @@ public:
         // Run simulation
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
 
-        //Test Warnings \TODO this should be only one warning see #1394
+        // Test Warnings
+        ///\todo this should be only one warning (see #1394)
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u); // Number not known
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
         Warnings::QuietDestroy();
     }
 
@@ -403,9 +408,10 @@ public:
         // Run simulation
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
 
-        //Test Warnings \TODO this should be only one warning see #1394
+        // Test Warnings
+        ///\todo this should be only one warning (see #1394)
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 761u);
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
         Warnings::QuietDestroy();
 
         // Tidy up
@@ -453,9 +459,10 @@ public:
         // Run simulation
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
 
-        //Test Warnings \TODO this should be only one warning see #1394
+        // Test Warnings
+        ///\todo this should be only one warning (see #1394)
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u); // Number not known.
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
         Warnings::QuietDestroy();
 
         // Tidy up
@@ -510,9 +517,10 @@ public:
         p_simulator = TissueSimulationArchiver<2, VertexCryptSimulation2d>::Load("TestVertexCryptWithBoundaryForce", end_time);
         delete p_simulator;
 
-        //Test Warnings \TODO this should be only one warning see #1394
+        // Test Warnings
+        ///\todo this should be only one warning (see #1394)
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 968u);
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
         Warnings::QuietDestroy();
     }
 
@@ -627,8 +635,9 @@ public:
         TS_ASSERT_DELTA(p_wnt->GetWntLevel(crypt.GetCellUsingLocationIndex(2)), 0.9748, 1e-4);
         TS_ASSERT_DELTA(p_wnt->GetWntLevel(crypt.GetCellUsingLocationIndex(3)), 0.9736, 1e-4);
 
-        //Test Warnings \TODO this should be only one warning see #1394
-        //TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1178u); // This gives 1177 on bob!! see #1394
+        // Test Warnings
+        ///\todo this should be only one warning (see #1394)
+        //TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1178u); // This gives 1177 on bob!! see #1376
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
         Warnings::QuietDestroy();
 
@@ -679,7 +688,8 @@ public:
         // Save the results
         TissueSimulationArchiver<2, VertexCryptSimulation2d>::Save(&simulator);
 
-        //Test Warnings \TODO this should be only one warning see #1394
+        // Test Warnings
+        ///\todo this should be only one warning (see #1394)
         //TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 905u); // This gives  902 on bob!! see #1394
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
         Warnings::QuietDestroy();
@@ -737,8 +747,9 @@ public:
         TS_ASSERT_DELTA(p_wnt->GetWntLevel(p_simulator2->rGetTissue().GetCellUsingLocationIndex(2)), 0.9748, 1e-4);
         TS_ASSERT_DELTA(p_wnt->GetWntLevel(p_simulator2->rGetTissue().GetCellUsingLocationIndex(3)), 0.9736, 1e-4);
 
-        //Test Warnings \TODO this should be only one warning see #1394
-        //TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 273u); // This gives  275 on bob!! see #1394
+        // Test Warnings
+        ///\todo this should be only one warning (see #1394)
+        //TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 273u); // This gives  275 on bob!! see #1376
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
         Warnings::QuietDestroy();
 

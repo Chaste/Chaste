@@ -155,7 +155,8 @@ public:
         TS_ASSERT_DELTA(tissue.rGetMesh().GetVolumeOfElement(0), 1.0, 0.05);
         TS_ASSERT_DELTA(tissue.rGetMesh().GetSurfaceAreaOfElement(0), 3.5449077, 0.1);
 
-        //Test Warnings \TODO this should be only one warning see #1394
+        // Test Warnings
+        ///\todo this should be only one warning (see #1394)
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1920u);
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
         Warnings::QuietDestroy();
@@ -267,7 +268,8 @@ public:
         TS_ASSERT_EQUALS(new_num_elements, old_num_elements+1);
         TS_ASSERT_EQUALS(new_num_cells, old_num_cells+1);
 
-        //Test Warnings \TODO this should be only one warning see #1394
+        // Test Warnings
+        ///\todo this should be only one warning (see #1394)
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 93u);
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
         Warnings::QuietDestroy();
@@ -326,14 +328,15 @@ public:
 		// Run simulation
 		simulator.Solve();
 
-		// \TODO the testing should test against a saved simulation or something similar, i.e check the positions of some vertices.
+		///\todo test against a saved simulation or something similar, i.e check the positions of some vertices.
 		TS_ASSERT_EQUALS(p_mesh->GetNode(13)->IsBoundaryNode(), true);
 		TS_ASSERT_EQUALS(p_mesh->GetNumElements(),4u);
 		TS_ASSERT_EQUALS(p_state2->GetColour(), 5u);
 		TS_ASSERT_EQUALS(p_state1->GetColour(), 0u);
 		TS_ASSERT_EQUALS(cells[0]->GetMutationState()->IsType<LabelledCellMutationState>(), true);
 
-		//Test Warnings \TODO this should be only one warning see #1394
+		// Test Warnings
+        ///\todo this should be only one warning (see #1394)
 		TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 137u);
 		TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
         Warnings::QuietDestroy();
@@ -399,16 +402,15 @@ public:
         TS_ASSERT_EQUALS(new_num_elements, old_num_elements+1);
         TS_ASSERT_EQUALS(new_num_cells, old_num_cells+1);
 
-        //Test Warnings \TODO this should be only one warning see #1394
+        // Test Warnings
+        ///\todo this should be only one warning (see #1394)
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 942u);
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
         Warnings::QuietDestroy();
     }
 
 
-    /*
-     * This test will fail with the larger timestep unless the movement is restricted to less than mCellRearangementThreshold.
-     */
+    // This test will fail with the larger timestep unless the movement is restricted to less than mCellRearangementThreshold.
     void TestVertexMonolayerWithVoid() throw (Exception)
     {
         // Create a simple 2D MutableVertexMesh
@@ -462,11 +464,11 @@ public:
         simulator.Solve();
 
         // Check that void has been removed and vertices are in the correct position
-        TS_ASSERT_EQUALS(simulator.rGetTissue().GetNumNodes(),82u);
+        TS_ASSERT_EQUALS(simulator.rGetTissue().GetNumNodes(), 82u);
         TS_ASSERT_EQUALS((static_cast<VertexBasedTissue<2>*>(&(simulator.rGetTissue())))->GetNumElements(),36u);
-        TS_ASSERT_EQUALS(simulator.rGetTissue().GetNumRealCells(),36u);
+        TS_ASSERT_EQUALS(simulator.rGetTissue().GetNumRealCells(), 36u);
 
-        //Test Warnings
+        // Test Warnings
         //TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 13413u); // This gives  13434 on bob!! see #1394
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
         Warnings::QuietDestroy();
@@ -623,7 +625,8 @@ public:
         TS_ASSERT_DELTA(tissue.rGetMesh().GetVolumeOfElement(0), 0.5098, 1e-4);
         TS_ASSERT_DELTA(tissue.rGetMesh().GetSurfaceAreaOfElement(0), 2.5417, 1e-3);
 
-        //Test Warnings \TODO this should be only one warning see #1394
+        // Test Warnings
+        ///\todo this should be only one warning (see #1394)
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 160u);
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
         Warnings::QuietDestroy();
@@ -634,7 +637,7 @@ public:
      * This test is to stress test the vertex simulations by creating a massive monolayer,
      * it would also be useful for benchmarking.
      *
-     * \todo In order to work the mesh archiving must support boundary nodes, see #1076
+     * \todo In order to work the mesh archiving must support boundary nodes (see #1076)
      */
     void noTestVertexStressTest() throw (Exception)
     {
@@ -680,13 +683,13 @@ public:
         // Run simulation
         simulator.Solve();
 
-        //archive now and then reload
+        // Archive now and then reload
 
         // Save simulation in steady state
         TissueSimulationArchiver<2, TissueSimulation<2> >::Save(&simulator);
 
-        //Now save and reload to find where it breaks!
-        for (int i=0; i<40; i++)
+        // Now save and reload to find where it breaks!
+        for (unsigned i=0; i<40; i++)
         {
             start_time = end_time;
             end_time = end_time + 10.0;
@@ -704,9 +707,7 @@ public:
     }
 
 
-    /**
-     * Test archiving of a TissueSimulation that uses a VertexBasedTissue.
-     */
+    // Test archiving of a TissueSimulation that uses a VertexBasedTissue.
     void TestArchiving() throw (Exception)
     {
         // Set end time
@@ -782,7 +783,8 @@ public:
         // Tidy up
         delete p_simulator;
 
-        //Test Warnings \TODO this should be only one warning see #1394
+        // Test Warnings
+        ///\todo this should be only one warning (see #1394)
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1216u);
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
         Warnings::QuietDestroy();
