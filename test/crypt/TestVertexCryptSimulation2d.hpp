@@ -627,7 +627,7 @@ public:
         TS_ASSERT_DELTA(node_4_location[1], 0.1757, 1e-4);
 
         std::vector<double> node_5_location = simulator.GetNodeLocation(5);
-        //TS_ASSERT_DELTA(node_5_location[0], 0.9755, 1e-4); // 0.9753 on bob #1376
+        TS_ASSERT_DELTA(node_5_location[0], 0.9755, 1e-3);
         TS_ASSERT_DELTA(node_5_location[1], 0.1715, 1e-4);
 
         // Test the Wnt concentration result
@@ -736,7 +736,7 @@ public:
         TS_ASSERT_DELTA(node_4_location[1], 0.1757, 1e-4);
 
         std::vector<double> node_5_location = p_simulator2->GetNodeLocation(5);
-        //TS_ASSERT_DELTA(node_5_location[0], 0.9755, 1e-4); // 0.9753 on bob #1376
+        TS_ASSERT_DELTA(node_5_location[0], 0.9755, 1e-3);
         TS_ASSERT_DELTA(node_5_location[1], 0.1715, 1e-4);
 
         // Test Wnt concentration was set up correctly
