@@ -250,15 +250,12 @@ public:
 
         // Test Set and Get methods
         TS_ASSERT_DELTA(basic_vertex_mesh.GetCellRearrangementThreshold(), 0.01, 1e-4); // Default value
-        TS_ASSERT_DELTA(basic_vertex_mesh.GetEdgeDivisionThreshold(), DBL_MAX, 1e-4); // Default value
         TS_ASSERT_DELTA(basic_vertex_mesh.GetT2Threshold(), 0.001, 1e-4); // Default value
 
         basic_vertex_mesh.SetCellRearrangementThreshold(0.03);
-        basic_vertex_mesh.SetEdgeDivisionThreshold(3.0);
         basic_vertex_mesh.SetT2Threshold(0.003);
 
         TS_ASSERT_DELTA(basic_vertex_mesh.GetCellRearrangementThreshold(), 0.03, 1e-4);
-        TS_ASSERT_DELTA(basic_vertex_mesh.GetEdgeDivisionThreshold(), 3.0, 1e-4);
         TS_ASSERT_DELTA(basic_vertex_mesh.GetT2Threshold(), 0.003, 1e-4);
 
         // Coverage
@@ -273,12 +270,10 @@ public:
 
         // Set/get parameter values
         p_mesh->SetCellRearrangementThreshold(0.1);
-        p_mesh->SetEdgeDivisionThreshold(5.1);
         p_mesh->SetT2Threshold(0.01);
         p_mesh->SetCellRearrangementRatio(1.6);
 
         TS_ASSERT_DELTA(p_mesh->GetCellRearrangementThreshold(), 0.1, 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetEdgeDivisionThreshold(), 5.1, 1e-6);
         TS_ASSERT_DELTA(p_mesh->GetT2Threshold(), 0.01, 1e-6);
         TS_ASSERT_DELTA(p_mesh->GetCellRearrangementRatio(), 1.6, 1e-6);
 
@@ -342,7 +337,6 @@ public:
 
         // Test Get methods
         TS_ASSERT_DELTA(mesh.GetCellRearrangementThreshold(), 0.01, 1e-4); // Default value
-        TS_ASSERT_DELTA(mesh.GetEdgeDivisionThreshold(), DBL_MAX, 1e-4); // Default value
         TS_ASSERT_DELTA(mesh.GetT2Threshold(), 0.001, 1e-4); // Default value
 
         // Check we have the right number of nodes and elements
@@ -1380,7 +1374,6 @@ public:
 
         // Set member variables
         p_mutable_mesh->SetCellRearrangementThreshold(0.54);
-        p_mutable_mesh->SetEdgeDivisionThreshold(17.3);
         p_mutable_mesh->SetT2Threshold(0.012);
         p_mutable_mesh->SetCellRearrangementRatio(1.6);
 
@@ -1427,8 +1420,6 @@ public:
             // Test member variables were archived correctly
             TS_ASSERT_DELTA(p_mesh_original->GetCellRearrangementThreshold(), 0.54, 1e-6);
             TS_ASSERT_DELTA(p_mesh_loaded->GetCellRearrangementThreshold(), 0.54, 1e-6);
-            TS_ASSERT_DELTA(p_mesh_original->GetEdgeDivisionThreshold(), 17.3, 1e-6);
-            TS_ASSERT_DELTA(p_mesh_loaded->GetEdgeDivisionThreshold(), 17.3, 1e-6);
             TS_ASSERT_DELTA(p_mesh_original->GetT2Threshold(), 0.012, 1e-6);
             TS_ASSERT_DELTA(p_mesh_loaded->GetT2Threshold(), 0.012, 1e-6);
             TS_ASSERT_DELTA(p_mesh_loaded->GetCellRearrangementRatio(), 1.6, 1e-6);
@@ -1484,7 +1475,6 @@ public:
 
         // Set member variables
         p_mutable_mesh->SetCellRearrangementThreshold(0.54);
-        p_mutable_mesh->SetEdgeDivisionThreshold(17.3);
         p_mutable_mesh->SetT2Threshold(0.012);
         p_mutable_mesh->SetCellRearrangementRatio(1.6);
 
@@ -1567,12 +1557,10 @@ public:
             }
 
             TS_ASSERT_DELTA(p_mesh_loaded->GetCellRearrangementThreshold(), 0.54, 1e-6);
-            TS_ASSERT_DELTA(p_mesh_loaded->GetEdgeDivisionThreshold(), 17.3, 1e-6);
             TS_ASSERT_DELTA(p_mesh_loaded->GetT2Threshold(), 0.012, 1e-6);
             TS_ASSERT_DELTA(p_mesh_loaded->GetCellRearrangementRatio(), 1.6, 1e-6);
 
             TS_ASSERT_DELTA(p_mesh_original->GetCellRearrangementThreshold(), 0.54, 1e-6);
-            TS_ASSERT_DELTA(p_mesh_original->GetEdgeDivisionThreshold(), 17.3, 1e-6);
             TS_ASSERT_DELTA(p_mesh_original->GetT2Threshold(), 0.012, 1e-6);
             TS_ASSERT_DELTA(p_mesh_original->GetCellRearrangementRatio(), 1.6, 1e-6);
 

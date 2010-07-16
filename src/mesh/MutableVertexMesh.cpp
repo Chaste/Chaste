@@ -35,16 +35,13 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::MutableVertexMesh(std::vector<Node<SPACE_DIM>*> nodes,
                                                std::vector<VertexElement<ELEMENT_DIM,SPACE_DIM>*> vertexElements,
                                                double cellRearrangementThreshold,
-                                               double edgeDivisionThreshold,
                                                double t2Threshold,
                                                double cellRearrangementRatio)
     : mCellRearrangementThreshold(cellRearrangementThreshold),
       mCellRearrangementRatio(cellRearrangementRatio),
-      mEdgeDivisionThreshold(edgeDivisionThreshold),
       mT2Threshold(t2Threshold)
 {
     assert(cellRearrangementThreshold > 0.0);
-    assert(edgeDivisionThreshold > 0.0);
     assert(t2Threshold > 0.0);
 
     // Reset member variables and clear mNodes and mElements
@@ -104,7 +101,6 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::MutableVertexMesh()
     : mCellRearrangementThreshold(0.01), // Overwritten as soon as archiving is complete
       mCellRearrangementRatio(1.5), // Overwritten as soon as archiving is complete
-      mEdgeDivisionThreshold(DBL_MAX), // Overwritten as soon as archiving is complete
       mT2Threshold(0.001) // Overwritten as soon as archiving is complete
 {
     this->mMeshChangesDuringSimulation = true;
@@ -126,13 +122,6 @@ double MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetCellRearrangementThreshold(
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetEdgeDivisionThreshold() const
-{
-    return mEdgeDivisionThreshold;
-}
-
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetT2Threshold() const
 {
     return mT2Threshold;
@@ -150,13 +139,6 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::SetCellRearrangementThreshold(double cellRearrangementThreshold)
 {
     mCellRearrangementThreshold = cellRearrangementThreshold;
-}
-
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::SetEdgeDivisionThreshold(double edgeDivisionThreshold)
-{
-    mEdgeDivisionThreshold = edgeDivisionThreshold;
 }
 
 
@@ -827,13 +809,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
                             IdentifySwapType(p_current_node, p_anticlockwise_node, rElementMap);
                             recheck_mesh = true;
                             break;
-                        }
-
-                        if (distance_between_nodes > mEdgeDivisionThreshold)
-                        {
-                            // If the nodes are too far apart, divide the edge
-                            DivideEdge(p_current_node, p_anticlockwise_node);
-                            new_num_nodes++;
                         }
                     }
                 }

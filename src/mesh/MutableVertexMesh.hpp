@@ -64,9 +64,6 @@ protected:
      */
     double mCellRearrangementRatio;
 
-    /** The maximum distance apart that neighbouring nodes in the mesh can be without the edge being divided. */
-    double mEdgeDivisionThreshold;
-
     /** The area threshold at which T2 swaps occur in an apoptotic, triangular cell/element */
     double mT2Threshold;
 
@@ -155,7 +152,6 @@ protected:
         // NOTE - Subclasses must archive their member variables BEFORE calling this method.
         archive & mCellRearrangementThreshold;
         archive & mCellRearrangementRatio;
-        archive & mEdgeDivisionThreshold;
         archive & mT2Threshold;
         archive & mDeletedNodeIndices;
         archive & mDeletedElementIndices;
@@ -177,7 +173,6 @@ public:
      * @param nodes vector of pointers to nodes
      * @param vertexElements vector of pointers to VertexElements
      * @param cellRearrangementThreshold the minimum threshold distance for element rearrangment (defaults to 0.01)
-     * @param edgeDivisionThreshold the maximum threshold distance for edge division (defaults to DBL_MAX)
      * @param t2Threshold the maximum threshold distance for Type 2 swaps (defaults to 0.001)
      * @param cellRearrangementRatio ratio between the minimum threshold distance for element 
      *                                rearrangment node separation after remeshing (defaults to 1.5)
@@ -185,7 +180,6 @@ public:
     MutableVertexMesh(std::vector<Node<SPACE_DIM>*> nodes,
                       std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*> vertexElements,
                       double cellRearrangementThreshold=0.01,
-                      double edgeDivisionThreshold=DBL_MAX,
                       double t2Threshold=0.001,
                       double cellRearrangementRatio=1.5);
 
@@ -205,13 +199,6 @@ public:
      * @param cellRearrangementThreshold
      */
     void SetCellRearrangementThreshold(double cellRearrangementThreshold);
-
-    /**
-     * Set method for mEdgeDivisionThreshold.
-     *
-     * @param edgeDivisionThreshold
-     */
-    void SetEdgeDivisionThreshold(double edgeDivisionThreshold);
 
     /**
      * Set method for mT2Threshold.
@@ -239,11 +226,6 @@ public:
      * @return mCellRearrangementThreshold
      */
     double GetCellRearrangementThreshold() const;
-
-    /**
-     * @return mEdgeDivisionThreshold
-     */
-    double GetEdgeDivisionThreshold() const;
 
     /**
      * @return mT2Threshold

@@ -31,15 +31,13 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 HoneycombMutableVertexMeshGenerator::HoneycombMutableVertexMeshGenerator(unsigned numElementsAcross,
                                                                          unsigned numElementsUp,
-                                                                           bool isFlatBottom,
+                                                                         bool isFlatBottom,
                                                                          double cellRearrangementThreshold,
-                                                                           double edgeDivisionThreshold,
-                                                                            double t2Threshold)
+                                                                         double t2Threshold)
 {
     assert(numElementsAcross > 0);
     assert(numElementsUp > 0);
     assert(cellRearrangementThreshold > 0.0);
-    assert(edgeDivisionThreshold > 0.0);
     assert(t2Threshold > 0.0);
 
     std::vector<Node<2>*> nodes;
@@ -137,7 +135,7 @@ HoneycombMutableVertexMeshGenerator::HoneycombMutableVertexMeshGenerator(unsigne
         }
     }
 
-    mpMesh = new MutableVertexMesh<2,2>(nodes, elements, cellRearrangementThreshold, edgeDivisionThreshold, t2Threshold);
+    mpMesh = new MutableVertexMesh<2,2>(nodes, elements, cellRearrangementThreshold, t2Threshold);
 }
 
 

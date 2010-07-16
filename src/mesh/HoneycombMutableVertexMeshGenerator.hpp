@@ -53,14 +53,12 @@ public:
      * @param numElementsUp  The number of rows of elements in the mesh
      * @param isFlatBottom  Whether to enforce a flat bottom to the mesh (defaults to false; only used if isCylindrical is true)
      * @param cellRearrangementThreshold the minimum threshold distance for element rearrangment (defaults to 0.01)
-     * @param edgeDivisionThreshold the maximum threshold distance for edge division (defaults to DBL_MAX)
      * @param t2Threshold the maximum threshold distance for Type 2 swaps (defaults to 0.001)
      */
     HoneycombMutableVertexMeshGenerator(unsigned numElementsAcross,
                                         unsigned numElementsUp,
                                         bool isFlatBottom=false,
                                         double cellRearrangementThreshold=0.01,
-                                        double edgeDivisionThreshold=DBL_MAX,
                                         double t2Threshold=0.001);
 
     /**

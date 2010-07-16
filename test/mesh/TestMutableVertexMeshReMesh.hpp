@@ -1681,55 +1681,6 @@ public:
         TS_ASSERT_THROWS_THIS(vertex_mesh.ReMesh(), "A node is contained in more than three elements");
     }
 
-    void TestReMeshDivideEdgeIfTooBig() throw(Exception)
-    {
-        // Create some nodes
-        Node<2>* p_node0 = new Node<2>(0, false, 0.0, 0.0);
-        Node<2>* p_node1 = new Node<2>(1, false, 0.5, -1.0);
-        Node<2>* p_node2 = new Node<2>(2, false, 1.0, 0.0);
-        Node<2>* p_node3 = new Node<2>(3, false, 0.5, 1.0);
-
-        std::vector<Node<2>*> nodes_in_element0;
-        nodes_in_element0.push_back(p_node0);
-        nodes_in_element0.push_back(p_node1);
-        nodes_in_element0.push_back(p_node3);
-
-        std::vector<Node<2>*> nodes_in_element1;
-        nodes_in_element1.push_back(p_node1);
-        nodes_in_element1.push_back(p_node2);
-        nodes_in_element1.push_back(p_node3);
-
-        std::vector<Node<2>*> nodes;
-        nodes.push_back(p_node0);
-        nodes.push_back(p_node1);
-        nodes.push_back(p_node2);
-        nodes.push_back(p_node3);
-
-        // Create 2 joined triangular elements
-        VertexElement<2,2>* p_element0 = new VertexElement<2,2>(0, nodes_in_element0);
-        VertexElement<2,2>* p_element1 = new VertexElement<2,2>(1, nodes_in_element1);
-        std::vector<VertexElement<2,2>* > elements;
-        elements.push_back(p_element0);
-        elements.push_back(p_element1);
-
-        // Create mesh
-        MutableVertexMesh<2,2> mesh(nodes, elements);
-        mesh.SetEdgeDivisionThreshold(1.5); // This needs to be set to allow edge division.
-
-        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 4u);
-        TS_ASSERT_EQUALS(mesh.GetNumElements(), 2u);
-
-        // Call remesh
-        mesh.ReMesh();
-
-        // Check that the edge between nodes 1 and 2 has divided
-        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 5u);
-        TS_ASSERT_EQUALS(mesh.GetNumElements(), 2u);
-
-        TS_ASSERT_DELTA(mesh.GetNode(4)->rGetLocation()[0], 0.5, 1e-8);
-        TS_ASSERT_DELTA(mesh.GetNode(4)->rGetLocation()[1], 0.0, 1e-8);
-    }
-
     ///\todo include boundary nodes in the tests
     void TestDivideEdge()
     {

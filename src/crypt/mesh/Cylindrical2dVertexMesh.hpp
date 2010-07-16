@@ -85,14 +85,12 @@ public:
      * @param nodes vector of pointers to nodes
      * @param vertexElements vector of pointers to VertexElements
      * @param cellRearrangementThreshold the minimum threshold distance for element rearrangment (defaults to 0.01)
-     * @param edgeDivisionThreshold the maximum threshold distance for edge division (defaults to DBL_MAX)
      * @param t2Threshold the maximum threshold distance for Type 2 swaps (defaults to 0.001)
      */
     Cylindrical2dVertexMesh(double width,
                             std::vector<Node<2>*> nodes,
                             std::vector<VertexElement<2,2>*> vertexElements,
                             double cellRearrangementThreshold=0.01,
-                            double edgeDivisionThreshold=DBL_MAX,
                             double t2Threshold=0.001);
 
     /**

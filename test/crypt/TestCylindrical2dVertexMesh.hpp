@@ -162,7 +162,6 @@ public:
         TS_ASSERT_EQUALS(new_index, old_num_nodes);
 
         // Remesh to update correspondences
-        p_mesh->SetEdgeDivisionThreshold(1000); // set high threshold to avoid more nodes appearing in the remesh
         VertexElementMap map(p_mesh->GetNumElements());
         p_mesh->ReMesh(map);
 

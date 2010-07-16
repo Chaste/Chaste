@@ -156,8 +156,7 @@ public:
         TS_ASSERT_DELTA(tissue.rGetMesh().GetSurfaceAreaOfElement(0), 3.5449077, 0.1);
 
         // Test Warnings
-        ///\todo this should be only one warning (see #1394)
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1920u);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
         Warnings::QuietDestroy();
     }
@@ -219,13 +218,11 @@ public:
         Warnings::QuietDestroy();
     }
 
-    // In this test edges can divide if they become too long.
-    void TestSimpleVertexMonolayerWithCellBirth() throw (Exception)
+    void TestSingleCellDividing() throw (Exception)
     {
         // Create a simple 2D MutableVertexMesh with only one cell
         HoneycombMutableVertexMeshGenerator generator(1, 1);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
-        p_mesh->SetEdgeDivisionThreshold(0.5); // See ticket # 1477
 
         // Set up cell.
         std::vector<TissueCellPtr> cells;
@@ -242,9 +239,6 @@ public:
         // Create tissue
         VertexBasedTissue<2> tissue(*p_mesh, cells);
 
-        unsigned old_num_nodes = tissue.GetNumNodes();
-        unsigned old_num_elements = tissue.GetNumElements();
-        unsigned old_num_cells = tissue.GetNumRealCells();
 
         // Create a force system
         NagaiHondaForce<2> force;
@@ -253,7 +247,7 @@ public:
 
         // Set up tissue simulation
         TissueSimulation<2> simulator(tissue, force_collection);
-        simulator.SetOutputDirectory("TestSimpleVertexMonolayerWithCellBirth");
+        simulator.SetOutputDirectory("TestSingleCellDividing");
         simulator.SetEndTime(1.0);
 
         // Run simulation
@@ -264,83 +258,15 @@ public:
         unsigned new_num_elements = (static_cast<VertexBasedTissue<2>*>(&(simulator.rGetTissue())))->GetNumElements();
         unsigned new_num_cells = simulator.rGetTissue().GetNumRealCells();
 
-        TS_ASSERT_EQUALS(new_num_nodes, old_num_nodes+9); // as division of element is longer than threshold so is divided
-        TS_ASSERT_EQUALS(new_num_elements, old_num_elements+1);
-        TS_ASSERT_EQUALS(new_num_cells, old_num_cells+1);
+        TS_ASSERT_EQUALS(new_num_nodes, 8u);
+        TS_ASSERT_EQUALS(new_num_elements, 2u);
+        TS_ASSERT_EQUALS(new_num_cells, 2u);
 
         // Test Warnings
-        ///\todo this should be only one warning (see #1394)
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 93u);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
         Warnings::QuietDestroy();
     }
-
-    // This test visualizing cells of 2 mutation types, wildtype and labelled type.
-    // It asserts that neighboring cells have the correct adhesion parameter for difference
-    // pairs of nodes.
-	void TestSimpleVertexMonolayerWithTwoMutationTypes() throw (Exception)
-	{
-		TissueConfig::Instance()->SetOutputCellMutationStates(true);
-
-		// Create a simple 2D MutableVertexMesh with only four cells
-		HoneycombMutableVertexMeshGenerator generator(2, 2);
-		MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
-
-		// Set up cell.
-		std::vector<TissueCellPtr> cells;
-		boost::shared_ptr<AbstractCellMutationState> p_state1(new WildTypeCellMutationState);
-		boost::shared_ptr<AbstractCellMutationState> p_state2(new LabelledCellMutationState);
-
-		for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
-		{
-			FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-			p_model->SetCellProliferativeType(TRANSIT);
-
-			if (elem_index == 0 || elem_index == 2)
-			{
-				TissueCellPtr p_cell1(new TissueCell(p_state2, p_model));
-				double birth_time = -2.0;
-				p_cell1->SetBirthTime(birth_time);
-				TS_ASSERT_EQUALS(p_cell1->GetMutationState()->IsType<LabelledCellMutationState>(), true);
-				cells.push_back(p_cell1);
-			}
-			else
-			{
-				TissueCellPtr p_cell(new TissueCell(p_state1, p_model));
-				double birth_time = -2.0;
-				p_cell->SetBirthTime(birth_time);
-				cells.push_back(p_cell);
-			}
-		}
-		// Create tissue
-		VertexBasedTissue<2> tissue(*p_mesh, cells);
-
-		// Create a force system
-		NagaiHondaForce<2> force(true);
-		std::vector<AbstractForce<2>* > force_collection;
-		force_collection.push_back(&force);
-
-		// Set up tissue simulation
-		TissueSimulation<2> simulator(tissue, force_collection);
-		simulator.SetOutputDirectory("TestSimpleVertexMonolayerWithTwoMutationStates");
-		simulator.SetEndTime(1.0);
-
-		// Run simulation
-		simulator.Solve();
-
-		///\todo test against a saved simulation or something similar, i.e check the positions of some vertices.
-		TS_ASSERT_EQUALS(p_mesh->GetNode(13)->IsBoundaryNode(), true);
-		TS_ASSERT_EQUALS(p_mesh->GetNumElements(),4u);
-		TS_ASSERT_EQUALS(p_state2->GetColour(), 5u);
-		TS_ASSERT_EQUALS(p_state1->GetColour(), 0u);
-		TS_ASSERT_EQUALS(cells[0]->GetMutationState()->IsType<LabelledCellMutationState>(), true);
-
-		// Test Warnings
-        ///\todo this should be only one warning (see #1394)
-		TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 137u);
-		TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
-        Warnings::QuietDestroy();
-	}
 
     void TestVertexMonolayerWithCellBirth() throw (Exception)
     {
@@ -403,11 +329,12 @@ public:
         TS_ASSERT_EQUALS(new_num_cells, old_num_cells+1);
 
         // Test Warnings
-        ///\todo this should be only one warning (see #1394)
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 942u);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
         Warnings::QuietDestroy();
     }
+
+
 
 
     // This test will fail with the larger timestep unless the movement is restricted to less than mCellRearangementThreshold.
@@ -469,7 +396,7 @@ public:
         TS_ASSERT_EQUALS(simulator.rGetTissue().GetNumRealCells(), 36u);
 
         // Test Warnings
-        //TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 13413u); // This gives  13434 on bob!! see #1394
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
         Warnings::QuietDestroy();
     }
@@ -542,14 +469,6 @@ public:
         // Run simulation
         simulator.Solve();
 
-        // Test Warnings
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 5u);
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Cell removed due to T2Swap this is not counted in the dead cells counter");
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
-
         // Check that cells 6 and 14 have now been removed.
         unsigned new_num_nodes = simulator.rGetTissue().GetNumNodes();
         unsigned new_num_elements = (static_cast<VertexBasedTissue<2>*>(&(simulator.rGetTissue())))->GetNumElements();
@@ -560,8 +479,142 @@ public:
         TS_ASSERT_EQUALS(new_num_cells, old_num_cells-5);
         TS_ASSERT_EQUALS(new_num_cells, new_num_elements);
 
-        Warnings::QuietDestroy();
+        // Test Warnings
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 2u);
+		TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
+		TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Cell removed due to T2Swap this is not counted in the dead cells counter");
+		Warnings::QuietDestroy();
     }
+
+    /*
+     * This test visualizing cells of 2 mutation types, wildtype and labelled type.
+	 * It asserts that neighboring cells have the correct adhesion parameter for difference
+	 * pairs of nodes.
+	 */
+	void TestVertexMonolayerWithTwoMutationTypes() throw (Exception)
+	{
+		TissueConfig::Instance()->SetOutputCellMutationStates(true);
+
+		// Create a simple 2D MutableVertexMesh with only four cells
+		HoneycombMutableVertexMeshGenerator generator(2, 2);
+		MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
+
+		// Set up cell.
+		std::vector<TissueCellPtr> cells;
+		boost::shared_ptr<AbstractCellMutationState> p_state1(new WildTypeCellMutationState);
+		boost::shared_ptr<AbstractCellMutationState> p_state2(new LabelledCellMutationState);
+
+		for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
+		{
+			FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+			p_model->SetCellProliferativeType(TRANSIT);
+
+			if (elem_index == 0 || elem_index == 2)
+			{
+				TissueCellPtr p_cell(new TissueCell(p_state2, p_model));
+				double birth_time = -2.0;
+				p_cell->SetBirthTime(birth_time);
+				cells.push_back(p_cell);
+			}
+			else
+			{
+				TissueCellPtr p_cell(new TissueCell(p_state1, p_model));
+				double birth_time = -2.0;
+				p_cell->SetBirthTime(birth_time);
+				cells.push_back(p_cell);
+			}
+		}
+		// Create tissue
+		VertexBasedTissue<2> tissue(*p_mesh, cells);
+
+		// Create a force system
+		NagaiHondaForce<2> force(true);
+		std::vector<AbstractForce<2>* > force_collection;
+		force_collection.push_back(&force);
+
+		// Set up tissue simulation
+		TissueSimulation<2> simulator(tissue, force_collection);
+		simulator.SetOutputDirectory("TestVertexMonolayerWithTwoMutationStates");
+		simulator.SetEndTime(1.0);
+
+		// Run simulation
+		simulator.Solve();
+
+		///\todo test against a saved simulation or something similar, i.e check the positions of some vertices.
+		TS_ASSERT_EQUALS(p_mesh->GetNode(13)->IsBoundaryNode(), true);
+		TS_ASSERT_EQUALS(p_mesh->GetNumElements(),4u);
+		TS_ASSERT_EQUALS(p_state2->GetColour(), 5u);
+		TS_ASSERT_EQUALS(p_state1->GetColour(), 0u);
+		TS_ASSERT_EQUALS(cells[0]->GetMutationState()->IsType<LabelledCellMutationState>(), true);
+
+		// Test Warnings
+		TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+		TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
+		Warnings::QuietDestroy();
+	}
+
+	 /*
+	  * This is a long test which demonstrates cell sorting through differential adhesion, it doesnt work yet as the
+	  * parameters for cell cell adhesion are not correct
+	  */
+	void noTestVertexMonolayerCellSorting() throw (Exception)
+	{
+		TissueConfig::Instance()->SetOutputCellMutationStates(true);
+
+		// Create a simple 2D MutableVertexMesh with only four cells
+		HoneycombMutableVertexMeshGenerator generator(5, 5);
+		MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
+
+		p_mesh->SetCellRearrangementThreshold(0.05);
+
+		// Set up cell.
+		std::vector<TissueCellPtr> cells;
+		boost::shared_ptr<AbstractCellMutationState> p_state1(new WildTypeCellMutationState);
+		boost::shared_ptr<AbstractCellMutationState> p_state2(new LabelledCellMutationState);
+
+		for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
+		{
+			FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+			p_model->SetCellProliferativeType(DIFFERENTIATED);
+
+			if (elem_index%3 == 0 )
+			{
+				TissueCellPtr p_cell(new TissueCell(p_state2, p_model));
+				double birth_time = -2.0;
+				p_cell->SetBirthTime(birth_time);
+				cells.push_back(p_cell);
+			}
+			else
+			{
+				TissueCellPtr p_cell(new TissueCell(p_state1, p_model));
+				double birth_time = -2.0;
+				p_cell->SetBirthTime(birth_time);
+				cells.push_back(p_cell);
+			}
+		}
+		// Create tissue
+		VertexBasedTissue<2> tissue(*p_mesh, cells);
+
+		// Create a force system
+		NagaiHondaForce<2> force(true);
+		std::vector<AbstractForce<2>* > force_collection;
+		force_collection.push_back(&force);
+
+		// Set up tissue simulation
+		TissueSimulation<2> simulator(tissue, force_collection);
+		simulator.SetOutputDirectory("TestVertexCellSorting");
+		simulator.SetDt(0.1);
+		simulator.SetEndTime(100.0);
+
+		// Run simulation
+		simulator.Solve();
+
+		//Test Warnings
+		TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+		TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
+		Warnings::QuietDestroy();
+	}
+
 
     void TestSingleCellRelaxationAndApoptosis() throw (Exception)
     {
@@ -626,8 +679,7 @@ public:
         TS_ASSERT_DELTA(tissue.rGetMesh().GetSurfaceAreaOfElement(0), 2.5417, 1e-3);
 
         // Test Warnings
-        ///\todo this should be only one warning (see #1394)
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 160u);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
         Warnings::QuietDestroy();
     }
@@ -784,8 +836,7 @@ public:
         delete p_simulator;
 
         // Test Warnings
-        ///\todo this should be only one warning (see #1394)
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1216u);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
         Warnings::QuietDestroy();
 

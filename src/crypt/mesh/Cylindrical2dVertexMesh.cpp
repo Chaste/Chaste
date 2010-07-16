@@ -31,9 +31,8 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(double width,
                                                  std::vector<Node<2>*> nodes,
                                                  std::vector<VertexElement<2, 2>*> vertexElements,
                                                  double cellRearrangementThreshold,
-                                                 double edgeDivisionThreshold,
                                                  double t2Threshold)
-    : MutableVertexMesh<2,2>(nodes, vertexElements, cellRearrangementThreshold, edgeDivisionThreshold, t2Threshold),
+    : MutableVertexMesh<2,2>(nodes, vertexElements, cellRearrangementThreshold, t2Threshold),
       mWidth(width)
 {
     // ReMesh to remove any deleted nodes and relabel
