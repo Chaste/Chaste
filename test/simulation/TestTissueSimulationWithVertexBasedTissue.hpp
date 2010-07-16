@@ -294,7 +294,7 @@ public:
 			FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
 			p_model->SetCellProliferativeType(TRANSIT);
 
-			if (elem_index == 0)
+			if (elem_index == 0 || elem_index == 2)
 			{
 				TissueCellPtr p_cell1(new TissueCell(p_state2, p_model));
 				double birth_time = -2.0;
@@ -314,7 +314,7 @@ public:
 		VertexBasedTissue<2> tissue(*p_mesh, cells);
 
 		// Create a force system
-		NagaiHondaForce<2> force;
+		NagaiHondaForce<2> force(true);
 		std::vector<AbstractForce<2>* > force_collection;
 		force_collection.push_back(&force);
 
@@ -325,14 +325,8 @@ public:
 
 		// Run simulation
 		simulator.Solve();
-		TS_ASSERT_DELTA(force.GetAdhesionParameter(p_mesh->GetNode(3), p_mesh->GetNode(6), 2), 1.5, 1e-4);
-		TS_ASSERT_DELTA(force.GetAdhesionParameter(p_mesh->GetNode(6), p_mesh->GetNode(3), 2), 1.5, 1e-4);
-		TS_ASSERT_DELTA(force.GetAdhesionParameter(p_mesh->GetNode(9), p_mesh->GetNode(12), 0), 1.0, 1e-4);
 
-		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(3), p_mesh->GetNode(6), tissue), 2u);
-		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(6), p_mesh->GetNode(3), tissue), 2u);
-		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(9), p_mesh->GetNode(12), tissue), 0u);
-
+		// \TODO the testing should test against a saved simulation or something similar, i.e check the positions of some vertices.
 		TS_ASSERT_EQUALS(p_mesh->GetNode(13)->IsBoundaryNode(), true);
 		TS_ASSERT_EQUALS(p_mesh->GetNumElements(),4u);
 		TS_ASSERT_EQUALS(p_state2->GetColour(), 5u);
@@ -340,7 +334,7 @@ public:
 		TS_ASSERT_EQUALS(cells[0]->GetMutationState()->IsType<LabelledCellMutationState>(), true);
 
 		//Test Warnings \TODO this should be only one warning see #1394
-		TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 140u);
+		TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 137u);
 		TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
         Warnings::QuietDestroy();
 	}

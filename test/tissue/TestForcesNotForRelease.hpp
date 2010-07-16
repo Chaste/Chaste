@@ -780,7 +780,7 @@ public:
 			FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
 			p_model->SetCellProliferativeType(TRANSIT);
 
-			if (elem_index == 0 || elem_index == 1)
+			if (elem_index == 0 || elem_index == 2) // cells chosen for coverage
 			{
 				TissueCellPtr p_cell1(new TissueCell(p_state2, p_model));
 				double birth_time = -2.0;
@@ -802,32 +802,139 @@ public:
 		VertexBasedTissue<2> tissue(*p_mesh, cells);
 
 		// Create a force system
-		NagaiHondaForce<2> force(true);
+		NagaiHondaForce<2> force(true); // the true says to use Differential Adhesion.
 		std::vector<AbstractForce<2>* > force_collection;
 		force_collection.push_back(&force);
 
 		// check mutation state
-		TS_ASSERT_EQUALS(cells[0]->GetMutationState()->IsType<LabelledCellMutationState>(), true);
-		TS_ASSERT_EQUALS(cells[1]->GetMutationState()->IsType<LabelledCellMutationState>(), true);
-		TS_ASSERT_EQUALS(cells[2]->GetMutationState()->IsType<WildTypeCellMutationState>(), true);
-		TS_ASSERT_EQUALS(cells[3]->GetMutationState()->IsType<WildTypeCellMutationState>(), true);
-		TS_ASSERT_EQUALS((tissue.GetCellUsingLocationIndex(3))->GetMutationState()->IsType<LabelledCellMutationState>(), false);
-		// 2 wildtypes
-		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(9), p_mesh->GetNode(12), tissue), 0u);
-		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(12), p_mesh->GetNode(9), tissue), 0u);
-		// wildtype and labelled
-		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(6), p_mesh->GetNode(8), tissue), 2u);
-		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(8), p_mesh->GetNode(6), tissue), 2u);
-		// 2 labelled
-		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(3), p_mesh->GetNode(6), tissue), 1u);
-		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(6), p_mesh->GetNode(3), tissue), 1u);
+		TS_ASSERT(cells[0]->GetMutationState()->IsType<LabelledCellMutationState>());
+		TS_ASSERT(cells[1]->GetMutationState()->IsType<WildTypeCellMutationState>());
+		TS_ASSERT(cells[2]->GetMutationState()->IsType<LabelledCellMutationState>());
+		TS_ASSERT(cells[3]->GetMutationState()->IsType<WildTypeCellMutationState>());
+		TS_ASSERT(cells[3]->GetMutationState()->IsType<WildTypeCellMutationState>());
 
-		TS_ASSERT_DELTA(force.GetAdhesionParameter(p_mesh->GetNode(9), p_mesh->GetNode(12),
-				force.GetCombinationCellTypes(p_mesh->GetNode(9), p_mesh->GetNode(12), tissue)), 1.0, 1e-4);
-		TS_ASSERT_DELTA(force.GetAdhesionParameter(p_mesh->GetNode(6), p_mesh->GetNode(8),
-				force.GetCombinationCellTypes(p_mesh->GetNode(6), p_mesh->GetNode(8), tissue)), 1.5, 1e-4);
-		TS_ASSERT_DELTA(force.GetAdhesionParameter(p_mesh->GetNode(3), p_mesh->GetNode(6),
-				force.GetCombinationCellTypes(p_mesh->GetNode(3), p_mesh->GetNode(6), tissue)), 2.0, 1e-4);
+		// 2 Wildtypes
+		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(7), p_mesh->GetNode(9), tissue), 0u);
+		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(9), p_mesh->GetNode(7), tissue), 0u);
+		TS_ASSERT_DELTA(force.GetAdhesionParameter(p_mesh->GetNode(7), p_mesh->GetNode(9), 0u), 1.0, 1e-4);
+
+		// Wildtype and Labelled
+		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(6), p_mesh->GetNode(9), tissue), 2u);
+		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(9), p_mesh->GetNode(6), tissue), 2u);
+		TS_ASSERT_DELTA(force.GetAdhesionParameter(p_mesh->GetNode(6), p_mesh->GetNode(9), 2u), 1.5, 1e-4);
+
+		// 2 Labelled
+		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(6), p_mesh->GetNode(8), tissue), 1u);
+		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(8), p_mesh->GetNode(6), tissue), 1u);
+		TS_ASSERT_DELTA(force.GetAdhesionParameter(p_mesh->GetNode(6), p_mesh->GetNode(8), 1u), 2.0, 1e-4);
+
+		// Labelled Void
+		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(0), p_mesh->GetNode(3), tissue), 99u);
+		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(3), p_mesh->GetNode(0), tissue), 99u);
+		TS_ASSERT_DELTA(force.GetAdhesionParameter(p_mesh->GetNode(0), p_mesh->GetNode(3), 99u), 1.0, 1e-4);
+
+		// Wildtype Void
+		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(10), p_mesh->GetNode(13), tissue), 99u);
+		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(13), p_mesh->GetNode(10), tissue), 99u);
+		TS_ASSERT_DELTA(force.GetAdhesionParameter(p_mesh->GetNode(10), p_mesh->GetNode(13),99u), 1.0, 1e-4);
+
+
+		// Initialise a vector of new node forces
+		std::vector<c_vector<double, 2> > node_forces;
+		node_forces.reserve(tissue.GetNumNodes());
+
+		for (unsigned i=0; i<tissue.GetNumNodes(); i++)
+		{
+			node_forces.push_back(zero_vector<double>(2));
+		}
+
+		force.AddForceContribution(node_forces, tissue);
+
+		// Check some example forces These will change if you modify the adhesion parameters.
+        TS_ASSERT_DELTA(node_forces[0][0], 0.0, 1e-4);
+        TS_ASSERT_DELTA(node_forces[0][1], -14.0135, 1e-4);
+
+        TS_ASSERT_DELTA(node_forces[10][0], 12.1361, 1e-4);
+        TS_ASSERT_DELTA(node_forces[10][1], -7.0067, 1e-4);
+	}
+
+
+	void TestArchivingNagaiHondaForce() throw (Exception)
+	{
+		OutputFileHandler handler("archive", false);    // don't erase contents of folder
+		std::string archive_filename = handler.GetOutputDirectoryFullPath() + "nagai_honda.arch";
+
+		{
+			// Construct a 2D vertex mesh consisting of a single element
+			std::vector<Node<2>*> nodes;
+			unsigned num_nodes = 20;
+			std::vector<double> angles = std::vector<double>(num_nodes);
+
+			for (unsigned i=0; i<num_nodes; i++)
+			{
+				angles[i] = M_PI+2.0*M_PI*(double)(i)/(double)(num_nodes);
+				nodes.push_back(new Node<2>(i, false, cos(angles[i]), sin(angles[i])));
+			}
+
+			std::vector<VertexElement<2,2>*> elements;
+			elements.push_back(new VertexElement<2,2>(0, nodes));
+
+			double cell_swap_threshold = 0.01;
+			double edge_division_threshold = 2.0;
+			MutableVertexMesh<2,2> mesh(nodes, elements, cell_swap_threshold, edge_division_threshold);
+
+			// Set up the cell
+			std::vector<TissueCellPtr> cells;
+			boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+			FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+			p_model->SetCellProliferativeType(DIFFERENTIATED);
+
+			TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+			p_cell->SetBirthTime(-1.0);
+			cells.push_back(p_cell);
+
+			// Create tissue
+			VertexBasedTissue<2> tissue(mesh, cells);
+			tissue.InitialiseCells();
+
+			// Create a force system
+			NagaiHondaForce<2> force;
+
+			std::ofstream ofs(archive_filename.c_str());
+			boost::archive::text_oarchive output_arch(ofs);
+
+			// Change the value of a TissueConfig member
+			TS_ASSERT_DELTA(TissueConfig::Instance()->GetTransitCellG1Duration(), 2.0, 1e-6);
+			TissueConfig::Instance()->SetTransitCellG1Duration(15.3);
+			TS_ASSERT_DELTA(TissueConfig::Instance()->GetTransitCellG1Duration(), 15.3, 1e-6);
+
+			// Serialize via pointer
+			NagaiHondaForce<2>* const p_force = &force;
+			output_arch << p_force;
+
+			// Tidy up
+			TissueConfig::Instance()->Reset();
+		}
+
+		{
+			// Check TissueConfig is reset
+			TS_ASSERT_DELTA(TissueConfig::Instance()->GetTransitCellG1Duration(), 2.0, 1e-6);
+
+			// Create an input archive
+			std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+			boost::archive::text_iarchive input_arch(ifs);
+
+			NagaiHondaForce<2>* p_force;
+
+			// Restore from the archive
+			input_arch >> p_force;
+
+			// Check TissueConfig has been correctly archived
+			TS_ASSERT_DELTA(TissueConfig::Instance()->GetTransitCellG1Duration(), 15.3, 1e-6);
+
+			// Tidy up
+			delete p_force;
+		}
 	}
 
     void TestWelikyOsterForceMethods() throw (Exception)

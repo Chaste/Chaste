@@ -199,6 +199,7 @@ double NagaiHondaForce<DIM>::GetAdhesionParameter(Node<DIM>* pNodeA, Node<DIM>* 
     }
     return adhesion_parameter;
 }
+
 template<unsigned DIM>
 double NagaiHondaForce<DIM>::GetAdhesionParameter(Node<DIM>* pNodeA, Node<DIM>* pNodeB, unsigned combinationCellType)
 {
@@ -220,7 +221,7 @@ double NagaiHondaForce<DIM>::GetAdhesionParameter(Node<DIM>* pNodeA, Node<DIM>* 
         assert(!shared_elements.empty());
 
         // If the edge corresponds to a single element, then the cell is on the boundary
-        if (shared_elements.size() == 1)
+        if (shared_elements.size() == 1) // \TODO This appears to be combinationCellType 99 and should probably be different for each mutation.
         {
             adhesion_parameter = TissueConfig::Instance()->GetNagaiHondaCellBoundaryAdhesionEnergyParameter();
         }
@@ -238,9 +239,10 @@ double NagaiHondaForce<DIM>::GetAdhesionParameter(Node<DIM>* pNodeA, Node<DIM>* 
             {
                 adhesion_parameter = 1.5;
             }
-            else // if else (if combinationCellType = 99)
+            else //
             {
-            	adhesion_parameter = TissueConfig::Instance()->GetNagaiHondaCellCellAdhesionEnergyParameter();
+            	// Shouldn't reach here as all cells should have mutations defied for differential adhesion. \TODO make a warning to say this and test it
+            	NEVER_REACHED;
             }
         }
         return adhesion_parameter;
@@ -266,34 +268,22 @@ unsigned NagaiHondaForce<DIM>::GetCombinationCellTypes(Node<DIM>* pNodeA, Node<D
 
         // Check that the nodes have a common edge
         assert(!shared_elements.empty());
-
-        unsigned element_index1 = UNSIGNED_UNSET;
-        unsigned element_index2 = UNSIGNED_UNSET;
-        boost::shared_ptr<AbstractCellMutationState> mutationStateCell1;
-        boost::shared_ptr<AbstractCellMutationState> mutationStateCell2;
+        // Check that at most 2 common elements
+        assert(shared_elements.size() < 3);
 
         if (shared_elements.size() == 2)
         {
+            // Get the elements connected to these two nodes
 
-        	unsigned count = 1;
-            for (typename std::set<unsigned>::iterator shrd_elem_iter = shared_elements.begin();
-            	             shrd_elem_iter != shared_elements.end();
-            	             ++shrd_elem_iter)
-            {
-                 if (count == 1)
-                 {
-                	 element_index1 = *shrd_elem_iter;
-                 }
-                 else if (count == 2)
-                 {
-                   	 element_index2 = *shrd_elem_iter;
-                 }
-                 count=count+1;
-            }
+        	typename std::set<unsigned>::iterator elem_iter = shared_elements.begin();
+        	unsigned element_index1 = *elem_iter;
+        	++elem_iter;
+         	unsigned element_index2 = *elem_iter;
 
            	TissueCellPtr p_cell1 = rTissue.GetCellUsingLocationIndex(element_index1);
             TissueCellPtr p_cell2 = rTissue.GetCellUsingLocationIndex(element_index2);
 
+            // Note this currently assumes only 2 mutation states: Labelled and Wild Type.
             if (p_cell1->GetMutationState()->IsType<LabelledCellMutationState>())
             {
                 if (p_cell2->GetMutationState()->IsType<LabelledCellMutationState>())
@@ -317,6 +307,8 @@ unsigned NagaiHondaForce<DIM>::GetCombinationCellTypes(Node<DIM>* pNodeA, Node<D
                 }
             }
         }
+
+
         return combinationCellType;
 }
 /////////////////////////////////////////////////////////////////////////////
