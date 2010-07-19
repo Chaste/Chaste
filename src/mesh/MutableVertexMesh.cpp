@@ -595,16 +595,28 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideEdge(Node<SPACE_DIM>* pNod
                           elements_containing_nodeB.end(),
                           std::inserter(shared_elements, shared_elements.begin()));
 
-    // Check that the nodes have a common edge
+    // Check that the nodes have a common edge and not more than 2
     assert(!shared_elements.empty());
+    assert(!shared_elements.size()<=2);
+
+    // Specifiy if its a boundary node
+    bool is_boundary_node = false;
+    if (shared_elements.size()==1)
+    {
+    	// If only one shared element then must be on the boundary.
+    	assert((pNodeA->IsBoundaryNode())&&(pNodeB->IsBoundaryNode()));
+    	is_boundary_node = true;
+    }
 
     // Create a new node (position is not important as it will be changed)
-    Node<SPACE_DIM>* p_new_node = new Node<SPACE_DIM>(GetNumNodes(), false, 0.0, 0.0);
+    Node<SPACE_DIM>* p_new_node = new Node<SPACE_DIM>(GetNumNodes(), is_boundary_node, 0.0, 0.0);
 
     // Update the node location
     c_vector<double, SPACE_DIM> new_node_position = pNodeA->rGetLocation() + 0.5*GetVectorFromAtoB(pNodeA->rGetLocation(), pNodeB->rGetLocation());
     ChastePoint<SPACE_DIM> point(new_node_position);
     p_new_node->SetPoint(new_node_position);
+
+
 
     // Add node to mesh
     this->mNodes.push_back(p_new_node);
