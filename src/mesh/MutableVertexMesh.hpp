@@ -74,6 +74,18 @@ protected:
     std::vector<unsigned> mDeletedElementIndices;
 
     /**
+     * Locations of T1Swaps (the mid point of the moving nodes), stored so they can be accessed and output by the tissue.
+     * The locations are stored until they are cleared by ClearLocationsOfT1Swaps()
+     */
+    std::vector< c_vector<double, SPACE_DIM> > mLocationsOfT1Swaps ;
+
+    /**
+     * Locations of T3Swaps (the location of the intersection with the edge), stored so they can be accessed and output by the tissue.
+     * The locations are stored until they are cleared by ClearLocationsOfT3Swaps()
+     */
+    std::vector< c_vector<double, SPACE_DIM> > mLocationsOfT3Swaps;
+
+    /**
      * Divide an element along the axis passing through two of its nodes.
      *
      * \todo This method currently assumes SPACE_DIM = 2 (see #866)
@@ -124,6 +136,15 @@ protected:
     void PerformT1Swap(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB, std::set<unsigned>& rElementsContainingNodes);
 
     /**
+     * Helper method for ReMesh to perform the T2 Swap
+     *
+     * \todo This method currently assumes SPACE_DIM = 2 (see #866)
+     *
+     * @param rElement the element to remove
+     */
+    void PerformT2Swap(VertexElement<ELEMENT_DIM,SPACE_DIM>& rElement);
+
+    /**
      * Called by ReMesh(). Moves a node, which has been found to overlap an element,
      * back onto the edge of that element and associates it with the element and adds
      * new nodes to maitain three elemets a node.
@@ -155,9 +176,12 @@ protected:
         archive & mT2Threshold;
         archive & mDeletedNodeIndices;
         archive & mDeletedElementIndices;
+        archive & mLocationsOfT1Swaps;
+        archive & mLocationsOfT3Swaps;
 
         archive & boost::serialization::base_object<VertexMesh<ELEMENT_DIM, SPACE_DIM> >(*this);
     }
+
 
 public:
 
@@ -248,6 +272,27 @@ public:
     unsigned GetNumElements() const;
 
     /**
+     * @return the locations of the T1Swaps
+     */
+    std::vector< c_vector<double, SPACE_DIM> > GetLocationsOfT1Swaps();
+
+	/**
+	 * @return the locations of the T1Swaps
+	 */
+	std::vector< c_vector<double, SPACE_DIM> > GetLocationsOfT3Swaps();
+
+	/**
+	 * Helper method to clear the stored T1Swaps
+	 */
+	void ClearLocationsOfT1Swaps();
+
+	/**
+	 * Helper method to clear the stored T3Swaps
+	 */
+	void ClearLocationsOfT3Swaps();
+
+
+    /**
      * Add a node to the mesh.
      *
      * Note: After calling this one or more times, you must then call ReMesh.
@@ -256,15 +301,6 @@ public:
      * @return the global index of the new node in the mesh.
      */
     unsigned AddNode(Node<SPACE_DIM>* pNewNode);
-
-    /**
-     * Helper method for ReMesh to perform the T2 Swap
-     *
-     * \todo This method currently assumes SPACE_DIM = 2 (see #866)
-     *
-     * @param rElement the element to remove
-     */
-    void PerformT2Swap(VertexElement<ELEMENT_DIM,SPACE_DIM>& rElement);
 
     /**
      * Mark an element as deleted. Note that it DOES NOT deal with the associated

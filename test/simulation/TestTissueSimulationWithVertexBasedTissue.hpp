@@ -342,8 +342,9 @@ public:
         HoneycombMutableVertexMeshGenerator generator(3, 3);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
 
-        // create a hole in the mesh
+        // create a horseshoe shaped mesh
         p_mesh->DeleteElementPriorToReMesh(0);
+        p_mesh->DeleteElementPriorToReMesh(1);
         p_mesh->DeleteElementPriorToReMesh(4);
         p_mesh->DeleteElementPriorToReMesh(6);
 
@@ -376,7 +377,7 @@ public:
         // Set up tissue simulation
         TissueSimulation<2> simulator(tissue, force_collection);
         simulator.SetOutputDirectory("TestVertexMonolayerWithVoid");
-        simulator.SetEndTime(30.0);
+        simulator.SetEndTime(20.0);
 
         ////////////////////////////////////////////
         /// Strange setup to speed up simulation ///
@@ -385,24 +386,18 @@ public:
         simulator.SetDt(0.1);
         ////////////////////////////////////////////
 
-        //Set up logfile so we can track T1Swaps make sure to close the logfile at the end of the test
-        LogFile* p_log_file = LogFile::Instance();
-        p_log_file->Set(1, "TestVertexMonolayerWithVoid", "log.txt");
-
         // Run simulation
         simulator.Solve();
 
         // Check that void has been removed and vertices are in the correct position
-        TS_ASSERT_EQUALS(simulator.rGetTissue().GetNumNodes(), 82u);
-        TS_ASSERT_EQUALS((static_cast<VertexBasedTissue<2>*>(&(simulator.rGetTissue())))->GetNumElements(),36u);
-        TS_ASSERT_EQUALS(simulator.rGetTissue().GetNumRealCells(), 36u);
+        TS_ASSERT_EQUALS(simulator.rGetTissue().GetNumNodes(), 40u);
+        TS_ASSERT_EQUALS((static_cast<VertexBasedTissue<2>*>(&(simulator.rGetTissue())))->GetNumElements(),15u);
+        TS_ASSERT_EQUALS(simulator.rGetTissue().GetNumRealCells(), 15u);
 
         // Test Warnings
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
         Warnings::QuietDestroy();
-
-        LogFile::Close();
     }
 
     void TestVertexMonolayerWithCellDeath() throw (Exception)

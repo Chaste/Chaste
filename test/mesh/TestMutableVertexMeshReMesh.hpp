@@ -515,6 +515,18 @@ public:
 
         TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(3), 0.2, 1e-6);
         TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(3), 1.0+0.2*sqrt(41.0), 1e-6);
+
+        // Test T1Swap Location tracking
+        std::vector< c_vector<double, 2> > t1_locations = vertex_mesh.GetLocationsOfT1Swaps();
+        TS_ASSERT_EQUALS(t1_locations.size(),1u);
+        TS_ASSERT_DELTA(t1_locations[0][0],0.5, 1e-6);
+        TS_ASSERT_DELTA(t1_locations[0][1],0.5, 1e-6);
+
+        // Test T1Swap Location clearing
+        vertex_mesh.ClearLocationsOfT1Swaps();
+        t1_locations = vertex_mesh.GetLocationsOfT1Swaps();
+        TS_ASSERT_EQUALS(t1_locations.size(),0u);
+
     }
 
     // This tests both PerformT1Swap and IdentifySwapType
@@ -1752,7 +1764,7 @@ public:
         TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(test_point7, 0), false);
     }
 
-    void TestT3Swap()
+    void TestPerformT3Swap()
     {
         /*
          * Make a small mesh consisting of five elements:
@@ -1917,6 +1929,19 @@ public:
             }
             TS_ASSERT_EQUALS(mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
         }
+
+        // Test T3Swap Location tracking
+        std::vector< c_vector<double, 2> > t3_locations = mesh.GetLocationsOfT3Swaps();
+        TS_ASSERT_EQUALS(t3_locations.size(),2u);
+        TS_ASSERT_DELTA(t3_locations[0][0],1.0, 1e-6);
+        TS_ASSERT_DELTA(t3_locations[0][1],0.5, 1e-6);
+        TS_ASSERT_DELTA(t3_locations[1][0],0.0, 1e-6);
+        TS_ASSERT_DELTA(t3_locations[1][1],0.5, 1e-6);
+
+        // Test T1Swap Location clearing
+        mesh.ClearLocationsOfT3Swaps();
+        t3_locations = mesh.GetLocationsOfT3Swaps();
+        TS_ASSERT_EQUALS(t3_locations.size(),0u);
     }
 
     void TestPerformT3SwapExceptions() throw(Exception)

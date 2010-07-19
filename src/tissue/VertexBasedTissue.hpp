@@ -70,6 +70,12 @@ private:
     /** Results file for elements. */
     out_stream mpVizElementsFile;
 
+    /** Results file for locations of T1Swaps. */
+    out_stream mpT1SwapLocationsFile;
+
+    /** Results file for locations of T3Swaps. */
+    out_stream mpT3SwapLocationsFile;
+
     friend class boost::serialization::access;
     /**
      * Serialize the object and its member variables.
