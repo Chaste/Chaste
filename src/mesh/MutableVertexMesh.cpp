@@ -188,29 +188,29 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNumElements() const
 //}
 
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::vector< c_vector<double, SPACE_DIM> > MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocationsOfT1Swaps()
-{
-	return mLocationsOfT1Swaps;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::vector< c_vector<double, SPACE_DIM> > MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocationsOfT3Swaps()
-{
-	return mLocationsOfT3Swaps;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ClearLocationsOfT1Swaps()
-{
-	mLocationsOfT1Swaps.clear();
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ClearLocationsOfT3Swaps()
-{
-	mLocationsOfT3Swaps.clear();
-}
+//template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+//std::vector< c_vector<double, SPACE_DIM> > MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocationsOfT1Swaps()
+//{
+//	return mLocationsOfT1Swaps;
+//}
+//
+//template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+//std::vector< c_vector<double, SPACE_DIM> > MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocationsOfT3Swaps()
+//{
+//	return mLocationsOfT3Swaps;
+//}
+//
+//template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+//void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ClearLocationsOfT1Swaps()
+//{
+//	mLocationsOfT1Swaps.clear();
+//}
+//
+//template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+//void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ClearLocationsOfT3Swaps()
+//{
+//	mLocationsOfT3Swaps.clear();
+//}
 
 
 
@@ -1403,7 +1403,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
     c_vector<double, SPACE_DIM> a_to_b = this->GetVectorFromAtoB(nodeA_location, nodeB_location);
 
     // Store the location of the T1Swap, the mid point of the moving nodes,
-	mLocationsOfT1Swaps.push_back(nodeA_location + 0.5*a_to_b);
+//	mLocationsOfT1Swaps.push_back(nodeA_location + 0.5*a_to_b);
 
     c_vector<double, SPACE_DIM> perpendicular_vector;
     perpendicular_vector(0) = -a_to_b(1);
@@ -1714,7 +1714,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
     c_vector<double, SPACE_DIM> intersection = vertexA + edge_ab_unit_vector*inner_prod(vector_a_to_point, edge_ab_unit_vector);
 
     // Store the location of the T3Swap, the location of the intersection with the edge.
-	mLocationsOfT3Swaps.push_back(intersection);
+//	mLocationsOfT3Swaps.push_back(intersection);
 
     /*
      * If the edge is shorter than 4.0*mCellRearrangementRatio*mCellRearangementThreshold move vertexA and vertexB
