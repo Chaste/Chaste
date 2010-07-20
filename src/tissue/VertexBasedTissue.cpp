@@ -413,19 +413,19 @@ void VertexBasedTissue<DIM>::WriteResultsToFiles()
     mrMesh.ClearLocationsOfT1Swaps();
 
 
-//    // Write Locations of T3Swaps to file
-//    *mpT3SwapLocationsFile << p_time->GetTime() << "\t";
-//    std::vector< c_vector<double, DIM> > t3_swap_locations = mrMesh.GetLocationsOfT3Swaps();
-//	*mpT3SwapLocationsFile << t3_swap_locations.size() << "\t";
-//    for (unsigned index = 0;  index < t3_swap_locations.size(); index++)
-//    {
-//		for (unsigned i=0; i<DIM; i++)
-//		{
-//			*mpT3SwapLocationsFile << t3_swap_locations[index][i] << "\t";
-//		}
-//    }
-//    *mpT3SwapLocationsFile << "\n";
-//    mrMesh.ClearLocationsOfT3Swaps();
+    // Write Locations of T3Swaps to file
+    *mpT3SwapLocationsFile << p_time->GetTime() << "\t";
+    std::vector< c_vector<double, DIM> > t3_swap_locations = mrMesh.GetLocationsOfT3Swaps();
+	*mpT3SwapLocationsFile << t3_swap_locations.size() << "\t";
+    for (unsigned index = 0;  index < t3_swap_locations.size(); index++)
+    {
+		for (unsigned i=0; i<DIM; i++)
+		{
+			*mpT3SwapLocationsFile << t3_swap_locations[index][i] << "\t";
+		}
+    }
+    *mpT3SwapLocationsFile << "\n";
+    mrMesh.ClearLocationsOfT3Swaps();
 
 
     // Write element data to file
@@ -597,7 +597,7 @@ void VertexBasedTissue<DIM>::CreateOutputFiles(const std::string& rDirectory, bo
     OutputFileHandler output_file_handler(rDirectory, cleanOutputDirectory);
     mpVizElementsFile = output_file_handler.OpenOutputFile("results.vizelements");
     mpT1SwapLocationsFile = output_file_handler.OpenOutputFile("T1SwapLocations.dat");
-//    mpT3SwapLocationsFile = output_file_handler.OpenOutputFile("T3SwapLocations.dat");
+    mpT3SwapLocationsFile = output_file_handler.OpenOutputFile("T3SwapLocations.dat");
     mDirPath = rDirectory;
 #ifdef CHASTE_VTK
     mpVtkMetaFile = output_file_handler.OpenOutputFile("results.pvd");
@@ -614,7 +614,7 @@ void VertexBasedTissue<DIM>::CloseOutputFiles()
     AbstractTissue<DIM>::CloseOutputFiles();
     mpVizElementsFile->close();
     mpT1SwapLocationsFile->close();
-//    mpT3SwapLocationsFile->close();
+    mpT3SwapLocationsFile->close();
 #ifdef CHASTE_VTK
     *mpVtkMetaFile << "    </Collection>\n";
     *mpVtkMetaFile << "</VTKFile>\n";

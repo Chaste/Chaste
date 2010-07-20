@@ -73,8 +73,8 @@ private:
     /** Results file for locations of T1Swaps. */
     out_stream mpT1SwapLocationsFile;
 
-//    /** Results file for locations of T3Swaps. */
-//    out_stream mpT3SwapLocationsFile;
+    /** Results file for locations of T3Swaps. */
+    out_stream mpT3SwapLocationsFile;
 
     friend class boost::serialization::access;
     /**
