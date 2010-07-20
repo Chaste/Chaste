@@ -398,21 +398,21 @@ void VertexBasedTissue<DIM>::WriteResultsToFiles()
     SimulationTime* p_time = SimulationTime::Instance();
 
 
-//    // Write Locations of T1Swaps to file
-//    *mpT1SwapLocationsFile << p_time->GetTime() << "\t";
-//    std::vector< c_vector<double, DIM> > t1_swap_locations = mrMesh.GetLocationsOfT1Swaps();
-//	*mpT1SwapLocationsFile << t1_swap_locations.size() << "\t";
-//    for (unsigned index = 0;  index < t1_swap_locations.size(); index++)
-//    {
-//		for (unsigned i=0; i<DIM; i++)
-//		{
-//			*mpT1SwapLocationsFile << t1_swap_locations[index][i] << "\t";
-//		}
-//    }
-//    *mpT1SwapLocationsFile << "\n";
-//    mrMesh.ClearLocationsOfT1Swaps();
-//
-//
+    // Write Locations of T1Swaps to file
+    *mpT1SwapLocationsFile << p_time->GetTime() << "\t";
+    std::vector< c_vector<double, DIM> > t1_swap_locations = mrMesh.GetLocationsOfT1Swaps();
+	*mpT1SwapLocationsFile << t1_swap_locations.size() << "\t";
+    for (unsigned index = 0;  index < t1_swap_locations.size(); index++)
+    {
+		for (unsigned i=0; i<DIM; i++)
+		{
+			*mpT1SwapLocationsFile << t1_swap_locations[index][i] << "\t";
+		}
+    }
+    *mpT1SwapLocationsFile << "\n";
+    mrMesh.ClearLocationsOfT1Swaps();
+
+
 //    // Write Locations of T3Swaps to file
 //    *mpT3SwapLocationsFile << p_time->GetTime() << "\t";
 //    std::vector< c_vector<double, DIM> > t3_swap_locations = mrMesh.GetLocationsOfT3Swaps();
@@ -596,7 +596,7 @@ void VertexBasedTissue<DIM>::CreateOutputFiles(const std::string& rDirectory, bo
 
     OutputFileHandler output_file_handler(rDirectory, cleanOutputDirectory);
     mpVizElementsFile = output_file_handler.OpenOutputFile("results.vizelements");
-//    mpT1SwapLocationsFile = output_file_handler.OpenOutputFile("T1SwapLocations.dat");
+    mpT1SwapLocationsFile = output_file_handler.OpenOutputFile("T1SwapLocations.dat");
 //    mpT3SwapLocationsFile = output_file_handler.OpenOutputFile("T3SwapLocations.dat");
     mDirPath = rDirectory;
 #ifdef CHASTE_VTK
@@ -613,7 +613,7 @@ void VertexBasedTissue<DIM>::CloseOutputFiles()
 {
     AbstractTissue<DIM>::CloseOutputFiles();
     mpVizElementsFile->close();
-//    mpT1SwapLocationsFile->close();
+    mpT1SwapLocationsFile->close();
 //    mpT3SwapLocationsFile->close();
 #ifdef CHASTE_VTK
     *mpVtkMetaFile << "    </Collection>\n";
