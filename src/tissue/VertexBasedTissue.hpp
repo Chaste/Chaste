@@ -28,6 +28,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #ifndef VERTEXBASEDTISSUE_HPP_
 #define VERTEXBASEDTISSUE_HPP_
 
+
 #include "AbstractTissue.hpp"
 #include "MutableVertexMesh.hpp"
 #include "ArchiveLocationInfo.hpp"

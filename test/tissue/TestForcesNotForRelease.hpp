@@ -814,29 +814,24 @@ public:
 		TS_ASSERT(cells[3]->GetMutationState()->IsType<WildTypeCellMutationState>());
 
 		// 2 Wildtypes
-		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(7), p_mesh->GetNode(9), tissue), 0u);
-		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(9), p_mesh->GetNode(7), tissue), 0u);
-		TS_ASSERT_DELTA(force.GetAdhesionParameter(p_mesh->GetNode(7), p_mesh->GetNode(9), 0u), 1.0, 1e-4);
+		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(7), p_mesh->GetNode(9), tissue), WILD_WILD);
+		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(9), p_mesh->GetNode(7), tissue), WILD_WILD);
 
 		// Wildtype and Labelled
-		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(6), p_mesh->GetNode(9), tissue), 2u);
-		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(9), p_mesh->GetNode(6), tissue), 2u);
-		TS_ASSERT_DELTA(force.GetAdhesionParameter(p_mesh->GetNode(6), p_mesh->GetNode(9), 2u), 1.5, 1e-4);
+		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(6), p_mesh->GetNode(9), tissue), WILD_LABELLED);
+		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(9), p_mesh->GetNode(6), tissue), WILD_LABELLED);
 
 		// 2 Labelled
-		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(6), p_mesh->GetNode(8), tissue), 1u);
-		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(8), p_mesh->GetNode(6), tissue), 1u);
-		TS_ASSERT_DELTA(force.GetAdhesionParameter(p_mesh->GetNode(6), p_mesh->GetNode(8), 1u), 2.0, 1e-4);
+		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(6), p_mesh->GetNode(8), tissue), LABELLED_LABELLED);
+		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(8), p_mesh->GetNode(6), tissue), LABELLED_LABELLED);
 
 		// Labelled Void
-		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(0), p_mesh->GetNode(3), tissue), 99u);
-		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(3), p_mesh->GetNode(0), tissue), 99u);
-		TS_ASSERT_DELTA(force.GetAdhesionParameter(p_mesh->GetNode(0), p_mesh->GetNode(3), 99u), 1.0, 1e-4);
+		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(0), p_mesh->GetNode(3), tissue), OTHER);
+		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(3), p_mesh->GetNode(0), tissue), OTHER);
 
 		// Wildtype Void
-		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(10), p_mesh->GetNode(13), tissue), 99u);
-		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(13), p_mesh->GetNode(10), tissue), 99u);
-		TS_ASSERT_DELTA(force.GetAdhesionParameter(p_mesh->GetNode(10), p_mesh->GetNode(13),99u), 1.0, 1e-4);
+		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(10), p_mesh->GetNode(13), tissue), OTHER);
+		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(13), p_mesh->GetNode(10), tissue), OTHER);
 
 
 		// Initialise a vector of new node forces
