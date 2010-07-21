@@ -38,6 +38,19 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 
 /**
+ * The possible paired contact types types of TissueCells.
+ */
+typedef enum CellContactsType
+{
+    WILD_WILD,
+    LABELLED_LABELLED,
+    WILD_LABELLED,
+    OTHER
+} CellContactsType;
+
+static const unsigned NUM_CELL_CONTACTS_TYPES=4;
+
+/**
  * A force class for use in vertex-based tissue simulations, based on a mechanical
  * model proposed by T. Nagai and H. Honda ("A dynamic cell model for the formation
  * of epithelial tissues", Philosophical Magazine Part B 81:699-719).
@@ -76,6 +89,14 @@ public:
     ~NagaiHondaForce();
 
     /**
+     * Get the using differential adhesion parameter that is 'true' if differential adhesion
+     * is to be used and 'false otherwise.
+     *
+     * @return the using differential adhesion parameter.
+     */
+    bool GetUsingDifferentialAdhesion(void);
+
+    /**
      * Overridden AddForceContribution() method.
      *
      * Calculates the force on each node in the vertex-based tissue based on the
@@ -106,16 +127,14 @@ public:
      *
      * @param pNodeA one node
      * @param pNodeB the other node
-     * @param combinationCellType is 0 if the associated 2 cells with a shared edge are wildtype;
-     * 1 if these cells are both labelled; 2 if one is wildtype and the other is labelled
+     * @param combinationCellType
      *
      * @return the adhesion parameter for this edge.
      */
-    double GetAdhesionParameter(Node<DIM>* pNodeA, Node<DIM>* pNodeB, unsigned combinationCellType);
+    double GetAdhesionParameterDifferentialAddition(Node<DIM>* pNodeA, Node<DIM>* pNodeB, CellContactsType combinationCellType);
 
     /**
-     * Get the combinationCellType is 0 if the associated 2 cells with a shared edge are wildtype;
-     * 1 if these cells are both labelled; 2 if one is wildtype and the other is labelled
+     * Get the combinationCellType
      *
      * @param pNodeA one node
      * @param pNodeB the other node
@@ -123,7 +142,7 @@ public:
      *
      * @return the combinationCellType for this edge.
      */
-    unsigned GetCombinationCellTypes(Node<DIM>* pNodeA, Node<DIM>* pNodeB, AbstractTissue<DIM>& rTissue);
+    CellContactsType GetCombinationCellTypes(Node<DIM>* pNodeA, Node<DIM>* pNodeB, AbstractTissue<DIM>& rTissue);
 };
 
 
