@@ -27,7 +27,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 */
 #include "NagaiHondaForce.hpp"
 
-
 template<unsigned DIM>
 NagaiHondaForce<DIM>::NagaiHondaForce(bool usingDifferentialAdhesion)
    : AbstractForce<DIM>(),
@@ -39,6 +38,13 @@ NagaiHondaForce<DIM>::NagaiHondaForce(bool usingDifferentialAdhesion)
 template<unsigned DIM>
 NagaiHondaForce<DIM>::~NagaiHondaForce()
 {
+}
+
+
+template<unsigned DIM>
+bool NagaiHondaForce<DIM>::GetUsingDifferentialAdhesion(void)
+{
+	return mUsingDifferentialAdhesion;
 }
 
 
@@ -131,21 +137,25 @@ void NagaiHondaForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM
 
 
             // Compute the adhesion parameter for each of these edges
-            double previous_edge_adhesion_parameter = GetAdhesionParameter(p_previous_node, p_current_node);
-            double next_edge_adhesion_parameter = GetAdhesionParameter(p_current_node, p_next_node);
+            double previous_edge_adhesion_parameter;
+            double next_edge_adhesion_parameter;
 
-			// if using differneital adhesion then adjust adhesion parameters.
+			// if using differential adhesion then adjust adhesion parameters.
             if (mUsingDifferentialAdhesion)
             {
-				// Determine combinationCellTypes (0: both cells sharing edge are wild types, 1: both cells sharing edge are labelled,
-				// 2: one of the cells sharing the edge is wild type and the other is labelled, 99: otherwise)
-				unsigned combinationCellTypesPreviousEdge = GetCombinationCellTypes(p_previous_node, p_current_node, rTissue);
-				unsigned combinationCellTypesNextEdge = GetCombinationCellTypes(p_current_node, p_next_node, rTissue);
+				// Determine combinationCellTypes
+            	CellContactsType combinationCellTypesPreviousEdge = GetCombinationCellTypes(p_previous_node, p_current_node, rTissue);
+            	CellContactsType combinationCellTypesNextEdge = GetCombinationCellTypes(p_current_node, p_next_node, rTissue);
 
 				// Compute the adhesion parameter for each of these edges
-				previous_edge_adhesion_parameter = GetAdhesionParameter(p_previous_node, p_current_node, combinationCellTypesPreviousEdge);
-				next_edge_adhesion_parameter = GetAdhesionParameter(p_current_node, p_next_node, combinationCellTypesNextEdge);
+				previous_edge_adhesion_parameter = GetAdhesionParameterDifferentialAddition(p_previous_node, p_current_node, combinationCellTypesPreviousEdge);
+				next_edge_adhesion_parameter = GetAdhesionParameterDifferentialAddition(p_current_node, p_next_node, combinationCellTypesNextEdge);
             }
+            else
+            {
+                previous_edge_adhesion_parameter = GetAdhesionParameter(p_previous_node, p_current_node);
+                next_edge_adhesion_parameter = GetAdhesionParameter(p_current_node, p_next_node);
+           }
 
             // Compute the gradient of the edge of the cell ending in this node
             c_vector<double, DIM> previous_edge_gradient = p_tissue->rGetMesh().GetPreviousEdgeGradientOfElementAtNode(p_element, local_index);
@@ -191,17 +201,21 @@ double NagaiHondaForce<DIM>::GetAdhesionParameter(Node<DIM>* pNodeA, Node<DIM>* 
     // If the edge corresponds to a single element, then the cell is on the boundary
     if (shared_elements.size() == 1)
     {
-        adhesion_parameter = TissueConfig::Instance()->GetNagaiHondaCellBoundaryAdhesionEnergyParameter();
+// \todo Get rid of mNagaiHondaCellBoundaryAdhesionEnergyParameter in TissueConfig
+    	//        adhesion_parameter = TissueConfig::Instance()->GetNagaiHondaCellBoundaryAdhesionEnergyParameter();
+    	adhesion_parameter = 1.0; // This is 0.01 the Nagai & Honda paper
     }
     else
     {
-        adhesion_parameter = TissueConfig::Instance()->GetNagaiHondaCellCellAdhesionEnergyParameter();
+    	// \todo Get rid of mNagaiHondaCellCellAdhesionEnergyParameter in TissueConfig
+//        adhesion_parameter = TissueConfig::Instance()->GetNagaiHondaCellCellAdhesionEnergyParameter();
+    	adhesion_parameter = 1.0; // This is 0.01 the Nagai & Honda paper
     }
     return adhesion_parameter;
 }
 
 template<unsigned DIM>
-double NagaiHondaForce<DIM>::GetAdhesionParameter(Node<DIM>* pNodeA, Node<DIM>* pNodeB, unsigned combinationCellType)
+double NagaiHondaForce<DIM>::GetAdhesionParameterDifferentialAddition(Node<DIM>* pNodeA, Node<DIM>* pNodeB, CellContactsType combinationCellType)
 {
        double adhesion_parameter;
 
@@ -221,23 +235,23 @@ double NagaiHondaForce<DIM>::GetAdhesionParameter(Node<DIM>* pNodeA, Node<DIM>* 
         assert(!shared_elements.empty());
 
         // If the edge corresponds to a single element, then the cell is on the boundary
-        if (shared_elements.size() == 1) ///\todo This appears to be combinationCellType 99 and should probably be different for each mutation.
+        if (shared_elements.size() == 1) ///\todo This appears to be combinationCellType OTHER and should probably be different for each mutation.
         {
-            adhesion_parameter = TissueConfig::Instance()->GetNagaiHondaCellBoundaryAdhesionEnergyParameter();
+            adhesion_parameter = 1.0;
         }
         else
         {
-            if (combinationCellType == 0) // if both cells are Wildtype (Mutation State)
+            if (combinationCellType == WILD_WILD) // if both cells are Wildtype (Mutation State)
             {
-                adhesion_parameter = TissueConfig::Instance()->GetNagaiHondaCellCellAdhesionEnergyParameter(); // Value of 1.0 in TissueConfig, but 0.01 the Nagai & Honda paper
+                adhesion_parameter = 0.01;
             }
-            else if (combinationCellType == 1) // if both cells are Labelled (Mutation State)
+            else if (combinationCellType == LABELLED_LABELLED) // if both cells are Labelled (Mutation State)
             {
-                adhesion_parameter = 2.0;
+                adhesion_parameter = 0.01;
             }
-            else if (combinationCellType == 2) // if one cell is Labelled and the other WildType (Mutation State)
+            else if (combinationCellType == WILD_LABELLED) // if one cell is Labelled and the other WildType (Mutation State)
             {
-                adhesion_parameter = 1.5;
+                adhesion_parameter = 1.0;
             }
             else //
             {
@@ -250,10 +264,10 @@ double NagaiHondaForce<DIM>::GetAdhesionParameter(Node<DIM>* pNodeA, Node<DIM>* 
 }
 
 template<unsigned DIM>
-unsigned NagaiHondaForce<DIM>::GetCombinationCellTypes(Node<DIM>* pNodeA, Node<DIM>* pNodeB,
+CellContactsType NagaiHondaForce<DIM>::GetCombinationCellTypes(Node<DIM>* pNodeA, Node<DIM>* pNodeB,
         AbstractTissue<DIM>& rTissue)
 {
-       unsigned combinationCellType = 99;
+		CellContactsType combinationCellType = OTHER;
 
         // Find the indices of the elements owned by each node
         std::set<unsigned> elements_containing_nodeA = pNodeA->rGetContainingElementIndices();
@@ -289,22 +303,22 @@ unsigned NagaiHondaForce<DIM>::GetCombinationCellTypes(Node<DIM>* pNodeA, Node<D
             {
                 if (p_cell2->GetMutationState()->IsType<LabelledCellMutationState>())
                 {
-                    combinationCellType = 1;
+                    combinationCellType = LABELLED_LABELLED;
                 }
                 else if (p_cell2->GetMutationState()->IsType<WildTypeCellMutationState>())
                 {
-                    combinationCellType = 2;
+                    combinationCellType = WILD_LABELLED;
                 }
             }
             else if (p_cell1->GetMutationState()->IsType<WildTypeCellMutationState>())
             {
                 if (p_cell2->GetMutationState()->IsType<WildTypeCellMutationState>())
                 {
-                    combinationCellType = 0;
+                    combinationCellType = WILD_WILD;
                 }
                 else if (p_cell2->GetMutationState()->IsType<LabelledCellMutationState>())
                 {
-                    combinationCellType = 2;
+                    combinationCellType = WILD_LABELLED;
                 }
             }
         }
