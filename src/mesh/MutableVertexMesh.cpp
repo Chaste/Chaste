@@ -870,7 +870,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
             recheck_mesh = false;
 
             // Check that no nodes have overlapped elements
-            /// \todo Only need to check this next bit if the element/node is on the boundary (see #1263)
             for (typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator elem_iter = this->GetElementIteratorBegin();
                  elem_iter != this->GetElementIteratorEnd();
                  ++elem_iter)
@@ -901,7 +900,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
                                  other_iter != this->GetElementIteratorEnd();
                                  ++other_iter)
                             {
-                                if (other_iter != elem_iter)
+                                if ( (other_iter->IsElementOnBoundary()) && (other_iter != elem_iter) )
                                 {
                                     if (ElementIncludesPoint(p_current_node->rGetLocation(), other_iter->GetIndex()))
                                     {
