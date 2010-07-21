@@ -1861,6 +1861,12 @@ public:
         // Call method to update mesh in this situation
         mesh.ReMesh();
 
+        // Save the mesh data using mesh writers
+				std::string dirname = "TempyTempy";
+                std::string mesh_filename = "vertex_remesh_T3";
+                VertexMeshWriter<2,2> mesh_writer(dirname, mesh_filename, false);
+                mesh_writer.WriteFilesUsingMesh(mesh);
+
         // Check that node 6 has been moved onto the edge a new node has been created and both added to elements 0 amd 1
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 5u);
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 16u);

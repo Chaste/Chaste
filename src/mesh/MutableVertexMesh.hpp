@@ -103,6 +103,16 @@ protected:
                            bool placeOriginalElementBelow=false);
 
     /**
+     * Helper method for ReMesh to check if elements have intersected and to correct them if required
+     *
+     * \todo This method currently assumes SPACE_DIM = 2 (see #866)
+     *
+     * @return whether to recheck the mesh again
+     */
+    bool CheckForIntersections();
+
+
+    /**
      * Helper method for ReMesh to Identify the type of swap
      *
      * \todo This method currently assumes SPACE_DIM = 2 (see #866)

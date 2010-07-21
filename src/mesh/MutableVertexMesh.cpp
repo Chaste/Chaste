@@ -861,60 +861,13 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
 
         // areas and perimeters of elements are sorted in PerformT1Swap() method
 
-
-        // Restart check after each T3Swap as elements are changed
-        // \todo don't need to do this at present as # of elements currently stays the same but will need this when tracking voids
+        //Check mesh for intersections, and perform T3Swaps where required
         recheck_mesh = true;
         while (recheck_mesh == true)
         {
-            recheck_mesh = false;
-
-            // Check that no nodes have overlapped elements
-            for (typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator elem_iter = this->GetElementIteratorBegin();
-                 elem_iter != this->GetElementIteratorEnd();
-                 ++elem_iter)
-            {
-                unsigned num_nodes = elem_iter->GetNumNodes();
-
-                if (!recheck_mesh)
-                {
-                    // Loop over element vertices
-                    for (unsigned local_index=0; local_index<num_nodes; local_index++)
-                    {
-                        /*
-                         *\todo use method extraction to make this more readable i.e. make the central
-                         * brake a return in a separate method containing all the nested loops/statements.
-                         */
-                        if (recheck_mesh)
-                        {
-                            break; //to break out of element vertices loop as vertices may have been deleted so num_nodes could have changed.
-                        }
-
-                        Node<SPACE_DIM>* p_current_node = elem_iter->GetNode(local_index);
-
-                        assert(!(p_current_node->IsDeleted()));
-
-                        if (p_current_node->IsBoundaryNode())
-                        {
-                            for (typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator other_iter = this->GetElementIteratorBegin();
-                                 other_iter != this->GetElementIteratorEnd();
-                                 ++other_iter)
-                            {
-                                if ( (other_iter->IsElementOnBoundary()) && (other_iter != elem_iter) )
-                                {
-                                    if (ElementIncludesPoint(p_current_node->rGetLocation(), other_iter->GetIndex()))
-                                    {
-                                        PerformT3Swap(p_current_node, other_iter->GetIndex());
-                                        recheck_mesh = true;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+        	recheck_mesh = CheckForIntersections();
         }
+
         RemoveDeletedNodes(); // to remove any nodes if they are deleted
 
     }
@@ -928,6 +881,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
 }
 
 
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh()
 {
@@ -935,6 +889,45 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh()
     ReMesh(map);
 }
 
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForIntersections()
+{
+
+	// Check that no boundary nodes have overlapped elements on the boundary
+	for (typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator node_iter = this->GetNodeIteratorBegin();
+		 node_iter != this->GetNodeIteratorEnd();
+		 ++node_iter)
+	{
+		if(node_iter->IsBoundaryNode())
+		{
+			assert(!(node_iter->IsDeleted()));
+
+			for (typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator elem_iter = this->GetElementIteratorBegin();
+				 elem_iter != this->GetElementIteratorEnd();
+				 ++elem_iter)
+			{
+				if (elem_iter->IsElementOnBoundary())
+				{
+
+					unsigned elem_index = elem_iter->GetIndex();
+
+					// Check that the node is not part of this element.
+					if (node_iter->rGetContainingElementIndices().count(elem_index) == 0)
+					{
+						if (ElementIncludesPoint(node_iter->rGetLocation(), elem_index))
+						{
+							PerformT3Swap(&(*node_iter), elem_index);
+							return true;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return false;
+}
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB, VertexElementMap& rElementMap)
