@@ -749,123 +749,34 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
 
     if (SPACE_DIM==2)
     {
-        // Remove deleted nodes and elements
-        RemoveDeletedNodesAndElements(rElementMap);
-
         /*
          * We do not need to call Clear() and remove all current data, since
          * cell birth, rearrangement and death result only in local remeshing
          * of a vertex-based mesh.
          */
 
-        // Restart check after each T1/T2Swap as elements are changed
+    	// Remove deleted nodes and elements
+        RemoveDeletedNodesAndElements(rElementMap);
+
+        // Check for element rearrangements
         bool recheck_mesh = true;
         while (recheck_mesh == true)
         {
-            recheck_mesh = false;
-
-            // Loop over elements to check for T2Swaps
             // Separate loops as need to check for T2Swaps first
-           for (typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator elem_iter = this->GetElementIteratorBegin();
-                 elem_iter != this->GetElementIteratorEnd();
-                 ++elem_iter)
-            {
-                if (!recheck_mesh)
-                {
-                    if (elem_iter->GetNumNodes() == 3u)
-                    {
-                        /*
-                         * Perform T2 swaps where necessary
-                         * Check there are only 3 nodes and the element is small enough
-                         */
-                        if (GetVolumeOfElement(elem_iter->GetIndex()) < GetT2Threshold())
-                        {
-                            PerformT2Swap(*elem_iter);
-                            // Now remove the deleted nodes (if we don't do this then the search for T1Swap causes errors)
+        	recheck_mesh = CheckForT2Swaps(rElementMap);
 
-                            RemoveDeletedNodesAndElements(rElementMap);
-                            recheck_mesh = true;
-                            break;
-                        }
-                    }
-                }
-            }
-            // Loop over elements to check for T1Swaps
-            for (typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator elem_iter = this->GetElementIteratorBegin();
-                 elem_iter != this->GetElementIteratorEnd();
-                 ++elem_iter)
-            {
-                if (!recheck_mesh)
-                {
-                    unsigned num_nodes = elem_iter->GetNumNodes();
-                    assert(num_nodes > 0); // if not element should be deleted
-
-                    unsigned new_num_nodes = num_nodes;
-
-                    /*
-                     *  Perform T1 swaps and divide edges where necessary
-                     *  Check there are > 3 nodes in both elements that contain the pair of nodes
-                     *  and the edges are small enough
-                     */
-
-                    // Loop over element vertices
-                    for (unsigned local_index=0; local_index<num_nodes; local_index++)
-                    {
-                        // Find locations of current node and anticlockwise node
-                        Node<SPACE_DIM>* p_current_node = elem_iter->GetNode(local_index);
-                        unsigned local_index_plus_one = (local_index+1)%new_num_nodes; /// \todo use iterators to tidy this up
-                        Node<SPACE_DIM>* p_anticlockwise_node = elem_iter->GetNode(local_index_plus_one);
-
-                        // Find distance between nodes
-                        double distance_between_nodes = this->GetDistanceBetweenNodes(p_current_node->GetIndex(), p_anticlockwise_node->GetIndex());
-
-                        std::set<unsigned> elements_of_node_a = p_current_node->rGetContainingElementIndices();
-                        std::set<unsigned> elements_of_node_b = p_anticlockwise_node->rGetContainingElementIndices();
-
-                        std::set<unsigned> all_elements;
-                        std::set_union(elements_of_node_a.begin(), elements_of_node_a.end(),
-                                       elements_of_node_b.begin(), elements_of_node_b.end(),
-                                       std::inserter(all_elements, all_elements.begin()));
-
-                        // Track if either node is in a triangular element.
-                        bool triangular_element = false;
-
-                        for (std::set<unsigned>::const_iterator it = all_elements.begin();
-                             it != all_elements.end();
-                             ++it)
-                        {
-                            ///\todo this magic number needs to be investigated
-                            if (this->GetElement(*it)->GetNumNodes() <= 3)//&&(this->GetVolumeOfElement(*it) < 2.0*GetT2Threshold()))
-                            {
-                                triangular_element = true;
-                            }
-                        }
-
-                        // If the nodes are too close together and we don't have any triangular elements connected to the nodes, perform a swap
-                        if ((!triangular_element) && (distance_between_nodes < mCellRearrangementThreshold))
-                        {
-                            // Identify the type of node swap/merge needed then call method to perform swap/merge
-                            IdentifySwapType(p_current_node, p_anticlockwise_node, rElementMap);
-                            recheck_mesh = true;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    break;
-                }
-            }
+			if (recheck_mesh == false)
+			{
+				recheck_mesh = CheckForT1Swaps(rElementMap);
+			}
         }
-        // ... end of element rearrangement code
 
-        // areas and perimeters of elements are sorted in PerformT1Swap() method
-
-        //Check mesh for intersections, and perform T3Swaps where required
+        //Check for element intersections.
         recheck_mesh = true;
-        while (recheck_mesh == true)
-        {
-        	recheck_mesh = CheckForIntersections();
+		while (recheck_mesh == true)
+		{
+			//Check mesh for intersections, and perform T3Swaps where required
+			recheck_mesh = CheckForIntersections();
         }
 
         RemoveDeletedNodes(); // to remove any nodes if they are deleted
@@ -887,6 +798,100 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh()
 {
     VertexElementMap map(GetNumElements());
     ReMesh(map);
+}
+
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForT1Swaps(VertexElementMap& rElementMap)
+{
+
+	// Loop over elements to check for T1Swaps
+	for (typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator elem_iter = this->GetElementIteratorBegin();
+		 elem_iter != this->GetElementIteratorEnd();
+		 ++elem_iter)
+	{
+		unsigned num_nodes = elem_iter->GetNumNodes();
+		assert(num_nodes > 0); // if not element should be deleted
+
+		unsigned new_num_nodes = num_nodes;
+
+		/*
+		 *  Perform T1 swaps and merges where necessary
+		 *  Check there are > 3 nodes in both elements that contain the pair of nodes
+		 *  and the edges are small enough
+		 */
+
+		// Loop over element vertices
+		for (unsigned local_index=0; local_index<num_nodes; local_index++)
+		{
+			// Find locations of current node and anticlockwise node
+			Node<SPACE_DIM>* p_current_node = elem_iter->GetNode(local_index);
+			unsigned local_index_plus_one = (local_index+1)%new_num_nodes; /// \todo use iterators to tidy this up
+			Node<SPACE_DIM>* p_anticlockwise_node = elem_iter->GetNode(local_index_plus_one);
+
+			// Find distance between nodes
+			double distance_between_nodes = this->GetDistanceBetweenNodes(p_current_node->GetIndex(), p_anticlockwise_node->GetIndex());
+
+			std::set<unsigned> elements_of_node_a = p_current_node->rGetContainingElementIndices();
+			std::set<unsigned> elements_of_node_b = p_anticlockwise_node->rGetContainingElementIndices();
+
+			std::set<unsigned> all_elements;
+			std::set_union(elements_of_node_a.begin(), elements_of_node_a.end(),
+						   elements_of_node_b.begin(), elements_of_node_b.end(),
+						   std::inserter(all_elements, all_elements.begin()));
+
+			// Track if either node is in a triangular element.
+			bool triangular_element = false;
+
+			for (std::set<unsigned>::const_iterator it = all_elements.begin();
+				 it != all_elements.end();
+				 ++it)
+			{
+				if (this->GetElement(*it)->GetNumNodes() <= 3)
+				{
+					triangular_element = true;
+				}
+			}
+
+			// If the nodes are too close together and we don't have any triangular elements connected to the nodes, perform a swap
+			if ((!triangular_element) && (distance_between_nodes < mCellRearrangementThreshold))
+			{
+				// Identify the type of node swap/merge needed then call method to perform swap/merge
+				IdentifySwapType(p_current_node, p_anticlockwise_node, rElementMap);
+				return true;
+			}
+		}
+	}
+    return false;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForT2Swaps(VertexElementMap& rElementMap)
+{
+
+    // Loop over elements to check for T2Swaps
+    for (typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator elem_iter = this->GetElementIteratorBegin();
+         elem_iter != this->GetElementIteratorEnd();
+         ++elem_iter)
+    {
+		if (elem_iter->GetNumNodes() == 3u)
+		{
+			/*
+			* Perform T2 swaps where necessary
+			* Check there are only 3 nodes and the element is small enough
+			*/
+			if (GetVolumeOfElement(elem_iter->GetIndex()) < GetT2Threshold())
+			{
+				PerformT2Swap(*elem_iter);
+
+				// Now remove the deleted nodes (if we don't do this then the search for T1Swap causes errors)
+				RemoveDeletedNodesAndElements(rElementMap);
+
+				return true;
+			}
+		}
+	}
+    return false;
 }
 
 

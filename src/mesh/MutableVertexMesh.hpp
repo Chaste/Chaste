@@ -103,6 +103,33 @@ protected:
                            bool placeOriginalElementBelow=false);
 
     /**
+     * Helper method for ReMesh to check if any neighbouring nodes in an element are within the mCellRearangementThreshold
+     * and perform any T1Swaps if required
+     *
+     * \todo This method currently assumes SPACE_DIM = 2 (see #866)
+     *
+     * @param rElementMap a VertexElementMap which associates the indices of VertexElements in the old mesh
+     *                   with indices of VertexElements in the new mesh.  This should be created
+     *                   with the correct size, GetNumElements()
+     * @return whether to recheck the mesh again
+     */
+    bool CheckForT1Swaps(VertexElementMap& rElementMap);
+
+    /**
+     * Helper method for ReMesh to check if any elements are smaller than the mT2Threshold
+     * and perform any T2Swaps, removing elements, if required
+     *
+     * \todo This method currently assumes SPACE_DIM = 2 (see #866)
+     *
+     * @param rElementMap a VertexElementMap which associates the indices of VertexElements in the old mesh
+     *                   with indices of VertexElements in the new mesh.  This should be created
+     *                   with the correct size, GetNumElements()
+     *
+     * @return whether to recheck the mesh again
+     */
+    bool CheckForT2Swaps(VertexElementMap& rElementMap);
+
+    /**
      * Helper method for ReMesh to check if elements have intersected and to correct them if required
      *
      * \todo This method currently assumes SPACE_DIM = 2 (see #866)
@@ -113,7 +140,7 @@ protected:
 
 
     /**
-     * Helper method for ReMesh to Identify the type of swap
+     * Helper method for ReMesh to Identify the type of swap when nodes are too close, T2Swap or NodeMerge.
      *
      * \todo This method currently assumes SPACE_DIM = 2 (see #866)
      *
