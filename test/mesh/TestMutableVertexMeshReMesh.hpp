@@ -40,110 +40,181 @@ class TestMutableVertexMeshReMesh : public CxxTest::TestSuite
 {
 public:
 
-    /*
-     * This tests both PerformNodeMerge and IdentifySwapType.
-     */
-    void TestPerformNodeMerge() throw(Exception)
-    {
-        // Create seven nodes
-        std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, false, -0.1, -0.1));
-        nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
-        nodes.push_back(new Node<2>(2, false, 1.0, 1.0));
-        nodes.push_back(new Node<2>(3, false, 0.0, 1.0));
-        nodes.push_back(new Node<2>(4, false, -1.0, 1.0));
-        nodes.push_back(new Node<2>(5, false, -1.0, 0.0));
-        nodes.push_back(new Node<2>(6, false, 0.1, -0.1));
-        nodes.push_back(new Node<2>(7, false, 0.0, 0.1));
+	/*
+	 * This tests both PerformNodeMerge and IdentifySwapType
+	 *
+	 *   ------
+	 *  |     /|
+	 *  |    / |
+	 *  |   x  |
+	 *  |  x   |
+	 *  | /    |
+	 *  |/     |
+	 *   --xx--
+	 *
+	 *  The nodes marked with an x are merged
+	 *
+	 */
+	void TestPerformNodeMerge() throw(Exception)
+	{
+		// Create nodes
+		std::vector<Node<2>*> nodes;
+		nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+		nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+		nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
+		nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
+		nodes.push_back(new Node<2>(4, true, 0.4, 0.0));
+		nodes.push_back(new Node<2>(5, true, 0.6, 0.0));
+		nodes.push_back(new Node<2>(6, false, 0.4, 0.4));
+		nodes.push_back(new Node<2>(7, false, 0.6, 0.6));
 
-        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2;
+		// Create two elements containing nodes
+		std::vector<Node<2>*> nodes_elem_0;
+		nodes_elem_0.push_back(nodes[0]);
+		nodes_elem_0.push_back(nodes[4]);
+		nodes_elem_0.push_back(nodes[5]);
+		nodes_elem_0.push_back(nodes[1]);
+		nodes_elem_0.push_back(nodes[2]);
+		nodes_elem_0.push_back(nodes[7]);
+		nodes_elem_0.push_back(nodes[6]);
 
-        // Create three elements containing these nodes
-        nodes_elem_0.push_back(nodes[1]);
-        nodes_elem_0.push_back(nodes[2]);
-        nodes_elem_0.push_back(nodes[3]);
-        nodes_elem_0.push_back(nodes[7]);
+		std::vector<Node<2>*> nodes_elem_1;
+		nodes_elem_1.push_back(nodes[0]);
+		nodes_elem_1.push_back(nodes[6]);
+		nodes_elem_1.push_back(nodes[7]);
+		nodes_elem_1.push_back(nodes[2]);
+		nodes_elem_1.push_back(nodes[3]);
 
-        nodes_elem_1.push_back(nodes[0]);
-        nodes_elem_1.push_back(nodes[6]);
-        nodes_elem_1.push_back(nodes[1]);
-        nodes_elem_1.push_back(nodes[7]);
-        nodes_elem_1.push_back(nodes[3]);
-        nodes_elem_1.push_back(nodes[4]);
+		std::vector<VertexElement<2,2>*> vertex_elements;
+		vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
+		vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
 
-        nodes_elem_2.push_back(nodes[0]);
-        nodes_elem_2.push_back(nodes[4]);
-        nodes_elem_2.push_back(nodes[5]);
+		// Make a vertex mesh
+		MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
+		// Test mesh has the correct numbers of elements and nodes
+		TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
+		TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 8u);
 
-        // Make a vertex mesh
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+		// Test the correct nodes are boundary nodes
+		TS_ASSERT_EQUALS(vertex_mesh.GetNode(0)->IsBoundaryNode(), true);
+		TS_ASSERT_EQUALS(vertex_mesh.GetNode(1)->IsBoundaryNode(), true);
+		TS_ASSERT_EQUALS(vertex_mesh.GetNode(2)->IsBoundaryNode(), true);
+		TS_ASSERT_EQUALS(vertex_mesh.GetNode(3)->IsBoundaryNode(), true);
+		TS_ASSERT_EQUALS(vertex_mesh.GetNode(4)->IsBoundaryNode(), true);
+		TS_ASSERT_EQUALS(vertex_mesh.GetNode(5)->IsBoundaryNode(), true);
+		TS_ASSERT_EQUALS(vertex_mesh.GetNode(6)->IsBoundaryNode(), false);
+		TS_ASSERT_EQUALS(vertex_mesh.GetNode(7)->IsBoundaryNode(), false);
 
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 3u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 8u);
+		// Merge nodes 6 and 7
+		VertexElementMap map(vertex_mesh.GetNumElements());
+		vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(6), vertex_mesh.GetNode(7), map);
 
-        // Merge nodes 0 and 6 (node 0 is in elements 1 and 2, node 6 is in element 1)
-        VertexElementMap map(vertex_mesh.GetNumElements());
-        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(0), vertex_mesh.GetNode(6), map);
+		// Test that the mesh is correctly updated
+		TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
+		TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 7u);
 
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 3u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 7u);
+		// Test the correct nodes are boundary nodes
+		TS_ASSERT_EQUALS(vertex_mesh.GetNode(0)->IsBoundaryNode(), true);
+		TS_ASSERT_EQUALS(vertex_mesh.GetNode(1)->IsBoundaryNode(), true);
+		TS_ASSERT_EQUALS(vertex_mesh.GetNode(2)->IsBoundaryNode(), true);
+		TS_ASSERT_EQUALS(vertex_mesh.GetNode(3)->IsBoundaryNode(), true);
+		TS_ASSERT_EQUALS(vertex_mesh.GetNode(4)->IsBoundaryNode(), true);
+		TS_ASSERT_EQUALS(vertex_mesh.GetNode(5)->IsBoundaryNode(), true);
+		TS_ASSERT_EQUALS(vertex_mesh.GetNode(6)->IsBoundaryNode(), false);
 
-        // Test nodes are in the correct place
-        TS_ASSERT_DELTA(vertex_mesh.GetNode(0)->rGetLocation()[0], 0.0, 1e-8);
-        TS_ASSERT_DELTA(vertex_mesh.GetNode(0)->rGetLocation()[1], -0.1, 1e-8);
+		// Test merged node is in the correct place
+		TS_ASSERT_DELTA(vertex_mesh.GetNode(6)->rGetLocation()[0], 0.5, 1e-3);
+		TS_ASSERT_DELTA(vertex_mesh.GetNode(6)->rGetLocation()[1], 0.5, 1e-3);
 
-        // Test elements have correct nodes
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(0)->GetIndex(), 1u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(1)->GetIndex(), 2u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(2)->GetIndex(), 3u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(3)->GetIndex(), 6u);
+		// Test elements have correct nodes
+		TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 6u);
+		TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(0)->GetIndex(), 0u);
+		TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(1)->GetIndex(), 4u);
+		TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(2)->GetIndex(), 5u);
+		TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(3)->GetIndex(), 1u);
+		TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(4)->GetIndex(), 2u);
+		TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(5)->GetIndex(), 6u);
 
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 5u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(0)->GetIndex(), 0u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(1)->GetIndex(), 1u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(2)->GetIndex(), 6u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(3)->GetIndex(), 3u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(4)->GetIndex(), 4u);
+		TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 4u);
+		TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(0)->GetIndex(), 0u);
+		TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(1)->GetIndex(), 6u);
+		TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(2)->GetIndex(), 2u);
+		TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(3)->GetIndex(), 3u);
 
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 3u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(0)->GetIndex(), 0u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(1)->GetIndex(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(2)->GetIndex(), 5u);
+		// Now merge nodes 4 and 5
+		vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5), map);
 
-        // Test areas and perimeters of elements
-        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 0.95, 1e-6);
-        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 2.9+sqrt(1.01), 1e-6);
+		// Test that the mesh is correctly updated
+		TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
+		TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
 
-        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(1), 0.65,1e-6);
-        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(1), 1.9+sqrt(2.21)+2.0*sqrt(1.01), 1e-6);
+		// Test the correct nodes are boundary nodes
+		TS_ASSERT_EQUALS(vertex_mesh.GetNode(0)->IsBoundaryNode(), true);
+		TS_ASSERT_EQUALS(vertex_mesh.GetNode(1)->IsBoundaryNode(), true);
+		TS_ASSERT_EQUALS(vertex_mesh.GetNode(2)->IsBoundaryNode(), true);
+		TS_ASSERT_EQUALS(vertex_mesh.GetNode(3)->IsBoundaryNode(), true);
+		TS_ASSERT_EQUALS(vertex_mesh.GetNode(4)->IsBoundaryNode(), true);
+		TS_ASSERT_EQUALS(vertex_mesh.GetNode(5)->IsBoundaryNode(), false);
 
-        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(2), 0.5,1e-6);
-        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(2), 1.0+sqrt(2.21)+sqrt(1.01), 1e-6);
-    }
+		// Test that the mesh is correctly updated
+		TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
+		TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
+
+		// Test merged node is in the correct place
+		TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.5, 1e-3);
+		TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[1], 0.0, 1e-3);
+
+		// Test elements have correct nodes
+		TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 5u);
+		TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(0)->GetIndex(), 0u);
+		TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(1)->GetIndex(), 4u);
+		TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(2)->GetIndex(), 1u);
+		TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(3)->GetIndex(), 2u);
+		TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(4)->GetIndex(), 5u);
+
+		TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 4u);
+		TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(0)->GetIndex(), 0u);
+		TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(1)->GetIndex(), 5u);
+		TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(2)->GetIndex(), 2u);
+		TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(3)->GetIndex(), 3u);
+
+		// Test Areas and Perimeters of elements
+		TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 0.5, 1e-6);
+		TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 2+sqrt(2), 1e-6);
+
+		TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(1), 0.5,1e-6);
+		TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(1), 2.0+sqrt(2), 1e-6);
+	}
 
     /*
      * This test provides coverage of the case in which, when the elements
      * previously containing the high-index node are updated to contain the
      * low-index node, at least one of these elements did not already contain
      * the low-index node.
+     *
+     *   -------x-x-----
+     *  |       |       |
+     *  |       |       |
+     *  |       |       |
+     *   ------- -------
+     *
+     *  The nodes marked with an x are merged
+     *
+     * \TODO this could be merged with the earlier test to shorten the test file.
+     *
      */
     void TestPerformNodeMergeWhenLowIndexNodeMustBeAddedToElement() throw(Exception)
     {
         // Create nodes
         std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
-        nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
-        nodes.push_back(new Node<2>(2, false, 2.0, 0.0));
-        nodes.push_back(new Node<2>(3, false, 2.0, 1.0));
-        nodes.push_back(new Node<2>(4, false, 1.01, 1.0));
-        nodes.push_back(new Node<2>(5, false, 1.0, 1.0));
-        nodes.push_back(new Node<2>(6, false, 0.0, 2.0));
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, true, 2.0, 0.0));
+        nodes.push_back(new Node<2>(3, true, 2.0, 1.0));
+        nodes.push_back(new Node<2>(4, true, 1.01, 1.0));
+        nodes.push_back(new Node<2>(5, true, 1.0, 1.0));
+        nodes.push_back(new Node<2>(6, true, 0.0, 2.0));
 
         // Create two elements containing nodes
         std::vector<Node<2>*> nodes_elem_0;
@@ -192,154 +263,41 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(1)->GetIndex(), 2u);
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(2)->GetIndex(), 3u);
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(3)->GetIndex(), 4u);
+
+        // Test boundary property of nodes
+        for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), true);
+        }
+
     }
 
-    // This tests both PerformNodeMerge and IdentifySwapType
-    void TestPerformNodeMergeOnEdge() throw(Exception)
-    {
-        // Create nodes
-        std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
-        nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
-        nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
-        nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
-        nodes.push_back(new Node<2>(4, true, 0.4, 0.0));
-        nodes.push_back(new Node<2>(5, true, 0.6, 0.0));
-        nodes.push_back(new Node<2>(6, false, 0.4, 0.4));
-        nodes.push_back(new Node<2>(7, false, 0.6, 0.6));
-
-        // Create two elements containing nodes
-        std::vector<Node<2>*> nodes_elem_0;
-        nodes_elem_0.push_back(nodes[0]);
-        nodes_elem_0.push_back(nodes[4]);
-        nodes_elem_0.push_back(nodes[5]);
-        nodes_elem_0.push_back(nodes[1]);
-        nodes_elem_0.push_back(nodes[2]);
-        nodes_elem_0.push_back(nodes[7]);
-        nodes_elem_0.push_back(nodes[6]);
-
-        std::vector<Node<2>*> nodes_elem_1;
-        nodes_elem_1.push_back(nodes[0]);
-        nodes_elem_1.push_back(nodes[6]);
-        nodes_elem_1.push_back(nodes[7]);
-        nodes_elem_1.push_back(nodes[2]);
-        nodes_elem_1.push_back(nodes[3]);
-
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
-
-        // Make a vertex mesh
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
-
-        // Test mesh has the correct numbers of elements and nodes
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 8u);
-
-        // Test the correct nodes are boundary nodes
-        TS_ASSERT_EQUALS(vertex_mesh.GetNode(0)->IsBoundaryNode(), true);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNode(1)->IsBoundaryNode(), true);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNode(2)->IsBoundaryNode(), true);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNode(3)->IsBoundaryNode(), true);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNode(4)->IsBoundaryNode(), true);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNode(5)->IsBoundaryNode(), true);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNode(6)->IsBoundaryNode(), false);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNode(7)->IsBoundaryNode(), false);
-
-        // Merge nodes 6 and 7
-        VertexElementMap map(vertex_mesh.GetNumElements());
-        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(6), vertex_mesh.GetNode(7), map);
-
-        // Test that the mesh is correctly updated
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 7u);
-
-        // Test the correct nodes are boundary nodes
-        TS_ASSERT_EQUALS(vertex_mesh.GetNode(0)->IsBoundaryNode(), true);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNode(1)->IsBoundaryNode(), true);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNode(2)->IsBoundaryNode(), true);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNode(3)->IsBoundaryNode(), true);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNode(4)->IsBoundaryNode(), true);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNode(5)->IsBoundaryNode(), true);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNode(6)->IsBoundaryNode(), false);
-
-        // Test merged node is in the correct place
-        TS_ASSERT_DELTA(vertex_mesh.GetNode(6)->rGetLocation()[0], 0.5, 1e-3);
-        TS_ASSERT_DELTA(vertex_mesh.GetNode(6)->rGetLocation()[1], 0.5, 1e-3);
-
-        // Test elements have correct nodes
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 6u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(0)->GetIndex(), 0u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(1)->GetIndex(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(2)->GetIndex(), 5u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(3)->GetIndex(), 1u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(4)->GetIndex(), 2u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(5)->GetIndex(), 6u);
-
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(0)->GetIndex(), 0u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(1)->GetIndex(), 6u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(2)->GetIndex(), 2u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(3)->GetIndex(), 3u);
-
-        // Now merge nodes 4 and 5
-        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5), map);
-
-        // Test that the mesh is correctly updated
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
-
-        // Test the correct nodes are boundary nodes
-        TS_ASSERT_EQUALS(vertex_mesh.GetNode(0)->IsBoundaryNode(), true);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNode(1)->IsBoundaryNode(), true);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNode(2)->IsBoundaryNode(), true);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNode(3)->IsBoundaryNode(), true);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNode(4)->IsBoundaryNode(), true);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNode(5)->IsBoundaryNode(), false);
-
-        // Test that the mesh is correctly updated
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
-
-        // Test merged node is in the correct place
-        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.5, 1e-3);
-        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[1], 0.0, 1e-3);
-
-        // Test elements have correct nodes
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 5u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(0)->GetIndex(), 0u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(1)->GetIndex(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(2)->GetIndex(), 1u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(3)->GetIndex(), 2u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(4)->GetIndex(), 5u);
-
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(0)->GetIndex(), 0u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(1)->GetIndex(), 5u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(2)->GetIndex(), 2u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(3)->GetIndex(), 3u);
-
-        // Test Areas and Perimeters of elements
-        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 0.5, 1e-6);
-        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 2+sqrt(2), 1e-6);
-
-        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(1), 0.5,1e-6);
-        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(1), 2.0+sqrt(2), 1e-6);
-    }
-
+    /*
+     *             ______
+     *            /      |
+     *           /       |
+     *          /        |
+     *   ----x-x---------|
+     *  |       \        |
+     *  |        \       |
+     *  |_________\______|
+     *
+     *  The nodes marked with an x are merged \TODO I think this should be a T1Swap see #1263
+     *
+     */
     void TestAnotherPerformNodeMerge() throw(Exception)
     {
-        // Create nodes
+        // Create nodes all boundary nodes
         std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
-        nodes.push_back(new Node<2>(1, false, 2.0, 0.0));
-        nodes.push_back(new Node<2>(2, false, 3.0, 0.0));
-        nodes.push_back(new Node<2>(3, false, 3.0, 1.0));
-        nodes.push_back(new Node<2>(4, false, 3.0, 2.0));
-        nodes.push_back(new Node<2>(5, false, 2.0, 2.0));
-        nodes.push_back(new Node<2>(6, false, 1.0, 1.0));
-        nodes.push_back(new Node<2>(7, false, 0.99, 1.0));
-        nodes.push_back(new Node<2>(8, false, 0.0, 1.0));
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 2.0, 0.0));
+        nodes.push_back(new Node<2>(2, true, 3.0, 0.0));
+        nodes.push_back(new Node<2>(3, true, 3.0, 1.0));
+        nodes.push_back(new Node<2>(4, true, 3.0, 2.0));
+        nodes.push_back(new Node<2>(5, true, 2.0, 2.0));
+        nodes.push_back(new Node<2>(6, true, 1.0, 1.0));
+        nodes.push_back(new Node<2>(7, true, 0.99, 1.0));
+        nodes.push_back(new Node<2>(8, true, 0.0, 1.0));
 
         // Create three elements containing nodes
         std::vector<Node<2>*> nodes_elem_0;
@@ -403,17 +361,34 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(1)->GetIndex(), 4u);
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(2)->GetIndex(), 5u);
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(3)->GetIndex(), 6u);
+
+        // Test boundary property of nodes
+        for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), true);
+        }
     }
 
     // This tests both PerformT1Swap and IdentifySwapType
     void TestPerformT1Swap() throw(Exception)
     {
-        // Make 6 nodes to assign to four elements
+
+        /* Make 6 nodes to assign to 4 elements.
+         *
+         *  _____
+         * |\   /|
+         * | \ / |
+         * |  |  |
+         * | / \ |
+         * |/___\|
+         *
+         */
+
         std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
-        nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
-        nodes.push_back(new Node<2>(2, false, 1.0, 1.0));
-        nodes.push_back(new Node<2>(3, false, 0.0, 1.0));
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
+        nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
         nodes.push_back(new Node<2>(4, false, 0.5, 0.4));
         nodes.push_back(new Node<2>(5, false, 0.5, 0.6));
 
@@ -645,7 +620,7 @@ public:
     // This tests both PerformT1Swap and IdentifySwapType
     void TestPerformT1SwapOnBoundary2() throw(Exception)
     {
-        /* Make 6 nodes to assign to 3 elements with 3 boundary nodes
+        /* Make 6 nodes to assign to 3 elements with one non boundary nodes
          *
          * |\   /|
          * | \ / |
@@ -656,8 +631,8 @@ public:
          */
 
         std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
-        nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
         nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
         nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
         nodes.push_back(new Node<2>(4, false, 0.5, 0.4));
@@ -745,14 +720,93 @@ public:
         // Test boundary property of nodes
         for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
         {
-            bool expected_boundary_node = true;
-            if ( i==0 || i==1 )
-            {
-                expected_boundary_node = false;
-            }
-            TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
+            TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), true);
         }
     }
+
+    // This tests both PerformT1Swap and IdentifySwapType And will need node merges to be changed to T1Swaps in IdentifySwapType
+//	void TestPerformT1SwapOnBoundary3() throw(Exception)
+//	{
+//		/* Make 7 nodes to assign to 2 elements with 3 boundary nodes
+//		 *
+//		 * |\   /|
+//		 * | \ / |
+//		 * |  |  |
+//		 * |  x  |
+//		 * |__|__|
+//		 *
+//		 */
+//
+//		std::vector<Node<2>*> nodes;
+//		nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+//		nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+//		nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
+//		nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
+//		nodes.push_back(new Node<2>(4, false, 0.5, 0.4));
+//		nodes.push_back(new Node<2>(5, true, 0.5, 0.6));
+//		nodes.push_back(new Node<2>(6, true, 0.5, 0.0));
+//
+//		// Make two elements out of these nodes
+//		std::vector<Node<2>*> nodes_elem_0;
+//		nodes_elem_0.push_back(nodes[1]);
+//		nodes_elem_0.push_back(nodes[2]);
+//		nodes_elem_0.push_back(nodes[5]);
+//		nodes_elem_0.push_back(nodes[4]);
+//		nodes_elem_0.push_back(nodes[6]);
+//
+//		std::vector<Node<2>*> nodes_elem_1;
+//		nodes_elem_1.push_back(nodes[0]);
+//		nodes_elem_1.push_back(nodes[6]);
+//		nodes_elem_1.push_back(nodes[4]);
+//		nodes_elem_1.push_back(nodes[5]);
+//		nodes_elem_1.push_back(nodes[3]);
+//
+//		std::vector<VertexElement<2,2>*> vertex_elements;
+//		vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
+//		vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
+//
+//		// Make a vertex mesh
+//		MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+//		vertex_mesh.SetCellRearrangementThreshold(0.1*2.0/1.5);// Threshold distance set to ease calculations.
+//
+//		TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
+//		TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 7u);
+//
+//		// Perform a T1 swap on nodes 5 and 4. Note: this way round to ensure coverage of boundary node tracking.
+//		VertexElementMap map(vertex_mesh.GetNumElements());
+//		vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4), map);
+//
+//		TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
+//		TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
+//
+//		// Test moved nodes are in the correct place
+//		TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.6, 1e-8);
+//		TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[1], 0.5, 1e-8);
+//
+//		TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.4, 1e-3);
+//		TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.5, 1e-3);
+//
+//		// Test elements have correct nodes
+//		TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
+//		TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(0)->GetIndex(), 1u);
+//		TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(1)->GetIndex(), 2u);
+//		TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(2)->GetIndex(), 4u);
+//		TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(3)->GetIndex(), 6u);
+//
+//		TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 5u);
+//		TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(0)->GetIndex(), 0u);
+//		TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(1)->GetIndex(), 6u);
+//		TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(2)->GetIndex(), 4u);
+//		TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(3)->GetIndex(), 5u);
+//		//TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(4)->GetIndex(), 3u);
+//
+//		// Test boundary property of nodes
+//		for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
+//		{
+//			TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), true);
+//		}
+//	}
+
 
     // This tests both PerformT1Swap and IdentifySwapType
     void TestPerformT1SwapToSeparate() throw(Exception)
@@ -1386,7 +1440,7 @@ public:
     }
 
     /**
-     * This tests the ReMesh method for preforming T2Swaps (element removal).
+     * This tests the ReMesh method for performing T2Swaps (element removal).
      */
     void TestRemeshForT2Swap() throw(Exception)
     {
@@ -1550,7 +1604,21 @@ public:
      *
      * In this test we read in a vertex mesh that contains several pairs of nodes that
      * are close enough to be merged.
-     */
+	 *
+	 *  -------xx-------
+	 *  \              /|
+	 *   \            / |
+	 *    \          /  |
+	 *     xx--xx--xx   x
+	 *    /          \  |
+	 *   /            \ |
+	 *  /              \|
+	 *  ---------------xx
+	 *
+	 *
+	 * Note: this also tests that boundary nodes are updated accordingly
+	 */
+
     void TestRemeshForMerge() throw(Exception)
     {
         // This also tests IdentifySwapType
@@ -1613,6 +1681,21 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(3)->GetIndex(), 4u);
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(4)->GetIndex(), 7u);
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(5)->GetIndex(), 5u);
+
+        // Test boundary property of nodes. All are boundary nodes except node 6.
+        for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
+        {
+            bool expected_boundary_node = true;
+            if ( i==5 || i==7 )
+            {
+                expected_boundary_node = false;
+            }
+            TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
+        }
+
+        //Test Warnings
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"There is a boundary node contained in three elements something has gone wrong.");
+        Warnings::QuietDestroy();
     }
 
     void TestReMeshExceptions() throw(Exception)

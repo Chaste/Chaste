@@ -31,6 +31,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "UblasCustomFunctions.hpp"
 #include "Warnings.hpp"
 #include "LogFile.hpp"
+#include "Debug.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::MutableVertexMesh(std::vector<Node<SPACE_DIM>*> nodes,
@@ -982,6 +983,11 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                  *
                  * We merge the nodes.
                  */
+
+            	// Check nodes A and B are on the boundary
+            	assert(pNodeA->IsBoundaryNode());
+            	assert(pNodeB->IsBoundaryNode());
+
                 PerformNodeMerge(pNodeA, pNodeB);
 
                 // Remove the deleted node and re-index
@@ -1003,10 +1009,37 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                          *    / \ Node B
                          *   /   \
                          *
-                         * We perform a Type 1 swap and seperate the elements in this case.
+                         * With voids on top and bottom
+                         *
+                         * We perform a Type 1 swap and separate the elements in this case.
                          */
                          PerformT1Swap(pNodeA, pNodeB,all_indices);
                     }
+                    else if (pNodeA->IsBoundaryNode() || pNodeB->IsBoundaryNode())
+					{
+						/*
+						 * In this case, the node configuration looks like:
+						 *
+						 *   \   /
+						 *    \ / Node A
+						 * (1) |   (2)      (element number in brackets)
+						 *     x Node B
+						 *     |
+						 *
+						 * With a void on top
+						 *
+						 * We perform a Type 1 swap on the elements in this case.
+						 *
+						 */
+
+                    	//\TODO this should be a T1 Swap see #1263 then we could merge with the above if as both are T1 swaps if there is at least one boundary node
+                        PerformNodeMerge(pNodeA, pNodeB);
+
+                        // Remove the deleted node and re-index
+                        RemoveDeletedNodes();
+
+                        //PerformT1Swap(pNodeA, pNodeB,all_indices);
+					}
                     else
                     {
                         /*
@@ -1034,12 +1067,15 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                      *   --o--o (2)
                      *     (1) \
                      *
-                     * We merge the nodes in this case.
+                     * We merge the nodes in this case. //\TODO this should be a T1 Swap see #1263
                      */
-                     PerformNodeMerge(pNodeA, pNodeB);
 
-                     // Remove the deleted node and re-index
-                     RemoveDeletedNodes();
+
+
+                    PerformNodeMerge(pNodeA, pNodeB);
+
+                    // Remove the deleted node and re-index
+                    RemoveDeletedNodes();
                 }
                 break;
             }
@@ -1059,14 +1095,22 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                      *  (1)    \ (2)
                      *          \
                      *
-                     * We perform a node merge in this case.
+                     * We perform a node merge in this case. Note should not be able to get here when running normal vertex code.
                      */
+
+                	// Check nodes A and B are on the boundary
+                	assert(pNodeA->IsBoundaryNode());
+                	assert(pNodeB->IsBoundaryNode());
+
+                	//\TODO this should possibly be an exception as the code shouldn't ever reach this point in a Vertex Simulation, #1263.
+
+                	WARNING("There is a boundary node contained in three elements something has gone wrong.");
+
                     PerformNodeMerge(pNodeA, pNodeB);
 
                     // Remove the deleted node and re-index
                     RemoveDeletedNodes();
                 }
-                ///\todo use the fact that both nodes are boundary nodes here (#1263)
                 else if (nodeA_elem_indices.size()==2 && nodeB_elem_indices.size()==2)
                 {
                     // element in nodeA_elem_indices which is not in nodeB_elem_indices contains a shared node with the element in nodeA_elem_indices which is not in nodeB_elem_indices.
@@ -1106,14 +1150,20 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                          * In this case, the node configuration looks like:
                          *
                          *     A  B                  A  B
-                         *      /\                 \      /
-                         *     /v \                 \(1) /
-                         * (3) o--o (1)  or      (2) o--o (3)    (element number in brackets, v is a void)
-                         *    / (2)\                 \v /
-                         *   /      \                 \/
+                         *      /\                 \        /
+                         *     /v \                 \  (1) /
+                         * (3)o----o (1)  or     (2) o----o (3)    (element number in brackets, v is a void)
+                         *   /  (2) \                 \v /
+                         *  /        \                 \/
                          *
                          * We perform a T3 way merge, removing the void.
                          */
+
+                    	// Check nodes A and B are on the boundary
+                    	assert(pNodeA->IsBoundaryNode());
+                    	assert(pNodeB->IsBoundaryNode());
+
+
                         unsigned nodeC_index;
                         if (next_node_1 == previous_node_2 && next_node_2 != previous_node_1)
                         {
@@ -1131,7 +1181,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
 
                         Node<SPACE_DIM>* p_nodeC = this->mNodes[nodeC_index];
 
-                        ///\todo this should be a helper method "PerformVoidRemoval(pNodeA, pNodeB, p_nodeC)";
+                        ///\todo this should be a helper method "PerformVoidRemoval(pNodeA, pNodeB, p_nodeC)"; see #1263.
 
                         unsigned nodeA_index = pNodeA->GetIndex();
                         unsigned nodeB_index = pNodeB->GetIndex();
@@ -1166,8 +1216,13 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                          *    / (2)\                /    \
                          *   /      \              /empty \
                          *
-                         * We perform a Type 1 swap in this case.
+                         * We perform a T1 Swap in this case.
                          */
+
+                    	// Check nodes A and B are on the boundary
+                    	assert(pNodeA->IsBoundaryNode());
+                    	assert(pNodeB->IsBoundaryNode());
+
                         PerformT1Swap(pNodeA, pNodeB, all_indices);
                     }
                 }
@@ -1180,94 +1235,48 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                     assert (   (nodeA_elem_indices.size()==2 && nodeB_elem_indices.size()==3)
                             || (nodeA_elem_indices.size()==3 && nodeB_elem_indices.size()==2) );
 
-                    /*
-                     * Let node alpha be the node contained in two elements and node beta
-                     * the node contained in three elements.
-                     */
-                    Node<SPACE_DIM>* p_node_alpha = (nodeA_elem_indices.size()==2) ? pNodeA : pNodeB;
-                    Node<SPACE_DIM>* p_node_beta = (nodeA_elem_indices.size()==2) ? pNodeB : pNodeA;
-
-                    // Get the set of elements containing node alpha and assert there are two such elements
-                    std::set<unsigned> node_alpha_elem_indices = p_node_alpha->rGetContainingElementIndices();
-                    assert(node_alpha_elem_indices.size() == 2u);
-
-                    // Get a pointer to the first of these elements and assert it contains node alpha
-                    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = this->mElements[*node_alpha_elem_indices.begin()];
-
-                    unsigned node_alpha_local_index = p_element->GetNodeLocalIndex(p_node_alpha->GetIndex());
-                    assert(node_alpha_local_index < UINT_MAX);
 
                     /*
-                     * Get the local indices of the nodes neighbouring node alpha in this element.
-                     * We add an extra temp in the second call to the % operator term to ensure we
-                     * are operating on a positive number (otherwise the % operator may break).
+                     * They can't both be boundary nodes
                      */
-                    unsigned temp = p_element->GetNumNodes();
-                    unsigned node_alpha_local_index_before = (node_alpha_local_index+1)%temp;
-                    unsigned node_alpha_local_index_after = (node_alpha_local_index+temp-1)%temp;
+                	assert(!(pNodeA->IsBoundaryNode() && pNodeB->IsBoundaryNode()));
 
-                    // Get pointers to these nodes and assert one of them is p_node_beta
-                    Node<SPACE_DIM>* p_node1 = p_element->GetNode(node_alpha_local_index_before);
-                    Node<SPACE_DIM>* p_node2 = p_element->GetNode(node_alpha_local_index_after);
-                    assert(p_node1 == p_node_beta || p_node2 == p_node_beta);
 
-                    // Get whichever of the nodes is NOT p_node_beta, call it node gamma
-                    Node<SPACE_DIM>* p_node_gamma = (p_node1 == p_node_beta) ? p_node2 : p_node1;
+					if (pNodeA->IsBoundaryNode() || pNodeB->IsBoundaryNode())
+					{
+						/*
+						 * In this case, the node configuration looks like:
+						 *
+						 *     A  B                      A  B
+						 *   \      /                  \      /
+						 *    \ (1)/                    \(1) /
+						 * (3) o--o (empty)  or  (empty) o--o (3)    (element number in brackets)
+						 *    / (2)\                    /(2) \
+						 *   /      \                  /      \
+						 *
+						 * We perform a Type 1 swap in this case.
+						 */
+						PerformT1Swap(pNodeA, pNodeB, all_indices);
+					}
+					else
+					{
+						/*
+						 * In this case, the node configuration looks like:
+						 *
+						 *     A  B             A  B
+						 *   \                       /
+						 *    \  (1)           (1)  /
+						 * (3) o--o---   or  ---o--o (3)    (element number in brackets)
+						 *    /  (2)           (2)  \
+						 *   /                       \
+						 *
+						 * We perform a node merge in this case. //\TODO this should be a T1 Swap see #1263 allowing us to merge with the above.
+						 */
+						PerformNodeMerge(pNodeA, pNodeB);
 
-                    // Get the set of elements containing nodes beta and gamma
-                    std::set<unsigned> node_beta_elem_indices = p_node_beta->rGetContainingElementIndices();
-                    std::set<unsigned> node_gamma_elem_indices = p_node_gamma->rGetContainingElementIndices();
-
-                    // Form the set intersection
-                    std::set<unsigned> intersection_indices, temp_set2;
-                    std::set_intersection(node_beta_elem_indices.begin(), node_beta_elem_indices.end(),
-                                   node_gamma_elem_indices.begin(), node_gamma_elem_indices.end(),
-                                   std::inserter(temp_set2, temp_set2.begin()));
-                    intersection_indices.swap(temp_set2); // temp_set2 will be deleted
-
-                    // The number of intersecting indices must be 1 or 2
-                    switch (intersection_indices.size())
-                    {
-                        case 1:
-                        {
-                            /*
-                             * In this case, the node configuration looks like:
-                             *
-                             *     A  B                      A  B
-                             *   \      /                  \      /
-                             *    \ (1)/                    \(1) /
-                             * (3) o--o (empty)  or  (empty) o--o (3)    (element number in brackets)
-                             *    / (2)\                    /(2) \
-                             *   /      \                  /      \
-                             *
-                             * We perform a Type 1 swap in this case.
-                             */
-                            PerformT1Swap(pNodeA, pNodeB, all_indices);
-                            break;
-                        }
-                        case 2:
-                        {
-                            /*
-                             * In this case, the node configuration looks like:
-                             *
-                             *     A  B             A  B
-                             *   \                       /
-                             *    \  (1)           (1)  /
-                             * (3) o--o---   or  ---o--o (3)    (element number in brackets)
-                             *    /  (2)           (2)  \
-                             *   /                       \
-                             *
-                             * We perform a node merge in this case.
-                             */
-                            PerformNodeMerge(pNodeA, pNodeB);
-
-                            // Remove the deleted node and re-index
-                            RemoveDeletedNodes();
-                            break;
-                        }
-                        default:
-                            NEVER_REACHED;
-                    }
+						// Remove the deleted node and re-index
+						RemoveDeletedNodes();
+					}
                 }
                 break;
             }
