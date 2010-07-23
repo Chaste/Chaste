@@ -82,8 +82,11 @@ double VertexBasedTissue<DIM>::GetDampingConstant(unsigned nodeIndex)
          iter != containing_elements.end();
          ++iter)
     {
-        boost::shared_ptr<AbstractCellMutationState> p_state = this->GetCellUsingLocationIndex(*iter)->GetMutationState();
-        if (p_state->IsType<WildTypeCellMutationState>())
+        TissueCellPtr p_cell = this->GetCellUsingLocationIndex(*iter);
+        bool cell_is_wild_type = p_cell->GetMutationState()->IsType<WildTypeCellMutationState>();
+        bool cell_is_labelled = p_cell->rGetCellPropertyCollection().HasProperty<CellLabel>();
+
+        if (cell_is_wild_type && !cell_is_labelled)
         {
             average_damping_constant += TissueConfig::Instance()->GetDampingConstantNormal()*temp;
         }

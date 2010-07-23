@@ -245,7 +245,7 @@ TissueCellPtr LatticeBasedTissue<DIM>::AddCell(TissueCellPtr pNewCell, const c_v
 
             // Move each cell between the parent cell and the chosen free nth degree neighbour
             std::vector<unsigned> indices(degree);
-            for(unsigned i=0; i<degree; i++)
+            for (unsigned i=0; i<degree; i++)
             {
                 indices[i] = parent_index + (i+1)*direction_index;
             }

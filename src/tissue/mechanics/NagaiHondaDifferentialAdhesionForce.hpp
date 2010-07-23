@@ -96,13 +96,13 @@ public:
     /**
      * Get the adhesion parameter for the edge between two given nodes.
      *
-     * \todo We now are only testing 2 mutation states.  This method could be extended
-     * to handle any number of mutation states.  One possibility is to have a method to set
-     * a dictionary, where given a pair of cell types, the dictionary returns
-     * a corresponding adhesion parameter value.
+     * \todo We now are only testing 2 mutation states. This method could be extended
+     * to handle any number of mutation states. One possibility is to have a method to set
+     * a dictionary, where given a pair of cell types, the dictionary returns a corresponding
+     * adhesion parameter value.
      *
      * \todo omit combinationCellType parameter and have method GetAdhesionParameterDifferentialAddition
-     * call combinationCellType to get combinationCellType.  Thus, make GetCombinationCellTypes private.
+     * call combinationCellType to get combinationCellType. Thus, make GetCombinationCellTypes private.
      *
      * @param pNodeA one node
      * @param pNodeB the other node
@@ -115,7 +115,7 @@ public:
     /**
      * Get the combinationCellType
      *
-     * \todo Make GetCombinationCellTypes private.  See todo comment with GetAdhesionParameterDifferentialAddition.
+     * \todo Make GetCombinationCellTypes private. See todo comment with GetAdhesionParameterDifferentialAddition.
      *
      * @param pNodeA one node
      * @param pNodeB the other node

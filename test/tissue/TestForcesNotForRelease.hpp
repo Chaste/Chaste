@@ -49,8 +49,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "WntConcentration.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "ApcTwoHitCellMutationState.hpp"
-#include "LabelledCellMutationState.hpp"
 #include "WildTypeCellMutationState.hpp"
+#include "CellLabel.hpp"
 
 class TestForcesNotForRelease : public AbstractCellBasedTestSuite
 {
@@ -69,13 +69,19 @@ public:
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         std::vector<TissueCellPtr> cells;
-        boost::shared_ptr<AbstractCellMutationState> p_state(new LabelledCellMutationState);
+        
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+
+        boost::shared_ptr<AbstractCellProperty> p_label(new CellLabel);
+        CellPropertyCollection collection;
+        collection.AddProperty(p_label);
+        
         for (unsigned i=0; i<location_indices.size(); i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(STEM);
 
-            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            TissueCellPtr p_cell(new TissueCell(p_state, p_model, false, collection));
             p_cell->SetBirthTime(-10);
 
             cells.push_back(p_cell);
@@ -772,32 +778,25 @@ public:
 
 		// Set up cells.
 		std::vector<TissueCellPtr> cells;
-		boost::shared_ptr<AbstractCellMutationState> p_state1(new WildTypeCellMutationState);
-		boost::shared_ptr<AbstractCellMutationState> p_state2(new LabelledCellMutationState);
+		boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+		boost::shared_ptr<AbstractCellProperty> p_label(new CellLabel);
 
 		for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
 		{
 			FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
 			p_model->SetCellProliferativeType(TRANSIT);
 
+            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            double birth_time = -2.0;
+            p_cell->SetBirthTime(birth_time);
+
 			if (elem_index == 0 || elem_index == 2) // cells chosen for coverage
 			{
-				TissueCellPtr p_cell1(new TissueCell(p_state2, p_model));
-				double birth_time = -2.0;
-				p_cell1->SetBirthTime(birth_time);
-				TS_ASSERT_EQUALS(p_cell1->GetMutationState()->IsType<LabelledCellMutationState>(), true);
-				cells.push_back(p_cell1);
+                p_cell->AddCellProperty(p_label);
 			}
-			else
-			{
-				TissueCellPtr p_cell(new TissueCell(p_state1, p_model));
-				double birth_time = -2.0;
-				p_cell->SetBirthTime(birth_time);
-				p_cell->SetMutationState(p_state1);
-				TS_ASSERT_EQUALS(p_cell->GetMutationState()->IsType<WildTypeCellMutationState>(), true);
-				cells.push_back(p_cell);
-			}
+            cells.push_back(p_cell);
 		}
+
 		// Create tissue
 		VertexBasedTissue<2> tissue(*p_mesh, cells);
 
@@ -806,36 +805,38 @@ public:
 		std::vector<AbstractForce<2>* > force_collection;
 		force_collection.push_back(&force);
 
-		// check mutation state
-		TS_ASSERT(cells[0]->GetMutationState()->IsType<LabelledCellMutationState>());
-		TS_ASSERT(cells[1]->GetMutationState()->IsType<WildTypeCellMutationState>());
-		TS_ASSERT(cells[2]->GetMutationState()->IsType<LabelledCellMutationState>());
-		TS_ASSERT(cells[3]->GetMutationState()->IsType<WildTypeCellMutationState>());
-		TS_ASSERT(cells[3]->GetMutationState()->IsType<WildTypeCellMutationState>());
+		// Check mutation state
+		for (unsigned i=0; i<3; i++)
+		{
+		    TS_ASSERT_EQUALS(cells[i]->GetMutationState()->IsType<WildTypeCellMutationState>(), true);
+		    if (i==0 || i==2)
+		    {
+		        TS_ASSERT_EQUALS(cells[i]->rGetCellPropertyCollection().HasProperty<CellLabel>(), true);
+		    }
+		}
 
-		// 2 Wildtypes
+		// There are two combinations of type WILD_WILD 
 		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(7), p_mesh->GetNode(9), tissue), WILD_WILD);
 		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(9), p_mesh->GetNode(7), tissue), WILD_WILD);
 		TS_ASSERT_DELTA(force.GetAdhesionParameterDifferentialAddition(p_mesh->GetNode(9), p_mesh->GetNode(7), WILD_WILD), 0.01, 1e-4);
 
-		// Wildtype and Labelled
+		// There are two combinations of type WILD_LABELLED 
 		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(6), p_mesh->GetNode(9), tissue), WILD_LABELLED);
 		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(9), p_mesh->GetNode(6), tissue), WILD_LABELLED);
 		TS_ASSERT_DELTA(force.GetAdhesionParameterDifferentialAddition(p_mesh->GetNode(9), p_mesh->GetNode(6), WILD_LABELLED), 1.0, 1e-4);
 
-		// 2 Labelled
+        // There are two combinations of type LABELLED_LABELLED 
 		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(6), p_mesh->GetNode(8), tissue), LABELLED_LABELLED);
 		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(8), p_mesh->GetNode(6), tissue), LABELLED_LABELLED);
 		TS_ASSERT_DELTA(force.GetAdhesionParameterDifferentialAddition(p_mesh->GetNode(9), p_mesh->GetNode(7), LABELLED_LABELLED), 0.01, 1e-4);
 
-		// Labelled Void
+        // There is one combination of type OTHER (labelled/void)
 		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(0), p_mesh->GetNode(3), tissue), OTHER);
 		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(3), p_mesh->GetNode(0), tissue), OTHER);
 
-		// Wildtype Void
+        // There is one combination of type OTHER (wild type/void)
 		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(10), p_mesh->GetNode(13), tissue), OTHER);
 		TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(13), p_mesh->GetNode(10), tissue), OTHER);
-
 
 		// Initialise a vector of new node forces
 		std::vector<c_vector<double, 2> > node_forces;
@@ -848,7 +849,7 @@ public:
 
 		force.AddForceContribution(node_forces, tissue);
 
-		// Check some example forces These will change if you modify the adhesion parameters.
+		// Check some example forces (these will change if you modify the adhesion parameters)
         TS_ASSERT_DELTA(node_forces[0][0], 0.0, 1e-4);
         TS_ASSERT_DELTA(node_forces[0][1], -14.0135, 1e-4);
 

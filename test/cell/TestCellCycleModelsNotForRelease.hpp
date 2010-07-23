@@ -44,7 +44,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "ApcOneHitCellMutationState.hpp"
 #include "ApcTwoHitCellMutationState.hpp"
 #include "BetaCateninOneHitCellMutationState.hpp"
-#include "LabelledCellMutationState.hpp"
+#include "CellLabel.hpp"
 
 /**
  * This class contains tests for methods on cell
@@ -94,7 +94,7 @@ public:
 
         TS_ASSERT_EQUALS(p_cell2->GetCellCycleModel()->GetCellProliferativeType(), TRANSIT);
 
-        StochasticDivisionRuleCellCycleModel* p_cycle_model2 = static_cast <StochasticDivisionRuleCellCycleModel*> (p_cell2->GetCellCycleModel());
+        StochasticDivisionRuleCellCycleModel* p_cycle_model2 = static_cast<StochasticDivisionRuleCellCycleModel*> (p_cell2->GetCellCycleModel());
         TS_ASSERT_EQUALS(p_cycle_model2->GetGeneration(), 1u);
 
         /**
@@ -129,7 +129,7 @@ public:
         TS_ASSERT_EQUALS(p_cell1->GetCellCycleModel()->GetCellProliferativeType(), STEM);
         TS_ASSERT_EQUALS(p_cycle_model1->GetGeneration(), 0u);
 
-        StochasticDivisionRuleCellCycleModel* p_cycle_model4 = static_cast <StochasticDivisionRuleCellCycleModel*> (p_cell4->GetCellCycleModel());
+        StochasticDivisionRuleCellCycleModel* p_cycle_model4 = static_cast<StochasticDivisionRuleCellCycleModel*> (p_cell4->GetCellCycleModel());
         TS_ASSERT_EQUALS(p_cycle_model4->DividedSymmetrically(), true);
         TS_ASSERT_EQUALS(p_cell4->GetCellCycleModel()->GetCellProliferativeType(), STEM);
         TS_ASSERT_EQUALS(p_cycle_model4->GetGeneration(), 0u);
@@ -146,7 +146,7 @@ public:
         TS_ASSERT_EQUALS(p_cell3->GetCellCycleModel()->GetCellProliferativeType(), TRANSIT);
         TS_ASSERT_EQUALS(p_cycle_model3->GetGeneration(), 1u);
 
-        StochasticDivisionRuleCellCycleModel* p_cycle_model5 = static_cast <StochasticDivisionRuleCellCycleModel*> (p_cell5->GetCellCycleModel());
+        StochasticDivisionRuleCellCycleModel* p_cycle_model5 = static_cast<StochasticDivisionRuleCellCycleModel*> (p_cell5->GetCellCycleModel());
         TS_ASSERT_EQUALS(p_cycle_model5->DividedSymmetrically(), true);
         TS_ASSERT_EQUALS(p_cell5->GetCellCycleModel()->GetCellProliferativeType(), TRANSIT);
         TS_ASSERT_EQUALS(p_cycle_model5->GetGeneration(), 1u);
@@ -159,7 +159,7 @@ public:
         TS_ASSERT_EQUALS(p_cell2->GetCellCycleModel()->GetCellProliferativeType(), DIFFERENTIATED);
         TS_ASSERT_EQUALS(p_cycle_model2->GetGeneration(), 2u);
 
-        StochasticDivisionRuleCellCycleModel* p_cycle_model6 = static_cast <StochasticDivisionRuleCellCycleModel*> (p_cell6->GetCellCycleModel());
+        StochasticDivisionRuleCellCycleModel* p_cycle_model6 = static_cast<StochasticDivisionRuleCellCycleModel*> (p_cell6->GetCellCycleModel());
         TS_ASSERT_EQUALS(p_cycle_model6->DividedSymmetrically(), false);
         TS_ASSERT_EQUALS(p_cell6->GetCellCycleModel()->GetCellProliferativeType(), DIFFERENTIATED);
         TS_ASSERT_EQUALS(p_cycle_model6->GetGeneration(), 2u);

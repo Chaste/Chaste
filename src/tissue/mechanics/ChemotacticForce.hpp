@@ -34,7 +34,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "AbstractForce.hpp"
 
 // Needed here to avoid serialization errors (on Boost<1.37)
-#include "LabelledCellMutationState.hpp"
+#include "CellLabel.hpp"
 
 /**
  * A chemotactic force class.

@@ -45,7 +45,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "HoneycombMutableVertexMeshGenerator.hpp"
 #include "VertexMeshWriter.hpp"
 #include "WildTypeCellMutationState.hpp"
-
+#include "CellLabel.hpp"
 #include "Warnings.hpp"
 #include "LogFile.hpp"
 
@@ -500,28 +500,23 @@ public:
 
 		// Set up cell.
 		std::vector<TissueCellPtr> cells;
-		boost::shared_ptr<AbstractCellMutationState> p_state1(new WildTypeCellMutationState);
-		boost::shared_ptr<AbstractCellMutationState> p_state2(new LabelledCellMutationState);
+		boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+		boost::shared_ptr<AbstractCellProperty> p_label(new CellLabel);
 
 		for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
 		{
 			FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
 			p_model->SetCellProliferativeType(TRANSIT);
 
+            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            double birth_time = -2.0;
+            p_cell->SetBirthTime(birth_time);
+
 			if (elem_index == 0 || elem_index == 2)
 			{
-				TissueCellPtr p_cell(new TissueCell(p_state2, p_model));
-				double birth_time = -2.0;
-				p_cell->SetBirthTime(birth_time);
-				cells.push_back(p_cell);
+				p_cell->AddCellProperty(p_label);
 			}
-			else
-			{
-				TissueCellPtr p_cell(new TissueCell(p_state1, p_model));
-				double birth_time = -2.0;
-				p_cell->SetBirthTime(birth_time);
-				cells.push_back(p_cell);
-			}
+            cells.push_back(p_cell);
 		}
 		// Create tissue
 		VertexBasedTissue<2> tissue(*p_mesh, cells);
@@ -542,9 +537,8 @@ public:
 		///\todo test against a saved simulation or something similar, i.e check the positions of some vertices.
 		TS_ASSERT_EQUALS(p_mesh->GetNode(13)->IsBoundaryNode(), true);
 		TS_ASSERT_EQUALS(p_mesh->GetNumElements(),4u);
-		TS_ASSERT_EQUALS(p_state2->GetColour(), 5u);
-		TS_ASSERT_EQUALS(p_state1->GetColour(), 0u);
-		TS_ASSERT_EQUALS(cells[0]->GetMutationState()->IsType<LabelledCellMutationState>(), true);
+		TS_ASSERT_EQUALS(p_state->GetColour(), 0u);
+		TS_ASSERT_EQUALS(cells[0]->rGetCellPropertyCollection().HasProperty<CellLabel>(), true);
 
 		// Test Warnings
 		TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);

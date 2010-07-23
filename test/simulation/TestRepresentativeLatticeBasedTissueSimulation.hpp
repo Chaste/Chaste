@@ -68,7 +68,7 @@ public:
 
          std::vector<TissueCellPtr> cells;
          std::vector<unsigned> real_node_indices;
-          for(unsigned i = 0; i < 9; i++)
+         for (unsigned i = 0; i < 9; i++)
          {
              FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
              p_model->SetCellProliferativeType(TRANSIT);

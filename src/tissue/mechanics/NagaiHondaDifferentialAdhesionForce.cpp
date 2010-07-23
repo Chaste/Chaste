@@ -211,67 +211,76 @@ double NagaiHondaDifferentialAdhesionForce<DIM>::GetAdhesionParameterDifferentia
 }
 
 template<unsigned DIM>
-CellContactsType NagaiHondaDifferentialAdhesionForce<DIM>::GetCombinationCellTypes(Node<DIM>* pNodeA, Node<DIM>* pNodeB,
-        AbstractTissue<DIM>& rTissue)
+CellContactsType NagaiHondaDifferentialAdhesionForce<DIM>::GetCombinationCellTypes(Node<DIM>* pNodeA,
+                                                                                   Node<DIM>* pNodeB,
+                                                                                   AbstractTissue<DIM>& rTissue)
 {
-		CellContactsType combinationCellType = OTHER;
+	CellContactsType combinationCellType = OTHER;
 
-        // Find the indices of the elements owned by each node
-        std::set<unsigned> elements_containing_nodeA = pNodeA->rGetContainingElementIndices();
-        std::set<unsigned> elements_containing_nodeB = pNodeB->rGetContainingElementIndices();
+    // Find the indices of the elements owned by each node
+    std::set<unsigned> elements_containing_nodeA = pNodeA->rGetContainingElementIndices();
+    std::set<unsigned> elements_containing_nodeB = pNodeB->rGetContainingElementIndices();
 
-        // Find common elements
-        std::set<unsigned> shared_elements;
-        std::set_intersection(elements_containing_nodeA.begin(),
-                              elements_containing_nodeA.end(),
-                              elements_containing_nodeB.begin(),
-                              elements_containing_nodeB.end(),
-                              std::inserter(shared_elements, shared_elements.begin()));
+    // Find common elements
+    std::set<unsigned> shared_elements;
+    std::set_intersection(elements_containing_nodeA.begin(),
+                          elements_containing_nodeA.end(),
+                          elements_containing_nodeB.begin(),
+                          elements_containing_nodeB.end(),
+                          std::inserter(shared_elements, shared_elements.begin()));
 
-        // Check that the nodes have a common edge
-        assert(!shared_elements.empty());
-        // Check that at most 2 common elements
-        assert(shared_elements.size() < 3);
+    // Check that the nodes have a common edge
+    assert(!shared_elements.empty());
+    // Check that at most 2 common elements
+    assert(shared_elements.size() < 3);
 
-        if (shared_elements.size() == 2)
+    if (shared_elements.size() == 2)
+    {
+        // Get the elements connected to these two nodes
+
+    	typename std::set<unsigned>::iterator elem_iter = shared_elements.begin();
+    	unsigned element_index1 = *elem_iter;
+    	++elem_iter;
+     	unsigned element_index2 = *elem_iter;
+
+       	TissueCellPtr p_cell1 = rTissue.GetCellUsingLocationIndex(element_index1);
+        TissueCellPtr p_cell2 = rTissue.GetCellUsingLocationIndex(element_index2);
+
+        bool cell1_is_labelled = p_cell1->rGetCellPropertyCollection().HasProperty<CellLabel>();
+        bool cell2_is_labelled = p_cell2->rGetCellPropertyCollection().HasProperty<CellLabel>();
+
+        bool cell1_is_wild_type = p_cell1->GetMutationState()->IsType<WildTypeCellMutationState>();
+        bool cell2_is_wild_type = p_cell2->GetMutationState()->IsType<WildTypeCellMutationState>();
+
+        // Note this currently assumes only 2 mutation states: labelled and unlabelled (wild type)
+        assert(cell1_is_labelled || cell1_is_wild_type);
+        assert(cell2_is_labelled || cell2_is_wild_type);
+
+        if (cell1_is_labelled)
         {
-            // Get the elements connected to these two nodes
-
-        	typename std::set<unsigned>::iterator elem_iter = shared_elements.begin();
-        	unsigned element_index1 = *elem_iter;
-        	++elem_iter;
-         	unsigned element_index2 = *elem_iter;
-
-           	TissueCellPtr p_cell1 = rTissue.GetCellUsingLocationIndex(element_index1);
-            TissueCellPtr p_cell2 = rTissue.GetCellUsingLocationIndex(element_index2);
-
-            // Note this currently assumes only 2 mutation states: Labelled and Wild Type.
-            if (p_cell1->GetMutationState()->IsType<LabelledCellMutationState>())
+            if (cell2_is_labelled)
             {
-                if (p_cell2->GetMutationState()->IsType<LabelledCellMutationState>())
-                {
-                    combinationCellType = LABELLED_LABELLED;
-                }
-                else if (p_cell2->GetMutationState()->IsType<WildTypeCellMutationState>())
-                {
-                    combinationCellType = WILD_LABELLED;
-                }
+                combinationCellType = LABELLED_LABELLED;
             }
-            else if (p_cell1->GetMutationState()->IsType<WildTypeCellMutationState>())
+            else
             {
-                if (p_cell2->GetMutationState()->IsType<WildTypeCellMutationState>())
-                {
-                    combinationCellType = WILD_WILD;
-                }
-                else if (p_cell2->GetMutationState()->IsType<LabelledCellMutationState>())
-                {
-                    combinationCellType = WILD_LABELLED;
-                }
+                combinationCellType = WILD_LABELLED;
             }
         }
+        else
+        {
+            if (cell2_is_labelled)
+            {
+                combinationCellType = WILD_LABELLED;
+            }
+            else
+            {
+                combinationCellType = WILD_WILD;
+            }
+        }
+    }
 
-
-        return combinationCellType;
+    return combinationCellType;
 }
 /////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
