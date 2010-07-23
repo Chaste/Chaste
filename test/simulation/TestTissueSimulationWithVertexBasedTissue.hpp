@@ -38,13 +38,13 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "StochasticDurationGenerationBasedCellCycleModel.hpp"
 #include "VertexBasedTissue.hpp"
 #include "NagaiHondaForce.hpp"
+#include "NagaiHondaDifferentialAdhesionForce.hpp"
 #include "WelikyOsterForce.hpp"
 #include "AbstractCellKiller.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "HoneycombMutableVertexMeshGenerator.hpp"
 #include "VertexMeshWriter.hpp"
 #include "WildTypeCellMutationState.hpp"
-//#include "LabelledCellMutationState.hpp"
 
 #include "Warnings.hpp"
 #include "LogFile.hpp"
@@ -484,6 +484,74 @@ public:
 		TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Cell removed due to T2Swap this is not counted in the dead cells counter");
 		Warnings::QuietDestroy();
     }
+
+    /*
+     * This test visualizing cells of 2 mutation types, wildtype and labelled type.
+	 * It asserts that neighboring cells have the correct adhesion parameter for difference
+	 * pairs of nodes.
+	 */
+	void TestVertexMonolayerWithTwoMutationTypes() throw (Exception)
+	{
+		TissueConfig::Instance()->SetOutputCellMutationStates(true);
+
+		// Create a simple 2D MutableVertexMesh with only four cells
+		HoneycombMutableVertexMeshGenerator generator(2, 2);
+		MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
+
+		// Set up cell.
+		std::vector<TissueCellPtr> cells;
+		boost::shared_ptr<AbstractCellMutationState> p_state1(new WildTypeCellMutationState);
+		boost::shared_ptr<AbstractCellMutationState> p_state2(new LabelledCellMutationState);
+
+		for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
+		{
+			FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+			p_model->SetCellProliferativeType(TRANSIT);
+
+			if (elem_index == 0 || elem_index == 2)
+			{
+				TissueCellPtr p_cell(new TissueCell(p_state2, p_model));
+				double birth_time = -2.0;
+				p_cell->SetBirthTime(birth_time);
+				cells.push_back(p_cell);
+			}
+			else
+			{
+				TissueCellPtr p_cell(new TissueCell(p_state1, p_model));
+				double birth_time = -2.0;
+				p_cell->SetBirthTime(birth_time);
+				cells.push_back(p_cell);
+			}
+		}
+		// Create tissue
+		VertexBasedTissue<2> tissue(*p_mesh, cells);
+
+		// Create a force system
+		NagaiHondaForce<2> force;
+		std::vector<AbstractForce<2>* > force_collection;
+		force_collection.push_back(&force);
+
+		// Set up tissue simulation
+		TissueSimulation<2> simulator(tissue, force_collection);
+		simulator.SetOutputDirectory("TestVertexMonolayerWithTwoMutationStates");
+		simulator.SetEndTime(1.0);
+
+		// Run simulation
+		simulator.Solve();
+
+		///\todo test against a saved simulation or something similar, i.e check the positions of some vertices.
+		TS_ASSERT_EQUALS(p_mesh->GetNode(13)->IsBoundaryNode(), true);
+		TS_ASSERT_EQUALS(p_mesh->GetNumElements(),4u);
+		TS_ASSERT_EQUALS(p_state2->GetColour(), 5u);
+		TS_ASSERT_EQUALS(p_state1->GetColour(), 0u);
+		TS_ASSERT_EQUALS(cells[0]->GetMutationState()->IsType<LabelledCellMutationState>(), true);
+
+		// Test Warnings
+		TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+		TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Vertices are moving more than half the CellRearangementThreshold this could cause elements to become inverted the motion has been restricted: - To avoid these warnings use a smaller timestep");
+		Warnings::QuietDestroy();
+	}
+
 
     void TestSingleCellRelaxationAndApoptosis() throw (Exception)
     {
