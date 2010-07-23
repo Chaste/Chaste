@@ -38,19 +38,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 
 /**
- * The possible paired contact types types of TissueCells.
- */
-typedef enum CellContactsType
-{
-    WILD_WILD,
-    LABELLED_LABELLED,
-    WILD_LABELLED,
-    OTHER
-} CellContactsType;
-
-static const unsigned NUM_CELL_CONTACTS_TYPES=4;
-
-/**
  * A force class for use in vertex-based tissue simulations, based on a mechanical
  * model proposed by T. Nagai and H. Honda ("A dynamic cell model for the formation
  * of epithelial tissues", Philosophical Magazine Part B 81:699-719).
@@ -62,8 +49,6 @@ friend class TestForcesNotForRelease;
 
 private:
 
-    bool mUsingDifferentialAdhesion; /**< Whether we are using differential adhesion between cells (set in constructor)*/
-
     friend class boost::serialization::access;
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
@@ -71,30 +56,18 @@ private:
         // If Archive is an output archive, then '&' resolves to '<<'
         // If Archive is an input archive, then '&' resolves to '>>'
         archive & boost::serialization::base_object<AbstractForce<DIM> >(*this);
-        archive & mUsingDifferentialAdhesion;
     }
 
 public:
 
     /**
      * Constructor.
-     *
-     * @param usingDifferentialAdhesion whether to use differential adhesion between cells.  Defaults to false
      */
-    NagaiHondaForce(bool usingDifferentialAdhesion=false);
-
+    NagaiHondaForce();
     /**
      * Destructor.
      */
     ~NagaiHondaForce();
-
-    /**
-     * Get the using differential adhesion parameter that is 'true' if differential adhesion
-     * is to be used and 'false otherwise.
-     *
-     * @return the using differential adhesion parameter.
-     */
-    bool GetUsingDifferentialAdhesion(void);
 
     /**
      * Overridden AddForceContribution() method.
@@ -117,32 +90,6 @@ public:
      */
     double GetAdhesionParameter(Node<DIM>* pNodeA, Node<DIM>* pNodeB);
 
-    /**
-     * Get the adhesion parameter for the edge between two given nodes.
-     *
-     * \todo We now are only testing 2 mutation states.  This method could be extended
-     * to handle any number of mutation states.  One possibility is to have a method to set
-     * a dictionary, where given a pair of cell types, the dictionary returns
-     * a corresponding adhesion parameter value.
-     *
-     * @param pNodeA one node
-     * @param pNodeB the other node
-     * @param combinationCellType
-     *
-     * @return the adhesion parameter for this edge.
-     */
-    double GetAdhesionParameterDifferentialAddition(Node<DIM>* pNodeA, Node<DIM>* pNodeB, CellContactsType combinationCellType);
-
-    /**
-     * Get the combinationCellType
-     *
-     * @param pNodeA one node
-     * @param pNodeB the other node
-     * @param rTissue reference to the tissue
-     *
-     * @return the combinationCellType for this edge.
-     */
-    CellContactsType GetCombinationCellTypes(Node<DIM>* pNodeA, Node<DIM>* pNodeB, AbstractTissue<DIM>& rTissue);
 };
 
 
