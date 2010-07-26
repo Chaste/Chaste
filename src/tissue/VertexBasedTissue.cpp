@@ -84,7 +84,7 @@ double VertexBasedTissue<DIM>::GetDampingConstant(unsigned nodeIndex)
     {
         TissueCellPtr p_cell = this->GetCellUsingLocationIndex(*iter);
         bool cell_is_wild_type = p_cell->GetMutationState()->IsType<WildTypeCellMutationState>();
-        bool cell_is_labelled = p_cell->rGetCellPropertyCollection().HasProperty<CellLabel>();
+        bool cell_is_labelled = p_cell->HasCellProperty<CellLabel>();
 
         if (cell_is_wild_type && !cell_is_labelled)
         {
@@ -363,7 +363,7 @@ double VertexBasedTissue<DIM>::GetTargetAreaOfCell(const TissueCellPtr pCell)
         g1_duration = TissueConfig::Instance()->GetTransitCellG1Duration();
     }
 
-    if (pCell->GetMutationState()->IsType<ApoptoticCellMutationState>())
+    if (pCell->HasCellProperty<ApoptoticCellProperty>())
     {
         // Age of cell when apoptosis begins
         if (pCell->GetStartOfApoptosisTime() - pCell->GetBirthTime() < g1_duration)

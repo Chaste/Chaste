@@ -246,8 +246,8 @@ CellContactsType NagaiHondaDifferentialAdhesionForce<DIM>::GetCombinationCellTyp
        	TissueCellPtr p_cell1 = rTissue.GetCellUsingLocationIndex(element_index1);
         TissueCellPtr p_cell2 = rTissue.GetCellUsingLocationIndex(element_index2);
 
-        bool cell1_is_labelled = p_cell1->rGetCellPropertyCollection().HasProperty<CellLabel>();
-        bool cell2_is_labelled = p_cell2->rGetCellPropertyCollection().HasProperty<CellLabel>();
+        bool cell1_is_labelled = p_cell1->HasCellProperty<CellLabel>();
+        bool cell2_is_labelled = p_cell2->HasCellProperty<CellLabel>();
 
         bool cell1_is_wild_type = p_cell1->GetMutationState()->IsType<WildTypeCellMutationState>();
         bool cell2_is_wild_type = p_cell2->GetMutationState()->IsType<WildTypeCellMutationState>();

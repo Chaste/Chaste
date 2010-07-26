@@ -538,7 +538,7 @@ public:
 		TS_ASSERT_EQUALS(p_mesh->GetNode(13)->IsBoundaryNode(), true);
 		TS_ASSERT_EQUALS(p_mesh->GetNumElements(),4u);
 		TS_ASSERT_EQUALS(p_state->GetColour(), 0u);
-		TS_ASSERT_EQUALS(cells[0]->rGetCellPropertyCollection().HasProperty<CellLabel>(), true);
+		TS_ASSERT_EQUALS(cells[0]->HasCellProperty<CellLabel>(), true);
 
 		// Test Warnings
 		TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);

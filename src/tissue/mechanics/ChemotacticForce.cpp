@@ -60,7 +60,7 @@ void ChemotacticForce<DIM>::AddForceContribution(std::vector<c_vector<double, DI
          ++cell_iter)
     {
         // Only labelled cells move chemotactically
-        if (cell_iter->rGetCellPropertyCollection().template HasProperty<CellLabel>())
+        if (cell_iter->template HasCellProperty<CellLabel>())
         {
             unsigned node_global_index = rTissue.GetLocationIndexUsingCell(*cell_iter);
 

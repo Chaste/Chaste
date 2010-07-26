@@ -811,7 +811,7 @@ public:
 		    TS_ASSERT_EQUALS(cells[i]->GetMutationState()->IsType<WildTypeCellMutationState>(), true);
 		    if (i==0 || i==2)
 		    {
-		        TS_ASSERT_EQUALS(cells[i]->rGetCellPropertyCollection().HasProperty<CellLabel>(), true);
+		        TS_ASSERT_EQUALS(cells[i]->HasCellProperty<CellLabel>(), true);
 		    }
 		}
 

@@ -1371,7 +1371,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_apc1(tissue.GetCellPropertyRegistry()->Get<ApcOneHitCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_apc2(tissue.GetCellPropertyRegistry()->Get<ApcTwoHitCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_bcat1(tissue.GetCellPropertyRegistry()->Get<BetaCateninOneHitCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_apoptotic_state(tissue.GetCellPropertyRegistry()->Get<ApoptoticCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_apoptotic_state(tissue.GetCellPropertyRegistry()->Get<ApoptoticCellProperty>());
         boost::shared_ptr<AbstractCellProperty> p_label(tissue.GetCellPropertyRegistry()->Get<CellLabel>());
 
         tissue.GetCellUsingLocationIndex(0)->GetCellCycleModel()->SetCellProliferativeType(TRANSIT);
@@ -1380,7 +1380,7 @@ public:
         tissue.GetCellUsingLocationIndex(1)->SetMutationState(p_apc1);
         tissue.GetCellUsingLocationIndex(2)->SetMutationState(p_apc2);
         tissue.GetCellUsingLocationIndex(3)->SetMutationState(p_bcat1);
-        tissue.GetCellUsingLocationIndex(4)->SetMutationState(p_apoptotic_state);
+        tissue.GetCellUsingLocationIndex(4)->AddCellProperty(p_apoptotic_state);
         tissue.SetCellAncestorsToLocationIndices();
 
         std::string output_directory = "TestLatticeBasedTissueWriters";
@@ -1411,9 +1411,9 @@ public:
 
         // Test the GetCellMutationStateCount function
         std::vector<unsigned> cell_mutation_states = tissue.GetCellMutationStateCount();
-        TS_ASSERT_EQUALS(cell_mutation_states.size(), 5u);
+        TS_ASSERT_EQUALS(cell_mutation_states.size(), 4u);
         TS_ASSERT_EQUALS(cell_mutation_states[0], 0u);
-        for (unsigned i=1; i<5; i++)
+        for (unsigned i=1; i<4; i++)
         {
             TS_ASSERT_EQUALS(cell_mutation_states[i], 1u);
         }
