@@ -50,7 +50,7 @@ private:
     {
         std::vector<TissueCellPtr> cells;
 
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         p_model->SetCellProliferativeType(DIFFERENTIATED);
         TissueCellPtr p_cell(new TissueCell(p_state, p_model));
@@ -81,7 +81,7 @@ public:
         mesh.ConstructRectangularMesh(2, 2, true); // 3*3 nodes
 
         // Create two cells
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         FixedDurationGenerationBasedCellCycleModel* p_model_1 = new FixedDurationGenerationBasedCellCycleModel();
         p_model_1->SetCellProliferativeType(DIFFERENTIATED);
         TissueCellPtr p_cell_1(new TissueCell(p_state, p_model_1));
@@ -193,7 +193,7 @@ public:
         mesh.ConstructRectangularMesh(2, 2, true); // 3*3 nodes
 
         // Create cell
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         p_model->SetCellProliferativeType(STEM);
         TissueCellPtr p_cell(new TissueCell(p_state, p_model));
@@ -245,7 +245,7 @@ public:
         mesh.ConstructRectangularMesh(2, 2, true); // 3*3 nodes
 
         // Create cell
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         p_model->SetCellProliferativeType(DIFFERENTIATED);
         TissueCellPtr p_cell(new TissueCell(p_state, p_model));
@@ -336,7 +336,7 @@ public:
         mesh.ConstructRectangularMesh(6, 6, true); // 7*7 nodes
 
         // Create cell
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         p_model->SetCellProliferativeType(DIFFERENTIATED);
         TissueCellPtr p_cell(new TissueCell(p_state, p_model));
@@ -457,7 +457,7 @@ public:
         mesh.ConstructRectangularMesh(6, 6, true); // 7*7 nodes
 
         // Create cells
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         std::vector<TissueCellPtr> cells;
         std::vector<unsigned> real_node_indices;
 
@@ -544,7 +544,7 @@ public:
         mesh.ConstructRectangularMesh(3, 3, true); // 4*4 nodes
 
         // Create cells
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         std::vector<TissueCellPtr> cells;
         std::vector<unsigned> real_node_indices;
 
@@ -589,7 +589,7 @@ public:
         mesh.ConstructRectangularMesh(3, 3, true); // 4*4 nodes
 
         // Create cells
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         std::vector<TissueCellPtr> cells;
         std::vector<unsigned> real_node_indices;
 
@@ -655,7 +655,7 @@ public:
         mesh.ConstructRectangularMesh(6, 6, true); // 7*7 nodes
 
         // Create cells
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         std::vector<TissueCellPtr> cells;
         std::vector<unsigned> real_node_indices;
 
@@ -690,7 +690,7 @@ public:
         mesh.ConstructRectangularMesh(2, 2, true); // 3*3 nodes
 
         // Create  one cell
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
 
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         p_model->SetCellProliferativeType(DIFFERENTIATED);
@@ -901,7 +901,7 @@ public:
 
         // Create three cells
         std::vector<TissueCellPtr> cells2;
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<3; i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
@@ -1181,7 +1181,7 @@ public:
             mesh.ConstructRectangularMesh(6, 6, true); // 7*7 nodes
 
             // Create cells
-            boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+            boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
             std::vector<TissueCellPtr> cells;
             std::vector<unsigned> real_node_indices;
             for (unsigned i=0; i<10; i++)
@@ -1295,7 +1295,7 @@ public:
 
         // Create cells
         std::vector<TissueCellPtr> cells;
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<5; i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
@@ -1351,7 +1351,7 @@ public:
         mesh.ConstructRectangularMesh(2, 2, true); // 3*3 nodes
 
         // Create cells
-        boost::shared_ptr<AbstractCellMutationState> p_wild_type_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_wild_type_state(new WildTypeCellMutationState);
         std::vector<unsigned> real_node_indices;
         std::vector<TissueCellPtr> cells;
         for (unsigned i=0; i<5; i++)
@@ -1367,11 +1367,11 @@ public:
         LatticeBasedTissue<2> tissue(mesh, cells, real_node_indices);
 
         // For coverage of WriteResultsToFiles()
-        boost::shared_ptr<AbstractCellMutationState> p_state = boost::dynamic_pointer_cast<AbstractCellMutationState>(tissue.GetCellPropertyRegistry()->Get<WildTypeCellMutationState>());
-        boost::shared_ptr<AbstractCellMutationState> p_apc1 = boost::dynamic_pointer_cast<AbstractCellMutationState>(tissue.GetCellPropertyRegistry()->Get<ApcOneHitCellMutationState>());
-        boost::shared_ptr<AbstractCellMutationState> p_apc2 = boost::dynamic_pointer_cast<AbstractCellMutationState>(tissue.GetCellPropertyRegistry()->Get<ApcTwoHitCellMutationState>());
-        boost::shared_ptr<AbstractCellMutationState> p_bcat1 = boost::dynamic_pointer_cast<AbstractCellMutationState>(tissue.GetCellPropertyRegistry()->Get<BetaCateninOneHitCellMutationState>());
-        boost::shared_ptr<AbstractCellMutationState> p_apoptotic_state = boost::dynamic_pointer_cast<AbstractCellMutationState>(tissue.GetCellPropertyRegistry()->Get<ApoptoticCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_state(tissue.GetCellPropertyRegistry()->Get<WildTypeCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_apc1(tissue.GetCellPropertyRegistry()->Get<ApcOneHitCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_apc2(tissue.GetCellPropertyRegistry()->Get<ApcTwoHitCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_bcat1(tissue.GetCellPropertyRegistry()->Get<BetaCateninOneHitCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_apoptotic_state(tissue.GetCellPropertyRegistry()->Get<ApoptoticCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_label(tissue.GetCellPropertyRegistry()->Get<CellLabel>());
 
         tissue.GetCellUsingLocationIndex(0)->GetCellCycleModel()->SetCellProliferativeType(TRANSIT);
@@ -1436,7 +1436,7 @@ public:
         mesh.ConstructRectangularMesh(2, 2, true); // 3*3 nodes
 
         // Create cells
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         std::vector<unsigned> real_node_indices;
         std::vector<TissueCellPtr> cells;
         for (unsigned i=0; i<5; i++)
@@ -1472,7 +1472,7 @@ public:
         mesh.ConstructRectangularMesh(2, 2, true); // 3*3 nodes
 
         // Create two cells
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         FixedDurationGenerationBasedCellCycleModel* p_model_1 = new FixedDurationGenerationBasedCellCycleModel();
         p_model_1->SetCellProliferativeType(DIFFERENTIATED);
         TissueCellPtr p_cell_1(new TissueCell(p_state, p_model_1));
@@ -1635,7 +1635,7 @@ public:
         TetrahedralMesh<2,2> mesh2;
         mesh2.ConstructRectangularMesh(2, 2, true); // 3*3 nodes
         std::vector<TissueCellPtr> cells2;
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<3; i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
