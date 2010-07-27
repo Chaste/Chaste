@@ -249,12 +249,9 @@ CellContactsType NagaiHondaDifferentialAdhesionForce<DIM>::GetCombinationCellTyp
         bool cell1_is_labelled = p_cell1->HasCellProperty<CellLabel>();
         bool cell2_is_labelled = p_cell2->HasCellProperty<CellLabel>();
 
-        bool cell1_is_wild_type = p_cell1->GetMutationState()->IsType<WildTypeCellMutationState>();
-        bool cell2_is_wild_type = p_cell2->GetMutationState()->IsType<WildTypeCellMutationState>();
-
         // Note this currently assumes only 2 mutation states: labelled and unlabelled (wild type)
-        assert(cell1_is_labelled || cell1_is_wild_type);
-        assert(cell2_is_labelled || cell2_is_wild_type);
+        assert(cell1_is_labelled || p_cell1->GetMutationState()->IsType<WildTypeCellMutationState>());
+        assert(cell2_is_labelled || p_cell2->GetMutationState()->IsType<WildTypeCellMutationState>());
 
         if (cell1_is_labelled)
         {
