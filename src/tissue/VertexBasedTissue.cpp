@@ -305,19 +305,19 @@ void VertexBasedTissue<DIM>::Update(bool hasHadBirthsOrDeaths)
 				this->mCellLocationMap[(*cell_iter).get()] = new_elem_index;
             }
         }
+
+        // Check that each VertexElement has only one TissueCellPtr associated with it in the updated tissue
+        Validate();
     }
 
     element_map.ResetToIdentity();
-
-    // Check that each VertexElement has only one TissueCellPtr associated with it in the updated tissue
-    Validate();
 }
 
 
 template<unsigned DIM>
 void VertexBasedTissue<DIM>::Validate()
 {
-	// Check each element has only one cell attached.
+	// Check each element has only one cell attached
     std::vector<unsigned> validated_element = std::vector<unsigned>(this->GetNumElements(), 0);
 
     for (typename AbstractTissue<DIM>::Iterator cell_iter = this->Begin();
