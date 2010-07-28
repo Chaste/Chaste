@@ -33,9 +33,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 
 /**
- *  Simple cell cycle model for use in crypt projection
- *  simulations under the non-niche hypothesis.
- *
+ * Simple cell cycle model for use in crypt projection
+ * simulations under the non-niche hypothesis.
  */
 class StochasticDivisionRuleCellCycleModel : public AbstractSimpleGenerationBasedCellCycleModel
 {
@@ -51,6 +50,7 @@ private:
         archive & *p_gen;
 
         archive & mDividedSymmetrically;
+        archive & mSymmetricDivisionProbability;
     }
 
     /**
@@ -63,6 +63,11 @@ private:
      * of symmetric division STEM -> 2 STEM or asymmetric division STEM -> STEM + TRANSIT.
      */
     bool mDividedSymmetrically;
+
+    /**
+     * Probability of symmetric division.
+     */
+    double mSymmetricDivisionProbability;
 
     /**
      *  Stochastically set the G1 duration.  Called on cell creation at
@@ -111,6 +116,17 @@ public:
      */
     bool DividedSymmetrically();
 
+    /**
+     * @return mSymmetricDivisionProbability
+     */
+    double GetSymmetricDivisionProbability();
+
+    /**
+     * Set mSymmetricDivisionProbability.
+     * 
+     * @param symmetricDivisionProbability the new value of mSymmetricDivisionProbability
+     */
+    void SetSymmetricDivisionProbability(double symmetricDivisionProbability);
 };
 
 // Declare identifier for the serializer

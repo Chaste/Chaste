@@ -41,6 +41,10 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
  * A force class for use in vertex-based tissue simulations, based on a mechanical
  * model proposed by T. Nagai and H. Honda ("A dynamic cell model for the formation
  * of epithelial tissues", Philosophical Magazine Part B 81:699-719).
+ * 
+ * Each of the model parameter member variables are rescaled such that mDampingConstantNormal
+ * takes the default value 1, whereas Nagai and Honda (who denote the parameter by
+ * nu) take the value 0.01.
  */
 template<unsigned DIM>
 class NagaiHondaForce  : public AbstractForce<DIM>
@@ -49,6 +53,35 @@ friend class TestForcesNotForRelease;
 
 private:
 
+    /*
+     * The following four parameters are used in vertex-based tissue simulations
+     * based on the mechanical model proposed by T. Nagai and H. Honda ("A dynamic
+     * cell model for the formation of epithelial tissues", Philosophical Magazine
+     * Part B 81:699-719). They are rescaled such that mDampingConstantNormal takes
+     * the default value 1, whereas Nagai and Honda (who denote the parameter by nu)
+     * take the value 0.01.
+     */
+
+    /**
+     * Cell deformation energy parameter. Has units of kg s^-2 (cell size at equilibrium rest length)^-1.
+     */
+    double mNagaiHondaDeformationEnergyParameter;
+
+    /**
+     * Cell membrane energy parameter. Has units of kg (cell size at equilibrium rest length) s^-2.
+     */
+    double mNagaiHondaMembraneSurfaceEnergyParameter;
+
+    /**
+     * Cell-cell adhesion energy parameter. Has has units of kg (cell size at equilibrium rest length)^2 s^-2.
+     */
+    double mNagaiHondaCellCellAdhesionEnergyParameter;
+
+    /**
+     * Cell-boundary adhesion energy parameter. Has units of kg (cell size at equilibrium rest length)^2 s^-2.
+     */
+    double mNagaiHondaCellBoundaryAdhesionEnergyParameter;
+
     friend class boost::serialization::access;
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
@@ -56,6 +89,10 @@ private:
         // If Archive is an output archive, then '&' resolves to '<<'
         // If Archive is an input archive, then '&' resolves to '>>'
         archive & boost::serialization::base_object<AbstractForce<DIM> >(*this);
+        archive & mNagaiHondaDeformationEnergyParameter;
+        archive & mNagaiHondaMembraneSurfaceEnergyParameter;
+        archive & mNagaiHondaCellCellAdhesionEnergyParameter;
+        archive & mNagaiHondaCellBoundaryAdhesionEnergyParameter;
     }
 
 public:
@@ -64,6 +101,7 @@ public:
      * Constructor.
      */
     NagaiHondaForce();
+
     /**
      * Destructor.
      */
@@ -90,6 +128,53 @@ public:
      */
     double GetAdhesionParameter(Node<DIM>* pNodeA, Node<DIM>* pNodeB);
 
+    /**
+     * @return mNagaiHondaDeformationEnergyParameter
+     */
+    double GetNagaiHondaDeformationEnergyParameter();
+
+    /**
+     * @return mNagaiHondaMembraneSurfaceEnergyParameter
+     */
+    double GetNagaiHondaMembraneSurfaceEnergyParameter();
+
+    /**
+     * @return mCellCellAdhesionEnergyParameter
+     */
+    double GetNagaiHondaCellCellAdhesionEnergyParameter();
+
+    /**
+     * @return mNagaiHondaCellBoundaryAdhesionEnergyParameter
+     */
+    double GetNagaiHondaCellBoundaryAdhesionEnergyParameter();
+
+    /**
+     * Set mNagaiHondaDeformationEnergyParameter.
+     * 
+     * @param nagaiHondaDeformationEnergyParameter the new value of mNagaiHondaDeformationEnergyParameter
+     */
+    void SetNagaiHondaDeformationEnergyParameter(double nagaiHondaDeformationEnergyParameter);
+
+    /**
+     * Set mNagaiHondaMembraneSurfaceEnergyParameter.
+     * 
+     * @param nagaiHondaMembraneSurfaceEnergyParameter the new value of mNagaiHondaMembraneSurfaceEnergyParameter
+     */
+    void SetNagaiHondaMembraneSurfaceEnergyParameter(double nagaiHondaMembraneSurfaceEnergyParameter);
+
+    /**
+     * Set mNagaiHondaCellCellAdhesionEnergyParameter.
+     * 
+     * @param nagaiHondaCellCellAdhesionEnergyEnergyParameter the new value of mNagaiHondaCellCellAdhesionEnergyParameter
+     */
+    void SetNagaiHondaCellCellAdhesionEnergyParameter(double nagaiHondaCellCellAdhesionEnergyEnergyParameter);
+
+    /**
+     * Set mNagaiHondaCellBoundaryAdhesionEnergyParameter.
+     * 
+     * @param nagaiHondaCellBoundaryAdhesionEnergyParameter the new value of mNagaiHondaCellBoundaryAdhesionEnergyParameter
+     */
+    void SetNagaiHondaCellBoundaryAdhesionEnergyParameter(double nagaiHondaCellBoundaryAdhesionEnergyParameter);
 };
 
 

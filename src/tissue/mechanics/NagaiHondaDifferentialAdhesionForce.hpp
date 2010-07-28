@@ -32,7 +32,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "AbstractForce.hpp"
+#include "NagaiHondaForce.hpp"
 #include "VertexBasedTissue.hpp"
 
 /**
@@ -55,7 +55,7 @@ static const unsigned NUM_CELL_CONTACTS_TYPES=4;
  * Assume differential adhesion.
  */
 template<unsigned DIM>
-class NagaiHondaDifferentialAdhesionForce  : public AbstractForce<DIM>
+class NagaiHondaDifferentialAdhesionForce : public NagaiHondaForce<DIM>
 {
 friend class TestDifferentialAdhesionForcesNotForRelease;
 

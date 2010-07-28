@@ -52,29 +52,35 @@ private :
         archive & mA;
         archive & mB;
         archive & mIncludeWntChemotaxis;
+        archive & mWntChemotaxisStrength;
     }
 
     /**
-     *  The value of the constant a in the definition of the crypt surface
+     * The value of the constant a in the definition of the crypt surface
      *      z = f(r) = a*r^b.
      */
     double mA;
 
     /**
-     *  The value of the constant b in the definition of the crypt surface
+     * The value of the constant b in the definition of the crypt surface
      *      z = f(r) = a*r^b.
      */
     double mB;
 
     /**
-     *  Map node indices to 3D locations on the crypt surface.
-     */
-    std::map<unsigned, c_vector<double, 3> > mNode3dLocationMap;
-
-    /**
      * Whether to include Wnt-dependent chemotaxis for stem cells.
      */
     bool mIncludeWntChemotaxis;
+    
+    /**
+     * Strength of Wnt-based chemotactic force.
+     */
+    double mWntChemotaxisStrength;
+
+    /**
+     *  Map node indices to 3D locations on the crypt surface.
+     */
+    std::map<unsigned, c_vector<double, 3> > mNode3dLocationMap;
 
     /**
      * Fix up the mappings between node indices and 3D locations.
@@ -117,6 +123,18 @@ public :
      * @return mB.
      */
     double GetB() const;
+
+    /**
+     * @return mWntChemotaxisStrength
+     */
+    double GetWntChemotaxisStrength();
+
+    /**
+     * Set mWntChemotaxisStrength.
+     * 
+     * @param wntChemotaxisStrength the new value of mWntChemotaxisStrength
+     */
+    void SetWntChemotaxisStrength(double wntChemotaxisStrength);
 
     /**
      * Set mIncludeWntChemotaxis.

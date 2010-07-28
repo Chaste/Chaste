@@ -464,7 +464,7 @@ public:
         // Store the force of the same node, but now with Wnt-chemotaxis
         c_vector<double,2> new_force = new_node_forces[11];
 
-        double wnt_chemotaxis_strength = TissueConfig::Instance()->GetWntChemotaxisStrength();
+        double wnt_chemotaxis_strength = crypt_projection_force.GetWntChemotaxisStrength();
         c_vector<double,2> wnt_component = wnt_chemotaxis_strength*WntConcentration<2>::Instance()->GetWntGradient(cells[11]);
 
         TS_ASSERT_DELTA(new_force[0], old_force[0]+wnt_component[0], 1e-4);
@@ -502,7 +502,12 @@ public:
             MeshBasedTissue<2> crypt(mesh, cells);
             p_params->SetCryptProjectionParameterA(1.0);
             p_params->SetCryptProjectionParameterB(2.0);
+
+            // Create force object
             CryptProjectionForce crypt_projection_force;
+
+            TS_ASSERT_DELTA(crypt_projection_force.GetWntChemotaxisStrength(), 100.0, 1e-6);
+            crypt_projection_force.SetWntChemotaxisStrength(15.0);
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -531,6 +536,7 @@ public:
             TS_ASSERT_EQUALS(p_crypt_projection_force->mUseCutoffPoint, true);
             TS_ASSERT_DELTA(p_crypt_projection_force->GetA(), 1.0, 1e-12);
             TS_ASSERT_DELTA(p_crypt_projection_force->GetB(), 2.0, 1e-12);
+            TS_ASSERT_DELTA(p_crypt_projection_force->GetWntChemotaxisStrength(), 15.0, 1e-6);
 
             delete p_crypt_projection_force;
         }
@@ -688,6 +694,27 @@ public:
         // Create a force system
         NagaiHondaForce<2> force;
 
+        // Test get/set methods
+        TS_ASSERT_DELTA(force.GetNagaiHondaDeformationEnergyParameter(), 100.0, 1e-12);
+        TS_ASSERT_DELTA(force.GetNagaiHondaMembraneSurfaceEnergyParameter(), 10.0, 1e-12);
+        TS_ASSERT_DELTA(force.GetNagaiHondaCellCellAdhesionEnergyParameter(), 1.0, 1e-12);
+        TS_ASSERT_DELTA(force.GetNagaiHondaCellBoundaryAdhesionEnergyParameter(), 1.0, 1e-12);
+
+        force.SetNagaiHondaDeformationEnergyParameter(5.8);
+        force.SetNagaiHondaMembraneSurfaceEnergyParameter(17.9);
+        force.SetNagaiHondaCellCellAdhesionEnergyParameter(0.5);
+        force.SetNagaiHondaCellBoundaryAdhesionEnergyParameter(0.6);
+
+        TS_ASSERT_DELTA(force.GetNagaiHondaDeformationEnergyParameter(), 5.8, 1e-12);
+        TS_ASSERT_DELTA(force.GetNagaiHondaMembraneSurfaceEnergyParameter(), 17.9, 1e-12);
+        TS_ASSERT_DELTA(force.GetNagaiHondaCellCellAdhesionEnergyParameter(), 0.5, 1e-12);
+        TS_ASSERT_DELTA(force.GetNagaiHondaCellBoundaryAdhesionEnergyParameter(), 0.6, 1e-12);
+
+        force.SetNagaiHondaDeformationEnergyParameter(100.0);
+        force.SetNagaiHondaMembraneSurfaceEnergyParameter(10.0);
+        force.SetNagaiHondaCellCellAdhesionEnergyParameter(1.0);
+        force.SetNagaiHondaCellBoundaryAdhesionEnergyParameter(1.0);
+
         // Initialise a vector of new node forces
         std::vector<c_vector<double, 2> > node_forces;
         node_forces.reserve(tissue.GetNumNodes());
@@ -765,6 +792,87 @@ public:
         }
     }
 
+    void TestNagaiHondaForceArchiving() throw (Exception)
+    {
+        // Set up
+        OutputFileHandler handler("archive", false);    // don't erase contents of folder
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "nagai_honda.arch";
+
+        {
+            // Construct a 2D vertex mesh consisting of a single element
+            std::vector<Node<2>*> nodes;
+            unsigned num_nodes = 20;
+            std::vector<double> angles = std::vector<double>(num_nodes);
+
+            for (unsigned i=0; i<num_nodes; i++)
+            {
+                angles[i] = M_PI+2.0*M_PI*(double)(i)/(double)(num_nodes);
+                nodes.push_back(new Node<2>(i, false, cos(angles[i]), sin(angles[i])));
+            }
+    
+            std::vector<VertexElement<2,2>*> elements;
+            elements.push_back(new VertexElement<2,2>(0, nodes));
+    
+            double cell_swap_threshold = 0.01;
+            double edge_division_threshold = 2.0;
+            MutableVertexMesh<2,2> mesh(nodes, elements, cell_swap_threshold, edge_division_threshold);
+    
+            // Set up the cell
+            std::vector<TissueCellPtr> cells;
+            boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+    
+            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            p_model->SetCellProliferativeType(DIFFERENTIATED);
+    
+            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            p_cell->SetBirthTime(-1.0);
+            cells.push_back(p_cell);
+    
+            // Create tissue
+            VertexBasedTissue<2> tissue(mesh, cells);
+            tissue.InitialiseCells();
+    
+            // Create a force system
+            NagaiHondaForce<2> force;    
+            force.SetNagaiHondaDeformationEnergyParameter(5.8);
+            force.SetNagaiHondaMembraneSurfaceEnergyParameter(17.9);
+            force.SetNagaiHondaCellCellAdhesionEnergyParameter(0.5);
+            force.SetNagaiHondaCellBoundaryAdhesionEnergyParameter(0.6);
+
+            // Serialize force  via pointer
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            AbstractForce<2>* const p_force = &force;
+            output_arch << p_force;
+        }
+
+        {
+            // Check TissueConfig is reset
+            TS_ASSERT_DELTA(TissueConfig::Instance()->GetStemCellG1Duration(), 14.0, 1e-6);
+
+            ArchiveLocationInfo::SetMeshPathname("mesh/test/data/", "square_2_elements");
+
+            // Create an input archive
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            // Restore force (and hence TissueConfig) from the archive
+            AbstractForce<2>* p_force;
+            input_arch >> p_force;
+
+            NagaiHondaForce<2>* p_static_cast_force = static_cast<NagaiHondaForce<2>*>(p_force);
+
+            // Check member variables have been correctly archived
+            TS_ASSERT_DELTA(p_static_cast_force->GetNagaiHondaDeformationEnergyParameter(), 5.8, 1e-12);
+            TS_ASSERT_DELTA(p_static_cast_force->GetNagaiHondaMembraneSurfaceEnergyParameter(), 17.9, 1e-12);
+            TS_ASSERT_DELTA(p_static_cast_force->GetNagaiHondaCellCellAdhesionEnergyParameter(), 0.5, 1e-12);
+            TS_ASSERT_DELTA(p_static_cast_force->GetNagaiHondaCellBoundaryAdhesionEnergyParameter(), 0.6, 1e-12);
+
+            // Tidy up
+            delete p_force;
+        }
+    }
 
     // This test contains cells of 2 mutation types, wildtype and labelled type,
     // on a larger mesh so that we can test interaction of 2 cells with labelled types.
@@ -972,6 +1080,19 @@ public:
         // Create a force system
         WelikyOsterForce<2> force;
 
+        // Test set/get methods
+        TS_ASSERT_DELTA(force.GetWelikyOsterAreaParameter(), 1.0, 1e-6);
+        TS_ASSERT_DELTA(force.GetWelikyOsterPerimeterParameter(), 1.0, 1e-6);
+
+        force.SetWelikyOsterAreaParameter(15.0);
+        force.SetWelikyOsterPerimeterParameter(17.0);
+
+        TS_ASSERT_DELTA(force.GetWelikyOsterAreaParameter(), 15.0, 1e-6);
+        TS_ASSERT_DELTA(force.GetWelikyOsterPerimeterParameter(), 17.0, 1e-6);
+
+        force.SetWelikyOsterAreaParameter(1.0);
+        force.SetWelikyOsterPerimeterParameter(1.0);
+
         // Initialise a vector of new node forces
         std::vector<c_vector<double, 2> > node_forces;
         node_forces.reserve(tissue.GetNumNodes());
@@ -1035,6 +1156,9 @@ public:
             // Create a force system
             WelikyOsterForce<2> force;
 
+            force.SetWelikyOsterAreaParameter(15.0);
+            force.SetWelikyOsterPerimeterParameter(17.0);
+
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
@@ -1055,8 +1179,6 @@ public:
             // Check TissueConfig is reset
             TS_ASSERT_DELTA(TissueConfig::Instance()->GetTransitCellG1Duration(), 2.0, 1e-6);
 
-//            ArchiveLocationInfo::SetMeshPathname("mesh/test/data/", "square_2_elements");
-
             // Create an input archive
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
@@ -1066,8 +1188,9 @@ public:
             // Restore from the archive
             input_arch >> p_force;
 
-            // Check TissueConfig has been correctly archived
-            TS_ASSERT_DELTA(TissueConfig::Instance()->GetTransitCellG1Duration(), 15.3, 1e-6);
+            // Check member variables have been correctly archived
+            TS_ASSERT_DELTA(p_force->GetWelikyOsterAreaParameter(), 15.0, 1e-6);
+            TS_ASSERT_DELTA(p_force->GetWelikyOsterPerimeterParameter(), 17.0, 1e-6);
 
             // Tidy up
             delete p_force;

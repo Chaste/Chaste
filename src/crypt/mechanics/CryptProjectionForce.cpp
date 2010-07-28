@@ -32,7 +32,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 CryptProjectionForce::CryptProjectionForce()
     : GeneralisedLinearSpringForce<2>(),
-      mIncludeWntChemotaxis(false)
+      mIncludeWntChemotaxis(false),
+      mWntChemotaxisStrength(100.0)
 {
     mA = TissueConfig::Instance()->GetCryptProjectionParameterA();
     mB = TissueConfig::Instance()->GetCryptProjectionParameterB();
@@ -77,6 +78,16 @@ double CryptProjectionForce::GetA() const
 double CryptProjectionForce::GetB() const
 {
     return mB;
+}
+
+void CryptProjectionForce::SetWntChemotaxisStrength(double wntChemotaxisStrength)
+{
+    assert(wntChemotaxisStrength >= 0.0);
+    mWntChemotaxisStrength = wntChemotaxisStrength;
+}
+double CryptProjectionForce::GetWntChemotaxisStrength()
+{
+    return mWntChemotaxisStrength;
 }
 
 void CryptProjectionForce::SetWntChemotaxis(bool includeWntChemotaxis)
@@ -261,15 +272,13 @@ void CryptProjectionForce::AddForceContribution(std::vector<c_vector<double,2> >
     {
         assert(WntConcentration<2>::Instance()->IsWntSetUp());
 
-        double wnt_chemotaxis_strength = TissueConfig::Instance()->GetWntChemotaxisStrength();
-
         for (AbstractTissue<2>::Iterator cell_iter = rTissue.Begin();
              cell_iter != rTissue.End();
              ++cell_iter)
         {
             if (cell_iter->GetCellCycleModel()->GetCellProliferativeType()==STEM)
             {
-                c_vector<double, 2> wnt_chemotactic_force = wnt_chemotaxis_strength*WntConcentration<2>::Instance()->GetWntGradient(*cell_iter);
+                c_vector<double, 2> wnt_chemotactic_force = mWntChemotaxisStrength*WntConcentration<2>::Instance()->GetWntGradient(*cell_iter);
                 unsigned index = rTissue.GetLocationIndexUsingCell(*cell_iter);
 
                 rForces[index] += wnt_chemotactic_force;

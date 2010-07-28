@@ -29,24 +29,23 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 template<unsigned DIM>
 NagaiHondaForce<DIM>::NagaiHondaForce()
-   : AbstractForce<DIM>()
+   : AbstractForce<DIM>(),
+     mNagaiHondaDeformationEnergyParameter(100.0), // This is 1.0 in the Nagai & Honda paper
+     mNagaiHondaMembraneSurfaceEnergyParameter(10.0), // This is 0.1 the Nagai & Honda paper
+     mNagaiHondaCellCellAdhesionEnergyParameter(1.0), // This is 0.01 the Nagai & Honda paper
+     mNagaiHondaCellBoundaryAdhesionEnergyParameter(1.0) // This is 0.01 the Nagai & Honda paper
 {
 }
-
 
 template<unsigned DIM>
 NagaiHondaForce<DIM>::~NagaiHondaForce()
 {
 }
 
-
 template<unsigned DIM>
 void NagaiHondaForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
                                                 AbstractTissue<DIM>& rTissue)
 {
-    // Helper instance of TissueConfig
-    TissueConfig* p_params = TissueConfig::Instance();
-
     // Helper variable that is a static cast of the tissue
     VertexBasedTissue<DIM>* p_tissue = static_cast<VertexBasedTissue<DIM>*>(&rTissue);
 
@@ -98,7 +97,7 @@ void NagaiHondaForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM
             double cell_target_area = p_tissue->GetTargetAreaOfCell(p_tissue->GetCellUsingLocationIndex(element_index));
 
             // Add the force contribution from this cell's deformation energy (note the minus sign)
-            deformation_contribution -= 2*p_params->GetNagaiHondaDeformationEnergyParameter()*(element_area - cell_target_area)*element_area_gradient;
+            deformation_contribution -= 2*GetNagaiHondaDeformationEnergyParameter()*(element_area - cell_target_area)*element_area_gradient;
 
             /******** End of deformation force calculation *************/
 
@@ -112,7 +111,7 @@ void NagaiHondaForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM
             double cell_target_perimeter = 2*sqrt(M_PI*cell_target_area);
 
             // Add the force contribution from this cell's membrane surface tension (note the minus sign)
-            membrane_surface_tension_contribution -= 2*p_params->GetNagaiHondaMembraneSurfaceEnergyParameter()*(element_perimeter - cell_target_perimeter)*element_perimeter_gradient;
+            membrane_surface_tension_contribution -= 2*GetNagaiHondaMembraneSurfaceEnergyParameter()*(element_perimeter - cell_target_perimeter)*element_perimeter_gradient;
 
             /******** End of membrane force calculation **********/
 
@@ -126,7 +125,6 @@ void NagaiHondaForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM
 
             unsigned next_node_local_index = (local_index+1)%(p_element->GetNumNodes());
             Node<DIM>* p_next_node = p_element->GetNode(next_node_local_index);
-
 
             // Compute the adhesion parameter for each of these edges
             double previous_edge_adhesion_parameter;
@@ -155,12 +153,9 @@ void NagaiHondaForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM
     }
 }
 
-
 template<unsigned DIM>
 double NagaiHondaForce<DIM>::GetAdhesionParameter(Node<DIM>* pNodeA, Node<DIM>* pNodeB)
 {
-    double adhesion_parameter;
-
     // Find the indices of the elements owned by each node
     std::set<unsigned> elements_containing_nodeA = pNodeA->rGetContainingElementIndices();
     std::set<unsigned> elements_containing_nodeB = pNodeB->rGetContainingElementIndices();
@@ -176,22 +171,64 @@ double NagaiHondaForce<DIM>::GetAdhesionParameter(Node<DIM>* pNodeA, Node<DIM>* 
     // Check that the nodes have a common edge
     assert(!shared_elements.empty());
 
+    double adhesion_parameter = GetNagaiHondaCellCellAdhesionEnergyParameter();
+
     // If the edge corresponds to a single element, then the cell is on the boundary
     if (shared_elements.size() == 1)
     {
-// \todo Get rid of mNagaiHondaCellBoundaryAdhesionEnergyParameter in TissueConfig
-    	//        adhesion_parameter = TissueConfig::Instance()->GetNagaiHondaCellBoundaryAdhesionEnergyParameter();
-    	adhesion_parameter = 1.0; // This is 0.01 the Nagai & Honda paper
+    	adhesion_parameter = GetNagaiHondaCellBoundaryAdhesionEnergyParameter();
     }
-    else
-    {
-    	// \todo Get rid of mNagaiHondaCellCellAdhesionEnergyParameter in TissueConfig
-//        adhesion_parameter = TissueConfig::Instance()->GetNagaiHondaCellCellAdhesionEnergyParameter();
-    	adhesion_parameter = 1.0; // This is 0.01 the Nagai & Honda paper
-    }
+
     return adhesion_parameter;
 }
 
+template<unsigned DIM>
+double NagaiHondaForce<DIM>::GetNagaiHondaDeformationEnergyParameter()
+{
+    return mNagaiHondaDeformationEnergyParameter;
+}
+
+template<unsigned DIM>
+double NagaiHondaForce<DIM>::GetNagaiHondaMembraneSurfaceEnergyParameter()
+{
+    return mNagaiHondaMembraneSurfaceEnergyParameter;
+}
+
+template<unsigned DIM>
+double NagaiHondaForce<DIM>::GetNagaiHondaCellCellAdhesionEnergyParameter()
+{
+    return mNagaiHondaCellCellAdhesionEnergyParameter;
+}
+
+template<unsigned DIM>
+double NagaiHondaForce<DIM>::GetNagaiHondaCellBoundaryAdhesionEnergyParameter()
+{
+    return mNagaiHondaCellBoundaryAdhesionEnergyParameter;
+}
+
+template<unsigned DIM>
+void NagaiHondaForce<DIM>::SetNagaiHondaDeformationEnergyParameter(double deformationEnergyParameter)
+{
+    mNagaiHondaDeformationEnergyParameter = deformationEnergyParameter;
+}
+
+template<unsigned DIM>
+void NagaiHondaForce<DIM>::SetNagaiHondaMembraneSurfaceEnergyParameter(double membraneSurfaceEnergyParameter)
+{
+    mNagaiHondaMembraneSurfaceEnergyParameter = membraneSurfaceEnergyParameter;
+}
+
+template<unsigned DIM>
+void NagaiHondaForce<DIM>::SetNagaiHondaCellCellAdhesionEnergyParameter(double cellCellAdhesionEnergyParameter)
+{
+    mNagaiHondaCellCellAdhesionEnergyParameter = cellCellAdhesionEnergyParameter;
+}
+
+template<unsigned DIM>
+void NagaiHondaForce<DIM>::SetNagaiHondaCellBoundaryAdhesionEnergyParameter(double cellBoundaryAdhesionEnergyParameter)
+{
+    mNagaiHondaCellBoundaryAdhesionEnergyParameter = cellBoundaryAdhesionEnergyParameter;
+}
 /////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////

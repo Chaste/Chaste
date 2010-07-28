@@ -40,13 +40,25 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
  * A force class for use in vertex-based tissue simulations, based on a mechanical
  * model proposed by M. Weliky and G. Oster ("The mechanical basis of cell rearrangement.
  * I. Epithelial morphogenesis during Fundulus epiboly", Development 109:373-386).
+ * 
+ * The default values for the two model parameter member variables are our own best
+ * estimates, since they are not given in the Weliky & Oster paper.
  */
 template<unsigned DIM>
 class WelikyOsterForce  : public AbstractForce<DIM>
 {
 friend class TestForcesNotForRelease;
-
 private:
+
+    /**
+     * Area parameter. Has units of kg (cell size at equilibrium rest length)^2 s^-2.
+     */
+    double mWelikyOsterAreaParameter;
+
+    /**
+     * Perimeter parameter. Has units of kg s^-2 (cell size at equilibrium rest length)^-1.
+     */
+    double mWelikyOsterPerimeterParameter;
 
     friend class boost::serialization::access;
     template<class Archive>
@@ -55,9 +67,13 @@ private:
         // If Archive is an output archive, then '&' resolves to '<<'
         // If Archive is an input archive, then '&' resolves to '>>'
         archive & boost::serialization::base_object<AbstractForce<DIM> >(*this);
+        archive & mWelikyOsterAreaParameter;
+        archive & mWelikyOsterPerimeterParameter;
     }
 
 public:
+
+
 
     /**
      * Constructor.
@@ -81,6 +97,29 @@ public:
     void AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
                               AbstractTissue<DIM>& rTissue);
 
+    /**
+     * @return mWelikyOsterAreaParameter.
+     */
+    double GetWelikyOsterAreaParameter();
+
+    /**
+     * @return mWelikyOsterPerimeterParameter.
+     */
+    double GetWelikyOsterPerimeterParameter();
+
+    /**
+     * Set mWelikyOsterAreaParameter.
+     * 
+     * @param welikyOsterAreaParameter the new value of mWelikyOsterAreaParameter
+     */
+    void SetWelikyOsterAreaParameter(double welikyOsterAreaParameter);
+
+    /**
+     * Set mWelikyOsterPerimeterParameter.
+     * 
+     * @param welikyOsterPerimeterParameter the new value of mWlikyOsterPerimeterParameter
+     */
+    void SetWelikyOsterPerimeterParameter(double welikyOsterPerimeterParameter);
 };
 
 

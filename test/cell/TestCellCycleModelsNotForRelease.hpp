@@ -75,7 +75,7 @@ public:
          * Test with asymmetric division
          */
 
-        TissueConfig::Instance()->SetSymmetricDivisionProbability(0.0);
+        p_cycle_model1->SetSymmetricDivisionProbability(0.0);
 
         // Increment time
         for (unsigned i=0; i<num_timesteps/3; i++)
@@ -101,15 +101,18 @@ public:
          * Test with symmetric division
          */
 
-        TissueConfig::Instance()->SetSymmetricDivisionProbability(1.0);
+        p_cycle_model1->SetSymmetricDivisionProbability(1.0);
         TissueConfig::Instance()->SetMaxTransitGenerations(1);
 
         StochasticDivisionRuleCellCycleModel* p_cycle_model3 = new StochasticDivisionRuleCellCycleModel;
-        p_cycle_model3->SetCellProliferativeType(STEM);
+        p_cycle_model3->SetCellProliferativeType(STEM);        
+        p_cycle_model3->SetSymmetricDivisionProbability(1.0);
+
         TissueCellPtr p_cell3(new TissueCell(p_state, p_cycle_model3));
         p_cell3->InitialiseCellCycleModel();
 
         TS_ASSERT_EQUALS(p_cycle_model3->GetGeneration(), 0u);
+        TS_ASSERT_DELTA(p_cycle_model3->GetSymmetricDivisionProbability(), 1.0, 1e-6);
 
         // Increment time
         for (unsigned i=0; i<num_timesteps/3; i++)
@@ -133,6 +136,7 @@ public:
         TS_ASSERT_EQUALS(p_cycle_model4->DividedSymmetrically(), true);
         TS_ASSERT_EQUALS(p_cell4->GetCellCycleModel()->GetCellProliferativeType(), STEM);
         TS_ASSERT_EQUALS(p_cycle_model4->GetGeneration(), 0u);
+        TS_ASSERT_DELTA(p_cycle_model4->GetSymmetricDivisionProbability(), 1.0, 1e-6);
 
         // The stem cell cell3 must have divided symmetrically. For coverage,
         // we iterate the random number generator so that it divides into two
@@ -185,6 +189,7 @@ public:
 
             StochasticDivisionRuleCellCycleModel model(true);
             model.SetCellProliferativeType(STEM);
+            model.SetSymmetricDivisionProbability(0.5);
 
             p_simulation_time->IncrementTimeOneStep();
 
@@ -218,6 +223,7 @@ public:
             TS_ASSERT_EQUALS(model.GetCellProliferativeType(), STEM);
             TS_ASSERT_EQUALS(model.DividedSymmetrically(), true);
 
+            TS_ASSERT_DELTA(model.GetSymmetricDivisionProbability(), 0.5, 1e-6);
             TS_ASSERT_DELTA(model.GetBirthTime(), -1.0, 1e-12);
             TS_ASSERT_DELTA(model.GetAge(), 1.5, 1e-12);
         }

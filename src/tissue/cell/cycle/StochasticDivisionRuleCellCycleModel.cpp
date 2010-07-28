@@ -29,10 +29,10 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "PetscTools.hpp"
 
 StochasticDivisionRuleCellCycleModel::StochasticDivisionRuleCellCycleModel(bool dividedSymmetrically)
-    : mDividedSymmetrically(dividedSymmetrically)
+    : mDividedSymmetrically(dividedSymmetrically),
+      mSymmetricDivisionProbability(0.0)
 {
 }
-
 
 void StochasticDivisionRuleCellCycleModel::SetG1Duration()
 {
@@ -65,7 +65,6 @@ void StochasticDivisionRuleCellCycleModel::SetG1Duration()
     }
 }
 
-
 void StochasticDivisionRuleCellCycleModel::ResetForDivision()
 {
     /**
@@ -79,16 +78,15 @@ void StochasticDivisionRuleCellCycleModel::ResetForDivision()
     if (mCellProliferativeType == STEM)
     {
         double test_number = RandomNumberGenerator::Instance()->ranf(); // U(0,1)
-        double sym_div_prob = TissueConfig::Instance()->GetSymmetricDivisionProbability();
 
         // If undergoing symmetric division...
-        if (test_number < sym_div_prob)
+        if (test_number < mSymmetricDivisionProbability)
         {
             mDividedSymmetrically = true;
 
             // Check if the daughter cells are both STEM or TRANSIT.
             // We assign an equal probability to each of these events.
-            if (test_number < 0.5*sym_div_prob)
+            if (test_number < 0.5*mSymmetricDivisionProbability)
             {
                 mCellProliferativeType = STEM;
             }
@@ -106,7 +104,6 @@ void StochasticDivisionRuleCellCycleModel::ResetForDivision()
     AbstractSimpleGenerationBasedCellCycleModel::ResetForDivision();
 }
 
-
 void StochasticDivisionRuleCellCycleModel::InitialiseDaughterCell()
 {
     if (mDividedSymmetrically == false)
@@ -121,18 +118,27 @@ void StochasticDivisionRuleCellCycleModel::InitialiseDaughterCell()
     }
 }
 
-
 AbstractCellCycleModel* StochasticDivisionRuleCellCycleModel::CreateCellCycleModel()
 {
     return new StochasticDivisionRuleCellCycleModel(*this);
 }
-
 
 bool StochasticDivisionRuleCellCycleModel::DividedSymmetrically()
 {
     return mDividedSymmetrically;
 }
 
+double StochasticDivisionRuleCellCycleModel::GetSymmetricDivisionProbability()
+{
+    return mSymmetricDivisionProbability;
+}
+
+void StochasticDivisionRuleCellCycleModel::SetSymmetricDivisionProbability(double symmetricDivisionProbability)
+{
+    assert(symmetricDivisionProbability <= 1.0);
+    assert(symmetricDivisionProbability >= 0.0);
+    mSymmetricDivisionProbability = symmetricDivisionProbability;
+}
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

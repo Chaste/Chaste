@@ -29,16 +29,16 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 template<unsigned DIM>
 WelikyOsterForce<DIM>::WelikyOsterForce()
-   : AbstractForce<DIM>()
+   : AbstractForce<DIM>(),
+     mWelikyOsterAreaParameter(1.0),
+     mWelikyOsterPerimeterParameter(1.0)
 {
 }
-
 
 template<unsigned DIM>
 WelikyOsterForce<DIM>::~WelikyOsterForce()
 {
 }
-
 
 template<unsigned DIM>
 void WelikyOsterForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
@@ -46,9 +46,6 @@ void WelikyOsterForce<DIM>::AddForceContribution(std::vector<c_vector<double, DI
 {
     // Make sure that we are in the correct dimension - this code will be eliminated at compile time
     assert(DIM == 2); // this method only works in 2D at present
-
-    // Helper instance of TissueConfig
-    TissueConfig* p_params = TissueConfig::Instance();
 
     // Helper variable that is a static cast of the tissue
     VertexBasedTissue<DIM>* p_tissue = static_cast<VertexBasedTissue<DIM>*>(&rTissue);
@@ -70,8 +67,7 @@ void WelikyOsterForce<DIM>::AddForceContribution(std::vector<c_vector<double, DI
         // Compute the area of this element
         double element_area = p_tissue->rGetMesh().GetVolumeOfElement(element_index);
 
-        double deformation_coefficient = p_params->GetWelikyOsterAreaParameter()/element_area;
-
+        double deformation_coefficient = GetWelikyOsterAreaParameter()/element_area;
 
         /******** End of deformation force calculation *************/
 
@@ -80,7 +76,7 @@ void WelikyOsterForce<DIM>::AddForceContribution(std::vector<c_vector<double, DI
         // Compute the perimeter of the element
         double element_perimeter = p_tissue->rGetMesh().GetSurfaceAreaOfElement(element_index);
 
-        double membrane_surface_tension_coefficient = p_params->GetWelikyOsterPerimeterParameter()*element_perimeter;
+        double membrane_surface_tension_coefficient = GetWelikyOsterPerimeterParameter()*element_perimeter;
 
         /******** End of membrane force calculation **********/
 
@@ -102,22 +98,41 @@ void WelikyOsterForce<DIM>::AddForceContribution(std::vector<c_vector<double, DI
             c_vector<double, DIM> outward_normal = -0.5*clockwise_unit_vector - 0.5*anti_clockwise_unit_vector;
             outward_normal /= norm_2(outward_normal);
 
-
             c_vector<double, DIM> deformation_contribution = deformation_coefficient * outward_normal;
 
             c_vector<double, DIM> membrane_surface_tension_contribution = membrane_surface_tension_coefficient * (clockwise_unit_vector + anti_clockwise_unit_vector);
 
-            //c_vector<double, DIM> adhesion_contribution = zero_vector<double>(DIM);
-
             c_vector<double, DIM> force_on_node = deformation_contribution +
                                                   membrane_surface_tension_contribution;
-                                                  // + adhesion_contribution;
 
             rForces[node_global_index] += force_on_node;
         }
     }
 }
 
+template<unsigned DIM>
+double WelikyOsterForce<DIM>::GetWelikyOsterAreaParameter()
+{
+    return mWelikyOsterAreaParameter;
+}
+
+template<unsigned DIM>
+double WelikyOsterForce<DIM>::GetWelikyOsterPerimeterParameter()
+{
+    return mWelikyOsterPerimeterParameter;
+}
+
+template<unsigned DIM>
+void WelikyOsterForce<DIM>::SetWelikyOsterAreaParameter(double welikyOsterAreaParameter)
+{
+    mWelikyOsterAreaParameter = welikyOsterAreaParameter;
+}
+
+template<unsigned DIM>
+void WelikyOsterForce<DIM>::SetWelikyOsterPerimeterParameter(double welikyOsterPerimeterParameter)
+{
+    mWelikyOsterPerimeterParameter = welikyOsterPerimeterParameter;
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation

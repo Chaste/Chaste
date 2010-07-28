@@ -29,7 +29,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 template<unsigned DIM>
 NagaiHondaDifferentialAdhesionForce<DIM>::NagaiHondaDifferentialAdhesionForce()
-   : AbstractForce<DIM>()
+   : NagaiHondaForce<DIM>()
 {
 }
 
@@ -44,9 +44,6 @@ template<unsigned DIM>
 void NagaiHondaDifferentialAdhesionForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
                                                 AbstractTissue<DIM>& rTissue)
 {
-    // Helper instance of TissueConfig
-    TissueConfig* p_params = TissueConfig::Instance();
-
     // Helper variable that is a static cast of the tissue
     VertexBasedTissue<DIM>* p_tissue = static_cast<VertexBasedTissue<DIM>*>(&rTissue);
 
@@ -98,7 +95,7 @@ void NagaiHondaDifferentialAdhesionForce<DIM>::AddForceContribution(std::vector<
             double cell_target_area = p_tissue->GetTargetAreaOfCell(p_tissue->GetCellUsingLocationIndex(element_index));
 
             // Add the force contribution from this cell's deformation energy (note the minus sign)
-            deformation_contribution -= 2*p_params->GetNagaiHondaDeformationEnergyParameter()*(element_area - cell_target_area)*element_area_gradient;
+            deformation_contribution -= 2*this->GetNagaiHondaDeformationEnergyParameter()*(element_area - cell_target_area)*element_area_gradient;
 
             /******** End of deformation force calculation *************/
 
@@ -112,7 +109,7 @@ void NagaiHondaDifferentialAdhesionForce<DIM>::AddForceContribution(std::vector<
             double cell_target_perimeter = 2*sqrt(M_PI*cell_target_area);
 
             // Add the force contribution from this cell's membrane surface tension (note the minus sign)
-            membrane_surface_tension_contribution -= 2*p_params->GetNagaiHondaMembraneSurfaceEnergyParameter()*(element_perimeter - cell_target_perimeter)*element_perimeter_gradient;
+            membrane_surface_tension_contribution -= 2*this->GetNagaiHondaMembraneSurfaceEnergyParameter()*(element_perimeter - cell_target_perimeter)*element_perimeter_gradient;
 
             /******** End of membrane force calculation **********/
 
@@ -126,7 +123,6 @@ void NagaiHondaDifferentialAdhesionForce<DIM>::AddForceContribution(std::vector<
 
             unsigned next_node_local_index = (local_index+1)%(p_element->GetNumNodes());
             Node<DIM>* p_next_node = p_element->GetNode(next_node_local_index);
-
 
             // Compute the adhesion parameter for each of these edges
             double previous_edge_adhesion_parameter;
@@ -180,6 +176,8 @@ double NagaiHondaDifferentialAdhesionForce<DIM>::GetAdhesionParameterDifferentia
 
         // Check that the nodes have a common edge
         assert(!shared_elements.empty());
+
+        ///\todo the parameter values should not be hard-coded, but stored as member variables with set/get methods
 
         // If the edge corresponds to a single element, then the cell is on the boundary
         if (shared_elements.size() == 1) ///\todo This appears to be combinationCellType OTHER and should probably be different for each mutation.
