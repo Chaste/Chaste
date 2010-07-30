@@ -1021,18 +1021,14 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
 						 *     x Node B
 						 *     |
 						 *
-						 * With a void on top
+						 * With a void on top.
 						 *
-						 * We perform a Type 1 swap on the elements in this case.
+						 * We should not be able to get here when running normal vertex code
+                         * as there should only be nodes on 3 way junctions or boundaries.
+						 *
 						 */
 
-                    	///\todo this should be a T1 Swap see #1263 then we could merge with the above if as both are T1 swaps if there is at least one boundary node
-                        PerformNodeMerge(pNodeA, pNodeB);
-
-                        // Remove the deleted node and re-index
-                        RemoveDeletedNodes();
-
-                        //PerformT1Swap(pNodeA, pNodeB,all_indices);
+                    	EXCEPTION("There is a non boundary node contained only in 2 elements something has gone wrong.");
 					}
                     else
                     {
@@ -1043,12 +1039,11 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                          *    A   B
                          * ---o---o---
                          *
-                         * We merge the nodes in this case.
+                         * We should not be able to get here when running normal vertex code
+                         * as there should only be nodes on 3 way junctions or boundaries.
                          */
-                        PerformNodeMerge(pNodeA, pNodeB);
 
-                        // Remove the deleted node and re-index
-                        RemoveDeletedNodes();
+                    	EXCEPTION("There are non boundary nodes contained in only in 2 elements something has gone wrong.");
                     }
                 }
                 else
@@ -1229,12 +1224,11 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
 						 *    /  (2)           (2)  \
 						 *   /                       \
 						 *
-						 * We perform a node merge in this case. //\TODO this should be a T1 Swap see #1263 allowing us to merge with the above.
+ 						 * We should not be able to get here when running normal vertex code
+                         * as there should only be nodes on 3 way junctions or boundaries.
 						 */
-						PerformNodeMerge(pNodeA, pNodeB);
 
-						// Remove the deleted node and re-index
-						RemoveDeletedNodes();
+						EXCEPTION("There are non boundary nodes contained only in 2 elements something has gone wrong.");
 					}
                 }
                 break;
