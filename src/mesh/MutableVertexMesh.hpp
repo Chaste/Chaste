@@ -191,6 +191,16 @@ protected:
      */
     void PerformT3Swap(Node<SPACE_DIM>* pNode, unsigned elementIndex);
 
+    /**
+	 * Helper method for ReMesh() to remove a triangular void in which one of the edges is
+	 * less than the cell rearrangement threshold.
+	 *
+     * @param pNodeA one of the nodes on the short edge
+     * @param pNodeB the other node on the short edge
+     * @param pNodeC the other node in the triangular void
+     */
+    void PerformVoidRemoval(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB, Node<SPACE_DIM>* pNodeC);
+
     /** Needed for serialization. */
     friend class boost::serialization::access;
 

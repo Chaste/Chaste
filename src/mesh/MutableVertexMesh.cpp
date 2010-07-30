@@ -31,6 +31,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "UblasCustomFunctions.hpp"
 #include "Warnings.hpp"
 #include "LogFile.hpp"
+#include "Debug.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::MutableVertexMesh(std::vector<Node<SPACE_DIM>*> nodes,
@@ -1086,21 +1087,15 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                      *  (1)    \ (2)
                      *          \
                      *
-                     * We perform a node merge in this case. Note should not be able to get here when running normal vertex code.
+                     * We should not be able to get here when running normal vertex code
+                     * as a boundary node is contained in at most 2 elements.
                      */
 
                 	// Check nodes A and B are on the boundary
                 	assert(pNodeA->IsBoundaryNode());
                 	assert(pNodeB->IsBoundaryNode());
 
-                	///\todo this should possibly be an exception as the code shouldn't ever reach this point in a Vertex Simulation, #1263.
-
-                	WARNING("There is a boundary node contained in three elements something has gone wrong.");
-
-                    PerformNodeMerge(pNodeA, pNodeB);
-
-                    // Remove the deleted node and re-index
-                    RemoveDeletedNodes();
+                	EXCEPTION("There is a boundary node contained in three elements something has gone wrong.");
                 }
                 else if (nodeA_elem_indices.size()==2 && nodeB_elem_indices.size()==2)
                 {
@@ -1139,12 +1134,13 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                         /*
                          * In this case, the node configuration looks like:
                          *
-                         *     A  B                  A  B
+                         *    A  C  B                A      B
                          *      /\                 \        /
                          *     /v \                 \  (1) /
                          * (3)o----o (1)  or     (2) o----o (3)    (element number in brackets, v is a void)
                          *   /  (2) \                 \v /
                          *  /        \                 \/
+                         *                             C
                          *
                          * We perform a T3 way merge, removing the void.
                          */
@@ -1153,45 +1149,23 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                     	assert(pNodeA->IsBoundaryNode());
                     	assert(pNodeB->IsBoundaryNode());
 
-                        unsigned nodeC_index;
-                        if (next_node_1 == previous_node_2 && next_node_2 != previous_node_1)
-                        {
-                            nodeC_index = next_node_1;
-                        }
-                        else if (next_node_2 == previous_node_1 && next_node_1 != previous_node_2)
-                        {
-                            nodeC_index = next_node_2;
-                        }
-                        else
-                        {
-                             assert(next_node_1 == previous_node_2 && next_node_2 == previous_node_1);
-                             EXCEPTION("Triangular element next to triangular void, not implemented yet.");
-                        }
+                    	// Get the other node in the triangular void
+                    	unsigned nodeC_index;
+                    	if (next_node_1 == previous_node_2 && next_node_2 != previous_node_1)
+                    	{
+                    		nodeC_index = next_node_1;
+                    	}
+                    	else if (next_node_2 == previous_node_1 && next_node_1 != previous_node_2)
+                    	{
+                    		nodeC_index = next_node_2;
+                    	}
+                    	else
+                    	{
+                    		 assert(next_node_1 == previous_node_2 && next_node_2 == previous_node_1);
+                    		 EXCEPTION("Triangular element next to triangular void, not implemented yet.");
+                    	}
 
-                        Node<SPACE_DIM>* p_nodeC = this->mNodes[nodeC_index];
-
-                        ///\todo this should be a helper method "PerformVoidRemoval(pNodeA, pNodeB, p_nodeC)"; see #1263.
-
-                        unsigned nodeA_index = pNodeA->GetIndex();
-                        unsigned nodeB_index = pNodeB->GetIndex();
-
-                        c_vector<double, SPACE_DIM> nodes_midpoint = pNodeA->rGetLocation() + this->GetVectorFromAtoB(pNodeA->rGetLocation(), pNodeB->rGetLocation())/3.0
-                                                                                            + this->GetVectorFromAtoB(pNodeA->rGetLocation(), p_nodeC->rGetLocation())/3.0;
-
-                        Node<SPACE_DIM>* p_low_node_A_B = (nodeA_index < nodeB_index) ? pNodeA : pNodeB; // Node with the lowest index out of A and B
-                        Node<SPACE_DIM>* p_low_node = (p_low_node_A_B->GetIndex() < nodeC_index) ? p_low_node_A_B : p_nodeC; // Node with the lowest index out of A, B and C.
-                        PerformNodeMerge(pNodeA,pNodeB);
-                        PerformNodeMerge(p_low_node_A_B,p_nodeC);
-
-                        c_vector<double, SPACE_DIM>& r_low_node_location = p_low_node->rGetModifiableLocation();
-
-                        r_low_node_location = nodes_midpoint;
-
-                        // Sort out boundary nodes
-                        p_low_node->SetAsBoundaryNode(false);
-
-                        // Remove the deleted nodes and re-index
-                        RemoveDeletedNodes();
+                    	PerformVoidRemoval(pNodeA, pNodeB, this->mNodes[nodeC_index]);
                     }
                     else
                     {
@@ -2279,6 +2253,33 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
         EXCEPTION("Trying to merge a node, contained in more than 2 elements, into another element, this is not possible with the vertex mesh.");
     }
 }
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformVoidRemoval(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB, Node<SPACE_DIM>* pNodeC)
+{
+	unsigned nodeA_index = pNodeA->GetIndex();
+	unsigned nodeB_index = pNodeB->GetIndex();
+	unsigned nodeC_index = pNodeC->GetIndex();
+
+	c_vector<double, SPACE_DIM> nodes_midpoint = pNodeA->rGetLocation() + this->GetVectorFromAtoB(pNodeA->rGetLocation(), pNodeB->rGetLocation())/3.0
+																		+ this->GetVectorFromAtoB(pNodeA->rGetLocation(), pNodeC->rGetLocation())/3.0;
+
+	Node<SPACE_DIM>* p_low_node_A_B = (nodeA_index < nodeB_index) ? pNodeA : pNodeB; // Node with the lowest index out of A and B
+	Node<SPACE_DIM>* p_low_node = (p_low_node_A_B->GetIndex() < nodeC_index) ? p_low_node_A_B : pNodeC; // Node with the lowest index out of A, B and C.
+	PerformNodeMerge(pNodeA,pNodeB);
+	PerformNodeMerge(p_low_node_A_B,pNodeC);
+
+	c_vector<double, SPACE_DIM>& r_low_node_location = p_low_node->rGetModifiableLocation();
+
+	r_low_node_location = nodes_midpoint;
+
+	// Sort out boundary nodes
+	p_low_node->SetAsBoundaryNode(false);
+
+	// Remove the deleted nodes and re-index
+	RemoveDeletedNodes();
+}
+
 
 /////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
