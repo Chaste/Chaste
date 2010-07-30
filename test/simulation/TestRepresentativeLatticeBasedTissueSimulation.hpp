@@ -63,7 +63,6 @@ public:
          mesh.ConstructRectangularMesh(20, 20, true); // 21*21 nodes
 
          // Create cell which keeps dividing
-         TissueConfig::Instance()->SetMaxTransitGenerations(UINT_MAX);
          boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
 
          std::vector<TissueCellPtr> cells;
@@ -72,6 +71,8 @@ public:
          {
              FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
              p_model->SetCellProliferativeType(TRANSIT);
+             p_model->SetMaxTransitGenerations(UINT_MAX);
+
              double birth_time = -RandomNumberGenerator::Instance()->ranf()*
                                   (TissueConfig::Instance()->GetStemCellG1Duration()
                                       + TissueConfig::Instance()->GetSG2MDuration() );

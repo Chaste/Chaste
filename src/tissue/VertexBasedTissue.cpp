@@ -348,52 +348,6 @@ void VertexBasedTissue<DIM>::Validate()
 
 
 template<unsigned DIM>
-double VertexBasedTissue<DIM>::GetTargetAreaOfCell(const TissueCellPtr pCell)
-{
-    // Get target area A of a healthy cell in S, G2 or M phase
-    double cell_target_area = TissueConfig::Instance()->GetMatureCellTargetArea();
-
-    double cell_age = pCell->GetAge();
-    double g1_duration = pCell->GetCellCycleModel()->GetG1Duration();
-
-    // If the cell is differentiated then its G1 duration is infinite
-    if (g1_duration == DBL_MAX) // don't use magic number, compare to DBL_MAX
-    {
-        // This is just for fixed cell cycle models, need to work out how to find the g1 duration
-        g1_duration = TissueConfig::Instance()->GetTransitCellG1Duration();
-    }
-
-    if (pCell->HasCellProperty<ApoptoticCellProperty>())
-    {
-        // Age of cell when apoptosis begins
-        if (pCell->GetStartOfApoptosisTime() - pCell->GetBirthTime() < g1_duration)
-        {
-            cell_target_area *= 0.5*(1 + (pCell->GetStartOfApoptosisTime() - pCell->GetBirthTime())/g1_duration);
-        }
-
-        // The target area of an apoptotic cell decreases linearly to zero (and past it negative)
-        cell_target_area = cell_target_area - 0.5*cell_target_area/(TissueConfig::Instance()->GetApoptosisTime())*(SimulationTime::Instance()->GetTime()-pCell->GetStartOfApoptosisTime());
-
-        // Don't allow a negative target area
-        if (cell_target_area < 0)
-        {
-            cell_target_area = 0;
-        }
-    }
-    else
-    {
-        // The target area of a proliferating cell increases linearly from A/2 to A over the course of the G1 phase
-        if (cell_age < g1_duration)
-        {
-            cell_target_area *= 0.5*(1 + cell_age/g1_duration);
-        }
-    }
-
-    return cell_target_area;
-}
-
-
-template<unsigned DIM>
 void VertexBasedTissue<DIM>::WriteResultsToFiles()
 {
     AbstractTissue<DIM>::WriteResultsToFiles();

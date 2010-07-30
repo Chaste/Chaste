@@ -191,12 +191,12 @@ c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nod
     if (p_cell_A->HasApoptosisBegun())
     {
         double time_until_death_a = p_cell_A->GetTimeUntilDeath();
-        a_rest_length = a_rest_length * time_until_death_a / p_config->GetApoptosisTime();
+        a_rest_length = a_rest_length * time_until_death_a / p_cell_A->GetApoptosisTime();
     }
     if (p_cell_B->HasApoptosisBegun())
     {
         double time_until_death_b = p_cell_B->GetTimeUntilDeath();
-        b_rest_length = b_rest_length * time_until_death_b / p_config->GetApoptosisTime();
+        b_rest_length = b_rest_length * time_until_death_b / p_cell_B->GetApoptosisTime();
     }
 
     rest_length = a_rest_length + b_rest_length;

@@ -102,11 +102,13 @@ public:
          */
 
         p_cycle_model1->SetSymmetricDivisionProbability(1.0);
-        TissueConfig::Instance()->SetMaxTransitGenerations(1);
+        p_cycle_model1->SetMaxTransitGenerations(1);
+        p_cycle_model2->SetMaxTransitGenerations(1);
 
         StochasticDivisionRuleCellCycleModel* p_cycle_model3 = new StochasticDivisionRuleCellCycleModel;
         p_cycle_model3->SetCellProliferativeType(STEM);        
         p_cycle_model3->SetSymmetricDivisionProbability(1.0);
+        p_cycle_model3->SetMaxTransitGenerations(1);
 
         TissueCellPtr p_cell3(new TissueCell(p_state, p_cycle_model3));
         p_cell3->InitialiseCellCycleModel();
@@ -149,14 +151,17 @@ public:
         TS_ASSERT_EQUALS(p_cycle_model3->DividedSymmetrically(), true);
         TS_ASSERT_EQUALS(p_cell3->GetCellCycleModel()->GetCellProliferativeType(), TRANSIT);
         TS_ASSERT_EQUALS(p_cycle_model3->GetGeneration(), 1u);
+        TS_ASSERT_EQUALS(p_cycle_model3->GetMaxTransitGenerations(), 1u);
 
         StochasticDivisionRuleCellCycleModel* p_cycle_model5 = static_cast<StochasticDivisionRuleCellCycleModel*> (p_cell5->GetCellCycleModel());
         TS_ASSERT_EQUALS(p_cycle_model5->DividedSymmetrically(), true);
         TS_ASSERT_EQUALS(p_cell5->GetCellCycleModel()->GetCellProliferativeType(), TRANSIT);
         TS_ASSERT_EQUALS(p_cycle_model5->GetGeneration(), 1u);
+        p_cycle_model5->SetSymmetricDivisionProbability(1.0);
 
         // The transit cell cell2 divides into two differentiated cells
         TS_ASSERT_EQUALS(p_cell2->ReadyToDivide(), true);
+        TS_ASSERT_EQUALS(static_cast<StochasticDivisionRuleCellCycleModel*> (p_cell2->GetCellCycleModel())->GetMaxTransitGenerations(), 1u);
         TissueCellPtr p_cell6 = p_cell2->Divide();
 
         TS_ASSERT_EQUALS(p_cycle_model2->DividedSymmetrically(), false);

@@ -92,7 +92,7 @@ void NagaiHondaDifferentialAdhesionForce<DIM>::AddForceContribution(std::vector<
             c_vector<double, DIM> element_area_gradient = p_tissue->rGetMesh().GetAreaGradientOfElementAtNode(p_element, local_index);
 
             // Get the target area of the cell
-            double cell_target_area = p_tissue->GetTargetAreaOfCell(p_tissue->GetCellUsingLocationIndex(element_index));
+            double cell_target_area = this->GetTargetAreaOfCell(p_tissue->GetCellUsingLocationIndex(element_index));
 
             // Add the force contribution from this cell's deformation energy (note the minus sign)
             deformation_contribution -= 2*this->GetNagaiHondaDeformationEnergyParameter()*(element_area - cell_target_area)*element_area_gradient;

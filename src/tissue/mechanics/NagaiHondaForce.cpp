@@ -33,7 +33,8 @@ NagaiHondaForce<DIM>::NagaiHondaForce()
      mNagaiHondaDeformationEnergyParameter(100.0), // This is 1.0 in the Nagai & Honda paper
      mNagaiHondaMembraneSurfaceEnergyParameter(10.0), // This is 0.1 the Nagai & Honda paper
      mNagaiHondaCellCellAdhesionEnergyParameter(1.0), // This is 0.01 the Nagai & Honda paper
-     mNagaiHondaCellBoundaryAdhesionEnergyParameter(1.0) // This is 0.01 the Nagai & Honda paper
+     mNagaiHondaCellBoundaryAdhesionEnergyParameter(1.0), // This is 0.01 the Nagai & Honda paper
+     mMatureCellTargetArea(1.0)
 {
 }
 
@@ -94,7 +95,7 @@ void NagaiHondaForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM
             c_vector<double, DIM> element_area_gradient = p_tissue->rGetMesh().GetAreaGradientOfElementAtNode(p_element, local_index);
 
             // Get the target area of the cell
-            double cell_target_area = p_tissue->GetTargetAreaOfCell(p_tissue->GetCellUsingLocationIndex(element_index));
+            double cell_target_area = GetTargetAreaOfCell(p_tissue->GetCellUsingLocationIndex(element_index));
 
             // Add the force contribution from this cell's deformation energy (note the minus sign)
             deformation_contribution -= 2*GetNagaiHondaDeformationEnergyParameter()*(element_area - cell_target_area)*element_area_gradient;
@@ -229,6 +230,65 @@ void NagaiHondaForce<DIM>::SetNagaiHondaCellBoundaryAdhesionEnergyParameter(doub
 {
     mNagaiHondaCellBoundaryAdhesionEnergyParameter = cellBoundaryAdhesionEnergyParameter;
 }
+
+template<unsigned DIM>
+double NagaiHondaForce<DIM>::GetTargetAreaOfCell(const TissueCellPtr pCell) const
+{
+    // Get target area A of a healthy cell in S, G2 or M phase
+    double cell_target_area = mMatureCellTargetArea;
+
+    double cell_age = pCell->GetAge();
+    double g1_duration = pCell->GetCellCycleModel()->GetG1Duration();
+
+    // If the cell is differentiated then its G1 duration is infinite
+    if (g1_duration == DBL_MAX) // don't use magic number, compare to DBL_MAX
+    {
+        // This is just for fixed cell cycle models, need to work out how to find the g1 duration
+        g1_duration = TissueConfig::Instance()->GetTransitCellG1Duration();
+    }
+
+    if (pCell->HasCellProperty<ApoptoticCellProperty>())
+    {
+        // Age of cell when apoptosis begins
+        if (pCell->GetStartOfApoptosisTime() - pCell->GetBirthTime() < g1_duration)
+        {
+            cell_target_area *= 0.5*(1 + (pCell->GetStartOfApoptosisTime() - pCell->GetBirthTime())/g1_duration);
+        }
+
+        // The target area of an apoptotic cell decreases linearly to zero (and past it negative)
+        cell_target_area = cell_target_area - 0.5*cell_target_area/(pCell->GetApoptosisTime())*(SimulationTime::Instance()->GetTime()-pCell->GetStartOfApoptosisTime());
+
+        // Don't allow a negative target area
+        if (cell_target_area < 0)
+        {
+            cell_target_area = 0;
+        }
+    }
+    else
+    {
+        // The target area of a proliferating cell increases linearly from A/2 to A over the course of the G1 phase
+        if (cell_age < g1_duration)
+        {
+            cell_target_area *= 0.5*(1 + cell_age/g1_duration);
+        }
+    }
+
+    return cell_target_area;
+}
+
+template<unsigned DIM>
+double NagaiHondaForce<DIM>::GetMatureCellTargetArea() const
+{
+    return mMatureCellTargetArea;
+}
+
+template<unsigned DIM>
+void NagaiHondaForce<DIM>::SetMatureCellTargetArea(double matureCellTargetArea)
+{
+    assert(matureCellTargetArea >= 0.0);
+    mMatureCellTargetArea = matureCellTargetArea;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////

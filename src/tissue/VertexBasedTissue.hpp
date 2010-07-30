@@ -275,17 +275,6 @@ public:
     void Update(bool hasHadBirthsOrDeaths=true);
 
     /**
-     * Get the target area of a given cell. This grows linearly from
-     * 0.5*A to A during the G1 phase of the cell cycle, then remains
-     * at A for the rest of the cell cycle, where A denotes the TissueConfig
-     * member variable mMatureCellTargetArea.
-     *
-     * @param pCell the cell
-     * @return the cell's target area
-     */
-    double GetTargetAreaOfCell(const TissueCellPtr pCell);
-
-    /**
      * Overridden CreateOutputFiles() method.
      *
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored

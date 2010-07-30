@@ -79,7 +79,6 @@ public:
     void TestTissueSimulationWithCryptProjectionSpringSystem() throw (Exception)
     {
         TissueConfig* p_params = TissueConfig::Instance();
-        p_params->SetWntStemThreshold(0.95);
 
         double a = 0.2;
         double b = 2.0;
@@ -109,6 +108,7 @@ public:
             SimpleWntCellCycleModel* p_model = new SimpleWntCellCycleModel();
             p_model->SetDimension(2);
             p_model->SetCellProliferativeType(TRANSIT);
+            p_model->SetWntStemThreshold(0.95);
 
             TissueCellPtr p_cell(new TissueCell(p_state, p_model));
             p_cell->InitialiseCellCycleModel();

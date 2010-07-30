@@ -157,11 +157,13 @@ public:
         TetrahedralMesh<2,2> mesh;
         mesh.ConstructRectangularMesh(20, 20, true); // 21*21 nodes
 
-        // Create cell which keeps dividing
-        TissueConfig::Instance()->SetMaxTransitGenerations(UINT_MAX);
+        // Create a cell which keeps dividing
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         p_model->SetCellProliferativeType(TRANSIT);
+        p_model->SetMaxTransitGenerations(UINT_MAX);
+
         TissueCellPtr p_cell(new TissueCell(p_state, p_model));
         p_cell->SetBirthTime(-13.5);
 

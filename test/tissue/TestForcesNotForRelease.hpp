@@ -736,7 +736,7 @@ public:
             TS_ASSERT_DELTA(node_forces[i][1], -force_magnitude*sin(angles[i]), 1e-4);
         }
 
-        double normal_target_area = tissue.GetTargetAreaOfCell(tissue.GetCellUsingLocationIndex(0));
+        double normal_target_area = force.GetTargetAreaOfCell(tissue.GetCellUsingLocationIndex(0));
 
         // Set up simulation time
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -745,7 +745,7 @@ public:
         // Set the cell to be necrotic
         tissue.GetCellUsingLocationIndex(0)->StartApoptosis();
 
-        double initial_apoptotic_target_area = tissue.GetTargetAreaOfCell(tissue.GetCellUsingLocationIndex(0));
+        double initial_apoptotic_target_area = force.GetTargetAreaOfCell(tissue.GetCellUsingLocationIndex(0));
 
         TS_ASSERT_DELTA(normal_target_area, initial_apoptotic_target_area, 1e-6);
 
@@ -768,7 +768,7 @@ public:
         // Increment time
         p_simulation_time->IncrementTimeOneStep();
 
-        double later_apoptotic_target_area = tissue.GetTargetAreaOfCell(tissue.GetCellUsingLocationIndex(0));
+        double later_apoptotic_target_area = force.GetTargetAreaOfCell(tissue.GetCellUsingLocationIndex(0));
 
         TS_ASSERT_LESS_THAN(later_apoptotic_target_area, initial_apoptotic_target_area);
 
@@ -790,6 +790,126 @@ public:
             TS_ASSERT_DELTA(node_forces[i][0], -apoptotic_force_magnitude*cos(angles[i]), 1e-4);
             TS_ASSERT_DELTA(node_forces[i][1], -apoptotic_force_magnitude*sin(angles[i]), 1e-4);
         }
+    }
+
+    void TestNagaiHondaGetTargetAreaOfCell() throw (Exception)
+    {
+        SimulationTime* p_simulation_time = SimulationTime::Instance();
+        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(3*0.25, 3);
+
+        // Create mesh
+        HoneycombMutableVertexMeshGenerator generator(3, 3);
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
+
+        // Set up cells
+        std::vector<TissueCellPtr> cells;
+        std::vector<unsigned> cell_location_indices;
+        boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
+        for (unsigned i=0; i<p_mesh->GetNumElements(); i++)
+        {
+            CellProliferativeType cell_type = STEM;
+
+            if ((i==0) || (i==4))
+            {
+                cell_type = DIFFERENTIATED;
+            }
+            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            p_model->SetCellProliferativeType(cell_type);
+
+            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            double birth_time = 0.0 - 2*i;
+            p_cell->SetBirthTime(birth_time);
+
+            cells.push_back(p_cell);
+            cell_location_indices.push_back(i);
+        }
+
+        // Create tissue
+        VertexBasedTissue<2> tissue(*p_mesh, cells);
+        tissue.InitialiseCells(); // this method must be called explicitly as there is no simulation
+
+        // Create a force system
+        NagaiHondaForce<2> force;
+
+        // Check GetTargetAreaOfCell()
+        for (VertexMesh<2,2>::VertexElementIterator iter = p_mesh->GetElementIteratorBegin();
+             iter != p_mesh->GetElementIteratorEnd();
+             ++iter)
+        {
+            unsigned elem_index = iter->GetIndex();
+            TissueCellPtr p_cell = tissue.GetCellUsingLocationIndex(elem_index);
+            double expected_area = force.GetMatureCellTargetArea();
+
+            if (elem_index!=4 && elem_index<=7u)
+            {
+                expected_area *= 0.5*(1 + ((double)elem_index)/7.0);
+            }
+
+            double actual_area = force.GetTargetAreaOfCell(p_cell);
+
+            TS_ASSERT_DELTA(actual_area, expected_area, 1e-12);
+        }
+
+        TissueCellPtr p_cell_0 = tissue.GetCellUsingLocationIndex(0);
+        TissueCellPtr p_cell_1 = tissue.GetCellUsingLocationIndex(1);
+        TissueCellPtr p_cell_4 = tissue.GetCellUsingLocationIndex(4);
+
+        // Make cell 1 and 4 undergo apoptosis
+        p_cell_1->StartApoptosis();
+        p_cell_4->StartApoptosis();
+
+        double actual_area_0 = force.GetTargetAreaOfCell(p_cell_0);
+        double actual_area_1 = force.GetTargetAreaOfCell(p_cell_1);
+        double actual_area_4 = force.GetTargetAreaOfCell(p_cell_4);
+
+        double expected_area_0 = 0.5;
+        double expected_area_1 = force.GetMatureCellTargetArea()*0.5*(1.0 + 1.0/7.0);
+        double expected_area_4 = force.GetMatureCellTargetArea();
+
+        TS_ASSERT_DELTA(actual_area_0, expected_area_0, 1e-12);
+        TS_ASSERT_DELTA(actual_area_1, expected_area_1, 1e-12);
+        TS_ASSERT_DELTA(actual_area_4, expected_area_4, 1e-12);
+
+        // Run for one time step
+        p_simulation_time->IncrementTimeOneStep();
+
+        double actual_area_0_after_dt = force.GetTargetAreaOfCell(p_cell_0);
+        double actual_area_1_after_dt = force.GetTargetAreaOfCell(p_cell_1);
+        double actual_area_4_after_dt = force.GetTargetAreaOfCell(p_cell_4);
+
+        // The target areas of cells 1 and 4 should have halved
+        expected_area_0 = force.GetMatureCellTargetArea()*0.5*(1.0 + 0.5*0.25);
+
+        TS_ASSERT_DELTA(actual_area_0_after_dt, expected_area_0, 1e-12);
+        TS_ASSERT_DELTA(actual_area_1_after_dt, 0.5*expected_area_1, 1e-12);
+        TS_ASSERT_DELTA(actual_area_4_after_dt, 0.5*expected_area_4, 1e-12);
+
+        // Make cell 0 undergo apoptosis
+        p_cell_0->StartApoptosis();
+
+        // Now run on for a further time step
+        p_simulation_time->IncrementTimeOneStep();
+
+        double actual_area_0_after_2dt = force.GetTargetAreaOfCell(p_cell_0);
+        double actual_area_1_after_2dt = force.GetTargetAreaOfCell(p_cell_1);
+        double actual_area_4_after_2dt = force.GetTargetAreaOfCell(p_cell_4);
+
+        // Cells 1 and 4 should now have zero target area and the target area of cell 0 should have halved
+        TS_ASSERT_DELTA(actual_area_0_after_2dt, 0.5*expected_area_0, 1e-12);
+        TS_ASSERT_DELTA(actual_area_1_after_2dt, 0.0, 1e-12);
+        TS_ASSERT_DELTA(actual_area_4_after_2dt, 0.0, 1e-12);
+
+        // Now run on for even further, for coverage
+        p_simulation_time->IncrementTimeOneStep();
+
+        double actual_area_0_after_3dt = force.GetTargetAreaOfCell(p_cell_0);
+        double actual_area_1_after_3dt = force.GetTargetAreaOfCell(p_cell_1);
+        double actual_area_4_after_3dt = force.GetTargetAreaOfCell(p_cell_4);
+
+        // All apoptotic cells should now have zero target area
+        TS_ASSERT_DELTA(actual_area_0_after_3dt, 0.0, 1e-12);
+        TS_ASSERT_DELTA(actual_area_1_after_3dt, 0.0, 1e-12);
+        TS_ASSERT_DELTA(actual_area_4_after_3dt, 0.0, 1e-12);
     }
 
     void TestNagaiHondaForceArchiving() throw (Exception)
@@ -838,6 +958,7 @@ public:
             force.SetNagaiHondaMembraneSurfaceEnergyParameter(17.9);
             force.SetNagaiHondaCellCellAdhesionEnergyParameter(0.5);
             force.SetNagaiHondaCellBoundaryAdhesionEnergyParameter(0.6);
+            force.SetMatureCellTargetArea(0.7);
 
             // Serialize force  via pointer
             std::ofstream ofs(archive_filename.c_str());
@@ -868,6 +989,7 @@ public:
             TS_ASSERT_DELTA(p_static_cast_force->GetNagaiHondaMembraneSurfaceEnergyParameter(), 17.9, 1e-12);
             TS_ASSERT_DELTA(p_static_cast_force->GetNagaiHondaCellCellAdhesionEnergyParameter(), 0.5, 1e-12);
             TS_ASSERT_DELTA(p_static_cast_force->GetNagaiHondaCellBoundaryAdhesionEnergyParameter(), 0.6, 1e-12);
+            TS_ASSERT_DELTA(p_static_cast_force->GetMatureCellTargetArea(), 0.7, 1e-12);
 
             // Tidy up
             delete p_force;

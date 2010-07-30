@@ -82,6 +82,11 @@ private:
      */
     double mNagaiHondaCellBoundaryAdhesionEnergyParameter;
 
+    /**
+     * Non-dimensional target area of a mature (fully-grown) TissueCell.
+     */
+    double mMatureCellTargetArea;
+
     friend class boost::serialization::access;
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
@@ -93,6 +98,7 @@ private:
         archive & mNagaiHondaMembraneSurfaceEnergyParameter;
         archive & mNagaiHondaCellCellAdhesionEnergyParameter;
         archive & mNagaiHondaCellBoundaryAdhesionEnergyParameter;
+        archive & mMatureCellTargetArea;
     }
 
 public:
@@ -175,6 +181,29 @@ public:
      * @param nagaiHondaCellBoundaryAdhesionEnergyParameter the new value of mNagaiHondaCellBoundaryAdhesionEnergyParameter
      */
     void SetNagaiHondaCellBoundaryAdhesionEnergyParameter(double nagaiHondaCellBoundaryAdhesionEnergyParameter);
+
+    /**
+     * Get the target area of a given cell. This grows linearly from
+     * 0.5*A to A during the G1 phase of the cell cycle, then remains
+     * at A for the rest of the cell cycle, where A denotes the TissueConfig
+     * member variable mMatureCellTargetArea.
+     *
+     * @param pCell the cell
+     * @return the cell's target area
+     */
+    double GetTargetAreaOfCell(const TissueCellPtr pCell) const;
+
+    /**
+     * @return mMatureCellTargetArea
+     */
+    double GetMatureCellTargetArea() const;
+
+    /**
+     * Set mMatureCellTargetArea.
+     * 
+     * @param matureCellTargetArea the new value of mMatureCellTargetArea
+     */
+    void SetMatureCellTargetArea(double matureCellTargetArea);
 };
 
 
