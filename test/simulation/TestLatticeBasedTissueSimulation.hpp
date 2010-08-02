@@ -479,8 +479,6 @@ public:
 
     void TestStandardResultForArchivingTestsBelow() throw (Exception)
     {
-        TissueConfig::Instance()->SetOutputCellCyclePhases(true);
-
         // Create mesh
         TetrahedralMesh<2,2> mesh;
         mesh.ConstructRectangularMesh(49, 49, true); // 50*50 nodes
@@ -502,6 +500,7 @@ public:
 
         // Create a tissue
         LatticeBasedTissue<2> tissue(mesh, cells, real_node_indices);
+        tissue.SetOutputCellCyclePhases(true);
 
         // Create a UpdateRule system
         DiffusionUpdateRule<2> update_rule;
@@ -552,8 +551,6 @@ public:
     // Testing Save
     void TestSave() throw (Exception)
     {
-        TissueConfig::Instance()->SetOutputCellCyclePhases(true);
-
         // Create mesh
         TetrahedralMesh<2,2> mesh;
         mesh.ConstructRectangularMesh(49, 49, true); // 50*50 nodes
@@ -575,6 +572,7 @@ public:
 
         // Create a tissue
         LatticeBasedTissue<2> tissue(mesh, cells, real_node_indices);
+        tissue.SetOutputCellCyclePhases(true);
 
         // Create a UpdateRule system
         DiffusionUpdateRule<2> update_rule;

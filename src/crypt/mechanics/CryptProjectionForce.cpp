@@ -171,7 +171,7 @@ c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nod
         std::set<TissueCellPtr> cell_pair = p_static_cast_tissue->CreateCellPair(p_cell_A, p_cell_B);
         if (p_static_cast_tissue->IsMarkedSpring(cell_pair))
         {
-            double lambda = p_config->GetMeinekeDivisionRestingSpringLength();
+            double lambda = mMeinekeDivisionRestingSpringLength;
             rest_length = lambda + (1.0 - lambda) * ageA/m_duration;
         }
         if (ageA+SimulationTime::Instance()->GetTimeStep() >= m_duration)

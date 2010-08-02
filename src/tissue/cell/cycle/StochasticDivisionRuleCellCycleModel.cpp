@@ -57,10 +57,10 @@ void StochasticDivisionRuleCellCycleModel::SetG1Duration()
     }
 
     // Check that the normal random deviate has not returned a small or negative G1 duration
-    if (mG1Duration < p_params->GetMinimumGapDuration())
+    if (mG1Duration < mMinimumGapDuration)
     {
         #define COVERAGE_IGNORE
-        mG1Duration = p_params->GetMinimumGapDuration();
+        mG1Duration = mMinimumGapDuration;
         #undef COVERAGE_IGNORE
     }
 }

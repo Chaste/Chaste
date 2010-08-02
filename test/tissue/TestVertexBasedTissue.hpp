@@ -789,12 +789,12 @@ public:
         tissue.GetCellUsingLocationIndex(5)->GetCellCycleModel()->SetCellProliferativeType(STEM);
         tissue.SetCellAncestorsToLocationIndices();
 
-        TissueConfig::Instance()->SetOutputCellMutationStates(true);
-        TissueConfig::Instance()->SetOutputCellProliferativeTypes(true);
-        TissueConfig::Instance()->SetOutputCellCyclePhases(true);
-        TissueConfig::Instance()->SetOutputCellAncestors(true);
-        TissueConfig::Instance()->SetOutputCellAges(true);
-        TissueConfig::Instance()->SetOutputCellVolumes(true);
+        tissue.SetOutputCellMutationStates(true);
+        tissue.SetOutputCellProliferativeTypes(true);
+        tissue.SetOutputCellCyclePhases(true);
+        tissue.SetOutputCellAncestors(true);
+        tissue.SetOutputCellAges(true);
+        tissue.SetOutputCellVolumes(true);
 
         // Coverage of writing CellwiseData to VTK
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();

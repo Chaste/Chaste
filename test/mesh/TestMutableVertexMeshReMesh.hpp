@@ -43,7 +43,6 @@ public:
 	/*
 	 * This tests both PerformNodeMerge and IdentifySwapType
 	 *
-	 *
 	 *       /|
 	 *      / |
 	 *     /  |
@@ -66,12 +65,12 @@ public:
 		nodes.push_back(new Node<2>(4, true, 0.6, 0.0));
 
 		// Create two elements containing nodes
+		unsigned node_indices_elem_0[5] = {0, 3, 4, 1, 2};
 		std::vector<Node<2>*> nodes_elem_0;
-		nodes_elem_0.push_back(nodes[0]);
-		nodes_elem_0.push_back(nodes[3]);
-		nodes_elem_0.push_back(nodes[4]);
-		nodes_elem_0.push_back(nodes[1]);
-		nodes_elem_0.push_back(nodes[2]);
+		for (unsigned i=0; i<5; i++)
+		{
+		    nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+		}
 
 		std::vector<VertexElement<2,2>*> vertex_elements;
 		vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
@@ -84,12 +83,10 @@ public:
 		TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 5u);
 
 		// Test the correct nodes are boundary nodes
-		TS_ASSERT_EQUALS(vertex_mesh.GetNode(0)->IsBoundaryNode(), true);
-		TS_ASSERT_EQUALS(vertex_mesh.GetNode(1)->IsBoundaryNode(), true);
-		TS_ASSERT_EQUALS(vertex_mesh.GetNode(2)->IsBoundaryNode(), true);
-		TS_ASSERT_EQUALS(vertex_mesh.GetNode(3)->IsBoundaryNode(), true);
-		TS_ASSERT_EQUALS(vertex_mesh.GetNode(4)->IsBoundaryNode(), true);
-
+		for (unsigned i=0; i<5; i++)
+		{
+		    TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), true);
+		}
 
 		// Merge nodes 3 and 4
 		VertexElementMap map(vertex_mesh.GetNumElements());
@@ -100,10 +97,10 @@ public:
 		TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 4u);
 
 		// Test the correct nodes are boundary nodes
-		TS_ASSERT_EQUALS(vertex_mesh.GetNode(0)->IsBoundaryNode(), true);
-		TS_ASSERT_EQUALS(vertex_mesh.GetNode(1)->IsBoundaryNode(), true);
-		TS_ASSERT_EQUALS(vertex_mesh.GetNode(2)->IsBoundaryNode(), true);
-		TS_ASSERT_EQUALS(vertex_mesh.GetNode(3)->IsBoundaryNode(), true);
+        for (unsigned i=0; i<4; i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), true);
+        }
 
 		// Test merged node is in the correct place
 		TS_ASSERT_DELTA(vertex_mesh.GetNode(3)->rGetLocation()[0], 0.5, 1e-3);
@@ -111,17 +108,17 @@ public:
 
 		// Test elements have correct nodes
 		TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
-		TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(0)->GetIndex(), 0u);
-		TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(1)->GetIndex(), 3u);
-		TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(2)->GetIndex(), 1u);
-		TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(3)->GetIndex(), 2u);
+		TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(0), 0u);
+		TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(1), 3u);
+		TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(2), 1u);
+		TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(3), 2u);
 
 		// Test Area and Perimeter of element
 		TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 0.5, 1e-6);
 		TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 2+sqrt(2), 1e-6);
 	}
 
-    /*
+    /**
      * This test provides coverage of the case in which, when the elements
      * previously containing the high-index node are updated to contain the
      * low-index node, at least one of these elements did not already contain
@@ -135,9 +132,8 @@ public:
      *
      *  The nodes marked with an x are merged
      *
-     * \TODO this could be merged with the earlier test to shorten the test file.
-     * \TODO I think this should be a T1Swap see #1263
-     *
+     * \todo this could be merged with the earlier test to shorten the test file.
+     * \todo I think this should be a T1Swap see #1263
      */
     void TestPerformNodeMergeWhenLowIndexNodeMustBeAddedToElement() throw(Exception)
     {
@@ -152,18 +148,17 @@ public:
         nodes.push_back(new Node<2>(6, true, 0.0, 2.0));
 
         // Create two elements containing nodes
-        std::vector<Node<2>*> nodes_elem_0;
-        nodes_elem_0.push_back(nodes[0]);
-        nodes_elem_0.push_back(nodes[1]);
-        nodes_elem_0.push_back(nodes[5]);
-        nodes_elem_0.push_back(nodes[6]);
-
-        std::vector<Node<2>*> nodes_elem_1;
-        nodes_elem_1.push_back(nodes[1]);
-        nodes_elem_1.push_back(nodes[2]);
-        nodes_elem_1.push_back(nodes[3]);
-        nodes_elem_1.push_back(nodes[4]);
-        nodes_elem_1.push_back(nodes[5]);
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
+        unsigned node_indices_elem_0[4] = {0, 1, 5, 6};
+        unsigned node_indices_elem_1[5] = {1, 2, 3, 4, 5};
+        for (unsigned i=0; i<5; i++)
+        {
+            if (i < 4)
+            {
+                nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+            }
+            nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+        }
 
         std::vector<VertexElement<2,2>*> vertex_elements;
         vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
@@ -188,29 +183,25 @@ public:
 
         // Test elements have correct nodes
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(0)->GetIndex(), 0u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(1)->GetIndex(), 1u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(2)->GetIndex(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(3)->GetIndex(), 5u);
-
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(0)->GetIndex(), 1u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(1)->GetIndex(), 2u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(2)->GetIndex(), 3u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(3)->GetIndex(), 4u);
+        unsigned node_indices_element_0[4] = {0, 1, 4, 5};
+        unsigned node_indices_element_1[4] = {1, 2, 3, 4};
+        for (unsigned i=0; i<4; i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
+        }
 
         // Test boundary property of nodes
         for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), true);
         }
-
     }
 
     // This tests both PerformT1Swap and IdentifySwapType
     void TestPerformT1Swap() throw(Exception)
     {
-
         /* Make 6 nodes to assign to 4 elements.
          *
          *  _____
@@ -231,27 +222,21 @@ public:
         nodes.push_back(new Node<2>(5, false, 0.5, 0.6));
 
         // Make two triangular and two rhomboid elements out of these nodes
-        std::vector<Node<2>*> nodes_elem_0;
-        nodes_elem_0.push_back(nodes[2]);
-        nodes_elem_0.push_back(nodes[3]);
-        nodes_elem_0.push_back(nodes[5]);
-
-        std::vector<Node<2>*> nodes_elem_1;
-        nodes_elem_1.push_back(nodes[2]);
-        nodes_elem_1.push_back(nodes[5]);
-        nodes_elem_1.push_back(nodes[4]);
-        nodes_elem_1.push_back(nodes[1]);
-
-        std::vector<Node<2>*> nodes_elem_2;
-        nodes_elem_2.push_back(nodes[1]);
-        nodes_elem_2.push_back(nodes[4]);
-        nodes_elem_2.push_back(nodes[0]);
-
-        std::vector<Node<2>*> nodes_elem_3;
-        nodes_elem_3.push_back(nodes[0]);
-        nodes_elem_3.push_back(nodes[4]);
-        nodes_elem_3.push_back(nodes[5]);
-        nodes_elem_3.push_back(nodes[3]);
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2, nodes_elem_3;
+        unsigned node_indices_elem_0[3] = {2, 3, 5};
+        unsigned node_indices_elem_1[4] = {2, 5, 4, 1};
+        unsigned node_indices_elem_2[3] = {1, 4, 0};
+        unsigned node_indices_elem_3[4] = {0, 4, 5, 3};
+        for (unsigned i=0; i<4; i++)
+        {
+            if (i < 3)
+            {
+                nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+                nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
+            }
+            nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+            nodes_elem_3.push_back(nodes[node_indices_elem_3[i]]);
+        }
 
         std::vector<VertexElement<2,2>*> vertex_elements;
         vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
@@ -294,27 +279,20 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.5, 1e-3);
 
         // Test elements have correct nodes
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(0)->GetIndex(), 2u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(1)->GetIndex(), 3u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(2)->GetIndex(), 5u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(3)->GetIndex(), 4u);
-
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(0)->GetIndex(), 2u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(1)->GetIndex(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(2)->GetIndex(), 1u);
-
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(0)->GetIndex(), 1u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(1)->GetIndex(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(2)->GetIndex(), 5u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(3)->GetIndex(), 0u);
-
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNumNodes(), 3u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNode(0)->GetIndex(), 0u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNode(1)->GetIndex(), 5u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNode(2)->GetIndex(), 3u);
+        unsigned node_indices_element_0[4] = {2, 3, 5, 4};
+        unsigned node_indices_element_1[3] = {2, 4, 1};
+        unsigned node_indices_element_2[4] = {1, 4, 5, 0};
+        unsigned node_indices_element_3[3] = {0, 5, 3};
+        for (unsigned i=0; i<4; i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
+            if (i < 3)
+            {
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNodeGlobalIndex(i), node_indices_element_3[i]);
+            }
+        }
 
         // Test areas and perimeters of elements
         TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 0.3, 1e-6);
@@ -366,21 +344,19 @@ public:
         nodes.push_back(new Node<2>(5, true, 0.5, 0.6));
 
         // Make two triangular and one rhomboid elements out of these nodes
-        std::vector<Node<2>*> nodes_elem_0;
-        nodes_elem_0.push_back(nodes[2]);
-        nodes_elem_0.push_back(nodes[3]);
-        nodes_elem_0.push_back(nodes[5]);
-
-        std::vector<Node<2>*> nodes_elem_1;
-        nodes_elem_1.push_back(nodes[1]);
-        nodes_elem_1.push_back(nodes[4]);
-        nodes_elem_1.push_back(nodes[0]);
-
-        std::vector<Node<2>*> nodes_elem_2;
-        nodes_elem_2.push_back(nodes[0]);
-        nodes_elem_2.push_back(nodes[4]);
-        nodes_elem_2.push_back(nodes[5]);
-        nodes_elem_2.push_back(nodes[3]);
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2;
+        unsigned node_indices_elem_0[3] = {2, 3, 5};
+        unsigned node_indices_elem_1[3] = {1, 4, 0};
+        unsigned node_indices_elem_2[4] = {0, 4, 5, 3};
+        for (unsigned i=0; i<4; i++)
+        {
+            if (i < 3)
+            {
+                nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+                nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+            }
+            nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
+        }
 
         std::vector<VertexElement<2,2>*> vertex_elements;
         vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
@@ -417,21 +393,20 @@ public:
 
         // Test elements have correct nodes
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(0)->GetIndex(), 2u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(1)->GetIndex(), 3u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(2)->GetIndex(), 5u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(3)->GetIndex(), 4u);
-
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(0)->GetIndex(), 1u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(1)->GetIndex(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(2)->GetIndex(), 5u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(3)->GetIndex(), 0u);
-
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 3u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(0)->GetIndex(), 0u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(1)->GetIndex(), 5u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(2)->GetIndex(), 3u);
+        unsigned node_indices_element_0[4] = {2, 3, 5, 4};
+        unsigned node_indices_element_1[4] = {1, 4, 5, 0};
+        unsigned node_indices_element_2[4] = {0, 5, 3};
+        for (unsigned i=0; i<4; i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
+            if (i < 3)
+            {
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
+            }
+        }
 
         // Test areas and perimeters of elements
         TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 0.3, 1e-6);
@@ -446,11 +421,7 @@ public:
         // Test boundary property of nodes
         for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
         {
-            bool expected_boundary_node = true;
-            if ( i==5 )
-            {
-                expected_boundary_node = false;
-            }
+            bool expected_boundary_node = (i!=5);
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
         }
     }
@@ -477,22 +448,19 @@ public:
         nodes.push_back(new Node<2>(5, true, 0.5, 0.6));
 
         // Make one triangular and two rhomboid elements out of these nodes
-        std::vector<Node<2>*> nodes_elem_0;
-        nodes_elem_0.push_back(nodes[1]);
-        nodes_elem_0.push_back(nodes[2]);
-        nodes_elem_0.push_back(nodes[5]);
-        nodes_elem_0.push_back(nodes[4]);
-
-        std::vector<Node<2>*> nodes_elem_1;
-        nodes_elem_1.push_back(nodes[1]);
-        nodes_elem_1.push_back(nodes[4]);
-        nodes_elem_1.push_back(nodes[0]);
-
-        std::vector<Node<2>*> nodes_elem_2;
-        nodes_elem_2.push_back(nodes[0]);
-        nodes_elem_2.push_back(nodes[4]);
-        nodes_elem_2.push_back(nodes[5]);
-        nodes_elem_2.push_back(nodes[3]);
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2;
+        unsigned node_indices_elem_0[4] = {1, 2, 5, 4};
+        unsigned node_indices_elem_1[3] = {1, 4, 0};
+        unsigned node_indices_elem_2[4] = {0, 4, 5, 3};
+        for (unsigned i=0; i<4; i++)
+        {
+            nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+            if (i < 3)
+            {
+                nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+            }
+            nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
+        }
 
         std::vector<VertexElement<2,2>*> vertex_elements;
         vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
@@ -527,23 +495,23 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.4, 1e-3);
         TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.5, 1e-3);
 
-        // Test elements have correct nodes
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 3u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(0)->GetIndex(), 1u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(1)->GetIndex(), 2u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(2)->GetIndex(), 4u);
-
-
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(0)->GetIndex(), 1u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(1)->GetIndex(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(2)->GetIndex(), 5u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(3)->GetIndex(), 0u);
-
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 3u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(0)->GetIndex(), 0u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(1)->GetIndex(), 5u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(2)->GetIndex(), 3u);
+
+        // Test elements have correct nodes
+        unsigned node_indices_element_0[3] = {1, 2, 4};
+        unsigned node_indices_element_1[4] = {1, 4, 5, 0};
+        unsigned node_indices_element_2[3] = {0, 5, 3};
+        for (unsigned i=0; i<4; i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
+            if (i < 3)
+            {
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
+            }
+        }
 
         // Test areas and perimeters of elements
         TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 0.2, 1e-6);
@@ -561,9 +529,6 @@ public:
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), true);
         }
     }
-
-
-
 
     // This tests both PerformT1Swap and IdentifySwapType
     void TestPerformT1SwapToSeparate() throw(Exception)
@@ -588,17 +553,14 @@ public:
         nodes.push_back(new Node<2>(5, true, 0.5, 0.6));
 
         // Make two rhomboid elements out of these nodes
-        std::vector<Node<2>*> nodes_elem_0;
-        nodes_elem_0.push_back(nodes[0]);
-        nodes_elem_0.push_back(nodes[4]);
-        nodes_elem_0.push_back(nodes[5]);
-        nodes_elem_0.push_back(nodes[3]);
-
-        std::vector<Node<2>*> nodes_elem_1;
-        nodes_elem_1.push_back(nodes[4]);
-        nodes_elem_1.push_back(nodes[1]);
-        nodes_elem_1.push_back(nodes[2]);
-        nodes_elem_1.push_back(nodes[5]);
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
+        unsigned node_indices_elem_0[4] = {0, 4, 5, 3};
+        unsigned node_indices_elem_1[4] = {4, 1, 2, 5};
+        for (unsigned i=0; i<4; i++)
+        {
+            nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+            nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+        }
 
         std::vector<VertexElement<2,2>*> vertex_elements;
         vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
@@ -629,16 +591,17 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.4, 1e-3);
         TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.5, 1e-3);
 
-        // Test elements have correct nodes
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 3u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(0)->GetIndex(), 0u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(1)->GetIndex(), 5u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(2)->GetIndex(), 3u);
-
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(0)->GetIndex(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(1)->GetIndex(), 1u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(2)->GetIndex(), 2u);
+
+        // Test elements have correct nodes
+        unsigned node_indices_element_0[3] = {0, 5, 3};
+        unsigned node_indices_element_1[3] = {4, 1, 2};
+        for (unsigned i=0; i<3; i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
+        }
 
         // Test areas and perimeters of elements
         TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 0.2, 1e-6);
@@ -650,8 +613,7 @@ public:
         // Test boundary property of nodes
         for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
         {
-            bool expected_boundary_node = true;
-            TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
+            TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), true);
         }
     }
 
@@ -667,27 +629,21 @@ public:
         nodes.push_back(new Node<2>(5, false, 0.5, 0.5));
 
         // Make two triangular and two rhomboid elements out of these nodes
-        std::vector<Node<2>*> nodes_elem_0;
-        nodes_elem_0.push_back(nodes[2]);
-        nodes_elem_0.push_back(nodes[3]);
-        nodes_elem_0.push_back(nodes[5]);
-
-        std::vector<Node<2>*> nodes_elem_1;
-        nodes_elem_1.push_back(nodes[2]);
-        nodes_elem_1.push_back(nodes[5]);
-        nodes_elem_1.push_back(nodes[4]);
-        nodes_elem_1.push_back(nodes[1]);
-
-        std::vector<Node<2>*> nodes_elem_2;
-        nodes_elem_2.push_back(nodes[1]);
-        nodes_elem_2.push_back(nodes[4]);
-        nodes_elem_2.push_back(nodes[0]);
-
-        std::vector<Node<2>*> nodes_elem_3;
-        nodes_elem_3.push_back(nodes[0]);
-        nodes_elem_3.push_back(nodes[4]);
-        nodes_elem_3.push_back(nodes[5]);
-        nodes_elem_3.push_back(nodes[3]);
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2, nodes_elem_3;
+        unsigned node_indices_elem_0[3] = {2, 3, 5};
+        unsigned node_indices_elem_1[4] = {2, 5, 4, 1};
+        unsigned node_indices_elem_2[3] = {1, 4, 0};
+        unsigned node_indices_elem_3[4] = {0, 4, 5, 3};
+        for (unsigned i=0; i<4; i++)
+        {
+            if (i < 3)
+            {
+                nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+                nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
+            }
+            nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+            nodes_elem_3.push_back(nodes[node_indices_elem_3[i]]);
+        }
 
         std::vector<VertexElement<2,2>*> vertex_elements;
         vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
@@ -735,40 +691,21 @@ public:
          *
          */
 
-        // Trapezium element
-        std::vector<Node<2>*> nodes_elem_0;
-        nodes_elem_0.push_back(nodes[0]);
-        nodes_elem_0.push_back(nodes[1]);
-        nodes_elem_0.push_back(nodes[5]);
-        nodes_elem_0.push_back(nodes[4]);
-
-        // Trapezium element
-        std::vector<Node<2>*> nodes_elem_1;
-        nodes_elem_1.push_back(nodes[1]);
-        nodes_elem_1.push_back(nodes[2]);
-        nodes_elem_1.push_back(nodes[6]);
-        nodes_elem_1.push_back(nodes[5]);
-
-        // Trapezium element
-        std::vector<Node<2>*> nodes_elem_2;
-        nodes_elem_2.push_back(nodes[2]);
-        nodes_elem_2.push_back(nodes[3]);
-        nodes_elem_2.push_back(nodes[7]);
-        nodes_elem_2.push_back(nodes[6]);
-
-        // Trapezium element
-        std::vector<Node<2>*> nodes_elem_3;
-        nodes_elem_3.push_back(nodes[0]);
-        nodes_elem_3.push_back(nodes[4]);
-        nodes_elem_3.push_back(nodes[7]);
-        nodes_elem_3.push_back(nodes[3]);
-
-        // Central square element
-        std::vector<Node<2>*> nodes_elem_4;
-        nodes_elem_4.push_back(nodes[4]);
-        nodes_elem_4.push_back(nodes[5]);
-        nodes_elem_4.push_back(nodes[6]);
-        nodes_elem_4.push_back(nodes[7]);
+        // Create elements
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2, nodes_elem_3, nodes_elem_4;
+        unsigned node_indices_elem_0[4] = {0, 1, 5, 4};
+        unsigned node_indices_elem_1[4] = {1, 2, 6, 5};
+        unsigned node_indices_elem_2[4] = {2, 3, 7, 6};
+        unsigned node_indices_elem_3[4] = {0, 4, 7, 3};
+        unsigned node_indices_elem_4[4] = {4, 5, 6, 7};
+        for (unsigned i=0; i<4; i++)
+        {
+            nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+            nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+            nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
+            nodes_elem_3.push_back(nodes[node_indices_elem_3[i]]);
+            nodes_elem_4.push_back(nodes[node_indices_elem_4[i]]);
+        }
 
         std::vector<VertexElement<2,2>*> vertex_elements;
         vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
@@ -812,36 +749,30 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.0875, 1e-3);
 
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 3u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(0)->GetIndex(), 0u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(1)->GetIndex(), 1u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(2)->GetIndex(), 4u);
-
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 5u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(0)->GetIndex(), 1u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(1)->GetIndex(), 2u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(2)->GetIndex(), 6u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(3)->GetIndex(), 5u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(4)->GetIndex(), 4u);
-
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(0)->GetIndex(), 2u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(1)->GetIndex(), 3u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(2)->GetIndex(), 7u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(3)->GetIndex(), 6u);
-
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNumNodes(), 5u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNode(0)->GetIndex(), 0u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNode(1)->GetIndex(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNode(2)->GetIndex(), 5u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNode(3)->GetIndex(), 7u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNode(4)->GetIndex(), 3u);
+        unsigned node_indices_element_0[3] = {0, 1, 4};
+        unsigned node_indices_element_1[5] = {1, 2, 6, 5, 4};
+        unsigned node_indices_element_2[4] = {2, 3, 7, 6};
+        unsigned node_indices_element_3[5] = {0, 4, 5, 7, 3};
+        unsigned node_indices_element_4[3] = {5, 6, 7};
+        for (unsigned i=0; i<5; i++)
+        {
+            if (i < 3)
+            {
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(4)->GetNodeGlobalIndex(i), node_indices_element_4[i]);
+            }
+            if (i < 4)
+            {
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
+            }
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNodeGlobalIndex(i), node_indices_element_3[i]);
+        }
 
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(4)->GetNumNodes(), 3u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(4)->GetNode(0)->GetIndex(), 5u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(4)->GetNode(1)->GetIndex(), 6u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(4)->GetNode(2)->GetIndex(), 7u);
-
-        vertex_mesh.SetT2Threshold(0.1); //T2 threshold larger so swap does occur
+        vertex_mesh.SetT2Threshold(0.1); // T2 threshold larger so swap does occur
         //vertexElement<2,2>* p_element_4 = vertex_mesh.GetElement(4);
         //vertex_mesh.PerformT2Swap(*p_element_4);
         vertex_mesh.ReMesh();
@@ -868,28 +799,26 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.0, 1e-3);
         TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.2875/3.0, 1e-3);
 
-        // Test elements are OK
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 3u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(0)->GetIndex(), 0u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(1)->GetIndex(), 1u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(2)->GetIndex(), 4u);
-
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(0)->GetIndex(), 1u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(1)->GetIndex(), 2u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(2)->GetIndex(), 5u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(3)->GetIndex(), 4u);
-
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 3u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(0)->GetIndex(), 2u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(1)->GetIndex(), 3u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(2)->GetIndex(), 5u);
-
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNumNodes(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNode(0)->GetIndex(), 0u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNode(1)->GetIndex(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNode(2)->GetIndex(), 5u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNode(3)->GetIndex(), 3u);
+
+        // Test elements are OK
+        unsigned new_node_indices_element_0[3] = {0, 1, 4};
+        unsigned new_node_indices_element_1[4] = {1, 2, 5, 4};
+        unsigned new_node_indices_element_2[3] = {2, 3, 5};
+        unsigned new_node_indices_element_3[4] = {0, 4, 5, 3};
+        for (unsigned i=0; i<4; i++)
+        {
+            if (i < 3)
+            {
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), new_node_indices_element_0[i]);
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), new_node_indices_element_2[i]);
+            }
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), new_node_indices_element_1[i]);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNodeGlobalIndex(i), new_node_indices_element_3[i]);
+        }
     }
 
     void TestPerformT2Swap() throw(Exception)
@@ -904,44 +833,33 @@ public:
         nodes.push_back(new Node<2>(5, false, 0.5, 0.3));
 
         /*
-        *  Make three trapezium elements with a central triangular element out of these nodes
-        *
-        *      /|\
-        *     / | \
-        *    /  |  \
-        *   /2 /_\ 1\   Triangular element is element zero
-        *  / _/   \_ \
-        * /_/___3___\_\
-        *
-        */
+         *  Make three trapezium elements with a central triangular element out of these nodes
+         *
+         *      /|\
+         *     / | \
+         *    /  |  \
+         *   /2 /_\ 1\   Triangular element is element zero
+         *  / _/   \_ \
+         * /_/___3___\_\
+         *
+         */
 
-
-        // Triangle element
-        std::vector<Node<2>*> nodes_elem_0;
-        nodes_elem_0.push_back(nodes[3]);
-        nodes_elem_0.push_back(nodes[4]);
-        nodes_elem_0.push_back(nodes[5]);
-
-        // Trapezium
-        std::vector<Node<2>*> nodes_elem_1;
-        nodes_elem_1.push_back(nodes[1]);
-        nodes_elem_1.push_back(nodes[2]);
-        nodes_elem_1.push_back(nodes[5]);
-        nodes_elem_1.push_back(nodes[4]);
-
-        // Trapezium
-        std::vector<Node<2>*> nodes_elem_2;
-        nodes_elem_2.push_back(nodes[2]);
-        nodes_elem_2.push_back(nodes[0]);
-        nodes_elem_2.push_back(nodes[3]);
-        nodes_elem_2.push_back(nodes[5]);
-
-        // Trapezium
-        std::vector<Node<2>*> nodes_elem_3;
-        nodes_elem_3.push_back(nodes[0]);
-        nodes_elem_3.push_back(nodes[1]);
-        nodes_elem_3.push_back(nodes[4]);
-        nodes_elem_3.push_back(nodes[3]);
+        // Create elements
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2, nodes_elem_3;
+        unsigned node_indices_elem_0[3] = {3, 4, 5};
+        unsigned node_indices_elem_1[4] = {1, 2, 5, 4};
+        unsigned node_indices_elem_2[4] = {2, 0, 3, 5};
+        unsigned node_indices_elem_3[4] = {0, 1, 4, 3};
+        for (unsigned i=0; i<4; i++)
+        {
+            if (i < 3)
+            {
+                nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+            }
+            nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+            nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
+            nodes_elem_3.push_back(nodes[node_indices_elem_3[i]]);
+        }
 
         std::vector<VertexElement<2,2>*> vertex_elements;
         vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
@@ -968,173 +886,155 @@ public:
         for (unsigned j=1; j<4; j++)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNumNodes(), 3u);
-            TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNode(0)->GetIndex(), j%3);
-            TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNode(1)->GetIndex(), (j+1)%3);
-            TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNode(2)->GetIndex(), 6u);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNodeGlobalIndex(0), j%3);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNodeGlobalIndex(1), (j+1)%3);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNodeGlobalIndex(2), 6u);
         }
 
         // Test boundary property of nodes. All are boundary nodes except node 3.
         for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
         {
-            bool expected_boundary_node = true;
-            if (i==3)
-            {
-                expected_boundary_node = false;
-            }
+            bool expected_boundary_node = (i!=3);
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
         }
     }
 
     void TestPerformT2SwapWithBoundaryNodes() throw(Exception)
     {
-    	{
-			// Make 6 nodes to assign to three elements
-			std::vector<Node<2>*> nodes;
-			nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
-			nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
-			nodes.push_back(new Node<2>(2, true, 0.5, 0.5));
-			nodes.push_back(new Node<2>(3, true, 0.4, 0.25));
-			nodes.push_back(new Node<2>(4, true, 0.6, 0.25));
-			nodes.push_back(new Node<2>(5, false, 0.5, 0.3));
+		// Make 6 nodes to assign to three elements
+		std::vector<Node<2>*> nodes;
+		nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+		nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+		nodes.push_back(new Node<2>(2, true, 0.5, 0.5));
+		nodes.push_back(new Node<2>(3, true, 0.4, 0.25));
+		nodes.push_back(new Node<2>(4, true, 0.6, 0.25));
+		nodes.push_back(new Node<2>(5, false, 0.5, 0.3));
 
-			/*
-			*  Make two trapezium elements with a central triangular element out of these nodes
-			*
-			*      /|\
-			*     / | \
-			*    /  |  \
-			*   /2 /_\ 1\   Triangular element is element zero
-			*  / _/   \_ \
-			* /_/       \_\
-			*
-			*/
+		/*
+		 *  Make two trapezium elements with a central triangular element out of these nodes
+		 *
+		 *      /|\
+		 *     / | \
+		 *    /  |  \
+		 *   /2 /_\ 1\   Triangular element is element zero
+		 *  / _/   \_ \
+		 * /_/       \_\
+		 *
+		 */
 
+		// Create elements
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2;
+        unsigned node_indices_elem_0[3] = {3, 4, 5};
+        unsigned node_indices_elem_1[4] = {1, 2, 5, 4};
+        unsigned node_indices_elem_2[4] = {2, 0, 3, 5};
+        for (unsigned i=0; i<4; i++)
+        {
+            if (i < 3)
+            {
+                nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+            }
+            nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+            nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
+        }
 
-			// Triangle element
-			std::vector<Node<2>*> nodes_elem_0;
-			nodes_elem_0.push_back(nodes[3]);
-			nodes_elem_0.push_back(nodes[4]);
-			nodes_elem_0.push_back(nodes[5]);
+		std::vector<VertexElement<2,2>*> vertex_elements;
+		vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
+		vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
+		vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
 
-			// Trapezium
-			std::vector<Node<2>*> nodes_elem_1;
-			nodes_elem_1.push_back(nodes[1]);
-			nodes_elem_1.push_back(nodes[2]);
-			nodes_elem_1.push_back(nodes[5]);
-			nodes_elem_1.push_back(nodes[4]);
+		// Make a vertex mesh
+		MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
 
-			// Trapezium
-			std::vector<Node<2>*> nodes_elem_2;
-			nodes_elem_2.push_back(nodes[2]);
-			nodes_elem_2.push_back(nodes[0]);
-			nodes_elem_2.push_back(nodes[3]);
-			nodes_elem_2.push_back(nodes[5]);
+		TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 3u);
+		TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
 
+		// Perform a T2 swap on the middle triangle element
+		VertexElement<2,2>* p_element_0 = vertex_mesh.GetElement(0);
+		vertex_mesh.PerformT2Swap(*p_element_0);
 
-			std::vector<VertexElement<2,2>*> vertex_elements;
-			vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-			vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
-			vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
+		TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
+		TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 4u);
 
-			// Make a vertex mesh
-			MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+		TS_ASSERT_EQUALS(vertex_mesh.GetNumAllElements(), 3u);
+		TS_ASSERT_EQUALS(vertex_mesh.GetNumAllNodes(), 7u);
 
-			TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 3u);
-			TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
+		for (unsigned j=1; j<3; j++)
+		{
+			TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNumNodes(), 3u);
+			TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNodeGlobalIndex(0), j%3);
+			TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNodeGlobalIndex(1), (j+1)%3);
+			TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNodeGlobalIndex(2), 6u);
+		}
 
-			// Perform a T2 swap on the middle triangle element
-			VertexElement<2,2>* p_element_0 = vertex_mesh.GetElement(0);
-			vertex_mesh.PerformT2Swap(*p_element_0);
+		// Test boundary property of nodes. All are boundary nodes.
+		for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
+		{
+			TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), true);
+		}
 
-			TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
-			TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 4u);
+		// Make 5 nodes to assign to two elements
+		std::vector<Node<2>*> nodes2;
+		nodes2.push_back(new Node<2>(0, true, 1.0, 0.0));
+		nodes2.push_back(new Node<2>(1, true, 0.5, 0.5));
+		nodes2.push_back(new Node<2>(2, true, 0.4, 0.25));
+		nodes2.push_back(new Node<2>(3, true, 0.6, 0.25));
+		nodes2.push_back(new Node<2>(4, true, 0.5, 0.3));
 
-			TS_ASSERT_EQUALS(vertex_mesh.GetNumAllElements(), 3u);
-			TS_ASSERT_EQUALS(vertex_mesh.GetNumAllNodes(), 7u);
+		/*
+		 *  Make one trapezium element with a central triangular element out of these nodes
+		 *
+		 *       |\
+		 *       | \
+		 *       |  \
+		 *      /_\ 1\   Triangular element is element zero
+		 *         \_ \
+		 *           \_\
+		 *
+		 */
 
-			for (unsigned j=1; j<3; j++)
-			{
-				TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNumNodes(), 3u);
-				TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNode(0)->GetIndex(), j%3);
-				TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNode(1)->GetIndex(), (j+1)%3);
-				TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNode(2)->GetIndex(), 6u);
-			}
+		// Triangle element
+		std::vector<Node<2>*> nodes2_elem_0;
+		nodes2_elem_0.push_back(nodes2[2]);
+		nodes2_elem_0.push_back(nodes2[3]);
+		nodes2_elem_0.push_back(nodes2[4]);
 
-			// Test boundary property of nodes. All are boundary nodes.
-			for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
-			{
-				TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), true);
-			}
-    	}
+		// Trapezium
+		std::vector<Node<2>*> nodes2_elem_1;
+		nodes2_elem_1.push_back(nodes2[0]);
+		nodes2_elem_1.push_back(nodes2[1]);
+		nodes2_elem_1.push_back(nodes2[4]);
+		nodes2_elem_1.push_back(nodes2[3]);
 
-    	{
-			// Make 5 nodes to assign to two elements
-			std::vector<Node<2>*> nodes;
-			nodes.push_back(new Node<2>(0, true, 1.0, 0.0));
-			nodes.push_back(new Node<2>(1, true, 0.5, 0.5));
-			nodes.push_back(new Node<2>(2, true, 0.4, 0.25));
-			nodes.push_back(new Node<2>(3, true, 0.6, 0.25));
-			nodes.push_back(new Node<2>(4, true, 0.5, 0.3));
+		std::vector<VertexElement<2,2>*> vertex_elements2;
+		vertex_elements2.push_back(new VertexElement<2,2>(0, nodes2_elem_0));
+		vertex_elements2.push_back(new VertexElement<2,2>(1, nodes2_elem_1));
 
-			/*
-			*  Make one trapezium element with a central triangular element out of these nodes
-			*
-			*       |\
-			*       | \
-			*       |  \
-			*      /_\ 1\   Triangular element is element zero
-			*         \_ \
-			*           \_\
-			*
-			*/
+		// Make a vertex mesh
+		MutableVertexMesh<2,2> vertex_mesh2(nodes2, vertex_elements2);
 
+		TS_ASSERT_EQUALS(vertex_mesh2.GetNumElements(), 2u);
+		TS_ASSERT_EQUALS(vertex_mesh2.GetNumNodes(), 5u);
 
-			// Triangle element
-			std::vector<Node<2>*> nodes_elem_0;
-			nodes_elem_0.push_back(nodes[2]);
-			nodes_elem_0.push_back(nodes[3]);
-			nodes_elem_0.push_back(nodes[4]);
+		// Perform a T2 swap on the middle triangle element
+		p_element_0 = vertex_mesh2.GetElement(0);
+		vertex_mesh2.PerformT2Swap(*p_element_0);
 
-			// Trapezium
-			std::vector<Node<2>*> nodes_elem_1;
-			nodes_elem_1.push_back(nodes[0]);
-			nodes_elem_1.push_back(nodes[1]);
-			nodes_elem_1.push_back(nodes[4]);
-			nodes_elem_1.push_back(nodes[3]);
+		TS_ASSERT_EQUALS(vertex_mesh2.GetNumElements(), 1u);
+		TS_ASSERT_EQUALS(vertex_mesh2.GetNumNodes(), 3u);
 
-			std::vector<VertexElement<2,2>*> vertex_elements;
-			vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-			vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
+		TS_ASSERT_EQUALS(vertex_mesh2.GetNumAllElements(), 2u);
+		TS_ASSERT_EQUALS(vertex_mesh2.GetNumAllNodes(), 6u);
 
-			// Make a vertex mesh
-			MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+	    TS_ASSERT_EQUALS(vertex_mesh2.GetElement(1)->GetNumNodes(), 3u);
+		TS_ASSERT_EQUALS(vertex_mesh2.GetElement(1)->GetNodeGlobalIndex(0), 0u);
+		TS_ASSERT_EQUALS(vertex_mesh2.GetElement(1)->GetNodeGlobalIndex(1), 1u);
+		TS_ASSERT_EQUALS(vertex_mesh2.GetElement(1)->GetNodeGlobalIndex(2), 5u);
 
-			TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
-			TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 5u);
-
-			// Perform a T2 swap on the middle triangle element
-			VertexElement<2,2>* p_element_0 = vertex_mesh.GetElement(0);
-			vertex_mesh.PerformT2Swap(*p_element_0);
-
-			TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 1u);
-			TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 3u);
-
-			TS_ASSERT_EQUALS(vertex_mesh.GetNumAllElements(), 2u);
-			TS_ASSERT_EQUALS(vertex_mesh.GetNumAllNodes(), 6u);
-
-
-		    TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
-			TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(0)->GetIndex(), 0u);
-			TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(1)->GetIndex(), 1u);
-			TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(2)->GetIndex(), 5u);
-
-			// Test boundary property of nodes. All are boundary nodes.
-			for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
-			{
-				TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), true);
-			}
-    	}
-
+		// Test boundary property of nodes. All are boundary nodes.
+		for (unsigned i=0; i<vertex_mesh2.GetNumNodes(); i++)
+		{
+			TS_ASSERT_EQUALS(vertex_mesh2.GetNode(i)->IsBoundaryNode(), true);
+		}
     }
 
 
@@ -1150,32 +1050,21 @@ public:
         nodes.push_back(new Node<2>(5, false, 0.5, 0.3));
 
         // Make two triangles and two trapezium elements out of these nodes
-
-        // Triangle element
-        std::vector<Node<2>*> nodes_elem_0;
-        nodes_elem_0.push_back(nodes[3]);
-        nodes_elem_0.push_back(nodes[4]);
-        nodes_elem_0.push_back(nodes[5]);
-
-        // Triangle element
-        std::vector<Node<2>*> nodes_elem_1;
-        nodes_elem_1.push_back(nodes[2]);
-        nodes_elem_1.push_back(nodes[5]);
-        nodes_elem_1.push_back(nodes[4]);
-
-        // Trapezium
-        std::vector<Node<2>*> nodes_elem_2;
-        nodes_elem_2.push_back(nodes[2]);
-        nodes_elem_2.push_back(nodes[0]);
-        nodes_elem_2.push_back(nodes[3]);
-        nodes_elem_2.push_back(nodes[5]);
-
-        // Trapezium
-        std::vector<Node<2>*> nodes_elem_3;
-        nodes_elem_3.push_back(nodes[0]);
-        nodes_elem_3.push_back(nodes[1]);
-        nodes_elem_3.push_back(nodes[4]);
-        nodes_elem_3.push_back(nodes[3]);
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2, nodes_elem_3;
+        unsigned node_indices_elem_0[3] = {3, 4, 5};
+        unsigned node_indices_elem_1[3] = {2, 5, 4};
+        unsigned node_indices_elem_2[4] = {2, 0, 3, 5};
+        unsigned node_indices_elem_3[4] = {0, 1, 4, 3};
+        for (unsigned i=0; i<4; i++)
+        {
+            if (i < 3)
+            {
+                nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+                nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+            }
+            nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
+            nodes_elem_3.push_back(nodes[node_indices_elem_3[i]]);
+        }
 
         std::vector<VertexElement<2,2>*> vertex_elements;
         vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
@@ -1211,33 +1100,21 @@ public:
         nodes.push_back(new Node<2>(5, false, 0.5, 0.475));
 
         // Make one triangular and three trapezium elements out of these nodes
-
-        // Triangle element
-        std::vector<Node<2>*> nodes_elem_0;
-        nodes_elem_0.push_back(nodes[3]);
-        nodes_elem_0.push_back(nodes[4]);
-        nodes_elem_0.push_back(nodes[5]);
-
-        // Trapezium
-        std::vector<Node<2>*> nodes_elem_1;
-        nodes_elem_1.push_back(nodes[1]);
-        nodes_elem_1.push_back(nodes[2]);
-        nodes_elem_1.push_back(nodes[5]);
-        nodes_elem_1.push_back(nodes[4]);
-
-        // Trapezium
-        std::vector<Node<2>*> nodes_elem_2;
-        nodes_elem_2.push_back(nodes[2]);
-        nodes_elem_2.push_back(nodes[0]);
-        nodes_elem_2.push_back(nodes[3]);
-        nodes_elem_2.push_back(nodes[5]);
-
-        // Trapezium
-        std::vector<Node<2>*> nodes_elem_3;
-        nodes_elem_3.push_back(nodes[0]);
-        nodes_elem_3.push_back(nodes[1]);
-        nodes_elem_3.push_back(nodes[4]);
-        nodes_elem_3.push_back(nodes[3]);
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2, nodes_elem_3;
+        unsigned node_indices_elem_0[3] = {3, 4, 5};
+        unsigned node_indices_elem_1[4] = {1, 2, 5, 4};
+        unsigned node_indices_elem_2[4] = {2, 0, 3, 5};
+        unsigned node_indices_elem_3[4] = {0, 1, 4, 3};
+        for (unsigned i=0; i<4; i++)
+        {
+            if (i < 3)
+            {
+                nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+            }
+            nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+            nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
+            nodes_elem_3.push_back(nodes[node_indices_elem_3[i]]);
+        }
 
         std::vector<VertexElement<2,2>*> vertex_elements;
         vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
@@ -1280,23 +1157,20 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetNode(3)->rGetLocation()[0], 0.4999, 1e-3);
         TS_ASSERT_DELTA(vertex_mesh.GetNode(3)->rGetLocation()[1], 0.2496, 1e-3);
 
-        // Test elements have correct nodes
-        // note nodes are renumbered as element 0 is deleted
-
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 3u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(0)->GetIndex(), 1u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(1)->GetIndex(), 2u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(2)->GetIndex(), 3u);
-
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(0)->GetIndex(), 2u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(1)->GetIndex(), 0u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(2)->GetIndex(), 3u);
-
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 3u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(0)->GetIndex(), 0u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(1)->GetIndex(), 1u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(2)->GetIndex(), 3u);
+
+        // Test elements have correct nodes (note nodes are renumbered as element 0 is deleted)
+        unsigned node_indices_element_0[3] = {1, 2, 3};
+        unsigned node_indices_element_1[3] = {2, 0, 3};
+        unsigned node_indices_element_2[3] = {0, 1, 3};
+        for (unsigned i=0; i<3; i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
+        }
     }
 
 
@@ -1317,7 +1191,6 @@ public:
      *
      * Note: this also tests that boundary nodes are updated accordingly
      */
-
     void TestReMeshForT1Swaps() throw(Exception)
     {
         // This also tests IdentifySwapType
@@ -1345,8 +1218,7 @@ public:
         VertexMeshWriter<2,2> mesh_writer(dirname, mesh_filename, false);
         mesh_writer.WriteFilesUsingMesh(vertex_mesh);
 
-
-        //Check the positions are updated correctly
+        // Check the positions are updated correctly
         OutputFileHandler handler("TestVertexMeshReMesh", false);
         std::string results_file1 = handler.GetOutputDirectoryFullPath() + "vertex_remesh_T1.node";
         std::string results_file2 = handler.GetOutputDirectoryFullPath() + "vertex_remesh_T1.cell";
@@ -1383,19 +1255,14 @@ public:
     		nodes.push_back(new Node<2>(5, false, 0.51, 0.51));
 
     		// Create two elements containing nodes
-    		std::vector<Node<2>*> nodes_elem_0;
-    		nodes_elem_0.push_back(nodes[0]);
-    		nodes_elem_0.push_back(nodes[1]);
-    		nodes_elem_0.push_back(nodes[2]);
-    		nodes_elem_0.push_back(nodes[5]);
-    		nodes_elem_0.push_back(nodes[4]);
-
-    		std::vector<Node<2>*> nodes_elem_1;
-    		nodes_elem_1.push_back(nodes[0]);
-    		nodes_elem_1.push_back(nodes[4]);
-    		nodes_elem_1.push_back(nodes[5]);
-    		nodes_elem_1.push_back(nodes[2]);
-    		nodes_elem_1.push_back(nodes[3]);
+            std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
+            unsigned node_indices_elem_0[5] = {0, 1, 2, 5, 4};
+            unsigned node_indices_elem_1[5] = {0, 4, 5, 2, 3};
+            for (unsigned i=0; i<5; i++)
+            {
+                nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+                nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+            }
 
     		std::vector<VertexElement<2,2>*> vertex_elements;
     		vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
@@ -1406,11 +1273,10 @@ public:
     		vertex_mesh.SetCellRearrangementThreshold(0.1);
 
     		// Try to Merge nodes 4 and 5
-    		TS_ASSERT_THROWS_THIS(vertex_mesh.ReMesh(), "There are non boundary nodes contained in only in 2 elements something has gone wrong.");
+    		TS_ASSERT_THROWS_THIS(vertex_mesh.ReMesh(), "There are non-boundary nodes contained in only in 2 elements something has gone wrong.");
     	}
 
     	{
-
 			/* Create 4 joined elements.
 			 *  _________
 			 * |    |   /
@@ -1422,7 +1288,7 @@ public:
 			 *
 			 */
 
-			// Create some nodes all boundary nodes except the central one.
+			// Create some nodes all boundary nodes except the central one
 			std::vector<Node<2>*> nodes;
 			nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
 			nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
@@ -1434,29 +1300,19 @@ public:
 			nodes.push_back(new Node<2>(7, true, 0.0, 1.0));
 			nodes.push_back(new Node<2>(8, false, 1.0, 1.0));
 
-			std::vector<Node<2>*> nodes_in_element0;
-			nodes_in_element0.push_back(nodes[0]);
-			nodes_in_element0.push_back(nodes[1]);
-			nodes_in_element0.push_back(nodes[8]);
-			nodes_in_element0.push_back(nodes[7]);
-
-			std::vector<Node<2>*> nodes_in_element1;
-			nodes_in_element1.push_back(nodes[1]);
-			nodes_in_element1.push_back(nodes[2]);
-			nodes_in_element1.push_back(nodes[3]);
-			nodes_in_element1.push_back(nodes[8]);
-
-			std::vector<Node<2>*> nodes_in_element2;
-			nodes_in_element2.push_back(nodes[8]);
-			nodes_in_element2.push_back(nodes[3]);
-			nodes_in_element2.push_back(nodes[4]);
-			nodes_in_element2.push_back(nodes[5]);
-
-			std::vector<Node<2>*> nodes_in_element3;
-			nodes_in_element3.push_back(nodes[7]);
-			nodes_in_element3.push_back(nodes[8]);
-			nodes_in_element3.push_back(nodes[5]);
-			nodes_in_element3.push_back(nodes[6]);
+            // Create two elements containing nodes
+            std::vector<Node<2>*> nodes_in_element0, nodes_in_element1, nodes_in_element2, nodes_in_element3;
+            unsigned node_indices_element_0[4] = {0, 1, 8, 7};
+            unsigned node_indices_element_1[4] = {1, 2, 3, 8};
+            unsigned node_indices_element_2[4] = {8, 3, 4, 5};
+            unsigned node_indices_element_3[4] = {7, 8, 5, 6};
+            for (unsigned i=0; i<4; i++)
+            {
+                nodes_in_element0.push_back(nodes[node_indices_element_0[i]]);
+                nodes_in_element1.push_back(nodes[node_indices_element_1[i]]);
+                nodes_in_element2.push_back(nodes[node_indices_element_2[i]]);
+                nodes_in_element3.push_back(nodes[node_indices_element_3[i]]);
+            }
 
 			std::vector<VertexElement<2,2>* > elements;
 			elements.push_back(new VertexElement<2,2>(0, nodes_in_element0));
@@ -1505,24 +1361,19 @@ public:
 			nodes.push_back(new Node<2>(8, true, 0.0, 1.0));
 
 			// Create three elements containing nodes
-			std::vector<Node<2>*> nodes_elem_0;
-			nodes_elem_0.push_back(nodes[0]);
-			nodes_elem_0.push_back(nodes[1]);
-			nodes_elem_0.push_back(nodes[6]);
-			nodes_elem_0.push_back(nodes[7]);
-			nodes_elem_0.push_back(nodes[8]);
-
-			std::vector<Node<2>*> nodes_elem_1;
-			nodes_elem_1.push_back(nodes[1]);
-			nodes_elem_1.push_back(nodes[2]);
-			nodes_elem_1.push_back(nodes[3]);
-			nodes_elem_1.push_back(nodes[6]);
-
-			std::vector<Node<2>*> nodes_elem_2;
-			nodes_elem_2.push_back(nodes[3]);
-			nodes_elem_2.push_back(nodes[4]);
-			nodes_elem_2.push_back(nodes[5]);
-			nodes_elem_2.push_back(nodes[6]);
+			std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2;
+			unsigned node_indices_elem_0[5] = {0, 1, 6, 7, 8};
+			unsigned node_indices_elem_1[4] = {1, 2, 3, 6};
+			unsigned node_indices_elem_2[4] = {3, 4, 5, 6};
+			for (unsigned i=0; i<5; i++)
+			{
+			    nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+			    if (i < 4)
+			    {
+			        nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+                    nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
+			    }
+			}
 
 			std::vector<VertexElement<2,2>*> vertex_elements;
 			vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
@@ -1562,19 +1413,14 @@ public:
 			nodes.push_back(new Node<2>(6, true, 0.5, 0.0));
 
 			// Make two elements out of these nodes
-			std::vector<Node<2>*> nodes_elem_0;
-			nodes_elem_0.push_back(nodes[1]);
-			nodes_elem_0.push_back(nodes[2]);
-			nodes_elem_0.push_back(nodes[5]);
-			nodes_elem_0.push_back(nodes[4]);
-			nodes_elem_0.push_back(nodes[6]);
-
-			std::vector<Node<2>*> nodes_elem_1;
-			nodes_elem_1.push_back(nodes[0]);
-			nodes_elem_1.push_back(nodes[6]);
-			nodes_elem_1.push_back(nodes[4]);
-			nodes_elem_1.push_back(nodes[5]);
-			nodes_elem_1.push_back(nodes[3]);
+            std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
+            unsigned node_indices_elem_0[5] = {1, 2, 5, 4, 6};
+            unsigned node_indices_elem_1[5] = {0, 6, 4, 5, 3};
+            for (unsigned i=0; i<5; i++)
+            {
+                nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+                nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+            }
 
 			std::vector<VertexElement<2,2>*> vertex_elements;
 			vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
@@ -1612,26 +1458,20 @@ public:
 			nodes.push_back(new Node<2>(6, true, 0.5, 0.0));
 			nodes.push_back(new Node<2>(7, true, 0.5, 1.0));
 
-			// Make two elements out of these nodes
-			std::vector<Node<2>*> nodes_elem_0;
-			nodes_elem_0.push_back(nodes[1]);
-			nodes_elem_0.push_back(nodes[2]);
-			nodes_elem_0.push_back(nodes[5]);
-			nodes_elem_0.push_back(nodes[4]);
-			nodes_elem_0.push_back(nodes[6]);
-
-			std::vector<Node<2>*> nodes_elem_1;
-			nodes_elem_1.push_back(nodes[0]);
-			nodes_elem_1.push_back(nodes[6]);
-			nodes_elem_1.push_back(nodes[4]);
-			nodes_elem_1.push_back(nodes[5]);
-			nodes_elem_1.push_back(nodes[3]);
-
-			std::vector<Node<2>*> nodes_elem_2;
-			nodes_elem_2.push_back(nodes[2]);
-			nodes_elem_2.push_back(nodes[3]);
-			nodes_elem_2.push_back(nodes[5]);
-			nodes_elem_2.push_back(nodes[7]);
+			// Make three elements out of these nodes
+            std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2;
+            unsigned node_indices_elem_0[5] = {1, 2, 5, 4, 6};
+            unsigned node_indices_elem_1[5] = {0, 6, 4, 5, 3};
+            unsigned node_indices_elem_2[4] = {2, 3, 5, 7};
+            for (unsigned i=0; i<5; i++)
+            {
+                nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+                nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+                if (i < 4)
+                {
+                    nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
+                }
+            }
 
 			std::vector<VertexElement<2,2>*> vertex_elements;
 			vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
@@ -1643,7 +1483,7 @@ public:
 			vertex_mesh.SetCellRearrangementThreshold(0.1);
 
 			// Attempt to Merge nodes 4 and 5
-			TS_ASSERT_THROWS_THIS(vertex_mesh.ReMesh(), "There are non boundary nodes contained only in 2 elements something has gone wrong.");
+			TS_ASSERT_THROWS_THIS(vertex_mesh.ReMesh(), "There are non-boundary nodes contained only in 2 elements something has gone wrong.");
 		}
     }
 
@@ -1748,35 +1588,27 @@ public:
         nodes.push_back(new Node<2>(11, true, 2.0, -1.0));
         nodes.push_back(new Node<2>(12, true, 2.0, 0.5));
 
-
-        std::vector<Node<2>*> nodes_in_element0;
-        nodes_in_element0.push_back(nodes[0]);
-        nodes_in_element0.push_back(nodes[1]);
-        nodes_in_element0.push_back(nodes[2]);
-        nodes_in_element0.push_back(nodes[3]);
-
-        std::vector<Node<2>*> nodes_in_element1;
-        nodes_in_element1.push_back(nodes[4]);
-        nodes_in_element1.push_back(nodes[12]);
-        nodes_in_element1.push_back(nodes[6]);
-
-        std::vector<Node<2>*> nodes_in_element2;
-        nodes_in_element2.push_back(nodes[12]);
-        nodes_in_element2.push_back(nodes[5]);
-        nodes_in_element2.push_back(nodes[6]);
-
-        std::vector<Node<2>*> nodes_in_element3;
-        nodes_in_element3.push_back(nodes[7]);
-        nodes_in_element3.push_back(nodes[8]);
-        nodes_in_element3.push_back(nodes[9]);
-
-        std::vector<Node<2>*> nodes_in_element4;
-        nodes_in_element4.push_back(nodes[10]);
-        nodes_in_element4.push_back(nodes[11]);
-        nodes_in_element4.push_back(nodes[4]);
-        nodes_in_element4.push_back(nodes[1]);
-        nodes_in_element4.push_back(nodes[0]);
-        nodes_in_element4.push_back(nodes[7]);
+        // Create elements
+        std::vector<Node<2>*> nodes_in_element0, nodes_in_element1, nodes_in_element2, nodes_in_element3, nodes_in_element4;
+        unsigned node_indices_element_0[4] = {0, 1, 2, 3};
+        unsigned node_indices_element_1[3] = {4, 12, 6};
+        unsigned node_indices_element_2[3] = {12, 5, 6};
+        unsigned node_indices_element_3[3] = {7, 8, 9};
+        unsigned node_indices_element_4[6] = {10, 11, 4, 1, 0, 7};
+        for (unsigned i=0; i<6; i++)
+        {
+            if (i < 4)
+            {
+                nodes_in_element0.push_back(nodes[node_indices_element_0[i]]);
+            }
+            if (i < 3)
+            {
+                nodes_in_element1.push_back(nodes[node_indices_element_1[i]]);
+                nodes_in_element2.push_back(nodes[node_indices_element_2[i]]);
+                nodes_in_element3.push_back(nodes[node_indices_element_3[i]]);
+            }
+            nodes_in_element4.push_back(nodes[node_indices_element_4[i]]);
+        }
 
         // Make elements
         std::vector<VertexElement<2,2>*> elements;
@@ -1811,15 +1643,14 @@ public:
         TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(mesh.GetNode(8)->rGetLocation(), 0), true);
         TS_ASSERT_EQUALS(mesh.GetLocalIndexForElementEdgeClosestToPoint(mesh.GetNode(8)->rGetLocation(), 0), 3u);
 
-
         // Call method to update mesh in this situation
         mesh.ReMesh();
 
         // Save the mesh data using mesh writers
-				std::string dirname = "TempyTempy";
-                std::string mesh_filename = "vertex_remesh_T3";
-                VertexMeshWriter<2,2> mesh_writer(dirname, mesh_filename, false);
-                mesh_writer.WriteFilesUsingMesh(mesh);
+		std::string dirname = "TempyTempy";
+        std::string mesh_filename = "vertex_remesh_T3";
+        VertexMeshWriter<2,2> mesh_writer(dirname, mesh_filename, false);
+        mesh_writer.WriteFilesUsingMesh(mesh);
 
         // Check that node 6 has been moved onto the edge a new node has been created and both added to elements 0 amd 1
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 5u);
@@ -1839,54 +1670,38 @@ public:
         TS_ASSERT_DELTA(mesh.GetNode(15)->rGetLocation()[0], 0.0, 1e-4);
         TS_ASSERT_DELTA(mesh.GetNode(15)->rGetLocation()[1], 0.55, 1e-4);
 
-        // Test elements have correct nodes
         TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNumNodes(), 9u);
-        TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(0), 0u);
-        TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(1), 1u);
-        TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(2), 13u);
-        TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(3), 6u);
-        TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(4), 14u);
-        TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(5), 2u);
-        TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(6), 3u);
-        TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(7), 15u);
-        TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(8), 8u);
-
         TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNumNodes(), 4u);
-        TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(0), 4u);
-        TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(1), 12u);
-        TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(2), 6u);
-        TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(3), 13u);
-
         TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNumNodes(), 4u);
-        TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNodeGlobalIndex(0), 12u);
-        TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNodeGlobalIndex(1), 5u);
-        TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNodeGlobalIndex(2), 14u);
-        TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNodeGlobalIndex(3), 6u);
-
         TS_ASSERT_EQUALS(mesh.GetElement(3)->GetNumNodes(), 4u);
-        TS_ASSERT_EQUALS(mesh.GetElement(3)->GetNodeGlobalIndex(0), 7u);
-        TS_ASSERT_EQUALS(mesh.GetElement(3)->GetNodeGlobalIndex(1), 8u);
-        TS_ASSERT_EQUALS(mesh.GetElement(3)->GetNodeGlobalIndex(2), 15u);
-        TS_ASSERT_EQUALS(mesh.GetElement(3)->GetNodeGlobalIndex(3), 9u);
-
-
-        //Other elements remain the same so get a void
         TS_ASSERT_EQUALS(mesh.GetElement(4)->GetNumNodes(), 6u);
-        TS_ASSERT_EQUALS(mesh.GetElement(4)->GetNodeGlobalIndex(0), 10u);
-        TS_ASSERT_EQUALS(mesh.GetElement(4)->GetNodeGlobalIndex(1), 11u);
-        TS_ASSERT_EQUALS(mesh.GetElement(4)->GetNodeGlobalIndex(2), 4u);
-        TS_ASSERT_EQUALS(mesh.GetElement(4)->GetNodeGlobalIndex(3), 1u);
-        TS_ASSERT_EQUALS(mesh.GetElement(4)->GetNodeGlobalIndex(4), 0u);
-        TS_ASSERT_EQUALS(mesh.GetElement(4)->GetNodeGlobalIndex(5), 7u);
 
-        // Test boundary property of nodes. All are boundary nodes except node 6.
+        // Test elements have correct nodes
+        unsigned new_node_indices_element_0[9] = {0, 1, 13, 6, 14, 2, 3, 15, 8};
+        unsigned new_node_indices_element_1[4] = {4, 12, 6, 13};
+        unsigned new_node_indices_element_2[4] = {12, 5, 14, 6};
+        unsigned new_node_indices_element_3[4] = {7, 8, 15, 9};
+        unsigned new_node_indices_element_4[6] = {10, 11, 4, 1, 0, 7};
+        for (unsigned i=0; i<9; i++)
+        {
+            TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(i), new_node_indices_element_0[i]);
+            if (i < 4)
+            {
+                TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(i), new_node_indices_element_1[i]);
+                TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNodeGlobalIndex(i), new_node_indices_element_2[i]);
+                TS_ASSERT_EQUALS(mesh.GetElement(3)->GetNodeGlobalIndex(i), new_node_indices_element_3[i]);
+            }
+            if (i < 6)
+            {
+                // Other elements remain the same so get a void
+                TS_ASSERT_EQUALS(mesh.GetElement(4)->GetNodeGlobalIndex(i), new_node_indices_element_4[i]);
+            }
+        }
+
+        // Test boundary property of nodes (all are boundary nodes except node 6)
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            bool expected_boundary_node = true;
-            if (i==6)
-            {
-                expected_boundary_node = false;
-            }
+            bool expected_boundary_node = (i!=6);
             TS_ASSERT_EQUALS(mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
         }
 
@@ -1928,26 +1743,19 @@ public:
             nodes.push_back(new Node<2>(7, true, 2.0, 0.7));
             nodes.push_back(new Node<2>(8, true, 2.0, 1.0));
 
-            std::vector<Node<2>*> nodes_in_element0;
-            nodes_in_element0.push_back(nodes[0]);
-            nodes_in_element0.push_back(nodes[1]);
-            nodes_in_element0.push_back(nodes[2]);
-            nodes_in_element0.push_back(nodes[3]);
-
-            std::vector<Node<2>*> nodes_in_element1;
-            nodes_in_element1.push_back(nodes[5]);
-            nodes_in_element1.push_back(nodes[6]);
-            nodes_in_element1.push_back(nodes[4]);
-
-            std::vector<Node<2>*> nodes_in_element2;
-            nodes_in_element2.push_back(nodes[6]);
-            nodes_in_element2.push_back(nodes[7]);
-            nodes_in_element2.push_back(nodes[4]);
-
-            std::vector<Node<2>*> nodes_in_element3;
-            nodes_in_element3.push_back(nodes[7]);
-            nodes_in_element3.push_back(nodes[8]);
-            nodes_in_element3.push_back(nodes[4]);
+            // Create elements
+            std::vector<Node<2>*> nodes_in_element0, nodes_in_element1, nodes_in_element2, nodes_in_element3;
+            unsigned node_indices_element_0[3] = {1, 2, 3};
+            unsigned node_indices_element_1[3] = {5, 6, 4};
+            unsigned node_indices_element_2[3] = {6, 7, 4};
+            unsigned node_indices_element_3[3] = {7, 8, 4};
+            for (unsigned i=0; i<3; i++)
+            {
+                nodes_in_element0.push_back(nodes[node_indices_element_0[i]]);
+                nodes_in_element1.push_back(nodes[node_indices_element_1[i]]);
+                nodes_in_element2.push_back(nodes[node_indices_element_2[i]]);
+                nodes_in_element3.push_back(nodes[node_indices_element_3[i]]);
+            }
 
             // Make elements
             std::vector<VertexElement<2,2>*> elements;
@@ -1984,21 +1792,20 @@ public:
             nodes.push_back(new Node<2>(4, true, 1.0, -1.0));
             nodes.push_back(new Node<2>(5, true, 2.0, 0.0));
 
-            std::vector<Node<2>*> nodes_in_element0;
-            nodes_in_element0.push_back(nodes[0]);
-            nodes_in_element0.push_back(nodes[1]);
-            nodes_in_element0.push_back(nodes[2]);
-            nodes_in_element0.push_back(nodes[3]);
-
-            std::vector<Node<2>*> nodes_in_element1;
-            nodes_in_element1.push_back(nodes[4]);
-            nodes_in_element1.push_back(nodes[5]);
-            nodes_in_element1.push_back(nodes[2]);
-
-            std::vector<Node<2>*> nodes_in_element2;
-            nodes_in_element2.push_back(nodes[0]);
-            nodes_in_element2.push_back(nodes[4]);
-            nodes_in_element2.push_back(nodes[1]);
+            // Create elements
+            std::vector<Node<2>*> nodes_in_element0, nodes_in_element1, nodes_in_element2;
+            unsigned node_indices_element_0[4] = {0, 1, 2, 3};
+            unsigned node_indices_element_1[3] = {4, 5, 2};
+            unsigned node_indices_element_2[3] = {0, 4, 1};
+            for (unsigned i=0; i<4; i++)
+            {
+                nodes_in_element0.push_back(nodes[node_indices_element_0[i]]);
+                if (i < 3)
+                {
+                    nodes_in_element1.push_back(nodes[node_indices_element_1[i]]);
+                    nodes_in_element2.push_back(nodes[node_indices_element_2[i]]);
+                }
+            }
 
             // Make elements
             std::vector<VertexElement<2,2>*> elements;
@@ -2026,10 +1833,10 @@ public:
         }
     }
 
-
     void TestT3SwapOnSmallEdge()
     {
-        /* Create a rectangular and a two triangular elements to test intersecting on an
+        /*
+         * Create a rectangular and a two triangular elements to test intersecting on an
          * edge that is too small
          *
          *
@@ -2040,6 +1847,7 @@ public:
          *
          *
          */
+
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
         nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
@@ -2050,28 +1858,26 @@ public:
         nodes.push_back(new Node<2>(6, true, 2.0, 0.1));
         nodes.push_back(new Node<2>(7, true, 2.0, 0.0));
 
-        std::vector<Node<2>*> nodes_in_element0;
-        nodes_in_element0.push_back(nodes[0]);
-        nodes_in_element0.push_back(nodes[1]);
-        nodes_in_element0.push_back(nodes[2]);
-        nodes_in_element0.push_back(nodes[3]);
-
-        std::vector<Node<2>*> nodes_in_element1;
-        nodes_in_element1.push_back(nodes[5]);
-        nodes_in_element1.push_back(nodes[6]);
-        nodes_in_element1.push_back(nodes[4]);
-
-        std::vector<Node<2>*> nodes_in_element2;
-        nodes_in_element2.push_back(nodes[7]);
-        nodes_in_element2.push_back(nodes[4]);
-        nodes_in_element2.push_back(nodes[6]);
+        // Create elements
+        std::vector<Node<2>*> nodes_in_element0, nodes_in_element1, nodes_in_element2;
+        unsigned node_indices_element_0[4] = {0, 1, 2, 3};
+        unsigned node_indices_element_1[3] = {5, 6, 4};
+        unsigned node_indices_element_2[3] = {7, 4, 6};
+        for (unsigned i=0; i<4; i++)
+        {
+            nodes_in_element0.push_back(nodes[node_indices_element_0[i]]);
+            if (i < 3)
+            {
+                nodes_in_element1.push_back(nodes[node_indices_element_1[i]]);
+                nodes_in_element2.push_back(nodes[node_indices_element_2[i]]);
+            }
+        }
 
         // Make elements
         std::vector<VertexElement<2,2>*> elements;
         elements.push_back(new VertexElement<2,2>(0, nodes_in_element0));
         elements.push_back(new VertexElement<2,2>(1, nodes_in_element1));
         elements.push_back(new VertexElement<2,2>(2, nodes_in_element2));
-
 
         // Make mesh
         MutableVertexMesh<2,2> vertex_mesh(nodes, elements);
@@ -2099,48 +1905,36 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetNode(9)->rGetLocation()[0], 1.0, 1e-8);
         TS_ASSERT_DELTA(vertex_mesh.GetNode(9)->rGetLocation()[1], 0.15, 1e-8);
 
-
         // Test locations of edges of intersected edge
         TS_ASSERT_DELTA(vertex_mesh.GetNode(1)->rGetLocation()[0], 1.0, 1e-8);
         TS_ASSERT_DELTA(vertex_mesh.GetNode(1)->rGetLocation()[1], -0.15, 1e-8);
         TS_ASSERT_DELTA(vertex_mesh.GetNode(2)->rGetLocation()[0], 1.0, 1e-8);
         TS_ASSERT_DELTA(vertex_mesh.GetNode(2)->rGetLocation()[1], 0.25, 1e-8);
 
-
-        // Test elements have correct nodes
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 7u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(0), 0u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(1), 1u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(2), 8u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(3), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(4), 9u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(5), 2u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(6), 3u);
-
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(0), 5u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(1), 6u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(2), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(3), 8u);
-
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(0), 7u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(1), 9u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(2), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(3), 6u);
+        
+        // Test elements have correct nodes
+        unsigned new_node_indices_element_0[7] = {0, 1, 8, 4, 9, 2, 3};
+        unsigned new_node_indices_element_1[4] = {5, 6, 4, 8};
+        unsigned new_node_indices_element_2[4] = {7, 9, 4, 6};
+        for (unsigned i=0; i<7; i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), new_node_indices_element_0[i]);
+            if (i < 4)
+            {
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), new_node_indices_element_1[i]);
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), new_node_indices_element_2[i]);
+            }
+        }
 
         // Test boundary property of nodes. All are boundary nodes except 4.
         for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
         {
-            bool expected_boundary_node = true;
-            if (i==4)
-            {
-                expected_boundary_node = false;
-            }
+            bool expected_boundary_node = (i!=4);
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
         }
-
-
     }
 
     void TestT3SwapForNeighboringElements()
@@ -2167,26 +1961,22 @@ public:
         nodes.push_back(new Node<2>(7, true, -1.0, 0.0));
         nodes.push_back(new Node<2>(8, true, -0.5, 0.5));
 
-        std::vector<Node<2>*> nodes_in_element0;
-        nodes_in_element0.push_back(nodes[0]);
-        nodes_in_element0.push_back(nodes[1]);
-        nodes_in_element0.push_back(nodes[2]);
-        nodes_in_element0.push_back(nodes[3]);
-
-        std::vector<Node<2>*> nodes_in_element1;
-        nodes_in_element1.push_back(nodes[1]);
-        nodes_in_element1.push_back(nodes[4]);
-        nodes_in_element1.push_back(nodes[6]);
-
-        std::vector<Node<2>*> nodes_in_element2;
-        nodes_in_element2.push_back(nodes[4]);
-        nodes_in_element2.push_back(nodes[5]);
-        nodes_in_element2.push_back(nodes[6]);
-
-        std::vector<Node<2>*> nodes_in_element3;
-        nodes_in_element3.push_back(nodes[7]);
-        nodes_in_element3.push_back(nodes[0]);
-        nodes_in_element3.push_back(nodes[8]);
+        // Create elements
+        std::vector<Node<2>*> nodes_in_element0, nodes_in_element1, nodes_in_element2, nodes_in_element3;
+        unsigned node_indices_element_0[4] = {0, 1, 2, 3};
+        unsigned node_indices_element_1[3] = {1, 4, 6};
+        unsigned node_indices_element_2[3] = {4, 5, 6};
+        unsigned node_indices_element_3[3] = {7, 0, 8};
+        for (unsigned i=0; i<4; i++)
+        {
+            nodes_in_element0.push_back(nodes[node_indices_element_0[i]]);
+            if (i < 3)
+            {
+                nodes_in_element1.push_back(nodes[node_indices_element_1[i]]);
+                nodes_in_element2.push_back(nodes[node_indices_element_2[i]]);
+                nodes_in_element3.push_back(nodes[node_indices_element_3[i]]);
+            }
+        }
 
         // Make elements
         std::vector<VertexElement<2,2>*> elements;
@@ -2240,44 +2030,37 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetNode(8)->rGetLocation()[0], 0.0, 1e-4);
         TS_ASSERT_DELTA(vertex_mesh.GetNode(8)->rGetLocation()[1], 0.5, 1e-4);
 
-        // Test elements have correct nodes
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 7u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(0), 0u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(1), 1u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(2), 6u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(3), 9u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(4), 2u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(5), 3u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(6), 8u);
-
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(0), 1u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(1), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(2), 6u);
-
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(0), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(1), 5u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(2), 9u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(3), 6u);
-
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNumNodes(), 3u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNodeGlobalIndex(0), 7u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNodeGlobalIndex(1), 0u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNodeGlobalIndex(2), 8u);
+
+        // Test elements have correct nodes
+        unsigned new_node_indices_element_0[7] = {0, 1, 6, 9, 2, 3, 8};
+        unsigned new_node_indices_element_1[3] = {1, 4, 6};
+        unsigned new_node_indices_element_2[4] = {4, 5, 9, 6};
+        unsigned new_node_indices_element_3[3] = {7, 0, 8};
+        for (unsigned i=0; i<7; i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), new_node_indices_element_0[i]);
+            if (i < 3)
+            {
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), new_node_indices_element_1[i]);
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNodeGlobalIndex(i), new_node_indices_element_3[i]);
+            }
+            if (i < 4)
+            {
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), new_node_indices_element_2[i]);
+            }
+        }
 
         // Test boundary property of nodes. All are boundary nodes except node 6.
         for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
         {
-            bool expected_boundary_node = true;
-            if (i==6)
-            {
-                expected_boundary_node = false;
-            }
+            bool expected_boundary_node = (i!=6);
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
         }
     }
-
 
     void TestT3SwapForNeighboringElementsWithTwoCommonNodes()
     {
@@ -2305,30 +2088,25 @@ public:
         nodes.push_back(new Node<2>(9, true, 1.0, 0.25));
         nodes.push_back(new Node<2>(10, true, 0.0, 0.25));
 
-        std::vector<Node<2>*> nodes_in_element0;
-        nodes_in_element0.push_back(nodes[0]);
-        nodes_in_element0.push_back(nodes[1]);
-        nodes_in_element0.push_back(nodes[9]);
-        nodes_in_element0.push_back(nodes[2]);
-        nodes_in_element0.push_back(nodes[3]);
-        nodes_in_element0.push_back(nodes[10]);
-
-        std::vector<Node<2>*> nodes_in_element1;
-        nodes_in_element1.push_back(nodes[1]);
-        nodes_in_element1.push_back(nodes[4]);
-        nodes_in_element1.push_back(nodes[6]);
-        nodes_in_element1.push_back(nodes[9]);
-
-        std::vector<Node<2>*> nodes_in_element2;
-        nodes_in_element2.push_back(nodes[4]);
-        nodes_in_element2.push_back(nodes[5]);
-        nodes_in_element2.push_back(nodes[6]);
-
-        std::vector<Node<2>*> nodes_in_element3;
-        nodes_in_element3.push_back(nodes[7]);
-        nodes_in_element3.push_back(nodes[0]);
-        nodes_in_element3.push_back(nodes[10]);
-        nodes_in_element3.push_back(nodes[8]);
+        // Create elements
+        std::vector<Node<2>*> nodes_in_element0, nodes_in_element1, nodes_in_element2, nodes_in_element3;
+        unsigned node_indices_element_0[6] = {0, 1, 9, 2, 3, 10};
+        unsigned node_indices_element_1[4] = {1, 4, 6, 9};
+        unsigned node_indices_element_2[3] = {4, 5, 6};
+        unsigned node_indices_element_3[4] = {7, 0, 10, 8};
+        for (unsigned i=0; i<6; i++)
+        {
+            nodes_in_element0.push_back(nodes[node_indices_element_0[i]]);
+            if (i < 4)
+            {
+                nodes_in_element1.push_back(nodes[node_indices_element_1[i]]);
+                nodes_in_element3.push_back(nodes[node_indices_element_3[i]]);
+            }
+            if (i < 3)
+            {
+                nodes_in_element2.push_back(nodes[node_indices_element_2[i]]);
+            }
+        }
 
         // Make elements
         std::vector<VertexElement<2,2>*> elements;
@@ -2373,7 +2151,6 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 4u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 10u);
 
-
         // Test locations of moved and new nodes (9 is the next free node when 6 is merged)
         TS_ASSERT_DELTA(vertex_mesh.GetNode(6)->rGetLocation()[0], 1.0, 1e-4);
         TS_ASSERT_DELTA(vertex_mesh.GetNode(6)->rGetLocation()[1], 0.45, 1e-4);
@@ -2383,46 +2160,39 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetNode(8)->rGetLocation()[0], 0.0, 1e-4);
         TS_ASSERT_DELTA(vertex_mesh.GetNode(8)->rGetLocation()[1], 0.5, 1e-4);
 
-        // Test elements have correct nodes
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 7u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(0), 0u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(1), 1u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(2), 6u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(3), 9u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(4), 2u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(5), 3u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(6), 8u);
-
-
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(0), 1u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(1), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(2), 6u);
-
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(0), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(1), 5u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(2), 9u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(3), 6u);
-
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNumNodes(), 3u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNodeGlobalIndex(0), 7u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNodeGlobalIndex(1), 0u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNodeGlobalIndex(2), 8u);
 
-        // Test boundary property of nodes. All are boundary nodes except node 6.
+        // Test elements have correct nodes
+        unsigned new_node_indices_element_0[7] = {0, 1, 6, 9, 2, 3, 8};
+        unsigned new_node_indices_element_1[3] = {1, 4, 6};
+        unsigned new_node_indices_element_2[4] = {4, 5, 9, 6};
+        unsigned new_node_indices_element_3[3] = {7, 0, 8};
+        for (unsigned i=0; i<7; i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), new_node_indices_element_0[i]);
+            if (i < 3)
+            {
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), new_node_indices_element_1[i]);
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNodeGlobalIndex(i), new_node_indices_element_3[i]);
+            }
+            if (i < 4)
+            {
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), new_node_indices_element_2[i]);
+            }
+        }
+
+        // Test boundary property of nodes (all are boundary nodes except node 6)
         for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
         {
-            bool expected_boundary_node = true;
-            if (i==6)
-            {
-                expected_boundary_node = false;
-            }
+            bool expected_boundary_node = (i!=6);
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
         }
     }
 
-   /**
+    /**
      * This tests the ReMesh method for performing T3Swaps, In this test we read in a vertex mesh
      * that contains several nodes that are inside other elements.
      *
@@ -2465,7 +2235,6 @@ public:
      *
      * Note: this also tests that boundary nodes are updated accordingly
      */
-
     void TestReMeshForT3Swaps() throw(Exception)
     {
         // This also tests IdentifySwapType
@@ -2504,7 +2273,6 @@ public:
 
     void TestReMeshForRemovingVoids() throw(Exception)
     {
-
         /*
          * 3 elements with a central void
          *  ______       _______
@@ -2526,25 +2294,19 @@ public:
         nodes.push_back(new Node<2>(7, true, 0.0, 0.5));
 
         // Make three elements out of these nodes
-        std::vector<Node<2>*> nodes_elem_0;
-        nodes_elem_0.push_back(nodes[0]);
-        nodes_elem_0.push_back(nodes[1]);
-        nodes_elem_0.push_back(nodes[5]);
-        nodes_elem_0.push_back(nodes[4]);
-        nodes_elem_0.push_back(nodes[7]);
-
-        std::vector<Node<2>*> nodes_elem_1;
-        nodes_elem_1.push_back(nodes[1]);
-        nodes_elem_1.push_back(nodes[2]);
-        nodes_elem_1.push_back(nodes[6]);
-        nodes_elem_1.push_back(nodes[5]);
-
-        std::vector<Node<2>*> nodes_elem_2;
-        nodes_elem_2.push_back(nodes[7]);
-        nodes_elem_2.push_back(nodes[4]);
-        nodes_elem_2.push_back(nodes[6]);
-        nodes_elem_2.push_back(nodes[2]);
-        nodes_elem_2.push_back(nodes[3]);
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2;
+        unsigned node_indices_elem_0[5] = {0, 1, 5, 4, 7};
+        unsigned node_indices_elem_1[4] = {1, 2, 6, 5};
+        unsigned node_indices_elem_2[5] = {7, 4, 6 ,2, 3};
+        for (unsigned i=0; i<5; i++)
+        {
+            nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+            if (i < 4)
+            {
+                nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+            }
+            nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
+        }
 
         std::vector<VertexElement<2,2>*> vertex_elements;
         vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
@@ -2588,29 +2350,28 @@ public:
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNode(4)->rGetContainingElementIndices(), expected_elements_containing_node_4);
 
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 4u);
+
         // Test elements have correct nodes
         // Note: nodes are renumbered void is removed and nodes reordered.
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(0)->GetIndex(), 0u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(1)->GetIndex(), 1u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(2)->GetIndex(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(3)->GetIndex(), 5u);
-
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(0)->GetIndex(), 1u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(1)->GetIndex(), 2u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(2)->GetIndex(), 4u);
-
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(0)->GetIndex(), 5u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(1)->GetIndex(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(2)->GetIndex(), 2u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(3)->GetIndex(), 3u);
+        unsigned node_indices_element_0[4] = {0, 1, 4, 5};
+        unsigned node_indices_element_1[3] = {1, 2, 4};
+        unsigned node_indices_element_2[4] = {5, 4, 2, 3};
+        for (unsigned i=0; i<4; i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
+            if (i < 3)
+            {
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
+            }
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
+        }
     }
 
     void TestReMeshForRemovingVoidsForCoverage() throw(Exception)
     {
-
         /*
          * 3 elements with a central void
          *           _________
@@ -2637,34 +2398,26 @@ public:
         nodes.push_back(new Node<2>(10, true, 1.0, 0.5));
 
         // Make 4 elements out of these nodes
-        std::vector<Node<2>*> nodes_elem_0;
-        nodes_elem_0.push_back(nodes[0]);
-        nodes_elem_0.push_back(nodes[1]);
-        nodes_elem_0.push_back(nodes[10]);
-        nodes_elem_0.push_back(nodes[9]);
-        nodes_elem_0.push_back(nodes[7]);
-        nodes_elem_0.push_back(nodes[5]);
-        nodes_elem_0.push_back(nodes[4]);
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2, nodes_elem_3;
 
-        std::vector<Node<2>*> nodes_elem_1;
-        nodes_elem_1.push_back(nodes[0]);
-        nodes_elem_1.push_back(nodes[4]);
-        nodes_elem_1.push_back(nodes[6]);
-        nodes_elem_1.push_back(nodes[3]);
+        unsigned node_indices_elem_0[7] = {0, 1, 10, 9, 7, 5, 4};
+        unsigned node_indices_elem_1[4] = {0, 4, 6, 3};
+        unsigned node_indices_elem_2[7] = {7, 8, 10, 2, 3, 6, 5};
+        unsigned node_indices_elem_3[3] = {10, 8, 9};
 
-        std::vector<Node<2>*> nodes_elem_2;
-        nodes_elem_2.push_back(nodes[7]);
-        nodes_elem_2.push_back(nodes[8]);
-        nodes_elem_2.push_back(nodes[10]);
-        nodes_elem_2.push_back(nodes[2]);
-        nodes_elem_2.push_back(nodes[3]);
-        nodes_elem_2.push_back(nodes[6]);
-        nodes_elem_2.push_back(nodes[5]);
-
-        std::vector<Node<2>*> nodes_elem_3;
-        nodes_elem_3.push_back(nodes[10]);
-        nodes_elem_3.push_back(nodes[8]);
-        nodes_elem_3.push_back(nodes[9]);
+        for (unsigned i=0; i<7; i++)
+        {
+            nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+            nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
+            if (i < 4)
+            {
+                nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+            }
+            if (i < 3)
+            {
+                nodes_elem_3.push_back(nodes[node_indices_elem_3[i]]);
+            }
+        }
 
         std::vector<VertexElement<2,2>*> vertex_elements;
         vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
@@ -2705,242 +2458,214 @@ public:
                               "Triangular element next to triangular void, not implemented yet.");
     }
 
-
     void TestT3SwapForRemovingVoids() throw(Exception)
+    {
+        /*
+         * 3 elements with a central void central node moved to overlap riight element
+         *  ______       _______
+         * |     /|     |      /|
+         * |___/| |     |_____/ |
+         * |   \| | --> |     \ |
+         * |_____\|     |______\|
+         */
+
+        // Make 7 nodes to assign to three elements
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
+        nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
+        nodes.push_back(new Node<2>(4, true, 0.4, 0.5));
+        nodes.push_back(new Node<2>(5, true, 0.5, 0.4));
+        nodes.push_back(new Node<2>(6, true, 0.5, 0.6));
+        nodes.push_back(new Node<2>(7, true, 0.0, 0.5));
+
+        // Make three elements out of these nodes
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2;
+        unsigned node_indices_elem_0[5] = {0, 1, 5, 4, 7};
+        unsigned node_indices_elem_1[4] = {1, 2, 6, 5};
+        unsigned node_indices_elem_2[5] = {7, 4, 6 ,2, 3};
+        for (unsigned i=0; i<5; i++)
         {
-
-            /*
-             * 3 elements with a central void central node moved to overlap riight element
-             *  ______       _______
-             * |     /|     |      /|
-             * |___/| |     |_____/ |
-             * |   \| | --> |     \ |
-             * |_____\|     |______\|
-             */
-
-            // Make 7 nodes to assign to three elements
-            std::vector<Node<2>*> nodes;
-            nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
-            nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
-            nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
-            nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
-            nodes.push_back(new Node<2>(4, true, 0.4, 0.5));
-            nodes.push_back(new Node<2>(5, true, 0.5, 0.4));
-            nodes.push_back(new Node<2>(6, true, 0.5, 0.6));
-            nodes.push_back(new Node<2>(7, true, 0.0, 0.5));
-
-            // Make three elements out of these nodes
-            std::vector<Node<2>*> nodes_elem_0;
-            nodes_elem_0.push_back(nodes[0]);
-            nodes_elem_0.push_back(nodes[1]);
-            nodes_elem_0.push_back(nodes[5]);
-            nodes_elem_0.push_back(nodes[4]);
-            nodes_elem_0.push_back(nodes[7]);
-
-            std::vector<Node<2>*> nodes_elem_1;
-            nodes_elem_1.push_back(nodes[1]);
-            nodes_elem_1.push_back(nodes[2]);
-            nodes_elem_1.push_back(nodes[6]);
-            nodes_elem_1.push_back(nodes[5]);
-
-            std::vector<Node<2>*> nodes_elem_2;
-            nodes_elem_2.push_back(nodes[7]);
-            nodes_elem_2.push_back(nodes[4]);
-            nodes_elem_2.push_back(nodes[6]);
-            nodes_elem_2.push_back(nodes[2]);
-            nodes_elem_2.push_back(nodes[3]);
-
-            std::vector<VertexElement<2,2>*> vertex_elements;
-            vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-            vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
-            vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
-
-            // Make a vertex mesh
-            MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
-
-            //vertex_mesh.SetCellRearrangementThreshold(0.1);
-
-            TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 3u);
-            TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 8u);
-
-            vertex_mesh.ReMesh(); // Edges too long so nothing happens
-
-            TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 3u);
-            TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 8u);
-
-
-            // Move node 4 to inside of element 1
-            c_vector<double, 2>& new_location = vertex_mesh.GetNode(4)->rGetModifiableLocation();
-            new_location(0) = 0.6;
-
-            TS_ASSERT_EQUALS(vertex_mesh.ElementIncludesPoint(vertex_mesh.GetNode(4)->rGetLocation(), 1), true);
-            TS_ASSERT_EQUALS(vertex_mesh.GetLocalIndexForElementEdgeClosestToPoint(vertex_mesh.GetNode(4)->rGetLocation(), 1), 2u);
-
-
-            // T3 swap should now happen, removing the void
-            vertex_mesh.ReMesh();
-
-            TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 3u);
-            TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
-
-            // Test merged node is in the correct place
-            TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.5, 1e-4);
-            TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[1], 0.5, 1e-4);
-
-            // Test ownership of the new nodes
-            std::set<unsigned> expected_elements_containing_node_4;
-            expected_elements_containing_node_4.insert(0);
-            expected_elements_containing_node_4.insert(1);
-            expected_elements_containing_node_4.insert(2);
-
-            TS_ASSERT_EQUALS(vertex_mesh.GetNode(4)->rGetContainingElementIndices(), expected_elements_containing_node_4);
-
-            // Test elements have correct nodes
-            // Note: nodes are renumbered void is removed and nodes reordered.
-            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
-            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(0)->GetIndex(), 0u);
-            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(1)->GetIndex(), 1u);
-            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(2)->GetIndex(), 4u);
-            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNode(3)->GetIndex(), 5u);
-
-            TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
-            TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(0)->GetIndex(), 1u);
-            TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(1)->GetIndex(), 2u);
-            TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNode(2)->GetIndex(), 4u);
-
-            TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 4u);
-            TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(0)->GetIndex(), 5u);
-            TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(1)->GetIndex(), 4u);
-            TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(2)->GetIndex(), 2u);
-            TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNode(3)->GetIndex(), 3u);
+            nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+            if (i < 4)
+            {
+                nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+            }
+            nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
         }
+
+        std::vector<VertexElement<2,2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
+
+        // Make a vertex mesh
+        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+
+        //vertex_mesh.SetCellRearrangementThreshold(0.1);
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 3u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 8u);
+
+        vertex_mesh.ReMesh(); // Edges too long so nothing happens
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 3u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 8u);
+
+        // Move node 4 to inside of element 1
+        c_vector<double, 2>& new_location = vertex_mesh.GetNode(4)->rGetModifiableLocation();
+        new_location(0) = 0.6;
+
+        TS_ASSERT_EQUALS(vertex_mesh.ElementIncludesPoint(vertex_mesh.GetNode(4)->rGetLocation(), 1), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetLocalIndexForElementEdgeClosestToPoint(vertex_mesh.GetNode(4)->rGetLocation(), 1), 2u);
+
+        // T3 swap should now happen, removing the void
+        vertex_mesh.ReMesh();
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 3u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
+
+        // Test merged node is in the correct place
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.5, 1e-4);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[1], 0.5, 1e-4);
+
+        // Test ownership of the new nodes
+        std::set<unsigned> expected_elements_containing_node_4;
+        expected_elements_containing_node_4.insert(0);
+        expected_elements_containing_node_4.insert(1);
+        expected_elements_containing_node_4.insert(2);
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(4)->rGetContainingElementIndices(), expected_elements_containing_node_4);
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 4u);
+
+        // Test elements have correct nodes
+        // Note: nodes are renumbered void is removed and nodes reordered.
+        unsigned node_indices_element_0[4] = {0, 1, 4, 5};
+        unsigned node_indices_element_1[3] = {1, 2, 4};
+        unsigned node_indices_element_2[4] = {5, 4, 2, 3};
+        for (unsigned i=0; i<4; i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
+            if (i < 3)
+            {
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
+            }
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
+        }
+    }
 
 
     void TestT3SwapWithConcaveElements()
-       {
-           /*
-            * Make a small mesh consisting of 2 elements:
-            * a rectangle sat upon an l shape (so concave)
-            *     ______       _______
-            *    |____|/      |_ _ | /
-            *    | |____  --> | |_\|/_
-            *    |______|     |_______|
-            *
-            */
+    {
+        /*
+         * Make a small mesh consisting of 2 elements:
+         * a rectangle sat upon an l shape (so concave)
+         *     ______       _______
+         *    |____|/      |_ _ | /
+         *    | |____  --> | |_\|/_
+         *    |______|     |_______|
+         */
 
-           // Make all nodes boundary nodes
-           std::vector<Node<2>*> nodes;
-           nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
-           nodes.push_back(new Node<2>(1, true, 2.0, 0.0));
-           nodes.push_back(new Node<2>(2, true, 2.0, 1.0));
-           nodes.push_back(new Node<2>(3, true, 1.0, 1.0));
-           nodes.push_back(new Node<2>(4, true, 1.0, 2.0));
-           nodes.push_back(new Node<2>(5, true, 0.0, 2.0));
-           nodes.push_back(new Node<2>(6, true, 2.0, 2.0));
-           nodes.push_back(new Node<2>(7, true, 2.0, 3.0));
-           nodes.push_back(new Node<2>(8, true, 0.0, 3.0));
-           nodes.push_back(new Node<2>(9, true, 3.0, 3.0));
+        // Make all nodes boundary nodes
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 2.0, 0.0));
+        nodes.push_back(new Node<2>(2, true, 2.0, 1.0));
+        nodes.push_back(new Node<2>(3, true, 1.0, 1.0));
+        nodes.push_back(new Node<2>(4, true, 1.0, 2.0));
+        nodes.push_back(new Node<2>(5, true, 0.0, 2.0));
+        nodes.push_back(new Node<2>(6, true, 2.0, 2.0));
+        nodes.push_back(new Node<2>(7, true, 2.0, 3.0));
+        nodes.push_back(new Node<2>(8, true, 0.0, 3.0));
+        nodes.push_back(new Node<2>(9, true, 3.0, 3.0));
 
-           std::vector<Node<2>*> nodes_in_element0;
-           nodes_in_element0.push_back(nodes[0]);
-           nodes_in_element0.push_back(nodes[1]);
-           nodes_in_element0.push_back(nodes[2]);
-           nodes_in_element0.push_back(nodes[3]);
-           nodes_in_element0.push_back(nodes[4]);
-           nodes_in_element0.push_back(nodes[5]);
-
-           std::vector<Node<2>*> nodes_in_element1;
-           nodes_in_element1.push_back(nodes[5]);
-           nodes_in_element1.push_back(nodes[4]);
-           nodes_in_element1.push_back(nodes[6]);
-           nodes_in_element1.push_back(nodes[7]);
-           nodes_in_element1.push_back(nodes[8]);
-
-           std::vector<Node<2>*> nodes_in_element2;
-           nodes_in_element2.push_back(nodes[7]);
-           nodes_in_element2.push_back(nodes[6]);
-           nodes_in_element2.push_back(nodes[9]);
-
-           // Make elements
-           std::vector<VertexElement<2,2>*> elements;
-           elements.push_back(new VertexElement<2,2>(0, nodes_in_element0));
-           elements.push_back(new VertexElement<2,2>(1, nodes_in_element1));
-           elements.push_back(new VertexElement<2,2>(2, nodes_in_element2));
-
-           // Make mesh
-           MutableVertexMesh<2,2> mesh(nodes, elements);
-           mesh.SetCellRearrangementThreshold(0.1*1.0/1.5);// Threshold distance set to ease calculations.
-
-           // Move node 6  so that it overlaps element 0
-           ChastePoint<2> point = mesh.GetNode(6)->GetPoint();
-           point.SetCoordinate(0u, 1.5);
-           point.SetCoordinate(1u, 0.9);
-           mesh.SetNode(6, point);
-
-           TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[0], 1.5, 1e-4);
-           TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[1], 0.9, 1e-4);
-
-           TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(mesh.GetNode(6)->rGetLocation(), 0), true);
-           TS_ASSERT_EQUALS(mesh.GetLocalIndexForElementEdgeClosestToPoint(mesh.GetNode(6)->rGetLocation(), 0), 2u);
-
-           // Call method to update mesh in this situation
-           mesh.ReMesh();//MoveOverlappingNodeOntoEdgeOfElement(mesh.GetNode(6), 0);
-
-           // Check that node 6 has been moved onto the edge a new node has been created and both added to elements 0 and 1
-           TS_ASSERT_EQUALS(mesh.GetNumElements(), 3u);
-           TS_ASSERT_EQUALS(mesh.GetNumNodes(), 12u);
-
-
-           // Test locations of moved and new nodes (10 and 11 are the next free node when 6 is merged)
-           TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[0], 1.5, 1e-4);
-           TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[1], 1.0, 1e-4);
-           TS_ASSERT_DELTA(mesh.GetNode(10)->rGetLocation()[0], 1.6, 1e-4);
-           TS_ASSERT_DELTA(mesh.GetNode(10)->rGetLocation()[1], 1.0, 1e-4);
-           TS_ASSERT_DELTA(mesh.GetNode(11)->rGetLocation()[0], 1.4, 1e-4);
-           TS_ASSERT_DELTA(mesh.GetNode(11)->rGetLocation()[1], 1.0, 1e-4);
-
-
-           // Test elements have correct nodes
-           TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNumNodes(), 9u);
-           TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(0), 0u);
-           TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(1), 1u);
-           TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(2), 2u);
-           TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(3), 10u);
-           TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(4), 6u);
-           TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(5), 11u);
-           TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(6), 3u);
-           TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(7), 4u);
-           TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(8), 5u);
-
-
-           TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNumNodes(), 6u);
-           TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(0), 5u);
-           TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(1), 4u);
-           TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(2), 11u);
-           TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(3), 6u);
-           TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(4), 7u);
-           TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(5), 8u);
-
-           TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNumNodes(), 4u);
-           TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNodeGlobalIndex(0), 7u);
-           TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNodeGlobalIndex(1), 6u);
-           TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNodeGlobalIndex(2), 10u);
-           TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNodeGlobalIndex(3), 9u);
-
-
-
-           // Test boundary property of nodes. All are boundary nodes.
-           for (unsigned i=0; i<mesh.GetNumNodes(); i++)
-           {
-               bool expected_boundary_node = true;
-            if (i==6)
+        // Make three elements out of these nodes
+        std::vector<Node<2>*> nodes_in_element0, nodes_in_element1, nodes_in_element2;
+        unsigned node_indices_in_element0[6] = {0, 1, 2, 3, 4, 5};
+        unsigned node_indices_in_element1[5] = {5, 4, 6, 7, 8};
+        unsigned node_indices_in_element2[3] = {7, 6 ,9};
+        for (unsigned i=0; i<6; i++)
+        {
+            nodes_in_element0.push_back(nodes[node_indices_in_element0[i]]);
+            if (i < 5)
             {
-                expected_boundary_node = false;
+                nodes_in_element1.push_back(nodes[node_indices_in_element1[i]]);
             }
-            TS_ASSERT_EQUALS(mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
-           }
-       }
+            if (i < 3)
+            {
+                nodes_in_element2.push_back(nodes[node_indices_in_element2[i]]);
+            }
+        }
 
+        // Make elements
+        std::vector<VertexElement<2,2>*> elements;
+        elements.push_back(new VertexElement<2,2>(0, nodes_in_element0));
+        elements.push_back(new VertexElement<2,2>(1, nodes_in_element1));
+        elements.push_back(new VertexElement<2,2>(2, nodes_in_element2));
+
+        // Make mesh
+        MutableVertexMesh<2,2> mesh(nodes, elements);
+        mesh.SetCellRearrangementThreshold(0.1*1.0/1.5);// Threshold distance set to ease calculations.
+
+        // Move node 6  so that it overlaps element 0
+        ChastePoint<2> point = mesh.GetNode(6)->GetPoint();
+        point.SetCoordinate(0u, 1.5);
+        point.SetCoordinate(1u, 0.9);
+        mesh.SetNode(6, point);
+
+        TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[0], 1.5, 1e-4);
+        TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[1], 0.9, 1e-4);
+
+        TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(mesh.GetNode(6)->rGetLocation(), 0), true);
+        TS_ASSERT_EQUALS(mesh.GetLocalIndexForElementEdgeClosestToPoint(mesh.GetNode(6)->rGetLocation(), 0), 2u);
+
+        // Call method to update mesh in this situation
+        mesh.ReMesh();//MoveOverlappingNodeOntoEdgeOfElement(mesh.GetNode(6), 0);
+
+        // Check that node 6 has been moved onto the edge a new node has been created and both added to elements 0 and 1
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), 3u);
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 12u);
+
+        // Test locations of moved and new nodes (10 and 11 are the next free node when 6 is merged)
+        TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[0], 1.5, 1e-4);
+        TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[1], 1.0, 1e-4);
+        TS_ASSERT_DELTA(mesh.GetNode(10)->rGetLocation()[0], 1.6, 1e-4);
+        TS_ASSERT_DELTA(mesh.GetNode(10)->rGetLocation()[1], 1.0, 1e-4);
+        TS_ASSERT_DELTA(mesh.GetNode(11)->rGetLocation()[0], 1.4, 1e-4);
+        TS_ASSERT_DELTA(mesh.GetNode(11)->rGetLocation()[1], 1.0, 1e-4);
+
+        TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNumNodes(), 9u);
+        TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNumNodes(), 6u);
+        TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNumNodes(), 4u);
+        
+        // Test elements have correct nodes
+        unsigned node_indices_element_0[9] = {0, 1, 2, 10, 6, 11, 3, 4, 5};
+        unsigned node_indices_element_1[6] = {5, 4, 11, 6, 7, 8};
+        unsigned node_indices_element_2[4] = {7, 6, 10, 9};
+        for (unsigned i=0; i<9; i++)
+        {
+            TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
+            if (i < 6)
+            {
+                TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
+            }
+            if (i < 4)
+            {
+                TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
+            }
+        }
+
+        // Test that the correct nodes are boundary nodes
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        {
+            bool expected_boundary_node = (i!=6);
+            TS_ASSERT_EQUALS(mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
+        }
+    }
 };
 
 #endif /*TESTMUTABLEVERTEXMESHREMESH_HPP_*/

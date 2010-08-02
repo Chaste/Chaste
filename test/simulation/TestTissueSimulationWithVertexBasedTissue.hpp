@@ -492,8 +492,6 @@ public:
 	 */
 	void TestVertexMonolayerWithTwoMutationTypes() throw (Exception)
 	{
-		TissueConfig::Instance()->SetOutputCellMutationStates(true);
-
 		// Create a simple 2D MutableVertexMesh with only four cells
 		HoneycombMutableVertexMeshGenerator generator(2, 2);
 		MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
@@ -518,8 +516,10 @@ public:
 			}
             cells.push_back(p_cell);
 		}
+
 		// Create tissue
 		VertexBasedTissue<2> tissue(*p_mesh, cells);
+        tissue.SetOutputCellMutationStates(true);
 
 		// Create a force system
 		NagaiHondaForce<2> force;

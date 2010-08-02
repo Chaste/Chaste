@@ -1346,6 +1346,9 @@ public:
 
     void TestLatticeBasedTissueOutputWriters()
     {
+        std::string output_directory = "TestLatticeBasedTissueWriters";
+        OutputFileHandler output_file_handler(output_directory, false);
+
         // Create mesh
         TetrahedralMesh<2,2> mesh;
         mesh.ConstructRectangularMesh(2, 2, true); // 3*3 nodes
@@ -1365,6 +1368,14 @@ public:
 
         // Create a tissue
         LatticeBasedTissue<2> tissue(mesh, cells, real_node_indices);
+        tissue.SetCellAncestorsToLocationIndices();
+        tissue.SetOutputCellIdData(true);
+        tissue.SetOutputCellMutationStates(true);
+        tissue.SetOutputCellProliferativeTypes(true);
+        tissue.SetOutputCellCyclePhases(true);
+        tissue.SetOutputCellAncestors(true);
+        tissue.SetOutputCellAges(true);
+        tissue.SetOutputCellVariables(true);
 
         // For coverage of WriteResultsToFiles()
         boost::shared_ptr<AbstractCellProperty> p_state(tissue.GetCellPropertyRegistry()->Get<WildTypeCellMutationState>());
@@ -1381,18 +1392,6 @@ public:
         tissue.GetCellUsingLocationIndex(2)->SetMutationState(p_apc2);
         tissue.GetCellUsingLocationIndex(3)->SetMutationState(p_bcat1);
         tissue.GetCellUsingLocationIndex(4)->AddCellProperty(p_apoptotic_state);
-        tissue.SetCellAncestorsToLocationIndices();
-
-        std::string output_directory = "TestLatticeBasedTissueWriters";
-        OutputFileHandler output_file_handler(output_directory, false);
-
-        TissueConfig::Instance()->SetOutputCellMutationStates(true);
-        TissueConfig::Instance()->SetOutputCellProliferativeTypes(true);
-        TissueConfig::Instance()->SetOutputCellCyclePhases(true);
-        TissueConfig::Instance()->SetOutputCellAncestors(true);
-        TissueConfig::Instance()->SetOutputCellAges(true);
-        TissueConfig::Instance()->SetOutputCellVariables(true);
-        TissueConfig::Instance()->SetOutputCellIdData(true);
 
         TS_ASSERT_THROWS_NOTHING(tissue.CreateOutputFiles(output_directory, false));
 

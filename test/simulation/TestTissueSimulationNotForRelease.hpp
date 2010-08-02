@@ -198,7 +198,7 @@ public:
         MeshBasedTissue<1> tissue(mesh, cells);
 
         // Coverage
-        TissueConfig::Instance()->SetOutputCellIdData(true);
+        tissue.SetOutputCellIdData(true);
 
         // Create a force law (no need for a cutoff as we're in 1D)
         GeneralisedLinearSpringForce<1> linear_force;

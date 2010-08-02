@@ -1043,7 +1043,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                          * as there should only be nodes on 3 way junctions or boundaries.
                          */
 
-                    	EXCEPTION("There are non boundary nodes contained in only in 2 elements something has gone wrong.");
+                    	EXCEPTION("There are non-boundary nodes contained in only in 2 elements something has gone wrong.");
                     }
                 }
                 else
@@ -1056,7 +1056,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                      *   --o--o (2)
                      *     (1) \
                      *
-                     * We merge the nodes in this case. //\TODO this should be a T1 Swap see #1263
+                     * We merge the nodes in this case. ///\todo this should be a T1 Swap see #1263
                      */
 
                     PerformNodeMerge(pNodeA, pNodeB);
@@ -1228,7 +1228,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                          * as there should only be nodes on 3 way junctions or boundaries.
 						 */
 
-						EXCEPTION("There are non boundary nodes contained only in 2 elements something has gone wrong.");
+						EXCEPTION("There are non-boundary nodes contained only in 2 elements something has gone wrong.");
 					}
                 }
                 break;

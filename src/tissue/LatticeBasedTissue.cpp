@@ -691,9 +691,6 @@ void LatticeBasedTissue<DIM>::CloseOutputFiles()
 template<unsigned DIM>
 void LatticeBasedTissue<DIM>::WriteResultsToFiles()
 {
-    // Helper pointer
-    TissueConfig* p_config = TissueConfig::Instance();
-
     double time = SimulationTime::Instance()->GetTime();
 
     *(this->mpVizNodesFile) << time << "\t";
@@ -723,27 +720,27 @@ void LatticeBasedTissue<DIM>::WriteResultsToFiles()
 
     *(this->mpVizCellProliferativeTypesFile) << time << "\t";
 
-    if (p_config->GetOutputCellAncestors())
+    if (this->mOutputCellAncestors)
     {
         *(this->mpVizCellAncestorsFile) << time << "\t";
     }
-    if (p_config->GetOutputCellMutationStates())
+    if (this->mOutputCellMutationStates)
     {
         *(this->mpCellMutationStatesFile) << time << "\t";
     }
-    if (p_config->GetOutputCellProliferativeTypes())
+    if (this->mOutputCellProliferativeTypes)
     {
         *(this->mpCellProliferativeTypesFile) << time << "\t";
     }
-    if (p_config->GetOutputCellVariables())
+    if (this->mOutputCellVariables)
     {
         *(this->mpCellVariablesFile) << time << "\t";
     }
-    if (p_config->GetOutputCellCyclePhases())
+    if (this->mOutputCellCyclePhases)
     {
         *(this->mpCellCyclePhasesFile) << time << "\t";
     }
-    if (p_config->GetOutputCellAges())
+    if (this->mOutputCellAges)
     {
         *(this->mpCellAgesFile) << time << "\t";
     }
@@ -751,7 +748,7 @@ void LatticeBasedTissue<DIM>::WriteResultsToFiles()
     GenerateCellResultsAndWriteToFiles();
 
     // Write logged cell data if required
-    if (p_config->GetOutputCellIdData())
+    if (this->mOutputCellIdData)
     {
         this->WriteCellIdDataToFile();
     }
