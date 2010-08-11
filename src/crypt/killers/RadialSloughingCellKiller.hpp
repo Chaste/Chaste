@@ -102,12 +102,12 @@ inline void save_construct_data(
 {
     // Save data required to construct instance
     const AbstractTissue<2>* const p_tissue = t->GetTissue();
-    ar << p_tissue;
+    ar & p_tissue;
     c_vector<double,2> centre = t->GetCentre();
-    ar << centre[0];
-    ar << centre[1];
+    ar & centre[0];
+    ar & centre[1];
     double radius = t->GetRadius();
-    ar << radius;
+    ar & radius;
 }
 
 /**
@@ -119,12 +119,12 @@ inline void load_construct_data(
 {
     // Retrieve data from archive required to construct new instance
     AbstractTissue<2>* p_tissue;
-    ar >> p_tissue;
+    ar & p_tissue;
     c_vector<double,2> centre;
-    ar >> centre[0];
-    ar >> centre[1];
+    ar & centre[0];
+    ar & centre[1];
     double radius;
-    ar >> radius;
+    ar & radius;
 
     // Invoke inplace constructor to initialise instance
     ::new(t)RadialSloughingCellKiller(p_tissue, centre, radius);

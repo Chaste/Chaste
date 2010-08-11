@@ -145,9 +145,9 @@ inline void load_construct_data(
 {
     // Retrieve data from archive required to construct new instance
     AbstractTissue<2>* p_tissue;
-    ar >> p_tissue;
+    ar & p_tissue;
     std::vector<AbstractForce<2>*> force_collection;
-    ar >> force_collection;
+    ar & force_collection;
 
     // Invoke inplace constructor to initialise instance
     ::new(t)VertexCryptSimulation2d(*p_tissue, force_collection, true, false);
