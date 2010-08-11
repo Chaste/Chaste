@@ -238,8 +238,6 @@ public:
 
     /**
      * Default constructor.
-     * 
-     * \todo store default values for mCellRearrangementThreshold etc in TissueConfig? (#1406)
      *
      * @param nodes vector of pointers to nodes
      * @param vertexElements vector of pointers to VertexElements
