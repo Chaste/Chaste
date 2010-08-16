@@ -646,13 +646,13 @@ public:
         }
 
         // Forces should be twice the forces found using Meineke alone (since a flat crypt is used)
-        TS_ASSERT_DELTA(new_node_forces[60][0], 2*0.5*linear_force.GetMeinekeSpringStiffness(), 1e-4);
+        TS_ASSERT_DELTA(new_node_forces[60][0], 2*0.5*p_params->GetMeinekeSpringStiffness(), 1e-4);
         TS_ASSERT_DELTA(new_node_forces[60][1], 0.0, 1e-4);
 
-        TS_ASSERT_DELTA(new_node_forces[59][0], 2*(-3+4.0/sqrt(7))*linear_force.GetMeinekeSpringStiffness(), 1e-4);
+        TS_ASSERT_DELTA(new_node_forces[59][0], 2*(-3+4.0/sqrt(7))*p_params->GetMeinekeSpringStiffness(), 1e-4);
         TS_ASSERT_DELTA(new_node_forces[59][1], 0.0, 1e-4);
 
-        TS_ASSERT_DELTA(new_node_forces[58][0], 2*0.5*linear_force.GetMeinekeSpringStiffness(), 1e-4);
+        TS_ASSERT_DELTA(new_node_forces[58][0], 2*0.5*p_params->GetMeinekeSpringStiffness(), 1e-4);
         TS_ASSERT_DELTA(new_node_forces[58][1], 0.0, 1e-4);
     }
 
