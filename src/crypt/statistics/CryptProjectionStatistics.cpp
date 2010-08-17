@@ -37,6 +37,11 @@ bool CellsRadiusComparison(const std::pair<TissueCellPtr, double> lhs, const std
     return lhs.second < rhs.second;
 }
 
+CryptProjectionStatistics::CryptProjectionStatistics(MeshBasedTissue<2>& rCrypt)
+    : AbstractCryptStatistics(rCrypt)
+{
+}
+
 bool CryptProjectionStatistics::CellIsInSection(double angle, const c_vector<double,2>& rCellPosition, double widthOfSection)
 {
     // Get corresponding 3D position of closest point on line

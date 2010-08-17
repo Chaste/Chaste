@@ -35,7 +35,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
  */
 class CryptProjectionStatistics : public AbstractCryptStatistics
 {
-protected:
+private:
 
     /**
      * CellIsInSection method.
@@ -49,13 +49,11 @@ protected:
 public:
 
     /**
-     *  Constructor
+     * Constructor.
      *
-     *  @param rCrypt  The crypt
+     * @param rCrypt The crypt
      */
-    CryptProjectionStatistics(MeshBasedTissue<2>& rCrypt)
-        : AbstractCryptStatistics(rCrypt)
-    {}
+    CryptProjectionStatistics(MeshBasedTissue<2>& rCrypt);
 
     /**
      * GetCryptSection method. Takes in an angle from the
@@ -64,7 +62,6 @@ public:
      * @param angle  The angle between the crypt section and the x axis in the projection
      */
     std::vector<TissueCellPtr> GetCryptSection(double angle = DBL_MAX);
-
 };
 
 #endif /*CRYPTPROJECTIONSTATISTICS_HPP_*/

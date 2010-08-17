@@ -106,21 +106,30 @@ void StochasticDivisionRuleCellCycleModel::ResetForDivision()
 
 void StochasticDivisionRuleCellCycleModel::InitialiseDaughterCell()
 {
-    if (mDividedSymmetrically == false)
-    {
-        // If cell division was asymmetric, then the daughter cell must be TRANSIT or DIFFERENTIATED
-        AbstractSimpleGenerationBasedCellCycleModel::InitialiseDaughterCell();
-    }
-    else
+    if (mDividedSymmetrically)
     {
         // If cell division was symmetric, then do not alter generation or cell type
         AbstractSimpleCellCycleModel::InitialiseDaughterCell();
+    }
+    else
+    {
+        // If cell division was asymmetric, then the daughter cell must be TRANSIT or DIFFERENTIATED
+        AbstractSimpleGenerationBasedCellCycleModel::InitialiseDaughterCell();
     }
 }
 
 AbstractCellCycleModel* StochasticDivisionRuleCellCycleModel::CreateCellCycleModel()
 {
-    return new StochasticDivisionRuleCellCycleModel(*this);
+    // Create a new cell cycle model
+    StochasticDivisionRuleCellCycleModel* p_model = new StochasticDivisionRuleCellCycleModel(mDividedSymmetrically);
+
+    // Set the values of the new cell cycle model's member variables
+    p_model->SetGeneration(mGeneration);
+    p_model->SetCellProliferativeType(mCellProliferativeType);
+    p_model->SetSymmetricDivisionProbability(mSymmetricDivisionProbability);
+    p_model->SetMaxTransitGenerations(mMaxTransitGenerations);
+
+    return p_model;
 }
 
 bool StochasticDivisionRuleCellCycleModel::DividedSymmetrically()
