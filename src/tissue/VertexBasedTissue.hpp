@@ -241,7 +241,7 @@ public:
      * @param rCellDivisionVector  if this vector has any non-zero component, then it is used as the axis
      *     along which the parent cell divides
      * @param pParentCell pointer to a parent cell (if required)
-     * @returns address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
+     * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
      */
     TissueCellPtr AddCell(TissueCellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, TissueCellPtr pParentCell=TissueCellPtr());
 
