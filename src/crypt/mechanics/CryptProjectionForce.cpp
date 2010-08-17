@@ -219,7 +219,7 @@ c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nod
     multiplication_factor *= VariableSpringConstantMultiplicationFactor(nodeAGlobalIndex, nodeBGlobalIndex, rTissue, is_closer_than_rest_length);
 
     // Calculate the 3D force between the two points
-    c_vector<double,3> force_between_nodes = multiplication_factor * p_config->GetMeinekeSpringStiffness() * unit_difference * (distance_between_nodes - rest_length);
+    c_vector<double,3> force_between_nodes = multiplication_factor * this->GetMeinekeSpringStiffness() * unit_difference * (distance_between_nodes - rest_length);
 
     // Calculate an outward normal unit vector to the tangent plane of the crypt surface at the 3D point corresponding to node B
     c_vector<double,3> outward_normal_unit_vector;
