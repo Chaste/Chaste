@@ -609,6 +609,18 @@ void VertexBasedTissue<DIM>::GenerateCellResultsAndWriteToFiles()
     this->WriteCellResultsToFiles(cell_type_counter, cell_cycle_phase_counter);
 }
 
+template<unsigned DIM>
+void VertexBasedTissue<DIM>::OutputTissueParameters(out_stream& rParamsFile)
+{
+    *rParamsFile <<  "\t <mCellRearrangementThreshold> " <<  mrMesh.GetCellRearrangementThreshold() << " </mCellRearrangementThreshold> \n" ;
+    *rParamsFile <<  "\t <mT2Threshold> " <<  mrMesh.GetT2Threshold() << " </mT2Threshold> \n" ;
+    *rParamsFile <<  "\t <mCellRearrangementRatio> " <<  mrMesh.GetCellRearrangementRatio() << " </mCellRearrangementRatio> \n" ;
+
+	// Call direct parent class method
+	AbstractTissue<DIM>::OutputTissueParameters(rParamsFile);
+
+}
+
 
 /////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation

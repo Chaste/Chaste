@@ -296,6 +296,16 @@ public:
      */
     virtual void GenerateCellResultsAndWriteToFiles();
 
+    /**
+     * Outputs Tissue Parameters to file
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
+     * @param rParamsFile the file stream to which the parameters are output
+     */
+    void OutputTissueParameters(out_stream& rParamsFile);
+
 };
 
 #include "SerializationExportWrapper.hpp"

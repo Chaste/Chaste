@@ -1429,6 +1429,13 @@ public:
 
         // For coverage
         TS_ASSERT_THROWS_NOTHING(tissue.WriteResultsToFiles());
+
+        //Test that the tissue parameters are output correctly
+		out_stream ParameterFile = output_file_handler.OpenOutputFile("results.parameters");
+		// Write tissue parameters to file
+		TS_ASSERT_THROWS_THIS(tissue.OutputTissueParameters(ParameterFile),"OutputTissueParameters() is not yet implemented for LatticeBasedTissue see #1453");
+		ParameterFile->close();
+
     }
 
     void TestValidateLatticeBasedTissue()

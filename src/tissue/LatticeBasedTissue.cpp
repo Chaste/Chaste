@@ -877,6 +877,13 @@ double LatticeBasedTissue<DIM>::GetDampingConstant(unsigned nodeIndex)
     return 0.0;
 }
 
+template<unsigned DIM>
+void LatticeBasedTissue<DIM>::OutputTissueParameters(out_stream& rParamsFile)
+{
+	// Currently this is not called from LatticeBasedTissueSimulation see #1453 for discussion on this for cell centre and vertex tissues.
+	EXCEPTION("OutputTissueParameters() is not yet implemented for LatticeBasedTissue see #1453");
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////
