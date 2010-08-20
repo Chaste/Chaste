@@ -124,6 +124,16 @@ public:
      * @return the combinationCellType for this edge.
      */
     CellContactsType GetCombinationCellTypes(Node<DIM>* pNodeA, Node<DIM>* pNodeB, AbstractTissue<DIM>& rTissue);
+
+    /**
+     * Outputs force Parameters to file
+	 *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
+     * @param rParamsFile the file stream to which the parameters are output
+     */
+    virtual void OutputForceParameters(out_stream& rParamsFile);
 };
 
 

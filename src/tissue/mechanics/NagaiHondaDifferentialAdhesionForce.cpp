@@ -277,6 +277,16 @@ CellContactsType NagaiHondaDifferentialAdhesionForce<DIM>::GetCombinationCellTyp
 
     return combinationCellType;
 }
+
+template<unsigned DIM>
+void NagaiHondaDifferentialAdhesionForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
+{
+	// No parameters to include
+
+	// Call direct parent class
+	NagaiHondaForce<DIM>::OutputForceParameters(rParamsFile);
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////

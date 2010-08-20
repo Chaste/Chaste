@@ -289,6 +289,20 @@ void NagaiHondaForce<DIM>::SetMatureCellTargetArea(double matureCellTargetArea)
     mMatureCellTargetArea = matureCellTargetArea;
 }
 
+template<unsigned DIM>
+void NagaiHondaForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
+{
+	*rParamsFile <<  "\t<mNagaiHondaDeformationEnergyParameter> " <<  mNagaiHondaDeformationEnergyParameter << " </mNagaiHondaDeformationEnergyParameter> \n" ;
+	*rParamsFile <<  "\t<mNagaiHondaMembraneSurfaceEnergyParameter> " <<  mNagaiHondaMembraneSurfaceEnergyParameter << " </mNagaiHondaMembraneSurfaceEnergyParameter> \n" ;
+	*rParamsFile <<  "\t<mNagaiHondaCellCellAdhesionEnergyParameter> " <<  mNagaiHondaCellCellAdhesionEnergyParameter << " </mNagaiHondaCellCellAdhesionEnergyParameter> \n" ;
+	*rParamsFile <<  "\t<mNagaiHondaCellBoundaryAdhesionEnergyParameter> " <<  mNagaiHondaCellBoundaryAdhesionEnergyParameter << " </mNagaiHondaCellBoundaryAdhesionEnergyParameter> \n" ;
+	*rParamsFile <<  "\t<mMatureCellTargetArea> " <<  mMatureCellTargetArea << " </mMatureCellTargetArea> \n" ;
+
+	// Call direct parent class
+	AbstractForce<DIM>::OutputForceParameters(rParamsFile);
+}
+
+
 /////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////

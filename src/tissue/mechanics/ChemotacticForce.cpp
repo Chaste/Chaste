@@ -80,6 +80,16 @@ void ChemotacticForce<DIM>::AddForceContribution(std::vector<c_vector<double, DI
     }
 }
 
+template<unsigned DIM>
+void GeneralisedLinearSpringForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
+{
+	// No parameters to include
+
+	// Call direct parent class
+	AbstractForce<DIM>::OutputForceParameters(rParamsFile);
+}
+
+
 
 /////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
