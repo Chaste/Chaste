@@ -771,6 +771,8 @@ public:
         // Create tissue
         VertexBasedTissue<2> tissue(*p_mesh, cells);
 
+        TS_ASSERT_EQUALS(tissue.GetIdentifier(), "VertexBasedTissue<2>");
+
         // For coverage of WriteResultsToFiles()
         boost::shared_ptr<AbstractCellProperty> p_state(tissue.GetCellPropertyRegistry()->Get<WildTypeCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_apc1(tissue.GetCellPropertyRegistry()->Get<ApcOneHitCellMutationState>());

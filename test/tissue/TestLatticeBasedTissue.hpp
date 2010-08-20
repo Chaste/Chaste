@@ -1368,6 +1368,9 @@ public:
 
         // Create a tissue
         LatticeBasedTissue<2> tissue(mesh, cells, real_node_indices);
+
+        TS_ASSERT_EQUALS(tissue.GetIdentifier(), "LatticeBasedTissue<2>");
+
         tissue.SetCellAncestorsToLocationIndices();
         tissue.SetOutputCellIdData(true);
         tissue.SetOutputCellMutationStates(true);
