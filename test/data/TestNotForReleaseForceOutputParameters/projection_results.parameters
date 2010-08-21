@@ -1,0 +1,7 @@
+	<mA> 0.5 </mA> 
+	<mB> 2 </mB> 
+	<mIncludeWntChemotaxis> 0 </mIncludeWntChemotaxis> 
+	<mWntChemotaxisStrength> 100 </mWntChemotaxisStrength> 
+	<mMeinekeSpringStiffness> 15 </mMeinekeSpringStiffness> 
+	<mMeinekeDivisionRestingSpringLength> 0.5 </mMeinekeDivisionRestingSpringLength> 
+	<mUseCutoffPoint> 0 </mUseCutoffPoint> 

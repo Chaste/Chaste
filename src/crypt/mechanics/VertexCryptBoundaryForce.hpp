@@ -93,6 +93,15 @@ public:
     /** @return mForceStrength */
     double GetForceStrength() const;
 
+    /**
+     * Outputs force Parameters to file
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
+     * @param rParamsFile the file stream to which the parameters are output
+     */
+    void OutputForceParameters(out_stream& rParamsFile);
 };
 
 

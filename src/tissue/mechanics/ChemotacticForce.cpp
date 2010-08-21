@@ -81,15 +81,13 @@ void ChemotacticForce<DIM>::AddForceContribution(std::vector<c_vector<double, DI
 }
 
 template<unsigned DIM>
-void GeneralisedLinearSpringForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
+void ChemotacticForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
-	// No parameters to include
+    // No parameters to include
 
-	// Call direct parent class
-	AbstractForce<DIM>::OutputForceParameters(rParamsFile);
+    // Call direct parent class
+    AbstractForce<DIM>::OutputForceParameters(rParamsFile);
 }
-
-
 
 /////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
@@ -98,7 +96,6 @@ void GeneralisedLinearSpringForce<DIM>::OutputForceParameters(out_stream& rParam
 template class ChemotacticForce<1>;
 template class ChemotacticForce<2>;
 template class ChemotacticForce<3>;
-
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

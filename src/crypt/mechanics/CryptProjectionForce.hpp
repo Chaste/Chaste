@@ -155,7 +155,6 @@ public :
      */
     double CalculateCryptSurfaceHeightAtPoint(const c_vector<double,2>& rNodeLocation);
 
-
     /**
      *  Calculates the derivative df/dr of the crypt surface function z=f(r) at a point
      *  whose 2D position is a distance r from the centre of the tissue, which we assume
@@ -175,6 +174,15 @@ public :
     void AddForceContribution(std::vector<c_vector<double,2> >& rForces,
                               AbstractTissue<2>& rTissue);
 
+    /**
+     * Outputs force Parameters to file
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
+     * @param rParamsFile the file stream to which the parameters are output
+     */
+    void OutputForceParameters(out_stream& rParamsFile);
 };
 
 // Declare identifier for the serializer
