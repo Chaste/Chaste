@@ -1431,10 +1431,10 @@ public:
         TS_ASSERT_THROWS_NOTHING(tissue.WriteResultsToFiles());
 
         //Test that the tissue parameters are output correctly
-		out_stream ParameterFile = output_file_handler.OpenOutputFile("results.parameters");
+		out_stream parameter_file = output_file_handler.OpenOutputFile("results.parameters");
 		// Write tissue parameters to file
-		TS_ASSERT_THROWS_THIS(tissue.OutputTissueParameters(ParameterFile),"OutputTissueParameters() is not yet implemented for LatticeBasedTissue see #1453");
-		ParameterFile->close();
+		TS_ASSERT_THROWS_THIS(tissue.OutputTissueParameters(parameter_file),"OutputTissueParameters() is not yet implemented for LatticeBasedTissue see #1453");
+		parameter_file->close();
 
     }
 
