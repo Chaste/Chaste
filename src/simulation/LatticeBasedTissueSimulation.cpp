@@ -293,6 +293,16 @@ const std::vector<AbstractUpdateRule<DIM>*> LatticeBasedTissueSimulation<DIM>::r
     return mUpdateRuleCollection;
 }
 
+template<unsigned DIM>
+void LatticeBasedTissueSimulation<DIM>::OutputSimulationParameters(out_stream& rParamsFile)
+{
+	// Currently this is not called from LatticeBasedTissueSimulation see #1453 for discussion on this for cell centre and vertex tissues.
+	EXCEPTION("OutputSimulationParameters() is not yet implemented for LatticeBasedTissueSimulation see #1453");
+
+	// Call direct parent class
+	//TissueSimulation<DIM>::OutputSimulationParameters(rParamsFile);
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////

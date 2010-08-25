@@ -882,6 +882,9 @@ void LatticeBasedTissue<DIM>::OutputTissueParameters(out_stream& rParamsFile)
 {
 	// Currently this is not called from LatticeBasedTissueSimulation see #1453 for discussion on this for cell centre and vertex tissues.
 	EXCEPTION("OutputTissueParameters() is not yet implemented for LatticeBasedTissue see #1453");
+
+	// Call direct parent class
+    //AbstractTissue<DIM>::OutputTissueParameters(rParamsFile);
 }
 
 /////////////////////////////////////////////////////////////////////////////

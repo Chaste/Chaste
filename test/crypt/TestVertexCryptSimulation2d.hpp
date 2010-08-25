@@ -637,6 +637,47 @@ public:
         WntConcentration<2>::Destroy();
     }
 
+    void TestVertexCryptSimulation2DParameterOutput() throw (Exception)
+   	{
+        // Create mesh
+        unsigned crypt_width = 4;
+        unsigned crypt_height = 6;
+        CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
+        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+
+        // Create cells
+        std::vector<TissueCellPtr> cells;
+        CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
+        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+
+        // Create tissue
+        VertexBasedTissue<2> crypt(*p_mesh, cells);
+
+        // Create force law
+        NagaiHondaForce<2> force_law;
+        std::vector<AbstractForce<2>*> force_collection;
+        force_collection.push_back(&force_law);
+
+        // Create crypt simulation from tissue and force law
+        VertexCryptSimulation2d simulator(crypt, force_collection);
+
+        // Create cell killer and pass in to crypt simulation
+        SloughingCellKiller<2> sloughing_cell_killer(&crypt, true);
+        simulator.AddCellKiller(&sloughing_cell_killer);
+
+   		std::string output_directory = "TestVertexCryptSimulation2dOutputParameters";
+   		OutputFileHandler output_file_handler(output_directory, false);
+   		out_stream parameter_file = output_file_handler.OpenOutputFile("vertex_crypt_sim_2d_results.parameters");
+   		simulator.OutputSimulationParameters(parameter_file);
+   		parameter_file->close();
+
+   		std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+   		TS_ASSERT_EQUALS(system(("diff " + results_dir + "vertex_crypt_sim_2d_results.parameters			notforrelease_cell_based/test/data/TestVertexCryptSimulationOutputParameters/vertex_crypt_sim_2d_results.parameters").c_str()), 0);
+
+   		//\TODO check output of simulator.OutputSimulationSetup();
+   	}
+
+
     // Testing Save
     void TestSave() throw (Exception)
     {

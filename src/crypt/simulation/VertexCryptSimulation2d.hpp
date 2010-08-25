@@ -111,6 +111,16 @@ public :
      * @param rOldLocations the node locations at the previous time step
      */
     void ApplyTissueBoundaryConditions(const std::vector<c_vector<double,2> >& rOldLocations);
+
+    /**
+     * Outputs Simulation Parameters to file
+	 *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
+     * @param rParamsFile the file stream to which the parameters are output
+     */
+    void OutputSimulationParameters(out_stream& rParamsFile);
 };
 
 

@@ -117,6 +117,18 @@ void VertexCryptSimulation2d::ApplyTissueBoundaryConditions(const std::vector< c
 }
 
 
+void VertexCryptSimulation2d::OutputSimulationParameters(out_stream& rParamsFile)
+{
+	// \TODO move crypt width and height from TissueConfig to this class #1496
+
+	*rParamsFile << "\t<mUseJiggledBottomCells> "<< mUseJiggledBottomCells << " </mUseJiggledBottomCells>\n";
+
+	// Call direct parent class
+	TissueSimulation<2>::OutputSimulationParameters(rParamsFile);
+
+}
+
+
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
 CHASTE_CLASS_EXPORT(VertexCryptSimulation2d)

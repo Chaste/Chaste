@@ -655,6 +655,50 @@ public:
         delete p_simulator2;
     }
 
+    void TestExceptions() throw (Exception)
+	{
+		// Create mesh
+		TetrahedralMesh<2,2> mesh;
+		mesh.ConstructRectangularMesh(49, 49, true); // 50*50 nodes
+
+		// Create cells
+		std::vector<TissueCellPtr> cells;
+		std::vector<unsigned> real_node_indices;
+		boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+		unsigned num_cells = 100;
+		for ( unsigned i=0; i<num_cells; i++)
+		{
+			FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+			p_model->SetCellProliferativeType(DIFFERENTIATED);
+			TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+			cells.push_back(p_cell);
+
+			real_node_indices.push_back(i);
+		}
+
+		// Create a tissue
+		LatticeBasedTissue<2> tissue(mesh, cells, real_node_indices);
+
+		// Create a UpdateRule system
+		DiffusionUpdateRule<2> update_rule;
+		std::vector<AbstractUpdateRule<2>* > update_rule_collection;
+		update_rule_collection.push_back(&update_rule);
+
+		// Set up tissue simulation
+		LatticeBasedTissueSimulation<2> simulator(tissue, update_rule_collection);
+		simulator.SetOutputDirectory("TestDiffusionOfLargeNumberOfCells");
+		simulator.SetDt(0.1);
+		simulator.SetEndTime(5.0);
+
+		//Test that the simulation parameters are output correctly
+		std::string output_directory = "TestTissueSimulationOutputParameters";
+		OutputFileHandler output_file_handler(output_directory, false);
+		out_stream parameter_file = output_file_handler.OpenOutputFile("results.parameters");
+		// Try to write simulation parameters to file
+		TS_ASSERT_THROWS_THIS(simulator.OutputSimulationParameters(parameter_file),"OutputSimulationParameters() is not yet implemented for LatticeBasedTissueSimulation see #1453");
+		parameter_file->close();
+	}
+
 };
 
 #endif /*TESTLATTICEBASEDTISSUESIMULATION_HPP_*/
