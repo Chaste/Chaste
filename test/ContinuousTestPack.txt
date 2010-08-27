@@ -15,5 +15,5 @@ tissue/TestDiscreteSystemForceCalculator.hpp
 tissue/TestForcesNotForRelease.hpp
 tissue/TestVertexBasedTissue.hpp
 tissue/TestLatticeBasedTissue.hpp
+tissue/TestLatticeBasedUpdateRules.hpp
 simulation/TestLatticeBasedTissueSimulation.hpp
-update_rules/TestLatticeBasedUpdateRules.hpp
