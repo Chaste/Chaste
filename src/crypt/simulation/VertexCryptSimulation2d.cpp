@@ -121,7 +121,7 @@ void VertexCryptSimulation2d::OutputSimulationParameters(out_stream& rParamsFile
 {
 	// \TODO move crypt width and height from TissueConfig to this class #1496
 
-	*rParamsFile << "\t<mUseJiggledBottomCells> "<< mUseJiggledBottomCells << " </mUseJiggledBottomCells>\n";
+	*rParamsFile << "\t\t<UseJiggledBottomCells>"<< mUseJiggledBottomCells << "</UseJiggledBottomCells>\n";
 
 	// Call direct parent class
 	TissueSimulation<2>::OutputSimulationParameters(rParamsFile);

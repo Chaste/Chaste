@@ -1,5 +1,5 @@
-		<mNagaiHondaDeformationEnergyParameter> 100 </mNagaiHondaDeformationEnergyParameter> 
-		<mNagaiHondaMembraneSurfaceEnergyParameter> 10 </mNagaiHondaMembraneSurfaceEnergyParameter> 
-		<mNagaiHondaCellCellAdhesionEnergyParameter> 1 </mNagaiHondaCellCellAdhesionEnergyParameter> 
-		<mNagaiHondaCellBoundaryAdhesionEnergyParameter> 1 </mNagaiHondaCellBoundaryAdhesionEnergyParameter> 
-		<mMatureCellTargetArea> 1 </mMatureCellTargetArea> 
+			<NagaiHondaDeformationEnergyParameter>100</NagaiHondaDeformationEnergyParameter> 
+			<NagaiHondaMembraneSurfaceEnergyParameter>10</NagaiHondaMembraneSurfaceEnergyParameter> 
+			<NagaiHondaCellCellAdhesionEnergyParameter>1</NagaiHondaCellCellAdhesionEnergyParameter> 
+			<NagaiHondaCellBoundaryAdhesionEnergyParameter>1</NagaiHondaCellBoundaryAdhesionEnergyParameter> 
+			<MatureCellTargetArea>1</MatureCellTargetArea> 

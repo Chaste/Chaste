@@ -289,10 +289,10 @@ void CryptProjectionForce::AddForceContribution(std::vector<c_vector<double,2> >
 
 void CryptProjectionForce::OutputForceParameters(out_stream& rParamsFile)
 {
-    *rParamsFile <<  "\t\t<mA> " <<  mA << " </mA> \n" ;
-    *rParamsFile <<  "\t\t<mB> " <<  mB << " </mB> \n" ;
-    *rParamsFile <<  "\t\t<mIncludeWntChemotaxis> " <<  mIncludeWntChemotaxis << " </mIncludeWntChemotaxis> \n" ;
-    *rParamsFile <<  "\t\t<mWntChemotaxisStrength> " <<  mWntChemotaxisStrength << " </mWntChemotaxisStrength> \n" ;
+    *rParamsFile <<  "\t\t\t<A>"<<  mA << "</A> \n" ;
+    *rParamsFile <<  "\t\t\t<B>"<<  mB << "</B> \n" ;
+    *rParamsFile <<  "\t\t\t<IncludeWntChemotaxis>"<<  mIncludeWntChemotaxis << "</IncludeWntChemotaxis> \n" ;
+    *rParamsFile <<  "\t\t\t<WntChemotaxisStrength>"<<  mWntChemotaxisStrength << "</WntChemotaxisStrength> \n" ;
 
     // Call direct parent class
     GeneralisedLinearSpringForce<2>::OutputForceParameters(rParamsFile);

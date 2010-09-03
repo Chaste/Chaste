@@ -612,9 +612,9 @@ void VertexBasedTissue<DIM>::GenerateCellResultsAndWriteToFiles()
 template<unsigned DIM>
 void VertexBasedTissue<DIM>::OutputTissueParameters(out_stream& rParamsFile)
 {
-    *rParamsFile <<  "\t<mCellRearrangementThreshold> " <<  mrMesh.GetCellRearrangementThreshold() << " </mCellRearrangementThreshold> \n" ;
-    *rParamsFile <<  "\t<mT2Threshold> " <<  mrMesh.GetT2Threshold() << " </mT2Threshold> \n" ;
-    *rParamsFile <<  "\t<mCellRearrangementRatio> " <<  mrMesh.GetCellRearrangementRatio() << " </mCellRearrangementRatio> \n" ;
+    *rParamsFile <<  "\t\t<CellRearrangementThreshold>"<<  mrMesh.GetCellRearrangementThreshold() << "</CellRearrangementThreshold> \n" ;
+    *rParamsFile <<  "\t\t<T2Threshold>"<<  mrMesh.GetT2Threshold() << "</T2Threshold> \n" ;
+    *rParamsFile <<  "\t\t<CellRearrangementRatio>"<<  mrMesh.GetCellRearrangementRatio() << "</CellRearrangementRatio> \n" ;
 
 	// Call direct parent class method
 	AbstractTissue<DIM>::OutputTissueParameters(rParamsFile);

@@ -41,6 +41,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "NagaiHondaDifferentialAdhesionForce.hpp"
 #include "WelikyOsterForce.hpp"
 #include "AbstractCellKiller.hpp"
+#include "TargetedCellKiller.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "HoneycombMutableVertexMeshGenerator.hpp"
 #include "VertexMeshWriter.hpp"
@@ -48,38 +49,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CellLabel.hpp"
 #include "Warnings.hpp"
 #include "LogFile.hpp"
-
-/**
- * Simple cell killer which at the first timestep kills any cell
- * whose corresponding location index is a given number.
- *
- * For testing purposes.
- */
-class TargetedCellKiller : public AbstractCellKiller<2>
-{
-private :
-
-    unsigned mTargetIndex;
-    bool mBloodLust;
-
-public :
-    TargetedCellKiller(AbstractTissue<2>* pTissue, unsigned targetIndex)
-        : AbstractCellKiller<2>(pTissue),
-          mTargetIndex(targetIndex),
-          mBloodLust(true)
-    {
-    }
-
-    virtual void TestAndLabelCellsForApoptosisOrDeath()
-    {
-        if ( !mBloodLust || mpTissue->GetNumRealCells()==0 || mpTissue->GetNumRealCells()<mTargetIndex+1)
-        {
-            return;
-        }
-        mpTissue->GetCellUsingLocationIndex(mTargetIndex)->Kill();
-        mBloodLust = false;
-    }
-};
 
 
 class TestTissueSimulationWithVertexBasedTissue : public AbstractCellBasedTestSuite
@@ -457,9 +426,9 @@ public:
         simulator.SetEndTime(0.5);
         
         // Create a cell killer and pass in to simulation (note we must account for element index changes following each kill)
-        TargetedCellKiller cell0_killer(&tissue, 0);    // element on the SW corner
-        TargetedCellKiller cell2_killer(&tissue, 2);    // element on the S boundary
-        TargetedCellKiller cell9_killer(&tissue, 9);  // element on the interior
+        TargetedCellKiller<2> cell0_killer(&tissue, 0);    // element on the SW corner
+        TargetedCellKiller<2> cell2_killer(&tissue, 2);    // element on the S boundary
+        TargetedCellKiller<2> cell9_killer(&tissue, 9);  // element on the interior
 
         simulator.AddCellKiller(&cell0_killer);
         simulator.AddCellKiller(&cell2_killer);
