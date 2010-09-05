@@ -26,8 +26,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#ifndef TESTVERTEXBASEDTISSUE_HPP_
-#define TESTVERTEXBASEDTISSUE_HPP_
+#ifndef TESTVERTEXBASEDCELLPOPULATION_HPP_
+#define TESTVERTEXBASEDCELLPOPULATION_HPP_
 
 #include <cxxtest/TestSuite.h>
 
@@ -35,7 +35,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <boost/archive/text_iarchive.hpp>
 
 #include "CellwiseData.hpp"
-#include "VertexBasedTissue.hpp"
+#include "VertexBasedCellPopulation.hpp"
 #include "HoneycombMutableVertexMeshGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "WntCellCycleModel.hpp"
@@ -48,7 +48,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "BetaCateninOneHitCellMutationState.hpp"
 #include "CellLabel.hpp"
 
-class TestVertexBasedTissue : public AbstractCellBasedTestSuite
+class TestVertexBasedCellPopulation : public AbstractCellBasedTestSuite
 {
 private:
 
@@ -58,16 +58,16 @@ private:
      * so its age is elem_index.
      */
     template<unsigned DIM>
-    std::vector<TissueCellPtr> SetUpCells(MutableVertexMesh<DIM,DIM>& rMesh)
+    std::vector<CellPtr> SetUpCells(MutableVertexMesh<DIM,DIM>& rMesh)
     {
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
         for (unsigned i=0; i<rMesh.GetNumElements(); i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(DIFFERENTIATED);
 
-            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            CellPtr p_cell(new Cell(p_state, p_model));
             double birth_time = 0.0 - i;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
@@ -78,32 +78,32 @@ private:
 public:
 
     // Test construction, accessors and iterator
-    void TestCreateSmallVertexBasedTissue() throw (Exception)
+    void TestCreateSmallVertexBasedCellPopulation() throw (Exception)
     {
         // Create a simple 2D VertexMesh
         HoneycombMutableVertexMeshGenerator generator(5, 3);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
 
         // Set up cells
-        std::vector<TissueCellPtr> cells = SetUpCells(*p_mesh);
+        std::vector<CellPtr> cells = SetUpCells(*p_mesh);
 
-        // Create tissue
+        // Create cell population
         unsigned num_cells = cells.size();
-        VertexBasedTissue<2> tissue(*p_mesh, cells);
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Test we have the correct number of cells and elements
-        TS_ASSERT_EQUALS(tissue.GetNumElements(), p_mesh->GetNumElements());
-        TS_ASSERT_EQUALS(tissue.rGetCells().size(), num_cells);
+        TS_ASSERT_EQUALS(cell_population.GetNumElements(), p_mesh->GetNumElements());
+        TS_ASSERT_EQUALS(cell_population.rGetCells().size(), num_cells);
 
         unsigned counter = 0;
 
-        // Test VertexBasedTissue::Iterator
-        for (VertexBasedTissue<2>::Iterator cell_iter = tissue.Begin();
-             cell_iter != tissue.End();
+        // Test VertexBasedCellPopulation::Iterator
+        for (VertexBasedCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
              ++cell_iter)
         {
             // Test operator* and that cells are in sync
-            TS_ASSERT_EQUALS(tissue.GetLocationIndexUsingCell(*cell_iter), counter);
+            TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter), counter);
 
             // Test operator-> and that cells are in sync
             TS_ASSERT_DELTA(cell_iter->GetAge(), (double)counter, 1e-12);
@@ -114,10 +114,10 @@ public:
         }
 
         // Test we have gone through all cells in the for loop
-        TS_ASSERT_EQUALS(counter, tissue.GetNumRealCells());
+        TS_ASSERT_EQUALS(counter, cell_population.GetNumRealCells());
 
         // Test GetNumNodes() method
-        TS_ASSERT_EQUALS(tissue.GetNumNodes(), p_mesh->GetNumNodes());
+        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), p_mesh->GetNumNodes());
     }
 
 
@@ -131,7 +131,7 @@ public:
 
 			// Set up cells, one for each element.
 			// Give each a birth time of -element_index, so the age = element_index.
-			std::vector<TissueCellPtr> cells;
+			std::vector<CellPtr> cells;
 			std::vector<unsigned> cell_location_indices;
 			boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
 			for (unsigned i=0; i<p_mesh->GetNumElements()-1; i++)
@@ -139,7 +139,7 @@ public:
 				FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
 				p_model->SetCellProliferativeType(STEM);
 
-				TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+				CellPtr p_cell(new Cell(p_state, p_model));
 
 				double birth_time = 0.0 - i;
 				p_cell->SetBirthTime(birth_time);
@@ -150,14 +150,14 @@ public:
 
 			// This should throw an exception as the number of cells
 			// does not equal the number of elements
-			std::vector<TissueCellPtr> cells_copy(cells);
-			TS_ASSERT_THROWS_THIS(VertexBasedTissue<2> tissue(*p_mesh, cells_copy),
+			std::vector<CellPtr> cells_copy(cells);
+			TS_ASSERT_THROWS_THIS(VertexBasedCellPopulation<2> cell_population(*p_mesh, cells_copy),
 					"Element 8 does not appear to have a cell associated with it");
 
 			FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
 			p_model->SetCellProliferativeType(STEM);
 
-			TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+			CellPtr p_cell(new Cell(p_state, p_model));
 
 			double birth_time = 0.0 - p_mesh->GetNumElements()-1;
 			p_cell->SetBirthTime(birth_time);
@@ -166,11 +166,11 @@ public:
 			cell_location_indices.push_back(p_mesh->GetNumElements()-1);
 
 			// This should pass as the number of cells equals the number of elements
-			std::vector<TissueCellPtr> cells_copy2(cells);
-			TS_ASSERT_THROWS_NOTHING(VertexBasedTissue<2> tissue(*p_mesh, cells_copy2));
+			std::vector<CellPtr> cells_copy2(cells);
+			TS_ASSERT_THROWS_NOTHING(VertexBasedCellPopulation<2> cell_population(*p_mesh, cells_copy2));
 
-			// Create tissue
-			VertexBasedTissue<2> tissue(*p_mesh, cells);
+			// Create cell population
+			VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
 			// Check correspondence between elements and cells
 
@@ -188,8 +188,8 @@ public:
 
 				std::set<unsigned> actual_node_indices;
 				unsigned elem_index = iter->GetIndex();
-				TissueCellPtr p_cell = tissue.GetCellUsingLocationIndex(elem_index);
-				VertexElement<2,2>* p_actual_element = tissue.GetElementCorrespondingToCell(p_cell);
+				CellPtr p_cell = cell_population.GetCellUsingLocationIndex(elem_index);
+				VertexElement<2,2>* p_actual_element = cell_population.GetElementCorrespondingToCell(p_cell);
 				unsigned actual_index = p_actual_element->GetIndex();
 
 				for (unsigned i=0; i<p_actual_element->GetNumNodes(); i++)
@@ -211,7 +211,7 @@ public:
 
 			// Set up cells, one for each element.
 			// Give each a birth time of -element_index, so the age = element_index.
-			std::vector<TissueCellPtr> cells;
+			std::vector<CellPtr> cells;
 			std::vector<unsigned> cell_location_indices;
 			boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
 			for (unsigned i=0; i<p_mesh->GetNumElements()+1; i++)
@@ -219,7 +219,7 @@ public:
 				FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
 				p_model->SetCellProliferativeType(STEM);
 
-				TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+				CellPtr p_cell(new Cell(p_state, p_model));
 
 				double birth_time = 0.0 - i;
 				p_cell->SetBirthTime(birth_time);
@@ -230,7 +230,7 @@ public:
 
 			// This should throw an exception as the number of cells
 			// does not equal the number of elements
-			TS_ASSERT_THROWS_THIS(VertexBasedTissue<2> tissue(*p_mesh, cells, false, true, cell_location_indices),
+			TS_ASSERT_THROWS_THIS(VertexBasedCellPopulation<2> cell_population(*p_mesh, cells, false, true, cell_location_indices),
 					"Element 0 appears to have 2 cells associated with it");
 		}
     }
@@ -238,14 +238,14 @@ public:
 
     void TestGetDampingConstant()
     {
-        TissueConfig::Instance()->SetDampingConstantMutant(8.0);
+        CellBasedConfig::Instance()->SetDampingConstantMutant(8.0);
 
         // Create mesh
         HoneycombMutableVertexMeshGenerator generator(3, 3);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
 
         // Set up cells
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         std::vector<unsigned> cell_location_indices;
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         boost::shared_ptr<AbstractCellProperty> p_apc1(new ApcOneHitCellMutationState);
@@ -258,7 +258,7 @@ public:
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(STEM);
 
-            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            CellPtr p_cell(new Cell(p_state, p_model));
 
             double birth_time = 0.0 - i;
             p_cell->SetBirthTime(birth_time);
@@ -271,36 +271,36 @@ public:
         cells[7]->SetMutationState(p_bcat1);
         cells[8]->AddCellProperty(p_label);
 
-        // Create tissue
-        VertexBasedTissue<2> tissue(*p_mesh, cells);
-        tissue.InitialiseCells(); // this method must be called explicitly as there is no simulation
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.InitialiseCells(); // this method must be called explicitly as there is no simulation
 
         // Test GetDampingConstant()
-        double normal_damping_constant = TissueConfig::Instance()->GetDampingConstantNormal();
-        double mutant_damping_constant = TissueConfig::Instance()->GetDampingConstantMutant();
+        double normal_damping_constant = CellBasedConfig::Instance()->GetDampingConstantNormal();
+        double mutant_damping_constant = CellBasedConfig::Instance()->GetDampingConstantMutant();
 
         // Node 0 is contained in cell 0 only, therefore should have mutant damping constant
-        double damping_constant_at_node_0 = tissue.GetDampingConstant(0);
+        double damping_constant_at_node_0 = cell_population.GetDampingConstant(0);
         TS_ASSERT_DELTA(damping_constant_at_node_0, mutant_damping_constant, 1e-6);
 
         // Node 1 is contained in cell 2 only, therefore should have a normal damping constant
-        double damping_constant_at_node_1 = tissue.GetDampingConstant(1);
+        double damping_constant_at_node_1 = cell_population.GetDampingConstant(1);
         TS_ASSERT_DELTA(damping_constant_at_node_1, normal_damping_constant, 1e-6);
 
         // Node 4 is contained in cells 0 and 1, therefore should an averaged damping constant
-        double damping_constant_at_node_4 = tissue.GetDampingConstant(4);
+        double damping_constant_at_node_4 = cell_population.GetDampingConstant(4);
         TS_ASSERT_DELTA(damping_constant_at_node_4, (normal_damping_constant+mutant_damping_constant)/2.0, 1e-6);
 
         // Node 8 is contained in cells 0, 1, 3, therefore should an averaged damping constant
-        double damping_constant_at_node_8 = tissue.GetDampingConstant(8);
+        double damping_constant_at_node_8 = cell_population.GetDampingConstant(8);
         TS_ASSERT_DELTA(damping_constant_at_node_8, (2*normal_damping_constant+mutant_damping_constant)/3.0, 1e-6);
 
         // Node 27 is contained in cell 6 only, therefore should have a mutant damping constant
-        double damping_constant_at_node_27 = tissue.GetDampingConstant(27);
+        double damping_constant_at_node_27 = cell_population.GetDampingConstant(27);
         TS_ASSERT_DELTA(damping_constant_at_node_27, mutant_damping_constant, 1e-6);
 
         // Node 25 is contained in cells 6 and 7, therefore should have a mutant damping constant
-        double damping_constant_at_node_25 = tissue.GetDampingConstant(25);
+        double damping_constant_at_node_25 = cell_population.GetDampingConstant(25);
         TS_ASSERT_DELTA(damping_constant_at_node_25, mutant_damping_constant, 1e-6);
     }
 
@@ -315,17 +315,17 @@ public:
         MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
 
         // Set up cells
-        std::vector<TissueCellPtr> cells = SetUpCells(*p_mesh);
+        std::vector<CellPtr> cells = SetUpCells(*p_mesh);
 
-        // Create tissue
-        VertexBasedTissue<2> tissue(*p_mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        unsigned num_cells_removed = tissue.RemoveDeadCells();
+        unsigned num_cells_removed = cell_population.RemoveDeadCells();
         TS_ASSERT_EQUALS(num_cells_removed, 0u);
 
         p_simulation_time->IncrementTimeOneStep();
 
-        TS_ASSERT_THROWS_NOTHING(tissue.Update());
+        TS_ASSERT_THROWS_NOTHING(cell_population.Update());
     }
 
 
@@ -363,73 +363,73 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 5u);
 
         // Create cells
-        std::vector<TissueCellPtr> cells = SetUpCells(vertex_mesh);
+        std::vector<CellPtr> cells = SetUpCells(vertex_mesh);
 
-        // Create tissue
-        VertexBasedTissue<2> tissue(vertex_mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
 
         // For coverage, test GetLocationOfCellCentre()
 
         // Cell 0 is a rectangle with centre of mass (0,0)
-        c_vector<double, 2> cell0_location = tissue.GetLocationOfCellCentre(tissue.GetCellUsingLocationIndex(0));
+        c_vector<double, 2> cell0_location = cell_population.GetLocationOfCellCentre(cell_population.GetCellUsingLocationIndex(0));
         TS_ASSERT_DELTA(cell0_location[0], 0.0, 1e-4);
         TS_ASSERT_DELTA(cell0_location[1], 0.0, 1e-4);
 
         // Cell 1 is a triangle with centre of mass (0,4/3)
-        c_vector<double, 2> cell1_location = tissue.GetLocationOfCellCentre(tissue.GetCellUsingLocationIndex(1));
+        c_vector<double, 2> cell1_location = cell_population.GetLocationOfCellCentre(cell_population.GetCellUsingLocationIndex(1));
         TS_ASSERT_DELTA(cell1_location[0], 0.0, 1e-4);
         TS_ASSERT_DELTA(cell1_location[1], 4.0/3.0, 1e-4);
 
         unsigned old_num_nodes = vertex_mesh.GetNumNodes();
         unsigned old_num_elements = vertex_mesh.GetNumElements();
-        unsigned old_num_cells = tissue.rGetCells().size();
+        unsigned old_num_cells = cell_population.rGetCells().size();
 
         // Add new cell by dividing element 0 along short axis
 
         c_vector<double,2> cell_division_vector = zero_vector<double>(2);
 
-        TissueCellPtr p_cell0 = tissue.GetCellUsingLocationIndex(0);
+        CellPtr p_cell0 = cell_population.GetCellUsingLocationIndex(0);
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
 
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         p_model->SetCellProliferativeType(STEM);
-        TissueCellPtr p_temp_cell(new TissueCell(p_state, p_model));
+        CellPtr p_temp_cell(new Cell(p_state, p_model));
         p_temp_cell->SetBirthTime(-1);
 
-        TissueCellPtr p_new_cell = tissue.AddCell(p_temp_cell, cell_division_vector, p_cell0);
+        CellPtr p_new_cell = cell_population.AddCell(p_temp_cell, cell_division_vector, p_cell0);
 
-        // Check that the new cell was successfully added to the tissue
-        TS_ASSERT_EQUALS(tissue.GetNumNodes(), old_num_nodes+2);
-        TS_ASSERT_EQUALS(tissue.GetNumElements(), old_num_elements+1);
-        TS_ASSERT_EQUALS(tissue.rGetCells().size(), old_num_cells+1);
-        TS_ASSERT_EQUALS(tissue.GetNumRealCells(), old_num_elements+1);
+        // Check that the new cell was successfully added to the cell population
+        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), old_num_nodes+2);
+        TS_ASSERT_EQUALS(cell_population.GetNumElements(), old_num_elements+1);
+        TS_ASSERT_EQUALS(cell_population.rGetCells().size(), old_num_cells+1);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), old_num_elements+1);
 
         // Check the location of the new nodes
-        TS_ASSERT_DELTA(tissue.GetNode(old_num_nodes)->rGetLocation()[0], 0.0, 1e-12);
-        TS_ASSERT_DELTA(tissue.GetNode(old_num_nodes)->rGetLocation()[1], 1.0, 1e-12);
+        TS_ASSERT_DELTA(cell_population.GetNode(old_num_nodes)->rGetLocation()[0], 0.0, 1e-12);
+        TS_ASSERT_DELTA(cell_population.GetNode(old_num_nodes)->rGetLocation()[1], 1.0, 1e-12);
 
-        TS_ASSERT_DELTA(tissue.GetNode(old_num_nodes+1)->rGetLocation()[0], 0.0, 1e-12);
-        TS_ASSERT_DELTA(tissue.GetNode(old_num_nodes+1)->rGetLocation()[1], -1.0, 1e-12);
+        TS_ASSERT_DELTA(cell_population.GetNode(old_num_nodes+1)->rGetLocation()[0], 0.0, 1e-12);
+        TS_ASSERT_DELTA(cell_population.GetNode(old_num_nodes+1)->rGetLocation()[1], -1.0, 1e-12);
 
         // Now test the nodes in each element
-        TS_ASSERT_EQUALS(tissue.GetElement(0)->GetNumNodes(), 4u);
-        TS_ASSERT_EQUALS(tissue.GetElement(1)->GetNumNodes(), 4u);
-        TS_ASSERT_EQUALS(tissue.GetElement(2)->GetNumNodes(), 4u);
+        TS_ASSERT_EQUALS(cell_population.GetElement(0)->GetNumNodes(), 4u);
+        TS_ASSERT_EQUALS(cell_population.GetElement(1)->GetNumNodes(), 4u);
+        TS_ASSERT_EQUALS(cell_population.GetElement(2)->GetNumNodes(), 4u);
 
-        TS_ASSERT_EQUALS(tissue.GetElement(0)->GetNodeGlobalIndex(0), 0u);
-        TS_ASSERT_EQUALS(tissue.GetElement(0)->GetNodeGlobalIndex(1), 1u);
-        TS_ASSERT_EQUALS(tissue.GetElement(0)->GetNodeGlobalIndex(2), 5u);
-        TS_ASSERT_EQUALS(tissue.GetElement(0)->GetNodeGlobalIndex(3), 6u);
+        TS_ASSERT_EQUALS(cell_population.GetElement(0)->GetNodeGlobalIndex(0), 0u);
+        TS_ASSERT_EQUALS(cell_population.GetElement(0)->GetNodeGlobalIndex(1), 1u);
+        TS_ASSERT_EQUALS(cell_population.GetElement(0)->GetNodeGlobalIndex(2), 5u);
+        TS_ASSERT_EQUALS(cell_population.GetElement(0)->GetNodeGlobalIndex(3), 6u);
 
-        TS_ASSERT_EQUALS(tissue.GetElement(1)->GetNodeGlobalIndex(0), 1u);
-        TS_ASSERT_EQUALS(tissue.GetElement(1)->GetNodeGlobalIndex(1), 4u);
-        TS_ASSERT_EQUALS(tissue.GetElement(1)->GetNodeGlobalIndex(2), 2u);
-        TS_ASSERT_EQUALS(tissue.GetElement(1)->GetNodeGlobalIndex(3), 5u);
+        TS_ASSERT_EQUALS(cell_population.GetElement(1)->GetNodeGlobalIndex(0), 1u);
+        TS_ASSERT_EQUALS(cell_population.GetElement(1)->GetNodeGlobalIndex(1), 4u);
+        TS_ASSERT_EQUALS(cell_population.GetElement(1)->GetNodeGlobalIndex(2), 2u);
+        TS_ASSERT_EQUALS(cell_population.GetElement(1)->GetNodeGlobalIndex(3), 5u);
 
-        TS_ASSERT_EQUALS(tissue.GetElement(2)->GetNodeGlobalIndex(0), 5u);
-        TS_ASSERT_EQUALS(tissue.GetElement(2)->GetNodeGlobalIndex(1), 2u);
-        TS_ASSERT_EQUALS(tissue.GetElement(2)->GetNodeGlobalIndex(2), 3u);
-        TS_ASSERT_EQUALS(tissue.GetElement(2)->GetNodeGlobalIndex(3), 6u);
+        TS_ASSERT_EQUALS(cell_population.GetElement(2)->GetNodeGlobalIndex(0), 5u);
+        TS_ASSERT_EQUALS(cell_population.GetElement(2)->GetNodeGlobalIndex(1), 2u);
+        TS_ASSERT_EQUALS(cell_population.GetElement(2)->GetNodeGlobalIndex(2), 3u);
+        TS_ASSERT_EQUALS(cell_population.GetElement(2)->GetNodeGlobalIndex(3), 6u);
 
         // Test ownership of the new nodes
         std::set<unsigned> expected_elements_containing_node_5;
@@ -437,16 +437,16 @@ public:
         expected_elements_containing_node_5.insert(1);
         expected_elements_containing_node_5.insert(2);
 
-        TS_ASSERT_EQUALS(tissue.GetNode(5)->rGetContainingElementIndices(), expected_elements_containing_node_5);
+        TS_ASSERT_EQUALS(cell_population.GetNode(5)->rGetContainingElementIndices(), expected_elements_containing_node_5);
 
         std::set<unsigned> expected_elements_containing_node_6;
         expected_elements_containing_node_6.insert(0);
         expected_elements_containing_node_6.insert(2);
 
-        TS_ASSERT_EQUALS(tissue.GetNode(6)->rGetContainingElementIndices(), expected_elements_containing_node_6);
+        TS_ASSERT_EQUALS(cell_population.GetNode(6)->rGetContainingElementIndices(), expected_elements_containing_node_6);
 
         // Check the index of the new cell
-        TS_ASSERT_EQUALS(tissue.GetLocationIndexUsingCell(p_new_cell), old_num_elements);
+        TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(p_new_cell), old_num_elements);
     }
 
 
@@ -470,22 +470,22 @@ public:
         MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
 
         // Create a cell
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         p_model->SetCellProliferativeType(DIFFERENTIATED);
 
-        TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+        CellPtr p_cell(new Cell(p_state, p_model));
         p_cell->SetBirthTime(-20.0);
         cells.push_back(p_cell);
 
-        // Create tissue
-        VertexBasedTissue<2> tissue(vertex_mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
 
-        TS_ASSERT_EQUALS(tissue.GetNumNodes(), 4u);
-        TS_ASSERT_EQUALS(tissue.GetNumElements(), 1u);
-        TS_ASSERT_EQUALS(tissue.rGetCells().size(), 1u);
-        TS_ASSERT_EQUALS(tissue.GetNumRealCells(), 1u);
+        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 4u);
+        TS_ASSERT_EQUALS(cell_population.GetNumElements(), 1u);
+        TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 1u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 1u);
 
         // Add a new cell by dividing element 0 along the axis (1,0)
         c_vector<double,2> cell_division_axis;
@@ -494,36 +494,36 @@ public:
 
         FixedDurationGenerationBasedCellCycleModel* p_model2 = new FixedDurationGenerationBasedCellCycleModel();
         p_model2->SetCellProliferativeType(STEM);
-        TissueCellPtr p_temp_cell(new TissueCell(p_state, p_model2));
+        CellPtr p_temp_cell(new Cell(p_state, p_model2));
         p_temp_cell->SetBirthTime(-1.0);
 
-        TissueCellPtr p_new_cell = tissue.AddCell(p_temp_cell, cell_division_axis, p_cell);
+        CellPtr p_new_cell = cell_population.AddCell(p_temp_cell, cell_division_axis, p_cell);
 
-        // Check that the new cell was successfully added to the tissue
-        TS_ASSERT_EQUALS(tissue.GetNumNodes(), 6u);
-        TS_ASSERT_EQUALS(tissue.GetNumElements(), 2u);
-        TS_ASSERT_EQUALS(tissue.rGetCells().size(), 2u);
-        TS_ASSERT_EQUALS(tissue.GetNumRealCells(), 2u);
+        // Check that the new cell was successfully added to the cell population
+        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 6u);
+        TS_ASSERT_EQUALS(cell_population.GetNumElements(), 2u);
+        TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 2u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 2u);
 
         // Check the location of the new nodes
-        TS_ASSERT_DELTA(tissue.GetNode(4)->rGetLocation()[0], 2.0, 1e-12);
-        TS_ASSERT_DELTA(tissue.GetNode(4)->rGetLocation()[1], 0.5, 1e-12);
-        TS_ASSERT_DELTA(tissue.GetNode(5)->rGetLocation()[0], 0.0, 1e-12);
-        TS_ASSERT_DELTA(tissue.GetNode(5)->rGetLocation()[1], 0.5, 1e-12);
+        TS_ASSERT_DELTA(cell_population.GetNode(4)->rGetLocation()[0], 2.0, 1e-12);
+        TS_ASSERT_DELTA(cell_population.GetNode(4)->rGetLocation()[1], 0.5, 1e-12);
+        TS_ASSERT_DELTA(cell_population.GetNode(5)->rGetLocation()[0], 0.0, 1e-12);
+        TS_ASSERT_DELTA(cell_population.GetNode(5)->rGetLocation()[1], 0.5, 1e-12);
 
         // Test ownership of the new nodes
         std::set<unsigned> expected_elements_containing_node_4;
         expected_elements_containing_node_4.insert(0);
         expected_elements_containing_node_4.insert(1);
-        TS_ASSERT_EQUALS(tissue.GetNode(4)->rGetContainingElementIndices(), expected_elements_containing_node_4);
+        TS_ASSERT_EQUALS(cell_population.GetNode(4)->rGetContainingElementIndices(), expected_elements_containing_node_4);
 
         std::set<unsigned> expected_elements_containing_node_5;
         expected_elements_containing_node_5.insert(0);
         expected_elements_containing_node_5.insert(1);
-        TS_ASSERT_EQUALS(tissue.GetNode(5)->rGetContainingElementIndices(), expected_elements_containing_node_5);
+        TS_ASSERT_EQUALS(cell_population.GetNode(5)->rGetContainingElementIndices(), expected_elements_containing_node_5);
 
         // Check the index of the new cell
-        TS_ASSERT_EQUALS(tissue.GetLocationIndexUsingCell(p_new_cell), 1u);
+        TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(p_new_cell), 1u);
     }
 
     void TestAddCellWithHoneycombMesh() throw (Exception)
@@ -534,7 +534,7 @@ public:
 
         // Set up cells, one for each VertexElement. Give each cell
         // a birth time of -elem_index, so its age is elem_index
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
@@ -551,87 +551,87 @@ public:
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(cell_type);
 
-            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            CellPtr p_cell(new Cell(p_state, p_model));
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
         }
 
-        // Create tissue
-        VertexBasedTissue<2> tissue(*p_mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Initialise cells (usually called in tissue simulation constructor)
-        tissue.InitialiseCells();
+        // Initialise cells (usually called in cell-based simulation constructor)
+        cell_population.InitialiseCells();
 
         unsigned old_num_nodes = p_mesh->GetNumNodes();
         unsigned old_num_elements = p_mesh->GetNumElements();
-        unsigned old_num_cells = tissue.rGetCells().size();
+        unsigned old_num_cells = cell_population.rGetCells().size();
 
         // Add a new cell by dividing cell 4
 
-        tissue.GetCellUsingLocationIndex(4)->ReadyToDivide();
-        TissueCellPtr p_cell4 = tissue.GetCellUsingLocationIndex(4);
+        cell_population.GetCellUsingLocationIndex(4)->ReadyToDivide();
+        CellPtr p_cell4 = cell_population.GetCellUsingLocationIndex(4);
 
-        TissueCellPtr p_new_cell = tissue.GetCellUsingLocationIndex(4)->Divide();
+        CellPtr p_new_cell = cell_population.GetCellUsingLocationIndex(4)->Divide();
 
         c_vector<double, 2> new_location = zero_vector<double>(2);
 
-        // Add new cell to the tissue
-        tissue.AddCell(p_new_cell, new_location, p_cell4);
+        // Add new cell to the cell population
+        cell_population.AddCell(p_new_cell, new_location, p_cell4);
 
-        // Check that the new cell was successfully added to the tissue
-        TS_ASSERT_EQUALS(tissue.GetNumNodes(), old_num_nodes+2);
-        TS_ASSERT_EQUALS(tissue.GetNumElements(), old_num_elements+1);
-        TS_ASSERT_EQUALS(tissue.rGetCells().size(), old_num_cells+1);
-        TS_ASSERT_EQUALS(tissue.GetNumRealCells(), old_num_elements+1);
+        // Check that the new cell was successfully added to the cell population
+        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), old_num_nodes+2);
+        TS_ASSERT_EQUALS(cell_population.GetNumElements(), old_num_elements+1);
+        TS_ASSERT_EQUALS(cell_population.rGetCells().size(), old_num_cells+1);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), old_num_elements+1);
 
         // Check the location of the new nodes
-        TS_ASSERT_DELTA(tissue.GetNode(old_num_nodes)->rGetLocation()[0], 2.4721, 1e-4);
-        TS_ASSERT_DELTA(tissue.GetNode(old_num_nodes)->rGetLocation()[1], 1.7481, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(old_num_nodes)->rGetLocation()[0], 2.4721, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(old_num_nodes)->rGetLocation()[1], 1.7481, 1e-4);
 
-        TS_ASSERT_DELTA(tissue.GetNode(old_num_nodes+1)->rGetLocation()[0], 1.5278, 1e-4);
-        TS_ASSERT_DELTA(tissue.GetNode(old_num_nodes+1)->rGetLocation()[1], 1.1386, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(old_num_nodes+1)->rGetLocation()[0], 1.5278, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(old_num_nodes+1)->rGetLocation()[1], 1.1386, 1e-4);
 
         // Now test the nodes in each element
-        for (unsigned i=0; i<tissue.GetNumElements(); i++)
+        for (unsigned i=0; i<cell_population.GetNumElements(); i++)
         {
             if (i==4 || i==9)
             {
                 // Elements 4 and 9 should each have one less node
-                TS_ASSERT_EQUALS(tissue.GetElement(i)->GetNumNodes(), 5u);
+                TS_ASSERT_EQUALS(cell_population.GetElement(i)->GetNumNodes(), 5u);
             }
             else if (i==1 || i==8)
             {
                 // Elements 3 and 8 should each have one extra node
-                TS_ASSERT_EQUALS(tissue.GetElement(i)->GetNumNodes(), 7u);
+                TS_ASSERT_EQUALS(cell_population.GetElement(i)->GetNumNodes(), 7u);
             }
             else
             {
-                TS_ASSERT_EQUALS(tissue.GetElement(i)->GetNumNodes(), 6u);
+                TS_ASSERT_EQUALS(cell_population.GetElement(i)->GetNumNodes(), 6u);
             }
         }
 
         // Check node ownership for a few elements
 
-        TS_ASSERT_EQUALS(tissue.GetElement(0)->GetNodeGlobalIndex(0), 0u);
-        TS_ASSERT_EQUALS(tissue.GetElement(0)->GetNodeGlobalIndex(1), 4u);
-        TS_ASSERT_EQUALS(tissue.GetElement(0)->GetNodeGlobalIndex(2), 8u);
-        TS_ASSERT_EQUALS(tissue.GetElement(0)->GetNodeGlobalIndex(3), 11u);
-        TS_ASSERT_EQUALS(tissue.GetElement(0)->GetNodeGlobalIndex(4), 7u);
-        TS_ASSERT_EQUALS(tissue.GetElement(0)->GetNodeGlobalIndex(5), 3u);
+        TS_ASSERT_EQUALS(cell_population.GetElement(0)->GetNodeGlobalIndex(0), 0u);
+        TS_ASSERT_EQUALS(cell_population.GetElement(0)->GetNodeGlobalIndex(1), 4u);
+        TS_ASSERT_EQUALS(cell_population.GetElement(0)->GetNodeGlobalIndex(2), 8u);
+        TS_ASSERT_EQUALS(cell_population.GetElement(0)->GetNodeGlobalIndex(3), 11u);
+        TS_ASSERT_EQUALS(cell_population.GetElement(0)->GetNodeGlobalIndex(4), 7u);
+        TS_ASSERT_EQUALS(cell_population.GetElement(0)->GetNodeGlobalIndex(5), 3u);
 
-        TS_ASSERT_EQUALS(tissue.GetElement(4)->GetNodeGlobalIndex(0), 9u);
-        TS_ASSERT_EQUALS(tissue.GetElement(4)->GetNodeGlobalIndex(1), 13u);
-        TS_ASSERT_EQUALS(tissue.GetElement(4)->GetNodeGlobalIndex(2), 17u);
-        TS_ASSERT_EQUALS(tissue.GetElement(4)->GetNodeGlobalIndex(3), 30u);
-        TS_ASSERT_EQUALS(tissue.GetElement(4)->GetNodeGlobalIndex(4), 31u);
+        TS_ASSERT_EQUALS(cell_population.GetElement(4)->GetNodeGlobalIndex(0), 9u);
+        TS_ASSERT_EQUALS(cell_population.GetElement(4)->GetNodeGlobalIndex(1), 13u);
+        TS_ASSERT_EQUALS(cell_population.GetElement(4)->GetNodeGlobalIndex(2), 17u);
+        TS_ASSERT_EQUALS(cell_population.GetElement(4)->GetNodeGlobalIndex(3), 30u);
+        TS_ASSERT_EQUALS(cell_population.GetElement(4)->GetNodeGlobalIndex(4), 31u);
 
-        TS_ASSERT_EQUALS(tissue.GetElement(8)->GetNodeGlobalIndex(0), 17u);
-        TS_ASSERT_EQUALS(tissue.GetElement(8)->GetNodeGlobalIndex(1), 22u);
-        TS_ASSERT_EQUALS(tissue.GetElement(8)->GetNodeGlobalIndex(2), 26u);
-        TS_ASSERT_EQUALS(tissue.GetElement(8)->GetNodeGlobalIndex(3), 29u);
-        TS_ASSERT_EQUALS(tissue.GetElement(8)->GetNodeGlobalIndex(4), 25u);
-        TS_ASSERT_EQUALS(tissue.GetElement(8)->GetNodeGlobalIndex(5), 21u);
-        TS_ASSERT_EQUALS(tissue.GetElement(8)->GetNodeGlobalIndex(6), 30u);
+        TS_ASSERT_EQUALS(cell_population.GetElement(8)->GetNodeGlobalIndex(0), 17u);
+        TS_ASSERT_EQUALS(cell_population.GetElement(8)->GetNodeGlobalIndex(1), 22u);
+        TS_ASSERT_EQUALS(cell_population.GetElement(8)->GetNodeGlobalIndex(2), 26u);
+        TS_ASSERT_EQUALS(cell_population.GetElement(8)->GetNodeGlobalIndex(3), 29u);
+        TS_ASSERT_EQUALS(cell_population.GetElement(8)->GetNodeGlobalIndex(4), 25u);
+        TS_ASSERT_EQUALS(cell_population.GetElement(8)->GetNodeGlobalIndex(5), 21u);
+        TS_ASSERT_EQUALS(cell_population.GetElement(8)->GetNodeGlobalIndex(6), 30u);
 
         // Test element ownership for a few nodes
 
@@ -639,21 +639,21 @@ public:
         expected_elements_containing_node_5.insert(1);
         expected_elements_containing_node_5.insert(2);
 
-        TS_ASSERT_EQUALS(tissue.GetNode(5)->rGetContainingElementIndices(), expected_elements_containing_node_5);
+        TS_ASSERT_EQUALS(cell_population.GetNode(5)->rGetContainingElementIndices(), expected_elements_containing_node_5);
 
         std::set<unsigned> expected_elements_containing_node_13;
         expected_elements_containing_node_13.insert(2);
         expected_elements_containing_node_13.insert(4);
         expected_elements_containing_node_13.insert(5);
 
-        TS_ASSERT_EQUALS(tissue.GetNode(13)->rGetContainingElementIndices(), expected_elements_containing_node_13);
+        TS_ASSERT_EQUALS(cell_population.GetNode(13)->rGetContainingElementIndices(), expected_elements_containing_node_13);
 
         std::set<unsigned> expected_elements_containing_node_30;
         expected_elements_containing_node_30.insert(8);
         expected_elements_containing_node_30.insert(4);
         expected_elements_containing_node_30.insert(9);
 
-        TS_ASSERT_EQUALS(tissue.GetNode(30)->rGetContainingElementIndices(), expected_elements_containing_node_30);
+        TS_ASSERT_EQUALS(cell_population.GetNode(30)->rGetContainingElementIndices(), expected_elements_containing_node_30);
     }
 
     void TestIsCellAssociatedWithADeletedLocation() throw (Exception)
@@ -664,19 +664,19 @@ public:
         p_mesh->GetElement(5)->MarkAsDeleted();
 
         // Set up cells
-        std::vector<TissueCellPtr> cells = SetUpCells(*p_mesh);
+        std::vector<CellPtr> cells = SetUpCells(*p_mesh);
 
-        // Create tissue but do not try to validate
-        VertexBasedTissue<2> tissue(*p_mesh, cells, false, false);
+        // Create cell population but do not try to validate
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells, false, false);
 
         // Test IsCellAssociatedWithADeletedLocation() method
-        for (VertexBasedTissue<2>::Iterator cell_iter = tissue.Begin();
-             cell_iter != tissue.End();
+        for (VertexBasedCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
              ++cell_iter)
         {
-            bool is_deleted = tissue.IsCellAssociatedWithADeletedLocation(*cell_iter);
+            bool is_deleted = cell_population.IsCellAssociatedWithADeletedLocation(*cell_iter);
 
-            if (tissue.GetLocationIndexUsingCell(*cell_iter) == 5)
+            if (cell_population.GetLocationIndexUsingCell(*cell_iter) == 5)
             {
                 TS_ASSERT_EQUALS(is_deleted, true);
             }
@@ -697,45 +697,45 @@ public:
         MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
 
         // Set up cells
-        std::vector<TissueCellPtr> cells = SetUpCells(*p_mesh);
+        std::vector<CellPtr> cells = SetUpCells(*p_mesh);
         cells[5]->StartApoptosis();
 
-        // Create tissue
-        VertexBasedTissue<2> tissue(*p_mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 24u);
-        TS_ASSERT_EQUALS(tissue.rGetCells().size(), 24u);
-        TS_ASSERT_EQUALS(tissue.GetNumRealCells(), 24u);
+        TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 24u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 24u);
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 68u);
 
         p_simulation_time->IncrementTimeOneStep();
 
         // Remove dead cells
-        unsigned num_cells_removed = tissue.RemoveDeadCells();
+        unsigned num_cells_removed = cell_population.RemoveDeadCells();
 
         TS_ASSERT_EQUALS(num_cells_removed, 1u);
 
         // We should now have one less real cell, since one cell has been
-        // marked as dead, so is skipped by the tissue iterator
-        TS_ASSERT_EQUALS(tissue.rGetCells().size(), 23u);
-        TS_ASSERT_EQUALS(tissue.GetNumRealCells(), 23u);
-        TS_ASSERT_EQUALS(tissue.GetNumElements(), 23u);
-        TS_ASSERT_EQUALS(tissue.GetNumElements(), 23u);
-        TS_ASSERT_EQUALS(tissue.GetNumNodes(), 68u);
+        // marked as dead, so is skipped by the cell population iterator
+        TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 23u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 23u);
+        TS_ASSERT_EQUALS(cell_population.GetNumElements(), 23u);
+        TS_ASSERT_EQUALS(cell_population.GetNumElements(), 23u);
+        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 68u);
 
-        tissue.Update();
+        cell_population.Update();
 
-        TS_ASSERT_EQUALS(tissue.rGetCells().size(), 23u);
-        TS_ASSERT_EQUALS(tissue.GetNumRealCells(), 23u);
-        TS_ASSERT_EQUALS(tissue.GetNumElements(), 23u);
-        TS_ASSERT_EQUALS(tissue.GetNumElements(), 23u);
-        TS_ASSERT_EQUALS(tissue.GetNumNodes(), 68u);
+        TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 23u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 23u);
+        TS_ASSERT_EQUALS(cell_population.GetNumElements(), 23u);
+        TS_ASSERT_EQUALS(cell_population.GetNumElements(), 23u);
+        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 68u);
 
         // Finally, check the cells' element indices have updated
 
         // We expect the cell element indices to be {0,11,...,23}
         std::set<unsigned> expected_elem_indices;
-        for (unsigned i=0; i<tissue.GetNumRealCells(); i++)
+        for (unsigned i=0; i<cell_population.GetNumRealCells(); i++)
         {
             expected_elem_indices.insert(i);
         }
@@ -743,12 +743,12 @@ public:
         // Get actual cell element indices
         std::set<unsigned> element_indices;
 
-        for (AbstractTissue<2>::Iterator cell_iter = tissue.Begin();
-             cell_iter != tissue.End();
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
              ++cell_iter)
         {
             // Record element index corresponding to cell
-            unsigned element_index = tissue.GetLocationIndexUsingCell(*cell_iter);
+            unsigned element_index = cell_population.GetLocationIndexUsingCell(*cell_iter);
             element_indices.insert(element_index);
         }
 
@@ -756,7 +756,7 @@ public:
     }
 
 
-    void TestVertexBasedTissueOutputWriters() throw (Exception)
+    void TestVertexBasedCellPopulationOutputWriters() throw (Exception)
     {
         // Set up SimulationTime (needed if VTK is used)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
@@ -766,75 +766,75 @@ public:
         MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
 
         // Set up cells
-        std::vector<TissueCellPtr> cells = SetUpCells(*p_mesh);
+        std::vector<CellPtr> cells = SetUpCells(*p_mesh);
 
-        // Create tissue
-        VertexBasedTissue<2> tissue(*p_mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        TS_ASSERT_EQUALS(tissue.GetIdentifier(), "VertexBasedTissue<2>");
+        TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "VertexBasedCellPopulation<2>");
 
         // For coverage of WriteResultsToFiles()
-        boost::shared_ptr<AbstractCellProperty> p_state(tissue.GetCellPropertyRegistry()->Get<WildTypeCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_apc1(tissue.GetCellPropertyRegistry()->Get<ApcOneHitCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_apc2(tissue.GetCellPropertyRegistry()->Get<ApcTwoHitCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_bcat1(tissue.GetCellPropertyRegistry()->Get<BetaCateninOneHitCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_apoptotic_state(tissue.GetCellPropertyRegistry()->Get<ApoptoticCellProperty>());
-        boost::shared_ptr<AbstractCellProperty> p_label(tissue.GetCellPropertyRegistry()->Get<CellLabel>());
+        boost::shared_ptr<AbstractCellProperty> p_state(cell_population.GetCellPropertyRegistry()->Get<WildTypeCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_apc1(cell_population.GetCellPropertyRegistry()->Get<ApcOneHitCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_apc2(cell_population.GetCellPropertyRegistry()->Get<ApcTwoHitCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_bcat1(cell_population.GetCellPropertyRegistry()->Get<BetaCateninOneHitCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_apoptotic_state(cell_population.GetCellPropertyRegistry()->Get<ApoptoticCellProperty>());
+        boost::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
 
-        tissue.GetCellUsingLocationIndex(0)->GetCellCycleModel()->SetCellProliferativeType(TRANSIT);
-        tissue.GetCellUsingLocationIndex(0)->AddCellProperty(p_label);
-        tissue.GetCellUsingLocationIndex(1)->GetCellCycleModel()->SetCellProliferativeType(DIFFERENTIATED);
-        tissue.GetCellUsingLocationIndex(1)->SetMutationState(p_apc1);
-        tissue.GetCellUsingLocationIndex(2)->SetMutationState(p_apc2);
-        tissue.GetCellUsingLocationIndex(3)->SetMutationState(p_bcat1);
-        tissue.GetCellUsingLocationIndex(4)->AddCellProperty(p_apoptotic_state);
-        tissue.GetCellUsingLocationIndex(5)->GetCellCycleModel()->SetCellProliferativeType(STEM);
-        tissue.SetCellAncestorsToLocationIndices();
+        cell_population.GetCellUsingLocationIndex(0)->GetCellCycleModel()->SetCellProliferativeType(TRANSIT);
+        cell_population.GetCellUsingLocationIndex(0)->AddCellProperty(p_label);
+        cell_population.GetCellUsingLocationIndex(1)->GetCellCycleModel()->SetCellProliferativeType(DIFFERENTIATED);
+        cell_population.GetCellUsingLocationIndex(1)->SetMutationState(p_apc1);
+        cell_population.GetCellUsingLocationIndex(2)->SetMutationState(p_apc2);
+        cell_population.GetCellUsingLocationIndex(3)->SetMutationState(p_bcat1);
+        cell_population.GetCellUsingLocationIndex(4)->AddCellProperty(p_apoptotic_state);
+        cell_population.GetCellUsingLocationIndex(5)->GetCellCycleModel()->SetCellProliferativeType(STEM);
+        cell_population.SetCellAncestorsToLocationIndices();
 
-        tissue.SetOutputCellMutationStates(true);
-        tissue.SetOutputCellProliferativeTypes(true);
-        tissue.SetOutputCellCyclePhases(true);
-        tissue.SetOutputCellAncestors(true);
-        tissue.SetOutputCellAges(true);
-        tissue.SetOutputCellVolumes(true);
+        cell_population.SetOutputCellMutationStates(true);
+        cell_population.SetOutputCellProliferativeTypes(true);
+        cell_population.SetOutputCellCyclePhases(true);
+        cell_population.SetOutputCellAncestors(true);
+        cell_population.SetOutputCellAges(true);
+        cell_population.SetOutputCellVolumes(true);
 
         // Coverage of writing CellwiseData to VTK
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(tissue.GetNumRealCells(), 2);
-        p_data->SetTissue(&tissue);
+        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 2);
+        p_data->SetCellPopulation(&cell_population);
         for (unsigned var=0; var<2; var++)
         {
-            for (AbstractTissue<2>::Iterator cell_iter = tissue.Begin();
-                 cell_iter != tissue.End();
+            for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+                 cell_iter != cell_population.End();
                  ++cell_iter)
             {
-                p_data->SetValue((double) 3.0*var, tissue.GetLocationIndexUsingCell(*cell_iter), var);
+                p_data->SetValue((double) 3.0*var, cell_population.GetLocationIndexUsingCell(*cell_iter), var);
             }
         }
 
-        std::string output_directory = "TestVertexBasedTissueOutputWriters";
+        std::string output_directory = "TestVertexBasedCellPopulationOutputWriters";
         OutputFileHandler output_file_handler(output_directory, false);
 
-        TS_ASSERT_THROWS_NOTHING(tissue.CreateOutputFiles(output_directory, false));
+        TS_ASSERT_THROWS_NOTHING(cell_population.CreateOutputFiles(output_directory, false));
 
-        tissue.WriteResultsToFiles();
+        cell_population.WriteResultsToFiles();
 
-        TS_ASSERT_THROWS_NOTHING(tissue.CloseOutputFiles());
+        TS_ASSERT_THROWS_NOTHING(cell_population.CloseOutputFiles());
 
         // Compare output with saved files of what they should look like
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.viznodes     notforrelease_cell_based/test/data/TestVertexBasedTissueOutputWriters/results.viznodes").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizelements     notforrelease_cell_based/test/data/TestVertexBasedTissueOutputWriters/results.vizelements").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizcelltypes     notforrelease_cell_based/test/data/TestVertexBasedTissueOutputWriters/results.vizcelltypes").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizancestors     notforrelease_cell_based/test/data/TestVertexBasedTissueOutputWriters/results.vizancestors").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellmutationstates.dat     notforrelease_cell_based/test/data/TestVertexBasedTissueOutputWriters/cellmutationstates.dat").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellages.dat     notforrelease_cell_based/test/data/TestVertexBasedTissueOutputWriters/cellages.dat").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellcyclephases.dat     notforrelease_cell_based/test/data/TestVertexBasedTissueOutputWriters/cellcyclephases.dat").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "celltypes.dat     notforrelease_cell_based/test/data/TestVertexBasedTissueOutputWriters/celltypes.dat").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.viznodes     notforrelease_cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/results.viznodes").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizelements     notforrelease_cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/results.vizelements").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizcelltypes     notforrelease_cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/results.vizcelltypes").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizancestors     notforrelease_cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/results.vizancestors").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellmutationstates.dat     notforrelease_cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/cellmutationstates.dat").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellages.dat     notforrelease_cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/cellages.dat").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellcyclephases.dat     notforrelease_cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/cellcyclephases.dat").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "celltypes.dat     notforrelease_cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/celltypes.dat").c_str()), 0);
 
         // Test the GetCellMutationStateCount function
-        std::vector<unsigned> cell_mutation_states = tissue.GetCellMutationStateCount();
+        std::vector<unsigned> cell_mutation_states = cell_population.GetCellMutationStateCount();
         TS_ASSERT_EQUALS(cell_mutation_states.size(), 4u);
         TS_ASSERT_EQUALS(cell_mutation_states[0], 21u);
         TS_ASSERT_EQUALS(cell_mutation_states[1], 1u);
@@ -842,36 +842,37 @@ public:
         TS_ASSERT_EQUALS(cell_mutation_states[3], 1u);
 
         // Test the GetCellProliferativeTypeCount function
-        std::vector<unsigned> cell_types = tissue.rGetCellProliferativeTypeCount();
+        std::vector<unsigned> cell_types = cell_population.rGetCellProliferativeTypeCount();
         TS_ASSERT_EQUALS(cell_types.size(), 3u);
         TS_ASSERT_EQUALS(cell_types[0], 1u);
         TS_ASSERT_EQUALS(cell_types[1], 1u);
         TS_ASSERT_EQUALS(cell_types[2], 22u);
 
         // For coverage
-        TS_ASSERT_THROWS_NOTHING(tissue.WriteResultsToFiles());
+        TS_ASSERT_THROWS_NOTHING(cell_population.WriteResultsToFiles());
 
         // Tidy up
         CellwiseData<2>::Destroy();
 
-        //Test that the tissue parameters are output correctly
+        //Test that the cell population parameters are output correctly
         out_stream parameter_file = output_file_handler.OpenOutputFile("results.parameters");
-        // Write tissue parameters to file
-        tissue.OutputTissueParameters(parameter_file);
+
+        // Write cell population parameters to file
+        cell_population.OutputCellPopulationParameters(parameter_file);
         parameter_file->close();
 
         // Compare output with saved files of what they should look like
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.parameters     notforrelease_cell_based/test/data/TestVertexBasedTissueOutputWriters/results.parameters").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.parameters     notforrelease_cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/results.parameters").c_str()), 0);
 
     }
 
 
-    void TestArchiving2dVertexBasedTissue() throw(Exception)
+    void TestArchiving2dVertexBasedCellPopulation() throw(Exception)
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
-        std::string archive_file = "vertex_tissue_2d.arch";
-        // The following line is required because the loading of a tissue
-        // is usually called by the method TissueSimulation::Load()
+        std::string archive_file = "vertex_cell_population_2d.arch";
+        // The following line is required because the loading of a cell population
+        // is usually called by the method CellBasedSimulation::Load()
         ArchiveLocationInfo::SetMeshFilename("vertex_mesh_2d");
 
         // Create mesh
@@ -879,7 +880,7 @@ public:
         MutableVertexMesh<2,2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        // Archive tissue
+        // Archive cell population
         {
             // Need to set up time
             unsigned num_steps = 10;
@@ -887,15 +888,15 @@ public:
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, num_steps+1);
 
             // Set up cells
-            std::vector<TissueCellPtr> cells = SetUpCells(mesh);
+            std::vector<CellPtr> cells = SetUpCells(mesh);
 
-            // Create tissue
-            VertexBasedTissue<2>* const p_tissue = new VertexBasedTissue<2>(mesh, cells);
+            // Create cell population
+            VertexBasedCellPopulation<2>* const p_cell_population = new VertexBasedCellPopulation<2>(mesh, cells);
 
             // Cells have been given birth times of 0 and -1.
             // Loop over them to run to time 0.0;
-            for (AbstractTissue<2>::Iterator cell_iter = p_tissue->Begin();
-                 cell_iter != p_tissue->End();
+            for (AbstractCellPopulation<2>::Iterator cell_iter = p_cell_population->Begin();
+                 cell_iter != p_cell_population->End();
                  ++cell_iter)
             {
                 cell_iter->ReadyToDivide();
@@ -905,16 +906,16 @@ public:
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
 
-            // Write the tissue to the archive
+            // Write the cell population to the archive
             (*p_arch) << static_cast<const SimulationTime&> (*p_simulation_time);
-            (*p_arch) << p_tissue;
+            (*p_arch) << p_cell_population;
 
             // Tidy up
             SimulationTime::Destroy();
-            delete p_tissue;
+            delete p_cell_population;
         }
 
-        // Restore tissue
+        // Restore cell population
         {
             // Need to set up time
             unsigned num_steps = 10;
@@ -927,19 +928,19 @@ public:
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
 
-            // Restore the tissue
+            // Restore the cell population
             (*p_arch) >> *p_simulation_time;
-            VertexBasedTissue<2>* p_tissue;
-            (*p_arch) >> p_tissue;
+            VertexBasedCellPopulation<2>* p_cell_population;
+            (*p_arch) >> p_cell_population;
 
-            // Check the tissue has been restored correctly
-            TS_ASSERT_EQUALS(p_tissue->rGetCells().size(), 2u);
+            // Check the cell population has been restored correctly
+            TS_ASSERT_EQUALS(p_cell_population->rGetCells().size(), 2u);
 
             // Cells have been given birth times of 0, -1, -2, -3, -4.
             // this checks that individual cells and their models are archived.
             unsigned counter = 0;
-            for (AbstractTissue<2>::Iterator cell_iter = p_tissue->Begin();
-                 cell_iter != p_tissue->End();
+            for (AbstractCellPopulation<2>::Iterator cell_iter = p_cell_population->Begin();
+                 cell_iter != p_cell_population->End();
                  ++cell_iter)
             {
                 TS_ASSERT_DELTA(cell_iter->GetAge(), (double)(counter), 1e-7);
@@ -950,12 +951,12 @@ public:
             TS_ASSERT_EQUALS(p_simulation_time->GetTime(), 0.0);
 
             // Check the mesh has been restored correctly
-            TS_ASSERT_EQUALS(p_tissue->rGetMesh().GetNumNodes(), 7u);
-            TS_ASSERT_EQUALS(p_tissue->rGetMesh().GetNumElements(), 2u);
-            TS_ASSERT_EQUALS(p_tissue->rGetMesh().GetNumFaces(), 0u);
+            TS_ASSERT_EQUALS(p_cell_population->rGetMesh().GetNumNodes(), 7u);
+            TS_ASSERT_EQUALS(p_cell_population->rGetMesh().GetNumElements(), 2u);
+            TS_ASSERT_EQUALS(p_cell_population->rGetMesh().GetNumFaces(), 0u);
 
             // Compare the loaded mesh against the original
-            MutableVertexMesh<2,2>& loaded_mesh = p_tissue->rGetMesh();
+            MutableVertexMesh<2,2>& loaded_mesh = p_cell_population->rGetMesh();
 
             TS_ASSERT_EQUALS(mesh.GetNumNodes(), loaded_mesh.GetNumNodes());
 
@@ -990,12 +991,12 @@ public:
             }
 
             // Tidy up
-            delete p_tissue;
+            delete p_cell_population;
         }
     }
 
 
-    void TestArchiving3dVertexBasedTissue() throw(Exception)
+    void TestArchiving3dVertexBasedCellPopulation() throw(Exception)
     {
         // Create mutable vertex mesh
         std::vector<Node<3>*> nodes;
@@ -1075,12 +1076,12 @@ public:
         MutableVertexMesh<3,3> mesh(nodes, elements);
 
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
-        std::string archive_file = "vertex_tissue_3d.arch";
-        // The following line is required because the loading of a tissue
-        // is usually called by the method TissueSimulation::Load()
+        std::string archive_file = "vertex_cell_population_3d.arch";
+        // The following line is required because the loading of a cell population
+        // is usually called by the method CellBasedSimulation::Load()
         ArchiveLocationInfo::SetMeshFilename("vertex_mesh");
 
-        // Archive tissue
+        // Archive cell population
         {
             // Need to set up time
             unsigned num_steps = 10;
@@ -1088,15 +1089,15 @@ public:
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, num_steps+1);
 
             // Set up cells
-            std::vector<TissueCellPtr> cells = SetUpCells(mesh);
+            std::vector<CellPtr> cells = SetUpCells(mesh);
 
-            // Create tissue
-            VertexBasedTissue<3>* const p_tissue = new VertexBasedTissue<3>(mesh, cells);
+            // Create cell population
+            VertexBasedCellPopulation<3>* const p_cell_population = new VertexBasedCellPopulation<3>(mesh, cells);
 
             // Cells have been given birth times of 0 and -1.
             // Loop over them to run to time 0.0;
-            for (AbstractTissue<3>::Iterator cell_iter = p_tissue->Begin();
-                 cell_iter != p_tissue->End();
+            for (AbstractCellPopulation<3>::Iterator cell_iter = p_cell_population->Begin();
+                 cell_iter != p_cell_population->End();
                  ++cell_iter)
             {
                 cell_iter->ReadyToDivide();
@@ -1106,16 +1107,16 @@ public:
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
 
-            // Write the tissue to the archive
+            // Write the cell population to the archive
             (*p_arch) << static_cast<const SimulationTime&> (*p_simulation_time);
-            (*p_arch) << p_tissue;
+            (*p_arch) << p_cell_population;
 
             // Tidy up
             SimulationTime::Destroy();
-            delete p_tissue;
+            delete p_cell_population;
         }
 
-        // Restore tissue
+        // Restore cell population
         {
             // Need to set up time
             unsigned num_steps = 10;
@@ -1128,19 +1129,19 @@ public:
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
 
-            // Restore the tissue
+            // Restore the cell population
             (*p_arch) >> *p_simulation_time;
-            VertexBasedTissue<3>* p_tissue;
-            (*p_arch) >> p_tissue;
+            VertexBasedCellPopulation<3>* p_cell_population;
+            (*p_arch) >> p_cell_population;
 
-            // Check the tissue has been restored correctly
-            TS_ASSERT_EQUALS(p_tissue->rGetCells().size(), 2u);
+            // Check the cell population has been restored correctly
+            TS_ASSERT_EQUALS(p_cell_population->rGetCells().size(), 2u);
 
             // Cells have been given birth times of 0, -1, -2, -3, -4.
             // this checks that individual cells and their models are archived.
             unsigned counter = 0;
-            for (AbstractTissue<3>::Iterator cell_iter = p_tissue->Begin();
-                 cell_iter != p_tissue->End();
+            for (AbstractCellPopulation<3>::Iterator cell_iter = p_cell_population->Begin();
+                 cell_iter != p_cell_population->End();
                  ++cell_iter)
             {
                 TS_ASSERT_DELTA(cell_iter->GetAge(), (double)(counter), 1e-7);
@@ -1151,12 +1152,12 @@ public:
             TS_ASSERT_EQUALS(p_simulation_time->GetTime(), 0.0);
 
             // Check the mesh has been restored correctly
-            TS_ASSERT_EQUALS(p_tissue->rGetMesh().GetNumNodes(), 9u);
-            TS_ASSERT_EQUALS(p_tissue->rGetMesh().GetNumElements(), 2u);
-            TS_ASSERT_EQUALS(p_tissue->rGetMesh().GetNumFaces(), 10u);
+            TS_ASSERT_EQUALS(p_cell_population->rGetMesh().GetNumNodes(), 9u);
+            TS_ASSERT_EQUALS(p_cell_population->rGetMesh().GetNumElements(), 2u);
+            TS_ASSERT_EQUALS(p_cell_population->rGetMesh().GetNumFaces(), 10u);
 
             // Compare the loaded mesh against the original
-            MutableVertexMesh<3,3>& loaded_mesh = p_tissue->rGetMesh();
+            MutableVertexMesh<3,3>& loaded_mesh = p_cell_population->rGetMesh();
 
             TS_ASSERT_EQUALS(mesh.GetNumNodes(), loaded_mesh.GetNumNodes());
 
@@ -1191,7 +1192,7 @@ public:
             }
 
             // Tidy up
-            delete p_tissue;
+            delete p_cell_population;
         }
     }
 
@@ -1206,16 +1207,16 @@ public:
         p_mesh->SetCellRearrangementThreshold(0.1);
 
         // Set up cells
-        std::vector<TissueCellPtr> cells = SetUpCells(*p_mesh);
+        std::vector<CellPtr> cells = SetUpCells(*p_mesh);
 
-        // Create tissue
-        VertexBasedTissue<2> tissue(*p_mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Make up some forces
-        std::vector<c_vector<double, 2> > old_posns(tissue.GetNumNodes());
-        std::vector<c_vector<double, 2> > forces_on_nodes(tissue.GetNumNodes());
+        std::vector<c_vector<double, 2> > old_posns(cell_population.GetNumNodes());
+        std::vector<c_vector<double, 2> > forces_on_nodes(cell_population.GetNumNodes());
 
-        for (unsigned i=0; i<tissue.GetNumNodes(); i++)
+        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
             old_posns[i][0] = p_mesh->GetNode(i)->rGetLocation()[0];
             old_posns[i][1] = p_mesh->GetNode(i)->rGetLocation()[1];
@@ -1226,22 +1227,22 @@ public:
 
         double time_step = 0.01;
 
-        tissue.UpdateNodeLocations(forces_on_nodes, time_step);
+        cell_population.UpdateNodeLocations(forces_on_nodes, time_step);
 
-        for (unsigned i=0; i<tissue.GetNumNodes(); i++)
+        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
-            TS_ASSERT_DELTA(tissue.GetNode(i)->rGetLocation()[0], old_posns[i][0] +   i*0.01*0.01, 1e-9);
-            TS_ASSERT_DELTA(tissue.GetNode(i)->rGetLocation()[1], old_posns[i][1] + 2*i*0.01*0.01, 1e-9);
+            TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetLocation()[0], old_posns[i][0] +   i*0.01*0.01, 1e-9);
+            TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetLocation()[1], old_posns[i][1] + 2*i*0.01*0.01, 1e-9);
         }
     }
 
 
     /**
-     * Test that post-#878, WntConcentration copes with a VertexBasedTissue.
-     * \todo When vertex-based tissue code is added to cell_based folder, move this
+     * Test that post-#878, WntConcentration copes with a VertexBasedCellPopulation.
+     * \todo When vertex-based cell population code is added to cell_based folder, move this
      *       test to TestWntConcentration.hpp
      */
-    void TestWntConcentrationWithVertexBasedTissue() throw(Exception)
+    void TestWntConcentrationWithVertexBasedCellPopulation() throw(Exception)
     {
         // Make some nodes
         std::vector<Node<2>*> nodes;
@@ -1272,7 +1273,7 @@ public:
         MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
 
         // Create cells
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<vertex_mesh.GetNumElements(); i++)
         {
@@ -1280,17 +1281,17 @@ public:
             p_cell_cycle_model->SetDimension(2);
             p_cell_cycle_model->SetCellProliferativeType(DIFFERENTIATED);
 
-            TissueCellPtr p_cell(new TissueCell(p_state, p_cell_cycle_model));
+            CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
             double birth_time = 0.0 - i;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
         }
 
-        // Create tissue
-        VertexBasedTissue<2> tissue(vertex_mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
 
-        // Set the top of this tissue, for the purposes of computing the WntConcentration
-        TissueConfig::Instance()->SetCryptLength(4.0);
+        // Set the top of this cell_population, for the purposes of computing the WntConcentration
+        CellBasedConfig::Instance()->SetCryptLength(4.0);
 
         // Set up an instance of the WntConcentration singleton object
         WntConcentration<2>* p_wnt = WntConcentration<2>::Instance();
@@ -1298,28 +1299,28 @@ public:
 
         // Check that the singleton can be set up
         p_wnt->SetType(LINEAR);
-        p_wnt->SetTissue(tissue);
+        p_wnt->SetCellPopulation(cell_population);
 
         TS_ASSERT_EQUALS(p_wnt->IsWntSetUp(), true);
 
         // Check that the singleton can be destroyed then recreated
         WntConcentration<2>::Destroy();
         WntConcentration<2>::Instance()->SetType(NONE);
-        WntConcentration<2>::Instance()->SetTissue(tissue);
+        WntConcentration<2>::Instance()->SetCellPopulation(cell_population);
         TS_ASSERT_EQUALS(WntConcentration<2>::Instance()->IsWntSetUp(), false); // not fully set up now it is a NONE type
 
         WntConcentration<2>::Destroy();
         WntConcentration<2>::Instance()->SetType(LINEAR);
-        WntConcentration<2>::Instance()->SetTissue(tissue);
+        WntConcentration<2>::Instance()->SetCellPopulation(cell_population);
 
         p_wnt = WntConcentration<2>::Instance();
         TS_ASSERT_EQUALS(p_wnt->IsWntSetUp(), true); // set up again
 
-        double wnt_at_cell0 = p_wnt->GetWntLevel(tissue.GetCellUsingLocationIndex(0));
-        double wnt_at_cell1 = p_wnt->GetWntLevel(tissue.GetCellUsingLocationIndex(1));
+        double wnt_at_cell0 = p_wnt->GetWntLevel(cell_population.GetCellUsingLocationIndex(0));
+        double wnt_at_cell1 = p_wnt->GetWntLevel(cell_population.GetCellUsingLocationIndex(1));
 
-        // We have set the top of the tissue to be 4, so the WntConcentration should decrease linearly
-        // up the tissue, from one at height 0 to zero at height 4.
+        // We have set the top of the cell population to be 4, so the WntConcentration should decrease linearly
+        // up the cell_population, from one at height 0 to zero at height 4.
 
         // Cell 0 has centre of mass (0,0)
         TS_ASSERT_DELTA(wnt_at_cell0, 1.0, 1e-4);
@@ -1329,7 +1330,7 @@ public:
     }
 
     ///\todo When vertex models are released, move this test into TestCellwiseData (see also #1419)
-    void TestCellwiseDataWithVertexBasedTissue() throw(Exception)
+    void TestCellwiseDataWithVertexBasedCellPopulation() throw(Exception)
     {
         // Make some nodes
         std::vector<Node<2>*> nodes;
@@ -1360,7 +1361,7 @@ public:
         MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
 
         // Create cells
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<vertex_mesh.GetNumElements(); i++)
         {
@@ -1368,14 +1369,14 @@ public:
             p_cell_cycle_model->SetDimension(2);
             p_cell_cycle_model->SetCellProliferativeType(DIFFERENTIATED);
 
-            TissueCellPtr p_cell(new TissueCell(p_state, p_cell_cycle_model));
+            CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
             double birth_time = 0.0 - i;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
         }
 
-        // Create tissue
-        VertexBasedTissue<2> tissue(vertex_mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
 
         TS_ASSERT_EQUALS(CellwiseData<2>::Instance()->IsSetUp(), false);
 
@@ -1384,21 +1385,21 @@ public:
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
 
         TS_ASSERT_EQUALS(CellwiseData<2>::Instance()->IsSetUp(), false);
-        TS_ASSERT_THROWS_THIS(p_data->SetTissue(&tissue),"SetTissue must be called after SetNumCellsAndVars()");
+        TS_ASSERT_THROWS_THIS(p_data->SetCellPopulation(&cell_population),"SetCellPopulation must be called after SetNumCellsAndVars()");
 
-        p_data->SetNumCellsAndVars(tissue.GetNumRealCells(), 1);
+        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1);
 
         TS_ASSERT_EQUALS(CellwiseData<2>::Instance()->IsSetUp(), false);
 
-        p_data->SetTissue(&tissue);
+        p_data->SetCellPopulation(&cell_population);
 
         TS_ASSERT_EQUALS(CellwiseData<2>::Instance()->IsSetUp(), true);
 
-        p_data->SetValue(1.23, tissue.GetElement(0)->GetIndex());
-        AbstractTissue<2>::Iterator cell_iter = tissue.Begin();
+        p_data->SetValue(1.23, cell_population.GetElement(0)->GetIndex());
+        AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
         TS_ASSERT_DELTA(p_data->GetValue(*cell_iter), 1.23, 1e-12);
 
-        p_data->SetValue(2.23, tissue.GetElement(1)->GetIndex());
+        p_data->SetValue(2.23, cell_population.GetElement(1)->GetIndex());
         ++cell_iter;
         TS_ASSERT_DELTA(p_data->GetValue(*cell_iter), 2.23, 1e-12);
 
@@ -1411,10 +1412,10 @@ public:
 
         FixedDurationGenerationBasedCellCycleModel* p_model2 = new FixedDurationGenerationBasedCellCycleModel();
         p_model2->SetCellProliferativeType(STEM);
-        TissueCellPtr p_new_cell(new TissueCell(p_state, p_model2));
+        CellPtr p_new_cell(new Cell(p_state, p_model2));
         p_new_cell->SetBirthTime(-1.0);
 
-        tissue.AddCell(p_new_cell, cell_division_axis, *cell_iter);
+        cell_population.AddCell(p_new_cell, cell_division_axis, *cell_iter);
 
         TS_ASSERT_THROWS_NOTHING(p_data->ReallocateMemory());
 
@@ -1423,8 +1424,8 @@ public:
         constant_value.push_back(1.579);
         p_data->SetConstantDataForTesting(constant_value);
 
-        for (AbstractTissue<2>::Iterator cell_iter = tissue.Begin();
-             cell_iter != tissue.End();
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
              ++cell_iter)
         {
             TS_ASSERT_DELTA(p_data->GetValue(*cell_iter), 1.579, 1e-12);
@@ -1438,18 +1439,18 @@ public:
 
         p_data = CellwiseData<2>::Instance();
 
-        p_data->SetNumCellsAndVars(tissue.GetNumRealCells(), 2);
-        p_data->SetTissue(&tissue);
+        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 2);
+        p_data->SetCellPopulation(&cell_population);
 
-        TS_ASSERT_THROWS_THIS(p_data->SetNumCellsAndVars(tissue.GetNumRealCells(), 1),"SetNumCellsAndVars() must be called before setting the Tissue (and after a Destroy)");
+        TS_ASSERT_THROWS_THIS(p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1),"SetNumCellsAndVars() must be called before setting the CellPopulation (and after a Destroy)");
         TS_ASSERT_EQUALS(CellwiseData<2>::Instance()->IsSetUp(), true);
 
-        p_data->SetValue(3.23, tissue.GetElement(0)->GetIndex(), 1);
-        AbstractTissue<2>::Iterator cell_iter2 = tissue.Begin();
+        p_data->SetValue(3.23, cell_population.GetElement(0)->GetIndex(), 1);
+        AbstractCellPopulation<2>::Iterator cell_iter2 = cell_population.Begin();
 
         TS_ASSERT_DELTA(p_data->GetValue(*cell_iter2, 1), 3.23, 1e-12);
 
-        p_data->SetValue(4.23, tissue.GetElement(1)->GetIndex(), 1);
+        p_data->SetValue(4.23, cell_population.GetElement(1)->GetIndex(), 1);
         ++cell_iter2;
 
         TS_ASSERT_DELTA(p_data->GetValue(*cell_iter2, 1), 4.23, 1e-12);
@@ -1463,12 +1464,12 @@ public:
     }
 
     ///\todo When vertex models are released, move this test into TestCellwiseData (see also #1419)
-    void TestArchiveCellwiseDataWithVertexBasedTissue()
+    void TestArchiveCellwiseDataWithVertexBasedCellPopulation()
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "vertex_cellwise.arch";
-        // The following line is required because the loading of a tissue
-        // is usually called by the method TissueSimulation::Load()
+        // The following line is required because the loading of a cell population
+        // is usually called by the method CellBasedSimulation::Load()
         ArchiveLocationInfo::SetMeshFilename("vertex_cellwise");
 
         // Create mesh
@@ -1482,15 +1483,15 @@ public:
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, num_steps+1);
 
         // Set up cells
-        std::vector<TissueCellPtr> cells = SetUpCells(mesh);
+        std::vector<CellPtr> cells = SetUpCells(mesh);
 
-        // Create tissue
-        VertexBasedTissue<2>* const p_tissue = new VertexBasedTissue<2>(mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2>* const p_cell_population = new VertexBasedCellPopulation<2>(mesh, cells);
 
         // Cells have been given birth times of 0 and -1.
         // Loop over them to run to time 0.0;
-        for (AbstractTissue<2>::Iterator cell_iter = p_tissue->Begin();
-             cell_iter != p_tissue->End();
+        for (AbstractCellPopulation<2>::Iterator cell_iter = p_cell_population->Begin();
+             cell_iter != p_cell_population->End();
              ++cell_iter)
         {
             cell_iter->ReadyToDivide();
@@ -1499,16 +1500,16 @@ public:
         {
             // Set up the data store
             CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-            p_data->SetNumCellsAndVars(p_tissue->GetNumRealCells(), 1);
-            p_data->SetTissue(p_tissue);
+            p_data->SetNumCellsAndVars(p_cell_population->GetNumRealCells(), 1);
+            p_data->SetCellPopulation(p_cell_population);
 
             // Put some data in
             unsigned i = 0;
-            for (AbstractTissue<2>::Iterator cell_iter = p_tissue->Begin();
-                 cell_iter != p_tissue->End();
+            for (AbstractCellPopulation<2>::Iterator cell_iter = p_cell_population->Begin();
+                 cell_iter != p_cell_population->End();
                  ++cell_iter)
             {
-                p_data->SetValue((double) i, p_tissue->GetLocationIndexUsingCell(*cell_iter), 0);
+                p_data->SetValue((double) i, p_cell_population->GetLocationIndexUsingCell(*cell_iter), 0);
                 i++;
             }
 
@@ -1522,7 +1523,7 @@ public:
             (*p_arch) << static_cast<const CellwiseData<2>&>(*CellwiseData<2>::Instance());
 
             CellwiseData<2>::Destroy();
-            delete p_tissue;
+            delete p_cell_population;
         }
 
         {
@@ -1538,21 +1539,21 @@ public:
             TS_ASSERT_EQUALS(CellwiseData<2>::Instance()->IsSetUp(), true);
             TS_ASSERT_EQUALS(p_data->IsSetUp(), true);
 
-            // We will have constructed a new tissue on load, so use the new tissue
-            AbstractTissue<2>& tissue = p_data->rGetTissue();
+            // We will have constructed a new cell population on load, so use the new cell population
+            AbstractCellPopulation<2>& cell_population = p_data->rGetCellPopulation();
 
-            for (AbstractTissue<2>::Iterator cell_iter = tissue.Begin();
-                 cell_iter != tissue.End();
+            for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+                 cell_iter != cell_population.End();
                  ++cell_iter)
             {
-                TS_ASSERT_DELTA(p_data->GetValue(*cell_iter, 0u), (double) tissue.GetLocationIndexUsingCell(*cell_iter), 1e-12);
+                TS_ASSERT_DELTA(p_data->GetValue(*cell_iter, 0u), (double) cell_population.GetLocationIndexUsingCell(*cell_iter), 1e-12);
             }
 
             // Tidy up
             CellwiseData<2>::Destroy();
-            delete (&tissue);
+            delete (&cell_population);
         }
     }
 };
 
-#endif /*TESTVERTEXBASEDTISSUE_HPP_*/
+#endif /*TESTVERTEXBASEDCELLPOPULATION_HPP_*/

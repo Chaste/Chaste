@@ -45,14 +45,14 @@ VertexCryptBoundaryForce<DIM>::~VertexCryptBoundaryForce()
 
 template<unsigned DIM>
 void VertexCryptBoundaryForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
-                                                         AbstractTissue<DIM>& rTissue)
+                                                         AbstractCellPopulation<DIM>& rCellPopulation)
 {
-    // Helper variable that is a static cast of the tissue
-    VertexBasedTissue<DIM>* p_tissue = static_cast<VertexBasedTissue<DIM>*>(&rTissue);
+    // Helper variable that is a static cast of the cell population
+    VertexBasedCellPopulation<DIM>* p_cell_population = static_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation);
 
     // Iterate over nodes
-    for (typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = p_tissue->rGetMesh().GetNodeIteratorBegin();
-         node_iter != p_tissue->rGetMesh().GetNodeIteratorEnd();
+    for (typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = p_cell_population->rGetMesh().GetNodeIteratorBegin();
+         node_iter != p_cell_population->rGetMesh().GetNodeIteratorEnd();
          ++node_iter)
     {
         double y = node_iter->rGetLocation()[1]; // y-coordinate of node

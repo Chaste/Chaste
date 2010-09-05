@@ -44,13 +44,13 @@ DiffusionUpdateRule<DIM>::~DiffusionUpdateRule()
 
 template<unsigned DIM>
 unsigned DiffusionUpdateRule<DIM>::GetNewLocationOfCell(unsigned currentLocationIndex,
-                                                        LatticeBasedTissue<DIM>& rTissue,
+                                                        LatticeBasedCellPopulation<DIM>& rCellPopulation,
                                                         double dt)
 {
     assert(DIM == 2); // this method only works in 2D at present
 
     // Make sure we have a cell at this node
-    if (rTissue.IsEmptySite(currentLocationIndex))
+    if (rCellPopulation.IsEmptySite(currentLocationIndex))
     {
         EXCEPTION("There is no cell at the current location.");
     }
@@ -62,7 +62,7 @@ unsigned DiffusionUpdateRule<DIM>::GetNewLocationOfCell(unsigned currentLocation
     if (RandomNumberGenerator::Instance()->ranf() < probability_of_moving)
     {
         // Find a random site from all of the available neighbouring nodes to move into
-        std::set<unsigned> free_neighbour_indices = rTissue.GetFreeNeighbouringNodeIndices(currentLocationIndex);
+        std::set<unsigned> free_neighbour_indices = rCellPopulation.GetFreeNeighbouringNodeIndices(currentLocationIndex);
 
         if (!free_neighbour_indices.empty()) // only move if there is any free space
         {

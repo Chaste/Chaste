@@ -53,7 +53,7 @@ public:
      *
      * @param rCrypt The crypt
      */
-    CryptProjectionStatistics(MeshBasedTissue<2>& rCrypt);
+    CryptProjectionStatistics(MeshBasedCellPopulation<2>& rCrypt);
 
     /**
      * GetCryptSection method. Takes in an angle from the
@@ -61,7 +61,7 @@ public:
      *
      * @param angle  The angle between the crypt section and the x axis in the projection
      */
-    std::vector<TissueCellPtr> GetCryptSection(double angle = DBL_MAX);
+    std::vector<CellPtr> GetCryptSection(double angle = DBL_MAX);
 };
 
 #endif /*CRYPTPROJECTIONSTATISTICS_HPP_*/

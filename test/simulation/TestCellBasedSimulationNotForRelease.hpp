@@ -25,8 +25,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
-#ifndef TESTTISSUESIMULATIONNOTFORRELEASE_HPP_
-#define TESTTISSUESIMULATIONNOTFORRELEASE_HPP_
+#ifndef TESTCELLBASEDSIMULATIONNOTFORRELEASE_HPP_
+#define TESTCELLBASEDSIMULATIONNOTFORRELEASE_HPP_
 
 #include <cxxtest/TestSuite.h>
 
@@ -34,21 +34,21 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <ctime>
 #include <cmath>
 
-#include "TissueSimulation.hpp"
+#include "CellBasedSimulation.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "SimpleWntCellCycleModel.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "RadialSloughingCellKiller.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "CryptProjectionForce.hpp"
-#include "MeshBasedTissueWithGhostNodes.hpp"
+#include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
 
 /**
- *  Note: Most tests of TissueSimulation are in TestCryptSimulation2d
+ *  Note: Most tests of CellBasedSimulation are in TestCryptSimulation2d
  */
-class TestTissueSimulationNotForRelease : public AbstractCellBasedTestSuite
+class TestCellBasedSimulationNotForRelease : public AbstractCellBasedTestSuite
 {
 private:
 
@@ -69,16 +69,16 @@ private:
 public:
 
     /**
-     *  Test a tissue simulation with a non-Meineke spring system.
+     *  Test a cell-based simulation with a non-Meineke spring system.
      *
      *  This test consists of a standard crypt projection model simulation with a
      *  radial sloughing cell killer, a crypt projection cell cycle model that
      *  depends on a radial Wnt gradient, and the crypt projection model spring
      *  system, and store the results for use in later archiving tests.
      */
-    void TestTissueSimulationWithCryptProjectionSpringSystem() throw (Exception)
+    void TestCellBasedSimulationWithCryptProjectionSpringSystem() throw (Exception)
     {
-        TissueConfig* p_params = TissueConfig::Instance();
+        CellBasedConfig* p_params = CellBasedConfig::Instance();
 
         double a = 0.2;
         double b = 2.0;
@@ -101,7 +101,7 @@ public:
         p_mesh->Translate(-width_of_mesh/2, -height_of_mesh/2);
 
         // To start off with, set up all cells to be of type TRANSIT
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<location_indices.size(); i++)
         {
@@ -110,7 +110,7 @@ public:
             p_model->SetCellProliferativeType(TRANSIT);
             p_model->SetWntStemThreshold(0.95);
 
-            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            CellPtr p_cell(new Cell(p_state, p_model));
             p_cell->InitialiseCellCycleModel();
 
             double birth_time = - RandomNumberGenerator::Instance()->ranf()*
@@ -120,24 +120,24 @@ public:
             cells.push_back(p_cell);
         }
 
-        // Make a tissue
-        MeshBasedTissueWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
+        // Make a cell population
+        MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
 
         // Set up the Wnt gradient
         WntConcentration<2>::Instance()->SetType(RADIAL);
-        WntConcentration<2>::Instance()->SetTissue(crypt);
+        WntConcentration<2>::Instance()->SetCellPopulation(crypt);
 
         // Create the force law and pass in to a std::list
         CryptProjectionForce crypt_projection_force;
         std::vector<AbstractForce<2>* > force_collection;
         force_collection.push_back(&crypt_projection_force);
 
-        // Make a tissue simulation
-        TissueSimulation<2> crypt_projection_simulator(crypt, force_collection, false, false);
+        // Make a cell-based simulation
+        CellBasedSimulation<2> crypt_projection_simulator(crypt, force_collection, false, false);
 
-        // Create a radial cell killer and pass it in to the tissue simulation
+        // Create a radial cell killer and pass it in to the cell-based simulation
         c_vector<double,2> centre = zero_vector<double>(2);
-        double crypt_radius = pow(TissueConfig::Instance()->GetCryptLength()/a, 1.0/b);
+        double crypt_radius = pow(CellBasedConfig::Instance()->GetCryptLength()/a, 1.0/b);
 
         RadialSloughingCellKiller killer(&crypt, centre, crypt_radius);
         crypt_projection_simulator.AddCellKiller(&killer);
@@ -169,9 +169,9 @@ public:
 
     /**
      * The purpose of this test is to check that it is possible to construct and run
-     * a short 1D tissue simulation without throwing any exceptions.
+     * a short 1D cell-based simulation without throwing any exceptions.
      */
-    void Test1dTissueSimulation() throw (Exception)
+    void Test1dCellBasedSimulation() throw (Exception)
     {
         // Create mesh
         TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
@@ -179,14 +179,14 @@ public:
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Set up cells so that cell 10 divides at time t=0.5, cell 9 at time t=1.5, etc
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(STEM);
 
-            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            CellPtr p_cell(new Cell(p_state, p_model));
 
             double birth_time = -13.5 - i;
             p_cell->SetBirthTime(birth_time);
@@ -194,33 +194,33 @@ public:
             cells.push_back(p_cell);
         }
 
-        // Create a tissue
-        MeshBasedTissue<1> tissue(mesh, cells);
+        // Create a cell population
+        MeshBasedCellPopulation<1> cell_population(mesh, cells);
 
         // Coverage
-        tissue.SetOutputCellIdData(true);
+        cell_population.SetOutputCellIdData(true);
 
         // Create a force law (no need for a cutoff as we're in 1D)
         GeneralisedLinearSpringForce<1> linear_force;
         std::vector<AbstractForce<1>* > force_collection;
         force_collection.push_back(&linear_force);
 
-        // Set up tissue simulation
-        TissueSimulation<1> simulator(tissue, force_collection);
-        simulator.SetOutputDirectory("Test1DTissueSimulation");
+        // Set up cell-based simulation
+        CellBasedSimulation<1> simulator(cell_population, force_collection);
+        simulator.SetOutputDirectory("Test1DCellBasedSimulation");
         simulator.SetEndTime(0.6);
 
-        unsigned initial_num_cells = simulator.rGetTissue().GetNumRealCells();
-        unsigned initial_num_nodes = simulator.rGetTissue().GetNumNodes();
-        unsigned initial_num_elements = (static_cast<MeshBasedTissue<1>* >(&(simulator.rGetTissue())))->rGetMesh().GetNumElements();
+        unsigned initial_num_cells = simulator.rGetCellPopulation().GetNumRealCells();
+        unsigned initial_num_nodes = simulator.rGetCellPopulation().GetNumNodes();
+        unsigned initial_num_elements = (static_cast<MeshBasedCellPopulation<1>* >(&(simulator.rGetCellPopulation())))->rGetMesh().GetNumElements();
 
         // Run simulation for a short time
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
 
-        TS_ASSERT_EQUALS(simulator.rGetTissue().GetNumRealCells(), initial_num_cells + 1);
-        TS_ASSERT_EQUALS(simulator.rGetTissue().GetNumNodes(), initial_num_nodes + 1);
-        TS_ASSERT_EQUALS((static_cast<MeshBasedTissue<1>* >(&(simulator.rGetTissue())))->rGetMesh().GetNumElements(), initial_num_elements + 1);
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), initial_num_cells + 1);
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), initial_num_nodes + 1);
+        TS_ASSERT_EQUALS((static_cast<MeshBasedCellPopulation<1>* >(&(simulator.rGetCellPopulation())))->rGetMesh().GetNumElements(), initial_num_elements + 1);
     }
 
 };
-#endif /*TESTTISSUESIMULATIONNOTFORRELEASE_HPP_*/
+#endif /*TESTCELLBASEDSIMULATIONNOTFORRELEASE_HPP_*/

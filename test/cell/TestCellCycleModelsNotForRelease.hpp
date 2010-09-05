@@ -66,7 +66,7 @@ public:
         StochasticDivisionRuleCellCycleModel* p_cycle_model1 = new StochasticDivisionRuleCellCycleModel;
         p_cycle_model1->SetCellProliferativeType(STEM);
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
-        TissueCellPtr p_cell1(new TissueCell(p_state, p_cycle_model1));
+        CellPtr p_cell1(new Cell(p_state, p_cycle_model1));
         p_cell1->InitialiseCellCycleModel();
 
         TS_ASSERT_EQUALS(p_cycle_model1->GetGeneration(), 0u);
@@ -90,7 +90,7 @@ public:
         TS_ASSERT_EQUALS(p_cycle_model1->GetGeneration(), 0u);
 
         TS_ASSERT_EQUALS(p_cell1->ReadyToDivide(), true);
-        TissueCellPtr p_cell2 = p_cell1->Divide();
+        CellPtr p_cell2 = p_cell1->Divide();
 
         TS_ASSERT_EQUALS(p_cell2->GetCellCycleModel()->GetCellProliferativeType(), TRANSIT);
 
@@ -110,7 +110,7 @@ public:
         p_cycle_model3->SetSymmetricDivisionProbability(1.0);
         p_cycle_model3->SetMaxTransitGenerations(1);
 
-        TissueCellPtr p_cell3(new TissueCell(p_state, p_cycle_model3));
+        CellPtr p_cell3(new Cell(p_state, p_cycle_model3));
         p_cell3->InitialiseCellCycleModel();
 
         TS_ASSERT_EQUALS(p_cycle_model3->GetGeneration(), 0u);
@@ -128,7 +128,7 @@ public:
         // The stem cell cell1 must have divided symmetrically, and it
         // happens to have divided into two stem cells
         TS_ASSERT_EQUALS(p_cell1->ReadyToDivide(), true);
-        TissueCellPtr p_cell4 = p_cell1->Divide();
+        CellPtr p_cell4 = p_cell1->Divide();
 
         TS_ASSERT_EQUALS(p_cycle_model1->DividedSymmetrically(), true);
         TS_ASSERT_EQUALS(p_cycle_model1->GetCellProliferativeType(), STEM);
@@ -146,7 +146,7 @@ public:
         RandomNumberGenerator::Instance()->ranf();
 
         TS_ASSERT_EQUALS(p_cell3->ReadyToDivide(), true);
-        TissueCellPtr p_cell5 = p_cell3->Divide();
+        CellPtr p_cell5 = p_cell3->Divide();
 
         TS_ASSERT_EQUALS(p_cycle_model3->DividedSymmetrically(), true);
         TS_ASSERT_EQUALS(p_cycle_model3->GetCellProliferativeType(), TRANSIT);
@@ -163,7 +163,7 @@ public:
         TS_ASSERT_EQUALS(p_cell2->ReadyToDivide(), true);
         TS_ASSERT_EQUALS(static_cast<StochasticDivisionRuleCellCycleModel*> (p_cell2->GetCellCycleModel())->GetMaxTransitGenerations(), 1u);
 
-        TissueCellPtr p_cell6 = p_cell2->Divide();
+        CellPtr p_cell6 = p_cell2->Divide();
 
         TS_ASSERT_EQUALS(p_cycle_model2->DividedSymmetrically(), false);
         TS_ASSERT_EQUALS(p_cycle_model2->GetCellProliferativeType(), DIFFERENTIATED);
@@ -177,7 +177,7 @@ public:
         // For coverage
         StochasticDivisionRuleCellCycleModel* p_cycle_model7 = new StochasticDivisionRuleCellCycleModel;
         p_cycle_model7->SetCellProliferativeType(DIFFERENTIATED);
-        TissueCellPtr p_cell7(new TissueCell(p_state, p_cycle_model7));
+        CellPtr p_cell7(new Cell(p_state, p_cycle_model7));
         p_cell7->InitialiseCellCycleModel();
         TS_ASSERT_EQUALS(p_cycle_model7->GetGeneration(), 0u);
     }

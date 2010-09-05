@@ -25,11 +25,11 @@ You should have received a copy of the GNU Lesser General Public License
 along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
-#ifndef VERTEXBASEDTISSUE_HPP_
-#define VERTEXBASEDTISSUE_HPP_
+#ifndef VERTEXBASEDCELLPOPULATION_HPP_
+#define VERTEXBASEDCELLPOPULATION_HPP_
 
 
-#include "AbstractTissue.hpp"
+#include "AbstractCellPopulation.hpp"
 #include "MutableVertexMesh.hpp"
 #include "ArchiveLocationInfo.hpp"
 
@@ -42,18 +42,18 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "WildTypeCellMutationState.hpp"
 
 /**
- * A facade class encapsulating a vertex-based 'tissue'.
+ * A facade class encapsulating a vertex-based cell population.
  *
  * Contains a group of cells and maintains the associations
- * between TissueCellPtrs and elements in the MutableVertexMesh.
+ * between CellPtrs and elements in the MutableVertexMesh.
  *
  */
 template<unsigned DIM>
-class VertexBasedTissue : public AbstractTissue<DIM>
+class VertexBasedCellPopulation : public AbstractCellPopulation<DIM>
 {
 private:
 
-    /** Vertex-based mesh associated with the tissue. */
+    /** Vertex-based mesh associated with the cell population. */
     MutableVertexMesh<DIM, DIM>& mrMesh;
 
     /** A cache of where the results are going (used for VTK writer). */
@@ -64,7 +64,7 @@ private:
 
     /**
      * Whether to delete the mesh when we are destroyed.
-     * Needed if this tissue has been de-serialized.
+     * Needed if this cell population has been de-serialized.
      */
     bool mDeleteMesh;
 
@@ -92,31 +92,31 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractTissue<DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractCellPopulation<DIM> >(*this);
     }
 
     /**
      * Check the consistency of internal data structures.
-     * Each VertexElement must have a TissueCellPtr associated with it.
+     * Each VertexElement must have a CellPtr associated with it.
      */
     void Validate();
 
 public:
 
     /**
-     * Create a new tissue facade from a mesh and collection of cells.
+     * Create a new cell population facade from a mesh and collection of cells.
      *
-     * There must be precisely one TissueCellPtr for each VertexElement in
+     * There must be precisely one CellPtr for each VertexElement in
      * the mesh.
      *
      * @param rMesh reference to a
-     * @param rCells reference to a vector of TissueCellPtrs
-     * @param deleteMesh set to true if you want the tissue to free the mesh memory on destruction
-     * @param validate whether to validate the tissue when it is created (defaults to true)
+     * @param rCells reference to a vector of CellPtrs
+     * @param deleteMesh set to true if you want the cell population to free the mesh memory on destruction
+     * @param validate whether to validate the cell population when it is created (defaults to true)
      * @param locationIndices an optional vector of location indices that correspond to real cells
      */
-    VertexBasedTissue(MutableVertexMesh<DIM, DIM>& rMesh,
-                      std::vector<TissueCellPtr>& rCells,
+    VertexBasedCellPopulation(MutableVertexMesh<DIM, DIM>& rMesh,
+                      std::vector<CellPtr>& rCells,
                       bool deleteMesh=false,
                       bool validate=true,
                       const std::vector<unsigned> locationIndices=std::vector<unsigned>());
@@ -126,12 +126,12 @@ public:
      *
      * @param rMesh a vertex mesh.
      */
-    VertexBasedTissue(MutableVertexMesh<DIM, DIM>& rMesh);
+    VertexBasedCellPopulation(MutableVertexMesh<DIM, DIM>& rMesh);
 
     /**
      * Destructor, which frees any memory allocated by the constructor.
      */
-    virtual ~VertexBasedTissue();
+    virtual ~VertexBasedCellPopulation();
 
     /**
      * Overridden GetDampingConstant() method.
@@ -161,14 +161,14 @@ public:
     VertexElement<DIM, DIM>* GetElement(unsigned elementIndex);
 
     /**
-     * @return the number of VertexElements in the tissue.
+     * @return the number of VertexElements in the cell population.
      */
     unsigned GetNumElements();
 
     /**
      * Overridden GetNumNodes() method.
      *
-     * @return the number of nodes in the tissue.
+     * @return the number of nodes in the cell population.
      */
     unsigned GetNumNodes();
 
@@ -177,14 +177,14 @@ public:
      * Find where a given cell is in space.
      *
      * \todo If required, we could come up with a more clever definition of cell location
-     *       for a VertexTissue (for example, there is no guarantee of convexity so the
+     *       for a VertexCellPopulation (for example, there is no guarantee of convexity so the
      *       centre of mass may lie outside the element)
      *
      * @param pCell the cell
      *
      * @return the location of the centre of mass of the element corresponding to this cell.
      */
-    c_vector<double, DIM> GetLocationOfCellCentre(TissueCellPtr pCell);
+    c_vector<double, DIM> GetLocationOfCellCentre(CellPtr pCell);
 
     /**
      * Overridden GetNode() method.
@@ -198,17 +198,17 @@ public:
     /**
      * Overridden AddNode() method.
      *
-     * Add a new node to the tissue.
+     * Add a new node to the cell population.
      *
      * @param pNewNode pointer to the new node
-     * @return global index of new node in tissue
+     * @return global index of new node in cell population
      */
     unsigned AddNode(Node<DIM>* pNewNode);
 
     /**
      * Overridden UpdateNodeLocations() method.
      *
-     * @param rNodeForces a vector containing the force on each node in the tissue
+     * @param rNodeForces a vector containing the force on each node in the cell population
      * @param dt the time step
      */
     void UpdateNodeLocations(const std::vector< c_vector<double, DIM> >& rNodeForces, double dt);
@@ -224,18 +224,18 @@ public:
     void SetNode(unsigned index, ChastePoint<DIM>& rNewLocation);
 
     /**
-     * Get a pointer to the element corresponding to a given TissueCellPtr.
+     * Get a pointer to the element corresponding to a given CellPtr.
      *
      * @param pCell the cell
      *
      * @return pointer to the element.
      */
-    VertexElement<DIM, DIM>* GetElementCorrespondingToCell(TissueCellPtr pCell);
+    VertexElement<DIM, DIM>* GetElementCorrespondingToCell(CellPtr pCell);
 
     /**
      * Overridden AddCell() method.
      *
-     * Add a new cell to the tissue.
+     * Add a new cell to the cell population.
      *
      * @param pNewCell  the cell to add
      * @param rCellDivisionVector  if this vector has any non-zero component, then it is used as the axis
@@ -243,12 +243,12 @@ public:
      * @param pParentCell pointer to a parent cell (if required)
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
      */
-    TissueCellPtr AddCell(TissueCellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, TissueCellPtr pParentCell=TissueCellPtr());
+    CellPtr AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell=CellPtr());
 
     /**
      * Remove all cells labelled as dead.
      *
-     * Note that after calling this method the tissue will be in an inconsistent state until
+     * Note that after calling this method the cell population will be in an inconsistent state until
      * the equivalent of a 'remesh' is performed! So don't try iterating over cells or anything
      * like that.
      *
@@ -262,15 +262,15 @@ public:
      * @param pCell the cell
      * @return whether a given cell is associated with a deleted element.
      */
-    bool IsCellAssociatedWithADeletedLocation(TissueCellPtr pCell);
+    bool IsCellAssociatedWithADeletedLocation(CellPtr pCell);
 
     /**
      * Remove the VertexElements which have been marked as deleted, perform
      * any cell rearrangements if required, and update the correspondence
-     * with TissueCellPtrs.
+     * with CellPtrs.
      *
-     * @param hasHadBirthsOrDeaths - a bool saying whether tissue has had Births Or Deaths
-     * not needed in this tissue class
+     * @param hasHadBirthsOrDeaths - a bool saying whether cell population has had Births Or Deaths
+     * not needed in this cell population class
      */
     void Update(bool hasHadBirthsOrDeaths=true);
 
@@ -297,30 +297,30 @@ public:
     virtual void GenerateCellResultsAndWriteToFiles();
 
     /**
-     * Outputs Tissue Parameters to file
+     * Outputs CellPopulation Parameters to file
      *
      * As this method is pure virtual, it must be overridden
      * in subclasses.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputTissueParameters(out_stream& rParamsFile);
+    void OutputCellPopulationParameters(out_stream& rParamsFile);
 
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(VertexBasedTissue)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(VertexBasedCellPopulation)
 
 namespace boost
 {
 namespace serialization
 {
 /**
- * Serialize information required to construct a VertexBasedTissue.
+ * Serialize information required to construct a VertexBasedCellPopulation.
  */
 template<class Archive, unsigned DIM>
 inline void save_construct_data(
-    Archive & ar, const VertexBasedTissue<DIM> * t, const BOOST_PFTO unsigned int file_version)
+    Archive & ar, const VertexBasedCellPopulation<DIM> * t, const BOOST_PFTO unsigned int file_version)
 {
     // Save data required to construct instance
     const MutableVertexMesh<DIM,DIM>* p_mesh = &(t->rGetMesh());
@@ -328,22 +328,22 @@ inline void save_construct_data(
 }
 
 /**
- * De-serialize constructor parameters and initialise a VertexBasedTissue.
+ * De-serialize constructor parameters and initialise a VertexBasedCellPopulation.
  * Loads the mesh from separate files.
  */
 template<class Archive, unsigned DIM>
 inline void load_construct_data(
-    Archive & ar, VertexBasedTissue<DIM> * t, const unsigned int file_version)
+    Archive & ar, VertexBasedCellPopulation<DIM> * t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
     MutableVertexMesh<DIM,DIM>* p_mesh;
     ar >> p_mesh;
 
     // Invoke inplace constructor to initialise instance
-    ::new(t)VertexBasedTissue<DIM>(*p_mesh);
+    ::new(t)VertexBasedCellPopulation<DIM>(*p_mesh);
 }
 }
 } // namespace ...
 
-#endif /*VERTEXBASEDTISSUE_HPP_*/
+#endif /*VERTEXBASEDCELLPOPULATION_HPP_*/
 

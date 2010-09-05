@@ -25,8 +25,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
-#ifndef TESTLATTICEBASEDTISSUE_HPP_
-#define TESTLATTICEBASEDTISSUE_HPP_
+#ifndef TESTLATTICEBASEDCELLPOPULATION_HPP_
+#define TESTLATTICEBASEDCELLPOPULATION_HPP_
 
 #include <cxxtest/TestSuite.h>
 
@@ -35,25 +35,25 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "ArchiveOpener.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
-#include "LatticeBasedTissue.hpp"
+#include "LatticeBasedCellPopulation.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 
-class TestLatticeBasedTissue : public AbstractCellBasedTestSuite
+class TestLatticeBasedCellPopulation : public AbstractCellBasedTestSuite
 {
 private:
 
     /**
      * Helper method. Create a single, wild type, differentiated cell and
-     * return as a vector for passing into a tissue constructor.
+     * return as a vector for passing into a cell population constructor.
      */
-    std::vector<TissueCellPtr> CreateSingleTissueCellPtr()
+    std::vector<CellPtr> CreateSingleCellPtr()
     {
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
 
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         p_model->SetCellProliferativeType(DIFFERENTIATED);
-        TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+        CellPtr p_cell(new Cell(p_state, p_model));
 
         cells.push_back(p_cell);
         return cells;
@@ -61,7 +61,7 @@ private:
 
     /**
      * Helper method. Return a given location index corresponding to a single
-     * cell as a vector for passing into a tissue constructor.
+     * cell as a vector for passing into a cell population constructor.
      *
      * @param locationIndex the locaiton index
      */
@@ -84,13 +84,13 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         FixedDurationGenerationBasedCellCycleModel* p_model_1 = new FixedDurationGenerationBasedCellCycleModel();
         p_model_1->SetCellProliferativeType(DIFFERENTIATED);
-        TissueCellPtr p_cell_1(new TissueCell(p_state, p_model_1));
+        CellPtr p_cell_1(new Cell(p_state, p_model_1));
 
         FixedDurationGenerationBasedCellCycleModel* p_model_2 = new FixedDurationGenerationBasedCellCycleModel();
         p_model_2->SetCellProliferativeType(DIFFERENTIATED);
-        TissueCellPtr p_cell_2(new TissueCell(p_state, p_model_2));
+        CellPtr p_cell_2(new Cell(p_state, p_model_2));
 
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         cells.push_back(p_cell_1);
         cells.push_back(p_cell_2);
 
@@ -98,16 +98,16 @@ public:
         real_node_indices.push_back(4);
         real_node_indices.push_back(1);
 
-        // Create a tissue
-        LatticeBasedTissue<2> tissue(mesh, cells, real_node_indices);
+        // Create a cell population
+        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Test GetNumNodes()
-        TS_ASSERT_EQUALS(tissue.GetNumNodes(), 9u);
+        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 9u);
 
         // Test GetNode()
-        for (unsigned index=0; index<tissue.GetNumNodes(); index++)
+        for (unsigned index=0; index<cell_population.GetNumNodes(); index++)
         {
-            Node<2>* p_node = tissue.GetNode(index);
+            Node<2>* p_node = cell_population.GetNode(index);
             TS_ASSERT_EQUALS(p_node->GetIndex(), index);
 
             c_vector<double, 2> node_location = p_node->rGetLocation();
@@ -118,37 +118,37 @@ public:
         }
 
         // Test GetNumRealCells()
-        TS_ASSERT_EQUALS(tissue.GetNumRealCells(), 2u);
-        TS_ASSERT_EQUALS(tissue.rGetCells().size(), 2u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 2u);
+        TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 2u);
 
         // Test GetLocationOfCellCentre() and GetLocationIndexUsingCell()
-        AbstractTissue<2>::Iterator cell_iter = tissue.Begin();
-        TS_ASSERT_EQUALS(tissue.GetLocationIndexUsingCell(*cell_iter), 4u);
+        AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter), 4u);
 
-        c_vector<double, 2> cell_1_location = tissue.GetLocationOfCellCentre(*cell_iter);
+        c_vector<double, 2> cell_1_location = cell_population.GetLocationOfCellCentre(*cell_iter);
         TS_ASSERT_DELTA(cell_1_location[0], 1.0, 1e-6);
         TS_ASSERT_DELTA(cell_1_location[1], 1.0, 1e-6);
 
         ++cell_iter;
 
-        TS_ASSERT_EQUALS(tissue.GetLocationIndexUsingCell(*cell_iter), 1u);
+        TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter), 1u);
 
-        c_vector<double, 2> cell_2_location = tissue.GetLocationOfCellCentre(*cell_iter);
+        c_vector<double, 2> cell_2_location = cell_population.GetLocationOfCellCentre(*cell_iter);
         TS_ASSERT_DELTA(cell_2_location[0], 1.0, 1e-6);
         TS_ASSERT_DELTA(cell_2_location[1], 0.0, 1e-6);
 
         // Test SetEmptySite(), rGetEmptySites() and GetEmptySiteIndices()
-        std::vector<bool>& r_ghost_nodes = tissue.rGetEmptySites();
-        for (unsigned index=0; index<tissue.GetNumNodes(); index++)
+        std::vector<bool>& r_ghost_nodes = cell_population.rGetEmptySites();
+        for (unsigned index=0; index<cell_population.GetNumNodes(); index++)
         {
             bool expect_ghost_node = (index != 4) && (index != 1);
-            TS_ASSERT_EQUALS(tissue.IsEmptySite(index), expect_ghost_node);
+            TS_ASSERT_EQUALS(cell_population.IsEmptySite(index), expect_ghost_node);
             TS_ASSERT_EQUALS(r_ghost_nodes[index], expect_ghost_node);
         }
 
-        std::set<unsigned> ghost_node_indices = tissue.GetEmptySiteIndices();
+        std::set<unsigned> ghost_node_indices = cell_population.GetEmptySiteIndices();
         std::set<unsigned> expected_ghost_node_indices;
-        for (unsigned index=0; index<tissue.GetNumNodes(); index++)
+        for (unsigned index=0; index<cell_population.GetNumNodes(); index++)
         {
             if ((index != 4) && (index != 1))
             {
@@ -159,29 +159,29 @@ public:
         TS_ASSERT_EQUALS(ghost_node_indices, expected_ghost_node_indices);
 
         // Test rGetMesh()
-        TetrahedralMesh<2,2>& r_mesh = tissue.rGetMesh();
+        TetrahedralMesh<2,2>& r_mesh = cell_population.rGetMesh();
         TS_ASSERT_EQUALS(r_mesh.GetNumNodes(), 9u);
         TS_ASSERT_EQUALS(r_mesh.GetNumElements(), 8u);
 
         // Test constructor without location indices argument
 
-        std::vector<TissueCellPtr> cells2;
+        std::vector<CellPtr> cells2;
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(DIFFERENTIATED);
-            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            CellPtr p_cell(new Cell(p_state, p_model));
             cells2.push_back(p_cell);
         }
 
-        LatticeBasedTissue<2> tissue2(mesh, cells2);
+        LatticeBasedCellPopulation<2> cell_population2(mesh, cells2);
 
-        TS_ASSERT_EQUALS(tissue2.GetNumRealCells(), 9u);
+        TS_ASSERT_EQUALS(cell_population2.GetNumRealCells(), 9u);
 
-        r_ghost_nodes = tissue2.rGetEmptySites();
-        for (unsigned index=0; index<tissue.GetNumNodes(); index++)
+        r_ghost_nodes = cell_population2.rGetEmptySites();
+        for (unsigned index=0; index<cell_population.GetNumNodes(); index++)
         {
-            TS_ASSERT_EQUALS(tissue.IsEmptySite(index), false);
+            TS_ASSERT_EQUALS(cell_population.IsEmptySite(index), false);
             TS_ASSERT_EQUALS(r_ghost_nodes[index], false);
         }
     }
@@ -196,45 +196,45 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         p_model->SetCellProliferativeType(STEM);
-        TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+        CellPtr p_cell(new Cell(p_state, p_model));
 
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         cells.push_back(p_cell);
 
         std::vector<unsigned> real_node_indices;
         real_node_indices.push_back(4);
 
-        // Create a tissue
-        LatticeBasedTissue<2> tissue(mesh, cells, real_node_indices);
+        // Create a cell population
+        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
-        TS_ASSERT_EQUALS(tissue.GetNumNodes(), 9u);
-        TS_ASSERT_EQUALS(tissue.GetNumRealCells(), 1u);
-        TS_ASSERT_EQUALS(tissue.rGetCells().size(), 1u);
+        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 9u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 1u);
+        TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 1u);
 
         // Check locations of cells
-        TS_ASSERT_EQUALS(tissue.GetLocationIndexUsingCell(*(tissue.rGetCells().begin())), 4u);
+        TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*(cell_population.rGetCells().begin())), 4u);
 
         // Create a new cell
         FixedDurationGenerationBasedCellCycleModel* p_model_2 = new FixedDurationGenerationBasedCellCycleModel();
         p_model_2->SetCellProliferativeType(STEM);
-        TissueCellPtr p_new_cell(new TissueCell(p_state, p_model_2));
+        CellPtr p_new_cell(new Cell(p_state, p_model_2));
 
-        // Add new cell to the tissue by dividing the cell at node 4
-        AbstractTissue<2>::Iterator cell_iter_1 = tissue.Begin();
-        tissue.AddCell(p_new_cell, zero_vector<double>(2), *cell_iter_1);
+        // Add new cell to the cell population by dividing the cell at node 4
+        AbstractCellPopulation<2>::Iterator cell_iter_1 = cell_population.Begin();
+        cell_population.AddCell(p_new_cell, zero_vector<double>(2), *cell_iter_1);
 
-        TS_ASSERT_LESS_THAN(tissue.GetLocationIndexUsingCell(p_new_cell), tissue.GetNumNodes());
-        TS_ASSERT(tissue.GetLocationIndexUsingCell(p_new_cell) != 4u);
+        TS_ASSERT_LESS_THAN(cell_population.GetLocationIndexUsingCell(p_new_cell), cell_population.GetNumNodes());
+        TS_ASSERT(cell_population.GetLocationIndexUsingCell(p_new_cell) != 4u);
 
-        TS_ASSERT_EQUALS(tissue.rGetCells().size(), 2u);
-        TS_ASSERT_EQUALS(tissue.GetNumRealCells(), 2u);
+        TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 2u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 2u);
 
         // Check locations of parent cell
-        AbstractTissue<2>::Iterator cell_iter_2 = tissue.Begin();
-        TS_ASSERT_EQUALS(tissue.GetLocationIndexUsingCell(*cell_iter_2), 4u);
+        AbstractCellPopulation<2>::Iterator cell_iter_2 = cell_population.Begin();
+        TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter_2), 4u);
         ++cell_iter_2;
-        TS_ASSERT_LESS_THAN(tissue.GetLocationIndexUsingCell(*cell_iter_2), tissue.GetNumNodes());
-        TS_ASSERT(tissue.GetLocationIndexUsingCell(*cell_iter_2) != 4u);
+        TS_ASSERT_LESS_THAN(cell_population.GetLocationIndexUsingCell(*cell_iter_2), cell_population.GetNumNodes());
+        TS_ASSERT(cell_population.GetLocationIndexUsingCell(*cell_iter_2) != 4u);
     }
 
     // Checks that this method correctly returns the first degree, i.e. nearest, neighbours
@@ -248,18 +248,18 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         p_model->SetCellProliferativeType(DIFFERENTIATED);
-        TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+        CellPtr p_cell(new Cell(p_state, p_model));
 
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         cells.push_back(p_cell);
 
         std::vector<unsigned> real_node_indices;
         real_node_indices.push_back(4);
 
-        // Create a tissue
-        LatticeBasedTissue<2> tissue(mesh, cells, real_node_indices);
+        // Create a cell population
+        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
-        std::set<unsigned> nearest_neighbours = tissue.GetNthDegreeNeighbouringNodeIndices(4, 1);
+        std::set<unsigned> nearest_neighbours = cell_population.GetNthDegreeNeighbouringNodeIndices(4, 1);
 
         std::set<unsigned> expected_neighbours;
         expected_neighbours.insert(7);
@@ -285,7 +285,7 @@ public:
         }
 
         // Now going to check for a corner node
-        std::set<unsigned> nearest_neighbours_2 = tissue.GetNthDegreeNeighbouringNodeIndices(2, 1);
+        std::set<unsigned> nearest_neighbours_2 = cell_population.GetNthDegreeNeighbouringNodeIndices(2, 1);
 
         std::set<unsigned> expected_neighbours_2;
         expected_neighbours_2.insert(5u);
@@ -306,7 +306,7 @@ public:
         }
 
         // Now checking a boundary node
-        std::set<unsigned> nearest_neighbours_3 = tissue.GetNthDegreeNeighbouringNodeIndices(3, 1);
+        std::set<unsigned> nearest_neighbours_3 = cell_population.GetNthDegreeNeighbouringNodeIndices(3, 1);
 
         std::set<unsigned> expected_neighbours_3;
         expected_neighbours_3.insert(6u);
@@ -339,19 +339,19 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         p_model->SetCellProliferativeType(DIFFERENTIATED);
-        TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+        CellPtr p_cell(new Cell(p_state, p_model));
 
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         cells.push_back(p_cell);
 
         std::vector<unsigned> real_node_indices;
         real_node_indices.push_back(29);
 
-        // Create a tissue
-        LatticeBasedTissue<2> tissue(mesh, cells, real_node_indices);
+        // Create a cell population
+        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Check the maximum degree possible in each direction
-        std::vector<unsigned> max_degrees = tissue.GetMaximumDegreeInEachDirection(29);
+        std::vector<unsigned> max_degrees = cell_population.GetMaximumDegreeInEachDirection(29);
         TS_ASSERT_EQUALS(max_degrees.size(), 8u);
         TS_ASSERT_EQUALS(max_degrees[0], 2u);
         TS_ASSERT_EQUALS(max_degrees[1], 1u);
@@ -363,7 +363,7 @@ public:
         TS_ASSERT_EQUALS(max_degrees[7], 2u);
 
         // Check the second degree neighbours
-        std::set<unsigned> nearest_neighbours_2 = tissue.GetNthDegreeNeighbouringNodeIndices(29, 2);
+        std::set<unsigned> nearest_neighbours_2 = cell_population.GetNthDegreeNeighbouringNodeIndices(29, 2);
         std::set<unsigned> expected_neighbours_2;
         expected_neighbours_2.insert(43);
         expected_neighbours_2.insert(15);
@@ -385,7 +385,7 @@ public:
         }
 
         // Check the third degree neighbours
-        std::set<unsigned> nearest_neighbours_3 = tissue.GetNthDegreeNeighbouringNodeIndices(29, 3);
+        std::set<unsigned> nearest_neighbours_3 = cell_population.GetNthDegreeNeighbouringNodeIndices(29, 3);
 
         std::set<unsigned> expected_neighbours_3;
         expected_neighbours_3.insert(8);
@@ -406,7 +406,7 @@ public:
         }
 
         // Check the fourth degree neighbours
-        std::set<unsigned> nearest_neighbours_4 = tissue.GetNthDegreeNeighbouringNodeIndices(29, 4);
+        std::set<unsigned> nearest_neighbours_4 = cell_population.GetNthDegreeNeighbouringNodeIndices(29, 4);
 
         std::set<unsigned> expected_neighbours_4;
         expected_neighbours_4.insert(1);
@@ -427,7 +427,7 @@ public:
         }
 
         // Check the fifth degree neighbours
-        std::set<unsigned> nearest_neighbours_5 = tissue.GetNthDegreeNeighbouringNodeIndices(29, 5);
+        std::set<unsigned> nearest_neighbours_5 = cell_population.GetNthDegreeNeighbouringNodeIndices(29, 5);
 
         std::set<unsigned> expected_neighbours_5;
         expected_neighbours_5.insert(34);
@@ -446,7 +446,7 @@ public:
         }
 
         // Check the sixth degree neighbours
-        std::set<unsigned> nearest_neighbours_6 = tissue.GetNthDegreeNeighbouringNodeIndices(29, 6);
+        std::set<unsigned> nearest_neighbours_6 = cell_population.GetNthDegreeNeighbouringNodeIndices(29, 6);
         TS_ASSERT_EQUALS(nearest_neighbours_6.empty(), true);
     }
 
@@ -458,7 +458,7 @@ public:
 
         // Create cells
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         std::vector<unsigned> real_node_indices;
 
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
@@ -467,74 +467,74 @@ public:
             {
                 FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
                 p_model->SetCellProliferativeType(DIFFERENTIATED);
-                TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+                CellPtr p_cell(new Cell(p_state, p_model));
                 cells.push_back(p_cell);
                 real_node_indices.push_back(i);
             }
         }
 
-        // Create a tissue
-        LatticeBasedTissue<2> tissue(mesh, cells, real_node_indices);
+        // Create a cell population
+        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
-        TS_ASSERT(tissue.IsEmptySite(45));
-        TS_ASSERT_EQUALS(tissue.GetNumNodes(), 49u);
-        TS_ASSERT_EQUALS(tissue.GetNumRealCells(), 48u);
-        TS_ASSERT_EQUALS(tissue.rGetCells().size(), 48u);
+        TS_ASSERT(cell_population.IsEmptySite(45));
+        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 49u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 48u);
+        TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 48u);
 
         // Create a new cell
         FixedDurationGenerationBasedCellCycleModel* p_model_2 = new FixedDurationGenerationBasedCellCycleModel();
         p_model_2->SetCellProliferativeType(DIFFERENTIATED);
-        TissueCellPtr p_new_cell(new TissueCell(p_state, p_model_2));
+        CellPtr p_new_cell(new Cell(p_state, p_model_2));
 
-        // Add new cell to the tissue by dividing the cell at node 24
-        TissueCellPtr p_parent_cell = tissue.GetCellUsingLocationIndex(24);
-        tissue.AddCell(p_new_cell, zero_vector<double>(2), p_parent_cell);
+        // Add new cell to the cell population by dividing the cell at node 24
+        CellPtr p_parent_cell = cell_population.GetCellUsingLocationIndex(24);
+        cell_population.AddCell(p_new_cell, zero_vector<double>(2), p_parent_cell);
 
         // Check the number of cells is correct
-        TS_ASSERT_EQUALS(tissue.rGetCells().size(), 49u);
-        TS_ASSERT_EQUALS(tissue.GetNumRealCells(), 49u);
+        TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 49u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 49u);
 
         // Check each cell corresponds to the correct location index
-        AbstractTissue<2>::Iterator cell_iter = tissue.Begin();
+        AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
 
         // The indices of cells 0 to 30 should be unchanged
         for (unsigned i=0; i<31; i++)
         {
-            TS_ASSERT_EQUALS(tissue.GetLocationIndexUsingCell(*cell_iter), i);
+            TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter), i);
             ++cell_iter;
         }
 
         // Cell 31 should have been pushed up to index 38
-        TS_ASSERT_EQUALS(tissue.GetLocationIndexUsingCell(*cell_iter), 38u);
+        TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter), 38u);
         ++cell_iter;
 
         // The indices of cells 32 to 37 should be unchanged
         for (unsigned i=32; i<38; i++)
         {
-            TS_ASSERT_EQUALS(tissue.GetLocationIndexUsingCell(*cell_iter), i);
+            TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter), i);
             ++cell_iter;
         }
 
         // Cell 38 should have been pushed up to index 45
-        TS_ASSERT_EQUALS(tissue.GetLocationIndexUsingCell(*cell_iter), 45u);
+        TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter), 45u);
         ++cell_iter;
 
         // The indices of cells 39 to 44 should be unchanged
         for (unsigned i=39; i<45; i++)
         {
-            TS_ASSERT_EQUALS(tissue.GetLocationIndexUsingCell(*cell_iter), i);
+            TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter), i);
             ++cell_iter;
         }
 
         // The indices of cells 46 to 48 should be unchanged
         for (unsigned i=46; i<49; i++)
         {
-            TS_ASSERT_EQUALS(tissue.GetLocationIndexUsingCell(*cell_iter), i);
+            TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter), i);
             ++cell_iter;
         }
 
         // Lastly the new cell should be at index 31
-        TS_ASSERT_EQUALS(tissue.GetLocationIndexUsingCell(*cell_iter), 31u);
+        TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter), 31u);
     }
 
     void TestCellDivisionWithOneEmptySiteOnlySearchingNearestNeighbours() throw(Exception)
@@ -545,7 +545,7 @@ public:
 
         // Create cells
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         std::vector<unsigned> real_node_indices;
 
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
@@ -554,31 +554,31 @@ public:
             {
                 FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
                 p_model->SetCellProliferativeType(DIFFERENTIATED);
-                TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+                CellPtr p_cell(new Cell(p_state, p_model));
                 cells.push_back(p_cell);
                 real_node_indices.push_back(i);
             }
         }
 
-        // Create a tissue
-        LatticeBasedTissue<2> tissue(mesh, cells, real_node_indices, true);        // Only searching the nearest neighbours (degree=1)
+        // Create a cell population
+        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices, true);        // Only searching the nearest neighbours (degree=1)
 
-        TS_ASSERT(tissue.IsEmptySite(13));
-        TS_ASSERT_EQUALS(tissue.GetNumNodes(), 16u);
-        TS_ASSERT_EQUALS(tissue.GetNumRealCells(), 15u);
-        TS_ASSERT_EQUALS(tissue.rGetCells().size(), 15u);
+        TS_ASSERT(cell_population.IsEmptySite(13));
+        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 16u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 15u);
+        TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 15u);
 
         // Create a new cell
         FixedDurationGenerationBasedCellCycleModel* p_model_2 = new FixedDurationGenerationBasedCellCycleModel();
         p_model_2->SetCellProliferativeType(DIFFERENTIATED);
-        TissueCellPtr p_new_cell(new TissueCell(p_state, p_model_2));
+        CellPtr p_new_cell(new Cell(p_state, p_model_2));
 
-        // Add new cell to the tissue by dividing the cell at node 5
-        TissueCellPtr p_parent_cell = tissue.GetCellUsingLocationIndex(5);
+        // Add new cell to the cell population by dividing the cell at node 5
+        CellPtr p_parent_cell = cell_population.GetCellUsingLocationIndex(5);
 
         // Try to divide the parent - should not be possible as there are no free nearest neighbours
 
-        TS_ASSERT_THROWS_THIS(tissue.AddCell(p_new_cell, zero_vector<double>(2), p_parent_cell),
+        TS_ASSERT_THROWS_THIS(cell_population.AddCell(p_new_cell, zero_vector<double>(2), p_parent_cell),
                               "Cell can not divide as there are no free neighbours at maximum degree in any direction");
     }
 
@@ -590,7 +590,7 @@ public:
 
         // Create cells
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         std::vector<unsigned> real_node_indices;
 
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
@@ -599,52 +599,52 @@ public:
             {
                 FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
                 p_model->SetCellProliferativeType(DIFFERENTIATED);
-                TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+                CellPtr p_cell(new Cell(p_state, p_model));
                 cells.push_back(p_cell);
                 real_node_indices.push_back(i);
             }
         }
 
-        // Create a tissue
-        LatticeBasedTissue<2> tissue(mesh, cells, real_node_indices, true);        // Only searching the nearest neighbours (degree=1)
+        // Create a cell population
+        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices, true);        // Only searching the nearest neighbours (degree=1)
 
-        TS_ASSERT(tissue.IsEmptySite(9));
-        TS_ASSERT_EQUALS(tissue.GetNumNodes(), 16u);
-        TS_ASSERT_EQUALS(tissue.GetNumRealCells(), 15u);
-        TS_ASSERT_EQUALS(tissue.rGetCells().size(), 15u);
+        TS_ASSERT(cell_population.IsEmptySite(9));
+        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 16u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 15u);
+        TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 15u);
 
         // Create a new cell
         FixedDurationGenerationBasedCellCycleModel* p_model_2 = new FixedDurationGenerationBasedCellCycleModel();
         p_model_2->SetCellProliferativeType(DIFFERENTIATED);
-        TissueCellPtr p_new_cell(new TissueCell(p_state, p_model_2));
+        CellPtr p_new_cell(new Cell(p_state, p_model_2));
 
-        // Add new cell to the tissue by dividing the cell at node 5
-        TissueCellPtr p_parent_cell = tissue.GetCellUsingLocationIndex(5);
-        tissue.AddCell(p_new_cell, zero_vector<double>(2), p_parent_cell);
+        // Add new cell to the cell population by dividing the cell at node 5
+        CellPtr p_parent_cell = cell_population.GetCellUsingLocationIndex(5);
+        cell_population.AddCell(p_new_cell, zero_vector<double>(2), p_parent_cell);
 
         // Check the number of cells is correct
-        TS_ASSERT_EQUALS(tissue.rGetCells().size(), 16u);
-        TS_ASSERT_EQUALS(tissue.GetNumRealCells(), 16u);
+        TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 16u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 16u);
 
         // Check each cell corresponds to the correct location index
-        AbstractTissue<2>::Iterator cell_iter = tissue.Begin();
+        AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
 
         // The indices of cells 0 to 8 should be unchanged
         for (unsigned i=0; i<9; i++)
         {
-            TS_ASSERT_EQUALS(tissue.GetLocationIndexUsingCell(*cell_iter), i);
+            TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter), i);
             ++cell_iter;
         }
 
         // The indices of cells 10 to 15 should be unchanged
         for (unsigned i=10; i<16; i++)
         {
-            TS_ASSERT_EQUALS(tissue.GetLocationIndexUsingCell(*cell_iter), i);
+            TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter), i);
             ++cell_iter;
         }
 
         // The new cell should be at node index 9
-        TS_ASSERT_EQUALS(tissue.GetLocationIndexUsingCell(*cell_iter), 9u);
+        TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter), 9u);
 
     }
 
@@ -656,30 +656,30 @@ public:
 
         // Create cells
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         std::vector<unsigned> real_node_indices;
 
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(DIFFERENTIATED);
-            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            CellPtr p_cell(new Cell(p_state, p_model));
             cells.push_back(p_cell);
             real_node_indices.push_back(i);
         }
 
-        // Create a tissue
-        LatticeBasedTissue<2> tissue(mesh, cells, real_node_indices);
+        // Create a cell population
+        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Create a new cell
         FixedDurationGenerationBasedCellCycleModel* p_model_2 = new FixedDurationGenerationBasedCellCycleModel();
         p_model_2->SetCellProliferativeType(DIFFERENTIATED);
-        TissueCellPtr p_new_cell(new TissueCell(p_state, p_model_2));
+        CellPtr p_new_cell(new Cell(p_state, p_model_2));
 
-        // Try adding new cell to the tissue by dividing the cell at node 24
-        TissueCellPtr p_parent_cell = tissue.GetCellUsingLocationIndex(24);
+        // Try adding new cell to the cell population by dividing the cell at node 24
+        CellPtr p_parent_cell = cell_population.GetCellUsingLocationIndex(24);
 
-        TS_ASSERT_THROWS_THIS(tissue.AddCell(p_new_cell, zero_vector<double>(2), p_parent_cell),
+        TS_ASSERT_THROWS_THIS(cell_population.AddCell(p_new_cell, zero_vector<double>(2), p_parent_cell),
                               "Cell can not divide as there are no free neighbours at maximum degree in any direction");
     }
 
@@ -694,27 +694,27 @@ public:
 
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         p_model->SetCellProliferativeType(DIFFERENTIATED);
-        TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+        CellPtr p_cell(new Cell(p_state, p_model));
 
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         cells.push_back(p_cell);
 
         std::vector<unsigned> real_node_indices;
         real_node_indices.push_back(0);
 
-        // Create a tissue
-        LatticeBasedTissue<2> lattice_based_tissue(mesh, cells, real_node_indices);
+        // Create a cell population
+        LatticeBasedCellPopulation<2> lattice_based_cell_population(mesh, cells, real_node_indices);
 
         // Count the number of cells using the iterator
         unsigned number_of_cells = 0;
-        for (AbstractTissue<2>::Iterator cell_iter = lattice_based_tissue.Begin();
-             cell_iter != lattice_based_tissue.End();
+        for (AbstractCellPopulation<2>::Iterator cell_iter = lattice_based_cell_population.Begin();
+             cell_iter != lattice_based_cell_population.End();
              ++cell_iter)
         {
             number_of_cells++;
         }
 
-        TS_ASSERT_EQUALS(number_of_cells, lattice_based_tissue.rGetCells().size());
+        TS_ASSERT_EQUALS(number_of_cells, lattice_based_cell_population.rGetCells().size());
     }
 
     void TestGetFreeNeighbouringNodeIndices1d()
@@ -730,14 +730,14 @@ public:
          */
 
         // Create one cell, initially corresponding to the far left node
-        std::vector<TissueCellPtr> cells = CreateSingleTissueCellPtr();
+        std::vector<CellPtr> cells = CreateSingleCellPtr();
         std::vector<unsigned> location_indices = CreateSingleLocationIndex(0);
 
-        // Create a tissue
-        LatticeBasedTissue<1> lattice_based_tissue(mesh, cells, location_indices);
+        // Create a cell population
+        LatticeBasedCellPopulation<1> lattice_based_cell_population(mesh, cells, location_indices);
 
         // Now find the neighbouring available sites
-        std::set<unsigned> free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(0);
+        std::set<unsigned> free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(0);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 1u);
 
         std::set<unsigned> expected_free_neighbouring_sites;
@@ -745,8 +745,8 @@ public:
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
 
         // Test non-boundary node 2
-        lattice_based_tissue.MoveCell(*lattice_based_tissue.Begin(), 2);
-        free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(2);
+        lattice_based_cell_population.MoveCell(*lattice_based_cell_population.Begin(), 2);
+        free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(2);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 2u);
 
         expected_free_neighbouring_sites.clear();
@@ -755,8 +755,8 @@ public:
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
 
         // Test eastern end
-        lattice_based_tissue.MoveCell(*(lattice_based_tissue.Begin()), 4);
-        free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(4);
+        lattice_based_cell_population.MoveCell(*(lattice_based_cell_population.Begin()), 4);
+        free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(4);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 1u);
 
         expected_free_neighbouring_sites.clear();
@@ -781,14 +781,14 @@ public:
          */
 
         // Create one cell, initially corresponding to the bottom left node
-        std::vector<TissueCellPtr> cells = CreateSingleTissueCellPtr();
+        std::vector<CellPtr> cells = CreateSingleCellPtr();
         std::vector<unsigned> cell_indices = CreateSingleLocationIndex(0);
 
-        // Create a tissue
-        LatticeBasedTissue<2> lattice_based_tissue(mesh, cells, cell_indices);
+        // Create a cell population
+        LatticeBasedCellPopulation<2> lattice_based_cell_population(mesh, cells, cell_indices);
 
         // Test bottom left node
-        std::set<unsigned> free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(0);
+        std::set<unsigned> free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(0);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 3u);
 
         std::set<unsigned> expected_free_neighbouring_sites;
@@ -798,8 +798,8 @@ public:
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
 
         // Test non-corner bottom nodes
-        lattice_based_tissue.MoveCell(*lattice_based_tissue.Begin(), 1);
-        free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(1);
+        lattice_based_cell_population.MoveCell(*lattice_based_cell_population.Begin(), 1);
+        free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(1);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 5u);
 
         expected_free_neighbouring_sites.clear();
@@ -811,8 +811,8 @@ public:
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
 
         // Test bottom right node
-        lattice_based_tissue.MoveCell(*lattice_based_tissue.Begin(), 2);
-        free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(2);
+        lattice_based_cell_population.MoveCell(*lattice_based_cell_population.Begin(), 2);
+        free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(2);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 3u);
 
         expected_free_neighbouring_sites.clear();
@@ -822,8 +822,8 @@ public:
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
 
         // Test non-corner left nodes
-        lattice_based_tissue.MoveCell(*lattice_based_tissue.Begin(), 3);
-        free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(3);
+        lattice_based_cell_population.MoveCell(*lattice_based_cell_population.Begin(), 3);
+        free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(3);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 5u);
 
         expected_free_neighbouring_sites.clear();
@@ -835,12 +835,12 @@ public:
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
 
         // Test centre node
-        lattice_based_tissue.MoveCell(*lattice_based_tissue.Begin(), 4);
-        free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(4);
+        lattice_based_cell_population.MoveCell(*lattice_based_cell_population.Begin(), 4);
+        free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(4);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 8u);
 
         expected_free_neighbouring_sites.clear();
-        for (unsigned i=0; i<lattice_based_tissue.GetNumNodes(); i++)
+        for (unsigned i=0; i<lattice_based_cell_population.GetNumNodes(); i++)
         {
             if (i != 4)
             {
@@ -850,8 +850,8 @@ public:
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
 
         // Test non-corner right nodes
-        lattice_based_tissue.MoveCell(*lattice_based_tissue.Begin(), 5);
-        free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(5);
+        lattice_based_cell_population.MoveCell(*lattice_based_cell_population.Begin(), 5);
+        free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(5);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 5u);
 
         expected_free_neighbouring_sites.clear();
@@ -863,8 +863,8 @@ public:
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
 
         // Test top left node
-        lattice_based_tissue.MoveCell(*lattice_based_tissue.Begin(), 6);
-        free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(6);
+        lattice_based_cell_population.MoveCell(*lattice_based_cell_population.Begin(), 6);
+        free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(6);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 3u);
 
         expected_free_neighbouring_sites.clear();
@@ -874,8 +874,8 @@ public:
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
 
         // Test non-corner top nodes
-        lattice_based_tissue.MoveCell(*lattice_based_tissue.Begin(), 7);
-        free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(7);
+        lattice_based_cell_population.MoveCell(*lattice_based_cell_population.Begin(), 7);
+        free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(7);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 5u);
 
         expected_free_neighbouring_sites.clear();
@@ -887,8 +887,8 @@ public:
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
 
         // Test top right node
-        lattice_based_tissue.MoveCell(*lattice_based_tissue.Begin(), 8);
-        free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(8);
+        lattice_based_cell_population.MoveCell(*lattice_based_cell_population.Begin(), 8);
+        free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(8);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 3u);
 
         expected_free_neighbouring_sites.clear();
@@ -897,16 +897,16 @@ public:
         expected_free_neighbouring_sites.insert(7);
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
 
-        // Now need to check the case where there is more than one real cell in the tissue
+        // Now need to check the case where there is more than one real cell in the cell population
 
         // Create three cells
-        std::vector<TissueCellPtr> cells2;
+        std::vector<CellPtr> cells2;
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<3; i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(DIFFERENTIATED);
-            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            CellPtr p_cell(new Cell(p_state, p_model));
             cells2.push_back(p_cell);
         }
 
@@ -916,11 +916,11 @@ public:
         location_indices.push_back(4);
         location_indices.push_back(5);
 
-        // Create a tissue
-        LatticeBasedTissue<2> lattice_based_tissue2(mesh, cells2, location_indices);
+        // Create a cell population
+        LatticeBasedCellPopulation<2> lattice_based_cell_population2(mesh, cells2, location_indices);
 
         // Now find the neighbouring available sites
-        free_neighbouring_sites = lattice_based_tissue2.GetFreeNeighbouringNodeIndices(1);
+        free_neighbouring_sites = lattice_based_cell_population2.GetFreeNeighbouringNodeIndices(1);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 3u);
 
         expected_free_neighbouring_sites.clear();
@@ -947,14 +947,14 @@ public:
          */
 
         // Create one cell, initially corresponding to the central node
-        std::vector<TissueCellPtr> cells = CreateSingleTissueCellPtr();
+        std::vector<CellPtr> cells = CreateSingleCellPtr();
         std::vector<unsigned> location_indices = CreateSingleLocationIndex(13);
 
-        // Create a tissue
-        LatticeBasedTissue<3> lattice_based_tissue(mesh, cells, location_indices);
+        // Create a cell population
+        LatticeBasedCellPopulation<3> lattice_based_cell_population(mesh, cells, location_indices);
 
         // Test central node
-        std::set<unsigned> free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(13);
+        std::set<unsigned> free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(13);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 26u);
 
         std::set<unsigned> expected_free_neighbouring_sites;
@@ -969,8 +969,8 @@ public:
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
 
         // Test bottom left corner node (node 0)
-        lattice_based_tissue.MoveCell(*(lattice_based_tissue.Begin()), 0);
-        free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(0);
+        lattice_based_cell_population.MoveCell(*(lattice_based_cell_population.Begin()), 0);
+        free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(0);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 7u);
 
         expected_free_neighbouring_sites.clear();
@@ -1013,14 +1013,14 @@ public:
          */
 
         // Create one cell, initially corresponding to the corner node
-        std::vector<TissueCellPtr> cells = CreateSingleTissueCellPtr();
+        std::vector<CellPtr> cells = CreateSingleCellPtr();
         std::vector<unsigned> location_indices = CreateSingleLocationIndex(0);
 
-        // Create a tissue
-        LatticeBasedTissue<3> lattice_based_tissue(mesh, cells, location_indices);
+        // Create a cell population
+        LatticeBasedCellPopulation<3> lattice_based_cell_population(mesh, cells, location_indices);
 
         // Test bottom left corner node (node 0)
-        std::set<unsigned> free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(0);
+        std::set<unsigned> free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(0);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 7u);
 
         std::set<unsigned> expected_free_neighbouring_sites;
@@ -1034,8 +1034,8 @@ public:
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
 
         // Test west side node (node 30)
-        lattice_based_tissue.MoveCell(*(lattice_based_tissue.Begin()), 30);
-        free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(30);
+        lattice_based_cell_population.MoveCell(*(lattice_based_cell_population.Begin()), 30);
+        free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(30);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 17u);
 
         expected_free_neighbouring_sites.clear();
@@ -1050,8 +1050,8 @@ public:
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
 
         // Test east side node (node 44)
-        lattice_based_tissue.MoveCell(*(lattice_based_tissue.Begin()), 44);
-        free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(44);
+        lattice_based_cell_population.MoveCell(*(lattice_based_cell_population.Begin()), 44);
+        free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(44);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 17u);
 
         expected_free_neighbouring_sites.clear();
@@ -1066,8 +1066,8 @@ public:
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
 
         // Test top layer node (node 52)
-        lattice_based_tissue.MoveCell(*(lattice_based_tissue.Begin()), 52);
-        free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(52);
+        lattice_based_cell_population.MoveCell(*(lattice_based_cell_population.Begin()), 52);
+        free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(52);
 
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 17u);
 
@@ -1102,13 +1102,13 @@ public:
          */
 
         // Create one cell, initially corresponding to the corner node
-        std::vector<TissueCellPtr> cells = CreateSingleTissueCellPtr();
+        std::vector<CellPtr> cells = CreateSingleCellPtr();
         std::vector<unsigned> location_indices = CreateSingleLocationIndex(0);
 
-        // Create a tissue
-        LatticeBasedTissue<2> lattice_based_tissue(mesh, cells, location_indices);
+        // Create a cell population
+        LatticeBasedCellPopulation<2> lattice_based_cell_population(mesh, cells, location_indices);
 
-        std::set<unsigned> free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(0);
+        std::set<unsigned> free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(0);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 3u);
 
         std::set<unsigned> expected_free_neighbouring_sites;
@@ -1118,8 +1118,8 @@ public:
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
 
         // Test east side node (node 5)
-        lattice_based_tissue.MoveCell(*(lattice_based_tissue.Begin()), 5);
-        free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(5);
+        lattice_based_cell_population.MoveCell(*(lattice_based_cell_population.Begin()), 5);
+        free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(5);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 5u);
 
         expected_free_neighbouring_sites.clear();
@@ -1131,8 +1131,8 @@ public:
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
 
         // Test non-boundary node (node 7)
-        lattice_based_tissue.MoveCell(*(lattice_based_tissue.Begin()), 7);
-        free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(7);
+        lattice_based_cell_population.MoveCell(*(lattice_based_cell_population.Begin()), 7);
+        free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(7);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 8u);
 
         expected_free_neighbouring_sites.clear();
@@ -1147,8 +1147,8 @@ public:
 
         // Test north boundary node (node 10)
 
-        lattice_based_tissue.MoveCell(*(lattice_based_tissue.Begin()), 10);
-        free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(10);
+        lattice_based_cell_population.MoveCell(*(lattice_based_cell_population.Begin()), 10);
+        free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(10);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 5u);
 
         expected_free_neighbouring_sites.clear();
@@ -1163,13 +1163,13 @@ public:
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
     }
 
-    void TestArchivingTissue() throw (Exception)
+    void TestArchivingCellPopulation() throw (Exception)
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
-        std::string archive_file = "lattice_based_tissue.arch";
-        ArchiveLocationInfo::SetMeshFilename("lattice_based_tissue");
+        std::string archive_file = "lattice_based_cell_population.arch";
+        ArchiveLocationInfo::SetMeshFilename("lattice_based_cell_population");
 
-        // Archive tissue
+        // Archive cell population
         {
             // Set up SimulationTime
             unsigned num_steps = 10;
@@ -1182,13 +1182,13 @@ public:
 
             // Create cells
             boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
-            std::vector<TissueCellPtr> cells;
+            std::vector<CellPtr> cells;
             std::vector<unsigned> real_node_indices;
             for (unsigned i=0; i<10; i++)
             {
                 FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
                 p_model->SetCellProliferativeType(DIFFERENTIATED);
-                TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+                CellPtr p_cell(new Cell(p_state, p_model));
 
                 double birth_time = -2.0 * (double)i;
                 p_cell->SetBirthTime(birth_time);
@@ -1197,13 +1197,13 @@ public:
                 real_node_indices.push_back(2*i);
             }
 
-            // Create tissue
-            LatticeBasedTissue<2>* const p_tissue = new LatticeBasedTissue<2>(mesh, cells, real_node_indices);
+            // Create cell population
+            LatticeBasedCellPopulation<2>* const p_cell_population = new LatticeBasedCellPopulation<2>(mesh, cells, real_node_indices);
 
             // Cells have been given birth times of 0, -2, -4, ...
             // Loop over them to run to time 0
-            for (AbstractTissue<2>::Iterator cell_iter = p_tissue->Begin();
-                cell_iter != p_tissue->End();
+            for (AbstractCellPopulation<2>::Iterator cell_iter = p_cell_population->Begin();
+                cell_iter != p_cell_population->End();
                 ++cell_iter)
             {
                 cell_iter->ReadyToDivide();
@@ -1213,16 +1213,16 @@ public:
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
 
-            // Write the tissue to the archive
+            // Write the cell population to the archive
             (*p_arch) << static_cast<const SimulationTime&> (*p_simulation_time);
-            (*p_arch) << p_tissue;
+            (*p_arch) << p_cell_population;
 
             // Tidy up
             SimulationTime::Destroy();
-            delete p_tissue;
+            delete p_cell_population;
         }
 
-        // Restore tissue
+        // Restore cell population
         {
             // Need to set up time
             unsigned num_steps = 10;
@@ -1232,19 +1232,19 @@ public:
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, num_steps+1);
             p_simulation_time->IncrementTimeOneStep();
 
-            LatticeBasedTissue<2>* p_tissue;
+            LatticeBasedCellPopulation<2>* p_cell_population;
 
-            // Restore the tissue
+            // Restore the cell population
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
 
             (*p_arch) >> *p_simulation_time;
-            (*p_arch) >> p_tissue;
+            (*p_arch) >> p_cell_population;
 
             // Check that each cell has the correct age
             unsigned counter = 0;
-            for (AbstractTissue<2>::Iterator cell_iter = p_tissue->Begin();
-                 cell_iter != p_tissue->End();
+            for (AbstractCellPopulation<2>::Iterator cell_iter = p_cell_population->Begin();
+                 cell_iter != p_cell_population->End();
                  ++cell_iter)
             {
                 TS_ASSERT_DELTA(cell_iter->GetAge(), (double)(counter), 1e-7);
@@ -1255,17 +1255,17 @@ public:
             TS_ASSERT_EQUALS(p_simulation_time->GetTime(), 0.0);
 
             // Check there is the correct number of cells
-            TS_ASSERT_EQUALS(p_tissue->GetNumRealCells(), 10u);
+            TS_ASSERT_EQUALS(p_cell_population->GetNumRealCells(), 10u);
 
             // Check there is the correct number of nodes
-            TS_ASSERT_EQUALS(p_tissue->GetEmptySiteIndices().size(), 39u);
+            TS_ASSERT_EQUALS(p_cell_population->GetEmptySiteIndices().size(), 39u);
 
             // Check there is the correct number of nodes
-            TS_ASSERT_EQUALS(p_tissue->GetNumNodes(), 49u);
+            TS_ASSERT_EQUALS(p_cell_population->GetNumNodes(), 49u);
 
             // Check some node positions
-            Node<2>* p_node_3 = p_tissue->GetNode(3);
-            Node<2>* p_node_11 = p_tissue->GetNode(11);
+            Node<2>* p_node_3 = p_cell_population->GetNode(3);
+            Node<2>* p_node_11 = p_cell_population->GetNode(11);
 
             TS_ASSERT_EQUALS(p_node_3->GetIndex(), 3u);
             TS_ASSERT_EQUALS(p_node_11->GetIndex(), 11u);
@@ -1279,7 +1279,7 @@ public:
             TS_ASSERT_EQUALS(p_node_11->IsBoundaryNode(), false);
 
             // Tidy up
-            delete p_tissue;
+            delete p_cell_population;
         }
     }
 
@@ -1294,13 +1294,13 @@ public:
         mesh.ConstructRectangularMesh(3, 3, true); // 4*4 nodes
 
         // Create cells
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<5; i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(DIFFERENTIATED);
-            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            CellPtr p_cell(new Cell(p_state, p_model));
             p_cell->SetBirthTime(-1.0);
             cells.push_back(p_cell);
         }
@@ -1315,38 +1315,38 @@ public:
         real_node_indices.push_back(8);
         real_node_indices.push_back(12);
 
-        // Create a tissue
-        LatticeBasedTissue<2> tissue(mesh, cells, real_node_indices);
+        // Create a cell population
+        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Test we have the right numbers of nodes and cells
-        TS_ASSERT_EQUALS(tissue.GetNumNodes(), 16u);
-        TS_ASSERT_EQUALS(tissue.GetNumRealCells(), 5u);
+        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 16u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 5u);
 
         p_simulation_time->IncrementTimeOneStep();
 
-        unsigned num_removed = tissue.RemoveDeadCells();
+        unsigned num_removed = cell_population.RemoveDeadCells();
 
         // Test that one cell has been removed
         TS_ASSERT_EQUALS(num_removed, 1u);
-        TS_ASSERT_EQUALS(tissue.GetNumRealCells(), 4u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 4u);
 
         // Test that no nodes have been removed
-        TS_ASSERT_EQUALS(tissue.GetNumNodes(), 16u);
+        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 16u);
 
         // Test that each cell's node index has been correctly updated
         unsigned index = 0;
-        for (AbstractTissue<2>::Iterator cell_iter = tissue.Begin();
-             cell_iter != tissue.End();
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
              ++cell_iter)
         {
-            TS_ASSERT_EQUALS(tissue.GetLocationIndexUsingCell(*cell_iter), 4*index);
+            TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter), 4*index);
             index++;
         }
     }
 
-    void TestLatticeBasedTissueOutputWriters()
+    void TestLatticeBasedCellPopulationOutputWriters()
     {
-        std::string output_directory = "TestLatticeBasedTissueWriters";
+        std::string output_directory = "TestLatticeBasedCellPopulationWriters";
         OutputFileHandler output_file_handler(output_directory, false);
 
         // Create mesh
@@ -1356,63 +1356,63 @@ public:
         // Create cells
         boost::shared_ptr<AbstractCellProperty> p_wild_type_state(new WildTypeCellMutationState);
         std::vector<unsigned> real_node_indices;
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         for (unsigned i=0; i<5; i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(DIFFERENTIATED);
-            TissueCellPtr p_cell(new TissueCell(p_wild_type_state, p_model));
+            CellPtr p_cell(new Cell(p_wild_type_state, p_model));
             cells.push_back(p_cell);
             real_node_indices.push_back(i);
         }
 
-        // Create a tissue
-        LatticeBasedTissue<2> tissue(mesh, cells, real_node_indices);
+        // Create a cell population
+        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
-        TS_ASSERT_EQUALS(tissue.GetIdentifier(), "LatticeBasedTissue<2>");
+        TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "LatticeBasedCellPopulation<2>");
 
-        tissue.SetCellAncestorsToLocationIndices();
-        tissue.SetOutputCellIdData(true);
-        tissue.SetOutputCellMutationStates(true);
-        tissue.SetOutputCellProliferativeTypes(true);
-        tissue.SetOutputCellCyclePhases(true);
-        tissue.SetOutputCellAncestors(true);
-        tissue.SetOutputCellAges(true);
-        tissue.SetOutputCellVariables(true);
+        cell_population.SetCellAncestorsToLocationIndices();
+        cell_population.SetOutputCellIdData(true);
+        cell_population.SetOutputCellMutationStates(true);
+        cell_population.SetOutputCellProliferativeTypes(true);
+        cell_population.SetOutputCellCyclePhases(true);
+        cell_population.SetOutputCellAncestors(true);
+        cell_population.SetOutputCellAges(true);
+        cell_population.SetOutputCellVariables(true);
 
         // For coverage of WriteResultsToFiles()
-        boost::shared_ptr<AbstractCellProperty> p_state(tissue.GetCellPropertyRegistry()->Get<WildTypeCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_apc1(tissue.GetCellPropertyRegistry()->Get<ApcOneHitCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_apc2(tissue.GetCellPropertyRegistry()->Get<ApcTwoHitCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_bcat1(tissue.GetCellPropertyRegistry()->Get<BetaCateninOneHitCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_apoptotic_state(tissue.GetCellPropertyRegistry()->Get<ApoptoticCellProperty>());
-        boost::shared_ptr<AbstractCellProperty> p_label(tissue.GetCellPropertyRegistry()->Get<CellLabel>());
+        boost::shared_ptr<AbstractCellProperty> p_state(cell_population.GetCellPropertyRegistry()->Get<WildTypeCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_apc1(cell_population.GetCellPropertyRegistry()->Get<ApcOneHitCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_apc2(cell_population.GetCellPropertyRegistry()->Get<ApcTwoHitCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_bcat1(cell_population.GetCellPropertyRegistry()->Get<BetaCateninOneHitCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_apoptotic_state(cell_population.GetCellPropertyRegistry()->Get<ApoptoticCellProperty>());
+        boost::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
 
-        tissue.GetCellUsingLocationIndex(0)->GetCellCycleModel()->SetCellProliferativeType(TRANSIT);
-        tissue.GetCellUsingLocationIndex(0)->AddCellProperty(p_label);
-        tissue.GetCellUsingLocationIndex(1)->GetCellCycleModel()->SetCellProliferativeType(DIFFERENTIATED);
-        tissue.GetCellUsingLocationIndex(1)->SetMutationState(p_apc1);
-        tissue.GetCellUsingLocationIndex(2)->SetMutationState(p_apc2);
-        tissue.GetCellUsingLocationIndex(3)->SetMutationState(p_bcat1);
-        tissue.GetCellUsingLocationIndex(4)->AddCellProperty(p_apoptotic_state);
+        cell_population.GetCellUsingLocationIndex(0)->GetCellCycleModel()->SetCellProliferativeType(TRANSIT);
+        cell_population.GetCellUsingLocationIndex(0)->AddCellProperty(p_label);
+        cell_population.GetCellUsingLocationIndex(1)->GetCellCycleModel()->SetCellProliferativeType(DIFFERENTIATED);
+        cell_population.GetCellUsingLocationIndex(1)->SetMutationState(p_apc1);
+        cell_population.GetCellUsingLocationIndex(2)->SetMutationState(p_apc2);
+        cell_population.GetCellUsingLocationIndex(3)->SetMutationState(p_bcat1);
+        cell_population.GetCellUsingLocationIndex(4)->AddCellProperty(p_apoptotic_state);
 
-        TS_ASSERT_THROWS_NOTHING(tissue.CreateOutputFiles(output_directory, false));
+        TS_ASSERT_THROWS_NOTHING(cell_population.CreateOutputFiles(output_directory, false));
 
-        tissue.WriteResultsToFiles();
+        cell_population.WriteResultsToFiles();
 
-        TS_ASSERT_THROWS_NOTHING(tissue.CloseOutputFiles());
+        TS_ASSERT_THROWS_NOTHING(cell_population.CloseOutputFiles());
 
         // Compare output with saved files of what they should look like
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.viznodes     notforrelease_cell_based/test/data/TestLatticeBasedTissueWriters/results.viznodes").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizcelltypes     notforrelease_cell_based/test/data/TestLatticeBasedTissueWriters/results.vizcelltypes").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizancestors     notforrelease_cell_based/test/data/TestLatticeBasedTissueWriters/results.vizancestors").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellmutationstates.dat     notforrelease_cell_based/test/data/TestLatticeBasedTissueWriters/cellmutationstates.dat").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellages.dat     notforrelease_cell_based/test/data/TestLatticeBasedTissueWriters/cellages.dat").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.viznodes     notforrelease_cell_based/test/data/TestLatticeBasedCellPopulationWriters/results.viznodes").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizcelltypes     notforrelease_cell_based/test/data/TestLatticeBasedCellPopulationWriters/results.vizcelltypes").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizancestors     notforrelease_cell_based/test/data/TestLatticeBasedCellPopulationWriters/results.vizancestors").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellmutationstates.dat     notforrelease_cell_based/test/data/TestLatticeBasedCellPopulationWriters/cellmutationstates.dat").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellages.dat     notforrelease_cell_based/test/data/TestLatticeBasedCellPopulationWriters/cellages.dat").c_str()), 0);
 
         // Test the GetCellMutationStateCount function
-        std::vector<unsigned> cell_mutation_states = tissue.GetCellMutationStateCount();
+        std::vector<unsigned> cell_mutation_states = cell_population.GetCellMutationStateCount();
         TS_ASSERT_EQUALS(cell_mutation_states.size(), 4u);
         TS_ASSERT_EQUALS(cell_mutation_states[0], 0u);
         for (unsigned i=1; i<4; i++)
@@ -1421,24 +1421,24 @@ public:
         }
 
         // Test the GetCellProliferativeTypeCount function
-        std::vector<unsigned> cell_types = tissue.rGetCellProliferativeTypeCount();
+        std::vector<unsigned> cell_types = cell_population.rGetCellProliferativeTypeCount();
         TS_ASSERT_EQUALS(cell_types.size(), 3u);
         TS_ASSERT_EQUALS(cell_types[0], 0u);
         TS_ASSERT_EQUALS(cell_types[1], 1u);
         TS_ASSERT_EQUALS(cell_types[2], 4u);
 
         // For coverage
-        TS_ASSERT_THROWS_NOTHING(tissue.WriteResultsToFiles());
+        TS_ASSERT_THROWS_NOTHING(cell_population.WriteResultsToFiles());
 
-        //Test that the tissue parameters are output correctly
+        //Test that the cell population parameters are output correctly
 		out_stream parameter_file = output_file_handler.OpenOutputFile("results.parameters");
-		// Write tissue parameters to file
-		TS_ASSERT_THROWS_THIS(tissue.OutputTissueParameters(parameter_file),"OutputTissueParameters() is not yet implemented for LatticeBasedTissue see #1453");
+		// Write cell population parameters to file
+		TS_ASSERT_THROWS_THIS(cell_population.OutputCellPopulationParameters(parameter_file),"OutputCellPopulationParameters() is not yet implemented for LatticeBasedCellPopulation see #1453");
 		parameter_file->close();
 
     }
 
-    void TestValidateLatticeBasedTissue()
+    void TestValidateLatticeBasedCellPopulation()
     {
         // Create mesh
         TetrahedralMesh<2,2> mesh;
@@ -1447,31 +1447,31 @@ public:
         // Create cells
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         std::vector<unsigned> real_node_indices;
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         for (unsigned i=0; i<5; i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(DIFFERENTIATED);
-            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            CellPtr p_cell(new Cell(p_state, p_model));
 
             cells.push_back(p_cell);
             real_node_indices.push_back(i);
         }
 
-        // Create a tissue
-        LatticeBasedTissue<2> tissue(mesh, cells, real_node_indices);
+        // Create a cell population
+        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Set node 2 to be an empty site, to test Validate()
-        tissue.mIsEmptySite[2] = true;
+        cell_population.mIsEmptySite[2] = true;
 
-        TS_ASSERT_THROWS_THIS(tissue.Validate(), "Node 2 is labelled as an empty site and has a cell attached");
+        TS_ASSERT_THROWS_THIS(cell_population.Validate(), "Node 2 is labelled as an empty site and has a cell attached");
 
-        tissue.mIsEmptySite[2] = false;
+        cell_population.mIsEmptySite[2] = false;
 
         // Set node 7 to not be an empty site, to test Validate()
-        tissue.mIsEmptySite[7] = false;
+        cell_population.mIsEmptySite[7] = false;
 
-        TS_ASSERT_THROWS_THIS(tissue.Validate(), "Node 7 does not appear to be an empty site or have a cell associated with it");
+        TS_ASSERT_THROWS_THIS(cell_population.Validate(), "Node 7 does not appear to be an empty site or have a cell associated with it");
     }
 
     void TestOtherMethods() throw(Exception)
@@ -1484,13 +1484,13 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         FixedDurationGenerationBasedCellCycleModel* p_model_1 = new FixedDurationGenerationBasedCellCycleModel();
         p_model_1->SetCellProliferativeType(DIFFERENTIATED);
-        TissueCellPtr p_cell_1(new TissueCell(p_state, p_model_1));
+        CellPtr p_cell_1(new Cell(p_state, p_model_1));
 
         FixedDurationGenerationBasedCellCycleModel* p_model_2 = new FixedDurationGenerationBasedCellCycleModel();
         p_model_2->SetCellProliferativeType(DIFFERENTIATED);
-        TissueCellPtr p_cell_2(new TissueCell(p_state, p_model_2));
+        CellPtr p_cell_2(new Cell(p_state, p_model_2));
 
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         cells.push_back(p_cell_1);
         cells.push_back(p_cell_2);
 
@@ -1498,23 +1498,23 @@ public:
         real_node_indices.push_back(4);
         real_node_indices.push_back(1);
 
-        // Create a tissue
-        LatticeBasedTissue<2> tissue(mesh, cells, real_node_indices);
+        // Create a cell population
+        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Test UpdateNodeLocations
         std::vector< c_vector<double, 2> > unused_vector;
-        TS_ASSERT_THROWS_THIS(tissue.UpdateNodeLocations(unused_vector, 1.0), "UpdateNodeLocations() cannot be called on a LatticeBasedTissue");
+        TS_ASSERT_THROWS_THIS(cell_population.UpdateNodeLocations(unused_vector, 1.0), "UpdateNodeLocations() cannot be called on a LatticeBasedCellPopulation");
 
         // Test AddNode()
         Node<2> unused_node(10);
-        TS_ASSERT_THROWS_THIS(tissue.AddNode(&unused_node), "AddNode() cannot be called on a LatticeBasedTissue");
+        TS_ASSERT_THROWS_THIS(cell_population.AddNode(&unused_node), "AddNode() cannot be called on a LatticeBasedCellPopulation");
 
         // Test SetNode()
         ChastePoint<2> unused_point;
-        TS_ASSERT_THROWS_THIS(tissue.SetNode(0, unused_point), "SetNode() cannot be called on a LatticeBasedTissue");
+        TS_ASSERT_THROWS_THIS(cell_population.SetNode(0, unused_point), "SetNode() cannot be called on a LatticeBasedCellPopulation");
 
         // Test GetDampingConstant()
-        TS_ASSERT_THROWS_THIS(tissue.GetDampingConstant(0), "GetDampingConstant() cannot be called on a LatticeBasedTissue");
+        TS_ASSERT_THROWS_THIS(cell_population.GetDampingConstant(0), "GetDampingConstant() cannot be called on a LatticeBasedCellPopulation");
     }
 
 
@@ -1525,14 +1525,14 @@ public:
         mesh.ConstructRectangularMesh(2, 2, true); // 3*3 nodes
 
         // Create one cell, initially corresponding to the bottom left node
-        std::vector<TissueCellPtr> cells = CreateSingleTissueCellPtr();
+        std::vector<CellPtr> cells = CreateSingleCellPtr();
         std::vector<unsigned> cell_indices = CreateSingleLocationIndex(0);
 
-        // Create a tissue
-        LatticeBasedTissue<2> lattice_based_tissue(mesh, cells, cell_indices);
+        // Create a cell population
+        LatticeBasedCellPopulation<2> lattice_based_cell_population(mesh, cells, cell_indices);
 
         // Set the neighbourhoods to be of von Neumann type
-        lattice_based_tissue.SetVonNeumannNeighbourhoods(true);
+        lattice_based_cell_population.SetVonNeumannNeighbourhoods(true);
 
         /*
          * Numbering the nodes as follows:
@@ -1545,7 +1545,7 @@ public:
          */
 
         // Test bottom left node
-        std::set<unsigned> free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(0);
+        std::set<unsigned> free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(0);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 2u);
 
         std::set<unsigned> expected_free_neighbouring_sites;
@@ -1554,8 +1554,8 @@ public:
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
 
         // Test non-corner bottom node
-        lattice_based_tissue.MoveCell(*(lattice_based_tissue.Begin()), 1);
-        free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(1);
+        lattice_based_cell_population.MoveCell(*(lattice_based_cell_population.Begin()), 1);
+        free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(1);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 3u);
 
         expected_free_neighbouring_sites.clear();
@@ -1565,8 +1565,8 @@ public:
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
 
         // Test bottom right node
-        lattice_based_tissue.MoveCell(*(lattice_based_tissue.Begin()), 2);
-        free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(2);
+        lattice_based_cell_population.MoveCell(*(lattice_based_cell_population.Begin()), 2);
+        free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(2);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 2u);
 
         expected_free_neighbouring_sites.clear();
@@ -1575,8 +1575,8 @@ public:
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
 
         // Test non-corner left nodes
-        lattice_based_tissue.MoveCell(*(lattice_based_tissue.Begin()), 3);
-        free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(3);
+        lattice_based_cell_population.MoveCell(*(lattice_based_cell_population.Begin()), 3);
+        free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(3);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 3u);
 
         expected_free_neighbouring_sites.clear();
@@ -1586,8 +1586,8 @@ public:
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
 
         // Test centre node
-        lattice_based_tissue.MoveCell(*(lattice_based_tissue.Begin()), 4);
-        free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(4);
+        lattice_based_cell_population.MoveCell(*(lattice_based_cell_population.Begin()), 4);
+        free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(4);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 4u);
 
         expected_free_neighbouring_sites.clear();
@@ -1598,8 +1598,8 @@ public:
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
 
         // Test non-corner right nodes
-        lattice_based_tissue.MoveCell(*(lattice_based_tissue.Begin()), 5);
-        free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(5);
+        lattice_based_cell_population.MoveCell(*(lattice_based_cell_population.Begin()), 5);
+        free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(5);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 3u);
 
         expected_free_neighbouring_sites.clear();
@@ -1609,8 +1609,8 @@ public:
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
 
         // Test top left node
-        lattice_based_tissue.MoveCell(*(lattice_based_tissue.Begin()), 6);
-        free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(6);
+        lattice_based_cell_population.MoveCell(*(lattice_based_cell_population.Begin()), 6);
+        free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(6);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 2u);
 
         expected_free_neighbouring_sites.clear();
@@ -1619,8 +1619,8 @@ public:
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
 
         // Test non-corner top nodes
-        lattice_based_tissue.MoveCell(*(lattice_based_tissue.Begin()), 7);
-        free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(7);
+        lattice_based_cell_population.MoveCell(*(lattice_based_cell_population.Begin()), 7);
+        free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(7);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 3u);
 
         expected_free_neighbouring_sites.clear();
@@ -1630,8 +1630,8 @@ public:
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
 
         // Test top right node
-        lattice_based_tissue.MoveCell(*(lattice_based_tissue.Begin()), 8);
-        free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(8);
+        lattice_based_cell_population.MoveCell(*(lattice_based_cell_population.Begin()), 8);
+        free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(8);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 2u);
 
         expected_free_neighbouring_sites.clear();
@@ -1639,17 +1639,17 @@ public:
         expected_free_neighbouring_sites.insert(7);
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
 
-        // Now check the case where there is more than one cell in the tissue
+        // Now check the case where there is more than one cell in the cell population
 
         TetrahedralMesh<2,2> mesh2;
         mesh2.ConstructRectangularMesh(2, 2, true); // 3*3 nodes
-        std::vector<TissueCellPtr> cells2;
+        std::vector<CellPtr> cells2;
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<3; i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(DIFFERENTIATED);
-            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            CellPtr p_cell(new Cell(p_state, p_model));
             cells2.push_back(p_cell);
         }
 
@@ -1658,13 +1658,13 @@ public:
         location_indices.push_back(4);
         location_indices.push_back(5);
 
-        // Create a tissue
-        LatticeBasedTissue<2> lattice_based_tissue2(mesh2, cells2, location_indices);
+        // Create a cell population
+        LatticeBasedCellPopulation<2> lattice_based_cell_population2(mesh2, cells2, location_indices);
 
         // Set the neighbourhoods to be of von Neumann type
-        lattice_based_tissue2.SetVonNeumannNeighbourhoods(true);
+        lattice_based_cell_population2.SetVonNeumannNeighbourhoods(true);
 
-        free_neighbouring_sites = lattice_based_tissue2.GetFreeNeighbouringNodeIndices(1);
+        free_neighbouring_sites = lattice_based_cell_population2.GetFreeNeighbouringNodeIndices(1);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 2u);
 
         expected_free_neighbouring_sites.clear();
@@ -1691,17 +1691,17 @@ public:
          */
 
         // Create one cell, initially corresponding to the central node
-        std::vector<TissueCellPtr> cells = CreateSingleTissueCellPtr();
+        std::vector<CellPtr> cells = CreateSingleCellPtr();
         std::vector<unsigned> location_indices = CreateSingleLocationIndex(13);
 
-        // Create a tissue
-        LatticeBasedTissue<3> lattice_based_tissue(mesh, cells, location_indices);
+        // Create a cell population
+        LatticeBasedCellPopulation<3> lattice_based_cell_population(mesh, cells, location_indices);
 
         // Set von Neumann neighbourhoods
-        lattice_based_tissue.SetVonNeumannNeighbourhoods(true);
+        lattice_based_cell_population.SetVonNeumannNeighbourhoods(true);
 
         // Test central node
-        std::set<unsigned> free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(13);
+        std::set<unsigned> free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(13);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 6u);
 
         std::set<unsigned> expected_free_neighbouring_sites;
@@ -1714,8 +1714,8 @@ public:
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
 
         // Test bottom left corner node (node 0)
-        lattice_based_tissue.MoveCell(*(lattice_based_tissue.Begin()), 0);
-        free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(0);
+        lattice_based_cell_population.MoveCell(*(lattice_based_cell_population.Begin()), 0);
+        free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(0);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 3u);
 
         expected_free_neighbouring_sites.clear();
@@ -1744,16 +1744,16 @@ public:
          */
 
         // Create one cell, initially corresponding to the corner node
-        std::vector<TissueCellPtr> cells = CreateSingleTissueCellPtr();
+        std::vector<CellPtr> cells = CreateSingleCellPtr();
         std::vector<unsigned> location_indices = CreateSingleLocationIndex(0);
 
-        // Create a tissue
-        LatticeBasedTissue<2> lattice_based_tissue(mesh, cells, location_indices);
+        // Create a cell population
+        LatticeBasedCellPopulation<2> lattice_based_cell_population(mesh, cells, location_indices);
 
         // Set von Neumann neighbourhoods
-        lattice_based_tissue.SetVonNeumannNeighbourhoods(true);
+        lattice_based_cell_population.SetVonNeumannNeighbourhoods(true);
 
-        std::set<unsigned> free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(0);
+        std::set<unsigned> free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(0);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 2u);
 
         std::set<unsigned> expected_free_neighbouring_sites;
@@ -1763,8 +1763,8 @@ public:
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
 
         // Test east side node (node 5)
-        lattice_based_tissue.MoveCell(*(lattice_based_tissue.Begin()), 5);
-        free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(5);
+        lattice_based_cell_population.MoveCell(*(lattice_based_cell_population.Begin()), 5);
+        free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(5);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 3u);
 
         expected_free_neighbouring_sites.clear();
@@ -1774,8 +1774,8 @@ public:
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
 
         // Test non-boundary node (node 7)
-        lattice_based_tissue.MoveCell(*(lattice_based_tissue.Begin()), 7);
-        free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(7);
+        lattice_based_cell_population.MoveCell(*(lattice_based_cell_population.Begin()), 7);
+        free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(7);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 4u);
 
         expected_free_neighbouring_sites.clear();
@@ -1786,8 +1786,8 @@ public:
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
 
         // Test north boundary node (node 10)
-        lattice_based_tissue.MoveCell(*(lattice_based_tissue.Begin()), 10);
-        free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(10);
+        lattice_based_cell_population.MoveCell(*(lattice_based_cell_population.Begin()), 10);
+        free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(10);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 3u);
 
         expected_free_neighbouring_sites.clear();
@@ -1826,17 +1826,17 @@ public:
          */
 
         // Create one cell, initially corresponding to the corner node
-        std::vector<TissueCellPtr> cells = CreateSingleTissueCellPtr();
+        std::vector<CellPtr> cells = CreateSingleCellPtr();
         std::vector<unsigned> location_indices = CreateSingleLocationIndex(0);
 
-        // Create a tissue
-        LatticeBasedTissue<3> lattice_based_tissue(mesh, cells, location_indices);
+        // Create a cell population
+        LatticeBasedCellPopulation<3> lattice_based_cell_population(mesh, cells, location_indices);
 
         // Set von Neumann neighbourhoods
-        lattice_based_tissue.SetVonNeumannNeighbourhoods(true);
+        lattice_based_cell_population.SetVonNeumannNeighbourhoods(true);
 
         // Test bottom left corner node (node 0)
-        std::set<unsigned> free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(0);
+        std::set<unsigned> free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(0);
 
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 3u);
 
@@ -1847,8 +1847,8 @@ public:
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
 
         // Test west side node (node 30)
-        lattice_based_tissue.MoveCell(*(lattice_based_tissue.Begin()), 30);
-        free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(30);
+        lattice_based_cell_population.MoveCell(*(lattice_based_cell_population.Begin()), 30);
+        free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(30);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 5u);
 
         expected_free_neighbouring_sites.clear();
@@ -1860,8 +1860,8 @@ public:
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
 
         // Test east side node (node 44)
-        lattice_based_tissue.MoveCell(*(lattice_based_tissue.Begin()), 44);
-        free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(44);
+        lattice_based_cell_population.MoveCell(*(lattice_based_cell_population.Begin()), 44);
+        free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(44);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 5u);
 
         expected_free_neighbouring_sites.clear();
@@ -1873,8 +1873,8 @@ public:
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
 
         // Test top layer node (node 52)
-        lattice_based_tissue.MoveCell(*(lattice_based_tissue.Begin()), 52);
-        free_neighbouring_sites = lattice_based_tissue.GetFreeNeighbouringNodeIndices(52);
+        lattice_based_cell_population.MoveCell(*(lattice_based_cell_population.Begin()), 52);
+        free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(52);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 5u);
 
         expected_free_neighbouring_sites.clear();
@@ -1888,4 +1888,4 @@ public:
 
 };
 
-#endif /*TESTLATTICEBASEDTISSUE_HPP_*/
+#endif /*TESTLATTICEBASEDCELLPOPULATION_HPP_*/

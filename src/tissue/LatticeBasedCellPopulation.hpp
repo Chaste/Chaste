@@ -25,8 +25,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
-#ifndef LATTICEBASEDTISSUE_HPP_
-#define LATTICEBASEDTISSUE_HPP_
+#ifndef LATTICEBASEDCELLPOPULATION_HPP_
+#define LATTICEBASEDCELLPOPULATION_HPP_
 
 #include <vector>
 #include <set>
@@ -41,27 +41,27 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 // Needed here to avoid serialization errors (on Boost<1.37)
 #include "WildTypeCellMutationState.hpp"
 
-#include "AbstractTissue.hpp"
+#include "AbstractCellPopulation.hpp"
 #include "TetrahedralMesh.hpp"
-#include "TissueCell.hpp"
+#include "Cell.hpp"
 #include "Node.hpp"
 #include "ChastePoint.hpp"
 
 /**
- * A facade class encapsulating a lattice-based 'tissue'
+ * A facade class encapsulating a lattice-based cell population.
  *
  * Contains a group of cells and maintains the associations between cells and
  * nodes in the mesh which correspond to lattice sites.
  *
  */
 template<unsigned DIM>
-class LatticeBasedTissue : public AbstractTissue<DIM>
+class LatticeBasedCellPopulation : public AbstractCellPopulation<DIM>
 {
-    friend class TestLatticeBasedTissue;
+    friend class TestLatticeBasedCellPopulation;
 
 private:
 
-    /** Reference to the mesh associated with the tissue. */
+    /** Reference to the mesh associated with the cell population. */
     TetrahedralMesh<DIM, DIM>& mrMesh;
 
     /** Records whether a node is an empty site or not. */
@@ -75,7 +75,7 @@ private:
 
     /**
      * Whether to delete the mesh when we are destroyed.
-     * Needed if this tissue has been de-serialized.
+     * Needed if this cell population has been de-serialized.
      */
     bool mDeleteMesh;
 
@@ -107,7 +107,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractTissue<DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractCellPopulation<DIM> >(*this);
         archive & mIsEmptySite;
         archive & mOnlyUseNearestNeighboursForDivision;
         archive & mUseVonNeumannNeighbourhoods;
@@ -122,22 +122,22 @@ private:
 public:
 
     /**
-     * Create a new tissue facade from a mesh and collection of cells.
+     * Create a new cell population facade from a mesh and collection of cells.
      *
      * There must be precisely 1 cell for each node of the mesh.
      *
      * @param rMesh a mutable tetrahedral mesh
-     * @param rCells TissueCellPtrs corresponding to the nodes of the mesh
+     * @param rCells CellPtrs corresponding to the nodes of the mesh
      * @param locationIndices an optional vector of location indices that correspond to real cells
      * @param onlyUseNearestNeighboursForDivision whether to only search the immediate neighbours
      *            for division (defaults to false)
      * @param useVonNeumannNeighbourhoods whether to use von Neumann neighbourhoods (defaults to false)
-     * @param deleteMesh set to true if you want the tissue to free the mesh memory on destruction
+     * @param deleteMesh set to true if you want the cell population to free the mesh memory on destruction
      *            (defaults to false)
-     * @param validate whether to validate the tissue (defaults to false)
+     * @param validate whether to validate the cell population (defaults to false)
      */
-    LatticeBasedTissue(TetrahedralMesh<DIM, DIM>& rMesh,
-                       std::vector<TissueCellPtr>& rCells,
+    LatticeBasedCellPopulation(TetrahedralMesh<DIM, DIM>& rMesh,
+                       std::vector<CellPtr>& rCells,
                        const std::vector<unsigned> locationIndices=std::vector<unsigned>(),
                        bool onlyUseNearestNeighboursForDivision=false,
                        bool useVonNeumannNeighbourhoods=false,
@@ -149,12 +149,12 @@ public:
      *
      * @param rMesh a tetrahedral mesh.
      */
-    LatticeBasedTissue(TetrahedralMesh<DIM, DIM>& rMesh);
+    LatticeBasedCellPopulation(TetrahedralMesh<DIM, DIM>& rMesh);
 
     /**
      * Destructor.
      */
-    ~LatticeBasedTissue();
+    ~LatticeBasedCellPopulation();
 
     /**
      * @return reference to  mrMesh.
@@ -198,7 +198,7 @@ public:
     /**
      * Overridden GetNumNodes() method.
      *
-     * @return the number of nodes in the tissue.
+     * @return the number of nodes in the cell population.
      */
     unsigned GetNumNodes();
 
@@ -214,11 +214,11 @@ public:
     /**
      * Overridden AddCell() method.
      *
-     * Add a new cell to the tissue and update mIsEmptySite.
+     * Add a new cell to the cell population and update mIsEmptySite.
      *
      * This method finds the nearest empty site to move to in the admissable directions (see diagram below).
      *
-     * The bool mOnlyUseNearestNeighboursForDivision is defined in the tissue constructor and
+     * The bool mOnlyUseNearestNeighboursForDivision is defined in the cell population constructor and
      * says whether to only search the immediate nearest neighbours when dividing.
      *
      * If there is more than one empty site at the same distance (i.e. degree) from the parent cell,
@@ -248,11 +248,11 @@ public:
      *
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
      */
-    virtual TissueCellPtr AddCell(TissueCellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, TissueCellPtr pParentCell=TissueCellPtr());
+    virtual CellPtr AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell=CellPtr());
 
     /**
      * Locate the sites neighbouring a site (this version is a Moore neighbourhood).
-     * Note: This dictates the geometry of the tissue and the type of neighbourhood
+     * Note: This dictates the geometry of the cell population and the type of neighbourhood
      * used and can be overridden to use different neighbourhoods or geometries.
      *
      * @param nodeIndex global index of the node of interest
@@ -275,7 +275,7 @@ public:
      * Locate the sites neighbouring a site (this version is a Moore neighbourhood)
      * which are free (i.e. are empty sites).
      *
-     * Note: This dictates the geometry of the tissue and the type of neighbourhood
+     * Note: This dictates the geometry of the cell population and the type of neighbourhood
      * used and can be overridden to use different neighbourhoods or geometries.
      *
      * @param nodeIndex global index of the node of interest
@@ -298,9 +298,9 @@ public:
     std::vector<unsigned> GetMaximumDegreeInEachDirection(unsigned nodeIndex);
 
     /**
-     * Locate the sites in n-th degree neighbouring sites (yhis version is a Moore
-     * neighbourhood). Note: This dictates the geometry of the tissue and the type
-     * of neighbourhood used and can be overridden to use different neighbourhoods
+     * Locate the sites in n-th degree neighbouring sites (this version is a Moore
+     * neighbourhood). Note: This dictates the geometry of the cell population and the type
+     * of neighbourhood used and can be overridden to use cell population neighbourhoods
      * or geometries.
      *
      * @param nodeIndex global index of the node of interest
@@ -317,7 +317,7 @@ public:
      * and therefore a ReMesh(map) must be called before any element
      * information is used.
      *
-     * Note also that after calling this method the tissue will be in an inconsistent state until
+     * Note also that after calling this method the cell population will be in an inconsistent state until
      * Update() is called! So don't try iterating over cells or anything like that.
      *
      * @return number of cells removed.
@@ -353,7 +353,7 @@ public:
 
     /**
      * Overridden GenerateCellResults() method.
-     * Generate results for a given cell in the current tissue state to output files.
+     * Generate results for a given cell in the current cell population state to output files.
      *
      * @param locationIndex location index of the cell
      * @param rCellProliferativeTypeCounter cell type counter
@@ -381,7 +381,7 @@ public:
      * @return whether a given cell is associated with a deleted
      *         node (cell-centre models) or element (vertex models).
      */
-    bool IsCellAssociatedWithADeletedLocation(TissueCellPtr pCell);
+    bool IsCellAssociatedWithADeletedLocation(CellPtr pCell);
 
     /**
      * Method to update the location of a particular cell
@@ -389,14 +389,14 @@ public:
      * @param pCell the cell to move
      * @param newLocationIndex the location to move the cell to
      */
-    void MoveCell(TissueCellPtr pCell, unsigned newLocationIndex);
+    void MoveCell(CellPtr pCell, unsigned newLocationIndex);
 
-///////////////////// Extra Methods not needed from Abstract Tissue ///////////////////
+///////////////////// Extra Methods not needed from Abstract CellPopulation ///////////////////
 
     /**
      * Overwritten UpdateNodeLocations method
      *
-     * Update the location of each node in the tissue given
+     * Update the location of each node in the cell population given
      * a vector of forces on nodes and a time step over which
      * to integrate the equations of motion.
      *
@@ -415,17 +415,17 @@ public:
      *
      * @return the location of the cell
      */
-    c_vector<double, DIM> GetLocationOfCellCentre(TissueCellPtr pCell);
+    c_vector<double, DIM> GetLocationOfCellCentre(CellPtr pCell);
 
     /**
-     * Add a new node to the tissue.
+     * Add a new node to the cell population.
      *
      * As this method is pure virtual, it must be overridden
      * in subclasses.
      *
      * @param pNewNode pointer to the new node
      *
-     * @return global index of new node in tissue.
+     * @return global index of new node in cell population.
      */
     unsigned AddNode(Node<DIM>* pNewNode);
 
@@ -453,14 +453,14 @@ public:
     double GetDampingConstant(unsigned nodeIndex);
 
     /**
-     * Outputs Tissue Parameters to file
+     * Outputs CellPopulation Parameters to file
      *
      * As this method is pure virtual, it must be overridden
      * in subclasses.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputTissueParameters(out_stream& rParamsFile);
+    void OutputCellPopulationParameters(out_stream& rParamsFile);
 
 
 };
@@ -468,18 +468,18 @@ public:
 
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(LatticeBasedTissue)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(LatticeBasedCellPopulation)
 
 namespace boost
 {
 namespace serialization
 {
 /**
- * Serialize information required to construct a LatticeBasedTissue.
+ * Serialize information required to construct a LatticeBasedCellPopulation.
  */
 template<class Archive, unsigned DIM>
 inline void save_construct_data(
-    Archive & ar, const LatticeBasedTissue<DIM> * t, const BOOST_PFTO unsigned int file_version)
+    Archive & ar, const LatticeBasedCellPopulation<DIM> * t, const BOOST_PFTO unsigned int file_version)
 {
     // Save data required to construct instance
     const TetrahedralMesh<DIM,DIM>* p_mesh = &(t->rGetMesh());
@@ -487,21 +487,21 @@ inline void save_construct_data(
 }
 
 /**
- * De-serialize constructor parameters and initialise a Tissue.
+ * De-serialize constructor parameters and initialise a CellPopulation.
  * Loads the mesh from separate files.
  */
 template<class Archive, unsigned DIM>
 inline void load_construct_data(
-    Archive & ar, LatticeBasedTissue<DIM> * t, const unsigned int file_version)
+    Archive & ar, LatticeBasedCellPopulation<DIM> * t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
     TetrahedralMesh<DIM,DIM>* p_mesh;
     ar >> p_mesh;
 
     // Invoke inplace constructor to initialise instance
-    ::new(t)LatticeBasedTissue<DIM>(*p_mesh);
+    ::new(t)LatticeBasedCellPopulation<DIM>(*p_mesh);
 }
 }
 } // namespace ...
 
-#endif /*LATTICEBASEDTISSUE_HPP_*/
+#endif /*LATTICEBASEDCELLPOPULATION_HPP_*/

@@ -48,16 +48,16 @@ public:
 
     void TestPrivateMethods() throw (Exception)
     {
-        // Set up a tissue
+        // Set up a cell population
         HoneycombMeshGenerator mesh_generator(7, 5, 0, false, 2.0);
         MutableMesh<2,2>* p_mesh = mesh_generator.GetMesh();
         std::vector<unsigned> location_indices = mesh_generator.GetCellLocationIndices();
 
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel,2> cells_generator;
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         cells_generator.GenerateGivenLocationIndices(cells, location_indices);
 
-        MeshBasedTissueWithGhostNodes<2> tissue(*p_mesh, cells, location_indices);
+        MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
 
         // Create the force law and pass in to a std::list
         GeneralisedLinearSpringForce<2> force;
@@ -65,7 +65,7 @@ public:
         force_collection.push_back(&force);
 
         // Create a force calculator
-        DiscreteSystemForceCalculator calculator(tissue, force_collection);
+        DiscreteSystemForceCalculator calculator(cell_population, force_collection);
 
         unsigned node_index = 8;
 
@@ -138,15 +138,15 @@ public:
 
     void TestCalculateExtremalNormalForces() throw (Exception)
     {
-        // Set up a tissue
+        // Set up a cell population
         HoneycombMeshGenerator mesh_generator(7, 5, 0, false, 2.0);
         MutableMesh<2,2>* p_mesh = mesh_generator.GetMesh();
 
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
-        MeshBasedTissue<2> tissue(*p_mesh, cells);
+        MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Create the force law and pass in to a std::list
         GeneralisedLinearSpringForce<2> force;
@@ -154,7 +154,7 @@ public:
         force_collection.push_back(&force);
 
         // Create a force calculator
-        DiscreteSystemForceCalculator calculator(tissue, force_collection);
+        DiscreteSystemForceCalculator calculator(cell_population, force_collection);
 
         // Test CalculateExtremalNormalForces
         std::vector< std::vector<double> > calculated_results = calculator.CalculateExtremalNormalForces();
@@ -206,16 +206,16 @@ public:
     {
         std::string output_directory = "TestDiscreteSystemForceCalculator";
 
-        // Set up a tissue
+        // Set up a cell population
 
         HoneycombMeshGenerator mesh_generator(7, 5, 0, false, 2.0);
         MutableMesh<2,2>* p_mesh = mesh_generator.GetMesh();
 
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
-        MeshBasedTissue<2> tissue(*p_mesh, cells);
+        MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Create the force law and pass in to a std::list
         GeneralisedLinearSpringForce<2> force;
@@ -223,7 +223,7 @@ public:
         force_collection.push_back(&force);
 
         // Create a force calculator
-        DiscreteSystemForceCalculator calculator(tissue, force_collection);
+        DiscreteSystemForceCalculator calculator(cell_population, force_collection);
 
         // Test WriteResultsToFile
         calculator.WriteResultsToFile(output_directory);
@@ -239,12 +239,12 @@ public:
         // (These lines are not actually necessary for generating results.vizstress)
 
         // This doesn't look very neat, but we need to pass in a std::vector of
-        // AbstractForces to TissueSimulation, compared with a std::vector of
+        // AbstractForces to CellBasedSimulation, compared with a std::vector of
         // AbstractTwoBodyInteractionForces to DiscreteSystemForceCalculator
         std::vector<AbstractForce<2>*> abstract_force_collection;
         abstract_force_collection.push_back(&force);
 
-        TissueSimulation<2> simulator(tissue, abstract_force_collection);
+        CellBasedSimulation<2> simulator(cell_population, abstract_force_collection);
         simulator.SetEndTime(0.05);
         simulator.SetOutputDirectory(output_directory);
         simulator.Solve();

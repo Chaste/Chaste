@@ -33,7 +33,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
-#include "MeshBasedTissue.hpp"
+#include "MeshBasedCellPopulation.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "RadialSloughingCellKiller.hpp"
@@ -72,23 +72,23 @@ public:
         double radius = 0.4;
 
         // Create cells
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
-        // Create tissue
-        MeshBasedTissue<2> tissue(mesh, cells);
+        // Create cell population
+        MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
         // Create cell killer and kill cells
-        RadialSloughingCellKiller radial_cell_killer(&tissue, centre, radius);
+        RadialSloughingCellKiller radial_cell_killer(&cell_population, centre, radius);
         radial_cell_killer.TestAndLabelCellsForApoptosisOrDeath();
 
         // Check that cells were labelled for death correctly
-        for (AbstractTissue<2>::Iterator cell_iter = tissue.Begin();
-             cell_iter != tissue.End();
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
              ++cell_iter)
         {
-            double r = norm_2(tissue.GetLocationOfCellCentre(*cell_iter) - centre);
+            double r = norm_2(cell_population.GetLocationOfCellCentre(*cell_iter) - centre);
 
             if (r > radius)
             {
@@ -101,14 +101,14 @@ public:
         }
 
         // Now get rid of dead cells
-        tissue.RemoveDeadCells();
+        cell_population.RemoveDeadCells();
 
         // Check that we are correctly left with cells inside the circle of death
-        for (AbstractTissue<2>::Iterator cell_iter = tissue.Begin();
-             cell_iter != tissue.End();
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
              ++cell_iter)
         {
-            double r = norm_2(tissue.GetLocationOfCellCentre(*cell_iter) - centre);
+            double r = norm_2(cell_population.GetLocationOfCellCentre(*cell_iter) - centre);
             TS_ASSERT_LESS_THAN_EQUALS(r, radius);
         }
     }

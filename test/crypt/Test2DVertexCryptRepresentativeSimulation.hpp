@@ -31,7 +31,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <cxxtest/TestSuite.h>
 
 // Must be included before any other cell_based headers
-#include "TissueSimulationArchiver.hpp"
+#include "CellBasedSimulationArchiver.hpp"
 
 #include "VertexCryptSimulation2d.hpp"
 #include "CylindricalHoneycombVertexMeshGenerator.hpp"
@@ -65,43 +65,43 @@ public:
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
             double birth_time = - RandomNumberGenerator::Instance()->ranf()*
-                                 ( TissueConfig::Instance()->GetTransitCellG1Duration()
-                                    + TissueConfig::Instance()->GetSG2MDuration() );
+                                 ( CellBasedConfig::Instance()->GetTransitCellG1Duration()
+                                    + CellBasedConfig::Instance()->GetSG2MDuration() );
 
             SimpleWntCellCycleModel* p_model = new SimpleWntCellCycleModel;
             p_model->SetDimension(2);
             p_model->SetCellProliferativeType(TRANSIT);
 
-            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            CellPtr p_cell(new Cell(p_state, p_model));
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
         }
 
-        // Create tissue
-        VertexBasedTissue<2> crypt(*p_mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
 
         // Set up Wnt gradient
         WntConcentration<2>::Instance()->SetType(LINEAR);
-        WntConcentration<2>::Instance()->SetTissue(crypt);
+        WntConcentration<2>::Instance()->SetCellPopulation(crypt);
 
         // Create force law
         NagaiHondaForce<2> force_law;
         std::vector<AbstractForce<2>*> force_collection;
         force_collection.push_back(&force_law);
 
-        // Create crypt simulation from tissue and force law
+        // Create crypt simulation from cell population and force law
         VertexCryptSimulation2d simulator(crypt, force_collection);
         simulator.SetSamplingTimestepMultiple(50);
         simulator.SetEndTime(30.0);
         simulator.SetOutputDirectory("Test2DVertexCryptRepresentativeSimulationForProfiling");
 
         // Make crypt shorter for sloughing
-        TissueConfig::Instance()->SetCryptLength(20.0);
+        CellBasedConfig::Instance()->SetCryptLength(20.0);
         SloughingCellKiller<2> sloughing_cell_killer(&crypt);
         simulator.AddCellKiller(&sloughing_cell_killer);
 

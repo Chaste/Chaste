@@ -26,26 +26,26 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#include "LatticeBasedTissue.hpp"
+#include "LatticeBasedCellPopulation.hpp"
 
 #include <cassert>
 #include <algorithm>
 
 #include "Exception.hpp"
 #include "RandomNumberGenerator.hpp"
-#include "TissueConfig.hpp"
+#include "CellBasedConfig.hpp"
 #include "SimulationTime.hpp"
 
 
 template<unsigned DIM>
-LatticeBasedTissue<DIM>::LatticeBasedTissue(TetrahedralMesh<DIM, DIM>& rMesh,
-                                            std::vector<TissueCellPtr>& rCells,
+LatticeBasedCellPopulation<DIM>::LatticeBasedCellPopulation(TetrahedralMesh<DIM, DIM>& rMesh,
+                                            std::vector<CellPtr>& rCells,
                                             const std::vector<unsigned> locationIndices,
                                             bool onlyUseNearestNeighboursForDivision,
                                             bool useVonNeumannNeighbourhoods,
                                             bool deleteMesh,
                                             bool validate)
-    : AbstractTissue<DIM>(rCells, locationIndices),
+    : AbstractCellPopulation<DIM>(rCells, locationIndices),
       mrMesh(rMesh),
       mOnlyUseNearestNeighboursForDivision(onlyUseNearestNeighboursForDivision),
       mDeleteMesh(deleteMesh),
@@ -54,7 +54,7 @@ LatticeBasedTissue<DIM>::LatticeBasedTissue(TetrahedralMesh<DIM, DIM>& rMesh,
     // This must always be true
     assert(this->mCells.size() <= mrMesh.GetNumNodes());
 
-    this->mTissueContainsMesh = true;
+    this->mCellPopulationContainsMesh = true;
 
     if (!locationIndices.empty())
     {
@@ -87,15 +87,15 @@ LatticeBasedTissue<DIM>::LatticeBasedTissue(TetrahedralMesh<DIM, DIM>& rMesh,
 }
 
 template<unsigned DIM>
-LatticeBasedTissue<DIM>::LatticeBasedTissue(TetrahedralMesh<DIM, DIM>& rMesh)
+LatticeBasedCellPopulation<DIM>::LatticeBasedCellPopulation(TetrahedralMesh<DIM, DIM>& rMesh)
     : mrMesh(rMesh)
 {
-    this->mTissueContainsMesh = true;
+    this->mCellPopulationContainsMesh = true;
     mDeleteMesh = true;
 }
 
 template<unsigned DIM>
-LatticeBasedTissue<DIM>::~LatticeBasedTissue()
+LatticeBasedCellPopulation<DIM>::~LatticeBasedCellPopulation()
 {
     if (mDeleteMesh)
     {
@@ -104,26 +104,26 @@ LatticeBasedTissue<DIM>::~LatticeBasedTissue()
 }
 
 template<unsigned DIM>
-void LatticeBasedTissue<DIM>::SetVonNeumannNeighbourhoods(bool useVonNeumannNeighbourhoods)
+void LatticeBasedCellPopulation<DIM>::SetVonNeumannNeighbourhoods(bool useVonNeumannNeighbourhoods)
 {
     mUseVonNeumannNeighbourhoods = useVonNeumannNeighbourhoods;
 }
 
 
 template<unsigned DIM>
-std::vector<bool>& LatticeBasedTissue<DIM>::rGetEmptySites()
+std::vector<bool>& LatticeBasedCellPopulation<DIM>::rGetEmptySites()
 {
     return this->mIsEmptySite;
 }
 
 template<unsigned DIM>
-bool LatticeBasedTissue<DIM>::IsEmptySite(unsigned index)
+bool LatticeBasedCellPopulation<DIM>::IsEmptySite(unsigned index)
 {
     return this->mIsEmptySite[index];
 }
 
 template<unsigned DIM>
-std::set<unsigned> LatticeBasedTissue<DIM>::GetEmptySiteIndices()
+std::set<unsigned> LatticeBasedCellPopulation<DIM>::GetEmptySiteIndices()
 {
     std::set<unsigned> ghost_node_indices;
     for (unsigned i=0; i<this->mIsEmptySite.size(); i++)
@@ -137,7 +137,7 @@ std::set<unsigned> LatticeBasedTissue<DIM>::GetEmptySiteIndices()
 }
 
 template<unsigned DIM>
-void LatticeBasedTissue<DIM>::SetEmptySites(const std::set<unsigned>& rEmptySiteIndices)
+void LatticeBasedCellPopulation<DIM>::SetEmptySites(const std::set<unsigned>& rEmptySiteIndices)
 {
     // Reinitialise all entries of mIsEmptySite to false
     this->mIsEmptySite = std::vector<bool>(this->mrMesh.GetNumNodes(), false);
@@ -152,37 +152,37 @@ void LatticeBasedTissue<DIM>::SetEmptySites(const std::set<unsigned>& rEmptySite
 }
 
 template<unsigned DIM>
-TetrahedralMesh<DIM, DIM>& LatticeBasedTissue<DIM>::rGetMesh()
+TetrahedralMesh<DIM, DIM>& LatticeBasedCellPopulation<DIM>::rGetMesh()
 {
     return mrMesh;
 }
 
 template<unsigned DIM>
-const TetrahedralMesh<DIM, DIM>& LatticeBasedTissue<DIM>::rGetMesh() const
+const TetrahedralMesh<DIM, DIM>& LatticeBasedCellPopulation<DIM>::rGetMesh() const
 {
     return mrMesh;
 }
 
 template<unsigned DIM>
-Node<DIM>* LatticeBasedTissue<DIM>::GetNode(unsigned index)
+Node<DIM>* LatticeBasedCellPopulation<DIM>::GetNode(unsigned index)
 {
     return mrMesh.GetNode(index);
 }
 
 template<unsigned DIM>
-unsigned LatticeBasedTissue<DIM>::GetNumNodes()
+unsigned LatticeBasedCellPopulation<DIM>::GetNumNodes()
 {
     return mrMesh.GetNumAllNodes();
 }
 
 template<unsigned DIM>
-TissueCellPtr LatticeBasedTissue<DIM>::AddCell(TissueCellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, TissueCellPtr pParentCell)
+CellPtr LatticeBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell)
 {
     ///\todo This method could probably be made more efficient (#1411)
 
     // Add rNewCell to mCells
     this->mCells.push_back(pNewCell);
-    TissueCellPtr p_created_cell = this->mCells.back();
+    CellPtr p_created_cell = this->mCells.back();
 
     // Temporarily provide a location index for the new cell
     this->mCellLocationMap[p_created_cell.get()] = UINT_MAX;
@@ -251,7 +251,7 @@ TissueCellPtr LatticeBasedTissue<DIM>::AddCell(TissueCellPtr pNewCell, const c_v
             }
             for (unsigned i=degree-1; i>0; i--)
             {
-                TissueCellPtr p_current_cell = this->mLocationCellMap[indices[i-1]];
+                CellPtr p_current_cell = this->mLocationCellMap[indices[i-1]];
                 assert(p_current_cell);
 
                 MoveCell(p_current_cell, indices[i]);
@@ -276,7 +276,7 @@ TissueCellPtr LatticeBasedTissue<DIM>::AddCell(TissueCellPtr pNewCell, const c_v
 }
 
 template<unsigned DIM>
-std::vector<unsigned> LatticeBasedTissue<DIM>::GetMaximumDegreeInEachDirection(unsigned nodeIndex)
+std::vector<unsigned> LatticeBasedCellPopulation<DIM>::GetMaximumDegreeInEachDirection(unsigned nodeIndex)
 {
     double width = this->mrMesh.GetWidth(0);
     unsigned nodes_across = (unsigned)width + 1;
@@ -328,7 +328,7 @@ std::vector<unsigned> LatticeBasedTissue<DIM>::GetMaximumDegreeInEachDirection(u
 
 
 template<unsigned DIM>
-std::set<unsigned> LatticeBasedTissue<DIM>::GetNthDegreeNeighbouringNodeIndices(unsigned nodeIndex, unsigned degree)
+std::set<unsigned> LatticeBasedCellPopulation<DIM>::GetNthDegreeNeighbouringNodeIndices(unsigned nodeIndex, unsigned degree)
 {
     std::set<unsigned> nth_degree_neighbours;
     std::vector<unsigned> nearest_neighbours = this->GetNeighbouringNodeIndicesVector(nodeIndex);
@@ -356,7 +356,7 @@ std::set<unsigned> LatticeBasedTissue<DIM>::GetNthDegreeNeighbouringNodeIndices(
 
 
 template<unsigned DIM>
-std::set<unsigned> LatticeBasedTissue<DIM>::GetFreeNeighbouringNodeIndices(unsigned nodeIndex)
+std::set<unsigned> LatticeBasedCellPopulation<DIM>::GetFreeNeighbouringNodeIndices(unsigned nodeIndex)
 {
     std::set<unsigned> free_neighbouring_nodes;
 
@@ -378,7 +378,7 @@ std::set<unsigned> LatticeBasedTissue<DIM>::GetFreeNeighbouringNodeIndices(unsig
 
 
 template<unsigned DIM>
-std::set<unsigned> LatticeBasedTissue<DIM>::GetNeighbouringNodeIndices(unsigned nodeIndex)
+std::set<unsigned> LatticeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsigned nodeIndex)
 {
     // Get the neighbouring node indices as a vector
     std::vector<unsigned> neighbouring_node_indices_vector = GetNeighbouringNodeIndicesVector(nodeIndex);
@@ -395,7 +395,7 @@ std::set<unsigned> LatticeBasedTissue<DIM>::GetNeighbouringNodeIndices(unsigned 
 
 
 template<unsigned DIM>
-std::vector<unsigned> LatticeBasedTissue<DIM>::GetNeighbouringNodeIndicesVector(unsigned nodeIndex)
+std::vector<unsigned> LatticeBasedCellPopulation<DIM>::GetNeighbouringNodeIndicesVector(unsigned nodeIndex)
 {
     std::vector<unsigned> all_neighbours;
 
@@ -603,11 +603,11 @@ std::vector<unsigned> LatticeBasedTissue<DIM>::GetNeighbouringNodeIndicesVector(
 
 
 template<unsigned DIM>
-unsigned LatticeBasedTissue<DIM>::RemoveDeadCells()
+unsigned LatticeBasedCellPopulation<DIM>::RemoveDeadCells()
 {
     unsigned num_removed = 0;
 
-    for (std::list<TissueCellPtr>::iterator cell_iter = this->mCells.begin();
+    for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
          cell_iter != this->mCells.end();
          ++cell_iter)
     {
@@ -631,13 +631,13 @@ unsigned LatticeBasedTissue<DIM>::RemoveDeadCells()
 }
 
 template<unsigned DIM>
-void LatticeBasedTissue<DIM>::Update(bool hasHadBirthsOrDeaths)
+void LatticeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 {
     Validate();
 }
 
 template<unsigned DIM>
-void LatticeBasedTissue<DIM>::Validate()
+void LatticeBasedCellPopulation<DIM>::Validate()
 {
     // Get a list of all the nodes that are ghosts
     std::vector<bool> validated_node = mIsEmptySite;
@@ -645,7 +645,7 @@ void LatticeBasedTissue<DIM>::Validate()
     assert(mIsEmptySite.size()==this->GetNumNodes());
 
     // Look through all of the cells and record what node they are associated with.
-    for (typename AbstractTissue<DIM>::Iterator cell_iter = this->Begin();
+    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
          cell_iter != this->End();
          ++cell_iter)
     {
@@ -677,19 +677,19 @@ void LatticeBasedTissue<DIM>::Validate()
 //////////////////////////////////////////////////////////////////////////////
 
 template<unsigned DIM>
-void LatticeBasedTissue<DIM>::CreateOutputFiles(const std::string& rDirectory, bool cleanOutputDirectory)
+void LatticeBasedCellPopulation<DIM>::CreateOutputFiles(const std::string& rDirectory, bool cleanOutputDirectory)
 {
-    AbstractTissue<DIM>::CreateOutputFiles(rDirectory, cleanOutputDirectory);
+    AbstractCellPopulation<DIM>::CreateOutputFiles(rDirectory, cleanOutputDirectory);
 }
 
 template<unsigned DIM>
-void LatticeBasedTissue<DIM>::CloseOutputFiles()
+void LatticeBasedCellPopulation<DIM>::CloseOutputFiles()
 {
-    AbstractTissue<DIM>::CloseOutputFiles();
+    AbstractCellPopulation<DIM>::CloseOutputFiles();
 }
 
 template<unsigned DIM>
-void LatticeBasedTissue<DIM>::WriteResultsToFiles()
+void LatticeBasedCellPopulation<DIM>::WriteResultsToFiles()
 {
     double time = SimulationTime::Instance()->GetTime();
 
@@ -755,7 +755,7 @@ void LatticeBasedTissue<DIM>::WriteResultsToFiles()
 }
 
 template<unsigned DIM>
-void LatticeBasedTissue<DIM>::GenerateCellResults(unsigned locationIndex,
+void LatticeBasedCellPopulation<DIM>::GenerateCellResults(unsigned locationIndex,
                                                   std::vector<unsigned>& rCellProliferativeTypeCounter,
                                                   std::vector<unsigned>& rCellCyclePhaseCounter)
 {
@@ -765,14 +765,14 @@ void LatticeBasedTissue<DIM>::GenerateCellResults(unsigned locationIndex,
     }
     else
     {
-        AbstractTissue<DIM>::GenerateCellResults(locationIndex,
+        AbstractCellPopulation<DIM>::GenerateCellResults(locationIndex,
                                                  rCellProliferativeTypeCounter,
                                                  rCellCyclePhaseCounter);
     }
 }
 
 template<unsigned DIM>
-void LatticeBasedTissue<DIM>::GenerateCellResultsAndWriteToFiles()
+void LatticeBasedCellPopulation<DIM>::GenerateCellResultsAndWriteToFiles()
 {
     // Set up cell type counter
     unsigned num_cell_types = this->mCellProliferativeTypeCount.size();
@@ -806,13 +806,13 @@ void LatticeBasedTissue<DIM>::GenerateCellResultsAndWriteToFiles()
 }
 
 template<unsigned DIM>
-bool LatticeBasedTissue<DIM>::IsCellAssociatedWithADeletedLocation(TissueCellPtr pCell)
+bool LatticeBasedCellPopulation<DIM>::IsCellAssociatedWithADeletedLocation(CellPtr pCell)
 {
     return false;
 }
 
 template<unsigned DIM>
-void LatticeBasedTissue<DIM>::MoveCell(TissueCellPtr pCell, unsigned newLocationIndex)
+void LatticeBasedCellPopulation<DIM>::MoveCell(CellPtr pCell, unsigned newLocationIndex)
 {
     // Get the current location index corresponding to this cell
     unsigned current_location_index = this->mCellLocationMap[pCell.get()];
@@ -844,13 +844,13 @@ void LatticeBasedTissue<DIM>::MoveCell(TissueCellPtr pCell, unsigned newLocation
 //////////////////////////////////////////////////////////////////////////////
 
 template<unsigned DIM>
-void LatticeBasedTissue<DIM>::UpdateNodeLocations(const std::vector< c_vector<double, DIM> >& rNodeForces, double dt)
+void LatticeBasedCellPopulation<DIM>::UpdateNodeLocations(const std::vector< c_vector<double, DIM> >& rNodeForces, double dt)
 {
-    EXCEPTION("UpdateNodeLocations() cannot be called on a LatticeBasedTissue");
+    EXCEPTION("UpdateNodeLocations() cannot be called on a LatticeBasedCellPopulation");
 }
 
 template<unsigned DIM>
-c_vector<double, DIM> LatticeBasedTissue<DIM>::GetLocationOfCellCentre(TissueCellPtr pCell)
+c_vector<double, DIM> LatticeBasedCellPopulation<DIM>::GetLocationOfCellCentre(CellPtr pCell)
 {
     unsigned node_index = this->mCellLocationMap[pCell.get()];
     c_vector<double, DIM> node_location = this->GetNode(node_index)->rGetLocation();
@@ -858,43 +858,43 @@ c_vector<double, DIM> LatticeBasedTissue<DIM>::GetLocationOfCellCentre(TissueCel
 }
 
 template<unsigned DIM>
-unsigned LatticeBasedTissue<DIM>::AddNode(Node<DIM>* pNewNode)
+unsigned LatticeBasedCellPopulation<DIM>::AddNode(Node<DIM>* pNewNode)
 {
-    EXCEPTION("AddNode() cannot be called on a LatticeBasedTissue");
+    EXCEPTION("AddNode() cannot be called on a LatticeBasedCellPopulation");
     return 0;
 }
 
 template<unsigned DIM>
-void LatticeBasedTissue<DIM>::SetNode(unsigned nodeIndex, ChastePoint<DIM>& rNewLocation)
+void LatticeBasedCellPopulation<DIM>::SetNode(unsigned nodeIndex, ChastePoint<DIM>& rNewLocation)
 {
-    EXCEPTION("SetNode() cannot be called on a LatticeBasedTissue");
+    EXCEPTION("SetNode() cannot be called on a LatticeBasedCellPopulation");
 }
 
 template<unsigned DIM>
-double LatticeBasedTissue<DIM>::GetDampingConstant(unsigned nodeIndex)
+double LatticeBasedCellPopulation<DIM>::GetDampingConstant(unsigned nodeIndex)
 {
-    EXCEPTION("GetDampingConstant() cannot be called on a LatticeBasedTissue");
+    EXCEPTION("GetDampingConstant() cannot be called on a LatticeBasedCellPopulation");
     return 0.0;
 }
 
 template<unsigned DIM>
-void LatticeBasedTissue<DIM>::OutputTissueParameters(out_stream& rParamsFile)
+void LatticeBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
-	// Currently this is not called from LatticeBasedTissueSimulation see #1453 for discussion on this for cell centre and vertex tissues.
-	EXCEPTION("OutputTissueParameters() is not yet implemented for LatticeBasedTissue see #1453");
+	// Currently this is not called from LatticeBasedCellBasedSimulation see #1453 for discussion on this for centre- and vertex-based cell populations.
+	EXCEPTION("OutputCellPopulationParameters() is not yet implemented for LatticeBasedCellPopulation see #1453");
 
 	// Call direct parent class
-    //AbstractTissue<DIM>::OutputTissueParameters(rParamsFile);
+    //AbstractCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);
 }
 
 /////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////
 
-template class LatticeBasedTissue<1>;
-template class LatticeBasedTissue<2>;
-template class LatticeBasedTissue<3>;
+template class LatticeBasedCellPopulation<1>;
+template class LatticeBasedCellPopulation<2>;
+template class LatticeBasedCellPopulation<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(LatticeBasedTissue)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(LatticeBasedCellPopulation)

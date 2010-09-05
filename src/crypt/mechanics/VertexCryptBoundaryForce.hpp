@@ -33,7 +33,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractForce.hpp"
-#include "VertexBasedTissue.hpp"
+#include "VertexBasedCellPopulation.hpp"
 
 
 /**
@@ -82,13 +82,13 @@ public:
     /**
      * Overridden AddForceContribution() method.
      *
-     * Calculates the boundary force on each node in the vertex-based tissue.
+     * Calculates the boundary force on each node in the vertex-based cell population.
      *
      * @param rForces reference to vector of forces on nodes
-     * @param rTissue reference to the tissue
+     * @param rCellPopulation reference to the cell population
      */
     void AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
-                              AbstractTissue<DIM>& rTissue);
+                              AbstractCellPopulation<DIM>& rCellPopulation);
 
     /** @return mForceStrength */
     double GetForceStrength() const;

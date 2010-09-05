@@ -61,11 +61,11 @@ public:
     /**
      * Constructor.
      *
-     * @param pTissue pointer to the tissue.
+     * @param pCellPopulation pointer to the cell population.
      * @param centre the centre of death.
      * @param radius the radius of death.
      */
-    RadialSloughingCellKiller(AbstractTissue<2>* pTissue,
+    RadialSloughingCellKiller(AbstractCellPopulation<2>* pCellPopulation,
                               c_vector<double,2> centre,
                               double radius);
 
@@ -101,8 +101,8 @@ inline void save_construct_data(
     Archive & ar, const RadialSloughingCellKiller * t, const BOOST_PFTO unsigned int file_version)
 {
     // Save data required to construct instance
-    const AbstractTissue<2>* const p_tissue = t->GetTissue();
-    ar & p_tissue;
+    const AbstractCellPopulation<2>* const p_cell_population = t->GetCellPopulation();
+    ar & p_cell_population;
     c_vector<double,2> centre = t->GetCentre();
     ar & centre[0];
     ar & centre[1];
@@ -118,8 +118,8 @@ inline void load_construct_data(
     Archive & ar, RadialSloughingCellKiller * t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
-    AbstractTissue<2>* p_tissue;
-    ar & p_tissue;
+    AbstractCellPopulation<2>* p_cell_population;
+    ar & p_cell_population;
     c_vector<double,2> centre;
     ar & centre[0];
     ar & centre[1];
@@ -127,7 +127,7 @@ inline void load_construct_data(
     ar & radius;
 
     // Invoke inplace constructor to initialise instance
-    ::new(t)RadialSloughingCellKiller(p_tissue, centre, radius);
+    ::new(t)RadialSloughingCellKiller(p_cell_population, centre, radius);
 }
 }
 } // namespace ...

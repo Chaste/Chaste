@@ -33,11 +33,11 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractForce.hpp"
-#include "VertexBasedTissue.hpp"
+#include "VertexBasedCellPopulation.hpp"
 
 
 /**
- * A force class for use in vertex-based tissue simulations, based on a mechanical
+ * A force class for use in vertex-based simulations, based on a mechanical
  * model proposed by M. Weliky and G. Oster ("The mechanical basis of cell rearrangement.
  * I. Epithelial morphogenesis during Fundulus epiboly", Development 109:373-386).
  * 
@@ -88,14 +88,14 @@ public:
     /**
      * Overridden AddForceContribution() method.
      *
-     * Calculates the force on each node in the vertex-based tissue based on the
+     * Calculates the force on each node in the vertex-based cell population based on the
      * Weliky Oster model.
      *
      * @param rForces reference to vector of forces on nodes
-     * @param rTissue reference to the tissue
+     * @param rCellPopulation reference to the cell population
      */
     void AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
-                              AbstractTissue<DIM>& rTissue);
+                              AbstractCellPopulation<DIM>& rCellPopulation);
 
     /**
      * @return mWelikyOsterAreaParameter.

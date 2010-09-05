@@ -31,7 +31,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <cxxtest/TestSuite.h>
 
 // Must be included before any other cell_based headers
-#include "TissueSimulationArchiver.hpp"
+#include "CellBasedSimulationArchiver.hpp"
 
 #include "VertexCryptSimulation2d.hpp"
 #include "Cylindrical2dVertexMesh.hpp"
@@ -119,20 +119,20 @@ public:
         p_mesh->SetCellRearrangementThreshold(0.1);
 
         // Set up cells
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
-        // Create tissue
-        VertexBasedTissue<2> tissue(*p_mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Create force law
         NagaiHondaForce<2> force_law;
         std::vector<AbstractForce<2>*> force_collection;
         force_collection.push_back(&force_law);
 
-        // Create crypt simulation from tissue and force law
-        VertexCryptSimulation2d simulator(tissue, force_collection);
+        // Create crypt simulation from cell population and force law
+        VertexCryptSimulation2d simulator(cell_population, force_collection);
 
         std::vector<c_vector<double, 2> > old_node_locations(p_mesh->GetNumNodes());
         std::vector<c_vector<double, 2> > forces(p_mesh->GetNumNodes());
@@ -150,9 +150,9 @@ public:
         simulator.SetDt(0.01);
         simulator.UpdateNodePositions(forces);
 
-        for (unsigned node_index=0; node_index<simulator.rGetTissue().GetNumNodes(); node_index++)
+        for (unsigned node_index=0; node_index<simulator.rGetCellPopulation().GetNumNodes(); node_index++)
         {
-            c_vector<double, 2> node_location = simulator.rGetTissue().GetNode(node_index)->rGetLocation();
+            c_vector<double, 2> node_location = simulator.rGetCellPopulation().GetNode(node_index)->rGetLocation();
 
             TS_ASSERT_DELTA(node_location[0], old_node_locations[node_index][0] + node_index*0.01*0.01, 1e-9);
 
@@ -180,19 +180,19 @@ public:
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
-        // Create tissue
-        VertexBasedTissue<2> crypt(*p_mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
 
         // Create force law
         NagaiHondaForce<2> force_law;
         std::vector<AbstractForce<2>*> force_collection;
         force_collection.push_back(&force_law);
 
-        // Create crypt simulation from tissue and force law
+        // Create crypt simulation from cell population and force law
         VertexCryptSimulation2d simulator(crypt, force_collection);
 
         simulator.SetOutputDirectory("VertexCrypt2DJiggledBottomCells");
@@ -235,19 +235,19 @@ public:
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells, all differentiated
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 0.0, 0.0, 0.0, 0.0);
 
-        // Create tissue
-        VertexBasedTissue<2> crypt(*p_mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
 
         // Create force law
         NagaiHondaForce<2> force_law;
         std::vector<AbstractForce<2>*> force_collection;
         force_collection.push_back(&force_law);
 
-        // Create crypt simulation from tissue and force law
+        // Create crypt simulation from cell population and force law
         VertexCryptSimulation2d simulator(crypt, force_collection);
         simulator.SetEndTime(0.1);
         simulator.SetSamplingTimestepMultiple(50);
@@ -276,7 +276,7 @@ public:
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells, bottom row are STEM rest are DIFFERENTIATED.
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 0.8,0.8,0.8,0.8);
 
@@ -287,22 +287,22 @@ public:
         cells[2]->SetBirthTime(-22.0);
         cells[3]->SetBirthTime(-21.0);
 
-        // Create tissue
-        VertexBasedTissue<2> crypt(*p_mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
 
         // Create force law
         NagaiHondaForce<2> force_law;
         std::vector<AbstractForce<2>*> force_collection;
         force_collection.push_back(&force_law);
 
-        // Create crypt simulation from tissue and force law
+        // Create crypt simulation from cell population and force law
         VertexCryptSimulation2d simulator(crypt, force_collection);
         simulator.SetSamplingTimestepMultiple(50);
         simulator.SetEndTime(0.1);
         simulator.SetOutputDirectory("TestVertexCryptWithBirth");
 
         // Make crypt shorter for sloughing
-        TissueConfig::Instance()->SetCryptLength(5.0);
+        CellBasedConfig::Instance()->SetCryptLength(5.0);
         SloughingCellKiller<2> sloughing_cell_killer(&crypt);
         simulator.AddCellKiller(&sloughing_cell_killer);
 
@@ -328,26 +328,26 @@ public:
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
-        // Create tissue
-        VertexBasedTissue<2> crypt(*p_mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
 
         // Create force law
         NagaiHondaForce<2> force_law;
         std::vector<AbstractForce<2>*> force_collection;
         force_collection.push_back(&force_law);
 
-        // Create crypt simulation from tissue and force law
+        // Create crypt simulation from cell population and force law
         VertexCryptSimulation2d simulator(crypt, force_collection);
         simulator.SetSamplingTimestepMultiple(50);
         simulator.SetEndTime(10);
         simulator.SetOutputDirectory("TestVertexCryptLong");
 
         // Make crypt shorter for sloughing
-        TissueConfig::Instance()->SetCryptLength(20.0);
+        CellBasedConfig::Instance()->SetCryptLength(20.0);
         SloughingCellKiller<2> sloughing_cell_killer(&crypt);
         simulator.AddCellKiller(&sloughing_cell_killer);
 
@@ -374,30 +374,30 @@ public:
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         CryptCellsGenerator<SimpleWntCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
-        // Create tissue
-        VertexBasedTissue<2> crypt(*p_mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
 
         // Set up Wnt gradient
         WntConcentration<2>::Instance()->SetType(LINEAR);
-        WntConcentration<2>::Instance()->SetTissue(crypt);
+        WntConcentration<2>::Instance()->SetCellPopulation(crypt);
 
         // Create force law
         NagaiHondaForce<2> force_law;
         std::vector<AbstractForce<2>*> force_collection;
         force_collection.push_back(&force_law);
 
-        // Create crypt simulation from tissue and force law
+        // Create crypt simulation from cell population and force law
         VertexCryptSimulation2d simulator(crypt, force_collection);
         simulator.SetSamplingTimestepMultiple(50);
         simulator.SetEndTime(0.1);
         simulator.SetOutputDirectory("TestShortWntBasedCryptSimulation");
 
         // Make crypt shorter for sloughing
-        TissueConfig::Instance()->SetCryptLength(10.0);
+        CellBasedConfig::Instance()->SetCryptLength(10.0);
         SloughingCellKiller<2> sloughing_cell_killer(&crypt);
         simulator.AddCellKiller(&sloughing_cell_killer);
 
@@ -424,30 +424,30 @@ public:
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         CryptCellsGenerator<SimpleWntCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
-        // Create tissue
-        VertexBasedTissue<2> crypt(*p_mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
 
         // Set up Wnt gradient
         WntConcentration<2>::Instance()->SetType(LINEAR);
-        WntConcentration<2>::Instance()->SetTissue(crypt);
+        WntConcentration<2>::Instance()->SetCellPopulation(crypt);
 
         // Create force law
         NagaiHondaForce<2> force_law;
         std::vector<AbstractForce<2>*> force_collection;
         force_collection.push_back(&force_law);
 
-        // Create crypt simulation from tissue and force law
+        // Create crypt simulation from cell population and force law
         VertexCryptSimulation2d simulator(crypt, force_collection);
         simulator.SetSamplingTimestepMultiple(50);
         simulator.SetEndTime(50.0);
         simulator.SetOutputDirectory("TestLongWntBasedVertexCryptSimulation");
 
         // Make crypt shorter for sloughing
-        TissueConfig::Instance()->SetCryptLength(20.0);
+        CellBasedConfig::Instance()->SetCryptLength(20.0);
         SloughingCellKiller<2> sloughing_cell_killer(&crypt);
         simulator.AddCellKiller(&sloughing_cell_killer);
 
@@ -473,12 +473,12 @@ public:
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells, bottom row are STEM rest are DIFFERENTIATED.
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 0.8, 0.8, 0.8, 0.8);
 
-        // Create tissue
-        VertexBasedTissue<2> crypt(*p_mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
 
         // Create boundary force law
         VertexCryptBoundaryForce<2> boundary_force_law(150);
@@ -490,7 +490,7 @@ public:
         force_collection.push_back(&boundary_force_law);
         force_collection.push_back(&force_law);
 
-        // Create crypt simulation from tissue and force law
+        // Create crypt simulation from cell population and force law
         VertexCryptSimulation2d simulator(crypt, force_collection);
         simulator.SetSamplingTimestepMultiple(50);
         double end_time = 0.1;
@@ -498,7 +498,7 @@ public:
         simulator.SetOutputDirectory("TestVertexCryptWithBoundaryForce");
 
         // Make crypt shorter for sloughing
-        TissueConfig::Instance()->SetCryptLength(6.0);
+        CellBasedConfig::Instance()->SetCryptLength(6.0);
         SloughingCellKiller<2> sloughing_cell_killer(&crypt);
         simulator.AddCellKiller(&sloughing_cell_killer);
 
@@ -506,9 +506,9 @@ public:
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
 
         // Coverage
-        TissueSimulationArchiver<2, VertexCryptSimulation2d>::Save(&simulator);
+        CellBasedSimulationArchiver<2, VertexCryptSimulation2d>::Save(&simulator);
         VertexCryptSimulation2d* p_simulator;
-        p_simulator = TissueSimulationArchiver<2, VertexCryptSimulation2d>::Load("TestVertexCryptWithBoundaryForce", end_time);
+        p_simulator = CellBasedSimulationArchiver<2, VertexCryptSimulation2d>::Load("TestVertexCryptWithBoundaryForce", end_time);
         delete p_simulator;
 
         // Test Warnings
@@ -529,19 +529,19 @@ public:
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
-        // Create tissue
-        VertexBasedTissue<2> crypt(*p_mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
 
         // Create force law
         NagaiHondaForce<2> force_law;
         std::vector<AbstractForce<2>*> force_collection;
         force_collection.push_back(&force_law);
 
-        // Create crypt simulation from tissue and force law
+        // Create crypt simulation from cell population and force law
         VertexCryptSimulation2d simulator(crypt, force_collection);
         simulator.SetOutputDirectory("VertexCrypt2DArchive");
         simulator.SetEndTime(0.1);
@@ -555,17 +555,17 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(0.1, 100);
 
         // Save
-        TissueSimulationArchiver<2, VertexCryptSimulation2d>::Save(&simulator);
+        CellBasedSimulationArchiver<2, VertexCryptSimulation2d>::Save(&simulator);
 
         // Load
         VertexCryptSimulation2d* p_simulator;
-        p_simulator = TissueSimulationArchiver<2, VertexCryptSimulation2d>::Load("VertexCrypt2DArchive", 0.0);
+        p_simulator = CellBasedSimulationArchiver<2, VertexCryptSimulation2d>::Load("VertexCrypt2DArchive", 0.0);
 
         // Create an identical mesh for comparison purposes
         Cylindrical2dVertexMesh* p_mesh2 = generator.GetCylindricalMesh();
 
         // Compare meshes
-        VertexMesh<2,2>& r_mesh = (static_cast<VertexBasedTissue<2>*>(&(p_simulator->rGetTissue())))->rGetMesh();
+        VertexMesh<2,2>& r_mesh = (static_cast<VertexBasedCellPopulation<2>*>(&(p_simulator->rGetCellPopulation())))->rGetMesh();
         CompareMeshes(p_mesh2, &r_mesh);
 
         //Test Warnings
@@ -585,24 +585,24 @@ public:
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
-        // Create tissue
-        VertexBasedTissue<2> crypt(*p_mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
 
         // We have a Wnt Gradient - but not Wnt dependent cells
         // so that the test runs quickly, but we test archiving of it!
         WntConcentration<2>::Instance()->SetType(LINEAR);
-        WntConcentration<2>::Instance()->SetTissue(crypt);
+        WntConcentration<2>::Instance()->SetCellPopulation(crypt);
 
         // Create force law
         NagaiHondaForce<2> force_law;
         std::vector<AbstractForce<2>*> force_collection;
         force_collection.push_back(&force_law);
 
-        // Create crypt simulation from tissue and force law
+        // Create crypt simulation from cell population and force law
         VertexCryptSimulation2d simulator(crypt, force_collection);
         simulator.SetOutputDirectory("VertexCrypt2DPeriodicStandardResult");
         simulator.SetEndTime(0.25);
@@ -646,19 +646,19 @@ public:
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
-        // Create tissue
-        VertexBasedTissue<2> crypt(*p_mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
 
         // Create force law
         NagaiHondaForce<2> force_law;
         std::vector<AbstractForce<2>*> force_collection;
         force_collection.push_back(&force_law);
 
-        // Create crypt simulation from tissue and force law
+        // Create crypt simulation from cell population and force law
         VertexCryptSimulation2d simulator(crypt, force_collection);
 
         // Create cell killer and pass in to crypt simulation
@@ -688,23 +688,23 @@ public:
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
-        // Create tissue
-        VertexBasedTissue<2> crypt(*p_mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
 
         // Create an instance of a Wnt concentration
         WntConcentration<2>::Instance()->SetType(LINEAR);
-        WntConcentration<2>::Instance()->SetTissue(crypt);
+        WntConcentration<2>::Instance()->SetCellPopulation(crypt);
 
         // Create force law
         NagaiHondaForce<2> force_law;
         std::vector<AbstractForce<2>*> force_collection;
         force_collection.push_back(&force_law);
 
-        // Create crypt simulation from tissue and force law
+        // Create crypt simulation from cell population and force law
         VertexCryptSimulation2d simulator(crypt, force_collection);
         simulator.SetOutputDirectory("VertexCrypt2DPeriodicSaveAndLoad");
 
@@ -719,7 +719,7 @@ public:
         simulator.Solve();
 
         // Save the results
-        TissueSimulationArchiver<2, VertexCryptSimulation2d>::Save(&simulator);
+        CellBasedSimulationArchiver<2, VertexCryptSimulation2d>::Save(&simulator);
 
         // Test Warnings
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
@@ -741,18 +741,18 @@ public:
         WntConcentration<2>::Instance();   // Make sure there is no existing Wnt Gradient before load
         WntConcentration<2>::Destroy();
 
-        p_simulator1 = TissueSimulationArchiver<2, VertexCryptSimulation2d>::Load("VertexCrypt2DPeriodicSaveAndLoad", 0.1);
+        p_simulator1 = CellBasedSimulationArchiver<2, VertexCryptSimulation2d>::Load("VertexCrypt2DPeriodicSaveAndLoad", 0.1);
         p_simulator1->SetEndTime(0.2);
         p_simulator1->Solve();
 
         // Get mesh
-        MutableVertexMesh<2,2>& r_mesh1 = (static_cast<VertexBasedTissue<2>*>(&(p_simulator1->rGetTissue())))->rGetMesh();
+        MutableVertexMesh<2,2>& r_mesh1 = (static_cast<VertexBasedCellPopulation<2>*>(&(p_simulator1->rGetCellPopulation())))->rGetMesh();
 
         // Save then reload, compare meshes either side
-        TissueSimulationArchiver<2, VertexCryptSimulation2d>::Save(p_simulator1);
+        CellBasedSimulationArchiver<2, VertexCryptSimulation2d>::Save(p_simulator1);
 
-        VertexCryptSimulation2d* p_simulator2 = TissueSimulationArchiver<2, VertexCryptSimulation2d>::Load("VertexCrypt2DPeriodicSaveAndLoad", 0.2);
-        MutableVertexMesh<2,2>& r_mesh2 = (static_cast<VertexBasedTissue<2>*>(&(p_simulator2->rGetTissue())))->rGetMesh();
+        VertexCryptSimulation2d* p_simulator2 = CellBasedSimulationArchiver<2, VertexCryptSimulation2d>::Load("VertexCrypt2DPeriodicSaveAndLoad", 0.2);
+        MutableVertexMesh<2,2>& r_mesh2 = (static_cast<VertexBasedCellPopulation<2>*>(&(p_simulator2->rGetCellPopulation())))->rGetMesh();
 
         CompareMeshes(&r_mesh1, &r_mesh2);
 
@@ -776,8 +776,8 @@ public:
 
         // Test the Wnt concentration result
         WntConcentration<2>* p_wnt = WntConcentration<2>::Instance();
-        TS_ASSERT_DELTA(p_wnt->GetWntLevel(p_simulator2->rGetTissue().GetCellUsingLocationIndex(2)), 0.9748, 1e-4);
-        TS_ASSERT_DELTA(p_wnt->GetWntLevel(p_simulator2->rGetTissue().GetCellUsingLocationIndex(3)), 0.9736, 1e-4);
+        TS_ASSERT_DELTA(p_wnt->GetWntLevel(p_simulator2->rGetCellPopulation().GetCellUsingLocationIndex(2)), 0.9748, 1e-4);
+        TS_ASSERT_DELTA(p_wnt->GetWntLevel(p_simulator2->rGetCellPopulation().GetCellUsingLocationIndex(3)), 0.9736, 1e-4);
 
         // Test Warnings
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);

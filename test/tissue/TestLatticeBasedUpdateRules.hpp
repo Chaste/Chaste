@@ -35,7 +35,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "DiffusionUpdateRule.hpp"
 #include "AdvectionUpdateRule.hpp"
-#include "LatticeBasedTissue.hpp"
+#include "LatticeBasedCellPopulation.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
@@ -69,16 +69,16 @@ public:
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         p_model->SetCellProliferativeType(DIFFERENTIATED);
-        TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+        CellPtr p_cell(new Cell(p_state, p_model));
 
-        // Create lattice-based tissue
-        std::vector<TissueCellPtr> cells;
+        // Create lattice-based cell population
+        std::vector<CellPtr> cells;
         cells.push_back(p_cell);
 
         std::vector<unsigned> real_node_indices;
         real_node_indices.push_back(4);
 
-        LatticeBasedTissue<2> tissue(mesh, cells, real_node_indices);
+        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Create update rule
         DiffusionUpdateRule<2> update_rule(2.0);
@@ -87,11 +87,11 @@ public:
         double dt = 1.0;
 
         // Test an exception is thrown when using a location index that does not correspond to a cell
-        TS_ASSERT_THROWS_THIS(update_rule.GetNewLocationOfCell(0, tissue, dt),
+        TS_ASSERT_THROWS_THIS(update_rule.GetNewLocationOfCell(0, cell_population, dt),
                               "There is no cell at the current location.");
 
         // Check the cell moves to the correct new location (random, but reproducible)
-        unsigned new_location_index = update_rule.GetNewLocationOfCell(4, tissue, dt);
+        unsigned new_location_index = update_rule.GetNewLocationOfCell(4, cell_population, dt);
 
         TS_ASSERT_EQUALS(new_location_index, 7u);
     }
@@ -102,8 +102,8 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "diff_update_rule.arch";
 
         {
-            // Set a member of TissueConfig in order to test archiving
-            TissueConfig::Instance()->SetStemCellG1Duration(15.67);
+            // Set a member of CellBasedConfig in order to test archiving
+            CellBasedConfig::Instance()->SetStemCellG1Duration(15.67);
 
             // Create update rule using different input argument
             DiffusionUpdateRule<2> update_rule(1.25);
@@ -118,10 +118,10 @@ public:
         }
 
         {
-            // Reset TissueConfig prior to loading update from archive
-            TS_ASSERT_DELTA(TissueConfig::Instance()->GetStemCellG1Duration(), 15.67, 1e-6);
-            TissueConfig::Instance()->Reset();
-            TS_ASSERT_DELTA(TissueConfig::Instance()->GetStemCellG1Duration(), 14.0, 1e-6);
+            // Reset CellBasedConfig prior to loading update from archive
+            TS_ASSERT_DELTA(CellBasedConfig::Instance()->GetStemCellG1Duration(), 15.67, 1e-6);
+            CellBasedConfig::Instance()->Reset();
+            TS_ASSERT_DELTA(CellBasedConfig::Instance()->GetStemCellG1Duration(), 14.0, 1e-6);
 
             // Create an input archive
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
@@ -134,7 +134,7 @@ public:
 
             // Test the member data
             TS_ASSERT_DELTA(p_update_rule->GetDiffusionConstant(), 1.25, 1e-6);
-            TS_ASSERT_DELTA(TissueConfig::Instance()->GetStemCellG1Duration(), 15.67, 1e-6);
+            TS_ASSERT_DELTA(CellBasedConfig::Instance()->GetStemCellG1Duration(), 15.67, 1e-6);
 
             // Tidy up
             delete p_update_rule;
@@ -149,21 +149,21 @@ public:
 
         // Create a line of cells along the bottom of the mesh
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         std::vector<unsigned> real_node_indices;
 
         for (unsigned i=0; i<6; i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(DIFFERENTIATED);
-            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            CellPtr p_cell(new Cell(p_state, p_model));
 
             cells.push_back(p_cell);
             real_node_indices.push_back(i);
         }
 
-        // Create tissue
-        LatticeBasedTissue<2> tissue(mesh, cells, real_node_indices);
+        // Create cell population
+        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Create advection update rule: impose a flow 'north' with (mean) speed 2 
         unsigned flow_direction = 0; // north
@@ -173,13 +173,13 @@ public:
         double dt = 1.0;
 
         // Test an exception is thrown when using a location index that does not correspond to a cell
-        TS_ASSERT_THROWS_THIS(update_rule.GetNewLocationOfCell(10, tissue, dt),
+        TS_ASSERT_THROWS_THIS(update_rule.GetNewLocationOfCell(10, cell_population, dt),
                               "There is no cell at the current location.");
 
         // Call GetNewLocationOfCell() on each cell
         for (unsigned i=0; i<6; i++)
         {
-            unsigned new_location_index = update_rule.GetNewLocationOfCell(i, tissue, dt);
+            unsigned new_location_index = update_rule.GetNewLocationOfCell(i, cell_population, dt);
             TS_ASSERT_EQUALS(new_location_index, i+6);
         }
     }
@@ -190,8 +190,8 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "adv_update_rule.arch";
 
         {
-            // Set a member of TissueConfig in order to test archiving
-            TissueConfig::Instance()->SetStemCellG1Duration(15.67);
+            // Set a member of CellBasedConfig in order to test archiving
+            CellBasedConfig::Instance()->SetStemCellG1Duration(15.67);
 
             // Create update rule using different input argument
             AdvectionUpdateRule<2> update_rule(3, 1.25);
@@ -206,10 +206,10 @@ public:
         }
 
         {
-            // Reset TissueConfig prior to loading update from archive
-            TS_ASSERT_DELTA(TissueConfig::Instance()->GetStemCellG1Duration(), 15.67, 1e-6);
-            TissueConfig::Instance()->Reset();
-            TS_ASSERT_DELTA(TissueConfig::Instance()->GetStemCellG1Duration(), 14.0, 1e-6);
+            // Reset CellBasedConfig prior to loading update from archive
+            TS_ASSERT_DELTA(CellBasedConfig::Instance()->GetStemCellG1Duration(), 15.67, 1e-6);
+            CellBasedConfig::Instance()->Reset();
+            TS_ASSERT_DELTA(CellBasedConfig::Instance()->GetStemCellG1Duration(), 14.0, 1e-6);
 
             // Create an input archive
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
@@ -223,7 +223,7 @@ public:
             // Test the member data
             TS_ASSERT_DELTA(p_update_rule->GetAdvectionSpeed(), 1.25, 1e-6);
             TS_ASSERT_EQUALS(p_update_rule->GetAdvectionDirection(), 3u);
-            TS_ASSERT_DELTA(TissueConfig::Instance()->GetStemCellG1Duration(), 15.67, 1e-6);
+            TS_ASSERT_DELTA(CellBasedConfig::Instance()->GetStemCellG1Duration(), 15.67, 1e-6);
 
             // Tidy up
             delete p_update_rule;

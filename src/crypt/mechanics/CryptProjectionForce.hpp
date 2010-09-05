@@ -85,9 +85,9 @@ private :
     /**
      * Fix up the mappings between node indices and 3D locations.
      *
-     * @param rTissue the tissue
+     * @param rCellPopulation the cell population
      */
-    void UpdateNode3dLocationMap(AbstractTissue<2>& rTissue);
+    void UpdateNode3dLocationMap(AbstractCellPopulation<2>& rCellPopulation);
 
     /**
      * Calculates the force between two nodes.
@@ -96,11 +96,11 @@ private :
      *
      * @param nodeAGlobalIndex the index of the first node
      * @param nodeBGlobalIndex the index of the second node
-     * @param rTissue the tissue
+     * @param rCellPopulation the cell population
      *
      * @return The force exerted on Node A by Node B.
      */
-    c_vector<double,2> CalculateForceBetweenNodes(unsigned nodeAGlobalIndex, unsigned nodeBGlobalIndex, AbstractTissue<2>& rTissue);
+    c_vector<double,2> CalculateForceBetweenNodes(unsigned nodeAGlobalIndex, unsigned nodeBGlobalIndex, AbstractCellPopulation<2>& rCellPopulation);
 
 public :
 
@@ -146,8 +146,8 @@ public :
     /**
      *  Calculates the height of the crypt surface given by
      *      z = f(r) = a*r^b
-     *  at a point whose 2D position is a distance r from the centre of the tissue.
-     *  This assumes that the tissue is centred at the origin.
+     *  at a point whose 2D position is a distance r from the centre of the cell population.
+     *  This assumes that the cell population is centred at the origin.
      *
      *  @param rNodeLocation
      *
@@ -157,7 +157,7 @@ public :
 
     /**
      *  Calculates the derivative df/dr of the crypt surface function z=f(r) at a point
-     *  whose 2D position is a distance r from the centre of the tissue, which we assume
+     *  whose 2D position is a distance r from the centre of the cell_population, which we assume
      *  to be at (0,0).
      *
      *  @param rNodeLocation the 2D location of a node
@@ -169,10 +169,10 @@ public :
      * Overridden AddForceContribution method.
      *
      * @param rForces reference to vector of forces on nodes
-     * @param rTissue reference to the tissue
+     * @param rCellPopulation reference to the cell population
      */
     void AddForceContribution(std::vector<c_vector<double,2> >& rForces,
-                              AbstractTissue<2>& rTissue);
+                              AbstractCellPopulation<2>& rCellPopulation);
 
     /**
      * Outputs force Parameters to file

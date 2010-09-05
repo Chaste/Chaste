@@ -25,18 +25,18 @@ You should have received a copy of the GNU Lesser General Public License
 along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
-#ifndef TESTTISSUESIMULATIONWITHVERTEXBASEDTISSUE_HPP_
-#define TESTTISSUESIMULATIONWITHVERTEXBASEDTISSUE_HPP_
+#ifndef TESTCELLBASEDSIMULATIONWITHVERTEXBASEDCELLPOPULATION_HPP_
+#define TESTCELLBASEDSIMULATIONWITHVERTEXBASEDCELLPOPULATION_HPP_
 
 #include <cxxtest/TestSuite.h>
 
 // Must be included before other cell_based headers
-#include "TissueSimulationArchiver.hpp"
+#include "CellBasedSimulationArchiver.hpp"
 
-#include "TissueSimulation.hpp"
+#include "CellBasedSimulation.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "StochasticDurationGenerationBasedCellCycleModel.hpp"
-#include "VertexBasedTissue.hpp"
+#include "VertexBasedCellPopulation.hpp"
 #include "NagaiHondaForce.hpp"
 #include "NagaiHondaDifferentialAdhesionForce.hpp"
 #include "WelikyOsterForce.hpp"
@@ -51,7 +51,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "LogFile.hpp"
 
 
-class TestTissueSimulationWithVertexBasedTissue : public AbstractCellBasedTestSuite
+class TestCellBasedSimulationWithVertexBasedCellPopulation : public AbstractCellBasedTestSuite
 {
 private:
 
@@ -91,29 +91,29 @@ public:
 
         // Set up cells, one for each VertexElement. Give each cell
         // a birth time of 0
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned elem_index=0; elem_index<mesh.GetNumElements(); elem_index++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(DIFFERENTIATED);
 
-            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            CellPtr p_cell(new Cell(p_state, p_model));
             double birth_time = -1.0;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
         }
 
-        // Create tissue
-        VertexBasedTissue<2> tissue(mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(mesh, cells);
 
         // Create a force system
         NagaiHondaForce<2> force;
         std::vector<AbstractForce<2>* > force_collection;
         force_collection.push_back(&force);
 
-        // Set up tissue simulation
-        TissueSimulation<2> simulator(tissue, force_collection);
+        // Set up cell-based simulation
+        CellBasedSimulation<2> simulator(cell_population, force_collection);
         simulator.SetOutputDirectory("TestSingleCellRelaxation");
         simulator.SetEndTime(1.0);
 
@@ -121,8 +121,8 @@ public:
         simulator.Solve();
 
         // Test relaxes to circle (can be more stringent with more nodes and more time)
-        TS_ASSERT_DELTA(tissue.rGetMesh().GetVolumeOfElement(0), 1.0, 0.05);
-        TS_ASSERT_DELTA(tissue.rGetMesh().GetSurfaceAreaOfElement(0), 3.5449077, 0.1);
+        TS_ASSERT_DELTA(cell_population.rGetMesh().GetVolumeOfElement(0), 1.0, 0.05);
+        TS_ASSERT_DELTA(cell_population.rGetMesh().GetSurfaceAreaOfElement(0), 3.5449077, 0.1);
 
         // Test Warnings
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
@@ -150,28 +150,28 @@ public:
 
         // Set up cells, one for each VertexElement. Give each cell
         // a birth time of 0
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned elem_index=0; elem_index<mesh.GetNumElements(); elem_index++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(DIFFERENTIATED);
 
-            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            CellPtr p_cell(new Cell(p_state, p_model));
             p_cell->SetBirthTime(-1.0);
             cells.push_back(p_cell);
         }
 
-        // Create tissue
-        VertexBasedTissue<2> tissue(mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(mesh, cells);
 
         // Create a force system
         WelikyOsterForce<2> force;
         std::vector<AbstractForce<2>* > force_collection;
         force_collection.push_back(&force);
 
-        // Set up tissue simulation
-        TissueSimulation<2> simulator(tissue, force_collection);
+        // Set up cell-based simulation
+        CellBasedSimulation<2> simulator(cell_population, force_collection);
         simulator.SetOutputDirectory("TestSingleCellRelaxationWelikyOster");
         simulator.SetEndTime(1.0);
 
@@ -179,8 +179,8 @@ public:
         simulator.Solve();
 
         // Test relaxes to circle (can be more stringent with more nodes and more time)
-        TS_ASSERT_DELTA(tissue.rGetMesh().GetVolumeOfElement(0), 1.0, 0.1);
-        TS_ASSERT_DELTA(tissue.rGetMesh().GetSurfaceAreaOfElement(0), 3.5449077, 0.1);
+        TS_ASSERT_DELTA(cell_population.rGetMesh().GetVolumeOfElement(0), 1.0, 0.1);
+        TS_ASSERT_DELTA(cell_population.rGetMesh().GetSurfaceAreaOfElement(0), 3.5449077, 0.1);
 
         //Test Warnings
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
@@ -194,19 +194,19 @@ public:
         MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
 
         // Set up cell.
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
 
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         p_model->SetCellProliferativeType(TRANSIT);
 
-        TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+        CellPtr p_cell(new Cell(p_state, p_model));
         double birth_time = -20.0; // divides straight away
         p_cell->SetBirthTime(birth_time);
         cells.push_back(p_cell);
 
-        // Create tissue
-        VertexBasedTissue<2> tissue(*p_mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
 
         // Create a force system
@@ -214,8 +214,8 @@ public:
         std::vector<AbstractForce<2>* > force_collection;
         force_collection.push_back(&force);
 
-        // Set up tissue simulation
-        TissueSimulation<2> simulator(tissue, force_collection);
+        // Set up cell-based simulation
+        CellBasedSimulation<2> simulator(cell_population, force_collection);
         simulator.SetOutputDirectory("TestSingleCellDividing");
         simulator.SetEndTime(1.0);
 
@@ -223,9 +223,9 @@ public:
         simulator.Solve();
 
         // Check that cell divided successfully
-        unsigned new_num_nodes = simulator.rGetTissue().GetNumNodes();
-        unsigned new_num_elements = (static_cast<VertexBasedTissue<2>*>(&(simulator.rGetTissue())))->GetNumElements();
-        unsigned new_num_cells = simulator.rGetTissue().GetNumRealCells();
+        unsigned new_num_nodes = simulator.rGetCellPopulation().GetNumNodes();
+        unsigned new_num_elements = (static_cast<VertexBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation())))->GetNumElements();
+        unsigned new_num_cells = simulator.rGetCellPopulation().GetNumRealCells();
 
         TS_ASSERT_EQUALS(new_num_nodes, 8u);
         TS_ASSERT_EQUALS(new_num_elements, 2u);
@@ -245,7 +245,7 @@ public:
 
         // Set up cells, one for each VertexElement. Give each cell
         // a birth time of -elem_index, so its age is elem_index
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
@@ -262,25 +262,25 @@ public:
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(cell_type);
 
-            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            CellPtr p_cell(new Cell(p_state, p_model));
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
         }
 
-        // Create tissue
-        VertexBasedTissue<2> tissue(*p_mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        unsigned old_num_nodes = tissue.GetNumNodes();
-        unsigned old_num_elements = tissue.GetNumElements();
-        unsigned old_num_cells = tissue.GetNumRealCells();
+        unsigned old_num_nodes = cell_population.GetNumNodes();
+        unsigned old_num_elements = cell_population.GetNumElements();
+        unsigned old_num_cells = cell_population.GetNumRealCells();
 
         // Create a force system
         NagaiHondaForce<2> force;
         std::vector<AbstractForce<2>* > force_collection;
         force_collection.push_back(&force);
 
-        // Set up tissue simulation
-        TissueSimulation<2> simulator(tissue, force_collection);
+        // Set up cell-based simulation
+        CellBasedSimulation<2> simulator(cell_population, force_collection);
         simulator.SetOutputDirectory("TestVertexMonolayerWithCellBirth");
         simulator.SetSamplingTimestepMultiple(50);
         simulator.SetEndTime(0.1);
@@ -289,9 +289,9 @@ public:
         simulator.Solve();
 
         // Check that cell 12 divided successfully
-        unsigned new_num_nodes = simulator.rGetTissue().GetNumNodes();
-        unsigned new_num_elements = (static_cast<VertexBasedTissue<2>*>(&(simulator.rGetTissue())))->GetNumElements();
-        unsigned new_num_cells = simulator.rGetTissue().GetNumRealCells();
+        unsigned new_num_nodes = simulator.rGetCellPopulation().GetNumNodes();
+        unsigned new_num_elements = (static_cast<VertexBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation())))->GetNumElements();
+        unsigned new_num_cells = simulator.rGetCellPopulation().GetNumRealCells();
 
         TS_ASSERT_EQUALS(new_num_nodes, old_num_nodes+2); // as division of element is longer than threshold so is divided
         TS_ASSERT_EQUALS(new_num_elements, old_num_elements+1);
@@ -321,30 +321,30 @@ public:
 
         // Set up cells, one for each VertexElement. Give each cell
         // a birth time of -elem_index-19, so its age is elem_index+19, so the first cell divides straight away.
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(STEM);
 
-            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            CellPtr p_cell(new Cell(p_state, p_model));
             double birth_time;
             birth_time = -(double)elem_index -19.0;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
         }
 
-        // Create tissue
-        VertexBasedTissue<2> tissue(*p_mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Create a force system
         NagaiHondaForce<2> force;
         std::vector<AbstractForce<2>* > force_collection;
         force_collection.push_back(&force);
 
-        // Set up tissue simulation
-        TissueSimulation<2> simulator(tissue, force_collection);
+        // Set up cell-based simulation
+        CellBasedSimulation<2> simulator(cell_population, force_collection);
         simulator.SetOutputDirectory("TestVertexMonolayerWithVoid");
         simulator.SetEndTime(20.0);
 
@@ -359,9 +359,9 @@ public:
         simulator.Solve();
 
         // Check that void has been removed and vertices are in the correct position
-        TS_ASSERT_EQUALS(simulator.rGetTissue().GetNumNodes(), 40u);
-        TS_ASSERT_EQUALS((static_cast<VertexBasedTissue<2>*>(&(simulator.rGetTissue())))->GetNumElements(),15u);
-        TS_ASSERT_EQUALS(simulator.rGetTissue().GetNumRealCells(), 15u);
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), 40u);
+        TS_ASSERT_EQUALS((static_cast<VertexBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation())))->GetNumElements(),15u);
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 15u);
 
         // Test Warnings
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
@@ -384,14 +384,14 @@ public:
 
         // Set up cells, one for each VertexElement. Give each cell
         // a birth time of -elem_index, so its age is elem_index
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(DIFFERENTIATED);
 
-            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            CellPtr p_cell(new Cell(p_state, p_model));
             double birth_time = 0.0 - elem_index;
             p_cell->SetBirthTime(birth_time);
 
@@ -408,27 +408,27 @@ public:
             cells.push_back(p_cell);
         }
 
-        // Create tissue
-        VertexBasedTissue<2> tissue(*p_mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        unsigned old_num_nodes = tissue.GetNumNodes();
-        unsigned old_num_elements = tissue.GetNumElements();
-        unsigned old_num_cells = tissue.GetNumRealCells();
+        unsigned old_num_nodes = cell_population.GetNumNodes();
+        unsigned old_num_elements = cell_population.GetNumElements();
+        unsigned old_num_cells = cell_population.GetNumRealCells();
 
         // Create a force system
         NagaiHondaForce<2> force;
         std::vector<AbstractForce<2>* > force_collection;
         force_collection.push_back(&force);
 
-        // Set up tissue simulation
-        TissueSimulation<2> simulator(tissue, force_collection);
+        // Set up cell-based simulation
+        CellBasedSimulation<2> simulator(cell_population, force_collection);
         simulator.SetOutputDirectory("TestVertexMonolayerWithCellDeath");
         simulator.SetEndTime(0.5);
         
         // Create a cell killer and pass in to simulation (note we must account for element index changes following each kill)
-        TargetedCellKiller<2> cell0_killer(&tissue, 0);    // element on the SW corner
-        TargetedCellKiller<2> cell2_killer(&tissue, 2);    // element on the S boundary
-        TargetedCellKiller<2> cell9_killer(&tissue, 9);  // element on the interior
+        TargetedCellKiller<2> cell0_killer(&cell_population, 0);    // element on the SW corner
+        TargetedCellKiller<2> cell2_killer(&cell_population, 2);    // element on the S boundary
+        TargetedCellKiller<2> cell9_killer(&cell_population, 9);  // element on the interior
 
         simulator.AddCellKiller(&cell0_killer);
         simulator.AddCellKiller(&cell2_killer);
@@ -438,9 +438,9 @@ public:
         simulator.Solve();
 
         // Check that cells 6 and 14 have now been removed.
-        unsigned new_num_nodes = simulator.rGetTissue().GetNumNodes();
-        unsigned new_num_elements = (static_cast<VertexBasedTissue<2>*>(&(simulator.rGetTissue())))->GetNumElements();
-        unsigned new_num_cells = simulator.rGetTissue().GetNumRealCells();
+        unsigned new_num_nodes = simulator.rGetCellPopulation().GetNumNodes();
+        unsigned new_num_elements = (static_cast<VertexBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation())))->GetNumElements();
+        unsigned new_num_cells = simulator.rGetCellPopulation().GetNumRealCells();
 
         TS_ASSERT_EQUALS(new_num_nodes, old_num_nodes-7);	// Due to the cells on the boundary that get killed and the apoptotic cell that does a T2 swap
         TS_ASSERT_EQUALS(new_num_elements, old_num_elements-5);
@@ -466,7 +466,7 @@ public:
 		MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
 
 		// Set up cell.
-		std::vector<TissueCellPtr> cells;
+		std::vector<CellPtr> cells;
 		boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
 		boost::shared_ptr<AbstractCellProperty> p_label(new CellLabel);
 
@@ -475,7 +475,7 @@ public:
 			FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
 			p_model->SetCellProliferativeType(TRANSIT);
 
-            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            CellPtr p_cell(new Cell(p_state, p_model));
             double birth_time = -2.0;
             p_cell->SetBirthTime(birth_time);
 
@@ -486,17 +486,17 @@ public:
             cells.push_back(p_cell);
 		}
 
-		// Create tissue
-		VertexBasedTissue<2> tissue(*p_mesh, cells);
-        tissue.SetOutputCellMutationStates(true);
+		// Create cell population
+		VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.SetOutputCellMutationStates(true);
 
 		// Create a force system
 		NagaiHondaForce<2> force;
 		std::vector<AbstractForce<2>* > force_collection;
 		force_collection.push_back(&force);
 
-		// Set up tissue simulation
-		TissueSimulation<2> simulator(tissue, force_collection);
+		// Set up cell-based simulation
+		CellBasedSimulation<2> simulator(cell_population, force_collection);
 		simulator.SetOutputDirectory("TestVertexMonolayerWithTwoMutationStates");
 		simulator.SetEndTime(1.0);
 
@@ -534,29 +534,29 @@ public:
         mesh.SetCellRearrangementThreshold(0.1);
 
         // Set up cells, one for each VertexElement
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned elem_index=0; elem_index<mesh.GetNumElements(); elem_index++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(DIFFERENTIATED);
 
-            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            CellPtr p_cell(new Cell(p_state, p_model));
             double birth_time = -1.0;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
         }
 
-        // Create tissue
-        VertexBasedTissue<2> tissue(mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(mesh, cells);
 
         // Create a force system
         NagaiHondaForce<2> force;
         std::vector<AbstractForce<2>* > force_collection;
         force_collection.push_back(&force);
 
-        // Set up tissue simulation
-        TissueSimulation<2> simulator(tissue, force_collection);
+        // Set up cell-based simulation
+        CellBasedSimulation<2> simulator(cell_population, force_collection);
         simulator.SetOutputDirectory("TestVertexSingleCellApoptosis");
         simulator.SetEndTime(2.0);
 
@@ -564,10 +564,10 @@ public:
         simulator.Solve();
 
         // Test relaxes to circle (can be more stringent with more nodes and more time)
-        TS_ASSERT_DELTA(tissue.rGetMesh().GetVolumeOfElement(0), 1.0, 1e-1);
-        TS_ASSERT_DELTA(tissue.rGetMesh().GetSurfaceAreaOfElement(0), 3.5449077, 1e-1);
+        TS_ASSERT_DELTA(cell_population.rGetMesh().GetVolumeOfElement(0), 1.0, 1e-1);
+        TS_ASSERT_DELTA(cell_population.rGetMesh().GetSurfaceAreaOfElement(0), 3.5449077, 1e-1);
 
-        TissueCellPtr p_cell = simulator.rGetTissue().GetCellUsingLocationIndex(0);
+        CellPtr p_cell = simulator.rGetCellPopulation().GetCellUsingLocationIndex(0);
         p_cell->StartApoptosis(false);
 
         simulator.SetEndTime(2.25); // any longer and cell target area is zero but element can't be removed as its the only one.
@@ -575,8 +575,8 @@ public:
         // Run simulation
         simulator.Solve();
 
-        TS_ASSERT_DELTA(tissue.rGetMesh().GetVolumeOfElement(0), 0.5098, 1e-4);
-        TS_ASSERT_DELTA(tissue.rGetMesh().GetSurfaceAreaOfElement(0), 2.5417, 1e-3);
+        TS_ASSERT_DELTA(cell_population.rGetMesh().GetVolumeOfElement(0), 0.5098, 1e-4);
+        TS_ASSERT_DELTA(cell_population.rGetMesh().GetSurfaceAreaOfElement(0), 2.5417, 1e-3);
 
         // Test Warnings
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
@@ -603,29 +603,29 @@ public:
 
         // Set up cells, one for each VertexElement. Give each cell
         // a birth time of -elem_index, so its age is elem_index
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
             StochasticDurationGenerationBasedCellCycleModel* p_model = new StochasticDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(STEM);
 
-            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            CellPtr p_cell(new Cell(p_state, p_model));
             double birth_time = -(double)elem_index;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
         }
 
-        // Create tissue
-        VertexBasedTissue<2> tissue(*p_mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Create a force system
         NagaiHondaForce<2> force;
         std::vector<AbstractForce<2>* > force_collection;
         force_collection.push_back(&force);
 
-        // Set up tissue simulation
-        TissueSimulation<2> simulator(tissue, force_collection);
+        // Set up cell-based simulation
+        CellBasedSimulation<2> simulator(cell_population, force_collection);
 
         simulator.SetOutputDirectory(output_directory);
         simulator.SetSamplingTimestepMultiple(50);
@@ -638,7 +638,7 @@ public:
         // Archive now and then reload
 
         // Save simulation in steady state
-        TissueSimulationArchiver<2, TissueSimulation<2> >::Save(&simulator);
+        CellBasedSimulationArchiver<2, CellBasedSimulation<2> >::Save(&simulator);
 
         // Now save and reload to find where it breaks!
         for (unsigned i=0; i<40; i++)
@@ -646,20 +646,20 @@ public:
             start_time = end_time;
             end_time = end_time + 10.0;
 
-            TissueSimulation<2>* p_simulator = TissueSimulationArchiver<2, TissueSimulation<2> >::Load(output_directory,start_time);
+            CellBasedSimulation<2>* p_simulator = CellBasedSimulationArchiver<2, CellBasedSimulation<2> >::Load(output_directory,start_time);
             p_simulator->SetDt(0.002);
             p_simulator->SetSamplingTimestepMultiple(50);
             p_simulator->SetEndTime(end_time);
             p_simulator->Solve();
 
-            TissueSimulationArchiver<2, TissueSimulation<2> >::Save(p_simulator);
+            CellBasedSimulationArchiver<2, CellBasedSimulation<2> >::Save(p_simulator);
             delete p_simulator;
         }
         Warnings::QuietDestroy();
     }
 
 
-    // Test archiving of a TissueSimulation that uses a VertexBasedTissue.
+    // Test archiving of a CellBasedSimulation that uses a VertexBasedCellPopulation.
     void TestArchiving() throw (Exception)
     {
         // Set end time
@@ -671,30 +671,30 @@ public:
 
         // Set up cells, one for each VertexElement. Give each cell
         // a birth time of -elem_index, so its age is elem_index
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(DIFFERENTIATED);
 
-            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            CellPtr p_cell(new Cell(p_state, p_model));
             double birth_time = 0.0 - elem_index;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
         }
 
-        // Create tissue
-        VertexBasedTissue<2> tissue(*p_mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Create a force system
         NagaiHondaForce<2> force;
         std::vector<AbstractForce<2>* > force_collection;
         force_collection.push_back(&force);
 
-        // Set up tissue simulation
-        TissueSimulation<2> simulator(tissue, force_collection);
-        simulator.SetOutputDirectory("TestTissueSimulationWithVertexBasedTissueSaveAndLoad");
+        // Set up cell-based simulation
+        CellBasedSimulation<2> simulator(cell_population, force_collection);
+        simulator.SetOutputDirectory("TestCellBasedSimulationWithVertexBasedCellPopulationSaveAndLoad");
         simulator.SetEndTime(end_time);
 
         TS_ASSERT_DELTA(simulator.GetDt(), 0.002, 1e-12);
@@ -702,31 +702,31 @@ public:
         // Run and save simulation
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
 
-        TissueSimulationArchiver<2, TissueSimulation<2> >::Save(&simulator);
+        CellBasedSimulationArchiver<2, CellBasedSimulation<2> >::Save(&simulator);
 
-        TS_ASSERT_EQUALS(simulator.rGetTissue().GetNumRealCells(), 36u);
-        TS_ASSERT_EQUALS(simulator.rGetTissue().GetNumNodes(), 96u);
-        TS_ASSERT_EQUALS((static_cast<VertexBasedTissue<2>*>(&(simulator.rGetTissue())))->GetNumElements(), 36u);
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 36u);
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), 96u);
+        TS_ASSERT_EQUALS((static_cast<VertexBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation())))->GetNumElements(), 36u);
 
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 0.1, 1e-9);
-        TissueCellPtr p_cell = simulator.rGetTissue().GetCellUsingLocationIndex(23);
+        CellPtr p_cell = simulator.rGetCellPopulation().GetCellUsingLocationIndex(23);
         TS_ASSERT_DELTA(p_cell->GetAge(), 23.1, 1e-4);
 
         SimulationTime::Destroy();
         SimulationTime::Instance()->SetStartTime(0.0);
 
         // Load simulation
-        TissueSimulation<2>* p_simulator
-            = TissueSimulationArchiver<2, TissueSimulation<2> >::Load("TestTissueSimulationWithVertexBasedTissueSaveAndLoad", end_time);
+        CellBasedSimulation<2>* p_simulator
+            = CellBasedSimulationArchiver<2, CellBasedSimulation<2> >::Load("TestCellBasedSimulationWithVertexBasedCellPopulationSaveAndLoad", end_time);
 
         p_simulator->SetEndTime(0.2);
 
-        TS_ASSERT_EQUALS(p_simulator->rGetTissue().GetNumRealCells(), 36u);
-        TS_ASSERT_EQUALS(p_simulator->rGetTissue().GetNumNodes(), 96u);
-        TS_ASSERT_EQUALS((static_cast<VertexBasedTissue<2>*>(&(p_simulator->rGetTissue())))->GetNumElements(), 36u);
+        TS_ASSERT_EQUALS(p_simulator->rGetCellPopulation().GetNumRealCells(), 36u);
+        TS_ASSERT_EQUALS(p_simulator->rGetCellPopulation().GetNumNodes(), 96u);
+        TS_ASSERT_EQUALS((static_cast<VertexBasedCellPopulation<2>*>(&(p_simulator->rGetCellPopulation())))->GetNumElements(), 36u);
 
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 0.1, 1e-9);
-        TissueCellPtr p_cell2 = p_simulator->rGetTissue().GetCellUsingLocationIndex(23);
+        CellPtr p_cell2 = p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(23);
         TS_ASSERT_DELTA(p_cell2->GetAge(), 23.1, 1e-4);
 
         // Run simulation
@@ -743,4 +743,4 @@ public:
     }
 };
 
-#endif /*TESTTISSUESIMULATIONWITHVERTEXBASEDTISSUE_HPP_*/
+#endif /*TESTCELLBASEDSIMULATIONWITHVERTEXBASEDCELLPOPULATION_HPP_*/

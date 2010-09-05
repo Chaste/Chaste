@@ -33,7 +33,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractUpdateRule.hpp"
-#include "LatticeBasedTissue.hpp"
+#include "LatticeBasedCellPopulation.hpp"
 
 /**
  * An update rule class to model uniform steady advection. This class is
@@ -111,11 +111,11 @@ public :
      * probability that scales to ensure that the average speed is mAdvectionSpeed
      *
      * @param currentLocationIndex reference to vector of forces on nodes
-     * @param rTissue reference to the tissue
+     * @param rCellPopulation reference to the cell population
      * @param dt timestep of the simulation to calculate probability of movement in current timestep
      */
     unsigned GetNewLocationOfCell(unsigned currentLocationIndex,
-                                  LatticeBasedTissue<DIM>& rTissue,
+                                  LatticeBasedCellPopulation<DIM>& rCellPopulation,
                                   double dt);
 
     /**

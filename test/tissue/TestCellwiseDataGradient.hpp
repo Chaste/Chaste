@@ -35,7 +35,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include <fstream>
 
-#include "MeshBasedTissueWithGhostNodes.hpp"
+#include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "CellwiseDataGradient.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
@@ -57,16 +57,16 @@ public:
         MutableMesh<2,2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        // Create a tissue
-        std::vector<TissueCellPtr> cells;
+        // Create a cell population
+        std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
-        MeshBasedTissue<2> tissue(mesh, cells);
+        MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
         // Set up data: C(x,y) = x^2
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(tissue.GetNumRealCells(), 1);
-        p_data->SetTissue(&tissue);
+        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1);
+        p_data->SetCellPopulation(&cell_population);
 
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
@@ -96,18 +96,18 @@ public:
         MutableMesh<2,2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        // Create a tissue
-        std::vector<TissueCellPtr> cells;
+        // Create a cell population
+        std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
-        MeshBasedTissue<2> tissue(mesh, cells);
+        MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
         //////////////////////////////////
         // C(x,y) = const
         //////////////////////////////////
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(tissue.GetNumRealCells(), 1);
-        p_data->SetTissue(&tissue);
+        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1);
+        p_data->SetCellPopulation(&cell_population);
 
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
@@ -190,17 +190,17 @@ public:
         }
 
         // Set up cells
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, cell_location_indices.size());
 
-        // Create a tissue
-        MeshBasedTissueWithGhostNodes<2> tissue(mesh, cells, cell_location_indices);
+        // Create a cell population
+        MeshBasedCellPopulationWithGhostNodes<2> cell_population(mesh, cells, cell_location_indices);
 
-        // Create an instance of CellwiseData and associate it with the tissue
+        // Create an instance of CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(tissue.GetNumNodes(), 1);
-        p_data->SetTissue(&tissue);
+        p_data->SetNumCellsAndVars(cell_population.GetNumNodes(), 1);
+        p_data->SetCellPopulation(&cell_population);
 
         //////////////////////////////////
         // C(x,y) = x^2 - y^2

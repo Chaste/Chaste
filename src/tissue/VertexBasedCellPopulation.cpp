@@ -26,22 +26,22 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#include "VertexBasedTissue.hpp"
+#include "VertexBasedCellPopulation.hpp"
 #include "CellwiseData.hpp"
 #include "VertexMeshWriter.hpp"
 #include "Warnings.hpp"
 
 template<unsigned DIM>
-VertexBasedTissue<DIM>::VertexBasedTissue(MutableVertexMesh<DIM, DIM>& rMesh,
-                                          std::vector<TissueCellPtr>& rCells,
+VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM, DIM>& rMesh,
+                                          std::vector<CellPtr>& rCells,
                                           bool deleteMesh,
                                           bool validate,
                                           const std::vector<unsigned> locationIndices)
-    : AbstractTissue<DIM>(rCells, locationIndices),
+    : AbstractCellPopulation<DIM>(rCells, locationIndices),
       mrMesh(rMesh),
       mDeleteMesh(deleteMesh)
 {
-    this->mTissueContainsMesh = true;
+    this->mCellPopulationContainsMesh = true;
 
     if (validate)
     {
@@ -51,16 +51,16 @@ VertexBasedTissue<DIM>::VertexBasedTissue(MutableVertexMesh<DIM, DIM>& rMesh,
 
 
 template<unsigned DIM>
-VertexBasedTissue<DIM>::VertexBasedTissue(MutableVertexMesh<DIM, DIM>& rMesh)
+VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM, DIM>& rMesh)
              : mrMesh(rMesh)
 {
-    this->mTissueContainsMesh = true;
+    this->mCellPopulationContainsMesh = true;
     mDeleteMesh = true;
 }
 
 
 template<unsigned DIM>
-VertexBasedTissue<DIM>::~VertexBasedTissue()
+VertexBasedCellPopulation<DIM>::~VertexBasedCellPopulation()
 {
     if (mDeleteMesh)
     {
@@ -70,7 +70,7 @@ VertexBasedTissue<DIM>::~VertexBasedTissue()
 
 
 template<unsigned DIM>
-double VertexBasedTissue<DIM>::GetDampingConstant(unsigned nodeIndex)
+double VertexBasedCellPopulation<DIM>::GetDampingConstant(unsigned nodeIndex)
 {
     // Take the average of the cells containing this vertex
     double average_damping_constant = 0.0;
@@ -82,17 +82,17 @@ double VertexBasedTissue<DIM>::GetDampingConstant(unsigned nodeIndex)
          iter != containing_elements.end();
          ++iter)
     {
-        TissueCellPtr p_cell = this->GetCellUsingLocationIndex(*iter);
+        CellPtr p_cell = this->GetCellUsingLocationIndex(*iter);
         bool cell_is_wild_type = p_cell->GetMutationState()->IsType<WildTypeCellMutationState>();
         bool cell_is_labelled = p_cell->HasCellProperty<CellLabel>();
 
         if (cell_is_wild_type && !cell_is_labelled)
         {
-            average_damping_constant += TissueConfig::Instance()->GetDampingConstantNormal()*temp;
+            average_damping_constant += CellBasedConfig::Instance()->GetDampingConstantNormal()*temp;
         }
         else
         {
-            average_damping_constant += TissueConfig::Instance()->GetDampingConstantMutant()*temp;
+            average_damping_constant += CellBasedConfig::Instance()->GetDampingConstantMutant()*temp;
         }
     }
 
@@ -101,77 +101,77 @@ double VertexBasedTissue<DIM>::GetDampingConstant(unsigned nodeIndex)
 
 
 template<unsigned DIM>
-MutableVertexMesh<DIM, DIM>& VertexBasedTissue<DIM>::rGetMesh()
+MutableVertexMesh<DIM, DIM>& VertexBasedCellPopulation<DIM>::rGetMesh()
 {
     return mrMesh;
 }
 
 
 template<unsigned DIM>
-const MutableVertexMesh<DIM, DIM>& VertexBasedTissue<DIM>::rGetMesh() const
+const MutableVertexMesh<DIM, DIM>& VertexBasedCellPopulation<DIM>::rGetMesh() const
 {
     return mrMesh;
 }
 
 
 template<unsigned DIM>
-VertexElement<DIM, DIM>* VertexBasedTissue<DIM>::GetElement(unsigned elementIndex)
+VertexElement<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetElement(unsigned elementIndex)
 {
     return mrMesh.GetElement(elementIndex);
 }
 
 
 template<unsigned DIM>
-unsigned VertexBasedTissue<DIM>::GetNumNodes()
+unsigned VertexBasedCellPopulation<DIM>::GetNumNodes()
 {
     return mrMesh.GetNumNodes();
 }
 
 
 template<unsigned DIM>
-c_vector<double, DIM> VertexBasedTissue<DIM>::GetLocationOfCellCentre(TissueCellPtr pCell)
+c_vector<double, DIM> VertexBasedCellPopulation<DIM>::GetLocationOfCellCentre(CellPtr pCell)
 {
     return mrMesh.GetCentroidOfElement(this->mCellLocationMap[pCell.get()]);
 }
 
 
 template<unsigned DIM>
-Node<DIM>* VertexBasedTissue<DIM>::GetNode(unsigned index)
+Node<DIM>* VertexBasedCellPopulation<DIM>::GetNode(unsigned index)
 {
     return mrMesh.GetNode(index);
 }
 
 
 template<unsigned DIM>
-unsigned VertexBasedTissue<DIM>::AddNode(Node<DIM>* pNewNode)
+unsigned VertexBasedCellPopulation<DIM>::AddNode(Node<DIM>* pNewNode)
 {
     return mrMesh.AddNode(pNewNode);
 }
 
 
 template<unsigned DIM>
-void VertexBasedTissue<DIM>::SetNode(unsigned nodeIndex, ChastePoint<DIM>& rNewLocation)
+void VertexBasedCellPopulation<DIM>::SetNode(unsigned nodeIndex, ChastePoint<DIM>& rNewLocation)
 {
     mrMesh.SetNode(nodeIndex, rNewLocation);
 }
 
 
 template<unsigned DIM>
-VertexElement<DIM, DIM>* VertexBasedTissue<DIM>::GetElementCorrespondingToCell(TissueCellPtr pCell)
+VertexElement<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetElementCorrespondingToCell(CellPtr pCell)
 {
     return mrMesh.GetElement(this->mCellLocationMap[pCell.get()]);
 }
 
 
 template<unsigned DIM>
-unsigned VertexBasedTissue<DIM>::GetNumElements()
+unsigned VertexBasedCellPopulation<DIM>::GetNumElements()
 {
     return mrMesh.GetNumElements();
 }
 
 
 template<unsigned DIM>
-TissueCellPtr VertexBasedTissue<DIM>::AddCell(TissueCellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, TissueCellPtr pParentCell)
+CellPtr VertexBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell)
 {
     // Get the element associated with this cell
     VertexElement<DIM, DIM>* p_element = GetElementCorrespondingToCell(pParentCell);
@@ -193,7 +193,7 @@ TissueCellPtr VertexBasedTissue<DIM>::AddCell(TissueCellPtr pNewCell, const c_ve
     this->mCells.push_back(pNewCell);
 
     // Update location cell map
-    TissueCellPtr p_created_cell = this->mCells.back();
+    CellPtr p_created_cell = this->mCells.back();
     this->mLocationCellMap[new_element_index] = p_created_cell;
     this->mCellLocationMap[p_created_cell.get()] = new_element_index;
     return p_created_cell;
@@ -201,11 +201,11 @@ TissueCellPtr VertexBasedTissue<DIM>::AddCell(TissueCellPtr pNewCell, const c_ve
 
 
 template<unsigned DIM>
-unsigned VertexBasedTissue<DIM>::RemoveDeadCells()
+unsigned VertexBasedCellPopulation<DIM>::RemoveDeadCells()
 {
     unsigned num_removed = 0;
 
-    for (std::list<TissueCellPtr>::iterator it = this->mCells.begin();
+    for (std::list<CellPtr>::iterator it = this->mCells.begin();
          it != this->mCells.end();
          ++it)
     {
@@ -223,7 +223,7 @@ unsigned VertexBasedTissue<DIM>::RemoveDeadCells()
 
 
 template<unsigned DIM>
-void VertexBasedTissue<DIM>::UpdateNodeLocations(const std::vector< c_vector<double, DIM> >& rNodeForces, double dt)
+void VertexBasedCellPopulation<DIM>::UpdateNodeLocations(const std::vector< c_vector<double, DIM> >& rNodeForces, double dt)
 {
     // Iterate over all nodes associated with real cells to update their positions
     for (unsigned node_index=0; node_index<GetNumNodes(); node_index++)
@@ -260,14 +260,14 @@ void VertexBasedTissue<DIM>::UpdateNodeLocations(const std::vector< c_vector<dou
 
 
 template<unsigned DIM>
-bool VertexBasedTissue<DIM>::IsCellAssociatedWithADeletedLocation(TissueCellPtr pCell)
+bool VertexBasedCellPopulation<DIM>::IsCellAssociatedWithADeletedLocation(CellPtr pCell)
 {
     return GetElementCorrespondingToCell(pCell)->IsDeleted();;
 }
 
 
 template<unsigned DIM>
-void VertexBasedTissue<DIM>::Update(bool hasHadBirthsOrDeaths)
+void VertexBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 {
     VertexElementMap element_map(mrMesh.GetNumAllElements());
 
@@ -275,13 +275,13 @@ void VertexBasedTissue<DIM>::Update(bool hasHadBirthsOrDeaths)
 
     if (!element_map.IsIdentityMap())
     {
-    	// Fix up the mappings between TissueCellPtrs and VertexElements
-        std::map<TissueCell*, unsigned> old_map = this->mCellLocationMap;
+    	// Fix up the mappings between CellPtrs and VertexElements
+        std::map<Cell*, unsigned> old_map = this->mCellLocationMap;
 
         this->mCellLocationMap.clear();
         this->mLocationCellMap.clear();
 
-        for (std::list<TissueCellPtr>::iterator cell_iter = this->mCells.begin();
+        for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
              cell_iter != this->mCells.end();
              ++cell_iter)
         {
@@ -306,7 +306,7 @@ void VertexBasedTissue<DIM>::Update(bool hasHadBirthsOrDeaths)
             }
         }
 
-        // Check that each VertexElement has only one TissueCellPtr associated with it in the updated tissue
+        // Check that each VertexElement has only one CellPtr associated with it in the updated cell population
         Validate();
     }
 
@@ -315,12 +315,12 @@ void VertexBasedTissue<DIM>::Update(bool hasHadBirthsOrDeaths)
 
 
 template<unsigned DIM>
-void VertexBasedTissue<DIM>::Validate()
+void VertexBasedCellPopulation<DIM>::Validate()
 {
 	// Check each element has only one cell attached
     std::vector<unsigned> validated_element = std::vector<unsigned>(this->GetNumElements(), 0);
 
-    for (typename AbstractTissue<DIM>::Iterator cell_iter = this->Begin();
+    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
          cell_iter != this->End();
          ++cell_iter)
     {
@@ -348,9 +348,9 @@ void VertexBasedTissue<DIM>::Validate()
 
 
 template<unsigned DIM>
-void VertexBasedTissue<DIM>::WriteResultsToFiles()
+void VertexBasedCellPopulation<DIM>::WriteResultsToFiles()
 {
-    AbstractTissue<DIM>::WriteResultsToFiles();
+    AbstractCellPopulation<DIM>::WriteResultsToFiles();
 
     SimulationTime* p_time = SimulationTime::Instance();
 
@@ -389,7 +389,7 @@ void VertexBasedTissue<DIM>::WriteResultsToFiles()
     *mpVizElementsFile << p_time->GetTime() << "\t";
 
     // Loop over cells and find associated elements so in the same order as the cells in output files
-    for (std::list<TissueCellPtr>::iterator cell_iter = this->mCells.begin();
+    for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
          cell_iter != this->mCells.end();
          ++cell_iter)
     {
@@ -456,7 +456,7 @@ void VertexBasedTissue<DIM>::WriteResultsToFiles()
         unsigned elem_index = elem_iter->GetIndex();
 
         // Get the cell corresponding to this element
-        TissueCellPtr p_cell = this->mLocationCellMap[elem_index];
+        CellPtr p_cell = this->mLocationCellMap[elem_index];
         assert(p_cell);
 
         if (this->mOutputCellAncestors)
@@ -547,9 +547,9 @@ void VertexBasedTissue<DIM>::WriteResultsToFiles()
 
 
 template<unsigned DIM>
-void VertexBasedTissue<DIM>::CreateOutputFiles(const std::string& rDirectory, bool cleanOutputDirectory)
+void VertexBasedCellPopulation<DIM>::CreateOutputFiles(const std::string& rDirectory, bool cleanOutputDirectory)
 {
-    AbstractTissue<DIM>::CreateOutputFiles(rDirectory, cleanOutputDirectory);
+    AbstractCellPopulation<DIM>::CreateOutputFiles(rDirectory, cleanOutputDirectory);
 
     OutputFileHandler output_file_handler(rDirectory, cleanOutputDirectory);
     mpVizElementsFile = output_file_handler.OpenOutputFile("results.vizelements");
@@ -566,9 +566,9 @@ void VertexBasedTissue<DIM>::CreateOutputFiles(const std::string& rDirectory, bo
 
 
 template<unsigned DIM>
-void VertexBasedTissue<DIM>::CloseOutputFiles()
+void VertexBasedCellPopulation<DIM>::CloseOutputFiles()
 {
-    AbstractTissue<DIM>::CloseOutputFiles();
+    AbstractCellPopulation<DIM>::CloseOutputFiles();
     mpVizElementsFile->close();
     mpT1SwapLocationsFile->close();
     mpT3SwapLocationsFile->close();
@@ -581,7 +581,7 @@ void VertexBasedTissue<DIM>::CloseOutputFiles()
 
 
 template<unsigned DIM>
-void VertexBasedTissue<DIM>::GenerateCellResultsAndWriteToFiles()
+void VertexBasedCellPopulation<DIM>::GenerateCellResultsAndWriteToFiles()
 {
     // Set up cell type counter
     unsigned num_cell_types = this->mCellProliferativeTypeCount.size();
@@ -599,7 +599,7 @@ void VertexBasedTissue<DIM>::GenerateCellResultsAndWriteToFiles()
         cell_cycle_phase_counter[i] = 0;
     }
 
-    for (typename AbstractTissue<DIM>::Iterator cell_iter = this->Begin();
+    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
          cell_iter != this->End();
          ++cell_iter)
     {
@@ -610,14 +610,14 @@ void VertexBasedTissue<DIM>::GenerateCellResultsAndWriteToFiles()
 }
 
 template<unsigned DIM>
-void VertexBasedTissue<DIM>::OutputTissueParameters(out_stream& rParamsFile)
+void VertexBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
     *rParamsFile <<  "\t\t<CellRearrangementThreshold>"<<  mrMesh.GetCellRearrangementThreshold() << "</CellRearrangementThreshold> \n" ;
     *rParamsFile <<  "\t\t<T2Threshold>"<<  mrMesh.GetT2Threshold() << "</T2Threshold> \n" ;
     *rParamsFile <<  "\t\t<CellRearrangementRatio>"<<  mrMesh.GetCellRearrangementRatio() << "</CellRearrangementRatio> \n" ;
 
 	// Call direct parent class method
-	AbstractTissue<DIM>::OutputTissueParameters(rParamsFile);
+	AbstractCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);
 
 }
 
@@ -627,11 +627,11 @@ void VertexBasedTissue<DIM>::OutputTissueParameters(out_stream& rParamsFile)
 /////////////////////////////////////////////////////////////////////////////
 
 
-template class VertexBasedTissue<1>;
-template class VertexBasedTissue<2>;
-template class VertexBasedTissue<3>;
+template class VertexBasedCellPopulation<1>;
+template class VertexBasedCellPopulation<2>;
+template class VertexBasedCellPopulation<3>;
 
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(VertexBasedTissue)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(VertexBasedCellPopulation)

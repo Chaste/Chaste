@@ -31,14 +31,14 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "TissueSimulation.hpp"
-#include "VertexBasedTissue.hpp"
+#include "CellBasedSimulation.hpp"
+#include "VertexBasedCellPopulation.hpp"
 
 
 /**
  * A 2D vertex-based crypt simulation object.
  */
-class VertexCryptSimulation2d : public TissueSimulation<2>
+class VertexCryptSimulation2d : public CellBasedSimulation<2>
 {
     // Allow tests to access private members, in order to test computation of
     // private functions eg. DoCellBirth
@@ -52,12 +52,12 @@ private :
     {
         // If Archive is an output archive, then & resolves to <<
         // If Archive is an input archive, then & resolves to >>
-        archive & boost::serialization::base_object<TissueSimulation<2> >(*this);
+        archive & boost::serialization::base_object<CellBasedSimulation<2> >(*this);
         archive & mUseJiggledBottomCells;
     }
 
-    /** Helper member that is a static cast of the tissue. */
-    VertexBasedTissue<2>* mpStaticCastTissue;
+    /** Helper member that is a static cast of the cell population. */
+    VertexBasedCellPopulation<2>* mpStaticCastCellPopulation;
 
     /** Whether to use a flat bottom surface or to jiggle the cells on the bottom surface */
     bool mUseJiggledBottomCells;
@@ -74,26 +74,26 @@ private :
      *
      * By default this method returns the zero vector. If the parent cell
      * is a stem cell, then this method returns the vector (0,1). This is
-     * then used by the VertexBasedTissue method AddCell() as the axis along
+     * then used by the VertexBasedCellPopulation method AddCell() as the axis along
      * which the cell divides.
      *
      * @param pParentCell the parent cell
      */
-    c_vector<double, 2> CalculateCellDivisionVector(TissueCellPtr pParentCell);
+    c_vector<double, 2> CalculateCellDivisionVector(CellPtr pParentCell);
 
 public :
 
     /**
      *  Constructor.
      *
-     *  @param rTissue A tissue facade class (contains a mesh and cells)
+     *  @param rCellPopulation A cell population object
      *  @param forceCollection The mechanics to use in the simulation
-     *  @param deleteTissueAndForceCollection Whether to delete the tissue and force collection on destruction to free up memory
+     *  @param deleteCellPopulationAndForceCollection Whether to delete the cell population and force collection on destruction to free up memory
      *  @param initialiseCells whether to initialise cells (set to false when loading from an archive)
      */
-    VertexCryptSimulation2d(AbstractTissue<2>& rTissue,
+    VertexCryptSimulation2d(AbstractCellPopulation<2>& rCellPopulation,
                       std::vector<AbstractForce<2>*> forceCollection,
-                      bool deleteTissueAndForceCollection=false,
+                      bool deleteCellPopulationAndForceCollection=false,
                       bool initialiseCells=true);
 
     /**
@@ -102,7 +102,7 @@ public :
     void UseJiggledBottomCells();
 
     /**
-     * Overridden ApplyTissueBoundaryConditions() method.
+     * Overridden ApplyCellPopulationBoundaryConditions() method.
      *
      * If an instance of WntConcentration is not set up, then stem cells at the
      * bottom of the crypt are pinned. Any cell that has moved below the bottom
@@ -110,7 +110,7 @@ public :
      *
      * @param rOldLocations the node locations at the previous time step
      */
-    void ApplyTissueBoundaryConditions(const std::vector<c_vector<double,2> >& rOldLocations);
+    void ApplyCellPopulationBoundaryConditions(const std::vector<c_vector<double,2> >& rOldLocations);
 
     /**
      * Outputs Simulation Parameters to file
@@ -140,8 +140,8 @@ inline void save_construct_data(
     Archive & ar, const VertexCryptSimulation2d * t, const BOOST_PFTO unsigned int file_version)
 {
     // Save data required to construct instance
-    const AbstractTissue<2> * p_tissue = &(t->rGetTissue());
-    ar & p_tissue;
+    const AbstractCellPopulation<2> * p_cell_population = &(t->rGetCellPopulation());
+    ar & p_cell_population;
     const std::vector<AbstractForce<2>*> force_collection = t->rGetForceCollection();
     ar & force_collection;
 }
@@ -154,13 +154,13 @@ inline void load_construct_data(
     Archive & ar, VertexCryptSimulation2d * t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
-    AbstractTissue<2>* p_tissue;
-    ar & p_tissue;
+    AbstractCellPopulation<2>* p_cell_population;
+    ar & p_cell_population;
     std::vector<AbstractForce<2>*> force_collection;
     ar & force_collection;
 
     // Invoke inplace constructor to initialise instance
-    ::new(t)VertexCryptSimulation2d(*p_tissue, force_collection, true, false);
+    ::new(t)VertexCryptSimulation2d(*p_cell_population, force_collection, true, false);
 }
 }
 } // namespace

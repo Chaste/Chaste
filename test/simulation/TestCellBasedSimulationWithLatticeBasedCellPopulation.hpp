@@ -25,17 +25,17 @@ You should have received a copy of the GNU Lesser General Public License
 along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
-#ifndef TESTLATTICEBASEDTISSUESIMULATION_HPP_
-#define TESTLATTICEBASEDTISSUESIMULATION_HPP_
+#ifndef TESTCELLBASEDSIMULATIONWITHLATTICEBASEDCELLPOPULATION_HPP_
+#define TESTCELLBASEDSIMULATIONWITHLATTICEBASEDCELLPOPULATION_HPP_
 
 #include <cxxtest/TestSuite.h>
 
 // Must be included before other cell_based headers
-#include "TissueSimulationArchiver.hpp"
+#include "CellBasedSimulationArchiver.hpp"
 
-#include "LatticeBasedTissueSimulation.hpp"
+#include "LatticeBasedCellBasedSimulation.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
-#include "LatticeBasedTissue.hpp"
+#include "LatticeBasedCellPopulation.hpp"
 #include "DiffusionUpdateRule.hpp"
 #include "AdvectionUpdateRule.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
@@ -44,7 +44,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "NumericFileComparison.hpp"
 #include "CellBasedEventHandler.hpp"
 
-class TestLatticeBasedTissueSimulation : public AbstractCellBasedTestSuite
+class TestCellBasedSimulationWithLatticeBasedCellPopulation : public AbstractCellBasedTestSuite
 {
 private:
 
@@ -104,13 +104,13 @@ public:
 
         FixedDurationGenerationBasedCellCycleModel* p_model_1 = new FixedDurationGenerationBasedCellCycleModel();
         p_model_1->SetCellProliferativeType(DIFFERENTIATED);
-        TissueCellPtr p_cell_1(new TissueCell(p_state, p_model_1));
+        CellPtr p_cell_1(new Cell(p_state, p_model_1));
 
         FixedDurationGenerationBasedCellCycleModel* p_model_2 = new FixedDurationGenerationBasedCellCycleModel();
         p_model_2->SetCellProliferativeType(DIFFERENTIATED);
-        TissueCellPtr p_cell_2(new TissueCell(p_state, p_model_2));
+        CellPtr p_cell_2(new Cell(p_state, p_model_2));
 
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         cells.push_back(p_cell_1);
         cells.push_back(p_cell_2);
 
@@ -118,16 +118,16 @@ public:
         real_node_indices.push_back(47);
         real_node_indices.push_back(73);
 
-        // Create a tissue
-        LatticeBasedTissue<2> tissue(mesh, cells, real_node_indices);
+        // Create a cell population
+        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Create a UpdateRule system
         DiffusionUpdateRule<2> update_rule;
         std::vector<AbstractUpdateRule<2>* > update_rule_collection;
         update_rule_collection.push_back(&update_rule);
 
-        // Set up tissue simulation
-        LatticeBasedTissueSimulation<2> simulator(tissue, update_rule_collection);
+        // Set up cell-based simulation
+        LatticeBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
         simulator.SetDt(1);
         simulator.SetEndTime(20);
 
@@ -143,10 +143,10 @@ public:
         // Run simulation
         simulator.Solve();
 
-        TS_ASSERT_EQUALS(tissue.GetNumRealCells(), 2u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 2u);
 
         // Coverage of CalculateCellDivisionVector()
-        c_vector<double, 2> cell_division_vector = simulator.CalculateCellDivisionVector(*(tissue.Begin()));
+        c_vector<double, 2> cell_division_vector = simulator.CalculateCellDivisionVector(*(cell_population.Begin()));
         TS_ASSERT_DELTA(cell_division_vector[0], 0.000, 1e-4);
         TS_ASSERT_DELTA(cell_division_vector[1], 0.000, 1e-4);
     }
@@ -164,23 +164,23 @@ public:
         p_model->SetCellProliferativeType(TRANSIT);
         p_model->SetMaxTransitGenerations(UINT_MAX);
 
-        TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+        CellPtr p_cell(new Cell(p_state, p_model));
         p_cell->SetBirthTime(-13.5);
 
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         cells.push_back(p_cell);
 
         std::vector<unsigned> real_node_indices;
         real_node_indices.push_back(220);
 
-        // Create a tissue
-        LatticeBasedTissue<2> tissue(mesh, cells, real_node_indices);
+        // Create a cell population
+        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Create an empty UpdateRule system so only movement from cell birth
         std::vector<AbstractUpdateRule<2>* > update_rule_collection;
 
-        // Set up tissue simulation
-        LatticeBasedTissueSimulation<2> simulator(tissue, update_rule_collection);
+        // Set up cell-based simulation
+        LatticeBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
         simulator.SetOutputDirectory("TestCellsDividing");
         simulator.SetDt(1);
         simulator.SetEndTime(50);
@@ -188,7 +188,7 @@ public:
         // Run simulation
         simulator.Solve();
 
-        TS_ASSERT_EQUALS(tissue.GetNumRealCells(), 32u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 32u);
     }
 
 
@@ -199,7 +199,7 @@ public:
         mesh.ConstructRectangularMesh(49, 49, true); // 50*50 nodes
 
         // Create cells
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         std::vector<unsigned> real_node_indices;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         unsigned num_cells = 100;
@@ -207,22 +207,22 @@ public:
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(DIFFERENTIATED);
-            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            CellPtr p_cell(new Cell(p_state, p_model));
             cells.push_back(p_cell);
 
             real_node_indices.push_back(i);
         }
 
-        // Create a tissue
-        LatticeBasedTissue<2> tissue(mesh, cells, real_node_indices);
+        // Create a cell population
+        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Create a UpdateRule system
         DiffusionUpdateRule<2> update_rule;
         std::vector<AbstractUpdateRule<2>* > update_rule_collection;
         update_rule_collection.push_back(&update_rule);
 
-        // Set up tissue simulation
-        LatticeBasedTissueSimulation<2> simulator(tissue, update_rule_collection);
+        // Set up cell-based simulation
+        LatticeBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
         simulator.SetOutputDirectory("TestDiffusionOfLargeNumberOfCells");
         simulator.SetDt(0.1);
         simulator.SetEndTime(5.0);
@@ -230,7 +230,7 @@ public:
         // Run simulation
         simulator.Solve();
 
-        TS_ASSERT_EQUALS(tissue.GetNumRealCells(), 100u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 100u);
     }
 
     void TestDiffusionAndDeathOfLargeNumberOfCells() throw (Exception)
@@ -240,7 +240,7 @@ public:
         mesh.ConstructRectangularMesh(19, 19, true); // 50*50 nodes
 
         // Create cells
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         std::vector<unsigned> real_node_indices;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         unsigned num_cells = 100;
@@ -248,34 +248,34 @@ public:
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(DIFFERENTIATED);
-            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            CellPtr p_cell(new Cell(p_state, p_model));
             cells.push_back(p_cell);
 
             real_node_indices.push_back(i);
         }
 
-        // Create a tissue
-        LatticeBasedTissue<2> tissue(mesh, cells, real_node_indices);
+        // Create a cell population
+        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Create a UpdateRule system
         DiffusionUpdateRule<2> update_rule;
         std::vector<AbstractUpdateRule<2>* > update_rule_collection;
         update_rule_collection.push_back(&update_rule);
 
-        // Set up tissue simulation
-        LatticeBasedTissueSimulation<2> simulator(tissue, update_rule_collection);
+        // Set up cell-based simulation
+        LatticeBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
         simulator.SetOutputDirectory("TestDiffusionAndDeathOfLargeNumberOfCells");
         simulator.SetDt(0.1);
         simulator.SetEndTime(10);
 
         // Create cell killer and pass in to simulation
-        RandomCellKiller<2> random_cell_killer(&tissue, 0.005);
+        RandomCellKiller<2> random_cell_killer(&cell_population, 0.005);
         simulator.AddCellKiller(&random_cell_killer);
 
         // Run simulation
         simulator.Solve();
 
-        TS_ASSERT_EQUALS(tissue.GetNumRealCells(), 95u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 95u);
     }
 
     void TestDiffusionAndDivisionOfLargeNumberOfCells() throw (Exception)
@@ -285,7 +285,7 @@ public:
         mesh.ConstructRectangularMesh(19, 19, true); // 50*50 nodes
 
         // Create cells
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         std::vector<unsigned> real_node_indices;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         unsigned num_cells = 50;
@@ -293,23 +293,23 @@ public:
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(STEM);
-            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            CellPtr p_cell(new Cell(p_state, p_model));
             p_cell->SetBirthTime(-RandomNumberGenerator::Instance()->ranf());
             cells.push_back(p_cell);
 
             real_node_indices.push_back(i);
         }
 
-        // Create a tissue
-        LatticeBasedTissue<2> tissue(mesh, cells, real_node_indices);
+        // Create a cell population
+        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Create a UpdateRule system
         DiffusionUpdateRule<2> update_rule;
         std::vector<AbstractUpdateRule<2>*> update_rule_collection;
         update_rule_collection.push_back(&update_rule);
 
-        // Set up tissue simulation
-        LatticeBasedTissueSimulation<2> simulator(tissue, update_rule_collection);
+        // Set up cell-based simulation
+        LatticeBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
         simulator.SetOutputDirectory("TestDiffusionAndDivisionOfLargeNumberOfCells");
         simulator.SetDt(0.1);
         simulator.SetEndTime(10);
@@ -317,7 +317,7 @@ public:
         // Run simulation
         simulator.Solve();
 
-        TS_ASSERT_EQUALS(tissue.GetNumRealCells(), 50u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 50u);
     }
 
     void TestDiffusionAndAdvectionAndDivisionOfLargeNumberOfCells() throw (Exception)
@@ -327,7 +327,7 @@ public:
         mesh.ConstructRectangularMesh(49, 49, true); // 50*50 nodes
 
         // Create cells
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         unsigned num_cells = 6;
 
         std::vector<unsigned> real_node_indices;
@@ -344,13 +344,13 @@ public:
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(STEM);
-            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            CellPtr p_cell(new Cell(p_state, p_model));
             p_cell->SetBirthTime(-RandomNumberGenerator::Instance()->ranf());
             cells.push_back(p_cell);
         }
 
-        // Create a tissue
-        LatticeBasedTissue<2> tissue(mesh, cells, real_node_indices);
+        // Create a cell population
+        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Create a UpdateRule system
         DiffusionUpdateRule<2> diffusion_update_rule;
@@ -359,8 +359,8 @@ public:
         update_rule_collection.push_back(&diffusion_update_rule);
         update_rule_collection.push_back(&advection_update_rule);
 
-        // Set up tissue simulation
-        LatticeBasedTissueSimulation<2> simulator(tissue, update_rule_collection);
+        // Set up cell-based simulation
+        LatticeBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
         simulator.SetOutputDirectory("TestDiffusionAndAdvectionAndDivision");
         simulator.SetDt(0.1);
         simulator.SetEndTime(10);
@@ -379,16 +379,16 @@ public:
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         p_model->SetCellProliferativeType(DIFFERENTIATED);
-        TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+        CellPtr p_cell(new Cell(p_state, p_model));
 
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         cells.push_back(p_cell);
 
         std::vector<unsigned> real_node_indices;
         real_node_indices.push_back(24);
 
-        // Create tissue
-        LatticeBasedTissue<2> tissue(mesh, cells, real_node_indices);
+        // Create cell population
+        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Create multiple advection update rules, one for each firection
         std::vector<AbstractUpdateRule<2>*> update_rule_collection;
@@ -409,8 +409,8 @@ public:
         update_rule_collection.push_back(&update_rule_6);
         update_rule_collection.push_back(&update_rule_7);
 
-        // Set up tissue simulation
-        LatticeBasedTissueSimulation<2> simulator(tissue, update_rule_collection);
+        // Set up cell-based simulation
+        LatticeBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
         simulator.SetOutputDirectory("TestMultipleAdvectionUpdateRules");
 
         /*
@@ -426,8 +426,8 @@ public:
         simulator.Solve();
 
         // Test cell remains at centre of mesh
-        AbstractTissue<2>::Iterator cell_iter = simulator.rGetTissue().Begin();
-        c_vector<double, 2> cell_location = simulator.rGetTissue().GetLocationOfCellCentre(*cell_iter);
+        AbstractCellPopulation<2>::Iterator cell_iter = simulator.rGetCellPopulation().Begin();
+        c_vector<double, 2> cell_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(*cell_iter);
         TS_ASSERT_DELTA(cell_location[0], 3.000, 1e-4);
         TS_ASSERT_DELTA(cell_location[1], 3.000, 1e-4);
     }
@@ -442,16 +442,16 @@ public:
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         p_model->SetCellProliferativeType(STEM);
-        TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+        CellPtr p_cell(new Cell(p_state, p_model));
 
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         cells.push_back(p_cell);
 
         std::vector<unsigned> real_node_indices;
         real_node_indices.push_back(0);
 
-        // Create a tissue
-        LatticeBasedTissue<2> tissue(mesh, cells, real_node_indices);
+        // Create a cell population
+        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Create two update rules
         DiffusionUpdateRule<2> diffusion_update_rule(1.0); // unit diffusion coefficient
@@ -460,8 +460,8 @@ public:
         update_rule_collection.push_back(&diffusion_update_rule);
         update_rule_collection.push_back(&advection_update_rule);
 
-        // Set up tissue simulation
-        LatticeBasedTissueSimulation<2> simulator(tissue, update_rule_collection, true, true);
+        // Set up cell-based simulation
+        LatticeBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection, true, true);
         simulator.SetOutputDirectory("TestRandomIterationOverUpdateRules");
         simulator.SetDt(0.1);
         simulator.SetEndTime(5.0);
@@ -470,8 +470,8 @@ public:
         simulator.Solve();
 
         // Test final position of cell
-        AbstractTissue<2>::Iterator cell_iter = simulator.rGetTissue().Begin();
-        c_vector<double, 2> cell_location = simulator.rGetTissue().GetLocationOfCellCentre(*cell_iter);
+        AbstractCellPopulation<2>::Iterator cell_iter = simulator.rGetCellPopulation().Begin();
+        c_vector<double, 2> cell_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(*cell_iter);
         TS_ASSERT_DELTA(cell_location[0], 0.000, 1e-4);
         TS_ASSERT_DELTA(cell_location[1], 3.000, 1e-4);
     }
@@ -484,7 +484,7 @@ public:
         mesh.ConstructRectangularMesh(49, 49, true); // 50*50 nodes
 
         // Create cells
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         std::vector<unsigned> real_node_indices;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         unsigned num_cells = 100;
@@ -492,42 +492,42 @@ public:
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(STEM);
-            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            CellPtr p_cell(new Cell(p_state, p_model));
             cells.push_back(p_cell);
 
             real_node_indices.push_back(i);
         }
 
-        // Create a tissue
-        LatticeBasedTissue<2> tissue(mesh, cells, real_node_indices);
-        tissue.SetOutputCellCyclePhases(true);
+        // Create a cell population
+        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
+        cell_population.SetOutputCellCyclePhases(true);
 
         // Create a UpdateRule system
         DiffusionUpdateRule<2> update_rule;
         std::vector<AbstractUpdateRule<2>* > update_rule_collection;
         update_rule_collection.push_back(&update_rule);
 
-        // Set up tissue simulation
-        LatticeBasedTissueSimulation<2> simulator(tissue, update_rule_collection);
+        // Set up cell-based simulation
+        LatticeBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
         simulator.SetOutputDirectory("LatticeBasedStandardResult");
         simulator.SetDt(0.1);
         simulator.SetEndTime(8.0);
 
         // Create cell killer and pass in to simulation
-        RandomCellKiller<2> random_cell_killer(&tissue, 0.005);
+        RandomCellKiller<2> random_cell_killer(&cell_population, 0.005);
         simulator.AddCellKiller(&random_cell_killer);
 
         // Run simulation
         simulator.Solve();
 
-        TS_ASSERT_EQUALS(simulator.rGetTissue().GetNumRealCells(), 96u);
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 96u);
 
-        AbstractTissue<2>::Iterator cell_iter = simulator.rGetTissue().Begin();
+        AbstractCellPopulation<2>::Iterator cell_iter = simulator.rGetCellPopulation().Begin();
         for (unsigned i=0; i<28; i++)
         {
             ++cell_iter;
         }
-        c_vector<double, 2> cell_28_location = simulator.rGetTissue().GetLocationOfCellCentre(*cell_iter);
+        c_vector<double, 2> cell_28_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(*cell_iter);
         TS_ASSERT_DELTA(cell_28_location[0], 31.000, 1e-4);
         TS_ASSERT_DELTA(cell_28_location[1], 3.000, 1e-4);
 
@@ -535,7 +535,7 @@ public:
         {
             ++cell_iter;
         }
-        c_vector<double, 2> cell_61_location = simulator.rGetTissue().GetLocationOfCellCentre(*cell_iter);
+        c_vector<double, 2> cell_61_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(*cell_iter);
         TS_ASSERT_DELTA(cell_61_location[0], 11.000, 1e-4);
         TS_ASSERT_DELTA(cell_61_location[1], 5.000, 1e-4);
 
@@ -556,7 +556,7 @@ public:
         mesh.ConstructRectangularMesh(49, 49, true); // 50*50 nodes
 
         // Create cells
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         std::vector<unsigned> real_node_indices;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         unsigned num_cells = 100;
@@ -564,23 +564,23 @@ public:
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetCellProliferativeType(STEM);
-            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            CellPtr p_cell(new Cell(p_state, p_model));
             cells.push_back(p_cell);
 
             real_node_indices.push_back(i);
         }
 
-        // Create a tissue
-        LatticeBasedTissue<2> tissue(mesh, cells, real_node_indices);
-        tissue.SetOutputCellCyclePhases(true);
+        // Create a cell population
+        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
+        cell_population.SetOutputCellCyclePhases(true);
 
         // Create a UpdateRule system
         DiffusionUpdateRule<2> update_rule;
         std::vector<AbstractUpdateRule<2>* > update_rule_collection;
         update_rule_collection.push_back(&update_rule);
 
-        // Set up tissue simulation
-        LatticeBasedTissueSimulation<2> simulator(tissue, update_rule_collection);
+        // Set up cell-based simulation
+        LatticeBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
         simulator.SetOutputDirectory("LatticeBasedSaveAndLoad");
         simulator.SetDt(0.1);
 
@@ -588,40 +588,40 @@ public:
         simulator.SetEndTime(3.0);
 
         // Create cell killer and pass in to simulation
-        RandomCellKiller<2> random_cell_killer(&tissue, 0.005);
+        RandomCellKiller<2> random_cell_killer(&cell_population, 0.005);
         simulator.AddCellKiller(&random_cell_killer);
 
         // Run simulation
         simulator.Solve();
 
-        TS_ASSERT_EQUALS(simulator.rGetTissue().GetNumRealCells(), 98u);
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 98u);
 
         // Save the results
-        TissueSimulationArchiver<2, LatticeBasedTissueSimulation<2> >::Save(&simulator);
+        CellBasedSimulationArchiver<2, LatticeBasedCellBasedSimulation<2> >::Save(&simulator);
     }
 
     // Testing Load (based on previous two tests)
     void TestLoad() throw (Exception)
     {
         // Load the simulation from the TestSave method above and run it from 3.0 to 6.0
-        LatticeBasedTissueSimulation<2>* p_simulator1;
+        LatticeBasedCellBasedSimulation<2>* p_simulator1;
 
-        p_simulator1 = TissueSimulationArchiver<2, LatticeBasedTissueSimulation<2> >::Load("LatticeBasedSaveAndLoad", 3.0);
+        p_simulator1 = CellBasedSimulationArchiver<2, LatticeBasedCellBasedSimulation<2> >::Load("LatticeBasedSaveAndLoad", 3.0);
 
-        TS_ASSERT_EQUALS(p_simulator1->rGetTissue().GetNumRealCells(), 98u);
+        TS_ASSERT_EQUALS(p_simulator1->rGetCellPopulation().GetNumRealCells(), 98u);
         TS_ASSERT_DELTA(p_simulator1->GetDt(), 0.1, 1e-6);
 
         p_simulator1->SetEndTime(6.0);
         p_simulator1->Solve();
 
         // Get mesh
-        TetrahedralMesh<2,2>& r_mesh1 = (static_cast<LatticeBasedTissue<2>*>(&(p_simulator1->rGetTissue())))->rGetMesh();
+        TetrahedralMesh<2,2>& r_mesh1 = (static_cast<LatticeBasedCellPopulation<2>*>(&(p_simulator1->rGetCellPopulation())))->rGetMesh();
 
         // Save then reload, compare meshes either side
-        TissueSimulationArchiver<2, LatticeBasedTissueSimulation<2> >::Save(p_simulator1);
+        CellBasedSimulationArchiver<2, LatticeBasedCellBasedSimulation<2> >::Save(p_simulator1);
 
-        LatticeBasedTissueSimulation<2>* p_simulator2 = TissueSimulationArchiver<2, LatticeBasedTissueSimulation<2> >::Load("LatticeBasedSaveAndLoad", 6.0);
-        TetrahedralMesh<2,2>& r_mesh2 = (static_cast<LatticeBasedTissue<2>*>(&(p_simulator2->rGetTissue())))->rGetMesh();
+        LatticeBasedCellBasedSimulation<2>* p_simulator2 = CellBasedSimulationArchiver<2, LatticeBasedCellBasedSimulation<2> >::Load("LatticeBasedSaveAndLoad", 6.0);
+        TetrahedralMesh<2,2>& r_mesh2 = (static_cast<LatticeBasedCellPopulation<2>*>(&(p_simulator2->rGetCellPopulation())))->rGetMesh();
 
         CompareMeshes(&r_mesh1, &r_mesh2);
 
@@ -631,14 +631,14 @@ public:
         // Run simulation
         p_simulator2->Solve();
 
-        TS_ASSERT_EQUALS(p_simulator2->rGetTissue().GetNumRealCells(), 96u);
+        TS_ASSERT_EQUALS(p_simulator2->rGetCellPopulation().GetNumRealCells(), 96u);
 
-        AbstractTissue<2>::Iterator cell_iter = p_simulator2->rGetTissue().Begin();
+        AbstractCellPopulation<2>::Iterator cell_iter = p_simulator2->rGetCellPopulation().Begin();
         for (unsigned i=0; i<28; i++)
         {
             ++cell_iter;
         }
-        c_vector<double, 2> cell_28_location = p_simulator2->rGetTissue().GetLocationOfCellCentre(*cell_iter);
+        c_vector<double, 2> cell_28_location = p_simulator2->rGetCellPopulation().GetLocationOfCellCentre(*cell_iter);
         TS_ASSERT_DELTA(cell_28_location[0], 31.000, 1e-4);
         TS_ASSERT_DELTA(cell_28_location[1], 3.000, 1e-4);
 
@@ -646,7 +646,7 @@ public:
         {
             ++cell_iter;
         }
-        c_vector<double, 2> cell_61_location = p_simulator2->rGetTissue().GetLocationOfCellCentre(*cell_iter);
+        c_vector<double, 2> cell_61_location = p_simulator2->rGetCellPopulation().GetLocationOfCellCentre(*cell_iter);
         TS_ASSERT_DELTA(cell_61_location[0], 11.000, 1e-4);
         TS_ASSERT_DELTA(cell_61_location[1], 5.000, 1e-4);
 
@@ -662,7 +662,7 @@ public:
 		mesh.ConstructRectangularMesh(49, 49, true); // 50*50 nodes
 
 		// Create cells
-		std::vector<TissueCellPtr> cells;
+		std::vector<CellPtr> cells;
 		std::vector<unsigned> real_node_indices;
 		boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
 		unsigned num_cells = 100;
@@ -670,35 +670,35 @@ public:
 		{
 			FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
 			p_model->SetCellProliferativeType(DIFFERENTIATED);
-			TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+			CellPtr p_cell(new Cell(p_state, p_model));
 			cells.push_back(p_cell);
 
 			real_node_indices.push_back(i);
 		}
 
-		// Create a tissue
-		LatticeBasedTissue<2> tissue(mesh, cells, real_node_indices);
+		// Create a cell population
+		LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
 		// Create a UpdateRule system
 		DiffusionUpdateRule<2> update_rule;
 		std::vector<AbstractUpdateRule<2>* > update_rule_collection;
 		update_rule_collection.push_back(&update_rule);
 
-		// Set up tissue simulation
-		LatticeBasedTissueSimulation<2> simulator(tissue, update_rule_collection);
+		// Set up cell-based simulation
+		LatticeBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
 		simulator.SetOutputDirectory("TestDiffusionOfLargeNumberOfCells");
 		simulator.SetDt(0.1);
 		simulator.SetEndTime(5.0);
 
 		//Test that the simulation parameters are output correctly
-		std::string output_directory = "TestTissueSimulationOutputParameters";
+		std::string output_directory = "TestCellBasedSimulationOutputParameters";
 		OutputFileHandler output_file_handler(output_directory, false);
 		out_stream parameter_file = output_file_handler.OpenOutputFile("results.parameters");
 		// Try to write simulation parameters to file
-		TS_ASSERT_THROWS_THIS(simulator.OutputSimulationParameters(parameter_file),"OutputSimulationParameters() is not yet implemented for LatticeBasedTissueSimulation see #1453");
+		TS_ASSERT_THROWS_THIS(simulator.OutputSimulationParameters(parameter_file),"OutputSimulationParameters() is not yet implemented for LatticeBasedCellBasedSimulation see #1453");
 		parameter_file->close();
 	}
 
 };
 
-#endif /*TESTLATTICEBASEDTISSUESIMULATION_HPP_*/
+#endif /*TESTCELLBASEDSIMULATIONWITHLATTICEBASEDCELLPOPULATION_HPP_*/

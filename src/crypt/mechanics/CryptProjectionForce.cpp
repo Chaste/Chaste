@@ -27,7 +27,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "CryptProjectionForce.hpp"
-#include "MeshBasedTissue.hpp"
+#include "MeshBasedCellPopulation.hpp"
 #include "WntConcentration.hpp"
 
 CryptProjectionForce::CryptProjectionForce()
@@ -35,15 +35,15 @@ CryptProjectionForce::CryptProjectionForce()
       mIncludeWntChemotaxis(false),
       mWntChemotaxisStrength(100.0)
 {
-    mA = TissueConfig::Instance()->GetCryptProjectionParameterA();
-    mB = TissueConfig::Instance()->GetCryptProjectionParameterB();
+    mA = CellBasedConfig::Instance()->GetCryptProjectionParameterA();
+    mB = CellBasedConfig::Instance()->GetCryptProjectionParameterB();
 }
 
 CryptProjectionForce::~CryptProjectionForce()
 {
 }
 
-void CryptProjectionForce::UpdateNode3dLocationMap(AbstractTissue<2>& rTissue)
+void CryptProjectionForce::UpdateNode3dLocationMap(AbstractCellPopulation<2>& rCellPopulation)
 {
     mNode3dLocationMap.clear();
 
@@ -51,15 +51,15 @@ void CryptProjectionForce::UpdateNode3dLocationMap(AbstractTissue<2>& rTissue)
     c_vector<double, 3> node_location_3d;
 
     // Only consider nodes corresponding to real cells
-    for (AbstractTissue<2>::Iterator cell_iter = rTissue.Begin();
-         cell_iter != rTissue.End();
+    for (AbstractCellPopulation<2>::Iterator cell_iter = rCellPopulation.Begin();
+         cell_iter != rCellPopulation.End();
          ++cell_iter)
     {
         // Get node index
-        unsigned node_index = rTissue.GetLocationIndexUsingCell(*cell_iter);
+        unsigned node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
 
         // Get 3D location
-        node_location_2d = rTissue.GetLocationOfCellCentre(*cell_iter);
+        node_location_2d = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
 
         node_location_3d[0] = node_location_2d[0];
         node_location_3d[1] = node_location_2d[1];
@@ -105,20 +105,20 @@ double CryptProjectionForce::CalculateCryptSurfaceDerivativeAtPoint(const c_vect
     return mA*mB*pow(norm_2(rNodeLocation), (mB - 1.0));
 }
 
-c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nodeAGlobalIndex, unsigned nodeBGlobalIndex, AbstractTissue<2>& rTissue)
+c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nodeAGlobalIndex, unsigned nodeBGlobalIndex, AbstractCellPopulation<2>& rCellPopulation)
 {
     // Helper pointer
-    TissueConfig* p_config = TissueConfig::Instance();
+    CellBasedConfig* p_config = CellBasedConfig::Instance();
 
-    assert(rTissue.HasMesh());
-    MeshBasedTissue<2>* p_static_cast_tissue = static_cast<MeshBasedTissue<2>*>(&rTissue);
+    assert(rCellPopulation.HasMesh());
+    MeshBasedCellPopulation<2>* p_static_cast_cell_population = static_cast<MeshBasedCellPopulation<2>*>(&rCellPopulation);
 
     // We should only ever calculate the force between two distinct nodes
     assert(nodeAGlobalIndex != nodeBGlobalIndex);
 
     // Get the node locations in 2D
-    c_vector<double,2> node_a_location_2d = rTissue.GetNode(nodeAGlobalIndex)->rGetLocation();
-    c_vector<double,2> node_b_location_2d = rTissue.GetNode(nodeBGlobalIndex)->rGetLocation();
+    c_vector<double,2> node_a_location_2d = rCellPopulation.GetNode(nodeAGlobalIndex)->rGetLocation();
+    c_vector<double,2> node_b_location_2d = rCellPopulation.GetNode(nodeBGlobalIndex)->rGetLocation();
 
     // "Get the unit vector parallel to the line joining the two nodes" [GeneralisedLinearSpringForce]
 
@@ -136,7 +136,7 @@ c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nod
     // two nodes located a distance apart greater than mUseCutoffPoint
     if (this->mUseCutoffPoint)
     {
-        if (distance_between_nodes >= p_config->GetMeinekeMechanicsCutOffLength())
+        if (distance_between_nodes >= p_config->GetMechanicsCutOffLength())
         {
             // Return zero (2D projected) force
             return zero_vector<double>(2);
@@ -147,8 +147,8 @@ c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nod
 
     double rest_length = 1.0;
 
-    TissueCellPtr p_cell_A = rTissue.GetCellUsingLocationIndex(nodeAGlobalIndex);
-    TissueCellPtr p_cell_B = rTissue.GetCellUsingLocationIndex(nodeBGlobalIndex);
+    CellPtr p_cell_A = rCellPopulation.GetCellUsingLocationIndex(nodeAGlobalIndex);
+    CellPtr p_cell_B = rCellPopulation.GetCellUsingLocationIndex(nodeBGlobalIndex);
 
     double ageA = p_cell_A->GetAge();
     double ageB = p_cell_B->GetAge();
@@ -168,8 +168,8 @@ c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nod
          * The spring rest length increases from a predefined small parameter
          * to a normal rest length of 1.0, over a period of one hour.
          */
-        std::set<TissueCellPtr> cell_pair = p_static_cast_tissue->CreateCellPair(p_cell_A, p_cell_B);
-        if (p_static_cast_tissue->IsMarkedSpring(cell_pair))
+        std::set<CellPtr> cell_pair = p_static_cast_cell_population->CreateCellPair(p_cell_A, p_cell_B);
+        if (p_static_cast_cell_population->IsMarkedSpring(cell_pair))
         {
             double lambda = mMeinekeDivisionRestingSpringLength;
             rest_length = lambda + (1.0 - lambda) * ageA/m_duration;
@@ -177,7 +177,7 @@ c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nod
         if (ageA+SimulationTime::Instance()->GetTimeStep() >= m_duration)
         {
             // This spring is about to go out of scope
-            p_static_cast_tissue->UnmarkSpring(cell_pair);
+            p_static_cast_cell_population->UnmarkSpring(cell_pair);
         }
     }
 
@@ -216,7 +216,7 @@ c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nod
      * subclasses it can depend on properties of each of the cells.
      */
     double multiplication_factor = 1.0;
-    multiplication_factor *= VariableSpringConstantMultiplicationFactor(nodeAGlobalIndex, nodeBGlobalIndex, rTissue, is_closer_than_rest_length);
+    multiplication_factor *= VariableSpringConstantMultiplicationFactor(nodeAGlobalIndex, nodeBGlobalIndex, rCellPopulation, is_closer_than_rest_length);
 
     // Calculate the 3D force between the two points
     c_vector<double,3> force_between_nodes = multiplication_factor * this->GetMeinekeSpringStiffness() * unit_difference * (distance_between_nodes - rest_length);
@@ -247,22 +247,22 @@ c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nod
 }
 
 void CryptProjectionForce::AddForceContribution(std::vector<c_vector<double,2> >& rForces,
-                                                AbstractTissue<2>& rTissue)
+                                                AbstractCellPopulation<2>& rCellPopulation)
 {
     // First work out the 3D location of each cell
-    UpdateNode3dLocationMap(rTissue);
+    UpdateNode3dLocationMap(rCellPopulation);
 
-    assert(rTissue.HasMesh());
-    MeshBasedTissue<2>* p_static_cast_tissue = static_cast<MeshBasedTissue<2>*>(&rTissue);
+    assert(rCellPopulation.HasMesh());
+    MeshBasedCellPopulation<2>* p_static_cast_cell_population = static_cast<MeshBasedCellPopulation<2>*>(&rCellPopulation);
 
-    for (MeshBasedTissue<2>::SpringIterator spring_iterator = p_static_cast_tissue->SpringsBegin();
-         spring_iterator != p_static_cast_tissue->SpringsEnd();
+    for (MeshBasedCellPopulation<2>::SpringIterator spring_iterator = p_static_cast_cell_population->SpringsBegin();
+         spring_iterator != p_static_cast_cell_population->SpringsEnd();
          ++spring_iterator)
     {
         unsigned nodeA_global_index = spring_iterator.GetNodeA()->GetIndex();
         unsigned nodeB_global_index = spring_iterator.GetNodeB()->GetIndex();
 
-        c_vector<double, 2> force = CalculateForceBetweenNodes(nodeA_global_index, nodeB_global_index, rTissue);
+        c_vector<double, 2> force = CalculateForceBetweenNodes(nodeA_global_index, nodeB_global_index, rCellPopulation);
 
         rForces[nodeB_global_index] -= force;
         rForces[nodeA_global_index] += force;
@@ -272,14 +272,14 @@ void CryptProjectionForce::AddForceContribution(std::vector<c_vector<double,2> >
     {
         assert(WntConcentration<2>::Instance()->IsWntSetUp());
 
-        for (AbstractTissue<2>::Iterator cell_iter = rTissue.Begin();
-             cell_iter != rTissue.End();
+        for (AbstractCellPopulation<2>::Iterator cell_iter = rCellPopulation.Begin();
+             cell_iter != rCellPopulation.End();
              ++cell_iter)
         {
             if (cell_iter->GetCellCycleModel()->GetCellProliferativeType()==STEM)
             {
                 c_vector<double, 2> wnt_chemotactic_force = mWntChemotaxisStrength*WntConcentration<2>::Instance()->GetWntGradient(*cell_iter);
-                unsigned index = rTissue.GetLocationIndexUsingCell(*cell_iter);
+                unsigned index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
 
                 rForces[index] += wnt_chemotactic_force;
             }

@@ -33,10 +33,10 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <boost/serialization/base_object.hpp>
 
 #include "NagaiHondaForce.hpp"
-#include "VertexBasedTissue.hpp"
+#include "VertexBasedCellPopulation.hpp"
 
 /**
- * The possible paired contact types types of TissueCells.
+ * The possible paired contact types types of Cells.
  */
 typedef enum CellContactsType
 {
@@ -49,7 +49,7 @@ typedef enum CellContactsType
 static const unsigned NUM_CELL_CONTACTS_TYPES=4;
 
 /**
- * A force class for use in vertex-based tissue simulations, based on a mechanical
+ * A force class for use in vertex-based simulations, based on a mechanical
  * model proposed by T. Nagai and H. Honda ("A dynamic cell model for the formation
  * of epithelial tissues", Philosophical Magazine Part B 81:699-719).
  * Assume differential adhesion.
@@ -85,13 +85,13 @@ public:
     /**
      * Overridden AddForceContribution() method.
      *
-     * Calculates the force on each node in the vertex-based tissue based on the
+     * Calculates the force on each node in the vertex-based cell population based on the
      * Nagai Honda model.
      *
      * @param rForces reference to vector of forces on nodes
-     * @param rTissue reference to the tissue
+     * @param rCellPopulation reference to the cell population
      */
-    void AddForceContribution(std::vector<c_vector<double, DIM> >& rForces, AbstractTissue<DIM>& rTissue);
+    void AddForceContribution(std::vector<c_vector<double, DIM> >& rForces, AbstractCellPopulation<DIM>& rCellPopulation);
 
     /**
      * Get the adhesion parameter for the edge between two given nodes.
@@ -119,11 +119,11 @@ public:
      *
      * @param pNodeA one node
      * @param pNodeB the other node
-     * @param rTissue reference to the tissue
+     * @param rCellPopulation reference to the cell population
      *
      * @return the combinationCellType for this edge.
      */
-    CellContactsType GetCombinationCellTypes(Node<DIM>* pNodeA, Node<DIM>* pNodeB, AbstractTissue<DIM>& rTissue);
+    CellContactsType GetCombinationCellTypes(Node<DIM>* pNodeA, Node<DIM>* pNodeB, AbstractCellPopulation<DIM>& rCellPopulation);
 
     /**
      * Outputs force Parameters to file

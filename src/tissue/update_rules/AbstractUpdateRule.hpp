@@ -30,8 +30,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
-#include "LatticeBasedTissue.hpp"
-#include "TissueConfig.hpp"
+#include "LatticeBasedCellPopulation.hpp"
+#include "CellBasedConfig.hpp"
 
 /**
  * An abstract force class.
@@ -55,7 +55,7 @@ class AbstractUpdateRule
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        TissueConfig* p_config = TissueConfig::Instance();
+        CellBasedConfig* p_config = CellBasedConfig::Instance();
         archive & *p_config;
         archive & p_config;
     }
@@ -78,11 +78,11 @@ public :
      * This method must be overridden in concrete classes.
      *
      * @param currentLocationIndex reference to vector of forces on nodes
-     * @param rTissue reference to the tissue
+     * @param rCellPopulation reference to the cell population
      * @param dt timestep of the simulation to calculate probability of movement in current timestep
      */
     virtual unsigned GetNewLocationOfCell(unsigned currentLocationIndex,
-                                          LatticeBasedTissue<DIM>& rTissue,
+                                          LatticeBasedCellPopulation<DIM>& rCellPopulation,
                                           double dt)=0;
 };
 

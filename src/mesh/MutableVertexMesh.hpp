@@ -45,7 +45,7 @@ class VertexMeshWriter;
 #include "ArchiveLocationInfo.hpp"
 
 /**
- * A vertex-based mesh class, for use in vertex-based tissue simulations.
+ * A vertex-based mesh class, for use in vertex-based cell-based simulations.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class MutableVertexMesh : public VertexMesh<ELEMENT_DIM, SPACE_DIM>
@@ -74,13 +74,13 @@ protected:
     std::vector<unsigned> mDeletedElementIndices;
 
     /**
-     * Locations of T1Swaps (the mid point of the moving nodes), stored so they can be accessed and output by the tissue.
+     * Locations of T1Swaps (the mid point of the moving nodes), stored so they can be accessed and output by the cell population.
      * The locations are stored until they are cleared by ClearLocationsOfT1Swaps()
      */
     std::vector< c_vector<double, SPACE_DIM> > mLocationsOfT1Swaps ;
 
     /**
-     * Locations of T3Swaps (the location of the intersection with the edge), stored so they can be accessed and output by the tissue.
+     * Locations of T3Swaps (the location of the intersection with the edge), stored so they can be accessed and output by the cell population.
      * The locations are stored until they are cleared by ClearLocationsOfT3Swaps()
      */
     std::vector< c_vector<double, SPACE_DIM> > mLocationsOfT3Swaps;

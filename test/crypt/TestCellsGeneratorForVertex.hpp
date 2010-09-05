@@ -56,7 +56,7 @@ public:
         double y3 = 4.0;
 
         // Create cells
-        std::vector<TissueCellPtr> fixed_cells, stochastic_cells;
+        std::vector<CellPtr> fixed_cells, stochastic_cells;
         CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> fixed_cells_generator;
         fixed_cells_generator.Generate(fixed_cells, p_mesh, std::vector<unsigned>(), true, y0, y1, y2, y3, true);
 
@@ -111,7 +111,7 @@ public:
         Cylindrical2dVertexMesh* p_mesh = mesh_generator.GetCylindricalMesh();
 
         // Create cells
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         CryptCellsGenerator<SimpleWntCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, true);
 

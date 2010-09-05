@@ -50,19 +50,19 @@ double ChemotacticForce<DIM>::GetChemotacticForceMagnitude(const double concentr
 
 template<unsigned DIM>
 void ChemotacticForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
-                                                 AbstractTissue<DIM>& rTissue)
+                                                 AbstractCellPopulation<DIM>& rCellPopulation)
 {
     CellwiseDataGradient<DIM> gradients;
     gradients.SetupGradients();
 
-    for (typename AbstractTissue<DIM>::Iterator cell_iter = rTissue.Begin();
-         cell_iter != rTissue.End();
+    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+         cell_iter != rCellPopulation.End();
          ++cell_iter)
     {
         // Only labelled cells move chemotactically
         if (cell_iter->template HasCellProperty<CellLabel>())
         {
-            unsigned node_global_index = rTissue.GetLocationIndexUsingCell(*cell_iter);
+            unsigned node_global_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
 
             c_vector<double,DIM>& r_gradient = gradients.rGetGradient(node_global_index);
             double nutrient_concentration = CellwiseData<DIM>::Instance()->GetValue(*cell_iter, 0);

@@ -33,12 +33,12 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractForce.hpp"
-#include "VertexBasedTissue.hpp"
+#include "VertexBasedCellPopulation.hpp"
 
 #include <iostream>
 
 /**
- * A force class for use in vertex-based tissue simulations, based on a mechanical
+ * A force class for use in vertex-based simulations, based on a mechanical
  * model proposed by T. Nagai and H. Honda ("A dynamic cell model for the formation
  * of epithelial tissues", Philosophical Magazine Part B 81:699-719).
  * 
@@ -52,15 +52,6 @@ class NagaiHondaForce  : public AbstractForce<DIM>
 friend class TestForcesNotForRelease;
 
 private:
-
-    /*
-     * The following four parameters are used in vertex-based tissue simulations
-     * based on the mechanical model proposed by T. Nagai and H. Honda ("A dynamic
-     * cell model for the formation of epithelial tissues", Philosophical Magazine
-     * Part B 81:699-719). They are rescaled such that mDampingConstantNormal takes
-     * the default value 1, whereas Nagai and Honda (who denote the parameter by nu)
-     * take the value 0.01.
-     */
 
     /**
      * Cell deformation energy parameter. Has units of kg s^-2 (cell size at equilibrium rest length)^-1.
@@ -83,7 +74,7 @@ private:
     double mNagaiHondaCellBoundaryAdhesionEnergyParameter;
 
     /**
-     * Non-dimensional target area of a mature (fully-grown) TissueCell.
+     * Non-dimensional target area of a mature (fully-grown) Cell.
      */
     double mMatureCellTargetArea;
 
@@ -116,13 +107,13 @@ public:
     /**
      * Overridden AddForceContribution() method.
      *
-     * Calculates the force on each node in the vertex-based tissue based on the
+     * Calculates the force on each node in the vertex-based cell population based on the
      * Nagai Honda model.
      *
      * @param rForces reference to vector of forces on nodes
-     * @param rTissue reference to the tissue
+     * @param rCellPopulation reference to the cell population
      */
-    void AddForceContribution(std::vector<c_vector<double, DIM> >& rForces, AbstractTissue<DIM>& rTissue);
+    void AddForceContribution(std::vector<c_vector<double, DIM> >& rForces, AbstractCellPopulation<DIM>& rCellPopulation);
 
     /**
      * Get the adhesion parameter for the edge between two given nodes.
@@ -185,13 +176,13 @@ public:
     /**
      * Get the target area of a given cell. This grows linearly from
      * 0.5*A to A during the G1 phase of the cell cycle, then remains
-     * at A for the rest of the cell cycle, where A denotes the TissueConfig
+     * at A for the rest of the cell cycle, where A denotes the CellBasedConfig
      * member variable mMatureCellTargetArea.
      *
      * @param pCell the cell
      * @return the cell's target area
      */
-    double GetTargetAreaOfCell(const TissueCellPtr pCell) const;
+    double GetTargetAreaOfCell(const CellPtr pCell) const;
 
     /**
      * @return mMatureCellTargetArea

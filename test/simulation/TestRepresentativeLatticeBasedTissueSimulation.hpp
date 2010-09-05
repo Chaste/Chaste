@@ -25,17 +25,17 @@ You should have received a copy of the GNU Lesser General Public License
 along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
-#ifndef TESTREPRESENTATIVELATTICEBASEDTISSUESIMULATION_HPP_
-#define TESTREPRESENTATIVELATTICEBASEDTISSUESIMULATION_HPP_
+#ifndef TESTREPRESENTATIVELATTICEBASEDCELLBASEDSIMULATION_HPP_
+#define TESTREPRESENTATIVELATTICEBASEDCELLBASEDSIMULATION_HPP_
 
 #include <cxxtest/TestSuite.h>
 
 // Must be included before other cell_based headers
-#include "TissueSimulationArchiver.hpp"
+#include "CellBasedSimulationArchiver.hpp"
 
-#include "LatticeBasedTissueSimulation.hpp"
+#include "LatticeBasedCellBasedSimulation.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
-#include "LatticeBasedTissue.hpp"
+#include "LatticeBasedCellPopulation.hpp"
 #include "DiffusionUpdateRule.hpp"
 #include "AdvectionUpdateRule.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
@@ -45,18 +45,18 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CellBasedEventHandler.hpp"
 
 /**
- * This class consists of a single test - a 2D lattice-based tissue
+ * This class consists of a single test - a 2D lattice-based cell population
  * simulation.  It has 9 cells that will divide in a square in the middle,
  * and the rest are empty sites.
  *
  * This test is used for profiling, to establish the run time
  * variation as the code is developed.
  */
-class TestRepresentativeLatticeBasedTissueSimulation : public AbstractCellBasedTestSuite
+class TestRepresentativeLatticeBasedCellBasedSimulation : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestRepresentativeLatticeBasedTissueSimulationForProfiling() throw (Exception)
+    void TestRepresentativeLatticeBasedCellBasedSimulationForProfiling() throw (Exception)
     {
         // Create mesh
          TetrahedralMesh<2,2> mesh;
@@ -65,7 +65,7 @@ public:
          // Create cell which keeps dividing
          boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
 
-         std::vector<TissueCellPtr> cells;
+         std::vector<CellPtr> cells;
          std::vector<unsigned> real_node_indices;
          for (unsigned i = 0; i < 9; i++)
          {
@@ -74,24 +74,24 @@ public:
              p_model->SetMaxTransitGenerations(UINT_MAX);
 
              double birth_time = -RandomNumberGenerator::Instance()->ranf()*
-                                  (TissueConfig::Instance()->GetStemCellG1Duration()
-                                      + TissueConfig::Instance()->GetSG2MDuration() );
+                                  (CellBasedConfig::Instance()->GetStemCellG1Duration()
+                                      + CellBasedConfig::Instance()->GetSG2MDuration() );
 
-             TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+             CellPtr p_cell(new Cell(p_state, p_model));
         	 p_cell->SetBirthTime(birth_time);
 
         	 cells.push_back(p_cell);
         	 real_node_indices.push_back(21 * (9 + i/3) + 9 + i%3);
          }
 
-         // Create a tissue
-         LatticeBasedTissue<2> tissue(mesh, cells, real_node_indices);
+         // Create a cell population
+         LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
          // Create an empty UpdateRule system so only movement from cell birth
          std::vector<AbstractUpdateRule<2>* > update_rule_collection;
 
-         // Set up tissue simulation
-         LatticeBasedTissueSimulation<2> simulator(tissue, update_rule_collection);
+         // Set up cell-based simulation
+         LatticeBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
          simulator.SetOutputDirectory("TestRepresentativeLatticeBasedSimulationForProfiling");
          simulator.SetEndTime(50);
 
@@ -102,4 +102,4 @@ public:
     }
 };
 
-#endif /* TESTREPRESENTATIVELATTICEBASEDTISSUESIMULATION_HPP_ */
+#endif /* TESTREPRESENTATIVELATTICEBASEDCELLBASEDSIMULATION_HPP_ */

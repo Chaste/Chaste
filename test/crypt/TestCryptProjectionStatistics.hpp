@@ -35,12 +35,12 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "CryptProjectionStatistics.hpp"
 #include "CryptProjectionForce.hpp"
-#include "TissueSimulation.hpp"
+#include "CellBasedSimulation.hpp"
 #include "SimpleWntCellCycleModel.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "RadialSloughingCellKiller.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
-#include "MeshBasedTissueWithGhostNodes.hpp"
+#include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "WntConcentration.hpp"
 #include "WildTypeCellMutationState.hpp"
 
@@ -51,8 +51,8 @@ public:
 
     void TestGetSection() throw (Exception)
     {
-        // Set up tissue
-        TissueConfig* p_params = TissueConfig::Instance();
+        // Set up cell population
+        CellBasedConfig* p_params = CellBasedConfig::Instance();
 
         double a = 0.2;
         double b = 2.0;
@@ -73,7 +73,7 @@ public:
 
         p_mesh->Translate(-width_of_mesh/2,-height_of_mesh/2);
 
-        std::vector<TissueCellPtr> cells;
+        std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         for (unsigned i=0; i<location_indices.size(); i++)
         {
@@ -82,7 +82,7 @@ public:
             p_model->SetCellProliferativeType(TRANSIT);
             p_model->SetWntStemThreshold(0.95);
 
-            TissueCellPtr p_cell(new TissueCell(p_state, p_model));
+            CellPtr p_cell(new Cell(p_state, p_model));
 
             p_cell->InitialiseCellCycleModel();
             double birth_time = - RandomNumberGenerator::Instance()->ranf()*
@@ -92,16 +92,16 @@ public:
             cells.push_back(p_cell);
         }
 
-        // Make a tissue
-        MeshBasedTissueWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
+        // Make a cell population
+        MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
 
         // Set up the Wnt gradient
         WntConcentration<2>::Instance()->SetType(RADIAL);
-        WntConcentration<2>::Instance()->SetTissue(crypt);
+        WntConcentration<2>::Instance()->SetCellPopulation(crypt);
 
         CryptProjectionStatistics statistics(crypt);
 
-        std::vector<TissueCellPtr> test_section = statistics.GetCryptSection(M_PI/2.0);
+        std::vector<CellPtr> test_section = statistics.GetCryptSection(M_PI/2.0);
 
         // Test the cells are correct
         TS_ASSERT_EQUALS(test_section.size(), 10u);
@@ -118,12 +118,12 @@ public:
         std::vector<AbstractForce<2>* > force_collection;
         force_collection.push_back(&crypt_projection_force);
 
-        // Make a tissue simulation
-        TissueSimulation<2> crypt_projection_simulator(crypt, force_collection, false, false);
+        // Make a cell-based simulation
+        CellBasedSimulation<2> crypt_projection_simulator(crypt, force_collection, false, false);
 
-        // Create a radial cell killer and pass it in to the tissue simulation
+        // Create a radial cell killer and pass it in to the cell-based simulation
         c_vector<double,2> centre = zero_vector<double>(2);
-        double crypt_radius = pow(TissueConfig::Instance()->GetCryptLength()/a, 1.0/b);
+        double crypt_radius = pow(CellBasedConfig::Instance()->GetCryptLength()/a, 1.0/b);
 
         RadialSloughingCellKiller killer(&crypt, centre, crypt_radius);
         crypt_projection_simulator.AddCellKiller(&killer);
@@ -135,7 +135,7 @@ public:
 
         statistics.LabelSPhaseCells();
 
-        std::vector<TissueCellPtr> test_section2 = statistics.GetCryptSection();
+        std::vector<CellPtr> test_section2 = statistics.GetCryptSection();
         std::vector<bool> labelled_cells = statistics.AreCryptSectionCellsLabelled(test_section2);
 
         TS_ASSERT_EQUALS(test_section2.size(), labelled_cells.size());

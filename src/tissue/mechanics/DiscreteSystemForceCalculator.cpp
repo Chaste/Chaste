@@ -27,9 +27,9 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 */
 #include "DiscreteSystemForceCalculator.hpp"
 
-DiscreteSystemForceCalculator::DiscreteSystemForceCalculator(MeshBasedTissue<2>& rTissue,
+DiscreteSystemForceCalculator::DiscreteSystemForceCalculator(MeshBasedCellPopulation<2>& rCellPopulation,
                                                              std::vector<AbstractTwoBodyInteractionForce<2>*> forceCollection)
-    : mrTissue(rTissue),
+    : mrCellPopulation(rCellPopulation),
       mForceCollection(forceCollection),
       mEpsilon(0.01)
 {
@@ -38,7 +38,7 @@ DiscreteSystemForceCalculator::DiscreteSystemForceCalculator(MeshBasedTissue<2>&
 
 std::vector< std::vector<double> > DiscreteSystemForceCalculator::CalculateExtremalNormalForces()
 {
-    unsigned num_nodes = mrTissue.GetNumNodes();
+    unsigned num_nodes = mrCellPopulation.GetNumNodes();
 
     std::vector< std::vector<double> > extremal_normal_forces;
     std::vector<double> minimum_normal_forces(num_nodes);
@@ -97,7 +97,7 @@ void DiscreteSystemForceCalculator::WriteResultsToFile(std::string simulationOut
     double minimum;
     double maximum;
 
-    TetrahedralMesh<2,2>& r_mesh = mrTissue.rGetMesh();
+    TetrahedralMesh<2,2>& r_mesh = mrCellPopulation.rGetMesh();
 
     std::vector< std::vector<double> > extremal_normal_forces = CalculateExtremalNormalForces();
 
@@ -121,7 +121,7 @@ void DiscreteSystemForceCalculator::WriteResultsToFile(std::string simulationOut
 
 std::set<unsigned> DiscreteSystemForceCalculator::GetNeighbouringNodeIndices(unsigned index)
 {
-    TetrahedralMesh<2,2>& r_mesh = mrTissue.rGetMesh();
+    TetrahedralMesh<2,2>& r_mesh = mrCellPopulation.rGetMesh();
 
     Node<2>* p_node = r_mesh.GetNode(index);
 
@@ -147,7 +147,7 @@ std::set<unsigned> DiscreteSystemForceCalculator::GetNeighbouringNodeIndices(uns
 
 std::vector<double> DiscreteSystemForceCalculator::CalculateFtAndFn(unsigned index, double theta)
 {
-    TetrahedralMesh<2,2>& r_mesh = mrTissue.rGetMesh();
+    TetrahedralMesh<2,2>& r_mesh = mrCellPopulation.rGetMesh();
 
     std::set<unsigned> neighbouring_node_indices = GetNeighbouringNodeIndices(index);
 
@@ -177,7 +177,7 @@ std::vector<double> DiscreteSystemForceCalculator::CalculateFtAndFn(unsigned ind
                  force_iter != mForceCollection.end();
                  ++force_iter)
             {
-               force_between_nodes += (*force_iter)->CalculateForceBetweenNodes(index, *iter, mrTissue);
+               force_between_nodes += (*force_iter)->CalculateForceBetweenNodes(index, *iter, mrCellPopulation);
             }
 
             unit_vec_between_nodes[0] = cos(alpha);
@@ -199,7 +199,7 @@ std::vector<double> DiscreteSystemForceCalculator::CalculateFtAndFn(unsigned ind
 
 std::vector<double> DiscreteSystemForceCalculator::GetSamplingAngles(unsigned index)
 {
-    TetrahedralMesh<2,2>& r_mesh = mrTissue.rGetMesh();
+    TetrahedralMesh<2,2>& r_mesh = mrCellPopulation.rGetMesh();
 
     std::set<unsigned> neighbouring_node_indices = GetNeighbouringNodeIndices(index);
 

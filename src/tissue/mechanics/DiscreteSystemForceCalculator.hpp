@@ -29,10 +29,10 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #define DISCRETESYSTEMFORCECALCULATOR_HPP_
 
 #include "AbstractTwoBodyInteractionForce.hpp"
-#include "MeshBasedTissue.hpp"
+#include "MeshBasedCellPopulation.hpp"
 
 /**
- * A class for calculating the force and stress on each node in a mesh-based tissue.
+ * A class for calculating the force and stress on each node in a mesh-based cell population.
  */
 class DiscreteSystemForceCalculator
 {
@@ -41,9 +41,9 @@ class DiscreteSystemForceCalculator
 private:
 
     /**
-     * Reference to tissue.
+     * Reference to cell population.
      */
-    MeshBasedTissue<2>& mrTissue;
+    MeshBasedCellPopulation<2>& mrCellPopulation;
 
     /** The mechanics used to determine the new location of the cells. */
     std::vector<AbstractTwoBodyInteractionForce<2>*> mForceCollection;
@@ -117,13 +117,13 @@ public:
     /**
      * Constructor.
      *
-     * @param rTissue reference to the tissue
+     * @param rCellPopulation reference to the cell population
      * @param forceCollection vector of force laws present
      */
-    DiscreteSystemForceCalculator(MeshBasedTissue<2>& rTissue, std::vector<AbstractTwoBodyInteractionForce<2>*> forceCollection);
+    DiscreteSystemForceCalculator(MeshBasedCellPopulation<2>& rCellPopulation, std::vector<AbstractTwoBodyInteractionForce<2>*> forceCollection);
 
     /**
-     * @return the extremal normal forces on each node in the tissue.
+     * @return the extremal normal forces on each node in the cell population.
      */
     std::vector< std::vector<double> > CalculateExtremalNormalForces();
 

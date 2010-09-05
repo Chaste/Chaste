@@ -29,17 +29,17 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "VertexCryptSimulation2d.hpp"
 #include "WntConcentration.hpp"
 
-VertexCryptSimulation2d::VertexCryptSimulation2d(AbstractTissue<2>& rTissue,
+VertexCryptSimulation2d::VertexCryptSimulation2d(AbstractCellPopulation<2>& rCellPopulation,
                   std::vector<AbstractForce<2>*> forceCollection,
-                  bool deleteTissueAndForceCollection,
+                  bool deleteCellPopulationAndForceCollection,
                   bool initialiseCells)
-    : TissueSimulation<2>(rTissue,
+    : CellBasedSimulation<2>(rCellPopulation,
                           forceCollection,
-                          deleteTissueAndForceCollection,
+                          deleteCellPopulationAndForceCollection,
                           initialiseCells),
       mUseJiggledBottomCells(false)
 {
-    mpStaticCastTissue = static_cast<VertexBasedTissue<2>*>(&mrTissue);
+    mpStaticCastCellPopulation = static_cast<VertexBasedCellPopulation<2>*>(&mrCellPopulation);
 }
 
 
@@ -51,11 +51,11 @@ void VertexCryptSimulation2d::UseJiggledBottomCells()
 
 void VertexCryptSimulation2d::WriteVisualizerSetupFile()
 {
-    *mpVizSetupFile << "MeshWidth\t" << mpStaticCastTissue->rGetMesh().GetWidth(0u) << "\n";
+    *mpVizSetupFile << "MeshWidth\t" << mpStaticCastCellPopulation->rGetMesh().GetWidth(0u) << "\n";
 }
 
 
-c_vector<double, 2> VertexCryptSimulation2d::CalculateCellDivisionVector(TissueCellPtr pParentCell)
+c_vector<double, 2> VertexCryptSimulation2d::CalculateCellDivisionVector(CellPtr pParentCell)
 {
     c_vector<double, 2> axis_of_division = zero_vector<double>(2);
 
@@ -74,7 +74,7 @@ c_vector<double, 2> VertexCryptSimulation2d::CalculateCellDivisionVector(TissueC
 }
 
 
-void VertexCryptSimulation2d::ApplyTissueBoundaryConditions(const std::vector< c_vector<double, 2> >& rOldLocations)
+void VertexCryptSimulation2d::ApplyCellPopulationBoundaryConditions(const std::vector< c_vector<double, 2> >& rOldLocations)
 {
     bool is_wnt_included = WntConcentration<2>::Instance()->IsWntSetUp();
     if (!is_wnt_included)
@@ -83,9 +83,9 @@ void VertexCryptSimulation2d::ApplyTissueBoundaryConditions(const std::vector< c
     }
 
     // Iterate over all nodes and update their positions according to the boundary conditions
-    for (unsigned node_index=0; node_index<this->mrTissue.GetNumNodes(); node_index++)
+    for (unsigned node_index=0; node_index<this->mrCellPopulation.GetNumNodes(); node_index++)
     {
-        Node<2>* p_node = this->mrTissue.GetNode(node_index);
+        Node<2>* p_node = this->mrCellPopulation.GetNode(node_index);
         c_vector<double, 2> old_location = rOldLocations[node_index];
 
         if (!is_wnt_included)
@@ -119,12 +119,12 @@ void VertexCryptSimulation2d::ApplyTissueBoundaryConditions(const std::vector< c
 
 void VertexCryptSimulation2d::OutputSimulationParameters(out_stream& rParamsFile)
 {
-	// \TODO move crypt width and height from TissueConfig to this class #1496
+	// \TODO move crypt width and height from CellBasedConfig to this class #1496
 
 	*rParamsFile << "\t\t<UseJiggledBottomCells>"<< mUseJiggledBottomCells << "</UseJiggledBottomCells>\n";
 
 	// Call direct parent class
-	TissueSimulation<2>::OutputSimulationParameters(rParamsFile);
+	CellBasedSimulation<2>::OutputSimulationParameters(rParamsFile);
 
 }
 

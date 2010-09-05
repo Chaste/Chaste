@@ -33,7 +33,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractUpdateRule.hpp"
-#include "LatticeBasedTissue.hpp"
+#include "LatticeBasedCellPopulation.hpp"
 
 /**
  * An update rule class to model diffusion on the lattice.
@@ -87,17 +87,17 @@ public :
     /**
      * Overridden GetNewLocationOfCell() method.
      *
-     * This randomly moves the cell in one of the possible directions defined by the tissue method
+     * This randomly moves the cell in one of the possible directions defined by the cell population method
      * GetNeighbouringNodeIndices().
      *
      * @param currentLocationIndex the current location index corresponding to a cell
-     * @param rTissue reference to the tissue
+     * @param rCellPopulation reference to the cell population
      * @param dt simulation time step, used to calculate the probability of movement
      *
      * @return the new location index of the cell
      */
     unsigned GetNewLocationOfCell(unsigned currentLocationIndex,
-                                  LatticeBasedTissue<DIM>& rTissue,
+                                  LatticeBasedCellPopulation<DIM>& rCellPopulation,
                                   double dt);
 
     /** @return mDiffusionConstant */

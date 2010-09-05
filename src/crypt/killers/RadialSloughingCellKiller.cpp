@@ -26,10 +26,10 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
 #include "RadialSloughingCellKiller.hpp"
-#include "AbstractCellCentreBasedTissue.hpp"
+#include "AbstractCentreBasedCellPopulation.hpp"
 
-RadialSloughingCellKiller::RadialSloughingCellKiller(AbstractTissue<2>* pTissue, c_vector<double,2> centre, double radius)
-    : AbstractCellKiller<2>(pTissue),
+RadialSloughingCellKiller::RadialSloughingCellKiller(AbstractCellPopulation<2>* pCellPopulation, c_vector<double,2> centre, double radius)
+    : AbstractCellKiller<2>(pCellPopulation),
       mCentre(centre),
       mRadius(radius)
 {
@@ -47,12 +47,12 @@ double RadialSloughingCellKiller::GetRadius() const
 
 void RadialSloughingCellKiller::TestAndLabelCellsForApoptosisOrDeath()
 {
-    for (AbstractTissue<2>::Iterator cell_iter = this->mpTissue->Begin();
-         cell_iter != this->mpTissue->End();
+    for (AbstractCellPopulation<2>::Iterator cell_iter = this->mpCellPopulation->Begin();
+         cell_iter != this->mpCellPopulation->End();
          ++cell_iter)
     {
-        // Get distance from centre of tissue
-        double r = norm_2(this->mpTissue->GetLocationOfCellCentre(*cell_iter) - mCentre);
+        // Get distance from centre of cell population
+        double r = norm_2(this->mpCellPopulation->GetLocationOfCellCentre(*cell_iter) - mCentre);
 
         if (r > mRadius)
         {

@@ -57,13 +57,13 @@ AdvectionUpdateRule<DIM>::~AdvectionUpdateRule()
  */
 template<unsigned DIM>
 unsigned AdvectionUpdateRule<DIM>::GetNewLocationOfCell(unsigned currentLocationIndex,
-                                                        LatticeBasedTissue<DIM>& rTissue,
+                                                        LatticeBasedCellPopulation<DIM>& rCellPopulation,
                                                         double dt)
 {
     assert(DIM == 2); // this method only works in 2D at present
 
     // Make sure we have a cell at this node
-    if (rTissue.IsEmptySite(currentLocationIndex))
+    if (rCellPopulation.IsEmptySite(currentLocationIndex))
     {
         EXCEPTION("There is no cell at the current location.");
     }
@@ -75,9 +75,9 @@ unsigned AdvectionUpdateRule<DIM>::GetNewLocationOfCell(unsigned currentLocation
     if (RandomNumberGenerator::Instance()->ranf() < probability_of_moving)
     {
         unsigned flow_induced_new_index = currentLocationIndex;
-        double width = rTissue.rGetMesh().GetWidth(0);
+        double width = rCellPopulation.rGetMesh().GetWidth(0);
         unsigned nodes_across = (unsigned)width + 1;
-        double height = rTissue.rGetMesh().GetWidth(1);
+        double height = rCellPopulation.rGetMesh().GetWidth(1);
         unsigned nodes_up = (unsigned)height + 1;
 
         // Work out whether this node lies on any edge of the mesh
@@ -157,7 +157,7 @@ unsigned AdvectionUpdateRule<DIM>::GetNewLocationOfCell(unsigned currentLocation
                 NEVER_REACHED;
         }
 
-        if (rTissue.IsEmptySite(flow_induced_new_index))
+        if (rCellPopulation.IsEmptySite(flow_induced_new_index))
         {
             new_location_index = flow_induced_new_index;
         }
