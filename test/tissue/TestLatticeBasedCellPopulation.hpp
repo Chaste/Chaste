@@ -1369,7 +1369,7 @@ public:
         // Create a cell population
         LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
-        TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "LatticeBasedCellPopulation<2>");
+        TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "LatticeBasedCellPopulation-2");
 
         cell_population.SetCellAncestorsToLocationIndices();
         cell_population.SetOutputCellIdData(true);

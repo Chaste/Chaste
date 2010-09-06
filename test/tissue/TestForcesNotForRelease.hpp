@@ -1387,7 +1387,7 @@ public:
 
         // Test with ChemotacticForce
         ChemotacticForce<2> chemotactic_force;
-        TS_ASSERT_EQUALS(chemotactic_force.GetIdentifier(), "ChemotacticForce<2>");
+        TS_ASSERT_EQUALS(chemotactic_force.GetIdentifier(), "ChemotacticForce-2");
 
         out_stream chemotactic_force_parameter_file = output_file_handler.OpenOutputFile("chemotactic_results.parameters");
         chemotactic_force.OutputForceParameters(chemotactic_force_parameter_file);
@@ -1409,7 +1409,7 @@ public:
 
         // Test with NagaiHondaForce
         NagaiHondaForce<2> nagai_force;
-        TS_ASSERT_EQUALS(nagai_force.GetIdentifier(), "NagaiHondaForce<2>");
+        TS_ASSERT_EQUALS(nagai_force.GetIdentifier(), "NagaiHondaForce-2");
 
         out_stream nagai_force_parameter_file = output_file_handler.OpenOutputFile("nagai_results.parameters");
         nagai_force.OutputForceParameters(nagai_force_parameter_file);
@@ -1420,7 +1420,7 @@ public:
 
         // Test with NagaiHondaForceDifferentialAdhesionForce
         NagaiHondaDifferentialAdhesionForce<2> differential_force;
-        TS_ASSERT_EQUALS(differential_force.GetIdentifier(), "NagaiHondaDifferentialAdhesionForce<2>");
+        TS_ASSERT_EQUALS(differential_force.GetIdentifier(), "NagaiHondaDifferentialAdhesionForce-2");
 
         out_stream differential_force_parameter_file = output_file_handler.OpenOutputFile("differential_results.parameters");
         differential_force.OutputForceParameters(differential_force_parameter_file);
@@ -1431,7 +1431,7 @@ public:
 
         // Test with WelikyOsterForce
         WelikyOsterForce<2> weliky_force;
-        TS_ASSERT_EQUALS(weliky_force.GetIdentifier(), "WelikyOsterForce<2>");
+        TS_ASSERT_EQUALS(weliky_force.GetIdentifier(), "WelikyOsterForce-2");
 
         out_stream weliky_force_parameter_file = output_file_handler.OpenOutputFile("weliky_results.parameters");
         weliky_force.OutputForceParameters(weliky_force_parameter_file);
@@ -1442,7 +1442,7 @@ public:
 
         // Test with VertexCryptBoundaryForce
         VertexCryptBoundaryForce<2> boundary_force;
-        TS_ASSERT_EQUALS(boundary_force.GetIdentifier(), "VertexCryptBoundaryForce<2>");
+        TS_ASSERT_EQUALS(boundary_force.GetIdentifier(), "VertexCryptBoundaryForce-2");
 
         out_stream boundary_force_parameter_file = output_file_handler.OpenOutputFile("boundary_results.parameters");
         boundary_force.OutputForceParameters(boundary_force_parameter_file);

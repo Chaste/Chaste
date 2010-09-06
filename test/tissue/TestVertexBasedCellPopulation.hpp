@@ -771,7 +771,7 @@ public:
         // Create cell population
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "VertexBasedCellPopulation<2>");
+        TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "VertexBasedCellPopulation-2");
 
         // For coverage of WriteResultsToFiles()
         boost::shared_ptr<AbstractCellProperty> p_state(cell_population.GetCellPropertyRegistry()->Get<WildTypeCellMutationState>());
