@@ -1,2 +1,2 @@
 cell/TestCellCycleModelsNotForRelease.hpp
-tissue/TestCellKillersNotForRelease.hpp
+population/TestCellKillersNotForRelease.hpp
