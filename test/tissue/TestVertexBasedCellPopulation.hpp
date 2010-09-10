@@ -120,6 +120,38 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), p_mesh->GetNumNodes());
     }
 
+    // Test that exception is thrown if no boundary nodes are defined in the mesh.
+	void TestExceptions() throw (Exception)
+	{
+		// Create a simple 2D VertexMesh
+		// Make four nodes all non boundary nodes to assign to one elements
+		std::vector<Node<2>*> basic_nodes;
+		basic_nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+		basic_nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
+		basic_nodes.push_back(new Node<2>(2, false, 1.0, 1.0));
+		basic_nodes.push_back(new Node<2>(3, false, 0.0, 1.0));
+
+		// Make one square elements out of these nodes
+		std::vector<Node<2>*> element_nodes;
+		for (unsigned i=0; i<4; i++)
+		{
+			element_nodes.push_back(basic_nodes[i]);
+		}
+
+		std::vector<VertexElement<2,2>*> basic_vertex_elements;
+		basic_vertex_elements.push_back(new VertexElement<2,2>(0, element_nodes));
+
+		// Make a vertex mesh with no boundary nodes
+		MutableVertexMesh<2,2> basic_vertex_mesh(basic_nodes, basic_vertex_elements);
+
+		// Set up cells
+		std::vector<CellPtr> cells = SetUpCells(basic_vertex_mesh);
+
+		// Create cell population
+		TS_ASSERT_THROWS_THIS(VertexBasedCellPopulation<2> cell_population(basic_vertex_mesh, cells),
+				"No boundary nodes are defined in the supplied vertex mesh which are needed for vertex based simulations.");
+	}
+
 
     void TestValidate() throw (Exception)
     {
@@ -333,11 +365,11 @@ public:
     {
         // Make some nodes
         std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, false, 2.0, -1.0));
-        nodes.push_back(new Node<2>(1, false, 2.0, 1.0));
-        nodes.push_back(new Node<2>(2, false, -2.0, 1.0));
-        nodes.push_back(new Node<2>(3, false, -2.0, -1.0));
-        nodes.push_back(new Node<2>(4, false, 0.0, 2.0));
+        nodes.push_back(new Node<2>(0, true, 2.0, -1.0));
+        nodes.push_back(new Node<2>(1, true, 2.0, 1.0));
+        nodes.push_back(new Node<2>(2, true, -2.0, 1.0));
+        nodes.push_back(new Node<2>(3, true, -2.0, -1.0));
+        nodes.push_back(new Node<2>(4, true, 0.0, 2.0));
 
         // Make a rectangular element out of nodes 0,1,2,3
         std::vector<Node<2>*> nodes_elem_1;
@@ -454,10 +486,10 @@ public:
     {
         // Make a vertex mesh consisting of a single square element
         std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
-        nodes.push_back(new Node<2>(1, false, 2.0, 0.0));
-        nodes.push_back(new Node<2>(2, false, 2.0, 1.0));
-        nodes.push_back(new Node<2>(3, false, 0.0, 1.0));
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 2.0, 0.0));
+        nodes.push_back(new Node<2>(2, true, 2.0, 1.0));
+        nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
 
         std::vector<Node<2>*> nodes_elem;
         for (unsigned i=0; i<4; i++)
@@ -1000,15 +1032,15 @@ public:
     {
         // Create mutable vertex mesh
         std::vector<Node<3>*> nodes;
-        nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.0));
-        nodes.push_back(new Node<3>(1, false, 1.0, 0.0, 0.0));
-        nodes.push_back(new Node<3>(2, false, 0.0, 1.0, 0.0));
-        nodes.push_back(new Node<3>(3, false, 0.0, 0.0, 1.0));
-        nodes.push_back(new Node<3>(4, false, 1.0, 1.0, 0.0));
-        nodes.push_back(new Node<3>(5, false, 0.0, 1.0, 1.0));
-        nodes.push_back(new Node<3>(6, false, 1.0, 0.0, 1.0));
-        nodes.push_back(new Node<3>(7, false, 1.0, 1.0, 1.0));
-        nodes.push_back(new Node<3>(8, false, 0.5, 0.5, 1.5));
+        nodes.push_back(new Node<3>(0, true, 0.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, true, 1.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(2, true, 0.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(3, true, 0.0, 0.0, 1.0));
+        nodes.push_back(new Node<3>(4, true, 1.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(5, true, 0.0, 1.0, 1.0));
+        nodes.push_back(new Node<3>(6, true, 1.0, 0.0, 1.0));
+        nodes.push_back(new Node<3>(7, true, 1.0, 1.0, 1.0));
+        nodes.push_back(new Node<3>(8, true, 0.5, 0.5, 1.5));
 
         std::vector<std::vector<Node<3>*> > nodes_faces(10);
         nodes_faces[0].push_back(nodes[0]);
@@ -1246,11 +1278,11 @@ public:
     {
         // Make some nodes
         std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, false, 2.0, -1.0));
-        nodes.push_back(new Node<2>(1, false, 2.0, 1.0));
-        nodes.push_back(new Node<2>(2, false, -2.0, 1.0));
-        nodes.push_back(new Node<2>(3, false, -2.0, -1.0));
-        nodes.push_back(new Node<2>(4, false, 0.0, 2.0));
+        nodes.push_back(new Node<2>(0, true, 2.0, -1.0));
+        nodes.push_back(new Node<2>(1, true, 2.0, 1.0));
+        nodes.push_back(new Node<2>(2, true, -2.0, 1.0));
+        nodes.push_back(new Node<2>(3, true, -2.0, -1.0));
+        nodes.push_back(new Node<2>(4, true, 0.0, 2.0));
 
         // Make a rectangular element out of nodes 0,1,2,3
         std::vector<Node<2>*> nodes_elem_1;
@@ -1334,11 +1366,11 @@ public:
     {
         // Make some nodes
         std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, false, 2.0, -1.0));
-        nodes.push_back(new Node<2>(1, false, 2.0, 1.0));
-        nodes.push_back(new Node<2>(2, false, -2.0, 1.0));
-        nodes.push_back(new Node<2>(3, false, -2.0, -1.0));
-        nodes.push_back(new Node<2>(4, false, 0.0, 2.0));
+        nodes.push_back(new Node<2>(0, true, 2.0, -1.0));
+        nodes.push_back(new Node<2>(1, true, 2.0, 1.0));
+        nodes.push_back(new Node<2>(2, true, -2.0, 1.0));
+        nodes.push_back(new Node<2>(3, true, -2.0, -1.0));
+        nodes.push_back(new Node<2>(4, true, 0.0, 2.0));
 
         // Make a rectangular element out of nodes 0,1,2,3
         std::vector<Node<2>*> nodes_elem_1;

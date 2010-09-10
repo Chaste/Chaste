@@ -666,7 +666,7 @@ public:
         for (unsigned i=0; i<num_nodes; i++)
         {
             angles[i] = M_PI+2.0*M_PI*(double)(i)/(double)(num_nodes);
-            nodes.push_back(new Node<2>(i, false, cos(angles[i]), sin(angles[i])));
+            nodes.push_back(new Node<2>(i, true, cos(angles[i]), sin(angles[i])));
         }
 
         std::vector<VertexElement<2,2>*> elements;
@@ -927,7 +927,7 @@ public:
             for (unsigned i=0; i<num_nodes; i++)
             {
                 angles[i] = M_PI+2.0*M_PI*(double)(i)/(double)(num_nodes);
-                nodes.push_back(new Node<2>(i, false, cos(angles[i]), sin(angles[i])));
+                nodes.push_back(new Node<2>(i, true, cos(angles[i]), sin(angles[i])));
             }
     
             std::vector<VertexElement<2,2>*> elements;
@@ -1102,7 +1102,7 @@ public:
             for (unsigned i=0; i<num_nodes; i++)
             {
                 angles[i] = M_PI+2.0*M_PI*(double)(i)/(double)(num_nodes);
-                nodes.push_back(new Node<2>(i, false, cos(angles[i]), sin(angles[i])));
+                nodes.push_back(new Node<2>(i, true, cos(angles[i]), sin(angles[i])));
             }
 
             std::vector<VertexElement<2,2>*> elements;
@@ -1175,7 +1175,7 @@ public:
         for (unsigned i=0; i<num_nodes; i++)
         {
             angles[i] = M_PI+2.0*M_PI*(double)(i)/(double)(num_nodes);
-            nodes.push_back(new Node<2>(i, false, cos(angles[i]), sin(angles[i])));
+            nodes.push_back(new Node<2>(i, true, cos(angles[i]), sin(angles[i])));
         }
 
         std::vector<VertexElement<2,2>*> elements;
@@ -1251,7 +1251,7 @@ public:
             for (unsigned i=0; i<num_nodes; i++)
             {
                 angles[i] = M_PI+2.0*M_PI*(double)(i)/(double)(num_nodes);
-                nodes.push_back(new Node<2>(i, false, cos(angles[i]), sin(angles[i])));
+                nodes.push_back(new Node<2>(i, true, cos(angles[i]), sin(angles[i])));
             }
 
             std::vector<VertexElement<2,2>*> elements;

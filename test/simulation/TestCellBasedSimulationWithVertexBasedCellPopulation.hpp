@@ -79,7 +79,7 @@ public:
         for (unsigned i=0; i<num_nodes; i++)
         {
             double theta = M_PI+2.0*M_PI*(double)(i)/(double)(num_nodes);
-            nodes.push_back(new Node<2>(i, false, cos(theta), sin(theta)));
+            nodes.push_back(new Node<2>(i, true, cos(theta), sin(theta)));
         }
 
         std::vector<VertexElement<2,2>*> elements;
@@ -138,7 +138,7 @@ public:
         for (unsigned i=0; i<num_nodes; i++)
         {
             double theta = M_PI+2.0*M_PI*(double)(i)/(double)(num_nodes);
-            nodes.push_back(new Node<2>(i, false, cos(theta), sin(theta)));
+            nodes.push_back(new Node<2>(i, true, cos(theta), sin(theta)));
         }
 
         std::vector<VertexElement<2,2>*> elements;
@@ -524,7 +524,7 @@ public:
         for (unsigned i=0; i<num_nodes; i++)
         {
             double theta = M_PI+2.0*M_PI*(double)(i)/(double)(num_nodes);
-            nodes.push_back(new Node<2>(i, false, cos(theta), sin(theta)));
+            nodes.push_back(new Node<2>(i, true, cos(theta), sin(theta)));
         }
 
         std::vector<VertexElement<2,2>*> elements;

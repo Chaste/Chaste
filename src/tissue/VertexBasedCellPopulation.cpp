@@ -43,7 +43,25 @@ VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM,
 {
     this->mCellPopulationContainsMesh = true;
 
-    if (validate)
+    // Check the mesh contains boundary nodes
+    bool contains_boundary_nodes = false;
+    for (typename MutableVertexMesh<DIM,DIM>::NodeIterator node_iter = mrMesh.GetNodeIteratorBegin();
+             node_iter != mrMesh.GetNodeIteratorEnd();
+             ++node_iter)
+    {
+        if (node_iter->IsBoundaryNode())
+        {
+            contains_boundary_nodes = true;
+        }
+    }
+    //if(mrMesh.GetNumBoundaryNodes()==0) \TODO should be able to do this but mBoundaryNodes is not used in vertex meshes see #1558.
+    if(!contains_boundary_nodes)
+    {
+    	EXCEPTION("No boundary nodes are defined in the supplied vertex mesh which are needed for vertex based simulations.");
+    }
+
+    // Check each element has only one cell attached
+	 if (validate)
     {
         Validate();
     }
