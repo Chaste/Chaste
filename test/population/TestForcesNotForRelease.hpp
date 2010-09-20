@@ -557,17 +557,17 @@ public:
             }
         }
 
-        // There are two combinations of type WILD_WILD 
+        // There are two combinations of type WILD_WILD
         TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(7), p_mesh->GetNode(9), cell_population), WILD_WILD);
         TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(9), p_mesh->GetNode(7), cell_population), WILD_WILD);
         TS_ASSERT_DELTA(force.GetAdhesionParameterDifferentialAddition(p_mesh->GetNode(9), p_mesh->GetNode(7), WILD_WILD), 0.01, 1e-4);
 
-        // There are two combinations of type WILD_LABELLED 
+        // There are two combinations of type WILD_LABELLED
         TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(6), p_mesh->GetNode(9), cell_population), WILD_LABELLED);
         TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(9), p_mesh->GetNode(6), cell_population), WILD_LABELLED);
         TS_ASSERT_DELTA(force.GetAdhesionParameterDifferentialAddition(p_mesh->GetNode(9), p_mesh->GetNode(6), WILD_LABELLED), 1.0, 1e-4);
 
-        // There are two combinations of type LABELLED_LABELLED 
+        // There are two combinations of type LABELLED_LABELLED
         TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(6), p_mesh->GetNode(8), cell_population), LABELLED_LABELLED);
         TS_ASSERT_EQUALS(force.GetCombinationCellTypes(p_mesh->GetNode(8), p_mesh->GetNode(6), cell_population), LABELLED_LABELLED);
         TS_ASSERT_DELTA(force.GetAdhesionParameterDifferentialAddition(p_mesh->GetNode(9), p_mesh->GetNode(7), LABELLED_LABELLED), 0.01, 1e-4);
@@ -678,67 +678,6 @@ public:
         }
     }
 
-    void TestVertexCryptBoundaryForce() throw (Exception)
-    {
-        // Create a simple 2D VertexMesh
-        HoneycombMutableVertexMeshGenerator generator(5, 5, false, 0.1, 0.5);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
-
-        // Translate mesh so that some points are below y=0
-        p_mesh->Translate(0.0, -3.0);
-
-        // Set up cells, one for each VertexElement. Give each cell
-        // a birth time of -elem_index, so its age is elem_index
-        std::vector<CellPtr> cells;
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
-        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
-        {
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-            p_model->SetCellProliferativeType(DIFFERENTIATED);
-
-            CellPtr p_cell(new Cell(p_state, p_model));
-            double birth_time = 0.0 - elem_index;
-            p_cell->SetBirthTime(birth_time);
-            cells.push_back(p_cell);
-        }
-
-        // Create cell population
-        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
-
-        // Create a force system
-        VertexCryptBoundaryForce<2> force(100);
-
-        // Initialise a vector of new node forces
-        std::vector<c_vector<double, 2> > node_forces;
-        node_forces.reserve(cell_population.GetNumNodes());
-
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
-        {
-            node_forces.push_back(zero_vector<double>(2));
-        }
-
-        force.AddForceContribution(node_forces, cell_population);
-
-        // Check forces are correct
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
-        {
-            TS_ASSERT_DELTA(node_forces[i][0], 0.0, 1e-4);
-
-            double y = cell_population.GetNode(i)->rGetLocation()[1];
-            if (y >= 0.0)
-            {
-                // If y > 0, the force contribution should be zero...
-                TS_ASSERT_DELTA(node_forces[i][1], 0.0, 1e-4);
-            }
-            else
-            {
-                // ...otherwise, the force contribution should be quadratic in y
-                double expected_force = force.GetForceStrength()*y*y;
-                TS_ASSERT_DELTA(node_forces[i][1], expected_force, 1e-4);
-            }
-        }
-    }
-
     void TestForceOutputParameters()
     {
         std::string output_directory = "TestNotForReleaseForceOutputParameters";
@@ -753,7 +692,7 @@ public:
         projection_force_parameter_file->close();
 
         std::string variable_force_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + variable_force_results_dir + "projection_results.parameters notforrelease_cell_based/test/data/TestNotForReleaseForceOutputParameters/projection_results.parameters").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + variable_force_results_dir + "projection_results.parameters notforrelease_cell_based/test/data/TestForcesNotForRelease/projection_results.parameters").c_str()), 0);
 
         // Test with NagaiHondaForceDifferentialAdhesionForce
         NagaiHondaDifferentialAdhesionForce<2> differential_force;
@@ -764,18 +703,7 @@ public:
         differential_force_parameter_file->close();
 
         std::string differential_force_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + differential_force_results_dir + "differential_results.parameters notforrelease_cell_based/test/data/TestNotForReleaseForceOutputParameters/differential_results.parameters").c_str()), 0);
-
-        // Test with VertexCryptBoundaryForce
-        VertexCryptBoundaryForce<2> boundary_force;
-        TS_ASSERT_EQUALS(boundary_force.GetIdentifier(), "VertexCryptBoundaryForce-2");
-
-        out_stream boundary_force_parameter_file = output_file_handler.OpenOutputFile("boundary_results.parameters");
-        boundary_force.OutputForceParameters(boundary_force_parameter_file);
-        boundary_force_parameter_file->close();
-
-        std::string boundary_force_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + boundary_force_results_dir + "boundary_results.parameters notforrelease_cell_based/test/data/TestNotForReleaseForceOutputParameters/boundary_results.parameters").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + differential_force_results_dir + "differential_results.parameters notforrelease_cell_based/test/data/TestForcesNotForRelease/differential_results.parameters").c_str()), 0);
     }
 };
 
