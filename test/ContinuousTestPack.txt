@@ -1,10 +1,5 @@
-crypt/TestCellsGeneratorForVertex.hpp
 crypt/TestCryptProjectionStatistics.hpp
-crypt/TestCylindrical2dVertexMesh.hpp
-crypt/TestVertexCryptSimulation2d.hpp
-mesh/TestCylindricalHoneycombVertexMeshGenerator.hpp
 simulation/TestCellBasedSimulationNotForRelease.hpp
-simulation/TestCellBasedSimulationWithVertexBasedCellPopulation.hpp
 population/TestCellKillersNotForRelease.hpp
 population/TestForcesNotForRelease.hpp
 population/TestLatticeBasedCellPopulation.hpp
