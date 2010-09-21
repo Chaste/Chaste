@@ -71,7 +71,7 @@ private :
      * Whether to include Wnt-dependent chemotaxis for stem cells.
      */
     bool mIncludeWntChemotaxis;
-    
+
     /**
      * Strength of Wnt-based chemotactic force.
      */
@@ -131,7 +131,7 @@ public :
 
     /**
      * Set mWntChemotaxisStrength.
-     * 
+     *
      * @param wntChemotaxisStrength the new value of mWntChemotaxisStrength
      */
     void SetWntChemotaxisStrength(double wntChemotaxisStrength);

@@ -56,8 +56,8 @@ public:
 
         double a = 0.2;
         double b = 2.0;
-        p_params->SetCryptProjectionParameterA(a);
-        p_params->SetCryptProjectionParameterB(b);
+        WntConcentration<2>::Instance()->SetCryptProjectionParameterA(a);
+        WntConcentration<2>::Instance()->SetCryptProjectionParameterB(b);
 
         int num_cells_depth = 20;
         int num_cells_width = 20;

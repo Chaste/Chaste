@@ -55,8 +55,6 @@ public:
 
     void TestCryptProjectionForceMethods() throw (Exception)
     {
-        CellBasedConfig* p_params = CellBasedConfig::Instance();
-
         // Create a mesh
         unsigned num_cells_width = 10;
         unsigned num_cells_depth = 10;
@@ -101,8 +99,8 @@ public:
         cell_population.MarkSpring(cell_pair_4_5);
 
         // Create a spring system with crypt surface z = 2*r
-        p_params->SetCryptProjectionParameterA(2.0);
-        p_params->SetCryptProjectionParameterB(1.0);
+        WntConcentration<2>::Instance()->SetCryptProjectionParameterA(2.0);
+        WntConcentration<2>::Instance()->SetCryptProjectionParameterB(1.0);
         CryptProjectionForce crypt_projection_force;
 
         // Test get methods
@@ -207,8 +205,8 @@ public:
         TS_ASSERT_DELTA(node_forces[0][1], 0.0, 1e-4);
 
         // Test that in the case of a flat crypt surface (mA=mB=0), the results are the same as for Meineke2001SpringSystem
-        p_params->SetCryptProjectionParameterA(0.001);
-        p_params->SetCryptProjectionParameterB(0.001);
+        WntConcentration<2>::Instance()->SetCryptProjectionParameterA(0.001);
+        WntConcentration<2>::Instance()->SetCryptProjectionParameterB(0.001);
         CryptProjectionForce flat_crypt_projection_force;
         GeneralisedLinearSpringForce<2> linear_force;
 
@@ -228,6 +226,8 @@ public:
             TS_ASSERT_DELTA( force_flat[0], force_meineke[0], 1e-3);
             TS_ASSERT_DELTA( force_flat[1], force_meineke[1], 1e-3);
         }
+
+        WntConcentration<2>::Destroy();
     }
 
     /**
@@ -236,8 +236,6 @@ public:
      */
     void TestCryptProjectionForceWithWntBasedChemotaxis() throw (Exception)
     {
-        CellBasedConfig* p_params = CellBasedConfig::Instance();
-
         // Create a mesh
         unsigned num_cells_width = 10;
         unsigned num_cells_depth = 10;
@@ -277,8 +275,8 @@ public:
         WntConcentration<2>::Instance()->SetCellPopulation(cell_population);
 
         // Create a spring system with crypt surface z = 2*r
-        p_params->SetCryptProjectionParameterA(2.0);
-        p_params->SetCryptProjectionParameterB(1.0);
+        WntConcentration<2>::Instance()->SetCryptProjectionParameterA(2.0);
+        WntConcentration<2>::Instance()->SetCryptProjectionParameterB(1.0);
         CryptProjectionForce crypt_projection_force;
 
         crypt_projection_force.SetWntChemotaxis(false);
@@ -321,12 +319,12 @@ public:
 
         TS_ASSERT_DELTA(new_force[0], old_force[0]+wnt_component[0], 1e-4);
         TS_ASSERT_DELTA(new_force[1], old_force[1]+wnt_component[1], 1e-4);
+
+        WntConcentration<2>::Destroy();
     }
 
     void TestCryptProjectionForceWithArchiving() throw (Exception)
     {
-        CellBasedConfig* p_params = CellBasedConfig::Instance();
-
         OutputFileHandler handler("archive", false);    // don't erase contents of folder
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "crypt_projection_spring_system.arch";
 
@@ -352,8 +350,8 @@ public:
             }
 
             MeshBasedCellPopulation<2> crypt(mesh, cells);
-            p_params->SetCryptProjectionParameterA(1.0);
-            p_params->SetCryptProjectionParameterB(2.0);
+            WntConcentration<2>::Instance()->SetCryptProjectionParameterA(1.0);
+            WntConcentration<2>::Instance()->SetCryptProjectionParameterB(2.0);
 
             // Create force object
             CryptProjectionForce crypt_projection_force;
@@ -370,6 +368,7 @@ public:
             p_crypt_projection_force->UseCutoffPoint(1.1);
 
             output_arch << p_crypt_projection_force;
+            WntConcentration<2>::Destroy();
         }
 
         {
@@ -396,8 +395,6 @@ public:
 
     void TestForceCollection() throw (Exception)
     {
-        CellBasedConfig* p_params = CellBasedConfig::Instance();
-
         unsigned cells_across = 7;
         unsigned cells_up = 5;
         unsigned thickness_of_ghost_layer = 3;
@@ -435,8 +432,8 @@ public:
         // Create two different force laws and add to a std::list
         GeneralisedLinearSpringForce<2> linear_force;
 
-        p_params->SetCryptProjectionParameterA(0.0001);
-        p_params->SetCryptProjectionParameterB(0.0001);
+        WntConcentration<2>::Instance()->SetCryptProjectionParameterA(0.0001);
+        WntConcentration<2>::Instance()->SetCryptProjectionParameterB(0.0001);
         CryptProjectionForce crypt_projection_force;
 
         std::vector<AbstractForce<2>* > forces;
@@ -506,6 +503,8 @@ public:
 
         TS_ASSERT_DELTA(new_node_forces[58][0], 2*0.5*linear_force.GetMeinekeSpringStiffness(), 1e-4);
         TS_ASSERT_DELTA(new_node_forces[58][1], 0.0, 1e-4);
+
+        WntConcentration<2>::Destroy();
     }
 
     // This test contains cells of 2 mutation types, wildtype and labelled type,

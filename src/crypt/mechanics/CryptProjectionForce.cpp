@@ -35,8 +35,8 @@ CryptProjectionForce::CryptProjectionForce()
       mIncludeWntChemotaxis(false),
       mWntChemotaxisStrength(100.0)
 {
-    mA = CellBasedConfig::Instance()->GetCryptProjectionParameterA();
-    mB = CellBasedConfig::Instance()->GetCryptProjectionParameterB();
+    mA = WntConcentration<2>::Instance()->GetCryptProjectionParameterA();
+    mB = WntConcentration<2>::Instance()->GetCryptProjectionParameterB();
 }
 
 CryptProjectionForce::~CryptProjectionForce()
