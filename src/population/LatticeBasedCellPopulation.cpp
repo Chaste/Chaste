@@ -54,8 +54,6 @@ LatticeBasedCellPopulation<DIM>::LatticeBasedCellPopulation(TetrahedralMesh<DIM,
     // This must always be true
     assert(this->mCells.size() <= mrMesh.GetNumNodes());
 
-    this->mCellPopulationContainsMesh = true;
-
     if (!locationIndices.empty())
     {
         // Create a set of node indices corresponding to empty sites
@@ -90,7 +88,6 @@ template<unsigned DIM>
 LatticeBasedCellPopulation<DIM>::LatticeBasedCellPopulation(TetrahedralMesh<DIM, DIM>& rMesh)
     : mrMesh(rMesh)
 {
-    this->mCellPopulationContainsMesh = true;
     mDeleteMesh = true;
 }
 

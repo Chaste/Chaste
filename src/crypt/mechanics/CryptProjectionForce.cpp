@@ -110,7 +110,7 @@ c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nod
     // Helper pointer
     CellBasedConfig* p_config = CellBasedConfig::Instance();
 
-    assert(rCellPopulation.HasMesh());
+    assert(rCellPopulation.IsMeshBasedCellPopulation());
     MeshBasedCellPopulation<2>* p_static_cast_cell_population = static_cast<MeshBasedCellPopulation<2>*>(&rCellPopulation);
 
     // We should only ever calculate the force between two distinct nodes
@@ -252,7 +252,7 @@ void CryptProjectionForce::AddForceContribution(std::vector<c_vector<double,2> >
     // First work out the 3D location of each cell
     UpdateNode3dLocationMap(rCellPopulation);
 
-    assert(rCellPopulation.HasMesh());
+    assert(rCellPopulation.IsMeshBasedCellPopulation());
     MeshBasedCellPopulation<2>* p_static_cast_cell_population = static_cast<MeshBasedCellPopulation<2>*>(&rCellPopulation);
 
     for (MeshBasedCellPopulation<2>::SpringIterator spring_iterator = p_static_cast_cell_population->SpringsBegin();
