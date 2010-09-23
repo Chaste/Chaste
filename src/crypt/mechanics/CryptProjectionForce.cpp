@@ -168,7 +168,7 @@ c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nod
          * The spring rest length increases from a predefined small parameter
          * to a normal rest length of 1.0, over a period of one hour.
          */
-        std::set<CellPtr> cell_pair = p_static_cast_cell_population->CreateCellPair(p_cell_A, p_cell_B);
+        std::pair<CellPtr,CellPtr> cell_pair = p_static_cast_cell_population->CreateCellPair(p_cell_A, p_cell_B);
         if (p_static_cast_cell_population->IsMarkedSpring(cell_pair))
         {
             double lambda = mMeinekeDivisionRestingSpringLength;

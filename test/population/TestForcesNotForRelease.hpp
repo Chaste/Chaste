@@ -95,7 +95,7 @@ public:
 
         // Create a cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        std::set<CellPtr> cell_pair_4_5 = cell_population.CreateCellPair(cell_population.GetCellUsingLocationIndex(4), cell_population.GetCellUsingLocationIndex(5));
+        std::pair<CellPtr,CellPtr> cell_pair_4_5 = cell_population.CreateCellPair(cell_population.GetCellUsingLocationIndex(4), cell_population.GetCellUsingLocationIndex(5));
         cell_population.MarkSpring(cell_pair_4_5);
 
         // Create a spring system with crypt surface z = 2*r
@@ -268,7 +268,7 @@ public:
 
         // Create a cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        std::set<CellPtr> cell_pair_4_5 = cell_population.CreateCellPair(cell_population.GetCellUsingLocationIndex(4), cell_population.GetCellUsingLocationIndex(5));
+        std::pair<CellPtr,CellPtr> cell_pair_4_5 = cell_population.CreateCellPair(cell_population.GetCellUsingLocationIndex(4), cell_population.GetCellUsingLocationIndex(5));
         cell_population.MarkSpring(cell_pair_4_5);
 
         WntConcentration<2>::Instance()->SetType(RADIAL);
