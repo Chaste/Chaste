@@ -78,8 +78,6 @@ public:
      */
     void TestCellBasedSimulationWithCryptProjectionSpringSystem() throw (Exception)
     {
-        CellBasedConfig* p_params = CellBasedConfig::Instance();
-
         double a = 0.2;
         double b = 2.0;
         WntConcentration<2>::Instance()->SetCryptProjectionParameterA(a);
@@ -114,8 +112,8 @@ public:
             p_cell->InitialiseCellCycleModel();
 
             double birth_time = - RandomNumberGenerator::Instance()->ranf()*
-                                  ( p_params->GetTransitCellG1Duration()
-                                   +p_params->GetSG2MDuration());
+                                  ( p_model->GetTransitCellG1Duration()
+                                   +p_model->GetSG2MDuration());
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
         }

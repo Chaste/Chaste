@@ -102,9 +102,6 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "diff_update_rule.arch";
 
         {
-            // Set a member of CellBasedConfig in order to test archiving
-            CellBasedConfig::Instance()->SetStemCellG1Duration(15.67);
-
             // Create update rule using different input argument
             DiffusionUpdateRule<2> update_rule(1.25);
 
@@ -119,11 +116,9 @@ public:
 
         {
             // Reset CellBasedConfig prior to loading update from archive
-            TS_ASSERT_DELTA(CellBasedConfig::Instance()->GetStemCellG1Duration(), 15.67, 1e-6);
             CellBasedConfig::Instance()->Reset();
-            TS_ASSERT_DELTA(CellBasedConfig::Instance()->GetStemCellG1Duration(), 14.0, 1e-6);
 
-            // Create an input archive
+        	// Create an input archive
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
 
@@ -134,7 +129,6 @@ public:
 
             // Test the member data
             TS_ASSERT_DELTA(p_update_rule->GetDiffusionConstant(), 1.25, 1e-6);
-            TS_ASSERT_DELTA(CellBasedConfig::Instance()->GetStemCellG1Duration(), 15.67, 1e-6);
 
             // Tidy up
             delete p_update_rule;
@@ -165,7 +159,7 @@ public:
         // Create cell population
         LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
-        // Create advection update rule: impose a flow 'north' with (mean) speed 2 
+        // Create advection update rule: impose a flow 'north' with (mean) speed 2
         unsigned flow_direction = 0; // north
         AdvectionUpdateRule<2> update_rule(flow_direction, 2.0);
 
@@ -190,9 +184,6 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "adv_update_rule.arch";
 
         {
-            // Set a member of CellBasedConfig in order to test archiving
-            CellBasedConfig::Instance()->SetStemCellG1Duration(15.67);
-
             // Create update rule using different input argument
             AdvectionUpdateRule<2> update_rule(3, 1.25);
 
@@ -207,9 +198,7 @@ public:
 
         {
             // Reset CellBasedConfig prior to loading update from archive
-            TS_ASSERT_DELTA(CellBasedConfig::Instance()->GetStemCellG1Duration(), 15.67, 1e-6);
             CellBasedConfig::Instance()->Reset();
-            TS_ASSERT_DELTA(CellBasedConfig::Instance()->GetStemCellG1Duration(), 14.0, 1e-6);
 
             // Create an input archive
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
@@ -223,7 +212,6 @@ public:
             // Test the member data
             TS_ASSERT_DELTA(p_update_rule->GetAdvectionSpeed(), 1.25, 1e-6);
             TS_ASSERT_EQUALS(p_update_rule->GetAdvectionDirection(), 3u);
-            TS_ASSERT_DELTA(CellBasedConfig::Instance()->GetStemCellG1Duration(), 15.67, 1e-6);
 
             // Tidy up
             delete p_update_rule;

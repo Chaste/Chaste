@@ -74,8 +74,8 @@ public:
              p_model->SetMaxTransitGenerations(UINT_MAX);
 
              double birth_time = -RandomNumberGenerator::Instance()->ranf()*
-                                  (CellBasedConfig::Instance()->GetStemCellG1Duration()
-                                      + CellBasedConfig::Instance()->GetSG2MDuration() );
+                                  (p_model->GetStemCellG1Duration()
+                                      + p_model->GetSG2MDuration() );
 
              CellPtr p_cell(new Cell(p_state, p_model));
         	 p_cell->SetBirthTime(birth_time);

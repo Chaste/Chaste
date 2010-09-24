@@ -156,13 +156,11 @@ c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nod
     assert(!std::isnan(ageA));
     assert(!std::isnan(ageB));
 
-    double m_duration = p_config->GetMDuration();
-
     /*
      * If the cells are both newly divided, then the rest length of the spring
-     * connecting them grows linearly with time, until 1 hour after division.
+     * connecting them grows linearly with time, until mMeinekeSpringGrowthDuration hour after division.
      */
-    if (ageA < m_duration && ageB < m_duration)
+    if (ageA < mMeinekeSpringGrowthDuration && ageB < mMeinekeSpringGrowthDuration)
     {
         /*
          * The spring rest length increases from a predefined small parameter
@@ -172,9 +170,9 @@ c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nod
         if (p_static_cast_cell_population->IsMarkedSpring(cell_pair))
         {
             double lambda = mMeinekeDivisionRestingSpringLength;
-            rest_length = lambda + (1.0 - lambda) * ageA/m_duration;
+            rest_length = lambda + (1.0 - lambda) * ageA/mMeinekeSpringGrowthDuration;
         }
-        if (ageA+SimulationTime::Instance()->GetTimeStep() >= m_duration)
+        if (ageA+SimulationTime::Instance()->GetTimeStep() >= mMeinekeSpringGrowthDuration)
         {
             // This spring is about to go out of scope
             p_static_cast_cell_population->UnmarkSpring(cell_pair);
