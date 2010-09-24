@@ -34,6 +34,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <ctime>
 #include <cmath>
 
+#include "CheckpointArchiveTypes.hpp"
+
 #include "CellBasedSimulation.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "SimpleWntCellCycleModel.hpp"
