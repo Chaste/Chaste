@@ -41,13 +41,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CryptProjectionForce.hpp"
 #include "HoneycombMutableVertexMeshGenerator.hpp"
 #include "VertexBasedCellPopulation.hpp"
-#include "NagaiHondaDifferentialAdhesionForce.hpp"
-//#include "LinearSpringWithVariableSpringConstantsForce.hpp"
-//#include "CellwiseDataGradient.hpp"
-//#include "VertexCryptBoundaryForce.hpp"
-//#include "ApcTwoHitCellMutationState.hpp"
-//#include "WildTypeCellMutationState.hpp"
-//#include "CellLabel.hpp"
 
 class TestForcesNotForRelease : public AbstractCellBasedTestSuite
 {
