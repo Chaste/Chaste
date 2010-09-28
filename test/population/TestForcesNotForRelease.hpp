@@ -159,7 +159,7 @@ public:
         double dist = norm_2(p_mesh->GetVectorFromAtoB(p_element->GetNode(0)->rGetLocation(),
                              p_element->GetNode(1)->rGetLocation()));
 
-        crypt_projection_force.UseCutoffPoint(dist - 0.1);
+        crypt_projection_force.SetCutOffLength(dist - 0.1);
 
         force_on_spring = crypt_projection_force.CalculateForceBetweenNodes(p_element->GetNodeGlobalIndex(1),
                                                                             p_element->GetNodeGlobalIndex(0),
@@ -358,7 +358,7 @@ public:
             // Serialize via pointer
             CryptProjectionForce* const p_crypt_projection_force = &crypt_projection_force;
 
-            p_crypt_projection_force->UseCutoffPoint(1.1);
+            p_crypt_projection_force->SetCutOffLength(1.1);
 
             output_arch << p_crypt_projection_force;
             WntConcentration<2>::Destroy();
@@ -377,7 +377,7 @@ public:
             input_arch >> p_crypt_projection_force;
 
             // Test the member data
-            TS_ASSERT_EQUALS(p_crypt_projection_force->mUseCutoffPoint, true);
+            TS_ASSERT_EQUALS(p_crypt_projection_force->mUseCutOffLength, true);
             TS_ASSERT_DELTA(p_crypt_projection_force->GetA(), 1.0, 1e-12);
             TS_ASSERT_DELTA(p_crypt_projection_force->GetB(), 2.0, 1e-12);
             TS_ASSERT_DELTA(p_crypt_projection_force->GetWntChemotaxisStrength(), 15.0, 1e-6);

@@ -132,11 +132,11 @@ c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nod
 
     unit_difference /= distance_between_nodes;
 
-    // If mUseCutoffPoint has been set, then there is zero force between
-    // two nodes located a distance apart greater than mUseCutoffPoint
-    if (this->mUseCutoffPoint)
+    // If mUseCutOffLength has been set, then there is zero force between
+    // two nodes located a distance apart greater than mUseCutOffLength
+    if (this->mUseCutOffLength)
     {
-        if (distance_between_nodes >= p_config->GetMechanicsCutOffLength())
+        if (distance_between_nodes >= mMechanicsCutOffLength)
         {
             // Return zero (2D projected) force
             return zero_vector<double>(2);
