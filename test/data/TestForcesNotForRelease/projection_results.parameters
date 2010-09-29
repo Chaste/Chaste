@@ -5,4 +5,5 @@
 			<MeinekeSpringStiffness>15</MeinekeSpringStiffness> 
 			<MeinekeDivisionRestingSpringLength>0.5</MeinekeDivisionRestingSpringLength> 
 			<MeinekeSpringGrowthDuration>1</MeinekeSpringGrowthDuration> 
-			<UseCutoffPoint>0</UseCutoffPoint> 
+			<UseCutOffLength>0</UseCutOffLength> 
+			<CutOffLength>3.95253e-322</CutOffLength> 

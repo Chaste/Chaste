@@ -107,9 +107,6 @@ double CryptProjectionForce::CalculateCryptSurfaceDerivativeAtPoint(const c_vect
 
 c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nodeAGlobalIndex, unsigned nodeBGlobalIndex, AbstractCellPopulation<2>& rCellPopulation)
 {
-    // Helper pointer (unused as of r10505)
-    //CellBasedConfig* p_config = CellBasedConfig::Instance();
-
     assert(rCellPopulation.IsMeshBasedCellPopulation());
     MeshBasedCellPopulation<2>* p_static_cast_cell_population = static_cast<MeshBasedCellPopulation<2>*>(&rCellPopulation);
 
