@@ -52,14 +52,15 @@ public:
 
         // Test with CryptProjectionForce
         CryptProjectionForce projection_force;
+        projection_force.SetCutOffLength(1.5);
         TS_ASSERT_EQUALS(projection_force.GetIdentifier(), "CryptProjectionForce");
 
         out_stream projection_force_parameter_file = output_file_handler.OpenOutputFile("projection_results.parameters");
         projection_force.OutputForceParameters(projection_force_parameter_file);
         projection_force_parameter_file->close();
 
-        std::string variable_force_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + variable_force_results_dir + "projection_results.parameters notforrelease_cell_based/test/data/TestForcesNotForRelease/projection_results.parameters").c_str()), 0);
+        std::string projection_force_results_dir = output_file_handler.GetOutputDirectoryFullPath();
+        TS_ASSERT_EQUALS(system(("diff " + projection_force_results_dir + "projection_results.parameters notforrelease_cell_based/test/data/TestForcesNotForRelease/projection_results.parameters").c_str()), 0);
     }
 };
 
