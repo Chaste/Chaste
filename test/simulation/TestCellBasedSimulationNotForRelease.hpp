@@ -92,6 +92,9 @@ public:
 
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, thickness_of_ghost_layer, false);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        CellBasedConfig::Instance()->SetCryptWidth((double)num_cells_width);
+        CellBasedConfig::Instance()->SetCryptLength((double)num_cells_depth *sqrt(3) /2.0);
+
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         ChasteCuboid<2> bounding_box=p_mesh->CalculateBoundingBox();
