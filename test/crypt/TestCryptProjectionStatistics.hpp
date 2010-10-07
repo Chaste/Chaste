@@ -94,9 +94,12 @@ public:
         // Make a cell population
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
 
+        double crypt_radius = pow(CellBasedConfig::Instance()->GetCryptLength()/a, 1.0/b);
+
         // Set up the Wnt gradient
         WntConcentration<2>::Instance()->SetType(RADIAL);
         WntConcentration<2>::Instance()->SetCellPopulation(crypt);
+        WntConcentration<2>::Instance()->SetCryptLength(CellBasedConfig::Instance()->GetCryptLength());
 
         CryptProjectionStatistics statistics(crypt);
 
@@ -122,7 +125,6 @@ public:
 
         // Create a radial cell killer and pass it in to the cell-based simulation
         c_vector<double,2> centre = zero_vector<double>(2);
-        double crypt_radius = pow(CellBasedConfig::Instance()->GetCryptLength()/a, 1.0/b);
 
         RadialSloughingCellKiller killer(&crypt, centre, crypt_radius);
         crypt_projection_simulator.AddCellKiller(&killer);

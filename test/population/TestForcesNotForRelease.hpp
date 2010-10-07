@@ -266,6 +266,8 @@ public:
 
         WntConcentration<2>::Instance()->SetType(RADIAL);
         WntConcentration<2>::Instance()->SetCellPopulation(cell_population);
+        WntConcentration<2>::Instance()->SetCryptLength(CellBasedConfig::Instance()->GetCryptLength());
+
 
         // Create a spring system with crypt surface z = 2*r
         WntConcentration<2>::Instance()->SetCryptProjectionParameterA(2.0);

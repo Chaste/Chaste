@@ -128,6 +128,8 @@ public:
         // Set up the Wnt gradient
         WntConcentration<2>::Instance()->SetType(RADIAL);
         WntConcentration<2>::Instance()->SetCellPopulation(crypt);
+        WntConcentration<2>::Instance()->SetCryptLength(CellBasedConfig::Instance()->GetCryptLength());
+
 
         // Create the force law and pass in to a std::list
         CryptProjectionForce crypt_projection_force;
