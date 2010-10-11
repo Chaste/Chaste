@@ -31,7 +31,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
 #include "LatticeBasedCellPopulation.hpp"
-#include "CellBasedConfig.hpp"
 
 /**
  * An abstract force class.
@@ -55,9 +54,6 @@ class AbstractUpdateRule
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        CellBasedConfig* p_config = CellBasedConfig::Instance();
-        archive & *p_config;
-        archive & p_config;
     }
 
 public :

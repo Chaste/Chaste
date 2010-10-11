@@ -115,9 +115,6 @@ public:
         }
 
         {
-            // Reset CellBasedConfig prior to loading update from archive
-            CellBasedConfig::Instance()->Reset();
-
         	// Create an input archive
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
@@ -197,9 +194,6 @@ public:
         }
 
         {
-            // Reset CellBasedConfig prior to loading update from archive
-            CellBasedConfig::Instance()->Reset();
-
             // Create an input archive
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
@@ -220,4 +214,3 @@ public:
 };
 
 #endif /*TESTLATTICEBASEDUPDATERULES_HPP_*/
-

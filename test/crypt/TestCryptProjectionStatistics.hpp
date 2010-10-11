@@ -62,7 +62,8 @@ public:
 
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, thickness_of_ghost_layer, false);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
-        CellBasedConfig::Instance()->SetCryptLength((double)num_cells_depth *sqrt(3) /2.0);
+
+        double crypt_length = (double)num_cells_depth *sqrt(3)/2.0;
 
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
@@ -94,12 +95,12 @@ public:
         // Make a cell population
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
 
-        double crypt_radius = pow(CellBasedConfig::Instance()->GetCryptLength()/a, 1.0/b);
+        double crypt_radius = pow(crypt_length/a, 1.0/b);
 
         // Set up the Wnt gradient
         WntConcentration<2>::Instance()->SetType(RADIAL);
         WntConcentration<2>::Instance()->SetCellPopulation(crypt);
-        WntConcentration<2>::Instance()->SetCryptLength(CellBasedConfig::Instance()->GetCryptLength());
+        WntConcentration<2>::Instance()->SetCryptLength(crypt_length);
 
         CryptProjectionStatistics statistics(crypt);
 

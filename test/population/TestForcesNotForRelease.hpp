@@ -229,6 +229,8 @@ public:
      */
     void TestCryptProjectionForceWithWntBasedChemotaxis() throw (Exception)
     {
+        double crypt_length = 22.0;
+
         // Create a mesh
         unsigned num_cells_width = 10;
         unsigned num_cells_depth = 10;
@@ -266,8 +268,7 @@ public:
 
         WntConcentration<2>::Instance()->SetType(RADIAL);
         WntConcentration<2>::Instance()->SetCellPopulation(cell_population);
-        WntConcentration<2>::Instance()->SetCryptLength(CellBasedConfig::Instance()->GetCryptLength());
-
+        WntConcentration<2>::Instance()->SetCryptLength(crypt_length);
 
         // Create a spring system with crypt surface z = 2*r
         WntConcentration<2>::Instance()->SetCryptProjectionParameterA(2.0);
