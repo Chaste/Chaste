@@ -1,8 +1,3 @@
-crypt/TestCryptProjectionStatistics.hpp
-simulation/TestCellBasedSimulationNotForRelease.hpp
-population/TestCellKillersNotForRelease.hpp
-population/TestForcesNotForRelease.hpp
-population/TestForces2NotForRelease.hpp
 population/TestLatticeBasedCellPopulation.hpp
 population/TestLatticeBasedUpdateRules.hpp
 simulation/TestCellBasedSimulationWithLatticeBasedCellPopulation.hpp
