@@ -38,7 +38,6 @@ LatticeBasedCellBasedSimulation<DIM>::LatticeBasedCellBasedSimulation(AbstractCe
                   bool deleteCellPopulationAndForceCollection,
                   bool initialiseCells)
     : CellBasedSimulation<DIM>(rCellPopulation,
-                  std::vector<AbstractForce<DIM>*>(), // Passing an empty force collection
                   deleteCellPopulationAndForceCollection,
                   initialiseCells),
     mUpdateRuleCollection(updateRuleCollection),
