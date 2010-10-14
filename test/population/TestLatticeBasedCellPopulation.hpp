@@ -456,6 +456,8 @@ public:
         TetrahedralMesh<2,2> mesh;
         mesh.ConstructRectangularMesh(6, 6, true); // 7*7 nodes
 
+        ///\todo use CellsGenerator? (#1583)
+
         // Create cells
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         std::vector<CellPtr> cells;
@@ -543,6 +545,8 @@ public:
         TetrahedralMesh<2,2> mesh;
         mesh.ConstructRectangularMesh(3, 3, true); // 4*4 nodes
 
+        ///\todo use CellsGenerator? (#1583)
+
         // Create cells
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         std::vector<CellPtr> cells;
@@ -587,6 +591,8 @@ public:
         // Create mesh
         TetrahedralMesh<2,2> mesh;
         mesh.ConstructRectangularMesh(3, 3, true); // 4*4 nodes
+
+        ///\todo use CellsGenerator? (#1583)
 
         // Create cells
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
@@ -653,6 +659,8 @@ public:
         // Create mesh
         TetrahedralMesh<2,2> mesh;
         mesh.ConstructRectangularMesh(6, 6, true); // 7*7 nodes
+
+        ///\todo use CellsGenerator? (#1583)
 
         // Create cells
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
@@ -1293,6 +1301,8 @@ public:
         TetrahedralMesh<2,2> mesh;
         mesh.ConstructRectangularMesh(3, 3, true); // 4*4 nodes
 
+        ///\todo use CellsGenerator? (#1583)
+
         // Create cells
         std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
@@ -1352,6 +1362,8 @@ public:
         // Create mesh
         TetrahedralMesh<2,2> mesh;
         mesh.ConstructRectangularMesh(2, 2, true); // 3*3 nodes
+
+        ///\todo use CellsGenerator? (#1583)
 
         // Create cells
         boost::shared_ptr<AbstractCellProperty> p_wild_type_state(new WildTypeCellMutationState);
@@ -1444,6 +1456,8 @@ public:
         TetrahedralMesh<2,2> mesh;
         mesh.ConstructRectangularMesh(2, 2, true); // 3*3 nodes
 
+        ///\todo use CellsGenerator? (#1583)
+
         // Create cells
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         std::vector<unsigned> real_node_indices;
@@ -1515,8 +1529,14 @@ public:
 
         // Test GetDampingConstant()
         TS_ASSERT_THROWS_THIS(cell_population.GetDampingConstant(0), "GetDampingConstant() cannot be called on a LatticeBasedCellPopulation");
-    }
 
+        // Test GetWidth() method
+        double width_x = cell_population.GetWidth(0);
+        TS_ASSERT_DELTA(width_x, 2.0, 1e-4);
+
+        double width_y = cell_population.GetWidth(1);
+        TS_ASSERT_DELTA(width_y, 2.0, 1e-4);
+    }
 
     void TestGetFreeVonNeumannNeighbouringNodeIndices2d()
     {
@@ -1885,7 +1905,6 @@ public:
         expected_free_neighbouring_sites.insert(55);
         TS_ASSERT_EQUALS(free_neighbouring_sites, expected_free_neighbouring_sites);
     }
-
 };
 
 #endif /*TESTLATTICEBASEDCELLPOPULATION_HPP_*/

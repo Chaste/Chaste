@@ -33,6 +33,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
+#include "CellsGenerator.hpp"
 #include "DiffusionUpdateRule.hpp"
 #include "AdvectionUpdateRule.hpp"
 #include "LatticeBasedCellPopulation.hpp"
@@ -140,16 +141,16 @@ public:
 
         // Create a line of cells along the bottom of the mesh
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+
+        // Create cells
         std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, 6);
+
         std::vector<unsigned> real_node_indices;
-
-        for (unsigned i=0; i<6; i++)
+        for (unsigned i=0; i<cells.size(); i++)
         {
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-            p_model->SetCellProliferativeType(DIFFERENTIATED);
-            CellPtr p_cell(new Cell(p_state, p_model));
-
-            cells.push_back(p_cell);
+            cells[i]->GetCellCycleModel()->SetCellProliferativeType(DIFFERENTIATED);
             real_node_indices.push_back(i);
         }
 

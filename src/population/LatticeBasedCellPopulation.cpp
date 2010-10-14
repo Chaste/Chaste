@@ -883,6 +883,15 @@ void LatticeBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream&
     //AbstractCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);
 }
 
+template<unsigned DIM>
+double LatticeBasedCellPopulation<DIM>::GetWidth(const unsigned& rDimension)
+{
+    // Call GetWidth() on the mesh
+    double width = mrMesh.GetWidth(rDimension);
+
+    return width;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////

@@ -462,10 +462,18 @@ public:
      */
     void OutputCellPopulationParameters(out_stream& rParamsFile);
 
-
+    /**
+     * Overridden GetWidth() method.
+     * 
+     * Calculate the 'width' of any dimension of the cell population by calling
+     * GetWidth() on the mesh.
+     *
+     * @param rDimension a dimension (0,1 or 2)
+     * @return The maximum distance between any nodes in this dimension.
+     */
+    double GetWidth(const unsigned& rDimension);
 };
 #undef COVERAGE_IGNORE //Avoid prototypes being treated as code by gcov
-
 
 #include "SerializationExportWrapper.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(LatticeBasedCellPopulation)

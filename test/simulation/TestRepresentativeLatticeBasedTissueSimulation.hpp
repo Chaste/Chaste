@@ -34,6 +34,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CellBasedSimulationArchiver.hpp"
 
 #include "LatticeBasedCellBasedSimulation.hpp"
+#include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "LatticeBasedCellPopulation.hpp"
 #include "DiffusionUpdateRule.hpp"
@@ -59,46 +60,40 @@ public:
     void TestRepresentativeLatticeBasedCellBasedSimulationForProfiling() throw (Exception)
     {
         // Create mesh
-         TetrahedralMesh<2,2> mesh;
-         mesh.ConstructRectangularMesh(20, 20, true); // 21*21 nodes
+        TetrahedralMesh<2,2> mesh;
+        mesh.ConstructRectangularMesh(20, 20, true); // 21*21 nodes
 
-         // Create cell which keeps dividing
-         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        // Create cell which keeps dividing
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
 
-         std::vector<CellPtr> cells;
-         std::vector<unsigned> real_node_indices;
-         for (unsigned i = 0; i < 9; i++)
-         {
-             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-             p_model->SetCellProliferativeType(TRANSIT);
-             p_model->SetMaxTransitGenerations(UINT_MAX);
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, 9);
 
-             double birth_time = -RandomNumberGenerator::Instance()->ranf()*
-                                  (p_model->GetStemCellG1Duration()
-                                      + p_model->GetSG2MDuration() );
-
-             CellPtr p_cell(new Cell(p_state, p_model));
-        	 p_cell->SetBirthTime(birth_time);
-
-        	 cells.push_back(p_cell);
-        	 real_node_indices.push_back(21 * (9 + i/3) + 9 + i%3);
+        std::vector<unsigned> real_node_indices;
+        for (unsigned i=0; i<cells.size(); i++)
+        {
+            cells[i]->GetCellCycleModel()->SetCellProliferativeType(TRANSIT);
+            dynamic_cast<FixedDurationGenerationBasedCellCycleModel*>(cells[i]->GetCellCycleModel())->SetMaxTransitGenerations(UINT_MAX);
+        	real_node_indices.push_back(21 * (9 + i/3) + 9 + i%3);
          }
 
-         // Create a cell population
-         LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
+        // Create a cell population
+        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
-         // Create an empty UpdateRule system so only movement from cell birth
-         std::vector<AbstractUpdateRule<2>* > update_rule_collection;
+        // Create an empty UpdateRule system so only movement from cell birth
+        std::vector<AbstractUpdateRule<2>* > update_rule_collection;
 
-         // Set up cell-based simulation
-         LatticeBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
-         simulator.SetOutputDirectory("TestRepresentativeLatticeBasedSimulationForProfiling");
-         simulator.SetEndTime(50);
+        // Set up cell-based simulation
+        LatticeBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        simulator.SetOutputDirectory("TestRepresentativeLatticeBasedSimulationForProfiling");
+        simulator.SetEndTime(50);
 
-         // Run simulation
-         simulator.Solve();
+        // Run simulation
+        simulator.Solve();
 
-         RandomNumberGenerator::Destroy();
+        RandomNumberGenerator::Destroy();
     }
 };
 
