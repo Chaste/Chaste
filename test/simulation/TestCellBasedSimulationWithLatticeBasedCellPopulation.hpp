@@ -100,7 +100,7 @@ public:
         TetrahedralMesh<2,2> mesh;
         mesh.ConstructRectangularMesh(10, 10, true); // 11*11 nodes
 
-        // Create cell
+        // Create two cells
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
 
         FixedDurationGenerationBasedCellCycleModel* p_model_1 = new FixedDurationGenerationBasedCellCycleModel();
@@ -158,7 +158,7 @@ public:
         TetrahedralMesh<2,2> mesh;
         mesh.ConstructRectangularMesh(20, 20, true); // 21*21 nodes
 
-        // Create a cell which keeps dividing
+        // Create a cell that keeps dividing
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
 
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
@@ -198,17 +198,17 @@ public:
         TetrahedralMesh<2,2> mesh;
         mesh.ConstructRectangularMesh(49, 49, true); // 50*50 nodes
 
+        // Create location indices
+        std::vector<unsigned> real_node_indices;
+        for (unsigned i=0; i<100; i++)
+        {
+            real_node_indices.push_back(i);
+        }
+
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, 100);
-
-        std::vector<unsigned> real_node_indices;
-        for (unsigned i=0; i<cells.size(); i++)
-        {
-            cells[i]->GetCellCycleModel()->SetCellProliferativeType(DIFFERENTIATED);
-            real_node_indices.push_back(i);
-        }
+        cells_generator.GenerateBasic(cells, real_node_indices.size(), real_node_indices, DIFFERENTIATED);
 
         // Create a cell population
         LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
@@ -236,17 +236,17 @@ public:
         TetrahedralMesh<2,2> mesh;
         mesh.ConstructRectangularMesh(19, 19, true); // 50*50 nodes
 
+        // Create location indices
+        std::vector<unsigned> real_node_indices;
+        for (unsigned i=0; i<100; i++)
+        {
+            real_node_indices.push_back(i);
+        }
+
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, 100);
-
-        std::vector<unsigned> real_node_indices;
-        for (unsigned i=0; i<cells.size(); i++)
-        {
-            cells[i]->GetCellCycleModel()->SetCellProliferativeType(DIFFERENTIATED);
-            real_node_indices.push_back(i);
-        }
+        cells_generator.GenerateBasic(cells, real_node_indices.size(), real_node_indices, DIFFERENTIATED);
 
         // Create a cell population
         LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
@@ -646,17 +646,17 @@ public:
 		TetrahedralMesh<2,2> mesh;
 		mesh.ConstructRectangularMesh(49, 49, true); // 50*50 nodes
 
+        // Create location indices
+        std::vector<unsigned> real_node_indices;
+        for (unsigned i=0; i<100; i++)
+        {
+            real_node_indices.push_back(i);
+        }
+
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, 100);
-
-        std::vector<unsigned> real_node_indices;
-        for (unsigned i=0; i<cells.size(); i++)
-        {
-            cells[i]->GetCellCycleModel()->SetCellProliferativeType(DIFFERENTIATED);
-            real_node_indices.push_back(i);
-        }
+        cells_generator.GenerateBasic(cells, real_node_indices.size(), real_node_indices, DIFFERENTIATED);
 
 		// Create a cell population
 		LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);

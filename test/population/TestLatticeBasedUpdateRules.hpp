@@ -142,17 +142,17 @@ public:
         // Create a line of cells along the bottom of the mesh
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
 
+        // Create location indices
+        std::vector<unsigned> real_node_indices;
+        for (unsigned i=0; i<6; i++)
+        {
+            real_node_indices.push_back(i);
+        }
+
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, 6);
-
-        std::vector<unsigned> real_node_indices;
-        for (unsigned i=0; i<cells.size(); i++)
-        {
-            cells[i]->GetCellCycleModel()->SetCellProliferativeType(DIFFERENTIATED);
-            real_node_indices.push_back(i);
-        }
+        cells_generator.GenerateBasic(cells, real_node_indices.size(), real_node_indices, DIFFERENTIATED);
 
         // Create cell population
         LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
