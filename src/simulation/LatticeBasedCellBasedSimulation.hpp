@@ -148,7 +148,7 @@ public:
     const std::vector<AbstractUpdateRule<DIM>*> rGetUpdateRuleCollection() const;
 
     /**
-     * Outputs Simulation Parameters to file
+     * Outputs simulation parameters to file
 	 *
      * As this method is pure virtual, it must be overridden
      * in subclasses. Currently not used for Lattice Based Simulations.
@@ -156,7 +156,6 @@ public:
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputSimulationParameters(out_stream& rParamsFile);
-
 };
 
 // Declare identifier for the serializer
