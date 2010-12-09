@@ -1,3 +1,5 @@
+mesh/TestPottsElement.hpp
+mesh/TestPottsMesh.hpp
 population/TestLatticeBasedCellPopulation.hpp
 population/TestLatticeBasedUpdateRules.hpp
 simulation/TestCellBasedSimulationWithLatticeBasedCellPopulation.hpp
