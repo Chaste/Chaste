@@ -587,7 +587,7 @@ protected:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(PottsMesh)
+//EXPORT_TEMPLATE_CLASS_ALL_DIMS(PottsMesh)
 
 
 ////////////////////////////////////////////////////////////////////////////////
