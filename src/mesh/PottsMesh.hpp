@@ -52,7 +52,7 @@ class VertexMeshWriter;
 /**
  * A vertex-based mesh class, for use in vertex-based simulations.
  */
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+//template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class PottsMesh //: public AbstractMesh<ELEMENT_DIM, SPACE_DIM>
 {
     friend class TestPottsMesh;
@@ -586,7 +586,7 @@ protected:
 //    };
 };
 
-#include "SerializationExportWrapper.hpp"
+//#include "SerializationExportWrapper.hpp"
 //EXPORT_TEMPLATE_CLASS_ALL_DIMS(PottsMesh)
 
 

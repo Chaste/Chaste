@@ -40,7 +40,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
  * VertexElement can have a variable number of nodes associated
  * with it.
  */
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+//template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class PottsElement //: public AbstractElement<ELEMENT_DIM, SPACE_DIM>
 {
 //private:
@@ -62,27 +62,27 @@ class PottsElement //: public AbstractElement<ELEMENT_DIM, SPACE_DIM>
 //     */
 //    std::vector<bool> mOrientations;
 //
-    /** Needed for serialization. */
-    friend class boost::serialization::access;
-    /**
-     * Serialize the object and its member variables.
-     *
-     * Note that serialization of the mesh and cells is handled by load/save_construct_data.
-     *
-     * Note also that member data related to writers is not saved - output must
-     * be set up again by the caller after a restart.
-     *
-     * @param archive the archive
-     * @param version the current version of this class
-     */
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
-    {
-        // This needs to be first so that MeshBasedCellPopulation::Validate() doesn't go mental.
-     //   archive & mFaces;
-     //   archive & mOrientations;
-     //   archive & boost::serialization::base_object<AbstractElement<ELEMENT_DIM, SPACE_DIM> >(*this);
-    }
+//    /** Needed for serialization. */
+//    friend class boost::serialization::access;
+//    /**
+//     * Serialize the object and its member variables.
+//     *
+//     * Note that serialization of the mesh and cells is handled by load/save_construct_data.
+//     *
+//     * Note also that member data related to writers is not saved - output must
+//     * be set up again by the caller after a restart.
+//     *
+//     * @param archive the archive
+//     * @param version the current version of this class
+//     */
+//    template<class Archive>
+//    void serialize(Archive & archive, const unsigned int version)
+//    {
+//        // This needs to be first so that MeshBasedCellPopulation::Validate() doesn't go mental.
+//     //   archive & mFaces;
+//     //   archive & mOrientations;
+//     //   archive & boost::serialization::base_object<AbstractElement<ELEMENT_DIM, SPACE_DIM> >(*this);
+//    }
 //
 //public:
 //

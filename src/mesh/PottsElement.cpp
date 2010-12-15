@@ -418,13 +418,13 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 
 
-/////////////////////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
-template class PottsElement<1,1>;
-template class PottsElement<1,2>;
-template class PottsElement<1,3>;
-template class PottsElement<2,2>;
-template class PottsElement<2,3>;
-template class PottsElement<3,3>;
+///////////////////////////////////////////////////////////////////////////////////////
+//// Explicit instantiation
+///////////////////////////////////////////////////////////////////////////////////////
+//
+//template class PottsElement<1,1>;
+//template class PottsElement<1,2>;
+//template class PottsElement<1,3>;
+//template class PottsElement<2,2>;
+//template class PottsElement<2,3>;
+//template class PottsElement<3,3>;

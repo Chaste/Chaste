@@ -40,6 +40,8 @@ public:
     void TestSimple()
     {
         TS_ASSERT(true);
+
+        PottsElement element();
     }
 
     // These are the sort of tests we need
