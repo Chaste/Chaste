@@ -46,7 +46,7 @@ public:
     {
         TS_ASSERT(true);
 
-        PottsMesh mesh();
+        PottsMesh mesh;
     }
 
     // These are the sort of tests we need

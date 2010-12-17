@@ -43,6 +43,10 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 //template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class PottsElement //: public AbstractElement<ELEMENT_DIM, SPACE_DIM>
 {
+public:
+    //** Default Constructor can remove once other constructors written */
+    PottsElement();
+
 //private:
 //
 //    /**

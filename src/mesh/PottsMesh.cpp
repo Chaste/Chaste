@@ -31,6 +31,11 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "UblasCustomFunctions.hpp"
 #include <list>
 
+
+PottsMesh::PottsMesh()
+{
+}
+
 ///**
 // * Global method allowing alist of pairs (unsigned, double) to be compared
 // * in terms of their second entry and std::list.sort() to be called.

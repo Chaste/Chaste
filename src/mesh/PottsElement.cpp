@@ -29,6 +29,9 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "RandomNumberGenerator.hpp"
 #include <cassert>
 
+PottsElement::PottsElement()
+{
+}
 
 //template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 //VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,

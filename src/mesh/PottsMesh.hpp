@@ -42,23 +42,22 @@ class VertexMeshWriter;
 #include <boost/serialization/split_member.hpp>
 
 #include "AbstractMesh.hpp"
-#include "ArchiveLocationInfo.hpp"
-#include "VertexMeshReader.hpp"
-#include "VertexMeshWriter.hpp"
-#include "VertexElement.hpp"
-#include "VertexElementMap.hpp"
-#include "TetrahedralMesh.hpp"
 
 /**
- * A vertex-based mesh class, for use in vertex-based simulations.
+ * A potts-based mesh class, for use in potts-based simulations.
  */
 //template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class PottsMesh //: public AbstractMesh<ELEMENT_DIM, SPACE_DIM>
 {
     friend class TestPottsMesh;
 
-protected:
+public:
 
+    //** Default Constructor can remove once other constructors written */
+    PottsMesh();
+
+
+//protected:
 //    /** Vector of pointers to VertexElements. */
 //    std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*> mElements;
 //

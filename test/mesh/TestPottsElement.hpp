@@ -41,7 +41,7 @@ public:
     {
         TS_ASSERT(true);
 
-        PottsElement element();
+        PottsElement element;
     }
 
     // These are the sort of tests we need
