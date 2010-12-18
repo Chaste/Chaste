@@ -45,33 +45,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 class PottsElement : public AbstractElement<2, 2>
 {
 public:
-    //** Default Constructor can remove once other constructors written */
-    PottsElement();
-
-//private:
-//    /** Needed for serialization. */
-//    friend class boost::serialization::access;
-//    /**
-//     * Serialize the object and its member variables.
-//     *
-//     * Note that serialization of the mesh and cells is handled by load/save_construct_data.
-//     *
-//     * Note also that member data related to writers is not saved - output must
-//     * be set up again by the caller after a restart.
-//     *
-//     * @param archive the archive
-//     * @param version the current version of this class
-//     */
-//    template<class Archive>
-//    void serialize(Archive & archive, const unsigned int version)
-//    {
-//        // This needs to be first so that MeshBasedCellPopulation::Validate() doesn't go mental.
-//     //   archive & mFaces;
-//     //   archive & mOrientations;
-//     //   archive & boost::serialization::base_object<AbstractElement<ELEMENT_DIM, SPACE_DIM> >(*this);
-//    }
-
-public:
     /**
      * Constructor.
      *
@@ -121,14 +94,6 @@ public:
      * @param rIndex is the local index of the node to remove
      */
     void DeleteNode(const unsigned& rIndex);
-
-//    /**
-//     * Add a node to the element between nodes at rIndex and rIndex+1.
-//     *
-//     * @param rIndex the local index of the node after which the new node is added
-//     * @param pNode a pointer to the new node
-//     */
-//    void AddNode(const unsigned& rIndex, Node<SPACE_DIM>* pNode);
 
     /**
      * Calculate the local index of a node given a global index
