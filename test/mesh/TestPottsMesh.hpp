@@ -41,256 +41,224 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 class TestPottsMesh : public CxxTest::TestSuite
 {
 public:
-
-    void TestSimple()
+    void TestBasic2dPottsMesh() throw(Exception)
     {
-        TS_ASSERT(true);
+        // Make 6 nodes to assign to two elements
+        std::vector<Node<2>*> basic_nodes;
+        basic_nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+        basic_nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
+        basic_nodes.push_back(new Node<2>(2, false, 2.0, 0.0));
+        basic_nodes.push_back(new Node<2>(3, false, 0.0, 1.0));
+        basic_nodes.push_back(new Node<2>(4, false, 1.0, 1.0));
+        basic_nodes.push_back(new Node<2>(5, false, 2.0, 1.0));
 
-        PottsMesh mesh;
+        // Make two triangular elements out of these nodes
+        std::vector<std::vector<Node<2>*> > nodes_elements(2);
+        nodes_elements[0].push_back(basic_nodes[0]);
+        nodes_elements[0].push_back(basic_nodes[1]);
+        nodes_elements[0].push_back(basic_nodes[3]);
+
+        nodes_elements[1].push_back(basic_nodes[2]);
+        nodes_elements[1].push_back(basic_nodes[4]);
+        nodes_elements[1].push_back(basic_nodes[5]);
+
+        std::vector<PottsElement*> basic_potts_elements;
+        basic_potts_elements.push_back(new PottsElement(0, nodes_elements[0]));
+        basic_potts_elements.push_back(new PottsElement(1, nodes_elements[1]));
+
+        // Make a vertex mesh
+        PottsMesh basic_potts_mesh(basic_nodes, basic_potts_elements);
+
+        TS_ASSERT_EQUALS(basic_potts_mesh.GetNumElements(), 2u);
+        TS_ASSERT_EQUALS(basic_potts_mesh.GetNumNodes(), 6u);
+
+        TS_ASSERT_DELTA(basic_potts_mesh.GetNode(2)->rGetLocation()[0], 2.0, 1e-3);
+        TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(1)->GetNode(2)->GetIndex(),5u);
+
+        // Check that the nodes know which elements they are in
+
+        // Nodes 0 1 and 3 are only in element 0
+        std::set<unsigned> temp_list1;
+        temp_list1.insert(0u);
+        TS_ASSERT_EQUALS(basic_nodes[0]->rGetContainingElementIndices(), temp_list1);
+        TS_ASSERT_EQUALS(basic_nodes[1]->rGetContainingElementIndices(), temp_list1);
+        TS_ASSERT_EQUALS(basic_nodes[3]->rGetContainingElementIndices(), temp_list1);
+
+
+        // Node 2 4 and 5 are only in element 1
+        std::set<unsigned> temp_list2;
+        temp_list2.insert(1u);
+        TS_ASSERT_EQUALS(basic_nodes[2]->rGetContainingElementIndices(), temp_list2);
+        TS_ASSERT_EQUALS(basic_nodes[4]->rGetContainingElementIndices(), temp_list2);
+        TS_ASSERT_EQUALS(basic_nodes[5]->rGetContainingElementIndices(), temp_list2);
+
+
+        // Test Area and Perimeter of elements
+        TS_ASSERT_DELTA(basic_potts_mesh.GetVolumeOfElement(0), 3.0, 1e-12);
+        TS_ASSERT_DELTA(basic_potts_mesh.GetSurfaceAreaOfElement(0), 0.0, 1e-12);//TODO this is Wrong
+
+        TS_ASSERT_DELTA(basic_potts_mesh.GetVolumeOfElement(1), 3.0, 1e-12);
+        TS_ASSERT_DELTA(basic_potts_mesh.GetSurfaceAreaOfElement(1), 0.0, 1e-12);//TODO this is Wrong
+
+
+        // Test GetCentroidOfElements
+        TS_ASSERT_DELTA(basic_potts_mesh.GetCentroidOfElement(0)[0], 1.0/3.0, 1e-12);
+        TS_ASSERT_DELTA(basic_potts_mesh.GetCentroidOfElement(0)[1], 1.0/3.0, 1e-12);
+
+        TS_ASSERT_DELTA(basic_potts_mesh.GetCentroidOfElement(1)[0], 5.0/3.0, 1e-12);
+        TS_ASSERT_DELTA(basic_potts_mesh.GetCentroidOfElement(1)[1], 2.0/3.0, 1e-12);
+
+
+        // Test GetVectorFromAtoB Method
+        c_vector<double, 2> vector=basic_potts_mesh.GetVectorFromAtoB(basic_potts_mesh.GetNode(0)->rGetLocation(), basic_potts_mesh.GetNode(1)->rGetLocation());
+        TS_ASSERT_DELTA(vector[0], 1.0, 1e-12);
+        TS_ASSERT_DELTA(vector[1], 0.0, 1e-12);
+
+
+        // Coverage
+        TS_ASSERT_EQUALS(basic_potts_mesh.SolveNodeMapping(0), 0u);
+        TS_ASSERT_EQUALS(basic_potts_mesh.SolveElementMapping(0), 0u);
+        TS_ASSERT_EQUALS(basic_potts_mesh.SolveBoundaryElementMapping(0), 0u);
+        TS_ASSERT_EQUALS(basic_potts_mesh.IsMeshChanging(), true);
     }
 
-    // These are the sort of tests we need
 
-//    void TestNodeIterator() throw (Exception)
-//    {
-//        // Create mesh
-//        HoneycombVertexMeshGenerator generator(3, 3);
-//
-//        VertexMesh<2,2>* p_mesh = generator.GetMesh();
-//
-//        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 30u);
-//
-//        unsigned counter = 0;
-//        for (VertexMesh<2,2>::NodeIterator iter = p_mesh->GetNodeIteratorBegin();
-//             iter != p_mesh->GetNodeIteratorEnd();
-//             ++iter)
-//        {
-//            unsigned node_index = iter->GetIndex();
-//            TS_ASSERT_EQUALS(counter, node_index); // assumes the iterator will give nodes 0,1..,N in that order
-//            counter++;
-//        }
-//        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), counter);
-//
-//        // Check that the node iterator correctly handles deleted nodes
-//        p_mesh->GetNode(0)->MarkAsDeleted();
-//
-//        counter = 0;
-//        for (VertexMesh<2,2>::NodeIterator iter = p_mesh->GetNodeIteratorBegin();
-//             iter != p_mesh->GetNodeIteratorEnd();
-//             ++iter)
-//        {
-//            unsigned node_index = iter->GetIndex();
-//            TS_ASSERT_EQUALS(counter+1, node_index); // assumes the iterator will give nodes 1..,N in that order
-//            counter++;
-//        }
-//
-//        TS_ASSERT_EQUALS(p_mesh->GetNumAllNodes(), counter+1);
-//
-//        // For coverage, test with an empty mesh
-//        VertexMesh<2,2> empty_mesh;
-//
-//        // Since the mesh is empty, the iterator should be set to mrMesh.mNodes.end() when constructed
-//        VertexMesh<2,2>::NodeIterator iter = empty_mesh.GetNodeIteratorBegin();
-//
-//        // Check that the iterator is now at the end (we need to check this as a double-negative,
-//        // as we only have a NOT-equals operator defined on the iterator).
-//        bool iter_is_not_at_end = (iter != empty_mesh.GetNodeIteratorEnd());
-//        TS_ASSERT_EQUALS(iter_is_not_at_end, false);
-//    }
-//
-//    void TestVertexElementIterator() throw (Exception)
-//    {
-//        // Create mesh
-//        HoneycombVertexMeshGenerator generator(3, 3);
-//        VertexMesh<2,2>* p_mesh = generator.GetMesh();
-//
-//        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 9u);
-//
-//        unsigned counter = 0;
-//        for (VertexMesh<2,2>::VertexElementIterator iter = p_mesh->GetElementIteratorBegin();
-//             iter != p_mesh->GetElementIteratorEnd();
-//             ++iter)
-//        {
-//            unsigned element_index = iter->GetIndex();
-//            TS_ASSERT_EQUALS(counter, element_index); // assumes the iterator will give elements 0,1..,N in that order
-//            counter++;
-//        }
-//
-//        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), counter);
-//
-//        // For coverage, test with an empty mesh
-//        VertexMesh<2,2> empty_mesh;
-//
-//        // Since the mesh is empty, the iterator should be set to mrMesh.mNodes.end() when constructed
-//        VertexMesh<2,2>::VertexElementIterator iter = empty_mesh.GetElementIteratorBegin();
-//
-//        // Check that the iterator is now at the end (we need to check this as a double-negative,
-//        // as we only have a NOT-equals operator defined on the iterator).
-//        bool iter_is_not_at_end = (iter != empty_mesh.GetElementIteratorEnd());
-//        TS_ASSERT_EQUALS(iter_is_not_at_end, false);
-//
-//        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), counter);
-//        TS_ASSERT_EQUALS(p_mesh->GetNumAllElements(), counter);
-//        TS_ASSERT_EQUALS(p_mesh->IsMeshChanging(), false);
-//    }
-//
-//    void TestBasic1dVertexMesh() throw(Exception)
-//    {
-//        // Make four nodes to assign to three elements
-//        std::vector<Node<1>*> nodes;
-//        for (unsigned i=0; i<4; i++)
-//        {
-//            nodes.push_back(new Node<1>(i, false, 0.5*(double)i));
-//        }
-//
-//        // Make three elements out of these nodes
-//        std::vector<std::vector<Node<1>*> > nodes_elements(3);
-//        std::vector<VertexElement<1,1>*> elements;
-//        for (unsigned i=0; i<3; i++)
-//        {
-//            nodes_elements[i].push_back(nodes[i]);
-//            nodes_elements[i].push_back(nodes[i+1]);
-//
-//            elements.push_back(new VertexElement<1,1>(i, nodes_elements[i]));
-//        }
-//
-//        // Make a vertex mesh
-//        VertexMesh<1,1> mesh(nodes, elements);
-//
-//        // Test the mesh has the correct number of nodes and elements
-//        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 4u);
-//        TS_ASSERT_EQUALS(mesh.GetNumElements(), 3u);
-//
-//        // Test the elements have the correct nodes
-//        TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNumNodes(), 2u);
-//        TS_ASSERT_DELTA(mesh.GetElement(0)->GetNodeLocation(0)[0], 0.0, 1e-6);
-//        TS_ASSERT_DELTA(mesh.GetElement(0)->GetNodeLocation(1)[0], 0.5, 1e-6);
-//
-//        TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNumNodes(), 2u);
-//        TS_ASSERT_DELTA(mesh.GetElement(1)->GetNodeLocation(0)[0], 0.5, 1e-6);
-//        TS_ASSERT_DELTA(mesh.GetElement(1)->GetNodeLocation(1)[0], 1.0, 1e-6);
-//
-//        TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNumNodes(), 2u);
-//        TS_ASSERT_DELTA(mesh.GetElement(2)->GetNodeLocation(0)[0], 1.0, 1e-6);
-//        TS_ASSERT_DELTA(mesh.GetElement(2)->GetNodeLocation(1)[0], 1.5, 1e-6);
-//
-//        // Test GetCentroidOfElement method
-//        TS_ASSERT_DELTA(mesh.GetCentroidOfElement(0)[0], 0.25, 1e-6);
-//        TS_ASSERT_DELTA(mesh.GetCentroidOfElement(1)[0], 0.75, 1e-6);
-//        TS_ASSERT_DELTA(mesh.GetCentroidOfElement(2)[0], 1.25, 1e-6);
-//    }
-//
-//    void TestBasic2dVertexMesh() throw(Exception)
-//    {
-//        // Make seven nodes to assign to two elements
-//        std::vector<Node<2>*> basic_nodes;
-//        basic_nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
-//        basic_nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
-//        basic_nodes.push_back(new Node<2>(2, false, 1.5, 1.0));
-//        basic_nodes.push_back(new Node<2>(3, false, 1.0, 2.0));
-//        basic_nodes.push_back(new Node<2>(4, false, 0.0, 1.0));
-//        basic_nodes.push_back(new Node<2>(5, false, 2.0, 0.0));
-//        basic_nodes.push_back(new Node<2>(6, false, 2.0, 3.0));
-//
-//        // Make two triangular elements out of these nodes
-//        std::vector<std::vector<Node<2>*> > nodes_elements(2);
-//        for (unsigned i=0; i<5; i++)
-//        {
-//            nodes_elements[0].push_back(basic_nodes[i]);
-//        }
-//        nodes_elements[1].push_back(basic_nodes[2]);
-//        nodes_elements[1].push_back(basic_nodes[5]);
-//        nodes_elements[1].push_back(basic_nodes[6]);
-//
-//        std::vector<VertexElement<2,2>*> basic_vertex_elements;
-//        basic_vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elements[0]));
-//        basic_vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elements[1]));
-//
-//        // Make a vertex mesh
-//        VertexMesh<2,2> basic_vertex_mesh(basic_nodes, basic_vertex_elements);
-//
-//        TS_ASSERT_EQUALS(basic_vertex_mesh.GetNumElements(), 2u);
-//        TS_ASSERT_EQUALS(basic_vertex_mesh.GetNumNodes(), 7u);
-//
-//        TS_ASSERT_DELTA(basic_vertex_mesh.GetNode(2)->rGetLocation()[0], 1.5, 1e-3);
-//        TS_ASSERT_EQUALS(basic_vertex_mesh.GetElement(1)->GetNode(2)->GetIndex(),6u);
-//
-//        // Check that the nodes know which elements they are in
-//        std::set<unsigned> temp_list1;
-//        temp_list1.insert(0u);
-//
-//        // Nodes 1 and 4 are only in element 0
-//        TS_ASSERT_EQUALS(basic_nodes[1]->rGetContainingElementIndices(), temp_list1);
-//        TS_ASSERT_EQUALS(basic_nodes[4]->rGetContainingElementIndices(), temp_list1);
-//
-//        // Node 2 is in elements 0 and 1
-//        temp_list1.insert(1u);
-//        TS_ASSERT_EQUALS(basic_nodes[2]->rGetContainingElementIndices(), temp_list1);
-//
-//        // Node 5 is only in element 1
-//        std::set<unsigned> temp_list2;
-//        temp_list2.insert(1u);
-//        TS_ASSERT_EQUALS(basic_nodes[5]->rGetContainingElementIndices(), temp_list2);
-//
-//        // Coverage
-//        TS_ASSERT_EQUALS(basic_vertex_mesh.SolveNodeMapping(0), 0u);
-//        TS_ASSERT_EQUALS(basic_vertex_mesh.SolveElementMapping(0), 0u);
-//        TS_ASSERT_EQUALS(basic_vertex_mesh.SolveBoundaryElementMapping(0), 0u);
-//    }
-//
-//    void TestBasic3dVertexMesh()
-//    {
-//        VertexMesh<3,3>* p_mesh = ConstructCubeAndPyramidMesh();
-//
-//        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 9u);
-//        TS_ASSERT_EQUALS(p_mesh->GetNumFaces(), 10u);
-//        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2u);
-//        TS_ASSERT_EQUALS(p_mesh->GetNumAllElements(), 2u);
-//
-//        // Test the location of one of the nodes
-//        Node<3>* p_node_2 = p_mesh->GetNode(2);
-//        TS_ASSERT_DELTA(p_node_2->rGetLocation()[0], 0.0, 1e-3);
-//        TS_ASSERT_DELTA(p_node_2->rGetLocation()[1], 1.0, 1e-3);
-//        TS_ASSERT_DELTA(p_node_2->rGetLocation()[2], 0.0, 1e-3);
-//
-//        // Test a couple of the elements
-//        VertexElement<3,3>* p_element_0 = p_mesh->GetElement(0);
-//        TS_ASSERT_EQUALS(p_element_0->GetNumNodes(), 8u);
-//        TS_ASSERT_EQUALS(p_element_0->GetNumFaces(), 6u);
-//
-//        VertexElement<3,3>* p_element_1 = p_mesh->GetElement(1);
-//        TS_ASSERT_EQUALS(p_element_1->GetNumNodes(), 5u);
-//        TS_ASSERT_EQUALS(p_element_1->GetNumFaces(), 5u);
-//
-//        // Check that the nodes know which elements they are in
-//        std::set<unsigned> temp_list1;
-//        temp_list1.insert(0);
-//
-//        // Nodes 0, 1, 2 and 4 are only in element 0
-//        TS_ASSERT_EQUALS(p_mesh->GetNode(0)->rGetContainingElementIndices(), temp_list1);
-//        TS_ASSERT_EQUALS(p_mesh->GetNode(1)->rGetContainingElementIndices(), temp_list1);
-//        TS_ASSERT_EQUALS(p_mesh->GetNode(2)->rGetContainingElementIndices(), temp_list1);
-//        TS_ASSERT_EQUALS(p_mesh->GetNode(4)->rGetContainingElementIndices(), temp_list1);
-//
-//        // Node 3, 5, 6 and 7 are in elements 0 and 1
-//        temp_list1.insert(1u);
-//        TS_ASSERT_EQUALS(p_mesh->GetNode(3)->rGetContainingElementIndices(), temp_list1);
-//        TS_ASSERT_EQUALS(p_mesh->GetNode(5)->rGetContainingElementIndices(), temp_list1);
-//        TS_ASSERT_EQUALS(p_mesh->GetNode(6)->rGetContainingElementIndices(), temp_list1);
-//        TS_ASSERT_EQUALS(p_mesh->GetNode(7)->rGetContainingElementIndices(), temp_list1);
-//
-//        // Node 8 is only in element 1
-//        std::set<unsigned> temp_list2;
-//        temp_list2.insert(1u);
-//        TS_ASSERT_EQUALS(p_mesh->GetNode(8)->rGetContainingElementIndices(), temp_list2);
-//
-//        // Coverage
-//        TS_ASSERT_EQUALS(p_mesh->SolveNodeMapping(0), 0u);
-//        TS_ASSERT_EQUALS(p_mesh->SolveElementMapping(0), 0u);
-//        TS_ASSERT_EQUALS(p_mesh->SolveBoundaryElementMapping(0), 0u);
-//
-//        delete p_mesh;
-//    }
+    void TestNodeIterator() throw (Exception)
+    {
+        // Make 6 nodes to assign to two elements
+        std::vector<Node<2>*> basic_nodes;
+        basic_nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+        basic_nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
+        basic_nodes.push_back(new Node<2>(2, false, 2.0, 0.0));
+        basic_nodes.push_back(new Node<2>(3, false, 0.0, 1.0));
+        basic_nodes.push_back(new Node<2>(4, false, 1.0, 1.0));
+        basic_nodes.push_back(new Node<2>(5, false, 2.0, 1.0));
+
+        // Make two triangular elements out of these nodes
+        std::vector<std::vector<Node<2>*> > nodes_elements(2);
+        nodes_elements[0].push_back(basic_nodes[0]);
+        nodes_elements[0].push_back(basic_nodes[1]);
+        nodes_elements[0].push_back(basic_nodes[3]);
+
+        nodes_elements[1].push_back(basic_nodes[2]);
+        nodes_elements[1].push_back(basic_nodes[4]);
+        nodes_elements[1].push_back(basic_nodes[5]);
+
+        std::vector<PottsElement*> basic_potts_elements;
+        basic_potts_elements.push_back(new PottsElement(0, nodes_elements[0]));
+        basic_potts_elements.push_back(new PottsElement(1, nodes_elements[1]));
+
+        // Make a vertex mesh \TODO Replace all the above with a MeshGenerator.
+        PottsMesh basic_potts_mesh(basic_nodes, basic_potts_elements);
+
+        unsigned counter = 0;
+        for (PottsMesh::NodeIterator iter = basic_potts_mesh.GetNodeIteratorBegin();
+             iter != basic_potts_mesh.GetNodeIteratorEnd();
+             ++iter)
+        {
+            unsigned node_index = iter->GetIndex();
+            TS_ASSERT_EQUALS(counter, node_index); // assumes the iterator will give nodes 0,1..,N in that order
+            counter++;
+        }
+        TS_ASSERT_EQUALS(basic_potts_mesh.GetNumNodes(), counter);
+
+        // Check that the node iterator correctly handles deleted nodes
+        basic_potts_mesh.GetNode(0)->MarkAsDeleted();
+
+        counter = 0;
+        for (PottsMesh::NodeIterator iter = basic_potts_mesh.GetNodeIteratorBegin();
+             iter != basic_potts_mesh.GetNodeIteratorEnd();
+             ++iter)
+        {
+            unsigned node_index = iter->GetIndex();
+            TS_ASSERT_EQUALS(counter+1, node_index); // assumes the iterator will give nodes 1..,N in that order
+            counter++;
+        }
+
+        TS_ASSERT_EQUALS(basic_potts_mesh.GetNumAllNodes(), counter+1);
+
+        // For coverage, test with an empty mesh
+        PottsMesh empty_mesh;
+
+        // Since the mesh is empty, the iterator should be set to mrMesh.mNodes.end() when constructed
+        PottsMesh::NodeIterator iter = empty_mesh.GetNodeIteratorBegin();
+
+        // Check that the iterator is now at the end (we need to check this as a double-negative,
+        // as we only have a NOT-equals operator defined on the iterator).
+        bool iter_is_not_at_end = (iter != empty_mesh.GetNodeIteratorEnd());
+        TS_ASSERT_EQUALS(iter_is_not_at_end, false);
+    }
+
+    void TestPottsElementIterator() throw (Exception)
+    {
+        // Make 6 nodes to assign to two elements
+        std::vector<Node<2>*> basic_nodes;
+        basic_nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+        basic_nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
+        basic_nodes.push_back(new Node<2>(2, false, 2.0, 0.0));
+        basic_nodes.push_back(new Node<2>(3, false, 0.0, 1.0));
+        basic_nodes.push_back(new Node<2>(4, false, 1.0, 1.0));
+        basic_nodes.push_back(new Node<2>(5, false, 2.0, 1.0));
+
+        // Make two triangular elements out of these nodes
+        std::vector<std::vector<Node<2>*> > nodes_elements(2);
+        nodes_elements[0].push_back(basic_nodes[0]);
+        nodes_elements[0].push_back(basic_nodes[1]);
+        nodes_elements[0].push_back(basic_nodes[3]);
+
+        nodes_elements[1].push_back(basic_nodes[2]);
+        nodes_elements[1].push_back(basic_nodes[4]);
+        nodes_elements[1].push_back(basic_nodes[5]);
+
+        std::vector<PottsElement*> basic_potts_elements;
+        basic_potts_elements.push_back(new PottsElement(0, nodes_elements[0]));
+        basic_potts_elements.push_back(new PottsElement(1, nodes_elements[1]));
+
+        // Make a vertex mesh \TODO Replace all the above with a MeshGenerator.
+        PottsMesh basic_potts_mesh(basic_nodes, basic_potts_elements);
+
+        unsigned counter = 0;
+        for (PottsMesh::PottsElementIterator iter = basic_potts_mesh.GetElementIteratorBegin();
+             iter != basic_potts_mesh.GetElementIteratorEnd();
+             ++iter)
+        {
+            unsigned element_index = iter->GetIndex();
+            TS_ASSERT_EQUALS(counter, element_index); // assumes the iterator will give elements 0,1..,N in that order
+            counter++;
+        }
+
+        TS_ASSERT_EQUALS(basic_potts_mesh.GetNumElements(), counter);
+        TS_ASSERT_EQUALS(basic_potts_mesh.GetNumAllElements(), counter);
+
+        // Check that the element iterator correctly handles deleted elements
+        basic_potts_mesh.GetElement(0)->MarkAsDeleted();
+
+        counter = 0;
+        for (PottsMesh::PottsElementIterator iter = basic_potts_mesh.GetElementIteratorBegin();
+             iter != basic_potts_mesh.GetElementIteratorEnd();
+             ++iter)
+        {
+            unsigned element_index = iter->GetIndex();
+            TS_ASSERT_EQUALS(counter+1, element_index); // assumes the iterator will give elements 0,1..,N in that order
+            counter++;
+        }
+
+        TS_ASSERT_EQUALS(basic_potts_mesh.GetNumElements()-1, counter);
+        TS_ASSERT_EQUALS(basic_potts_mesh.GetNumAllElements()-1, counter);
+
+        // For coverage, test with an empty mesh
+        PottsMesh empty_mesh;
+
+        // Since the mesh is empty, the iterator should be set to mrMesh.mNodes.end() when constructed
+        PottsMesh::PottsElementIterator iter = empty_mesh.GetElementIteratorBegin();
+
+        // Check that the iterator is now at the end (we need to check this as a double-negative,
+        // as we only have a NOT-equals operator defined on the iterator).
+        bool iter_is_not_at_end = (iter != empty_mesh.GetElementIteratorEnd());
+        TS_ASSERT_EQUALS(iter_is_not_at_end, false);
+    }
+
+
 //
 //    void TestGetCentroidOfElement() throw(Exception)
 //    {
