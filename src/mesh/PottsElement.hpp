@@ -96,6 +96,14 @@ public:
     void DeleteNode(const unsigned& rIndex);
 
     /**
+     * Add node to element. Note that we dont care about ordering in a potts
+     * element so just add it to the end of the mNodes vector.
+     *
+     * @param pNode is a pointer to the new node
+     */
+    void AddNode(Node<2>* pNode);
+
+    /**
      * Calculate the local index of a node given a global index
      * if node is not contained in element return UINT_MAX.
      *

@@ -94,32 +94,14 @@ void PottsElement::DeleteNode(const unsigned& rIndex)
     this->mNodes.erase(this->mNodes.begin() + rIndex);
 }
 
-//void PottsElement::AddNode(const unsigned& rIndex, Node<2>* pNode)
-//{
-//    /**
-//     * When constructing a VertexMesh as the Voronoi dual to a Delaunay mesh,
-//     * each PottsElement is initially constructed without nodes. We therefore
-//     * require the two cases below.
-//     */
-//    if (this->mNodes.empty())
-//    {
-//        // Populate mNodes with pNode
-//        this->mNodes.push_back(pNode);
-//
-//        // Add element to this node
-//        this->mNodes[0]->AddElement(this->mIndex);
-//    }
-//    else
-//    {
-//        assert(rIndex < this->mNodes.size());
-//
-//        // Add pNode to rIndex+1 element of mNodes pushing the others up
-//        this->mNodes.insert(this->mNodes.begin() + rIndex+1,  pNode);
-//
-//        // Add element to this node
-//        this->mNodes[rIndex+1]->AddElement(this->mIndex);
-//    }
-//}
+void PottsElement::AddNode(Node<2>* pNode)
+{
+    // Add element to this node
+    pNode->AddElement(this->mIndex);
+
+    // Add pNode to mNodes
+    this->mNodes.push_back(pNode);
+}
 
 unsigned PottsElement::GetNodeLocalIndex(unsigned globalIndex) const
 {
