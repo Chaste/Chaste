@@ -37,6 +37,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 //#include "PottsMeshWriter.hpp"
 //#include "PottsMeshReader.hpp"
 #include "PottsMesh.hpp"
+#include "PottsMeshGenerator.hpp"
 
 class TestPottsMesh : public CxxTest::TestSuite
 {
@@ -125,49 +126,28 @@ public:
 
     void TestNodeIterator() throw (Exception)
     {
-        // Make 6 nodes to assign to two elements
-        std::vector<Node<2>*> basic_nodes;
-        basic_nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
-        basic_nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
-        basic_nodes.push_back(new Node<2>(2, false, 2.0, 0.0));
-        basic_nodes.push_back(new Node<2>(3, false, 0.0, 1.0));
-        basic_nodes.push_back(new Node<2>(4, false, 1.0, 1.0));
-        basic_nodes.push_back(new Node<2>(5, false, 2.0, 1.0));
+        PottsMeshGenerator generator(4, 4, 2, 2, 2, 2);
 
-        // Make two triangular elements out of these nodes
-        std::vector<std::vector<Node<2>*> > nodes_elements(2);
-        nodes_elements[0].push_back(basic_nodes[0]);
-        nodes_elements[0].push_back(basic_nodes[1]);
-        nodes_elements[0].push_back(basic_nodes[3]);
-
-        nodes_elements[1].push_back(basic_nodes[2]);
-        nodes_elements[1].push_back(basic_nodes[4]);
-        nodes_elements[1].push_back(basic_nodes[5]);
-
-        std::vector<PottsElement*> basic_potts_elements;
-        basic_potts_elements.push_back(new PottsElement(0, nodes_elements[0]));
-        basic_potts_elements.push_back(new PottsElement(1, nodes_elements[1]));
-
-        // Make a vertex mesh \TODO Replace all the above with a MeshGenerator.
-        PottsMesh basic_potts_mesh(basic_nodes, basic_potts_elements);
+        // Create mesh
+        PottsMesh* p_mesh = generator.GetMesh();
 
         unsigned counter = 0;
-        for (PottsMesh::NodeIterator iter = basic_potts_mesh.GetNodeIteratorBegin();
-             iter != basic_potts_mesh.GetNodeIteratorEnd();
+        for (PottsMesh::NodeIterator iter = p_mesh->GetNodeIteratorBegin();
+             iter != p_mesh->GetNodeIteratorEnd();
              ++iter)
         {
             unsigned node_index = iter->GetIndex();
             TS_ASSERT_EQUALS(counter, node_index); // assumes the iterator will give nodes 0,1..,N in that order
             counter++;
         }
-        TS_ASSERT_EQUALS(basic_potts_mesh.GetNumNodes(), counter);
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), counter);
 
         // Check that the node iterator correctly handles deleted nodes
-        basic_potts_mesh.GetNode(0)->MarkAsDeleted();
+        p_mesh->GetNode(0)->MarkAsDeleted();
 
         counter = 0;
-        for (PottsMesh::NodeIterator iter = basic_potts_mesh.GetNodeIteratorBegin();
-             iter != basic_potts_mesh.GetNodeIteratorEnd();
+        for (PottsMesh::NodeIterator iter = p_mesh->GetNodeIteratorBegin();
+             iter != p_mesh->GetNodeIteratorEnd();
              ++iter)
         {
             unsigned node_index = iter->GetIndex();
@@ -175,7 +155,7 @@ public:
             counter++;
         }
 
-        TS_ASSERT_EQUALS(basic_potts_mesh.GetNumAllNodes(), counter+1);
+        TS_ASSERT_EQUALS(p_mesh->GetNumAllNodes(), counter+1);
 
         // For coverage, test with an empty mesh
         PottsMesh empty_mesh;
@@ -191,35 +171,14 @@ public:
 
     void TestPottsElementIterator() throw (Exception)
     {
-        // Make 6 nodes to assign to two elements
-        std::vector<Node<2>*> basic_nodes;
-        basic_nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
-        basic_nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
-        basic_nodes.push_back(new Node<2>(2, false, 2.0, 0.0));
-        basic_nodes.push_back(new Node<2>(3, false, 0.0, 1.0));
-        basic_nodes.push_back(new Node<2>(4, false, 1.0, 1.0));
-        basic_nodes.push_back(new Node<2>(5, false, 2.0, 1.0));
+        PottsMeshGenerator generator(4, 4, 2, 2, 2, 2);
 
-        // Make two triangular elements out of these nodes
-        std::vector<std::vector<Node<2>*> > nodes_elements(2);
-        nodes_elements[0].push_back(basic_nodes[0]);
-        nodes_elements[0].push_back(basic_nodes[1]);
-        nodes_elements[0].push_back(basic_nodes[3]);
-
-        nodes_elements[1].push_back(basic_nodes[2]);
-        nodes_elements[1].push_back(basic_nodes[4]);
-        nodes_elements[1].push_back(basic_nodes[5]);
-
-        std::vector<PottsElement*> basic_potts_elements;
-        basic_potts_elements.push_back(new PottsElement(0, nodes_elements[0]));
-        basic_potts_elements.push_back(new PottsElement(1, nodes_elements[1]));
-
-        // Make a vertex mesh \TODO Replace all the above with a MeshGenerator.
-        PottsMesh basic_potts_mesh(basic_nodes, basic_potts_elements);
+        // Create mesh
+        PottsMesh* p_mesh = generator.GetMesh();
 
         unsigned counter = 0;
-        for (PottsMesh::PottsElementIterator iter = basic_potts_mesh.GetElementIteratorBegin();
-             iter != basic_potts_mesh.GetElementIteratorEnd();
+        for (PottsMesh::PottsElementIterator iter = p_mesh->GetElementIteratorBegin();
+             iter != p_mesh->GetElementIteratorEnd();
              ++iter)
         {
             unsigned element_index = iter->GetIndex();
@@ -227,15 +186,15 @@ public:
             counter++;
         }
 
-        TS_ASSERT_EQUALS(basic_potts_mesh.GetNumElements(), counter);
-        TS_ASSERT_EQUALS(basic_potts_mesh.GetNumAllElements(), counter);
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), counter);
+        TS_ASSERT_EQUALS(p_mesh->GetNumAllElements(), counter);
 
         // Check that the element iterator correctly handles deleted elements
-        basic_potts_mesh.GetElement(0)->MarkAsDeleted();
+        p_mesh->GetElement(0)->MarkAsDeleted();
 
         counter = 0;
-        for (PottsMesh::PottsElementIterator iter = basic_potts_mesh.GetElementIteratorBegin();
-             iter != basic_potts_mesh.GetElementIteratorEnd();
+        for (PottsMesh::PottsElementIterator iter = p_mesh->GetElementIteratorBegin();
+             iter != p_mesh->GetElementIteratorEnd();
              ++iter)
         {
             unsigned element_index = iter->GetIndex();
@@ -243,8 +202,8 @@ public:
             counter++;
         }
 
-        TS_ASSERT_EQUALS(basic_potts_mesh.GetNumElements()-1, counter);
-        TS_ASSERT_EQUALS(basic_potts_mesh.GetNumAllElements()-1, counter);
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements()-1, counter);
+        TS_ASSERT_EQUALS(p_mesh->GetNumAllElements()-1, counter);
 
         // For coverage, test with an empty mesh
         PottsMesh empty_mesh;
