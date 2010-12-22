@@ -5,3 +5,4 @@ population/TestLatticeBasedCellPopulation.hpp
 population/TestLatticeBasedUpdateRules.hpp
 population/TestPottsBasedCellPopulation.hpp
 simulation/TestCellBasedSimulationWithLatticeBasedCellPopulation.hpp
+simulation/TestCellBasedSimulationWithPottsBasedCellPopulation.hpp
