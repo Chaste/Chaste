@@ -313,7 +313,7 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(PottsBasedCellPopulation)
+CHASTE_CLASS_EXPORT(PottsBasedCellPopulation)
 
 namespace boost
 {
