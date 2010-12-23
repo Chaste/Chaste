@@ -150,25 +150,25 @@ CellPtr PottsBasedCellPopulation::AddCell(CellPtr pNewCell, const c_vector<doubl
     //PottsElement* p_element = GetElementCorrespondingToCell(pParentCell);
 
     // Divide the element
-    unsigned new_element_index;
-    if (norm_2(rCellDivisionVector) < DBL_EPSILON)
-    {
-        // If the cell division vector is the default zero vector, divide the element along the short axis
-        //new_element_index = mrMesh.DivideElementAlongShortAxis(p_element, true);
-    }
-    else
-    {
-        // If the cell division vector has any non-zero component, divide the element along this axis
-        //new_element_index = mrMesh.DivideElementAlongGivenAxis(p_element, rCellDivisionVector, true);
-    }
-
-    // Associate the new cell with the element
-    this->mCells.push_back(pNewCell);
+//    unsigned new_element_index=0u;
+//    if (norm_2(rCellDivisionVector) < DBL_EPSILON)
+//    {
+//        // If the cell division vector is the default zero vector, divide the element along the short axis
+//        //new_element_index = mrMesh.DivideElementAlongShortAxis(p_element, true);
+//    }
+//    else
+//    {
+//        // If the cell division vector has any non-zero component, divide the element along this axis
+//        //new_element_index = mrMesh.DivideElementAlongGivenAxis(p_element, rCellDivisionVector, true);
+//    }
+//
+//    // Associate the new cell with the element
+//    this->mCells.push_back(pNewCell);
 
     // Update location cell map
     CellPtr p_created_cell = this->mCells.back();
-    this->mLocationCellMap[new_element_index] = p_created_cell;
-    this->mCellLocationMap[p_created_cell.get()] = new_element_index;
+//    this->mLocationCellMap[new_element_index] = p_created_cell;
+//    this->mCellLocationMap[p_created_cell.get()] = new_element_index;
     return p_created_cell;
 }
 
