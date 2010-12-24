@@ -195,11 +195,11 @@ public:
      */
     virtual c_vector<double, 2> GetCentroidOfElement(unsigned index);
 
-    /**
-     * Construct the mesh using a MeshReader.
-     *
-     * @param rMeshReader the mesh reader
-     */
+//    /**
+//     * Construct the mesh using a MeshReader.
+//     *
+//     * @param rMeshReader the mesh reader
+//     */
 //    void ConstructFromMeshReader(AbstractMeshReader<2,2>& rMeshReader);
 
     /**
