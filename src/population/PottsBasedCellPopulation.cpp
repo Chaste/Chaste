@@ -50,12 +50,12 @@ PottsBasedCellPopulation::PottsBasedCellPopulation(PottsMesh& rMesh,
 }
 
 
-//template<unsigned DIM>
-PottsBasedCellPopulation::PottsBasedCellPopulation(PottsMesh& rMesh)
-             : mrMesh(rMesh)
-{
-    mDeleteMesh = true;
-}
+////template<unsigned DIM>
+//PottsBasedCellPopulation::PottsBasedCellPopulation(PottsMesh& rMesh)
+//             : mrMesh(rMesh)
+//{
+//    mDeleteMesh = true;
+//}
 
 
 //template<unsigned DIM>
@@ -63,7 +63,10 @@ PottsBasedCellPopulation::~PottsBasedCellPopulation()
 {
     if (mDeleteMesh)
     {
+        // Not used until archiving is implemented
+        #define COVERAGE_IGNORE
         delete &mrMesh;
+        #undef COVERAGE_IGNORE
     }
 }
 
@@ -144,7 +147,9 @@ unsigned PottsBasedCellPopulation::GetNumElements()
 CellPtr PottsBasedCellPopulation::AddCell(CellPtr pNewCell, const c_vector<double,2>& rCellDivisionVector, CellPtr pParentCell)
 {
     //Method Not Written Yet
+    #define COVERAGE_IGNORE
     assert(0);
+    #undef COVERAGE_IGNORE
 
     // Get the element associated with this cell
     //PottsElement* p_element = GetElementCorrespondingToCell(pParentCell);
@@ -176,9 +181,6 @@ CellPtr PottsBasedCellPopulation::AddCell(CellPtr pNewCell, const c_vector<doubl
 //template<unsigned DIM>
 unsigned PottsBasedCellPopulation::RemoveDeadCells()
 {
-    //Method Not Written Yet
-    //assert(0);
-
     unsigned num_removed = 0;
 
     for (std::list<CellPtr>::iterator it = this->mCells.begin();
@@ -390,13 +392,8 @@ void PottsBasedCellPopulation::GenerateCellResultsAndWriteToFiles()
 //template<unsigned DIM>
 void PottsBasedCellPopulation::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
-//    *rParamsFile <<  "\t\t<CellRearrangementThreshold>"<<  mrMesh.GetCellRearrangementThreshold() << "</CellRearrangementThreshold> \n" ;
-//    *rParamsFile <<  "\t\t<T2Threshold>"<<  mrMesh.GetT2Threshold() << "</T2Threshold> \n" ;
-//    *rParamsFile <<  "\t\t<CellRearrangementRatio>"<<  mrMesh.GetCellRearrangementRatio() << "</CellRearrangementRatio> \n" ;
-
 	// Call direct parent class method
 	AbstractCellPopulation<2>::OutputCellPopulationParameters(rParamsFile);
-
 }
 
 //template<unsigned DIM>
@@ -411,7 +408,10 @@ double PottsBasedCellPopulation::GetWidth(const unsigned& rDimension)
 //template<unsigned DIM>
 double PottsBasedCellPopulation::GetDampingConstant(unsigned nodeIndex)
 {
+    // \TODO Method Not Needed for this population type need to refactor out
+    #define COVERAGE_IGNORE
     assert(0);
+    #undef COVERAGE_IGNORE
     return 0.0;
 }
 

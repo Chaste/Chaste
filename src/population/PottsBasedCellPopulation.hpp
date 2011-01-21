@@ -86,12 +86,14 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
+#define COVERAGE_IGNORE
         archive & boost::serialization::base_object<AbstractCellPopulation<2> >(*this);
+#undef COVERAGE_IGNORE
     }
 
     /**
      * Check the consistency of internal data structures.
-     * Each VertexElement must have a CellPtr associated with it.
+     * Each PottsElement must have a CellPtr associated with it.
      */
     void Validate();
 
@@ -120,7 +122,7 @@ public:
      *
      * @param rMesh a vertex mesh.
      */
-    PottsBasedCellPopulation(PottsMesh& rMesh);
+    //PottsBasedCellPopulation(PottsMesh& rMesh);
 
     /**
      * Destructor, which frees any memory allocated by the constructor.
@@ -315,6 +317,8 @@ public:
 #include "SerializationExportWrapper.hpp"
 CHASTE_CLASS_EXPORT(PottsBasedCellPopulation)
 
+// No archiving yet so untested
+#define COVERAGE_IGNORE
 namespace boost
 {
 namespace serialization
@@ -348,6 +352,7 @@ inline void load_construct_data(
 }
 }
 } // namespace ...
+#undef COVERAGE_IGNORE
 
 #endif /*POTTSBASEDCELLPOPULATION_HPP_*/
 
