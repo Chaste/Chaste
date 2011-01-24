@@ -51,6 +51,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 //template<unsigned DIM>
 class PottsBasedCellPopulation : public AbstractCellPopulation<2>
 {
+    friend class TestPottsBasedCellPopulation;
+
 private:
 
     /** Potts-based mesh associated with the cell population. */
@@ -96,6 +98,27 @@ private:
      * Each PottsElement must have a CellPtr associated with it.
      */
     void Validate();
+
+    /**
+     * Locate the sites neighbouring a site (this version is a Moore neighbourhood).
+     * Note: This dictates the geometry of the cell population and the type of neighbourhood
+     * used and can be overridden to use different neighbourhoods or geometries.
+     *
+     * @param nodeIndex global index of the node of interest
+     *
+     * @return set of all nodes
+     */
+    std::set<unsigned> GetNeighbouringNodeIndices(unsigned nodeIndex);
+
+    /**
+     * Same method as GetNeighbouringNodeIndices above, but returns an ORDERED vector
+     * of neighbouring nodes, in the order N, NW, W, SW, S, SE, E, NE. This is needed
+     * to make GetNthDegreeNeighbouringNodeIndices work, as this exploits the ordering
+     * of the neighbours.
+     *
+     * @param nodeIndex global index of the node of interest
+     */
+    std::vector<unsigned> GetNeighbouringNodeIndicesVector(unsigned nodeIndex);
 
 public:
 
