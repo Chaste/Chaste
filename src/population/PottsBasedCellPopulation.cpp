@@ -28,11 +28,11 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "PottsBasedCellPopulation.hpp"
 #include "CellwiseData.hpp"
-#include "VertexMeshWriter.hpp"
+#include "RandomNumberGenerator.hpp"
 #include "Warnings.hpp"
-#include "Debug.hpp"
+//#include "Debug.hpp"
 
-////template<unsigned DIM>
+//template<unsigned DIM>
 PottsBasedCellPopulation::PottsBasedCellPopulation(PottsMesh& rMesh,
                                           std::vector<CellPtr>& rCells,
                                           bool deleteMesh,
@@ -204,35 +204,97 @@ unsigned PottsBasedCellPopulation::RemoveDeadCells()
 void PottsBasedCellPopulation::UpdateNodeLocations(const std::vector< c_vector<double, 2> >& rNodeForces, double dt)
 {
     // Randomly move elements
-    // Loop over elements and exchange
-    for (PottsMesh::PottsElementIterator elem_iter = mrMesh.GetElementIteratorBegin();
-                elem_iter != mrMesh.GetElementIteratorEnd();
-                 ++elem_iter)
+
+
+    // Loop over nodes and exchange //TODO make this a random sweep
+    for (AbstractMesh<2,2>::NodeIterator node_iter = mrMesh.GetNodeIteratorBegin();
+         node_iter != mrMesh.GetNodeIteratorEnd();
+         ++node_iter)
     {
-        // add the next node to the Element
-        unsigned last_node = elem_iter->GetNodeGlobalIndex(elem_iter->GetNumNodes()-1);
-        unsigned next_node;
-        if (last_node +1  < mrMesh.GetNumNodes())
+        assert(node_iter->GetNumContainingElements() <= 1);
+
+        if(node_iter->GetNumContainingElements() == 1)
         {
-            next_node = last_node +1;
-        }
-        else
-        {
-            next_node = 0;
+            // Find a random site from all of the available neighbouring nodes to extend the element into
+            std::set<unsigned> neighboring_node_indices = GetNeighbouringNodeIndices(node_iter->GetIndex());
+
+            if (!neighboring_node_indices.empty())
+            {
+                unsigned num_neighbours = neighboring_node_indices.size();
+                unsigned chosen_neighbour = RandomNumberGenerator::Instance()->randMod(num_neighbours);
+
+                std::set<unsigned>::iterator neighbour_iter = neighboring_node_indices.begin();
+                for (unsigned i=0; i<chosen_neighbour; i++)
+                {
+                    neighbour_iter++;
+                }
+                double new_location_index = *neighbour_iter;
+
+                std::set<unsigned> containing_elements = node_iter->rGetContainingElementIndices();
+                std::set<unsigned> new_location_containing_elements = GetNode(new_location_index)->rGetContainingElementIndices();
+
+                if(containing_elements.size()==1)
+                {
+                    std::set<unsigned>::iterator elem_iter = containing_elements.begin();
+
+                    if(new_location_containing_elements.size()>0)
+                    {
+                        assert(new_location_containing_elements.size()==1);
+
+                        // Check if the elements are different otherwise no point doing anything
+
+                        if( (*containing_elements.begin()) != (*new_location_containing_elements.begin()))
+                        {
+                            //PRINT_2_VARIABLES( (*containing_elements.begin()), (*new_location_containing_elements.begin()));
+
+                            // Iterate over the elements containing the target node to remove node should be at most one element.
+                            for (std::set<unsigned>::iterator iter = new_location_containing_elements.begin();
+                                 iter != new_location_containing_elements.end();
+                                 ++iter)
+                            {
+                                GetElement(*iter)->DeleteNode(GetElement(*iter)->GetNodeLocalIndex(new_location_index));
+                            }
+                        }
+                    }
+                    // Now add node to original element
+                    GetElement(*elem_iter)->AddNode(mrMesh.GetNode(new_location_index));
+                }
+            }
+            else  //(neighboring_node_indices.empty())
+            {
+                NEVER_REACHED;
+            }
         }
 
-        std::set<unsigned> containing_elem_indices = GetNode(next_node)->rGetContainingElementIndices();
 
-        // Iterate over these elements to remove node
-        for (std::set<unsigned>::iterator iter = containing_elem_indices.begin();
-             iter != containing_elem_indices.end();
-             ++iter)
-        {
-            GetElement(*iter)->DeleteNode(GetElement(*iter)->GetNodeLocalIndex(next_node));
-        }
+//        std::set<unsigned> containing_elem_indices = GetNode(next_node)->rGetContainingElementIndices();
+//
 
-        // Now add node to original element
-        elem_iter->AddNode(mrMesh.GetNode(next_node));
+//
+//
+//        unsigned last_node = elem_iter->GetNodeGlobalIndex(elem_iter->GetNumNodes()-1);
+//        unsigned next_node;
+//        if (last_node +1  < mrMesh.GetNumNodes())
+//        {
+//            next_node = last_node +1;
+//        }
+//        else
+//        {
+//            next_node = 0;
+//        }
+//
+//        std::set<unsigned> containing_elem_indices = GetNode(next_node)->rGetContainingElementIndices();
+//
+//        // Iterate over these elements to remove node
+//        for (std::set<unsigned>::iterator iter = containing_elem_indices.begin();
+//             iter != containing_elem_indices.end();
+//             ++iter)
+//        {
+//            GetElement(*iter)->DeleteNode(GetElement(*iter)->GetNodeLocalIndex(next_node));
+//        }
+//
+//        // Now add node to original element
+//        elem_iter->AddNode(mrMesh.GetNode(next_node));
     }
 
 }
