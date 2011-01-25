@@ -249,11 +249,75 @@ double PottsMesh::GetVolumeOfElement(unsigned index)
 
 double PottsMesh::GetSurfaceAreaOfElement(unsigned index)
 {
-    // TODO this is not correct need to work this out from the number of free boudaries
+    // TODO this is not correct need to work this out from the number of free boundaries. See #1683.
     double surface_area = 0.0;
 
     return surface_area;
 }
+
+std::set<unsigned> PottsMesh::GetNeighbouringNodeIndices(unsigned nodeIndex)
+{
+    // Create a set of neighbouring node indices
+    std::set<unsigned> neighbouring_node_indices;
+
+    double width = this->GetWidth(0);
+    unsigned nodes_across = (unsigned)width + 1; // Getting the number of nodes along x axis of mesh
+
+    double height = this->GetWidth(1);
+    unsigned nodes_up = (unsigned)height + 1;
+
+    /*
+     * This stores the available neighbours using the following numbering:
+     *
+     *  1-----0-----7
+     *  |     |     |
+     *  |     |     |
+     *  2-----x-----6
+     *  |     |     |
+     *  |     |     |
+     *  3-----4-----5
+     */
+
+    // Create a vector of possible neighbouring node indices
+    std::vector<unsigned> neighbour_indices_vector(8, nodeIndex);
+    neighbour_indices_vector[0] += nodes_across;
+    neighbour_indices_vector[1] += nodes_across - 1;
+    neighbour_indices_vector[2] -= 1;
+    neighbour_indices_vector[3] -= nodes_across + 1;
+    neighbour_indices_vector[4] -= nodes_across;
+    neighbour_indices_vector[5] -= nodes_across - 1;
+    neighbour_indices_vector[6] += 1;
+    neighbour_indices_vector[7] += nodes_across + 1;
+
+    // Work out whether this node lies on any edge of the mesh
+    bool on_south_edge = (nodeIndex < nodes_across);
+    bool on_north_edge = (nodeIndex > nodes_up*(nodes_across - 1)-1);
+    bool on_west_edge = (nodeIndex%nodes_across == 0);
+    bool on_east_edge = (nodeIndex%nodes_across == nodes_across - 1);
+
+    // Create a vector of booleans for which neighbours are available
+    // Use the order N, NW, W, SW, S, SE, E, NE
+    std::vector<bool> available_neighbours = std::vector<bool>(8, true);
+    available_neighbours[0] = !on_north_edge;
+    available_neighbours[1] = !(on_north_edge || on_west_edge);
+    available_neighbours[2] = !on_west_edge;
+    available_neighbours[3] = !(on_south_edge || on_west_edge);
+    available_neighbours[4] = !on_south_edge;
+    available_neighbours[5] = !(on_south_edge || on_east_edge);
+    available_neighbours[6] = !on_east_edge;
+    available_neighbours[7] = !(on_north_edge || on_east_edge);
+
+    // Using neighbour_indices_vector and available_neighbours, store the indices of all available neighbours to the set all_neighbours
+    for (unsigned i=0; i<8; i++)
+    {
+        if (available_neighbours[i])
+        {
+            neighbouring_node_indices.insert(neighbour_indices_vector[i]);
+        }
+    }
+    return neighbouring_node_indices;
+}
+
 
 
 /////////////////////////////////////////////////////////////////////////////////////

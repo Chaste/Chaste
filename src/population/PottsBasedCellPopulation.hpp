@@ -99,27 +99,6 @@ private:
      */
     void Validate();
 
-    /**
-     * Locate the sites neighbouring a site (this version is a Moore neighbourhood).
-     * Note: This dictates the geometry of the cell population and the type of neighbourhood
-     * used and can be overridden to use different neighbourhoods or geometries.
-     *
-     * @param nodeIndex global index of the node of interest
-     *
-     * @return set of all nodes
-     */
-    std::set<unsigned> GetNeighbouringNodeIndices(unsigned nodeIndex);
-
-    /**
-     * Same method as GetNeighbouringNodeIndices above, but returns an ORDERED vector
-     * of neighbouring nodes, in the order N, NW, W, SW, S, SE, E, NE. This is needed
-     * to make GetNthDegreeNeighbouringNodeIndices work, as this exploits the ordering
-     * of the neighbours.
-     *
-     * @param nodeIndex global index of the node of interest
-     */
-    std::vector<unsigned> GetNeighbouringNodeIndicesVector(unsigned nodeIndex);
-
 public:
 
     /**
@@ -194,10 +173,6 @@ public:
     /**
      * Overridden GetLocationOfCellCentre() method.
      * Find where a given cell is in space.
-     *
-     * \todo If required, we could come up with a more clever definition of cell location
-     *       for a PottsCellPopulation (for example, there is no guarantee of convexity so the
-     *       centre of mass may lie outside the element)
      *
      * @param pCell the cell
      *

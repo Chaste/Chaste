@@ -243,6 +243,20 @@ public:
      */
     virtual double GetSurfaceAreaOfElement(unsigned index);
 
+    /**
+     * Given a node, find a set containing the indices of its neighbouring nodes.
+     * This is virtual void and must be implemented in base classes to implement
+     * periodicity .etc.
+     *
+     * \TODO this might be better to store as a look up table which is calculated
+     * in the constructor.
+     *
+     * @param nodeIndex global index of the node
+     * @return its neighbouring node indices
+     */
+    std::set<unsigned> GetNeighbouringNodeIndices(unsigned nodeIndex);
+
+
     //////////////////////////////////////////////////////////////////////
     //                         Nested classes                           //
     //////////////////////////////////////////////////////////////////////

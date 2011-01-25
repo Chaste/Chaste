@@ -74,7 +74,6 @@ public:
     {
         // Create a simple 2D PottsMesh
         PottsMeshGenerator generator(16, 18, 4, 4, 4, 4);
-        //PottsMeshGenerator generator(50, 50, 1, 1, 50, 1);
         PottsMesh* p_mesh = generator.GetMesh();
 
         // Create cells

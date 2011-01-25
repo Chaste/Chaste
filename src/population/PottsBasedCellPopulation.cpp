@@ -203,7 +203,12 @@ unsigned PottsBasedCellPopulation::RemoveDeadCells()
 //template<unsigned DIM>
 void PottsBasedCellPopulation::UpdateNodeLocations(const std::vector< c_vector<double, 2> >& rNodeForces, double dt)
 {
-    // Randomly move elements
+    // This is where we currently perform the Monte Carlo simulations
+
+    /* Currently we just randomly move elements by looping over all the nodes
+     * finding a random neighbour and assigning this neighbour to be the same
+     * element as the original node.
+     */
 
 
     // Loop over nodes and exchange //TODO make this a random sweep
@@ -211,12 +216,13 @@ void PottsBasedCellPopulation::UpdateNodeLocations(const std::vector< c_vector<d
          node_iter != mrMesh.GetNodeIteratorEnd();
          ++node_iter)
     {
+        // Node should be in at most one element
         assert(node_iter->GetNumContainingElements() <= 1);
 
         if(node_iter->GetNumContainingElements() == 1)
         {
             // Find a random site from all of the available neighbouring nodes to extend the element into
-            std::set<unsigned> neighboring_node_indices = GetNeighbouringNodeIndices(node_iter->GetIndex());
+            std::set<unsigned> neighboring_node_indices = mrMesh.GetNeighbouringNodeIndices(node_iter->GetIndex());
 
             if (!neighboring_node_indices.empty())
             {
@@ -385,231 +391,6 @@ void PottsBasedCellPopulation::Validate()
             EXCEPTION(ss.str());
         }
     }
-}
-
-
-//template<unsigned DIM>
-std::set<unsigned> PottsBasedCellPopulation::GetNeighbouringNodeIndices(unsigned nodeIndex)
-{
-    // Get the neighbouring node indices as a vector
-    std::vector<unsigned> neighbouring_node_indices_vector = GetNeighbouringNodeIndicesVector(nodeIndex);
-
-    // Now populate a std::set with these node indices
-    std::set<unsigned> all_neighbours;
-    for (unsigned i=0; i<neighbouring_node_indices_vector.size(); i++)
-    {
-        all_neighbours.insert(neighbouring_node_indices_vector[i]);
-    }
-
-    return all_neighbours;
-}
-
-
-//template<unsigned DIM>
-std::vector<unsigned> PottsBasedCellPopulation::GetNeighbouringNodeIndicesVector(unsigned nodeIndex)
-{
-    std::vector<unsigned> all_neighbours;
-
-//    switch (DIM)
-//    {
-//        case 1:
-//        {
-//            double width = this->mrMesh.GetWidth(0);
-//            unsigned nodes_across = (unsigned)width + 1; // Getting the number of nodes along x axis of mesh
-//
-//            /*
-//             * This stores the available neighbours using the following numbering:
-//             *
-//             * 0------x------1
-//             *
-//             */
-//
-//            // Create a vector of possible neighbouring node indices
-//            std::vector<unsigned> neighbour_indices(2, nodeIndex);
-//            neighbour_indices[0] -= 1;
-//            neighbour_indices[1] += 1;
-//
-//            // Work out whether this node lies on any edge of the mesh
-//            bool on_west_edge = (nodeIndex == 0);
-//            bool on_east_edge = (nodeIndex == nodes_across-1);
-//
-//            // Create a vector of booleans for which neighbours are available
-//            std::vector<bool> available_neighbours = std::vector<bool>(8, true);
-//            available_neighbours[0] = !on_west_edge;
-//            available_neighbours[1] = !on_east_edge;
-//
-//            // Using neighbour_indices and available_neighbours, store the indices of all available neighbours to the set all_neighbours
-//            for (unsigned i=0; i<2; i++)
-//            {
-//                if (available_neighbours[i])
-//                {
-//                    all_neighbours.push_back(neighbour_indices[i]);
-//                }
-//            }
-//            break;
-//        }
-//        case 2:
-//        {
-            double width = this->mrMesh.GetWidth(0);
-            unsigned nodes_across = (unsigned)width + 1; // Getting the number of nodes along x axis of mesh
-
-            double height = this->mrMesh.GetWidth(1);
-            unsigned nodes_up = (unsigned)height + 1;
-
-            /*
-             * This stores the available neighbours using the following numbering:
-             *
-             *  1-----0-----7
-             *  |     |     |
-             *  |     |     |
-             *  2-----x-----6
-             *  |     |     |
-             *  |     |     |
-             *  3-----4-----5
-             */
-
-            // Create a vector of possible neighbouring node indices
-            std::vector<unsigned> neighbour_indices(8, nodeIndex);
-            neighbour_indices[0] += nodes_across;
-            neighbour_indices[1] += nodes_across - 1;
-            neighbour_indices[2] -= 1;
-            neighbour_indices[3] -= nodes_across + 1;
-            neighbour_indices[4] -= nodes_across;
-            neighbour_indices[5] -= nodes_across - 1;
-            neighbour_indices[6] += 1;
-            neighbour_indices[7] += nodes_across + 1;
-
-            // Work out whether this node lies on any edge of the mesh
-            bool on_south_edge = (nodeIndex < nodes_across);
-            bool on_north_edge = (nodeIndex > nodes_up*(nodes_across - 1)-1);
-            bool on_west_edge = (nodeIndex%nodes_across == 0);
-            bool on_east_edge = (nodeIndex%nodes_across == nodes_across - 1);
-
-            // Create a vector of booleans for which neighbours are available
-            // Use the order N, NW, W, SW, S, SE, E, NE
-            std::vector<bool> available_neighbours = std::vector<bool>(8, true);
-            available_neighbours[0] = !on_north_edge;
-            available_neighbours[1] = !(on_north_edge || on_west_edge);// || mUseVonNeumannNeighbourhoods);
-            available_neighbours[2] = !on_west_edge;
-            available_neighbours[3] = !(on_south_edge || on_west_edge);// || mUseVonNeumannNeighbourhoods);
-            available_neighbours[4] = !on_south_edge;
-            available_neighbours[5] = !(on_south_edge || on_east_edge);// || mUseVonNeumannNeighbourhoods);
-            available_neighbours[6] = !on_east_edge;
-            available_neighbours[7] = !(on_north_edge || on_east_edge);// || mUseVonNeumannNeighbourhoods);
-
-            // Using neighbour_indices and available_neighbours, store the indices of all available neighbours to the set all_neighbours
-            for (unsigned i=0; i<8; i++)
-            {
-                if (available_neighbours[i])
-                {
-                    all_neighbours.push_back(neighbour_indices[i]);
-                }
-            }
-//            break;
-//        }
-//        case 3:
-//        {
-//            double width = this->mrMesh.GetWidth(0);
-//            unsigned nodes_across = (unsigned)width + 1; // Getting the number of nodes along x axis of mesh
-//
-//            double height = this->mrMesh.GetWidth(1);
-//            unsigned nodes_up = (unsigned)height + 1; // Getting the number of nodes along y axis of mesh
-//
-//            double depth = this->mrMesh.GetWidth(2);
-//            unsigned nodes_deep = (unsigned)depth + 1; // Getting the number of nodes along z axis of mesh
-//
-//            unsigned nodes_layer = nodes_across*nodes_up; // Number of nodes in each layer
-//
-//            /*
-//             * This stores the available neighbours using the following numbering:
-//             *
-//             *     6------7------8           14-----15-----16            23-----24-----25
-//             *     |      |      |           |      |      |             |      |      |
-//             *     |      |      |           |      |      |             |      |      |
-//             *     3------4------5           12-----x------13            20-----21-----22
-//             *     |      |      |           |      |      |             |      |      |
-//             *     |      |      |           |      |      |             |      |      |
-//             *     0------1------2           9------10-----11            17-----18-----19
-//             *
-//             */
-//
-//            // Create a vector of possible neighbouring node indices
-//            std::vector<unsigned> neighbour_indices(26, nodeIndex);
-//            for (unsigned i=0; i<9; i++)
-//            {
-//                neighbour_indices[i] -= nodes_layer;
-//                neighbour_indices[25-i] += nodes_layer;
-//            }
-//            for (unsigned i=0; i<3; i++)
-//            {
-//                neighbour_indices[i] -= nodes_across;
-//                neighbour_indices[9+i] -= nodes_across;
-//                neighbour_indices[17+i] -= nodes_across;
-//                neighbour_indices[6+i] += nodes_across;
-//                neighbour_indices[14+i] += nodes_across;
-//                neighbour_indices[23+i] += nodes_across;
-//            }
-//            for (unsigned i=0; i<4; i++)
-//            {
-//                neighbour_indices[3*i] -= 1;
-//                neighbour_indices[25-3*i] += 1;
-//                neighbour_indices[2+3*i] += 1;
-//                neighbour_indices[23-3*i] -= 1;
-//            }
-//            neighbour_indices[12] -= 1;
-//            neighbour_indices[13] += 1;
-//
-//            // Work out whether this node lies on any face of the mesh
-//            bool on_bottom_face = (nodeIndex < nodes_layer);
-//            bool on_top_face = (nodeIndex > (nodes_deep-1)*nodes_layer-1);
-//            bool on_south_face = (nodeIndex%nodes_layer < nodes_across);
-//            bool on_north_face = (nodeIndex%nodes_layer > nodes_across*(nodes_up-1)-1);
-//            bool on_west_face = (nodeIndex%nodes_across == 0);
-//            bool on_east_face = (nodeIndex%nodes_across == nodes_across - 1);
-//
-//            // Create a vector of booleans for which neighbours are available
-//            std::vector<bool> available_neighbours = std::vector<bool>(26, true);
-//            available_neighbours[0] = !(on_bottom_face || on_west_face || on_south_face || mUseVonNeumannNeighbourhoods);
-//            available_neighbours[1] = !(on_bottom_face || on_south_face || mUseVonNeumannNeighbourhoods);
-//            available_neighbours[2] = !(on_bottom_face || on_east_face || on_south_face|| mUseVonNeumannNeighbourhoods);
-//            available_neighbours[3] = !(on_bottom_face || on_west_face|| mUseVonNeumannNeighbourhoods);
-//            available_neighbours[4] = !on_bottom_face;
-//            available_neighbours[5] = !(on_bottom_face || on_east_face|| mUseVonNeumannNeighbourhoods);
-//            available_neighbours[6] = !(on_bottom_face || on_west_face || on_north_face|| mUseVonNeumannNeighbourhoods);
-//            available_neighbours[7] = !(on_bottom_face || on_north_face|| mUseVonNeumannNeighbourhoods);
-//            available_neighbours[8] = !(on_bottom_face || on_east_face || on_north_face|| mUseVonNeumannNeighbourhoods);
-//            available_neighbours[9] = !(on_west_face || on_south_face|| mUseVonNeumannNeighbourhoods);
-//            available_neighbours[10] = !on_south_face;
-//            available_neighbours[11] = !(on_east_face || on_south_face|| mUseVonNeumannNeighbourhoods);
-//            available_neighbours[12] = !on_west_face;
-//            available_neighbours[13] = !on_east_face;
-//            available_neighbours[14] = !(on_west_face || on_north_face|| mUseVonNeumannNeighbourhoods);
-//            available_neighbours[15] = !on_north_face;
-//            available_neighbours[16] = !(on_east_face || on_north_face|| mUseVonNeumannNeighbourhoods);
-//            available_neighbours[17] = !(on_top_face || on_west_face || on_south_face|| mUseVonNeumannNeighbourhoods);
-//            available_neighbours[18] = !(on_top_face || on_south_face|| mUseVonNeumannNeighbourhoods);
-//            available_neighbours[19] = !(on_top_face || on_east_face || on_south_face|| mUseVonNeumannNeighbourhoods);
-//            available_neighbours[20] = !(on_top_face || on_west_face|| mUseVonNeumannNeighbourhoods);
-//            available_neighbours[21] = !on_top_face;
-//            available_neighbours[22] = !(on_top_face || on_east_face|| mUseVonNeumannNeighbourhoods);
-//            available_neighbours[23] = !(on_top_face || on_west_face || on_north_face|| mUseVonNeumannNeighbourhoods);
-//            available_neighbours[24] = !(on_top_face || on_north_face|| mUseVonNeumannNeighbourhoods);
-//            available_neighbours[25] = !(on_top_face || on_east_face || on_north_face|| mUseVonNeumannNeighbourhoods);
-//
-//            // Using neighbour_indices and available_neighbours, store the indices of all available neighbours to the set all_neighbours
-//            for (unsigned i=0; i<26; i++)
-//            {
-//                if (available_neighbours[i])
-//                {
-//                    all_neighbours.push_back(neighbour_indices[i]);
-//                }
-//            }
-//            break;
-//        }
-//        default:
-//            NEVER_REACHED;
-//    }
-    return all_neighbours;
 }
 
 //template<unsigned DIM>
