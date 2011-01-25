@@ -132,14 +132,6 @@ public:
     virtual ~PottsBasedCellPopulation();
 
     /**
-     * Overridden GetDampingConstant() method.
-     *
-     * @param nodeIndex the global index of this node
-     * @return the average damping constant of the cells surrounding the node.
-     */
-    double GetDampingConstant(unsigned nodeIndex);
-
-    /**
      * @return reference to  mrMesh.
      */
     PottsMesh& rGetMesh();
@@ -164,6 +156,15 @@ public:
     unsigned GetNumElements();
 
     /**
+     * Overridden GetNode() method.
+     *
+     * @param index global index of the specified node
+     *
+     * @return a pointer to the node.
+     */
+    Node<2>* GetNode(unsigned index);
+
+    /**
      * Overridden GetNumNodes() method.
      *
      * @return the number of nodes in the cell population.
@@ -179,43 +180,6 @@ public:
      * @return the location of the centre of mass of the element corresponding to this cell.
      */
     c_vector<double, 2> GetLocationOfCellCentre(CellPtr pCell);
-
-    /**
-     * Overridden GetNode() method.
-     *
-     * @param index global index of the specified node
-     *
-     * @return a pointer to the node.
-     */
-    Node<2>* GetNode(unsigned index);
-
-    /**
-     * Overridden AddNode() method.
-     *
-     * Add a new node to the cell population.
-     *
-     * @param pNewNode pointer to the new node
-     * @return global index of new node in cell population
-     */
-    unsigned AddNode(Node<2>* pNewNode);
-
-    /**
-     * Overridden UpdateNodeLocations() method.
-     *
-     * @param rNodeForces a vector containing the force on each node in the cell population
-     * @param dt the time step
-     */
-    void UpdateNodeLocations(const std::vector< c_vector<double, 2> >& rNodeForces, double dt);
-
-    /**
-     * Overridden SetNode() method.
-     *
-     * Move the node with a given index to a new point in space.
-     *
-     * @param index the index of the node to be moved
-     * @param rNewLocation the new target location of the node
-     */
-    void SetNode(unsigned index, ChastePoint<2>& rNewLocation);
 
     /**
      * Get a pointer to the element corresponding to a given CellPtr.
@@ -251,6 +215,14 @@ public:
     unsigned RemoveDeadCells();
 
     /**
+     * Overridden UpdateNodeLocations() method.
+     *
+     * @param rNodeForces a vector containing the force on each node in the cell population
+     * @param dt the time step
+     */
+    void UpdateNodeLocations(const std::vector< c_vector<double, 2> >& rNodeForces, double dt);
+
+    /**
      * Overridden IsCellAssociatedWithADeletedLocation() method.
      *
      * @param pCell the cell
@@ -259,8 +231,7 @@ public:
     bool IsCellAssociatedWithADeletedLocation(CellPtr pCell);
 
     /**
-     * Remove the VertexElements which have been marked as deleted, perform
-     * any cell rearrangements if required, and update the correspondence
+     * Remove the PottsElements which have been marked as deleted, and update the correspondence
      * with CellPtrs.
      *
      * @param hasHadBirthsOrDeaths - a bool saying whether cell population has had Births Or Deaths
@@ -291,6 +262,17 @@ public:
     virtual void GenerateCellResultsAndWriteToFiles();
 
     /**
+     * Overridden GetWidth() method.
+     *
+     * Calculate the 'width' of any dimension of the cell population by calling
+     * GetWidth() on the mesh.
+     *
+     * @param rDimension a dimension (0,1 or 2)
+     * @return The maximum distance between any nodes in this dimension.
+     */
+    double GetWidth(const unsigned& rDimension);
+
+    /**
      * Outputs CellPopulation parameters to file
      *
      * As this method is pure virtual, it must be overridden
@@ -300,16 +282,39 @@ public:
      */
     void OutputCellPopulationParameters(out_stream& rParamsFile);
 
+
+    /////////////////////////////////////////////////////////////////////////////
+    // Unused Methods to be refactored out of the AbstractCellPopulation?
+    /////////////////////////////////////////////////////////////////////////////
+
     /**
-     * Overridden GetWidth() method.
-     * 
-     * Calculate the 'width' of any dimension of the cell population by calling
-     * GetWidth() on the mesh.
+     * Overridden AddNode() method.
      *
-     * @param rDimension a dimension (0,1 or 2)
-     * @return The maximum distance between any nodes in this dimension.
+     * Add a new node to the cell population.
+     *
+     * @param pNewNode pointer to the new node
+     * @return global index of new node in cell population
      */
-    double GetWidth(const unsigned& rDimension);
+    unsigned AddNode(Node<2>* pNewNode);
+
+    /**
+     * Overridden SetNode() method.
+     *
+     * Move the node with a given index to a new point in space.
+     *
+     * @param index the index of the node to be moved
+     * @param rNewLocation the new target location of the node
+     */
+    void SetNode(unsigned index, ChastePoint<2>& rNewLocation);
+
+    /**
+     * Overridden GetDampingConstant() method.
+     *
+     * @param nodeIndex the global index of this node
+     * @return the average damping constant of the cells surrounding the node.
+     */
+    double GetDampingConstant(unsigned nodeIndex);
+
 };
 
 #include "SerializationExportWrapper.hpp"
