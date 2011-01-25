@@ -235,7 +235,6 @@ public:
      * with CellPtrs.
      *
      * @param hasHadBirthsOrDeaths - a bool saying whether cell population has had Births Or Deaths
-     * not needed in this cell population class
      */
     void Update(bool hasHadBirthsOrDeaths=true);
 

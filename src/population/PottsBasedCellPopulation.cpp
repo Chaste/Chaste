@@ -30,7 +30,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CellwiseData.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "Warnings.hpp"
-//#include "Debug.hpp"
 
 
 //template<unsigned DIM>
@@ -196,7 +195,7 @@ unsigned PottsBasedCellPopulation::RemoveDeadCells()
         {
             // Remove the element from the mesh
             num_removed++;
-            //mrMesh.DeleteElementPriorToReMesh(this->mCellLocationMap[(*it).get()]);
+            mrMesh.DeleteElement(this->mCellLocationMap[(*it).get()]);
             it = this->mCells.erase(it);
             --it;
         }
@@ -267,6 +266,8 @@ void PottsBasedCellPopulation::UpdateNodeLocations(const std::vector< c_vector<d
                                  ++iter)
                             {
                                 GetElement(*iter)->DeleteNode(GetElement(*iter)->GetNodeLocalIndex(new_location_index));
+
+                                // If this causes the element to have no nodes then flag the element and cell to be deleted.
                             }
                         }
                     }

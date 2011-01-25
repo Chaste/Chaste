@@ -113,6 +113,8 @@ void PottsMesh::Clear()
         delete this->mNodes[i];
     }
     this->mNodes.clear();
+
+    mDeletedElementIndices.clear();
 }
 
 
@@ -124,7 +126,7 @@ unsigned PottsMesh::GetNumNodes() const
 
 unsigned PottsMesh::GetNumElements() const
 {
-    return mElements.size();
+    return mElements.size() - mDeletedElementIndices.size();
 }
 
 
@@ -317,6 +319,51 @@ std::set<unsigned> PottsMesh::GetNeighbouringNodeIndices(unsigned nodeIndex)
     }
     return neighbouring_node_indices;
 }
+
+
+void PottsMesh::DeleteElement(unsigned index)
+{
+    // Mark this element as deleted this also updates the nodes containing element indices.
+    this->mElements[index]->MarkAsDeleted();
+    mDeletedElementIndices.push_back(index);
+}
+
+//unsigned PottsMesh::DivideElement(PottsElement* pElement)
+//{
+//    // Store the number of nodes in the element (this changes when nodes are deleted from the element)
+//    unsigned num_nodes = pElement->GetNumNodes();
+//
+//    // Copy the nodes in this element
+//    std::vector<Node<SPACE_DIM>*> nodes_elem;
+//    for (unsigned i=0; i<num_nodes; i++)
+//    {
+//        nodes_elem.push_back(pElement->GetNode(i));
+//    }
+//
+//    // Get the index of the new element
+//    unsigned new_element_index;
+//    if (mDeletedElementIndices.empty())
+//    {
+//        new_element_index = this->mElements.size();
+//    }
+//    else
+//    {
+//        new_element_index = mDeletedElementIndices.back();
+//        mDeletedElementIndices.pop_back();
+//        delete this->mElements[new_element_index];
+//    }
+//
+//    // Add the new element to the mesh
+//    AddElement(new VertexElement<ELEMENT_DIM,SPACE_DIM>(new_element_index, nodes_elem));
+//
+//    /**
+//     * Remove the correct nodes from each element. If placeOriginalElementBelow is true,
+//     * place the original element below (in the y direction) the new element; otherwise,
+//     * place it above.
+//     */
+//
+//    return new_element_index;
+//}
 
 
 

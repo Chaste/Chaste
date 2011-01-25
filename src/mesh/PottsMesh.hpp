@@ -57,6 +57,13 @@ protected:
     std::vector<PottsElement *> mElements;
 
     /**
+     * Indices of elements that have been marked as deleted.
+     * These indices can be reused when adding new elements.
+     */
+    std::vector<unsigned> mDeletedElementIndices;
+
+
+    /**
      * Solve node mapping method. This overridden method is required
      * as it is pure virtual in the base class.
      *
@@ -93,6 +100,8 @@ protected:
 //    template<class Archive>
 //    void save(Archive & archive, const unsigned int version) const
 //    {
+//        // NOTE - Subclasses must archive their member variables BEFORE calling this method.
+//        archive & mDeletedElementIndices;
 //        archive & boost::serialization::base_object<AbstractMesh<ELEMENT_DIM,SPACE_DIM> >(*this);
 //
 //        // Create a mesh writer pointing to the correct file and directory
@@ -111,6 +120,8 @@ protected:
 //    template<class Archive>
 //    void load(Archive & archive, const unsigned int version)
 //    {
+//        // NOTE - Subclasses must archive their member variables BEFORE calling this method.
+//        archive & mDeletedElementIndices;
 //        archive & boost::serialization::base_object<AbstractMesh<ELEMENT_DIM,SPACE_DIM> >(*this);
 //
 //        PottsMeshReader<ELEMENT_DIM,SPACE_DIM> mesh_reader(ArchiveLocationInfo::GetArchiveDirectory() + ArchiveLocationInfo::GetMeshFilename());
@@ -255,6 +266,15 @@ public:
      * @return its neighbouring node indices
      */
     std::set<unsigned> GetNeighbouringNodeIndices(unsigned nodeIndex);
+
+    /**
+     * Mark an element as deleted. Note that in a Potts mesh this does not
+     * delete the nodes so no remeshing is required.
+     *
+     * @param index  the global index of a specified Potts element
+     */
+    void DeleteElement(unsigned index);
+
 
 
     //////////////////////////////////////////////////////////////////////

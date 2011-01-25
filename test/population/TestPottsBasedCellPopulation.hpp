@@ -103,10 +103,12 @@ public:
         TS_ASSERT_DELTA(width_y, 3.0, 1e-4);
 
         // Test RemoveDeadCells() method
+        TS_ASSERT_EQUALS(cell_population.GetNumElements(), 4u);
         cell_population.Begin()->Kill();
         TS_ASSERT_EQUALS(cell_population.RemoveDeadCells(), 1u);
-
-
+        TS_ASSERT_EQUALS(cell_population.GetNumElements(), 3u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 3u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumAllElements(), 4u);
     }
 
     void TestValidate() throw (Exception)
