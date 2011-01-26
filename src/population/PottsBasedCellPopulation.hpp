@@ -119,13 +119,6 @@ public:
                       bool validate=true,
                       const std::vector<unsigned> locationIndices=std::vector<unsigned>());
 
-//    /**
-//     * Constructor for use by the de-serializer.
-//     *
-//     * @param rMesh a vertex mesh.
-//     */
-//    PottsBasedCellPopulation(PottsMesh& rMesh);
-
     /**
      * Destructor, which frees any memory allocated by the constructor.
      */

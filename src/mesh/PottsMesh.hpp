@@ -259,7 +259,7 @@ public:
      * This is virtual void and must be implemented in base classes to implement
      * periodicity .etc.
      *
-     * \TODO this might be better to store as a look up table which is calculated
+     * TODO this might be better to store as a look up table which is calculated
      * in the constructor.
      *
      * @param nodeIndex global index of the node
