@@ -207,8 +207,8 @@ public:
 //        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 1);
 //
 //        // Create a simple vertex-based mesh
-//        HoneycombMutableVertexMeshGenerator generator(4, 6);
-//        MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
+//        HoneycombVertexMeshGenerator generator(4, 6);
+//        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 //
 //        // Create cells
 //        std::vector<CellPtr> cells;
@@ -427,8 +427,8 @@ public:
 //    void TestAddCellWithHoneycombMesh() throw (Exception)
 //    {
 //        // Create a mesh with 9 elements
-//        HoneycombMutableVertexMeshGenerator generator(3, 3);
-//        MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
+//        HoneycombVertexMeshGenerator generator(3, 3);
+//        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 //
 //        // Set up cells, one for each VertexElement. Give each cell
 //        // a birth time of -elem_index, so its age is elem_index
@@ -557,8 +557,8 @@ public:
 //    void TestIsCellAssociatedWithADeletedLocation() throw (Exception)
 //    {
 //        // Create a simple vertex-based mesh
-//        HoneycombMutableVertexMeshGenerator generator(4, 6);
-//        MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
+//        HoneycombVertexMeshGenerator generator(4, 6);
+//        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 //        p_mesh->GetElement(5)->MarkAsDeleted();
 //
 //        // Create cells
@@ -587,8 +587,8 @@ public:
 //        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 1);
 //
 //        // Create a simple vertex-based mesh
-//        HoneycombMutableVertexMeshGenerator generator(4, 6);
-//        MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
+//        HoneycombVertexMeshGenerator generator(4, 6);
+//        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 //
 //        // Create cells
 //        std::vector<CellPtr> cells;
@@ -658,8 +658,8 @@ public:
 //        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 //
 //        // Create a simple vertex-based mesh
-//        HoneycombMutableVertexMeshGenerator generator(4, 6);
-//        MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
+//        HoneycombVertexMeshGenerator generator(4, 6);
+//        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 //
 //        // Create cells
 //        std::vector<CellPtr> cells;
@@ -1102,8 +1102,8 @@ public:
 //    void TestUpdateNodeLocations() throw (Exception)
 //    {
 //        // Create a simple 2D VertexMesh
-//        HoneycombMutableVertexMeshGenerator generator(5, 3);
-//        MutableVertexMesh<2,2>* p_mesh = generator.GetMutableMesh();
+//        HoneycombVertexMeshGenerator generator(5, 3);
+//        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 //
 //        // Impose a larger cell rearrangement threshold so that motion is uninhibited (see #1376)
 //        p_mesh->SetCellRearrangementThreshold(0.1);
