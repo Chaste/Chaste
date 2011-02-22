@@ -48,7 +48,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CellLabel.hpp"
 #include "Warnings.hpp"
 #include "LogFile.hpp"
-#include "Debug.hpp"
 
 class TestCellBasedSimulationWithPottsBasedCellPopulation : public AbstractCellBasedTestSuite
 {
