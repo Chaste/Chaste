@@ -31,7 +31,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "RandomNumberGenerator.hpp"
 #include "Warnings.hpp"
 
-
 //template<unsigned DIM>
 void PottsBasedCellPopulation::Validate()
 {
@@ -254,25 +253,50 @@ void PottsBasedCellPopulation::UpdateNodeLocations(const std::vector< c_vector<d
 
                         // Check if the elements are different otherwise no point doing anything
 
-                        if( (*containing_elements.begin()) != (*new_location_containing_elements.begin()))
+                        if( (*elem_iter) != (*new_location_containing_elements.begin()))
                         {
 
                             // Here the 2 nodes are in different elements so we should calculate the Hamiltonian to see
                             // If we make the replacement or not
 
-                            // Iterate over the elements containing the target node to remove node should be at most one element.
-                            for (std::set<unsigned>::iterator iter = new_location_containing_elements.begin();
-                                 iter != new_location_containing_elements.end();
-                                 ++iter)
-                            {
-                                GetElement(*iter)->DeleteNode(GetElement(*iter)->GetNodeLocalIndex(new_location_index));
+                            unsigned element_1 = (*elem_iter);
+                            unsigned element_2 = (*new_location_containing_elements.begin());
 
-                                // If this causes the element to have no nodes then flag the element and cell to be deleted.
+                            // This is the hamiltonian and it only has a volume constraint at present
+                            double lambda_volume = 0.01;
+                            double target_volume = 16.0;
+                            double T = 0.1;
+                            double H_0 = lambda_volume*pow(mrMesh.GetVolumeOfElement(element_1)-target_volume, 2.0)+
+                                         lambda_volume*pow(mrMesh.GetVolumeOfElement(element_2)-target_volume, 2.0);
+                            double H_1 = lambda_volume*pow(mrMesh.GetVolumeOfElement(element_1)+1.0-target_volume, 2.0)+
+                                         lambda_volume*pow(mrMesh.GetVolumeOfElement(element_2)-1.0-target_volume, 2.0);
+
+                            double delta_H = H_1-H_0;
+
+                            // Uniform random number
+                            double random_number = RandomNumberGenerator::Instance()->ranf();
+                            double p = exp(-delta_H/T);
+
+                            if ( delta_H <= 0 || random_number < p )
+                            {
+                                //Do swap
+
+                                // Iterate over the elements containing the target node to remove node should be at most one element.
+                                for (std::set<unsigned>::iterator iter = new_location_containing_elements.begin();
+                                     iter != new_location_containing_elements.end();
+                                     ++iter)
+                                {
+                                    GetElement(*iter)->DeleteNode(GetElement(*iter)->GetNodeLocalIndex(new_location_index));
+
+                                    // If this causes the element to have no nodes then flag the element and cell to be deleted.
+                                }
+
+                                // Now add node to original element
+                                GetElement(*elem_iter)->AddNode(mrMesh.GetNode(new_location_index));
+
                             }
                         }
                     }
-                    // Now add node to original element
-                    GetElement(*elem_iter)->AddNode(mrMesh.GetNode(new_location_index));
                 }
             }
             else  //(neighboring_node_indices.empty())
