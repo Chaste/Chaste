@@ -262,16 +262,46 @@ void PottsBasedCellPopulation::UpdateNodeLocations(const std::vector< c_vector<d
                             unsigned element_1 = (*elem_iter);
                             unsigned element_2 = (*new_location_containing_elements.begin());
 
-                            // This is the hamiltonian and it only has a volume constraint at present
+                            // This is the hamiltonian
+
+
+                            // Add the volume constraint.
                             double lambda_volume = 0.01;
                             double target_volume = 16.0;
-                            double T = 0.1;
                             double H_0 = lambda_volume*pow(mrMesh.GetVolumeOfElement(element_1)-target_volume, 2.0)+
                                          lambda_volume*pow(mrMesh.GetVolumeOfElement(element_2)-target_volume, 2.0);
                             double H_1 = lambda_volume*pow(mrMesh.GetVolumeOfElement(element_1)+1.0-target_volume, 2.0)+
                                          lambda_volume*pow(mrMesh.GetVolumeOfElement(element_2)-1.0-target_volume, 2.0);
 
+
+
+                            //double lambda_contact = 0.01;
+
+                            // Iterate over nodes neighbouring the target node to work out the contact energy contribution
+                            std::set<unsigned> target_neighboring_node_indices = mrMesh.GetNeighbouringNodeIndices(new_location_index);
+
+                            for (std::set<unsigned>::iterator iter = target_neighboring_node_indices.begin();
+                                 iter != target_neighboring_node_indices.end();
+                                 ++iter)
+                            {
+                                // If the nodes are currently from different elements
+                                //if ( (*new_location_containing_elements.begin()) != (*iter->rGetContainingElementIndices().begin()) )
+                                {
+                                    H_0 += 0.0;
+                                }
+
+                                // If the nodes will be different elements after swap
+                                {
+                                     H_1 += 0.0;
+                                }
+
+                            }
+
+
+
                             double delta_H = H_1-H_0;
+
+                            double T = 0.1;
 
                             // Uniform random number
                             double random_number = RandomNumberGenerator::Instance()->ranf();
