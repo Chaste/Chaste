@@ -36,16 +36,10 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CellsGenerator.hpp"
 #include "CellBasedSimulation.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
-#include "StochasticDurationGenerationBasedCellCycleModel.hpp"
 #include "PottsBasedCellPopulation.hpp"
-#include "NagaiHondaForce.hpp"
-#include "WelikyOsterForce.hpp"
-#include "AbstractCellKiller.hpp"
-#include "TargetedCellKiller.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "PottsMeshGenerator.hpp"
 #include "WildTypeCellMutationState.hpp"
-#include "CellLabel.hpp"
 #include "Warnings.hpp"
 #include "LogFile.hpp"
 
@@ -88,7 +82,7 @@ public:
         simulator.SetOutputDirectory("TestPottsMonolayer");
         simulator.SetEndTime(0.1);
 
-        // Create an force law and pass it to the simulation
+        ///\todo Create an force law and pass it to the simulation
         
         // Run simulation
         simulator.Solve();

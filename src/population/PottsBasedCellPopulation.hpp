@@ -42,10 +42,11 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "WildTypeCellMutationState.hpp"
 
 /**
- * A facade class encapsulating a vertex-based cell population.
+ * A facade class encapsulating a cell population under the Cellular
+ * Potts model framework.
  *
  * Contains a group of cells and maintains the associations
- * between CellPtrs and elements in the MutableVertexMesh.
+ * between CellPtrs and elements in a specialised PottsMesh class.
  *
  */
 //template<unsigned DIM>
@@ -57,12 +58,6 @@ private:
 
     /** Potts-based mesh associated with the cell population. */
     PottsMesh& mrMesh;
-
-    /** A cache of where the results are going (used for VTK writer). */
-    std::string mDirPath;
-
-    /** Meta results file for VTK. */
-    out_stream mpVtkMetaFile;
 
     /**
      * Whether to delete the mesh when we are destroyed.
@@ -99,6 +94,14 @@ private:
      */
     void Validate();
 
+    /**
+     * Overridden WriteVtkResultsToFile() method.
+     */
+    void WriteVtkResultsToFile()
+    {
+        ///\todo implement writing VTK results for this class
+    }
+
 public:
 
     /**
@@ -125,7 +128,7 @@ public:
     virtual ~PottsBasedCellPopulation();
 
     /**
-     * @return reference to  mrMesh.
+     * @return reference to mrMesh.
      */
     PottsMesh& rGetMesh();
 
@@ -238,6 +241,7 @@ public:
      * @param cleanOutputDirectory  whether to delete the contents of the output directory prior to output file creation
      */
     void CreateOutputFiles(const std::string& rDirectory, bool cleanOutputDirectory);
+
     /**
      * Overridden CloseOutputFiles() method.
      */
@@ -274,9 +278,8 @@ public:
      */
     void OutputCellPopulationParameters(out_stream& rParamsFile);
 
-
     /////////////////////////////////////////////////////////////////////////////
-    // Unused Methods to be refactored out of the AbstractCellPopulation?
+    ///\todo Unused Methods to be refactored out of the AbstractCellPopulation?
     /////////////////////////////////////////////////////////////////////////////
 
     /**
@@ -306,7 +309,6 @@ public:
      * @return the average damping constant of the cells surrounding the node.
      */
     double GetDampingConstant(unsigned nodeIndex);
-
 };
 
 #include "SerializationExportWrapper.hpp"

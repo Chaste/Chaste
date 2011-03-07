@@ -35,11 +35,11 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <boost/serialization/vector.hpp>
 
 /**
- * An element class for use in the PottsMesh class. The main
- * difference between this and the Element class is that a
- * PottsElement can have a variable number of nodes associated
- * with it and these represent the lattice sites contained in
- * the element.
+ * An element class for use in the PottsMesh class.
+ * 
+ * The main difference between this and the Element class is that a
+ * PottsElement can have a variable number of nodes associated with
+ * it and these represent the lattice sites contained in the element.
  */
 //template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class PottsElement : public AbstractElement<2, 2>

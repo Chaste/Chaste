@@ -67,7 +67,7 @@ public:
         basic_potts_elements.push_back(new PottsElement(0, nodes_elements[0]));
         basic_potts_elements.push_back(new PottsElement(1, nodes_elements[1]));
 
-        // Make a vertex mesh
+        // Make a PottsMesh
         PottsMesh basic_potts_mesh(basic_nodes, basic_potts_elements);
 
         TS_ASSERT_EQUALS(basic_potts_mesh.GetNumElements(), 2u);
@@ -85,14 +85,12 @@ public:
         TS_ASSERT_EQUALS(basic_nodes[1]->rGetContainingElementIndices(), temp_list1);
         TS_ASSERT_EQUALS(basic_nodes[3]->rGetContainingElementIndices(), temp_list1);
 
-
         // Node 2 4 and 5 are only in element 1
         std::set<unsigned> temp_list2;
         temp_list2.insert(1u);
         TS_ASSERT_EQUALS(basic_nodes[2]->rGetContainingElementIndices(), temp_list2);
         TS_ASSERT_EQUALS(basic_nodes[4]->rGetContainingElementIndices(), temp_list2);
         TS_ASSERT_EQUALS(basic_nodes[5]->rGetContainingElementIndices(), temp_list2);
-
 
         // Test Area and Perimeter of elements
         TS_ASSERT_DELTA(basic_potts_mesh.GetVolumeOfElement(0), 3.0, 1e-12);
@@ -101,7 +99,6 @@ public:
         TS_ASSERT_DELTA(basic_potts_mesh.GetVolumeOfElement(1), 3.0, 1e-12);
         TS_ASSERT_DELTA(basic_potts_mesh.GetSurfaceAreaOfElement(1), 0.0, 1e-12);//TODO this is Wrong
 
-
         // Test GetCentroidOfElements
         TS_ASSERT_DELTA(basic_potts_mesh.GetCentroidOfElement(0)[0], 1.0/3.0, 1e-12);
         TS_ASSERT_DELTA(basic_potts_mesh.GetCentroidOfElement(0)[1], 1.0/3.0, 1e-12);
@@ -109,12 +106,10 @@ public:
         TS_ASSERT_DELTA(basic_potts_mesh.GetCentroidOfElement(1)[0], 5.0/3.0, 1e-12);
         TS_ASSERT_DELTA(basic_potts_mesh.GetCentroidOfElement(1)[1], 2.0/3.0, 1e-12);
 
-
         // Test GetVectorFromAtoB Method
         c_vector<double, 2> vector=basic_potts_mesh.GetVectorFromAtoB(basic_potts_mesh.GetNode(0)->rGetLocation(), basic_potts_mesh.GetNode(1)->rGetLocation());
         TS_ASSERT_DELTA(vector[0], 1.0, 1e-12);
         TS_ASSERT_DELTA(vector[1], 0.0, 1e-12);
-
 
         // Coverage
         TS_ASSERT_EQUALS(basic_potts_mesh.SolveNodeMapping(0), 0u);
@@ -122,7 +117,6 @@ public:
         TS_ASSERT_EQUALS(basic_potts_mesh.SolveBoundaryElementMapping(0), 0u);
         TS_ASSERT_EQUALS(basic_potts_mesh.IsMeshChanging(), true);
     }
-
 
     void TestNodeIterator() throw (Exception)
     {
@@ -236,7 +230,6 @@ public:
         TS_ASSERT_DELTA(height, 3.0, 1e-4);
         TS_ASSERT_DELTA(width, 3.0, 1e-4);
     }
-
 
     void TestGetNeighbouringNodeIndices()
     {

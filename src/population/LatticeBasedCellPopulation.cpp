@@ -876,7 +876,7 @@ double LatticeBasedCellPopulation<DIM>::GetDampingConstant(unsigned nodeIndex)
 template<unsigned DIM>
 void LatticeBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
-	// Currently this is not called from LatticeBasedCellBasedSimulation see #1453 for discussion on this for centre- and vertex-based cell populations.
+	// Currently this is not called from LatticeBasedCellBasedSimulation; see #1453 for a discussion on this for centre- and vertex-based cell populations.
 	EXCEPTION("OutputCellPopulationParameters() is not yet implemented for LatticeBasedCellPopulation see #1453");
 
 	// Call direct parent class

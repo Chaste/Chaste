@@ -44,8 +44,8 @@ PottsMesh::PottsMesh(std::vector<Node<2>*> nodes, std::vector<PottsElement*> pot
     }
     for (unsigned elem_index=0; elem_index<pottsElements.size(); elem_index++)
     {
-        PottsElement* p_temp_vertex_element = pottsElements[elem_index];
-        mElements.push_back(p_temp_vertex_element);
+        PottsElement* p_temp_element = pottsElements[elem_index];
+        mElements.push_back(p_temp_element);
     }
 
     // Register elements with nodes
@@ -65,19 +65,16 @@ PottsMesh::PottsMesh(std::vector<Node<2>*> nodes, std::vector<PottsElement*> pot
     this->mMeshChangesDuringSimulation = true;
 }
 
-
 PottsMesh::PottsMesh()
 {
     this->mMeshChangesDuringSimulation = true;
     Clear();
 }
 
-
 PottsMesh::~PottsMesh()
 {
     Clear();
 }
-
 
 unsigned PottsMesh::SolveNodeMapping(unsigned index) const
 {
@@ -91,12 +88,10 @@ unsigned PottsMesh::SolveElementMapping(unsigned index) const
     return index;
 }
 
-
 unsigned PottsMesh::SolveBoundaryElementMapping(unsigned index) const
 {
     return index;
 }
-
 
 void PottsMesh::Clear()
 {
@@ -117,24 +112,20 @@ void PottsMesh::Clear()
     mDeletedElementIndices.clear();
 }
 
-
 unsigned PottsMesh::GetNumNodes() const
 {
     return this->mNodes.size();
 }
-
 
 unsigned PottsMesh::GetNumElements() const
 {
     return mElements.size() - mDeletedElementIndices.size();
 }
 
-
 unsigned PottsMesh::GetNumAllElements() const
 {
     return mElements.size();
 }
-
 
 PottsElement* PottsMesh::GetElement(unsigned index) const
 {
@@ -142,14 +133,12 @@ PottsElement* PottsMesh::GetElement(unsigned index) const
     return mElements[index];
 }
 
-
 c_vector<double, 2> PottsMesh::GetCentroidOfElement(unsigned index)
 {
     PottsElement* p_element = GetElement(index);
     unsigned num_nodes_in_element = p_element->GetNumNodes();
 
-
-    // This should probably be returning the nearest node
+    ///\todo This should probably be returning the nearest node
     c_vector<double, 2> centroid = zero_vector<double>(2);
 
     double temp_centroid_x = 0;
@@ -157,7 +146,7 @@ c_vector<double, 2> PottsMesh::GetCentroidOfElement(unsigned index)
 
     for (unsigned local_index=0; local_index<num_nodes_in_element; local_index++)
     {
-        // Find locations of current node
+        // Find location of current node
         c_vector<double, 2> current_node = p_element->GetNodeLocation(local_index);
 
         temp_centroid_x += current_node[0];
@@ -227,7 +216,6 @@ c_vector<double, 2> PottsMesh::GetCentroidOfElement(unsigned index)
 //    }
 //}
 
-
 c_vector<double, 2> PottsMesh::GetVectorFromAtoB(const c_vector<double, 2>& rLocationA, const c_vector<double, 2>& rLocationB)
 {
     c_vector<double, 2> vector;
@@ -236,7 +224,6 @@ c_vector<double, 2> PottsMesh::GetVectorFromAtoB(const c_vector<double, 2>& rLoc
 
     return vector;
 }
-
 
 double PottsMesh::GetVolumeOfElement(unsigned index)
 {
@@ -248,10 +235,9 @@ double PottsMesh::GetVolumeOfElement(unsigned index)
     return element_volume;
 }
 
-
 double PottsMesh::GetSurfaceAreaOfElement(unsigned index)
 {
-    // TODO this is not correct need to work this out from the number of free boundaries. See #1683.
+    //\todo this is not correct need to work this out from the number of free boundaries. See #1683.
     double surface_area = 0.0;
 
     return surface_area;
@@ -320,10 +306,9 @@ std::set<unsigned> PottsMesh::GetNeighbouringNodeIndices(unsigned nodeIndex)
     return neighbouring_node_indices;
 }
 
-
 void PottsMesh::DeleteElement(unsigned index)
 {
-    // Mark this element as deleted this also updates the nodes containing element indices.
+    // Mark this element as deleted; this also updates the nodes containing element indices
     this->mElements[index]->MarkAsDeleted();
     mDeletedElementIndices.push_back(index);
 }
@@ -354,7 +339,7 @@ void PottsMesh::DeleteElement(unsigned index)
 //    }
 //
 //    // Add the new element to the mesh
-//    AddElement(new VertexElement<ELEMENT_DIM,SPACE_DIM>(new_element_index, nodes_elem));
+//    AddElement(new PottsElement<ELEMENT_DIM,SPACE_DIM>(new_element_index, nodes_elem));
 //
 //    /**
 //     * Remove the correct nodes from each element. If placeOriginalElementBelow is true,
@@ -364,8 +349,6 @@ void PottsMesh::DeleteElement(unsigned index)
 //
 //    return new_element_index;
 //}
-
-
 
 /////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation

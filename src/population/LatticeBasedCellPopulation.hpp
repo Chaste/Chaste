@@ -119,6 +119,14 @@ private:
      */
     void Validate();
 
+    /**
+     * Overridden WriteVtkResultsToFile() method.
+     */
+    void WriteVtkResultsToFile()
+    {
+        ///\todo implement writing VTK results for this class
+    }
+
 public:
 
     /**

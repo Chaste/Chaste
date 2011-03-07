@@ -103,7 +103,6 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetElement(4)->GetNodeGlobalIndex(4), 31u);
         TS_ASSERT_EQUALS(p_mesh->GetElement(4)->GetNodeGlobalIndex(5), 32u);
 
-
         // Check that some nodes are contained in the correct elements
 
         // Node 0 is only in element 0

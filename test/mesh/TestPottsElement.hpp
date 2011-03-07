@@ -39,7 +39,6 @@ public:
 
     void Test2dPottsElement()
     {
-
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
         nodes.push_back(new Node<2>(1, false, 0.0, 1.0));

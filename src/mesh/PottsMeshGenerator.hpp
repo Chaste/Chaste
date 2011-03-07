@@ -34,12 +34,11 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "PottsMesh.hpp"
 
 /**
- *  Generator of regular potts meshes, used as starting points for many simulations.
+ * Generator of regular Potts meshes, used as starting points for many simulations.
  *
- *  This class takes in options such as width, height,
+ * This class takes in options such as width, height,
  *
- *
- *  NOTE: the user should delete the mesh after use to manage memory.
+ * NOTE: the user should delete the mesh after use to manage memory.
  */
 class PottsMeshGenerator
 {
@@ -65,7 +64,7 @@ public:
                        unsigned elementWidth, unsigned elementHeight);
 
     /**
-     * Null constructor for derived classes to call...
+     * Null constructor for derived classes to call.
      */
     PottsMeshGenerator()
     {
@@ -77,7 +76,7 @@ public:
     virtual ~PottsMeshGenerator();
 
     /**
-     * @return a potts mesh based on a 2D plane.
+     * @return a planar 2D Potts mesh.
      */
     virtual PottsMesh* GetMesh();
 };

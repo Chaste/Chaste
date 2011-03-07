@@ -45,7 +45,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "PottsElement.hpp"
 
 /**
- * A potts-based mesh class, for use in potts-based simulations.
+ * A Potts-based mesh class, for use in Cellular Potts model simulations.
  */
 //template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class PottsMesh : public AbstractMesh<2, 2>
@@ -61,7 +61,6 @@ protected:
      * These indices can be reused when adding new elements.
      */
     std::vector<unsigned> mDeletedElementIndices;
-
 
     /**
      * Solve node mapping method. This overridden method is required
@@ -189,9 +188,9 @@ public:
     unsigned GetNumAllElements() const;
 
     /**
-     * @param index  the global index of a specified vertex element.
+     * @param index  the global index of a specified PottsElement.
      *
-     * @return a pointer to the vertex element
+     * @return a pointer to the PottsElement
      */
     PottsElement* GetElement(unsigned index) const;
 
@@ -214,7 +213,7 @@ public:
 //    void ConstructFromMeshReader(AbstractMeshReader<2,2>& rMeshReader);
 
     /**
-     * Delete mNodes, mFaces and mElements.
+     * Delete mNodes and mElements.
      */
     virtual void Clear();
 
@@ -230,25 +229,25 @@ public:
      * @return c_vector from location A to location B.
      */
     virtual c_vector<double, 2> GetVectorFromAtoB(const c_vector<double, 2>& rLocationA,
-                                                          const c_vector<double, 2>& rLocationB);
+                                                  const c_vector<double, 2>& rLocationB);
 
     /**
-     * Get the volume (or area in 2D, or length in 1D) of an element.
+     * Get the volume (or area in 2D, or length in 1D) of a PottsElement.
      *
      * This needs to be overridden in daughter classes for non-Euclidean metrics.
      *
-     * @param index  the global index of a specified vertex element
+     * @param index  the global index of a specified PottsElement element
      *
      * @return the volume of the element
      */
     virtual double GetVolumeOfElement(unsigned index);
 
     /**
-     * Compute the surface area (or perimeter in 2D) of an element.
+     * Compute the surface area (or perimeter in 2D) of a PottsElement.
      *
      * This needs to be overridden in daughter classes for non-Euclidean metrics.
      *
-     * @param index  the global index of a specified vertex element
+     * @param index  the global index of a specified PottsElement
      *
      * @return the surfacearea of the element
      */
@@ -274,8 +273,6 @@ public:
      * @param index  the global index of a specified Potts element
      */
     void DeleteElement(unsigned index);
-
-
 
     //////////////////////////////////////////////////////////////////////
     //                         Nested classes                           //
@@ -345,8 +342,6 @@ public:
             }
         }
 
-
-
     private:
         /** The mesh we're iterating over. */
         PottsMesh& mrMesh;
@@ -372,7 +367,6 @@ public:
 //#include "SerializationExportWrapper.hpp"
 //EXPORT_TEMPLATE_CLASS_ALL_DIMS(PottsMesh)
 
-
 //////////////////////////////////////////////////////////////////////////////
 // PottsElementIterator class implementation - most methods are inlined    //
 //////////////////////////////////////////////////////////////////////////////
@@ -382,7 +376,6 @@ PottsMesh::PottsElementIterator PottsMesh::GetElementIteratorBegin(
 {
     return PottsElementIterator(*this, mElements.begin(), skipDeletedElements);
 }
-
 
 PottsMesh::PottsElementIterator PottsMesh::GetElementIteratorEnd()
 {
@@ -426,6 +419,5 @@ bool PottsMesh::PottsElementIterator::IsAllowedElement()
 {
     return !(mSkipDeletedElements && (*this)->IsDeleted());
 }
-
 
 #endif /*POTTSMESH_HPP_*/

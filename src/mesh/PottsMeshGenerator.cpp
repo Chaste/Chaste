@@ -28,7 +28,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "PottsMeshGenerator.hpp"
 
-
 PottsMeshGenerator::PottsMeshGenerator(unsigned numNodesAcross, unsigned numNodesUp,
                                        unsigned numElementsAcross, unsigned numElementsUp,
                                        unsigned elementWidth, unsigned elementHeight)
@@ -65,7 +64,6 @@ PottsMeshGenerator::PottsMeshGenerator(unsigned numNodesAcross, unsigned numNode
         }
     }
 
-
     /*
      * Create the elements. The array node_indices contains the
      * global node indices, in increasing order.
@@ -97,7 +95,6 @@ PottsMeshGenerator::PottsMeshGenerator(unsigned numNodesAcross, unsigned numNode
     mpMesh = new PottsMesh(nodes, elements);
 }
 
-
 PottsMeshGenerator::~PottsMeshGenerator()
 {
     delete mpMesh;
@@ -107,6 +104,3 @@ PottsMesh* PottsMeshGenerator::GetMesh()
 {
     return mpMesh;
 }
-
-
-
