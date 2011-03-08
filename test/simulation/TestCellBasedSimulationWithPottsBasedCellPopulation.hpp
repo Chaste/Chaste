@@ -37,6 +37,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CellBasedSimulation.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "PottsBasedCellPopulation.hpp"
+#include "SloughingCellKiller.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "PottsMeshGenerator.hpp"
 #include "WildTypeCellMutationState.hpp"
@@ -63,7 +64,7 @@ private:
 
 public:
 
-    void TestPottsMonolayerWithCellBirth() throw (Exception)
+    void TestPottsMonolayerWithNoBirthOrDeath() throw (Exception)
     {
         // Create a simple 2D PottsMesh
         PottsMeshGenerator generator(16, 18, 4, 4, 4, 4);
@@ -86,6 +87,50 @@ public:
         
         // Run simulation
         simulator.Solve();
+
+        // Check that the same number of cells
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 16u);
+
+        // Test no births or deaths
+        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
+        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
+    }
+
+    void TestPottsMonolayerWithDeath() throw (Exception)
+    {
+        // Create a simple 2D PottsMesh
+        PottsMeshGenerator generator(16, 24, 4, 8, 4, 2);
+        PottsMesh* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), DIFFERENTIATED);
+
+        // Create cell population
+        PottsBasedCellPopulation cell_population(*p_mesh, cells);
+
+        // Set up cell-based simulation
+        CellBasedSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestPottsMonolayerWithBirthAndDeath");
+        simulator.SetEndTime(0.1);
+
+
+        // Create cell killer and pass in to crypt simulation
+        SloughingCellKiller<2> sloughing_cell_killer(&cell_population,16u);
+        simulator.AddCellKiller(&sloughing_cell_killer);
+
+
+        // Run simulation
+        simulator.Solve();
+
+        // Check the number of cells
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 19u);
+
+        // Test no births or deaths
+        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
+        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 13u);
+
     }
 };
 
