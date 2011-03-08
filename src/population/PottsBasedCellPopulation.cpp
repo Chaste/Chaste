@@ -189,198 +189,232 @@ void PottsBasedCellPopulation::UpdateNodeLocations(const std::vector< c_vector<d
      * It will eventually be moved to the Simulation class.
      */
 
-    /*
-     * Currently we just randomly move elements by looping over all the nodes
-     * finding a random neighbour and assigning this neighbour to be the same
-     * element as the original node.
-     */
-
     // Loop over nodes and exchange
     ///\todo make this a random sweep (see #1664 and associated tickets)
     for (AbstractMesh<2,2>::NodeIterator node_iter = mrMesh.GetNodeIteratorBegin();
          node_iter != mrMesh.GetNodeIteratorEnd();
          ++node_iter)
     {
-        // Node should be in at most one element
+
+        // Helper bool to save computational time if there's no point swapping elements
+        bool swap_elements=true;
+
+        // All nodes should be in at most one element.
         assert(node_iter->GetNumContainingElements() <= 1);
 
-        if (node_iter->GetNumContainingElements() == 1)
+        // Find a random site from all of the available neighbouring nodes to extend the element/medium into
+        std::set<unsigned> neighboring_node_indices = mrMesh.GetNeighbouringNodeIndices(node_iter->GetIndex());
+
+        unsigned new_location_index;
+
+        if (!neighboring_node_indices.empty())
         {
-            // Find a random site from all of the available neighbouring nodes to extend the element into
-            std::set<unsigned> neighboring_node_indices = mrMesh.GetNeighbouringNodeIndices(node_iter->GetIndex());
+            unsigned num_neighbours = neighboring_node_indices.size();
+            unsigned chosen_neighbour = RandomNumberGenerator::Instance()->randMod(num_neighbours);
 
-            if (!neighboring_node_indices.empty())
+            std::set<unsigned>::iterator neighbour_iter = neighboring_node_indices.begin();
+            for (unsigned i=0; i<chosen_neighbour; i++)
             {
-                unsigned num_neighbours = neighboring_node_indices.size();
-                unsigned chosen_neighbour = RandomNumberGenerator::Instance()->randMod(num_neighbours);
+                neighbour_iter++;
+            }
 
-                std::set<unsigned>::iterator neighbour_iter = neighboring_node_indices.begin();
-                for (unsigned i=0; i<chosen_neighbour; i++)
+            new_location_index = *neighbour_iter;
+        }
+        else  //(neighboring_node_indices.empty())
+        {
+            // Every node in your mesh should have at least one neighbour.
+            NEVER_REACHED;
+        }
+
+        std::set<unsigned> containing_elements = node_iter->rGetContainingElementIndices();
+        std::set<unsigned> new_location_containing_elements = GetNode(new_location_index)->rGetContainingElementIndices();
+
+        // All nodes should be in at most one element.
+        assert(new_location_containing_elements.size() <= 1);
+
+        double H_0 = 0.0; // Hamiltonian before swap
+        double H_1 = 0.0; // Hamiltonian after swap
+
+        // Hamiltonian parameters
+        double lambda_volume = 0.1;
+        double target_volume = 16.0;
+        double lambda_contact = 0.1;
+
+        if (containing_elements.size() == 1) // current node is in an element
+        {
+            if (new_location_containing_elements.size()==1) // target node is in an element
+            {
+                /*
+                 * Here the two nodes are in both contained in elements.
+                 */
+
+                // Check if the elements are different otherwise no point doing anything
+                if( (*containing_elements.begin()) != (*new_location_containing_elements.begin()))
                 {
-                    neighbour_iter++;
-                }
+                    /*
+                     * Here the two nodes are in different elements, so we should calculate
+                     * the Hamiltonian to see whether or not we make the replacement
+                     */
+                    unsigned current_element = (*containing_elements.begin());
+                    unsigned target_element = (*new_location_containing_elements.begin());
 
-                double new_location_index = *neighbour_iter;
+                    // This is the Hamiltonian
 
-                std::set<unsigned> containing_elements = node_iter->rGetContainingElementIndices();
-                std::set<unsigned> new_location_containing_elements = GetNode(new_location_index)->rGetContainingElementIndices();
+                    // Add the volume constraint
+                    H_0 = lambda_volume*pow(mrMesh.GetVolumeOfElement(current_element)-target_volume, 2.0)+
+                          lambda_volume*pow(mrMesh.GetVolumeOfElement(target_element)-target_volume, 2.0);
+                    H_1 = lambda_volume*pow(mrMesh.GetVolumeOfElement(current_element)+1.0-target_volume, 2.0)+
+                          lambda_volume*pow(mrMesh.GetVolumeOfElement(target_element)-1.0-target_volume, 2.0);
 
-                if (containing_elements.size() == 1)
-                {
-                    std::set<unsigned>::iterator elem_iter = containing_elements.begin();
+                    // Iterate over nodes neighbouring the target node to work out the contact energy contribution
+                    std::set<unsigned> target_neighboring_node_indices = mrMesh.GetNeighbouringNodeIndices(new_location_index);
 
-                    if (new_location_containing_elements.size()>0)
+                    for (std::set<unsigned>::iterator iter = target_neighboring_node_indices.begin();
+                         iter != target_neighboring_node_indices.end();
+                         ++iter)
                     {
-                        assert(new_location_containing_elements.size()==1);
+                        std::set<unsigned> neighboring_node_containing_elements = mrMesh.GetNode(*iter)->rGetContainingElementIndices();
+                        unsigned neighbour_element = (*neighboring_node_containing_elements.begin());
 
-                        // Check if the elements are different otherwise no point doing anything
-
-                        if( (*elem_iter) != (*new_location_containing_elements.begin()))
+                        if ( neighboring_node_containing_elements.size() != 0u )
                         {
-
-                            /*
-                             * Here the two nodes are in different elements, so we should calculate
-                             * the Hamiltonian to see whether or not we make the replacement
-                             */
-
-                            unsigned curent_element = (*elem_iter);
-                            unsigned target_element = (*new_location_containing_elements.begin());
-
-                            // This is the Hamiltonian
-
-                            // Add the volume constraint
-                            double lambda_volume = 0.1;
-                            double target_volume = 16.0;
-                            double H_0 = lambda_volume*pow(mrMesh.GetVolumeOfElement(curent_element)-target_volume, 2.0)+
-                                         lambda_volume*pow(mrMesh.GetVolumeOfElement(target_element)-target_volume, 2.0);
-                            double H_1 = lambda_volume*pow(mrMesh.GetVolumeOfElement(curent_element)+1.0-target_volume, 2.0)+
-                                         lambda_volume*pow(mrMesh.GetVolumeOfElement(target_element)-1.0-target_volume, 2.0);
-
-                            double lambda_contact = 0.1;
-
-                            // Iterate over nodes neighbouring the target node to work out the contact energy contribution
-                            std::set<unsigned> target_neighboring_node_indices = mrMesh.GetNeighbouringNodeIndices(new_location_index);
-
-                            for (std::set<unsigned>::iterator iter = target_neighboring_node_indices.begin();
-                                 iter != target_neighboring_node_indices.end();
-                                 ++iter)
-                            {
-                                std::set<unsigned> neighboring_node_containing_elements = mrMesh.GetNode(*iter)->rGetContainingElementIndices();
-                                unsigned neighbour_element = (*neighboring_node_containing_elements.begin());
-
-                                // If the nodes are currently from different elements
-                                if ( target_element != neighbour_element )
-                                {
-                                    H_0 += lambda_contact;
-                                }
-
-                                // If the nodes will be different elements after swap
-                                if ( curent_element != neighbour_element )
-                                {
-                                     H_1 += lambda_contact;
-                                }
-                            }
-
-                            double delta_H = H_1 - H_0;
-                            double T = 0.1;
-
-                            // Uniform random number
-                            double random_number = RandomNumberGenerator::Instance()->ranf();
-                            double p = exp(-delta_H/T);
-
-                            if (delta_H <= 0 || random_number < p)
-                            {
-                                // Do swap
-
-                                // Iterate over the elements containing the target node to remove node should be at most one element
-                                for (std::set<unsigned>::iterator iter = new_location_containing_elements.begin();
-                                     iter != new_location_containing_elements.end();
-                                     ++iter)
-                                {
-                                    GetElement(*iter)->DeleteNode(GetElement(*iter)->GetNodeLocalIndex(new_location_index));
-
-                                    // If this causes the element to have no nodes then flag the element and cell to be deleted
-                                }
-
-                                // Now add node to original element
-                                GetElement(*elem_iter)->AddNode(mrMesh.GetNode(new_location_index));
-                            }
-                        }
-                    }
-                    else // new_location_containing_elements.size()==0
-                    {
-                        assert(new_location_containing_elements.size()==0);
-
-                        /*
-                         * Here the target node not in an element, so we should calculate
-                         * the Hamiltonian to see whether or not we make the replacement
-                         */
-
-                        unsigned curent_element = (*elem_iter);
-
-                        // This is the Hamiltonian
-
-                        // Add the volume constraint
-                        double lambda_volume = 0.1;
-                        double target_volume = 16.0;
-                        double H_0 = lambda_volume*pow(mrMesh.GetVolumeOfElement(curent_element)-target_volume, 2.0);
-                        double H_1 = lambda_volume*pow(mrMesh.GetVolumeOfElement(curent_element)+1.0-target_volume, 2.0);
-
-                        double lambda_contact = 0.1;
-
-                        // Iterate over nodes neighbouring the target node to work out the contact energy contribution
-                        std::set<unsigned> target_neighboring_node_indices = mrMesh.GetNeighbouringNodeIndices(new_location_index);
-
-                        for (std::set<unsigned>::iterator iter = target_neighboring_node_indices.begin();
-                             iter != target_neighboring_node_indices.end();
-                             ++iter)
-                        {
-                            std::set<unsigned> neighboring_node_containing_elements = mrMesh.GetNode(*iter)->rGetContainingElementIndices();
-                            unsigned neighbour_element = (*neighboring_node_containing_elements.begin());
-
                             // If the nodes are currently from different elements
-                            if ( neighboring_node_containing_elements.size() != 0u )
+                            if ( target_element != neighbour_element )
                             {
                                 H_0 += lambda_contact;
                             }
 
-                            // If the nodes will be different elements after swap
-                            if ( curent_element != neighbour_element )
+                            // If the nodes will be in different elements after swap
+                            if ( current_element != neighbour_element )
                             {
                                  H_1 += lambda_contact;
                             }
                         }
-
-                        double delta_H = H_1 - H_0;
-                        double T = 0.1;
-
-                        // Uniform random number
-                        double random_number = RandomNumberGenerator::Instance()->ranf();
-                        double p = exp(-delta_H/T);
-
-                        if (delta_H <= 0 || random_number < p)
-                        {
-                            // Do swap
-
-                            // Iterate over the elements containing the target node to remove node should be at most one element
-                            for (std::set<unsigned>::iterator iter = new_location_containing_elements.begin();
-                                 iter != new_location_containing_elements.end();
-                                 ++iter)
-                            {
-                                GetElement(*iter)->DeleteNode(GetElement(*iter)->GetNodeLocalIndex(new_location_index));
-
-                                // If this causes the element to have no nodes then flag the element and cell to be deleted
-                            }
-
-                            // Now add node to original element
-                            GetElement(*elem_iter)->AddNode(mrMesh.GetNode(new_location_index));
-                        }
                     }
                 }
-                else  //(neighboring_node_indices.empty())
+                else //elements the same so no swap needed
                 {
-                    NEVER_REACHED;
+                    // Don't need to do any swapping for this case to save computations.
+                    swap_elements = false;
                 }
+            }
+            else // (new_location_containing_elements.size()==0) // target node is not in an element
+            {
+                assert(new_location_containing_elements.size()==0);
+
+                /*
+                 * Here the target node not in an element but the current node is. So we should calculate
+                 * the Hamiltonian to see whether or not we make the replacement
+                 */
+
+                unsigned current_element = (*containing_elements.begin());
+
+                // This is the Hamiltonian
+
+                // Add the volume constraint
+                H_0 = lambda_volume*pow(mrMesh.GetVolumeOfElement(current_element)-target_volume, 2.0);
+                H_1 = lambda_volume*pow(mrMesh.GetVolumeOfElement(current_element)+1.0-target_volume, 2.0);
+
+                // Iterate over nodes neighbouring the target node to work out the contact energy contribution
+                std::set<unsigned> target_neighboring_node_indices = mrMesh.GetNeighbouringNodeIndices(new_location_index);
+
+                for (std::set<unsigned>::iterator iter = target_neighboring_node_indices.begin();
+                     iter != target_neighboring_node_indices.end();
+                     ++iter)
+                {
+                    std::set<unsigned> neighboring_node_containing_elements = mrMesh.GetNode(*iter)->rGetContainingElementIndices();
+                    unsigned neighbour_element = (*neighboring_node_containing_elements.begin());
+
+                    // If the neighboring node is currently not in elements
+                    if ( neighboring_node_containing_elements.size() != 0u )
+                    {
+                        H_0 += lambda_contact;
+                    }
+
+                    // If the nodes will be in different elements after swap
+                    if ( ( current_element != neighbour_element ) && ( neighboring_node_containing_elements.size() != 0u ) )
+                    {
+                         H_1 += lambda_contact;
+                    }
+                }
+            }
+        }
+        else // (containing_elements.size() == 0) // current node is not in an element
+        {
+            if (new_location_containing_elements.size()==1) // target node is in an element
+            {
+                /*
+                 * Here the target node is in an element and the current node is not. So we should calculate
+                 * the Hamiltonian to see whether or not we make the replacement
+                 */
+
+                unsigned target_element = (*new_location_containing_elements.begin());
+
+                // This is the Hamiltonian
+
+                // Add the volume constraint
+                H_0 = lambda_volume*pow(mrMesh.GetVolumeOfElement(target_element)-target_volume, 2.0);
+                H_1 = lambda_volume*pow(mrMesh.GetVolumeOfElement(target_element)-1.0-target_volume, 2.0);
+
+                // Iterate over nodes neighbouring the target node to work out the contact energy contribution
+                std::set<unsigned> target_neighboring_node_indices = mrMesh.GetNeighbouringNodeIndices(new_location_index);
+
+                for (std::set<unsigned>::iterator iter = target_neighboring_node_indices.begin();
+                     iter != target_neighboring_node_indices.end();
+                     ++iter)
+                {
+                    std::set<unsigned> neighboring_node_containing_elements = mrMesh.GetNode(*iter)->rGetContainingElementIndices();
+                    unsigned neighbour_element = (*neighboring_node_containing_elements.begin());
+
+                    // If the nodes are currently from different elements
+                    if ( ( target_element != neighbour_element ) && ( neighboring_node_containing_elements.size() != 0u ) )
+                    {
+                        H_0 += lambda_contact;
+                    }
+
+                    // If the neighbouring node is not in an element (like the target node after the swap).
+                    if ( neighboring_node_containing_elements.size() != 0u )
+                    {
+                        H_1 += lambda_contact;
+                    }
+                }
+
+            }
+            else // (new_location_containing_elements.size()==0) // target node is not in an element
+            {
+                // Don't need to do any swapping for this case to save computations.
+                swap_elements = false;
+            }
+        }
+
+
+        double delta_H = H_1 - H_0;
+        double T = 0.1;
+
+        //Generate a uniform random number to do the random motion.
+        double random_number = RandomNumberGenerator::Instance()->ranf();
+        double p = exp(-delta_H/T);
+
+        if ( ( delta_H <= 0 || random_number < p) && swap_elements )
+        {
+            // Do swap
+
+            // Iterate over the elements containing the target node to remove node, this should be at most one element.
+            for (std::set<unsigned>::iterator iter = new_location_containing_elements.begin();
+                 iter != new_location_containing_elements.end();
+                 ++iter)
+            {
+                GetElement(*iter)->DeleteNode(GetElement(*iter)->GetNodeLocalIndex(new_location_index));
+
+                // TODO If this causes the element to have no nodes then flag the element and cell to be deleted
+            }
+
+            // Now iterate over the elements containing the current node to add the target node, this should be at most one element.
+            for (std::set<unsigned>::iterator iter = containing_elements.begin();
+                 iter != containing_elements.end();
+                 ++iter)
+            {
+                GetElement(*iter)->AddNode(mrMesh.GetNode(new_location_index));
             }
         }
     }
