@@ -80,14 +80,6 @@ PottsBasedCellPopulation::PottsBasedCellPopulation(PottsMesh& rMesh,
     }
 }
 
-///\todo This method will be used when archiving, cf VertexBasedCellPopulation.hpp (see #1684 and associated tickets)
-////template<unsigned DIM>
-//PottsBasedCellPopulation::PottsBasedCellPopulation(PottsMesh& rMesh)
-//             : mrMesh(rMesh)
-//{
-//    mDeleteMesh = true;
-//}
-
 //template<unsigned DIM>
 PottsBasedCellPopulation::~PottsBasedCellPopulation()
 {
