@@ -1215,7 +1215,7 @@ public:
                  ++cell_iter)
             {
                 TS_ASSERT_DELTA(cell_iter->GetAge(), (double)(counter), 1e-7);
-                counter = counter + 2.0;
+                counter = counter + 2;
             }
 
             // Check the simulation time has been restored (through the cell)
