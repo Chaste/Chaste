@@ -249,7 +249,7 @@ void PottsBasedCellPopulation::UpdateNodeLocations(const std::vector< c_vector<d
                  */
 
                 // Check if the elements are different otherwise no point doing anything
-                if( (*containing_elements.begin()) != (*new_location_containing_elements.begin()))
+                if ( (*containing_elements.begin()) != (*new_location_containing_elements.begin()))
                 {
                     /*
                      * Here the two nodes are in different elements, so we should calculate
