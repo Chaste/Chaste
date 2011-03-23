@@ -879,7 +879,7 @@ void LatticeBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream&
 	// Currently this is not called from LatticeBasedCellBasedSimulation; see #1453 for a discussion on this for centre- and vertex-based cell populations.
 	EXCEPTION("OutputCellPopulationParameters() is not yet implemented for LatticeBasedCellPopulation see #1453");
 
-	// Call direct parent class
+	// Call method on direct parent class
     //AbstractCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);
 }
 

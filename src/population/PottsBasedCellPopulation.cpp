@@ -578,7 +578,7 @@ double PottsBasedCellPopulation::GetWidth(const unsigned& rDimension)
 //template<unsigned DIM>
 void PottsBasedCellPopulation::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
-	// Call direct parent class method
+	// Call method on direct parent class
 	AbstractCellPopulation<2>::OutputCellPopulationParameters(rParamsFile);
 }
 
