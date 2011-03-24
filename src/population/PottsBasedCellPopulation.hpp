@@ -31,6 +31,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "AbstractCellPopulation.hpp"
 #include "PottsMesh.hpp"
+#include "VertexMesh.hpp"
 #include "ArchiveLocationInfo.hpp"
 
 #include "ChasteSerialization.hpp"
@@ -60,6 +61,13 @@ private:
     PottsMesh& mrMesh;
 
     /**
+     * Pointer to a VertexMesh object that stores the Element tessellation that is used to visualise
+     * mrMesh. The tessellation is created by calling CreateElelment Tessellation() and can
+     * be accessed by calling GetElementTessellation().
+     */
+    VertexMesh<2, 2>* mpElementTessellation;
+
+    /**
      * Whether to delete the mesh when we are destroyed.
      * Needed if this cell population has been de-serialized.
      */
@@ -85,6 +93,11 @@ private:
     {
 #define COVERAGE_IGNORE
         archive & boost::serialization::base_object<AbstractCellPopulation<2> >(*this);
+
+        // The Voronoi stuff can't be archived yet
+        //archive & mpElementTessellation
+        delete mpElementTessellation;
+        mpElementTessellation = NULL;
 #undef COVERAGE_IGNORE
     }
 
@@ -101,6 +114,16 @@ private:
     {
         ///\todo implement writing VTK results for this class
     }
+
+    /**
+     * Create a Element tessellation of the mesh for use in visualising the mesh.
+     */
+    void CreateElementTessellation();
+
+    /**
+     * Get a reference to mpElementTessellation.
+     */
+    VertexMesh<2, 2>* GetElementTessellation();
 
 public:
 
