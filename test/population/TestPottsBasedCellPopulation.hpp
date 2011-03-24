@@ -199,6 +199,52 @@ public:
 		TS_ASSERT_THROWS_THIS(PottsBasedCellPopulation cell_population2(*p_mesh2, cells2, false, true, cell_location_indices2),
 				"Element 0 appears to have 2 cells associated with it");
     }
+
+    void TestCellDivision() throw(Exception)
+    {
+        // Create a simple 2D PottsMesh with one cell
+        PottsMeshGenerator generator(2, 2, 1, 1, 2, 2);
+        PottsMesh* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+        // Create cell population
+        PottsBasedCellPopulation cell_population(*p_mesh, cells);
+
+        // Test we have the correct number of cells and elements
+        TS_ASSERT_EQUALS(cell_population.GetNumElements(), 1u);
+        TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 1u);
+
+        // Create a new cell
+        boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
+        FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+        p_model->SetCellProliferativeType(STEM);
+        CellPtr p_new_cell(new Cell(p_state, p_model));
+
+        // Add new cell to the cell population by dividing the cell
+        AbstractCellPopulation<2>::Iterator cell_iter_1 = cell_population.Begin();
+        cell_population.AddCell(p_new_cell, zero_vector<double>(2), *cell_iter_1);
+
+        TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(p_new_cell), 1u);
+
+        TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 2u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 2u);
+
+        // Check locations of parent and daughter cell
+        AbstractCellPopulation<2>::Iterator cell_iter_2 = cell_population.Begin();
+        TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter_2), 0u);
+        ++cell_iter_2;
+        TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter_2), 1u);
+
+        // Check Elements are as expected
+        TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(0)->GetNodeGlobalIndex(0), 0u);
+        TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(0)->GetNodeGlobalIndex(1), 1u);
+        TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(1)->GetNodeGlobalIndex(0), 2u);
+        TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(1)->GetNodeGlobalIndex(1), 3u);
+    }
 };
 
 #endif /*TESTPOTTSBASEDCELLPOPULATION_HPP_*/

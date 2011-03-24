@@ -313,42 +313,143 @@ void PottsMesh::DeleteElement(unsigned index)
     mDeletedElementIndices.push_back(index);
 }
 
-//unsigned PottsMesh::DivideElement(PottsElement* pElement)
-//{
-//    // Store the number of nodes in the element (this changes when nodes are deleted from the element)
-//    unsigned num_nodes = pElement->GetNumNodes();
-//
-//    // Copy the nodes in this element
-//    std::vector<Node<SPACE_DIM>*> nodes_elem;
-//    for (unsigned i=0; i<num_nodes; i++)
-//    {
-//        nodes_elem.push_back(pElement->GetNode(i));
-//    }
-//
-//    // Get the index of the new element
-//    unsigned new_element_index;
-//    if (mDeletedElementIndices.empty())
-//    {
-//        new_element_index = this->mElements.size();
-//    }
-//    else
-//    {
-//        new_element_index = mDeletedElementIndices.back();
-//        mDeletedElementIndices.pop_back();
-//        delete this->mElements[new_element_index];
-//    }
-//
-//    // Add the new element to the mesh
-//    AddElement(new PottsElement<ELEMENT_DIM,SPACE_DIM>(new_element_index, nodes_elem));
-//
-//    /**
-//     * Remove the correct nodes from each element. If placeOriginalElementBelow is true,
-//     * place the original element below (in the y direction) the new element; otherwise,
-//     * place it above.
-//     */
-//
-//    return new_element_index;
-//}
+unsigned PottsMesh::DivideElement(PottsElement* pElement,
+                                  bool placeOriginalElementBelow)
+{
+    // Store the number of nodes in the element (this changes when nodes are deleted from the element)
+    unsigned num_nodes = pElement->GetNumNodes();
+
+    if (num_nodes < 2)
+    {
+        EXCEPTION("Tried to divide a Potts element with only one node.");
+    }
+
+    // Copy the nodes in this element
+    std::vector<Node<2>*> nodes_elem;
+    for (unsigned i=0; i<num_nodes; i++)
+    {
+        nodes_elem.push_back(pElement->GetNode(i));
+    }
+
+    // Get the index of the new element
+    unsigned new_element_index;
+    if (mDeletedElementIndices.empty())
+    {
+        new_element_index = this->mElements.size();
+    }
+    else
+    {
+        new_element_index = mDeletedElementIndices.back();
+        mDeletedElementIndices.pop_back();
+        delete this->mElements[new_element_index];
+    }
+
+    // Add the new element to the mesh
+    AddElement(new PottsElement(new_element_index, nodes_elem));
+
+    /**
+     * Remove the correct nodes from each element. If placeOriginalElementBelow is true,
+     * place the original element below (in the y direction) the new element; otherwise,
+     * place it above.
+     */
+
+    unsigned half_num_nodes = num_nodes/2; // This will round down
+
+    // Find lowest element
+    ///\todo this could be more efficient
+    double height_midpoint_1 = 0.0;
+    double height_midpoint_2 = 0.0;
+    unsigned counter_1 = 0;
+    unsigned counter_2 = 0;
+
+    for (unsigned i=0; i<num_nodes; i++)
+    {
+        if (i<=half_num_nodes)
+        {
+            height_midpoint_1 += pElement->GetNode(i)->rGetLocation()[1];
+            counter_1++;
+        }
+        else
+        {
+            height_midpoint_2 += pElement->GetNode(i)->rGetLocation()[1];
+            counter_2++;
+        }
+    }
+    height_midpoint_1 /= (double)counter_1;
+    height_midpoint_2 /= (double)counter_2;
+
+    for (unsigned i=num_nodes; i>0; i--)
+    {
+        if (i-1 >= half_num_nodes)
+        {
+            if (height_midpoint_1 < height_midpoint_2)
+            {
+                if (placeOriginalElementBelow)
+                {
+                    pElement->DeleteNode(i-1);
+                }
+                else
+                {
+                    this->mElements[new_element_index]->DeleteNode(i-1);
+                }
+            }
+            else
+            {
+                if (placeOriginalElementBelow)
+                {
+                    this->mElements[new_element_index]->DeleteNode(i-1);
+                }
+                else
+                {
+                    pElement->DeleteNode(i-1);
+                }
+            }
+        }
+        else // i-1 < half_num_nodes
+        {
+            if (height_midpoint_1 < height_midpoint_2)
+            {
+                if (placeOriginalElementBelow)
+                {
+                    this->mElements[new_element_index]->DeleteNode(i-1);
+                }
+                else
+                {
+                    pElement->DeleteNode(i-1);
+                }
+            }
+            else
+            {
+                if (placeOriginalElementBelow)
+                {
+                    pElement->DeleteNode(i-1);
+                }
+                else
+                {
+                    this->mElements[new_element_index]->DeleteNode(i-1);
+                }
+            }
+        }
+    }
+
+    return new_element_index;
+}
+
+unsigned PottsMesh::AddElement(PottsElement* pNewElement)
+{
+    unsigned new_element_index = pNewElement->GetIndex();
+
+    if (new_element_index == this->mElements.size())
+    {
+        this->mElements.push_back(pNewElement);
+    }
+    else
+    {
+        this->mElements[new_element_index] = pNewElement;
+    }
+    pNewElement->RegisterWithNodes();
+    return pNewElement->GetIndex();
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation

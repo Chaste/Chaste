@@ -36,7 +36,7 @@ PottsMeshGenerator::PottsMeshGenerator(unsigned numNodesAcross, unsigned numNode
     assert(numElementsUp > 0);
     assert(elementWidth > 0);
     assert(elementHeight > 0);
-    assert(numElementsAcross*elementWidth==numNodesAcross);
+    assert(numElementsAcross*elementWidth<=numNodesAcross);
     assert(numElementsUp*elementHeight<=numNodesUp);
 
     std::vector<Node<2>*> nodes;

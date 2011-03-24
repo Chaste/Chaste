@@ -36,6 +36,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CellsGenerator.hpp"
 #include "CellBasedSimulation.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "StochasticDurationGenerationBasedCellCycleModel.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "SloughingCellKiller.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
@@ -73,14 +74,14 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), DIFFERENTIATED);
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), DIFFERENTIATED);
 
         // Create cell population
         PottsBasedCellPopulation cell_population(*p_mesh, cells);
 
         // Set up cell-based simulation
         CellBasedSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestPottsMonolayer");
+        simulator.SetOutputDirectory("TestSimplePottsMonolayer");
         simulator.SetEndTime(0.1);
 
         ///\todo Create an force law and pass it to the simulation
@@ -105,14 +106,14 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), DIFFERENTIATED);
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), DIFFERENTIATED);
 
         // Create cell population
         PottsBasedCellPopulation cell_population(*p_mesh, cells);
 
         // Set up cell-based simulation
         CellBasedSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestPottsMonolayerWithBirthAndDeath");
+        simulator.SetOutputDirectory("TestPottsMonolayerWithDeath");
         simulator.SetEndTime(0.1);
 
 
@@ -132,6 +133,39 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 15u);
 
     }
+
+    void TestPottsMonolayerWithBirth() throw (Exception)
+    {
+        // Create a simple 2D PottsMesh
+        PottsMeshGenerator generator(16, 36, 1, 1, 4, 4);
+        PottsMesh* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<StochasticDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), STEM);
+
+        // Create cell population
+        PottsBasedCellPopulation cell_population(*p_mesh, cells);
+
+        // Set up cell-based simulation
+        CellBasedSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestPottsMonolayerWithBirth");
+        simulator.SetDt(0.1);
+        simulator.SetEndTime(20);
+
+        // Run simulation
+        simulator.Solve();
+
+        // Check the number of cells
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 4u);
+
+        // Test no births or deaths
+        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 3u);
+        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
+
+    }
+
 };
 
 #endif /*TESTCELLBASEDSIMULATIONWITHPOTTSBASEDCELLPOPULATION_HPP_*/

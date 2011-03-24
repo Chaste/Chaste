@@ -274,6 +274,28 @@ public:
      */
     void DeleteElement(unsigned index);
 
+    /**
+     * Divide an element by assigning half the nodes to each new element in numerical order.
+     * If an odd number of nodes then the existing element has one more node than the new element.
+     *
+     *
+     * @param pElement the element to divide
+     * @param placeOriginalElementBelow whether to place the original element below (in the y direction) the new element (defaults to false)
+     *
+     * @return the index of the new element
+     */
+    unsigned DivideElement(PottsElement* pElement,
+                           bool placeOriginalElementBelow=false);
+
+    /**
+     * Add an element to the mesh.
+     *
+     * @param pNewElement the new element
+     *
+     * @return the index of the new element in the mesh
+     */
+    unsigned AddElement(PottsElement* pNewElement);
+
     //////////////////////////////////////////////////////////////////////
     //                         Nested classes                           //
     //////////////////////////////////////////////////////////////////////

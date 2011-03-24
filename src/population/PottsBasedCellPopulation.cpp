@@ -143,20 +143,19 @@ PottsElement* PottsBasedCellPopulation::GetElementCorrespondingToCell(CellPtr pC
 //template<unsigned DIM>
 CellPtr PottsBasedCellPopulation::AddCell(CellPtr pNewCell, const c_vector<double,2>& rCellDivisionVector, CellPtr pParentCell)
 {
-    // Method Not Written Yet
-    #define COVERAGE_IGNORE
-    assert(0);
-    #undef COVERAGE_IGNORE
-
     // Get the element associated with this cell
-    //PottsElement* p_element = GetElementCorrespondingToCell(pParentCell);
+    PottsElement* p_element = GetElementCorrespondingToCell(pParentCell);
 
     // Divide the element
+    unsigned new_element_index = mrMesh.DivideElement(p_element, true); // new element will be below the existing element
+
+    // Associate the new cell with the element
+    this->mCells.push_back(pNewCell);
 
     // Update location cell map
     CellPtr p_created_cell = this->mCells.back();
-//    this->mLocationCellMap[new_element_index] = p_created_cell;
-//    this->mCellLocationMap[p_created_cell.get()] = new_element_index;
+    this->mLocationCellMap[new_element_index] = p_created_cell;
+    this->mCellLocationMap[p_created_cell.get()] = new_element_index;
     return p_created_cell;
 }
 
