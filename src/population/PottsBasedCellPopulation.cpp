@@ -624,7 +624,7 @@ void PottsBasedCellPopulation::CreateElementTessellation()
 
 VertexMesh<2, 2>* PottsBasedCellPopulation::GetElementTessellation()
 {
-    assert(mpElementTessellation!=NULL);
+    //assert(mpElementTessellation!=NULL);
     return mpElementTessellation;
 }
 
