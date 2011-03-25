@@ -450,7 +450,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 2u);
     }
 
-    void TestDivideVertexElement() throw(Exception)
+    void TestDividePottaElement() throw(Exception)
     {
         {
             // Original Element BELOW new element
@@ -462,36 +462,42 @@ public:
             basic_nodes.push_back(new Node<2>(2, false, 0.0, 1.0));
             basic_nodes.push_back(new Node<2>(3, false, 1.0, 1.0));
 
-            // Make one rectangular element out of these nodes.
-            std::vector<Node<2>*> nodes_elem;
-            nodes_elem.push_back(basic_nodes[0]);
-            nodes_elem.push_back(basic_nodes[1]);
-            nodes_elem.push_back(basic_nodes[2]);
-            nodes_elem.push_back(basic_nodes[3]);
+            // Make two rectangular element out of these nodes.
+            std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
+            nodes_elem_0.push_back(basic_nodes[0]);
+            nodes_elem_0.push_back(basic_nodes[2]);
+            nodes_elem_1.push_back(basic_nodes[3]);
+            nodes_elem_1.push_back(basic_nodes[1]);
 
             std::vector<PottsElement*> basic_potts_elements;
-            basic_potts_elements.push_back(new PottsElement(0, nodes_elem));
-
+            basic_potts_elements.push_back(new PottsElement(0, nodes_elem_0));
+            basic_potts_elements.push_back(new PottsElement(1, nodes_elem_1));
             // Make a potts mesh
             PottsMesh basic_potts_mesh(basic_nodes, basic_potts_elements);
 
-            TS_ASSERT_EQUALS(basic_potts_mesh.GetNumElements(), 1u);
+            TS_ASSERT_EQUALS(basic_potts_mesh.GetNumElements(), 2u);
             TS_ASSERT_EQUALS(basic_potts_mesh.GetNumNodes(), 4u);
 
-            // Divide element, putting the original element below the new element
+            // Divide elements, putting the original element below the new element
             unsigned new_element_index = basic_potts_mesh.DivideElement(basic_potts_mesh.GetElement(0), true);
+            TS_ASSERT_EQUALS(new_element_index, 2u);
+            new_element_index = basic_potts_mesh.DivideElement(basic_potts_mesh.GetElement(1), true);
+            TS_ASSERT_EQUALS(new_element_index, 3u);
 
-            TS_ASSERT_EQUALS(new_element_index, 1u);
-            TS_ASSERT_EQUALS(basic_potts_mesh.GetNumElements(), 2u);
+            TS_ASSERT_EQUALS(basic_potts_mesh.GetNumElements(), 4u);
 
             // Test elements have correct nodes
-            TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(0)->GetNumNodes(), 2u);
+            TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(0)->GetNumNodes(), 1u);
             TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(0)->GetNodeGlobalIndex(0), 0u);
-            TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(0)->GetNodeGlobalIndex(1), 1u);
 
-            TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(1)->GetNumNodes(), 2u);
-            TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(1)->GetNodeGlobalIndex(0), 2u);
-            TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(1)->GetNodeGlobalIndex(1), 3u);
+            TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(1)->GetNumNodes(), 1u);
+            TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(1)->GetNodeGlobalIndex(0), 1u);
+
+            TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(2)->GetNumNodes(), 1u);
+            TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(2)->GetNodeGlobalIndex(0), 2u);
+
+            TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(3)->GetNumNodes(), 1u);
+            TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(3)->GetNodeGlobalIndex(0), 3u);
         }
         {
             // Original Element ABOVE new element
@@ -503,36 +509,42 @@ public:
             basic_nodes.push_back(new Node<2>(2, false, 0.0, 1.0));
             basic_nodes.push_back(new Node<2>(3, false, 1.0, 1.0));
 
-            // Make one rectangular element out of these nodes.
-            std::vector<Node<2>*> nodes_elem;
-            nodes_elem.push_back(basic_nodes[0]);
-            nodes_elem.push_back(basic_nodes[1]);
-            nodes_elem.push_back(basic_nodes[2]);
-            nodes_elem.push_back(basic_nodes[3]);
+            // Make two rectangular element out of these nodes.
+            std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
+            nodes_elem_0.push_back(basic_nodes[0]);
+            nodes_elem_0.push_back(basic_nodes[2]);
+            nodes_elem_1.push_back(basic_nodes[3]);
+            nodes_elem_1.push_back(basic_nodes[1]);
 
             std::vector<PottsElement*> basic_potts_elements;
-            basic_potts_elements.push_back(new PottsElement(0, nodes_elem));
-
+            basic_potts_elements.push_back(new PottsElement(0, nodes_elem_0));
+            basic_potts_elements.push_back(new PottsElement(1, nodes_elem_1));
             // Make a potts mesh
             PottsMesh basic_potts_mesh(basic_nodes, basic_potts_elements);
 
-            TS_ASSERT_EQUALS(basic_potts_mesh.GetNumElements(), 1u);
+            TS_ASSERT_EQUALS(basic_potts_mesh.GetNumElements(), 2u);
             TS_ASSERT_EQUALS(basic_potts_mesh.GetNumNodes(), 4u);
 
-            // Divide element, putting the original element above the new element
+            // Divide elements, putting the original element above the new element
             unsigned new_element_index = basic_potts_mesh.DivideElement(basic_potts_mesh.GetElement(0), false);
+            TS_ASSERT_EQUALS(new_element_index, 2u);
+            new_element_index = basic_potts_mesh.DivideElement(basic_potts_mesh.GetElement(1), false);
+            TS_ASSERT_EQUALS(new_element_index, 3u);
 
-            TS_ASSERT_EQUALS(new_element_index, 1u);
-            TS_ASSERT_EQUALS(basic_potts_mesh.GetNumElements(), 2u);
+            TS_ASSERT_EQUALS(basic_potts_mesh.GetNumElements(), 4u);
 
             // Test elements have correct nodes
-            TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(0)->GetNumNodes(), 2u);
+            TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(0)->GetNumNodes(), 1u);
             TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(0)->GetNodeGlobalIndex(0), 2u);
-            TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(0)->GetNodeGlobalIndex(1), 3u);
 
-            TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(1)->GetNumNodes(), 2u);
-            TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(1)->GetNodeGlobalIndex(0), 0u);
-            TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(1)->GetNodeGlobalIndex(1), 1u);
+            TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(1)->GetNumNodes(), 1u);
+            TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(1)->GetNodeGlobalIndex(0), 3u);
+
+            TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(2)->GetNumNodes(), 1u);
+            TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(2)->GetNodeGlobalIndex(0), 0u);
+
+            TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(3)->GetNumNodes(), 1u);
+            TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(3)->GetNodeGlobalIndex(0), 1u);
         }
         {
             //Testing Exceptions

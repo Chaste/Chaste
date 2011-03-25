@@ -364,7 +364,7 @@ unsigned PottsMesh::DivideElement(PottsElement* pElement,
 
     for (unsigned i=0; i<num_nodes; i++)
     {
-        if (i<=half_num_nodes)
+        if (i<half_num_nodes)
         {
             height_midpoint_1 += pElement->GetNode(i)->rGetLocation()[1];
             counter_1++;
