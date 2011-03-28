@@ -450,7 +450,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 2u);
     }
 
-    void TestDividePottaElement() throw(Exception)
+    void TestDividePottsElement() throw(Exception)
     {
         {
             // Original Element BELOW new element
@@ -573,8 +573,50 @@ public:
             TS_ASSERT_THROWS_THIS(basic_potts_mesh.DivideElement(basic_potts_mesh.GetElement(0), false),
                                           "Tried to divide a Potts element with only one node.");
         }
+    }
 
+    void TestDeleteAndDividePottsElement() throw(Exception)
+    {
+        // Make four nodes
+        std::vector<Node<2>*> basic_nodes;
+        basic_nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+        basic_nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
+        basic_nodes.push_back(new Node<2>(2, false, 0.0, 1.0));
+        basic_nodes.push_back(new Node<2>(3, false, 1.0, 1.0));
 
+        // Make two rectangular element out of these nodes.
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
+        nodes_elem_0.push_back(basic_nodes[0]);
+        nodes_elem_0.push_back(basic_nodes[2]);
+        nodes_elem_1.push_back(basic_nodes[3]);
+        nodes_elem_1.push_back(basic_nodes[1]);
+
+        std::vector<PottsElement*> basic_potts_elements;
+        basic_potts_elements.push_back(new PottsElement(0, nodes_elem_0));
+        basic_potts_elements.push_back(new PottsElement(1, nodes_elem_1));
+        // Make a potts mesh
+        PottsMesh basic_potts_mesh(basic_nodes, basic_potts_elements);
+
+        TS_ASSERT_EQUALS(basic_potts_mesh.GetNumElements(), 2u);
+        TS_ASSERT_EQUALS(basic_potts_mesh.GetNumNodes(), 4u);
+
+        // Delete element 0
+        basic_potts_mesh.DeleteElement(0);
+
+        // Divide remaining element
+        unsigned new_element_index = basic_potts_mesh.DivideElement(basic_potts_mesh.GetElement(1));
+
+        // Check index reused
+        TS_ASSERT_EQUALS(new_element_index, 0u);
+
+        TS_ASSERT_EQUALS(basic_potts_mesh.GetNumElements(), 2u);
+
+        // Test elements have correct nodes
+        TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(0)->GetNumNodes(), 1u);
+        //TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(0)->GetNodeGlobalIndex(0), 2u);
+
+        TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(1)->GetNumNodes(), 1u);
+        //TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(1)->GetNodeGlobalIndex(0), 3u);
     }
 
     //    void TestArchive2dPottsMesh()
