@@ -70,7 +70,7 @@ private:
         archive & mDiffusionConstant;
     }
 
-public :
+public:
 
     /**
      * Constructor.

@@ -56,7 +56,7 @@ class AbstractUpdateRule
     {
     }
 
-public :
+public:
 
     /**
      * Default constructor.

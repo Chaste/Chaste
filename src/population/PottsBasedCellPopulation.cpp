@@ -601,7 +601,7 @@ void PottsBasedCellPopulation::CreateElementTessellation()
 //
 //        bool are_shared_edges = true;
 //
-//        while(are_shared_edges)
+//        while (are_shared_edges)
 //        {
 //            for (unsigned i=0; i<num_nodes; i++)
 //            {
