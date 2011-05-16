@@ -29,7 +29,11 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 template<unsigned DIM>
 BuskeInteractionForce<DIM>::BuskeInteractionForce()
-   : AbstractTwoBodyInteractionForce<DIM>()
+   : AbstractTwoBodyInteractionForce<DIM>(),
+     mAdhesionEnergyParameter(200),        // Denoted by epsilon in Buske et al (2011) (doi:10.1371/journal.pcbi.1001045).
+     mDeformationEnergyParameter(4.0/3.0),      // Denoted by D in Buske et al (2011) (doi:10.1371/journal.pcbi.1001045).
+     mCompressionEnergyParameter(1.0)       // Denoted by K in Buske et al (2011) (doi:10.1371/journal.pcbi.1001045).
+
 {
 }
 
@@ -67,17 +71,38 @@ c_vector<double, DIM> BuskeInteractionForce<DIM>::CalculateForceBetweenNodes(uns
     // Normalize the unit vector
     unit_vector /= distance_between_nodes;
 
+    // Determine Radius' of cells
+//    CellPtr p_cell_A = rCellPopulation.GetCellUsingLocationIndex(nodeAGlobalIndex);
+//    CellPtr p_cell_B = rCellPopulation.GetCellUsingLocationIndex(nodeBGlobalIndex);
+
+    double radius_of_cell_one = 1.0;
+    double radius_of_cell_two = 1.0;
+
     // Compute the force vector
-    c_vector<double, DIM> force_between_nodes = GetMagnitudeOfForce(distance_between_nodes) * unit_vector;
+    c_vector<double, DIM> force_between_nodes = GetMagnitudeOfForce(distance_between_nodes,radius_of_cell_one,radius_of_cell_two) * unit_vector;
 
     return force_between_nodes;
 }
 
 template<unsigned DIM>
-double BuskeInteractionForce<DIM>::GetMagnitudeOfForce(double distanceBetweenNodes)
+double BuskeInteractionForce<DIM>::GetMagnitudeOfForce(double distanceBetweenNodes, double radiusOfCellOne, double radiusOfCellTwo)
 {
-	/** \todo add the magnitude calculation here*/
-	return 0.0;
+	double xij = 0.5*(radiusOfCellOne*radiusOfCellOne - radiusOfCellTwo*radiusOfCellTwo + distanceBetweenNodes*distanceBetweenNodes)/distanceBetweenNodes;
+
+	double dxijdd = 1.0 - 2.0*xij/distanceBetweenNodes;
+
+	// Calculate contribution from adhesive interaction energy
+	double dWAdd = -2.0*mAdhesionEnergyParameter*M_PI*xij*dxijdd;
+
+	// Calculate contribution from deformation interaction energy
+	double dWDdd = -pow(radiusOfCellOne + radiusOfCellTwo - distanceBetweenNodes,1.5)
+			        *pow(radiusOfCellOne*radiusOfCellTwo/(radiusOfCellOne+radiusOfCellTwo),0.5)
+			        /mDeformationEnergyParameter;
+
+	// Calculate contribution from compression interaction energy
+	double dWKdd = 0.0;
+
+	return dWAdd + dWDdd + dWKdd;
 }
 
 template<unsigned DIM>

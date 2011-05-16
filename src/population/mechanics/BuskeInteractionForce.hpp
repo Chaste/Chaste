@@ -34,7 +34,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <boost/serialization/base_object.hpp>
 
 /**
- * A force law employed by Buske et al (2010) in their overlapping spheres
+ * A force law employed by Buske et al (2011) in their overlapping spheres
  * model of the intestinal crypt (doi:10.1371/journal.pcbi.1001045).
  *
  * Length is scaled by natural length.
@@ -63,6 +63,42 @@ private :
         archive & boost::serialization::base_object<AbstractTwoBodyInteractionForce<DIM> >(*this);
     }
 
+protected:
+
+    /**
+     * Adhesion energy parameter.
+     *
+     * Represented by the parameter epsilon in the model by Buske et al (2011) in
+     * their off-lattice model of the intestinal crypt
+     * (doi:10.1371/journal.pcbi.1001045).
+     */
+    double mAdhesionEnergyParameter;
+
+    /**
+     * Deformation energy parameter.
+     *
+     * Represented by the parameter D in the model by Buske et al (2011) in
+     * their off-lattice model of the intestinal crypt
+     * (doi:10.1371/journal.pcbi.1001045).
+     *
+     * Note: D=3/2(1-nu^2)/E
+     *
+     * Where E is the Young Modulus and nu is the Poisson ratio of cells
+     */
+    double mDeformationEnergyParameter;
+
+    /**
+     * Compression energy parameter
+     *
+     * Represented by the parameter K in the model by Buske et al (2011) in
+     * their off-lattice model of the intestinal crypt
+     * (doi:10.1371/journal.pcbi.1001045).
+     *
+     * Note: K is the bulk modulus of the spheres.
+     */
+    double mCompressionEnergyParameter;
+
+
 public :
 
     /**
@@ -86,7 +122,7 @@ public :
      * 
      * @param distanceBetweenNodes the distance between two nodes
      */
-    double GetMagnitudeOfForce(double distanceBetweenNodes);
+    double GetMagnitudeOfForce(double distanceBetweenNodes, double radiusOfCellOne, double radiusOfCellTwo);
 
     /**
      * Overridden OutputForceParameters() method.
