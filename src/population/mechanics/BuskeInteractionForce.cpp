@@ -17,6 +17,7 @@ Chaste is distributed in the hope that it will be useful, but WITHOUT
 ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
 FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
 License for more details. The offer of Chaste under the terms of the
+License is subject to the License being interpreted in accordance with
 English Law and subject to any action against the University of Oxford
 being under the jurisdiction of the English Courts.
 
@@ -31,16 +32,16 @@ template<unsigned DIM>
 BuskeInteractionForce<DIM>::BuskeInteractionForce()
    : AbstractTwoBodyInteractionForce<DIM>(),
      mAdhesionEnergyParameter(200),        // Denoted by epsilon in Buske et al (2011) (doi:10.1371/journal.pcbi.1001045).
-     mDeformationEnergyParameter(4.0/3.0),      // Denoted by D in Buske et al (2011) (doi:10.1371/journal.pcbi.1001045).
-     mCompressionEnergyParameter(1.0)       // Denoted by K in Buske et al (2011) (doi:10.1371/journal.pcbi.1001045).
+     mDeformationEnergyParameter(4.0/3.0), // Denoted by D in Buske et al (2011) (doi:10.1371/journal.pcbi.1001045).
+     mCompressionEnergyParameter(1.0)      // Denoted by K in Buske et al (2011) (doi:10.1371/journal.pcbi.1001045).
 
 {
 }
 
 template<unsigned DIM>
 c_vector<double, DIM> BuskeInteractionForce<DIM>::CalculateForceBetweenNodes(unsigned nodeAGlobalIndex,
-                                                                                        unsigned nodeBGlobalIndex,
-                                                                                        AbstractCellPopulation<DIM>& rCellPopulation)
+                                                                             unsigned nodeBGlobalIndex,
+                                                                             AbstractCellPopulation<DIM>& rCellPopulation)
 {
     // We should only ever calculate the force between two distinct nodes
     assert(nodeAGlobalIndex != nodeBGlobalIndex);
@@ -71,7 +72,7 @@ c_vector<double, DIM> BuskeInteractionForce<DIM>::CalculateForceBetweenNodes(uns
     // Normalize the unit vector
     unit_vector /= distance_between_nodes;
 
-    // Determine Radius' of cells
+    // Determine cell radii
 //    CellPtr p_cell_A = rCellPopulation.GetCellUsingLocationIndex(nodeAGlobalIndex);
 //    CellPtr p_cell_B = rCellPopulation.GetCellUsingLocationIndex(nodeBGlobalIndex);
 
@@ -111,7 +112,6 @@ void BuskeInteractionForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 	// Call method on direct parent class
 	AbstractTwoBodyInteractionForce<DIM>::OutputForceParameters(rParamsFile);
 }
-
 
 /////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation

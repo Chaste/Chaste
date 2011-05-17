@@ -37,7 +37,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
  * A force law employed by Buske et al (2011) in their overlapping spheres
  * model of the intestinal crypt (doi:10.1371/journal.pcbi.1001045).
  *
- * Length is scaled by natural length.
+ * Length is scaled by natural length. \todo does this mean natural radius of a cell? If so at what age? (#1764)
  * Time is in hours.
  */
 template<unsigned DIM>
@@ -45,7 +45,7 @@ class BuskeInteractionForce : public AbstractTwoBodyInteractionForce<DIM>
 {
     friend class TestForcesNotForRelease;
 
-private :
+private:
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -98,8 +98,7 @@ protected:
      */
     double mCompressionEnergyParameter;
 
-
-public :
+public:
 
     /**
      * Constructor.
@@ -118,9 +117,12 @@ public :
     c_vector<double, DIM> CalculateForceBetweenNodes(unsigned nodeAGlobalIndex, unsigned nodeBGlobalIndex, AbstractCellPopulation<DIM>& rCellPopulation);
 
     /**
-     * Calculate the magnitude of the force for two nodes that are a given distance apart.
+     * Calculate the magnitude of the force between two nodes that are a given distance apart and
+     * are associated with given cell radii.
      * 
      * @param distanceBetweenNodes the distance between two nodes
+     * @param radiusOfCellOne radius of a cell
+     * @param radiusOfCellTwo radius of a cell
      */
     double GetMagnitudeOfForce(double distanceBetweenNodes, double radiusOfCellOne, double radiusOfCellTwo);
 
@@ -133,7 +135,6 @@ public :
 };
 
 #include "SerializationExportWrapper.hpp"
-
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(BuskeInteractionForce)
 
 #endif /*BUSKEINTERACTIONFORCE_HPP_*/

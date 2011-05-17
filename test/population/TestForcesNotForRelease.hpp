@@ -47,7 +47,7 @@ public:
 
     void TestBuskeInteractionForceMethods() throw (Exception)
     {
-        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create a simple mesh
 		unsigned num_cells_depth = 5;
@@ -65,7 +65,6 @@ public:
 		cell_population.SetMechanicsCutOffLength(1.5);
 		cell_population.Update();
 
-
         // Create force
         BuskeInteractionForce<2> buske_force;
 
@@ -80,18 +79,12 @@ public:
 
         // Reset cut off length
         buske_force.SetCutOffLength(DBL_MAX);
-        /*
-         ************************************************************************
-         ************************************************************************
-         *  Test node force calculation
-         ************************************************************************
-         ************************************************************************
-         */
+
+        // Test node force calculation
 
         // Initialise a vector of node forces
         std::vector<c_vector<double, 2> > node_forces;
         node_forces.reserve(cell_population.GetNumNodes());
-
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
              node_forces.push_back(zero_vector<double>(2));
@@ -109,7 +102,6 @@ public:
             TS_ASSERT_DELTA(node_forces[node_index][0], 0.0, 1e-4);
             TS_ASSERT_DELTA(node_forces[node_index][1], 0.0, 1e-4);
         }
-
     }
 
     void TestForceOutputParameters()
