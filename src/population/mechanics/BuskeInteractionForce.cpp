@@ -96,11 +96,20 @@ double BuskeInteractionForce<DIM>::GetMagnitudeOfForce(double distanceBetweenNod
 	double dWAdd = -2.0*mAdhesionEnergyParameter*M_PI*xij*dxijdd;
 
 	// Calculate contribution from deformation interaction energy
-	double dWDdd = -pow(radiusOfCellOne + radiusOfCellTwo - distanceBetweenNodes,1.5)
-			        *pow(radiusOfCellOne*radiusOfCellTwo/(radiusOfCellOne+radiusOfCellTwo),0.5)
-			        /mDeformationEnergyParameter;
+	double dWDdd;
 
-	// Calculate contribution from compression interaction energy
+	if (distanceBetweenNodes < radiusOfCellOne + radiusOfCellTwo)
+	{
+		dWDdd = -pow(radiusOfCellOne + radiusOfCellTwo - distanceBetweenNodes,1.5)
+                *pow(radiusOfCellOne*radiusOfCellTwo/(radiusOfCellOne+radiusOfCellTwo),0.5)
+			    /mDeformationEnergyParameter;
+	}
+	else  // no deformation energy contribution as too far apart
+	{
+		dWDdd = 0.0;
+	}
+
+	// Calculate contribution from compression interaction energy Still todo
 	double dWKdd = 0.0;
 
 	return dWAdd + dWDdd + dWKdd;
