@@ -34,6 +34,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <boost/archive/text_iarchive.hpp>
 
 #include "BuskeInteractionForce.hpp"
+#include "BuskeCompressionForce.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "NodeBasedCellPopulation.hpp"
@@ -91,7 +92,12 @@ public:
         }
 
         buske_force.AddForceContribution(node_forces, cell_population);
+        
+        // Create compression force
+        BuskeCompressionForce<2> buske_compression_force;
 
+        buske_compression_force.AddForceContribution(node_forces, cell_population);
+        
         // Test forces on non-ghost nodes \todo need to actually test something here.
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();

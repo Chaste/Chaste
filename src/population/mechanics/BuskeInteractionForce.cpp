@@ -87,7 +87,7 @@ c_vector<double, DIM> BuskeInteractionForce<DIM>::CalculateForceBetweenNodes(uns
 
 template<unsigned DIM>
 double BuskeInteractionForce<DIM>::GetMagnitudeOfForce(double distanceBetweenNodes, double radiusOfCellOne, double radiusOfCellTwo)
-{
+{      
 	double xij = 0.5*(radiusOfCellOne*radiusOfCellOne - radiusOfCellTwo*radiusOfCellTwo + distanceBetweenNodes*distanceBetweenNodes)/distanceBetweenNodes;
 
 	double dxijdd = 1.0 - 2.0*xij/distanceBetweenNodes;
@@ -110,9 +110,9 @@ double BuskeInteractionForce<DIM>::GetMagnitudeOfForce(double distanceBetweenNod
 	}
 
 	// Calculate contribution from compression interaction energy Still todo
-	double dWKdd = 0.0;
+//	double dWKdd = 0.0;    // This shouldn't be here - the compression force must be calculated for each cell individually
 
-	return dWAdd + dWDdd + dWKdd;
+	return dWAdd + dWDdd; // + dWKdd;
 }
 
 template<unsigned DIM>

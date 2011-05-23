@@ -35,9 +35,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "AbstractForce.hpp"
 #include "TetrahedralMesh.hpp"
 
-// Needed here to avoid serialization errors (on Boost<1.37)
-#include "CellLabel.hpp"
-
 /**
  * A force law employed by Buske et al (2011) in their overlapping spheres
  * model of the intestinal crypt (doi:10.1371/journal.pcbi.1001045).
@@ -99,7 +96,7 @@ public:
 
     /**
      * Given a node index, returns the set of neighbouring node indices which
-     * lie within a specific interaction distance. 
+     * lie within a specific interaction distance. (Sum of the two cell radii.)
      *
      * @param index the node index
      *
