@@ -99,6 +99,7 @@ public:
      * lie within a specific interaction distance. (Sum of the two cell radii.)
      *
      * @param index the node index
+     * @param rCellPopulation a cell population object
      *
      * @return the set of neighbouring node indices.
      */
@@ -106,7 +107,9 @@ public:
     
     /**
      * Overridden AddForceContribution() method.
-     *
+     * 
+     * @param rForces a vector of forces on notes
+     * @param rCellPopulation a cell population object
      */
     void AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
                               AbstractCellPopulation<DIM>& rCellPopulation);
