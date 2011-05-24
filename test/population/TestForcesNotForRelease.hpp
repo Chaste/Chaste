@@ -54,15 +54,19 @@ public:
 		unsigned num_cells_depth = 5;
 		unsigned num_cells_width = 5;
 		HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-		TetrahedralMesh<2,2>* p_mesh = generator.GetMesh();
+        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+
+        // Convert this to a NodesOnlyMesh
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
 
 		// Create cells
 		std::vector<CellPtr> cells;
 		CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-		cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes());
+		cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
 		// Create a node-based cell population
-		NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
+		NodeBasedCellPopulation<2> cell_population(mesh, *p_generating_mesh, cells);
 		cell_population.SetMechanicsCutOffLength(1.5);
 		cell_population.Update();
 
@@ -136,8 +140,12 @@ public:
         {
             TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
 
-            MutableMesh<2,2> mesh;
-            mesh.ConstructFromMeshReader(mesh_reader);
+            MutableMesh<2,2> generating_mesh;
+            generating_mesh.ConstructFromMeshReader(mesh_reader);
+
+            // Convert this to a NodesOnlyMesh
+            NodesOnlyMesh<2> mesh;
+            mesh.ConstructNodesWithoutMesh(generating_mesh);
 
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
 
@@ -154,7 +162,7 @@ public:
                 cells.push_back(p_cell);
             }
 
-            NodeBasedCellPopulation<2> cell_population(mesh, cells);
+            NodeBasedCellPopulation<2> cell_population(mesh, generating_mesh, cells);
             BuskeInteractionForce<2> buske_force;
 
             std::ofstream ofs(archive_filename.c_str());
