@@ -45,7 +45,6 @@ template<unsigned DIM>
 class BuskeInteractionForce : public AbstractTwoBodyInteractionForce<DIM>
 {
     friend class TestForcesNotForRelease;
-
 private:
 
     /** Needed for serialization. */
@@ -62,9 +61,9 @@ private:
         // If Archive is an output archive, then '&' resolves to '<<'
         // If Archive is an input archive, then '&' resolves to '>>'
         archive & boost::serialization::base_object<AbstractTwoBodyInteractionForce<DIM> >(*this);
+        archive & mAdhesionEnergyParameter;
+        archive & mDeformationEnergyParameter;
     }
-
-protected:
 
     /**
      * Adhesion energy parameter.
@@ -88,23 +87,36 @@ protected:
      */
     double mDeformationEnergyParameter;
 
-    /**
-     * Compression energy parameter
-     *
-     * Represented by the parameter K in the model by Buske et al (2011) in
-     * their off-lattice model of the intestinal crypt
-     * (doi:10.1371/journal.pcbi.1001045).
-     *
-     * Note: K is the bulk modulus of the spheres.
-     */
-    double mCompressionEnergyParameter;
-
 public:
 
     /**
      * Constructor.
      */
     BuskeInteractionForce();
+
+    /**
+     * Get mAdhesionEnergyParameter.
+     */
+    double GetAdhesionEnergyParameter();
+
+    /**
+     * Set mAdhesionEnergyParameter.
+     * 
+     * @param adhesionEnergyParameter the new value of mAdhesionEnergyParameter
+     */
+    void SetAdhesionEnergyParameter(double adhesionEnergyParameter);
+
+    /**
+     * Get mDeformationEnergyParameter.
+     */
+    double GetDeformationEnergyParameter();
+
+    /**
+     * Set mDeformationEnergyParameter.
+     * 
+     * @param deformationEnergyParameter the new value of mDeformationEnergyParameter
+     */
+    void SetDeformationEnergyParameter(double deformationEnergyParameter);
 
     /**
      * Calculate the force between two nodes.

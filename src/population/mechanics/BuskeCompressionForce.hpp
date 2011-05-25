@@ -45,20 +45,10 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
  * This class specifically calculates the compression force which forms part of equation (A6) in the Buske paper.
  */
 template<unsigned DIM>
-class BuskeCompressionForce  : public AbstractForce<DIM>
+class BuskeCompressionForce : public AbstractForce<DIM>
 {
-    
     friend class TestForcesNotForRelease;
-
 private:
-
-    /**
-     * Get the magnitude of the chemotactic force.
-     *
-     * @param concentration the local nutrient concentration
-     * @param concentrationGradientMagnitude the magnitude of the local nutrient concentration gradient
-     */
-//    double GetChemotacticForceMagnitude(const double concentration, const double concentrationGradientMagnitude);
 
     friend class boost::serialization::access;
     template<class Archive>
@@ -67,12 +57,11 @@ private:
         // If Archive is an output archive, then '&' resolves to '<<'
         // If Archive is an input archive, then '&' resolves to '>>'
         archive & boost::serialization::base_object<AbstractForce<DIM> >(*this);
+        archive & mCompressionEnergyParameter;
     }
     
-    protected:
-    
     /**
-     * Compression energy parameter
+     * Compression energy parameter.
      *
      * Represented by the parameter K in the model by Buske et al (2011) in
      * their off-lattice model of the intestinal crypt
@@ -90,9 +79,16 @@ public:
     BuskeCompressionForce();
 
     /**
-     * Destructor.
+     * Get mCompressionEnergyParameter.
      */
-    ~BuskeCompressionForce();
+    double GetCompressionEnergyParameter();
+
+    /**
+     * Set mCompressionEnergyParameter.
+     * 
+     * @param compressionEnergyParameter the new value of mCompressionEnergyParameter
+     */
+    void SetCompressionEnergyParameter(double compressionEnergyParameter);
 
     /**
      * Given a node index, returns the set of neighbouring node indices which
@@ -123,7 +119,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(BuskeCompressionForce)
 
 #endif /*BUSKECOMPRESSIONFORCE_HPP_*/

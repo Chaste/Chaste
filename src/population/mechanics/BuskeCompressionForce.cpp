@@ -31,13 +31,20 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 template<unsigned DIM>
 BuskeCompressionForce<DIM>::BuskeCompressionForce()
     : AbstractForce<DIM>(),
-    mCompressionEnergyParameter(1.0) // Denoted by K in Buske et al (2011) (doi:10.1371/journal.pcbi.1001045).
+      mCompressionEnergyParameter(1.0)
 {    
 }
 
 template<unsigned DIM>
-BuskeCompressionForce<DIM>::~BuskeCompressionForce()
+double BuskeCompressionForce<DIM>::GetCompressionEnergyParameter()
 {
+    return mCompressionEnergyParameter;
+}
+
+template<unsigned DIM>
+void BuskeCompressionForce<DIM>::SetCompressionEnergyParameter(double compressionEnergyParameter)
+{
+    mCompressionEnergyParameter = compressionEnergyParameter;
 }
 
 template<unsigned DIM>
@@ -46,8 +53,8 @@ std::set<unsigned> BuskeCompressionForce<DIM>::GetNeighbouringNodeWithinInteract
     std::set<unsigned> neighbouring_node_indices;
     
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
-     cell_iter != rCellPopulation.End();
-     ++cell_iter)
+         cell_iter != rCellPopulation.End();
+         ++cell_iter)
     { 
         unsigned node_j_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
         
@@ -99,8 +106,8 @@ void BuskeCompressionForce<DIM>::AddForceContribution(std::vector<c_vector<doubl
         double dVAdd = 0.0;
         
         for (std::set<unsigned>::iterator iter = neighbouring_node_indices.begin();
-        iter != neighbouring_node_indices.end();
-        ++iter)
+             iter != neighbouring_node_indices.end();
+             ++iter)
         {                  
             // Get the node locations
             c_vector<double, DIM> node_i_location = rCellPopulation.GetNode(node_global_index)->rGetLocation();
@@ -124,23 +131,22 @@ void BuskeCompressionForce<DIM>::AddForceContribution(std::vector<c_vector<doubl
             double xij = 0.5*(radius_of_cell_i*radius_of_cell_i - radius_of_cell_j*radius_of_cell_j + dij*dij)/dij;
 
             delta_V_c += M_PI*pow(radius_of_cell_i - xij,2)*(2*radius_of_cell_i - xij)/3.0;
-            
-            
+
             double dxijdd = 1.0 - 2.0*xij/dij;
             
             dVAdd += M_PI*dxijdd*(5.0*pow(radius_of_cell_i,2) + 3.0*pow(xij,2) - 8.0*radius_of_cell_i*xij)/3.0;
-            
         }
         
-        double VA = 4.0/3.0*M_PI*pow(radius_of_cell_i,3) - delta_V_c;
+        double V_A = 4.0/3.0*M_PI*pow(radius_of_cell_i,3) - delta_V_c;
         
-        /** Target volume of the cell 
-         *  \todo Doesn't say in the Buske paper how they calculate this, so 
-         * we need to look at this to be sure it's what we want
+        /**
+         * Target volume of the cell 
+         * \todo Doesn't say in the Buske paper how they calculate this, so 
+         * we need to look at this to be sure it's what we want (#1764)
          */ 
-        double VT = 5.0;
+        double V_T = 5.0;
       
-        double force_magnitude = -mCompressionEnergyParameter/VT*(VT - VA)*dVAdd;
+        double force_magnitude = -mCompressionEnergyParameter/V_T*(V_T - V_A)*dVAdd;
       
         rForces[node_global_index] += force_magnitude*unit_vector;      
     }
@@ -149,7 +155,7 @@ void BuskeCompressionForce<DIM>::AddForceContribution(std::vector<c_vector<doubl
 template<unsigned DIM>
 void BuskeCompressionForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
-    // No parameters to include
+    *rParamsFile << "\t\t\t<CompressionEnergyParameter>" << mCompressionEnergyParameter << "</CompressionEnergyParameter> \n";
 
     // Call method on direct parent class
     AbstractForce<DIM>::OutputForceParameters(rParamsFile);

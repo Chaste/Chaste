@@ -32,10 +32,32 @@ template<unsigned DIM>
 BuskeInteractionForce<DIM>::BuskeInteractionForce()
    : AbstractTwoBodyInteractionForce<DIM>(),
      mAdhesionEnergyParameter(200),        // Denoted by epsilon in Buske et al (2011) (doi:10.1371/journal.pcbi.1001045).
-     mDeformationEnergyParameter(4.0/3.0), // Denoted by D in Buske et al (2011) (doi:10.1371/journal.pcbi.1001045).
-     mCompressionEnergyParameter(1.0)      // Denoted by K in Buske et al (2011) (doi:10.1371/journal.pcbi.1001045).
-
+     mDeformationEnergyParameter(4.0/3.0) // Denoted by D in Buske et al (2011) (doi:10.1371/journal.pcbi.1001045).
 {
+}
+
+template<unsigned DIM>
+double BuskeInteractionForce<DIM>::GetAdhesionEnergyParameter()
+{
+    return mAdhesionEnergyParameter;
+}
+
+template<unsigned DIM>
+void BuskeInteractionForce<DIM>::SetAdhesionEnergyParameter(double adhesionEnergyParameter)
+{
+    mAdhesionEnergyParameter = adhesionEnergyParameter;
+}
+
+template<unsigned DIM>
+double BuskeInteractionForce<DIM>::GetDeformationEnergyParameter()
+{
+    return mDeformationEnergyParameter;
+}
+
+template<unsigned DIM>
+void BuskeInteractionForce<DIM>::SetDeformationEnergyParameter(double deformationEnergyParameter)
+{
+    mDeformationEnergyParameter = deformationEnergyParameter;
 }
 
 template<unsigned DIM>
@@ -118,6 +140,9 @@ double BuskeInteractionForce<DIM>::GetMagnitudeOfForce(double distanceBetweenNod
 template<unsigned DIM>
 void BuskeInteractionForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
+    *rParamsFile << "\t\t\t<AdhesionEnergyParameter>" << mAdhesionEnergyParameter << "</AdhesionEnergyParameter> \n";
+    *rParamsFile << "\t\t\t<DeformationEnergyParameter>" << mDeformationEnergyParameter << "</DeformationEnergyParameter> \n";
+
 	// Call method on direct parent class
 	AbstractTwoBodyInteractionForce<DIM>::OutputForceParameters(rParamsFile);
 }
