@@ -84,7 +84,7 @@ public:
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
         // Create a node-based cell population
-        NodeBasedCellPopulation<2> node_based_cell_population(mesh, *p_generating_mesh, cells);
+        NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
         node_based_cell_population.SetMechanicsCutOffLength(1.5);
 
         // Set up cell-based simulation

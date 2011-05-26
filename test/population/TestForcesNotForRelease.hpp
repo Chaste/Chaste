@@ -66,7 +66,7 @@ public:
 		cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
 		// Create a node-based cell population
-		NodeBasedCellPopulation<2> cell_population(mesh, *p_generating_mesh, cells);
+		NodeBasedCellPopulation<2> cell_population(mesh, cells);
 		cell_population.SetMechanicsCutOffLength(1.5);
 		cell_population.Update();
 
@@ -133,7 +133,7 @@ public:
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
         // Create a node-based cell population
-        NodeBasedCellPopulation<2> cell_population(mesh, *p_generating_mesh, cells);
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
         cell_population.SetMechanicsCutOffLength(1.5);
         cell_population.Update();
 
@@ -227,7 +227,7 @@ public:
                 cells.push_back(p_cell);
             }
 
-            NodeBasedCellPopulation<2> cell_population(mesh, generating_mesh, cells);
+            NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
             // Create a force object and set member variables
             BuskeInteractionForce<2> buske_force;
@@ -297,7 +297,7 @@ public:
                 cells.push_back(p_cell);
             }
 
-            NodeBasedCellPopulation<2> cell_population(mesh, generating_mesh, cells);
+            NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
             // Create a force object and set member variables
             BuskeCompressionForce<2> buske_compression_force;
