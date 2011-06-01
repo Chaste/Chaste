@@ -36,7 +36,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * An element class for use in the PottsMesh class.
- * 
+ *
  * The main difference between this and the Element class is that a
  * PottsElement can have a variable number of nodes associated with
  * it and these represent the lattice sites contained in the element.

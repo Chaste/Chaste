@@ -41,7 +41,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
  *
  * Length is scaled by natural length. \todo does this mean natural radius of a cell? If so at what age? (#1764)
  * Time is in hours.
- * 
+ *
  * This class specifically calculates the compression force which forms part of equation (A6) in the Buske paper.
  */
 template<unsigned DIM>
@@ -59,7 +59,7 @@ private:
         archive & boost::serialization::base_object<AbstractForce<DIM> >(*this);
         archive & mCompressionEnergyParameter;
     }
-    
+
     /**
      * Compression energy parameter.
      *
@@ -85,7 +85,7 @@ public:
 
     /**
      * Set mCompressionEnergyParameter.
-     * 
+     *
      * @param compressionEnergyParameter the new value of mCompressionEnergyParameter
      */
     void SetCompressionEnergyParameter(double compressionEnergyParameter);
@@ -100,10 +100,10 @@ public:
      * @return the set of neighbouring node indices.
      */
     std::set<unsigned> GetNeighbouringNodeWithinInteractionDistance(unsigned index, AbstractCellPopulation<DIM>& rCellPopulation);
-    
+
     /**
      * Overridden AddForceContribution() method.
-     * 
+     *
      * @param rForces a vector of forces on notes
      * @param rCellPopulation a cell population object
      */

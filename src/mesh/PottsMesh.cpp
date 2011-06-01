@@ -352,10 +352,9 @@ unsigned PottsMesh::DivideElement(PottsElement* pElement,
      * place the original element below (in the y direction) the new element; otherwise,
      * place it above.
      */
-
     unsigned half_num_nodes = num_nodes/2; // This will round down
-    assert(half_num_nodes>0);
-    assert(half_num_nodes<num_nodes);
+    assert(half_num_nodes > 0);
+    assert(half_num_nodes < num_nodes);
 
     // Find lowest element
     ///\todo this could be more efficient

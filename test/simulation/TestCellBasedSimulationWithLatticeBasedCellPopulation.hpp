@@ -641,10 +641,10 @@ public:
     }
 
     void TestExceptions() throw (Exception)
-	{
-		// Create mesh
-		TetrahedralMesh<2,2> mesh;
-		mesh.ConstructRectangularMesh(49, 49, true); // 50*50 nodes
+    {
+        // Create mesh
+        TetrahedralMesh<2,2> mesh;
+        mesh.ConstructRectangularMesh(49, 49, true); // 50*50 nodes
 
         // Create location indices
         std::vector<unsigned> real_node_indices;
@@ -658,28 +658,28 @@ public:
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, real_node_indices.size(), real_node_indices, DIFFERENTIATED);
 
-		// Create a cell population
-		LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
+        // Create a cell population
+        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
-		// Create a UpdateRule system
-		DiffusionUpdateRule<2> update_rule;
-		std::vector<AbstractUpdateRule<2>* > update_rule_collection;
-		update_rule_collection.push_back(&update_rule);
+        // Create a UpdateRule system
+        DiffusionUpdateRule<2> update_rule;
+        std::vector<AbstractUpdateRule<2>* > update_rule_collection;
+        update_rule_collection.push_back(&update_rule);
 
-		// Set up cell-based simulation
-		LatticeBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
-		simulator.SetOutputDirectory("TestDiffusionOfLargeNumberOfCells");
-		simulator.SetDt(0.1);
-		simulator.SetEndTime(5.0);
+        // Set up cell-based simulation
+        LatticeBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        simulator.SetOutputDirectory("TestDiffusionOfLargeNumberOfCells");
+        simulator.SetDt(0.1);
+        simulator.SetEndTime(5.0);
 
-		//Test that the simulation parameters are output correctly
-		std::string output_directory = "TestCellBasedSimulationOutputParameters";
-		OutputFileHandler output_file_handler(output_directory, false);
-		out_stream parameter_file = output_file_handler.OpenOutputFile("results.parameters");
-		// Try to write simulation parameters to file
-		TS_ASSERT_THROWS_THIS(simulator.OutputSimulationParameters(parameter_file),"OutputSimulationParameters() is not yet implemented for LatticeBasedCellBasedSimulation see #1453");
-		parameter_file->close();
-	}
+        //Test that the simulation parameters are output correctly
+        std::string output_directory = "TestCellBasedSimulationOutputParameters";
+        OutputFileHandler output_file_handler(output_directory, false);
+        out_stream parameter_file = output_file_handler.OpenOutputFile("results.parameters");
+        // Try to write simulation parameters to file
+        TS_ASSERT_THROWS_THIS(simulator.OutputSimulationParameters(parameter_file),"OutputSimulationParameters() is not yet implemented for LatticeBasedCellBasedSimulation see #1453");
+        parameter_file->close();
+    }
 };
 
 #endif /*TESTCELLBASEDSIMULATIONWITHLATTICEBASEDCELLPOPULATION_HPP_*/

@@ -472,7 +472,7 @@ public:
 
     /**
      * Overridden GetWidth() method.
-     * 
+     *
      * Calculate the 'width' of any dimension of the cell population by calling
      * GetWidth() on the mesh.
      *
@@ -481,7 +481,7 @@ public:
      */
     double GetWidth(const unsigned& rDimension);
 };
-#undef COVERAGE_IGNORE //Avoid prototypes being treated as code by gcov
+#undef COVERAGE_IGNORE // Avoid prototypes being treated as code by gcov
 
 #include "SerializationExportWrapper.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(LatticeBasedCellPopulation)

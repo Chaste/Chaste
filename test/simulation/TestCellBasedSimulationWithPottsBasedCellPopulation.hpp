@@ -85,7 +85,7 @@ public:
         simulator.SetEndTime(0.1);
 
         ///\todo Create an force law and pass it to the simulation
-        
+
         // Run simulation
         simulator.Solve();
 

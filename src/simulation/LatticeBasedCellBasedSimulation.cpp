@@ -295,11 +295,11 @@ const std::vector<AbstractUpdateRule<DIM>*> LatticeBasedCellBasedSimulation<DIM>
 template<unsigned DIM>
 void LatticeBasedCellBasedSimulation<DIM>::OutputSimulationParameters(out_stream& rParamsFile)
 {
-	// Currently this is not called from LatticeBasedCellBasedSimulation; see #1453 for a discussion on this for centre- and vertex-based cell population.
-	EXCEPTION("OutputSimulationParameters() is not yet implemented for LatticeBasedCellBasedSimulation see #1453");
+    // Currently this is not called from LatticeBasedCellBasedSimulation; see #1453 for a discussion on this for centre- and vertex-based cell population.
+    EXCEPTION("OutputSimulationParameters() is not yet implemented for LatticeBasedCellBasedSimulation see #1453");
 
-	// Call method on direct parent class
-	//CellBasedSimulation<DIM>::OutputSimulationParameters(rParamsFile);
+    // Call method on direct parent class
+    //CellBasedSimulation<DIM>::OutputSimulationParameters(rParamsFile);
 }
 
 /////////////////////////////////////////////////////////////////////////////

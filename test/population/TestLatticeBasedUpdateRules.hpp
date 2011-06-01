@@ -116,7 +116,7 @@ public:
         }
 
         {
-        	// Create an input archive
+            // Create an input archive
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
 

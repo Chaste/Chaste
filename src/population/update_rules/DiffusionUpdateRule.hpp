@@ -37,12 +37,12 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * An update rule class to model diffusion on the lattice.
- * 
- * A diffusion coefficient (defaulting to 1.0) is passed into the constructor. 
- * At each time step, a uniform random number r_i is generated for each cell i; 
- * if r_i > D*dt, where D denotes the diffusion coefficient and dt denotes the 
- * time step, then the cell is moved to a random free neighbouring site (if there 
- * are no free neighbouring sites, then the cell is not moved). 
+ *
+ * A diffusion coefficient (defaulting to 1.0) is passed into the constructor.
+ * At each time step, a uniform random number r_i is generated for each cell i;
+ * if r_i > D*dt, where D denotes the diffusion coefficient and dt denotes the
+ * time step, then the cell is moved to a random free neighbouring site (if there
+ * are no free neighbouring sites, then the cell is not moved).
  */
 template<unsigned DIM>
 class DiffusionUpdateRule : public AbstractUpdateRule<DIM>

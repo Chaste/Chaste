@@ -109,32 +109,32 @@ c_vector<double, DIM> BuskeInteractionForce<DIM>::CalculateForceBetweenNodes(uns
 
 template<unsigned DIM>
 double BuskeInteractionForce<DIM>::GetMagnitudeOfForce(double distanceBetweenNodes, double radiusOfCellOne, double radiusOfCellTwo)
-{      
-	double xij = 0.5*(radiusOfCellOne*radiusOfCellOne - radiusOfCellTwo*radiusOfCellTwo + distanceBetweenNodes*distanceBetweenNodes)/distanceBetweenNodes;
+{
+    double xij = 0.5*(radiusOfCellOne*radiusOfCellOne - radiusOfCellTwo*radiusOfCellTwo + distanceBetweenNodes*distanceBetweenNodes)/distanceBetweenNodes;
 
-	double dxijdd = 1.0 - 2.0*xij/distanceBetweenNodes;
+    double dxijdd = 1.0 - 2.0*xij/distanceBetweenNodes;
 
-	// Calculate contribution from adhesive interaction energy
-	double dWAdd = -2.0*mAdhesionEnergyParameter*M_PI*xij*dxijdd;
+    // Calculate contribution from adhesive interaction energy
+    double dWAdd = -2.0*mAdhesionEnergyParameter*M_PI*xij*dxijdd;
 
-	// Calculate contribution from deformation interaction energy
-	double dWDdd;
+    // Calculate contribution from deformation interaction energy
+    double dWDdd;
 
-	if (distanceBetweenNodes < radiusOfCellOne + radiusOfCellTwo)
-	{
-		dWDdd = -pow(radiusOfCellOne + radiusOfCellTwo - distanceBetweenNodes,1.5)
+    if (distanceBetweenNodes < radiusOfCellOne + radiusOfCellTwo)
+    {
+        dWDdd = -pow(radiusOfCellOne + radiusOfCellTwo - distanceBetweenNodes,1.5)
                 *pow(radiusOfCellOne*radiusOfCellTwo/(radiusOfCellOne+radiusOfCellTwo),0.5)
-			    /mDeformationEnergyParameter;
-	}
-	else  // no deformation energy contribution as too far apart
-	{
-		dWDdd = 0.0;
-	}
+                /mDeformationEnergyParameter;
+    }
+    else  // no deformation energy contribution as too far apart
+    {
+        dWDdd = 0.0;
+    }
 
-	// Calculate contribution from compression interaction energy Still todo
-//	double dWKdd = 0.0;    // This shouldn't be here - the compression force must be calculated for each cell individually
+    // Calculate contribution from compression interaction energy Still todo
+//    double dWKdd = 0.0;    // This shouldn't be here - the compression force must be calculated for each cell individually
 
-	return dWAdd + dWDdd; // + dWKdd;
+    return dWAdd + dWDdd; // + dWKdd;
 }
 
 template<unsigned DIM>
@@ -143,8 +143,8 @@ void BuskeInteractionForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
     *rParamsFile << "\t\t\t<AdhesionEnergyParameter>" << mAdhesionEnergyParameter << "</AdhesionEnergyParameter> \n";
     *rParamsFile << "\t\t\t<DeformationEnergyParameter>" << mDeformationEnergyParameter << "</DeformationEnergyParameter> \n";
 
-	// Call method on direct parent class
-	AbstractTwoBodyInteractionForce<DIM>::OutputForceParameters(rParamsFile);
+    // Call method on direct parent class
+    AbstractTwoBodyInteractionForce<DIM>::OutputForceParameters(rParamsFile);
 }
 
 /////////////////////////////////////////////////////////////////////////////

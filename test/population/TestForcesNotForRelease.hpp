@@ -51,24 +51,24 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create a simple mesh
-		unsigned num_cells_depth = 5;
-		unsigned num_cells_width = 5;
-		HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
+        unsigned num_cells_depth = 5;
+        unsigned num_cells_width = 5;
+        HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
 
-		// Create cells
-		std::vector<CellPtr> cells;
-		CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-		cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
-		// Create a node-based cell population
-		NodeBasedCellPopulation<2> cell_population(mesh, cells);
-		cell_population.SetMechanicsCutOffLength(1.5);
-		cell_population.Update();
+        // Create a node-based cell population
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+        cell_population.SetMechanicsCutOffLength(1.5);
+        cell_population.Update();
 
         // Create force
         BuskeInteractionForce<2> buske_force;
@@ -103,7 +103,7 @@ public:
         }
 
         buske_force.AddForceContribution(node_forces, cell_population);
-        
+
         // Test forces on nodes
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
@@ -158,7 +158,7 @@ public:
         }
 
         buske_compression_force.AddForceContribution(node_forces, cell_population);
-        
+
         // Test forces on nodes
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
@@ -170,20 +170,20 @@ public:
 
     void TestForceOutputParameters()
     {
-		std::string output_directory = "TestNotForReleaseForcesOutputParameters";
-		OutputFileHandler output_file_handler(output_directory, false);
+        std::string output_directory = "TestNotForReleaseForcesOutputParameters";
+        OutputFileHandler output_file_handler(output_directory, false);
 
-		// Test with BuskeInteractionForce
-		BuskeInteractionForce<2> buske_force;
-		buske_force.SetCutOffLength(1.5);
-		TS_ASSERT_EQUALS(buske_force.GetIdentifier(), "BuskeInteractionForce-2");
+        // Test with BuskeInteractionForce
+        BuskeInteractionForce<2> buske_force;
+        buske_force.SetCutOffLength(1.5);
+        TS_ASSERT_EQUALS(buske_force.GetIdentifier(), "BuskeInteractionForce-2");
 
-		out_stream buske_force_parameter_file = output_file_handler.OpenOutputFile("buske_results.parameters");
-		buske_force.OutputForceParameters(buske_force_parameter_file);
-		buske_force_parameter_file->close();
+        out_stream buske_force_parameter_file = output_file_handler.OpenOutputFile("buske_results.parameters");
+        buske_force.OutputForceParameters(buske_force_parameter_file);
+        buske_force_parameter_file->close();
 
-		std::string buske_force_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-		TS_ASSERT_EQUALS(system(("diff " + buske_force_results_dir + "buske_results.parameters notforrelease_cell_based/test/data/TestForcesNotForRelease/buske_results.parameters").c_str()), 0);
+        std::string buske_force_results_dir = output_file_handler.GetOutputDirectoryFullPath();
+        TS_ASSERT_EQUALS(system(("diff " + buske_force_results_dir + "buske_results.parameters notforrelease_cell_based/test/data/TestForcesNotForRelease/buske_results.parameters").c_str()), 0);
 
         // Test with BuskeCompressionForce
         BuskeCompressionForce<2> buske_compression_force;
@@ -219,10 +219,10 @@ public:
             boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
             for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {
-		        FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-		        p_model->SetCellProliferativeType(STEM);
+                FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+                p_model->SetCellProliferativeType(STEM);
 
-		        CellPtr p_cell(new Cell(p_state, p_model));
+                CellPtr p_cell(new Cell(p_state, p_model));
                 p_cell->SetBirthTime(-50.0);
                 cells.push_back(p_cell);
             }
@@ -234,7 +234,7 @@ public:
             buske_force.SetCutOffLength(1.7);
             buske_force.SetAdhesionEnergyParameter(12.0);
             buske_force.SetDeformationEnergyParameter(13.0);
-        
+
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
@@ -302,7 +302,7 @@ public:
             // Create a force object and set member variables
             BuskeCompressionForce<2> buske_compression_force;
             buske_compression_force.SetCompressionEnergyParameter(14.0);
-        
+
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 

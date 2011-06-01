@@ -104,13 +104,13 @@ public:
      *
      * @param rCellPopulation A cell population object
      * @param updateRuleCollection The cell movement rules to use in the simulation
-     * @param iterateRandomlyOverUpdateRuleCollection whether to iterate randomly over 
+     * @param iterateRandomlyOverUpdateRuleCollection whether to iterate randomly over
      *        mUpdateRuleCollection when updating cell locations (defaults to false)
-     * @param iterateRandomlyOverCells whether to iterate randomly over cells when 
+     * @param iterateRandomlyOverCells whether to iterate randomly over cells when
      *        updating cell locations (defaults to false)
-     * @param deleteCellPopulationAndForceCollection Whether to delete the cell population and force 
+     * @param deleteCellPopulationAndForceCollection Whether to delete the cell population and force
      *        collection on destruction to free up memory (defaults to false)
-     * @param initialiseCells whether to initialise cells (defaults to true, set to 
+     * @param initialiseCells whether to initialise cells (defaults to true, set to
      *        false when loading from an archive)
      */
     LatticeBasedCellBasedSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
@@ -144,7 +144,7 @@ public:
 
     /**
      * Outputs simulation parameters to file
-	 *
+     *
      * As this method is pure virtual, it must be overridden
      * in subclasses. Currently not used for Lattice Based Simulations.
      *

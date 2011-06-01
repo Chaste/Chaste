@@ -434,7 +434,7 @@ void PottsBasedCellPopulation::Update(bool hasHadBirthsOrDeaths)
 //
 //    if (!element_map.IsIdentityMap())
 //    {
-//    	// Fix up the mappings between CellPtrs and PottsElements
+//        // Fix up the mappings between CellPtrs and PottsElements
 //        std::map<Cell*, unsigned> old_map = this->mCellLocationMap;
 //
 //        this->mCellLocationMap.clear();
@@ -449,19 +449,19 @@ void PottsBasedCellPopulation::Update(bool hasHadBirthsOrDeaths)
 //
 //            if (element_map.IsDeleted(old_elem_index))
 //            {
-//            	/*\todo this is a kludge to remove the cell once a T2Swap occurs this is not included in the dead cells counter.
-//            	 * This should be included in the RemoveDeadCells method so the death is counted
-//            	 */
-//            	WARNING("Cell removed due to T2Swap this is not counted in the dead cells counter");
-//            	cell_iter = this->mCells.erase(cell_iter);
-//            	--cell_iter;
+//                /*\todo this is a kludge to remove the cell once a T2Swap occurs this is not included in the dead cells counter.
+//                 * This should be included in the RemoveDeadCells method so the death is counted
+//                 */
+//                WARNING("Cell removed due to T2Swap this is not counted in the dead cells counter");
+//                cell_iter = this->mCells.erase(cell_iter);
+//                --cell_iter;
 //            }
 //            else
 //            {
-//				unsigned new_elem_index = element_map.GetNewIndex(old_elem_index);
+//                unsigned new_elem_index = element_map.GetNewIndex(old_elem_index);
 //
-//				this->mLocationCellMap[new_elem_index] = *cell_iter;
-//				this->mCellLocationMap[(*cell_iter).get()] = new_elem_index;
+//                this->mLocationCellMap[new_elem_index] = *cell_iter;
+//                this->mCellLocationMap[(*cell_iter).get()] = new_elem_index;
 //            }
 //        }
 //
@@ -508,32 +508,32 @@ void PottsBasedCellPopulation::WriteResultsToFiles()
          cell_iter != this->mCells.end();
          ++cell_iter)
     {
-    	unsigned elem_index = this->GetLocationIndexUsingCell(*cell_iter);
+        unsigned elem_index = this->GetLocationIndexUsingCell(*cell_iter);
 
-    	// Hack that covers the case where the element is associated with a cell that has just been killed (#1129)
-		bool elem_corresponds_to_dead_cell = false;
+        // Hack that covers the case where the element is associated with a cell that has just been killed (#1129)
+        bool elem_corresponds_to_dead_cell = false;
 
-		if (this->mLocationCellMap[elem_index])
-		{
-			elem_corresponds_to_dead_cell = this->mLocationCellMap[elem_index]->IsDead();
-		}
+        if (this->mLocationCellMap[elem_index])
+        {
+            elem_corresponds_to_dead_cell = this->mLocationCellMap[elem_index]->IsDead();
+        }
 
-		// Write node data to file
-		if ( !(GetElement(elem_index)->IsDeleted()) && !elem_corresponds_to_dead_cell)
-		{
-			PottsElement* p_element = mrMesh.GetElement(elem_index);
+        // Write node data to file
+        if ( !(GetElement(elem_index)->IsDeleted()) && !elem_corresponds_to_dead_cell)
+        {
+            PottsElement* p_element = mrMesh.GetElement(elem_index);
 
-			unsigned num_nodes_in_element = p_element->GetNumNodes();
+            unsigned num_nodes_in_element = p_element->GetNumNodes();
 
-			// First write the number of Nodes belonging to this PottsElement
-			*mpVizElementsFile << num_nodes_in_element << " ";
+            // First write the number of Nodes belonging to this PottsElement
+            *mpVizElementsFile << num_nodes_in_element << " ";
 
-			// Then write the global index of each Node in this element
-			for (unsigned i=0; i<num_nodes_in_element; i++)
-			{
-				*mpVizElementsFile << p_element->GetNodeGlobalIndex(i) << " ";
-			}
-		}
+            // Then write the global index of each Node in this element
+            for (unsigned i=0; i<num_nodes_in_element; i++)
+            {
+                *mpVizElementsFile << p_element->GetNodeGlobalIndex(i) << " ";
+            }
+        }
     }
     *mpVizElementsFile << "\n";
 }
@@ -628,12 +628,11 @@ VertexMesh<2, 2>* PottsBasedCellPopulation::GetElementTessellation()
     return mpElementTessellation;
 }
 
-
 //template<unsigned DIM>
 void PottsBasedCellPopulation::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
-	// Call method on direct parent class
-	AbstractCellPopulation<2>::OutputCellPopulationParameters(rParamsFile);
+    // Call method on direct parent class
+    AbstractCellPopulation<2>::OutputCellPopulationParameters(rParamsFile);
 }
 
 /////////////////////////////////////////////////////////////////////////////

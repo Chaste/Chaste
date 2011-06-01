@@ -101,7 +101,7 @@ public:
 
     /**
      * Set mAdhesionEnergyParameter.
-     * 
+     *
      * @param adhesionEnergyParameter the new value of mAdhesionEnergyParameter
      */
     void SetAdhesionEnergyParameter(double adhesionEnergyParameter);
@@ -113,7 +113,7 @@ public:
 
     /**
      * Set mDeformationEnergyParameter.
-     * 
+     *
      * @param deformationEnergyParameter the new value of mDeformationEnergyParameter
      */
     void SetDeformationEnergyParameter(double deformationEnergyParameter);
@@ -132,7 +132,7 @@ public:
     /**
      * Calculate the magnitude of the force between two nodes that are a given distance apart and
      * are associated with given cell radii.
-     * 
+     *
      * @param distanceBetweenNodes the distance between two nodes
      * @param radiusOfCellOne radius of a cell
      * @param radiusOfCellTwo radius of a cell

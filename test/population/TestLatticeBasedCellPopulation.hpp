@@ -46,7 +46,7 @@ private:
     /**
      * Helper method. Create a single, wild type, differentiated cell and
      * return as a vector for passing into a cell population constructor.
-     * 
+     *
      * @param cellProliferativeType  the proliferative type of the cell (defaults to DIFFERENTIATED)
      */
     std::vector<CellPtr> CreateSingleCellPtr(CellProliferativeType cellProliferativeType=DIFFERENTIATED)
@@ -1153,7 +1153,7 @@ public:
             {
                 real_node_indices.push_back(2*i);
             }
-    
+
             // Create cells
             std::vector<CellPtr> cells;
             CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
@@ -1267,7 +1267,7 @@ public:
         real_node_indices.push_back(7);
         real_node_indices.push_back(8);
         real_node_indices.push_back(12);
-    
+
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
@@ -1402,10 +1402,10 @@ public:
         TS_ASSERT_THROWS_NOTHING(cell_population.WriteResultsToFiles());
 
         //Test that the cell population parameters are output correctly
-		out_stream parameter_file = output_file_handler.OpenOutputFile("results.parameters");
-		// Write cell population parameters to file
-		TS_ASSERT_THROWS_THIS(cell_population.OutputCellPopulationParameters(parameter_file),"OutputCellPopulationParameters() is not yet implemented for LatticeBasedCellPopulation see #1453");
-		parameter_file->close();
+        out_stream parameter_file = output_file_handler.OpenOutputFile("results.parameters");
+        // Write cell population parameters to file
+        TS_ASSERT_THROWS_THIS(cell_population.OutputCellPopulationParameters(parameter_file),"OutputCellPopulationParameters() is not yet implemented for LatticeBasedCellPopulation see #1453");
+        parameter_file->close();
 
     }
 
@@ -1421,7 +1421,7 @@ public:
         {
             real_node_indices.push_back(i);
         }
-    
+
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;

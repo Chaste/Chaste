@@ -76,7 +76,7 @@ public:
         {
             cells[i]->GetCellCycleModel()->SetCellProliferativeType(TRANSIT);
             dynamic_cast<FixedDurationGenerationBasedCellCycleModel*>(cells[i]->GetCellCycleModel())->SetMaxTransitGenerations(UINT_MAX);
-        	real_node_indices.push_back(21 * (9 + i/3) + 9 + i%3);
+            real_node_indices.push_back(21 * (9 + i/3) + 9 + i%3);
          }
 
         // Create a cell population
