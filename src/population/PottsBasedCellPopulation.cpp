@@ -539,6 +539,51 @@ void PottsBasedCellPopulation::WriteResultsToFiles()
 }
 
 //template<unsigned DIM>
+void PottsBasedCellPopulation::WriteCellVolumeResultsToFile()
+{    
+    // Write time to file
+    *(this->mpCellVolumesFile) << SimulationTime::Instance()->GetTime() << " ";
+
+    // Loop over cells and find associated elements so in the same order as the cells in output files
+     for (AbstractCellPopulation<2>::Iterator cell_iter = this->Begin();
+         cell_iter != this->End();
+         ++cell_iter)
+    {
+        unsigned elem_index = this->GetLocationIndexUsingCell(*cell_iter);
+
+        // Hack that covers the case where the element is associated with a cell that has just been killed (#1129)
+        bool elem_corresponds_to_dead_cell = false;
+
+        if (this->mLocationCellMap[elem_index])
+        {
+            elem_corresponds_to_dead_cell = this->mLocationCellMap[elem_index]->IsDead();
+        }
+
+        // Write node data to file
+        if ( !(GetElement(elem_index)->IsDeleted()) && !elem_corresponds_to_dead_cell)
+        {
+           // Write element index to file
+            *(this->mpCellVolumesFile) << elem_index << " ";
+
+            // Write cell ID to file
+            unsigned cell_index = cell_iter->GetCellId();
+            *(this->mpCellVolumesFile) << cell_index << " ";
+
+            // Write centroid location to file            
+            c_vector<double, 2> centroid_location = mrMesh.GetCentroidOfElement(elem_index); 
+            
+            *(this->mpCellVolumesFile) << centroid_location[0] << " ";
+            *(this->mpCellVolumesFile) << centroid_location[1] << " ";
+
+            // Write cell volume (in 3D) or area (in 2D) to file
+            double cell_volume = mrMesh.GetVolumeOfElement(elem_index);
+            *(this->mpCellVolumesFile) << cell_volume << " ";
+        }
+    }
+    *(this->mpCellVolumesFile) << "\n";
+}
+
+//template<unsigned DIM>
 void PottsBasedCellPopulation::GenerateCellResultsAndWriteToFiles()
 {
     // Set up cell type counter

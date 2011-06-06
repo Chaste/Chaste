@@ -751,6 +751,42 @@ void LatticeBasedCellPopulation<DIM>::WriteResultsToFiles()
 }
 
 template<unsigned DIM>
+void LatticeBasedCellPopulation<DIM>::WriteCellVolumeResultsToFile()
+{   
+    // Write time to file
+    *(this->mpCellVolumesFile) << SimulationTime::Instance()->GetTime() << " ";
+
+    // Loop over cells
+    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter=this->Begin(); 
+         cell_iter!=this->End(); ++cell_iter)
+    {
+        // Get the index of the corresponding node in mrMesh
+        unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
+
+        // Cell volumes all one (equal-sized lattice sites)
+        double cell_volume = 1.0;
+           
+        // Write node index to file
+        *(this->mpCellVolumesFile) << node_index << " ";
+
+        // Write cell ID to file
+        unsigned cell_index = cell_iter->GetCellId();
+        *(this->mpCellVolumesFile) << cell_index << " ";
+
+        // Write node location to file
+        c_vector<double, DIM> node_location = this->GetNode(node_index)->rGetLocation();
+        for (unsigned i=0; i<DIM; i++)
+        {
+            *(this->mpCellVolumesFile) << node_location[i] << " ";
+        }
+
+        // Write cell volume (in 3D) or area (in 2D) to file
+        *(this->mpCellVolumesFile) << cell_volume << " ";
+    }
+    *(this->mpCellVolumesFile) << "\n";
+}
+
+template<unsigned DIM>
 void LatticeBasedCellPopulation<DIM>::GenerateCellResults(unsigned locationIndex,
                                                   std::vector<unsigned>& rCellProliferativeTypeCounter,
                                                   std::vector<unsigned>& rCellCyclePhaseCounter)

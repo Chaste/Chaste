@@ -274,6 +274,11 @@ public:
      * Overridden WriteResultsToFiles() method.
      */
     void WriteResultsToFiles();
+                
+    /** 
+     * Overridden WriteCellVolumeResultsToFile() method.
+     */
+    void WriteCellVolumeResultsToFile();   
 
     /**
      * Overridden GenerateCellResultsAndWriteToFiles() method.
