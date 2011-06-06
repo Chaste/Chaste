@@ -41,6 +41,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "HoneycombMeshGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "BuskeInteractionForce.hpp"
+#include "BuskeCompressionForce.hpp"
 
 class TestCellBasedSimulationWithNodeBasedCellPopulation : public AbstractCellBasedTestSuite
 {
@@ -66,7 +67,7 @@ public:
      * Create a simulation of a NodeBasedCellPopulation with a BuskeInteractionForce system.
      * Test that no exceptions are thrown, and write the results to file.
      */
-    void TestSimpleMonolayer() throw (Exception)
+    void TestSimpleMonolayerWithBuskeInteractionForce() throw (Exception)
     {
         // Create a simple mesh
         unsigned num_cells_depth = 5;
@@ -89,13 +90,18 @@ public:
 
         // Set up cell-based simulation
         CellBasedSimulation<2> simulator(node_based_cell_population);
-        simulator.SetOutputDirectory("TestCellBasedSimulationWithBuskeInteractionForce");
+        simulator.SetOutputDirectory("TestCellBasedSimulationWithBuskeForces");
         simulator.SetEndTime(10.0);
 
         // Create a force law and pass it to the simulation
-        BuskeInteractionForce<2> buske_force;
-        buske_force.SetCutOffLength(1.5);
-        simulator.AddForce(&buske_force);
+        BuskeInteractionForce<2> buske_interaction_force;
+        buske_interaction_force.SetAdhesionEnergyParameter(0.002);
+        buske_interaction_force.SetCutOffLength(3.0);
+        simulator.AddForce(&buske_interaction_force);
+
+        // Create a force law and pass it to the simulation
+        //BuskeCompressionForce<2> buske_compression_force;
+        //simulator.AddForce(&buske_compression_force);
 
         simulator.Solve();
 
@@ -116,6 +122,68 @@ public:
 
         TS_ASSERT(min_distance_between_cells > 1e-3);
     }
+
+
+    /**
+     * Create a simulation of a NodeBasedCellPopulation with a BuskeInteractionForce system.
+     * Test that no exceptions are thrown, and write the results to file.
+     */
+    void TestSimpleMonolayerWithBuskeCompressionForce() throw (Exception)
+    {
+        // Create a simple mesh
+        unsigned num_cells_depth = 5;
+        unsigned num_cells_width = 5;
+        HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
+        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+
+        // Convert this to a NodesOnlyMesh
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), TRANSIT);
+
+        // Create a node-based cell population
+        NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
+        node_based_cell_population.SetMechanicsCutOffLength(1.5);
+
+        // Set up cell-based simulation
+        CellBasedSimulation<2> simulator(node_based_cell_population);
+        simulator.SetOutputDirectory("TestCellBasedSimulationWithBuskeCompressionForce");
+        simulator.SetEndTime(10.0);
+
+        // Create a force law and pass it to the simulation
+        BuskeCompressionForce<2> buske_compression_force;
+        simulator.AddForce(&buske_compression_force);
+
+
+
+        simulator.Solve();
+
+        // Check that nothing's gone badly wrong by testing that nodes aren't too close together
+        double min_distance_between_cells = 1.0;
+
+        for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+        {
+            for (unsigned j=i+1; j<simulator.rGetCellPopulation().GetNumNodes(); j++)
+            {
+                double distance = norm_2(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()-simulator.rGetCellPopulation().GetNode(j)->rGetLocation());
+                if (distance < min_distance_between_cells)
+                {
+                    min_distance_between_cells = distance;
+                }
+            }
+        }
+
+        TS_ASSERT(min_distance_between_cells > 1e-3);
+    }
+
+
+
+
+
 };
 
 #endif /*TESTCELLBASEDSIMULATIONWITHNODEBASEDCELLPOPULATION_HPP_*/

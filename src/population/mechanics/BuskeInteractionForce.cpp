@@ -27,6 +27,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "BuskeInteractionForce.hpp"
+#include "Debug.hpp"
 
 template<unsigned DIM>
 BuskeInteractionForce<DIM>::BuskeInteractionForce()
@@ -112,10 +113,10 @@ double BuskeInteractionForce<DIM>::GetMagnitudeOfForce(double distanceBetweenNod
 {
     double xij = 0.5*(radiusOfCellOne*radiusOfCellOne - radiusOfCellTwo*radiusOfCellTwo + distanceBetweenNodes*distanceBetweenNodes)/distanceBetweenNodes;
 
-    double dxijdd = 1.0 - 2.0*xij/distanceBetweenNodes;
+    double dxijdd = 1.0 - xij/distanceBetweenNodes;
 
     // Calculate contribution from adhesive interaction energy
-    double dWAdd = -2.0*mAdhesionEnergyParameter*M_PI*xij*dxijdd;
+    double dWAdd = 2.0*mAdhesionEnergyParameter*M_PI*xij*dxijdd;
 
     // Calculate contribution from deformation interaction energy
     double dWDdd;
@@ -130,9 +131,6 @@ double BuskeInteractionForce<DIM>::GetMagnitudeOfForce(double distanceBetweenNod
     {
         dWDdd = 0.0;
     }
-
-    // Calculate contribution from compression interaction energy Still todo
-//    double dWKdd = 0.0;    // This shouldn't be here - the compression force must be calculated for each cell individually
 
     return dWAdd + dWDdd; // + dWKdd;
 }
