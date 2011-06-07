@@ -27,7 +27,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "BuskeInteractionForce.hpp"
-#include "Debug.hpp"
 
 template<unsigned DIM>
 BuskeInteractionForce<DIM>::BuskeInteractionForce()

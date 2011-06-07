@@ -27,7 +27,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "BuskeCompressionForce.hpp"
-#include "Debug.hpp"
 
 template<unsigned DIM>
 BuskeCompressionForce<DIM>::BuskeCompressionForce()
@@ -71,7 +70,7 @@ std::set<unsigned> BuskeCompressionForce<DIM>::GetNeighbouringNodeWithinInteract
 			// Calculate the distance between the two nodes
 			double distance_between_nodes = norm_2(unit_vector);
 
-			// Determine cell radii
+			///\todo Determine cell radii (see #1762 and #1764)
 			//    CellPtr p_cell_A = rCellPopulation.GetCellUsingLocationIndex(nodeAGlobalIndex);
 			//    CellPtr p_cell_B = rCellPopulation.GetCellUsingLocationIndex(nodeBGlobalIndex);
 
@@ -94,7 +93,6 @@ template<unsigned DIM>
 void BuskeCompressionForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
                                                  AbstractCellPopulation<DIM>& rCellPopulation)
 {
-    double radius_of_cell_i;
     c_vector<double, DIM> unit_vector;
 
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
@@ -107,7 +105,10 @@ void BuskeCompressionForce<DIM>::AddForceContribution(std::vector<c_vector<doubl
         std::set<unsigned> neighbouring_node_indices = GetNeighbouringNodeWithinInteractionDistance(node_global_index, rCellPopulation);
 
         double delta_V_c = 0.0;
-        c_vector<double, DIM> dVAdd_vector=zero_vector<double>(DIM);
+        c_vector<double, DIM> dVAdd_vector = zero_vector<double>(DIM);
+
+        ///\todo Determine radius of cell i (see #1762 and #1764)
+        double radius_of_cell_i = 1.0;
 
         for (std::set<unsigned>::iterator iter = neighbouring_node_indices.begin();
              iter != neighbouring_node_indices.end();
@@ -125,17 +126,13 @@ void BuskeCompressionForce<DIM>::AddForceContribution(std::vector<c_vector<doubl
 
             unit_vector /= dij;
 
-            // Determine cell radii
-            //    CellPtr p_cell_A = rCellPopulation.GetCellUsingLocationIndex(nodeAGlobalIndex);
-            //    CellPtr p_cell_B = rCellPopulation.GetCellUsingLocationIndex(nodeBGlobalIndex);
-
-            radius_of_cell_i = 1.0;
+            ///\todo Determine radius of cell j (see #1762 and #1764)
             double radius_of_cell_j = 1.0;
-            double dVAdd=0.0;
+
+            double dVAdd = 0.0;
 
             if (dij < radius_of_cell_i + radius_of_cell_j)
             {
-
 				double xij = 0.5*(radius_of_cell_i*radius_of_cell_i - radius_of_cell_j*radius_of_cell_j + dij*dij)/dij;
 
 				delta_V_c += M_PI*pow(radius_of_cell_i - xij,2)*(2*radius_of_cell_i - xij)/3.0;
@@ -145,7 +142,7 @@ void BuskeCompressionForce<DIM>::AddForceContribution(std::vector<c_vector<doubl
 				dVAdd = M_PI*dxijdd*(5.0*pow(radius_of_cell_i,2) + 3.0*pow(xij,2) - 8.0*radius_of_cell_i*xij)/3.0;
             }
 
-            dVAdd_vector+=dVAdd*unit_vector;
+            dVAdd_vector += dVAdd*unit_vector;
         }
 
         double V_A = 4.0/3.0*M_PI*pow(radius_of_cell_i,3) - delta_V_c;
@@ -157,11 +154,8 @@ void BuskeCompressionForce<DIM>::AddForceContribution(std::vector<c_vector<doubl
          */
         double V_T = 5.0;
 
-        /**
-        * The sign in force_magnitude is different from the one in equation A3 in the Buske paper.
-        */
+        // The sign in force_magnitude is different from the one in equation A3 in the Buske paper
         rForces[node_global_index] += -mCompressionEnergyParameter/V_T*(V_T - V_A)*dVAdd_vector;
-
     }
 }
 
@@ -185,4 +179,3 @@ template class BuskeCompressionForce<3>;
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(BuskeCompressionForce)
-

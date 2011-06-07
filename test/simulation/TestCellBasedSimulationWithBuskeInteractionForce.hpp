@@ -34,7 +34,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CellBasedSimulationArchiver.hpp"
 
 #include "AbstractCellBasedTestSuite.hpp"
-
 #include "CellsGenerator.hpp"
 #include "CellBasedSimulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
@@ -99,10 +98,6 @@ public:
         buske_interaction_force.SetCutOffLength(3.0);
         simulator.AddForce(&buske_interaction_force);
 
-        // Create a force law and pass it to the simulation
-        //BuskeCompressionForce<2> buske_compression_force;
-        //simulator.AddForce(&buske_compression_force);
-
         simulator.Solve();
 
         // Check that nothing's gone badly wrong by testing that nodes aren't too close together
@@ -122,7 +117,6 @@ public:
 
         TS_ASSERT(min_distance_between_cells > 1e-3);
     }
-
 
     /**
      * Create a simulation of a NodeBasedCellPopulation with a BuskeInteractionForce system.
@@ -158,8 +152,6 @@ public:
         BuskeCompressionForce<2> buske_compression_force;
         simulator.AddForce(&buske_compression_force);
 
-
-
         simulator.Solve();
 
         // Check that nothing's gone badly wrong by testing that nodes aren't too close together
@@ -179,11 +171,6 @@ public:
 
         TS_ASSERT(min_distance_between_cells > 1e-3);
     }
-
-
-
-
-
 };
 
 #endif /*TESTCELLBASEDSIMULATIONWITHNODEBASEDCELLPOPULATION_HPP_*/
