@@ -673,18 +673,6 @@ void LatticeBasedCellPopulation<DIM>::Validate()
 //////////////////////////////////////////////////////////////////////////////
 
 template<unsigned DIM>
-void LatticeBasedCellPopulation<DIM>::CreateOutputFiles(const std::string& rDirectory, bool cleanOutputDirectory)
-{
-    AbstractCellPopulation<DIM>::CreateOutputFiles(rDirectory, cleanOutputDirectory);
-}
-
-template<unsigned DIM>
-void LatticeBasedCellPopulation<DIM>::CloseOutputFiles()
-{
-    AbstractCellPopulation<DIM>::CloseOutputFiles();
-}
-
-template<unsigned DIM>
 void LatticeBasedCellPopulation<DIM>::WriteResultsToFiles()
 {
     double time = SimulationTime::Instance()->GetTime();
@@ -739,6 +727,10 @@ void LatticeBasedCellPopulation<DIM>::WriteResultsToFiles()
     if (this->mOutputCellAges)
     {
         *(this->mpCellAgesFile) << time << "\t";
+    }
+    if (this->mOutputCellVolumes)
+    {
+        WriteCellVolumeResultsToFile();
     }
 
     GenerateCellResultsAndWriteToFiles();

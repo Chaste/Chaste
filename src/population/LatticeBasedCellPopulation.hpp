@@ -342,19 +342,6 @@ public:
     void Update(bool hasHadBirthsOrDeaths=true);
 
     /**
-     * Overridden CreateOutputFiles() method.
-     *
-     * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
-     * @param cleanOutputDirectory  whether to delete the contents of the output directory prior to output file creation
-     */
-    void CreateOutputFiles(const std::string& rDirectory, bool cleanOutputDirectory);
-
-    /**
-     * Overridden CloseOutputFiles() method.
-     */
-    void CloseOutputFiles();
-
-    /**
      * Overridden WriteResultsToFiles() method.
      */
     void WriteResultsToFiles();

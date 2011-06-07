@@ -1350,6 +1350,7 @@ public:
         cell_population.SetOutputCellAncestors(true);
         cell_population.SetOutputCellAges(true);
         cell_population.SetOutputCellVariables(true);
+        cell_population.SetOutputCellVolumes(true);
 
         // For coverage of WriteResultsToFiles()
         boost::shared_ptr<AbstractCellProperty> p_state(cell_population.GetCellPropertyRegistry()->Get<WildTypeCellMutationState>());
@@ -1381,6 +1382,7 @@ public:
         TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizancestors     notforrelease_cell_based/test/data/TestLatticeBasedCellPopulationWriters/results.vizancestors").c_str()), 0);
         TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellmutationstates.dat     notforrelease_cell_based/test/data/TestLatticeBasedCellPopulationWriters/cellmutationstates.dat").c_str()), 0);
         TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellages.dat     notforrelease_cell_based/test/data/TestLatticeBasedCellPopulationWriters/cellages.dat").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellareas.dat     notforrelease_cell_based/test/data/TestLatticeBasedCellPopulationWriters/cellareas.dat").c_str()), 0);
 
         // Test the GetCellMutationStateCount function
         std::vector<unsigned> cell_mutation_states = cell_population.GetCellMutationStateCount();
@@ -1401,12 +1403,12 @@ public:
         // For coverage
         TS_ASSERT_THROWS_NOTHING(cell_population.WriteResultsToFiles());
 
-        //Test that the cell population parameters are output correctly
+        // Test that the cell population parameters are output correctly
         out_stream parameter_file = output_file_handler.OpenOutputFile("results.parameters");
+
         // Write cell population parameters to file
         TS_ASSERT_THROWS_THIS(cell_population.OutputCellPopulationParameters(parameter_file),"OutputCellPopulationParameters() is not yet implemented for LatticeBasedCellPopulation see #1453");
         parameter_file->close();
-
     }
 
     void TestValidateLatticeBasedCellPopulation()
