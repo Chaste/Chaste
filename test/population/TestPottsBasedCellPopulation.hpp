@@ -245,6 +245,62 @@ public:
         TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(1)->GetNodeGlobalIndex(0), 2u);
         TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(1)->GetNodeGlobalIndex(1), 3u);
     }
+
+    void TestPottsBasedCellPopulationWriters()
+    {
+        std::string output_directory = "TestPottsBasedCellPopulationWriters";
+        OutputFileHandler output_file_handler(output_directory, false);
+
+        // Create a simple 2D PottsMesh
+        PottsMeshGenerator generator(4, 4, 2, 2, 2, 2);
+        PottsMesh* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+        // Create cell population
+        PottsBasedCellPopulation cell_population(*p_mesh, cells);
+
+        TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "PottsBasedCellPopulation");
+
+        cell_population.SetCellAncestorsToLocationIndices();
+        cell_population.SetOutputCellIdData(true);
+        cell_population.SetOutputCellMutationStates(true);
+        cell_population.SetOutputCellProliferativeTypes(true);
+        cell_population.SetOutputCellCyclePhases(true);
+        cell_population.SetOutputCellAncestors(true);
+        cell_population.SetOutputCellAges(true);
+        cell_population.SetOutputCellVariables(true);
+        cell_population.SetOutputCellVolumes(true);
+
+        TS_ASSERT_THROWS_NOTHING(cell_population.CreateOutputFiles(output_directory, false));
+
+        cell_population.WriteResultsToFiles();
+
+        TS_ASSERT_THROWS_NOTHING(cell_population.CloseOutputFiles());
+
+        // Compare output with saved files of what they should look like
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.viznodes     notforrelease_cell_based/test/data/TestPottsBasedCellPopulationWriters/results.viznodes").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizcelltypes     notforrelease_cell_based/test/data/TestPottsBasedCellPopulationWriters/results.vizcelltypes").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizancestors     notforrelease_cell_based/test/data/TestPottsBasedCellPopulationWriters/results.vizancestors").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellmutationstates.dat     notforrelease_cell_based/test/data/TestPottsBasedCellPopulationWriters/cellmutationstates.dat").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellages.dat     notforrelease_cell_based/test/data/TestPottsBasedCellPopulationWriters/cellages.dat").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellareas.dat     notforrelease_cell_based/test/data/TestPottsBasedCellPopulationWriters/cellareas.dat").c_str()), 0);
+
+        // Test that the cell population parameters are output correctly
+        out_stream parameter_file = output_file_handler.OpenOutputFile("results.parameters");
+
+        // Write cell population parameters to file
+        cell_population.OutputCellPopulationParameters(parameter_file);
+        parameter_file->close();
+
+        // Compare output with saved files of what they should look like
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.parameters    notforrelease_cell_based/test/data/TestPottsBasedCellPopulationWriters/results.parameters").c_str()), 0);
+    }
 };
 
 #endif /*TESTPOTTSBASEDCELLPOPULATION_HPP_*/

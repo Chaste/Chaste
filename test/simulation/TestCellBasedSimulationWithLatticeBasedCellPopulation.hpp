@@ -672,10 +672,11 @@ public:
         simulator.SetDt(0.1);
         simulator.SetEndTime(5.0);
 
-        //Test that the simulation parameters are output correctly
+        // Test that the simulation parameters are output correctly
         std::string output_directory = "TestCellBasedSimulationOutputParameters";
         OutputFileHandler output_file_handler(output_directory, false);
         out_stream parameter_file = output_file_handler.OpenOutputFile("results.parameters");
+
         // Try to write simulation parameters to file
         TS_ASSERT_THROWS_THIS(simulator.OutputSimulationParameters(parameter_file),"OutputSimulationParameters() is not yet implemented for LatticeBasedCellBasedSimulation see #1453");
         parameter_file->close();

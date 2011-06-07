@@ -547,7 +547,7 @@ public:
             TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(3)->GetNodeGlobalIndex(0), 1u);
         }
         {
-            //Testing Exceptions
+            // Testing Exceptions
 
             // Make four nodes
             std::vector<Node<2>*> basic_nodes;
