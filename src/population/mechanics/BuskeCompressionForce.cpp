@@ -70,7 +70,7 @@ std::set<unsigned> BuskeCompressionForce<DIM>::GetNeighbouringNodeWithinInteract
 			// Calculate the distance between the two nodes
 			double distance_between_nodes = norm_2(unit_vector);
 
-			///\todo Determine cell radii (see #1762 and #1764)
+			///\todo Determine cell radii (see #1764)
 			//    CellPtr p_cell_A = rCellPopulation.GetCellUsingLocationIndex(nodeAGlobalIndex);
 			//    CellPtr p_cell_B = rCellPopulation.GetCellUsingLocationIndex(nodeBGlobalIndex);
 
@@ -107,7 +107,7 @@ void BuskeCompressionForce<DIM>::AddForceContribution(std::vector<c_vector<doubl
         double delta_V_c = 0.0;
         c_vector<double, DIM> dVAdd_vector = zero_vector<double>(DIM);
 
-        ///\todo Determine radius of cell i (see #1762 and #1764)
+        ///\todo Determine radius of cell i (see #1764)
         double radius_of_cell_i = 1.0;
 
         for (std::set<unsigned>::iterator iter = neighbouring_node_indices.begin();
@@ -126,7 +126,7 @@ void BuskeCompressionForce<DIM>::AddForceContribution(std::vector<c_vector<doubl
 
             unit_vector /= dij;
 
-            ///\todo Determine radius of cell j (see #1762 and #1764)
+            ///\todo Determine radius of cell j (see #1764)
             double radius_of_cell_j = 1.0;
 
             double dVAdd = 0.0;
