@@ -27,6 +27,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "BuskeCompressionForce.hpp"
+#include "NodeBasedCellPopulation.hpp"
 
 template<unsigned DIM>
 BuskeCompressionForce<DIM>::BuskeCompressionForce()
@@ -48,20 +49,29 @@ void BuskeCompressionForce<DIM>::SetCompressionEnergyParameter(double compressio
 }
 
 template<unsigned DIM>
-std::set<unsigned> BuskeCompressionForce<DIM>::GetNeighbouringNodeWithinInteractionDistance(unsigned index, AbstractCellPopulation<DIM>& rCellPopulation)
+std::set<unsigned> BuskeCompressionForce<DIM>::GetNeighbouringNodeIndicesWithinInteractionDistance(unsigned index, AbstractCellPopulation<DIM>& rCellPopulation)
 {
-    std::set<unsigned> neighbouring_node_indices;
+    NodesOnlyMesh<DIM>& r_mesh = static_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation)->rGetMesh();
 
+    // Get the location of this node
+    c_vector<double, DIM> node_i_location = rCellPopulation.GetNode(index)->rGetLocation();
+
+    // Get the radius of the cell corresponding to this node
+    double radius_of_cell_i = r_mesh.GetCellRadius(index);
+
+    // Loop over cells in the population
+    std::set<unsigned> neighbouring_node_indices;
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
          cell_iter != rCellPopulation.End();
          ++cell_iter)
     {
+        // Get the node index corresponding to this cell
         unsigned node_j_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
 
-        if (node_j_index != index) // Only return the neighbours not the original node
+        // Only return the neighbours, not the original node
+        if (node_j_index != index)
         {
-			// Get the node locations
-			c_vector<double, DIM> node_i_location = rCellPopulation.GetNode(index)->rGetLocation();
+			// Get the location of this node
 			c_vector<double, DIM> node_j_location = rCellPopulation.GetNode(node_j_index)->rGetLocation();
 
 			// Get the unit vector parallel to the line joining the two nodes (assuming no periodicities etc.)
@@ -70,17 +80,14 @@ std::set<unsigned> BuskeCompressionForce<DIM>::GetNeighbouringNodeWithinInteract
 			// Calculate the distance between the two nodes
 			double distance_between_nodes = norm_2(unit_vector);
 
-			///\todo Determine cell radii (see #1764)
-			//    CellPtr p_cell_A = rCellPopulation.GetCellUsingLocationIndex(nodeAGlobalIndex);
-			//    CellPtr p_cell_B = rCellPopulation.GetCellUsingLocationIndex(nodeBGlobalIndex);
+            // Get the radius of the cell corresponding to this node
+            double radius_of_cell_j = r_mesh.GetCellRadius(node_j_index);
 
-			double radius_of_cell_i = 1.0;
-			double radius_of_cell_j = 1.0;
-
+            // If the cells are close enough to exert a force on each other...
 			double max_interaction_distance = radius_of_cell_i + radius_of_cell_j;
-
 			if (distance_between_nodes < max_interaction_distance)
 			{
+			    // ...then add this node index to the set of neighbouring node indices
 				neighbouring_node_indices.insert(node_j_index);
 			}
 		}
@@ -91,31 +98,39 @@ std::set<unsigned> BuskeCompressionForce<DIM>::GetNeighbouringNodeWithinInteract
 
 template<unsigned DIM>
 void BuskeCompressionForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
-                                                 AbstractCellPopulation<DIM>& rCellPopulation)
+                                                      AbstractCellPopulation<DIM>& rCellPopulation)
 {
+    // This force class is defined for NodeBasedCellPopulations only
+    assert(dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL);
+
     c_vector<double, DIM> unit_vector;
 
+    // Loop over cells in the population
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
          cell_iter != rCellPopulation.End();
          ++cell_iter)
     {
-        unsigned node_global_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
+        // Get the node index corresponding to this cell
+        unsigned node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
 
-        // Get all of the neighbouring cells
-        std::set<unsigned> neighbouring_node_indices = GetNeighbouringNodeWithinInteractionDistance(node_global_index, rCellPopulation);
+        // Get the location of this node
+        c_vector<double, DIM> node_i_location = rCellPopulation.GetNode(node_index)->rGetLocation();
+
+        // Get the radius of this cell
+        double radius_of_cell_i = static_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation)->rGetMesh().GetCellRadius(node_index);
 
         double delta_V_c = 0.0;
         c_vector<double, DIM> dVAdd_vector = zero_vector<double>(DIM);
 
-        ///\todo Determine radius of cell i (see #1764)
-        double radius_of_cell_i = 1.0;
+        // Get the set of node indices corresponding to this cell's neighbours
+        std::set<unsigned> neighbouring_node_indices = GetNeighbouringNodeIndicesWithinInteractionDistance(node_index, rCellPopulation);
 
+        // Loop over this set
         for (std::set<unsigned>::iterator iter = neighbouring_node_indices.begin();
              iter != neighbouring_node_indices.end();
              ++iter)
         {
-            // Get the node locations
-            c_vector<double, DIM> node_i_location = rCellPopulation.GetNode(node_global_index)->rGetLocation();
+            // Get the location of this node
             c_vector<double, DIM> node_j_location = rCellPopulation.GetNode(*iter)->rGetLocation();
 
             // Get the unit vector parallel to the line joining the two nodes (assuming no periodicities etc.)
@@ -126,23 +141,22 @@ void BuskeCompressionForce<DIM>::AddForceContribution(std::vector<c_vector<doubl
 
             unit_vector /= dij;
 
-            ///\todo Determine radius of cell j (see #1764)
-            double radius_of_cell_j = 1.0;
+            // Get the radius of the cell corresponding to this node
+            double radius_of_cell_j = static_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation)->rGetMesh().GetCellRadius(*iter);
 
-            double dVAdd = 0.0;
-
+            // If the cells are close enough to exert a force on each other...
             if (dij < radius_of_cell_i + radius_of_cell_j)
             {
+                // ...then compute the adhesion force and add it to the vector of forces...
 				double xij = 0.5*(radius_of_cell_i*radius_of_cell_i - radius_of_cell_j*radius_of_cell_j + dij*dij)/dij;
-
-				delta_V_c += M_PI*pow(radius_of_cell_i - xij,2)*(2*radius_of_cell_i - xij)/3.0;
-
 				double dxijdd = 1.0 - xij/dij;
+				double dVAdd = M_PI*dxijdd*(5.0*pow(radius_of_cell_i,2) + 3.0*pow(xij,2) - 8.0*radius_of_cell_i*xij)/3.0;
 
-				dVAdd = M_PI*dxijdd*(5.0*pow(radius_of_cell_i,2) + 3.0*pow(xij,2) - 8.0*radius_of_cell_i*xij)/3.0;
+                dVAdd_vector += dVAdd*unit_vector;
+
+                // ...and add the contribution to the compression force acting on cell i
+                delta_V_c += M_PI*pow(radius_of_cell_i - xij,2)*(2*radius_of_cell_i - xij)/3.0;
             }
-
-            dVAdd_vector += dVAdd*unit_vector;
         }
 
         double V_A = 4.0/3.0*M_PI*pow(radius_of_cell_i,3) - delta_V_c;
@@ -154,8 +168,8 @@ void BuskeCompressionForce<DIM>::AddForceContribution(std::vector<c_vector<doubl
          */
         double V_T = 5.0;
 
-        // The sign in force_magnitude is different from the one in equation A3 in the Buske paper
-        rForces[node_global_index] += -mCompressionEnergyParameter/V_T*(V_T - V_A)*dVAdd_vector;
+        // Note: the sign in force_magnitude is different from the one in equation (A3) in the Buske paper
+        rForces[node_index] += -mCompressionEnergyParameter/V_T*(V_T - V_A)*dVAdd_vector;
     }
 }
 

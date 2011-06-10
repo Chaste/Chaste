@@ -65,6 +65,9 @@ c_vector<double, DIM> BuskeInteractionForce<DIM>::CalculateForceBetweenNodes(uns
                                                                              unsigned nodeBGlobalIndex,
                                                                              AbstractCellPopulation<DIM>& rCellPopulation)
 {
+    // This force class is defined for NodeBasedCellPopulations only
+    assert(dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL);
+
     // We should only ever calculate the force between two distinct nodes
     assert(nodeAGlobalIndex != nodeBGlobalIndex);
 
@@ -94,12 +97,10 @@ c_vector<double, DIM> BuskeInteractionForce<DIM>::CalculateForceBetweenNodes(uns
     // Normalize the unit vector
     unit_vector /= distance_between_nodes;
 
-    // Determine cell radii
-//    CellPtr p_cell_A = rCellPopulation.GetCellUsingLocationIndex(nodeAGlobalIndex);
-//    CellPtr p_cell_B = rCellPopulation.GetCellUsingLocationIndex(nodeBGlobalIndex);
-
-    double radius_of_cell_one = 1.0;
-    double radius_of_cell_two = 1.0;
+    // Get the cell radii
+    NodesOnlyMesh<DIM>& r_mesh = static_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation)->rGetMesh();
+    double radius_of_cell_one = r_mesh.GetCellRadius(nodeAGlobalIndex);
+    double radius_of_cell_two = r_mesh.GetCellRadius(nodeBGlobalIndex);
 
     // Compute the force vector
     c_vector<double, DIM> force_between_nodes = GetMagnitudeOfForce(distance_between_nodes,radius_of_cell_one,radius_of_cell_two) * unit_vector;

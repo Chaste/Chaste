@@ -99,7 +99,7 @@ public:
      *
      * @return the set of neighbouring node indices.
      */
-    std::set<unsigned> GetNeighbouringNodeWithinInteractionDistance(unsigned index, AbstractCellPopulation<DIM>& rCellPopulation);
+    std::set<unsigned> GetNeighbouringNodeIndicesWithinInteractionDistance(unsigned index, AbstractCellPopulation<DIM>& rCellPopulation);
 
     /**
      * Overridden AddForceContribution() method.
