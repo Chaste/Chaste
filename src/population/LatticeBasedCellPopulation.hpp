@@ -259,17 +259,6 @@ public:
     virtual CellPtr AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell=CellPtr());
 
     /**
-     * Locate the sites neighbouring a site (this version is a Moore neighbourhood).
-     * Note: This dictates the geometry of the cell population and the type of neighbourhood
-     * used and can be overridden to use different neighbourhoods or geometries.
-     *
-     * @param nodeIndex global index of the node of interest
-     *
-     * @return set of all nodes
-     */
-    std::set<unsigned> GetNeighbouringNodeIndices(unsigned nodeIndex);
-
-    /**
      * Same method as GetNeighbouringNodeIndices above, but returns an ORDERED vector
      * of neighbouring nodes, in the order N, NW, W, SW, S, SE, E, NE. This is needed
      * to make GetNthDegreeNeighbouringNodeIndices work, as this exploits the ordering
@@ -472,6 +461,18 @@ public:
      * @return The maximum distance between any nodes in this dimension.
      */
     double GetWidth(const unsigned& rDimension);
+
+    /**
+     * Overridden GetNeighbouringNodeIndices() method.
+     *
+     * Locate the sites neighbouring a site (this version is a Moore neighbourhood).
+     * Note: This dictates the geometry of the cell population and the type of neighbourhood
+     * used and can be overridden to use different neighbourhoods or geometries.
+     *
+     * @param index the node index
+     * @return the set of neighbouring node indices.
+     */
+    std::set<unsigned> GetNeighbouringNodeIndices(unsigned index);
 };
 #undef COVERAGE_IGNORE // Avoid prototypes being treated as code by gcov
 

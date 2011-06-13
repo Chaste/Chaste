@@ -71,9 +71,19 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumElements(), p_mesh->GetNumElements());
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), num_cells);
 
-        unsigned counter = 0;
+        // Test GetNeighbouringNodeIndices() method
+        std::set<unsigned> node_10_neighbours = cell_population.GetNeighbouringNodeIndices(10);
+
+        std::set<unsigned> expected_node_10_neighbours;
+        expected_node_10_neighbours.insert(11);
+        expected_node_10_neighbours.insert(14);
+        expected_node_10_neighbours.insert(15);
+
+        TS_ASSERT_EQUALS(node_10_neighbours.size(), expected_node_10_neighbours.size());
+        TS_ASSERT_EQUALS(node_10_neighbours, expected_node_10_neighbours);
 
         // Test PottsBasedCellPopulation::Iterator
+        unsigned counter = 0;
         for (PottsBasedCellPopulation::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)

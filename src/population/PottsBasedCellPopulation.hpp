@@ -306,6 +306,14 @@ public:
      */
     void OutputCellPopulationParameters(out_stream& rParamsFile);
 
+    /**
+     * Overridden GetNeighbouringNodeIndices() method.
+     *
+     * @param index the node index
+     * @return the set of neighbouring node indices.
+     */
+    std::set<unsigned> GetNeighbouringNodeIndices(unsigned index);
+
     /////////////////////////////////////////////////////////////////////////////
     ///\todo Unused Methods to be refactored out of the AbstractCellPopulation?
     /////////////////////////////////////////////////////////////////////////////

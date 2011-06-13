@@ -31,7 +31,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "RandomNumberGenerator.hpp"
 #include "Warnings.hpp"
 
-//template<unsigned DIM>
 void PottsBasedCellPopulation::Validate()
 {
     // Check each element has only one cell associated with it
@@ -63,7 +62,6 @@ void PottsBasedCellPopulation::Validate()
     }
 }
 
-//template<unsigned DIM>
 PottsBasedCellPopulation::PottsBasedCellPopulation(PottsMesh& rMesh,
                                           std::vector<CellPtr>& rCells,
                                           bool deleteMesh,
@@ -80,7 +78,6 @@ PottsBasedCellPopulation::PottsBasedCellPopulation(PottsMesh& rMesh,
     }
 }
 
-//template<unsigned DIM>
 PottsBasedCellPopulation::~PottsBasedCellPopulation()
 {
     if (mDeleteMesh)
@@ -92,55 +89,46 @@ PottsBasedCellPopulation::~PottsBasedCellPopulation()
     }
 }
 
-//template<unsigned DIM>
 PottsMesh& PottsBasedCellPopulation::rGetMesh()
 {
     return mrMesh;
 }
 
-//template<unsigned DIM>
 const PottsMesh& PottsBasedCellPopulation::rGetMesh() const
 {
     return mrMesh;
 }
 
-//template<unsigned DIM>
 PottsElement* PottsBasedCellPopulation::GetElement(unsigned elementIndex)
 {
     return mrMesh.GetElement(elementIndex);
 }
 
-//template<unsigned DIM>
 unsigned PottsBasedCellPopulation::GetNumElements()
 {
     return mrMesh.GetNumElements();
 }
 
-//template<unsigned DIM>
 Node<2>* PottsBasedCellPopulation::GetNode(unsigned index)
 {
     return mrMesh.GetNode(index);
 }
 
-//template<unsigned DIM>
 unsigned PottsBasedCellPopulation::GetNumNodes()
 {
     return mrMesh.GetNumNodes();
 }
 
-//template<unsigned DIM>
 c_vector<double, 2> PottsBasedCellPopulation::GetLocationOfCellCentre(CellPtr pCell)
 {
     return mrMesh.GetCentroidOfElement(this->mCellLocationMap[pCell.get()]);
 }
 
-//template<unsigned DIM>
 PottsElement* PottsBasedCellPopulation::GetElementCorrespondingToCell(CellPtr pCell)
 {
     return mrMesh.GetElement(this->mCellLocationMap[pCell.get()]);
 }
 
-//template<unsigned DIM>
 CellPtr PottsBasedCellPopulation::AddCell(CellPtr pNewCell, const c_vector<double,2>& rCellDivisionVector, CellPtr pParentCell)
 {
     // Get the element associated with this cell
@@ -159,7 +147,6 @@ CellPtr PottsBasedCellPopulation::AddCell(CellPtr pNewCell, const c_vector<doubl
     return p_created_cell;
 }
 
-//template<unsigned DIM>
 unsigned PottsBasedCellPopulation::RemoveDeadCells()
 {
     unsigned num_removed = 0;
@@ -180,7 +167,6 @@ unsigned PottsBasedCellPopulation::RemoveDeadCells()
     return num_removed;
 }
 
-//template<unsigned DIM>
 void PottsBasedCellPopulation::UpdateNodeLocations(const std::vector< c_vector<double, 2> >& rNodeForces, double dt)
 {
     /*
@@ -241,14 +227,14 @@ void PottsBasedCellPopulation::UpdateNodeLocations(const std::vector< c_vector<d
 
         if (containing_elements.size() == 1) // current node is in an element
         {
-            if (new_location_containing_elements.size()==1) // target node is in an element
+            if (new_location_containing_elements.size() == 1) // target node is in an element
             {
                 /*
                  * Here the two nodes are in both contained in elements.
                  */
 
                 // Check if the elements are different otherwise no point doing anything
-                if ( (*containing_elements.begin()) != (*new_location_containing_elements.begin()))
+                if ((*containing_elements.begin()) != (*new_location_containing_elements.begin()))
                 {
                     /*
                      * Here the two nodes are in different elements, so we should calculate
@@ -386,11 +372,10 @@ void PottsBasedCellPopulation::UpdateNodeLocations(const std::vector< c_vector<d
             }
         }
 
-
         double delta_H = H_1 - H_0;
         double T = 0.1;
 
-        //Generate a uniform random number to do the random motion.
+        // Generate a uniform random number to do the random motion.
         double random_number = RandomNumberGenerator::Instance()->ranf();
         double p = exp(-delta_H/T);
 
@@ -405,7 +390,7 @@ void PottsBasedCellPopulation::UpdateNodeLocations(const std::vector< c_vector<d
             {
                 GetElement(*iter)->DeleteNode(GetElement(*iter)->GetNodeLocalIndex(new_location_index));
 
-                // TODO If this causes the element to have no nodes then flag the element and cell to be deleted
+                ///\todo If this causes the element to have no nodes then flag the element and cell to be deleted
             }
 
             // Now iterate over the elements containing the current node to add the target node, this should be at most one element.
@@ -419,60 +404,16 @@ void PottsBasedCellPopulation::UpdateNodeLocations(const std::vector< c_vector<d
     }
 }
 
-//template<unsigned DIM>
 bool PottsBasedCellPopulation::IsCellAssociatedWithADeletedLocation(CellPtr pCell)
 {
     return GetElementCorrespondingToCell(pCell)->IsDeleted();;
 }
 
-//template<unsigned DIM>
 void PottsBasedCellPopulation::Update(bool hasHadBirthsOrDeaths)
 {
-//    PottsElementMap element_map(mrMesh.GetNumAllElements());
-//
-//    mrMesh.ReMesh(element_map);
-//
-//    if (!element_map.IsIdentityMap())
-//    {
-//        // Fix up the mappings between CellPtrs and PottsElements
-//        std::map<Cell*, unsigned> old_map = this->mCellLocationMap;
-//
-//        this->mCellLocationMap.clear();
-//        this->mLocationCellMap.clear();
-//
-//        for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
-//             cell_iter != this->mCells.end();
-//             ++cell_iter)
-//        {
-//            // This shouldn't ever happen, as the cell vector only contains living cells
-//            unsigned old_elem_index = old_map[(*cell_iter).get()];
-//
-//            if (element_map.IsDeleted(old_elem_index))
-//            {
-//                /*\todo this is a kludge to remove the cell once a T2Swap occurs this is not included in the dead cells counter.
-//                 * This should be included in the RemoveDeadCells method so the death is counted
-//                 */
-//                WARNING("Cell removed due to T2Swap this is not counted in the dead cells counter");
-//                cell_iter = this->mCells.erase(cell_iter);
-//                --cell_iter;
-//            }
-//            else
-//            {
-//                unsigned new_elem_index = element_map.GetNewIndex(old_elem_index);
-//
-//                this->mLocationCellMap[new_elem_index] = *cell_iter;
-//                this->mCellLocationMap[(*cell_iter).get()] = new_elem_index;
-//            }
-//        }
-//
-//        // Check that each PottsElement has only one CellPtr associated with it in the updated cell population
-//        Validate();
-//    }
-//
-//    element_map.ResetToIdentity();
+    ///\todo implement this method
 }
 
-//template<unsigned DIM>
 void PottsBasedCellPopulation::CreateOutputFiles(const std::string& rDirectory, bool cleanOutputDirectory)
 {
     AbstractCellPopulation<2>::CreateOutputFiles(rDirectory, cleanOutputDirectory);
@@ -481,19 +422,14 @@ void PottsBasedCellPopulation::CreateOutputFiles(const std::string& rDirectory, 
     mpVizElementsFile = output_file_handler.OpenOutputFile("results.vizelements");
 }
 
-//template<unsigned DIM>
 void PottsBasedCellPopulation::CloseOutputFiles()
 {
     AbstractCellPopulation<2>::CloseOutputFiles();
     mpVizElementsFile->close();
 }
 
-//template<unsigned DIM>
 void PottsBasedCellPopulation::WriteResultsToFiles()
 {
-    // Only works for 2D at present
-    //assert(DIM ==2);
-
     AbstractCellPopulation<2>::WriteResultsToFiles();
 
     CreateElementTessellation(); //To be used to output to the visualiser
@@ -538,7 +474,6 @@ void PottsBasedCellPopulation::WriteResultsToFiles()
     *mpVizElementsFile << "\n";
 }
 
-//template<unsigned DIM>
 void PottsBasedCellPopulation::WriteCellVolumeResultsToFile()
 {    
     // Write time to file
@@ -583,7 +518,6 @@ void PottsBasedCellPopulation::WriteCellVolumeResultsToFile()
     *(this->mpCellVolumesFile) << "\n";
 }
 
-//template<unsigned DIM>
 void PottsBasedCellPopulation::GenerateCellResultsAndWriteToFiles()
 {
     // Set up cell type counter
@@ -612,7 +546,6 @@ void PottsBasedCellPopulation::GenerateCellResultsAndWriteToFiles()
     this->WriteCellResultsToFiles(cell_type_counter, cell_cycle_phase_counter);
 }
 
-//template<unsigned DIM>
 double PottsBasedCellPopulation::GetWidth(const unsigned& rDimension)
 {
     // Call GetWidth() on the mesh
@@ -632,7 +565,7 @@ void PottsBasedCellPopulation::CreateElementTessellation()
     //mpElementTessellation = mpVoronoiTesselation
 
     /*
-     * For each PottsElement find the voronoi cells of the contained nodes that share
+     * For each PottsElement find the Voronoi cells of the contained nodes that share
      * two common voronoi nodes and merge the voronoi cells. Keep searching until
      * there are no such pairs. This gives the ElementTesselation for the PottsElement
      */
@@ -669,11 +602,9 @@ void PottsBasedCellPopulation::CreateElementTessellation()
 
 VertexMesh<2, 2>* PottsBasedCellPopulation::GetElementTessellation()
 {
-    //assert(mpElementTessellation!=NULL);
     return mpElementTessellation;
 }
 
-//template<unsigned DIM>
 void PottsBasedCellPopulation::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
     // Call method on direct parent class
@@ -684,7 +615,6 @@ void PottsBasedCellPopulation::OutputCellPopulationParameters(out_stream& rParam
 ///\todo Unused Methods to be refactored out of the AbstractCellPopulation?
 /////////////////////////////////////////////////////////////////////////////
 
-//template<unsigned DIM>
 unsigned PottsBasedCellPopulation::AddNode(Node<2>* pNewNode)
 {
     ///\todo Method not needed for this population type; need to refactor out?
@@ -692,14 +622,12 @@ unsigned PottsBasedCellPopulation::AddNode(Node<2>* pNewNode)
     return 0;
 }
 
-//template<unsigned DIM>
 void PottsBasedCellPopulation::SetNode(unsigned nodeIndex, ChastePoint<2>& rNewLocation)
 {
     ///\todo Method not needed for this population type; need to refactor out?
     //mrMesh.SetNode(nodeIndex, rNewLocation);
 }
 
-//template<unsigned DIM>
 double PottsBasedCellPopulation::GetDampingConstant(unsigned nodeIndex)
 {
     ///\todo Method not needed for this population type; need to refactor out?
@@ -709,13 +637,33 @@ double PottsBasedCellPopulation::GetDampingConstant(unsigned nodeIndex)
     return 0.0;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
+std::set<unsigned> PottsBasedCellPopulation::GetNeighbouringNodeIndices(unsigned index)
+{
+    // Get pointer to this node
+    Node<2>* p_node = mrMesh.GetNode(index);
 
-//template class PottsBasedCellPopulation<1>;
-//template class PottsBasedCellPopulation<2>;
-//template class PottsBasedCellPopulation<3>;
+    // Loop over containing elements
+    std::set<unsigned> neighbouring_node_indices;
+    for (Node<2>::ContainingElementIterator elem_iter = p_node->ContainingElementsBegin();
+         elem_iter != p_node->ContainingElementsEnd();
+         ++elem_iter)
+    {
+        // Get pointer to this containing element
+        PottsElement* p_element = mrMesh.GetElement(*elem_iter);
+
+        // Loop over nodes contained in this element
+        for (unsigned i=0; i<p_element->GetNumNodes(); i++)
+        {
+            // Get index of this node and add its index to the set if not the original node
+            unsigned node_index = p_element->GetNodeGlobalIndex(i);
+            if (node_index != index)
+            {
+                neighbouring_node_indices.insert(node_index);
+            }
+        }
+    }
+    return neighbouring_node_indices;
+}
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

@@ -459,6 +459,19 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 48u);
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 48u);
 
+        // Test GetNeighbouringNodeIndices() method
+        std::set<unsigned> node_20_neighbours = cell_population.GetNeighbouringNodeIndices(20);
+
+        std::set<unsigned> expected_node_20_neighbours;
+        expected_node_20_neighbours.insert(12);
+        expected_node_20_neighbours.insert(13);
+        expected_node_20_neighbours.insert(19);
+        expected_node_20_neighbours.insert(26);
+        expected_node_20_neighbours.insert(27);
+
+        TS_ASSERT_EQUALS(node_20_neighbours.size(), expected_node_20_neighbours.size());
+        TS_ASSERT_EQUALS(node_20_neighbours, expected_node_20_neighbours);
+
         // Create a new cell
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         FixedDurationGenerationBasedCellCycleModel* p_model_2 = new FixedDurationGenerationBasedCellCycleModel();
