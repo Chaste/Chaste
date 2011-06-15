@@ -25,8 +25,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
-#ifndef TESTCELLBASEDSIMULATIONWITHNODEBASEDCELLPOPULATION_HPP_
-#define TESTCELLBASEDSIMULATIONWITHNODEBASEDCELLPOPULATION_HPP_
+#ifndef TESTCELLBASEDSIMULATIONWITHBUSKEFORCES_HPP_
+#define TESTCELLBASEDSIMULATIONWITHBUSKEFORCES_HPP_
 
 #include <cxxtest/TestSuite.h>
 
@@ -42,7 +42,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "BuskeInteractionForce.hpp"
 #include "BuskeCompressionForce.hpp"
 
-class TestCellBasedSimulationWithNodeBasedCellPopulation : public AbstractCellBasedTestSuite
+class TestCellBasedSimulationWithBuskeForces : public AbstractCellBasedTestSuite
 {
 private:
 
@@ -90,7 +90,7 @@ public:
         // Set up cell-based simulation
         CellBasedSimulation<2> simulator(node_based_cell_population);
         simulator.SetOutputDirectory("TestCellBasedSimulationWithBuskeForces");
-        simulator.SetEndTime(10.0);
+        simulator.SetEndTime(5.0);
 
         // Create a force law and pass it to the simulation
         BuskeInteractionForce<2> buske_interaction_force;
@@ -146,7 +146,7 @@ public:
         // Set up cell-based simulation
         CellBasedSimulation<2> simulator(node_based_cell_population);
         simulator.SetOutputDirectory("TestCellBasedSimulationWithBuskeCompressionForce");
-        simulator.SetEndTime(10.0);
+        simulator.SetEndTime(5.0);
 
         // Create a force law and pass it to the simulation
         BuskeCompressionForce<2> buske_compression_force;
@@ -162,6 +162,7 @@ public:
             for (unsigned j=i+1; j<simulator.rGetCellPopulation().GetNumNodes(); j++)
             {
                 double distance = norm_2(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()-simulator.rGetCellPopulation().GetNode(j)->rGetLocation());
+                std::cout << "distance = " << distance << std::endl; 
                 if (distance < min_distance_between_cells)
                 {
                     min_distance_between_cells = distance;
@@ -173,4 +174,4 @@ public:
     }
 };
 
-#endif /*TESTCELLBASEDSIMULATIONWITHNODEBASEDCELLPOPULATION_HPP_*/
+#endif /*TESTCELLBASEDSIMULATIONWITHBUSKEFORCES_HPP_*/
