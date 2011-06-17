@@ -62,16 +62,11 @@ private:
 
 public:
 
-    ///\todo #1764 This test is only here because the others in the suite are borken
-    void TestNothing() throw (Exception)
-    {
-        TS_ASSERT(true);    
-    }
     /**
      * Create a simulation of a NodeBasedCellPopulation with a BuskeInteractionForce system.
      * Test that no exceptions are thrown, and write the results to file.
      */
-    void trips_assertion_TestSimpleMonolayerWithBuskeInteractionForce() throw (Exception)
+    void TestSimpleMonolayerWithBuskeInteractionForce() throw (Exception)
     {
         // Create a simple mesh
         unsigned num_cells_depth = 5;
@@ -127,7 +122,7 @@ public:
      * Create a simulation of a NodeBasedCellPopulation with a BuskeInteractionForce system.
      * Test that no exceptions are thrown, and write the results to file.
      */
-    void trips_assertion_TestSimpleMonolayerWithBuskeCompressionForce() throw (Exception)
+    void TestSimpleMonolayerWithBuskeCompressionForce() throw (Exception)
     {
         // Create a simple mesh
         unsigned num_cells_depth = 5;
@@ -159,24 +154,22 @@ public:
 
         simulator.Solve();
 
-        ///\todo Uncomment the code below and see what goes wrong (#1764)
+        // Check that nothing's gone badly wrong by testing that nodes aren't too close together
+        double min_distance_between_cells = 1.0;
 
-//        // Check that nothing's gone badly wrong by testing that nodes aren't too close together
-//        double min_distance_between_cells = 1.0;
-//
-//        for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
-//        {
-//            for (unsigned j=i+1; j<simulator.rGetCellPopulation().GetNumNodes(); j++)
-//            {
-//                double distance = norm_2(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()-simulator.rGetCellPopulation().GetNode(j)->rGetLocation());
-//                if (distance < min_distance_between_cells)
-//                {
-//                    min_distance_between_cells = distance;
-//                }
-//            }
-//        }
-//
-//        TS_ASSERT(min_distance_between_cells > 1e-3);
+        for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+        {
+            for (unsigned j=i+1; j<simulator.rGetCellPopulation().GetNumNodes(); j++)
+            {
+                double distance = norm_2(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()-simulator.rGetCellPopulation().GetNode(j)->rGetLocation());
+                if (distance < min_distance_between_cells)
+                {
+                    min_distance_between_cells = distance;
+                }
+            }
+        }
+
+        TS_ASSERT(min_distance_between_cells > 1e-3);
     }
 };
 
