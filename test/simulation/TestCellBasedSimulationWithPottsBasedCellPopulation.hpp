@@ -160,13 +160,13 @@ public:
         // Check the number of cells
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 4u);
 
-        // Test no births or deaths
+        // Test no deaths and some births
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 3u);
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
 
     }
 
-    void noTestPottsCrypt() throw (Exception)
+    void TestPottsCrypt() throw (Exception)
 	{
 		// Create a simple 2D PottsMesh
 		PottsMeshGenerator generator(12, 22, 3, 1, 4, 4);
@@ -182,9 +182,9 @@ public:
 
 		// Set up cell-based simulation
 		CellBasedSimulation<2> simulator(cell_population);
-		simulator.SetOutputDirectory("TestPottsMonolayerWithBirth");
+		simulator.SetOutputDirectory("TestPottsCrypt");
 		simulator.SetDt(0.1);
-		simulator.SetEndTime(100);
+		simulator.SetEndTime(25);
 
         // Create cell killer and pass in to crypt simulation
         SloughingCellKiller<2> sloughing_cell_killer(&cell_population,16u);
@@ -194,11 +194,11 @@ public:
 		simulator.Solve();
 
 		// Check the number of cells
-		TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 4u);
+		TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 15u);
 
-		// Test no births or deaths
-		TS_ASSERT_EQUALS(simulator.GetNumBirths(), 3u);
-		TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
+		// Test number of births or deaths
+		TS_ASSERT_EQUALS(simulator.GetNumBirths(), 15u);
+		TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 3u);
 
 	}
 
