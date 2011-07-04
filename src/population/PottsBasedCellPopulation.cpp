@@ -221,7 +221,7 @@ void PottsBasedCellPopulation::UpdateNodeLocations(const std::vector< c_vector<d
         double H_1 = 0.0; // Hamiltonian after swap
 
         // Hamiltonian parameters
-        double lambda_volume = 0.1;
+        double lambda_volume = 0.5;
         double target_volume = 16.0;
         double lambda_contact = 0.1;
 
@@ -556,48 +556,7 @@ double PottsBasedCellPopulation::GetWidth(const unsigned& rDimension)
 
 void PottsBasedCellPopulation::CreateElementTessellation()
 {
-    //delete mpElementTessellation;
-
-    // Calculate Voronoi tesselation of the nodes (only needs to be done once)
-    //mpVoronoiTessellation = new VertexMesh<2, 2>(tesselation_nodes, is_mesh_periodic);;
-
-    // Create the ElementTeselation
-    //mpElementTessellation = mpVoronoiTesselation
-
-    /*
-     * For each PottsElement find the Voronoi cells of the contained nodes that share
-     * two common voronoi nodes and merge the voronoi cells. Keep searching until
-     * there are no such pairs. This gives the ElementTesselation for the PottsElement
-     */
-
-//    for (PottsMesh::PottsElementIterator elem_iter = mrMesh.GetElementIteratorBegin();
-//         elem_iter != mrMesh.GetElementIteratorEnd();
-//         ++elem_iter)
-//    {
-//        unsigned element_index = elem_iter->GetIndex();
-//        unsigned num_nodes = elem_iter->GetNumNodes();
-//
-//        bool are_shared_edges = true;
-//
-//        while (are_shared_edges)
-//        {
-//            for (unsigned i=0; i<num_nodes; i++)
-//            {
-//                for (unsigned j=0; j<num_nodes; j++)
-//                {
-//                    // Look for shared voronoi nodes between cell i and j
-//                    // if find shared edge perform voronoi cell merge
-//                    //mpElementTessellation.MergeElements(mpElementTessellation.GetElement(elem_iter->GetNodeGlobalIndex(i),
-//                    //                                    mpElementTessellation.GetElement(elem_iter->GetNodeGlobalIndex(j));
-//                    // and break;
-//                }
-//            }
-//        }
-//
-//    }
-
-    // Make Vertex Mesh
-    //mpElementTessellation = new VertexMesh<2, 2>(tesselation_nodes, is_mesh_periodic);
+	// TODO create a potts teselation here to enable VTK output.
 }
 
 VertexMesh<2, 2>* PottsBasedCellPopulation::GetElementTessellation()

@@ -62,7 +62,7 @@ private:
 
     /**
      * Pointer to a VertexMesh object that stores the Element tessellation that is used to visualise
-     * mrMesh. The tessellation is created by calling CreateElelment Tessellation() and can
+     * mrMesh. The tessellation is created by calling CreateElelmentTessellation() and can
      * be accessed by calling GetElementTessellation().
      */
     VertexMesh<2, 2>* mpElementTessellation;
