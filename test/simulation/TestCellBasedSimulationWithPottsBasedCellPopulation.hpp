@@ -131,7 +131,6 @@ public:
         // Test no births or deaths
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 15u);
-
     }
 
     void TestPottsMonolayerWithBirth() throw (Exception)
@@ -163,7 +162,6 @@ public:
         // Test no deaths and some births
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 3u);
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
-
     }
 
     void TestPottsCrypt() throw (Exception)
@@ -199,10 +197,7 @@ public:
 		// Test number of births or deaths
 		TS_ASSERT_EQUALS(simulator.GetNumBirths(), 15u);
 		TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 3u);
-
 	}
-
-
 };
 
 #endif /*TESTCELLBASEDSIMULATIONWITHPOTTSBASEDCELLPOPULATION_HPP_*/

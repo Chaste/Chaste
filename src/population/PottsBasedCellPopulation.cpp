@@ -556,7 +556,7 @@ double PottsBasedCellPopulation::GetWidth(const unsigned& rDimension)
 
 void PottsBasedCellPopulation::CreateElementTessellation()
 {
-	// TODO create a potts teselation here to enable VTK output.
+	///\todo create a Potts tessellation here to enable VTK output
 }
 
 VertexMesh<2, 2>* PottsBasedCellPopulation::GetElementTessellation()
