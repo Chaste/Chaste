@@ -322,6 +322,7 @@ void PottsBasedCellPopulation::UpdateNodeLocations(const std::vector< c_vector<d
                          H_1 += lambda_contact;
                     }
                 }
+
             }
         }
         else // (containing_elements.size() == 0) // current node is not in an element
@@ -371,6 +372,25 @@ void PottsBasedCellPopulation::UpdateNodeLocations(const std::vector< c_vector<d
                 swap_elements = false;
             }
         }
+
+//        // Work out the stem cell retainer
+//        if (containing_elements.size() == 1) // current node is in an element
+//        {
+//            unsigned current_element = (*containing_elements.begin());
+//            if (this->mLocationCellMap[current_element]->GetCellCycleModel()->GetCellProliferativeType()==STEM)
+//            {
+//                // If move is up then penalise this
+//                if (mrMesh.GetNode(new_location_index)->rGetLocation()[1] > node_iter->rGetLocation()[1])
+//                {
+//                    H_1 += 1;
+//                }
+//                // If move is down then favor it
+//                if (mrMesh.GetNode(new_location_index)->rGetLocation()[1] < node_iter->rGetLocation()[1])
+//                {
+//                    H_1 -= 1;
+//                }
+//            }
+//        }
 
         double delta_H = H_1 - H_0;
         double T = 0.1;
