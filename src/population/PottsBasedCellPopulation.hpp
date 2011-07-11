@@ -32,6 +32,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "AbstractCellPopulation.hpp"
 #include "PottsMesh.hpp"
 #include "VertexMesh.hpp"
+#include "AbstractPottsUpdateRule.hpp"
 #include "ArchiveLocationInfo.hpp"
 
 #include "ChasteSerialization.hpp"
@@ -76,6 +77,9 @@ private:
     /** Results file for elements. */
     out_stream mpVizElementsFile;
 
+    /** The update rules used to determine the new location of the cells. */
+    std::vector<AbstractPottsUpdateRule<2>*> mUpdateRulesCollection;
+
     friend class boost::serialization::access;
     /**
      * Serialize the object and its member variables.
@@ -98,6 +102,9 @@ private:
         //archive & mpElementTessellation
         delete mpElementTessellation;
         mpElementTessellation = NULL;
+
+        archive & mUpdateRulesCollection;
+
 #undef COVERAGE_IGNORE
     }
 
@@ -245,8 +252,8 @@ public:
     /**
 	 * Method to calculate the Hamiltonian.
 	 *
-	 * @param The index of the current node/lattice site
-	 * @param The index of the target node/lattice site
+	 * @param CurrentNodeIndex The index of the current node/lattice site
+	 * @param TargetNodeIndex The index of the target node/lattice site
 	 * @return The difference in the Hamiltonian with the current configuration and
 	 * the configuration with the target node having the same spin as the current node.
 	 */
@@ -306,6 +313,13 @@ public:
      * @return The maximum distance between any nodes in this dimension.
      */
     double GetWidth(const unsigned& rDimension);
+
+//    /**
+//	 * Add an update rule to be used in this simulation (use this to set up the Hamiltonian).
+//	 *
+//	 * @param pUpdateRule pointer  to an update rule
+//	 */
+//	void AddUpdateRule(AbstractPottsBasedUpdateRule<2>* pUpdateRule);
 
     /**
      * Outputs CellPopulation parameters to file

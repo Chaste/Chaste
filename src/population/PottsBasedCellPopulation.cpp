@@ -263,7 +263,7 @@ double PottsBasedCellPopulation::EvaluateHamiltonian(unsigned CurrentNodeIndex, 
 
     double delta_H =0.0; // H_1-H_0 differnece in Hamiltonian after and before swap.
 
-    // Volume Contribution    // Hamiltonian parameters
+    //// VOLUME CONSTRAINT UPDATE RULE ////
     double lambda_volume = 0.5;
     double target_volume = 16.0;
 
@@ -279,7 +279,7 @@ double PottsBasedCellPopulation::EvaluateHamiltonian(unsigned CurrentNodeIndex, 
     }
 
 
-    // Adhesion Contribution  // Hamiltonian parameters
+    //// CELL CELL ADHESION UPDATE RULE ////
     double lambda_contact = 0.1;
 
 
@@ -325,6 +325,8 @@ double PottsBasedCellPopulation::EvaluateHamiltonian(unsigned CurrentNodeIndex, 
 			}
 		}
 	}
+
+	//// STEM CELL RETAINER UPDATE RULE ////
 
 //        // Work out the stem cell retainer
 //        if (containing_elements.size() == 1) // current node is in an element
@@ -498,6 +500,11 @@ double PottsBasedCellPopulation::GetWidth(const unsigned& rDimension)
 
     return width;
 }
+
+//void PottsBasedCellPopulation::AddUpdateRule(AbstractPottsBasedUpdateRule<2>* pUpdateRule);
+//{
+//    mUpdateRuleCollection.push_back(pUpdateRule);
+//}
 
 void PottsBasedCellPopulation::CreateElementTessellation()
 {
