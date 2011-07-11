@@ -165,41 +165,41 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
     }
 
-    void TestPottsCrypt() throw (Exception)
-	{
-		// Create a simple 2D PottsMesh
-		PottsMeshGenerator generator(12, 28, 3, 6, 4, 4);
-		PottsMesh* p_mesh = generator.GetMesh();
-
-		// Create cells
-		std::vector<CellPtr> cells;
-        CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 4.0, 6.0, 8, 12.0);
-
-		// Create cell population
-		PottsBasedCellPopulation cell_population(*p_mesh, cells);
-
-		// Set up cell-based simulation
-		CellBasedSimulation<2> simulator(cell_population);
-		simulator.SetOutputDirectory("TestPottsCrypt");
-		simulator.SetDt(0.01);
-		simulator.SetSamplingTimestepMultiple(10);
-		simulator.SetEndTime(1.0);
-
-        // Create cell killer and pass in to crypt simulation
-        SloughingCellKiller<2> sloughing_cell_killer(&cell_population,24u);
-        simulator.AddCellKiller(&sloughing_cell_killer);
-
-		// Run simulation
-		simulator.Solve();
-
-		// Check the number of cells
-		TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 19u);
-
-		// Test number of births or deaths
-		TS_ASSERT_EQUALS(simulator.GetNumBirths(), 3u);
-		TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 2u);
-	}
+//    void TestPottsCrypt() throw (Exception)
+//	{
+//		// Create a simple 2D PottsMesh
+//		PottsMeshGenerator generator(12, 28, 3, 6, 4, 4);
+//		PottsMesh* p_mesh = generator.GetMesh();
+//
+//		// Create cells
+//		std::vector<CellPtr> cells;
+//        CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
+//        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 4.0, 6.0, 8, 12.0);
+//
+//		// Create cell population
+//		PottsBasedCellPopulation cell_population(*p_mesh, cells);
+//
+//		// Set up cell-based simulation
+//		CellBasedSimulation<2> simulator(cell_population);
+//		simulator.SetOutputDirectory("TestPottsCrypt");
+//		simulator.SetDt(0.01);
+//		simulator.SetSamplingTimestepMultiple(10);
+//		simulator.SetEndTime(1.0);
+//
+//        // Create cell killer and pass in to crypt simulation
+//        SloughingCellKiller<2> sloughing_cell_killer(&cell_population,24u);
+//        simulator.AddCellKiller(&sloughing_cell_killer);
+//
+//		// Run simulation
+//		simulator.Solve();
+//
+//		// Check the number of cells
+//		TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 19u);
+//
+//		// Test number of births or deaths
+//		TS_ASSERT_EQUALS(simulator.GetNumBirths(), 3u);
+//		TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 2u);
+//	}
 };
 
 #endif /*TESTCELLBASEDSIMULATIONWITHPOTTSBASEDCELLPOPULATION_HPP_*/
