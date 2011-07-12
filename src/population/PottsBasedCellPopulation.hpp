@@ -315,12 +315,12 @@ public:
      */
     double GetWidth(const unsigned& rDimension);
 
-//    /**
-//	 * Add an update rule to be used in this simulation (use this to set up the Hamiltonian).
-//	 *
-//	 * @param pUpdateRule pointer  to an update rule
-//	 */
-//	void AddUpdateRule(AbstractPottsBasedUpdateRule<2>* pUpdateRule);
+    /**
+	 * Add an update rule to be used in this simulation (use this to set up the Hamiltonian).
+	 *
+	 * @param pUpdateRule pointer  to an update rule
+	 */
+	void AddUpdateRule(AbstractPottsUpdateRule<2>* pUpdateRule);
 
     /**
      * Outputs CellPopulation parameters to file

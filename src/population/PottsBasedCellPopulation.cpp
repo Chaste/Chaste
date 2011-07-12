@@ -501,10 +501,10 @@ double PottsBasedCellPopulation::GetWidth(const unsigned& rDimension)
     return width;
 }
 
-//void PottsBasedCellPopulation::AddUpdateRule(AbstractPottsBasedUpdateRule<2>* pUpdateRule);
-//{
-//    mUpdateRuleCollection.push_back(pUpdateRule);
-//}
+void PottsBasedCellPopulation::AddUpdateRule(AbstractPottsUpdateRule<2>* pUpdateRule)
+{
+	mUpdateRulesCollection.push_back(pUpdateRule);
+}
 
 void PottsBasedCellPopulation::CreateElementTessellation()
 {
