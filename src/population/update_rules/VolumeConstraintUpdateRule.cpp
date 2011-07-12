@@ -41,7 +41,7 @@ VolumeConstraintUpdateRule<DIM>::~VolumeConstraintUpdateRule()
 }
 template<unsigned DIM>
 void VolumeConstraintUpdateRule<DIM>::EvaluateHamiltonianContribution(double delta_H, unsigned CurrentNodeIndex, unsigned TargetNodeIndex,
-											                          PottsBasedCellPopulation& rCellPopulation)
+																	  AbstractCellPopulation<DIM>& rCellPopulation)
 {
  // TODO
 }

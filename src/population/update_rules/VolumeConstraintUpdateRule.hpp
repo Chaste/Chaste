@@ -40,7 +40,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
  * A chemotactic force class.
  */
 template<unsigned DIM>
-class VolumeConstraintUpdateRule  : public AbstractForce<DIM>
+class VolumeConstraintUpdateRule  : public AbstractPottsUpdateRule<DIM>
 {
 friend class TestPottsUpdateRules;
 
@@ -79,7 +79,7 @@ public:
 	 * @param rCellPopulation The cell population
 	 */
     void EvaluateHamiltonianContribution(double delta_H, unsigned CurrentNodeIndex, unsigned TargetNodeIndex,
-												 PottsBasedCellPopulation& rCellPopulation);
+												 AbstractCellPopulation<DIM>& rCellPopulation);
 
     /**
      * Overridden OutputUpdateRuleParameters() method.

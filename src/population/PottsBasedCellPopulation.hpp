@@ -33,6 +33,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "PottsMesh.hpp"
 #include "VertexMesh.hpp"
 #include "AbstractPottsUpdateRule.hpp"
+#include "VolumeConstraintUpdateRule.hpp"
 #include "ArchiveLocationInfo.hpp"
 
 #include "ChasteSerialization.hpp"
