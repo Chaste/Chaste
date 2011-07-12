@@ -40,6 +40,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "StochasticDurationGenerationBasedCellCycleModel.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "SloughingCellKiller.hpp"
+#include "VolumeConstraintUpdateRule.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "PottsMeshGenerator.hpp"
 #include "WildTypeCellMutationState.hpp"
@@ -80,12 +81,14 @@ public:
         // Create cell population
         PottsBasedCellPopulation cell_population(*p_mesh, cells);
 
+        // Create an update rule and pass it to the cell population
+		VolumeConstraintUpdateRule<2> volume_constraint_update_rule;
+		cell_population.AddUpdateRule(&volume_constraint_update_rule);
+
         // Set up cell-based simulation
         CellBasedSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestSimplePottsMonolayer");
         simulator.SetEndTime(0.1);
-
-        ///\todo Create an force law and pass it to the simulation
 
         // Run simulation
         simulator.Solve();
@@ -111,6 +114,10 @@ public:
 
         // Create cell population
         PottsBasedCellPopulation cell_population(*p_mesh, cells);
+
+        // Create an update rule and pass it to the cell population
+        VolumeConstraintUpdateRule<2> volume_constraint_update_rule;
+        cell_population.AddUpdateRule(&volume_constraint_update_rule);
 
         // Set up cell-based simulation
         CellBasedSimulation<2> simulator(cell_population);
@@ -147,6 +154,10 @@ public:
 
         // Create cell population
         PottsBasedCellPopulation cell_population(*p_mesh, cells);
+
+        // Create an update rule and pass it to the cell population
+		VolumeConstraintUpdateRule<2> volume_constraint_update_rule;
+		cell_population.AddUpdateRule(&volume_constraint_update_rule);
 
         // Set up cell-based simulation
         CellBasedSimulation<2> simulator(cell_population);

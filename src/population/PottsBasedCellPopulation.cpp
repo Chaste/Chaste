@@ -30,7 +30,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CellwiseData.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "Warnings.hpp"
-#include "Debug.hpp"
 
 void PottsBasedCellPopulation::Validate()
 {
@@ -216,7 +215,20 @@ void PottsBasedCellPopulation::UpdateNodeLocations(const std::vector< c_vector<d
             ((containing_elements.size()>0) || (new_location_containing_elements.size()>0) ))
         {
         	double delta_H = 0.0;
-        	delta_H += EvaluateHamiltonian(node_iter->GetIndex(),new_location_index);
+
+            // Now add force contributions to the Hamiltonian from each AbstractPottsUpdateRule
+            for (std::vector<AbstractPottsUpdateRule<2>*>::iterator iter = mUpdateRuleCollection.begin();
+                 iter != mUpdateRuleCollection.end();
+                 ++iter)
+            {
+                (*iter)->EvaluateHamiltonianContribution(delta_H, node_iter->GetIndex(), new_location_index, *this);
+            }
+            //assert(delta_H == EvaluateHamiltonian(node_iter->GetIndex(),new_location_index));
+            //PRINT_2_VARIABLES(delta_H, EvaluateHamiltonian(node_iter->GetIndex(),new_location_index));
+
+            delta_H = EvaluateHamiltonian(node_iter->GetIndex(),new_location_index);
+
+
 
 			double T = 0.1;
 			// Generate a uniform random number to do the random motion.
@@ -261,7 +273,7 @@ double PottsBasedCellPopulation::EvaluateHamiltonian(unsigned CurrentNodeIndex, 
     assert(new_location_containing_elements.begin() != containing_elements.begin());
     assert((containing_elements.size()>0) || (new_location_containing_elements.size()>0));
 
-    double delta_H =0.0; // H_1-H_0 differnece in Hamiltonian after and before swap.
+    double delta_H = 0.0; // H_1-H_0 differnece in Hamiltonian after and before swap.
 
     //// VOLUME CONSTRAINT UPDATE RULE ////
     double lambda_volume = 0.5;
@@ -503,7 +515,7 @@ double PottsBasedCellPopulation::GetWidth(const unsigned& rDimension)
 
 void PottsBasedCellPopulation::AddUpdateRule(AbstractPottsUpdateRule<2>* pUpdateRule)
 {
-	mUpdateRulesCollection.push_back(pUpdateRule);
+	mUpdateRuleCollection.push_back(pUpdateRule);
 }
 
 void PottsBasedCellPopulation::CreateElementTessellation()

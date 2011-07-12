@@ -33,7 +33,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "PottsMesh.hpp"
 #include "VertexMesh.hpp"
 #include "AbstractPottsUpdateRule.hpp"
-#include "VolumeConstraintUpdateRule.hpp"
 #include "ArchiveLocationInfo.hpp"
 
 #include "ChasteSerialization.hpp"
@@ -79,7 +78,7 @@ private:
     out_stream mpVizElementsFile;
 
     /** The update rules used to determine the new location of the cells. */
-    std::vector<AbstractPottsUpdateRule<2>*> mUpdateRulesCollection;
+    std::vector<AbstractPottsUpdateRule<2>*> mUpdateRuleCollection;
 
     friend class boost::serialization::access;
     /**
@@ -104,7 +103,7 @@ private:
         delete mpElementTessellation;
         mpElementTessellation = NULL;
 
-        archive & mUpdateRulesCollection;
+        archive & mUpdateRuleCollection;
 
 #undef COVERAGE_IGNORE
     }

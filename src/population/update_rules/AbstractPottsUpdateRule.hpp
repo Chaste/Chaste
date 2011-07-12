@@ -73,13 +73,13 @@ public:
     /**
 	 * Calculate the contribution to the Hamiltonian.
 	 *
-	 * @param delta_H The current value of the difference in the Hamiltonian with the current configuration and
+	 * @param DeltaH The current value of the difference in the Hamiltonian with the current configuration and
 	 * the configuration with the target node having the same spin as the current node.
 	 * @param CurrentNodeIndexThe index of the current node/lattice site
 	 * @param TargetNodeIndex The index of the target node/lattice site
 	 * @param rCellPopulation The cell population
 	 */
-    virtual void EvaluateHamiltonianContribution(double delta_H, unsigned CurrentNodeIndex, unsigned TargetNodeIndex, AbstractCellPopulation<DIM>& rCellPopulation)=0;
+    virtual void EvaluateHamiltonianContribution(double& DeltaH, unsigned CurrentNodeIndex, unsigned TargetNodeIndex, AbstractCellPopulation<2>& rCellPopulation)=0;
 
     /**
      * Outputs force used in the simulation to file and then calls OutputUpdateRuleParameters to output all relevant parameters.

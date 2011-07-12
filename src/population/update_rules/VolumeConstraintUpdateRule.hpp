@@ -32,6 +32,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractPottsUpdateRule.hpp"
+#include "PottsBasedCellPopulation.hpp"
 
 // Needed here to avoid serialization errors (on Boost<1.37)
 #include "CellLabel.hpp"
@@ -72,14 +73,14 @@ public:
 	 *
 	 * Uses  sum_elements alpha (V_i - V_i^T)^2
 	 *
-	 * @param delta_H The current value of the difference in the Hamiltonian with the current configuration and
+	 * @param DeltaH The current value of the difference in the Hamiltonian with the current configuration and
 	 * the configuration with the target node having the same spin as the current node.
 	 * @param CurrentNodeIndex The index of the current node/lattice site
 	 * @param TargetNodeIndex The index of the target node/lattice site
 	 * @param rCellPopulation The cell population
 	 */
-    void EvaluateHamiltonianContribution(double delta_H, unsigned CurrentNodeIndex, unsigned TargetNodeIndex,
-												 AbstractCellPopulation<DIM>& rCellPopulation);
+    void EvaluateHamiltonianContribution(double& DeltaH, unsigned CurrentNodeIndex, unsigned TargetNodeIndex,
+												 AbstractCellPopulation<2>& rCellPopulation);
 
     /**
      * Overridden OutputUpdateRuleParameters() method.
@@ -91,6 +92,6 @@ public:
 
 #include "SerializationExportWrapper.hpp"
 
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(ChemotacticForce)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(VolumeConstraintUpdateRule)
 
 #endif /*VOLUMECONSTRAINTUPDATERULE_HPP_*/
