@@ -27,21 +27,21 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 */
 
 
-#include "VolumeConstraintUpdateRule.hpp"
+#include "AdhesionUpdateRule.hpp"
 
 template<unsigned DIM>
-VolumeConstraintUpdateRule<DIM>::VolumeConstraintUpdateRule()
+AdhesionUpdateRule<DIM>::AdhesionUpdateRule()
     : AbstractPottsUpdateRule<DIM>()
 {
 }
 
 template<unsigned DIM>
-VolumeConstraintUpdateRule<DIM>::~VolumeConstraintUpdateRule()
+AdhesionUpdateRule<DIM>::~AdhesionUpdateRule()
 {
 }
 
 template<unsigned DIM>
-double VolumeConstraintUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned CurrentNodeIndex, unsigned TargetNodeIndex,
+double AdhesionUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned CurrentNodeIndex, unsigned TargetNodeIndex,
 																	  AbstractCellPopulation<2>& rCellPopulation)
 {
 	double delta_H = 0.0;
@@ -53,7 +53,7 @@ double VolumeConstraintUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned
 	/** TODO this is probably not the best way of doing this it will slow things down probably should pass in a PottsBasedCellPopulation #1665 */
 	if (dynamic_cast<PottsBasedCellPopulation*>(&rCellPopulation) == NULL)
 	{
-		EXCEPTION("VolumeConstraintUpdateRule is to be used with a PottsBasedCellPopulation only");
+		EXCEPTION("AdhesionUpdateRule is to be used with a PottsBasedCellPopulation only");
 	}
 
 	// Helper variable that is a static cast of the cell population
@@ -69,27 +69,57 @@ double VolumeConstraintUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned
 	assert(new_location_containing_elements.begin() != containing_elements.begin());
 	assert((containing_elements.size()>0) || (new_location_containing_elements.size()>0));
 
-	//// VOLUME CONSTRAINT UPDATE RULE ////
-	double lambda_volume = 0.5;
-	double target_volume = 16.0;
+	//// CELL CELL ADHESION UPDATE RULE ////
+	double lambda_contact = 0.1;
 
-	if (containing_elements.size() == 1) // current node is in an element
-	{
-		unsigned current_element = (*containing_elements.begin());
-		delta_H += lambda_volume*(pow(p_cell_population->rGetMesh().GetVolumeOfElement(current_element) + 1.0 - target_volume, 2.0) - pow(p_cell_population->rGetMesh().GetVolumeOfElement(current_element) - target_volume, 2.0));
-	}
-	if (new_location_containing_elements.size() == 1) // target node is in an element
-	{
-		unsigned target_element = (*new_location_containing_elements.begin());
-		delta_H += lambda_volume*(pow(p_cell_population->rGetMesh().GetVolumeOfElement(target_element) - 1.0 - target_volume, 2.0) - pow(p_cell_population->rGetMesh().GetVolumeOfElement(target_element) - target_volume, 2.0));
-	}
+	// Iterate over nodes neighbouring the target node to work out the contact energy contribution
+	std::set<unsigned> target_neighboring_node_indices = p_cell_population->rGetMesh().GetNeighbouringNodeIndices(TargetNodeIndex);
 
+	for (std::set<unsigned>::iterator iter = target_neighboring_node_indices.begin();
+		 iter != target_neighboring_node_indices.end();
+		 ++iter)
+	{
+		std::set<unsigned> neighboring_node_containing_elements = p_cell_population->rGetMesh().GetNode(*iter)->rGetContainingElementIndices();
+
+
+		if ( neighboring_node_containing_elements.size() == 1u )
+		{
+			unsigned neighbour_element = (*neighboring_node_containing_elements.begin());
+
+			if (new_location_containing_elements.size() == 1u) // target node is in an element
+			{
+				unsigned target_element = (*new_location_containing_elements.begin());
+				// If the nodes are currently from different elements
+				if ( target_element != neighbour_element )
+				{
+					delta_H -= lambda_contact;
+				}
+			}
+			else
+			{
+				delta_H -= lambda_contact;
+			}
+			if (containing_elements.size() == 1u) // current node is in an element
+			{
+				unsigned current_element = (*containing_elements.begin());
+				// If the nodes will be in different elements after swap
+				if ( current_element != neighbour_element )
+				{
+					delta_H += lambda_contact;
+				}
+			}
+			else
+			{
+				delta_H += lambda_contact;
+			}
+		}
+	}
 	return delta_H;
 }
 
 
 template<unsigned DIM>
-void VolumeConstraintUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
+void AdhesionUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
 {
     // No parameters to include
 
@@ -101,10 +131,10 @@ void VolumeConstraintUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rPa
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////
 
-template class VolumeConstraintUpdateRule<1>;
-template class VolumeConstraintUpdateRule<2>;
-template class VolumeConstraintUpdateRule<3>;
+template class AdhesionUpdateRule<1>;
+template class AdhesionUpdateRule<2>;
+template class AdhesionUpdateRule<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(VolumeConstraintUpdateRule)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(AdhesionUpdateRule)

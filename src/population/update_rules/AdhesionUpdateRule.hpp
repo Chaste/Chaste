@@ -25,81 +25,74 @@ You should have received a copy of the GNU Lesser General Public License
 along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
-#ifndef ABSTRACTPOTTSUPDATERULE_HPP_
-#define ABSTRACTPOTTSUPDATERULE_HPP_
+#ifndef ADHESIONUPDATERULE_HPP_
+#define ADHESIONUPDATERULE_HPP_
 
 #include "ChasteSerialization.hpp"
-#include "ClassIsAbstract.hpp"
+#include <boost/serialization/base_object.hpp>
 
-#include "AbstractCellPopulation.hpp"
-#include "Identifiable.hpp"
+#include "AbstractPottsUpdateRule.hpp"
+#include "PottsBasedCellPopulation.hpp"
+
+// Needed here to avoid serialization errors (on Boost<1.37)
+#include "CellLabel.hpp"
 
 /**
- * An abstract Potts update rule class, for use in cell-based simulations.
+ * A chemotactic force class.
  */
 template<unsigned DIM>
-class AbstractPottsUpdateRule : public Identifiable
+class AdhesionUpdateRule  : public AbstractPottsUpdateRule<DIM>
 {
-    /** Needed for serialization. */
+friend class TestPottsUpdateRules;
+
+private:
+
     friend class boost::serialization::access;
-    /**
-     * Serialize the object and its member variables.
-     *
-     * Serialization of singleton objects must be done with care.
-     * Before the object is serialized via a pointer, it *MUST* be
-     * serialized directly, or an assertion will trip when a second
-     * instance of the class is created on de-serialization.
-     *
-     * @param archive the archive
-     * @param version the current version of this class
-     */
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
+        // If Archive is an output archive, then '&' resolves to '<<'
+        // If Archive is an input archive, then '&' resolves to '>>'
+        archive & boost::serialization::base_object<AbstractPottsUpdateRule<DIM> >(*this);
     }
 
 public:
 
     /**
-     * Default constructor.
+     * Constructor.
      */
-    AbstractPottsUpdateRule();
+    AdhesionUpdateRule();
 
     /**
      * Destructor.
      */
-    virtual ~AbstractPottsUpdateRule();
+    ~AdhesionUpdateRule();
 
     /**
-	 * Calculate the contribution to the Hamiltonian.
+	 * Overridden EvaluateHamiltonianContribution() method
 	 *
-	 * @param CurrentNodeIndexThe index of the current node/lattice site
+	 * Uses  sum_adjacentsites delta(spin(i),spin(j)) gamma(spin(i),spin(j)
+	 *
+	 * @param CurrentNodeIndex The index of the current node/lattice site
 	 * @param TargetNodeIndex The index of the target node/lattice site
 	 * @param rCellPopulation The cell population
 	 *
 	 * @return The difference in the Hamiltonian with the current configuration and
 	 * the configuration with the target node having the same spin as the current node.
 	 */
-    virtual double EvaluateHamiltonianContribution(unsigned CurrentNodeIndex, unsigned TargetNodeIndex, AbstractCellPopulation<2>& rCellPopulation)=0;
+    double EvaluateHamiltonianContribution(unsigned CurrentNodeIndex, unsigned TargetNodeIndex,
+												 AbstractCellPopulation<2>& rCellPopulation);
 
     /**
-     * Outputs force used in the simulation to file and then calls OutputUpdateRuleParameters to output all relevant parameters.
+     * Overridden OutputUpdateRuleParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputUpdateRuleInfo(out_stream& rParamsFile);
-
-    /**
-     * Outputs update rule parameters to file
-     *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
-     *
-     * @param rParamsFile the file stream to which the parameters are output
-     */
-    virtual void OutputUpdateRuleParameters(out_stream& rParamsFile)=0;
+    void OutputUpdateRuleParameters(out_stream& rParamsFile);
 };
 
-TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractPottsUpdateRule)
+#include "SerializationExportWrapper.hpp"
 
-#endif /*ABSTRACTPOTTSUPDATERULE_HPP_*/
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(AdhesionUpdateRule)
+
+#endif /*ADHESIONUPDATERULE_HPP_*/

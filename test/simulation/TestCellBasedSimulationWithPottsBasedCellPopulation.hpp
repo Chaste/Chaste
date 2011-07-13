@@ -41,6 +41,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "PottsBasedCellPopulation.hpp"
 #include "SloughingCellKiller.hpp"
 #include "VolumeConstraintUpdateRule.hpp"
+#include "AdhesionUpdateRule.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "PottsMeshGenerator.hpp"
 #include "WildTypeCellMutationState.hpp"
@@ -81,9 +82,11 @@ public:
         // Create cell population
         PottsBasedCellPopulation cell_population(*p_mesh, cells);
 
-        // Create an update rule and pass it to the cell population
+        // Create update rules and pass to the cell population
 		VolumeConstraintUpdateRule<2> volume_constraint_update_rule;
 		cell_population.AddUpdateRule(&volume_constraint_update_rule);
+		AdhesionUpdateRule<2> adhesion_update_rule;
+		cell_population.AddUpdateRule(&adhesion_update_rule);
 
         // Set up cell-based simulation
         CellBasedSimulation<2> simulator(cell_population);
@@ -115,9 +118,12 @@ public:
         // Create cell population
         PottsBasedCellPopulation cell_population(*p_mesh, cells);
 
-        // Create an update rule and pass it to the cell population
-        VolumeConstraintUpdateRule<2> volume_constraint_update_rule;
-        cell_population.AddUpdateRule(&volume_constraint_update_rule);
+        // Create update rules and pass to the cell population
+		VolumeConstraintUpdateRule<2> volume_constraint_update_rule;
+		cell_population.AddUpdateRule(&volume_constraint_update_rule);
+		AdhesionUpdateRule<2> adhesion_update_rule;
+		cell_population.AddUpdateRule(&adhesion_update_rule);
+
 
         // Set up cell-based simulation
         CellBasedSimulation<2> simulator(cell_population);
@@ -155,9 +161,11 @@ public:
         // Create cell population
         PottsBasedCellPopulation cell_population(*p_mesh, cells);
 
-        // Create an update rule and pass it to the cell population
+        // Create update rules and pass to the cell population
 		VolumeConstraintUpdateRule<2> volume_constraint_update_rule;
 		cell_population.AddUpdateRule(&volume_constraint_update_rule);
+		AdhesionUpdateRule<2> adhesion_update_rule;
+		cell_population.AddUpdateRule(&adhesion_update_rule);
 
         // Set up cell-based simulation
         CellBasedSimulation<2> simulator(cell_population);

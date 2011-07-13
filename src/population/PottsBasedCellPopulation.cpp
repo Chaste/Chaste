@@ -170,8 +170,7 @@ unsigned PottsBasedCellPopulation::RemoveDeadCells()
 void PottsBasedCellPopulation::UpdateNodeLocations(const std::vector< c_vector<double, 2> >& rNodeForces, double dt)
 {
     /*
-     * This is where we currently perform the Monte Carlo simulations.
-     * It will eventually be moved to the Simulation class.
+     * This is where we perform the Monte Carlo simulations.
      */
 
     // Loop over nodes and exchange
@@ -221,14 +220,8 @@ void PottsBasedCellPopulation::UpdateNodeLocations(const std::vector< c_vector<d
                  iter != mUpdateRuleCollection.end();
                  ++iter)
             {
-                (*iter)->EvaluateHamiltonianContribution(delta_H, node_iter->GetIndex(), new_location_index, *this);
+                delta_H += (*iter)->EvaluateHamiltonianContribution(node_iter->GetIndex(), new_location_index, *this);
             }
-            //assert(delta_H == EvaluateHamiltonian(node_iter->GetIndex(),new_location_index));
-            //PRINT_2_VARIABLES(delta_H, EvaluateHamiltonian(node_iter->GetIndex(),new_location_index));
-
-            delta_H = EvaluateHamiltonian(node_iter->GetIndex(),new_location_index);
-
-
 
 			double T = 0.1;
 			// Generate a uniform random number to do the random motion.
@@ -260,108 +253,6 @@ void PottsBasedCellPopulation::UpdateNodeLocations(const std::vector< c_vector<d
         }
     }
 }
-
-double PottsBasedCellPopulation::EvaluateHamiltonian(unsigned CurrentNodeIndex, unsigned TargetNodeIndex)
-{
-    std::set<unsigned> containing_elements = GetNode(CurrentNodeIndex)->rGetContainingElementIndices();
-    std::set<unsigned> new_location_containing_elements = GetNode(TargetNodeIndex)->rGetContainingElementIndices();
-
-    // All nodes should be in at most one element.
-    assert(new_location_containing_elements.size() <= 1);
-
-    // Both elements should be different to use this method
-    assert(new_location_containing_elements.begin() != containing_elements.begin());
-    assert((containing_elements.size()>0) || (new_location_containing_elements.size()>0));
-
-    double delta_H = 0.0; // H_1-H_0 differnece in Hamiltonian after and before swap.
-
-    //// VOLUME CONSTRAINT UPDATE RULE ////
-    double lambda_volume = 0.5;
-    double target_volume = 16.0;
-
-    if (containing_elements.size() == 1) // current node is in an element
-	{
-    	unsigned current_element = (*containing_elements.begin());
-		delta_H += lambda_volume*(pow(mrMesh.GetVolumeOfElement(current_element) + 1.0 - target_volume, 2.0) - pow(mrMesh.GetVolumeOfElement(current_element) - target_volume, 2.0));
-	}
-    if (new_location_containing_elements.size() == 1) // target node is in an element
-    {
-    	unsigned target_element = (*new_location_containing_elements.begin());
-    	delta_H += lambda_volume*(pow(mrMesh.GetVolumeOfElement(target_element) - 1.0 - target_volume, 2.0) - pow(mrMesh.GetVolumeOfElement(target_element) - target_volume, 2.0));
-    }
-
-
-    //// CELL CELL ADHESION UPDATE RULE ////
-    double lambda_contact = 0.1;
-
-
-	// Iterate over nodes neighbouring the target node to work out the contact energy contribution
-	std::set<unsigned> target_neighboring_node_indices = mrMesh.GetNeighbouringNodeIndices(TargetNodeIndex);
-
-	for (std::set<unsigned>::iterator iter = target_neighboring_node_indices.begin();
-		 iter != target_neighboring_node_indices.end();
-		 ++iter)
-	{
-		std::set<unsigned> neighboring_node_containing_elements = mrMesh.GetNode(*iter)->rGetContainingElementIndices();
-
-
-		if ( neighboring_node_containing_elements.size() == 1u )
-		{
-			unsigned neighbour_element = (*neighboring_node_containing_elements.begin());
-
-			if (new_location_containing_elements.size() == 1u) // target node is in an element
-			{
-				unsigned target_element = (*new_location_containing_elements.begin());
-				// If the nodes are currently from different elements
-				if ( target_element != neighbour_element )
-				{
-					delta_H -= lambda_contact;
-				}
-			}
-			else
-			{
-				delta_H -= lambda_contact;
-			}
-			if (containing_elements.size() == 1u) // current node is in an element
-			{
-				unsigned current_element = (*containing_elements.begin());
-				// If the nodes will be in different elements after swap
-				if ( current_element != neighbour_element )
-				{
-					delta_H += lambda_contact;
-				}
-			}
-			else
-			{
-				delta_H += lambda_contact;
-			}
-		}
-	}
-
-	//// STEM CELL RETAINER UPDATE RULE ////
-
-//        // Work out the stem cell retainer
-//        if (containing_elements.size() == 1) // current node is in an element
-//        {
-//            unsigned current_element = (*containing_elements.begin());
-//            if (this->mLocationCellMap[current_element]->GetCellCycleModel()->GetCellProliferativeType()==STEM)
-//            {
-//                // If move is up then penalise this
-//                if (mrMesh.GetNode(new_location_index)->rGetLocation()[1] > node_iter->rGetLocation()[1])
-//                {
-//                    H_1 += 1;
-//                }
-//                // If move is down then favor it
-//                if (mrMesh.GetNode(new_location_index)->rGetLocation()[1] < node_iter->rGetLocation()[1])
-//                {
-//                    H_1 -= 1;
-//                }
-//            }
-//        }
-
-    return delta_H;
-}
-
 
 bool PottsBasedCellPopulation::IsCellAssociatedWithADeletedLocation(CellPtr pCell)
 {
