@@ -41,8 +41,9 @@ AdhesionUpdateRule<DIM>::~AdhesionUpdateRule()
 }
 
 template<unsigned DIM>
-double AdhesionUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned CurrentNodeIndex, unsigned TargetNodeIndex,
-																	  AbstractCellPopulation<2>& rCellPopulation)
+double AdhesionUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned currentNodeIndex,
+                                                                unsigned targetNodeIndex,
+                                                                AbstractCellPopulation<2>& rCellPopulation)
 {
 	double delta_H = 0.0;
 
@@ -59,8 +60,8 @@ double AdhesionUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned Current
 	// Helper variable that is a static cast of the cell population
 	PottsBasedCellPopulation* p_cell_population = static_cast<PottsBasedCellPopulation*>(&rCellPopulation);
 
-	std::set<unsigned> containing_elements = p_cell_population->GetNode(CurrentNodeIndex)->rGetContainingElementIndices();
-	std::set<unsigned> new_location_containing_elements = p_cell_population->GetNode(TargetNodeIndex)->rGetContainingElementIndices();
+	std::set<unsigned> containing_elements = p_cell_population->GetNode(currentNodeIndex)->rGetContainingElementIndices();
+	std::set<unsigned> new_location_containing_elements = p_cell_population->GetNode(targetNodeIndex)->rGetContainingElementIndices();
 
 	// All nodes should be in at most one element.
 	assert(new_location_containing_elements.size() <= 1);
@@ -73,7 +74,7 @@ double AdhesionUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned Current
 	double lambda_contact = 0.1;
 
 	// Iterate over nodes neighbouring the target node to work out the contact energy contribution
-	std::set<unsigned> target_neighboring_node_indices = p_cell_population->rGetMesh().GetNeighbouringNodeIndices(TargetNodeIndex);
+	std::set<unsigned> target_neighboring_node_indices = p_cell_population->rGetMesh().GetNeighbouringNodeIndices(targetNodeIndex);
 
 	for (std::set<unsigned>::iterator iter = target_neighboring_node_indices.begin();
 		 iter != target_neighboring_node_indices.end();

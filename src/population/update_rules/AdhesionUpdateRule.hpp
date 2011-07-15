@@ -41,7 +41,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
  * A chemotactic force class.
  */
 template<unsigned DIM>
-class AdhesionUpdateRule  : public AbstractPottsUpdateRule<DIM>
+class AdhesionUpdateRule : public AbstractPottsUpdateRule<DIM>
 {
 friend class TestPottsUpdateRules;
 
@@ -73,15 +73,16 @@ public:
 	 *
 	 * Uses  sum_adjacentsites delta(spin(i),spin(j)) gamma(spin(i),spin(j)
 	 *
-	 * @param CurrentNodeIndex The index of the current node/lattice site
-	 * @param TargetNodeIndex The index of the target node/lattice site
+	 * @param currentNodeIndex The index of the current node/lattice site
+	 * @param targetNodeIndex The index of the target node/lattice site
 	 * @param rCellPopulation The cell population
 	 *
 	 * @return The difference in the Hamiltonian with the current configuration and
 	 * the configuration with the target node having the same spin as the current node.
 	 */
-    double EvaluateHamiltonianContribution(unsigned CurrentNodeIndex, unsigned TargetNodeIndex,
-												 AbstractCellPopulation<2>& rCellPopulation);
+    double EvaluateHamiltonianContribution(unsigned currentNodeIndex,
+                                           unsigned targetNodeIndex,
+                                           AbstractCellPopulation<2>& rCellPopulation);
 
     /**
      * Overridden OutputUpdateRuleParameters() method.
@@ -92,7 +93,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(AdhesionUpdateRule)
 
 #endif /*ADHESIONUPDATERULE_HPP_*/

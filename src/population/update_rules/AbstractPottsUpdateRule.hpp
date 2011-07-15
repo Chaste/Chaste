@@ -73,14 +73,14 @@ public:
     /**
 	 * Calculate the contribution to the Hamiltonian.
 	 *
-	 * @param CurrentNodeIndexThe index of the current node/lattice site
-	 * @param TargetNodeIndex The index of the target node/lattice site
+	 * @param currentNodeIndex The index of the current node/lattice site
+	 * @param targetNodeIndex The index of the target node/lattice site
 	 * @param rCellPopulation The cell population
 	 *
 	 * @return The difference in the Hamiltonian with the current configuration and
 	 * the configuration with the target node having the same spin as the current node.
 	 */
-    virtual double EvaluateHamiltonianContribution(unsigned CurrentNodeIndex, unsigned TargetNodeIndex, AbstractCellPopulation<2>& rCellPopulation)=0;
+    virtual double EvaluateHamiltonianContribution(unsigned currentNodeIndex, unsigned targetNodeIndex, AbstractCellPopulation<2>& rCellPopulation)=0;
 
     /**
      * Outputs force used in the simulation to file and then calls OutputUpdateRuleParameters to output all relevant parameters.

@@ -41,8 +41,9 @@ VolumeConstraintUpdateRule<DIM>::~VolumeConstraintUpdateRule()
 }
 
 template<unsigned DIM>
-double VolumeConstraintUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned CurrentNodeIndex, unsigned TargetNodeIndex,
-																	  AbstractCellPopulation<2>& rCellPopulation)
+double VolumeConstraintUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned currentNodeIndex,
+                                                                        unsigned targetNodeIndex,
+                                                                        AbstractCellPopulation<2>& rCellPopulation)
 {
 	double delta_H = 0.0;
 
@@ -50,7 +51,7 @@ double VolumeConstraintUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned
 	assert(DIM == 2); // this method only works in 2D at present
 
 	// Throw an exception message if not using a PottsBasedCellPopulation
-	/** TODO this is probably not the best way of doing this it will slow things down probably should pass in a PottsBasedCellPopulation #1665 */
+	///\todo this is probably not the best way of doing this it will slow things down probably should pass in a PottsBasedCellPopulation (#1665)
 	if (dynamic_cast<PottsBasedCellPopulation*>(&rCellPopulation) == NULL)
 	{
 		EXCEPTION("VolumeConstraintUpdateRule is to be used with a PottsBasedCellPopulation only");
@@ -59,8 +60,8 @@ double VolumeConstraintUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned
 	// Helper variable that is a static cast of the cell population
 	PottsBasedCellPopulation* p_cell_population = static_cast<PottsBasedCellPopulation*>(&rCellPopulation);
 
-	std::set<unsigned> containing_elements = p_cell_population->GetNode(CurrentNodeIndex)->rGetContainingElementIndices();
-	std::set<unsigned> new_location_containing_elements = p_cell_population->GetNode(TargetNodeIndex)->rGetContainingElementIndices();
+	std::set<unsigned> containing_elements = p_cell_population->GetNode(currentNodeIndex)->rGetContainingElementIndices();
+	std::set<unsigned> new_location_containing_elements = p_cell_population->GetNode(targetNodeIndex)->rGetContainingElementIndices();
 
 	// All nodes should be in at most one element.
 	assert(new_location_containing_elements.size() <= 1);

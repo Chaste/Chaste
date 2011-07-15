@@ -47,7 +47,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 template<unsigned DIM>
 class DiffusionUpdateRule : public AbstractUpdateRule<DIM>
 {
-
 private:
 
     /** Diffusion constant. */

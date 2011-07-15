@@ -51,7 +51,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 template<unsigned DIM>
 class AdvectionUpdateRule : public AbstractUpdateRule<DIM>
 {
-
 private:
 
     /**
@@ -131,6 +130,5 @@ public:
 
 #include "SerializationExportWrapper.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(AdvectionUpdateRule)
-
 
 #endif /*ADVECTIONUPDATERULE_HPP_*/

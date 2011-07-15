@@ -73,15 +73,16 @@ public:
 	 *
 	 * Uses  sum_elements alpha (V_i - V_i^T)^2
 	 *
-	 * @param CurrentNodeIndex The index of the current node/lattice site
-	 * @param TargetNodeIndex The index of the target node/lattice site
+	 * @param currentNodeIndex The index of the current node/lattice site
+	 * @param targetNodeIndex The index of the target node/lattice site
 	 * @param rCellPopulation The cell population
 	 *
 	 * @return The difference in the Hamiltonian with the current configuration and
 	 * the configuration with the target node having the same spin as the current node.
 	 */
-    double EvaluateHamiltonianContribution(unsigned CurrentNodeIndex, unsigned TargetNodeIndex,
-												 AbstractCellPopulation<2>& rCellPopulation);
+    double EvaluateHamiltonianContribution(unsigned currentNodeIndex,
+                                           unsigned targetNodeIndex,
+                                           AbstractCellPopulation<2>& rCellPopulation);
 
     /**
      * Overridden OutputUpdateRuleParameters() method.
@@ -92,7 +93,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(VolumeConstraintUpdateRule)
 
 #endif /*VOLUMECONSTRAINTUPDATERULE_HPP_*/

@@ -251,13 +251,15 @@ public:
 
     /**
 	 * Method to calculate the Hamiltonian.
+	 * \todo This is not defined in the .cpp file
 	 *
-	 * @param CurrentNodeIndex The index of the current node/lattice site
-	 * @param TargetNodeIndex The index of the target node/lattice site
+	 * @param currentNodeIndex The index of the current node/lattice site
+	 * @param targetNodeIndex The index of the target node/lattice site
+	 *
 	 * @return The difference in the Hamiltonian with the current configuration and
 	 * the configuration with the target node having the same spin as the current node.
 	 */
-    double EvaluateHamiltonian(unsigned CurrentNodeIndex, unsigned TargetNodeIndex);
+    double EvaluateHamiltonian(unsigned currentNodeIndex, unsigned targetNodeIndex);
 
     /**
      * Overridden IsCellAssociatedWithADeletedLocation() method.
