@@ -174,7 +174,7 @@ public:
      *
      * @return a pointer to the PottsElement.
      */
-    PottsElement* GetElement(unsigned elementIndex);
+    PottsElement<2>* GetElement(unsigned elementIndex);
 
     /**
      * @return the number of PottsElements in the cell population.
@@ -214,7 +214,7 @@ public:
      *
      * @return pointer to the element.
      */
-    PottsElement* GetElementCorrespondingToCell(CellPtr pCell);
+    PottsElement<2>* GetElementCorrespondingToCell(CellPtr pCell);
 
     /**
      * Overridden AddCell() method.

@@ -29,17 +29,21 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "RandomNumberGenerator.hpp"
 #include <cassert>
 
-PottsElement::PottsElement(unsigned index, const std::vector<Node<2>*>& rNodes)
-    : AbstractElement<2,2>(index, rNodes)
+
+template<unsigned DIM>
+PottsElement<DIM>::PottsElement(unsigned index, const std::vector<Node<DIM>*>& rNodes)
+    : AbstractElement<DIM,DIM>(index, rNodes)
 {
     RegisterWithNodes();
 }
 
-PottsElement::~PottsElement()
+template<unsigned DIM>
+PottsElement<DIM>::~PottsElement()
 {
 }
 
-void PottsElement::RegisterWithNodes()
+template<unsigned DIM>
+void PottsElement<DIM>::RegisterWithNodes()
 {
     for (unsigned i=0; i<this->mNodes.size(); i++)
     {
@@ -47,7 +51,8 @@ void PottsElement::RegisterWithNodes()
     }
 }
 
-void PottsElement::MarkAsDeleted()
+template<unsigned DIM>
+void PottsElement<DIM>::MarkAsDeleted()
 {
     // Mark element as deleted
     this->mIsDeleted = true;
@@ -59,7 +64,8 @@ void PottsElement::MarkAsDeleted()
     }
 }
 
-void PottsElement::ResetIndex(unsigned index)
+template<unsigned DIM>
+void PottsElement<DIM>::ResetIndex(unsigned index)
 {
     for (unsigned i=0; i<this->GetNumNodes(); i++)
     {
@@ -69,7 +75,8 @@ void PottsElement::ResetIndex(unsigned index)
     RegisterWithNodes();
 }
 
-void PottsElement::UpdateNode(const unsigned& rIndex, Node<2>* pNode)
+template<unsigned DIM>
+void PottsElement<DIM>::UpdateNode(const unsigned& rIndex, Node<DIM>* pNode)
 {
     assert(rIndex < this->mNodes.size());
 
@@ -83,7 +90,8 @@ void PottsElement::UpdateNode(const unsigned& rIndex, Node<2>* pNode)
     this->mNodes[rIndex]->AddElement(this->mIndex);
 }
 
-void PottsElement::DeleteNode(const unsigned& rIndex)
+template<unsigned DIM>
+void PottsElement<DIM>::DeleteNode(const unsigned& rIndex)
 {
     assert(rIndex < this->mNodes.size());
 
@@ -94,7 +102,8 @@ void PottsElement::DeleteNode(const unsigned& rIndex)
     this->mNodes.erase(this->mNodes.begin() + rIndex);
 }
 
-void PottsElement::AddNode(Node<2>* pNode)
+template<unsigned DIM>
+void PottsElement<DIM>::AddNode(Node<DIM>* pNode)
 {
     // Add element to this node
     pNode->AddElement(this->mIndex);
@@ -103,7 +112,8 @@ void PottsElement::AddNode(Node<2>* pNode)
     this->mNodes.push_back(pNode);
 }
 
-unsigned PottsElement::GetNodeLocalIndex(unsigned globalIndex) const
+template<unsigned DIM>
+unsigned PottsElement<DIM>::GetNodeLocalIndex(unsigned globalIndex) const
 {
     unsigned local_index = UINT_MAX;
     for (unsigned i=0; i<this->mNodes.size(); i++)
@@ -116,7 +126,8 @@ unsigned PottsElement::GetNodeLocalIndex(unsigned globalIndex) const
     return local_index;
 }
 
-bool PottsElement::IsElementOnBoundary() const
+template<unsigned DIM>
+bool PottsElement<DIM>::IsElementOnBoundary() const
 {
     bool is_element_on_boundary = false;
     for (unsigned i=0; i<this->mNodes.size(); i++)
@@ -130,13 +141,10 @@ bool PottsElement::IsElementOnBoundary() const
     return is_element_on_boundary;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////
-//// Explicit instantiation
-///////////////////////////////////////////////////////////////////////////////////////
-//
-//template class PottsElement<1,1>;
-//template class PottsElement<1,2>;
-//template class PottsElement<1,3>;
-//template class PottsElement<2,2>;
-//template class PottsElement<2,3>;
-//template class PottsElement<3,3>;
+/////////////////////////////////////////////////////////////////////////////////////
+// Explicit instantiation
+/////////////////////////////////////////////////////////////////////////////////////
+
+template class PottsElement<1>;
+template class PottsElement<2>;
+template class PottsElement<3>;

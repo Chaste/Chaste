@@ -40,7 +40,7 @@ PottsMeshGenerator::PottsMeshGenerator(unsigned numNodesAcross, unsigned numNode
     assert(numElementsUp*elementHeight<=numNodesUp);
 
     std::vector<Node<2>*> nodes;
-    std::vector<PottsElement*>  elements;
+    std::vector<PottsElement<2>*>  elements;
 
     unsigned node_index = 0;
     unsigned node_indices[elementWidth*elementHeight];
@@ -88,7 +88,7 @@ PottsMeshGenerator::PottsMeshGenerator(unsigned numNodesAcross, unsigned numNode
             }
 
             element_index = j*numElementsAcross + i;
-            PottsElement* p_element = new PottsElement(element_index, element_nodes);
+            PottsElement<2>* p_element = new PottsElement<2>(element_index, element_nodes);
             elements.push_back(p_element);
         }
     }

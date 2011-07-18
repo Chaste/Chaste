@@ -63,9 +63,9 @@ public:
         nodes_elements[1].push_back(basic_nodes[4]);
         nodes_elements[1].push_back(basic_nodes[5]);
 
-        std::vector<PottsElement*> basic_potts_elements;
-        basic_potts_elements.push_back(new PottsElement(0, nodes_elements[0]));
-        basic_potts_elements.push_back(new PottsElement(1, nodes_elements[1]));
+        std::vector<PottsElement<2>*> basic_potts_elements;
+        basic_potts_elements.push_back(new PottsElement<2>(0, nodes_elements[0]));
+        basic_potts_elements.push_back(new PottsElement<2>(1, nodes_elements[1]));
 
         // Make a PottsMesh
         PottsMesh basic_potts_mesh(basic_nodes, basic_potts_elements);
@@ -434,8 +434,8 @@ public:
             nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
         }
 
-        std::vector<PottsElement*> elements;
-        elements.push_back(new PottsElement(0, nodes_elem_0));
+        std::vector<PottsElement<2>*> elements;
+        elements.push_back(new PottsElement<2>(0, nodes_elem_0));
 
         // Make a vertex mesh
         PottsMesh mesh(nodes, elements);
@@ -444,7 +444,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 1u);
 
         // Add a new element to the mesh
-        mesh.AddElement(new PottsElement(1, nodes_elem_1));
+        mesh.AddElement(new PottsElement<2>(1, nodes_elem_1));
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 6u);
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 2u);
@@ -469,9 +469,9 @@ public:
             nodes_elem_1.push_back(basic_nodes[3]);
             nodes_elem_1.push_back(basic_nodes[1]);
 
-            std::vector<PottsElement*> basic_potts_elements;
-            basic_potts_elements.push_back(new PottsElement(0, nodes_elem_0));
-            basic_potts_elements.push_back(new PottsElement(1, nodes_elem_1));
+            std::vector<PottsElement<2>*> basic_potts_elements;
+            basic_potts_elements.push_back(new PottsElement<2>(0, nodes_elem_0));
+            basic_potts_elements.push_back(new PottsElement<2>(1, nodes_elem_1));
             // Make a potts mesh
             PottsMesh basic_potts_mesh(basic_nodes, basic_potts_elements);
 
@@ -516,9 +516,9 @@ public:
             nodes_elem_1.push_back(basic_nodes[3]);
             nodes_elem_1.push_back(basic_nodes[1]);
 
-            std::vector<PottsElement*> basic_potts_elements;
-            basic_potts_elements.push_back(new PottsElement(0, nodes_elem_0));
-            basic_potts_elements.push_back(new PottsElement(1, nodes_elem_1));
+            std::vector<PottsElement<2>*> basic_potts_elements;
+            basic_potts_elements.push_back(new PottsElement<2>(0, nodes_elem_0));
+            basic_potts_elements.push_back(new PottsElement<2>(1, nodes_elem_1));
             // Make a potts mesh
             PottsMesh basic_potts_mesh(basic_nodes, basic_potts_elements);
 
@@ -560,8 +560,8 @@ public:
             std::vector<Node<2>*> nodes_elem;
             nodes_elem.push_back(basic_nodes[0]);
 
-            std::vector<PottsElement*> basic_potts_elements;
-            basic_potts_elements.push_back(new PottsElement(0, nodes_elem));
+            std::vector<PottsElement<2>*> basic_potts_elements;
+            basic_potts_elements.push_back(new PottsElement<2>(0, nodes_elem));
 
             // Make a potts mesh
             PottsMesh basic_potts_mesh(basic_nodes, basic_potts_elements);
@@ -591,9 +591,9 @@ public:
         nodes_elem_1.push_back(basic_nodes[3]);
         nodes_elem_1.push_back(basic_nodes[1]);
 
-        std::vector<PottsElement*> basic_potts_elements;
-        basic_potts_elements.push_back(new PottsElement(0, nodes_elem_0));
-        basic_potts_elements.push_back(new PottsElement(1, nodes_elem_1));
+        std::vector<PottsElement<2>*> basic_potts_elements;
+        basic_potts_elements.push_back(new PottsElement<2>(0, nodes_elem_0));
+        basic_potts_elements.push_back(new PottsElement<2>(1, nodes_elem_1));
         // Make a potts mesh
         PottsMesh basic_potts_mesh(basic_nodes, basic_potts_elements);
 

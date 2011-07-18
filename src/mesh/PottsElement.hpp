@@ -32,7 +32,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
-#include <boost/serialization/vector.hpp>
 
 /**
  * An element class for use in the PottsMesh class.
@@ -40,10 +39,34 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
  * The main difference between this and the Element class is that a
  * PottsElement can have a variable number of nodes associated with
  * it and these represent the lattice sites contained in the element.
+ * As they are just a collection of sites there is no concept of
+ * Element Dimension.
+ *
  */
-//template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class PottsElement : public AbstractElement<2, 2>
+template<unsigned DIM>
+class PottsElement : public AbstractElement<DIM, DIM>
 {
+private:
+
+    /** Needed for serialization. */
+    friend class boost::serialization::access;
+    /**
+     * Serialize the object and its member variables.
+     *
+     * Note that serialization of the mesh and cells is handled by load/save_construct_data.
+     *
+     * Note also that member data related to writers is not saved - output must
+     * be set up again by the caller after a restart.
+     *
+     * @param archive the archive
+     * @param version the current version of this class
+     */
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+        archive & boost::serialization::base_object<AbstractElement<DIM, DIM> >(*this);
+    }
+
 public:
     /**
      * Constructor.
@@ -51,7 +74,7 @@ public:
      * @param index global index of the element
      * @param rNodes vector of Nodes associated with the element
      */
-    PottsElement(unsigned index, const std::vector<Node<2>*>& rNodes);
+    PottsElement(unsigned index, const std::vector<Node<DIM>*>& rNodes);
 
     /**
      * Destructor.
@@ -86,7 +109,7 @@ public:
      * @param rIndex is an local index to which node to change
      * @param pNode is a pointer to the replacement node
      */
-    void UpdateNode(const unsigned& rIndex, Node<2>* pNode);
+    void UpdateNode(const unsigned& rIndex, Node<DIM>* pNode);
 
     /**
      * Delete a node with given local index.
@@ -101,7 +124,7 @@ public:
      *
      * @param pNode is a pointer to the new node
      */
-    void AddNode(Node<2>* pNode);
+    void AddNode(Node<DIM>* pNode);
 
     /**
      * Calculate the local index of a node given a global index

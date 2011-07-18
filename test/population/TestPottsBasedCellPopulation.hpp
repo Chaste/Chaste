@@ -177,7 +177,7 @@ public:
             std::set<unsigned> actual_node_indices;
             unsigned elem_index = iter->GetIndex();
             CellPtr p_cell = cell_population.GetCellUsingLocationIndex(elem_index);
-            PottsElement* p_actual_element = cell_population.GetElementCorrespondingToCell(p_cell);
+            PottsElement<2>* p_actual_element = cell_population.GetElementCorrespondingToCell(p_cell);
             unsigned actual_index = p_actual_element->GetIndex();
 
             for (unsigned i=0; i<p_actual_element->GetNumNodes(); i++)

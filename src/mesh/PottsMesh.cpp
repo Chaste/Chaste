@@ -31,7 +31,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "UblasCustomFunctions.hpp"
 #include <list>
 
-PottsMesh::PottsMesh(std::vector<Node<2>*> nodes, std::vector<PottsElement*> pottsElements)
+PottsMesh::PottsMesh(std::vector<Node<2>*> nodes, std::vector<PottsElement<2>*> pottsElements)
 {
     // Reset member variables and clear mNodes and mElements
     Clear();
@@ -44,14 +44,14 @@ PottsMesh::PottsMesh(std::vector<Node<2>*> nodes, std::vector<PottsElement*> pot
     }
     for (unsigned elem_index=0; elem_index<pottsElements.size(); elem_index++)
     {
-        PottsElement* p_temp_element = pottsElements[elem_index];
+        PottsElement<2>* p_temp_element = pottsElements[elem_index];
         mElements.push_back(p_temp_element);
     }
 
     // Register elements with nodes
     for (unsigned index=0; index<mElements.size(); index++)
     {
-        PottsElement* p_element = mElements[index];
+        PottsElement<2>* p_element = mElements[index];
 
         unsigned element_index = p_element->GetIndex();
         unsigned num_nodes_in_element = p_element->GetNumNodes();
@@ -127,7 +127,7 @@ unsigned PottsMesh::GetNumAllElements() const
     return mElements.size();
 }
 
-PottsElement* PottsMesh::GetElement(unsigned index) const
+PottsElement<2>* PottsMesh::GetElement(unsigned index) const
 {
     assert(index < mElements.size());
     return mElements[index];
@@ -135,7 +135,7 @@ PottsElement* PottsMesh::GetElement(unsigned index) const
 
 c_vector<double, 2> PottsMesh::GetCentroidOfElement(unsigned index)
 {
-    PottsElement* p_element = GetElement(index);
+    PottsElement<2>* p_element = GetElement(index);
     unsigned num_nodes_in_element = p_element->GetNumNodes();
 
     ///\todo This should probably be returning the nearest node
@@ -204,7 +204,7 @@ c_vector<double, 2> PottsMesh::GetCentroidOfElement(unsigned index)
 //        }
 //
 //        // Use nodes and index to construct this element
-//        PottsElement<2,2>* p_element = new PottsElement<2,2>(elem_index, nodes);
+//        PottsElement<2><2,2>* p_element = new PottsElement<2><2,2>(elem_index, nodes);
 //        mElements.push_back(p_element);
 //
 //        if (rMeshReader.GetNumElementAttributes() > 0)
@@ -228,7 +228,7 @@ c_vector<double, 2> PottsMesh::GetVectorFromAtoB(const c_vector<double, 2>& rLoc
 double PottsMesh::GetVolumeOfElement(unsigned index)
 {
     // Get pointer to this element
-    PottsElement* p_element = GetElement(index);
+    PottsElement<2>* p_element = GetElement(index);
 
     double element_volume = (double) p_element->GetNumNodes();
 
@@ -313,7 +313,7 @@ void PottsMesh::DeleteElement(unsigned index)
     mDeletedElementIndices.push_back(index);
 }
 
-unsigned PottsMesh::DivideElement(PottsElement* pElement,
+unsigned PottsMesh::DivideElement(PottsElement<2>* pElement,
                                   bool placeOriginalElementBelow)
 {
     // Store the number of nodes in the element (this changes when nodes are deleted from the element)
@@ -345,7 +345,7 @@ unsigned PottsMesh::DivideElement(PottsElement* pElement,
     }
 
     // Add the new element to the mesh
-    AddElement(new PottsElement(new_element_index, nodes_elem));
+    AddElement(new PottsElement<2>(new_element_index, nodes_elem));
 
     /**
      * Remove the correct nodes from each element. If placeOriginalElementBelow is true,
@@ -436,7 +436,7 @@ unsigned PottsMesh::DivideElement(PottsElement* pElement,
     return new_element_index;
 }
 
-unsigned PottsMesh::AddElement(PottsElement* pNewElement)
+unsigned PottsMesh::AddElement(PottsElement<2>* pNewElement)
 {
     unsigned new_element_index = pNewElement->GetIndex();
 

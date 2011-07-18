@@ -54,7 +54,7 @@ class PottsMesh : public AbstractMesh<2, 2>
 
 protected:
     /** Vector of pointers to PottsElements. */
-    std::vector<PottsElement *> mElements;
+    std::vector<PottsElement<2>*> mElements;
 
     /**
      * Indices of elements that have been marked as deleted.
@@ -160,7 +160,7 @@ public:
      * @param PottsElements vector of pointers to PottsElements
      */
     PottsMesh(std::vector<Node<2>*> nodes,
-               std::vector<PottsElement*> PottsElements);
+               std::vector<PottsElement<2>*> PottsElements);
 
     /**
      * Default constructor for use by serializer.
@@ -192,7 +192,7 @@ public:
      *
      * @return a pointer to the PottsElement
      */
-    PottsElement* GetElement(unsigned index) const;
+    PottsElement<2>* GetElement(unsigned index) const;
 
     /**
      * Compute the centroid of an element.
@@ -284,7 +284,7 @@ public:
      *
      * @return the index of the new element
      */
-    unsigned DivideElement(PottsElement* pElement,
+    unsigned DivideElement(PottsElement<2>* pElement,
                            bool placeOriginalElementBelow=false);
 
     /**
@@ -294,7 +294,7 @@ public:
      *
      * @return the index of the new element in the mesh
      */
-    unsigned AddElement(PottsElement* pNewElement);
+    unsigned AddElement(PottsElement<2>* pNewElement);
 
     //////////////////////////////////////////////////////////////////////
     //                         Nested classes                           //
@@ -313,12 +313,12 @@ public:
          *
          * Make sure to use a reference for the result to avoid copying elements unnecessarily.
          */
-        inline PottsElement& operator*();
+        inline PottsElement<2>& operator*();
 
         /**
          * Member access from a pointer.
          */
-        inline PottsElement* operator->();
+        inline PottsElement<2>* operator->();
 
         /**
          * Comparison not-equal-to.
@@ -343,7 +343,7 @@ public:
          * @param skipDeletedElements whether to include deleted elements
          */
         PottsElementIterator(PottsMesh& rMesh,
-                             std::vector<PottsElement *>::iterator elementIter,
+                             std::vector<PottsElement<2>*>::iterator elementIter,
                              bool skipDeletedElements=true)
             : mrMesh(rMesh),
               mElementIter(elementIter),
@@ -369,7 +369,7 @@ public:
         PottsMesh& mrMesh;
 
         /** The actual element iterator. */
-        std::vector<PottsElement *>::iterator mElementIter;
+        std::vector<PottsElement<2>*>::iterator mElementIter;
 
         /** Whether to skip deleted elements. */
         bool mSkipDeletedElements;
@@ -404,13 +404,13 @@ PottsMesh::PottsElementIterator PottsMesh::GetElementIteratorEnd()
     return PottsElementIterator(*this, mElements.end());
 }
 
-PottsElement& PottsMesh::PottsElementIterator::operator*()
+PottsElement<2>& PottsMesh::PottsElementIterator::operator*()
 {
     assert(!IsAtEnd());
     return **mElementIter;
 }
 
-PottsElement* PottsMesh::PottsElementIterator::operator->()
+PottsElement<2>* PottsMesh::PottsElementIterator::operator->()
 {
     assert(!IsAtEnd());
     return *mElementIter;

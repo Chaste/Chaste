@@ -99,7 +99,7 @@ const PottsMesh& PottsBasedCellPopulation::rGetMesh() const
     return mrMesh;
 }
 
-PottsElement* PottsBasedCellPopulation::GetElement(unsigned elementIndex)
+PottsElement<2>* PottsBasedCellPopulation::GetElement(unsigned elementIndex)
 {
     return mrMesh.GetElement(elementIndex);
 }
@@ -124,7 +124,7 @@ c_vector<double, 2> PottsBasedCellPopulation::GetLocationOfCellCentre(CellPtr pC
     return mrMesh.GetCentroidOfElement(this->mCellLocationMap[pCell.get()]);
 }
 
-PottsElement* PottsBasedCellPopulation::GetElementCorrespondingToCell(CellPtr pCell)
+PottsElement<2>* PottsBasedCellPopulation::GetElementCorrespondingToCell(CellPtr pCell)
 {
     return mrMesh.GetElement(this->mCellLocationMap[pCell.get()]);
 }
@@ -132,7 +132,7 @@ PottsElement* PottsBasedCellPopulation::GetElementCorrespondingToCell(CellPtr pC
 CellPtr PottsBasedCellPopulation::AddCell(CellPtr pNewCell, const c_vector<double,2>& rCellDivisionVector, CellPtr pParentCell)
 {
     // Get the element associated with this cell
-    PottsElement* p_element = GetElementCorrespondingToCell(pParentCell);
+    PottsElement<2>* p_element = GetElementCorrespondingToCell(pParentCell);
 
     // Divide the element
     unsigned new_element_index = mrMesh.DivideElement(p_element, true); // new element will be below the existing element
@@ -307,7 +307,7 @@ void PottsBasedCellPopulation::WriteResultsToFiles()
         // Write node data to file
         if ( !(GetElement(elem_index)->IsDeleted()) && !elem_corresponds_to_dead_cell)
         {
-            PottsElement* p_element = mrMesh.GetElement(elem_index);
+            PottsElement<2>* p_element = mrMesh.GetElement(elem_index);
 
             unsigned num_nodes_in_element = p_element->GetNumNodes();
 
@@ -463,7 +463,7 @@ std::set<unsigned> PottsBasedCellPopulation::GetNeighbouringNodeIndices(unsigned
          ++elem_iter)
     {
         // Get pointer to this containing element
-        PottsElement* p_element = mrMesh.GetElement(*elem_iter);
+        PottsElement<2>* p_element = mrMesh.GetElement(*elem_iter);
 
         // Loop over nodes contained in this element
         for (unsigned i=0; i<p_element->GetNumNodes(); i++)
