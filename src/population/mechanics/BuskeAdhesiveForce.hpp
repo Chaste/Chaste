@@ -26,8 +26,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#ifndef BUSKEINTERACTIONFORCE_HPP_
-#define BUSKEINTERACTIONFORCE_HPP_
+#ifndef BUSKEADHESIVEFORCE_HPP_
+#define BUSKEADHESIVEFORCE_HPP_
 
 #include "AbstractTwoBodyInteractionForce.hpp"
 
@@ -42,7 +42,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
  * Time is in hours.
  */
 template<unsigned DIM>
-class BuskeInteractionForce : public AbstractTwoBodyInteractionForce<DIM>
+class BuskeAdhesiveForce : public AbstractTwoBodyInteractionForce<DIM>
 {
     friend class TestForcesNotForRelease;
 private:
@@ -62,7 +62,6 @@ private:
         // If Archive is an input archive, then '&' resolves to '>>'
         archive & boost::serialization::base_object<AbstractTwoBodyInteractionForce<DIM> >(*this);
         archive & mAdhesionEnergyParameter;
-        archive & mDeformationEnergyParameter;
     }
 
     /**
@@ -74,25 +73,12 @@ private:
      */
     double mAdhesionEnergyParameter;
 
-    /**
-     * Deformation energy parameter.
-     *
-     * Represented by the parameter D in the model by Buske et al (2011) in
-     * their off-lattice model of the intestinal crypt
-     * (doi:10.1371/journal.pcbi.1001045).
-     *
-     * Note: D=3/2(1-nu^2)/E
-     *
-     * Where E is the Young Modulus and nu is the Poisson ratio of cells
-     */
-    double mDeformationEnergyParameter;
-
 public:
 
     /**
      * Constructor.
      */
-    BuskeInteractionForce();
+    BuskeAdhesiveForce();
 
     /**
      * Get mAdhesionEnergyParameter.
@@ -105,18 +91,6 @@ public:
      * @param adhesionEnergyParameter the new value of mAdhesionEnergyParameter
      */
     void SetAdhesionEnergyParameter(double adhesionEnergyParameter);
-
-    /**
-     * Get mDeformationEnergyParameter.
-     */
-    double GetDeformationEnergyParameter();
-
-    /**
-     * Set mDeformationEnergyParameter.
-     *
-     * @param deformationEnergyParameter the new value of mDeformationEnergyParameter
-     */
-    void SetDeformationEnergyParameter(double deformationEnergyParameter);
 
     /**
      * Calculate the force between two nodes.
@@ -148,6 +122,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(BuskeInteractionForce)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(BuskeAdhesiveForce)
 
-#endif /*BUSKEINTERACTIONFORCE_HPP_*/
+#endif /*BUSKEADHESIVEFORCE_HPP_*/

@@ -26,42 +26,29 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#include "BuskeInteractionForce.hpp"
+#include "BuskeElasticForce.hpp"
 
 template<unsigned DIM>
-BuskeInteractionForce<DIM>::BuskeInteractionForce()
+BuskeElasticForce<DIM>::BuskeElasticForce()
    : AbstractTwoBodyInteractionForce<DIM>(),
-     mAdhesionEnergyParameter(200),        // Denoted by epsilon in Buske et al (2011) (doi:10.1371/journal.pcbi.1001045).
      mDeformationEnergyParameter(4.0/3.0) // Denoted by D in Buske et al (2011) (doi:10.1371/journal.pcbi.1001045).
 {
 }
 
 template<unsigned DIM>
-double BuskeInteractionForce<DIM>::GetAdhesionEnergyParameter()
-{
-    return mAdhesionEnergyParameter;
-}
-
-template<unsigned DIM>
-void BuskeInteractionForce<DIM>::SetAdhesionEnergyParameter(double adhesionEnergyParameter)
-{
-    mAdhesionEnergyParameter = adhesionEnergyParameter;
-}
-
-template<unsigned DIM>
-double BuskeInteractionForce<DIM>::GetDeformationEnergyParameter()
+double BuskeElasticForce<DIM>::GetDeformationEnergyParameter()
 {
     return mDeformationEnergyParameter;
 }
 
 template<unsigned DIM>
-void BuskeInteractionForce<DIM>::SetDeformationEnergyParameter(double deformationEnergyParameter)
+void BuskeElasticForce<DIM>::SetDeformationEnergyParameter(double deformationEnergyParameter)
 {
     mDeformationEnergyParameter = deformationEnergyParameter;
 }
 
 template<unsigned DIM>
-c_vector<double, DIM> BuskeInteractionForce<DIM>::CalculateForceBetweenNodes(unsigned nodeAGlobalIndex,
+c_vector<double, DIM> BuskeElasticForce<DIM>::CalculateForceBetweenNodes(unsigned nodeAGlobalIndex,
                                                                              unsigned nodeBGlobalIndex,
                                                                              AbstractCellPopulation<DIM>& rCellPopulation)
 {
@@ -109,15 +96,8 @@ c_vector<double, DIM> BuskeInteractionForce<DIM>::CalculateForceBetweenNodes(uns
 }
 
 template<unsigned DIM>
-double BuskeInteractionForce<DIM>::GetMagnitudeOfForce(double distanceBetweenNodes, double radiusOfCellOne, double radiusOfCellTwo)
+double BuskeElasticForce<DIM>::GetMagnitudeOfForce(double distanceBetweenNodes, double radiusOfCellOne, double radiusOfCellTwo)
 {
-    double xij = 0.5*(radiusOfCellOne*radiusOfCellOne - radiusOfCellTwo*radiusOfCellTwo + distanceBetweenNodes*distanceBetweenNodes)/distanceBetweenNodes;
-
-    double dxijdd = 1.0 - xij/distanceBetweenNodes;
-
-    // Calculate contribution from adhesive interaction energy
-    double dWAdd = 2.0*mAdhesionEnergyParameter*M_PI*xij*dxijdd;
-
     // Calculate contribution from deformation interaction energy
     double dWDdd;
 
@@ -132,13 +112,12 @@ double BuskeInteractionForce<DIM>::GetMagnitudeOfForce(double distanceBetweenNod
         dWDdd = 0.0;
     }
 
-    return dWAdd + dWDdd; // + dWKdd;
+    return dWDdd; //
 }
 
 template<unsigned DIM>
-void BuskeInteractionForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
+void BuskeElasticForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<AdhesionEnergyParameter>" << mAdhesionEnergyParameter << "</AdhesionEnergyParameter> \n";
     *rParamsFile << "\t\t\t<DeformationEnergyParameter>" << mDeformationEnergyParameter << "</DeformationEnergyParameter> \n";
 
     // Call method on direct parent class
@@ -149,10 +128,10 @@ void BuskeInteractionForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////
 
-template class BuskeInteractionForce<1>;
-template class BuskeInteractionForce<2>;
-template class BuskeInteractionForce<3>;
+template class BuskeElasticForce<1>;
+template class BuskeElasticForce<2>;
+template class BuskeElasticForce<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(BuskeInteractionForce)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(BuskeElasticForce)
