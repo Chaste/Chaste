@@ -147,30 +147,19 @@ PottsElement<DIM>* PottsMesh<DIM>::GetElement(unsigned index) const
 template<unsigned DIM>
 c_vector<double, DIM> PottsMesh<DIM>::GetCentroidOfElement(unsigned index)
 {
-
-	//TODO Not Written in 3d yet
-	assert(DIM==2);
-
     PottsElement<DIM>* p_element = GetElement(index);
     unsigned num_nodes_in_element = p_element->GetNumNodes();
 
     ///\todo This should probably be returning the nearest node
-    c_vector<double, 2> centroid = zero_vector<double>(2);
-
-    double temp_centroid_x = 0;
-    double temp_centroid_y = 0;
+    c_vector<double, DIM> centroid = zero_vector<double>(DIM);
 
     for (unsigned local_index=0; local_index<num_nodes_in_element; local_index++)
-    {
-        // Find location of current node
-        c_vector<double, 2> current_node = p_element->GetNodeLocation(local_index);
+	{
+		// Find location of current node and add it to the centroid
+		centroid += p_element->GetNodeLocation(local_index);
+	}
 
-        temp_centroid_x += current_node[0];
-        temp_centroid_y += current_node[1];
-    }
-
-    centroid(0) = temp_centroid_x/num_nodes_in_element;
-    centroid(1) = temp_centroid_y/num_nodes_in_element;
+    centroid /= num_nodes_in_element;
 
     return centroid;
 }

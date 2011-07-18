@@ -94,10 +94,10 @@ public:
 
         // Test Area and Perimeter of elements
         TS_ASSERT_DELTA(basic_potts_mesh.GetVolumeOfElement(0), 3.0, 1e-12);
-        TS_ASSERT_DELTA(basic_potts_mesh.GetSurfaceAreaOfElement(0), 0.0, 1e-12);//TODO this is Wrong
+        TS_ASSERT_DELTA(basic_potts_mesh.GetSurfaceAreaOfElement(0), 0.0, 1e-12);//TODO this is wrong see #1683
 
         TS_ASSERT_DELTA(basic_potts_mesh.GetVolumeOfElement(1), 3.0, 1e-12);
-        TS_ASSERT_DELTA(basic_potts_mesh.GetSurfaceAreaOfElement(1), 0.0, 1e-12);//TODO this is Wrong
+        TS_ASSERT_DELTA(basic_potts_mesh.GetSurfaceAreaOfElement(1), 0.0, 1e-12);//TODO this is wrong see #1683
 
         // Test GetCentroidOfElements
         TS_ASSERT_DELTA(basic_potts_mesh.GetCentroidOfElement(0)[0], 1.0/3.0, 1e-12);
@@ -117,6 +117,89 @@ public:
         TS_ASSERT_EQUALS(basic_potts_mesh.SolveBoundaryElementMapping(0), 0u);
         TS_ASSERT_EQUALS(basic_potts_mesh.IsMeshChanging(), true);
     }
+
+    void TestBasic3dPottsMesh() throw(Exception)
+	{
+		// Make 8 nodes to assign to two elements
+		std::vector<Node<3>*> basic_nodes;
+		basic_nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.0));
+		basic_nodes.push_back(new Node<3>(1, false, 1.0, 0.0, 0.0));
+		basic_nodes.push_back(new Node<3>(2, false, 0.0, 1.0, 0.0));
+		basic_nodes.push_back(new Node<3>(3, false, 1.0, 1.0, 0.0));
+		basic_nodes.push_back(new Node<3>(4, false, 0.0, 0.0, 1.0));
+		basic_nodes.push_back(new Node<3>(5, false, 1.0, 0.0, 1.0));
+		basic_nodes.push_back(new Node<3>(6, false, 0.0, 1.0, 1.0));
+	    basic_nodes.push_back(new Node<3>(7, false, 1.0, 1.0, 1.0));
+
+		// Make two elements out of these nodes leaving some sites free
+		std::vector<std::vector<Node<3>*> > nodes_elements(2);
+		nodes_elements[0].push_back(basic_nodes[1]);
+		nodes_elements[0].push_back(basic_nodes[2]);
+		nodes_elements[0].push_back(basic_nodes[3]);
+
+		nodes_elements[1].push_back(basic_nodes[0]);
+		nodes_elements[1].push_back(basic_nodes[4]);
+		nodes_elements[1].push_back(basic_nodes[5]);
+
+		std::vector<PottsElement<3>*> basic_potts_elements;
+		basic_potts_elements.push_back(new PottsElement<3>(0, nodes_elements[0]));
+		basic_potts_elements.push_back(new PottsElement<3>(1, nodes_elements[1]));
+
+		// Make a PottsMesh
+		PottsMesh<3> basic_potts_mesh(basic_nodes, basic_potts_elements);
+
+		TS_ASSERT_EQUALS(basic_potts_mesh.GetNumElements(), 2u);
+		TS_ASSERT_EQUALS(basic_potts_mesh.GetNumNodes(), 8u);
+
+		TS_ASSERT_DELTA(basic_potts_mesh.GetNode(2)->rGetLocation()[0], 0.0, 1e-3);
+		TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(1)->GetNode(2)->GetIndex(),5u);
+
+		// Check that the nodes know which elements they are in
+
+		// Nodes 1 2 and 3 are only in element 0
+		std::set<unsigned> temp_list1;
+		temp_list1.insert(0u);
+		TS_ASSERT_EQUALS(basic_nodes[1]->rGetContainingElementIndices(), temp_list1);
+		TS_ASSERT_EQUALS(basic_nodes[2]->rGetContainingElementIndices(), temp_list1);
+		TS_ASSERT_EQUALS(basic_nodes[3]->rGetContainingElementIndices(), temp_list1);
+
+		// Node 0 4 and 5 are only in element 1
+		std::set<unsigned> temp_list2;
+		temp_list2.insert(1u);
+		TS_ASSERT_EQUALS(basic_nodes[0]->rGetContainingElementIndices(), temp_list2);
+		TS_ASSERT_EQUALS(basic_nodes[4]->rGetContainingElementIndices(), temp_list2);
+		TS_ASSERT_EQUALS(basic_nodes[5]->rGetContainingElementIndices(), temp_list2);
+
+		// Test Area and Perimeter of elements
+		TS_ASSERT_DELTA(basic_potts_mesh.GetVolumeOfElement(0), 3.0, 1e-12);
+		TS_ASSERT_DELTA(basic_potts_mesh.GetSurfaceAreaOfElement(0), 0.0, 1e-12);//TODO this is wrong see #1683
+
+		TS_ASSERT_DELTA(basic_potts_mesh.GetVolumeOfElement(1), 3.0, 1e-12);
+		TS_ASSERT_DELTA(basic_potts_mesh.GetSurfaceAreaOfElement(1), 0.0, 1e-12);//TODO this is wrong see #1683
+
+		// Test GetCentroidOfElements
+		TS_ASSERT_DELTA(basic_potts_mesh.GetCentroidOfElement(0)[0], 2.0/3.0, 1e-12);
+		TS_ASSERT_DELTA(basic_potts_mesh.GetCentroidOfElement(0)[1], 2.0/3.0, 1e-12);
+		TS_ASSERT_DELTA(basic_potts_mesh.GetCentroidOfElement(0)[2], 0.0, 1e-12);
+
+		TS_ASSERT_DELTA(basic_potts_mesh.GetCentroidOfElement(1)[0], 1.0/3.0, 1e-12);
+		TS_ASSERT_DELTA(basic_potts_mesh.GetCentroidOfElement(1)[1], 0.0, 1e-12);
+		TS_ASSERT_DELTA(basic_potts_mesh.GetCentroidOfElement(1)[2], 2.0/3.0, 1e-12);
+
+		// Test GetVectorFromAtoB Method
+		c_vector<double, 3> vector=basic_potts_mesh.GetVectorFromAtoB(basic_potts_mesh.GetNode(0)->rGetLocation(), basic_potts_mesh.GetNode(7)->rGetLocation());
+		TS_ASSERT_DELTA(vector[0], 1.0, 1e-12);
+		TS_ASSERT_DELTA(vector[1], 1.0, 1e-12);
+		TS_ASSERT_DELTA(vector[2], 1.0, 1e-12);
+
+		// Coverage
+		TS_ASSERT_EQUALS(basic_potts_mesh.SolveNodeMapping(0), 0u);
+		TS_ASSERT_EQUALS(basic_potts_mesh.SolveElementMapping(0), 0u);
+		TS_ASSERT_EQUALS(basic_potts_mesh.SolveBoundaryElementMapping(0), 0u);
+		TS_ASSERT_EQUALS(basic_potts_mesh.IsMeshChanging(), true);
+	}
+
+
 
     void TestNodeIterator() throw (Exception)
     {
