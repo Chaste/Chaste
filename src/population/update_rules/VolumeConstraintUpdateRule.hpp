@@ -53,7 +53,9 @@ private:
     {
         // If Archive is an output archive, then '&' resolves to '<<'
         // If Archive is an input archive, then '&' resolves to '>>'
-        archive & boost::serialization::base_object<AbstractPottsUpdateRule<DIM> >(*this);
+
+    	/** todo implement archiving see #1685 */
+        //archive & boost::serialization::base_object<AbstractPottsUpdateRule<DIM> >(*this);
     }
 
 public:
