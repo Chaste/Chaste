@@ -43,6 +43,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "CellLabel.hpp"
+#include "PottsMeshGenerator.hpp"
 
 #include "NodesOnlyMesh.hpp"
 #include "NodeBasedCellPopulation.hpp"
@@ -54,124 +55,80 @@ public:
 
     void TestVolumeConstraintUpdateRuleMethods() throw (Exception)
     {
-//		unsigned cells_across = 7;
-//		unsigned cells_up = 5;
-//		unsigned thickness_of_ghost_layer = 0;
-//
-//		SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
-//
-//		HoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-//		MutableMesh<2,2>* p_mesh = generator.GetMesh();
-//		std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
-//
-//		// Create cells
-//		std::vector<CellPtr> cells;
-//		CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-//		cells_generator.GenerateBasic(cells, location_indices.size(), location_indices);
-//
-//		boost::shared_ptr<AbstractCellProperty> p_label(new CellLabel);
-//		for (unsigned i=0; i<cells.size(); i++)
-//		{
-//			cells[i]->SetBirthTime(-10);
-//			cells[i]->AddCellProperty(p_label);
-//		}
-//
-//		MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
-//
-//		// Set up cellwise data and associate it with the cell population
-//		CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-//		p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1);
-//		p_data->SetCellPopulation(&cell_population);
-//
-//		for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
-//		{
-//			double x = p_mesh->GetNode(i)->rGetLocation()[0];
-//			p_data->SetValue(x/50.0, p_mesh->GetNode(i)->GetIndex());
-//		}
-//
-//		ChemotacticForce<2> chemotactic_force;
-//
-//		// Initialise a vector of new node forces
-//		std::vector<c_vector<double, 2> > node_forces;
-//		node_forces.reserve(cell_population.GetNumNodes());
-//
-//		for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
-//		{
-//			 node_forces.push_back(zero_vector<double>(2));
-//		}
-//		chemotactic_force.AddForceContribution(node_forces, cell_population);
-//
-//		for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-//			 cell_iter != cell_population.End();
-//			 ++cell_iter)
-//		{
-//			unsigned index = cell_population.GetLocationIndexUsingCell(*cell_iter);
-//			double x = cell_population.GetLocationOfCellCentre(*cell_iter)[0];
-//			double c = x/50;
-//			double norm_grad_c = 1.0/50.0;
-//			double force_magnitude = chemotactic_force.GetChemotacticForceMagnitude(c, norm_grad_c);
-//
-//			// Fc = force_magnitude*(1,0), Fspring = 0
-//			TS_ASSERT_DELTA(node_forces[index][0], force_magnitude, 1e-4);
-//			TS_ASSERT_DELTA(node_forces[index][1], 0.0, 1e-4);
-//		}
+		// Create a simple 2D PottsMesh with 2 elements
+		PottsMeshGenerator generator(4, 4, 1, 2, 2, 2);
+		PottsMesh* p_mesh = generator.GetMesh();
+
+		// Create cells
+		std::vector<CellPtr> cells;
+		CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+		cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+		// Create cell population
+		PottsBasedCellPopulation cell_population(*p_mesh, cells);
+
+		// Create an update law system
+		VolumeConstraintUpdateRule<2> volume_constraint;
+
+		// Test get/set methods
+		TS_ASSERT_DELTA(volume_constraint.GetDeformationEnergyParameter(), 0.5, 1e-12);
+		TS_ASSERT_DELTA(volume_constraint.GetMatureCellTargetVolume(), 16.0, 1e-12);
+
+		volume_constraint.SetDeformationEnergyParameter(0.5);
+		volume_constraint.SetMatureCellTargetVolume(0.6);
+
+		TS_ASSERT_DELTA(volume_constraint.GetDeformationEnergyParameter(), 0.5, 1e-12);
+		TS_ASSERT_DELTA(volume_constraint.GetMatureCellTargetVolume(), 0.6, 1e-12);
+
+		volume_constraint.SetDeformationEnergyParameter(1.0);
+		volume_constraint.SetMatureCellTargetVolume(16.0);
+
+		//TODO Add tests of other methods
 	}
 
 	void TestVolumeConstraintUpdateRuleArchiving() throw (Exception)
 	{
-//		// Set up
-//		OutputFileHandler handler("archive", false);    // don't erase contents of folder
-//		std::string archive_filename = handler.GetOutputDirectoryFullPath() + "chemotaxis_spring_system.arch";
-//
-//		{
-//			// Create mesh
-//			TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
-//			MutableMesh<2,2> mesh;
-//			mesh.ConstructFromMeshReader(mesh_reader);
-//
-//			// SimulationTime is usually set up by a CellBasedSimulation
-//			SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
-//
-//			// Create cells
-//			std::vector<CellPtr> cells;
-//			CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-//			cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
-//			for (unsigned i=0; i<cells.size(); i++)
-//			{
-//				cells[i]->SetBirthTime(-50);
-//			}
-//
-//			// Create cell population
-//			MeshBasedCellPopulation<2> cell_population(mesh, cells);
-//
-//			// Create force
-//			ChemotacticForce<2> chemotactic_force;
-//
-//			// Serialize force via pointer
-//			std::ofstream ofs(archive_filename.c_str());
-//			boost::archive::text_oarchive output_arch(ofs);
-//
-//			ChemotacticForce<2>* const p_chemotactic_force = &chemotactic_force;
-//			output_arch << p_chemotactic_force;
-//		}
-//
-//		{
-//			ArchiveLocationInfo::SetMeshPathname("mesh/test/data/", "square_2_elements");
-//
-//			// Create an input archive
-//			std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
-//			boost::archive::text_iarchive input_arch(ifs);
-//
-//			// Restore force from the archive
-//			ChemotacticForce<2>* p_chemotactic_force;
-//			input_arch >> p_chemotactic_force;
-//
-//			///\todo test something here, for example that member variables have been correctly archived
-//
-//			// Tidy up
-//			delete p_chemotactic_force;
-//		}
+		// TODO
 	}
+
+    void TestAdhesionUpdateRuleMethods() throw (Exception)
+    {
+    	// Create a simple 2D PottsMesh with 2 elements
+		PottsMeshGenerator generator(4, 4, 1, 2, 2, 2);
+		PottsMesh* p_mesh = generator.GetMesh();
+
+		// Create cells
+		std::vector<CellPtr> cells;
+		CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+		cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+		// Create cell population
+		PottsBasedCellPopulation cell_population(*p_mesh, cells);
+
+		// Create an update law system
+		AdhesionUpdateRule<2> adhesion_update;
+
+		// Test get/set methods
+	 	TS_ASSERT_DELTA(adhesion_update.GetCellCellAdhesionEnergyParameter(), 0.1, 1e-12);
+		TS_ASSERT_DELTA(adhesion_update.GetCellBoundaryAdhesionEnergyParameter(), 0.2, 1e-12);
+
+		adhesion_update.SetCellCellAdhesionEnergyParameter(0.5);
+		adhesion_update.SetCellBoundaryAdhesionEnergyParameter(0.6);
+
+     	TS_ASSERT_DELTA(adhesion_update.GetCellCellAdhesionEnergyParameter(), 0.5, 1e-12);
+		TS_ASSERT_DELTA(adhesion_update.GetCellBoundaryAdhesionEnergyParameter(), 0.6, 1e-12);
+
+		adhesion_update.SetCellCellAdhesionEnergyParameter(0.1);
+		adhesion_update.SetCellBoundaryAdhesionEnergyParameter(0.2);
+
+		//TODO Add tests of other methods
+    }
+
+	void TestAdhesionUpdateRuleArchiving() throw (Exception)
+	{
+		// TODO
+	}
+
 
 	void TestUpdateRuleOutputUpdateRuleInfo()
 	{

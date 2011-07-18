@@ -1,2 +1,4 @@
 		<VolumeConstraintUpdateRule-2>
+			<DeformationEnergyParameter>0.5</DeformationEnergyParameter> 
+			<MatureCellTargetVolume>16</MatureCellTargetVolume> 
 		</VolumeConstraintUpdateRule-2>

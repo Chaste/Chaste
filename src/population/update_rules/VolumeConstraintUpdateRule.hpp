@@ -38,7 +38,11 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CellLabel.hpp"
 
 /**
- * A chemotactic force class.
+ * A volume constraint update rule class for use in Potts based simulations.
+ *
+ * Note this currently assumes cells don't grow, i.e the target Volume is constant
+ * for each cell over time.
+ *
  */
 template<unsigned DIM>
 class VolumeConstraintUpdateRule  : public AbstractPottsUpdateRule<DIM>
@@ -46,6 +50,17 @@ class VolumeConstraintUpdateRule  : public AbstractPottsUpdateRule<DIM>
 friend class TestPottsUpdateRules;
 
 private:
+
+	/**
+	 * Cell deformation energy parameter. Has units of ?
+	 */
+	double mDeformationEnergyParameter;
+
+    /**
+     * Non-dimensional target Volume of a mature (fully-grown) Cell, given in number of lattice sites
+     */
+    double mMatureCellTargetVolume;
+
 
     friend class boost::serialization::access;
     template<class Archive>
@@ -56,6 +71,8 @@ private:
 
     	/** todo implement archiving see #1685 */
         //archive & boost::serialization::base_object<AbstractPottsUpdateRule<DIM> >(*this);
+        //archive & mDeformationEnergyParameter;
+    	//archive & mMatureCellTargetVolume;
     }
 
 public:
@@ -87,6 +104,31 @@ public:
                                            AbstractCellPopulation<2>& rCellPopulation);
 
     /**
+     * @return mDeformationEnergyParameter
+     */
+    double GetDeformationEnergyParameter();
+
+    /**
+     * Set mDeformationEnergyParameter.
+     *
+     * @param deformationEnergyParameter the new value of mDeformationEnergyParameter
+     */
+    void SetDeformationEnergyParameter(double deformationEnergyParameter);
+
+
+    /**
+     * @return mMatureCellTargetVolume
+     */
+    double GetMatureCellTargetVolume() const;
+
+    /**
+     * Set mMatureCellTargetVolume.
+     *
+     * @param matureCellTargetVolume the new value of mMatureCellTargetVolume
+     */
+    void SetMatureCellTargetVolume(double matureCellTargetVolume);
+
+    /**
      * Overridden OutputUpdateRuleParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
@@ -98,3 +140,4 @@ public:
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(VolumeConstraintUpdateRule)
 
 #endif /*VOLUMECONSTRAINTUPDATERULE_HPP_*/
+

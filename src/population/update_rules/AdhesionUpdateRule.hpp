@@ -47,6 +47,16 @@ friend class TestPottsUpdateRules;
 
 private:
 
+    /**
+     * Cell-cell adhesion energy parameter. Has has units of ?
+     */
+    double mCellCellAdhesionEnergyParameter;
+
+    /**
+     * Cell-boundary adhesion energy parameter. Has units of ?
+     */
+    double mCellBoundaryAdhesionEnergyParameter;
+
     friend class boost::serialization::access;
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
@@ -56,6 +66,8 @@ private:
 
     	/** todo implement archiving see #1685 */
         //archive & boost::serialization::base_object<AbstractPottsUpdateRule<DIM> >(*this);
+        //archive & mCellCellAdhesionEnergyParameter;
+        //archive & mCellBoundaryAdhesionEnergyParameter;
     }
 
 public:
@@ -85,6 +97,30 @@ public:
     double EvaluateHamiltonianContribution(unsigned currentNodeIndex,
                                            unsigned targetNodeIndex,
                                            AbstractCellPopulation<2>& rCellPopulation);
+
+	/**
+ 	 * @return mCellCellAdhesionEnergyParameter
+ 	 */
+	double GetCellCellAdhesionEnergyParameter();
+
+	/**
+	 * @return mCellBoundaryAdhesionEnergyParameter
+	 */
+	double GetCellBoundaryAdhesionEnergyParameter();
+
+	/**
+	 * Set mCellCellAdhesionEnergyParameter.
+	 *
+	 * @param cellCellAdhesionEnergyEnergyParameter the new value of mCellCellAdhesionEnergyParameter
+	 */
+	void SetCellCellAdhesionEnergyParameter(double cellCellAdhesionEnergyEnergyParameter);
+
+	/**
+	 * Set mCellBoundaryAdhesionEnergyParameter.
+	 *
+	 * @param cellBoundaryAdhesionEnergyParameter the new value of mCellBoundaryAdhesionEnergyParameter
+	 */
+	void SetCellBoundaryAdhesionEnergyParameter(double cellBoundaryAdhesionEnergyParameter);
 
     /**
      * Overridden OutputUpdateRuleParameters() method.

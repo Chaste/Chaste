@@ -140,11 +140,11 @@ public:
         simulator.Solve();
 
         // Check the number of cells
-        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 18u);
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 17u);
 
         // Test no births or deaths
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
-        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 14u);
+        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 15u);
     }
 
     void TestPottsMonolayerWithBirth() throw (Exception)

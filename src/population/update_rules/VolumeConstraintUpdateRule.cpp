@@ -31,7 +31,9 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 template<unsigned DIM>
 VolumeConstraintUpdateRule<DIM>::VolumeConstraintUpdateRule()
-    : AbstractPottsUpdateRule<DIM>()
+    : AbstractPottsUpdateRule<DIM>(),
+      mDeformationEnergyParameter(0.5), // Educated guess
+      mMatureCellTargetVolume(16.0) // Defaults to a 4*4 cell size
 {
 }
 
@@ -70,29 +72,52 @@ double VolumeConstraintUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned
 	assert(new_location_containing_elements.begin() != containing_elements.begin());
 	assert((containing_elements.size()>0) || (new_location_containing_elements.size()>0));
 
-	//// VOLUME CONSTRAINT UPDATE RULE ////
-	double lambda_volume = 0.5;
-	double target_volume = 16.0;
-
 	if (containing_elements.size() == 1) // current node is in an element
 	{
 		unsigned current_element = (*containing_elements.begin());
-		delta_H += lambda_volume*(pow(p_cell_population->rGetMesh().GetVolumeOfElement(current_element) + 1.0 - target_volume, 2.0) - pow(p_cell_population->rGetMesh().GetVolumeOfElement(current_element) - target_volume, 2.0));
+		delta_H += mDeformationEnergyParameter*(pow(p_cell_population->rGetMesh().GetVolumeOfElement(current_element) + 1.0 - mMatureCellTargetVolume, 2.0) - pow(p_cell_population->rGetMesh().GetVolumeOfElement(current_element) - mMatureCellTargetVolume, 2.0));
 	}
 	if (new_location_containing_elements.size() == 1) // target node is in an element
 	{
 		unsigned target_element = (*new_location_containing_elements.begin());
-		delta_H += lambda_volume*(pow(p_cell_population->rGetMesh().GetVolumeOfElement(target_element) - 1.0 - target_volume, 2.0) - pow(p_cell_population->rGetMesh().GetVolumeOfElement(target_element) - target_volume, 2.0));
+		delta_H += mDeformationEnergyParameter*(pow(p_cell_population->rGetMesh().GetVolumeOfElement(target_element) - 1.0 - mMatureCellTargetVolume, 2.0) - pow(p_cell_population->rGetMesh().GetVolumeOfElement(target_element) - mMatureCellTargetVolume, 2.0));
 	}
 
 	return delta_H;
+}
+
+template<unsigned DIM>
+double VolumeConstraintUpdateRule<DIM>::GetDeformationEnergyParameter()
+{
+    return mDeformationEnergyParameter;
+}
+
+
+template<unsigned DIM>
+void VolumeConstraintUpdateRule<DIM>::SetDeformationEnergyParameter(double deformationEnergyParameter)
+{
+    mDeformationEnergyParameter = deformationEnergyParameter;
+}
+
+template<unsigned DIM>
+double VolumeConstraintUpdateRule<DIM>::GetMatureCellTargetVolume() const
+{
+    return mMatureCellTargetVolume;
+}
+
+template<unsigned DIM>
+void VolumeConstraintUpdateRule<DIM>::SetMatureCellTargetVolume(double matureCellTargetVolume)
+{
+    assert(matureCellTargetVolume >= 0.0);
+    mMatureCellTargetVolume = matureCellTargetVolume;
 }
 
 
 template<unsigned DIM>
 void VolumeConstraintUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
 {
-    // No parameters to include
+    *rParamsFile << "\t\t\t<DeformationEnergyParameter>" << mDeformationEnergyParameter << "</DeformationEnergyParameter> \n";
+	*rParamsFile << "\t\t\t<MatureCellTargetVolume>" << mMatureCellTargetVolume << "</MatureCellTargetVolume> \n";
 
     // Call method on direct parent class
     AbstractPottsUpdateRule<DIM>::OutputUpdateRuleParameters(rParamsFile);

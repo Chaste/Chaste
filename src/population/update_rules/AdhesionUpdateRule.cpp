@@ -31,7 +31,9 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 template<unsigned DIM>
 AdhesionUpdateRule<DIM>::AdhesionUpdateRule()
-    : AbstractPottsUpdateRule<DIM>()
+    : AbstractPottsUpdateRule<DIM>(),
+      mCellCellAdhesionEnergyParameter(0.1), // Educated guess
+      mCellBoundaryAdhesionEnergyParameter(0.2) // Educated guess
 {
 }
 
@@ -70,9 +72,6 @@ double AdhesionUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned current
 	assert(new_location_containing_elements.begin() != containing_elements.begin());
 	assert((containing_elements.size()>0) || (new_location_containing_elements.size()>0));
 
-	//// CELL CELL ADHESION UPDATE RULE ////
-	double lambda_contact = 0.1;
-
 	// Iterate over nodes neighbouring the target node to work out the contact energy contribution
 	std::set<unsigned> target_neighboring_node_indices = p_cell_population->rGetMesh().GetNeighbouringNodeIndices(targetNodeIndex);
 
@@ -83,46 +82,110 @@ double AdhesionUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned current
 		std::set<unsigned> neighboring_node_containing_elements = p_cell_population->rGetMesh().GetNode(*iter)->rGetContainingElementIndices();
 
 
-		if ( neighboring_node_containing_elements.size() == 1u )
+//		if ( neighboring_node_containing_elements.size() == 1u )
+//		{
+//			unsigned neighbour_element = (*neighboring_node_containing_elements.begin());
+//
+//			if (new_location_containing_elements.size() == 1u) // target node is in an element
+//			{
+//				unsigned target_element = (*new_location_containing_elements.begin());
+//				// If the nodes are currently from different elements
+//				if ( target_element != neighbour_element )
+//				{
+//					delta_H -= mCellCellAdhesionEnergyParameter;
+//				}
+//			}
+//			else // one cell and one medium
+//			{
+//				delta_H -= mCellCellAdhesionEnergyParameter;
+//			}
+//			if (containing_elements.size() == 1u) // current node is in an element
+//			{
+//				unsigned current_element = (*containing_elements.begin());
+//				// If the nodes will be in different elements after swap
+//				if ( current_element != neighbour_element )
+//				{
+//					delta_H += mCellCellAdhesionEnergyParameter;
+//				}
+//			}
+//			else
+//			{
+//				delta_H += mCellCellAdhesionEnergyParameter;
+//			}
+//		}
+
+		// Before move (H_0)
+		if (( neighboring_node_containing_elements.size() == 1u ) && (containing_elements.size() == 1u))
 		{
 			unsigned neighbour_element = (*neighboring_node_containing_elements.begin());
+			unsigned current_element = (*containing_elements.begin());
 
-			if (new_location_containing_elements.size() == 1u) // target node is in an element
+			// If the nodes are currently from different elements
+			if ( current_element != neighbour_element )
 			{
-				unsigned target_element = (*new_location_containing_elements.begin());
-				// If the nodes are currently from different elements
-				if ( target_element != neighbour_element )
-				{
-					delta_H -= lambda_contact;
-				}
+				delta_H += mCellCellAdhesionEnergyParameter;
 			}
-			else
+		}
+		if ( (( neighboring_node_containing_elements.size() == 0u ) && (containing_elements.size() == 1u)) ||
+			 (( neighboring_node_containing_elements.size() == 1u ) && (containing_elements.size() == 0u)) )
+		{
+			// One node is in an element and the other is in the medium
+			delta_H += mCellBoundaryAdhesionEnergyParameter;
+		}
+
+
+		// After move (H_1)
+		if (( neighboring_node_containing_elements.size() == 1u ) && (new_location_containing_elements.size() == 1u))
+		{
+			unsigned neighbour_element = (*neighboring_node_containing_elements.begin());
+			unsigned target_element = (*new_location_containing_elements.begin());
+
+			// If the nodes are currently from different elements
+			if ( target_element != neighbour_element )
 			{
-				delta_H -= lambda_contact;
+				delta_H -= mCellCellAdhesionEnergyParameter;
 			}
-			if (containing_elements.size() == 1u) // current node is in an element
-			{
-				unsigned current_element = (*containing_elements.begin());
-				// If the nodes will be in different elements after swap
-				if ( current_element != neighbour_element )
-				{
-					delta_H += lambda_contact;
-				}
-			}
-			else
-			{
-				delta_H += lambda_contact;
-			}
+		}
+		if ( (( neighboring_node_containing_elements.size() == 0u ) && (new_location_containing_elements.size() == 1u)) ||
+			 (( neighboring_node_containing_elements.size() == 1u ) && (new_location_containing_elements.size() == 0u)) )
+		{
+			// One node is in an element and the other is in the medium
+			delta_H -= mCellBoundaryAdhesionEnergyParameter;
 		}
 	}
 	return delta_H;
+}
+
+template<unsigned DIM>
+double AdhesionUpdateRule<DIM>::GetCellCellAdhesionEnergyParameter()
+{
+    return mCellCellAdhesionEnergyParameter;
+}
+
+template<unsigned DIM>
+double AdhesionUpdateRule<DIM>::GetCellBoundaryAdhesionEnergyParameter()
+{
+    return mCellBoundaryAdhesionEnergyParameter;
+}
+
+template<unsigned DIM>
+void AdhesionUpdateRule<DIM>::SetCellCellAdhesionEnergyParameter(double cellCellAdhesionEnergyParameter)
+{
+    mCellCellAdhesionEnergyParameter = cellCellAdhesionEnergyParameter;
+}
+
+template<unsigned DIM>
+void AdhesionUpdateRule<DIM>::SetCellBoundaryAdhesionEnergyParameter(double cellBoundaryAdhesionEnergyParameter)
+{
+    mCellBoundaryAdhesionEnergyParameter = cellBoundaryAdhesionEnergyParameter;
 }
 
 
 template<unsigned DIM>
 void AdhesionUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
 {
-    // No parameters to include
+	*rParamsFile << "\t\t\t<CellCellAdhesionEnergyParameter>" << mCellCellAdhesionEnergyParameter << "</CellCellAdhesionEnergyParameter> \n";
+    *rParamsFile << "\t\t\t<CellBoundaryAdhesionEnergyParameter>" << mCellBoundaryAdhesionEnergyParameter << "</CellBoundaryAdhesionEnergyParameter> \n";
 
     // Call method on direct parent class
     AbstractPottsUpdateRule<DIM>::OutputUpdateRuleParameters(rParamsFile);
