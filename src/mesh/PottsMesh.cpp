@@ -31,7 +31,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "UblasCustomFunctions.hpp"
 #include <list>
 
-PottsMesh::PottsMesh(std::vector<Node<2>*> nodes, std::vector<PottsElement<2>*> pottsElements)
+template<unsigned DIM>
+PottsMesh<DIM>::PottsMesh(std::vector<Node<DIM>*> nodes, std::vector<PottsElement<DIM>*> pottsElements)
 {
     // Reset member variables and clear mNodes and mElements
     Clear();
@@ -39,19 +40,19 @@ PottsMesh::PottsMesh(std::vector<Node<2>*> nodes, std::vector<PottsElement<2>*> 
     // Populate mNodes and mElements
     for (unsigned node_index=0; node_index<nodes.size(); node_index++)
     {
-        Node<2>* p_temp_node = nodes[node_index];
+        Node<DIM>* p_temp_node = nodes[node_index];
         this->mNodes.push_back(p_temp_node);
     }
     for (unsigned elem_index=0; elem_index<pottsElements.size(); elem_index++)
     {
-        PottsElement<2>* p_temp_element = pottsElements[elem_index];
+        PottsElement<DIM>* p_temp_element = pottsElements[elem_index];
         mElements.push_back(p_temp_element);
     }
 
     // Register elements with nodes
     for (unsigned index=0; index<mElements.size(); index++)
     {
-        PottsElement<2>* p_element = mElements[index];
+        PottsElement<DIM>* p_element = mElements[index];
 
         unsigned element_index = p_element->GetIndex();
         unsigned num_nodes_in_element = p_element->GetNumNodes();
@@ -65,35 +66,41 @@ PottsMesh::PottsMesh(std::vector<Node<2>*> nodes, std::vector<PottsElement<2>*> 
     this->mMeshChangesDuringSimulation = true;
 }
 
-PottsMesh::PottsMesh()
+template<unsigned DIM>
+PottsMesh<DIM>::PottsMesh()
 {
     this->mMeshChangesDuringSimulation = true;
     Clear();
 }
 
-PottsMesh::~PottsMesh()
+template<unsigned DIM>
+PottsMesh<DIM>::~PottsMesh()
 {
     Clear();
 }
 
-unsigned PottsMesh::SolveNodeMapping(unsigned index) const
+template<unsigned DIM>
+unsigned PottsMesh<DIM>::SolveNodeMapping(unsigned index) const
 {
     assert(index < this->mNodes.size());
     return index;
 }
 
-unsigned PottsMesh::SolveElementMapping(unsigned index) const
+template<unsigned DIM>
+unsigned PottsMesh<DIM>::SolveElementMapping(unsigned index) const
 {
     assert(index < this->mElements.size());
     return index;
 }
 
-unsigned PottsMesh::SolveBoundaryElementMapping(unsigned index) const
+template<unsigned DIM>
+unsigned PottsMesh<DIM>::SolveBoundaryElementMapping(unsigned index) const
 {
     return index;
 }
 
-void PottsMesh::Clear()
+template<unsigned DIM>
+void PottsMesh<DIM>::Clear()
 {
     // Delete elements
     for (unsigned i=0; i<mElements.size(); i++)
@@ -112,30 +119,39 @@ void PottsMesh::Clear()
     mDeletedElementIndices.clear();
 }
 
-unsigned PottsMesh::GetNumNodes() const
+template<unsigned DIM>
+unsigned PottsMesh<DIM>::GetNumNodes() const
 {
     return this->mNodes.size();
 }
 
-unsigned PottsMesh::GetNumElements() const
+template<unsigned DIM>
+unsigned PottsMesh<DIM>::GetNumElements() const
 {
     return mElements.size() - mDeletedElementIndices.size();
 }
 
-unsigned PottsMesh::GetNumAllElements() const
+template<unsigned DIM>
+unsigned PottsMesh<DIM>::GetNumAllElements() const
 {
     return mElements.size();
 }
 
-PottsElement<2>* PottsMesh::GetElement(unsigned index) const
+template<unsigned DIM>
+PottsElement<DIM>* PottsMesh<DIM>::GetElement(unsigned index) const
 {
     assert(index < mElements.size());
     return mElements[index];
 }
 
-c_vector<double, 2> PottsMesh::GetCentroidOfElement(unsigned index)
+template<unsigned DIM>
+c_vector<double, DIM> PottsMesh<DIM>::GetCentroidOfElement(unsigned index)
 {
-    PottsElement<2>* p_element = GetElement(index);
+
+	//TODO Not Written in 3d yet
+	assert(DIM==2);
+
+    PottsElement<DIM>* p_element = GetElement(index);
     unsigned num_nodes_in_element = p_element->GetNumNodes();
 
     ///\todo This should probably be returning the nearest node
@@ -216,26 +232,29 @@ c_vector<double, 2> PottsMesh::GetCentroidOfElement(unsigned index)
 //    }
 //}
 
-c_vector<double, 2> PottsMesh::GetVectorFromAtoB(const c_vector<double, 2>& rLocationA, const c_vector<double, 2>& rLocationB)
+template<unsigned DIM>
+c_vector<double, DIM> PottsMesh<DIM>::GetVectorFromAtoB(const c_vector<double, DIM>& rLocationA, const c_vector<double, DIM>& rLocationB)
 {
-    c_vector<double, 2> vector;
+    c_vector<double, DIM> vector;
 
-    vector = AbstractMesh<2, 2>::GetVectorFromAtoB(rLocationA, rLocationB);
+    vector = AbstractMesh<DIM, DIM>::GetVectorFromAtoB(rLocationA, rLocationB);
 
     return vector;
 }
 
-double PottsMesh::GetVolumeOfElement(unsigned index)
+template<unsigned DIM>
+double PottsMesh<DIM>::GetVolumeOfElement(unsigned index)
 {
     // Get pointer to this element
-    PottsElement<2>* p_element = GetElement(index);
+    PottsElement<DIM>* p_element = GetElement(index);
 
     double element_volume = (double) p_element->GetNumNodes();
 
     return element_volume;
 }
 
-double PottsMesh::GetSurfaceAreaOfElement(unsigned index)
+template<unsigned DIM>
+double PottsMesh<DIM>::GetSurfaceAreaOfElement(unsigned index)
 {
     //\todo this is not correct need to work this out from the number of free boundaries. See #1683.
     double surface_area = 0.0;
@@ -243,8 +262,12 @@ double PottsMesh::GetSurfaceAreaOfElement(unsigned index)
     return surface_area;
 }
 
-std::set<unsigned> PottsMesh::GetNeighbouringNodeIndices(unsigned nodeIndex)
+template<unsigned DIM>
+std::set<unsigned> PottsMesh<DIM>::GetNeighbouringNodeIndices(unsigned nodeIndex)
 {
+	//TODO not implemented in 3d yet
+	assert(DIM==2);
+
     // Create a set of neighbouring node indices
     std::set<unsigned> neighbouring_node_indices;
 
@@ -306,16 +329,21 @@ std::set<unsigned> PottsMesh::GetNeighbouringNodeIndices(unsigned nodeIndex)
     return neighbouring_node_indices;
 }
 
-void PottsMesh::DeleteElement(unsigned index)
+template<unsigned DIM>
+void PottsMesh<DIM>::DeleteElement(unsigned index)
 {
     // Mark this element as deleted; this also updates the nodes containing element indices
     this->mElements[index]->MarkAsDeleted();
     mDeletedElementIndices.push_back(index);
 }
 
-unsigned PottsMesh::DivideElement(PottsElement<2>* pElement,
+template<unsigned DIM>
+unsigned PottsMesh<DIM>::DivideElement(PottsElement<DIM>* pElement,
                                   bool placeOriginalElementBelow)
 {
+	//TODO not implemented in 3d yet
+	assert(DIM==2);
+
     // Store the number of nodes in the element (this changes when nodes are deleted from the element)
     unsigned num_nodes = pElement->GetNumNodes();
 
@@ -325,7 +353,7 @@ unsigned PottsMesh::DivideElement(PottsElement<2>* pElement,
     }
 
     // Copy the nodes in this element
-    std::vector<Node<2>*> nodes_elem;
+    std::vector<Node<DIM>*> nodes_elem;
     for (unsigned i=0; i<num_nodes; i++)
     {
         nodes_elem.push_back(pElement->GetNode(i));
@@ -345,7 +373,7 @@ unsigned PottsMesh::DivideElement(PottsElement<2>* pElement,
     }
 
     // Add the new element to the mesh
-    AddElement(new PottsElement<2>(new_element_index, nodes_elem));
+    AddElement(new PottsElement<DIM>(new_element_index, nodes_elem));
 
     /**
      * Remove the correct nodes from each element. If placeOriginalElementBelow is true,
@@ -436,7 +464,8 @@ unsigned PottsMesh::DivideElement(PottsElement<2>* pElement,
     return new_element_index;
 }
 
-unsigned PottsMesh::AddElement(PottsElement<2>* pNewElement)
+template<unsigned DIM>
+unsigned PottsMesh<DIM>::AddElement(PottsElement<DIM>* pNewElement)
 {
     unsigned new_element_index = pNewElement->GetIndex();
 
@@ -456,12 +485,9 @@ unsigned PottsMesh::AddElement(PottsElement<2>* pNewElement)
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////////////
 
-//template class PottsMesh<1,1>;
-//template class PottsMesh<1,2>;
-//template class PottsMesh<1,3>;
-//template class PottsMesh<2,2>;
-//template class PottsMesh<2,3>;
-//template class PottsMesh<3,3>;
+template class PottsMesh<1>;
+template class PottsMesh<2>;
+template class PottsMesh<3>;
 
 
 //// Serialization for Boost >= 1.36

@@ -68,7 +68,7 @@ public:
         basic_potts_elements.push_back(new PottsElement<2>(1, nodes_elements[1]));
 
         // Make a PottsMesh
-        PottsMesh basic_potts_mesh(basic_nodes, basic_potts_elements);
+        PottsMesh<2> basic_potts_mesh(basic_nodes, basic_potts_elements);
 
         TS_ASSERT_EQUALS(basic_potts_mesh.GetNumElements(), 2u);
         TS_ASSERT_EQUALS(basic_potts_mesh.GetNumNodes(), 6u);
@@ -123,10 +123,10 @@ public:
         PottsMeshGenerator generator(4, 4, 2, 2, 2, 2);
 
         // Create mesh
-        PottsMesh* p_mesh = generator.GetMesh();
+        PottsMesh<2>* p_mesh = generator.GetMesh();
 
         unsigned counter = 0;
-        for (PottsMesh::NodeIterator iter = p_mesh->GetNodeIteratorBegin();
+        for (PottsMesh<2>::NodeIterator iter = p_mesh->GetNodeIteratorBegin();
              iter != p_mesh->GetNodeIteratorEnd();
              ++iter)
         {
@@ -140,7 +140,7 @@ public:
         p_mesh->GetNode(0)->MarkAsDeleted();
 
         counter = 0;
-        for (PottsMesh::NodeIterator iter = p_mesh->GetNodeIteratorBegin();
+        for (PottsMesh<2>::NodeIterator iter = p_mesh->GetNodeIteratorBegin();
              iter != p_mesh->GetNodeIteratorEnd();
              ++iter)
         {
@@ -152,10 +152,10 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumAllNodes(), counter+1);
 
         // For coverage, test with an empty mesh
-        PottsMesh empty_mesh;
+        PottsMesh<2> empty_mesh;
 
         // Since the mesh is empty, the iterator should be set to mrMesh.mNodes.end() when constructed
-        PottsMesh::NodeIterator iter = empty_mesh.GetNodeIteratorBegin();
+        PottsMesh<2>::NodeIterator iter = empty_mesh.GetNodeIteratorBegin();
 
         // Check that the iterator is now at the end (we need to check this as a double-negative,
         // as we only have a NOT-equals operator defined on the iterator).
@@ -167,10 +167,10 @@ public:
     {
         // Create mesh
         PottsMeshGenerator generator(4, 4, 2, 2, 2, 2);
-        PottsMesh* p_mesh = generator.GetMesh();
+        PottsMesh<2>* p_mesh = generator.GetMesh();
 
         unsigned counter = 0;
-        for (PottsMesh::PottsElementIterator iter = p_mesh->GetElementIteratorBegin();
+        for (PottsMesh<2>::PottsElementIterator iter = p_mesh->GetElementIteratorBegin();
              iter != p_mesh->GetElementIteratorEnd();
              ++iter)
         {
@@ -186,7 +186,7 @@ public:
         p_mesh->GetElement(0)->MarkAsDeleted();
 
         counter = 0;
-        for (PottsMesh::PottsElementIterator iter = p_mesh->GetElementIteratorBegin();
+        for (PottsMesh<2>::PottsElementIterator iter = p_mesh->GetElementIteratorBegin();
              iter != p_mesh->GetElementIteratorEnd();
              ++iter)
         {
@@ -199,10 +199,10 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumAllElements()-1, counter);
 
         // For coverage, test with an empty mesh
-        PottsMesh empty_mesh;
+        PottsMesh<2> empty_mesh;
 
         // Since the mesh is empty, the iterator should be set to mrMesh.mNodes.end() when constructed
-        PottsMesh::PottsElementIterator iter = empty_mesh.GetElementIteratorBegin();
+        PottsMesh<2>::PottsElementIterator iter = empty_mesh.GetElementIteratorBegin();
 
         // Check that the iterator is now at the end (we need to check this as a double-negative,
         // as we only have a NOT-equals operator defined on the iterator).
@@ -214,7 +214,7 @@ public:
     {
         // Create mesh
         PottsMeshGenerator generator(4, 4, 2, 2, 2, 2);
-        PottsMesh* p_mesh = generator.GetMesh();
+        PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Test CalculateBoundingBox() method
         ChasteCuboid<2> bounds=p_mesh->CalculateBoundingBox();
@@ -243,7 +243,7 @@ public:
          *     0----1----2
          */
         PottsMeshGenerator generator(3, 3, 1, 1, 3, 3);
-        PottsMesh* p_mesh = generator.GetMesh();
+        PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Test bottom left node
         std::set<unsigned> neighbouring_sites = p_mesh->GetNeighbouringNodeIndices(0);
@@ -352,7 +352,7 @@ public:
     {
         // Create 2D mesh
         PottsMeshGenerator generator(4, 4, 2, 2, 2, 2);
-        PottsMesh* p_mesh = generator.GetMesh();
+        PottsMesh<2>* p_mesh = generator.GetMesh();
 
         TS_ASSERT_DELTA(p_mesh->GetWidth(0), 3.0, 1e-4);
         TS_ASSERT_DELTA(p_mesh->GetWidth(1), 3.0, 1e-4);
@@ -389,7 +389,7 @@ public:
     {
         // Create 2D mesh
         PottsMeshGenerator generator(4, 4, 2, 2, 2, 2);
-        PottsMesh* p_mesh = generator.GetMesh();
+        PottsMesh<2>* p_mesh = generator.GetMesh();
 
         c_vector<double, 2> old_location1 = p_mesh->GetNode(4)->rGetLocation();
         c_vector<double, 2> old_location2 = p_mesh->GetNode(9)->rGetLocation();
@@ -438,7 +438,7 @@ public:
         elements.push_back(new PottsElement<2>(0, nodes_elem_0));
 
         // Make a vertex mesh
-        PottsMesh mesh(nodes, elements);
+        PottsMesh<2> mesh(nodes, elements);
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 6u);
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 1u);
@@ -473,7 +473,7 @@ public:
             basic_potts_elements.push_back(new PottsElement<2>(0, nodes_elem_0));
             basic_potts_elements.push_back(new PottsElement<2>(1, nodes_elem_1));
             // Make a potts mesh
-            PottsMesh basic_potts_mesh(basic_nodes, basic_potts_elements);
+            PottsMesh<2> basic_potts_mesh(basic_nodes, basic_potts_elements);
 
             TS_ASSERT_EQUALS(basic_potts_mesh.GetNumElements(), 2u);
             TS_ASSERT_EQUALS(basic_potts_mesh.GetNumNodes(), 4u);
@@ -520,7 +520,7 @@ public:
             basic_potts_elements.push_back(new PottsElement<2>(0, nodes_elem_0));
             basic_potts_elements.push_back(new PottsElement<2>(1, nodes_elem_1));
             // Make a potts mesh
-            PottsMesh basic_potts_mesh(basic_nodes, basic_potts_elements);
+            PottsMesh<2> basic_potts_mesh(basic_nodes, basic_potts_elements);
 
             TS_ASSERT_EQUALS(basic_potts_mesh.GetNumElements(), 2u);
             TS_ASSERT_EQUALS(basic_potts_mesh.GetNumNodes(), 4u);
@@ -564,7 +564,7 @@ public:
             basic_potts_elements.push_back(new PottsElement<2>(0, nodes_elem));
 
             // Make a potts mesh
-            PottsMesh basic_potts_mesh(basic_nodes, basic_potts_elements);
+            PottsMesh<2> basic_potts_mesh(basic_nodes, basic_potts_elements);
 
             TS_ASSERT_EQUALS(basic_potts_mesh.GetNumElements(), 1u);
             TS_ASSERT_EQUALS(basic_potts_mesh.GetNumNodes(), 4u);
@@ -595,7 +595,7 @@ public:
         basic_potts_elements.push_back(new PottsElement<2>(0, nodes_elem_0));
         basic_potts_elements.push_back(new PottsElement<2>(1, nodes_elem_1));
         // Make a potts mesh
-        PottsMesh basic_potts_mesh(basic_nodes, basic_potts_elements);
+        PottsMesh<2> basic_potts_mesh(basic_nodes, basic_potts_elements);
 
         TS_ASSERT_EQUALS(basic_potts_mesh.GetNumElements(), 2u);
         TS_ASSERT_EQUALS(basic_potts_mesh.GetNumNodes(), 4u);
@@ -641,8 +641,8 @@ public:
     //
     //        // Create an output archive
     //        {
-    //            TS_ASSERT_EQUALS((static_cast<PottsMesh*>(p_mesh))->GetNumNodes(), 46u);
-    //            TS_ASSERT_EQUALS((static_cast<PottsMesh*>(p_mesh))->GetNumElements(), 15u);
+    //            TS_ASSERT_EQUALS((static_cast<PottsMesh<2>*>(p_mesh))->GetNumNodes(), 46u);
+    //            TS_ASSERT_EQUALS((static_cast<PottsMesh<2>*>(p_mesh))->GetNumElements(), 15u);
     //
     //            // Create output archive
     //            ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -663,8 +663,8 @@ public:
     //            // Restore from the archive
     //            (*p_arch) >> p_mesh2;
     //
-    //            PottsMesh* p_mesh_original = static_cast<PottsMesh*>(p_mesh);
-    //            PottsMesh* p_mesh_loaded = static_cast<PottsMesh*>(p_mesh2);
+    //            PottsMesh<2>* p_mesh_original = static_cast<PottsMesh<2>*>(p_mesh);
+    //            PottsMesh<2>* p_mesh_loaded = static_cast<PottsMesh<2>*>(p_mesh2);
     //
     //            // Compare the loaded mesh against the original
     //

@@ -56,7 +56,7 @@ public:
     {
         // Create a simple 2D PottsMesh
         PottsMeshGenerator generator(4, 4, 2, 2, 2, 2);
-        PottsMesh* p_mesh = generator.GetMesh();
+        PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -125,7 +125,7 @@ public:
     {
         // Create a simple potts-based mesh
         PottsMeshGenerator generator(4, 4, 2, 2, 2, 2);
-        PottsMesh* p_mesh = generator.GetMesh();
+        PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -162,7 +162,7 @@ public:
         PottsBasedCellPopulation cell_population(*p_mesh, cells);
 
         // Check correspondence between elements and cells
-        for (PottsMesh::PottsElementIterator iter = p_mesh->GetElementIteratorBegin();
+        for (PottsMesh<2>::PottsElementIterator iter = p_mesh->GetElementIteratorBegin();
              iter != p_mesh->GetElementIteratorEnd();
              ++iter)
         {
@@ -191,7 +191,7 @@ public:
 
         // Create another simple potts-based mesh
         PottsMeshGenerator generator2(4, 4, 2, 2, 2, 2);
-        PottsMesh* p_mesh2 = generator2.GetMesh();
+        PottsMesh<2>* p_mesh2 = generator2.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells2;
@@ -214,7 +214,7 @@ public:
     {
         // Create a simple 2D PottsMesh with one cell
         PottsMeshGenerator generator(2, 2, 1, 1, 2, 2);
-        PottsMesh* p_mesh = generator.GetMesh();
+        PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -263,7 +263,7 @@ public:
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator generator(4, 4, 2, 2, 2, 2);
-        PottsMesh* p_mesh = generator.GetMesh();
+        PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;

@@ -47,14 +47,14 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 /**
  * A Potts-based mesh class, for use in Cellular Potts model simulations.
  */
-//template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class PottsMesh : public AbstractMesh<2, 2>
+template<unsigned DIM>
+class PottsMesh : public AbstractMesh<DIM, DIM>
 {
     friend class TestPottsMesh;
 
 protected:
     /** Vector of pointers to PottsElements. */
-    std::vector<PottsElement<2>*> mElements;
+    std::vector<PottsElement<DIM>*> mElements;
 
     /**
      * Indices of elements that have been marked as deleted.
@@ -107,7 +107,7 @@ protected:
 //        PottsMeshWriter mesh_writer(ArchiveLocationInfo::GetArchiveRelativePath(),
 //                                                             ArchiveLocationInfo::GetMeshFilename(),
 //                                                             false);
-//        mesh_writer.WriteFilesUsingMesh(*(const_cast<PottsMesh*>(this)));
+//        mesh_writer.WriteFilesUsingMesh(*(const_cast<PottsMesh<2>*>(this)));
 //    }
 //
 //    /**
@@ -159,8 +159,8 @@ public:
      * @param nodes vector of pointers to nodes
      * @param PottsElements vector of pointers to PottsElements
      */
-    PottsMesh(std::vector<Node<2>*> nodes,
-               std::vector<PottsElement<2>*> PottsElements);
+    PottsMesh(std::vector<Node<DIM>*> nodes,
+               std::vector<PottsElement<DIM>*> PottsElements);
 
     /**
      * Default constructor for use by serializer.
@@ -192,7 +192,7 @@ public:
      *
      * @return a pointer to the PottsElement
      */
-    PottsElement<2>* GetElement(unsigned index) const;
+    PottsElement<DIM>* GetElement(unsigned index) const;
 
     /**
      * Compute the centroid of an element.
@@ -203,14 +203,14 @@ public:
      *
      * @return (centroid_x,centroid_y).
      */
-    virtual c_vector<double, 2> GetCentroidOfElement(unsigned index);
+    virtual c_vector<double, DIM> GetCentroidOfElement(unsigned index);
 
 //    /*
 //     * Construct the mesh using a MeshReader.
 //     *
 //     * @param rMeshReader the mesh reader
 //     */
-//    void ConstructFromMeshReader(AbstractMeshReader<2,2>& rMeshReader);
+//    void ConstructFromMeshReader(AbstractMeshReader<DIM,DIM>& rMeshReader);
 
     /**
      * Delete mNodes and mElements.
@@ -228,8 +228,8 @@ public:
      *
      * @return c_vector from location A to location B.
      */
-    virtual c_vector<double, 2> GetVectorFromAtoB(const c_vector<double, 2>& rLocationA,
-                                                  const c_vector<double, 2>& rLocationB);
+    virtual c_vector<double, DIM> GetVectorFromAtoB(const c_vector<double, DIM>& rLocationA,
+                                                  const c_vector<double, DIM>& rLocationB);
 
     /**
      * Get the volume (or area in 2D, or length in 1D) of a PottsElement.
@@ -284,7 +284,7 @@ public:
      *
      * @return the index of the new element
      */
-    unsigned DivideElement(PottsElement<2>* pElement,
+    unsigned DivideElement(PottsElement<DIM>* pElement,
                            bool placeOriginalElementBelow=false);
 
     /**
@@ -294,7 +294,7 @@ public:
      *
      * @return the index of the new element in the mesh
      */
-    unsigned AddElement(PottsElement<2>* pNewElement);
+    unsigned AddElement(PottsElement<DIM>* pNewElement);
 
     //////////////////////////////////////////////////////////////////////
     //                         Nested classes                           //
@@ -303,7 +303,7 @@ public:
     /**
      * A smart iterator over the elements in the mesh.
      *
-     * \todo This is the same as in AbstractTetrahedralMesh - merge? (#1379)
+     * \todo This is the same as in AbstractTetrahedralMesh and VertexMesh- merge? (#1379)
      */
     class PottsElementIterator
     {
@@ -313,19 +313,19 @@ public:
          *
          * Make sure to use a reference for the result to avoid copying elements unnecessarily.
          */
-        inline PottsElement<2>& operator*();
+        inline PottsElement<DIM>& operator*();
 
         /**
          * Member access from a pointer.
          */
-        inline PottsElement<2>* operator->();
+        inline PottsElement<DIM>* operator->();
 
         /**
          * Comparison not-equal-to.
          *
          * @param rOther iterator with which comparison is made
          */
-        inline bool operator!=(const PottsMesh::PottsElementIterator& rOther);
+        inline bool operator!=(const PottsMesh<DIM>::PottsElementIterator& rOther);
 
         /**
          * Prefix increment operator.
@@ -333,7 +333,7 @@ public:
         inline PottsElementIterator& operator++();
 
         /**
-         * Constructor for a new iterator. NOTE this is moved here as this class is currently not templated.
+         * Constructor for a new iterator.
          *
          * This should not be called directly by user code; use the mesh methods
          * PottsMesh::GetElementIteratorBegin and PottsMesh::GetElementIteratorEnd instead.
@@ -342,34 +342,16 @@ public:
          * @param elementIter where to start iterating
          * @param skipDeletedElements whether to include deleted elements
          */
-        PottsElementIterator(PottsMesh& rMesh,
-                             std::vector<PottsElement<2>*>::iterator elementIter,
-                             bool skipDeletedElements=true)
-            : mrMesh(rMesh),
-              mElementIter(elementIter),
-              mSkipDeletedElements(skipDeletedElements)
-        {
-            if (mrMesh.mElements.empty())
-            {
-                // Cope with empty meshes
-                mElementIter = mrMesh.mElements.end();
-            }
-            else
-            {
-                // Make sure we start at an allowed element
-                if (mElementIter == mrMesh.mElements.begin() && !IsAllowedElement())
-                {
-                    ++(*this);
-                }
-            }
-        }
+        PottsElementIterator(PottsMesh<DIM>& rMesh,
+        		             typename std::vector<PottsElement<DIM> *>::iterator elementIter,
+                             bool skipDeletedElements=true);
 
     private:
         /** The mesh we're iterating over. */
-        PottsMesh& mrMesh;
+        PottsMesh<DIM>& mrMesh;
 
         /** The actual element iterator. */
-        std::vector<PottsElement<2>*>::iterator mElementIter;
+        typename std::vector<PottsElement<DIM> *>::iterator mElementIter;
 
         /** Whether to skip deleted elements. */
         bool mSkipDeletedElements;
@@ -390,38 +372,43 @@ public:
 //EXPORT_TEMPLATE_CLASS_ALL_DIMS(PottsMesh)
 
 //////////////////////////////////////////////////////////////////////////////
-// PottsElementIterator class implementation - most methods are inlined    //
+// PottsElementIterator class implementation - most methods are inlined     //
 //////////////////////////////////////////////////////////////////////////////
 
-PottsMesh::PottsElementIterator PottsMesh::GetElementIteratorBegin(
+template<unsigned DIM>
+typename PottsMesh<DIM>::PottsElementIterator PottsMesh<DIM>::GetElementIteratorBegin(
         bool skipDeletedElements)
 {
     return PottsElementIterator(*this, mElements.begin(), skipDeletedElements);
 }
 
-PottsMesh::PottsElementIterator PottsMesh::GetElementIteratorEnd()
+template<unsigned DIM>
+typename PottsMesh<DIM>::PottsElementIterator PottsMesh<DIM>::GetElementIteratorEnd()
 {
     return PottsElementIterator(*this, mElements.end());
 }
-
-PottsElement<2>& PottsMesh::PottsElementIterator::operator*()
+template<unsigned DIM>
+PottsElement<DIM>& PottsMesh<DIM>::PottsElementIterator::operator*()
 {
     assert(!IsAtEnd());
     return **mElementIter;
 }
 
-PottsElement<2>* PottsMesh::PottsElementIterator::operator->()
+template<unsigned DIM>
+PottsElement<DIM>* PottsMesh<DIM>::PottsElementIterator::operator->()
 {
     assert(!IsAtEnd());
     return *mElementIter;
 }
 
-bool PottsMesh::PottsElementIterator::operator!=(const PottsMesh::PottsElementIterator& rOther)
+template<unsigned DIM>
+bool PottsMesh<DIM>::PottsElementIterator::operator!=(const PottsMesh<DIM>::PottsElementIterator& rOther)
 {
     return mElementIter != rOther.mElementIter;
 }
 
-PottsMesh::PottsElementIterator& PottsMesh::PottsElementIterator::operator++()
+template<unsigned DIM>
+typename PottsMesh<DIM>::PottsElementIterator& PottsMesh<DIM>::PottsElementIterator::operator++()
 {
     do
     {
@@ -432,12 +419,39 @@ PottsMesh::PottsElementIterator& PottsMesh::PottsElementIterator::operator++()
     return (*this);
 }
 
-bool PottsMesh::PottsElementIterator::IsAtEnd()
+template<unsigned DIM>
+PottsMesh<DIM>::PottsElementIterator::PottsElementIterator(
+		PottsMesh<DIM>& rMesh,
+		typename std::vector<PottsElement<DIM>*>::iterator elementIter,
+        bool skipDeletedElements)
+	: mrMesh(rMesh),
+	  mElementIter(elementIter),
+	  mSkipDeletedElements(skipDeletedElements)
+{
+	if (mrMesh.mElements.empty())
+	{
+		// Cope with empty meshes
+		mElementIter = mrMesh.mElements.end();
+	}
+	else
+	{
+		// Make sure we start at an allowed element
+		if (mElementIter == mrMesh.mElements.begin() && !IsAllowedElement())
+		{
+			++(*this);
+		}
+	}
+}
+
+
+template<unsigned DIM>
+bool PottsMesh<DIM>::PottsElementIterator::IsAtEnd()
 {
     return mElementIter == mrMesh.mElements.end();
 }
 
-bool PottsMesh::PottsElementIterator::IsAllowedElement()
+template<unsigned DIM>
+bool PottsMesh<DIM>::PottsElementIterator::IsAllowedElement()
 {
     return !(mSkipDeletedElements && (*this)->IsDeleted());
 }

@@ -92,7 +92,7 @@ PottsMeshGenerator::PottsMeshGenerator(unsigned numNodesAcross, unsigned numNode
             elements.push_back(p_element);
         }
     }
-    mpMesh = new PottsMesh(nodes, elements);
+    mpMesh = new PottsMesh<2>(nodes, elements);
 }
 
 PottsMeshGenerator::~PottsMeshGenerator()
@@ -100,7 +100,7 @@ PottsMeshGenerator::~PottsMeshGenerator()
     delete mpMesh;
 }
 
-PottsMesh* PottsMeshGenerator::GetMesh()
+PottsMesh<2>* PottsMeshGenerator::GetMesh()
 {
     return mpMesh;
 }

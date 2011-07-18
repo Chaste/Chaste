@@ -57,7 +57,7 @@ public:
     {
 		// Create a simple 2D PottsMesh with 2 elements
 		PottsMeshGenerator generator(4, 4, 1, 2, 2, 2);
-		PottsMesh* p_mesh = generator.GetMesh();
+		PottsMesh<2>* p_mesh = generator.GetMesh();
 
 		// Create cells
 		std::vector<CellPtr> cells;
@@ -95,7 +95,7 @@ public:
     {
     	// Create a simple 2D PottsMesh with 2 elements
 		PottsMeshGenerator generator(4, 4, 1, 2, 2, 2);
-		PottsMesh* p_mesh = generator.GetMesh();
+		PottsMesh<2>* p_mesh = generator.GetMesh();
 
 		// Create cells
 		std::vector<CellPtr> cells;

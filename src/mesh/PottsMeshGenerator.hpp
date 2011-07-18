@@ -45,7 +45,7 @@ class PottsMeshGenerator
 protected:
 
     /** A pointer to the mesh this class creates */
-    PottsMesh* mpMesh;
+    PottsMesh<2>* mpMesh;
 
 public:
 
@@ -78,7 +78,7 @@ public:
     /**
      * @return a planar 2D Potts mesh.
      */
-    virtual PottsMesh* GetMesh();
+    virtual PottsMesh<2>* GetMesh();
 };
 
 #endif /*POTTSMESHGENERATOR_HPP_*/

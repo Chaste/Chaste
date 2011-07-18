@@ -59,7 +59,7 @@ class PottsBasedCellPopulation : public AbstractCellPopulation<2>
 private:
 
     /** Potts-based mesh associated with the cell population. */
-    PottsMesh& mrMesh;
+    PottsMesh<2> & mrMesh;
 
     /**
      * Pointer to a VertexMesh object that stores the Element tessellation that is used to visualise
@@ -146,7 +146,7 @@ public:
      * @param validate whether to validate the cell population when it is created (defaults to true)
      * @param locationIndices an optional vector of location indices that correspond to real cells
      */
-    PottsBasedCellPopulation(PottsMesh& rMesh,
+    PottsBasedCellPopulation(PottsMesh<2>& rMesh,
                       std::vector<CellPtr>& rCells,
                       bool deleteMesh=false,
                       bool validate=true,
@@ -160,12 +160,12 @@ public:
     /**
      * @return reference to mrMesh.
      */
-    PottsMesh& rGetMesh();
+    PottsMesh<2>& rGetMesh();
 
     /**
      * @return const reference to mrMesh (used in archiving).
      */
-    const PottsMesh& rGetMesh() const;
+    const PottsMesh<2>& rGetMesh() const;
 
     /**
      * Get a particular PottsElement.
@@ -391,7 +391,7 @@ inline void save_construct_data(
     Archive & ar, const PottsBasedCellPopulation * t, const BOOST_PFTO unsigned int file_version)
 {
     // Save data required to construct instance
-    const PottsMesh* p_mesh = &(t->rGetMesh());
+    const PottsMesh<2>* p_mesh = &(t->rGetMesh());
     ar & p_mesh;
 }
 
@@ -404,7 +404,7 @@ inline void load_construct_data(
     Archive & ar, PottsBasedCellPopulation * t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
-    PottsMesh* p_mesh;
+    PottsMesh<2>* p_mesh;
     ar >> p_mesh;
 
     // Invoke inplace constructor to initialise instance

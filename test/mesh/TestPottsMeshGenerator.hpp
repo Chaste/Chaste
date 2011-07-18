@@ -45,7 +45,7 @@ public:
         PottsMeshGenerator generator(9, 5, 3, 2, 3, 2);
 
         // Create mesh
-        PottsMesh* p_mesh = generator.GetMesh();
+        PottsMesh<2>* p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 6u);
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 45u);

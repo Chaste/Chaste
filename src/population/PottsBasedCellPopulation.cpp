@@ -62,7 +62,7 @@ void PottsBasedCellPopulation::Validate()
     }
 }
 
-PottsBasedCellPopulation::PottsBasedCellPopulation(PottsMesh& rMesh,
+PottsBasedCellPopulation::PottsBasedCellPopulation(PottsMesh<2>& rMesh,
                                           std::vector<CellPtr>& rCells,
                                           bool deleteMesh,
                                           bool validate,
@@ -89,12 +89,12 @@ PottsBasedCellPopulation::~PottsBasedCellPopulation()
     }
 }
 
-PottsMesh& PottsBasedCellPopulation::rGetMesh()
+PottsMesh<2>& PottsBasedCellPopulation::rGetMesh()
 {
     return mrMesh;
 }
 
-const PottsMesh& PottsBasedCellPopulation::rGetMesh() const
+const PottsMesh<2>& PottsBasedCellPopulation::rGetMesh() const
 {
     return mrMesh;
 }
