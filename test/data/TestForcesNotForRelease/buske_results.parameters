@@ -1,6 +1,6 @@
 			<AdhesionEnergyParameter>200</AdhesionEnergyParameter> 
 			<UseCutOffLength>1</UseCutOffLength> 
 			<CutOffLength>1.5</CutOffLength> 
-			<DeformationEnergyParameter>1.33333</DeformationEnergyParameter> 
+			<DeformationEnergyParameter>0.00133333</DeformationEnergyParameter> 
 			<UseCutOffLength>1</UseCutOffLength> 
 			<CutOffLength>1.5</CutOffLength> 
