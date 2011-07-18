@@ -39,7 +39,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "NodeBasedCellPopulation.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
-#include "BuskeInteractionForce.hpp"
+#include "BuskeAdhesiveForce.hpp"
+#include "BuskeElasticForce.hpp"
 #include "BuskeCompressionForce.hpp"
 
 class TestCellBasedSimulationWithBuskeForces : public AbstractCellBasedTestSuite
@@ -93,9 +94,9 @@ public:
         simulator.SetEndTime(5.0);
 
         // Create a force law and pass it to the simulation
-        BuskeInteractionForce<2> buske_interaction_force;
+        BuskeAdhesiveForce<2> buske_interaction_force;
         buske_interaction_force.SetAdhesionEnergyParameter(0.002);
-        buske_interaction_force.SetCutOffLength(3.0);
+        //buske_interaction_force.SetCutOffLength(3.0);
         simulator.AddForce(&buske_interaction_force);
 
         simulator.Solve();
