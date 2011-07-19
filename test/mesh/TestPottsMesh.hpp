@@ -273,7 +273,9 @@ public:
              iter != p_mesh->GetElementIteratorEnd();
              ++iter)
         {
-            unsigned element_index = iter->GetIndex();
+
+        	// this time check the * Operator
+        	unsigned element_index = (*iter).GetIndex();
             TS_ASSERT_EQUALS(counter+1, element_index); // assumes the iterator will give elements 0,1..,N in that order
             counter++;
         }
