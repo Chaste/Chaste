@@ -254,7 +254,7 @@ double PottsMesh<DIM>::GetSurfaceAreaOfElement(unsigned index)
 template<unsigned DIM>
 std::set<unsigned> PottsMesh<DIM>::GetNeighbouringNodeIndices(unsigned nodeIndex)
 {
-	//TODO not implemented in 3d yet
+	///\todo not implemented in 3d yet
 	assert(DIM==2);
 
     // Create a set of neighbouring node indices
@@ -330,7 +330,7 @@ template<unsigned DIM>
 unsigned PottsMesh<DIM>::DivideElement(PottsElement<DIM>* pElement,
                                   bool placeOriginalElementBelow)
 {
-	//TODO not implemented in 3d yet
+	///\todo not implemented in 3d yet
 	assert(DIM==2);
 
     // Store the number of nodes in the element (this changes when nodes are deleted from the element)

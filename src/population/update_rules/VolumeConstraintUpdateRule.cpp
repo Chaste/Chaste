@@ -26,7 +26,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-
 #include "VolumeConstraintUpdateRule.hpp"
 
 template<unsigned DIM>
@@ -92,7 +91,6 @@ double VolumeConstraintUpdateRule<DIM>::GetDeformationEnergyParameter()
     return mDeformationEnergyParameter;
 }
 
-
 template<unsigned DIM>
 void VolumeConstraintUpdateRule<DIM>::SetDeformationEnergyParameter(double deformationEnergyParameter)
 {
@@ -111,7 +109,6 @@ void VolumeConstraintUpdateRule<DIM>::SetMatureCellTargetVolume(double matureCel
     assert(matureCellTargetVolume >= 0.0);
     mMatureCellTargetVolume = matureCellTargetVolume;
 }
-
 
 template<unsigned DIM>
 void VolumeConstraintUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)

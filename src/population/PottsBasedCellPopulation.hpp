@@ -248,19 +248,6 @@ public:
      */
     void UpdateNodeLocations(const std::vector< c_vector<double, 2> >& rNodeForces, double dt);
 
-
-    /**
-	 * Method to calculate the Hamiltonian.
-	 * \todo This is not defined in the .cpp file
-	 *
-	 * @param currentNodeIndex The index of the current node/lattice site
-	 * @param targetNodeIndex The index of the target node/lattice site
-	 *
-	 * @return The difference in the Hamiltonian with the current configuration and
-	 * the configuration with the target node having the same spin as the current node.
-	 */
-    double EvaluateHamiltonian(unsigned currentNodeIndex, unsigned targetNodeIndex);
-
     /**
      * Overridden IsCellAssociatedWithADeletedLocation() method.
      *

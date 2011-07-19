@@ -179,20 +179,18 @@ void PottsBasedCellPopulation::UpdateNodeLocations(const std::vector< c_vector<d
          node_iter != mrMesh.GetNodeIteratorEnd();
          ++node_iter)
     {
-        // All nodes should be in at most one element.
+        // Each node in the mesh must be in at most one element
         assert(node_iter->GetNumContainingElements() <= 1);
 
-        // Find a random site from all of the available neighbouring nodes to extend the element/medium into
-        std::set<unsigned> neighboring_node_indices = mrMesh.GetNeighbouringNodeIndices(node_iter->GetIndex());
-
+        // Find a random available neighbouring node to extend the element/medium into
+        std::set<unsigned> neighbouring_node_indices = mrMesh.GetNeighbouringNodeIndices(node_iter->GetIndex());
         unsigned new_location_index;
-
-        if (!neighboring_node_indices.empty())
+        if (!neighbouring_node_indices.empty())
         {
-            unsigned num_neighbours = neighboring_node_indices.size();
+            unsigned num_neighbours = neighbouring_node_indices.size();
             unsigned chosen_neighbour = RandomNumberGenerator::Instance()->randMod(num_neighbours);
 
-            std::set<unsigned>::iterator neighbour_iter = neighboring_node_indices.begin();
+            std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
             for (unsigned i=0; i<chosen_neighbour; i++)
             {
                 neighbour_iter++;
@@ -200,22 +198,22 @@ void PottsBasedCellPopulation::UpdateNodeLocations(const std::vector< c_vector<d
 
             new_location_index = *neighbour_iter;
         }
-        else  //(neighboring_node_indices.empty())
+        else
         {
-            // Every node in your mesh should have at least one neighbour.
+            // Each node in the mesh must have at least one neighbour
             NEVER_REACHED;
         }
 
         std::set<unsigned> containing_elements = node_iter->rGetContainingElementIndices();
         std::set<unsigned> new_location_containing_elements = GetNode(new_location_index)->rGetContainingElementIndices();
 
-        // Only calculate  Hamiltonian and update elements if the nodes are from different elements
-        if (((*containing_elements.begin()) != (*new_location_containing_elements.begin())) &&
-            ((containing_elements.size()>0) || (new_location_containing_elements.size()>0) ))
+        // Only calculate Hamiltonian and update elements if the nodes are from different elements
+        if (   ( *containing_elements.begin() != *new_location_containing_elements.begin() )
+            && ( !containing_elements.empty() || !new_location_containing_elements.empty() ) )
         {
         	double delta_H = 0.0;
 
-            // Now add force contributions to the Hamiltonian from each AbstractPottsUpdateRule
+            // Now add contributions to the Hamiltonian from each AbstractPottsUpdateRule
             for (std::vector<AbstractPottsUpdateRule<2>*>::iterator iter = mUpdateRuleCollection.begin();
                  iter != mUpdateRuleCollection.end();
                  ++iter)
@@ -223,16 +221,18 @@ void PottsBasedCellPopulation::UpdateNodeLocations(const std::vector< c_vector<d
                 delta_H += (*iter)->EvaluateHamiltonianContribution(node_iter->GetIndex(), new_location_index, *this);
             }
 
+            ///\todo This should be made a member variable of the class
 			double T = 0.1;
-			// Generate a uniform random number to do the random motion.
+
+			// Generate a uniform random number to do the random motion
 			double random_number = RandomNumberGenerator::Instance()->ranf();
 			double p = exp(-delta_H/T);
 
-			if ( delta_H <= 0 || random_number < p)
+			if (delta_H <= 0 || random_number < p)
 			{
 				// Do swap
 
-				// Iterate over the elements containing the target node to remove node, this should be at most one element.
+			    // Remove the target node from any elements containing it (there should be at most one such element)
 				for (std::set<unsigned>::iterator iter = new_location_containing_elements.begin();
 					 iter != new_location_containing_elements.end();
 					 ++iter)
@@ -242,7 +242,7 @@ void PottsBasedCellPopulation::UpdateNodeLocations(const std::vector< c_vector<d
 					///\todo If this causes the element to have no nodes then flag the element and cell to be deleted
 				}
 
-				// Now iterate over the elements containing the current node to add the target node, this should be at most one element.
+                // Next add the target node to any elements containing the current node (there should be at most one such element)
 				for (std::set<unsigned>::iterator iter = containing_elements.begin();
 					 iter != containing_elements.end();
 					 ++iter)

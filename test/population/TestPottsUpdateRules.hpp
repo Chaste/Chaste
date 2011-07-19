@@ -83,12 +83,12 @@ public:
 		volume_constraint.SetDeformationEnergyParameter(1.0);
 		volume_constraint.SetMatureCellTargetVolume(16.0);
 
-		//TODO Add tests of other methods
+		///\todo Add tests of other methods
 	}
 
 	void TestVolumeConstraintUpdateRuleArchiving() throw (Exception)
 	{
-		// TODO
+		///\todo
 	}
 
     void TestAdhesionUpdateRuleMethods() throw (Exception)
@@ -121,12 +121,12 @@ public:
 		adhesion_update.SetCellCellAdhesionEnergyParameter(0.1);
 		adhesion_update.SetCellBoundaryAdhesionEnergyParameter(0.2);
 
-		//TODO Add tests of other methods
+		///\todo Add tests of other methods
     }
 
 	void TestAdhesionUpdateRuleArchiving() throw (Exception)
 	{
-		// TODO
+		///\todo
 	}
 
 

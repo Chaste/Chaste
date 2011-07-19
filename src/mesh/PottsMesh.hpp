@@ -157,10 +157,10 @@ public:
      * Default constructor.
      *
      * @param nodes vector of pointers to nodes
-     * @param PottsElements vector of pointers to PottsElements
+     * @param pottsElements vector of pointers to PottsElements
      */
     PottsMesh(std::vector<Node<DIM>*> nodes,
-               std::vector<PottsElement<DIM>*> PottsElements);
+              std::vector<PottsElement<DIM>*> pottsElements);
 
     /**
      * Default constructor for use by serializer.
@@ -229,7 +229,7 @@ public:
      * @return c_vector from location A to location B.
      */
     virtual c_vector<double, DIM> GetVectorFromAtoB(const c_vector<double, DIM>& rLocationA,
-                                                  const c_vector<double, DIM>& rLocationB);
+                                                    const c_vector<double, DIM>& rLocationB);
 
     /**
      * Get the volume (or area in 2D, or length in 1D) of a PottsElement.

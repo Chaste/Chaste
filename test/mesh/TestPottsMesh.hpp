@@ -94,10 +94,10 @@ public:
 
         // Test Area and Perimeter of elements
         TS_ASSERT_DELTA(basic_potts_mesh.GetVolumeOfElement(0), 3.0, 1e-12);
-        TS_ASSERT_DELTA(basic_potts_mesh.GetSurfaceAreaOfElement(0), 0.0, 1e-12);//TODO this is wrong see #1683
+        TS_ASSERT_DELTA(basic_potts_mesh.GetSurfaceAreaOfElement(0), 0.0, 1e-12); ///\todo this is wrong (see #1683)
 
         TS_ASSERT_DELTA(basic_potts_mesh.GetVolumeOfElement(1), 3.0, 1e-12);
-        TS_ASSERT_DELTA(basic_potts_mesh.GetSurfaceAreaOfElement(1), 0.0, 1e-12);//TODO this is wrong see #1683
+        TS_ASSERT_DELTA(basic_potts_mesh.GetSurfaceAreaOfElement(1), 0.0, 1e-12); ///\todo this is wrong (see #1683)
 
         // Test GetCentroidOfElements
         TS_ASSERT_DELTA(basic_potts_mesh.GetCentroidOfElement(0)[0], 1.0/3.0, 1e-12);
@@ -152,7 +152,7 @@ public:
 		TS_ASSERT_EQUALS(basic_potts_mesh.GetNumNodes(), 8u);
 
 		TS_ASSERT_DELTA(basic_potts_mesh.GetNode(2)->rGetLocation()[0], 0.0, 1e-3);
-		TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(1)->GetNode(2)->GetIndex(),5u);
+		TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(1)->GetNode(2)->GetIndex(), 5u);
 
 		// Check that the nodes know which elements they are in
 
@@ -172,10 +172,10 @@ public:
 
 		// Test Area and Perimeter of elements
 		TS_ASSERT_DELTA(basic_potts_mesh.GetVolumeOfElement(0), 3.0, 1e-12);
-		TS_ASSERT_DELTA(basic_potts_mesh.GetSurfaceAreaOfElement(0), 0.0, 1e-12);//TODO this is wrong see #1683
+		TS_ASSERT_DELTA(basic_potts_mesh.GetSurfaceAreaOfElement(0), 0.0, 1e-12); ///\todo this is wrong (see #1683)
 
 		TS_ASSERT_DELTA(basic_potts_mesh.GetVolumeOfElement(1), 3.0, 1e-12);
-		TS_ASSERT_DELTA(basic_potts_mesh.GetSurfaceAreaOfElement(1), 0.0, 1e-12);//TODO this is wrong see #1683
+		TS_ASSERT_DELTA(basic_potts_mesh.GetSurfaceAreaOfElement(1), 0.0, 1e-12); ///\todo this is wrong (see #1683)
 
 		// Test GetCentroidOfElements
 		TS_ASSERT_DELTA(basic_potts_mesh.GetCentroidOfElement(0)[0], 2.0/3.0, 1e-12);
@@ -274,7 +274,7 @@ public:
              ++iter)
         {
 
-        	// this time check the * Operator
+        	// This time check the * operator
         	unsigned element_index = (*iter).GetIndex();
             TS_ASSERT_EQUALS(counter+1, element_index); // assumes the iterator will give elements 0,1..,N in that order
             counter++;
@@ -289,8 +289,10 @@ public:
         // Since the mesh is empty, the iterator should be set to mrMesh.mNodes.end() when constructed
         PottsMesh<2>::PottsElementIterator iter = empty_mesh.GetElementIteratorBegin();
 
-        // Check that the iterator is now at the end (we need to check this as a double-negative,
-        // as we only have a NOT-equals operator defined on the iterator).
+        /*
+         * Check that the iterator is now at the end (we need to check this as a double-negative,
+         * as we only have a NOT-equals operator defined on the iterator).
+         */
         bool iter_is_not_at_end = (iter != empty_mesh.GetElementIteratorEnd());
         TS_ASSERT_EQUALS(iter_is_not_at_end, false);
     }
@@ -557,7 +559,8 @@ public:
             std::vector<PottsElement<2>*> basic_potts_elements;
             basic_potts_elements.push_back(new PottsElement<2>(0, nodes_elem_0));
             basic_potts_elements.push_back(new PottsElement<2>(1, nodes_elem_1));
-            // Make a potts mesh
+
+            // Make a Potts mesh
             PottsMesh<2> basic_potts_mesh(basic_nodes, basic_potts_elements);
 
             TS_ASSERT_EQUALS(basic_potts_mesh.GetNumElements(), 2u);
@@ -585,7 +588,7 @@ public:
             TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(3)->GetNodeGlobalIndex(0), 3u);
         }
         {
-            // Original Element ABOVE new element
+            // Original element ABOVE new element
 
             // Make four nodes
             std::vector<Node<2>*> basic_nodes;
@@ -594,7 +597,7 @@ public:
             basic_nodes.push_back(new Node<2>(2, false, 0.0, 1.0));
             basic_nodes.push_back(new Node<2>(3, false, 1.0, 1.0));
 
-            // Make two rectangular element out of these nodes.
+            // Make two rectangular element out of these nodes
             std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
             nodes_elem_0.push_back(basic_nodes[0]);
             nodes_elem_0.push_back(basic_nodes[2]);
@@ -604,7 +607,8 @@ public:
             std::vector<PottsElement<2>*> basic_potts_elements;
             basic_potts_elements.push_back(new PottsElement<2>(0, nodes_elem_0));
             basic_potts_elements.push_back(new PottsElement<2>(1, nodes_elem_1));
-            // Make a potts mesh
+
+            // Make a Potts mesh
             PottsMesh<2> basic_potts_mesh(basic_nodes, basic_potts_elements);
 
             TS_ASSERT_EQUALS(basic_potts_mesh.GetNumElements(), 2u);
@@ -632,7 +636,7 @@ public:
             TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(3)->GetNodeGlobalIndex(0), 1u);
         }
         {
-            // Testing Exceptions
+            // Testing exceptions
 
             // Make four nodes
             std::vector<Node<2>*> basic_nodes;
@@ -641,14 +645,14 @@ public:
             basic_nodes.push_back(new Node<2>(2, false, 0.0, 1.0));
             basic_nodes.push_back(new Node<2>(3, false, 1.0, 1.0));
 
-            // Make one rectangular element out of one of these nodes.
+            // Make one rectangular element out of one of these nodes
             std::vector<Node<2>*> nodes_elem;
             nodes_elem.push_back(basic_nodes[0]);
 
             std::vector<PottsElement<2>*> basic_potts_elements;
             basic_potts_elements.push_back(new PottsElement<2>(0, nodes_elem));
 
-            // Make a potts mesh
+            // Make a Potts mesh
             PottsMesh<2> basic_potts_mesh(basic_nodes, basic_potts_elements);
 
             TS_ASSERT_EQUALS(basic_potts_mesh.GetNumElements(), 1u);
@@ -669,7 +673,7 @@ public:
         basic_nodes.push_back(new Node<2>(2, false, 0.0, 1.0));
         basic_nodes.push_back(new Node<2>(3, false, 1.0, 1.0));
 
-        // Make two rectangular element out of these nodes.
+        // Make two rectangular element out of these nodes
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
         nodes_elem_0.push_back(basic_nodes[0]);
         nodes_elem_0.push_back(basic_nodes[2]);
@@ -679,7 +683,8 @@ public:
         std::vector<PottsElement<2>*> basic_potts_elements;
         basic_potts_elements.push_back(new PottsElement<2>(0, nodes_elem_0));
         basic_potts_elements.push_back(new PottsElement<2>(1, nodes_elem_1));
-        // Make a potts mesh
+
+        // Make a Potts mesh
         PottsMesh<2> basic_potts_mesh(basic_nodes, basic_potts_elements);
 
         TS_ASSERT_EQUALS(basic_potts_mesh.GetNumElements(), 2u);

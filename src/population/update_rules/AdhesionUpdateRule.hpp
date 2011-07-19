@@ -64,7 +64,7 @@ private:
         // If Archive is an output archive, then '&' resolves to '<<'
         // If Archive is an input archive, then '&' resolves to '>>'
 
-    	/** todo implement archiving see #1685 */
+    	///\todo implement archiving (see #1685)
         //archive & boost::serialization::base_object<AbstractPottsUpdateRule<DIM> >(*this);
         //archive & mCellCellAdhesionEnergyParameter;
         //archive & mCellBoundaryAdhesionEnergyParameter;

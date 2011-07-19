@@ -53,7 +53,7 @@ double AdhesionUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned current
 	assert(DIM == 2); // this method only works in 2D at present
 
 	// Throw an exception message if not using a PottsBasedCellPopulation
-	/** TODO this is probably not the best way of doing this it will slow things down probably should pass in a PottsBasedCellPopulation #1665 */
+	///\todo this is probably not the best way of doing this, it will slow things down; probably should pass in a PottsBasedCellPopulation (#1665)
 	if (dynamic_cast<PottsBasedCellPopulation*>(&rCellPopulation) == NULL)
 	{
 		EXCEPTION("AdhesionUpdateRule is to be used with a PottsBasedCellPopulation only");
@@ -73,18 +73,17 @@ double AdhesionUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned current
 	assert((containing_elements.size()>0) || (new_location_containing_elements.size()>0));
 
 	// Iterate over nodes neighbouring the target node to work out the contact energy contribution
-	std::set<unsigned> target_neighboring_node_indices = p_cell_population->rGetMesh().GetNeighbouringNodeIndices(targetNodeIndex);
+	std::set<unsigned> target_neighbouring_node_indices = p_cell_population->rGetMesh().GetNeighbouringNodeIndices(targetNodeIndex);
 
-	for (std::set<unsigned>::iterator iter = target_neighboring_node_indices.begin();
-		 iter != target_neighboring_node_indices.end();
+	for (std::set<unsigned>::iterator iter = target_neighbouring_node_indices.begin();
+		 iter != target_neighbouring_node_indices.end();
 		 ++iter)
 	{
-		std::set<unsigned> neighboring_node_containing_elements = p_cell_population->rGetMesh().GetNode(*iter)->rGetContainingElementIndices();
+		std::set<unsigned> neighbouring_node_containing_elements = p_cell_population->rGetMesh().GetNode(*iter)->rGetContainingElementIndices();
 
-
-//		if ( neighboring_node_containing_elements.size() == 1u )
+//		if ( neighbouring_node_containing_elements.size() == 1u )
 //		{
-//			unsigned neighbour_element = (*neighboring_node_containing_elements.begin());
+//			unsigned neighbour_element = (*neighbouring_node_containing_elements.begin());
 //
 //			if (new_location_containing_elements.size() == 1u) // target node is in an element
 //			{
@@ -115,9 +114,9 @@ double AdhesionUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned current
 //		}
 
 		// Before move (H_0)
-		if (( neighboring_node_containing_elements.size() == 1u ) && (containing_elements.size() == 1u))
+		if (( neighbouring_node_containing_elements.size() == 1u ) && (containing_elements.size() == 1u))
 		{
-			unsigned neighbour_element = (*neighboring_node_containing_elements.begin());
+			unsigned neighbour_element = (*neighbouring_node_containing_elements.begin());
 			unsigned current_element = (*containing_elements.begin());
 
 			// If the nodes are currently from different elements
@@ -126,18 +125,17 @@ double AdhesionUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned current
 				delta_H += mCellCellAdhesionEnergyParameter;
 			}
 		}
-		if ( (( neighboring_node_containing_elements.size() == 0u ) && (containing_elements.size() == 1u)) ||
-			 (( neighboring_node_containing_elements.size() == 1u ) && (containing_elements.size() == 0u)) )
+		if ( (( neighbouring_node_containing_elements.size() == 0u ) && (containing_elements.size() == 1u)) ||
+			 (( neighbouring_node_containing_elements.size() == 1u ) && (containing_elements.size() == 0u)) )
 		{
 			// One node is in an element and the other is in the medium
 			delta_H += mCellBoundaryAdhesionEnergyParameter;
 		}
 
-
 		// After move (H_1)
-		if (( neighboring_node_containing_elements.size() == 1u ) && (new_location_containing_elements.size() == 1u))
+		if ((neighbouring_node_containing_elements.size() == 1u) && (new_location_containing_elements.size() == 1u))
 		{
-			unsigned neighbour_element = (*neighboring_node_containing_elements.begin());
+			unsigned neighbour_element = (*neighbouring_node_containing_elements.begin());
 			unsigned target_element = (*new_location_containing_elements.begin());
 
 			// If the nodes are currently from different elements
@@ -146,8 +144,8 @@ double AdhesionUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned current
 				delta_H -= mCellCellAdhesionEnergyParameter;
 			}
 		}
-		if ( (( neighboring_node_containing_elements.size() == 0u ) && (new_location_containing_elements.size() == 1u)) ||
-			 (( neighboring_node_containing_elements.size() == 1u ) && (new_location_containing_elements.size() == 0u)) )
+		if ( (( neighbouring_node_containing_elements.size() == 0u ) && (new_location_containing_elements.size() == 1u)) ||
+			 (( neighbouring_node_containing_elements.size() == 1u ) && (new_location_containing_elements.size() == 0u)) )
 		{
 			// One node is in an element and the other is in the medium
 			delta_H -= mCellBoundaryAdhesionEnergyParameter;

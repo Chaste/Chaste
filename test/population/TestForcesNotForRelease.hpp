@@ -42,7 +42,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "HoneycombMeshGenerator.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
-#include "Debug.hpp"
 
 class TestForcesNotForRelease : public AbstractCellBasedTestSuite
 {
@@ -202,74 +201,73 @@ public:
  		}
     }
 
-	 void TestBuskeMixedForceMethods() throw (Exception)
-	    {
-	        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+    void TestBuskeMixedForceMethods() throw (Exception)
+    {
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
-	        // Create a simple mesh
-	        unsigned num_cells_depth = 1;
-	        unsigned num_cells_width = 2;
-	        HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-	        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        // Create a simple mesh
+        unsigned num_cells_depth = 1;
+        unsigned num_cells_width = 2;
+        HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
+        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
-	        // Convert this to a NodesOnlyMesh
-	        NodesOnlyMesh<2> mesh;
-	        mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
+        // Convert this to a NodesOnlyMesh
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
 
-	        // Create cells
-	        std::vector<CellPtr> cells;
-	        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-	        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
-	        // Create a node-based cell population
-	        NodeBasedCellPopulation<2> cell_population(mesh, cells);
-	        cell_population.SetMechanicsCutOffLength(1.5);
-	        cell_population.Update();
+        // Create a node-based cell population
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+        cell_population.SetMechanicsCutOffLength(1.5);
+        cell_population.Update();
 
-	        // Create force
-	        BuskeAdhesiveForce<2> buske_adhesive_force;
-	        BuskeElasticForce<2> buske_elastic_force;
-	        BuskeCompressionForce<2> buske_compression_force;
+        // Create force
+        BuskeAdhesiveForce<2> buske_adhesive_force;
+        BuskeElasticForce<2> buske_elastic_force;
+        BuskeCompressionForce<2> buske_compression_force;
 
-	 	   // Test node force calculation
+ 	    // Test node force calculation
 
-	  	   // Initialise a vector of node forces
-	  	   std::vector<c_vector<double, 2> > node_adhesive_force;
-	  	   std::vector<c_vector<double, 2> > node_elastic_force;
-	  	   std::vector<c_vector<double, 2> > node_compression_force;
+  	    // Initialise a vector of node forces
+  	    std::vector<c_vector<double, 2> > node_adhesive_force;
+  	    std::vector<c_vector<double, 2> > node_elastic_force;
+  	    std::vector<c_vector<double, 2> > node_compression_force;
 
-	  	   node_adhesive_force.reserve(cell_population.GetNumNodes());
-	  	   node_elastic_force.reserve(cell_population.GetNumNodes());
-	  	   node_compression_force.reserve(cell_population.GetNumNodes());
+  	    node_adhesive_force.reserve(cell_population.GetNumNodes());
+  	    node_elastic_force.reserve(cell_population.GetNumNodes());
+        node_compression_force.reserve(cell_population.GetNumNodes());
 
-	  		for (unsigned i=0; i<40; i++)
-	  		{
-	  			// Move nodes close together
-	  			double separation = 4.0 - (double)i/10.0;
-	  			cell_population.GetNode(1)->rGetModifiableLocation()[0] = separation;
+        for (unsigned i=0; i<40; i++)
+  		{
+  			// Move nodes close together
+  			double separation = 4.0 - (double)i/10.0;
+  			cell_population.GetNode(1)->rGetModifiableLocation()[0] = separation;
 
-	  			// Reset the vector of node forces
-	  			node_adhesive_force.clear();
-				node_elastic_force.clear();
-				node_compression_force.clear();
-	  			for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
-	  			{
-	  				 node_adhesive_force.push_back(zero_vector<double>(2));
-	  			  	 node_elastic_force.push_back(zero_vector<double>(2));
-	  			  	 node_compression_force.push_back(zero_vector<double>(2));
-	  			}
+  			// Reset the vector of node forces
+  			node_adhesive_force.clear();
+			node_elastic_force.clear();
+			node_compression_force.clear();
+  			for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+  			{
+  				 node_adhesive_force.push_back(zero_vector<double>(2));
+  			  	 node_elastic_force.push_back(zero_vector<double>(2));
+  			  	 node_compression_force.push_back(zero_vector<double>(2));
+  			}
 
-	  			buske_adhesive_force.AddForceContribution(node_adhesive_force, cell_population);
-	  			buske_elastic_force.AddForceContribution(node_elastic_force, cell_population);
-	  			buske_compression_force.AddForceContribution(node_compression_force, cell_population);
+  			buske_adhesive_force.AddForceContribution(node_adhesive_force, cell_population);
+  			buske_elastic_force.AddForceContribution(node_elastic_force, cell_population);
+  			buske_compression_force.AddForceContribution(node_compression_force, cell_population);
 
-	  			// Test forces
-	  			PRINT_VECTOR(node_adhesive_force[0]);
-	  			PRINT_VECTOR(node_elastic_force[0]);
-	  			PRINT_VECTOR(node_compression_force[0]);
-	  		}
-	    }
-    void TestBuskeCompressionForceMethods() throw (Exception)
+  			// Test forces
+  			///\todo test something!
+  		}
+    }
+
+	void TestBuskeCompressionForceMethods() throw (Exception)
     {
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
