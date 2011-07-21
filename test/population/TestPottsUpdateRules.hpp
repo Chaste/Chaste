@@ -44,10 +44,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "WildTypeCellMutationState.hpp"
 #include "CellLabel.hpp"
 #include "PottsMeshGenerator.hpp"
-
 #include "NodesOnlyMesh.hpp"
 #include "NodeBasedCellPopulation.hpp"
-
 
 class TestPottsUpdateRules : public AbstractCellBasedTestSuite
 {
@@ -83,8 +81,50 @@ public:
 		volume_constraint.SetDeformationEnergyParameter(1.0);
 		volume_constraint.SetMatureCellTargetVolume(16.0);
 
-		///\todo Add tests of other methods
+		// Test EvaluateHamiltonianContribution()
+		///\todo Check this is the correct numerical value (see #1665)
+		double contribution = volume_constraint.EvaluateHamiltonianContribution(0, 1, cell_population);
+		TS_ASSERT_DELTA(contribution, 2.0, 1e-6);
 	}
+
+    void TestArchiveVolumeConstraintUpdateRule() throw(Exception)
+    {
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "VolumeConstraintUpdateRule.arch";
+
+        {
+            VolumeConstraintUpdateRule<2> update_rule;
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Set member variables
+            update_rule.SetDeformationEnergyParameter(0.5);
+            update_rule.SetMatureCellTargetVolume(0.6);
+
+            // Serialize via pointer to most abstract class possible
+            AbstractPottsUpdateRule<2>* const p_update_rule = &update_rule;
+            output_arch << p_update_rule;
+        }
+
+        {
+            AbstractPottsUpdateRule<2>* p_update_rule;
+
+            // Create an input archive
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            // Restore from the archive
+            input_arch >> p_update_rule;
+
+            // Test the member data
+            TS_ASSERT_DELTA((static_cast<VolumeConstraintUpdateRule<2>*>(p_update_rule))->GetDeformationEnergyParameter(), 0.5, 1e-6);
+            TS_ASSERT_DELTA((static_cast<VolumeConstraintUpdateRule<2>*>(p_update_rule))->GetMatureCellTargetVolume(), 0.6, 1e-6);
+
+            // Tidy up
+            delete p_update_rule;
+        }
+    }
 
     void TestAdhesionUpdateRuleMethods() throw (Exception)
     {
@@ -116,7 +156,49 @@ public:
 		adhesion_update.SetCellCellAdhesionEnergyParameter(0.1);
 		adhesion_update.SetCellBoundaryAdhesionEnergyParameter(0.2);
 
-		///\todo Add tests of other methods
+        // Test EvaluateHamiltonianContribution()
+        ///\todo Check this is the correct numerical value (see #1665)
+        double contribution = adhesion_update.EvaluateHamiltonianContribution(0, 1, cell_population);
+        TS_ASSERT_DELTA(contribution, 0.0, 1e-6);
+    }
+
+    void TestArchiveAdhesionUpdateRule() throw(Exception)
+    {
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "AdhesionUpdateRule.arch";
+
+        {
+            AdhesionUpdateRule<2> update_rule;
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Set member variables
+            update_rule.SetCellCellAdhesionEnergyParameter(0.5);
+            update_rule.SetCellBoundaryAdhesionEnergyParameter(0.6);
+
+            // Serialize via pointer to most abstract class possible
+            AbstractPottsUpdateRule<2>* const p_update_rule = &update_rule;
+            output_arch << p_update_rule;
+        }
+
+        {
+            AbstractPottsUpdateRule<2>* p_update_rule;
+
+            // Create an input archive
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            // Restore from the archive
+            input_arch >> p_update_rule;
+
+            // Test the member data
+            TS_ASSERT_DELTA((static_cast<AdhesionUpdateRule<2>*>(p_update_rule))->GetCellCellAdhesionEnergyParameter(), 0.5, 1e-6);
+            TS_ASSERT_DELTA((static_cast<AdhesionUpdateRule<2>*>(p_update_rule))->GetCellBoundaryAdhesionEnergyParameter(), 0.6, 1e-6);
+
+            // Tidy up
+            delete p_update_rule;
+        }
     }
 
 	void TestUpdateRuleOutputUpdateRuleInfo()
@@ -126,7 +208,9 @@ public:
 
 		// Test with VolumeConstraintUpdateRule
 		VolumeConstraintUpdateRule<2> volume_constraint;
-		//volume_constraint.SetSomething(1.5);
+        volume_constraint.SetDeformationEnergyParameter(0.1);
+        volume_constraint.SetMatureCellTargetVolume(20);
+
 		TS_ASSERT_EQUALS(volume_constraint.GetIdentifier(), "VolumeConstraintUpdateRule-2");
 
 		out_stream volume_constraint_parameter_file = output_file_handler.OpenOutputFile("volume_constraint_results.parameters");
@@ -138,7 +222,9 @@ public:
 
 		// Test with VolumeConstraintUpdateRule
 		AdhesionUpdateRule<2> adhesion_update;
-		//adhesion_update.SetSomething(1.5);
+        adhesion_update.SetCellCellAdhesionEnergyParameter(0.3);
+        adhesion_update.SetCellBoundaryAdhesionEnergyParameter(0.4);
+
 		TS_ASSERT_EQUALS(adhesion_update.GetIdentifier(), "AdhesionUpdateRule-2");
 
 		out_stream adhesion_update_parameter_file = output_file_handler.OpenOutputFile("adhesion_update_results.parameters");
@@ -148,45 +234,6 @@ public:
 		std::string adhesion_update_results_dir = output_file_handler.GetOutputDirectoryFullPath();
 		TS_ASSERT_EQUALS(system(("diff " + adhesion_update_results_dir + "adhesion_update_results.parameters notforrelease_cell_based/test/data/TestUpdateRules/adhesion_update_results.parameters").c_str()), 0);
 	}
-
-    void TestIncompatibleUpdateRules() throw (Exception)
-    {
-        // Create a NodeBasedCellPopulation
-        std::vector<Node<2>*> nodes;
-        unsigned num_nodes = 10;
-        for (unsigned i=0; i<num_nodes; i++)
-        {
-            double x = (double)(i);
-            double y = (double)(i);
-            nodes.push_back(new Node<2>(i, true, x, y));
-        }
-
-        // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(nodes);
-
-        std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, num_nodes);
-
-        NodeBasedCellPopulation<2> cell_population(mesh, cells);
-
-        // Test that VolumeConstraintUpdateRule throws the correct exception
-        VolumeConstraintUpdateRule<2> volume_constraint;
-        TS_ASSERT_THROWS_THIS(volume_constraint.EvaluateHamiltonianContribution(0u, 1u, cell_population),
-                "VolumeConstraintUpdateRule is to be used with a PottsBasedCellPopulation only");
-
-        // Test that AdhesionUpdateRule throws the correct exception
-        AdhesionUpdateRule<2> adhesion_update;
-        TS_ASSERT_THROWS_THIS(adhesion_update.EvaluateHamiltonianContribution(0u, 1u, cell_population),
-                "AdhesionUpdateRule is to be used with a PottsBasedCellPopulation only");
-
-        // When the node-only mesh goes out of scope, then it's a different set of nodes that get destroyed
-        for (unsigned i=0; i<nodes.size(); i++)
-        {
-            delete nodes[i];
-        }
-    }
 };
 
 #endif /*TESTPOTTSUPDATERULES_HPP_*/

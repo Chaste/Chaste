@@ -44,42 +44,43 @@ VolumeConstraintUpdateRule<DIM>::~VolumeConstraintUpdateRule()
 template<unsigned DIM>
 double VolumeConstraintUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned currentNodeIndex,
                                                                         unsigned targetNodeIndex,
-                                                                        AbstractCellPopulation<2>& rCellPopulation)
+                                                                        PottsBasedCellPopulation& rCellPopulation)
 {
 	double delta_H = 0.0;
 
-	// Make sure that we are in the correct dimension - this code will be eliminated at compile time
-	assert(DIM == 2); // this method only works in 2D at present
+	// This method only works in 2D at present
+	assert(DIM == 2);
 
-	// Throw an exception message if not using a PottsBasedCellPopulation
-	///\todo this is probably not the best way of doing this it will slow things down probably should pass in a PottsBasedCellPopulation (#1665)
-	if (dynamic_cast<PottsBasedCellPopulation*>(&rCellPopulation) == NULL)
-	{
-		EXCEPTION("VolumeConstraintUpdateRule is to be used with a PottsBasedCellPopulation only");
-	}
+	std::set<unsigned> containing_elements = rCellPopulation.GetNode(currentNodeIndex)->rGetContainingElementIndices();
+	std::set<unsigned> new_location_containing_elements = rCellPopulation.GetNode(targetNodeIndex)->rGetContainingElementIndices();
 
-	// Helper variable that is a static cast of the cell population
-	PottsBasedCellPopulation* p_cell_population = static_cast<PottsBasedCellPopulation*>(&rCellPopulation);
+    bool current_node_contained = !containing_elements.empty();
+    bool target_node_contained = !new_location_containing_elements.empty();
 
-	std::set<unsigned> containing_elements = p_cell_population->GetNode(currentNodeIndex)->rGetContainingElementIndices();
-	std::set<unsigned> new_location_containing_elements = p_cell_population->GetNode(targetNodeIndex)->rGetContainingElementIndices();
+    // At least one of the current node and target node must be in an element
+    assert(current_node_contained || target_node_contained);
 
-	// All nodes should be in at most one element.
-	assert(new_location_containing_elements.size() <= 1);
+    // Every node must each be in at most one element
+    assert(new_location_containing_elements.size() < 2);
 
-	// Both elements should be different to use this method
-	assert(new_location_containing_elements.begin() != containing_elements.begin());
-	assert((containing_elements.size()>0) || (new_location_containing_elements.size()>0));
+    // The current node and target node must not be in the same element
+    assert(new_location_containing_elements.begin() != containing_elements.begin());
 
-	if (containing_elements.size() == 1) // current node is in an element
+	if (current_node_contained) // current node is in an element
 	{
 		unsigned current_element = (*containing_elements.begin());
-		delta_H += mDeformationEnergyParameter*(pow(p_cell_population->rGetMesh().GetVolumeOfElement(current_element) + 1.0 - mMatureCellTargetVolume, 2.0) - pow(p_cell_population->rGetMesh().GetVolumeOfElement(current_element) - mMatureCellTargetVolume, 2.0));
+		double current_volume = rCellPopulation.rGetMesh().GetVolumeOfElement(current_element);
+		double current_volume_difference = current_volume - mMatureCellTargetVolume;
+
+		delta_H += mDeformationEnergyParameter*((current_volume_difference + 1.0)*(current_volume_difference + 1.0) - current_volume_difference*current_volume_difference);
 	}
-	if (new_location_containing_elements.size() == 1) // target node is in an element
+	if (target_node_contained) // target node is in an element
 	{
 		unsigned target_element = (*new_location_containing_elements.begin());
-		delta_H += mDeformationEnergyParameter*(pow(p_cell_population->rGetMesh().GetVolumeOfElement(target_element) - 1.0 - mMatureCellTargetVolume, 2.0) - pow(p_cell_population->rGetMesh().GetVolumeOfElement(target_element) - mMatureCellTargetVolume, 2.0));
+        double target_volume = rCellPopulation.rGetMesh().GetVolumeOfElement(target_element);
+        double target_volume_difference = target_volume - mMatureCellTargetVolume;
+
+		delta_H += mDeformationEnergyParameter*((target_volume_difference - 1.0)*(target_volume_difference - 1.0) - target_volume_difference*target_volume_difference);
 	}
 
 	return delta_H;

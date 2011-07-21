@@ -40,27 +40,29 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 /**
  * A volume constraint update rule class for use in Potts based simulations.
  *
- * Note this currently assumes cells don't grow, i.e the target Volume is constant
+ * Note this currently assumes cells don't grow, i.e the target volume is constant
  * for each cell over time.
- *
  */
 template<unsigned DIM>
-class VolumeConstraintUpdateRule  : public AbstractPottsUpdateRule<DIM>
+class VolumeConstraintUpdateRule : public AbstractPottsUpdateRule<DIM>
 {
 friend class TestPottsUpdateRules;
 
 private:
 
 	/**
-	 * Cell deformation energy parameter. Has units of ?
+	 * Cell deformation energy parameter.
+     * Set to the default value 0.5 in the constructor.
+     * \todo provide units
 	 */
 	double mDeformationEnergyParameter;
 
     /**
-     * Non-dimensional target Volume of a mature (fully-grown) Cell, given in number of lattice sites
+     * Non-dimensional target volume of a mature (fully-grown) cell,
+     * given in number of lattice sites.
+     * Set to the default value 16 in the constructor.
      */
     double mMatureCellTargetVolume;
-
 
     friend class boost::serialization::access;
     template<class Archive>
@@ -68,11 +70,9 @@ private:
     {
         // If Archive is an output archive, then '&' resolves to '<<'
         // If Archive is an input archive, then '&' resolves to '>>'
-
-    	///\todo implement archiving (see #1685)
-        //archive & boost::serialization::base_object<AbstractPottsUpdateRule<DIM> >(*this);
-        //archive & mDeformationEnergyParameter;
-    	//archive & mMatureCellTargetVolume;
+        archive & boost::serialization::base_object<AbstractPottsUpdateRule<DIM> >(*this);
+        archive & mDeformationEnergyParameter;
+    	archive & mMatureCellTargetVolume;
     }
 
 public:
@@ -90,7 +90,7 @@ public:
     /**
 	 * Overridden EvaluateHamiltonianContribution() method
 	 *
-	 * Uses  sum_elements alpha (V_i - V_i^T)^2
+	 * Uses sum_elements alpha (V_i - V_i^T)^2.
 	 *
 	 * @param currentNodeIndex The index of the current node/lattice site
 	 * @param targetNodeIndex The index of the target node/lattice site
@@ -101,7 +101,7 @@ public:
 	 */
     double EvaluateHamiltonianContribution(unsigned currentNodeIndex,
                                            unsigned targetNodeIndex,
-                                           AbstractCellPopulation<2>& rCellPopulation);
+                                           PottsBasedCellPopulation& rCellPopulation);
 
     /**
      * @return mDeformationEnergyParameter
@@ -114,7 +114,6 @@ public:
      * @param deformationEnergyParameter the new value of mDeformationEnergyParameter
      */
     void SetDeformationEnergyParameter(double deformationEnergyParameter);
-
 
     /**
      * @return mMatureCellTargetVolume
@@ -140,4 +139,3 @@ public:
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(VolumeConstraintUpdateRule)
 
 #endif /*VOLUMECONSTRAINTUPDATERULE_HPP_*/
-

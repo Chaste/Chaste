@@ -38,7 +38,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CellLabel.hpp"
 
 /**
- * A chemotactic force class.
+ * An adhesion update rule for use in cell-based simulations
+ * using the cellular Potts model.
  */
 template<unsigned DIM>
 class AdhesionUpdateRule : public AbstractPottsUpdateRule<DIM>
@@ -48,12 +49,16 @@ friend class TestPottsUpdateRules;
 private:
 
     /**
-     * Cell-cell adhesion energy parameter. Has has units of ?
+     * Cell-cell adhesion energy parameter.
+     * Set to the default value 0.1 in the constructor.
+     * \todo provide units
      */
     double mCellCellAdhesionEnergyParameter;
 
     /**
-     * Cell-boundary adhesion energy parameter. Has units of ?
+     * Cell-boundary adhesion energy parameter.
+     * Set to the default value 0.2 in the constructor.
+     * \todo provide units
      */
     double mCellBoundaryAdhesionEnergyParameter;
 
@@ -63,11 +68,9 @@ private:
     {
         // If Archive is an output archive, then '&' resolves to '<<'
         // If Archive is an input archive, then '&' resolves to '>>'
-
-    	///\todo implement archiving (see #1685)
-        //archive & boost::serialization::base_object<AbstractPottsUpdateRule<DIM> >(*this);
-        //archive & mCellCellAdhesionEnergyParameter;
-        //archive & mCellBoundaryAdhesionEnergyParameter;
+        archive & boost::serialization::base_object<AbstractPottsUpdateRule<DIM> >(*this);
+        archive & mCellCellAdhesionEnergyParameter;
+        archive & mCellBoundaryAdhesionEnergyParameter;
     }
 
 public:
@@ -96,7 +99,7 @@ public:
 	 */
     double EvaluateHamiltonianContribution(unsigned currentNodeIndex,
                                            unsigned targetNodeIndex,
-                                           AbstractCellPopulation<2>& rCellPopulation);
+                                           PottsBasedCellPopulation& rCellPopulation);
 
 	/**
  	 * @return mCellCellAdhesionEnergyParameter

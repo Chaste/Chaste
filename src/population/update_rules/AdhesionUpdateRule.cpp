@@ -26,7 +26,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-
 #include "AdhesionUpdateRule.hpp"
 
 template<unsigned DIM>
@@ -45,112 +44,76 @@ AdhesionUpdateRule<DIM>::~AdhesionUpdateRule()
 template<unsigned DIM>
 double AdhesionUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned currentNodeIndex,
                                                                 unsigned targetNodeIndex,
-                                                                AbstractCellPopulation<2>& rCellPopulation)
+                                                                PottsBasedCellPopulation& rCellPopulation)
 {
-	double delta_H = 0.0;
+    // This method only works in 2D at present
+	assert(DIM == 2);
 
-	// Make sure that we are in the correct dimension - this code will be eliminated at compile time
-	assert(DIM == 2); // this method only works in 2D at present
+	std::set<unsigned> containing_elements = rCellPopulation.GetNode(currentNodeIndex)->rGetContainingElementIndices();
+	std::set<unsigned> new_location_containing_elements = rCellPopulation.GetNode(targetNodeIndex)->rGetContainingElementIndices();
 
-	// Throw an exception message if not using a PottsBasedCellPopulation
-	///\todo this is probably not the best way of doing this, it will slow things down; probably should pass in a PottsBasedCellPopulation (#1665)
-	if (dynamic_cast<PottsBasedCellPopulation*>(&rCellPopulation) == NULL)
-	{
-		EXCEPTION("AdhesionUpdateRule is to be used with a PottsBasedCellPopulation only");
-	}
+	bool current_node_contained = !containing_elements.empty();
+    bool target_node_contained = !new_location_containing_elements.empty();
 
-	// Helper variable that is a static cast of the cell population
-	PottsBasedCellPopulation* p_cell_population = static_cast<PottsBasedCellPopulation*>(&rCellPopulation);
+    // At least one of the current node and target node must be in an element
+	assert(current_node_contained || target_node_contained);
 
-	std::set<unsigned> containing_elements = p_cell_population->GetNode(currentNodeIndex)->rGetContainingElementIndices();
-	std::set<unsigned> new_location_containing_elements = p_cell_population->GetNode(targetNodeIndex)->rGetContainingElementIndices();
+	// Every node must each be in at most one element
+	assert(new_location_containing_elements.size() < 2);
 
-	// All nodes should be in at most one element.
-	assert(new_location_containing_elements.size() <= 1);
-
-	// Both elements should be different to use this method
+	// The current node and target node must not be in the same element
 	assert(new_location_containing_elements.begin() != containing_elements.begin());
-	assert((containing_elements.size()>0) || (new_location_containing_elements.size()>0));
 
 	// Iterate over nodes neighbouring the target node to work out the contact energy contribution
-	std::set<unsigned> target_neighbouring_node_indices = p_cell_population->rGetMesh().GetNeighbouringNodeIndices(targetNodeIndex);
-
+    double delta_H = 0.0;
+	std::set<unsigned> target_neighbouring_node_indices = rCellPopulation.rGetMesh().GetNeighbouringNodeIndices(targetNodeIndex);
 	for (std::set<unsigned>::iterator iter = target_neighbouring_node_indices.begin();
 		 iter != target_neighbouring_node_indices.end();
 		 ++iter)
 	{
-		std::set<unsigned> neighbouring_node_containing_elements = p_cell_population->rGetMesh().GetNode(*iter)->rGetContainingElementIndices();
+		std::set<unsigned> neighbouring_node_containing_elements = rCellPopulation.rGetMesh().GetNode(*iter)->rGetContainingElementIndices();
 
-//		if ( neighbouring_node_containing_elements.size() == 1u )
-//		{
-//			unsigned neighbour_element = (*neighbouring_node_containing_elements.begin());
-//
-//			if (new_location_containing_elements.size() == 1u) // target node is in an element
-//			{
-//				unsigned target_element = (*new_location_containing_elements.begin());
-//				// If the nodes are currently from different elements
-//				if ( target_element != neighbour_element )
-//				{
-//					delta_H -= mCellCellAdhesionEnergyParameter;
-//				}
-//			}
-//			else // one cell and one medium
-//			{
-//				delta_H -= mCellCellAdhesionEnergyParameter;
-//			}
-//			if (containing_elements.size() == 1u) // current node is in an element
-//			{
-//				unsigned current_element = (*containing_elements.begin());
-//				// If the nodes will be in different elements after swap
-//				if ( current_element != neighbour_element )
-//				{
-//					delta_H += mCellCellAdhesionEnergyParameter;
-//				}
-//			}
-//			else
-//			{
-//				delta_H += mCellCellAdhesionEnergyParameter;
-//			}
-//		}
+        // Every node must each be in at most one element
+		assert(neighbouring_node_containing_elements.size() < 2);
+        bool neighbouring_node_contained = !neighbouring_node_containing_elements.empty();
 
 		// Before move (H_0)
-		if (( neighbouring_node_containing_elements.size() == 1u ) && (containing_elements.size() == 1u))
+		if (neighbouring_node_contained && current_node_contained)
 		{
 			unsigned neighbour_element = (*neighbouring_node_containing_elements.begin());
 			unsigned current_element = (*containing_elements.begin());
 
-			// If the nodes are currently from different elements
-			if ( current_element != neighbour_element )
+			// The nodes are currently contained in different elements
+			if (current_element != neighbour_element)
 			{
 				delta_H += mCellCellAdhesionEnergyParameter;
 			}
 		}
-		if ( (( neighbouring_node_containing_elements.size() == 0u ) && (containing_elements.size() == 1u)) ||
-			 (( neighbouring_node_containing_elements.size() == 1u ) && (containing_elements.size() == 0u)) )
+		else if ( (neighbouring_node_contained && !current_node_contained) || (!neighbouring_node_contained && current_node_contained) )
 		{
 			// One node is in an element and the other is in the medium
 			delta_H += mCellBoundaryAdhesionEnergyParameter;
 		}
 
 		// After move (H_1)
-		if ((neighbouring_node_containing_elements.size() == 1u) && (new_location_containing_elements.size() == 1u))
+		if (neighbouring_node_contained && target_node_contained)
 		{
 			unsigned neighbour_element = (*neighbouring_node_containing_elements.begin());
 			unsigned target_element = (*new_location_containing_elements.begin());
 
-			// If the nodes are currently from different elements
+            // The nodes are currently contained in different elements
 			if ( target_element != neighbour_element )
 			{
 				delta_H -= mCellCellAdhesionEnergyParameter;
 			}
 		}
-		if ( (( neighbouring_node_containing_elements.size() == 0u ) && (new_location_containing_elements.size() == 1u)) ||
-			 (( neighbouring_node_containing_elements.size() == 1u ) && (new_location_containing_elements.size() == 0u)) )
+		if ( (neighbouring_node_contained && !target_node_contained) || (!neighbouring_node_contained && target_node_contained) )
 		{
 			// One node is in an element and the other is in the medium
 			delta_H -= mCellBoundaryAdhesionEnergyParameter;
 		}
 	}
+
 	return delta_H;
 }
 
@@ -177,7 +140,6 @@ void AdhesionUpdateRule<DIM>::SetCellBoundaryAdhesionEnergyParameter(double cell
 {
     mCellBoundaryAdhesionEnergyParameter = cellBoundaryAdhesionEnergyParameter;
 }
-
 
 template<unsigned DIM>
 void AdhesionUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)

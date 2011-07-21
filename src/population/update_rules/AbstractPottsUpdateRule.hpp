@@ -31,11 +31,14 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
 
-#include "AbstractCellPopulation.hpp"
+#include "PottsBasedCellPopulation.hpp"
 #include "Identifiable.hpp"
 
+class PottsBasedCellPopulation; // Circular definition
+
 /**
- * An abstract Potts update rule class, for use in cell-based simulations.
+ * An abstract Potts update rule class, for use in cell-based simulations
+ * using the cellular Potts model.
  */
 template<unsigned DIM>
 class AbstractPottsUpdateRule : public Identifiable
@@ -80,22 +83,25 @@ public:
 	 * @return The difference in the Hamiltonian with the current configuration and
 	 * the configuration with the target node having the same spin as the current node.
 	 */
-    virtual double EvaluateHamiltonianContribution(unsigned currentNodeIndex, unsigned targetNodeIndex, AbstractCellPopulation<2>& rCellPopulation)=0;
+    virtual double EvaluateHamiltonianContribution(unsigned currentNodeIndex,
+                                                   unsigned targetNodeIndex,
+                                                   PottsBasedCellPopulation& rCellPopulation)=0;
 
     /**
-     * Outputs force used in the simulation to file and then calls OutputUpdateRuleParameters to output all relevant parameters.
+     * Output update rule to file. Call OutputUpdateRuleParameters() to output
+     * all member variables to file.
      *
-     * @param rParamsFile the file stream to which the parameters are output
+     * @param rParamsFile a file stream
      */
     void OutputUpdateRuleInfo(out_stream& rParamsFile);
 
     /**
-     * Outputs update rule parameters to file
+     * Output update rule parameters to file.
      *
      * As this method is pure virtual, it must be overridden
      * in subclasses.
      *
-     * @param rParamsFile the file stream to which the parameters are output
+     * @param rParamsFile a file stream
      */
     virtual void OutputUpdateRuleParameters(out_stream& rParamsFile)=0;
 };

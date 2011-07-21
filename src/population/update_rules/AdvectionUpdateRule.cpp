@@ -60,7 +60,8 @@ unsigned AdvectionUpdateRule<DIM>::GetNewLocationOfCell(unsigned currentLocation
                                                         LatticeBasedCellPopulation<DIM>& rCellPopulation,
                                                         double dt)
 {
-    assert(DIM == 2); // this method only works in 2D at present
+    // This method only works in 2D at present
+    assert(DIM == 2);
 
     // Make sure we have a cell at this node
     if (rCellPopulation.IsEmptySite(currentLocationIndex))
@@ -86,7 +87,6 @@ unsigned AdvectionUpdateRule<DIM>::GetNewLocationOfCell(unsigned currentLocation
         bool on_west_edge = (currentLocationIndex%nodes_across == 0);
         bool on_east_edge = (currentLocationIndex%nodes_across == nodes_across - 1);
 
-        ///\todo This could probably be made much more efficient
         switch (mAdvectionDirection)
         {
             case 0:

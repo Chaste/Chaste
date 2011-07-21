@@ -1,4 +1,4 @@
 		<AdhesionUpdateRule-2>
-			<CellCellAdhesionEnergyParameter>0.1</CellCellAdhesionEnergyParameter> 
-			<CellBoundaryAdhesionEnergyParameter>0.2</CellBoundaryAdhesionEnergyParameter> 
+			<CellCellAdhesionEnergyParameter>0.3</CellCellAdhesionEnergyParameter> 
+			<CellBoundaryAdhesionEnergyParameter>0.4</CellBoundaryAdhesionEnergyParameter> 
 		</AdhesionUpdateRule-2>

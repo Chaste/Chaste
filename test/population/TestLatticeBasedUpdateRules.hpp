@@ -110,7 +110,6 @@ public:
 
             // Serialize via pointer to most abstract class possible
             AbstractUpdateRule<2>* const p_update_rule = &update_rule;
-
             output_arch << p_update_rule;
         }
 
@@ -188,7 +187,6 @@ public:
 
             // Serialize via pointer to most abstract class possible
             AbstractUpdateRule<2>* const p_update_rule = &update_rule;
-
             output_arch << p_update_rule;
         }
 

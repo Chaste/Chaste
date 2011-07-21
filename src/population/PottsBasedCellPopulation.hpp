@@ -25,9 +25,9 @@ You should have received a copy of the GNU Lesser General Public License
 along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
+
 #ifndef POTTSBASEDCELLPOPULATION_HPP_
 #define POTTSBASEDCELLPOPULATION_HPP_
-
 
 #include "AbstractCellPopulation.hpp"
 #include "PottsMesh.hpp"
@@ -43,13 +43,15 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 // Needed here to avoid serialization errors (on Boost<1.37)
 #include "WildTypeCellMutationState.hpp"
 
+template<unsigned DIM>
+class AbstractPottsUpdateRule; // Circular definition
+
 /**
  * A facade class encapsulating a cell population under the Cellular
  * Potts model framework.
  *
  * Contains a group of cells and maintains the associations
  * between CellPtrs and elements in a specialised PottsMesh class.
- *
  */
 //template<unsigned DIM>
 class PottsBasedCellPopulation : public AbstractCellPopulation<2>
@@ -66,7 +68,7 @@ private:
      * mrMesh. The tessellation is created by calling CreateElelmentTessellation() and can
      * be accessed by calling GetElementTessellation().
      */
-    VertexMesh<2, 2>* mpElementTessellation;
+    VertexMesh<2,2>* mpElementTessellation;
 
     /**
      * Whether to delete the mesh when we are destroyed.
@@ -130,7 +132,7 @@ private:
     /**
      * Get a reference to mpElementTessellation.
      */
-    VertexMesh<2, 2>* GetElementTessellation();
+    VertexMesh<2,2>* GetElementTessellation();
 
 public:
 
@@ -143,14 +145,15 @@ public:
      * @param rMesh reference to a PottsMesh
      * @param rCells reference to a vector of CellPtrs
      * @param deleteMesh set to true if you want the cell population to free the mesh memory on destruction
+     *                   (defaults to false)
      * @param validate whether to validate the cell population when it is created (defaults to true)
      * @param locationIndices an optional vector of location indices that correspond to real cells
      */
     PottsBasedCellPopulation(PottsMesh<2>& rMesh,
-                      std::vector<CellPtr>& rCells,
-                      bool deleteMesh=false,
-                      bool validate=true,
-                      const std::vector<unsigned> locationIndices=std::vector<unsigned>());
+                             std::vector<CellPtr>& rCells,
+                             bool deleteMesh=false,
+                             bool validate=true,
+                             const std::vector<unsigned> locationIndices=std::vector<unsigned>());
 
     /**
      * Destructor, which frees any memory allocated by the constructor.

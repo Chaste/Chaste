@@ -106,8 +106,8 @@ public:
     /**
      * Overridden GetNewLocationOfCell() method.
      *
-     * This moves the cell in the prescribed direction mAdvectionDirection to its nearest neighbour if this is free, with a
-     * probability that scales to ensure that the average speed is mAdvectionSpeed
+     * This moves the cell in the prescribed direction mAdvectionDirection to its nearest neighbour 
+     * if this is free, with a probability that scales to ensure that the average speed is mAdvectionSpeed.
      *
      * @param currentLocationIndex reference to vector of forces on nodes
      * @param rCellPopulation reference to the cell population
