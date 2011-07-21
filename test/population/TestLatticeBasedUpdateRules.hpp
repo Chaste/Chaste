@@ -99,34 +99,33 @@ public:
 
     void TestArchiveDiffusionUpdateRule() throw(Exception)
     {
-        OutputFileHandler handler("archive", false); // don't erase contents of folder
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "diff_update_rule.arch";
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "DiffusionUpdateRule.arch";
 
         {
-            // Create update rule using different input argument
             DiffusionUpdateRule<2> update_rule(1.25);
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
-            // Serialize via pointer
-            DiffusionUpdateRule<2>* const p_update_rule = &update_rule;
+            // Serialize via pointer to most abstract class possible
+            AbstractUpdateRule<2>* const p_update_rule = &update_rule;
 
             output_arch << p_update_rule;
         }
 
         {
+            AbstractUpdateRule<2>* p_update_rule;
+
             // Create an input archive
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
-
-            DiffusionUpdateRule<2>* p_update_rule;
 
             // Restore from the archive
             input_arch >> p_update_rule;
 
             // Test the member data
-            TS_ASSERT_DELTA(p_update_rule->GetDiffusionConstant(), 1.25, 1e-6);
+            TS_ASSERT_DELTA((static_cast<DiffusionUpdateRule<2>*>(p_update_rule))->GetDiffusionConstant(), 1.25, 1e-6);
 
             // Tidy up
             delete p_update_rule;
@@ -178,35 +177,34 @@ public:
 
     void TestArchiveAdvectionUpdateRule() throw(Exception)
     {
-        OutputFileHandler handler("archive", false); // don't erase contents of folder
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "adv_update_rule.arch";
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "AdvectionUpdateRule.arch";
 
         {
-            // Create update rule using different input argument
             AdvectionUpdateRule<2> update_rule(3, 1.25);
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
-            // Serialize via pointer
-            AdvectionUpdateRule<2>* const p_update_rule = &update_rule;
+            // Serialize via pointer to most abstract class possible
+            AbstractUpdateRule<2>* const p_update_rule = &update_rule;
 
             output_arch << p_update_rule;
         }
 
         {
+            AbstractUpdateRule<2>* p_update_rule;
+
             // Create an input archive
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
-
-            AdvectionUpdateRule<2>* p_update_rule;
 
             // Restore from the archive
             input_arch >> p_update_rule;
 
             // Test the member data
-            TS_ASSERT_DELTA(p_update_rule->GetAdvectionSpeed(), 1.25, 1e-6);
-            TS_ASSERT_EQUALS(p_update_rule->GetAdvectionDirection(), 3u);
+            TS_ASSERT_DELTA((static_cast<AdvectionUpdateRule<2>*>(p_update_rule))->GetAdvectionSpeed(), 1.25, 1e-6);
+            TS_ASSERT_EQUALS((static_cast<AdvectionUpdateRule<2>*>(p_update_rule))->GetAdvectionDirection(), 3u);
 
             // Tidy up
             delete p_update_rule;

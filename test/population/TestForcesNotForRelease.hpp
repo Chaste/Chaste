@@ -47,80 +47,80 @@ class TestForcesNotForRelease : public AbstractCellBasedTestSuite
 {
 public:
 
-	 void TestBuskeAdhesiveForceMethods() throw (Exception)
-	    {
-	        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+    void TestBuskeAdhesiveForceMethods() throw (Exception)
+    {
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
-	        // Create a simple mesh
-	        unsigned num_cells_depth = 1;
-	        unsigned num_cells_width = 2;
-	        HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-	        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        // Create a simple mesh
+        unsigned num_cells_depth = 1;
+        unsigned num_cells_width = 2;
+        HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
+        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
-	        // Convert this to a NodesOnlyMesh
-	        NodesOnlyMesh<2> mesh;
-	        mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
+        // Convert this to a NodesOnlyMesh
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
 
-	        // Create cells
-	        std::vector<CellPtr> cells;
-	        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-	        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
-	        // Create a node-based cell population
-	        NodeBasedCellPopulation<2> cell_population(mesh, cells);
-	        cell_population.SetMechanicsCutOffLength(1.5);
-	        cell_population.Update();
+        // Create a node-based cell population
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+        cell_population.SetMechanicsCutOffLength(1.5);
+        cell_population.Update();
 
-	        // Create force
-	        BuskeAdhesiveForce<2> buske_adhesive_force;
+        // Create force
+        BuskeAdhesiveForce<2> buske_adhesive_force;
 
-	        // Test set/get methods
-	        TS_ASSERT_EQUALS(buske_adhesive_force.GetUseCutOffLength(), false);
-	        TS_ASSERT_DELTA(buske_adhesive_force.GetCutOffLength(), DBL_MAX, 1e-6);
-	        TS_ASSERT_DELTA(buske_adhesive_force.GetAdhesionEnergyParameter(), 200, 1e-6);
+        // Test set/get methods
+        TS_ASSERT_EQUALS(buske_adhesive_force.GetUseCutOffLength(), false);
+        TS_ASSERT_DELTA(buske_adhesive_force.GetCutOffLength(), DBL_MAX, 1e-6);
+        TS_ASSERT_DELTA(buske_adhesive_force.GetAdhesionEnergyParameter(), 200, 1e-6);
 
-	        buske_adhesive_force.SetCutOffLength(1.5);
-	        buske_adhesive_force.SetAdhesionEnergyParameter(1.0);
+        buske_adhesive_force.SetCutOffLength(1.5);
+        buske_adhesive_force.SetAdhesionEnergyParameter(1.0);
 
-	        TS_ASSERT_EQUALS(buske_adhesive_force.GetUseCutOffLength(), true);
-	        TS_ASSERT_DELTA(buske_adhesive_force.GetCutOffLength(), 1.5, 1e-6);
-	        TS_ASSERT_DELTA(buske_adhesive_force.GetAdhesionEnergyParameter(), 1.0, 1e-6);
+        TS_ASSERT_EQUALS(buske_adhesive_force.GetUseCutOffLength(), true);
+        TS_ASSERT_DELTA(buske_adhesive_force.GetCutOffLength(), 1.5, 1e-6);
+        TS_ASSERT_DELTA(buske_adhesive_force.GetAdhesionEnergyParameter(), 1.0, 1e-6);
 
-	        buske_adhesive_force.SetCutOffLength(DBL_MAX);
-	        buske_adhesive_force.SetAdhesionEnergyParameter(200);
+        buske_adhesive_force.SetCutOffLength(DBL_MAX);
+        buske_adhesive_force.SetAdhesionEnergyParameter(200);
 
-	 	   // Test node force calculation
+ 	    // Test node force calculation
 
-	  	   // Initialise a vector of node forces
-	  	   std::vector<c_vector<double, 2> > node_forces;
-	  	   node_forces.reserve(cell_population.GetNumNodes());
+  	    // Initialise a vector of node forces
+  	    std::vector<c_vector<double, 2> > node_forces;
+        node_forces.reserve(cell_population.GetNumNodes());
 
-	  		for (unsigned i=0; i<40; i++)
-	  		{
-	  			// Move nodes close together
-	  			double separation = 4.0 - (double)i/10.0;
-	  			cell_population.GetNode(1)->rGetModifiableLocation()[0] = separation;
+  		for (unsigned i=0; i<40; i++)
+  		{
+  			// Move nodes close together
+  			double separation = 4.0 - (double)i/10.0;
+  			cell_population.GetNode(1)->rGetModifiableLocation()[0] = separation;
 
-	  			// Reset the vector of node forces
-	  			node_forces.clear();
-	  			for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
-	  			{
-	  				 node_forces.push_back(zero_vector<double>(2));
-	  			}
+  			// Reset the vector of node forces
+  			node_forces.clear();
+  			for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+  			{
+  				 node_forces.push_back(zero_vector<double>(2));
+  			}
 
-	  			buske_adhesive_force.AddForceContribution(node_forces, cell_population);
+  			buske_adhesive_force.AddForceContribution(node_forces, cell_population);
 
-	  			// Test forces on nodes
-	  			double analytical_force_magnitude = 100.0*M_PI*separation;
+  			// Test forces on nodes
+  			double analytical_force_magnitude = 100.0*M_PI*separation;
 
-	  			   ///\todo test force calculation (#1764)
-	  			TS_ASSERT_DELTA(node_forces[0][0], analytical_force_magnitude, 1e-4);
-	  			TS_ASSERT_DELTA(node_forces[0][1], 0.0, 1e-4);
+            ///\todo test force calculation (#1764)
+  			TS_ASSERT_DELTA(node_forces[0][0], analytical_force_magnitude, 1e-4);
+  			TS_ASSERT_DELTA(node_forces[0][1], 0.0, 1e-4);
 
-	  			TS_ASSERT_DELTA(node_forces[1][0], -analytical_force_magnitude, 1e-4);
-	  			TS_ASSERT_DELTA(node_forces[1][1], 0.0, 1e-4);
-	  		}
-	    }
+  			TS_ASSERT_DELTA(node_forces[1][0], -analytical_force_magnitude, 1e-4);
+            TS_ASSERT_DELTA(node_forces[1][1], 0.0, 1e-4);
+  		}
+    }
 
     void TestBuskeElasticForceMethods() throw (Exception)
     {
@@ -164,11 +164,11 @@ public:
         buske_elastic_force.SetCutOffLength(DBL_MAX);
         buske_elastic_force.SetDeformationEnergyParameter(4.0/3.0);
 
- 	   // Test node force calculation
+ 	    // Test node force calculation
 
- 	   // Initialise a vector of node forces
- 	   std::vector<c_vector<double, 2> > node_forces;
- 	   node_forces.reserve(cell_population.GetNumNodes());
+ 	    // Initialise a vector of node forces
+ 	    std::vector<c_vector<double, 2> > node_forces;
+ 	    node_forces.reserve(cell_population.GetNumNodes());
 
  		for (unsigned i=0; i<40; i++)
  		{
@@ -243,7 +243,7 @@ public:
 
         for (unsigned i=0; i<40; i++)
   		{
-  			// Move nodes close together
+            // Move nodes close together
   			double separation = 4.0 - (double)i/10.0;
   			cell_population.GetNode(1)->rGetModifiableLocation()[0] = separation;
 
@@ -431,201 +431,120 @@ public:
     void TestBuskeAdhesiveForceArchiving() throw (Exception)
     {
         OutputFileHandler handler("archive", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "buske_adhesive_force_system.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "BuskeAdhesiveForce.arch";
 
         {
-            // Create a NodesOnlyMesh
-            TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
-            MutableMesh<2,2> generating_mesh;
-            generating_mesh.ConstructFromMeshReader(mesh_reader);
-
-            NodesOnlyMesh<2> mesh;
-            mesh.ConstructNodesWithoutMesh(generating_mesh);
-
-            // Set up SimulationTime
-            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
-
-            // Create a cell population
-            std::vector<CellPtr> cells;
-            boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
-            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
-            {
-                FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-                p_model->SetCellProliferativeType(STEM);
-
-                CellPtr p_cell(new Cell(p_state, p_model));
-                p_cell->SetBirthTime(-50.0);
-                cells.push_back(p_cell);
-            }
-
-            NodeBasedCellPopulation<2> cell_population(mesh, cells);
-
-            // Create a force object and set member variables
-            BuskeAdhesiveForce<2> buske_adhesive_force;
-            buske_adhesive_force.SetCutOffLength(1.7);
-            buske_adhesive_force.SetAdhesionEnergyParameter(12.0);
+            BuskeAdhesiveForce<2> force;
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
-            // Serialize force object via pointer
-            AbstractForce<2>* const p_buske_adhesive_force = &buske_adhesive_force;
+            // Set member variables
+            force.SetCutOffLength(1.7);
+            force.SetAdhesionEnergyParameter(12.0);
 
-            output_arch << p_buske_adhesive_force;
+            // Serialize via pointer to most abstract class possible
+            AbstractForce<2>* const p_force = &force;
+
+            output_arch << p_force;
         }
 
         {
-            ArchiveLocationInfo::SetMeshPathname("mesh/test/data", "square_2_elements");
+            AbstractForce<2>* p_force;
 
             // Create an input archive
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
 
-            AbstractForce<2>* p_buske_adhesive_force;
+            // Restore from the archive
+            input_arch >> p_force;
 
-            // Restore force object from the archive
-            input_arch >> p_buske_adhesive_force;
-
-            // Test member variables
-            TS_ASSERT_EQUALS(dynamic_cast<BuskeAdhesiveForce<2>*>(p_buske_adhesive_force)->GetUseCutOffLength(), true);
-            TS_ASSERT_DELTA(dynamic_cast<BuskeAdhesiveForce<2>*>(p_buske_adhesive_force)->GetCutOffLength(), 1.7, 1e-6);
-            TS_ASSERT_DELTA(dynamic_cast<BuskeAdhesiveForce<2>*>(p_buske_adhesive_force)->GetAdhesionEnergyParameter(), 12.0, 1e-6);
+            // Check member variables have been correctly archived
+            TS_ASSERT_EQUALS(dynamic_cast<BuskeAdhesiveForce<2>*>(p_force)->GetUseCutOffLength(), true);
+            TS_ASSERT_DELTA(dynamic_cast<BuskeAdhesiveForce<2>*>(p_force)->GetCutOffLength(), 1.7, 1e-6);
+            TS_ASSERT_DELTA(dynamic_cast<BuskeAdhesiveForce<2>*>(p_force)->GetAdhesionEnergyParameter(), 12.0, 1e-6);
 
             // Tidy up
-            delete p_buske_adhesive_force;
+            delete p_force;
         }
     }
 
     void TestBuskeElasticForceArchiving() throw (Exception)
-      {
-          OutputFileHandler handler("archive", false);
-          std::string archive_filename = handler.GetOutputDirectoryFullPath() + "buske_elastic_force_system.arch";
-
-          {
-              // Create a NodesOnlyMesh
-              TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
-              MutableMesh<2,2> generating_mesh;
-              generating_mesh.ConstructFromMeshReader(mesh_reader);
-
-              NodesOnlyMesh<2> mesh;
-              mesh.ConstructNodesWithoutMesh(generating_mesh);
-
-              // Set up SimulationTime
-              SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
-
-              // Create a cell population
-              std::vector<CellPtr> cells;
-              boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
-              for (unsigned i=0; i<mesh.GetNumNodes(); i++)
-              {
-                  FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-                  p_model->SetCellProliferativeType(STEM);
-
-                  CellPtr p_cell(new Cell(p_state, p_model));
-                  p_cell->SetBirthTime(-50.0);
-                  cells.push_back(p_cell);
-              }
-
-              NodeBasedCellPopulation<2> cell_population(mesh, cells);
-
-              // Create a force object and set member variables
-              BuskeElasticForce<2> buske_elastic_force;
-              buske_elastic_force.SetCutOffLength(1.7);
-              buske_elastic_force.SetDeformationEnergyParameter(13.0);
-
-              std::ofstream ofs(archive_filename.c_str());
-              boost::archive::text_oarchive output_arch(ofs);
-
-              // Serialize force object via pointer
-              AbstractForce<2>* const p_buske_elastic_force = &buske_elastic_force;
-
-              output_arch << p_buske_elastic_force;
-          }
-
-          {
-              ArchiveLocationInfo::SetMeshPathname("mesh/test/data", "square_2_elements");
-
-              // Create an input archive
-              std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
-              boost::archive::text_iarchive input_arch(ifs);
-
-              AbstractForce<2>* p_buske_elastic_force;
-
-              // Restore force object from the archive
-              input_arch >> p_buske_elastic_force;
-
-              // Test member variables
-              TS_ASSERT_EQUALS(dynamic_cast<BuskeElasticForce<2>*>(p_buske_elastic_force)->GetUseCutOffLength(), true);
-              TS_ASSERT_DELTA(dynamic_cast<BuskeElasticForce<2>*>(p_buske_elastic_force)->GetCutOffLength(), 1.7, 1e-6);
-              TS_ASSERT_DELTA(dynamic_cast<BuskeElasticForce<2>*>(p_buske_elastic_force)->GetDeformationEnergyParameter(), 13.0, 1e-6);
-
-              // Tidy up
-              delete p_buske_elastic_force;
-          }
-      }
-
-    void TestBuskeCompressionForceArchiving() throw (Exception)
     {
         OutputFileHandler handler("archive", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "buske_compression_force_system.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "BuskeElasticForce.arch";
 
         {
-            // Create a NodesOnlyMesh
-            TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
-            MutableMesh<2,2> generating_mesh;
-            generating_mesh.ConstructFromMeshReader(mesh_reader);
-
-            NodesOnlyMesh<2> mesh;
-            mesh.ConstructNodesWithoutMesh(generating_mesh);
-
-            // Set up SimulationTime
-            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
-
-            // Create a cell population
-            std::vector<CellPtr> cells;
-            boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
-            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
-            {
-                FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-                p_model->SetCellProliferativeType(STEM);
-
-                CellPtr p_cell(new Cell(p_state, p_model));
-                p_cell->SetBirthTime(-50.0);
-                cells.push_back(p_cell);
-            }
-
-            NodeBasedCellPopulation<2> cell_population(mesh, cells);
-
-            // Create a force object and set member variables
-            BuskeCompressionForce<2> buske_compression_force;
-            buske_compression_force.SetCompressionEnergyParameter(14.0);
+            BuskeElasticForce<2> force;
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
-            // Serialize force object via pointer
-            AbstractForce<2>* const p_buske_compression_force = &buske_compression_force;
+            // Set member variables
+            force.SetCutOffLength(1.7);
+            force.SetDeformationEnergyParameter(13.0);
 
-            output_arch << p_buske_compression_force;
+            // Serialize via pointer to most abstract class possible
+            AbstractForce<2>* const p_force = &force;
+
+            output_arch << p_force;
         }
 
         {
-            ArchiveLocationInfo::SetMeshPathname("mesh/test/data", "square_2_elements");
+            AbstractForce<2>* p_force;
 
             // Create an input archive
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
 
-            AbstractForce<2>* p_buske_compression_force;
+            // Restore from the archive
+            input_arch >> p_force;
 
-            // Restore force object from the archive
-            input_arch >> p_buske_compression_force;
-
-            // Test member variable
-            TS_ASSERT_DELTA(dynamic_cast<BuskeCompressionForce<2>*>(p_buske_compression_force)->GetCompressionEnergyParameter(), 14.0, 1e-6);
+            // Check member variables have been correctly archived
+            TS_ASSERT_EQUALS(dynamic_cast<BuskeElasticForce<2>*>(p_force)->GetUseCutOffLength(), true);
+            TS_ASSERT_DELTA(dynamic_cast<BuskeElasticForce<2>*>(p_force)->GetCutOffLength(), 1.7, 1e-6);
+            TS_ASSERT_DELTA(dynamic_cast<BuskeElasticForce<2>*>(p_force)->GetDeformationEnergyParameter(), 13.0, 1e-6);
 
             // Tidy up
-            delete p_buske_compression_force;
+            delete p_force;
+        }
+    }
+
+    void TestBuskeCompressionForceArchiving() throw (Exception)
+    {
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "BuskeCompressionForce.arch";
+
+        {
+            BuskeCompressionForce<2> force;
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Set member variables
+            force.SetCompressionEnergyParameter(14.0);
+
+            // Serialize via pointer to most abstract class possible
+            AbstractForce<2>* const p_force = &force;
+
+            output_arch << p_force;
+        }
+
+        {
+            AbstractForce<2>* p_force;
+
+            // Create an input archive
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            // Restore from the archive
+            input_arch >> p_force;
+
+            // Check member variables have been correctly archived
+            TS_ASSERT_DELTA(dynamic_cast<BuskeCompressionForce<2>*>(p_force)->GetCompressionEnergyParameter(), 14.0, 1e-6);
+
+            // Tidy up
+            delete p_force;
         }
     }
 };

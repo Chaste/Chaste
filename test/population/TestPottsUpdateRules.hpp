@@ -86,11 +86,6 @@ public:
 		///\todo Add tests of other methods
 	}
 
-	void TestVolumeConstraintUpdateRuleArchiving() throw (Exception)
-	{
-		///\todo
-	}
-
     void TestAdhesionUpdateRuleMethods() throw (Exception)
     {
     	// Create a simple 2D PottsMesh with 2 elements
@@ -124,12 +119,6 @@ public:
 		///\todo Add tests of other methods
     }
 
-	void TestAdhesionUpdateRuleArchiving() throw (Exception)
-	{
-		///\todo
-	}
-
-
 	void TestUpdateRuleOutputUpdateRuleInfo()
 	{
 		std::string output_directory = "TestPottsUpdateRulesOutputParameters";
@@ -159,7 +148,6 @@ public:
 		std::string adhesion_update_results_dir = output_file_handler.GetOutputDirectoryFullPath();
 		TS_ASSERT_EQUALS(system(("diff " + adhesion_update_results_dir + "adhesion_update_results.parameters notforrelease_cell_based/test/data/TestUpdateRules/adhesion_update_results.parameters").c_str()), 0);
 	}
-
 
     void TestIncompatibleUpdateRules() throw (Exception)
     {
