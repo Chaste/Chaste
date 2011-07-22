@@ -48,16 +48,12 @@ void PottsBasedCellPopulation::Validate()
     {
         if (validated_element[i] == 0)
         {
-            std::stringstream ss;
-            ss << "Element " << i << " does not appear to have a cell associated with it";
-            EXCEPTION(ss.str());
+            EXCEPTION("Element " << i << " does not appear to have a cell associated with it");
         }
 
         if (validated_element[i] > 1)
         {
-            std::stringstream ss;
-            ss << "Element " << i << " appears to have " << validated_element[i] << " cells associated with it";
-            EXCEPTION(ss.str());
+            EXCEPTION("Element " << i << " appears to have " << validated_element[i] << " cells associated with it");
         }
     }
 }

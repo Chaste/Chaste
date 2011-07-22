@@ -650,9 +650,7 @@ void LatticeBasedCellPopulation<DIM>::Validate()
         // If the node attached to this cell is labelled as an empty site, then throw an error
         if (mIsEmptySite[node_index])
         {
-            std::stringstream ss;
-            ss << "Node " << node_index << " is labelled as an empty site and has a cell attached";
-            EXCEPTION(ss.str());
+            EXCEPTION("Node " << node_index << " is labelled as an empty site and has a cell attached");
         }
         validated_node[node_index] = true;
     }
@@ -661,9 +659,7 @@ void LatticeBasedCellPopulation<DIM>::Validate()
     {
         if (!validated_node[i])
         {
-            std::stringstream ss;
-            ss << "Node " << i << " does not appear to be an empty site or have a cell associated with it";
-            EXCEPTION(ss.str());
+            EXCEPTION("Node " << i << " does not appear to be an empty site or have a cell associated with it");
         }
     }
 }
