@@ -91,7 +91,7 @@ public:
 
         // Set up cell-based simulation
         CellBasedSimulation<2> simulator(node_based_cell_population);
-        simulator.SetOutputDirectory("TestCellBasedSimulationWithBuskeForces");
+        simulator.SetOutputDirectory("TestCellBasedSimulationWithBuskeAdhesiveForce");
         simulator.SetEndTime(5.0);
 
         // Create a force law and pass it to the simulation
@@ -146,7 +146,7 @@ public:
 
         // Set up cell-based simulation
         CellBasedSimulation<2> simulator(node_based_cell_population);
-        simulator.SetOutputDirectory("TestCellBasedSimulationWithBuskeForces");
+        simulator.SetOutputDirectory("TestCellBasedSimulationWithBuskeElasticForce");
         simulator.SetEndTime(5.0);
 
         // Create a force law and pass it to the simulation
@@ -228,139 +228,91 @@ public:
     }
 
     /**
-      * Create a simulation of a NodeBasedCellPopulation with all Buske forces.
-      * Test that no exceptions are thrown.
-      */
-     void TestAllBuskeForces() throw (Exception)
-     {
-         // Create a simple mesh
-         unsigned num_cells_depth = 5;
-         unsigned num_cells_width = 5;
-         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+     * Create a simulation of a NodeBasedCellPopulation with all Buske forces.
+     * Test that no exceptions are thrown.
+     */
+    void TestAllBuskeForces() throw (Exception)
+    {
+		// Create a simple mesh
+		unsigned num_cells_depth = 5;
+		unsigned num_cells_width = 5;
+		HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
+		TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
-         // Convert this to a NodesOnlyMesh
-         NodesOnlyMesh<2> mesh;
-         mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
+		// Convert this to a NodesOnlyMesh
+		NodesOnlyMesh<2> mesh;
+		mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
 
-         // Create cells
-         std::vector<CellPtr> cells;
-         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), TRANSIT);
+		// Create cells
+		std::vector<CellPtr> cells;
+		CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+		cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), TRANSIT);
 
-         // Create a node-based cell population
-         NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
-         node_based_cell_population.SetMechanicsCutOffLength(1.5);
+		// Create a node-based cell population
+		NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
+		node_based_cell_population.SetMechanicsCutOffLength(1.5);
 
-         // Set up cell-based simulation
-         CellBasedSimulation<2> simulator(node_based_cell_population);
-         simulator.SetOutputDirectory("TestAllBuskeForces");
-         simulator.SetEndTime(5.0);
+		// Set up cell-based simulation
+		CellBasedSimulation<2> simulator(node_based_cell_population);
+		simulator.SetOutputDirectory("TestAllBuskeForces");
+		simulator.SetEndTime(5.0);
 
-         // Create a force law and pass it to the simulation
-         BuskeCompressionForce<2> buske_compression_force;
-         BuskeElasticForce<2> buske_elastic_force;
-         BuskeAdhesiveForce<2> buske_adhesive_force;
-         simulator.AddForce(&buske_compression_force);
-         simulator.AddForce(&buske_elastic_force);
-         simulator.AddForce(&buske_adhesive_force);
+		// Create a force law and pass it to the simulation
+		BuskeCompressionForce<2> buske_compression_force;
+		BuskeElasticForce<2> buske_elastic_force;
+		BuskeAdhesiveForce<2> buske_adhesive_force;
+		simulator.AddForce(&buske_compression_force);
+		simulator.AddForce(&buske_elastic_force);
+		simulator.AddForce(&buske_adhesive_force);
 
-         simulator.Solve();
-     }
+		simulator.Solve();
+    }
 
-     /**
-        * Create two simulations of a NodeBasedCellPopulation with all Buske forces, generalised spring forces and compare the two.
-        * Test that no exceptions are thrown.
-        */
-       void TestComparisonSpringBuskeForces() throw (Exception)
-       {
-    	    /**
-			* Buske simulation.
-			*
-			*/
+    /**
+	 * Test that 2 nodes relax to the equilibrium distance.
+     */
 
-           // Create a simple mesh
-           unsigned num_cells_depth = 1;
-           unsigned num_cells_width = 2;
-           HoneycombMeshGenerator generator_buske(num_cells_width, num_cells_depth, 0, 1.0);
-           TetrahedralMesh<2,2>* p_generating_mesh_buske = generator_buske.GetMesh();
+	void TestBuskeRelaxationForces() throw (Exception)
+	{
+		// Create a simple mesh with two nodes
+		unsigned num_cells_depth = 1;
+		unsigned num_cells_width = 2;
+		HoneycombMeshGenerator generator_buske(num_cells_width, num_cells_depth, 0, 1.0);
+		TetrahedralMesh<2,2>* p_generating_mesh_buske = generator_buske.GetMesh();
 
-           // Convert this to a NodesOnlyMesh
-           NodesOnlyMesh<2> mesh_buske;
-           mesh_buske.ConstructNodesWithoutMesh(*p_generating_mesh_buske);
+		// Convert this to a NodesOnlyMesh
+		NodesOnlyMesh<2> mesh_buske;
+		mesh_buske.ConstructNodesWithoutMesh(*p_generating_mesh_buske);
 
-           // Create cells
-           std::vector<CellPtr> cells_buske;
-           CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator_buske;
-           cells_generator_buske.GenerateBasicRandom(cells_buske, mesh_buske.GetNumNodes(), TRANSIT);
+		// Create cells
+		std::vector<CellPtr> cells_buske;
+		CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator_buske;
+		cells_generator_buske.GenerateBasicRandom(cells_buske, mesh_buske.GetNumNodes(), DIFFERENTIATED);
 
-           // Create a node-based cell population
-           NodeBasedCellPopulation<2> node_based_cell_population_buske(mesh_buske, cells_buske);
-           node_based_cell_population_buske.SetMechanicsCutOffLength(1.5);
+		// Create a node-based cell population
+		NodeBasedCellPopulation<2> node_based_cell_population_buske(mesh_buske, cells_buske);
+		node_based_cell_population_buske.SetMechanicsCutOffLength(1.5);
 
-           // Set up cell-based simulation
-           CellBasedSimulation<2> simulator_buske(node_based_cell_population_buske);
-           simulator_buske.SetOutputDirectory("TestCompareBuskeWithSpring/Buske");
-           simulator_buske.SetEndTime(1.0);
-           simulator_buske.SetNoBirth(true);
+		// Set up cell-based simulation
+		CellBasedSimulation<2> simulator(node_based_cell_population_buske);
+		simulator.SetOutputDirectory("TestBuskeRelaxation");
+		simulator.SetEndTime(1.0);
 
-           // Create Buske force laws and pass it to the simulation
-           BuskeCompressionForce<2> buske_compression_force;
-           BuskeElasticForce<2> buske_elastic_force;
-           BuskeAdhesiveForce<2> buske_adhesive_force;
-           simulator_buske.AddForce(&buske_compression_force);
-           simulator_buske.AddForce(&buske_elastic_force);
-           simulator_buske.AddForce(&buske_adhesive_force);
+		// Create all three Buske force laws and pass to the simulation
+		BuskeCompressionForce<2> buske_compression_force;
+		BuskeElasticForce<2> buske_elastic_force;
+		BuskeAdhesiveForce<2> buske_adhesive_force;
+		simulator.AddForce(&buske_compression_force);
+		simulator.AddForce(&buske_elastic_force);
+		simulator.AddForce(&buske_adhesive_force);
 
-           // Solve
-           simulator_buske.Solve();
+		// Solve
+		simulator.Solve();
 
-           // Re-initialise time
-
-           SimulationTime::Destroy();
-           SimulationTime::Instance()->SetStartTime(0.0);
-
-  	       /**
-			* Generalised springs simulation.
-			*
-			*/
-
-           // Create a simple mesh
-           HoneycombMeshGenerator generator_spring(num_cells_width, num_cells_depth, 0, 0.5);
-           TetrahedralMesh<2,2>* p_generating_mesh_spring = generator_spring.GetMesh();
-
-           // Convert this to a NodesOnlyMesh
-           NodesOnlyMesh<2> mesh_spring;
-           mesh_spring.ConstructNodesWithoutMesh(*p_generating_mesh_spring);
-
-           // Create cells
-           std::vector<CellPtr> cells_spring;
-           CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator_spring;
-           cells_generator_spring.GenerateBasicRandom(cells_spring, mesh_spring.GetNumNodes(), TRANSIT);
-
-           // Create a node-based cell population
-           NodeBasedCellPopulation<2> node_based_cell_population_spring(mesh_spring, cells_spring);
-           node_based_cell_population_spring.SetMechanicsCutOffLength(1.5);
-
-           // Set up cell-based simulation
-           CellBasedSimulation<2> simulator_spring(node_based_cell_population_spring);
-           simulator_spring.SetOutputDirectory("TestCompareBuskeWithSpring/Spring");
-           simulator_spring.SetEndTime(1.0);
-           simulator_spring.SetNoBirth(true);
-
-           // Create spring force laws and pass it to the simulation
-           GeneralisedLinearSpringForce<2> spring_force;
-           simulator_spring.AddForce(&spring_force);
-
-           simulator_spring.Solve();
-
-    	    /**
-  			* Comparison between Buske and springs after 1 hour. Both are expected to be relaxed.
-  			* The 1.0 difference is because Buske default radius is 1.0, whereas spring default radius is 0.5.
-  			*/
-           TS_ASSERT_DELTA(simulator_buske.rGetCellPopulation().GetNode(0)->rGetLocation()[0], simulator_spring.rGetCellPopulation().GetNode(0)->rGetLocation()[0], 1.0 + 1e-1);
-           TS_ASSERT_DELTA(simulator_buske.rGetCellPopulation().GetNode(1)->rGetLocation()[0], simulator_spring.rGetCellPopulation().GetNode(1)->rGetLocation()[0], 1.0 + 1e-1);
-       }
+		// The nodes should be about 1.7 apart as this is te minimum of the sum of the energies.
+		TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()[0], -0.3596,  1e-4);
+		TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(1)->rGetLocation()[0], 1.3596,  1e-4);
+	}
 };
 
 #endif /*TESTCELLBASEDSIMULATIONWITHBUSKEFORCES_HPP_*/
