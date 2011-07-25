@@ -179,7 +179,7 @@ void PottsBasedCellPopulation::UpdateNodeLocations(const std::vector< c_vector<d
         assert(node_iter->GetNumContainingElements() <= 1);
 
         // Find a random available neighbouring node to extend the element/medium into
-        std::set<unsigned> neighbouring_node_indices = mrMesh.GetNeighbouringNodeIndices(node_iter->GetIndex());
+        std::set<unsigned> neighbouring_node_indices = mrMesh.GetMooreNeighbouringNodeIndices(node_iter->GetIndex());
         unsigned new_location_index;
         if (!neighbouring_node_indices.empty())
         {

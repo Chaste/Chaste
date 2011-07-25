@@ -31,6 +31,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "UblasCustomFunctions.hpp"
 #include <list>
 
+#include "Debug.hpp"
+
 template<unsigned DIM>
 PottsMesh<DIM>::PottsMesh(std::vector<Node<DIM>*> nodes, std::vector<PottsElement<DIM>*> pottsElements)
 {
@@ -245,27 +247,50 @@ double PottsMesh<DIM>::GetVolumeOfElement(unsigned index)
 template<unsigned DIM>
 double PottsMesh<DIM>::GetSurfaceAreaOfElement(unsigned index)
 {
-    //\todo this is not correct need to work this out from the number of free boundaries. See #1683.
-    double surface_area = 0.0;
+	///\todo not implemented in 3d yet
+	assert(DIM==2);
 
+	// Get pointer to this element
+	PottsElement<DIM>* p_element = GetElement(index);
+
+    double surface_area = 0.0;
+    for (unsigned node_index=0; node_index< p_element->GetNumNodes(); node_index++)
+    {
+    	std::set<unsigned> neighbouring_node_indicies = GetVonNeumannNeighbouringNodeIndices(p_element->GetNode(node_index)->GetIndex());
+    	unsigned local_edges=4;
+    	for (std::set<unsigned>::iterator iter=neighbouring_node_indicies.begin();
+			 iter!=neighbouring_node_indicies.end();
+			 iter++)
+    	{
+    		std::set<unsigned> neighbouring_node_element_indices = this->mNodes[*iter]->rGetContainingElementIndices();
+
+    		if (neighbouring_node_element_indices.size()>0 && local_edges>0 )
+    		{
+				unsigned neighbouring_node_element_index = *(neighbouring_node_element_indices.begin());
+				if(neighbouring_node_element_index == index)
+				{
+					local_edges--;
+				}
+    		}
+    	}
+    	surface_area += local_edges;
+    }
     return surface_area;
 }
 
 template<unsigned DIM>
-std::set<unsigned> PottsMesh<DIM>::GetNeighbouringNodeIndices(unsigned nodeIndex)
+std::set<unsigned> PottsMesh<DIM>::GetMooreNeighbouringNodeIndices(unsigned nodeIndex)
 {
 	///\todo not implemented in 3d yet
 	assert(DIM==2);
 
     // Create a set of neighbouring node indices
-    std::set<unsigned> neighbouring_node_indices;
+    std::set<unsigned> neighbouring_moore_node_indices;
 
     double width = this->GetWidth(0);
     unsigned nodes_across = (unsigned)width + 1; // Getting the number of nodes along x axis of mesh
-
     double height = this->GetWidth(1);
     unsigned nodes_up = (unsigned)height + 1;
-
     /*
      * This stores the available neighbours using the following numbering:
      *
@@ -291,7 +316,7 @@ std::set<unsigned> PottsMesh<DIM>::GetNeighbouringNodeIndices(unsigned nodeIndex
 
     // Work out whether this node lies on any edge of the mesh
     bool on_south_edge = (nodeIndex < nodes_across);
-    bool on_north_edge = (nodeIndex > nodes_up*(nodes_across - 1)-1);
+    bool on_north_edge = (nodeIndex > nodes_across*(nodes_up - 1) - 1);
     bool on_west_edge = (nodeIndex%nodes_across == 0);
     bool on_east_edge = (nodeIndex%nodes_across == nodes_across - 1);
 
@@ -312,10 +337,68 @@ std::set<unsigned> PottsMesh<DIM>::GetNeighbouringNodeIndices(unsigned nodeIndex
     {
         if (available_neighbours[i])
         {
-            neighbouring_node_indices.insert(neighbour_indices_vector[i]);
+            neighbouring_moore_node_indices.insert(neighbour_indices_vector[i]);
         }
     }
-    return neighbouring_node_indices;
+    return neighbouring_moore_node_indices;
+}
+
+template<unsigned DIM>
+std::set<unsigned> PottsMesh<DIM>::GetVonNeumannNeighbouringNodeIndices(unsigned nodeIndex)
+{
+	///\todo not implemented in 3d yet
+	assert(DIM==2);
+
+    // Create a set of neighbouring node indices
+    std::set<unsigned> neighbouring_von_neumann_node_indices;
+
+    double width = this->GetWidth(0);
+    unsigned nodes_across = (unsigned)width + 1; // Getting the number of nodes along x axis of mesh
+    double height = this->GetWidth(1);
+    unsigned nodes_up = (unsigned)height + 1;
+
+    /*
+     * This stores the available neighbours using the following numbering:
+     *
+     *        0
+     *        |
+     *        |
+     *  1-----x-----3
+     *        |
+     *        |
+     *  	  2
+     */
+
+    // Create a vector of possible neighbouring node indices
+    std::vector<unsigned> neighbour_indices_vector(4, nodeIndex);
+    neighbour_indices_vector[0] += nodes_across;
+    neighbour_indices_vector[1] -= 1;
+    neighbour_indices_vector[2] -= nodes_across;
+    neighbour_indices_vector[3] += 1;
+
+    // Work out whether this node lies on any edge of the mesh
+    bool on_south_edge = (nodeIndex < nodes_across);
+    bool on_north_edge = (nodeIndex > nodes_across*(nodes_up - 1) - 1);
+    bool on_west_edge = (nodeIndex%nodes_across == 0);
+    bool on_east_edge = (nodeIndex%nodes_across == nodes_across - 1);
+
+    // Create a vector of booleans for which neighbours are available
+    // Use the order N, NW, W, SW, S, SE, E, NE
+    std::vector<bool> available_neighbours = std::vector<bool>(4, true);
+    available_neighbours[0] = !on_north_edge;
+    available_neighbours[1] = !on_west_edge;
+    available_neighbours[2] = !on_south_edge;
+    available_neighbours[3] = !on_east_edge;
+
+    // Using neighbour_indices_vector and available_neighbours, store the indices of all available neighbours to the set all_neighbours
+    for (unsigned i=0; i<4; i++)
+    {
+        if (available_neighbours[i])
+        {
+        	neighbouring_von_neumann_node_indices.insert(neighbour_indices_vector[i]);
+        }
+    }
+    return neighbouring_von_neumann_node_indices;
 }
 
 template<unsigned DIM>
