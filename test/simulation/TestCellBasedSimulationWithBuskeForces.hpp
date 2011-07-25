@@ -42,6 +42,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "BuskeAdhesiveForce.hpp"
 #include "BuskeElasticForce.hpp"
 #include "BuskeCompressionForce.hpp"
+#include "GeneralisedLinearSpringForce.hpp"
 
 class TestCellBasedSimulationWithBuskeForces : public AbstractCellBasedTestSuite
 {
@@ -266,6 +267,100 @@ public:
 
          simulator.Solve();
      }
+
+     /**
+        * Create two simulations of a NodeBasedCellPopulation with all Buske forces, generalised spring forces and compare the two.
+        * Test that no exceptions are thrown.
+        */
+       void TestComparisonSpringBuskeForces() throw (Exception)
+       {
+    	    /**
+			* Buske simulation.
+			*
+			*/
+
+           // Create a simple mesh
+           unsigned num_cells_depth = 1;
+           unsigned num_cells_width = 2;
+           HoneycombMeshGenerator generator_buske(num_cells_width, num_cells_depth, 0, 1.0);
+           TetrahedralMesh<2,2>* p_generating_mesh_buske = generator_buske.GetMesh();
+
+           // Convert this to a NodesOnlyMesh
+           NodesOnlyMesh<2> mesh_buske;
+           mesh_buske.ConstructNodesWithoutMesh(*p_generating_mesh_buske);
+
+           // Create cells
+           std::vector<CellPtr> cells_buske;
+           CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator_buske;
+           cells_generator_buske.GenerateBasicRandom(cells_buske, mesh_buske.GetNumNodes(), TRANSIT);
+
+           // Create a node-based cell population
+           NodeBasedCellPopulation<2> node_based_cell_population_buske(mesh_buske, cells_buske);
+           node_based_cell_population_buske.SetMechanicsCutOffLength(1.5);
+
+           // Set up cell-based simulation
+           CellBasedSimulation<2> simulator_buske(node_based_cell_population_buske);
+           simulator_buske.SetOutputDirectory("TestCompareBuskeWithSpring/Buske");
+           simulator_buske.SetEndTime(1.0);
+           simulator_buske.SetNoBirth(true);
+
+           // Create Buske force laws and pass it to the simulation
+           BuskeCompressionForce<2> buske_compression_force;
+           BuskeElasticForce<2> buske_elastic_force;
+           BuskeAdhesiveForce<2> buske_adhesive_force;
+           simulator_buske.AddForce(&buske_compression_force);
+           simulator_buske.AddForce(&buske_elastic_force);
+           simulator_buske.AddForce(&buske_adhesive_force);
+
+           // Solve
+           simulator_buske.Solve();
+
+           // Re-initialise time
+
+           SimulationTime::Destroy();
+           SimulationTime::Instance()->SetStartTime(0.0);
+
+  	       /**
+			* Generalised springs simulation.
+			*
+			*/
+
+           // Create a simple mesh
+           HoneycombMeshGenerator generator_spring(num_cells_width, num_cells_depth, 0, 0.5);
+           TetrahedralMesh<2,2>* p_generating_mesh_spring = generator_spring.GetMesh();
+
+           // Convert this to a NodesOnlyMesh
+           NodesOnlyMesh<2> mesh_spring;
+           mesh_spring.ConstructNodesWithoutMesh(*p_generating_mesh_spring);
+
+           // Create cells
+           std::vector<CellPtr> cells_spring;
+           CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator_spring;
+           cells_generator_spring.GenerateBasicRandom(cells_spring, mesh_spring.GetNumNodes(), TRANSIT);
+
+           // Create a node-based cell population
+           NodeBasedCellPopulation<2> node_based_cell_population_spring(mesh_spring, cells_spring);
+           node_based_cell_population_spring.SetMechanicsCutOffLength(1.5);
+
+           // Set up cell-based simulation
+           CellBasedSimulation<2> simulator_spring(node_based_cell_population_spring);
+           simulator_spring.SetOutputDirectory("TestCompareBuskeWithSpring/Spring");
+           simulator_spring.SetEndTime(1.0);
+           simulator_spring.SetNoBirth(true);
+
+           // Create spring force laws and pass it to the simulation
+           GeneralisedLinearSpringForce<2> spring_force;
+           simulator_spring.AddForce(&spring_force);
+
+           simulator_spring.Solve();
+
+    	    /**
+  			* Comparison between Buske and springs after 1 hour. Both are expected to be relaxed.
+  			* The 1.0 difference is because Buske default radius is 1.0, whereas spring default radius is 0.5.
+  			*/
+           TS_ASSERT_DELTA(simulator_buske.rGetCellPopulation().GetNode(0)->rGetLocation()[0], simulator_spring.rGetCellPopulation().GetNode(0)->rGetLocation()[0], 1.0 + 1e-1);
+           TS_ASSERT_DELTA(simulator_buske.rGetCellPopulation().GetNode(1)->rGetLocation()[0], simulator_spring.rGetCellPopulation().GetNode(1)->rGetLocation()[0], 1.0 + 1e-1);
+       }
 };
 
 #endif /*TESTCELLBASEDSIMULATIONWITHBUSKEFORCES_HPP_*/
