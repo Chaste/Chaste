@@ -32,7 +32,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 template<unsigned DIM>
 BuskeCompressionForce<DIM>::BuskeCompressionForce()
     : AbstractForce<DIM>(),
-      mCompressionEnergyParameter(1000.0)
+      mCompressionEnergyParameter(5.0)
 {
 }
 

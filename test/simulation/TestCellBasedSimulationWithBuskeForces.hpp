@@ -173,7 +173,7 @@ public:
     }
 
     /**
-     * Create a simulation of a NodeBasedCellPopulation with a BuskeInteractionForce system.
+     * Create a simulation of a NodeBasedCellPopulation with a BuskeCompressionForce system.
      * Test that no exceptions are thrown, and write the results to file.
      */
     void TestSimpleMonolayerWithBuskeCompressionForce() throw (Exception)
@@ -225,6 +225,47 @@ public:
 
         TS_ASSERT(min_distance_between_cells > 1e-3);
     }
+
+    /**
+      * Create a simulation of a NodeBasedCellPopulation with all Buske forces.
+      * Test that no exceptions are thrown.
+      */
+     void TestAllBuskeForces() throw (Exception)
+     {
+         // Create a simple mesh
+         unsigned num_cells_depth = 5;
+         unsigned num_cells_width = 5;
+         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
+         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+
+         // Convert this to a NodesOnlyMesh
+         NodesOnlyMesh<2> mesh;
+         mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
+
+         // Create cells
+         std::vector<CellPtr> cells;
+         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), TRANSIT);
+
+         // Create a node-based cell population
+         NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
+         node_based_cell_population.SetMechanicsCutOffLength(1.5);
+
+         // Set up cell-based simulation
+         CellBasedSimulation<2> simulator(node_based_cell_population);
+         simulator.SetOutputDirectory("TestAllBuskeForces");
+         simulator.SetEndTime(5.0);
+
+         // Create a force law and pass it to the simulation
+         BuskeCompressionForce<2> buske_compression_force;
+         BuskeElasticForce<2> buske_elastic_force;
+         BuskeAdhesiveForce<2> buske_adhesive_force;
+         simulator.AddForce(&buske_compression_force);
+         simulator.AddForce(&buske_elastic_force);
+         simulator.AddForce(&buske_adhesive_force);
+
+         simulator.Solve();
+     }
 };
 
 #endif /*TESTCELLBASEDSIMULATIONWITHBUSKEFORCES_HPP_*/

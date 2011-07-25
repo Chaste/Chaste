@@ -31,7 +31,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 template<unsigned DIM>
 BuskeElasticForce<DIM>::BuskeElasticForce()
    : AbstractTwoBodyInteractionForce<DIM>(),
-     mDeformationEnergyParameter(4.0/3000.0) // Denoted by D in Buske et al (2011) (doi:10.1371/journal.pcbi.1001045).
+     mDeformationEnergyParameter(4.0/(3.0*5.0)) // Denoted by D in Buske et al (2011) (doi:10.1371/journal.pcbi.1001045).
 {
 }
 

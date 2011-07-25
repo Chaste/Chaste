@@ -31,7 +31,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 template<unsigned DIM>
 BuskeAdhesiveForce<DIM>::BuskeAdhesiveForce()
    : AbstractTwoBodyInteractionForce<DIM>(),
-     mAdhesionEnergyParameter(200)        // Denoted by epsilon in Buske et al (2011) (doi:10.1371/journal.pcbi.1001045).
+     mAdhesionEnergyParameter(0.2)        // Denoted by epsilon in Buske et al (2011) (doi:10.1371/journal.pcbi.1001045).
 {
 }
 

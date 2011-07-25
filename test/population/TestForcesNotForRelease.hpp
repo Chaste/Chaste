@@ -77,7 +77,7 @@ public:
         // Test set/get methods
         TS_ASSERT_EQUALS(buske_adhesive_force.GetUseCutOffLength(), false);
         TS_ASSERT_DELTA(buske_adhesive_force.GetCutOffLength(), DBL_MAX, 1e-6);
-        TS_ASSERT_DELTA(buske_adhesive_force.GetAdhesionEnergyParameter(), 200, 1e-6);
+        TS_ASSERT_DELTA(buske_adhesive_force.GetAdhesionEnergyParameter(), 0.2, 1e-6);
 
         buske_adhesive_force.SetCutOffLength(1.5);
         buske_adhesive_force.SetAdhesionEnergyParameter(1.0);
@@ -160,7 +160,7 @@ public:
         // Test set/get methods
         TS_ASSERT_EQUALS(buske_elastic_force.GetUseCutOffLength(), false);
         TS_ASSERT_DELTA(buske_elastic_force.GetCutOffLength(), DBL_MAX, 1e-6);
-        TS_ASSERT_DELTA(buske_elastic_force.GetDeformationEnergyParameter(), 4.0/3000.0, 1e-6);
+        TS_ASSERT_DELTA(buske_elastic_force.GetDeformationEnergyParameter(), 4.0/(3.0*5.0), 1e-6);
 
         buske_elastic_force.SetCutOffLength(1.5);
         buske_elastic_force.SetDeformationEnergyParameter(1.0);
@@ -303,7 +303,7 @@ public:
         BuskeCompressionForce<2> buske_compression_force;
 
         // Test set/get methods
-        TS_ASSERT_DELTA(buske_compression_force.GetCompressionEnergyParameter(), 1000.0, 1e-6);
+        TS_ASSERT_DELTA(buske_compression_force.GetCompressionEnergyParameter(), 5.0, 1e-6);
         buske_compression_force.SetCompressionEnergyParameter(15.0);
 
         TS_ASSERT_DELTA(buske_compression_force.GetCompressionEnergyParameter(), 15.0, 1e-6);
@@ -386,12 +386,12 @@ public:
 		// Test forces on nodes
 
 		// This node should only move in the x-direction
-		TS_ASSERT_DELTA(node_forces[0][0], -130.2988, 1e-4);
+		TS_ASSERT_DELTA(node_forces[0][0], -0.6514, 1e-4);
 		TS_ASSERT_DELTA(node_forces[0][1], 0.0, 1e-4);
-		TS_ASSERT_DELTA(node_forces[1][0], 57.8979, 1e-4);
-		TS_ASSERT_DELTA(node_forces[1][1], -57.8979, 1e-4);
-		TS_ASSERT_DELTA(node_forces[2][0], 57.8979, 1e-4);
-		TS_ASSERT_DELTA(node_forces[2][1], 57.8979, 1e-4);
+		TS_ASSERT_DELTA(node_forces[1][0], 0.2894, 1e-4);
+		TS_ASSERT_DELTA(node_forces[1][1], -0.2894, 1e-4);
+		TS_ASSERT_DELTA(node_forces[2][0], 0.2894, 1e-4);
+		TS_ASSERT_DELTA(node_forces[2][1], 0.2894, 1e-4);
 
         // When the node-only mesh goes out of scope, then it's a different set of nodes that get destroyed
         for (unsigned i=0; i<nodes.size(); i++)
