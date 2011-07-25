@@ -55,7 +55,7 @@ public:
     void TestCreateSmallPottsBasedCellPopulationAndGetWidth() throw (Exception)
     {
         // Create a simple 2D PottsMesh
-        PottsMeshGenerator generator(4, 4, 2, 2, 2, 2);
+        PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Create cells
@@ -124,7 +124,7 @@ public:
     void TestValidate() throw (Exception)
     {
         // Create a simple potts-based mesh
-        PottsMeshGenerator generator(4, 4, 2, 2, 2, 2);
+    	PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Create cells
@@ -190,7 +190,7 @@ public:
         }
 
         // Create another simple potts-based mesh
-        PottsMeshGenerator generator2(4, 4, 2, 2, 2, 2);
+        PottsMeshGenerator<2> generator2(4, 2, 2, 4, 2, 2);
         PottsMesh<2>* p_mesh2 = generator2.GetMesh();
 
         // Create cells
@@ -213,7 +213,7 @@ public:
     void TestCellDivision() throw(Exception)
     {
         // Create a simple 2D PottsMesh with one cell
-        PottsMeshGenerator generator(2, 2, 1, 1, 2, 2);
+    	PottsMeshGenerator<2> generator(2, 1, 2, 2, 1, 2);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Create cells
@@ -262,7 +262,7 @@ public:
         OutputFileHandler output_file_handler(output_directory, false);
 
         // Create a simple 2D PottsMesh
-        PottsMeshGenerator generator(4, 4, 2, 2, 2, 2);
+        PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Create cells

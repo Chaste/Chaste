@@ -54,7 +54,7 @@ public:
     void TestVolumeConstraintUpdateRuleMethods() throw (Exception)
     {
 		// Create a simple 2D PottsMesh with 2 elements
-		PottsMeshGenerator generator(4, 4, 1, 2, 2, 2);
+		PottsMeshGenerator<2> generator(4, 1, 2, 4, 2, 2);
 		PottsMesh<2>* p_mesh = generator.GetMesh();
 
 		// Create cells
@@ -129,7 +129,7 @@ public:
     void TestAdhesionUpdateRuleMethods() throw (Exception)
     {
     	// Create a simple 2D PottsMesh with 2 elements
-		PottsMeshGenerator generator(4, 4, 1, 2, 2, 2);
+    	PottsMeshGenerator<2> generator(4, 1, 2, 4, 2, 2);
 		PottsMesh<2>* p_mesh = generator.GetMesh();
 
 		// Create cells

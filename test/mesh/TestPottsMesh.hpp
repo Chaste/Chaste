@@ -205,7 +205,7 @@ public:
 
     void TestNodeIterator() throw (Exception)
     {
-        PottsMeshGenerator generator(4, 4, 2, 2, 2, 2);
+        PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
 
         // Create mesh
         PottsMesh<2>* p_mesh = generator.GetMesh();
@@ -251,7 +251,7 @@ public:
     void TestPottsElementIterator() throw (Exception)
     {
         // Create mesh
-        PottsMeshGenerator generator(4, 4, 2, 2, 2, 2);
+        PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         unsigned counter = 0;
@@ -302,7 +302,7 @@ public:
     void TestMeshGetWidthAndBoundingBoxMethod()
     {
         // Create mesh
-        PottsMeshGenerator generator(4, 4, 2, 2, 2, 2);
+        PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Test CalculateBoundingBox() method
@@ -320,7 +320,7 @@ public:
         TS_ASSERT_DELTA(width, 3.0, 1e-4);
     }
 
-    void TestGetMooreNeighbouringNodeIndices()
+    void TestGetMooreNeighbouringNodeIndices2d()
     {
         /* Create a simple potts-based mesh with one element
          * Numbering the nodes as follows:
@@ -331,7 +331,7 @@ public:
          *     |    |    |
          *     0----1----2
          */
-        PottsMeshGenerator generator(3, 3, 1, 1, 3, 3);
+        PottsMeshGenerator<2> generator(3, 1, 3, 3, 1, 3);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Test bottom left node
@@ -437,7 +437,127 @@ public:
         TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
     }
 
-    void TestGetVonNeumannNeighbouringNodeIndices()
+    void TestGetMooreNeighbouringNodeIndices3d()
+    {
+        /* Create a simple potts-based mesh with one element
+         * Numbering the nodes as follows:
+         *
+		 *     6------7------8           15-----16-----17            24-----25-----26
+		 *     |      |      |           |      |      |             |      |      |
+		 *     |      |      |           |      |      |             |      |      |
+		 *     3------4------5           12-----13-----14            21-----22-----23
+		 *     |      |      |           |      |      |             |      |      |
+		 *     |      |      |           |      |      |             |      |      |
+		 *     0------1------2           9------10-----11            18-----19-----20
+         */
+
+        PottsMeshGenerator<2> generator(3, 1, 3, 3, 1, 3);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Test bottom left node
+        std::set<unsigned> neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(0);
+        TS_ASSERT_EQUALS(neighbouring_sites.size(), 3u);
+
+        std::set<unsigned> expected_neighbouring_sites;
+        expected_neighbouring_sites.insert(1);
+        expected_neighbouring_sites.insert(3);
+        expected_neighbouring_sites.insert(4);
+        TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
+
+        // Test non-corner bottom nodes
+        neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(1);
+        TS_ASSERT_EQUALS(neighbouring_sites.size(), 5u);
+
+        expected_neighbouring_sites.clear();
+        expected_neighbouring_sites.insert(0);
+        expected_neighbouring_sites.insert(2);
+        expected_neighbouring_sites.insert(3);
+        expected_neighbouring_sites.insert(4);
+        expected_neighbouring_sites.insert(5);
+        TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
+
+        // Test bottom right node
+        neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(2);
+        TS_ASSERT_EQUALS(neighbouring_sites.size(), 3u);
+
+        expected_neighbouring_sites.clear();
+        expected_neighbouring_sites.insert(1);
+        expected_neighbouring_sites.insert(4);
+        expected_neighbouring_sites.insert(5);
+        TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
+
+        // Test non-corner left nodes
+        neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(3);
+        TS_ASSERT_EQUALS(neighbouring_sites.size(), 5u);
+
+        expected_neighbouring_sites.clear();
+        expected_neighbouring_sites.insert(0);
+        expected_neighbouring_sites.insert(1);
+        expected_neighbouring_sites.insert(4);
+        expected_neighbouring_sites.insert(6);
+        expected_neighbouring_sites.insert(7);
+        TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
+
+        // Test centre node
+        neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(4);
+        TS_ASSERT_EQUALS(neighbouring_sites.size(), 8u);
+
+        expected_neighbouring_sites.clear();
+        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        {
+            if (i != 4)
+            {
+                expected_neighbouring_sites.insert(i);
+            }
+        }
+        TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
+
+        // Test non-corner right nodes
+        neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(5);
+        TS_ASSERT_EQUALS(neighbouring_sites.size(), 5u);
+
+        expected_neighbouring_sites.clear();
+        expected_neighbouring_sites.insert(1);
+        expected_neighbouring_sites.insert(2);
+        expected_neighbouring_sites.insert(4);
+        expected_neighbouring_sites.insert(7);
+        expected_neighbouring_sites.insert(8);
+        TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
+
+        // Test top left node
+        neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(6);
+        TS_ASSERT_EQUALS(neighbouring_sites.size(), 3u);
+
+        expected_neighbouring_sites.clear();
+        expected_neighbouring_sites.insert(3);
+        expected_neighbouring_sites.insert(4);
+        expected_neighbouring_sites.insert(7);
+        TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
+
+        // Test non-corner top nodes
+        neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(7);
+        TS_ASSERT_EQUALS(neighbouring_sites.size(), 5u);
+
+        expected_neighbouring_sites.clear();
+        expected_neighbouring_sites.insert(3);
+        expected_neighbouring_sites.insert(4);
+        expected_neighbouring_sites.insert(5);
+        expected_neighbouring_sites.insert(6);
+        expected_neighbouring_sites.insert(8);
+        TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
+
+        // Test top right node
+        neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(8);
+        TS_ASSERT_EQUALS(neighbouring_sites.size(), 3u);
+
+        expected_neighbouring_sites.clear();
+        expected_neighbouring_sites.insert(4);
+        expected_neighbouring_sites.insert(5);
+        expected_neighbouring_sites.insert(7);
+        TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
+    }
+
+    void TestGetVonNeumannNeighbouringNodeIndices2d()
 	{
 		/* Create a simple potts-based mesh with one element
 		 * Numbering the nodes as follows:
@@ -448,7 +568,7 @@ public:
 		 *     |    |    |
 		 *     0----1----2
 		 */
-		PottsMeshGenerator generator(3, 3, 1, 1, 3, 3);
+        PottsMeshGenerator<2> generator(3, 1, 3, 3, 1, 3);
 		PottsMesh<2>* p_mesh = generator.GetMesh();
 
 		// Test bottom left node
@@ -543,7 +663,7 @@ public:
     void Test2dScaleAndTranslate()
     {
         // Create 2D mesh
-        PottsMeshGenerator generator(4, 4, 2, 2, 2, 2);
+        PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         TS_ASSERT_DELTA(p_mesh->GetWidth(0), 3.0, 1e-4);
@@ -580,7 +700,7 @@ public:
     void TestTranslation2DWithUblas()
     {
         // Create 2D mesh
-        PottsMeshGenerator generator(4, 4, 2, 2, 2, 2);
+        PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         c_vector<double, 2> old_location1 = p_mesh->GetNode(4)->rGetLocation();

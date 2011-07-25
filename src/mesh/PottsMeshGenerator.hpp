@@ -40,12 +40,13 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
  *
  * NOTE: the user should delete the mesh after use to manage memory.
  */
+template<unsigned DIM>
 class PottsMeshGenerator
 {
 protected:
 
     /** A pointer to the mesh this class creates */
-    PottsMesh<2>* mpMesh;
+    PottsMesh<DIM>* mpMesh;
 
 public:
 
@@ -53,15 +54,18 @@ public:
      * Constructor.
      *
      * @param numNodesAcross  The number of columns of nodes in the mesh
-     * @param numNodesUp  The number of rows of nodes in the mesh
      * @param numElementsAcross  The number of columns of elements in the mesh
+     * @param elementWidth  Width of the elements
+     * @param numNodesUp  The number of rows of nodes in the mesh
      * @param numElementsUp  The number of rows of elements in the mesh
-     * @param elementWidth  The number of rows of nodes in each element
-     * @param elementHeight  The number of rows of nodes in each element
+     * @param elementHeight  Height of the elements
+     * @param numNodesDeep  The number nodes deep for this mesh
+     * @param numElementsDeep  The number of elements deep for this mesh
+     * @param elementDepth  The number of rows of nodes in each element
      */
-    PottsMeshGenerator(unsigned numNodesAcross, unsigned numNodesUp,
-                       unsigned numElementsAcross, unsigned numElementsUp,
-                       unsigned elementWidth, unsigned elementHeight);
+    PottsMeshGenerator(	unsigned numNodesAcross, unsigned numElementsAcross, unsigned elementWidth,
+						unsigned numNodesUp, unsigned numElementsUp, unsigned elementHeight,
+						unsigned numNodesDeep=1u, unsigned numElementsDeep=1u, unsigned elementDepth=1u);
 
     /**
      * Null constructor for derived classes to call.
@@ -78,7 +82,7 @@ public:
     /**
      * @return a planar 2D Potts mesh.
      */
-    virtual PottsMesh<2>* GetMesh();
+    virtual PottsMesh<DIM>* GetMesh();
 };
 
 #endif /*POTTSMESHGENERATOR_HPP_*/

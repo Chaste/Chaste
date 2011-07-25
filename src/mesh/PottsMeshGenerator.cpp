@@ -27,23 +27,27 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "PottsMeshGenerator.hpp"
-
-PottsMeshGenerator::PottsMeshGenerator(unsigned numNodesAcross, unsigned numNodesUp,
-                                       unsigned numElementsAcross, unsigned numElementsUp,
-                                       unsigned elementWidth, unsigned elementHeight)
+template<unsigned DIM>
+PottsMeshGenerator<DIM>::PottsMeshGenerator(	unsigned numNodesAcross, unsigned numElementsAcross, unsigned elementWidth,
+												unsigned numNodesUp, unsigned numElementsUp, unsigned elementHeight,
+												unsigned numNodesDeep, unsigned numElementsDeep, unsigned elementDepth)
 {
     assert(numElementsAcross > 0);
     assert(numElementsUp > 0);
     assert(elementWidth > 0);
     assert(elementHeight > 0);
+    assert(numElementsDeep>0);
+    assert(numNodesDeep > 0);
+    assert(elementDepth>0);
+    assert(numElementsDeep*elementDepth<=numNodesDeep);
     assert(numElementsAcross*elementWidth<=numNodesAcross);
     assert(numElementsUp*elementHeight<=numNodesUp);
 
-    std::vector<Node<2>*> nodes;
-    std::vector<PottsElement<2>*>  elements;
+    std::vector<Node<DIM>*> nodes;
+    std::vector<PottsElement<DIM>*>  elements;
 
     unsigned node_index = 0;
-    unsigned node_indices[elementWidth*elementHeight];
+    unsigned node_indices[elementWidth*elementHeight*elementDepth];
     unsigned element_index;
 
     /*
@@ -52,55 +56,80 @@ PottsMeshGenerator::PottsMeshGenerator(unsigned numNodesAcross, unsigned numNode
      * nodes. On each interior row we have numNodesAcross nodes, the first and last nodes
      * are boundary nodes.
      */
-    for (unsigned j=0; j<numNodesUp; j++)
+    for( unsigned k=0; k<numNodesDeep; k++)
     {
-        for (unsigned i=0; i<numNodesAcross; i++)
-        {
-            bool is_boundary_node = (j==0 || j==numNodesUp-1 || i==0 || i==numNodesAcross-1) ? true : false;
-
-            Node<2>* p_node = new Node<2>(node_index, is_boundary_node, i, j);
-            nodes.push_back(p_node);
-            node_index++;
-        }
+		for (unsigned j=0; j<numNodesUp; j++)
+		{
+			for (unsigned i=0; i<numNodesAcross; i++)
+			{
+				bool is_boundary_node=false;
+				if(DIM==2)
+				{
+					is_boundary_node = (j==0 || j==numNodesUp-1 || i==0 || i==numNodesAcross-1) ? true : false;
+				}
+				if(DIM==3)
+				{
+					is_boundary_node = (j==0 || j==numNodesUp-1 || i==0 || i==numNodesAcross-1 || k==0 || k==numNodesDeep-1) ? true : false;
+				}
+				Node<DIM>* p_node = new Node<DIM>(node_index, is_boundary_node, i, j, k);
+				nodes.push_back(p_node);
+				node_index++;
+			}
+		}
     }
 
     /*
      * Create the elements. The array node_indices contains the
      * global node indices, in increasing order.
      */
-    for (unsigned j=0; j<numElementsUp; j++)
+    for (unsigned n=0; n<numElementsDeep; n++)
     {
-        for (unsigned i=0; i<numElementsAcross; i++)
-        {
-            for (unsigned l=0; l<elementHeight; l++)
-            {
-                for (unsigned k=0; k<elementWidth; k++)
-                {
-                    node_indices[l*elementWidth + k] = j*elementHeight*numNodesAcross + i*elementWidth
-                                                       + l*numNodesAcross + k;
-                }
-            }
+		for (unsigned j=0; j<numElementsUp; j++)
+		{
+			for (unsigned i=0; i<numElementsAcross; i++)
+			{
+				for (unsigned m=0; m<elementDepth; m++)
+				{
+					for (unsigned l=0; l<elementHeight; l++)
+					{
+						for (unsigned k=0; k<elementWidth; k++)
+						{
+							node_indices[m*elementHeight*elementWidth + l*elementWidth + k] = n*elementDepth*numNodesUp*numNodesAcross + j*elementHeight*numNodesAcross + i*elementWidth +
+															   m*numNodesAcross*numNodesUp + l*numNodesAcross + k;
+						}
+					}
+				}
+				std::vector<Node<DIM>*> element_nodes;
+				for (unsigned k=0; k<elementDepth*elementHeight*elementWidth; k++)
+				{
+				   element_nodes.push_back(nodes[node_indices[k]]);
+				}
 
-            std::vector<Node<2>*> element_nodes;
-            for (unsigned k=0; k<elementHeight*elementWidth; k++)
-            {
-               element_nodes.push_back(nodes[node_indices[k]]);
-            }
-
-            element_index = j*numElementsAcross + i;
-            PottsElement<2>* p_element = new PottsElement<2>(element_index, element_nodes);
-            elements.push_back(p_element);
-        }
+				element_index = n*numElementsAcross*numElementsUp + j*numElementsAcross + i;
+				PottsElement<DIM>* p_element = new PottsElement<DIM>(element_index, element_nodes);
+				elements.push_back(p_element);
+			}
+		}
     }
-    mpMesh = new PottsMesh<2>(nodes, elements);
-}
 
-PottsMeshGenerator::~PottsMeshGenerator()
+    mpMesh = new PottsMesh<DIM>(nodes, elements);
+}
+template<unsigned DIM>
+PottsMeshGenerator<DIM>::~PottsMeshGenerator()
 {
     delete mpMesh;
 }
 
-PottsMesh<2>* PottsMeshGenerator::GetMesh()
+template<unsigned DIM>
+PottsMesh<DIM>* PottsMeshGenerator<DIM>::GetMesh()
 {
     return mpMesh;
 }
+
+/////////////////////////////////////////////////////////////////////////////////////
+// Explicit instantiation
+/////////////////////////////////////////////////////////////////////////////////////
+
+template class PottsMeshGenerator<1>;
+template class PottsMeshGenerator<2>;
+template class PottsMeshGenerator<3>;

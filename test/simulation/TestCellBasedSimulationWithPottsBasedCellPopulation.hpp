@@ -71,7 +71,7 @@ public:
     void TestPottsMonolayerWithNoBirthOrDeath() throw (Exception)
     {
         // Create a simple 2D PottsMesh
-        PottsMeshGenerator generator(16, 18, 4, 4, 4, 4);
+    	PottsMeshGenerator<2> generator(16, 4, 4, 18, 4, 4);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Create cells
@@ -107,7 +107,7 @@ public:
     void TestPottsMonolayerWithDeath() throw (Exception)
     {
         // Create a simple 2D PottsMesh
-        PottsMeshGenerator generator(16, 24, 4, 8, 4, 2);
+    	PottsMeshGenerator<2> generator(16, 4, 4, 24, 8, 2);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Create cells
@@ -150,7 +150,7 @@ public:
     void TestPottsMonolayerWithBirth() throw (Exception)
     {
         // Create a simple 2D PottsMesh
-        PottsMeshGenerator generator(8, 10, 1, 1, 4, 4);
+    	PottsMeshGenerator<2> generator(8, 1, 4, 10, 1, 4);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Create cells
