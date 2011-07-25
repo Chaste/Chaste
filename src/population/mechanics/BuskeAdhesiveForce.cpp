@@ -98,13 +98,21 @@ c_vector<double, DIM> BuskeAdhesiveForce<DIM>::CalculateForceBetweenNodes(unsign
 template<unsigned DIM>
 double BuskeAdhesiveForce<DIM>::GetMagnitudeOfForce(double distanceBetweenNodes, double radiusOfCellOne, double radiusOfCellTwo)
 {
-    double xij = 0.5*(radiusOfCellOne*radiusOfCellOne - radiusOfCellTwo*radiusOfCellTwo + distanceBetweenNodes*distanceBetweenNodes)/distanceBetweenNodes;
+	double dWAdd;
 
-    double dxijdd = 1.0 - xij/distanceBetweenNodes;
+   if (distanceBetweenNodes < radiusOfCellOne + radiusOfCellTwo)
+	{
+        double xij = 0.5*(radiusOfCellOne*radiusOfCellOne - radiusOfCellTwo*radiusOfCellTwo + distanceBetweenNodes*distanceBetweenNodes)/distanceBetweenNodes;
 
-    // Calculate contribution from adhesive interaction energy
-    double dWAdd = 2.0*mAdhesionEnergyParameter*M_PI*xij*dxijdd;
+	    double dxijdd = 1.0 - xij/distanceBetweenNodes;
 
+	    // Calculate contribution from adhesive interaction energy
+	    dWAdd = 2.0*mAdhesionEnergyParameter*M_PI*xij*dxijdd;
+	}
+	else  // no adhesion energy contribution as too far apart
+	{
+		dWAdd = 0.0;
+	}
     return dWAdd; //
 }
 
