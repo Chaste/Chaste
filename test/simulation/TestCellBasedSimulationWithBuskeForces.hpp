@@ -309,7 +309,7 @@ public:
 		// Solve
 		simulator.Solve();
 
-		// The nodes should be about 1.7 apart as this is te minimum of the sum of the energies.
+		// The nodes should be about 1.7 apart as this is the minimum of the sum of the energies.
 		TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()[0], -0.3596,  1e-4);
 		TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(1)->rGetLocation()[0], 1.3596,  1e-4);
 	}
