@@ -94,10 +94,10 @@ public:
 
         // Test Area and Perimeter of elements
         TS_ASSERT_DELTA(basic_potts_mesh.GetVolumeOfElement(0), 3.0, 1e-12);
-        TS_ASSERT_DELTA(basic_potts_mesh.GetSurfaceAreaOfElement(0), 8.0, 1e-12); ///\todo this is wrong (see #1683)
+        TS_ASSERT_DELTA(basic_potts_mesh.GetSurfaceAreaOfElement(0), 8.0, 1e-12);
 
         TS_ASSERT_DELTA(basic_potts_mesh.GetVolumeOfElement(1), 3.0, 1e-12);
-        TS_ASSERT_DELTA(basic_potts_mesh.GetSurfaceAreaOfElement(1), 8.0, 1e-12); ///\todo this is wrong (see #1683)
+        TS_ASSERT_DELTA(basic_potts_mesh.GetSurfaceAreaOfElement(1), 8.0, 1e-12);
 
         // Test GetCentroidOfElements
         TS_ASSERT_DELTA(basic_potts_mesh.GetCentroidOfElement(0)[0], 1.0/3.0, 1e-12);
@@ -172,12 +172,12 @@ public:
 		TS_ASSERT_EQUALS(basic_nodes[4]->rGetContainingElementIndices(), temp_list2);
 		TS_ASSERT_EQUALS(basic_nodes[5]->rGetContainingElementIndices(), temp_list2);
 
-		// Test Area and Perimeter of elements
+		// Test Area and Volume of elements
 		TS_ASSERT_DELTA(basic_potts_mesh.GetVolumeOfElement(0), 3.0, 1e-12);
-		//TS_ASSERT_DELTA(basic_potts_mesh.GetSurfaceAreaOfElement(0), 0.0, 1e-12); ///\todo this is wrong (see #1683)
+		TS_ASSERT_DELTA(basic_potts_mesh.GetSurfaceAreaOfElement(0), 14.0, 1e-12);
 
 		TS_ASSERT_DELTA(basic_potts_mesh.GetVolumeOfElement(1), 3.0, 1e-12);
-		//TS_ASSERT_DELTA(basic_potts_mesh.GetSurfaceAreaOfElement(1), 0.0, 1e-12); ///\todo this is wrong (see #1683)
+		TS_ASSERT_DELTA(basic_potts_mesh.GetSurfaceAreaOfElement(1), 14.0, 1e-12);
 
 		// Test GetCentroidOfElements
 		TS_ASSERT_DELTA(basic_potts_mesh.GetCentroidOfElement(0)[0], 2.0/3.0, 1e-12);
@@ -659,6 +659,156 @@ public:
 		expected_neighbouring_sites.insert(7);
 		TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
 	}
+
+    void TestGetVonNeumannNeighbouringNodeIndices3d()
+ 	{
+		/* Create a simple potts-based mesh with one element
+		 * Numbering the nodes as follows:
+		 *
+		 *        0  5
+		 *        | /
+		 *        |/
+		 *  1-----x-----3
+		 *      / |
+		 *     /  |
+		 *    4   2
+		 */
+        PottsMeshGenerator<3> generator(3, 1, 3, 3, 1, 3, 3, 1, 3);
+ 		PottsMesh<3>* p_mesh = generator.GetMesh();
+
+ 		// Test bottom left node
+ 		std::set<unsigned> neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(0);
+ 		TS_ASSERT_EQUALS(neighbouring_sites.size(), 3u);
+
+ 		std::set<unsigned> expected_neighbouring_sites;
+ 		expected_neighbouring_sites.insert(1);
+ 		expected_neighbouring_sites.insert(3);
+ 		expected_neighbouring_sites.insert(9);
+ 		TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
+
+ 		// Test non-corner bottom nodes
+ 		neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(1);
+ 		TS_ASSERT_EQUALS(neighbouring_sites.size(), 4u);
+
+ 		expected_neighbouring_sites.clear();
+ 		expected_neighbouring_sites.insert(0);
+ 		expected_neighbouring_sites.insert(2);
+ 		expected_neighbouring_sites.insert(4);
+ 		expected_neighbouring_sites.insert(10);
+ 		TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
+
+ 		// Test bottom right node
+ 		neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(2);
+ 		TS_ASSERT_EQUALS(neighbouring_sites.size(), 3u);
+
+ 		expected_neighbouring_sites.clear();
+ 		expected_neighbouring_sites.insert(1);
+ 		expected_neighbouring_sites.insert(5);
+ 		expected_neighbouring_sites.insert(11);
+ 		TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
+
+ 		// Test non-corner left nodes
+ 		neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(3);
+ 		TS_ASSERT_EQUALS(neighbouring_sites.size(), 4u);
+
+ 		expected_neighbouring_sites.clear();
+ 		expected_neighbouring_sites.insert(0);
+ 		expected_neighbouring_sites.insert(4);
+ 		expected_neighbouring_sites.insert(6);
+ 		expected_neighbouring_sites.insert(12);
+ 		TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
+
+ 		// Test centre node on the first slice
+ 		neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(4);
+ 		TS_ASSERT_EQUALS(neighbouring_sites.size(), 5u);
+
+ 		expected_neighbouring_sites.clear();
+ 		expected_neighbouring_sites.insert(1);
+ 		expected_neighbouring_sites.insert(3);
+ 		expected_neighbouring_sites.insert(5);
+ 		expected_neighbouring_sites.insert(7);
+ 		expected_neighbouring_sites.insert(13);
+
+ 		TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
+
+ 		// Test non-corner right nodes
+ 		neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(5);
+ 		TS_ASSERT_EQUALS(neighbouring_sites.size(), 4u);
+
+ 		expected_neighbouring_sites.clear();
+ 		expected_neighbouring_sites.insert(2);
+ 		expected_neighbouring_sites.insert(4);
+ 		expected_neighbouring_sites.insert(8);
+ 		expected_neighbouring_sites.insert(14);
+ 		TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
+
+ 		// Test top left node
+ 		neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(6);
+ 		TS_ASSERT_EQUALS(neighbouring_sites.size(), 3u);
+
+ 		expected_neighbouring_sites.clear();
+ 		expected_neighbouring_sites.insert(3);
+ 		expected_neighbouring_sites.insert(7);
+ 		expected_neighbouring_sites.insert(15);
+ 		TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
+
+ 		// Test non-corner top nodes
+ 		neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(7);
+ 		TS_ASSERT_EQUALS(neighbouring_sites.size(), 4u);
+
+ 		expected_neighbouring_sites.clear();
+ 		expected_neighbouring_sites.insert(4);
+ 		expected_neighbouring_sites.insert(6);
+ 		expected_neighbouring_sites.insert(8);
+ 		expected_neighbouring_sites.insert(16);
+ 		TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
+
+ 		// Test top right node
+ 		neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(8);
+ 		TS_ASSERT_EQUALS(neighbouring_sites.size(), 3u);
+
+ 		expected_neighbouring_sites.clear();
+ 		expected_neighbouring_sites.insert(5);
+ 		expected_neighbouring_sites.insert(7);
+ 		expected_neighbouring_sites.insert(17);
+ 		TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
+
+ 		// Test top middle node
+ 		neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(13);
+ 		TS_ASSERT_EQUALS(neighbouring_sites.size(), 6u);
+
+ 		expected_neighbouring_sites.clear();
+ 		expected_neighbouring_sites.insert(4);
+ 		expected_neighbouring_sites.insert(22);
+ 		expected_neighbouring_sites.insert(14);
+ 		expected_neighbouring_sites.insert(12);
+ 		expected_neighbouring_sites.insert(10);
+ 		expected_neighbouring_sites.insert(16);
+ 		TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
+
+		// Test centre node on the back
+ 		neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(22);
+ 		TS_ASSERT_EQUALS(neighbouring_sites.size(), 5u);
+
+ 		expected_neighbouring_sites.clear();
+ 		expected_neighbouring_sites.insert(21);
+ 		expected_neighbouring_sites.insert(23);
+ 		expected_neighbouring_sites.insert(25);
+ 		expected_neighbouring_sites.insert(19);
+ 		expected_neighbouring_sites.insert(13);
+ 		TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
+
+		// Test bottom node on the back
+ 		neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(19);
+ 		TS_ASSERT_EQUALS(neighbouring_sites.size(), 4u);
+
+ 		expected_neighbouring_sites.clear();
+ 		expected_neighbouring_sites.insert(18);
+ 		expected_neighbouring_sites.insert(22);
+ 		expected_neighbouring_sites.insert(20);
+ 		expected_neighbouring_sites.insert(10);
+ 		TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
+ 	}
 
     void Test2dScaleAndTranslate()
     {

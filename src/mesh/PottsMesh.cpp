@@ -248,7 +248,7 @@ template<unsigned DIM>
 double PottsMesh<DIM>::GetSurfaceAreaOfElement(unsigned index)
 {
 	///\todo not implemented in 3d yet
-	assert(DIM==2);
+	assert(DIM==2 || DIM==3);
 
 	// Get pointer to this element
 	PottsElement<DIM>* p_element = GetElement(index);
@@ -257,7 +257,7 @@ double PottsMesh<DIM>::GetSurfaceAreaOfElement(unsigned index)
     for (unsigned node_index=0; node_index< p_element->GetNumNodes(); node_index++)
     {
     	std::set<unsigned> neighbouring_node_indicies = GetVonNeumannNeighbouringNodeIndices(p_element->GetNode(node_index)->GetIndex());
-    	unsigned local_edges=4;
+    	unsigned local_edges=2*DIM;
     	for (std::set<unsigned>::iterator iter=neighbouring_node_indicies.begin();
 			 iter!=neighbouring_node_indicies.end();
 			 iter++)
@@ -346,57 +346,124 @@ std::set<unsigned> PottsMesh<DIM>::GetMooreNeighbouringNodeIndices(unsigned node
 template<unsigned DIM>
 std::set<unsigned> PottsMesh<DIM>::GetVonNeumannNeighbouringNodeIndices(unsigned nodeIndex)
 {
-	///\todo not implemented in 3d yet
-	assert(DIM==2);
+	assert(DIM==2 || DIM==3);
 
     // Create a set of neighbouring node indices
     std::set<unsigned> neighbouring_von_neumann_node_indices;
 
-    double width = this->GetWidth(0);
-    unsigned nodes_across = (unsigned)width + 1; // Getting the number of nodes along x axis of mesh
-    double height = this->GetWidth(1);
-    unsigned nodes_up = (unsigned)height + 1;
+    c_vector<double, DIM> size;
+    c_vector<unsigned, DIM> nodes_number;
 
-    /*
-     * This stores the available neighbours using the following numbering:
-     *
-     *        0
-     *        |
-     *        |
-     *  1-----x-----3
-     *        |
-     *        |
-     *  	  2
-     */
-
-    // Create a vector of possible neighbouring node indices
-    std::vector<unsigned> neighbour_indices_vector(4, nodeIndex);
-    neighbour_indices_vector[0] += nodes_across;
-    neighbour_indices_vector[1] -= 1;
-    neighbour_indices_vector[2] -= nodes_across;
-    neighbour_indices_vector[3] += 1;
-
-    // Work out whether this node lies on any edge of the mesh
-    bool on_south_edge = (nodeIndex < nodes_across);
-    bool on_north_edge = (nodeIndex > nodes_across*(nodes_up - 1) - 1);
-    bool on_west_edge = (nodeIndex%nodes_across == 0);
-    bool on_east_edge = (nodeIndex%nodes_across == nodes_across - 1);
-
-    // Create a vector of booleans for which neighbours are available
-    // Use the order N, NW, W, SW, S, SE, E, NE
-    std::vector<bool> available_neighbours = std::vector<bool>(4, true);
-    available_neighbours[0] = !on_north_edge;
-    available_neighbours[1] = !on_west_edge;
-    available_neighbours[2] = !on_south_edge;
-    available_neighbours[3] = !on_east_edge;
-
-    // Using neighbour_indices_vector and available_neighbours, store the indices of all available neighbours to the set all_neighbours
-    for (unsigned i=0; i<4; i++)
+    for(unsigned i=0;i<DIM;i++)
     {
-        if (available_neighbours[i])
-        {
-        	neighbouring_von_neumann_node_indices.insert(neighbour_indices_vector[i]);
-        }
+		size(i) = this->GetWidth(i);
+		nodes_number(i)=(unsigned)size(i) + 1;
+    }
+
+	// Create a vector of possible neighbouring node indices
+	std::vector<unsigned> neighbour_indices_vector(2u*DIM, nodeIndex);
+
+    switch(DIM)
+    {
+		case 2:
+		{
+			assert(DIM==2);
+			/*
+			 * This stores the available neighbours using the following numbering:
+			 *
+			 *        0
+			 *        |
+			 *        |
+			 *  1-----x-----3
+			 *        |
+			 *        |
+			 *  	  2
+			 */
+
+			neighbour_indices_vector[0] += nodes_number(0);
+			neighbour_indices_vector[1] -= 1;
+			neighbour_indices_vector[2] -= nodes_number(0);
+			neighbour_indices_vector[3] += 1;
+
+			// Work out whether this node lies on any edge of the mesh
+			bool on_south_edge = (nodeIndex < nodes_number(0));
+			bool on_north_edge = (nodeIndex > nodes_number(0)*(nodes_number(1) - 1) - 1);
+			bool on_west_edge = (nodeIndex%nodes_number(0) == 0);
+			bool on_east_edge = (nodeIndex%nodes_number(0) == nodes_number(0) - 1);
+
+			// Create a vector of booleans for which neighbours are available
+			// Use the order N, W, S, E
+			std::vector<bool> available_neighbours = std::vector<bool>(2*DIM, true);
+			available_neighbours[0] = !on_north_edge;
+			available_neighbours[1] = !on_west_edge;
+			available_neighbours[2] = !on_south_edge;
+			available_neighbours[3] = !on_east_edge;
+
+			// Using neighbour_indices_vector and available_neighbours, store the indices of all available neighbours to the set all_neighbours
+			for (unsigned i=0; i<4; i++)
+			{
+				if (available_neighbours[i])
+				{
+					neighbouring_von_neumann_node_indices.insert(neighbour_indices_vector[i]);
+				}
+			}
+
+
+			break;
+		}
+		case 3:
+		{
+			assert(DIM==3);
+
+			/*
+			 * This stores the available neighbours using the following numbering:
+			 *
+			 *        0  5
+			 *        | /
+			 *        |/
+			 *  1-----x-----3
+			 *      / |
+			 *     /  |
+			 *    4   2
+			 */
+
+			neighbour_indices_vector[0] += nodes_number(0);
+			neighbour_indices_vector[1] -= 1;
+			neighbour_indices_vector[2] -= nodes_number(0);
+			neighbour_indices_vector[3] += 1;
+			neighbour_indices_vector[4] -= nodes_number(0)*nodes_number(1);
+			neighbour_indices_vector[5] += nodes_number(0)*nodes_number(1);
+
+			// Work out whether this node lies on any edge of the mesh
+			bool on_south_edge = (nodeIndex%(nodes_number(0)*nodes_number(1))<nodes_number(0));
+			bool on_north_edge = (nodeIndex%(nodes_number(0)*nodes_number(1))>(nodes_number(0)*nodes_number(1)-nodes_number(0)-1));
+			bool on_west_edge = (nodeIndex%nodes_number(0)== 0);
+			bool on_east_edge = (nodeIndex%nodes_number(0) == nodes_number(0) - 1);
+			bool on_front_edge = (nodeIndex < nodes_number(0)*nodes_number(1)-1);
+			bool on_back_edge = (nodeIndex > nodes_number(0)*nodes_number(1)*nodes_number(2)-nodes_number(0)*nodes_number(1)-1);
+
+			// Create a vector of booleans for which neighbours are available
+			// Use the order N, W, S, E, F, B
+			std::vector<bool> available_neighbours = std::vector<bool>(2*DIM, true);
+			available_neighbours[0] = !on_north_edge;
+			available_neighbours[1] = !on_west_edge;
+			available_neighbours[2] = !on_south_edge;
+			available_neighbours[3] = !on_east_edge;
+			available_neighbours[4] = !on_front_edge;
+			available_neighbours[5] = !on_back_edge;
+
+			// Using neighbour_indices_vector and available_neighbours, store the indices of all available neighbours to the set all_neighbours
+			for (unsigned i=0; i<6; i++)
+			{
+				if (available_neighbours[i] && neighbour_indices_vector[i]<nodes_number(0)*nodes_number(1)*nodes_number(2))
+				{
+					neighbouring_von_neumann_node_indices.insert(neighbour_indices_vector[i]);
+				}
+			}
+			break;
+		}
+		default:
+			NEVER_REACHED;
     }
     return neighbouring_von_neumann_node_indices;
 }
