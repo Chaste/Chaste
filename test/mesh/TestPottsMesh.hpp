@@ -451,110 +451,95 @@ public:
 		 *     0------1------2           9------10-----11            18-----19-----20
          */
 
-        PottsMeshGenerator<2> generator(3, 1, 3, 3, 1, 3);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        PottsMeshGenerator<3> generator(3, 1, 3, 3, 1, 3, 3, 1, 3);
+        PottsMesh<3>* p_mesh = generator.GetMesh();
 
         // Test bottom left node
         std::set<unsigned> neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(0);
-        TS_ASSERT_EQUALS(neighbouring_sites.size(), 3u);
+        TS_ASSERT_EQUALS(neighbouring_sites.size(), 7u);
 
         std::set<unsigned> expected_neighbouring_sites;
         expected_neighbouring_sites.insert(1);
         expected_neighbouring_sites.insert(3);
         expected_neighbouring_sites.insert(4);
+        expected_neighbouring_sites.insert(9);
+        expected_neighbouring_sites.insert(10);
+        expected_neighbouring_sites.insert(12);
+        expected_neighbouring_sites.insert(13);
         TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
 
-        // Test non-corner bottom nodes
-        neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(1);
-        TS_ASSERT_EQUALS(neighbouring_sites.size(), 5u);
+        // Test middle front
+        neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(4);
+        TS_ASSERT_EQUALS(neighbouring_sites.size(), 17u);
 
         expected_neighbouring_sites.clear();
         expected_neighbouring_sites.insert(0);
+        expected_neighbouring_sites.insert(1);
         expected_neighbouring_sites.insert(2);
         expected_neighbouring_sites.insert(3);
-        expected_neighbouring_sites.insert(4);
         expected_neighbouring_sites.insert(5);
+        expected_neighbouring_sites.insert(6);
+        expected_neighbouring_sites.insert(7);
+        expected_neighbouring_sites.insert(8);
+        expected_neighbouring_sites.insert(9);
+        expected_neighbouring_sites.insert(10);
+        expected_neighbouring_sites.insert(11);
+        expected_neighbouring_sites.insert(12);
+        expected_neighbouring_sites.insert(13);
+        expected_neighbouring_sites.insert(14);
+        expected_neighbouring_sites.insert(15);
+        expected_neighbouring_sites.insert(16);
+        expected_neighbouring_sites.insert(17);
         TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
 
         // Test bottom right node
-        neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(2);
-        TS_ASSERT_EQUALS(neighbouring_sites.size(), 3u);
-
-        expected_neighbouring_sites.clear();
-        expected_neighbouring_sites.insert(1);
-        expected_neighbouring_sites.insert(4);
-        expected_neighbouring_sites.insert(5);
-        TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
-
-        // Test non-corner left nodes
-        neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(3);
-        TS_ASSERT_EQUALS(neighbouring_sites.size(), 5u);
+        neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(13);
+        TS_ASSERT_EQUALS(neighbouring_sites.size(), 26u);
 
         expected_neighbouring_sites.clear();
         expected_neighbouring_sites.insert(0);
         expected_neighbouring_sites.insert(1);
-        expected_neighbouring_sites.insert(4);
-        expected_neighbouring_sites.insert(6);
-        expected_neighbouring_sites.insert(7);
-        TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
-
-        // Test centre node
-        neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(4);
-        TS_ASSERT_EQUALS(neighbouring_sites.size(), 8u);
-
-        expected_neighbouring_sites.clear();
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
-        {
-            if (i != 4)
-            {
-                expected_neighbouring_sites.insert(i);
-            }
-        }
-        TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
-
-        // Test non-corner right nodes
-        neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(5);
-        TS_ASSERT_EQUALS(neighbouring_sites.size(), 5u);
-
-        expected_neighbouring_sites.clear();
-        expected_neighbouring_sites.insert(1);
         expected_neighbouring_sites.insert(2);
-        expected_neighbouring_sites.insert(4);
-        expected_neighbouring_sites.insert(7);
-        expected_neighbouring_sites.insert(8);
-        TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
-
-        // Test top left node
-        neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(6);
-        TS_ASSERT_EQUALS(neighbouring_sites.size(), 3u);
-
-        expected_neighbouring_sites.clear();
         expected_neighbouring_sites.insert(3);
-        expected_neighbouring_sites.insert(4);
-        expected_neighbouring_sites.insert(7);
-        TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
-
-        // Test non-corner top nodes
-        neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(7);
-        TS_ASSERT_EQUALS(neighbouring_sites.size(), 5u);
-
-        expected_neighbouring_sites.clear();
-        expected_neighbouring_sites.insert(3);
-        expected_neighbouring_sites.insert(4);
+		expected_neighbouring_sites.insert(4);
         expected_neighbouring_sites.insert(5);
         expected_neighbouring_sites.insert(6);
+        expected_neighbouring_sites.insert(7);
         expected_neighbouring_sites.insert(8);
+		expected_neighbouring_sites.insert(9);
+        expected_neighbouring_sites.insert(10);
+        expected_neighbouring_sites.insert(11);
+        expected_neighbouring_sites.insert(12);
+        expected_neighbouring_sites.insert(14);
+		expected_neighbouring_sites.insert(15);
+        expected_neighbouring_sites.insert(16);
+        expected_neighbouring_sites.insert(17);
+        expected_neighbouring_sites.insert(18);
+        expected_neighbouring_sites.insert(19);
+		expected_neighbouring_sites.insert(20);
+        expected_neighbouring_sites.insert(21);
+        expected_neighbouring_sites.insert(22);
+        expected_neighbouring_sites.insert(23);
+        expected_neighbouring_sites.insert(24);
+		expected_neighbouring_sites.insert(25);
+		expected_neighbouring_sites.insert(26);
         TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
 
-        // Test top right node
-        neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(8);
-        TS_ASSERT_EQUALS(neighbouring_sites.size(), 3u);
+        // Test non-corner left nodes
+        neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(26);
+        TS_ASSERT_EQUALS(neighbouring_sites.size(), 7u);
 
         expected_neighbouring_sites.clear();
-        expected_neighbouring_sites.insert(4);
-        expected_neighbouring_sites.insert(5);
-        expected_neighbouring_sites.insert(7);
+        expected_neighbouring_sites.insert(25);
+        expected_neighbouring_sites.insert(23);
+        expected_neighbouring_sites.insert(22);
+        expected_neighbouring_sites.insert(14);
+        expected_neighbouring_sites.insert(17);
+        expected_neighbouring_sites.insert(16);
+        expected_neighbouring_sites.insert(13);
         TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
+
+
     }
 
     void TestGetVonNeumannNeighbouringNodeIndices2d()
