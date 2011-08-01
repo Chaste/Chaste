@@ -49,59 +49,14 @@ void BuskeCompressionForce<DIM>::SetCompressionEnergyParameter(double compressio
 }
 
 template<unsigned DIM>
-std::set<unsigned> BuskeCompressionForce<DIM>::GetNeighbouringNodeIndicesWithinInteractionDistance(unsigned index, AbstractCellPopulation<DIM>& rCellPopulation)
-{
-    NodesOnlyMesh<DIM>& r_mesh = static_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation)->rGetMesh();
-
-    // Get the location of this node
-    c_vector<double, DIM> node_i_location = rCellPopulation.GetNode(index)->rGetLocation();
-
-    // Get the radius of the cell corresponding to this node
-    double radius_of_cell_i = r_mesh.GetCellRadius(index);
-
-    // Loop over cells in the population
-    std::set<unsigned> neighbouring_node_indices;
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
-         cell_iter != rCellPopulation.End();
-         ++cell_iter)
-    {
-        // Get the node index corresponding to this cell
-        unsigned node_j_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
-
-        // Only return the neighbours, not the original node
-        if (node_j_index != index)
-        {
-			// Get the location of this node
-			c_vector<double, DIM> node_j_location = rCellPopulation.GetNode(node_j_index)->rGetLocation();
-
-			// Get the unit vector parallel to the line joining the two nodes (assuming no periodicities etc.)
-			c_vector<double, DIM> unit_vector = node_i_location - node_j_location;
-
-			// Calculate the distance between the two nodes
-			double distance_between_nodes = norm_2(unit_vector);
-
-            // Get the radius of the cell corresponding to this node
-            double radius_of_cell_j = r_mesh.GetCellRadius(node_j_index);
-
-            // If the cells are close enough to exert a force on each other...
-			double max_interaction_distance = radius_of_cell_i + radius_of_cell_j;
-			if (distance_between_nodes < max_interaction_distance)
-			{
-			    // ...then add this node index to the set of neighbouring node indices
-				neighbouring_node_indices.insert(node_j_index);
-			}
-		}
-    }
-
-    return neighbouring_node_indices;
-}
-
-template<unsigned DIM>
 void BuskeCompressionForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
                                                       AbstractCellPopulation<DIM>& rCellPopulation)
 {
     // This force class is defined for NodeBasedCellPopulations only
     assert(dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL);
+
+    NodeBasedCellPopulation<DIM>* p_static_cast_cell_population = static_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation);
+
 
     c_vector<double, DIM> unit_vector;
 
@@ -123,7 +78,7 @@ void BuskeCompressionForce<DIM>::AddForceContribution(std::vector<c_vector<doubl
         c_vector<double, DIM> dVAdd_vector = zero_vector<double>(DIM);
 
         // Get the set of node indices corresponding to this cell's neighbours
-        std::set<unsigned> neighbouring_node_indices = GetNeighbouringNodeIndicesWithinInteractionDistance(node_index, rCellPopulation);
+        std::set<unsigned> neighbouring_node_indices = p_static_cast_cell_population->GetNeighbouringNodeIndices(node_index);
 
         // Loop over this set
         for (std::set<unsigned>::iterator iter = neighbouring_node_indices.begin();

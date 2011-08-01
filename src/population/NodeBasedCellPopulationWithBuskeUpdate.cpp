@@ -51,8 +51,6 @@ NodeBasedCellPopulationWithBuskeUpdate<DIM>::NodeBasedCellPopulationWithBuskeUpd
 template<unsigned DIM>
 void NodeBasedCellPopulationWithBuskeUpdate<DIM>::UpdateNodeLocations(const std::vector< c_vector<double, DIM> >& rNodeForces, double dt)
 {
-
-
 	// Declare solver and give the size of the system and timestep
 	unsigned system_size = rNodeForces.size()*DIM;
 
@@ -75,14 +73,63 @@ void NodeBasedCellPopulationWithBuskeUpdate<DIM>::UpdateNodeLocations(const std:
 		// Get index of node associated with cell
 		unsigned node_index = this->mCellLocationMap[(*cell_iter).get()];
 
+        // Get the location of this node
+        c_vector<double, DIM> node_i_location = this->GetNode(node_index)->rGetLocation();
+
+        // Get the radius of this cell
+        double radius_of_cell_i = this->rGetMesh().GetCellRadius(node_index);
+
 		// Get damping constant for node
 		double damping_const = this->GetDampingConstant(node_index);
 
+		// loop over neighbours to add contribution
 
-		// This is currently just the identity matrix will need to add the area contribution see #1770
+		// Get the set of node indices corresponding to this cell's neighbours
+		std::set<unsigned> neighbouring_node_indices = this->GetNeighbouringNodeIndices(node_index);
+
+		for (std::set<unsigned>::iterator iter = neighbouring_node_indices.begin();
+             iter != neighbouring_node_indices.end();
+             ++iter)
+        {
+			unsigned neighbour_node_index = *iter;
+
+			// Calculate Aij
+			double Aij = 0.0;
+
+            // Get the location of this node
+            c_vector<double, DIM> node_j_location = this->GetNode(neighbour_node_index)->rGetLocation();
+
+            // Get the unit vector parallel to the line joining the two nodes (assuming no periodicities etc.)
+            c_vector<double, DIM> unit_vector = node_j_location - node_i_location;
+
+            // Calculate the distance between the two nodes
+            double dij = norm_2(unit_vector);
+
+            unit_vector /= dij;
+
+            // Get the radius of the cell corresponding to this node
+            double radius_of_cell_j = this->rGetMesh().GetCellRadius(neighbour_node_index);
+
+            if (dij < radius_of_cell_i + radius_of_cell_j)
+            {
+                // ...then compute the adhesion force and add it to the vector of forces...
+				double xij = 0.5*(radius_of_cell_i*radius_of_cell_i - radius_of_cell_j*radius_of_cell_j + dij*dij)/dij;
+
+				Aij = M_PI*(radius_of_cell_i*radius_of_cell_i - xij*xij);
+
+	    		// This is contribution from the sum term in (A7)
+	    		for (unsigned i=0; i<DIM; i++)
+	    		{
+	    			PetscMatTools::AddToElement(r_matrix, DIM*neighbour_node_index+i, DIM*neighbour_node_index+i, -damping_const*Aij);
+	    			PetscMatTools::AddToElement(r_matrix, DIM*node_index+i, DIM*node_index+i, damping_const*Aij);
+	    		}
+            }
+        }
+
+		// This is the standard contribution (i.e. not in the sum) in (A7)
 		for (unsigned i=0; i<DIM; i++)
 		{
-			PetscMatTools::SetElement(r_matrix, DIM*node_index+i, DIM*node_index+i, damping_const);
+			PetscMatTools::AddToElement(r_matrix, DIM*node_index+i, DIM*node_index+i, damping_const);
 		}
 
 		// Add current positions to initial_conditions and RHS vector

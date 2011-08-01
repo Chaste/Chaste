@@ -91,17 +91,6 @@ public:
     void SetCompressionEnergyParameter(double compressionEnergyParameter);
 
     /**
-     * Given a node index, returns the set of neighbouring node indices which
-     * lie within a specific interaction distance. (Sum of the two cell radii.)
-     *
-     * @param index the node index
-     * @param rCellPopulation a cell population object
-     *
-     * @return the set of neighbouring node indices.
-     */
-    std::set<unsigned> GetNeighbouringNodeIndicesWithinInteractionDistance(unsigned index, AbstractCellPopulation<DIM>& rCellPopulation);
-
-    /**
      * Overridden AddForceContribution() method.
      *
      * @param rForces a vector of forces on notes
