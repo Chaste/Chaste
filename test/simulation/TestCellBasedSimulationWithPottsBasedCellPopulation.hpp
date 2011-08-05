@@ -42,11 +42,13 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "SloughingCellKiller.hpp"
 #include "VolumeConstraintUpdateRule.hpp"
 #include "AdhesionUpdateRule.hpp"
+#include "DifferentialAdhesionUpdateRule.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "PottsMeshGenerator.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "Warnings.hpp"
 #include "LogFile.hpp"
+#include "Debug.hpp"
 
 class TestCellBasedSimulationWithPottsBasedCellPopulation : public AbstractCellBasedTestSuite
 {
@@ -181,6 +183,71 @@ public:
 
         // Test no deaths and some births
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 3u);
+        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
+    }
+
+    void TestPottsMonolayerCellSorting() throw (Exception)
+    {
+        // Create a simple 2D PottsMesh
+        PottsMeshGenerator<2> generator(20, 4, 4, 20, 4, 4);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), DIFFERENTIATED);
+
+        // Make this pointer first as if we move it after creating the cell population the label numbers aren't tracked
+        boost::shared_ptr<AbstractCellProperty> p_label(new CellLabel);
+
+        // Create cell population
+        PottsBasedCellPopulation cell_population(*p_mesh, cells);
+
+        cell_population.SetOutputCellMutationStates(true); // So outputs the labeled cells
+
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            if (RandomNumberGenerator::Instance()->ranf() < 0.5)
+            {
+                (*cell_iter)->AddCellProperty(p_label);
+            }
+        }
+
+        // Create update rules and pass to the cell population
+        VolumeConstraintUpdateRule<2> volume_constraint_update_rule;
+        cell_population.AddUpdateRule(&volume_constraint_update_rule);
+        volume_constraint_update_rule.SetMatureCellTargetVolume(16);
+        volume_constraint_update_rule.SetDeformationEnergyParameter(20.0);
+
+        DifferentialAdhesionUpdateRule<2> differential_adhesion_update_rule;
+
+        differential_adhesion_update_rule.SetLabelledCellLabelledCellAdhesionEnergyParameter(16);
+        differential_adhesion_update_rule.SetLabelledCellCellAdhesionEnergyParameter(11);
+        differential_adhesion_update_rule.SetCellCellAdhesionEnergyParameter(2);
+        differential_adhesion_update_rule.SetLabelledCellBoundaryAdhesionEnergyParameter(16);
+        differential_adhesion_update_rule.SetCellBoundaryAdhesionEnergyParameter(16);
+
+        cell_population.AddUpdateRule(&differential_adhesion_update_rule);
+
+
+
+
+        // Set up cell-based simulation
+        CellBasedSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestPottsCellSorting");
+        simulator.SetDt(0.1);
+        simulator.SetEndTime(10);
+
+        // Run simulation
+        simulator.Solve();
+
+        // Check that the same number of cells
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 16u);
+
+        // Test no births or deaths
+        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
     }
 

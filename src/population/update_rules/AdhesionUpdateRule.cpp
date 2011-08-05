@@ -86,14 +86,21 @@ double AdhesionUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned current
 			// The nodes are currently contained in different elements
 			if (current_element != neighbour_element)
 			{
-				delta_H += mCellCellAdhesionEnergyParameter;
+				delta_H += GetCellCellAdhesionEnergy(rCellPopulation.GetCellUsingLocationIndex(current_element), rCellPopulation.GetCellUsingLocationIndex(neighbour_element));
 			}
 		}
-		else if ( (neighbouring_node_contained && !current_node_contained) || (!neighbouring_node_contained && current_node_contained) )
+		else if ( neighbouring_node_contained && !current_node_contained )
 		{
+		    unsigned neighbour_element = (*neighbouring_node_containing_elements.begin());
 			// One node is in an element and the other is in the medium
-			delta_H += mCellBoundaryAdhesionEnergyParameter;
+			delta_H += GetCellBoundaryAdhesionEnergy(rCellPopulation.GetCellUsingLocationIndex(neighbour_element));
 		}
+		else if ( !neighbouring_node_contained && current_node_contained )
+        {
+		    unsigned current_element = (*containing_elements.begin());
+            // One node is in an element and the other is in the medium
+            delta_H += GetCellBoundaryAdhesionEnergy(rCellPopulation.GetCellUsingLocationIndex(current_element));
+        }
 
 		// After move (H_1)
 		if (neighbouring_node_contained && target_node_contained)
@@ -104,18 +111,38 @@ double AdhesionUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned current
             // The nodes are currently contained in different elements
 			if ( target_element != neighbour_element )
 			{
-				delta_H -= mCellCellAdhesionEnergyParameter;
+				delta_H -= GetCellCellAdhesionEnergy(rCellPopulation.GetCellUsingLocationIndex(target_element),rCellPopulation.GetCellUsingLocationIndex(neighbour_element));
 			}
 		}
-		if ( (neighbouring_node_contained && !target_node_contained) || (!neighbouring_node_contained && target_node_contained) )
+		else if ( (neighbouring_node_contained && !target_node_contained) || (!neighbouring_node_contained && target_node_contained) )
 		{
+		    unsigned neighbour_element = (*neighbouring_node_containing_elements.begin());
 			// One node is in an element and the other is in the medium
-			delta_H -= mCellBoundaryAdhesionEnergyParameter;
+			delta_H -= GetCellBoundaryAdhesionEnergy(rCellPopulation.GetCellUsingLocationIndex(neighbour_element));
 		}
+		else if ( (neighbouring_node_contained && !target_node_contained) || (!neighbouring_node_contained && target_node_contained) )
+        {
+		    unsigned current_element = (*containing_elements.begin());
+            // One node is in an element and the other is in the medium
+            delta_H -= GetCellBoundaryAdhesionEnergy(rCellPopulation.GetCellUsingLocationIndex(current_element));
+        }
 	}
 
 	return delta_H;
 }
+
+template<unsigned DIM>
+double AdhesionUpdateRule<DIM>::GetCellCellAdhesionEnergy(CellPtr pCellA, CellPtr pCellB)
+{
+    return GetCellCellAdhesionEnergyParameter();
+}
+
+template<unsigned DIM>
+double AdhesionUpdateRule<DIM>::GetCellBoundaryAdhesionEnergy(CellPtr pCell)
+{
+    return GetCellBoundaryAdhesionEnergyParameter();
+}
+
 
 template<unsigned DIM>
 double AdhesionUpdateRule<DIM>::GetCellCellAdhesionEnergyParameter()
@@ -140,6 +167,7 @@ void AdhesionUpdateRule<DIM>::SetCellBoundaryAdhesionEnergyParameter(double cell
 {
     mCellBoundaryAdhesionEnergyParameter = cellBoundaryAdhesionEnergyParameter;
 }
+
 
 template<unsigned DIM>
 void AdhesionUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
