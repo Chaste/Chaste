@@ -48,7 +48,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "WildTypeCellMutationState.hpp"
 #include "Warnings.hpp"
 #include "LogFile.hpp"
-#include "Debug.hpp"
 
 class TestCellBasedSimulationWithPottsBasedCellPopulation : public AbstractCellBasedTestSuite
 {
@@ -189,7 +188,7 @@ public:
     void TestPottsMonolayerCellSorting() throw (Exception)
     {
         // Create a simple 2D PottsMesh
-        PottsMeshGenerator<2> generator(20, 4, 4, 20, 4, 4);
+        PottsMeshGenerator<2> generator(30, 4, 4, 30, 4, 4);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Create cells
@@ -219,15 +218,15 @@ public:
         VolumeConstraintUpdateRule<2> volume_constraint_update_rule;
         cell_population.AddUpdateRule(&volume_constraint_update_rule);
         volume_constraint_update_rule.SetMatureCellTargetVolume(16);
-        volume_constraint_update_rule.SetDeformationEnergyParameter(20.0);
+        volume_constraint_update_rule.SetDeformationEnergyParameter(0.2);
 
         DifferentialAdhesionUpdateRule<2> differential_adhesion_update_rule;
 
-        differential_adhesion_update_rule.SetLabelledCellLabelledCellAdhesionEnergyParameter(16);
-        differential_adhesion_update_rule.SetLabelledCellCellAdhesionEnergyParameter(11);
-        differential_adhesion_update_rule.SetCellCellAdhesionEnergyParameter(2);
-        differential_adhesion_update_rule.SetLabelledCellBoundaryAdhesionEnergyParameter(16);
-        differential_adhesion_update_rule.SetCellBoundaryAdhesionEnergyParameter(16);
+        differential_adhesion_update_rule.SetLabelledCellLabelledCellAdhesionEnergyParameter(0.16);
+        differential_adhesion_update_rule.SetLabelledCellCellAdhesionEnergyParameter(0.11);
+        differential_adhesion_update_rule.SetCellCellAdhesionEnergyParameter(0.02);
+        differential_adhesion_update_rule.SetLabelledCellBoundaryAdhesionEnergyParameter(0.16);
+        differential_adhesion_update_rule.SetCellBoundaryAdhesionEnergyParameter(0.16);
 
         cell_population.AddUpdateRule(&differential_adhesion_update_rule);
 
@@ -238,7 +237,7 @@ public:
         CellBasedSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestPottsCellSorting");
         simulator.SetDt(0.1);
-        simulator.SetEndTime(10);
+        simulator.SetEndTime(1);
 
         // Run simulation
         simulator.Solve();

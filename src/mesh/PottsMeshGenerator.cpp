@@ -30,7 +30,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 template<unsigned DIM>
 PottsMeshGenerator<DIM>::PottsMeshGenerator(	unsigned numNodesAcross, unsigned numElementsAcross, unsigned elementWidth,
 												unsigned numNodesUp, unsigned numElementsUp, unsigned elementHeight,
-												unsigned numNodesDeep, unsigned numElementsDeep, unsigned elementDepth)
+												unsigned numNodesDeep, unsigned numElementsDeep, unsigned elementDepth )
 {
     assert(numElementsAcross > 0);
     assert(numElementsUp > 0);
@@ -39,9 +39,9 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(	unsigned numNodesAcross, unsigned n
     assert(numElementsDeep>0);
     assert(numNodesDeep > 0);
     assert(elementDepth>0);
-    assert(numElementsDeep*elementDepth<=numNodesDeep);
     assert(numElementsAcross*elementWidth<=numNodesAcross);
     assert(numElementsUp*elementHeight<=numNodesUp);
+    assert(numElementsDeep*elementDepth<=numNodesDeep);
 
     std::vector<Node<DIM>*> nodes;
     std::vector<PottsElement<DIM>*>  elements;
@@ -49,6 +49,15 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(	unsigned numNodesAcross, unsigned n
     unsigned node_index = 0;
     unsigned node_indices[elementWidth*elementHeight*elementDepth];
     unsigned element_index;
+
+    // Calculate the width of the medium on the edge and offset the node index so that the elelments are in the centre of the mesh.
+    unsigned across_gap = (numNodesAcross -  numElementsAcross*elementWidth)/2;
+    unsigned up_gap = (numNodesUp -  numElementsUp*elementHeight)/2;
+    unsigned deep_gap = (numNodesDeep -  numElementsDeep*elementDepth)/2;
+
+    unsigned index_offset = deep_gap*numNodesAcross*numNodesUp +
+                            up_gap*numNodesAcross +
+                            across_gap;
 
     /*
      * Create the nodes, row by row, from the bottom up
@@ -94,8 +103,13 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(	unsigned numNodesAcross, unsigned n
 					{
 						for (unsigned k=0; k<elementWidth; k++)
 						{
-							node_indices[m*elementHeight*elementWidth + l*elementWidth + k] = n*elementDepth*numNodesUp*numNodesAcross + j*elementHeight*numNodesAcross + i*elementWidth +
-															   m*numNodesAcross*numNodesUp + l*numNodesAcross + k;
+							node_indices[m*elementHeight*elementWidth + l*elementWidth + k] = n*elementDepth*numNodesUp*numNodesAcross +
+							                                                                  j*elementHeight*numNodesAcross +
+							                                                                  i*elementWidth +
+							                                                                  m*numNodesAcross*numNodesUp +
+							                                                                  l*numNodesAcross +
+							                                                                  k + index_offset;
+
 						}
 					}
 				}

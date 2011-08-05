@@ -218,7 +218,7 @@ void PottsBasedCellPopulation::UpdateNodeLocations(const std::vector< c_vector<d
             }
 
             ///\todo This should be made a member variable of the class
-			double T = 10;
+			double T = 0.1;
 
 			// Generate a uniform random number to do the random motion
 			double random_number = RandomNumberGenerator::Instance()->ranf();
