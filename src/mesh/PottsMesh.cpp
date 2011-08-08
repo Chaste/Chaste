@@ -31,8 +31,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "UblasCustomFunctions.hpp"
 #include <list>
 
-#include "Debug.hpp"
-
 template<unsigned DIM>
 PottsMesh<DIM>::PottsMesh(std::vector<Node<DIM>*> nodes, std::vector<PottsElement<DIM>*> pottsElements)
 {
@@ -226,9 +224,7 @@ c_vector<double, DIM> PottsMesh<DIM>::GetCentroidOfElement(unsigned index)
 template<unsigned DIM>
 c_vector<double, DIM> PottsMesh<DIM>::GetVectorFromAtoB(const c_vector<double, DIM>& rLocationA, const c_vector<double, DIM>& rLocationB)
 {
-    c_vector<double, DIM> vector;
-
-    vector = AbstractMesh<DIM, DIM>::GetVectorFromAtoB(rLocationA, rLocationB);
+    c_vector<double, DIM> vector = AbstractMesh<DIM, DIM>::GetVectorFromAtoB(rLocationA, rLocationB);
 
     return vector;
 }
@@ -236,9 +232,7 @@ c_vector<double, DIM> PottsMesh<DIM>::GetVectorFromAtoB(const c_vector<double, D
 template<unsigned DIM>
 double PottsMesh<DIM>::GetVolumeOfElement(unsigned index)
 {
-    // Get pointer to this element
     PottsElement<DIM>* p_element = GetElement(index);
-
     double element_volume = (double) p_element->GetNumNodes();
 
     return element_volume;
@@ -256,18 +250,18 @@ double PottsMesh<DIM>::GetSurfaceAreaOfElement(unsigned index)
     double surface_area = 0.0;
     for (unsigned node_index=0; node_index< p_element->GetNumNodes(); node_index++)
     {
-    	std::set<unsigned> neighbouring_node_indicies = GetVonNeumannNeighbouringNodeIndices(p_element->GetNode(node_index)->GetIndex());
-    	unsigned local_edges=2*DIM;
-    	for (std::set<unsigned>::iterator iter=neighbouring_node_indicies.begin();
-			 iter!=neighbouring_node_indicies.end();
+    	std::set<unsigned> neighbouring_node_indices = GetVonNeumannNeighbouringNodeIndices(p_element->GetNode(node_index)->GetIndex());
+    	unsigned local_edges = 2*DIM;
+    	for (std::set<unsigned>::iterator iter = neighbouring_node_indices.begin();
+			 iter != neighbouring_node_indices.end();
 			 iter++)
     	{
     		std::set<unsigned> neighbouring_node_element_indices = this->mNodes[*iter]->rGetContainingElementIndices();
 
-    		if (neighbouring_node_element_indices.size()>0 && local_edges>0 )
+    		if (neighbouring_node_element_indices.size()>0 && local_edges>0)
     		{
 				unsigned neighbouring_node_element_index = *(neighbouring_node_element_indices.begin());
-				if(neighbouring_node_element_index == index)
+				if (neighbouring_node_element_index == index)
 				{
 					local_edges--;
 				}
@@ -295,11 +289,11 @@ std::set<unsigned> PottsMesh<DIM>::GetMooreNeighbouringNodeIndices(unsigned node
 		size(i) = this->GetWidth(i);
 		nodes_number(i)=(unsigned)size(i) + 1;
     }
-    switch(DIM)
+    switch (DIM)
     {
 		case 2:
 		{
-			assert(DIM==2);
+			assert(DIM == 2);
 			/*
 			     * This stores the available neighbours using the following numbering:
 			     *
@@ -354,7 +348,7 @@ std::set<unsigned> PottsMesh<DIM>::GetMooreNeighbouringNodeIndices(unsigned node
 
 		case 3:
 		{
-			assert(DIM==3);
+			assert(DIM ==3 );
 			/*
 			 * This stores the available neighbours using the following numbering:
 			 *						FRONT			BACK
@@ -377,15 +371,13 @@ std::set<unsigned> PottsMesh<DIM>::GetMooreNeighbouringNodeIndices(unsigned node
 			neighbour_indices_vector[5] -= nodes_number(0) - 1;
 			neighbour_indices_vector[6] += 1;
 			neighbour_indices_vector[7] += nodes_number(0) + 1;
-
 			neighbour_indices_vector[8] -= nodes_number(0)*nodes_number(1);
-			for(unsigned i=9;i<17;i++)
+			for( unsigned i=9; i<17; i++)
 			{
-				neighbour_indices_vector[i]=neighbour_indices_vector[i-9]-nodes_number(0)*nodes_number(1);
+				neighbour_indices_vector[i] = neighbour_indices_vector[i-9]-nodes_number(0)*nodes_number(1);
 			}
-
 			neighbour_indices_vector[17] += nodes_number(0)*nodes_number(1);
-			for(unsigned i=18;i<26;i++)
+			for (unsigned i=18; i<26; i++)
 			{
 				neighbour_indices_vector[i]=neighbour_indices_vector[i-18]+nodes_number(0)*nodes_number(1);
 			}
@@ -410,16 +402,16 @@ std::set<unsigned> PottsMesh<DIM>::GetMooreNeighbouringNodeIndices(unsigned node
 			available_neighbours[6] = !on_east_edge;
 			available_neighbours[7] = !(on_north_edge || on_east_edge);
 			available_neighbours[8] = !(on_front_edge);
-			for(unsigned i=9;i<17;i++)
+			for (unsigned i=9; i<17; i++)
 			{
 				available_neighbours[i] = (available_neighbours[i-9] && !(on_front_edge));
 			}
 			available_neighbours[17] = !(on_back_edge);
-			for(unsigned i=18;i<26;i++)
+			for (unsigned i=18; i<26; i++)
 			{
 				available_neighbours[i] = (available_neighbours[i-18] && !(on_back_edge));
 			}
-			PRINT_VECTOR(available_neighbours);
+
 			// Using neighbour_indices_vector and available_neighbours, store the indices of all available neighbours to the set all_neighbours
 			for (unsigned i=0; i<26; i++)
 			{
@@ -432,7 +424,6 @@ std::set<unsigned> PottsMesh<DIM>::GetMooreNeighbouringNodeIndices(unsigned node
 		}
 		default:
 			NEVER_REACHED;
-
     }
 
     return neighbouring_moore_node_indices;
@@ -449,20 +440,20 @@ std::set<unsigned> PottsMesh<DIM>::GetVonNeumannNeighbouringNodeIndices(unsigned
     c_vector<double, DIM> size;
     c_vector<unsigned, DIM> nodes_number;
 
-    for(unsigned i=0;i<DIM;i++)
+    for (unsigned i=0; i<DIM; i++)
     {
 		size(i) = this->GetWidth(i);
-		nodes_number(i)=(unsigned)size(i) + 1;
+		nodes_number(i) = (unsigned)size(i) + 1;
     }
 
 	// Create a vector of possible neighbouring node indices
 	std::vector<unsigned> neighbour_indices_vector(2u*DIM, nodeIndex);
 
-    switch(DIM)
+    switch (DIM)
     {
 		case 2:
 		{
-			assert(DIM==2);
+			assert(DIM == 2);
 			/*
 			 * This stores the available neighbours using the following numbering:
 			 *
@@ -502,13 +493,11 @@ std::set<unsigned> PottsMesh<DIM>::GetVonNeumannNeighbouringNodeIndices(unsigned
 					neighbouring_von_neumann_node_indices.insert(neighbour_indices_vector[i]);
 				}
 			}
-
-
 			break;
 		}
 		case 3:
 		{
-			assert(DIM==3);
+			assert(DIM == 3);
 
 			/*
 			 * This stores the available neighbours using the following numbering:

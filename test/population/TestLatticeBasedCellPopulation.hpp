@@ -25,6 +25,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
+
 #ifndef TESTLATTICEBASEDCELLPOPULATION_HPP_
 #define TESTLATTICEBASEDCELLPOPULATION_HPP_
 
@@ -956,7 +957,7 @@ public:
         expected_free_neighbouring_sites.clear();
         for (unsigned i=0; i<14; i++)
         {
-            if ( i==1 || i==3 || i==4 || i==9 || i==10 || i==12 || i==13 )
+            if (i==1 || i==3 || i==4 || i==9 || i==10 || i==12 || i==13)
             {
                 expected_free_neighbouring_sites.insert(i);
             }
@@ -1037,8 +1038,8 @@ public:
         expected_free_neighbouring_sites.clear();
         for (unsigned i=0; i<60; i++)
         {
-            if ( i==28 || i==29 || i==31 || i==32 || i==34 || i==35 || i==40 || i==41 || i==43 || i==46 || i==47
-              || i==52 || i==53 || i==55 || i==56 || i==58 || i==59 )
+            if (   i==28 || i==29 || i==31 || i==32 || i==34 || i==35 || i==40 || i==41 || i==43 || i==46 || i==47
+                || i==52 || i==53 || i==55 || i==56 || i==58 || i==59 )
             {
                 expected_free_neighbouring_sites.insert(i);
             }
@@ -1054,8 +1055,8 @@ public:
         expected_free_neighbouring_sites.clear();
         for (unsigned i=0; i<57; i++)
         {
-            if ( i==36 || i==37 || i==38 || i==39 || i==40 || i==41 || i==42 || i==43 || i==44 || i==48 || i==49
-              || i==50 || i==51 || i==53 || i==54 || i==55 || i==56 )
+            if (   i==36 || i==37 || i==38 || i==39 || i==40 || i==41 || i==42 || i==43 || i==44 || i==48 || i==49
+                || i==50 || i==51 || i==53 || i==54 || i==55 || i==56 )
             {
                 expected_free_neighbouring_sites.insert(i);
             }

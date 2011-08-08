@@ -83,7 +83,6 @@ public:
 		volume_constraint.SetMatureCellTargetVolume(16.0);
 
 		// Test EvaluateHamiltonianContribution()
-		///\todo Check this is the correct numerical value (see #1665)
 		double contribution = volume_constraint.EvaluateHamiltonianContribution(0, 1, cell_population);
 		TS_ASSERT_DELTA(contribution, 2.0, 1e-6);
 	}
@@ -163,9 +162,7 @@ public:
         TS_ASSERT_DELTA(adhesion_update.GetCellCellAdhesionEnergy(p_cell_0,p_cell_1), 0.1, 1e-12);
         TS_ASSERT_DELTA(adhesion_update.GetCellBoundaryAdhesionEnergy(p_cell_0), 0.2, 1e-12);
 
-
         // Test EvaluateHamiltonianContribution()
-        ///\todo Check this is the correct numerical value (see #1665)
         double contribution = adhesion_update.EvaluateHamiltonianContribution(0, 1, cell_population);
         TS_ASSERT_DELTA(contribution, 0.0, 1e-6);
     }

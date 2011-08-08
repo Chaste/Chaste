@@ -125,7 +125,7 @@ private:
      */
     void WriteVtkResultsToFile()
     {
-        ///\todo implement writing VTK results for this class
+        ///\todo implement writing VTK results for this class (#1666)
     }
 
     /**

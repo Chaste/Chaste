@@ -30,8 +30,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 // The header file below must be included in any file that uses Petsc
 #include "PetscSetupAndFinalize.hpp"
 
-#include "Debug.hpp"
-
 template<unsigned DIM>
 NodeBasedCellPopulationWithBuskeUpdate<DIM>::NodeBasedCellPopulationWithBuskeUpdate(NodesOnlyMesh<DIM>& rMesh,
                                       std::vector<CellPtr>& rCells,

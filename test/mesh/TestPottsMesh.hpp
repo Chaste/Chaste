@@ -647,7 +647,8 @@ public:
 
     void TestGetVonNeumannNeighbouringNodeIndices3d()
  	{
-		/* Create a simple potts-based mesh with one element
+		/*
+		 * Create a simple Potts-based mesh with one element
 		 * Numbering the nodes as follows:
 		 *
 		 *        0  5

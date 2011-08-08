@@ -25,6 +25,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
+
 #ifndef LATTICEBASEDCELLPOPULATION_HPP_
 #define LATTICEBASEDCELLPOPULATION_HPP_
 
@@ -124,7 +125,7 @@ private:
      */
     void WriteVtkResultsToFile()
     {
-        ///\todo implement writing VTK results for this class
+        ///\todo implement writing VTK results for this class (#1666)
     }
 
 public:

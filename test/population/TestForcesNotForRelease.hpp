@@ -25,6 +25,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
+
 #ifndef TESTFORCESNOTFORRELEASE_HPP_
 #define TESTFORCESNOTFORRELEASE_HPP_
 
@@ -111,17 +112,12 @@ public:
   			buske_adhesive_force.AddForceContribution(node_forces, cell_population);
 
   			// Test forces on nodes
-  			double analytical_force_magnitude;
-  			if (separation<2.0)
+  			double analytical_force_magnitude = 0.0;
+  			if (separation < 2.0)
   			{
   				analytical_force_magnitude = 100.0*M_PI*separation;
   			}
-  			else
-  			{
-  				analytical_force_magnitude = 0.0;
-  			}
 
-            ///\todo test force calculation (#1764)
   			TS_ASSERT_DELTA(node_forces[0][0], analytical_force_magnitude, 1e-4);
   			TS_ASSERT_DELTA(node_forces[0][1], 0.0, 1e-4);
 

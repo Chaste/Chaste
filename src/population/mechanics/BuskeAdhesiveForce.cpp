@@ -49,8 +49,8 @@ void BuskeAdhesiveForce<DIM>::SetAdhesionEnergyParameter(double adhesionEnergyPa
 
 template<unsigned DIM>
 c_vector<double, DIM> BuskeAdhesiveForce<DIM>::CalculateForceBetweenNodes(unsigned nodeAGlobalIndex,
-                                                                             unsigned nodeBGlobalIndex,
-                                                                             AbstractCellPopulation<DIM>& rCellPopulation)
+                                                                          unsigned nodeBGlobalIndex,
+                                                                          AbstractCellPopulation<DIM>& rCellPopulation)
 {
     // This force class is defined for NodeBasedCellPopulations only
     assert(dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL);
@@ -98,22 +98,18 @@ c_vector<double, DIM> BuskeAdhesiveForce<DIM>::CalculateForceBetweenNodes(unsign
 template<unsigned DIM>
 double BuskeAdhesiveForce<DIM>::GetMagnitudeOfForce(double distanceBetweenNodes, double radiusOfCellOne, double radiusOfCellTwo)
 {
-	double dWAdd;
+	double dWAdd = 0.0;
 
-   if (distanceBetweenNodes < radiusOfCellOne + radiusOfCellTwo)
+	// If the cells are close enough...
+    if (distanceBetweenNodes < radiusOfCellOne + radiusOfCellTwo)
 	{
+        // ...calculate the force contribution from their adhesive interaction energy
         double xij = 0.5*(radiusOfCellOne*radiusOfCellOne - radiusOfCellTwo*radiusOfCellTwo + distanceBetweenNodes*distanceBetweenNodes)/distanceBetweenNodes;
-
 	    double dxijdd = 1.0 - xij/distanceBetweenNodes;
-
-	    // Calculate contribution from adhesive interaction energy
 	    dWAdd = 2.0*mAdhesionEnergyParameter*M_PI*xij*dxijdd;
 	}
-	else  // no adhesion energy contribution as too far apart
-	{
-		dWAdd = 0.0;
-	}
-    return dWAdd; //
+
+    return dWAdd;
 }
 
 template<unsigned DIM>

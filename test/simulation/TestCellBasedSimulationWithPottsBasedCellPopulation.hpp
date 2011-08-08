@@ -25,6 +25,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
+
 #ifndef TESTCELLBASEDSIMULATIONWITHPOTTSBASEDCELLPOPULATION_HPP_
 #define TESTCELLBASEDSIMULATIONWITHPOTTSBASEDCELLPOPULATION_HPP_
 

@@ -65,18 +65,18 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(	unsigned numNodesAcross, unsigned n
      * nodes. On each interior row we have numNodesAcross nodes, the first and last nodes
      * are boundary nodes.
      */
-    for( unsigned k=0; k<numNodesDeep; k++)
+    for (unsigned k=0; k<numNodesDeep; k++)
     {
 		for (unsigned j=0; j<numNodesUp; j++)
 		{
 			for (unsigned i=0; i<numNodesAcross; i++)
 			{
 				bool is_boundary_node=false;
-				if(DIM==2)
+				if (DIM==2)
 				{
 					is_boundary_node = (j==0 || j==numNodesUp-1 || i==0 || i==numNodesAcross-1) ? true : false;
 				}
-				if(DIM==3)
+				if (DIM==3)
 				{
 					is_boundary_node = (j==0 || j==numNodesUp-1 || i==0 || i==numNodesAcross-1 || k==0 || k==numNodesDeep-1) ? true : false;
 				}

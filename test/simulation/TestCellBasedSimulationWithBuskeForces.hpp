@@ -25,6 +25,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
+
 #ifndef TESTCELLBASEDSIMULATIONWITHBUSKEFORCES_HPP_
 #define TESTCELLBASEDSIMULATIONWITHBUSKEFORCES_HPP_
 
@@ -269,9 +270,8 @@ public:
     }
 
     /**
-	 * Test that 2 nodes relax to the equilibrium distance.
+	 * Test that two nodes relax to the equilibrium distance.
      */
-
 	void TestBuskeRelaxationForces() throw (Exception)
 	{
 		// Create a simple mesh with two nodes
