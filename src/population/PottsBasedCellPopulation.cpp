@@ -30,7 +30,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CellwiseData.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "Warnings.hpp"
-#include "Debug.hpp"
 
 void PottsBasedCellPopulation::Validate()
 {

@@ -50,10 +50,8 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(	unsigned numNodesAcross, unsigned n
     unsigned node_indices[elementWidth*elementHeight*elementDepth];
     unsigned element_index;
 
+    ///\todo modify this offset so that it does not break the build (#1686)
 
-    /*
-     * \todo modify this offset so that it does not break the build
-     */
 //    // Calculate the width of the medium on the edge and offset the node index so that the elelments are in the centre of the mesh.
 //    unsigned across_gap = (numNodesAcross -  numElementsAcross*elementWidth)/2;
 //    unsigned up_gap = (numNodesUp -  numElementsUp*elementHeight)/2;

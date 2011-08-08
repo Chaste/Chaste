@@ -31,7 +31,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "AbstractTwoBodyInteractionForce.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
-#include "Debug.hpp"
+
 /**
  * An abstract class for two-body force laws.
  */
