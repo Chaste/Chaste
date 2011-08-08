@@ -105,6 +105,36 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
     }
+    
+    void TestPottsMonolayerWithRandomSweep() throw (Exception)
+    {
+        // Create a simple 2D PottsMesh
+        PottsMeshGenerator<2> generator(16, 4, 4, 18, 4, 4);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), DIFFERENTIATED);
+
+        // Create cell population
+        PottsBasedCellPopulation cell_population(*p_mesh, cells);
+        cell_population.SetUpdateNodesInRandomOrder(true);
+        
+        // Create update rules and pass to the cell population
+        VolumeConstraintUpdateRule<2> volume_constraint_update_rule;
+        cell_population.AddUpdateRule(&volume_constraint_update_rule);
+        AdhesionUpdateRule<2> adhesion_update_rule;
+        cell_population.AddUpdateRule(&adhesion_update_rule);
+
+        // Set up cell-based simulation
+        CellBasedSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestSimplePottsMonolayerWithRandomSweep");
+        simulator.SetEndTime(0.1);
+
+        // Run simulation
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+    }
 
     void TestPottsMonolayerWithDeath() throw (Exception)
     {

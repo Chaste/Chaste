@@ -30,6 +30,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CellwiseData.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "Warnings.hpp"
+#include "Debug.hpp"
 
 void PottsBasedCellPopulation::Validate()
 {
@@ -66,7 +67,8 @@ PottsBasedCellPopulation::PottsBasedCellPopulation(PottsMesh<2>& rMesh,
     : AbstractCellPopulation<2>(rCells, locationIndices),
       mrMesh(rMesh),
       mDeleteMesh(deleteMesh),
-      mTemperature(0.1)
+      mTemperature(0.1),
+      mUpdateNodesInRandomOrder(false)
 {
     // Check each element has only one cell associated with it
     if (validate)
@@ -166,26 +168,41 @@ unsigned PottsBasedCellPopulation::RemoveDeadCells()
 
 void PottsBasedCellPopulation::UpdateNodeLocations(const std::vector< c_vector<double, 2> >& rNodeForces, double dt)
 {
-    /*
-     * This is where we perform the Monte Carlo simulations.
-     */
+    // This is where we perform the Monte Carlo simulations
+    unsigned num_nodes = mrMesh.GetNumNodes();
+
+    RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
+    std::vector<unsigned> perm(num_nodes);
+
+    if (mUpdateNodesInRandomOrder)
+    {
+        p_gen->Shuffle(num_nodes, perm);
+    }
+    else
+    {
+        for (unsigned i=0; i<num_nodes; i++)
+        {
+            perm[i] = i;
+        }
+    }
 
     // Loop over nodes and exchange
-    ///\todo make this a random sweep (see #1664 and associated tickets)
-    for (AbstractMesh<2,2>::NodeIterator node_iter = mrMesh.GetNodeIteratorBegin();
-         node_iter != mrMesh.GetNodeIteratorEnd();
-         ++node_iter)
+    for (unsigned i=0; i<perm.size(); i++)
     {
+        unsigned node_index = perm[i];
+
+        Node<2>* p_node = mrMesh.GetNode(node_index);
+
         // Each node in the mesh must be in at most one element
-        assert(node_iter->GetNumContainingElements() <= 1);
+        assert(p_node->GetNumContainingElements() <= 1);
 
         // Find a random available neighbouring node to extend the element/medium into
-        std::set<unsigned> neighbouring_node_indices = mrMesh.GetMooreNeighbouringNodeIndices(node_iter->GetIndex());
+        std::set<unsigned> neighbouring_node_indices = mrMesh.GetMooreNeighbouringNodeIndices(node_index);
         unsigned new_location_index;
         if (!neighbouring_node_indices.empty())
         {
             unsigned num_neighbours = neighbouring_node_indices.size();
-            unsigned chosen_neighbour = RandomNumberGenerator::Instance()->randMod(num_neighbours);
+            unsigned chosen_neighbour = p_gen->randMod(num_neighbours);
 
             std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
             for (unsigned i=0; i<chosen_neighbour; i++)
@@ -201,7 +218,7 @@ void PottsBasedCellPopulation::UpdateNodeLocations(const std::vector< c_vector<d
             NEVER_REACHED;
         }
 
-        std::set<unsigned> containing_elements = node_iter->rGetContainingElementIndices();
+        std::set<unsigned> containing_elements = p_node->rGetContainingElementIndices();
         std::set<unsigned> new_location_containing_elements = GetNode(new_location_index)->rGetContainingElementIndices();
 
         // Only calculate Hamiltonian and update elements if the nodes are from different elements
@@ -215,11 +232,11 @@ void PottsBasedCellPopulation::UpdateNodeLocations(const std::vector< c_vector<d
                  iter != mUpdateRuleCollection.end();
                  ++iter)
             {
-                delta_H += (*iter)->EvaluateHamiltonianContribution(node_iter->GetIndex(), new_location_index, *this);
+                delta_H += (*iter)->EvaluateHamiltonianContribution(p_node->GetIndex(), new_location_index, *this);
             }
 
 			// Generate a uniform random number to do the random motion
-			double random_number = RandomNumberGenerator::Instance()->ranf();
+			double random_number = p_gen->ranf();
 			double p = exp(-delta_H/mTemperature);
 
 			if (delta_H <= 0 || random_number < p)
@@ -405,7 +422,7 @@ void PottsBasedCellPopulation::AddUpdateRule(AbstractPottsUpdateRule<2>* pUpdate
 
 void PottsBasedCellPopulation::CreateElementTessellation()
 {
-	///\todo create a Potts tessellation here to enable VTK output
+	///\todo create a Potts tessellation here to enable VTK output (#1666)
 }
 
 VertexMesh<2, 2>* PottsBasedCellPopulation::GetElementTessellation()
@@ -419,30 +436,31 @@ void PottsBasedCellPopulation::OutputCellPopulationParameters(out_stream& rParam
     AbstractCellPopulation<2>::OutputCellPopulationParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
-///\todo Unused Methods to be refactored out of the AbstractCellPopulation?
-/////////////////////////////////////////////////////////////////////////////
-
 unsigned PottsBasedCellPopulation::AddNode(Node<2>* pNewNode)
 {
-    ///\todo Method not needed for this population type; need to refactor out?
-    //return mrMesh.AddNode(pNewNode);
+    EXCEPTION("Cannot call AddNode on a PottsBasedCellPopulation");
     return 0;
 }
 
 void PottsBasedCellPopulation::SetNode(unsigned nodeIndex, ChastePoint<2>& rNewLocation)
 {
-    ///\todo Method not needed for this population type; need to refactor out?
-    //mrMesh.SetNode(nodeIndex, rNewLocation);
+    EXCEPTION("Cannot call SetNode on a PottsBasedCellPopulation");
 }
 
 double PottsBasedCellPopulation::GetDampingConstant(unsigned nodeIndex)
 {
-    ///\todo Method not needed for this population type; need to refactor out?
-    #define COVERAGE_IGNORE
-    assert(0);
-    #undef COVERAGE_IGNORE
+    EXCEPTION("Cannot call GetDampingConstant on a PottsBasedCellPopulation");
     return 0.0;
+}
+
+bool PottsBasedCellPopulation::GetUpdateNodesInRandomOrder()
+{
+    return mUpdateNodesInRandomOrder;
+}
+
+void PottsBasedCellPopulation::SetUpdateNodesInRandomOrder(bool flag)
+{
+    mUpdateNodesInRandomOrder = flag;
 }
 
 std::set<unsigned> PottsBasedCellPopulation::GetNeighbouringNodeIndices(unsigned index)

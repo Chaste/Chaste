@@ -48,12 +48,14 @@ class AbstractPottsUpdateRule; // Circular definition
 
 /**
  * A facade class encapsulating a cell population under the Cellular
- * Potts model framework.
+ * Potts Model framework.
  *
  * Contains a group of cells and maintains the associations
  * between CellPtrs and elements in a specialised PottsMesh class.
+ * 
+ * The code currently requires the PottsMesh object to be fixed,
+ * in the sense that no new nodes or elements can be added.
  */
-//template<unsigned DIM>
 class PottsBasedCellPopulation : public AbstractCellPopulation<2>
 {
     friend class TestPottsBasedCellPopulation;
@@ -84,6 +86,9 @@ private:
 
     /** The temperature of the system. Initialized to 0.1 in the constructor. */
     double mTemperature;
+    
+    /** Whether to update nodes in random order. Initialized to false in the constructor. */
+    bool mUpdateNodesInRandomOrder;
 
     friend class boost::serialization::access;
     /**
@@ -347,10 +352,6 @@ public:
      */
     double GetTemperature();
 
-    /////////////////////////////////////////////////////////////////////////////
-    ///\todo Unused Methods to be refactored out of the AbstractCellPopulation?
-    /////////////////////////////////////////////////////////////////////////////
-
     /**
      * Overridden AddNode() method.
      *
@@ -378,6 +379,20 @@ public:
      * @return the average damping constant of the cells surrounding the node.
      */
     double GetDampingConstant(unsigned nodeIndex);
+    
+    /**
+     * Get whether we update nodes in a random order.
+     * 
+     * @return mUpdateNodesInRandomOrder
+     */
+    bool GetUpdateNodesInRandomOrder();
+    
+    /**
+     * Get whether we update nodes in a random order.
+     * 
+     * @param flag Whether to update nodes in a random order.
+     */
+    void SetUpdateNodesInRandomOrder(bool flag);
 };
 
 #include "SerializationExportWrapper.hpp"

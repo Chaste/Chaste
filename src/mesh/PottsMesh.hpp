@@ -352,7 +352,7 @@ public:
          *
          * @param rMesh the mesh to iterator over
          * @param elementIter where to start iterating
-         * @param skipDeletedElements whether to include deleted elements
+         * @param skipDeletedElements whether to include deleted elements (defaults to true)
          */
         PottsElementIterator(PottsMesh<DIM>& rMesh,
         		             typename std::vector<PottsElement<DIM> *>::iterator elementIter,
@@ -454,7 +454,6 @@ PottsMesh<DIM>::PottsElementIterator::PottsElementIterator(
 		}
 	}
 }
-
 
 template<unsigned DIM>
 bool PottsMesh<DIM>::PottsElementIterator::IsAtEnd()
