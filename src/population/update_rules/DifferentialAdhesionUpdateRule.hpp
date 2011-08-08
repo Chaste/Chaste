@@ -131,14 +131,14 @@ public:
     /**
      * Set mLabelledCellLabelledCellAdhesionEnergyParameter.
      *
-     * @param labelledCellLabelledCellAdhesionEnergyEnergyParameter the new value of mLabelledCellLabelledCellAdhesionEnergyParameter
+     * @param labelledCellLabelledCellAdhesionEnergyParameter the new value of mLabelledCellLabelledCellAdhesionEnergyParameter
      */
     void SetLabelledCellLabelledCellAdhesionEnergyParameter(double labelledCellLabelledCellAdhesionEnergyParameter);
 
     /**
      * Set mLabelledCellCellAdhesionEnergyParameter.
      *
-     * @param labelledCellCellAdhesionEnergyEnergyParameter the new value of mLabelledCelldCellAdhesionEnergyParameter
+     * @param labelledCellCellAdhesionEnergyParameter the new value of mLabelledCelldCellAdhesionEnergyParameter
      */
     void SetLabelledCellCellAdhesionEnergyParameter(double labelledCellCellAdhesionEnergyParameter);
 
