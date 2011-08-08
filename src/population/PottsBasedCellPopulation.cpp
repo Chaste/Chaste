@@ -65,7 +65,8 @@ PottsBasedCellPopulation::PottsBasedCellPopulation(PottsMesh<2>& rMesh,
                                           const std::vector<unsigned> locationIndices)
     : AbstractCellPopulation<2>(rCells, locationIndices),
       mrMesh(rMesh),
-      mDeleteMesh(deleteMesh)
+      mDeleteMesh(deleteMesh),
+      mTemperature(0.1)
 {
     // Check each element has only one cell associated with it
     if (validate)
@@ -217,12 +218,9 @@ void PottsBasedCellPopulation::UpdateNodeLocations(const std::vector< c_vector<d
                 delta_H += (*iter)->EvaluateHamiltonianContribution(node_iter->GetIndex(), new_location_index, *this);
             }
 
-            ///\todo This should be made a member variable of the class
-			double T = 0.1;
-
 			// Generate a uniform random number to do the random motion
 			double random_number = RandomNumberGenerator::Instance()->ranf();
-			double p = exp(-delta_H/T);
+			double p = exp(-delta_H/mTemperature);
 
 			if (delta_H <= 0 || random_number < p)
 			{
@@ -301,7 +299,7 @@ void PottsBasedCellPopulation::WriteResultsToFiles()
         }
 
         // Write node data to file
-        if ( !(GetElement(elem_index)->IsDeleted()) && !elem_corresponds_to_dead_cell)
+        if (!(GetElement(elem_index)->IsDeleted()) && !elem_corresponds_to_dead_cell)
         {
             PottsElement<2>* p_element = mrMesh.GetElement(elem_index);
 
@@ -341,7 +339,7 @@ void PottsBasedCellPopulation::WriteCellVolumeResultsToFile()
         }
 
         // Write node data to file
-        if ( !(GetElement(elem_index)->IsDeleted()) && !elem_corresponds_to_dead_cell)
+        if (!(GetElement(elem_index)->IsDeleted()) && !elem_corresponds_to_dead_cell)
         {
            // Write element index to file
             *(this->mpCellVolumesFile) << elem_index << " ";
@@ -473,6 +471,16 @@ std::set<unsigned> PottsBasedCellPopulation::GetNeighbouringNodeIndices(unsigned
         }
     }
     return neighbouring_node_indices;
+}
+
+void PottsBasedCellPopulation::SetTemperature(double temperature)
+{
+    mTemperature = temperature;
+}
+
+double PottsBasedCellPopulation::GetTemperature()
+{
+    return mTemperature;
 }
 
 // Serialization for Boost >= 1.36

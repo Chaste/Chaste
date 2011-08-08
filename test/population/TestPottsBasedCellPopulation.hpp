@@ -67,6 +67,12 @@ public:
         unsigned num_cells = cells.size();
         PottsBasedCellPopulation cell_population(*p_mesh, cells);
 
+        // Coverage
+        TS_ASSERT_DELTA(cell_population.GetTemperature(), 0.1, 1e-6);
+        cell_population.SetTemperature(10.0);
+        TS_ASSERT_DELTA(cell_population.GetTemperature(), 10.0, 1e-6);
+        cell_population.SetTemperature(0.1);
+
         // Test we have the correct number of cells and elements
         TS_ASSERT_EQUALS(cell_population.GetNumElements(), p_mesh->GetNumElements());
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), num_cells);

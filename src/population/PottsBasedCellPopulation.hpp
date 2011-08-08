@@ -82,6 +82,9 @@ private:
     /** The update rules used to determine the new location of the cells. */
     std::vector<AbstractPottsUpdateRule<2>*> mUpdateRuleCollection;
 
+    /** The temperature of the system. Initialized to 0.1 in the constructor. */
+    double mTemperature;
+
     friend class boost::serialization::access;
     /**
      * Serialize the object and its member variables.
@@ -106,6 +109,7 @@ private:
         mpElementTessellation = NULL;
 
         archive & mUpdateRuleCollection;
+        archive & mTemperature;
 
 #undef COVERAGE_IGNORE
     }
@@ -330,6 +334,18 @@ public:
      * @return the set of neighbouring node indices.
      */
     std::set<unsigned> GetNeighbouringNodeIndices(unsigned index);
+
+    /**
+     * Set mTemperature.
+     * 
+     * @param temperature the temperature of the system
+     */
+    void SetTemperature(double temperature);
+
+    /**
+     * @return mTemperature
+     */
+    double GetTemperature();
 
     /////////////////////////////////////////////////////////////////////////////
     ///\todo Unused Methods to be refactored out of the AbstractCellPopulation?
