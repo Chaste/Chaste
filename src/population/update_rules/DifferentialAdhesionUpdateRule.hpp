@@ -158,6 +158,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(AdhesionUpdateRule)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(DifferentialAdhesionUpdateRule)
 
 #endif /*DIFFERENTIALADHESIONUPDATERULE_HPP_*/
