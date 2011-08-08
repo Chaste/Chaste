@@ -35,6 +35,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "AbstractPottsUpdateRule.hpp"
 #include "VolumeConstraintUpdateRule.hpp"
+#include "SurfaceAreaConstraintUpdateRule.hpp"
 #include "AdhesionUpdateRule.hpp"
 #include "DifferentialAdhesionUpdateRule.hpp"
 #include "CellsGenerator.hpp"
@@ -86,6 +87,41 @@ public:
 		double contribution = volume_constraint.EvaluateHamiltonianContribution(0, 1, cell_population);
 		TS_ASSERT_DELTA(contribution, 2.0, 1e-6);
 	}
+    
+    void TestSurfaceAreaConstraintUpdateRuleMethods() throw (Exception)
+    {
+        // Create a simple 2D PottsMesh with 2 elements
+        PottsMeshGenerator<2> generator(4, 1, 2, 4, 2, 2);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+        // Create cell population
+        PottsBasedCellPopulation cell_population(*p_mesh, cells);
+
+        // Create an update law system
+        SurfaceAreaConstraintUpdateRule<2> surface_area_constraint;
+
+        // Test get/set methods
+        TS_ASSERT_DELTA(surface_area_constraint.GetDeformationEnergyParameter(), 0.5, 1e-12);
+        TS_ASSERT_DELTA(surface_area_constraint.GetMatureCellTargetSurfaceArea(), 16.0, 1e-12);
+
+        surface_area_constraint.SetDeformationEnergyParameter(0.5);
+        surface_area_constraint.SetMatureCellTargetSurfaceArea(0.6);
+
+        TS_ASSERT_DELTA(surface_area_constraint.GetDeformationEnergyParameter(), 0.5, 1e-12);
+        TS_ASSERT_DELTA(surface_area_constraint.GetMatureCellTargetSurfaceArea(), 0.6, 1e-12);
+
+        surface_area_constraint.SetDeformationEnergyParameter(1.0);
+        surface_area_constraint.SetMatureCellTargetSurfaceArea(16.0);
+
+        // Test EvaluateHamiltonianContribution()
+        double contribution = surface_area_constraint.EvaluateHamiltonianContribution(0, 1, cell_population);
+        TS_ASSERT_DELTA(contribution, 2.0, 1e-6);
+    }
 
     void TestArchiveVolumeConstraintUpdateRule() throw(Exception)
     {
@@ -120,6 +156,45 @@ public:
             // Test the member data
             TS_ASSERT_DELTA((static_cast<VolumeConstraintUpdateRule<2>*>(p_update_rule))->GetDeformationEnergyParameter(), 0.5, 1e-6);
             TS_ASSERT_DELTA((static_cast<VolumeConstraintUpdateRule<2>*>(p_update_rule))->GetMatureCellTargetVolume(), 0.6, 1e-6);
+
+            // Tidy up
+            delete p_update_rule;
+        }
+    }
+
+    void TestArchiveSurfaceAreaConstraintUpdateRule() throw(Exception)
+    {
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "SurfaceAreaConstraintUpdateRule.arch";
+
+        {
+            SurfaceAreaConstraintUpdateRule<2> update_rule;
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Set member variables
+            update_rule.SetDeformationEnergyParameter(0.5);
+            update_rule.SetMatureCellTargetSurfaceArea(0.6);
+
+            // Serialize via pointer to most abstract class possible
+            AbstractPottsUpdateRule<2>* const p_update_rule = &update_rule;
+            output_arch << p_update_rule;
+        }
+
+        {
+            AbstractPottsUpdateRule<2>* p_update_rule;
+
+            // Create an input archive
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            // Restore from the archive
+            input_arch >> p_update_rule;
+
+            // Test the member data
+            TS_ASSERT_DELTA((static_cast<SurfaceAreaConstraintUpdateRule<2>*>(p_update_rule))->GetDeformationEnergyParameter(), 0.5, 1e-6);
+            TS_ASSERT_DELTA((static_cast<SurfaceAreaConstraintUpdateRule<2>*>(p_update_rule))->GetMatureCellTargetSurfaceArea(), 0.6, 1e-6);
 
             // Tidy up
             delete p_update_rule;
@@ -328,6 +403,20 @@ public:
 
 		std::string volume_constraint_results_dir = output_file_handler.GetOutputDirectoryFullPath();
 		TS_ASSERT_EQUALS(system(("diff " + volume_constraint_results_dir + "volume_constraint_results.parameters notforrelease_cell_based/test/data/TestUpdateRules/volume_constraint_results.parameters").c_str()), 0);
+
+        // Test with SurfaceAreaConstraintUpdateRule
+        SurfaceAreaConstraintUpdateRule<2> surface_area_constraint;
+        surface_area_constraint.SetDeformationEnergyParameter(0.1);
+        surface_area_constraint.SetMatureCellTargetSurfaceArea(20);
+
+        TS_ASSERT_EQUALS(surface_area_constraint.GetIdentifier(), "SurfaceAreaConstraintUpdateRule-2");
+
+        out_stream surface_area_constraint_parameter_file = output_file_handler.OpenOutputFile("surface_area_constraint_results.parameters");
+        surface_area_constraint.OutputUpdateRuleInfo(surface_area_constraint_parameter_file);
+        surface_area_constraint_parameter_file->close();
+
+        std::string surface_area_constraint_results_dir = output_file_handler.GetOutputDirectoryFullPath();
+        TS_ASSERT_EQUALS(system(("diff " + surface_area_constraint_results_dir + "surface_area_constraint_results.parameters notforrelease_cell_based/test/data/TestUpdateRules/surface_area_constraint_results.parameters").c_str()), 0);
 
 		// Test with AdhesionUpdateRule
 		AdhesionUpdateRule<2> adhesion_update;
