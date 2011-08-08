@@ -50,14 +50,18 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(	unsigned numNodesAcross, unsigned n
     unsigned node_indices[elementWidth*elementHeight*elementDepth];
     unsigned element_index;
 
-    // Calculate the width of the medium on the edge and offset the node index so that the elelments are in the centre of the mesh.
-    unsigned across_gap = (numNodesAcross -  numElementsAcross*elementWidth)/2;
-    unsigned up_gap = (numNodesUp -  numElementsUp*elementHeight)/2;
-    unsigned deep_gap = (numNodesDeep -  numElementsDeep*elementDepth)/2;
 
-    unsigned index_offset = deep_gap*numNodesAcross*numNodesUp +
-                            up_gap*numNodesAcross +
-                            across_gap;
+    /*
+     * \todo modify this offset so that it does not break the build
+     */
+//    // Calculate the width of the medium on the edge and offset the node index so that the elelments are in the centre of the mesh.
+//    unsigned across_gap = (numNodesAcross -  numElementsAcross*elementWidth)/2;
+//    unsigned up_gap = (numNodesUp -  numElementsUp*elementHeight)/2;
+//    unsigned deep_gap = (numNodesDeep -  numElementsDeep*elementDepth)/2;
+//
+//    unsigned index_offset = deep_gap*numNodesAcross*numNodesUp +
+//                            up_gap*numNodesAcross +
+//                            across_gap;
 
     /*
      * Create the nodes, row by row, from the bottom up
@@ -108,7 +112,7 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(	unsigned numNodesAcross, unsigned n
 							                                                                  i*elementWidth +
 							                                                                  m*numNodesAcross*numNodesUp +
 							                                                                  l*numNodesAcross +
-							                                                                  k + index_offset;
+							                                                                  k;// + index_offset;
 
 						}
 					}
