@@ -232,8 +232,8 @@ public:
 		adhesion_update.SetCellBoundaryAdhesionEnergyParameter(0.2);
 
         // Test get adhesion methods
-		CellPtr p_cell_0 =  cell_population.GetCellUsingLocationIndex(0u);
-		CellPtr p_cell_1 =  cell_population.GetCellUsingLocationIndex(1u);
+		CellPtr p_cell_0 = cell_population.GetCellUsingLocationIndex(0u);
+		CellPtr p_cell_1 = cell_population.GetCellUsingLocationIndex(1u);
         TS_ASSERT_DELTA(adhesion_update.GetCellCellAdhesionEnergy(p_cell_0,p_cell_1), 0.1, 1e-12);
         TS_ASSERT_DELTA(adhesion_update.GetCellBoundaryAdhesionEnergy(p_cell_0), 0.2, 1e-12);
 

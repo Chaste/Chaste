@@ -77,58 +77,64 @@ double AdhesionUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned current
 		assert(neighbouring_node_containing_elements.size() < 2);
         bool neighbouring_node_contained = !neighbouring_node_containing_elements.empty();
 
-		// Before move (H_0)
+		/**
+		 * Before the move, we have a positive contribution H_0 to the Hamiltonian if:
+		 * the current node and neighbouring node are contained in the same Potts element;
+		 * the current node and neighbouring node are contained in different Potts elements;
+		 * the neighbouring node is contained in a Potts element, but the current node is not; or
+		 * the current node is contained in a Potts element, but the neighbouring node is not.
+		 */
 		if (neighbouring_node_contained && current_node_contained)
 		{
 			unsigned neighbour_element = (*neighbouring_node_containing_elements.begin());
 			unsigned current_element = (*containing_elements.begin());
-
-			// The nodes are currently contained in different elements
 			if (current_element != neighbour_element)
 			{
+			    // The nodes are currently contained in different elements
 				delta_H += GetCellCellAdhesionEnergy(rCellPopulation.GetCellUsingLocationIndex(current_element), rCellPopulation.GetCellUsingLocationIndex(neighbour_element));
 			}
 		}
 		else if (neighbouring_node_contained && !current_node_contained)
 		{
+		    // The neighbouring node is contained in a Potts element, but the current node is not
 		    unsigned neighbour_element = (*neighbouring_node_containing_elements.begin());
-
-			// One node is in an element and the other is in the medium
 			delta_H += GetCellBoundaryAdhesionEnergy(rCellPopulation.GetCellUsingLocationIndex(neighbour_element));
 		}
 		else if (!neighbouring_node_contained && current_node_contained)
         {
+		    // The current node is contained in a Potts element, but the neighbouring node is not
 		    unsigned current_element = (*containing_elements.begin());
-
-            // One node is in an element and the other is in the medium
             delta_H += GetCellBoundaryAdhesionEnergy(rCellPopulation.GetCellUsingLocationIndex(current_element));
         }
 
-		// After move (H_1)
+        /**
+         * After the move, we have a negative contribution H_1 to the Hamiltonian if:
+         * the target node and neighbouring node are contained in the same Potts element;
+         * the target node and neighbouring node are contained in different Potts elements;
+         * the neighbouring node is contained in a Potts element, but the target node is not; or
+         * the target node is contained in a Potts element, but the neighbouring node is not.
+         */
 		if (neighbouring_node_contained && target_node_contained)
 		{
 			unsigned neighbour_element = (*neighbouring_node_containing_elements.begin());
 			unsigned target_element = (*new_location_containing_elements.begin());
-
-            // The nodes are currently contained in different elements
-			if ( target_element != neighbour_element )
+			if (target_element != neighbour_element)
 			{
+                // The nodes are currently contained in different elements
 				delta_H -= GetCellCellAdhesionEnergy(rCellPopulation.GetCellUsingLocationIndex(target_element),rCellPopulation.GetCellUsingLocationIndex(neighbour_element));
 			}
 		}
-		else if ((neighbouring_node_contained && !target_node_contained) || (!neighbouring_node_contained && target_node_contained))
-		{
-		    unsigned neighbour_element = (*neighbouring_node_containing_elements.begin());
-
-			// One node is in an element and the other is in the medium
-			delta_H -= GetCellBoundaryAdhesionEnergy(rCellPopulation.GetCellUsingLocationIndex(neighbour_element));
-		}
-		else if ((neighbouring_node_contained && !target_node_contained) || (!neighbouring_node_contained && target_node_contained))
+        else if (neighbouring_node_contained && !target_node_contained)
         {
-		    unsigned current_element = (*containing_elements.begin());
-
-            // One node is in an element and the other is in the medium
-            delta_H -= GetCellBoundaryAdhesionEnergy(rCellPopulation.GetCellUsingLocationIndex(current_element));
+            // The neighbouring node is contained in a Potts element, but the current node is not
+            unsigned neighbour_element = (*neighbouring_node_containing_elements.begin());
+            delta_H -= GetCellBoundaryAdhesionEnergy(rCellPopulation.GetCellUsingLocationIndex(neighbour_element));
+        }
+        else if (!neighbouring_node_contained && target_node_contained)
+        {
+            // The current node is contained in a Potts element, but the neighbouring node is not
+            unsigned target_element = (*new_location_containing_elements.begin());
+            delta_H -= GetCellBoundaryAdhesionEnergy(rCellPopulation.GetCellUsingLocationIndex(target_element));
         }
 	}
 
