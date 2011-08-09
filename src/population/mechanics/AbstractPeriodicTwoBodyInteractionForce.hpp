@@ -98,6 +98,8 @@ public:
 
     /**
      * Returns the initial width.
+     * 
+     * @param initialWidth the initial width
      */
     void SetInitialWidth(double initialWidth);
 

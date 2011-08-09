@@ -39,7 +39,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "GeneralisedLinearSpringForce.hpp"
 #include "GeneralisedPeriodicLinearSpringForce.hpp"
 #include "HoneycombMeshGenerator.hpp"
-#include "CellBasedSimulation.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "MutableMesh.hpp"
@@ -90,14 +89,6 @@ public:
         TS_ASSERT_DELTA(node_forces[2][1], 2.88444e-15, 1e-3);
         TS_ASSERT_DELTA(node_forces[3][0], -7.5, 1e-3);
         TS_ASSERT_DELTA(node_forces[3][1], 2.00962, 1e-3);
-
-        // Set up simulation
-        CellBasedSimulation<2> simulator(cell_population);
-        simulator.AddForce(&linear_force);
-        simulator.SetOutputDirectory("TestPeriodicBoundaryConditions");
-        simulator.SetEndTime(0.01);
-
-        simulator.Solve();
     }
 
     void TestPeriodicForceOnNonUniformMesh() throw(Exception)
@@ -124,17 +115,9 @@ public:
         // Create Voronoi tessellation
         cell_population.CreateVoronoiTessellation();
 
-        // Set up simulation
-        CellBasedSimulation<2> simulator(cell_population);
-
-        simulator.SetOutputDirectory("TestNewPeriodicForceClass");
-        simulator.SetEndTime(0.01);
-
         // Create force
         GeneralisedPeriodicLinearSpringForce<2> linear_force;
         linear_force.SetInitialWidth(4.5);
-
-        simulator.AddForce(&linear_force);
 
         // Initialise a vector of node forces
         std::vector<c_vector<double, 2> > node_forces;
@@ -162,9 +145,6 @@ public:
         TS_ASSERT_DELTA(node_forces[5][1], -1.54716, 1e-3);
         TS_ASSERT_DELTA(node_forces[6][0], -2.01801, 1e-3);
         TS_ASSERT_DELTA(node_forces[6][1], 0.731214, 1e-3);
-
-        // Run simulation
-        simulator.Solve();
     }
 };
 
