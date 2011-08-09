@@ -46,10 +46,12 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
     // Create a helper pointer
 	MeshBasedCellPopulation<DIM>* p_cell_population = static_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation);
 
-	// Rather than iterating over the springs here, we firstly want to extend the mesh by creating
-	// the image nodes, then loop over all edges to work out the forces acting on the real nodes.
-
-	// Create a new, extended mesh by copying real nodes to form image nodes on either side, and create an accompanying extended cell population
+	/*
+	 * Rather than iterating over the springs here, we first create a new, extended mesh by copying
+	 * real nodes to form image nodes on either side of the original mesh and creating an extended
+	 * cell population. We then use this extended cell population to work out the forces acting on
+	 * the real nodes.
+	 */
 
 	// These vectors will contain the real nodes and image nodes, and real cells and image cells, respectively
 	std::vector<Node<DIM>*> extended_node_set;
@@ -90,8 +92,8 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
     	Node<DIM>* p_real_node = new Node<DIM>(real_node_index, real_node_location);
     	extended_node_set.push_back(p_real_node);
 
-    	// todo The code block below would need to be amended for 3d
-    	// todo Think more about the use of centroid to make more general
+    	///\todo The code block below would need to be amended for 3d (#1856)
+    	///\todo Think more about the use of centroid to make more general (#1856)
 
     	// Compute the location of the image node corresponding to this node
         c_vector<double,DIM> image_node_location = real_node_location;
@@ -112,8 +114,8 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
 		CellPtr p_image_cell(new Cell(cell_iter->GetMutationState(), cell_iter->GetCellCycleModel(), false));
 		image_cells.push_back(p_image_cell);
 
-		// todo No set age method, which may matter when it comes to working out the rest length
-		//      of the spring for the force calculation
+		///\todo No set age method, which may matter when it comes to working out the rest length
+		//      of the spring for the force calculation (#1856)
 //		p_new_image_cell->SetAge();
 
         // Start from total number of real nodes and increment upwards
@@ -145,8 +147,7 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
     // ...and, with this mesh and extended_cell_set, we create a MeshBasedCellPopulation
     MeshBasedCellPopulation<DIM>* p_extended_cell_population = new MeshBasedCellPopulation<DIM>(extended_mesh, extended_cell_set);
 
-    // todo might we need to call Update() on extended_cell_population to ensure
-    // that mMarkedSprings is correct?
+    ///\todo might we need to call Update() on extended_cell_population to ensure that mMarkedSprings is correct? (#1856)
 
 	// Now loop over the extended mesh and calculate the force acting on real nodes
 	// (using the edge iterator ensures that each edge is visited only once)
@@ -155,21 +156,21 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
          ++edge_iterator)
     {
         unsigned nodeA_global_index = edge_iterator.GetNodeA()->GetIndex();
-        unsigned nodeB_global_index =  edge_iterator.GetNodeB()->GetIndex();
+        unsigned nodeB_global_index = edge_iterator.GetNodeB()->GetIndex();
 
         c_vector<double, DIM> force = CalculateForceBetweenNodes(nodeA_global_index, nodeB_global_index, *p_extended_cell_population);
 
         // Now we make sure that we only apply the force to the real node and not the image node
-        if ( (nodeA_global_index < num_real_nodes) &&  (nodeB_global_index < num_real_nodes) )
+        if ((nodeA_global_index < num_real_nodes) && (nodeB_global_index < num_real_nodes))
         {
 			rForces[nodeB_global_index] -= force;
 			rForces[nodeA_global_index] += force;
         }
-        else if ( (nodeA_global_index >= num_real_nodes) &&  (nodeB_global_index < num_real_nodes) )
+        else if ((nodeA_global_index >= num_real_nodes) && (nodeB_global_index < num_real_nodes))
         {
 			rForces[nodeB_global_index] -= force;
         }
-        else if ( (nodeA_global_index < num_real_nodes) &&  (nodeB_global_index >= num_real_nodes) )
+        else if ((nodeA_global_index < num_real_nodes) && (nodeB_global_index >= num_real_nodes))
         {
         	rForces[nodeA_global_index] += force;
         }
@@ -185,12 +186,13 @@ double AbstractPeriodicTwoBodyInteractionForce<DIM>::GetInitialWidth()
 template<unsigned DIM>
 void AbstractPeriodicTwoBodyInteractionForce<DIM>::SetInitialWidth(double initialWidth)
 {
-	mInitialWidth=initialWidth;
+	mInitialWidth = initialWidth;
 }
 
 template<unsigned DIM>
 void AbstractPeriodicTwoBodyInteractionForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
+    *rParamsFile << "\t\t\t<InitialWidth>" << mInitialWidth << "</InitialWidth> \n";
 
     // Call method on direct parent class
     AbstractTwoBodyInteractionForce<DIM>::OutputForceParameters(rParamsFile);

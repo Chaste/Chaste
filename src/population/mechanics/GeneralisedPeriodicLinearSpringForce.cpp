@@ -28,7 +28,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "GeneralisedPeriodicLinearSpringForce.hpp"
 
-
 template<unsigned DIM>
 GeneralisedPeriodicLinearSpringForce<DIM>::GeneralisedPeriodicLinearSpringForce()
    : AbstractPeriodicTwoBodyInteractionForce<DIM>(),
@@ -36,10 +35,11 @@ GeneralisedPeriodicLinearSpringForce<DIM>::GeneralisedPeriodicLinearSpringForce(
      mMeinekeDivisionRestingSpringLength(0.5),
      mMeinekeSpringGrowthDuration(1.0)
 {
-    if (DIM == 1)
-    {
-        mMeinekeSpringStiffness = 30.0;
-    }
+    /**
+     * \todo once AbstractPeriodicTwoBodyInteractionForce (and hence this class) is extended
+     * to cope with 1D/3D, reset mMeinekeSpringStiffness to 30.0 if DIM==1 here (see also
+     * GeneralisedLinearSpringForce)
+     */
 }
 
 template<unsigned DIM>
@@ -61,6 +61,9 @@ c_vector<double, DIM> GeneralisedPeriodicLinearSpringForce<DIM>::CalculateForceB
                                                                                     unsigned nodeBGlobalIndex,
                                                                                     AbstractCellPopulation<DIM>& rCellPopulation)
 {
+    ///\todo extend force class to cope with a NodeBasedCellPopulation (#1856)
+    assert(rCellPopulation.IsMeshBasedCellPopulation());
+
     // We should only ever calculate the force between two distinct nodes
     assert(nodeAGlobalIndex != nodeBGlobalIndex);
 
@@ -68,22 +71,15 @@ c_vector<double, DIM> GeneralisedPeriodicLinearSpringForce<DIM>::CalculateForceB
     c_vector<double, DIM> node_a_location = rCellPopulation.GetNode(nodeAGlobalIndex)->rGetLocation();
     c_vector<double, DIM> node_b_location = rCellPopulation.GetNode(nodeBGlobalIndex)->rGetLocation();
 
-    // Get the unit vector parallel to the line joining the two nodes
-    c_vector<double, DIM> unit_difference;
-    if (rCellPopulation.IsMeshBasedCellPopulation())
-    {
-        /*
-         * We use the mesh method GetVectorFromAtoB() to compute the direction of the
-         * unit vector along the line joining the two nodes, rather than simply subtract
-         * their positions, because this method can be overloaded (e.g. to enforce a
-         * periodic boundary in Cylindrical2dMesh).
-         */
-        unit_difference = (static_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation))->rGetMesh().GetVectorFromAtoB(node_a_location, node_b_location);
-    }
-    else
-    {
-        unit_difference = node_b_location - node_a_location;
-    }
+    /*
+     * Get the unit vector parallel to the line joining the two nodes.
+     *
+     * We use the mesh method GetVectorFromAtoB() to compute the direction of the
+     * unit vector along the line joining the two nodes, rather than simply subtract
+     * their positions, because this method can be overloaded (e.g. to enforce a
+     * periodic boundary in Cylindrical2dMesh).
+     */
+    c_vector<double, DIM> unit_difference = (static_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation))->rGetMesh().GetVectorFromAtoB(node_a_location, node_b_location);
 
     // Calculate the distance between the two nodes
     double distance_between_nodes = norm_2(unit_difference);
@@ -117,55 +113,12 @@ c_vector<double, DIM> GeneralisedPeriodicLinearSpringForce<DIM>::CalculateForceB
     assert(!std::isnan(ageA));
     assert(!std::isnan(ageB));
 
-    /*
-     * If the cells are both newly divided, then the rest length of the spring
-     * connecting them grows linearly with time, until 1 hour after division.
-     */
-    if (ageA < mMeinekeSpringGrowthDuration && ageB < mMeinekeSpringGrowthDuration)
-    {
-        if (rCellPopulation.IsMeshBasedCellPopulation())
-        {
-            MeshBasedCellPopulation<DIM>* p_static_cast_cell_population = static_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation);
-
-            std::pair<CellPtr,CellPtr> cell_pair = p_static_cast_cell_population->CreateCellPair(p_cell_A, p_cell_B);
-
-            if (p_static_cast_cell_population->IsMarkedSpring(cell_pair))
-            {
-                // Spring rest length increases from a small value to the normal rest length over 1 hour
-                double lambda = mMeinekeDivisionRestingSpringLength;
-                rest_length = lambda + (1.0 - lambda) * ageA/mMeinekeSpringGrowthDuration;
-            }
-            if (ageA + SimulationTime::Instance()->GetTimeStep() >= mMeinekeSpringGrowthDuration)
-            {
-                // This spring is about to go out of scope
-                p_static_cast_cell_population->UnmarkSpring(cell_pair);
-            }
-        }
-        else
-        {
-            // Spring rest length increases from mDivisionRestingSpringLength to normal rest length, 1.0, over 1 hour
-            double lambda = mMeinekeDivisionRestingSpringLength;
-            rest_length = lambda + (1.0 - lambda) * ageA/mMeinekeSpringGrowthDuration;
-        }
-    }
+    ///\todo Extend force class to cope with newly divided cells (#1856)
 
     double a_rest_length = rest_length*0.5;
     double b_rest_length = a_rest_length;
 
-    /*
-     * If either of the cells has begun apoptosis, then the length of the spring
-     * connecting them decreases linearly with time.
-     */
-    if (p_cell_A->HasApoptosisBegun())
-    {
-        double time_until_death_a = p_cell_A->GetTimeUntilDeath();
-        a_rest_length = a_rest_length * time_until_death_a / p_cell_A->GetApoptosisTime();
-    }
-    if (p_cell_B->HasApoptosisBegun())
-    {
-        double time_until_death_b = p_cell_B->GetTimeUntilDeath();
-        b_rest_length = b_rest_length * time_until_death_b / p_cell_B->GetApoptosisTime();
-    }
+    ///\todo Extend force class to cope with apoptotic cells (#1856)
 
     rest_length = a_rest_length + b_rest_length;
     assert(rest_length <= 1.0+1e-12);
@@ -178,35 +131,8 @@ c_vector<double, DIM> GeneralisedPeriodicLinearSpringForce<DIM>::CalculateForceB
     double spring_stiffness = mMeinekeSpringStiffness;
     double overlap = distance_between_nodes - rest_length;
 
-    if (rCellPopulation.IsMeshBasedCellPopulation())
-    {
-        return multiplication_factor * spring_stiffness * unit_difference * overlap;
-    }
-    else
-    {
-        // A reasonably stable simple force law
-        if (distance_between_nodes > rest_length)
-        {
-            double alpha = 5;
-            c_vector<double, DIM> temp = spring_stiffness * unit_difference * overlap * exp(-alpha * overlap);
-            for (unsigned i=0; i<DIM; i++)
-            {
-                assert(!std::isnan(temp[i]));
-            }
-            return temp;
-        }
-        else
-        {
-            c_vector<double, DIM> temp = spring_stiffness * unit_difference * log(1 + overlap);
-            for (unsigned i=0; i<DIM; i++)
-            {
-                assert(!std::isnan(temp[i]));
-            }
-            return temp;
-        }
-    }
+    return multiplication_factor * spring_stiffness * unit_difference * overlap;
 }
-
 
 template<unsigned DIM>
 double GeneralisedPeriodicLinearSpringForce<DIM>::GetMeinekeSpringStiffness()
@@ -223,7 +149,6 @@ double GeneralisedPeriodicLinearSpringForce<DIM>::GetMeinekeSpringGrowthDuration
 {
     return mMeinekeSpringGrowthDuration;
 }
-
 
 template<unsigned DIM>
 void GeneralisedPeriodicLinearSpringForce<DIM>::SetMeinekeSpringStiffness(double springStiffness)
@@ -257,7 +182,7 @@ void GeneralisedPeriodicLinearSpringForce<DIM>::OutputForceParameters(out_stream
     *rParamsFile << "\t\t\t<MeinekeSpringGrowthDuration>" << mMeinekeSpringGrowthDuration << "</MeinekeSpringGrowthDuration> \n";
 
     // Call method on direct parent class
-    AbstractTwoBodyInteractionForce<DIM>::OutputForceParameters(rParamsFile);
+    AbstractPeriodicTwoBodyInteractionForce<DIM>::OutputForceParameters(rParamsFile);
 }
 
 /////////////////////////////////////////////////////////////////////////////

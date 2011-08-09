@@ -87,6 +87,8 @@ protected:
      * Represented by the parameter mu in the model by Meineke et al (2001) in
      * their off-lattice model of the intestinal crypt
      * (doi:10.1046/j.0960-7722.2001.00216.x).
+     * 
+     * Initialised to 15.0 in the constructor. 
      */
     double mMeinekeSpringStiffness;
 
@@ -96,6 +98,8 @@ protected:
      *
      * The value of this parameter should be larger than mDivisionSeparation,
      * because of pressure from neighbouring springs.
+     *
+     * Initialised to 0.5 in the constructor.
      */
     double mMeinekeDivisionRestingSpringLength;
 
@@ -103,7 +107,9 @@ protected:
      * The time it takes for the springs rest length to increase from
      * mMeinekeDivisionRestingSpringLength to its natural length.
      *
-     * The value of this parameter is usually the same as the M Phase of the cell cycle and defaults to 1.
+     * The value of this parameter is usually the same as the M Phase of the cell cycle.
+     *
+     * Initialised to 1.0 in the constructor.
      */
     double mMeinekeSpringGrowthDuration;
 

@@ -146,6 +146,73 @@ public:
         TS_ASSERT_DELTA(node_forces[6][0], -2.01801, 1e-3);
         TS_ASSERT_DELTA(node_forces[6][1], 0.731214, 1e-3);
     }
+
+    void TestGeneralisedPeriodicLinearSpringForceArchiving() throw (Exception)
+    {
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "GeneralisedPeriodicLinearSpringForce.arch";
+
+        {
+            // Create force object and set member variables
+            GeneralisedPeriodicLinearSpringForce<2> force;
+
+            force.SetInitialWidth(7.3);
+            force.SetMeinekeSpringStiffness(13.0);
+            force.SetMeinekeDivisionRestingSpringLength(0.6);
+            force.SetMeinekeSpringGrowthDuration(2.0);
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Serialize via pointer to most abstract class possible
+            AbstractForce<2>* const p_force = &force;
+
+            output_arch << p_force;
+        }
+
+        {
+            AbstractForce<2>* p_force;
+
+            // Create an input archive
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            // Restore from the archive
+            input_arch >> p_force;
+
+            // Check member variables have been correctly archived
+            TS_ASSERT_DELTA(dynamic_cast<GeneralisedPeriodicLinearSpringForce<2>*>(p_force)->GetInitialWidth(), 7.3, 1e-6);
+            TS_ASSERT_DELTA(dynamic_cast<GeneralisedPeriodicLinearSpringForce<2>*>(p_force)->GetMeinekeSpringStiffness(), 13.0, 1e-6);
+            TS_ASSERT_DELTA(dynamic_cast<GeneralisedPeriodicLinearSpringForce<2>*>(p_force)->GetMeinekeDivisionRestingSpringLength(), 0.6, 1e-6);
+            TS_ASSERT_DELTA(dynamic_cast<GeneralisedPeriodicLinearSpringForce<2>*>(p_force)->GetMeinekeSpringGrowthDuration(), 2.0, 1e-6);
+
+            // Tidy up
+            delete p_force;
+        }
+    }
+
+    void TestForceOutputParameters()
+    {
+        std::string output_directory = "TestPeriodicForcesOutputParameters";
+        OutputFileHandler output_file_handler(output_directory, false);
+
+        // Test with GeneralisedPeriodicLinearSpringForce
+        GeneralisedPeriodicLinearSpringForce<2> force;
+
+        force.SetInitialWidth(7.3);
+        force.SetMeinekeSpringStiffness(13.0);
+        force.SetMeinekeDivisionRestingSpringLength(0.6);
+        force.SetMeinekeSpringGrowthDuration(2.0);
+
+        TS_ASSERT_EQUALS(force.GetIdentifier(), "GeneralisedPeriodicLinearSpringForce-2");
+
+        out_stream force_parameter_file = output_file_handler.OpenOutputFile("periodic_results.parameters");
+        force.OutputForceParameters(force_parameter_file);
+        force_parameter_file->close();
+
+        std::string force_results_dir = output_file_handler.GetOutputDirectoryFullPath();
+        TS_ASSERT_EQUALS(system(("diff " + force_results_dir + "periodic_results.parameters notforrelease_cell_based/test/data/TestPeriodicForces/periodic_results.parameters").c_str()), 0);
+    }
 };
 
 #endif /* TESTPERIODICFORCES_HPP_ */

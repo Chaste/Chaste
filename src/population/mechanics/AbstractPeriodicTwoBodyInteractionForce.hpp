@@ -54,6 +54,7 @@ private:
         // If Archive is an output archive, then '&' resolves to '<<'
         // If Archive is an input archive, then '&' resolves to '>>'
         archive & boost::serialization::base_object<AbstractForce<DIM> >(*this);
+        archive & mInitialWidth;
     }
 
 protected:
@@ -109,7 +110,6 @@ public:
      * @param rParamsFile the file stream to which the parameters are output
      */
     virtual void OutputForceParameters(out_stream& rParamsFile);
-
 };
 
 #endif /* ABSTRACTPERIODICTWOBODYINTERACTIONFORCE_HPP_ */
