@@ -71,10 +71,10 @@ public:
      */
     void TestSimpleMonolayerWithBuskeAdhesiveForce() throw (Exception)
     {
+        EXIT_IF_PARALLEL; // HoneycombMeshGenerator doesn't work in parallel
+
         // Create a simple mesh
-        unsigned num_cells_depth = 5;
-        unsigned num_cells_width = 5;
-        HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
+        HoneycombMeshGenerator generator(5, 5, 0);
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
@@ -117,7 +117,7 @@ public:
             }
         }
 
-        TS_ASSERT(min_distance_between_cells > 1e-3);
+        TS_ASSERT_LESS_THAN_EQUALS(1e-3, min_distance_between_cells);
     }
 
     /**
@@ -126,10 +126,10 @@ public:
      */
     void TestSimpleMonolayerWithBuskeElasticForce() throw (Exception)
     {
+        EXIT_IF_PARALLEL; // HoneycombMeshGenerator doesn't work in parallel
+
         // Create a simple mesh
-        unsigned num_cells_depth = 5;
-        unsigned num_cells_width = 5;
-        HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
+        HoneycombMeshGenerator generator(5, 5, 0);
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
@@ -171,7 +171,7 @@ public:
             }
         }
 
-        TS_ASSERT(min_distance_between_cells > 1e-3);
+        TS_ASSERT_LESS_THAN_EQUALS(1e-3, min_distance_between_cells);
     }
 
     /**
@@ -180,6 +180,8 @@ public:
      */
     void TestSimpleMonolayerWithBuskeCompressionForce() throw (Exception)
     {
+        EXIT_IF_PARALLEL; // HoneycombMeshGenerator doesn't work in parallel
+
         // Create a simple mesh
         unsigned num_cells_depth = 5;
         unsigned num_cells_width = 5;
@@ -234,85 +236,85 @@ public:
      */
     void TestAllBuskeForces() throw (Exception)
     {
-		// Create a simple mesh
-		unsigned num_cells_depth = 5;
-		unsigned num_cells_width = 5;
-		HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-		TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        EXIT_IF_PARALLEL; // HoneycombMeshGenerator doesn't work in parallel
 
-		// Convert this to a NodesOnlyMesh
-		NodesOnlyMesh<2> mesh;
-		mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
+        // Create a simple mesh
+        HoneycombMeshGenerator generator(5, 5, 0);
+        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
-		// Create cells
-		std::vector<CellPtr> cells;
-		CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-		cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), TRANSIT);
+        // Convert this to a NodesOnlyMesh
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
 
-		// Create a node-based cell population
-		NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
-		node_based_cell_population.SetMechanicsCutOffLength(1.5);
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), TRANSIT);
 
-		// Set up cell-based simulation
-		CellBasedSimulation<2> simulator(node_based_cell_population);
-		simulator.SetOutputDirectory("TestAllBuskeForces");
-		simulator.SetEndTime(5.0);
+        // Create a node-based cell population
+        NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
+        node_based_cell_population.SetMechanicsCutOffLength(1.5);
 
-		// Create a force law and pass it to the simulation
-		BuskeCompressionForce<2> buske_compression_force;
-		BuskeElasticForce<2> buske_elastic_force;
-		BuskeAdhesiveForce<2> buske_adhesive_force;
-		simulator.AddForce(&buske_compression_force);
-		simulator.AddForce(&buske_elastic_force);
-		simulator.AddForce(&buske_adhesive_force);
+        // Set up cell-based simulation
+        CellBasedSimulation<2> simulator(node_based_cell_population);
+        simulator.SetOutputDirectory("TestAllBuskeForces");
+        simulator.SetEndTime(5.0);
 
-		simulator.Solve();
+        // Create a force law and pass it to the simulation
+        BuskeCompressionForce<2> buske_compression_force;
+        BuskeElasticForce<2> buske_elastic_force;
+        BuskeAdhesiveForce<2> buske_adhesive_force;
+        simulator.AddForce(&buske_compression_force);
+        simulator.AddForce(&buske_elastic_force);
+        simulator.AddForce(&buske_adhesive_force);
+
+        simulator.Solve();
     }
 
     /**
-	 * Test that two nodes relax to the equilibrium distance.
+     * Test that two nodes relax to the equilibrium distance.
      */
-	void TestBuskeRelaxationForces() throw (Exception)
-	{
-		// Create a simple mesh with two nodes
-		unsigned num_cells_depth = 1;
-		unsigned num_cells_width = 2;
-		HoneycombMeshGenerator generator_buske(num_cells_width, num_cells_depth, 0, 1.0);
-		TetrahedralMesh<2,2>* p_generating_mesh_buske = generator_buske.GetMesh();
+    void TestBuskeRelaxationForces() throw (Exception)
+    {
+        EXIT_IF_PARALLEL; // HoneycombMeshGenerator doesn't work in parallel
 
-		// Convert this to a NodesOnlyMesh
-		NodesOnlyMesh<2> mesh_buske;
-		mesh_buske.ConstructNodesWithoutMesh(*p_generating_mesh_buske);
+        // Create a simple mesh with two nodes
+        HoneycombMeshGenerator generator_buske(2, 1, 0, 1.0);
+        TetrahedralMesh<2,2>* p_generating_mesh_buske = generator_buske.GetMesh();
 
-		// Create cells
-		std::vector<CellPtr> cells_buske;
-		CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator_buske;
-		cells_generator_buske.GenerateBasicRandom(cells_buske, mesh_buske.GetNumNodes(), DIFFERENTIATED);
+        // Convert this to a NodesOnlyMesh
+        NodesOnlyMesh<2> mesh_buske;
+        mesh_buske.ConstructNodesWithoutMesh(*p_generating_mesh_buske);
 
-		// Create a node-based cell population
-		NodeBasedCellPopulation<2> node_based_cell_population_buske(mesh_buske, cells_buske);
-		node_based_cell_population_buske.SetMechanicsCutOffLength(1.5);
+        // Create cells
+        std::vector<CellPtr> cells_buske;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator_buske;
+        cells_generator_buske.GenerateBasicRandom(cells_buske, mesh_buske.GetNumNodes(), DIFFERENTIATED);
 
-		// Set up cell-based simulation
-		CellBasedSimulation<2> simulator(node_based_cell_population_buske);
-		simulator.SetOutputDirectory("TestBuskeRelaxation");
-		simulator.SetEndTime(1.0);
+        // Create a node-based cell population
+        NodeBasedCellPopulation<2> node_based_cell_population_buske(mesh_buske, cells_buske);
+        node_based_cell_population_buske.SetMechanicsCutOffLength(1.5);
 
-		// Create all three Buske force laws and pass to the simulation
-		BuskeCompressionForce<2> buske_compression_force;
-		BuskeElasticForce<2> buske_elastic_force;
-		BuskeAdhesiveForce<2> buske_adhesive_force;
-		simulator.AddForce(&buske_compression_force);
-		simulator.AddForce(&buske_elastic_force);
-		simulator.AddForce(&buske_adhesive_force);
+        // Set up cell-based simulation
+        CellBasedSimulation<2> simulator(node_based_cell_population_buske);
+        simulator.SetOutputDirectory("TestBuskeRelaxation");
+        simulator.SetEndTime(1.0);
 
-		// Solve
-		simulator.Solve();
+        // Create all three Buske force laws and pass to the simulation
+        BuskeCompressionForce<2> buske_compression_force;
+        BuskeElasticForce<2> buske_elastic_force;
+        BuskeAdhesiveForce<2> buske_adhesive_force;
+        simulator.AddForce(&buske_compression_force);
+        simulator.AddForce(&buske_elastic_force);
+        simulator.AddForce(&buske_adhesive_force);
 
-		// The nodes should be about 1.7 apart as this is the minimum of the sum of the energies.
-		TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()[0], -0.3596,  1e-4);
-		TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(1)->rGetLocation()[0], 1.3596,  1e-4);
-	}
+        // Solve
+        simulator.Solve();
+
+        // The nodes should be about 1.7 apart as this is the minimum of the sum of the energies.
+        TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()[0], -0.3596,  1e-4);
+        TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(1)->rGetLocation()[0], 1.3596,  1e-4);
+    }
 };
 
 #endif /*TESTCELLBASEDSIMULATIONWITHBUSKEFORCES_HPP_*/

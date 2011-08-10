@@ -49,10 +49,10 @@ public:
 
     void TestBoundaryConditions() throw (Exception)
     {
-    	// Create a simple mesh
-        unsigned num_cells_depth = 2;
-        unsigned num_cells_width = 2;
-        HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
+        EXIT_IF_PARALLEL; //HoneycombMeshGenerator doesn't work in parallel
+
+        // Create a simple mesh
+        HoneycombMeshGenerator generator(2, 2, 0);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
 
         // Create cells
