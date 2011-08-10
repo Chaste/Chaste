@@ -67,7 +67,6 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
          ++cell_iter)
     {
         // First, create and store a copy of this real node and cell
-        unsigned real_node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
         c_vector<double, DIM> real_node_location = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
 
         // Create a copy of this cell and store it
@@ -75,11 +74,10 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
         extended_cells[count] = p_real_cell;
 
         // Create a copy of the node corresponding to this cell and store it
-    	Node<DIM>* p_real_node = new Node<DIM>(real_node_index, real_node_location);
+    	Node<DIM>* p_real_node = new Node<DIM>(count, real_node_location);
     	extended_nodes[count] = p_real_node;
 
         // Second, create and store the corresponding image node and cell
-        unsigned image_node_index = num_real_cells + real_node_index;
         c_vector<double, DIM> image_node_location = real_node_location;
         if (image_node_location[0] >= centroid(0))
         {
@@ -95,7 +93,7 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
         extended_cells[num_real_cells+count] = p_image_cell;
 
         // Create a copy of the node corresponding to this cell, suitable translated, and store it
-        Node<DIM>* p_image_node = new Node<DIM>(image_node_index, image_node_location);
+        Node<DIM>* p_image_node = new Node<DIM>(num_real_cells + count, image_node_location);
         extended_nodes[num_real_cells+count] = p_image_node;
 
         count++;
@@ -123,11 +121,16 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
         // Apply this force to any real nodes (i.e. nodes whose indices are less than num_real_nodes)
         if (nodeA_global_index < num_real_cells)
         {
-            rForces[nodeA_global_index] += force;
+            
+            CellPtr p_cell = p_extended_cell_population->GetCellUsingLocationIndex(nodeA_global_index);
+            unsigned index = rCellPopulation.GetLocationIndexUsingCell(p_cell);
+            rForces[index] += force;
         }
         if (nodeB_global_index < num_real_cells)
         {
-            rForces[nodeB_global_index] -= force;
+            CellPtr p_cell = p_extended_cell_population->GetCellUsingLocationIndex(nodeB_global_index);
+            unsigned index = rCellPopulation.GetLocationIndexUsingCell(p_cell);
+            rForces[index] -= force;
         }
     }
 
