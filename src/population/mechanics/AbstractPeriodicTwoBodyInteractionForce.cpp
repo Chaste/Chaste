@@ -28,7 +28,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "AbstractPeriodicTwoBodyInteractionForce.hpp"
 
-
 template<unsigned DIM>
 AbstractPeriodicTwoBodyInteractionForce<DIM>::AbstractPeriodicTwoBodyInteractionForce()
    : AbstractTwoBodyInteractionForce<DIM>(),
@@ -40,119 +39,78 @@ template<unsigned DIM>
 void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
                                                                 AbstractCellPopulation<DIM>& rCellPopulation)
 {
+    /*
+     * Rather than iterating over the springs here, we first create a new, extended mesh by copying
+     * real nodes to form image nodes on either side of the original mesh and creating an extended
+     * cell population. We then use this extended cell population to work out the forces acting on
+     * the real nodes.
+     */
+
     // This method currently works only in 2d
     assert(DIM == 2);
 
-    // Create a helper pointer
-	MeshBasedCellPopulation<DIM>* p_cell_population = static_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation);
-
-	/*
-	 * Rather than iterating over the springs here, we first create a new, extended mesh by copying
-	 * real nodes to form image nodes on either side of the original mesh and creating an extended
-	 * cell population. We then use this extended cell population to work out the forces acting on
-	 * the real nodes.
-	 */
-
-	// These vectors will contain the real nodes and image nodes, and real cells and image cells, respectively
-	std::vector<Node<DIM>*> extended_node_set;
-    std::vector<CellPtr > extended_cell_set;
-
-	// This vector will contain only the image nodes, and image cells, respectively
-	std::vector<Node<DIM>*> image_node_set;
-    std::vector<CellPtr> image_cells;
-
-    // This vector will contain only the real cells
-	std::vector<CellPtr> real_cells;
-
-	unsigned num_real_nodes = rCellPopulation.GetNumRealCells();
-	unsigned new_image_node_index = num_real_nodes;
+    unsigned num_real_nodes = rCellPopulation.GetNumRealCells();
+	std::vector<Node<DIM>*> extended_nodes(2*num_real_nodes);
+    std::vector<CellPtr> extended_cells(2*num_real_nodes);
 
 	// The width of the extended mesh
 	double extended_mesh_width =  mInitialWidth;
 
-	// Calculate centroid of cell population
+	// Calculate the cell population's centroid
 	c_vector<double, DIM> centroid = rCellPopulation.GetCentroidOfCellPopulation();
 
-    // We iterate over all cells in the population
+    ///\todo The code block below would need to be amended for 3d (#1856)
+    ///\todo Think more about the use of centroid to make more general (#1856)
+
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
          cell_iter != rCellPopulation.End();
          ++cell_iter)
     {
-        // Create the 'real' cell corresponding to this cell and add it to the vector of real cells
-        CellPtr p_real_cell(new Cell(cell_iter->GetMutationState(), cell_iter->GetCellCycleModel(), false));
-        real_cells.push_back(p_real_cell);
+        // First, create and store a copy of this real node and cell
+        unsigned real_node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
+        c_vector<double, DIM> real_node_location = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
 
-        // Get the node corresponding to this cell
-    	Node<DIM>* p_node = p_cell_population->GetNodeCorrespondingToCell(*cell_iter);
-    	c_vector<double,DIM> real_node_location = p_node->rGetLocation();
-    	unsigned real_node_index = p_node->GetIndex();
+        // Create a copy of this cell and store it
+        CellPtr p_real_cell = *cell_iter;
+        extended_cells[real_node_index] = p_real_cell;
 
-    	// Create a copy of this node and add it to the vector of all nodes
-    	// (we push back all the original nodes first so that they are all kept together)
+        // Create a copy of the node corresponding to this cell and store it
     	Node<DIM>* p_real_node = new Node<DIM>(real_node_index, real_node_location);
-    	extended_node_set.push_back(p_real_node);
+    	extended_nodes[real_node_index] = p_real_node;
 
-    	///\todo The code block below would need to be amended for 3d (#1856)
-    	///\todo Think more about the use of centroid to make more general (#1856)
+        // Second, create and store the corresponding image node and cell
+        unsigned image_node_index = real_node_index + num_real_nodes;
+        c_vector<double, DIM> image_node_location = real_node_location;
+        if (image_node_location[0] >= centroid(0))
+        {
+            image_node_location[0] -= extended_mesh_width;
+        }
+        else if (image_node_location[0] < centroid(0))
+        {
+            image_node_location[0] += extended_mesh_width;
+        }
 
-    	// Compute the location of the image node corresponding to this node
-        c_vector<double,DIM> image_node_location = real_node_location;
-		if (real_node_location[0] >= centroid(0)) // Right-hand boundary node
-		{
-			image_node_location[0] -= extended_mesh_width;
-		}
-		else if (real_node_location[0] < centroid(0))
-		{
-			image_node_location[0] += extended_mesh_width;
-		}
+        // Create a copy of this cell and store it
+        CellPtr p_image_cell = *cell_iter;
+        extended_cells[image_node_index] = p_image_cell;
 
-		// Create the image node corresponding to this node and add it to the vector of image nodes
-		Node<DIM>* p_image_node = new Node<DIM>(new_image_node_index, image_node_location);
-        image_node_set.push_back(p_image_node);
-
-		// Create the image cell corresponding to this cell and add it to the vector of image cells
-		CellPtr p_image_cell(new Cell(cell_iter->GetMutationState(), cell_iter->GetCellCycleModel(), false));
-		image_cells.push_back(p_image_cell);
-
-		///\todo No set age method, which may matter when it comes to working out the rest length
-		//      of the spring for the force calculation (#1856)
-//		p_new_image_cell->SetAge();
-
-        // Start from total number of real nodes and increment upwards
-		new_image_node_index++;
+        // Create a copy of the node corresponding to this cell, suitable translated, and store it
+        Node<DIM>* p_image_node = new Node<DIM>(image_node_index, image_node_location);
+        extended_nodes[image_node_index] = p_image_node;
     }
 
-    // Now construct the vectors extended_node_set and extended_cell_set so that
-    // the image nodes/cells are together at the end of each vector
-    for (unsigned i=0; i<image_node_set.size(); i++)
-    {
-    	extended_node_set.push_back(image_node_set[i]);
-    }
-    for (unsigned i=0; i<real_cells.size(); i++)
-    {
-    	extended_cell_set.push_back(real_cells[i]);
-    }
-    for (unsigned i=0; i<image_cells.size(); i++)
-    {
-    	extended_cell_set.push_back(image_cells[i]);
-    }
+    // Now construct a mesh using extended_nodes
+    MutableMesh<DIM,DIM>* p_extended_mesh = new MutableMesh<DIM,DIM>(extended_nodes);
 
-    // Check that the vectors extended_node_set and extended_cell_set are the correct size
-    assert(extended_cell_set.size() == 2*num_real_nodes);
-    assert(extended_node_set.size() == 2*num_real_nodes);
+    // Use extended_mesh and extended_cells to create a MeshBasedCellPopulation
+    MeshBasedCellPopulation<DIM>* p_extended_cell_population = new MeshBasedCellPopulation<DIM>(*p_extended_mesh, extended_cells, std::vector<unsigned>(), false, false);
 
-    // We now construct a mesh using extended_node_set...
-    MutableMesh<DIM,DIM> extended_mesh(extended_node_set);
-
-    // ...and, with this mesh and extended_cell_set, we create a MeshBasedCellPopulation
-    MeshBasedCellPopulation<DIM>* p_extended_cell_population = new MeshBasedCellPopulation<DIM>(extended_mesh, extended_cell_set);
-
-    ///\todo might we need to call Update() on extended_cell_population to ensure that mMarkedSprings is correct? (#1856)
+    ///\todo should we call p_extended_cell_population->Update() to ensure mMarkedSprings is correct? (#1856)
 
 	// Now loop over the extended mesh and calculate the force acting on real nodes
-	// (using the edge iterator ensures that each edge is visited only once)
-    for (typename MutableMesh<DIM,DIM>::EdgeIterator edge_iterator = extended_mesh.EdgesBegin();
-         edge_iterator != extended_mesh.EdgesEnd();
+	// (using the edge iterator ensures that each edge is visited exactly once)
+    for (typename MutableMesh<DIM,DIM>::EdgeIterator edge_iterator = p_extended_mesh->EdgesBegin();
+         edge_iterator != p_extended_mesh->EdgesEnd();
          ++edge_iterator)
     {
         unsigned nodeA_global_index = edge_iterator.GetNodeA()->GetIndex();
@@ -160,21 +118,20 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
 
         c_vector<double, DIM> force = CalculateForceBetweenNodes(nodeA_global_index, nodeB_global_index, *p_extended_cell_population);
 
-        // Now we make sure that we only apply the force to the real node and not the image node
-        if ((nodeA_global_index < num_real_nodes) && (nodeB_global_index < num_real_nodes))
+        // Apply this force to any real nodes (i.e. nodes whose indices are less than num_real_nodes)
+        if (nodeA_global_index < num_real_nodes)
         {
-			rForces[nodeB_global_index] -= force;
-			rForces[nodeA_global_index] += force;
+            rForces[nodeA_global_index] += force;
         }
-        else if ((nodeA_global_index >= num_real_nodes) && (nodeB_global_index < num_real_nodes))
+        if (nodeB_global_index < num_real_nodes)
         {
-			rForces[nodeB_global_index] -= force;
-        }
-        else if ((nodeA_global_index < num_real_nodes) && (nodeB_global_index >= num_real_nodes))
-        {
-        	rForces[nodeA_global_index] += force;
+            rForces[nodeB_global_index] -= force;
         }
     }
+
+    // Avoid memory leaks
+    delete p_extended_cell_population;
+    delete p_extended_mesh;
 }
 
 template<unsigned DIM>

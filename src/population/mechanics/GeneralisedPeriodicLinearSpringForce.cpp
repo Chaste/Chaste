@@ -96,7 +96,7 @@ c_vector<double, DIM> GeneralisedPeriodicLinearSpringForce<DIM>::CalculateForceB
     {
         if (distance_between_nodes >= this->GetCutOffLength())
         {
-            return zero_vector<double>(DIM); // c_vector<double,DIM>() is not guaranteed to be fresh memory
+            return zero_vector<double>(DIM);
         }
     }
 

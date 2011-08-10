@@ -91,7 +91,6 @@ public:
     void AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
                               AbstractCellPopulation<DIM>& rCellPopulation);
 
-
     /**
      * Returns the initial width.
      */
@@ -99,7 +98,7 @@ public:
 
     /**
      * Returns the initial width.
-     * 
+     *
      * @param initialWidth the initial width
      */
     void SetInitialWidth(double initialWidth);

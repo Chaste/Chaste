@@ -87,8 +87,8 @@ protected:
      * Represented by the parameter mu in the model by Meineke et al (2001) in
      * their off-lattice model of the intestinal crypt
      * (doi:10.1046/j.0960-7722.2001.00216.x).
-     * 
-     * Initialised to 15.0 in the constructor. 
+     *
+     * Initialised to 15.0 in the constructor.
      */
     double mMeinekeSpringStiffness;
 
