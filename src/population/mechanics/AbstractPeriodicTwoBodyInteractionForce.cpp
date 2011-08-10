@@ -52,11 +52,11 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
 	// These vectors will contain the real nodes and image nodes, and real cells and image cells, respectively
     // We make separate vectors for the image nodes so these can be added on at the end. Otherwise end up in trouble
     // with incorrect indices if you have ghost nodes.
-	std::vector<Node<DIM>*> extended_node_set;
-    std::vector<CellPtr > extended_cell_set;
+	std::vector<Node<DIM>*> extended_nodes;
+    std::vector<CellPtr > extended_cells;
 
 	// This vector will contain only the image nodes, and image cells, respectively
-	std::vector<Node<DIM>*> image_node_set;
+	std::vector<Node<DIM>*> image_nodes;
     std::vector<CellPtr> image_cells;
 
     // This vector will contain only the real cells
@@ -88,7 +88,7 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
 
         // Create a copy of the node corresponding to this cell and store it
     	Node<DIM>* p_real_node = new Node<DIM>(real_node_index, real_node_location);
-     	extended_node_set.push_back(p_real_node);
+     	extended_nodes.push_back(p_real_node);
 
         // Second, create and store the corresponding image node and cell
         c_vector<double, DIM> image_node_location = real_node_location;
@@ -108,36 +108,36 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
 
         // Create a copy of the node corresponding to this cell, suitable translated, and store it
         Node<DIM>* p_image_node = new Node<DIM>(new_image_node_index, image_node_location);
-        image_node_set.push_back(p_image_node);
+        image_nodes.push_back(p_image_node);
 
         // Start from total number of real nodes and increment upwards
 		new_image_node_index++;
     }
 
-    // Now construct the vectors extended_node_set and extended_cell_set so that
+    // Now construct the vectors extended_nodes and extended_cells so that
     // the image nodes/cells are together at the end of each vector
-    for (unsigned i=0; i<image_node_set.size(); i++)
+    for (unsigned i=0; i<image_nodes.size(); i++)
     {
-    	extended_node_set.push_back(image_node_set[i]);
+    	extended_nodes.push_back(image_nodes[i]);
     }
     for (unsigned i=0; i<real_cells.size(); i++)
     {
-    	extended_cell_set.push_back(real_cells[i]);
+    	extended_cells.push_back(real_cells[i]);
     }
     for (unsigned i=0; i<image_cells.size(); i++)
     {
-    	extended_cell_set.push_back(image_cells[i]);
+    	extended_cells.push_back(image_cells[i]);
     }
 
-    // Check that the vectors extended_node_set and extended_cell_set are the correct size
-    assert(extended_cell_set.size() == 2*num_real_cells);
-    assert(extended_node_set.size() == 2*num_real_cells);
+    // Check that the vectors extended_nodes and extended_cells are the correct size
+    assert(extended_cells.size() == 2*num_real_cells);
+    assert(extended_nodes.size() == 2*num_real_cells);
 
-    // We now construct a mesh using extended_node_set...
-    MutableMesh<DIM,DIM>* p_extended_mesh = new MutableMesh<DIM,DIM>(extended_node_set);
+    // We now construct a mesh using extended_nodes...
+    MutableMesh<DIM,DIM>* p_extended_mesh = new MutableMesh<DIM,DIM>(extended_nodes);
 
-    // ...and, with this mesh and extended_cell_set, we create a MeshBasedCellPopulation
-    MeshBasedCellPopulation<DIM>* p_extended_cell_population = new MeshBasedCellPopulation<DIM>(*p_extended_mesh, extended_cell_set, std::vector<unsigned>(), false, false);
+    // ...and, with this mesh and extended_cells, we create a MeshBasedCellPopulation
+    MeshBasedCellPopulation<DIM>* p_extended_cell_population = new MeshBasedCellPopulation<DIM>(*p_extended_mesh, extended_cells, std::vector<unsigned>(), false, false);
 
     ///\todo should we call p_extended_cell_population->Update() to ensure mMarkedSprings is correct? (#1856)
 
