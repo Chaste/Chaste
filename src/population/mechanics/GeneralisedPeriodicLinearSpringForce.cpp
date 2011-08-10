@@ -107,12 +107,6 @@ c_vector<double, DIM> GeneralisedPeriodicLinearSpringForce<DIM>::CalculateForceB
     CellPtr p_cell_A = rCellPopulation.GetCellUsingLocationIndex(nodeAGlobalIndex);
     CellPtr p_cell_B = rCellPopulation.GetCellUsingLocationIndex(nodeBGlobalIndex);
 
-    double ageA = p_cell_A->GetAge();
-    double ageB = p_cell_B->GetAge();
-
-    assert(!std::isnan(ageA));
-    assert(!std::isnan(ageB));
-
     ///\todo Extend force class to cope with newly divided cells (#1856)
 
     double a_rest_length = rest_length*0.5;
