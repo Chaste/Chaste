@@ -36,6 +36,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "MeshBasedCellPopulation.hpp"
+#include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "GeneralisedPeriodicLinearSpringForce.hpp"
 #include "HoneycombMeshGenerator.hpp"
@@ -47,7 +48,7 @@ class TestPeriodicForces : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestBoundaryConditions() throw (Exception)
+    void TestPeriodicForceOnHoneycombMesh() throw (Exception)
     {
         EXIT_IF_PARALLEL; //HoneycombMeshGenerator doesn't work in parallel
 
@@ -146,6 +147,52 @@ public:
         TS_ASSERT_DELTA(node_forces[6][0], -2.01801, 1e-3);
         TS_ASSERT_DELTA(node_forces[6][1], 0.731214, 1e-3);
     }
+
+    void TestPeriodicForceOnHoneycombMeshWithGhostNodes() throw (Exception)
+    {
+        EXIT_IF_PARALLEL; //HoneycombMeshGenerator doesn't work in parallel
+
+        // Create a simple mesh
+        HoneycombMeshGenerator generator(2, 2, 1);
+        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
+
+        // Create cell population
+        MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
+
+        // Get initial width of the cell population
+        double initial_width = cell_population.GetWidth(0);
+
+        // Create force
+        GeneralisedPeriodicLinearSpringForce<2> linear_force;
+        linear_force.SetInitialWidth(initial_width);
+
+        // Initialise a vector of node forces
+        std::vector<c_vector<double, 2> > node_forces;
+        node_forces.reserve(cell_population.GetNumNodes());
+
+        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        {
+            node_forces.push_back(zero_vector<double>(2));
+        }
+
+        linear_force.AddForceContribution(node_forces, cell_population);
+
+        TS_ASSERT_DELTA(node_forces[0][0], 7.5, 1e-3);
+        TS_ASSERT_DELTA(node_forces[0][1], -2.00962, 1e-3);
+        TS_ASSERT_DELTA(node_forces[1][0], -7.5, 1e-3);
+        TS_ASSERT_DELTA(node_forces[1][1], -2.88444e-15, 1e-3);
+        TS_ASSERT_DELTA(node_forces[2][0], 7.5, 1e-3);
+        TS_ASSERT_DELTA(node_forces[2][1], 2.88444e-15, 1e-3);
+        TS_ASSERT_DELTA(node_forces[3][0], -7.5, 1e-3);
+        TS_ASSERT_DELTA(node_forces[3][1], 2.00962, 1e-3);
+    }
+
 
     void TestGeneralisedPeriodicLinearSpringForceArchiving() throw (Exception)
     {
