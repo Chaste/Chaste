@@ -34,6 +34,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <boost/archive/text_iarchive.hpp>
 
 #include "CellsGenerator.hpp"
+#include "CellBasedSimulation.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
@@ -148,21 +149,21 @@ public:
         TS_ASSERT_DELTA(node_forces[6][1], 0.731214, 1e-3);
     }
 
-    void noTestPeriodicForceOnHoneycombMeshWithGhostNodes() throw (Exception)
+    void TestPeriodicForceOnHoneycombMeshWithGhostNodes() throw (Exception)
     {
         EXIT_IF_PARALLEL; // HoneycombMeshGenerator doesn't work in parallel
 
-        // Create a simple mesh
         HoneycombMeshGenerator generator(2, 2, 1);
+
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
-        // Create cells
+        // Set up cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, location_indices.size());
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel,2> cells_generator;
+        cells_generator.GenerateGivenLocationIndices(cells, location_indices);
 
-        // Create cell population
+        // Create a cell population
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
 
         // Get initial width of the cell population
@@ -170,7 +171,7 @@ public:
 
         // Create force
         GeneralisedPeriodicLinearSpringForce<2> linear_force;
-        linear_force.SetInitialWidth(initial_width);
+        linear_force.SetInitialWidth(initial_width+0.5);
 
         // Initialise a vector of node forces
         std::vector<c_vector<double, 2> > node_forces;
@@ -183,14 +184,14 @@ public:
 
         linear_force.AddForceContribution(node_forces, cell_population);
 
-        TS_ASSERT_DELTA(node_forces[5][0], 7.5, 1e-3);
-        TS_ASSERT_DELTA(node_forces[5][1], -2.00962, 1e-3);
-        TS_ASSERT_DELTA(node_forces[6][0], -7.5, 1e-3);
-        TS_ASSERT_DELTA(node_forces[6][1], -2.88444e-15, 1e-3);
-        TS_ASSERT_DELTA(node_forces[9][0], 7.5, 1e-3);
-        TS_ASSERT_DELTA(node_forces[9][1], 2.88444e-15, 1e-3);
-        TS_ASSERT_DELTA(node_forces[10][0], -7.5, 1e-3);
-        TS_ASSERT_DELTA(node_forces[10][1], 2.00962, 1e-3);
+        TS_ASSERT_DELTA(node_forces[5][0], 0.0, 1e-4);
+        TS_ASSERT_DELTA(node_forces[5][1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(node_forces[6][0], 0.0, 1e-4);
+        TS_ASSERT_DELTA(node_forces[6][1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(node_forces[9][0], 0.0, 1e-4);
+        TS_ASSERT_DELTA(node_forces[9][1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(node_forces[10][0], 0.0, 1e-4);
+        TS_ASSERT_DELTA(node_forces[10][1], 0.0, 1e-4);
     }
 
     void TestGeneralisedPeriodicLinearSpringForceArchiving() throw (Exception)

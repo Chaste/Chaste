@@ -49,9 +49,21 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
     // This method currently works only in 2d
     assert(DIM == 2);
 
-    unsigned num_real_cells = rCellPopulation.GetNumRealCells();
-	std::vector<Node<DIM>*> extended_nodes(2*num_real_cells);
-    std::vector<CellPtr> extended_cells(2*num_real_cells);
+	// These vectors will contain the real nodes and image nodes, and real cells and image cells, respectively
+    // We make separate vectors for the image nodes so these can be added on at the end. Otherwise end up in trouble
+    // with incorrect indices if you have ghost nodes.
+	std::vector<Node<DIM>*> extended_node_set;
+    std::vector<CellPtr > extended_cell_set;
+
+	// This vector will contain only the image nodes, and image cells, respectively
+	std::vector<Node<DIM>*> image_node_set;
+    std::vector<CellPtr> image_cells;
+
+    // This vector will contain only the real cells
+	std::vector<CellPtr> real_cells;
+
+	unsigned num_real_cells = rCellPopulation.GetNumRealCells();
+	unsigned new_image_node_index = num_real_cells;
 
 	// The width of the extended mesh
 	double extended_mesh_width =  mInitialWidth;
@@ -61,24 +73,26 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
 
     ///\todo The code block below would need to be amended for 3d (#1856)
     ///\todo Think more about the use of centroid to make more general (#1856)
-    unsigned count = 0;
+
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
          cell_iter != rCellPopulation.End();
          ++cell_iter)
     {
         // First, create and store a copy of this real node and cell
+        unsigned real_node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
         c_vector<double, DIM> real_node_location = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
 
         // Create a copy of this cell and store it
         CellPtr p_real_cell = *cell_iter;
-        extended_cells[count] = p_real_cell;
+        real_cells.push_back(p_real_cell);
 
         // Create a copy of the node corresponding to this cell and store it
-    	Node<DIM>* p_real_node = new Node<DIM>(count, real_node_location);
-    	extended_nodes[count] = p_real_node;
+    	Node<DIM>* p_real_node = new Node<DIM>(real_node_index, real_node_location);
+     	extended_node_set.push_back(p_real_node);
 
         // Second, create and store the corresponding image node and cell
         c_vector<double, DIM> image_node_location = real_node_location;
+
         if (image_node_location[0] >= centroid(0))
         {
             image_node_location[0] -= extended_mesh_width;
@@ -90,20 +104,40 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
 
         // Create a copy of this cell and store it
         CellPtr p_image_cell = *cell_iter;
-        extended_cells[num_real_cells+count] = p_image_cell;
+        image_cells.push_back(p_image_cell);
 
         // Create a copy of the node corresponding to this cell, suitable translated, and store it
-        Node<DIM>* p_image_node = new Node<DIM>(num_real_cells + count, image_node_location);
-        extended_nodes[num_real_cells+count] = p_image_node;
+        Node<DIM>* p_image_node = new Node<DIM>(new_image_node_index, image_node_location);
+        image_node_set.push_back(p_image_node);
 
-        count++;
+        // Start from total number of real nodes and increment upwards
+		new_image_node_index++;
     }
 
-    // Now construct a mesh using extended_nodes
-    MutableMesh<DIM,DIM>* p_extended_mesh = new MutableMesh<DIM,DIM>(extended_nodes);
+    // Now construct the vectors extended_node_set and extended_cell_set so that
+    // the image nodes/cells are together at the end of each vector
+    for (unsigned i=0; i<image_node_set.size(); i++)
+    {
+    	extended_node_set.push_back(image_node_set[i]);
+    }
+    for (unsigned i=0; i<real_cells.size(); i++)
+    {
+    	extended_cell_set.push_back(real_cells[i]);
+    }
+    for (unsigned i=0; i<image_cells.size(); i++)
+    {
+    	extended_cell_set.push_back(image_cells[i]);
+    }
 
-    // Use extended_mesh and extended_cells to create a MeshBasedCellPopulation
-    MeshBasedCellPopulation<DIM>* p_extended_cell_population = new MeshBasedCellPopulation<DIM>(*p_extended_mesh, extended_cells, std::vector<unsigned>(), false, false);
+    // Check that the vectors extended_node_set and extended_cell_set are the correct size
+    assert(extended_cell_set.size() == 2*num_real_cells);
+    assert(extended_node_set.size() == 2*num_real_cells);
+
+    // We now construct a mesh using extended_node_set...
+    MutableMesh<DIM,DIM>* p_extended_mesh = new MutableMesh<DIM,DIM>(extended_node_set);
+
+    // ...and, with this mesh and extended_cell_set, we create a MeshBasedCellPopulation
+    MeshBasedCellPopulation<DIM>* p_extended_cell_population = new MeshBasedCellPopulation<DIM>(*p_extended_mesh, extended_cell_set, std::vector<unsigned>(), false, false);
 
     ///\todo should we call p_extended_cell_population->Update() to ensure mMarkedSprings is correct? (#1856)
 
@@ -121,16 +155,11 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
         // Apply this force to any real nodes (i.e. nodes whose indices are less than num_real_nodes)
         if (nodeA_global_index < num_real_cells)
         {
-            
-            CellPtr p_cell = p_extended_cell_population->GetCellUsingLocationIndex(nodeA_global_index);
-            unsigned index = rCellPopulation.GetLocationIndexUsingCell(p_cell);
-            rForces[index] += force;
+            rForces[nodeA_global_index] += force;
         }
         if (nodeB_global_index < num_real_cells)
         {
-            CellPtr p_cell = p_extended_cell_population->GetCellUsingLocationIndex(nodeB_global_index);
-            unsigned index = rCellPopulation.GetLocationIndexUsingCell(p_cell);
-            rForces[index] -= force;
+            rForces[nodeB_global_index] -= force;
         }
     }
 
