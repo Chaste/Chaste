@@ -37,7 +37,7 @@ AbstractPeriodicTwoBodyInteractionForce<DIM>::AbstractPeriodicTwoBodyInteraction
 
 template<unsigned DIM>
 void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
-                                                                AbstractCellPopulation<DIM>& rCellPopulation)
+                                                                        AbstractCellPopulation<DIM>& rCellPopulation)
 {
     /*
      * Rather than iterating over the springs here, we first create a new, extended mesh by copying
@@ -49,9 +49,9 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
     // This method currently works only in 2d
     assert(DIM == 2);
 
-    unsigned num_real_nodes = rCellPopulation.GetNumRealCells();
-	std::vector<Node<DIM>*> extended_nodes(2*num_real_nodes);
-    std::vector<CellPtr> extended_cells(2*num_real_nodes);
+    unsigned num_real_cells = rCellPopulation.GetNumRealCells();
+	std::vector<Node<DIM>*> extended_nodes(2*num_real_cells);
+    std::vector<CellPtr> extended_cells(2*num_real_cells);
 
 	// The width of the extended mesh
 	double extended_mesh_width =  mInitialWidth;
@@ -61,7 +61,7 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
 
     ///\todo The code block below would need to be amended for 3d (#1856)
     ///\todo Think more about the use of centroid to make more general (#1856)
-
+    unsigned count = 0;
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
          cell_iter != rCellPopulation.End();
          ++cell_iter)
@@ -72,14 +72,14 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
 
         // Create a copy of this cell and store it
         CellPtr p_real_cell = *cell_iter;
-        extended_cells[real_node_index] = p_real_cell;
+        extended_cells[count] = p_real_cell;
 
         // Create a copy of the node corresponding to this cell and store it
     	Node<DIM>* p_real_node = new Node<DIM>(real_node_index, real_node_location);
-    	extended_nodes[real_node_index] = p_real_node;
+    	extended_nodes[count] = p_real_node;
 
         // Second, create and store the corresponding image node and cell
-        unsigned image_node_index = real_node_index + num_real_nodes;
+        unsigned image_node_index = num_real_cells + real_node_index;
         c_vector<double, DIM> image_node_location = real_node_location;
         if (image_node_location[0] >= centroid(0))
         {
@@ -92,11 +92,13 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
 
         // Create a copy of this cell and store it
         CellPtr p_image_cell = *cell_iter;
-        extended_cells[image_node_index] = p_image_cell;
+        extended_cells[num_real_cells+count] = p_image_cell;
 
         // Create a copy of the node corresponding to this cell, suitable translated, and store it
         Node<DIM>* p_image_node = new Node<DIM>(image_node_index, image_node_location);
-        extended_nodes[image_node_index] = p_image_node;
+        extended_nodes[num_real_cells+count] = p_image_node;
+
+        count++;
     }
 
     // Now construct a mesh using extended_nodes
@@ -119,11 +121,11 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
         c_vector<double, DIM> force = CalculateForceBetweenNodes(nodeA_global_index, nodeB_global_index, *p_extended_cell_population);
 
         // Apply this force to any real nodes (i.e. nodes whose indices are less than num_real_nodes)
-        if (nodeA_global_index < num_real_nodes)
+        if (nodeA_global_index < num_real_cells)
         {
             rForces[nodeA_global_index] += force;
         }
-        if (nodeB_global_index < num_real_nodes)
+        if (nodeB_global_index < num_real_cells)
         {
             rForces[nodeB_global_index] -= force;
         }

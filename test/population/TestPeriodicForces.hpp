@@ -150,7 +150,7 @@ public:
 
     void TestPeriodicForceOnHoneycombMeshWithGhostNodes() throw (Exception)
     {
-        EXIT_IF_PARALLEL; //HoneycombMeshGenerator doesn't work in parallel
+        EXIT_IF_PARALLEL; // HoneycombMeshGenerator doesn't work in parallel
 
         // Create a simple mesh
         HoneycombMeshGenerator generator(2, 2, 1);
@@ -160,7 +160,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes(), location_indices);
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
@@ -192,7 +192,6 @@ public:
         TS_ASSERT_DELTA(node_forces[3][0], -7.5, 1e-3);
         TS_ASSERT_DELTA(node_forces[3][1], 2.00962, 1e-3);
     }
-
 
     void TestGeneralisedPeriodicLinearSpringForceArchiving() throw (Exception)
     {
