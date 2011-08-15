@@ -31,7 +31,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 template<unsigned DIM>
 AbstractPeriodicTwoBodyInteractionForce<DIM>::AbstractPeriodicTwoBodyInteractionForce()
    : AbstractTwoBodyInteractionForce<DIM>(),
-     mInitialWidth(0.0),
+     mPeriodicDomainWidth(DOUBLE_UNSET),
      mpExtendedMesh(NULL)
 {
 }
@@ -46,14 +46,17 @@ template<unsigned DIM>
 void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
                                                                         AbstractCellPopulation<DIM>& rCellPopulation)
 {
+    // If the width of the periodic domain has not been specified, use the initial width of the cell population
+    if (mPeriodicDomainWidth == DOUBLE_UNSET)
+    {
+        mPeriodicDomainWidth = rCellPopulation.GetWidth(0);
+    }
+
     mExtendedMeshNodeIndexMap.clear();
 
     // Create a vector of nodes for use in constructing mpExtendedMesh
     unsigned num_cells = rCellPopulation.GetNumRealCells();
     std::vector<Node<DIM>*> extended_nodes(2*num_cells);
-
-    // The width of the extended mesh
-    double extended_mesh_width = mInitialWidth;
 
     // We iterate over all cells in the population
     unsigned count = 0;
@@ -68,7 +71,7 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
         // Create a copy of the node corresponding to this cell and store it
         Node<DIM>* p_real_node = new Node<DIM>(real_node_index, real_node_location);
         extended_nodes[count] = p_real_node;
-        
+
         /**
          * \todo The code block below would need to be amended for 3d to cope with
          * the z direction too and to make sure we copy from left to right and from
@@ -77,13 +80,13 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
 
         // Compute the location of the image node corresponding to this node
         c_vector<double,DIM> image_node_location = real_node_location;
-        if (real_node_location[0] >= mInitialWidth*0.5) //centroid(0)) // Right-hand boundary node
+        if (real_node_location[0] >= mPeriodicDomainWidth*0.5)
         {
-            image_node_location[0] -= extended_mesh_width;
+            image_node_location[0] -= mPeriodicDomainWidth;
         }
-        else if (real_node_location[0] <  mInitialWidth*0.5) //centroid(0))
+        else if (real_node_location[0] <  mPeriodicDomainWidth*0.5)
         {
-            image_node_location[0] += extended_mesh_width;
+            image_node_location[0] += mPeriodicDomainWidth;
         }
 
         // Create a copy of the node corresponding to this cell, suitable translated, and store it
@@ -108,9 +111,9 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
     {
         unsigned nodeA_global_index = edge_iterator.GetNodeA()->GetIndex();
         unsigned nodeB_global_index = edge_iterator.GetNodeB()->GetIndex();
-               
+
         c_vector<double, DIM> force = CalculateForceBetweenNodes(nodeA_global_index, nodeB_global_index, rCellPopulation);      
-                
+
         // Apply this force to any real nodes (i.e. nodes whose indices are less than num_real_nodes)
         if (nodeA_global_index < num_cells)
         {
@@ -126,21 +129,21 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
 }
 
 template<unsigned DIM>
-double AbstractPeriodicTwoBodyInteractionForce<DIM>::GetInitialWidth()
+double AbstractPeriodicTwoBodyInteractionForce<DIM>::GetPeriodicDomainWidth()
 {
-	return mInitialWidth;
+	return mPeriodicDomainWidth;
 }
 
 template<unsigned DIM>
-void AbstractPeriodicTwoBodyInteractionForce<DIM>::SetInitialWidth(double initialWidth)
+void AbstractPeriodicTwoBodyInteractionForce<DIM>::SetPeriodicDomainWidth(double periodicDomainWidth)
 {
-	mInitialWidth = initialWidth;
+	mPeriodicDomainWidth = periodicDomainWidth;
 }
 
 template<unsigned DIM>
 void AbstractPeriodicTwoBodyInteractionForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<InitialWidth>" << mInitialWidth << "</InitialWidth> \n";
+    *rParamsFile << "\t\t\t<PeriodicDomainWidth>" << mPeriodicDomainWidth << "</PeriodicDomainWidth> \n";
 
     // Call method on direct parent class
     AbstractTwoBodyInteractionForce<DIM>::OutputForceParameters(rParamsFile);

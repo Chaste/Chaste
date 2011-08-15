@@ -54,13 +54,13 @@ private:
         // If Archive is an output archive, then '&' resolves to '<<'
         // If Archive is an input archive, then '&' resolves to '>>'
         archive & boost::serialization::base_object<AbstractForce<DIM> >(*this);
-        archive & mInitialWidth;
+        archive & mPeriodicDomainWidth;
     }
 
 protected:
 
-    /** Initial width of the mesh for use in periodic boundaries. */
-    double mInitialWidth;
+    /** Width of the periodic domain. */
+    double mPeriodicDomainWidth;
     
     /** An extended mesh, used to implement periodicity. */
     MutableMesh<DIM,DIM>* mpExtendedMesh;
@@ -103,16 +103,16 @@ public:
                               AbstractCellPopulation<DIM>& rCellPopulation);
 
     /**
-     * Returns the initial width.
+     * Returns the width of the periodic domain.
      */
-    double GetInitialWidth();
+    double GetPeriodicDomainWidth();
 
     /**
-     * Returns the initial width.
+     * Returns the width of the periodic domain.
      *
-     * @param initialWidth the initial width
+     * @param periodicDomainWidth the width of the periodic domain
      */
-    void SetInitialWidth(double initialWidth);
+    void SetPeriodicDomainWidth(double periodicDomainWidth);
 
     /**
      * Overridden OutputForceParameters() method.

@@ -65,12 +65,8 @@ public:
         // Create cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Get initial width of the cell population
-        double initial_width = cell_population.GetWidth(0);
-
         // Create force
         GeneralisedPeriodicLinearSpringForce<2> linear_force;
-        linear_force.SetInitialWidth(initial_width);
 
         // Initialise a vector of node forces
         std::vector<c_vector<double, 2> > node_forces;
@@ -119,7 +115,7 @@ public:
 
         // Create force
         GeneralisedPeriodicLinearSpringForce<2> linear_force;
-        linear_force.SetInitialWidth(4.5);
+        linear_force.SetPeriodicDomainWidth(4.5);
 
         // Initialise a vector of node forces
         std::vector<c_vector<double, 2> > node_forces;
@@ -168,7 +164,7 @@ public:
 
         // Create force
         GeneralisedPeriodicLinearSpringForce<2> linear_force;
-        linear_force.SetInitialWidth(2.0);
+        linear_force.SetPeriodicDomainWidth(2.0);
 
         // Initialise a vector of node forces
         std::vector<c_vector<double, 2> > node_forces;
@@ -214,7 +210,7 @@ public:
         
         // Create force
         GeneralisedPeriodicLinearSpringForce<2> linear_force;
-        linear_force.SetInitialWidth(1.0);
+        linear_force.SetPeriodicDomainWidth(1.0);
         linear_force.SetCutOffLength(0.5);
         
         // Initialise a vector of node forces
@@ -269,7 +265,7 @@ public:
         
         // Create force
         GeneralisedPeriodicLinearSpringForce<2> linear_force;
-        linear_force.SetInitialWidth(1.0);
+        linear_force.SetPeriodicDomainWidth(1.0);
         linear_force.SetCutOffLength(0.5);
         
         // Initialise a vector of node forces
@@ -302,7 +298,7 @@ public:
             // Create force object and set member variables
             GeneralisedPeriodicLinearSpringForce<2> force;
 
-            force.SetInitialWidth(7.3);
+            force.SetPeriodicDomainWidth(7.3);
             force.SetMeinekeSpringStiffness(13.0);
             force.SetMeinekeDivisionRestingSpringLength(0.6);
             force.SetMeinekeSpringGrowthDuration(2.0);
@@ -327,7 +323,7 @@ public:
             input_arch >> p_force;
 
             // Check member variables have been correctly archived
-            TS_ASSERT_DELTA(dynamic_cast<GeneralisedPeriodicLinearSpringForce<2>*>(p_force)->GetInitialWidth(), 7.3, 1e-6);
+            TS_ASSERT_DELTA(dynamic_cast<GeneralisedPeriodicLinearSpringForce<2>*>(p_force)->GetPeriodicDomainWidth(), 7.3, 1e-6);
             TS_ASSERT_DELTA(dynamic_cast<GeneralisedPeriodicLinearSpringForce<2>*>(p_force)->GetMeinekeSpringStiffness(), 13.0, 1e-6);
             TS_ASSERT_DELTA(dynamic_cast<GeneralisedPeriodicLinearSpringForce<2>*>(p_force)->GetMeinekeDivisionRestingSpringLength(), 0.6, 1e-6);
             TS_ASSERT_DELTA(dynamic_cast<GeneralisedPeriodicLinearSpringForce<2>*>(p_force)->GetMeinekeSpringGrowthDuration(), 2.0, 1e-6);
@@ -345,7 +341,7 @@ public:
         // Test with GeneralisedPeriodicLinearSpringForce
         GeneralisedPeriodicLinearSpringForce<2> force;
 
-        force.SetInitialWidth(7.3);
+        force.SetPeriodicDomainWidth(7.3);
         force.SetMeinekeSpringStiffness(13.0);
         force.SetMeinekeDivisionRestingSpringLength(0.6);
         force.SetMeinekeSpringGrowthDuration(2.0);
