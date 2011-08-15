@@ -183,7 +183,7 @@ public:
         surface_area_constraint.SetMatureCellTargetSurfaceArea(8.0);
 
 		// Test EvaluateHamiltonianContribution()
-//        double gamma = surface_area_constraint.GetDeformationEnergyParameter();
+        double gamma = surface_area_constraint.GetDeformationEnergyParameter();
 
 		// Both points lie within cell 0
 		TS_ASSERT_THROWS_THIS(surface_area_constraint.EvaluateHamiltonianContribution(0, 1, cell_population),
@@ -197,17 +197,21 @@ public:
 		TS_ASSERT_THROWS_THIS(surface_area_constraint.EvaluateHamiltonianContribution(2, 3, cell_population),
 		                       "At least one of the current node or target node must be in an element.");
 
+		// Current site in cell 0; target site in cell medium Cell on edge of domain
+		double contribution = surface_area_constraint.EvaluateHamiltonianContribution(1, 2, cell_population);
+		TS_ASSERT_DELTA(contribution, 4.0*gamma, 1e-6);
+
 		// Current site in cell 0; target site in cell medium
-//		double contribution = surface_area_constraint.EvaluateHamiltonianContribution(5, 6, cell_population);
-//		TS_ASSERT_DELTA(contribution, 4.0*gamma, 1e-6);
-//
-//		// Current site in cell medium; target site in cell 0
-//		contribution = surface_area_constraint.EvaluateHamiltonianContribution(6, 5, cell_population);
-//		TS_ASSERT_DELTA(contribution, 0.0, 1e-6);
-//
-//		// Current site in cell 0; target site in cell 1
-//		contribution = surface_area_constraint.EvaluateHamiltonianContribution(5, 9, cell_population);
-//		TS_ASSERT_DELTA(contribution, 4.0*gamma, 1e-6);
+		contribution = surface_area_constraint.EvaluateHamiltonianContribution(5, 6, cell_population);
+		TS_ASSERT_DELTA(contribution, 4.0*gamma, 1e-6);
+
+		// Current site in cell medium; target site in cell 0
+		contribution = surface_area_constraint.EvaluateHamiltonianContribution(6, 5, cell_population);
+		TS_ASSERT_DELTA(contribution, 0.0, 1e-6);
+
+		// Current site in cell 0; target site in cell 1
+		contribution = surface_area_constraint.EvaluateHamiltonianContribution(5, 9, cell_population);
+		TS_ASSERT_DELTA(contribution, 4.0*gamma, 1e-6);
     }
 
     void TestArchiveSurfaceAreaConstraintPottsUpdateRule() throw(Exception)

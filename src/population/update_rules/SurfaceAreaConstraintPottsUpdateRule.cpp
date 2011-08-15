@@ -74,21 +74,62 @@ double SurfaceAreaConstraintPottsUpdateRule<DIM>::EvaluateHamiltonianContributio
         }
     }
 
+    // Iterate over nodes neighbouring the target node to work out the change in surface area
+	unsigned neighbours_in_same_element_as_current_node = 0;
+	unsigned neighbours_in_same_element_as_target_node = 0;
+	std::set<unsigned> target_neighbouring_node_indices = rCellPopulation.rGetMesh().GetVonNeumannNeighbouringNodeIndices(targetNodeIndex);
+	for (std::set<unsigned>::iterator iter = target_neighbouring_node_indices.begin();
+		 iter != target_neighbouring_node_indices.end();
+		 ++iter)
+	{
+		std::set<unsigned> neighbouring_node_containing_elements = rCellPopulation.rGetMesh().GetNode(*iter)->rGetContainingElementIndices();
+
+		// Every node must each be in at most one element
+		assert(neighbouring_node_containing_elements.size() < 2);
+
+		bool neighbouring_node_contained = !neighbouring_node_containing_elements.empty();
+
+		if (neighbouring_node_contained && target_node_contained)
+		{
+			unsigned neighbour_element = (*neighbouring_node_containing_elements.begin());
+			unsigned target_element = (*new_location_containing_elements.begin());
+			if (target_element == neighbour_element)
+			{
+				neighbours_in_same_element_as_target_node++;
+			}
+		}
+		if (neighbouring_node_contained && current_node_contained)
+		{
+			unsigned neighbour_element = (*neighbouring_node_containing_elements.begin());
+			unsigned current_element = (*containing_elements.begin());
+			if (current_element == neighbour_element)
+			{
+				neighbours_in_same_element_as_current_node++;
+			}
+		}
+	}
+	assert(neighbours_in_same_element_as_current_node<5);
+	assert(neighbours_in_same_element_as_target_node<5);
+
+	double change_in_surface_area[5] = {4,2,0,-2,-4};
+
 	if (current_node_contained) // current node is in an element
 	{
 		unsigned current_element = (*containing_elements.begin());
 		double current_surface_area = rCellPopulation.rGetMesh().GetSurfaceAreaOfElement(current_element);
 		double current_surface_area_difference = current_surface_area - mMatureCellTargetSurfaceArea;
+		double current_surface_area_difference_after_switch = current_surface_area_difference + change_in_surface_area[neighbours_in_same_element_as_current_node];
 
-		delta_H += mDeformationEnergyParameter*((current_surface_area_difference + 1.0)*(current_surface_area_difference + 1.0) - current_surface_area_difference*current_surface_area_difference);
+		delta_H += mDeformationEnergyParameter*(current_surface_area_difference_after_switch*current_surface_area_difference_after_switch - current_surface_area_difference*current_surface_area_difference);
 	}
 	if (target_node_contained) // target node is in an element
 	{
 		unsigned target_element = (*new_location_containing_elements.begin());
         double target_surface_area = rCellPopulation.rGetMesh().GetSurfaceAreaOfElement(target_element);
         double target_surface_area_difference = target_surface_area - mMatureCellTargetSurfaceArea;
+        double target_surface_area_difference_after_switch = target_surface_area_difference - change_in_surface_area[neighbours_in_same_element_as_target_node];
 
-		delta_H += mDeformationEnergyParameter*((target_surface_area_difference - 1.0)*(target_surface_area_difference - 1.0) - target_surface_area_difference*target_surface_area_difference);
+		delta_H += mDeformationEnergyParameter*(target_surface_area_difference_after_switch*target_surface_area_difference_after_switch - target_surface_area_difference*target_surface_area_difference);
 	}
 
 	return delta_H;
