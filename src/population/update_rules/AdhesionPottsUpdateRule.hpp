@@ -89,14 +89,14 @@ public:
     /**
 	 * Overridden EvaluateHamiltonianContribution() method
 	 *
-	 * Uses  sum_adjacentsites delta(spin(i),spin(j)) gamma(spin(i),spin(j)
+	 * Uses  sum_adjacentsites (1-delta(spin(i),spin(j))) gamma(spin(i),spin(j))
 	 *
 	 * @param currentNodeIndex The index of the current node/lattice site
 	 * @param targetNodeIndex The index of the target node/lattice site
 	 * @param rCellPopulation The cell population
 	 *
-	 * @return The difference in the Hamiltonian with the current configuration and
-	 * the configuration with the target node having the same spin as the current node.
+	 * @return The difference in the Hamiltonian with the configuration of the target node
+	 * having the same spin as the current node with the current configuration. i.e H_1-H_0
 	 */
     double EvaluateHamiltonianContribution(unsigned currentNodeIndex,
                                            unsigned targetNodeIndex,

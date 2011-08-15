@@ -224,7 +224,7 @@ void PottsBasedCellPopulation::UpdateNodeLocations(const std::vector< c_vector<d
         if (   ( *containing_elements.begin() != *new_location_containing_elements.begin() )
             && ( !containing_elements.empty() || !new_location_containing_elements.empty() ) )
         {
-        	double delta_H = 0.0;
+        	double delta_H = 0.0; // This is H_1-H_0.
 
             // Now add contributions to the Hamiltonian from each AbstractPottsUpdateRule
             for (std::vector<AbstractPottsUpdateRule<2>*>::iterator iter = mUpdateRuleCollection.begin();
@@ -464,29 +464,8 @@ void PottsBasedCellPopulation::SetUpdateNodesInRandomOrder(bool flag)
 
 std::set<unsigned> PottsBasedCellPopulation::GetNeighbouringNodeIndices(unsigned index)
 {
-    // Get pointer to this node
-    Node<2>* p_node = mrMesh.GetNode(index);
-
-    // Loop over containing elements
+    EXCEPTION("Cannot call GetNeighbouringNodeIndices on a PottsBasedCellPopulation need to go through the PottsMesh instead");
     std::set<unsigned> neighbouring_node_indices;
-    for (Node<2>::ContainingElementIterator elem_iter = p_node->ContainingElementsBegin();
-         elem_iter != p_node->ContainingElementsEnd();
-         ++elem_iter)
-    {
-        // Get pointer to this containing element
-        PottsElement<2>* p_element = mrMesh.GetElement(*elem_iter);
-
-        // Loop over nodes contained in this element
-        for (unsigned i=0; i<p_element->GetNumNodes(); i++)
-        {
-            // Get index of this node and add its index to the set if not the original node
-            unsigned node_index = p_element->GetNodeGlobalIndex(i);
-            if (node_index != index)
-            {
-                neighbouring_node_indices.insert(node_index);
-            }
-        }
-    }
     return neighbouring_node_indices;
 }
 

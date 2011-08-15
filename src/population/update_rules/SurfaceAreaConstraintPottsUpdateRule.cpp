@@ -58,14 +58,21 @@ double SurfaceAreaConstraintPottsUpdateRule<DIM>::EvaluateHamiltonianContributio
     bool current_node_contained = !containing_elements.empty();
     bool target_node_contained = !new_location_containing_elements.empty();
 
-    // At least one of the current node and target node must be in an element
-    assert(current_node_contained || target_node_contained);
-
-    // Every node must each be in at most one element
+    // Every node must each be in at most one element.
     assert(new_location_containing_elements.size() < 2);
 
-    // The current node and target node must not be in the same element
-    assert(new_location_containing_elements.begin() != containing_elements.begin());
+    if(!current_node_contained && !target_node_contained)
+    {
+    	EXCEPTION("At least one of the current node or target node must be in an element.");
+    }
+
+    if (current_node_contained && target_node_contained)
+    {
+        if(*(new_location_containing_elements.begin()) == *(containing_elements.begin()))
+        {
+            EXCEPTION("The current node and target node must not be in the same element.");
+        }
+    }
 
 	if (current_node_contained) // current node is in an element
 	{

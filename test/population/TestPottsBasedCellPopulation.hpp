@@ -88,15 +88,8 @@ public:
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), num_cells);
 
         // Test GetNeighbouringNodeIndices() method
-        std::set<unsigned> node_10_neighbours = cell_population.GetNeighbouringNodeIndices(10);
+        TS_ASSERT_THROWS_THIS(        cell_population.GetNeighbouringNodeIndices(10), "Cannot call GetNeighbouringNodeIndices on a PottsBasedCellPopulation need to go through the PottsMesh instead");
 
-        std::set<unsigned> expected_node_10_neighbours;
-        expected_node_10_neighbours.insert(11);
-        expected_node_10_neighbours.insert(14);
-        expected_node_10_neighbours.insert(15);
-
-        TS_ASSERT_EQUALS(node_10_neighbours.size(), expected_node_10_neighbours.size());
-        TS_ASSERT_EQUALS(node_10_neighbours, expected_node_10_neighbours);
 
         // Test PottsBasedCellPopulation::Iterator
         unsigned counter = 0;
