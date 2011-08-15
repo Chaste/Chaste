@@ -25,21 +25,20 @@ You should have received a copy of the GNU Lesser General Public License
 along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
-
-#ifndef TESTREPRESENTATIVELATTICEBASEDCELLBASEDSIMULATION_HPP_
-#define TESTREPRESENTATIVELATTICEBASEDCELLBASEDSIMULATION_HPP_
+#ifndef TESTREPRESENTATIVECABASEDCELLBASEDSIMULATION_HPP_
+#define TESTREPRESENTATIVECABASEDCELLBASEDSIMULATION_HPP_
 
 #include <cxxtest/TestSuite.h>
 
 // Must be included before other cell_based headers
 #include "CellBasedSimulationArchiver.hpp"
 
-#include "CaBasedCellBasedSimulation.hpp"
+#include "LatticeBasedCellBasedSimulation.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
-#include "CaBasedCellPopulation.hpp"
-#include "DiffusionCaUpdateRule.hpp"
-#include "AdvectionCaUpdateRule.hpp"
+#include "LatticeBasedCellPopulation.hpp"
+#include "DiffusionUpdateRule.hpp"
+#include "AdvectionUpdateRule.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "RandomCellKiller.hpp"
@@ -47,14 +46,14 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CellBasedEventHandler.hpp"
 
 /**
- * This class consists of a single test - a 2D lattice-based cell population
- * simulation.  It has 9 cells that will divide in a square in the middle,
+ * This class consists of a single test - a 2D Cellular Automaton-based cell population
+ * simulation. It has 9 cells that will divide in a square in the middle,
  * and the rest are empty sites.
  *
  * This test is used for profiling, to establish the run time
  * variation as the code is developed.
  */
-class TestRepresentativeCaBasedCellBasedSimulation : public AbstractCellBasedTestSuite
+class TestRepresentativeLatticeBasedCellBasedSimulation : public AbstractCellBasedTestSuite
 {
 public:
 
@@ -81,13 +80,13 @@ public:
          }
 
         // Create a cell population
-        CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
+        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Create an empty UpdateRule system so only movement from cell birth
-        std::vector<AbstractCaUpdateRule<2>* > update_rule_collection;
+        std::vector<AbstractUpdateRule<2>* > update_rule_collection;
 
         // Set up cell-based simulation
-        CaBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        LatticeBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
         simulator.SetOutputDirectory("TestRepresentativeCaBasedSimulationForProfiling");
         simulator.SetEndTime(50);
 
@@ -98,4 +97,4 @@ public:
     }
 };
 
-#endif /* TESTREPRESENTATIVELATTICEBASEDCELLBASEDSIMULATION_HPP_ */
+#endif /* TESTREPRESENTATIVECABASEDCELLBASEDSIMULATION_HPP_ */
