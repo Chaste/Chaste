@@ -2,8 +2,8 @@ mesh/TestPottsElement.hpp
 mesh/TestPottsMesh.hpp
 mesh/TestPottsMeshGenerator.hpp
 population/TestForcesNotForRelease.hpp
-population/TestLatticeBasedCellPopulation.hpp
-population/TestLatticeBasedUpdateRules.hpp
+population/TestCaBasedCellPopulation.hpp
+population/TestCaBasedUpdateRules.hpp
 population/TestNodeBasedCellPopulationWithBuskeUpdate.hpp
 population/TestPottsBasedCellPopulation.hpp
 population/TestPottsUpdateRules.hpp

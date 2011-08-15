@@ -35,33 +35,33 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <boost/archive/text_iarchive.hpp>
 
 #include "CellsGenerator.hpp"
-#include "DiffusionUpdateRule.hpp"
-#include "AdvectionUpdateRule.hpp"
-#include "LatticeBasedCellPopulation.hpp"
+#include "DiffusionCaUpdateRule.hpp"
+#include "AdvectionCaUpdateRule.hpp"
+#include "CaBasedCellPopulation.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 
-class TestLatticeBasedUpdateRules : public AbstractCellBasedTestSuite
+class TestCaBasedUpdateRules : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestDiffusionUpdateRuleConstructor()
+    void TestDiffusionCaUpdateRuleConstructor()
     {
         // Create update rule using default input argument
-        DiffusionUpdateRule<2> update_rule1;
+        DiffusionCaUpdateRule<2> update_rule1;
 
         // Check the diffusion constant has been set correctly
         TS_ASSERT_DELTA(update_rule1.GetDiffusionConstant(), 1.0000, 1e-6);
 
         // Create update rule using different input argument
-        DiffusionUpdateRule<3> update_rule2(3.1412);
+        DiffusionCaUpdateRule<3> update_rule2(3.1412);
 
         // Check the diffusion constant has been set correctly
         TS_ASSERT_DELTA(update_rule2.GetDiffusionConstant(), 3.1412, 1e-6);
     }
 
-    void TestDiffusionUpdateRuleGetNewLocationOfCell() throw(Exception)
+    void TestDiffusionCaUpdateRuleGetNewLocationOfCell() throw(Exception)
     {
         // Create mesh
         TetrahedralMesh<2,2> mesh;
@@ -80,10 +80,10 @@ public:
         std::vector<unsigned> real_node_indices;
         real_node_indices.push_back(4);
 
-        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
+        CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Create update rule
-        DiffusionUpdateRule<2> update_rule(2.0);
+        DiffusionCaUpdateRule<2> update_rule(2.0);
 
         // Set the time step high enough that movement is guaranteed
         double dt = 1.0;
@@ -98,24 +98,24 @@ public:
         TS_ASSERT_EQUALS(new_location_index, 7u);
     }
 
-    void TestArchiveDiffusionUpdateRule() throw(Exception)
+    void TestArchiveDiffusionCaUpdateRule() throw(Exception)
     {
         OutputFileHandler handler("archive", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "DiffusionUpdateRule.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "DiffusionCaUpdateRule.arch";
 
         {
-            DiffusionUpdateRule<2> update_rule(1.25);
+            DiffusionCaUpdateRule<2> update_rule(1.25);
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
             // Serialize via pointer to most abstract class possible
-            AbstractUpdateRule<2>* const p_update_rule = &update_rule;
+            AbstractCaUpdateRule<2>* const p_update_rule = &update_rule;
             output_arch << p_update_rule;
         }
 
         {
-            AbstractUpdateRule<2>* p_update_rule;
+            AbstractCaUpdateRule<2>* p_update_rule;
 
             // Create an input archive
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
@@ -125,14 +125,14 @@ public:
             input_arch >> p_update_rule;
 
             // Test the member data
-            TS_ASSERT_DELTA((static_cast<DiffusionUpdateRule<2>*>(p_update_rule))->GetDiffusionConstant(), 1.25, 1e-6);
+            TS_ASSERT_DELTA((static_cast<DiffusionCaUpdateRule<2>*>(p_update_rule))->GetDiffusionConstant(), 1.25, 1e-6);
 
             // Tidy up
             delete p_update_rule;
         }
     }
 
-    void TestAdvectionUpdateRuleGetNewLocationOfCell() throw(Exception)
+    void TestAdvectionCaUpdateRuleGetNewLocationOfCell() throw(Exception)
     {
         // Create mesh
         TetrahedralMesh<2,2> mesh;
@@ -154,11 +154,11 @@ public:
         cells_generator.GenerateBasic(cells, real_node_indices.size(), real_node_indices, DIFFERENTIATED);
 
         // Create cell population
-        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
+        CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Create advection update rule: impose a flow 'north' with (mean) speed 2
         unsigned flow_direction = 0; // north
-        AdvectionUpdateRule<2> update_rule(flow_direction, 2.0);
+        AdvectionCaUpdateRule<2> update_rule(flow_direction, 2.0);
 
         // Take the time step large enough for flow-induced movement to be guaranteed
         double dt = 1.0;
@@ -175,24 +175,24 @@ public:
         }
     }
 
-    void TestArchiveAdvectionUpdateRule() throw(Exception)
+    void TestArchiveAdvectionCaUpdateRule() throw(Exception)
     {
         OutputFileHandler handler("archive", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "AdvectionUpdateRule.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "AdvectionCaUpdateRule.arch";
 
         {
-            AdvectionUpdateRule<2> update_rule(3, 1.25);
+            AdvectionCaUpdateRule<2> update_rule(3, 1.25);
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
             // Serialize via pointer to most abstract class possible
-            AbstractUpdateRule<2>* const p_update_rule = &update_rule;
+            AbstractCaUpdateRule<2>* const p_update_rule = &update_rule;
             output_arch << p_update_rule;
         }
 
         {
-            AbstractUpdateRule<2>* p_update_rule;
+            AbstractCaUpdateRule<2>* p_update_rule;
 
             // Create an input archive
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
@@ -202,8 +202,8 @@ public:
             input_arch >> p_update_rule;
 
             // Test the member data
-            TS_ASSERT_DELTA((static_cast<AdvectionUpdateRule<2>*>(p_update_rule))->GetAdvectionSpeed(), 1.25, 1e-6);
-            TS_ASSERT_EQUALS((static_cast<AdvectionUpdateRule<2>*>(p_update_rule))->GetAdvectionDirection(), 3u);
+            TS_ASSERT_DELTA((static_cast<AdvectionCaUpdateRule<2>*>(p_update_rule))->GetAdvectionSpeed(), 1.25, 1e-6);
+            TS_ASSERT_EQUALS((static_cast<AdvectionCaUpdateRule<2>*>(p_update_rule))->GetAdvectionDirection(), 3u);
 
             // Tidy up
             delete p_update_rule;

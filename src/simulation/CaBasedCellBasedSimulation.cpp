@@ -26,13 +26,13 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#include "LatticeBasedCellBasedSimulation.hpp"
+#include "CaBasedCellBasedSimulation.hpp"
 #include "CellBasedEventHandler.hpp"
 #include "LogFile.hpp"
 
 template<unsigned DIM>
-LatticeBasedCellBasedSimulation<DIM>::LatticeBasedCellBasedSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
-                  std::vector<AbstractUpdateRule<DIM>*> updateRuleCollection,
+CaBasedCellBasedSimulation<DIM>::CaBasedCellBasedSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
+                  std::vector<AbstractCaUpdateRule<DIM>*> updateRuleCollection,
                   bool iterateRandomlyOverUpdateRuleCollection,
                   bool iterateRandomlyOverCells,
                   bool deleteCellPopulationAndForceCollection,
@@ -45,15 +45,15 @@ LatticeBasedCellBasedSimulation<DIM>::LatticeBasedCellBasedSimulation(AbstractCe
     mIterateRandomlyOverUpdateRuleCollection(iterateRandomlyOverUpdateRuleCollection),
     mIterateRandomlyOverCells(iterateRandomlyOverCells)
 {
-    mpStaticCastCellPopulation = static_cast<LatticeBasedCellPopulation<DIM>*>(&this->mrCellPopulation);
+    mpStaticCastCellPopulation = static_cast<CaBasedCellPopulation<DIM>*>(&this->mrCellPopulation);
 }
 
 template<unsigned DIM>
-LatticeBasedCellBasedSimulation<DIM>::~LatticeBasedCellBasedSimulation()
+CaBasedCellBasedSimulation<DIM>::~CaBasedCellBasedSimulation()
 {
     if (mAllocatedMemoryForUpdateRuleCollection)
     {
-        for (typename std::vector<AbstractUpdateRule<DIM>*>::iterator update_iter = mUpdateRuleCollection.begin();
+        for (typename std::vector<AbstractCaUpdateRule<DIM>*>::iterator update_iter = mUpdateRuleCollection.begin();
              update_iter != mUpdateRuleCollection.end();
              ++update_iter)
         {
@@ -63,14 +63,14 @@ LatticeBasedCellBasedSimulation<DIM>::~LatticeBasedCellBasedSimulation()
 }
 
 template<unsigned DIM>
-c_vector<double, DIM> LatticeBasedCellBasedSimulation<DIM>::CalculateCellDivisionVector(CellPtr pParentCell)
+c_vector<double, DIM> CaBasedCellBasedSimulation<DIM>::CalculateCellDivisionVector(CellPtr pParentCell)
 {
     c_vector<double, DIM> axis_of_division = zero_vector<double>(DIM);
     return axis_of_division;
 }
 
 template<unsigned DIM>
-void LatticeBasedCellBasedSimulation<DIM>::UpdateCellLocations()
+void CaBasedCellBasedSimulation<DIM>::UpdateCellLocations()
 {
     // Iterate over contributions from each UpdateRule
     if (mIterateRandomlyOverUpdateRuleCollection)
@@ -79,7 +79,7 @@ void LatticeBasedCellBasedSimulation<DIM>::UpdateCellLocations()
         std::random_shuffle(mUpdateRuleCollection.begin(), mUpdateRuleCollection.end());
     }
 
-    for (typename std::vector<AbstractUpdateRule<DIM>*>::iterator update_iter = mUpdateRuleCollection.begin();
+    for (typename std::vector<AbstractCaUpdateRule<DIM>*>::iterator update_iter = mUpdateRuleCollection.begin();
          update_iter != mUpdateRuleCollection.end();
          ++update_iter)
     {
@@ -133,7 +133,7 @@ void LatticeBasedCellBasedSimulation<DIM>::UpdateCellLocations()
 
 ///\todo Much of this code can probably merged with CellBasedSimulation::Solve()
 template<unsigned DIM>
-void LatticeBasedCellBasedSimulation<DIM>::Solve()
+void CaBasedCellBasedSimulation<DIM>::Solve()
 {
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::EVERYTHING);
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::SETUP);
@@ -287,16 +287,16 @@ void LatticeBasedCellBasedSimulation<DIM>::Solve()
 }
 
 template<unsigned DIM>
-const std::vector<AbstractUpdateRule<DIM>*> LatticeBasedCellBasedSimulation<DIM>::rGetUpdateRuleCollection() const
+const std::vector<AbstractCaUpdateRule<DIM>*> CaBasedCellBasedSimulation<DIM>::rGetUpdateRuleCollection() const
 {
     return mUpdateRuleCollection;
 }
 
 template<unsigned DIM>
-void LatticeBasedCellBasedSimulation<DIM>::OutputSimulationParameters(out_stream& rParamsFile)
+void CaBasedCellBasedSimulation<DIM>::OutputSimulationParameters(out_stream& rParamsFile)
 {
-    // Currently this is not called from LatticeBasedCellBasedSimulation; see #1453 for a discussion on this for centre- and vertex-based cell population.
-    EXCEPTION("OutputSimulationParameters() is not yet implemented for LatticeBasedCellBasedSimulation see #1453");
+    // Currently this is not called from CaBasedCellBasedSimulation; see #1453 for a discussion on this for centre- and vertex-based cell population.
+    EXCEPTION("OutputSimulationParameters() is not yet implemented for CaBasedCellBasedSimulation see #1453");
 
     // Call method on direct parent class
     //CellBasedSimulation<DIM>::OutputSimulationParameters(rParamsFile);
@@ -306,10 +306,10 @@ void LatticeBasedCellBasedSimulation<DIM>::OutputSimulationParameters(out_stream
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////
 
-template class LatticeBasedCellBasedSimulation<1>;
-template class LatticeBasedCellBasedSimulation<2>;
-template class LatticeBasedCellBasedSimulation<3>;
+template class CaBasedCellBasedSimulation<1>;
+template class CaBasedCellBasedSimulation<2>;
+template class CaBasedCellBasedSimulation<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(LatticeBasedCellBasedSimulation)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(CaBasedCellBasedSimulation)

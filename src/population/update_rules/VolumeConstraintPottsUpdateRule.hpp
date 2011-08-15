@@ -45,7 +45,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
  * for each cell over time.
  */
 template<unsigned DIM>
-class VolumeConstraintUpdateRule : public AbstractPottsUpdateRule<DIM>
+class VolumeConstraintPottsUpdateRule : public AbstractPottsUpdateRule<DIM>
 {
 friend class TestPottsUpdateRules;
 
@@ -81,12 +81,12 @@ public:
     /**
      * Constructor.
      */
-    VolumeConstraintUpdateRule();
+    VolumeConstraintPottsUpdateRule();
 
     /**
      * Destructor.
      */
-    ~VolumeConstraintUpdateRule();
+    ~VolumeConstraintPottsUpdateRule();
 
     /**
 	 * Overridden EvaluateHamiltonianContribution() method
@@ -137,6 +137,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(VolumeConstraintUpdateRule)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(VolumeConstraintPottsUpdateRule)
 
 #endif /*VOLUMECONSTRAINTUPDATERULE_HPP_*/

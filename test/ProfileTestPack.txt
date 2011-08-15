@@ -1,1 +1,1 @@
-simulation/TestRepresentativeLatticeBasedTissueSimulation.hpp
+simulation/TestRepresentativeCaBasedTissueSimulation.hpp

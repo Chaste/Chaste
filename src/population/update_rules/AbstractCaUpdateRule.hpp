@@ -26,18 +26,18 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#ifndef ABSTRACTUPDATERULE_HPP_
-#define ABSTRACTUPDATERULE_HPP_
+#ifndef ABSTRACTCAUPDATERULE_HPP_
+#define ABSTRACTCAUPDATERULE_HPP_
 
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
-#include "LatticeBasedCellPopulation.hpp"
+#include "CaBasedCellPopulation.hpp"
 
 /**
  * An abstract force class.
  */
 template<unsigned DIM>
-class AbstractUpdateRule
+class AbstractCaUpdateRule
 {
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -62,12 +62,12 @@ public:
     /**
      * Default constructor.
      */
-    AbstractUpdateRule();
+    AbstractCaUpdateRule();
 
     /**
      * Destructor.
      */
-    virtual ~AbstractUpdateRule();
+    virtual ~AbstractCaUpdateRule();
 
     /**
      * Calculates the new location for a particular cell.
@@ -79,20 +79,20 @@ public:
      * @param dt timestep of the simulation to calculate probability of movement in current timestep
      */
     virtual unsigned GetNewLocationOfCell(unsigned currentLocationIndex,
-                                          LatticeBasedCellPopulation<DIM>& rCellPopulation,
+                                          CaBasedCellPopulation<DIM>& rCellPopulation,
                                           double dt)=0;
 };
 
 template<unsigned DIM>
-AbstractUpdateRule<DIM>::AbstractUpdateRule()
+AbstractCaUpdateRule<DIM>::AbstractCaUpdateRule()
 {
 }
 
 template<unsigned DIM>
-AbstractUpdateRule<DIM>::~AbstractUpdateRule()
+AbstractCaUpdateRule<DIM>::~AbstractCaUpdateRule()
 {
 }
 
-TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractUpdateRule)
+TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractCaUpdateRule)
 
-#endif /*ABSTRACTUPDATERULE_HPP_*/
+#endif /*ABSTRACTCAUPDATERULE_HPP_*/

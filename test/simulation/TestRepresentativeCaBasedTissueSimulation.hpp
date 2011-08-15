@@ -34,12 +34,12 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 // Must be included before other cell_based headers
 #include "CellBasedSimulationArchiver.hpp"
 
-#include "LatticeBasedCellBasedSimulation.hpp"
+#include "CaBasedCellBasedSimulation.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
-#include "LatticeBasedCellPopulation.hpp"
-#include "DiffusionUpdateRule.hpp"
-#include "AdvectionUpdateRule.hpp"
+#include "CaBasedCellPopulation.hpp"
+#include "DiffusionCaUpdateRule.hpp"
+#include "AdvectionCaUpdateRule.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "RandomCellKiller.hpp"
@@ -54,11 +54,11 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
  * This test is used for profiling, to establish the run time
  * variation as the code is developed.
  */
-class TestRepresentativeLatticeBasedCellBasedSimulation : public AbstractCellBasedTestSuite
+class TestRepresentativeCaBasedCellBasedSimulation : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestRepresentativeLatticeBasedCellBasedSimulationForProfiling() throw (Exception)
+    void TestRepresentativeCaBasedCellBasedSimulationForProfiling() throw (Exception)
     {
         // Create mesh
         TetrahedralMesh<2,2> mesh;
@@ -81,14 +81,14 @@ public:
          }
 
         // Create a cell population
-        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
+        CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Create an empty UpdateRule system so only movement from cell birth
-        std::vector<AbstractUpdateRule<2>* > update_rule_collection;
+        std::vector<AbstractCaUpdateRule<2>* > update_rule_collection;
 
         // Set up cell-based simulation
-        LatticeBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
-        simulator.SetOutputDirectory("TestRepresentativeLatticeBasedSimulationForProfiling");
+        CaBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        simulator.SetOutputDirectory("TestRepresentativeCaBasedSimulationForProfiling");
         simulator.SetEndTime(50);
 
         // Run simulation

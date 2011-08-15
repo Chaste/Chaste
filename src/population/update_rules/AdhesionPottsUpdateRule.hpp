@@ -26,8 +26,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#ifndef SURFACEAREACONSTRAINTUPDATERULE_HPP_
-#define SURFACEAREACONSTRAINTUPDATERULE_HPP_
+#ifndef ADHESIONUPDATERULE_HPP_
+#define ADHESIONUPDATERULE_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -39,32 +39,29 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CellLabel.hpp"
 
 /**
- * A volume constraint update rule class for use in Potts based simulations.
- *
- * Note this currently assumes cells don't grow, i.e the target volume is constant
- * for each cell over time.
+ * An adhesion update rule for use in cell-based simulations
+ * using the cellular Potts model.
  */
 template<unsigned DIM>
-class SurfaceAreaConstraintUpdateRule : public AbstractPottsUpdateRule<DIM>
+class AdhesionPottsUpdateRule : public AbstractPottsUpdateRule<DIM>
 {
 friend class TestPottsUpdateRules;
 
 private:
 
-	/**
-	 * Cell deformation energy parameter.
-     * Set to the default value 0.5 in the constructor.
+    /**
+     * Cell-cell adhesion energy parameter.
+     * Set to the default value 0.1 in the constructor.
      * \todo provide units
-	 */
-	double mDeformationEnergyParameter;
+     */
+    double mCellCellAdhesionEnergyParameter;
 
     /**
-     * \todo provide units #1829
-     * Non-dimensional target surface area of a mature (fully-grown) cell,
-     * given in units of area of lattice site.
-     * Set to the default value 16 in the constructor.
+     * Cell-boundary adhesion energy parameter.
+     * Set to the default value 0.2 in the constructor.
+     * \todo provide units
      */
-    double mMatureCellTargetSurfaceArea;
+    double mCellBoundaryAdhesionEnergyParameter;
 
     friend class boost::serialization::access;
     template<class Archive>
@@ -73,8 +70,8 @@ private:
         // If Archive is an output archive, then '&' resolves to '<<'
         // If Archive is an input archive, then '&' resolves to '>>'
         archive & boost::serialization::base_object<AbstractPottsUpdateRule<DIM> >(*this);
-        archive & mDeformationEnergyParameter;
-    	archive & mMatureCellTargetSurfaceArea;
+        archive & mCellCellAdhesionEnergyParameter;
+        archive & mCellBoundaryAdhesionEnergyParameter;
     }
 
 public:
@@ -82,17 +79,17 @@ public:
     /**
      * Constructor.
      */
-    SurfaceAreaConstraintUpdateRule();
+    AdhesionPottsUpdateRule();
 
     /**
      * Destructor.
      */
-    ~SurfaceAreaConstraintUpdateRule();
+    ~AdhesionPottsUpdateRule();
 
     /**
 	 * Overridden EvaluateHamiltonianContribution() method
 	 *
-	 * Uses sum_elements gamma (A_i - A_i^T)^2.
+	 * Uses  sum_adjacentsites delta(spin(i),spin(j)) gamma(spin(i),spin(j)
 	 *
 	 * @param currentNodeIndex The index of the current node/lattice site
 	 * @param targetNodeIndex The index of the target node/lattice site
@@ -106,28 +103,49 @@ public:
                                            PottsBasedCellPopulation& rCellPopulation);
 
     /**
-     * @return mDeformationEnergyParameter
-     */
-    double GetDeformationEnergyParameter();
-
-    /**
-     * Set mDeformationEnergyParameter.
+     * Method to calculate the specific interaction between 2 cells can be overridden in
+     * child classes to  implement differential adhesion .etc.
      *
-     * @param deformationEnergyParameter the new value of mDeformationEnergyParameter
-     */
-    void SetDeformationEnergyParameter(double deformationEnergyParameter);
-
-    /**
-     * @return mMatureCellTargetSurfaceArea
-     */
-    double GetMatureCellTargetSurfaceArea() const;
-
-    /**
-     * Set mMatureCellTargetSurfaceArea.
+     * @param pCellA pointer to the 1st cell
+     * @param pCellB pointer to the 2nd cell
      *
-     * @param matureCellTargetSurfaceArea the new value of mMatureCellTargetSurfaceArea
+     * @return The cell cell interaction adhesion energy between the two cells
      */
-    void SetMatureCellTargetSurfaceArea(double matureCellTargetSurfaceArea);
+    virtual double GetCellCellAdhesionEnergy(CellPtr pCellA, CellPtr pCellB);
+
+    /**
+     * Method to calculate the specific interaction between cell and medium can be overridden in
+     * child classes to  implement differential adhesion .etc.
+     *
+     * @param pCell pointer to the cell
+     *
+     * @return Cell boundary interaction adhesion energy for the cell
+     */
+    virtual double GetCellBoundaryAdhesionEnergy(CellPtr pCell);
+
+	/**
+ 	 * @return mCellCellAdhesionEnergyParameter
+ 	 */
+	double GetCellCellAdhesionEnergyParameter();
+
+	/**
+	 * @return mCellBoundaryAdhesionEnergyParameter
+	 */
+	double GetCellBoundaryAdhesionEnergyParameter();
+
+	/**
+	 * Set mCellCellAdhesionEnergyParameter.
+	 *
+	 * @param cellCellAdhesionEnergyEnergyParameter the new value of mCellCellAdhesionEnergyParameter
+	 */
+	void SetCellCellAdhesionEnergyParameter(double cellCellAdhesionEnergyEnergyParameter);
+
+	/**
+	 * Set mCellBoundaryAdhesionEnergyParameter.
+	 *
+	 * @param cellBoundaryAdhesionEnergyParameter the new value of mCellBoundaryAdhesionEnergyParameter
+	 */
+	void SetCellBoundaryAdhesionEnergyParameter(double cellBoundaryAdhesionEnergyParameter);
 
     /**
      * Overridden OutputUpdateRuleParameters() method.
@@ -138,6 +156,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(SurfaceAreaConstraintUpdateRule)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(AdhesionPottsUpdateRule)
 
-#endif /*SURFACEAREACONSTRAINTUPDATERULE_HPP_*/
+#endif /*ADHESIONUPDATERULE_HPP_*/

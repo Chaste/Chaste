@@ -26,25 +26,25 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#include "DiffusionUpdateRule.hpp"
+#include "DiffusionCaUpdateRule.hpp"
 
 #include "RandomNumberGenerator.hpp"
 
 template<unsigned DIM>
-DiffusionUpdateRule<DIM>::DiffusionUpdateRule(double diffusionConstant)
-    : AbstractUpdateRule<DIM>(),
+DiffusionCaUpdateRule<DIM>::DiffusionCaUpdateRule(double diffusionConstant)
+    : AbstractCaUpdateRule<DIM>(),
       mDiffusionConstant(diffusionConstant)
 {
 }
 
 template<unsigned DIM>
-DiffusionUpdateRule<DIM>::~DiffusionUpdateRule()
+DiffusionCaUpdateRule<DIM>::~DiffusionCaUpdateRule()
 {
 }
 
 template<unsigned DIM>
-unsigned DiffusionUpdateRule<DIM>::GetNewLocationOfCell(unsigned currentLocationIndex,
-                                                        LatticeBasedCellPopulation<DIM>& rCellPopulation,
+unsigned DiffusionCaUpdateRule<DIM>::GetNewLocationOfCell(unsigned currentLocationIndex,
+                                                        CaBasedCellPopulation<DIM>& rCellPopulation,
                                                         double dt)
 {
     assert(DIM == 2); // this method only works in 2D at present
@@ -82,7 +82,7 @@ unsigned DiffusionUpdateRule<DIM>::GetNewLocationOfCell(unsigned currentLocation
 }
 
 template<unsigned DIM>
-double DiffusionUpdateRule<DIM>::GetDiffusionConstant()
+double DiffusionCaUpdateRule<DIM>::GetDiffusionConstant()
 {
     return mDiffusionConstant;
 }
@@ -91,10 +91,10 @@ double DiffusionUpdateRule<DIM>::GetDiffusionConstant()
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////
 
-template class DiffusionUpdateRule<1>;
-template class DiffusionUpdateRule<2>;
-template class DiffusionUpdateRule<3>;
+template class DiffusionCaUpdateRule<1>;
+template class DiffusionCaUpdateRule<2>;
+template class DiffusionCaUpdateRule<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(DiffusionUpdateRule)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(DiffusionCaUpdateRule)

@@ -26,11 +26,11 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#include "DifferentialAdhesionUpdateRule.hpp"
+#include "DifferentialAdhesionPottsUpdateRule.hpp"
 
 template<unsigned DIM>
-DifferentialAdhesionUpdateRule<DIM>::DifferentialAdhesionUpdateRule()
-    : AdhesionUpdateRule<DIM>(),
+DifferentialAdhesionPottsUpdateRule<DIM>::DifferentialAdhesionPottsUpdateRule()
+    : AdhesionPottsUpdateRule<DIM>(),
       mLabelledCellLabelledCellAdhesionEnergyParameter(0.1), // Educated guess
       mLabelledCellCellAdhesionEnergyParameter(0.1), // Educated guess
       mLabelledCellBoundaryAdhesionEnergyParameter(0.2) // Educated guess
@@ -38,13 +38,13 @@ DifferentialAdhesionUpdateRule<DIM>::DifferentialAdhesionUpdateRule()
 }
 
 template<unsigned DIM>
-DifferentialAdhesionUpdateRule<DIM>::~DifferentialAdhesionUpdateRule()
+DifferentialAdhesionPottsUpdateRule<DIM>::~DifferentialAdhesionPottsUpdateRule()
 {
 }
 
 
 template<unsigned DIM>
-double DifferentialAdhesionUpdateRule<DIM>::GetCellCellAdhesionEnergy(CellPtr pCellA, CellPtr pCellB)
+double DifferentialAdhesionPottsUpdateRule<DIM>::GetCellCellAdhesionEnergy(CellPtr pCellA, CellPtr pCellB)
 {
     if( pCellA->HasCellProperty<CellLabel>() && pCellB->HasCellProperty<CellLabel>() )
     {
@@ -61,7 +61,7 @@ double DifferentialAdhesionUpdateRule<DIM>::GetCellCellAdhesionEnergy(CellPtr pC
 }
 
 template<unsigned DIM>
-double DifferentialAdhesionUpdateRule<DIM>::GetCellBoundaryAdhesionEnergy(CellPtr pCell)
+double DifferentialAdhesionPottsUpdateRule<DIM>::GetCellBoundaryAdhesionEnergy(CellPtr pCell)
 {
     if( pCell->HasCellProperty<CellLabel>() )
     {
@@ -75,61 +75,61 @@ double DifferentialAdhesionUpdateRule<DIM>::GetCellBoundaryAdhesionEnergy(CellPt
 
 
 template<unsigned DIM>
-double DifferentialAdhesionUpdateRule<DIM>::GetLabelledCellLabelledCellAdhesionEnergyParameter()
+double DifferentialAdhesionPottsUpdateRule<DIM>::GetLabelledCellLabelledCellAdhesionEnergyParameter()
 {
     return mLabelledCellLabelledCellAdhesionEnergyParameter;
 }
 
 template<unsigned DIM>
-double DifferentialAdhesionUpdateRule<DIM>::GetLabelledCellCellAdhesionEnergyParameter()
+double DifferentialAdhesionPottsUpdateRule<DIM>::GetLabelledCellCellAdhesionEnergyParameter()
 {
     return mLabelledCellCellAdhesionEnergyParameter;
 }
 
 template<unsigned DIM>
-double DifferentialAdhesionUpdateRule<DIM>::GetLabelledCellBoundaryAdhesionEnergyParameter()
+double DifferentialAdhesionPottsUpdateRule<DIM>::GetLabelledCellBoundaryAdhesionEnergyParameter()
 {
     return mLabelledCellBoundaryAdhesionEnergyParameter;
 }
 
 template<unsigned DIM>
-void DifferentialAdhesionUpdateRule<DIM>::SetLabelledCellLabelledCellAdhesionEnergyParameter(double labelledCellLabelledCellAdhesionEnergyParameter)
+void DifferentialAdhesionPottsUpdateRule<DIM>::SetLabelledCellLabelledCellAdhesionEnergyParameter(double labelledCellLabelledCellAdhesionEnergyParameter)
 {
     mLabelledCellLabelledCellAdhesionEnergyParameter = labelledCellLabelledCellAdhesionEnergyParameter;
 }
 
 template<unsigned DIM>
-void DifferentialAdhesionUpdateRule<DIM>::SetLabelledCellCellAdhesionEnergyParameter(double labelledCellCellAdhesionEnergyParameter)
+void DifferentialAdhesionPottsUpdateRule<DIM>::SetLabelledCellCellAdhesionEnergyParameter(double labelledCellCellAdhesionEnergyParameter)
 {
     mLabelledCellCellAdhesionEnergyParameter = labelledCellCellAdhesionEnergyParameter;
 }
 
 template<unsigned DIM>
-void DifferentialAdhesionUpdateRule<DIM>::SetLabelledCellBoundaryAdhesionEnergyParameter(double labelledCellBoundaryAdhesionEnergyParameter)
+void DifferentialAdhesionPottsUpdateRule<DIM>::SetLabelledCellBoundaryAdhesionEnergyParameter(double labelledCellBoundaryAdhesionEnergyParameter)
 {
     mLabelledCellBoundaryAdhesionEnergyParameter = labelledCellBoundaryAdhesionEnergyParameter;
 }
 
 
 template<unsigned DIM>
-void DifferentialAdhesionUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
+void DifferentialAdhesionPottsUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
 {
 	*rParamsFile << "\t\t\t<LabelledCellLabelledCellAdhesionEnergyParameter>" << mLabelledCellLabelledCellAdhesionEnergyParameter << "</LabelledCellLabelledCellAdhesionEnergyParameter> \n";
     *rParamsFile << "\t\t\t<LabelledCellCellAdhesionEnergyParameter>" << mLabelledCellCellAdhesionEnergyParameter << "</LabelledCellCellAdhesionEnergyParameter> \n";
     *rParamsFile << "\t\t\t<LabelledCellBoundaryAdhesionEnergyParameter>" << mLabelledCellBoundaryAdhesionEnergyParameter << "</LabelledCellBoundaryAdhesionEnergyParameter> \n";
 
     // Call method on direct parent class
-    AdhesionUpdateRule<DIM>::OutputUpdateRuleParameters(rParamsFile);
+    AdhesionPottsUpdateRule<DIM>::OutputUpdateRuleParameters(rParamsFile);
 }
 
 /////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////
 
-template class DifferentialAdhesionUpdateRule<1>;
-template class DifferentialAdhesionUpdateRule<2>;
-template class DifferentialAdhesionUpdateRule<3>;
+template class DifferentialAdhesionPottsUpdateRule<1>;
+template class DifferentialAdhesionPottsUpdateRule<2>;
+template class DifferentialAdhesionPottsUpdateRule<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(DifferentialAdhesionUpdateRule)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(DifferentialAdhesionPottsUpdateRule)

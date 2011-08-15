@@ -35,12 +35,12 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <boost/archive/text_iarchive.hpp>
 
 #include "ArchiveOpener.hpp"
-#include "LatticeBasedCellPopulation.hpp"
+#include "CaBasedCellPopulation.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 
-class TestLatticeBasedCellPopulation : public AbstractCellBasedTestSuite
+class TestCaBasedCellPopulation : public AbstractCellBasedTestSuite
 {
 private:
 
@@ -103,7 +103,7 @@ public:
         real_node_indices.push_back(1);
 
         // Create a cell population
-        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
+        CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Test GetNumNodes()
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 9u);
@@ -178,7 +178,7 @@ public:
             cells2.push_back(p_cell);
         }
 
-        LatticeBasedCellPopulation<2> cell_population2(mesh, cells2);
+        CaBasedCellPopulation<2> cell_population2(mesh, cells2);
 
         TS_ASSERT_EQUALS(cell_population2.GetNumRealCells(), 9u);
 
@@ -201,7 +201,7 @@ public:
         std::vector<unsigned> real_node_indices = CreateSingleLocationIndex(4);
 
         // Create a cell population
-        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
+        CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 9u);
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 1u);
@@ -246,7 +246,7 @@ public:
         std::vector<unsigned> real_node_indices = CreateSingleLocationIndex(4);
 
         // Create a cell population
-        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
+        CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         std::set<unsigned> nearest_neighbours = cell_population.GetNthDegreeNeighbouringNodeIndices(4, 1);
 
@@ -329,7 +329,7 @@ public:
         std::vector<unsigned> real_node_indices = CreateSingleLocationIndex(29);
 
         // Create a cell population
-        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
+        CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Check the maximum degree possible in each direction
         std::vector<unsigned> max_degrees = cell_population.GetMaximumDegreeInEachDirection(29);
@@ -453,7 +453,7 @@ public:
         cells_generator.GenerateBasic(cells, real_node_indices.size(), real_node_indices, DIFFERENTIATED);
 
         // Create a cell population
-        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
+        CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         TS_ASSERT(cell_population.IsEmptySite(45));
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 49u);
@@ -552,7 +552,7 @@ public:
         cells_generator.GenerateBasic(cells, real_node_indices.size(), real_node_indices, DIFFERENTIATED);
 
         // Create a cell population
-        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices, true); // Only searching the nearest neighbours (degree=1)
+        CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices, true); // Only searching the nearest neighbours (degree=1)
 
         TS_ASSERT(cell_population.IsEmptySite(13));
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 16u);
@@ -596,7 +596,7 @@ public:
         cells_generator.GenerateBasic(cells, real_node_indices.size(), real_node_indices, DIFFERENTIATED);
 
         // Create a cell population
-        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices, true); // Only searching the nearest neighbours (degree=1)
+        CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices, true); // Only searching the nearest neighbours (degree=1)
 
         TS_ASSERT(cell_population.IsEmptySite(9));
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 16u);
@@ -658,7 +658,7 @@ public:
         cells_generator.GenerateBasic(cells, real_node_indices.size(), real_node_indices, DIFFERENTIATED);
 
         // Create a cell population
-        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
+        CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Create a new cell
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
@@ -684,7 +684,7 @@ public:
         std::vector<unsigned> real_node_indices = CreateSingleLocationIndex(0);
 
         // Create a cell population
-        LatticeBasedCellPopulation<2> lattice_based_cell_population(mesh, cells, real_node_indices);
+        CaBasedCellPopulation<2> lattice_based_cell_population(mesh, cells, real_node_indices);
 
         // Count the number of cells using the iterator
         unsigned number_of_cells = 0;
@@ -715,7 +715,7 @@ public:
         std::vector<unsigned> location_indices = CreateSingleLocationIndex(0);
 
         // Create a cell population
-        LatticeBasedCellPopulation<1> lattice_based_cell_population(mesh, cells, location_indices);
+        CaBasedCellPopulation<1> lattice_based_cell_population(mesh, cells, location_indices);
 
         // Now find the neighbouring available sites
         std::set<unsigned> free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(0);
@@ -766,7 +766,7 @@ public:
         std::vector<unsigned> cell_indices = CreateSingleLocationIndex(0);
 
         // Create a cell population
-        LatticeBasedCellPopulation<2> lattice_based_cell_population(mesh, cells, cell_indices);
+        CaBasedCellPopulation<2> lattice_based_cell_population(mesh, cells, cell_indices);
 
         // Test bottom left node
         std::set<unsigned> free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(0);
@@ -898,7 +898,7 @@ public:
         location_indices.push_back(5);
 
         // Create a cell population
-        LatticeBasedCellPopulation<2> lattice_based_cell_population2(mesh, cells2, location_indices);
+        CaBasedCellPopulation<2> lattice_based_cell_population2(mesh, cells2, location_indices);
 
         // Now find the neighbouring available sites
         free_neighbouring_sites = lattice_based_cell_population2.GetFreeNeighbouringNodeIndices(1);
@@ -932,7 +932,7 @@ public:
         std::vector<unsigned> location_indices = CreateSingleLocationIndex(13);
 
         // Create a cell population
-        LatticeBasedCellPopulation<3> lattice_based_cell_population(mesh, cells, location_indices);
+        CaBasedCellPopulation<3> lattice_based_cell_population(mesh, cells, location_indices);
 
         // Test central node
         std::set<unsigned> free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(13);
@@ -998,7 +998,7 @@ public:
         std::vector<unsigned> location_indices = CreateSingleLocationIndex(0);
 
         // Create a cell population
-        LatticeBasedCellPopulation<3> lattice_based_cell_population(mesh, cells, location_indices);
+        CaBasedCellPopulation<3> lattice_based_cell_population(mesh, cells, location_indices);
 
         // Test bottom left corner node (node 0)
         std::set<unsigned> free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(0);
@@ -1087,7 +1087,7 @@ public:
         std::vector<unsigned> location_indices = CreateSingleLocationIndex(0);
 
         // Create a cell population
-        LatticeBasedCellPopulation<2> lattice_based_cell_population(mesh, cells, location_indices);
+        CaBasedCellPopulation<2> lattice_based_cell_population(mesh, cells, location_indices);
 
         std::set<unsigned> free_neighbouring_sites = lattice_based_cell_population.GetFreeNeighbouringNodeIndices(0);
         TS_ASSERT_EQUALS(free_neighbouring_sites.size(), 3u);
@@ -1179,7 +1179,7 @@ public:
             }
 
             // Create cell population
-            LatticeBasedCellPopulation<2>* const p_cell_population = new LatticeBasedCellPopulation<2>(mesh, cells, real_node_indices);
+            CaBasedCellPopulation<2>* const p_cell_population = new CaBasedCellPopulation<2>(mesh, cells, real_node_indices);
 
             // Cells have been given birth times of 0, -2, -4, ...
             // Loop over them to run to time 0
@@ -1213,7 +1213,7 @@ public:
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, num_steps+1);
             p_simulation_time->IncrementTimeOneStep();
 
-            LatticeBasedCellPopulation<2>* p_cell_population;
+            CaBasedCellPopulation<2>* p_cell_population;
 
             // Restore the cell population
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -1295,7 +1295,7 @@ public:
         cells[2]->StartApoptosis();
 
         // Create a cell population
-        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
+        CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Test we have the right numbers of nodes and cells
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 16u);
@@ -1323,9 +1323,9 @@ public:
         }
     }
 
-    void TestLatticeBasedCellPopulationOutputWriters()
+    void TestCaBasedCellPopulationOutputWriters()
     {
-        std::string output_directory = "TestLatticeBasedCellPopulationWriters";
+        std::string output_directory = "TestCaBasedCellPopulationWriters";
         OutputFileHandler output_file_handler(output_directory, false);
 
         // Create mesh
@@ -1352,9 +1352,9 @@ public:
         }
 
         // Create a cell population
-        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
+        CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
-        TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "LatticeBasedCellPopulation-2");
+        TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "CaBasedCellPopulation-2");
 
         cell_population.SetCellAncestorsToLocationIndices();
         cell_population.SetOutputCellIdData(true);
@@ -1391,12 +1391,12 @@ public:
         // Compare output with saved files of what they should look like
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.viznodes     notforrelease_cell_based/test/data/TestLatticeBasedCellPopulationWriters/results.viznodes").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizcelltypes     notforrelease_cell_based/test/data/TestLatticeBasedCellPopulationWriters/results.vizcelltypes").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizancestors     notforrelease_cell_based/test/data/TestLatticeBasedCellPopulationWriters/results.vizancestors").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellmutationstates.dat     notforrelease_cell_based/test/data/TestLatticeBasedCellPopulationWriters/cellmutationstates.dat").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellages.dat     notforrelease_cell_based/test/data/TestLatticeBasedCellPopulationWriters/cellages.dat").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellareas.dat     notforrelease_cell_based/test/data/TestLatticeBasedCellPopulationWriters/cellareas.dat").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.viznodes     notforrelease_cell_based/test/data/TestCaBasedCellPopulationWriters/results.viznodes").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizcelltypes     notforrelease_cell_based/test/data/TestCaBasedCellPopulationWriters/results.vizcelltypes").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizancestors     notforrelease_cell_based/test/data/TestCaBasedCellPopulationWriters/results.vizancestors").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellmutationstates.dat     notforrelease_cell_based/test/data/TestCaBasedCellPopulationWriters/cellmutationstates.dat").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellages.dat     notforrelease_cell_based/test/data/TestCaBasedCellPopulationWriters/cellages.dat").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellareas.dat     notforrelease_cell_based/test/data/TestCaBasedCellPopulationWriters/cellareas.dat").c_str()), 0);
 
         // Test the GetCellMutationStateCount function
         std::vector<unsigned> cell_mutation_states = cell_population.GetCellMutationStateCount();
@@ -1421,11 +1421,11 @@ public:
         out_stream parameter_file = output_file_handler.OpenOutputFile("results.parameters");
 
         // Write cell population parameters to file
-        TS_ASSERT_THROWS_THIS(cell_population.OutputCellPopulationParameters(parameter_file),"OutputCellPopulationParameters() is not yet implemented for LatticeBasedCellPopulation see #1453");
+        TS_ASSERT_THROWS_THIS(cell_population.OutputCellPopulationParameters(parameter_file),"OutputCellPopulationParameters() is not yet implemented for CaBasedCellPopulation see #1453");
         parameter_file->close();
     }
 
-    void TestValidateLatticeBasedCellPopulation()
+    void TestValidateCaBasedCellPopulation()
     {
         // Create mesh
         TetrahedralMesh<2,2> mesh;
@@ -1444,7 +1444,7 @@ public:
         cells_generator.GenerateBasic(cells, real_node_indices.size(), real_node_indices, DIFFERENTIATED);
 
         // Create a cell population
-        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
+        CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Set node 2 to be an empty site, to test Validate()
         cell_population.mIsEmptySite[2] = true;
@@ -1484,22 +1484,22 @@ public:
         real_node_indices.push_back(1);
 
         // Create a cell population
-        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
+        CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Test UpdateNodeLocations
         std::vector< c_vector<double, 2> > unused_vector;
-        TS_ASSERT_THROWS_THIS(cell_population.UpdateNodeLocations(unused_vector, 1.0), "UpdateNodeLocations() cannot be called on a LatticeBasedCellPopulation");
+        TS_ASSERT_THROWS_THIS(cell_population.UpdateNodeLocations(unused_vector, 1.0), "UpdateNodeLocations() cannot be called on a CaBasedCellPopulation");
 
         // Test AddNode()
         Node<2> unused_node(10);
-        TS_ASSERT_THROWS_THIS(cell_population.AddNode(&unused_node), "AddNode() cannot be called on a LatticeBasedCellPopulation");
+        TS_ASSERT_THROWS_THIS(cell_population.AddNode(&unused_node), "AddNode() cannot be called on a CaBasedCellPopulation");
 
         // Test SetNode()
         ChastePoint<2> unused_point;
-        TS_ASSERT_THROWS_THIS(cell_population.SetNode(0, unused_point), "SetNode() cannot be called on a LatticeBasedCellPopulation");
+        TS_ASSERT_THROWS_THIS(cell_population.SetNode(0, unused_point), "SetNode() cannot be called on a CaBasedCellPopulation");
 
         // Test GetDampingConstant()
-        TS_ASSERT_THROWS_THIS(cell_population.GetDampingConstant(0), "GetDampingConstant() cannot be called on a LatticeBasedCellPopulation");
+        TS_ASSERT_THROWS_THIS(cell_population.GetDampingConstant(0), "GetDampingConstant() cannot be called on a CaBasedCellPopulation");
 
         // Test GetWidth() method
         double width_x = cell_population.GetWidth(0);
@@ -1520,7 +1520,7 @@ public:
         std::vector<unsigned> cell_indices = CreateSingleLocationIndex(0);
 
         // Create a cell population
-        LatticeBasedCellPopulation<2> lattice_based_cell_population(mesh, cells, cell_indices);
+        CaBasedCellPopulation<2> lattice_based_cell_population(mesh, cells, cell_indices);
 
         // Set the neighbourhoods to be of von Neumann type
         lattice_based_cell_population.SetVonNeumannNeighbourhoods(true);
@@ -1650,7 +1650,7 @@ public:
         location_indices.push_back(5);
 
         // Create a cell population
-        LatticeBasedCellPopulation<2> lattice_based_cell_population2(mesh2, cells2, location_indices);
+        CaBasedCellPopulation<2> lattice_based_cell_population2(mesh2, cells2, location_indices);
 
         // Set the neighbourhoods to be of von Neumann type
         lattice_based_cell_population2.SetVonNeumannNeighbourhoods(true);
@@ -1686,7 +1686,7 @@ public:
         std::vector<unsigned> location_indices = CreateSingleLocationIndex(13);
 
         // Create a cell population
-        LatticeBasedCellPopulation<3> lattice_based_cell_population(mesh, cells, location_indices);
+        CaBasedCellPopulation<3> lattice_based_cell_population(mesh, cells, location_indices);
 
         // Set von Neumann neighbourhoods
         lattice_based_cell_population.SetVonNeumannNeighbourhoods(true);
@@ -1739,7 +1739,7 @@ public:
         std::vector<unsigned> location_indices = CreateSingleLocationIndex(0);
 
         // Create a cell population
-        LatticeBasedCellPopulation<2> lattice_based_cell_population(mesh, cells, location_indices);
+        CaBasedCellPopulation<2> lattice_based_cell_population(mesh, cells, location_indices);
 
         // Set von Neumann neighbourhoods
         lattice_based_cell_population.SetVonNeumannNeighbourhoods(true);
@@ -1821,7 +1821,7 @@ public:
         std::vector<unsigned> location_indices = CreateSingleLocationIndex(0);
 
         // Create a cell population
-        LatticeBasedCellPopulation<3> lattice_based_cell_population(mesh, cells, location_indices);
+        CaBasedCellPopulation<3> lattice_based_cell_population(mesh, cells, location_indices);
 
         // Set von Neumann neighbourhoods
         lattice_based_cell_population.SetVonNeumannNeighbourhoods(true);

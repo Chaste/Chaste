@@ -33,19 +33,19 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <boost/serialization/base_object.hpp>
 
 #include "CellBasedSimulation.hpp"
-#include "LatticeBasedCellPopulation.hpp"
-#include "AbstractUpdateRule.hpp"
+#include "CaBasedCellPopulation.hpp"
+#include "AbstractCaUpdateRule.hpp"
 
 
 /**
  * A lattice-based cell-based simulation object.
  */
  template<unsigned DIM>
-class LatticeBasedCellBasedSimulation : public CellBasedSimulation<DIM>
+class CaBasedCellBasedSimulation : public CellBasedSimulation<DIM>
 {
     // Allow tests to access private members, in order to test computation of
     // private functions eg. DoCellBirth
-    friend class TestCellBasedSimulationWithLatticeBasedCellPopulation;
+    friend class TestCellBasedSimulationWithCaBasedCellPopulation;
 
 private:
 
@@ -70,10 +70,10 @@ private:
     }
 
     /** Helper member that is a static cast of the cell population. */
-    LatticeBasedCellPopulation<DIM>* mpStaticCastCellPopulation;
+    CaBasedCellPopulation<DIM>* mpStaticCastCellPopulation;
 
     /** The rules used to determine the new locations of cells. */
-    std::vector<AbstractUpdateRule<DIM>*> mUpdateRuleCollection;
+    std::vector<AbstractCaUpdateRule<DIM>*> mUpdateRuleCollection;
 
     /** Whether delete the collection of update rules in the destructor. */
     bool mAllocatedMemoryForUpdateRuleCollection;
@@ -113,8 +113,8 @@ public:
      * @param initialiseCells whether to initialise cells (defaults to true, set to
      *        false when loading from an archive)
      */
-    LatticeBasedCellBasedSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
-                      std::vector<AbstractUpdateRule<DIM>*> updateRuleCollection,
+    CaBasedCellBasedSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
+                      std::vector<AbstractCaUpdateRule<DIM>*> updateRuleCollection,
                       bool iterateRandomlyOverUpdateRuleCollection=false,
                       bool iterateRandomlyOverCells=false,
                       bool deleteCellPopulationAndForceCollection=false,
@@ -123,7 +123,7 @@ public:
     /**
      * Destructor.
      */
-    ~LatticeBasedCellBasedSimulation();
+    ~CaBasedCellBasedSimulation();
 
     /**
      * Main solve method.
@@ -140,13 +140,13 @@ public:
     /**
      * @return const reference to mUpdateRuleCollection (used in archiving).
      */
-    const std::vector<AbstractUpdateRule<DIM>*> rGetUpdateRuleCollection() const;
+    const std::vector<AbstractCaUpdateRule<DIM>*> rGetUpdateRuleCollection() const;
 
     /**
      * Outputs simulation parameters to file
      *
      * As this method is pure virtual, it must be overridden
-     * in subclasses. Currently not used for Lattice Based Simulations.
+     * in subclasses. Currently not used for Ca Based Simulations.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
@@ -155,41 +155,41 @@ public:
 
 // Declare identifier for the serializer
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(LatticeBasedCellBasedSimulation)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(CaBasedCellBasedSimulation)
 
 namespace boost
 {
 namespace serialization
 {
 /**
- * Serialize information required to construct a LatticeBasedCellBasedSimulation.
+ * Serialize information required to construct a CaBasedCellBasedSimulation.
  */
 template<class Archive, unsigned DIM>
 inline void save_construct_data(
-    Archive & ar, const LatticeBasedCellBasedSimulation<DIM> * t, const BOOST_PFTO unsigned int file_version)
+    Archive & ar, const CaBasedCellBasedSimulation<DIM> * t, const BOOST_PFTO unsigned int file_version)
 {
     // Save data required to construct instance
     const AbstractCellPopulation<DIM> * p_cell_population = &(t->rGetCellPopulation());
     ar & p_cell_population;
-    const std::vector<AbstractUpdateRule<DIM>*> update_rule_collection = t->rGetUpdateRuleCollection();
+    const std::vector<AbstractCaUpdateRule<DIM>*> update_rule_collection = t->rGetUpdateRuleCollection();
     ar & update_rule_collection;
 }
 
 /**
- * De-serialize constructor parameters and initialise a LatticeBasedCellBasedSimulation.
+ * De-serialize constructor parameters and initialise a CaBasedCellBasedSimulation.
  */
 template<class Archive, unsigned DIM>
 inline void load_construct_data(
-    Archive & ar, LatticeBasedCellBasedSimulation<DIM> * t, const unsigned int file_version)
+    Archive & ar, CaBasedCellBasedSimulation<DIM> * t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
     AbstractCellPopulation<DIM>* p_cell_population;
     ar >> p_cell_population;
-    std::vector<AbstractUpdateRule<DIM>*> update_rule_collection;
+    std::vector<AbstractCaUpdateRule<DIM>*> update_rule_collection;
     ar >> update_rule_collection;
 
     // Invoke inplace constructor to initialise instance
-    ::new(t)LatticeBasedCellBasedSimulation<DIM>(*p_cell_population, update_rule_collection, false, false, true, false);
+    ::new(t)CaBasedCellBasedSimulation<DIM>(*p_cell_population, update_rule_collection, false, false, true, false);
 }
 }
 } // namespace

@@ -26,14 +26,14 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#ifndef ADVECTIONUPDATERULE_HPP_
-#define ADVECTIONUPDATERULE_HPP_
+#ifndef ADVECTIONCAUPDATERULE_HPP_
+#define ADVECTIONCAUPDATERULE_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "AbstractUpdateRule.hpp"
-#include "LatticeBasedCellPopulation.hpp"
+#include "AbstractCaUpdateRule.hpp"
+#include "CaBasedCellPopulation.hpp"
 
 /**
  * An update rule class to model uniform steady advection. This class is
@@ -49,7 +49,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
  * the flow speed, independent of the time step used.
  */
 template<unsigned DIM>
-class AdvectionUpdateRule : public AbstractUpdateRule<DIM>
+class AdvectionCaUpdateRule : public AbstractCaUpdateRule<DIM>
 {
 private:
 
@@ -78,7 +78,7 @@ private:
     {
         // If Archive is an output archive, then '&' resolves to '<<'
         // If Archive is an input archive, then '&' resolves to '>>'
-        archive & boost::serialization::base_object<AbstractUpdateRule<DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractCaUpdateRule<DIM> >(*this);
         archive & mAdvectionDirection;
         archive & mAdvectionSpeed;
     }
@@ -91,17 +91,17 @@ public:
      * @param advectionDirection the direction of the flow (must take one of the values 0 to 7 inclusive)
      * @param advectionSpeed the speed of the flow
      */
-    AdvectionUpdateRule(unsigned advectionDirection, double advectionSpeed);
+    AdvectionCaUpdateRule(unsigned advectionDirection, double advectionSpeed);
 
     /**
      * Alternative constructor, for use in archiving.
      */
-    AdvectionUpdateRule();
+    AdvectionCaUpdateRule();
 
     /**
      * Destructor.
      */
-    ~AdvectionUpdateRule();
+    ~AdvectionCaUpdateRule();
 
     /**
      * Overridden GetNewLocationOfCell() method.
@@ -114,7 +114,7 @@ public:
      * @param dt timestep of the simulation to calculate probability of movement in current timestep
      */
     unsigned GetNewLocationOfCell(unsigned currentLocationIndex,
-                                  LatticeBasedCellPopulation<DIM>& rCellPopulation,
+                                  CaBasedCellPopulation<DIM>& rCellPopulation,
                                   double dt);
 
     /**
@@ -129,6 +129,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(AdvectionUpdateRule)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(AdvectionCaUpdateRule)
 
-#endif /*ADVECTIONUPDATERULE_HPP_*/
+#endif /*ADVECTIONCAUPDATERULE_HPP_*/

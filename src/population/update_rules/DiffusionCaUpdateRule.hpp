@@ -26,14 +26,14 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#ifndef DIFFUSIONUPDATERULE_HPP_
-#define DIFFUSIONUPDATERULE_HPP_
+#ifndef DIFFUSIONCAUPDATERULE_HPP_
+#define DIFFUSIONCAUPDATERULE_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "AbstractUpdateRule.hpp"
-#include "LatticeBasedCellPopulation.hpp"
+#include "AbstractCaUpdateRule.hpp"
+#include "CaBasedCellPopulation.hpp"
 
 /**
  * An update rule class to model diffusion on the lattice.
@@ -45,7 +45,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
  * are no free neighbouring sites, then the cell is not moved).
  */
 template<unsigned DIM>
-class DiffusionUpdateRule : public AbstractUpdateRule<DIM>
+class DiffusionCaUpdateRule : public AbstractCaUpdateRule<DIM>
 {
 private:
 
@@ -65,7 +65,7 @@ private:
     {
         // If Archive is an output archive, then '&' resolves to '<<'
         // If Archive is an input archive, then '&' resolves to '>>'
-        archive & boost::serialization::base_object<AbstractUpdateRule<DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractCaUpdateRule<DIM> >(*this);
         archive & mDiffusionConstant;
     }
 
@@ -76,12 +76,12 @@ public:
      *
      * @param diffusionConstant the diffusion constant (defaults to 1.0)
      */
-    DiffusionUpdateRule(double diffusionConstant=1.0);
+    DiffusionCaUpdateRule(double diffusionConstant=1.0);
 
     /**
      * Destructor.
      */
-    ~DiffusionUpdateRule();
+    ~DiffusionCaUpdateRule();
 
     /**
      * Overridden GetNewLocationOfCell() method.
@@ -96,7 +96,7 @@ public:
      * @return the new location index of the cell
      */
     unsigned GetNewLocationOfCell(unsigned currentLocationIndex,
-                                  LatticeBasedCellPopulation<DIM>& rCellPopulation,
+                                  CaBasedCellPopulation<DIM>& rCellPopulation,
                                   double dt);
 
     /** @return mDiffusionConstant */
@@ -104,6 +104,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(DiffusionUpdateRule)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(DiffusionCaUpdateRule)
 
-#endif /*DIFFUSIONUPDATERULE_HPP_*/
+#endif /*DIFFUSIONCAUPDATERULE_HPP_*/

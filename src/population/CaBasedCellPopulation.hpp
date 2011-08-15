@@ -56,9 +56,9 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 template<unsigned DIM>
-class LatticeBasedCellPopulation : public AbstractCellPopulation<DIM>
+class CaBasedCellPopulation : public AbstractCellPopulation<DIM>
 {
-    friend class TestLatticeBasedCellPopulation;
+    friend class TestCaBasedCellPopulation;
 
 private:
 
@@ -145,7 +145,7 @@ public:
      *            (defaults to false)
      * @param validate whether to validate the cell population (defaults to false)
      */
-    LatticeBasedCellPopulation(TetrahedralMesh<DIM, DIM>& rMesh,
+    CaBasedCellPopulation(TetrahedralMesh<DIM, DIM>& rMesh,
                        std::vector<CellPtr>& rCells,
                        const std::vector<unsigned> locationIndices=std::vector<unsigned>(),
                        bool onlyUseNearestNeighboursForDivision=false,
@@ -158,12 +158,12 @@ public:
      *
      * @param rMesh a tetrahedral mesh.
      */
-    LatticeBasedCellPopulation(TetrahedralMesh<DIM, DIM>& rMesh);
+    CaBasedCellPopulation(TetrahedralMesh<DIM, DIM>& rMesh);
 
     /**
      * Destructor.
      */
-    ~LatticeBasedCellPopulation();
+    ~CaBasedCellPopulation();
 
     /**
      * @return reference to  mrMesh.
@@ -478,18 +478,18 @@ public:
 #undef COVERAGE_IGNORE // Avoid prototypes being treated as code by gcov
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(LatticeBasedCellPopulation)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(CaBasedCellPopulation)
 
 namespace boost
 {
 namespace serialization
 {
 /**
- * Serialize information required to construct a LatticeBasedCellPopulation.
+ * Serialize information required to construct a CaBasedCellPopulation.
  */
 template<class Archive, unsigned DIM>
 inline void save_construct_data(
-    Archive & ar, const LatticeBasedCellPopulation<DIM> * t, const BOOST_PFTO unsigned int file_version)
+    Archive & ar, const CaBasedCellPopulation<DIM> * t, const BOOST_PFTO unsigned int file_version)
 {
     // Save data required to construct instance
     const TetrahedralMesh<DIM,DIM>* p_mesh = &(t->rGetMesh());
@@ -502,14 +502,14 @@ inline void save_construct_data(
  */
 template<class Archive, unsigned DIM>
 inline void load_construct_data(
-    Archive & ar, LatticeBasedCellPopulation<DIM> * t, const unsigned int file_version)
+    Archive & ar, CaBasedCellPopulation<DIM> * t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
     TetrahedralMesh<DIM,DIM>* p_mesh;
     ar >> p_mesh;
 
     // Invoke inplace constructor to initialise instance
-    ::new(t)LatticeBasedCellPopulation<DIM>(*p_mesh);
+    ::new(t)CaBasedCellPopulation<DIM>(*p_mesh);
 }
 }
 } // namespace ...

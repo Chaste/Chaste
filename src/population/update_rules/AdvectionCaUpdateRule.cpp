@@ -26,27 +26,27 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#include "AdvectionUpdateRule.hpp"
+#include "AdvectionCaUpdateRule.hpp"
 
 #include "Exception.hpp"
 #include "RandomNumberGenerator.hpp"
 
 template<unsigned DIM>
-AdvectionUpdateRule<DIM>::AdvectionUpdateRule(unsigned advectionDirection, double advectionSpeed)
-    : AbstractUpdateRule<DIM>(),
+AdvectionCaUpdateRule<DIM>::AdvectionCaUpdateRule(unsigned advectionDirection, double advectionSpeed)
+    : AbstractCaUpdateRule<DIM>(),
       mAdvectionDirection(advectionDirection),
       mAdvectionSpeed(advectionSpeed)
 {
 }
 
 template<unsigned DIM>
-AdvectionUpdateRule<DIM>::AdvectionUpdateRule()
-    : AbstractUpdateRule<DIM>()
+AdvectionCaUpdateRule<DIM>::AdvectionCaUpdateRule()
+    : AbstractCaUpdateRule<DIM>()
 {
 }
 
 template<unsigned DIM>
-AdvectionUpdateRule<DIM>::~AdvectionUpdateRule()
+AdvectionCaUpdateRule<DIM>::~AdvectionCaUpdateRule()
 {
 }
 
@@ -56,8 +56,8 @@ AdvectionUpdateRule<DIM>::~AdvectionUpdateRule()
  * read in.
  */
 template<unsigned DIM>
-unsigned AdvectionUpdateRule<DIM>::GetNewLocationOfCell(unsigned currentLocationIndex,
-                                                        LatticeBasedCellPopulation<DIM>& rCellPopulation,
+unsigned AdvectionCaUpdateRule<DIM>::GetNewLocationOfCell(unsigned currentLocationIndex,
+                                                        CaBasedCellPopulation<DIM>& rCellPopulation,
                                                         double dt)
 {
     // This method only works in 2D at present
@@ -166,13 +166,13 @@ unsigned AdvectionUpdateRule<DIM>::GetNewLocationOfCell(unsigned currentLocation
 }
 
 template<unsigned DIM>
-unsigned AdvectionUpdateRule<DIM>::GetAdvectionDirection()
+unsigned AdvectionCaUpdateRule<DIM>::GetAdvectionDirection()
 {
     return mAdvectionDirection;
 }
 
 template<unsigned DIM>
-double AdvectionUpdateRule<DIM>::GetAdvectionSpeed()
+double AdvectionCaUpdateRule<DIM>::GetAdvectionSpeed()
 {
     return mAdvectionSpeed;
 }
@@ -181,10 +181,10 @@ double AdvectionUpdateRule<DIM>::GetAdvectionSpeed()
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////
 
-template class AdvectionUpdateRule<1>;
-template class AdvectionUpdateRule<2>;
-template class AdvectionUpdateRule<3>;
+template class AdvectionCaUpdateRule<1>;
+template class AdvectionCaUpdateRule<2>;
+template class AdvectionCaUpdateRule<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(AdvectionUpdateRule)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(AdvectionCaUpdateRule)

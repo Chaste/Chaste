@@ -35,18 +35,18 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CellBasedSimulationArchiver.hpp"
 
 #include "CellsGenerator.hpp"
-#include "LatticeBasedCellBasedSimulation.hpp"
+#include "CaBasedCellBasedSimulation.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
-#include "LatticeBasedCellPopulation.hpp"
-#include "DiffusionUpdateRule.hpp"
-#include "AdvectionUpdateRule.hpp"
+#include "CaBasedCellPopulation.hpp"
+#include "DiffusionCaUpdateRule.hpp"
+#include "AdvectionCaUpdateRule.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "RandomCellKiller.hpp"
 #include "NumericFileComparison.hpp"
 #include "CellBasedEventHandler.hpp"
 
-class TestCellBasedSimulationWithLatticeBasedCellPopulation : public AbstractCellBasedTestSuite
+class TestCellBasedSimulationWithCaBasedCellPopulation : public AbstractCellBasedTestSuite
 {
 private:
 
@@ -121,15 +121,15 @@ public:
         real_node_indices.push_back(73);
 
         // Create a cell population
-        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
+        CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Create a UpdateRule system
-        DiffusionUpdateRule<2> update_rule;
-        std::vector<AbstractUpdateRule<2>* > update_rule_collection;
+        DiffusionCaUpdateRule<2> update_rule;
+        std::vector<AbstractCaUpdateRule<2>* > update_rule_collection;
         update_rule_collection.push_back(&update_rule);
 
         // Set up cell-based simulation
-        LatticeBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        CaBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
         simulator.SetDt(1);
         simulator.SetEndTime(20);
 
@@ -176,13 +176,13 @@ public:
         real_node_indices.push_back(220);
 
         // Create a cell population
-        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
+        CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Create an empty UpdateRule system so only movement from cell birth
-        std::vector<AbstractUpdateRule<2>* > update_rule_collection;
+        std::vector<AbstractCaUpdateRule<2>* > update_rule_collection;
 
         // Set up cell-based simulation
-        LatticeBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        CaBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
         simulator.SetOutputDirectory("TestCellsDividing");
         simulator.SetDt(1);
         simulator.SetEndTime(50);
@@ -212,15 +212,15 @@ public:
         cells_generator.GenerateBasic(cells, real_node_indices.size(), real_node_indices, DIFFERENTIATED);
 
         // Create a cell population
-        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
+        CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Create a UpdateRule system
-        DiffusionUpdateRule<2> update_rule;
-        std::vector<AbstractUpdateRule<2>* > update_rule_collection;
+        DiffusionCaUpdateRule<2> update_rule;
+        std::vector<AbstractCaUpdateRule<2>* > update_rule_collection;
         update_rule_collection.push_back(&update_rule);
 
         // Set up cell-based simulation
-        LatticeBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        CaBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
         simulator.SetOutputDirectory("TestDiffusionOfLargeNumberOfCells");
         simulator.SetDt(0.1);
         simulator.SetEndTime(5.0);
@@ -250,15 +250,15 @@ public:
         cells_generator.GenerateBasic(cells, real_node_indices.size(), real_node_indices, DIFFERENTIATED);
 
         // Create a cell population
-        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
+        CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Create a UpdateRule system
-        DiffusionUpdateRule<2> update_rule;
-        std::vector<AbstractUpdateRule<2>* > update_rule_collection;
+        DiffusionCaUpdateRule<2> update_rule;
+        std::vector<AbstractCaUpdateRule<2>* > update_rule_collection;
         update_rule_collection.push_back(&update_rule);
 
         // Set up cell-based simulation
-        LatticeBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        CaBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
         simulator.SetOutputDirectory("TestDiffusionAndDeathOfLargeNumberOfCells");
         simulator.SetDt(0.1);
         simulator.SetEndTime(10);
@@ -292,15 +292,15 @@ public:
         }
 
         // Create a cell population
-        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
+        CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Create a UpdateRule system
-        DiffusionUpdateRule<2> update_rule;
-        std::vector<AbstractUpdateRule<2>*> update_rule_collection;
+        DiffusionCaUpdateRule<2> update_rule;
+        std::vector<AbstractCaUpdateRule<2>*> update_rule_collection;
         update_rule_collection.push_back(&update_rule);
 
         // Set up cell-based simulation
-        LatticeBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        CaBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
         simulator.SetOutputDirectory("TestDiffusionAndDivisionOfLargeNumberOfCells");
         simulator.SetDt(0.1);
         simulator.SetEndTime(10);
@@ -337,17 +337,17 @@ public:
         real_node_indices.push_back(100);
 
         // Create a cell population
-        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
+        CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Create a UpdateRule system
-        DiffusionUpdateRule<2> diffusion_update_rule;
-        AdvectionUpdateRule<2> advection_update_rule(7, 2.0);
-        std::vector<AbstractUpdateRule<2>*> update_rule_collection;
+        DiffusionCaUpdateRule<2> diffusion_update_rule;
+        AdvectionCaUpdateRule<2> advection_update_rule(7, 2.0);
+        std::vector<AbstractCaUpdateRule<2>*> update_rule_collection;
         update_rule_collection.push_back(&diffusion_update_rule);
         update_rule_collection.push_back(&advection_update_rule);
 
         // Set up cell-based simulation
-        LatticeBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        CaBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
         simulator.SetOutputDirectory("TestDiffusionAndAdvectionAndDivision");
         simulator.SetDt(0.1);
         simulator.SetEndTime(10);
@@ -356,7 +356,7 @@ public:
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
     }
 
-    void TestMultipleAdvectionUpdateRules() throw(Exception)
+    void TestMultipleAdvectionCaUpdateRules() throw(Exception)
     {
         // Create mesh
         TetrahedralMesh<2,2> mesh;
@@ -375,18 +375,18 @@ public:
         real_node_indices.push_back(24);
 
         // Create cell population
-        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
+        CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Create multiple advection update rules, one for each firection
-        std::vector<AbstractUpdateRule<2>*> update_rule_collection;
-        AdvectionUpdateRule<2> update_rule_0(0, 1.0);
-        AdvectionUpdateRule<2> update_rule_1(1, 1.0);
-        AdvectionUpdateRule<2> update_rule_2(2, 1.0);
-        AdvectionUpdateRule<2> update_rule_3(3, 1.0);
-        AdvectionUpdateRule<2> update_rule_4(4, 1.0);
-        AdvectionUpdateRule<2> update_rule_5(5, 1.0);
-        AdvectionUpdateRule<2> update_rule_6(6, 1.0);
-        AdvectionUpdateRule<2> update_rule_7(7, 1.0);
+        std::vector<AbstractCaUpdateRule<2>*> update_rule_collection;
+        AdvectionCaUpdateRule<2> update_rule_0(0, 1.0);
+        AdvectionCaUpdateRule<2> update_rule_1(1, 1.0);
+        AdvectionCaUpdateRule<2> update_rule_2(2, 1.0);
+        AdvectionCaUpdateRule<2> update_rule_3(3, 1.0);
+        AdvectionCaUpdateRule<2> update_rule_4(4, 1.0);
+        AdvectionCaUpdateRule<2> update_rule_5(5, 1.0);
+        AdvectionCaUpdateRule<2> update_rule_6(6, 1.0);
+        AdvectionCaUpdateRule<2> update_rule_7(7, 1.0);
         update_rule_collection.push_back(&update_rule_0);
         update_rule_collection.push_back(&update_rule_1);
         update_rule_collection.push_back(&update_rule_2);
@@ -397,8 +397,8 @@ public:
         update_rule_collection.push_back(&update_rule_7);
 
         // Set up cell-based simulation
-        LatticeBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
-        simulator.SetOutputDirectory("TestMultipleAdvectionUpdateRules");
+        CaBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        simulator.SetOutputDirectory("TestMultipleAdvectionCaUpdateRules");
 
         /*
          * Set the time step to be large enough to guarantee that the cell moves
@@ -438,17 +438,17 @@ public:
         real_node_indices.push_back(0);
 
         // Create a cell population
-        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
+        CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Create two update rules
-        DiffusionUpdateRule<2> diffusion_update_rule(1.0); // unit diffusion coefficient
-        AdvectionUpdateRule<2> advection_update_rule(0, 1.0); // flow upward with unit mean speed
-        std::vector<AbstractUpdateRule<2>*> update_rule_collection;
+        DiffusionCaUpdateRule<2> diffusion_update_rule(1.0); // unit diffusion coefficient
+        AdvectionCaUpdateRule<2> advection_update_rule(0, 1.0); // flow upward with unit mean speed
+        std::vector<AbstractCaUpdateRule<2>*> update_rule_collection;
         update_rule_collection.push_back(&diffusion_update_rule);
         update_rule_collection.push_back(&advection_update_rule);
 
         // Set up cell-based simulation
-        LatticeBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection, true, true);
+        CaBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection, true, true);
         simulator.SetOutputDirectory("TestRandomIterationOverUpdateRules");
         simulator.SetDt(0.1);
         simulator.SetEndTime(5.0);
@@ -485,17 +485,17 @@ public:
         }
 
         // Create a cell population
-        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
+        CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
         cell_population.SetOutputCellCyclePhases(true);
 
         // Create a UpdateRule system
-        DiffusionUpdateRule<2> update_rule;
-        std::vector<AbstractUpdateRule<2>* > update_rule_collection;
+        DiffusionCaUpdateRule<2> update_rule;
+        std::vector<AbstractCaUpdateRule<2>* > update_rule_collection;
         update_rule_collection.push_back(&update_rule);
 
         // Set up cell-based simulation
-        LatticeBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
-        simulator.SetOutputDirectory("LatticeBasedStandardResult");
+        CaBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        simulator.SetOutputDirectory("CaBasedStandardResult");
         simulator.SetDt(0.1);
         simulator.SetEndTime(8.0);
 
@@ -526,12 +526,12 @@ public:
         TS_ASSERT_DELTA(cell_61_location[1], 5.000, 1e-4);
 
         // Check writing of Voronoi data
-        OutputFileHandler handler("LatticeBasedStandardResult", false);
+        OutputFileHandler handler("CaBasedStandardResult", false);
         std::string results_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/cellcyclephases.dat";
 
-        NumericFileComparison comp(results_file, "notforrelease_cell_based/test/data/LatticeBasedCellCyclePhaseOutput/cellcyclephases.dat");
+        NumericFileComparison comp(results_file, "notforrelease_cell_based/test/data/CaBasedCellCyclePhaseOutput/cellcyclephases.dat");
         TS_ASSERT(comp.CompareFiles());
-        TS_ASSERT_EQUALS(system(("diff " + results_file + " notforrelease_cell_based/test/data/LatticeBasedCellCyclePhaseOutput/cellcyclephases.dat").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_file + " notforrelease_cell_based/test/data/CaBasedCellCyclePhaseOutput/cellcyclephases.dat").c_str()), 0);
     }
 
     // Testing Save
@@ -557,17 +557,17 @@ public:
         }
 
         // Create a cell population
-        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
+        CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
         cell_population.SetOutputCellCyclePhases(true);
 
         // Create a UpdateRule system
-        DiffusionUpdateRule<2> update_rule;
-        std::vector<AbstractUpdateRule<2>* > update_rule_collection;
+        DiffusionCaUpdateRule<2> update_rule;
+        std::vector<AbstractCaUpdateRule<2>* > update_rule_collection;
         update_rule_collection.push_back(&update_rule);
 
         // Set up cell-based simulation
-        LatticeBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
-        simulator.SetOutputDirectory("LatticeBasedSaveAndLoad");
+        CaBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        simulator.SetOutputDirectory("CaBasedSaveAndLoad");
         simulator.SetDt(0.1);
 
         // Our full end time is 8.0, here we run until 3.0 then load and run more below
@@ -583,16 +583,16 @@ public:
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 98u);
 
         // Save the results
-        CellBasedSimulationArchiver<2, LatticeBasedCellBasedSimulation<2> >::Save(&simulator);
+        CellBasedSimulationArchiver<2, CaBasedCellBasedSimulation<2> >::Save(&simulator);
     }
 
     // Testing Load (based on previous two tests)
     void TestLoad() throw (Exception)
     {
         // Load the simulation from the TestSave method above and run it from 3.0 to 6.0
-        LatticeBasedCellBasedSimulation<2>* p_simulator1;
+        CaBasedCellBasedSimulation<2>* p_simulator1;
 
-        p_simulator1 = CellBasedSimulationArchiver<2, LatticeBasedCellBasedSimulation<2> >::Load("LatticeBasedSaveAndLoad", 3.0);
+        p_simulator1 = CellBasedSimulationArchiver<2, CaBasedCellBasedSimulation<2> >::Load("CaBasedSaveAndLoad", 3.0);
 
         TS_ASSERT_EQUALS(p_simulator1->rGetCellPopulation().GetNumRealCells(), 98u);
         TS_ASSERT_DELTA(p_simulator1->GetDt(), 0.1, 1e-6);
@@ -601,13 +601,13 @@ public:
         p_simulator1->Solve();
 
         // Get mesh
-        TetrahedralMesh<2,2>& r_mesh1 = (static_cast<LatticeBasedCellPopulation<2>*>(&(p_simulator1->rGetCellPopulation())))->rGetMesh();
+        TetrahedralMesh<2,2>& r_mesh1 = (static_cast<CaBasedCellPopulation<2>*>(&(p_simulator1->rGetCellPopulation())))->rGetMesh();
 
         // Save then reload, compare meshes either side
-        CellBasedSimulationArchiver<2, LatticeBasedCellBasedSimulation<2> >::Save(p_simulator1);
+        CellBasedSimulationArchiver<2, CaBasedCellBasedSimulation<2> >::Save(p_simulator1);
 
-        LatticeBasedCellBasedSimulation<2>* p_simulator2 = CellBasedSimulationArchiver<2, LatticeBasedCellBasedSimulation<2> >::Load("LatticeBasedSaveAndLoad", 6.0);
-        TetrahedralMesh<2,2>& r_mesh2 = (static_cast<LatticeBasedCellPopulation<2>*>(&(p_simulator2->rGetCellPopulation())))->rGetMesh();
+        CaBasedCellBasedSimulation<2>* p_simulator2 = CellBasedSimulationArchiver<2, CaBasedCellBasedSimulation<2> >::Load("CaBasedSaveAndLoad", 6.0);
+        TetrahedralMesh<2,2>& r_mesh2 = (static_cast<CaBasedCellPopulation<2>*>(&(p_simulator2->rGetCellPopulation())))->rGetMesh();
 
         CompareMeshes(&r_mesh1, &r_mesh2);
 
@@ -660,15 +660,15 @@ public:
         cells_generator.GenerateBasic(cells, real_node_indices.size(), real_node_indices, DIFFERENTIATED);
 
         // Create a cell population
-        LatticeBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
+        CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Create a UpdateRule system
-        DiffusionUpdateRule<2> update_rule;
-        std::vector<AbstractUpdateRule<2>* > update_rule_collection;
+        DiffusionCaUpdateRule<2> update_rule;
+        std::vector<AbstractCaUpdateRule<2>* > update_rule_collection;
         update_rule_collection.push_back(&update_rule);
 
         // Set up cell-based simulation
-        LatticeBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        CaBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
         simulator.SetOutputDirectory("TestDiffusionOfLargeNumberOfCells");
         simulator.SetDt(0.1);
         simulator.SetEndTime(5.0);
@@ -679,7 +679,7 @@ public:
         out_stream parameter_file = output_file_handler.OpenOutputFile("results.parameters");
 
         // Try to write simulation parameters to file
-        TS_ASSERT_THROWS_THIS(simulator.OutputSimulationParameters(parameter_file),"OutputSimulationParameters() is not yet implemented for LatticeBasedCellBasedSimulation see #1453");
+        TS_ASSERT_THROWS_THIS(simulator.OutputSimulationParameters(parameter_file),"OutputSimulationParameters() is not yet implemented for CaBasedCellBasedSimulation see #1453");
         parameter_file->close();
     }
 };

@@ -26,10 +26,10 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#include "AdhesionUpdateRule.hpp"
+#include "AdhesionPottsUpdateRule.hpp"
 
 template<unsigned DIM>
-AdhesionUpdateRule<DIM>::AdhesionUpdateRule()
+AdhesionPottsUpdateRule<DIM>::AdhesionPottsUpdateRule()
     : AbstractPottsUpdateRule<DIM>(),
       mCellCellAdhesionEnergyParameter(0.1), // Educated guess
       mCellBoundaryAdhesionEnergyParameter(0.2) // Educated guess
@@ -37,12 +37,12 @@ AdhesionUpdateRule<DIM>::AdhesionUpdateRule()
 }
 
 template<unsigned DIM>
-AdhesionUpdateRule<DIM>::~AdhesionUpdateRule()
+AdhesionPottsUpdateRule<DIM>::~AdhesionPottsUpdateRule()
 {
 }
 
 template<unsigned DIM>
-double AdhesionUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned currentNodeIndex,
+double AdhesionPottsUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned currentNodeIndex,
                                                                 unsigned targetNodeIndex,
                                                                 PottsBasedCellPopulation& rCellPopulation)
 {
@@ -142,43 +142,43 @@ double AdhesionUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned current
 }
 
 template<unsigned DIM>
-double AdhesionUpdateRule<DIM>::GetCellCellAdhesionEnergy(CellPtr pCellA, CellPtr pCellB)
+double AdhesionPottsUpdateRule<DIM>::GetCellCellAdhesionEnergy(CellPtr pCellA, CellPtr pCellB)
 {
     return GetCellCellAdhesionEnergyParameter();
 }
 
 template<unsigned DIM>
-double AdhesionUpdateRule<DIM>::GetCellBoundaryAdhesionEnergy(CellPtr pCell)
+double AdhesionPottsUpdateRule<DIM>::GetCellBoundaryAdhesionEnergy(CellPtr pCell)
 {
     return GetCellBoundaryAdhesionEnergyParameter();
 }
 
 template<unsigned DIM>
-double AdhesionUpdateRule<DIM>::GetCellCellAdhesionEnergyParameter()
+double AdhesionPottsUpdateRule<DIM>::GetCellCellAdhesionEnergyParameter()
 {
     return mCellCellAdhesionEnergyParameter;
 }
 
 template<unsigned DIM>
-double AdhesionUpdateRule<DIM>::GetCellBoundaryAdhesionEnergyParameter()
+double AdhesionPottsUpdateRule<DIM>::GetCellBoundaryAdhesionEnergyParameter()
 {
     return mCellBoundaryAdhesionEnergyParameter;
 }
 
 template<unsigned DIM>
-void AdhesionUpdateRule<DIM>::SetCellCellAdhesionEnergyParameter(double cellCellAdhesionEnergyParameter)
+void AdhesionPottsUpdateRule<DIM>::SetCellCellAdhesionEnergyParameter(double cellCellAdhesionEnergyParameter)
 {
     mCellCellAdhesionEnergyParameter = cellCellAdhesionEnergyParameter;
 }
 
 template<unsigned DIM>
-void AdhesionUpdateRule<DIM>::SetCellBoundaryAdhesionEnergyParameter(double cellBoundaryAdhesionEnergyParameter)
+void AdhesionPottsUpdateRule<DIM>::SetCellBoundaryAdhesionEnergyParameter(double cellBoundaryAdhesionEnergyParameter)
 {
     mCellBoundaryAdhesionEnergyParameter = cellBoundaryAdhesionEnergyParameter;
 }
 
 template<unsigned DIM>
-void AdhesionUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
+void AdhesionPottsUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
 {
 	*rParamsFile << "\t\t\t<CellCellAdhesionEnergyParameter>" << mCellCellAdhesionEnergyParameter << "</CellCellAdhesionEnergyParameter> \n";
     *rParamsFile << "\t\t\t<CellBoundaryAdhesionEnergyParameter>" << mCellBoundaryAdhesionEnergyParameter << "</CellBoundaryAdhesionEnergyParameter> \n";
@@ -191,10 +191,10 @@ void AdhesionUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////
 
-template class AdhesionUpdateRule<1>;
-template class AdhesionUpdateRule<2>;
-template class AdhesionUpdateRule<3>;
+template class AdhesionPottsUpdateRule<1>;
+template class AdhesionPottsUpdateRule<2>;
+template class AdhesionPottsUpdateRule<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(AdhesionUpdateRule)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(AdhesionPottsUpdateRule)

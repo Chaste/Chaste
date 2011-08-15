@@ -31,7 +31,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "AdhesionUpdateRule.hpp"
+#include "AdhesionPottsUpdateRule.hpp"
 #include "PottsBasedCellPopulation.hpp"
 
 // Needed here to avoid serialization errors (on Boost<1.37)
@@ -43,7 +43,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
  * between unlabelled and labelled cells
  */
 template<unsigned DIM>
-class DifferentialAdhesionUpdateRule : public AdhesionUpdateRule<DIM>
+class DifferentialAdhesionPottsUpdateRule : public AdhesionPottsUpdateRule<DIM>
 {
 friend class TestPottsUpdateRules;
 
@@ -76,7 +76,7 @@ private:
     {
         // If Archive is an output archive, then '&' resolves to '<<'
         // If Archive is an input archive, then '&' resolves to '>>'
-        archive & boost::serialization::base_object<AdhesionUpdateRule<DIM> >(*this);
+        archive & boost::serialization::base_object<AdhesionPottsUpdateRule<DIM> >(*this);
         archive & mLabelledCellLabelledCellAdhesionEnergyParameter;
         archive & mLabelledCellCellAdhesionEnergyParameter;
         archive & mLabelledCellBoundaryAdhesionEnergyParameter;
@@ -87,12 +87,12 @@ public:
     /**
      * Constructor.
      */
-    DifferentialAdhesionUpdateRule();
+    DifferentialAdhesionPottsUpdateRule();
 
     /**
      * Destructor.
      */
-    ~DifferentialAdhesionUpdateRule();
+    ~DifferentialAdhesionPottsUpdateRule();
 
     /**
      * Overridden GetCellCellAdhesionEnergy method to implement differential adhesion.
@@ -158,6 +158,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(DifferentialAdhesionUpdateRule)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(DifferentialAdhesionPottsUpdateRule)
 
 #endif /*DIFFERENTIALADHESIONUPDATERULE_HPP_*/

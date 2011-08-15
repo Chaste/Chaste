@@ -26,24 +26,24 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#include "VolumeConstraintUpdateRule.hpp"
+#include "SurfaceAreaConstraintPottsUpdateRule.hpp"
 
 template<unsigned DIM>
-VolumeConstraintUpdateRule<DIM>::VolumeConstraintUpdateRule()
+SurfaceAreaConstraintPottsUpdateRule<DIM>::SurfaceAreaConstraintPottsUpdateRule()
     : AbstractPottsUpdateRule<DIM>(),
       mDeformationEnergyParameter(0.5), // Educated guess
-      mMatureCellTargetVolume(16.0) // Defaults to a 4*4 cell size
+      mMatureCellTargetSurfaceArea(16.0) // Defaults to a 4*4 cell size
 {
-        /// \todo Default values don't apply in 3D. 
+    /// \todo Default values don't apply in 3D. 
 }
 
 template<unsigned DIM>
-VolumeConstraintUpdateRule<DIM>::~VolumeConstraintUpdateRule()
+SurfaceAreaConstraintPottsUpdateRule<DIM>::~SurfaceAreaConstraintPottsUpdateRule()
 {
 }
 
 template<unsigned DIM>
-double VolumeConstraintUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned currentNodeIndex,
+double SurfaceAreaConstraintPottsUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned currentNodeIndex,
                                                                         unsigned targetNodeIndex,
                                                                         PottsBasedCellPopulation& rCellPopulation)
 {
@@ -70,53 +70,53 @@ double VolumeConstraintUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned
 	if (current_node_contained) // current node is in an element
 	{
 		unsigned current_element = (*containing_elements.begin());
-		double current_volume = rCellPopulation.rGetMesh().GetVolumeOfElement(current_element);
-		double current_volume_difference = current_volume - mMatureCellTargetVolume;
+		double current_surface_area = rCellPopulation.rGetMesh().GetSurfaceAreaOfElement(current_element);
+		double current_surface_area_difference = current_surface_area - mMatureCellTargetSurfaceArea;
 
-		delta_H += mDeformationEnergyParameter*((current_volume_difference + 1.0)*(current_volume_difference + 1.0) - current_volume_difference*current_volume_difference);
+		delta_H += mDeformationEnergyParameter*((current_surface_area_difference + 1.0)*(current_surface_area_difference + 1.0) - current_surface_area_difference*current_surface_area_difference);
 	}
 	if (target_node_contained) // target node is in an element
 	{
 		unsigned target_element = (*new_location_containing_elements.begin());
-        double target_volume = rCellPopulation.rGetMesh().GetVolumeOfElement(target_element);
-        double target_volume_difference = target_volume - mMatureCellTargetVolume;
+        double target_surface_area = rCellPopulation.rGetMesh().GetSurfaceAreaOfElement(target_element);
+        double target_surface_area_difference = target_surface_area - mMatureCellTargetSurfaceArea;
 
-		delta_H += mDeformationEnergyParameter*((target_volume_difference - 1.0)*(target_volume_difference - 1.0) - target_volume_difference*target_volume_difference);
+		delta_H += mDeformationEnergyParameter*((target_surface_area_difference - 1.0)*(target_surface_area_difference - 1.0) - target_surface_area_difference*target_surface_area_difference);
 	}
 
 	return delta_H;
 }
 
 template<unsigned DIM>
-double VolumeConstraintUpdateRule<DIM>::GetDeformationEnergyParameter()
+double SurfaceAreaConstraintPottsUpdateRule<DIM>::GetDeformationEnergyParameter()
 {
     return mDeformationEnergyParameter;
 }
 
 template<unsigned DIM>
-void VolumeConstraintUpdateRule<DIM>::SetDeformationEnergyParameter(double deformationEnergyParameter)
+void SurfaceAreaConstraintPottsUpdateRule<DIM>::SetDeformationEnergyParameter(double deformationEnergyParameter)
 {
     mDeformationEnergyParameter = deformationEnergyParameter;
 }
 
 template<unsigned DIM>
-double VolumeConstraintUpdateRule<DIM>::GetMatureCellTargetVolume() const
+double SurfaceAreaConstraintPottsUpdateRule<DIM>::GetMatureCellTargetSurfaceArea() const
 {
-    return mMatureCellTargetVolume;
+    return mMatureCellTargetSurfaceArea;
 }
 
 template<unsigned DIM>
-void VolumeConstraintUpdateRule<DIM>::SetMatureCellTargetVolume(double matureCellTargetVolume)
+void SurfaceAreaConstraintPottsUpdateRule<DIM>::SetMatureCellTargetSurfaceArea(double matureCellTargetSurfaceArea)
 {
-    assert(matureCellTargetVolume >= 0.0);
-    mMatureCellTargetVolume = matureCellTargetVolume;
+    assert(matureCellTargetSurfaceArea >= 0.0);
+    mMatureCellTargetSurfaceArea = matureCellTargetSurfaceArea;
 }
 
 template<unsigned DIM>
-void VolumeConstraintUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
+void SurfaceAreaConstraintPottsUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<DeformationEnergyParameter>" << mDeformationEnergyParameter << "</DeformationEnergyParameter> \n";
-	*rParamsFile << "\t\t\t<MatureCellTargetVolume>" << mMatureCellTargetVolume << "</MatureCellTargetVolume> \n";
+	*rParamsFile << "\t\t\t<MatureCellTargetSurfaceArea>" << mMatureCellTargetSurfaceArea << "</MatureCellTargetSurfaceArea> \n";
 
     // Call method on direct parent class
     AbstractPottsUpdateRule<DIM>::OutputUpdateRuleParameters(rParamsFile);
@@ -126,10 +126,10 @@ void VolumeConstraintUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rPa
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////
 
-template class VolumeConstraintUpdateRule<1>;
-template class VolumeConstraintUpdateRule<2>;
-template class VolumeConstraintUpdateRule<3>;
+template class SurfaceAreaConstraintPottsUpdateRule<1>;
+template class SurfaceAreaConstraintPottsUpdateRule<2>;
+template class SurfaceAreaConstraintPottsUpdateRule<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(VolumeConstraintUpdateRule)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(SurfaceAreaConstraintPottsUpdateRule)
