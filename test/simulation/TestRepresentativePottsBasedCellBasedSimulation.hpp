@@ -40,9 +40,9 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "StochasticDurationGenerationBasedCellCycleModel.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "SloughingCellKiller.hpp"
-#include "VolumeConstraintUpdateRule.hpp"
-#include "AdhesionUpdateRule.hpp"
-#include "DifferentialAdhesionUpdateRule.hpp"
+#include "VolumeConstraintPottsUpdateRule.hpp"
+#include "AdhesionPottsUpdateRule.hpp"
+#include "DifferentialAdhesionPottsUpdateRule.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "PottsMeshGenerator.hpp"
 #include "WildTypeCellMutationState.hpp"
@@ -91,12 +91,12 @@ public:
         }
 
         // Create update rules and pass to the cell population
-        VolumeConstraintUpdateRule<2> volume_constraint_update_rule;
+        VolumeConstraintPottsUpdateRule<2> volume_constraint_update_rule;
         cell_population.AddUpdateRule(&volume_constraint_update_rule);
         volume_constraint_update_rule.SetMatureCellTargetVolume(16);
         volume_constraint_update_rule.SetDeformationEnergyParameter(0.2);
 
-        DifferentialAdhesionUpdateRule<2> differential_adhesion_update_rule;
+        DifferentialAdhesionPottsUpdateRule<2> differential_adhesion_update_rule;
 
         differential_adhesion_update_rule.SetLabelledCellLabelledCellAdhesionEnergyParameter(0.16);
         differential_adhesion_update_rule.SetLabelledCellCellAdhesionEnergyParameter(0.11);
