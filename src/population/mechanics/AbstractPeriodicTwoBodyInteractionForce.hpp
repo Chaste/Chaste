@@ -61,6 +61,12 @@ protected:
 
     /** Initial width of the mesh for use in periodic boundaries. */
     double mInitialWidth;
+    
+    /** An extended mesh, used to implement periodicity. */
+    MutableMesh<DIM,DIM>* mpExtendedMesh;
+
+    /** A map from node indices in mpExtendedMesh to node indices in the cell population. */
+    std::map<unsigned, unsigned> mExtendedMeshNodeIndexMap;
 
 public:
 
@@ -68,6 +74,11 @@ public:
      * Constructor.
      */
     AbstractPeriodicTwoBodyInteractionForce();
+
+    /**
+     * Destructor.
+     */
+    ~AbstractPeriodicTwoBodyInteractionForce();
 
     /**
      * Calculates the force between two nodes.

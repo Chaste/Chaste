@@ -166,12 +166,9 @@ public:
         // Create a cell population
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
 
-        // Get initial width of the cell population
-        double initial_width = cell_population.GetWidth(0);
-
         // Create force
         GeneralisedPeriodicLinearSpringForce<2> linear_force;
-        linear_force.SetInitialWidth(initial_width+0.5);
+        linear_force.SetInitialWidth(2.0);
 
         // Initialise a vector of node forces
         std::vector<c_vector<double, 2> > node_forces;
@@ -194,6 +191,108 @@ public:
         TS_ASSERT_DELTA(node_forces[10][1], 0.0, 1e-4);
     }
 
+    void TestSimpleNonZeroForces() throw(Exception)
+    {
+                // Create 2D mesh
+        std::vector<Node<2> *> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.1, 0.0));
+        nodes.push_back(new Node<2>(1, true, 0.9, 0.0));
+        nodes.push_back(new Node<2>(2, true, 0.1, 1.0));
+        nodes.push_back(new Node<2>(3, true, 0.9, 1.0));
+        MutableMesh<2,2> mesh(nodes);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        // Create cell population
+        MeshBasedCellPopulation<2> cell_population(mesh, cells);
+
+        // Create Voronoi tessellation
+        cell_population.CreateVoronoiTessellation();
+        
+        // Create force
+        GeneralisedPeriodicLinearSpringForce<2> linear_force;
+        linear_force.SetInitialWidth(1.0);
+        linear_force.SetCutOffLength(0.5);
+        
+        // Initialise a vector of node forces
+        std::vector<c_vector<double, 2> > node_forces;
+        node_forces.reserve(cell_population.GetNumNodes());
+
+        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        {
+            node_forces.push_back(zero_vector<double>(2));
+        }
+
+        linear_force.AddForceContribution(node_forces, cell_population);
+             
+        TS_ASSERT_DELTA(node_forces[0][0], 12.0, 1e-4);
+        TS_ASSERT_DELTA(node_forces[0][1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(node_forces[1][0], -12.0, 1e-4);
+        TS_ASSERT_DELTA(node_forces[1][1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(node_forces[2][0], 12.0, 1e-4);
+        TS_ASSERT_DELTA(node_forces[2][1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(node_forces[3][0], -12.0, 1e-4);
+        TS_ASSERT_DELTA(node_forces[3][1], 0.0, 1e-4);                
+    }
+    
+    void TestSimpleNonZeroForcesWithGhostNodes() throw(Exception)
+    {
+        // Create 2D mesh
+        std::vector<Node<2> *> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.1, 0.0));
+        nodes.push_back(new Node<2>(1, true, 0.9, 0.0));
+        nodes.push_back(new Node<2>(2, true, 0.1, 1.0));
+        nodes.push_back(new Node<2>(3, true, 0.9, 1.0));
+        nodes.push_back(new Node<2>(4, true, 0.5, -0.2));
+        nodes.push_back(new Node<2>(5, true, 0.5, 1.1));
+        MutableMesh<2,2> mesh(nodes);
+
+        std::vector<unsigned> location_indices;
+        location_indices.push_back(0);
+        location_indices.push_back(1);
+        location_indices.push_back(2);
+        location_indices.push_back(3);
+                              
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateGivenLocationIndices(cells, location_indices);
+
+        // Create cell population
+        MeshBasedCellPopulationWithGhostNodes<2> cell_population(mesh, cells, location_indices);
+
+        // Create Voronoi tessellation
+        cell_population.CreateVoronoiTessellation();
+        
+        // Create force
+        GeneralisedPeriodicLinearSpringForce<2> linear_force;
+        linear_force.SetInitialWidth(1.0);
+        linear_force.SetCutOffLength(0.5);
+        
+        // Initialise a vector of node forces
+        std::vector<c_vector<double, 2> > node_forces;
+        node_forces.reserve(cell_population.GetNumNodes());
+
+        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        {
+            node_forces.push_back(zero_vector<double>(2));
+        }
+
+        linear_force.AddForceContribution(node_forces, cell_population);
+             
+        TS_ASSERT_DELTA(node_forces[0][0], 12.0, 1e-4);
+        TS_ASSERT_DELTA(node_forces[0][1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(node_forces[1][0], -12.0, 1e-4);
+        TS_ASSERT_DELTA(node_forces[1][1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(node_forces[2][0], 12.0, 1e-4);
+        TS_ASSERT_DELTA(node_forces[2][1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(node_forces[3][0], -12.0, 1e-4);
+        TS_ASSERT_DELTA(node_forces[3][1], 0.0, 1e-4);                
+    }
+    
     void TestGeneralisedPeriodicLinearSpringForceArchiving() throw (Exception)
     {
         OutputFileHandler handler("archive", false);

@@ -68,8 +68,8 @@ c_vector<double, DIM> GeneralisedPeriodicLinearSpringForce<DIM>::CalculateForceB
     assert(nodeAGlobalIndex != nodeBGlobalIndex);
 
     // Get the node locations
-    c_vector<double, DIM> node_a_location = rCellPopulation.GetNode(nodeAGlobalIndex)->rGetLocation();
-    c_vector<double, DIM> node_b_location = rCellPopulation.GetNode(nodeBGlobalIndex)->rGetLocation();
+    c_vector<double, DIM> node_a_location = this->mpExtendedMesh->GetNode(nodeAGlobalIndex)->rGetLocation();
+    c_vector<double, DIM> node_b_location = this->mpExtendedMesh->GetNode(nodeBGlobalIndex)->rGetLocation();
 
     /*
      * Get the unit vector parallel to the line joining the two nodes.
@@ -79,7 +79,7 @@ c_vector<double, DIM> GeneralisedPeriodicLinearSpringForce<DIM>::CalculateForceB
      * their positions, because this method can be overloaded (e.g. to enforce a
      * periodic boundary in Cylindrical2dMesh).
      */
-    c_vector<double, DIM> unit_difference = (static_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation))->rGetMesh().GetVectorFromAtoB(node_a_location, node_b_location);
+    c_vector<double, DIM> unit_difference = this->mpExtendedMesh->GetVectorFromAtoB(node_a_location, node_b_location);
 
     // Calculate the distance between the two nodes
     double distance_between_nodes = norm_2(unit_difference);
@@ -104,9 +104,6 @@ c_vector<double, DIM> GeneralisedPeriodicLinearSpringForce<DIM>::CalculateForceB
 
     double rest_length = 1.0;
 
-    CellPtr p_cell_A = rCellPopulation.GetCellUsingLocationIndex(nodeAGlobalIndex);
-    CellPtr p_cell_B = rCellPopulation.GetCellUsingLocationIndex(nodeBGlobalIndex);
-
     ///\todo Extend force class to cope with newly divided cells (#1856)
 
     double a_rest_length = rest_length*0.5;
@@ -121,7 +118,7 @@ c_vector<double, DIM> GeneralisedPeriodicLinearSpringForce<DIM>::CalculateForceB
 
     // Although in this class the 'spring constant' is a constant parameter, in
     // subclasses it can depend on properties of each of the cells
-    double multiplication_factor = VariableSpringConstantMultiplicationFactor(nodeAGlobalIndex, nodeBGlobalIndex, rCellPopulation, is_closer_than_rest_length);
+    double multiplication_factor = VariableSpringConstantMultiplicationFactor(this->mExtendedMeshNodeIndexMap[nodeAGlobalIndex], this->mExtendedMeshNodeIndexMap[nodeBGlobalIndex], rCellPopulation, is_closer_than_rest_length);
     double spring_stiffness = mMeinekeSpringStiffness;
     double overlap = distance_between_nodes - rest_length;
 
