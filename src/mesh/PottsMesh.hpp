@@ -30,8 +30,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #define POTTSMESH_HPP_
 
 // Forward declaration prevents circular include chain
-//template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-//class PottsMeshWriter;
+template<unsigned DIM>
+class PottsMeshWriter;
 
 #include <iostream>
 #include <map>
@@ -43,6 +43,9 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <boost/serialization/split_member.hpp>
 
 #include "AbstractMesh.hpp"
+#include "ArchiveLocationInfo.hpp"
+#include "PottsMeshReader.hpp"
+#include "PottsMeshWriter.hpp"
 #include "PottsElement.hpp"
 
 /**
@@ -90,44 +93,44 @@ protected:
     /** Needed for serialization. */
     friend class boost::serialization::access;
 
-//    /**
-//     * Archive the PottsMesh and its member variables. Note that this will
-//     * write out a PottsMeshWriter file to wherever ArchiveLocationInfo has specified.
-//     *
-//     * @param archive the archive
-//     * @param version the current version of this class
-//     */
-//    template<class Archive>
-//    void save(Archive & archive, const unsigned int version) const
-//    {
-//        // NOTE - Subclasses must archive their member variables BEFORE calling this method.
-//        archive & mDeletedElementIndices;
-//        archive & boost::serialization::base_object<AbstractMesh<ELEMENT_DIM,SPACE_DIM> >(*this);
-//
-//        // Create a mesh writer pointing to the correct file and directory
-//        PottsMeshWriter mesh_writer(ArchiveLocationInfo::GetArchiveRelativePath(),
-//                                                             ArchiveLocationInfo::GetMeshFilename(),
-//                                                             false);
-//        mesh_writer.WriteFilesUsingMesh(*(const_cast<PottsMesh<2>*>(this)));
-//    }
-//
-//    /**
-//     * Loads a mesh by using PottsMeshReader and the location in ArchiveLocationInfo.
-//     *
-//     * @param archive the archive
-//     * @param version the current version of this class
-//     */
-//    template<class Archive>
-//    void load(Archive & archive, const unsigned int version)
-//    {
-//        // NOTE - Subclasses must archive their member variables BEFORE calling this method.
-//        archive & mDeletedElementIndices;
-//        archive & boost::serialization::base_object<AbstractMesh<ELEMENT_DIM,SPACE_DIM> >(*this);
-//
-//        PottsMeshReader<ELEMENT_DIM,SPACE_DIM> mesh_reader(ArchiveLocationInfo::GetArchiveDirectory() + ArchiveLocationInfo::GetMeshFilename());
-//        this->ConstructFromMeshReader(mesh_reader);
-//    }
-//    BOOST_SERIALIZATION_SPLIT_MEMBER()
+    /**
+     * Archive the PottsMesh and its member variables. Note that this will
+     * write out a PottsMeshWriter file to wherever ArchiveLocationInfo has specified.
+     *
+     * @param archive the archive
+     * @param version the current version of this class
+     */
+    template<class Archive>
+    void save(Archive & archive, const unsigned int version) const
+    {
+        // NOTE - Subclasses must archive their member variables BEFORE calling this method.
+        archive & mDeletedElementIndices;
+        archive & boost::serialization::base_object<AbstractMesh<DIM, DIM> >(*this);
+
+        // Create a mesh writer pointing to the correct file and directory
+        PottsMeshWriter<DIM> mesh_writer(ArchiveLocationInfo::GetArchiveRelativePath(),
+                                         ArchiveLocationInfo::GetMeshFilename(),
+                                         false);
+        mesh_writer.WriteFilesUsingMesh(*(const_cast<PottsMesh<DIM>*>(this)));
+    }
+
+    /**
+     * Loads a mesh by using PottsMeshReader and the location in ArchiveLocationInfo.
+     *
+     * @param archive the archive
+     * @param version the current version of this class
+     */
+    template<class Archive>
+    void load(Archive & archive, const unsigned int version)
+    {
+        // NOTE - Subclasses must archive their member variables BEFORE calling this method.
+        archive & mDeletedElementIndices;
+        archive & boost::serialization::base_object<AbstractMesh<DIM, DIM> >(*this);
+
+        PottsMeshReader<DIM> mesh_reader(ArchiveLocationInfo::GetArchiveDirectory() + ArchiveLocationInfo::GetMeshFilename());
+        this->ConstructFromMeshReader(mesh_reader);
+    }
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
 
 public:
 
@@ -206,12 +209,12 @@ public:
      */
     virtual c_vector<double, DIM> GetCentroidOfElement(unsigned index);
 
-//    /*
-//     * Construct the mesh using a MeshReader.
-//     *
-//     * @param rMeshReader the mesh reader
-//     */
-//    void ConstructFromMeshReader(AbstractMeshReader<DIM,DIM>& rMeshReader);
+    /**
+     * Construct the mesh using a MeshReader.
+     *
+     * @param rMeshReader the mesh reader
+     */
+    void ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& rMeshReader);
 
     /**
      * Delete mNodes and mElements.
@@ -380,8 +383,8 @@ public:
     };
 };
 
-//#include "SerializationExportWrapper.hpp"
-//EXPORT_TEMPLATE_CLASS_ALL_DIMS(PottsMesh)
+#include "SerializationExportWrapper.hpp"
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(PottsMesh)
 
 //////////////////////////////////////////////////////////////////////////////
 // PottsElementIterator class implementation - most methods are inlined     //

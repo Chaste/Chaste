@@ -63,12 +63,12 @@ class PottsBasedCellPopulation : public AbstractCellPopulation<2>
 private:
 
     /** Potts-based mesh associated with the cell population. */
-    PottsMesh<2> & mrMesh;
+    PottsMesh<2>& mrMesh;
 
     /**
-     * Pointer to a VertexMesh object that stores the Element tessellation that is used to visualise
-     * mrMesh. The tessellation is created by calling CreateElelmentTessellation() and can
-     * be accessed by calling GetElementTessellation().
+     * Pointer to a VertexMesh object that stores the Element tessellation that is used to
+     * visualise mrMesh. The tessellation is created by calling CreateElementTessellation()
+     * and can be accessed by calling GetElementTessellation().
      */
     VertexMesh<2,2>* mpElementTessellation;
 
@@ -108,8 +108,10 @@ private:
 #define COVERAGE_IGNORE
         archive & boost::serialization::base_object<AbstractCellPopulation<2> >(*this);
 
-        // The Voronoi stuff can't be archived yet
-        //archive & mpElementTessellation
+        /*
+         * In its current form the code does not allow the direct serialization
+         * of the VertexMesh class, so instead we delete mpVoronoiTessellation.
+         */
         delete mpElementTessellation;
         mpElementTessellation = NULL;
 
@@ -128,20 +130,7 @@ private:
     /**
      * Overridden WriteVtkResultsToFile() method.
      */
-    void WriteVtkResultsToFile()
-    {
-        ///\todo implement writing VTK results for this class (#1666)
-    }
-
-    /**
-     * Create a Element tessellation of the mesh for use in visualising the mesh.
-     */
-    void CreateElementTessellation();
-
-    /**
-     * Get a reference to mpElementTessellation.
-     */
-    VertexMesh<2,2>* GetElementTessellation();
+    void WriteVtkResultsToFile(){}
 
 public:
 
@@ -163,6 +152,13 @@ public:
                              bool deleteMesh=false,
                              bool validate=true,
                              const std::vector<unsigned> locationIndices=std::vector<unsigned>());
+
+    /**
+     * Constructor for use by the de-serializer.
+     *
+     * @param rMesh a vertex mesh.
+     */
+    PottsBasedCellPopulation(PottsMesh<2>& rMesh);
 
     /**
      * Destructor, which frees any memory allocated by the constructor.
@@ -396,6 +392,16 @@ public:
      * @param flag Whether to update nodes in a random order.
      */
     void SetUpdateNodesInRandomOrder(bool flag);
+
+    /**
+     * Create a Element tessellation of the mesh for use in visualising the mesh.
+     */
+    void CreateElementTessellation();
+
+    /**
+     * Get a reference to mpElementTessellation.
+     */
+    VertexMesh<2,2>* GetElementTessellation();
 };
 
 #include "SerializationExportWrapper.hpp"
@@ -432,7 +438,7 @@ inline void load_construct_data(
     ar >> p_mesh;
 
     // Invoke inplace constructor to initialise instance
-    //::new(t)PottsBasedCellPopulation(*p_mesh);
+    ::new(t)PottsBasedCellPopulation(*p_mesh);
 }
 }
 } // namespace ...

@@ -65,6 +65,7 @@ PottsBasedCellPopulation::PottsBasedCellPopulation(PottsMesh<2>& rMesh,
                                           const std::vector<unsigned> locationIndices)
     : AbstractCellPopulation<2>(rCells, locationIndices),
       mrMesh(rMesh),
+      mpElementTessellation(NULL),
       mDeleteMesh(deleteMesh),
       mTemperature(0.1),
       mUpdateNodesInRandomOrder(true)
@@ -76,14 +77,22 @@ PottsBasedCellPopulation::PottsBasedCellPopulation(PottsMesh<2>& rMesh,
     }
 }
 
+PottsBasedCellPopulation::PottsBasedCellPopulation(PottsMesh<2>& rMesh)
+    : mrMesh(rMesh),
+      mpElementTessellation(NULL),
+      mDeleteMesh(true),
+      mTemperature(0.1),
+      mUpdateNodesInRandomOrder(true)
+{
+}
+
 PottsBasedCellPopulation::~PottsBasedCellPopulation()
 {
+    delete mpElementTessellation;
+
     if (mDeleteMesh)
     {
-        // Not used until archiving is implemented
-        #define COVERAGE_IGNORE
         delete &mrMesh;
-        #undef COVERAGE_IGNORE
     }
 }
 
@@ -189,7 +198,6 @@ void PottsBasedCellPopulation::UpdateNodeLocations(const std::vector< c_vector<d
     for (unsigned i=0; i<perm.size(); i++)
     {
         unsigned node_index = perm[i];
-
         Node<2>* p_node = mrMesh.GetNode(node_index);
 
         // Each node in the mesh must be in at most one element
@@ -421,11 +429,24 @@ void PottsBasedCellPopulation::AddUpdateRule(AbstractPottsUpdateRule<2>* pUpdate
 
 void PottsBasedCellPopulation::CreateElementTessellation()
 {
-	///\todo create a Potts tessellation here to enable VTK output (#1666)
+    ///\todo implement this method (#1666)
+//	delete mpElementTessellation;
+//
+//    ///\todo this code would need to be extended if the domain were required to be periodic
+//
+//	std::vector<Node<2>*> nodes;
+//	for (unsigned node_index=0; node_index<mrMesh.GetNumNodes(); node_index++)
+//	{
+//	    Node<2>* p_temp_node = mrMesh.GetNode(node_index);
+//	    nodes.push_back(p_temp_node);
+//	}
+//	MutableMesh<2,2> mesh(nodes);
+//    mpElementTessellation = new VertexMesh<2,2>(mesh);
 }
 
-VertexMesh<2, 2>* PottsBasedCellPopulation::GetElementTessellation()
+VertexMesh<2,2>* PottsBasedCellPopulation::GetElementTessellation()
 {
+//    assert(mpElementTessellation != NULL);
     return mpElementTessellation;
 }
 

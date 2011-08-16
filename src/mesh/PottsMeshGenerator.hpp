@@ -57,18 +57,25 @@ public:
      * @param numNodesAcross  The number of columns of nodes in the mesh
      * @param numElementsAcross  The number of columns of elements in the mesh
      * @param elementWidth  Width of the elements
-     * @param numNodesUp  The number of rows of nodes in the mesh
-     * @param numElementsUp  The number of rows of elements in the mesh
-     * @param elementHeight  Height of the elements
-     * @param numNodesDeep  The number nodes deep for this mesh
-     * @param numElementsDeep  The number of elements deep for this mesh
-     * @param elementDepth  The number of rows of nodes in each element
-     * @param startAtBottomLeft  If true then the mesh starts in the bottom left corner of the domain rather than the centre, used for simple tests
+     * @param numNodesUp  The number of rows of nodes in the mesh (defaults to 1)
+     * @param numElementsUp  The number of rows of elements in the mesh (defaults to 1)
+     * @param elementHeight  Height of the elements (defaults to 1)
+     * @param numNodesDeep  The number nodes deep for this mesh (defaults to 1)
+     * @param numElementsDeep  The number of elements deep for this mesh (defaults to 1)
+     * @param elementDepth  The number of rows of nodes in each element (defaults to 1)
+     * @param startAtBottomLeft  If true then the mesh starts in the bottom left corner
+     *     of the domain rather than the centre, used for simple tests (defaults to false)
      */
-    PottsMeshGenerator(	unsigned numNodesAcross, unsigned numElementsAcross, unsigned elementWidth,
-						unsigned numNodesUp=1u, unsigned numElementsUp=1u, unsigned elementHeight=1u,
-						unsigned numNodesDeep=1u, unsigned numElementsDeep=1u, unsigned elementDepth=1u,
-						bool startAtBottomLeft = false);
+    PottsMeshGenerator(unsigned numNodesAcross,
+                       unsigned numElementsAcross,
+                       unsigned elementWidth,
+					   unsigned numNodesUp=1u,
+					   unsigned numElementsUp=1u,
+					   unsigned elementHeight=1u,
+					   unsigned numNodesDeep=1u,
+					   unsigned numElementsDeep=1u,
+					   unsigned elementDepth=1u,
+					   bool startAtBottomLeft = false);
 
     /**
      * Null constructor for derived classes to call.

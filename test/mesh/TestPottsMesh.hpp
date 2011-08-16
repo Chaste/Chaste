@@ -34,10 +34,11 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
-//#include "PottsMeshWriter.hpp"
-//#include "PottsMeshReader.hpp"
+#include "PottsMeshWriter.hpp"
+#include "PottsMeshReader.hpp"
 #include "PottsMesh.hpp"
 #include "PottsMeshGenerator.hpp"
+#include "ArchiveOpener.hpp"
 
 class TestPottsMesh : public CxxTest::TestSuite
 {
@@ -1070,92 +1071,95 @@ public:
         //TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(1)->GetNodeGlobalIndex(0), 3u);
     }
 
-    //    void TestArchive2dPottsMesh()
-    //    {
-    //        FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
-    //        std::string archive_file = "potts_mesh_2d.arch";
-    //        ArchiveLocationInfo::SetMeshFilename("potts_mesh");
-    //
-    //        HoneycombPottsMeshGenerator generator(4, 4, 2, 2, 2, 2);
-    //        AbstractMesh<2,2>* const p_mesh = generator.GetMesh();
-    //
-    //        /*
-    //         * You need the const above to stop a BOOST_STATIC_ASSERTION failure.
-    //         * This is because the serialization library only allows you to save tracked
-    //         * objects while the compiler considers them const, to prevent the objects
-    //         * changing during the save, and so object tracking leading to wrong results.
-    //         *
-    //         * E.g. A is saved once via pointer, then changed, then saved again. The second
-    //         * save notes that A was saved before, so doesn't write its data again, and the
-    //         * change is lost.
-    //         */
-    //
-    //        // Create an output archive
-    //        {
-    //            TS_ASSERT_EQUALS((static_cast<PottsMesh<2>*>(p_mesh))->GetNumNodes(), 46u);
-    //            TS_ASSERT_EQUALS((static_cast<PottsMesh<2>*>(p_mesh))->GetNumElements(), 15u);
-    //
-    //            // Create output archive
-    //            ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
-    //            boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
-    //
-    //            // We have to serialize via a pointer here, or the derived class information is lost
-    //            (*p_arch) << p_mesh;
-    //        }
-    //
-    //        {
-    //            // De-serialize and compare
-    //            AbstractMesh<2,2>* p_mesh2;
-    //
-    //            // Create an input archive
-    //            ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
-    //            boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
-    //
-    //            // Restore from the archive
-    //            (*p_arch) >> p_mesh2;
-    //
-    //            PottsMesh<2>* p_mesh_original = static_cast<PottsMesh<2>*>(p_mesh);
-    //            PottsMesh<2>* p_mesh_loaded = static_cast<PottsMesh<2>*>(p_mesh2);
-    //
-    //            // Compare the loaded mesh against the original
-    //
-    //            TS_ASSERT_EQUALS(p_mesh_original->GetNumNodes(), p_mesh_loaded->GetNumNodes());
-    //
-    //            for (unsigned node_index=0; node_index<p_mesh_original->GetNumNodes(); node_index++)
-    //            {
-    //                Node<2>* p_node = p_mesh_original->GetNode(node_index);
-    //                Node<2>* p_node2 = p_mesh_loaded->GetNode(node_index);
-    //
-    //                TS_ASSERT_EQUALS(p_node->IsDeleted(), p_node2->IsDeleted());
-    //                TS_ASSERT_EQUALS(p_node->GetIndex(), p_node2->GetIndex());
-    //
-    //                TS_ASSERT_EQUALS(p_node->IsBoundaryNode(), p_node2->IsBoundaryNode());
-    //
-    //                for (unsigned dimension=0; dimension<2; dimension++)
-    //                {
-    //                    TS_ASSERT_DELTA(p_node->rGetLocation()[dimension], p_node2->rGetLocation()[dimension], 1e-4);
-    //                }
-    //            }
-    //
-    //            TS_ASSERT_EQUALS(p_mesh_original->GetNumElements(), p_mesh_loaded->GetNumElements());
-    //
-    //            for (unsigned elem_index=0; elem_index < p_mesh_original->GetNumElements(); elem_index++)
-    //            {
-    //                TS_ASSERT_EQUALS(p_mesh_original->GetElement(elem_index)->GetNumNodes(),
-    //                                 p_mesh_loaded->GetElement(elem_index)->GetNumNodes());
-    //
-    //                for (unsigned local_index=0; local_index<p_mesh_original->GetElement(elem_index)->GetNumNodes(); local_index++)
-    //                {
-    //                    TS_ASSERT_EQUALS(p_mesh_original->GetElement(elem_index)->GetNodeGlobalIndex(local_index),
-    //                                     p_mesh_loaded->GetElement(elem_index)->GetNodeGlobalIndex(local_index));
-    //                }
-    //            }
-    //
-    //            // Tidy up
-    //            delete p_mesh_loaded;
-    //        }
-    //        //HoneycombPottsMeshGenerator deletes the original
-    //    }
+    void TestArchive2dPottsMesh()
+    {
+        FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
+        std::string archive_file = "potts_mesh_2d.arch";
+        ArchiveLocationInfo::SetMeshFilename("potts_mesh");
+
+        // Create mesh
+        PottsMeshReader<2> mesh_reader("notforrelease_cell_based/test/data/TestPottsMeshWriter/potts_mesh_2d");
+        PottsMesh<2> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        AbstractMesh<2,2>* const p_mesh = &mesh;
+
+        /*
+         * You need the const above to stop a BOOST_STATIC_ASSERTION failure.
+         * This is because the serialization library only allows you to save tracked
+         * objects while the compiler considers them const, to prevent the objects
+         * changing during the save, and so object tracking leading to wrong results.
+         *
+         * E.g. A is saved once via pointer, then changed, then saved again. The second
+         * save notes that A was saved before, so doesn't write its data again, and the
+         * change is lost.
+         */
+
+        // Create an output archive
+        {
+            TS_ASSERT_EQUALS((static_cast<PottsMesh<2>*>(p_mesh))->GetNumNodes(), 6u);
+            TS_ASSERT_EQUALS((static_cast<PottsMesh<2>*>(p_mesh))->GetNumElements(), 2u);
+
+            // Create output archive
+            ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
+
+            // We have to serialize via a pointer here, or the derived class information is lost
+            (*p_arch) << p_mesh;
+        }
+
+        {
+            // De-serialize and compare
+            AbstractMesh<2,2>* p_mesh2;
+
+            // Create an input archive
+            ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
+
+            // Restore from the archive
+            (*p_arch) >> p_mesh2;
+
+            PottsMesh<2>* p_mesh_original = static_cast<PottsMesh<2>*>(p_mesh);
+            PottsMesh<2>* p_mesh_loaded = static_cast<PottsMesh<2>*>(p_mesh2);
+
+            // Compare the loaded mesh against the original
+
+            TS_ASSERT_EQUALS(p_mesh_original->GetNumNodes(), p_mesh_loaded->GetNumNodes());
+
+            for (unsigned node_index=0; node_index<p_mesh_original->GetNumNodes(); node_index++)
+            {
+                Node<2>* p_node = p_mesh_original->GetNode(node_index);
+                Node<2>* p_node2 = p_mesh_loaded->GetNode(node_index);
+
+                TS_ASSERT_EQUALS(p_node->IsDeleted(), p_node2->IsDeleted());
+                TS_ASSERT_EQUALS(p_node->GetIndex(), p_node2->GetIndex());
+
+                TS_ASSERT_EQUALS(p_node->IsBoundaryNode(), p_node2->IsBoundaryNode());
+
+                for (unsigned dimension=0; dimension<2; dimension++)
+                {
+                    TS_ASSERT_DELTA(p_node->rGetLocation()[dimension], p_node2->rGetLocation()[dimension], 1e-4);
+                }
+            }
+
+            TS_ASSERT_EQUALS(p_mesh_original->GetNumElements(), p_mesh_loaded->GetNumElements());
+
+            for (unsigned elem_index=0; elem_index < p_mesh_original->GetNumElements(); elem_index++)
+            {
+                TS_ASSERT_EQUALS(p_mesh_original->GetElement(elem_index)->GetNumNodes(),
+                                 p_mesh_loaded->GetElement(elem_index)->GetNumNodes());
+
+                for (unsigned local_index=0; local_index<p_mesh_original->GetElement(elem_index)->GetNumNodes(); local_index++)
+                {
+                    TS_ASSERT_EQUALS(p_mesh_original->GetElement(elem_index)->GetNodeGlobalIndex(local_index),
+                                     p_mesh_loaded->GetElement(elem_index)->GetNodeGlobalIndex(local_index));
+                }
+            }
+
+            // Tidy up
+            delete p_mesh_loaded;
+        }
+    }
 };
 
 #endif /*TESTPOTTSMESH_HPP_*/
