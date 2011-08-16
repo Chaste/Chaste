@@ -26,8 +26,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#ifndef TESTPOTTSWRITER_HPP_
-#define TESTPOTTSWRITER_HPP_
+#ifndef TESTPOTTSMESHWRITER_HPP_
+#define TESTPOTTSMESHWRITER_HPP_
 
 #include <cxxtest/TestSuite.h>
 
@@ -40,7 +40,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "PottsMeshWriter.hpp"
 #include "VtkMeshWriter.hpp"
 
-class TestPottsWriter : public CxxTest::TestSuite
+class TestPottsMeshWriter : public CxxTest::TestSuite
 {
 public:
     void TestPottsMeshWriterIn2d() throw (Exception)
@@ -87,4 +87,4 @@ public:
     }
 };
 
-#endif // TESTPOTTSWRITER_HPP_
+#endif // TESTPOTTSMESHWRITER_HPP_

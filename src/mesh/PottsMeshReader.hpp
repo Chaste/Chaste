@@ -174,12 +174,6 @@ public:
      * @return the nodes of each element (and any attribute infomation, if there is any) in turn.
      */
     ElementData GetNextElementData();
-
-    /**
-     * @return the nodes of each element (and any attribute infomation, if there is any) in turn, then its faces.
-     *         This method should only be called in 3D.
-     */
-    PottsElementData GetNextElementDataWithFaces();
 };
 
 #endif /*POTTSMESHREADER_HPP_*/

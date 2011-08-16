@@ -1,8 +1,8 @@
 mesh/TestPottsElement.hpp
 mesh/TestPottsMesh.hpp
 mesh/TestPottsMeshGenerator.hpp
-mesh/TestPottsWriter.hpp
-mesh/TestPottsReader.hpp
+mesh/TestPottsMeshWriter.hpp
+mesh/TestPottsMeshReader.hpp
 population/TestForcesNotForRelease.hpp
 population/TestCaBasedCellPopulation.hpp
 population/TestCaBasedUpdateRules.hpp

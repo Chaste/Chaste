@@ -169,16 +169,6 @@ ElementData PottsMeshReader<SPACE_DIM>::GetNextElementData()
     return element_data;
 }
 
-// \todo This method should not be there but it is declared as pure virtual in the parent abstract class, so it needs to be overridden
-template<unsigned SPACE_DIM>
-PottsElementData PottsMeshReader<SPACE_DIM>::GetNextElementDataWithFaces()
-{
-    // Create data structure for this element
-    PottsElementData element_data;
-
-    return element_data;
-}
-
 template<unsigned SPACE_DIM>
 void PottsMeshReader<SPACE_DIM>::OpenFiles()
 {
