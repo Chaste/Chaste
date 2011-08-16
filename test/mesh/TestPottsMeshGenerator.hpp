@@ -42,7 +42,7 @@ public:
 
     void TestPottsMeshGeneratorSimple2d() throw(Exception)
     {
-        PottsMeshGenerator<2> generator(9, 3, 3, 5, 2, 2);
+        PottsMeshGenerator<2> generator(9, 3, 3, 5, 2, 2, 1, 1, 1, true); // last bool makes elements start in bottom left
 
         // Create mesh
         PottsMesh<2>* p_mesh = generator.GetMesh();
@@ -129,7 +129,7 @@ public:
 
     void TestPottsMeshGeneratorSimple3d() throw(Exception)
 	{
-		PottsMeshGenerator<3> generator(4, 2, 2, 4, 2, 2, 6, 2, 2);
+		PottsMeshGenerator<3> generator(4, 2, 2, 4, 2, 2, 6, 2, 2, true); // last bool makes elements start in bottom left
 
 		// Create mesh
 		PottsMesh<3>* p_mesh = generator.GetMesh();

@@ -56,7 +56,7 @@ public:
     void TestVolumeConstraintPottsUpdateRuleMethods() throw (Exception)
     {
 		// Create a simple 2D PottsMesh with 2 elements
-		PottsMeshGenerator<2> generator(4, 1, 2, 4, 2, 2);
+		PottsMeshGenerator<2> generator(4, 1, 2, 4, 2, 2, 1, 1, 1, true); // last bool makes elements start in bottom left
 		PottsMesh<2>* p_mesh = generator.GetMesh();
 
 		// Create cells
@@ -155,7 +155,7 @@ public:
     void TestSurfaceAreaConstraintPottsUpdateRuleMethods() throw (Exception)
     {
         // Create a simple 2D PottsMesh with 2 elements
-        PottsMeshGenerator<2> generator(4, 1, 2, 4, 2, 2);
+        PottsMeshGenerator<2> generator(4, 1, 2, 4, 2, 2, 1, 1, 1, true); // last bool makes elements start in bottom left
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Create cells
@@ -256,7 +256,7 @@ public:
     void TestAdhesionPottsUpdateRuleMethods() throw (Exception)
     {
     	// Create a simple 2D PottsMesh with 2 elements
-    	PottsMeshGenerator<2> generator(4, 1, 2, 4, 2, 2);
+    	PottsMeshGenerator<2> generator(4, 1, 2, 4, 2, 2, 1, 1, 1, true); // last bool makes elements start in bottom left
 		PottsMesh<2>* p_mesh = generator.GetMesh();
 
 		// Create cells
@@ -361,7 +361,7 @@ public:
     void TestDifferentialAdhesionPottsUpdateRuleMethods() throw (Exception)
     {
         // Create a simple 2D PottsMesh with 4 elements
-        PottsMeshGenerator<2> generator(5, 2, 2, 4, 2, 2);
+        PottsMeshGenerator<2> generator(5, 2, 2, 4, 2, 2, 1, 1, 1, true); // last bool makes elements start in bottom left
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Create cells

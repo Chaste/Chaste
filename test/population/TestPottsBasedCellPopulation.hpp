@@ -72,10 +72,10 @@ public:
         cell_population.SetTemperature(10.0);
         TS_ASSERT_DELTA(cell_population.GetTemperature(), 10.0, 1e-6);
         cell_population.SetTemperature(0.1);
-        TS_ASSERT_EQUALS(cell_population.GetUpdateNodesInRandomOrder(), false);
-        cell_population.SetUpdateNodesInRandomOrder(true);
         TS_ASSERT_EQUALS(cell_population.GetUpdateNodesInRandomOrder(), true);
         cell_population.SetUpdateNodesInRandomOrder(false);
+        TS_ASSERT_EQUALS(cell_population.GetUpdateNodesInRandomOrder(), false);
+        cell_population.SetUpdateNodesInRandomOrder(true);
 
         ChastePoint<2> location;
         TS_ASSERT_THROWS_THIS(cell_population.AddNode(NULL), "Cannot call AddNode on a PottsBasedCellPopulation");

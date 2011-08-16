@@ -67,7 +67,7 @@ PottsBasedCellPopulation::PottsBasedCellPopulation(PottsMesh<2>& rMesh,
       mrMesh(rMesh),
       mDeleteMesh(deleteMesh),
       mTemperature(0.1),
-      mUpdateNodesInRandomOrder(false)
+      mUpdateNodesInRandomOrder(true)
 {
     // Check each element has only one cell associated with it
     if (validate)

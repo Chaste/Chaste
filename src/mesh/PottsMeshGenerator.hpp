@@ -63,10 +63,12 @@ public:
      * @param numNodesDeep  The number nodes deep for this mesh
      * @param numElementsDeep  The number of elements deep for this mesh
      * @param elementDepth  The number of rows of nodes in each element
+     * @param startAtBottomLeft  If true then the mesh starts in the bottom left corner of the domain rather than the centre, used for simple tests
      */
     PottsMeshGenerator(	unsigned numNodesAcross, unsigned numElementsAcross, unsigned elementWidth,
-						unsigned numNodesUp, unsigned numElementsUp, unsigned elementHeight,
-						unsigned numNodesDeep=1u, unsigned numElementsDeep=1u, unsigned elementDepth=1u);
+						unsigned numNodesUp=1u, unsigned numElementsUp=1u, unsigned elementHeight=1u,
+						unsigned numNodesDeep=1u, unsigned numElementsDeep=1u, unsigned elementDepth=1u,
+						bool startAtBottomLeft = false);
 
     /**
      * Null constructor for derived classes to call.
