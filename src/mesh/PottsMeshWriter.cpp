@@ -57,9 +57,7 @@ PottsMeshWriter<SPACE_DIM>::PottsMeshWriter(const std::string& rDirectory,
 {
     mpIters->pNodeIter = NULL;
     mpIters->pElemIter = NULL;
-
 }
-
 
 template<unsigned SPACE_DIM>
 PottsMeshWriter<SPACE_DIM>::~PottsMeshWriter()
@@ -108,7 +106,7 @@ std::vector<double> PottsMeshWriter<SPACE_DIM>::GetNextNode()
 template<unsigned SPACE_DIM>
 ElementData PottsMeshWriter<SPACE_DIM>::GetNextElement()
 {
-    ///\todo Assert this method should only be called in 2D? (#1076/#1377)
+    ///\todo Assert this method should only be called in 2D? (#1663/#1377)
 
     if (mpMesh)
     {
@@ -121,7 +119,7 @@ ElementData PottsMeshWriter<SPACE_DIM>::GetNextElement()
             unsigned old_index = (*(mpIters->pElemIter))->GetNodeGlobalIndex(j);
             elem_data.NodeIndices[j] = mpMesh->IsMeshChanging() ? mpNodeMap->GetNewIndex(old_index) : old_index;
         }
-        ///\todo: set attribute (#1076)
+        ///\todo: set attribute (#1663)
         ++(*(mpIters->pElemIter));
         return elem_data;
     }
@@ -131,7 +129,7 @@ ElementData PottsMeshWriter<SPACE_DIM>::GetNextElement()
     }
 }
 
-///\todo Mesh should be const (#1076)
+///\todo Mesh should be const (#1663)
 template<unsigned SPACE_DIM>
 void PottsMeshWriter<SPACE_DIM>::WriteFilesUsingMesh(PottsMesh<SPACE_DIM>& rMesh)
 {

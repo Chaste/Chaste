@@ -28,21 +28,22 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "PottsMeshGenerator.hpp"
 template<unsigned DIM>
-PottsMeshGenerator<DIM>::PottsMeshGenerator( unsigned numNodesAcross, unsigned numElementsAcross, unsigned elementWidth,
-											 unsigned numNodesUp, unsigned numElementsUp, unsigned elementHeight,
-											 unsigned numNodesDeep, unsigned numElementsDeep, unsigned elementDepth,
-											 bool startAtBottomLeft)
+PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned numElementsAcross, unsigned elementWidth,
+											unsigned numNodesUp, unsigned numElementsUp, unsigned elementHeight,
+											unsigned numNodesDeep, unsigned numElementsDeep, unsigned elementDepth,
+											bool startAtBottomLeft)
 {
     assert(numElementsAcross > 0);
     assert(numElementsUp > 0);
     assert(elementWidth > 0);
     assert(elementHeight > 0);
-    assert(numElementsDeep>0);
+    assert(numElementsDeep > 0);
     assert(numNodesDeep > 0);
-    assert(elementDepth>0);
-    assert(numElementsAcross*elementWidth<=numNodesAcross);
-    assert(numElementsUp*elementHeight<=numNodesUp);
-    assert(numElementsDeep*elementDepth<=numNodesDeep);
+    assert(elementDepth > 0);
+
+    assert(numElementsAcross*elementWidth <= numNodesAcross);
+    assert(numElementsUp*elementHeight <= numNodesUp);
+    assert(numElementsDeep*elementDepth <= numNodesDeep);
 
     std::vector<Node<DIM>*> nodes;
     std::vector<PottsElement<DIM>*>  elements;
@@ -60,9 +61,7 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator( unsigned numNodesAcross, unsigned n
 
     if (!startAtBottomLeft) // Elements in centre of mesh
     {
-        index_offset = deep_gap*numNodesAcross*numNodesUp +
-                            up_gap*numNodesAcross +
-                            across_gap;
+        index_offset = deep_gap*numNodesAcross*numNodesUp + up_gap*numNodesAcross + across_gap;
     }
 
     /*

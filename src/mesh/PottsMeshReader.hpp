@@ -25,6 +25,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
+
 #ifndef POTTSMESHREADER_HPP_
 #define POTTSMESHREADER_HPP_
 
@@ -51,7 +52,7 @@ struct PottsElementData
 /**
  * A mesh reader class for potts-based meshes. So far implemented in 2D only.
  */
- template<unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 class PottsMeshReader : public AbstractMeshReader<SPACE_DIM, SPACE_DIM>
 {
 private:
@@ -179,8 +180,6 @@ public:
      *         This method should only be called in 3D.
      */
     PottsElementData GetNextElementDataWithFaces();
-
 };
-
 
 #endif /*POTTSMESHREADER_HPP_*/

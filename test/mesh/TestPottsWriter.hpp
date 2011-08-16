@@ -84,7 +84,6 @@ public:
         // To ignore the provenance data we only go as far as
         TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" " + results_file1 + " notforrelease_cell_based/test/data/TestPottsMeshWriter/potts_mesh_2d.node").c_str()), 0);
         TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" " + results_file2 + " notforrelease_cell_based/test/data/TestPottsMeshWriter/potts_mesh_2d.cell").c_str()), 0);
-
     }
 };
 

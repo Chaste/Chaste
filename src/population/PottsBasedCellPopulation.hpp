@@ -333,8 +333,10 @@ public:
     void OutputCellPopulationParameters(out_stream& rParamsFile);
 
     /**
-     * Overridden GetNeighbouringNodeIndices() method. Which currently returns an exception as
-     * the 2 types of neighborhood: Moore; and VonNumann are defined in the PottsMesh.     *
+     * Overridden GetNeighbouringNodeIndices() method.
+     * 
+     * This method currently returns an exception as the two types of neighbourhood
+     * (Moore and Von Neumann) are defined in the PottsMesh.
      *
      * @param index the node index
      * @return the set of neighbouring node indices.

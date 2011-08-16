@@ -25,6 +25,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
+
 #ifndef POTTSMESHWRITER_HPP_
 #define POTTSMESHWRITER_HPP_
 
@@ -32,15 +33,9 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 template<unsigned SPACE_DIM>
 class PottsMesh;
 
-
-
 #include "PottsMesh.hpp"
 #include "AbstractMeshWriter.hpp"
 #include "NodeMap.hpp"
-
-// Forward declaration prevents circular include chain
-template<unsigned SPACE_DIM>
-class PottsMesh;
 
 template<unsigned SPACE_DIM>
 struct MeshPottsWriterIterators;
@@ -52,6 +47,7 @@ template<unsigned SPACE_DIM>
 class PottsMeshWriter : public AbstractMeshWriter<SPACE_DIM, SPACE_DIM>
 {
 private:
+
     /**
      * If writing from a mesh object, the mesh to write to disk.
      * Otherwise NULL.
@@ -74,7 +70,7 @@ public:
      *
      * @param rDirectory reference to the output directory, relative to where Chaste output is stored
      * @param rBaseName reference to the base name for results files
-     * @param clearOutputDir whether to clear the output directory prior to writing files
+     * @param clearOutputDir whether to clear the output directory prior to writing files (defaults to true)
      */
     PottsMeshWriter(const std::string& rDirectory,
                      const std::string& rBaseName,
@@ -108,7 +104,6 @@ public:
      * This method must be overridden in concrete classes.
      */
     void WriteFiles();
-
 };
 
 #endif /*POTTSMESHWRITER_HPP_*/

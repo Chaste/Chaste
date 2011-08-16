@@ -97,7 +97,7 @@ public:
 
 		// Both points lie within cell medium
 		TS_ASSERT_THROWS_THIS(volume_constraint.EvaluateHamiltonianContribution(2, 3, cell_population),
-		                       "At least one of the current node or target node must be in an element.");
+		                      "At least one of the current node or target node must be in an element.");
 
 		// Current site in cell 0; target site in cell medium
 		double contribution = volume_constraint.EvaluateHamiltonianContribution(5, 6, cell_population);
@@ -548,7 +548,6 @@ public:
         differential_adhesion_update.SetCellCellAdhesionEnergyParameter(0.5);
         differential_adhesion_update.SetLabelledCellBoundaryAdhesionEnergyParameter(0.6);
         differential_adhesion_update.SetCellBoundaryAdhesionEnergyParameter(0.7);
-
 
         TS_ASSERT_EQUALS(differential_adhesion_update.GetIdentifier(), "DifferentialAdhesionPottsUpdateRule-2");
 

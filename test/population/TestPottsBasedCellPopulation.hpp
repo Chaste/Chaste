@@ -82,14 +82,12 @@ public:
         TS_ASSERT_THROWS_THIS(cell_population.SetNode(0, location), "Cannot call SetNode on a PottsBasedCellPopulation");
         TS_ASSERT_THROWS_THIS(cell_population.GetDampingConstant(0), "Cannot call GetDampingConstant on a PottsBasedCellPopulation");
 
-
         // Test we have the correct number of cells and elements
         TS_ASSERT_EQUALS(cell_population.GetNumElements(), p_mesh->GetNumElements());
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), num_cells);
 
         // Test GetNeighbouringNodeIndices() method
-        TS_ASSERT_THROWS_THIS(        cell_population.GetNeighbouringNodeIndices(10), "Cannot call GetNeighbouringNodeIndices on a PottsBasedCellPopulation need to go through the PottsMesh instead");
-
+        TS_ASSERT_THROWS_THIS(cell_population.GetNeighbouringNodeIndices(10), "Cannot call GetNeighbouringNodeIndices() on a PottsBasedCellPopulation, need to go through the PottsMesh instead");
 
         // Test PottsBasedCellPopulation::Iterator
         unsigned counter = 0;

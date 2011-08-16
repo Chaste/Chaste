@@ -25,11 +25,11 @@ You should have received a copy of the GNU Lesser General Public License
 along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
+
 #include "PottsMeshReader.hpp"
 #include "Exception.hpp"
 
 #include <sstream>
-
 
 template<unsigned SPACE_DIM>
 PottsMeshReader<SPACE_DIM>::PottsMeshReader(std::string pathBaseName)
@@ -66,7 +66,7 @@ unsigned PottsMeshReader<SPACE_DIM>::GetNumElementAttributes() const
 template<unsigned SPACE_DIM>
 ElementData PottsMeshReader<SPACE_DIM>::GetNextFaceData()
 {
-    /// \todo Implement this method (#1076, #1377)
+    /// \todo Implement this method (#1663, #1377)
     ElementData ret;
     ret.NodeIndices = std::vector<unsigned>();
     ret.AttributeValue = 0;
@@ -76,7 +76,7 @@ ElementData PottsMeshReader<SPACE_DIM>::GetNextFaceData()
 template<unsigned SPACE_DIM>
 unsigned PottsMeshReader<SPACE_DIM>::GetNumFaces() const
 {
-    /// \todo Implement this method (#1076)
+    /// \todo Implement this method (#1663)
     return 0;
 }
 
@@ -269,7 +269,6 @@ void PottsMeshReader<SPACE_DIM>::GetNextLineFromStream(std::ifstream& fileStream
     }
     while (line_is_blank);
 }
-
 
 /////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation

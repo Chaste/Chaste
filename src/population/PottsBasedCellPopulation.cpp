@@ -464,7 +464,7 @@ void PottsBasedCellPopulation::SetUpdateNodesInRandomOrder(bool flag)
 
 std::set<unsigned> PottsBasedCellPopulation::GetNeighbouringNodeIndices(unsigned index)
 {
-    EXCEPTION("Cannot call GetNeighbouringNodeIndices on a PottsBasedCellPopulation need to go through the PottsMesh instead");
+    EXCEPTION("Cannot call GetNeighbouringNodeIndices() on a PottsBasedCellPopulation, need to go through the PottsMesh instead");
     std::set<unsigned> neighbouring_node_indices;
     return neighbouring_node_indices;
 }

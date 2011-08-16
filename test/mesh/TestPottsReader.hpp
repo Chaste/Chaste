@@ -36,7 +36,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "PottsMeshReader.hpp"
 
-
 class TestPottsReader : public CxxTest::TestSuite
 {
 public:
