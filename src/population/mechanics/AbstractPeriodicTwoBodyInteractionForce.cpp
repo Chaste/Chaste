@@ -56,76 +56,194 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
 
     // Create a vector of nodes for use in constructing mpExtendedMesh
     unsigned num_cells = rCellPopulation.GetNumRealCells();
-    std::vector<Node<DIM>*> extended_nodes(2*num_cells);
+    std::vector<Node<DIM>*> extended_nodes(DIM*num_cells);
 
     // We iterate over all cells in the population
     unsigned count = 0;
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
-         cell_iter != rCellPopulation.End();
-         ++cell_iter)
+
+    switch (DIM)
     {
-        // First, create and store a copy of this real node and cell
-        unsigned real_node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
-        c_vector<double, DIM> real_node_location = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
-
-        // Create a copy of the node corresponding to this cell and store it
-        Node<DIM>* p_real_node = new Node<DIM>(real_node_index, real_node_location);
-        extended_nodes[count] = p_real_node;
-
-        /**
-         * \todo The code block below would need to be amended for 3d to cope with
-         * the z direction too and to make sure we copy from left to right and from
-         * front to back.
-         */
-
-        // Compute the location of the image node corresponding to this node
-        c_vector<double,DIM> image_node_location = real_node_location;
-        if (real_node_location[0] >= mPeriodicDomainWidth*0.5)
+        case 1:
         {
-            image_node_location[0] -= mPeriodicDomainWidth;
+            break;
         }
-        else if (real_node_location[0] <  mPeriodicDomainWidth*0.5)
+        case 2:
         {
-            image_node_location[0] += mPeriodicDomainWidth;
+            for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+                 cell_iter != rCellPopulation.End();
+                 ++cell_iter)
+            {
+                // First, create and store a copy of this real node and cell
+                unsigned real_node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
+                c_vector<double, DIM> real_node_location = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
+
+                // Create a copy of the node corresponding to this cell and store it
+                Node<DIM>* p_real_node = new Node<DIM>(real_node_index, real_node_location);
+                extended_nodes[count] = p_real_node;
+
+                // Compute the location of the image node corresponding to this node
+                c_vector<double,DIM> image_node_location = real_node_location;
+                if (real_node_location[0] >= mPeriodicDomainWidth*0.5)
+                {
+                    image_node_location[0] -= mPeriodicDomainWidth;
+                }
+                else if (real_node_location[0] <  mPeriodicDomainWidth*0.5)
+                {
+                    image_node_location[0] += mPeriodicDomainWidth;
+                }
+
+                // Create a copy of the node corresponding to this cell, suitable translated, and store it
+                Node<DIM>* p_image_node = new Node<DIM>(num_cells+count, image_node_location);
+                extended_nodes[num_cells+count] = p_image_node;
+
+                // Populate mExtendedMeshNodeIndexMap
+                mExtendedMeshNodeIndexMap[count] = real_node_index;
+                mExtendedMeshNodeIndexMap[num_cells+count] = real_node_index;
+
+                count++;
+            }
+
+            // We now construct mpExtendedMesh using extended_nodes
+            mpExtendedMesh = new MutableMesh<DIM,DIM>(extended_nodes);
+
+        	// Now loop over the extended mesh and calculate the force acting on real nodes
+        	// (using the edge iterator ensures that each edge is visited exactly once)
+            for (typename MutableMesh<DIM,DIM>::EdgeIterator edge_iterator = mpExtendedMesh->EdgesBegin();
+                 edge_iterator != mpExtendedMesh->EdgesEnd();
+                 ++edge_iterator)
+            {
+                unsigned nodeA_global_index = edge_iterator.GetNodeA()->GetIndex();
+                unsigned nodeB_global_index = edge_iterator.GetNodeB()->GetIndex();
+
+                c_vector<double, DIM> force = CalculateForceBetweenNodes(nodeA_global_index, nodeB_global_index, rCellPopulation);
+
+                // Apply this force to any real nodes (i.e. nodes whose indices are less than num_real_nodes)
+                if (nodeA_global_index < num_cells)
+                {
+                    unsigned real_node_index_A = mExtendedMeshNodeIndexMap[nodeA_global_index];
+                    rForces[real_node_index_A] += force;
+                }
+                if (nodeB_global_index < num_cells)
+                {
+                    unsigned real_node_index_B = mExtendedMeshNodeIndexMap[nodeB_global_index];
+                    rForces[real_node_index_B] -= force;
+                }
+            }
+
+			break;
+        }
+        case 3:
+        {
+            // If the width of the periodic domain has not been specified, use the initial width of the cell population
+            if (mPeriodicDomainDepth == DOUBLE_UNSET)
+            {
+            	mPeriodicDomainDepth = rCellPopulation.GetWidth(1);
+            }
+
+            // First, extend the mesh in the x-direction
+
+            for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+                 cell_iter != rCellPopulation.End();
+                 ++cell_iter)
+            {
+                // First, create and store a copy of this real node and cell
+                unsigned real_node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
+                c_vector<double, DIM> real_node_location = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
+
+                // Create a copy of the node corresponding to this cell and store it
+                Node<DIM>* p_real_node = new Node<DIM>(real_node_index, real_node_location);
+                extended_nodes[count] = p_real_node;
+
+                // Compute the location of the image node corresponding to this node
+                c_vector<double,DIM> image_node_location = real_node_location;
+                if (real_node_location[0] >= mPeriodicDomainWidth*0.5)
+                {
+                    image_node_location[0] -= mPeriodicDomainWidth;
+                }
+                else if (real_node_location[0] <  mPeriodicDomainWidth*0.5)
+                {
+                    image_node_location[0] += mPeriodicDomainWidth;
+                }
+
+                // Create a copy of the node corresponding to this cell, suitable translated, and store it
+                Node<DIM>* p_image_node = new Node<DIM>(num_cells+count, image_node_location);
+                extended_nodes[num_cells+count] = p_image_node;
+
+                // Populate mExtendedMeshNodeIndexMap
+                mExtendedMeshNodeIndexMap[count] = real_node_index;
+                mExtendedMeshNodeIndexMap[num_cells+count] = real_node_index;
+
+                count++;
+            }
+
+            // Second, extend this extended mesh in the y-direction, so that we cover the corners too
+            // (We don't need to store the real nodes anymore
+
+            for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+                 cell_iter != rCellPopulation.End();
+                 ++cell_iter)
+            {
+                // First, create and store a copy of this real node and cell
+                unsigned real_node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
+                c_vector<double, DIM> real_node_location = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
+
+                // Compute the location of the image node corresponding to this node
+                c_vector<double,DIM> image_node_location = real_node_location;
+
+                if (real_node_location[1] >= mPeriodicDomainDepth*0.5)
+                {
+                    image_node_location[1] -= mPeriodicDomainDepth;
+                }
+                else if (real_node_location[1] <  mPeriodicDomainDepth*0.5)
+                {
+                    image_node_location[1] += mPeriodicDomainDepth;
+                }
+
+                // Create a copy of the node corresponding to this cell, suitable translated, and store it
+                Node<DIM>* p_image_node = new Node<DIM>(num_cells+count, image_node_location);
+                extended_nodes[num_cells+count] = p_image_node;
+
+                // Populate mExtendedMeshNodeIndexMap
+                mExtendedMeshNodeIndexMap[num_cells+count] = real_node_index;
+
+                count++;
+            }
+
+            // We now construct mpExtendedMesh using extended_nodes
+            mpExtendedMesh = new MutableMesh<DIM,DIM>(extended_nodes);
+
+        	// Now loop over the extended mesh and calculate the force acting on real nodes
+        	// (using the edge iterator ensures that each edge is visited exactly once)
+            for (typename MutableMesh<DIM,DIM>::EdgeIterator edge_iterator = mpExtendedMesh->EdgesBegin();
+                 edge_iterator != mpExtendedMesh->EdgesEnd();
+                 ++edge_iterator)
+            {
+                unsigned nodeA_global_index = edge_iterator.GetNodeA()->GetIndex();
+                unsigned nodeB_global_index = edge_iterator.GetNodeB()->GetIndex();
+
+                c_vector<double, DIM> force = CalculateForceBetweenNodes(nodeA_global_index, nodeB_global_index, rCellPopulation);
+
+                // Apply this force to any real nodes (i.e. nodes whose indices are less than num_real_nodes)
+                if (nodeA_global_index < num_cells)
+                {
+                    unsigned real_node_index_A = mExtendedMeshNodeIndexMap[nodeA_global_index];
+                    rForces[real_node_index_A] += force;
+                }
+                if (nodeB_global_index < num_cells)
+                {
+                    unsigned real_node_index_B = mExtendedMeshNodeIndexMap[nodeB_global_index];
+                    rForces[real_node_index_B] -= force;
+                }
+            }
+
+			break;
         }
 
-        // Create a copy of the node corresponding to this cell, suitable translated, and store it
-        Node<DIM>* p_image_node = new Node<DIM>(num_cells+count, image_node_location);
-        extended_nodes[num_cells+count] = p_image_node;
-
-        // Populate mExtendedMeshNodeIndexMap
-        mExtendedMeshNodeIndexMap[count] = real_node_index;
-        mExtendedMeshNodeIndexMap[num_cells+count] = real_node_index;
-
-        count++;
+        default:
+            // This can't happen
+            NEVER_REACHED;
     }
 
-    // We now construct mpExtendedMesh using extended_nodes
-    mpExtendedMesh = new MutableMesh<DIM,DIM>(extended_nodes);
-
-	// Now loop over the extended mesh and calculate the force acting on real nodes
-	// (using the edge iterator ensures that each edge is visited exactly once)
-    for (typename MutableMesh<DIM,DIM>::EdgeIterator edge_iterator = mpExtendedMesh->EdgesBegin();
-         edge_iterator != mpExtendedMesh->EdgesEnd();
-         ++edge_iterator)
-    {
-        unsigned nodeA_global_index = edge_iterator.GetNodeA()->GetIndex();
-        unsigned nodeB_global_index = edge_iterator.GetNodeB()->GetIndex();
-
-        c_vector<double, DIM> force = CalculateForceBetweenNodes(nodeA_global_index, nodeB_global_index, rCellPopulation);      
-
-        // Apply this force to any real nodes (i.e. nodes whose indices are less than num_real_nodes)
-        if (nodeA_global_index < num_cells)
-        {
-            unsigned real_node_index_A = mExtendedMeshNodeIndexMap[nodeA_global_index];
-            rForces[real_node_index_A] += force;
-        }
-        if (nodeB_global_index < num_cells)
-        {
-            unsigned real_node_index_B = mExtendedMeshNodeIndexMap[nodeB_global_index];
-            rForces[real_node_index_B] -= force;
-        }
-    }
 }
 
 template<unsigned DIM>
@@ -138,6 +256,18 @@ template<unsigned DIM>
 void AbstractPeriodicTwoBodyInteractionForce<DIM>::SetPeriodicDomainWidth(double periodicDomainWidth)
 {
 	mPeriodicDomainWidth = periodicDomainWidth;
+}
+
+template<unsigned DIM>
+double AbstractPeriodicTwoBodyInteractionForce<DIM>::GetPeriodicDomainDepth()
+{
+	return mPeriodicDomainDepth;
+}
+
+template<unsigned DIM>
+void AbstractPeriodicTwoBodyInteractionForce<DIM>::SetPeriodicDomainDepth(double periodicDomainDepth)
+{
+	mPeriodicDomainDepth = periodicDomainDepth;
 }
 
 template<unsigned DIM>

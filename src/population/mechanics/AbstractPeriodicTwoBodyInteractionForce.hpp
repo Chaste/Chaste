@@ -62,6 +62,9 @@ protected:
     /** Width of the periodic domain. */
     double mPeriodicDomainWidth;
     
+    /** Depth of the periodic domain. */
+    double mPeriodicDomainDepth;
+
     /** An extended mesh, used to implement periodicity. */
     MutableMesh<DIM,DIM>* mpExtendedMesh;
 
@@ -113,6 +116,18 @@ public:
      * @param periodicDomainWidth the width of the periodic domain
      */
     void SetPeriodicDomainWidth(double periodicDomainWidth);
+
+    /**
+     * Returns the depth of the periodic domain.
+     */
+    double GetPeriodicDomainDepth();
+
+    /**
+     * Returns the depth of the periodic domain.
+     *
+     * @param periodicDomainDepth the width of the periodic domain
+     */
+    void SetPeriodicDomainDepth(double periodicDomainDepth);
 
     /**
      * Overridden OutputForceParameters() method.

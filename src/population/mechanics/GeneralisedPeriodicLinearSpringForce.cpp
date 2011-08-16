@@ -78,6 +78,8 @@ c_vector<double, DIM> GeneralisedPeriodicLinearSpringForce<DIM>::CalculateForceB
      * unit vector along the line joining the two nodes, rather than simply subtract
      * their positions, because this method can be overloaded (e.g. to enforce a
      * periodic boundary in Cylindrical2dMesh).
+     *
+     * todo: Though, if this is a periodic force class, we won't be overloading this method?
      */
     c_vector<double, DIM> unit_difference = this->mpExtendedMesh->GetVectorFromAtoB(node_a_location, node_b_location);
 
