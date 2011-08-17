@@ -1160,6 +1160,55 @@ public:
             delete p_mesh_loaded;
         }
     }
+
+    void TestMeshConstructionFromMeshReader()
+    {
+        // Create mesh
+        PottsMeshReader<2> mesh_reader("notforrelease_cell_based/test/data/TestPottsMeshWriter/potts_mesh_2d");
+        PottsMesh<2> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        // Check we have the right number of nodes and elements
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 6u);
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), 2u);
+
+        // Check some node co-ordinates
+        TS_ASSERT_DELTA(mesh.GetNode(0)->GetPoint()[0], 0.0, 1e-6);
+        TS_ASSERT_DELTA(mesh.GetNode(0)->GetPoint()[1], 0.0, 1e-6);
+        TS_ASSERT_DELTA(mesh.GetNode(2)->GetPoint()[0], 2.0, 1e-6);
+        TS_ASSERT_DELTA(mesh.GetNode(2)->GetPoint()[1], 0.0, 1e-6);
+
+        // Check second element has the right nodes
+        TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(0), 2u);
+        TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(1), 4u);
+        TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(2), 5u);
+        TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNode(1), mesh.GetNode(4));
+
+        // Create mesh in which elements have attributes
+        PottsMeshReader<2> mesh_reader2("notforrelease_cell_based/test/data/TestPottsMeshReader2d/potts_mesh_with_element_attributes");
+        PottsMesh<2> mesh2;
+        mesh2.ConstructFromMeshReader(mesh_reader2);
+
+        // Check we have the right number of nodes & elements
+        TS_ASSERT_EQUALS(mesh2.GetNumNodes(), 6u);
+        TS_ASSERT_EQUALS(mesh2.GetNumElements(), 2u);
+
+        // Check some node co-ordinates
+        TS_ASSERT_DELTA(mesh2.GetNode(0)->GetPoint()[0], 0.0, 1e-6);
+        TS_ASSERT_DELTA(mesh2.GetNode(0)->GetPoint()[1], 0.0, 1e-6);
+        TS_ASSERT_DELTA(mesh2.GetNode(2)->GetPoint()[0], 2.0, 1e-6);
+        TS_ASSERT_DELTA(mesh2.GetNode(2)->GetPoint()[1], 0.0, 1e-6);
+
+        // Check second element has the right nodes
+        TS_ASSERT_EQUALS(mesh2.GetElement(1)->GetNodeGlobalIndex(0), 2u);
+        TS_ASSERT_EQUALS(mesh2.GetElement(1)->GetNodeGlobalIndex(1), 4u);
+        TS_ASSERT_EQUALS(mesh2.GetElement(1)->GetNodeGlobalIndex(2), 5u);
+        TS_ASSERT_EQUALS(mesh2.GetElement(1)->GetNode(1), mesh2.GetNode(4));
+
+        // Check element attributes
+        TS_ASSERT_EQUALS(mesh2.GetElement(0)->GetRegion(), 97u);
+        TS_ASSERT_EQUALS(mesh2.GetElement(1)->GetRegion(), 152u);
+    }
 };
 
 #endif /*TESTPOTTSMESH_HPP_*/
