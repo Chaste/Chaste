@@ -332,7 +332,7 @@ public:
 
 		CellBasedSimulation<3> simulator(cell_population);
 
-//		// Create periodic force law
+		// Create periodic force law
 		GeneralisedPeriodicLinearSpringForce<3> periodic_force;  // Variable spring strengths
         periodic_force.SetPeriodicDomainWidth(3.0);
         periodic_force.SetPeriodicDomainDepth(3.0);
@@ -410,8 +410,10 @@ public:
         TS_ASSERT_DELTA(node_forces[17][0], -15.1265, 1e-4);
         TS_ASSERT_DELTA(node_forces[17][1], -15.1265, 1e-4);
         TS_ASSERT_DELTA(node_forces[17][2], -15.1265, 1e-4);
-    }
 
+        // Tidy up
+        delete p_mesh;
+    }
 
     void TestGeneralisedPeriodicLinearSpringForceArchiving() throw (Exception)
     {
