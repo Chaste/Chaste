@@ -3,6 +3,7 @@ mesh/TestPottsMesh.hpp
 mesh/TestPottsMeshGenerator.hpp
 mesh/TestPottsMeshWriter.hpp
 mesh/TestPottsMeshReader.hpp
+odes/TestDeltaNotchOdeSystem.hpp
 population/TestForcesNotForRelease.hpp
 population/TestCaBasedCellPopulation.hpp
 population/TestCaBasedUpdateRules.hpp
