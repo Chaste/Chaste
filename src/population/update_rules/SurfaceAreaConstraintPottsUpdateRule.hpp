@@ -103,7 +103,7 @@ public:
 	 */
     double EvaluateHamiltonianContribution(unsigned currentNodeIndex,
                                            unsigned targetNodeIndex,
-                                           PottsBasedCellPopulation& rCellPopulation);
+                                           PottsBasedCellPopulation<DIM>& rCellPopulation);
 
     /**
      * @return mDeformationEnergyParameter

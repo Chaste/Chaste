@@ -56,21 +56,22 @@ class AbstractPottsUpdateRule; // Circular definition
  * The code currently requires the PottsMesh object to be fixed,
  * in the sense that no new nodes or elements can be added.
  */
-class PottsBasedCellPopulation : public AbstractCellPopulation<2>
+template<unsigned DIM>
+class PottsBasedCellPopulation : public AbstractCellPopulation<DIM>
 {
     friend class TestPottsBasedCellPopulation;
 
 private:
 
     /** Potts-based mesh associated with the cell population. */
-    PottsMesh<2>& mrMesh;
+    PottsMesh<DIM>& mrMesh;
 
     /**
      * Pointer to a VertexMesh object that stores the Element tessellation that is used to
      * visualise mrMesh. The tessellation is created by calling CreateElementTessellation()
      * and can be accessed by calling GetElementTessellation().
      */
-    VertexMesh<2,2>* mpElementTessellation;
+    VertexMesh<DIM,DIM>* mpElementTessellation;
 
     /**
      * Whether to delete the mesh when we are destroyed.
@@ -82,7 +83,7 @@ private:
     out_stream mpVizElementsFile;
 
     /** The update rules used to determine the new location of the cells. */
-    std::vector<AbstractPottsUpdateRule<2>*> mUpdateRuleCollection;
+    std::vector<AbstractPottsUpdateRule<DIM>*> mUpdateRuleCollection;
 
     /** The temperature of the system. Initialized to 0.1 in the constructor. */
     double mTemperature;
@@ -106,7 +107,7 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
 #define COVERAGE_IGNORE
-        archive & boost::serialization::base_object<AbstractCellPopulation<2> >(*this);
+        archive & boost::serialization::base_object<AbstractCellPopulation<DIM> >(*this);
 
         /*
          * In its current form the code does not allow the direct serialization
@@ -147,7 +148,7 @@ public:
      * @param validate whether to validate the cell population when it is created (defaults to true)
      * @param locationIndices an optional vector of location indices that correspond to real cells
      */
-    PottsBasedCellPopulation(PottsMesh<2>& rMesh,
+    PottsBasedCellPopulation(PottsMesh<DIM>& rMesh,
                              std::vector<CellPtr>& rCells,
                              bool deleteMesh=false,
                              bool validate=true,
@@ -158,7 +159,7 @@ public:
      *
      * @param rMesh a vertex mesh.
      */
-    PottsBasedCellPopulation(PottsMesh<2>& rMesh);
+    PottsBasedCellPopulation(PottsMesh<DIM>& rMesh);
 
     /**
      * Destructor, which frees any memory allocated by the constructor.
@@ -168,12 +169,12 @@ public:
     /**
      * @return reference to mrMesh.
      */
-    PottsMesh<2>& rGetMesh();
+    PottsMesh<DIM>& rGetMesh();
 
     /**
      * @return const reference to mrMesh (used in archiving).
      */
-    const PottsMesh<2>& rGetMesh() const;
+    const PottsMesh<DIM>& rGetMesh() const;
 
     /**
      * Get a particular PottsElement.
@@ -182,7 +183,7 @@ public:
      *
      * @return a pointer to the PottsElement.
      */
-    PottsElement<2>* GetElement(unsigned elementIndex);
+    PottsElement<DIM>* GetElement(unsigned elementIndex);
 
     /**
      * @return the number of PottsElements in the cell population.
@@ -196,7 +197,7 @@ public:
      *
      * @return a pointer to the node.
      */
-    Node<2>* GetNode(unsigned index);
+    Node<DIM>* GetNode(unsigned index);
 
     /**
      * Overridden GetNumNodes() method.
@@ -213,7 +214,7 @@ public:
      *
      * @return the location of the centre of mass of the element corresponding to this cell.
      */
-    c_vector<double, 2> GetLocationOfCellCentre(CellPtr pCell);
+    c_vector<double, DIM> GetLocationOfCellCentre(CellPtr pCell);
 
     /**
      * Get a pointer to the element corresponding to a given CellPtr.
@@ -222,7 +223,7 @@ public:
      *
      * @return pointer to the element.
      */
-    PottsElement<2>* GetElementCorrespondingToCell(CellPtr pCell);
+    PottsElement<DIM>* GetElementCorrespondingToCell(CellPtr pCell);
 
     /**
      * Overridden AddCell() method.
@@ -235,7 +236,7 @@ public:
      * @param pParentCell pointer to a parent cell (if required)
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
      */
-    CellPtr AddCell(CellPtr pNewCell, const c_vector<double,2>& rCellDivisionVector, CellPtr pParentCell=CellPtr());
+    CellPtr AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell=CellPtr());
 
     /**
      * Remove all cells labelled as dead.
@@ -254,7 +255,7 @@ public:
      * @param rNodeForces a vector containing the force on each node in the cell population
      * @param dt the time step
      */
-    void UpdateNodeLocations(const std::vector< c_vector<double, 2> >& rNodeForces, double dt);
+    void UpdateNodeLocations(const std::vector< c_vector<double, DIM> >& rNodeForces, double dt);
 
     /**
      * Overridden IsCellAssociatedWithADeletedLocation() method.
@@ -316,7 +317,7 @@ public:
 	 *
 	 * @param pUpdateRule pointer  to an update rule
 	 */
-	void AddUpdateRule(AbstractPottsUpdateRule<2>* pUpdateRule);
+	void AddUpdateRule(AbstractPottsUpdateRule<DIM>* pUpdateRule);
 
     /**
      * Outputs CellPopulation parameters to file
@@ -359,7 +360,7 @@ public:
      * @param pNewNode pointer to the new node
      * @return global index of new node in cell population
      */
-    unsigned AddNode(Node<2>* pNewNode);
+    unsigned AddNode(Node<DIM>* pNewNode);
 
     /**
      * Overridden SetNode() method.
@@ -369,7 +370,7 @@ public:
      * @param index the index of the node to be moved
      * @param rNewLocation the new target location of the node
      */
-    void SetNode(unsigned index, ChastePoint<2>& rNewLocation);
+    void SetNode(unsigned index, ChastePoint<DIM>& rNewLocation);
 
     /**
      * Overridden GetDampingConstant() method.
@@ -401,11 +402,11 @@ public:
     /**
      * Get a reference to mpElementTessellation.
      */
-    VertexMesh<2,2>* GetElementTessellation();
+    VertexMesh<DIM,DIM>* GetElementTessellation();
 };
 
 #include "SerializationExportWrapper.hpp"
-CHASTE_CLASS_EXPORT(PottsBasedCellPopulation)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(PottsBasedCellPopulation)
 
 // No archiving yet so untested
 #define COVERAGE_IGNORE
@@ -416,12 +417,12 @@ namespace serialization
 /**
  * Serialize information required to construct a PottsBasedCellPopulation.
  */
-template<class Archive>
+template<class Archive, unsigned DIM>
 inline void save_construct_data(
-    Archive & ar, const PottsBasedCellPopulation * t, const BOOST_PFTO unsigned int file_version)
+    Archive & ar, const PottsBasedCellPopulation<DIM> * t, const BOOST_PFTO unsigned int file_version)
 {
     // Save data required to construct instance
-    const PottsMesh<2>* p_mesh = &(t->rGetMesh());
+    const PottsMesh<DIM>* p_mesh = &(t->rGetMesh());
     ar & p_mesh;
 }
 
@@ -429,16 +430,16 @@ inline void save_construct_data(
  * De-serialize constructor parameters and initialise a PottsBasedCellPopulation.
  * Loads the mesh from separate files.
  */
-template<class Archive>
+template<class Archive, unsigned DIM>
 inline void load_construct_data(
-    Archive & ar, PottsBasedCellPopulation * t, const unsigned int file_version)
+    Archive & ar, PottsBasedCellPopulation<DIM> * t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
-    PottsMesh<2>* p_mesh;
+    PottsMesh<DIM>* p_mesh;
     ar >> p_mesh;
 
     // Invoke inplace constructor to initialise instance
-    ::new(t)PottsBasedCellPopulation(*p_mesh);
+    ::new(t)PottsBasedCellPopulation<DIM>(*p_mesh);
 }
 }
 } // namespace ...

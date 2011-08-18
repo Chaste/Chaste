@@ -82,7 +82,7 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), DIFFERENTIATED);
 
         // Create cell population
-        PottsBasedCellPopulation cell_population(*p_mesh, cells);
+        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Create update rules and pass to the cell population
 		VolumeConstraintPottsUpdateRule<2> volume_constraint_update_rule;
@@ -118,7 +118,7 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), DIFFERENTIATED);
 
         // Create cell population
-        PottsBasedCellPopulation cell_population(*p_mesh, cells);
+        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetUpdateNodesInRandomOrder(false);
         
         // Create update rules and pass to the cell population
@@ -148,7 +148,7 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), DIFFERENTIATED);
 
         // Create cell population
-        PottsBasedCellPopulation cell_population(*p_mesh, cells);
+        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Create update rules and pass to the cell population
 		VolumeConstraintPottsUpdateRule<2> volume_constraint_update_rule;
@@ -160,7 +160,8 @@ public:
         // Set up cell-based simulation
         CellBasedSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestPottsMonolayerWithDeath");
-        simulator.SetEndTime(0.1);
+        simulator.SetDt(0.1);
+        simulator.SetEndTime(1.0);
 
 
         // Create cell killer and pass in to simulation
@@ -172,11 +173,11 @@ public:
         simulator.Solve();
 
         // Check the number of cells
-        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 17u);
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 18u);
 
         // Test no births or deaths
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
-        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 15u);
+        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 14u);
     }
 
     void TestPottsMonolayerWithBirth() throw (Exception)
@@ -191,7 +192,7 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), STEM);
 
         // Create cell population
-        PottsBasedCellPopulation cell_population(*p_mesh, cells);
+        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Create update rules and pass to the cell population
 		VolumeConstraintPottsUpdateRule<2> volume_constraint_update_rule;
@@ -231,7 +232,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_label(new CellLabel);
 
         // Create cell population
-        PottsBasedCellPopulation cell_population(*p_mesh, cells);
+        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         cell_population.SetOutputCellMutationStates(true); // So outputs the labeled cells
 
@@ -265,7 +266,7 @@ public:
         CellBasedSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestPottsCellSorting");
         simulator.SetDt(0.1);
-        simulator.SetEndTime(1);
+        simulator.SetEndTime(1.0);
 
         // Run simulation
         simulator.Solve();
@@ -277,6 +278,108 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
     }
+
+    void TestPottsSpheroidWithNoBirthOrDeath() throw (Exception)
+    {
+        // Create a simple 3D PottsMesh
+        PottsMeshGenerator<3> generator(10, 2, 2, 10, 2, 2, 10, 2, 2);
+        PottsMesh<3>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), DIFFERENTIATED);
+
+        // Create cell population
+        PottsBasedCellPopulation<3> cell_population(*p_mesh, cells);
+
+        // Create update rules and pass to the cell population
+        VolumeConstraintPottsUpdateRule<3> volume_constraint_update_rule;
+        volume_constraint_update_rule.SetMatureCellTargetVolume(16);
+        cell_population.AddUpdateRule(&volume_constraint_update_rule);
+        AdhesionPottsUpdateRule<3> adhesion_update_rule;
+        cell_population.AddUpdateRule(&adhesion_update_rule);
+
+        // Set up cell-based simulation
+        CellBasedSimulation<3> simulator(cell_population);
+        simulator.SetOutputDirectory("TestSimplePottsSpheroid");
+        simulator.SetDt(0.1);
+        simulator.SetEndTime(1.0);
+
+        // Run simulation
+        simulator.Solve();
+
+        // Check that the same number of cells
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 8u);
+
+        // Test no births or deaths
+        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
+        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
+    }
+
+    void TestPottsSpheroidCellSorting() throw (Exception)
+    {
+        // Create a simple 3D PottsMesh
+        PottsMeshGenerator<3> generator(10, 2, 2, 10, 2, 2, 10, 2, 2);
+        PottsMesh<3>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), DIFFERENTIATED);
+
+        // Make this pointer first as if we move it after creating the cell population the label numbers aren't tracked
+        boost::shared_ptr<AbstractCellProperty> p_label(new CellLabel);
+
+        // Create cell population
+        PottsBasedCellPopulation<3> cell_population(*p_mesh, cells);
+
+        cell_population.SetOutputCellMutationStates(true); // So outputs the labeled cells
+
+        for (AbstractCellPopulation<3>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            if (RandomNumberGenerator::Instance()->ranf() < 0.5)
+            {
+                (*cell_iter)->AddCellProperty(p_label);
+            }
+        }
+
+        // Create update rules and pass to the cell population
+        VolumeConstraintPottsUpdateRule<3> volume_constraint_update_rule;
+        cell_population.AddUpdateRule(&volume_constraint_update_rule);
+        volume_constraint_update_rule.SetMatureCellTargetVolume(8);
+        volume_constraint_update_rule.SetDeformationEnergyParameter(0.2);
+
+        DifferentialAdhesionPottsUpdateRule<3> differential_adhesion_update_rule;
+        differential_adhesion_update_rule.SetLabelledCellLabelledCellAdhesionEnergyParameter(0.16);
+        differential_adhesion_update_rule.SetLabelledCellCellAdhesionEnergyParameter(0.11);
+        differential_adhesion_update_rule.SetCellCellAdhesionEnergyParameter(0.02);
+        differential_adhesion_update_rule.SetLabelledCellBoundaryAdhesionEnergyParameter(0.16);
+        differential_adhesion_update_rule.SetCellBoundaryAdhesionEnergyParameter(0.16);
+
+        cell_population.AddUpdateRule(&differential_adhesion_update_rule);
+
+
+        // Set up cell-based simulation
+        CellBasedSimulation<3> simulator(cell_population);
+        simulator.SetOutputDirectory("TestPotts3DCellSorting");
+        simulator.SetDt(0.1);
+        simulator.SetEndTime(1.0);
+
+        // Run simulation
+        simulator.Solve();
+
+        // Check that the same number of cells
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 8u);
+
+        // Test no births or deaths
+        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
+        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
+    }
+
+
 
 //    void TestPottsCrypt() throw (Exception)
 //	{
@@ -290,7 +393,7 @@ public:
 //        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 4.0, 6.0, 8, 12.0);
 //
 //		// Create cell population
-//		PottsBasedCellPopulation cell_population(*p_mesh, cells);
+//		PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 //
 //		// Set up cell-based simulation
 //		CellBasedSimulation<2> simulator(cell_population);

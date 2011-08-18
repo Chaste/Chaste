@@ -65,7 +65,7 @@ public:
 		cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
 		// Create cell population
-		PottsBasedCellPopulation cell_population(*p_mesh, cells);
+		PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
 		// Create an update law system
 		VolumeConstraintPottsUpdateRule<2> volume_constraint;
@@ -164,7 +164,7 @@ public:
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
         // Create cell population
-        PottsBasedCellPopulation cell_population(*p_mesh, cells);
+        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Create an update law system
         SurfaceAreaConstraintPottsUpdateRule<2> surface_area_constraint;
@@ -265,7 +265,7 @@ public:
 		cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
 		// Create cell population
-		PottsBasedCellPopulation cell_population(*p_mesh, cells);
+		PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
 		// Create an update law system
 		AdhesionPottsUpdateRule<2> adhesion_update;
@@ -375,7 +375,7 @@ public:
         cells[1]->AddCellProperty(p_label);
 
         // Create cell population
-        PottsBasedCellPopulation cell_population(*p_mesh, cells);
+        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Create an update law system
         DifferentialAdhesionPottsUpdateRule<2> differential_adhesion_update;

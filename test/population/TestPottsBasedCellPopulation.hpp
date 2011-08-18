@@ -65,7 +65,7 @@ public:
 
         // Create cell population
         unsigned num_cells = cells.size();
-        PottsBasedCellPopulation cell_population(*p_mesh, cells);
+        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 16u);
         TS_ASSERT_EQUALS(cell_population.GetNumElements(), 4u);
@@ -93,9 +93,9 @@ public:
         // Test GetNeighbouringNodeIndices() method
         TS_ASSERT_THROWS_THIS(cell_population.GetNeighbouringNodeIndices(10), "Cannot call GetNeighbouringNodeIndices() on a PottsBasedCellPopulation, need to go through the PottsMesh instead");
 
-        // Test PottsBasedCellPopulation::Iterator
+        // Test PottsBasedCellPopulation<2>::Iterator
         unsigned counter = 0;
-        for (PottsBasedCellPopulation::Iterator cell_iter = cell_population.Begin();
+        for (PottsBasedCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -151,7 +151,7 @@ public:
 
         // This should throw an exception as the number of cells does not equal the number of elements
         std::vector<CellPtr> cells_copy(cells);
-        TS_ASSERT_THROWS_THIS(PottsBasedCellPopulation cell_population(*p_mesh, cells_copy),
+        TS_ASSERT_THROWS_THIS(PottsBasedCellPopulation<2> cell_population(*p_mesh, cells_copy),
                 "Element 3 does not appear to have a cell associated with it");
 
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
@@ -167,10 +167,10 @@ public:
 
         // This should pass as the number of cells equals the number of elements
         std::vector<CellPtr> cells_copy2(cells);
-        TS_ASSERT_THROWS_NOTHING(PottsBasedCellPopulation cell_population(*p_mesh, cells_copy2));
+        TS_ASSERT_THROWS_NOTHING(PottsBasedCellPopulation<2> cell_population(*p_mesh, cells_copy2));
 
         // Create cell population
-        PottsBasedCellPopulation cell_population(*p_mesh, cells);
+        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Check correspondence between elements and cells
         for (PottsMesh<2>::PottsElementIterator iter = p_mesh->GetElementIteratorBegin();
@@ -217,7 +217,7 @@ public:
 
         // This should throw an exception as the number of cells
         // does not equal the number of elements
-        TS_ASSERT_THROWS_THIS(PottsBasedCellPopulation cell_population2(*p_mesh2, cells2, false, true, cell_location_indices2),
+        TS_ASSERT_THROWS_THIS(PottsBasedCellPopulation<2> cell_population2(*p_mesh2, cells2, false, true, cell_location_indices2),
                 "Element 0 appears to have 2 cells associated with it");
     }
 
@@ -233,7 +233,7 @@ public:
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
         // Create cell population
-        PottsBasedCellPopulation cell_population(*p_mesh, cells);
+        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Test we have the correct number of cells and elements
         TS_ASSERT_EQUALS(cell_population.GetNumElements(), 1u);
@@ -280,7 +280,7 @@ public:
 //        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 //
 //        // Create cell population
-//        PottsBasedCellPopulation cell_population(*p_mesh, cells);
+//        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 //
 //        // Create element tessellation
 //        cell_population.CreateElementTessellation();
@@ -308,9 +308,9 @@ public:
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
         // Create cell population
-        PottsBasedCellPopulation cell_population(*p_mesh, cells);
+        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "PottsBasedCellPopulation");
+        TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "PottsBasedCellPopulation-2");
 
         cell_population.SetCellAncestorsToLocationIndices();
         cell_population.SetOutputCellIdData(true);
@@ -376,7 +376,7 @@ public:
             cells_generator.GenerateBasic(cells, mesh.GetNumElements());
 
             // Create cell population
-            PottsBasedCellPopulation* const p_cell_population = new PottsBasedCellPopulation(mesh, cells);
+            PottsBasedCellPopulation<2>* const p_cell_population = new PottsBasedCellPopulation<2>(mesh, cells);
 
             // Cells have been given birth times of 0 and -1.
             // Loop over them to run to time 0.0;
@@ -415,7 +415,7 @@ public:
 
             // Restore the cell population
             (*p_arch) >> *p_simulation_time;
-            PottsBasedCellPopulation* p_cell_population;
+            PottsBasedCellPopulation<2>* p_cell_population;
             (*p_arch) >> p_cell_population;
 
             // Check the cell population has been restored correctly
@@ -451,7 +451,7 @@ public:
 
                 TS_ASSERT_EQUALS(p_node->IsDeleted(), p_node2->IsDeleted());
                 TS_ASSERT_EQUALS(p_node->GetIndex(), p_node2->GetIndex());
-            
+
                 for (unsigned dimension=0; dimension<2; dimension++)
                 {
                     TS_ASSERT_DELTA(p_node->rGetLocation()[dimension], p_node2->rGetLocation()[dimension], 1e-4);

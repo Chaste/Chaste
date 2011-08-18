@@ -35,6 +35,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "PottsBasedCellPopulation.hpp"
 #include "Identifiable.hpp"
 
+template<unsigned DIM>
 class PottsBasedCellPopulation; // Circular definition
 
 /**
@@ -86,7 +87,7 @@ public:
 	 */
     virtual double EvaluateHamiltonianContribution(unsigned currentNodeIndex,
                                                    unsigned targetNodeIndex,
-                                                   PottsBasedCellPopulation& rCellPopulation)=0;
+                                                   PottsBasedCellPopulation<DIM>& rCellPopulation)=0;
 
     /**
      * Output update rule to file. Call OutputUpdateRuleParameters() to output

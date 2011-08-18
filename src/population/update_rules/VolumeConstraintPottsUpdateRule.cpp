@@ -45,12 +45,9 @@ VolumeConstraintPottsUpdateRule<DIM>::~VolumeConstraintPottsUpdateRule()
 template<unsigned DIM>
 double VolumeConstraintPottsUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned currentNodeIndex,
                                                                         unsigned targetNodeIndex,
-                                                                        PottsBasedCellPopulation& rCellPopulation)
+                                                                        PottsBasedCellPopulation<DIM>& rCellPopulation)
 {
 	double delta_H = 0.0;
-
-	// This method only works in 2D at present
-	assert(DIM == 2);
 
 	std::set<unsigned> containing_elements = rCellPopulation.GetNode(currentNodeIndex)->rGetContainingElementIndices();
 	std::set<unsigned> new_location_containing_elements = rCellPopulation.GetNode(targetNodeIndex)->rGetContainingElementIndices();

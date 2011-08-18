@@ -100,7 +100,7 @@ public:
 	 */
     double EvaluateHamiltonianContribution(unsigned currentNodeIndex,
                                            unsigned targetNodeIndex,
-                                           PottsBasedCellPopulation& rCellPopulation);
+                                           PottsBasedCellPopulation<DIM>& rCellPopulation);
 
     /**
      * Method to calculate the specific interaction between 2 cells can be overridden in

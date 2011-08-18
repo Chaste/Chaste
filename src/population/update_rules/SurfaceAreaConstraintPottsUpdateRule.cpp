@@ -45,7 +45,7 @@ SurfaceAreaConstraintPottsUpdateRule<DIM>::~SurfaceAreaConstraintPottsUpdateRule
 template<unsigned DIM>
 double SurfaceAreaConstraintPottsUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned currentNodeIndex,
                                                                         unsigned targetNodeIndex,
-                                                                        PottsBasedCellPopulation& rCellPopulation)
+                                                                        PottsBasedCellPopulation<DIM>& rCellPopulation)
 {
 	double delta_H = 0.0;
 
