@@ -119,8 +119,6 @@ public:
         TS_ASSERT_EQUALS(basic_potts_mesh.IsMeshChanging(), true);
     }
 
-
-
     void TestBasic3dPottsMesh() throw(Exception)
 	{
 		// Make 8 nodes to assign to two elements
@@ -201,8 +199,6 @@ public:
 		TS_ASSERT_EQUALS(basic_potts_mesh.SolveBoundaryElementMapping(0), 0u);
 		TS_ASSERT_EQUALS(basic_potts_mesh.IsMeshChanging(), true);
 	}
-
-
 
     void TestNodeIterator() throw (Exception)
     {
@@ -539,8 +535,6 @@ public:
         expected_neighbouring_sites.insert(16);
         expected_neighbouring_sites.insert(13);
         TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
-
-
     }
 
     void TestGetVonNeumannNeighbouringNodeIndices2d()
@@ -860,7 +854,6 @@ public:
         TS_ASSERT_DELTA(new_location2[0], old_location2[0] + 2.0, 1e-6);
         TS_ASSERT_DELTA(new_location2[1], old_location2[1] + 3.0, 1e-6);
     }
-
 
     void TestAddElement() throw (Exception)
     {

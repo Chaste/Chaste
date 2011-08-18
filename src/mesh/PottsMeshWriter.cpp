@@ -106,8 +106,6 @@ std::vector<double> PottsMeshWriter<SPACE_DIM>::GetNextNode()
 template<unsigned SPACE_DIM>
 ElementData PottsMeshWriter<SPACE_DIM>::GetNextElement()
 {
-    ///\todo Assert this method should only be called in 2D? (#1663/#1377)
-
     if (mpMesh)
     {
         assert(this->mNumElements == mpMesh->GetNumElements());
@@ -119,8 +117,11 @@ ElementData PottsMeshWriter<SPACE_DIM>::GetNextElement()
             unsigned old_index = (*(mpIters->pElemIter))->GetNodeGlobalIndex(j);
             elem_data.NodeIndices[j] = mpMesh->IsMeshChanging() ? mpNodeMap->GetNewIndex(old_index) : old_index;
         }
-        ///\todo: set attribute (#1663)
+
+        // Set attribute
+        elem_data.AttributeValue = (*(mpIters->pElemIter))->GetRegion();
         ++(*(mpIters->pElemIter));
+
         return elem_data;
     }
     else
@@ -199,6 +200,12 @@ void PottsMeshWriter<SPACE_DIM>::WriteFiles()
     // Write the element header
     unsigned num_elements = this->GetNumElements();
 
+    unsigned first_elem_attribute_value = (*(mpIters->pElemIter))->GetRegion();
+    if (first_elem_attribute_value != 0)
+    {
+        num_attr = 1;
+    }
+
     *p_element_file << num_elements << "\t";
     *p_element_file << num_attr << "\n";
 
@@ -220,7 +227,11 @@ void PottsMeshWriter<SPACE_DIM>::WriteFiles()
             *p_element_file << "\t" << node_indices[i];
         }
 
-        ///\todo write element attributes if necessary
+        // Write the element attribute if necessary
+        if (elem_data.AttributeValue != 0)
+        {
+            *p_element_file << "\t" << elem_data.AttributeValue;
+        }
 
         // New line
         *p_element_file << "\n";

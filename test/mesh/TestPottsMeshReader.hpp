@@ -180,6 +180,34 @@ public:
         TS_ASSERT_EQUALS(mesh_reader.GetNumEdges(), 0u);
     }
 
+    void TestPottsMeshReader3d() throw(Exception)
+    {
+        PottsMeshReader<3> mesh_reader("notforrelease_cell_based/test/data/TestPottsMeshWriter/potts_mesh_3d");
+
+        TS_ASSERT_EQUALS(mesh_reader.GetNumNodes(), 8u);
+        TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 2u);
+        TS_ASSERT_EQUALS(mesh_reader.GetNumElementAttributes(), 0u);
+
+        std::vector<double> next_node;
+        next_node = mesh_reader.GetNextNode();
+
+        TS_ASSERT_DELTA(next_node[0], 0.0, 1e-6);
+        TS_ASSERT_DELTA(next_node[1], 0.0, 1e-6)
+        TS_ASSERT_DELTA(next_node[2], 0.0, 1e-6)
+
+        next_node = mesh_reader.GetNextNode();
+
+        TS_ASSERT_DELTA(next_node[0], 1.0, 1e-6);
+        TS_ASSERT_DELTA(next_node[1], 0.0, 1e-6)
+        TS_ASSERT_DELTA(next_node[2], 0.0, 1e-6)
+
+        next_node = mesh_reader.GetNextNode();
+
+        TS_ASSERT_DELTA(next_node[0], 0.0, 1e-6);
+        TS_ASSERT_DELTA(next_node[1], 1.0, 1e-6)
+        TS_ASSERT_DELTA(next_node[2], 0.0, 1e-6)
+    }
+
     void TestOtherExceptions() throw(Exception)
     {
         TS_ASSERT_THROWS_THIS(PottsMeshReader<2> mesh_reader("notforrelease_cell_based/test/data/nonexistent_file"),
