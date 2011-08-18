@@ -15,3 +15,5 @@ population/TestDeltaNotchCellCycleModel.hpp
 simulation/TestCellBasedSimulationWithBuskeForces.hpp
 simulation/TestCellBasedSimulationWithLatticeBasedCellPopulation.hpp
 simulation/TestCellBasedSimulationWithPottsBasedCellPopulation.hpp
+simulation/TestCellBasedSimulationWithDeltaNotch.hpp
+
