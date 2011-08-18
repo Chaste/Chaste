@@ -76,7 +76,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_label(new CellLabel);
 
         // Create cell population
-        PottsBasedCellPopulation cell_population(*p_mesh, cells);
+        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         cell_population.SetOutputCellMutationStates(true); // So outputs the labeled cells
 
