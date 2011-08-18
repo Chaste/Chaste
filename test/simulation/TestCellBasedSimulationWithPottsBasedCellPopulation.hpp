@@ -106,7 +106,7 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
     }
     
-    void TestPottsMonolayerWithRandomSweep() throw (Exception)
+    void TestPottsMonolayerWithNonRandomSweep() throw (Exception)
     {
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(16, 4, 4, 18, 4, 4);
@@ -119,7 +119,7 @@ public:
 
         // Create cell population
         PottsBasedCellPopulation cell_population(*p_mesh, cells);
-        cell_population.SetUpdateNodesInRandomOrder(true);
+        cell_population.SetUpdateNodesInRandomOrder(false);
         
         // Create update rules and pass to the cell population
         VolumeConstraintPottsUpdateRule<2> volume_constraint_update_rule;
