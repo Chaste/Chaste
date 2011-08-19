@@ -320,7 +320,11 @@ public:
     void TestPottsSpheroidCellSorting() throw (Exception)
     {
         // Create a simple 3D PottsMesh
-        PottsMeshGenerator<3> generator(10, 2, 2, 10, 2, 2, 10, 2, 2);
+        unsigned domain_size = 10;
+        unsigned element_number = 4;
+        unsigned element_size = 2;
+
+        PottsMeshGenerator<3> generator(domain_size, element_number, element_size, domain_size, element_number, element_size, domain_size, element_number, element_size);
         PottsMesh<3>* p_mesh = generator.GetMesh();
 
         // Create cells
@@ -349,7 +353,7 @@ public:
         // Create update rules and pass to the cell population
         VolumeConstraintPottsUpdateRule<3> volume_constraint_update_rule;
         cell_population.AddUpdateRule(&volume_constraint_update_rule);
-        volume_constraint_update_rule.SetMatureCellTargetVolume(8);
+        volume_constraint_update_rule.SetMatureCellTargetVolume(element_size*element_size*element_size);
         volume_constraint_update_rule.SetDeformationEnergyParameter(0.2);
 
         DifferentialAdhesionPottsUpdateRule<3> differential_adhesion_update_rule;
@@ -372,7 +376,7 @@ public:
         simulator.Solve();
 
         // Check that the same number of cells
-        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 8u);
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 64u);
 
         // Test no births or deaths
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);

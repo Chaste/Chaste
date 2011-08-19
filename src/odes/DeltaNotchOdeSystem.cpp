@@ -28,7 +28,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "DeltaNotchOdeSystem.hpp"
 #include "CellwiseOdeSystemInformation.hpp"
-#include "Debug.hpp"
 
 DeltaNotchOdeSystem::DeltaNotchOdeSystem(double meanDelta, std::vector<double> stateVariables)
     : AbstractOdeSystem(3)

@@ -27,6 +27,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "PottsMeshGenerator.hpp"
+
 template<unsigned DIM>
 PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned numElementsAcross, unsigned elementWidth,
 											unsigned numNodesUp, unsigned numElementsUp, unsigned elementHeight,
@@ -52,15 +53,17 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
     unsigned node_indices[elementWidth*elementHeight*elementDepth];
     unsigned element_index;
 
-    // Calculate the width of the medium on the edge and offset the node index so that the elements are in the centre of the mesh.
-    unsigned across_gap = (numNodesAcross -  numElementsAcross*elementWidth)/2;
-    unsigned up_gap = (numNodesUp -  numElementsUp*elementHeight)/2;
-    unsigned deep_gap = (numNodesDeep -  numElementsDeep*elementDepth)/2;
+
 
     unsigned index_offset = 0;
 
     if (!startAtBottomLeft) // Elements in centre of mesh
     {
+        // Calculate the width of the medium on the edge and offset the node index so that the elements are in the centre of the mesh.
+        unsigned across_gap = (numNodesAcross -  numElementsAcross*elementWidth)/2;
+        unsigned up_gap = (numNodesUp -  numElementsUp*elementHeight)/2;
+        unsigned deep_gap = (numNodesDeep -  numElementsDeep*elementDepth)/2;
+
         index_offset = deep_gap*numNodesAcross*numNodesUp + up_gap*numNodesAcross + across_gap;
     }
 
