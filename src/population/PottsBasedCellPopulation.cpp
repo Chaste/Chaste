@@ -30,6 +30,9 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CellwiseData.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "Warnings.hpp"
+//Needed to convert mesh in order to write nodes to VTK (visualize as glyphs)
+#include "VtkMeshWriter.hpp"
+#include "NodesOnlyMesh.hpp"
 
 template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::Validate()
@@ -535,7 +538,31 @@ double PottsBasedCellPopulation<DIM>::GetTemperature()
 {
     return mTemperature;
 }
+template<unsigned DIM>
+void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile()
+{
+#ifdef CHASTE_VTK
+    std::stringstream time;
+    time << SimulationTime::Instance()->GetTimeStepsElapsed();
+    VtkMeshWriter<DIM, DIM> mesh_writer(this->mDirPath, "results_"+time.str(), false);
 
+    ///\todo #1666 - Add cell-type and element-ids to the VTK data.
+
+    //The current VTK writer can only write things which inherit from AbstractTetrahedralMeshWriter
+    //For now, we do an explicit conversion to NodesOnlyMesh.  This can be written to VTK then visualized as glyphs.
+
+    NodesOnlyMesh<DIM> temp_mesh;
+    temp_mesh.ConstructNodesWithoutMesh(mrMesh);
+    mesh_writer.WriteFilesUsingMesh(temp_mesh);
+
+    *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
+    *(this->mpVtkMetaFile) << time;
+    *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
+    *(this->mpVtkMetaFile) << time;
+    *(this->mpVtkMetaFile) << ".vtu\"/>\n";
+#endif //CHASTE_VTK
+
+}
 /////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////

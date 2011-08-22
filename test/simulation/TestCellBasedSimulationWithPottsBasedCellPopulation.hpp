@@ -274,6 +274,18 @@ public:
         // Test no births or deaths
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
+#ifdef CHASTE_VTK
+        //Test that VTK writer has produced some files
+        OutputFileHandler handler("TestPottsCellSorting", false);
+        std::string results_dir = handler.GetOutputDirectoryFullPath();
+        // Initial condition file
+        FileFinder vtk_file(results_dir + "results_from_time_0/results_0.vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtk_file.Exists());
+
+        // Final file
+        FileFinder vtk_file2(results_dir + "results_from_time_0/results_10.vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtk_file2.Exists());
+ #endif //CHASTE_VTK
     }
 
     void TestPottsSpheroidWithNoBirthOrDeath() throw (Exception)
@@ -377,6 +389,18 @@ public:
         // Test no births or deaths
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
+#ifdef CHASTE_VTK
+        //Test that VTK writer has produced some files
+        OutputFileHandler handler("TestPotts3DCellSorting", false);
+        std::string results_dir = handler.GetOutputDirectoryFullPath();
+        // Initial condition file
+        FileFinder vtk_file(results_dir + "results_from_time_0/results_0.vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtk_file.Exists());
+
+        // Final file
+        FileFinder vtk_file2(results_dir + "results_from_time_0/results_10.vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtk_file2.Exists());
+ #endif //CHASTE_VTK
     }
 
 //    void TestPottsCrypt() throw (Exception)

@@ -129,9 +129,9 @@ private:
     void Validate();
 
     /**
-     * Overridden WriteVtkResultsToFile() method.
+     * Overridden WriteVtkResultsToFile() method.   Implementation happening in #1666
      */
-    void WriteVtkResultsToFile(){}
+    void WriteVtkResultsToFile();
 
 public:
 
