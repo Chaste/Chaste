@@ -556,9 +556,9 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile()
     mesh_writer.WriteFilesUsingMesh(temp_mesh);
 
     *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
-    *(this->mpVtkMetaFile) << time;
+    *(this->mpVtkMetaFile) << time.str();
     *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
-    *(this->mpVtkMetaFile) << time;
+    *(this->mpVtkMetaFile) << time.str();
     *(this->mpVtkMetaFile) << ".vtu\"/>\n";
 #endif //CHASTE_VTK
 
