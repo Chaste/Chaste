@@ -75,6 +75,22 @@ private:
 
 public:
 
+    void TestSetDomainDimensions() throw (Exception)
+    {
+        GeneralisedPeriodicLinearSpringForce<2> linear_force2d;
+        TS_ASSERT_DELTA(linear_force2d.GetPeriodicDomainWidth(), DOUBLE_UNSET, 1e-3);
+        linear_force2d.SetPeriodicDomainWidth(1.576);
+        TS_ASSERT_DELTA(linear_force2d.GetPeriodicDomainWidth(), 1.576, 1e-3);
+
+        GeneralisedPeriodicLinearSpringForce<3> linear_force3d;
+		TS_ASSERT_DELTA(linear_force3d.GetPeriodicDomainWidth(), DOUBLE_UNSET, 1e-3);
+		TS_ASSERT_DELTA(linear_force3d.GetPeriodicDomainDepth(), DOUBLE_UNSET, 1e-3);
+		linear_force3d.SetPeriodicDomainWidth(1.576);
+		linear_force3d.SetPeriodicDomainDepth(1.865);
+		TS_ASSERT_DELTA(linear_force3d.GetPeriodicDomainWidth(), 1.576, 1e-3);
+		TS_ASSERT_DELTA(linear_force3d.GetPeriodicDomainDepth(), 1.865, 1e-3);
+    }
+
     void TestPeriodicForceOnHoneycombMesh() throw (Exception)
     {
         EXIT_IF_PARALLEL; //HoneycombMeshGenerator doesn't work in parallel
@@ -335,7 +351,6 @@ public:
 		// Create periodic force law
 		GeneralisedPeriodicLinearSpringForce<3> periodic_force;  // Variable spring strengths
         periodic_force.SetPeriodicDomainWidth(3.0);
-        periodic_force.SetPeriodicDomainDepth(3.0);
 
         simulator.AddForce(&periodic_force);
 

@@ -156,18 +156,15 @@ public:
 		AdhesionPottsUpdateRule<2> adhesion_update_rule;
 		cell_population.AddUpdateRule(&adhesion_update_rule);
 
-
         // Set up cell-based simulation
         CellBasedSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestPottsMonolayerWithDeath");
         simulator.SetDt(0.1);
         simulator.SetEndTime(1.0);
 
-
         // Create cell killer and pass in to simulation
         SloughingCellKiller<2> sloughing_cell_killer(&cell_population,16u);
         simulator.AddCellKiller(&sloughing_cell_killer);
-
 
         // Run simulation
         simulator.Solve();
@@ -205,6 +202,7 @@ public:
         simulator.SetOutputDirectory("TestPottsMonolayerWithBirth");
         simulator.SetDt(0.1);
         simulator.SetEndTime(20);
+        simulator.SetSamplingTimestepMultiple(20);
 
         // Run simulation
         simulator.Solve();
@@ -260,7 +258,6 @@ public:
         differential_adhesion_update_rule.SetCellBoundaryAdhesionEnergyParameter(0.16);
 
         cell_population.AddUpdateRule(&differential_adhesion_update_rule);
-
 
         // Set up cell-based simulation
         CellBasedSimulation<2> simulator(cell_population);
@@ -365,7 +362,6 @@ public:
 
         cell_population.AddUpdateRule(&differential_adhesion_update_rule);
 
-
         // Set up cell-based simulation
         CellBasedSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory("TestPotts3DCellSorting");
@@ -382,8 +378,6 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
     }
-
-
 
 //    void TestPottsCrypt() throw (Exception)
 //	{

@@ -27,11 +27,13 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "AbstractPeriodicTwoBodyInteractionForce.hpp"
+#include "Debug.hpp"
 
 template<unsigned DIM>
 AbstractPeriodicTwoBodyInteractionForce<DIM>::AbstractPeriodicTwoBodyInteractionForce()
    : AbstractTwoBodyInteractionForce<DIM>(),
      mPeriodicDomainWidth(DOUBLE_UNSET),
+     mPeriodicDomainDepth(DOUBLE_UNSET),
      mpExtendedMesh(NULL)
 {
 }
@@ -137,7 +139,7 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
             // If the width of the periodic domain has not been specified, use the initial width of the cell population
             if (mPeriodicDomainDepth == DOUBLE_UNSET)
             {
-            	mPeriodicDomainDepth = rCellPopulation.GetWidth(1);
+            	mPeriodicDomainDepth = rCellPopulation.GetWidth(1) + 1.0;
             }
 
             // First, extend the mesh in the x-direction
