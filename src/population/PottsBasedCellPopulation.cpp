@@ -546,7 +546,42 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile()
     time << SimulationTime::Instance()->GetTimeStepsElapsed();
     VtkMeshWriter<DIM, DIM> mesh_writer(this->mDirPath, "results_"+time.str(), false);
 
-    ///\todo #1666 - Add cell-type and element-ids to the VTK data.
+    unsigned num_nodes = GetNumNodes();
+    std::vector<double> cell_types;
+    std::vector<double> elem_ids;
+    cell_types.reserve(num_nodes);
+    elem_ids.reserve(num_nodes);
+
+    for (typename AbstractMesh<DIM,DIM>::NodeIterator iter = mrMesh.GetNodeIteratorBegin();
+            iter != mrMesh.GetNodeIteratorEnd();
+            ++iter)
+    {
+        std::set<unsigned> element_indices = iter->rGetContainingElementIndices();
+
+        if(element_indices.size() == 0)
+        {
+         // No elements associated with this gridpoint
+            cell_types.push_back(-1.0);
+            elem_ids.push_back(-1.0);
+        }
+        else
+        {
+         // The number of elements should be zero or one
+            assert(element_indices.size()==1);
+
+            unsigned element_index = *(element_indices.begin());
+            elem_ids.push_back((double)element_index);
+
+            CellPtr p_cell = this->mLocationCellMap[element_index];
+            double cell_type = p_cell->GetCellCycleModel()->GetCellProliferativeType();
+            cell_types.push_back(cell_type);
+        }
+    }
+
+    assert(cell_types.size() == num_nodes);
+    assert(elem_ids.size() == num_nodes);
+    mesh_writer.AddPointData("Element index", elem_ids);
+    mesh_writer.AddPointData("Cell types", cell_types);
 
     //The current VTK writer can only write things which inherit from AbstractTetrahedralMeshWriter
     //For now, we do an explicit conversion to NodesOnlyMesh.  This can be written to VTK then visualized as glyphs.
