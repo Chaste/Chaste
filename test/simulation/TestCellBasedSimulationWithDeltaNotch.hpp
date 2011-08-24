@@ -75,6 +75,8 @@ public:
     ///\todo: For mesh and vertex based
     void TestPostSolveNodeBased() throw(Exception)
     {
+    	EXIT_IF_PARALLEL;
+
     	// Create a small population
 		HoneycombMeshGenerator generator(2, 2, 0);
 		MutableMesh<2,2>* p_mesh = generator.GetMesh();
@@ -140,6 +142,8 @@ public:
 
     void TestPostSolveVertex() throw (Exception)
 	{
+    	EXIT_IF_PARALLEL;
+
     	// Create a regular vertex mesh
 		HoneycombVertexMeshGenerator generator(2, 2);
 		MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
@@ -199,6 +203,8 @@ public:
 
     void TestPostSolveMeshBased() throw (Exception)
 	{
+    	EXIT_IF_PARALLEL;
+
 		// Create a 2D honeycomb mesh
 		HoneycombMeshGenerator generator(2, 2, 0);
 		MutableMesh<2,2>* p_mesh = generator.GetMesh();
@@ -258,6 +264,8 @@ public:
 
     void TestArchiving() throw (Exception)
     {
+    	EXIT_IF_PARALLEL;
+
     	// Create a regular vertex mesh
 		HoneycombVertexMeshGenerator generator(2, 2);
 		MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
