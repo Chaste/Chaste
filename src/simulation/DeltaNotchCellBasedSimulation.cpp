@@ -32,7 +32,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "MeshBasedCellPopulation.hpp"
 #include "CellwiseData.hpp"
 #include "DeltaNotchCellCycleModel.hpp"
-#include "Debug.hpp"
 
 template<unsigned DIM>
 DeltaNotchCellBasedSimulation<DIM>::DeltaNotchCellBasedSimulation(AbstractCellPopulation<DIM>& rCellPopulation,

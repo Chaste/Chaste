@@ -27,7 +27,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "AbstractPeriodicTwoBodyInteractionForce.hpp"
-#include "Debug.hpp"
 
 template<unsigned DIM>
 AbstractPeriodicTwoBodyInteractionForce<DIM>::AbstractPeriodicTwoBodyInteractionForce()
