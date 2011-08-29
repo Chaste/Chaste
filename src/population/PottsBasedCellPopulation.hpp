@@ -33,11 +33,9 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "PottsMesh.hpp"
 #include "VertexMesh.hpp"
 #include "AbstractPottsUpdateRule.hpp"
-#include "ArchiveLocationInfo.hpp"
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
-#include <boost/serialization/set.hpp>
 #include <boost/serialization/vector.hpp>
 
 // Needed here to avoid serialization errors (on Boost<1.37)
