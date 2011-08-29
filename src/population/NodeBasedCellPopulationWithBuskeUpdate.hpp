@@ -31,17 +31,9 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "NodeBasedCellPopulation.hpp"
 
-#include "PetscVecTools.hpp"
-#include "PetscMatTools.hpp"
-#include "ReplicatableVector.hpp"
-#include "OdeLinearSystemSolver.hpp"
-
-#include "ArchiveLocationInfo.hpp"
-
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
-#include <boost/serialization/set.hpp>
-#include <boost/serialization/vector.hpp>
+
 
 /**
  * A NodeBasedCellPopulationWithBuskeUpdate is a CellPopulation consisting of only nodes in space with associated cells.

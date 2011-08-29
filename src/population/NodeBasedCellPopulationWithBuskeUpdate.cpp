@@ -27,8 +27,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 */
 #include "NodeBasedCellPopulationWithBuskeUpdate.hpp"
 
-// The header file below must be included in any file that uses Petsc
-#include "PetscSetupAndFinalize.hpp"
+#include "ReplicatableVector.hpp"
+#include "OdeLinearSystemSolver.hpp"
 
 template<unsigned DIM>
 NodeBasedCellPopulationWithBuskeUpdate<DIM>::NodeBasedCellPopulationWithBuskeUpdate(NodesOnlyMesh<DIM>& rMesh,

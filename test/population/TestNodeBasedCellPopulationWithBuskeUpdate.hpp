@@ -43,6 +43,9 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "TrianglesMeshReader.hpp"
 #include "NodesOnlyMesh.hpp"
 
+// The header file below must be included in any file that uses Petsc
+#include "PetscSetupAndFinalize.hpp"
+
 class TestNodeBasedCellPopulationWithBuskeUpdate : public AbstractCellBasedTestSuite
 {
 public:
