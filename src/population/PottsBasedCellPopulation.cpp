@@ -195,36 +195,42 @@ template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::UpdateNodeLocations(const std::vector< c_vector<double, DIM> >& rNodeForces, double dt)
 {
 
-    // This is where we perform the Monte Carlo simulations
-    unsigned num_nodes = mrMesh.GetNumNodes();
+    /*
+     * This is where we perform the Monte Carlo simulations
+     *
+     * We sample randomly from all nodes in the mesh. Once we have selected a target node we randomly select a neighbour.
+     * The Hamiltonian is evaluated in the current configuration (H_0) and with the target node added to the same element
+     * as the neighbour (H_1). Based on the vale of deltaH = H_1-H_0 the switch is either made or not.
+     *
+     * For each Timestep (i.e. each time this method is called we sample mrMesh.GetNumNodes() nodes, this is known as a Monte Carlo Step (MCS).
+     *
+     */
 
     RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
-    std::vector<unsigned> perm(num_nodes);
+    unsigned num_nodes = mrMesh.GetNumNodes();
 
-    if (mUpdateNodesInRandomOrder)
+    for (unsigned i=0; i<num_nodes; i++)
     {
-        p_gen->Shuffle(num_nodes, perm);
-    }
-    else
-    {
-        for (unsigned i=0; i<num_nodes; i++)
+        unsigned node_index;
+
+        if (mUpdateNodesInRandomOrder)
         {
-            perm[i] = i;
+            node_index = p_gen->randMod(num_nodes);
         }
-    }
+        else
+        {
+            // Loop over nodes in index order.
+            node_index = i;
+        }
 
-    // Loop over nodes and exchange
-    for (unsigned i=0; i<perm.size(); i++)
-    {
-        unsigned node_index = perm[i];
         Node<DIM>* p_node = mrMesh.GetNode(node_index);
 
         // Each node in the mesh must be in at most one element
         assert(p_node->GetNumContainingElements() <= 1);
 
-        // Find a random available neighbouring node to extend the element/medium into
+        // Find a random available neighbouring node to overwrite current site
         std::set<unsigned> neighbouring_node_indices = mrMesh.GetMooreNeighbouringNodeIndices(node_index);
-        unsigned new_location_index;
+        unsigned neighbour_location_index;
         if (!neighbouring_node_indices.empty())
         {
             unsigned num_neighbours = neighbouring_node_indices.size();
@@ -236,7 +242,7 @@ void PottsBasedCellPopulation<DIM>::UpdateNodeLocations(const std::vector< c_vec
                 neighbour_iter++;
             }
 
-            new_location_index = *neighbour_iter;
+            neighbour_location_index = *neighbour_iter;
         }
         else
         {
@@ -245,11 +251,11 @@ void PottsBasedCellPopulation<DIM>::UpdateNodeLocations(const std::vector< c_vec
         }
 
         std::set<unsigned> containing_elements = p_node->rGetContainingElementIndices();
-        std::set<unsigned> new_location_containing_elements = GetNode(new_location_index)->rGetContainingElementIndices();
+        std::set<unsigned> neighbour_containing_elements = GetNode(neighbour_location_index)->rGetContainingElementIndices();
 
         // Only calculate Hamiltonian and update elements if the nodes are from different elements
-        if (   ( *containing_elements.begin() != *new_location_containing_elements.begin() )
-            && ( !containing_elements.empty() || !new_location_containing_elements.empty() ) )
+        if (   ( *containing_elements.begin() != *neighbour_containing_elements.begin() )
+            && ( !containing_elements.empty() || !neighbour_containing_elements.empty() ) )
         {
         	double delta_H = 0.0; // This is H_1-H_0.
 
@@ -258,7 +264,7 @@ void PottsBasedCellPopulation<DIM>::UpdateNodeLocations(const std::vector< c_vec
                  iter != mUpdateRuleCollection.end();
                  ++iter)
             {
-                delta_H += (*iter)->EvaluateHamiltonianContribution(p_node->GetIndex(), new_location_index, *this);
+                delta_H += (*iter)->EvaluateHamiltonianContribution(neighbour_location_index, p_node->GetIndex(), *this);
             }
 
 			// Generate a uniform random number to do the random motion
@@ -269,22 +275,22 @@ void PottsBasedCellPopulation<DIM>::UpdateNodeLocations(const std::vector< c_vec
 			{
 				// Do swap
 
-			    // Remove the target node from any elements containing it (there should be at most one such element)
-				for (std::set<unsigned>::iterator iter = new_location_containing_elements.begin();
-					 iter != new_location_containing_elements.end();
-					 ++iter)
-				{
-					GetElement(*iter)->DeleteNode(GetElement(*iter)->GetNodeLocalIndex(new_location_index));
-
-					///\todo If this causes the element to have no nodes then flag the element and cell to be deleted
-				}
-
-                // Next add the target node to any elements containing the current node (there should be at most one such element)
+			    // Remove the current node from any elements containing it (there should be at most one such element)
 				for (std::set<unsigned>::iterator iter = containing_elements.begin();
 					 iter != containing_elements.end();
 					 ++iter)
 				{
-					GetElement(*iter)->AddNode(mrMesh.GetNode(new_location_index));
+					GetElement(*iter)->DeleteNode(GetElement(*iter)->GetNodeLocalIndex(node_index));
+
+					///\todo If this causes the element to have no nodes then flag the element and cell to be deleted
+				}
+
+                // Next add the current node to any elements containing the neighbouring node (there should be at most one such element)
+				for (std::set<unsigned>::iterator iter = neighbour_containing_elements.begin();
+					 iter != neighbour_containing_elements.end();
+					 ++iter)
+				{
+					GetElement(*iter)->AddNode(mrMesh.GetNode(node_index));
 				}
 			}
         }
