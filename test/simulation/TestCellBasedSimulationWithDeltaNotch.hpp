@@ -193,9 +193,9 @@ public:
 		// Run simulation
 		simulator.Solve();
 
-		TS_ASSERT_DELTA(p_data->GetValue(cells[0],0),0.9386,1e-4);
-        TS_ASSERT_DELTA(p_data->GetValue(cells[1],0),0.9990,1e-4);
-		TS_ASSERT_DELTA(p_data->GetValue(cells[2],0),0.9589,1e-4);
+		TS_ASSERT_DELTA(p_data->GetValue(cells[0],0),0.9386,5e-4);
+                TS_ASSERT_DELTA(p_data->GetValue(cells[1],0),0.9990,5e-4);
+		TS_ASSERT_DELTA(p_data->GetValue(cells[2],0),0.9589,5e-4);
 
 		// Tidy up
 		CellwiseData<2>::Destroy();
