@@ -554,8 +554,12 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile()
 
     unsigned num_nodes = GetNumNodes();
     std::vector<double> cell_types;
+    std::vector<double> cell_mutation_states;
+    std::vector<double> cell_labels;
     std::vector<double> elem_ids;
     cell_types.reserve(num_nodes);
+    cell_mutation_states.reserve(num_nodes);
+    cell_labels.reserve(num_nodes);
     elem_ids.reserve(num_nodes);
 
     for (typename AbstractMesh<DIM,DIM>::NodeIterator iter = mrMesh.GetNodeIteratorBegin();
@@ -566,13 +570,18 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile()
 
         if(element_indices.size() == 0)
         {
-         // No elements associated with this gridpoint
+            // No elements associated with this gridpoint
             cell_types.push_back(-1.0);
             elem_ids.push_back(-1.0);
+            if (this->mOutputCellMutationStates)
+            {
+                cell_mutation_states.push_back(-1.0);
+                cell_labels.push_back(-1.0);
+            }
         }
         else
         {
-         // The number of elements should be zero or one
+            // The number of elements should be zero or one
             assert(element_indices.size()==1);
 
             unsigned element_index = *(element_indices.begin());
@@ -581,13 +590,37 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile()
             CellPtr p_cell = this->mLocationCellMap[element_index];
             double cell_type = p_cell->GetCellCycleModel()->GetCellProliferativeType();
             cell_types.push_back(cell_type);
+
+            if (this->mOutputCellMutationStates)
+            {
+                double cell_mutation_state = p_cell->GetMutationState()->GetColour();
+                cell_mutation_states.push_back(cell_mutation_state);
+
+                double cell_label = 0.0;
+                if (p_cell->HasCellProperty<CellLabel>())
+                {
+                    CellPropertyCollection collection = p_cell->rGetCellPropertyCollection().GetProperties<CellLabel>();
+                    boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(collection.GetProperty());
+                    cell_label = p_label->GetColour();
+                }
+                cell_labels.push_back(cell_label);
+            }
         }
     }
 
     assert(cell_types.size() == num_nodes);
     assert(elem_ids.size() == num_nodes);
+
     mesh_writer.AddPointData("Element index", elem_ids);
     mesh_writer.AddPointData("Cell types", cell_types);
+
+    if (this->mOutputCellMutationStates)
+    {
+        assert(cell_mutation_states.size() == num_nodes);
+        mesh_writer.AddPointData("Mutation states", cell_mutation_states);
+        assert(cell_labels.size() == num_nodes);
+        mesh_writer.AddPointData("Cell labels", cell_labels);
+    }
 
     //The current VTK writer can only write things which inherit from AbstractTetrahedralMeshWriter
     //For now, we do an explicit conversion to NodesOnlyMesh.  This can be written to VTK then visualized as glyphs.
