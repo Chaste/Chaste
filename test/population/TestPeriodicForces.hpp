@@ -34,7 +34,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <boost/archive/text_iarchive.hpp>
 
 #include "CellsGenerator.hpp"
-#include "CellBasedSimulation.hpp"
+#include "OffLatticeSimulation.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
@@ -346,7 +346,7 @@ public:
         // Test Save with a MeshBasedCellPopulationWithGhostNodes
         MeshBasedCellPopulation<3> cell_population(*p_mesh, cells);
 
-		CellBasedSimulation<3> simulator(cell_population);
+		OffLatticeSimulation<3> simulator(cell_population);
 
 		// Create periodic force law
 		GeneralisedPeriodicLinearSpringForce<3> periodic_force;  // Variable spring strengths

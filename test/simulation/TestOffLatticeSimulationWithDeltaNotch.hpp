@@ -26,13 +26,13 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#ifndef TESTDELTANOTCHCELLBASEDSIMULATION_HPP_
-#define TESTDELTANOTCHCELLBASEDSIMULATION_HPP_
+#ifndef TESTOFFLATTICESIMULATIONWITHDELTANOTCH_HPP_
+#define TESTOFFLATTICESIMULATIONWITHDELTANOTCH_HPP_
 
 #include <cxxtest/TestSuite.h>
 
 // Must be included before other cell_based headers
-#include "CellBasedSimulationArchiver.hpp"
+#include "OffLatticeSimulationArchiver.hpp"
 
 #include <ctime>
 #include "NodesOnlyMesh.hpp"
@@ -43,13 +43,13 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "GeneralisedLinearSpringForce.hpp"
 #include "NagaiHondaForce.hpp"
 #include "VertexBasedCellPopulation.hpp"
-#include "DeltaNotchCellBasedSimulation.hpp"
+#include "DeltaNotchOffLatticeSimulation.hpp"
 #include "CellwiseData.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "Warnings.hpp"
 
-class TestDeltaNotchCellBasedSimulation : public AbstractCellBasedTestSuite
+class TestDeltaNotchOffLatticeSimulation : public AbstractCellBasedTestSuite
 { 
 private:
     double mLastStartTime;
@@ -118,7 +118,7 @@ public:
 		}
 
         // Create and configure cell-based simulation
-        DeltaNotchCellBasedSimulation<2> simulator(cell_population);
+        DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDeltaNotchNodeBasedPostSolve");
         simulator.SetEndTime(0.01);
 
@@ -182,7 +182,7 @@ public:
 		}
 
 		// Create and configure cell-based simulation
-		DeltaNotchCellBasedSimulation<2> simulator(cell_population);
+		DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
 		simulator.SetOutputDirectory("TestDeltaNotchVertex2D");
 		simulator.SetEndTime(0.01);
 
@@ -241,7 +241,7 @@ public:
 		}
 
 		// Create and configure cell-based simulation
-		DeltaNotchCellBasedSimulation<2> simulator(cell_population);
+		DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
 		simulator.SetOutputDirectory("TestDeltaNotchMeshBasedPostSolve");
 		simulator.SetEndTime(0.01);
 
@@ -304,8 +304,8 @@ public:
 		}
 
 		// Create and configure cell-based simulation
-		DeltaNotchCellBasedSimulation<2> simulator(cell_population);
-		simulator.SetOutputDirectory("TestDeltaNotchCellBasedSimulationSaveAndLoad");
+		DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
+		simulator.SetOutputDirectory("TestDeltaNotchOffLatticeSimulationSaveAndLoad");
 		double end_time=0.01;
 		simulator.SetEndTime(end_time);
 
@@ -316,7 +316,7 @@ public:
         // Run and save simulation
         simulator.Solve();
 
-        CellBasedSimulationArchiver<2, DeltaNotchCellBasedSimulation<2> >::Save(&simulator);
+        OffLatticeSimulationArchiver<2, DeltaNotchOffLatticeSimulation<2> >::Save(&simulator);
 
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 4u);
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), 16u);
@@ -330,8 +330,8 @@ public:
         SimulationTime::Instance()->SetStartTime(0.0);
 
         // Load simulation
-        DeltaNotchCellBasedSimulation<2>* p_simulator
-            = CellBasedSimulationArchiver<2, DeltaNotchCellBasedSimulation<2> >::Load("TestDeltaNotchCellBasedSimulationSaveAndLoad", end_time);
+        DeltaNotchOffLatticeSimulation<2>* p_simulator
+            = OffLatticeSimulationArchiver<2, DeltaNotchOffLatticeSimulation<2> >::Load("TestDeltaNotchOffLatticeSimulationSaveAndLoad", end_time);
 
         p_simulator->SetEndTime(0.2);
 
@@ -356,4 +356,4 @@ public:
     }
 };
 
-#endif /*TESTDELTANOTCHCELLBASEDSIMULATION_HPP_*/
+#endif /*TESTOFFLATTICESIMULATIONWITHDELTANOTCH_HPP_*/

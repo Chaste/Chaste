@@ -26,16 +26,16 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#ifndef TESTCELLBASEDSIMULATIONWITHLATTICEBASEDCELLPOPULATION_HPP_
-#define TESTCELLBASEDSIMULATIONWITHLATTICEBASEDCELLPOPULATION_HPP_
+#ifndef TESTCABASEDIMULATIONWITHCABASEDCELLPOPULATION_HPP_
+#define TESTCABASEDIMULATIONWITHCABASEDCELLPOPULATION_HPP_
 
 #include <cxxtest/TestSuite.h>
 
 // Must be included before other cell_based headers
-#include "CellBasedSimulationArchiver.hpp"
+#include "OffLatticeSimulationArchiver.hpp"
 
 #include "CellsGenerator.hpp"
-#include "CaBasedCellBasedSimulation.hpp"
+#include "CaBasedSimulation.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "CaBasedCellPopulation.hpp"
 #include "DiffusionCaUpdateRule.hpp"
@@ -46,7 +46,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "NumericFileComparison.hpp"
 #include "CellBasedEventHandler.hpp"
 
-class TestCellBasedSimulationWithCaBasedCellPopulation : public AbstractCellBasedTestSuite
+class TestCaBasedSimulationWithCaBasedCellPopulation : public AbstractCellBasedTestSuite
 {
 private:
 
@@ -129,7 +129,7 @@ public:
         update_rule_collection.push_back(&update_rule);
 
         // Set up cell-based simulation
-        CaBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        CaBasedSimulation<2> simulator(cell_population, update_rule_collection);
         simulator.SetDt(1);
         simulator.SetEndTime(20);
 
@@ -182,7 +182,7 @@ public:
         std::vector<AbstractCaUpdateRule<2>* > update_rule_collection;
 
         // Set up cell-based simulation
-        CaBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        CaBasedSimulation<2> simulator(cell_population, update_rule_collection);
         simulator.SetOutputDirectory("TestCellsDividing");
         simulator.SetDt(1);
         simulator.SetEndTime(50);
@@ -220,7 +220,7 @@ public:
         update_rule_collection.push_back(&update_rule);
 
         // Set up cell-based simulation
-        CaBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        CaBasedSimulation<2> simulator(cell_population, update_rule_collection);
         simulator.SetOutputDirectory("TestDiffusionOfLargeNumberOfCells");
         simulator.SetDt(0.1);
         simulator.SetEndTime(5.0);
@@ -258,7 +258,7 @@ public:
         update_rule_collection.push_back(&update_rule);
 
         // Set up cell-based simulation
-        CaBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        CaBasedSimulation<2> simulator(cell_population, update_rule_collection);
         simulator.SetOutputDirectory("TestDiffusionAndDeathOfLargeNumberOfCells");
         simulator.SetDt(0.1);
         simulator.SetEndTime(10);
@@ -300,7 +300,7 @@ public:
         update_rule_collection.push_back(&update_rule);
 
         // Set up cell-based simulation
-        CaBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        CaBasedSimulation<2> simulator(cell_population, update_rule_collection);
         simulator.SetOutputDirectory("TestDiffusionAndDivisionOfLargeNumberOfCells");
         simulator.SetDt(0.1);
         simulator.SetEndTime(10);
@@ -347,7 +347,7 @@ public:
         update_rule_collection.push_back(&advection_update_rule);
 
         // Set up cell-based simulation
-        CaBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        CaBasedSimulation<2> simulator(cell_population, update_rule_collection);
         simulator.SetOutputDirectory("TestDiffusionAndAdvectionAndDivision");
         simulator.SetDt(0.1);
         simulator.SetEndTime(10);
@@ -397,7 +397,7 @@ public:
         update_rule_collection.push_back(&update_rule_7);
 
         // Set up cell-based simulation
-        CaBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        CaBasedSimulation<2> simulator(cell_population, update_rule_collection);
         simulator.SetOutputDirectory("TestMultipleAdvectionCaUpdateRules");
 
         /*
@@ -448,7 +448,7 @@ public:
         update_rule_collection.push_back(&advection_update_rule);
 
         // Set up cell-based simulation
-        CaBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection, true, true);
+        CaBasedSimulation<2> simulator(cell_population, update_rule_collection, true, true);
         simulator.SetOutputDirectory("TestRandomIterationOverUpdateRules");
         simulator.SetDt(0.1);
         simulator.SetEndTime(5.0);
@@ -494,7 +494,7 @@ public:
         update_rule_collection.push_back(&update_rule);
 
         // Set up cell-based simulation
-        CaBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        CaBasedSimulation<2> simulator(cell_population, update_rule_collection);
         simulator.SetOutputDirectory("CaBasedStandardResult");
         simulator.SetDt(0.1);
         simulator.SetEndTime(8.0);
@@ -566,7 +566,7 @@ public:
         update_rule_collection.push_back(&update_rule);
 
         // Set up cell-based simulation
-        CaBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        CaBasedSimulation<2> simulator(cell_population, update_rule_collection);
         simulator.SetOutputDirectory("CaBasedSaveAndLoad");
         simulator.SetDt(0.1);
 
@@ -583,16 +583,16 @@ public:
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 98u);
 
         // Save the results
-        CellBasedSimulationArchiver<2, CaBasedCellBasedSimulation<2> >::Save(&simulator);
+        OffLatticeSimulationArchiver<2, CaBasedSimulation<2> >::Save(&simulator);
     }
 
     // Testing Load (based on previous two tests)
     void TestLoad() throw (Exception)
     {
         // Load the simulation from the TestSave method above and run it from 3.0 to 6.0
-        CaBasedCellBasedSimulation<2>* p_simulator1;
+        CaBasedSimulation<2>* p_simulator1;
 
-        p_simulator1 = CellBasedSimulationArchiver<2, CaBasedCellBasedSimulation<2> >::Load("CaBasedSaveAndLoad", 3.0);
+        p_simulator1 = OffLatticeSimulationArchiver<2, CaBasedSimulation<2> >::Load("CaBasedSaveAndLoad", 3.0);
 
         TS_ASSERT_EQUALS(p_simulator1->rGetCellPopulation().GetNumRealCells(), 98u);
         TS_ASSERT_DELTA(p_simulator1->GetDt(), 0.1, 1e-6);
@@ -604,9 +604,9 @@ public:
         TetrahedralMesh<2,2>& r_mesh1 = (static_cast<CaBasedCellPopulation<2>*>(&(p_simulator1->rGetCellPopulation())))->rGetMesh();
 
         // Save then reload, compare meshes either side
-        CellBasedSimulationArchiver<2, CaBasedCellBasedSimulation<2> >::Save(p_simulator1);
+        OffLatticeSimulationArchiver<2, CaBasedSimulation<2> >::Save(p_simulator1);
 
-        CaBasedCellBasedSimulation<2>* p_simulator2 = CellBasedSimulationArchiver<2, CaBasedCellBasedSimulation<2> >::Load("CaBasedSaveAndLoad", 6.0);
+        CaBasedSimulation<2>* p_simulator2 = OffLatticeSimulationArchiver<2, CaBasedSimulation<2> >::Load("CaBasedSaveAndLoad", 6.0);
         TetrahedralMesh<2,2>& r_mesh2 = (static_cast<CaBasedCellPopulation<2>*>(&(p_simulator2->rGetCellPopulation())))->rGetMesh();
 
         CompareMeshes(&r_mesh1, &r_mesh2);
@@ -668,7 +668,7 @@ public:
         update_rule_collection.push_back(&update_rule);
 
         // Set up cell-based simulation
-        CaBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        CaBasedSimulation<2> simulator(cell_population, update_rule_collection);
         simulator.SetOutputDirectory("TestDiffusionOfLargeNumberOfCells");
         simulator.SetDt(0.1);
         simulator.SetEndTime(5.0);
@@ -679,9 +679,9 @@ public:
         out_stream parameter_file = output_file_handler.OpenOutputFile("results.parameters");
 
         // Try to write simulation parameters to file
-        TS_ASSERT_THROWS_THIS(simulator.OutputSimulationParameters(parameter_file),"OutputSimulationParameters() is not yet implemented for CaBasedCellBasedSimulation see #1453");
+        TS_ASSERT_THROWS_THIS(simulator.OutputSimulationParameters(parameter_file),"OutputSimulationParameters() is not yet implemented for CaBasedSimulation see #1453");
         parameter_file->close();
     }
 };
 
-#endif /*TESTCELLBASEDSIMULATIONWITHLATTICEBASEDCELLPOPULATION_HPP_*/
+#endif /*TESTONLATTICESIMULATIONWITHCABASEDCELLPOPULATION_HPP_*/

@@ -26,18 +26,18 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#include "CaBasedCellBasedSimulation.hpp"
+#include "CaBasedSimulation.hpp"
 #include "CellBasedEventHandler.hpp"
 #include "LogFile.hpp"
 
 template<unsigned DIM>
-CaBasedCellBasedSimulation<DIM>::CaBasedCellBasedSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
+CaBasedSimulation<DIM>::CaBasedSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
                   std::vector<AbstractCaUpdateRule<DIM>*> updateRuleCollection,
                   bool iterateRandomlyOverUpdateRuleCollection,
                   bool iterateRandomlyOverCells,
                   bool deleteCellPopulationAndForceCollection,
                   bool initialiseCells)
-    : CellBasedSimulation<DIM>(rCellPopulation,
+    : OffLatticeSimulation<DIM>(rCellPopulation,
                   deleteCellPopulationAndForceCollection,
                   initialiseCells),
     mUpdateRuleCollection(updateRuleCollection),
@@ -49,7 +49,7 @@ CaBasedCellBasedSimulation<DIM>::CaBasedCellBasedSimulation(AbstractCellPopulati
 }
 
 template<unsigned DIM>
-CaBasedCellBasedSimulation<DIM>::~CaBasedCellBasedSimulation()
+CaBasedSimulation<DIM>::~CaBasedSimulation()
 {
     if (mAllocatedMemoryForUpdateRuleCollection)
     {
@@ -63,14 +63,14 @@ CaBasedCellBasedSimulation<DIM>::~CaBasedCellBasedSimulation()
 }
 
 template<unsigned DIM>
-c_vector<double, DIM> CaBasedCellBasedSimulation<DIM>::CalculateCellDivisionVector(CellPtr pParentCell)
+c_vector<double, DIM> CaBasedSimulation<DIM>::CalculateCellDivisionVector(CellPtr pParentCell)
 {
     c_vector<double, DIM> axis_of_division = zero_vector<double>(DIM);
     return axis_of_division;
 }
 
 template<unsigned DIM>
-void CaBasedCellBasedSimulation<DIM>::UpdateCellLocations()
+void CaBasedSimulation<DIM>::UpdateCellLocations()
 {
     // Iterate over contributions from each UpdateRule
     if (mIterateRandomlyOverUpdateRuleCollection)
@@ -131,9 +131,9 @@ void CaBasedCellBasedSimulation<DIM>::UpdateCellLocations()
     }
 }
 
-///\todo Much of this code can probably merged with CellBasedSimulation::Solve()
+///\todo Much of this code can probably merged with OffLatticeSimulation::Solve()
 template<unsigned DIM>
-void CaBasedCellBasedSimulation<DIM>::Solve()
+void CaBasedSimulation<DIM>::Solve()
 {
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::EVERYTHING);
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::SETUP);
@@ -287,29 +287,29 @@ void CaBasedCellBasedSimulation<DIM>::Solve()
 }
 
 template<unsigned DIM>
-const std::vector<AbstractCaUpdateRule<DIM>*> CaBasedCellBasedSimulation<DIM>::rGetUpdateRuleCollection() const
+const std::vector<AbstractCaUpdateRule<DIM>*> CaBasedSimulation<DIM>::rGetUpdateRuleCollection() const
 {
     return mUpdateRuleCollection;
 }
 
 template<unsigned DIM>
-void CaBasedCellBasedSimulation<DIM>::OutputSimulationParameters(out_stream& rParamsFile)
+void CaBasedSimulation<DIM>::OutputSimulationParameters(out_stream& rParamsFile)
 {
-    // Currently this is not called from CaBasedCellBasedSimulation; see #1453 for a discussion on this for centre- and vertex-based cell population.
-    EXCEPTION("OutputSimulationParameters() is not yet implemented for CaBasedCellBasedSimulation see #1453");
+    // Currently this is not called from CaBasedSimulation; see #1453 for a discussion on this for centre- and vertex-based cell population.
+    EXCEPTION("OutputSimulationParameters() is not yet implemented for CaBasedSimulation see #1453");
 
     // Call method on direct parent class
-    //CellBasedSimulation<DIM>::OutputSimulationParameters(rParamsFile);
+    //OffLatticeSimulation<DIM>::OutputSimulationParameters(rParamsFile);
 }
 
 /////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////
 
-template class CaBasedCellBasedSimulation<1>;
-template class CaBasedCellBasedSimulation<2>;
-template class CaBasedCellBasedSimulation<3>;
+template class CaBasedSimulation<1>;
+template class CaBasedSimulation<2>;
+template class CaBasedSimulation<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(CaBasedCellBasedSimulation)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(CaBasedSimulation)

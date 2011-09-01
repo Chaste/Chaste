@@ -900,7 +900,7 @@ double CaBasedCellPopulation<DIM>::GetDampingConstant(unsigned nodeIndex)
 template<unsigned DIM>
 void CaBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
-    // Currently this is not called from CaBasedCellBasedSimulation; see #1453 for a discussion on this for centre- and vertex-based cell populations.
+    // Currently this is not called from CaBasedSimulation; see #1453 for a discussion on this for centre- and vertex-based cell populations.
     EXCEPTION("OutputCellPopulationParameters() is not yet implemented for CaBasedCellPopulation see #1453");
 }
 

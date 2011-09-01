@@ -1,2 +1,2 @@
-simulation/TestRepresentativeCaBasedCellBasedSimulation.hpp
-simulation/TestRepresentativePottsBasedCellBasedSimulation.hpp
+simulation/TestRepresentativeCaBasedSimulation.hpp
+simulation/TestRepresentativePottsBasedOnLatticeSimulation.hpp

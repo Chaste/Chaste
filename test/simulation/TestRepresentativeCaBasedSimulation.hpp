@@ -25,15 +25,15 @@ You should have received a copy of the GNU Lesser General Public License
 along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
-#ifndef TESTREPRESENTATIVECABASEDCELLBASEDSIMULATION_HPP_
-#define TESTREPRESENTATIVECABASEDCELLBASEDSIMULATION_HPP_
+#ifndef TESTREPRESENTATIVECABASEDONLATTICESIMULATION_HPP_
+#define TESTREPRESENTATIVECABASEDONLATTICESIMULATION_HPP_
 
 #include <cxxtest/TestSuite.h>
 
 // Must be included before other cell_based headers
-#include "CellBasedSimulationArchiver.hpp"
+#include "OffLatticeSimulationArchiver.hpp"
 
-#include "CaBasedCellBasedSimulation.hpp"
+#include "CaBasedSimulation.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "CaBasedCellPopulation.hpp"
@@ -57,7 +57,7 @@ class TestRepresentativeLatticeBasedCellBasedSimulation : public AbstractCellBas
 {
 public:
 
-    void TestRepresentativeCaBasedCellBasedSimulationForProfiling() throw (Exception)
+    void TestRepresentativeCaBasedSimulationForProfiling() throw (Exception)
     {
         // Create mesh
         TetrahedralMesh<2,2> mesh;
@@ -86,7 +86,7 @@ public:
         std::vector<AbstractCaUpdateRule<2>* > update_rule_collection;
 
         // Set up cell-based simulation
-        CaBasedCellBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        CaBasedSimulation<2> simulator(cell_population, update_rule_collection);
         simulator.SetOutputDirectory("TestRepresentativeCaBasedSimulationForProfiling");
         simulator.SetEndTime(50);
 
@@ -97,4 +97,4 @@ public:
     }
 };
 
-#endif /* TESTREPRESENTATIVECABASEDCELLBASEDSIMULATION_HPP_ */
+#endif /* TESTREPRESENTATIVECABASEDONLATTICESIMULATION_HPP_ */

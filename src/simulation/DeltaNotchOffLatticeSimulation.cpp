@@ -26,7 +26,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#include "DeltaNotchCellBasedSimulation.hpp"
+#include "DeltaNotchOffLatticeSimulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "MeshBasedCellPopulation.hpp"
@@ -34,22 +34,22 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "DeltaNotchCellCycleModel.hpp"
 
 template<unsigned DIM>
-DeltaNotchCellBasedSimulation<DIM>::DeltaNotchCellBasedSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
+DeltaNotchOffLatticeSimulation<DIM>::DeltaNotchOffLatticeSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
                                                                   bool deleteCellPopulationAndForceCollection,
                                                                   bool initialiseCells)
-    : CellBasedSimulation<DIM>(rCellPopulation, deleteCellPopulationAndForceCollection, initialiseCells)
+    : OffLatticeSimulation<DIM>(rCellPopulation, deleteCellPopulationAndForceCollection, initialiseCells)
 {
 
 }
 
 template<unsigned DIM>
-DeltaNotchCellBasedSimulation<DIM>::~DeltaNotchCellBasedSimulation()
+DeltaNotchOffLatticeSimulation<DIM>::~DeltaNotchOffLatticeSimulation()
 {
 }
 
 
 template<unsigned DIM>
-void DeltaNotchCellBasedSimulation<DIM>::PostSolve()
+void DeltaNotchOffLatticeSimulation<DIM>::PostSolve()
 {
     this->mrCellPopulation.Update();
     CellwiseData<DIM>::Instance()->ReallocateMemory();
@@ -202,10 +202,10 @@ void DeltaNotchCellBasedSimulation<DIM>::PostSolve()
 }
 
 
-template class DeltaNotchCellBasedSimulation<1>;
-template class DeltaNotchCellBasedSimulation<2>;
-template class DeltaNotchCellBasedSimulation<3>;
+template class DeltaNotchOffLatticeSimulation<1>;
+template class DeltaNotchOffLatticeSimulation<2>;
+template class DeltaNotchOffLatticeSimulation<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(DeltaNotchCellBasedSimulation)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(DeltaNotchOffLatticeSimulation)

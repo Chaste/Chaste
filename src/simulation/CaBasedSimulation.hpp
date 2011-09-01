@@ -26,13 +26,13 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#ifndef LATTICEBASEDCELLBASEDSIMULATION_HPP_
-#define LATTICEBASEDCELLBASEDSIMULATION_HPP_
+#ifndef CABASEDSIMULATION_HPP_
+#define CABASEDSIMULATION_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "CellBasedSimulation.hpp"
+#include "OffLatticeSimulation.hpp"
 #include "CaBasedCellPopulation.hpp"
 #include "AbstractCaUpdateRule.hpp"
 
@@ -41,11 +41,11 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
  * A lattice-based cell-based simulation object.
  */
  template<unsigned DIM>
-class CaBasedCellBasedSimulation : public CellBasedSimulation<DIM>
+class CaBasedSimulation : public OffLatticeSimulation<DIM>
 {
     // Allow tests to access private members, in order to test computation of
     // private functions eg. DoCellBirth
-    friend class TestCellBasedSimulationWithCaBasedCellPopulation;
+    friend class TestCaBasedSimulationWithCaBasedCellPopulation;
 
 private:
 
@@ -62,7 +62,7 @@ private:
     {
         // If Archive is an output archive, then & resolves to <<
         // If Archive is an input archive, then & resolves to >>
-        archive & boost::serialization::base_object<CellBasedSimulation<DIM> >(*this);
+        archive & boost::serialization::base_object<OffLatticeSimulation<DIM> >(*this);
 
         archive & mUpdateRuleCollection;
         archive & mIterateRandomlyOverUpdateRuleCollection;
@@ -113,7 +113,7 @@ public:
      * @param initialiseCells whether to initialise cells (defaults to true, set to
      *        false when loading from an archive)
      */
-    CaBasedCellBasedSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
+    CaBasedSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
                       std::vector<AbstractCaUpdateRule<DIM>*> updateRuleCollection,
                       bool iterateRandomlyOverUpdateRuleCollection=false,
                       bool iterateRandomlyOverCells=false,
@@ -123,7 +123,7 @@ public:
     /**
      * Destructor.
      */
-    ~CaBasedCellBasedSimulation();
+    ~CaBasedSimulation();
 
     /**
      * Main solve method.
@@ -155,18 +155,18 @@ public:
 
 // Declare identifier for the serializer
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(CaBasedCellBasedSimulation)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(CaBasedSimulation)
 
 namespace boost
 {
 namespace serialization
 {
 /**
- * Serialize information required to construct a CaBasedCellBasedSimulation.
+ * Serialize information required to construct a CaBasedSimulation.
  */
 template<class Archive, unsigned DIM>
 inline void save_construct_data(
-    Archive & ar, const CaBasedCellBasedSimulation<DIM> * t, const BOOST_PFTO unsigned int file_version)
+    Archive & ar, const CaBasedSimulation<DIM> * t, const BOOST_PFTO unsigned int file_version)
 {
     // Save data required to construct instance
     const AbstractCellPopulation<DIM> * p_cell_population = &(t->rGetCellPopulation());
@@ -176,11 +176,11 @@ inline void save_construct_data(
 }
 
 /**
- * De-serialize constructor parameters and initialise a CaBasedCellBasedSimulation.
+ * De-serialize constructor parameters and initialise a CaBasedSimulation.
  */
 template<class Archive, unsigned DIM>
 inline void load_construct_data(
-    Archive & ar, CaBasedCellBasedSimulation<DIM> * t, const unsigned int file_version)
+    Archive & ar, CaBasedSimulation<DIM> * t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
     AbstractCellPopulation<DIM>* p_cell_population;
@@ -189,9 +189,9 @@ inline void load_construct_data(
     ar >> update_rule_collection;
 
     // Invoke inplace constructor to initialise instance
-    ::new(t)CaBasedCellBasedSimulation<DIM>(*p_cell_population, update_rule_collection, false, false, true, false);
+    ::new(t)CaBasedSimulation<DIM>(*p_cell_population, update_rule_collection, false, false, true, false);
 }
 }
 } // namespace
 
-#endif /*LATTICEBASEDCELLBASEDSIMULATION_HPP_*/
+#endif /*CABASEDSIMULATION_HPP_*/

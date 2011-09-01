@@ -26,21 +26,21 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#ifndef DELTANOTCHCELLBASEDSIMULATION_HPP_
-#define DELTANOTCHCELLBASEDSIMULATION_HPP_
+#ifndef DELTANOTCHOFFLATTICESIMULATION_HPP_
+#define DELTANOTCHOFFLATTICESIMULATION_HPP_
 
 #include <map>
 #include "ChasteSerialization.hpp"
-#include "CellBasedSimulation.hpp"
+#include "OffLatticeSimulation.hpp"
 #include "PetscTools.hpp"
 #include "OutputFileHandler.hpp"
 
 /**
- * Subclass of CellBasedSimulation in which the mean levels Delta in neighbouring cells
+ * Subclass of OffLatticeSimulation in which the mean levels Delta in neighbouring cells
  * are computed and stored in CellwiseData for use in DeltaNotchOdeSystem in a centre based cell population
  */
 template<unsigned DIM>
-class DeltaNotchCellBasedSimulation : public CellBasedSimulation<DIM>
+class DeltaNotchOffLatticeSimulation : public OffLatticeSimulation<DIM>
 {
 private :
 
@@ -60,7 +60,7 @@ private :
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<CellBasedSimulation<DIM> >(*this);
+        archive & boost::serialization::base_object<OffLatticeSimulation<DIM> >(*this);
     }
 
 
@@ -81,18 +81,18 @@ public:
      * @param deleteCellPopulationAndForceCollection whether to delete cell population and force collection.
      * @param initialiseCells whether to initialise cells (set to false when loading from an archive)
      */
-     DeltaNotchCellBasedSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
+     DeltaNotchOffLatticeSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
                                    bool deleteCellPopulationAndForceCollection=false,
                                    bool initialiseCells=true);
 
      /**
       * Destructor.
       */
-    ~DeltaNotchCellBasedSimulation();
+    ~DeltaNotchOffLatticeSimulation();
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(DeltaNotchCellBasedSimulation)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(DeltaNotchOffLatticeSimulation)
 
 namespace boost
 {
@@ -100,7 +100,7 @@ namespace serialization
 {
 template<class Archive, unsigned DIM>
 inline void save_construct_data(
-    Archive & ar, const DeltaNotchCellBasedSimulation<DIM> * t, const BOOST_PFTO unsigned int file_version)
+    Archive & ar, const DeltaNotchOffLatticeSimulation<DIM> * t, const BOOST_PFTO unsigned int file_version)
 {
     const AbstractCellPopulation<DIM> * p_cell_population = &(t->rGetCellPopulation());
     ar & p_cell_population;
@@ -108,14 +108,14 @@ inline void save_construct_data(
 
 template<class Archive, unsigned DIM>
 inline void load_construct_data(
-    Archive & ar, DeltaNotchCellBasedSimulation<DIM> * t, const unsigned int file_version)
+    Archive & ar, DeltaNotchOffLatticeSimulation<DIM> * t, const unsigned int file_version)
 {
     AbstractCellPopulation<DIM>* p_cell_population;
     ar >> p_cell_population;
 
-    ::new(t)DeltaNotchCellBasedSimulation<DIM>(*p_cell_population, true, false);
+    ::new(t)DeltaNotchOffLatticeSimulation<DIM>(*p_cell_population, true, false);
 }
 }
 } // namespace ...
 
-#endif /*DELTANOTCHCELLBASEDSIMULATION_HPP_*/
+#endif /*DELTANOTCHOFFLATTICESIMULATION_HPP_*/

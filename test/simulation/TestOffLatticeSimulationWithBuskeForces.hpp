@@ -26,17 +26,17 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#ifndef TESTCELLBASEDSIMULATIONWITHBUSKEFORCES_HPP_
-#define TESTCELLBASEDSIMULATIONWITHBUSKEFORCES_HPP_
+#ifndef TESTOFFLATTICESIMULATIONWITHBUSKEFORCES_HPP_
+#define TESTOFFLATTICESIMULATIONWITHBUSKEFORCES_HPP_
 
 #include <cxxtest/TestSuite.h>
 
 // Must be included before other cell_based headers
-#include "CellBasedSimulationArchiver.hpp"
+#include "OffLatticeSimulationArchiver.hpp"
 
 #include "AbstractCellBasedTestSuite.hpp"
 #include "CellsGenerator.hpp"
-#include "CellBasedSimulation.hpp"
+#include "OffLatticeSimulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
@@ -45,7 +45,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "BuskeCompressionForce.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 
-class TestCellBasedSimulationWithBuskeForces : public AbstractCellBasedTestSuite
+class TestOffLatticeSimulationWithBuskeForces : public AbstractCellBasedTestSuite
 {
 private:
 
@@ -91,8 +91,8 @@ public:
         node_based_cell_population.SetMechanicsCutOffLength(1.5);
 
         // Set up cell-based simulation
-        CellBasedSimulation<2> simulator(node_based_cell_population);
-        simulator.SetOutputDirectory("TestCellBasedSimulationWithBuskeAdhesiveForce");
+        OffLatticeSimulation<2> simulator(node_based_cell_population);
+        simulator.SetOutputDirectory("TestOffLatticeSimulationWithBuskeAdhesiveForce");
         simulator.SetEndTime(5.0);
 
         // Create a force law and pass it to the simulation
@@ -146,8 +146,8 @@ public:
         node_based_cell_population.SetMechanicsCutOffLength(1.5);
 
         // Set up cell-based simulation
-        CellBasedSimulation<2> simulator(node_based_cell_population);
-        simulator.SetOutputDirectory("TestCellBasedSimulationWithBuskeElasticForce");
+        OffLatticeSimulation<2> simulator(node_based_cell_population);
+        simulator.SetOutputDirectory("TestOffLatticeSimulationWithBuskeElasticForce");
         simulator.SetEndTime(5.0);
 
         // Create a force law and pass it to the simulation
@@ -202,8 +202,8 @@ public:
         node_based_cell_population.SetMechanicsCutOffLength(1.5);
 
         // Set up cell-based simulation
-        CellBasedSimulation<2> simulator(node_based_cell_population);
-        simulator.SetOutputDirectory("TestCellBasedSimulationWithBuskeCompressionForce");
+        OffLatticeSimulation<2> simulator(node_based_cell_population);
+        simulator.SetOutputDirectory("TestOffLatticeSimulationWithBuskeCompressionForce");
         simulator.SetEndTime(5.0);
 
         // Create a force law and pass it to the simulation
@@ -256,7 +256,7 @@ public:
         node_based_cell_population.SetMechanicsCutOffLength(1.5);
 
         // Set up cell-based simulation
-        CellBasedSimulation<2> simulator(node_based_cell_population);
+        OffLatticeSimulation<2> simulator(node_based_cell_population);
         simulator.SetOutputDirectory("TestAllBuskeForces");
         simulator.SetEndTime(5.0);
 
@@ -296,7 +296,7 @@ public:
         node_based_cell_population_buske.SetMechanicsCutOffLength(1.5);
 
         // Set up cell-based simulation
-        CellBasedSimulation<2> simulator(node_based_cell_population_buske);
+        OffLatticeSimulation<2> simulator(node_based_cell_population_buske);
         simulator.SetOutputDirectory("TestBuskeRelaxation");
         simulator.SetEndTime(1.0);
 
@@ -317,4 +317,4 @@ public:
     }
 };
 
-#endif /*TESTCELLBASEDSIMULATIONWITHBUSKEFORCES_HPP_*/
+#endif /*TESTOFFLATTICESIMULATIONWITHBUSKEFORCES_HPP_*/

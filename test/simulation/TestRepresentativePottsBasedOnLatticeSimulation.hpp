@@ -25,17 +25,17 @@ You should have received a copy of the GNU Lesser General Public License
 along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
-#ifndef TESTREPRESENTATIVEPOTTSBASEDCELLBASEDSIMULATION_HPP_
-#define TESTREPRESENTATIVEPOTTSBASEDCELLBASEDSIMULATION_HPP_
+#ifndef TESTREPRESENTATIVEPOTTSBASEDONLATTICESIMULATION_HPP_
+#define TESTREPRESENTATIVEPOTTSBASEDONLATTICESIMULATION_HPP_
 
 #include <cxxtest/TestSuite.h>
 
 // Must be included before other cell_based headers
-#include "CellBasedSimulationArchiver.hpp"
+#include "OffLatticeSimulationArchiver.hpp"
 
 #include "CellsGenerator.hpp"
 #include "CryptCellsGenerator.hpp"
-#include "CellBasedSimulation.hpp"
+#include "OffLatticeSimulation.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "StochasticDurationGenerationBasedCellCycleModel.hpp"
 #include "PottsBasedCellPopulation.hpp"
@@ -57,7 +57,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
  * This test is used for profiling, to establish the run time
  * variation as the code is developed.
  */
-class TestRepresentativePottsBasedCellBasedSimulationForProfiling : public AbstractCellBasedTestSuite
+class TestRepresentativePottsBasedOffLatticeSimulationForProfiling : public AbstractCellBasedTestSuite
 {
 public:
 
@@ -107,7 +107,7 @@ public:
         cell_population.AddUpdateRule(&differential_adhesion_update_rule);
 
         // Set up cell-based simulation
-        CellBasedSimulation<2> simulator(cell_population);
+        OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestRepresentativeCaBasedSimulationForProfiling");
         simulator.SetDt(0.1);
         simulator.SetEndTime(10);
@@ -117,4 +117,4 @@ public:
     }
 };
 
-#endif /*TESTREPRESENTATIVEPOTTSBASEDCELLBASEDSIMULATION_HPP_*/
+#endif /*TESTREPRESENTATIVEPOTTSBASEDONLATTICESIMULATION_HPP_*/
