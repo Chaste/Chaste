@@ -36,7 +36,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "CellsGenerator.hpp"
 #include "CryptCellsGenerator.hpp"
-#include "OffLatticeSimulation.hpp"
+#include "OnLatticeSimulation.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "StochasticDurationGenerationBasedCellCycleModel.hpp"
 #include "PottsBasedCellPopulation.hpp"
@@ -50,7 +50,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "Warnings.hpp"
 #include "LogFile.hpp"
 
-class TestOffLatticeSimulationWithPottsBasedCellPopulation : public AbstractCellBasedTestSuite
+class TestOnLatticeSimulationWithPottsBasedCellPopulation : public AbstractCellBasedTestSuite
 {
 private:
 
@@ -91,7 +91,7 @@ public:
 		cell_population.AddUpdateRule(&adhesion_update_rule);
 
         // Set up cell-based simulation
-        OffLatticeSimulation<2> simulator(cell_population);
+        OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestSimplePottsMonolayer");
         simulator.SetEndTime(0.1);
 
@@ -128,7 +128,7 @@ public:
         cell_population.AddUpdateRule(&adhesion_update_rule);
 
         // Set up cell-based simulation
-        OffLatticeSimulation<2> simulator(cell_population);
+        OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestSimplePottsMonolayerWithRandomSweep");
         simulator.SetEndTime(0.1);
 
@@ -157,7 +157,7 @@ public:
 		cell_population.AddUpdateRule(&adhesion_update_rule);
 
         // Set up cell-based simulation
-        OffLatticeSimulation<2> simulator(cell_population);
+        OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestPottsMonolayerWithDeath");
         simulator.SetDt(0.1);
         simulator.SetEndTime(1.0);
@@ -198,7 +198,7 @@ public:
 		cell_population.AddUpdateRule(&adhesion_update_rule);
 
         // Set up cell-based simulation
-        OffLatticeSimulation<2> simulator(cell_population);
+        OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestPottsMonolayerWithBirth");
         simulator.SetDt(0.1);
         simulator.SetEndTime(20);
@@ -260,7 +260,7 @@ public:
         cell_population.AddUpdateRule(&differential_adhesion_update_rule);
 
         // Set up cell-based simulation
-        OffLatticeSimulation<2> simulator(cell_population);
+        OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestPottsCellSorting");
         simulator.SetDt(0.1);
         simulator.SetEndTime(1.0);
@@ -310,7 +310,7 @@ public:
         cell_population.AddUpdateRule(&adhesion_update_rule);
 
         // Set up cell-based simulation
-        OffLatticeSimulation<3> simulator(cell_population);
+        OnLatticeSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory("TestSimplePottsSpheroid");
         simulator.SetDt(0.1);
         simulator.SetEndTime(1.0);
@@ -375,7 +375,7 @@ public:
         cell_population.AddUpdateRule(&differential_adhesion_update_rule);
 
         // Set up cell-based simulation
-        OffLatticeSimulation<3> simulator(cell_population);
+        OnLatticeSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory("TestPotts3DCellSorting");
         simulator.SetDt(0.1);
         simulator.SetEndTime(1.0);
@@ -418,7 +418,7 @@ public:
 //		PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 //
 //		// Set up cell-based simulation
-//		OffLatticeSimulation<2> simulator(cell_population);
+//		OnLatticeSimulation<2> simulator(cell_population);
 //		simulator.SetOutputDirectory("TestPottsCrypt");
 //		simulator.SetDt(0.01);
 //		simulator.SetSamplingTimestepMultiple(10);

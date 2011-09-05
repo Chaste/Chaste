@@ -32,7 +32,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "OffLatticeSimulation.hpp"
+#include "AbstractCellBasedSimulation.hpp"
 #include "CaBasedCellPopulation.hpp"
 #include "AbstractCaUpdateRule.hpp"
 
@@ -41,7 +41,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
  * A lattice-based cell-based simulation object.
  */
  template<unsigned DIM>
-class CaBasedSimulation : public OffLatticeSimulation<DIM>
+class CaBasedSimulation : public AbstractCellBasedSimulation<DIM>
 {
     // Allow tests to access private members, in order to test computation of
     // private functions eg. DoCellBirth
@@ -62,7 +62,7 @@ private:
     {
         // If Archive is an output archive, then & resolves to <<
         // If Archive is an input archive, then & resolves to >>
-        archive & boost::serialization::base_object<OffLatticeSimulation<DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractCellBasedSimulation<DIM> >(*this);
 
         archive & mUpdateRuleCollection;
         archive & mIterateRandomlyOverUpdateRuleCollection;
@@ -151,7 +151,18 @@ public:
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputSimulationParameters(out_stream& rParamsFile);
+
+    /*
+     * Overridden UpdateCellLocationsAndTopology mehtod needed as its pure virtual in
+     * AbstractCellBasedSimulation.
+     *
+     * This does nothing here as there is an overridden solve method.
+     */
+    void UpdateCellLocationsAndTopology()
+    {
+    }
 };
+
 
 // Declare identifier for the serializer
 #include "SerializationExportWrapper.hpp"

@@ -37,7 +37,7 @@ CaBasedSimulation<DIM>::CaBasedSimulation(AbstractCellPopulation<DIM>& rCellPopu
                   bool iterateRandomlyOverCells,
                   bool deleteCellPopulationAndForceCollection,
                   bool initialiseCells)
-    : OffLatticeSimulation<DIM>(rCellPopulation,
+    : AbstractCellBasedSimulation<DIM>(rCellPopulation,
                   deleteCellPopulationAndForceCollection,
                   initialiseCells),
     mUpdateRuleCollection(updateRuleCollection),
@@ -45,6 +45,8 @@ CaBasedSimulation<DIM>::CaBasedSimulation(AbstractCellPopulation<DIM>& rCellPopu
     mIterateRandomlyOverUpdateRuleCollection(iterateRandomlyOverUpdateRuleCollection),
     mIterateRandomlyOverCells(iterateRandomlyOverCells)
 {
+    assert(dynamic_cast<CaBasedCellPopulation<DIM>*>(&rCellPopulation));
+
     mpStaticCastCellPopulation = static_cast<CaBasedCellPopulation<DIM>*>(&this->mrCellPopulation);
 }
 

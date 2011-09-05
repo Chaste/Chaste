@@ -462,6 +462,12 @@ void PottsBasedCellPopulation<DIM>::AddUpdateRule(AbstractPottsUpdateRule<DIM>* 
 }
 
 template<unsigned DIM>
+const std::vector<AbstractPottsUpdateRule<DIM>*>& PottsBasedCellPopulation<DIM>::rGetUpdateRuleCollection() const
+{
+    return mUpdateRuleCollection;
+}
+
+template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::CreateElementTessellation()
 {
     ///\todo implement this method (#1666)

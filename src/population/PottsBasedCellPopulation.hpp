@@ -317,6 +317,14 @@ public:
 	 */
 	void AddUpdateRule(AbstractPottsUpdateRule<DIM>* pUpdateRule);
 
+
+    /**
+     * Get the collection of update rules to be used in the Simulations
+     *
+     * @return the update rule collection
+     */
+	const std::vector<AbstractPottsUpdateRule<DIM>*>& rGetUpdateRuleCollection() const;
+
     /**
      * Outputs CellPopulation parameters to file
      *
