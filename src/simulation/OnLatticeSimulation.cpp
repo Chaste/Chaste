@@ -82,6 +82,13 @@ void OnLatticeSimulation<DIM>::OutputAdditionalSimulationSetup(out_stream& rPara
 }
 
 template<unsigned DIM>
+void OnLatticeSimulation<DIM>::AddUpdateRule(AbstractPottsUpdateRule<DIM>* pUpdateRule)
+{
+    mpStaticCastCellPopulation->AddUpdateRule(pUpdateRule);
+}
+
+
+template<unsigned DIM>
 void OnLatticeSimulation<DIM>::OutputSimulationParameters(out_stream& rParamsFile)
 {
     // Call method on direct parent class

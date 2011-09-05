@@ -108,13 +108,11 @@ public:
     }
 
     /**
-     * Add a force to be used in this simulation (use this to set the mechanics system).
+     * Add an update rule to be used in this simulation (use this to set the Hamiltonian).
      *
      * @param pUpdateRule pointer to a potts update rule law
      */
-    void AddUpdateRule(AbstractPottsUpdateRule<DIM>* pUpdateRule)
-    {
-    }
+    void AddUpdateRule(AbstractPottsUpdateRule<DIM>* pUpdateRule);
 
     /**
      * Overridden OutputAdditionalSimulationSetup method to output the force and cell

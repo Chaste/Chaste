@@ -47,9 +47,12 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "PottsMeshGenerator.hpp"
 #include "WildTypeCellMutationState.hpp"
+
+#include "HoneycombMeshGenerator.hpp"
+#include "NodeBasedCellPopulation.hpp"
+
 #include "Warnings.hpp"
 #include "LogFile.hpp"
-
 class TestOnLatticeSimulationWithPottsBasedCellPopulation : public AbstractCellBasedTestSuite
 {
 private:
@@ -70,6 +73,30 @@ private:
 
 public:
 
+    void TestOnLatticeSimulationExceptions()
+    {
+        // Create a simple tetrahedral mesh
+        unsigned num_cells_depth = 5;
+        unsigned num_cells_width = 5;
+        HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
+        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+
+        // Convert this to a NodesOnlyMesh
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
+
+        // Create a node-based cell population
+        NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
+        node_based_cell_population.SetMechanicsCutOffLength(1.5);
+
+        TS_ASSERT_THROWS_THIS(OnLatticeSimulation<2> simulator(node_based_cell_population),"OnLaticeSimulations require a PottsBasedCellPopulation.");
+    }
+
     void TestPottsMonolayerWithNoBirthOrDeath() throw (Exception)
     {
         // Create a simple 2D PottsMesh
@@ -84,16 +111,16 @@ public:
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Create update rules and pass to the cell population
-		VolumeConstraintPottsUpdateRule<2> volume_constraint_update_rule;
-		cell_population.AddUpdateRule(&volume_constraint_update_rule);
-		AdhesionPottsUpdateRule<2> adhesion_update_rule;
-		cell_population.AddUpdateRule(&adhesion_update_rule);
-
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestSimplePottsMonolayer");
         simulator.SetEndTime(0.1);
+
+        // Create update rules and pass to the simulation
+        VolumeConstraintPottsUpdateRule<2> volume_constraint_update_rule;
+        simulator.AddUpdateRule(&volume_constraint_update_rule);
+        AdhesionPottsUpdateRule<2> adhesion_update_rule;
+        simulator.AddUpdateRule(&adhesion_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -120,17 +147,17 @@ public:
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetUpdateNodesInRandomOrder(false);
-        
-        // Create update rules and pass to the cell population
-        VolumeConstraintPottsUpdateRule<2> volume_constraint_update_rule;
-        cell_population.AddUpdateRule(&volume_constraint_update_rule);
-        AdhesionPottsUpdateRule<2> adhesion_update_rule;
-        cell_population.AddUpdateRule(&adhesion_update_rule);
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestSimplePottsMonolayerWithRandomSweep");
         simulator.SetEndTime(0.1);
+
+        // Create update rules and pass to the simulation
+        VolumeConstraintPottsUpdateRule<2> volume_constraint_update_rule;
+        simulator.AddUpdateRule(&volume_constraint_update_rule);
+        AdhesionPottsUpdateRule<2> adhesion_update_rule;
+        simulator.AddUpdateRule(&adhesion_update_rule);
 
         // Run simulation
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
@@ -150,17 +177,17 @@ public:
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Create update rules and pass to the cell population
-		VolumeConstraintPottsUpdateRule<2> volume_constraint_update_rule;
-		cell_population.AddUpdateRule(&volume_constraint_update_rule);
-		AdhesionPottsUpdateRule<2> adhesion_update_rule;
-		cell_population.AddUpdateRule(&adhesion_update_rule);
-
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestPottsMonolayerWithDeath");
         simulator.SetDt(0.1);
         simulator.SetEndTime(1.0);
+
+        // Create update rules and pass to the simulation
+        VolumeConstraintPottsUpdateRule<2> volume_constraint_update_rule;
+        simulator.AddUpdateRule(&volume_constraint_update_rule);
+        AdhesionPottsUpdateRule<2> adhesion_update_rule;
+        simulator.AddUpdateRule(&adhesion_update_rule);
 
         // Create cell killer and pass in to simulation
         SloughingCellKiller<2> sloughing_cell_killer(&cell_population,16u);
@@ -191,18 +218,18 @@ public:
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Create update rules and pass to the cell population
-		VolumeConstraintPottsUpdateRule<2> volume_constraint_update_rule;
-		cell_population.AddUpdateRule(&volume_constraint_update_rule);
-		AdhesionPottsUpdateRule<2> adhesion_update_rule;
-		cell_population.AddUpdateRule(&adhesion_update_rule);
-
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestPottsMonolayerWithBirth");
         simulator.SetDt(0.1);
         simulator.SetEndTime(20);
         simulator.SetSamplingTimestepMultiple(20);
+
+        // Create update rules and pass to the simulation
+        VolumeConstraintPottsUpdateRule<2> volume_constraint_update_rule;
+        simulator.AddUpdateRule(&volume_constraint_update_rule);
+        AdhesionPottsUpdateRule<2> adhesion_update_rule;
+        simulator.AddUpdateRule(&adhesion_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -244,11 +271,17 @@ public:
             }
         }
 
-        // Create update rules and pass to the cell population
+        // Set up cell-based simulation
+        OnLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestPottsCellSorting");
+        simulator.SetDt(0.1);
+        simulator.SetEndTime(1.0);
+
+        // Create update rules and pass to the simulation
         VolumeConstraintPottsUpdateRule<2> volume_constraint_update_rule;
-        cell_population.AddUpdateRule(&volume_constraint_update_rule);
         volume_constraint_update_rule.SetMatureCellTargetVolume(16);
         volume_constraint_update_rule.SetDeformationEnergyParameter(0.2);
+        simulator.AddUpdateRule(&volume_constraint_update_rule);
 
         DifferentialAdhesionPottsUpdateRule<2> differential_adhesion_update_rule;
         differential_adhesion_update_rule.SetLabelledCellLabelledCellAdhesionEnergyParameter(0.16);
@@ -256,14 +289,7 @@ public:
         differential_adhesion_update_rule.SetCellCellAdhesionEnergyParameter(0.02);
         differential_adhesion_update_rule.SetLabelledCellBoundaryAdhesionEnergyParameter(0.16);
         differential_adhesion_update_rule.SetCellBoundaryAdhesionEnergyParameter(0.16);
-
-        cell_population.AddUpdateRule(&differential_adhesion_update_rule);
-
-        // Set up cell-based simulation
-        OnLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestPottsCellSorting");
-        simulator.SetDt(0.1);
-        simulator.SetEndTime(1.0);
+        simulator.AddUpdateRule(&differential_adhesion_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -302,18 +328,18 @@ public:
         // Create cell population
         PottsBasedCellPopulation<3> cell_population(*p_mesh, cells);
 
-        // Create update rules and pass to the cell population
-        VolumeConstraintPottsUpdateRule<3> volume_constraint_update_rule;
-        volume_constraint_update_rule.SetMatureCellTargetVolume(16);
-        cell_population.AddUpdateRule(&volume_constraint_update_rule);
-        AdhesionPottsUpdateRule<3> adhesion_update_rule;
-        cell_population.AddUpdateRule(&adhesion_update_rule);
-
         // Set up cell-based simulation
         OnLatticeSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory("TestSimplePottsSpheroid");
         simulator.SetDt(0.1);
         simulator.SetEndTime(1.0);
+
+        // Create update rules and pass to the simulation
+        VolumeConstraintPottsUpdateRule<3> volume_constraint_update_rule;
+        volume_constraint_update_rule.SetMatureCellTargetVolume(16);
+        simulator.AddUpdateRule(&volume_constraint_update_rule);
+        AdhesionPottsUpdateRule<3> adhesion_update_rule;
+        simulator.AddUpdateRule(&adhesion_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -359,11 +385,17 @@ public:
             }
         }
 
-        // Create update rules and pass to the cell population
+        // Set up cell-based simulation
+        OnLatticeSimulation<3> simulator(cell_population);
+        simulator.SetOutputDirectory("TestPotts3DCellSorting");
+        simulator.SetDt(0.1);
+        simulator.SetEndTime(1.0);
+
+        // Create update rules and pass to the simulation
         VolumeConstraintPottsUpdateRule<3> volume_constraint_update_rule;
-        cell_population.AddUpdateRule(&volume_constraint_update_rule);
         volume_constraint_update_rule.SetMatureCellTargetVolume(element_size*element_size*element_size);
         volume_constraint_update_rule.SetDeformationEnergyParameter(0.2);
+        simulator.AddUpdateRule(&volume_constraint_update_rule);
 
         DifferentialAdhesionPottsUpdateRule<3> differential_adhesion_update_rule;
         differential_adhesion_update_rule.SetLabelledCellLabelledCellAdhesionEnergyParameter(0.16);
@@ -371,14 +403,7 @@ public:
         differential_adhesion_update_rule.SetCellCellAdhesionEnergyParameter(0.02);
         differential_adhesion_update_rule.SetLabelledCellBoundaryAdhesionEnergyParameter(0.16);
         differential_adhesion_update_rule.SetCellBoundaryAdhesionEnergyParameter(0.16);
-
-        cell_population.AddUpdateRule(&differential_adhesion_update_rule);
-
-        // Set up cell-based simulation
-        OnLatticeSimulation<3> simulator(cell_population);
-        simulator.SetOutputDirectory("TestPotts3DCellSorting");
-        simulator.SetDt(0.1);
-        simulator.SetEndTime(1.0);
+        simulator.AddUpdateRule(&differential_adhesion_update_rule);
 
         // Run simulation
         simulator.Solve();
