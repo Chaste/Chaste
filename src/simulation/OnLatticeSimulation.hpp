@@ -116,15 +116,14 @@ public:
 
     /**
      * Overridden OutputAdditionalSimulationSetup method to output the force and cell
-     * population boundary condition information
+     * population boundary condition information.
+     *
+     * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputAdditionalSimulationSetup(out_stream& rParamsFile);
 
     /**
-     * Outputs simulation parameters to file
-     *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * Outputs simulation parameters to file.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
