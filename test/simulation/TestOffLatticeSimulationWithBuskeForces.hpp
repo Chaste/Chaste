@@ -32,7 +32,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <cxxtest/TestSuite.h>
 
 // Must be included before other cell_based headers
-#include "OffLatticeSimulationArchiver.hpp"
+#include "CellBasedSimulationArchiver.hpp"
 
 #include "AbstractCellBasedTestSuite.hpp"
 #include "CellsGenerator.hpp"

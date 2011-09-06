@@ -32,7 +32,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <cxxtest/TestSuite.h>
 
 // Must be included before other cell_based headers
-#include "OffLatticeSimulationArchiver.hpp"
+#include "CellBasedSimulationArchiver.hpp"
 
 #include "CellsGenerator.hpp"
 #include "CaBasedSimulation.hpp"
@@ -583,7 +583,7 @@ public:
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 98u);
 
         // Save the results
-        OffLatticeSimulationArchiver<2, CaBasedSimulation<2> >::Save(&simulator);
+        CellBasedSimulationArchiver<2, CaBasedSimulation<2> >::Save(&simulator);
     }
 
     // Testing Load (based on previous two tests)
@@ -592,7 +592,7 @@ public:
         // Load the simulation from the TestSave method above and run it from 3.0 to 6.0
         CaBasedSimulation<2>* p_simulator1;
 
-        p_simulator1 = OffLatticeSimulationArchiver<2, CaBasedSimulation<2> >::Load("CaBasedSaveAndLoad", 3.0);
+        p_simulator1 = CellBasedSimulationArchiver<2, CaBasedSimulation<2> >::Load("CaBasedSaveAndLoad", 3.0);
 
         TS_ASSERT_EQUALS(p_simulator1->rGetCellPopulation().GetNumRealCells(), 98u);
         TS_ASSERT_DELTA(p_simulator1->GetDt(), 0.1, 1e-6);
@@ -604,9 +604,9 @@ public:
         TetrahedralMesh<2,2>& r_mesh1 = (static_cast<CaBasedCellPopulation<2>*>(&(p_simulator1->rGetCellPopulation())))->rGetMesh();
 
         // Save then reload, compare meshes either side
-        OffLatticeSimulationArchiver<2, CaBasedSimulation<2> >::Save(p_simulator1);
+        CellBasedSimulationArchiver<2, CaBasedSimulation<2> >::Save(p_simulator1);
 
-        CaBasedSimulation<2>* p_simulator2 = OffLatticeSimulationArchiver<2, CaBasedSimulation<2> >::Load("CaBasedSaveAndLoad", 6.0);
+        CaBasedSimulation<2>* p_simulator2 = CellBasedSimulationArchiver<2, CaBasedSimulation<2> >::Load("CaBasedSaveAndLoad", 6.0);
         TetrahedralMesh<2,2>& r_mesh2 = (static_cast<CaBasedCellPopulation<2>*>(&(p_simulator2->rGetCellPopulation())))->rGetMesh();
 
         CompareMeshes(&r_mesh1, &r_mesh2);

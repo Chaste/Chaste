@@ -32,7 +32,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <cxxtest/TestSuite.h>
 
 // Must be included before other cell_based headers
-#include "OffLatticeSimulationArchiver.hpp"
+#include "CellBasedSimulationArchiver.hpp"
 
 #include <ctime>
 #include "NodesOnlyMesh.hpp"
@@ -316,7 +316,7 @@ public:
         // Run and save simulation
         simulator.Solve();
 
-        OffLatticeSimulationArchiver<2, DeltaNotchOffLatticeSimulation<2> >::Save(&simulator);
+        CellBasedSimulationArchiver<2, DeltaNotchOffLatticeSimulation<2> >::Save(&simulator);
 
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 4u);
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), 16u);
@@ -331,7 +331,7 @@ public:
 
         // Load simulation
         DeltaNotchOffLatticeSimulation<2>* p_simulator
-            = OffLatticeSimulationArchiver<2, DeltaNotchOffLatticeSimulation<2> >::Load("TestDeltaNotchOffLatticeSimulationSaveAndLoad", end_time);
+            = CellBasedSimulationArchiver<2, DeltaNotchOffLatticeSimulation<2> >::Load("TestDeltaNotchOffLatticeSimulationSaveAndLoad", end_time);
 
         p_simulator->SetEndTime(0.2);
 
