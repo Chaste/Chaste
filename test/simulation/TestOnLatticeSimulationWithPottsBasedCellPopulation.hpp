@@ -34,25 +34,25 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 // Must be included before other cell_based headers
 #include "OffLatticeSimulationArchiver.hpp"
 
+#include "HoneycombMeshGenerator.hpp"
+#include "PottsMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
-#include "CryptCellsGenerator.hpp"
-#include "OnLatticeSimulation.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "StochasticDurationGenerationBasedCellCycleModel.hpp"
+#include "WildTypeCellMutationState.hpp"
+#include "CryptCellsGenerator.hpp"
 #include "PottsBasedCellPopulation.hpp"
-#include "SloughingCellKiller.hpp"
+#include "NodeBasedCellPopulation.hpp"
 #include "VolumeConstraintPottsUpdateRule.hpp"
 #include "AdhesionPottsUpdateRule.hpp"
 #include "DifferentialAdhesionPottsUpdateRule.hpp"
-#include "AbstractCellBasedTestSuite.hpp"
-#include "PottsMeshGenerator.hpp"
-#include "WildTypeCellMutationState.hpp"
-
-#include "HoneycombMeshGenerator.hpp"
-#include "NodeBasedCellPopulation.hpp"
-
+#include "SloughingCellKiller.hpp"
+#include "OnLatticeSimulation.hpp"
+#include "OffLatticeSimulation.hpp"
 #include "Warnings.hpp"
 #include "LogFile.hpp"
+#include "AbstractCellBasedTestSuite.hpp"
+
 class TestOnLatticeSimulationWithPottsBasedCellPopulation : public AbstractCellBasedTestSuite
 {
 private:
@@ -95,6 +95,24 @@ public:
         node_based_cell_population.SetMechanicsCutOffLength(1.5);
 
         TS_ASSERT_THROWS_THIS(OnLatticeSimulation<2> simulator(node_based_cell_population),"OnLaticeSimulations require a PottsBasedCellPopulation.");
+    }
+
+    void TestMoreOnLatticeSimulationExceptions()
+    {
+        // Create a simple 2D PottsMesh
+        PottsMeshGenerator<2> generator(16, 4, 4, 18, 4, 4);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), DIFFERENTIATED);
+
+        // Create cell population
+        PottsBasedCellPopulation<2> potts_based_cell_population(*p_mesh, cells);
+
+        // Try to set up off lattice simulation
+        TS_ASSERT_THROWS_THIS(OffLatticeSimulation<2> simulator(potts_based_cell_population),"OffLaticeSimulations require a VertexBasedCellPopulation or a subclass of AbstractCentreBasedCellPopulation.");
     }
 
     void TestPottsMonolayerWithNoBirthOrDeath() throw (Exception)
