@@ -45,7 +45,7 @@ OnLatticeSimulation<DIM>::OnLatticeSimulation(AbstractCellPopulation<DIM>& rCell
 {
     if ( !dynamic_cast<PottsBasedCellPopulation<DIM>*>(&rCellPopulation))
     {
-        EXCEPTION("OnLaticeSimulations require a PottsBasedCellPopulation.");
+        EXCEPTION("OnLatticeSimulations require a PottsBasedCellPopulation.");
     }
 
     mpStaticCastCellPopulation = static_cast<PottsBasedCellPopulation<DIM>*>(&rCellPopulation);

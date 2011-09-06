@@ -94,7 +94,7 @@ public:
         NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
         node_based_cell_population.SetMechanicsCutOffLength(1.5);
 
-        TS_ASSERT_THROWS_THIS(OnLatticeSimulation<2> simulator(node_based_cell_population),"OnLaticeSimulations require a PottsBasedCellPopulation.");
+        TS_ASSERT_THROWS_THIS(OnLatticeSimulation<2> simulator(node_based_cell_population),"OnLatticeSimulations require a PottsBasedCellPopulation.");
     }
 
     void TestMoreOnLatticeSimulationExceptions()
