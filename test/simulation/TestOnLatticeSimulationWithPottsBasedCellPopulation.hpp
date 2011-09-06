@@ -112,7 +112,7 @@ public:
         PottsBasedCellPopulation<2> potts_based_cell_population(*p_mesh, cells);
 
         // Try to set up off lattice simulation
-        TS_ASSERT_THROWS_THIS(OffLatticeSimulation<2> simulator(potts_based_cell_population),"OffLaticeSimulations require a VertexBasedCellPopulation or a subclass of AbstractCentreBasedCellPopulation.");
+        TS_ASSERT_THROWS_THIS(OffLatticeSimulation<2> simulator(potts_based_cell_population),"OffLatticeSimulations require a VertexBasedCellPopulation or a subclass of AbstractCentreBasedCellPopulation.");
     }
 
     void TestPottsMonolayerWithNoBirthOrDeath() throw (Exception)
