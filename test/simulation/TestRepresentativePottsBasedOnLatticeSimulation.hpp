@@ -35,7 +35,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "CellsGenerator.hpp"
 #include "CryptCellsGenerator.hpp"
-#include "OffLatticeSimulation.hpp"
+#include "OnLatticeSimulation.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "StochasticDurationGenerationBasedCellCycleModel.hpp"
 #include "PottsBasedCellPopulation.hpp"
@@ -57,7 +57,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
  * This test is used for profiling, to establish the run time
  * variation as the code is developed.
  */
-class TestRepresentativePottsBasedOffLatticeSimulationForProfiling : public AbstractCellBasedTestSuite
+class TestRepresentativePottsBasedOnLatticeSimulationForProfiling : public AbstractCellBasedTestSuite
 {
 public:
 
@@ -107,7 +107,7 @@ public:
         cell_population.AddUpdateRule(&differential_adhesion_update_rule);
 
         // Set up cell-based simulation
-        OffLatticeSimulation<2> simulator(cell_population);
+        OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestRepresentativeCaBasedSimulationForProfiling");
         simulator.SetDt(0.1);
         simulator.SetEndTime(10);
