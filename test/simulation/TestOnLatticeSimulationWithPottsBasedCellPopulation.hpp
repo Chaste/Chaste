@@ -71,6 +71,17 @@ private:
         AbstractCellBasedTestSuite::tearDown();
     }
 
+    void RandomlyLabelCells(std::vector<CellPtr>& rCells, boost::shared_ptr<AbstractCellProperty> pLabel, double labeledRatio)
+    {
+        for (unsigned i = 0; i<rCells.size(); i++)
+        {
+            if (RandomNumberGenerator::Instance()->ranf() < labeledRatio)
+            {
+                rCells[i]->AddCellProperty(pLabel);
+            }
+        }
+    }
+
 public:
 
     void TestOnLatticeSimulationExceptions()
@@ -274,20 +285,11 @@ public:
         // Make this pointer first as if we move it after creating the cell population the label numbers aren't tracked
         boost::shared_ptr<AbstractCellProperty> p_label(new CellLabel);
 
+        RandomlyLabelCells(cells,p_label,0.5);
+
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
-
-        cell_population.SetOutputCellMutationStates(true); // So outputs the labeled cells
-
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
-        {
-            if (RandomNumberGenerator::Instance()->ranf() < 0.5)
-            {
-                (*cell_iter)->AddCellProperty(p_label);
-            }
-        }
+        cell_population.SetOutputCellMutationStates(true); // So outputs the labelled cells
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
@@ -388,20 +390,11 @@ public:
         // Make this pointer first as if we move it after creating the cell population the label numbers aren't tracked
         boost::shared_ptr<AbstractCellProperty> p_label(new CellLabel);
 
+        RandomlyLabelCells(cells,p_label,0.5);
+
         // Create cell population
         PottsBasedCellPopulation<3> cell_population(*p_mesh, cells);
-
         cell_population.SetOutputCellMutationStates(true); // So outputs the labelled cells
-
-        for (AbstractCellPopulation<3>::Iterator cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
-        {
-            if (RandomNumberGenerator::Instance()->ranf() < 0.5)
-            {
-                (*cell_iter)->AddCellProperty(p_label);
-            }
-        }
 
         // Set up cell-based simulation
         OnLatticeSimulation<3> simulator(cell_population);
