@@ -446,6 +446,122 @@ public:
  #endif //CHASTE_VTK
     }
 
+    void TestStandardResultForArchivingTestsBelow() throw (Exception)
+    {
+        // Create a simple 2D PottsMesh
+        PottsMeshGenerator<2> generator(10, 1, 4, 10, 1, 4);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<StochasticDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), STEM);
+
+        // Create cell population
+        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Set up cell-based simulation
+        OnLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestOnLatticeSimulationWithPottsBasedCellPopulationStandardResult");
+        simulator.SetDt(0.1);
+        simulator.SetEndTime(20);
+        simulator.SetSamplingTimestepMultiple(10);
+
+        // Create update rules and pass to the simulation
+        VolumeConstraintPottsUpdateRule<2> volume_constraint_update_rule;
+        simulator.AddUpdateRule(&volume_constraint_update_rule);
+        AdhesionPottsUpdateRule<2> adhesion_update_rule;
+        simulator.AddUpdateRule(&adhesion_update_rule);
+
+        // Run simulation
+        simulator.Solve();
+
+        // Check some results
+        PottsElement<2>* element_0 = static_cast <PottsBasedCellPopulation<2>*>(&simulator.rGetCellPopulation())->GetElement(0u);
+        TS_ASSERT_EQUALS(element_0->GetNumNodes(), 16u);
+        TS_ASSERT_EQUALS(element_0->GetNode(0)->GetIndex(), 33u);
+        TS_ASSERT_EQUALS(element_0->GetNode(8)->GetIndex(), 57u);
+        TS_ASSERT_EQUALS(element_0->GetNode(15)->GetIndex(), 78u);
+
+        PottsElement<2>* element_1 = static_cast <PottsBasedCellPopulation<2>*>(&simulator.rGetCellPopulation())->GetElement(1u);
+        TS_ASSERT_EQUALS(element_1->GetNumNodes(), 16u);
+        TS_ASSERT_EQUALS(element_1->GetNode(0)->GetIndex(), 80u);
+        TS_ASSERT_EQUALS(element_1->GetNode(8)->GetIndex(), 72u);
+        TS_ASSERT_EQUALS(element_1->GetNode(15)->GetIndex(), 74u);
+    }
+
+    // Testing Save
+    void TestSave() throw (Exception)
+    {
+        // Create a simple 2D PottsMesh
+        PottsMeshGenerator<2> generator(10, 1, 4, 10, 1, 4);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<StochasticDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), STEM);
+
+        // Create cell population
+        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Set up cell-based simulation
+        OnLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestOnLatticeSimulationWithPottsBasedCellPopulationSaveAndLoad");
+        simulator.SetDt(0.1);
+        simulator.SetEndTime(10);
+        simulator.SetSamplingTimestepMultiple(10);
+
+        // Create update rules and pass to the simulation
+        VolumeConstraintPottsUpdateRule<2> volume_constraint_update_rule;
+        simulator.AddUpdateRule(&volume_constraint_update_rule);
+        AdhesionPottsUpdateRule<2> adhesion_update_rule;
+        simulator.AddUpdateRule(&adhesion_update_rule);
+
+        // Run simulation
+        simulator.Solve();
+
+        // Save the results
+        CellBasedSimulationArchiver<2, OnLatticeSimulation<2> >::Save(&simulator);
+    }
+
+    // Testing Load (based on previous two tests)
+    void TestLoad() throw (Exception)
+    {
+        // Load the simulation from the TestSave method above and
+        // run it from 10.0 to 15.0
+        OnLatticeSimulation<2>* p_simulator1;
+        p_simulator1 = CellBasedSimulationArchiver<2, OnLatticeSimulation<2> >::Load("TestOnLatticeSimulationWithPottsBasedCellPopulationSaveAndLoad", 10.0);
+
+        p_simulator1->SetEndTime(15.0);
+        p_simulator1->Solve();
+
+        // Save, then reload and run from 15.0 to 20.0
+        CellBasedSimulationArchiver<2, OnLatticeSimulation<2> >::Save(p_simulator1);
+        OnLatticeSimulation<2>* p_simulator2
+            = CellBasedSimulationArchiver<2, OnLatticeSimulation<2> >::Load("TestOnLatticeSimulationWithPottsBasedCellPopulationSaveAndLoad", 15.0);
+
+        p_simulator2->SetEndTime(20.0);
+        p_simulator2->Solve();
+
+        // These results are from time 20.0 in TestStandardResultForArchivingTestBelow()
+        PottsElement<2>* element_0 = static_cast <PottsBasedCellPopulation<2>*>(&p_simulator2->rGetCellPopulation())->GetElement(0u);
+        TS_ASSERT_EQUALS(element_0->GetNumNodes(), 16u);
+        TS_ASSERT_EQUALS(element_0->GetNode(0)->GetIndex(), 33u);
+        TS_ASSERT_EQUALS(element_0->GetNode(8)->GetIndex(), 57u);
+        TS_ASSERT_EQUALS(element_0->GetNode(15)->GetIndex(), 78u);
+
+        PottsElement<2>* element_1 = static_cast <PottsBasedCellPopulation<2>*>(&p_simulator2->rGetCellPopulation())->GetElement(1u);
+        TS_ASSERT_EQUALS(element_1->GetNumNodes(), 16u);
+        TS_ASSERT_EQUALS(element_1->GetNode(0)->GetIndex(), 80u);
+        TS_ASSERT_EQUALS(element_1->GetNode(8)->GetIndex(), 72u);
+        TS_ASSERT_EQUALS(element_1->GetNode(15)->GetIndex(), 74u);
+
+        // Tidy up
+        delete p_simulator1;
+        delete p_simulator2;
+    }
+
 //    void TestPottsCrypt() throw (Exception)
 //	{
 //		// Create a simple 2D PottsMesh
