@@ -260,7 +260,7 @@ void PottsBasedCellPopulation<DIM>::UpdateNodeLocations(const std::vector< c_vec
         	double delta_H = 0.0; // This is H_1-H_0.
 
             // Now add contributions to the Hamiltonian from each AbstractPottsUpdateRule
-            for (typename std::vector<AbstractPottsUpdateRule<DIM>*>::iterator iter = mUpdateRuleCollection.begin();
+            for (typename std::vector<boost::shared_ptr<AbstractPottsUpdateRule<DIM> > >::iterator iter = mUpdateRuleCollection.begin();
                  iter != mUpdateRuleCollection.end();
                  ++iter)
             {
@@ -456,13 +456,13 @@ double PottsBasedCellPopulation<DIM>::GetWidth(const unsigned& rDimension)
 }
 
 template<unsigned DIM>
-void PottsBasedCellPopulation<DIM>::AddUpdateRule(AbstractPottsUpdateRule<DIM>* pUpdateRule)
+void PottsBasedCellPopulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractPottsUpdateRule<DIM> >  pUpdateRule)
 {
 	mUpdateRuleCollection.push_back(pUpdateRule);
 }
 
 template<unsigned DIM>
-const std::vector<AbstractPottsUpdateRule<DIM>*>& PottsBasedCellPopulation<DIM>::rGetUpdateRuleCollection() const
+const std::vector<boost::shared_ptr<AbstractPottsUpdateRule<DIM> > >& PottsBasedCellPopulation<DIM>::rGetUpdateRuleCollection() const
 {
     return mUpdateRuleCollection;
 }

@@ -37,6 +37,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CellwiseData.hpp"
 #include "CellsGenerator.hpp"
 #include "PottsBasedCellPopulation.hpp"
+#include "VolumeConstraintPottsUpdateRule.hpp"
 #include "PottsMeshGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
@@ -352,6 +353,34 @@ public:
         TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.parameters    notforrelease_cell_based/test/data/TestPottsBasedCellPopulationWriters/results.parameters").c_str()), 0);
     }
 
+    void TestAddingUpdateRules() throw(Exception)
+    {
+        // Create a simple 2D PottsMesh with one cell
+        PottsMeshGenerator<2> generator(2, 1, 2, 2, 1, 2);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+        // Create cell population
+        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Test we have the correct number of cells and elements
+        TS_ASSERT_EQUALS(cell_population.GetNumElements(), 1u);
+        TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 1u);
+
+        // Create an update rule and pass to the population
+        boost::shared_ptr<VolumeConstraintPottsUpdateRule<2> > p_volume_constraint_update_rule(new VolumeConstraintPottsUpdateRule<2>);
+        cell_population.AddUpdateRule(p_volume_constraint_update_rule);
+
+        // Check the update rules are correct
+        std::vector<boost::shared_ptr<AbstractPottsUpdateRule<2> > > update_rule_collection = cell_population.rGetUpdateRuleCollection();
+        TS_ASSERT_EQUALS(update_rule_collection.size(),1u);
+        TS_ASSERT_EQUALS((*update_rule_collection[0]).GetIdentifier(), "VolumeConstraintPottsUpdateRule-2");
+    }
+
     void TestArchiving2dPottsBasedCellPopulation() throw(Exception)
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
@@ -389,6 +418,10 @@ public:
             {
                 cell_iter->ReadyToDivide();
             }
+
+            // Create an update rule and pass to the population
+            boost::shared_ptr<VolumeConstraintPottsUpdateRule<2> > p_volume_constraint_update_rule(new VolumeConstraintPottsUpdateRule<2>);
+            p_cell_population->AddUpdateRule(p_volume_constraint_update_rule);
 
             // Create output archive
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -476,6 +509,11 @@ public:
                     TS_ASSERT_EQUALS(this_index, loaded_index);
                 }
             }
+
+            // Check Update rules are restored correctly
+            std::vector<boost::shared_ptr<AbstractPottsUpdateRule<2> > > update_rule_collection = p_cell_population->rGetUpdateRuleCollection();
+            TS_ASSERT_EQUALS(update_rule_collection.size(),1u);
+            TS_ASSERT_EQUALS((*update_rule_collection[0]).GetIdentifier(), "VolumeConstraintPottsUpdateRule-2");
 
             // Tidy up
             delete p_cell_population;

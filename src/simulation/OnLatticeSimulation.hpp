@@ -110,9 +110,9 @@ public:
     /**
      * Add an update rule to be used in this simulation (use this to set the Hamiltonian).
      *
-     * @param pUpdateRule pointer to a potts update rule law
+     * @param pUpdateRule share pointer to a Potts update rule law
      */
-    void AddUpdateRule(AbstractPottsUpdateRule<DIM>* pUpdateRule);
+    void AddUpdateRule(boost::shared_ptr<AbstractPottsUpdateRule<DIM> > pUpdateRule);
 
     /**
      * Overridden OutputAdditionalSimulationSetup method to output the force and cell

@@ -67,11 +67,11 @@ void OnLatticeSimulation<DIM>::UpdateCellLocationsAndTopology()
 template<unsigned DIM>
 void OnLatticeSimulation<DIM>::OutputAdditionalSimulationSetup(out_stream& rParamsFile)
 {
-    std::vector<AbstractPottsUpdateRule<DIM>*> update_rule_collection = mpStaticCastCellPopulation->rGetUpdateRuleCollection();
+    std::vector<boost::shared_ptr<AbstractPottsUpdateRule<DIM> > > update_rule_collection = mpStaticCastCellPopulation->rGetUpdateRuleCollection();
 
     // Loop over UpdateRules
     *rParamsFile << "\n\t<UpdateRules>\n";
-    for (typename std::vector<AbstractPottsUpdateRule<DIM>*>::iterator iter = update_rule_collection.begin();
+    for (typename std::vector<boost::shared_ptr<AbstractPottsUpdateRule<DIM> > >::iterator iter = update_rule_collection.begin();
          iter != update_rule_collection.end();
          ++iter)
     {
@@ -82,7 +82,7 @@ void OnLatticeSimulation<DIM>::OutputAdditionalSimulationSetup(out_stream& rPara
 }
 
 template<unsigned DIM>
-void OnLatticeSimulation<DIM>::AddUpdateRule(AbstractPottsUpdateRule<DIM>* pUpdateRule)
+void OnLatticeSimulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractPottsUpdateRule<DIM> > pUpdateRule)
 {
     mpStaticCastCellPopulation->AddUpdateRule(pUpdateRule);
 }
