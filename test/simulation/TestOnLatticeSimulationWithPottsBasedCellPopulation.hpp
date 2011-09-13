@@ -54,6 +54,10 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "SmartPointers.hpp"
 
+#include "CryptCellsGenerator.hpp"
+#include "WntConcentration.hpp"
+#include "SimpleWntCellCycleModel.hpp"
+
 class TestOnLatticeSimulationWithPottsBasedCellPopulation : public AbstractCellBasedTestSuite
 {
 private:
@@ -85,7 +89,7 @@ private:
 
 public:
 
-    void TestOnLatticeSimulationExceptions()
+    void xTestOnLatticeSimulationExceptions()
     {
         // Create a simple tetrahedral mesh
         unsigned num_cells_depth = 5;
@@ -109,7 +113,7 @@ public:
         TS_ASSERT_THROWS_THIS(OnLatticeSimulation<2> simulator(node_based_cell_population),"OnLatticeSimulations require a PottsBasedCellPopulation.");
     }
 
-    void TestMoreOnLatticeSimulationExceptions()
+    void xTestMoreOnLatticeSimulationExceptions()
     {
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(16, 4, 4, 18, 4, 4);
@@ -127,7 +131,7 @@ public:
         TS_ASSERT_THROWS_THIS(OffLatticeSimulation<2> simulator(potts_based_cell_population),"OffLatticeSimulations require a VertexBasedCellPopulation or a subclass of AbstractCentreBasedCellPopulation.");
     }
 
-    void TestPottsMonolayerWithNoBirthOrDeath() throw (Exception)
+    void xTestPottsMonolayerWithNoBirthOrDeath() throw (Exception)
     {
         // Create a simple 2D PottsMesh
     	PottsMeshGenerator<2> generator(16, 4, 4, 18, 4, 4);
@@ -163,7 +167,7 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
     }
     
-    void TestPottsMonolayerWithNonRandomSweep() throw (Exception)
+    void xTestPottsMonolayerWithNonRandomSweep() throw (Exception)
     {
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(16, 4, 4, 18, 4, 4);
@@ -193,7 +197,7 @@ public:
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
     }
 
-    void TestPottsMonolayerWithDeath() throw (Exception)
+    void xTestPottsMonolayerWithDeath() throw (Exception)
     {
         // Create a simple 2D PottsMesh
     	PottsMeshGenerator<2> generator(16, 4, 4, 24, 8, 2);
@@ -234,7 +238,7 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 12u);
     }
 
-    void TestPottsMonolayerWithBirth() throw (Exception)
+    void xTestPottsMonolayerWithBirth() throw (Exception)
     {
         // Create a simple 2D PottsMesh
     	PottsMeshGenerator<2> generator(8, 1, 4, 10, 1, 4);
@@ -272,7 +276,7 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
     }
 
-    void TestPottsMonolayerCellSorting() throw (Exception)
+    void xTestPottsMonolayerCellSorting() throw (Exception)
     {
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(30, 4, 4, 30, 4, 4);
@@ -335,7 +339,7 @@ public:
  #endif //CHASTE_VTK
     }
 
-    void TestPottsSpheroidWithNoBirthOrDeath() throw (Exception)
+    void xTestPottsSpheroidWithNoBirthOrDeath() throw (Exception)
     {
         // Create a simple 3D PottsMesh
         PottsMeshGenerator<3> generator(10, 2, 2, 10, 2, 2, 10, 2, 2);
@@ -374,7 +378,7 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
     }
 
-    void TestPottsSpheroidCellSorting() throw (Exception)
+    void xTestPottsSpheroidCellSorting() throw (Exception)
     {
         // Create a simple 3D PottsMesh
         unsigned domain_size = 10;
@@ -442,7 +446,7 @@ public:
  #endif //CHASTE_VTK
     }
 
-    void TestStandardResultForArchivingTestsBelow() throw (Exception)
+    void xTestStandardResultForArchivingTestsBelow() throw (Exception)
     {
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(10, 1, 4, 10, 1, 4);
@@ -487,7 +491,7 @@ public:
     }
 
     // Testing Save
-    void TestSave() throw (Exception)
+    void xTestSave() throw (Exception)
     {
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(10, 1, 4, 10, 1, 4);
@@ -522,7 +526,7 @@ public:
     }
 
     // Testing Load (based on previous two tests)
-    void TestLoad() throw (Exception)
+    void xTestLoad() throw (Exception)
     {
         // Load the simulation from the TestSave method above and
         // run it from 10.0 to 15.0
@@ -558,41 +562,60 @@ public:
         delete p_simulator2;
     }
 
-//    void TestPottsCrypt() throw (Exception)
-//	{
-//		// Create a simple 2D PottsMesh
-//		PottsMeshGenerator generator(12, 28, 3, 6, 4, 4);
-//		PottsMesh<2>* p_mesh = generator.GetMesh();
-//
-//		// Create cells
-//		std::vector<CellPtr> cells;
-//        CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
-//        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 4.0, 6.0, 8, 12.0);
-//
-//		// Create cell population
-//		PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
-//
-//		// Set up cell-based simulation
-//		OnLatticeSimulation<2> simulator(cell_population);
-//		simulator.SetOutputDirectory("TestPottsCrypt");
-//		simulator.SetDt(0.01);
-//		simulator.SetSamplingTimestepMultiple(10);
-//		simulator.SetEndTime(1.0);
-//
-//        // Create cell killer and pass in to crypt simulation
-//        SloughingCellKiller<2> sloughing_cell_killer(&cell_population,24u);
-//        simulator.AddCellKiller(&sloughing_cell_killer);
-//
-//		// Run simulation
-//		simulator.Solve();
-//
-//		// Check the number of cells
-//		TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 19u);
-//
-//		// Test number of births or deaths
-//		TS_ASSERT_EQUALS(simulator.GetNumBirths(), 3u);
-//		TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 2u);
-//	}
+    void TestPottsCrypt() throw (Exception)
+	{
+
+        double crypt_length = 80;
+
+
+		// Create a simple 2D PottsMesh
+		//PottsMeshGenerator<2> generator(40, 10, 4, 90, 20, 4, 1, 1, 1, true);
+        PottsMeshGenerator<2> generator(20, 5, 4, 45, 10, 4, 1, 1, 1, true);
+		PottsMesh<2>* p_mesh = generator.GetMesh();
+
+		// Create cells
+		std::vector<CellPtr> cells;
+        CellsGenerator<SimpleWntCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), TRANSIT);
+
+		// Create cell population
+		PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
+		cell_population.SetOutputCellVolumes(true);
+
+        // Create an instance of a Wnt concentration
+        WntConcentration<2>::Instance()->SetType(LINEAR);
+        WntConcentration<2>::Instance()->SetCellPopulation(cell_population);
+        WntConcentration<2>::Instance()->SetCryptLength(crypt_length);
+
+		// Set up cell-based simulation
+		OnLatticeSimulation<2> simulator(cell_population);
+		simulator.SetOutputDirectory("TestPottsCrypt");
+		simulator.SetDt(0.1);
+		simulator.SetSamplingTimestepMultiple(1);
+		simulator.SetEndTime(1.0);
+		simulator.SetOutputCellVelocities(true);
+
+        // Create cell killer and pass in to crypt simulation
+        SloughingCellKiller<2> sloughing_cell_killer(&cell_population,crypt_length);
+        simulator.AddCellKiller(&sloughing_cell_killer);
+
+
+        // Create update rules and pass to the simulation
+        MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule,);
+        simulator.AddUpdateRule(p_volume_constraint_update_rule);
+        MAKE_PTR(AdhesionPottsUpdateRule<2>, p_adhesion_update_rule,);
+        simulator.AddUpdateRule(p_adhesion_update_rule);
+
+		// Run simulation
+		simulator.Solve();
+
+		// Check the number of cells
+		TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 19u);
+
+		// Test number of births or deaths
+		TS_ASSERT_EQUALS(simulator.GetNumBirths(), 3u);
+		TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 2u);
+	}
 };
 
 #endif /*TESTONLATTICESIMULATIONWITHPOTTSBASEDCELLPOPULATION_HPP_*/

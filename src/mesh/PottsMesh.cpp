@@ -275,7 +275,6 @@ double PottsMesh<DIM>::GetSurfaceAreaOfElement(unsigned index)
 template<unsigned DIM>
 std::set<unsigned> PottsMesh<DIM>::GetMooreNeighbouringNodeIndices(unsigned nodeIndex)
 {
-	///\todo not implemented in 3d yet
 	assert(DIM==2 || DIM==3);
 
     // Create a set of neighbouring node indices
