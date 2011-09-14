@@ -32,13 +32,10 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include <cfloat>
-
 #include "StochasticDurationGenerationBasedCellCycleModel.hpp"
 #include "DeltaNotchOdeSystem.hpp"
 #include "AbstractCellCycleModelOdeSolver.hpp"
 #include "CellCycleModelOdeHandler.hpp"
-#include "PetscTools.hpp"
 
 /**
  * A subclass of StochasticDurationGenerationBasedCellCycleModel
