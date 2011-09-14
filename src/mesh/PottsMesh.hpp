@@ -66,6 +66,12 @@ protected:
      */
     std::vector<unsigned> mDeletedElementIndices;
 
+    /** Vector of set of VonNeuman Neighbours for each node. */
+    std::vector< std::set<unsigned> > mVonNeumannNeighbouringNodeIndices;
+
+    /** Vector of set of Moore Neighbours for each node. */
+    std::vector< std::set<unsigned> > mMooreNeighbouringNodeIndices;
+
     /**
      * Solve node mapping method. This overridden method is required
      * as it is pure virtual in the base class.
@@ -258,28 +264,26 @@ public:
     virtual double GetSurfaceAreaOfElement(unsigned index);
 
     /**
-     * Given a node, find a set containing the indices of its Moore neighbouring nodes.
-	 * This should be over-ridden in child classes to implement peroidicity etc.
-     *
-     * \todo this might be better to store as a look up table which is calculated
-     * in the constructor.
-     *
+     * Given a node, return a set containing the indices of its Moore neighbouring nodes.
+	 *
      * @param nodeIndex global index of the node
      * @return neighbouring node indices in Moore neighbourhood
      */
     std::set<unsigned> GetMooreNeighbouringNodeIndices(unsigned nodeIndex);
 
     /**
-     * Given a node, find a set containing the indices of its Von Neumann neighbouring nodes.
-     * This should be over-ridden in child classes to implement peroidicity etc.
-     *
-     * \todo this might be better to store as a look up table which is calculated
-     * in the constructor.
+     * Given a node, return a set containing the indices of its Von Neumann neighbouring nodes.
      *
      * @param nodeIndex global index of the node
      * @return neighbouring node indices in Von Neumann neighbourhood
      */
     std::set<unsigned> GetVonNeumannNeighbouringNodeIndices(unsigned nodeIndex);
+
+    /**
+     * Helper method to calculate the Noore and Von Neumann Neighbourhoods of all nodes
+     * This should be over-ridden in child classes to implement peroidicity etc.
+     */
+    void CaclulateNeighbouringNodeIndices();
 
     /**
      * Mark an element as deleted. Note that in a Potts mesh this does not

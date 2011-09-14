@@ -194,6 +194,8 @@ unsigned PottsBasedCellPopulation<DIM>::RemoveDeadCells()
 template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::UpdateNodeLocations(const std::vector< c_vector<double, DIM> >& rNodeForces, double dt)
 {
+    //TODO think about making this a member variable.
+    unsigned sweeps_per_timestep=1;
 
     /*
      * This is where we perform the Monte Carlo simulations
@@ -209,7 +211,7 @@ void PottsBasedCellPopulation<DIM>::UpdateNodeLocations(const std::vector< c_vec
     RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
     unsigned num_nodes = mrMesh.GetNumNodes();
 
-    for (unsigned i=0; i<num_nodes; i++)
+    for (unsigned i=0; i<num_nodes*sweeps_per_timestep; i++)
     {
         unsigned node_index;
 
@@ -220,7 +222,7 @@ void PottsBasedCellPopulation<DIM>::UpdateNodeLocations(const std::vector< c_vec
         else
         {
             // Loop over nodes in index order.
-            node_index = i;
+            node_index = i%num_nodes;
         }
 
         Node<DIM>* p_node = mrMesh.GetNode(node_index);
