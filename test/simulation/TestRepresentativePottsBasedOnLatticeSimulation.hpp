@@ -97,12 +97,12 @@ public:
         simulator.SetEndTime(10);
 
         // Create update rules and pass to the simulation
-        MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule,);
+        MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
         p_volume_constraint_update_rule->SetMatureCellTargetVolume(16);
         p_volume_constraint_update_rule->SetDeformationEnergyParameter(0.2);
         simulator.AddUpdateRule(p_volume_constraint_update_rule);
 
-        MAKE_PTR(DifferentialAdhesionPottsUpdateRule<2>, p_differential_adhesion_update_rule,);
+        MAKE_PTR(DifferentialAdhesionPottsUpdateRule<2>, p_differential_adhesion_update_rule);
         p_differential_adhesion_update_rule->SetLabelledCellLabelledCellAdhesionEnergyParameter(0.16);
         p_differential_adhesion_update_rule->SetLabelledCellCellAdhesionEnergyParameter(0.11);
         p_differential_adhesion_update_rule->SetCellCellAdhesionEnergyParameter(0.02);
