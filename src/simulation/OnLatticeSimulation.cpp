@@ -54,79 +54,14 @@ OnLatticeSimulation<DIM>::OnLatticeSimulation(AbstractCellPopulation<DIM>& rCell
 template<unsigned DIM>
 void OnLatticeSimulation<DIM>::UpdateCellLocationsAndTopology()
 {
-    std::vector<c_vector<double, DIM> > old_cell_locations;
-
-    if (mOutputCellVelocities)
-    {
-
-        unsigned num_cells = this->mrCellPopulation.GetNumRealCells();
-
-        /*
-         * Get the previous cell centre locations to calculate velocity
-         */
-        old_cell_locations.reserve(num_cells);
-
-        for (unsigned cell_index=0; cell_index<num_cells; cell_index++)
-        {
-            old_cell_locations[cell_index] = mpStaticCastCellPopulation->rGetMesh().GetCentroidOfElement(cell_index);
-        }
-    }
-
-
-
-    ////////////////////////////
-    // Update cell positions
-    ////////////////////////////
     std::vector<c_vector<double, DIM> > forces(1, zero_vector<double>(DIM));
+
+    ////////////////////////////
+    // Update node positions
+    ////////////////////////////
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::POSITION);
     this->mrCellPopulation.UpdateNodeLocations(forces, this->mDt);
     CellBasedEventHandler::EndEvent(CellBasedEventHandler::POSITION);
-
-
-    // Write Cell velocities to file if required
-    if (mOutputCellVelocities)
-    {
-        if (SimulationTime::Instance()->GetTimeStepsElapsed()%this->mSamplingTimestepMultiple == 0)
-        {
-            unsigned num_cells = this->mrCellPopulation.GetNumRealCells();
-
-            *mpCellVelocitiesFile << SimulationTime::Instance()->GetTime() << "\t";
-            for (unsigned cell_index=0; cell_index<num_cells; cell_index++)
-            {
-                const c_vector<double,DIM>& position = mpStaticCastCellPopulation->rGetMesh().GetCentroidOfElement(cell_index);
-                c_vector<double, DIM> velocity = (position - old_cell_locations[cell_index])/this->mDt;
-                *mpCellVelocitiesFile << cell_index  << " ";
-                for (unsigned i=0; i<DIM; i++)
-                {
-                    *mpCellVelocitiesFile << position[i] << " ";
-                }
-                for (unsigned i=0; i<DIM; i++)
-                {
-                    *mpCellVelocitiesFile << velocity[i] << " ";
-                }
-            }
-            *mpCellVelocitiesFile << "\n";
-        }
-    }
-}
-
-template<unsigned DIM>
-void OnLatticeSimulation<DIM>::SetupSolve()
-{
-    if (mOutputCellVelocities)
-    {
-        OutputFileHandler output_file_handler2(this->mSimulationOutputDirectory+"/", false);
-        mpCellVelocitiesFile = output_file_handler2.OpenOutputFile("cellvelocities.dat");
-    }
-}
-
-template<unsigned DIM>
-void OnLatticeSimulation<DIM>::AfterSolve()
-{
-    if (mOutputCellVelocities)
-    {
-        mpCellVelocitiesFile->close();
-    }
 }
 
 template<unsigned DIM>
@@ -152,23 +87,10 @@ void OnLatticeSimulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractPottsUpda
     mpStaticCastCellPopulation->AddUpdateRule(pUpdateRule);
 }
 
-template<unsigned DIM>
-bool OnLatticeSimulation<DIM>::GetOutputCellVelocities()
-{
-    return mOutputCellVelocities;
-}
-
-template<unsigned DIM>
-void OnLatticeSimulation<DIM>::SetOutputCellVelocities(bool outputCellVelocities)
-{
-    mOutputCellVelocities = outputCellVelocities;
-}
 
 template<unsigned DIM>
 void OnLatticeSimulation<DIM>::OutputSimulationParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t<OutputCellVelocities>" << mOutputCellVelocities << "</OutputCellVelocities>\n";
-
     // Call method on direct parent class
     AbstractCellBasedSimulation<DIM>::OutputSimulationParameters(rParamsFile);
 }

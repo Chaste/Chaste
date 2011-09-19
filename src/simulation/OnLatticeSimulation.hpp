@@ -58,12 +58,6 @@ protected:
     /** Helper member that is a static cast of the cell population. */
     PottsBasedCellPopulation<DIM>* mpStaticCastCellPopulation;
 
-    /** Whether to write the cell velocities to a file. */
-    bool mOutputCellVelocities;
-
-    /** Results file cell velocities. */
-    out_stream mpCellVelocitiesFile;
-
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
@@ -83,7 +77,6 @@ protected:
         // If Archive is an output archive, then & resolves to <<
         // If Archive is an input archive, then & resolves to >>
         archive & boost::serialization::base_object<AbstractCellBasedSimulation<DIM> >(*this);
-        archive & mOutputCellVelocities;
     }
 
     /**
@@ -120,29 +113,6 @@ public:
      * @param pUpdateRule share pointer to a Potts update rule law
      */
     void AddUpdateRule(boost::shared_ptr<AbstractPottsUpdateRule<DIM> > pUpdateRule);
-
-    /**
-     * @return mOutputCellVelocities
-     */
-    bool GetOutputCellVelocities();
-
-    /**
-     * Set mOutputCellVelocities.
-     *
-     * @param outputCellVelocities the new value of mOutputCellVelocities
-     */
-    void SetOutputCellVelocities(bool outputCellVelocities);
-
-
-    /**
-     * Overridden SetupSolve() method to setup the cell velocities file.
-     */
-    virtual void SetupSolve();
-
-    /**
-     * Overridden AfterSolve() method to close the cell velocities file.
-     */
-    virtual void AfterSolve();
 
     /**
      * Overridden OutputAdditionalSimulationSetup method to output the force and cell
