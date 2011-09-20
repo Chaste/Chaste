@@ -45,6 +45,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "RandomCellKiller.hpp"
 #include "NumericFileComparison.hpp"
 #include "CellBasedEventHandler.hpp"
+#include "SmartPointers.hpp"
 
 class TestCaBasedSimulationWithCaBasedCellPopulation : public AbstractCellBasedTestSuite
 {
@@ -102,7 +103,7 @@ public:
         mesh.ConstructRectangularMesh(10, 10, true); // 11*11 nodes
 
         // Create two cells
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        MAKE_PTR(WildTypeCellMutationState, p_state);
 
         FixedDurationGenerationBasedCellCycleModel* p_model_1 = new FixedDurationGenerationBasedCellCycleModel();
         p_model_1->SetCellProliferativeType(DIFFERENTIATED);
@@ -160,7 +161,7 @@ public:
         mesh.ConstructRectangularMesh(20, 20, true); // 21*21 nodes
 
         // Create a cell that keeps dividing
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        MAKE_PTR(WildTypeCellMutationState, p_state);
 
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         p_model->SetCellProliferativeType(TRANSIT);
@@ -264,8 +265,8 @@ public:
         simulator.SetEndTime(10);
 
         // Create cell killer and pass in to simulation
-        RandomCellKiller<2> random_cell_killer(&cell_population, 0.005);
-        simulator.AddCellKiller(&random_cell_killer);
+        MAKE_PTR_ARGS(RandomCellKiller<2>, p_killer, (&cell_population, 0.005));
+        simulator.AddCellKiller(p_killer);
 
         // Run simulation
         simulator.Solve();
@@ -363,7 +364,7 @@ public:
         mesh.ConstructRectangularMesh(6, 6, true); // 7*7 nodes
 
         // Create a single cell in the centre of the mesh
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        MAKE_PTR(WildTypeCellMutationState, p_state);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         p_model->SetCellProliferativeType(DIFFERENTIATED);
         CellPtr p_cell(new Cell(p_state, p_model));
@@ -426,7 +427,7 @@ public:
         mesh.ConstructRectangularMesh(10, 10, true); // 50*50 nodes
 
         // Create a single cell
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        MAKE_PTR(WildTypeCellMutationState, p_state);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         p_model->SetCellProliferativeType(STEM);
         CellPtr p_cell(new Cell(p_state, p_model));
@@ -472,7 +473,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         std::vector<unsigned> real_node_indices;
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        MAKE_PTR(WildTypeCellMutationState, p_state);
         unsigned num_cells = 100;
         for (unsigned i=0; i<num_cells; i++)
         {
@@ -500,8 +501,8 @@ public:
         simulator.SetEndTime(8.0);
 
         // Create cell killer and pass in to simulation
-        RandomCellKiller<2> random_cell_killer(&cell_population, 0.005);
-        simulator.AddCellKiller(&random_cell_killer);
+        MAKE_PTR_ARGS(RandomCellKiller<2>, p_killer, (&cell_population, 0.005));
+        simulator.AddCellKiller(p_killer);
 
         // Run simulation
         simulator.Solve();
@@ -544,7 +545,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         std::vector<unsigned> real_node_indices;
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        MAKE_PTR(WildTypeCellMutationState, p_state);
         unsigned num_cells = 100;
         for (unsigned i=0; i<num_cells; i++)
         {
@@ -574,8 +575,8 @@ public:
         simulator.SetEndTime(3.0);
 
         // Create cell killer and pass in to simulation
-        RandomCellKiller<2> random_cell_killer(&cell_population, 0.005);
-        simulator.AddCellKiller(&random_cell_killer);
+        MAKE_PTR_ARGS(RandomCellKiller<2>,  p_killer, (&cell_population, 0.005));
+        simulator.AddCellKiller(p_killer);
 
         // Run simulation
         simulator.Solve();

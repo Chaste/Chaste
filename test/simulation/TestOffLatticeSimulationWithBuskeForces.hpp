@@ -44,6 +44,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "BuskeElasticForce.hpp"
 #include "BuskeCompressionForce.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
+#include "SmartPointers.hpp"
 
 class TestOffLatticeSimulationWithBuskeForces : public AbstractCellBasedTestSuite
 {
@@ -96,9 +97,9 @@ public:
         simulator.SetEndTime(5.0);
 
         // Create a force law and pass it to the simulation
-        BuskeAdhesiveForce<2> buske_adhesive_force;
-        buske_adhesive_force.SetAdhesionEnergyParameter(0.002);
-        simulator.AddForce(&buske_adhesive_force);
+        MAKE_PTR(BuskeAdhesiveForce<2>, p_buske_adhesive_force);
+        p_buske_adhesive_force->SetAdhesionEnergyParameter(0.002);
+        simulator.AddForce(p_buske_adhesive_force);
 
         simulator.Solve();
 
@@ -151,8 +152,8 @@ public:
         simulator.SetEndTime(5.0);
 
         // Create a force law and pass it to the simulation
-        BuskeElasticForce<2> buske_elastic_force;
-        simulator.AddForce(&buske_elastic_force);
+        MAKE_PTR(BuskeElasticForce<2>, p_buske_elastic_force);
+        simulator.AddForce(p_buske_elastic_force);
 
         simulator.Solve();
 
@@ -207,8 +208,8 @@ public:
         simulator.SetEndTime(5.0);
 
         // Create a force law and pass it to the simulation
-        BuskeCompressionForce<2> buske_compression_force;
-        simulator.AddForce(&buske_compression_force);
+        MAKE_PTR(BuskeCompressionForce<2>, buske_compression_force);
+        simulator.AddForce(buske_compression_force);
 
         simulator.Solve();
 
@@ -261,12 +262,12 @@ public:
         simulator.SetEndTime(5.0);
 
         // Create a force law and pass it to the simulation
-        BuskeCompressionForce<2> buske_compression_force;
-        BuskeElasticForce<2> buske_elastic_force;
-        BuskeAdhesiveForce<2> buske_adhesive_force;
-        simulator.AddForce(&buske_compression_force);
-        simulator.AddForce(&buske_elastic_force);
-        simulator.AddForce(&buske_adhesive_force);
+        MAKE_PTR(BuskeCompressionForce<2>, p_buske_compression_force);
+        MAKE_PTR(BuskeElasticForce<2>, p_buske_elastic_force);
+        MAKE_PTR(BuskeAdhesiveForce<2>, p_buske_adhesive_force);
+        simulator.AddForce(p_buske_compression_force);
+        simulator.AddForce(p_buske_elastic_force);
+        simulator.AddForce(p_buske_adhesive_force);
 
         simulator.Solve();
     }
@@ -301,12 +302,12 @@ public:
         simulator.SetEndTime(1.0);
 
         // Create all three Buske force laws and pass to the simulation
-        BuskeCompressionForce<2> buske_compression_force;
-        BuskeElasticForce<2> buske_elastic_force;
-        BuskeAdhesiveForce<2> buske_adhesive_force;
-        simulator.AddForce(&buske_compression_force);
-        simulator.AddForce(&buske_elastic_force);
-        simulator.AddForce(&buske_adhesive_force);
+        MAKE_PTR(BuskeCompressionForce<2>, p_buske_compression_force);
+        MAKE_PTR(BuskeElasticForce<2>, p_buske_elastic_force);
+        MAKE_PTR(BuskeAdhesiveForce<2>, p_buske_adhesive_force);
+        simulator.AddForce(p_buske_compression_force);
+        simulator.AddForce(p_buske_elastic_force);
+        simulator.AddForce(p_buske_adhesive_force);
 
         // Solve
         simulator.Solve();

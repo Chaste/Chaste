@@ -78,11 +78,11 @@ public:
      * Default constructor.
      *
      * @param rCellPopulation A cell population facade class (contains a mesh and cells)
-     * @param deleteCellPopulationAndForceCollection whether to delete cell population and force collection.
+     * @param deleteCellPopulationInDestructor whether to delete cell population and force collection.
      * @param initialiseCells whether to initialise cells (set to false when loading from an archive)
      */
      DeltaNotchOffLatticeSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
-                                   bool deleteCellPopulationAndForceCollection=false,
+                                   bool deleteCellPopulationInDestructor=false,
                                    bool initialiseCells=true);
 
      /**

@@ -41,6 +41,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
+#include "SmartPointers.hpp"
 
 class TestCaBasedUpdateRules : public AbstractCellBasedTestSuite
 {
@@ -68,7 +69,7 @@ public:
         mesh.ConstructRectangularMesh(2, 2, true); // 3*3 nodes
 
         // Create a cell
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        MAKE_PTR(WildTypeCellMutationState, p_state);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         p_model->SetCellProliferativeType(DIFFERENTIATED);
         CellPtr p_cell(new Cell(p_state, p_model));
@@ -139,7 +140,6 @@ public:
         mesh.ConstructRectangularMesh(5, 5, true); // 6*6 nodes
 
         // Create a line of cells along the bottom of the mesh
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
 
         // Create location indices
         std::vector<unsigned> real_node_indices;

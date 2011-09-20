@@ -48,6 +48,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "Warnings.hpp"
+#include "SmartPointers.hpp"
 
 class TestDeltaNotchOffLatticeSimulation : public AbstractCellBasedTestSuite
 { 
@@ -86,7 +87,7 @@ public:
 
         // Create some cells, each with a cell-cycle model that incorporates a Delta-Notch ODE system
         std::vector<CellPtr> cells;
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        MAKE_PTR(WildTypeCellMutationState, p_state);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
@@ -123,9 +124,9 @@ public:
         simulator.SetEndTime(0.01);
 
         // Set up force law and add to simulation
-        GeneralisedLinearSpringForce<2> force;
-        force.SetCutOffLength(1.5);
-        simulator.AddForce(&force);
+        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        p_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_force);
 
         // Run simulation
         simulator.Solve();
@@ -150,7 +151,7 @@ public:
 
 		// Create some cells, each with a cell-cycle model that incorporates a delta-notch ODE system
 		std::vector<CellPtr> cells;
-		boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        MAKE_PTR(WildTypeCellMutationState, p_state);
 		for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
 		{
 			DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
@@ -187,8 +188,8 @@ public:
 		simulator.SetEndTime(0.01);
 
 		// Create force law and add to simulation
-		NagaiHondaForce<2> force;
-		simulator.AddForce(&force);
+		MAKE_PTR(NagaiHondaForce<2>, p_force);
+		simulator.AddForce(p_force);
 
 		// Run simulation
 		simulator.Solve();
@@ -211,7 +212,7 @@ public:
 
 		// Create some cells, each with a cell-cycle model that incorporates a Delta-Notch ODE system
 		std::vector<CellPtr> cells;
-		boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        MAKE_PTR(WildTypeCellMutationState, p_state);
 		for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
 		{
 			DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
@@ -246,9 +247,9 @@ public:
 		simulator.SetEndTime(0.01);
 
 		// Set up force law and add to simulation
-		GeneralisedLinearSpringForce<2> force;
-		force.SetCutOffLength(1.5);
-		simulator.AddForce(&force);
+		MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+		p_force->SetCutOffLength(1.5);
+		simulator.AddForce(p_force);
 
 		// Run simulation
 		simulator.Solve();
@@ -272,7 +273,7 @@ public:
 
 		// Create some cells, each with a cell-cycle model that incorporates a delta-notch ODE system
 		std::vector<CellPtr> cells;
-		boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        MAKE_PTR(WildTypeCellMutationState, p_state);
 		for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
 		{
 			DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
@@ -310,8 +311,8 @@ public:
 		simulator.SetEndTime(end_time);
 
         // Create a force law and pass it to the simulation
-        NagaiHondaForce<2> nagai_honda_force;
-        simulator.AddForce(&nagai_honda_force);
+        MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
+        simulator.AddForce(p_nagai_honda_force);
 
         // Run and save simulation
         simulator.Solve();

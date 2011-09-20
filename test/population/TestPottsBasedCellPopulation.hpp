@@ -47,6 +47,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "ApcTwoHitCellMutationState.hpp"
 #include "BetaCateninOneHitCellMutationState.hpp"
 #include "CellLabel.hpp"
+#include "SmartPointers.hpp"
 
 class TestPottsBasedCellPopulation : public AbstractCellBasedTestSuite
 {
@@ -155,7 +156,7 @@ public:
         TS_ASSERT_THROWS_THIS(PottsBasedCellPopulation<2> cell_population(*p_mesh, cells_copy),
                 "Element 3 does not appear to have a cell associated with it");
 
-        boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
+        MAKE_PTR(WildTypeCellMutationState, p_state);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         p_model->SetCellProliferativeType(STEM);
         CellPtr p_cell(new Cell(p_state, p_model));
@@ -241,7 +242,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 1u);
 
         // Create a new cell
-        boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
+        MAKE_PTR(WildTypeCellMutationState, p_state);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         p_model->SetCellProliferativeType(STEM);
         CellPtr p_new_cell(new Cell(p_state, p_model));
@@ -372,7 +373,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 1u);
 
         // Create an update rule and pass to the population
-        boost::shared_ptr<VolumeConstraintPottsUpdateRule<2> > p_volume_constraint_update_rule(new VolumeConstraintPottsUpdateRule<2>);
+        MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
         cell_population.AddUpdateRule(p_volume_constraint_update_rule);
 
         // Check the update rules are correct
@@ -420,7 +421,7 @@ public:
             }
 
             // Create an update rule and pass to the population
-            boost::shared_ptr<VolumeConstraintPottsUpdateRule<2> > p_volume_constraint_update_rule(new VolumeConstraintPottsUpdateRule<2>);
+            MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
             p_cell_population->AddUpdateRule(p_volume_constraint_update_rule);
 
             // Create output archive

@@ -41,6 +41,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CheckReadyToDivideAndPhaseIsUpdated.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "CellwiseData.hpp"
+#include "SmartPointers.hpp"
 
 class TestDeltaNotchCellCycleModel : public AbstractCellBasedTestSuite
 {
@@ -74,7 +75,7 @@ public:
         p_diff_model->SetCellProliferativeType(DIFFERENTIATED);
         p_diff_model->SetDimension(1);
 
-        boost::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
+        MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
 
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_stem_model));
         p_stem_cell->InitialiseCellCycleModel();
@@ -128,7 +129,9 @@ public:
             DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel;
             p_model->SetDimension(2);
             p_model->SetCellProliferativeType(TRANSIT);
-            boost::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
+
+            MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
+
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
             p_cell->InitialiseCellCycleModel();
             p_cell->SetBirthTime(-1.1);

@@ -39,6 +39,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
+#include "SmartPointers.hpp"
 
 class TestCaBasedCellPopulation : public AbstractCellBasedTestSuite
 {
@@ -54,7 +55,7 @@ private:
     {
         std::vector<CellPtr> cells;
 
-        boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
+        MAKE_PTR(WildTypeCellMutationState, p_state);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         p_model->SetCellProliferativeType(cellProliferativeType);
         CellPtr p_cell(new Cell(p_state, p_model));
@@ -85,7 +86,7 @@ public:
         mesh.ConstructRectangularMesh(2, 2, true); // 3*3 nodes
 
         // Create two cells
-        boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
+        MAKE_PTR(WildTypeCellMutationState, p_state);
         FixedDurationGenerationBasedCellCycleModel* p_model_1 = new FixedDurationGenerationBasedCellCycleModel();
         p_model_1->SetCellProliferativeType(DIFFERENTIATED);
         CellPtr p_cell_1(new Cell(p_state, p_model_1));
@@ -211,7 +212,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*(cell_population.rGetCells().begin())), 4u);
 
         // Create a new cell
-        boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
+        MAKE_PTR(WildTypeCellMutationState, p_state);
         FixedDurationGenerationBasedCellCycleModel* p_model_2 = new FixedDurationGenerationBasedCellCycleModel();
         p_model_2->SetCellProliferativeType(STEM);
         CellPtr p_new_cell(new Cell(p_state, p_model_2));
@@ -474,7 +475,7 @@ public:
         TS_ASSERT_EQUALS(node_20_neighbours, expected_node_20_neighbours);
 
         // Create a new cell
-        boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
+        MAKE_PTR(WildTypeCellMutationState, p_state);
         FixedDurationGenerationBasedCellCycleModel* p_model_2 = new FixedDurationGenerationBasedCellCycleModel();
         p_model_2->SetCellProliferativeType(DIFFERENTIATED);
         CellPtr p_new_cell(new Cell(p_state, p_model_2));
@@ -560,7 +561,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 15u);
 
         // Create a new cell
-        boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
+        MAKE_PTR(WildTypeCellMutationState, p_state);
         FixedDurationGenerationBasedCellCycleModel* p_model_2 = new FixedDurationGenerationBasedCellCycleModel();
         p_model_2->SetCellProliferativeType(DIFFERENTIATED);
         CellPtr p_new_cell(new Cell(p_state, p_model_2));
@@ -604,7 +605,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 15u);
 
         // Create a new cell
-        boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
+        MAKE_PTR(WildTypeCellMutationState, p_state);
         FixedDurationGenerationBasedCellCycleModel* p_model_2 = new FixedDurationGenerationBasedCellCycleModel();
         p_model_2->SetCellProliferativeType(DIFFERENTIATED);
         CellPtr p_new_cell(new Cell(p_state, p_model_2));
@@ -661,7 +662,7 @@ public:
         CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Create a new cell
-        boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
+        MAKE_PTR(WildTypeCellMutationState, p_state);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         p_model->SetCellProliferativeType(DIFFERENTIATED);
         CellPtr p_new_cell(new Cell(p_state, p_model));
@@ -882,7 +883,7 @@ public:
 
         // Create three cells
         std::vector<CellPtr> cells2;
-        boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
+        MAKE_PTR(WildTypeCellMutationState, p_state);
         for (unsigned i=0; i<3; i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
@@ -1344,7 +1345,7 @@ public:
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, real_node_indices.size(), real_node_indices, DIFFERENTIATED);
 
-        boost::shared_ptr<AbstractCellProperty> p_wt(new WildTypeCellMutationState);
+        MAKE_PTR(WildTypeCellMutationState, p_wt);
         for (unsigned i=0; i<cells.size(); i++)
         {
             cells[i]->SetBirthTime(0);
@@ -1466,7 +1467,7 @@ public:
         mesh.ConstructRectangularMesh(2, 2, true); // 3*3 nodes
 
         // Create two cells
-        boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
+        MAKE_PTR(WildTypeCellMutationState, p_state);
         FixedDurationGenerationBasedCellCycleModel* p_model_1 = new FixedDurationGenerationBasedCellCycleModel();
         p_model_1->SetCellProliferativeType(DIFFERENTIATED);
         CellPtr p_cell_1(new Cell(p_state, p_model_1));
@@ -1635,7 +1636,7 @@ public:
         TetrahedralMesh<2,2> mesh2;
         mesh2.ConstructRectangularMesh(2, 2, true); // 3*3 nodes
         std::vector<CellPtr> cells2;
-        boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
+        MAKE_PTR(WildTypeCellMutationState, p_state);
         for (unsigned i=0; i<3; i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();

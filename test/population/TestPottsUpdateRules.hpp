@@ -48,6 +48,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "PottsMeshGenerator.hpp"
 #include "NodesOnlyMesh.hpp"
 #include "NodeBasedCellPopulation.hpp"
+#include "SmartPointers.hpp"
 
 class TestPottsUpdateRules : public AbstractCellBasedTestSuite
 {
@@ -437,7 +438,7 @@ public:
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
         // Label cells 0 and 1
-        boost::shared_ptr<AbstractCellProperty> p_label(new CellLabel);
+        MAKE_PTR(CellLabel, p_label);
         cells[0]->AddCellProperty(p_label);
         cells[1]->AddCellProperty(p_label);
 
@@ -534,7 +535,7 @@ public:
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
         // Label cells 0 and 1
-        boost::shared_ptr<AbstractCellProperty> p_label(new CellLabel);
+        MAKE_PTR(CellLabel, p_label);
         cells[0]->AddCellProperty(p_label);
         cells[1]->AddCellProperty(p_label);
 
@@ -627,7 +628,7 @@ public:
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
         // Label cells 0 and 1
-        boost::shared_ptr<AbstractCellProperty> p_label(new CellLabel);
+        MAKE_PTR(CellLabel, p_label);
         cells[0]->AddCellProperty(p_label);
         cells[1]->AddCellProperty(p_label);
 

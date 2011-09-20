@@ -313,10 +313,9 @@ public:
     /**
      * Add an update rule to be used in this simulation (use this to set up the Hamiltonian).
      *
-     * @param pUpdateRule pointer  to an update rule
+     * @param pUpdateRule pointer to an update rule
      */
     void AddUpdateRule(boost::shared_ptr<AbstractPottsUpdateRule<DIM> > pUpdateRule);
-
 
     /**
      * Get the collection of update rules to be used in the Simulations

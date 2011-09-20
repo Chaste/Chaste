@@ -35,13 +35,13 @@ CaBasedSimulation<DIM>::CaBasedSimulation(AbstractCellPopulation<DIM>& rCellPopu
                   std::vector<AbstractCaUpdateRule<DIM>*> updateRuleCollection,
                   bool iterateRandomlyOverUpdateRuleCollection,
                   bool iterateRandomlyOverCells,
-                  bool deleteCellPopulationAndForceCollection,
+                  bool deleteCellPopulationInDestructor,
                   bool initialiseCells)
     : AbstractCellBasedSimulation<DIM>(rCellPopulation,
-                  deleteCellPopulationAndForceCollection,
+                  deleteCellPopulationInDestructor,
                   initialiseCells),
     mUpdateRuleCollection(updateRuleCollection),
-    mAllocatedMemoryForUpdateRuleCollection(deleteCellPopulationAndForceCollection),
+    mAllocatedMemoryForUpdateRuleCollection(deleteCellPopulationInDestructor),
     mIterateRandomlyOverUpdateRuleCollection(iterateRandomlyOverUpdateRuleCollection),
     mIterateRandomlyOverCells(iterateRandomlyOverCells)
 {

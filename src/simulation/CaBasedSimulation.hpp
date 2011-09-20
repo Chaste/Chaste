@@ -108,7 +108,7 @@ public:
      *        mUpdateRuleCollection when updating cell locations (defaults to false)
      * @param iterateRandomlyOverCells whether to iterate randomly over cells when
      *        updating cell locations (defaults to false)
-     * @param deleteCellPopulationAndForceCollection Whether to delete the cell population and force
+     * @param deleteCellPopulationInDestructor Whether to delete the cell population and force
      *        collection on destruction to free up memory (defaults to false)
      * @param initialiseCells whether to initialise cells (defaults to true, set to
      *        false when loading from an archive)
@@ -117,7 +117,7 @@ public:
                       std::vector<AbstractCaUpdateRule<DIM>*> updateRuleCollection,
                       bool iterateRandomlyOverUpdateRuleCollection=false,
                       bool iterateRandomlyOverCells=false,
-                      bool deleteCellPopulationAndForceCollection=false,
+                      bool deleteCellPopulationInDestructor=false,
                       bool initialiseCells=true);
 
     /**

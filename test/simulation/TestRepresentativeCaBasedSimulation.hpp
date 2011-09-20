@@ -63,9 +63,6 @@ public:
         TetrahedralMesh<2,2> mesh;
         mesh.ConstructRectangularMesh(20, 20, true); // 21*21 nodes
 
-        // Create cell which keeps dividing
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
-
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;

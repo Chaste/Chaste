@@ -73,7 +73,7 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), DIFFERENTIATED);
 
         // Make this pointer first as if we move it after creating the cell population the label numbers aren't tracked
-        boost::shared_ptr<AbstractCellProperty> p_label(new CellLabel);
+        MAKE_PTR(CellLabel, p_label);
 
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);

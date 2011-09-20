@@ -35,9 +35,9 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 template<unsigned DIM>
 DeltaNotchOffLatticeSimulation<DIM>::DeltaNotchOffLatticeSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
-                                                                  bool deleteCellPopulationAndForceCollection,
+                                                                  bool deleteCellPopulationInDestructor,
                                                                   bool initialiseCells)
-    : OffLatticeSimulation<DIM>(rCellPopulation, deleteCellPopulationAndForceCollection, initialiseCells)
+    : OffLatticeSimulation<DIM>(rCellPopulation, deleteCellPopulationInDestructor, initialiseCells)
 {
 
 }

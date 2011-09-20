@@ -44,6 +44,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "MutableMesh.hpp"
+#include "SmartPointers.hpp"
 
 class TestPeriodicForces : public AbstractCellBasedTestSuite
 {
@@ -346,13 +347,12 @@ public:
         // Test Save with a MeshBasedCellPopulationWithGhostNodes
         MeshBasedCellPopulation<3> cell_population(*p_mesh, cells);
 
-		OffLatticeSimulation<3> simulator(cell_population);
+	OffLatticeSimulation<3> simulator(cell_population);
 
-		// Create periodic force law
-		GeneralisedPeriodicLinearSpringForce<3> periodic_force;  // Variable spring strengths
-        periodic_force.SetPeriodicDomainWidth(3.0);
-
-        simulator.AddForce(&periodic_force);
+	// Create periodic force law
+	MAKE_PTR(GeneralisedPeriodicLinearSpringForce<3>, p_periodic_force); // Variable spring strengths
+        p_periodic_force->SetPeriodicDomainWidth(3.0);
+        simulator.AddForce(p_periodic_force);
 
         // Initialise a vector of node forces
         std::vector<c_vector<double, 3> > node_forces;
@@ -367,7 +367,7 @@ public:
         SimulationTime::Instance()->SetStartTime(0.0);
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(0.01, 1);
 
-        periodic_force.AddForceContribution(node_forces, cell_population);
+        p_periodic_force->AddForceContribution(node_forces, cell_population);
 
         SimulationTime::Destroy();
 

@@ -72,11 +72,11 @@ private:
         AbstractCellBasedTestSuite::tearDown();
     }
 
-    void RandomlyLabelCells(std::vector<CellPtr>& rCells, boost::shared_ptr<AbstractCellProperty> pLabel, double labeledRatio)
+    void RandomlyLabelCells(std::vector<CellPtr>& rCells, boost::shared_ptr<AbstractCellProperty> pLabel, double labelledRatio)
     {
         for (unsigned i = 0; i<rCells.size(); i++)
         {
-            if (RandomNumberGenerator::Instance()->ranf() < labeledRatio)
+            if (RandomNumberGenerator::Instance()->ranf() < labelledRatio)
             {
                 rCells[i]->AddCellProperty(pLabel);
             }
@@ -220,8 +220,8 @@ public:
         simulator.AddUpdateRule(p_adhesion_update_rule);
 
         // Create cell killer and pass in to simulation
-        SloughingCellKiller<2> sloughing_cell_killer(&cell_population,16u);
-        simulator.AddCellKiller(&sloughing_cell_killer);
+        MAKE_PTR_ARGS(SloughingCellKiller<2>, p_killer, (&cell_population, 16));
+        simulator.AddCellKiller(p_killer);
 
         // Run simulation
         simulator.Solve();
@@ -284,9 +284,8 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), DIFFERENTIATED);
 
         // Make this pointer first as if we move it after creating the cell population the label numbers aren't tracked
-        boost::shared_ptr<AbstractCellProperty> p_label(new CellLabel);
-
-        RandomlyLabelCells(cells,p_label,0.5);
+        MAKE_PTR(CellLabel, p_label);
+        RandomlyLabelCells(cells, p_label, 0.5);
 
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
@@ -389,9 +388,8 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), DIFFERENTIATED);
 
         // Make this pointer first as if we move it after creating the cell population the label numbers aren't tracked
-        boost::shared_ptr<AbstractCellProperty> p_label(new CellLabel);
-
-        RandomlyLabelCells(cells,p_label,0.5);
+        MAKE_PTR(CellLabel, p_label);
+        RandomlyLabelCells(cells, p_label, 0.5);
 
         // Create cell population
         PottsBasedCellPopulation<3> cell_population(*p_mesh, cells);
@@ -556,7 +554,7 @@ public:
         delete p_simulator2;
     }
 
-//    void TestPottsCrypt() throw (Exception)
+//  void TestPottsCrypt() throw (Exception)
 //  {
 //      // Create a simple 2D PottsMesh
 //      PottsMeshGenerator generator(12, 28, 3, 6, 4, 4);
@@ -564,8 +562,8 @@ public:
 //
 //      // Create cells
 //      std::vector<CellPtr> cells;
-//        CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
-//        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 4.0, 6.0, 8, 12.0);
+//      CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
+//      cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 4.0, 6.0, 8, 12.0);
 //
 //      // Create cell population
 //      PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
@@ -577,9 +575,9 @@ public:
 //      simulator.SetSamplingTimestepMultiple(10);
 //      simulator.SetEndTime(1.0);
 //
-//        // Create cell killer and pass in to crypt simulation
-//        SloughingCellKiller<2> sloughing_cell_killer(&cell_population,24u);
-//        simulator.AddCellKiller(&sloughing_cell_killer);
+//      // Create cell killer and pass in to crypt simulation
+//      MAKE_PTR_ARGS(SloughingCellKiller<2>, p_killer, (&cell_population, 24));
+//      simulator.AddCellKiller(p_killer);
 //
 //      // Run simulation
 //      simulator.Solve();
