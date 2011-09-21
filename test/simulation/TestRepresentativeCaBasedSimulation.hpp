@@ -37,8 +37,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "CaBasedCellPopulation.hpp"
-#include "DiffusionCaUpdateRule.hpp"
-#include "AdvectionCaUpdateRule.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "RandomCellKiller.hpp"
@@ -79,11 +77,8 @@ public:
         // Create a cell population
         CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
-        // Create an empty UpdateRule system so only movement from cell birth
-        std::vector<AbstractCaUpdateRule<2>* > update_rule_collection;
-
         // Set up cell-based simulation
-        CaBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        CaBasedSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestRepresentativeCaBasedSimulationForProfiling");
         simulator.SetEndTime(50);
 

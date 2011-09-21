@@ -32,22 +32,18 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
 #include "CaBasedCellPopulation.hpp"
+#include "Identifiable.hpp"
 
 /**
- * An abstract force class.
+ * An abstract CA update rule class.
  */
 template<unsigned DIM>
-class AbstractCaUpdateRule
+class AbstractCaUpdateRule : public Identifiable
 {
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
      * Serialize the object and its member variables.
-     *
-     * Serialization of singleton objects must be done with care.
-     * Before the object is serialized via a pointer, it *MUST* be
-     * serialized directly, or an assertion will trip when a second
-     * instance of the class is created on de-serialization.
      *
      * @param archive the archive
      * @param version the current version of this class
@@ -81,17 +77,25 @@ public:
     virtual unsigned GetNewLocationOfCell(unsigned currentLocationIndex,
                                           CaBasedCellPopulation<DIM>& rCellPopulation,
                                           double dt)=0;
+
+    /**
+     * Output update rule to file. Call OutputUpdateRuleParameters() to output
+     * all member variables to file.
+     *
+     * @param rParamsFile a file stream
+     */
+    void OutputUpdateRuleInfo(out_stream& rParamsFile);
+
+    /**
+     * Output update rule parameters to file.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
+     * @param rParamsFile a file stream
+     */
+    virtual void OutputUpdateRuleParameters(out_stream& rParamsFile)=0;
 };
-
-template<unsigned DIM>
-AbstractCaUpdateRule<DIM>::AbstractCaUpdateRule()
-{
-}
-
-template<unsigned DIM>
-AbstractCaUpdateRule<DIM>::~AbstractCaUpdateRule()
-{
-}
 
 TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractCaUpdateRule)
 

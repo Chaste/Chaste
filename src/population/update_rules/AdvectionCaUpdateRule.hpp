@@ -126,6 +126,13 @@ public:
      * @return mAdvectionSpeed.
      */
     double GetAdvectionSpeed();
+
+    /**
+     * Overridden OutputUpdateRuleParameters() method.
+     *
+     * @param rParamsFile the file stream to which the parameters are output
+     */
+    void OutputUpdateRuleParameters(out_stream& rParamsFile);
 };
 
 #include "SerializationExportWrapper.hpp"

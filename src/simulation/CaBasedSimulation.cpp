@@ -32,7 +32,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 template<unsigned DIM>
 CaBasedSimulation<DIM>::CaBasedSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
-                  std::vector<AbstractCaUpdateRule<DIM>*> updateRuleCollection,
                   bool iterateRandomlyOverUpdateRuleCollection,
                   bool iterateRandomlyOverCells,
                   bool deleteCellPopulationInDestructor,
@@ -40,8 +39,6 @@ CaBasedSimulation<DIM>::CaBasedSimulation(AbstractCellPopulation<DIM>& rCellPopu
     : AbstractCellBasedSimulation<DIM>(rCellPopulation,
                   deleteCellPopulationInDestructor,
                   initialiseCells),
-    mUpdateRuleCollection(updateRuleCollection),
-    mAllocatedMemoryForUpdateRuleCollection(deleteCellPopulationInDestructor),
     mIterateRandomlyOverUpdateRuleCollection(iterateRandomlyOverUpdateRuleCollection),
     mIterateRandomlyOverCells(iterateRandomlyOverCells)
 {
@@ -53,15 +50,6 @@ CaBasedSimulation<DIM>::CaBasedSimulation(AbstractCellPopulation<DIM>& rCellPopu
 template<unsigned DIM>
 CaBasedSimulation<DIM>::~CaBasedSimulation()
 {
-    if (mAllocatedMemoryForUpdateRuleCollection)
-    {
-        for (typename std::vector<AbstractCaUpdateRule<DIM>*>::iterator update_iter = mUpdateRuleCollection.begin();
-             update_iter != mUpdateRuleCollection.end();
-             ++update_iter)
-        {
-            delete *update_iter;
-        }
-    }
 }
 
 template<unsigned DIM>
@@ -81,7 +69,7 @@ void CaBasedSimulation<DIM>::UpdateCellLocations()
         std::random_shuffle(mUpdateRuleCollection.begin(), mUpdateRuleCollection.end());
     }
 
-    for (typename std::vector<AbstractCaUpdateRule<DIM>*>::iterator update_iter = mUpdateRuleCollection.begin();
+    for (typename std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > >::iterator update_iter = mUpdateRuleCollection.begin();
          update_iter != mUpdateRuleCollection.end();
          ++update_iter)
     {
@@ -131,6 +119,12 @@ void CaBasedSimulation<DIM>::UpdateCellLocations()
             }
         }
     }
+}
+
+template<unsigned DIM>
+void CaBasedSimulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractCaUpdateRule<DIM> > pUpdateRule)
+{
+    mUpdateRuleCollection.push_back(pUpdateRule);
 }
 
 ///\todo Much of this code can probably merged with OffLatticeSimulation::Solve()
@@ -289,7 +283,7 @@ void CaBasedSimulation<DIM>::Solve()
 }
 
 template<unsigned DIM>
-const std::vector<AbstractCaUpdateRule<DIM>*> CaBasedSimulation<DIM>::rGetUpdateRuleCollection() const
+const std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > > CaBasedSimulation<DIM>::rGetUpdateRuleCollection() const
 {
     return mUpdateRuleCollection;
 }

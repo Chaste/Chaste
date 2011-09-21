@@ -209,6 +209,34 @@ public:
             delete p_update_rule;
         }
     }
+
+    void TestCaUpdateRulesOutputParameters()
+    {
+        std::string output_directory = "TestCaUpdateRulesOutputParameters";
+        OutputFileHandler output_file_handler(output_directory, false);
+
+        // Test with AdvectionCaUpdateRule
+        AdvectionCaUpdateRule<2> advection_update_rule(3, 1.6);
+        TS_ASSERT_EQUALS(advection_update_rule.GetIdentifier(), "AdvectionCaUpdateRule-2");
+
+        out_stream advection_update_rule_parameter_file = output_file_handler.OpenOutputFile("advection_update_rule_results.parameters");
+        advection_update_rule.OutputUpdateRuleParameters(advection_update_rule_parameter_file);
+        advection_update_rule_parameter_file->close();
+
+        std::string advection_update_rule_results_dir = output_file_handler.GetOutputDirectoryFullPath();
+        TS_ASSERT_EQUALS(system(("diff " + advection_update_rule_results_dir + "advection_update_rule_results.parameters notforrelease_cell_based/test/data/TestCaUpdateRules/advection_update_rule_results.parameters").c_str()), 0);
+
+        // Test with DiffusionCaUpdateRule
+        DiffusionCaUpdateRule<2> diffusion_update_rule(1.4);
+        TS_ASSERT_EQUALS(diffusion_update_rule.GetIdentifier(), "DiffusionCaUpdateRule-2");
+
+        out_stream diffusion_update_rule_parameter_file = output_file_handler.OpenOutputFile("diffusion_update_rule_results.parameters");
+        diffusion_update_rule.OutputUpdateRuleParameters(diffusion_update_rule_parameter_file);
+        diffusion_update_rule_parameter_file->close();
+
+        std::string diffusion_update_rule_results_dir = output_file_handler.GetOutputDirectoryFullPath();
+        TS_ASSERT_EQUALS(system(("diff " + diffusion_update_rule_results_dir + "diffusion_update_rule_results.parameters notforrelease_cell_based/test/data/TestCaUpdateRules/diffusion_update_rule_results.parameters").c_str()), 0);
+    }
 };
 
 #endif /*TESTLATTICEBASEDUPDATERULES_HPP_*/

@@ -73,10 +73,7 @@ private:
     CaBasedCellPopulation<DIM>* mpStaticCastCellPopulation;
 
     /** The rules used to determine the new locations of cells. */
-    std::vector<AbstractCaUpdateRule<DIM>*> mUpdateRuleCollection;
-
-    /** Whether delete the collection of update rules in the destructor. */
-    bool mAllocatedMemoryForUpdateRuleCollection;
+    std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > > mUpdateRuleCollection;
 
     /** Whether to iterate randomly over mUpdateRuleCollection when updating cell locations. */
     bool mIterateRandomlyOverUpdateRuleCollection;
@@ -103,7 +100,6 @@ public:
      * Constructor.
      *
      * @param rCellPopulation A cell population object
-     * @param updateRuleCollection The cell movement rules to use in the simulation
      * @param iterateRandomlyOverUpdateRuleCollection whether to iterate randomly over
      *        mUpdateRuleCollection when updating cell locations (defaults to false)
      * @param iterateRandomlyOverCells whether to iterate randomly over cells when
@@ -114,7 +110,6 @@ public:
      *        false when loading from an archive)
      */
     CaBasedSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
-                      std::vector<AbstractCaUpdateRule<DIM>*> updateRuleCollection,
                       bool iterateRandomlyOverUpdateRuleCollection=false,
                       bool iterateRandomlyOverCells=false,
                       bool deleteCellPopulationInDestructor=false,
@@ -140,7 +135,7 @@ public:
     /**
      * @return const reference to mUpdateRuleCollection (used in archiving).
      */
-    const std::vector<AbstractCaUpdateRule<DIM>*> rGetUpdateRuleCollection() const;
+    const std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > > rGetUpdateRuleCollection() const;
 
     /**
      * Outputs simulation parameters to file
@@ -152,7 +147,7 @@ public:
      */
     void OutputSimulationParameters(out_stream& rParamsFile);
 
-    /*
+    /**
      * Overridden UpdateCellLocationsAndTopology mehtod needed as its pure virtual in
      * AbstractCellBasedSimulation.
      *
@@ -161,8 +156,14 @@ public:
     void UpdateCellLocationsAndTopology()
     {
     }
-};
 
+    /**
+     * Add an update rule to be used in this simulation.
+     *
+     * @param pUpdateRule shared pointer to a CA update rule law
+     */
+    void AddUpdateRule(boost::shared_ptr<AbstractCaUpdateRule<DIM> > pUpdateRule);
+};
 
 // Declare identifier for the serializer
 #include "SerializationExportWrapper.hpp"
@@ -182,8 +183,6 @@ inline void save_construct_data(
     // Save data required to construct instance
     const AbstractCellPopulation<DIM> * p_cell_population = &(t->rGetCellPopulation());
     ar & p_cell_population;
-    const std::vector<AbstractCaUpdateRule<DIM>*> update_rule_collection = t->rGetUpdateRuleCollection();
-    ar & update_rule_collection;
 }
 
 /**
@@ -196,11 +195,9 @@ inline void load_construct_data(
     // Retrieve data from archive required to construct new instance
     AbstractCellPopulation<DIM>* p_cell_population;
     ar >> p_cell_population;
-    std::vector<AbstractCaUpdateRule<DIM>*> update_rule_collection;
-    ar >> update_rule_collection;
 
     // Invoke inplace constructor to initialise instance
-    ::new(t)CaBasedSimulation<DIM>(*p_cell_population, update_rule_collection, false, false, true, false);
+    ::new(t)CaBasedSimulation<DIM>(*p_cell_population, false, false, true, false);
 }
 }
 } // namespace

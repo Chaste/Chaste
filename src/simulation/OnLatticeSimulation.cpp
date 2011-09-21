@@ -87,14 +87,12 @@ void OnLatticeSimulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractPottsUpda
     mpStaticCastCellPopulation->AddUpdateRule(pUpdateRule);
 }
 
-
 template<unsigned DIM>
 void OnLatticeSimulation<DIM>::OutputSimulationParameters(out_stream& rParamsFile)
 {
     // Call method on direct parent class
     AbstractCellBasedSimulation<DIM>::OutputSimulationParameters(rParamsFile);
 }
-
 
 /////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation

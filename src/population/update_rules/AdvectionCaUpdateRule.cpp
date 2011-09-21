@@ -177,6 +177,16 @@ double AdvectionCaUpdateRule<DIM>::GetAdvectionSpeed()
     return mAdvectionSpeed;
 }
 
+template<unsigned DIM>
+void AdvectionCaUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
+{
+    *rParamsFile << "\t\t\t<AdvectionDirection>" << mAdvectionDirection << "</AdvectionDirection> \n";
+    *rParamsFile << "\t\t\t<AdvectionSpeed>" << mAdvectionSpeed << "</AdvectionSpeed> \n";
+
+    // Call method on direct parent class
+    AbstractCaUpdateRule<DIM>::OutputUpdateRuleParameters(rParamsFile);
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////

@@ -495,6 +495,9 @@ VertexMesh<DIM,DIM>* PottsBasedCellPopulation<DIM>::GetElementTessellation()
 template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
+    *rParamsFile << "\t\t<Temperature>" << mTemperature << "</Temperature> \n";
+    *rParamsFile << "\t\t<UpdateNodesInRandomOrder>" << mUpdateNodesInRandomOrder << "</UpdateNodesInRandomOrder> \n";
+      
     // Call method on direct parent class
     AbstractCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);
 }

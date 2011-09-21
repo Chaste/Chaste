@@ -1,5 +1,5 @@
-		<Temperature>0.1</Temperature> 
-		<UpdateNodesInRandomOrder>1</UpdateNodesInRandomOrder> 
+		<OnlyUseNearestNeighboursForDivision>0</OnlyUseNearestNeighboursForDivision> 
+		<UseVonNeumannNeighbourhoods>0</UseVonNeumannNeighbourhoods> 
 		<DampingConstantNormal>1</DampingConstantNormal>
 		<DampingConstantMutant>1</DampingConstantMutant>
 		<OutputCellIdData>1</OutputCellIdData> 

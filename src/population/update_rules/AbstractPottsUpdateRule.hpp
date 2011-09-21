@@ -31,7 +31,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
-
 #include "PottsBasedCellPopulation.hpp"
 #include "Identifiable.hpp"
 
@@ -48,12 +47,7 @@ class AbstractPottsUpdateRule : public Identifiable
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
-     * Serialize the object and its member variables.
-     *
-     * Serialization of singleton objects must be done with care.
-     * Before the object is serialized via a pointer, it *MUST* be
-     * serialized directly, or an assertion will trip when a second
-     * instance of the class is created on de-serialization.
+     * Serialize the object.
      *
      * @param archive the archive
      * @param version the current version of this class

@@ -1422,8 +1422,11 @@ public:
         out_stream parameter_file = output_file_handler.OpenOutputFile("results.parameters");
 
         // Write cell population parameters to file
-        TS_ASSERT_THROWS_THIS(cell_population.OutputCellPopulationParameters(parameter_file),"OutputCellPopulationParameters() is not yet implemented for CaBasedCellPopulation see #1453");
+        cell_population.OutputCellPopulationParameters(parameter_file);
         parameter_file->close();
+
+        // Compare output with saved files of what they should look like
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.parameters    notforrelease_cell_based/test/data/TestCaBasedCellPopulationWriters/results.parameters").c_str()), 0);
     }
 
     void TestValidateCaBasedCellPopulation()

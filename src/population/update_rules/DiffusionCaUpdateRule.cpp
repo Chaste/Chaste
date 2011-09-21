@@ -87,6 +87,15 @@ double DiffusionCaUpdateRule<DIM>::GetDiffusionConstant()
     return mDiffusionConstant;
 }
 
+template<unsigned DIM>
+void DiffusionCaUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
+{
+    *rParamsFile << "\t\t\t<DiffusionConstant>" << mDiffusionConstant << "</DiffusionConstant> \n";
+
+    // Call method on direct parent class
+    AbstractCaUpdateRule<DIM>::OutputUpdateRuleParameters(rParamsFile);
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////

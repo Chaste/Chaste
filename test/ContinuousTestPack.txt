@@ -6,7 +6,7 @@ mesh/TestPottsMeshReader.hpp
 odes/TestDeltaNotchOdeSystem.hpp
 population/TestForcesNotForRelease.hpp
 population/TestCaBasedCellPopulation.hpp
-population/TestCaBasedUpdateRules.hpp
+population/TestCaUpdateRules.hpp
 population/TestNodeBasedCellPopulationWithBuskeUpdate.hpp
 population/TestPottsBasedCellPopulation.hpp
 population/TestPottsUpdateRules.hpp

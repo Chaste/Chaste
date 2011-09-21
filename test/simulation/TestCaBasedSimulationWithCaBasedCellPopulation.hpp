@@ -124,15 +124,14 @@ public:
         // Create a cell population
         CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
-        // Create a UpdateRule system
-        DiffusionCaUpdateRule<2> update_rule;
-        std::vector<AbstractCaUpdateRule<2>* > update_rule_collection;
-        update_rule_collection.push_back(&update_rule);
-
         // Set up cell-based simulation
-        CaBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        CaBasedSimulation<2> simulator(cell_population);
         simulator.SetDt(1);
         simulator.SetEndTime(20);
+
+        // Pass an update rule to the simulation
+        MAKE_PTR(DiffusionCaUpdateRule<2>, p_update_rule);
+        simulator.AddUpdateRule(p_update_rule);
 
         TS_ASSERT_THROWS_THIS(simulator.Solve(), "OutputDirectory not set");
         CellBasedEventHandler::Reset();
@@ -179,11 +178,8 @@ public:
         // Create a cell population
         CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
-        // Create an empty UpdateRule system so only movement from cell birth
-        std::vector<AbstractCaUpdateRule<2>* > update_rule_collection;
-
         // Set up cell-based simulation
-        CaBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        CaBasedSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestCellsDividing");
         simulator.SetDt(1);
         simulator.SetEndTime(50);
@@ -215,16 +211,15 @@ public:
         // Create a cell population
         CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
-        // Create a UpdateRule system
-        DiffusionCaUpdateRule<2> update_rule;
-        std::vector<AbstractCaUpdateRule<2>* > update_rule_collection;
-        update_rule_collection.push_back(&update_rule);
-
         // Set up cell-based simulation
-        CaBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        CaBasedSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDiffusionOfLargeNumberOfCells");
         simulator.SetDt(0.1);
         simulator.SetEndTime(5.0);
+
+        // Pass an update rule to the simulation
+        MAKE_PTR(DiffusionCaUpdateRule<2>, p_update_rule);
+        simulator.AddUpdateRule(p_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -253,16 +248,15 @@ public:
         // Create a cell population
         CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
-        // Create a UpdateRule system
-        DiffusionCaUpdateRule<2> update_rule;
-        std::vector<AbstractCaUpdateRule<2>* > update_rule_collection;
-        update_rule_collection.push_back(&update_rule);
-
         // Set up cell-based simulation
-        CaBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        CaBasedSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDiffusionAndDeathOfLargeNumberOfCells");
         simulator.SetDt(0.1);
         simulator.SetEndTime(10);
+
+        // Pass an update rule to the simulation
+        MAKE_PTR(DiffusionCaUpdateRule<2>, p_update_rule);
+        simulator.AddUpdateRule(p_update_rule);
 
         // Create cell killer and pass in to simulation
         MAKE_PTR_ARGS(RandomCellKiller<2>, p_killer, (&cell_population, 0.005));
@@ -295,16 +289,15 @@ public:
         // Create a cell population
         CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
-        // Create a UpdateRule system
-        DiffusionCaUpdateRule<2> update_rule;
-        std::vector<AbstractCaUpdateRule<2>*> update_rule_collection;
-        update_rule_collection.push_back(&update_rule);
-
         // Set up cell-based simulation
-        CaBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        CaBasedSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDiffusionAndDivisionOfLargeNumberOfCells");
         simulator.SetDt(0.1);
         simulator.SetEndTime(10);
+
+        // Pass an update rule to the simulation
+        MAKE_PTR(DiffusionCaUpdateRule<2>, p_update_rule);
+        simulator.AddUpdateRule(p_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -340,18 +333,19 @@ public:
         // Create a cell population
         CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
-        // Create a UpdateRule system
-        DiffusionCaUpdateRule<2> diffusion_update_rule;
-        AdvectionCaUpdateRule<2> advection_update_rule(7, 2.0);
-        std::vector<AbstractCaUpdateRule<2>*> update_rule_collection;
-        update_rule_collection.push_back(&diffusion_update_rule);
-        update_rule_collection.push_back(&advection_update_rule);
-
         // Set up cell-based simulation
-        CaBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        CaBasedSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDiffusionAndAdvectionAndDivision");
         simulator.SetDt(0.1);
         simulator.SetEndTime(10);
+
+        // Pass an update rule to the simulation
+        MAKE_PTR(DiffusionCaUpdateRule<2>, p_update_rule);
+        simulator.AddUpdateRule(p_update_rule);
+        
+        // Pass another update rule to the simulation
+        MAKE_PTR_ARGS(AdvectionCaUpdateRule<2>, p_update_rule2, (7, 2.0));
+        simulator.AddUpdateRule(p_update_rule2);
 
         // Run simulation
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
@@ -378,28 +372,27 @@ public:
         // Create cell population
         CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
-        // Create multiple advection update rules, one for each firection
-        std::vector<AbstractCaUpdateRule<2>*> update_rule_collection;
-        AdvectionCaUpdateRule<2> update_rule_0(0, 1.0);
-        AdvectionCaUpdateRule<2> update_rule_1(1, 1.0);
-        AdvectionCaUpdateRule<2> update_rule_2(2, 1.0);
-        AdvectionCaUpdateRule<2> update_rule_3(3, 1.0);
-        AdvectionCaUpdateRule<2> update_rule_4(4, 1.0);
-        AdvectionCaUpdateRule<2> update_rule_5(5, 1.0);
-        AdvectionCaUpdateRule<2> update_rule_6(6, 1.0);
-        AdvectionCaUpdateRule<2> update_rule_7(7, 1.0);
-        update_rule_collection.push_back(&update_rule_0);
-        update_rule_collection.push_back(&update_rule_1);
-        update_rule_collection.push_back(&update_rule_2);
-        update_rule_collection.push_back(&update_rule_3);
-        update_rule_collection.push_back(&update_rule_4);
-        update_rule_collection.push_back(&update_rule_5);
-        update_rule_collection.push_back(&update_rule_6);
-        update_rule_collection.push_back(&update_rule_7);
-
         // Set up cell-based simulation
-        CaBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        CaBasedSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestMultipleAdvectionCaUpdateRules");
+
+        // Pass multiple advection update rules to the simulation, one for each direction
+        MAKE_PTR_ARGS(AdvectionCaUpdateRule<2>, p_update_rule0, (0, 1.0));
+        MAKE_PTR_ARGS(AdvectionCaUpdateRule<2>, p_update_rule1, (1, 1.0));
+        MAKE_PTR_ARGS(AdvectionCaUpdateRule<2>, p_update_rule2, (2, 1.0));
+        MAKE_PTR_ARGS(AdvectionCaUpdateRule<2>, p_update_rule3, (3, 1.0));
+        MAKE_PTR_ARGS(AdvectionCaUpdateRule<2>, p_update_rule4, (4, 1.0));
+        MAKE_PTR_ARGS(AdvectionCaUpdateRule<2>, p_update_rule5, (5, 1.0));
+        MAKE_PTR_ARGS(AdvectionCaUpdateRule<2>, p_update_rule6, (6, 1.0));
+        MAKE_PTR_ARGS(AdvectionCaUpdateRule<2>, p_update_rule7, (7, 1.0));
+        simulator.AddUpdateRule(p_update_rule0);
+        simulator.AddUpdateRule(p_update_rule1);
+        simulator.AddUpdateRule(p_update_rule2);
+        simulator.AddUpdateRule(p_update_rule3);
+        simulator.AddUpdateRule(p_update_rule4);
+        simulator.AddUpdateRule(p_update_rule5);
+        simulator.AddUpdateRule(p_update_rule6);
+        simulator.AddUpdateRule(p_update_rule7);
 
         /*
          * Set the time step to be large enough to guarantee that the cell moves
@@ -441,18 +434,19 @@ public:
         // Create a cell population
         CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
-        // Create two update rules
-        DiffusionCaUpdateRule<2> diffusion_update_rule(1.0); // unit diffusion coefficient
-        AdvectionCaUpdateRule<2> advection_update_rule(0, 1.0); // flow upward with unit mean speed
-        std::vector<AbstractCaUpdateRule<2>*> update_rule_collection;
-        update_rule_collection.push_back(&diffusion_update_rule);
-        update_rule_collection.push_back(&advection_update_rule);
-
         // Set up cell-based simulation
-        CaBasedSimulation<2> simulator(cell_population, update_rule_collection, true, true);
+        CaBasedSimulation<2> simulator(cell_population, true, true);
         simulator.SetOutputDirectory("TestRandomIterationOverUpdateRules");
         simulator.SetDt(0.1);
         simulator.SetEndTime(5.0);
+
+        // Pass an update rule to the simulation
+        MAKE_PTR_ARGS(DiffusionCaUpdateRule<2>, p_update_rule, (1.0)); // unit diffusion coefficient
+        simulator.AddUpdateRule(p_update_rule);
+        
+        // Pass another update rule to the simulation
+        MAKE_PTR_ARGS(AdvectionCaUpdateRule<2>, p_update_rule2, (0, 1.0)); // flow upward with unit mean speed
+        simulator.AddUpdateRule(p_update_rule2);
 
         // Run simulation
         simulator.Solve();
@@ -489,16 +483,15 @@ public:
         CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
         cell_population.SetOutputCellCyclePhases(true);
 
-        // Create a UpdateRule system
-        DiffusionCaUpdateRule<2> update_rule;
-        std::vector<AbstractCaUpdateRule<2>* > update_rule_collection;
-        update_rule_collection.push_back(&update_rule);
-
         // Set up cell-based simulation
-        CaBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        CaBasedSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("CaBasedStandardResult");
         simulator.SetDt(0.1);
         simulator.SetEndTime(8.0);
+
+        // Pass an update rule to the simulation
+        MAKE_PTR(DiffusionCaUpdateRule<2>, p_update_rule);
+        simulator.AddUpdateRule(p_update_rule);
 
         // Create cell killer and pass in to simulation
         MAKE_PTR_ARGS(RandomCellKiller<2>, p_killer, (&cell_population, 0.005));
@@ -561,15 +554,14 @@ public:
         CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
         cell_population.SetOutputCellCyclePhases(true);
 
-        // Create a UpdateRule system
-        DiffusionCaUpdateRule<2> update_rule;
-        std::vector<AbstractCaUpdateRule<2>* > update_rule_collection;
-        update_rule_collection.push_back(&update_rule);
-
         // Set up cell-based simulation
-        CaBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        CaBasedSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("CaBasedSaveAndLoad");
         simulator.SetDt(0.1);
+
+        // Pass an update rule to the simulation
+        MAKE_PTR(DiffusionCaUpdateRule<2>, p_update_rule);
+        simulator.AddUpdateRule(p_update_rule);
 
         // Our full end time is 8.0, here we run until 3.0 then load and run more below
         simulator.SetEndTime(3.0);
@@ -663,21 +655,20 @@ public:
         // Create a cell population
         CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
-        // Create a UpdateRule system
-        DiffusionCaUpdateRule<2> update_rule;
-        std::vector<AbstractCaUpdateRule<2>* > update_rule_collection;
-        update_rule_collection.push_back(&update_rule);
-
         // Set up cell-based simulation
-        CaBasedSimulation<2> simulator(cell_population, update_rule_collection);
+        CaBasedSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDiffusionOfLargeNumberOfCells");
         simulator.SetDt(0.1);
         simulator.SetEndTime(5.0);
 
+        // Pass an update rule to the simulation
+        MAKE_PTR(DiffusionCaUpdateRule<2>, p_update_rule);
+        simulator.AddUpdateRule(p_update_rule);
+
         // Test that the simulation parameters are output correctly
-        std::string output_directory = "TestCellBasedSimulationOutputParameters";
+        std::string output_directory = "TestCaBasedSimulationOutputParameters";
         OutputFileHandler output_file_handler(output_directory, false);
-        out_stream parameter_file = output_file_handler.OpenOutputFile("results.parameters");
+        out_stream parameter_file = output_file_handler.OpenOutputFile("ca_simulation_results.parameters");
 
         // Try to write simulation parameters to file
         TS_ASSERT_THROWS_THIS(simulator.OutputSimulationParameters(parameter_file),"OutputSimulationParameters() is not yet implemented for CaBasedSimulation see #1453");
