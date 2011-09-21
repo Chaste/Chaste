@@ -34,7 +34,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <cassert>
 #include <vector>
 
-#include "Exception.hpp"
 #include "AbstractMeshReader.hpp"
 
 /**

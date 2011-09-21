@@ -27,7 +27,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "AdvectionCaUpdateRule.hpp"
-
 #include "Exception.hpp"
 #include "RandomNumberGenerator.hpp"
 

@@ -31,7 +31,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CellwiseData.hpp"
 #include "CellCycleModelOdeSolver.hpp"
 #include "CvodeAdaptor.hpp"
-#include "PetscTools.hpp"
+#include "Exception.hpp"
 
 DeltaNotchCellCycleModel::DeltaNotchCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : CellCycleModelOdeHandler(DOUBLE_UNSET, pOdeSolver)
