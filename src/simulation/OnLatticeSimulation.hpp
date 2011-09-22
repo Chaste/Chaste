@@ -80,13 +80,14 @@ protected:
     }
 
     /**
-     * Overridden this UpdateCellLocationsAndTopology method.
+     * Overridden UpdateCellLocationsAndTopology() method.
      *
-     * In On lattice simulations this method performs the monte carlo sampling.
+     * In on-lattice simulations this method performs Monte Carlo sampling.
      */
-    virtual void UpdateCellLocationsAndTopology();
+    void UpdateCellLocationsAndTopology();
 
 public:
+
     /**
      * Constructor.
      *
@@ -97,15 +98,6 @@ public:
     OnLatticeSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
                          bool deleteCellPopulationAndCellKillersInDestructor=false,
                          bool initialiseCells=true);
-
-    /**
-     * Destructor.
-     *
-     * This frees the Forces and Boundary Conditions, if they were created by de-serialization.
-     */
-    virtual ~OnLatticeSimulation()
-    {
-    }
 
     /**
      * Add an update rule to be used in this simulation (use this to set the Hamiltonian).

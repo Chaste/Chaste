@@ -75,10 +75,16 @@ private:
     /** The rules used to determine the new locations of cells. */
     std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > > mUpdateRuleCollection;
 
-    /** Whether to iterate randomly over mUpdateRuleCollection when updating cell locations. */
+    /**
+     * Whether to iterate randomly over mUpdateRuleCollection when updating cell locations.
+     * Defaults to false in the constructor.
+     */
     bool mIterateRandomlyOverUpdateRuleCollection;
 
-    /** Whether to iterate randomly over cells when updating cell locations. */
+    /**
+     * Whether to iterate randomly over cells when updating cell locations.
+     * Defaults to false in the constructor.
+     */
     bool mIterateRandomlyOverCells;
 
     /**
@@ -94,6 +100,19 @@ private:
      */
     void UpdateCellLocations();
 
+    /**
+     * Overridden UpdateCellPopulation() method.
+     * Calls the deaths, births and (if mUpdateCellPopulation is true) CellPopulation::Update() methods.
+     * Does nothing if at the start of a simulation that has just been loaded, to ensure consistency
+     * in random number generation.
+     */
+    void UpdateCellPopulation();
+
+    /**
+     * Overridden UpdateCellLocationsAndTopology() method.
+     */
+    void UpdateCellLocationsAndTopology();
+
 public:
 
     /**
@@ -102,35 +121,12 @@ public:
      * @param rCellPopulation A cell population object
      * @param iterateRandomlyOverUpdateRuleCollection whether to iterate randomly over
      *        mUpdateRuleCollection when updating cell locations (defaults to false)
-     * @param iterateRandomlyOverCells whether to iterate randomly over cells when
-     *        updating cell locations (defaults to false)
-     * @param deleteCellPopulationInDestructor Whether to delete the cell population and force
-     *        collection on destruction to free up memory (defaults to false)
      * @param initialiseCells whether to initialise cells (defaults to true, set to
      *        false when loading from an archive)
      */
     CaBasedSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
-                      bool iterateRandomlyOverUpdateRuleCollection=false,
-                      bool iterateRandomlyOverCells=false,
                       bool deleteCellPopulationInDestructor=false,
                       bool initialiseCells=true);
-
-    /**
-     * Destructor.
-     */
-    ~CaBasedSimulation();
-
-    /**
-     * Main solve method.
-     *
-     * This method sets up the simulation time, creates output files, and initialises the
-     * cell population. It then iterates through a time loop. At each time step, first any cell death
-     * or birth is implemented, then the cell population topology is updated, then the update rule is
-     * recalculated and the cell population evolved according to whatever update rules are present in
-     * the simulation, and finally the results for that time step are output to file. At the
-     * end of the time loop, the method closes any output files.
-     */
-    void Solve();
 
     /**
      * @return const reference to mUpdateRuleCollection (used in archiving).
@@ -148,21 +144,25 @@ public:
     void OutputSimulationParameters(out_stream& rParamsFile);
 
     /**
-     * Overridden UpdateCellLocationsAndTopology mehtod needed as its pure virtual in
-     * AbstractCellBasedSimulation.
-     *
-     * This does nothing here as there is an overridden solve method.
-     */
-    void UpdateCellLocationsAndTopology()
-    {
-    }
-
-    /**
      * Add an update rule to be used in this simulation.
      *
      * @param pUpdateRule shared pointer to a CA update rule law
      */
     void AddUpdateRule(boost::shared_ptr<AbstractCaUpdateRule<DIM> > pUpdateRule);
+
+    /**
+     * Set mIterateRandomlyOverUpdateRuleCollection.
+     * 
+     * @param iterateRandomly whether to iterate randomly over mUpdateRuleCollection
+     */
+    void SetIterateRandomlyOverUpdateRuleCollection(bool iterateRandomly);
+
+    /**
+     * Set mIterateRandomlyOverUpdateRuleCollection.
+     * 
+     * @param iterateRandomly whether to iterate randomly over cells
+     */
+    void SetIterateRandomlyOverCells(bool iterateRandomly);
 };
 
 // Declare identifier for the serializer
@@ -197,7 +197,7 @@ inline void load_construct_data(
     ar >> p_cell_population;
 
     // Invoke inplace constructor to initialise instance
-    ::new(t)CaBasedSimulation<DIM>(*p_cell_population, false, false, true, false);
+    ::new(t)CaBasedSimulation<DIM>(*p_cell_population, true, false);
 }
 }
 } // namespace

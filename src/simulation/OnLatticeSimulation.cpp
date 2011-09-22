@@ -56,9 +56,7 @@ void OnLatticeSimulation<DIM>::UpdateCellLocationsAndTopology()
 {
     std::vector<c_vector<double, DIM> > forces(1, zero_vector<double>(DIM));
 
-    ////////////////////////////
     // Update node positions
-    ////////////////////////////
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::POSITION);
     this->mrCellPopulation.UpdateNodeLocations(forces, this->mDt);
     CellBasedEventHandler::EndEvent(CellBasedEventHandler::POSITION);
@@ -69,13 +67,12 @@ void OnLatticeSimulation<DIM>::OutputAdditionalSimulationSetup(out_stream& rPara
 {
     std::vector<boost::shared_ptr<AbstractPottsUpdateRule<DIM> > > update_rule_collection = mpStaticCastCellPopulation->rGetUpdateRuleCollection();
 
-    // Loop over UpdateRules
+    // Loop over the collection of update rules and output info for each
     *rParamsFile << "\n\t<UpdateRules>\n";
     for (typename std::vector<boost::shared_ptr<AbstractPottsUpdateRule<DIM> > >::iterator iter = update_rule_collection.begin();
          iter != update_rule_collection.end();
          ++iter)
     {
-        // Output update rule details
         (*iter)->OutputUpdateRuleInfo(rParamsFile);
     }
     *rParamsFile << "\t</UpdateRules>\n";

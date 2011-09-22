@@ -32,24 +32,29 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 template<unsigned DIM>
 CaBasedSimulation<DIM>::CaBasedSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
-                  bool iterateRandomlyOverUpdateRuleCollection,
-                  bool iterateRandomlyOverCells,
-                  bool deleteCellPopulationInDestructor,
-                  bool initialiseCells)
+                                          bool deleteCellPopulationInDestructor,
+                                          bool initialiseCells)
     : AbstractCellBasedSimulation<DIM>(rCellPopulation,
-                  deleteCellPopulationInDestructor,
-                  initialiseCells),
-    mIterateRandomlyOverUpdateRuleCollection(iterateRandomlyOverUpdateRuleCollection),
-    mIterateRandomlyOverCells(iterateRandomlyOverCells)
+                                       deleteCellPopulationInDestructor,
+                                       initialiseCells)
 {
+    mIterateRandomlyOverUpdateRuleCollection = false;
+    mIterateRandomlyOverCells = false;
+    
     assert(dynamic_cast<CaBasedCellPopulation<DIM>*>(&rCellPopulation));
-
     mpStaticCastCellPopulation = static_cast<CaBasedCellPopulation<DIM>*>(&this->mrCellPopulation);
 }
 
 template<unsigned DIM>
-CaBasedSimulation<DIM>::~CaBasedSimulation()
+void CaBasedSimulation<DIM>::SetIterateRandomlyOverUpdateRuleCollection(bool iterateRandomly)
 {
+    mIterateRandomlyOverUpdateRuleCollection = iterateRandomly;
+}
+
+template<unsigned DIM>
+void CaBasedSimulation<DIM>::SetIterateRandomlyOverCells(bool iterateRandomly)
+{
+    mIterateRandomlyOverCells = iterateRandomly;
 }
 
 template<unsigned DIM>
@@ -60,7 +65,7 @@ c_vector<double, DIM> CaBasedSimulation<DIM>::CalculateCellDivisionVector(CellPt
 }
 
 template<unsigned DIM>
-void CaBasedSimulation<DIM>::UpdateCellLocations()
+void CaBasedSimulation<DIM>::UpdateCellLocationsAndTopology()
 {
     // Iterate over contributions from each UpdateRule
     if (mIterateRandomlyOverUpdateRuleCollection)
@@ -127,161 +132,6 @@ void CaBasedSimulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractCaUpdateRul
     mUpdateRuleCollection.push_back(pUpdateRule);
 }
 
-///\todo Much of this code can probably merged with OffLatticeSimulation::Solve()
-template<unsigned DIM>
-void CaBasedSimulation<DIM>::Solve()
-{
-    CellBasedEventHandler::BeginEvent(CellBasedEventHandler::EVERYTHING);
-    CellBasedEventHandler::BeginEvent(CellBasedEventHandler::SETUP);
-
-    // Set up the simulation time
-    SimulationTime* p_simulation_time = SimulationTime::Instance();
-    double current_time = p_simulation_time->GetTime();
-
-    unsigned num_time_steps = (unsigned) ((this->mEndTime-current_time)/this->mDt+0.5);
-
-    if (current_time > 0) // use the reset function if necessary
-    {
-        p_simulation_time->ResetEndTimeAndNumberOfTimeSteps(this->mEndTime, num_time_steps);
-    }
-    else
-    {
-        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(this->mEndTime, num_time_steps);
-    }
-
-    if (this->mOutputDirectory == "")
-    {
-        EXCEPTION("OutputDirectory not set");
-    }
-
-    double time_now = p_simulation_time->GetTime();
-    std::ostringstream time_string;
-    time_string << time_now;
-
-    std::string results_directory = this->mOutputDirectory +"/results_from_time_" + time_string.str();
-    this->mSimulationOutputDirectory = results_directory;
-
-    ///////////////////////////////////////////////////////////
-    // Set up Simulation
-    ///////////////////////////////////////////////////////////
-
-    // Create output files for the visualizer
-    OutputFileHandler output_file_handler(results_directory+"/", true);
-
-    this->mrCellPopulation.CreateOutputFiles(results_directory+"/", false);
-
-    this->mpVizSetupFile = output_file_handler.OpenOutputFile("results.vizsetup");
-
-    this->SetupSolve();
-
-    // Age the cells to the correct time. Note that cells are created with
-    // negative birth times so that some are initially almost ready to divide.
-    LOG(1, "Setting up cells...");
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mrCellPopulation.Begin();
-         cell_iter != this->mrCellPopulation.End();
-         ++cell_iter)
-    {
-        // We don't use the result; this call is just to force the cells to age
-        // to the current time running their cell-cycle models to get there
-        cell_iter->ReadyToDivide();
-    }
-    LOG(1, "\tdone\n");
-
-    // Write initial conditions to file for the visualizer
-    this->WriteVisualizerSetupFile();
-
-    *this->mpVizSetupFile << std::flush;
-
-    this->mrCellPopulation.WriteResultsToFiles();
-
-    CellBasedEventHandler::EndEvent(CellBasedEventHandler::SETUP);
-
-    /////////////////////////////////////////////////////////////////////
-    // Main time loop
-    /////////////////////////////////////////////////////////////////////
-
-    while ((p_simulation_time->GetTimeStepsElapsed() < num_time_steps) && !(this->StoppingEventHasOccurred()) )
-    {
-        LOG(1, "--TIME = " << p_simulation_time->GetTime() << "\n");
-
-        /*
-         * If mInitialiseCells is false, then the simulation has been loaded from an archive.
-         * In this case, we should not call UpdateCellPopulation() at the first time step. This is
-         * because it will have already been called at the final time step prior to saving;
-         * if we were to call it again now, then we would have introduced an extra call to
-         * the random number generator compared to if we had not saved and loaded the simulation,
-         * thus affecting results. This would be bad - we don't want saving and loading to have
-         * any effect on the course of a simulation! See #1445.
-         */
-        bool update_cell_population_this_timestep = true;
-        if (!this->mInitialiseCells && (p_simulation_time->GetTimeStepsElapsed() == 0))
-        {
-            update_cell_population_this_timestep = false;
-        }
-
-        if (update_cell_population_this_timestep)
-        {
-            /**
-             * This function calls:
-             * DoCellRemoval()
-             * DoCellBirth()
-             * CellPopulation::Update()
-             */
-            this->UpdateCellPopulation();
-        }
-
-        //////////////////////////////////////////////////////
-        // Calculate Cell Movements and Update Cell Locations
-        //////////////////////////////////////////////////////
-        CellBasedEventHandler::BeginEvent(CellBasedEventHandler::POSITION);
-        UpdateCellLocations();
-        CellBasedEventHandler::EndEvent(CellBasedEventHandler::POSITION);
-
-        //////////////////////////////////////////
-        // PostSolve, which may be implemented by
-        // child classes (eg to solve PDEs)
-        //////////////////////////////////////////
-        this->PostSolve();
-
-        // Increment simulation time here, so results files look sensible
-        p_simulation_time->IncrementTimeOneStep();
-
-        ////////////////////////////
-        // Output current results
-        ////////////////////////////
-        CellBasedEventHandler::BeginEvent(CellBasedEventHandler::OUTPUT);
-
-        // Write results to file
-        if (p_simulation_time->GetTimeStepsElapsed()%this->mSamplingTimestepMultiple==0)
-        {
-            this->mrCellPopulation.WriteResultsToFiles();
-        }
-
-        CellBasedEventHandler::EndEvent(CellBasedEventHandler::OUTPUT);
-    }
-
-    LOG(1, "--END TIME = " << SimulationTime::Instance()->GetTime() << "\n");
-
-    /*
-     * Carry out a final update so that cell population is coherent with new cell positions.
-     * NB cell birth/death still need to be checked because they may be spatially-dependent.
-     */
-    this->UpdateCellPopulation();
-
-    this->AfterSolve();
-
-    CellBasedEventHandler::BeginEvent(CellBasedEventHandler::OUTPUT);
-
-    this->mrCellPopulation.CloseOutputFiles();
-
-    *this->mpVizSetupFile << "Complete\n";
-    this->mpVizSetupFile->close();
-
-    CellBasedEventHandler::EndEvent(CellBasedEventHandler::OUTPUT);
-
-    CellBasedEventHandler::EndEvent(CellBasedEventHandler::EVERYTHING);
-}
-
 template<unsigned DIM>
 const std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > > CaBasedSimulation<DIM>::rGetUpdateRuleCollection() const
 {
@@ -291,11 +141,35 @@ const std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > > CaBasedSimulat
 template<unsigned DIM>
 void CaBasedSimulation<DIM>::OutputSimulationParameters(out_stream& rParamsFile)
 {
-    // Currently this is not called from CaBasedSimulation; see #1453 for a discussion on this for centre- and vertex-based cell population.
-    EXCEPTION("OutputSimulationParameters() is not yet implemented for CaBasedSimulation see #1453");
+    *rParamsFile << "\t\t<IterateRandomlyOverUpdateRuleCollection>" << mIterateRandomlyOverUpdateRuleCollection << "</IterateRandomlyOverUpdateRuleCollection>\n";
+    *rParamsFile << "\t\t<IterateRandomlyOverCells>" << mIterateRandomlyOverCells << "</IterateRandomlyOverCells>\n";
 
     // Call method on direct parent class
-    //OffLatticeSimulation<DIM>::OutputSimulationParameters(rParamsFile);
+    AbstractCellBasedSimulation<DIM>::OutputSimulationParameters(rParamsFile);
+}
+
+template<unsigned DIM>
+void CaBasedSimulation<DIM>::UpdateCellPopulation()
+{
+    /*
+     * If mInitialiseCells is false, then the simulation has been loaded from an archive.
+     * In this case, we should not call UpdateCellPopulation() at the first time step. This is
+     * because it will have already been called at the final time step prior to saving;
+     * if we were to call it again now, then we would have introduced an extra call to
+     * the random number generator compared to if we had not saved and loaded the simulation,
+     * thus affecting results. This would be bad - we don't want saving and loading to have
+     * any effect on the course of a simulation! See #1445.
+     */
+    bool update_cell_population_this_timestep = true;
+    if (!this->mInitialiseCells && (SimulationTime::Instance()->GetTimeStepsElapsed() == 0))
+    {
+        update_cell_population_this_timestep = false;
+    }
+
+    if (update_cell_population_this_timestep)
+    {
+        AbstractCellBasedSimulation<DIM>::UpdateCellPopulation();
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////

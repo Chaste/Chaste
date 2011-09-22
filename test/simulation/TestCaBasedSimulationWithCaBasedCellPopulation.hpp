@@ -435,10 +435,12 @@ public:
         CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Set up cell-based simulation
-        CaBasedSimulation<2> simulator(cell_population, true, true);
+        CaBasedSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestRandomIterationOverUpdateRules");
         simulator.SetDt(0.1);
         simulator.SetEndTime(5.0);
+        simulator.SetIterateRandomlyOverUpdateRuleCollection(true);
+        simulator.SetIterateRandomlyOverCells(true);
 
         // Pass an update rule to the simulation
         MAKE_PTR_ARGS(DiffusionCaUpdateRule<2>, p_update_rule, (1.0)); // unit diffusion coefficient
@@ -670,9 +672,11 @@ public:
         OutputFileHandler output_file_handler(output_directory, false);
         out_stream parameter_file = output_file_handler.OpenOutputFile("ca_simulation_results.parameters");
 
-        // Try to write simulation parameters to file
-        TS_ASSERT_THROWS_THIS(simulator.OutputSimulationParameters(parameter_file),"OutputSimulationParameters() is not yet implemented for CaBasedSimulation see #1453");
+        simulator.OutputSimulationParameters(parameter_file);
         parameter_file->close();
+
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "ca_simulation_results.parameters  notforrelease_cell_based/test/data/TestCaSimulationOutputParameters/ca_simulation_results.parameters").c_str()), 0);
     }
 };
 
