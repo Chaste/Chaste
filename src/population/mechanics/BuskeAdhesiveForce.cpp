@@ -115,7 +115,7 @@ double BuskeAdhesiveForce<DIM>::GetMagnitudeOfForce(double distanceBetweenNodes,
 template<unsigned DIM>
 void BuskeAdhesiveForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<AdhesionEnergyParameter>" << mAdhesionEnergyParameter << "</AdhesionEnergyParameter> \n";
+    *rParamsFile << "\t\t\t<AdhesionEnergyParameter>" << mAdhesionEnergyParameter << "</AdhesionEnergyParameter>\n";
 
     // Call method on direct parent class
     AbstractTwoBodyInteractionForce<DIM>::OutputForceParameters(rParamsFile);

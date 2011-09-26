@@ -34,6 +34,9 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CaBasedCellPopulation.hpp"
 #include "Identifiable.hpp"
 
+template<unsigned DIM>
+class CaBasedCellPopulation; // Circular definition
+
 /**
  * An abstract CA update rule class.
  */

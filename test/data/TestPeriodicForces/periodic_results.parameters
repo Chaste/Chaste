@@ -1,6 +1,6 @@
-			<MeinekeSpringStiffness>13</MeinekeSpringStiffness> 
-			<MeinekeDivisionRestingSpringLength>0.6</MeinekeDivisionRestingSpringLength> 
-			<MeinekeSpringGrowthDuration>2</MeinekeSpringGrowthDuration> 
-			<PeriodicDomainWidth>7.3</PeriodicDomainWidth> 
-			<UseCutOffLength>0</UseCutOffLength> 
-			<CutOffLength>1.79769e+308</CutOffLength> 
+			<MeinekeSpringStiffness>13</MeinekeSpringStiffness>
+			<MeinekeDivisionRestingSpringLength>0.6</MeinekeDivisionRestingSpringLength>
+			<MeinekeSpringGrowthDuration>2</MeinekeSpringGrowthDuration>
+			<PeriodicDomainWidth>7.3</PeriodicDomainWidth>
+			<UseCutOffLength>0</UseCutOffLength>
+			<CutOffLength>1.79769e+308</CutOffLength>

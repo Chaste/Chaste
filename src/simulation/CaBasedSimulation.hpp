@@ -43,8 +43,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
  template<unsigned DIM>
 class CaBasedSimulation : public AbstractCellBasedSimulation<DIM>
 {
-    // Allow tests to access private members, in order to test computation of
-    // private functions eg. DoCellBirth
+    // Allow tests to access private members, in order to test computation of private functions e.g. DoCellBirth()
     friend class TestCaBasedSimulationWithCaBasedCellPopulation;
 
 private:
@@ -60,8 +59,6 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        // If Archive is an output archive, then & resolves to <<
-        // If Archive is an input archive, then & resolves to >>
         archive & boost::serialization::base_object<AbstractCellBasedSimulation<DIM> >(*this);
 
         archive & mUpdateRuleCollection;
@@ -119,8 +116,8 @@ public:
      * Constructor.
      *
      * @param rCellPopulation A cell population object
-     * @param iterateRandomlyOverUpdateRuleCollection whether to iterate randomly over
-     *        mUpdateRuleCollection when updating cell locations (defaults to false)
+     * @param deleteCellPopulationInDestructor Whether to delete the cell population on destruction to
+     *     free up memory (defaults to false)
      * @param initialiseCells whether to initialise cells (defaults to true, set to
      *        false when loading from an archive)
      */

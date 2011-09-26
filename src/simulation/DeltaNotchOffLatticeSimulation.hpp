@@ -47,12 +47,7 @@ private :
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
-     * Archive the member variables.
-     *
-     * Serialization of singleton objects must be done with care.
-     * Before the object is serialized via a pointer, it *MUST* be
-     * serialized directly, or an assertion will trip when a second
-     * instance of the class is created on de-serialization.
+     * Archive the object and its member variables.
      *
      * @param archive the archive
      * @param version the current version of this class
@@ -63,23 +58,23 @@ private :
         archive & boost::serialization::base_object<OffLatticeSimulation<DIM> >(*this);
     }
 
-
     /**
-     *  Overridden PostSolve() method.
+     * Overridden PostSolve() method.
      */
     void PostSolve();
-
 
 public:
 
     /** The file that the values of beta catenin is written out to. */
 	out_stream mVizDeltaFile;
+
     /**
      * Default constructor.
      *
      * @param rCellPopulation A cell population facade class (contains a mesh and cells)
-     * @param deleteCellPopulationInDestructor whether to delete cell population and force collection.
-     * @param initialiseCells whether to initialise cells (set to false when loading from an archive)
+     * @param deleteCellPopulationInDestructor Whether to delete the cell population on destruction to
+     *     free up memory (defaults to false)
+     * @param initialiseCells whether to initialise cells (defaults to true, set to false when loading from an archive)
      */
      DeltaNotchOffLatticeSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
                                    bool deleteCellPopulationInDestructor=false,

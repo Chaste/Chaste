@@ -67,12 +67,7 @@ protected:
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
-     * Archive the member variables.
-     *
-     * Serialization of singleton objects must be done with care.
-     * Before the object is serialized via a pointer, it *MUST* be
-     * serialized directly, or an assertion will trip when a second
-     * instance of the class is created on de-serialization.
+     * Archive the object and its member variables.
      *
      * @param archive the archive
      * @param version the current version of this class
@@ -80,8 +75,6 @@ protected:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        // If Archive is an output archive, then & resolves to <<
-        // If Archive is an input archive, then & resolves to >>
         archive & boost::serialization::base_object<AbstractCellBasedSimulation<DIM> >(*this);
         archive & mOutputCellVelocities;
     }
@@ -99,8 +92,10 @@ public:
      * Constructor.
      *
      * @param rCellPopulation A cell population object
-     * @param deleteCellPopulationAndCellKillersInDestructor Whether to delete the cell population and cell killer collection on destruction to free up memory
-     * @param initialiseCells Whether to initialise cells (set to false when loading from an archive)
+     * @param deleteCellPopulationInDestructor Whether to delete the cell population on destruction to
+     *     free up memory (defaults to false)
+     * @param initialiseCells Whether to initialise cells (defaults to true, set to false when loading
+     * from an archive)
      */
     OnLatticeSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
                          bool deleteCellPopulationAndCellKillersInDestructor=false,
@@ -124,7 +119,6 @@ public:
      * @param outputCellVelocities the new value of mOutputCellVelocities
      */
     void SetOutputCellVelocities(bool outputCellVelocities);
-
 
     /**
      * Overridden SetupSolve() method to setup the cell velocities file.

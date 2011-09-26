@@ -26,8 +26,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#ifndef LATTICEBASEDCELLPOPULATION_HPP_
-#define LATTICEBASEDCELLPOPULATION_HPP_
+#ifndef CABASEDCELLPOPULATION_HPP_
+#define CABASEDCELLPOPULATION_HPP_
 
 #include <vector>
 #include <set>
@@ -44,9 +44,9 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "AbstractCellPopulation.hpp"
 #include "TetrahedralMesh.hpp"
-#include "Cell.hpp"
-#include "Node.hpp"
-#include "ChastePoint.hpp"
+
+template<unsigned DIM>
+class AbstractCaUpdateRule; // Circular definition
 
 /**
  * A facade class encapsulating a lattice-based cell population.
@@ -514,4 +514,4 @@ inline void load_construct_data(
 }
 } // namespace ...
 
-#endif /*LATTICEBASEDCELLPOPULATION_HPP_*/
+#endif /*CABASEDCELLPOPULATION_HPP_*/

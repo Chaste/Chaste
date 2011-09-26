@@ -1,12 +1,12 @@
-		<OnlyUseNearestNeighboursForDivision>0</OnlyUseNearestNeighboursForDivision> 
-		<UseVonNeumannNeighbourhoods>0</UseVonNeumannNeighbourhoods> 
+		<OnlyUseNearestNeighboursForDivision>0</OnlyUseNearestNeighboursForDivision>
+		<UseVonNeumannNeighbourhoods>0</UseVonNeumannNeighbourhoods>
 		<DampingConstantNormal>1</DampingConstantNormal>
 		<DampingConstantMutant>1</DampingConstantMutant>
-		<OutputCellIdData>1</OutputCellIdData> 
-		<OutputCellMutationStates>1</OutputCellMutationStates> 
-		<OutputCellAncestors>1</OutputCellAncestors> 
-		<OutputCellProliferativeTypes>1</OutputCellProliferativeTypes> 
-		<OutputCellVariables>1</OutputCellVariables> 
-		<OutputCellCyclePhases>1</OutputCellCyclePhases> 
-		<OutputCellAges>1</OutputCellAges> 
-		<OutputCellVolumes>1</OutputCellVolumes> 
+		<OutputCellIdData>1</OutputCellIdData>
+		<OutputCellMutationStates>1</OutputCellMutationStates>
+		<OutputCellAncestors>1</OutputCellAncestors>
+		<OutputCellProliferativeTypes>1</OutputCellProliferativeTypes>
+		<OutputCellVariables>1</OutputCellVariables>
+		<OutputCellCyclePhases>1</OutputCellCyclePhases>
+		<OutputCellAges>1</OutputCellAges>
+		<OutputCellVolumes>1</OutputCellVolumes>

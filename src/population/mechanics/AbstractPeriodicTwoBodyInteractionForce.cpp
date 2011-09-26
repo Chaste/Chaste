@@ -275,7 +275,7 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::SetPeriodicDomainDepth(double
 template<unsigned DIM>
 void AbstractPeriodicTwoBodyInteractionForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<PeriodicDomainWidth>" << mPeriodicDomainWidth << "</PeriodicDomainWidth> \n";
+    *rParamsFile << "\t\t\t<PeriodicDomainWidth>" << mPeriodicDomainWidth << "</PeriodicDomainWidth>\n";
 
     // Call method on direct parent class
     AbstractTwoBodyInteractionForce<DIM>::OutputForceParameters(rParamsFile);

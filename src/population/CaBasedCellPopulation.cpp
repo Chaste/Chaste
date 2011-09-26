@@ -899,8 +899,8 @@ double CaBasedCellPopulation<DIM>::GetDampingConstant(unsigned nodeIndex)
 template<unsigned DIM>
 void CaBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t<OnlyUseNearestNeighboursForDivision>" << mOnlyUseNearestNeighboursForDivision << "</OnlyUseNearestNeighboursForDivision> \n";
-    *rParamsFile << "\t\t<UseVonNeumannNeighbourhoods>" << mUseVonNeumannNeighbourhoods << "</UseVonNeumannNeighbourhoods> \n";
+    *rParamsFile << "\t\t<OnlyUseNearestNeighboursForDivision>" << mOnlyUseNearestNeighboursForDivision << "</OnlyUseNearestNeighboursForDivision>\n";
+    *rParamsFile << "\t\t<UseVonNeumannNeighbourhoods>" << mUseVonNeumannNeighbourhoods << "</UseVonNeumannNeighbourhoods>\n";
       
     // Call method on direct parent class
     AbstractCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);

@@ -210,7 +210,7 @@ public:
         }
     }
 
-    void TestCaUpdateRulesOutputParameters()
+    void TestUpdateRuleOutputUpdateRuleInfo()
     {
         std::string output_directory = "TestCaUpdateRulesOutputParameters";
         OutputFileHandler output_file_handler(output_directory, false);
@@ -220,7 +220,7 @@ public:
         TS_ASSERT_EQUALS(advection_update_rule.GetIdentifier(), "AdvectionCaUpdateRule-2");
 
         out_stream advection_update_rule_parameter_file = output_file_handler.OpenOutputFile("advection_update_rule_results.parameters");
-        advection_update_rule.OutputUpdateRuleParameters(advection_update_rule_parameter_file);
+        advection_update_rule.OutputUpdateRuleInfo(advection_update_rule_parameter_file);
         advection_update_rule_parameter_file->close();
 
         std::string advection_update_rule_results_dir = output_file_handler.GetOutputDirectoryFullPath();
@@ -231,7 +231,7 @@ public:
         TS_ASSERT_EQUALS(diffusion_update_rule.GetIdentifier(), "DiffusionCaUpdateRule-2");
 
         out_stream diffusion_update_rule_parameter_file = output_file_handler.OpenOutputFile("diffusion_update_rule_results.parameters");
-        diffusion_update_rule.OutputUpdateRuleParameters(diffusion_update_rule_parameter_file);
+        diffusion_update_rule.OutputUpdateRuleInfo(diffusion_update_rule_parameter_file);
         diffusion_update_rule_parameter_file->close();
 
         std::string diffusion_update_rule_results_dir = output_file_handler.GetOutputDirectoryFullPath();
