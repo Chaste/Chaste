@@ -66,6 +66,12 @@ protected:
      */
     std::vector<unsigned> mDeletedElementIndices;
 
+    /** Vector of set of VonNeuman Neighbours for each node. */
+    std::vector< std::set<unsigned> > mVonNeumannNeighbouringNodeIndices;
+
+    /** Vector of set of Moore Neighbours for each node. */
+    std::vector< std::set<unsigned> > mMooreNeighbouringNodeIndices;
+
     /**
      * Solve node mapping method. This overridden method is required
      * as it is pure virtual in the base class.
@@ -258,11 +264,7 @@ public:
     virtual double GetSurfaceAreaOfElement(unsigned index);
 
     /**
-     * Given a node, find a set containing the indices of its Moore neighbouring nodes.
-	 * This should be over-ridden in child classes to implement peroidicity etc.
-     *
-     * \todo this might be better to store as a look up table which is calculated
-     * in the constructor.
+     * Given a node, return a set containing the indices of its Moore neighbouring nodes.
      *
      * @param nodeIndex global index of the node
      * @return neighbouring node indices in Moore neighbourhood
@@ -270,16 +272,18 @@ public:
     std::set<unsigned> GetMooreNeighbouringNodeIndices(unsigned nodeIndex);
 
     /**
-     * Given a node, find a set containing the indices of its Von Neumann neighbouring nodes.
-     * This should be over-ridden in child classes to implement peroidicity etc.
-     *
-     * \todo this might be better to store as a look up table which is calculated
-     * in the constructor.
+     * Given a node, return a set containing the indices of its Von Neumann neighbouring nodes.
      *
      * @param nodeIndex global index of the node
      * @return neighbouring node indices in Von Neumann neighbourhood
      */
     std::set<unsigned> GetVonNeumannNeighbouringNodeIndices(unsigned nodeIndex);
+
+    /**
+     * Helper method to calculate the Noore and Von Neumann Neighbourhoods of all nodes
+     * This should be over-ridden in child classes to implement peroidicity etc.
+     */
+    void CaclulateNeighbouringNodeIndices();
 
     /**
      * Mark an element as deleted. Note that in a Potts mesh this does not
@@ -358,7 +362,7 @@ public:
          * @param skipDeletedElements whether to include deleted elements (defaults to true)
          */
         PottsElementIterator(PottsMesh<DIM>& rMesh,
-        		             typename std::vector<PottsElement<DIM> *>::iterator elementIter,
+                             typename std::vector<PottsElement<DIM> *>::iterator elementIter,
                              bool skipDeletedElements=true);
 
     private:
@@ -436,26 +440,26 @@ typename PottsMesh<DIM>::PottsElementIterator& PottsMesh<DIM>::PottsElementItera
 
 template<unsigned DIM>
 PottsMesh<DIM>::PottsElementIterator::PottsElementIterator(
-		PottsMesh<DIM>& rMesh,
-		typename std::vector<PottsElement<DIM>*>::iterator elementIter,
+        PottsMesh<DIM>& rMesh,
+        typename std::vector<PottsElement<DIM>*>::iterator elementIter,
         bool skipDeletedElements)
-	: mrMesh(rMesh),
-	  mElementIter(elementIter),
-	  mSkipDeletedElements(skipDeletedElements)
+    : mrMesh(rMesh),
+      mElementIter(elementIter),
+      mSkipDeletedElements(skipDeletedElements)
 {
-	if (mrMesh.mElements.empty())
-	{
-		// Cope with empty meshes
-		mElementIter = mrMesh.mElements.end();
-	}
-	else
-	{
-		// Make sure we start at an allowed element
-		if (mElementIter == mrMesh.mElements.begin() && !IsAllowedElement())
-		{
-			++(*this);
-		}
-	}
+    if (mrMesh.mElements.empty())
+    {
+        // Cope with empty meshes
+        mElementIter = mrMesh.mElements.end();
+    }
+    else
+    {
+        // Make sure we start at an allowed element
+        if (mElementIter == mrMesh.mElements.begin() && !IsAllowedElement())
+        {
+            ++(*this);
+        }
+    }
 }
 
 template<unsigned DIM>
