@@ -98,6 +98,68 @@ CaBasedCellPopulation<DIM>::~CaBasedCellPopulation()
 }
 
 template<unsigned DIM>
+void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
+{
+    // Iterate over contributions from each UpdateRule
+    if (this->mIterateRandomlyOverUpdateRuleCollection)
+    {
+        // Randomly permute mUpdateRuleCollection
+        std::random_shuffle(mUpdateRuleCollection.begin(), mUpdateRuleCollection.end());
+    }
+
+    for (typename std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > >::iterator update_iter = mUpdateRuleCollection.begin();
+         update_iter != mUpdateRuleCollection.end();
+         ++update_iter)
+    {
+        // Randomly permute cells
+        if (this->mUpdateNodesInRandomOrder)
+        {
+            std::vector<CellPtr> cells_vector;
+            for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+                 cell_iter != this->End();
+                 ++cell_iter)
+            {
+                cells_vector.push_back(*cell_iter);
+            }
+            std::random_shuffle(cells_vector.begin(), cells_vector.end());
+
+            for (unsigned i=0; i<cells_vector.size(); i++)
+            {
+                // Get index of the node associated with cell
+                unsigned current_location_index = this->GetLocationIndexUsingCell(cells_vector[i]);
+
+                assert(!this->IsEmptySite(current_location_index));
+
+                // Get index of node the cell is to move to
+                unsigned new_location_index = (*update_iter)->GetNewLocationOfCell(current_location_index, *this, dt);
+
+                // Update the location index of the cell and free the old site
+                this->MoveCell(cells_vector[i], new_location_index);
+            }
+        }
+        else
+        {
+            // Iterate over all cells and update their positions
+            for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+                 cell_iter != this->End();
+                 ++cell_iter)
+            {
+                // Get index of the node associated with cell
+                unsigned current_location_index = this->GetLocationIndexUsingCell(*cell_iter);
+
+                assert(!this->IsEmptySite(current_location_index));
+
+                // Get index of node the cell is to move to
+                unsigned new_location_index = (*update_iter)->GetNewLocationOfCell(current_location_index, *this, dt);
+
+                // Update the location index of the cell and free the old site
+                this->MoveCell(*cell_iter, new_location_index);
+            }
+        }
+    }
+}
+
+template<unsigned DIM>
 void CaBasedCellPopulation<DIM>::SetOnlyUseNearestNeighboursForDivision(bool onlyUseNearestNeighboursForDivision)
 {
     mOnlyUseNearestNeighboursForDivision = onlyUseNearestNeighboursForDivision;

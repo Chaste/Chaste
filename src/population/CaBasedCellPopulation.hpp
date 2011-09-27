@@ -171,6 +171,13 @@ public:
     const TetrahedralMesh<DIM, DIM>& rGetMesh() const;
 
     /**
+     * Overridden UpdateCellLocations() method.
+     *
+     * @param dt time step
+     */
+    void UpdateCellLocations(double dt);
+
+    /**
      * Set mOnlyUseNearestNeighboursForDivision.
      * 
      * @param onlyUseNearestNeighboursForDivision whether to only search the next nearest neighbours for an

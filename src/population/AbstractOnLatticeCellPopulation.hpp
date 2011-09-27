@@ -103,6 +103,17 @@ public:
     virtual ~AbstractOnLatticeCellPopulation();
 
     /**
+     * Update cell locations over the course of a time step of specified length.
+     * 
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
+     * @param dt time step
+     */
+    virtual void UpdateCellLocations(double dt)
+    {}
+
+    /**
      * Get whether we update nodes in a random order.
      * 
      * @return mUpdateNodesInRandomOrder

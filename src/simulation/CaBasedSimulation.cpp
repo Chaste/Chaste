@@ -27,8 +27,12 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "CaBasedSimulation.hpp"
+#include "PottsBasedCellPopulation.hpp"
+#include "CaBasedCellPopulation.hpp"
 #include "CellBasedEventHandler.hpp"
 #include "LogFile.hpp"
+#include "Version.hpp"
+#include "ExecutableSupport.hpp"
 
 template<unsigned DIM>
 CaBasedSimulation<DIM>::CaBasedSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
@@ -36,127 +40,164 @@ CaBasedSimulation<DIM>::CaBasedSimulation(AbstractCellPopulation<DIM>& rCellPopu
                                           bool initialiseCells)
     : AbstractCellBasedSimulation<DIM>(rCellPopulation,
                                        deleteCellPopulationInDestructor,
-                                       initialiseCells)
+                                       initialiseCells),
+      mOutputCellVelocities(false)
 {
-    assert(dynamic_cast<CaBasedCellPopulation<DIM>*>(&rCellPopulation));
-    mpStaticCastCellPopulation = static_cast<CaBasedCellPopulation<DIM>*>(&this->mrCellPopulation);
-}
-
-template<unsigned DIM>
-void CaBasedSimulation<DIM>::OutputAdditionalSimulationSetup(out_stream& rParamsFile)
-{
-    std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > > update_rule_collection = mpStaticCastCellPopulation->rGetUpdateRuleCollection();
-
-    // Loop over the collection of update rules and output info for each
-    *rParamsFile << "\n\t<UpdateRules>\n";
-    for (typename std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > >::iterator iter = update_rule_collection.begin();
-         iter != update_rule_collection.end();
-         ++iter)
+    if (!dynamic_cast<AbstractOnLatticeCellPopulation<DIM>*>(&rCellPopulation))
     {
-        (*iter)->OutputUpdateRuleInfo(rParamsFile);
+        EXCEPTION("OnLatticeSimulations require a subclass of AbstractOnLatticeCellPopulation.");
     }
-    *rParamsFile << "\t</UpdateRules>\n";
+
+    this->mDt = 1.0/120.0; // 30 seconds
 }
 
 template<unsigned DIM>
 void CaBasedSimulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractCaUpdateRule<DIM> > pUpdateRule)
 {
-    mpStaticCastCellPopulation->AddUpdateRule(pUpdateRule);
+    if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
+    {
+        static_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->AddUpdateRule(pUpdateRule);
+    }
 }
 
 template<unsigned DIM>
 void CaBasedSimulation<DIM>::UpdateCellLocationsAndTopology()
 {
-    std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > > update_rule_collection = mpStaticCastCellPopulation->rGetUpdateRuleCollection();
-    
-    // Iterate over contributions from each UpdateRule
-    if (mpStaticCastCellPopulation->GetIterateRandomlyOverUpdateRuleCollection())
+    // Store current locations of cell centres if required
+    std::vector<c_vector<double, DIM> > old_cell_locations;
+    unsigned num_cells = this->mrCellPopulation.GetNumRealCells();
+    old_cell_locations.reserve(num_cells);
+    if (mOutputCellVelocities)
     {
-        // Randomly permute mUpdateRuleCollection
-        std::random_shuffle(update_rule_collection.begin(), update_rule_collection.end());
+        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mrCellPopulation.Begin();
+             cell_iter != this->mrCellPopulation.End();
+             ++cell_iter)
+        {
+            unsigned index = this->mrCellPopulation.GetLocationIndexUsingCell(*cell_iter);
+            old_cell_locations[index] = this->mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
+        }
     }
 
-    for (typename std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > >::iterator update_iter = update_rule_collection.begin();
-         update_iter != update_rule_collection.end();
-         ++update_iter)
+    // Update cell locations
+    CellBasedEventHandler::BeginEvent(CellBasedEventHandler::POSITION);
+    static_cast<AbstractOnLatticeCellPopulation<DIM>*>(&(this->mrCellPopulation))->UpdateCellLocations(this->GetDt());
+    CellBasedEventHandler::EndEvent(CellBasedEventHandler::POSITION);
+
+    // Write cell velocities to file if required
+    if (mOutputCellVelocities)
     {
-        // Randomly permute cells
-        if (mpStaticCastCellPopulation->GetUpdateNodesInRandomOrder())
+        if (SimulationTime::Instance()->GetTimeStepsElapsed()%this->mSamplingTimestepMultiple == 0)
         {
-            std::vector<CellPtr> cells_vector;
+            *mpCellVelocitiesFile << SimulationTime::Instance()->GetTime() << "\t";
+
             for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mrCellPopulation.Begin();
                  cell_iter != this->mrCellPopulation.End();
                  ++cell_iter)
             {
-                cells_vector.push_back(*cell_iter);
+                unsigned index = this->mrCellPopulation.GetLocationIndexUsingCell(*cell_iter);
+                const c_vector<double,DIM>& position = this->mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
+                c_vector<double, DIM> velocity = (position - old_cell_locations[index])/this->mDt;
+
+                *mpCellVelocitiesFile << index  << " ";
+                for (unsigned i=0; i<DIM; i++)
+                {
+                    *mpCellVelocitiesFile << position[i] << " ";
+                }
+                for (unsigned i=0; i<DIM; i++)
+                {
+                    *mpCellVelocitiesFile << velocity[i] << " ";
+                }
             }
-            std::random_shuffle(cells_vector.begin(), cells_vector.end());
-
-            for (unsigned i=0; i<cells_vector.size(); i++)
-            {
-                // Get index of the node associated with cell
-                unsigned current_location_index = this->mrCellPopulation.GetLocationIndexUsingCell(cells_vector[i]);
-
-                assert(mpStaticCastCellPopulation->IsEmptySite(current_location_index) == false);
-
-                // Get index of node the cell is to move to
-                unsigned new_location_index = (*update_iter)->GetNewLocationOfCell(current_location_index, *mpStaticCastCellPopulation, this->GetDt());
-
-                // Update the location index of the cell and free the old site
-                mpStaticCastCellPopulation->MoveCell(cells_vector[i], new_location_index);
-            }
-        }
-        else
-        {
-            // Iterate over all cells and update their positions
-            for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mrCellPopulation.Begin();
-                 cell_iter != this->mrCellPopulation.End();
-                 ++cell_iter)
-            {
-                // Get index of the node associated with cell
-                unsigned current_location_index = this->mrCellPopulation.GetLocationIndexUsingCell(*cell_iter);
-
-                assert(mpStaticCastCellPopulation->IsEmptySite(current_location_index) == false);
-
-                // Get index of node the cell is to move to
-                unsigned new_location_index = (*update_iter)->GetNewLocationOfCell(current_location_index, *mpStaticCastCellPopulation, this->GetDt());
-
-                // Update the location index of the cell and free the old site
-                mpStaticCastCellPopulation->MoveCell(*cell_iter, new_location_index);
-            }
+            *mpCellVelocitiesFile << "\n";
         }
     }
 }
 
 template<unsigned DIM>
-void CaBasedSimulation<DIM>::OutputSimulationParameters(out_stream& rParamsFile)
+void CaBasedSimulation<DIM>::SetupSolve()
 {
-    // Call method on direct parent class
-    AbstractCellBasedSimulation<DIM>::OutputSimulationParameters(rParamsFile);
+    if (mOutputCellVelocities)
+    {
+        OutputFileHandler output_file_handler(this->mSimulationOutputDirectory+"/", false);
+        mpCellVelocitiesFile = output_file_handler.OpenOutputFile("cellvelocities.dat");
+    }
+}
+
+template<unsigned DIM>
+void CaBasedSimulation<DIM>::AfterSolve()
+{
+    if (mOutputCellVelocities)
+    {
+        mpCellVelocitiesFile->close();
+    }
+}
+
+template<unsigned DIM>
+bool CaBasedSimulation<DIM>::GetOutputCellVelocities()
+{
+    return mOutputCellVelocities;
+}
+
+template<unsigned DIM>
+void CaBasedSimulation<DIM>::SetOutputCellVelocities(bool outputCellVelocities)
+{
+    mOutputCellVelocities = outputCellVelocities;
 }
 
 template<unsigned DIM>
 void CaBasedSimulation<DIM>::UpdateCellPopulation()
 {
-    /*
-     * If mInitialiseCells is false, then the simulation has been loaded from an archive.
-     * In this case, we should not call UpdateCellPopulation() at the first time step. This is
-     * because it will have already been called at the final time step prior to saving;
-     * if we were to call it again now, then we would have introduced an extra call to
-     * the random number generator compared to if we had not saved and loaded the simulation,
-     * thus affecting results. This would be bad - we don't want saving and loading to have
-     * any effect on the course of a simulation! See #1445.
-     */
-    bool update_cell_population_this_timestep = true;
-    if (!this->mInitialiseCells && (SimulationTime::Instance()->GetTimeStepsElapsed() == 0))
+    if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
     {
-        update_cell_population_this_timestep = false;
+        /*
+         * If mInitialiseCells is false, then the simulation has been loaded from an archive.
+         * In this case, we should not call UpdateCellPopulation() at the first time step. This is
+         * because it will have already been called at the final time step prior to saving;
+         * if we were to call it again now, then we would have introduced an extra call to
+         * the random number generator compared to if we had not saved and loaded the simulation,
+         * thus affecting results. This would be bad - we don't want saving and loading to have
+         * any effect on the course of a simulation! See #1445.
+         */
+        bool update_cell_population_this_timestep = true;
+        if (!this->mInitialiseCells && (SimulationTime::Instance()->GetTimeStepsElapsed() == 0))
+        {
+            update_cell_population_this_timestep = false;
+        }
+    
+        if (update_cell_population_this_timestep)
+        {
+            AbstractCellBasedSimulation<DIM>::UpdateCellPopulation();
+        }
     }
+}
 
-    if (update_cell_population_this_timestep)
+template<unsigned DIM>
+void CaBasedSimulation<DIM>::OutputAdditionalSimulationSetup(out_stream& rParamsFile)
+{
+    // Loop over the collection of update rules and output info for each
+    *rParamsFile << "\n\t<UpdateRules>\n";
+    if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
     {
-        AbstractCellBasedSimulation<DIM>::UpdateCellPopulation();
+        std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > > collection = 
+            static_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->rGetUpdateRuleCollection();
+
+        for (typename std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > >::iterator iter = collection.begin();
+             iter != collection.end();
+             ++iter)
+        {
+            (*iter)->OutputUpdateRuleInfo(rParamsFile);
+        }
     }
+    *rParamsFile << "\t</UpdateRules>\n";
+}
+
+template<unsigned DIM>
+void CaBasedSimulation<DIM>::OutputSimulationParameters(out_stream& rParamsFile)
+{
+    *rParamsFile << "\t\t<OutputCellVelocities>" << mOutputCellVelocities << "</OutputCellVelocities>\n";
+
+    // Call method on direct parent class
+    AbstractCellBasedSimulation<DIM>::OutputSimulationParameters(rParamsFile);
 }
 
 /////////////////////////////////////////////////////////////////////////////

@@ -148,11 +148,6 @@ public:
         simulator.Solve();
 
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 2u);
-
-        // Coverage of CalculateCellDivisionVector()
-        c_vector<double, 2> cell_division_vector = simulator.CalculateCellDivisionVector(*(cell_population.Begin()));
-        TS_ASSERT_DELTA(cell_division_vector[0], 0.000, 1e-4);
-        TS_ASSERT_DELTA(cell_division_vector[1], 0.000, 1e-4);
     }
 
     void TestCellsDividing() throw (Exception)
@@ -467,7 +462,7 @@ public:
         // Test final position of first cell
         AbstractCellPopulation<2>::Iterator cell_iter_final = simulator.rGetCellPopulation().Begin();
         c_vector<double, 2> cell_location_final = simulator.rGetCellPopulation().GetLocationOfCellCentre(*cell_iter_final);
-        TS_ASSERT_DELTA(cell_location_final[0], 1.000, 1e-4);
+        TS_ASSERT_DELTA(cell_location_final[0], 0.000, 1e-4);
         TS_ASSERT_DELTA(cell_location_final[1], 3.000, 1e-4);
     }
 

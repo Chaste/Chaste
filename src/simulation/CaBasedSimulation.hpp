@@ -33,23 +33,29 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractCellBasedSimulation.hpp"
-#include "CaBasedCellPopulation.hpp"
+#include "AbstractCaUpdateRule.hpp"
 
 /**
- * A lattice-based cell-based simulation object.
+ * Run an on-lattice 2D or 3D cell-based simulation.
+ *
+ * The OnLatticeSimulation is constructed with a CellPopulation, which
+ * updates the correspondence between each Cell and its spatial representation
+ * and handles cell division (governed by the CellCycleModel associated
+ * with each cell). Once constructed, one or more Update rules may be passed
+ * to the OnLatticeSimulation object, to define the processes which update
+ * cells in the CellPopulation. Similarly, one or more CellKillers may be passed
+ * to the OnLatticeSimulation object to specify conditions in which Cells
+ * may die.
  */
- template<unsigned DIM>
+template<unsigned DIM>
 class CaBasedSimulation : public AbstractCellBasedSimulation<DIM>
 {
-    // Allow tests to access private members, in order to test computation of private functions e.g. DoCellBirth()
-    friend class TestCaBasedSimulationWithCaBasedCellPopulation;
-
 private:
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
-     * Serialize the object and its member variables.
+     * Serialize the object and any member variables.
      *
      * @param archive the archive
      * @param version the current version of this class
@@ -58,22 +64,23 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractCellBasedSimulation<DIM> >(*this);
+        archive & mOutputCellVelocities;
     }
 
-    /** Helper member that is a static cast of the cell population. */
-    CaBasedCellPopulation<DIM>* mpStaticCastCellPopulation;
-
     /**
-     * Move each cell to a new lattice site for this timestep by calling the
-     * CellPopulation method MoveCell().
+     * Whether to write the cell velocities to a file.
+     * Initialised to false in constuctor.
      */
-    void UpdateCellLocations();
+    bool mOutputCellVelocities;
+
+    /** Results file cell velocities. */
+    out_stream mpCellVelocitiesFile;
 
     /**
      * Overridden UpdateCellPopulation() method.
      * Calls the deaths, births and (if mUpdateCellPopulation is true) CellPopulation::Update() methods.
-     * Does nothing if at the start of a simulation that has just been loaded, to ensure consistency
-     * in random number generation.
+     * If using a CaBasedCellPopulation, this method does nothing if at the start of a simulation that
+     * has just been loaded, to ensure consistency in random number generation.
      */
     void UpdateCellPopulation();
 
@@ -90,8 +97,8 @@ public:
      * @param rCellPopulation A cell population object
      * @param deleteCellPopulationInDestructor Whether to delete the cell population on destruction to
      *     free up memory (defaults to false)
-     * @param initialiseCells whether to initialise cells (defaults to true, set to
-     *        false when loading from an archive)
+     * @param initialiseCells Whether to initialise cells (defaults to true, set to false when loading
+     * from an archive)
      */
     CaBasedSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
                       bool deleteCellPopulationInDestructor=false,
@@ -105,7 +112,30 @@ public:
     void AddUpdateRule(boost::shared_ptr<AbstractCaUpdateRule<DIM> > pUpdateRule);
 
     /**
-     * Overridden OutputAdditionalSimulationSetup method to output the force and cell
+     * Overridden OutputAdditionalSimulationSetup() method.
+     * Outputs the update rule information.
+     */
+    bool GetOutputCellVelocities();
+
+    /**
+     * Set mOutputCellVelocities.
+     *
+     * @param outputCellVelocities the new value of mOutputCellVelocities
+     */
+    void SetOutputCellVelocities(bool outputCellVelocities);
+
+    /**
+     * Overridden SetupSolve() method to set up the cell velocities file.
+     */
+    virtual void SetupSolve();
+
+    /**
+     * Overridden AfterSolve() method to close the cell velocities file.
+     */
+    virtual void AfterSolve();
+
+    /**
+     * Overridden OutputAdditionalSimulationSetup() method to output the force and cell
      * population boundary condition information.
      *
      * @param rParamsFile the file stream to which the parameters are output
@@ -113,10 +143,7 @@ public:
     void OutputAdditionalSimulationSetup(out_stream& rParamsFile);
 
     /**
-     * Outputs simulation parameters to file
-     *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses. Currently not used for Ca Based Simulations.
+     * Overridden OutputSimulationParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
