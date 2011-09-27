@@ -92,7 +92,7 @@ public:
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestRepresentativeCaBasedSimulationForProfiling");
+        simulator.SetOutputDirectory("TestRepresentativePottsBasedSimulationForProfiling");
         simulator.SetDt(0.1);
         simulator.SetEndTime(10);
 
@@ -100,7 +100,7 @@ public:
         MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
         p_volume_constraint_update_rule->SetMatureCellTargetVolume(16);
         p_volume_constraint_update_rule->SetDeformationEnergyParameter(0.2);
-        simulator.AddUpdateRule(p_volume_constraint_update_rule);
+        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
 
         MAKE_PTR(DifferentialAdhesionPottsUpdateRule<2>, p_differential_adhesion_update_rule);
         p_differential_adhesion_update_rule->SetLabelledCellLabelledCellAdhesionEnergyParameter(0.16);
@@ -108,7 +108,7 @@ public:
         p_differential_adhesion_update_rule->SetCellCellAdhesionEnergyParameter(0.02);
         p_differential_adhesion_update_rule->SetLabelledCellBoundaryAdhesionEnergyParameter(0.16);
         p_differential_adhesion_update_rule->SetCellBoundaryAdhesionEnergyParameter(0.16);
-        simulator.AddUpdateRule(p_differential_adhesion_update_rule);
+        simulator.AddPottsUpdateRule(p_differential_adhesion_update_rule);
 
         // Run simulation
         simulator.Solve();

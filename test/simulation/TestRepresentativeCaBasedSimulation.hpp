@@ -33,7 +33,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 // Must be included before other cell_based headers
 #include "CellBasedSimulationArchiver.hpp"
 
-#include "CaBasedSimulation.hpp"
+#include "OnLatticeSimulation.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "CaBasedCellPopulation.hpp"
@@ -78,7 +78,7 @@ public:
         CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Set up cell-based simulation
-        CaBasedSimulation<2> simulator(cell_population);
+        OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestRepresentativeCaBasedSimulationForProfiling");
         simulator.SetEndTime(50);
 

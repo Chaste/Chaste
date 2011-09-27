@@ -33,6 +33,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractCellBasedSimulation.hpp"
+#include "AbstractCaUpdateRule.hpp"
 #include "AbstractPottsUpdateRule.hpp"
 
 /**
@@ -55,7 +56,7 @@ protected:
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
-     * Archive the object and its member variables.
+     * Serialize the object and any member variables.
      *
      * @param archive the archive
      * @param version the current version of this class
@@ -67,9 +68,6 @@ protected:
         archive & mOutputCellVelocities;
     }
 
-    /** Helper member that is a static cast of the cell population. */
-    PottsBasedCellPopulation<DIM>* mpStaticCastCellPopulation;
-
     /**
      * Whether to write the cell velocities to a file.
      * Initialised to false in constuctor.
@@ -79,13 +77,13 @@ protected:
     /** Results file cell velocities. */
     out_stream mpCellVelocitiesFile;
 
-//    /**
-//     * Overridden UpdateCellPopulation() method.
-//     * 
-//     * If using a CaBasedCellPopulation, this method does nothing if at the start of a simulation that
-//     * has just been loaded, to ensure consistency in random number generation.
-//     */
-//    void UpdateCellPopulation();
+    /**
+     * Overridden UpdateCellPopulation() method.
+     * 
+     * If using a CaBasedCellPopulation, this method does nothing if at the start of a simulation that
+     * has just been loaded, to ensure consistency in random number generation.
+     */
+    void UpdateCellPopulation();
 
     /**
      * Overridden UpdateCellLocationsAndTopology() method.
@@ -110,11 +108,18 @@ public:
                         bool initialiseCells=true);
 
     /**
+     * Add an update rule to be used in this simulation.
+     *
+     * @param pUpdateRule shared pointer to a CA update rule law
+     */
+    void AddCaUpdateRule(boost::shared_ptr<AbstractCaUpdateRule<DIM> > pUpdateRule);
+
+    /**
      * Add an update rule to be used in this simulation (use this to set the Hamiltonian).
      *
      * @param pUpdateRule shared pointer to a Potts update rule law
      */
-    void AddUpdateRule(boost::shared_ptr<AbstractPottsUpdateRule<DIM> > pUpdateRule);
+    void AddPottsUpdateRule(boost::shared_ptr<AbstractPottsUpdateRule<DIM> > pUpdateRule);
 
     /**
      * Overridden OutputAdditionalSimulationSetup() method.

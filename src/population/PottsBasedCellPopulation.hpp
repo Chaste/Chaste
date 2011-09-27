@@ -246,12 +246,11 @@ public:
     unsigned RemoveDeadCells();
 
     /**
-     * Overridden UpdateNodeLocations() method.
+     * Overridden UpdateCellLocations() method.
      *
-     * @param rNodeForces a vector containing the force on each node in the cell population
-     * @param dt the time step
+     * @param dt time step
      */
-    void UpdateNodeLocations(const std::vector< c_vector<double, DIM> >& rNodeForces, double dt);
+    void UpdateCellLocations(double dt);
 
     /**
      * Overridden IsCellAssociatedWithADeletedLocation() method.

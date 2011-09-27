@@ -26,8 +26,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#ifndef TESTCABASEDIMULATIONWITHCABASEDCELLPOPULATION_HPP_
-#define TESTCABASEDIMULATIONWITHCABASEDCELLPOPULATION_HPP_
+#ifndef TESTONLATTICESIMULATIONWITHCABASEDCELLPOPULATION_HPP_
+#define TESTONLATTICESIMULATIONWITHCABASEDCELLPOPULATION_HPP_
 
 #include <cxxtest/TestSuite.h>
 
@@ -35,7 +35,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CellBasedSimulationArchiver.hpp"
 
 #include "CellsGenerator.hpp"
-#include "CaBasedSimulation.hpp"
+#include "OnLatticeSimulation.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "CaBasedCellPopulation.hpp"
 #include "DiffusionCaUpdateRule.hpp"
@@ -47,7 +47,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CellBasedEventHandler.hpp"
 #include "SmartPointers.hpp"
 
-class TestCaBasedSimulationWithCaBasedCellPopulation : public AbstractCellBasedTestSuite
+class TestOnLatticeSimulationWithCaBasedCellPopulation : public AbstractCellBasedTestSuite
 {
 private:
 
@@ -127,13 +127,13 @@ public:
         cell_population.SetUpdateNodesInRandomOrder(false);
 
         // Set up cell-based simulation
-        CaBasedSimulation<2> simulator(cell_population);
+        OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetDt(1);
         simulator.SetEndTime(20);
 
         // Pass an update rule to the simulation
         MAKE_PTR(DiffusionCaUpdateRule<2>, p_update_rule);
-        simulator.AddUpdateRule(p_update_rule);
+        simulator.AddCaUpdateRule(p_update_rule);
 
         TS_ASSERT_THROWS_THIS(simulator.Solve(), "OutputDirectory not set");
         CellBasedEventHandler::Reset();
@@ -178,7 +178,7 @@ public:
         cell_population.SetUpdateNodesInRandomOrder(false);
 
         // Set up cell-based simulation
-        CaBasedSimulation<2> simulator(cell_population);
+        OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestCellsDividing");
         simulator.SetDt(1);
         simulator.SetEndTime(50);
@@ -213,14 +213,14 @@ public:
         cell_population.SetUpdateNodesInRandomOrder(false);
 
         // Set up cell-based simulation
-        CaBasedSimulation<2> simulator(cell_population);
+        OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDiffusionOfLargeNumberOfCells");
         simulator.SetDt(0.1);
         simulator.SetEndTime(5.0);
 
         // Pass an update rule to the simulation
         MAKE_PTR(DiffusionCaUpdateRule<2>, p_update_rule);
-        simulator.AddUpdateRule(p_update_rule);
+        simulator.AddCaUpdateRule(p_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -252,14 +252,14 @@ public:
         cell_population.SetUpdateNodesInRandomOrder(false);
 
         // Set up cell-based simulation
-        CaBasedSimulation<2> simulator(cell_population);
+        OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDiffusionAndDeathOfLargeNumberOfCells");
         simulator.SetDt(0.1);
         simulator.SetEndTime(10);
 
         // Pass an update rule to the simulation
         MAKE_PTR(DiffusionCaUpdateRule<2>, p_update_rule);
-        simulator.AddUpdateRule(p_update_rule);
+        simulator.AddCaUpdateRule(p_update_rule);
 
         // Create cell killer and pass in to simulation
         MAKE_PTR_ARGS(RandomCellKiller<2>, p_killer, (&cell_population, 0.005));
@@ -293,14 +293,14 @@ public:
         CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
         // Set up cell-based simulation
-        CaBasedSimulation<2> simulator(cell_population);
+        OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDiffusionAndDivisionOfLargeNumberOfCells");
         simulator.SetDt(0.1);
         simulator.SetEndTime(10);
 
         // Pass an update rule to the simulation
         MAKE_PTR(DiffusionCaUpdateRule<2>, p_update_rule);
-        simulator.AddUpdateRule(p_update_rule);
+        simulator.AddCaUpdateRule(p_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -339,18 +339,18 @@ public:
         cell_population.SetUpdateNodesInRandomOrder(false);
 
         // Set up cell-based simulation
-        CaBasedSimulation<2> simulator(cell_population);
+        OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDiffusionAndAdvectionAndDivision");
         simulator.SetDt(0.1);
         simulator.SetEndTime(10);
 
         // Pass an update rule to the simulation
         MAKE_PTR(DiffusionCaUpdateRule<2>, p_update_rule);
-        simulator.AddUpdateRule(p_update_rule);
+        simulator.AddCaUpdateRule(p_update_rule);
         
         // Pass another update rule to the simulation
         MAKE_PTR_ARGS(AdvectionCaUpdateRule<2>, p_update_rule2, (7, 2.0));
-        simulator.AddUpdateRule(p_update_rule2);
+        simulator.AddCaUpdateRule(p_update_rule2);
 
         // Run simulation
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
@@ -380,7 +380,7 @@ public:
         cell_population.SetUpdateNodesInRandomOrder(false);
 
         // Set up cell-based simulation
-        CaBasedSimulation<2> simulator(cell_population);
+        OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestMultipleAdvectionCaUpdateRules");
 
         // Pass multiple advection update rules to the simulation, one for each direction
@@ -392,14 +392,14 @@ public:
         MAKE_PTR_ARGS(AdvectionCaUpdateRule<2>, p_update_rule5, (5, 1.0));
         MAKE_PTR_ARGS(AdvectionCaUpdateRule<2>, p_update_rule6, (6, 1.0));
         MAKE_PTR_ARGS(AdvectionCaUpdateRule<2>, p_update_rule7, (7, 1.0));
-        simulator.AddUpdateRule(p_update_rule0);
-        simulator.AddUpdateRule(p_update_rule1);
-        simulator.AddUpdateRule(p_update_rule2);
-        simulator.AddUpdateRule(p_update_rule3);
-        simulator.AddUpdateRule(p_update_rule4);
-        simulator.AddUpdateRule(p_update_rule5);
-        simulator.AddUpdateRule(p_update_rule6);
-        simulator.AddUpdateRule(p_update_rule7);
+        simulator.AddCaUpdateRule(p_update_rule0);
+        simulator.AddCaUpdateRule(p_update_rule1);
+        simulator.AddCaUpdateRule(p_update_rule2);
+        simulator.AddCaUpdateRule(p_update_rule3);
+        simulator.AddCaUpdateRule(p_update_rule4);
+        simulator.AddCaUpdateRule(p_update_rule5);
+        simulator.AddCaUpdateRule(p_update_rule6);
+        simulator.AddCaUpdateRule(p_update_rule7);
 
         /*
          * Set the time step to be large enough to guarantee that the cell moves
@@ -443,18 +443,18 @@ public:
         cell_population.SetIterateRandomlyOverUpdateRuleCollection(true);
 
         // Set up cell-based simulation
-        CaBasedSimulation<2> simulator(cell_population);
+        OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestRandomIterationOverUpdateRules");
         simulator.SetDt(0.1);
         simulator.SetEndTime(5.0);
 
         // Pass an update rule to the simulation
         MAKE_PTR_ARGS(DiffusionCaUpdateRule<2>, p_update_rule, (1.0)); // unit diffusion coefficient
-        simulator.AddUpdateRule(p_update_rule);
+        simulator.AddCaUpdateRule(p_update_rule);
         
         // Pass another update rule to the simulation
         MAKE_PTR_ARGS(AdvectionCaUpdateRule<2>, p_update_rule2, (0, 1.0)); // flow upward with unit mean speed
-        simulator.AddUpdateRule(p_update_rule2);
+        simulator.AddCaUpdateRule(p_update_rule2);
 
         // Run simulation
         simulator.Solve();
@@ -494,14 +494,14 @@ public:
         cell_population.SetUpdateNodesInRandomOrder(false);
 
         // Set up cell-based simulation
-        CaBasedSimulation<2> simulator(cell_population);
+        OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("CaBasedStandardResult");
         simulator.SetDt(0.1);
         simulator.SetEndTime(8.0);
 
         // Pass an update rule to the simulation
         MAKE_PTR(DiffusionCaUpdateRule<2>, p_update_rule);
-        simulator.AddUpdateRule(p_update_rule);
+        simulator.AddCaUpdateRule(p_update_rule);
 
         // Create cell killer and pass in to simulation
         MAKE_PTR_ARGS(RandomCellKiller<2>, p_killer, (&cell_population, 0.005));
@@ -567,13 +567,13 @@ public:
         cell_population.SetUpdateNodesInRandomOrder(false);
 
         // Set up cell-based simulation
-        CaBasedSimulation<2> simulator(cell_population);
+        OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("CaBasedSaveAndLoad");
         simulator.SetDt(0.1);
 
         // Pass an update rule to the simulation
         MAKE_PTR(DiffusionCaUpdateRule<2>, p_update_rule);
-        simulator.AddUpdateRule(p_update_rule);
+        simulator.AddCaUpdateRule(p_update_rule);
 
         // Our full end time is 8.0, here we run until 3.0 then load and run more below
         simulator.SetEndTime(3.0);
@@ -588,16 +588,16 @@ public:
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 98u);
 
         // Save the results
-        CellBasedSimulationArchiver<2, CaBasedSimulation<2> >::Save(&simulator);
+        CellBasedSimulationArchiver<2, OnLatticeSimulation<2> >::Save(&simulator);
     }
 
     // Testing Load (based on previous two tests)
     void TestLoad() throw (Exception)
     {
         // Load the simulation from the TestSave method above and run it from 3.0 to 6.0
-        CaBasedSimulation<2>* p_simulator1;
+        OnLatticeSimulation<2>* p_simulator1;
 
-        p_simulator1 = CellBasedSimulationArchiver<2, CaBasedSimulation<2> >::Load("CaBasedSaveAndLoad", 3.0);
+        p_simulator1 = CellBasedSimulationArchiver<2, OnLatticeSimulation<2> >::Load("CaBasedSaveAndLoad", 3.0);
 
         TS_ASSERT_EQUALS(p_simulator1->rGetCellPopulation().GetNumRealCells(), 98u);
         TS_ASSERT_DELTA(p_simulator1->GetDt(), 0.1, 1e-6);
@@ -609,9 +609,9 @@ public:
         TetrahedralMesh<2,2>& r_mesh1 = (static_cast<CaBasedCellPopulation<2>*>(&(p_simulator1->rGetCellPopulation())))->rGetMesh();
 
         // Save then reload, compare meshes either side
-        CellBasedSimulationArchiver<2, CaBasedSimulation<2> >::Save(p_simulator1);
+        CellBasedSimulationArchiver<2, OnLatticeSimulation<2> >::Save(p_simulator1);
 
-        CaBasedSimulation<2>* p_simulator2 = CellBasedSimulationArchiver<2, CaBasedSimulation<2> >::Load("CaBasedSaveAndLoad", 6.0);
+        OnLatticeSimulation<2>* p_simulator2 = CellBasedSimulationArchiver<2, OnLatticeSimulation<2> >::Load("CaBasedSaveAndLoad", 6.0);
         TetrahedralMesh<2,2>& r_mesh2 = (static_cast<CaBasedCellPopulation<2>*>(&(p_simulator2->rGetCellPopulation())))->rGetMesh();
 
         CompareMeshes(&r_mesh1, &r_mesh2);
@@ -670,18 +670,17 @@ public:
         cell_population.SetUpdateNodesInRandomOrder(false);
 
         // Set up cell-based simulation
-        CaBasedSimulation<2> simulator(cell_population);
+        OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDiffusionOfLargeNumberOfCells");
         simulator.SetDt(0.1);
         simulator.SetEndTime(5.0);
         
-
         // Pass an update rule to the simulation
         MAKE_PTR(DiffusionCaUpdateRule<2>, p_update_rule);
-        simulator.AddUpdateRule(p_update_rule);
+        simulator.AddCaUpdateRule(p_update_rule);
 
         // Test that the simulation parameters are output correctly
-        std::string output_directory = "TestCaBasedSimulationOutputParameters";
+        std::string output_directory = "TestOnLatticeSimulationOutputParameters";
         OutputFileHandler output_file_handler(output_directory, false);
         out_stream parameter_file = output_file_handler.OpenOutputFile("ca_simulation_results.parameters");
 

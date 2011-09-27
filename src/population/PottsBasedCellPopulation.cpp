@@ -191,7 +191,7 @@ unsigned PottsBasedCellPopulation<DIM>::RemoveDeadCells()
 }
 
 template<unsigned DIM>
-void PottsBasedCellPopulation<DIM>::UpdateNodeLocations(const std::vector< c_vector<double, DIM> >& rNodeForces, double dt)
+void PottsBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
 {
     /*
      * This method implements a Monte Carlo method to update the cell population.
