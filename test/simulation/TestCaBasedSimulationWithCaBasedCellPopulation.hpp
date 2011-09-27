@@ -453,11 +453,11 @@ public:
         // Run simulation
         simulator.Solve();
 
-        // Test final position of cell
-        AbstractCellPopulation<2>::Iterator cell_iter = simulator.rGetCellPopulation().Begin();
-        c_vector<double, 2> cell_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(*cell_iter);
-        TS_ASSERT_DELTA(cell_location[0], 0.000, 1e-4);
-        TS_ASSERT_DELTA(cell_location[1], 3.000, 1e-4);
+        // Test final position of first cell
+        AbstractCellPopulation<2>::Iterator cell_iter_final = simulator.rGetCellPopulation().Begin();
+        c_vector<double, 2> cell_location_final = simulator.rGetCellPopulation().GetLocationOfCellCentre(*cell_iter_final);
+        TS_ASSERT_DELTA(cell_location_final[0], 1.000, 1e-4);
+        TS_ASSERT_DELTA(cell_location_final[1], 3.000, 1e-4);
     }
 
     void TestStandardResultForArchivingTestsBelow() throw (Exception)

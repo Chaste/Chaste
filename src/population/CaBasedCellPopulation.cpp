@@ -43,10 +43,9 @@ CaBasedCellPopulation<DIM>::CaBasedCellPopulation(TetrahedralMesh<DIM, DIM>& rMe
                                             bool useVonNeumannNeighbourhoods,
                                             bool deleteMesh,
                                             bool validate)
-    : AbstractCellPopulation<DIM>(rCells, locationIndices),
+    : AbstractOnLatticeCellPopulation<DIM>(rCells, locationIndices),
       mrMesh(rMesh),
       mOnlyUseNearestNeighboursForDivision(onlyUseNearestNeighboursForDivision),
-      mDeleteMesh(deleteMesh),
       mUseVonNeumannNeighbourhoods(useVonNeumannNeighbourhoods)
 {
     // This must always be true
@@ -84,18 +83,32 @@ CaBasedCellPopulation<DIM>::CaBasedCellPopulation(TetrahedralMesh<DIM, DIM>& rMe
 
 template<unsigned DIM>
 CaBasedCellPopulation<DIM>::CaBasedCellPopulation(TetrahedralMesh<DIM, DIM>& rMesh)
-    : mrMesh(rMesh)
+    : AbstractOnLatticeCellPopulation<DIM>(),
+      mrMesh(rMesh),
+      mOnlyUseNearestNeighboursForDivision(false),
+      mUseVonNeumannNeighbourhoods(false)
 {
-    mDeleteMesh = true;
 }
 
 template<unsigned DIM>
 CaBasedCellPopulation<DIM>::~CaBasedCellPopulation()
 {
-    if (mDeleteMesh)
+    if (this->mDeleteMesh)
     {
         delete &mrMesh;
     }
+}
+
+template<unsigned DIM>
+void CaBasedCellPopulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractCaUpdateRule<DIM> > pUpdateRule)
+{
+    mUpdateRuleCollection.push_back(pUpdateRule);
+}
+
+template<unsigned DIM>
+const std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > >& CaBasedCellPopulation<DIM>::rGetUpdateRuleCollection() const
+{
+    return mUpdateRuleCollection;
 }
 
 template<unsigned DIM>
@@ -103,7 +116,6 @@ void CaBasedCellPopulation<DIM>::SetVonNeumannNeighbourhoods(bool useVonNeumannN
 {
     mUseVonNeumannNeighbourhoods = useVonNeumannNeighbourhoods;
 }
-
 
 template<unsigned DIM>
 std::vector<bool>& CaBasedCellPopulation<DIM>::rGetEmptySites()
@@ -321,7 +333,6 @@ std::vector<unsigned> CaBasedCellPopulation<DIM>::GetMaximumDegreeInEachDirectio
     return non_zero_degrees_in_each_direction;
 }
 
-
 template<unsigned DIM>
 std::set<unsigned> CaBasedCellPopulation<DIM>::GetNthDegreeNeighbouringNodeIndices(unsigned nodeIndex, unsigned degree)
 {
@@ -349,7 +360,6 @@ std::set<unsigned> CaBasedCellPopulation<DIM>::GetNthDegreeNeighbouringNodeIndic
     return nth_degree_neighbours;
 }
 
-
 template<unsigned DIM>
 std::set<unsigned> CaBasedCellPopulation<DIM>::GetFreeNeighbouringNodeIndices(unsigned nodeIndex)
 {
@@ -371,7 +381,6 @@ std::set<unsigned> CaBasedCellPopulation<DIM>::GetFreeNeighbouringNodeIndices(un
     return free_neighbouring_nodes;
 }
 
-
 template<unsigned DIM>
 std::set<unsigned> CaBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsigned nodeIndex)
 {
@@ -387,7 +396,6 @@ std::set<unsigned> CaBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsign
 
     return all_neighbours;
 }
-
 
 template<unsigned DIM>
 std::vector<unsigned> CaBasedCellPopulation<DIM>::GetNeighbouringNodeIndicesVector(unsigned nodeIndex)
@@ -596,7 +604,6 @@ std::vector<unsigned> CaBasedCellPopulation<DIM>::GetNeighbouringNodeIndicesVect
     return all_neighbours;
 }
 
-
 template<unsigned DIM>
 unsigned CaBasedCellPopulation<DIM>::RemoveDeadCells()
 {
@@ -662,10 +669,6 @@ void CaBasedCellPopulation<DIM>::Validate()
         }
     }
 }
-
-//////////////////////////////////////////////////////////////////////////////
-//                             Output methods                               //
-//////////////////////////////////////////////////////////////////////////////
 
 template<unsigned DIM>
 void CaBasedCellPopulation<DIM>::WriteResultsToFiles()
@@ -857,10 +860,6 @@ void CaBasedCellPopulation<DIM>::MoveCell(CellPtr pCell, unsigned newLocationInd
         }
     }
 }
-
-//////////////////////////////////////////////////////////////////////////////
-//                             Methods Not used                             //
-//////////////////////////////////////////////////////////////////////////////
 
 template<unsigned DIM>
 void CaBasedCellPopulation<DIM>::UpdateNodeLocations(const std::vector< c_vector<double, DIM> >& rNodeForces, double dt)

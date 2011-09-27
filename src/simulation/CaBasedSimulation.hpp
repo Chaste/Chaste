@@ -34,8 +34,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "AbstractCellBasedSimulation.hpp"
 #include "CaBasedCellPopulation.hpp"
-#include "AbstractCaUpdateRule.hpp"
-
 
 /**
  * A lattice-based cell-based simulation object.
@@ -61,16 +59,12 @@ private:
     {
         archive & boost::serialization::base_object<AbstractCellBasedSimulation<DIM> >(*this);
 
-        archive & mUpdateRuleCollection;
         archive & mIterateRandomlyOverUpdateRuleCollection;
         archive & mIterateRandomlyOverCells;
     }
 
     /** Helper member that is a static cast of the cell population. */
     CaBasedCellPopulation<DIM>* mpStaticCastCellPopulation;
-
-    /** The rules used to determine the new locations of cells. */
-    std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > > mUpdateRuleCollection;
 
     /**
      * Whether to iterate randomly over mUpdateRuleCollection when updating cell locations.
@@ -83,13 +77,6 @@ private:
      * Defaults to false in the constructor.
      */
     bool mIterateRandomlyOverCells;
-
-    /**
-     * Overridden CalculateCellDivisionVector() method.
-     *
-     * @param pParentCell the parent cell
-     */
-    c_vector<double, DIM> CalculateCellDivisionVector(CellPtr pParentCell);
 
     /**
      * Move each cell to a new lattice site for this timestep by calling the
@@ -126,9 +113,19 @@ public:
                       bool initialiseCells=true);
 
     /**
-     * @return const reference to mUpdateRuleCollection (used in archiving).
+     * Add an update rule to be used in this simulation.
+     *
+     * @param pUpdateRule shared pointer to a CA update rule law
      */
-    const std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > > rGetUpdateRuleCollection() const;
+    void AddUpdateRule(boost::shared_ptr<AbstractCaUpdateRule<DIM> > pUpdateRule);
+
+    /**
+     * Overridden OutputAdditionalSimulationSetup method to output the force and cell
+     * population boundary condition information.
+     *
+     * @param rParamsFile the file stream to which the parameters are output
+     */
+    void OutputAdditionalSimulationSetup(out_stream& rParamsFile);
 
     /**
      * Outputs simulation parameters to file
@@ -139,13 +136,6 @@ public:
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputSimulationParameters(out_stream& rParamsFile);
-
-    /**
-     * Add an update rule to be used in this simulation.
-     *
-     * @param pUpdateRule shared pointer to a CA update rule law
-     */
-    void AddUpdateRule(boost::shared_ptr<AbstractCaUpdateRule<DIM> > pUpdateRule);
 
     /**
      * Set mIterateRandomlyOverUpdateRuleCollection.

@@ -316,7 +316,7 @@ public:
     void AddUpdateRule(boost::shared_ptr<AbstractPottsUpdateRule<DIM> > pUpdateRule);
 
     /**
-     * Get the collection of update rules to be used in the Simulations
+     * Get the collection of update rules to be used in this simulation.
      *
      * @return the update rule collection
      */

@@ -42,8 +42,9 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 // Needed here to avoid serialization errors (on Boost<1.37)
 #include "WildTypeCellMutationState.hpp"
 
-#include "AbstractCellPopulation.hpp"
+#include "AbstractOnLatticeCellPopulation.hpp"
 #include "TetrahedralMesh.hpp"
+#include "AbstractCaUpdateRule.hpp"
 
 template<unsigned DIM>
 class AbstractCaUpdateRule; // Circular definition
@@ -53,10 +54,9 @@ class AbstractCaUpdateRule; // Circular definition
  *
  * Contains a group of cells and maintains the associations between cells and
  * nodes in the mesh which correspond to lattice sites.
- *
  */
 template<unsigned DIM>
-class CaBasedCellPopulation : public AbstractCellPopulation<DIM>
+class CaBasedCellPopulation : public AbstractOnLatticeCellPopulation<DIM>
 {
     friend class TestCaBasedCellPopulation;
 
@@ -64,6 +64,9 @@ private:
 
     /** Reference to the mesh associated with the cell population. */
     TetrahedralMesh<DIM, DIM>& mrMesh;
+
+    /** The update rules used to determine the new location of the cells. */
+    std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > > mUpdateRuleCollection;
 
     /** Records whether a node is an empty site or not. */
     std::vector<bool> mIsEmptySite;
@@ -73,12 +76,6 @@ private:
      * is going to divide.
      */
     bool mOnlyUseNearestNeighboursForDivision;
-
-    /**
-     * Whether to delete the mesh when we are destroyed.
-     * Needed if this cell population has been de-serialized.
-     */
-    bool mDeleteMesh;
 
     /**
      * Whether to implement von Neumann neighbourhoods for dividing and moving cells.
@@ -108,7 +105,8 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractCellPopulation<DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractOnLatticeCellPopulation<DIM> >(*this);
+        archive & mUpdateRuleCollection;
         archive & mIsEmptySite;
         archive & mOnlyUseNearestNeighboursForDivision;
         archive & mUseVonNeumannNeighbourhoods;
@@ -174,6 +172,20 @@ public:
      * @return const reference to mrMesh (used in archiving).
      */
     const TetrahedralMesh<DIM, DIM>& rGetMesh() const;
+
+    /**
+     * Add an update rule to be used in this simulation.
+     *
+     * @param pUpdateRule pointer to an update rule
+     */
+    void AddUpdateRule(boost::shared_ptr<AbstractCaUpdateRule<DIM> > pUpdateRule);
+
+    /**
+     * Get the collection of update rules to be used in this simulation.
+     *
+     * @return the update rule collection
+     */
+    const std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > >& rGetUpdateRuleCollection() const;
 
     /**
      * Set method for mUseVonNeumannNeighbourhoods.

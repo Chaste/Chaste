@@ -46,6 +46,28 @@ CaBasedSimulation<DIM>::CaBasedSimulation(AbstractCellPopulation<DIM>& rCellPopu
 }
 
 template<unsigned DIM>
+void CaBasedSimulation<DIM>::OutputAdditionalSimulationSetup(out_stream& rParamsFile)
+{
+    std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > > update_rule_collection = mpStaticCastCellPopulation->rGetUpdateRuleCollection();
+
+    // Loop over the collection of update rules and output info for each
+    *rParamsFile << "\n\t<UpdateRules>\n";
+    for (typename std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > >::iterator iter = update_rule_collection.begin();
+         iter != update_rule_collection.end();
+         ++iter)
+    {
+        (*iter)->OutputUpdateRuleInfo(rParamsFile);
+    }
+    *rParamsFile << "\t</UpdateRules>\n";
+}
+
+template<unsigned DIM>
+void CaBasedSimulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractCaUpdateRule<DIM> > pUpdateRule)
+{
+    mpStaticCastCellPopulation->AddUpdateRule(pUpdateRule);
+}
+
+template<unsigned DIM>
 void CaBasedSimulation<DIM>::SetIterateRandomlyOverUpdateRuleCollection(bool iterateRandomly)
 {
     mIterateRandomlyOverUpdateRuleCollection = iterateRandomly;
@@ -58,24 +80,19 @@ void CaBasedSimulation<DIM>::SetIterateRandomlyOverCells(bool iterateRandomly)
 }
 
 template<unsigned DIM>
-c_vector<double, DIM> CaBasedSimulation<DIM>::CalculateCellDivisionVector(CellPtr pParentCell)
-{
-    c_vector<double, DIM> axis_of_division = zero_vector<double>(DIM);
-    return axis_of_division;
-}
-
-template<unsigned DIM>
 void CaBasedSimulation<DIM>::UpdateCellLocationsAndTopology()
 {
+    std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > > update_rule_collection = mpStaticCastCellPopulation->rGetUpdateRuleCollection();
+    
     // Iterate over contributions from each UpdateRule
     if (mIterateRandomlyOverUpdateRuleCollection)
     {
         // Randomly permute mUpdateRuleCollection
-        std::random_shuffle(mUpdateRuleCollection.begin(), mUpdateRuleCollection.end());
+        std::random_shuffle(update_rule_collection.begin(), update_rule_collection.end());
     }
 
-    for (typename std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > >::iterator update_iter = mUpdateRuleCollection.begin();
-         update_iter != mUpdateRuleCollection.end();
+    for (typename std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > >::iterator update_iter = update_rule_collection.begin();
+         update_iter != update_rule_collection.end();
          ++update_iter)
     {
         // Randomly permute cells
@@ -124,18 +141,6 @@ void CaBasedSimulation<DIM>::UpdateCellLocationsAndTopology()
             }
         }
     }
-}
-
-template<unsigned DIM>
-void CaBasedSimulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractCaUpdateRule<DIM> > pUpdateRule)
-{
-    mUpdateRuleCollection.push_back(pUpdateRule);
-}
-
-template<unsigned DIM>
-const std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > > CaBasedSimulation<DIM>::rGetUpdateRuleCollection() const
-{
-    return mUpdateRuleCollection;
 }
 
 template<unsigned DIM>
