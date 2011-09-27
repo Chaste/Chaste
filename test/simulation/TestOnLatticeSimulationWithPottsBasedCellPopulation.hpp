@@ -42,7 +42,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "StochasticDurationGenerationBasedCellCycleModel.hpp"
 #include "WildTypeCellMutationState.hpp"
-#include "CryptCellsGenerator.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "VolumeConstraintPottsUpdateRule.hpp"
@@ -52,7 +51,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "OnLatticeSimulation.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "Warnings.hpp"
-#include "LogFile.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "SmartPointers.hpp"
 
@@ -90,9 +88,7 @@ public:
     void TestOnLatticeSimulationExceptions()
     {
         // Create a simple tetrahedral mesh
-        unsigned num_cells_depth = 5;
-        unsigned num_cells_width = 5;
-        HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
+        HoneycombMeshGenerator generator(3, 3, 0);
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
@@ -108,13 +104,14 @@ public:
         NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
         node_based_cell_population.SetMechanicsCutOffLength(1.5);
 
-        TS_ASSERT_THROWS_THIS(OnLatticeSimulation<2> simulator(node_based_cell_population),"OnLatticeSimulations require a PottsBasedCellPopulation.");
+        TS_ASSERT_THROWS_THIS(OnLatticeSimulation<2> simulator(node_based_cell_population),
+            "OnLatticeSimulations require a PottsBasedCellPopulation.");
     }
 
     void TestMoreOnLatticeSimulationExceptions()
     {
         // Create a simple 2D PottsMesh
-        PottsMeshGenerator<2> generator(16, 4, 4, 18, 4, 4);
+        PottsMeshGenerator<2> generator(6, 2, 2, 6, 2, 2);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Create cells
@@ -126,13 +123,14 @@ public:
         PottsBasedCellPopulation<2> potts_based_cell_population(*p_mesh, cells);
 
         // Try to set up off lattice simulation
-        TS_ASSERT_THROWS_THIS(OffLatticeSimulation<2> simulator(potts_based_cell_population),"OffLatticeSimulations require a VertexBasedCellPopulation or a subclass of AbstractCentreBasedCellPopulation.");
+        TS_ASSERT_THROWS_THIS(OffLatticeSimulation<2> simulator(potts_based_cell_population),
+            "OffLatticeSimulations require a VertexBasedCellPopulation or a subclass of AbstractCentreBasedCellPopulation.");
     }
 
     void TestPottsMonolayerWithNoBirthOrDeath() throw (Exception)
     {
         // Create a simple 2D PottsMesh
-        PottsMeshGenerator<2> generator(16, 4, 4, 18, 4, 4);
+        PottsMeshGenerator<2> generator(6, 2, 2, 6, 2, 2);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Create cells
@@ -158,7 +156,7 @@ public:
         simulator.Solve();
 
         // Check that the same number of cells
-        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 16u);
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 4u);
 
         // Test no births or deaths
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
@@ -168,7 +166,7 @@ public:
     void TestPottsMonolayerWithNonRandomSweep() throw (Exception)
     {
         // Create a simple 2D PottsMesh
-        PottsMeshGenerator<2> generator(16, 4, 4, 18, 4, 4);
+        PottsMeshGenerator<2> generator(6, 2, 2, 6, 2, 2);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Create cells
@@ -484,7 +482,6 @@ public:
         TS_ASSERT_EQUALS(element_1->GetNode(15)->GetIndex(), 74u);
     }
 
-    // Testing Save
     void TestSave() throw (Exception)
     {
         // Create a simple 2D PottsMesh
@@ -519,7 +516,6 @@ public:
         CellBasedSimulationArchiver<2, OnLatticeSimulation<2> >::Save(&simulator);
     }
 
-    // Testing Load (based on previous two tests)
     void TestLoad() throw (Exception)
     {
         // Load the simulation from the TestSave method above and

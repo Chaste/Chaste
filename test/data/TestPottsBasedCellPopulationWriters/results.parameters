@@ -1,5 +1,7 @@
 		<Temperature>0.1</Temperature>
+		<NumSweepsPerTimestep>5</NumSweepsPerTimestep>
 		<UpdateNodesInRandomOrder>1</UpdateNodesInRandomOrder>
+		<IterateRandomlyOverUpdateRuleCollection>0</IterateRandomlyOverUpdateRuleCollection>
 		<DampingConstantNormal>1</DampingConstantNormal>
 		<DampingConstantMutant>1</DampingConstantMutant>
 		<OutputCellIdData>1</OutputCellIdData>

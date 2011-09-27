@@ -52,13 +52,15 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 template<unsigned DIM>
 class OnLatticeSimulation : public AbstractCellBasedSimulation<DIM>
 {
-
 protected:
 
     /** Helper member that is a static cast of the cell population. */
     PottsBasedCellPopulation<DIM>* mpStaticCastCellPopulation;
 
-    /** Whether to write the cell velocities to a file. */
+    /**
+     * Whether to write the cell velocities to a file.
+     * Initialised to false in constuctor.
+     */
     bool mOutputCellVelocities;
 
     /** Results file cell velocities. */
@@ -98,8 +100,8 @@ public:
      * from an archive)
      */
     OnLatticeSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
-                         bool deleteCellPopulationAndCellKillersInDestructor=false,
-                         bool initialiseCells=true);
+                        bool deleteCellPopulationInDestructor=false,
+                        bool initialiseCells=true);
 
     /**
      * Add an update rule to be used in this simulation (use this to set the Hamiltonian).
@@ -109,6 +111,8 @@ public:
     void AddUpdateRule(boost::shared_ptr<AbstractPottsUpdateRule<DIM> > pUpdateRule);
 
     /**
+     * Overridden OutputAdditionalSimulationSetup() method.
+     * Outputs the update rule information.
      * @return mOutputCellVelocities
      */
     bool GetOutputCellVelocities();

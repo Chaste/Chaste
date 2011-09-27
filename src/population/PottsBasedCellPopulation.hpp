@@ -29,7 +29,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #ifndef POTTSBASEDCELLPOPULATION_HPP_
 #define POTTSBASEDCELLPOPULATION_HPP_
 
-#include "AbstractCellPopulation.hpp"
+#include "AbstractOnLatticeCellPopulation.hpp"
 #include "PottsMesh.hpp"
 #include "VertexMesh.hpp"
 #include "AbstractPottsUpdateRule.hpp"
@@ -55,7 +55,7 @@ class AbstractPottsUpdateRule; // Circular definition
  * in the sense that no new nodes or elements can be added.
  */
 template<unsigned DIM>
-class PottsBasedCellPopulation : public AbstractCellPopulation<DIM>
+class PottsBasedCellPopulation : public AbstractOnLatticeCellPopulation<DIM>
 {
     friend class TestPottsBasedCellPopulation;
 
@@ -71,12 +71,6 @@ private:
      */
     VertexMesh<DIM,DIM>* mpElementTessellation;
 
-    /**
-     * Whether to delete the mesh when we are destroyed.
-     * Needed if this cell population has been de-serialized.
-     */
-    bool mDeleteMesh;
-
     /** Results file for elements. */
     out_stream mpVizElementsFile;
 
@@ -85,9 +79,12 @@ private:
 
     /** The temperature of the system. Initialized to 0.1 in the constructor. */
     double mTemperature;
-    
-    /** Whether to update nodes in random order. Initialized to false in the constructor. */
-    bool mUpdateNodesInRandomOrder;
+
+    /**
+     * The number of MonteCarlo sweeps of the mesh performed each timestep.
+     * Initialised to 1 in the constructor.
+     */
+    unsigned mNumSweepsPerTimestep;
 
     friend class boost::serialization::access;
     /**
@@ -105,7 +102,7 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
 #define COVERAGE_IGNORE
-        archive & boost::serialization::base_object<AbstractCellPopulation<DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractOnLatticeCellPopulation<DIM> >(*this);
 
         /*
          * In its current form the code does not allow the direct serialization
@@ -116,6 +113,7 @@ private:
 
         archive & mUpdateRuleCollection;
         archive & mTemperature;
+        archive & mNumSweepsPerTimestep;
 
 #undef COVERAGE_IGNORE
     }
@@ -358,6 +356,18 @@ public:
     double GetTemperature();
 
     /**
+     * Set mNumSweepsPerTimestep.
+     * 
+     * @param numSweepsPerTimestep the number of MonteCarlo sweeps of the mesh performed each timestep
+     */
+    void SetNumSweepsPerTimestep(unsigned numSweepsPerTimestep);
+
+    /**
+     * @return mNumSweepsPerTimestep
+     */
+    unsigned GetNumSweepsPerTimestep();
+
+    /**
      * Overridden AddNode() method.
      *
      * Add a new node to the cell population.
@@ -385,20 +395,6 @@ public:
      */
     double GetDampingConstant(unsigned nodeIndex);
     
-    /**
-     * Get whether we update nodes in a random order.
-     * 
-     * @return mUpdateNodesInRandomOrder
-     */
-    bool GetUpdateNodesInRandomOrder();
-    
-    /**
-     * Get whether we update nodes in a random order.
-     * 
-     * @param flag Whether to update nodes in a random order.
-     */
-    void SetUpdateNodesInRandomOrder(bool flag);
-
     /**
      * Create a Element tessellation of the mesh for use in visualising the mesh.
      */
@@ -451,4 +447,3 @@ inline void load_construct_data(
 #undef COVERAGE_IGNORE
 
 #endif /*POTTSBASEDCELLPOPULATION_HPP_*/
-

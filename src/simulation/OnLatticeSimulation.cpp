@@ -39,17 +39,19 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 template<unsigned DIM>
 OnLatticeSimulation<DIM>::OnLatticeSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
-                                                bool deleteCellPopulationAndCellKillersInDestructor,
+                                                bool deleteCellPopulationInDestructor,
                                                 bool initialiseCells)
-    : AbstractCellBasedSimulation<DIM>(rCellPopulation, deleteCellPopulationAndCellKillersInDestructor, initialiseCells),
+    : AbstractCellBasedSimulation<DIM>(rCellPopulation, deleteCellPopulationInDestructor, initialiseCells),
       mOutputCellVelocities(false)
 {
-    if ( !dynamic_cast<PottsBasedCellPopulation<DIM>*>(&rCellPopulation))
+    if (!dynamic_cast<PottsBasedCellPopulation<DIM>*>(&rCellPopulation))
     {
         EXCEPTION("OnLatticeSimulations require a PottsBasedCellPopulation.");
     }
 
     mpStaticCastCellPopulation = static_cast<PottsBasedCellPopulation<DIM>*>(&rCellPopulation);
+
+    this->mDt = 1.0/120.0; // 30 seconds
 }
 
 template<unsigned DIM>
@@ -59,12 +61,9 @@ void OnLatticeSimulation<DIM>::UpdateCellLocationsAndTopology()
 
     if (mOutputCellVelocities)
     {
-
         unsigned num_cells = this->mrCellPopulation.GetNumRealCells();
 
-        /*
-         * Get the previous cell centre locations to calculate velocity
-         */
+        // Get the previous cell centre locations to calculate velocity
         old_cell_locations.reserve(num_cells);
 
         for (unsigned cell_index=0; cell_index<num_cells; cell_index++)
@@ -73,18 +72,14 @@ void OnLatticeSimulation<DIM>::UpdateCellLocationsAndTopology()
         }
     }
 
-
-
-    ////////////////////////////
-    // Update cell positions
-    ////////////////////////////
     std::vector<c_vector<double, DIM> > forces(1, zero_vector<double>(DIM));
+
+    // Update node positions
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::POSITION);
     this->mrCellPopulation.UpdateNodeLocations(forces, this->mDt);
     CellBasedEventHandler::EndEvent(CellBasedEventHandler::POSITION);
 
-
-    // Write Cell velocities to file if required
+    // Write cell velocities to file if required
     if (mOutputCellVelocities)
     {
         if (SimulationTime::Instance()->GetTimeStepsElapsed()%this->mSamplingTimestepMultiple == 0)
@@ -172,7 +167,6 @@ void OnLatticeSimulation<DIM>::OutputSimulationParameters(out_stream& rParamsFil
     // Call method on direct parent class
     AbstractCellBasedSimulation<DIM>::OutputSimulationParameters(rParamsFile);
 }
-
 
 /////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation

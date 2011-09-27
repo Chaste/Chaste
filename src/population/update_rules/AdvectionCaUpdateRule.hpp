@@ -107,7 +107,7 @@ public:
      * This moves the cell in the prescribed direction mAdvectionDirection to its nearest neighbour 
      * if this is free, with a probability that scales to ensure that the average speed is mAdvectionSpeed.
      *
-     * @param currentLocationIndex reference to vector of forces on nodes
+     * @param currentLocationIndex the current location index of a cell
      * @param rCellPopulation reference to the cell population
      * @param dt timestep of the simulation to calculate probability of movement in current timestep
      */

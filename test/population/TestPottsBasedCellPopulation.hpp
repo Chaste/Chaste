@@ -34,7 +34,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
-#include "CellwiseData.hpp"
 #include "CellsGenerator.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "VolumeConstraintPottsUpdateRule.hpp"
@@ -43,10 +42,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "ArchiveOpener.hpp"
 #include "WildTypeCellMutationState.hpp"
-#include "ApcOneHitCellMutationState.hpp"
-#include "ApcTwoHitCellMutationState.hpp"
-#include "BetaCateninOneHitCellMutationState.hpp"
-#include "CellLabel.hpp"
 #include "SmartPointers.hpp"
 
 class TestPottsBasedCellPopulation : public AbstractCellBasedTestSuite
@@ -67,6 +62,7 @@ public:
 
         // Create cell population
         unsigned num_cells = cells.size();
+
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 16u);
@@ -82,11 +78,6 @@ public:
         cell_population.SetUpdateNodesInRandomOrder(false);
         TS_ASSERT_EQUALS(cell_population.GetUpdateNodesInRandomOrder(), false);
         cell_population.SetUpdateNodesInRandomOrder(true);
-
-        ChastePoint<2> location;
-        TS_ASSERT_THROWS_THIS(cell_population.AddNode(NULL), "Cannot call AddNode on a PottsBasedCellPopulation");
-        TS_ASSERT_THROWS_THIS(cell_population.SetNode(0, location), "Cannot call SetNode on a PottsBasedCellPopulation");
-        TS_ASSERT_THROWS_THIS(cell_population.GetDampingConstant(0), "Cannot call GetDampingConstant on a PottsBasedCellPopulation");
 
         // Test we have the correct number of cells and elements
         TS_ASSERT_EQUALS(cell_population.GetNumElements(), p_mesh->GetNumElements());
@@ -137,7 +128,7 @@ public:
     void TestValidate() throw (Exception)
     {
         // Create a simple potts-based mesh
-    	PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
+        PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Create cells
@@ -226,7 +217,7 @@ public:
     void TestCellDivision() throw(Exception)
     {
         // Create a simple 2D PottsMesh with one cell
-    	PottsMeshGenerator<2> generator(2, 1, 2, 2, 1, 2);
+        PottsMeshGenerator<2> generator(2, 1, 2, 2, 1, 2);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Create cells
@@ -323,8 +314,11 @@ public:
         cell_population.SetOutputCellAges(true);
         cell_population.SetOutputCellVariables(true);
         cell_population.SetOutputCellVolumes(true);
+        cell_population.SetNumSweepsPerTimestep(5);
 
-        //VTK writing needs a simulation time
+        TS_ASSERT_EQUALS(cell_population.GetNumSweepsPerTimestep(), 5u);
+
+        // VTK writing needs a simulation time
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         TS_ASSERT_THROWS_NOTHING(cell_population.CreateOutputFiles(output_directory, false));

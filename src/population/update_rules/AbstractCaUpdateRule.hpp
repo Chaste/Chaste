@@ -73,7 +73,7 @@ public:
      *
      * This method must be overridden in concrete classes.
      *
-     * @param currentLocationIndex reference to vector of forces on nodes
+     * @param currentLocationIndex the current location index of a cell
      * @param rCellPopulation reference to the cell population
      * @param dt timestep of the simulation to calculate probability of movement in current timestep
      */

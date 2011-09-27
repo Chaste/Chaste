@@ -33,11 +33,11 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "ChasteSerialization.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "PetscTools.hpp"
-#include "OutputFileHandler.hpp"
 
 /**
- * Subclass of OffLatticeSimulation in which the mean levels Delta in neighbouring cells
- * are computed and stored in CellwiseData for use in DeltaNotchOdeSystem in a centre based cell population
+ * Subclass of OffLatticeSimulation in which the mean levels of Delta in neighbouring cells
+ * are computed and stored in CellwiseData for use in DeltaNotchOdeSystem in a centre-based
+ * cell population.
  */
 template<unsigned DIM>
 class DeltaNotchOffLatticeSimulation : public OffLatticeSimulation<DIM>
@@ -66,7 +66,7 @@ private :
 public:
 
     /** The file that the values of beta catenin is written out to. */
-	out_stream mVizDeltaFile;
+    out_stream mVizDeltaFile;
 
     /**
      * Default constructor.

@@ -27,7 +27,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "PottsBasedCellPopulation.hpp"
-#include "CellwiseData.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "Warnings.hpp"
 //Needed to convert mesh in order to write nodes to VTK (visualize as glyphs)
@@ -62,18 +61,18 @@ void PottsBasedCellPopulation<DIM>::Validate()
         }
     }
 }
+
 template<unsigned DIM>
 PottsBasedCellPopulation<DIM>::PottsBasedCellPopulation(PottsMesh<DIM>& rMesh,
                                                         std::vector<CellPtr>& rCells,
                                                         bool deleteMesh,
                                                         bool validate,
                                                         const std::vector<unsigned> locationIndices)
-    : AbstractCellPopulation<DIM>(rCells, locationIndices),
+    : AbstractOnLatticeCellPopulation<DIM>(rCells, locationIndices, deleteMesh),
       mrMesh(rMesh),
       mpElementTessellation(NULL),
-      mDeleteMesh(deleteMesh),
       mTemperature(0.1),
-      mUpdateNodesInRandomOrder(true)
+      mNumSweepsPerTimestep(1)
 {
     // Check each element has only one cell associated with it
     if (validate)
@@ -84,11 +83,11 @@ PottsBasedCellPopulation<DIM>::PottsBasedCellPopulation(PottsMesh<DIM>& rMesh,
 
 template<unsigned DIM>
 PottsBasedCellPopulation<DIM>::PottsBasedCellPopulation(PottsMesh<DIM>& rMesh)
-    : mrMesh(rMesh),
+    : AbstractOnLatticeCellPopulation<DIM>(),
+      mrMesh(rMesh),
       mpElementTessellation(NULL),
-      mDeleteMesh(true),
       mTemperature(0.1),
-      mUpdateNodesInRandomOrder(true)
+      mNumSweepsPerTimestep(1)
 {
 }
 
@@ -97,12 +96,11 @@ PottsBasedCellPopulation<DIM>::~PottsBasedCellPopulation()
 {
     delete mpElementTessellation;
 
-    if (mDeleteMesh)
+    if (this->mDeleteMesh)
     {
         delete &mrMesh;
     }
 }
-
 
 template<unsigned DIM>
 PottsMesh<DIM>& PottsBasedCellPopulation<DIM>::rGetMesh()
@@ -195,28 +193,32 @@ unsigned PottsBasedCellPopulation<DIM>::RemoveDeadCells()
 template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::UpdateNodeLocations(const std::vector< c_vector<double, DIM> >& rNodeForces, double dt)
 {
-    //TODO think about making this a member variable.
-    unsigned sweeps_per_timestep=1;
-
     /*
-     * This is where we perform the Monte Carlo simulations
+     * This method implements a Monte Carlo method to update the cell population.
+     * We sample randomly from all nodes in the mesh. Once we have selected a target
+     * node we randomly select a neighbour. The Hamiltonian is evaluated in the
+     * current configuration (H_0) and with the target node added to the same
+     * element as the neighbour (H_1). Based on the vale of deltaH = H_1 - H_0,
+     * the switch is either made or not.
      *
-     * We sample randomly from all nodes in the mesh. Once we have selected a target node we randomly select a neighbour.
-     * The Hamiltonian is evaluated in the current configuration (H_0) and with the target node added to the same element
-     * as the neighbour (H_1). Based on the vale of deltaH = H_1-H_0 the switch is either made or not.
-     *
-     * For each Timestep (i.e. each time this method is called we sample mrMesh.GetNumNodes() nodes, this is known as a Monte Carlo Step (MCS).
-     *
+     * For each time step (i.e. each time this method is called) we sample
+     * mrMesh.GetNumNodes() nodes. This is known as a Monte Carlo Step (MCS).
      */
 
     RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
     unsigned num_nodes = mrMesh.GetNumNodes();
 
-    for (unsigned i=0; i<num_nodes*sweeps_per_timestep; i++)
+    // Randomly permute mUpdateRuleCollection if specified
+    if (this->mIterateRandomlyOverUpdateRuleCollection)
+    {
+        std::random_shuffle(mUpdateRuleCollection.begin(), mUpdateRuleCollection.end());
+    }
+
+    for (unsigned i=0; i<num_nodes*mNumSweepsPerTimestep; i++)
     {
         unsigned node_index;
 
-        if (mUpdateNodesInRandomOrder)
+        if (this->mUpdateNodesInRandomOrder)
         {
             node_index = p_gen->randMod(num_nodes);
         }
@@ -260,7 +262,7 @@ void PottsBasedCellPopulation<DIM>::UpdateNodeLocations(const std::vector< c_vec
         if (   ( *containing_elements.begin() != *neighbour_containing_elements.begin() )
             && ( !containing_elements.empty() || !neighbour_containing_elements.empty() ) )
         {
-        	double delta_H = 0.0; // This is H_1-H_0.
+            double delta_H = 0.0; // This is H_1-H_0.
 
             // Now add contributions to the Hamiltonian from each AbstractPottsUpdateRule
             for (typename std::vector<boost::shared_ptr<AbstractPottsUpdateRule<DIM> > >::iterator iter = mUpdateRuleCollection.begin();
@@ -270,32 +272,32 @@ void PottsBasedCellPopulation<DIM>::UpdateNodeLocations(const std::vector< c_vec
                 delta_H += (*iter)->EvaluateHamiltonianContribution(neighbour_location_index, p_node->GetIndex(), *this);
             }
 
-			// Generate a uniform random number to do the random motion
-			double random_number = p_gen->ranf();
-			double p = exp(-delta_H/mTemperature);
+            // Generate a uniform random number to do the random motion
+            double random_number = p_gen->ranf();
+            double p = exp(-delta_H/mTemperature);
 
-			if (delta_H <= 0 || random_number < p)
-			{
-				// Do swap
+            if (delta_H <= 0 || random_number < p)
+            {
+                // Do swap
 
-			    // Remove the current node from any elements containing it (there should be at most one such element)
-				for (std::set<unsigned>::iterator iter = containing_elements.begin();
-					 iter != containing_elements.end();
-					 ++iter)
-				{
-					GetElement(*iter)->DeleteNode(GetElement(*iter)->GetNodeLocalIndex(node_index));
+                // Remove the current node from any elements containing it (there should be at most one such element)
+                for (std::set<unsigned>::iterator iter = containing_elements.begin();
+                     iter != containing_elements.end();
+                     ++iter)
+                {
+                    GetElement(*iter)->DeleteNode(GetElement(*iter)->GetNodeLocalIndex(node_index));
 
-					///\todo If this causes the element to have no nodes then flag the element and cell to be deleted
-				}
+                    ///\todo If this causes the element to have no nodes then flag the element and cell to be deleted
+                }
 
                 // Next add the current node to any elements containing the neighbouring node (there should be at most one such element)
-				for (std::set<unsigned>::iterator iter = neighbour_containing_elements.begin();
-					 iter != neighbour_containing_elements.end();
-					 ++iter)
-				{
-					GetElement(*iter)->AddNode(mrMesh.GetNode(node_index));
-				}
-			}
+                for (std::set<unsigned>::iterator iter = neighbour_containing_elements.begin();
+                     iter != neighbour_containing_elements.end();
+                     ++iter)
+                {
+                    GetElement(*iter)->AddNode(mrMesh.GetNode(node_index));
+                }
+            }
         }
     }
 }
@@ -461,7 +463,7 @@ double PottsBasedCellPopulation<DIM>::GetWidth(const unsigned& rDimension)
 template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractPottsUpdateRule<DIM> > pUpdateRule)
 {
-	mUpdateRuleCollection.push_back(pUpdateRule);
+    mUpdateRuleCollection.push_back(pUpdateRule);
 }
 
 template<unsigned DIM>
@@ -474,17 +476,17 @@ template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::CreateElementTessellation()
 {
     ///\todo implement this method (#1666)
-//	delete mpElementTessellation;
+//  delete mpElementTessellation;
 //
 //    ///\todo this code would need to be extended if the domain were required to be periodic
 //
-//	std::vector<Node<2>*> nodes;
-//	for (unsigned node_index=0; node_index<mrMesh.GetNumNodes(); node_index++)
-//	{
-//	    Node<2>* p_temp_node = mrMesh.GetNode(node_index);
-//	    nodes.push_back(p_temp_node);
-//	}
-//	MutableMesh<2,2> mesh(nodes);
+//  std::vector<Node<2>*> nodes;
+//  for (unsigned node_index=0; node_index<mrMesh.GetNumNodes(); node_index++)
+//  {
+//      Node<2>* p_temp_node = mrMesh.GetNode(node_index);
+//      nodes.push_back(p_temp_node);
+//  }
+//  MutableMesh<2,2> mesh(nodes);
 //    mpElementTessellation = new VertexMesh<2,2>(mesh);
 }
 
@@ -499,10 +501,10 @@ template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t<Temperature>" << mTemperature << "</Temperature>\n";
-    *rParamsFile << "\t\t<UpdateNodesInRandomOrder>" << mUpdateNodesInRandomOrder << "</UpdateNodesInRandomOrder>\n";
-      
+    *rParamsFile << "\t\t<NumSweepsPerTimestep>" << mNumSweepsPerTimestep << "</NumSweepsPerTimestep>\n";
+
     // Call method on direct parent class
-    AbstractCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);
+    AbstractOnLatticeCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);
 }
 
 template<unsigned DIM>
@@ -526,18 +528,6 @@ double PottsBasedCellPopulation<DIM>::GetDampingConstant(unsigned nodeIndex)
 }
 
 template<unsigned DIM>
-bool PottsBasedCellPopulation<DIM>::GetUpdateNodesInRandomOrder()
-{
-    return mUpdateNodesInRandomOrder;
-}
-
-template<unsigned DIM>
-void PottsBasedCellPopulation<DIM>::SetUpdateNodesInRandomOrder(bool flag)
-{
-    mUpdateNodesInRandomOrder = flag;
-}
-
-template<unsigned DIM>
 std::set<unsigned> PottsBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsigned index)
 {
     EXCEPTION("Cannot call GetNeighbouringNodeIndices() on a PottsBasedCellPopulation, need to go through the PottsMesh instead");
@@ -556,6 +546,19 @@ double PottsBasedCellPopulation<DIM>::GetTemperature()
 {
     return mTemperature;
 }
+
+template<unsigned DIM>
+void PottsBasedCellPopulation<DIM>::SetNumSweepsPerTimestep(unsigned numSweepsPerTimestep)
+{
+    mNumSweepsPerTimestep = numSweepsPerTimestep;
+}
+
+template<unsigned DIM>
+unsigned PottsBasedCellPopulation<DIM>::GetNumSweepsPerTimestep()
+{
+    return mNumSweepsPerTimestep;
+}
+
 template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile()
 {
@@ -647,8 +650,8 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile()
     *(this->mpVtkMetaFile) << time.str();
     *(this->mpVtkMetaFile) << ".vtu\"/>\n";
 #endif //CHASTE_VTK
-
 }
+
 /////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////
