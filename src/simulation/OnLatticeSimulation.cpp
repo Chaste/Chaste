@@ -27,31 +27,36 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "OnLatticeSimulation.hpp"
-
-#include "AbstractCentreBasedCellPopulation.hpp"
-#include "VertexBasedCellPopulation.hpp"
-
+#include "CaBasedCellPopulation.hpp"
+#include "PottsBasedCellPopulation.hpp"
 #include "CellBasedEventHandler.hpp"
 #include "LogFile.hpp"
 #include "Version.hpp"
 #include "ExecutableSupport.hpp"
 
-
 template<unsigned DIM>
 OnLatticeSimulation<DIM>::OnLatticeSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
-                                                bool deleteCellPopulationInDestructor,
-                                                bool initialiseCells)
-    : AbstractCellBasedSimulation<DIM>(rCellPopulation, deleteCellPopulationInDestructor, initialiseCells),
+                                              bool deleteCellPopulationInDestructor,
+                                              bool initialiseCells)
+    : AbstractCellBasedSimulation<DIM>(rCellPopulation,
+                                       deleteCellPopulationInDestructor,
+                                       initialiseCells),
       mOutputCellVelocities(false)
 {
-    if (!dynamic_cast<PottsBasedCellPopulation<DIM>*>(&rCellPopulation))
+    if (!dynamic_cast<AbstractOnLatticeCellPopulation<DIM>*>(&rCellPopulation))
     {
-        EXCEPTION("OnLatticeSimulations require a PottsBasedCellPopulation.");
+        EXCEPTION("OnLatticeSimulations require a subclass of AbstractOnLatticeCellPopulation.");
     }
 
-    mpStaticCastCellPopulation = static_cast<PottsBasedCellPopulation<DIM>*>(&rCellPopulation);
+    mpStaticCastCellPopulation = static_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation));
 
     this->mDt = 1.0/120.0; // 30 seconds
+}
+
+template<unsigned DIM>
+void OnLatticeSimulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractPottsUpdateRule<DIM> > pUpdateRule)
+{
+    static_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->AddUpdateRule(pUpdateRule);
 }
 
 template<unsigned DIM>
@@ -126,9 +131,49 @@ void OnLatticeSimulation<DIM>::AfterSolve()
 }
 
 template<unsigned DIM>
+bool OnLatticeSimulation<DIM>::GetOutputCellVelocities()
+{
+    return mOutputCellVelocities;
+}
+
+template<unsigned DIM>
+void OnLatticeSimulation<DIM>::SetOutputCellVelocities(bool outputCellVelocities)
+{
+    mOutputCellVelocities = outputCellVelocities;
+}
+
+//template<unsigned DIM>
+//void OnLatticeSimulation<DIM>::UpdateCellPopulation()
+//{
+//    if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
+//    {
+//        /*
+//         * If mInitialiseCells is false, then the simulation has been loaded from an archive.
+//         * In this case, we should not call UpdateCellPopulation() at the first time step. This is
+//         * because it will have already been called at the final time step prior to saving;
+//         * if we were to call it again now, then we would have introduced an extra call to
+//         * the random number generator compared to if we had not saved and loaded the simulation,
+//         * thus affecting results. This would be bad - we don't want saving and loading to have
+//         * any effect on the course of a simulation! See #1445.
+//         */
+//        bool update_cell_population_this_timestep = true;
+//        if (!this->mInitialiseCells && (SimulationTime::Instance()->GetTimeStepsElapsed() == 0))
+//        {
+//            update_cell_population_this_timestep = false;
+//        }
+//    
+//        if (update_cell_population_this_timestep)
+//        {
+//            AbstractCellBasedSimulation<DIM>::UpdateCellPopulation();
+//        }
+//    }
+//}
+
+template<unsigned DIM>
 void OnLatticeSimulation<DIM>::OutputAdditionalSimulationSetup(out_stream& rParamsFile)
 {
-    std::vector<boost::shared_ptr<AbstractPottsUpdateRule<DIM> > > update_rule_collection = mpStaticCastCellPopulation->rGetUpdateRuleCollection();
+    std::vector<boost::shared_ptr<AbstractPottsUpdateRule<DIM> > > update_rule_collection =
+        static_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->rGetUpdateRuleCollection();
 
     // Loop over the collection of update rules and output info for each
     *rParamsFile << "\n\t<UpdateRules>\n";
@@ -139,24 +184,6 @@ void OnLatticeSimulation<DIM>::OutputAdditionalSimulationSetup(out_stream& rPara
         (*iter)->OutputUpdateRuleInfo(rParamsFile);
     }
     *rParamsFile << "\t</UpdateRules>\n";
-}
-
-template<unsigned DIM>
-void OnLatticeSimulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractPottsUpdateRule<DIM> > pUpdateRule)
-{
-    mpStaticCastCellPopulation->AddUpdateRule(pUpdateRule);
-}
-
-template<unsigned DIM>
-bool OnLatticeSimulation<DIM>::GetOutputCellVelocities()
-{
-    return mOutputCellVelocities;
-}
-
-template<unsigned DIM>
-void OnLatticeSimulation<DIM>::SetOutputCellVelocities(bool outputCellVelocities)
-{
-    mOutputCellVelocities = outputCellVelocities;
 }
 
 template<unsigned DIM>

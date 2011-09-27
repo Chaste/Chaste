@@ -29,16 +29,14 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #ifndef ONLATTICESIMULATION_HPP_
 #define ONLATTICESIMULATION_HPP_
 
+#include "ChasteSerialization.hpp"
+#include <boost/serialization/base_object.hpp>
+
 #include "AbstractCellBasedSimulation.hpp"
 #include "AbstractPottsUpdateRule.hpp"
 
-#include "ChasteSerialization.hpp"
-#include <boost/serialization/base_object.hpp>
-#include <boost/serialization/set.hpp>
-#include <boost/serialization/vector.hpp>
-
 /**
- * Run an on-lattice 2D or 3D cell-based simulation using a Potts Model
+ * Run an on-lattice 2D or 3D cell-based simulation.
  *
  * The OnLatticeSimulation is constructed with a CellPopulation, which
  * updates the correspondence between each Cell and its spatial representation
@@ -53,18 +51,6 @@ template<unsigned DIM>
 class OnLatticeSimulation : public AbstractCellBasedSimulation<DIM>
 {
 protected:
-
-    /** Helper member that is a static cast of the cell population. */
-    PottsBasedCellPopulation<DIM>* mpStaticCastCellPopulation;
-
-    /**
-     * Whether to write the cell velocities to a file.
-     * Initialised to false in constuctor.
-     */
-    bool mOutputCellVelocities;
-
-    /** Results file cell velocities. */
-    out_stream mpCellVelocitiesFile;
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -81,10 +67,30 @@ protected:
         archive & mOutputCellVelocities;
     }
 
+    /** Helper member that is a static cast of the cell population. */
+    PottsBasedCellPopulation<DIM>* mpStaticCastCellPopulation;
+
+    /**
+     * Whether to write the cell velocities to a file.
+     * Initialised to false in constuctor.
+     */
+    bool mOutputCellVelocities;
+
+    /** Results file cell velocities. */
+    out_stream mpCellVelocitiesFile;
+
+//    /**
+//     * Overridden UpdateCellPopulation() method.
+//     * 
+//     * If using a CaBasedCellPopulation, this method does nothing if at the start of a simulation that
+//     * has just been loaded, to ensure consistency in random number generation.
+//     */
+//    void UpdateCellPopulation();
+
     /**
      * Overridden UpdateCellLocationsAndTopology() method.
      *
-     * In on-lattice simulations this method performs Monte Carlo sampling.
+     * If using a PottsBasedCellPopulation, this method performs Monte Carlo sampling.
      */
     void UpdateCellLocationsAndTopology();
 
@@ -113,7 +119,6 @@ public:
     /**
      * Overridden OutputAdditionalSimulationSetup() method.
      * Outputs the update rule information.
-     * @return mOutputCellVelocities
      */
     bool GetOutputCellVelocities();
 
@@ -135,7 +140,7 @@ public:
     virtual void AfterSolve();
 
     /**
-     * Overridden OutputAdditionalSimulationSetup method to output the force and cell
+     * Overridden OutputAdditionalSimulationSetup() method to output the force and cell
      * population boundary condition information.
      *
      * @param rParamsFile the file stream to which the parameters are output
@@ -143,7 +148,7 @@ public:
     void OutputAdditionalSimulationSetup(out_stream& rParamsFile);
 
     /**
-     * Outputs simulation parameters to file.
+     * Overridden OutputSimulationParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */

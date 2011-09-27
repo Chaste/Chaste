@@ -105,7 +105,7 @@ public:
         node_based_cell_population.SetMechanicsCutOffLength(1.5);
 
         TS_ASSERT_THROWS_THIS(OnLatticeSimulation<2> simulator(node_based_cell_population),
-            "OnLatticeSimulations require a PottsBasedCellPopulation.");
+            "OnLatticeSimulations require a subclass of AbstractOnLatticeCellPopulation.");
     }
 
     void TestMoreOnLatticeSimulationExceptions()
@@ -585,7 +585,6 @@ public:
         // Create cell killer and pass in to simulation
         MAKE_PTR_ARGS(SloughingCellKiller<2>, p_killer, (&cell_population, crypt_length));
         simulator.AddCellKiller(p_killer);
-
 
         // Create update rules and pass to the simulation
         MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);

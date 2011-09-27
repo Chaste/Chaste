@@ -78,7 +78,7 @@ private:
 
     /**
      * Overridden UpdateCellPopulation() method.
-     * Calls the deaths, births and (if mUpdateCellPopulation is true) CellPopulation::Update() methods.
+     * 
      * If using a CaBasedCellPopulation, this method does nothing if at the start of a simulation that
      * has just been loaded, to ensure consistency in random number generation.
      */
@@ -86,6 +86,8 @@ private:
 
     /**
      * Overridden UpdateCellLocationsAndTopology() method.
+     *
+     * If using a PottsBasedCellPopulation, this method performs Monte Carlo sampling.
      */
     void UpdateCellLocationsAndTopology();
 

@@ -27,8 +27,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "CaBasedSimulation.hpp"
-#include "PottsBasedCellPopulation.hpp"
 #include "CaBasedCellPopulation.hpp"
+#include "PottsBasedCellPopulation.hpp"
 #include "CellBasedEventHandler.hpp"
 #include "LogFile.hpp"
 #include "Version.hpp"
