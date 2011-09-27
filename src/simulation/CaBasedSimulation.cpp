@@ -38,9 +38,6 @@ CaBasedSimulation<DIM>::CaBasedSimulation(AbstractCellPopulation<DIM>& rCellPopu
                                        deleteCellPopulationInDestructor,
                                        initialiseCells)
 {
-    mIterateRandomlyOverUpdateRuleCollection = false;
-    mIterateRandomlyOverCells = false;
-    
     assert(dynamic_cast<CaBasedCellPopulation<DIM>*>(&rCellPopulation));
     mpStaticCastCellPopulation = static_cast<CaBasedCellPopulation<DIM>*>(&this->mrCellPopulation);
 }
@@ -68,24 +65,12 @@ void CaBasedSimulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractCaUpdateRul
 }
 
 template<unsigned DIM>
-void CaBasedSimulation<DIM>::SetIterateRandomlyOverUpdateRuleCollection(bool iterateRandomly)
-{
-    mIterateRandomlyOverUpdateRuleCollection = iterateRandomly;
-}
-
-template<unsigned DIM>
-void CaBasedSimulation<DIM>::SetIterateRandomlyOverCells(bool iterateRandomly)
-{
-    mIterateRandomlyOverCells = iterateRandomly;
-}
-
-template<unsigned DIM>
 void CaBasedSimulation<DIM>::UpdateCellLocationsAndTopology()
 {
     std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > > update_rule_collection = mpStaticCastCellPopulation->rGetUpdateRuleCollection();
     
     // Iterate over contributions from each UpdateRule
-    if (mIterateRandomlyOverUpdateRuleCollection)
+    if (mpStaticCastCellPopulation->GetIterateRandomlyOverUpdateRuleCollection())
     {
         // Randomly permute mUpdateRuleCollection
         std::random_shuffle(update_rule_collection.begin(), update_rule_collection.end());
@@ -96,7 +81,7 @@ void CaBasedSimulation<DIM>::UpdateCellLocationsAndTopology()
          ++update_iter)
     {
         // Randomly permute cells
-        if (mIterateRandomlyOverCells)
+        if (mpStaticCastCellPopulation->GetUpdateNodesInRandomOrder())
         {
             std::vector<CellPtr> cells_vector;
             for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mrCellPopulation.Begin();
@@ -146,9 +131,6 @@ void CaBasedSimulation<DIM>::UpdateCellLocationsAndTopology()
 template<unsigned DIM>
 void CaBasedSimulation<DIM>::OutputSimulationParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t<IterateRandomlyOverUpdateRuleCollection>" << mIterateRandomlyOverUpdateRuleCollection << "</IterateRandomlyOverUpdateRuleCollection>\n";
-    *rParamsFile << "\t\t<IterateRandomlyOverCells>" << mIterateRandomlyOverCells << "</IterateRandomlyOverCells>\n";
-
     // Call method on direct parent class
     AbstractCellBasedSimulation<DIM>::OutputSimulationParameters(rParamsFile);
 }

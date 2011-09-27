@@ -553,7 +553,8 @@ public:
         cells_generator.GenerateBasic(cells, real_node_indices.size(), real_node_indices, DIFFERENTIATED);
 
         // Create a cell population
-        CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices, true); // Only searching the nearest neighbours (degree=1)
+        CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices, true);
+        cell_population.SetOnlyUseNearestNeighboursForDivision(true);
 
         TS_ASSERT(cell_population.IsEmptySite(13));
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 16u);

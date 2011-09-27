@@ -74,12 +74,14 @@ private:
     /**
      * Whether to only search the next nearest neighbours for an empty site when a cell
      * is going to divide.
+     * Defaults to false in the constructor.
      */
     bool mOnlyUseNearestNeighboursForDivision;
 
     /**
      * Whether to implement von Neumann neighbourhoods for dividing and moving cells.
      * These neighbourhoods only correspond to the N, S, E, W neighbours.
+     * Defaults to false in the constructor.
      */
     bool mUseVonNeumannNeighbourhoods;
 
@@ -136,9 +138,6 @@ public:
      * @param rMesh a mutable tetrahedral mesh
      * @param rCells CellPtrs corresponding to the nodes of the mesh
      * @param locationIndices an optional vector of location indices that correspond to real cells
-     * @param onlyUseNearestNeighboursForDivision whether to only search the immediate neighbours
-     *            for division (defaults to false)
-     * @param useVonNeumannNeighbourhoods whether to use von Neumann neighbourhoods (defaults to false)
      * @param deleteMesh set to true if you want the cell population to free the mesh memory on destruction
      *            (defaults to false)
      * @param validate whether to validate the cell population (defaults to false)
@@ -146,8 +145,6 @@ public:
     CaBasedCellPopulation(TetrahedralMesh<DIM, DIM>& rMesh,
                        std::vector<CellPtr>& rCells,
                        const std::vector<unsigned> locationIndices=std::vector<unsigned>(),
-                       bool onlyUseNearestNeighboursForDivision=false,
-                       bool useVonNeumannNeighbourhoods=false,
                        bool deleteMesh=false,
                        bool validate=true);
 
@@ -172,6 +169,19 @@ public:
      * @return const reference to mrMesh (used in archiving).
      */
     const TetrahedralMesh<DIM, DIM>& rGetMesh() const;
+
+    /**
+     * Set mOnlyUseNearestNeighboursForDivision.
+     * 
+     * @param onlyUseNearestNeighboursForDivision whether to only search the next nearest neighbours for an
+     *     empty site when a cell is going to divide.
+     */
+    void SetOnlyUseNearestNeighboursForDivision(bool onlyUseNearestNeighboursForDivision);
+
+    /**
+     * Get mOnlyUseNearestNeighboursForDivision.
+     */
+    bool GetOnlyUseNearestNeighboursForDivision();
 
     /**
      * Add an update rule to be used in this simulation.

@@ -58,25 +58,10 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractCellBasedSimulation<DIM> >(*this);
-
-        archive & mIterateRandomlyOverUpdateRuleCollection;
-        archive & mIterateRandomlyOverCells;
     }
 
     /** Helper member that is a static cast of the cell population. */
     CaBasedCellPopulation<DIM>* mpStaticCastCellPopulation;
-
-    /**
-     * Whether to iterate randomly over mUpdateRuleCollection when updating cell locations.
-     * Defaults to false in the constructor.
-     */
-    bool mIterateRandomlyOverUpdateRuleCollection;
-
-    /**
-     * Whether to iterate randomly over cells when updating cell locations.
-     * Defaults to false in the constructor.
-     */
-    bool mIterateRandomlyOverCells;
 
     /**
      * Move each cell to a new lattice site for this timestep by calling the
@@ -136,20 +121,6 @@ public:
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputSimulationParameters(out_stream& rParamsFile);
-
-    /**
-     * Set mIterateRandomlyOverUpdateRuleCollection.
-     * 
-     * @param iterateRandomly whether to iterate randomly over mUpdateRuleCollection
-     */
-    void SetIterateRandomlyOverUpdateRuleCollection(bool iterateRandomly);
-
-    /**
-     * Set mIterateRandomlyOverUpdateRuleCollection.
-     * 
-     * @param iterateRandomly whether to iterate randomly over cells
-     */
-    void SetIterateRandomlyOverCells(bool iterateRandomly);
 };
 
 // Declare identifier for the serializer

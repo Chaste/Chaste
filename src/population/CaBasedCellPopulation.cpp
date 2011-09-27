@@ -39,14 +39,12 @@ template<unsigned DIM>
 CaBasedCellPopulation<DIM>::CaBasedCellPopulation(TetrahedralMesh<DIM, DIM>& rMesh,
                                             std::vector<CellPtr>& rCells,
                                             const std::vector<unsigned> locationIndices,
-                                            bool onlyUseNearestNeighboursForDivision,
-                                            bool useVonNeumannNeighbourhoods,
                                             bool deleteMesh,
                                             bool validate)
     : AbstractOnLatticeCellPopulation<DIM>(rCells, locationIndices),
       mrMesh(rMesh),
-      mOnlyUseNearestNeighboursForDivision(onlyUseNearestNeighboursForDivision),
-      mUseVonNeumannNeighbourhoods(useVonNeumannNeighbourhoods)
+      mOnlyUseNearestNeighboursForDivision(false),
+      mUseVonNeumannNeighbourhoods(false)
 {
     // This must always be true
     assert(this->mCells.size() <= mrMesh.GetNumNodes());
@@ -97,6 +95,18 @@ CaBasedCellPopulation<DIM>::~CaBasedCellPopulation()
     {
         delete &mrMesh;
     }
+}
+
+template<unsigned DIM>
+void CaBasedCellPopulation<DIM>::SetOnlyUseNearestNeighboursForDivision(bool onlyUseNearestNeighboursForDivision)
+{
+    mOnlyUseNearestNeighboursForDivision = onlyUseNearestNeighboursForDivision;
+}
+
+template<unsigned DIM>
+bool CaBasedCellPopulation<DIM>::GetOnlyUseNearestNeighboursForDivision()
+{
+    return mOnlyUseNearestNeighboursForDivision;
 }
 
 template<unsigned DIM>

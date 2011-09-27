@@ -1,5 +1,3 @@
-		<IterateRandomlyOverUpdateRuleCollection>0</IterateRandomlyOverUpdateRuleCollection>
-		<IterateRandomlyOverCells>0</IterateRandomlyOverCells>
 		<Dt>0.1</Dt>
 		<EndTime>5</EndTime>
 		<SamplingTimestepMultiple>1</SamplingTimestepMultiple>
