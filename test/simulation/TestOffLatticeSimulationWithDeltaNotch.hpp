@@ -99,7 +99,7 @@ public:
 
         // Create cell population
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
-        cell_population.SetMechanicsCutOffLength(1.5);
+        cell_population.SetMechanicsCutOffLength(1.51);
         cell_population.SetCellAncestorsToLocationIndices();
 
         // Create and initialize CellwiseData
