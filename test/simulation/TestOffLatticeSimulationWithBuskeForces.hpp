@@ -45,6 +45,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "BuskeCompressionForce.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "SmartPointers.hpp"
+#include "PetscSetupAndFinalize.hpp"
 
 class TestOffLatticeSimulationWithBuskeForces : public AbstractCellBasedTestSuite
 {
