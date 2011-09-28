@@ -70,6 +70,13 @@ void OnLatticeSimulation<DIM>::AddPottsUpdateRule(boost::shared_ptr<AbstractPott
 }
 
 template<unsigned DIM>
+c_vector<double, DIM> OnLatticeSimulation<DIM>::CalculateCellDivisionVector(CellPtr pParentCell)
+{
+    ///\todo do something for Potts models here
+    return zero_vector<double>(DIM);
+}
+
+template<unsigned DIM>
 void OnLatticeSimulation<DIM>::UpdateCellLocationsAndTopology()
 {
     // Store current locations of cell centres if required

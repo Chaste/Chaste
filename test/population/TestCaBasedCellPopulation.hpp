@@ -1491,20 +1491,9 @@ public:
         // Create a cell population
         CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
 
-        // Test UpdateNodeLocations
-        std::vector< c_vector<double, 2> > unused_vector;
-        TS_ASSERT_THROWS_THIS(cell_population.UpdateNodeLocations(unused_vector, 1.0), "UpdateNodeLocations() cannot be called on a CaBasedCellPopulation");
-
-        // Test AddNode()
-        Node<2> unused_node(10);
-        TS_ASSERT_THROWS_THIS(cell_population.AddNode(&unused_node), "AddNode() cannot be called on a CaBasedCellPopulation");
-
         // Test SetNode()
         ChastePoint<2> unused_point;
         TS_ASSERT_THROWS_THIS(cell_population.SetNode(0, unused_point), "SetNode() cannot be called on a CaBasedCellPopulation");
-
-        // Test GetDampingConstant()
-        TS_ASSERT_THROWS_THIS(cell_population.GetDampingConstant(0), "GetDampingConstant() cannot be called on a CaBasedCellPopulation");
 
         // Test GetWidth() method
         double width_x = cell_population.GetWidth(0);

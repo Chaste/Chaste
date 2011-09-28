@@ -367,16 +367,6 @@ public:
     unsigned GetNumSweepsPerTimestep();
 
     /**
-     * Overridden AddNode() method.
-     *
-     * Add a new node to the cell population.
-     *
-     * @param pNewNode pointer to the new node
-     * @return global index of new node in cell population
-     */
-    unsigned AddNode(Node<DIM>* pNewNode);
-
-    /**
      * Overridden SetNode() method.
      *
      * Move the node with a given index to a new point in space.
@@ -385,14 +375,6 @@ public:
      * @param rNewLocation the new target location of the node
      */
     void SetNode(unsigned index, ChastePoint<DIM>& rNewLocation);
-
-    /**
-     * Overridden GetDampingConstant() method.
-     *
-     * @param nodeIndex the global index of this node
-     * @return the average damping constant of the cells surrounding the node.
-     */
-    double GetDampingConstant(unsigned nodeIndex);
     
     /**
      * Create a Element tessellation of the mesh for use in visualising the mesh.

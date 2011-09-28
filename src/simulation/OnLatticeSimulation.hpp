@@ -51,7 +51,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 template<unsigned DIM>
 class OnLatticeSimulation : public AbstractCellBasedSimulation<DIM>
 {
-protected:
+private:
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -67,6 +67,8 @@ protected:
         archive & boost::serialization::base_object<AbstractCellBasedSimulation<DIM> >(*this);
         archive & mOutputCellVelocities;
     }
+
+protected:
 
     /**
      * Whether to write the cell velocities to a file.
@@ -91,6 +93,17 @@ protected:
      * If using a PottsBasedCellPopulation, this method performs Monte Carlo sampling.
      */
     void UpdateCellLocationsAndTopology();
+
+    /**
+     * Overridden CalculateCellDivisionVector() method for determining how cell division occurs.
+     * This method returns a vector which is then passed into the CellPopulation method AddCell().
+     * This method may be overridden by subclasses.
+     *
+     * @param pParentCell the parent cell
+     *
+     * @return a vector containing information on cell division.
+     */
+    virtual c_vector<double, DIM> CalculateCellDivisionVector(CellPtr pParentCell);
 
 public:
 

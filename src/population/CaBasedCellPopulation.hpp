@@ -410,23 +410,6 @@ public:
      */
     void MoveCell(CellPtr pCell, unsigned newLocationIndex);
 
-///////////////////// Extra Methods not needed from Abstract CellPopulation ///////////////////
-
-    /**
-     * Overwritten UpdateNodeLocations method
-     *
-     * Update the location of each node in the cell population given
-     * a vector of forces on nodes and a time step over which
-     * to integrate the equations of motion.
-     *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
-     *
-     * @param rNodeForces  forces on nodes
-     * @param dt time step not used in lattice based sims
-     */
-    void UpdateNodeLocations(const std::vector< c_vector<double, DIM> >& rNodeForces, double dt);
-
     /**
      * Find where a given cell is in space.
      *
@@ -435,18 +418,6 @@ public:
      * @return the location of the cell
      */
     c_vector<double, DIM> GetLocationOfCellCentre(CellPtr pCell);
-
-    /**
-     * Add a new node to the cell population.
-     *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
-     *
-     * @param pNewNode pointer to the new node
-     *
-     * @return global index of new node in cell population.
-     */
-    unsigned AddNode(Node<DIM>* pNewNode);
 
     /**
      * Move the node with a given index to a new point in space.
@@ -458,18 +429,6 @@ public:
      * @param rNewLocation the new target location of the node
      */
     void SetNode(unsigned nodeIndex, ChastePoint<DIM>& rNewLocation);
-
-    /**
-     * Get the damping constant for this node - ie d in drdt = F/d.
-     *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
-     *
-     * @param nodeIndex the global index of this node
-     *
-     * @return the damping constant at the node.
-     */
-    double GetDampingConstant(unsigned nodeIndex);
 
     /**
      * Outputs CellPopulation parameters to file

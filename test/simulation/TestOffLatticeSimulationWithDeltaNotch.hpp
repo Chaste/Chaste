@@ -49,6 +49,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "WildTypeCellMutationState.hpp"
 #include "Warnings.hpp"
 #include "SmartPointers.hpp"
+#include "PetscSetupAndFinalize.hpp"
 
 class TestDeltaNotchOffLatticeSimulation : public AbstractCellBasedTestSuite
 { 
@@ -68,10 +69,6 @@ private:
         AbstractCellBasedTestSuite::tearDown();
     }
 public:
-
-    /*
-     * Test the Delta-Notch averaging for cell neighbours on mesh, node and vertex based simulations. Overwritten PostSolve is the only new method in DeltaNotchCellBasedSimualtion.
-     */
 
     ///\todo: For mesh and vertex based
     void TestPostSolveNodeBased() throw(Exception)
@@ -138,7 +135,6 @@ public:
 
         // Tidy up
         CellwiseData<2>::Destroy();
-
     }
 
     void TestPostSolveVertex() throw (Exception)

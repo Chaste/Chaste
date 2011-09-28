@@ -934,12 +934,6 @@ void CaBasedCellPopulation<DIM>::MoveCell(CellPtr pCell, unsigned newLocationInd
 }
 
 template<unsigned DIM>
-void CaBasedCellPopulation<DIM>::UpdateNodeLocations(const std::vector< c_vector<double, DIM> >& rNodeForces, double dt)
-{
-    EXCEPTION("UpdateNodeLocations() cannot be called on a CaBasedCellPopulation");
-}
-
-template<unsigned DIM>
 c_vector<double, DIM> CaBasedCellPopulation<DIM>::GetLocationOfCellCentre(CellPtr pCell)
 {
     unsigned node_index = this->mCellLocationMap[pCell.get()];
@@ -948,23 +942,9 @@ c_vector<double, DIM> CaBasedCellPopulation<DIM>::GetLocationOfCellCentre(CellPt
 }
 
 template<unsigned DIM>
-unsigned CaBasedCellPopulation<DIM>::AddNode(Node<DIM>* pNewNode)
-{
-    EXCEPTION("AddNode() cannot be called on a CaBasedCellPopulation");
-    return 0;
-}
-
-template<unsigned DIM>
 void CaBasedCellPopulation<DIM>::SetNode(unsigned nodeIndex, ChastePoint<DIM>& rNewLocation)
 {
     EXCEPTION("SetNode() cannot be called on a CaBasedCellPopulation");
-}
-
-template<unsigned DIM>
-double CaBasedCellPopulation<DIM>::GetDampingConstant(unsigned nodeIndex)
-{
-    EXCEPTION("GetDampingConstant() cannot be called on a CaBasedCellPopulation");
-    return 0.0;
 }
 
 template<unsigned DIM>

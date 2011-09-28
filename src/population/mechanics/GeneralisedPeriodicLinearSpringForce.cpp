@@ -62,7 +62,7 @@ c_vector<double, DIM> GeneralisedPeriodicLinearSpringForce<DIM>::CalculateForceB
                                                                                     AbstractCellPopulation<DIM>& rCellPopulation)
 {
     ///\todo extend force class to cope with a NodeBasedCellPopulation (#1856)
-    assert(rCellPopulation.IsMeshBasedCellPopulation());
+    assert(dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation));
 
     // We should only ever calculate the force between two distinct nodes
     assert(nodeAGlobalIndex != nodeBGlobalIndex);

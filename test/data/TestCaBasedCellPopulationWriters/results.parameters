@@ -1,7 +1,5 @@
 		<OnlyUseNearestNeighboursForDivision>0</OnlyUseNearestNeighboursForDivision>
 		<UseVonNeumannNeighbourhoods>0</UseVonNeumannNeighbourhoods>
-		<DampingConstantNormal>1</DampingConstantNormal>
-		<DampingConstantMutant>1</DampingConstantMutant>
 		<OutputCellIdData>1</OutputCellIdData>
 		<OutputCellMutationStates>1</OutputCellMutationStates>
 		<OutputCellAncestors>1</OutputCellAncestors>

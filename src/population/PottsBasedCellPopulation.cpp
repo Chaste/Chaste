@@ -508,23 +508,9 @@ void PottsBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& r
 }
 
 template<unsigned DIM>
-unsigned PottsBasedCellPopulation<DIM>::AddNode(Node<DIM>* pNewNode)
-{
-    EXCEPTION("Cannot call AddNode on a PottsBasedCellPopulation");
-    return 0;
-}
-
-template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::SetNode(unsigned nodeIndex, ChastePoint<DIM>& rNewLocation)
 {
     EXCEPTION("Cannot call SetNode on a PottsBasedCellPopulation");
-}
-
-template<unsigned DIM>
-double PottsBasedCellPopulation<DIM>::GetDampingConstant(unsigned nodeIndex)
-{
-    EXCEPTION("Cannot call GetDampingConstant on a PottsBasedCellPopulation");
-    return 0.0;
 }
 
 template<unsigned DIM>
