@@ -372,6 +372,45 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
     }
 
+    void TestRandomIterationOverUpdateRules() throw (Exception)
+    {
+        // Create a simple 2D PottsMesh
+        PottsMeshGenerator<2> generator(8, 1, 4, 10, 1, 4);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<StochasticDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), STEM);
+
+        // Create cell population
+        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.SetIterateRandomlyOverUpdateRuleCollection(true);
+
+        // Set up cell-based simulation
+        OnLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestPottsMonolayerWithBirth");
+        simulator.SetDt(0.1);
+        simulator.SetEndTime(20);
+        simulator.SetSamplingTimestepMultiple(20);
+
+        // Create update rules and pass to the simulation
+        MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
+        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
+        MAKE_PTR(AdhesionPottsUpdateRule<2>, p_adhesion_update_rule);
+        simulator.AddPottsUpdateRule(p_adhesion_update_rule);
+
+        // Run simulation
+        simulator.Solve();
+
+        // Check the number of cells
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 4u);
+
+        // Test no deaths and some births
+        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 3u);
+        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
+    }
+
     void TestPottsSpheroidCellSorting() throw (Exception)
     {
         // Create a simple 3D PottsMesh

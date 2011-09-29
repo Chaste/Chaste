@@ -110,8 +110,7 @@ public:
      *
      * @param dt time step
      */
-    virtual void UpdateCellLocations(double dt)
-    {}
+    virtual void UpdateCellLocations(double dt)=0;
 
     /**
      * Get whether we update nodes in a random order.
