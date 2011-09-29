@@ -43,7 +43,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "HoneycombMeshGenerator.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
-#include "PetscSetupAndFinalize.hpp"
 
 class TestForcesNotForRelease : public AbstractCellBasedTestSuite
 {
