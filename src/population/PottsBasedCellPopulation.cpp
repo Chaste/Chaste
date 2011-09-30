@@ -29,7 +29,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "PottsBasedCellPopulation.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "Warnings.hpp"
-//Needed to convert mesh in order to write nodes to VTK (visualize as glyphs)
+
+// Needed to convert mesh in order to write nodes to VTK (visualize as glyphs)
 #include "VtkMeshWriter.hpp"
 #include "NodesOnlyMesh.hpp"
 #include "Exception.hpp"
@@ -311,7 +312,6 @@ bool PottsBasedCellPopulation<DIM>::IsCellAssociatedWithADeletedLocation(CellPtr
 template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 {
-    ///\todo implement this method
 }
 
 template<unsigned DIM>
@@ -335,7 +335,7 @@ void PottsBasedCellPopulation<DIM>::WriteResultsToFiles()
 {
     AbstractCellPopulation<DIM>::WriteResultsToFiles();
 
-    CreateElementTessellation(); //To be used to output to the visualiser
+    CreateElementTessellation(); // To be used to output to the visualiser
 
     SimulationTime* p_time = SimulationTime::Instance();
 
@@ -508,12 +508,6 @@ void PottsBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& r
 }
 
 template<unsigned DIM>
-void PottsBasedCellPopulation<DIM>::SetNode(unsigned nodeIndex, ChastePoint<DIM>& rNewLocation)
-{
-    EXCEPTION("Cannot call SetNode on a PottsBasedCellPopulation");
-}
-
-template<unsigned DIM>
 std::set<unsigned> PottsBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsigned index)
 {
     EXCEPTION("Cannot call GetNeighbouringNodeIndices() on a PottsBasedCellPopulation, need to go through the PottsMesh instead");
@@ -564,12 +558,12 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile()
     elem_ids.reserve(num_nodes);
 
     for (typename AbstractMesh<DIM,DIM>::NodeIterator iter = mrMesh.GetNodeIteratorBegin();
-            iter != mrMesh.GetNodeIteratorEnd();
-            ++iter)
+         iter != mrMesh.GetNodeIteratorEnd();
+         ++iter)
     {
         std::set<unsigned> element_indices = iter->rGetContainingElementIndices();
 
-        if(element_indices.size() == 0)
+        if (element_indices.empty())
         {
             // No elements associated with this gridpoint
             cell_types.push_back(-1.0);
@@ -583,7 +577,7 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         else
         {
             // The number of elements should be zero or one
-            assert(element_indices.size()==1);
+            assert(element_indices.size() == 1);
 
             unsigned element_index = *(element_indices.begin());
             elem_ids.push_back((double)element_index);
@@ -623,9 +617,10 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         mesh_writer.AddPointData("Cell labels", cell_labels);
     }
 
-    //The current VTK writer can only write things which inherit from AbstractTetrahedralMeshWriter
-    //For now, we do an explicit conversion to NodesOnlyMesh.  This can be written to VTK then visualized as glyphs.
-
+    /*
+     * The current VTK writer can only write things which inherit from AbstractTetrahedralMeshWriter.
+     * For now, we do an explicit conversion to NodesOnlyMesh. This can be written to VTK then visualized as glyphs.
+     */
     NodesOnlyMesh<DIM> temp_mesh;
     temp_mesh.ConstructNodesWithoutMesh(mrMesh);
     mesh_writer.WriteFilesUsingMesh(temp_mesh);

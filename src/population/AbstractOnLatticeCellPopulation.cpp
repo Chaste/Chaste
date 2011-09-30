@@ -78,6 +78,12 @@ bool AbstractOnLatticeCellPopulation<DIM>::GetIterateRandomlyOverUpdateRuleColle
 }
 
 template<unsigned DIM>
+void AbstractOnLatticeCellPopulation<DIM>::SetNode(unsigned nodeIndex, ChastePoint<DIM>& rNewLocation)
+{
+    EXCEPTION("SetNode() cannot be called on a subclass of AbstractOnLatticeCellPopulation.");
+}
+
+template<unsigned DIM>
 void AbstractOnLatticeCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t<UpdateNodesInRandomOrder>" << mUpdateNodesInRandomOrder << "</UpdateNodesInRandomOrder>\n";

@@ -48,8 +48,7 @@ class TestPottsBasedCellPopulation : public AbstractCellBasedTestSuite
 {
 public:
 
-    // Test construction, accessors and iterator
-    void TestCreateSmallPottsBasedCellPopulationAndGetWidth() throw (Exception)
+    void TestConstructor() throw(Exception)
     {
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
@@ -61,68 +60,60 @@ public:
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
         // Create cell population
-        unsigned num_cells = cells.size();
-
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 16u);
-        TS_ASSERT_EQUALS(cell_population.GetNumElements(), 4u);
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 4u);
-
-        // Coverage
-        TS_ASSERT_DELTA(cell_population.GetTemperature(), 0.1, 1e-6);
-        cell_population.SetTemperature(10.0);
-        TS_ASSERT_DELTA(cell_population.GetTemperature(), 10.0, 1e-6);
-        cell_population.SetTemperature(0.1);
-        TS_ASSERT_EQUALS(cell_population.GetUpdateNodesInRandomOrder(), true);
-        cell_population.SetUpdateNodesInRandomOrder(false);
-        TS_ASSERT_EQUALS(cell_population.GetUpdateNodesInRandomOrder(), false);
-        cell_population.SetUpdateNodesInRandomOrder(true);
-
-        // Test we have the correct number of cells and elements
+        // Test that the mesh and cells are correctly assigned
+        TS_ASSERT_EQUALS(&(cell_population.rGetMesh()), p_mesh);
         TS_ASSERT_EQUALS(cell_population.GetNumElements(), p_mesh->GetNumElements());
-        TS_ASSERT_EQUALS(cell_population.rGetCells().size(), num_cells);
+        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), p_mesh->GetNumNodes());
 
-        // Test GetNeighbouringNodeIndices() method
-        TS_ASSERT_THROWS_THIS(cell_population.GetNeighbouringNodeIndices(10), "Cannot call GetNeighbouringNodeIndices() on a PottsBasedCellPopulation, need to go through the PottsMesh instead");
+        AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (unsigned i=0; i<cells.size(); i++)
+        {
+            TS_ASSERT_EQUALS(*cell_iter, cells[i]);
+            ++cell_iter;
+        }
 
-        // Test PottsBasedCellPopulation<2>::Iterator
-        unsigned counter = 0;
-        for (PottsBasedCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        // Test that we do not have any update rules present
+        TS_ASSERT_EQUALS(cell_population.rGetUpdateRuleCollection().empty(), true);
+
+        // Test that the other member variables of this object are initialised correctly
+        TS_ASSERT(cell_population.GetElementTessellation() == NULL);
+        TS_ASSERT_DELTA(cell_population.GetTemperature(), 0.1, 1e-6);
+        TS_ASSERT_EQUALS(cell_population.GetNumSweepsPerTimestep(), 1u);
+        TS_ASSERT_EQUALS(cell_population.GetUpdateNodesInRandomOrder(), true);
+        TS_ASSERT_EQUALS(cell_population.GetIterateRandomlyOverUpdateRuleCollection(), false);
+    }
+
+    void TestIsCellAssociatedWithADeletedLocation() throw (Exception)
+    {
+        // Create a Potts-based cell population but do not try to validate
+        PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+        p_mesh->GetElement(0)->MarkAsDeleted();
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells, false, false);
+
+        // Test IsCellAssociatedWithADeletedLocation() method
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
-            // Test operator* and that cells are in sync
-            TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter), counter);
+            bool is_deleted = cell_population.IsCellAssociatedWithADeletedLocation(*cell_iter);
 
-            // Test operator-> and that cells are in sync
-            TS_ASSERT_DELTA(cell_iter->GetAge(), (double)counter, 1e-12);
-
-            TS_ASSERT_EQUALS(counter, p_mesh->GetElement(counter)->GetIndex());
-
-            counter++;
+            if (cell_population.GetLocationIndexUsingCell(*cell_iter) == 0)
+            {
+                TS_ASSERT_EQUALS(is_deleted, true);
+            }
+            else
+            {
+                TS_ASSERT_EQUALS(is_deleted, false);
+            }
         }
-
-        // Test we have gone through all cells in the for loop
-        TS_ASSERT_EQUALS(counter, cell_population.GetNumRealCells());
-
-        // Test GetNumNodes() method
-        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), p_mesh->GetNumNodes());
-
-        // Test GetWidth() method
-        double width_x = cell_population.GetWidth(0);
-        TS_ASSERT_DELTA(width_x, 3.0, 1e-4);
-
-        double width_y = cell_population.GetWidth(1);
-        TS_ASSERT_DELTA(width_y, 3.0, 1e-4);
-
-        // Test RemoveDeadCells() method
-        TS_ASSERT_EQUALS(cell_population.GetNumElements(), 4u);
-        cell_population.Begin()->Kill();
-        TS_ASSERT_EQUALS(cell_population.RemoveDeadCells(), 1u);
-        TS_ASSERT_EQUALS(cell_population.GetNumElements(), 3u);
-        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 3u);
-        TS_ASSERT_EQUALS(p_mesh->GetNumAllElements(), 4u);
     }
 
     void TestValidate() throw (Exception)
@@ -214,7 +205,35 @@ public:
                 "Element 0 appears to have 2 cells associated with it");
     }
 
-    void TestCellDivision() throw(Exception)
+    void TestRemoveDeadCellsAndUpdate() throw(Exception)
+    {
+        // Create a simple 2D PottsMesh
+        PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+        // Create cell population
+        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Test RemoveDeadCells() method
+        TS_ASSERT_EQUALS(cell_population.GetNumElements(), 4u);
+
+        cell_population.Begin()->Kill();
+
+        TS_ASSERT_EQUALS(cell_population.RemoveDeadCells(), 1u);
+        TS_ASSERT_EQUALS(cell_population.GetNumElements(), 3u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 3u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumAllElements(), 4u);
+
+        // Test that Update() throws no errors
+        TS_ASSERT_THROWS_NOTHING(cell_population.Update());
+    }
+
+    void TestAddCell() throw(Exception)
     {
         // Create a simple 2D PottsMesh with one cell
         PottsMeshGenerator<2> generator(2, 1, 2, 2, 1, 2);
@@ -260,7 +279,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(1)->GetNodeGlobalIndex(1), 3u);
     }
 
-///\todo implement this test (#1666)
+    ///\todo implement this test (#1666)
 //    void TestVoronoiMethods()
 //    {
 //        // Create a simple 2D PottsMesh
@@ -286,8 +305,11 @@ public:
 //        TS_ASSERT_EQUALS(p_tessellation->GetNumElements(), 16u);
 //    }
 
-    void TestPottsBasedCellPopulationWriters()
+    void TestWriteResultsToFileAndOutputCellPopulationParameters()
     {
+        // Resetting the maximum cell ID to zero (to account for previous tests)
+        Cell::ResetMaxCellId();
+
         std::string output_directory = "TestPottsBasedCellPopulationWriters";
         OutputFileHandler output_file_handler(output_directory, false);
 
@@ -348,6 +370,89 @@ public:
         TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.parameters    notforrelease_cell_based/test/data/TestPottsBasedCellPopulationWriters/results.parameters").c_str()), 0);
     }
 
+    void TestNodeAndMeshMethods() throw(Exception)
+    {
+        // Create a Potts-based cell population
+        PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Test GetNumNodes()
+        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 16u);
+
+        // Test GetNode()
+        for (unsigned index=0; index<cell_population.GetNumNodes(); index++)
+        {
+            Node<2>* p_node = cell_population.GetNode(index);
+            TS_ASSERT_EQUALS(p_node->GetIndex(), index);
+
+            c_vector<double, 2> node_location = p_node->rGetLocation();
+            double expected_x = (double)(index%4);
+            double expected_y = (double)(index>3) + (double)(index>7) + (double)(index>11);
+            TS_ASSERT_DELTA(node_location[0], expected_x, 1e-3);
+            TS_ASSERT_DELTA(node_location[1], expected_y, 1e-3);
+        }
+
+        // Test GetElement()
+        for (unsigned index=0; index<cell_population.GetNumElements(); index++)
+        {
+            PottsElement<2>* p_element = cell_population.GetElement(index);
+            TS_ASSERT_EQUALS(p_element->GetIndex(), index);
+
+            TS_ASSERT_EQUALS(p_element->GetNumNodes(), 4u);
+        }
+        
+        // Test SetNode()
+        ChastePoint<2> unused_point;
+        TS_ASSERT_THROWS_THIS(cell_population.SetNode(0, unused_point),
+                              "SetNode() cannot be called on a subclass of AbstractOnLatticeCellPopulation.");
+
+        // Test GetWidth() method
+        double width_x = cell_population.GetWidth(0);
+        TS_ASSERT_DELTA(width_x, 3.0, 1e-4);
+
+        double width_y = cell_population.GetWidth(1);
+        TS_ASSERT_DELTA(width_y, 3.0, 1e-4);
+
+        // Test GetNeighbouringNodeIndices() method
+        TS_ASSERT_THROWS_THIS(cell_population.GetNeighbouringNodeIndices(10),
+            "Cannot call GetNeighbouringNodeIndices() on a PottsBasedCellPopulation, need to go through the PottsMesh instead");
+    }
+
+    void TestGetLocationOfCellCentre() throw (Exception)
+    {
+        // Create a Potts-based cell population
+        PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Test GetLocationOfCellCentre()
+        AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+
+        for (unsigned i=0; i<4; i++)
+        {
+            c_vector<double, 2> cell_1_location = cell_population.GetLocationOfCellCentre(*cell_iter);
+
+            double x = 0.5 + 2*(i%2 != 0);
+            double y = 0.5 + 2*(i > 1);
+
+            TS_ASSERT_DELTA(cell_1_location[0], x, 1e-6);
+            TS_ASSERT_DELTA(cell_1_location[1], y, 1e-6);
+
+            ++cell_iter;
+        }
+    }
+
     void TestAddingUpdateRules() throw(Exception)
     {
         // Create a simple 2D PottsMesh with one cell
@@ -376,7 +481,7 @@ public:
         TS_ASSERT_EQUALS((*update_rule_collection[0]).GetIdentifier(), "VolumeConstraintPottsUpdateRule-2");
     }
 
-    void TestArchiving2dPottsBasedCellPopulation() throw(Exception)
+    void TestArchiving() throw(Exception)
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "potts_cell_population_2d.arch";
@@ -392,122 +497,56 @@ public:
 
         // Archive cell population
         {
-            // Need to set up time
-            unsigned num_steps = 10;
-            SimulationTime* p_simulation_time = SimulationTime::Instance();
-            p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, num_steps+1);
-
-            // Create cells
+            // Create a Potts-based cell population object
             std::vector<CellPtr> cells;
             CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasic(cells, mesh.GetNumElements());
 
             // Create cell population
-            PottsBasedCellPopulation<2>* const p_cell_population = new PottsBasedCellPopulation<2>(mesh, cells);
-
-            // Cells have been given birth times of 0 and -1.
-            // Loop over them to run to time 0.0;
-            for (AbstractCellPopulation<2>::Iterator cell_iter = p_cell_population->Begin();
-                 cell_iter != p_cell_population->End();
-                 ++cell_iter)
-            {
-                cell_iter->ReadyToDivide();
-            }
+            AbstractCellPopulation<2>* const p_cell_population = new PottsBasedCellPopulation<2>(mesh, cells);
 
             // Create an update rule and pass to the population
             MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
-            p_cell_population->AddUpdateRule(p_volume_constraint_update_rule);
+            static_cast<PottsBasedCellPopulation<2>*>(p_cell_population)->AddUpdateRule(p_volume_constraint_update_rule);
 
             // Create output archive
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
 
-            // Write the cell population to the archive
-            (*p_arch) << static_cast<const SimulationTime&> (*p_simulation_time);
+            // Set member variables in order to test that they are archived correctly
+            static_cast<PottsBasedCellPopulation<2>*>(p_cell_population)->SetTemperature(0.25);
+            static_cast<PottsBasedCellPopulation<2>*>(p_cell_population)->SetNumSweepsPerTimestep(3);
+            static_cast<PottsBasedCellPopulation<2>*>(p_cell_population)->SetUpdateNodesInRandomOrder(false);
+            static_cast<PottsBasedCellPopulation<2>*>(p_cell_population)->SetIterateRandomlyOverUpdateRuleCollection(true);
+
+            // Archive the cell population
             (*p_arch) << p_cell_population;
 
             // Tidy up
-            SimulationTime::Destroy();
             delete p_cell_population;
         }
 
         // Restore cell population
         {
-            // Need to set up time
-            unsigned num_steps = 10;
-            SimulationTime* p_simulation_time = SimulationTime::Instance();
-            p_simulation_time->SetStartTime(0.0);
-            p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, num_steps+1);
-            p_simulation_time->IncrementTimeOneStep();
+            AbstractCellPopulation<2>* p_cell_population;
 
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
 
             // Restore the cell population
-            (*p_arch) >> *p_simulation_time;
-            PottsBasedCellPopulation<2>* p_cell_population;
             (*p_arch) >> p_cell_population;
 
-            // Check the cell population has been restored correctly
-            TS_ASSERT_EQUALS(p_cell_population->rGetCells().size(), 2u);
+            // Test that the member variables have been archived correctly
+            PottsBasedCellPopulation<2>* p_static_population = static_cast<PottsBasedCellPopulation<2>*>(p_cell_population);
+            TS_ASSERT_DELTA(p_static_population->GetTemperature(), 0.25, 1e-6);
+            TS_ASSERT_EQUALS(p_static_population->GetNumSweepsPerTimestep(), 3u);
+            TS_ASSERT_EQUALS(p_static_population->GetUpdateNodesInRandomOrder(), false);
+            TS_ASSERT_EQUALS(p_static_population->GetIterateRandomlyOverUpdateRuleCollection(), true);
 
-            // Cells have been given birth times of 0, -1, -2, -3, -4.
-            // this checks that individual cells and their models are archived.
-            unsigned counter = 0;
-            for (AbstractCellPopulation<2>::Iterator cell_iter = p_cell_population->Begin();
-                 cell_iter != p_cell_population->End();
-                 ++cell_iter)
-            {
-                TS_ASSERT_DELTA(cell_iter->GetAge(), (double)(counter), 1e-7);
-                counter++;
-            }
-
-            // Check the simulation time has been restored (through the cell)
-            TS_ASSERT_EQUALS(p_simulation_time->GetTime(), 0.0);
-
-            // Check the mesh has been restored correctly
-            TS_ASSERT_EQUALS(p_cell_population->rGetMesh().GetNumNodes(), 6u);
-            TS_ASSERT_EQUALS(p_cell_population->rGetMesh().GetNumElements(), 2u);
-
-            // Compare the loaded mesh against the original
-            PottsMesh<2>& loaded_mesh = p_cell_population->rGetMesh();
-
-            TS_ASSERT_EQUALS(mesh.GetNumNodes(), loaded_mesh.GetNumNodes());
-
-            for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
-            {
-                Node<2>* p_node = mesh.GetNode(node_index);
-                Node<2>* p_node2 = loaded_mesh.GetNode(node_index);
-
-                TS_ASSERT_EQUALS(p_node->IsDeleted(), p_node2->IsDeleted());
-                TS_ASSERT_EQUALS(p_node->GetIndex(), p_node2->GetIndex());
-
-                for (unsigned dimension=0; dimension<2; dimension++)
-                {
-                    TS_ASSERT_DELTA(p_node->rGetLocation()[dimension], p_node2->rGetLocation()[dimension], 1e-4);
-                }
-            }
-
-            TS_ASSERT_EQUALS(mesh.GetNumElements(), loaded_mesh.GetNumElements());
-
-            for (unsigned elem_index=0; elem_index < mesh.GetNumElements(); elem_index++)
-            {
-                TS_ASSERT_EQUALS(mesh.GetElement(elem_index)->GetNumNodes(),
-                                 loaded_mesh.GetElement(elem_index)->GetNumNodes());
-
-                for (unsigned local_index=0; local_index<mesh.GetElement(elem_index)->GetNumNodes(); local_index++)
-                {
-                    unsigned this_index = mesh.GetElement(elem_index)->GetNodeGlobalIndex(local_index);
-                    unsigned loaded_index = loaded_mesh.GetElement(elem_index)->GetNodeGlobalIndex(local_index);
-
-                    TS_ASSERT_EQUALS(this_index, loaded_index);
-                }
-            }
-
-            // Check Update rules are restored correctly
-            std::vector<boost::shared_ptr<AbstractPottsUpdateRule<2> > > update_rule_collection = p_cell_population->rGetUpdateRuleCollection();
-            TS_ASSERT_EQUALS(update_rule_collection.size(),1u);
+            // Test that the update rule has been archived correctly
+            std::vector<boost::shared_ptr<AbstractPottsUpdateRule<2> > > update_rule_collection = p_static_population->rGetUpdateRuleCollection();
+            TS_ASSERT_EQUALS(update_rule_collection.size(), 1u);
             TS_ASSERT_EQUALS((*update_rule_collection[0]).GetIdentifier(), "VolumeConstraintPottsUpdateRule-2");
 
             // Tidy up

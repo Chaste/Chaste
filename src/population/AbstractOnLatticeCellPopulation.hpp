@@ -139,6 +139,17 @@ public:
     bool GetIterateRandomlyOverUpdateRuleCollection();
 
     /**
+     * Overridden SetNode() method.
+     *
+     * This method throws an exception if called on a subclass of AbstractOnLatticeCellPopulation,
+     * since in such classes the lattice is assumed to be fixed.
+     *
+     * @param index the index of the node to be moved
+     * @param rNewLocation the new target location of the node
+     */
+    void SetNode(unsigned index, ChastePoint<DIM>& rNewLocation);
+
+    /**
      * Outputs CellPopulation parameters to file
      *
      * @param rParamsFile the file stream to which the parameters are output

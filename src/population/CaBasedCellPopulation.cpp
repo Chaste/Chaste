@@ -26,14 +26,16 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#include "CaBasedCellPopulation.hpp"
-
 #include <cassert>
 #include <algorithm>
 
-#include "Exception.hpp"
+#include "CaBasedCellPopulation.hpp"
 #include "RandomNumberGenerator.hpp"
-#include "SimulationTime.hpp"
+
+// Needed to convert mesh in order to write nodes to VTK (visualize as glyphs)
+#include "VtkMeshWriter.hpp"
+#include "NodesOnlyMesh.hpp"
+#include "Exception.hpp"
 
 template<unsigned DIM>
 CaBasedCellPopulation<DIM>::CaBasedCellPopulation(TetrahedralMesh<DIM, DIM>& rMesh,
@@ -54,7 +56,7 @@ CaBasedCellPopulation<DIM>::CaBasedCellPopulation(TetrahedralMesh<DIM, DIM>& rMe
         // Create a set of node indices corresponding to empty sites
         std::set<unsigned> node_indices;
         std::set<unsigned> location_indices;
-        std::set<unsigned> ghost_node_indices;
+        std::set<unsigned> empty_site_indices;
 
         for (unsigned i=0; i<this->GetNumNodes(); i++)
         {
@@ -67,14 +69,14 @@ CaBasedCellPopulation<DIM>::CaBasedCellPopulation(TetrahedralMesh<DIM, DIM>& rMe
 
         std::set_difference(node_indices.begin(), node_indices.end(),
                             location_indices.begin(), location_indices.end(),
-                            std::inserter(ghost_node_indices, ghost_node_indices.begin()));
+                            std::inserter(empty_site_indices, empty_site_indices.begin()));
 
         // This method finishes and then calls Validate()
-        SetEmptySites(ghost_node_indices);
+        SetEmptySites(empty_site_indices);
     }
     else
     {
-        this->mIsEmptySite = std::vector<bool>(this->GetNumNodes(), false);
+        mIsEmptySite = std::vector<bool>(this->GetNumNodes(), false);
         Validate();
     }
 }
@@ -184,47 +186,55 @@ const std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > >& CaBasedCellPo
 }
 
 template<unsigned DIM>
-void CaBasedCellPopulation<DIM>::SetVonNeumannNeighbourhoods(bool useVonNeumannNeighbourhoods)
+void CaBasedCellPopulation<DIM>::SetUseVonNeumannNeighbourhoods(bool useVonNeumannNeighbourhoods)
 {
     mUseVonNeumannNeighbourhoods = useVonNeumannNeighbourhoods;
 }
 
 template<unsigned DIM>
+bool CaBasedCellPopulation<DIM>::GetUseVonNeumannNeighbourhoods()
+{
+    return mUseVonNeumannNeighbourhoods;
+}
+
+template<unsigned DIM>
 std::vector<bool>& CaBasedCellPopulation<DIM>::rGetEmptySites()
 {
-    return this->mIsEmptySite;
+    return mIsEmptySite;
 }
 
 template<unsigned DIM>
 bool CaBasedCellPopulation<DIM>::IsEmptySite(unsigned index)
 {
-    return this->mIsEmptySite[index];
+    return mIsEmptySite[index];
 }
 
 template<unsigned DIM>
 std::set<unsigned> CaBasedCellPopulation<DIM>::GetEmptySiteIndices()
 {
-    std::set<unsigned> ghost_node_indices;
-    for (unsigned i=0; i<this->mIsEmptySite.size(); i++)
+    std::set<unsigned> empty_site_indices;
+    for (unsigned i=0; i<mIsEmptySite.size(); i++)
     {
-        if (this->mIsEmptySite[i])
+        if (mIsEmptySite[i])
         {
-            ghost_node_indices.insert(i);
+            empty_site_indices.insert(i);
         }
     }
-    return ghost_node_indices;
+    return empty_site_indices;
 }
 
 template<unsigned DIM>
 void CaBasedCellPopulation<DIM>::SetEmptySites(const std::set<unsigned>& rEmptySiteIndices)
 {
     // Reinitialise all entries of mIsEmptySite to false
-    this->mIsEmptySite = std::vector<bool>(this->mrMesh.GetNumNodes(), false);
+    mIsEmptySite = std::vector<bool>(this->mrMesh.GetNumNodes(), false);
 
     // Update mIsEmptySite
-    for (std::set<unsigned>::iterator iter=rEmptySiteIndices.begin(); iter!=rEmptySiteIndices.end(); ++iter)
+    for (std::set<unsigned>::iterator iter = rEmptySiteIndices.begin();
+         iter != rEmptySiteIndices.end();
+         ++iter)
     {
-        this->mIsEmptySite[*iter] = true;
+        mIsEmptySite[*iter] = true;
     }
 
     Validate();
@@ -257,6 +267,17 @@ unsigned CaBasedCellPopulation<DIM>::GetNumNodes()
 template<unsigned DIM>
 CellPtr CaBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell)
 {
+    /*
+     * In the case of a CaBasedCellPopulation, we must provided a parent cell when calling AddCell().
+     * This is because the location of the parent cell is used as a starting point in the search
+     * among neighbours for an empty site in which to locate the new cell. Therefore, if no parent
+     * cell is provided, we throw the following exception.
+     */
+    if (pParentCell == CellPtr())
+    {
+        EXCEPTION("A parent cell must be provided when calling AddCell() on a CaBasedCellPopulation.");
+    }
+
     ///\todo This method could probably be made more efficient (#1411)
 
     // Add rNewCell to mCells
@@ -273,7 +294,7 @@ CellPtr CaBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_vector<dou
 
     if (mOnlyUseNearestNeighboursForDivision)
     {
-        degree_upper_bound = 1;            // Only want to search the next nearest neighbours
+        degree_upper_bound = 1;
     }
     else
     {
@@ -348,10 +369,89 @@ CellPtr CaBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_vector<dou
     // If no free neighbour was found, throw an exception
     if (!free_neighbour_was_found)
     {
-        EXCEPTION("Cell can not divide as there are no free neighbours at maximum degree in any direction");
+        EXCEPTION("Cell can not divide as there are no free neighbours at maximum degree in any direction.");
     }
 
     return p_created_cell;
+}
+
+template<unsigned DIM>
+void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile()
+{
+#ifdef CHASTE_VTK
+    std::stringstream time;
+    time << SimulationTime::Instance()->GetTimeStepsElapsed();
+    VtkMeshWriter<DIM, DIM> mesh_writer(this->mDirPath, "results_"+time.str(), false);
+
+    unsigned num_nodes = GetNumNodes();
+    std::vector<double> cell_types;
+    std::vector<double> cell_mutation_states;
+    std::vector<double> cell_labels;
+    cell_types.reserve(num_nodes);
+    cell_mutation_states.reserve(num_nodes);
+    cell_labels.reserve(num_nodes);
+
+    for (unsigned node_index=0; node_index<num_nodes; node_index++)
+    {
+        if (node_index)
+        {
+            // No cell is associated with this node
+            cell_types.push_back(-1.0);
+            if (this->mOutputCellMutationStates)
+            {
+                cell_mutation_states.push_back(-1.0);
+                cell_labels.push_back(-1.0);
+            }
+        }
+        else
+        {
+            CellPtr p_cell = this->mLocationCellMap[node_index];
+            double cell_type = p_cell->GetCellCycleModel()->GetCellProliferativeType();
+            cell_types.push_back(cell_type);
+
+            if (this->mOutputCellMutationStates)
+            {
+                double cell_mutation_state = p_cell->GetMutationState()->GetColour();
+                cell_mutation_states.push_back(cell_mutation_state);
+
+                double cell_label = 0.0;
+                if (p_cell->HasCellProperty<CellLabel>())
+                {
+                    CellPropertyCollection collection = p_cell->rGetCellPropertyCollection().GetProperties<CellLabel>();
+                    boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(collection.GetProperty());
+                    cell_label = p_label->GetColour();
+                }
+                cell_labels.push_back(cell_label);
+            }
+        }
+    }
+
+    assert(cell_types.size() == num_nodes);
+
+    mesh_writer.AddPointData("Cell types", cell_types);
+
+    if (this->mOutputCellMutationStates)
+    {
+        assert(cell_mutation_states.size() == num_nodes);
+        mesh_writer.AddPointData("Mutation states", cell_mutation_states);
+        assert(cell_labels.size() == num_nodes);
+        mesh_writer.AddPointData("Cell labels", cell_labels);
+    }
+
+    /*
+     * The current VTK writer can only write things which inherit from AbstractTetrahedralMeshWriter.
+     * For now, we do an explicit conversion to NodesOnlyMesh. This can be written to VTK then visualized as glyphs.
+     */
+    NodesOnlyMesh<DIM> temp_mesh;
+    temp_mesh.ConstructNodesWithoutMesh(mrMesh);
+    mesh_writer.WriteFilesUsingMesh(temp_mesh);
+
+    *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
+    *(this->mpVtkMetaFile) << time.str();
+    *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
+    *(this->mpVtkMetaFile) << time.str();
+    *(this->mpVtkMetaFile) << ".vtu\"/>\n";
+#endif //CHASTE_VTK
 }
 
 template<unsigned DIM>
@@ -691,7 +791,7 @@ unsigned CaBasedCellPopulation<DIM>::RemoveDeadCells()
             unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
 
             // Set this node to be an empty site
-            this->mIsEmptySite[node_index] = true;
+            mIsEmptySite[node_index] = true;
             this->mCellLocationMap.erase((*cell_iter).get());
             this->mLocationCellMap.erase(node_index);
 
@@ -713,12 +813,12 @@ void CaBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 template<unsigned DIM>
 void CaBasedCellPopulation<DIM>::Validate()
 {
-    // Get a list of all the nodes that are ghosts
+    // Get a list of all the sites that are empty
     std::vector<bool> validated_node = mIsEmptySite;
 
-    assert(mIsEmptySite.size()==this->GetNumNodes());
+    assert(mIsEmptySite.size() == this->GetNumNodes());
 
-    // Look through all of the cells and record what node they are associated with.
+    // Look through all of the cells and record what node they are associated with
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
          cell_iter != this->End();
          ++cell_iter)
@@ -818,24 +918,22 @@ void CaBasedCellPopulation<DIM>::WriteCellVolumeResultsToFile()
     // Write time to file
     *(this->mpCellVolumesFile) << SimulationTime::Instance()->GetTime() << " ";
 
+    // Cell volumes all one (equal-sized lattice sites)
+    double cell_volume = 1.0;
+
     // Loop over cells
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter=this->Begin(); 
          cell_iter!=this->End(); ++cell_iter)
     {
-        // Get the index of the corresponding node in mrMesh
+        // Get the index of the corresponding node in mrMesh and write to file
         unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
-
-        // Cell volumes all one (equal-sized lattice sites)
-        double cell_volume = 1.0;
-           
-        // Write node index to file
         *(this->mpCellVolumesFile) << node_index << " ";
 
-        // Write cell ID to file
+        // Get cell ID and write to file
         unsigned cell_index = cell_iter->GetCellId();
         *(this->mpCellVolumesFile) << cell_index << " ";
 
-        // Write node location to file
+        // Get node location and write to file
         c_vector<double, DIM> node_location = this->GetNode(node_index)->rGetLocation();
         for (unsigned i=0; i<DIM; i++)
         {
@@ -917,7 +1015,7 @@ void CaBasedCellPopulation<DIM>::MoveCell(CellPtr pCell, unsigned newLocationInd
         assert(IsEmptySite(newLocationIndex));
 
         // Update the new location index to correspond to this cell
-        this->mIsEmptySite[newLocationIndex] = false;
+        mIsEmptySite[newLocationIndex] = false;
         this->mLocationCellMap[newLocationIndex] = pCell;
 
         // Update this cell to correspond to the new location index
@@ -928,7 +1026,7 @@ void CaBasedCellPopulation<DIM>::MoveCell(CellPtr pCell, unsigned newLocationInd
         {
             // ...update the current location index to correspond to an empty site
             this->mLocationCellMap.erase(current_location_index);
-            this->mIsEmptySite[current_location_index] = true;
+            mIsEmptySite[current_location_index] = true;
         }
     }
 }
@@ -939,12 +1037,6 @@ c_vector<double, DIM> CaBasedCellPopulation<DIM>::GetLocationOfCellCentre(CellPt
     unsigned node_index = this->mCellLocationMap[pCell.get()];
     c_vector<double, DIM> node_location = this->GetNode(node_index)->rGetLocation();
     return node_location;
-}
-
-template<unsigned DIM>
-void CaBasedCellPopulation<DIM>::SetNode(unsigned nodeIndex, ChastePoint<DIM>& rNewLocation)
-{
-    EXCEPTION("SetNode() cannot be called on a CaBasedCellPopulation");
 }
 
 template<unsigned DIM>

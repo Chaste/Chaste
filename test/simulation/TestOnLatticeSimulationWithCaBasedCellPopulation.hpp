@@ -129,7 +129,7 @@ public:
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetDt(1);
-        simulator.SetEndTime(20);
+        simulator.SetEndTime(10);
 
         // Pass an update rule to the simulation
         MAKE_PTR(DiffusionCaUpdateRule<2>, p_update_rule);
@@ -158,11 +158,9 @@ public:
 
         // Create a cell that keeps dividing
         MAKE_PTR(WildTypeCellMutationState, p_state);
-
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         p_model->SetCellProliferativeType(TRANSIT);
         p_model->SetMaxTransitGenerations(UINT_MAX);
-
         CellPtr p_cell(new Cell(p_state, p_model));
         p_cell->SetBirthTime(-13.5);
 
@@ -193,7 +191,7 @@ public:
     {
         // Create mesh
         TetrahedralMesh<2,2> mesh;
-        mesh.ConstructRectangularMesh(49, 49, true); // 50*50 nodes
+        mesh.ConstructRectangularMesh(19, 19, true); // 20*20 nodes
 
         // Create location indices
         std::vector<unsigned> real_node_indices;
@@ -216,7 +214,7 @@ public:
         OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDiffusionOfLargeNumberOfCells");
         simulator.SetDt(0.1);
-        simulator.SetEndTime(5.0);
+        simulator.SetEndTime(1.0);
 
         // Pass an update rule to the simulation
         MAKE_PTR(DiffusionCaUpdateRule<2>, p_update_rule);
@@ -232,7 +230,7 @@ public:
     {
         // Create mesh
         TetrahedralMesh<2,2> mesh;
-        mesh.ConstructRectangularMesh(19, 19, true); // 50*50 nodes
+        mesh.ConstructRectangularMesh(19, 19, true); // 20*20 nodes
 
         // Create location indices
         std::vector<unsigned> real_node_indices;
@@ -255,7 +253,7 @@ public:
         OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDiffusionAndDeathOfLargeNumberOfCells");
         simulator.SetDt(0.1);
-        simulator.SetEndTime(10);
+        simulator.SetEndTime(1);
 
         // Pass an update rule to the simulation
         MAKE_PTR(DiffusionCaUpdateRule<2>, p_update_rule);
@@ -268,7 +266,7 @@ public:
         // Run simulation
         simulator.Solve();
 
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 95u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 99u);
     }
 
     void TestDiffusionAndDivisionOfLargeNumberOfCells() throw (Exception)
@@ -418,52 +416,6 @@ public:
         c_vector<double, 2> cell_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(*cell_iter);
         TS_ASSERT_DELTA(cell_location[0], 3.000, 1e-4);
         TS_ASSERT_DELTA(cell_location[1], 3.000, 1e-4);
-    }
-
-    void TestRandomIterationOverUpdateRules() throw (Exception)
-    {
-        // Create mesh
-        TetrahedralMesh<2,2> mesh;
-        mesh.ConstructRectangularMesh(10, 10, true); // 50*50 nodes
-
-        // Create a single cell
-        MAKE_PTR(WildTypeCellMutationState, p_state);
-        FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-        p_model->SetCellProliferativeType(STEM);
-        CellPtr p_cell(new Cell(p_state, p_model));
-
-        std::vector<CellPtr> cells;
-        cells.push_back(p_cell);
-
-        std::vector<unsigned> real_node_indices;
-        real_node_indices.push_back(0);
-
-        // Create a cell population
-        CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
-        cell_population.SetIterateRandomlyOverUpdateRuleCollection(true);
-
-        // Set up cell-based simulation
-        OnLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestRandomIterationOverUpdateRules");
-        simulator.SetDt(0.1);
-        simulator.SetEndTime(5.0);
-
-        // Pass an update rule to the simulation
-        MAKE_PTR_ARGS(DiffusionCaUpdateRule<2>, p_update_rule, (1.0)); // unit diffusion coefficient
-        simulator.AddCaUpdateRule(p_update_rule);
-        
-        // Pass another update rule to the simulation
-        MAKE_PTR_ARGS(AdvectionCaUpdateRule<2>, p_update_rule2, (0, 1.0)); // flow upward with unit mean speed
-        simulator.AddCaUpdateRule(p_update_rule2);
-
-        // Run simulation
-        simulator.Solve();
-
-        // Test final position of first cell
-        AbstractCellPopulation<2>::Iterator cell_iter_final = simulator.rGetCellPopulation().Begin();
-        c_vector<double, 2> cell_location_final = simulator.rGetCellPopulation().GetLocationOfCellCentre(*cell_iter_final);
-        TS_ASSERT_DELTA(cell_location_final[0], 0.000, 1e-4);
-        TS_ASSERT_DELTA(cell_location_final[1], 3.000, 1e-4);
     }
 
     void TestStandardResultForArchivingTestsBelow() throw (Exception)

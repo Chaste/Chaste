@@ -123,10 +123,7 @@ private:
     /**
      * Overridden WriteVtkResultsToFile() method.
      */
-    void WriteVtkResultsToFile()
-    {
-        ///\todo implement writing VTK results for this class (#1666)
-    }
+    void WriteVtkResultsToFile();
 
 public:
 
@@ -209,7 +206,12 @@ public:
      *
      * @param useVonNeumannNeighbourhoods whether to use von Neumann neighbourhoods
      */
-    void SetVonNeumannNeighbourhoods(bool useVonNeumannNeighbourhoods);
+    void SetUseVonNeumannNeighbourhoods(bool useVonNeumannNeighbourhoods);
+
+    /**
+     * @return mUseVonNeumannNeighbourhoods
+     */
+    bool GetUseVonNeumannNeighbourhoods();
 
     /**
      * @return mIsEmptySite.
@@ -217,8 +219,6 @@ public:
     std::vector<bool>& rGetEmptySites();
 
     /**
-     * Overridden IsEmptySite() method.
-     *
      * Find if a given node is an empty site. The abstract method always returns false
      * but is overridden in subclasses.
      *
@@ -289,7 +289,7 @@ public:
     virtual CellPtr AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell=CellPtr());
 
     /**
-     * Same method as GetNeighbouringNodeIndices above, but returns an ORDERED vector
+     * Same method as GetNeighbouringNodeIndices() above, but returns an ORDERED vector
      * of neighbouring nodes, in the order N, NW, W, SW, S, SE, E, NE. This is needed
      * to make GetNthDegreeNeighbouringNodeIndices work, as this exploits the ordering
      * of the neighbours.
@@ -418,17 +418,6 @@ public:
      * @return the location of the cell
      */
     c_vector<double, DIM> GetLocationOfCellCentre(CellPtr pCell);
-
-    /**
-     * Move the node with a given index to a new point in space.
-     *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
-     *
-     * @param nodeIndex the index of the node to be moved
-     * @param rNewLocation the new target location of the node
-     */
-    void SetNode(unsigned nodeIndex, ChastePoint<DIM>& rNewLocation);
 
     /**
      * Outputs CellPopulation parameters to file

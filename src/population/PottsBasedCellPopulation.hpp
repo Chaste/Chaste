@@ -365,16 +365,6 @@ public:
      * @return mNumSweepsPerTimestep
      */
     unsigned GetNumSweepsPerTimestep();
-
-    /**
-     * Overridden SetNode() method.
-     *
-     * Move the node with a given index to a new point in space.
-     *
-     * @param index the index of the node to be moved
-     * @param rNewLocation the new target location of the node
-     */
-    void SetNode(unsigned index, ChastePoint<DIM>& rNewLocation);
     
     /**
      * Create a Element tessellation of the mesh for use in visualising the mesh.
