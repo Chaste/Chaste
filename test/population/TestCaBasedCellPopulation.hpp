@@ -435,6 +435,11 @@ public:
 
         // Archive a cell population
         {
+            // Need to set up time
+            unsigned num_steps = 10;
+            SimulationTime* p_simulation_time = SimulationTime::Instance();
+            p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, num_steps+1);
+
             // Create a CA-based cell population object
             TetrahedralMesh<2,2> mesh;
             mesh.ConstructRectangularMesh(6, 6, true);
@@ -451,6 +456,15 @@ public:
 
             AbstractCellPopulation<2>* const p_cell_population = new CaBasedCellPopulation<2>(mesh, cells, real_node_indices);
 
+            // Cells have been given birth times of 0, -1, -2, -3, -4.
+            // loop over them to run to time 0.0;
+            for (AbstractCellPopulation<2>::Iterator cell_iter = p_cell_population->Begin();
+                 cell_iter != p_cell_population->End();
+                 ++cell_iter)
+            {
+                cell_iter->ReadyToDivide();
+            }
+
             // Set member variables in order to test that they are archived correctly
             static_cast<CaBasedCellPopulation<2>*>(p_cell_population)->SetOnlyUseNearestNeighboursForDivision(true);
             static_cast<CaBasedCellPopulation<2>*>(p_cell_population)->SetUseVonNeumannNeighbourhoods(true);
@@ -466,20 +480,30 @@ public:
             boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
 
             // Archive the cell population
+            (*p_arch) << static_cast<const SimulationTime&>(*p_simulation_time);
             (*p_arch) << p_cell_population;
 
             // Tidy up
+            SimulationTime::Destroy();
             delete p_cell_population;
         }
 
         // Restore the cell population
         {
-            AbstractCellPopulation<2>* p_cell_population;
+            // Need to set up time
+            unsigned num_steps = 10;
+            SimulationTime* p_simulation_time = SimulationTime::Instance();
+            p_simulation_time->SetStartTime(0.0);
+            p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, num_steps+1);
+            p_simulation_time->IncrementTimeOneStep();
 
             // Restore the cell population
+            AbstractCellPopulation<2>* p_cell_population;
+
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
 
+            (*p_arch) >> *p_simulation_time;
             (*p_arch) >> p_cell_population;
 
             // Test that the member variables have been archived correctly

@@ -497,6 +497,11 @@ public:
 
         // Archive cell population
         {
+            // Need to set up time
+            unsigned num_steps = 10;
+            SimulationTime* p_simulation_time = SimulationTime::Instance();
+            p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, num_steps+1);
+
             // Create a Potts-based cell population object
             std::vector<CellPtr> cells;
             CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
@@ -504,6 +509,15 @@ public:
 
             // Create cell population
             AbstractCellPopulation<2>* const p_cell_population = new PottsBasedCellPopulation<2>(mesh, cells);
+
+            // Cells have been given birth times of 0, -1, -2, -3, -4.
+            // loop over them to run to time 0.0;
+            for (AbstractCellPopulation<2>::Iterator cell_iter = p_cell_population->Begin();
+                 cell_iter != p_cell_population->End();
+                 ++cell_iter)
+            {
+                cell_iter->ReadyToDivide();
+            }
 
             // Create an update rule and pass to the population
             MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
@@ -520,14 +534,23 @@ public:
             static_cast<PottsBasedCellPopulation<2>*>(p_cell_population)->SetIterateRandomlyOverUpdateRuleCollection(true);
 
             // Archive the cell population
+            (*p_arch) << static_cast<const SimulationTime&>(*p_simulation_time);
             (*p_arch) << p_cell_population;
 
             // Tidy up
+            SimulationTime::Destroy();
             delete p_cell_population;
         }
 
         // Restore cell population
         {
+            // Need to set up time
+            unsigned num_steps = 10;
+            SimulationTime* p_simulation_time = SimulationTime::Instance();
+            p_simulation_time->SetStartTime(0.0);
+            p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, num_steps+1);
+            p_simulation_time->IncrementTimeOneStep();
+
             AbstractCellPopulation<2>* p_cell_population;
 
             // Create an input archive
@@ -535,6 +558,7 @@ public:
             boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
 
             // Restore the cell population
+            (*p_arch) >> *p_simulation_time;
             (*p_arch) >> p_cell_population;
 
             // Test that the member variables have been archived correctly
