@@ -132,6 +132,9 @@ void OnLatticeSimulation<DIM>::UpdateCellLocationsAndTopology()
 template<unsigned DIM>
 void OnLatticeSimulation<DIM>::SetupSolve()
 {
+    // First call method on base class
+    AbstractCellBasedSimulation<DIM>::SetupSolve();
+
     if (mOutputCellVelocities)
     {
         OutputFileHandler output_file_handler2(this->mSimulationOutputDirectory+"/", false);
@@ -142,6 +145,9 @@ void OnLatticeSimulation<DIM>::SetupSolve()
 template<unsigned DIM>
 void OnLatticeSimulation<DIM>::AfterSolve()
 {
+    // First call method on base class
+    AbstractCellBasedSimulation<DIM>::AfterSolve();
+
     if (mOutputCellVelocities)
     {
         mpCellVelocitiesFile->close();
