@@ -378,80 +378,82 @@ CellPtr CaBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_vector<dou
 template<unsigned DIM>
 void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile()
 {
-#ifdef CHASTE_VTK
-    std::stringstream time;
-    time << SimulationTime::Instance()->GetTimeStepsElapsed();
-    VtkMeshWriter<DIM, DIM> mesh_writer(this->mDirPath, "results_"+time.str(), false);
 
-    unsigned num_nodes = GetNumNodes();
-    std::vector<double> cell_types;
-    std::vector<double> cell_mutation_states;
-    std::vector<double> cell_labels;
-    cell_types.reserve(num_nodes);
-    cell_mutation_states.reserve(num_nodes);
-    cell_labels.reserve(num_nodes);
-
-    for (unsigned node_index=0; node_index<num_nodes; node_index++)
-    {
-        if (node_index)
-        {
-            // No cell is associated with this node
-            cell_types.push_back(-1.0);
-            if (this->mOutputCellMutationStates)
-            {
-                cell_mutation_states.push_back(-1.0);
-                cell_labels.push_back(-1.0);
-            }
-        }
-        else
-        {
-            CellPtr p_cell = this->mLocationCellMap[node_index];
-            double cell_type = p_cell->GetCellCycleModel()->GetCellProliferativeType();
-            cell_types.push_back(cell_type);
-
-            if (this->mOutputCellMutationStates)
-            {
-                double cell_mutation_state = p_cell->GetMutationState()->GetColour();
-                cell_mutation_states.push_back(cell_mutation_state);
-
-                double cell_label = 0.0;
-                if (p_cell->HasCellProperty<CellLabel>())
-                {
-                    CellPropertyCollection collection = p_cell->rGetCellPropertyCollection().GetProperties<CellLabel>();
-                    boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(collection.GetProperty());
-                    cell_label = p_label->GetColour();
-                }
-                cell_labels.push_back(cell_label);
-            }
-        }
-    }
-
-    assert(cell_types.size() == num_nodes);
-
-    mesh_writer.AddPointData("Cell types", cell_types);
-
-    if (this->mOutputCellMutationStates)
-    {
-        assert(cell_mutation_states.size() == num_nodes);
-        mesh_writer.AddPointData("Mutation states", cell_mutation_states);
-        assert(cell_labels.size() == num_nodes);
-        mesh_writer.AddPointData("Cell labels", cell_labels);
-    }
-
-    /*
-     * The current VTK writer can only write things which inherit from AbstractTetrahedralMeshWriter.
-     * For now, we do an explicit conversion to NodesOnlyMesh. This can be written to VTK then visualized as glyphs.
-     */
-    NodesOnlyMesh<DIM> temp_mesh;
-    temp_mesh.ConstructNodesWithoutMesh(mrMesh);
-    mesh_writer.WriteFilesUsingMesh(temp_mesh);
-
-    *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
-    *(this->mpVtkMetaFile) << time.str();
-    *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
-    *(this->mpVtkMetaFile) << time.str();
-    *(this->mpVtkMetaFile) << ".vtu\"/>\n";
-#endif //CHASTE_VTK
+    //TODO Implement VTK output for CA simulations #1914
+//#ifdef CHASTE_VTK
+//    std::stringstream time;
+//    time << SimulationTime::Instance()->GetTimeStepsElapsed();
+//    VtkMeshWriter<DIM, DIM> mesh_writer(this->mDirPath, "results_"+time.str(), false);
+//
+//    unsigned num_nodes = GetNumNodes();
+//    std::vector<double> cell_types;
+//    std::vector<double> cell_mutation_states;
+//    std::vector<double> cell_labels;
+//    cell_types.reserve(num_nodes);
+//    cell_mutation_states.reserve(num_nodes);
+//    cell_labels.reserve(num_nodes);
+//
+//    for (unsigned node_index=0; node_index<num_nodes; node_index++)
+//    {
+//        if (node_index)
+//        {
+//            // No cell is associated with this node
+//            cell_types.push_back(-1.0);
+//            if (this->mOutputCellMutationStates)
+//            {
+//                cell_mutation_states.push_back(-1.0);
+//                cell_labels.push_back(-1.0);
+//            }
+//        }
+//        else
+//        {
+//            CellPtr p_cell = this->mLocationCellMap[node_index];
+//            double cell_type = p_cell->GetCellCycleModel()->GetCellProliferativeType();
+//            cell_types.push_back(cell_type);
+//
+//            if (this->mOutputCellMutationStates)
+//            {
+//                double cell_mutation_state = p_cell->GetMutationState()->GetColour();
+//                cell_mutation_states.push_back(cell_mutation_state);
+//
+//                double cell_label = 0.0;
+//                if (p_cell->HasCellProperty<CellLabel>())
+//                {
+//                    CellPropertyCollection collection = p_cell->rGetCellPropertyCollection().GetProperties<CellLabel>();
+//                    boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(collection.GetProperty());
+//                    cell_label = p_label->GetColour();
+//                }
+//                cell_labels.push_back(cell_label);
+//            }
+//        }
+//    }
+//
+//    assert(cell_types.size() == num_nodes);
+//
+//    mesh_writer.AddPointData("Cell types", cell_types);
+//
+//    if (this->mOutputCellMutationStates)
+//    {
+//        assert(cell_mutation_states.size() == num_nodes);
+//        mesh_writer.AddPointData("Mutation states", cell_mutation_states);
+//        assert(cell_labels.size() == num_nodes);
+//        mesh_writer.AddPointData("Cell labels", cell_labels);
+//    }
+//
+//    /*
+//     * The current VTK writer can only write things which inherit from AbstractTetrahedralMeshWriter.
+//     * For now, we do an explicit conversion to NodesOnlyMesh. This can be written to VTK then visualized as glyphs.
+//     */
+//    NodesOnlyMesh<DIM> temp_mesh;
+//    temp_mesh.ConstructNodesWithoutMesh(mrMesh);
+//    mesh_writer.WriteFilesUsingMesh(temp_mesh);
+//
+//    *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
+//    *(this->mpVtkMetaFile) << time.str();
+//    *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
+//    *(this->mpVtkMetaFile) << time.str();
+//    *(this->mpVtkMetaFile) << ".vtu\"/>\n";
+//#endif //CHASTE_VTK
 }
 
 template<unsigned DIM>
@@ -839,76 +841,6 @@ void CaBasedCellPopulation<DIM>::Validate()
         {
             EXCEPTION("Node " << i << " does not appear to be an empty site or have a cell associated with it");
         }
-    }
-}
-
-template<unsigned DIM>
-void CaBasedCellPopulation<DIM>::WriteResultsToFiles()
-{
-    double time = SimulationTime::Instance()->GetTime();
-
-    *(this->mpVizNodesFile) << time << "\t";
-    *(this->mpVizBoundaryNodesFile) << time << "\t";
-
-    // Write node data to file
-    for (unsigned node_index=0; node_index<GetNumNodes(); node_index++)
-    {
-        ///\todo we may need a hack to cover the case where the node is associated with a cell that has just been killed (#1129)
-
-        Node<DIM>* p_node = GetNode(node_index);
-
-        // Write node data to file
-        if (!(p_node->IsDeleted()))
-        {
-            const c_vector<double, DIM>& position = p_node->rGetLocation();
-
-            for (unsigned i=0; i<DIM; i++)
-            {
-                *(this->mpVizNodesFile) << position[i] << " ";
-            }
-            *(this->mpVizBoundaryNodesFile) << p_node->IsBoundaryNode() << " ";
-        }
-    }
-    *(this->mpVizNodesFile) << "\n";
-    *(this->mpVizBoundaryNodesFile) << "\n";
-
-    *(this->mpVizCellProliferativeTypesFile) << time << "\t";
-
-    if (this->mOutputCellAncestors)
-    {
-        *(this->mpVizCellAncestorsFile) << time << "\t";
-    }
-    if (this->mOutputCellMutationStates)
-    {
-        *(this->mpCellMutationStatesFile) << time << "\t";
-    }
-    if (this->mOutputCellProliferativeTypes)
-    {
-        *(this->mpCellProliferativeTypesFile) << time << "\t";
-    }
-    if (this->mOutputCellVariables)
-    {
-        *(this->mpCellVariablesFile) << time << "\t";
-    }
-    if (this->mOutputCellCyclePhases)
-    {
-        *(this->mpCellCyclePhasesFile) << time << "\t";
-    }
-    if (this->mOutputCellAges)
-    {
-        *(this->mpCellAgesFile) << time << "\t";
-    }
-    if (this->mOutputCellVolumes)
-    {
-        WriteCellVolumeResultsToFile();
-    }
-
-    GenerateCellResultsAndWriteToFiles();
-
-    // Write logged cell data if required
-    if (this->mOutputCellIdData)
-    {
-        this->WriteCellIdDataToFile();
     }
 }
 

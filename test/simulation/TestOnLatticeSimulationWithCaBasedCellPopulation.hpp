@@ -142,12 +142,26 @@ public:
         SimulationTime::Destroy();
         SimulationTime::Instance()->SetStartTime(0.0);
 
-        simulator.SetOutputDirectory("TestCellsDiffusing");
+        simulator.SetOutputDirectory("TestCaCellsDiffusing");
 
         // Run simulation
         simulator.Solve();
 
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 2u);
+
+        //TODO Implement VTK output for CA simulations #1914
+//#ifdef CHASTE_VTK
+//        //Test that VTK writer has produced some files
+//        OutputFileHandler handler("TestCaCellsDiffusing", false);
+//        std::string results_dir = handler.GetOutputDirectoryFullPath();
+//        // Initial condition file
+//        FileFinder vtk_file(results_dir + "results_from_time_0/results_0.vtu", RelativeTo::Absolute);
+//        TS_ASSERT(vtk_file.Exists());
+//
+//        // Final file
+//        FileFinder vtk_file2(results_dir + "results_from_time_0/results_10.vtu", RelativeTo::Absolute);
+//        TS_ASSERT(vtk_file2.Exists());
+//#endif //CHASTE_VTK
     }
 
     void TestCellsDividing() throw (Exception)
@@ -177,7 +191,7 @@ public:
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestCellsDividing");
+        simulator.SetOutputDirectory("TestCaCellsDividing");
         simulator.SetDt(1);
         simulator.SetEndTime(50);
 
@@ -212,7 +226,7 @@ public:
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestDiffusionOfLargeNumberOfCells");
+        simulator.SetOutputDirectory("TestCaDiffusionOfLargeNumberOfCells");
         simulator.SetDt(0.1);
         simulator.SetEndTime(1.0);
 
@@ -251,7 +265,7 @@ public:
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestDiffusionAndDeathOfLargeNumberOfCells");
+        simulator.SetOutputDirectory("TestCaDiffusionAndDeathOfLargeNumberOfCells");
         simulator.SetDt(0.1);
         simulator.SetEndTime(1);
 
@@ -292,7 +306,7 @@ public:
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestDiffusionAndDivisionOfLargeNumberOfCells");
+        simulator.SetOutputDirectory("TestCaDiffusionAndDivisionOfLargeNumberOfCells");
         simulator.SetDt(0.1);
         simulator.SetEndTime(10);
 
@@ -338,7 +352,7 @@ public:
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestDiffusionAndAdvectionAndDivision");
+        simulator.SetOutputDirectory("TestCaDiffusionAndAdvectionAndDivision");
         simulator.SetDt(0.1);
         simulator.SetEndTime(10);
 
@@ -623,7 +637,7 @@ public:
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestDiffusionOfLargeNumberOfCells");
+        simulator.SetOutputDirectory("TestCaDiffusionOfLargeNumberOfCells");
         simulator.SetDt(0.1);
         simulator.SetEndTime(5.0);
         

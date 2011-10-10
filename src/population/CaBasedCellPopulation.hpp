@@ -360,11 +360,6 @@ public:
      */
     void Update(bool hasHadBirthsOrDeaths=true);
 
-    /**
-     * Overridden WriteResultsToFiles() method.
-     */
-    void WriteResultsToFiles();
-        
     /** 
      * Overridden WriteCellVolumeResultsToFile() method.
      */
