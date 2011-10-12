@@ -378,8 +378,7 @@ CellPtr CaBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_vector<dou
 template<unsigned DIM>
 void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile()
 {
-
-    //TODO Implement VTK output for CA simulations #1914
+    ///\todo Implement VTK output for CA simulations (see #1914)
 //#ifdef CHASTE_VTK
 //    std::stringstream time;
 //    time << SimulationTime::Instance()->GetTimeStepsElapsed();

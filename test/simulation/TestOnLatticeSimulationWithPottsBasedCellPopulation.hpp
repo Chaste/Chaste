@@ -619,9 +619,7 @@ public:
         simulator.SetDt(0.1);
         simulator.SetSamplingTimestepMultiple(1);
         simulator.SetEndTime(10.0);
-
-///\todo uncomment the line below and get the test compiling (#1890)
-//        simulator.SetOutputCellVelocities(true);
+        simulator.SetOutputCellVelocities(true);
 
         // Create cell killer and pass in to simulation
         MAKE_PTR_ARGS(SloughingCellKiller<2>, p_killer, (&cell_population, crypt_length));

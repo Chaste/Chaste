@@ -149,7 +149,7 @@ public:
 
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 2u);
 
-        //TODO Implement VTK output for CA simulations #1914
+        ///\todo Implement VTK output for CA simulations (see #1914)
 //#ifdef CHASTE_VTK
 //        //Test that VTK writer has produced some files
 //        OutputFileHandler handler("TestCaCellsDiffusing", false);
@@ -162,6 +162,63 @@ public:
 //        FileFinder vtk_file2(results_dir + "results_from_time_0/results_10.vtu", RelativeTo::Absolute);
 //        TS_ASSERT(vtk_file2.Exists());
 //#endif //CHASTE_VTK
+    }
+
+    void TestOutputCellVelocities() throw (Exception)
+    {
+        // Create mesh
+        TetrahedralMesh<2,2> mesh;
+        mesh.ConstructRectangularMesh(10, 10, true);
+
+        // Create two cells
+        MAKE_PTR(WildTypeCellMutationState, p_state);
+
+        FixedDurationGenerationBasedCellCycleModel* p_model_1 = new FixedDurationGenerationBasedCellCycleModel();
+        p_model_1->SetCellProliferativeType(DIFFERENTIATED);
+        CellPtr p_cell_1(new Cell(p_state, p_model_1));
+
+        FixedDurationGenerationBasedCellCycleModel* p_model_2 = new FixedDurationGenerationBasedCellCycleModel();
+        p_model_2->SetCellProliferativeType(DIFFERENTIATED);
+        CellPtr p_cell_2(new Cell(p_state, p_model_2));
+
+        std::vector<CellPtr> cells;
+        cells.push_back(p_cell_1);
+        cells.push_back(p_cell_2);
+
+        std::vector<unsigned> real_node_indices;
+        real_node_indices.push_back(47);
+        real_node_indices.push_back(73);
+
+        // Create a cell population
+        CaBasedCellPopulation<2> cell_population(mesh, cells, real_node_indices);
+        cell_population.SetIterateRandomlyOverUpdateRuleCollection(false);
+        cell_population.SetUpdateNodesInRandomOrder(false);
+
+        // Set up cell-based simulation
+        OnLatticeSimulation<2> simulator(cell_population);
+        simulator.SetDt(1);
+        simulator.SetEndTime(10);
+
+        // Pass an update rule to the simulation
+        MAKE_PTR(DiffusionCaUpdateRule<2>, p_update_rule);
+        simulator.AddCaUpdateRule(p_update_rule);
+
+        simulator.SetOutputDirectory("TestOutputCellVelocities");
+
+        // Test get/set methods for mOutputCellVelocities
+        TS_ASSERT_EQUALS(simulator.GetOutputCellVelocities(), false);
+        simulator.SetOutputCellVelocities(true);
+        TS_ASSERT_EQUALS(simulator.GetOutputCellVelocities(), true);
+
+        // Run simulation and output cell velocities
+        simulator.Solve();
+        
+        // Check cell velocities file
+        OutputFileHandler handler("TestOutputCellVelocities", false);
+
+        std::string cell_velocities_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/cellvelocities.dat";
+        NumericFileComparison cell_velocities(cell_velocities_file, "notforrelease_cell_based/test/data/TestOutputCellVelocities/cellvelocities.dat");
+        TS_ASSERT(cell_velocities.CompareFiles(1e-2));
     }
 
     void TestCellsDividing() throw (Exception)

@@ -75,57 +75,63 @@ c_vector<double, DIM> OnLatticeSimulation<DIM>::CalculateCellDivisionVector(Cell
     ///\todo do something for Potts models here
     return zero_vector<double>(DIM);
 }
-
+#include "Debug.hpp"
 template<unsigned DIM>
 void OnLatticeSimulation<DIM>::UpdateCellLocationsAndTopology()
 {
-    // Store current locations of cell centres if required
-    std::vector<c_vector<double, DIM> > old_cell_locations;
-    unsigned num_cells = this->mrCellPopulation.GetNumRealCells();
-    old_cell_locations.reserve(num_cells);
-    if (mOutputCellVelocities)
+    // Store whether we are sampling results at the current timestep
+    SimulationTime* p_time = SimulationTime::Instance();
+    bool at_sampling_timestep = (p_time->GetTimeStepsElapsed()%this->mSamplingTimestepMultiple == 0);
+
+    /*
+     * If required, store the current locations of cell centres. Note that we need to
+     * use a std::map between cells and locations, rather than (say) a std::vector with
+     * location indices corresponding to cells, since once we call UpdateCellLocations()
+     * the location index of each cell may change. This is especially true in the case
+     * of a CaBasedCellPopulation.
+     */
+    std::map<CellPtr, c_vector<double, DIM> > old_cell_locations;
+    if (mOutputCellVelocities && at_sampling_timestep)
     {
         for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mrCellPopulation.Begin();
              cell_iter != this->mrCellPopulation.End();
              ++cell_iter)
         {
-            unsigned index = this->mrCellPopulation.GetLocationIndexUsingCell(*cell_iter);
-            old_cell_locations[index] = this->mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
+            old_cell_locations[*cell_iter] = this->mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
         }
     }
 
     // Update cell locations
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::POSITION);
-    static_cast<AbstractOnLatticeCellPopulation<DIM>*>(&(this->mrCellPopulation))->UpdateCellLocations(this->GetDt());
+    static_cast<AbstractOnLatticeCellPopulation<DIM>*>(&(this->mrCellPopulation))->UpdateCellLocations(this->mDt);
     CellBasedEventHandler::EndEvent(CellBasedEventHandler::POSITION);
 
-    // Write cell velocities to file if required
-    if (mOutputCellVelocities)
+    // Now write cell velocities to file if required
+    if (mOutputCellVelocities && at_sampling_timestep)
     {
-        if (SimulationTime::Instance()->GetTimeStepsElapsed()%this->mSamplingTimestepMultiple == 0)
+        *mpCellVelocitiesFile << p_time->GetTime() << "\t";
+
+        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mrCellPopulation.Begin();
+             cell_iter != this->mrCellPopulation.End();
+             ++cell_iter)
         {
-            *mpCellVelocitiesFile << SimulationTime::Instance()->GetTime() << "\t";
+            unsigned index = this->mrCellPopulation.GetLocationIndexUsingCell(*cell_iter);
+            const c_vector<double,DIM>& position = this->mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
 
-            for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mrCellPopulation.Begin();
-                 cell_iter != this->mrCellPopulation.End();
-                 ++cell_iter)
+            c_vector<double, DIM> velocity = (position - old_cell_locations[*cell_iter])/this->mDt;
+
+            *mpCellVelocitiesFile << index  << " ";
+            for (unsigned i=0; i<DIM; i++)
             {
-                unsigned index = this->mrCellPopulation.GetLocationIndexUsingCell(*cell_iter);
-                const c_vector<double,DIM>& position = this->mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
-                c_vector<double, DIM> velocity = (position - old_cell_locations[index])/this->mDt;
-
-                *mpCellVelocitiesFile << index  << " ";
-                for (unsigned i=0; i<DIM; i++)
-                {
-                    *mpCellVelocitiesFile << position[i] << " ";
-                }
-                for (unsigned i=0; i<DIM; i++)
-                {
-                    *mpCellVelocitiesFile << velocity[i] << " ";
-                }
+                *mpCellVelocitiesFile << position[i] << " ";
             }
-            *mpCellVelocitiesFile << "\n";
+
+            for (unsigned i=0; i<DIM; i++)
+            {
+                *mpCellVelocitiesFile << velocity[i] << " ";
+            }
         }
+        *mpCellVelocitiesFile << "\n";
     }
 }
 
