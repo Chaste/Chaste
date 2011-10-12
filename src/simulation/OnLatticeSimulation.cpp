@@ -75,7 +75,7 @@ c_vector<double, DIM> OnLatticeSimulation<DIM>::CalculateCellDivisionVector(Cell
     ///\todo do something for Potts models here
     return zero_vector<double>(DIM);
 }
-#include "Debug.hpp"
+
 template<unsigned DIM>
 void OnLatticeSimulation<DIM>::UpdateCellLocationsAndTopology()
 {
