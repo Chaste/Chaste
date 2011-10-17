@@ -279,6 +279,38 @@ public:
         TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(1)->GetNodeGlobalIndex(1), 3u);
     }
 
+    void TestUpdateCellLocations()
+	{
+        // Create a simple 2D PottsMesh with two cells
+        PottsMeshGenerator<2> generator(4, 2, 2, 2, 1, 2);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+        // Create cell population
+        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Set node selection to non-random lattice sweeping -- this will loop over the nodes in index order
+        TS_ASSERT_EQUALS(true, cell_population.GetUpdateNodesInRandomOrder());
+		cell_population.SetUpdateNodesInRandomOrder(false);
+		//Increase temperature -- allows swaps to be more likely
+		TS_ASSERT_EQUALS(cell_population.GetTemperature(),0.1);
+		cell_population.SetTemperature(10.0);
+
+        // Create a volume update rule and pass to the population
+        MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
+        cell_population.AddUpdateRule(p_volume_constraint_update_rule);
+
+        // Commence lattice sweeping, updating where necessary
+        cell_population.UpdateCellLocations(1.0);
+        TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 2u);
+        TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(0)->GetNumNodes(), 1u);
+        TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(1)->GetNumNodes(), 7u);
+	}
+
     ///\todo implement this test (#1666)
 //    void TestVoronoiMethods()
 //    {

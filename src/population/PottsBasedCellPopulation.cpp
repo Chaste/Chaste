@@ -190,7 +190,7 @@ unsigned PottsBasedCellPopulation<DIM>::RemoveDeadCells()
     }
     return num_removed;
 }
-
+#include "Debug.hpp"
 template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
 {
@@ -276,7 +276,7 @@ void PottsBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
             // Generate a uniform random number to do the random motion
             double random_number = p_gen->ranf();
             double p = exp(-delta_H/mTemperature);
-
+            PRINT_2_VARIABLES(random_number, p);
             if (delta_H <= 0 || random_number < p)
             {
                 // Do swap
