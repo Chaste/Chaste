@@ -43,6 +43,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "ArchiveOpener.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "SmartPointers.hpp"
+#include "CellLabel.hpp"
 
 class TestPottsBasedCellPopulation : public AbstractCellBasedTestSuite
 {
@@ -293,10 +294,11 @@ public:
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Set node selection to non-random lattice sweeping -- this will loop over the nodes in index order
+        // Set node selection to non-random lattice sweeping: this will loop over the nodes in index order
         TS_ASSERT_EQUALS(true, cell_population.GetUpdateNodesInRandomOrder());
 		cell_population.SetUpdateNodesInRandomOrder(false);
-		//Increase temperature -- allows swaps to be more likely
+
+		// Increase temperature: allows swaps to be more likely
 		TS_ASSERT_EQUALS(cell_population.GetTemperature(),0.1);
 		cell_population.SetTemperature(10.0);
 
@@ -310,6 +312,41 @@ public:
         TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(0)->GetNumNodes(), 1u);
         TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(1)->GetNumNodes(), 7u);
 	}
+
+    void TestUpdateCellLocationsRandomly()
+    {
+        // Create a simple 2D PottsMesh with two cells
+        PottsMeshGenerator<2> generator(4, 2, 2, 2, 1, 2);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+        // Create cell population
+        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Set node selection to random lattice sweeping and (for coverage) random iteration over update rules
+        cell_population.SetUpdateNodesInRandomOrder(true);
+        cell_population.SetIterateRandomlyOverUpdateRuleCollection(true);
+
+        // Increase temperature: allows swaps to be more likely
+        TS_ASSERT_EQUALS(cell_population.GetTemperature(),0.1);
+        cell_population.SetTemperature(10.0);
+
+        // Create a volume update rule and pass to the population
+        MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
+        cell_population.AddUpdateRule(p_volume_constraint_update_rule);
+
+        // Commence lattice sweeping, updating where necessary
+        cell_population.UpdateCellLocations(1.0);
+
+        // Note that these results differ to those in the above test due to extra random numbers being called
+        TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 2u);
+        TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(0)->GetNumNodes(), 6u);
+        TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(1)->GetNumNodes(), 2u);
+    }
 
     ///\todo implement this test (#1666)
 //    void TestVoronoiMethods()
@@ -346,7 +383,7 @@ public:
         OutputFileHandler output_file_handler(output_directory, false);
 
         // Create a simple 2D PottsMesh
-        PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
+        PottsMeshGenerator<2> generator(6, 2, 2, 6, 2, 2);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Create cells
@@ -356,6 +393,10 @@ public:
 
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // For coverage, label one cell
+        boost::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
+        cell_population.GetCellUsingLocationIndex(0)->AddCellProperty(p_label);
 
         TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "PottsBasedCellPopulation-2");
 
