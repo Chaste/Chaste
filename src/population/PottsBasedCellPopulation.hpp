@@ -227,8 +227,7 @@ public:
      * Add a new cell to the cell population.
      *
      * @param pNewCell  the cell to add
-     * @param rCellDivisionVector  if this vector has any non-zero component, then it is used as the axis
-     *     along which the parent cell divides \todo This parameter is not used in this class -- either implement or change comment
+     * @param rCellDivisionVector  this parameter is not yet used in this class (see #1737) 
      * @param pParentCell pointer to a parent cell (if required)
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
      */
