@@ -65,6 +65,7 @@ public:
      * @param elementDepth  The number of rows of nodes in each element (defaults to 1)
      * @param startAtBottomLeft  If true then the mesh starts in the bottom left corner
      *     of the domain rather than the centre, used for simple tests (defaults to false)
+     * @param isPeriodicInX  If true then the mesh is periodic in the x dimnesion (defaults to false)
      */
     PottsMeshGenerator(unsigned numNodesAcross,
                        unsigned numElementsAcross,
@@ -75,7 +76,8 @@ public:
 					   unsigned numNodesDeep=1u,
 					   unsigned numElementsDeep=1u,
 					   unsigned elementDepth=1u,
-					   bool startAtBottomLeft = false);
+					   bool startAtBottomLeft = false,
+					   bool isPeriodicInX = false);
 
     /**
      * Null constructor for derived classes to call.

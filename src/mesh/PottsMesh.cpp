@@ -32,7 +32,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <list>
 
 template<unsigned DIM>
-PottsMesh<DIM>::PottsMesh(std::vector<Node<DIM>*> nodes, std::vector<PottsElement<DIM>*> pottsElements)
+PottsMesh<DIM>::PottsMesh(std::vector<Node<DIM>*> nodes, std::vector<PottsElement<DIM>*> pottsElements, bool isPeriodicInX)
+        : mIsPeriodicInX(isPeriodicInX)
 {
     // Reset member variables and clear mNodes and mElements
     Clear();
@@ -63,7 +64,7 @@ PottsMesh<DIM>::PottsMesh(std::vector<Node<DIM>*> nodes, std::vector<PottsElemen
         }
     }
 
-    // Calculate and store the neeighbourhoods.
+    // Calculate and store the neighbourhoods.
     CaclulateNeighbouringNodeIndices();
 
     this->mMeshChangesDuringSimulation = true;
@@ -342,6 +343,25 @@ void PottsMesh<DIM>::CaclulateNeighbouringNodeIndices()
                 bool on_west_edge = (node_index%num_nodes_across(0) == 0);
                 bool on_east_edge = (node_index%num_nodes_across(0) == num_nodes_across(0) - 1);
 
+                if(mIsPeriodicInX)
+                {
+                    if(on_west_edge)
+                    {
+                        moore_neighbour_indices_vector[1] = node_index + 2*num_nodes_across(0) - 1;
+                        moore_neighbour_indices_vector[2] = node_index + num_nodes_across(0) - 1;
+                        moore_neighbour_indices_vector[3] = node_index - 1;
+                        on_west_edge = false;
+                    }
+
+                    if(on_east_edge)
+                    {
+                        moore_neighbour_indices_vector[5] = node_index - 2*num_nodes_across(0) + 1;
+                        moore_neighbour_indices_vector[6] = node_index - num_nodes_across(0) + 1;
+                        moore_neighbour_indices_vector[7] = node_index + 1;
+                        on_east_edge = false;
+                    }
+                }
+
                 // Create a vector of booleans for which neighbours are available
                 // Use the order N, NW, W, SW, S, SE, E, NE
                 std::vector<bool> available_neighbours = std::vector<bool>(8, true);
@@ -408,6 +428,45 @@ void PottsMesh<DIM>::CaclulateNeighbouringNodeIndices()
                 bool on_east_edge = (node_index%num_nodes_across(0) == num_nodes_across(0) - 1);
                 bool on_front_edge = (node_index < num_nodes_across(0)*num_nodes_across(1)-1);
                 bool on_back_edge = (node_index > num_nodes_across(0)*num_nodes_across(1)*num_nodes_across(2)-num_nodes_across(0)*num_nodes_across(1)-1);
+
+
+                if(mIsPeriodicInX)
+                {
+                    if(on_west_edge)
+                    {
+                        moore_neighbour_indices_vector[1] = node_index + 2*num_nodes_across(0) - 1;
+                        moore_neighbour_indices_vector[2] = node_index + num_nodes_across(0) - 1;
+                        moore_neighbour_indices_vector[3] = node_index - 1;
+
+                        moore_neighbour_indices_vector[10] = moore_neighbour_indices_vector[1] - num_nodes_across(0)*num_nodes_across(1);
+                        moore_neighbour_indices_vector[11] = moore_neighbour_indices_vector[2] - num_nodes_across(0)*num_nodes_across(1);
+                        moore_neighbour_indices_vector[12] = moore_neighbour_indices_vector[3] - num_nodes_across(0)*num_nodes_across(1);
+
+                        moore_neighbour_indices_vector[19] = moore_neighbour_indices_vector[1] + num_nodes_across(0)*num_nodes_across(1);
+                        moore_neighbour_indices_vector[20] = moore_neighbour_indices_vector[2] + num_nodes_across(0)*num_nodes_across(1);
+                        moore_neighbour_indices_vector[21] = moore_neighbour_indices_vector[3] + num_nodes_across(0)*num_nodes_across(1);
+
+                        on_west_edge = false;
+                    }
+
+                    if(on_east_edge)
+                    {
+                        moore_neighbour_indices_vector[5] = node_index - 2*num_nodes_across(0) + 1;
+                        moore_neighbour_indices_vector[6] = node_index - num_nodes_across(0) + 1;
+                        moore_neighbour_indices_vector[7] = node_index + 1;
+
+                        moore_neighbour_indices_vector[14] = moore_neighbour_indices_vector[5] - num_nodes_across(0)*num_nodes_across(1);
+                        moore_neighbour_indices_vector[15] = moore_neighbour_indices_vector[6] - num_nodes_across(0)*num_nodes_across(1);
+                        moore_neighbour_indices_vector[16] = moore_neighbour_indices_vector[7] - num_nodes_across(0)*num_nodes_across(1);
+
+                        moore_neighbour_indices_vector[23] = moore_neighbour_indices_vector[5] + num_nodes_across(0)*num_nodes_across(1);
+                        moore_neighbour_indices_vector[24] = moore_neighbour_indices_vector[6] + num_nodes_across(0)*num_nodes_across(1);
+                        moore_neighbour_indices_vector[25] = moore_neighbour_indices_vector[7] + num_nodes_across(0)*num_nodes_across(1);
+                        on_east_edge = false;
+                    }
+                }
+
+
 
                 // Create a vector of booleans for which neighbours are available
                 // Use the order N, NW, W, SW, S, SE, E, NE
@@ -478,6 +537,24 @@ void PottsMesh<DIM>::CaclulateNeighbouringNodeIndices()
                 bool on_west_edge = (node_index%num_nodes_across(0) == 0);
                 bool on_east_edge = (node_index%num_nodes_across(0) == num_nodes_across(0) - 1);
 
+
+
+                if(mIsPeriodicInX)
+                {
+                    if(on_west_edge)
+                    {
+                        von_neumann_neighbour_indices_vector[1] = node_index + num_nodes_across(0) - 1;
+                        on_west_edge = false;
+                    }
+
+                    if(on_east_edge)
+                    {
+                        von_neumann_neighbour_indices_vector[3] = node_index - num_nodes_across(0) + 1;
+                        on_east_edge = false;
+                    }
+                }
+
+
                 // Create a vector of booleans for which neighbours are available
                 // Use the order N, W, S, E
                 std::vector<bool> available_neighbours = std::vector<bool>(2*DIM, true);
@@ -528,6 +605,22 @@ void PottsMesh<DIM>::CaclulateNeighbouringNodeIndices()
                 bool on_east_edge = (node_index%num_nodes_across(0) == num_nodes_across(0) - 1);
                 bool on_front_edge = (node_index < num_nodes_across(0)*num_nodes_across(1)-1);
                 bool on_back_edge = (node_index > num_nodes_across(0)*num_nodes_across(1)*num_nodes_across(2)-num_nodes_across(0)*num_nodes_across(1)-1);
+
+
+                if(mIsPeriodicInX)
+                {
+                    if(on_west_edge)
+                    {
+                        von_neumann_neighbour_indices_vector[1] = node_index + num_nodes_across(0) - 1;
+                        on_west_edge = false;
+                    }
+
+                    if(on_east_edge)
+                    {
+                        von_neumann_neighbour_indices_vector[3] = node_index - num_nodes_across(0) + 1;
+                        on_east_edge = false;
+                    }
+                }
 
                 // Create a vector of booleans for which neighbours are available
                 // Use the order N, W, S, E, F, B
