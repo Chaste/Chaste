@@ -114,7 +114,7 @@ protected:
     {
         // NOTE - Subclasses must archive their member variables BEFORE calling this method.
         archive & mDeletedElementIndices;
-        archive & mIsPeriodicInX;
+        //archive & mIsPeriodicInX;
         archive & boost::serialization::base_object<AbstractMesh<DIM, DIM> >(*this);
 
         // Create a mesh writer pointing to the correct file and directory
