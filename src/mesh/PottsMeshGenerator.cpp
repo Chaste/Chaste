@@ -32,7 +32,7 @@ template<unsigned DIM>
 PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned numElementsAcross, unsigned elementWidth,
 											unsigned numNodesUp, unsigned numElementsUp, unsigned elementHeight,
 											unsigned numNodesDeep, unsigned numElementsDeep, unsigned elementDepth,
-											bool startAtBottomLeft)
+											bool startAtBottomLeft, bool isPeriodicInX)
 {
     assert(numElementsAcross > 0);
     assert(numElementsUp > 0);
@@ -117,7 +117,6 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
 							                                                                  m*numNodesAcross*numNodesUp +
 							                                                                  l*numNodesAcross +
 							                                                                  k + index_offset;
-
 						}
 					}
 				}
@@ -134,7 +133,7 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
 		}
     }
 
-    mpMesh = new PottsMesh<DIM>(nodes, elements);
+    mpMesh = new PottsMesh<DIM>(nodes, elements, isPeriodicInX);
 }
 template<unsigned DIM>
 PottsMeshGenerator<DIM>::~PottsMeshGenerator()

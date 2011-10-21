@@ -111,7 +111,6 @@ protected:
     {
         // NOTE - Subclasses must archive their member variables BEFORE calling this method.
         archive & mDeletedElementIndices;
-        //archive & mIsPeriodicInX;
         archive & boost::serialization::base_object<AbstractMesh<DIM, DIM> >(*this);
 
         // Create a mesh writer pointing to the correct file and directory
@@ -169,9 +168,11 @@ public:
      *
      * @param nodes vector of pointers to nodes
      * @param pottsElements vector of pointers to PottsElements
+     * @param isPeriodicInX  If true then the mesh is periodic in the x dimnension (defaults to false)
      */
     PottsMesh(std::vector<Node<DIM>*> nodes,
-              std::vector<PottsElement<DIM>*> pottsElements);
+              std::vector<PottsElement<DIM>*> pottsElements,
+              bool isPeriodicInX = false);
 
     /**
      * Default constructor for use by serializer.
@@ -282,9 +283,10 @@ public:
 
     /**
      * Helper method to calculate the Noore and Von Neumann Neighbourhoods of all nodes
-     * This should be over-ridden in child classes to implement peroidicity etc.
+     *
+     * @param isPeriodicInX  If true then the mesh is periodic in the x dimnension
      */
-    void CaclulateNeighbouringNodeIndices();
+    void CaclulateNeighbouringNodeIndices(bool isPeriodicInX);
 
     /**
      * Mark an element as deleted. Note that in a Potts mesh this does not
