@@ -72,9 +72,6 @@ protected:
     /** Vector of set of Moore Neighbours for each node. */
     std::vector< std::set<unsigned> > mMooreNeighbouringNodeIndices;
 
-    /** Bool to indicate if the mesh is periodic in the X dimension */
-    bool mIsPeriodicInX;
-
     /**
      * Solve node mapping method. This overridden method is required
      * as it is pure virtual in the base class.
@@ -174,8 +171,7 @@ public:
      * @param pottsElements vector of pointers to PottsElements
      */
     PottsMesh(std::vector<Node<DIM>*> nodes,
-              std::vector<PottsElement<DIM>*> pottsElements,
-              bool isPeriodicInX = false);
+              std::vector<PottsElement<DIM>*> pottsElements);
 
     /**
      * Default constructor for use by serializer.
