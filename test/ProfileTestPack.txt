@@ -1,2 +1,0 @@
-simulation/TestRepresentativeCaBasedSimulation.hpp
-simulation/TestRepresentativePottsBasedOnLatticeSimulation.hpp
