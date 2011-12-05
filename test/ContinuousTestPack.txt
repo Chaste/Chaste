@@ -1,4 +1,1 @@
-odes/TestDeltaNotchOdeSystem.hpp
 population/TestPeriodicForces.hpp
-population/TestDeltaNotchCellCycleModel.hpp
-simulation/TestOffLatticeSimulationWithDeltaNotch.hpp
