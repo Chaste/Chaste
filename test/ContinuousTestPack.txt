@@ -1,7 +1,4 @@
 odes/TestDeltaNotchOdeSystem.hpp
-population/TestForcesNotForRelease.hpp
-population/TestNodeBasedCellPopulationWithBuskeUpdate.hpp
 population/TestPeriodicForces.hpp
 population/TestDeltaNotchCellCycleModel.hpp
-simulation/TestOffLatticeSimulationWithBuskeForces.hpp
 simulation/TestOffLatticeSimulationWithDeltaNotch.hpp
