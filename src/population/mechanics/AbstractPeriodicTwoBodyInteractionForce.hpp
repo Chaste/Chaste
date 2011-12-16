@@ -59,7 +59,7 @@ protected:
 
     /** Width of the periodic domain. */
     double mPeriodicDomainWidth;
-    
+
     /** Depth of the periodic domain. */
     double mPeriodicDomainDepth;
 

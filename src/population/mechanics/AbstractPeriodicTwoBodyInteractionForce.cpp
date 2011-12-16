@@ -108,8 +108,8 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
             // We now construct mpExtendedMesh using extended_nodes
             mpExtendedMesh = new MutableMesh<DIM,DIM>(extended_nodes);
 
-        	// Now loop over the extended mesh and calculate the force acting on real nodes
-        	// (using the edge iterator ensures that each edge is visited exactly once)
+            // Now loop over the extended mesh and calculate the force acting on real nodes
+            // (using the edge iterator ensures that each edge is visited exactly once)
             for (typename MutableMesh<DIM,DIM>::EdgeIterator edge_iterator = mpExtendedMesh->EdgesBegin();
                  edge_iterator != mpExtendedMesh->EdgesEnd();
                  ++edge_iterator)
@@ -132,14 +132,14 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
                 }
             }
 
-			break;
+            break;
         }
         case 3:
         {
             // If the width of the periodic domain has not been specified, use the initial width of the cell population
             if (mPeriodicDomainDepth == DOUBLE_UNSET)
             {
-            	mPeriodicDomainDepth = rCellPopulation.GetWidth(1) + 1.0;
+                mPeriodicDomainDepth = rCellPopulation.GetWidth(1) + 1.0;
             }
 
             // First, extend the mesh in the x-direction
@@ -214,8 +214,8 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
             // We now construct mpExtendedMesh using extended_nodes
             mpExtendedMesh = new MutableMesh<DIM,DIM>(extended_nodes);
 
-        	// Now loop over the extended mesh and calculate the force acting on real nodes
-        	// (using the edge iterator ensures that each edge is visited exactly once)
+            // Now loop over the extended mesh and calculate the force acting on real nodes
+            // (using the edge iterator ensures that each edge is visited exactly once)
             for (typename MutableMesh<DIM,DIM>::EdgeIterator edge_iterator = mpExtendedMesh->EdgesBegin();
                  edge_iterator != mpExtendedMesh->EdgesEnd();
                  ++edge_iterator)
@@ -238,7 +238,7 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
                 }
             }
 
-			break;
+            break;
         }
 
         default:
@@ -251,25 +251,25 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
 template<unsigned DIM>
 double AbstractPeriodicTwoBodyInteractionForce<DIM>::GetPeriodicDomainWidth()
 {
-	return mPeriodicDomainWidth;
+    return mPeriodicDomainWidth;
 }
 
 template<unsigned DIM>
 void AbstractPeriodicTwoBodyInteractionForce<DIM>::SetPeriodicDomainWidth(double periodicDomainWidth)
 {
-	mPeriodicDomainWidth = periodicDomainWidth;
+    mPeriodicDomainWidth = periodicDomainWidth;
 }
 
 template<unsigned DIM>
 double AbstractPeriodicTwoBodyInteractionForce<DIM>::GetPeriodicDomainDepth()
 {
-	return mPeriodicDomainDepth;
+    return mPeriodicDomainDepth;
 }
 
 template<unsigned DIM>
 void AbstractPeriodicTwoBodyInteractionForce<DIM>::SetPeriodicDomainDepth(double periodicDomainDepth)
 {
-	mPeriodicDomainDepth = periodicDomainDepth;
+    mPeriodicDomainDepth = periodicDomainDepth;
 }
 
 template<unsigned DIM>

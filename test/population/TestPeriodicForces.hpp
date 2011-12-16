@@ -54,24 +54,24 @@ private:
     MutableMesh<3,3>* Make3dMesh(unsigned width=3, unsigned height=3, unsigned depth=3)
     {
 
-		/*   	   _ _ _ _ _
-		 *        /        /|
-		 *       /        / |
-		 * 	    /_ _ _ _ /  | depth
-		 * 	   |         |  |
-		 *     |         |  |
-		 *     |         |  /
-		 *     |         | / height
-		 * 	   |_ _ _ _ _|/
-		 *        width
-		 */
+        /*          _ _ _ _ _
+         *        /        /|
+         *       /        / |
+         *         /_ _ _ _ /  | depth
+         *        |         |  |
+         *     |         |  |
+         *     |         |  /
+         *     |         | / height
+         *        |_ _ _ _ _|/
+         *        width
+         */
 
-		 MutableMesh<3,3>* p_mesh = new MutableMesh<3,3>;
-		 p_mesh->ConstructCuboid(width, height, depth);
-		 TrianglesMeshWriter<3,3> mesh_writer("", "3dSpringMesh");
-		 mesh_writer.WriteFilesUsingMesh(*p_mesh);
+         MutableMesh<3,3>* p_mesh = new MutableMesh<3,3>;
+         p_mesh->ConstructCuboid(width, height, depth);
+         TrianglesMeshWriter<3,3> mesh_writer("", "3dSpringMesh");
+         mesh_writer.WriteFilesUsingMesh(*p_mesh);
 
-		 return p_mesh;
+         return p_mesh;
     }
 
 public:
@@ -84,12 +84,12 @@ public:
         TS_ASSERT_DELTA(linear_force2d.GetPeriodicDomainWidth(), 1.576, 1e-3);
 
         GeneralisedPeriodicLinearSpringForce<3> linear_force3d;
-		TS_ASSERT_DELTA(linear_force3d.GetPeriodicDomainWidth(), DOUBLE_UNSET, 1e-3);
-		TS_ASSERT_DELTA(linear_force3d.GetPeriodicDomainDepth(), DOUBLE_UNSET, 1e-3);
-		linear_force3d.SetPeriodicDomainWidth(1.576);
-		linear_force3d.SetPeriodicDomainDepth(1.865);
-		TS_ASSERT_DELTA(linear_force3d.GetPeriodicDomainWidth(), 1.576, 1e-3);
-		TS_ASSERT_DELTA(linear_force3d.GetPeriodicDomainDepth(), 1.865, 1e-3);
+        TS_ASSERT_DELTA(linear_force3d.GetPeriodicDomainWidth(), DOUBLE_UNSET, 1e-3);
+        TS_ASSERT_DELTA(linear_force3d.GetPeriodicDomainDepth(), DOUBLE_UNSET, 1e-3);
+        linear_force3d.SetPeriodicDomainWidth(1.576);
+        linear_force3d.SetPeriodicDomainDepth(1.865);
+        TS_ASSERT_DELTA(linear_force3d.GetPeriodicDomainWidth(), 1.576, 1e-3);
+        TS_ASSERT_DELTA(linear_force3d.GetPeriodicDomainDepth(), 1.865, 1e-3);
     }
 
     void TestPeriodicForceOnHoneycombMesh() throw (Exception)
@@ -250,12 +250,12 @@ public:
 
         // Create Voronoi tessellation
         cell_population.CreateVoronoiTessellation();
-        
+
         // Create force
         GeneralisedPeriodicLinearSpringForce<2> linear_force;
         linear_force.SetPeriodicDomainWidth(1.0);
         linear_force.SetCutOffLength(0.5);
-        
+
         // Initialise a vector of node forces
         std::vector<c_vector<double, 2> > node_forces;
         node_forces.reserve(cell_population.GetNumNodes());
@@ -266,7 +266,7 @@ public:
         }
 
         linear_force.AddForceContribution(node_forces, cell_population);
-             
+
         TS_ASSERT_DELTA(node_forces[0][0], 12.0, 1e-4);
         TS_ASSERT_DELTA(node_forces[0][1], 0.0, 1e-4);
         TS_ASSERT_DELTA(node_forces[1][0], -12.0, 1e-4);
@@ -274,9 +274,9 @@ public:
         TS_ASSERT_DELTA(node_forces[2][0], 12.0, 1e-4);
         TS_ASSERT_DELTA(node_forces[2][1], 0.0, 1e-4);
         TS_ASSERT_DELTA(node_forces[3][0], -12.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[3][1], 0.0, 1e-4);                
+        TS_ASSERT_DELTA(node_forces[3][1], 0.0, 1e-4);
     }
-    
+
     void TestSimpleNonZeroForcesWithGhostNodes() throw(Exception)
     {
         // Create 2D mesh
@@ -294,7 +294,7 @@ public:
         location_indices.push_back(1);
         location_indices.push_back(2);
         location_indices.push_back(3);
-                              
+
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
@@ -305,12 +305,12 @@ public:
 
         // Create Voronoi tessellation
         cell_population.CreateVoronoiTessellation();
-        
+
         // Create force
         GeneralisedPeriodicLinearSpringForce<2> linear_force;
         linear_force.SetPeriodicDomainWidth(1.0);
         linear_force.SetCutOffLength(0.5);
-        
+
         // Initialise a vector of node forces
         std::vector<c_vector<double, 2> > node_forces;
         node_forces.reserve(cell_population.GetNumNodes());
@@ -321,7 +321,7 @@ public:
         }
 
         linear_force.AddForceContribution(node_forces, cell_population);
-             
+
         TS_ASSERT_DELTA(node_forces[0][0], 12.0, 1e-4);
         TS_ASSERT_DELTA(node_forces[0][1], 0.0, 1e-4);
         TS_ASSERT_DELTA(node_forces[1][0], -12.0, 1e-4);
@@ -329,9 +329,9 @@ public:
         TS_ASSERT_DELTA(node_forces[2][0], 12.0, 1e-4);
         TS_ASSERT_DELTA(node_forces[2][1], 0.0, 1e-4);
         TS_ASSERT_DELTA(node_forces[3][0], -12.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[3][1], 0.0, 1e-4);                
+        TS_ASSERT_DELTA(node_forces[3][1], 0.0, 1e-4);
     }
-    
+
     void TestPeriodicSpringForces3d() throw(Exception)
     {
         unsigned width = 2;
@@ -347,10 +347,10 @@ public:
         // Test Save with a MeshBasedCellPopulationWithGhostNodes
         MeshBasedCellPopulation<3> cell_population(*p_mesh, cells);
 
-	OffLatticeSimulation<3> simulator(cell_population);
+    OffLatticeSimulation<3> simulator(cell_population);
 
-	// Create periodic force law
-	MAKE_PTR(GeneralisedPeriodicLinearSpringForce<3>, p_periodic_force); // Variable spring strengths
+    // Create periodic force law
+    MAKE_PTR(GeneralisedPeriodicLinearSpringForce<3>, p_periodic_force); // Variable spring strengths
         p_periodic_force->SetPeriodicDomainWidth(3.0);
         simulator.AddForce(p_periodic_force);
 
