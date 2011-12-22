@@ -1,0 +1,4 @@
+		<OutputNodeVelocities>0</OutputNodeVelocities>
+		<Dt>0.00833333</Dt>
+		<EndTime>0</EndTime>
+		<SamplingTimestepMultiple>1</SamplingTimestepMultiple>

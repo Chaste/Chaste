@@ -1,0 +1,30 @@
+# No parameters file specified
+no_params
+
+# monodomain with baseline parameters
+base_monodomain
+
+# bidomain with baseline parameters
+base_bidomain
+
+# bidomain with bath
+bidomain_with_bath
+
+# monodomain with baseline parameters and some post-processing output
+postprocess_monodomain
+
+# bidomain simulation with <SaveSimulation> defined
+save_bidomain
+
+# bidomain simulation with <ResumeSimulation> defined
+resume_bidomain
+
+# monodomain 2D simulation with <SaveSimulation> defined
+save_monodomain
+
+# monodomain 2D simulation with <ResumeSimulation> defined
+resume_monodomain
+
+# bidomain simulation with initial mesh read in Memfem format
+imported_mesh_bidomain
+

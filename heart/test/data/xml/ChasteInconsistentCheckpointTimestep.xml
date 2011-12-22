@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ChasteParameters
+    xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/2_0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="https://chaste.comlab.ox.ac.uk/nss/parameters/2_0 ../../../src/io/ChasteParameters_2_0.xsd">
+
+	<Simulation>
+		<CheckpointSimulation timestep="1.5" unit="ms" max_checkpoints_on_disk="3"/>		
+	</Simulation>
+	<Physiological/>
+    <Numerical>
+		<TimeSteps ode="0.05" pde="0.1" printing="1.0" unit="ms" />
+	</Numerical>
+			    
+</ChasteParameters>

@@ -1,0 +1,70 @@
+chaste-source (2.3.13060) intrepid; urgency=low
+
+  * Package release 2.3 of Chaste, with corrections.
+
+ -- Chaste Team <chaste-admin@maillist.ox.ac.uk>  Sat, 02 Jul 2011 13:10:59 +0000
+
+chaste-source (2.3) intrepid; urgency=low
+
+  * Package release 2.3 of Chaste.
+
+ -- Chaste Team <chaste-admin@maillist.ox.ac.uk>  Tue, 31 May 2011 15:50:28 +0000
+
+chaste-source (2.2) intrepid; urgency=low
+
+  * Package release 2.2 of Chaste.
+
+ -- Chaste Team <chaste-admin@maillist.ox.ac.uk>  Mon, 18 Apr 2011 10:25:51 +0000
+
+chaste-source (2.1.10858) intrepid; urgency=low
+
+  * Package revision 10858 of Chaste.
+
+ -- Chaste Team <chaste-admin@maillist.ox.ac.uk>  Mon, 04 Oct 2010 15:15:19 +0000
+
+chaste-source (2.1) intrepid; urgency=low
+
+  * Package release 2.1 of Chaste.
+
+ -- Chaste Team <chaste-admin@maillist.ox.ac.uk>  Mon, 01 Nov 2010 14:35:26 +0000
+
+chaste-source (2.0) intrepid; urgency=low
+
+  * Package release 2.0 of Chaste.
+
+ -- Chaste Team <chaste-admin@maillist.ox.ac.uk>  Wed, 14 Apr 2010 13:46:35 +0000
+
+chaste-source (1.1) intrepid; urgency=low
+
+  * Package release 1.1 of Chaste.
+
+ -- Chaste Team <chaste-admin@maillist.ox.ac.uk>  Tue, 04 Aug 2009 16:07:44 +0000
+
+chaste-source (1.0.6608) intrepid; urgency=low
+
+  * Package revision 6608 of Chaste.
+    - Adds PyCml to the package.
+
+ -- Chaste Team <chaste-admin@maillist.ox.ac.uk>  Wed, 22 Jul 2009 15:15:29 +0000
+
+chaste-source (1.0.6433) intrepid; urgency=low
+
+  * Package revision 6433 of Chaste.
+    - Improvements to library detection.
+    - Don't compress licence files so the HTML index works.
+
+ -- Chaste Team <chaste-admin@maillist.ox.ac.uk>  Thu, 02 Jul 2009 15:18:50 +0000
+
+chaste-source (1.0.6420M) intrepid; urgency=low
+
+  * Package revision 6420M of Chaste.
+  * Add missing package dependency.
+
+ -- Chaste Team <chaste-admin@maillist.ox.ac.uk>  Wed, 01 Jul 2009 17:07:43 +0000
+
+chaste-source (1.0.5981) intrepid; urgency=low
+
+  * Initial packaging of Chaste for Ubuntu Intrepid
+
+ -- Chaste Team <chaste-admin@maillist.ox.ac.uk>  Wed, 20 May 2009 15:05:48 +0100
+

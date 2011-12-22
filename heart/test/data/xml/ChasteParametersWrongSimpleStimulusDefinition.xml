@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ChasteParameters
+    xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/2_1"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="https://chaste.comlab.ox.ac.uk/nss/parameters/2_1 ../../../src/io/ChasteParameters_2_1.xsd">
+ 
+	<Simulation>
+		<!-- 
+			Problem definition 
+		-->
+		<SpaceDimension>3</SpaceDimension> <!-- 1, 2 or 3 -->
+	    <SimulationDuration unit="ms">10.0</SimulationDuration>
+	    <Domain>Mono</Domain> <!-- Mono or Bi -->
+	    
+		<!-- 
+			Mesh definition 
+		-->
+		<Mesh unit="cm">
+			<!-- Create a Fibre (1D), Sheet (2D) or Slab (3D) mesh in memory -->
+			<Slab x="4.0" y="0.1" z="2.0" inter_node_space="0.1"/>  
+	  	</Mesh>
+	
+		<!--
+			Ionic models	
+		-->
+		<IonicModels>
+			<!-- Specify a default cell model (compulsory) and any number of regional models (optional) -->
+			<!-- Can be hardcoded models, e.g. -->
+			<Default><Hardcoded>FaberRudy2000</Hardcoded></Default>			
+		</IonicModels>
+	
+	    <!-- 
+	    	Stimuli (as many <Stimulus> definitions as needed) 
+	   	-->
+   		<Stimuli>
+   		    <!-- Specify some intracellular current stimuli -->			
+			<Stimulus> <!-- #1 -->
+				<Strength unit="uA/cm^3">-25500.0</Strength>
+				<Duration unit="ms">0.5</Duration>
+				<Delay unit="ms">2.0</Delay>				
+				<StopTime unit="ms">8.0</StopTime>
+				<Location unit="cm">
+					<Cuboid>
+						<LowerCoordinates x="-5.0" y="-0.125" z="-5.0"/>
+						<UpperCoordinates x="0.0"  y="0.125"  z="0.0"/>
+					</Cuboid>
+				</Location>
+			</Stimulus>	
+
+		</Stimuli>
+
+		<!-- 
+			Output 
+		-->
+		<!-- Where to store the output (relative to CHASTE_TEST_OUTPUT) -->
+		<OutputDirectory>ChasteResults</OutputDirectory>
+		<!-- Prefix for output files -->
+		<OutputFilenamePrefix>SimulationResults</OutputFilenamePrefix>						
+	</Simulation>
+	
+	<Physiological>
+	    <!--
+	        Conductivities: Longitudinal (along fibre), Transverse (in sheet), Normal (between sheets)
+	    -->
+	    <IntracellularConductivities longi="1.75" trans="1.75" normal="1.75" unit="mS/cm"/>
+	    <ExtracellularConductivities longi="7.0"  trans="7.0"  normal="7.0" unit="mS/cm"/>
+	    <BathConductivity unit="mS/cm"> 7.0 </BathConductivity>
+	    
+	    <!-- PDE reaction/diffusion parameters -->
+	    <SurfaceAreaToVolumeRatio unit="1/cm"> 1400 </SurfaceAreaToVolumeRatio> <!-- usually denoted Chi or A_m in mono-/bidomain PDEs -->
+	    <Capacitance unit="uF/cm^2"> 1.0 </Capacitance> <!-- usually denoted C_m in mono-/bidomain PDEs -->
+	</Physiological>
+
+	<Numerical>
+	    <!-- ode is time-step used in cell-models, pde is time-step used in PDE solution, printing is timestep used for writing output to HDF5 file -->
+		<!-- Note that ode<=pde<=printing. ode must divide pde and pde must divide printing. -->
+		<TimeSteps ode="0.025" pde="0.05" printing="1.0" unit="ms"/>
+		
+		<!-- Tolerance for PETSc Krylov (linear system) solver -->
+		<KSPTolerances>
+			<KSPRelative>1e-6</KSPRelative>
+			<!-- Or absolute <KSPAbsolute>1e-8</KSPAbsolute> -->
+		</KSPTolerances>
+		<!-- KSP solver type -->
+		<KSPSolver>gmres</KSPSolver>
+		<!-- KSP preconditioner type -->
+		<KSPPreconditioner>bjacobi</KSPPreconditioner>		
+	</Numerical>
+		
+</ChasteParameters>

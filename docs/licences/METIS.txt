@@ -1,0 +1,12 @@
+METIS can be freely distributed provided that:
+   * A reference to the following paper is included: “A Fast and Highly
+     Quality Multilevel Scheme for Partitioning Irregular Graphs”.
+     George Karypis and Vipin Kumar. SIAM Journal on Scientific
+     Computing, Vol. 20, No. 1, pp. 359—392, 1999.
+   * The original documentation (PDF file of the manual) and copyright
+     notice is included.
+
+Permission to distribute/include METIS with your application
+must be obtained by sending email to metis@cs.umn.edu.
+
+METIS is Copyright 1997, Regents of the University of Minnesota

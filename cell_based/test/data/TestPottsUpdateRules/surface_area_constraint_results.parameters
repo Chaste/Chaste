@@ -1,0 +1,4 @@
+		<SurfaceAreaConstraintPottsUpdateRule-2>
+			<DeformationEnergyParameter>0.1</DeformationEnergyParameter>
+			<MatureCellTargetSurfaceArea>20</MatureCellTargetSurfaceArea>
+		</SurfaceAreaConstraintPottsUpdateRule-2>

@@ -1,0 +1,12 @@
+		<MechanicsCutOffLength>1.5</MechanicsCutOffLength>
+		<MeinekeDivisionSeparation>0.3</MeinekeDivisionSeparation>
+		<DampingConstantNormal>1</DampingConstantNormal>
+		<DampingConstantMutant>1</DampingConstantMutant>
+		<OutputCellIdData>1</OutputCellIdData>
+		<OutputCellMutationStates>1</OutputCellMutationStates>
+		<OutputCellAncestors>1</OutputCellAncestors>
+		<OutputCellProliferativeTypes>1</OutputCellProliferativeTypes>
+		<OutputCellVariables>0</OutputCellVariables>
+		<OutputCellCyclePhases>1</OutputCellCyclePhases>
+		<OutputCellAges>1</OutputCellAges>
+		<OutputCellVolumes>1</OutputCellVolumes>

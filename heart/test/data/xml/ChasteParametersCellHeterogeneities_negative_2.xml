@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ChasteParameters
+    xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/2_0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="https://chaste.comlab.ox.ac.uk/nss/parameters/2_0 ../../../src/io/ChasteParameters_2_0.xsd">
+       
+	<Simulation>
+		<!-- 
+			Problem definition 
+		-->
+		<SpaceDimension>3</SpaceDimension>
+	    <SimulationDuration unit="ms">10.0</SimulationDuration>
+	    <Domain>Mono</Domain>
+	    
+		<!-- 
+			Mesh definition 
+		-->
+		<Mesh unit="cm">
+			<Slab x="4.0" y="0.1" z="2.0" inter_node_space="0.1"/>    
+	  	</Mesh>
+	
+		<!--
+			Ionic models	
+		-->
+		<IonicModels>
+			<Default><Hardcoded>FaberRudy2000</Hardcoded></Default>
+		</IonicModels>
+	
+	    <!-- 
+	    	Stimuli (as many <Stimulus> definitions as needed) 
+	   	-->
+   		<Stimuli>
+		  	<Stimulus> <!-- #1 -->
+				<Strength unit="uA/cm^3">-25500.0</Strength>
+				<Duration unit="ms">0.5</Duration>
+				<Delay unit="ms">0</Delay>
+				<Location unit="cm">
+					<Cuboid>
+						<LowerCoordinates x="-5.0"  y="-0.125" z="-5.0"/>
+						<UpperCoordinates x="-4.75" y="0.125"  z="5.0"/>
+					</Cuboid>
+				</Location>
+			</Stimulus>	
+		</Stimuli>
+
+	    <!-- 
+	    	Ionic cell model heterogeneities (as many <CellHeterogeneity> definitions as needed) 
+	   	-->
+		<CellHeterogeneities>
+		  	<CellHeterogeneity> <!-- #1 -->
+				<ScaleFactorGks unit="dimensionless">0.462</ScaleFactorGks>
+				<ScaleFactorIto unit="dimensionless">0.0</ScaleFactorIto>
+				<ScaleFactorGkr unit="dimensionless">1.0</ScaleFactorGkr>
+				<Location unit="cm">
+						<EpiLayer unit="dimensionless">0.8</EpiLayer>
+				</Location>
+			</CellHeterogeneity>	
+		    <CellHeterogeneity> <!-- #2 -->
+				<ScaleFactorGks unit="dimensionless">0.5</ScaleFactorGks>
+				<ScaleFactorIto unit="dimensionless">0.1</ScaleFactorIto>
+				<ScaleFactorGkr unit="dimensionless">1.0</ScaleFactorGkr>
+				<Location unit="cm">
+						<EndoLayer unit="dimensionless">0.6</EndoLayer>
+				</Location>
+			</CellHeterogeneity>	
+		   <CellHeterogeneity> <!-- #3 -->
+				<ScaleFactorGks unit="dimensionless">0.3</ScaleFactorGks>
+				<ScaleFactorIto unit="dimensionless">0.9</ScaleFactorIto>
+				<ScaleFactorGkr unit="dimensionless">2.0</ScaleFactorGkr>
+				<Location unit="cm">
+						<MidLayer unit="dimensionless">-0.4</MidLayer>
+				</Location>
+			</CellHeterogeneity>
+		</CellHeterogeneities>		
+
+		<!-- 
+			Output 
+		-->
+		<OutputDirectory>ChasteResults</OutputDirectory>
+
+		<OutputVisualizer meshalyzer="no" vtk="yes" cmgui="no"/>
+				
+	</Simulation>
+	
+	<Physiological>
+	    <!--
+	        Conductivities
+	    -->
+	    <IntracellularConductivities longi="1.75" trans="1.75" normal="1.75" unit="mS/cm"/>
+	    <ExtracellularConductivities longi="7.0"  trans="7.0"  normal="7.0" unit="mS/cm"/>
+	    <BathConductivity unit="mS/cm"> 7.0 </BathConductivity>
+	    <SurfaceAreaToVolumeRatio unit="1/cm"> 1400 </SurfaceAreaToVolumeRatio>
+	    <Capacitance unit="uF/cm^2"> 1.0 </Capacitance>
+	</Physiological>
+
+	<Numerical>
+		<TimeSteps ode="0.025" pde="0.05" printing="1.0" unit="ms"/>
+		<KSPTolerances>
+			<KSPRelative>1e-6</KSPRelative>
+		</KSPTolerances>
+		<KSPSolver>gmres</KSPSolver>
+		<KSPPreconditioner>bjacobi</KSPPreconditioner>
+		<AdaptivityParameters target_error="2.0" sigma="0.01" max_edge_length="0.04" min_edge_length="0.005" gradation="1.3" max_nodes="1000" num_sweeps="5" />
+	</Numerical>
+
+</ChasteParameters>

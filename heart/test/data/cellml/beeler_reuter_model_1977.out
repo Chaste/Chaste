@@ -1,0 +1,149 @@
+    |\^/|     Maple 12 (SUN SPARC SOLARIS)
+._|\|   |/|_. Copyright (c) Maplesoft, a division of Waterloo Maple Inc. 2008
+ \  MAPLE  /  All rights reserved. Maple is a trademark of
+ <____ ____>  Waterloo Maple Inc.
+      |       Type ? for help.
+1
+var_membrane__time := var_environment__time
+var_sodium_current__m := var_sodium_current_m_gate__m
+var_sodium_current__j := var_sodium_current_j_gate__j
+var_sodium_current__h := var_sodium_current_h_gate__h
+var_sodium_current__V := var_membrane__V
+var_sodium_current__i_Na := (var_sodium_current__g_Na*
+var_sodium_current_m_gate__m^3*var_sodium_current_h_gate__h*
+var_sodium_current_j_gate__j+var_sodium_current__g_Nac)*(var_membrane__V-
+var_sodium_current__E_Na)
+var_membrane__i_Na := (var_sodium_current__g_Na*var_sodium_current_m_gate__m^3*
+var_sodium_current_h_gate__h*var_sodium_current_j_gate__j+
+var_sodium_current__g_Nac)*(var_membrane__V-var_sodium_current__E_Na)
+var_slow_inward_current__d := var_slow_inward_current_d_gate__d
+var_slow_inward_current__f := var_slow_inward_current_f_gate__f
+var_slow_inward_current__V := var_membrane__V
+var_slow_inward_current__E_s := -82.3-13.0287*ln(.1e-2*
+var_slow_inward_current__Cai)
+var_slow_inward_current__i_s := var_slow_inward_current__g_s*
+var_slow_inward_current_d_gate__d*var_slow_inward_current_f_gate__f*(
+var_membrane__V+82.3+13.0287*ln(.1e-2*var_slow_inward_current__Cai))
+var_membrane__i_s := var_slow_inward_current__g_s*
+var_slow_inward_current_d_gate__d*var_slow_inward_current_f_gate__f*(
+var_membrane__V+82.3+13.0287*ln(.1e-2*var_slow_inward_current__Cai))
+var_time_dependent_outward_current__x1 := 
+var_time_dependent_outward_current_x1_gate__x1
+var_time_dependent_outward_current__V := var_membrane__V
+var_time_dependent_outward_current__i_x1 := .8e-2*
+var_time_dependent_outward_current_x1_gate__x1*(exp(.4e-1*var_membrane__V+3.08)
+-1)/exp(.4e-1*var_membrane__V+1.40)
+var_membrane__i_x1 := .8e-2*var_time_dependent_outward_current_x1_gate__x1*(exp
+(.4e-1*var_membrane__V+3.08)-1)/exp(.4e-1*var_membrane__V+1.40)
+var_time_independent_outward_current__V := var_membrane__V
+var_time_independent_outward_current__i_K1 := .140e-1*(exp(.4e-1*
+var_membrane__V+3.40)-1)/(exp(.8e-1*var_membrane__V+4.24)+exp(.4e-1*
+var_membrane__V+2.12))+.70e-3*(var_membrane__V+23)/(1-exp(-.4e-1*
+var_membrane__V-.92))
+var_membrane__i_K1 := .140e-1*(exp(.4e-1*var_membrane__V+3.40)-1)/(exp(.8e-1*
+var_membrane__V+4.24)+exp(.4e-1*var_membrane__V+2.12))+.70e-3*(var_membrane__V+
+23)/(1-exp(-.4e-1*var_membrane__V-.92))
+var_stimulus_protocol__time := var_environment__time
+var_stimulus_protocol__Istim := `if`(var_stimulus_protocol__IstimStart <= 
+var_environment__time and var_environment__time <= 
+var_stimulus_protocol__IstimEnd and var_environment__time-
+var_stimulus_protocol__IstimStart-floor((var_environment__time-
+var_stimulus_protocol__IstimStart)/var_stimulus_protocol__IstimPeriod)*
+var_stimulus_protocol__IstimPeriod <= var_stimulus_protocol__IstimPulseDuration
+,var_stimulus_protocol__IstimAmplitude,0)
+var_membrane__Istim := `if`(var_stimulus_protocol__IstimStart <= 
+var_environment__time and var_environment__time <= 
+var_stimulus_protocol__IstimEnd and var_environment__time-
+var_stimulus_protocol__IstimStart-floor((var_environment__time-
+var_stimulus_protocol__IstimStart)/var_stimulus_protocol__IstimPeriod)*
+var_stimulus_protocol__IstimPeriod <= var_stimulus_protocol__IstimPulseDuration
+,var_stimulus_protocol__IstimAmplitude,0)
+var_sodium_current__time := var_environment__time
+var_sodium_current_m_gate__V := var_membrane__V
+var_sodium_current_m_gate__alpha_m := -(var_membrane__V+47)/(exp(-.1*
+var_membrane__V-4.7)-1)
+var_sodium_current_m_gate__beta_m := 40*exp(-.56e-1*var_membrane__V-4.032)
+var_sodium_current_m_gate__time := var_environment__time
+var_sodium_current_h_gate__V := var_membrane__V
+var_sodium_current_h_gate__alpha_h := .126*exp(-.25*var_membrane__V-19.25)
+var_sodium_current_h_gate__beta_h := 1.7/(exp(-.82e-1*var_membrane__V-1.8450)+1
+)
+var_sodium_current_h_gate__time := var_environment__time
+var_sodium_current_j_gate__V := var_membrane__V
+var_sodium_current_j_gate__alpha_j := .55e-1*exp(-.25*var_membrane__V-19.50)/(
+exp(-.2*var_membrane__V-15.6)+1)
+var_sodium_current_j_gate__beta_j := .3/(exp(-.1*var_membrane__V-3.2)+1)
+var_sodium_current_j_gate__time := var_environment__time
+var_slow_inward_current__time := var_environment__time
+var_slow_inward_current_d_gate__V := var_membrane__V
+var_slow_inward_current_d_gate__alpha_d := .95e-1*exp(-1/100*var_membrane__V+1/
+20)/(1+exp(-.7199424046e-1*var_membrane__V+.3599712023))
+var_slow_inward_current_d_gate__beta_d := .7e-1*exp(-1/59*var_membrane__V-44/59
+)/(1+exp(1/20*var_membrane__V+11/5))
+var_slow_inward_current_d_gate__time := var_environment__time
+var_slow_inward_current_f_gate__V := var_membrane__V
+var_slow_inward_current_f_gate__alpha_f := .12e-1*exp(-1/125*var_membrane__V-28
+/125)/(1+exp(.1499250375*var_membrane__V+4.197901050))
+var_slow_inward_current_f_gate__beta_f := .65e-2*exp(-1/50*var_membrane__V-3/5)
+/(1+exp(-1/5*var_membrane__V-6))
+var_slow_inward_current_f_gate__time := var_environment__time
+var_time_dependent_outward_current__time := var_environment__time
+var_time_dependent_outward_current_x1_gate__V := var_membrane__V
+var_time_dependent_outward_current_x1_gate__alpha_x1 := .5e-3*exp(.8264462810e-\
+1*var_membrane__V+4.132231405)/(1+exp(.5714285714e-1*var_membrane__V+2.85714285\
+7))
+var_time_dependent_outward_current_x1_gate__beta_x1 := .13e-2*exp(-.5998800240e\
+-1*var_membrane__V-1.199760048)/(1+exp(-1/25*var_membrane__V-4/5))
+var_time_dependent_outward_current_x1_gate__time := var_environment__time
+d_dt_membrane__V := (`if`(var_stimulus_protocol__IstimStart <= 
+var_environment__time and var_environment__time <= 
+var_stimulus_protocol__IstimEnd and var_environment__time-
+var_stimulus_protocol__IstimStart-floor((var_environment__time-
+var_stimulus_protocol__IstimStart)/var_stimulus_protocol__IstimPeriod)*
+var_stimulus_protocol__IstimPeriod <= var_stimulus_protocol__IstimPulseDuration
+,var_stimulus_protocol__IstimAmplitude,0)+(var_sodium_current__g_Na*
+var_sodium_current_m_gate__m^3*var_sodium_current_h_gate__h*
+var_sodium_current_j_gate__j+var_sodium_current__g_Nac)*(var_membrane__V-
+var_sodium_current__E_Na)+var_slow_inward_current__g_s*
+var_slow_inward_current_d_gate__d*var_slow_inward_current_f_gate__f*(
+var_membrane__V+82.3+13.0287*ln(.1e-2*var_slow_inward_current__Cai))+.8e-2*
+var_time_dependent_outward_current_x1_gate__x1*(exp(.4e-1*var_membrane__V+3.08)
+-1)/exp(.4e-1*var_membrane__V+1.40)+.140e-1*(exp(.4e-1*var_membrane__V+3.40)-1)
+/(exp(.8e-1*var_membrane__V+4.24)+exp(.4e-1*var_membrane__V+2.12))+.70e-3*(
+var_membrane__V+23)/(1-exp(-.4e-1*var_membrane__V-.92)))/var_membrane__C
+d_dt_sodium_current_m_gate__m := -(var_membrane__V+47)/(exp(-.1*var_membrane__V
+-4.7)-1)*(1-var_sodium_current_m_gate__m)-40*exp(-.56e-1*var_membrane__V-4.032)
+*var_sodium_current_m_gate__m
+d_dt_sodium_current_h_gate__h := .126*exp(-.25*var_membrane__V-19.25)*(1-
+var_sodium_current_h_gate__h)-1.7/(exp(-.82e-1*var_membrane__V-1.8450)+1)*
+var_sodium_current_h_gate__h
+d_dt_sodium_current_j_gate__j := .55e-1*exp(-.25*var_membrane__V-19.50)/(exp(-.\
+2*var_membrane__V-15.6)+1)*(1-var_sodium_current_j_gate__j)-.3/(exp(-.1*
+var_membrane__V-3.2)+1)*var_sodium_current_j_gate__j
+d_dt_slow_inward_current__Cai := -.1e-1*var_slow_inward_current__g_s*
+var_slow_inward_current_d_gate__d*var_slow_inward_current_f_gate__f*(
+var_membrane__V+82.3+13.0287*ln(.1e-2*var_slow_inward_current__Cai))+.7e-5-.7e-\
+1*var_slow_inward_current__Cai
+d_dt_slow_inward_current_d_gate__d := .95e-1*exp(-1/100*var_membrane__V+1/20)/(
+1+exp(-.7199424046e-1*var_membrane__V+.3599712023))*(1-
+var_slow_inward_current_d_gate__d)-.7e-1*exp(-1/59*var_membrane__V-44/59)/(1+
+exp(1/20*var_membrane__V+11/5))*var_slow_inward_current_d_gate__d
+d_dt_slow_inward_current_f_gate__f := .12e-1*exp(-1/125*var_membrane__V-28/125)
+/(1+exp(.1499250375*var_membrane__V+4.197901050))*(1-
+var_slow_inward_current_f_gate__f)-.65e-2*exp(-1/50*var_membrane__V-3/5)/(1+exp
+(-1/5*var_membrane__V-6))*var_slow_inward_current_f_gate__f
+d_dt_time_dependent_outward_current_x1_gate__x1 := .5e-3*exp(.8264462810e-1*
+var_membrane__V+4.132231405)/(1+exp(.5714285714e-1*var_membrane__V+2.857142857)
+)*(1-var_time_dependent_outward_current_x1_gate__x1)-.13e-2*exp(-.5998800240e-1
+*var_membrane__V-1.199760048)/(1+exp(-1/25*var_membrane__V-4/5))*
+var_time_dependent_outward_current_x1_gate__x1
+g_var_slow_inward_current__Cai := var_slow_inward_current__Cai-
+var_slow_inward_current__Cai_old-delta_t*(-.1e-1*var_slow_inward_current__g_s*
+var_slow_inward_current_d_gate__d*var_slow_inward_current_f_gate__f*(
+var_membrane__V+82.3+13.0287*ln(.1e-2*var_slow_inward_current__Cai))+.7e-5-.7e-\
+1*var_slow_inward_current__Cai)
+"--var_slow_inward_current__Cai/var_slow_inward_current__Cai--"
+1-delta_t*(-.1302870000*var_slow_inward_current__g_s*
+var_slow_inward_current_d_gate__d*var_slow_inward_current_f_gate__f/
+var_slow_inward_current__Cai-.7e-1)
+memory used=0.8MB, alloc=0.6MB, time=0.16

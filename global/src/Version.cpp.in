@@ -1,0 +1,136 @@
+/*
+
+Copyright (C) University of Oxford, 2005-2009
+
+University of Oxford means the Chancellor, Masters and Scholars of the
+University of Oxford, having an administrative office at Wellington
+Square, Oxford OX1 2JD, UK.
+
+This file is part of Chaste.
+
+Chaste is free software: you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License as published
+by the Free Software Foundation, either version 2.1 of the License, or
+(at your option) any later version.
+
+Chaste is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details. The offer of Chaste under the terms of the
+License is subject to the License being interpreted in accordance with
+English Law and subject to any action against the University of Oxford
+being under the jurisdiction of the English Courts.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Chaste. If not, see <http://www.gnu.org/licenses/>.
+
+*/
+
+/**
+ * @file
+ * 
+ * This is a template file for generating the Version.cpp source on the fly.
+ * Content of the form %(example)s is replaced by suitable values.
+ * See the function GetVersionCpp in python/SConsTools.py for more details.
+ */
+
+#include "Version.hpp"
+#include <sstream>
+#include <ctime>
+
+const char* ChasteBuildInfo::GetRootDir()
+{
+    return "%(chaste_root)s";
+}
+
+std::string ChasteBuildInfo::GetVersionString()
+{
+    std::stringstream version;
+    version << GetMajorReleaseNumber() << "." << GetMinorReleaseNumber()
+            << "." << GetRevisionNumber();
+    return version.str();
+}
+
+unsigned ChasteBuildInfo::GetMajorReleaseNumber()
+{
+    return 3u;
+}
+
+unsigned ChasteBuildInfo::GetMinorReleaseNumber()
+{
+    return 0u;
+}
+
+unsigned ChasteBuildInfo::GetRevisionNumber()
+{
+    return %(revision)d;
+}
+
+bool ChasteBuildInfo::IsWorkingCopyModified()
+{
+    return %(wc_modified)s;
+}
+
+const char* ChasteBuildInfo::GetBuildTime()
+{
+    return "%(build_time)s";
+}
+
+const char* ChasteBuildInfo::GetCurrentTime()
+{
+    // Get time in UTC
+    time_t rawtime;
+    time(&rawtime);
+    struct tm* p_timeinfo = gmtime(&rawtime);
+    // Convert to string
+    const unsigned bufsize = %(time_size)d;
+    static char buffer[bufsize];
+    strftime(buffer, bufsize, "%(time_format)s", p_timeinfo);
+    return buffer;
+}
+
+const char* ChasteBuildInfo::GetBuilderUnameInfo()
+{
+    return "%(uname)s";
+}
+
+const char* ChasteBuildInfo::GetBuildInformation()
+{
+    return "%(build_info)s";
+}
+
+const char* ChasteBuildInfo::GetCompilerType()
+{
+	return "%(compiler_type)s";
+}
+
+const char* ChasteBuildInfo::GetCompilerVersion()
+{
+	return "%(compiler_version)s";
+}
+
+const char* ChasteBuildInfo::GetCompilerFlags()
+{
+	return "%(cc_flags)s";
+}
+
+std::string ChasteBuildInfo::GetProvenanceString()
+{
+    std::stringstream prov;
+    prov << "Created by Chaste version " << GetVersionString();
+    if (IsWorkingCopyModified())
+    {
+        prov << " (with uncommitted modifications)";
+    }
+    prov << " on " << GetCurrentTime() << ".  ";
+    prov << "Chaste was built on " << GetBuildTime()
+         << " by machine (uname) '" << GetBuilderUnameInfo()
+         << "' using settings: " << GetBuildInformation();
+    prov << "." << std::endl;
+    return prov.str();
+}
+
+const char* ChasteBuildInfo::GetXsdVersion()
+{
+	return "%(xsd_version)s";
+}

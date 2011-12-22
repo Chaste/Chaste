@@ -1,0 +1,180 @@
+Group name: square_128_elements
+Shape.  Dimension=2, simplex(2)*simplex
+ #Scale factor sets= 0
+ #Nodes= 3
+ #Fields=3
+ 1) coordinates, coordinate, rectangular cartesian, #Components=2
+   x.  l.simplex(2)*l.simplex, no modify, standard node based.
+     #Nodes= 3
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+   y.  l.simplex(2)*l.simplex, no modify, standard node based.
+     #Nodes= 3
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+2)  V , field, rectangular cartesian, #Components=1
+   x.  l.simplex(2)*l.simplex, no modify, standard node based.
+     #Nodes= 3
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+3)  Phi_e , field, rectangular cartesian, #Components=1
+   x.  l.simplex(2)*l.simplex, no modify, standard node based.
+     #Nodes= 3
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+Element:	1 0 0 Nodes:	29	53	6	
+Element:	2 0 0 Nodes:	26	42	14	
+Element:	3 0 0 Nodes:	70	38	12	
+Element:	4 0 0 Nodes:	2	41	81	
+Element:	5 0 0 Nodes:	5	27	48	
+Element:	6 0 0 Nodes:	34	66	4	
+Element:	7 0 0 Nodes:	67	37	9	
+Element:	8 0 0 Nodes:	39	77	7	
+Element:	9 0 0 Nodes:	56	31	10	
+Element:	10 0 0 Nodes:	45	30	10	
+Element:	11 0 0 Nodes:	51	35	11	
+Element:	12 0 0 Nodes:	6	43	29	
+Element:	13 0 0 Nodes:	72	9	37	
+Element:	14 0 0 Nodes:	75	40	12	
+Element:	15 0 0 Nodes:	5	48	33	
+Element:	16 0 0 Nodes:	7	73	39	
+Element:	17 0 0 Nodes:	28	49	14	
+Element:	18 0 0 Nodes:	27	46	14	
+Element:	19 0 0 Nodes:	10	26	45	
+Element:	20 0 0 Nodes:	10	30	56	
+Element:	21 0 0 Nodes:	32	59	17	
+Element:	22 0 0 Nodes:	47	31	17	
+Element:	23 0 0 Nodes:	34	64	18	
+Element:	24 0 0 Nodes:	36	69	19	
+Element:	25 0 0 Nodes:	11	28	51	
+Element:	26 0 0 Nodes:	65	35	20	
+Element:	27 0 0 Nodes:	5	33	63	
+Element:	28 0 0 Nodes:	12	36	70	
+Element:	29 0 0 Nodes:	12	38	75	
+Element:	30 0 0 Nodes:	71	40	23	
+Element:	31 0 0 Nodes:	41	80	24	
+Element:	32 0 0 Nodes:	13	32	61	
+Element:	33 0 0 Nodes:	44	15	26	
+Element:	34 0 0 Nodes:	43	6	26	
+Element:	35 0 0 Nodes:	47	17	27	
+Element:	36 0 0 Nodes:	14	42	27	
+Element:	37 0 0 Nodes:	50	19	28	
+Element:	38 0 0 Nodes:	14	46	28	
+Element:	39 0 0 Nodes:	52	18	29	
+Element:	40 0 0 Nodes:	14	49	29	
+Element:	41 0 0 Nodes:	55	16	30	
+Element:	42 0 0 Nodes:	54	1	30	
+Element:	43 0 0 Nodes:	58	17	31	
+Element:	44 0 0 Nodes:	57	8	31	
+Element:	45 0 0 Nodes:	60	25	32	
+Element:	46 0 0 Nodes:	17	58	32	
+Element:	47 0 0 Nodes:	62	21	33	
+Element:	48 0 0 Nodes:	17	59	33	
+Element:	49 0 0 Nodes:	65	20	34	
+Element:	50 0 0 Nodes:	18	52	34	
+Element:	51 0 0 Nodes:	68	20	35	
+Element:	52 0 0 Nodes:	67	9	35	
+Element:	53 0 0 Nodes:	5	63	36	
+Element:	54 0 0 Nodes:	19	50	36	
+Element:	55 0 0 Nodes:	71	23	37	
+Element:	56 0 0 Nodes:	19	69	37	
+Element:	57 0 0 Nodes:	74	22	38	
+Element:	58 0 0 Nodes:	73	7	38	
+Element:	59 0 0 Nodes:	76	24	39	
+Element:	60 0 0 Nodes:	21	62	39	
+Element:	61 0 0 Nodes:	79	23	40	
+Element:	62 0 0 Nodes:	78	3	40	
+Element:	63 0 0 Nodes:	13	61	41	
+Element:	64 0 0 Nodes:	24	76	41	
+Element:	65 0 0 Nodes:	10	27	42	
+Element:	66 0 0 Nodes:	26	10	42	
+Element:	67 0 0 Nodes:	14	29	43	
+Element:	68 0 0 Nodes:	26	14	43	
+Element:	69 0 0 Nodes:	26	6	44	
+Element:	70 0 0 Nodes:	15	30	45	
+Element:	71 0 0 Nodes:	26	15	45	
+Element:	72 0 0 Nodes:	5	28	46	
+Element:	73 0 0 Nodes:	27	5	46	
+Element:	74 0 0 Nodes:	10	31	47	
+Element:	75 0 0 Nodes:	27	10	47	
+Element:	76 0 0 Nodes:	17	33	48	
+Element:	77 0 0 Nodes:	27	17	48	
+Element:	78 0 0 Nodes:	11	29	49	
+Element:	79 0 0 Nodes:	28	11	49	
+Element:	80 0 0 Nodes:	5	36	50	
+Element:	81 0 0 Nodes:	28	5	50	
+Element:	82 0 0 Nodes:	19	35	51	
+Element:	83 0 0 Nodes:	28	19	51	
+Element:	84 0 0 Nodes:	11	34	52	
+Element:	85 0 0 Nodes:	29	11	52	
+Element:	86 0 0 Nodes:	29	18	53	
+Element:	87 0 0 Nodes:	30	15	54	
+Element:	88 0 0 Nodes:	30	1	55	
+Element:	89 0 0 Nodes:	16	31	56	
+Element:	90 0 0 Nodes:	30	16	56	
+Element:	91 0 0 Nodes:	31	16	57	
+Element:	92 0 0 Nodes:	8	32	58	
+Element:	93 0 0 Nodes:	31	8	58	
+Element:	94 0 0 Nodes:	13	33	59	
+Element:	95 0 0 Nodes:	32	13	59	
+Element:	96 0 0 Nodes:	32	8	60	
+Element:	97 0 0 Nodes:	25	41	61	
+Element:	98 0 0 Nodes:	32	25	61	
+Element:	99 0 0 Nodes:	13	39	62	
+Element:	100 0 0 Nodes:	33	13	62	
+Element:	101 0 0 Nodes:	21	36	63	
+Element:	102 0 0 Nodes:	33	21	63	
+Element:	103 0 0 Nodes:	34	4	64	
+Element:	104 0 0 Nodes:	11	35	65	
+Element:	105 0 0 Nodes:	34	11	65	
+Element:	106 0 0 Nodes:	34	20	66	
+Element:	107 0 0 Nodes:	19	37	67	
+Element:	108 0 0 Nodes:	35	19	67	
+Element:	109 0 0 Nodes:	35	9	68	
+Element:	110 0 0 Nodes:	12	37	69	
+Element:	111 0 0 Nodes:	36	12	69	
+Element:	112 0 0 Nodes:	21	38	70	
+Element:	113 0 0 Nodes:	36	21	70	
+Element:	114 0 0 Nodes:	12	40	71	
+Element:	115 0 0 Nodes:	37	12	71	
+Element:	116 0 0 Nodes:	37	23	72	
+Element:	117 0 0 Nodes:	21	39	73	
+Element:	118 0 0 Nodes:	38	21	73	
+Element:	119 0 0 Nodes:	38	7	74	
+Element:	120 0 0 Nodes:	22	40	75	
+Element:	121 0 0 Nodes:	38	22	75	
+Element:	122 0 0 Nodes:	13	41	76	
+Element:	123 0 0 Nodes:	39	13	76	
+Element:	124 0 0 Nodes:	39	24	77	
+Element:	125 0 0 Nodes:	40	22	78	
+Element:	126 0 0 Nodes:	40	3	79	
+Element:	127 0 0 Nodes:	41	2	80	
+Element:	128 0 0 Nodes:	41	25	81	

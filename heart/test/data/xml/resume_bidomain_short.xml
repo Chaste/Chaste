@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ChasteParameters xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/3_0">
+
+	<ResumeSimulation>
+		<ArchiveDirectory relative_to="this_file">SaveBidomainShort_0.2ms</ArchiveDirectory>
+		<SpaceDimension>3</SpaceDimension>
+	    <SimulationDuration unit="ms">0.4</SimulationDuration>
+	    <Domain>Bi</Domain>
+        <OutputVisualizer meshalyzer="yes" vtk="no" cmgui="no"/>
+	</ResumeSimulation>
+	
+	<!-- These elements must exist, but their contents are ignored -->
+	<Physiological/>
+	<Numerical/>		
+		    
+</ChasteParameters>

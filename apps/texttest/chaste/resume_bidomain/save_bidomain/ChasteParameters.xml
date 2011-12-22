@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<cp20:ChasteParameters xmlns:cp20="https://chaste.comlab.ox.ac.uk/nss/parameters/2_0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ChasteParameters_1_1.xsd" xsi:schemaLocation="https://chaste.comlab.ox.ac.uk/nss/parameters/2_0 ChasteParameters_2_0.xsd">
+
+  <cp20:Simulation>
+    <cp20:SimulationDuration unit="ms">10</cp20:SimulationDuration>
+    <cp20:Domain>Bi</cp20:Domain>
+    <cp20:Mesh unit="cm">
+      <cp20:LoadMesh conductivity_media="NoFibreOrientation" name="mesh/test/data/cube_1626_elements"/>
+    </cp20:Mesh>
+    <cp20:IonicModels>
+      <cp20:Default>
+        <cp20:Hardcoded>Fox2002BackwardEuler</cp20:Hardcoded>
+      </cp20:Default>
+    </cp20:IonicModels>
+    <cp20:Stimuli>
+      <cp20:Stimulus>
+        <cp20:Strength unit="uA/cm^3">-80000</cp20:Strength>
+        <cp20:Duration unit="ms">1</cp20:Duration>
+        <cp20:Delay unit="ms">0</cp20:Delay>
+        <cp20:Location unit="cm">
+          <cp20:Cuboid>
+            <cp20:LowerCoordinates x="0" y="0" z="0"/>
+            <cp20:UpperCoordinates x="0.1" y="1" z="1"/>
+          </cp20:Cuboid>
+        </cp20:Location>
+      </cp20:Stimulus>
+    </cp20:Stimuli>
+    <cp20:OutputDirectory>SaveBidomain</cp20:OutputDirectory>
+    <cp20:OutputFilenamePrefix>Bidomain_3d</cp20:OutputFilenamePrefix>
+    <cp20:CheckpointSimulation max_checkpoints_on_disk="3" timestep="2" unit="ms"/>
+  </cp20:Simulation>
+
+  <cp20:Physiological>
+    <cp20:IntracellularConductivities longi="1.75" normal="1.75" trans="1.75" unit="mS/cm"/>
+    <cp20:ExtracellularConductivities longi="7" normal="7" trans="7" unit="mS/cm"/>
+    <cp20:SurfaceAreaToVolumeRatio unit="1/cm">1400</cp20:SurfaceAreaToVolumeRatio>
+    <cp20:Capacitance unit="uF/cm^2">1</cp20:Capacitance>
+  </cp20:Physiological>
+
+  <cp20:Numerical>
+    <cp20:TimeSteps ode="0.01" pde="0.1" printing="0.1" unit="ms"/>
+    <cp20:KSPTolerances>
+      <cp20:KSPAbsolute>1e-06</cp20:KSPAbsolute>
+    </cp20:KSPTolerances>
+    <cp20:KSPSolver>gmres</cp20:KSPSolver>
+    <cp20:KSPPreconditioner>jacobi</cp20:KSPPreconditioner>
+  </cp20:Numerical>
+
+</cp20:ChasteParameters>

@@ -1,0 +1,14 @@
+			<UseEdgeBasedSpringConstant>0</UseEdgeBasedSpringConstant>
+			<UseMutantSprings>0</UseMutantSprings>
+			<MutantMutantMultiplier>1.79769e+308</MutantMutantMultiplier>
+			<NormalMutantMultiplier>1.79769e+308</NormalMutantMultiplier>
+			<UseBCatSprings>0</UseBCatSprings>
+			<UseApoptoticSprings>0</UseApoptoticSprings>
+			<BetaCatSpringScaler>3.02333</BetaCatSpringScaler>
+			<ApoptoticSpringTensionStiffness>3.75</ApoptoticSpringTensionStiffness>
+			<ApoptoticSpringCompressionStiffness>11.25</ApoptoticSpringCompressionStiffness>
+			<MeinekeSpringStiffness>15</MeinekeSpringStiffness>
+			<MeinekeDivisionRestingSpringLength>0.5</MeinekeDivisionRestingSpringLength>
+			<MeinekeSpringGrowthDuration>1</MeinekeSpringGrowthDuration>
+			<UseCutOffLength>1</UseCutOffLength>
+			<CutOffLength>1.5</CutOffLength>

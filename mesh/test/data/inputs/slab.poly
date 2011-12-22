@@ -1,0 +1,20 @@
+#Part 1 - node file is elsewhere
+0
+#Part 2 - list of facets
+6 0 #6 facets, no boundary markers
+1 0 0 #facet number 0 
+4 0 3 2 1 
+1 0 0 #facet number 1 
+4 4 5 6 7
+1 0 0 #facet number 2 
+4 0 1 5 4
+1 0 0 #facet number 3 
+4 1 2 6 5
+1 0 0 #facet number 4 
+4 2 3 7 6
+1 0 0 #facet number 5 
+4 0 4 7 3
+#Part 3 - list of holes
+0
+#Part 4 - list of regions
+0

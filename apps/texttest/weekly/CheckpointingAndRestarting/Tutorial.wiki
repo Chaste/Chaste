@@ -1,0 +1,63 @@
+== Checkpointing ==
+
+Checkpointing involves writing every aspect of a simulation to disk, midway through the simulation, so that it can later be restarted (possibly with new parameter values). In order to write a checkpoint you have to put the following line in the simulation block in the xml parameters file 
+{{{
+#!xml
+<CheckpointSimulation timestep="1.0" unit="ms" max_checkpoints_on_disk="10"/>
+}}}
+The attached files can be run as an example.
+
+A checkpointed simulation produces the following output directory structure:
+{{{
+CHASTE_TEST_OUTPUT
+    <OutputDirectory>
+    <OutputDirectory>_checkpoints
+        1.0ms                        (or whatever the checkpoint timestep is set to)
+            <OutputDirectory>        (a copy of the simulation output so far)
+            <OutputDirectory>_1.0ms  (the checkpoint data itself)
+            ResumeParameters.xml     (a parameters file for easy resuming from this checkpoint)
+        2.0ms
+            ...
+}}}
+(For example, if the output directory is `ChasteResults`, the checkpoints will then be found in the directory `$CHASTE_TEST_OUTPUT/ChasteResults_checkpoints`.
+
+== Restarting ==
+
+First run the attached simulation. The following steps guide you through the process of restarting the simulation using the final checkpoint.
+
+First, copy the checkpoint directory to a new directory (not technically required but advisable) and change directory into it.
+{{{
+#!sh
+cd testoutput/ChasteResults_checkpoints/
+cp -r 5ms 5ms_extended
+cd 5ms_extended
+}}}
+
+The `ResumeParameters.xml` file is the new parameters file to be given to the executable, and has to be edited before being run. Open the `ResumeParameters.xml` file and change `SimulationDuration` to 10ms.
+
+If you wish to append results to the original .h5 file, you need to either move the `ChasteResults` folder into your test output folder, or do
+{{{
+#!sh
+export CHASTE_TEST_OUTPUT=.
+}}}
+so that the original results file saved with the checkpoint can be located.
+
+Finally, run the simulation again with `ResumeParameters.xml` as the input xml file. The new results folder is `./ChasteResults`, or, from the original directory `testoutput/ChasteResults_checkpoints/5ms_extended/ChasteResults`. The output files in here include the simulation results from ''before and after'' the checkpoint.
+
+'''Notes:'''
+ * The timestep specifies how frequently to checkpoint, and must be a multiple of the printing timestep. 
+ * You can optionally specify the maximum number of checkpoints to keep on disk; when this limit is reached, the oldest checkpoint will be deleted before a new checkpoint is made.
+ * Note that making a checkpoint does add a significant overhead at present, in particular because the mesh is written out to disk at each checkpoint. This is to ensure that each checkpoint directory contains everything needed to resume the simulation. In particular, the mesh written out will be in permuted form if it was partitioned for a parallel simulation.
+ * Meshes written in checkpoints use a binary form of the Triangle/Tetgen mesh format. This makes checkpoints significantly smaller but will cause portability problems if checkpoints are moved between little-endian systems (e.g. x86) and big-endian systems (e.g. PowerPC).
+ * Checkpoints may be resumed on any number of processes — you are not restricted to the number on which it was saved. However, the mesh will not be re-partitioned if loaded on a different number of processes, so the parallel efficiency of the simulation may be significantly reduced in this case.
+ * Resuming a checkpoint will attempt to extend the original results h5 file, if present, so that the file contains the complete simulation results. If this file does not exist, a new file will be created to contain just the results from the resume point. 
+ * Various parameters can be altered when resuming from a checkpoint, by specifying new settings in the `ResumeParameters.xml` file.  The file source:trunk/heart/test/data/xml/ChasteParametersResumeSimulationFullFormat.xml (also shipped with the standalone executable) explains what can be changed.
+ * Note that the `progress_status.txt` file only reports the percentage of time to go to the ''next'' checkpoint, not the end of the simulation, so will not be especially useful for watching progress in a simulation with checkpoints. However, the existence of checkpoint output folders (`1ms`, `2ms`, etc) provide this information instead.
+
+== Using checkpoints from previous Chaste releases ==
+
+We endeavour to ensure that new versions of Chaste will always be able to load checkpoint files created by the previous release.  Sometimes, however, some manual conversion of the checkpoint will be required.  This is the case in order to upgrade from release 2.0 to 2.1.  A script `archive_convert.sed` is provided in both the source and executable releases of Chaste to assist with this process.  It must be run as follows:
+{{{
+#!sh
+sed -i -f archive_convert.sed path_to_checkpoint_data_folder/*.arch*
+}}}

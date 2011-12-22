@@ -1,0 +1,37 @@
+= Using fibre directions and postprocessing =
+
+== Fibres ==
+
+Fibres directions must currently be read from a file. Hence simulations with fibres can ''only'' be done for meshes that are read in, not auto-generated.
+Altering the xml parameters file to tell the executable to read fibres is trivial: instead of doing
+{{{
+#!xml
+<Mesh unit="cm">
+    <LoadMesh name="sheet_800_elements"/>
+</Mesh>
+}}}
+do
+{{{
+#!xml
+<Mesh unit="cm">
+    <LoadMesh name="sheet_800_elements" conductivity_media="Orthotropic"/>
+</Mesh>
+}}}
+The options for the last parameters are "!NoFibreOrientation", "Axisymmetric" or "Orthotropic". If "Axisymmetric", the file `sheet_800_elements.axi` will also be read,
+if "Orthotropic", `sheet_800_elements.ortho` will be read. See the file formats documentation for full descriptions of these formats, but basically .axi files provide
+the fibre direction for each element in the mesh, and .ortho files provide the fibre, sheet (and normal in 3D) directions for each element in the mesh. 
+
+In the example attached to this page, fibres have been defined for each element in the constant (1,1) direction.
+
+== Postprocessing ==
+
+Various postprocessing options are available. The following for example computes the conduction velocity between node 200 and all the other nodes in the mesh, writing
+the results to the file `<output_directory>/output/ConductionVelocityFromNode200.dat`.
+{{{
+#!xml
+<PostProcessing>
+    <ConductionVelocityMap origin_node="200"/>
+</PostProcessing>
+}}}
+As well as conduction velocity, it is also possible to obtain APD at a prescribed repolarisation percent, activation times and upstroke velocities. See the "full format"
+example parameters file for usage.

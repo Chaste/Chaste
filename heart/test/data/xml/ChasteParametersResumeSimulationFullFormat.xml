@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ChasteParameters
+    xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/3_0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="https://chaste.comlab.ox.ac.uk/nss/parameters/3_0 ../../../src/io/ChasteParameters_3_0.xsd">
+
+    <!-- See also ChasteParametersFullFormat.xml -->
+    
+    <ResumeSimulation>
+        <!-- Input directory for checkpoint archive-->
+        <ArchiveDirectory relative_to='chaste_test_output'>ChasteResults_10ms</ArchiveDirectory>
+        
+        <!-- This must match the dimension of the original archive -->
+        <SpaceDimension>3</SpaceDimension>
+        
+        <!-- This simulation time is measured from the start of the *original* simulation so must be greater than the checkpoint time -->
+        <SimulationDuration unit="ms">20.0</SimulationDuration>
+
+        <!-- This must match the domain-type of the original archive -->
+        <Domain>Mono</Domain>
+        
+        <!-- This has the same contents as the equivalent element in <Simulation>, or may be absent or empty.
+             If any definitions are given, they completely replace the original stimuli definition. -->
+        <Stimuli>
+        </Stimuli>
+        
+        <!-- Again this has the same contents as the equivalent element in <Simulation>, or may be absent or empty.
+             Definitions here are additive, being applied after any heterogeneities in the checkpoint.  Thus,
+             parameters set here will override original definitions if they set the same parameter on the same cell. -->
+        <CellHeterogeneities>
+        </CellHeterogeneities>
+        
+        <!-- When to write future checkpoints (Optional) -->
+        <CheckpointSimulation timestep="20.0" unit="ms" max_checkpoints_on_disk="3"/>
+        
+        <!-- Postprocess to visualizers (Compulsory but the options may be all set to "no") -->
+        <OutputVisualizer meshalyzer="yes" vtk="no" cmgui="no" precision="16"/>
+    </ResumeSimulation>
+
+    <!-- This element must exist, but its contents are ignored -->
+    <Physiological/>
+     
+    <!-- The Numerical element must exist, but its contents are optional.  If supplied, they will
+         override the options specified in the original simulation. -->
+    <Numerical>
+        <TimeSteps ode="0.01" pde="0.01" printing="0.01" unit="ms"/>
+        <KSPTolerances>
+            <KSPAbsolute>1e-5</KSPAbsolute>
+        </KSPTolerances>
+        <KSPSolver>cg</KSPSolver>
+        <KSPPreconditioner>none</KSPPreconditioner>
+		<MeshPartitioning>parmetis</MeshPartitioning>
+		<UseStateVariableInterpolation>no</UseStateVariableInterpolation> <!-- UseStateVariableInterpolation is currently ignored on resume -->
+        <AdaptivityParameters target_error="0" sigma="0" max_edge_length="0" min_edge_length="0" gradation="0" max_nodes="0" num_sweeps="0"/>
+    </Numerical>
+    
+    <!-- This element and contents are optional.  If supplied, they will
+         override the options specified in the original simulation. -->
+    <PostProcessing>
+        <ActionPotentialDurationMap repolarisation_percentage="70" threshold="-20" threshold_unit="mV"/>
+        <UpstrokeTimeMap threshold="-20" threshold_unit="mV"/>
+        <MaxUpstrokeVelocityMap threshold="-20" threshold_unit="mV"/>
+        <ConductionVelocityMap origin_node="1"/>
+    </PostProcessing>
+
+</ChasteParameters>

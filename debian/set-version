@@ -1,0 +1,125 @@
+#!/usr/bin/env python
+
+"""
+Figure out the best version number for the chaste-source package, and
+write the debian/changelog file appropriately.
+
+The script expects to be run in a checked-out and fully up-to-date Chaste
+root folder, and will use subversion to determine the version.  If the
+working copy is checked out from a tag, then the corresponding release
+number (formatted as n.m) will be used.  If it's from trunk, then we are
+making a point release, including the current svn version as a third
+component (e.g. n.m.rrrr).  We look for the latest release that is earlier
+than the checked-out revision to determine "n.m".
+"""
+
+import os
+import sys
+import time
+
+# Configuration
+maintainer_email = 'chaste-admin@maillist.ox.ac.uk'
+package_name = 'chaste-source'
+ubuntu_version = 'intrepid'
+
+
+# Check that the cwd looks OK
+changelog = 'debian/changelog'
+if not os.path.exists(changelog):
+    print >>sys.stderr, changelog, "file not found; are you in a Chaste working copy?"
+    sys.exit(1)
+
+# Get the current revision
+rev = rev_str = os.popen('svnversion').read().strip()
+if rev[-1] == 'M':
+    rev_str = rev_str[:-1]
+try:
+    rev_int = int(rev_str)
+except ValueError:
+    print >>sys.stderr, "Revision", rev, "isn't an integer; is your working copy up-to-date?"
+    sys.exit(1)
+
+# Find out where we're checked out from
+pipe = os.popen('svn info')
+for line in pipe:
+    if line.startswith('URL'):
+        url = line.split()[1]
+    elif line.startswith('Repository Root'):
+        repo = line.split(':', 1)[1].strip()
+pipe.close()
+
+location = url[len(repo)+1:]
+
+print "Packaging", location, "from", url
+
+def release_version(version):
+    """Ensure we have a version in the form n.m (not just n)."""
+    parts = version.split('.')
+    if len(parts) < 1:
+        raise ValueError('Empty version string')
+    elif len(parts) < 2:
+        version = version + '.0'
+    elif len(parts) > 2:
+        raise ValueError('Too many version components')
+    return version
+
+def version_as_int(version):
+    """Convert a version string n.m to an integer n*1000+m."""
+    n, m = version.split('.')
+    return int(n)*1000 + int(m)
+
+# And now work out the version
+if location == 'trunk':
+    # Now we've got to be clever.  Look for the most recent release in tags.
+    latest_release = '0.0'
+    cmd = 'svn ls -v -r %d %s/tags' % (rev_int, repo)
+    pipe = os.popen(cmd)
+    for line in pipe:
+        tag = line.split()[-1]
+        if tag.startswith('release_'):
+            version = release_version(tag[8:-1])
+            if version_as_int(version) > version_as_int(latest_release):
+                latest_release = version
+    pipe.close()
+    package_version = latest_release + '.' + rev_str
+    message = 'Package revision %s of Chaste.' % rev
+    # Write version number for benefit of SCons
+    open('ReleaseVersion.txt', 'w').write(package_version)
+else:
+    # location had better be tags/release_<version>
+    assert location.startswith('tags/release_')
+    package_version = release_version(location[13:])
+    message = 'Package release %s of Chaste.' % package_version
+
+print "Version is", package_version
+
+# Check if we're likely to package any projects
+projects = filter(lambda s: s[0] != '.',
+                  os.listdir('projects'))
+if projects:
+    print "Projects exist.  Do you really want to include them?"
+    print projects
+
+subst = {'package': package_name,
+         'version': package_version,
+         'distro': ubuntu_version,
+         'addr': maintainer_email,
+         'message': message,
+         'date': time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.gmtime())}
+
+log_entry = """%(package)s (%(version)s) %(distro)s; urgency=low
+
+  * %(message)s
+
+ -- Chaste Team <%(addr)s>  %(date)s
+
+""" % subst
+
+# Write changelog and launch editor
+current_changelog = open(changelog).read()
+os.rename(changelog, changelog + '.bak')
+fp = open(changelog, 'w')
+fp.write(log_entry)
+fp.write(current_changelog)
+fp.close()
+print "Please open", changelog, "in your editor to check the contents."

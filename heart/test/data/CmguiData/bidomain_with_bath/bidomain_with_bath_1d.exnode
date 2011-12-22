@@ -1,0 +1,16 @@
+! Created by Chaste version 2.0.8705 on Wed, 21 Apr 2010 17:03:22 +0000.  Chaste was built on Wed, 21 Apr 2010 17:03:12 +0000 by machine (uname) 'Linux clpc98.comlab 2.6.27.25-78.2.57a.fc9.x86_64 #1 SMP Thu Aug 20 17:44:40 BST 2009 x86_64' using settings: default, no Chaste libraries.
+Group name: bidomain_with_bath_1d
+ #Fields=1
+ 1) coordinates, coordinate, rectangular cartesian, #Components=1
+   x.  Value index= 1, #Derivatives= 0
+Node:	1	0	
+Node:	2	0.1	
+Node:	3	0.2	
+Node:	4	0.3	
+Node:	5	0.4	
+Node:	6	0.5	
+Node:	7	0.6	
+Node:	8	0.7	
+Node:	9	0.8	
+Node:	10	0.9	
+Node:	11	1	

@@ -1,0 +1,72 @@
+= Making the `MeshConvert` utility and using it the help produce scalable mesh loading =
+
+=== What it's for ===
+
+When you run Chaste on large clusters or supercomputers the part of the simulation that might
+scale least well is the initial mesh load.  
+ * Traditional mesh files come in ASCII format with a variable amount of characters per line.  
+ * Because random access into ASCII files is difficult each process must spool through unwanted lines
+ * This means each file is read in its entirety by all processes causing file contention
+ 
+This page shows you how to convert from a given 3D mesh format (Tetgen/Memfem/CARP/VTK) to 
+our a special binary version of the Triangle/Tetgen format.
+ * This allows for random access when running in parallel
+ * This also produces a "node connectivity list" {{{(.ncl)}}} file which is a map from node indices
+ to containing element indices.  The presence of this file cuts the calculation cost at mesh load time.
+
+=== Making the executable(s) ===
+
+It is assumed that as you are running on a parallel cluster or supercomputer you have access to the Chaste 
+source code.  You can produce all executables (including the standalone Chaste program) using:
+{{{
+#!sh
+scons chaste_libs=1 compile_only=1 exe=1 build=GccOpt apps
+}}}
+Binaries {{{Chaste, MeshConvert...}}} are made in {{{apps/src}}}.
+
+You may get a speed improvement from using a "no debug" build-type like {{{build=GccOpt_ndebug}}}, but
+this is at the expense of doing less error checking.
+
+
+=== Running the converter ===
+
+You may want to download and save the attached file [attachment:MeshConvert.tgz MeshConvert.tgz] and 
+unpack the files for testing purposes. Either use an Archive Manager to extract the content to disk or save it and then unpack it with
+{{{
+#!sh
+tar xvfz  MeshConvert.tgz
+}}}
+
+These files are just ASCII mesh data for the UCSD ventricular mesh.  Run the converter like so:
+{{{
+#!sh
+./apps/src/MeshConvert MeshConvert/simple_cube
+}}}
+
+The argument {{{MeshConvert/simple_cube}}} should be the full relative path to the place where you unpacked the
+mesh files.  Note that no suffix is given.  If you have compiled with VTK enabled then you will be able to 
+convert a single {{{.vtu}}} file into a binary-format file.
+
+You will see the usual Chaste Copyright notice and information about the compilation details followed by:
+{{{
+...
+Note: for VTK reading, give the full file path (including '.vtu' extension)
+Opening simple_cube mesh file(s).
+Writing  simple_cube_bin.node etc. mesh file in [PATH_TO_OUTPUT]
+Done.
+}}}
+
+You can control the location of the folder for the output using {{{$CHASTE_TEST_OUTPUT}}}:  The space 
+labelled {{{[PATH_TO_OUTPUT]}}} in the above will be taken from the environmental variable
+{{{$CHASTE_TEST_OUTPUT}}}, if it is set, but will be {{{./testoutput}}} otherwise.
+{{{
+ls ./testoutput
+simple_cube_bin.ele  simple_cube_bin.face  simple_cube_bin.ncl  simple_cube_bin.node
+}}}
+
+=== Running in parallel ===
+
+If you run the program in parallel then the original mesh is loaded (in a non-scalable way) and then
+partitioned before writing back out.  This means that the original node ordering may be permuted.
+The advantage to pre-processing by running this converter in parallel (on {{{n}}} processes) is that 
+mesh partitioning may be faster when the Chaste code is run live (also on {{{n}}} processes).

@@ -1,0 +1,2012 @@
+    |\^/|     Maple 12 (SUN SPARC SOLARIS)
+._|\|   |/|_. Copyright (c) Maplesoft, a division of Waterloo Maple Inc. 2008
+ \  MAPLE  /  All rights reserved. Maple is a trademark of
+ <____ ____>  Waterloo Maple Inc.
+      |       Type ? for help.
+1
+var_Environment__FonRT := var_Environment__F/var_Environment__R/
+var_Environment__T
+var_cell__time := var_Environment__time
+var_reversal_potentials__FonRT := var_Environment__F/var_Environment__R/
+var_Environment__T
+var_reversal_potentials__K_o := var_Environment__K_o
+var_reversal_potentials__ek := 1/var_Environment__F*var_Environment__R*
+var_Environment__T*ln(var_Environment__K_o/var_reversal_potentials__K_i)
+var_IK1__ek := 1/var_Environment__F*var_Environment__R*var_Environment__T*ln(
+var_Environment__K_o/var_reversal_potentials__K_i)
+var_IK1__V := var_cell__V
+var_IK1__aki := 1.02/(1+exp(.2385*var_cell__V-.2385/var_Environment__F*
+var_Environment__R*var_Environment__T*ln(var_Environment__K_o/
+var_reversal_potentials__K_i)-14.1227775))
+var_IK1__bki := (.49124*exp(.8032e-1*var_cell__V-.8032e-1/var_Environment__F*
+var_Environment__R*var_Environment__T*ln(var_Environment__K_o/
+var_reversal_potentials__K_i)+.43983232)+exp(.6175e-1*var_cell__V-.6175e-1/
+var_Environment__F*var_Environment__R*var_Environment__T*ln(
+var_Environment__K_o/var_reversal_potentials__K_i)-36.6986425))/(1+exp(-.5143*
+var_cell__V+.5143/var_Environment__F*var_Environment__R*var_Environment__T*ln(
+var_Environment__K_o/var_reversal_potentials__K_i)-2.4444679))
+var_IK1__xkin := 1.02/(1+exp(.2385*var_cell__V-.2385/var_Environment__F*
+var_Environment__R*var_Environment__T*ln(var_Environment__K_o/
+var_reversal_potentials__K_i)-14.1227775))/(1.02/(1+exp(.2385*var_cell__V-.2385
+/var_Environment__F*var_Environment__R*var_Environment__T*ln(
+var_Environment__K_o/var_reversal_potentials__K_i)-14.1227775))+(.49124*exp(.\
+8032e-1*var_cell__V-.8032e-1/var_Environment__F*var_Environment__R*
+var_Environment__T*ln(var_Environment__K_o/var_reversal_potentials__K_i)+.43983\
+232)+exp(.6175e-1*var_cell__V-.6175e-1/var_Environment__F*var_Environment__R*
+var_Environment__T*ln(var_Environment__K_o/var_reversal_potentials__K_i)-36.698\
+6425))/(1+exp(-.5143*var_cell__V+.5143/var_Environment__F*var_Environment__R*
+var_Environment__T*ln(var_Environment__K_o/var_reversal_potentials__K_i)-2.4444\
+679)))
+var_IK1__K_o := var_Environment__K_o
+var_IK1__xik1 := .4389381126*var_IK1__gkix*var_Environment__K_o^(1/2)/(1+exp(.2\
+385*var_cell__V-.2385/var_Environment__F*var_Environment__R*var_Environment__T*
+ln(var_Environment__K_o/var_reversal_potentials__K_i)-14.1227775))/(1.02/(1+exp
+(.2385*var_cell__V-.2385/var_Environment__F*var_Environment__R*
+var_Environment__T*ln(var_Environment__K_o/var_reversal_potentials__K_i)-14.122\
+7775))+(.49124*exp(.8032e-1*var_cell__V-.8032e-1/var_Environment__F*
+var_Environment__R*var_Environment__T*ln(var_Environment__K_o/
+var_reversal_potentials__K_i)+.43983232)+exp(.6175e-1*var_cell__V-.6175e-1/
+var_Environment__F*var_Environment__R*var_Environment__T*ln(
+var_Environment__K_o/var_reversal_potentials__K_i)-36.6986425))/(1+exp(-.5143*
+var_cell__V+.5143/var_Environment__F*var_Environment__R*var_Environment__T*ln(
+var_Environment__K_o/var_reversal_potentials__K_i)-2.4444679)))*(var_cell__V-1/
+var_Environment__F*var_Environment__R*var_Environment__T*ln(
+var_Environment__K_o/var_reversal_potentials__K_i))
+var_cell__xik1 := .4389381126*var_IK1__gkix*var_Environment__K_o^(1/2)/(1+exp(.\
+2385*var_cell__V-.2385/var_Environment__F*var_Environment__R*var_Environment__T
+*ln(var_Environment__K_o/var_reversal_potentials__K_i)-14.1227775))/(1.02/(1+
+exp(.2385*var_cell__V-.2385/var_Environment__F*var_Environment__R*
+var_Environment__T*ln(var_Environment__K_o/var_reversal_potentials__K_i)-14.122\
+7775))+(.49124*exp(.8032e-1*var_cell__V-.8032e-1/var_Environment__F*
+var_Environment__R*var_Environment__T*ln(var_Environment__K_o/
+var_reversal_potentials__K_i)+.43983232)+exp(.6175e-1*var_cell__V-.6175e-1/
+var_Environment__F*var_Environment__R*var_Environment__T*ln(
+var_Environment__K_o/var_reversal_potentials__K_i)-36.6986425))/(1+exp(-.5143*
+var_cell__V+.5143/var_Environment__F*var_Environment__R*var_Environment__T*ln(
+var_Environment__K_o/var_reversal_potentials__K_i)-2.4444679)))*(var_cell__V-1/
+var_Environment__F*var_Environment__R*var_Environment__T*ln(
+var_Environment__K_o/var_reversal_potentials__K_i))
+var_Ito__ek := 1/var_Environment__F*var_Environment__R*var_Environment__T*ln(
+var_Environment__K_o/var_reversal_potentials__K_i)
+var_Ito__V := var_cell__V
+var_Ito__rt2 := 1/10*var_cell__V+3.350000000
+var_Ito__rs_inf := 1/(1+exp(1/10*var_cell__V+3.350000000))
+var_Ito__xitos := var_Ito__ScaleFactorIto*var_Ito__gtos*var_Ito__xtos*(
+var_Ito__ytos+.5/(1+exp(1/10*var_cell__V+3.350000000)))*(var_cell__V-1/
+var_Environment__F*var_Environment__R*var_Environment__T*ln(
+var_Environment__K_o/var_reversal_potentials__K_i))
+var_Ito__xitof := var_Ito__gtof*var_Ito__xtof*var_Ito__ytof*(var_cell__V-1/
+var_Environment__F*var_Environment__R*var_Environment__T*ln(
+var_Environment__K_o/var_reversal_potentials__K_i))
+var_Ito__xito := var_Ito__ScaleFactorIto*var_Ito__gtos*var_Ito__xtos*(
+var_Ito__ytos+.5/(1+exp(1/10*var_cell__V+3.350000000)))*(var_cell__V-1/
+var_Environment__F*var_Environment__R*var_Environment__T*ln(
+var_Environment__K_o/var_reversal_potentials__K_i))+var_Ito__gtof*var_Ito__xtof
+*var_Ito__ytof*(var_cell__V-1/var_Environment__F*var_Environment__R*
+var_Environment__T*ln(var_Environment__K_o/var_reversal_potentials__K_i))
+var_cell__xito := var_Ito__ScaleFactorIto*var_Ito__gtos*var_Ito__xtos*(
+var_Ito__ytos+.5/(1+exp(1/10*var_cell__V+3.350000000)))*(var_cell__V-1/
+var_Environment__F*var_Environment__R*var_Environment__T*ln(
+var_Environment__K_o/var_reversal_potentials__K_i))+var_Ito__gtof*var_Ito__xtof
+*var_Ito__ytof*(var_cell__V-1/var_Environment__F*var_Environment__R*
+var_Environment__T*ln(var_Environment__K_o/var_reversal_potentials__K_i))
+var_INaK__V := var_cell__V
+var_INaK__FonRT := var_Environment__F/var_Environment__R/var_Environment__T
+var_INaK__Na_o := var_Environment__Na_o
+var_INaK__sigma := 1/7*exp(.1485884101e-1*var_Environment__Na_o)-1/7
+var_INaK__fNaK := 1/(1+.1245*exp(-.1*var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T)+.365e-1*(1/7*exp(.1485884101e-1*
+var_Environment__Na_o)-1/7)*exp(-var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T))
+var_INaK__Na_i := var_Na__Na_i
+var_INaK__K_o := var_Environment__K_o
+var_INaK__xiNaK := var_INaK__gNaK/(1+.1245*exp(-.1*var_cell__V*
+var_Environment__F/var_Environment__R/var_Environment__T)+.365e-1*(1/7*exp(.\
+1485884101e-1*var_Environment__Na_o)-1/7)*exp(-var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T))*var_Na__Na_i/(var_Na__Na_i+
+var_INaK__xkmnai)*var_Environment__K_o/(var_Environment__K_o+var_INaK__xkmko)
+var_cell__xiNaK := var_INaK__gNaK/(1+.1245*exp(-.1*var_cell__V*
+var_Environment__F/var_Environment__R/var_Environment__T)+.365e-1*(1/7*exp(.\
+1485884101e-1*var_Environment__Na_o)-1/7)*exp(-var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T))*var_Na__Na_i/(var_Na__Na_i+
+var_INaK__xkmnai)*var_Environment__K_o/(var_Environment__K_o+var_INaK__xkmko)
+var_INaCa__V := var_cell__V
+var_INaCa__FonRT := var_Environment__F/var_Environment__R/var_Environment__T
+var_INaCa__zw4 := 1+.2*exp(-.65*var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T)
+var_INaCa__Ca_submem := var_Ca__Ca_submem
+var_INaCa__aloss := 1/(1+var_INaCa__xkdna^3/var_Ca__Ca_submem^3)
+var_INaCa__Na_o := var_Environment__Na_o
+var_INaCa__Na_i := var_Na__Na_i
+var_INaCa__Ca_o := var_Environment__Ca_o
+var_Ca__csm := 1/1000*var_Ca__Ca_submem
+var_INaCa__csm := 1/1000*var_Ca__Ca_submem
+var_INaCa__yz4 := var_Na__Na_i^3*var_Environment__Ca_o+1/1000*
+var_Environment__Na_o^3*var_Ca__Ca_submem
+var_INaCa__yz1 := var_INaCa__xmcao*var_Na__Na_i^3+1/1000*var_INaCa__xmnao^3*
+var_Ca__Ca_submem
+var_INaCa__yz3 := var_INaCa__xmcai*var_Environment__Na_o^3*(1+var_Na__Na_i^3/
+var_INaCa__xmnai^3)
+var_INaCa__yz2 := var_INaCa__xmnai^3*var_Environment__Ca_o*(1+1/1000*
+var_Ca__Ca_submem/var_INaCa__xmcai)
+var_INaCa__zw8 := var_INaCa__xmcao*var_Na__Na_i^3+1/1000*var_INaCa__xmnao^3*
+var_Ca__Ca_submem+var_INaCa__xmnai^3*var_Environment__Ca_o*(1+1/1000*
+var_Ca__Ca_submem/var_INaCa__xmcai)+var_INaCa__xmcai*var_Environment__Na_o^3*(1
++var_Na__Na_i^3/var_INaCa__xmnai^3)+var_Na__Na_i^3*var_Environment__Ca_o+1/1000
+*var_Environment__Na_o^3*var_Ca__Ca_submem
+var_INaCa__zw3 := var_Na__Na_i^3*var_Environment__Ca_o*exp(.35*var_cell__V*
+var_Environment__F/var_Environment__R/var_Environment__T)-1/1000*
+var_Environment__Na_o^3*var_Ca__Ca_submem*exp(-.65*var_cell__V*
+var_Environment__F/var_Environment__R/var_Environment__T)
+var_INaCa__jNaCa := var_INaCa__gNaCa/(1+var_INaCa__xkdna^3/var_Ca__Ca_submem^3)
+*(var_Na__Na_i^3*var_Environment__Ca_o*exp(.35*var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T)-1/1000*var_Environment__Na_o^3*
+var_Ca__Ca_submem*exp(-.65*var_cell__V*var_Environment__F/var_Environment__R/
+var_Environment__T))/(1+.2*exp(-.65*var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T))/(var_INaCa__xmcao*var_Na__Na_i^3+1/1000
+*var_INaCa__xmnao^3*var_Ca__Ca_submem+var_INaCa__xmnai^3*var_Environment__Ca_o*
+(1+1/1000*var_Ca__Ca_submem/var_INaCa__xmcai)+var_INaCa__xmcai*
+var_Environment__Na_o^3*(1+var_Na__Na_i^3/var_INaCa__xmnai^3)+var_Na__Na_i^3*
+var_Environment__Ca_o+1/1000*var_Environment__Na_o^3*var_Ca__Ca_submem)
+var_INaCa__wca := var_cell__wca
+var_INaCa__xiNaCa := var_cell__wca*var_INaCa__gNaCa/(1+var_INaCa__xkdna^3/
+var_Ca__Ca_submem^3)*(var_Na__Na_i^3*var_Environment__Ca_o*exp(.35*var_cell__V*
+var_Environment__F/var_Environment__R/var_Environment__T)-1/1000*
+var_Environment__Na_o^3*var_Ca__Ca_submem*exp(-.65*var_cell__V*
+var_Environment__F/var_Environment__R/var_Environment__T))/(1+.2*exp(-.65*
+var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T))/(
+var_INaCa__xmcao*var_Na__Na_i^3+1/1000*var_INaCa__xmnao^3*var_Ca__Ca_submem+
+var_INaCa__xmnai^3*var_Environment__Ca_o*(1+1/1000*var_Ca__Ca_submem/
+var_INaCa__xmcai)+var_INaCa__xmcai*var_Environment__Na_o^3*(1+var_Na__Na_i^3/
+var_INaCa__xmnai^3)+var_Na__Na_i^3*var_Environment__Ca_o+1/1000*
+var_Environment__Na_o^3*var_Ca__Ca_submem)
+var_cell__xiNaCa := var_cell__wca*var_INaCa__gNaCa/(1+var_INaCa__xkdna^3/
+var_Ca__Ca_submem^3)*(var_Na__Na_i^3*var_Environment__Ca_o*exp(.35*var_cell__V*
+var_Environment__F/var_Environment__R/var_Environment__T)-1/1000*
+var_Environment__Na_o^3*var_Ca__Ca_submem*exp(-.65*var_cell__V*
+var_Environment__F/var_Environment__R/var_Environment__T))/(1+.2*exp(-.65*
+var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T))/(
+var_INaCa__xmcao*var_Na__Na_i^3+1/1000*var_INaCa__xmnao^3*var_Ca__Ca_submem+
+var_INaCa__xmnai^3*var_Environment__Ca_o*(1+1/1000*var_Ca__Ca_submem/
+var_INaCa__xmcai)+var_INaCa__xmcai*var_Environment__Na_o^3*(1+var_Na__Na_i^3/
+var_INaCa__xmnai^3)+var_Na__Na_i^3*var_Environment__Ca_o+1/1000*
+var_Environment__Na_o^3*var_Ca__Ca_submem)
+var_ICaL__Ca_o := var_Environment__Ca_o
+var_ICaL__V := var_cell__V
+var_ICaL__FonRT := var_Environment__F/var_Environment__R/var_Environment__T
+var_ICaL__F := var_Environment__F
+var_ICaL__za := 2*var_cell__V*var_Environment__F/var_Environment__R/
+var_Environment__T
+var_ICaL__csm := 1/1000*var_Ca__Ca_submem
+var_ICaL__rxa := `if`(2*abs(var_cell__V*var_Environment__F/var_Environment__R/
+var_Environment__T) < .1e-2,2*var_ICaL__pca*var_ICaL__F*(var_ICaL__csm*exp(
+var_ICaL__za)-.341*var_ICaL__Ca_o),4*var_ICaL__pca*var_ICaL__V*var_ICaL__F*
+var_ICaL__FonRT*(var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o)/(exp(
+var_ICaL__za)-1))
+var_ICaL__po := 1-var_ICaL__xi1ca-var_ICaL__xi2ca-var_ICaL__xi1ba-
+var_ICaL__xi2ba-var_ICaL__c1-var_ICaL__c2
+var_ICaL__jca := var_ICaL__gca*(1-var_ICaL__xi1ca-var_ICaL__xi2ca-
+var_ICaL__xi1ba-var_ICaL__xi2ba-var_ICaL__c1-var_ICaL__c2)*`if`(2*abs(
+var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T) < .1e-2,2
+*var_ICaL__pca*var_ICaL__F*(var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o
+),4*var_ICaL__pca*var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(
+var_ICaL__za)-.341*var_ICaL__Ca_o)/(exp(var_ICaL__za)-1))
+var_ICaL__wca := var_cell__wca
+var_ICaL__xica := 2*var_cell__wca*var_ICaL__gca*(1-var_ICaL__xi1ca-
+var_ICaL__xi2ca-var_ICaL__xi1ba-var_ICaL__xi2ba-var_ICaL__c1-var_ICaL__c2)*`if`
+(2*abs(var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T) <
+.1e-2,2*var_ICaL__pca*var_ICaL__F*(var_ICaL__csm*exp(var_ICaL__za)-.341*
+var_ICaL__Ca_o),4*var_ICaL__pca*var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(
+var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o)/(exp(var_ICaL__za)-1))
+var_cell__xica := 2*var_cell__wca*var_ICaL__gca*(1-var_ICaL__xi1ca-
+var_ICaL__xi2ca-var_ICaL__xi1ba-var_ICaL__xi2ba-var_ICaL__c1-var_ICaL__c2)*`if`
+(2*abs(var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T) <
+.1e-2,2*var_ICaL__pca*var_ICaL__F*(var_ICaL__csm*exp(var_ICaL__za)-.341*
+var_ICaL__Ca_o),4*var_ICaL__pca*var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(
+var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o)/(exp(var_ICaL__za)-1))
+var_IKr__K_o := var_Environment__K_o
+var_IKr__ek := 1/var_Environment__F*var_Environment__R*var_Environment__T*ln(
+var_Environment__K_o/var_reversal_potentials__K_i)
+var_IKr__V := var_cell__V
+var_IKr__rg := 1/(1+exp(.4464285714e-1*var_cell__V+1.473214286))
+var_IKr__xikr := .4303314829*var_IKr__ScaleFactorGkr*var_IKr__gkr*
+var_Environment__K_o^(1/2)*var_IKr__xr/(1+exp(.4464285714e-1*var_cell__V+1.4732\
+14286))*(var_cell__V-1/var_Environment__F*var_Environment__R*var_Environment__T
+*ln(var_Environment__K_o/var_reversal_potentials__K_i))
+var_cell__xikr := .4303314829*var_IKr__ScaleFactorGkr*var_IKr__gkr*
+var_Environment__K_o^(1/2)*var_IKr__xr/(1+exp(.4464285714e-1*var_cell__V+1.4732\
+14286))*(var_cell__V-1/var_Environment__F*var_Environment__R*var_Environment__T
+*ln(var_Environment__K_o/var_reversal_potentials__K_i))
+var_IKs__Ca_i := var_Ca__Ca_i
+var_IKs__gksx := 1+.8/(1+.125/var_Ca__Ca_i^3)
+var_IKs__V := var_cell__V
+var_reversal_potentials__Na_o := var_Environment__Na_o
+var_reversal_potentials__Na_i := var_Na__Na_i
+var_reversal_potentials__eks := 1/var_Environment__F*var_Environment__R*
+var_Environment__T*ln((var_Environment__K_o+var_reversal_potentials__prNaK*
+var_Environment__Na_o)/(var_reversal_potentials__K_i+
+var_reversal_potentials__prNaK*var_Na__Na_i))
+var_IKs__eks := 1/var_Environment__F*var_Environment__R*var_Environment__T*ln((
+var_Environment__K_o+var_reversal_potentials__prNaK*var_Environment__Na_o)/(
+var_reversal_potentials__K_i+var_reversal_potentials__prNaK*var_Na__Na_i))
+var_IKs__xiks := var_IKs__ScaleFactorGks*var_IKs__gks*(1+.8/(1+.125/
+var_Ca__Ca_i^3))*var_IKs__xs1*var_IKs__xs2*(var_cell__V-1/var_Environment__F*
+var_Environment__R*var_Environment__T*ln((var_Environment__K_o+
+var_reversal_potentials__prNaK*var_Environment__Na_o)/(
+var_reversal_potentials__K_i+var_reversal_potentials__prNaK*var_Na__Na_i)))
+var_cell__xiks := var_IKs__ScaleFactorGks*var_IKs__gks*(1+.8/(1+.125/
+var_Ca__Ca_i^3))*var_IKs__xs1*var_IKs__xs2*(var_cell__V-1/var_Environment__F*
+var_Environment__R*var_Environment__T*ln((var_Environment__K_o+
+var_reversal_potentials__prNaK*var_Environment__Na_o)/(
+var_reversal_potentials__K_i+var_reversal_potentials__prNaK*var_Na__Na_i)))
+var_cell__past := floor(var_Environment__time/var_cell__stim_period)*
+var_cell__stim_period
+var_cell__i_Stim := `if`(var_cell__stim_offset <= var_Environment__time-floor(
+var_Environment__time/var_cell__stim_period)*var_cell__stim_period and 
+var_Environment__time-floor(var_Environment__time/var_cell__stim_period)*
+var_cell__stim_period <= var_cell__stim_offset+var_cell__stim_duration,
+var_cell__stim_amplitude,0)
+var_INa__V := var_cell__V
+var_reversal_potentials__ena := 1/var_Environment__F*var_Environment__R*
+var_Environment__T*ln(var_Environment__Na_o/var_Na__Na_i)
+var_INa__ena := 1/var_Environment__F*var_Environment__R*var_Environment__T*ln(
+var_Environment__Na_o/var_Na__Na_i)
+var_INa__xina := var_INa__gna*var_INa__xh*var_INa__xj*var_INa__xm^3*(
+var_cell__V-1/var_Environment__F*var_Environment__R*var_Environment__T*ln(
+var_Environment__Na_o/var_Na__Na_i))
+var_cell__xina := var_INa__gna*var_INa__xh*var_INa__xj*var_INa__xm^3*(
+var_cell__V-1/var_Environment__F*var_Environment__R*var_Environment__T*ln(
+var_Environment__Na_o/var_Na__Na_i))
+var_cell__Itotal := -var_INa__gna*var_INa__xh*var_INa__xj*var_INa__xm^3*(
+var_cell__V-1/var_Environment__F*var_Environment__R*var_Environment__T*ln(
+var_Environment__Na_o/var_Na__Na_i))-.4389381126*var_IK1__gkix*
+var_Environment__K_o^(1/2)/(1+exp(.2385*var_cell__V-.2385/var_Environment__F*
+var_Environment__R*var_Environment__T*ln(var_Environment__K_o/
+var_reversal_potentials__K_i)-14.1227775))/(1.02/(1+exp(.2385*var_cell__V-.2385
+/var_Environment__F*var_Environment__R*var_Environment__T*ln(
+var_Environment__K_o/var_reversal_potentials__K_i)-14.1227775))+(.49124*exp(.\
+8032e-1*var_cell__V-.8032e-1/var_Environment__F*var_Environment__R*
+var_Environment__T*ln(var_Environment__K_o/var_reversal_potentials__K_i)+.43983\
+232)+exp(.6175e-1*var_cell__V-.6175e-1/var_Environment__F*var_Environment__R*
+var_Environment__T*ln(var_Environment__K_o/var_reversal_potentials__K_i)-36.698\
+6425))/(1+exp(-.5143*var_cell__V+.5143/var_Environment__F*var_Environment__R*
+var_Environment__T*ln(var_Environment__K_o/var_reversal_potentials__K_i)-2.4444\
+679)))*(var_cell__V-1/var_Environment__F*var_Environment__R*var_Environment__T*
+ln(var_Environment__K_o/var_reversal_potentials__K_i))-.4303314829*
+var_IKr__ScaleFactorGkr*var_IKr__gkr*var_Environment__K_o^(1/2)*var_IKr__xr/(1+
+exp(.4464285714e-1*var_cell__V+1.473214286))*(var_cell__V-1/var_Environment__F*
+var_Environment__R*var_Environment__T*ln(var_Environment__K_o/
+var_reversal_potentials__K_i))-var_IKs__ScaleFactorGks*var_IKs__gks*(1+.8/(1+.1\
+25/var_Ca__Ca_i^3))*var_IKs__xs1*var_IKs__xs2*(var_cell__V-1/var_Environment__F
+*var_Environment__R*var_Environment__T*ln((var_Environment__K_o+
+var_reversal_potentials__prNaK*var_Environment__Na_o)/(
+var_reversal_potentials__K_i+var_reversal_potentials__prNaK*var_Na__Na_i)))-
+var_Ito__ScaleFactorIto*var_Ito__gtos*var_Ito__xtos*(var_Ito__ytos+.5/(1+exp(1/
+10*var_cell__V+3.350000000)))*(var_cell__V-1/var_Environment__F*
+var_Environment__R*var_Environment__T*ln(var_Environment__K_o/
+var_reversal_potentials__K_i))-var_Ito__gtof*var_Ito__xtof*var_Ito__ytof*(
+var_cell__V-1/var_Environment__F*var_Environment__R*var_Environment__T*ln(
+var_Environment__K_o/var_reversal_potentials__K_i))-var_cell__wca*
+var_INaCa__gNaCa/(1+var_INaCa__xkdna^3/var_Ca__Ca_submem^3)*(var_Na__Na_i^3*
+var_Environment__Ca_o*exp(.35*var_cell__V*var_Environment__F/var_Environment__R
+/var_Environment__T)-1/1000*var_Environment__Na_o^3*var_Ca__Ca_submem*exp(-.65*
+var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T))/(1+.2*
+exp(-.65*var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T))
+/(var_INaCa__xmcao*var_Na__Na_i^3+1/1000*var_INaCa__xmnao^3*var_Ca__Ca_submem+
+var_INaCa__xmnai^3*var_Environment__Ca_o*(1+1/1000*var_Ca__Ca_submem/
+var_INaCa__xmcai)+var_INaCa__xmcai*var_Environment__Na_o^3*(1+var_Na__Na_i^3/
+var_INaCa__xmnai^3)+var_Na__Na_i^3*var_Environment__Ca_o+1/1000*
+var_Environment__Na_o^3*var_Ca__Ca_submem)-2*var_cell__wca*var_ICaL__gca*(1-
+var_ICaL__xi1ca-var_ICaL__xi2ca-var_ICaL__xi1ba-var_ICaL__xi2ba-var_ICaL__c1-
+var_ICaL__c2)*`if`(2*abs(var_cell__V*var_Environment__F/var_Environment__R/
+var_Environment__T) < .1e-2,2*var_ICaL__pca*var_ICaL__F*(var_ICaL__csm*exp(
+var_ICaL__za)-.341*var_ICaL__Ca_o),4*var_ICaL__pca*var_ICaL__V*var_ICaL__F*
+var_ICaL__FonRT*(var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o)/(exp(
+var_ICaL__za)-1))-var_INaK__gNaK/(1+.1245*exp(-.1*var_cell__V*
+var_Environment__F/var_Environment__R/var_Environment__T)+.365e-1*(1/7*exp(.\
+1485884101e-1*var_Environment__Na_o)-1/7)*exp(-var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T))*var_Na__Na_i/(var_Na__Na_i+
+var_INaK__xkmnai)*var_Environment__K_o/(var_Environment__K_o+var_INaK__xkmko)-
+`if`(var_cell__stim_offset <= var_Environment__time-floor(var_Environment__time
+/var_cell__stim_period)*var_cell__stim_period and var_Environment__time-floor(
+var_Environment__time/var_cell__stim_period)*var_cell__stim_period <= 
+var_cell__stim_offset+var_cell__stim_duration,var_cell__stim_amplitude,0)
+var_INa__time := var_Environment__time
+var_INa__am := `if`(.1e-2 < abs(var_cell__V+47.13),.32*(var_INa__V+47.13)/(1-
+exp(-.1*var_INa__V-4.713)),3.2)
+var_INa__bm := .8e-1*exp(-1/11*var_cell__V)
+var_INa__ah := `if`(var_cell__V < -40,.135*exp(-11.76470588-.1470588235*
+var_INa__V),0)
+var_INa__bh := `if`(var_cell__V < -40,3.56*exp(.79e-1*var_INa__V)+310000*exp(.3\
+5*var_INa__V),1/(.13+.13*exp(-.9009009009e-1*var_INa__V-.9603603604)))
+var_INa__aj := `if`(var_cell__V < -40,(-127140*exp(.2444*var_INa__V)-.3474e-4*
+exp(-.4391e-1*var_INa__V))*(var_INa__V+37.78)/(1+exp(.311*var_INa__V+24.64053))
+,0)
+var_INa__bj := `if`(var_cell__V < -40,.1212*exp(-.1052e-1*var_INa__V)/(1+exp(-.\
+1378*var_INa__V-5.531292)),.3*exp(-.2535e-6*var_INa__V)/(1+exp(-.1*var_INa__V-3\
+.2)))
+var_ICaL__time := var_Environment__time
+var_ICaL__Ca_dyad := var_Ca__Ca_dyad
+var_ICaL__poinf := 1/(1+exp((-var_cell__V+var_ICaL__vth)/var_ICaL__s6))
+var_ICaL__fca := 1/(1+var_ICaL__cat^3/var_Ca__Ca_dyad^3)
+var_ICaL__alpha := 1/(1+exp((-var_cell__V+var_ICaL__vth)/var_ICaL__s6))/
+var_ICaL__taupo
+var_ICaL__beta := (1-1/(1+exp((-var_cell__V+var_ICaL__vth)/var_ICaL__s6)))/
+var_ICaL__taupo
+var_ICaL__k1 := .24168e-1/(1+var_ICaL__cat^3/var_Ca__Ca_dyad^3)
+var_ICaL__poi := 1/(1+exp((-var_cell__V+var_ICaL__vx)/var_ICaL__sx))
+var_ICaL__k3 := (1-1/(1+exp((-var_cell__V+var_ICaL__vx)/var_ICaL__sx)))/
+var_ICaL__tau3
+var_ICaL__k3t := (1-1/(1+exp((-var_cell__V+var_ICaL__vx)/var_ICaL__sx)))/
+var_ICaL__tau3
+var_ICaL__Ps := 1/(1+exp((-var_cell__V+var_ICaL__vyr)/var_ICaL__syr))
+var_ICaL__tau_ca := var_ICaL__tca/(1+var_Ca__Ca_dyad^4/var_ICaL__cpt^4)+.1
+var_ICaL__recov := 10+4954*exp(.6410256410e-1*var_cell__V)
+var_ICaL__Pr := 1-1/(1+exp((-var_cell__V+var_ICaL__vy)/var_ICaL__sy))
+var_ICaL__tauca := (9.9+4954*exp(.6410256410e-1*var_cell__V)-var_ICaL__tca/(1+
+var_Ca__Ca_dyad^4/var_ICaL__cpt^4))*(1-1/(1+exp((-var_cell__V+var_ICaL__vy)/
+var_ICaL__sy)))+var_ICaL__tca/(1+var_Ca__Ca_dyad^4/var_ICaL__cpt^4)+.1
+var_ICaL__k6 := 1/(1+var_ICaL__cat^3/var_Ca__Ca_dyad^3)/(1+exp((-var_cell__V+
+var_ICaL__vyr)/var_ICaL__syr))/((9.9+4954*exp(.6410256410e-1*var_cell__V)-
+var_ICaL__tca/(1+var_Ca__Ca_dyad^4/var_ICaL__cpt^4))*(1-1/(1+exp((-var_cell__V+
+var_ICaL__vy)/var_ICaL__sy)))+var_ICaL__tca/(1+var_Ca__Ca_dyad^4/var_ICaL__cpt^
+4)+.1)
+var_ICaL__k5 := (1-1/(1+exp((-var_cell__V+var_ICaL__vyr)/var_ICaL__syr)))/((9.9
++4954*exp(.6410256410e-1*var_cell__V)-var_ICaL__tca/(1+var_Ca__Ca_dyad^4/
+var_ICaL__cpt^4))*(1-1/(1+exp((-var_cell__V+var_ICaL__vy)/var_ICaL__sy)))+
+var_ICaL__tca/(1+var_Ca__Ca_dyad^4/var_ICaL__cpt^4)+.1)
+var_ICaL__tauba := (-440+4954*exp(.6410256410e-1*var_cell__V))*(1-1/(1+exp((-
+var_cell__V+var_ICaL__vy)/var_ICaL__sy)))+450
+var_ICaL__k6t := 1/(1+exp((-var_cell__V+var_ICaL__vyr)/var_ICaL__syr))/((-440+
+4954*exp(.6410256410e-1*var_cell__V))*(1-1/(1+exp((-var_cell__V+var_ICaL__vy)/
+var_ICaL__sy)))+450)
+var_ICaL__k5t := (1-1/(1+exp((-var_cell__V+var_ICaL__vyr)/var_ICaL__syr)))/((-\
+440+4954*exp(.6410256410e-1*var_cell__V))*(1-1/(1+exp((-var_cell__V+
+var_ICaL__vy)/var_ICaL__sy)))+450)
+var_ICaL__k4 := .24168e-1*(1-1/(1+exp((-var_cell__V+var_ICaL__vx)/var_ICaL__sx)
+))/var_ICaL__tau3/(1+exp((-var_cell__V+var_ICaL__vth)/var_ICaL__s6))/(1-1/(1+
+exp((-var_cell__V+var_ICaL__vth)/var_ICaL__s6)))/var_ICaL__k2*(1-1/(1+exp((-
+var_cell__V+var_ICaL__vyr)/var_ICaL__syr)))*(1+exp((-var_cell__V+var_ICaL__vyr)
+/var_ICaL__syr))
+var_ICaL__k4t := (1-1/(1+exp((-var_cell__V+var_ICaL__vx)/var_ICaL__sx)))/
+var_ICaL__tau3/(1+exp((-var_cell__V+var_ICaL__vth)/var_ICaL__s6))/(1-1/(1+exp((
+-var_cell__V+var_ICaL__vth)/var_ICaL__s6)))*var_ICaL__k1t/var_ICaL__k2t*(1-1/(1
++exp((-var_cell__V+var_ICaL__vyr)/var_ICaL__syr)))*(1+exp((-var_cell__V+
+var_ICaL__vyr)/var_ICaL__syr))
+var_ICaL__s1 := .182688e-1/(1+var_ICaL__cat^3/var_Ca__Ca_dyad^3)
+var_ICaL__s2 := .7559086395*var_ICaL__r1/var_ICaL__r2*var_ICaL__k2
+var_ICaL__s2t := var_ICaL__s1t*var_ICaL__r1/var_ICaL__r2*var_ICaL__k2t/
+var_ICaL__k1t
+var_IKr__time := var_Environment__time
+var_IKr__xkrv1 := `if`(.1e-2 < abs(var_cell__V+7),.138e-2*(var_IKr__V+7)/(1-exp
+(-.123*var_IKr__V-.861)),.1121951220e-1)
+var_IKr__xkrv2 := `if`(.1e-2 < abs(var_cell__V+10),.61e-3*(var_IKr__V+10)/(exp(
+.145*var_IKr__V+1.450)-1),.4206896552e-2)
+var_IKr__taukr := 1/(`if`(.1e-2 < abs(var_cell__V+7),.138e-2*(var_IKr__V+7)/(1-
+exp(-.123*var_IKr__V-.861)),.1121951220e-1)+`if`(.1e-2 < abs(var_cell__V+10),.\
+61e-3*(var_IKr__V+10)/(exp(.145*var_IKr__V+1.450)-1),.4206896552e-2))
+var_IKr__xkrinf := 1/(1+exp(-.1333333333*var_cell__V-6.666666665))
+var_IKs__time := var_Environment__time
+var_IKs__xs1ss := 1/(1+exp(-.5988023952e-1*var_cell__V+.8982035928e-1))
+var_IKs__xs2ss := 1/(1+exp(-.5988023952e-1*var_cell__V+.8982035928e-1))
+var_IKs__tauxs1 := `if`(abs(var_cell__V+30) < .1455604076e-1,417.9462527,1/(.\
+719e-4*(var_IKs__V+30)/(1-exp(-.148*var_IKs__V-4.440))+.131e-3*(var_IKs__V+30)/
+(exp(.687e-1*var_IKs__V+2.0610)-1)))
+var_IKs__tauxs2 := 4*`if`(abs(var_cell__V+30) < .1455604076e-1,417.9462527,1/(.\
+719e-4*(var_IKs__V+30)/(1-exp(-.148*var_IKs__V-4.440))+.131e-3*(var_IKs__V+30)/
+(exp(.687e-1*var_IKs__V+2.0610)-1)))
+var_Ito__time := var_Environment__time
+var_Ito__rt1 := -1/15*var_cell__V-1/5
+var_Ito__rt3 := 1/10*var_cell__V+6
+var_Ito__rt4 := -1/900*var_cell__V^2
+var_Ito__rt5 := 1/10*var_cell__V+3.350000000
+var_Ito__xtos_inf := 1/(1+exp(-1/15*var_cell__V-1/5))
+var_Ito__ytos_inf := 1/(1+exp(1/10*var_cell__V+3.350000000))
+var_Ito__xtof_inf := 1/(1+exp(-1/15*var_cell__V-1/5))
+var_Ito__ytof_inf := 1/(1+exp(1/10*var_cell__V+3.350000000))
+var_Ito__txs := 9/(1+exp(1/15*var_cell__V+1/5))+.5
+var_Ito__tys := 3000/(1+exp(1/10*var_cell__V+6))+30
+var_Ito__txf := 3.5*exp(-1/900*var_cell__V^2)+1.5
+var_Ito__tyf := 20/(1+exp(1/10*var_cell__V+3.350000000))+20
+var_Irel__V := var_cell__V
+var_Irel__time := var_Environment__time
+var_Irel__Ca_NSR := var_Ca__Ca_NSR
+var_Ileak_Iup_Ixfer__Ca_NSR := var_Ca__Ca_NSR
+var_Ileak_Iup_Ixfer__Ca_i := var_Ca__Ca_i
+var_Ileak_Iup_Ixfer__jleak := var_Ileak_Iup_Ixfer__gleak*var_Ca__Ca_NSR^2/(
+var_Ca__Ca_NSR^2+var_Ileak_Iup_Ixfer__kj^2)*(16.667*var_Ca__Ca_NSR-var_Ca__Ca_i
+)
+var_Ca__jleak := var_Ileak_Iup_Ixfer__gleak*var_Ca__Ca_NSR^2/(var_Ca__Ca_NSR^2+
+var_Ileak_Iup_Ixfer__kj^2)*(16.667*var_Ca__Ca_NSR-var_Ca__Ca_i)
+var_Ileak_Iup_Ixfer__jup := var_Ileak_Iup_Ixfer__vup*var_Ca__Ca_i^2/(
+var_Ca__Ca_i^2+var_Ileak_Iup_Ixfer__cup^2)
+var_Ca__jup := var_Ileak_Iup_Ixfer__vup*var_Ca__Ca_i^2/(var_Ca__Ca_i^2+
+var_Ileak_Iup_Ixfer__cup^2)
+var_Ca__xir := var_Irel__xir
+var_Ca__dCa_JSR := -var_Irel__xir+var_Ileak_Iup_Ixfer__vup*var_Ca__Ca_i^2/(
+var_Ca__Ca_i^2+var_Ileak_Iup_Ixfer__cup^2)-var_Ileak_Iup_Ixfer__gleak*
+var_Ca__Ca_NSR^2/(var_Ca__Ca_NSR^2+var_Ileak_Iup_Ixfer__kj^2)*(16.667*
+var_Ca__Ca_NSR-var_Ca__Ca_i)
+var_Irel__dCa_JSR := -var_Irel__xir+var_Ileak_Iup_Ixfer__vup*var_Ca__Ca_i^2/(
+var_Ca__Ca_i^2+var_Ileak_Iup_Ixfer__cup^2)-var_Ileak_Iup_Ixfer__gleak*
+var_Ca__Ca_NSR^2/(var_Ca__Ca_NSR^2+var_Ileak_Iup_Ixfer__kj^2)*(16.667*
+var_Ca__Ca_NSR-var_Ca__Ca_i)
+var_Irel__po := 1-var_ICaL__xi1ca-var_ICaL__xi2ca-var_ICaL__xi1ba-
+var_ICaL__xi2ba-var_ICaL__c1-var_ICaL__c2
+var_Irel__rxa := `if`(2*abs(var_cell__V*var_Environment__F/var_Environment__R/
+var_Environment__T) < .1e-2,2*var_ICaL__pca*var_ICaL__F*(var_ICaL__csm*exp(
+var_ICaL__za)-.341*var_ICaL__Ca_o),4*var_ICaL__pca*var_ICaL__V*var_ICaL__F*
+var_ICaL__FonRT*(var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o)/(exp(
+var_ICaL__za)-1))
+var_Irel__bv := (1-var_Irel__av)*var_Irel__cstar-50
+var_Irel__Qr0 := `if`(50 < var_Irel__Ca_JSR and var_Irel__Ca_JSR < 
+var_Irel__cstar,var_Irel__Ca_JSR-50,`if`(var_Irel__cstar <= var_Irel__Ca_JSR,
+var_Irel__av*var_Irel__Ca_JSR+var_Irel__bv,0))
+var_Irel__Qr := var_Ca__Ca_NSR*`if`(50 < var_Irel__Ca_JSR and var_Irel__Ca_JSR
+< var_Irel__cstar,var_Irel__Ca_JSR-50,`if`(var_Irel__cstar <= var_Irel__Ca_JSR,
+var_Irel__av*var_Irel__Ca_JSR+var_Irel__bv,0))/var_Irel__cstar
+var_Irel__sparkV := exp(-var_Irel__ay*(var_cell__V+30))/(1+exp(-var_Irel__ay*(
+var_cell__V+30)))
+var_Irel__spark_rate := var_Irel__gryr*(1-var_ICaL__xi1ca-var_ICaL__xi2ca-
+var_ICaL__xi1ba-var_ICaL__xi2ba-var_ICaL__c1-var_ICaL__c2)*abs(`if`(2*abs(
+var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T) < .1e-2,2
+*var_ICaL__pca*var_ICaL__F*(var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o
+),4*var_ICaL__pca*var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(
+var_ICaL__za)-.341*var_ICaL__Ca_o)/(exp(var_ICaL__za)-1)))*exp(-var_Irel__ay*(
+var_cell__V+30))/(1+exp(-var_Irel__ay*(var_cell__V+30)))
+var_Irel__xirp := (1-var_ICaL__xi1ca-var_ICaL__xi2ca-var_ICaL__xi1ba-
+var_ICaL__xi2ba-var_ICaL__c1-var_ICaL__c2)*var_Ca__Ca_NSR*`if`(50 < 
+var_Irel__Ca_JSR and var_Irel__Ca_JSR < var_Irel__cstar,var_Irel__Ca_JSR-50,
+`if`(var_Irel__cstar <= var_Irel__Ca_JSR,var_Irel__av*var_Irel__Ca_JSR+
+var_Irel__bv,0))/var_Irel__cstar*abs(`if`(2*abs(var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T) < .1e-2,2*var_ICaL__pca*var_ICaL__F*(
+var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o),4*var_ICaL__pca*
+var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(var_ICaL__za)-.341*
+var_ICaL__Ca_o)/(exp(var_ICaL__za)-1)))*var_Irel__gbarsr*exp(-var_Irel__ax*(
+var_cell__V+30))/(1+exp(-var_Irel__ax*(var_cell__V+30)))
+var_Irel__xicap := (1-var_ICaL__xi1ca-var_ICaL__xi2ca-var_ICaL__xi1ba-
+var_ICaL__xi2ba-var_ICaL__c1-var_ICaL__c2)*var_Irel__gdyad*abs(`if`(2*abs(
+var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T) < .1e-2,2
+*var_ICaL__pca*var_ICaL__F*(var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o
+),4*var_ICaL__pca*var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(
+var_ICaL__za)-.341*var_ICaL__Ca_o)/(exp(var_ICaL__za)-1)))
+var_Irel__xiryr := (1-var_ICaL__xi1ca-var_ICaL__xi2ca-var_ICaL__xi1ba-
+var_ICaL__xi2ba-var_ICaL__c1-var_ICaL__c2)*var_Ca__Ca_NSR*`if`(50 < 
+var_Irel__Ca_JSR and var_Irel__Ca_JSR < var_Irel__cstar,var_Irel__Ca_JSR-50,
+`if`(var_Irel__cstar <= var_Irel__Ca_JSR,var_Irel__av*var_Irel__Ca_JSR+
+var_Irel__bv,0))/var_Irel__cstar*abs(`if`(2*abs(var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T) < .1e-2,2*var_ICaL__pca*var_ICaL__F*(
+var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o),4*var_ICaL__pca*
+var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(var_ICaL__za)-.341*
+var_ICaL__Ca_o)/(exp(var_ICaL__za)-1)))*var_Irel__gbarsr*exp(-var_Irel__ax*(
+var_cell__V+30))/(1+exp(-var_Irel__ax*(var_cell__V+30)))+(1-var_ICaL__xi1ca-
+var_ICaL__xi2ca-var_ICaL__xi1ba-var_ICaL__xi2ba-var_ICaL__c1-var_ICaL__c2)*
+var_Irel__gdyad*abs(`if`(2*abs(var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T) < .1e-2,2*var_ICaL__pca*var_ICaL__F*(
+var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o),4*var_ICaL__pca*
+var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(var_ICaL__za)-.341*
+var_ICaL__Ca_o)/(exp(var_ICaL__za)-1)))
+var_Na__time := var_Environment__time
+var_Na__wca := var_cell__wca
+var_Na__xina := var_INa__gna*var_INa__xh*var_INa__xj*var_INa__xm^3*(var_cell__V
+-1/var_Environment__F*var_Environment__R*var_Environment__T*ln(
+var_Environment__Na_o/var_Na__Na_i))
+var_Na__xiNaK := var_INaK__gNaK/(1+.1245*exp(-.1*var_cell__V*var_Environment__F
+/var_Environment__R/var_Environment__T)+.365e-1*(1/7*exp(.1485884101e-1*
+var_Environment__Na_o)-1/7)*exp(-var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T))*var_Na__Na_i/(var_Na__Na_i+
+var_INaK__xkmnai)*var_Environment__K_o/(var_Environment__K_o+var_INaK__xkmko)
+var_Na__xiNaCa := var_cell__wca*var_INaCa__gNaCa/(1+var_INaCa__xkdna^3/
+var_Ca__Ca_submem^3)*(var_Na__Na_i^3*var_Environment__Ca_o*exp(.35*var_cell__V*
+var_Environment__F/var_Environment__R/var_Environment__T)-1/1000*
+var_Environment__Na_o^3*var_Ca__Ca_submem*exp(-.65*var_cell__V*
+var_Environment__F/var_Environment__R/var_Environment__T))/(1+.2*exp(-.65*
+var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T))/(
+var_INaCa__xmcao*var_Na__Na_i^3+1/1000*var_INaCa__xmnao^3*var_Ca__Ca_submem+
+var_INaCa__xmnai^3*var_Environment__Ca_o*(1+1/1000*var_Ca__Ca_submem/
+var_INaCa__xmcai)+var_INaCa__xmcai*var_Environment__Na_o^3*(1+var_Na__Na_i^3/
+var_INaCa__xmnai^3)+var_Na__Na_i^3*var_Environment__Ca_o+1/1000*
+var_Environment__Na_o^3*var_Ca__Ca_submem)
+var_Ca__time := var_Environment__time
+var_Ca__xiryr := (1-var_ICaL__xi1ca-var_ICaL__xi2ca-var_ICaL__xi1ba-
+var_ICaL__xi2ba-var_ICaL__c1-var_ICaL__c2)*var_Ca__Ca_NSR*`if`(50 < 
+var_Irel__Ca_JSR and var_Irel__Ca_JSR < var_Irel__cstar,var_Irel__Ca_JSR-50,
+`if`(var_Irel__cstar <= var_Irel__Ca_JSR,var_Irel__av*var_Irel__Ca_JSR+
+var_Irel__bv,0))/var_Irel__cstar*abs(`if`(2*abs(var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T) < .1e-2,2*var_ICaL__pca*var_ICaL__F*(
+var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o),4*var_ICaL__pca*
+var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(var_ICaL__za)-.341*
+var_ICaL__Ca_o)/(exp(var_ICaL__za)-1)))*var_Irel__gbarsr*exp(-var_Irel__ax*(
+var_cell__V+30))/(1+exp(-var_Irel__ax*(var_cell__V+30)))+(1-var_ICaL__xi1ca-
+var_ICaL__xi2ca-var_ICaL__xi1ba-var_ICaL__xi2ba-var_ICaL__c1-var_ICaL__c2)*
+var_Irel__gdyad*abs(`if`(2*abs(var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T) < .1e-2,2*var_ICaL__pca*var_ICaL__F*(
+var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o),4*var_ICaL__pca*
+var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(var_ICaL__za)-.341*
+var_ICaL__Ca_o)/(exp(var_ICaL__za)-1)))
+var_Ca__bpxs := var_Ca__bcal*var_Ca__xkcal/(var_Ca__xkcal+var_Ca__Ca_submem)^2
+var_Ca__spxs := var_Ca__srmax*var_Ca__srkd/(var_Ca__srkd+var_Ca__Ca_submem)^2
+var_Ca__mempxs := var_Ca__bmem*var_Ca__kmem/(var_Ca__kmem+var_Ca__Ca_submem)^2
+var_Ca__sarpxs := var_Ca__bsar*var_Ca__ksar/(var_Ca__ksar+var_Ca__Ca_submem)^2
+var_Ca__dcsib := 1/(1+var_Ca__bcal*var_Ca__xkcal/(var_Ca__xkcal+
+var_Ca__Ca_submem)^2+var_Ca__srmax*var_Ca__srkd/(var_Ca__srkd+var_Ca__Ca_submem
+)^2+var_Ca__bmem*var_Ca__kmem/(var_Ca__kmem+var_Ca__Ca_submem)^2+var_Ca__bsar*
+var_Ca__ksar/(var_Ca__ksar+var_Ca__Ca_submem)^2)
+var_Ca__bpxi := var_Ca__bcal*var_Ca__xkcal/(var_Ca__xkcal+var_Ca__Ca_i)^2
+var_Ca__spxi := var_Ca__srmax*var_Ca__srkd/(var_Ca__srkd+var_Ca__Ca_i)^2
+var_Ca__mempxi := var_Ca__bmem*var_Ca__kmem/(var_Ca__kmem+var_Ca__Ca_i)^2
+var_Ca__sarpxi := var_Ca__bsar*var_Ca__ksar/(var_Ca__ksar+var_Ca__Ca_i)^2
+var_Ca__dciib := 1/(1+var_Ca__bcal*var_Ca__xkcal/(var_Ca__xkcal+var_Ca__Ca_i)^2
++var_Ca__srmax*var_Ca__srkd/(var_Ca__srkd+var_Ca__Ca_i)^2+var_Ca__bmem*
+var_Ca__kmem/(var_Ca__kmem+var_Ca__Ca_i)^2+var_Ca__bsar*var_Ca__ksar/(
+var_Ca__ksar+var_Ca__Ca_i)^2)
+var_Ca__xbi := var_Ca__xkon*var_Ca__Ca_i*(var_Ca__btrop-var_Ca__tropi)-
+var_Ca__xkoff*var_Ca__tropi
+var_Ca__xbs := var_Ca__xkon*var_Ca__Ca_submem*(var_Ca__btrop-var_Ca__trops)-
+var_Ca__xkoff*var_Ca__trops
+var_Ca__jd := (var_Ca__Ca_submem-var_Ca__Ca_i)/var_Ca__taud
+var_Ca__jNaCa := var_INaCa__gNaCa/(1+var_INaCa__xkdna^3/var_Ca__Ca_submem^3)*(
+var_Na__Na_i^3*var_Environment__Ca_o*exp(.35*var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T)-1/1000*var_Environment__Na_o^3*
+var_Ca__Ca_submem*exp(-.65*var_cell__V*var_Environment__F/var_Environment__R/
+var_Environment__T))/(1+.2*exp(-.65*var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T))/(var_INaCa__xmcao*var_Na__Na_i^3+1/1000
+*var_INaCa__xmnao^3*var_Ca__Ca_submem+var_INaCa__xmnai^3*var_Environment__Ca_o*
+(1+1/1000*var_Ca__Ca_submem/var_INaCa__xmcai)+var_INaCa__xmcai*
+var_Environment__Na_o^3*(1+var_Na__Na_i^3/var_INaCa__xmnai^3)+var_Na__Na_i^3*
+var_Environment__Ca_o+1/1000*var_Environment__Na_o^3*var_Ca__Ca_submem)
+var_Ca__jca := var_ICaL__gca*(1-var_ICaL__xi1ca-var_ICaL__xi2ca-var_ICaL__xi1ba
+-var_ICaL__xi2ba-var_ICaL__c1-var_ICaL__c2)*`if`(2*abs(var_cell__V*
+var_Environment__F/var_Environment__R/var_Environment__T) < .1e-2,2*
+var_ICaL__pca*var_ICaL__F*(var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o)
+,4*var_ICaL__pca*var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(
+var_ICaL__za)-.341*var_ICaL__Ca_o)/(exp(var_ICaL__za)-1))
+d_dt_cell__V := -var_INa__gna*var_INa__xh*var_INa__xj*var_INa__xm^3*(
+var_cell__V-1/var_Environment__F*var_Environment__R*var_Environment__T*ln(
+var_Environment__Na_o/var_Na__Na_i))-.4389381126*var_IK1__gkix*
+var_Environment__K_o^(1/2)/(1+exp(.2385*var_cell__V-.2385/var_Environment__F*
+var_Environment__R*var_Environment__T*ln(var_Environment__K_o/
+var_reversal_potentials__K_i)-14.1227775))/(1.02/(1+exp(.2385*var_cell__V-.2385
+/var_Environment__F*var_Environment__R*var_Environment__T*ln(
+var_Environment__K_o/var_reversal_potentials__K_i)-14.1227775))+(.49124*exp(.\
+8032e-1*var_cell__V-.8032e-1/var_Environment__F*var_Environment__R*
+var_Environment__T*ln(var_Environment__K_o/var_reversal_potentials__K_i)+.43983\
+232)+exp(.6175e-1*var_cell__V-.6175e-1/var_Environment__F*var_Environment__R*
+var_Environment__T*ln(var_Environment__K_o/var_reversal_potentials__K_i)-36.698\
+6425))/(1+exp(-.5143*var_cell__V+.5143/var_Environment__F*var_Environment__R*
+var_Environment__T*ln(var_Environment__K_o/var_reversal_potentials__K_i)-2.4444\
+679)))*(var_cell__V-1/var_Environment__F*var_Environment__R*var_Environment__T*
+ln(var_Environment__K_o/var_reversal_potentials__K_i))-.4303314829*
+var_IKr__ScaleFactorGkr*var_IKr__gkr*var_Environment__K_o^(1/2)*var_IKr__xr/(1+
+exp(.4464285714e-1*var_cell__V+1.473214286))*(var_cell__V-1/var_Environment__F*
+var_Environment__R*var_Environment__T*ln(var_Environment__K_o/
+var_reversal_potentials__K_i))-var_IKs__ScaleFactorGks*var_IKs__gks*(1+.8/(1+.1\
+25/var_Ca__Ca_i^3))*var_IKs__xs1*var_IKs__xs2*(var_cell__V-1/var_Environment__F
+*var_Environment__R*var_Environment__T*ln((var_Environment__K_o+
+var_reversal_potentials__prNaK*var_Environment__Na_o)/(
+var_reversal_potentials__K_i+var_reversal_potentials__prNaK*var_Na__Na_i)))-
+var_Ito__ScaleFactorIto*var_Ito__gtos*var_Ito__xtos*(var_Ito__ytos+.5/(1+exp(1/
+10*var_cell__V+3.350000000)))*(var_cell__V-1/var_Environment__F*
+var_Environment__R*var_Environment__T*ln(var_Environment__K_o/
+var_reversal_potentials__K_i))-var_Ito__gtof*var_Ito__xtof*var_Ito__ytof*(
+var_cell__V-1/var_Environment__F*var_Environment__R*var_Environment__T*ln(
+var_Environment__K_o/var_reversal_potentials__K_i))-var_cell__wca*
+var_INaCa__gNaCa/(1+var_INaCa__xkdna^3/var_Ca__Ca_submem^3)*(var_Na__Na_i^3*
+var_Environment__Ca_o*exp(.35*var_cell__V*var_Environment__F/var_Environment__R
+/var_Environment__T)-1/1000*var_Environment__Na_o^3*var_Ca__Ca_submem*exp(-.65*
+var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T))/(1+.2*
+exp(-.65*var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T))
+/(var_INaCa__xmcao*var_Na__Na_i^3+1/1000*var_INaCa__xmnao^3*var_Ca__Ca_submem+
+var_INaCa__xmnai^3*var_Environment__Ca_o*(1+1/1000*var_Ca__Ca_submem/
+var_INaCa__xmcai)+var_INaCa__xmcai*var_Environment__Na_o^3*(1+var_Na__Na_i^3/
+var_INaCa__xmnai^3)+var_Na__Na_i^3*var_Environment__Ca_o+1/1000*
+var_Environment__Na_o^3*var_Ca__Ca_submem)-2*var_cell__wca*var_ICaL__gca*(1-
+var_ICaL__xi1ca-var_ICaL__xi2ca-var_ICaL__xi1ba-var_ICaL__xi2ba-var_ICaL__c1-
+var_ICaL__c2)*`if`(2*abs(var_cell__V*var_Environment__F/var_Environment__R/
+var_Environment__T) < .1e-2,2*var_ICaL__pca*var_ICaL__F*(var_ICaL__csm*exp(
+var_ICaL__za)-.341*var_ICaL__Ca_o),4*var_ICaL__pca*var_ICaL__V*var_ICaL__F*
+var_ICaL__FonRT*(var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o)/(exp(
+var_ICaL__za)-1))-var_INaK__gNaK/(1+.1245*exp(-.1*var_cell__V*
+var_Environment__F/var_Environment__R/var_Environment__T)+.365e-1*(1/7*exp(.\
+1485884101e-1*var_Environment__Na_o)-1/7)*exp(-var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T))*var_Na__Na_i/(var_Na__Na_i+
+var_INaK__xkmnai)*var_Environment__K_o/(var_Environment__K_o+var_INaK__xkmko)-
+`if`(var_cell__stim_offset <= var_Environment__time-floor(var_Environment__time
+/var_cell__stim_period)*var_cell__stim_period and var_Environment__time-floor(
+var_Environment__time/var_cell__stim_period)*var_cell__stim_period <= 
+var_cell__stim_offset+var_cell__stim_duration,var_cell__stim_amplitude,0)
+d_dt_INa__xh := `if`(var_cell__V < -40,.135*exp(-11.76470588-.1470588235*
+var_INa__V),0)*(1-var_INa__xh)-`if`(var_cell__V < -40,3.56*exp(.79e-1*
+var_INa__V)+310000*exp(.35*var_INa__V),1/(.13+.13*exp(-.9009009009e-1*
+var_INa__V-.9603603604)))*var_INa__xh
+d_dt_INa__xj := `if`(var_cell__V < -40,(-127140*exp(.2444*var_INa__V)-.3474e-4*
+exp(-.4391e-1*var_INa__V))*(var_INa__V+37.78)/(1+exp(.311*var_INa__V+24.64053))
+,0)*(1-var_INa__xj)-`if`(var_cell__V < -40,.1212*exp(-.1052e-1*var_INa__V)/(1+
+exp(-.1378*var_INa__V-5.531292)),.3*exp(-.2535e-6*var_INa__V)/(1+exp(-.1*
+var_INa__V-3.2)))*var_INa__xj
+d_dt_INa__xm := `if`(.1e-2 < abs(var_cell__V+47.13),.32*(var_INa__V+47.13)/(1-
+exp(-.1*var_INa__V-4.713)),3.2)*(1-var_INa__xm)-.8e-1*exp(-1/11*var_cell__V)*
+var_INa__xm
+d_dt_ICaL__c1 := 1/(1+exp((-var_cell__V+var_ICaL__vth)/var_ICaL__s6))/
+var_ICaL__taupo*var_ICaL__c2+var_ICaL__k2*var_ICaL__xi1ca+var_ICaL__k2t*
+var_ICaL__xi1ba+var_ICaL__r2*(1-var_ICaL__xi1ca-var_ICaL__xi2ca-var_ICaL__xi1ba
+-var_ICaL__xi2ba-var_ICaL__c1-var_ICaL__c2)-((1-1/(1+exp((-var_cell__V+
+var_ICaL__vth)/var_ICaL__s6)))/var_ICaL__taupo+var_ICaL__r1+var_ICaL__k1t+.\
+24168e-1/(1+var_ICaL__cat^3/var_Ca__Ca_dyad^3))*var_ICaL__c1
+d_dt_ICaL__c2 := (1-1/(1+exp((-var_cell__V+var_ICaL__vth)/var_ICaL__s6)))/
+var_ICaL__taupo*var_ICaL__c1+(1-1/(1+exp((-var_cell__V+var_ICaL__vyr)/
+var_ICaL__syr)))/((9.9+4954*exp(.6410256410e-1*var_cell__V)-var_ICaL__tca/(1+
+var_Ca__Ca_dyad^4/var_ICaL__cpt^4))*(1-1/(1+exp((-var_cell__V+var_ICaL__vy)/
+var_ICaL__sy)))+var_ICaL__tca/(1+var_Ca__Ca_dyad^4/var_ICaL__cpt^4)+.1)*
+var_ICaL__xi2ca+(1-1/(1+exp((-var_cell__V+var_ICaL__vyr)/var_ICaL__syr)))/((-\
+440+4954*exp(.6410256410e-1*var_cell__V))*(1-1/(1+exp((-var_cell__V+
+var_ICaL__vy)/var_ICaL__sy)))+450)*var_ICaL__xi2ba-(1/(1+var_ICaL__cat^3/
+var_Ca__Ca_dyad^3)/(1+exp((-var_cell__V+var_ICaL__vyr)/var_ICaL__syr))/((9.9+
+4954*exp(.6410256410e-1*var_cell__V)-var_ICaL__tca/(1+var_Ca__Ca_dyad^4/
+var_ICaL__cpt^4))*(1-1/(1+exp((-var_cell__V+var_ICaL__vy)/var_ICaL__sy)))+
+var_ICaL__tca/(1+var_Ca__Ca_dyad^4/var_ICaL__cpt^4)+.1)+1/(1+exp((-var_cell__V+
+var_ICaL__vyr)/var_ICaL__syr))/((-440+4954*exp(.6410256410e-1*var_cell__V))*(1-
+1/(1+exp((-var_cell__V+var_ICaL__vy)/var_ICaL__sy)))+450)+1/(1+exp((-
+var_cell__V+var_ICaL__vth)/var_ICaL__s6))/var_ICaL__taupo)*var_ICaL__c2
+d_dt_ICaL__xi1ca := .24168e-1/(1+var_ICaL__cat^3/var_Ca__Ca_dyad^3)*
+var_ICaL__c1+.24168e-1*(1-1/(1+exp((-var_cell__V+var_ICaL__vx)/var_ICaL__sx)))/
+var_ICaL__tau3/(1+exp((-var_cell__V+var_ICaL__vth)/var_ICaL__s6))/(1-1/(1+exp((
+-var_cell__V+var_ICaL__vth)/var_ICaL__s6)))/var_ICaL__k2*(1-1/(1+exp((-
+var_cell__V+var_ICaL__vyr)/var_ICaL__syr)))*(1+exp((-var_cell__V+var_ICaL__vyr)
+/var_ICaL__syr))*var_ICaL__xi2ca+.182688e-1/(1+var_ICaL__cat^3/var_Ca__Ca_dyad^
+3)*(1-var_ICaL__xi1ca-var_ICaL__xi2ca-var_ICaL__xi1ba-var_ICaL__xi2ba-
+var_ICaL__c1-var_ICaL__c2)-((1-1/(1+exp((-var_cell__V+var_ICaL__vx)/
+var_ICaL__sx)))/var_ICaL__tau3+var_ICaL__k2+.7559086395*var_ICaL__r1/
+var_ICaL__r2*var_ICaL__k2)*var_ICaL__xi1ca
+d_dt_ICaL__xi1ba := var_ICaL__k1t*var_ICaL__c1+(1-1/(1+exp((-var_cell__V+
+var_ICaL__vx)/var_ICaL__sx)))/var_ICaL__tau3/(1+exp((-var_cell__V+var_ICaL__vth
+)/var_ICaL__s6))/(1-1/(1+exp((-var_cell__V+var_ICaL__vth)/var_ICaL__s6)))*
+var_ICaL__k1t/var_ICaL__k2t*(1-1/(1+exp((-var_cell__V+var_ICaL__vyr)/
+var_ICaL__syr)))*(1+exp((-var_cell__V+var_ICaL__vyr)/var_ICaL__syr))*
+var_ICaL__xi2ba+var_ICaL__s1t*(1-var_ICaL__xi1ca-var_ICaL__xi2ca-
+var_ICaL__xi1ba-var_ICaL__xi2ba-var_ICaL__c1-var_ICaL__c2)-((1-1/(1+exp((-
+var_cell__V+var_ICaL__vx)/var_ICaL__sx)))/var_ICaL__tau3+var_ICaL__k2t+
+var_ICaL__s1t*var_ICaL__r1/var_ICaL__r2*var_ICaL__k2t/var_ICaL__k1t)*
+var_ICaL__xi1ba
+d_dt_ICaL__xi2ca := (1-1/(1+exp((-var_cell__V+var_ICaL__vx)/var_ICaL__sx)))/
+var_ICaL__tau3*var_ICaL__xi1ca+1/(1+var_ICaL__cat^3/var_Ca__Ca_dyad^3)/(1+exp((
+-var_cell__V+var_ICaL__vyr)/var_ICaL__syr))/((9.9+4954*exp(.6410256410e-1*
+var_cell__V)-var_ICaL__tca/(1+var_Ca__Ca_dyad^4/var_ICaL__cpt^4))*(1-1/(1+exp((
+-var_cell__V+var_ICaL__vy)/var_ICaL__sy)))+var_ICaL__tca/(1+var_Ca__Ca_dyad^4/
+var_ICaL__cpt^4)+.1)*var_ICaL__c2-((1-1/(1+exp((-var_cell__V+var_ICaL__vyr)/
+var_ICaL__syr)))/((9.9+4954*exp(.6410256410e-1*var_cell__V)-var_ICaL__tca/(1+
+var_Ca__Ca_dyad^4/var_ICaL__cpt^4))*(1-1/(1+exp((-var_cell__V+var_ICaL__vy)/
+var_ICaL__sy)))+var_ICaL__tca/(1+var_Ca__Ca_dyad^4/var_ICaL__cpt^4)+.1)+.24168e\
+-1*(1-1/(1+exp((-var_cell__V+var_ICaL__vx)/var_ICaL__sx)))/var_ICaL__tau3/(1+
+exp((-var_cell__V+var_ICaL__vth)/var_ICaL__s6))/(1-1/(1+exp((-var_cell__V+
+var_ICaL__vth)/var_ICaL__s6)))/var_ICaL__k2*(1-1/(1+exp((-var_cell__V+
+var_ICaL__vyr)/var_ICaL__syr)))*(1+exp((-var_cell__V+var_ICaL__vyr)/
+var_ICaL__syr)))*var_ICaL__xi2ca
+d_dt_ICaL__xi2ba := (1-1/(1+exp((-var_cell__V+var_ICaL__vx)/var_ICaL__sx)))/
+var_ICaL__tau3*var_ICaL__xi1ba+1/(1+exp((-var_cell__V+var_ICaL__vyr)/
+var_ICaL__syr))/((-440+4954*exp(.6410256410e-1*var_cell__V))*(1-1/(1+exp((-
+var_cell__V+var_ICaL__vy)/var_ICaL__sy)))+450)*var_ICaL__c2-((1-1/(1+exp((-
+var_cell__V+var_ICaL__vyr)/var_ICaL__syr)))/((-440+4954*exp(.6410256410e-1*
+var_cell__V))*(1-1/(1+exp((-var_cell__V+var_ICaL__vy)/var_ICaL__sy)))+450)+(1-1
+/(1+exp((-var_cell__V+var_ICaL__vx)/var_ICaL__sx)))/var_ICaL__tau3/(1+exp((-
+var_cell__V+var_ICaL__vth)/var_ICaL__s6))/(1-1/(1+exp((-var_cell__V+
+var_ICaL__vth)/var_ICaL__s6)))*var_ICaL__k1t/var_ICaL__k2t*(1-1/(1+exp((-
+var_cell__V+var_ICaL__vyr)/var_ICaL__syr)))*(1+exp((-var_cell__V+var_ICaL__vyr)
+/var_ICaL__syr)))*var_ICaL__xi2ba
+d_dt_IKr__xr := (1/(1+exp(-.1333333333*var_cell__V-6.666666665))-var_IKr__xr)*(
+`if`(.1e-2 < abs(var_cell__V+7),.138e-2*(var_IKr__V+7)/(1-exp(-.123*var_IKr__V-\
+.861)),.1121951220e-1)+`if`(.1e-2 < abs(var_cell__V+10),.61e-3*(var_IKr__V+10)/
+(exp(.145*var_IKr__V+1.450)-1),.4206896552e-2))
+d_dt_IKs__xs1 := (1/(1+exp(-.5988023952e-1*var_cell__V+.8982035928e-1))-
+var_IKs__xs1)/`if`(abs(var_cell__V+30) < .1455604076e-1,417.9462527,1/(.719e-4*
+(var_IKs__V+30)/(1-exp(-.148*var_IKs__V-4.440))+.131e-3*(var_IKs__V+30)/(exp(.\
+687e-1*var_IKs__V+2.0610)-1)))
+d_dt_IKs__xs2 := 1/4*(1/(1+exp(-.5988023952e-1*var_cell__V+.8982035928e-1))-
+var_IKs__xs2)/`if`(abs(var_cell__V+30) < .1455604076e-1,417.9462527,1/(.719e-4*
+(var_IKs__V+30)/(1-exp(-.148*var_IKs__V-4.440))+.131e-3*(var_IKs__V+30)/(exp(.\
+687e-1*var_IKs__V+2.0610)-1)))
+d_dt_Ito__xtos := (1/(1+exp(-1/15*var_cell__V-1/5))-var_Ito__xtos)/(9/(1+exp(1/
+15*var_cell__V+1/5))+.5)
+d_dt_Ito__ytos := (1/(1+exp(1/10*var_cell__V+3.350000000))-var_Ito__ytos)/(3000
+/(1+exp(1/10*var_cell__V+6))+30)
+d_dt_Ito__xtof := (1/(1+exp(-1/15*var_cell__V-1/5))-var_Ito__xtof)/(3.5*exp(-1/
+900*var_cell__V^2)+1.5)
+d_dt_Ito__ytof := (1/(1+exp(1/10*var_cell__V+3.350000000))-var_Ito__ytof)/(20/(
+1+exp(1/10*var_cell__V+3.350000000))+20)
+d_dt_Irel__Ca_JSR := (var_Ca__Ca_NSR-var_Irel__Ca_JSR)/var_Irel__taua
+d_dt_Irel__xir := var_Irel__gryr*(1-var_ICaL__xi1ca-var_ICaL__xi2ca-
+var_ICaL__xi1ba-var_ICaL__xi2ba-var_ICaL__c1-var_ICaL__c2)*abs(`if`(2*abs(
+var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T) < .1e-2,2
+*var_ICaL__pca*var_ICaL__F*(var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o
+),4*var_ICaL__pca*var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(
+var_ICaL__za)-.341*var_ICaL__Ca_o)/(exp(var_ICaL__za)-1)))*exp(-var_Irel__ay*(
+var_cell__V+30))/(1+exp(-var_Irel__ay*(var_cell__V+30)))*var_Ca__Ca_NSR*`if`(50
+< var_Irel__Ca_JSR and var_Irel__Ca_JSR < var_Irel__cstar,var_Irel__Ca_JSR-50,
+`if`(var_Irel__cstar <= var_Irel__Ca_JSR,var_Irel__av*var_Irel__Ca_JSR+
+var_Irel__bv,0))/var_Irel__cstar-var_Irel__xir*(1-var_Irel__taur*(-
+var_Irel__xir+var_Ileak_Iup_Ixfer__vup*var_Ca__Ca_i^2/(var_Ca__Ca_i^2+
+var_Ileak_Iup_Ixfer__cup^2)-var_Ileak_Iup_Ixfer__gleak*var_Ca__Ca_NSR^2/(
+var_Ca__Ca_NSR^2+var_Ileak_Iup_Ixfer__kj^2)*(16.667*var_Ca__Ca_NSR-var_Ca__Ca_i
+))/var_Ca__Ca_NSR)/var_Irel__taur
+d_dt_Na__Na_i := 1/1000*(-var_INa__gna*var_INa__xh*var_INa__xj*var_INa__xm^3*(
+var_cell__V-1/var_Environment__F*var_Environment__R*var_Environment__T*ln(
+var_Environment__Na_o/var_Na__Na_i))-3*var_INaK__gNaK/(1+.1245*exp(-.1*
+var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T)+.365e-1*(
+1/7*exp(.1485884101e-1*var_Environment__Na_o)-1/7)*exp(-var_cell__V*
+var_Environment__F/var_Environment__R/var_Environment__T))*var_Na__Na_i/(
+var_Na__Na_i+var_INaK__xkmnai)*var_Environment__K_o/(var_Environment__K_o+
+var_INaK__xkmko)-3*var_cell__wca*var_INaCa__gNaCa/(1+var_INaCa__xkdna^3/
+var_Ca__Ca_submem^3)*(var_Na__Na_i^3*var_Environment__Ca_o*exp(.35*var_cell__V*
+var_Environment__F/var_Environment__R/var_Environment__T)-1/1000*
+var_Environment__Na_o^3*var_Ca__Ca_submem*exp(-.65*var_cell__V*
+var_Environment__F/var_Environment__R/var_Environment__T))/(1+.2*exp(-.65*
+var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T))/(
+var_INaCa__xmcao*var_Na__Na_i^3+1/1000*var_INaCa__xmnao^3*var_Ca__Ca_submem+
+var_INaCa__xmnai^3*var_Environment__Ca_o*(1+1/1000*var_Ca__Ca_submem/
+var_INaCa__xmcai)+var_INaCa__xmcai*var_Environment__Na_o^3*(1+var_Na__Na_i^3/
+var_INaCa__xmnai^3)+var_Na__Na_i^3*var_Environment__Ca_o+1/1000*
+var_Environment__Na_o^3*var_Ca__Ca_submem))/var_cell__wca
+d_dt_Ca__Ca_dyad := (1-var_ICaL__xi1ca-var_ICaL__xi2ca-var_ICaL__xi1ba-
+var_ICaL__xi2ba-var_ICaL__c1-var_ICaL__c2)*var_Ca__Ca_NSR*`if`(50 < 
+var_Irel__Ca_JSR and var_Irel__Ca_JSR < var_Irel__cstar,var_Irel__Ca_JSR-50,
+`if`(var_Irel__cstar <= var_Irel__Ca_JSR,var_Irel__av*var_Irel__Ca_JSR+
+var_Irel__bv,0))/var_Irel__cstar*abs(`if`(2*abs(var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T) < .1e-2,2*var_ICaL__pca*var_ICaL__F*(
+var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o),4*var_ICaL__pca*
+var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(var_ICaL__za)-.341*
+var_ICaL__Ca_o)/(exp(var_ICaL__za)-1)))*var_Irel__gbarsr*exp(-var_Irel__ax*(
+var_cell__V+30))/(1+exp(-var_Irel__ax*(var_cell__V+30)))+(1-var_ICaL__xi1ca-
+var_ICaL__xi2ca-var_ICaL__xi1ba-var_ICaL__xi2ba-var_ICaL__c1-var_ICaL__c2)*
+var_Irel__gdyad*abs(`if`(2*abs(var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T) < .1e-2,2*var_ICaL__pca*var_ICaL__F*(
+var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o),4*var_ICaL__pca*
+var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(var_ICaL__za)-.341*
+var_ICaL__Ca_o)/(exp(var_ICaL__za)-1)))-(var_Ca__Ca_dyad-var_Ca__Ca_submem)/
+var_Ca__taups
+d_dt_Ca__Ca_submem := 1/(1+var_Ca__bcal*var_Ca__xkcal/(var_Ca__xkcal+
+var_Ca__Ca_submem)^2+var_Ca__srmax*var_Ca__srkd/(var_Ca__srkd+var_Ca__Ca_submem
+)^2+var_Ca__bmem*var_Ca__kmem/(var_Ca__kmem+var_Ca__Ca_submem)^2+var_Ca__bsar*
+var_Ca__ksar/(var_Ca__ksar+var_Ca__Ca_submem)^2)*(50*var_Irel__xir-50*(
+var_Ca__Ca_submem-var_Ca__Ca_i)/var_Ca__taud-50*var_ICaL__gca*(1-
+var_ICaL__xi1ca-var_ICaL__xi2ca-var_ICaL__xi1ba-var_ICaL__xi2ba-var_ICaL__c1-
+var_ICaL__c2)*`if`(2*abs(var_cell__V*var_Environment__F/var_Environment__R/
+var_Environment__T) < .1e-2,2*var_ICaL__pca*var_ICaL__F*(var_ICaL__csm*exp(
+var_ICaL__za)-.341*var_ICaL__Ca_o),4*var_ICaL__pca*var_ICaL__V*var_ICaL__F*
+var_ICaL__FonRT*(var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o)/(exp(
+var_ICaL__za)-1))+50*var_INaCa__gNaCa/(1+var_INaCa__xkdna^3/var_Ca__Ca_submem^3
+)*(var_Na__Na_i^3*var_Environment__Ca_o*exp(.35*var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T)-1/1000*var_Environment__Na_o^3*
+var_Ca__Ca_submem*exp(-.65*var_cell__V*var_Environment__F/var_Environment__R/
+var_Environment__T))/(1+.2*exp(-.65*var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T))/(var_INaCa__xmcao*var_Na__Na_i^3+1/1000
+*var_INaCa__xmnao^3*var_Ca__Ca_submem+var_INaCa__xmnai^3*var_Environment__Ca_o*
+(1+1/1000*var_Ca__Ca_submem/var_INaCa__xmcai)+var_INaCa__xmcai*
+var_Environment__Na_o^3*(1+var_Na__Na_i^3/var_INaCa__xmnai^3)+var_Na__Na_i^3*
+var_Environment__Ca_o+1/1000*var_Environment__Na_o^3*var_Ca__Ca_submem)-
+var_Ca__xkon*var_Ca__Ca_submem*(var_Ca__btrop-var_Ca__trops)+var_Ca__xkoff*
+var_Ca__trops)
+d_dt_Ca__Ca_i := 1/(1+var_Ca__bcal*var_Ca__xkcal/(var_Ca__xkcal+var_Ca__Ca_i)^2
++var_Ca__srmax*var_Ca__srkd/(var_Ca__srkd+var_Ca__Ca_i)^2+var_Ca__bmem*
+var_Ca__kmem/(var_Ca__kmem+var_Ca__Ca_i)^2+var_Ca__bsar*var_Ca__ksar/(
+var_Ca__ksar+var_Ca__Ca_i)^2)*((var_Ca__Ca_submem-var_Ca__Ca_i)/var_Ca__taud-
+var_Ileak_Iup_Ixfer__vup*var_Ca__Ca_i^2/(var_Ca__Ca_i^2+
+var_Ileak_Iup_Ixfer__cup^2)+var_Ileak_Iup_Ixfer__gleak*var_Ca__Ca_NSR^2/(
+var_Ca__Ca_NSR^2+var_Ileak_Iup_Ixfer__kj^2)*(16.667*var_Ca__Ca_NSR-var_Ca__Ca_i
+)-var_Ca__xkon*var_Ca__Ca_i*(var_Ca__btrop-var_Ca__tropi)+var_Ca__xkoff*
+var_Ca__tropi)
+d_dt_Ca__Ca_NSR := -var_Irel__xir+var_Ileak_Iup_Ixfer__vup*var_Ca__Ca_i^2/(
+var_Ca__Ca_i^2+var_Ileak_Iup_Ixfer__cup^2)-var_Ileak_Iup_Ixfer__gleak*
+var_Ca__Ca_NSR^2/(var_Ca__Ca_NSR^2+var_Ileak_Iup_Ixfer__kj^2)*(16.667*
+var_Ca__Ca_NSR-var_Ca__Ca_i)
+d_dt_Ca__tropi := var_Ca__xkon*var_Ca__Ca_i*(var_Ca__btrop-var_Ca__tropi)-
+var_Ca__xkoff*var_Ca__tropi
+d_dt_Ca__trops := var_Ca__xkon*var_Ca__Ca_submem*(var_Ca__btrop-var_Ca__trops)-
+var_Ca__xkoff*var_Ca__trops
+g_var_Ca__Ca_NSR := var_Ca__Ca_NSR-var_Ca__Ca_NSR_old-delta_t*(-var_Irel__xir+
+var_Ileak_Iup_Ixfer__vup*var_Ca__Ca_i^2/(var_Ca__Ca_i^2+
+var_Ileak_Iup_Ixfer__cup^2)-var_Ileak_Iup_Ixfer__gleak*var_Ca__Ca_NSR^2/(
+var_Ca__Ca_NSR^2+var_Ileak_Iup_Ixfer__kj^2)*(16.667*var_Ca__Ca_NSR-var_Ca__Ca_i
+))
+g_var_Ca__Ca_dyad := var_Ca__Ca_dyad-var_Ca__Ca_dyad_old-delta_t*((1-
+var_ICaL__xi1ca-var_ICaL__xi2ca-var_ICaL__xi1ba-var_ICaL__xi2ba-var_ICaL__c1-
+var_ICaL__c2)*var_Ca__Ca_NSR*`if`(50 < var_Irel__Ca_JSR and var_Irel__Ca_JSR <
+var_Irel__cstar,var_Irel__Ca_JSR-50,`if`(var_Irel__cstar <= var_Irel__Ca_JSR,
+var_Irel__av*var_Irel__Ca_JSR+var_Irel__bv,0))/var_Irel__cstar*abs(`if`(2*abs(
+var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T) < .1e-2,2
+*var_ICaL__pca*var_ICaL__F*(var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o
+),4*var_ICaL__pca*var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(
+var_ICaL__za)-.341*var_ICaL__Ca_o)/(exp(var_ICaL__za)-1)))*var_Irel__gbarsr*exp
+(-var_Irel__ax*(var_cell__V+30))/(1+exp(-var_Irel__ax*(var_cell__V+30)))+(1-
+var_ICaL__xi1ca-var_ICaL__xi2ca-var_ICaL__xi1ba-var_ICaL__xi2ba-var_ICaL__c1-
+var_ICaL__c2)*var_Irel__gdyad*abs(`if`(2*abs(var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T) < .1e-2,2*var_ICaL__pca*var_ICaL__F*(
+var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o),4*var_ICaL__pca*
+var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(var_ICaL__za)-.341*
+var_ICaL__Ca_o)/(exp(var_ICaL__za)-1)))-(var_Ca__Ca_dyad-var_Ca__Ca_submem)/
+var_Ca__taups)
+g_var_Ca__Ca_i := var_Ca__Ca_i-var_Ca__Ca_i_old-delta_t/(1+var_Ca__bcal*
+var_Ca__xkcal/(var_Ca__xkcal+var_Ca__Ca_i)^2+var_Ca__srmax*var_Ca__srkd/(
+var_Ca__srkd+var_Ca__Ca_i)^2+var_Ca__bmem*var_Ca__kmem/(var_Ca__kmem+
+var_Ca__Ca_i)^2+var_Ca__bsar*var_Ca__ksar/(var_Ca__ksar+var_Ca__Ca_i)^2)*((
+var_Ca__Ca_submem-var_Ca__Ca_i)/var_Ca__taud-var_Ileak_Iup_Ixfer__vup*
+var_Ca__Ca_i^2/(var_Ca__Ca_i^2+var_Ileak_Iup_Ixfer__cup^2)+
+var_Ileak_Iup_Ixfer__gleak*var_Ca__Ca_NSR^2/(var_Ca__Ca_NSR^2+
+var_Ileak_Iup_Ixfer__kj^2)*(16.667*var_Ca__Ca_NSR-var_Ca__Ca_i)-var_Ca__xkon*
+var_Ca__Ca_i*(var_Ca__btrop-var_Ca__tropi)+var_Ca__xkoff*var_Ca__tropi)
+g_var_Ca__Ca_submem := var_Ca__Ca_submem-var_Ca__Ca_submem_old-delta_t/(1+
+var_Ca__bcal*var_Ca__xkcal/(var_Ca__xkcal+var_Ca__Ca_submem)^2+var_Ca__srmax*
+var_Ca__srkd/(var_Ca__srkd+var_Ca__Ca_submem)^2+var_Ca__bmem*var_Ca__kmem/(
+var_Ca__kmem+var_Ca__Ca_submem)^2+var_Ca__bsar*var_Ca__ksar/(var_Ca__ksar+
+var_Ca__Ca_submem)^2)*(50*var_Irel__xir-50*(var_Ca__Ca_submem-var_Ca__Ca_i)/
+var_Ca__taud-50*var_ICaL__gca*(1-var_ICaL__xi1ca-var_ICaL__xi2ca-
+var_ICaL__xi1ba-var_ICaL__xi2ba-var_ICaL__c1-var_ICaL__c2)*`if`(2*abs(
+var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T) < .1e-2,2
+*var_ICaL__pca*var_ICaL__F*(var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o
+),4*var_ICaL__pca*var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(
+var_ICaL__za)-.341*var_ICaL__Ca_o)/(exp(var_ICaL__za)-1))+50*var_INaCa__gNaCa/(
+1+var_INaCa__xkdna^3/var_Ca__Ca_submem^3)*(var_Na__Na_i^3*var_Environment__Ca_o
+*exp(.35*var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T)-\
+1/1000*var_Environment__Na_o^3*var_Ca__Ca_submem*exp(-.65*var_cell__V*
+var_Environment__F/var_Environment__R/var_Environment__T))/(1+.2*exp(-.65*
+var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T))/(
+var_INaCa__xmcao*var_Na__Na_i^3+1/1000*var_INaCa__xmnao^3*var_Ca__Ca_submem+
+var_INaCa__xmnai^3*var_Environment__Ca_o*(1+1/1000*var_Ca__Ca_submem/
+var_INaCa__xmcai)+var_INaCa__xmcai*var_Environment__Na_o^3*(1+var_Na__Na_i^3/
+var_INaCa__xmnai^3)+var_Na__Na_i^3*var_Environment__Ca_o+1/1000*
+var_Environment__Na_o^3*var_Ca__Ca_submem)-var_Ca__xkon*var_Ca__Ca_submem*(
+var_Ca__btrop-var_Ca__trops)+var_Ca__xkoff*var_Ca__trops)
+g_var_Ca__tropi := var_Ca__tropi-var_Ca__tropi_old-delta_t*(var_Ca__xkon*
+var_Ca__Ca_i*(var_Ca__btrop-var_Ca__tropi)-var_Ca__xkoff*var_Ca__tropi)
+g_var_Ca__trops := var_Ca__trops-var_Ca__trops_old-delta_t*(var_Ca__xkon*
+var_Ca__Ca_submem*(var_Ca__btrop-var_Ca__trops)-var_Ca__xkoff*var_Ca__trops)
+g_var_ICaL__c1 := var_ICaL__c1-var_ICaL__c1_old-delta_t*(1/(1+exp((-var_cell__V
++var_ICaL__vth)/var_ICaL__s6))/var_ICaL__taupo*var_ICaL__c2+var_ICaL__k2*
+var_ICaL__xi1ca+var_ICaL__k2t*var_ICaL__xi1ba+var_ICaL__r2*(1-var_ICaL__xi1ca-
+var_ICaL__xi2ca-var_ICaL__xi1ba-var_ICaL__xi2ba-var_ICaL__c1-var_ICaL__c2)-((1-
+1/(1+exp((-var_cell__V+var_ICaL__vth)/var_ICaL__s6)))/var_ICaL__taupo+
+var_ICaL__r1+var_ICaL__k1t+.24168e-1/(1+var_ICaL__cat^3/var_Ca__Ca_dyad^3))*
+var_ICaL__c1)
+g_var_ICaL__c2 := var_ICaL__c2-var_ICaL__c2_old-delta_t*((1-1/(1+exp((-
+var_cell__V+var_ICaL__vth)/var_ICaL__s6)))/var_ICaL__taupo*var_ICaL__c1+(1-1/(1
++exp((-var_cell__V+var_ICaL__vyr)/var_ICaL__syr)))/((9.9+4954*exp(.6410256410e-\
+1*var_cell__V)-var_ICaL__tca/(1+var_Ca__Ca_dyad^4/var_ICaL__cpt^4))*(1-1/(1+exp
+((-var_cell__V+var_ICaL__vy)/var_ICaL__sy)))+var_ICaL__tca/(1+var_Ca__Ca_dyad^4
+/var_ICaL__cpt^4)+.1)*var_ICaL__xi2ca+(1-1/(1+exp((-var_cell__V+var_ICaL__vyr)/
+var_ICaL__syr)))/((-440+4954*exp(.6410256410e-1*var_cell__V))*(1-1/(1+exp((-
+var_cell__V+var_ICaL__vy)/var_ICaL__sy)))+450)*var_ICaL__xi2ba-(1/(1+
+var_ICaL__cat^3/var_Ca__Ca_dyad^3)/(1+exp((-var_cell__V+var_ICaL__vyr)/
+var_ICaL__syr))/((9.9+4954*exp(.6410256410e-1*var_cell__V)-var_ICaL__tca/(1+
+var_Ca__Ca_dyad^4/var_ICaL__cpt^4))*(1-1/(1+exp((-var_cell__V+var_ICaL__vy)/
+var_ICaL__sy)))+var_ICaL__tca/(1+var_Ca__Ca_dyad^4/var_ICaL__cpt^4)+.1)+1/(1+
+exp((-var_cell__V+var_ICaL__vyr)/var_ICaL__syr))/((-440+4954*exp(.6410256410e-1
+*var_cell__V))*(1-1/(1+exp((-var_cell__V+var_ICaL__vy)/var_ICaL__sy)))+450)+1/(
+1+exp((-var_cell__V+var_ICaL__vth)/var_ICaL__s6))/var_ICaL__taupo)*var_ICaL__c2
+)
+g_var_ICaL__xi1ba := var_ICaL__xi1ba-var_ICaL__xi1ba_old-delta_t*(var_ICaL__k1t
+*var_ICaL__c1+(1-1/(1+exp((-var_cell__V+var_ICaL__vx)/var_ICaL__sx)))/
+var_ICaL__tau3/(1+exp((-var_cell__V+var_ICaL__vth)/var_ICaL__s6))/(1-1/(1+exp((
+-var_cell__V+var_ICaL__vth)/var_ICaL__s6)))*var_ICaL__k1t/var_ICaL__k2t*(1-1/(1
++exp((-var_cell__V+var_ICaL__vyr)/var_ICaL__syr)))*(1+exp((-var_cell__V+
+var_ICaL__vyr)/var_ICaL__syr))*var_ICaL__xi2ba+var_ICaL__s1t*(1-var_ICaL__xi1ca
+-var_ICaL__xi2ca-var_ICaL__xi1ba-var_ICaL__xi2ba-var_ICaL__c1-var_ICaL__c2)-((1
+-1/(1+exp((-var_cell__V+var_ICaL__vx)/var_ICaL__sx)))/var_ICaL__tau3+
+var_ICaL__k2t+var_ICaL__s1t*var_ICaL__r1/var_ICaL__r2*var_ICaL__k2t/
+var_ICaL__k1t)*var_ICaL__xi1ba)
+g_var_ICaL__xi1ca := var_ICaL__xi1ca-var_ICaL__xi1ca_old-delta_t*(.24168e-1/(1+
+var_ICaL__cat^3/var_Ca__Ca_dyad^3)*var_ICaL__c1+.24168e-1*(1-1/(1+exp((-
+var_cell__V+var_ICaL__vx)/var_ICaL__sx)))/var_ICaL__tau3/(1+exp((-var_cell__V+
+var_ICaL__vth)/var_ICaL__s6))/(1-1/(1+exp((-var_cell__V+var_ICaL__vth)/
+var_ICaL__s6)))/var_ICaL__k2*(1-1/(1+exp((-var_cell__V+var_ICaL__vyr)/
+var_ICaL__syr)))*(1+exp((-var_cell__V+var_ICaL__vyr)/var_ICaL__syr))*
+var_ICaL__xi2ca+.182688e-1/(1+var_ICaL__cat^3/var_Ca__Ca_dyad^3)*(1-
+var_ICaL__xi1ca-var_ICaL__xi2ca-var_ICaL__xi1ba-var_ICaL__xi2ba-var_ICaL__c1-
+var_ICaL__c2)-((1-1/(1+exp((-var_cell__V+var_ICaL__vx)/var_ICaL__sx)))/
+var_ICaL__tau3+var_ICaL__k2+.7559086395*var_ICaL__r1/var_ICaL__r2*var_ICaL__k2)
+*var_ICaL__xi1ca)
+g_var_ICaL__xi2ba := var_ICaL__xi2ba-var_ICaL__xi2ba_old-delta_t*((1-1/(1+exp((
+-var_cell__V+var_ICaL__vx)/var_ICaL__sx)))/var_ICaL__tau3*var_ICaL__xi1ba+1/(1+
+exp((-var_cell__V+var_ICaL__vyr)/var_ICaL__syr))/((-440+4954*exp(.6410256410e-1
+*var_cell__V))*(1-1/(1+exp((-var_cell__V+var_ICaL__vy)/var_ICaL__sy)))+450)*
+var_ICaL__c2-((1-1/(1+exp((-var_cell__V+var_ICaL__vyr)/var_ICaL__syr)))/((-440+
+4954*exp(.6410256410e-1*var_cell__V))*(1-1/(1+exp((-var_cell__V+var_ICaL__vy)/
+var_ICaL__sy)))+450)+(1-1/(1+exp((-var_cell__V+var_ICaL__vx)/var_ICaL__sx)))/
+var_ICaL__tau3/(1+exp((-var_cell__V+var_ICaL__vth)/var_ICaL__s6))/(1-1/(1+exp((
+-var_cell__V+var_ICaL__vth)/var_ICaL__s6)))*var_ICaL__k1t/var_ICaL__k2t*(1-1/(1
++exp((-var_cell__V+var_ICaL__vyr)/var_ICaL__syr)))*(1+exp((-var_cell__V+
+var_ICaL__vyr)/var_ICaL__syr)))*var_ICaL__xi2ba)
+g_var_ICaL__xi2ca := var_ICaL__xi2ca-var_ICaL__xi2ca_old-delta_t*((1-1/(1+exp((
+-var_cell__V+var_ICaL__vx)/var_ICaL__sx)))/var_ICaL__tau3*var_ICaL__xi1ca+1/(1+
+var_ICaL__cat^3/var_Ca__Ca_dyad^3)/(1+exp((-var_cell__V+var_ICaL__vyr)/
+var_ICaL__syr))/((9.9+4954*exp(.6410256410e-1*var_cell__V)-var_ICaL__tca/(1+
+var_Ca__Ca_dyad^4/var_ICaL__cpt^4))*(1-1/(1+exp((-var_cell__V+var_ICaL__vy)/
+var_ICaL__sy)))+var_ICaL__tca/(1+var_Ca__Ca_dyad^4/var_ICaL__cpt^4)+.1)*
+var_ICaL__c2-((1-1/(1+exp((-var_cell__V+var_ICaL__vyr)/var_ICaL__syr)))/((9.9+
+4954*exp(.6410256410e-1*var_cell__V)-var_ICaL__tca/(1+var_Ca__Ca_dyad^4/
+var_ICaL__cpt^4))*(1-1/(1+exp((-var_cell__V+var_ICaL__vy)/var_ICaL__sy)))+
+var_ICaL__tca/(1+var_Ca__Ca_dyad^4/var_ICaL__cpt^4)+.1)+.24168e-1*(1-1/(1+exp((
+-var_cell__V+var_ICaL__vx)/var_ICaL__sx)))/var_ICaL__tau3/(1+exp((-var_cell__V+
+var_ICaL__vth)/var_ICaL__s6))/(1-1/(1+exp((-var_cell__V+var_ICaL__vth)/
+var_ICaL__s6)))/var_ICaL__k2*(1-1/(1+exp((-var_cell__V+var_ICaL__vyr)/
+var_ICaL__syr)))*(1+exp((-var_cell__V+var_ICaL__vyr)/var_ICaL__syr)))*
+var_ICaL__xi2ca)
+g_var_Irel__Ca_JSR := var_Irel__Ca_JSR-var_Irel__Ca_JSR_old-delta_t*(
+var_Ca__Ca_NSR-var_Irel__Ca_JSR)/var_Irel__taua
+g_var_Irel__xir := var_Irel__xir-var_Irel__xir_old-delta_t*(var_Irel__gryr*(1-
+var_ICaL__xi1ca-var_ICaL__xi2ca-var_ICaL__xi1ba-var_ICaL__xi2ba-var_ICaL__c1-
+var_ICaL__c2)*abs(`if`(2*abs(var_cell__V*var_Environment__F/var_Environment__R/
+var_Environment__T) < .1e-2,2*var_ICaL__pca*var_ICaL__F*(var_ICaL__csm*exp(
+var_ICaL__za)-.341*var_ICaL__Ca_o),4*var_ICaL__pca*var_ICaL__V*var_ICaL__F*
+var_ICaL__FonRT*(var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o)/(exp(
+var_ICaL__za)-1)))*exp(-var_Irel__ay*(var_cell__V+30))/(1+exp(-var_Irel__ay*(
+var_cell__V+30)))*var_Ca__Ca_NSR*`if`(50 < var_Irel__Ca_JSR and 
+var_Irel__Ca_JSR < var_Irel__cstar,var_Irel__Ca_JSR-50,`if`(var_Irel__cstar <=
+var_Irel__Ca_JSR,var_Irel__av*var_Irel__Ca_JSR+var_Irel__bv,0))/var_Irel__cstar
+-var_Irel__xir*(1-var_Irel__taur*(-var_Irel__xir+var_Ileak_Iup_Ixfer__vup*
+var_Ca__Ca_i^2/(var_Ca__Ca_i^2+var_Ileak_Iup_Ixfer__cup^2)-
+var_Ileak_Iup_Ixfer__gleak*var_Ca__Ca_NSR^2/(var_Ca__Ca_NSR^2+
+var_Ileak_Iup_Ixfer__kj^2)*(16.667*var_Ca__Ca_NSR-var_Ca__Ca_i))/var_Ca__Ca_NSR
+)/var_Irel__taur)
+g_var_Na__Na_i := var_Na__Na_i-var_Na__Na_i_old-1/1000*delta_t*(-var_INa__gna*
+var_INa__xh*var_INa__xj*var_INa__xm^3*(var_cell__V-1/var_Environment__F*
+var_Environment__R*var_Environment__T*ln(var_Environment__Na_o/var_Na__Na_i))-3
+*var_INaK__gNaK/(1+.1245*exp(-.1*var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T)+.365e-1*(1/7*exp(.1485884101e-1*
+var_Environment__Na_o)-1/7)*exp(-var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T))*var_Na__Na_i/(var_Na__Na_i+
+var_INaK__xkmnai)*var_Environment__K_o/(var_Environment__K_o+var_INaK__xkmko)-3
+*var_cell__wca*var_INaCa__gNaCa/(1+var_INaCa__xkdna^3/var_Ca__Ca_submem^3)*(
+var_Na__Na_i^3*var_Environment__Ca_o*exp(.35*var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T)-1/1000*var_Environment__Na_o^3*
+var_Ca__Ca_submem*exp(-.65*var_cell__V*var_Environment__F/var_Environment__R/
+var_Environment__T))/(1+.2*exp(-.65*var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T))/(var_INaCa__xmcao*var_Na__Na_i^3+1/1000
+*var_INaCa__xmnao^3*var_Ca__Ca_submem+var_INaCa__xmnai^3*var_Environment__Ca_o*
+(1+1/1000*var_Ca__Ca_submem/var_INaCa__xmcai)+var_INaCa__xmcai*
+var_Environment__Na_o^3*(1+var_Na__Na_i^3/var_INaCa__xmnai^3)+var_Na__Na_i^3*
+var_Environment__Ca_o+1/1000*var_Environment__Na_o^3*var_Ca__Ca_submem))/
+var_cell__wca
+"--var_Ca__Ca_NSR/var_Ca__Ca_NSR--"
+1-delta_t*(-2*var_Ileak_Iup_Ixfer__gleak*var_Ca__Ca_NSR/(var_Ca__Ca_NSR^2+
+var_Ileak_Iup_Ixfer__kj^2)*(16.667*var_Ca__Ca_NSR-var_Ca__Ca_i)+2*
+var_Ileak_Iup_Ixfer__gleak*var_Ca__Ca_NSR^3/(var_Ca__Ca_NSR^2+
+var_Ileak_Iup_Ixfer__kj^2)^2*(16.667*var_Ca__Ca_NSR-var_Ca__Ca_i)-16.667*
+var_Ileak_Iup_Ixfer__gleak*var_Ca__Ca_NSR^2/(var_Ca__Ca_NSR^2+
+var_Ileak_Iup_Ixfer__kj^2))
+"--var_Ca__Ca_NSR/var_Ca__Ca_dyad--"
+0
+"--var_Ca__Ca_NSR/var_Ca__Ca_i--"
+-delta_t*(2*var_Ileak_Iup_Ixfer__vup*var_Ca__Ca_i/(var_Ca__Ca_i^2+
+var_Ileak_Iup_Ixfer__cup^2)-2*var_Ileak_Iup_Ixfer__vup*var_Ca__Ca_i^3/(
+var_Ca__Ca_i^2+var_Ileak_Iup_Ixfer__cup^2)^2+var_Ileak_Iup_Ixfer__gleak*
+var_Ca__Ca_NSR^2/(var_Ca__Ca_NSR^2+var_Ileak_Iup_Ixfer__kj^2))
+"--var_Ca__Ca_NSR/var_Ca__Ca_submem--"
+0
+"--var_Ca__Ca_NSR/var_Ca__tropi--"
+0
+"--var_Ca__Ca_NSR/var_Ca__trops--"
+0
+"--var_Ca__Ca_NSR/var_ICaL__c1--"
+0
+"--var_Ca__Ca_NSR/var_ICaL__c2--"
+0
+"--var_Ca__Ca_NSR/var_ICaL__xi1ba--"
+0
+"--var_Ca__Ca_NSR/var_ICaL__xi1ca--"
+0
+"--var_Ca__Ca_NSR/var_ICaL__xi2ba--"
+0
+"--var_Ca__Ca_NSR/var_ICaL__xi2ca--"
+0
+"--var_Ca__Ca_NSR/var_Irel__Ca_JSR--"
+0
+"--var_Ca__Ca_NSR/var_Irel__xir--"
+delta_t
+"--var_Ca__Ca_NSR/var_Na__Na_i--"
+0
+"--var_Ca__Ca_dyad/var_Ca__Ca_NSR--"
+-delta_t*(1-var_ICaL__xi1ca-var_ICaL__xi2ca-var_ICaL__xi1ba-var_ICaL__xi2ba-
+var_ICaL__c1-var_ICaL__c2)*`if`(50 < var_Irel__Ca_JSR and var_Irel__Ca_JSR < 
+var_Irel__cstar,var_Irel__Ca_JSR-50,`if`(var_Irel__cstar <= var_Irel__Ca_JSR,
+var_Irel__av*var_Irel__Ca_JSR+var_Irel__bv,0))/var_Irel__cstar*abs(`if`(2*abs(
+var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T) < .1e-2,2
+*var_ICaL__pca*var_ICaL__F*(var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o
+),4*var_ICaL__pca*var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(
+var_ICaL__za)-.341*var_ICaL__Ca_o)/(exp(var_ICaL__za)-1)))*var_Irel__gbarsr*exp
+(-var_Irel__ax*(var_cell__V+30))/(1+exp(-var_Irel__ax*(var_cell__V+30)))
+"--var_Ca__Ca_dyad/var_Ca__Ca_dyad--"
+1+delta_t/var_Ca__taups
+"--var_Ca__Ca_dyad/var_Ca__Ca_i--"
+0
+"--var_Ca__Ca_dyad/var_Ca__Ca_submem--"
+-delta_t/var_Ca__taups
+"--var_Ca__Ca_dyad/var_Ca__tropi--"
+0
+"--var_Ca__Ca_dyad/var_Ca__trops--"
+0
+"--var_Ca__Ca_dyad/var_ICaL__c1--"
+-delta_t*(-var_Ca__Ca_NSR*`if`(50 < var_Irel__Ca_JSR and var_Irel__Ca_JSR < 
+var_Irel__cstar,var_Irel__Ca_JSR-50,`if`(var_Irel__cstar <= var_Irel__Ca_JSR,
+var_Irel__av*var_Irel__Ca_JSR+var_Irel__bv,0))/var_Irel__cstar*abs(`if`(2*abs(
+var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T) < .1e-2,2
+*var_ICaL__pca*var_ICaL__F*(var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o
+),4*var_ICaL__pca*var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(
+var_ICaL__za)-.341*var_ICaL__Ca_o)/(exp(var_ICaL__za)-1)))*var_Irel__gbarsr*exp
+(-var_Irel__ax*(var_cell__V+30))/(1+exp(-var_Irel__ax*(var_cell__V+30)))-
+var_Irel__gdyad*abs(`if`(2*abs(var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T) < .1e-2,2*var_ICaL__pca*var_ICaL__F*(
+var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o),4*var_ICaL__pca*
+var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(var_ICaL__za)-.341*
+var_ICaL__Ca_o)/(exp(var_ICaL__za)-1))))
+"--var_Ca__Ca_dyad/var_ICaL__c2--"
+-delta_t*(-var_Ca__Ca_NSR*`if`(50 < var_Irel__Ca_JSR and var_Irel__Ca_JSR < 
+var_Irel__cstar,var_Irel__Ca_JSR-50,`if`(var_Irel__cstar <= var_Irel__Ca_JSR,
+var_Irel__av*var_Irel__Ca_JSR+var_Irel__bv,0))/var_Irel__cstar*abs(`if`(2*abs(
+var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T) < .1e-2,2
+*var_ICaL__pca*var_ICaL__F*(var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o
+),4*var_ICaL__pca*var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(
+var_ICaL__za)-.341*var_ICaL__Ca_o)/(exp(var_ICaL__za)-1)))*var_Irel__gbarsr*exp
+(-var_Irel__ax*(var_cell__V+30))/(1+exp(-var_Irel__ax*(var_cell__V+30)))-
+var_Irel__gdyad*abs(`if`(2*abs(var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T) < .1e-2,2*var_ICaL__pca*var_ICaL__F*(
+var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o),4*var_ICaL__pca*
+var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(var_ICaL__za)-.341*
+var_ICaL__Ca_o)/(exp(var_ICaL__za)-1))))
+"--var_Ca__Ca_dyad/var_ICaL__xi1ba--"
+-delta_t*(-var_Ca__Ca_NSR*`if`(50 < var_Irel__Ca_JSR and var_Irel__Ca_JSR < 
+var_Irel__cstar,var_Irel__Ca_JSR-50,`if`(var_Irel__cstar <= var_Irel__Ca_JSR,
+var_Irel__av*var_Irel__Ca_JSR+var_Irel__bv,0))/var_Irel__cstar*abs(`if`(2*abs(
+var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T) < .1e-2,2
+*var_ICaL__pca*var_ICaL__F*(var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o
+),4*var_ICaL__pca*var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(
+var_ICaL__za)-.341*var_ICaL__Ca_o)/(exp(var_ICaL__za)-1)))*var_Irel__gbarsr*exp
+(-var_Irel__ax*(var_cell__V+30))/(1+exp(-var_Irel__ax*(var_cell__V+30)))-
+var_Irel__gdyad*abs(`if`(2*abs(var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T) < .1e-2,2*var_ICaL__pca*var_ICaL__F*(
+var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o),4*var_ICaL__pca*
+var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(var_ICaL__za)-.341*
+var_ICaL__Ca_o)/(exp(var_ICaL__za)-1))))
+"--var_Ca__Ca_dyad/var_ICaL__xi1ca--"
+-delta_t*(-var_Ca__Ca_NSR*`if`(50 < var_Irel__Ca_JSR and var_Irel__Ca_JSR < 
+var_Irel__cstar,var_Irel__Ca_JSR-50,`if`(var_Irel__cstar <= var_Irel__Ca_JSR,
+var_Irel__av*var_Irel__Ca_JSR+var_Irel__bv,0))/var_Irel__cstar*abs(`if`(2*abs(
+var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T) < .1e-2,2
+*var_ICaL__pca*var_ICaL__F*(var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o
+),4*var_ICaL__pca*var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(
+var_ICaL__za)-.341*var_ICaL__Ca_o)/(exp(var_ICaL__za)-1)))*var_Irel__gbarsr*exp
+(-var_Irel__ax*(var_cell__V+30))/(1+exp(-var_Irel__ax*(var_cell__V+30)))-
+var_Irel__gdyad*abs(`if`(2*abs(var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T) < .1e-2,2*var_ICaL__pca*var_ICaL__F*(
+var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o),4*var_ICaL__pca*
+var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(var_ICaL__za)-.341*
+var_ICaL__Ca_o)/(exp(var_ICaL__za)-1))))
+"--var_Ca__Ca_dyad/var_ICaL__xi2ba--"
+-delta_t*(-var_Ca__Ca_NSR*`if`(50 < var_Irel__Ca_JSR and var_Irel__Ca_JSR < 
+var_Irel__cstar,var_Irel__Ca_JSR-50,`if`(var_Irel__cstar <= var_Irel__Ca_JSR,
+var_Irel__av*var_Irel__Ca_JSR+var_Irel__bv,0))/var_Irel__cstar*abs(`if`(2*abs(
+var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T) < .1e-2,2
+*var_ICaL__pca*var_ICaL__F*(var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o
+),4*var_ICaL__pca*var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(
+var_ICaL__za)-.341*var_ICaL__Ca_o)/(exp(var_ICaL__za)-1)))*var_Irel__gbarsr*exp
+(-var_Irel__ax*(var_cell__V+30))/(1+exp(-var_Irel__ax*(var_cell__V+30)))-
+var_Irel__gdyad*abs(`if`(2*abs(var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T) < .1e-2,2*var_ICaL__pca*var_ICaL__F*(
+var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o),4*var_ICaL__pca*
+var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(var_ICaL__za)-.341*
+var_ICaL__Ca_o)/(exp(var_ICaL__za)-1))))
+"--var_Ca__Ca_dyad/var_ICaL__xi2ca--"
+-delta_t*(-var_Ca__Ca_NSR*`if`(50 < var_Irel__Ca_JSR and var_Irel__Ca_JSR < 
+var_Irel__cstar,var_Irel__Ca_JSR-50,`if`(var_Irel__cstar <= var_Irel__Ca_JSR,
+var_Irel__av*var_Irel__Ca_JSR+var_Irel__bv,0))/var_Irel__cstar*abs(`if`(2*abs(
+var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T) < .1e-2,2
+*var_ICaL__pca*var_ICaL__F*(var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o
+),4*var_ICaL__pca*var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(
+var_ICaL__za)-.341*var_ICaL__Ca_o)/(exp(var_ICaL__za)-1)))*var_Irel__gbarsr*exp
+(-var_Irel__ax*(var_cell__V+30))/(1+exp(-var_Irel__ax*(var_cell__V+30)))-
+var_Irel__gdyad*abs(`if`(2*abs(var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T) < .1e-2,2*var_ICaL__pca*var_ICaL__F*(
+var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o),4*var_ICaL__pca*
+var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(var_ICaL__za)-.341*
+var_ICaL__Ca_o)/(exp(var_ICaL__za)-1))))
+"--var_Ca__Ca_dyad/var_Irel__Ca_JSR--"
+-delta_t*(1-var_ICaL__xi1ca-var_ICaL__xi2ca-var_ICaL__xi1ba-var_ICaL__xi2ba-
+var_ICaL__c1-var_ICaL__c2)*var_Ca__Ca_NSR*
+`if`(50 < var_Irel__Ca_JSR and var_Irel__Ca_JSR < var_Irel__cstar,
+1,
+`if`(var_Irel__cstar <= var_Irel__Ca_JSR,
+var_Irel__av,
+0))
+/var_Irel__cstar*abs(`if`(2*abs(var_cell__V*var_Environment__F
+/var_Environment__R/var_Environment__T) < .1e-2,2*var_ICaL__pca*var_ICaL__F*(
+var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o),4*var_ICaL__pca*
+var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(var_ICaL__za)-.341*
+var_ICaL__Ca_o)/(exp(var_ICaL__za)-1)))*var_Irel__gbarsr*exp(-var_Irel__ax*(
+var_cell__V+30))/(1+exp(-var_Irel__ax*(var_cell__V+30)))
+"--var_Ca__Ca_dyad/var_Irel__xir--"
+0
+"--var_Ca__Ca_dyad/var_Na__Na_i--"
+0
+"--var_Ca__Ca_i/var_Ca__Ca_NSR--"
+-delta_t/(1+var_Ca__bcal*var_Ca__xkcal/(var_Ca__xkcal+var_Ca__Ca_i)^2+
+var_Ca__srmax*var_Ca__srkd/(var_Ca__srkd+var_Ca__Ca_i)^2+var_Ca__bmem*
+var_Ca__kmem/(var_Ca__kmem+var_Ca__Ca_i)^2+var_Ca__bsar*var_Ca__ksar/(
+var_Ca__ksar+var_Ca__Ca_i)^2)*(2*var_Ileak_Iup_Ixfer__gleak*var_Ca__Ca_NSR/(
+var_Ca__Ca_NSR^2+var_Ileak_Iup_Ixfer__kj^2)*(16.667*var_Ca__Ca_NSR-var_Ca__Ca_i
+)-2*var_Ileak_Iup_Ixfer__gleak*var_Ca__Ca_NSR^3/(var_Ca__Ca_NSR^2+
+var_Ileak_Iup_Ixfer__kj^2)^2*(16.667*var_Ca__Ca_NSR-var_Ca__Ca_i)+16.667*
+var_Ileak_Iup_Ixfer__gleak*var_Ca__Ca_NSR^2/(var_Ca__Ca_NSR^2+
+var_Ileak_Iup_Ixfer__kj^2))
+"--var_Ca__Ca_i/var_Ca__Ca_dyad--"
+0
+"--var_Ca__Ca_i/var_Ca__Ca_i--"
+1+delta_t/(1+var_Ca__bcal*var_Ca__xkcal/(var_Ca__xkcal+var_Ca__Ca_i)^2+
+var_Ca__srmax*var_Ca__srkd/(var_Ca__srkd+var_Ca__Ca_i)^2+var_Ca__bmem*
+var_Ca__kmem/(var_Ca__kmem+var_Ca__Ca_i)^2+var_Ca__bsar*var_Ca__ksar/(
+var_Ca__ksar+var_Ca__Ca_i)^2)^2*((var_Ca__Ca_submem-var_Ca__Ca_i)/var_Ca__taud-
+var_Ileak_Iup_Ixfer__vup*var_Ca__Ca_i^2/(var_Ca__Ca_i^2+
+var_Ileak_Iup_Ixfer__cup^2)+var_Ileak_Iup_Ixfer__gleak*var_Ca__Ca_NSR^2/(
+var_Ca__Ca_NSR^2+var_Ileak_Iup_Ixfer__kj^2)*(16.667*var_Ca__Ca_NSR-var_Ca__Ca_i
+)-var_Ca__xkon*var_Ca__Ca_i*(var_Ca__btrop-var_Ca__tropi)+var_Ca__xkoff*
+var_Ca__tropi)*(-2*var_Ca__bcal*var_Ca__xkcal/(var_Ca__xkcal+var_Ca__Ca_i)^3-2*
+var_Ca__srmax*var_Ca__srkd/(var_Ca__srkd+var_Ca__Ca_i)^3-2*var_Ca__bmem*
+var_Ca__kmem/(var_Ca__kmem+var_Ca__Ca_i)^3-2*var_Ca__bsar*var_Ca__ksar/(
+var_Ca__ksar+var_Ca__Ca_i)^3)-delta_t/(1+var_Ca__bcal*var_Ca__xkcal/(
+var_Ca__xkcal+var_Ca__Ca_i)^2+var_Ca__srmax*var_Ca__srkd/(var_Ca__srkd+
+var_Ca__Ca_i)^2+var_Ca__bmem*var_Ca__kmem/(var_Ca__kmem+var_Ca__Ca_i)^2+
+var_Ca__bsar*var_Ca__ksar/(var_Ca__ksar+var_Ca__Ca_i)^2)*(-1/var_Ca__taud-2*
+var_Ileak_Iup_Ixfer__vup*var_Ca__Ca_i/(var_Ca__Ca_i^2+var_Ileak_Iup_Ixfer__cup^
+2)+2*var_Ileak_Iup_Ixfer__vup*var_Ca__Ca_i^3/(var_Ca__Ca_i^2+
+var_Ileak_Iup_Ixfer__cup^2)^2-var_Ileak_Iup_Ixfer__gleak*var_Ca__Ca_NSR^2/(
+var_Ca__Ca_NSR^2+var_Ileak_Iup_Ixfer__kj^2)-var_Ca__xkon*(var_Ca__btrop-
+var_Ca__tropi))
+"--var_Ca__Ca_i/var_Ca__Ca_submem--"
+-delta_t/(1+var_Ca__bcal*var_Ca__xkcal/(var_Ca__xkcal+var_Ca__Ca_i)^2+
+var_Ca__srmax*var_Ca__srkd/(var_Ca__srkd+var_Ca__Ca_i)^2+var_Ca__bmem*
+var_Ca__kmem/(var_Ca__kmem+var_Ca__Ca_i)^2+var_Ca__bsar*var_Ca__ksar/(
+var_Ca__ksar+var_Ca__Ca_i)^2)/var_Ca__taud
+"--var_Ca__Ca_i/var_Ca__tropi--"
+-delta_t/(1+var_Ca__bcal*var_Ca__xkcal/(var_Ca__xkcal+var_Ca__Ca_i)^2+
+var_Ca__srmax*var_Ca__srkd/(var_Ca__srkd+var_Ca__Ca_i)^2+var_Ca__bmem*
+var_Ca__kmem/(var_Ca__kmem+var_Ca__Ca_i)^2+var_Ca__bsar*var_Ca__ksar/(
+var_Ca__ksar+var_Ca__Ca_i)^2)*(var_Ca__xkon*var_Ca__Ca_i+var_Ca__xkoff)
+"--var_Ca__Ca_i/var_Ca__trops--"
+0
+"--var_Ca__Ca_i/var_ICaL__c1--"
+0
+"--var_Ca__Ca_i/var_ICaL__c2--"
+0
+"--var_Ca__Ca_i/var_ICaL__xi1ba--"
+0
+"--var_Ca__Ca_i/var_ICaL__xi1ca--"
+0
+"--var_Ca__Ca_i/var_ICaL__xi2ba--"
+0
+"--var_Ca__Ca_i/var_ICaL__xi2ca--"
+0
+"--var_Ca__Ca_i/var_Irel__Ca_JSR--"
+0
+"--var_Ca__Ca_i/var_Irel__xir--"
+0
+"--var_Ca__Ca_i/var_Na__Na_i--"
+0
+"--var_Ca__Ca_submem/var_Ca__Ca_NSR--"
+0
+"--var_Ca__Ca_submem/var_Ca__Ca_dyad--"
+0
+"--var_Ca__Ca_submem/var_Ca__Ca_i--"
+-50*delta_t/(1+var_Ca__bcal*var_Ca__xkcal/(var_Ca__xkcal+var_Ca__Ca_submem)^2+
+var_Ca__srmax*var_Ca__srkd/(var_Ca__srkd+var_Ca__Ca_submem)^2+var_Ca__bmem*
+var_Ca__kmem/(var_Ca__kmem+var_Ca__Ca_submem)^2+var_Ca__bsar*var_Ca__ksar/(
+var_Ca__ksar+var_Ca__Ca_submem)^2)/var_Ca__taud
+"--var_Ca__Ca_submem/var_Ca__Ca_submem--"
+1+delta_t/(1+var_Ca__bcal*var_Ca__xkcal/(var_Ca__xkcal+var_Ca__Ca_submem)^2+
+var_Ca__srmax*var_Ca__srkd/(var_Ca__srkd+var_Ca__Ca_submem)^2+var_Ca__bmem*
+var_Ca__kmem/(var_Ca__kmem+var_Ca__Ca_submem)^2+var_Ca__bsar*var_Ca__ksar/(
+var_Ca__ksar+var_Ca__Ca_submem)^2)^2*(50*var_Irel__xir-50*(var_Ca__Ca_submem-
+var_Ca__Ca_i)/var_Ca__taud-50*var_ICaL__gca*(1-var_ICaL__xi1ca-var_ICaL__xi2ca-
+var_ICaL__xi1ba-var_ICaL__xi2ba-var_ICaL__c1-var_ICaL__c2)*`if`(2*abs(
+var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T) < .1e-2,2
+*var_ICaL__pca*var_ICaL__F*(var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o
+),4*var_ICaL__pca*var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(
+var_ICaL__za)-.341*var_ICaL__Ca_o)/(exp(var_ICaL__za)-1))+50*var_INaCa__gNaCa/(
+1+var_INaCa__xkdna^3/var_Ca__Ca_submem^3)*(var_Na__Na_i^3*var_Environment__Ca_o
+*exp(.35*var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T)-\
+1/1000*var_Environment__Na_o^3*var_Ca__Ca_submem*exp(-.65*var_cell__V*
+var_Environment__F/var_Environment__R/var_Environment__T))/(1+.2*exp(-.65*
+var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T))/(
+var_INaCa__xmcao*var_Na__Na_i^3+1/1000*var_INaCa__xmnao^3*var_Ca__Ca_submem+
+var_INaCa__xmnai^3*var_Environment__Ca_o*(1+1/1000*var_Ca__Ca_submem/
+var_INaCa__xmcai)+var_INaCa__xmcai*var_Environment__Na_o^3*(1+var_Na__Na_i^3/
+var_INaCa__xmnai^3)+var_Na__Na_i^3*var_Environment__Ca_o+1/1000*
+var_Environment__Na_o^3*var_Ca__Ca_submem)-var_Ca__xkon*var_Ca__Ca_submem*(
+var_Ca__btrop-var_Ca__trops)+var_Ca__xkoff*var_Ca__trops)*(-2*var_Ca__bcal*
+var_Ca__xkcal/(var_Ca__xkcal+var_Ca__Ca_submem)^3-2*var_Ca__srmax*var_Ca__srkd/
+(var_Ca__srkd+var_Ca__Ca_submem)^3-2*var_Ca__bmem*var_Ca__kmem/(var_Ca__kmem+
+var_Ca__Ca_submem)^3-2*var_Ca__bsar*var_Ca__ksar/(var_Ca__ksar+
+var_Ca__Ca_submem)^3)-delta_t/(1+var_Ca__bcal*var_Ca__xkcal/(var_Ca__xkcal+
+var_Ca__Ca_submem)^2+var_Ca__srmax*var_Ca__srkd/(var_Ca__srkd+var_Ca__Ca_submem
+)^2+var_Ca__bmem*var_Ca__kmem/(var_Ca__kmem+var_Ca__Ca_submem)^2+var_Ca__bsar*
+var_Ca__ksar/(var_Ca__ksar+var_Ca__Ca_submem)^2)*(-50/var_Ca__taud+150*
+var_INaCa__gNaCa/(1+var_INaCa__xkdna^3/var_Ca__Ca_submem^3)^2*(var_Na__Na_i^3*
+var_Environment__Ca_o*exp(.35*var_cell__V*var_Environment__F/var_Environment__R
+/var_Environment__T)-1/1000*var_Environment__Na_o^3*var_Ca__Ca_submem*exp(-.65*
+var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T))/(1+.2*
+exp(-.65*var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T))
+/(var_INaCa__xmcao*var_Na__Na_i^3+1/1000*var_INaCa__xmnao^3*var_Ca__Ca_submem+
+var_INaCa__xmnai^3*var_Environment__Ca_o*(1+1/1000*var_Ca__Ca_submem/
+var_INaCa__xmcai)+var_INaCa__xmcai*var_Environment__Na_o^3*(1+var_Na__Na_i^3/
+var_INaCa__xmnai^3)+var_Na__Na_i^3*var_Environment__Ca_o+1/1000*
+var_Environment__Na_o^3*var_Ca__Ca_submem)*var_INaCa__xkdna^3/var_Ca__Ca_submem
+^4-1/20*var_INaCa__gNaCa/(1+var_INaCa__xkdna^3/var_Ca__Ca_submem^3)*
+var_Environment__Na_o^3*exp(-.65*var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T)/(1+.2*exp(-.65*var_cell__V*
+var_Environment__F/var_Environment__R/var_Environment__T))/(var_INaCa__xmcao*
+var_Na__Na_i^3+1/1000*var_INaCa__xmnao^3*var_Ca__Ca_submem+var_INaCa__xmnai^3*
+var_Environment__Ca_o*(1+1/1000*var_Ca__Ca_submem/var_INaCa__xmcai)+
+var_INaCa__xmcai*var_Environment__Na_o^3*(1+var_Na__Na_i^3/var_INaCa__xmnai^3)+
+var_Na__Na_i^3*var_Environment__Ca_o+1/1000*var_Environment__Na_o^3*
+var_Ca__Ca_submem)-50*var_INaCa__gNaCa/(1+var_INaCa__xkdna^3/var_Ca__Ca_submem^
+3)*(var_Na__Na_i^3*var_Environment__Ca_o*exp(.35*var_cell__V*var_Environment__F
+/var_Environment__R/var_Environment__T)-1/1000*var_Environment__Na_o^3*
+var_Ca__Ca_submem*exp(-.65*var_cell__V*var_Environment__F/var_Environment__R/
+var_Environment__T))/(1+.2*exp(-.65*var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T))/(var_INaCa__xmcao*var_Na__Na_i^3+1/1000
+*var_INaCa__xmnao^3*var_Ca__Ca_submem+var_INaCa__xmnai^3*var_Environment__Ca_o*
+(1+1/1000*var_Ca__Ca_submem/var_INaCa__xmcai)+var_INaCa__xmcai*
+var_Environment__Na_o^3*(1+var_Na__Na_i^3/var_INaCa__xmnai^3)+var_Na__Na_i^3*
+var_Environment__Ca_o+1/1000*var_Environment__Na_o^3*var_Ca__Ca_submem)^2*(1/
+1000*var_INaCa__xmnao^3+1/1000*var_INaCa__xmnai^3*var_Environment__Ca_o/
+var_INaCa__xmcai+1/1000*var_Environment__Na_o^3)-var_Ca__xkon*(var_Ca__btrop-
+var_Ca__trops))
+"--var_Ca__Ca_submem/var_Ca__tropi--"
+0
+"--var_Ca__Ca_submem/var_Ca__trops--"
+-delta_t/(1+var_Ca__bcal*var_Ca__xkcal/(var_Ca__xkcal+var_Ca__Ca_submem)^2+
+var_Ca__srmax*var_Ca__srkd/(var_Ca__srkd+var_Ca__Ca_submem)^2+var_Ca__bmem*
+var_Ca__kmem/(var_Ca__kmem+var_Ca__Ca_submem)^2+var_Ca__bsar*var_Ca__ksar/(
+var_Ca__ksar+var_Ca__Ca_submem)^2)*(var_Ca__xkon*var_Ca__Ca_submem+
+var_Ca__xkoff)
+"--var_Ca__Ca_submem/var_ICaL__c1--"
+-50*delta_t/(1+var_Ca__bcal*var_Ca__xkcal/(var_Ca__xkcal+var_Ca__Ca_submem)^2+
+var_Ca__srmax*var_Ca__srkd/(var_Ca__srkd+var_Ca__Ca_submem)^2+var_Ca__bmem*
+var_Ca__kmem/(var_Ca__kmem+var_Ca__Ca_submem)^2+var_Ca__bsar*var_Ca__ksar/(
+var_Ca__ksar+var_Ca__Ca_submem)^2)*var_ICaL__gca*`if`(2*abs(var_cell__V*
+var_Environment__F/var_Environment__R/var_Environment__T) < .1e-2,2*
+var_ICaL__pca*var_ICaL__F*(var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o)
+,4*var_ICaL__pca*var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(
+var_ICaL__za)-.341*var_ICaL__Ca_o)/(exp(var_ICaL__za)-1))
+"--var_Ca__Ca_submem/var_ICaL__c2--"
+-50*delta_t/(1+var_Ca__bcal*var_Ca__xkcal/(var_Ca__xkcal+var_Ca__Ca_submem)^2+
+var_Ca__srmax*var_Ca__srkd/(var_Ca__srkd+var_Ca__Ca_submem)^2+var_Ca__bmem*
+var_Ca__kmem/(var_Ca__kmem+var_Ca__Ca_submem)^2+var_Ca__bsar*var_Ca__ksar/(
+var_Ca__ksar+var_Ca__Ca_submem)^2)*var_ICaL__gca*`if`(2*abs(var_cell__V*
+var_Environment__F/var_Environment__R/var_Environment__T) < .1e-2,2*
+var_ICaL__pca*var_ICaL__F*(var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o)
+,4*var_ICaL__pca*var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(
+var_ICaL__za)-.341*var_ICaL__Ca_o)/(exp(var_ICaL__za)-1))
+"--var_Ca__Ca_submem/var_ICaL__xi1ba--"
+-50*delta_t/(1+var_Ca__bcal*var_Ca__xkcal/(var_Ca__xkcal+var_Ca__Ca_submem)^2+
+var_Ca__srmax*var_Ca__srkd/(var_Ca__srkd+var_Ca__Ca_submem)^2+var_Ca__bmem*
+var_Ca__kmem/(var_Ca__kmem+var_Ca__Ca_submem)^2+var_Ca__bsar*var_Ca__ksar/(
+var_Ca__ksar+var_Ca__Ca_submem)^2)*var_ICaL__gca*`if`(2*abs(var_cell__V*
+var_Environment__F/var_Environment__R/var_Environment__T) < .1e-2,2*
+var_ICaL__pca*var_ICaL__F*(var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o)
+,4*var_ICaL__pca*var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(
+var_ICaL__za)-.341*var_ICaL__Ca_o)/(exp(var_ICaL__za)-1))
+"--var_Ca__Ca_submem/var_ICaL__xi1ca--"
+-50*delta_t/(1+var_Ca__bcal*var_Ca__xkcal/(var_Ca__xkcal+var_Ca__Ca_submem)^2+
+var_Ca__srmax*var_Ca__srkd/(var_Ca__srkd+var_Ca__Ca_submem)^2+var_Ca__bmem*
+var_Ca__kmem/(var_Ca__kmem+var_Ca__Ca_submem)^2+var_Ca__bsar*var_Ca__ksar/(
+var_Ca__ksar+var_Ca__Ca_submem)^2)*var_ICaL__gca*`if`(2*abs(var_cell__V*
+var_Environment__F/var_Environment__R/var_Environment__T) < .1e-2,2*
+var_ICaL__pca*var_ICaL__F*(var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o)
+,4*var_ICaL__pca*var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(
+var_ICaL__za)-.341*var_ICaL__Ca_o)/(exp(var_ICaL__za)-1))
+"--var_Ca__Ca_submem/var_ICaL__xi2ba--"
+-50*delta_t/(1+var_Ca__bcal*var_Ca__xkcal/(var_Ca__xkcal+var_Ca__Ca_submem)^2+
+var_Ca__srmax*var_Ca__srkd/(var_Ca__srkd+var_Ca__Ca_submem)^2+var_Ca__bmem*
+var_Ca__kmem/(var_Ca__kmem+var_Ca__Ca_submem)^2+var_Ca__bsar*var_Ca__ksar/(
+var_Ca__ksar+var_Ca__Ca_submem)^2)*var_ICaL__gca*`if`(2*abs(var_cell__V*
+var_Environment__F/var_Environment__R/var_Environment__T) < .1e-2,2*
+var_ICaL__pca*var_ICaL__F*(var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o)
+,4*var_ICaL__pca*var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(
+var_ICaL__za)-.341*var_ICaL__Ca_o)/(exp(var_ICaL__za)-1))
+"--var_Ca__Ca_submem/var_ICaL__xi2ca--"
+-50*delta_t/(1+var_Ca__bcal*var_Ca__xkcal/(var_Ca__xkcal+var_Ca__Ca_submem)^2+
+var_Ca__srmax*var_Ca__srkd/(var_Ca__srkd+var_Ca__Ca_submem)^2+var_Ca__bmem*
+var_Ca__kmem/(var_Ca__kmem+var_Ca__Ca_submem)^2+var_Ca__bsar*var_Ca__ksar/(
+var_Ca__ksar+var_Ca__Ca_submem)^2)*var_ICaL__gca*`if`(2*abs(var_cell__V*
+var_Environment__F/var_Environment__R/var_Environment__T) < .1e-2,2*
+var_ICaL__pca*var_ICaL__F*(var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o)
+,4*var_ICaL__pca*var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(
+var_ICaL__za)-.341*var_ICaL__Ca_o)/(exp(var_ICaL__za)-1))
+"--var_Ca__Ca_submem/var_Irel__Ca_JSR--"
+0
+"--var_Ca__Ca_submem/var_Irel__xir--"
+-50*delta_t/(1+var_Ca__bcal*var_Ca__xkcal/(var_Ca__xkcal+var_Ca__Ca_submem)^2+
+var_Ca__srmax*var_Ca__srkd/(var_Ca__srkd+var_Ca__Ca_submem)^2+var_Ca__bmem*
+var_Ca__kmem/(var_Ca__kmem+var_Ca__Ca_submem)^2+var_Ca__bsar*var_Ca__ksar/(
+var_Ca__ksar+var_Ca__Ca_submem)^2)
+"--var_Ca__Ca_submem/var_Na__Na_i--"
+-delta_t/(1+var_Ca__bcal*var_Ca__xkcal/(var_Ca__xkcal+var_Ca__Ca_submem)^2+
+var_Ca__srmax*var_Ca__srkd/(var_Ca__srkd+var_Ca__Ca_submem)^2+var_Ca__bmem*
+var_Ca__kmem/(var_Ca__kmem+var_Ca__Ca_submem)^2+var_Ca__bsar*var_Ca__ksar/(
+var_Ca__ksar+var_Ca__Ca_submem)^2)*(150*var_INaCa__gNaCa/(1+var_INaCa__xkdna^3/
+var_Ca__Ca_submem^3)*var_Na__Na_i^2*var_Environment__Ca_o*exp(.35*var_cell__V*
+var_Environment__F/var_Environment__R/var_Environment__T)/(1+.2*exp(-.65*
+var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T))/(
+var_INaCa__xmcao*var_Na__Na_i^3+1/1000*var_INaCa__xmnao^3*var_Ca__Ca_submem+
+var_INaCa__xmnai^3*var_Environment__Ca_o*(1+1/1000*var_Ca__Ca_submem/
+var_INaCa__xmcai)+var_INaCa__xmcai*var_Environment__Na_o^3*(1+var_Na__Na_i^3/
+var_INaCa__xmnai^3)+var_Na__Na_i^3*var_Environment__Ca_o+1/1000*
+var_Environment__Na_o^3*var_Ca__Ca_submem)-50*var_INaCa__gNaCa/(1+
+var_INaCa__xkdna^3/var_Ca__Ca_submem^3)*(var_Na__Na_i^3*var_Environment__Ca_o*
+exp(.35*var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T)-1
+/1000*var_Environment__Na_o^3*var_Ca__Ca_submem*exp(-.65*var_cell__V*
+var_Environment__F/var_Environment__R/var_Environment__T))/(1+.2*exp(-.65*
+var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T))/(
+var_INaCa__xmcao*var_Na__Na_i^3+1/1000*var_INaCa__xmnao^3*var_Ca__Ca_submem+
+var_INaCa__xmnai^3*var_Environment__Ca_o*(1+1/1000*var_Ca__Ca_submem/
+var_INaCa__xmcai)+var_INaCa__xmcai*var_Environment__Na_o^3*(1+var_Na__Na_i^3/
+var_INaCa__xmnai^3)+var_Na__Na_i^3*var_Environment__Ca_o+1/1000*
+var_Environment__Na_o^3*var_Ca__Ca_submem)^2*(3*var_INaCa__xmcao*var_Na__Na_i^2
++3*var_INaCa__xmcai*var_Environment__Na_o^3*var_Na__Na_i^2/var_INaCa__xmnai^3+3
+*var_Na__Na_i^2*var_Environment__Ca_o))
+"--var_Ca__tropi/var_Ca__Ca_NSR--"
+0
+"--var_Ca__tropi/var_Ca__Ca_dyad--"
+0
+"--var_Ca__tropi/var_Ca__Ca_i--"
+-delta_t*var_Ca__xkon*(var_Ca__btrop-var_Ca__tropi)
+"--var_Ca__tropi/var_Ca__Ca_submem--"
+0
+"--var_Ca__tropi/var_Ca__tropi--"
+1-delta_t*(-var_Ca__xkon*var_Ca__Ca_i-var_Ca__xkoff)
+"--var_Ca__tropi/var_Ca__trops--"
+0
+"--var_Ca__tropi/var_ICaL__c1--"
+0
+"--var_Ca__tropi/var_ICaL__c2--"
+0
+"--var_Ca__tropi/var_ICaL__xi1ba--"
+0
+"--var_Ca__tropi/var_ICaL__xi1ca--"
+0
+"--var_Ca__tropi/var_ICaL__xi2ba--"
+0
+"--var_Ca__tropi/var_ICaL__xi2ca--"
+0
+"--var_Ca__tropi/var_Irel__Ca_JSR--"
+0
+"--var_Ca__tropi/var_Irel__xir--"
+0
+"--var_Ca__tropi/var_Na__Na_i--"
+0
+"--var_Ca__trops/var_Ca__Ca_NSR--"
+0
+"--var_Ca__trops/var_Ca__Ca_dyad--"
+0
+"--var_Ca__trops/var_Ca__Ca_i--"
+0
+"--var_Ca__trops/var_Ca__Ca_submem--"
+-delta_t*var_Ca__xkon*(var_Ca__btrop-var_Ca__trops)
+"--var_Ca__trops/var_Ca__tropi--"
+0
+"--var_Ca__trops/var_Ca__trops--"
+1-delta_t*(-var_Ca__xkon*var_Ca__Ca_submem-var_Ca__xkoff)
+"--var_Ca__trops/var_ICaL__c1--"
+0
+"--var_Ca__trops/var_ICaL__c2--"
+0
+"--var_Ca__trops/var_ICaL__xi1ba--"
+0
+"--var_Ca__trops/var_ICaL__xi1ca--"
+0
+"--var_Ca__trops/var_ICaL__xi2ba--"
+0
+"--var_Ca__trops/var_ICaL__xi2ca--"
+0
+"--var_Ca__trops/var_Irel__Ca_JSR--"
+0
+"--var_Ca__trops/var_Irel__xir--"
+0
+"--var_Ca__trops/var_Na__Na_i--"
+0
+"--var_ICaL__c1/var_Ca__Ca_NSR--"
+0
+"--var_ICaL__c1/var_Ca__Ca_dyad--"
+.72504e-1*delta_t/(1+var_ICaL__cat^3/var_Ca__Ca_dyad^3)^2*var_ICaL__cat^3/
+var_Ca__Ca_dyad^4*var_ICaL__c1
+"--var_ICaL__c1/var_Ca__Ca_i--"
+0
+"--var_ICaL__c1/var_Ca__Ca_submem--"
+0
+"--var_ICaL__c1/var_Ca__tropi--"
+0
+"--var_ICaL__c1/var_Ca__trops--"
+0
+"--var_ICaL__c1/var_ICaL__c1--"
+1-delta_t*(-var_ICaL__r2-(1-1/(1+exp((-var_cell__V+var_ICaL__vth)/var_ICaL__s6)
+))/var_ICaL__taupo-var_ICaL__r1-var_ICaL__k1t-.24168e-1/(1+var_ICaL__cat^3/
+var_Ca__Ca_dyad^3))
+"--var_ICaL__c1/var_ICaL__c2--"
+-delta_t*(1/(1+exp((-var_cell__V+var_ICaL__vth)/var_ICaL__s6))/var_ICaL__taupo-
+var_ICaL__r2)
+"--var_ICaL__c1/var_ICaL__xi1ba--"
+-delta_t*(var_ICaL__k2t-var_ICaL__r2)
+"--var_ICaL__c1/var_ICaL__xi1ca--"
+-delta_t*(var_ICaL__k2-var_ICaL__r2)
+"--var_ICaL__c1/var_ICaL__xi2ba--"
+delta_t*var_ICaL__r2
+"--var_ICaL__c1/var_ICaL__xi2ca--"
+delta_t*var_ICaL__r2
+"--var_ICaL__c1/var_Irel__Ca_JSR--"
+0
+"--var_ICaL__c1/var_Irel__xir--"
+0
+"--var_ICaL__c1/var_Na__Na_i--"
+0
+"--var_ICaL__c2/var_Ca__Ca_NSR--"
+0
+"--var_ICaL__c2/var_Ca__Ca_dyad--"
+-delta_t*(
+  -(
+    1-1/(
+      1+exp(
+        (
+          -var_cell__V+var_ICaL__vyr
+        )/var_ICaL__syr
+      )
+    )
+  )/(
+    (
+      9.9+4954*exp(
+        .6410256410e-1*var_cell__V
+      )-var_ICaL__tca/(
+        1+var_Ca__Ca_dyad^4/var_ICaL__cpt^4
+      )
+    )*(
+      1-1/(
+        1+exp(
+          (
+            -var_cell__V+var_ICaL__vy
+          )/var_ICaL__sy
+        )
+      )
+    )+var_ICaL__tca/(
+      1+var_Ca__Ca_dyad^4/var_ICaL__cpt^4
+    )+.1
+  )^2*var_ICaL__xi2ca*(
+    4*var_ICaL__tca/(
+      1+var_Ca__Ca_dyad^4/var_ICaL__cpt^4
+    )^2*var_Ca__Ca_dyad^3/var_ICaL__cpt^4*(
+      1-1/(
+        1+exp(
+          (
+            -var_cell__V+var_ICaL__vy
+          )/var_ICaL__sy
+        )
+      )
+    )-4*var_ICaL__tca/(
+      1+var_Ca__Ca_dyad^4/var_ICaL__cpt^4
+    )^2*var_Ca__Ca_dyad^3/var_ICaL__cpt^4
+  )-(
+    3/(
+      1+var_ICaL__cat^3/var_Ca__Ca_dyad^3
+    )^2/(
+      1+exp(
+        (
+          -var_cell__V+var_ICaL__vyr
+        )/var_ICaL__syr
+      )
+    )/(
+      (
+        9.9+4954*exp(
+          .6410256410e-1*var_cell__V
+        )-var_ICaL__tca/(
+          1+var_Ca__Ca_dyad^4/var_ICaL__cpt^4
+        )
+      )*(
+        1-1/(
+          1+exp(
+            (
+              -var_cell__V+var_ICaL__vy
+            )/var_ICaL__sy
+          )
+        )
+      )+var_ICaL__tca/(
+        1+var_Ca__Ca_dyad^4/var_ICaL__cpt^4
+      )+.1
+    )*var_ICaL__cat^3/var_Ca__Ca_dyad^4-1/(
+      1+var_ICaL__cat^3/var_Ca__Ca_dyad^3
+    )/(
+      1+exp(
+        (
+          -var_cell__V+var_ICaL__vyr
+        )/var_ICaL__syr
+      )
+    )/(
+      (
+        9.9+4954*exp(
+          .6410256410e-1*var_cell__V
+        )-var_ICaL__tca/(
+          1+var_Ca__Ca_dyad^4/var_ICaL__cpt^4
+        )
+      )*(
+        1-1/(
+          1+exp(
+            (
+              -var_cell__V+var_ICaL__vy
+            )/var_ICaL__sy
+          )
+        )
+      )+var_ICaL__tca/(
+        1+var_Ca__Ca_dyad^4/var_ICaL__cpt^4
+      )+.1
+    )^2*(
+      4*var_ICaL__tca/(
+        1+var_Ca__Ca_dyad^4/var_ICaL__cpt^4
+      )^2*var_Ca__Ca_dyad^3/var_ICaL__cpt^4*(
+        1-1/(
+          1+exp(
+            (
+              -var_cell__V+var_ICaL__vy
+            )/var_ICaL__sy
+          )
+        )
+      )-4*var_ICaL__tca/(
+        1+var_Ca__Ca_dyad^4/var_ICaL__cpt^4
+      )^2*var_Ca__Ca_dyad^3/var_ICaL__cpt^4
+    )
+  )*var_ICaL__c2
+)
+"--var_ICaL__c2/var_Ca__Ca_i--"
+0
+"--var_ICaL__c2/var_Ca__Ca_submem--"
+0
+"--var_ICaL__c2/var_Ca__tropi--"
+0
+"--var_ICaL__c2/var_Ca__trops--"
+0
+"--var_ICaL__c2/var_ICaL__c1--"
+-delta_t*(1-1/(1+exp((-var_cell__V+var_ICaL__vth)/var_ICaL__s6)))/
+var_ICaL__taupo
+"--var_ICaL__c2/var_ICaL__c2--"
+1-delta_t*(-1/(1+var_ICaL__cat^3/var_Ca__Ca_dyad^3)/(1+exp((-var_cell__V+
+var_ICaL__vyr)/var_ICaL__syr))/((9.9+4954*exp(.6410256410e-1*var_cell__V)-
+var_ICaL__tca/(1+var_Ca__Ca_dyad^4/var_ICaL__cpt^4))*(1-1/(1+exp((-var_cell__V+
+var_ICaL__vy)/var_ICaL__sy)))+var_ICaL__tca/(1+var_Ca__Ca_dyad^4/var_ICaL__cpt^
+4)+.1)-1/(1+exp((-var_cell__V+var_ICaL__vyr)/var_ICaL__syr))/((-440+4954*exp(.\
+6410256410e-1*var_cell__V))*(1-1/(1+exp((-var_cell__V+var_ICaL__vy)/
+var_ICaL__sy)))+450)-1/(1+exp((-var_cell__V+var_ICaL__vth)/var_ICaL__s6))/
+var_ICaL__taupo)
+"--var_ICaL__c2/var_ICaL__xi1ba--"
+0
+"--var_ICaL__c2/var_ICaL__xi1ca--"
+0
+"--var_ICaL__c2/var_ICaL__xi2ba--"
+-delta_t*(1-1/(1+exp((-var_cell__V+var_ICaL__vyr)/var_ICaL__syr)))/((-440+4954*
+exp(.6410256410e-1*var_cell__V))*(1-1/(1+exp((-var_cell__V+var_ICaL__vy)/
+var_ICaL__sy)))+450)
+"--var_ICaL__c2/var_ICaL__xi2ca--"
+-delta_t*(1-1/(1+exp((-var_cell__V+var_ICaL__vyr)/var_ICaL__syr)))/((9.9+4954*
+exp(.6410256410e-1*var_cell__V)-var_ICaL__tca/(1+var_Ca__Ca_dyad^4/
+var_ICaL__cpt^4))*(1-1/(1+exp((-var_cell__V+var_ICaL__vy)/var_ICaL__sy)))+
+var_ICaL__tca/(1+var_Ca__Ca_dyad^4/var_ICaL__cpt^4)+.1)
+"--var_ICaL__c2/var_Irel__Ca_JSR--"
+0
+"--var_ICaL__c2/var_Irel__xir--"
+0
+"--var_ICaL__c2/var_Na__Na_i--"
+0
+"--var_ICaL__xi1ba/var_Ca__Ca_NSR--"
+0
+"--var_ICaL__xi1ba/var_Ca__Ca_dyad--"
+0
+"--var_ICaL__xi1ba/var_Ca__Ca_i--"
+0
+"--var_ICaL__xi1ba/var_Ca__Ca_submem--"
+0
+"--var_ICaL__xi1ba/var_Ca__tropi--"
+0
+"--var_ICaL__xi1ba/var_Ca__trops--"
+0
+"--var_ICaL__xi1ba/var_ICaL__c1--"
+-delta_t*(var_ICaL__k1t-var_ICaL__s1t)
+"--var_ICaL__xi1ba/var_ICaL__c2--"
+delta_t*var_ICaL__s1t
+"--var_ICaL__xi1ba/var_ICaL__xi1ba--"
+1-delta_t*(-var_ICaL__s1t-(1-1/(1+exp((-var_cell__V+var_ICaL__vx)/var_ICaL__sx)
+))/var_ICaL__tau3-var_ICaL__k2t-var_ICaL__s1t*var_ICaL__r1/var_ICaL__r2*
+var_ICaL__k2t/var_ICaL__k1t)
+"--var_ICaL__xi1ba/var_ICaL__xi1ca--"
+delta_t*var_ICaL__s1t
+"--var_ICaL__xi1ba/var_ICaL__xi2ba--"
+-delta_t*((1-1/(1+exp((-var_cell__V+var_ICaL__vx)/var_ICaL__sx)))/
+var_ICaL__tau3/(1+exp((-var_cell__V+var_ICaL__vth)/var_ICaL__s6))/(1-1/(1+exp((
+-var_cell__V+var_ICaL__vth)/var_ICaL__s6)))*var_ICaL__k1t/var_ICaL__k2t*(1-1/(1
++exp((-var_cell__V+var_ICaL__vyr)/var_ICaL__syr)))*(1+exp((-var_cell__V+
+var_ICaL__vyr)/var_ICaL__syr))-var_ICaL__s1t)
+"--var_ICaL__xi1ba/var_ICaL__xi2ca--"
+delta_t*var_ICaL__s1t
+"--var_ICaL__xi1ba/var_Irel__Ca_JSR--"
+0
+"--var_ICaL__xi1ba/var_Irel__xir--"
+0
+"--var_ICaL__xi1ba/var_Na__Na_i--"
+0
+"--var_ICaL__xi1ca/var_Ca__Ca_NSR--"
+0
+"--var_ICaL__xi1ca/var_Ca__Ca_dyad--"
+-delta_t*(.72504e-1/(1+var_ICaL__cat^3/var_Ca__Ca_dyad^3)^2*var_ICaL__cat^3/
+var_Ca__Ca_dyad^4*var_ICaL__c1+.548064e-1/(1+var_ICaL__cat^3/var_Ca__Ca_dyad^3)
+^2*(1-var_ICaL__xi1ca-var_ICaL__xi2ca-var_ICaL__xi1ba-var_ICaL__xi2ba-
+var_ICaL__c1-var_ICaL__c2)*var_ICaL__cat^3/var_Ca__Ca_dyad^4)
+"--var_ICaL__xi1ca/var_Ca__Ca_i--"
+0
+"--var_ICaL__xi1ca/var_Ca__Ca_submem--"
+0
+"--var_ICaL__xi1ca/var_Ca__tropi--"
+0
+"--var_ICaL__xi1ca/var_Ca__trops--"
+0
+"--var_ICaL__xi1ca/var_ICaL__c1--"
+-.58992e-2*delta_t/(1+var_ICaL__cat^3/var_Ca__Ca_dyad^3)
+"--var_ICaL__xi1ca/var_ICaL__c2--"
+.182688e-1*delta_t/(1+var_ICaL__cat^3/var_Ca__Ca_dyad^3)
+"--var_ICaL__xi1ca/var_ICaL__xi1ba--"
+.182688e-1*delta_t/(1+var_ICaL__cat^3/var_Ca__Ca_dyad^3)
+"--var_ICaL__xi1ca/var_ICaL__xi1ca--"
+1-delta_t*(-.182688e-1/(1+var_ICaL__cat^3/var_Ca__Ca_dyad^3)-(1-1/(1+exp((-
+var_cell__V+var_ICaL__vx)/var_ICaL__sx)))/var_ICaL__tau3-var_ICaL__k2-.75590863\
+95*var_ICaL__r1/var_ICaL__r2*var_ICaL__k2)
+"--var_ICaL__xi1ca/var_ICaL__xi2ba--"
+.182688e-1*delta_t/(1+var_ICaL__cat^3/var_Ca__Ca_dyad^3)
+"--var_ICaL__xi1ca/var_ICaL__xi2ca--"
+-delta_t*(.24168e-1*(1-1/(1+exp((-var_cell__V+var_ICaL__vx)/var_ICaL__sx)))/
+var_ICaL__tau3/(1+exp((-var_cell__V+var_ICaL__vth)/var_ICaL__s6))/(1-1/(1+exp((
+-var_cell__V+var_ICaL__vth)/var_ICaL__s6)))/var_ICaL__k2*(1-1/(1+exp((-
+var_cell__V+var_ICaL__vyr)/var_ICaL__syr)))*(1+exp((-var_cell__V+var_ICaL__vyr)
+/var_ICaL__syr))-.182688e-1/(1+var_ICaL__cat^3/var_Ca__Ca_dyad^3))
+"--var_ICaL__xi1ca/var_Irel__Ca_JSR--"
+0
+"--var_ICaL__xi1ca/var_Irel__xir--"
+0
+"--var_ICaL__xi1ca/var_Na__Na_i--"
+0
+"--var_ICaL__xi2ba/var_Ca__Ca_NSR--"
+0
+"--var_ICaL__xi2ba/var_Ca__Ca_dyad--"
+0
+"--var_ICaL__xi2ba/var_Ca__Ca_i--"
+0
+"--var_ICaL__xi2ba/var_Ca__Ca_submem--"
+0
+"--var_ICaL__xi2ba/var_Ca__tropi--"
+0
+"--var_ICaL__xi2ba/var_Ca__trops--"
+0
+"--var_ICaL__xi2ba/var_ICaL__c1--"
+0
+"--var_ICaL__xi2ba/var_ICaL__c2--"
+-delta_t/(1+exp((-var_cell__V+var_ICaL__vyr)/var_ICaL__syr))/((-440+4954*exp(.\
+6410256410e-1*var_cell__V))*(1-1/(1+exp((-var_cell__V+var_ICaL__vy)/
+var_ICaL__sy)))+450)
+"--var_ICaL__xi2ba/var_ICaL__xi1ba--"
+-delta_t*(1-1/(1+exp((-var_cell__V+var_ICaL__vx)/var_ICaL__sx)))/var_ICaL__tau3
+"--var_ICaL__xi2ba/var_ICaL__xi1ca--"
+0
+"--var_ICaL__xi2ba/var_ICaL__xi2ba--"
+1-delta_t*(-(1-1/(1+exp((-var_cell__V+var_ICaL__vyr)/var_ICaL__syr)))/((-440+
+4954*exp(.6410256410e-1*var_cell__V))*(1-1/(1+exp((-var_cell__V+var_ICaL__vy)/
+var_ICaL__sy)))+450)-(1-1/(1+exp((-var_cell__V+var_ICaL__vx)/var_ICaL__sx)))/
+var_ICaL__tau3/(1+exp((-var_cell__V+var_ICaL__vth)/var_ICaL__s6))/(1-1/(1+exp((
+-var_cell__V+var_ICaL__vth)/var_ICaL__s6)))*var_ICaL__k1t/var_ICaL__k2t*(1-1/(1
++exp((-var_cell__V+var_ICaL__vyr)/var_ICaL__syr)))*(1+exp((-var_cell__V+
+var_ICaL__vyr)/var_ICaL__syr)))
+"--var_ICaL__xi2ba/var_ICaL__xi2ca--"
+0
+"--var_ICaL__xi2ba/var_Irel__Ca_JSR--"
+0
+"--var_ICaL__xi2ba/var_Irel__xir--"
+0
+"--var_ICaL__xi2ba/var_Na__Na_i--"
+0
+"--var_ICaL__xi2ca/var_Ca__Ca_NSR--"
+0
+"--var_ICaL__xi2ca/var_Ca__Ca_dyad--"
+-delta_t*(3/(1+var_ICaL__cat^3/var_Ca__Ca_dyad^3)^2/(1+exp((-var_cell__V+
+var_ICaL__vyr)/var_ICaL__syr))/((9.9+4954*exp(.6410256410e-1*var_cell__V)-
+var_ICaL__tca/(1+var_Ca__Ca_dyad^4/var_ICaL__cpt^4))*(1-1/(1+exp((-var_cell__V+
+var_ICaL__vy)/var_ICaL__sy)))+var_ICaL__tca/(1+var_Ca__Ca_dyad^4/var_ICaL__cpt^
+4)+.1)*var_ICaL__c2*var_ICaL__cat^3/var_Ca__Ca_dyad^4-1/(1+var_ICaL__cat^3/
+var_Ca__Ca_dyad^3)/(1+exp((-var_cell__V+var_ICaL__vyr)/var_ICaL__syr))/((9.9+
+4954*exp(.6410256410e-1*var_cell__V)-var_ICaL__tca/(1+var_Ca__Ca_dyad^4/
+var_ICaL__cpt^4))*(1-1/(1+exp((-var_cell__V+var_ICaL__vy)/var_ICaL__sy)))+
+var_ICaL__tca/(1+var_Ca__Ca_dyad^4/var_ICaL__cpt^4)+.1)^2*var_ICaL__c2*(4*
+var_ICaL__tca/(1+var_Ca__Ca_dyad^4/var_ICaL__cpt^4)^2*var_Ca__Ca_dyad^3/
+var_ICaL__cpt^4*(1-1/(1+exp((-var_cell__V+var_ICaL__vy)/var_ICaL__sy)))-4*
+var_ICaL__tca/(1+var_Ca__Ca_dyad^4/var_ICaL__cpt^4)^2*var_Ca__Ca_dyad^3/
+var_ICaL__cpt^4)+(1-1/(1+exp((-var_cell__V+var_ICaL__vyr)/var_ICaL__syr)))/((9.\
+9+4954*exp(.6410256410e-1*var_cell__V)-var_ICaL__tca/(1+var_Ca__Ca_dyad^4/
+var_ICaL__cpt^4))*(1-1/(1+exp((-var_cell__V+var_ICaL__vy)/var_ICaL__sy)))+
+var_ICaL__tca/(1+var_Ca__Ca_dyad^4/var_ICaL__cpt^4)+.1)^2*var_ICaL__xi2ca*(4*
+var_ICaL__tca/(1+var_Ca__Ca_dyad^4/var_ICaL__cpt^4)^2*var_Ca__Ca_dyad^3/
+var_ICaL__cpt^4*(1-1/(1+exp((-var_cell__V+var_ICaL__vy)/var_ICaL__sy)))-4*
+var_ICaL__tca/(1+var_Ca__Ca_dyad^4/var_ICaL__cpt^4)^2*var_Ca__Ca_dyad^3/
+var_ICaL__cpt^4))
+"--var_ICaL__xi2ca/var_Ca__Ca_i--"
+0
+"--var_ICaL__xi2ca/var_Ca__Ca_submem--"
+0
+"--var_ICaL__xi2ca/var_Ca__tropi--"
+0
+"--var_ICaL__xi2ca/var_Ca__trops--"
+0
+"--var_ICaL__xi2ca/var_ICaL__c1--"
+0
+"--var_ICaL__xi2ca/var_ICaL__c2--"
+-delta_t/(1+var_ICaL__cat^3/var_Ca__Ca_dyad^3)/(1+exp((-var_cell__V+
+var_ICaL__vyr)/var_ICaL__syr))/((9.9+4954*exp(.6410256410e-1*var_cell__V)-
+var_ICaL__tca/(1+var_Ca__Ca_dyad^4/var_ICaL__cpt^4))*(1-1/(1+exp((-var_cell__V+
+var_ICaL__vy)/var_ICaL__sy)))+var_ICaL__tca/(1+var_Ca__Ca_dyad^4/var_ICaL__cpt^
+4)+.1)
+"--var_ICaL__xi2ca/var_ICaL__xi1ba--"
+0
+"--var_ICaL__xi2ca/var_ICaL__xi1ca--"
+-delta_t*(1-1/(1+exp((-var_cell__V+var_ICaL__vx)/var_ICaL__sx)))/var_ICaL__tau3
+"--var_ICaL__xi2ca/var_ICaL__xi2ba--"
+0
+"--var_ICaL__xi2ca/var_ICaL__xi2ca--"
+1-delta_t*(-(1-1/(1+exp((-var_cell__V+var_ICaL__vyr)/var_ICaL__syr)))/((9.9+
+4954*exp(.6410256410e-1*var_cell__V)-var_ICaL__tca/(1+var_Ca__Ca_dyad^4/
+var_ICaL__cpt^4))*(1-1/(1+exp((-var_cell__V+var_ICaL__vy)/var_ICaL__sy)))+
+var_ICaL__tca/(1+var_Ca__Ca_dyad^4/var_ICaL__cpt^4)+.1)-.24168e-1*(1-1/(1+exp((
+-var_cell__V+var_ICaL__vx)/var_ICaL__sx)))/var_ICaL__tau3/(1+exp((-var_cell__V+
+var_ICaL__vth)/var_ICaL__s6))/(1-1/(1+exp((-var_cell__V+var_ICaL__vth)/
+var_ICaL__s6)))/var_ICaL__k2*(1-1/(1+exp((-var_cell__V+var_ICaL__vyr)/
+var_ICaL__syr)))*(1+exp((-var_cell__V+var_ICaL__vyr)/var_ICaL__syr)))
+"--var_ICaL__xi2ca/var_Irel__Ca_JSR--"
+0
+"--var_ICaL__xi2ca/var_Irel__xir--"
+0
+"--var_ICaL__xi2ca/var_Na__Na_i--"
+0
+"--var_Irel__Ca_JSR/var_Ca__Ca_NSR--"
+-delta_t/var_Irel__taua
+"--var_Irel__Ca_JSR/var_Ca__Ca_dyad--"
+0
+"--var_Irel__Ca_JSR/var_Ca__Ca_i--"
+0
+"--var_Irel__Ca_JSR/var_Ca__Ca_submem--"
+0
+"--var_Irel__Ca_JSR/var_Ca__tropi--"
+0
+"--var_Irel__Ca_JSR/var_Ca__trops--"
+0
+"--var_Irel__Ca_JSR/var_ICaL__c1--"
+0
+"--var_Irel__Ca_JSR/var_ICaL__c2--"
+0
+"--var_Irel__Ca_JSR/var_ICaL__xi1ba--"
+0
+"--var_Irel__Ca_JSR/var_ICaL__xi1ca--"
+0
+"--var_Irel__Ca_JSR/var_ICaL__xi2ba--"
+0
+"--var_Irel__Ca_JSR/var_ICaL__xi2ca--"
+0
+"--var_Irel__Ca_JSR/var_Irel__Ca_JSR--"
+1+delta_t/var_Irel__taua
+"--var_Irel__Ca_JSR/var_Irel__xir--"
+0
+"--var_Irel__Ca_JSR/var_Na__Na_i--"
+0
+"--var_Irel__xir/var_Ca__Ca_NSR--"
+-delta_t*(var_Irel__gryr*(1-var_ICaL__xi1ca-var_ICaL__xi2ca-var_ICaL__xi1ba-
+var_ICaL__xi2ba-var_ICaL__c1-var_ICaL__c2)*abs(`if`(2*abs(var_cell__V*
+var_Environment__F/var_Environment__R/var_Environment__T) < .1e-2,2*
+var_ICaL__pca*var_ICaL__F*(var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o)
+,4*var_ICaL__pca*var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(
+var_ICaL__za)-.341*var_ICaL__Ca_o)/(exp(var_ICaL__za)-1)))*exp(-var_Irel__ay*(
+var_cell__V+30))/(1+exp(-var_Irel__ay*(var_cell__V+30)))*`if`(50 < 
+var_Irel__Ca_JSR and var_Irel__Ca_JSR < var_Irel__cstar,var_Irel__Ca_JSR-50,
+`if`(var_Irel__cstar <= var_Irel__Ca_JSR,var_Irel__av*var_Irel__Ca_JSR+
+var_Irel__bv,0))/var_Irel__cstar-var_Irel__xir*(-var_Irel__taur*(-2*
+var_Ileak_Iup_Ixfer__gleak*var_Ca__Ca_NSR/(var_Ca__Ca_NSR^2+
+var_Ileak_Iup_Ixfer__kj^2)*(16.667*var_Ca__Ca_NSR-var_Ca__Ca_i)+2*
+var_Ileak_Iup_Ixfer__gleak*var_Ca__Ca_NSR^3/(var_Ca__Ca_NSR^2+
+var_Ileak_Iup_Ixfer__kj^2)^2*(16.667*var_Ca__Ca_NSR-var_Ca__Ca_i)-16.667*
+var_Ileak_Iup_Ixfer__gleak*var_Ca__Ca_NSR^2/(var_Ca__Ca_NSR^2+
+var_Ileak_Iup_Ixfer__kj^2))/var_Ca__Ca_NSR+var_Irel__taur*(-var_Irel__xir+
+var_Ileak_Iup_Ixfer__vup*var_Ca__Ca_i^2/(var_Ca__Ca_i^2+
+var_Ileak_Iup_Ixfer__cup^2)-var_Ileak_Iup_Ixfer__gleak*var_Ca__Ca_NSR^2/(
+var_Ca__Ca_NSR^2+var_Ileak_Iup_Ixfer__kj^2)*(16.667*var_Ca__Ca_NSR-var_Ca__Ca_i
+))/var_Ca__Ca_NSR^2)/var_Irel__taur)
+"--var_Irel__xir/var_Ca__Ca_dyad--"
+0
+"--var_Irel__xir/var_Ca__Ca_i--"
+-delta_t*var_Irel__xir*(2*var_Ileak_Iup_Ixfer__vup*var_Ca__Ca_i/(var_Ca__Ca_i^2
++var_Ileak_Iup_Ixfer__cup^2)-2*var_Ileak_Iup_Ixfer__vup*var_Ca__Ca_i^3/(
+var_Ca__Ca_i^2+var_Ileak_Iup_Ixfer__cup^2)^2+var_Ileak_Iup_Ixfer__gleak*
+var_Ca__Ca_NSR^2/(var_Ca__Ca_NSR^2+var_Ileak_Iup_Ixfer__kj^2))/var_Ca__Ca_NSR
+"--var_Irel__xir/var_Ca__Ca_submem--"
+0
+"--var_Irel__xir/var_Ca__tropi--"
+0
+"--var_Irel__xir/var_Ca__trops--"
+0
+"--var_Irel__xir/var_ICaL__c1--"
+delta_t*var_Irel__gryr*abs(`if`(2*abs(var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T) < .1e-2,2*var_ICaL__pca*var_ICaL__F*(
+var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o),4*var_ICaL__pca*
+var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(var_ICaL__za)-.341*
+var_ICaL__Ca_o)/(exp(var_ICaL__za)-1)))*exp(-var_Irel__ay*(var_cell__V+30))/(1+
+exp(-var_Irel__ay*(var_cell__V+30)))*var_Ca__Ca_NSR*`if`(50 < var_Irel__Ca_JSR
+and var_Irel__Ca_JSR < var_Irel__cstar,var_Irel__Ca_JSR-50,`if`(var_Irel__cstar
+<= var_Irel__Ca_JSR,var_Irel__av*var_Irel__Ca_JSR+var_Irel__bv,0))/
+var_Irel__cstar
+"--var_Irel__xir/var_ICaL__c2--"
+delta_t*var_Irel__gryr*abs(`if`(2*abs(var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T) < .1e-2,2*var_ICaL__pca*var_ICaL__F*(
+var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o),4*var_ICaL__pca*
+var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(var_ICaL__za)-.341*
+var_ICaL__Ca_o)/(exp(var_ICaL__za)-1)))*exp(-var_Irel__ay*(var_cell__V+30))/(1+
+exp(-var_Irel__ay*(var_cell__V+30)))*var_Ca__Ca_NSR*`if`(50 < var_Irel__Ca_JSR
+and var_Irel__Ca_JSR < var_Irel__cstar,var_Irel__Ca_JSR-50,`if`(var_Irel__cstar
+<= var_Irel__Ca_JSR,var_Irel__av*var_Irel__Ca_JSR+var_Irel__bv,0))/
+var_Irel__cstar
+"--var_Irel__xir/var_ICaL__xi1ba--"
+delta_t*var_Irel__gryr*abs(`if`(2*abs(var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T) < .1e-2,2*var_ICaL__pca*var_ICaL__F*(
+var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o),4*var_ICaL__pca*
+var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(var_ICaL__za)-.341*
+var_ICaL__Ca_o)/(exp(var_ICaL__za)-1)))*exp(-var_Irel__ay*(var_cell__V+30))/(1+
+exp(-var_Irel__ay*(var_cell__V+30)))*var_Ca__Ca_NSR*`if`(50 < var_Irel__Ca_JSR
+and var_Irel__Ca_JSR < var_Irel__cstar,var_Irel__Ca_JSR-50,`if`(var_Irel__cstar
+<= var_Irel__Ca_JSR,var_Irel__av*var_Irel__Ca_JSR+var_Irel__bv,0))/
+var_Irel__cstar
+"--var_Irel__xir/var_ICaL__xi1ca--"
+delta_t*var_Irel__gryr*abs(`if`(2*abs(var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T) < .1e-2,2*var_ICaL__pca*var_ICaL__F*(
+var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o),4*var_ICaL__pca*
+var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(var_ICaL__za)-.341*
+var_ICaL__Ca_o)/(exp(var_ICaL__za)-1)))*exp(-var_Irel__ay*(var_cell__V+30))/(1+
+exp(-var_Irel__ay*(var_cell__V+30)))*var_Ca__Ca_NSR*`if`(50 < var_Irel__Ca_JSR
+and var_Irel__Ca_JSR < var_Irel__cstar,var_Irel__Ca_JSR-50,`if`(var_Irel__cstar
+<= var_Irel__Ca_JSR,var_Irel__av*var_Irel__Ca_JSR+var_Irel__bv,0))/
+var_Irel__cstar
+"--var_Irel__xir/var_ICaL__xi2ba--"
+delta_t*var_Irel__gryr*abs(`if`(2*abs(var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T) < .1e-2,2*var_ICaL__pca*var_ICaL__F*(
+var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o),4*var_ICaL__pca*
+var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(var_ICaL__za)-.341*
+var_ICaL__Ca_o)/(exp(var_ICaL__za)-1)))*exp(-var_Irel__ay*(var_cell__V+30))/(1+
+exp(-var_Irel__ay*(var_cell__V+30)))*var_Ca__Ca_NSR*`if`(50 < var_Irel__Ca_JSR
+and var_Irel__Ca_JSR < var_Irel__cstar,var_Irel__Ca_JSR-50,`if`(var_Irel__cstar
+<= var_Irel__Ca_JSR,var_Irel__av*var_Irel__Ca_JSR+var_Irel__bv,0))/
+var_Irel__cstar
+"--var_Irel__xir/var_ICaL__xi2ca--"
+delta_t*var_Irel__gryr*abs(`if`(2*abs(var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T) < .1e-2,2*var_ICaL__pca*var_ICaL__F*(
+var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o),4*var_ICaL__pca*
+var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(var_ICaL__za)-.341*
+var_ICaL__Ca_o)/(exp(var_ICaL__za)-1)))*exp(-var_Irel__ay*(var_cell__V+30))/(1+
+exp(-var_Irel__ay*(var_cell__V+30)))*var_Ca__Ca_NSR*`if`(50 < var_Irel__Ca_JSR
+and var_Irel__Ca_JSR < var_Irel__cstar,var_Irel__Ca_JSR-50,`if`(var_Irel__cstar
+<= var_Irel__Ca_JSR,var_Irel__av*var_Irel__Ca_JSR+var_Irel__bv,0))/
+var_Irel__cstar
+"--var_Irel__xir/var_Irel__Ca_JSR--"
+-delta_t*var_Irel__gryr*(1-var_ICaL__xi1ca-var_ICaL__xi2ca-var_ICaL__xi1ba-
+var_ICaL__xi2ba-var_ICaL__c1-var_ICaL__c2)*abs(`if`(2*abs(var_cell__V*
+var_Environment__F/var_Environment__R/var_Environment__T) < .1e-2,2*
+var_ICaL__pca*var_ICaL__F*(var_ICaL__csm*exp(var_ICaL__za)-.341*var_ICaL__Ca_o)
+,4*var_ICaL__pca*var_ICaL__V*var_ICaL__F*var_ICaL__FonRT*(var_ICaL__csm*exp(
+var_ICaL__za)-.341*var_ICaL__Ca_o)/(exp(var_ICaL__za)-1)))*exp(-var_Irel__ay*(
+var_cell__V+30))/(1+exp(-var_Irel__ay*(var_cell__V+30)))*var_Ca__Ca_NSR*
+`if`(50 < var_Irel__Ca_JSR and var_Irel__Ca_JSR < var_Irel__cstar,
+1,
+`if`(var_Irel__cstar <= var_Irel__Ca_JSR,
+var_Irel__av,
+0))
+/var_Irel__cstar
+"--var_Irel__xir/var_Irel__xir--"
+1-delta_t*(-(1-var_Irel__taur*(-var_Irel__xir+var_Ileak_Iup_Ixfer__vup*
+var_Ca__Ca_i^2/(var_Ca__Ca_i^2+var_Ileak_Iup_Ixfer__cup^2)-
+var_Ileak_Iup_Ixfer__gleak*var_Ca__Ca_NSR^2/(var_Ca__Ca_NSR^2+
+var_Ileak_Iup_Ixfer__kj^2)*(16.667*var_Ca__Ca_NSR-var_Ca__Ca_i))/var_Ca__Ca_NSR
+)/var_Irel__taur-var_Irel__xir/var_Ca__Ca_NSR)
+"--var_Irel__xir/var_Na__Na_i--"
+0
+"--var_Na__Na_i/var_Ca__Ca_NSR--"
+0
+"--var_Na__Na_i/var_Ca__Ca_dyad--"
+0
+"--var_Na__Na_i/var_Ca__Ca_i--"
+0
+"--var_Na__Na_i/var_Ca__Ca_submem--"
+-1/1000*delta_t*(-9*var_cell__wca*var_INaCa__gNaCa/(1+var_INaCa__xkdna^3/
+var_Ca__Ca_submem^3)^2*(var_Na__Na_i^3*var_Environment__Ca_o*exp(.35*
+var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T)-1/1000*
+var_Environment__Na_o^3*var_Ca__Ca_submem*exp(-.65*var_cell__V*
+var_Environment__F/var_Environment__R/var_Environment__T))/(1+.2*exp(-.65*
+var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T))/(
+var_INaCa__xmcao*var_Na__Na_i^3+1/1000*var_INaCa__xmnao^3*var_Ca__Ca_submem+
+var_INaCa__xmnai^3*var_Environment__Ca_o*(1+1/1000*var_Ca__Ca_submem/
+var_INaCa__xmcai)+var_INaCa__xmcai*var_Environment__Na_o^3*(1+var_Na__Na_i^3/
+var_INaCa__xmnai^3)+var_Na__Na_i^3*var_Environment__Ca_o+1/1000*
+var_Environment__Na_o^3*var_Ca__Ca_submem)*var_INaCa__xkdna^3/var_Ca__Ca_submem
+^4+3/1000*var_cell__wca*var_INaCa__gNaCa/(1+var_INaCa__xkdna^3/
+var_Ca__Ca_submem^3)*var_Environment__Na_o^3*exp(-.65*var_cell__V*
+var_Environment__F/var_Environment__R/var_Environment__T)/(1+.2*exp(-.65*
+var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T))/(
+var_INaCa__xmcao*var_Na__Na_i^3+1/1000*var_INaCa__xmnao^3*var_Ca__Ca_submem+
+var_INaCa__xmnai^3*var_Environment__Ca_o*(1+1/1000*var_Ca__Ca_submem/
+var_INaCa__xmcai)+var_INaCa__xmcai*var_Environment__Na_o^3*(1+var_Na__Na_i^3/
+var_INaCa__xmnai^3)+var_Na__Na_i^3*var_Environment__Ca_o+1/1000*
+var_Environment__Na_o^3*var_Ca__Ca_submem)+3*var_cell__wca*var_INaCa__gNaCa/(1+
+var_INaCa__xkdna^3/var_Ca__Ca_submem^3)*(var_Na__Na_i^3*var_Environment__Ca_o*
+exp(.35*var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T)-1
+/1000*var_Environment__Na_o^3*var_Ca__Ca_submem*exp(-.65*var_cell__V*
+var_Environment__F/var_Environment__R/var_Environment__T))/(1+.2*exp(-.65*
+var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T))/(
+var_INaCa__xmcao*var_Na__Na_i^3+1/1000*var_INaCa__xmnao^3*var_Ca__Ca_submem+
+var_INaCa__xmnai^3*var_Environment__Ca_o*(1+1/1000*var_Ca__Ca_submem/
+var_INaCa__xmcai)+var_INaCa__xmcai*var_Environment__Na_o^3*(1+var_Na__Na_i^3/
+var_INaCa__xmnai^3)+var_Na__Na_i^3*var_Environment__Ca_o+1/1000*
+var_Environment__Na_o^3*var_Ca__Ca_submem)^2*(1/1000*var_INaCa__xmnao^3+1/1000*
+var_INaCa__xmnai^3*var_Environment__Ca_o/var_INaCa__xmcai+1/1000*
+var_Environment__Na_o^3))/var_cell__wca
+"--var_Na__Na_i/var_Ca__tropi--"
+0
+"--var_Na__Na_i/var_Ca__trops--"
+0
+"--var_Na__Na_i/var_ICaL__c1--"
+0
+"--var_Na__Na_i/var_ICaL__c2--"
+0
+"--var_Na__Na_i/var_ICaL__xi1ba--"
+0
+"--var_Na__Na_i/var_ICaL__xi1ca--"
+0
+"--var_Na__Na_i/var_ICaL__xi2ba--"
+0
+"--var_Na__Na_i/var_ICaL__xi2ca--"
+0
+"--var_Na__Na_i/var_Irel__Ca_JSR--"
+0
+"--var_Na__Na_i/var_Irel__xir--"
+0
+"--var_Na__Na_i/var_Na__Na_i--"
+1-1/1000*delta_t*(-var_INa__gna*var_INa__xh*var_INa__xj*var_INa__xm^3/
+var_Environment__F*var_Environment__R*var_Environment__T/var_Na__Na_i-3*
+var_INaK__gNaK/(1+.1245*exp(-.1*var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T)+.365e-1*(1/7*exp(.1485884101e-1*
+var_Environment__Na_o)-1/7)*exp(-var_cell__V*var_Environment__F/
+var_Environment__R/var_Environment__T))/(var_Na__Na_i+var_INaK__xkmnai)*
+var_Environment__K_o/(var_Environment__K_o+var_INaK__xkmko)+3*var_INaK__gNaK/(1
++.1245*exp(-.1*var_cell__V*var_Environment__F/var_Environment__R/
+var_Environment__T)+.365e-1*(1/7*exp(.1485884101e-1*var_Environment__Na_o)-1/7)
+*exp(-var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T))*
+var_Na__Na_i/(var_Na__Na_i+var_INaK__xkmnai)^2*var_Environment__K_o/(
+var_Environment__K_o+var_INaK__xkmko)-9*var_cell__wca*var_INaCa__gNaCa/(1+
+var_INaCa__xkdna^3/var_Ca__Ca_submem^3)*var_Na__Na_i^2*var_Environment__Ca_o*
+exp(.35*var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T)/(
+1+.2*exp(-.65*var_cell__V*var_Environment__F/var_Environment__R/
+var_Environment__T))/(var_INaCa__xmcao*var_Na__Na_i^3+1/1000*var_INaCa__xmnao^3
+*var_Ca__Ca_submem+var_INaCa__xmnai^3*var_Environment__Ca_o*(1+1/1000*
+var_Ca__Ca_submem/var_INaCa__xmcai)+var_INaCa__xmcai*var_Environment__Na_o^3*(1
++var_Na__Na_i^3/var_INaCa__xmnai^3)+var_Na__Na_i^3*var_Environment__Ca_o+1/1000
+*var_Environment__Na_o^3*var_Ca__Ca_submem)+3*var_cell__wca*var_INaCa__gNaCa/(1
++var_INaCa__xkdna^3/var_Ca__Ca_submem^3)*(var_Na__Na_i^3*var_Environment__Ca_o*
+exp(.35*var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T)-1
+/1000*var_Environment__Na_o^3*var_Ca__Ca_submem*exp(-.65*var_cell__V*
+var_Environment__F/var_Environment__R/var_Environment__T))/(1+.2*exp(-.65*
+var_cell__V*var_Environment__F/var_Environment__R/var_Environment__T))/(
+var_INaCa__xmcao*var_Na__Na_i^3+1/1000*var_INaCa__xmnao^3*var_Ca__Ca_submem+
+var_INaCa__xmnai^3*var_Environment__Ca_o*(1+1/1000*var_Ca__Ca_submem/
+var_INaCa__xmcai)+var_INaCa__xmcai*var_Environment__Na_o^3*(1+var_Na__Na_i^3/
+var_INaCa__xmnai^3)+var_Na__Na_i^3*var_Environment__Ca_o+1/1000*
+var_Environment__Na_o^3*var_Ca__Ca_submem)^2*(3*var_INaCa__xmcao*var_Na__Na_i^2
++3*var_INaCa__xmcai*var_Environment__Na_o^3*var_Na__Na_i^2/var_INaCa__xmnai^3+3
+*var_Na__Na_i^2*var_Environment__Ca_o))/var_cell__wca
+memory used=2.2MB, alloc=1.1MB, time=0.45

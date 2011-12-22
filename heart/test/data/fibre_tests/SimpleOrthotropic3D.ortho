@@ -1,0 +1,14 @@
+# We allow comments and blank lines anywhere
+
+6
+
+1 0 0 0 1 0 0 0 1
+1 0 0 0 1 0 0 0 1
+
+# We allow comments and blank lines anywhere
+
+1 0 0 0 1 0 0 0 1
+1 0 0 0 1 0 0 0 1
+1 0 0 0 1 0 0 0 1
+#The last line is a permutation matrix (non-symmetric)
+0 1 0 0 0 1 1 0 0

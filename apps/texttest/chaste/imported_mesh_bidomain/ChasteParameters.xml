@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ChasteParameters xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/2_0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://chaste.comlab.ox.ac.uk/nss/parameters/2_0 ChasteParameters_2_0.xsd">
+<!-- 
+Based on TestBidomainDistributedMesh.hpp::TestBidomainProblemWithDistributedMeshFromMemfem3DParMetis() rev=8772
+But run for a little longer
+ URL
+ https://chaste.comlab.ox.ac.uk/cgi-bin/trac.cgi/browser/trunk/heart/test/bidomain/TestBidomainDistributedMesh.hpp?rev=8772
+-->
+	<Simulation>       
+		<!-- 
+			Problem definition 
+		-->    
+	    <SimulationDuration unit="ms">10.0</SimulationDuration>
+	    <Domain>Bi</Domain>
+	    <IonicModels>
+	    	<Default><Hardcoded>LuoRudyI</Hardcoded></Default>
+    	</IonicModels>
+	    
+		<!-- 
+			Mesh definition - IMPORTANTLY THIS MESH IS IMPORTED FROM MEMFEM
+			[0, 0.25]x[0, 0.25]x[0, 0.25] step size ~ 0.02
+		-->    
+		<Mesh unit="cm">
+			<LoadMesh name="Memfem_slab" conductivity_media="NoFibreOrientation"/>
+	  	</Mesh>
+		    
+	    <!-- 
+	    	Stimuli (as many <Stimulus> definitions as needed) 
+	   	-->
+   		<Stimuli>
+			<Stimulus> <!-- #1 -->
+				<Strength unit="uA/cm^3">-6000</Strength>
+				<Duration unit="ms">0.5</Duration>
+				<Delay unit="ms">0.0</Delay>
+				<Location unit="cm">
+					<Cuboid>
+						<LowerCoordinates x="0.0" y="0.0"  z="0.0"/>
+						<UpperCoordinates x="0.01" y="0.25" z="0.25"/>
+					</Cuboid>
+				</Location>
+			</Stimulus>	
+		</Stimuli>
+		
+		<!-- 
+			Output 
+		-->
+		<OutputDirectory>ChasteResults</OutputDirectory>
+		<OutputFilenamePrefix>SimulationResults</OutputFilenamePrefix>
+		
+	</Simulation>
+	
+	<Physiological>
+	    <!--
+	        Conductivities
+	    -->
+	    <IntracellularConductivities longi="1.75" trans="1.75" normal="1.75" unit="mS/cm"/>
+	    <ExtracellularConductivities longi="7.0"  trans="7.0"  normal="7.0" unit="mS/cm"/>
+	    <SurfaceAreaToVolumeRatio unit="1/cm"> 1.0 </SurfaceAreaToVolumeRatio>
+	    <Capacitance unit="uF/cm^2"> 1.0 </Capacitance>
+	</Physiological>
+
+	<Numerical>
+		<TimeSteps ode="0.01" pde="0.1" printing="0.1" unit="ms"/>
+		<KSPTolerances>
+			<!-- Get results to match in h5dump -->
+			<KSPAbsolute>1e-6</KSPAbsolute>
+		</KSPTolerances>
+		<KSPSolver>cg</KSPSolver>
+		<KSPPreconditioner>bjacobi</KSPPreconditioner>
+	</Numerical>		
+		    
+</ChasteParameters>

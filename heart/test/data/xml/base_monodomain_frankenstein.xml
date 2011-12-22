@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ChasteParameters xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/2_0">
+
+	<Simulation>       
+		<!-- 
+			Problem definition 
+		-->    
+	    <SimulationDuration unit="ms">0.1</SimulationDuration>
+	    <Domain>Mono</Domain>
+	    <IonicModels>
+	    	<Default><Hardcoded>tenTusscher2006</Hardcoded></Default>
+			<Region> <!-- REGION 1 -->
+                <IonicModel><Hardcoded>KittenGorillaCell</Hardcoded></IonicModel>
+                <Location unit="cm">
+                    <Cuboid>
+                        <LowerCoordinates x="0.0" y="0.0" z="0.0"/>
+                        <UpperCoordinates x="0.0" y="0.0"  z="0.0"/>
+                    </Cuboid>
+                </Location>
+            </Region><!-- REGION 1 -->
+        </IonicModels>
+	    
+		<!-- 
+			Mesh definition 
+		-->    
+		<Mesh unit="cm">
+			<Slab x="1" y="0.1" z="0.1" inter_node_space="0.1"/>
+	  	</Mesh>
+		    
+	    <!-- 
+	    	Stimuli (as many <Stimulus> definitions as needed) 
+	   	-->
+   		<Stimuli>
+			<Stimulus> <!-- #1 -->
+				<Strength unit="uA/cm^3">0.0</Strength> <!-- It's not really stimulated -->
+				<Duration unit="ms">1.0</Duration>
+				<Delay unit="ms">2.0</Delay>
+				<Location unit="cm">
+					<Cuboid>
+						<LowerCoordinates x="-0.05" y="-0.05" z="-0.05"/>
+						<UpperCoordinates x="0.05" y="0.05" z="0.05"/>
+					</Cuboid>
+				</Location>
+			</Stimulus>	
+		</Stimuli>
+		
+		<!-- 
+			Output 
+		-->
+		<OutputDirectory>Kirsten</OutputDirectory>
+		<OutputFilenamePrefix>SimulationResults</OutputFilenamePrefix>
+	</Simulation>
+	
+	<Physiological>
+	    <!--
+	        Conductivities
+	    -->
+	    <IntracellularConductivities longi="1.75" trans="1.75" normal="1.75" unit="mS/cm"/>
+	    <ExtracellularConductivities longi="7.0"  trans="7.0"  normal="7.0" unit="mS/cm"/>
+	    <SurfaceAreaToVolumeRatio unit="1/cm"> 1400 </SurfaceAreaToVolumeRatio>
+	    <Capacitance unit="uF/cm^2"> 1.0 </Capacitance>
+	</Physiological>
+
+	<Numerical>
+		<TimeSteps ode="0.01" pde="0.1" printing="0.1" unit="ms"/>
+		<KSPTolerances>
+			<KSPRelative>1e-6</KSPRelative>
+		</KSPTolerances>
+		<KSPSolver>gmres</KSPSolver>
+		<KSPPreconditioner>jacobi</KSPPreconditioner>
+	</Numerical>		
+		    
+</ChasteParameters>

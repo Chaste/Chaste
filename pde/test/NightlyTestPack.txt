@@ -1,0 +1,5 @@
+TestSimpleLinearParabolicSolverLong.hpp
+TestSolvingCoupledNonlinearPdes.hpp
+tutorials/TestSolvingLinearParabolicPdeSystemsWithCoupledOdeSystemsTutorial.hpp
+tutorials/TestSolvingLinearPdesTutorial.hpp
+tutorials/TestSolvingNonlinearPdesTutorial.hpp

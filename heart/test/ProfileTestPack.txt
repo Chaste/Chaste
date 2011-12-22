@@ -1,0 +1,8 @@
+convergence/TestConvergenceEfficiency.hpp
+monodomain/TestMonodomainSlabLong.hpp
+performance/Test1dBidomainProblemForEfficiency.hpp
+performance/Test3dBidomainProblemForEfficiency.hpp
+performance/Test3dBidomainProblemForEfficiencyWithFasterOdes.hpp
+performance/Test3dBidomainProblemWithMetisForEfficiency.hpp
+performance/Test3dBidomainProblemWithPermForEfficiency.hpp
+postprocessing/TestLongPostprocessing.hpp

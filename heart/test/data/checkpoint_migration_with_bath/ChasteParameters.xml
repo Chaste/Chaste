@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<cp:ChasteParameters xmlns:cp="https://chaste.comlab.ox.ac.uk/nss/parameters/2_1" xmlns:cp20="https://chaste.comlab.ox.ac.uk/nss/parameters/2_0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="/home/chaste/eclipse/workspace/Chaste/heart/src/io/ChasteParameters_1_1.xsd" xsi:schemaLocation="https://chaste.comlab.ox.ac.uk/nss/parameters/2_1 /home/chaste/eclipse/workspace/Chaste/heart/src/io/ChasteParameters_2_1.xsd https://chaste.comlab.ox.ac.uk/nss/parameters/2_0 /home/chaste/eclipse/workspace/Chaste/heart/src/io/ChasteParameters_2_0.xsd">
+
+  <cp:Simulation>
+    <cp:SpaceDimension>3</cp:SpaceDimension>
+    <cp:SimulationDuration unit="ms">0.2</cp:SimulationDuration>
+    <cp:Domain>Mono</cp:Domain>
+    <cp:IonicModels>
+      <cp:Default>
+        <cp:Hardcoded>LuoRudyI</cp:Hardcoded>
+      </cp:Default>
+    </cp:IonicModels>
+    <cp:Electrodes>
+      <cp:GroundSecondElectrode>no</cp:GroundSecondElectrode>
+      <cp:PerpendicularToAxis>x</cp:PerpendicularToAxis>
+      <cp:Strength unit="uA/cm^2">-11000</cp:Strength>
+      <cp:StartTime unit="ms">0</cp:StartTime>
+      <cp:Duration unit="ms">1.9</cp:Duration>
+    </cp:Electrodes>
+    <cp:OutputDirectory>TestCreateArchiveForLoadAsSequentialWithBath</cp:OutputDirectory>
+    <cp:OutputFilenamePrefix>simulation</cp:OutputFilenamePrefix>
+  </cp:Simulation>
+
+  <cp:Physiological>
+    <cp:IntracellularConductivities longi="1.75" normal="1.75" trans="1.75" unit="mS/cm"/>
+    <cp:ExtracellularConductivities longi="7" normal="7" trans="7" unit="mS/cm"/>
+    <cp:BathConductivity unit="mS/cm">7</cp:BathConductivity>
+    <cp:SurfaceAreaToVolumeRatio unit="1/cm">1400</cp:SurfaceAreaToVolumeRatio>
+    <cp:Capacitance unit="uF/cm^2">1</cp:Capacitance>
+  </cp:Physiological>
+
+  <cp:Numerical>
+    <cp:TimeSteps ode="0.001" pde="0.01" printing="0.01" unit="ms"/>
+    <cp:KSPTolerances>
+      <cp:KSPAbsolute>1e-06</cp:KSPAbsolute>
+    </cp:KSPTolerances>
+    <cp:KSPSolver>cg</cp:KSPSolver>
+    <cp:KSPPreconditioner>bjacobi</cp:KSPPreconditioner>
+  </cp:Numerical>
+
+  <cp:PostProcessing/>
+
+</cp:ChasteParameters>

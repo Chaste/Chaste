@@ -1,0 +1,5 @@
+FIXED -1
+UNLIMITED 1
+VARIABLES 1
+ODE SOLVER: RungeKutta2IvpOdeSolver
+Created by Chaste version 2.1.12408 (with uncommitted modifications) on Wed, 13 Apr 2011 14:19:29 +0000.  Chaste was built on Wed, 13 Apr 2011 14:19:12 +0000 by machine (uname) 'Linux userpc44.comlab.ox.ac.uk 2.6.24-29-generic #1 SMP Wed Mar 16 18:58:12 UTC 2011 x86_64' using settings: default, no Chaste libraries.

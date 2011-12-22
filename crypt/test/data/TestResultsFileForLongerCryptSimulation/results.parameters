@@ -1,0 +1,68 @@
+<Chaste>
+
+	<CryptSimulation2d>
+		<CryptCircumference>16</CryptCircumference>
+		<UseJiggledBottomCells>1</UseJiggledBottomCells>
+		<OutputNodeVelocities>0</OutputNodeVelocities>
+		<Dt>0.00833333</Dt>
+		<EndTime>20</EndTime>
+		<SamplingTimestepMultiple>10</SamplingTimestepMultiple>
+	</CryptSimulation2d>
+
+	<MeshBasedCellPopulation-2>
+		<UseAreaBasedDampingConstant>0</UseAreaBasedDampingConstant>
+		<AreaBasedDampingConstantParameter>0.1</AreaBasedDampingConstantParameter>
+		<OutputVoronoiData>0</OutputVoronoiData>
+		<OutputCellPopulationVolumes>0</OutputCellPopulationVolumes>
+		<MeinekeDivisionSeparation>0.3</MeinekeDivisionSeparation>
+		<DampingConstantNormal>1</DampingConstantNormal>
+		<DampingConstantMutant>1</DampingConstantMutant>
+		<OutputCellIdData>0</OutputCellIdData>
+		<OutputCellMutationStates>0</OutputCellMutationStates>
+		<OutputCellAncestors>0</OutputCellAncestors>
+		<OutputCellProliferativeTypes>1</OutputCellProliferativeTypes>
+		<OutputCellVariables>0</OutputCellVariables>
+		<OutputCellCyclePhases>0</OutputCellCyclePhases>
+		<OutputCellAges>0</OutputCellAges>
+		<OutputCellVolumes>0</OutputCellVolumes>
+	</MeshBasedCellPopulation-2>
+
+	<CellCycleModels>
+		<SimpleWntCellCycleModel>
+			<UseCellProliferativeTypeDependentG1Duration>0</UseCellProliferativeTypeDependentG1Duration>
+			<WntStemThreshold>0.8</WntStemThreshold>
+			<WntTransitThreshold>0.65</WntTransitThreshold>
+			<WntLabelledThreshold>0.65</WntLabelledThreshold>
+			<StemCellG1Duration>9.4</StemCellG1Duration>
+			<TransitCellG1Duration>9.4</TransitCellG1Duration>
+			<SDuration>7.4</SDuration>
+			<G2Duration>1.4</G2Duration>
+			<MDuration>0.72</MDuration>
+		</SimpleWntCellCycleModel>
+	</CellCycleModels>
+
+	<CellKillers>
+		<SloughingCellKiller-2>
+			<SloughLength>16.4545</SloughLength>
+			<SloughSides>0</SloughSides>
+			<SloughWidth>10</SloughWidth>
+		</SloughingCellKiller-2>
+	</CellKillers>
+
+	<Forces>
+		<GeneralisedLinearSpringForce-2>
+			<MeinekeSpringStiffness>30</MeinekeSpringStiffness>
+			<MeinekeDivisionRestingSpringLength>0.5</MeinekeDivisionRestingSpringLength>
+			<MeinekeSpringGrowthDuration>0.72</MeinekeSpringGrowthDuration>
+			<UseCutOffLength>0</UseCutOffLength>
+			<CutOffLength>1.79769e+308</CutOffLength>
+		</GeneralisedLinearSpringForce-2>
+	</Forces>
+
+	<CellPopulationBoundaryConditions>
+		<CryptSimulationBoundaryCondition-2>
+		<UseJiggledBottomCells>1</UseJiggledBottomCells>
+		</CryptSimulationBoundaryCondition-2>
+	</CellPopulationBoundaryConditions>
+
+</Chaste>

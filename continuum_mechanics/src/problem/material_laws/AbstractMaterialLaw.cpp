@@ -1,0 +1,176 @@
+/*
+
+Copyright (C) University of Oxford, 2005-2011
+
+University of Oxford means the Chancellor, Masters and Scholars of the
+University of Oxford, having an administrative office at Wellington
+Square, Oxford OX1 2JD, UK.
+
+This file is part of Chaste.
+
+Chaste is free software: you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License as published
+by the Free Software Foundation, either version 2.1 of the License, or
+(at your option) any later version.
+
+Chaste is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details. The offer of Chaste under the terms of the
+License is subject to the License being interpreted in accordance with
+English Law and subject to any action against the University of Oxford
+being under the jurisdiction of the English Courts.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Chaste. If not, see <http://www.gnu.org/licenses/>.
+
+*/
+
+#include "AbstractMaterialLaw.hpp"
+
+template<unsigned DIM>
+AbstractMaterialLaw<DIM>::AbstractMaterialLaw()
+    : mpChangeOfBasisMatrix(NULL)
+{
+}
+
+template<unsigned DIM>
+void AbstractMaterialLaw<DIM>::ComputeCauchyStress(c_matrix<double,DIM,DIM>& rF,
+                                                   double pressure,
+                                                   c_matrix<double,DIM,DIM>& rSigma)
+{
+    double detF = Determinant(rF);
+
+    c_matrix<double,DIM,DIM> C = prod(trans(rF), rF);
+    c_matrix<double,DIM,DIM> invC = Inverse(C);
+
+    c_matrix<double,DIM,DIM> T;
+
+    static FourthOrderTensor<DIM,DIM,DIM,DIM> dTdE; // not filled in, made static for efficiency
+
+    ComputeStressAndStressDerivative(C, invC, pressure, T, dTdE, false);
+
+    /*
+     * Looping is probably more eficient then doing rSigma = (1/detF)*rF*T*transpose(rF),
+     * which doesn't seem to compile anyway, as rF is a Tensor<2,DIM> and T is a
+     * SymmetricTensor<2,DIM>.
+     */
+    for (unsigned i=0; i<DIM; i++)
+    {
+        for (unsigned j=0; j<DIM; j++)
+        {
+            rSigma(i,j) = 0.0;
+            for (unsigned M=0; M<DIM; M++)
+            {
+                for (unsigned N=0; N<DIM; N++)
+                {
+                    rSigma(i,j) += rF(i,M)*T(M,N)*rF(j,N);
+                }
+            }
+            rSigma(i,j) /= detF;
+        }
+    }
+}
+
+template<unsigned DIM>
+void AbstractMaterialLaw<DIM>::Compute1stPiolaKirchoffStress(c_matrix<double,DIM,DIM>& rF,
+                                                             double pressure,
+                                                             c_matrix<double,DIM,DIM>& rS)
+{
+    c_matrix<double,DIM,DIM> C = prod(trans(rF), rF);
+    c_matrix<double,DIM,DIM> invC = Inverse(C);
+
+    c_matrix<double,DIM,DIM> T;
+
+    static FourthOrderTensor<DIM,DIM,DIM,DIM> dTdE; // not filled in, made static for efficiency
+
+    ComputeStressAndStressDerivative(C, invC, pressure, T, dTdE, false);
+
+    rS = prod(T, trans(rF));
+}
+
+template<unsigned DIM>
+void AbstractMaterialLaw<DIM>::Compute2ndPiolaKirchoffStress(c_matrix<double,DIM,DIM>& rC,
+                                                             double pressure,
+                                                             c_matrix<double,DIM,DIM>& rT)
+{
+    c_matrix<double,DIM,DIM> invC = Inverse(rC);
+
+    static FourthOrderTensor<DIM,DIM,DIM,DIM> dTdE; // not filled in, made static for efficiency
+
+    ComputeStressAndStressDerivative(rC, invC, pressure, rT, dTdE, false);
+}
+
+template<unsigned DIM>
+void AbstractMaterialLaw<DIM>::ScaleMaterialParameters(double scaleFactor)
+{
+    #define COVERAGE_IGNORE
+    EXCEPTION("[the material law you are using]::ScaleMaterialParameters() has not been implemented\n");
+    #undef COVERAGE_IGNORE
+}
+
+template<unsigned DIM>
+void AbstractMaterialLaw<DIM>::SetChangeOfBasisMatrix(c_matrix<double,DIM,DIM>& rChangeOfBasisMatrix)
+{
+    mpChangeOfBasisMatrix = &rChangeOfBasisMatrix;
+}
+
+template<unsigned DIM>
+void AbstractMaterialLaw<DIM>::ResetToNoChangeOfBasisMatrix()
+{
+    mpChangeOfBasisMatrix = NULL;
+}
+
+template<unsigned DIM>
+void AbstractMaterialLaw<DIM>::ComputeTransformedDeformationTensor(c_matrix<double,DIM,DIM>& rC, c_matrix<double,DIM,DIM>& rInvC,
+                                                                   c_matrix<double,DIM,DIM>& rCTransformed, c_matrix<double,DIM,DIM>& rInvCTransformed)
+{
+    // Writing the local coordinate system as fibre/sheet/normal, as in cardiac problems..
+
+    // Let P be the change-of-basis matrix P = (\mathbf{m}_f, \mathbf{m}_s, \mathbf{m}_n).
+    // The transformed C for the fibre/sheet basis is C* = P^T C P.
+    if (mpChangeOfBasisMatrix)
+    {
+        // C* = P^T C P, and ditto inv(C)
+        rCTransformed = prod(trans(*mpChangeOfBasisMatrix),(c_matrix<double,DIM,DIM>)prod(rC,*mpChangeOfBasisMatrix));         // C*    = P^T C    P
+        rInvCTransformed = prod(trans(*mpChangeOfBasisMatrix),(c_matrix<double,DIM,DIM>)prod(rInvC,*mpChangeOfBasisMatrix));   // invC* = P^T invC P
+    }
+    else
+    {
+        rCTransformed = rC;
+        rInvCTransformed = rInvC;
+    }
+}
+
+template<unsigned DIM>
+void AbstractMaterialLaw<DIM>::TransformStressAndStressDerivative(c_matrix<double,DIM,DIM>& rT,
+                                                                  FourthOrderTensor<DIM,DIM,DIM,DIM>& rDTdE,
+                                                                  bool transformDTdE)
+{
+    //  T = P T* P^T   and   dTdE_{MNPQ}  =  P_{Mm}P_{Nn}P_{Pp}P_{Qq} dT*dE*_{mnpq}
+    if (mpChangeOfBasisMatrix)
+    {
+        static c_matrix<double,DIM,DIM> T_transformed_times_Ptrans;
+        T_transformed_times_Ptrans = prod(rT, trans(*mpChangeOfBasisMatrix));
+
+        rT = prod(*mpChangeOfBasisMatrix, T_transformed_times_Ptrans);  // T = P T* P^T
+
+        // dTdE_{MNPQ}  =  P_{Mm}P_{Nn}P_{Pp}P_{Qq} dT*dE*_{mnpq}
+        if (transformDTdE)
+        {
+            static FourthOrderTensor<DIM,DIM,DIM,DIM> temp;
+            temp.template SetAsContractionOnFirstDimension<DIM>(*mpChangeOfBasisMatrix, rDTdE);
+            rDTdE.template SetAsContractionOnSecondDimension<DIM>(*mpChangeOfBasisMatrix, temp);
+            temp.template SetAsContractionOnThirdDimension<DIM>(*mpChangeOfBasisMatrix, rDTdE);
+            rDTdE.template SetAsContractionOnFourthDimension<DIM>(*mpChangeOfBasisMatrix, temp);
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+// Explicit instantiation
+////////////////////////////////////////////////////////////////////////////////////
+
+//template class AbstractMaterialLaw<1>;
+template class AbstractMaterialLaw<2>;
+template class AbstractMaterialLaw<3>;

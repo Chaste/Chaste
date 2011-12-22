@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ChasteParameters
+    xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/2_0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="https://chaste.comlab.ox.ac.uk/nss/parameters/2_0 ../../../src/io/ChasteParameters_2_0.xsd">
+
+	<Simulation/>
+	<Physiological/>
+    <Numerical>
+		<TimeSteps ode="1.5" pde="0.05" printing="1.0" unit="ms" />
+	</Numerical>
+			    
+</ChasteParameters>

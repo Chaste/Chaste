@@ -1,0 +1,35 @@
+The executable can be used with a general CellML file to specify the cell model, rather than just choosing from the list of hardcoded cell model options (although some names in the CellML file have to match the names Chaste is expecting). However, in order to run Chaste with CellML files, a full developer installation is (currently) required, as !PyCml is used to convert the CellML into code which is then compiled and dynamically loaded, all when running the executable.
+
+To run a simulation with this, you have to provide the path and name of the CellML model as follows.
+{{{
+#!xml
+<IonicModels>
+    <Default><Dynamic><Path relative_to="cwd">LuoRudy1991.cellml</Path></Dynamic></Default>
+</IonicModels>
+}}}
+In this example, the file `LuoRudy1991.cellml` should be placed in the same folder as the `UsingCellmlFiles.xml` file,
+which should be your current directory when running the simulation.
+
+The executable can also output any of the variables that are used in the cell model. The following block needs to be added to the `Simulation` block of `UsingCellmlFiles.xml`. 
+{{{
+#!xml
+<OutputVariables>
+    <Var name="Cai"/>
+    <Var name="Nai"/>
+</OutputVariables>
+}}}
+The name should match the name of the variable in the CellML file. Also, you have to alter the CellML file to tell !PyCml which variables or quantities can be selected for output. Each variable must have a `cmeta:id` specified 
+{{{
+#!xml
+<variable units="millimolar" public_interface="out" name="Cai" initial_value="0.0002" cmeta:id="Cai"/>
+}}}
+and an RDF annotation added, e.g.
+{{{
+#!xml
+<rdf:Description rdf:about="#Cai">
+    <derived-quantity xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</derived-quantity>
+</rdf:Description>
+}}}
+which for convenience can be placed at the end of the CellML file.  See ["ChasteGuides/CodeGenerationFromCellML"] for full details of the functionality available.  The [ChasteGuides/TroubleShooting#PyCmlerrors PyCml section of the TroubleShooting page] may be useful if you experience problems.
+
+The attached files run a simple one-dimensional simulation, with the `LuoRudy1991.cellml` file modified in order to allow the output ot the intracellular calcium and sodium concentrations. Ionic currents and other quantities of interest can be also selected in the same way.

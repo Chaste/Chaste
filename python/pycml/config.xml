@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<pycml_config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="config.xsd">
+
+<!--
+  There are 3 ways of specifying variables:
+  1. By name (var type='name')
+     Variable names are given in full form, i.e. component,variable
+  2. By standardised name (var type='oxmeta')
+     Use the name from the oxmeta annotations
+  3. By reference to a section of this config file (when defining lookup table keys)
+     e.g. <var type='config-name'>transmembrane_potential</var>
+
+  Within any element that specifies a variable, a list of <var> elements can be
+  provided.  Each will be tried in turn to see if a match can be found in the model,
+  and the first match wins.
+-->
+
+<global>
+  <lookup_tables>
+    <lookup_table>
+      <!-- Only one var allowed here -->
+      <var type='config-name'>transmembrane_potential</var>
+      <min>-100.0001</min>
+      <max>99.9999</max>
+      <step>0.01</step>
+    </lookup_table>
+  </lookup_tables>
+  <currents>
+    <stimulus>
+      <var type='oxmeta'>membrane_stimulus_current</var>
+      <var type='name'>membrane,i_Stim</var>
+      <var type='name'>membrane,I_stim</var>
+      <var type='name'>cell,i_Stim</var>
+      <var type='name'>membrane,i_stim</var>
+      <var type='name'>membrane,I_st</var>
+      <var type='name'>membrane,i_st</var>
+      <var type='name'>membrane,i_pulse</var>
+    </stimulus>
+    <ionic_match>
+      <!-- regexp on var names -->
+      <var type='name'>membrane,i_.*</var>
+      <var type='name'>cell,i_.*</var>
+      <var type='name'>cell,xi.*</var>
+    </ionic_match>
+    <!--
+      Note that the stimulus current is automatically
+      excluded from being an ionic current.
+      Also note that there are implicit ^ and $ around the regexp.
+      -->
+  </currents>
+  <transmembrane_potential>
+    <var type='oxmeta'>membrane_voltage</var>
+    <var type='name'>membrane,V</var>
+    <var type='name'>cell,V</var>
+    <var type='name'>membrane,E</var>
+  </transmembrane_potential>
+  <membrane_capacitance>
+    <var type='oxmeta'>membrane_capacitance</var>
+    <var type='name'>membrane,Cm</var>
+    <var type='name'>membrane,C</var>
+    <var type='name'>membrane,C_m</var>
+    <var type='name'>membrane,C_sc</var>
+  </membrane_capacitance>
+</global>
+
+<for_model id="tentusscher_model_2006_epi">
+  <lookup_tables>
+    <lookup_table>
+      <var type='config-name'>transmembrane_potential</var>
+      <min>-250.0001</min>
+      <max>349.9999</max>
+    </lookup_table>
+  </lookup_tables>
+</for_model>
+
+<for_model id="faber_rudy_2000">
+  <lookup_tables>
+    <lookup_table>
+      <var>membrane,V</var>
+      <max>269.9999</max>
+    </lookup_table>
+  </lookup_tables>
+</for_model> 
+
+</pycml_config>

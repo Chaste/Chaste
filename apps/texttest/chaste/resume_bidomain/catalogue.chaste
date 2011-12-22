@@ -1,0 +1,17 @@
+The following new files/directories were created:
+<Test Directory>
+----SaveBidomain
+--------machine_info_0.txt
+--------provenance_info_0.txt
+--------vtk_output
+------------.chaste_deletable_folder
+------------Bidomain_3d.vtu
+------------Bidomain_3d_times.info
+------------ChasteDefaults.xml
+------------ChasteParameters.xml
+
+The following existing files/directories changed their contents:
+<Test Directory>
+----SaveBidomain
+--------Bidomain_3d.h5
+--------progress_status.txt

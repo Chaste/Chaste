@@ -1,0 +1,2029 @@
+    |\^/|     Maple 12 (SUN SPARC SOLARIS)
+._|\|   |/|_. Copyright (c) Maplesoft, a division of Waterloo Maple Inc. 2008
+ \  MAPLE  /  All rights reserved. Maple is a trademark of
+ <____ ____>  Waterloo Maple Inc.
+      |       Type ? for help.
+1
+var_membrane__time := var_environment__time
+var_sodium_current__F := var_membrane__F
+var_sodium_current__R := var_membrane__R
+var_sodium_current__T := var_membrane__T
+var_sodium_current__Na_c := var_cleft_space_ion_concentrations__Na_c
+var_sodium_current__Na_i := var_intracellular_ion_concentrations__Na_i
+var_sodium_current__E_Na := var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__Na_c/
+var_intracellular_ion_concentrations__Na_i)
+var_sodium_current__m := var_sodium_current_m_gate__m
+var_sodium_current__h2 := var_sodium_current_h2_gate__h2
+var_sodium_current__h1 := var_sodium_current_h1_gate__h1
+var_sodium_current__V := var_membrane__V
+var_sodium_current__i_Na := var_sodium_current__P_Na*
+var_sodium_current_m_gate__m^3*(.635*var_sodium_current_h1_gate__h1+.365*
+var_sodium_current_h2_gate__h2)*var_cleft_space_ion_concentrations__Na_c*
+var_membrane__V*var_membrane__F^2/var_membrane__R/var_membrane__T*(exp((
+var_membrane__V-var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__Na_c/
+var_intracellular_ion_concentrations__Na_i))*var_membrane__F/var_membrane__R/
+var_membrane__T)-1)/(exp(var_membrane__V*var_membrane__F/var_membrane__R/
+var_membrane__T)-1)
+var_membrane__i_Na := var_sodium_current__P_Na*var_sodium_current_m_gate__m^3*(
+.635*var_sodium_current_h1_gate__h1+.365*var_sodium_current_h2_gate__h2)*
+var_cleft_space_ion_concentrations__Na_c*var_membrane__V*var_membrane__F^2/
+var_membrane__R/var_membrane__T*(exp((var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__Na_c/
+var_intracellular_ion_concentrations__Na_i))*var_membrane__F/var_membrane__R/
+var_membrane__T)-1)/(exp(var_membrane__V*var_membrane__F/var_membrane__R/
+var_membrane__T)-1)
+var_L_type_Ca_channel__PM := var_environment__PM
+var_L_type_Ca_channel__V := var_membrane__V
+var_L_type_Ca_channel__d_prime := 1/(1+exp(-1/12*var_membrane__V+23/12))
+var_L_type_Ca_channel__CT := var_environment__CT
+var_L_type_Ca_channel__f_L := var_L_type_Ca_channel_f_L_gate__f_L
+var_L_type_Ca_channel__d_L := var_L_type_Ca_channel_d_L_gate__d_L
+var_L_type_Ca_channel__i_Ca_L := var_L_type_Ca_channel__g_Ca_L*(
+var_L_type_Ca_channel_d_L_gate__d_L*var_L_type_Ca_channel_f_L_gate__f_L+1/(1+
+exp(-1/12*var_membrane__V+23/12)))*(var_membrane__V-
+var_L_type_Ca_channel__E_Ca_app)
+var_membrane__i_Ca_L := var_L_type_Ca_channel__g_Ca_L*(
+var_L_type_Ca_channel_d_L_gate__d_L*var_L_type_Ca_channel_f_L_gate__f_L+1/(1+
+exp(-1/12*var_membrane__V+23/12)))*(var_membrane__V-
+var_L_type_Ca_channel__E_Ca_app)
+var_T_type_Ca_channel__d_T := var_T_type_Ca_channel_d_T_gate__d_T
+var_T_type_Ca_channel__V := var_membrane__V
+var_T_type_Ca_channel__f_T := var_T_type_Ca_channel_f_T_gate__f_T
+var_T_type_Ca_channel__i_Ca_T := var_T_type_Ca_channel__g_Ca_T*
+var_T_type_Ca_channel_d_T_gate__d_T*var_T_type_Ca_channel_f_T_gate__f_T*(
+var_membrane__V-var_T_type_Ca_channel__E_Ca_T)
+var_membrane__i_Ca_T := var_T_type_Ca_channel__g_Ca_T*
+var_T_type_Ca_channel_d_T_gate__d_T*var_T_type_Ca_channel_f_T_gate__f_T*(
+var_membrane__V-var_T_type_Ca_channel__E_Ca_T)
+var_Ca_independent_transient_outward_K_current__V := var_membrane__V
+var_Ca_independent_transient_outward_K_current__CT := var_environment__CT
+var_Ca_independent_transient_outward_K_current__PM := var_environment__PM
+var_Ca_independent_transient_outward_K_current__s2 := 
+var_Ca_independent_transient_outward_K_current_s2_gate__s2
+var_Ca_independent_transient_outward_K_current__s3 := 
+var_Ca_independent_transient_outward_K_current_s3_gate__s3
+var_Ca_independent_transient_outward_K_current__s1 := 
+var_Ca_independent_transient_outward_K_current_s1_gate__s1
+var_Ca_independent_transient_outward_K_current__r := 
+var_Ca_independent_transient_outward_K_current_r_gate__r
+var_Ca_independent_transient_outward_K_current__F := var_membrane__F
+var_Ca_independent_transient_outward_K_current__K_c := 
+var_cleft_space_ion_concentrations__K_c
+var_Ca_independent_transient_outward_K_current__T := var_membrane__T
+var_Ca_independent_transient_outward_K_current__K_i := 
+var_intracellular_ion_concentrations__K_i
+var_Ca_independent_transient_outward_K_current__R := var_membrane__R
+var_Ca_independent_transient_outward_K_current__E_K := var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i)
+var_Ca_independent_transient_outward_K_current__i_to := 
+var_Ca_independent_transient_outward_K_current__g_to*
+var_Ca_independent_transient_outward_K_current_r_gate__r*(.59*
+var_Ca_independent_transient_outward_K_current_s1_gate__s1^3+.41*
+var_Ca_independent_transient_outward_K_current_s2_gate__s2^3)*(.6*
+var_Ca_independent_transient_outward_K_current_s3_gate__s3^6+.4)*(
+var_membrane__V-var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))
+var_membrane__i_to := var_Ca_independent_transient_outward_K_current__g_to*
+var_Ca_independent_transient_outward_K_current_r_gate__r*(.59*
+var_Ca_independent_transient_outward_K_current_s1_gate__s1^3+.41*
+var_Ca_independent_transient_outward_K_current_s2_gate__s2^3)*(.6*
+var_Ca_independent_transient_outward_K_current_s3_gate__s3^6+.4)*(
+var_membrane__V-var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))
+var_Ca_independent_transient_outward_K_current__i_sus := .1e-2*var_membrane__V+
+.70e-1
+var_membrane__i_sus := .1e-2*var_membrane__V+.70e-1
+var_inward_rectifier__T := var_membrane__T
+var_inward_rectifier__V := var_membrane__V
+var_inward_rectifier__R := var_membrane__R
+var_inward_rectifier__K_c := var_cleft_space_ion_concentrations__K_c
+var_inward_rectifier__CT := var_environment__CT
+var_inward_rectifier__F := var_membrane__F
+var_inward_rectifier__E_K := var_membrane__R*var_membrane__T/var_membrane__F*ln
+(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i)
+var_inward_rectifier__PM := var_environment__PM
+var_inward_rectifier__i_K1 := var_inward_rectifier__g_K1*(var_membrane__V-
+var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))*
+var_cleft_space_ion_concentrations__K_c^3/(
+var_cleft_space_ion_concentrations__K_c+var_inward_rectifier__KmK1)^3/(1+exp(
+var_inward_rectifier__steepK1*var_membrane__F*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i)-var_inward_rectifier__shiftK1)/
+var_membrane__R/var_membrane__T))
+var_membrane__i_K1 := var_inward_rectifier__g_K1*(var_membrane__V-
+var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))*
+var_cleft_space_ion_concentrations__K_c^3/(
+var_cleft_space_ion_concentrations__K_c+var_inward_rectifier__KmK1)^3/(1+exp(
+var_inward_rectifier__steepK1*var_membrane__F*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i)-var_inward_rectifier__shiftK1)/
+var_membrane__R/var_membrane__T))
+var_delayed_rectifier_K_current__V := var_membrane__V
+var_delayed_rectifier_K_current__E_K := var_membrane__R*var_membrane__T/
+var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i)
+var_delayed_rectifier_K_current__p_a := 
+var_delayed_rectifier_K_current_pa_gate__p_a
+var_delayed_rectifier_K_current__p_i := 
+var_delayed_rectifier_K_current_pi_gate__p_i
+var_delayed_rectifier_K_current__i_Kr := var_delayed_rectifier_K_current__g_Kr*
+var_delayed_rectifier_K_current_pa_gate__p_a*
+var_delayed_rectifier_K_current_pi_gate__p_i*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))
+var_membrane__i_Kr := var_delayed_rectifier_K_current__g_Kr*
+var_delayed_rectifier_K_current_pa_gate__p_a*
+var_delayed_rectifier_K_current_pi_gate__p_i*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))
+var_delayed_rectifier_K_current__z := var_delayed_rectifier_K_current_z_gate__z
+var_delayed_rectifier_K_current__i_Ks := var_delayed_rectifier_K_current__g_Ks*
+var_delayed_rectifier_K_current_z_gate__z*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))
+var_membrane__i_Ks := var_delayed_rectifier_K_current__g_Ks*
+var_delayed_rectifier_K_current_z_gate__z*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))
+var_background_currents__V := var_membrane__V
+var_background_currents__E_Na := var_membrane__R*var_membrane__T/
+var_membrane__F*ln(var_cleft_space_ion_concentrations__Na_c/
+var_intracellular_ion_concentrations__Na_i)
+var_background_currents__PM := var_environment__PM
+var_background_currents__CT := var_environment__CT
+var_background_currents__i_B_Na := var_background_currents__g_B_Na*(
+var_membrane__V-var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__Na_c/
+var_intracellular_ion_concentrations__Na_i))
+var_membrane__i_B_Na := var_background_currents__g_B_Na*(var_membrane__V-
+var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__Na_c/
+var_intracellular_ion_concentrations__Na_i))
+var_background_currents__Ca_c := var_cleft_space_ion_concentrations__Ca_c
+var_background_currents__R := var_membrane__R
+var_background_currents__Ca_i := var_intracellular_ion_concentrations__Ca_i
+var_background_currents__F := var_membrane__F
+var_background_currents__T := var_membrane__T
+var_background_currents__E_Ca := 1/2*var_membrane__R*var_membrane__T/
+var_membrane__F*ln(var_cleft_space_ion_concentrations__Ca_c/
+var_intracellular_ion_concentrations__Ca_i)
+var_background_currents__i_B_Ca := var_background_currents__g_B_Ca*(
+var_membrane__V-1/2*var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__Ca_c/
+var_intracellular_ion_concentrations__Ca_i))
+var_membrane__i_B_Ca := var_background_currents__g_B_Ca*(var_membrane__V-1/2*
+var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__Ca_c/
+var_intracellular_ion_concentrations__Ca_i))
+var_sodium_potassium_pump__K_c := var_cleft_space_ion_concentrations__K_c
+var_sodium_potassium_pump__Na_i := var_intracellular_ion_concentrations__Na_i
+var_sodium_potassium_pump__V := var_membrane__V
+var_sodium_potassium_pump__i_p := 1.6*var_sodium_potassium_pump__i_NaK_max*
+var_cleft_space_ion_concentrations__K_c/(
+var_cleft_space_ion_concentrations__K_c+var_sodium_potassium_pump__k_NaK_K)*
+var_intracellular_ion_concentrations__Na_i^1.5/(
+var_intracellular_ion_concentrations__Na_i^1.5+
+var_sodium_potassium_pump__k_NaK_Na^1.5)/(1.5+exp(-1/40*var_membrane__V-3/2))
+var_membrane__i_p := 1.6*var_sodium_potassium_pump__i_NaK_max*
+var_cleft_space_ion_concentrations__K_c/(
+var_cleft_space_ion_concentrations__K_c+var_sodium_potassium_pump__k_NaK_K)*
+var_intracellular_ion_concentrations__Na_i^1.5/(
+var_intracellular_ion_concentrations__Na_i^1.5+
+var_sodium_potassium_pump__k_NaK_Na^1.5)/(1.5+exp(-1/40*var_membrane__V-3/2))
+var_sarcolemmal_calcium_pump_current__Ca_i := 
+var_intracellular_ion_concentrations__Ca_i
+var_sarcolemmal_calcium_pump_current__i_CaP := 
+var_sarcolemmal_calcium_pump_current__i_CaP_max*
+var_intracellular_ion_concentrations__Ca_i/(
+var_intracellular_ion_concentrations__Ca_i+
+var_sarcolemmal_calcium_pump_current__k_CaP)
+var_membrane__i_CaP := var_sarcolemmal_calcium_pump_current__i_CaP_max*
+var_intracellular_ion_concentrations__Ca_i/(
+var_intracellular_ion_concentrations__Ca_i+
+var_sarcolemmal_calcium_pump_current__k_CaP)
+var_Na_Ca_ion_exchanger_current__Ca_c := 
+var_cleft_space_ion_concentrations__Ca_c
+var_Na_Ca_ion_exchanger_current__Na_i := 
+var_intracellular_ion_concentrations__Na_i
+var_Na_Ca_ion_exchanger_current__Ca_i := 
+var_intracellular_ion_concentrations__Ca_i
+var_Na_Ca_ion_exchanger_current__F := var_membrane__F
+var_Na_Ca_ion_exchanger_current__R := var_membrane__R
+var_Na_Ca_ion_exchanger_current__Na_c := 
+var_cleft_space_ion_concentrations__Na_c
+var_Na_Ca_ion_exchanger_current__V := var_membrane__V
+var_Na_Ca_ion_exchanger_current__T := var_membrane__T
+var_Na_Ca_ion_exchanger_current__i_NaCa := 
+var_Na_Ca_ion_exchanger_current__k_NaCa*(
+var_intracellular_ion_concentrations__Na_i^3*
+var_cleft_space_ion_concentrations__Ca_c*exp(
+var_Na_Ca_ion_exchanger_current__gamma*var_membrane__F*var_membrane__V/
+var_membrane__R/var_membrane__T)-var_cleft_space_ion_concentrations__Na_c^3*
+var_intracellular_ion_concentrations__Ca_i*exp((
+var_Na_Ca_ion_exchanger_current__gamma-1)*var_membrane__V*var_membrane__F/
+var_membrane__R/var_membrane__T))/(1+var_Na_Ca_ion_exchanger_current__d_NaCa*(
+var_cleft_space_ion_concentrations__Na_c^3*
+var_intracellular_ion_concentrations__Ca_i+
+var_intracellular_ion_concentrations__Na_i^3*
+var_cleft_space_ion_concentrations__Ca_c))
+var_membrane__i_NaCa := var_Na_Ca_ion_exchanger_current__k_NaCa*(
+var_intracellular_ion_concentrations__Na_i^3*
+var_cleft_space_ion_concentrations__Ca_c*exp(
+var_Na_Ca_ion_exchanger_current__gamma*var_membrane__F*var_membrane__V/
+var_membrane__R/var_membrane__T)-var_cleft_space_ion_concentrations__Na_c^3*
+var_intracellular_ion_concentrations__Ca_i*exp((
+var_Na_Ca_ion_exchanger_current__gamma-1)*var_membrane__V*var_membrane__F/
+var_membrane__R/var_membrane__T))/(1+var_Na_Ca_ion_exchanger_current__d_NaCa*(
+var_cleft_space_ion_concentrations__Na_c^3*
+var_intracellular_ion_concentrations__Ca_i+
+var_intracellular_ion_concentrations__Na_i^3*
+var_cleft_space_ion_concentrations__Ca_c))
+var_membrane__i_Stim := `if`(var_membrane__stim_start <= var_environment__time
+and var_environment__time <= var_membrane__stim_end and var_environment__time-
+var_membrane__stim_start-floor((var_environment__time-var_membrane__stim_start)
+/var_membrane__stim_period)*var_membrane__stim_period <= 
+var_membrane__stim_duration,var_membrane__stim_amplitude,0)
+var_sodium_current__time := var_environment__time
+var_sodium_current_m_gate__V := var_membrane__V
+var_sodium_current_m_gate__E0_m := var_membrane__V+44.4
+var_sodium_current_m_gate__alpha_m := -460*(var_membrane__V+44.4)/(exp(-.\
+7890791446e-1*var_membrane__V-3.503511402)-1)
+var_sodium_current_m_gate__beta_m := 18400*exp(-.7890791446e-1*var_membrane__V-\
+3.503511402)
+var_sodium_current_m_gate__time := var_environment__time
+var_sodium_current_h1_gate__V := var_membrane__V
+var_sodium_current_h1_gate__alpha_h := 44.9*exp(-.1795332136*var_membrane__V-12\
+.01077199)
+var_sodium_current_h1_gate__beta_h := 1491/(1+323.3*exp(-.7751937984e-1*
+var_membrane__V-7.333333333))
+var_sodium_current_h1_gate__h_infinity := 44.9*exp(-.1795332136*var_membrane__V
+-12.01077199)/(44.9*exp(-.1795332136*var_membrane__V-12.01077199)+1491/(1+323.3
+*exp(-.7751937984e-1*var_membrane__V-7.333333333)))
+var_sodium_current_h1_gate__tau_h1 := .3e-1/(1+exp(1/6*var_membrane__V+20/3))+.\
+15e-3
+var_sodium_current_h1_gate__time := var_environment__time
+var_sodium_current_h2_gate__V := var_membrane__V
+var_sodium_current_h2_gate__tau_h2 := .12/(1+exp(1/2*var_membrane__V+30))+.45e-\
+3
+var_sodium_current_h2_gate__h_infinity := 44.9*exp(-.1795332136*var_membrane__V
+-12.01077199)/(44.9*exp(-.1795332136*var_membrane__V-12.01077199)+1491/(1+323.3
+*exp(-.7751937984e-1*var_membrane__V-7.333333333)))
+var_sodium_current_h2_gate__time := var_environment__time
+var_L_type_Ca_channel__time := var_environment__time
+var_L_type_Ca_channel_d_L_gate__V := var_membrane__V
+var_L_type_Ca_channel_d_L_gate__E0_alpha_d_L := var_membrane__V+45
+var_L_type_Ca_channel_d_L_gate__E0_beta_d_L := var_membrane__V+5
+var_L_type_Ca_channel_d_L_gate__E10 := var_membrane__V+10
+var_L_type_Ca_channel_d_L_gate__alpha_d_L := -16.72*(var_membrane__V+45)/(exp(-\
+.4000000000*var_membrane__V-18.00000000)-1)-50*(var_membrane__V+10)/(exp(-.2079\
+866889*var_membrane__V-2.079866889)-1)
+var_L_type_Ca_channel_d_L_gate__beta_d_L := 4.48*(var_membrane__V+5)/(exp(.4000\
+000000*var_membrane__V+2.000000000)-1)
+var_L_type_Ca_channel_d_L_gate__d_L_infinity := 1/(1+exp(-.1515151515*
+var_membrane__V-1.659090909))
+var_L_type_Ca_channel_d_L_gate__tau_d_L := 1/(-16.72*(var_membrane__V+45)/(exp(
+-.4000000000*var_membrane__V-18.00000000)-1)-50*(var_membrane__V+10)/(exp(-.207\
+9866889*var_membrane__V-2.079866889)-1)+4.48*(var_membrane__V+5)/(exp(.40000000\
+00*var_membrane__V+2.000000000)-1))
+var_L_type_Ca_channel_d_L_gate__time := var_environment__time
+var_L_type_Ca_channel_f_L_gate__V := var_membrane__V
+var_L_type_Ca_channel_f_L_gate__E0_f_L := var_membrane__V+18
+var_L_type_Ca_channel_f_L_gate__alpha_f_L := 8.49*(var_membrane__V+18)/(exp(1/4
+*var_membrane__V+9/2)-1)
+var_L_type_Ca_channel_f_L_gate__beta_f_L := 67.922/(1+exp(-1/4*var_membrane__V-\
+9/2))
+var_L_type_Ca_channel_f_L_gate__f_L_infinity := 8.49*(var_membrane__V+18)/(exp(
+1/4*var_membrane__V+9/2)-1)/(8.49*(var_membrane__V+18)/(exp(1/4*var_membrane__V
++9/2)-1)+67.922/(1+exp(-1/4*var_membrane__V-9/2)))
+var_L_type_Ca_channel_f_L_gate__tau_f_L := 1/(8.49*(var_membrane__V+18)/(exp(1/
+4*var_membrane__V+9/2)-1)+67.922/(1+exp(-1/4*var_membrane__V-9/2)))
+var_L_type_Ca_channel_f_L_gate__time := var_environment__time
+var_T_type_Ca_channel__time := var_environment__time
+var_T_type_Ca_channel_d_T_gate__V := var_membrane__V
+var_T_type_Ca_channel_d_T_gate__E0_d_T := var_membrane__V+23.3
+var_T_type_Ca_channel_d_T_gate__alpha_d_T := 674.173*exp(1/30*var_membrane__V+.\
+7766666667)
+var_T_type_Ca_channel_d_T_gate__beta_d_T := 674.173*exp(-1/30*var_membrane__V-.\
+7766666667)
+var_T_type_Ca_channel_d_T_gate__d_T_infinity := 1/(1+exp(-.1639344262*
+var_membrane__V-3.770491802))
+var_T_type_Ca_channel_d_T_gate__tau_d_T := 1/(674.173*exp(1/30*var_membrane__V+
+.7766666667)+674.173*exp(-1/30*var_membrane__V-.7766666667))
+var_T_type_Ca_channel_d_T_gate__time := var_environment__time
+var_T_type_Ca_channel_f_T_gate__V := var_membrane__V
+var_T_type_Ca_channel_f_T_gate__E0_f_T := var_membrane__V+75
+var_T_type_Ca_channel_f_T_gate__alpha_f_T := 9.637*exp(-.1200480192e-1*
+var_membrane__V-.9003601440)
+var_T_type_Ca_channel_f_T_gate__beta_f_T := 9.637*exp(.6501950585e-1*
+var_membrane__V+4.876462939)
+var_T_type_Ca_channel_f_T_gate__f_T_infinity := 9.637*exp(-.1200480192e-1*
+var_membrane__V-.9003601440)/(9.637*exp(-.1200480192e-1*var_membrane__V-.900360\
+1440)+9.637*exp(.6501950585e-1*var_membrane__V+4.876462939))
+var_T_type_Ca_channel_f_T_gate__tau_f_T := 1/(9.637*exp(-.1200480192e-1*
+var_membrane__V-.9003601440)+9.637*exp(.6501950585e-1*var_membrane__V+4.8764629\
+39))
+var_T_type_Ca_channel_f_T_gate__time := var_environment__time
+var_Ca_independent_transient_outward_K_current__time := var_environment__time
+var_Ca_independent_transient_outward_K_current_r_gate__V := var_membrane__V
+var_Ca_independent_transient_outward_K_current_r_gate__alpha_r := 386.6*exp(1/
+12*var_membrane__V)
+var_Ca_independent_transient_outward_K_current_r_gate__beta_r := 8.011*exp(-.13\
+88888889*var_membrane__V)
+var_Ca_independent_transient_outward_K_current_r_gate__tau_r := 1/(386.6*exp(1/
+12*var_membrane__V)+8.011*exp(-.1388888889*var_membrane__V))+.4e-3
+var_Ca_independent_transient_outward_K_current_r_gate__r_infinity := 1/(1+exp(-\
+.1775252974*var_membrane__V-2.662879461))
+var_Ca_independent_transient_outward_K_current_r_gate__time := 
+var_environment__time
+var_Ca_independent_transient_outward_K_current_s1_gate__V := var_membrane__V
+var_Ca_independent_transient_outward_K_current_s1_gate__tau_s1 := .5466/(1+exp(
+.1e2*var_membrane__V+328.))+.204e-1
+var_Ca_independent_transient_outward_K_current_s1_gate__s1_infinity := 1/(1+exp
+(.1416430595*var_membrane__V+4.007082153))
+var_Ca_independent_transient_outward_K_current_s1_gate__time := 
+var_environment__time
+var_Ca_independent_transient_outward_K_current_s2_gate__V := var_membrane__V
+var_Ca_independent_transient_outward_K_current_s2_gate__tau_s2 := 5.75/(1+exp(.\
+1e2*var_membrane__V+328.))+.45/(1+exp(-.7158196135e-1*var_membrane__V+.96921975\
+67))
+var_Ca_independent_transient_outward_K_current_s2_gate__s2_infinity := 1/(1+exp
+(.1416430595*var_membrane__V+4.007082153))
+var_Ca_independent_transient_outward_K_current_s2_gate__time := 
+var_environment__time
+var_Ca_independent_transient_outward_K_current_s3_gate__V := var_membrane__V
+var_Ca_independent_transient_outward_K_current_s3_gate__tau_s3 := 7.5/(1+exp(2.\
+000000000*var_membrane__V+46.00000000))+.5
+var_Ca_independent_transient_outward_K_current_s3_gate__s3_infinity := .6002400\
+960/(1+exp(.3652300950e-1*var_membrane__V+1.850620891))+.3997599039
+var_Ca_independent_transient_outward_K_current_s3_gate__time := 
+var_environment__time
+var_delayed_rectifier_K_current__time := var_environment__time
+var_delayed_rectifier_K_current_z_gate__V := var_membrane__V
+var_delayed_rectifier_K_current_z_gate__alpha_z := 1.66*exp(.1439843345e-1*
+var_membrane__V)
+var_delayed_rectifier_K_current_z_gate__beta_z := .3*exp(-.4581691561e-1*
+var_membrane__V)
+var_delayed_rectifier_K_current_z_gate__tau_z := 1/(1.66*exp(.1439843345e-1*
+var_membrane__V)+.3*exp(-.4581691561e-1*var_membrane__V))+.6e-1
+var_delayed_rectifier_K_current_z_gate__z_infinity := 1/(1+exp(-.7246376812e-1*
+var_membrane__V+.6521739131e-1))
+var_delayed_rectifier_K_current_z_gate__time := var_environment__time
+var_delayed_rectifier_K_current_pa_gate__V := var_membrane__V
+var_delayed_rectifier_K_current_pa_gate__alpha_p_a := 9*exp(.3941508021e-1*
+var_membrane__V)
+var_delayed_rectifier_K_current_pa_gate__beta_p_a := 1.3*exp(-.7676953785e-1*
+var_membrane__V)
+var_delayed_rectifier_K_current_pa_gate__tau_p_a := 1/(9*exp(.3941508021e-1*
+var_membrane__V)+1.3*exp(-.7676953785e-1*var_membrane__V))
+var_delayed_rectifier_K_current_pa_gate__p_a_infinity := 1/(1+exp(-.1351351351*
+var_membrane__V-.6891891890))
+var_delayed_rectifier_K_current_pa_gate__time := var_environment__time
+var_delayed_rectifier_K_current_pi_gate__V := var_membrane__V
+var_delayed_rectifier_K_current_pi_gate__alpha_p_i := 100*exp(-.1829993595e-1*
+var_membrane__V)
+var_delayed_rectifier_K_current_pi_gate__beta_p_i := 656*exp(.9420009985e-2*
+var_membrane__V)
+var_delayed_rectifier_K_current_pi_gate__tau_p_i := 1/(100*exp(-.1829993595e-1*
+var_membrane__V)+656*exp(.9420009985e-2*var_membrane__V))
+var_delayed_rectifier_K_current_pi_gate__p_i_infinity := 1/(1+exp(.5358970649e-\
+1*var_membrane__V+2.539728729))
+var_delayed_rectifier_K_current_pi_gate__time := var_environment__time
+var_intracellular_ion_concentrations__time := var_environment__time
+var_intracellular_ion_concentrations__F := var_membrane__F
+var_intracellular_ion_concentrations__i_Na := var_sodium_current__P_Na*
+var_sodium_current_m_gate__m^3*(.635*var_sodium_current_h1_gate__h1+.365*
+var_sodium_current_h2_gate__h2)*var_cleft_space_ion_concentrations__Na_c*
+var_membrane__V*var_membrane__F^2/var_membrane__R/var_membrane__T*(exp((
+var_membrane__V-var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__Na_c/
+var_intracellular_ion_concentrations__Na_i))*var_membrane__F/var_membrane__R/
+var_membrane__T)-1)/(exp(var_membrane__V*var_membrane__F/var_membrane__R/
+var_membrane__T)-1)
+var_intracellular_ion_concentrations__i_Ca_L := var_L_type_Ca_channel__g_Ca_L*(
+var_L_type_Ca_channel_d_L_gate__d_L*var_L_type_Ca_channel_f_L_gate__f_L+1/(1+
+exp(-1/12*var_membrane__V+23/12)))*(var_membrane__V-
+var_L_type_Ca_channel__E_Ca_app)
+var_intracellular_ion_concentrations__i_Ca_T := var_T_type_Ca_channel__g_Ca_T*
+var_T_type_Ca_channel_d_T_gate__d_T*var_T_type_Ca_channel_f_T_gate__f_T*(
+var_membrane__V-var_T_type_Ca_channel__E_Ca_T)
+var_intracellular_ion_concentrations__i_B_Na := var_background_currents__g_B_Na
+*(var_membrane__V-var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__Na_c/
+var_intracellular_ion_concentrations__Na_i))
+var_intracellular_ion_concentrations__i_NaCa := 
+var_Na_Ca_ion_exchanger_current__k_NaCa*(
+var_intracellular_ion_concentrations__Na_i^3*
+var_cleft_space_ion_concentrations__Ca_c*exp(
+var_Na_Ca_ion_exchanger_current__gamma*var_membrane__F*var_membrane__V/
+var_membrane__R/var_membrane__T)-var_cleft_space_ion_concentrations__Na_c^3*
+var_intracellular_ion_concentrations__Ca_i*exp((
+var_Na_Ca_ion_exchanger_current__gamma-1)*var_membrane__V*var_membrane__F/
+var_membrane__R/var_membrane__T))/(1+var_Na_Ca_ion_exchanger_current__d_NaCa*(
+var_cleft_space_ion_concentrations__Na_c^3*
+var_intracellular_ion_concentrations__Ca_i+
+var_intracellular_ion_concentrations__Na_i^3*
+var_cleft_space_ion_concentrations__Ca_c))
+var_intracellular_ion_concentrations__i_p := 1.6*
+var_sodium_potassium_pump__i_NaK_max*var_cleft_space_ion_concentrations__K_c/(
+var_cleft_space_ion_concentrations__K_c+var_sodium_potassium_pump__k_NaK_K)*
+var_intracellular_ion_concentrations__Na_i^1.5/(
+var_intracellular_ion_concentrations__Na_i^1.5+
+var_sodium_potassium_pump__k_NaK_Na^1.5)/(1.5+exp(-1/40*var_membrane__V-3/2))
+var_intracellular_ion_concentrations__i_Kr := 
+var_delayed_rectifier_K_current__g_Kr*
+var_delayed_rectifier_K_current_pa_gate__p_a*
+var_delayed_rectifier_K_current_pi_gate__p_i*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))
+var_intracellular_ion_concentrations__i_Ks := 
+var_delayed_rectifier_K_current__g_Ks*var_delayed_rectifier_K_current_z_gate__z
+*(var_membrane__V-var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))
+var_intracellular_ion_concentrations__i_K1 := var_inward_rectifier__g_K1*(
+var_membrane__V-var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))*
+var_cleft_space_ion_concentrations__K_c^3/(
+var_cleft_space_ion_concentrations__K_c+var_inward_rectifier__KmK1)^3/(1+exp(
+var_inward_rectifier__steepK1*var_membrane__F*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i)-var_inward_rectifier__shiftK1)/
+var_membrane__R/var_membrane__T))
+var_intracellular_ion_concentrations__i_to := 
+var_Ca_independent_transient_outward_K_current__g_to*
+var_Ca_independent_transient_outward_K_current_r_gate__r*(.59*
+var_Ca_independent_transient_outward_K_current_s1_gate__s1^3+.41*
+var_Ca_independent_transient_outward_K_current_s2_gate__s2^3)*(.6*
+var_Ca_independent_transient_outward_K_current_s3_gate__s3^6+.4)*(
+var_membrane__V-var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))
+var_intracellular_ion_concentrations__i_sus := .1e-2*var_membrane__V+.70e-1
+var_intracellular_ion_concentrations__i_CaP := 
+var_sarcolemmal_calcium_pump_current__i_CaP_max*
+var_intracellular_ion_concentrations__Ca_i/(
+var_intracellular_ion_concentrations__Ca_i+
+var_sarcolemmal_calcium_pump_current__k_CaP)
+var_intracellular_ion_concentrations__i_B_Ca := var_background_currents__g_B_Ca
+*(var_membrane__V-1/2*var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__Ca_c/
+var_intracellular_ion_concentrations__Ca_i))
+var_Ca_handling_by_the_SR__Ca_i := var_intracellular_ion_concentrations__Ca_i
+var_Ca_handling_by_the_SR__i_up := var_Ca_handling_by_the_SR__I_up_max*(
+var_intracellular_ion_concentrations__Ca_i/var_Ca_handling_by_the_SR__k_cyca-
+var_Ca_handling_by_the_SR__k_xcs^2*var_Ca_handling_by_the_SR__Ca_up/
+var_Ca_handling_by_the_SR__k_srca)/((var_intracellular_ion_concentrations__Ca_i
++var_Ca_handling_by_the_SR__k_cyca)/var_Ca_handling_by_the_SR__k_cyca+
+var_Ca_handling_by_the_SR__k_xcs*(var_Ca_handling_by_the_SR__Ca_up+
+var_Ca_handling_by_the_SR__k_srca)/var_Ca_handling_by_the_SR__k_srca)
+var_intracellular_ion_concentrations__i_up := 
+var_Ca_handling_by_the_SR__I_up_max*(var_intracellular_ion_concentrations__Ca_i
+/var_Ca_handling_by_the_SR__k_cyca-var_Ca_handling_by_the_SR__k_xcs^2*
+var_Ca_handling_by_the_SR__Ca_up/var_Ca_handling_by_the_SR__k_srca)/((
+var_intracellular_ion_concentrations__Ca_i+var_Ca_handling_by_the_SR__k_cyca)/
+var_Ca_handling_by_the_SR__k_cyca+var_Ca_handling_by_the_SR__k_xcs*(
+var_Ca_handling_by_the_SR__Ca_up+var_Ca_handling_by_the_SR__k_srca)/
+var_Ca_handling_by_the_SR__k_srca)
+var_Ca_handling_by_the_SR__i_rel := var_Ca_handling_by_the_SR__alpha_rel*
+var_Ca_handling_by_the_SR__F2^2/(var_Ca_handling_by_the_SR__F2+.25)^2*(
+var_Ca_handling_by_the_SR__Ca_rel-var_intracellular_ion_concentrations__Ca_i)
+var_intracellular_ion_concentrations__i_rel := 
+var_Ca_handling_by_the_SR__alpha_rel*var_Ca_handling_by_the_SR__F2^2/(
+var_Ca_handling_by_the_SR__F2+.25)^2*(var_Ca_handling_by_the_SR__Ca_rel-
+var_intracellular_ion_concentrations__Ca_i)
+var_intracellular_Ca_buffering__Ca_i := 
+var_intracellular_ion_concentrations__Ca_i
+var_intracellular_Ca_buffering__dOCdt := 200000*
+var_intracellular_ion_concentrations__Ca_i*(1-
+var_intracellular_Ca_buffering__O_C)-476*var_intracellular_Ca_buffering__O_C
+var_intracellular_ion_concentrations__dOCdt := 200000*
+var_intracellular_ion_concentrations__Ca_i*(1-
+var_intracellular_Ca_buffering__O_C)-476*var_intracellular_Ca_buffering__O_C
+var_intracellular_Ca_buffering__dOTCdt := 78400*
+var_intracellular_ion_concentrations__Ca_i*(1-
+var_intracellular_Ca_buffering__O_TC)-392*var_intracellular_Ca_buffering__O_TC
+var_intracellular_ion_concentrations__dOTCdt := 78400*
+var_intracellular_ion_concentrations__Ca_i*(1-
+var_intracellular_Ca_buffering__O_TC)-392*var_intracellular_Ca_buffering__O_TC
+var_intracellular_Ca_buffering__dOTMgCdt := 200000*
+var_intracellular_ion_concentrations__Ca_i*(1-
+var_intracellular_Ca_buffering__O_TMgC-var_intracellular_Ca_buffering__O_TMgMg)
+-6.6*var_intracellular_Ca_buffering__O_TMgC
+var_intracellular_ion_concentrations__dOTMgCdt := 200000*
+var_intracellular_ion_concentrations__Ca_i*(1-
+var_intracellular_Ca_buffering__O_TMgC-var_intracellular_Ca_buffering__O_TMgMg)
+-6.6*var_intracellular_Ca_buffering__O_TMgC
+var_intracellular_Ca_buffering__time := var_environment__time
+var_cleft_space_ion_concentrations__time := var_environment__time
+var_cleft_space_ion_concentrations__F := var_membrane__F
+var_cleft_space_ion_concentrations__i_p := 1.6*
+var_sodium_potassium_pump__i_NaK_max*var_cleft_space_ion_concentrations__K_c/(
+var_cleft_space_ion_concentrations__K_c+var_sodium_potassium_pump__k_NaK_K)*
+var_intracellular_ion_concentrations__Na_i^1.5/(
+var_intracellular_ion_concentrations__Na_i^1.5+
+var_sodium_potassium_pump__k_NaK_Na^1.5)/(1.5+exp(-1/40*var_membrane__V-3/2))
+var_cleft_space_ion_concentrations__i_Kr := 
+var_delayed_rectifier_K_current__g_Kr*
+var_delayed_rectifier_K_current_pa_gate__p_a*
+var_delayed_rectifier_K_current_pi_gate__p_i*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))
+var_cleft_space_ion_concentrations__i_Ks := 
+var_delayed_rectifier_K_current__g_Ks*var_delayed_rectifier_K_current_z_gate__z
+*(var_membrane__V-var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))
+var_cleft_space_ion_concentrations__i_K1 := var_inward_rectifier__g_K1*(
+var_membrane__V-var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))*
+var_cleft_space_ion_concentrations__K_c^3/(
+var_cleft_space_ion_concentrations__K_c+var_inward_rectifier__KmK1)^3/(1+exp(
+var_inward_rectifier__steepK1*var_membrane__F*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i)-var_inward_rectifier__shiftK1)/
+var_membrane__R/var_membrane__T))
+var_cleft_space_ion_concentrations__i_to := 
+var_Ca_independent_transient_outward_K_current__g_to*
+var_Ca_independent_transient_outward_K_current_r_gate__r*(.59*
+var_Ca_independent_transient_outward_K_current_s1_gate__s1^3+.41*
+var_Ca_independent_transient_outward_K_current_s2_gate__s2^3)*(.6*
+var_Ca_independent_transient_outward_K_current_s3_gate__s3^6+.4)*(
+var_membrane__V-var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))
+var_cleft_space_ion_concentrations__i_sus := .1e-2*var_membrane__V+.70e-1
+var_Ca_handling_by_the_SR__F := var_membrane__F
+var_Ca_handling_by_the_SR__i_tr := 2*(var_Ca_handling_by_the_SR__Ca_up-
+var_Ca_handling_by_the_SR__Ca_rel)*var_membrane__F*
+var_Ca_handling_by_the_SR__Vol_rel/var_Ca_handling_by_the_SR__tau_tr
+var_Ca_handling_by_the_SR__V := var_membrane__V
+var_Ca_handling_by_the_SR__r_act := 240*exp(.8e-1*var_membrane__V-1.60)+203.8*
+var_intracellular_ion_concentrations__Ca_i^4/(
+var_intracellular_ion_concentrations__Ca_i+var_Ca_handling_by_the_SR__k_rel)^4
+var_Ca_handling_by_the_SR__r_inact := 33.96+339.6*
+var_intracellular_ion_concentrations__Ca_i^4/(
+var_intracellular_ion_concentrations__Ca_i+var_Ca_handling_by_the_SR__k_rel)^4
+var_Ca_handling_by_the_SR__time := var_environment__time
+d_dt_membrane__V := -1/var_membrane__Cm*(var_delayed_rectifier_K_current__g_Kr*
+var_delayed_rectifier_K_current_pa_gate__p_a*
+var_delayed_rectifier_K_current_pi_gate__p_i*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))+
+var_delayed_rectifier_K_current__g_Ks*var_delayed_rectifier_K_current_z_gate__z
+*(var_membrane__V-var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))+var_sodium_current__P_Na*
+var_sodium_current_m_gate__m^3*(.635*var_sodium_current_h1_gate__h1+.365*
+var_sodium_current_h2_gate__h2)*var_cleft_space_ion_concentrations__Na_c*
+var_membrane__V*var_membrane__F^2/var_membrane__R/var_membrane__T*(exp((
+var_membrane__V-var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__Na_c/
+var_intracellular_ion_concentrations__Na_i))*var_membrane__F/var_membrane__R/
+var_membrane__T)-1)/(exp(var_membrane__V*var_membrane__F/var_membrane__R/
+var_membrane__T)-1)+var_L_type_Ca_channel__g_Ca_L*(
+var_L_type_Ca_channel_d_L_gate__d_L*var_L_type_Ca_channel_f_L_gate__f_L+1/(1+
+exp(-1/12*var_membrane__V+23/12)))*(var_membrane__V-
+var_L_type_Ca_channel__E_Ca_app)+var_T_type_Ca_channel__g_Ca_T*
+var_T_type_Ca_channel_d_T_gate__d_T*var_T_type_Ca_channel_f_T_gate__f_T*(
+var_membrane__V-var_T_type_Ca_channel__E_Ca_T)+
+var_Ca_independent_transient_outward_K_current__g_to*
+var_Ca_independent_transient_outward_K_current_r_gate__r*(.59*
+var_Ca_independent_transient_outward_K_current_s1_gate__s1^3+.41*
+var_Ca_independent_transient_outward_K_current_s2_gate__s2^3)*(.6*
+var_Ca_independent_transient_outward_K_current_s3_gate__s3^6+.4)*(
+var_membrane__V-var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))+.1e-2*var_membrane__V+.70e-1+
+var_inward_rectifier__g_K1*(var_membrane__V-var_membrane__R*var_membrane__T/
+var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))*
+var_cleft_space_ion_concentrations__K_c^3/(
+var_cleft_space_ion_concentrations__K_c+var_inward_rectifier__KmK1)^3/(1+exp(
+var_inward_rectifier__steepK1*var_membrane__F*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i)-var_inward_rectifier__shiftK1)/
+var_membrane__R/var_membrane__T))+var_background_currents__g_B_Na*(
+var_membrane__V-var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__Na_c/
+var_intracellular_ion_concentrations__Na_i))+var_background_currents__g_B_Ca*(
+var_membrane__V-1/2*var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__Ca_c/
+var_intracellular_ion_concentrations__Ca_i))+1.6*
+var_sodium_potassium_pump__i_NaK_max*var_cleft_space_ion_concentrations__K_c/(
+var_cleft_space_ion_concentrations__K_c+var_sodium_potassium_pump__k_NaK_K)*
+var_intracellular_ion_concentrations__Na_i^1.5/(
+var_intracellular_ion_concentrations__Na_i^1.5+
+var_sodium_potassium_pump__k_NaK_Na^1.5)/(1.5+exp(-1/40*var_membrane__V-3/2))+
+var_sarcolemmal_calcium_pump_current__i_CaP_max*
+var_intracellular_ion_concentrations__Ca_i/(
+var_intracellular_ion_concentrations__Ca_i+
+var_sarcolemmal_calcium_pump_current__k_CaP)+
+var_Na_Ca_ion_exchanger_current__k_NaCa*(
+var_intracellular_ion_concentrations__Na_i^3*
+var_cleft_space_ion_concentrations__Ca_c*exp(
+var_Na_Ca_ion_exchanger_current__gamma*var_membrane__F*var_membrane__V/
+var_membrane__R/var_membrane__T)-var_cleft_space_ion_concentrations__Na_c^3*
+var_intracellular_ion_concentrations__Ca_i*exp((
+var_Na_Ca_ion_exchanger_current__gamma-1)*var_membrane__V*var_membrane__F/
+var_membrane__R/var_membrane__T))/(1+var_Na_Ca_ion_exchanger_current__d_NaCa*(
+var_cleft_space_ion_concentrations__Na_c^3*
+var_intracellular_ion_concentrations__Ca_i+
+var_intracellular_ion_concentrations__Na_i^3*
+var_cleft_space_ion_concentrations__Ca_c))+`if`(var_membrane__stim_start <= 
+var_environment__time and var_environment__time <= var_membrane__stim_end and 
+var_environment__time-var_membrane__stim_start-floor((var_environment__time-
+var_membrane__stim_start)/var_membrane__stim_period)*var_membrane__stim_period
+<= var_membrane__stim_duration,var_membrane__stim_amplitude,0))
+d_dt_sodium_current_m_gate__m := -460*(var_membrane__V+44.4)/(exp(-.7890791446e\
+-1*var_membrane__V-3.503511402)-1)*(1-var_sodium_current_m_gate__m)-18400*exp(-
+.7890791446e-1*var_membrane__V-3.503511402)*var_sodium_current_m_gate__m
+d_dt_sodium_current_h1_gate__h1 := (44.9*exp(-.1795332136*var_membrane__V-12.01\
+077199)/(44.9*exp(-.1795332136*var_membrane__V-12.01077199)+1491/(1+323.3*exp(-
+.7751937984e-1*var_membrane__V-7.333333333)))-var_sodium_current_h1_gate__h1)/(
+.3e-1/(1+exp(1/6*var_membrane__V+20/3))+.15e-3)
+d_dt_sodium_current_h2_gate__h2 := (44.9*exp(-.1795332136*var_membrane__V-12.01\
+077199)/(44.9*exp(-.1795332136*var_membrane__V-12.01077199)+1491/(1+323.3*exp(-
+.7751937984e-1*var_membrane__V-7.333333333)))-var_sodium_current_h2_gate__h2)/(
+.12/(1+exp(1/2*var_membrane__V+30))+.45e-3)
+d_dt_L_type_Ca_channel_d_L_gate__d_L := (1/(1+exp(-.1515151515*var_membrane__V-\
+1.659090909))-var_L_type_Ca_channel_d_L_gate__d_L)*(-16.72*(var_membrane__V+45)
+/(exp(-.4000000000*var_membrane__V-18.00000000)-1)-50*(var_membrane__V+10)/(exp
+(-.2079866889*var_membrane__V-2.079866889)-1)+4.48*(var_membrane__V+5)/(exp(.40\
+00000000*var_membrane__V+2.000000000)-1))
+d_dt_L_type_Ca_channel_f_L_gate__f_L := (8.49*(var_membrane__V+18)/(exp(1/4*
+var_membrane__V+9/2)-1)/(8.49*(var_membrane__V+18)/(exp(1/4*var_membrane__V+9/2
+)-1)+67.922/(1+exp(-1/4*var_membrane__V-9/2)))-
+var_L_type_Ca_channel_f_L_gate__f_L)*(8.49*(var_membrane__V+18)/(exp(1/4*
+var_membrane__V+9/2)-1)+67.922/(1+exp(-1/4*var_membrane__V-9/2)))
+d_dt_T_type_Ca_channel_d_T_gate__d_T := (1/(1+exp(-.1639344262*var_membrane__V-\
+3.770491802))-var_T_type_Ca_channel_d_T_gate__d_T)*(674.173*exp(1/30*
+var_membrane__V+.7766666667)+674.173*exp(-1/30*var_membrane__V-.7766666667))
+d_dt_T_type_Ca_channel_f_T_gate__f_T := (9.637*exp(-.1200480192e-1*
+var_membrane__V-.9003601440)/(9.637*exp(-.1200480192e-1*var_membrane__V-.900360\
+1440)+9.637*exp(.6501950585e-1*var_membrane__V+4.876462939))-
+var_T_type_Ca_channel_f_T_gate__f_T)*(9.637*exp(-.1200480192e-1*var_membrane__V
+-.9003601440)+9.637*exp(.6501950585e-1*var_membrane__V+4.876462939))
+d_dt_Ca_independent_transient_outward_K_current_r_gate__r := (1/(1+exp(-.177525\
+2974*var_membrane__V-2.662879461))-
+var_Ca_independent_transient_outward_K_current_r_gate__r)/(1/(386.6*exp(1/12*
+var_membrane__V)+8.011*exp(-.1388888889*var_membrane__V))+.4e-3)
+d_dt_Ca_independent_transient_outward_K_current_s1_gate__s1 := (1/(1+exp(.14164\
+30595*var_membrane__V+4.007082153))-
+var_Ca_independent_transient_outward_K_current_s1_gate__s1)/(.5466/(1+exp(.1e2*
+var_membrane__V+328.))+.204e-1)
+d_dt_Ca_independent_transient_outward_K_current_s2_gate__s2 := (1/(1+exp(.14164\
+30595*var_membrane__V+4.007082153))-
+var_Ca_independent_transient_outward_K_current_s2_gate__s2)/(5.75/(1+exp(.1e2*
+var_membrane__V+328.))+.45/(1+exp(-.7158196135e-1*var_membrane__V+.9692197567))
+)
+d_dt_Ca_independent_transient_outward_K_current_s3_gate__s3 := (.6002400960/(1+
+exp(.3652300950e-1*var_membrane__V+1.850620891))+.3997599039-
+var_Ca_independent_transient_outward_K_current_s3_gate__s3)/(7.5/(1+exp(2.00000\
+0000*var_membrane__V+46.00000000))+.5)
+d_dt_delayed_rectifier_K_current_z_gate__z := (1/(1+exp(-.7246376812e-1*
+var_membrane__V+.6521739131e-1))-var_delayed_rectifier_K_current_z_gate__z)/(1/
+(1.66*exp(.1439843345e-1*var_membrane__V)+.3*exp(-.4581691561e-1*
+var_membrane__V))+.6e-1)
+d_dt_delayed_rectifier_K_current_pa_gate__p_a := (1/(1+exp(-.1351351351*
+var_membrane__V-.6891891890))-var_delayed_rectifier_K_current_pa_gate__p_a)*(9*
+exp(.3941508021e-1*var_membrane__V)+1.3*exp(-.7676953785e-1*var_membrane__V))
+d_dt_delayed_rectifier_K_current_pi_gate__p_i := (1/(1+exp(.5358970649e-1*
+var_membrane__V+2.539728729))-var_delayed_rectifier_K_current_pi_gate__p_i)*(
+100*exp(-.1829993595e-1*var_membrane__V)+656*exp(.9420009985e-2*var_membrane__V
+))
+d_dt_intracellular_ion_concentrations__Na_i := (-var_sodium_current__P_Na*
+var_sodium_current_m_gate__m^3*(.635*var_sodium_current_h1_gate__h1+.365*
+var_sodium_current_h2_gate__h2)*var_cleft_space_ion_concentrations__Na_c*
+var_membrane__V*var_membrane__F^2/var_membrane__R/var_membrane__T*(exp((
+var_membrane__V-var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__Na_c/
+var_intracellular_ion_concentrations__Na_i))*var_membrane__F/var_membrane__R/
+var_membrane__T)-1)/(exp(var_membrane__V*var_membrane__F/var_membrane__R/
+var_membrane__T)-1)-var_background_currents__g_B_Na*(var_membrane__V-
+var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__Na_c/
+var_intracellular_ion_concentrations__Na_i))-4.8*
+var_sodium_potassium_pump__i_NaK_max*var_cleft_space_ion_concentrations__K_c/(
+var_cleft_space_ion_concentrations__K_c+var_sodium_potassium_pump__k_NaK_K)*
+var_intracellular_ion_concentrations__Na_i^1.5/(
+var_intracellular_ion_concentrations__Na_i^1.5+
+var_sodium_potassium_pump__k_NaK_Na^1.5)/(1.5+exp(-1/40*var_membrane__V-3/2))-3
+*var_Na_Ca_ion_exchanger_current__k_NaCa*(
+var_intracellular_ion_concentrations__Na_i^3*
+var_cleft_space_ion_concentrations__Ca_c*exp(
+var_Na_Ca_ion_exchanger_current__gamma*var_membrane__F*var_membrane__V/
+var_membrane__R/var_membrane__T)-var_cleft_space_ion_concentrations__Na_c^3*
+var_intracellular_ion_concentrations__Ca_i*exp((
+var_Na_Ca_ion_exchanger_current__gamma-1)*var_membrane__V*var_membrane__F/
+var_membrane__R/var_membrane__T))/(1+var_Na_Ca_ion_exchanger_current__d_NaCa*(
+var_cleft_space_ion_concentrations__Na_c^3*
+var_intracellular_ion_concentrations__Ca_i+
+var_intracellular_ion_concentrations__Na_i^3*
+var_cleft_space_ion_concentrations__Ca_c)))/
+var_intracellular_ion_concentrations__Vol_i/var_membrane__F
+d_dt_intracellular_ion_concentrations__K_i := (-
+var_Ca_independent_transient_outward_K_current__g_to*
+var_Ca_independent_transient_outward_K_current_r_gate__r*(.59*
+var_Ca_independent_transient_outward_K_current_s1_gate__s1^3+.41*
+var_Ca_independent_transient_outward_K_current_s2_gate__s2^3)*(.6*
+var_Ca_independent_transient_outward_K_current_s3_gate__s3^6+.4)*(
+var_membrane__V-var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))-.1e-2*var_membrane__V-.70e-1-
+var_inward_rectifier__g_K1*(var_membrane__V-var_membrane__R*var_membrane__T/
+var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))*
+var_cleft_space_ion_concentrations__K_c^3/(
+var_cleft_space_ion_concentrations__K_c+var_inward_rectifier__KmK1)^3/(1+exp(
+var_inward_rectifier__steepK1*var_membrane__F*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i)-var_inward_rectifier__shiftK1)/
+var_membrane__R/var_membrane__T))-var_delayed_rectifier_K_current__g_Kr*
+var_delayed_rectifier_K_current_pa_gate__p_a*
+var_delayed_rectifier_K_current_pi_gate__p_i*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))-
+var_delayed_rectifier_K_current__g_Ks*var_delayed_rectifier_K_current_z_gate__z
+*(var_membrane__V-var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))+3.2*
+var_sodium_potassium_pump__i_NaK_max*var_cleft_space_ion_concentrations__K_c/(
+var_cleft_space_ion_concentrations__K_c+var_sodium_potassium_pump__k_NaK_K)*
+var_intracellular_ion_concentrations__Na_i^1.5/(
+var_intracellular_ion_concentrations__Na_i^1.5+
+var_sodium_potassium_pump__k_NaK_Na^1.5)/(1.5+exp(-1/40*var_membrane__V-3/2)))/
+var_intracellular_ion_concentrations__Vol_i/var_membrane__F
+d_dt_intracellular_ion_concentrations__Ca_i := 1/2*(-
+var_L_type_Ca_channel__g_Ca_L*(var_L_type_Ca_channel_d_L_gate__d_L*
+var_L_type_Ca_channel_f_L_gate__f_L+1/(1+exp(-1/12*var_membrane__V+23/12)))*(
+var_membrane__V-var_L_type_Ca_channel__E_Ca_app)-var_T_type_Ca_channel__g_Ca_T*
+var_T_type_Ca_channel_d_T_gate__d_T*var_T_type_Ca_channel_f_T_gate__f_T*(
+var_membrane__V-var_T_type_Ca_channel__E_Ca_T)-var_background_currents__g_B_Ca*
+(var_membrane__V-1/2*var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__Ca_c/
+var_intracellular_ion_concentrations__Ca_i))-
+var_sarcolemmal_calcium_pump_current__i_CaP_max*
+var_intracellular_ion_concentrations__Ca_i/(
+var_intracellular_ion_concentrations__Ca_i+
+var_sarcolemmal_calcium_pump_current__k_CaP)+2*
+var_Na_Ca_ion_exchanger_current__k_NaCa*(
+var_intracellular_ion_concentrations__Na_i^3*
+var_cleft_space_ion_concentrations__Ca_c*exp(
+var_Na_Ca_ion_exchanger_current__gamma*var_membrane__F*var_membrane__V/
+var_membrane__R/var_membrane__T)-var_cleft_space_ion_concentrations__Na_c^3*
+var_intracellular_ion_concentrations__Ca_i*exp((
+var_Na_Ca_ion_exchanger_current__gamma-1)*var_membrane__V*var_membrane__F/
+var_membrane__R/var_membrane__T))/(1+var_Na_Ca_ion_exchanger_current__d_NaCa*(
+var_cleft_space_ion_concentrations__Na_c^3*
+var_intracellular_ion_concentrations__Ca_i+
+var_intracellular_ion_concentrations__Na_i^3*
+var_cleft_space_ion_concentrations__Ca_c))-var_Ca_handling_by_the_SR__I_up_max*
+(var_intracellular_ion_concentrations__Ca_i/var_Ca_handling_by_the_SR__k_cyca-
+var_Ca_handling_by_the_SR__k_xcs^2*var_Ca_handling_by_the_SR__Ca_up/
+var_Ca_handling_by_the_SR__k_srca)/((var_intracellular_ion_concentrations__Ca_i
++var_Ca_handling_by_the_SR__k_cyca)/var_Ca_handling_by_the_SR__k_cyca+
+var_Ca_handling_by_the_SR__k_xcs*(var_Ca_handling_by_the_SR__Ca_up+
+var_Ca_handling_by_the_SR__k_srca)/var_Ca_handling_by_the_SR__k_srca)+
+var_Ca_handling_by_the_SR__alpha_rel*var_Ca_handling_by_the_SR__F2^2/(
+var_Ca_handling_by_the_SR__F2+.25)^2*(var_Ca_handling_by_the_SR__Ca_rel-
+var_intracellular_ion_concentrations__Ca_i))/
+var_intracellular_ion_concentrations__Vol_Ca/var_membrane__F-6272.00*
+var_intracellular_ion_concentrations__Ca_i*(1-
+var_intracellular_Ca_buffering__O_TC)+31.36*
+var_intracellular_Ca_buffering__O_TC-32000.00*
+var_intracellular_ion_concentrations__Ca_i*(1-
+var_intracellular_Ca_buffering__O_TMgC-var_intracellular_Ca_buffering__O_TMgMg)
++1.056*var_intracellular_Ca_buffering__O_TMgC-9000.000*
+var_intracellular_ion_concentrations__Ca_i*(1-
+var_intracellular_Ca_buffering__O_C)+21.420*var_intracellular_Ca_buffering__O_C
+d_dt_intracellular_Ca_buffering__O_C := 200000*
+var_intracellular_ion_concentrations__Ca_i*(1-
+var_intracellular_Ca_buffering__O_C)-476*var_intracellular_Ca_buffering__O_C
+d_dt_intracellular_Ca_buffering__O_TC := 78400*
+var_intracellular_ion_concentrations__Ca_i*(1-
+var_intracellular_Ca_buffering__O_TC)-392*var_intracellular_Ca_buffering__O_TC
+d_dt_intracellular_Ca_buffering__O_TMgC := 200000*
+var_intracellular_ion_concentrations__Ca_i*(1-
+var_intracellular_Ca_buffering__O_TMgC-var_intracellular_Ca_buffering__O_TMgMg)
+-6.6*var_intracellular_Ca_buffering__O_TMgC
+d_dt_intracellular_Ca_buffering__O_TMgMg := 2000*
+var_intracellular_Ca_buffering__Mg_i*(1-var_intracellular_Ca_buffering__O_TMgC-
+var_intracellular_Ca_buffering__O_TMgMg)-666*
+var_intracellular_Ca_buffering__O_TMgMg
+d_dt_cleft_space_ion_concentrations__K_c := (
+var_Ca_independent_transient_outward_K_current__g_to*
+var_Ca_independent_transient_outward_K_current_r_gate__r*(.59*
+var_Ca_independent_transient_outward_K_current_s1_gate__s1^3+.41*
+var_Ca_independent_transient_outward_K_current_s2_gate__s2^3)*(.6*
+var_Ca_independent_transient_outward_K_current_s3_gate__s3^6+.4)*(
+var_membrane__V-var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))+.1e-2*var_membrane__V+.70e-1+
+var_inward_rectifier__g_K1*(var_membrane__V-var_membrane__R*var_membrane__T/
+var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))*
+var_cleft_space_ion_concentrations__K_c^3/(
+var_cleft_space_ion_concentrations__K_c+var_inward_rectifier__KmK1)^3/(1+exp(
+var_inward_rectifier__steepK1*var_membrane__F*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i)-var_inward_rectifier__shiftK1)/
+var_membrane__R/var_membrane__T))+var_delayed_rectifier_K_current__g_Kr*
+var_delayed_rectifier_K_current_pa_gate__p_a*
+var_delayed_rectifier_K_current_pi_gate__p_i*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))+
+var_delayed_rectifier_K_current__g_Ks*var_delayed_rectifier_K_current_z_gate__z
+*(var_membrane__V-var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))-3.2*
+var_sodium_potassium_pump__i_NaK_max*var_cleft_space_ion_concentrations__K_c/(
+var_cleft_space_ion_concentrations__K_c+var_sodium_potassium_pump__k_NaK_K)*
+var_intracellular_ion_concentrations__Na_i^1.5/(
+var_intracellular_ion_concentrations__Na_i^1.5+
+var_sodium_potassium_pump__k_NaK_Na^1.5)/(1.5+exp(-1/40*var_membrane__V-3/2)))/
+var_cleft_space_ion_concentrations__Vol_c/var_membrane__F
+d_dt_Ca_handling_by_the_SR__O_Calse := 480*var_Ca_handling_by_the_SR__Ca_rel*(1
+-var_Ca_handling_by_the_SR__O_Calse)-400*var_Ca_handling_by_the_SR__O_Calse
+d_dt_Ca_handling_by_the_SR__Ca_rel := 1/2*(2*(var_Ca_handling_by_the_SR__Ca_up-
+var_Ca_handling_by_the_SR__Ca_rel)*var_membrane__F*
+var_Ca_handling_by_the_SR__Vol_rel/var_Ca_handling_by_the_SR__tau_tr-
+var_Ca_handling_by_the_SR__alpha_rel*var_Ca_handling_by_the_SR__F2^2/(
+var_Ca_handling_by_the_SR__F2+.25)^2*(var_Ca_handling_by_the_SR__Ca_rel-
+var_intracellular_ion_concentrations__Ca_i))/var_Ca_handling_by_the_SR__Vol_rel
+/var_membrane__F-14880*var_Ca_handling_by_the_SR__Ca_rel*(1-
+var_Ca_handling_by_the_SR__O_Calse)+12400*var_Ca_handling_by_the_SR__O_Calse
+d_dt_Ca_handling_by_the_SR__Ca_up := 1/2*(var_Ca_handling_by_the_SR__I_up_max*(
+var_intracellular_ion_concentrations__Ca_i/var_Ca_handling_by_the_SR__k_cyca-
+var_Ca_handling_by_the_SR__k_xcs^2*var_Ca_handling_by_the_SR__Ca_up/
+var_Ca_handling_by_the_SR__k_srca)/((var_intracellular_ion_concentrations__Ca_i
++var_Ca_handling_by_the_SR__k_cyca)/var_Ca_handling_by_the_SR__k_cyca+
+var_Ca_handling_by_the_SR__k_xcs*(var_Ca_handling_by_the_SR__Ca_up+
+var_Ca_handling_by_the_SR__k_srca)/var_Ca_handling_by_the_SR__k_srca)-2*(
+var_Ca_handling_by_the_SR__Ca_up-var_Ca_handling_by_the_SR__Ca_rel)*
+var_membrane__F*var_Ca_handling_by_the_SR__Vol_rel/
+var_Ca_handling_by_the_SR__tau_tr)/var_Ca_handling_by_the_SR__Vol_up/
+var_membrane__F
+d_dt_Ca_handling_by_the_SR__F1 := var_Ca_handling_by_the_SR__k_F3*
+var_Ca_handling_by_the_SR__F3-(240*exp(.8e-1*var_membrane__V-1.60)+203.8*
+var_intracellular_ion_concentrations__Ca_i^4/(
+var_intracellular_ion_concentrations__Ca_i+var_Ca_handling_by_the_SR__k_rel)^4)
+*var_Ca_handling_by_the_SR__F1
+d_dt_Ca_handling_by_the_SR__F2 := (240*exp(.8e-1*var_membrane__V-1.60)+203.8*
+var_intracellular_ion_concentrations__Ca_i^4/(
+var_intracellular_ion_concentrations__Ca_i+var_Ca_handling_by_the_SR__k_rel)^4)
+*var_Ca_handling_by_the_SR__F1-(33.96+339.6*
+var_intracellular_ion_concentrations__Ca_i^4/(
+var_intracellular_ion_concentrations__Ca_i+var_Ca_handling_by_the_SR__k_rel)^4)
+*var_Ca_handling_by_the_SR__F2
+d_dt_Ca_handling_by_the_SR__F3 := (33.96+339.6*
+var_intracellular_ion_concentrations__Ca_i^4/(
+var_intracellular_ion_concentrations__Ca_i+var_Ca_handling_by_the_SR__k_rel)^4)
+*var_Ca_handling_by_the_SR__F2-var_Ca_handling_by_the_SR__k_F3*
+var_Ca_handling_by_the_SR__F3
+g_var_Ca_handling_by_the_SR__Ca_rel := var_Ca_handling_by_the_SR__Ca_rel-
+var_Ca_handling_by_the_SR__Ca_rel_old-delta_t*(1/2*(2*(
+var_Ca_handling_by_the_SR__Ca_up-var_Ca_handling_by_the_SR__Ca_rel)*
+var_membrane__F*var_Ca_handling_by_the_SR__Vol_rel/
+var_Ca_handling_by_the_SR__tau_tr-var_Ca_handling_by_the_SR__alpha_rel*
+var_Ca_handling_by_the_SR__F2^2/(var_Ca_handling_by_the_SR__F2+.25)^2*(
+var_Ca_handling_by_the_SR__Ca_rel-var_intracellular_ion_concentrations__Ca_i))/
+var_Ca_handling_by_the_SR__Vol_rel/var_membrane__F-14880*
+var_Ca_handling_by_the_SR__Ca_rel*(1-var_Ca_handling_by_the_SR__O_Calse)+12400*
+var_Ca_handling_by_the_SR__O_Calse)
+g_var_Ca_handling_by_the_SR__Ca_up := var_Ca_handling_by_the_SR__Ca_up-
+var_Ca_handling_by_the_SR__Ca_up_old-1/2*delta_t*(
+var_Ca_handling_by_the_SR__I_up_max*(var_intracellular_ion_concentrations__Ca_i
+/var_Ca_handling_by_the_SR__k_cyca-var_Ca_handling_by_the_SR__k_xcs^2*
+var_Ca_handling_by_the_SR__Ca_up/var_Ca_handling_by_the_SR__k_srca)/((
+var_intracellular_ion_concentrations__Ca_i+var_Ca_handling_by_the_SR__k_cyca)/
+var_Ca_handling_by_the_SR__k_cyca+var_Ca_handling_by_the_SR__k_xcs*(
+var_Ca_handling_by_the_SR__Ca_up+var_Ca_handling_by_the_SR__k_srca)/
+var_Ca_handling_by_the_SR__k_srca)-2*(var_Ca_handling_by_the_SR__Ca_up-
+var_Ca_handling_by_the_SR__Ca_rel)*var_membrane__F*
+var_Ca_handling_by_the_SR__Vol_rel/var_Ca_handling_by_the_SR__tau_tr)/
+var_Ca_handling_by_the_SR__Vol_up/var_membrane__F
+g_var_Ca_handling_by_the_SR__F1 := var_Ca_handling_by_the_SR__F1-
+var_Ca_handling_by_the_SR__F1_old-delta_t*(var_Ca_handling_by_the_SR__k_F3*
+var_Ca_handling_by_the_SR__F3-(240*exp(.8e-1*var_membrane__V-1.60)+203.8*
+var_intracellular_ion_concentrations__Ca_i^4/(
+var_intracellular_ion_concentrations__Ca_i+var_Ca_handling_by_the_SR__k_rel)^4)
+*var_Ca_handling_by_the_SR__F1)
+g_var_Ca_handling_by_the_SR__F2 := var_Ca_handling_by_the_SR__F2-
+var_Ca_handling_by_the_SR__F2_old-delta_t*((240*exp(.8e-1*var_membrane__V-1.60)
++203.8*var_intracellular_ion_concentrations__Ca_i^4/(
+var_intracellular_ion_concentrations__Ca_i+var_Ca_handling_by_the_SR__k_rel)^4)
+*var_Ca_handling_by_the_SR__F1-(33.96+339.6*
+var_intracellular_ion_concentrations__Ca_i^4/(
+var_intracellular_ion_concentrations__Ca_i+var_Ca_handling_by_the_SR__k_rel)^4)
+*var_Ca_handling_by_the_SR__F2)
+g_var_Ca_handling_by_the_SR__F3 := var_Ca_handling_by_the_SR__F3-
+var_Ca_handling_by_the_SR__F3_old-delta_t*((33.96+339.6*
+var_intracellular_ion_concentrations__Ca_i^4/(
+var_intracellular_ion_concentrations__Ca_i+var_Ca_handling_by_the_SR__k_rel)^4)
+*var_Ca_handling_by_the_SR__F2-var_Ca_handling_by_the_SR__k_F3*
+var_Ca_handling_by_the_SR__F3)
+g_var_Ca_handling_by_the_SR__O_Calse := var_Ca_handling_by_the_SR__O_Calse-
+var_Ca_handling_by_the_SR__O_Calse_old-delta_t*(480*
+var_Ca_handling_by_the_SR__Ca_rel*(1-var_Ca_handling_by_the_SR__O_Calse)-400*
+var_Ca_handling_by_the_SR__O_Calse)
+g_var_cleft_space_ion_concentrations__K_c := 
+var_cleft_space_ion_concentrations__K_c-
+var_cleft_space_ion_concentrations__K_c_old-delta_t*(
+var_Ca_independent_transient_outward_K_current__g_to*
+var_Ca_independent_transient_outward_K_current_r_gate__r*(.59*
+var_Ca_independent_transient_outward_K_current_s1_gate__s1^3+.41*
+var_Ca_independent_transient_outward_K_current_s2_gate__s2^3)*(.6*
+var_Ca_independent_transient_outward_K_current_s3_gate__s3^6+.4)*(
+var_membrane__V-var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))+.1e-2*var_membrane__V+.70e-1+
+var_inward_rectifier__g_K1*(var_membrane__V-var_membrane__R*var_membrane__T/
+var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))*
+var_cleft_space_ion_concentrations__K_c^3/(
+var_cleft_space_ion_concentrations__K_c+var_inward_rectifier__KmK1)^3/(1+exp(
+var_inward_rectifier__steepK1*var_membrane__F*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i)-var_inward_rectifier__shiftK1)/
+var_membrane__R/var_membrane__T))+var_delayed_rectifier_K_current__g_Kr*
+var_delayed_rectifier_K_current_pa_gate__p_a*
+var_delayed_rectifier_K_current_pi_gate__p_i*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))+
+var_delayed_rectifier_K_current__g_Ks*var_delayed_rectifier_K_current_z_gate__z
+*(var_membrane__V-var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))-3.2*
+var_sodium_potassium_pump__i_NaK_max*var_cleft_space_ion_concentrations__K_c/(
+var_cleft_space_ion_concentrations__K_c+var_sodium_potassium_pump__k_NaK_K)*
+var_intracellular_ion_concentrations__Na_i^1.5/(
+var_intracellular_ion_concentrations__Na_i^1.5+
+var_sodium_potassium_pump__k_NaK_Na^1.5)/(1.5+exp(-1/40*var_membrane__V-3/2)))/
+var_cleft_space_ion_concentrations__Vol_c/var_membrane__F
+g_var_intracellular_Ca_buffering__O_C := var_intracellular_Ca_buffering__O_C-
+var_intracellular_Ca_buffering__O_C_old-delta_t*(200000*
+var_intracellular_ion_concentrations__Ca_i*(1-
+var_intracellular_Ca_buffering__O_C)-476*var_intracellular_Ca_buffering__O_C)
+g_var_intracellular_Ca_buffering__O_TC := var_intracellular_Ca_buffering__O_TC-
+var_intracellular_Ca_buffering__O_TC_old-delta_t*(78400*
+var_intracellular_ion_concentrations__Ca_i*(1-
+var_intracellular_Ca_buffering__O_TC)-392*var_intracellular_Ca_buffering__O_TC)
+g_var_intracellular_Ca_buffering__O_TMgC := 
+var_intracellular_Ca_buffering__O_TMgC-
+var_intracellular_Ca_buffering__O_TMgC_old-delta_t*(200000*
+var_intracellular_ion_concentrations__Ca_i*(1-
+var_intracellular_Ca_buffering__O_TMgC-var_intracellular_Ca_buffering__O_TMgMg)
+-6.6*var_intracellular_Ca_buffering__O_TMgC)
+g_var_intracellular_Ca_buffering__O_TMgMg := 
+var_intracellular_Ca_buffering__O_TMgMg-
+var_intracellular_Ca_buffering__O_TMgMg_old-delta_t*(2000*
+var_intracellular_Ca_buffering__Mg_i*(1-var_intracellular_Ca_buffering__O_TMgC-
+var_intracellular_Ca_buffering__O_TMgMg)-666*
+var_intracellular_Ca_buffering__O_TMgMg)
+g_var_intracellular_ion_concentrations__Ca_i := 
+var_intracellular_ion_concentrations__Ca_i-
+var_intracellular_ion_concentrations__Ca_i_old-delta_t*(1/2*(-
+var_L_type_Ca_channel__g_Ca_L*(var_L_type_Ca_channel_d_L_gate__d_L*
+var_L_type_Ca_channel_f_L_gate__f_L+1/(1+exp(-1/12*var_membrane__V+23/12)))*(
+var_membrane__V-var_L_type_Ca_channel__E_Ca_app)-var_T_type_Ca_channel__g_Ca_T*
+var_T_type_Ca_channel_d_T_gate__d_T*var_T_type_Ca_channel_f_T_gate__f_T*(
+var_membrane__V-var_T_type_Ca_channel__E_Ca_T)-var_background_currents__g_B_Ca*
+(var_membrane__V-1/2*var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__Ca_c/
+var_intracellular_ion_concentrations__Ca_i))-
+var_sarcolemmal_calcium_pump_current__i_CaP_max*
+var_intracellular_ion_concentrations__Ca_i/(
+var_intracellular_ion_concentrations__Ca_i+
+var_sarcolemmal_calcium_pump_current__k_CaP)+2*
+var_Na_Ca_ion_exchanger_current__k_NaCa*(
+var_intracellular_ion_concentrations__Na_i^3*
+var_cleft_space_ion_concentrations__Ca_c*exp(
+var_Na_Ca_ion_exchanger_current__gamma*var_membrane__F*var_membrane__V/
+var_membrane__R/var_membrane__T)-var_cleft_space_ion_concentrations__Na_c^3*
+var_intracellular_ion_concentrations__Ca_i*exp((
+var_Na_Ca_ion_exchanger_current__gamma-1)*var_membrane__V*var_membrane__F/
+var_membrane__R/var_membrane__T))/(1+var_Na_Ca_ion_exchanger_current__d_NaCa*(
+var_cleft_space_ion_concentrations__Na_c^3*
+var_intracellular_ion_concentrations__Ca_i+
+var_intracellular_ion_concentrations__Na_i^3*
+var_cleft_space_ion_concentrations__Ca_c))-var_Ca_handling_by_the_SR__I_up_max*
+(var_intracellular_ion_concentrations__Ca_i/var_Ca_handling_by_the_SR__k_cyca-
+var_Ca_handling_by_the_SR__k_xcs^2*var_Ca_handling_by_the_SR__Ca_up/
+var_Ca_handling_by_the_SR__k_srca)/((var_intracellular_ion_concentrations__Ca_i
++var_Ca_handling_by_the_SR__k_cyca)/var_Ca_handling_by_the_SR__k_cyca+
+var_Ca_handling_by_the_SR__k_xcs*(var_Ca_handling_by_the_SR__Ca_up+
+var_Ca_handling_by_the_SR__k_srca)/var_Ca_handling_by_the_SR__k_srca)+
+var_Ca_handling_by_the_SR__alpha_rel*var_Ca_handling_by_the_SR__F2^2/(
+var_Ca_handling_by_the_SR__F2+.25)^2*(var_Ca_handling_by_the_SR__Ca_rel-
+var_intracellular_ion_concentrations__Ca_i))/
+var_intracellular_ion_concentrations__Vol_Ca/var_membrane__F-6272.00*
+var_intracellular_ion_concentrations__Ca_i*(1-
+var_intracellular_Ca_buffering__O_TC)+31.36*
+var_intracellular_Ca_buffering__O_TC-32000.00*
+var_intracellular_ion_concentrations__Ca_i*(1-
+var_intracellular_Ca_buffering__O_TMgC-var_intracellular_Ca_buffering__O_TMgMg)
++1.056*var_intracellular_Ca_buffering__O_TMgC-9000.000*
+var_intracellular_ion_concentrations__Ca_i*(1-
+var_intracellular_Ca_buffering__O_C)+21.420*var_intracellular_Ca_buffering__O_C
+)
+g_var_intracellular_ion_concentrations__K_i := 
+var_intracellular_ion_concentrations__K_i-
+var_intracellular_ion_concentrations__K_i_old-delta_t*(-
+var_Ca_independent_transient_outward_K_current__g_to*
+var_Ca_independent_transient_outward_K_current_r_gate__r*(.59*
+var_Ca_independent_transient_outward_K_current_s1_gate__s1^3+.41*
+var_Ca_independent_transient_outward_K_current_s2_gate__s2^3)*(.6*
+var_Ca_independent_transient_outward_K_current_s3_gate__s3^6+.4)*(
+var_membrane__V-var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))-.1e-2*var_membrane__V-.70e-1-
+var_inward_rectifier__g_K1*(var_membrane__V-var_membrane__R*var_membrane__T/
+var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))*
+var_cleft_space_ion_concentrations__K_c^3/(
+var_cleft_space_ion_concentrations__K_c+var_inward_rectifier__KmK1)^3/(1+exp(
+var_inward_rectifier__steepK1*var_membrane__F*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i)-var_inward_rectifier__shiftK1)/
+var_membrane__R/var_membrane__T))-var_delayed_rectifier_K_current__g_Kr*
+var_delayed_rectifier_K_current_pa_gate__p_a*
+var_delayed_rectifier_K_current_pi_gate__p_i*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))-
+var_delayed_rectifier_K_current__g_Ks*var_delayed_rectifier_K_current_z_gate__z
+*(var_membrane__V-var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))+3.2*
+var_sodium_potassium_pump__i_NaK_max*var_cleft_space_ion_concentrations__K_c/(
+var_cleft_space_ion_concentrations__K_c+var_sodium_potassium_pump__k_NaK_K)*
+var_intracellular_ion_concentrations__Na_i^1.5/(
+var_intracellular_ion_concentrations__Na_i^1.5+
+var_sodium_potassium_pump__k_NaK_Na^1.5)/(1.5+exp(-1/40*var_membrane__V-3/2)))/
+var_intracellular_ion_concentrations__Vol_i/var_membrane__F
+g_var_intracellular_ion_concentrations__Na_i := 
+var_intracellular_ion_concentrations__Na_i-
+var_intracellular_ion_concentrations__Na_i_old-delta_t*(-
+var_sodium_current__P_Na*var_sodium_current_m_gate__m^3*(.635*
+var_sodium_current_h1_gate__h1+.365*var_sodium_current_h2_gate__h2)*
+var_cleft_space_ion_concentrations__Na_c*var_membrane__V*var_membrane__F^2/
+var_membrane__R/var_membrane__T*(exp((var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__Na_c/
+var_intracellular_ion_concentrations__Na_i))*var_membrane__F/var_membrane__R/
+var_membrane__T)-1)/(exp(var_membrane__V*var_membrane__F/var_membrane__R/
+var_membrane__T)-1)-var_background_currents__g_B_Na*(var_membrane__V-
+var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__Na_c/
+var_intracellular_ion_concentrations__Na_i))-4.8*
+var_sodium_potassium_pump__i_NaK_max*var_cleft_space_ion_concentrations__K_c/(
+var_cleft_space_ion_concentrations__K_c+var_sodium_potassium_pump__k_NaK_K)*
+var_intracellular_ion_concentrations__Na_i^1.5/(
+var_intracellular_ion_concentrations__Na_i^1.5+
+var_sodium_potassium_pump__k_NaK_Na^1.5)/(1.5+exp(-1/40*var_membrane__V-3/2))-3
+*var_Na_Ca_ion_exchanger_current__k_NaCa*(
+var_intracellular_ion_concentrations__Na_i^3*
+var_cleft_space_ion_concentrations__Ca_c*exp(
+var_Na_Ca_ion_exchanger_current__gamma*var_membrane__F*var_membrane__V/
+var_membrane__R/var_membrane__T)-var_cleft_space_ion_concentrations__Na_c^3*
+var_intracellular_ion_concentrations__Ca_i*exp((
+var_Na_Ca_ion_exchanger_current__gamma-1)*var_membrane__V*var_membrane__F/
+var_membrane__R/var_membrane__T))/(1+var_Na_Ca_ion_exchanger_current__d_NaCa*(
+var_cleft_space_ion_concentrations__Na_c^3*
+var_intracellular_ion_concentrations__Ca_i+
+var_intracellular_ion_concentrations__Na_i^3*
+var_cleft_space_ion_concentrations__Ca_c)))/
+var_intracellular_ion_concentrations__Vol_i/var_membrane__F
+"--var_Ca_handling_by_the_SR__Ca_rel/var_Ca_handling_by_the_SR__Ca_rel--"
+1-delta_t*(1/2*(-2*var_membrane__F*var_Ca_handling_by_the_SR__Vol_rel/
+var_Ca_handling_by_the_SR__tau_tr-var_Ca_handling_by_the_SR__alpha_rel*
+var_Ca_handling_by_the_SR__F2^2/(var_Ca_handling_by_the_SR__F2+.25)^2)/
+var_Ca_handling_by_the_SR__Vol_rel/var_membrane__F-14880+14880*
+var_Ca_handling_by_the_SR__O_Calse)
+"--var_Ca_handling_by_the_SR__Ca_rel/var_Ca_handling_by_the_SR__Ca_up--"
+-delta_t/var_Ca_handling_by_the_SR__tau_tr
+"--var_Ca_handling_by_the_SR__Ca_rel/var_Ca_handling_by_the_SR__F1--"
+0
+"--var_Ca_handling_by_the_SR__Ca_rel/var_Ca_handling_by_the_SR__F2--"
+-1/2*delta_t*(-2*var_Ca_handling_by_the_SR__alpha_rel*
+var_Ca_handling_by_the_SR__F2/(var_Ca_handling_by_the_SR__F2+.25)^2*(
+var_Ca_handling_by_the_SR__Ca_rel-var_intracellular_ion_concentrations__Ca_i)+2
+*var_Ca_handling_by_the_SR__alpha_rel*var_Ca_handling_by_the_SR__F2^2/(
+var_Ca_handling_by_the_SR__F2+.25)^3*(var_Ca_handling_by_the_SR__Ca_rel-
+var_intracellular_ion_concentrations__Ca_i))/var_Ca_handling_by_the_SR__Vol_rel
+/var_membrane__F
+"--var_Ca_handling_by_the_SR__Ca_rel/var_Ca_handling_by_the_SR__F3--"
+0
+"--var_Ca_handling_by_the_SR__Ca_rel/var_Ca_handling_by_the_SR__O_Calse--"
+-delta_t*(14880*var_Ca_handling_by_the_SR__Ca_rel+12400)
+"--var_Ca_handling_by_the_SR__Ca_rel/var_cleft_space_ion_concentrations__K_c--"
+0
+"--var_Ca_handling_by_the_SR__Ca_rel/var_intracellular_Ca_buffering__O_C--"
+0
+"--var_Ca_handling_by_the_SR__Ca_rel/var_intracellular_Ca_buffering__O_TC--"
+0
+"--var_Ca_handling_by_the_SR__Ca_rel/var_intracellular_Ca_buffering__O_TMgC--"
+0
+"--var_Ca_handling_by_the_SR__Ca_rel/var_intracellular_Ca_buffering__O_TMgMg--"
+0
+"--var_Ca_handling_by_the_SR__Ca_rel/var_intracellular_ion_concentrations__Ca_i\
+--"
+-1/2*delta_t*var_Ca_handling_by_the_SR__alpha_rel*var_Ca_handling_by_the_SR__F2
+^2/(var_Ca_handling_by_the_SR__F2+.25)^2/var_Ca_handling_by_the_SR__Vol_rel/
+var_membrane__F
+"--var_Ca_handling_by_the_SR__Ca_rel/var_intracellular_ion_concentrations__K_i-\
+-"
+0
+"--var_Ca_handling_by_the_SR__Ca_rel/var_intracellular_ion_concentrations__Na_i\
+--"
+0
+"--var_Ca_handling_by_the_SR__Ca_up/var_Ca_handling_by_the_SR__Ca_rel--"
+-delta_t*var_Ca_handling_by_the_SR__Vol_rel/var_Ca_handling_by_the_SR__tau_tr/
+var_Ca_handling_by_the_SR__Vol_up
+"--var_Ca_handling_by_the_SR__Ca_up/var_Ca_handling_by_the_SR__Ca_up--"
+1-1/2*delta_t*(-var_Ca_handling_by_the_SR__I_up_max*
+var_Ca_handling_by_the_SR__k_xcs^2/var_Ca_handling_by_the_SR__k_srca/((
+var_intracellular_ion_concentrations__Ca_i+var_Ca_handling_by_the_SR__k_cyca)/
+var_Ca_handling_by_the_SR__k_cyca+var_Ca_handling_by_the_SR__k_xcs*(
+var_Ca_handling_by_the_SR__Ca_up+var_Ca_handling_by_the_SR__k_srca)/
+var_Ca_handling_by_the_SR__k_srca)-var_Ca_handling_by_the_SR__I_up_max*(
+var_intracellular_ion_concentrations__Ca_i/var_Ca_handling_by_the_SR__k_cyca-
+var_Ca_handling_by_the_SR__k_xcs^2*var_Ca_handling_by_the_SR__Ca_up/
+var_Ca_handling_by_the_SR__k_srca)/((var_intracellular_ion_concentrations__Ca_i
++var_Ca_handling_by_the_SR__k_cyca)/var_Ca_handling_by_the_SR__k_cyca+
+var_Ca_handling_by_the_SR__k_xcs*(var_Ca_handling_by_the_SR__Ca_up+
+var_Ca_handling_by_the_SR__k_srca)/var_Ca_handling_by_the_SR__k_srca)^2*
+var_Ca_handling_by_the_SR__k_xcs/var_Ca_handling_by_the_SR__k_srca-2*
+var_membrane__F*var_Ca_handling_by_the_SR__Vol_rel/
+var_Ca_handling_by_the_SR__tau_tr)/var_Ca_handling_by_the_SR__Vol_up/
+var_membrane__F
+"--var_Ca_handling_by_the_SR__Ca_up/var_Ca_handling_by_the_SR__F1--"
+0
+"--var_Ca_handling_by_the_SR__Ca_up/var_Ca_handling_by_the_SR__F2--"
+0
+"--var_Ca_handling_by_the_SR__Ca_up/var_Ca_handling_by_the_SR__F3--"
+0
+"--var_Ca_handling_by_the_SR__Ca_up/var_Ca_handling_by_the_SR__O_Calse--"
+0
+"--var_Ca_handling_by_the_SR__Ca_up/var_cleft_space_ion_concentrations__K_c--"
+0
+"--var_Ca_handling_by_the_SR__Ca_up/var_intracellular_Ca_buffering__O_C--"
+0
+"--var_Ca_handling_by_the_SR__Ca_up/var_intracellular_Ca_buffering__O_TC--"
+0
+"--var_Ca_handling_by_the_SR__Ca_up/var_intracellular_Ca_buffering__O_TMgC--"
+0
+"--var_Ca_handling_by_the_SR__Ca_up/var_intracellular_Ca_buffering__O_TMgMg--"
+0
+"--var_Ca_handling_by_the_SR__Ca_up/var_intracellular_ion_concentrations__Ca_i-\
+-"
+-1/2*delta_t*(var_Ca_handling_by_the_SR__I_up_max/
+var_Ca_handling_by_the_SR__k_cyca/((var_intracellular_ion_concentrations__Ca_i+
+var_Ca_handling_by_the_SR__k_cyca)/var_Ca_handling_by_the_SR__k_cyca+
+var_Ca_handling_by_the_SR__k_xcs*(var_Ca_handling_by_the_SR__Ca_up+
+var_Ca_handling_by_the_SR__k_srca)/var_Ca_handling_by_the_SR__k_srca)-
+var_Ca_handling_by_the_SR__I_up_max*(var_intracellular_ion_concentrations__Ca_i
+/var_Ca_handling_by_the_SR__k_cyca-var_Ca_handling_by_the_SR__k_xcs^2*
+var_Ca_handling_by_the_SR__Ca_up/var_Ca_handling_by_the_SR__k_srca)/((
+var_intracellular_ion_concentrations__Ca_i+var_Ca_handling_by_the_SR__k_cyca)/
+var_Ca_handling_by_the_SR__k_cyca+var_Ca_handling_by_the_SR__k_xcs*(
+var_Ca_handling_by_the_SR__Ca_up+var_Ca_handling_by_the_SR__k_srca)/
+var_Ca_handling_by_the_SR__k_srca)^2/var_Ca_handling_by_the_SR__k_cyca)/
+var_Ca_handling_by_the_SR__Vol_up/var_membrane__F
+"--var_Ca_handling_by_the_SR__Ca_up/var_intracellular_ion_concentrations__K_i--\
+"
+0
+"--var_Ca_handling_by_the_SR__Ca_up/var_intracellular_ion_concentrations__Na_i-\
+-"
+0
+"--var_Ca_handling_by_the_SR__F1/var_Ca_handling_by_the_SR__Ca_rel--"
+0
+"--var_Ca_handling_by_the_SR__F1/var_Ca_handling_by_the_SR__Ca_up--"
+0
+"--var_Ca_handling_by_the_SR__F1/var_Ca_handling_by_the_SR__F1--"
+1-delta_t*(-240*exp(.8e-1*var_membrane__V-1.60)-203.8*
+var_intracellular_ion_concentrations__Ca_i^4/(
+var_intracellular_ion_concentrations__Ca_i+var_Ca_handling_by_the_SR__k_rel)^4)
+"--var_Ca_handling_by_the_SR__F1/var_Ca_handling_by_the_SR__F2--"
+0
+"--var_Ca_handling_by_the_SR__F1/var_Ca_handling_by_the_SR__F3--"
+-delta_t*var_Ca_handling_by_the_SR__k_F3
+"--var_Ca_handling_by_the_SR__F1/var_Ca_handling_by_the_SR__O_Calse--"
+0
+"--var_Ca_handling_by_the_SR__F1/var_cleft_space_ion_concentrations__K_c--"
+0
+"--var_Ca_handling_by_the_SR__F1/var_intracellular_Ca_buffering__O_C--"
+0
+"--var_Ca_handling_by_the_SR__F1/var_intracellular_Ca_buffering__O_TC--"
+0
+"--var_Ca_handling_by_the_SR__F1/var_intracellular_Ca_buffering__O_TMgC--"
+0
+"--var_Ca_handling_by_the_SR__F1/var_intracellular_Ca_buffering__O_TMgMg--"
+0
+"--var_Ca_handling_by_the_SR__F1/var_intracellular_ion_concentrations__Ca_i--"
+delta_t*(815.2*var_intracellular_ion_concentrations__Ca_i^3/(
+var_intracellular_ion_concentrations__Ca_i+var_Ca_handling_by_the_SR__k_rel)^4-\
+815.2*var_intracellular_ion_concentrations__Ca_i^4/(
+var_intracellular_ion_concentrations__Ca_i+var_Ca_handling_by_the_SR__k_rel)^5)
+*var_Ca_handling_by_the_SR__F1
+"--var_Ca_handling_by_the_SR__F1/var_intracellular_ion_concentrations__K_i--"
+0
+"--var_Ca_handling_by_the_SR__F1/var_intracellular_ion_concentrations__Na_i--"
+0
+"--var_Ca_handling_by_the_SR__F2/var_Ca_handling_by_the_SR__Ca_rel--"
+0
+"--var_Ca_handling_by_the_SR__F2/var_Ca_handling_by_the_SR__Ca_up--"
+0
+"--var_Ca_handling_by_the_SR__F2/var_Ca_handling_by_the_SR__F1--"
+-delta_t*(240*exp(.8e-1*var_membrane__V-1.60)+203.8*
+var_intracellular_ion_concentrations__Ca_i^4/(
+var_intracellular_ion_concentrations__Ca_i+var_Ca_handling_by_the_SR__k_rel)^4)
+"--var_Ca_handling_by_the_SR__F2/var_Ca_handling_by_the_SR__F2--"
+1-delta_t*(-33.96-339.6*var_intracellular_ion_concentrations__Ca_i^4/(
+var_intracellular_ion_concentrations__Ca_i+var_Ca_handling_by_the_SR__k_rel)^4)
+"--var_Ca_handling_by_the_SR__F2/var_Ca_handling_by_the_SR__F3--"
+0
+"--var_Ca_handling_by_the_SR__F2/var_Ca_handling_by_the_SR__O_Calse--"
+0
+"--var_Ca_handling_by_the_SR__F2/var_cleft_space_ion_concentrations__K_c--"
+0
+"--var_Ca_handling_by_the_SR__F2/var_intracellular_Ca_buffering__O_C--"
+0
+"--var_Ca_handling_by_the_SR__F2/var_intracellular_Ca_buffering__O_TC--"
+0
+"--var_Ca_handling_by_the_SR__F2/var_intracellular_Ca_buffering__O_TMgC--"
+0
+"--var_Ca_handling_by_the_SR__F2/var_intracellular_Ca_buffering__O_TMgMg--"
+0
+"--var_Ca_handling_by_the_SR__F2/var_intracellular_ion_concentrations__Ca_i--"
+-delta_t*((815.2*var_intracellular_ion_concentrations__Ca_i^3/(
+var_intracellular_ion_concentrations__Ca_i+var_Ca_handling_by_the_SR__k_rel)^4-\
+815.2*var_intracellular_ion_concentrations__Ca_i^4/(
+var_intracellular_ion_concentrations__Ca_i+var_Ca_handling_by_the_SR__k_rel)^5)
+*var_Ca_handling_by_the_SR__F1-(1358.4*
+var_intracellular_ion_concentrations__Ca_i^3/(
+var_intracellular_ion_concentrations__Ca_i+var_Ca_handling_by_the_SR__k_rel)^4-\
+1358.4*var_intracellular_ion_concentrations__Ca_i^4/(
+var_intracellular_ion_concentrations__Ca_i+var_Ca_handling_by_the_SR__k_rel)^5)
+*var_Ca_handling_by_the_SR__F2)
+"--var_Ca_handling_by_the_SR__F2/var_intracellular_ion_concentrations__K_i--"
+0
+"--var_Ca_handling_by_the_SR__F2/var_intracellular_ion_concentrations__Na_i--"
+0
+"--var_Ca_handling_by_the_SR__F3/var_Ca_handling_by_the_SR__Ca_rel--"
+0
+"--var_Ca_handling_by_the_SR__F3/var_Ca_handling_by_the_SR__Ca_up--"
+0
+"--var_Ca_handling_by_the_SR__F3/var_Ca_handling_by_the_SR__F1--"
+0
+"--var_Ca_handling_by_the_SR__F3/var_Ca_handling_by_the_SR__F2--"
+-delta_t*(33.96+339.6*var_intracellular_ion_concentrations__Ca_i^4/(
+var_intracellular_ion_concentrations__Ca_i+var_Ca_handling_by_the_SR__k_rel)^4)
+"--var_Ca_handling_by_the_SR__F3/var_Ca_handling_by_the_SR__F3--"
+1+delta_t*var_Ca_handling_by_the_SR__k_F3
+"--var_Ca_handling_by_the_SR__F3/var_Ca_handling_by_the_SR__O_Calse--"
+0
+"--var_Ca_handling_by_the_SR__F3/var_cleft_space_ion_concentrations__K_c--"
+0
+"--var_Ca_handling_by_the_SR__F3/var_intracellular_Ca_buffering__O_C--"
+0
+"--var_Ca_handling_by_the_SR__F3/var_intracellular_Ca_buffering__O_TC--"
+0
+"--var_Ca_handling_by_the_SR__F3/var_intracellular_Ca_buffering__O_TMgC--"
+0
+"--var_Ca_handling_by_the_SR__F3/var_intracellular_Ca_buffering__O_TMgMg--"
+0
+"--var_Ca_handling_by_the_SR__F3/var_intracellular_ion_concentrations__Ca_i--"
+-delta_t*(1358.4*var_intracellular_ion_concentrations__Ca_i^3/(
+var_intracellular_ion_concentrations__Ca_i+var_Ca_handling_by_the_SR__k_rel)^4-\
+1358.4*var_intracellular_ion_concentrations__Ca_i^4/(
+var_intracellular_ion_concentrations__Ca_i+var_Ca_handling_by_the_SR__k_rel)^5)
+*var_Ca_handling_by_the_SR__F2
+"--var_Ca_handling_by_the_SR__F3/var_intracellular_ion_concentrations__K_i--"
+0
+"--var_Ca_handling_by_the_SR__F3/var_intracellular_ion_concentrations__Na_i--"
+0
+"--var_Ca_handling_by_the_SR__O_Calse/var_Ca_handling_by_the_SR__Ca_rel--"
+-delta_t*(480-480*var_Ca_handling_by_the_SR__O_Calse)
+"--var_Ca_handling_by_the_SR__O_Calse/var_Ca_handling_by_the_SR__Ca_up--"
+0
+"--var_Ca_handling_by_the_SR__O_Calse/var_Ca_handling_by_the_SR__F1--"
+0
+"--var_Ca_handling_by_the_SR__O_Calse/var_Ca_handling_by_the_SR__F2--"
+0
+"--var_Ca_handling_by_the_SR__O_Calse/var_Ca_handling_by_the_SR__F3--"
+0
+"--var_Ca_handling_by_the_SR__O_Calse/var_Ca_handling_by_the_SR__O_Calse--"
+1-delta_t*(-480*var_Ca_handling_by_the_SR__Ca_rel-400)
+"--var_Ca_handling_by_the_SR__O_Calse/var_cleft_space_ion_concentrations__K_c--\
+"
+0
+"--var_Ca_handling_by_the_SR__O_Calse/var_intracellular_Ca_buffering__O_C--"
+0
+"--var_Ca_handling_by_the_SR__O_Calse/var_intracellular_Ca_buffering__O_TC--"
+0
+"--var_Ca_handling_by_the_SR__O_Calse/var_intracellular_Ca_buffering__O_TMgC--"
+0
+"--var_Ca_handling_by_the_SR__O_Calse/var_intracellular_Ca_buffering__O_TMgMg--\
+"
+0
+"--var_Ca_handling_by_the_SR__O_Calse/var_intracellular_ion_concentrations__Ca_\
+i--"
+0
+"--var_Ca_handling_by_the_SR__O_Calse/var_intracellular_ion_concentrations__K_i\
+--"
+0
+"--var_Ca_handling_by_the_SR__O_Calse/var_intracellular_ion_concentrations__Na_\
+i--"
+0
+"--var_cleft_space_ion_concentrations__K_c/var_Ca_handling_by_the_SR__Ca_rel--"
+0
+"--var_cleft_space_ion_concentrations__K_c/var_Ca_handling_by_the_SR__Ca_up--"
+0
+"--var_cleft_space_ion_concentrations__K_c/var_Ca_handling_by_the_SR__F1--"
+0
+"--var_cleft_space_ion_concentrations__K_c/var_Ca_handling_by_the_SR__F2--"
+0
+"--var_cleft_space_ion_concentrations__K_c/var_Ca_handling_by_the_SR__F3--"
+0
+"--var_cleft_space_ion_concentrations__K_c/var_Ca_handling_by_the_SR__O_Calse--\
+"
+0
+"--var_cleft_space_ion_concentrations__K_c/var_cleft_space_ion_concentrations__\
+K_c--"
+1-delta_t*(-var_Ca_independent_transient_outward_K_current__g_to*
+var_Ca_independent_transient_outward_K_current_r_gate__r*(.59*
+var_Ca_independent_transient_outward_K_current_s1_gate__s1^3+.41*
+var_Ca_independent_transient_outward_K_current_s2_gate__s2^3)*(.6*
+var_Ca_independent_transient_outward_K_current_s3_gate__s3^6+.4)*
+var_membrane__R*var_membrane__T/var_membrane__F/
+var_cleft_space_ion_concentrations__K_c-var_inward_rectifier__g_K1*
+var_membrane__R*var_membrane__T/var_membrane__F*
+var_cleft_space_ion_concentrations__K_c^2/(
+var_cleft_space_ion_concentrations__K_c+var_inward_rectifier__KmK1)^3/(1+exp(
+var_inward_rectifier__steepK1*var_membrane__F*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i)-var_inward_rectifier__shiftK1)/
+var_membrane__R/var_membrane__T))+3*var_inward_rectifier__g_K1*(var_membrane__V
+-var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))*
+var_cleft_space_ion_concentrations__K_c^2/(
+var_cleft_space_ion_concentrations__K_c+var_inward_rectifier__KmK1)^3/(1+exp(
+var_inward_rectifier__steepK1*var_membrane__F*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i)-var_inward_rectifier__shiftK1)/
+var_membrane__R/var_membrane__T))-3*var_inward_rectifier__g_K1*(var_membrane__V
+-var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))*
+var_cleft_space_ion_concentrations__K_c^3/(
+var_cleft_space_ion_concentrations__K_c+var_inward_rectifier__KmK1)^4/(1+exp(
+var_inward_rectifier__steepK1*var_membrane__F*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i)-var_inward_rectifier__shiftK1)/
+var_membrane__R/var_membrane__T))+var_inward_rectifier__g_K1*(var_membrane__V-
+var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))*
+var_cleft_space_ion_concentrations__K_c^2/(
+var_cleft_space_ion_concentrations__K_c+var_inward_rectifier__KmK1)^3/(1+exp(
+var_inward_rectifier__steepK1*var_membrane__F*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i)-var_inward_rectifier__shiftK1)/
+var_membrane__R/var_membrane__T))^2*var_inward_rectifier__steepK1*exp(
+var_inward_rectifier__steepK1*var_membrane__F*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i)-var_inward_rectifier__shiftK1)/
+var_membrane__R/var_membrane__T)-var_delayed_rectifier_K_current__g_Kr*
+var_delayed_rectifier_K_current_pa_gate__p_a*
+var_delayed_rectifier_K_current_pi_gate__p_i*var_membrane__R*var_membrane__T/
+var_membrane__F/var_cleft_space_ion_concentrations__K_c-
+var_delayed_rectifier_K_current__g_Ks*var_delayed_rectifier_K_current_z_gate__z
+*var_membrane__R*var_membrane__T/var_membrane__F/
+var_cleft_space_ion_concentrations__K_c-3.2*
+var_sodium_potassium_pump__i_NaK_max/(var_cleft_space_ion_concentrations__K_c+
+var_sodium_potassium_pump__k_NaK_K)*var_intracellular_ion_concentrations__Na_i^
+1.5/(var_intracellular_ion_concentrations__Na_i^1.5+
+var_sodium_potassium_pump__k_NaK_Na^1.5)/(1.5+exp(-1/40*var_membrane__V-3/2))+3\
+.2*var_sodium_potassium_pump__i_NaK_max*var_cleft_space_ion_concentrations__K_c
+/(var_cleft_space_ion_concentrations__K_c+var_sodium_potassium_pump__k_NaK_K)^2
+*var_intracellular_ion_concentrations__Na_i^1.5/(
+var_intracellular_ion_concentrations__Na_i^1.5+
+var_sodium_potassium_pump__k_NaK_Na^1.5)/(1.5+exp(-1/40*var_membrane__V-3/2)))/
+var_cleft_space_ion_concentrations__Vol_c/var_membrane__F
+"--var_cleft_space_ion_concentrations__K_c/var_intracellular_Ca_buffering__O_C-\
+-"
+0
+"--var_cleft_space_ion_concentrations__K_c/var_intracellular_Ca_buffering__O_TC\
+--"
+0
+"--var_cleft_space_ion_concentrations__K_c/var_intracellular_Ca_buffering__O_TM\
+gC--"
+0
+"--var_cleft_space_ion_concentrations__K_c/var_intracellular_Ca_buffering__O_TM\
+gMg--"
+0
+"--var_cleft_space_ion_concentrations__K_c/var_intracellular_ion_concentrations\
+__Ca_i--"
+0
+"--var_cleft_space_ion_concentrations__K_c/var_intracellular_ion_concentrations\
+__K_i--"
+-delta_t*(var_Ca_independent_transient_outward_K_current__g_to*
+var_Ca_independent_transient_outward_K_current_r_gate__r*(.59*
+var_Ca_independent_transient_outward_K_current_s1_gate__s1^3+.41*
+var_Ca_independent_transient_outward_K_current_s2_gate__s2^3)*(.6*
+var_Ca_independent_transient_outward_K_current_s3_gate__s3^6+.4)*
+var_membrane__R*var_membrane__T/var_membrane__F/
+var_intracellular_ion_concentrations__K_i+var_inward_rectifier__g_K1*
+var_membrane__R*var_membrane__T/var_membrane__F/
+var_intracellular_ion_concentrations__K_i*
+var_cleft_space_ion_concentrations__K_c^3/(
+var_cleft_space_ion_concentrations__K_c+var_inward_rectifier__KmK1)^3/(1+exp(
+var_inward_rectifier__steepK1*var_membrane__F*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i)-var_inward_rectifier__shiftK1)/
+var_membrane__R/var_membrane__T))-var_inward_rectifier__g_K1*(var_membrane__V-
+var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))*
+var_cleft_space_ion_concentrations__K_c^3/(
+var_cleft_space_ion_concentrations__K_c+var_inward_rectifier__KmK1)^3/(1+exp(
+var_inward_rectifier__steepK1*var_membrane__F*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i)-var_inward_rectifier__shiftK1)/
+var_membrane__R/var_membrane__T))^2*var_inward_rectifier__steepK1/
+var_intracellular_ion_concentrations__K_i*exp(var_inward_rectifier__steepK1*
+var_membrane__F*(var_membrane__V-var_membrane__R*var_membrane__T/
+var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i)-var_inward_rectifier__shiftK1)/
+var_membrane__R/var_membrane__T)+var_delayed_rectifier_K_current__g_Kr*
+var_delayed_rectifier_K_current_pa_gate__p_a*
+var_delayed_rectifier_K_current_pi_gate__p_i*var_membrane__R*var_membrane__T/
+var_membrane__F/var_intracellular_ion_concentrations__K_i+
+var_delayed_rectifier_K_current__g_Ks*var_delayed_rectifier_K_current_z_gate__z
+*var_membrane__R*var_membrane__T/var_membrane__F/
+var_intracellular_ion_concentrations__K_i)/
+var_cleft_space_ion_concentrations__Vol_c/var_membrane__F
+"--var_cleft_space_ion_concentrations__K_c/var_intracellular_ion_concentrations\
+__Na_i--"
+-delta_t*(-4.80*var_sodium_potassium_pump__i_NaK_max*
+var_cleft_space_ion_concentrations__K_c/(
+var_cleft_space_ion_concentrations__K_c+var_sodium_potassium_pump__k_NaK_K)*
+var_intracellular_ion_concentrations__Na_i^.5/(
+var_intracellular_ion_concentrations__Na_i^1.5+
+var_sodium_potassium_pump__k_NaK_Na^1.5)/(1.5+exp(-1/40*var_membrane__V-3/2))+4\
+.80*var_sodium_potassium_pump__i_NaK_max*
+var_cleft_space_ion_concentrations__K_c/(
+var_cleft_space_ion_concentrations__K_c+var_sodium_potassium_pump__k_NaK_K)*
+var_intracellular_ion_concentrations__Na_i^2.0/(
+var_intracellular_ion_concentrations__Na_i^1.5+
+var_sodium_potassium_pump__k_NaK_Na^1.5)^2/(1.5+exp(-1/40*var_membrane__V-3/2))
+)/var_cleft_space_ion_concentrations__Vol_c/var_membrane__F
+"--var_intracellular_Ca_buffering__O_C/var_Ca_handling_by_the_SR__Ca_rel--"
+0
+"--var_intracellular_Ca_buffering__O_C/var_Ca_handling_by_the_SR__Ca_up--"
+0
+"--var_intracellular_Ca_buffering__O_C/var_Ca_handling_by_the_SR__F1--"
+0
+"--var_intracellular_Ca_buffering__O_C/var_Ca_handling_by_the_SR__F2--"
+0
+"--var_intracellular_Ca_buffering__O_C/var_Ca_handling_by_the_SR__F3--"
+0
+"--var_intracellular_Ca_buffering__O_C/var_Ca_handling_by_the_SR__O_Calse--"
+0
+"--var_intracellular_Ca_buffering__O_C/var_cleft_space_ion_concentrations__K_c-\
+-"
+0
+"--var_intracellular_Ca_buffering__O_C/var_intracellular_Ca_buffering__O_C--"
+1-delta_t*(-200000*var_intracellular_ion_concentrations__Ca_i-476)
+"--var_intracellular_Ca_buffering__O_C/var_intracellular_Ca_buffering__O_TC--"
+0
+"--var_intracellular_Ca_buffering__O_C/var_intracellular_Ca_buffering__O_TMgC--\
+"
+0
+"--var_intracellular_Ca_buffering__O_C/var_intracellular_Ca_buffering__O_TMgMg-\
+-"
+0
+"--var_intracellular_Ca_buffering__O_C/var_intracellular_ion_concentrations__Ca\
+_i--"
+-delta_t*(200000-200000*var_intracellular_Ca_buffering__O_C)
+"--var_intracellular_Ca_buffering__O_C/var_intracellular_ion_concentrations__K_\
+i--"
+0
+"--var_intracellular_Ca_buffering__O_C/var_intracellular_ion_concentrations__Na\
+_i--"
+0
+"--var_intracellular_Ca_buffering__O_TC/var_Ca_handling_by_the_SR__Ca_rel--"
+0
+"--var_intracellular_Ca_buffering__O_TC/var_Ca_handling_by_the_SR__Ca_up--"
+0
+"--var_intracellular_Ca_buffering__O_TC/var_Ca_handling_by_the_SR__F1--"
+0
+"--var_intracellular_Ca_buffering__O_TC/var_Ca_handling_by_the_SR__F2--"
+0
+"--var_intracellular_Ca_buffering__O_TC/var_Ca_handling_by_the_SR__F3--"
+0
+"--var_intracellular_Ca_buffering__O_TC/var_Ca_handling_by_the_SR__O_Calse--"
+0
+"--var_intracellular_Ca_buffering__O_TC/var_cleft_space_ion_concentrations__K_c\
+--"
+0
+"--var_intracellular_Ca_buffering__O_TC/var_intracellular_Ca_buffering__O_C--"
+0
+"--var_intracellular_Ca_buffering__O_TC/var_intracellular_Ca_buffering__O_TC--"
+1-delta_t*(-78400*var_intracellular_ion_concentrations__Ca_i-392)
+"--var_intracellular_Ca_buffering__O_TC/var_intracellular_Ca_buffering__O_TMgC-\
+-"
+0
+"--var_intracellular_Ca_buffering__O_TC/var_intracellular_Ca_buffering__O_TMgMg\
+--"
+0
+"--var_intracellular_Ca_buffering__O_TC/var_intracellular_ion_concentrations__C\
+a_i--"
+-delta_t*(78400-78400*var_intracellular_Ca_buffering__O_TC)
+"--var_intracellular_Ca_buffering__O_TC/var_intracellular_ion_concentrations__K\
+_i--"
+0
+"--var_intracellular_Ca_buffering__O_TC/var_intracellular_ion_concentrations__N\
+a_i--"
+0
+"--var_intracellular_Ca_buffering__O_TMgC/var_Ca_handling_by_the_SR__Ca_rel--"
+0
+"--var_intracellular_Ca_buffering__O_TMgC/var_Ca_handling_by_the_SR__Ca_up--"
+0
+"--var_intracellular_Ca_buffering__O_TMgC/var_Ca_handling_by_the_SR__F1--"
+0
+"--var_intracellular_Ca_buffering__O_TMgC/var_Ca_handling_by_the_SR__F2--"
+0
+"--var_intracellular_Ca_buffering__O_TMgC/var_Ca_handling_by_the_SR__F3--"
+0
+"--var_intracellular_Ca_buffering__O_TMgC/var_Ca_handling_by_the_SR__O_Calse--"
+0
+"--var_intracellular_Ca_buffering__O_TMgC/var_cleft_space_ion_concentrations__K\
+_c--"
+0
+"--var_intracellular_Ca_buffering__O_TMgC/var_intracellular_Ca_buffering__O_C--\
+"
+0
+"--var_intracellular_Ca_buffering__O_TMgC/var_intracellular_Ca_buffering__O_TC-\
+-"
+0
+"--var_intracellular_Ca_buffering__O_TMgC/var_intracellular_Ca_buffering__O_TMg\
+C--"
+1-delta_t*(-200000*var_intracellular_ion_concentrations__Ca_i-6.6)
+"--var_intracellular_Ca_buffering__O_TMgC/var_intracellular_Ca_buffering__O_TMg\
+Mg--"
+200000*delta_t*var_intracellular_ion_concentrations__Ca_i
+"--var_intracellular_Ca_buffering__O_TMgC/var_intracellular_ion_concentrations_\
+_Ca_i--"
+-delta_t*(200000-200000*var_intracellular_Ca_buffering__O_TMgC-200000*
+var_intracellular_Ca_buffering__O_TMgMg)
+"--var_intracellular_Ca_buffering__O_TMgC/var_intracellular_ion_concentrations_\
+_K_i--"
+0
+"--var_intracellular_Ca_buffering__O_TMgC/var_intracellular_ion_concentrations_\
+_Na_i--"
+0
+"--var_intracellular_Ca_buffering__O_TMgMg/var_Ca_handling_by_the_SR__Ca_rel--"
+0
+"--var_intracellular_Ca_buffering__O_TMgMg/var_Ca_handling_by_the_SR__Ca_up--"
+0
+"--var_intracellular_Ca_buffering__O_TMgMg/var_Ca_handling_by_the_SR__F1--"
+0
+"--var_intracellular_Ca_buffering__O_TMgMg/var_Ca_handling_by_the_SR__F2--"
+0
+"--var_intracellular_Ca_buffering__O_TMgMg/var_Ca_handling_by_the_SR__F3--"
+0
+"--var_intracellular_Ca_buffering__O_TMgMg/var_Ca_handling_by_the_SR__O_Calse--\
+"
+0
+"--var_intracellular_Ca_buffering__O_TMgMg/var_cleft_space_ion_concentrations__\
+K_c--"
+0
+"--var_intracellular_Ca_buffering__O_TMgMg/var_intracellular_Ca_buffering__O_C-\
+-"
+0
+"--var_intracellular_Ca_buffering__O_TMgMg/var_intracellular_Ca_buffering__O_TC\
+--"
+0
+"--var_intracellular_Ca_buffering__O_TMgMg/var_intracellular_Ca_buffering__O_TM\
+gC--"
+2000*delta_t*var_intracellular_Ca_buffering__Mg_i
+"--var_intracellular_Ca_buffering__O_TMgMg/var_intracellular_Ca_buffering__O_TM\
+gMg--"
+1-delta_t*(-2000*var_intracellular_Ca_buffering__Mg_i-666)
+"--var_intracellular_Ca_buffering__O_TMgMg/var_intracellular_ion_concentrations\
+__Ca_i--"
+0
+"--var_intracellular_Ca_buffering__O_TMgMg/var_intracellular_ion_concentrations\
+__K_i--"
+0
+"--var_intracellular_Ca_buffering__O_TMgMg/var_intracellular_ion_concentrations\
+__Na_i--"
+0
+"--var_intracellular_ion_concentrations__Ca_i/var_Ca_handling_by_the_SR__Ca_rel\
+--"
+-1/2*delta_t*var_Ca_handling_by_the_SR__alpha_rel*var_Ca_handling_by_the_SR__F2
+^2/(var_Ca_handling_by_the_SR__F2+.25)^2/
+var_intracellular_ion_concentrations__Vol_Ca/var_membrane__F
+"--var_intracellular_ion_concentrations__Ca_i/var_Ca_handling_by_the_SR__Ca_up-\
+-"
+-1/2*delta_t*(var_Ca_handling_by_the_SR__I_up_max*
+var_Ca_handling_by_the_SR__k_xcs^2/var_Ca_handling_by_the_SR__k_srca/((
+var_intracellular_ion_concentrations__Ca_i+var_Ca_handling_by_the_SR__k_cyca)/
+var_Ca_handling_by_the_SR__k_cyca+var_Ca_handling_by_the_SR__k_xcs*(
+var_Ca_handling_by_the_SR__Ca_up+var_Ca_handling_by_the_SR__k_srca)/
+var_Ca_handling_by_the_SR__k_srca)+var_Ca_handling_by_the_SR__I_up_max*(
+var_intracellular_ion_concentrations__Ca_i/var_Ca_handling_by_the_SR__k_cyca-
+var_Ca_handling_by_the_SR__k_xcs^2*var_Ca_handling_by_the_SR__Ca_up/
+var_Ca_handling_by_the_SR__k_srca)/((var_intracellular_ion_concentrations__Ca_i
++var_Ca_handling_by_the_SR__k_cyca)/var_Ca_handling_by_the_SR__k_cyca+
+var_Ca_handling_by_the_SR__k_xcs*(var_Ca_handling_by_the_SR__Ca_up+
+var_Ca_handling_by_the_SR__k_srca)/var_Ca_handling_by_the_SR__k_srca)^2*
+var_Ca_handling_by_the_SR__k_xcs/var_Ca_handling_by_the_SR__k_srca)/
+var_intracellular_ion_concentrations__Vol_Ca/var_membrane__F
+"--var_intracellular_ion_concentrations__Ca_i/var_Ca_handling_by_the_SR__F1--"
+0
+"--var_intracellular_ion_concentrations__Ca_i/var_Ca_handling_by_the_SR__F2--"
+-1/2*delta_t*(2*var_Ca_handling_by_the_SR__alpha_rel*
+var_Ca_handling_by_the_SR__F2/(var_Ca_handling_by_the_SR__F2+.25)^2*(
+var_Ca_handling_by_the_SR__Ca_rel-var_intracellular_ion_concentrations__Ca_i)-2
+*var_Ca_handling_by_the_SR__alpha_rel*var_Ca_handling_by_the_SR__F2^2/(
+var_Ca_handling_by_the_SR__F2+.25)^3*(var_Ca_handling_by_the_SR__Ca_rel-
+var_intracellular_ion_concentrations__Ca_i))/
+var_intracellular_ion_concentrations__Vol_Ca/var_membrane__F
+"--var_intracellular_ion_concentrations__Ca_i/var_Ca_handling_by_the_SR__F3--"
+0
+"--var_intracellular_ion_concentrations__Ca_i/var_Ca_handling_by_the_SR__O_Cals\
+e--"
+0
+"--var_intracellular_ion_concentrations__Ca_i/var_cleft_space_ion_concentration\
+s__K_c--"
+0
+"--var_intracellular_ion_concentrations__Ca_i/var_intracellular_Ca_buffering__O\
+_C--"
+-delta_t*(9000.000*var_intracellular_ion_concentrations__Ca_i+21.420)
+"--var_intracellular_ion_concentrations__Ca_i/var_intracellular_Ca_buffering__O\
+_TC--"
+-delta_t*(6272.00*var_intracellular_ion_concentrations__Ca_i+31.36)
+"--var_intracellular_ion_concentrations__Ca_i/var_intracellular_Ca_buffering__O\
+_TMgC--"
+-delta_t*(32000.00*var_intracellular_ion_concentrations__Ca_i+1.056)
+"--var_intracellular_ion_concentrations__Ca_i/var_intracellular_Ca_buffering__O\
+_TMgMg--"
+-32000.00*delta_t*var_intracellular_ion_concentrations__Ca_i
+"--var_intracellular_ion_concentrations__Ca_i/var_intracellular_ion_concentrati\
+ons__Ca_i--"
+1-delta_t*(1/2*(-1/2*var_background_currents__g_B_Ca*var_membrane__R*
+var_membrane__T/var_membrane__F/var_intracellular_ion_concentrations__Ca_i-
+var_sarcolemmal_calcium_pump_current__i_CaP_max/(
+var_intracellular_ion_concentrations__Ca_i+
+var_sarcolemmal_calcium_pump_current__k_CaP)+
+var_sarcolemmal_calcium_pump_current__i_CaP_max*
+var_intracellular_ion_concentrations__Ca_i/(
+var_intracellular_ion_concentrations__Ca_i+
+var_sarcolemmal_calcium_pump_current__k_CaP)^2-2*
+var_Na_Ca_ion_exchanger_current__k_NaCa*
+var_cleft_space_ion_concentrations__Na_c^3*exp((
+var_Na_Ca_ion_exchanger_current__gamma-1)*var_membrane__V*var_membrane__F/
+var_membrane__R/var_membrane__T)/(1+var_Na_Ca_ion_exchanger_current__d_NaCa*(
+var_cleft_space_ion_concentrations__Na_c^3*
+var_intracellular_ion_concentrations__Ca_i+
+var_intracellular_ion_concentrations__Na_i^3*
+var_cleft_space_ion_concentrations__Ca_c))-2*
+var_Na_Ca_ion_exchanger_current__k_NaCa*(
+var_intracellular_ion_concentrations__Na_i^3*
+var_cleft_space_ion_concentrations__Ca_c*exp(
+var_Na_Ca_ion_exchanger_current__gamma*var_membrane__F*var_membrane__V/
+var_membrane__R/var_membrane__T)-var_cleft_space_ion_concentrations__Na_c^3*
+var_intracellular_ion_concentrations__Ca_i*exp((
+var_Na_Ca_ion_exchanger_current__gamma-1)*var_membrane__V*var_membrane__F/
+var_membrane__R/var_membrane__T))/(1+var_Na_Ca_ion_exchanger_current__d_NaCa*(
+var_cleft_space_ion_concentrations__Na_c^3*
+var_intracellular_ion_concentrations__Ca_i+
+var_intracellular_ion_concentrations__Na_i^3*
+var_cleft_space_ion_concentrations__Ca_c))^2*
+var_Na_Ca_ion_exchanger_current__d_NaCa*
+var_cleft_space_ion_concentrations__Na_c^3-var_Ca_handling_by_the_SR__I_up_max/
+var_Ca_handling_by_the_SR__k_cyca/((var_intracellular_ion_concentrations__Ca_i+
+var_Ca_handling_by_the_SR__k_cyca)/var_Ca_handling_by_the_SR__k_cyca+
+var_Ca_handling_by_the_SR__k_xcs*(var_Ca_handling_by_the_SR__Ca_up+
+var_Ca_handling_by_the_SR__k_srca)/var_Ca_handling_by_the_SR__k_srca)+
+var_Ca_handling_by_the_SR__I_up_max*(var_intracellular_ion_concentrations__Ca_i
+/var_Ca_handling_by_the_SR__k_cyca-var_Ca_handling_by_the_SR__k_xcs^2*
+var_Ca_handling_by_the_SR__Ca_up/var_Ca_handling_by_the_SR__k_srca)/((
+var_intracellular_ion_concentrations__Ca_i+var_Ca_handling_by_the_SR__k_cyca)/
+var_Ca_handling_by_the_SR__k_cyca+var_Ca_handling_by_the_SR__k_xcs*(
+var_Ca_handling_by_the_SR__Ca_up+var_Ca_handling_by_the_SR__k_srca)/
+var_Ca_handling_by_the_SR__k_srca)^2/var_Ca_handling_by_the_SR__k_cyca-
+var_Ca_handling_by_the_SR__alpha_rel*var_Ca_handling_by_the_SR__F2^2/(
+var_Ca_handling_by_the_SR__F2+.25)^2)/
+var_intracellular_ion_concentrations__Vol_Ca/var_membrane__F-47272.000+6272.00*
+var_intracellular_Ca_buffering__O_TC+32000.00*
+var_intracellular_Ca_buffering__O_TMgC+32000.00*
+var_intracellular_Ca_buffering__O_TMgMg+9000.000*
+var_intracellular_Ca_buffering__O_C)
+"--var_intracellular_ion_concentrations__Ca_i/var_intracellular_ion_concentrati\
+ons__K_i--"
+0
+"--var_intracellular_ion_concentrations__Ca_i/var_intracellular_ion_concentrati\
+ons__Na_i--"
+-1/2*delta_t*(6*var_Na_Ca_ion_exchanger_current__k_NaCa*
+var_intracellular_ion_concentrations__Na_i^2*
+var_cleft_space_ion_concentrations__Ca_c*exp(
+var_Na_Ca_ion_exchanger_current__gamma*var_membrane__F*var_membrane__V/
+var_membrane__R/var_membrane__T)/(1+var_Na_Ca_ion_exchanger_current__d_NaCa*(
+var_cleft_space_ion_concentrations__Na_c^3*
+var_intracellular_ion_concentrations__Ca_i+
+var_intracellular_ion_concentrations__Na_i^3*
+var_cleft_space_ion_concentrations__Ca_c))-6*
+var_Na_Ca_ion_exchanger_current__k_NaCa*(
+var_intracellular_ion_concentrations__Na_i^3*
+var_cleft_space_ion_concentrations__Ca_c*exp(
+var_Na_Ca_ion_exchanger_current__gamma*var_membrane__F*var_membrane__V/
+var_membrane__R/var_membrane__T)-var_cleft_space_ion_concentrations__Na_c^3*
+var_intracellular_ion_concentrations__Ca_i*exp((
+var_Na_Ca_ion_exchanger_current__gamma-1)*var_membrane__V*var_membrane__F/
+var_membrane__R/var_membrane__T))/(1+var_Na_Ca_ion_exchanger_current__d_NaCa*(
+var_cleft_space_ion_concentrations__Na_c^3*
+var_intracellular_ion_concentrations__Ca_i+
+var_intracellular_ion_concentrations__Na_i^3*
+var_cleft_space_ion_concentrations__Ca_c))^2*
+var_Na_Ca_ion_exchanger_current__d_NaCa*
+var_intracellular_ion_concentrations__Na_i^2*
+var_cleft_space_ion_concentrations__Ca_c)/
+var_intracellular_ion_concentrations__Vol_Ca/var_membrane__F
+"--var_intracellular_ion_concentrations__K_i/var_Ca_handling_by_the_SR__Ca_rel-\
+-"
+0
+"--var_intracellular_ion_concentrations__K_i/var_Ca_handling_by_the_SR__Ca_up--\
+"
+0
+"--var_intracellular_ion_concentrations__K_i/var_Ca_handling_by_the_SR__F1--"
+0
+"--var_intracellular_ion_concentrations__K_i/var_Ca_handling_by_the_SR__F2--"
+0
+"--var_intracellular_ion_concentrations__K_i/var_Ca_handling_by_the_SR__F3--"
+0
+"--var_intracellular_ion_concentrations__K_i/var_Ca_handling_by_the_SR__O_Calse\
+--"
+0
+"--var_intracellular_ion_concentrations__K_i/var_cleft_space_ion_concentrations\
+__K_c--"
+-delta_t*(var_Ca_independent_transient_outward_K_current__g_to*
+var_Ca_independent_transient_outward_K_current_r_gate__r*(.59*
+var_Ca_independent_transient_outward_K_current_s1_gate__s1^3+.41*
+var_Ca_independent_transient_outward_K_current_s2_gate__s2^3)*(.6*
+var_Ca_independent_transient_outward_K_current_s3_gate__s3^6+.4)*
+var_membrane__R*var_membrane__T/var_membrane__F/
+var_cleft_space_ion_concentrations__K_c+var_inward_rectifier__g_K1*
+var_membrane__R*var_membrane__T/var_membrane__F*
+var_cleft_space_ion_concentrations__K_c^2/(
+var_cleft_space_ion_concentrations__K_c+var_inward_rectifier__KmK1)^3/(1+exp(
+var_inward_rectifier__steepK1*var_membrane__F*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i)-var_inward_rectifier__shiftK1)/
+var_membrane__R/var_membrane__T))-3*var_inward_rectifier__g_K1*(var_membrane__V
+-var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))*
+var_cleft_space_ion_concentrations__K_c^2/(
+var_cleft_space_ion_concentrations__K_c+var_inward_rectifier__KmK1)^3/(1+exp(
+var_inward_rectifier__steepK1*var_membrane__F*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i)-var_inward_rectifier__shiftK1)/
+var_membrane__R/var_membrane__T))+3*var_inward_rectifier__g_K1*(var_membrane__V
+-var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))*
+var_cleft_space_ion_concentrations__K_c^3/(
+var_cleft_space_ion_concentrations__K_c+var_inward_rectifier__KmK1)^4/(1+exp(
+var_inward_rectifier__steepK1*var_membrane__F*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i)-var_inward_rectifier__shiftK1)/
+var_membrane__R/var_membrane__T))-var_inward_rectifier__g_K1*(var_membrane__V-
+var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))*
+var_cleft_space_ion_concentrations__K_c^2/(
+var_cleft_space_ion_concentrations__K_c+var_inward_rectifier__KmK1)^3/(1+exp(
+var_inward_rectifier__steepK1*var_membrane__F*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i)-var_inward_rectifier__shiftK1)/
+var_membrane__R/var_membrane__T))^2*var_inward_rectifier__steepK1*exp(
+var_inward_rectifier__steepK1*var_membrane__F*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i)-var_inward_rectifier__shiftK1)/
+var_membrane__R/var_membrane__T)+var_delayed_rectifier_K_current__g_Kr*
+var_delayed_rectifier_K_current_pa_gate__p_a*
+var_delayed_rectifier_K_current_pi_gate__p_i*var_membrane__R*var_membrane__T/
+var_membrane__F/var_cleft_space_ion_concentrations__K_c+
+var_delayed_rectifier_K_current__g_Ks*var_delayed_rectifier_K_current_z_gate__z
+*var_membrane__R*var_membrane__T/var_membrane__F/
+var_cleft_space_ion_concentrations__K_c+3.2*
+var_sodium_potassium_pump__i_NaK_max/(var_cleft_space_ion_concentrations__K_c+
+var_sodium_potassium_pump__k_NaK_K)*var_intracellular_ion_concentrations__Na_i^
+1.5/(var_intracellular_ion_concentrations__Na_i^1.5+
+var_sodium_potassium_pump__k_NaK_Na^1.5)/(1.5+exp(-1/40*var_membrane__V-3/2))-3\
+.2*var_sodium_potassium_pump__i_NaK_max*var_cleft_space_ion_concentrations__K_c
+/(var_cleft_space_ion_concentrations__K_c+var_sodium_potassium_pump__k_NaK_K)^2
+*var_intracellular_ion_concentrations__Na_i^1.5/(
+var_intracellular_ion_concentrations__Na_i^1.5+
+var_sodium_potassium_pump__k_NaK_Na^1.5)/(1.5+exp(-1/40*var_membrane__V-3/2)))/
+var_intracellular_ion_concentrations__Vol_i/var_membrane__F
+"--var_intracellular_ion_concentrations__K_i/var_intracellular_Ca_buffering__O_\
+C--"
+0
+"--var_intracellular_ion_concentrations__K_i/var_intracellular_Ca_buffering__O_\
+TC--"
+0
+"--var_intracellular_ion_concentrations__K_i/var_intracellular_Ca_buffering__O_\
+TMgC--"
+0
+"--var_intracellular_ion_concentrations__K_i/var_intracellular_Ca_buffering__O_\
+TMgMg--"
+0
+"--var_intracellular_ion_concentrations__K_i/var_intracellular_ion_concentratio\
+ns__Ca_i--"
+0
+"--var_intracellular_ion_concentrations__K_i/var_intracellular_ion_concentratio\
+ns__K_i--"
+1-delta_t*(-var_Ca_independent_transient_outward_K_current__g_to*
+var_Ca_independent_transient_outward_K_current_r_gate__r*(.59*
+var_Ca_independent_transient_outward_K_current_s1_gate__s1^3+.41*
+var_Ca_independent_transient_outward_K_current_s2_gate__s2^3)*(.6*
+var_Ca_independent_transient_outward_K_current_s3_gate__s3^6+.4)*
+var_membrane__R*var_membrane__T/var_membrane__F/
+var_intracellular_ion_concentrations__K_i-var_inward_rectifier__g_K1*
+var_membrane__R*var_membrane__T/var_membrane__F/
+var_intracellular_ion_concentrations__K_i*
+var_cleft_space_ion_concentrations__K_c^3/(
+var_cleft_space_ion_concentrations__K_c+var_inward_rectifier__KmK1)^3/(1+exp(
+var_inward_rectifier__steepK1*var_membrane__F*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i)-var_inward_rectifier__shiftK1)/
+var_membrane__R/var_membrane__T))+var_inward_rectifier__g_K1*(var_membrane__V-
+var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i))*
+var_cleft_space_ion_concentrations__K_c^3/(
+var_cleft_space_ion_concentrations__K_c+var_inward_rectifier__KmK1)^3/(1+exp(
+var_inward_rectifier__steepK1*var_membrane__F*(var_membrane__V-var_membrane__R*
+var_membrane__T/var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i)-var_inward_rectifier__shiftK1)/
+var_membrane__R/var_membrane__T))^2*var_inward_rectifier__steepK1/
+var_intracellular_ion_concentrations__K_i*exp(var_inward_rectifier__steepK1*
+var_membrane__F*(var_membrane__V-var_membrane__R*var_membrane__T/
+var_membrane__F*ln(var_cleft_space_ion_concentrations__K_c/
+var_intracellular_ion_concentrations__K_i)-var_inward_rectifier__shiftK1)/
+var_membrane__R/var_membrane__T)-var_delayed_rectifier_K_current__g_Kr*
+var_delayed_rectifier_K_current_pa_gate__p_a*
+var_delayed_rectifier_K_current_pi_gate__p_i*var_membrane__R*var_membrane__T/
+var_membrane__F/var_intracellular_ion_concentrations__K_i-
+var_delayed_rectifier_K_current__g_Ks*var_delayed_rectifier_K_current_z_gate__z
+*var_membrane__R*var_membrane__T/var_membrane__F/
+var_intracellular_ion_concentrations__K_i)/
+var_intracellular_ion_concentrations__Vol_i/var_membrane__F
+"--var_intracellular_ion_concentrations__K_i/var_intracellular_ion_concentratio\
+ns__Na_i--"
+-delta_t*(4.80*var_sodium_potassium_pump__i_NaK_max*
+var_cleft_space_ion_concentrations__K_c/(
+var_cleft_space_ion_concentrations__K_c+var_sodium_potassium_pump__k_NaK_K)*
+var_intracellular_ion_concentrations__Na_i^.5/(
+var_intracellular_ion_concentrations__Na_i^1.5+
+var_sodium_potassium_pump__k_NaK_Na^1.5)/(1.5+exp(-1/40*var_membrane__V-3/2))-4\
+.80*var_sodium_potassium_pump__i_NaK_max*
+var_cleft_space_ion_concentrations__K_c/(
+var_cleft_space_ion_concentrations__K_c+var_sodium_potassium_pump__k_NaK_K)*
+var_intracellular_ion_concentrations__Na_i^2.0/(
+var_intracellular_ion_concentrations__Na_i^1.5+
+var_sodium_potassium_pump__k_NaK_Na^1.5)^2/(1.5+exp(-1/40*var_membrane__V-3/2))
+)/var_intracellular_ion_concentrations__Vol_i/var_membrane__F
+"--var_intracellular_ion_concentrations__Na_i/var_Ca_handling_by_the_SR__Ca_rel\
+--"
+0
+"--var_intracellular_ion_concentrations__Na_i/var_Ca_handling_by_the_SR__Ca_up-\
+-"
+0
+"--var_intracellular_ion_concentrations__Na_i/var_Ca_handling_by_the_SR__F1--"
+0
+"--var_intracellular_ion_concentrations__Na_i/var_Ca_handling_by_the_SR__F2--"
+0
+"--var_intracellular_ion_concentrations__Na_i/var_Ca_handling_by_the_SR__F3--"
+0
+"--var_intracellular_ion_concentrations__Na_i/var_Ca_handling_by_the_SR__O_Cals\
+e--"
+0
+"--var_intracellular_ion_concentrations__Na_i/var_cleft_space_ion_concentration\
+s__K_c--"
+-delta_t*(-4.8*var_sodium_potassium_pump__i_NaK_max/(
+var_cleft_space_ion_concentrations__K_c+var_sodium_potassium_pump__k_NaK_K)*
+var_intracellular_ion_concentrations__Na_i^1.5/(
+var_intracellular_ion_concentrations__Na_i^1.5+
+var_sodium_potassium_pump__k_NaK_Na^1.5)/(1.5+exp(-1/40*var_membrane__V-3/2))+4\
+.8*var_sodium_potassium_pump__i_NaK_max*var_cleft_space_ion_concentrations__K_c
+/(var_cleft_space_ion_concentrations__K_c+var_sodium_potassium_pump__k_NaK_K)^2
+*var_intracellular_ion_concentrations__Na_i^1.5/(
+var_intracellular_ion_concentrations__Na_i^1.5+
+var_sodium_potassium_pump__k_NaK_Na^1.5)/(1.5+exp(-1/40*var_membrane__V-3/2)))/
+var_intracellular_ion_concentrations__Vol_i/var_membrane__F
+"--var_intracellular_ion_concentrations__Na_i/var_intracellular_Ca_buffering__O\
+_C--"
+0
+"--var_intracellular_ion_concentrations__Na_i/var_intracellular_Ca_buffering__O\
+_TC--"
+0
+"--var_intracellular_ion_concentrations__Na_i/var_intracellular_Ca_buffering__O\
+_TMgC--"
+0
+"--var_intracellular_ion_concentrations__Na_i/var_intracellular_Ca_buffering__O\
+_TMgMg--"
+0
+"--var_intracellular_ion_concentrations__Na_i/var_intracellular_ion_concentrati\
+ons__Ca_i--"
+-delta_t*(3*var_Na_Ca_ion_exchanger_current__k_NaCa*
+var_cleft_space_ion_concentrations__Na_c^3*exp((
+var_Na_Ca_ion_exchanger_current__gamma-1)*var_membrane__V*var_membrane__F/
+var_membrane__R/var_membrane__T)/(1+var_Na_Ca_ion_exchanger_current__d_NaCa*(
+var_cleft_space_ion_concentrations__Na_c^3*
+var_intracellular_ion_concentrations__Ca_i+
+var_intracellular_ion_concentrations__Na_i^3*
+var_cleft_space_ion_concentrations__Ca_c))+3*
+var_Na_Ca_ion_exchanger_current__k_NaCa*(
+var_intracellular_ion_concentrations__Na_i^3*
+var_cleft_space_ion_concentrations__Ca_c*exp(
+var_Na_Ca_ion_exchanger_current__gamma*var_membrane__F*var_membrane__V/
+var_membrane__R/var_membrane__T)-var_cleft_space_ion_concentrations__Na_c^3*
+var_intracellular_ion_concentrations__Ca_i*exp((
+var_Na_Ca_ion_exchanger_current__gamma-1)*var_membrane__V*var_membrane__F/
+var_membrane__R/var_membrane__T))/(1+var_Na_Ca_ion_exchanger_current__d_NaCa*(
+var_cleft_space_ion_concentrations__Na_c^3*
+var_intracellular_ion_concentrations__Ca_i+
+var_intracellular_ion_concentrations__Na_i^3*
+var_cleft_space_ion_concentrations__Ca_c))^2*
+var_Na_Ca_ion_exchanger_current__d_NaCa*
+var_cleft_space_ion_concentrations__Na_c^3)/
+var_intracellular_ion_concentrations__Vol_i/var_membrane__F
+"--var_intracellular_ion_concentrations__Na_i/var_intracellular_ion_concentrati\
+ons__K_i--"
+0
+"--var_intracellular_ion_concentrations__Na_i/var_intracellular_ion_concentrati\
+ons__Na_i--"
+1-delta_t*(-var_sodium_current__P_Na*var_sodium_current_m_gate__m^3*(.635*
+var_sodium_current_h1_gate__h1+.365*var_sodium_current_h2_gate__h2)*
+var_cleft_space_ion_concentrations__Na_c*var_membrane__V*var_membrane__F^2/
+var_membrane__R/var_membrane__T/var_intracellular_ion_concentrations__Na_i*exp(
+(var_membrane__V-var_membrane__R*var_membrane__T/var_membrane__F*ln(
+var_cleft_space_ion_concentrations__Na_c/
+var_intracellular_ion_concentrations__Na_i))*var_membrane__F/var_membrane__R/
+var_membrane__T)/(exp(var_membrane__V*var_membrane__F/var_membrane__R/
+var_membrane__T)-1)-var_background_currents__g_B_Na*var_membrane__R*
+var_membrane__T/var_membrane__F/var_intracellular_ion_concentrations__Na_i-7.20
+*var_sodium_potassium_pump__i_NaK_max*var_cleft_space_ion_concentrations__K_c/(
+var_cleft_space_ion_concentrations__K_c+var_sodium_potassium_pump__k_NaK_K)*
+var_intracellular_ion_concentrations__Na_i^.5/(
+var_intracellular_ion_concentrations__Na_i^1.5+
+var_sodium_potassium_pump__k_NaK_Na^1.5)/(1.5+exp(-1/40*var_membrane__V-3/2))+7\
+.20*var_sodium_potassium_pump__i_NaK_max*
+var_cleft_space_ion_concentrations__K_c/(
+var_cleft_space_ion_concentrations__K_c+var_sodium_potassium_pump__k_NaK_K)*
+var_intracellular_ion_concentrations__Na_i^2.0/(
+var_intracellular_ion_concentrations__Na_i^1.5+
+var_sodium_potassium_pump__k_NaK_Na^1.5)^2/(1.5+exp(-1/40*var_membrane__V-3/2))
+-9*var_Na_Ca_ion_exchanger_current__k_NaCa*
+var_intracellular_ion_concentrations__Na_i^2*
+var_cleft_space_ion_concentrations__Ca_c*exp(
+var_Na_Ca_ion_exchanger_current__gamma*var_membrane__F*var_membrane__V/
+var_membrane__R/var_membrane__T)/(1+var_Na_Ca_ion_exchanger_current__d_NaCa*(
+var_cleft_space_ion_concentrations__Na_c^3*
+var_intracellular_ion_concentrations__Ca_i+
+var_intracellular_ion_concentrations__Na_i^3*
+var_cleft_space_ion_concentrations__Ca_c))+9*
+var_Na_Ca_ion_exchanger_current__k_NaCa*(
+var_intracellular_ion_concentrations__Na_i^3*
+var_cleft_space_ion_concentrations__Ca_c*exp(
+var_Na_Ca_ion_exchanger_current__gamma*var_membrane__F*var_membrane__V/
+var_membrane__R/var_membrane__T)-var_cleft_space_ion_concentrations__Na_c^3*
+var_intracellular_ion_concentrations__Ca_i*exp((
+var_Na_Ca_ion_exchanger_current__gamma-1)*var_membrane__V*var_membrane__F/
+var_membrane__R/var_membrane__T))/(1+var_Na_Ca_ion_exchanger_current__d_NaCa*(
+var_cleft_space_ion_concentrations__Na_c^3*
+var_intracellular_ion_concentrations__Ca_i+
+var_intracellular_ion_concentrations__Na_i^3*
+var_cleft_space_ion_concentrations__Ca_c))^2*
+var_Na_Ca_ion_exchanger_current__d_NaCa*
+var_intracellular_ion_concentrations__Na_i^2*
+var_cleft_space_ion_concentrations__Ca_c)/
+var_intracellular_ion_concentrations__Vol_i/var_membrane__F
+memory used=1.8MB, alloc=0.9MB, time=0.43

@@ -1,0 +1,103 @@
+/*
+
+Copyright (C) University of Oxford, 2005-2011
+
+University of Oxford means the Chancellor, Masters and Scholars of the
+University of Oxford, having an administrative office at Wellington
+Square, Oxford OX1 2JD, UK.
+
+This file is part of Chaste.
+
+Chaste is free software: you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License as published
+by the Free Software Foundation, either version 2.1 of the License, or
+(at your option) any later version.
+
+Chaste is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details. The offer of Chaste under the terms of the
+License is subject to the License being interpreted in accordance with
+English Law and subject to any action against the University of Oxford
+being under the jurisdiction of the English Courts.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Chaste. If not, see <http://www.gnu.org/licenses/>.
+
+*/
+
+#include "VertexCryptBoundaryForce.hpp"
+#include "MathsCustomFunctions.hpp"
+
+template<unsigned DIM>
+VertexCryptBoundaryForce<DIM>::VertexCryptBoundaryForce(double forceStrength)
+   : AbstractForce<DIM>(),
+     mForceStrength(forceStrength)
+{
+    // We don't want the force to act in the wrong direction
+    assert(mForceStrength > 0.0);
+}
+
+template<unsigned DIM>
+VertexCryptBoundaryForce<DIM>::~VertexCryptBoundaryForce()
+{
+}
+
+template<unsigned DIM>
+void VertexCryptBoundaryForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
+                                                         AbstractCellPopulation<DIM>& rCellPopulation)
+{
+    // Helper variable that is a static cast of the cell population
+    VertexBasedCellPopulation<DIM>* p_cell_population = static_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation);
+
+    // Throw an exception message if not using a VertexBasedCellPopulation
+    if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL)
+    {
+        EXCEPTION("VertexCryptBoundaryForce is to be used with VertexBasedCellPopulations only");
+    }
+
+    // Iterate over nodes
+    for (typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = p_cell_population->rGetMesh().GetNodeIteratorBegin();
+         node_iter != p_cell_population->rGetMesh().GetNodeIteratorEnd();
+         ++node_iter)
+    {
+        double y = node_iter->rGetLocation()[1]; // y-coordinate of node
+
+        // If the node lies below the line y=0, then add the boundary force contribution to rForces
+        if (y < 0.0)
+        {
+            c_vector<double, DIM> boundary_force = zero_vector<double>(DIM);
+            boundary_force[1] = mForceStrength*SmallPow(y, 2);
+
+            rForces[node_iter->GetIndex()] += boundary_force;
+        }
+    }
+}
+
+template<unsigned DIM>
+double VertexCryptBoundaryForce<DIM>::GetForceStrength() const
+{
+    return mForceStrength;
+}
+
+template<unsigned DIM>
+void VertexCryptBoundaryForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
+{
+    *rParamsFile << "\t\t\t<ForceStrength>" << mForceStrength << "</ForceStrength>\n";
+
+    // Call method on direct parent class
+    AbstractForce<DIM>::OutputForceParameters(rParamsFile);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Explicit instantiation
+/////////////////////////////////////////////////////////////////////////////
+
+template class VertexCryptBoundaryForce<1>;
+template class VertexCryptBoundaryForce<2>;
+template class VertexCryptBoundaryForce<3>;
+
+
+// Serialization for Boost >= 1.36
+#include "SerializationExportWrapperForCpp.hpp"
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(VertexCryptBoundaryForce)

@@ -1,0 +1,217 @@
+Group name: axi3d
+Shape.  Dimension=3, simplex(2;3)*simplex*simplex
+ #Scale factor sets= 0
+ #Nodes= 4
+ #Fields=3
+ 1) coordinates, coordinate, rectangular cartesian, #Components=3
+   x.  l.simplex(2;3)*l.simplex*l.simplex, no modify, standard node based.
+     #Nodes= 4
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+      4.  #Values=1
+       Value indices:     1
+       Scale factor indices:   4
+   y.  l.simplex(2;3)*l.simplex*l.simplex, no modify, standard node based.
+     #Nodes= 4
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+      4.  #Values=1
+       Value indices:     1
+       Scale factor indices:   4
+   z.  l.simplex(2;3)*l.simplex*l.simplex, no modify, standard node based.
+     #Nodes= 4
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+      4.  #Values=1
+       Value indices:     1
+       Scale factor indices:   4
+2)  V , field, rectangular cartesian, #Components=1
+   x.  l.simplex(2;3)*l.simplex*l.simplex, no modify, standard node based.
+     #Nodes= 4
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+      4.  #Values=1
+       Value indices:     1
+       Scale factor indices:   4
+3)  Phi_e , field, rectangular cartesian, #Components=1
+   x.  l.simplex(2;3)*l.simplex*l.simplex, no modify, standard node based.
+     #Nodes= 4
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+      4.  #Values=1
+       Value indices:     1
+       Scale factor indices:   4
+Element:	1 0 0 Nodes:	39	1	25	9	
+Element:	2 0 0 Nodes:	12	42	46	43	
+Element:	3 0 0 Nodes:	41	13	27	11	
+Element:	4 0 0 Nodes:	43	26	20	28	
+Element:	5 0 0 Nodes:	46	43	41	37	
+Element:	6 0 0 Nodes:	18	26	44	10	
+Element:	7 0 0 Nodes:	14	43	28	12	
+Element:	8 0 0 Nodes:	23	6	27	47	
+Element:	9 0 0 Nodes:	15	34	32	45	
+Element:	10 0 0 Nodes:	30	2	6	15	
+Element:	11 0 0 Nodes:	11	25	27	41	
+Element:	12 0 0 Nodes:	13	41	27	21	
+Element:	13 0 0 Nodes:	20	26	43	18	
+Element:	14 0 0 Nodes:	22	38	20	43	
+Element:	15 0 0 Nodes:	12	28	26	43	
+Element:	16 0 0 Nodes:	32	42	11	13	
+Element:	17 0 0 Nodes:	5	29	9	1	
+Element:	18 0 0 Nodes:	41	13	11	42	
+Element:	19 0 0 Nodes:	25	9	5	17	
+Element:	20 0 0 Nodes:	6	30	34	2	
+Element:	21 0 0 Nodes:	28	12	31	14	
+Element:	22 0 0 Nodes:	31	46	42	32	
+Element:	23 0 0 Nodes:	4	31	26	10	
+Element:	24 0 0 Nodes:	20	43	28	22	
+Element:	25 0 0 Nodes:	26	28	12	31	
+Element:	26 0 0 Nodes:	18	10	8	26	
+Element:	27 0 0 Nodes:	10	8	26	4	
+Element:	28 0 0 Nodes:	46	31	42	12	
+Element:	29 0 0 Nodes:	19	21	27	41	
+Element:	30 0 0 Nodes:	39	11	41	25	
+Element:	31 0 0 Nodes:	10	29	18	8	
+Element:	32 0 0 Nodes:	25	9	17	39	
+Element:	33 0 0 Nodes:	11	27	25	32	
+Element:	34 0 0 Nodes:	5	29	1	36	
+Element:	35 0 0 Nodes:	1	29	9	35	
+Element:	36 0 0 Nodes:	1	9	39	35	
+Element:	37 0 0 Nodes:	43	14	28	22	
+Element:	38 0 0 Nodes:	15	27	2	6	
+Element:	39 0 0 Nodes:	33	49	24	7	
+Element:	40 0 0 Nodes:	5	29	36	17	
+Element:	41 0 0 Nodes:	30	48	34	15	
+Element:	42 0 0 Nodes:	3	16	7	28	
+Element:	43 0 0 Nodes:	28	24	49	7	
+Element:	44 0 0 Nodes:	30	47	6	23	
+Element:	45 0 0 Nodes:	45	21	27	47	
+Element:	46 0 0 Nodes:	2	32	27	15	
+Element:	47 0 0 Nodes:	24	23	30	33	
+Element:	48 0 0 Nodes:	15	48	47	30	
+Element:	49 0 0 Nodes:	2	30	34	15	
+Element:	50 0 0 Nodes:	3	7	30	33	
+Element:	51 0 0 Nodes:	3	30	7	16	
+Element:	52 0 0 Nodes:	4	29	8	35	
+Element:	53 0 0 Nodes:	43	46	41	42	
+Element:	54 0 0 Nodes:	30	24	49	23	
+Element:	55 0 0 Nodes:	32	11	27	13	
+Element:	56 0 0 Nodes:	28	22	14	50	
+Element:	57 0 0 Nodes:	28	3	16	50	
+Element:	58 0 0 Nodes:	45	27	21	13	
+Element:	59 0 0 Nodes:	13	45	27	32	
+Element:	60 0 0 Nodes:	46	50	31	14	
+Element:	61 0 0 Nodes:	23	30	47	49	
+Element:	62 0 0 Nodes:	17	29	9	5	
+Element:	63 0 0 Nodes:	25	1	5	9	
+Element:	64 0 0 Nodes:	9	35	29	40	
+Element:	65 0 0 Nodes:	50	46	31	34	
+Element:	66 0 0 Nodes:	25	11	32	39	
+Element:	67 0 0 Nodes:	33	49	7	30	
+Element:	68 0 0 Nodes:	49	22	24	28	
+Element:	69 0 0 Nodes:	44	31	26	12	
+Element:	70 0 0 Nodes:	10	29	35	40	
+Element:	71 0 0 Nodes:	35	1	29	36	
+Element:	72 0 0 Nodes:	18	36	29	17	
+Element:	73 0 0 Nodes:	10	35	31	44	
+Element:	74 0 0 Nodes:	4	29	10	8	
+Element:	75 0 0 Nodes:	17	40	9	29	
+Element:	76 0 0 Nodes:	28	14	31	50	
+Element:	77 0 0 Nodes:	32	46	34	31	
+Element:	78 0 0 Nodes:	40	35	44	39	
+Element:	79 0 0 Nodes:	8	29	18	36	
+Element:	80 0 0 Nodes:	31	14	12	46	
+Element:	81 0 0 Nodes:	34	15	32	2	
+Element:	82 0 0 Nodes:	23	30	33	6	
+Element:	83 0 0 Nodes:	33	6	30	34	
+Element:	84 0 0 Nodes:	3	50	34	16	
+Element:	85 0 0 Nodes:	3	30	16	34	
+Element:	86 0 0 Nodes:	3	33	30	34	
+Element:	87 0 0 Nodes:	16	34	48	50	
+Element:	88 0 0 Nodes:	49	30	47	48	
+Element:	89 0 0 Nodes:	4	10	29	35	
+Element:	90 0 0 Nodes:	4	31	10	35	
+Element:	91 0 0 Nodes:	35	39	42	44	
+Element:	92 0 0 Nodes:	42	32	35	31	
+Element:	93 0 0 Nodes:	8	35	29	36	
+Element:	94 0 0 Nodes:	12	26	44	43	
+Element:	95 0 0 Nodes:	41	21	13	37	
+Element:	96 0 0 Nodes:	41	46	13	42	
+Element:	97 0 0 Nodes:	17	19	25	41	
+Element:	98 0 0 Nodes:	44	42	31	12	
+Element:	99 0 0 Nodes:	39	1	35	32	
+Element:	100 0 0 Nodes:	39	25	1	32	
+Element:	101 0 0 Nodes:	32	42	39	11	
+Element:	102 0 0 Nodes:	9	39	35	40	
+Element:	103 0 0 Nodes:	19	27	25	41	
+Element:	104 0 0 Nodes:	18	40	29	10	
+Element:	105 0 0 Nodes:	17	40	29	18	
+Element:	106 0 0 Nodes:	19	37	21	41	
+Element:	107 0 0 Nodes:	19	38	37	41	
+Element:	108 0 0 Nodes:	41	25	17	39	
+Element:	109 0 0 Nodes:	37	41	38	43	
+Element:	110 0 0 Nodes:	46	43	37	22	
+Element:	111 0 0 Nodes:	42	44	31	35	
+Element:	112 0 0 Nodes:	32	42	35	39	
+Element:	113 0 0 Nodes:	43	14	22	46	
+Element:	114 0 0 Nodes:	37	43	38	22	
+Element:	115 0 0 Nodes:	10	40	35	44	
+Element:	116 0 0 Nodes:	44	26	18	43	
+Element:	117 0 0 Nodes:	10	31	26	44	
+Element:	118 0 0 Nodes:	15	48	34	45	
+Element:	119 0 0 Nodes:	23	27	21	47	
+Element:	120 0 0 Nodes:	15	32	27	45	
+Element:	121 0 0 Nodes:	13	32	42	46	
+Element:	122 0 0 Nodes:	13	45	32	46	
+Element:	123 0 0 Nodes:	43	14	46	12	
+Element:	124 0 0 Nodes:	41	46	37	13	
+Element:	125 0 0 Nodes:	46	32	34	45	
+Element:	126 0 0 Nodes:	15	6	30	47	
+Element:	127 0 0 Nodes:	15	27	6	47	
+Element:	128 0 0 Nodes:	15	45	27	47	
+Element:	129 0 0 Nodes:	16	34	30	48	
+Element:	130 0 0 Nodes:	50	45	34	48	
+Element:	131 0 0 Nodes:	16	7	28	49	
+Element:	132 0 0 Nodes:	16	30	7	49	
+Element:	133 0 0 Nodes:	16	48	30	49	
+Element:	134 0 0 Nodes:	49	28	50	22	
+Element:	135 0 0 Nodes:	33	49	30	24	
+Element:	136 0 0 Nodes:	46	34	50	45	
+Element:	137 0 0 Nodes:	50	3	34	31	
+Element:	138 0 0 Nodes:	50	28	3	31	
+Element:	139 0 0 Nodes:	16	49	28	50	

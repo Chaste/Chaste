@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ChasteParameters xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/2_1">
+
+	<Simulation>       
+		<!-- 
+			Problem definition 
+		-->    
+	    <SimulationDuration unit="ms">20</SimulationDuration>
+	    <Domain>Mono</Domain>
+	    <SpaceDimension>1</SpaceDimension>
+	    <IonicModels>
+	    	<Default><Dynamic>
+	    	    <Path relative_to="chaste_source_root">heart/dynamic/luo_rudy_1991_dyn.cellml</Path>
+	    	</Dynamic></Default>
+    	</IonicModels>
+	    
+		<!-- 
+			Mesh definition 
+		-->    
+		<Mesh unit="cm">
+			<Fibre x="0.1" inter_node_space="0.01"/>
+	  	</Mesh>
+		    
+	    <!-- 
+	    	Stimuli (as many <Stimulus> definitions as needed) 
+	   	-->
+   		<Stimuli>
+			<Stimulus> <!-- #1 -->
+				<Strength unit="uA/cm^3">-300000.0</Strength>
+				<Duration unit="ms">1.0</Duration>
+				<Delay unit="ms">2.0</Delay>
+				<Location unit="cm">
+					<Cuboid>
+						<LowerCoordinates x="0" y="0" z="0"/>
+						<UpperCoordinates x="0.011" y="0" z="0"/>
+					</Cuboid>
+				</Location>
+			</Stimulus>	
+		</Stimuli>
+
+		<CellHeterogeneities>
+		    <!-- Try to set a non-existent parameter -->
+		  	<CellHeterogeneity> 
+				<ScaleFactorGks unit="dimensionless">1.0</ScaleFactorGks>
+				<ScaleFactorIto unit="dimensionless">1.0</ScaleFactorIto>
+				<ScaleFactorGkr unit="dimensionless">1.0</ScaleFactorGkr>
+				<Location unit="cm">
+					<Cuboid>
+						<LowerCoordinates x="0.025" y="0" z="0"/>
+						<UpperCoordinates x="0.075" y="0" z="0"/>
+					</Cuboid>
+				</Location>
+				<SetParameter name="missing-parameter" value="0.0"/>
+			</CellHeterogeneity>	
+		</CellHeterogeneities>
+		
+		<OutputDirectory>Mono1dSodiumBlock</OutputDirectory>
+	</Simulation>
+	
+
+    <Physiological>
+    </Physiological>
+	<Numerical>
+		<TimeSteps ode="0.01" pde="0.1" printing="0.1" unit="ms"/>
+	</Numerical>		
+		    
+</ChasteParameters>

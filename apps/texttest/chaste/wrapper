@@ -1,0 +1,24 @@
+#!/bin/bash
+
+source_root="`dirname $0`/../../.."
+
+# For some tests, we want to simulate not having the source tree, containing the XML schemas,
+# available.  So we remove the execute permission from the 'heart' folder while running Chaste.
+hide="no"
+if [ "$1" == "--hide-schema" ]; then
+	shift
+	hide="yes"
+	chmod a-x "$source_root/heart"
+fi
+
+if [ "$1" == "--mesh-convert" ]; then
+	#Run the mesh converter exe
+	shift
+	"$source_root/apps/src/MeshConvert" "$@"
+else
+	#Run the Chaste exe
+	"$source_root/apps/src/Chaste" "$@"
+fi	
+if [ "$hide" == "yes" ]; then
+	chmod a+x "$source_root/heart"
+fi

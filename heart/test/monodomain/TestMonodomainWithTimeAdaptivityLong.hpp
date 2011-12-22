@@ -1,0 +1,162 @@
+/*
+
+Copyright (C) University of Oxford, 2005-2011
+
+University of Oxford means the Chancellor, Masters and Scholars of the
+University of Oxford, having an administrative office at Wellington
+Square, Oxford OX1 2JD, UK.
+
+This file is part of Chaste.
+
+Chaste is free software: you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License as published
+by the Free Software Foundation, either version 2.1 of the License, or
+(at your option) any later version.
+
+Chaste is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details. The offer of Chaste under the terms of the
+License is subject to the License being interpreted in accordance with
+English Law and subject to any action against the University of Oxford
+being under the jurisdiction of the English Courts.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Chaste. If not, see <http://www.gnu.org/licenses/>.
+
+*/
+
+#ifndef TESTMONODOMAINWITHTIMEADAPTIVITYLONG_HPP_
+#define TESTMONODOMAINWITHTIMEADAPTIVITYLONG_HPP_
+
+#include <cxxtest/TestSuite.h>
+#include "MonodomainProblem.hpp"
+#include "petscvec.h"
+#include <vector>
+#include "PetscSetupAndFinalize.hpp"
+#include "CheckMonoLr91Vars.hpp"
+#include "ReplicatableVector.hpp"
+#include "PlaneStimulusCellFactory.hpp"
+#include "LuoRudy1991.hpp"
+#include "DistributedTetrahedralMesh.hpp"
+#include "PetscVecTools.hpp"
+
+
+// Toy controller which just goes alters the timestep from 0.01ms to 1ms after a given
+// threshold time.
+class FixedTimeAdaptivityController : public AbstractTimeAdaptivityController
+{
+private:
+    double mThresholdTime;
+
+    double ComputeTimeStep(double currentTime, Vec currentSolution)
+    {
+        if(currentTime < mThresholdTime)
+        {
+            return 0.01; // ms
+        }
+        else
+        {
+            return 1;
+        }
+    }
+
+
+public:
+    FixedTimeAdaptivityController(double thresholdTime)
+      : AbstractTimeAdaptivityController(0.01, 1.0),
+        mThresholdTime(thresholdTime)
+    {
+        assert(thresholdTime > 0);
+    }
+};
+
+
+class TestMonodomainWithTimeAdaptivity : public CxxTest::TestSuite
+{
+public:
+    void Test1dApd() throw(Exception)
+    {
+        HeartConfig::Instance()->SetPrintingTimeStep(1.0);
+        HeartConfig::Instance()->SetSimulationDuration(400); //ms
+
+        DistributedTetrahedralMesh<1,1> mesh;
+        mesh.ConstructRegularSlabMesh(0.01, 1.0); // h=0.01cm, width=1cm
+
+        PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory(-600.0*1000);
+
+        //////////////////////////////////////////////////////////////////////////
+        // run original simulation - no adaptivity, dt=0.01 all the way through
+        //////////////////////////////////////////////////////////////////////////
+        HeartConfig::Instance()->SetOutputDirectory("MonoWithTimeAdaptivity1dLong/OrigNoAdapt");
+        MonodomainProblem<1> problem(&cell_factory);
+        problem.SetMesh(&mesh);
+
+        problem.Initialise();
+        problem.Solve();
+
+        HeartEventHandler::Headings();
+        HeartEventHandler::Report();
+
+        //////////////////////////////////////////////////////////////////////////
+        // run adaptive simulation - dt=0.01 for first 2ms, then dt=1
+        //////////////////////////////////////////////////////////////////////////
+        HeartConfig::Instance()->SetOutputDirectory("MonoWithTimeAdaptivity1dLong/SimpleAdapt");
+        MonodomainProblem<1> adaptive_problem(&cell_factory);
+        adaptive_problem.SetMesh(&mesh);
+
+        FixedTimeAdaptivityController controller(25);
+        adaptive_problem.SetUseTimeAdaptivityController(true, &controller);
+        adaptive_problem.Initialise();
+        adaptive_problem.Solve();
+
+        HeartEventHandler::Headings();
+        HeartEventHandler::Report();
+
+        Hdf5DataReader reader_no_adapt("MonoWithTimeAdaptivity1dLong/OrigNoAdapt","SimulationResults");
+        Hdf5DataReader reader_adapt("MonoWithTimeAdaptivity1dLong/SimpleAdapt","SimulationResults");
+
+        unsigned num_timesteps = reader_no_adapt.GetUnlimitedDimensionValues().size();
+        assert(num_timesteps == reader_adapt.GetUnlimitedDimensionValues().size());
+
+        DistributedVectorFactory factory(mesh.GetNumNodes());
+        Vec voltage_no_adapt = factory.CreateVec();
+        Vec voltage_adapt = factory.CreateVec();
+
+        Vec difference;
+        VecDuplicate(voltage_adapt, &difference);
+
+        for(unsigned timestep=0; timestep<num_timesteps; timestep++)
+        {
+            reader_no_adapt.GetVariableOverNodes(voltage_no_adapt, "V", timestep);
+            reader_adapt.GetVariableOverNodes(voltage_adapt, "V", timestep);
+
+            PetscVecTools::WAXPY(difference, -1.0, voltage_adapt, voltage_no_adapt);
+            double l_inf_norm;
+            VecNorm(difference, NORM_INFINITY, &l_inf_norm);
+
+            //std::cout << l_inf_norm << "\n";
+            if(timestep < 25)
+            {
+                TS_ASSERT_DELTA(l_inf_norm, 0.0, 1e-12); // first 25 ms, there should be no difference
+            }
+            else
+            {
+                TS_ASSERT_DELTA(l_inf_norm, 0.0, 2.25); // the difference is at most ~2mv, which occurs during the downstroke
+            }
+        }
+
+        VecDestroy(voltage_no_adapt);
+        VecDestroy(voltage_adapt);
+    }
+};
+
+#endif /*TESTMONODOMAINWITHTIMEADAPTIVITYLONG_HPP_*/
+
+//
+//
+//Entering Test1dApd
+//         InMesh             Init           AssSys              Ode            Comms           AssRhs           NeuBCs           DirBCs              Ksp           Output         PostProc            User1            Total
+//   0.000 (  0%)     0.000 (  0%)     0.003 (  0%)    13.342 ( 61%)     0.904 (  4%)     0.830 (  4%)     0.048 (  0%)     0.000 (  0%)     4.915 ( 23%)     0.171 (  1%)     0.124 (  1%)     0.000 (  0%)    21.720 (100%)  (seconds)
+//         InMesh             Init           AssSys              Ode            Comms           AssRhs           NeuBCs           DirBCs              Ksp           Output         PostProc            User1            Total
+//   0.000 (  0%)     0.001 (  0%)     0.006 (  0%)     7.018 ( 84%)     0.077 (  1%)     0.066 (  1%)     0.004 (  0%)     0.000 (  0%)     0.388 (  5%)     0.506 (  6%)     0.121 (  1%)     0.000 (  0%)     8.323 (100%)  (seconds)

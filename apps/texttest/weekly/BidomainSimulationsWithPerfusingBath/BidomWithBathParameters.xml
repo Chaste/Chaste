@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ChasteParameters
+	   xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/2_1"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="https://chaste.comlab.ox.ac.uk/nss/parameters/2_1 ChasteParameters_2_1.xsd">
+
+	<Simulation>       
+            <!-- 
+		Problem definition 
+	    -->    
+	    <SimulationDuration unit="ms">50.0</SimulationDuration>
+	    <Domain>BiWithBath</Domain>
+	    <SpaceDimension>2</SpaceDimension>
+	    <IonicModels>
+	    	<Default><Hardcoded>LuoRudyI</Hardcoded></Default>
+    	    </IonicModels>
+	    
+	    <!-- 
+		Mesh definition 
+	    -->    
+            <Mesh unit="cm">
+                <LoadMesh name="2D_0_to_1mm_400_elements_with_bath" conductivity_media="NoFibreOrientation"/>
+            </Mesh>
+
+	    <!--
+		Electrodes
+	    -->
+	    <Electrodes>
+		<GroundSecondElectrode>yes</GroundSecondElectrode>
+		<PerpendicularToAxis>x</PerpendicularToAxis>
+		<Strength unit="uA/cm^2">-11000</Strength>
+		<StartTime unit="ms">0.0</StartTime> 
+		<Duration unit="ms">2.0</Duration>
+	    </Electrodes>
+		
+            <OutputDirectory>ChasteResults</OutputDirectory>	
+		<OutputFilenamePrefix>BathResults</OutputFilenamePrefix>		
+        </Simulation>
+		
+	
+  	<Physiological>
+	    <IntracellularConductivities longi="1.75" normal="1.75" trans="1.75" unit="mS/cm"/>
+	    <ExtracellularConductivities longi="7" normal="7" trans="7" unit="mS/cm"/>
+            <BathConductivity unit="mS/cm">7</BathConductivity>
+            <SurfaceAreaToVolumeRatio unit="1/cm">1400</SurfaceAreaToVolumeRatio>
+            <Capacitance unit="uF/cm^2">1</Capacitance>
+        </Physiological>
+
+        <Numerical>
+            <TimeSteps ode="0.001" pde="0.01" printing="0.01" unit="ms"/>
+            <KSPTolerances>
+                 <KSPAbsolute>1e-6</KSPAbsolute>
+            </KSPTolerances>
+        </Numerical>
+</ChasteParameters>

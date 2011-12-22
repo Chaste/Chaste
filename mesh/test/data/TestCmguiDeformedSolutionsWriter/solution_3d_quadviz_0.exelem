@@ -1,0 +1,391 @@
+! Created by Chaste version 2.0.9534 (with uncommitted modifications) on Wed, 14 Jul 2010 18:44:28 +0000.  Chaste was built on Wed, 14 Jul 2010 18:44:20 +0000 by machine (uname) 'Linux userpc60.comlab.ox.ac.uk 2.6.24-28-generic #1 SMP Wed May 26 23:34:09 UTC 2010 x86_64' using settings: default, no Chaste libraries.
+Group name: solution_3d_quadviz
+Shape.  Dimension=3, simplex(2;3)*simplex*simplex
+ #Scale factor sets= 0
+ #Nodes= 10
+ #Fields=1
+ 1) coordinates, coordinate, rectangular cartesian, #Components=3
+   x.  q.simplex(2;3)*q.simplex*q.simplex, no modify, standard node based.
+     #Nodes= 10
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+      4.  #Values=1
+       Value indices:     1
+       Scale factor indices:   4
+      5.  #Values=1
+       Value indices:     1
+       Scale factor indices:   5
+      6.  #Values=1
+       Value indices:     1
+       Scale factor indices:   6
+      7.  #Values=1
+       Value indices:     1
+       Scale factor indices:   7
+      8.  #Values=1
+       Value indices:     1
+       Scale factor indices:   8
+      9.  #Values=1
+       Value indices:     1
+       Scale factor indices:   9
+      10.  #Values=1
+       Value indices:     1
+       Scale factor indices:   10
+   y.  q.simplex(2;3)*q.simplex*q.simplex, no modify, standard node based.
+     #Nodes= 10
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+      4.  #Values=1
+       Value indices:     1
+       Scale factor indices:   4
+      5.  #Values=1
+       Value indices:     1
+       Scale factor indices:   5
+      6.  #Values=1
+       Value indices:     1
+       Scale factor indices:   6
+      7.  #Values=1
+       Value indices:     1
+       Scale factor indices:   7
+      8.  #Values=1
+       Value indices:     1
+       Scale factor indices:   8
+      9.  #Values=1
+       Value indices:     1
+       Scale factor indices:   9
+      10.  #Values=1
+       Value indices:     1
+       Scale factor indices:   10
+   z.  q.simplex(2;3)*q.simplex*q.simplex, no modify, standard node based.
+     #Nodes= 10
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+      4.  #Values=1
+       Value indices:     1
+       Scale factor indices:   4
+      5.  #Values=1
+       Value indices:     1
+       Scale factor indices:   5
+      6.  #Values=1
+       Value indices:     1
+       Scale factor indices:   6
+      7.  #Values=1
+       Value indices:     1
+       Scale factor indices:   7
+      8.  #Values=1
+       Value indices:     1
+       Scale factor indices:   8
+      9.  #Values=1
+       Value indices:     1
+       Scale factor indices:   9
+      10.  #Values=1
+       Value indices:     1
+       Scale factor indices:   10
+Element:	1 0 0 Nodes:	96	106	95	108	107	80	109	110	111	77	
+Element:	2 0 0 Nodes:	53	112	57	114	113	72	115	116	117	54	
+Element:	3 0 0 Nodes:	38	118	57	120	119	56	121	112	122	53	
+Element:	4 0 0 Nodes:	19	123	23	125	124	22	126	127	128	38	
+Element:	5 0 0 Nodes:	27	129	26	131	130	11	132	133	134	8	
+Element:	6 0 0 Nodes:	46	135	62	137	136	65	138	139	140	61	
+Element:	7 0 0 Nodes:	55	141	52	143	142	37	144	145	146	56	
+Element:	8 0 0 Nodes:	22	128	38	148	147	41	149	150	151	37	
+Element:	9 0 0 Nodes:	70	152	67	154	153	52	155	156	157	71	
+Element:	10 0 0 Nodes:	21	158	2	160	159	17	161	162	163	20	
+Element:	11 0 0 Nodes:	67	156	71	165	164	68	153	157	166	52	
+Element:	12 0 0 Nodes:	8	167	23	169	168	7	170	171	172	4	
+Element:	13 0 0 Nodes:	60	173	42	175	174	41	176	177	178	45	
+Element:	14 0 0 Nodes:	38	118	57	180	179	42	147	181	174	41	
+Element:	15 0 0 Nodes:	12	182	9	184	183	27	185	186	132	8	
+Element:	16 0 0 Nodes:	37	187	53	150	121	38	146	122	120	56	
+Element:	17 0 0 Nodes:	72	188	71	190	189	56	114	191	122	53	
+Element:	18 0 0 Nodes:	11	192	30	194	193	15	195	196	197	14	
+Element:	19 0 0 Nodes:	99	198	83	200	199	98	201	202	203	102	
+Element:	20 0 0 Nodes:	26	204	23	129	205	27	206	207	208	42	
+Element:	21 0 0 Nodes:	59	209	44	211	210	60	212	213	175	41	
+Element:	22 0 0 Nodes:	26	206	42	214	174	41	204	207	215	23	
+Element:	23 0 0 Nodes:	7	216	26	169	133	8	217	130	134	11	
+Element:	24 0 0 Nodes:	80	111	77	219	218	62	220	221	222	81	
+Element:	25 0 0 Nodes:	67	223	83	165	224	68	225	226	227	86	
+Element:	26 0 0 Nodes:	66	228	50	230	229	47	231	232	233	65	
+Element:	27 0 0 Nodes:	49	234	53	236	235	52	237	238	166	68	
+Element:	28 0 0 Nodes:	8	239	24	186	240	9	132	241	183	27	
+Element:	29 0 0 Nodes:	80	242	98	243	200	99	244	199	198	83	
+Element:	30 0 0 Nodes:	50	245	69	247	246	53	248	249	238	68	
+Element:	31 0 0 Nodes:	93	250	78	252	251	77	253	254	109	96	
+Element:	32 0 0 Nodes:	65	255	68	256	224	83	257	258	259	84	
+Element:	33 0 0 Nodes:	50	248	68	247	238	53	260	237	234	49	
+Element:	34 0 0 Nodes:	68	164	71	238	191	53	166	157	235	52	
+Element:	35 0 0 Nodes:	47	261	62	263	262	63	230	264	265	66	
+Element:	36 0 0 Nodes:	35	266	32	268	267	17	269	270	271	36	
+Element:	37 0 0 Nodes:	23	272	5	171	273	4	167	274	170	8	
+Element:	38 0 0 Nodes:	78	275	63	276	262	62	277	278	222	81	
+Element:	39 0 0 Nodes:	65	279	81	257	280	84	281	220	282	80	
+Element:	40 0 0 Nodes:	83	283	87	224	284	68	226	285	227	86	
+Element:	41 0 0 Nodes:	44	286	25	288	287	26	213	289	214	41	
+Element:	42 0 0 Nodes:	22	290	26	291	287	25	148	214	289	41	
+Element:	43 0 0 Nodes:	23	127	38	293	292	20	294	295	296	39	
+Element:	44 0 0 Nodes:	57	118	38	179	180	42	297	295	298	39	
+Element:	45 0 0 Nodes:	5	272	23	299	293	20	300	301	302	24	
+Element:	46 0 0 Nodes:	57	118	38	116	303	54	112	121	115	53	
+Element:	47 0 0 Nodes:	72	190	56	188	189	71	304	305	306	75	
+Element:	48 0 0 Nodes:	27	184	12	132	185	8	131	307	134	11	
+Element:	49 0 0 Nodes:	32	270	36	309	308	51	310	311	312	33	
+Element:	50 0 0 Nodes:	22	128	38	124	127	23	148	147	215	41	
+Element:	51 0 0 Nodes:	61	140	65	138	137	46	313	314	315	64	
+Element:	52 0 0 Nodes:	23	167	8	205	132	27	301	239	241	24	
+Element:	53 0 0 Nodes:	65	232	50	316	260	49	255	248	237	68	
+Element:	54 0 0 Nodes:	95	317	99	106	318	96	107	243	108	80	
+Element:	55 0 0 Nodes:	69	319	66	245	228	50	320	321	322	51	
+Element:	56 0 0 Nodes:	45	177	42	178	174	41	323	206	214	26	
+Element:	57 0 0 Nodes:	36	271	17	324	163	20	325	160	161	21	
+Element:	58 0 0 Nodes:	59	326	55	328	327	40	329	144	330	56	
+Element:	59 0 0 Nodes:	69	245	50	331	232	65	249	248	255	68	
+Element:	60 0 0 Nodes:	71	189	56	191	122	53	157	145	235	52	
+Element:	61 0 0 Nodes:	30	192	11	193	194	15	332	307	333	12	
+Element:	62 0 0 Nodes:	27	129	26	334	323	45	335	336	337	30	
+Element:	63 0 0 Nodes:	11	192	30	131	335	27	307	332	184	12	
+Element:	64 0 0 Nodes:	95	107	80	339	338	76	340	341	342	79	
+Element:	65 0 0 Nodes:	80	343	64	341	344	79	244	345	346	83	
+Element:	66 0 0 Nodes:	46	347	49	348	260	50	349	350	351	31	
+Element:	67 0 0 Nodes:	28	352	44	354	353	43	355	286	356	25	
+Element:	68 0 0 Nodes:	33	357	17	311	271	36	358	359	360	18	
+Element:	69 0 0 Nodes:	38	126	19	150	361	37	128	125	149	22	
+Element:	70 0 0 Nodes:	23	123	19	171	362	4	293	363	364	20	
+Element:	71 0 0 Nodes:	14	195	11	196	192	30	365	366	367	29	
+Element:	72 0 0 Nodes:	35	368	39	269	369	36	370	296	324	20	
+Element:	73 0 0 Nodes:	41	174	42	175	173	60	181	179	371	57	
+Element:	74 0 0 Nodes:	61	372	77	373	111	80	374	375	338	76	
+Element:	75 0 0 Nodes:	71	376	89	155	377	70	378	379	380	86	
+Element:	76 0 0 Nodes:	79	340	95	382	381	98	383	384	385	94	
+Element:	77 0 0 Nodes:	67	386	85	225	387	86	152	388	380	70	
+Element:	78 0 0 Nodes:	71	389	87	391	390	90	378	285	392	86	
+Element:	79 0 0 Nodes:	84	259	83	393	202	102	394	283	395	87	
+Element:	80 0 0 Nodes:	71	396	55	398	397	74	189	144	399	56	
+Element:	81 0 0 Nodes:	54	400	50	401	245	69	115	247	246	53	
+Element:	82 0 0 Nodes:	29	402	26	403	288	44	404	287	286	25	
+Element:	83 0 0 Nodes:	58	405	55	406	397	74	407	408	409	73	
+Element:	84 0 0 Nodes:	30	336	26	367	402	29	192	130	366	11	
+Element:	85 0 0 Nodes:	50	228	66	229	230	47	322	321	410	51	
+Element:	86 0 0 Nodes:	73	411	89	412	377	70	409	413	414	74	
+Element:	87 0 0 Nodes:	25	415	40	289	416	41	286	417	213	44	
+Element:	88 0 0 Nodes:	53	235	52	187	142	37	418	419	420	34	
+Element:	89 0 0 Nodes:	80	343	64	373	313	61	341	344	421	79	
+Element:	90 0 0 Nodes:	49	237	68	236	166	52	422	165	153	67	
+Element:	91 0 0 Nodes:	48	423	32	424	309	51	425	310	312	33	
+Element:	92 0 0 Nodes:	54	400	50	426	322	51	401	245	320	69	
+Element:	93 0 0 Nodes:	62	222	81	218	221	77	276	277	251	78	
+Element:	94 0 0 Nodes:	83	198	99	244	243	80	259	427	282	84	
+Element:	95 0 0 Nodes:	99	427	84	428	280	81	243	282	220	80	
+Element:	96 0 0 Nodes:	2	158	21	430	429	18	431	432	433	3	
+Element:	97 0 0 Nodes:	83	346	79	199	382	98	434	435	436	82	
+Element:	98 0 0 Nodes:	53	234	49	235	236	52	418	437	419	34	
+Element:	99 0 0 Nodes:	22	290	26	438	216	7	291	287	439	25	
+Element:	100 0 0 Nodes:	53	187	37	121	150	38	418	420	440	34	
+Element:	101 0 0 Nodes:	18	429	21	359	160	17	360	325	271	36	
+Element:	102 0 0 Nodes:	25	289	41	415	416	40	291	148	441	22	
+Element:	103 0 0 Nodes:	62	222	81	262	278	63	264	442	265	66	
+Element:	104 0 0 Nodes:	92	443	96	444	109	77	445	106	110	95	
+Element:	105 0 0 Nodes:	38	121	53	440	418	34	446	447	448	35	
+Element:	106 0 0 Nodes:	22	290	26	148	214	41	124	204	215	23	
+Element:	107 0 0 Nodes:	35	449	19	446	126	38	370	363	292	20	
+Element:	108 0 0 Nodes:	71	376	89	391	450	90	398	413	451	74	
+Element:	109 0 0 Nodes:	72	452	68	114	238	53	453	249	246	69	
+Element:	110 0 0 Nodes:	82	436	98	434	199	83	454	455	456	101	
+Element:	111 0 0 Nodes:	86	392	90	378	391	71	379	450	376	89	
+Element:	112 0 0 Nodes:	37	457	40	151	416	41	149	441	148	22	
+Element:	113 0 0 Nodes:	31	458	47	351	229	50	349	459	348	46	
+Element:	114 0 0 Nodes:	16	460	34	461	448	35	462	463	449	19	
+Element:	115 0 0 Nodes:	65	231	66	257	464	84	279	442	280	81	
+Element:	116 0 0 Nodes:	42	207	23	465	301	24	298	294	466	39	
+Element:	117 0 0 Nodes:	71	156	67	164	165	68	378	225	227	86	
+Element:	118 0 0 Nodes:	83	345	64	223	467	67	224	468	165	68	
+Element:	119 0 0 Nodes:	83	224	68	256	255	65	345	468	314	64	
+Element:	120 0 0 Nodes:	70	414	74	377	413	89	155	398	376	71	
+Element:	121 0 0 Nodes:	19	362	4	125	469	22	123	171	124	23	
+Element:	122 0 0 Nodes:	35	449	19	448	463	34	446	126	440	38	
+Element:	123 0 0 Nodes:	50	470	34	351	471	31	260	437	350	49	
+Element:	124 0 0 Nodes:	35	269	36	368	369	39	472	473	474	54	
+Element:	125 0 0 Nodes:	69	401	54	246	115	53	453	117	114	72	
+Element:	126 0 0 Nodes:	51	308	36	475	269	35	426	473	472	54	
+Element:	127 0 0 Nodes:	47	410	51	476	424	48	477	309	423	32	
+Element:	128 0 0 Nodes:	7	168	23	216	204	26	438	124	290	22	
+Element:	129 0 0 Nodes:	60	478	56	211	329	59	175	479	212	41	
+Element:	130 0 0 Nodes:	53	447	35	115	472	54	247	480	400	50	
+Element:	131 0 0 Nodes:	54	303	38	472	446	35	115	121	447	53	
+Element:	132 0 0 Nodes:	41	213	44	416	417	40	212	209	328	59	
+Element:	133 0 0 Nodes:	59	481	74	326	397	55	329	399	144	56	
+Element:	134 0 0 Nodes:	58	482	43	484	483	59	485	486	328	40	
+Element:	135 0 0 Nodes:	10	487	25	488	404	29	489	355	490	28	
+Element:	136 0 0 Nodes:	28	355	25	490	404	29	352	286	403	44	
+Element:	137 0 0 Nodes:	21	161	20	491	302	24	492	299	300	5	
+Element:	138 0 0 Nodes:	4	171	23	364	293	20	273	272	299	5	
+Element:	139 0 0 Nodes:	23	127	38	123	126	19	293	292	363	20	
+Element:	140 0 0 Nodes:	20	296	39	161	493	21	302	466	491	24	
+Element:	141 0 0 Nodes:	2	431	3	495	494	6	158	432	496	21	
+Element:	142 0 0 Nodes:	98	242	80	381	107	95	382	341	340	79	
+Element:	143 0 0 Nodes:	102	203	98	497	455	101	202	199	456	83	
+Element:	144 0 0 Nodes:	98	382	79	385	383	94	498	499	500	97	
+Element:	145 0 0 Nodes:	80	107	95	243	317	99	242	381	200	98	
+Element:	146 0 0 Nodes:	83	345	64	434	501	82	223	467	502	67	
+Element:	147 0 0 Nodes:	37	187	53	146	122	56	142	235	145	52	
+Element:	148 0 0 Nodes:	20	299	5	161	492	21	162	503	158	2	
+Element:	149 0 0 Nodes:	20	504	1	163	505	17	506	507	508	16	
+Element:	150 0 0 Nodes:	21	496	6	158	495	2	492	509	503	5	
+Element:	151 0 0 Nodes:	5	509	6	300	510	24	492	496	491	21	
+Element:	152 0 0 Nodes:	55	396	71	397	398	74	511	155	414	70	
+Element:	153 0 0 Nodes:	26	287	25	512	487	10	216	439	513	7	
+Element:	154 0 0 Nodes:	47	410	51	230	321	66	476	424	514	48	
+Element:	155 0 0 Nodes:	47	230	66	263	265	63	476	514	515	48	
+Element:	156 0 0 Nodes:	8	186	9	239	240	24	274	516	300	5	
+Element:	157 0 0 Nodes:	5	516	9	300	240	24	509	517	510	6	
+Element:	158 0 0 Nodes:	25	404	29	287	402	26	487	488	512	10	
+Element:	159 0 0 Nodes:	29	365	14	488	518	10	519	520	521	13	
+Element:	160 0 0 Nodes:	30	367	29	336	402	26	337	522	323	45	
+Element:	161 0 0 Nodes:	59	484	58	326	405	55	481	406	397	74	
+Element:	162 0 0 Nodes:	41	178	45	213	523	44	175	176	210	60	
+Element:	163 0 0 Nodes:	56	189	71	305	306	75	399	398	524	74	
+Element:	164 0 0 Nodes:	86	387	85	526	525	104	379	527	528	89	
+Element:	165 0 0 Nodes:	55	511	70	397	414	74	408	412	409	73	
+Element:	166 0 0 Nodes:	89	379	86	527	387	85	377	380	388	70	
+Element:	167 0 0 Nodes:	42	174	41	207	215	23	180	147	127	38	
+Element:	168 0 0 Nodes:	69	529	87	453	530	72	249	284	452	68	
+Element:	169 0 0 Nodes:	76	531	92	375	444	77	339	445	110	95	
+Element:	170 0 0 Nodes:	80	373	61	338	374	76	341	421	342	79	
+Element:	171 0 0 Nodes:	53	191	71	238	164	68	114	188	452	72	
+Element:	172 0 0 Nodes:	87	390	90	285	392	86	532	533	534	105	
+Element:	173 0 0 Nodes:	75	535	59	305	329	56	524	481	399	74	
+Element:	174 0 0 Nodes:	56	145	52	189	157	71	144	141	396	55	
+Element:	175 0 0 Nodes:	71	155	70	156	152	67	378	380	225	86	
+Element:	176 0 0 Nodes:	71	378	86	164	227	68	389	285	284	87	
+Element:	177 0 0 Nodes:	95	339	76	537	536	91	384	538	539	94	
+Element:	178 0 0 Nodes:	86	540	82	387	541	85	225	502	386	67	
+Element:	179 0 0 Nodes:	102	542	86	543	534	105	395	285	532	87	
+Element:	180 0 0 Nodes:	83	198	99	259	427	84	202	201	393	102	
+Element:	181 0 0 Nodes:	82	434	83	435	346	79	501	345	344	64	
+Element:	182 0 0 Nodes:	83	283	87	226	285	86	202	395	542	102	
+Element:	183 0 0 Nodes:	83	283	87	259	394	84	224	284	258	68	
+Element:	184 0 0 Nodes:	37	146	56	457	330	40	143	144	327	55	
+Element:	185 0 0 Nodes:	59	326	55	484	405	58	328	327	485	40	
+Element:	186 0 0 Nodes:	16	508	17	461	268	35	544	267	266	32	
+Element:	187 0 0 Nodes:	19	126	38	361	150	37	463	440	420	34	
+Element:	188 0 0 Nodes:	104	528	89	525	527	85	545	546	547	88	
+Element:	189 0 0 Nodes:	65	233	47	137	459	46	232	229	348	50	
+Element:	190 0 0 Nodes:	102	542	86	202	226	83	497	548	456	101	
+Element:	191 0 0 Nodes:	39	296	20	493	161	21	369	324	325	36	
+Element:	192 0 0 Nodes:	57	116	54	118	303	38	297	474	295	39	
+Element:	193 0 0 Nodes:	32	310	33	267	357	17	270	311	271	36	
+Element:	194 0 0 Nodes:	61	139	62	373	219	80	372	218	111	77	
+Element:	195 0 0 Nodes:	62	135	46	136	137	65	261	459	233	47	
+Element:	196 0 0 Nodes:	62	264	66	261	230	47	136	231	233	65	
+Element:	197 0 0 Nodes:	81	279	65	442	231	66	222	136	264	62	
+Element:	198 0 0 Nodes:	79	341	80	346	244	83	382	242	199	98	
+Element:	199 0 0 Nodes:	69	331	65	245	232	50	319	231	228	66	
+Element:	200 0 0 Nodes:	19	462	16	363	506	20	449	461	370	35	
+Element:	201 0 0 Nodes:	1	507	16	504	506	20	549	462	363	19	
+Element:	202 0 0 Nodes:	5	550	1	299	504	20	273	551	364	4	
+Element:	203 0 0 Nodes:	17	159	2	505	552	1	163	162	504	20	
+Element:	204 0 0 Nodes:	86	392	90	379	450	89	534	533	553	105	
+Element:	205 0 0 Nodes:	104	526	86	554	534	105	555	548	556	101	
+Element:	206 0 0 Nodes:	23	205	27	207	208	42	301	241	465	24	
+Element:	207 0 0 Nodes:	86	540	82	548	454	101	387	541	557	85	
+Element:	208 0 0 Nodes:	105	556	101	534	548	86	543	497	542	102	
+Element:	209 0 0 Nodes:	45	523	44	323	288	26	178	213	214	41	
+Element:	210 0 0 Nodes:	42	206	26	177	323	45	208	129	334	27	
+Element:	211 0 0 Nodes:	39	368	35	474	472	54	295	446	303	38	
+Element:	212 0 0 Nodes:	39	295	38	296	292	20	368	446	370	35	
+Element:	213 0 0 Nodes:	23	294	39	207	298	42	127	295	180	38	
+Element:	214 0 0 Nodes:	40	417	44	415	286	25	486	353	356	43	
+Element:	215 0 0 Nodes:	11	366	29	195	365	14	558	488	518	10	
+Element:	216 0 0 Nodes:	35	269	36	268	271	17	370	324	163	20	
+Element:	217 0 0 Nodes:	51	410	47	322	229	50	309	477	559	32	
+Element:	218 0 0 Nodes:	50	559	32	229	477	47	351	560	458	31	
+Element:	219 0 0 Nodes:	16	506	20	461	370	35	508	163	268	17	
+Element:	220 0 0 Nodes:	51	475	35	308	269	36	309	266	270	32	
+Element:	221 0 0 Nodes:	16	544	32	461	266	35	561	560	562	31	
+Element:	222 0 0 Nodes:	20	299	5	162	503	2	504	550	552	1	
+Element:	223 0 0 Nodes:	4	172	7	469	438	22	171	168	124	23	
+Element:	224 0 0 Nodes:	29	488	10	490	489	28	519	521	563	13	
+Element:	225 0 0 Nodes:	101	548	86	557	387	85	555	526	525	104	
+Element:	226 0 0 Nodes:	100	564	101	566	565	97	567	454	568	82	
+Element:	227 0 0 Nodes:	70	569	88	388	547	85	377	546	527	89	
+Element:	228 0 0 Nodes:	79	383	94	342	538	76	340	384	339	95	
+Element:	229 0 0 Nodes:	21	160	17	158	159	2	429	359	430	18	
+Element:	230 0 0 Nodes:	16	561	31	461	562	35	460	471	448	34	
+Element:	231 0 0 Nodes:	60	478	56	371	119	57	570	305	571	75	
+Element:	232 0 0 Nodes:	72	304	75	113	571	57	190	305	119	56	
+Element:	233 0 0 Nodes:	75	570	60	305	478	56	535	211	329	59	
+Element:	234 0 0 Nodes:	90	391	71	572	188	72	390	389	530	87	
+Element:	235 0 0 Nodes:	87	530	72	284	452	68	389	188	164	71	
+Element:	236 0 0 Nodes:	53	112	57	122	119	56	114	113	190	72	
+Element:	237 0 0 Nodes:	91	573	92	536	531	76	537	445	339	95	
+Element:	238 0 0 Nodes:	77	221	81	111	220	80	109	574	108	96	
+Element:	239 0 0 Nodes:	96	574	81	108	220	80	318	428	243	99	
+Element:	240 0 0 Nodes:	80	111	77	107	110	95	338	375	339	76	
+Element:	241 0 0 Nodes:	39	466	24	296	302	20	294	301	293	23	
+Element:	242 0 0 Nodes:	5	272	23	300	301	24	274	167	239	8	
+Element:	243 0 0 Nodes:	49	422	67	575	467	64	237	165	468	68	
+Element:	244 0 0 Nodes:	70	155	71	154	157	52	511	396	141	55	
+Element:	245 0 0 Nodes:	64	314	65	315	137	46	575	316	347	49	
+Element:	246 0 0 Nodes:	64	575	49	468	237	68	314	316	255	65	
+Element:	247 0 0 Nodes:	46	348	50	347	260	49	137	232	316	65	
+Element:	248 0 0 Nodes:	53	234	49	418	437	34	247	260	470	50	
+Element:	249 0 0 Nodes:	104	554	105	526	534	86	528	553	379	89	
+Element:	250 0 0 Nodes:	70	569	88	377	546	89	412	576	411	73	
+Element:	251 0 0 Nodes:	71	398	74	391	451	90	306	524	577	75	
+Element:	252 0 0 Nodes:	101	456	83	454	434	82	548	226	540	86	
+Element:	253 0 0 Nodes:	103	578	85	579	547	88	580	525	545	104	
+Element:	254 0 0 Nodes:	86	540	82	225	502	67	226	434	223	83	
+Element:	255 0 0 Nodes:	71	306	75	391	577	90	188	304	572	72	
+Element:	256 0 0 Nodes:	43	483	59	486	328	40	353	209	417	44	
+Element:	257 0 0 Nodes:	41	175	60	479	478	56	181	371	119	57	
+Element:	258 0 0 Nodes:	38	120	56	118	119	57	147	479	181	41	
+Element:	259 0 0 Nodes:	37	151	41	457	416	40	146	479	330	56	
+Element:	260 0 0 Nodes:	40	328	59	330	329	56	416	212	479	41	
+Element:	261 0 0 Nodes:	37	151	41	146	479	56	150	147	120	38	
+Element:	262 0 0 Nodes:	77	221	81	109	574	96	251	277	254	78	
+Element:	263 0 0 Nodes:	77	252	93	109	253	96	444	581	443	92	
+Element:	264 0 0 Nodes:	32	559	50	309	322	51	266	480	475	35	
+Element:	265 0 0 Nodes:	31	562	35	471	448	34	351	480	470	50	
+Element:	266 0 0 Nodes:	34	418	53	470	247	50	448	447	480	35	
+Element:	267 0 0 Nodes:	35	472	54	480	400	50	475	426	322	51	
+Element:	268 0 0 Nodes:	31	562	35	351	480	50	560	266	559	32	
+Element:	269 0 0 Nodes:	45	522	29	323	402	26	523	403	288	44	
+Element:	270 0 0 Nodes:	1	504	20	551	364	4	549	363	362	19	
+Element:	271 0 0 Nodes:	65	281	80	257	282	84	256	244	259	83	
+Element:	272 0 0 Nodes:	62	219	80	222	220	81	136	281	279	65	
+Element:	273 0 0 Nodes:	61	140	65	313	314	64	373	281	343	80	
+Element:	274 0 0 Nodes:	64	345	83	343	244	80	314	256	281	65	
+Element:	275 0 0 Nodes:	61	140	65	373	281	80	139	136	219	62	
+Element:	276 0 0 Nodes:	7	217	11	513	558	10	216	130	512	26	
+Element:	277 0 0 Nodes:	10	488	29	512	402	26	558	366	130	11	
+Element:	278 0 0 Nodes:	11	192	30	130	336	26	131	335	129	27	
+Element:	279 0 0 Nodes:	26	133	8	129	132	27	204	167	205	23	
+Element:	280 0 0 Nodes:	7	168	23	169	167	8	216	204	133	26	
+Element:	281 0 0 Nodes:	98	436	82	382	435	79	498	568	499	97	
+Element:	282 0 0 Nodes:	101	557	85	454	541	82	564	582	567	100	
+Element:	283 0 0 Nodes:	101	565	97	454	568	82	455	498	436	98	
+Element:	284 0 0 Nodes:	85	557	101	525	555	104	582	564	583	100	
+Element:	285 0 0 Nodes:	65	331	69	255	249	68	257	584	258	84	
+Element:	286 0 0 Nodes:	68	284	87	258	394	84	249	529	584	69	
+Element:	287 0 0 Nodes:	65	331	69	257	584	84	231	319	464	66	
+Element:	288 0 0 Nodes:	85	525	104	578	580	103	582	583	585	100	

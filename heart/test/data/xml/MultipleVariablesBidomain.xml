@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ChasteParameters
+    xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/2_0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="https://chaste.comlab.ox.ac.uk/nss/parameters/2_0 ../../../src/io/ChasteParameters_2_0.xsd">
+       
+        <Simulation>
+                <!-- 
+                        Problem definition 
+                -->
+                <SpaceDimension>1</SpaceDimension>
+                <SimulationDuration unit="ms">0.1</SimulationDuration>
+                <Domain>Bi</Domain>
+                <IonicModels>
+                    <Default><Hardcoded>FaberRudy2000</Hardcoded></Default>
+                </IonicModels>
+                    
+                <!-- 
+                        Mesh definition 
+                -->
+                <Mesh unit="cm">
+                        <LoadMesh name="mesh/test/data/1D_0_to_1mm_10_elements" conductivity_media="NoFibreOrientation"/>
+                </Mesh>
+        
+                <!-- 
+                        Output 
+                -->
+                <OutputDirectory>MultipleVariablesBidomain</OutputDirectory>
+                <OutputVariables>
+                    <Var name="CaI"/>
+                    <Var name="Nai"/>
+                    <Var name="Ki"/>
+                </OutputVariables>
+        </Simulation>
+        
+        <Physiological>
+        </Physiological>
+
+        <Numerical>
+                <TimeSteps ode="0.01" pde="0.01" printing="0.01" unit="ms"/>
+                <KSPTolerances>
+                    <KSPAbsolute>1e-8</KSPAbsolute>
+                </KSPTolerances>
+        </Numerical>
+
+</ChasteParameters>

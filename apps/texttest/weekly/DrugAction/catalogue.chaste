@@ -1,0 +1,17 @@
+The following new files/directories were created:
+<Test Directory>
+----ChasteResults
+--------.chaste_deletable_folder
+--------DrugActionResults.h5
+--------machine_info_0.txt
+--------progress_status.txt
+--------provenance_info_0.txt
+--------output
+------------.chaste_deletable_folder
+------------ChasteDefaults.xml
+------------ChasteParameters.xml
+------------DrugActionResults_V.dat
+------------DrugActionResults_mesh.cnnx
+------------DrugActionResults_mesh.pts
+------------DrugActionResults_times.info
+------------NodalTraces_V.dat

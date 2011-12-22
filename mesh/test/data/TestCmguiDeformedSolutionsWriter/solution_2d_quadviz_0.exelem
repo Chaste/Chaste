@@ -1,0 +1,63 @@
+! Created by Chaste version 2.0.9534 (with uncommitted modifications) on Wed, 14 Jul 2010 18:47:43 +0000.  Chaste was built on Wed, 14 Jul 2010 18:47:34 +0000 by machine (uname) 'Linux userpc60.comlab.ox.ac.uk 2.6.24-28-generic #1 SMP Wed May 26 23:34:09 UTC 2010 x86_64' using settings: default, no Chaste libraries.
+Group name: solution_2d_quadviz
+Shape.  Dimension=2, simplex(2)*simplex
+ #Scale factor sets= 0
+ #Nodes= 6
+ #Fields=1
+ 1) coordinates, coordinate, rectangular cartesian, #Components=2
+   x.  q.simplex(2)*q.simplex, no modify, standard node based.
+     #Nodes= 6
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+      4.  #Values=1
+       Value indices:     1
+       Scale factor indices:   4
+      5.  #Values=1
+       Value indices:     1
+       Scale factor indices:   5
+      6.  #Values=1
+       Value indices:     1
+       Scale factor indices:   6
+   y.  q.simplex(2)*q.simplex, no modify, standard node based.
+     #Nodes= 6
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+      4.  #Values=1
+       Value indices:     1
+       Scale factor indices:   4
+      5.  #Values=1
+       Value indices:     1
+       Scale factor indices:   5
+      6.  #Values=1
+       Value indices:     1
+       Scale factor indices:   6
+Element:	1 0 0 Nodes:	1	16	2	18	17	4	
+Element:	2 0 0 Nodes:	4	17	2	20	19	5	
+Element:	3 0 0 Nodes:	8	21	10	23	22	7	
+Element:	4 0 0 Nodes:	5	24	8	25	23	7	
+Element:	5 0 0 Nodes:	10	26	11	28	27	13	
+Element:	6 0 0 Nodes:	7	29	4	25	20	5	
+Element:	7 0 0 Nodes:	2	30	3	19	31	5	
+Element:	8 0 0 Nodes:	5	32	6	24	33	8	
+Element:	9 0 0 Nodes:	6	32	5	34	31	3	
+Element:	10 0 0 Nodes:	6	35	9	33	36	8	
+Element:	11 0 0 Nodes:	8	36	9	38	37	12	
+Element:	12 0 0 Nodes:	11	39	14	27	40	13	
+Element:	13 0 0 Nodes:	14	39	11	42	41	12	
+Element:	14 0 0 Nodes:	12	43	15	42	44	14	
+Element:	15 0 0 Nodes:	11	45	8	41	38	12	
+Element:	16 0 0 Nodes:	8	45	11	21	26	10	

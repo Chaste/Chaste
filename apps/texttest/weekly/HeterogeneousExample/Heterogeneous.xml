@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ChasteParameters xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/2_1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="https://chaste.comlab.ox.ac.uk/nss/parameters/2_1 ChasteParameters_2_1.xsd">
+
+	<Simulation>
+		<!-- Problem definition -->
+		<SpaceDimension>3</SpaceDimension>
+		<SimulationDuration unit="ms">150.0</SimulationDuration>
+		<Domain>Mono</Domain>
+		<!-- Mesh definition -->
+		<Mesh unit="cm">
+			<Slab x="0.3" y="0.3" z="0.075" inter_node_space="0.015"/>
+		</Mesh>
+
+		<IonicModels>
+			<Default>
+				<Hardcoded>MahajanShiferaw</Hardcoded>
+			</Default>
+			<!-- Conductivity heterogeneity -->
+			<Region>
+				<IonicModel>
+					<Hardcoded>DifrancescoNoble</Hardcoded>
+				</IonicModel>
+				<Location unit="cm">
+					<Cuboid>
+						<LowerCoordinates x="0.13" y="0.0" z="0.03"/>
+						<UpperCoordinates x="0.17" y="0.15" z="0.05"/>
+					</Cuboid>
+				</Location>
+			</Region>
+		</IonicModels>
+
+		<!-- Stimuli (as many <Stimulus> definitions as needed) -->
+		<Stimuli>
+			<Stimulus>
+				<!-- #1 -->
+				<Strength unit="uA/cm^3">-355000.0</Strength>
+				<Duration unit="ms">2.0</Duration>
+				<Delay unit="ms">0</Delay>
+				<Location unit="cm">
+					<Cuboid>
+						<LowerCoordinates x="0.13" y="0.0" z="0.03"/>
+						<UpperCoordinates x="0.17" y="0.02" z="0.05"/>
+					</Cuboid>
+				</Location>
+			</Stimulus>
+		</Stimuli>
+		<!-- 
+	         Conductivity heterogeneities 
+	     -->
+		<ConductivityHeterogeneities>
+			<ConductivityHeterogeneity>
+				<!-- #1 -->
+				<IntracellularConductivities longi="0.0" trans="2.75" normal="0.0" unit="mS/cm"/>
+				<ExtracellularConductivities longi="0.0" trans="2.75" normal="0.0" unit="mS/cm"/>
+				<Location unit="cm">
+					<Cuboid>
+						<LowerCoordinates x="0.12" y="0.0" z="0.015"/>
+						<UpperCoordinates x="0.18" y="0.14" z="0.065"/>
+					</Cuboid>
+				</Location>
+			</ConductivityHeterogeneity>
+		</ConductivityHeterogeneities>
+		<!-- Output -->
+		<OutputDirectory>HeterogeneousSimulation</OutputDirectory>
+		<OutputFilenamePrefix>SimulationResults</OutputFilenamePrefix>
+	</Simulation>
+
+	<Physiological>
+		<!-- Default conductivities -->
+		<IntracellularConductivities longi="0.2" trans="0.2" normal="0.2" unit="mS/cm"/>
+		<ExtracellularConductivities longi="0.2" trans="0.2" normal="0.2" unit="mS/cm"/>
+		<SurfaceAreaToVolumeRatio unit="1/cm"> 1400 </SurfaceAreaToVolumeRatio>
+		<Capacitance unit="uF/cm^2"> 1.0 </Capacitance>
+	</Physiological>
+
+	<Numerical>
+		<TimeSteps ode="0.005" pde="0.01" printing="0.1" unit="ms"/>
+	</Numerical>
+
+</ChasteParameters>

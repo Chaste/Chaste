@@ -1,0 +1,142 @@
+! Created by Chaste version 2.0.9760 on Thu, 29 Jul 2010 03:58:54 +0000.  Chaste was built on Thu, 29 Jul 2010 03:58:26 +0000 by machine (uname) 'Linux compphys11 2.6.32-24-generic #38-Ubuntu SMP Mon Jul 5 09:20:59 UTC 2010 x86_64' using settings: default, shared libraries.
+Group name: 3_vars
+Shape.  Dimension=1, line
+ #Scale factor sets= 0
+ #Nodes= 2
+ #Fields=4
+ 1) coordinates, coordinate, rectangular cartesian, #Components=1
+   x.  l.Lagrange, no modify, standard node based.
+     #Nodes= 2
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+2)  Vm_1 , field, rectangular cartesian, #Components=1
+   x.  l.Lagrange, no modify, standard node based.
+     #Nodes= 2
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+3)  Vm_2 , field, rectangular cartesian, #Components=1
+   x.  l.Lagrange, no modify, standard node based.
+     #Nodes= 2
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+4)  Phi_e , field, rectangular cartesian, #Components=1
+   x.  l.Lagrange, no modify, standard node based.
+     #Nodes= 2
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+Element:	1 0 0 Nodes:	1	2	
+Element:	2 0 0 Nodes:	2	3	
+Element:	3 0 0 Nodes:	3	4	
+Element:	4 0 0 Nodes:	4	5	
+Element:	5 0 0 Nodes:	5	6	
+Element:	6 0 0 Nodes:	6	7	
+Element:	7 0 0 Nodes:	7	8	
+Element:	8 0 0 Nodes:	8	9	
+Element:	9 0 0 Nodes:	9	10	
+Element:	10 0 0 Nodes:	10	11	
+Element:	11 0 0 Nodes:	11	12	
+Element:	12 0 0 Nodes:	12	13	
+Element:	13 0 0 Nodes:	13	14	
+Element:	14 0 0 Nodes:	14	15	
+Element:	15 0 0 Nodes:	15	16	
+Element:	16 0 0 Nodes:	16	17	
+Element:	17 0 0 Nodes:	17	18	
+Element:	18 0 0 Nodes:	18	19	
+Element:	19 0 0 Nodes:	19	20	
+Element:	20 0 0 Nodes:	20	21	
+Element:	21 0 0 Nodes:	21	22	
+Element:	22 0 0 Nodes:	22	23	
+Element:	23 0 0 Nodes:	23	24	
+Element:	24 0 0 Nodes:	24	25	
+Element:	25 0 0 Nodes:	25	26	
+Element:	26 0 0 Nodes:	26	27	
+Element:	27 0 0 Nodes:	27	28	
+Element:	28 0 0 Nodes:	28	29	
+Element:	29 0 0 Nodes:	29	30	
+Element:	30 0 0 Nodes:	30	31	
+Element:	31 0 0 Nodes:	31	32	
+Element:	32 0 0 Nodes:	32	33	
+Element:	33 0 0 Nodes:	33	34	
+Element:	34 0 0 Nodes:	34	35	
+Element:	35 0 0 Nodes:	35	36	
+Element:	36 0 0 Nodes:	36	37	
+Element:	37 0 0 Nodes:	37	38	
+Element:	38 0 0 Nodes:	38	39	
+Element:	39 0 0 Nodes:	39	40	
+Element:	40 0 0 Nodes:	40	41	
+Element:	41 0 0 Nodes:	41	42	
+Element:	42 0 0 Nodes:	42	43	
+Element:	43 0 0 Nodes:	43	44	
+Element:	44 0 0 Nodes:	44	45	
+Element:	45 0 0 Nodes:	45	46	
+Element:	46 0 0 Nodes:	46	47	
+Element:	47 0 0 Nodes:	47	48	
+Element:	48 0 0 Nodes:	48	49	
+Element:	49 0 0 Nodes:	49	50	
+Element:	50 0 0 Nodes:	50	51	
+Element:	51 0 0 Nodes:	51	52	
+Element:	52 0 0 Nodes:	52	53	
+Element:	53 0 0 Nodes:	53	54	
+Element:	54 0 0 Nodes:	54	55	
+Element:	55 0 0 Nodes:	55	56	
+Element:	56 0 0 Nodes:	56	57	
+Element:	57 0 0 Nodes:	57	58	
+Element:	58 0 0 Nodes:	58	59	
+Element:	59 0 0 Nodes:	59	60	
+Element:	60 0 0 Nodes:	60	61	
+Element:	61 0 0 Nodes:	61	62	
+Element:	62 0 0 Nodes:	62	63	
+Element:	63 0 0 Nodes:	63	64	
+Element:	64 0 0 Nodes:	64	65	
+Element:	65 0 0 Nodes:	65	66	
+Element:	66 0 0 Nodes:	66	67	
+Element:	67 0 0 Nodes:	67	68	
+Element:	68 0 0 Nodes:	68	69	
+Element:	69 0 0 Nodes:	69	70	
+Element:	70 0 0 Nodes:	70	71	
+Element:	71 0 0 Nodes:	71	72	
+Element:	72 0 0 Nodes:	72	73	
+Element:	73 0 0 Nodes:	73	74	
+Element:	74 0 0 Nodes:	74	75	
+Element:	75 0 0 Nodes:	75	76	
+Element:	76 0 0 Nodes:	76	77	
+Element:	77 0 0 Nodes:	77	78	
+Element:	78 0 0 Nodes:	78	79	
+Element:	79 0 0 Nodes:	79	80	
+Element:	80 0 0 Nodes:	80	81	
+Element:	81 0 0 Nodes:	81	82	
+Element:	82 0 0 Nodes:	82	83	
+Element:	83 0 0 Nodes:	83	84	
+Element:	84 0 0 Nodes:	84	85	
+Element:	85 0 0 Nodes:	85	86	
+Element:	86 0 0 Nodes:	86	87	
+Element:	87 0 0 Nodes:	87	88	
+Element:	88 0 0 Nodes:	88	89	
+Element:	89 0 0 Nodes:	89	90	
+Element:	90 0 0 Nodes:	90	91	
+Element:	91 0 0 Nodes:	91	92	
+Element:	92 0 0 Nodes:	92	93	
+Element:	93 0 0 Nodes:	93	94	
+Element:	94 0 0 Nodes:	94	95	
+Element:	95 0 0 Nodes:	95	96	
+Element:	96 0 0 Nodes:	96	97	
+Element:	97 0 0 Nodes:	97	98	
+Element:	98 0 0 Nodes:	98	99	
+Element:	99 0 0 Nodes:	99	100	
+Element:	100 0 0 Nodes:	100	101	

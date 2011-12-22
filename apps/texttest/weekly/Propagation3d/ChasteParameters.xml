@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ChasteParameters
+    xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/2_1"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="https://chaste.comlab.ox.ac.uk/nss/parameters/2_1 ChasteParameters_2_1.xsd">
+
+	<Simulation>
+		<!-- 
+			Problem definition 
+		-->
+		<SpaceDimension>3</SpaceDimension>
+	    <SimulationDuration unit="ms">5.0</SimulationDuration>
+	    <Domain>Mono</Domain>
+	    <IonicModels>
+	    	<Default><Hardcoded>LuoRudyIBackwardEuler</Hardcoded></Default>
+    	</IonicModels>
+	    
+		<!-- 
+			Mesh definition 
+		-->
+		<Mesh unit="cm">
+			<LoadMesh name="heart_chaste2_renum_i_triangles" conductivity_media="Axisymmetric"/>
+	  	</Mesh>
+	
+	    <!-- 
+	    	Stimuli (as many <Stimulus> definitions as needed) 
+	   	-->
+	   	<Stimuli>
+		  	<Stimulus> <!-- #1 -->
+				<Strength unit="uA/cm^3">-80000.0</Strength>
+				<Duration unit="ms">2.0</Duration>
+				<Delay unit="ms">0</Delay>
+				<Location unit="cm">
+					<Cuboid>
+						<LowerCoordinates x="-100" y="-100" z="-100"/>
+						<UpperCoordinates x="100" y="100" z="0.04248"/>
+					</Cuboid>
+				</Location>
+			</Stimulus>	
+		</Stimuli>
+
+		
+		<!-- 
+			Output 
+		-->
+		<OutputDirectory>ChasteResults</OutputDirectory>
+		<OutputFilenamePrefix>3dResults</OutputFilenamePrefix>
+		<!-- Postprocess for possible visualizers --> 
+		<OutputVisualizer meshalyzer="yes" vtk="no" cmgui="yes"/> 		
+		
+	</Simulation>
+	
+	<Physiological>
+	    <!--
+	        Conductivities
+	    -->
+	    <IntracellularConductivities longi="1.75" trans="0.19" normal="0.19" unit="mS/cm"/>
+	    <ExtracellularConductivities longi="7.0"  trans="2.4"  normal="2.4" unit="mS/cm"/>
+	    <SurfaceAreaToVolumeRatio unit="1/cm"> 1400 </SurfaceAreaToVolumeRatio>
+	    <Capacitance unit="uF/cm^2"> 1.0 </Capacitance>
+	</Physiological>
+
+	<Numerical>
+		<TimeSteps ode="0.02" pde="0.1" printing="1" unit="ms"/>
+	</Numerical>
+
+</ChasteParameters>

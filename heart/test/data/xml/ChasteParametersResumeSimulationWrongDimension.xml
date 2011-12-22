@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ChasteParameters
+    xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/2_0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="https://chaste.comlab.ox.ac.uk/nss/parameters/2_0 ../../../src/io/ChasteParameters_2_0.xsd">
+       
+	<ResumeSimulation>
+        <ArchiveDirectory>ChasteResults_10ms</ArchiveDirectory>
+        <SpaceDimension>2</SpaceDimension>
+	    <SimulationDuration unit="ms">20.0</SimulationDuration>
+	    <Domain>Mono</Domain>
+        <CheckpointSimulation timestep="20.0" unit="ms" max_checkpoints_on_disk="3"/>
+        <OutputVisualizer meshalyzer="yes" vtk="no" cmgui="no"/>
+	</ResumeSimulation>
+	
+	<!-- These elements must exist, but their contents are ignored -->
+	<Physiological/>
+	<Numerical/>
+
+</ChasteParameters>

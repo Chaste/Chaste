@@ -1,0 +1,60 @@
+# Shell script to create meshalyzer input files from the memfem output (which 
+# are in CoolGraphics format)
+# 
+# arguments are:
+#   1. the input files path and prefix. Files are assumed to start at <prefix>0, with increment 1
+#   2. number of final file  
+#   3. the output prefix 
+
+
+echo ""
+echo "Running memfem2meshalzer:"
+
+RESULTS_PREFIX=$1
+FINAL=$2
+OUTPUT_PREFIX=$3
+
+if [ -z "${RESULTS_PREFIX}" ] ; then
+	echo "ERROR: results file prefix is empty string"
+	exit 1
+fi
+
+if [ -z "${FINAL}" ] ; then
+	echo "ERROR: number corresponding to final file is empty string"
+	exit 1
+else
+	if [ ${FINAL} -le 0 ]; then
+		echo "ERROR: number corresponding to final file should be greater than zero"
+		exit 1
+	fi
+fi
+
+if [ -z "${OUTPUT_PREFIX}" ] ; then
+	echo "ERROR: output file prefix is empty string"
+	exit 1
+fi
+
+
+
+
+#######################################################################################
+#  create data files
+#######################################################################################
+rm -f ${OUTPUT_PREFIX}_voltage.dat
+rm -f ${OUTPUT_PREFIX}_extracell.dat
+
+i=0
+while [ $i -le ${FINAL} ]
+do
+	echo "  adding ${RESULTS_PREFIX}${i}.."
+	
+	## multiply by 1000 here to convert volts to millivolts
+ 	tail -n +2 "${RESULTS_PREFIX}${i}" | awk '{print $3*1000}' >> ${OUTPUT_PREFIX}_voltage.dat
+  	tail -n +2 "${RESULTS_PREFIX}${i}" | awk '{print $1*1000}' >> ${OUTPUT_PREFIX}_extracell.dat
+	i=$((i+1))
+done
+
+echo ""
+echo "  written ${OUTPUT_PREFIX}_voltage.dat and ${OUTPUT_PREFIX}_extracell.dat"
+echo "  ..done!"
+echo ""

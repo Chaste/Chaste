@@ -1,0 +1,71 @@
+"""Copyright (C) University of Oxford, 2005-2011
+
+University of Oxford means the Chancellor, Masters and Scholars of the
+University of Oxford, having an administrative office at Wellington
+Square, Oxford OX1 2JD, UK.
+
+This file is part of Chaste.
+
+Chaste is free software: you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License as published
+by the Free Software Foundation, either version 2.1 of the License, or
+(at your option) any later version.
+
+Chaste is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details. The offer of Chaste under the terms of the
+License is subject to the License being interpreted in accordance with
+English Law and subject to any action against the University of Oxford
+being under the jurisdiction of the English Courts.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Chaste. If not, see <http://www.gnu.org/licenses/>.
+"""
+
+"""
+Specialised component build script for python code.
+"""
+
+import os
+
+Import("*")
+
+curdir = os.getcwd()
+# Look for source files within the <component> folder
+os.chdir('../..') # This is so .o files are built in <component>/build/<something>/
+pydirs = SConsTools.FindSourceFiles(env, '.', sourceExts=['.py'], ignoreDirs=['build', 'test'], dirsOnly=True)
+# Move back to the buid dir
+os.chdir(curdir)
+
+# Look for files containing a test suite
+# A list of test suites to run will be found in a test/<name>TestPack.txt
+# file, one per line.
+# Alternatively, a single test suite may have been specified on the command line.
+testfiles = SConsTools.FindTestsToRun(build, BUILD_TARGETS,
+                                      single_test_suite,
+                                      single_test_suite_dir,
+                                      all_tests,
+                                      component='python')
+
+# Test runner for Python tests needs to use a source scanner
+# to find what Python files we depend on.
+runtest = Builder(action=env['BUILDERS']['RunTest'].action,
+                  source_scanner=SConsTools.PyScanner())
+env['BUILDERS']['PyRunTest'] = runtest
+
+# The list of paths to search for Python modules.
+env.Append(PYINCPATH=pydirs)
+
+test_log_files = []
+if not compile_only:
+    for testfile in testfiles:
+        prefix = os.path.splitext(testfile)[0]
+        log_file = env.File(prefix+'.log')
+        test_log_files.append(log_file)
+        env.PyRunTest(log_file, os.path.join('test', testfile))
+        if force_test_runs:
+            env.AlwaysBuild(log_file)
+    
+result = (test_log_files, None)
+Return("result")

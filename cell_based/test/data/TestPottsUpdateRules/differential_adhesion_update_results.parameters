@@ -1,0 +1,7 @@
+		<DifferentialAdhesionPottsUpdateRule-2>
+			<LabelledCellLabelledCellAdhesionEnergyParameter>0.3</LabelledCellLabelledCellAdhesionEnergyParameter>
+			<LabelledCellCellAdhesionEnergyParameter>0.4</LabelledCellCellAdhesionEnergyParameter>
+			<LabelledCellBoundaryAdhesionEnergyParameter>0.6</LabelledCellBoundaryAdhesionEnergyParameter>
+			<CellCellAdhesionEnergyParameter>0.5</CellCellAdhesionEnergyParameter>
+			<CellBoundaryAdhesionEnergyParameter>0.7</CellBoundaryAdhesionEnergyParameter>
+		</DifferentialAdhesionPottsUpdateRule-2>

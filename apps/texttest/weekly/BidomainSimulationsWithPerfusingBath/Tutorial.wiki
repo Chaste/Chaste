@@ -1,0 +1,36 @@
+= Running a bidomain simulation of cardiac tissue contained in a perfusing bath =
+
+''This tutorial is based on a nightly acceptance test apps/texttest/chaste/bidomain_with_bath''
+
+
+To run a bidomain simulation of cardiac tissue contained in a perfusing bath, we need to make three additions.
+
+Firstly, we have to define the `domain` field to be `BiWithBath`, rather than `Mono` or `Bi`.
+{{{
+#!xml
+<Domain>BiWithBath</Domain>
+}}}
+
+Second, our mesh elements file has to label each element as either being tissue or bath. The mesh definition in the parameters file defines the following mesh
+{{{
+#!xml
+<Mesh unit="cm">
+<LoadMesh name="2D_0_to_1mm_400_elements_with_bath" conductivity_media="NoFibreOrientation"/>
+</Mesh>
+}}}
+for which the .ele file now has an extra column, which takes the value 0 for tissue and 1 for bath (see attached, and file formats documentation). Currently, the full overall mesh ought to be cuboid-shaped (see below).
+
+Finally, the XML file can define electrodes, which are used to apply an extracellular (surface) stimulus, ie shocks
+{{{
+#!xml
+<Electrodes>
+    <GroundSecondElectrode>yes</GroundSecondElectrode>
+    <PerpendicularToAxis>x</PerpendicularToAxis>
+    <Strength unit="uA/cm^2">-11000</Strength>
+    <StartTime unit="ms">0.0</StartTime>
+    <Duration unit="ms">2.0</Duration>
+</Electrodes>
+}}}
+This says that the shocks are applied to the surfaces x=xmin and x=xmax (xmin and xmax will be computed), hence the reason for the mesh needing to be a cuboid shape, so that the points satisfying x=xmin belong to a surface. The strength refers to the strength of the first electrode (the one on x=xmin). The second electrode (x=xmax) can be either be grounded or not, if not the strength is chosen so that input-stimulus is precisely equal to output-stimulus.
+
+To visualise, load the results in meshalyzer. Note that phi_e is defined throughout the domain (tissue and bath). The voltage is technically only defined in the tissue. However for computational reasons and to simplify visualisation, a 'dummy' voltage with a value of 0 is given for each bath node. This should be clear when visualising the voltage.

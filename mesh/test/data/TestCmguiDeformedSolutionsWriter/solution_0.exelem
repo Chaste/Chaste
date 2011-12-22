@@ -1,0 +1,36 @@
+Group name: solution
+Shape.  Dimension=2, simplex(2)*simplex
+ #Scale factor sets= 0
+ #Nodes= 3
+ #Fields=1
+ 1) coordinates, coordinate, rectangular cartesian, #Components=2
+   x.  l.simplex(2)*l.simplex, no modify, standard node based.
+     #Nodes= 3
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+   y.  l.simplex(2)*l.simplex, no modify, standard node based.
+     #Nodes= 3
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+Element:	1 0 0 Nodes:	1	2	4	
+Element:	2 0 0 Nodes:	5	7	4	
+Element:	3 0 0 Nodes:	4	2	5	
+Element:	4 0 0 Nodes:	5	3	6	
+Element:	5 0 0 Nodes:	3	5	2	
+Element:	6 0 0 Nodes:	8	6	9	
+Element:	7 0 0 Nodes:	6	8	5	
+Element:	8 0 0 Nodes:	5	8	7	

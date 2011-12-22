@@ -1,0 +1,6 @@
+		<CellBasedPdeHandler-2>
+		<WriteAverageRadialPdeSolution>0</WriteAverageRadialPdeSolution>
+		<WriteDailyAverageRadialPdeSolution>0</WriteDailyAverageRadialPdeSolution>
+		<SetBcsOnCoarseBoundary>1</SetBcsOnCoarseBoundary>
+		<NumRadialIntervals>4294967295</NumRadialIntervals>
+		</CellBasedPdeHandler-2>

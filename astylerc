@@ -1,0 +1,16 @@
+# Chaste configuration file for Artistic Style (http://astyle.sourceforge.net/)
+#
+# We use 4 spaces to indent
+indent=spaces=4
+# Braces should go on their own lines
+brackets=break
+# Continuation lines can be indented up to 60 spaces
+max-instatement-indent=60
+# Don't add any extra indent to multi-line conditionals
+min-conditional-indent=0
+# Indent switch blocks (so case statements are indented)
+indent-switches
+# Pad empty lines with the current indent level of whitespace
+fill-empty-lines
+# Suffix of original files should end with ~ so svn ignores them
+suffix=.pre~

@@ -1,0 +1,20 @@
+! Ignored line in test comparison 
+! They will contain provenance data
+Group name: cube_2mm_12_elements
+ #Fields=1
+ 1) coordinates, coordinate, rectangular cartesian, #Components=3
+   x.  Value index= 1, #Derivatives= 0
+   y.  Value index= 2, #Derivatives= 0
+   z.  Value index= 3, #Derivatives= 0
+Node:	1	0	0	0	
+Node:	2	0.2	0	0	
+Node:	3	0.2	0.2	0	
+Node:	4	0	0.2	0	
+Node:	5	0	0	0.2	
+Node:	6	0.2	0	0.2	
+Node:	7	0.2	0.2	0.2	
+Node:	8	0	0.2	0.2	
+Node:	9	0.0999125	0	0	
+Node:	10	0.2	0.099907	0	
+Node:	11	0.0999285	0.2	0.2	
+Node:	12	0	0.0999914	0.2	

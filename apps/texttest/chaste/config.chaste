@@ -1,0 +1,165 @@
+binary:$TEXTTEST_CHECKOUT/apps/texttest/chaste/wrapper
+default_checkout:Chaste
+create_catalogues:true
+
+# Files needed by running tests
+link_test_path:ChasteParameters.xml
+link_test_path:ChasteParameters_2_0.xsd
+link_test_path:ChasteParameters_2_1.xsd
+link_test_path:ChasteParameters_2_2.xsd
+link_test_path:ChasteParameters_2_3.xsd
+link_test_path:cube_1626_elements.ele
+link_test_path:cube_1626_elements.face
+link_test_path:cube_1626_elements.node
+link_test_path:Memfem_slab.pts
+link_test_path:Memfem_slab.tetras
+link_test_path:Memfem_slab.tri
+link_test_path:2D_0_to_1mm_400_elements_with_bath.node
+link_test_path:2D_0_to_1mm_400_elements_with_bath.ele
+link_test_path:2D_0_to_1mm_400_elements_with_bath.edge
+link_test_path:luo_rudy_1991.cellml
+# Directories containing an archived simulation
+link_test_path:save_bidomain
+link_test_path:save_monodomain
+# Directories with the results file to extend (copy over since h5 file will be extended)
+copy_test_path:SaveBidomain
+copy_test_path:SaveMonodomain
+
+# Files needed by tutorials
+link_test_path:FibreSimulation.xml
+link_test_path:sheet_800_elements.edge
+link_test_path:sheet_800_elements.ele
+link_test_path:sheet_800_elements.node
+link_test_path:sheet_800_elements.ortho
+#Note that 2D_0_to_1mm_400_elements_with_bath mesh for BidomainSimulationsWithPerfusingBath is an input for a regular acceptance test above
+link_test_path:BidomWithBathParameters.xml
+link_test_path:CheckpointExample.xml
+link_test_path:UsingCellmlFiles.xml
+link_test_path:LuoRudy1991.cellml
+link_test_path:Heterogeneous.xml
+link_test_path:heart_chaste2_renum_i_triangles.node
+link_test_path:heart_chaste2_renum_i_triangles.face
+link_test_path:heart_chaste2_renum_i_triangles.ele
+link_test_path:heart_chaste2_renum_i_triangles.axi
+#Mesh files to be converted
+link_test_path:simple_cube.node
+link_test_path:simple_cube.face
+link_test_path:simple_cube.ele
+
+
+
+
+[collate_file]
+#[collate_file] Simulation results files
+results_h5:ChasteResults/SimulationResults.h5
+results_v_dat:ChasteResults/output/SimulationResults_V.dat
+results_v_dat:ChasteResults/output/1dResults_V.dat
+results_v_dat:ChasteResults/output/DrugActionResults_V.dat
+results_v_dat:ChasteResults/output/3dResults_V.dat
+results_v_dat:ChasteResults/output/BathResults_V.dat
+results_v_dat:ChasteResults/output/CheckpointingResults_V.dat
+results_phi_e_dat:ChasteResults/output/SimulationResults_Phi_e.dat
+results_phi_e_dat:ChasteResults/output/BathResults_Phi_e.dat
+results_phi_e_dat:ChasteResults/output/3dResults_Phi_e.dat
+size_of_h5:ChasteResults/S1S2Results.h5
+
+#[collate_file] Mesh files
+mesh_pts:ChasteResults/output/SimulationResults_mesh.pts
+mesh_tri:ChasteResults/output/SimulationResults_mesh.tri
+mesh_tetras:ChasteResults/output/SimulationResults_mesh.tetras
+mesh_pts:ChasteResults/output/S1S2Results_mesh.pts
+mesh_tri:ChasteResults/output/S1S2Results_mesh.tri
+mesh_pts:ChasteResults/output/1dResults_mesh.pts
+mesh_pts:ChasteResults/output/DrugActionResults_mesh.pts
+mesh_pts:ChasteResults/output/3dResults_mesh.pts
+mesh_tri:ChasteResults/output/3dResults_mesh.tri
+mesh_tetras:ChasteResults/output/3dResults_mesh.tetras
+mesh_pts:ChasteResults/output/BathResults_mesh.pts
+mesh_tri:ChasteResults/output/BathResults_mesh.tri
+
+#[collate_file] Extra files to test against in postprocess_monodomain
+Apd_90_minus_30_Map_dat:ChasteResults/output/Apd_90_-30_Map.dat
+ConductionVelocityFromNode10_dat:ChasteResults/output/ConductionVelocityFromNode10.dat
+ConductionVelocityFromNode20_dat:ChasteResults/output/ConductionVelocityFromNode20.dat
+MaxUpstrokeVelocityMap_minus_30_dat:ChasteResults/output/MaxUpstrokeVelocityMap_-30.dat
+UpstrokeTimeMap_minus_30_dat:ChasteResults/output/UpstrokeTimeMap_-30.dat
+NodalTraces_V_dat:ChasteResults/output/NodalTraces_V.dat
+
+#[collate_file] Extra file to test against in save_monodomain and save_bidomain
+AbstractCardiacProblem_mSolution_h5:ChasteResults_checkpoints/10ms/ChasteResults_10ms/AbstractCardiacProblem_mSolution.h5
+
+#[collate_file] Extra files to test against in resume_monodomain & resume_bidomain
+results_h5:SaveMonodomain/Monodomain_2d.h5
+results_h5:SaveBidomain/Bidomain_3d.h5
+
+[collate_script]
+#Some HDF5 files (S1S2) we only check for size - as number of blocks
+size_of_h5:stat -c %b
+# We need to translate hdf5 files into text in order to compare them with diff
+results_h5:h5dump
+results_bi_h5:h5dump
+# (After h5dump) some HDF5 file results are piped through a filter to round to a certain number of decimal places
+results_h5:$TEXTTEST_CHECKOUT/python/RoundResultsFiles.py 8
+# Some external voltage results are filtered to round to a certain number of decimal places
+results_phi_e_dat:cat
+results_phi_e_dat:$TEXTTEST_CHECKOUT/python/RoundResultsFiles.py 8
+AbstractCardiacProblem_mSolution_h5:h5dump
+
+[checkout_location]
+Chaste:$HOME/eclipse/workspace/Chaste
+
+[batch_use_collection]
+default:true
+
+[batch_result_repository]
+default:$CHASTE_TEST_OUTPUT/texttest_output
+
+[historical_report_location]
+default:$CHASTE_TEST_OUTPUT/texttest_reports
+
+[run_dependent_text]
+# Filter out lines with timing information
+output:(seconds)
+# Filter out uname
+output:(uname)
+# Filter out revision and build details
+output:from revision number
+# Handle absolute paths in error messages
+errors:{INTERNAL writedir}{REPLACE <texttest_dir>}
+# Handle source code line numbers
+errors:Chaste error: ([a-zA-Z./]+):([0-9]+):{REPLACE Chaste error: \1:line:}
+
+# Ignore warnings about rounded results
+results_phi_e_dat:Warning: These have been
+results_h5:Warning: These have been
+# Ignore path to original HDF5 file in h5dump files
+results_h5:HDF5
+AbstractCardiacProblem_mSolution_h5:HDF5
+
+#[run_dependent_text] Ignore provenance
+# ... in Meshalyzer mesh output
+mesh_tri:Created by Chaste
+mesh_pts:Created by Chaste
+mesh_tetras:Created by Chaste
+# ... in Meshalyzer data output
+results_v_dat: Created by Chaste
+results_phi_e_dat: Created by Chaste
+# ... in HDF5 h5dump files
+results_h5:Created by Chaste
+AbstractCardiacProblem_mSolution_h5:Created by Chaste
+# ... in postprocessing output
+Apd_90_minus_30_Map_dat: Created by Chaste
+ConductionVelocityFromNode10_dat: Created by Chaste
+ConductionVelocityFromNode20_dat: Created by Chaste
+MaxUpstrokeVelocityMap_minus_30_dat: Created by Chaste
+UpstrokeTimeMap_minus_30_dat: Created by Chaste
+NodalTraces_V_dat: Created by Chaste
+
+#[run_dependent_text] Dynamically generated models generate variable output
+output:{INTERNAL writedir}{REPLACE <texttest_dir>}
+output:/[^ ]+/(Chaste|[_a-zA-Z0-9]+-[-_0-9]+){REPLACE <chaste_dir>}
+output:(/[^ ]*/)?heart/[^ ]*dynamic/tmp_[0-9]+_[0-9]+{REPLACE <build_path>}
+output:RunXsd\(\[.*\], \[(.*)\]\){REPLACE Run Xsd on \1}
+output:mpicxx .*(/[^/]+\.[a-zA-Z]+){REPLACE mpicxx <args> <path>\1}
+output:Running \['.*/python/ConvertCellModel.py', '-A', '-p', '--output-dir', '<chaste_dir>/<build_path>', '-y', '<build_path>/(.*).cellml'\]{REPLACE Running PyCml on \1}
+output:scons: building associated

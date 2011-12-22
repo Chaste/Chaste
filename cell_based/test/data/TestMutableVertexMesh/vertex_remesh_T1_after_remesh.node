@@ -1,0 +1,25 @@
+22	2	0	1
+0	0	0	0
+1	1	0	0
+2	1	1	0
+3	0	1	0
+4	0	-1	1
+5	1	-1	1
+6	2	0	1
+7	2	1	1
+8	1	2	1
+9	0	2	1
+10	-1	1	1
+11	-1	0	1
+12	0.5	-0.575	1
+13	0.5	-0.425	0
+14	1.5	0.425	1
+15	1.5	0.575	1
+16	0.5	1.425	0
+17	0.5	1.575	1
+18	-0.5	0.425	1
+19	-0.5	0.575	1
+20	0.5	0.425	0
+21	0.5	0.575	0
+# Created by Chaste version 2.0.9192 on Thu, 10 Jun 2010 13:29:10 +0000.  Chaste was built on Thu, 10 Jun 2010 13:28:54 +0000 by machine (uname) 'Linux clfh6829 2.6.32-22-generic #36-Ubuntu SMP Thu Jun 3 19:31:57 UTC 2010 x86_64' using settings: default, no Chaste libraries.
+

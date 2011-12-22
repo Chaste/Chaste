@@ -1,0 +1,3 @@
+Time(msecs) I_Na(milliamperes) I_K(milliamperes) I_Ca(milliamperes)
+ -2.00000000e-01   1.20000000e+01  -1.10000000e-123 -3.31240000e-123
+  2.00000000e-01  -1.20000000e+01  7.12412356e+102  3.12400000e+123 

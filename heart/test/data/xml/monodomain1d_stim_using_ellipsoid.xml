@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ChasteParameters xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/2_2">
+
+	<Simulation>       
+		<!-- 
+			Problem definition 
+		-->    
+	    <SimulationDuration unit="ms">2</SimulationDuration>
+	    <Domain>Mono</Domain>
+	    <SpaceDimension>1</SpaceDimension>
+	    <IonicModels>
+	    	<Default><Hardcoded>Fox2002BackwardEuler</Hardcoded></Default>
+    	</IonicModels>
+	    
+		<!-- 
+			Mesh definition 
+		-->    
+		<Mesh unit="cm">
+			<Fibre x="0.1" inter_node_space="0.05"/>
+	  	</Mesh>
+		    
+	    <!-- 
+	    	Stimuli (as many <Stimulus> definitions as needed) 
+	   	-->
+   		<Stimuli>
+			<Stimulus> <!-- #1  Note all nodes stimulated using ellipsoid -->
+				<Strength unit="uA/cm^3">-80000.0</Strength>
+				<Duration unit="ms">1.0</Duration>
+				<Delay unit="ms">2.0</Delay>
+				<Location unit="cm">
+				    <Ellipsoid>
+						<Centre x="0" y="0.0" z="0.0"/>
+						<Radii  x="1" y="0.1" z="0.1"/>
+					</Ellipsoid>
+				</Location>
+			</Stimulus>	
+		</Stimuli>
+		
+		<OutputDirectory>Mono1DStimUsingEllipsoid</OutputDirectory>
+		<CheckpointSimulation timestep="0.1" unit="ms" max_checkpoints_on_disk="3"/>
+	</Simulation>
+	
+
+    <Physiological>
+    </Physiological>
+	<Numerical>
+		<TimeSteps ode="0.1" pde="0.1" printing="0.1" unit="ms"/>
+	</Numerical>		
+		    
+</ChasteParameters>

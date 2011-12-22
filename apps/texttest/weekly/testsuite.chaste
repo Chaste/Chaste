@@ -1,0 +1,17 @@
+#Note - if any names match names in the regular acceptance tests, then there's a possibility
+#that catalogues may get confused.
+
+# No parameters file specified
+no_parameters
+
+# Executable tutorials
+UsingFibreDefinitions
+BidomainSimulationsWithPerfusingBath
+CheckpointingAndRestarting
+UsingCellmlFiles
+HeterogeneousExample
+Propagation1d
+DrugAction
+S1S2Protocol
+Propagation3d
+MeshConvert

@@ -1,0 +1,84 @@
+= Simulations with heterogeneities =
+
+The two main features of the executable demonstrated in this example are:
+ * Ability to place different cell models in different locations of the mesh.
+ * Ability to 'isolate' a fiber within a 3D geometry by setting heterogeneous orthotropic conductivities.
+
+== Background ==
+
+Purkinje fibres are part of the conduction system in the heart and responsible for delivering electrical stimuli to the myocardium. Recently, several investigators focused their attention on the study of the Purkinje-myocardial interface (e.g., Huelsing ''et al'', Am J Phys, 2000). Here, we will simulate a Purkinje fiber (Noble-Difrancesco model) exciting a 3D slab of rabbit myocardial cells (Mahajan Shiferaw model). We stimulate the Purkinje cell and they will excite the myocardial tissue. This type of simulation is the first step towards an anatomically-based study of the Purkinje-myocardial electrotonic interface, where the attention will be placed on the conditions under which abnormal electrical phenomena in Purkinje cells (e.g., EAD) can propagate into the myocardium and trigger arrhythmic events.  
+
+== Procedure ==
+
+Study the XML parameters definition given below. The defines a 3 mm by 3 mm by 0.75 mm slab, with Purkinje cells are placed along a fiber running halfway through the slab in the y direction. A default cell model (!MahajanShiferaw) is set up, but a different cell model (!DifrancescoNoble) is used in a separate cuboid region. Similarly, default conductivities are set up, but different conductivities are specified in another cuboid region.
+
+Run using the full xml file from the attachment, although first simulate for only 1 ms of activity (instead of the 150ms defined below) and have a quick look at different cells in different locations. This is possible because the two cell models have slightly different initial resting potential and at t=0 it is therefore possible to visually distinguish the two cell types in meshalyzer. Then we will run a longer simulation (150 ms) and observe the activation pattern along the fiber and into the myocardium. Simulating 240 ms (an entire AP) of activity took 722 seconds on a standard recent desktop. 
+
+Further experiments can be run with different conductivities in the myocardial tissue (higher conductivities likely to uncouple the tissue and prevent propagation) and/or different Purkinje geometries of cell models.
+
+
+{{{
+#!xml
+
+    <Simulation>
+        <!-- Problem definition -->
+        <SpaceDimension>3</SpaceDimension>
+        <SimulationDuration unit="ms">150.0</SimulationDuration>
+        <Domain>Mono</Domain>
+        <!-- Mesh definition -->
+        <Mesh unit="cm">
+            <Slab x="0.3" y="0.3" z="0.075" inter_node_space="0.015"/>    
+        </Mesh>
+
+        <IonicModels>
+            <Default>
+                <Hardcoded>MahajanShiferaw</Hardcoded>
+            </Default>
+            <!-- Cell model heterogeneity -->
+              <Region>
+                <IonicModel>
+                   <Hardcoded>DifrancescoNoble</Hardcoded>
+                </IonicModel>
+                <Location unit="cm">
+                    <Cuboid>
+                        <LowerCoordinates x="0.13" y="0.0" z="0.03"/>
+                        <UpperCoordinates x="0.17" y="0.15" z="0.05"/>
+                    </Cuboid>
+                </Location>
+            </Region>
+        </IonicModels>
+        
+        <!-- Stimuli (as many <Stimulus> definitions as needed) -->
+        <Stimuli>
+          <Stimulus> <!-- #1 -->
+            <Strength unit="uA/cm^3">-355000.0</Strength>
+            <Duration unit="ms">2.0</Duration>
+            <Delay unit="ms">0</Delay>
+            <Location unit="cm">
+                <Cuboid>
+                    <LowerCoordinates x="0.13" y="0.0" z="0.03"/>
+                    <UpperCoordinates x="0.17" y="0.02" z="0.05"/>
+                </Cuboid>
+            </Location>
+          </Stimulus>    
+        </Stimuli>    
+        <!-- 
+             Conductivity heterogeneities 
+         -->
+        <ConductivityHeterogeneities>
+          <ConductivityHeterogeneity> <!-- #1 -->
+            <IntracellularConductivities longi="0.0" trans="2.75" normal="0.0" unit="mS/cm"/>
+            <ExtracellularConductivities longi="0.0"  trans="2.75"  normal="0.0" unit="mS/cm"/>
+            <Location unit="cm">
+                <Cuboid>
+                    <LowerCoordinates x="0.12" y="0.0" z="0.015"/>
+                    <UpperCoordinates x="0.18" y="0.14" z="0.065"/>
+                </Cuboid>
+            </Location>                
+          </ConductivityHeterogeneity>                
+          <!-- etc ... -->
+        </ConductivityHeterogeneities>    
+    </Simulation>
+
+}}}
+

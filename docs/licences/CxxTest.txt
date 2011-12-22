@@ -1,0 +1,5 @@
+CxxTest included with Chaste is based on CxxTest version 3.10.1.  It is 
+licenced under LGPL v2.1.
+
+The Chaste team has made certain modifications to this Open Source code
+which affect its output and resolve some compiler warning issues.

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<cp:ChasteParameters xmlns:cp="https://chaste.comlab.ox.ac.uk/nss/parameters/3_0" xmlns:cp20="https://chaste.comlab.ox.ac.uk/nss/parameters/2_0" xmlns:cp21="https://chaste.comlab.ox.ac.uk/nss/parameters/2_1" xmlns:cp22="https://chaste.comlab.ox.ac.uk/nss/parameters/2_2" xmlns:cp23="https://chaste.comlab.ox.ac.uk/nss/parameters/2_3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ChasteParameters_1_1.xsd" xsi:schemaLocation="https://chaste.comlab.ox.ac.uk/nss/parameters/3_0 ChasteParameters_3_0.xsd https://chaste.comlab.ox.ac.uk/nss/parameters/2_0 ChasteParameters_2_0.xsd https://chaste.comlab.ox.ac.uk/nss/parameters/2_1 ChasteParameters_2_1.xsd https://chaste.comlab.ox.ac.uk/nss/parameters/2_2 ChasteParameters_2_2.xsd https://chaste.comlab.ox.ac.uk/nss/parameters/2_3 ChasteParameters_2_3.xsd">
+
+  <cp:Simulation>
+    <cp:SpaceDimension>3</cp:SpaceDimension>
+    <cp:Domain>Mono</cp:Domain>
+    <cp:IonicModels>
+      <cp:Default>
+        <cp:Hardcoded>LuoRudyI</cp:Hardcoded>
+      </cp:Default>
+    </cp:IonicModels>
+    <cp:OutputDirectory>ChasteResults</cp:OutputDirectory>
+    <cp:OutputFilenamePrefix>SimulationResults</cp:OutputFilenamePrefix>
+  </cp:Simulation>
+
+  <cp:Physiological>
+    <cp:IntracellularConductivities longi="1.75" normal="1.75" trans="1.75" unit="mS/cm"/>
+    <cp:ExtracellularConductivities longi="7" normal="7" trans="7" unit="mS/cm"/>
+    <cp:BathConductivity unit="mS/cm">7</cp:BathConductivity>
+    <cp:SurfaceAreaToVolumeRatio unit="1/cm">1400</cp:SurfaceAreaToVolumeRatio>
+    <cp:Capacitance unit="uF/cm^2">1</cp:Capacitance>
+  </cp:Physiological>
+
+  <cp:Numerical>
+    <cp:TimeSteps ode="0.01" pde="0.01" printing="0.01" unit="ms"/>
+    <cp:KSPTolerances>
+      <cp:KSPAbsolute>0.0002</cp:KSPAbsolute>
+    </cp:KSPTolerances>
+    <cp:KSPSolver>cg</cp:KSPSolver>
+    <cp:KSPPreconditioner>bjacobi</cp:KSPPreconditioner>
+    <cp:MeshPartitioning>metis</cp:MeshPartitioning>
+    <cp:UseStateVariableInterpolation>no</cp:UseStateVariableInterpolation>
+  </cp:Numerical>
+
+  <cp:PostProcessing/>
+
+</cp:ChasteParameters>

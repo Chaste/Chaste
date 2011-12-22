@@ -1,0 +1,42 @@
+Source: chaste-source
+Section: science
+Priority: extra
+Maintainer: Chaste Team <chaste-admin@maillist.ox.ac.uk>
+Build-Depends: debhelper (>= 5)
+Standards-Version: 3.7.2
+
+Package: chaste-source
+Architecture: all
+Depends: scons, g++, libopenmpi-dev, petsc-dev (>= 2.3.3-14), libhdf5-openmpi-dev, xsdcxx, libboost-serialization-dev, libparmetis-dev, libxerces-c2-dev, rnv (= 1.7.10-2chaste1) | rnv (= 1.7.10-1chaste1), python-amara, python-rdflib | python-librdf
+Recommends: valgrind, libsundials-serial-dev, libvtk5-dev, libfltk1.1
+Suggests: libgoogle-perftools-dev, doxygen, graphviz, eclipse-cdt, sun-java6-jre
+Description: general purpose computational biology simulation package
+ Chaste (Cancer, Heart and Soft Tissue Environment) is a general purpose
+ simulation package aimed at multi-scale, computationally demanding problems
+ arising in biology and physiology. Current functionality includes tissue and
+ cell level electrophysiology, discrete tissue modelling, and soft tissue
+ modelling. The package is being developed by a team mainly based in the
+ Computational Biology Group at Oxford University Computing Laboratory, and
+ development draws on expertise from software engineering, high performance
+ computing, mathematical modelling and scientific computing.
+ .
+ The main website for Chaste can be found at
+ http://www.cs.ox.ac.uk/chaste
+
+Package: chaste-dependencies
+Architecture: all
+Depends: scons, g++, libopenmpi-dev, petsc-dev (>= 2.3.3-14), libhdf5-openmpi-dev, xsdcxx, libboost-serialization-dev, libparmetis-dev, libxerces-c2-dev, rnv (= 1.7.10-2chaste1) | rnv (= 1.7.10-1chaste1), python-amara, python-rdflib | python-librdf
+Recommends: valgrind, libsundials-serial-dev, libpetsc2.3.3-dbg|libpetsc3.0.0-dbg|libpetsc3.1-dbg, libvtk5-dev, libfltk1.1
+Suggests: libgoogle-perftools-dev, doxygen, graphviz, eclipse-cdt, sun-java6-jre, subversion
+Conflicts: libatlas-base-dev (>= 3.8.3), libatlas3gf-base (>= 3.8.3)
+Description: metapackage for installing the dependencies of Chaste
+ Chaste (Cancer, Heart and Soft Tissue Environment) is a general purpose
+ simulation package aimed at multi-scale, computationally demanding problems
+ arising in biology and physiology.
+ .
+ The main package for Chaste is chaste-source.  This metapackage installs
+ its dependencies, and is provided for the benefit of Chaste developers who
+ obtain the source code from the Chaste repository.
+ .
+ The main website for Chaste can be found at
+ http://www.cs.ox.ac.uk/chaste

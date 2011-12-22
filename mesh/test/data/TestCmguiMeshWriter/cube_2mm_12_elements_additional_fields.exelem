@@ -1,0 +1,90 @@
+Group name: cube_2mm_12_elements
+Shape.  Dimension=3, simplex(2;3)*simplex*simplex
+ #Scale factor sets= 0
+ #Nodes= 4
+ #Fields=3
+ 1) coordinates, coordinate, rectangular cartesian, #Components=3
+   x.  l.simplex(2;3)*l.simplex*l.simplex, no modify, standard node based.
+     #Nodes= 4
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+      4.  #Values=1
+       Value indices:     1
+       Scale factor indices:   4
+   y.  l.simplex(2;3)*l.simplex*l.simplex, no modify, standard node based.
+     #Nodes= 4
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+      4.  #Values=1
+       Value indices:     1
+       Scale factor indices:   4
+   z.  l.simplex(2;3)*l.simplex*l.simplex, no modify, standard node based.
+     #Nodes= 4
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+      4.  #Values=1
+       Value indices:     1
+       Scale factor indices:   4
+2)  V , field, rectangular cartesian, #Components=1
+   x.  l.simplex(2;3)*l.simplex*l.simplex, no modify, standard node based.
+     #Nodes= 4
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+      4.  #Values=1
+       Value indices:     1
+       Scale factor indices:   4
+3)  Phi_e , field, rectangular cartesian, #Components=1
+   x.  l.simplex(2;3)*l.simplex*l.simplex, no modify, standard node based.
+     #Nodes= 4
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+      4.  #Values=1
+       Value indices:     1
+       Scale factor indices:   4
+Element:	1 0 0 Nodes:	12	4	9	1	
+Element:	2 0 0 Nodes:	11	9	6	12	
+Element:	3 0 0 Nodes:	11	6	10	7	
+Element:	4 0 0 Nodes:	12	4	11	9	
+Element:	5 0 0 Nodes:	2	9	6	10	
+Element:	6 0 0 Nodes:	4	12	11	8	
+Element:	7 0 0 Nodes:	5	9	12	6	
+Element:	8 0 0 Nodes:	12	9	5	1	
+Element:	9 0 0 Nodes:	11	10	3	7	
+Element:	10 0 0 Nodes:	4	11	10	3	
+Element:	11 0 0 Nodes:	11	9	4	10	
+Element:	12 0 0 Nodes:	9	11	6	10	

@@ -1,0 +1,4 @@
+		<OutputCellVelocities>0</OutputCellVelocities>
+		<Dt>0.1</Dt>
+		<EndTime>5</EndTime>
+		<SamplingTimestepMultiple>1</SamplingTimestepMultiple>

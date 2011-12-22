@@ -1,0 +1,8 @@
+22 serialization::archive 3 0 1 0
+0 0 0 0  2 52 pack<void (DistributedTetrahedralMesh< 1,1 >)>::type 1 0
+1 2 0 0 0 0 0 0 1 1 0 1 0 6 42 pack<void (MonodomainTissue< 1,1 >)>::type 1 0
+2 2
+1 1 0
+3 7
+3 0 0 0 0 1 0.10000000000000001 6
+2

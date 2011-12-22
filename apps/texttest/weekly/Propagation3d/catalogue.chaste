@@ -1,0 +1,31 @@
+The following new files/directories were created:
+<Test Directory>
+----ChasteResults
+--------.chaste_deletable_folder
+--------3dResults.h5
+--------machine_info_0.txt
+--------progress_status.txt
+--------provenance_info_0.txt
+--------cmgui_output
+------------.chaste_deletable_folder
+------------3dResults.exelem
+------------3dResults.exnode
+------------3dResults_0.exnode
+------------3dResults_1.exnode
+------------3dResults_2.exnode
+------------3dResults_3.exnode
+------------3dResults_4.exnode
+------------3dResults_5.exnode
+------------3dResults_times.info
+------------ChasteDefaults.xml
+------------ChasteParameters.xml
+------------script.com
+--------output
+------------.chaste_deletable_folder
+------------3dResults_V.dat
+------------3dResults_mesh.pts
+------------3dResults_mesh.tetras
+------------3dResults_mesh.tri
+------------3dResults_times.info
+------------ChasteDefaults.xml
+------------ChasteParameters.xml

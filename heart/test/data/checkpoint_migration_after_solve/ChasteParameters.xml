@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<cp20:ChasteParameters xmlns:cp20="https://chaste.comlab.ox.ac.uk/nss/parameters/2_0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="/home/chaste/eclipse/workspace/Chaste/heart/src/io/ChasteParameters_1_1.xsd" xsi:schemaLocation="https://chaste.comlab.ox.ac.uk/nss/parameters/2_0 /home/chaste/eclipse/workspace/Chaste/heart/src/io/ChasteParameters_2_0.xsd">
+
+  <cp20:Simulation>
+    <cp20:SpaceDimension>3</cp20:SpaceDimension>
+    <cp20:SimulationDuration unit="ms">0.1</cp20:SimulationDuration>
+    <cp20:Domain>Mono</cp20:Domain>
+    <cp20:IonicModels>
+      <cp20:Default>
+        <cp20:Hardcoded>LuoRudyI</cp20:Hardcoded>
+      </cp20:Default>
+    </cp20:IonicModels>
+    <cp20:OutputDirectory>TestCreateArchiveForMigrateAfterSolve</cp20:OutputDirectory>
+    <cp20:OutputFilenamePrefix>simulation</cp20:OutputFilenamePrefix>
+  </cp20:Simulation>
+
+  <cp20:Physiological>
+    <cp20:IntracellularConductivities longi="1.75" normal="1.75" trans="1.75" unit="mS/cm"/>
+    <cp20:ExtracellularConductivities longi="7" normal="7" trans="7" unit="mS/cm"/>
+    <cp20:BathConductivity unit="mS/cm">7</cp20:BathConductivity>
+    <cp20:SurfaceAreaToVolumeRatio unit="1/cm">1400</cp20:SurfaceAreaToVolumeRatio>
+    <cp20:Capacitance unit="uF/cm^2">1</cp20:Capacitance>
+  </cp20:Physiological>
+
+  <cp20:Numerical>
+    <cp20:TimeSteps ode="0.01" pde="0.01" printing="0.01" unit="ms"/>
+    <cp20:KSPTolerances>
+      <cp20:KSPAbsolute>1e-06</cp20:KSPAbsolute>
+    </cp20:KSPTolerances>
+    <cp20:KSPSolver>cg</cp20:KSPSolver>
+    <cp20:KSPPreconditioner>bjacobi</cp20:KSPPreconditioner>
+  </cp20:Numerical>
+
+  <cp20:PostProcessing/>
+
+</cp20:ChasteParameters>

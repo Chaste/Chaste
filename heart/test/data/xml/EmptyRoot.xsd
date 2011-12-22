@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="https://chaste.comlab.ox.ac.uk/nss/parameters/2_0"
+           xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/2_0"
+           elementFormDefault="qualified">
+
+  <!-- Type with no content or attributes -->    
+  <xs:complexType name="empty_type">
+  </xs:complexType>
+  
+  <!-- The single root element.  All parameters files must start with this. -->
+  <xs:element name="ChasteParameters" type="empty_type"/>
+
+</xs:schema>

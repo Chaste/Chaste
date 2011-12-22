@@ -1,0 +1,15 @@
+71.1123
+23.6466
+-49.3841
+-78.9707
+-83.6828
+-83.8934
+-83.8612
+-83.8538
+-83.8543
+-83.8546
+-83.8545
+# Created by Chaste version 0.0.100 on Mon, 09 May 1492 15:54:12 +0000.  Chaste was built on Wed, 05 May 2010 10:10:05 +0000 by machine (uname) 'Linux chaste-bob 2.6.24-27-server #1 SMP Fri Mar 12 01:23:09 UTC 2010 x86_64' using settings: default, shared libraries.
+0
+1
+2

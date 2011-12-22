@@ -1,0 +1,56 @@
+Group name: axi3d
+ #Fields=1
+ 1) coordinates, coordinate, rectangular cartesian, #Components=3
+   x.  Value index= 1, #Derivatives= 0
+   y.  Value index= 2, #Derivatives= 0
+   z.  Value index= 3, #Derivatives= 0
+Node:	1	0	0	0	
+Node:	2	0	5	0	
+Node:	3	0	5	3	
+Node:	4	0	0	3	
+Node:	5	2	0	0	
+Node:	6	2	5	0	
+Node:	7	2	5	3	
+Node:	8	2	0	3	
+Node:	9	1	1	1	
+Node:	10	1	1	2	
+Node:	11	1	2	1	
+Node:	12	1	2	2	
+Node:	13	1	3	1	
+Node:	14	1	3	2	
+Node:	15	1	4	1	
+Node:	16	1	4	2	
+Node:	17	2	1	1	
+Node:	18	2	1	2	
+Node:	19	2	2	1	
+Node:	20	2	2	2	
+Node:	21	2	3	1	
+Node:	22	2	3	2	
+Node:	23	2	4	1	
+Node:	24	2	4	2	
+Node:	25	2	2	0	
+Node:	26	2	2	3	
+Node:	27	2	3	0	
+Node:	28	2	3	3	
+Node:	29	1.5	0.5	1.5	
+Node:	30	1.5	4.5	1.5	
+Node:	31	0	2.49826	3	
+Node:	32	0	2.50214	0	
+Node:	33	2	5	1.50144	
+Node:	34	0	5	1.50055	
+Node:	35	0	0	1.49894	
+Node:	36	2	0	1.49878	
+Node:	37	2	3	1.49906	
+Node:	38	2	2	1.50138	
+Node:	39	1	1.49974	1	
+Node:	40	1	1	1.50014	
+Node:	41	1.5001	2	1	
+Node:	42	1	2	1.49956	
+Node:	43	1.50022	2	2	
+Node:	44	1	1.50001	2	
+Node:	45	1	3.49998	1	
+Node:	46	1	3	1.50041	
+Node:	47	1.50016	4	1	
+Node:	48	1	4	1.4997	
+Node:	49	1.50017	4	2	
+Node:	50	1	3.50008	2	

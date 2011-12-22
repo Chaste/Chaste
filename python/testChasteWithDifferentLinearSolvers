@@ -1,0 +1,34 @@
+#!/bin/sh
+
+#cd /home/chaste/eclipse/workspace/Chaste
+
+##testexe=${1:-coupled/build/optimised/bidomain/Test3dBidomainProblemForEfficiencyRunner}
+##testexe=${1:- heart/build/intel_production/Test3dBidomainProblemForEfficiencyWithFasterOdesRunner}
+
+testexe=${1:- heart/build/optimised/bidomain/TestBidomain3DForNumericsPaperRunner}
+
+##for LinearSolver in richardson chebychev cg cgne gmres tcqmr bcgs bcgsl cgs tfqmr cr lsqr preonly qcg bicg fgmres minres symmlq lgmres
+##for LinearSolver in  preonly bicg fgmres minres symmlq lgmres
+##for LinearSolver in cg gmres bcgs cgs tfqmr cr bicg fgmres minres symmlq lgmres
+
+##  for PreCond in none jacobi sor lu shell bjacobi mg eisenstat ilu icc asm ksp composite redundant spai nn cholesky samg pbjacobi mat hypre fieldsplit tfs ml prometheus galerkin
+##  for PreCond in none jacobi sor bjacobi asm mat fieldsplit
+##  for PreCond in none jacobi sor 
+
+
+for LinearSolver in cg bicg gmres minres symmlq
+#for LinearSolver in symmlq
+do 
+  for PreCond in none bjacobi sor asm
+  #for PreCond in bjacobi
+    do
+	for NbOfProcs in 4
+	do
+		echo "-------------------------------------------------------------------------------"
+		echo "time mpirun -np $NbOfProcs $testexe -ksp_type $LinearSolver -pc_type $PreCond"
+		echo RUN: $LinearSolver $PreCond
+		/usr/bin/time -p mpirun -np $NbOfProcs $testexe -ksp_type $LinearSolver -pc_type $PreCond
+	done
+    done
+done
+

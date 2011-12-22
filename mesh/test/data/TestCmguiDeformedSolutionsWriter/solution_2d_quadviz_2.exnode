@@ -1,0 +1,51 @@
+! Created by Chaste version 2.0.9534 (with uncommitted modifications) on Wed, 14 Jul 2010 18:47:43 +0000.  Chaste was built on Wed, 14 Jul 2010 18:47:34 +0000 by machine (uname) 'Linux userpc60.comlab.ox.ac.uk 2.6.24-28-generic #1 SMP Wed May 26 23:34:09 UTC 2010 x86_64' using settings: default, no Chaste libraries.
+Group name: solution_2d_quadviz
+ #Fields=1
+ 1) coordinates, coordinate, rectangular cartesian, #Components=2
+   x.  Value index= 1, #Derivatives= 0
+   y.  Value index= 2, #Derivatives= 0
+Node:	1	0	0	
+Node:	2	2	0	
+Node:	3	4	0	
+Node:	4	0	3	
+Node:	5	2	3	
+Node:	6	4	3	
+Node:	7	0	6	
+Node:	8	2	6	
+Node:	9	4	6	
+Node:	10	0	9	
+Node:	11	2	9	
+Node:	12	4	9	
+Node:	13	0	12	
+Node:	14	2	12	
+Node:	15	4	12	
+Node:	16	1.08	0.12	
+Node:	17	1.08	1.62	
+Node:	18	0.08	1.62	
+Node:	19	2.08	1.62	
+Node:	20	1.08	3.12	
+Node:	21	1.08	7.62	
+Node:	22	0.08	7.62	
+Node:	23	1.08	6.12	
+Node:	24	2.08	4.62	
+Node:	25	1.08	4.62	
+Node:	26	1.08	9.12	
+Node:	27	1.08	10.62	
+Node:	28	0.08	10.62	
+Node:	29	0.08	4.62	
+Node:	30	3.08	0.12	
+Node:	31	3.08	1.62	
+Node:	32	3.08	3.12	
+Node:	33	3.08	4.62	
+Node:	34	4.08	1.62	
+Node:	35	4.08	4.62	
+Node:	36	3.08	6.12	
+Node:	37	4.08	7.62	
+Node:	38	3.08	7.62	
+Node:	39	2.08	10.62	
+Node:	40	1.08	12.12	
+Node:	41	3.08	9.12	
+Node:	42	3.08	10.62	
+Node:	43	4.08	10.62	
+Node:	44	3.08	12.12	
+Node:	45	2.08	7.62	

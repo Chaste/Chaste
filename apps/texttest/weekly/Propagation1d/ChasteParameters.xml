@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ChasteParameters
+    xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/2_1"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="https://chaste.comlab.ox.ac.uk/nss/parameters/2_1 ChasteParameters_2_1.xsd">
+
+	<Simulation>
+		<!-- 
+			Problem definition 
+		-->
+		<SpaceDimension>1</SpaceDimension>
+	    <SimulationDuration unit="ms">500.0</SimulationDuration>
+	    <Domain>Mono</Domain>
+	    <IonicModels>
+	    	<Default><Hardcoded>LuoRudyI</Hardcoded></Default>
+    	</IonicModels>
+	    
+		<!-- 
+			Mesh definition 
+		-->
+		<Mesh unit="cm">
+			<Fibre x="4.0" inter_node_space="0.01"/>    
+	  	</Mesh>
+	
+	    <!-- 
+	    	Stimuli (as many <Stimulus> definitions as needed) 
+	   	-->
+	   	<Stimuli>
+		  	<Stimulus> <!-- #1 -->
+				<Strength unit="uA/cm^3">-25500.0</Strength>
+				<Duration unit="ms">2.0</Duration>
+				<Delay unit="ms">0</Delay>
+				<Period unit="ms">100</Period>
+				<Location unit="cm">
+					<Cuboid>
+						<LowerCoordinates x="0.0" y="-0.1" z="-1.0"/>
+						<UpperCoordinates x="0.2" y="0.1" z="1.0"/>
+					</Cuboid>
+				</Location>
+			</Stimulus>	
+		</Stimuli>
+		
+		<!-- 
+			Output 
+		-->
+		<OutputDirectory>ChasteResults</OutputDirectory>
+		<OutputFilenamePrefix>1dResults</OutputFilenamePrefix>
+	</Simulation>
+	
+	<Physiological>
+	    <!--
+	        Conductivities
+	    -->
+	    <IntracellularConductivities longi="1.75" trans="1.75" normal="1.75" unit="mS/cm"/>
+	    <ExtracellularConductivities longi="7.0"  trans="7.0"  normal="7.0" unit="mS/cm"/>
+	    <SurfaceAreaToVolumeRatio unit="1/cm"> 1400 </SurfaceAreaToVolumeRatio>
+	    <Capacitance unit="uF/cm^2"> 1.0 </Capacitance>
+	</Physiological>
+
+	<Numerical>
+		<TimeSteps ode="0.005" pde="0.01" printing="1.0" unit="ms"/>
+	</Numerical>
+
+</ChasteParameters>
