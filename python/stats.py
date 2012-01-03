@@ -89,11 +89,11 @@ def print_stats():
 
     print revision,'\t',epoch_weeks,'\t',source_stats[0],'\t',source_stats[1],\
         '\t',test_stats[0],'\t',test_stats[1],'\t',test_stats[2],'\t',test_stats[3],\
-        '\t',source_stats[1]+test_stats[1]
+        '\t',source_stats[1]+test_stats[1],'\t',date_line[3]
 
 def print_header():
     """Print a TSV header line corresponding to the output of print_stats."""
-    print '#rev\ttime (weeks)\tsrc_files\tsrc_loc\ttest_files\ttests_loc\ttest_suites\ttests\ttotal_loc'
+    print '#rev\ttime (weeks)\tsrc_files\tsrc_loc\ttest_files\ttests_loc\ttest_suites\ttests\ttotal_loc\tdate'
 
 def run():
     """Do the processing."""
