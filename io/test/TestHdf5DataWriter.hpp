@@ -996,7 +996,7 @@ public:
 
         TS_ASSERT_THROWS_NOTHING(mpTestWriter = new Hdf5DataWriter(vec_factory, "", "testdefine"));
 
-        int ina_var_id;
+        int ina_var_id = 9999;
         TS_ASSERT_THROWS_NOTHING(mpTestWriter->DefineFixedDimension(5000));
         TS_ASSERT_THROWS_NOTHING(ina_var_id = mpTestWriter->DefineVariable("I_Na", "milliamperes"));
         TS_ASSERT_EQUALS(ina_var_id, 0);
