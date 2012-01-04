@@ -151,8 +151,17 @@ public:
 
     /**
      * Get the leaf name of this file or directory.
+     *
+     * i.e. the individual file or directory name and none of the preceding folders on its path.
      */
     std::string GetLeafName() const;
+
+    /**
+     * Get the leaf name of this file or directory, with any file extension removed.
+     *
+     * i.e. the individual file or directory name and none of the preceding folders on its path.
+     */
+    std::string GetLeafNameNoExtension() const;
 
     /**
      * Get a finder for the folder containing this file or directory.

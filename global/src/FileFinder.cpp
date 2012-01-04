@@ -189,6 +189,13 @@ std::string FileFinder::GetLeafName() const
     return full_name.substr(slash+1);
 }
 
+std::string FileFinder::GetLeafNameNoExtension() const
+{
+    std::string leaf_name = GetLeafName();
+    size_t dot = leaf_name.rfind('.');
+    return leaf_name.substr(0,dot);
+}
+
 FileFinder FileFinder::GetParent() const
 {
     std::string full_name = GetAbsolutePath();

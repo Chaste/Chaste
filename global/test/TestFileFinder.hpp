@@ -73,6 +73,7 @@ public:
 
             // Check we can extract the leaf name
             TS_ASSERT_EQUALS(file_finder.GetLeafName(), "FileFinder.hpp");
+            TS_ASSERT_EQUALS(file_finder.GetLeafNameNoExtension(), "FileFinder");
 
             // And the parent folder name
             FileFinder parent("global/src", RelativeTo::ChasteSourceRoot);
