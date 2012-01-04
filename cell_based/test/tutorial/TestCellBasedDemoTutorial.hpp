@@ -128,7 +128,7 @@ public:
          * Here that is a {{{VertexBasedCellPopulation}}} and the dimension is <2>.*/
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        /* We now create an {{{OffSimulation}}} object and pass in the {{{CellPopulation}}}. We also set some
+        /* We now create an {{{OffLatticeSimulation}}} object and pass in the {{{CellPopulation}}}. We also set some
          * options on the simulation like output directory, output multiple (so we don't visualise every timestep),
          * and end time.
          */
@@ -186,7 +186,7 @@ public:
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);//**Changed**//
         cell_population.SetMechanicsCutOffLength(1.5); //**Changed**//
 
-        /* We create an {{{OffSimulation}}} object as before, all we change is the output directory
+        /* We create an {{{OffLatticeSimulation}}} object as before, all we change is the output directory
          * and output results more often as a larger default timestep is used for these simulations. */
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("CellBasedDemo2"); //**Changed**//
@@ -243,7 +243,7 @@ public:
         /* This time we create a {{{MeshBasedCellPopulation}}} as we are using a {{{MutableMesh}}}.*/
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells); //**Changed**//
 
-        /* We create an {{{OffSimulation}}} object as before, all we change is the output directory.*/
+        /* We create an {{{OffLatticeSimulation}}} object as before, all we change is the output directory.*/
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("CellBasedDemo3"); //**Changed**//
         simulator.SetSamplingTimestepMultiple(12);
@@ -295,7 +295,7 @@ public:
          * We also need to pass the indices of non ghost nodes as an extra argument.*/
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices); //**Changed**//
 
-        /* We create an {{{OffSimulation}}} object as before, all we change is the output directory and the end time.
+        /* We create an {{{OffLatticeSimulation}}} object as before, all we change is the output directory and the end time.
          * The Tyson Novak model is for yeast cells and therefore cells proliferate much more often and so we run the simulation for
          * less time to keep cell numbers relatively small for this demo.
          *
