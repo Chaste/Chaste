@@ -139,10 +139,10 @@ public:
 
         /*
          * Having created a mesh, we now create a {{{std::vector}}} of {{{CellPtr}}}s.
-         * To do this, we the `CryptCellsGenerator` helper class, which is templated over the type
+         * To do this, we use the `CryptCellsGenerator` helper class, which is templated over the type
          * of cell-cycle model required (here {{{FixedDurationGenerationBasedCellCycleModel}}})
          * and the dimension. We create an empty vector of cells and pass this into the
-         * method {{{Generate()}}} along with the mesh. The third argument 'true' indicates that the cells
+         * method {{{Generate()}}} along with the mesh. The fourth argument 'true' indicates that the cells
          * should be assigned random birth times, to avoid synchronous division. The
          * {{{cells}}} vector is populated once the method {{{Generate()}}} is
          * called. Note that we only ever deal with shared pointers to cells, named {{{CellPtr}}}s.

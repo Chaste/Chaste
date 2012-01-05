@@ -118,7 +118,7 @@ public:
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
 
         /* Having created a mesh, we now create a {{{std::vector}}} of {{{CellPtr}}}s.
-         * To do this, we the `CellsGenerator` helper class, which is templated over the type
+         * To do this, we use the `CellsGenerator` helper class, which is templated over the type
          * of cell cycle model required (here {{{StochasticDurationCellCycleModel}}})
          * and the dimension.
          * For a list of possible cell cycle models see subclasses of {{{AbstractCellCycleModel}}}.
@@ -132,7 +132,7 @@ public:
          * the proliferative type of the cell STEM, TRANSIT or DIFFERENTIATED. */
         std::vector<CellPtr> cells;
         CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(),TRANSIT);
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), TRANSIT);
 
         /* Now we have a mesh and a set of cells to go with it, we can create a {{{CellPopulation}}}.
          * In general, this class associates a collection of cells with a mesh.
@@ -224,7 +224,7 @@ public:
         /* Next, we generate a mutable mesh. To create a {{{MutableMesh}}}, we can use
          * the {{{HoneycombMeshGenerator}}} as before. Here the first and second arguments
          * define the size of the mesh - we have chosen a mesh that is 2 nodes (i.e.
-         * cells) wide, and 2 nodes high.The third argument specifies the number of layers
+         * cells) wide, and 2 nodes high.  The third argument specifies the number of layers
          * of ghost nodes to make.
          */
         HoneycombMeshGenerator generator(2, 2, 2);
