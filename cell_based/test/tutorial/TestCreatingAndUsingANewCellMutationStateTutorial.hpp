@@ -193,7 +193,7 @@ public:
 
         /* We can also test that archiving is implemented correctly for our cell
          * mutation state, as follows (further details on how to implement and
-         * test archiving can be found on the BoostSerialization page).  */
+         * test archiving can be found at ChasteGuides/BoostSerialization).  */
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "mutation.arch";
 
