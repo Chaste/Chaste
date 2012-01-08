@@ -133,18 +133,20 @@ public:
         cells_generator.Generate(cells, p_mesh, location_indices, true);
 
         /* We now create boost shared pointers to any mutations we wish to use.
-         * We need to do this before making the cell population or otherwise the numbers of
-         * each type of mutation aren't tracked.          *
-         * For a list of possible mutations see subclasses of {{{AbstractCellMutationState}}}.
-         * These can be found in the inheritance diagram, here, [class:AbstractCellMutationState AbstractCellMutationState].
-         * Each mutation has a different effect on the cell cycle models see the class documentation for details.
+         * We need to do this using the {{{CellPropertyRegistry}}}, otherwise
+         * the numbers of each type of mutation aren't correctly tracked. For
+         * a list of possible mutations, see subclasses of {{{AbstractCellMutationState}}}.
+         * These can be found in the inheritance diagram, here,
+         * [class:AbstractCellMutationState AbstractCellMutationState].
+         * Each mutation has a different effect on the cell cycle models; see the class
+         * documentation for details.
          */
-        MAKE_PTR(ApcTwoHitCellMutationState, p_state);
+        boost::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<ApcTwoHitCellMutationState>());
 
         /* We create the cell population, as before. */
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
 
-        /* In order to visualise mutant cells and to count how many cells there are of each type we need to use the following command.*/
+        /* In order to visualize mutant cells and to count how many cells there are of each type we need to use the following command.*/
         cell_population.SetOutputCellMutationStates(true);
 
         /*
@@ -186,8 +188,8 @@ public:
          * We select one of the cells and set the mutation state to {{{ApcTwoHitCellMutationState}}} (i.e. p_state).
          */
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-                                                 cell_iter != cell_population.End();
-                                                 ++cell_iter)
+             cell_iter != cell_population.End();
+             ++cell_iter)
         {
             unsigned node_index = cell_population.GetLocationIndexUsingCell(*cell_iter);
 
@@ -197,20 +199,24 @@ public:
             }
         }
 
-        // Change the drag on the mutant cell
-        cell_population.SetDampingConstantMutant(10*cell_population.GetDampingConstantNormal());
-
-       /* Next we re set the end time to some later time.
+       /*
+        * We also change the value of the damping constant for mutant cells to be
+        * ten times the normal value.
         */
+       double normal_damping_constant = cell_population.GetDampingConstantNormal();
+       cell_population.SetDampingConstantMutant(10*normal_damping_constant);
+
+       /* Next we reset the end time to some later time. */
        simulator.SetEndTime(20);
 
-        /* Solve to new end time */
-        simulator.Solve();
+       /* Run the simulation to the new end time. */
+       simulator.Solve();
 
-        /*
-         * Finally, we must tidy up by destroying the {{{WntConcentration}}}
-         * singleton object. This avoids memory leaks occurring. */
-        WntConcentration<2>::Destroy();
+       /*
+        * Finally, we must tidy up by destroying the {{{WntConcentration}}}
+        * singleton object. This avoids memory leaks occurring.
+        */
+       WntConcentration<2>::Destroy();
     }
     /*
      * EMPTYLINE
@@ -225,7 +231,7 @@ public:
      * java executable.
      *
      * In the results folder there is also a file {{{cellmutationstates.dat}}} which tracks the numbers of each mutation type in the simulation.
-     * These results are just tab separated columns so may be visualised by using gnuplot, Matlab or similar.
+     * These results are just tab separated columns so may be visualized by using gnuplot, Matlab or similar.
      *
      * EMPTYLINE
      */

@@ -102,6 +102,14 @@ public:
 
         double width_y = cell_population.GetWidth(1);
         TS_ASSERT_DELTA(width_y, 2.8867, 1e-4);
+
+        // For coverage of GetVolumeOfCell()
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), sqrt(3)/2, 1e-6);
+        }
     }
 
     // Test that exception is thrown if no boundary nodes are defined in the mesh.

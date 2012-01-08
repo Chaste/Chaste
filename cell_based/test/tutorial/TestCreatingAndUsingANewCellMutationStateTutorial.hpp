@@ -263,7 +263,7 @@ public:
          * takes in the mesh and the cells vector. */
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        /* In order to visualise labelled cells we need to use the following command.*/
+        /* In order to visualize labelled cells we need to use the following command.*/
         cell_population.SetOutputCellMutationStates(true);
 
         /* We then pass in the cell population into an {{{OffLatticeSimulation}}},
@@ -282,7 +282,7 @@ public:
         simulator.Solve();
     }
     /*
-     * When you visualise the results with
+     * When you visualize the results with
      *
      * {{{java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithNewMutationState/results_from_time_0}}}
      *

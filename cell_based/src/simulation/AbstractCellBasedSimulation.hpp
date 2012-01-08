@@ -126,7 +126,7 @@ protected:
     /** Simulation Output directory either the same as mOutputDirectory or includes mOutputDirectory/results_from_time_[TIME]. */
     std::string mSimulationOutputDirectory;
 
-    /** Visualiser setup file. */
+    /** Visualizer setup file. */
     out_stream mpVizSetupFile;
 
     /** Counts the number of births during the simulation. */

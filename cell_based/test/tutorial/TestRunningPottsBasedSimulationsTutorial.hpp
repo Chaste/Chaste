@@ -236,7 +236,7 @@ public:
          */
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        /* In order to visualise labelled cells we need to use the following command.*/
+        /* In order to visualize labelled cells we need to use the following command.*/
         cell_population.SetOutputCellMutationStates(true);
 
         /* We then pass in the cell population into an {{{OnLatticeSimulation}}},
@@ -326,7 +326,7 @@ public:
          */
         PottsBasedCellPopulation<3> cell_population(*p_mesh, cells);
 
-        /* In order to visualise labelled cells we need to use the following command.*/
+        /* In order to visualize labelled cells we need to use the following command.*/
         cell_population.SetOutputCellMutationStates(true);
 
         /* We then pass in the cell population into an {{{OnLatticeSimulation}}},

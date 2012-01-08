@@ -84,7 +84,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 /*
  * The next header is the simulation class corresponding to the contact inhibition cell-cycle model.
- * The essential difference with other simulation classes is that {{{CellWiseData}}} is updated with the
+ * The essential difference with other simulation classes is that {{{CellwiseData}}} is updated with the
  * volumes each cell (either the volume of the Voronoi elements or vertex element depending on population type).
  */
 #include "VolumeTrackedOffLatticeSimulation.hpp"
@@ -148,32 +148,24 @@ public:
          * the vector of cell pointers (for cycles and states)*/
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        /* In order to visualise labelled cells (i.e. those that are inhibited from division) you need to use the following command.*/
+        /* In order to visualize labelled cells (i.e. those that are inhibited from division) you need to use the following command.*/
         cell_population.SetOutputCellMutationStates(true);
 
         /* To keep track of the volumes of the cells that are used in the contact inhibition cell-cycle,
-         * we use the singleton class {{{CellWiseData}}}. Here, we just initialise it with one variable
+         * we use the singleton class {{{CellwiseData}}}. Here, we just initialise it with one variable
          * and associate it with the cell population. */
 
         /* This creates the instance of {{{CellwiseData}}}: */
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        /* the first thing we do is set the number of variables we with to use {{{CellWiseData}}} to track, we do this by passing the number
+        /* the first thing we do is set the number of variables we with to use {{{CellwiseData}}} to track, we do this by passing the number
          * of cells in the simulation and the number of variables to  the {{{SetNumCellsAndVars}}} method.*/
         p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1);
-        /* We then pass the cell population to the {{{CellWiseData}}} object so the size of the data can vary over time.
+        /* We then pass the cell population to the {{{CellwiseData}}} object so the size of the data can vary over time.
          * The simulation won't run without the cell population set.*/
         p_data->SetCellPopulation(&cell_population);
-        /* We now loop over the cells and assign an initial value for the volume. This can be anything as it is overwritten
-         * by the {{{PostSolve()}}} method in {{{VolumeTrackedOffLatticeSimulation}}}.*/
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
-        {
-            p_data->SetValue(1.0, cell_population.GetLocationIndexUsingCell(*cell_iter));
-        }
 
         /* Then, we define the contact {{{VolumeTrackedOffLatticeSimulation}}} class, that automatically updates the volumes of the cells
-         * in {{{CellWiseData}}}. We also set up the output directory, the end time and the output multiple.
+         * in {{{CellwiseData}}}. We also set up the output directory, the end time and the output multiple.
          */
         VolumeTrackedOffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestContactInhibitionInBox");
@@ -282,11 +274,11 @@ public:
          * the vector of cell pointers*/
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        /* In order to visualise labelled cells (i.e those that are inhibited from division) you need to use the following command.*/
+        /* In order to visualize labelled cells (i.e those that are inhibited from division) you need to use the following command.*/
         cell_population.SetOutputCellMutationStates(true);
 
         /* To keep track of the volumes of the cells that are used in the contact inhibition cell-cycle,
-         * we use the singleton class {{{CellWiseData}}}. Here, we just initialise it with one variable
+         * we use the singleton class {{{CellwiseData}}}. Here, we just initialise it with one variable
          * and associate it with the cell population: */
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
         p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1);
@@ -299,7 +291,7 @@ public:
         }
 
         /*  Then, we define the contact {{{VolumeTrackedOffLatticeSimulation}}} class, that automatically updates the volumes of the cells
-         * in {{{CellWiseData}}}. We also set up the output directory, the end time and the output multiple.
+         * in {{{CellwiseData}}}. We also set up the output directory, the end time and the output multiple.
          */
         VolumeTrackedOffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestContactInhibitionTumourInBox");
@@ -392,7 +384,7 @@ public:
         cell_population.SetOutputCellMutationStates(true);
 
         /* To keep track of the volumes of the cells that are used in the contact inhibition cell-cycle,
-         * we use the singleton class {{{CellWiseData}}}. Here, we just initialise it with one variable
+         * we use the singleton class {{{CellwiseData}}}. Here, we just initialise it with one variable
          * and associate it with the cell population. This time each cell is associated with a vertex element */
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
         p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1);
@@ -405,7 +397,7 @@ public:
         }
 
         /*  Then, we define the {{{VolumeTrackedOffLatticeSimulation}}} class, that automatically updates the volumes of the cells
-         * in {{{CellWiseData}}}. We also set up the output directory, the end time and the output multiple.
+         * in {{{CellwiseData}}}. We also set up the output directory, the end time and the output multiple.
          */
         VolumeTrackedOffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestVertexContactInhibition");

@@ -189,7 +189,7 @@ public:
      *
      * You will notice that half of each cell cell around the edge is missing.
      * This is because the Voronoi region for nodes on the edge of the mesh can be
-     * infinite, therefore we only visualise the part inside the mesh.
+     * infinite, therefore we only visualize the part inside the mesh.
      * This also means there may be "long" edges in the mesh which can cause the cells
      * to move due long range interactions resulting in an artificially rounded shape.
      *

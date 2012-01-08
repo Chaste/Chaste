@@ -128,9 +128,11 @@ public:
          * Here that is a {{{VertexBasedCellPopulation}}} and the dimension is <2>.*/
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        /* We now create an {{{OffLatticeSimulation}}} object and pass in the {{{CellPopulation}}}. We also set some
-         * options on the simulation like output directory, output multiple (so we don't visualise every timestep),
-         * and end time.
+        /*
+         * We now create an {{{OffLatticeSimulation}}} object and pass in the
+         * {{{CellPopulation}}}. We also set some options on the simulation
+         * like output directory, output multiple (so we don't visualize every
+         * timestep), and end time.
          */
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("CellBasedDemo1");

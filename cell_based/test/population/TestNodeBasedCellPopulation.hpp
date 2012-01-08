@@ -591,6 +591,14 @@ public:
         // Create a cell population
         NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
 
+        // For coverage of GetVolumeOfCell()
+        for (AbstractCellPopulation<2>::Iterator cell_iter = node_based_cell_population.Begin();
+             cell_iter != node_based_cell_population.End();
+             ++cell_iter)
+        {
+            TS_ASSERT_DELTA(node_based_cell_population.GetVolumeOfCell(*cell_iter), M_PI, 1e-6);
+        }
+
         // For coverage of WriteResultsToFiles()
         boost::shared_ptr<AbstractCellProperty> p_state(node_based_cell_population.GetCellPropertyRegistry()->Get<WildTypeCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_apc1(node_based_cell_population.GetCellPropertyRegistry()->Get<ApcOneHitCellMutationState>());

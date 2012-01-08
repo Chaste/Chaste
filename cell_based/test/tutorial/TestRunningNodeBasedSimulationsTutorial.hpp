@@ -161,7 +161,7 @@ public:
      *
      * To visualize the results, open a new terminal, {{{cd}}} to the Chaste directory,
      * then {{{cd}}} to {{{anim}}}. Then do: {{{java Visualize2dCentreCells /tmp/$USER/testoutput/NodeBasedMonolayer/results_from_time_0}}}.
-     * we need to select the 'Cells as circles` option to be able to visualise the cells, as opposed
+     * we need to select the 'Cells as circles` option to be able to visualize the cells, as opposed
      * to just the centres.
      * We may have to do: {{{javac Visualize2dCentreCells.java}}} beforehand to create the
      * java executable.

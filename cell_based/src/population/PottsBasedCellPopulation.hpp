@@ -66,7 +66,7 @@ private:
 
     /**
      * Pointer to a VertexMesh object that stores the Element tessellation that is used to
-     * visualise mrMesh. The tessellation is created by calling CreateElementTessellation()
+     * visualize mrMesh. The tessellation is created by calling CreateElementTessellation()
      * and can be accessed by calling GetElementTessellation().
      */
     VertexMesh<DIM,DIM>* mpElementTessellation;
@@ -289,6 +289,13 @@ public:
      * Overridden WriteCellVolumeResultsToFile() method.
      */
     void WriteCellVolumeResultsToFile();
+
+    /**
+     * Overridden GetVolumeOfCell() method.
+     * 
+     * @param pCell boost shared pointer to a cell
+     */
+    double GetVolumeOfCell(CellPtr pCell);
 
     /**
      * Overridden GenerateCellResultsAndWriteToFiles() method.

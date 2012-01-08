@@ -352,6 +352,13 @@ public:
     void WriteCellVolumeResultsToFile();
 
     /**
+     * Overridden GetVolumeOfCell() method.
+     * 
+     * @param pCell boost shared pointer to a cell
+     */
+    double GetVolumeOfCell(CellPtr pCell);
+
+    /**
      * Create a Voronoi tessellation of the mesh.
      */
     void CreateVoronoiTessellation();
@@ -369,6 +376,8 @@ public:
      * because the global indices of Delaunay nodes and Voronoi elements may not match,
      * e.g. if a node is a ghost node or corresponds to a Voronoi face.
      *
+     * \todo This method is somewhat redundant following the introduction of the method GetVolumeOfCell() (see #1985).
+     * 
      * @param index a node global index
      */
     double GetVolumeOfVoronoiElement(unsigned index);

@@ -366,6 +366,13 @@ public:
     void WriteCellVolumeResultsToFile();
 
     /**
+     * Overridden GetVolumeOfCell() method.
+     * 
+     * @param pCell boost shared pointer to a cell
+     */
+    double GetVolumeOfCell(CellPtr pCell);
+
+    /**
      * Overridden GenerateCellResults() method.
      * Generate results for a given cell in the current cell population state to output files.
      *

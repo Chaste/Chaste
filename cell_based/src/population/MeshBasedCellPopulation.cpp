@@ -782,6 +782,27 @@ void MeshBasedCellPopulation<DIM>::WriteCellPopulationVolumeResultsToFile()
 }
 
 template<unsigned DIM>
+double MeshBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
+{
+    // Ensure that the Voronoi tessellation exists
+    if (mpVoronoiTessellation == NULL)
+    {
+        CreateVoronoiTessellation();
+    }
+
+    // Get the node index corresponding to this cell
+    unsigned node_index = this->GetLocationIndexUsingCell(pCell);
+
+    // Get the element index of the Voronoi tessellation corresponding to this node index
+    unsigned element_index = mpVoronoiTessellation->GetVoronoiElementIndexCorrespondingToDelaunayNodeIndex(node_index);
+    
+    // Get the cell's volume from the Voronoi tessellation
+    double cell_volume = mpVoronoiTessellation->GetVolumeOfElement(element_index);
+
+    return cell_volume;
+}
+
+template<unsigned DIM>
 void MeshBasedCellPopulation<DIM>::WriteCellVolumeResultsToFile()
 {
     assert (mpVoronoiTessellation != NULL);
@@ -789,6 +810,8 @@ void MeshBasedCellPopulation<DIM>::WriteCellVolumeResultsToFile()
 
     // Write time to file
     *(this->mpCellVolumesFile) << SimulationTime::Instance()->GetTime() << " ";
+
+    ///\todo It would be simpler to merely iterate over the cell population here
 
     // Loop over elements of mpVoronoiTessellation
     for (typename VertexMesh<DIM,DIM>::VertexElementIterator elem_iter = mpVoronoiTessellation->GetElementIteratorBegin();
@@ -808,7 +831,7 @@ void MeshBasedCellPopulation<DIM>::WriteCellVolumeResultsToFile()
             *(this->mpCellVolumesFile) << node_index << " ";
 
             // Get the cell corresponding to this node
-            CellPtr p_cell =  this->mLocationCellMap[node_index];
+            CellPtr p_cell = this->mLocationCellMap[node_index];
 
             // Write cell ID to file
             unsigned cell_index = p_cell->GetCellId();
@@ -822,7 +845,7 @@ void MeshBasedCellPopulation<DIM>::WriteCellVolumeResultsToFile()
             }
 
             // Write cell volume (in 3D) or area (in 2D) to file
-            double cell_volume = mpVoronoiTessellation->GetVolumeOfElement(elem_index);
+            double cell_volume = this->GetVolumeOfCell(p_cell);
             *(this->mpCellVolumesFile) << cell_volume << " ";
         }
     }

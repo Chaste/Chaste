@@ -306,7 +306,7 @@ public:
         simulator.Solve();
     }
     /*
-     * When you visualise the results with
+     * When you visualize the results with
      *
      * {{{java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithMyForce/results_from_time_0}}}
      *

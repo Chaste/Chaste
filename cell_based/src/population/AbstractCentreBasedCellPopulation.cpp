@@ -192,7 +192,11 @@ void AbstractCentreBasedCellPopulation<DIM>::WriteTimeAndNodeResultsToFiles()
     // Write node data to file
     for (unsigned node_index=0; node_index<this->GetNumNodes(); node_index++)
     {
-        // Hack that covers the case where the node in an AbstractCentreBasedCellPopulation is associated with a cell that has just been killed (#1129) This breaks the vertex visualiser when apoptotic cells are involved.
+        /*
+         * Hack that covers the case where the node in an AbstractCentreBasedCellPopulation
+         * is associated with a cell that has just been killed (#1129). This breaks the
+         * vertex visualizer when apoptotic cells are involved.
+         */
         bool node_corresponds_to_dead_cell = false;
         if (this->mLocationCellMap[node_index])
         {

@@ -420,15 +420,27 @@ void VertexBasedCellPopulation<DIM>::WriteResultsToFiles()
 }
 
 template<unsigned DIM>
+double VertexBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
+{
+    // Get the vertex element index corresponding to this cell
+    unsigned elem_index = this->GetLocationIndexUsingCell(pCell);
+
+    // Get the cell's volume from the vertex mesh
+    double cell_volume = mrMesh.GetVolumeOfElement(elem_index);
+
+    return cell_volume;
+}
+
+template<unsigned DIM>
 void VertexBasedCellPopulation<DIM>::WriteCellVolumeResultsToFile()
 {
     assert(DIM==2);
 
-     // Write time to file
+    // Write time to file
     *(this->mpCellVolumesFile) << SimulationTime::Instance()->GetTime() << " ";
 
     // Loop over cells and find associated elements so in the same order as the cells in output files
-     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
          cell_iter != this->End();
          ++cell_iter)
     {
@@ -460,7 +472,7 @@ void VertexBasedCellPopulation<DIM>::WriteCellVolumeResultsToFile()
             }
 
             // Write cell volume (in 3D) or area (in 2D) to file
-            double cell_volume = mrMesh.GetVolumeOfElement(elem_index);
+            double cell_volume = this->GetVolumeOfCell(*cell_iter);
             *(this->mpCellVolumesFile) << cell_volume << " ";
         }
     }

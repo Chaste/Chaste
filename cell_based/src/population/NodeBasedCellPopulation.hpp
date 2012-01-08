@@ -285,6 +285,13 @@ public:
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
      */
     virtual CellPtr AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell=CellPtr());
+
+    /**
+     * Overridden GetVolumeOfCell() method.
+     * 
+     * @param pCell boost shared pointer to a cell
+     */
+    double GetVolumeOfCell(CellPtr pCell);
 };
 
 #include "SerializationExportWrapper.hpp"

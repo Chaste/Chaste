@@ -924,7 +924,7 @@ public:
         double crypt_length = 22.0;
         unsigned cells_across = 2;
         unsigned cells_up = 2;
-        double crypt_width = 0.5; // Make this bigger if want to visualise output
+        double crypt_width = 0.5; // Make this bigger if want to visualize output
         unsigned thickness_of_ghost_layer = 1;
 
         HoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer, crypt_width/cells_across);

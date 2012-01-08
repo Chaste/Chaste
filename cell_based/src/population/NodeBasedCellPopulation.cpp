@@ -380,6 +380,29 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
 }
 
 template<unsigned DIM>
+double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
+{
+    // Get node index corresponding to this cell
+    unsigned node_index = this->GetLocationIndexUsingCell(pCell);
+
+    // Get cell radius
+    double cell_radius = mrMesh.GetCellRadius(node_index);
+
+    // Get cell volume from radius
+    double cell_volume = 0.0;
+    if (DIM == 2)
+    {
+        cell_volume = M_PI*cell_radius*cell_radius;
+    }
+    else if (DIM == 3)
+    {
+        cell_volume = (4.0/3.0)*M_PI*cell_radius*cell_radius*cell_radius;
+    }
+
+    return cell_volume;
+}
+
+template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::WriteCellVolumeResultsToFile()
 {
     assert(DIM==2 || DIM==3);
@@ -388,8 +411,9 @@ void NodeBasedCellPopulation<DIM>::WriteCellVolumeResultsToFile()
     *(this->mpCellVolumesFile) << SimulationTime::Instance()->GetTime() << " ";
 
     // Loop over cells
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter=this->Begin();
-         cell_iter!=this->End(); ++cell_iter)
+    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+         cell_iter != this->End();
+         ++cell_iter)
     {
         // Get the index of the corresponding node in mrMesh
         unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
@@ -407,23 +431,11 @@ void NodeBasedCellPopulation<DIM>::WriteCellVolumeResultsToFile()
             *(this->mpCellVolumesFile) << node_location[i] << " ";
         }
 
-        // Get cell radius
-        double cell_radius = mrMesh.GetCellRadius(node_index);
-
-        // Get cell volume from radius
-        double cell_volume = 0.0;
-
-        if (DIM == 2)
-        {
-            cell_volume = M_PI*cell_radius*cell_radius;
-        }
-        else if (DIM == 3)
-        {
-            cell_volume = (4.0/3.0)*M_PI*cell_radius*cell_radius*cell_radius;
-        }
         // Write cell volume (in 3D) or area (in 2D) to file
+        double cell_volume = this->GetVolumeOfCell(*cell_iter);
         *(this->mpCellVolumesFile) << cell_volume << " ";
     }
+
     *(this->mpCellVolumesFile) << "\n";
 }
 

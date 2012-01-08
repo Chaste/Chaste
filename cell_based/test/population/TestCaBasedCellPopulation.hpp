@@ -359,6 +359,14 @@ public:
         cell_population.SetOutputCellVariables(true);
         cell_population.SetOutputCellVolumes(true);
 
+        // For coverage of GetVolumeOfCell()
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), 1.0, 1e-6);
+        }
+
         // For coverage of WriteResultsToFiles()
         boost::shared_ptr<AbstractCellProperty> p_state(cell_population.GetCellPropertyRegistry()->Get<WildTypeCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_apc1(cell_population.GetCellPropertyRegistry()->Get<ApcOneHitCellMutationState>());
@@ -457,7 +465,7 @@ public:
             AbstractCellPopulation<2>* const p_cell_population = new CaBasedCellPopulation<2>(mesh, cells, real_node_indices);
 
             // Cells have been given birth times of 0, -1, -2, -3, -4.
-            // loop over them to run to time 0.0;
+            // Loop over them to run to time 0.
             for (AbstractCellPopulation<2>::Iterator cell_iter = p_cell_population->Begin();
                  cell_iter != p_cell_population->End();
                  ++cell_iter)

@@ -348,8 +348,9 @@ public:
 
         /* We now create a shared pointer to our new property, as follows. */
         MAKE_PTR(MotileCellProperty, p_motile);
-        /* Also create a shared pointer to a cell label so we can visualise the different cell types.
-         * Note that this is also a {{{CellProperty}}}.
+        /*
+         * Also create a shared pointer to a cell label so we can visualize the
+         * different cell types. Note that this is also a {{{CellProperty}}}.
          */
         MAKE_PTR(CellLabel, p_label);
 
@@ -394,7 +395,7 @@ public:
          */
         cell_population.SetMechanicsCutOffLength(1.5);
 
-        /* In order to visualise labelled cells we need to use the following command.*/
+        /* In order to visualize labelled cells we need to use the following command.*/
         cell_population.SetOutputCellMutationStates(true);
 
         /* We then pass in the cell population into an {{{OffLatticeSimulation}}},
@@ -420,7 +421,7 @@ public:
         delete p_mesh;
     }
     /*
-     * When you visualise the results with
+     * When you visualize the results with
      *
      * {{{java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithMotileCellProperty/results_from_time_0}}}
      *

@@ -36,11 +36,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Subclass of OffLatticeSimulation in which the volume of the cells is used in
- * a CellWiseData structure for contact inhibition below a threshold volume.
- * Works only with MeshBasedPopulation and a VertexBasedPopulation at the moment.
+ * a CellwiseData structure for contact inhibition below a threshold volume.
  */
-//\todo implement NodeBasedPopulation
-
 template<unsigned DIM>
 class VolumeTrackedOffLatticeSimulation : public OffLatticeSimulation<DIM>
 {
@@ -61,9 +58,19 @@ private :
     }
 
     /**
-     * Overridden PostSolve() method.
+     * Overridden SetupSolve() method. Calls UpdateCellwiseData().
+     */
+    void SetupSolve();
+
+    /**
+     * Overridden PostSolve() method. Calls UpdateCellwiseData().
      */
     void PostSolve();
+
+    /**
+     * Compute the volume of each cell in the population and store these in the CellwiseData singleton.
+     */
+    void UpdateCellwiseData();
 
 public:
 

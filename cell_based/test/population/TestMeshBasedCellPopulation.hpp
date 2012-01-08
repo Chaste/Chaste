@@ -319,11 +319,7 @@ public:
         // Create a cell population, with no ghost nodes at the moment
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
-        //////////////////
-        // Test set node
-        //////////////////
-
-        // Move node 0 by a small amount
+        // Test SetNode() by moving node 0 by a small amount
         AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
         c_vector<double,2> new_location = cell_population.GetLocationOfCellCentre(*cell_iter);
         new_location[0] += 1e-2;
@@ -334,9 +330,7 @@ public:
         TS_ASSERT_DELTA(mesh.GetNode(0)->rGetLocation()[0], new_location[0], 1e-12);
         TS_ASSERT_DELTA(mesh.GetNode(0)->rGetLocation()[1], new_location[1], 1e-12);
 
-        //////////////////
-        // Test add cell
-        //////////////////
+        // Test AddCell()
         unsigned old_num_nodes = mesh.GetNumNodes();
         unsigned old_num_cells = cell_population.rGetCells().size();
 
@@ -525,6 +519,21 @@ public:
         TS_ASSERT_DELTA(cell_population2d.GetVolumeOfVoronoiElement(2), 0.0, 1e-6);
         TS_ASSERT_DELTA(cell_population2d.GetVolumeOfVoronoiElement(3), 0.0, 1e-6);
         TS_ASSERT_DELTA(cell_population2d.GetVolumeOfVoronoiElement(4), 0.5, 1e-6);
+
+        // For coverage of GetVolumeOfCell()
+        for (AbstractCellPopulation<2>::Iterator iter = cell_population2d.Begin();
+             iter != cell_population2d.End();
+             ++iter)
+        {
+            if (cell_population2d.GetLocationIndexUsingCell(*iter) == 4)
+            {
+                TS_ASSERT_DELTA(cell_population2d.GetVolumeOfCell(*iter), 0.5, 1e-6);
+            }
+            else
+            {
+                TS_ASSERT_DELTA(cell_population2d.GetVolumeOfCell(*iter), 0.0, 1e-6);
+            }
+        }
 
         // Test element perimeters
         TS_ASSERT_DELTA(cell_population2d.GetSurfaceAreaOfVoronoiElement(0), sqrt(2), 1e-6);

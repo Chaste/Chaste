@@ -846,17 +846,25 @@ void CaBasedCellPopulation<DIM>::Validate()
 }
 
 template<unsigned DIM>
+double CaBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
+{    
+    // Cell volumes all one (equal-sized lattice sites)
+    ///\todo modify this method to account for more general lattices
+    double cell_volume = 1.0;
+
+    return cell_volume;
+}
+
+template<unsigned DIM>
 void CaBasedCellPopulation<DIM>::WriteCellVolumeResultsToFile()
 {
     // Write time to file
     *(this->mpCellVolumesFile) << SimulationTime::Instance()->GetTime() << " ";
 
-    // Cell volumes all one (equal-sized lattice sites)
-    double cell_volume = 1.0;
-
     // Loop over cells
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter=this->Begin();
-         cell_iter!=this->End(); ++cell_iter)
+    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+         cell_iter != this->End();
+         ++cell_iter)
     {
         // Get the index of the corresponding node in mrMesh and write to file
         unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
@@ -874,6 +882,7 @@ void CaBasedCellPopulation<DIM>::WriteCellVolumeResultsToFile()
         }
 
         // Write cell volume (in 3D) or area (in 2D) to file
+        double cell_volume = this->GetVolumeOfCell(*cell_iter);
         *(this->mpCellVolumesFile) << cell_volume << " ";
     }
     *(this->mpCellVolumesFile) << "\n";

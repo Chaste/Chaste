@@ -44,7 +44,6 @@ template<unsigned DIM>
 class CellwiseData : public SerializableSingleton<CellwiseData<DIM> >
 {
     friend class TestCellwiseData;
-
 private:
 
     /** The single instance of the singleton object */
@@ -170,8 +169,9 @@ public:
     bool IsSetUp();
 
     /**
-     * Reallocate size of mData. Needed because of growth/death. Reallocates
-     * according to the number of nodes in the mesh in the CellPopulation member variable
+     * Reallocate size of mData according to the number of cells in the CellPopulation
+     * member variable. Needed because of possible cell division and cell death over
+     * the course of each time step.
      */
     void ReallocateMemory();
 

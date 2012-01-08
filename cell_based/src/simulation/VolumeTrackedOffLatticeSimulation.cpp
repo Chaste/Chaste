@@ -28,7 +28,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "VolumeTrackedOffLatticeSimulation.hpp"
 #include "MeshBasedCellPopulation.hpp"
-#include "VertexBasedCellPopulation.hpp"
 #include "CellwiseData.hpp"
 
 template<unsigned DIM>
@@ -37,10 +36,6 @@ VolumeTrackedOffLatticeSimulation<DIM>::VolumeTrackedOffLatticeSimulation(Abstra
                                                       bool initialiseCells)
     : OffLatticeSimulation<DIM>(rCellPopulation, deleteCellPopulationInDestructor, initialiseCells)
 {
-    if (!dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation) && !dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) )
-    {
-        EXCEPTION("VolumeTrackedOffLatticeSimulation require a subclass of MeshBasedCellPopulation or VertexBasedSimulation.");
-    }
 }
 
 template<unsigned DIM>
@@ -49,48 +44,57 @@ VolumeTrackedOffLatticeSimulation<DIM>::~VolumeTrackedOffLatticeSimulation()
 }
 
 template<unsigned DIM>
+void VolumeTrackedOffLatticeSimulation<DIM>::SetupSolve()
+{
+    /*
+     * We must update CellwiseData in SetupSolve(), otherwise it will not have been
+     * fully initialised by the time we enter the main time loop.
+     */
+    UpdateCellwiseData();
+}
+
+template<unsigned DIM>
 void VolumeTrackedOffLatticeSimulation<DIM>::PostSolve()
+{
+    UpdateCellwiseData();
+}
+
+template<unsigned DIM>
+void VolumeTrackedOffLatticeSimulation<DIM>::UpdateCellwiseData()
 {
     // Make sure the cell population is updated
     this->mrCellPopulation.Update();
+
+    // Prepare CellwiseData by reallocating memory according to the number of cells
     CellwiseData<DIM>::Instance()->ReallocateMemory();
 
+    /**
+     * This hack is needed because in the case of a MeshBasedCellPopulation in which
+     * multiple cell divisions have occurred over one time step, the Voronoi tessellation
+     * (while existing) is out-of-date. Thus, if we did not regenerate the Voronoi
+     * tessellation here, an assertion may trip as we try to access a Voronoi element
+     * whose index exceeds the number of elements in the out-of-date tessellation.
+     * 
+     * \todo work out how to properly fix this (#1986)
+     */
     if (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
     {
-        // Static cast on the cell population
-        MeshBasedCellPopulation<DIM>* p_static_cast_cell_population = static_cast<MeshBasedCellPopulation<DIM>*>(&(this->mrCellPopulation));
-
-        // Create Voronoi tessellation for volumes
-        p_static_cast_cell_population->CreateVoronoiTessellation();
-
-        // Loop over cells and set volume value in CellWiseData
-        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mrCellPopulation.Begin();
-             cell_iter != this->mrCellPopulation.End();
-             ++cell_iter)
-        {
-            // Get the index of the node corresponding to this cell
-            unsigned node_index = this->mrCellPopulation.GetLocationIndexUsingCell(*cell_iter);
-
-            // Store in CellwiseData
-            CellwiseData<DIM>::Instance()->SetValue(p_static_cast_cell_population->GetVolumeOfVoronoiElement(node_index), node_index, 0);
-        }
+        static_cast<MeshBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->CreateVoronoiTessellation();
     }
-    else if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
+
+    // Iterate over cell population
+    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mrCellPopulation.Begin();
+         cell_iter != this->mrCellPopulation.End();
+         ++cell_iter)
     {
-        // Static cast on the cell population
-        VertexBasedCellPopulation<DIM>* p_static_cast_cell_population = static_cast<VertexBasedCellPopulation<DIM>*>(&(this->mrCellPopulation));
+        // Get the volume of this cell
+        double cell_volume = this->mrCellPopulation.GetVolumeOfCell(*cell_iter);
 
-        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mrCellPopulation.Begin();
-             cell_iter != this->mrCellPopulation.End();
-             ++cell_iter)
-        {
+        // Get the location index corresponding to this cell
+        unsigned location_index = this->mrCellPopulation.GetLocationIndexUsingCell(*cell_iter);
 
-            // Get the index of vertex element corresponding to this cell
-            unsigned element_index = this->mrCellPopulation.GetLocationIndexUsingCell(*cell_iter);
-
-            // Store in CellwiseData
-            CellwiseData<DIM>::Instance()->SetValue(p_static_cast_cell_population->rGetMesh().GetVolumeOfElement(element_index), element_index, 0);
-        }
+        // Store the cell's volume in CellwiseData
+        CellwiseData<DIM>::Instance()->SetValue(cell_volume, location_index, 0);
     }
 }
 

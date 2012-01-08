@@ -84,6 +84,14 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumSweepsPerTimestep(), 1u);
         TS_ASSERT_EQUALS(cell_population.GetUpdateNodesInRandomOrder(), true);
         TS_ASSERT_EQUALS(cell_population.GetIterateRandomlyOverUpdateRuleCollection(), false);
+
+        // For coverage of GetVolumeOfCell()
+        for (AbstractCellPopulation<2>::Iterator cell_iter2 = cell_population.Begin();
+             cell_iter2 != cell_population.End();
+             ++cell_iter2)
+        {
+            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter2), 4.0, 1e-6);
+        }
     }
 
     void TestIsCellAssociatedWithADeletedLocation() throw (Exception)

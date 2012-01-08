@@ -431,6 +431,15 @@ public:
     virtual double GetWidth(const unsigned& rDimension)=0;
 
     /**
+     * Get the volume (or area in 2D, or length in 1D) of a given cell.
+     * 
+     * As this method is pure virtual, it must be overridden in subclasses.
+     * 
+     * @param pCell boost shared pointer to a cell
+     */
+    virtual double GetVolumeOfCell(CellPtr pCell)=0;
+
+    /**
      * Given a node index, returns the set of neighbouring node indices.
      *
      * As this method is pure virtual, it must be overridden
