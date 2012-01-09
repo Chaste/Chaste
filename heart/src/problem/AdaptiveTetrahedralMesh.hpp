@@ -6,7 +6,7 @@ Copyright (C) Fujitsu Laboratories of Europe, 2009-2010
 
 /*
 
-Copyright (C) University of Oxford, 2005-2011
+Copyright (C) University of Oxford, 2005-2012
 
 University of Oxford means the Chancellor, Masters and Scholars of the
 University of Oxford, having an administrative office at Wellington

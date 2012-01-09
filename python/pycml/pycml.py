@@ -2,7 +2,7 @@
 # We want 1/2==0.5
 from __future__ import division
 
-"""Copyright (C) University of Oxford, 2005-2011
+"""Copyright (C) University of Oxford, 2005-2012
 
 University of Oxford means the Chancellor, Masters and Scholars of the
 University of Oxford, having an administrative office at Wellington
