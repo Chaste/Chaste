@@ -33,6 +33,7 @@ import re
 import subprocess
 import sys
 import time
+import threading
 
 from SCons.Script import Command, Dir, Value, Copy, Delete
 import SCons.Action
@@ -46,6 +47,9 @@ sys.path[0:0] = [our_path]
 import BuildTools
 relpath = BuildTools.relpath
 set = BuildTools.set
+
+# Should provide a whole-build global lock, if needed
+_lock = threading.Lock()
 
 # Possible extensions for source files in Chaste
 chaste_source_exts = ['.cpp', '.xsd', '.cellml']
@@ -131,7 +135,13 @@ def BuildTest(target, source, env):
 
     def process(o):
         """Process an object file as described in BuildTest.__doc__"""
-        o.scan() # Needed to ensure scons dependencies are set up
+        # Ensure scons' dependencies are set up, in a thread-safe fashion
+        _lock.acquire()
+        o._chaste_lock = getattr(o, '_chaste_lock', threading.Lock())
+        _lock.release()
+        o._chaste_lock.acquire()
+        o.scan()
+        o._chaste_lock.release()
         for d in o.implicit:
             hdr = str(d)
             if hdr not in header_files:
