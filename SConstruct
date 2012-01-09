@@ -458,8 +458,9 @@ if test_summary and not compile_only:
     Execute(Mkdir(output_dir))
     # Remove old results. Note that this command gets run before anything is built.
     #for oldfile in os.listdir(output_dir):
-    #  os.remove(os.path.join(output_dir, oldfile))
+    #    os.remove(os.path.join(output_dir, oldfile))
     # Add a summary generator to the list of things for scons to do
+    show_output_folder = False
     if isinstance(build, BuildTypes.Coverage):
         # Remove old .gcda files before running more tests
         # First, find appropriate build directories
@@ -487,21 +488,22 @@ if test_summary and not compile_only:
         summary_action = cmd + '; python python/ParseDoxygen.py doxygen-output.log doxygen-error.log ' + output_dir
     else:
         summary_action = 'python python/DisplayTests.py '+output_dir+' '+build_type
+        show_output_folder = '@echo "Test output written to: ' + senv['ENV']['CHASTE_TEST_OUTPUT'] + '"'
   
     summary_index = os.path.join(output_dir, 'index.html')
     senv.Command(summary_index, Flatten(test_log_files), summary_action)
+    if show_output_folder:
+        senv.AddPostAction(summary_index, show_output_folder)
     # Avoid circular dependencies
     senv.Ignore(summary_index, summary_index)
     senv.Ignore(Dir(output_dir), summary_index)
-    # Make sure the summary is always required by any build targets requested
-    # explicitly
+    # Make sure the summary is always required by any build targets requested explicitly
     for targ in COMMAND_LINE_TARGETS:
         senv.Depends(targ, summary_index)
     senv.Default(summary_index)
     # Also allow other code to add dependencies, by making the summary depend on an Alias
     senv.Depends(summary_index, senv.Alias('test_summary_dependencies'))
-    # Try to ensure it runs even if SCons thinks it's up-to-date, just to
-    # re-assure the user
+    # Try to ensure it runs even if SCons thinks it's up-to-date, just to re-assure the user
     senv.AlwaysBuild(summary_index)
 
 
