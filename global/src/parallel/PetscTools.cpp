@@ -46,7 +46,11 @@ unsigned PetscTools::mNumBarriers = 0u;
 
 void PetscTools::ResetCache()
 {
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
+    PetscBool is_there;
+#else
     PetscTruth is_there;
+#endif
     PetscInitialized(&is_there);
     if (is_there)
     {
@@ -300,7 +304,11 @@ void PetscTools::DumpPetscObject(const Mat& rMat, const std::string& rOutputFile
 
     PetscViewerBinaryOpen(PETSC_COMM_WORLD, rOutputFileFullPath.c_str(), type, &view);
     MatView(rMat, view);
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
+    PetscViewerDestroy(&view);
+#else
     PetscViewerDestroy(view);
+#endif
 }
 
 void PetscTools::DumpPetscObject(const Vec& rVec, const std::string& rOutputFileFullPath)
@@ -314,7 +322,11 @@ void PetscTools::DumpPetscObject(const Vec& rVec, const std::string& rOutputFile
 
     PetscViewerBinaryOpen(PETSC_COMM_WORLD, rOutputFileFullPath.c_str(), type, &view);
     VecView(rVec, view);
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
+    PetscViewerDestroy(&view);
+#else
     PetscViewerDestroy(view);
+#endif
 }
 
 void PetscTools::ReadPetscObject(Mat& rMat, const std::string& rOutputFileFullPath, Vec rParallelLayout)
@@ -335,8 +347,13 @@ void PetscTools::ReadPetscObject(Mat& rMat, const std::string& rOutputFileFullPa
 
     PetscViewerBinaryOpen(PETSC_COMM_WORLD, rOutputFileFullPath.c_str(),
                           type, &view);
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
+    MatLoad(&view, MATMPIAIJ, &rMat);
+    PetscViewerDestroy(&view);
+#else
     MatLoad(view, MATMPIAIJ, &rMat);
     PetscViewerDestroy(view);
+#endif
 
     if (rParallelLayout != NULL)
     {

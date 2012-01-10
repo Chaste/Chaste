@@ -39,13 +39,21 @@ void ReplicatableVector::RemovePetscContext()
 {
     if (mToAll != NULL)
     {
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
+        VecScatterDestroy(&mToAll);
+#else
         VecScatterDestroy(mToAll);
+#endif    
         mToAll = NULL;
     }
 
     if (mReplicated != NULL)
     {
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
+        VecDestroy(&mReplicated);
+#else
         VecDestroy(mReplicated);
+#endif    
         mReplicated = NULL;
     }
 
@@ -136,7 +144,11 @@ void ReplicatableVector::Replicate(unsigned lo, unsigned hi)
     ReplicatePetscVector(distributed_vec);
 
     // Clean up
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
+    VecDestroy(&distributed_vec);
+#else
     VecDestroy(distributed_vec);
+#endif    
 }
 
 void ReplicatableVector::ReplicatePetscVector(Vec vec)

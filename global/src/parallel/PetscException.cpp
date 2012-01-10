@@ -97,8 +97,11 @@ std::string GetKspErrorMessage(PetscInt kspError)
 #else
     // This array contains the strings describing KSP convergence/divergence reasons.
     // It is exported by libpetscksp.a
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
+    //External declaration of KSPConvergedReasons already happens
+#else
     extern const char **KSPConvergedReasons;
-
+#endif
     // The code for the last known error (-10) is hardcoded in PETSc, in future releases it might change.
     // It is defined in src/ksp/ksp/interface/dlregisksp.c
     if (kspError >= -10)

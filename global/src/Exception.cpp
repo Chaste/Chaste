@@ -95,7 +95,11 @@ void Exception::Terminate(const std::string& rMessage, const std::string& rFilen
     /*
      * Check if we're running in parallel.
      */
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
+    PetscBool is_there;
+#else
     PetscTruth is_there;
+#endif
     PetscInitialized(&is_there);
     if (is_there)
     {
