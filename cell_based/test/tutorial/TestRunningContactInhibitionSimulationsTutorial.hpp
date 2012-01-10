@@ -283,12 +283,6 @@ public:
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
         p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1);
         p_data->SetCellPopulation(&cell_population);
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
-        {
-            p_data->SetValue(1.0, cell_population.GetLocationIndexUsingCell(*cell_iter));
-        }
 
         /*  Then, we define the contact {{{VolumeTrackedOffLatticeSimulation}}} class, that automatically updates the volumes of the cells
          * in {{{CellwiseData}}}. We also set up the output directory, the end time and the output multiple.
@@ -297,7 +291,6 @@ public:
         simulator.SetOutputDirectory("TestContactInhibitionTumourInBox");
         simulator.SetSamplingTimestepMultiple(12);
         simulator.SetEndTime(20.0);
-
 
         /* Next, we create a force law (springs) to be applied between cell centres and set up a
          * cut-off length beyond which cells stop interacting. We then pass this to the {{{VolumeTrackedOffLatticeSimulation}}} */
@@ -385,16 +378,10 @@ public:
 
         /* To keep track of the volumes of the cells that are used in the contact inhibition cell-cycle,
          * we use the singleton class {{{CellwiseData}}}. Here, we just initialise it with one variable
-         * and associate it with the cell population. This time each cell is associated with a vertex element */
+         * and associate it with the cell population. This time each cell is associated with a vertex element. */
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
         p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1);
         p_data->SetCellPopulation(&cell_population);
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
-        {
-            p_data->SetValue(1.0, cell_population.GetLocationIndexUsingCell(*cell_iter));
-        }
 
         /*  Then, we define the {{{VolumeTrackedOffLatticeSimulation}}} class, that automatically updates the volumes of the cells
          * in {{{CellwiseData}}}. We also set up the output directory, the end time and the output multiple.
@@ -412,7 +399,7 @@ public:
         /* To run the simulation, we call {{{Solve()}}}. */
         simulator.Solve();
 
-        /* Finally, as in previous cell-based Chaste tutorials, we call {{{Destroy()}}} on the singleton classes. */
+        /* Finally, as in previous cell-based Chaste tutorials, we call {{{Destroy()}}} on any singleton classes. */
         CellwiseData<2>::Destroy();
     }
     /*
@@ -428,6 +415,5 @@ public:
      *
      * EMPTYLINE
      */
-
 };
 #endif /*TESTRUNNIGCONTACTINHIBITIONSIMULATIONSTUTORIAL_HPP_*/

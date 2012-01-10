@@ -49,151 +49,60 @@ DeltaNotchOffLatticeSimulation<DIM>::~DeltaNotchOffLatticeSimulation()
 template<unsigned DIM>
 void DeltaNotchOffLatticeSimulation<DIM>::PostSolve()
 {
+    // Make sure the cell population is updated
     this->mrCellPopulation.Update();
+
+    // Prepare CellwiseData by reallocating memory according to the number of cells
     CellwiseData<DIM>::Instance()->ReallocateMemory();
 
-    if (dynamic_cast<AbstractCentreBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
+    // First store each cell's Notch and Delta concentrations in CellwiseData
+    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mrCellPopulation.Begin();
+         cell_iter != this->mrCellPopulation.End();
+         ++cell_iter)
     {
-        // Create and initialize vector of mean Delta concentrations
-        unsigned num_cells = this->mrCellPopulation.GetNumRealCells();
-        std::vector<double> mean_delta(num_cells);
-        std::vector<unsigned> num_neighbours(num_cells);
-        for (unsigned i=0; i<num_cells; i++)
-        {
-            mean_delta[i] = 0.0;
-            num_neighbours[i] = 0;
-        }
-        if (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
-        {
-            ///\todo needs testing
+        unsigned index = this->mrCellPopulation.GetLocationIndexUsingCell(*cell_iter);
 
-            // Iterate over all springs (i.e. neighbouring cells)
-            MeshBasedCellPopulation<DIM>* p_static_cast_cell_population = static_cast<MeshBasedCellPopulation<DIM>*>(&(this->mrCellPopulation));
-            for (typename MeshBasedCellPopulation<DIM>::SpringIterator spring_iterator = p_static_cast_cell_population->SpringsBegin();
-                 spring_iterator != p_static_cast_cell_population->SpringsEnd();
-                 ++spring_iterator)
-            {
-                // Get the index of each node on this edge
-                unsigned node_a_index = spring_iterator.GetNodeA()->GetIndex();
-                unsigned node_b_index = spring_iterator.GetNodeB()->GetIndex();
+        DeltaNotchCellCycleModel* p_model = static_cast<DeltaNotchCellCycleModel*>(cell_iter->GetCellCycleModel());
+        double this_delta = p_model->GetDelta();
+        double this_notch = p_model->GetNotch();
 
-                // Get the cell associated with each node
-                CellPtr p_cell_a = this->mrCellPopulation.GetCellUsingLocationIndex(node_a_index);
-                CellPtr p_cell_b = this->mrCellPopulation.GetCellUsingLocationIndex(node_b_index);
-
-                // Get the Delta concentration at each cell
-                double delta_a = static_cast<DeltaNotchCellCycleModel*>(p_cell_a->GetCellCycleModel())->GetDelta();
-                double delta_b = static_cast<DeltaNotchCellCycleModel*>(p_cell_b->GetCellCycleModel())->GetDelta();
-
-                // Add each cell's neighbour's Delta concentration to mean_delta
-                mean_delta[node_a_index] += delta_b;
-                mean_delta[node_b_index] += delta_a;
-
-                // Increment the number of neighbours found for each cell
-                num_neighbours[node_a_index]++;
-                num_neighbours[node_b_index]++;
-            }
-        }
-        else // assume a NodeBasedCellPopulation
-        {
-            // Get a set of all neighbouring node pairs
-            for (unsigned node_a_index=0; node_a_index<this->mrCellPopulation.GetNumNodes(); node_a_index++)
-            {
-                for (unsigned node_b_index=0; node_b_index<this->mrCellPopulation.GetNumNodes(); node_b_index++)
-                {
-                     bool neighbours = (norm_2(this->mrCellPopulation.GetNode(node_a_index)->rGetLocation() - this->mrCellPopulation.GetNode(node_b_index)->rGetLocation()) <= 1.5);
-                     if ((node_a_index!= node_b_index) && (neighbours == true))
-                     {
-                        // Get the cell associated with each node
-                        CellPtr p_cell_a = this->mrCellPopulation.GetCellUsingLocationIndex(node_a_index);
-                        CellPtr p_cell_b = this->mrCellPopulation.GetCellUsingLocationIndex(node_b_index);
-
-                        // Get the Delta concentration at each cell
-                        //double delta_a = static_cast<DeltaNotchCellCycleModel*>(p_cell_a->GetCellCycleModel())->GetDelta();
-                        double delta_b = static_cast<DeltaNotchCellCycleModel*>(p_cell_b->GetCellCycleModel())->GetDelta();
-
-                        // Add each cell's neighbour's Delta concentration to mean_delta
-                        mean_delta[node_a_index] += delta_b;
-
-                        // Increment the number of neighbours found for each cell
-                        num_neighbours[node_a_index]++;
-                    }
-                }
-            }
-        }
-
-        // Make mean_delta a vector of mean (rather than total) concentrations and store in CellwiseData
-        for (unsigned i=0; i<num_cells; i++)
-        {
-            if (num_neighbours[i] != 0)
-            {
-                mean_delta[i] /= num_neighbours[i];
-            }
-        }
-
-        // Loop over cells
-        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mrCellPopulation.Begin();
-             cell_iter != this->mrCellPopulation.End();
-             ++cell_iter)
-        {
-            // Also store this cell's Delta and Notch concentrations
-            unsigned node_index = this->mrCellPopulation.GetLocationIndexUsingCell(*cell_iter);
-            double this_delta = static_cast<DeltaNotchCellCycleModel*>(cell_iter->GetCellCycleModel())->GetDelta();
-            double this_notch = static_cast<DeltaNotchCellCycleModel*>(cell_iter->GetCellCycleModel())->GetNotch();
-            CellwiseData<DIM>::Instance()->SetValue(mean_delta[node_index], node_index, 0);
-            CellwiseData<DIM>::Instance()->SetValue(this_delta, node_index, 1);
-            CellwiseData<DIM>::Instance()->SetValue(this_notch, node_index, 2);
-        }
+        // Note that the state variables must be in the same order as listed in DeltaNotchOdeSystem
+        CellwiseData<DIM>::Instance()->SetValue(this_notch, index, 0);
+        CellwiseData<DIM>::Instance()->SetValue(this_delta, index, 1);
     }
-    else // assume a VertexBasedCellPopulation
+
+    // Next iterate over the population to compute and store each cell's neighbouring Delta concentration in CellwiseData
+    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mrCellPopulation.Begin();
+         cell_iter != this->mrCellPopulation.End();
+         ++cell_iter)
     {
-        // Loop over cells
-        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mrCellPopulation.Begin();
-             cell_iter != this->mrCellPopulation.End();
-             ++cell_iter)
+        // Get the location index corresponding to this cell
+        unsigned index = this->mrCellPopulation.GetLocationIndexUsingCell(*cell_iter);
+
+        // Get the set of neighbouring location indices            
+        std::set<unsigned> neighbour_indices;
+        if (dynamic_cast<AbstractCentreBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
         {
-            // Get the vertex element corresponding to this cell
-            unsigned element_index = this->mrCellPopulation.GetLocationIndexUsingCell(*cell_iter);
-            VertexElement<DIM,DIM>* p_element = static_cast<VertexBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->GetElement(element_index);
+            neighbour_indices = this->mrCellPopulation.GetNeighbouringNodeIndices(index);
+        }
+        else
+        {
+            neighbour_indices = static_cast<VertexBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->rGetMesh().GetNeighbouringElementIndices(index);
+        }
 
-            // Get a set of neighbouring element indices
-            std::set<unsigned> neighbour_indices;
-            for (unsigned local_index=0; local_index<p_element->GetNumNodes(); local_index++)
-            {
-                Node<DIM>* p_node = p_element->GetNode(local_index);
-                std::set<unsigned> elements = p_node->rGetContainingElementIndices();
-                std::set<unsigned> all_elements;
-                std::set_union(neighbour_indices.begin(), neighbour_indices.end(),
-                               elements.begin(), elements.end(),
-                               std::inserter(all_elements, all_elements.begin()));
-
-                neighbour_indices = all_elements;
-            }
-            neighbour_indices.erase(element_index);
-            unsigned num_neighbours = neighbour_indices.size();
-
-            // Compute mean Delta concentration, averaged over neighbours
+        // Compute this cell's average neighbouring Delta concentration and store in CellwiseData
+        if (!neighbour_indices.empty())
+        {
             double mean_delta = 0.0;
             for (std::set<unsigned>::iterator iter = neighbour_indices.begin();
                  iter != neighbour_indices.end();
                  ++iter)
             {
                 CellPtr p_cell = this->mrCellPopulation.GetCellUsingLocationIndex(*iter);
-                double delta = static_cast<DeltaNotchCellCycleModel*>(p_cell->GetCellCycleModel())->GetDelta();
-                if (num_neighbours != 0)
-                {
-                    mean_delta += delta/num_neighbours;
-                }
+                double this_delta = CellwiseData<DIM>::Instance()->GetValue(p_cell, 1);
+                mean_delta += this_delta/neighbour_indices.size();
             }
-
-            // Store this value in CellwiseData
-            CellwiseData<DIM>::Instance()->SetValue(mean_delta, p_element->GetIndex(), 0);
-
-            // Also store this cell's Delta and Notch concentrations
-            double this_delta = static_cast<DeltaNotchCellCycleModel*>(cell_iter->GetCellCycleModel())->GetDelta();
-            double this_notch = static_cast<DeltaNotchCellCycleModel*>(cell_iter->GetCellCycleModel())->GetNotch();
-            CellwiseData<DIM>::Instance()->SetValue(this_delta, p_element->GetIndex(), 1);
-            CellwiseData<DIM>::Instance()->SetValue(this_notch, p_element->GetIndex(), 2);
+            CellwiseData<DIM>::Instance()->SetValue(mean_delta, index, 2);
         }
     }
 }
