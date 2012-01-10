@@ -192,13 +192,12 @@ else:
     SConsignFile(os.path.join(COMMAND_LINE_TARGETS[0], '.sconsign'))
 
 # Chaste components (top level dirs).
-# We hard code dependencies between them, and use this to work out the
-# order to link them in.  Each one is linked against just its dependencies,
-# in the order given here.
+# Direct dependencies of each component are given, and a topological sort of the
+# full dependency graph done to figure out which components to link against in what order.
 comp_deps = {'cell_based': ['pde', 'ode', 'mesh', 'linalg', 'io', 'global'],
-             'crypt': ['cell_based', 'pde', 'ode', 'mesh', 'linalg', 'io', 'global'],
-             'notforrelease': ['heart', 'continuum_mechanics', 'pde', 'ode', 'mesh', 'linalg', 'io', 'global'],
-             'notforrelease_cell_based': ['crypt', 'cell_based', 'pde', 'ode', 'mesh', 'linalg', 'io', 'global'],
+             'crypt': ['cell_based'],
+             'notforrelease': ['heart'],
+             'notforrelease_cell_based': ['crypt', 'cell_based'],
              'heart': ['continuum_mechanics', 'pde', 'ode', 'mesh', 'linalg', 'io', 'global'],
              'continuum_mechanics': ['pde', 'ode', 'mesh', 'linalg', 'io', 'global'],
              'pde': ['ode', 'mesh', 'linalg', 'io', 'global'],
@@ -206,19 +205,19 @@ comp_deps = {'cell_based': ['pde', 'ode', 'mesh', 'linalg', 'io', 'global'],
              'linalg': ['global'],
              'ode': ['linalg', 'io', 'global'],
              'io': ['global'],
-             'global': [],
-             'core': ['pde', 'ode', 'mesh', 'linalg', 'io', 'global']}
-SConsTools.comp_deps = comp_deps
+             'global': []
+             }
 components = ['python', 'global', 'io', 'linalg', 'mesh', 'ode', 'pde', 'continuum_mechanics',
               'heart', 'cell_based', 'crypt', 'notforrelease', 'notforrelease_cell_based']
-# Ignore non-existent components
-# e.g. notforrelease wont appear in a release version
+# Ignore non-existent components, e.g. notforrelease wont appear in a release version
 for comp in components[:]:
     if not os.path.isdir(comp):
         components.remove(comp)
 Export('components', 'comp_deps')
 
-Alias('core', Split('global io linalg mesh ode pde continuum_mechanics'))
+# Virtual component aliasing all core components
+comp_deps['core'] = Split('global io linalg mesh ode pde continuum_mechanics')
+Alias('core', comp_deps['core'])
 
 # Set extra paths to search for libraries and include files.
 # Paths to PETSc, and any other external libraries, should be set here.
@@ -289,6 +288,8 @@ env.Replace(CPPPATH = cpppath)
 env['build'] = build
 env['buildsig'] = build.GetSignature()
 env['CHASTE_COMPONENTS'] = components + ['projects']
+env['CHASTE_COMP_DEPS'] = comp_deps
+env['CHASTE_LIBRARIES'] = {}
 env['CHASTE_OBJECTS'] = {}
 env['UPDATE_CHASTE_PROVENANCE'] = update_provenance
 
@@ -336,7 +337,7 @@ if hasattr(hostconfig.conf, 'ModifyEnv') and callable(hostconfig.conf.ModifyEnv)
     hostconfig.conf.ModifyEnv(env)
 
 # We need different linker flags when compiling dynamically loadable modules
-dynenv = env.Clone()
+dynenv = SConsTools.CloneEnv(env)
 env.Append(LINKFLAGS=' '+build.rdynamic_link_flag)
 # Try to avoid likely conflicts
 for path in [p for p in dynenv['CPPPATH'] if 'cellml' in str(p)]:
@@ -388,17 +389,7 @@ if not isinstance(build, BuildTypes.DoxygenCoverage):
         if not os.path.exists(bld_dir):
             os.mkdir(bld_dir)
         script = os.path.join(toplevel_dir, 'SConscript')
-        (test_logs, lib) = SConscript(script, src_dir=toplevel_dir, build_dir=bld_dir,
-                                      duplicate=0)
-        if not lib:
-            # This component hasn't created a library file, so don't try to link
-            # against it.  Happens if the component consists only of headers.
-            for v in comp_deps.itervalues():
-                try:
-                    v.remove(toplevel_dir)
-                except ValueError:
-                    pass
-        test_log_files.append(test_logs)
+        test_log_files.append(SConscript(script, src_dir=toplevel_dir, build_dir=bld_dir, duplicate=0))
     
     # Any user projects?
     for project in glob.glob('projects/*'):
@@ -417,8 +408,11 @@ if not isinstance(build, BuildTypes.DoxygenCoverage):
         if not os.path.exists(bld_dir):
             os.makedirs(bld_dir)
         script = os.path.join(project, 'SConscript')
-        test_log_files.append(SConscript(script, src_dir=project, build_dir=bld_dir,
-                                         duplicate=0))
+        test_log_files.append(SConscript(script, src_dir=project, build_dir=bld_dir, duplicate=0))
+    
+    # Calculate full library dependencies now we know what projects need
+    if use_chaste_libs:
+        SConsTools.DetermineLibraryDependencies(env, comp_deps)
     
     # Make sure test executables get built if compile_only=1
     env.Default(env.Alias('test_exes'))
@@ -452,10 +446,11 @@ def RequestedProjects():
 # Test summary generation
 if test_summary and not compile_only:
     # Copy the build env, since we change TargetSigs
-    senv = env.Clone()
+    senv = SConsTools.CloneEnv(env)
     # Get the directory to put results & summary in
     output_dir = build.output_dir
-    Execute(Mkdir(output_dir))
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
     # Remove old results. Note that this command gets run before anything is built.
     #for oldfile in os.listdir(output_dir):
     #    os.remove(os.path.join(output_dir, oldfile))

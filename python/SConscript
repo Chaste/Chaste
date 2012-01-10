@@ -42,7 +42,7 @@ os.chdir(curdir)
 # A list of test suites to run will be found in a test/<name>TestPack.txt
 # file, one per line.
 # Alternatively, a single test suite may have been specified on the command line.
-testfiles = SConsTools.FindTestsToRun(build, BUILD_TARGETS,
+testfiles = SConsTools.FindTestsToRun(env, build, BUILD_TARGETS,
                                       single_test_suite,
                                       single_test_suite_dir,
                                       all_tests,
@@ -67,5 +67,5 @@ if not compile_only:
         if force_test_runs:
             env.AlwaysBuild(log_file)
     
-result = (test_log_files, None)
+result = test_log_files
 Return("result")

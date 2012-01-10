@@ -48,6 +48,15 @@ import BuildTools
 relpath = BuildTools.relpath
 set = BuildTools.set
 
+def pns(nodes):
+    """Pretty-print nodes for debugging."""
+    return map(str, nodes)
+
+def tsp(*args):
+    """Thread-safer print, for debugging."""
+    msg = ' '.join(map(str, args)) + '\n'
+    print msg,
+
 # Should provide a whole-build global lock, if needed
 _lock = threading.Lock()
 
@@ -106,6 +115,7 @@ def FindSourceFiles(env, rootDir, ignoreDirs=[], dirsOnly=False, includeRoot=Fal
                                             GenerateCppFromValue)[0])
     return source_files, source_dirs
 
+
 def BuildTest(target, source, env):
     """A builder for test executables.
 
@@ -131,7 +141,10 @@ def BuildTest(target, source, env):
     """
     header_files = set()
     objects = []
-    #print sorted(env['CHASTE_OBJECTS'].keys())
+    #import thread
+    #tid = thread.get_ident()
+    #tsp(tid, source[0], sorted(env['CHASTE_OBJECTS'].keys()))
+    #tsp(tid, source[0], sorted(env['CHASTE_COMPONENTS']))
 
     def process(o):
         """Process an object file as described in BuildTest.__doc__"""
@@ -142,10 +155,11 @@ def BuildTest(target, source, env):
         o._chaste_lock.acquire()
         o.scan()
         o._chaste_lock.release()
+        # Now process the dependencies
         for d in o.implicit:
             hdr = str(d)
             if hdr not in header_files:
-                #print str(o), hdr, o.state
+                #tsp(tid, source[0], str(o), hdr, o.state)
                 header_files.add(hdr)
                 # Is this a Chaste header?
                 parts = hdr.split(os.path.sep)
@@ -163,20 +177,21 @@ def BuildTest(target, source, env):
                             has_source = source_filename in env['CHASTE_OBJECTS']
                             if has_source:
                                 break
+                    #tsp(tid, source[0], base, has_source)
                     if has_source:
                         # Find the object file(s) and analyse it/them
                         objs = env['CHASTE_OBJECTS'][source_filename]
                         objects.extend(objs)
                         for obj in objs:
-                            #print str(obj), obj.state
+                            #tsp(tid, str(obj), obj.state)
                             process(obj)
 
     for o in source:
-        #print str(o), o.state
+        #tsp(tid, str(o), o.state)
         process(o)
     # Build the test itself
     runner = env['RUNNER_EXE']
-    #print "Building", runner, "from", pns(source+objects)
+    #tsp("Building", runner, "from", pns(source+objects), "by", tid)
     actual_runner = env['TestBuilder'](target=runner, source=source+objects)
     env.Alias('test_exes', actual_runner)
     assert actual_runner[0] is runner # Just in case
@@ -192,12 +207,87 @@ def RegisterObjects(env, key, objs):
         if src.is_derived():
             env['CHASTE_OBJECTS'][src.path] = [obj]
 
-def pns(nodes):
-    """Pretty-print nodes for debugging"""
-    return map(str, nodes)
+
+def CloneEnv(env):
+    """Clone a construction environment, but don't copy some objects.
+    
+    There are a couple of special dictionaries which need to be the same object in all
+    environments, to ensure that updates are shared.  So after calling the normal Clone
+    we need to refer back to the original.
+    """
+    newenv = env.Clone()
+    newenv['CHASTE_OBJECTS'] = env['CHASTE_OBJECTS']
+    newenv['CHASTE_COMP_DEPS'] = env['CHASTE_COMP_DEPS']
+    newenv['CHASTE_LIBRARIES'] = env['CHASTE_LIBRARIES']
+    return newenv
 
 
-def FindTestsToRun(build, BUILD_TARGETS,
+def DetermineLibraryDependencies(env, partialGraph):
+    """Determine which Chaste libraries each component/project needs to link against.
+    
+    The supplied partial dependency graph maps each component/project to a list of its
+    direct dependencies.  On exit from this method each will be mapped instead to an
+    ordered list of all its direct and indirect dependencies.  The ordering is based
+    on a topological sort, with each component listed prior to its dependencies, and
+    so determines the linker command line.
+    """
+    if env['build'].debug:
+        print "Initial component dependencies:", partialGraph
+    WHITE, GRAY, BLACK = 0, 1, 2
+    full_graph = {}
+    def get_lib(comp, projectOnly=False):
+        """Get the library node for a component."""
+        if not isinstance(comp, type('')):
+            lib = comp # It's already a library node
+        elif comp == 'core':
+            lib = None # Not a real library
+        elif projectOnly and not comp.startswith('projects'):
+            lib = comp # We should link components with -lcomp, not linklib/libcomp.so
+        else:
+            lib = env['CHASTE_LIBRARIES'][comp]
+        return lib
+    def process_comp(node, root, colours={}, gray_stack=[]):
+        """Sort the dependencies for a single component."""
+        colours[node] = GRAY
+        gray_stack.append(node)
+        for dep in partialGraph[node]:
+            if dep not in partialGraph:
+                raise ValueError("Chaste library %s is listed as a dependency of %s but doesn't exist"
+                                 % (dep, node))
+            dep_col = colours.get(dep, WHITE)
+            if dep_col is GRAY:
+                i = gray_stack.index(dep)
+                raise ValueError("Chaste library dependency cycle found, with the following libraries: "
+                                 + ', '.join(gray_stack[i:]))
+            elif dep_col is WHITE:
+                process_comp(dep, root, colours, gray_stack)
+        colours[node] = BLACK
+        gray_stack.pop()
+        if node is not root:
+            node_lib = get_lib(node, projectOnly=True)
+            if node_lib:
+                full_graph[root].append(node_lib)
+        else:
+            # Prior to this we have each node listed *after* all its dependencies
+            full_graph[root].reverse()
+            colours.clear() # So it's ready for the next root
+    for comp in partialGraph:
+        if comp != 'core':
+            full_graph[comp] = []
+            process_comp(comp, comp)
+            comp_lib = get_lib(comp)
+            if comp_lib:
+                deps = map(get_lib, full_graph[comp])
+                if deps:
+                    env.Depends(comp_lib, deps)
+    if env['build'].debug:
+        print "Complete component dependencies:", full_graph
+    # Transfer results to partialGraph
+    partialGraph.clear()
+    partialGraph.update(full_graph)
+
+
+def FindTestsToRun(env, build, BUILD_TARGETS,
                    singleTestSuite, singleTestSuiteDir, allTests,
                    component=None, project=None):
     """Find header files defining tests to run.
@@ -238,7 +328,7 @@ def FindTestsToRun(build, BUILD_TARGETS,
         test_this_comp = False
         root_dir = Dir('#').abspath
         this_comp_targets = ['.', root_dir]
-        if not project and component in comp_deps['core']:
+        if not project and component in env['CHASTE_COMP_DEPS']['core']:
             this_comp_targets.append('core')
         if project:
             this_comp_targets.extend(
@@ -617,7 +707,7 @@ def BuildExes(build, env, appsPath, components, otherVars, project=None):
     project, if given, means we're building executables for that project, and hence
     need to link against its library too.
     """
-    env = env.Clone()
+    env = CloneEnv(env)
     src_path = os.path.join(appsPath, 'src')
 
     if otherVars['static_libs']:
@@ -650,7 +740,7 @@ def BuildExes(build, env, appsPath, components, otherVars, project=None):
             RunAcceptanceTests(build, env, appsPath, test_path, exes, otherVars)
 
 
-def ScheduleTestBuild(env, env_with_libs, testfile, prefix, use_chaste_libs):
+def ScheduleTestBuild(env, overrides, testfile, prefix, use_chaste_libs):
     """Set the compilation of a single test.
     
     This handles the logic of building with or without chaste_libs, and ensures
@@ -658,7 +748,7 @@ def ScheduleTestBuild(env, env_with_libs, testfile, prefix, use_chaste_libs):
     projects and core components.
     
     @param env  the main SCons environment to use
-    @param env_with_libs  the environment for building the test runner with chaste_libs
+    @param overrides  construction variable overrides for building the test exe
     @param testfile  the path of the test .hpp file, relative to the 'test' folder
     @param prefix  testfile without extension
     @param use_chaste_libs  whether to use chaste_libs
@@ -668,7 +758,7 @@ def ScheduleTestBuild(env, env_with_libs, testfile, prefix, use_chaste_libs):
     runner_exe = env.File(ExeName(env, prefix+'Runner'))
     if use_chaste_libs:
         runner_dummy = None
-        runner_exe = env_with_libs.Program(runner_exe, runner_cpp)
+        runner_exe = env.Program(runner_exe, runner_cpp, **overrides)
         # Make sure we build the test unless the user says otherwise
         env.Default(runner_exe)
     else:
@@ -703,7 +793,7 @@ def DoDynamicallyLoadableModules(otherVars):
     # Build any dynamically loadable modules
     dyn_libs = []
     if dyn_cpppath:
-        dyn_env = otherVars['dynenv'].Clone()
+        dyn_env = CloneEnv(otherVars['dynenv'])
         dyn_env.Prepend(CPPPATH=dyn_cpppath)
     else:
         dyn_env = otherVars['dynenv']
@@ -729,7 +819,7 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
         import os
         Import("*")
         project_name = os.path.basename(os.path.dirname(os.path.dirname(os.getcwd())))
-        chaste_libs_used = comp_deps['core']
+        chaste_libs_used = comp_deps['core'] # or ['heart'], ['cell_based', 'crypt'], etc.
         result = SConsTools.DoProjectSConscript(project_name, chaste_libs_used, globals())
         Return("result")
     """
@@ -738,6 +828,9 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
     # Commonly used variables
     env = otherVars['env']
     use_chaste_libs = otherVars['use_chaste_libs']
+    project_path = os.path.join('projects', projectName)
+    # Store our dependencies
+    env['CHASTE_COMP_DEPS'][project_path] = chasteLibsUsed
     # Note that because we are using SCons' variant dir functionality, and the build
     # dir is created before the SConscript files are executed, that the working dir
     # will be set to <project>/build/<something>.
@@ -750,14 +843,20 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
     testsource, test_cpppath = FindSourceFiles(env, 'test', ignoreDirs=['data'])
     extra_cpppath.extend(test_cpppath)
     del test_cpppath
+    # Add project dependencies to the include search path
+    os.chdir(Dir('#').abspath)
+    for dep in chasteLibsUsed:
+        if dep.startswith('projects'):
+            proj_dirs = FindSourceFiles(env, os.path.join(dep, 'src'), ignoreDirs=['broken'],
+                                        dirsOnly=True, includeRoot=True)
+            extra_cpppath.extend(map(lambda s: os.path.join(Dir('#').abspath, s), proj_dirs))
     # Move back to the build dir
     os.chdir(curdir)
 
     # Look for files containing a test suite
-    # A list of test suites to run will be found in a test/<name>TestPack.txt
-    # file, one per line.
+    # A list of test suites to run will be found in a test/<name>TestPack.txt file, one per line.
     # Alternatively, a single test suite may have been specified on the command line.
-    testfiles = FindTestsToRun(otherVars['build'], otherVars['BUILD_TARGETS'],
+    testfiles = FindTestsToRun(env, otherVars['build'], otherVars['BUILD_TARGETS'],
                                otherVars['single_test_suite'],
                                otherVars['single_test_suite_dir'],
                                otherVars['all_tests'],
@@ -767,56 +866,51 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
 
     # Add extra source and test folders to CPPPATH only for this project
     if extra_cpppath:
-        newenv = env.Clone()
-        newenv.Prepend(CPPPATH=extra_cpppath)
-        # Make sure both envs reference the same dict *object*,
-        # so updates in one env are reflected in all.
-        newenv['CHASTE_OBJECTS'] = env['CHASTE_OBJECTS']
-        env = newenv
+        env = CloneEnv(env)
+        env.Prepend(CPPPATH=extra_cpppath)
     
     # Build any dynamically loadable modules
     dyn_libs = DoDynamicallyLoadableModules(otherVars)
 
     # Libraries to link against (TODO: only add project libs if sources exist)
-    all_libs = ['test'+projectName, projectName] + chasteLibsUsed + otherVars['other_libs']
+    chaste_libs = ["${CHASTE_COMP_DEPS['%s']}" % project_path]
+    all_libs = ['test'+projectName, projectName] + chaste_libs + otherVars['other_libs']
 
     if use_chaste_libs:
         # Build the library for this project
-        project_lib = env.StaticLibrary(projectName, files)
+        project_lib = env.StaticLibrary(projectName, files)[0]
         
         # Build the test library for this project
-        test_lib = env.StaticLibrary('test'+projectName, testsource)
+        test_lib = env.StaticLibrary('test'+projectName, testsource)[0]
     else:
         # Build the object files for this project
         project_lib = test_lib = None
         for source_file in files + testsource:
             objs = env.StaticObject(source_file)
-            key = os.path.join('projects', projectName, source_file)
+            key = os.path.join(project_path, source_file)
             RegisterObjects(env, key, objs)
+    env['CHASTE_LIBRARIES'][project_path] = project_lib
 
-    # Make test output depend on shared libraries, so if implementation changes
-    # then tests are re-run.
+    # Make test output depend on shared libraries, so if implementation changes then tests are re-run.
     lib_deps = [project_lib, test_lib] # only this project's libraries
     #lib_deps.extend(map(lambda lib: '#lib/lib%s.so' % lib, chasteLibsUsed)) # all Chaste libs used
 
-    # Collect a list of test log files to use as dependencies for the test
-    # summary generation
+    # Collect a list of test log files to use as dependencies for the test summary generation
     test_log_files = []
 
     # Build and run tests of this project
     if testfiles:
         if not use_chaste_libs:
-            buildenv = env.Clone(LIBS=otherVars['other_libs'],
-                                 LIBPATH=otherVars['other_libpaths'])
-            env['TestBuilder'] = \
-                lambda target, source: buildenv.Program(target, source)
+            overrides = {'LIBS': otherVars['other_libs'],
+                         'LIBPATH': otherVars['other_libpaths']}
+            env['TestBuilder'] = lambda target, source: env.Program(target, source, **overrides)
         else:
-            buildenv = env.Clone(LIBS = all_libs,
-                                 LIBPATH = ['#/lib', '.'] + otherVars['other_libpaths'])
+            overrides = {'LIBS': all_libs,
+                         'LIBPATH': ['#/lib', '.'] + otherVars['other_libpaths']}
     for testfile in testfiles:
         prefix = os.path.splitext(testfile)[0]
         #print projectName, 'test', prefix
-        (runner_exe, runner_dummy) = ScheduleTestBuild(env, buildenv, testfile, prefix, use_chaste_libs)
+        (runner_exe, runner_dummy) = ScheduleTestBuild(env, overrides, testfile, prefix, use_chaste_libs)
         if not otherVars['compile_only']:
             log_file = env.File(prefix+'.log')
             if use_chaste_libs:
@@ -843,10 +937,10 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
     return test_log_files
 
 def CheckForSpecialFiles(env, component, files, otherVars):
+    """Schedule compiles of source files that need special compilation flags."""
     special_files = [('mesh', 'src/3rdparty/tetgen1.4.2/predicates.cpp')]
     special_objs = []
-    special_env = env.Clone()
-    special_env.Replace(CCFLAGS='-O0')
+    overrides = {'CCFLAGS': '-O0'}
     for special_comp, special_file in special_files:
         if special_comp == component and special_file in files:
             # Remove from files
@@ -854,11 +948,11 @@ def CheckForSpecialFiles(env, component, files, otherVars):
             # Handle specially
             if otherVars['use_chaste_libs']:
                 if otherVars['static_libs']:
-                    special_objs.extend(special_env.StaticObject(special_file))
+                    special_objs.extend(env.StaticObject(special_file, **overrides))
                 else:
-                    special_objs.extend(special_env.SharedObject(special_file))
+                    special_objs.extend(env.SharedObject(special_file, **overrides))
             else:
-                objs = special_env.StaticObject(special_file)
+                objs = env.StaticObject(special_file, **overrides)
                 key = os.path.join(component, str(special_file))
                 RegisterObjects(env, key, objs)
                 special_objs.extend(objs)
@@ -906,7 +1000,7 @@ def DoComponentSConscript(component, otherVars):
     # A list of test suites to run will be found in a test/<name>TestPack.txt
     # file, one per line.
     # Alternatively, a single test suite may have been specified on the command line.
-    testfiles = FindTestsToRun(otherVars['build'], otherVars['BUILD_TARGETS'],
+    testfiles = FindTestsToRun(env, otherVars['build'], otherVars['BUILD_TARGETS'],
                                otherVars['single_test_suite'],
                                otherVars['single_test_suite_dir'],
                                otherVars['all_tests'],
@@ -916,13 +1010,9 @@ def DoComponentSConscript(component, otherVars):
     
     # Add test folders to CPPPATH only for this component
     if test_cpppath:
-        newenv = env.Clone()
-        newenv.Prepend(CPPPATH=test_cpppath)
-        # Make sure both envs reference the same dict *object*,
-        # so updates in one env are reflected in all.
-        newenv['CHASTE_OBJECTS'] = env['CHASTE_OBJECTS']
-        env = newenv
-    
+        env = CloneEnv(env)
+        env.Prepend(CPPPATH=test_cpppath)
+
     # Build any dynamically loadable modules
     dyn_libs = DoDynamicallyLoadableModules(otherVars)
     
@@ -934,12 +1024,14 @@ def DoComponentSConscript(component, otherVars):
             lib = env.StaticLibrary(component, files + special_objects)
             lib = env.Install('#lib', lib)
             libpath = '#lib'
+            env['CHASTE_LIBRARIES'][component] = lib[0]
         else:
             if files:
                 lib = env.SharedLibrary(component, files + special_objects)
             else:
                 lib = None
             libpath = '#linklib'
+            # env['CHASTE_LIBRARIES'][component] is set by fasterSharedLibrary
         # Build the test library for this component
         env.StaticLibrary('test'+component, testsource)
         # Install libraries?
@@ -957,9 +1049,9 @@ def DoComponentSConscript(component, otherVars):
     # Determine libraries to link against.
     # Note that order does matter!
     if lib:
-        chaste_libs = [component] + otherVars['comp_deps'][component]
+        chaste_libs = [component] + ["${CHASTE_COMP_DEPS['%s']}" % component]
     else:
-        chaste_libs = otherVars['comp_deps'][component]
+        chaste_libs = ["${CHASTE_COMP_DEPS['%s']}" % component]
     all_libs = ['test'+component] + chaste_libs + otherVars['other_libs']
     
     # Make test output depend on shared libraries, so if implementation changes
@@ -975,18 +1067,17 @@ def DoComponentSConscript(component, otherVars):
     # Build and run tests of this component
     if testfiles:
         if not use_chaste_libs:
-            buildenv = env.Clone(LIBS=otherVars['other_libs'],
-                                 LIBPATH=otherVars['other_libpaths'])
-            env['TestBuilder'] = \
-                lambda target, source: buildenv.Program(target, source)
+            overrides = {'LIBS': otherVars['other_libs'],
+                         'LIBPATH': otherVars['other_libpaths']}
+            env['TestBuilder'] = lambda target, source: env.Program(target, source, **overrides)
         else:
-            buildenv = env.Clone(LIBS = all_libs,
-                                 LIBPATH = [libpath, '.'] + otherVars['other_libpaths'])
+            overrides = {'LIBS': all_libs,
+                         'LIBPATH': [libpath, '.'] + otherVars['other_libpaths']}
     
     for testfile in testfiles:
         prefix = os.path.splitext(testfile)[0]
         #print component, 'test', prefix
-        (runner_exe, runner_dummy) = ScheduleTestBuild(env, buildenv, testfile, prefix, use_chaste_libs)
+        (runner_exe, runner_dummy) = ScheduleTestBuild(env, overrides, testfile, prefix, use_chaste_libs)
         if not otherVars['compile_only']:
             log_file = env.File(prefix+'.log')
             if use_chaste_libs:
@@ -1001,4 +1092,4 @@ def DoComponentSConscript(component, otherVars):
             if otherVars['force_test_runs']:
                 env.AlwaysBuild(log_file)
     
-    return (test_log_files, lib)
+    return test_log_files
