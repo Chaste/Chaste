@@ -280,6 +280,12 @@ def DetermineLibraryDependencies(env, partialGraph):
                 deps = map(get_lib, full_graph[comp])
                 if deps:
                     env.Depends(comp_lib, deps)
+    for comp in full_graph:
+        for i, dep in enumerate(full_graph[comp]):
+            if isinstance(dep, type('')):
+                full_graph[comp][i] = '-l' + dep
+            else:
+                full_graph[comp][i] = dep.abspath
     if env['build'].debug:
         print "Complete component dependencies:", full_graph
     # Transfer results to partialGraph
