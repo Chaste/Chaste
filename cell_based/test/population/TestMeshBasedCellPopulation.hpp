@@ -510,16 +510,6 @@ public:
         // Create cell population
         MeshBasedCellPopulation<2> cell_population2d(mesh2d, cells2d);
 
-        // Create Voronoi tessellation
-        cell_population2d.CreateVoronoiTessellation();
-
-        // Test element areas
-        TS_ASSERT_DELTA(cell_population2d.GetVolumeOfVoronoiElement(0), 0.0, 1e-6);
-        TS_ASSERT_DELTA(cell_population2d.GetVolumeOfVoronoiElement(1), 0.0, 1e-6);
-        TS_ASSERT_DELTA(cell_population2d.GetVolumeOfVoronoiElement(2), 0.0, 1e-6);
-        TS_ASSERT_DELTA(cell_population2d.GetVolumeOfVoronoiElement(3), 0.0, 1e-6);
-        TS_ASSERT_DELTA(cell_population2d.GetVolumeOfVoronoiElement(4), 0.5, 1e-6);
-
         // For coverage of GetVolumeOfCell()
         for (AbstractCellPopulation<2>::Iterator iter = cell_population2d.Begin();
              iter != cell_population2d.End();
@@ -534,6 +524,15 @@ public:
                 TS_ASSERT_DELTA(cell_population2d.GetVolumeOfCell(*iter), 0.0, 1e-6);
             }
         }
+
+        // The Voronoi tessellation has been created by this point, since GetVolumeOfCell() has been called
+
+        // Test element areas
+        TS_ASSERT_DELTA(cell_population2d.GetVolumeOfVoronoiElement(0), 0.0, 1e-6);
+        TS_ASSERT_DELTA(cell_population2d.GetVolumeOfVoronoiElement(1), 0.0, 1e-6);
+        TS_ASSERT_DELTA(cell_population2d.GetVolumeOfVoronoiElement(2), 0.0, 1e-6);
+        TS_ASSERT_DELTA(cell_population2d.GetVolumeOfVoronoiElement(3), 0.0, 1e-6);
+        TS_ASSERT_DELTA(cell_population2d.GetVolumeOfVoronoiElement(4), 0.5, 1e-6);
 
         // Test element perimeters
         TS_ASSERT_DELTA(cell_population2d.GetSurfaceAreaOfVoronoiElement(0), sqrt(2), 1e-6);

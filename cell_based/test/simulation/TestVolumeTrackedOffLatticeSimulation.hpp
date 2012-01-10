@@ -26,8 +26,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#ifndef TESTOFFLATTICESIMULATIONWITHVOLUMETRACKED_HPP_
-#define TESTOFFLATTICESIMULATIONWITHVOLUMETRACKED_HPP_
+#ifndef TESTVOLUMETRACKEDOFFLATTICESIMULATION_HPP_
+#define TESTVOLUMETRACKEDOFFLATTICESIMULATION_HPP_
 
 #include <cxxtest/TestSuite.h>
 
@@ -69,8 +69,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CellsGenerator.hpp"
 #include "Warnings.hpp"
 
-///\todo This test suite would be better named TestVolumeTrackedOffLatticeSimulation
-class TestOffLatticeSimulationWithVolumeTracked : public AbstractCellBasedTestSuite
+class TestVolumeTrackedOffLatticeSimulation : public AbstractCellBasedTestSuite
 {
 public:
 
@@ -332,4 +331,4 @@ public:
     }
 };
 
-#endif /*TESTOFFLATTICESIMULATIONWITHVOLUMETRACKED_HPP_*/
+#endif /*TESTVOLUMETRACKEDOFFLATTICESIMULATION_HPP_*/
