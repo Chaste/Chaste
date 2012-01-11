@@ -341,6 +341,7 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::SetUseTimeAdapti
     }
 }
 
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Solve()
 {
@@ -453,13 +454,26 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Solve()
 
         try
         {
-            mSolution = mpSolver->Solve();
+            try
+            {
+                mSolution = mpSolver->Solve();
+            }
+            catch (const Exception &e)
+            {
+#ifndef NDEBUG
+                PetscTools::ReplicateException(true);
+                throw e;
+#endif
+            }
+#ifndef NDEBUG
+            PetscTools::ReplicateException(false);
+#endif
         }
-        catch (Exception &e)
+        catch (const Exception& e)
         {
             // Free memory
             delete mpSolver;
-            mpSolver=NULL;
+            mpSolver = NULL;
             if (initial_condition != mSolution)
             {
                 /*
@@ -467,24 +481,17 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Solve()
                  * freed somewhere else (e.g. in the destructor). Later, in this while loop
                  * we will set initial_condition = mSolution (or, if this is a resumed solution
                  * it may also have been done when initial_condition was created). mSolution
-                 * is going to be cleaned up in the constructor. So, only VecDestroy
+                 * is going to be cleaned up in the destructor. So, only VecDestroy
                  * initial_condition when it is not equal to mSolution (see #1695).
                  */
                 VecDestroy(initial_condition);
             }
 
-#ifndef NDEBUG
-            PetscTools::ReplicateException(true);
-#endif
             // Re-throw
-            HeartEventHandler::Reset();//EndEvent(HeartEventHandler::EVERYTHING);
-            ///\todo #1318 the following line will deadlock if not every process throws in the Solve call
+            HeartEventHandler::Reset();
             CloseFilesAndPostProcess();
             throw e;
         }
-#ifndef NDEBUG
-        PetscTools::ReplicateException(false);
-#endif
 
         // Free old initial condition
         HeartEventHandler::BeginEvent(HeartEventHandler::COMMUNICATION);
