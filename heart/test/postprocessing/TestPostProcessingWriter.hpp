@@ -289,6 +289,27 @@ public:
         NumericFileComparison comp(file1, file2);
         TS_ASSERT(comp.CompareFiles(1e-12));
     }
+
+    void TestSwitchingOutputFormat() throw (Exception)
+    {
+        HeartConfig::Instance()->Reset();
+        HeartConfig::Instance()->SetVisualizeWithCmgui();
+
+        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
+        DistributedTetrahedralMesh<1,1> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        std::string output_dir = "ChasteResults/cmgui_output"; // default given by HeartConfig
+        PostProcessingWriter<1,1> writer(mesh, "heart/test/data", "postprocessingapd", false);
+
+        writer.WriteApdMapFile(60.0, -30.0);
+
+        std::string file1 = OutputFileHandler::GetChasteTestOutputDirectory() + output_dir + "/Apd_60_-30_Map.dat";
+        std::string file2 = "heart/test/data/PostProcessorWriter/good_apd_postprocessing.dat";
+        NumericFileComparison comp(file1, file2);
+        TS_ASSERT(comp.CompareFiles(1e-12));
+
+    }
 };
 
 

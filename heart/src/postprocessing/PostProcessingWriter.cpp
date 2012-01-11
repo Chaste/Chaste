@@ -36,6 +36,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "Version.hpp"
 #include "HeartEventHandler.hpp"
 
+///\todo #1660 remove warnings
+#include "Warnings.hpp"
 #include <iostream>
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -61,8 +63,22 @@ PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::PostProcessingWriter(AbstractTetra
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WritePostProcessingFiles()
 {
-// Please note that only the master processor should write to file.
-// Each of the private methods called here takes care of checking.
+	//Check that post-processing is really needed
+	///\todo #1660 Check for warnings in output
+	if(!HeartConfig::Instance()->IsPostProcessingRequested())
+	{
+		WARNING("PostProcessingWriter might not be needed in this case (#1660)");
+	}
+
+	//Check that it's safe to send the results to the (hard-code) subfolder for Meshalyzer
+	///\todo #1660 Check for warnings in output
+	if(!HeartConfig::Instance()->GetVisualizeWithMeshalyzer())
+	{
+		WARNING("PostProcessingWriter might not be needed in this case (#1660)");
+	}
+
+	// Please note that only the master processor should write to file.
+	// Each of the private methods called here takes care of checking.
 
     if (HeartConfig::Instance()->IsApdMapsRequested())
     {
@@ -258,7 +274,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteAboveThresholdDepolarisa
             total_number_of_above_threshold_depolarisations = total_number_of_above_threshold_depolarisations + above_threshold_depolarisations[ead_index];
         }
 
-        //for this item, puch back the number of upstrokes...
+        //for this item, push back the number of upstrokes...
         if (no_upstroke_occurred)
         {
             output_item.push_back(0);
@@ -267,7 +283,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteAboveThresholdDepolarisa
         {
             output_item.push_back(upstroke_velocities.size());
         }
-        //... and the number of above thrshold depolarisations
+        //... and the number of above threshold depolarisations
         output_item.push_back((double) total_number_of_above_threshold_depolarisations);
 
         output_data.push_back(output_item);
@@ -288,7 +304,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteVariablesOverTimeAtNodes
         std::vector<std::vector<double> > output_data;
         if (PetscTools::AmMaster())//only master process fills the data structure
         {
-            //allocate memory: NXM matrix where N = numbe rof time stpes and M number of requested nodes
+            //allocate memory: NXM matrix where N = number of time steps and M number of requested nodes
             output_data.resize( mpDataReader->GetUnlimitedDimensionValues().size() );
             for (unsigned j = 0; j < mpDataReader->GetUnlimitedDimensionValues().size(); j++)
             {
@@ -326,10 +342,19 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteVariablesOverTimeAtNodes
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteGenericFile(std::vector<std::vector<double> >& rDataPayload, std::string fileName)
 {
-    OutputFileHandler output_file_handler(HeartConfig::Instance()->GetOutputDirectory() + "/output", false);
+    std::string sub_folder = "output";
+	if(HeartConfig::Instance()->GetVisualizeWithCmgui())
+	{
+		//Special case - want to check it Meshalyzer output has also been requested...
+	    sub_folder = "cmgui_output";
+	}
+
+	OutputFileHandler output_file_handler(HeartConfig::Instance()->GetOutputDirectory() + "/" + sub_folder, false);
+
+
     for (unsigned writing_process=0; writing_process<PetscTools::GetNumProcs(); writing_process++)
     {
-        if(PetscTools::GetMyRank() == writing_process)
+    	if(PetscTools::GetMyRank() == writing_process)
         {
             out_stream p_file=out_stream(NULL);
             if (PetscTools::AmMaster())
