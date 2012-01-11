@@ -257,6 +257,38 @@ public:
      * @param rParallelLayout If provided, rMat will have the same parallel layout. Its content is irrelevant.
      */
     static void ReadPetscObject(Vec& rVec, const std::string& rOutputFileFullPath, Vec rParallelLayout=NULL);
+
+    /**
+     * Destroy method
+     * Note that PETSc 3.1 and previous destroy based on a PETSc object
+     * but PETSc 3.2 and later destroy based on a pointer to a PETSc object
+     * 
+     * @param rVec a reference to the PETSc object
+     */
+     static inline void Destroy(Vec& rVec)
+     {
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
+        VecDestroy(&rVec);
+#else
+        VecDestroy(rVec);
+#endif   
+     }
+     
+    /**
+     * Destroy method
+     * Note that PETSc 3.1 and previous destroy based on a PETSc object
+     * but PETSc 3.2 and later destroy based on a pointer to a PETSc object
+     * 
+     * @param rMat a reference to the PETSc object
+     */
+     static inline void Destroy(Mat& rMat)
+     {
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
+        MatDestroy(&rMat);
+#else
+        MatDestroy(rMat);
+#endif   
+     }        
 };
 
 #endif /*PETSCTOOLS_HPP_*/

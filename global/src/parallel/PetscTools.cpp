@@ -372,7 +372,7 @@ void PetscTools::ReadPetscObject(Mat& rMat, const std::string& rOutputFileFullPa
 
         MatCopy(rMat, temp_mat, DIFFERENT_NONZERO_PATTERN);
 
-        MatDestroy(rMat);
+        Destroy(rMat);
         rMat = temp_mat;
     }
 }
@@ -399,3 +399,5 @@ void PetscTools::ReadPetscObject(Vec& rVec, const std::string& rOutputFileFullPa
     }
     PetscViewerDestroy(view);
 }
+
+
