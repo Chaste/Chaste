@@ -1423,17 +1423,17 @@ bool HeartConfig::GetCheckpointSimulation() const
     {
         if (IsSimulationDefined())
         {
-            CheckSimulationIsDefined("GetSaveSimulation");
-            DecideLocation( & mpUserParameters->Simulation()->CheckpointSimulation(),
-                            & mpDefaultParameters->Simulation()->CheckpointSimulation(),
-                            "Simulation/SaveSimulation");
+            CheckSimulationIsDefined("GetCheckpointSimulation");
+            DecideLocation(& mpUserParameters->Simulation()->CheckpointSimulation(),
+                           & mpDefaultParameters->Simulation()->CheckpointSimulation(),
+                           "CheckpointSimulation");
         }
-        else /// \todo #1160 What code covers this?  Should be removed ideally.
+        else
         {
-            CheckResumeSimulationIsDefined("GetSaveSimulation");
-            DecideLocation( & mpUserParameters->ResumeSimulation()->CheckpointSimulation(),
-                            & mpDefaultParameters->Simulation()->CheckpointSimulation(),
-                            "ResumeSimulation/SaveSimulation");
+            CheckResumeSimulationIsDefined("GetCheckpointSimulation");
+            DecideLocation(& mpUserParameters->ResumeSimulation()->CheckpointSimulation(),
+                           & mpDefaultParameters->Simulation()->CheckpointSimulation(),
+                           "CheckpointSimulation");
         }
         return true;
     }
@@ -1447,17 +1447,17 @@ double HeartConfig::GetCheckpointTimestep() const
 {
     if (IsSimulationDefined())
     {
-        CheckSimulationIsDefined("GetSaveSimulation");
-        return DecideLocation( & mpUserParameters->Simulation()->CheckpointSimulation(),
-                        & mpDefaultParameters->Simulation()->CheckpointSimulation(),
-                        "Simulation/SaveSimulation")->get().timestep();
+        CheckSimulationIsDefined("GetCheckpointTimestep");
+        return DecideLocation(& mpUserParameters->Simulation()->CheckpointSimulation(),
+                              & mpDefaultParameters->Simulation()->CheckpointSimulation(),
+                              "CheckpointSimulation")->get().timestep();
     }
-    else /// \todo #1160 What code covers this?  Should be removed ideally.
+    else
     {
-        CheckResumeSimulationIsDefined("GetSaveSimulation");
-        return DecideLocation( & mpUserParameters->ResumeSimulation()->CheckpointSimulation(),
-                        & mpDefaultParameters->Simulation()->CheckpointSimulation(),
-                        "ResumeSimulation/SaveSimulation")->get().timestep();
+        CheckResumeSimulationIsDefined("GetCheckpointTimestep");
+        return DecideLocation(& mpUserParameters->ResumeSimulation()->CheckpointSimulation(),
+                              & mpDefaultParameters->Simulation()->CheckpointSimulation(),
+                              "CheckpointSimulation")->get().timestep();
     }
 }
 
@@ -1465,17 +1465,17 @@ unsigned HeartConfig::GetMaxCheckpointsOnDisk() const
 {
     if (IsSimulationDefined())
     {
-        CheckSimulationIsDefined("GetSaveSimulation");
-        return DecideLocation( & mpUserParameters->Simulation()->CheckpointSimulation(),
-                        & mpDefaultParameters->Simulation()->CheckpointSimulation(),
-                        "Simulation/SaveSimulation")->get().max_checkpoints_on_disk();
+        CheckSimulationIsDefined("GetMaxCheckpointsOnDisk");
+        return DecideLocation(& mpUserParameters->Simulation()->CheckpointSimulation(),
+                              & mpDefaultParameters->Simulation()->CheckpointSimulation(),
+                              "CheckpointSimulation")->get().max_checkpoints_on_disk();
     }
-    else /// \todo #1160 What code covers this?  Should be removed ideally.
+    else
     {
-        CheckResumeSimulationIsDefined("GetSaveSimulation");
-        return DecideLocation( & mpUserParameters->ResumeSimulation()->CheckpointSimulation(),
-                        & mpDefaultParameters->Simulation()->CheckpointSimulation(),
-                        "ResumeSimulation/SaveSimulation")->get().max_checkpoints_on_disk();
+        CheckResumeSimulationIsDefined("GetMaxCheckpointsOnDisk");
+        return DecideLocation(& mpUserParameters->ResumeSimulation()->CheckpointSimulation(),
+                              & mpDefaultParameters->Simulation()->CheckpointSimulation(),
+                              "CheckpointSimulation")->get().max_checkpoints_on_disk();
     }
 }
 
