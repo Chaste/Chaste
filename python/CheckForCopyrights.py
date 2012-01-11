@@ -26,6 +26,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
+import re
 import sys
 
 # Check, apply or modify the copyright notice
@@ -42,9 +43,8 @@ if '-dir' in sys.argv:
     i = sys.argv.index('-dir')
     chaste_dir = os.path.realpath(sys.argv[i+1])
 
-#This next variable is unused -- it shows the previous deprecated notice
-#as a mechanism for rolling the notice forward
-previous_deprecated_notice="""Copyright (C) University of Oxford, 2005-2008
+
+deprecated_notice = re.compile(r"""Copyright \(C\) University of Oxford, 2005-\d{4}
 
 University of Oxford means the Chancellor, Masters and Scholars of the
 University of Oxford, having an administrative office at Wellington
@@ -55,7 +55,7 @@ This file is part of Chaste.
 Chaste is free software: you can redistribute it and/or modify it
 under the terms of the GNU Lesser General Public License as published
 by the Free Software Foundation, either version 2.1 of the License, or
-(at your option) any later version.
+\(at your option\) any later version.
 
 Chaste is distributed in the hope that it will be useful, but WITHOUT
 ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -67,32 +67,7 @@ being under the jurisdiction of the English Courts.
 
 You should have received a copy of the GNU Lesser General Public License
 along with Chaste. If not, see <http://www.gnu.org/licenses/>.
-"""
-
-deprecated_notice="""Copyright (C) University of Oxford, 2005-2011
-
-University of Oxford means the Chancellor, Masters and Scholars of the
-University of Oxford, having an administrative office at Wellington
-Square, Oxford OX1 2JD, UK.
-
-This file is part of Chaste.
-
-Chaste is free software: you can redistribute it and/or modify it
-under the terms of the GNU Lesser General Public License as published
-by the Free Software Foundation, either version 2.1 of the License, or
-(at your option) any later version.
-
-Chaste is distributed in the hope that it will be useful, but WITHOUT
-ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
-License for more details. The offer of Chaste under the terms of the
-License is subject to the License being interpreted in accordance with
-English Law and subject to any action against the University of Oxford
-being under the jurisdiction of the English Courts.
-
-You should have received a copy of the GNU Lesser General Public License
-along with Chaste. If not, see <http://www.gnu.org/licenses/>.
-"""
+""", re.MULTILINE)
 
 current_notice="""Copyright (C) University of Oxford, 2005-2012
 
@@ -128,8 +103,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 py_current_notice='\"\"\"'+current_notice+'\"\"\"\n'
 cpp_current_notice='/*\n\n'+current_notice+'\n*/'
-cpp_deprecated_notice='/*\n\n'+deprecated_notice+'\n*/'
-
 
 pycml_notice=" Processed by pycml - CellML Tools in Python"
 xsd2_notice="// Copyright (C) 2005-2007 Code Synthesis Tools CC"
@@ -186,20 +159,24 @@ py_lgpl_notice = """# This library is free software; you can redistribute it and
 
 
 
-def CheckForCopyrightNotice(findStr, fileIn):
-    """Test if the (possibly multi-line) string findStr is contained anywhere in fileIn."""
+def CheckForCopyrightNotice(findStrOrRe, fileIn):
+    """Test if the (possibly multi-line) string/regexp findStr is contained anywhere in fileIn."""
     fileIn.seek(0)
     file_text = fileIn.read()
-    return (file_text.find(findStr) >= 0)
+    if isinstance(findStrOrRe, type('')):
+        found = file_text.find(findStrOrRe) >= 0
+    else:
+        found = findStrOrRe.search(file_text) is not None
+    return found
     
-def ReplaceStringInFile(findStr, repStr, filePath):
-    """Replaces all findStr by repStr in file filePath"""
+def ReplaceStringInFile(findRe, repStr, filePath):
+    """Replaces all strings matching findRe by repStr in file filePath"""
     tempName = filePath+'~'
     input = open(filePath)
     output = open(tempName, 'w')
 
     s = input.read()
-    output.write(s.replace(findStr, repStr))
+    output.write(findRe.sub(repStr, s))
     output.close()
     input.close()
     os.rename(tempName, filePath)
@@ -246,10 +223,10 @@ def InspectFile(fileName):
             return True
     if valid_notice:
         return True
-    if CheckForCopyrightNotice(cpp_deprecated_notice, file_in):
+    if CheckForCopyrightNotice(deprecated_notice, file_in):
         print 'Found deprecated copyright notice for', fileName
         if apply_update:
-            ReplaceStringInFile(cpp_deprecated_notice, cpp_current_notice, fileName)
+            ReplaceStringInFile(deprecated_notice, current_notice, fileName)
             return True
         else:
             print 'Fix this by doing: python python/CheckForCopyrights.py -update'
