@@ -36,6 +36,7 @@ import time
 import threading
 
 from SCons.Script import Command, Dir, Value, Copy, Delete
+import SCons
 import SCons.Action
 import SCons.Tool
 import SCons.Script
@@ -280,12 +281,15 @@ def DetermineLibraryDependencies(env, partialGraph):
                 deps = map(get_lib, full_graph[comp])
                 if deps:
                     env.Depends(comp_lib, deps)
-    for comp in full_graph:
-        for i, dep in enumerate(full_graph[comp]):
-            if isinstance(dep, type('')):
-                full_graph[comp][i] = '-l' + dep
-            else:
-                full_graph[comp][i] = dep.abspath
+    # Early versions of SCons aren't as nice
+    scons_ver = env._get_major_minor_revision(SCons.__version__)
+    if scons_ver < (1,0,0):
+        for comp in full_graph:
+            for i, dep in enumerate(full_graph[comp]):
+                if isinstance(dep, type('')):
+                    full_graph[comp][i] = '-l' + dep
+                else:
+                    raise ValueError("Unable to use projects as dependencies with this version of SCons")
     if env['build'].debug:
         print "Complete component dependencies:", full_graph
     # Transfer results to partialGraph
