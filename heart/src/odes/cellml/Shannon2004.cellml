@@ -115,7 +115,13 @@ http://www.cellml.org/
       <unit units="mole" exponent="-1"/>
    </units>
    <component name="environment">
-      <variable name="time" units="millisecond" public_interface="out"/>
+      <variable name="time" public_interface="out" units="millisecond" cmeta:id="time">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#time">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#time"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
    </component>
    <component name="cell">
 	  <variable name="V" units="millivolt" initial_value="-85.721630473733" public_interface="out" cmeta:id="membrane_voltage">
@@ -168,7 +174,7 @@ http://www.cellml.org/
             </rdf:Description>
          </rdf:RDF>
       </variable>
-	  <variable name="stim_amplitude" units="microA_per_microF" initial_value="9.5" cmeta:id="membrane_stimulus_current_amplitude">
+	  <variable name="stim_amplitude" units="microA_per_microF" initial_value="-9.5" cmeta:id="membrane_stimulus_current_amplitude">
          <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
             <rdf:Description rdf:about="#membrane_stimulus_current_amplitude">
                <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_stimulus_current_amplitude"/>
@@ -181,10 +187,7 @@ http://www.cellml.org/
             <ci>i_Stim</ci>
             <piecewise>
                <piece>
-                  <apply>
-                     <minus/>
-                     <ci>stim_amplitude</ci>
-                  </apply>
+                  <ci>stim_amplitude</ci>
                   <apply>
                      <and/>
                      <apply>
@@ -272,9 +275,21 @@ http://www.cellml.org/
       </math>
    </component>
    <component name="model_parameters">
-      <variable name="Ko" units="millimolar" initial_value="5.4" public_interface="out"/>
+	  <variable name="Ko" units="millimolar" initial_value="5.4" public_interface="out" cmeta:id="extracellular_potassium_concentration">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#extracellular_potassium_concentration">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#extracellular_potassium_concentration"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>		  
       <variable name="Nao" units="millimolar" initial_value="140" public_interface="out"/>
-      <variable name="Cao" units="millimolar" initial_value="1.8" public_interface="out"/>
+      <variable name="Cao" units="millimolar" initial_value="1.8" public_interface="out" cmeta:id="extracellular_calcium_concentration">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#extracellular_calcium_concentration">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#extracellular_calcium_concentration"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
       <variable name="Clo" units="millimolar" initial_value="150" public_interface="out"/>
 	  <variable name="Ki" units="millimolar" initial_value="135" public_interface="out" cmeta:id="cytosolic_potassium_concentration">
          <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
@@ -1819,14 +1834,15 @@ http://www.cellml.org/
       </variable>	  	  
       <variable name="i_Ks_jct" units="microA_per_microF"/>
       <variable name="i_Ks_SL" units="microA_per_microF"/>
-      <variable name="G_Ks_SL" units="milliS_per_microF" cmeta:id="membrane_slow_delayed_rectifier_potassium_current_conductance">
+      <variable name="G_Ks_SL" units="milliS_per_microF"/>
+      <variable name="G_Ks_jct" units="milliS_per_microF"/>
+      <variable name="G_Ks_max" units="milliS_per_microF" initial_value = "0.07" cmeta:id="membrane_slow_delayed_rectifier_potassium_current_conductance">
          <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
             <rdf:Description rdf:about="#membrane_slow_delayed_rectifier_potassium_current_conductance">
                <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_slow_delayed_rectifier_potassium_current_conductance"/>
             </rdf:Description>
          </rdf:RDF>
-      </variable>	
-      <variable name="G_Ks_jct" units="milliS_per_microF"/>
+      </variable>   
       <variable name="Fx_Ks_jct" units="dimensionless" initial_value="0.11"/>
       <variable name="Fx_Ks_SL" units="dimensionless" initial_value="0.89"/>
       <variable name="E_Ks_jct" units="millivolt"/>
@@ -1893,7 +1909,7 @@ http://www.cellml.org/
             <ci>G_Ks_jct</ci>
             <apply>
                <times/>
-               <cn cellml:units="milliS_per_microF">0.07</cn>
+               <ci>G_Ks_max</ci>
                <apply>
                   <plus/>
                   <cn cellml:units="dimensionless">0.057</cn>
@@ -1928,7 +1944,7 @@ http://www.cellml.org/
             <ci>G_Ks_SL</ci>
             <apply>
                <times/>
-               <cn cellml:units="milliS_per_microF">0.07</cn>
+               <ci>G_Ks_max</ci>
                <apply>
                   <plus/>
                   <cn cellml:units="dimensionless">0.057</cn>
@@ -2750,13 +2766,14 @@ http://www.cellml.org/
             </rdf:Description>
          </rdf:RDF>
       </variable>	  
-      <variable name="G_K1" units="milliS_per_microF" cmeta:id="membrane_inward_rectifier_potassium_current_conductance">
+      <variable name="G_K1" units="milliS_per_microF"/>
+      <variable name="G_K1_max" units="milliS_per_microF" initial_value="0.9" cmeta:id="membrane_inward_rectifier_potassium_current_conductance">
          <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
             <rdf:Description rdf:about="#membrane_inward_rectifier_potassium_current_conductance">
                <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_inward_rectifier_potassium_current_conductance"/>
             </rdf:Description>
          </rdf:RDF>
-      </variable>	 	
+      </variable>	 		  
       <variable name="V" units="millivolt" public_interface="in" private_interface="out"/>
       <variable name="E_K" units="millivolt" public_interface="in" private_interface="out"/>
       <variable name="Ko" units="millimolar" public_interface="in"/>
@@ -2767,7 +2784,7 @@ http://www.cellml.org/
             <ci>G_K1</ci>
             <apply>
                <times/>
-               <cn cellml:units="milliS_per_microF">0.9</cn>
+               <ci>G_K1_max</ci>
                <apply>
                   <root/>
                   <apply>
@@ -4406,7 +4423,13 @@ http://www.cellml.org/
       <variable name="I" units="dimensionless" initial_value="8.71752603681652e-8" public_interface="out"/>
       <variable name="RI" units="dimensionless"/>
       <variable name="O" units="dimensionless" initial_value="7.1199533741995e-7" public_interface="out"/>
-      <variable name="ks" units="per_millisecond" initial_value="25"/>
+	  <variable name="ks" units="per_millisecond" initial_value="25" cmeta:id="SR_release_current_max">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#SR_release_current_max">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#SR_release_current_max"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>	  
       <variable name="koCa" units="per_millimolar2_per_millisecond" initial_value="10"/>
       <variable name="kom" units="per_millisecond" initial_value="0.06"/>
       <variable name="kiCa" units="per_millimolar_per_millisecond" initial_value="0.5"/>
@@ -4657,7 +4680,13 @@ http://www.cellml.org/
    </component>
    <component name="Jpump_SR">
       <variable name="j_pump_SR" units="millimolar_per_millisecond" public_interface="out"/>
-      <variable name="V_max" units="millimolar_per_millisecond" initial_value="0.000286"/>
+	  <variable name="V_max" units="millimolar_per_millisecond" initial_value="0.000286" cmeta:id="SR_uptake_current_max">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#SR_uptake_current_max">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#SR_uptake_current_max"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>		  
       <variable name="Q10_SRCaP" units="dimensionless" initial_value="2.6"/>
       <variable name="Q_SRCaP" units="dimensionless"/>
       <variable name="Kmf" units="millimolar" initial_value="0.000246"/>
@@ -5156,7 +5185,13 @@ http://www.cellml.org/
       </math>
    </component>
    <component name="Ca_buffer">
-      <variable name="Ca_SR" units="millimolar" initial_value="0.547125831028543" public_interface="out" private_interface="out"/>
+	  <variable name="Ca_SR" units="millimolar" initial_value="0.547125831028543" public_interface="out" private_interface="out" cmeta:id="JSR_calcium_concentration">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#JSR_calcium_concentration">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#JSR_calcium_concentration"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>		  
       <variable name="Ca_SL" units="millimolar" initial_value="0.000104971310105451" public_interface="out" private_interface="out"/>
       <variable name="Ca_jct" units="millimolar" initial_value="0.000174045152623969" public_interface="out" private_interface="out"/>
 	  <variable name="Cai" units="millimolar" initial_value="8.6504944644883e-5" public_interface="out" private_interface="out" cmeta:id="cytosolic_calcium_concentration">
