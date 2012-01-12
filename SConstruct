@@ -350,6 +350,10 @@ Export('env', 'dynenv')
 test_log_files = []
 
 if run_infrastructure_tests and not GetOption('clean'):
+    if not os.path.exists(build.GetTestReportDir()):
+        os.makedirs(build.GetTestReportDir())
+    if not env.GetOption('silent'):
+        print "Running infrastructure tests..."
     # Check for orphaned test files
     out = File(build.GetTestReportDir() + 'OrphanedTests.log')
     os.system('python/TestRunner.py python/CheckForOrphanedTests.py ' +

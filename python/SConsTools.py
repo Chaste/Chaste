@@ -940,7 +940,7 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
         apps_path = os.path.join(Dir('#').abspath, 'projects', projectName, 'apps')
         if os.path.isdir(apps_path):
             BuildExes(otherVars['build'], env, apps_path,
-                      components=chasteLibsUsed,
+                      components=chaste_libs,
                       otherVars=otherVars,
                       project=projectName)
     
