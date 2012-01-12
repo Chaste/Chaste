@@ -183,6 +183,13 @@ public:
     static void ReplaceSpacesWithUnderscores(std::string& rPath);
 
     /**
+     * Replace any underscores in a path or filename with spaces (for making titles etc.).
+     *
+     * @param rPath  A path or file name
+     */
+    static void ReplaceUnderscoresWithSpaces(std::string& rPath);
+
+    /**
      * For testing purposes, fake the value of one of the normally fixed paths, e.g. ChasteSourceRoot.
      *
      * @param fakeWhat  which path to fake

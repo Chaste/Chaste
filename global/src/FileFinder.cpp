@@ -221,6 +221,17 @@ void FileFinder::ReplaceSpacesWithUnderscores(std::string& rPath)
     }
 }
 
+void FileFinder::ReplaceUnderscoresWithSpaces(std::string& rPath)
+{
+    for(std::string::iterator it = rPath.begin(); it != rPath.end(); ++it)
+    {
+        if(*it == '_')
+        {
+            *it = ' ';
+        }
+    }
+}
+
 void FileFinder::FakePath(RelativeTo::Value fakeWhat, const std::string& rFakePath)
 {
     msFakeWhat = fakeWhat;

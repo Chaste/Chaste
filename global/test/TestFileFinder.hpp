@@ -189,8 +189,14 @@ public:
     void TestHandyFilenameOperations()
     {
         std::string path_with_spaces = "a path/with spaces.txt";
+
         FileFinder::ReplaceSpacesWithUnderscores(path_with_spaces);
+
         TS_ASSERT_EQUALS(path_with_spaces,"a_path/with_spaces.txt");
+
+        FileFinder::ReplaceUnderscoresWithSpaces(path_with_spaces);
+
+        TS_ASSERT_EQUALS(path_with_spaces,"a path/with spaces.txt");
     }
 
     void TestFaking()
