@@ -210,6 +210,17 @@ bool FileFinder::IsAbsolutePath(const std::string& rPath)
     return rPath[0]=='/';
 }
 
+void FileFinder::ReplaceSpacesWithUnderscores(std::string& rPath)
+{
+    for(std::string::iterator it = rPath.begin(); it != rPath.end(); ++it)
+    {
+        if(*it == ' ')
+        {
+            *it = '_';
+        }
+    }
+}
+
 void FileFinder::FakePath(RelativeTo::Value fakeWhat, const std::string& rFakePath)
 {
     msFakeWhat = fakeWhat;

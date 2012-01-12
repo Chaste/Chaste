@@ -186,6 +186,13 @@ public:
         TS_ASSERT_EQUALS(child.GetAbsolutePath(), abs_path + "src/");
     }
 
+    void TestHandyFilenameOperations()
+    {
+        std::string path_with_spaces = "a path/with spaces.txt";
+        FileFinder::ReplaceSpacesWithUnderscores(path_with_spaces);
+        TS_ASSERT_EQUALS(path_with_spaces,"a_path/with_spaces.txt");
+    }
+
     void TestFaking()
     {
         FileFinder::FakePath(RelativeTo::ChasteSourceRoot, "test");
