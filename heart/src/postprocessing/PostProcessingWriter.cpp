@@ -36,8 +36,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "Version.hpp"
 #include "HeartEventHandler.hpp"
 
-///\todo #1660 remove warnings
-#include "Warnings.hpp"
 #include <iostream>
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -64,18 +62,9 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WritePostProcessingFiles()
 {
 	//Check that post-processing is really needed
-	///\todo #1660 Check for warnings in output
-	if(!HeartConfig::Instance()->IsPostProcessingRequested())
-	{
-		WARNING("PostProcessingWriter might not be needed in this case (#1660)");
-	}
-
-	//Check that it's safe to send the results to the (hard-code) subfolder for Meshalyzer
-	///\todo #1660 Check for warnings in output
-	if(!HeartConfig::Instance()->GetVisualizeWithMeshalyzer())
-	{
-		WARNING("PostProcessingWriter might not be needed in this case (#1660)");
-	}
+	assert(HeartConfig::Instance()->IsPostProcessingRequested());
+	//Check that it's safe to send the results to the (hard-code) subfolder for Meshalyzer/CMGui
+	assert(HeartConfig::Instance()->GetVisualizeWithMeshalyzer() || HeartConfig::Instance()->GetVisualizeWithCmgui());
 
 	// Please note that only the master processor should write to file.
 	// Each of the private methods called here takes care of checking.
@@ -339,50 +328,57 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteVariablesOverTimeAtNodes
     }
 }
 
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteGenericFile(std::vector<std::vector<double> >& rDataPayload, std::string fileName)
+void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteGenericFile(std::vector<std::vector<double> >& rDataPayload, const std::string& rFileName)
 {
-    std::string sub_folder = "output";
+
+	if(HeartConfig::Instance()->GetVisualizeWithMeshalyzer())
+	{
+		WriteGenericFileToMeshalyzer(rDataPayload, "output", rFileName);
+	}
 	if(HeartConfig::Instance()->GetVisualizeWithCmgui())
 	{
-		//Special case - want to check it Meshalyzer output has also been requested...
-	    sub_folder = "cmgui_output";
+		//Special case use of the wrong method - \todo #1660 need to change the format of this data
+		WriteGenericFileToMeshalyzer(rDataPayload, "cmgui_output", rFileName);
 	}
 
-	OutputFileHandler output_file_handler(HeartConfig::Instance()->GetOutputDirectory() + "/" + sub_folder, false);
 
-
-    for (unsigned writing_process=0; writing_process<PetscTools::GetNumProcs(); writing_process++)
-    {
-    	if(PetscTools::GetMyRank() == writing_process)
-        {
-            out_stream p_file=out_stream(NULL);
-            if (PetscTools::AmMaster())
-            {
-                //Open the file for the first time
-                p_file = output_file_handler.OpenOutputFile(fileName);
-                //write provenance info
-                std::string comment = "# " + ChasteBuildInfo::GetProvenanceString();
-                *p_file << comment;
-            }
-            else
-            {
-                //Append to the existing file
-                p_file = output_file_handler.OpenOutputFile(fileName, std::ios::app);
-            }
-            for (unsigned line_number=0; line_number<rDataPayload.size(); line_number++)
-            {
-                for (unsigned i = 0; i < rDataPayload[line_number].size(); i++)
-                {
-                    *p_file << rDataPayload[line_number][i] << "\t";
-                }
-                *p_file << std::endl;
-            }
-            p_file->close();
-        }
-        //Process i+1 waits for process i to close the file
-        PetscTools::Barrier();
-    }//Loop in writing_process
+}
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteGenericFileToMeshalyzer(std::vector<std::vector<double> >& rDataPayload, const std::string& rFolder, const std::string& rFileName)
+{
+	OutputFileHandler output_file_handler(HeartConfig::Instance()->GetOutputDirectory() + "/" + rFolder, false);
+    PetscTools::BeginRoundRobin();
+	{
+		out_stream p_file=out_stream(NULL);
+		//Open file
+		if (PetscTools::AmMaster())
+		{
+			//Open the file for the first time
+			p_file = output_file_handler.OpenOutputFile(rFileName);
+			//write provenance info
+			std::string comment = "# " + ChasteBuildInfo::GetProvenanceString();
+			*p_file << comment;
+		}
+		else
+		{
+			//Append to the existing file
+			p_file = output_file_handler.OpenOutputFile(rFileName, std::ios::app);
+		}
+		//Write data
+		for (unsigned line_number=0; line_number<rDataPayload.size(); line_number++)
+		{
+			for (unsigned i = 0; i < rDataPayload[line_number].size(); i++)
+			{
+				*p_file << rDataPayload[line_number][i] << "\t";
+			}
+			*p_file << std::endl;
+		}
+		p_file->close();
+	}
+	//There's a barrier included here: Process i+1 waits for process i to close the file
+	PetscTools::EndRoundRobin();
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -393,5 +389,4 @@ template class PostProcessingWriter<1,1>;
 template class PostProcessingWriter<1,2>;
 template class PostProcessingWriter<2,2>;
 template class PostProcessingWriter<1,3>;
-//template class PostProcessingWriter<2,3>;
 template class PostProcessingWriter<3,3>;
