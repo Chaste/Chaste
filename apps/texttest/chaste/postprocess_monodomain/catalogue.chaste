@@ -52,8 +52,14 @@ The following new files/directories were created:
 ------------3dResults_8.exnode
 ------------3dResults_9.exnode
 ------------3dResults_times.info
+------------Apd_90_-30_Map.dat
 ------------ChasteDefaults.xml
 ------------ChasteParameters.xml
+------------ConductionVelocityFromNode10.dat
+------------ConductionVelocityFromNode20.dat
+------------MaxUpstrokeVelocityMap_-30.dat
+------------NodalTraces_V.dat
+------------UpstrokeTimeMap_-30.dat
 ------------script.com
 --------output
 ------------.chaste_deletable_folder
