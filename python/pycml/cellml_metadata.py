@@ -44,41 +44,102 @@ import pycml
 # Allowed metadata names, more to come
 # TODO #1209: Use a proper ontology!
 METADATA_NAMES = frozenset(
-    ['membrane_voltage', 'time', 'membrane_capacitance', 'membrane_E_R', 'membrane_stimulus_current', 'membrane_stimulus_current_duration',
-     'membrane_stimulus_current_amplitude','membrane_stimulus_current_period','membrane_stimulus_current_offset','membrane_stimulus_current_end',
-     'membrane_fast_sodium_current', 'membrane_fast_sodium_current_conductance', 'membrane_fast_sodium_current_m_gate', 'membrane_fast_sodium_current_h_gate',
-     'membrane_potassium_current', 'membrane_potassium_current_conductance', 'potassium_channel_n_gate', 
-     'leakage_current','membrane_fast_sodium_current_j_gate', 'temperature',
-     'membrane_rapid_delayed_rectifier_potassium_current_conductance','membrane_slow_delayed_rectifier_potassium_current_conductance',
-     'membrane_inward_rectifier_potassium_current_conductance',
-     'rapid_time_dependent_potassium_current_conductance', 'rapid_time_dependent_potassium_current_Xr1_gate',
-     'rapid_time_dependent_potassium_current_Xr2_gate', 'slow_time_dependent_potassium_current_conductance',
-     'slow_time_dependent_potassium_current_Xs_gate', 'sodium_background_current_conductance',
-     'membrane_L_type_calcium_current_conductance', 'membrane_L_type_calcium_current_d_gate', 'membrane_L_type_calcium_current_f_gate', 'L_type_Ca_current_f2_gate',
-     'membrane_L_type_calcium_current_fCass_gate', 'calcium_background_current_conductance', 'membrane_transient_outward_current_conductance',
-     'membrane_transient_outward_current_s_gate', 'membrane_transient_outward_current_r_gate', 'membrane_sodium_potassium_pump_current_permeability',
-     'membrane_sodium_calcium_exchanger_current_maximum', 'calcium_pump_current_conductance', 'membrane_potassium_pump_current_conductance',
-     'calcium_dynamics_release_current_maximum', 'calcium_dynamics_leak_current_maximum', 'calcium_leak_current_conductance',
-     'calcium_dynamics_uptake_current_maximum',
-     'cytosolic_calcium_concentration',
-     'state_variable',
-     # What follows are some more metadata names agreed by Gary Mirams and Penny Noble
-     'cytosolic_potassium_concentration', 'cytosolic_sodium_concentration',
-     'cytoplasmic_potassium_concentration', 'cytoplasmic_sodium_concentration',
-     'membrane_fast_sodium_current_shift_inactivation', 'membrane_fast_sodium_current_reduced_inactivation', 'membrane_fast_sodium_current_h_gate_tau', 'membrane_fast_sodium_current_j_gate_tau',
-     'membrane_L_type_calcium_current', 'membrane_L_type_calcium_current_fCa_gate', 'membrane_L_type_calcium_current_fCa2_gate', 'membrane_L_type_calcium_current_f2_gate', 'membrane_L_type_calcium_current_f2ds_gate', 'membrane_L_type_calcium_current_d2_gate', 'membrane_L_type_calcium_current_f_gate_tau', 'membrane_L_type_calcium_current_f2_gate_tau', 'membrane_L_type_calcium_current_fCa_gate_tau', 'membrane_L_type_calcium_current_fCa2_gate_tau',
-     'membrane_rapid_delayed_rectifier_potassium_current', 'membrane_rapid_delayed_rectifier_potassium_current_conductance1', 'membrane_rapid_delayed_rectifier_potassium_current_conductance2',
-     'membrane_sodium_calcium_exchanger_current', 'membrane_sodium_calcium_exchanger_current_conductance',
-     'membrane_delayed_rectifier_potassium_current', 'membrane_delayed_rectifier_potassium_current_conductance',
-     'membrane_transient_outward_current',
-     'membrane_inward_rectifier_potassium_current',
-     'membrane_slow_delayed_rectifier_potassium_current',
-     'calcium_concentration_intracellular',
+    ['state_variable',
+     # Cardiac-specific labels
+     'membrane_voltage', 'time', 'membrane_capacitance', 'membrane_E_R',  'temperature', 'leakage_current',
+     # Stimulus current
+     'membrane_stimulus_current', 
+        'membrane_stimulus_current_duration',
+        'membrane_stimulus_current_amplitude',
+        'membrane_stimulus_current_period',
+        'membrane_stimulus_current_offset',
+        'membrane_stimulus_current_end',
+     # =====================================================
+     # CONCENTRATIONS
+     # =====================================================
+     # basic 'intracellular' and 'extracellular'
+     'extracellular_potassium_concentration', 'extracellular_calcium_concentration', 'extracellular_sodium_concentration', 
+     'cytosolic_calcium_concentration','cytosolic_potassium_concentration', 'cytosolic_sodium_concentration',
+     # in Calcium subsystem
+     'JSR_calcium_concentration',
      'diadicspace_calcium_concentration',
-     'SR_release_current',
+     # Others
+     'bath_potassium_concentration',
+     # =====================================================
+     # CURRENTS
+     # =====================================================
+     # HISTORIC metadata - only for early models lacking components.
+     'membrane_potassium_current', 
+        'membrane_potassium_current_conductance', 
+        'potassium_channel_n_gate', 
+    'membrane_delayed_rectifier_potassium_current', 
+        'membrane_delayed_rectifier_potassium_current_conductance',
+     'rapid_time_dependent_potassium_current_conductance', 
+        'rapid_time_dependent_potassium_current_Xr1_gate',
+        'rapid_time_dependent_potassium_current_Xr2_gate', 
+     'slow_time_dependent_potassium_current_conductance',
+        'slow_time_dependent_potassium_current_Xs_gate', 
+     # MODERN metadata - labels all new models should be able to use.
+     # I Na (fast)
+     'membrane_fast_sodium_current', 
+        'membrane_fast_sodium_current_conductance', 
+        'membrane_fast_sodium_current_m_gate', 
+        'membrane_fast_sodium_current_h_gate',
+            'membrane_fast_sodium_current_h_gate_tau',
+        'membrane_fast_sodium_current_j_gate', 
+            'membrane_fast_sodium_current_j_gate_tau',
+        'membrane_fast_sodium_current_shift_inactivation', 'membrane_fast_sodium_current_reduced_inactivation', 
+     # I Na (background)
+     'sodium_background_current_conductance',
+     # Potassium currents
+     # I Kr
+     'membrane_rapid_delayed_rectifier_potassium_current', 
+        'membrane_rapid_delayed_rectifier_potassium_current_conductance',
+        'membrane_rapid_delayed_rectifier_potassium_current_conductance1', 
+        'membrane_rapid_delayed_rectifier_potassium_current_conductance2',
+     # I Ks
+     'membrane_slow_delayed_rectifier_potassium_current',   
+        'membrane_slow_delayed_rectifier_potassium_current_conductance',
+     # I NCX
+     'membrane_sodium_calcium_exchanger_current', 
+        'membrane_sodium_calcium_exchanger_current_conductance',     
+     # I to
+     'membrane_transient_outward_current',
+        'membrane_transient_outward_current_conductance',
+        'membrane_sodium_calcium_exchanger_current_maximum',
+     # I K1
+     'membrane_inward_rectifier_potassium_current',     
+        'membrane_inward_rectifier_potassium_current_conductance',
+        'membrane_transient_outward_current_s_gate', 
+        'membrane_transient_outward_current_r_gate',
+     # pumps and exchangers
+      'membrane_sodium_potassium_pump_current_permeability',
+      'calcium_pump_current_conductance', 
+      'membrane_potassium_pump_current_conductance', 
+     # I CaL
+     'membrane_L_type_calcium_current', 
+        'membrane_L_type_calcium_current_conductance', 
+        'membrane_L_type_calcium_current_d_gate', 
+        'membrane_L_type_calcium_current_f_gate', 
+        'membrane_L_type_calcium_current_fCass_gate',
+        'membrane_L_type_calcium_current_fCa_gate', 
+        'membrane_L_type_calcium_current_fCa2_gate', 
+        'membrane_L_type_calcium_current_f2_gate', 
+        'membrane_L_type_calcium_current_f2ds_gate', 
+        'membrane_L_type_calcium_current_d2_gate', 
+        'membrane_L_type_calcium_current_f_gate_tau', 
+        'membrane_L_type_calcium_current_f2_gate_tau', 
+        'membrane_L_type_calcium_current_fCa_gate_tau', 
+        'membrane_L_type_calcium_current_fCa2_gate_tau',
+     # I Ca (background)
+     'calcium_background_current_conductance', 
+     # Calcium subsystem parameters  
+     'SR_release_current', 'SR_leak_current_max', 'SR_release_current_max', 
+     'SR_release_kmcacyt', 'SR_release_kmcads', 'SR_uptake_current_max', 
+     'calcium_dynamics_release_current_maximum', 'calcium_dynamics_leak_current_maximum', 
+     'calcium_leak_current_conductance', 'calcium_dynamics_uptake_current_maximum',       
+     # Penny and Alan, protocol-specific stuff (to be replaced by Functional Curation in the end)
      'concentration_clamp_onoff',
-     'extracellular_potassium_concentration', 'extracellular_calcium_concentration', 'extracellular_sodium_concentration', 'bath_potassium_concentration',
-     'SR_leak_current_max', 'SR_release_current_max', 'SR_release_kmcacyt', 'SR_release_kmcads', 'SR_uptake_current_max', 'JSR_calcium_concentration'
 ])
 
 # Parameters for the stimulus current
