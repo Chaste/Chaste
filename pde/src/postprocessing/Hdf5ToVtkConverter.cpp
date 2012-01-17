@@ -130,7 +130,7 @@ Hdf5ToVtkConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToVtkConverter(std::string input
     }
 
     // Tidy up
-    VecDestroy(data);
+    PetscTools::Destroy(data);
 
     // Normally the in-memory mesh is converted
     if (!usingOriginalNodeOrdering)

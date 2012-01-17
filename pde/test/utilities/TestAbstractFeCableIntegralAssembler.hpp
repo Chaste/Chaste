@@ -180,7 +180,7 @@ public:
             TS_ASSERT_DELTA(vec_repl[i], 0.0, 1e-4);
         }
 
-        VecDestroy(vec);
+        PetscTools::Destroy(vec);
 
         //Test matrix assembly
         int lo, hi;
@@ -222,7 +222,7 @@ public:
             }
         }
 
-        MatDestroy(mat);
+        PetscTools::Destroy(mat);
     }
 
 
@@ -249,8 +249,8 @@ public:
         vector_assembler.SetVectorToAssemble(vec,true);
         vector_assembler.Assemble();
 
-        VecDestroy(vec);
-        VecDestroy(current_soln);
+        PetscTools::Destroy(vec);
+        PetscTools::Destroy(current_soln);
     }
 };
 

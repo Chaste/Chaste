@@ -61,7 +61,7 @@ public:
         PetscVecTools::Finalise(initial_guess);
         TS_ASSERT_THROWS_THIS(solver_newton.Solve(&ComputeTestResidual, &(ComputeTestJacobian), initial_guess, length, NULL),
                 "Iteration 27, unable to find damping factor such that residual decreases in update direction");
-        VecDestroy(initial_guess);
+        PetscTools::Destroy(initial_guess);
     }
 
     void TestOn2dNonlinearProblem() throw (Exception)
@@ -101,9 +101,9 @@ public:
             TS_ASSERT_DELTA(answer_newton_repl[i],1/sqrt(2.0),tol);
         }
 
-        VecDestroy(initial_guess);
-        VecDestroy(answer_petsc);
-        VecDestroy(answer_newton);
+        PetscTools::Destroy(initial_guess);
+        PetscTools::Destroy(answer_petsc);
+        PetscTools::Destroy(answer_newton);
     }
 
     void TestOn3dNonlinearProblem() throw (Exception)
@@ -152,10 +152,10 @@ public:
         VecNorm(residual, NORM_2, &norm);
         TS_ASSERT_LESS_THAN(norm/length, 1e-10);
 
-        VecDestroy(residual);
-        VecDestroy(initial_guess);
-        VecDestroy(answer_petsc);
-        VecDestroy(answer_newton);
+        PetscTools::Destroy(residual);
+        PetscTools::Destroy(initial_guess);
+        PetscTools::Destroy(answer_petsc);
+        PetscTools::Destroy(answer_newton);
     }
 };
 

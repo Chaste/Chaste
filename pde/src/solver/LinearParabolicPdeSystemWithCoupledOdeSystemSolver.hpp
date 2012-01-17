@@ -491,7 +491,7 @@ void LinearParabolicPdeSystemWithCoupledOdeSystemSolver<ELEMENT_DIM, SPACE_DIM, 
         // Reset the initial condition for the next timestep
         if (this->mInitialCondition != initial_condition)
         {
-            VecDestroy(this->mInitialCondition);
+            PetscTools::Destroy(this->mInitialCondition);
         }
         this->mInitialCondition = soln;
 
@@ -505,7 +505,7 @@ void LinearParabolicPdeSystemWithCoupledOdeSystemSolver<ELEMENT_DIM, SPACE_DIM, 
     // Restore saved initial condition to avoid user confusion!
     if (this->mInitialCondition != initial_condition)
     {
-        VecDestroy(this->mInitialCondition);
+        PetscTools::Destroy(this->mInitialCondition);
     }
     this->mInitialCondition = initial_condition;
 

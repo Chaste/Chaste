@@ -246,29 +246,29 @@ LinearSystem::~LinearSystem()
 
     if (mDestroyMatAndVec)
     {
-        VecDestroy(mRhsVector);
-        MatDestroy(mLhsMatrix);
+        PetscTools::Destroy(mRhsVector);
+        PetscTools::Destroy(mLhsMatrix);
     }
 
     if (mPrecondMatrixIsNotLhs)
     {
-        MatDestroy(mPrecondMatrix);
+        PetscTools::Destroy(mPrecondMatrix);
     }
 
     if (mMatNullSpace)
     {
-        MatNullSpaceDestroy(mMatNullSpace);
+        MatNullSpaceDestroy(PETSC_DESTROY_PARAM(mMatNullSpace));
     }
 
     if (mKspIsSetup)
     {
-        KSPDestroy(mKspSolver);
+        KSPDestroy(PETSC_DESTROY_PARAM(mKspSolver));
     }
 
     if (mDirichletBoundaryConditionsVector)
     {
         ///\todo Never tested in linalg component
-        VecDestroy(mDirichletBoundaryConditionsVector);
+        PetscTools::Destroy(mDirichletBoundaryConditionsVector);
     }
 
 #if (PETSC_VERSION_MAJOR == 3)
@@ -445,7 +445,7 @@ void LinearSystem::RemoveNullSpace()
     // Only remove if previously set
     if (mMatNullSpace)
     {
-        PETSCEXCEPT( MatNullSpaceDestroy(mMatNullSpace) );
+        PETSCEXCEPT( MatNullSpaceDestroy(PETSC_DESTROY_PARAM(mMatNullSpace)) );
         PETSCEXCEPT( MatNullSpaceCreate(PETSC_COMM_WORLD, PETSC_FALSE, 0, NULL, &mMatNullSpace) );
         if (mKspIsSetup)
         {
@@ -877,7 +877,7 @@ Vec LinearSystem::Solve(Vec lhsGuess)
 
         if (chebyshev_lhs_vector)
         {
-            VecDestroy(chebyshev_lhs_vector);
+            PetscTools::Destroy(chebyshev_lhs_vector);
         }
 
 #ifdef TRACE_KSP
@@ -956,19 +956,19 @@ Vec LinearSystem::Solve(Vec lhsGuess)
 //    VecGetArray(temp, &p_temp);
 //    std::cout << "temp[0] = " << p_temp[0] << "\n";
 //    VecRestoreArray(temp, &p_temp);
-//    VecDestroy(temp);
+//    PetscTools::Destroy(temp);
 //    // Dump the matrix to file
 //    PetscViewer viewer;
 //    PetscViewerASCIIOpen(PETSC_COMM_WORLD,"mat.output",&viewer);
 //    MatView(mLhsMatrix, viewer);
 //    PetscViewerFlush(viewer);
-//    PetscViewerDestroy(viewer);
+//    PetscViewerDestroy(PETSC_DESTROY_PARAM(viewer);
 //    // Dump the rhs vector to file
 //    PetscViewerASCIIOpen(PETSC_COMM_WORLD,"vec.output",&viewer);
 //    PetscViewerSetFormat(viewer, PETSC_VIEWER_ASCII_MATLAB);
 //    VecView(mRhsVector, viewer);
 //    PetscViewerFlush(viewer);
-//    PetscViewerDestroy(viewer);
+//    PetscViewerDestroy(PETSC_DESTROY_PARAM(viewer);
 
     try
     {
@@ -1090,6 +1090,8 @@ Vec LinearSystem::Solve(Vec lhsGuess)
             }
 
             KSPSetNormType(mKspSolver, KSP_NO_NORM);
+#elif (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 2)
+            KSPSetNormType(mKspSolver, KSP_NORM_NONE);
 #else
             KSPSetNormType(mKspSolver, KSP_NORM_NO);
 #endif
@@ -1116,7 +1118,7 @@ Vec LinearSystem::Solve(Vec lhsGuess)
     catch (const Exception& e)
     {
         // Destroy solution vector on error to avoid memory leaks
-        VecDestroy(lhs_vector);
+        PetscTools::Destroy(lhs_vector);
         throw e;
     }
 
@@ -1159,7 +1161,7 @@ void LinearSystem::ResetKspSolver()
 {
     if (mKspIsSetup)
     {
-        KSPDestroy(mKspSolver);
+        KSPDestroy(PETSC_DESTROY_PARAM(mKspSolver));
     }
 
     mKspIsSetup = false;

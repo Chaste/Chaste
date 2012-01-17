@@ -43,8 +43,8 @@ OdeLinearSystemSolver::OdeLinearSystemSolver(unsigned systemSize, double timeSte
 
 OdeLinearSystemSolver::~OdeLinearSystemSolver()
 {
-    VecDestroy(mCurrentSolution);
-    VecDestroy(mForceVector);
+    PetscTools::Destroy(mCurrentSolution);
+    PetscTools::Destroy(mForceVector);
 }
 
 double OdeLinearSystemSolver::GetTimeStep()
@@ -77,7 +77,7 @@ Vec OdeLinearSystemSolver::SolveOneTimeStep()
     PetscVecTools::AddScaledVector(mLinearSystem.rGetRhsVector(), mForceVector, mTimeStep);
 
     // avoid memory leaks
-    VecDestroy(mCurrentSolution);
+    PetscTools::Destroy(mCurrentSolution);
 
     // Having constructed the RHS vector, solve the resulting linear system...
     mCurrentSolution = mLinearSystem.Solve();

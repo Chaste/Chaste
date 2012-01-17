@@ -150,8 +150,8 @@ public:
             TS_ASSERT_DELTA(answer_repl[i], u, 0.001);
         }
 
-        VecDestroy(initial_guess);
-        VecDestroy(answer);
+        PetscTools::Destroy(initial_guess);
+        PetscTools::Destroy(answer);
     }
 
     void TestWithHeatEquation1DAndNeumannBCs()
@@ -193,8 +193,8 @@ public:
             TS_ASSERT_DELTA(answer_repl[i], u, 0.001);
         }
 
-        VecDestroy(initial_guess);
-        VecDestroy(answer);
+        PetscTools::Destroy(initial_guess);
+        PetscTools::Destroy(answer);
     }
 
     void TestWithHeatEquation1D2()
@@ -235,8 +235,8 @@ public:
             TS_ASSERT_DELTA(answer_repl[i], u, 0.001);
         }
 
-        VecDestroy(initial_guess);
-        VecDestroy(answer);
+        PetscTools::Destroy(initial_guess);
+        PetscTools::Destroy(answer);
     }
 
     void TestWithHeatEquation1D3()
@@ -277,8 +277,8 @@ public:
             TS_ASSERT_DELTA(answer_repl[i], u, 0.001);
         }
 
-        VecDestroy(initial_guess);
-        VecDestroy(answer);
+        PetscTools::Destroy(initial_guess);
+        PetscTools::Destroy(answer);
     }
 
     void TestWithHeatEquation1D4()
@@ -323,8 +323,8 @@ public:
             TS_ASSERT_DELTA(answer_repl[i], u, 0.01);
         }
 
-        VecDestroy(initial_guess);
-        VecDestroy(answer);
+        PetscTools::Destroy(initial_guess);
+        PetscTools::Destroy(answer);
     }
 
     void TestWithHeatEquation1D5()
@@ -372,8 +372,8 @@ public:
             TS_ASSERT_DELTA(answer_repl[i], u, 0.01);
         }
 
-        VecDestroy(initial_guess);
-        VecDestroy(answer);
+        PetscTools::Destroy(initial_guess);
+        PetscTools::Destroy(answer);
     }
 
     void TestWithHeatEquation1DAndNeumannBCs2()
@@ -420,9 +420,9 @@ public:
             TS_ASSERT_DELTA(answer_repl[i], u, 0.001);
         }
 
-        VecDestroy(badly_sized_init_guess);
-        VecDestroy(initial_guess);
-        VecDestroy(answer);
+        PetscTools::Destroy(badly_sized_init_guess);
+        PetscTools::Destroy(initial_guess);
+        PetscTools::Destroy(answer);
     }
 
     void TestHeatEquationWithNeumannOnUnitDisc()
@@ -468,8 +468,8 @@ public:
             TS_ASSERT_DELTA(answer_repl[i], u, 0.01);
         }
 
-        VecDestroy(initial_guess);
-        VecDestroy(answer);
+        PetscTools::Destroy(initial_guess);
+        PetscTools::Destroy(answer);
     }
 
     void TestWithHeatEquation2DAndNeumannBCs()
@@ -535,8 +535,8 @@ public:
             TS_ASSERT_DELTA(answer_repl[i], u, 0.15);
         }
 
-        VecDestroy(initial_guess);
-        VecDestroy(answer);
+        PetscTools::Destroy(initial_guess);
+        PetscTools::Destroy(answer);
     }
 
     void Test2dOnUnitSquare()
@@ -618,7 +618,7 @@ public:
             TS_ASSERT_DELTA(answer_repl[i], u, 0.01);
         }
 
-        VecDestroy(answer);
+        PetscTools::Destroy(answer);
 
         // Analytical Jacobian
         answer=solver.Solve(initial_guess, true);
@@ -633,8 +633,8 @@ public:
             TS_ASSERT_DELTA(answer_repl2[i], u, 0.01);
         }
 
-        VecDestroy(initial_guess);
-        VecDestroy(answer);
+        PetscTools::Destroy(initial_guess);
+        PetscTools::Destroy(answer);
     }
 
     void TestNasty2dEquationOnUnitSquare()
@@ -716,7 +716,7 @@ public:
             TS_ASSERT_DELTA(answer_repl[i], u, 0.01);
         }
 
-        VecDestroy(answer);
+        PetscTools::Destroy(answer);
 
         // Analytical Jacobian
         answer=solver.Solve(initial_guess, true);
@@ -731,8 +731,8 @@ public:
             TS_ASSERT_DELTA(answer_repl2[i], u, 0.01);
         }
 
-        VecDestroy(initial_guess);
-        VecDestroy(answer);
+        PetscTools::Destroy(initial_guess);
+        PetscTools::Destroy(answer);
     }
 };
 

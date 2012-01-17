@@ -269,7 +269,7 @@ public:
         TS_ASSERT_THROWS_THIS(monodomain_tissue.rGetExtracellularConductivityTensor(0),
                               "Monodomain tissues do not have extracellular conductivity tensors.");
 
-        VecDestroy(voltage);
+        PetscTools::Destroy(voltage);
     }
 
     void TestMonodomainTissueGetCardiacCell() throw(Exception)
@@ -342,8 +342,8 @@ public:
             TS_ASSERT_DELTA(voltage2_repl[1], monodomain_tissue.GetCardiacCell(1)->GetVoltage(), 1e-10);
         }
 
-        VecDestroy(voltage);
-        VecDestroy(voltage2);
+        PetscTools::Destroy(voltage);
+        PetscTools::Destroy(voltage2);
     }
 
     void TestGetConductivityAndConductivityModifier() throw(Exception)
@@ -501,8 +501,8 @@ public:
             TS_ASSERT_DELTA(voltage2_repl[0], monodomain_tissue.GetCardiacCellOrHaloCell(0)->GetVoltage(), 1e-10);
         }
 
-        VecDestroy(voltage);
-        VecDestroy(voltage2);
+        PetscTools::Destroy(voltage);
+        PetscTools::Destroy(voltage2);
     }
 
     void TestSaveAndLoadCardiacTissue() throw (Exception)

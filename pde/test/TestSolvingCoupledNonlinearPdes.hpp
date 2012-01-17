@@ -467,7 +467,7 @@ public:
             TS_ASSERT_DELTA(v, y, 1e-2);
         }
 
-        VecDestroy(result);
+        PetscTools::Destroy(result);
     }
 };
 #endif /*TESTSOLVINGCOUPLEDNONLINEARPDES_HPP_*/

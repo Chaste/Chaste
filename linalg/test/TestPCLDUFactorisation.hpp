@@ -60,7 +60,7 @@ public:
         Mat system_matrix;
         PetscTools::ReadPetscObject(system_matrix, "linalg/test/data/matrices/cube_6000elems_half_activated.mat", parallel_layout);
 
-        VecDestroy(parallel_layout);
+        PetscTools::Destroy(parallel_layout);
 
         // Set rhs = A * [1 0 1 0 ... 1 0]'
         Vec one_zeros = factory.CreateVec(2);
@@ -74,7 +74,7 @@ public:
         PetscVecTools::Finalise(one_zeros);
 
         MatMult(system_matrix, one_zeros, rhs);
-        VecDestroy(one_zeros);
+        PetscTools::Destroy(one_zeros);
 
         LinearSystem ls = LinearSystem(rhs, system_matrix);
 
@@ -108,9 +108,9 @@ public:
         // Coverage (setting PC type after first solve)
         ls.SetPcType("ldufactorisation");
 
-        MatDestroy(system_matrix);
-        VecDestroy(rhs);
-        VecDestroy(solution);
+        PetscTools::Destroy(system_matrix);
+        PetscTools::Destroy(rhs);
+        PetscTools::Destroy(solution);
 
 #if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x.x
         const PCType pc;
@@ -154,9 +154,9 @@ public:
 
             point_jacobi_its = ls.GetNumIterations();
 
-            MatDestroy(system_matrix);
-            VecDestroy(system_rhs);
-            VecDestroy(solution);
+            PetscTools::Destroy(system_matrix);
+            PetscTools::Destroy(system_rhs);
+            PetscTools::Destroy(solution);
         }
         Timer::PrintAndReset("No preconditioning");
 
@@ -179,16 +179,16 @@ public:
 
             block_diag_its = ls.GetNumIterations();
 
-            MatDestroy(system_matrix);
-            VecDestroy(system_rhs);
-            VecDestroy(solution);
+            PetscTools::Destroy(system_matrix);
+            PetscTools::Destroy(system_rhs);
+            PetscTools::Destroy(solution);
         }
         Timer::Print("LDU factorisation preconditioner");
 
         std::cout << block_diag_its << " " << point_jacobi_its << std::endl;
         TS_ASSERT_LESS_THAN_EQUALS(block_diag_its, point_jacobi_its);
 
-        VecDestroy(parallel_layout);
+        PetscTools::Destroy(parallel_layout);
     }
 };
 

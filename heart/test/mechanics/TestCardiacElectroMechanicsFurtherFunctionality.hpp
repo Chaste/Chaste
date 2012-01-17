@@ -181,8 +181,8 @@ public:
             TS_ASSERT_LESS_THAN(-90, end_voltage_repl[i]);
         }
 
-        VecDestroy(start_voltage);
-        VecDestroy(end_voltage);
+        PetscTools::Destroy(start_voltage);
+        PetscTools::Destroy(end_voltage);
     }
 
     // Similar to first part of above test, except the deformation isn't just constant stretch, and
@@ -302,8 +302,8 @@ public:
             TS_ASSERT_LESS_THAN(-90, end_voltage_repl[i]);
         }
 
-        VecDestroy(start_voltage);
-        VecDestroy(end_voltage);
+        PetscTools::Destroy(start_voltage);
+        PetscTools::Destroy(end_voltage);
     }
 
     // Run a where the domain in long and thin, and held squashed in the X-direction, by Dirichlet
@@ -401,7 +401,7 @@ public:
                     num_stimulated_nodes[sim]++;
                 }
             }
-            VecDestroy(voltage);
+            PetscTools::Destroy(voltage);
         }
 
         // check the number of stimulated nodes is greater in the second case,

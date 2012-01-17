@@ -46,11 +46,7 @@ unsigned PetscTools::mNumBarriers = 0u;
 
 void PetscTools::ResetCache()
 {
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
-    PetscBool is_there;
-#else
     PetscTruth is_there;
-#endif
     PetscInitialized(&is_there);
     if (is_there)
     {
@@ -304,11 +300,7 @@ void PetscTools::DumpPetscObject(const Mat& rMat, const std::string& rOutputFile
 
     PetscViewerBinaryOpen(PETSC_COMM_WORLD, rOutputFileFullPath.c_str(), type, &view);
     MatView(rMat, view);
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
-    PetscViewerDestroy(&view);
-#else
-    PetscViewerDestroy(view);
-#endif
+    PetscViewerDestroy(PETSC_DESTROY_PARAM(view));
 }
 
 void PetscTools::DumpPetscObject(const Vec& rVec, const std::string& rOutputFileFullPath)
@@ -322,11 +314,7 @@ void PetscTools::DumpPetscObject(const Vec& rVec, const std::string& rOutputFile
 
     PetscViewerBinaryOpen(PETSC_COMM_WORLD, rOutputFileFullPath.c_str(), type, &view);
     VecView(rVec, view);
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
-    PetscViewerDestroy(&view);
-#else
-    PetscViewerDestroy(view);
-#endif
+    PetscViewerDestroy(PETSC_DESTROY_PARAM(view));
 }
 
 void PetscTools::ReadPetscObject(Mat& rMat, const std::string& rOutputFileFullPath, Vec rParallelLayout)
@@ -347,13 +335,17 @@ void PetscTools::ReadPetscObject(Mat& rMat, const std::string& rOutputFileFullPa
 
     PetscViewerBinaryOpen(PETSC_COMM_WORLD, rOutputFileFullPath.c_str(),
                           type, &view);
+
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
-    MatLoad(&view, MATMPIAIJ, &rMat);
-    PetscViewerDestroy(&view);
+    MatCreate(PETSC_COMM_WORLD,&rMat);
+    MatSetType(rMat,MATMPIAIJ);
+    MatLoad(rMat,view);
 #else
     MatLoad(view, MATMPIAIJ, &rMat);
     PetscViewerDestroy(view);
 #endif
+
+    PetscViewerDestroy(PETSC_DESTROY_PARAM(view));
 
     if (rParallelLayout != NULL)
     {
@@ -372,7 +364,7 @@ void PetscTools::ReadPetscObject(Mat& rMat, const std::string& rOutputFileFullPa
 
         MatCopy(rMat, temp_mat, DIFFERENT_NONZERO_PATTERN);
 
-        Destroy(rMat);
+        PetscTools::Destroy(rMat);
         rMat = temp_mat;
     }
 }
@@ -390,14 +382,24 @@ void PetscTools::ReadPetscObject(Vec& rVec, const std::string& rOutputFileFullPa
                           type, &view);
     if (rParallelLayout == NULL)
     {
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 2)
+    	VecCreate(PETSC_COMM_WORLD,&rVec);
+    	VecSetType(rVec,VECMPI);
+    	VecLoad(rVec,view);
+#else
         VecLoad(view, VECMPI, &rVec);
+#endif
     }
     else
     {
         VecDuplicate(rParallelLayout, &rVec);
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 2)
+        VecLoad(rVec,view);
+#else
         VecLoadIntoVector(view, rVec);
+#endif
     }
-    PetscViewerDestroy(view);
+    PetscViewerDestroy(PETSC_DESTROY_PARAM(view));
 }
 
 

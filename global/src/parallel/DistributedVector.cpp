@@ -72,6 +72,15 @@ double& DistributedVector::operator[](Iterator index) throw (DistributedVectorEx
 void DistributedVector::Restore()
 {
     VecRestoreArray(mVec, &mpVec);
+
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 2)
+    /** \todo #1994
+     * mpVec is NULL after this function call
+     * WARNING: VecRestoreArray function was called in many other places? should be checked - Arash
+     */
+    VecGetArray(mVec, &mpVec);
+#endif
+
 }
 
 // Iterator class

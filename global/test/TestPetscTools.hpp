@@ -116,9 +116,9 @@ public:
             TS_ASSERT(strcmp(type, MATMPIAIJ)==0);
         }
 
-        VecDestroy(vec1);
-        VecDestroy(vec2);
-        MatDestroy(mat);
+        PetscTools::Destroy(vec1);
+        PetscTools::Destroy(vec2);
+        PetscTools::Destroy(mat);
 
         // Test SetupMatrix with non-default preallocation
         Mat mat2;
@@ -157,16 +157,16 @@ public:
             TS_ASSERT_EQUALS( nonzeros_allocated, (unsigned)(6*(hi-lo)) );
         }
 
-        MatDestroy(mat2);
+        PetscTools::Destroy(mat2);
 
         Mat mat_over_allocate;
         PetscTools::SetupMat(mat_over_allocate, 12, 12, 13);
-        MatDestroy(mat_over_allocate);
+        PetscTools::Destroy(mat_over_allocate);
 
         // coverage
         Mat mat3;
         PetscTools::SetupMat(mat3, 1, 1, 0);
-        MatDestroy(mat3);
+        PetscTools::Destroy(mat3);
     }
 
     void TestBarrier()
@@ -262,8 +262,8 @@ public:
         PetscTools::DumpPetscObject(matrix, output_dir + "ten_times_ten.mat");
         PetscTools::DumpPetscObject(vector, output_dir + "ten_times_ten.vec");
 
-        MatDestroy(matrix);
-        VecDestroy(vector);
+        PetscTools::Destroy(matrix);
+        PetscTools::Destroy(vector);
 
         Mat matrix_read;
         Vec vector_read;
@@ -292,8 +292,8 @@ public:
 
         VecRestoreArray(vector_read, &p_vector_read);
 
-        MatDestroy(matrix_read);
-        VecDestroy(vector_read);
+        PetscTools::Destroy(matrix_read);
+        PetscTools::Destroy(vector_read);
     }
 
     /*
@@ -339,9 +339,9 @@ public:
 
         VecRestoreArray(vector_read, &p_vector_read);
 
-        MatDestroy(matrix_read);
-        VecDestroy(vector_read);
-        VecDestroy(parallel_layout);
+        PetscTools::Destroy(matrix_read);
+        PetscTools::Destroy(vector_read);
+        PetscTools::Destroy(parallel_layout);
     }
 
     void TestUnevenCreation()
@@ -365,7 +365,7 @@ public:
         TS_ASSERT_EQUALS((unsigned)petsc_lo, expected_lo);
         TS_ASSERT_EQUALS((unsigned)petsc_hi, expected_hi);
 
-        VecDestroy(petsc_vec_uneven);
+        PetscTools::Destroy(petsc_vec_uneven);
     }
 };
 

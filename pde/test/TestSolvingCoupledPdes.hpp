@@ -320,8 +320,8 @@ public:
             //std::cout << result_1unknown_repl[i] << " ";
         }
 
-        VecDestroy(result_2unknowns);
-        VecDestroy(result_1unknown);
+        PetscTools::Destroy(result_2unknowns);
+        PetscTools::Destroy(result_1unknown);
     }
 
     /*  Solve:
@@ -408,8 +408,8 @@ public:
             //std::cout << result_1unknown_repl[i] << " ";
         }
 
-        VecDestroy(result_2unknowns);
-        VecDestroy(result_1unknown);
+        PetscTools::Destroy(result_2unknowns);
+        PetscTools::Destroy(result_1unknown);
     }
 
     /*
@@ -458,7 +458,7 @@ public:
         }
 
         //p_file->close();
-        VecDestroy(result);
+        PetscTools::Destroy(result);
     }
 };
 

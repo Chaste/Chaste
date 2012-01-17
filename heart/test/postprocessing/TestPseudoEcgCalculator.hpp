@@ -105,8 +105,8 @@ public:
 
         writer.Close();
 
-        VecDestroy(petsc_data_1);
-        VecDestroy(petsc_data_2);
+        PetscTools::Destroy(petsc_data_1);
+        PetscTools::Destroy(petsc_data_2);
 
         ///////////////////////////////////////////////////
         // Now we compute the pseudo ECG. We set an electrode at x=15.
@@ -194,8 +194,8 @@ public:
 
         writer.Close();
 
-        VecDestroy(petsc_data_1);
-        VecDestroy(petsc_data_2);
+        PetscTools::Destroy(petsc_data_1);
+        PetscTools::Destroy(petsc_data_2);
 
         ///////////////////////////////////////////////////
         // Now we compute the pseudo ECG. We set an electrode at x=15.

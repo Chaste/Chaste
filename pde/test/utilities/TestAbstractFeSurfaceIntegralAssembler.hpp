@@ -105,7 +105,7 @@ public:
             TS_ASSERT_DELTA(vec_repl[i], 0.0 + offset, 1e-4);
         }
 
-        VecDestroy(vec);
+        PetscTools::Destroy(vec);
     }
 
 
@@ -141,7 +141,7 @@ public:
         TS_ASSERT_DELTA(vec_repl[2], 1.0, 1e-4);
         TS_ASSERT_DELTA(vec_repl[3], 1.0, 1e-4);
 
-        VecDestroy(vec);
+        PetscTools::Destroy(vec);
     }
 };
 

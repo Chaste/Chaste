@@ -124,9 +124,17 @@ public:
         TS_ASSERT_THROWS_NOTHING(mpParallelWriter->AdvanceAlongUnlimitedDimension());
 
         // Change the data
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 2)
+        VecSqrtAbs(var1);
+#else
         VecSqrt(var1);
+#endif
         VecAbs(var2);
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 2)
+        VecSqrtAbs(var2);
+#else
         VecSqrt(var2);
+#endif
 
         // Write out the data again (Conventional)
         /*
@@ -158,9 +166,9 @@ public:
 
         TS_ASSERT_EQUALS(system(("diff "+output_dir+"ParallelColumnWriter_unlimited.dat io/test/data/ColumnWriter_unlimited.dat").c_str()), 0);
 
-        VecDestroy(var1);
-        VecDestroy(var2);
-        VecDestroy(var3);
+        PetscTools::Destroy(var1);
+        PetscTools::Destroy(var2);
+        PetscTools::Destroy(var3);
     }
 
     void TestPutSlice()
@@ -205,7 +213,7 @@ public:
         TS_ASSERT_EQUALS(system(("diff "+output_dir+"Stripe_000000.dat io/test/data/Stripe_000000.dat").c_str()), 0);
         TS_ASSERT_EQUALS(system(("diff "+output_dir+"Stripe_unlimited.dat io/test/data/Stripe_unlimited.dat").c_str()), 0);
 
-        VecDestroy(striped);
+        PetscTools::Destroy(striped);
         delete p_parallel_writer;
     }
 

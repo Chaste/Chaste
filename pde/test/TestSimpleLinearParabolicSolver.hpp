@@ -139,8 +139,8 @@ public:
         TS_ASSERT_EQUALS(solver.mMatrixIsAssembled, false);
 
         // Tidy up
-        VecDestroy(initial_condition);
-        VecDestroy(result);
+        PetscTools::Destroy(initial_condition);
+        PetscTools::Destroy(result);
     }
 
     void TestSimpleLinearParabolicSolver1DZeroDirichWithSourceTerm()
@@ -191,8 +191,8 @@ public:
         }
 
         // Tidy up
-        VecDestroy(initial_condition);
-        VecDestroy(result);
+        PetscTools::Destroy(initial_condition);
+        PetscTools::Destroy(result);
     }
 
     void TestSimpleLinearParabolicSolverNonzeroNeumannCondition()
@@ -246,8 +246,8 @@ public:
         }
 
         // Tidy up
-        VecDestroy(initial_condition);
-        VecDestroy(result);
+        PetscTools::Destroy(initial_condition);
+        PetscTools::Destroy(result);
     }
 
     void TestSimpleLinearParabolicSolver2DZeroDirich()
@@ -342,8 +342,8 @@ public:
         }
 
         // Tidy up
-        VecDestroy(initial_condition);
-        VecDestroy(result);
+        PetscTools::Destroy(initial_condition);
+        PetscTools::Destroy(result);
     }
 
     void TestSimpleLinearParabolicSolver2DNonzeroDirichWithSourceTerm()
@@ -402,8 +402,8 @@ public:
         }
 
         // Tidy up
-        VecDestroy(initial_condition);
-        VecDestroy(result);
+        PetscTools::Destroy(initial_condition);
+        PetscTools::Destroy(result);
     }
 
     ///\todo This test fails with current tolerance
@@ -476,8 +476,8 @@ public:
         VecRestoreArray(result, &p_result);
 
         // Tidy up
-        VecDestroy(initial_condition);
-        VecDestroy(result);
+        PetscTools::Destroy(initial_condition);
+        PetscTools::Destroy(result);
     }
 
     void TestSimpleLinearParabolicSolver2DMixedOnCoarseMesh()
@@ -556,8 +556,8 @@ public:
         }
 
         // Tidy up
-        VecDestroy(initial_condition);
-        VecDestroy(result);
+        PetscTools::Destroy(initial_condition);
+        PetscTools::Destroy(result);
     }
 
     void TestSimpleLinearParabolicSolver2DMixed()
@@ -640,8 +640,8 @@ public:
         }
 
         // Tidy up
-        VecDestroy(initial_condition);
-        VecDestroy(result);
+        PetscTools::Destroy(initial_condition);
+        PetscTools::Destroy(result);
     }
 
     void TestHeatEquationSolutionDoesntDrift2D()
@@ -687,8 +687,8 @@ public:
         }
 
         // Tidy up
-        VecDestroy(initial_condition);
-        VecDestroy(result);
+        PetscTools::Destroy(initial_condition);
+        PetscTools::Destroy(result);
     }
 
     void TestHeatEquationSolutionDoesntDrift1D()
@@ -750,8 +750,8 @@ public:
         TS_ASSERT_EQUALS(finder4.Exists(), false);
 
         // Tidy up
-        VecDestroy(initial_condition);
-        VecDestroy(result);
+        PetscTools::Destroy(initial_condition);
+        PetscTools::Destroy(result);
     }
 
     /*
@@ -856,8 +856,8 @@ public:
         }
 
         // Tidy up
-        VecDestroy(initial_condition);
-        VecDestroy(result);
+        PetscTools::Destroy(initial_condition);
+        PetscTools::Destroy(result);
     }
 
     /*
@@ -919,8 +919,8 @@ public:
         TS_ASSERT_EQUALS(solver.mMatrixIsAssembled, false);
 
         // Tidy up
-        VecDestroy(initial_condition);
-        VecDestroy(result);
+        PetscTools::Destroy(initial_condition);
+        PetscTools::Destroy(result);
     }
 };
 

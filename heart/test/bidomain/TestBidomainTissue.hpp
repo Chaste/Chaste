@@ -166,8 +166,8 @@ public:
         TS_ASSERT_EQUALS(bidomain_tissue.rGetIntracellularStimulusCacheReplicated()[0], -80);
         TS_ASSERT_EQUALS(bidomain_tissue.rGetIntracellularStimulusCacheReplicated()[1], 0);
 
-        VecDestroy(monodomain_vec);
-        VecDestroy(bidomain_vec);
+        PetscTools::Destroy(monodomain_vec);
+        PetscTools::Destroy(bidomain_vec);
     }
 
 

@@ -149,7 +149,7 @@ public:
     bool HasAveragedSourcePde();
 
     /**
-     * Call VecDestroy on mSolution.
+     * Call PetscTools::Destroy( on mSolution.
      */
     void DestroySolution();
 

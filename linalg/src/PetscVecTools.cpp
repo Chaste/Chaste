@@ -157,12 +157,12 @@ void PetscVecTools::SetupInterleavedVectorScatterGather(Vec interleavedVec, VecS
     VecScatterCreate(interleavedVec, A11_rows, x1_subvector, all_vector, &rFirstVariableScatterContext);
     VecScatterCreate(interleavedVec, A22_rows, x2_subvector, all_vector, &rSecondVariableScatterContext);
 
-    VecDestroy(x1_subvector);
-    VecDestroy(x2_subvector);
+    PetscTools::Destroy(x1_subvector);
+    PetscTools::Destroy(x2_subvector);
 
-    ISDestroy(A11_rows);
-    ISDestroy(A22_rows);
-    ISDestroy(all_vector);
+    ISDestroy(PETSC_DESTROY_PARAM(A11_rows));
+    ISDestroy(PETSC_DESTROY_PARAM(A22_rows));
+    ISDestroy(PETSC_DESTROY_PARAM(all_vector));
 }
 
 void PetscVecTools::DoInterleavedVecScatter(Vec interleavedVec, VecScatter firstVariableScatterContext, Vec firstVariableVec, VecScatter secondVariableScatterContefirstVariableScatterContextt, Vec secondVariableVec)

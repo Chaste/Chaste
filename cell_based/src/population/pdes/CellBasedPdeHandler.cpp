@@ -386,7 +386,7 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
             if (is_previous_solution_size_correct)
             {
                 p_pde_and_bc->SetSolution(solver.Solve(initial_guess));
-                VecDestroy(initial_guess);
+                PetscTools::Destroy(initial_guess);
             }
             else // ...otherwise do not supply one
             {
@@ -401,7 +401,7 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
             if (is_previous_solution_size_correct)
             {
                 p_pde_and_bc->SetSolution(solver.Solve(initial_guess));
-                VecDestroy(initial_guess);
+                PetscTools::Destroy(initial_guess);
             }
             else // ...otherwise do not supply one
             {

@@ -240,19 +240,19 @@ Hdf5DataWriter::~Hdf5DataWriter()
 
     if (mSinglePermutation)
     {
-        MatDestroy(mSinglePermutation);
+        PetscTools::Destroy(mSinglePermutation);
     }
     if (mDoublePermutation)
     {
-        MatDestroy(mDoublePermutation);
+        PetscTools::Destroy(mDoublePermutation);
     }
     if (mSingleIncompleteOutputMatrix)
     {
-        MatDestroy(mSingleIncompleteOutputMatrix);
+        PetscTools::Destroy(mSingleIncompleteOutputMatrix);
     }
     if (mDoubleIncompleteOutputMatrix)
     {
-        MatDestroy(mDoubleIncompleteOutputMatrix);
+        PetscTools::Destroy(mDoubleIncompleteOutputMatrix);
     }
 }
 
@@ -757,7 +757,7 @@ void Hdf5DataWriter::PutVector(int variableID, Vec petscVector)
     if (petscVector != output_petsc_vector)
     {
         // Free local vector
-        VecDestroy(output_petsc_vector);
+        PetscTools::Destroy(output_petsc_vector);
     }
 }
 
@@ -891,7 +891,7 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
     if (petscVector != output_petsc_vector)
     {
         // Free local vector
-        VecDestroy(output_petsc_vector);
+        PetscTools::Destroy(output_petsc_vector);
     }
 }
 

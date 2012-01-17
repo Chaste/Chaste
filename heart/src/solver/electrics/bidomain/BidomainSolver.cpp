@@ -240,8 +240,8 @@ BidomainSolver<ELEMENT_DIM,SPACE_DIM>::~BidomainSolver()
 
     if(mVecForConstructingRhs)
     {
-        VecDestroy(mVecForConstructingRhs);
-        MatDestroy(mMassMatrix);
+        PetscTools::Destroy(mVecForConstructingRhs);
+        PetscTools::Destroy(mMassMatrix);
     }
 
     if(mpBidomainCorrectionTermAssembler)

@@ -89,7 +89,7 @@ public:
         TS_ASSERT_DELTA(soln_next_timestep_repl2[1], 11.0 + 3*dt, 1e-6);
 
         // Tidy up
-        VecDestroy(initial_condition);
+        PetscTools::Destroy(initial_condition);
     }
 
     // Solve a simple ODE linear system M dr/dt = f
@@ -138,7 +138,7 @@ public:
         TS_ASSERT_DELTA(soln_next_timestep_repl2[1], 11.0 + 2*dt, 1e-6);
 
         // Tidy up
-        VecDestroy(initial_condition);
+        PetscTools::Destroy(initial_condition);
     }
 
     // Solve a simple ODE linear system M dr/dt = f
@@ -207,7 +207,7 @@ public:
         TS_ASSERT_DELTA(soln_next_timestep_repl2[3], 13.0 + 2*0.04*dt, 1e-6);
 
         // Tidy up
-        VecDestroy(initial_condition);
+        PetscTools::Destroy(initial_condition);
     }
 };
 

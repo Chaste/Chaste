@@ -85,7 +85,7 @@ Hdf5ToTxtConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToTxtConverter(std::string input
     }
 
     // Tidy up
-    VecDestroy(data);
+    PetscTools::Destroy(data);
 }
 
 /////////////////////////////////////////////////////////////////////

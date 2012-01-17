@@ -100,8 +100,8 @@ public:
         Vec bad_vec = PetscTools::CreateAndSetVec(mesh.GetNumNodes()+1, 0.0);
         TS_ASSERT_THROWS_THIS(volume_calculator.Calculate(mesh,bad_vec),"The solution size does not match the mesh");
 
-        VecDestroy(vec);
-        VecDestroy(bad_vec);
+        PetscTools::Destroy(vec);
+        PetscTools::Destroy(bad_vec);
     }
 
     void TestWithExampleFunctionals()
@@ -154,7 +154,7 @@ public:
         result = other_calculator.Calculate(mesh, petsc_vec);
         TS_ASSERT_DELTA(result, 1 + 2.0/3.0, 1e-6);
 
-        VecDestroy(petsc_vec);
+        PetscTools::Destroy(petsc_vec);
     }
 
     void TestWithExampleFunctionalsNonDistributed()
@@ -207,7 +207,7 @@ public:
         result = other_calculator.Calculate(mesh, petsc_vec);
         TS_ASSERT_DELTA(result, 1 + 2.0/3.0, 1e-6);
 
-        VecDestroy(petsc_vec);
+        PetscTools::Destroy(petsc_vec);
     }
 };
 

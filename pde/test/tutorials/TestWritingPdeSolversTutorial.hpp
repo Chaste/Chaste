@@ -430,7 +430,7 @@ public:
             TS_ASSERT_DELTA(u, u_exact, 0.002);
             TS_ASSERT_DELTA(v, v_exact, 0.007);
         }
-        VecDestroy(result);
+        PetscTools::Destroy(result);
     }
 
     /* Now run a test solving the parabolic-parabolic-parabolic PDE system. */
@@ -497,8 +497,8 @@ public:
         mesh_writer.WriteFilesUsingMesh(mesh);
 
         /* Note that we need to destroy the initial condition vector as well as the solution. */
-        VecDestroy(initial_condition);
-        VecDestroy(result);
+        PetscTools::Destroy(initial_condition);
+        PetscTools::Destroy(result);
         /*
          *
          * '''Visualisation:''' To visualise in matlab/octave, you can load the node file,

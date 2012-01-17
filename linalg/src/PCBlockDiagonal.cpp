@@ -58,20 +58,20 @@ PCBlockDiagonal::~PCBlockDiagonal()
     }
 #endif
 
-    MatDestroy(mPCContext.A11_matrix_subblock);
-    MatDestroy(mPCContext.A22_matrix_subblock);
+    PetscTools::Destroy(mPCContext.A11_matrix_subblock);
+    PetscTools::Destroy(mPCContext.A22_matrix_subblock);
 
-    PCDestroy(mPCContext.PC_amg_A11);
-    PCDestroy(mPCContext.PC_amg_A22);
+    PCDestroy(PETSC_DESTROY_PARAM(mPCContext.PC_amg_A11));
+    PCDestroy(PETSC_DESTROY_PARAM(mPCContext.PC_amg_A22));
 
-    VecDestroy(mPCContext.x1_subvector);
-    VecDestroy(mPCContext.y1_subvector);
+    PetscTools::Destroy(mPCContext.x1_subvector);
+    PetscTools::Destroy(mPCContext.y1_subvector);
 
-    VecDestroy(mPCContext.x2_subvector);
-    VecDestroy(mPCContext.y2_subvector);
+    PetscTools::Destroy(mPCContext.x2_subvector);
+    PetscTools::Destroy(mPCContext.y2_subvector);
 
-    VecScatterDestroy(mPCContext.A11_scatter_ctx);
-    VecScatterDestroy(mPCContext.A22_scatter_ctx);
+    VecScatterDestroy(PETSC_DESTROY_PARAM(mPCContext.A11_scatter_ctx));
+    VecScatterDestroy(PETSC_DESTROY_PARAM(mPCContext.A22_scatter_ctx));
 }
 
 void PCBlockDiagonal::PCBlockDiagonalCreate(KSP& rKspObject)
@@ -111,7 +111,7 @@ void PCBlockDiagonal::PCBlockDiagonalCreate(KSP& rKspObject)
 
         PetscVecTools::SetupInterleavedVectorScatterGather(dummy_vec, mPCContext.A11_scatter_ctx, mPCContext.A22_scatter_ctx);
 
-        VecDestroy(dummy_vec);
+        PetscTools::Destroy(dummy_vec);
     }
 
     // Get matrix sublock A11
@@ -127,7 +127,7 @@ void PCBlockDiagonal::PCBlockDiagonalCreate(KSP& rKspObject)
         ISCreateStride(PETSC_COMM_WORLD, high-low, 2*low, 2, &A11_local_rows);
         ISCreateStride(PETSC_COMM_WORLD, global_size, 0, 2, &A11_columns);
 
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 1) //PETSc 3.1
+#if (PETSC_VERSION_MAJOR == 3 && (PETSC_VERSION_MINOR == 1 || PETSC_VERSION_MINOR ==  2) ) //PETSc 3.1
         MatGetSubMatrix(system_matrix, A11_local_rows, A11_local_rows,
             MAT_INITIAL_MATRIX, &mPCContext.A11_matrix_subblock);
 #else
@@ -136,8 +136,8 @@ void PCBlockDiagonal::PCBlockDiagonalCreate(KSP& rKspObject)
 #endif
 
 
-        ISDestroy(A11_local_rows);
-        ISDestroy(A11_columns);
+        ISDestroy(PETSC_DESTROY_PARAM(A11_local_rows));
+        ISDestroy(PETSC_DESTROY_PARAM(A11_columns));
     }
 
     // Get matrix sublock A22
@@ -153,7 +153,7 @@ void PCBlockDiagonal::PCBlockDiagonalCreate(KSP& rKspObject)
         ISCreateStride(PETSC_COMM_WORLD, high-low, 2*low+1, 2, &A22_local_rows);
         ISCreateStride(PETSC_COMM_WORLD, global_size, 1, 2, &A22_columns);
 
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 1) //PETSc 3.1
+#if (PETSC_VERSION_MAJOR == 3 && (PETSC_VERSION_MINOR == 1 || PETSC_VERSION_MINOR ==  2) ) //PETSc 3.1
         MatGetSubMatrix(system_matrix, A22_local_rows, A22_local_rows,
             MAT_INITIAL_MATRIX, &mPCContext.A22_matrix_subblock);
 #else
@@ -161,8 +161,8 @@ void PCBlockDiagonal::PCBlockDiagonalCreate(KSP& rKspObject)
             MAT_INITIAL_MATRIX, &mPCContext.A22_matrix_subblock);
 #endif
 
-        ISDestroy(A22_local_rows);
-        ISDestroy(A22_columns);
+        ISDestroy(PETSC_DESTROY_PARAM(A22_local_rows));
+        ISDestroy(PETSC_DESTROY_PARAM(A22_columns));
     }
 
     // Register call-back function and its context
@@ -258,7 +258,7 @@ void PCBlockDiagonal::PCBlockDiagonalSetUp()
     PCSetUp(mPCContext.PC_amg_A22);
 }
 
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 1) //PETSc 3.1
+#if (PETSC_VERSION_MAJOR == 3 && (PETSC_VERSION_MINOR == 1 || PETSC_VERSION_MINOR ==  2) ) //PETSc 3.1
 PetscErrorCode PCBlockDiagonalApply(PC pc_object, Vec x, Vec y)
 {
   void* pc_context;

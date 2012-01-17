@@ -177,7 +177,7 @@ class ExtendedBidomainProblem : public AbstractCardiacProblem<DIM,DIM, 3>
             wrapped_voltages_to_be_written.Restore();
 
             writer.PutStripedVector(variable_ids, voltages_to_be_written);
-            VecDestroy(voltages_to_be_written);
+            PetscTools::Destroy(voltages_to_be_written);
         }
     }
 
@@ -257,9 +257,9 @@ class ExtendedBidomainProblem : public AbstractCardiacProblem<DIM,DIM, 3>
                 mSolution_phi_2[index] = vm_second_cell_distri[index] + phie_distri[index];
                 mSolution_phie[index] = phie_distri[index];
             }
-            VecDestroy(V);
-            VecDestroy(V_2);
-            VecDestroy(phie);
+            PetscTools::Destroy(V);
+            PetscTools::Destroy(V_2);
+            PetscTools::Destroy(phie);
 
             mSolution_distri.Restore();
         }

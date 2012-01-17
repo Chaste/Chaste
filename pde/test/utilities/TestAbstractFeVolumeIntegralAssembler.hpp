@@ -214,7 +214,7 @@ private:
             TS_ASSERT_DELTA(vec_repl[i], volume_of_element*mesh.GetNode(i)->GetNumContainingElements(), 1e-4);
         }
 
-        VecDestroy(vec);
+        PetscTools::Destroy(vec);
     }
 
 public:
@@ -260,7 +260,7 @@ public:
             }
         }
 
-        MatDestroy(mat);
+        PetscTools::Destroy(mat);
     }
 
     // Test the ability to assemble both a vector and a matrix
@@ -362,8 +362,8 @@ public:
             }
         }
 
-        VecDestroy(vec);
-        MatDestroy(mat);
+        PetscTools::Destroy(vec);
+        PetscTools::Destroy(mat);
 
     }
 
@@ -444,7 +444,7 @@ public:
             }
         }
 
-        MatDestroy(mat);
+        PetscTools::Destroy(mat);
     }
 
 
@@ -502,7 +502,7 @@ public:
             TS_ASSERT_DELTA(PetscMatTools::GetElement(mat,3,3)/scale_factor, 1.0/6 , 1e-6);
         }
 
-        MatDestroy(mat);
+        PetscTools::Destroy(mat);
     }
 
     void TestStiffnessMatrixAssembler1d() throw(Exception)
@@ -582,7 +582,7 @@ public:
             }
         }
 
-        MatDestroy(mat);
+        PetscTools::Destroy(mat);
     }
 
     void TestInterpolationOfPositionAndCurrentSolution() throw(Exception)
@@ -604,8 +604,8 @@ public:
         // No tests here, there are two TS_ASSERTS insider TestingAssembler::ComputeVectorTerm()
         assembler.Assemble();
 
-        VecDestroy(vec);
-        VecDestroy(current_solution);
+        PetscTools::Destroy(vec);
+        PetscTools::Destroy(current_solution);
     }
 };
 #endif /*TESTABSTRACTFEVOLUMEINTEGRALASSEMBLER_HPP_*/

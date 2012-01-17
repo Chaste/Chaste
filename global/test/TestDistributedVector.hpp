@@ -106,9 +106,9 @@ public:
         TS_ASSERT_EQUALS((unsigned)petsc_lo, expected_lo);
         TS_ASSERT_EQUALS((unsigned)petsc_hi, expected_hi);
 
-        VecDestroy(petsc_vec);
-        VecDestroy(petsc_vec2);
-        VecDestroy(petsc_vec_uneven);
+        PetscTools::Destroy(petsc_vec);
+        PetscTools::Destroy(petsc_vec2);
+        PetscTools::Destroy(petsc_vec_uneven);
 
         // Test static field for archiving
         // (see also heart/src/problem/CardiacSimulationArchiver.hpp)
@@ -231,8 +231,8 @@ public:
             TS_ASSERT_THROWS(quadratic[3],DistributedVectorException);
         }
 
-        VecDestroy(vec);
-        VecDestroy(striped);
+        PetscTools::Destroy(vec);
+        PetscTools::Destroy(striped);
     }
 
     void TestWrite()
@@ -317,9 +317,9 @@ public:
             TS_ASSERT_THROWS(linear_chunk[2],DistributedVectorException);
         }
 
-        VecDestroy(petsc_vec);
-        VecDestroy(striped);
-        VecDestroy(chunked);
+        PetscTools::Destroy(petsc_vec);
+        PetscTools::Destroy(striped);
+        PetscTools::Destroy(chunked);
     }
 
     void TestException()
@@ -354,7 +354,7 @@ public:
         {
             TS_ASSERT_EQUALS(global_lows[proc_index], (proc_index+1)*proc_index/2);
         }
-        VecDestroy(petsc_vec);
+        PetscTools::Destroy(petsc_vec);
     }
 
     void TestArchiving() throw (Exception)

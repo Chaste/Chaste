@@ -629,8 +629,8 @@ public:
 
         }
 
-        VecDestroy(test_vec);
-        VecDestroy(product_vec);
+        PetscTools::Destroy(test_vec);
+        PetscTools::Destroy(product_vec);
     }
 
     // Solve using an exponential material law. Doesn't test against an exact solution, just that check that the

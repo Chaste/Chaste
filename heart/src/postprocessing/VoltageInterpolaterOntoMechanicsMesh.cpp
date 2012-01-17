@@ -87,7 +87,7 @@ VoltageInterpolaterOntoMechanicsMesh<DIM>::VoltageInterpolaterOntoMechanicsMesh(
 
         if(voltage_coarse!=NULL)
         {
-            VecDestroy(voltage_coarse);
+            PetscTools::Destroy(voltage_coarse);
         }
         voltage_coarse = PetscTools::CreateVec(interpolated_voltages);
 
@@ -99,8 +99,8 @@ VoltageInterpolaterOntoMechanicsMesh<DIM>::VoltageInterpolaterOntoMechanicsMesh(
 
     if(voltage_coarse!=NULL)
     {
-        VecDestroy(voltage);
-        VecDestroy(voltage_coarse);
+        PetscTools::Destroy(voltage);
+        PetscTools::Destroy(voltage_coarse);
     }
 
     // delete to flush

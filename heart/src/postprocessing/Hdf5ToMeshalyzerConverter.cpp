@@ -76,7 +76,7 @@ void Hdf5ToMeshalyzerConverter<ELEMENT_DIM,SPACE_DIM>::Write(std::string type)
             }
         }
     }
-    VecDestroy(data);
+    PetscTools::Destroy(data);
     if (PetscTools::AmMaster())
     {
         std::string comment = "# " + ChasteBuildInfo::GetProvenanceString();

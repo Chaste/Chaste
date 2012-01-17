@@ -255,13 +255,13 @@ AbstractContinuumMechanicsSolver<DIM>::~AbstractContinuumMechanicsSolver()
 
     if (mResidualVector)
     {
-        VecDestroy(mResidualVector);
-        VecDestroy(mLinearSystemRhsVector);
-        MatDestroy(mJacobianMatrix);
-        MatDestroy(mPreconditionMatrix);
+        PetscTools::Destroy(mResidualVector);
+        PetscTools::Destroy(mLinearSystemRhsVector);
+        PetscTools::Destroy(mJacobianMatrix);
+        PetscTools::Destroy(mPreconditionMatrix);
         if (mCompressibilityType==COMPRESSIBLE)
         {
-            VecDestroy(mDirichletBoundaryConditionsVector);
+            PetscTools::Destroy(mDirichletBoundaryConditionsVector);
         }
     }
 }

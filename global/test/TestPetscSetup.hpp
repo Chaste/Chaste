@@ -35,6 +35,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "PetscSetupAndFinalize.hpp"
 #include "PetscException.hpp"
+#include "PetscTools.hpp"
 #include "Warnings.hpp"
 #include "IsNan.hpp"
 
@@ -63,7 +64,7 @@ public:
 
         Vec v;
         err = VecCreateMPI(PETSC_COMM_WORLD, 2, 1, &v);
-        VecDestroy(v);
+        PetscTools::Destroy(v);
         //#define PETSC_ERR_ARG_WRONGSTATE   73   /* object in argument is in wrong */
         //#define PETSC_ERR_ARG_INCOMP       75   /* two arguments are incompatible */
         TS_ASSERT_EQUALS(err, PETSC_ERR_ARG_INCOMP);
@@ -77,7 +78,7 @@ public:
         // See if we can do it without a temporary
         TS_ASSERT_THROWS(
             PETSCEXCEPT(VecCreateMPI(PETSC_COMM_WORLD, 2, 1, &v)), Exception);
-        VecDestroy(v);
+        PetscTools::Destroy(v);
 
         // This test give back an "unknown error" message
         TS_ASSERT_THROWS( PETSCEXCEPT(-3), Exception);

@@ -59,22 +59,22 @@ PCLDUFactorisation::~PCLDUFactorisation()
     }
 #endif
 
-    MatDestroy(mPCContext.A11_matrix_subblock);
-    MatDestroy(mPCContext.A22_matrix_subblock);
-    MatDestroy(mPCContext.B_matrix_subblock);
+    PetscTools::Destroy(mPCContext.A11_matrix_subblock);
+    PetscTools::Destroy(mPCContext.A22_matrix_subblock);
+    PetscTools::Destroy(mPCContext.B_matrix_subblock);
 
-    PCDestroy(mPCContext.PC_amg_A11);
-    PCDestroy(mPCContext.PC_amg_A22);
+    PCDestroy(PETSC_DESTROY_PARAM(mPCContext.PC_amg_A11));
+    PCDestroy(PETSC_DESTROY_PARAM(mPCContext.PC_amg_A22));
 
-    VecDestroy(mPCContext.x1_subvector);
-    VecDestroy(mPCContext.y1_subvector);
-    VecDestroy(mPCContext.x2_subvector);
-    VecDestroy(mPCContext.y2_subvector);
-    VecDestroy(mPCContext.z);
-    VecDestroy(mPCContext.temp);
+    PetscTools::Destroy(mPCContext.x1_subvector);
+    PetscTools::Destroy(mPCContext.y1_subvector);
+    PetscTools::Destroy(mPCContext.x2_subvector);
+    PetscTools::Destroy(mPCContext.y2_subvector);
+    PetscTools::Destroy(mPCContext.z);
+    PetscTools::Destroy(mPCContext.temp);
 
-    VecScatterDestroy(mPCContext.A11_scatter_ctx);
-    VecScatterDestroy(mPCContext.A22_scatter_ctx);
+    VecScatterDestroy(PETSC_DESTROY_PARAM(mPCContext.A11_scatter_ctx));
+    VecScatterDestroy(PETSC_DESTROY_PARAM(mPCContext.A22_scatter_ctx));
 }
 
 void PCLDUFactorisation::PCLDUFactorisationCreate(KSP& rKspObject)
@@ -115,7 +115,7 @@ void PCLDUFactorisation::PCLDUFactorisationCreate(KSP& rKspObject)
 
         PetscVecTools::SetupInterleavedVectorScatterGather(dummy_vec, mPCContext.A11_scatter_ctx, mPCContext.A22_scatter_ctx);
 
-        VecDestroy(dummy_vec);
+        PetscTools::Destroy(dummy_vec);
     }
 
     // Get matrix sublock A11
@@ -131,15 +131,15 @@ void PCLDUFactorisation::PCLDUFactorisationCreate(KSP& rKspObject)
         ISCreateStride(PETSC_COMM_WORLD, high-low, 2*low, 2, &A11_local_rows);
         ISCreateStride(PETSC_COMM_WORLD, global_size, 0, 2, &A11_columns);
 
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 1) //PETSc 3.1
+#if (PETSC_VERSION_MAJOR == 3 && (PETSC_VERSION_MINOR == 1 || PETSC_VERSION_MINOR ==  2) ) //PETSc 3.1
         MatGetSubMatrix(system_matrix, A11_local_rows, A11_local_rows,
             MAT_INITIAL_MATRIX, &mPCContext.A11_matrix_subblock);
 #else
         MatGetSubMatrix(system_matrix, A11_local_rows, A11_columns, PETSC_DECIDE,
             MAT_INITIAL_MATRIX, &mPCContext.A11_matrix_subblock);
 #endif
-        ISDestroy(A11_local_rows);
-        ISDestroy(A11_columns);
+        ISDestroy(PETSC_DESTROY_PARAM(A11_local_rows));
+        ISDestroy(PETSC_DESTROY_PARAM(A11_columns));
     }
 
     // Get matrix sublock A22
@@ -155,7 +155,7 @@ void PCLDUFactorisation::PCLDUFactorisationCreate(KSP& rKspObject)
         ISCreateStride(PETSC_COMM_WORLD, high-low, 2*low+1, 2, &A22_local_rows);
         ISCreateStride(PETSC_COMM_WORLD, global_size, 1, 2, &A22_columns);
 
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 1) //PETSc 3.1
+#if (PETSC_VERSION_MAJOR == 3 && (PETSC_VERSION_MINOR == 1 || PETSC_VERSION_MINOR ==  2) ) //PETSc 3.1
         MatGetSubMatrix(system_matrix, A22_local_rows, A22_local_rows,
             MAT_INITIAL_MATRIX, &mPCContext.A22_matrix_subblock);
 #else
@@ -163,8 +163,8 @@ void PCLDUFactorisation::PCLDUFactorisationCreate(KSP& rKspObject)
             MAT_INITIAL_MATRIX, &mPCContext.A22_matrix_subblock);
 #endif
 
-        ISDestroy(A22_local_rows);
-        ISDestroy(A22_columns);
+        ISDestroy(PETSC_DESTROY_PARAM(A22_local_rows));
+        ISDestroy(PETSC_DESTROY_PARAM(A22_columns));
     }
 
     // Get matrix sublock B (the upper triangular one)
@@ -179,7 +179,7 @@ void PCLDUFactorisation::PCLDUFactorisationCreate(KSP& rKspObject)
         IS B_columns;
         ISCreateStride(PETSC_COMM_WORLD, high-low, 2*low, 2, &B_local_rows);
 
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 1) //PETSc 3.1
+#if (PETSC_VERSION_MAJOR == 3 && (PETSC_VERSION_MINOR == 1 || PETSC_VERSION_MINOR ==  2) ) //PETSc 3.1
         ISCreateStride(PETSC_COMM_WORLD, high-low, 2*low+1, 2, &B_columns);
         MatGetSubMatrix(system_matrix, B_local_rows, B_columns,
             MAT_INITIAL_MATRIX, &mPCContext.B_matrix_subblock);
@@ -189,8 +189,8 @@ void PCLDUFactorisation::PCLDUFactorisationCreate(KSP& rKspObject)
             MAT_INITIAL_MATRIX, &mPCContext.B_matrix_subblock);
 #endif
 
-        ISDestroy(B_local_rows);
-        ISDestroy(B_columns);
+        ISDestroy(PETSC_DESTROY_PARAM(B_local_rows));
+        ISDestroy(PETSC_DESTROY_PARAM(B_columns));
     }
 
     /*
@@ -312,7 +312,7 @@ void PCLDUFactorisation::PCLDUFactorisationSetUp()
     PCSetFromOptions(mPCContext.PC_amg_A22);
     PCSetUp(mPCContext.PC_amg_A22);
 }
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 1) //PETSc 3.1
+#if (PETSC_VERSION_MAJOR == 3 && (PETSC_VERSION_MINOR == 1 || PETSC_VERSION_MINOR ==  2) ) //PETSc 3.1
 PetscErrorCode PCLDUFactorisationApply(PC pc_object, Vec x, Vec y)
 {
   void* pc_context;

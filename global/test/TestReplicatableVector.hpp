@@ -63,7 +63,7 @@ public:
             int lo, hi;
             Vec temp_vec = PetscTools::CreateVec(vec_size);
             VecGetOwnershipRange(temp_vec,&lo,&hi);
-            VecDestroy(temp_vec); // vector no longer needed
+            PetscTools::Destroy(temp_vec); // vector no longer needed
 
             ReplicatableVector rep_vector(vec_size);
             for (int global_index=0; global_index<vec_size; global_index++)
@@ -120,7 +120,7 @@ public:
             }
         }
 
-        VecDestroy(petsc_vec);
+        PetscTools::Destroy(petsc_vec);
     }
 
     void TestPetscReplicationUsingAlternativeConstructor()
@@ -156,7 +156,7 @@ public:
             }
         }
 
-        VecDestroy(petsc_vec);
+        PetscTools::Destroy(petsc_vec);
     }
 };
 

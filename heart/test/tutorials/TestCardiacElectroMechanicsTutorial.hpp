@@ -572,7 +572,7 @@ public:
         {
             TS_ASSERT_DELTA(voltage_repl[i], -81.9142, 1e-3);
         }
-        VecDestroy(voltage);
+        PetscTools::Destroy(voltage);
 
     }
 };

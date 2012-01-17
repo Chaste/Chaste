@@ -490,7 +490,7 @@ void AbstractNonlinearElasticitySolver<DIM>::ApplyDirichletBoundaryConditions(bo
             //   -value*[0 a_21 a_31 .. a_N1]
             // and will be added to the RHS.
             PetscVecTools::AddScaledVector(this->mDirichletBoundaryConditionsVector, matrix_col, minus_value);
-            VecDestroy(matrix_col);
+            PetscTools::Destroy(matrix_col);
         }
     }
 
@@ -731,9 +731,9 @@ double AbstractNonlinearElasticitySolver<DIM>::TakeNewtonStep()
         double initial_resid_norm;
         VecNorm(linsys_residual, NORM_2, &initial_resid_norm);
 
-        VecDestroy(temp);
-        VecDestroy(temp2);
-        VecDestroy(linsys_residual);
+        PetscTools::Destroy(temp);
+        PetscTools::Destroy(temp2);
+        PetscTools::Destroy(linsys_residual);
 
         double ksp_rel_tol = 1e-6;
         double absolute_tol = ksp_rel_tol * initial_resid_norm;
@@ -789,8 +789,8 @@ double AbstractNonlinearElasticitySolver<DIM>::TakeNewtonStep()
     KSPGetIterationNumber(solver, &num_iters);
     if (num_iters==0)
     {
-        VecDestroy(solution);
-        KSPDestroy(solver);
+        PetscTools::Destroy(solution);
+        KSPDestroy(PETSC_DESTROY_PARAM(solver));
         EXCEPTION("KSP Absolute tolerance was too high, linear system wasn't solved - there will be no decrease in Newton residual. Decrease KspAbsoluteTolerance");
     }
 
@@ -819,8 +819,8 @@ double AbstractNonlinearElasticitySolver<DIM>::TakeNewtonStep()
     double new_norm_resid = UpdateSolutionUsingLineSearch(solution);
     MechanicsEventHandler::EndEvent(MechanicsEventHandler::UPDATE);
 
-    VecDestroy(solution);
-    KSPDestroy(solver);
+    PetscTools::Destroy(solution);
+    KSPDestroy(PETSC_DESTROY_PARAM(solver));
 
     return new_norm_resid;
 }

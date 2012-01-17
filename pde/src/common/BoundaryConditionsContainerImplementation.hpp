@@ -341,7 +341,7 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ApplyDirich
                  * and will be added to the RHS.
                  */
                 PetscVecTools::AddScaledVector(rLinearSystem.rGetDirichletBoundaryConditionsVector(), matrix_col, minus_value);
-                VecDestroy(matrix_col);
+                PetscTools::Destroy(matrix_col);
             }
         }
 

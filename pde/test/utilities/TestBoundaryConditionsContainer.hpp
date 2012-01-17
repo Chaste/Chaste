@@ -311,7 +311,7 @@ public:
         {
             delete nodes_array[i];
         }
-        VecDestroy(solution);
+        PetscTools::Destroy(solution);
     }
 
     void TestApplyToSymmetricLinearSystem()
@@ -392,7 +392,7 @@ public:
         {
             delete nodes_array[i];
         }
-        VecDestroy(solution);
+        PetscTools::Destroy(solution);
     }
 
     void TestApplyToNonlinearSystem()
@@ -453,8 +453,8 @@ public:
             delete nodes_array[i];
         }
 
-        VecDestroy(solution);
-        VecDestroy(residual);
+        PetscTools::Destroy(solution);
+        PetscTools::Destroy(residual);
     }
 
     void TestDefineZeroDirichletOnMeshBoundary()
@@ -586,7 +586,7 @@ public:
         DistributedVectorFactory factory(SIZE);
         Vec template_vec = factory.CreateVec(2);
         LinearSystem some_system(template_vec, 2*SIZE);
-        VecDestroy(template_vec);
+        PetscTools::Destroy(template_vec);
 
         //LinearSystem some_system(2*SIZE);
         for (int i = 0; i < 2*SIZE; i++)
@@ -655,7 +655,7 @@ public:
             delete nodes_array[i];
         }
 
-        VecDestroy(solution);
+        PetscTools::Destroy(solution);
     }
 
     void TestApplyToLinearSystem3Unknowns()
@@ -665,7 +665,7 @@ public:
         DistributedVectorFactory factory(SIZE);
         Vec template_vec = factory.CreateVec(3);
         LinearSystem some_system(template_vec, 3*SIZE);
-        VecDestroy(template_vec);
+        PetscTools::Destroy(template_vec);
 
         //LinearSystem some_system(3*SIZE);
         for (int i = 0; i < 3*SIZE; i++)
@@ -729,7 +729,7 @@ public:
         {
             delete nodes_array[i];
         }
-        VecDestroy(solution);
+        PetscTools::Destroy(solution);
     }
 
     void TestApplyToNonlinearSystem3Unknowns()
@@ -808,8 +808,8 @@ public:
         VecRestoreArray(solution, &p_solution);
         VecRestoreArray(residual, &p_residual);
 
-        VecDestroy(solution);
-        VecDestroy(residual);
+        PetscTools::Destroy(solution);
+        PetscTools::Destroy(residual);
     }
 
     void TestArchiving()

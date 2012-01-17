@@ -126,8 +126,8 @@ public:
         }
 
         // Tidy up
-        VecDestroy(initial_condition);
-        VecDestroy(result);
+        PetscTools::Destroy(initial_condition);
+        PetscTools::Destroy(result);
     }
 
     void TestHeatEquationWithCoupledOdeSystemIn1dWithMixed()
@@ -201,8 +201,8 @@ public:
         }
 
         // Tidy up
-        VecDestroy(initial_condition);
-        VecDestroy(result);
+        PetscTools::Destroy(initial_condition);
+        PetscTools::Destroy(result);
     }
 
     void TestHeatEquationWithCoupledOdeSystemIn2dWithZeroDirichlet()
@@ -277,8 +277,8 @@ public:
         }
 
         // Tidy up
-        VecDestroy(initial_condition);
-        VecDestroy(result);
+        PetscTools::Destroy(initial_condition);
+        PetscTools::Destroy(result);
     }
 
     void TestSolveAndWriteResultsToFileMethod()
@@ -359,7 +359,7 @@ public:
 #endif // CHASTE_VTK
 
         // Tidy up
-        VecDestroy(initial_condition);
+        PetscTools::Destroy(initial_condition);
     }
 
     /**
@@ -426,8 +426,8 @@ public:
         TS_ASSERT(comp_results.CompareFiles(1e-3));
 
         // Tidy up
-        VecDestroy(initial_condition);
-        VecDestroy(solution);
+        PetscTools::Destroy(initial_condition);
+        PetscTools::Destroy(solution);
     }
 };
 

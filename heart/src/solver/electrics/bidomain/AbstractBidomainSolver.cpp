@@ -173,7 +173,7 @@ void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::FinaliseLinearSystem(Vec exi
 
                 this->mpLinearSystem->SetNullBasis(null_basis, 1);
 
-                VecDestroy(null_basis[0]);
+                PetscTools::Destroy(null_basis[0]);
                 mNullSpaceCreated = true;
             }
         }
@@ -329,7 +329,6 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::FinaliseForBath(bool computeMatrix, bool computeVector)
 {
     assert(mBathSimulation);
-
     PetscTruth is_matrix_assembled;
     MatAssembled(this->mpLinearSystem->GetLhsMatrix(), &is_matrix_assembled);
     assert(is_matrix_assembled == PETSC_TRUE);

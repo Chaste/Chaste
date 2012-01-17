@@ -360,10 +360,10 @@ void AbstractNonlinearAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>
         PetscVecTools::AddToElement(current_guess_copy, global_index_outer, -h);
     }
 
-    VecDestroy(residual);
-    VecDestroy(perturbed_residual);
-    VecDestroy(result);
-    VecDestroy(current_guess_copy);
+    PetscTools::Destroy(residual);
+    PetscTools::Destroy(perturbed_residual);
+    PetscTools::Destroy(result);
+    PetscTools::Destroy(current_guess_copy);
 
     PetscMatTools::Finalise(*pJacobian);
 }
@@ -423,9 +423,9 @@ bool AbstractNonlinearAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>
     ComputeJacobian(initial_guess, &numerical_jacobian);
 
     bool ok = PetscMatTools::CheckEquality(numerical_jacobian, analytic_jacobian, tol);
-    MatDestroy(numerical_jacobian);
-    MatDestroy(analytic_jacobian);
-    VecDestroy(initial_guess);
+    PetscTools::Destroy(numerical_jacobian);
+    PetscTools::Destroy(analytic_jacobian);
+    PetscTools::Destroy(initial_guess);
 
     return ok;
 }

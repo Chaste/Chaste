@@ -29,6 +29,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <cassert>
 
 #include "DistributedVectorFactory.hpp"
+#include "PetscTools.hpp"
 
 // Initialise static data
 bool DistributedVectorFactory::msCheckNumberOfProcessesOnLoad = true;
@@ -86,11 +87,7 @@ DistributedVectorFactory::DistributedVectorFactory(unsigned size, PetscInt local
 #endif
     Vec vec = PetscTools::CreateVec(size, local);
     CalculateOwnership(vec);
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
-    VecDestroy(&vec);
-#else
-    VecDestroy(vec);
-#endif    
+    PetscTools::Destroy(vec);
 }
 
 DistributedVectorFactory::DistributedVectorFactory(DistributedVectorFactory* pOriginalFactory)
@@ -106,11 +103,7 @@ DistributedVectorFactory::DistributedVectorFactory(DistributedVectorFactory* pOr
     Vec vec = PetscTools::CreateVec(mpOriginalFactory->GetProblemSize());
 
     CalculateOwnership(vec);
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
-    VecDestroy(&vec);
-#else
-    VecDestroy(vec);
-#endif    
+    PetscTools::Destroy(vec);
 }
 
 DistributedVectorFactory::DistributedVectorFactory(unsigned lo, unsigned hi, unsigned size, unsigned numProcs)
@@ -134,11 +127,7 @@ DistributedVectorFactory::~DistributedVectorFactory()
 void DistributedVectorFactory::CheckForPetsc()
 {
     assert(mPetscStatusKnown==false);
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
-    PetscBool petsc_is_initialised;
-#else
     PetscTruth petsc_is_initialised;
-#endif
     PetscInitialized(&petsc_is_initialised);
 
     /*

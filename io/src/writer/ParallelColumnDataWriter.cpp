@@ -106,7 +106,7 @@ void ParallelColumnDataWriter::PutVectorStripe(int variableId, DistributedVector
 
     // Put the unstriped vector
     ParallelColumnDataWriter::PutVector(variableId, unstriped_petsc);
-    VecDestroy(unstriped_petsc);
+    PetscTools::Destroy(unstriped_petsc);
 }
 
 void ParallelColumnDataWriter::EndDefineMode()
@@ -142,8 +142,8 @@ ParallelColumnDataWriter::~ParallelColumnDataWriter()
 {
     if (mConcentrated != NULL)
     {
-        VecScatterDestroy(mToMaster);
-        VecDestroy(mConcentrated);
+        VecScatterDestroy(PETSC_DESTROY_PARAM(mToMaster));
+        PetscTools::Destroy(mConcentrated);
     }
     Close();
 }

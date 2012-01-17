@@ -94,7 +94,7 @@ AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::~AbstractCardiacProbl
     delete mpCardiacTissue;
     if (mSolution)
     {
-        VecDestroy(mSolution);
+        PetscTools::Destroy(mSolution);
     }
 
     if (mAllocatedMemoryForMesh)
@@ -184,7 +184,7 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Initialise()
     if (mSolution)
     {
         HeartEventHandler::BeginEvent(HeartEventHandler::COMMUNICATION);
-        VecDestroy(mSolution);
+        PetscTools::Destroy(mSolution);
         mSolution = NULL;
         HeartEventHandler::EndEvent(HeartEventHandler::COMMUNICATION);
     }
@@ -401,10 +401,10 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Solve()
                  * A PETSc Vec is a pointer, so we *don't* need to free the memory if it is
                  * freed somewhere else (e.g. in the destructor). If this is a resumed solution
                  * we set initial_condition = mSolution earlier. mSolution is going to be
-                 * cleaned up in the constructor. So, only VecDestroy initial_condition when
+                 * cleaned up in the constructor. So, only PetscTools::Destroy( initial_condition when
                  * it is not equal to mSolution (see #1695).
                  */
-                VecDestroy(initial_condition);
+                PetscTools::Destroy(initial_condition);
             }
             throw e;
         }
@@ -481,10 +481,14 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Solve()
                  * freed somewhere else (e.g. in the destructor). Later, in this while loop
                  * we will set initial_condition = mSolution (or, if this is a resumed solution
                  * it may also have been done when initial_condition was created). mSolution
+<<<<<<< .mine
+                 * is going to be cleaned up in the constructor. So, only PetscTools::Destroy(
+=======
                  * is going to be cleaned up in the destructor. So, only VecDestroy
+>>>>>>> .r14623
                  * initial_condition when it is not equal to mSolution (see #1695).
                  */
-                VecDestroy(initial_condition);
+                PetscTools::Destroy(initial_condition);
             }
 
             // Re-throw
@@ -495,7 +499,7 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Solve()
 
         // Free old initial condition
         HeartEventHandler::BeginEvent(HeartEventHandler::COMMUNICATION);
-        VecDestroy(initial_condition);
+        PetscTools::Destroy(initial_condition);
         HeartEventHandler::EndEvent(HeartEventHandler::COMMUNICATION);
 
         // Initial condition for next loop is current solution
@@ -706,7 +710,7 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::WriteExtraVariab
         // Write it to disc
         this->mpWriter->PutVector(mExtraVariablesId[var_index], variable_data);
 
-        VecDestroy(variable_data);
+        PetscTools::Destroy(variable_data);
     }
 }
 

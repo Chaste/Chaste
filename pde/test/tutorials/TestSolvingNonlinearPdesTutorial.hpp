@@ -243,8 +243,8 @@ public:
         }
 
         /* Finally, we have to remember to destroy the PETSc {{{Vec}}}s. */
-        VecDestroy(initial_guess);
-        VecDestroy(answer);
+        PetscTools::Destroy(initial_guess);
+        PetscTools::Destroy(answer);
     }
 };
 

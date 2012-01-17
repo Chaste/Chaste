@@ -81,8 +81,8 @@ public:
         }
 
         // Tidy up
-        VecDestroy(simple_result);
-        VecDestroy(pde_result);
+        PetscTools::Destroy(simple_result);
+        PetscTools::Destroy(pde_result);
     }
 };
 

@@ -77,9 +77,9 @@ public:
 
             cg_its = ls.GetNumIterations();
 
-            MatDestroy(system_matrix);
-            VecDestroy(system_rhs);
-            VecDestroy(solution);
+            PetscTools::Destroy(system_matrix);
+            PetscTools::Destroy(system_rhs);
+            PetscTools::Destroy(solution);
         }
         Timer::PrintAndReset("CG");
 
@@ -103,16 +103,16 @@ public:
 
             chebyshev_its = ls.GetNumIterations();
 
-            MatDestroy(system_matrix);
-            VecDestroy(system_rhs);
-            VecDestroy(solution);
+            PetscTools::Destroy(system_matrix);
+            PetscTools::Destroy(system_rhs);
+            PetscTools::Destroy(solution);
         }
         Timer::Print("Chebyshev");
 
         TS_ASSERT_LESS_THAN(cg_its, 15u); // Takes 14 iterations with 16 cores
         TS_ASSERT_LESS_THAN(chebyshev_its, 17u); // Takes 16 iterations with 16 cores
 
-        VecDestroy(parallel_layout);
+        PetscTools::Destroy(parallel_layout);
     }
 
     void TestChebyshevAdaptiveVsNoAdaptive() throw (Exception)
@@ -162,7 +162,7 @@ public:
             TS_ASSERT_DELTA(ls.mEigMin, 0.0124, 1e-4);
             TS_ASSERT_DELTA(ls.mEigMax, 1.8810, 1e-4);
 
-            VecDestroy(solution);
+            PetscTools::Destroy(solution);
         }
         catch (Exception& e)
         {
@@ -194,7 +194,7 @@ public:
             TS_ASSERT_DELTA(ls.mEigMin, 0.0124, 1e-4);
             TS_ASSERT_DELTA(ls.mEigMax, 1.8841, 1e-4);
 
-            VecDestroy(solution);
+            PetscTools::Destroy(solution);
         }
 
         // Make sure we are not inheriting a non-default number of iterations from previous test
@@ -213,14 +213,14 @@ public:
             TS_ASSERT_EQUALS(ls.mEigMin, DBL_MAX);
             TS_ASSERT_EQUALS(ls.mEigMax, DBL_MIN);
 
-            VecDestroy(solution);
+            PetscTools::Destroy(solution);
         }
 
-        MatDestroy(system_matrix);
-        VecDestroy(system_rhs);
+        PetscTools::Destroy(system_matrix);
+        PetscTools::Destroy(system_rhs);
 
-        VecDestroy(parallel_layout);
-        VecDestroy(zero_guess);
+        PetscTools::Destroy(parallel_layout);
+        PetscTools::Destroy(zero_guess);
     }
 };
 

@@ -74,8 +74,8 @@ Vec SimplePetscNonlinearSolver::Solve(PetscErrorCode (*pComputeResidual)(SNES,Ve
     SNESSolve(snes, PETSC_NULL, x);
 #endif
 
-    VecDestroy(residual);
-    MatDestroy(jacobian); // Free Jacobian
+    PetscTools::Destroy(residual);
+    PetscTools::Destroy(jacobian); // Free Jacobian
 
     SNESConvergedReason reason;
     SNESGetConvergedReason(snes,&reason);
@@ -84,13 +84,13 @@ Vec SimplePetscNonlinearSolver::Solve(PetscErrorCode (*pComputeResidual)(SNES,Ve
     {
         std::stringstream reason_stream;
         reason_stream << reason;
-        VecDestroy(x); // Since caller can't free the memory in this case
-        SNESDestroy(snes);
+        PetscTools::Destroy(x); // Since caller can't free the memory in this case
+        SNESDestroy(PETSC_DESTROY_PARAM(snes));
         EXCEPTION("Nonlinear Solver did not converge. PETSc reason code:"
                   +reason_stream.str()+" .");
     }
 #undef COVERAGE_IGNORE
-    SNESDestroy(snes);
+    SNESDestroy(PETSC_DESTROY_PARAM(snes));
 
     return x;
 }

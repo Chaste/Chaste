@@ -190,7 +190,7 @@ void AdaptiveBidomainProblem::InitializeSolutionOnAdaptedMesh( VtkMeshReader<3,3
 
     if (mSolution)
     {
-        VecDestroy(mSolution);
+        PetscTools::Destroy(mSolution);
     }
 
     mSolution = solution;
@@ -488,7 +488,7 @@ void AdaptiveBidomainProblem::Solve()
         try
         {
             Vec new_solution = mpSolver->Solve();
-            VecDestroy(mSolution);
+            PetscTools::Destroy(mSolution);
             mSolution = new_solution;
 //            ReplicatableVector replicatable_solution( mSolution );
 //            std::cout << replicatable_solution[2*2e6] << std::endl;        // Vm at node x is mSolution[2*x]

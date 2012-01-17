@@ -52,6 +52,13 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 //#define DEBUG_BARRIERS
 #endif
 
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
+typedef PetscBool PetscTruth;
+#define PETSC_DESTROY_PARAM(x) &x ///\todo #1994 Remove
+#else
+#define PETSC_DESTROY_PARAM(x) x
+#endif
+
 /**
  * A helper class of static methods.
  */

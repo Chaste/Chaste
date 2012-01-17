@@ -173,7 +173,7 @@ void NodeBasedCellPopulationWithBuskeUpdate<DIM>::UpdateNodeLocations(const std:
     }
 
     // Tidy up
-    VecDestroy(initial_condition);
+    PetscTools::Destroy(initial_condition);
 }
 
 template<unsigned DIM>

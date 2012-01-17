@@ -94,7 +94,7 @@ public:
             TS_ASSERT_DELTA(result_repl[i], u, 0.001);
         }
 
-        VecDestroy(result);
+        PetscTools::Destroy(result);
     }
 
     void TestWithHeatEquation2()
@@ -130,7 +130,7 @@ public:
             TS_ASSERT_DELTA(result_repl[i], u, 0.001);
         }
 
-        VecDestroy(result);
+        PetscTools::Destroy(result);
     }
 
     void TestWithHeatEquationNonzeroNeumannCondition()
@@ -169,7 +169,7 @@ public:
             TS_ASSERT_DELTA(result_repl[i], u, 0.001);
         }
 
-        VecDestroy(result);
+        PetscTools::Destroy(result);
     }
 
     void Test2dHeatEquationOnUnitSquare()
@@ -201,7 +201,7 @@ public:
         ReplicatableVector result_repl(result);
         TS_ASSERT_DELTA(result_repl[4], 1.0/12.0, 0.001);
 
-        VecDestroy(result);
+        PetscTools::Destroy(result);
     }
 
     void TestHeatEquationWithNeumannOnUnitDisc()
@@ -243,7 +243,7 @@ public:
             TS_ASSERT_DELTA(result_repl[i], u, 0.01);
         }
 
-        VecDestroy(result);
+        PetscTools::Destroy(result);
     }
 
     void TestVaryingPdeAndMeshReader1D()
@@ -279,7 +279,7 @@ public:
             TS_ASSERT_DELTA(result_repl[i], u, 0.2);
         }
 
-        VecDestroy(result);
+        PetscTools::Destroy(result);
     }
 
     /**
@@ -363,7 +363,7 @@ public:
         }
 
         VecRestoreArray(result, &p_result);
-        VecDestroy(result);
+        PetscTools::Destroy(result);
     }
 
     // Test 3d data
@@ -408,7 +408,7 @@ public:
             TS_ASSERT_DELTA(result_repl[i], u, 0.01);
         }
 
-        VecDestroy(result);
+        PetscTools::Destroy(result);
     }
 
     // Test 3d data
@@ -473,7 +473,7 @@ public:
             TS_ASSERT_DELTA(result_repl[i], u, 0.1);
         }
 
-        VecDestroy(result);
+        PetscTools::Destroy(result);
     }
 
     // Solve u_xx + 4*u = 0, u(0)=1, u(1)=2 => u = a sin(2x) + cos(2x), where a = (2-cos2)/sin2
@@ -512,7 +512,7 @@ public:
             TS_ASSERT_DELTA(result_repl[i], u, u*0.001);
         }
 
-        VecDestroy(result);
+        PetscTools::Destroy(result);
     }
 
     /*
@@ -559,7 +559,7 @@ public:
             TS_ASSERT_DELTA(result_repl[i], u, u*0.01);
         }
 
-        VecDestroy(result);
+        PetscTools::Destroy(result);
     }
 
     /*
@@ -639,7 +639,7 @@ public:
         // Coverage
         TS_ASSERT(solver.GetLinearSystem()!=NULL);
 
-        VecDestroy(result);
+        PetscTools::Destroy(result);
     }
 };
 

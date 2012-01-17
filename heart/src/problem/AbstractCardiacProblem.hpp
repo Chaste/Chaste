@@ -300,8 +300,8 @@ private:
 
             mSolution_distri.Restore();
 
-            VecDestroy(vm);
-            VecDestroy(phie);
+            PetscTools::Destroy(vm);
+            PetscTools::Destroy(phie);
 
         }
         archive & mCurrentTime;

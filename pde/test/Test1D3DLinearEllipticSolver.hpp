@@ -84,7 +84,7 @@ public:
             TS_ASSERT_DELTA(result_repl[i], u, 0.001);
         }
 
-        VecDestroy(result);
+        PetscTools::Destroy(result);
     }
 
     void TestWithPoissonsEquation1dMeshIn3dSpace() throw (Exception)
@@ -120,7 +120,7 @@ public:
             TS_ASSERT_DELTA(result_repl[i], u, 0.001);
         }
 
-        VecDestroy(result);
+        PetscTools::Destroy(result);
     }
 
     void TestBranchedPoissonsEquation1dMeshIn3dSpace() throw (Exception)
@@ -165,8 +165,9 @@ public:
             TS_ASSERT_DELTA(result_repl[i], u, 0.001);
         }
 
-        VecDestroy(result);
+        PetscTools::Destroy(result);
     }
+    
 };
 
 #endif //_TESTSIMPLELINEARELLIPTICSOLVER_HPP_

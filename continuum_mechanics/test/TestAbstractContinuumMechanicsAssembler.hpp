@@ -268,10 +268,10 @@ public:
         assembler.SetMatrixToAssemble(bad_size_mat, true);
         TS_ASSERT_THROWS_CONTAINS(assembler.AssembleMatrix(), "Matrix provided to be assembled has size 67, not expected size of 5");
 
-        MatDestroy(mat);
-        VecDestroy(vec);
-        MatDestroy(bad_size_mat);
-        VecDestroy(bad_size_vec);
+        PetscTools::Destroy(mat);
+        PetscTools::Destroy(vec);
+        PetscTools::Destroy(bad_size_mat);
+        PetscTools::Destroy(bad_size_vec);
     }
 
     // same to main part of TestAssemblers1d except 2d
@@ -337,8 +337,8 @@ public:
             }
         }
 
-        VecDestroy(vec);
-        MatDestroy(mat);
+        PetscTools::Destroy(vec);
+        PetscTools::Destroy(mat);
     }
 
     // same as main part of TestAssemblers1d except 3d
@@ -407,8 +407,8 @@ public:
             }
         }
 
-        VecDestroy(vec);
-        MatDestroy(mat);
+        PetscTools::Destroy(vec);
+        PetscTools::Destroy(mat);
     }
 
     void TestWithMassMatrixInPressurePressureBlock() throw(Exception)
@@ -470,8 +470,8 @@ public:
             }
         }
 
-        MatDestroy(mat1);
-        MatDestroy(mat2);
+        PetscTools::Destroy(mat1);
+        PetscTools::Destroy(mat2);
     }
 };
 

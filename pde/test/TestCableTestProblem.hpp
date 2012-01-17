@@ -194,7 +194,7 @@ public:
         }
 
         VecRestoreArray(result, &p_result);
-        VecDestroy(result);
+        PetscTools::Destroy(result);
     }
 };
 

@@ -123,7 +123,7 @@ public:
             }
         }
 
-        MatDestroy(mat);
+        PetscTools::Destroy(mat);
     }
 
 };

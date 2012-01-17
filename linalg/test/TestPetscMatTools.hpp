@@ -70,8 +70,8 @@ public:
         TS_ASSERT(!PetscMatTools::CheckEquality(matrix1, matrix2));
         TS_ASSERT(PetscMatTools::CheckEquality(matrix1, matrix2, 1e-9));
 
-        MatDestroy(matrix1);
-        MatDestroy(matrix2);
+        PetscTools::Destroy(matrix1);
+        PetscTools::Destroy(matrix2);
     }
 
     void TestSymmetryCheck() throw (Exception)
@@ -96,7 +96,7 @@ public:
         TS_ASSERT(!PetscMatTools::CheckSymmetry(matrix));
         TS_ASSERT(PetscMatTools::CheckSymmetry(matrix, 1e-9));
 
-        MatDestroy(matrix);
+        PetscTools::Destroy(matrix);
     }
 };
 

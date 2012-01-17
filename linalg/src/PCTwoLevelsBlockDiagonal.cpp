@@ -39,26 +39,26 @@ PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonal(KSP& rKspObject, std::vector<
 
 PCTwoLevelsBlockDiagonal::~PCTwoLevelsBlockDiagonal()
 {
-    MatDestroy(mPCContext.A11_matrix_subblock);
-    MatDestroy(mPCContext.A22_B1_matrix_subblock);
-    MatDestroy(mPCContext.A22_B2_matrix_subblock);
+    PetscTools::Destroy(mPCContext.A11_matrix_subblock);
+    PetscTools::Destroy(mPCContext.A22_B1_matrix_subblock);
+    PetscTools::Destroy(mPCContext.A22_B2_matrix_subblock);
 
-    PCDestroy(mPCContext.PC_amg_A11);
-    PCDestroy(mPCContext.PC_amg_A22_B1);
-    PCDestroy(mPCContext.PC_amg_A22_B2);
+    PCDestroy(PETSC_DESTROY_PARAM(mPCContext.PC_amg_A11));
+    PCDestroy(PETSC_DESTROY_PARAM(mPCContext.PC_amg_A22_B1));
+    PCDestroy(PETSC_DESTROY_PARAM(mPCContext.PC_amg_A22_B2));
 
-    VecDestroy(mPCContext.x1_subvector);
-    VecDestroy(mPCContext.y1_subvector);
+    PetscTools::Destroy(mPCContext.x1_subvector);
+    PetscTools::Destroy(mPCContext.y1_subvector);
 
-    VecDestroy(mPCContext.x21_subvector);
-    VecDestroy(mPCContext.y21_subvector);
+    PetscTools::Destroy(mPCContext.x21_subvector);
+    PetscTools::Destroy(mPCContext.y21_subvector);
 
-    VecDestroy(mPCContext.x22_subvector);
-    VecDestroy(mPCContext.y22_subvector);
+    PetscTools::Destroy(mPCContext.x22_subvector);
+    PetscTools::Destroy(mPCContext.y22_subvector);
 
-    VecScatterDestroy(mPCContext.A11_scatter_ctx);
-    VecScatterDestroy(mPCContext.A22_B1_scatter_ctx);
-    VecScatterDestroy(mPCContext.A22_B2_scatter_ctx);
+    VecScatterDestroy(PETSC_DESTROY_PARAM(mPCContext.A11_scatter_ctx));
+    VecScatterDestroy(PETSC_DESTROY_PARAM(mPCContext.A22_B1_scatter_ctx));
+    VecScatterDestroy(PETSC_DESTROY_PARAM(mPCContext.A22_B2_scatter_ctx));
 }
 
 void PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalCreate(KSP& rKspObject, std::vector<PetscInt>& rBathNodes)
@@ -118,7 +118,14 @@ void PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalCreate(KSP& rKspObject, s
     {
         phi_e_bath_rows[index] = 2*rBathNodes[index] + 1;
     }
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 2)
+    /**\todo #1994
+     * I am not sure if we need to use PETSC_OWN_POINTER or PETSC_USE_POINTER - Arash
+     */
+    ISCreateGeneral(PETSC_COMM_WORLD, rBathNodes.size(), phi_e_bath_rows, PETSC_OWN_POINTER,&A22_bath_rows);
+ #else
     ISCreateGeneralWithArray(PETSC_COMM_WORLD, rBathNodes.size(), phi_e_bath_rows, &A22_bath_rows);
+#endif
 
     IS A22_tissue_rows;
     ISDifference(A22_all_rows, A22_bath_rows, &A22_tissue_rows);
@@ -146,11 +153,11 @@ void PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalCreate(KSP& rKspObject, s
         VecScatterCreate(dummy_vec, A22_B1_rows, mPCContext.x21_subvector, tissue_vector, &mPCContext.A22_B1_scatter_ctx);
         VecScatterCreate(dummy_vec, A22_B2_rows, mPCContext.x22_subvector, bath_vector, &mPCContext.A22_B2_scatter_ctx);
 
-        ISDestroy(all_vector);
-        ISDestroy(tissue_vector);
-        ISDestroy(bath_vector);
+        ISDestroy(PETSC_DESTROY_PARAM(all_vector));
+        ISDestroy(PETSC_DESTROY_PARAM(tissue_vector));
+        ISDestroy(PETSC_DESTROY_PARAM(bath_vector));
 
-        VecDestroy(dummy_vec);
+        PetscTools::Destroy(dummy_vec);
     }
 
     // Get matrix sublock A11
@@ -165,7 +172,7 @@ void PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalCreate(KSP& rKspObject, s
         IS& A11_columns=A11_all_rows;
         ISCreateStride(PETSC_COMM_WORLD, high-low, 2*low, 2, &A11_local_rows); /// \todo: #1082 OK in parallel. Use as an example for the other two blocks
 
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 1) //PETSc 3.1
+#if (PETSC_VERSION_MAJOR == 3 && (PETSC_VERSION_MINOR == 1 || PETSC_VERSION_MINOR ==  2) ) //PETSc 3.1
         MatGetSubMatrix(system_matrix, A11_local_rows, A11_columns,
             MAT_INITIAL_MATRIX, &mPCContext.A11_matrix_subblock);
 #else
@@ -173,7 +180,7 @@ void PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalCreate(KSP& rKspObject, s
             MAT_INITIAL_MATRIX, &mPCContext.A11_matrix_subblock);
 #endif
 
-        ISDestroy(A11_local_rows);
+        ISDestroy(PETSC_DESTROY_PARAM(A11_local_rows));
     }
 
     // Get matrix sublock A22_B1
@@ -188,7 +195,7 @@ void PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalCreate(KSP& rKspObject, s
         IS& A22_B1_local_rows = A22_tissue_rows; // wrong in parallel, need to give local rows
         IS& A22_B1_columns = A22_tissue_rows;
 
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 1) //PETSc 3.1
+#if (PETSC_VERSION_MAJOR == 3 && (PETSC_VERSION_MINOR == 1 || PETSC_VERSION_MINOR ==  2) ) //PETSc 3.1
         MatGetSubMatrix(system_matrix, A22_B1_local_rows, A22_B1_columns,
             MAT_INITIAL_MATRIX, &mPCContext.A22_B1_matrix_subblock);
 #else
@@ -210,7 +217,7 @@ void PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalCreate(KSP& rKspObject, s
         IS& A22_B2_local_rows = A22_bath_rows; // wrong in parallel, need to give local rows
         IS& A22_B2_columns = A22_bath_rows;
 
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 1) //PETSc 3.1
+#if (PETSC_VERSION_MAJOR == 3 && (PETSC_VERSION_MINOR == 1 || PETSC_VERSION_MINOR ==  2) ) //PETSc 3.1
         MatGetSubMatrix(system_matrix, A22_B2_local_rows, A22_B2_columns,
             MAT_INITIAL_MATRIX, &mPCContext.A22_B2_matrix_subblock);
 #else
@@ -219,11 +226,11 @@ void PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalCreate(KSP& rKspObject, s
 #endif
     }
 
-    ISDestroy(A11_all_rows);
-    ISDestroy(A22_all_rows);
-    ISDestroy(A22_bath_rows);
+    ISDestroy(PETSC_DESTROY_PARAM(A11_all_rows));
+    ISDestroy(PETSC_DESTROY_PARAM(A22_all_rows));
+    ISDestroy(PETSC_DESTROY_PARAM(A22_bath_rows));
     delete[] phi_e_bath_rows;
-    ISDestroy(A22_tissue_rows);
+    ISDestroy(PETSC_DESTROY_PARAM(A22_tissue_rows));
 
     // Register call-back function and its context
     PCSetType(mPetscPCObject, PCSHELL);
@@ -274,7 +281,7 @@ void PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalSetUp()
     PCSetUp(mPCContext.PC_amg_A22_B2);
 }
 
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 1) //PETSc 3.1
+#if (PETSC_VERSION_MAJOR == 3 && (PETSC_VERSION_MINOR == 1 || PETSC_VERSION_MINOR ==  2) ) //PETSc 3.1
 PetscErrorCode PCTwoLevelsBlockDiagonalApply(PC pc_object, Vec x, Vec y)
 {
   void* pc_context;

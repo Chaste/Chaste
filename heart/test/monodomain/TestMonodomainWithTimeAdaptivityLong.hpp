@@ -146,8 +146,8 @@ public:
             }
         }
 
-        VecDestroy(voltage_no_adapt);
-        VecDestroy(voltage_adapt);
+        PetscTools::Destroy(voltage_no_adapt);
+        PetscTools::Destroy(voltage_adapt);
     }
 };
 

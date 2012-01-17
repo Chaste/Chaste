@@ -291,7 +291,7 @@ public:
             TS_ASSERT_DELTA(u, u_correct, 1e-10);
         }
 
-        VecDestroy(solution);
+        PetscTools::Destroy(solution);
     }
 
     void TestSolveLaplacianWithQuadratics2d() throw (Exception)
@@ -348,8 +348,8 @@ public:
             TS_ASSERT_DELTA(u_1, u_2, 0.08*5e-2);
         }
 
-        VecDestroy(solution_lin);
-        VecDestroy(solution_quads);
+        PetscTools::Destroy(solution_lin);
+        PetscTools::Destroy(solution_quads);
     }
 
     void TestSolveLaplacianWithQuadratics2dReordered() throw (Exception)
@@ -413,8 +413,8 @@ public:
             TS_ASSERT_DELTA(u_1, u_2, 0.08*5e-2);
         }
 
-        VecDestroy(solution_lin);
-        VecDestroy(solution_quads);
+        PetscTools::Destroy(solution_lin);
+        PetscTools::Destroy(solution_quads);
     }
 
 
@@ -468,8 +468,8 @@ public:
             //          <<  u_2 << " " << fabs(u_1-u_2) << "\n";
         }
 
-        VecDestroy(solution_lin);
-        VecDestroy(solution_quads);
+        PetscTools::Destroy(solution_lin);
+        PetscTools::Destroy(solution_quads);
     }
 };
 

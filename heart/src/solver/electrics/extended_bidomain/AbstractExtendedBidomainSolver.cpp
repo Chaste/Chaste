@@ -120,7 +120,7 @@ void AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::FinaliseLinearSystem
 
                 this->mpLinearSystem->SetNullBasis(nullbasis, 1);
 
-                VecDestroy(nullbasis[0]);
+                PetscTools::Destroy(nullbasis[0]);
                 mNullSpaceCreated = true;
             }
         }

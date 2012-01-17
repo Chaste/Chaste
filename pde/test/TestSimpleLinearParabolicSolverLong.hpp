@@ -154,8 +154,8 @@ public:
             TS_ASSERT_DELTA(result_repl[i], u, 0.001);
         }
 
-        VecDestroy(result);
-        VecDestroy(initial_condition);
+        PetscTools::Destroy(result);
+        PetscTools::Destroy(initial_condition);
     }
 
     /**
@@ -214,8 +214,8 @@ public:
             TS_ASSERT_DELTA(result_repl[i], u, 0.1);
         }
 
-        VecDestroy(initial_condition);
-        VecDestroy(result);
+        PetscTools::Destroy(initial_condition);
+        PetscTools::Destroy(result);
     }
 
     /**
@@ -295,8 +295,8 @@ public:
             TS_ASSERT_DELTA(p_result[local_index], u, 0.1);
         }
         VecRestoreArray(result, &p_result);
-        VecDestroy(initial_condition);
-        VecDestroy(result);
+        PetscTools::Destroy(initial_condition);
+        PetscTools::Destroy(result);
     }
 
     /**
@@ -403,8 +403,8 @@ public:
             TS_ASSERT_DELTA(p_result[local_index], u, u*0.15);
         }
         VecRestoreArray(result, &p_result);
-        VecDestroy(initial_condition);
-        VecDestroy(result);
+        PetscTools::Destroy(initial_condition);
+        PetscTools::Destroy(result);
     }
 };
 

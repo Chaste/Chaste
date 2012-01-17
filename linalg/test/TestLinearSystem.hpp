@@ -100,7 +100,7 @@ public:
             }
         }
         VecRestoreArray(solution_vector, &p_solution_elements_array);
-        VecDestroy(solution_vector);
+        PetscTools::Destroy(solution_vector);
 
         // SetRelativeTolerance
         ls.SetRelativeTolerance(1e-2);
@@ -122,7 +122,7 @@ public:
             }
         }
         VecRestoreArray(solution_vector, &p_solution_elements_array);
-        VecDestroy(solution_vector);
+        PetscTools::Destroy(solution_vector);
 
         /*
          * Reset KSP stuff. This doesn't need to be done, but we're making sure
@@ -149,7 +149,7 @@ public:
             }
         }
         VecRestoreArray(solution_vector, &p_solution_elements_array);
-        VecDestroy(solution_vector);
+        PetscTools::Destroy(solution_vector);
     }
 
     void TestZeroingLinearSystem()
@@ -332,7 +332,7 @@ public:
             TS_ASSERT_EQUALS(distributed_third_row[index], 3);
         }
 
-        VecDestroy(third_row);
+        PetscTools::Destroy(third_row);
     }
 
 
@@ -350,7 +350,7 @@ public:
         TS_ASSERT_EQUALS(lo1, lo2);
         TS_ASSERT_EQUALS(hi1, hi2);
 
-        VecDestroy(test_vec);
+        PetscTools::Destroy(test_vec);
     }
 
     void TestLinearSystem2()
@@ -386,7 +386,7 @@ public:
         }
         VecRestoreArray(solution_vector, &p_solution_elements_array);
 
-        VecDestroy(solution_vector);
+        PetscTools::Destroy(solution_vector);
     }
 
     /**
@@ -405,7 +405,7 @@ public:
             LinearSystem ls((PetscInt) size);
             TS_ASSERT_THROWS_THIS(ls.SetNullBasis(&non_orthonormal, 1),
                     "One of the vectors in the null space is not normalised");
-            VecDestroy(non_orthonormal);
+            PetscTools::Destroy(non_orthonormal);
         }
 
         // Test it throws if the vectors in the base are not orthogonal
@@ -423,8 +423,8 @@ public:
             LinearSystem ls((PetscInt) size);
             TS_ASSERT_THROWS_THIS(ls.SetNullBasis(null_basis, 3),"The null space is not orthogonal.");
 
-            VecDestroy(one_zeros);
-            VecDestroy(zero_one_zeros);
+            PetscTools::Destroy(one_zeros);
+            PetscTools::Destroy(zero_one_zeros);
         }
 
 
@@ -443,8 +443,8 @@ public:
             LinearSystem ls((PetscInt) size);
             TS_ASSERT_THROWS_NOTHING(ls.SetNullBasis(null_basis, 2));
 
-            VecDestroy(one_zeros);
-            VecDestroy(zero_one_zeros);
+            PetscTools::Destroy(one_zeros);
+            PetscTools::Destroy(zero_one_zeros);
         }
 #endif
     }
@@ -491,9 +491,9 @@ public:
         TS_ASSERT_DELTA(replicated_solution[1], 1.0, 1e-8);
         TS_ASSERT_DELTA(replicated_solution[2], 1.0, 1e-8);
 
-        VecDestroy(one_zeros);
-        VecDestroy(wrong_solution);
-        VecDestroy(solution);
+        PetscTools::Destroy(one_zeros);
+        PetscTools::Destroy(wrong_solution);
+        PetscTools::Destroy(solution);
 
     }
 
@@ -567,8 +567,8 @@ public:
                              test_val2);
         }
 
-        VecDestroy(test_vec);
-        MatDestroy(m);
+        PetscTools::Destroy(test_vec);
+        PetscTools::Destroy(m);
     }
 
     void TestLinearSystem1WithIntialGuess()
@@ -623,9 +623,9 @@ public:
 #endif
         TS_ASSERT_THROWS_CONTAINS(solution_vector = ls.Solve(bad_guess),
                 "DIVERGED_DTOL in function");
-        VecDestroy(solution_vector);
-        VecDestroy(good_guess);
-        VecDestroy(bad_guess);
+        PetscTools::Destroy(solution_vector);
+        PetscTools::Destroy(good_guess);
+        PetscTools::Destroy(bad_guess);
     }
 
     void TestAddMultipleValues()
@@ -721,7 +721,7 @@ public:
 
         VecRestoreArray(solution_vector, &p_solution_elements_array);
 
-        VecDestroy(solution_vector);
+        PetscTools::Destroy(solution_vector);
 
         // coverage
         ls.SetMatrixIsSymmetric(false);
@@ -787,8 +787,8 @@ public:
 
         VecRestoreArray(solution_vector, &p_solution_elements_array);
         VecRestoreArray(solution_vector2, &p_solution_elements_array2);
-        VecDestroy(solution_vector2);
-        VecDestroy(solution_vector);
+        PetscTools::Destroy(solution_vector2);
+        PetscTools::Destroy(solution_vector);
     }
 
     void TestGetSetKSP() throw (Exception)
@@ -801,7 +801,7 @@ public:
         ls.AssembleFinalLinearSystem();
         Vec solution_vector;
         solution_vector = ls.Solve();
-        VecDestroy(solution_vector);
+        PetscTools::Destroy(solution_vector);
         PetscReal rtol, atol, dtol;
         int maxits;
         KSPGetTolerances(ls.mKspSolver, &rtol, &atol, &dtol, &maxits);
@@ -853,7 +853,7 @@ public:
         ls2.AssembleFinalLinearSystem();
         Vec solution_vector2;
         solution_vector2 = ls2.Solve();
-        VecDestroy(solution_vector2);
+        PetscTools::Destroy(solution_vector2);
         KSPGetTolerances(ls2.mKspSolver, &rtol, &atol, &dtol, &maxits);
         TS_ASSERT_EQUALS(rtol, DBL_EPSILON);
         TS_ASSERT_EQUALS(atol, 1e-3);
@@ -866,7 +866,7 @@ public:
         ls2.SetAbsoluteTolerance(1e-2);
         Vec solution_vector3;
         solution_vector3 = ls2.Solve();
-        VecDestroy(solution_vector3);
+        PetscTools::Destroy(solution_vector3);
         KSPGetTolerances(ls2.mKspSolver, &rtol, &atol, &dtol, &maxits);
         TS_ASSERT_EQUALS(rtol, DBL_EPSILON);
         TS_ASSERT_EQUALS(atol, 1e-2);
@@ -913,13 +913,13 @@ public:
             PetscViewerBinaryOpen(PETSC_COMM_WORLD, archive_filename_rhs.c_str(), type, &vec_viewer);
 
             VecView(ls.GetRhsVector(), vec_viewer);
-            PetscViewerDestroy(vec_viewer);
+            PetscViewerDestroy(PETSC_DESTROY_PARAM(vec_viewer));
 
             PetscViewer mat_viewer;
             PetscViewerBinaryOpen(PETSC_COMM_WORLD, archive_filename_lhs.c_str(), type, &mat_viewer);
 
             MatView(ls.GetLhsMatrix(), mat_viewer);
-            PetscViewerDestroy(mat_viewer);
+            PetscViewerDestroy(PETSC_DESTROY_PARAM(mat_viewer));
         }
         // LOAD
         {
@@ -932,8 +932,16 @@ public:
 #endif
             PetscViewerBinaryOpen(PETSC_COMM_WORLD, archive_filename_rhs.c_str(), type, &vec_viewer);
             Vec new_vec;
+
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 2)
+            ///\todo #1994 review this
+            VecCreate(PETSC_COMM_WORLD,&new_vec);
+            VecSetType(new_vec,PETSC_NULL);
+            VecLoad(new_vec,vec_viewer);
+#else
             VecLoad(vec_viewer, PETSC_NULL, &new_vec);
-            PetscViewerDestroy(vec_viewer);
+#endif
+            PetscViewerDestroy(PETSC_DESTROY_PARAM(vec_viewer));
 
             int lo, hi;
             VecGetOwnershipRange(new_vec, &lo, &hi);
@@ -950,13 +958,22 @@ public:
                 TS_ASSERT_DELTA(p_vec_values[i-lo], answer[i], 1e-9);
             }
 
-            VecDestroy(new_vec);
+            PetscTools::Destroy(new_vec);
 
             PetscViewer mat_viewer;
             PetscViewerBinaryOpen(PETSC_COMM_WORLD, archive_filename_lhs.c_str(), type, &mat_viewer);
             Mat new_mat;
+
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 2)
+            ///\todo #1994 review this
+            MatCreate(PETSC_COMM_WORLD,&new_mat);
+            MatSetType(new_mat,PETSC_NULL);
+            MatLoad(new_mat,mat_viewer);
+#else
             MatLoad(mat_viewer, PETSC_NULL, &new_mat);
-            PetscViewerDestroy(mat_viewer);
+#endif
+
+            PetscViewerDestroy(PETSC_DESTROY_PARAM(mat_viewer));
 
             for (int row=lo; row<hi; row++)
             {
@@ -977,7 +994,7 @@ public:
                 }
             }
 
-            MatDestroy(new_mat);
+            PetscTools::Destroy(new_mat);
         }
     }
 
@@ -1094,7 +1111,7 @@ public:
             // Check archiving of KSP/PC types
             Vec solution_vector3;
             solution_vector3 = p_linear_system->Solve();
-            VecDestroy(solution_vector3);
+            PetscTools::Destroy(solution_vector3);
 #if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x.x
             const KSPType solver;
             const PCType pc;
@@ -1127,7 +1144,7 @@ public:
         // Note that this test deadlocks if the file's not on the disk
         PetscTools::ReadPetscObject(system_rhs, "linalg/test/data/matrices/cube_6000elems_half_activated.vec", parallel_layout);
 
-        VecDestroy(parallel_layout);
+        PetscTools::Destroy(parallel_layout);
 
         LinearSystem ls = LinearSystem(system_rhs, system_matrix);
 
@@ -1137,23 +1154,23 @@ public:
         ls.SetPcType("bjacobi");
         Vec solution = ls.Solve(/*no guess provided*/);
         unsigned block_jacobi_its = ls.GetNumIterations();
-        VecDestroy(solution);
+        PetscTools::Destroy(solution);
 
         ls.SetPcType("ldufactorisation");
         solution = ls.Solve(/*no guess provided*/);
         unsigned ldu_its = ls.GetNumIterations();
-        VecDestroy(solution);
+        PetscTools::Destroy(solution);
 
         ls.SetPcType("bjacobi");
         solution = ls.Solve(/*no guess provided*/);
         unsigned second_block_jacobi_its = ls.GetNumIterations();
-        VecDestroy(solution);
+        PetscTools::Destroy(solution);
 
         TS_ASSERT_DIFFERS(block_jacobi_its, ldu_its)
         TS_ASSERT_DIFFERS(ldu_its, second_block_jacobi_its)
 
-        MatDestroy(system_matrix);
-        VecDestroy(system_rhs);
+        PetscTools::Destroy(system_matrix);
+        PetscTools::Destroy(system_rhs);
     }
 
 //    void TestSingularSolves() throw(Exception)
@@ -1191,7 +1208,7 @@ public:
         // Note that this test deadlocks if the file's not on the disk
         PetscTools::ReadPetscObject(system_rhs, "linalg/test/data/matrices/cube_6000elems_half_activated.vec", parallel_layout);
 
-        VecDestroy(parallel_layout);
+        PetscTools::Destroy(parallel_layout);
 
         unsigned num_it_same_mat=0, num_it_diff_mat=1;
 
@@ -1202,7 +1219,7 @@ public:
             Vec solution = ls.Solve();
             num_it_same_mat = ls.GetNumIterations();
 
-            VecDestroy(solution);
+            PetscTools::Destroy(solution);
         }
 
         /*
@@ -1223,7 +1240,7 @@ public:
             Vec solution = ls_diff_precond.Solve();
             num_it_diff_mat = ls_diff_precond.GetNumIterations();
 
-            VecDestroy(solution);
+            PetscTools::Destroy(solution);
         }
 
         TS_ASSERT_EQUALS(num_it_diff_mat, num_it_same_mat);
@@ -1247,14 +1264,14 @@ public:
             Vec solution = ls_diff_precond.Solve();
             num_it_diff_mat = ls_diff_precond.GetNumIterations();
 
-            VecDestroy(solution);
+            PetscTools::Destroy(solution);
         }
 
         TS_ASSERT_EQUALS(num_it_diff_mat, 80u); // It takes 80 iterations if you run with ls.SetPcType("none");
         TS_ASSERT_LESS_THAN(num_it_same_mat, num_it_diff_mat);
 
-        VecDestroy(system_rhs);
-        MatDestroy(system_matrix);
+        PetscTools::Destroy(system_rhs);
+        PetscTools::Destroy(system_matrix);
     }
 
     void TestFixedNumberOfIterations() throw (Exception)
@@ -1315,7 +1332,7 @@ public:
         PetscVecTools::WAXPY(difference, -1.0, new_solution, solution);
         VecNorm(difference, NORM_INFINITY, &l_inf_norm);
         TS_ASSERT_DELTA(l_inf_norm, 0.0, 4e-4);
-        VecDestroy(new_solution);
+        PetscTools::Destroy(new_solution);
 
         /*
          * Solve using previous solution as new guess takes 0 iterations as
@@ -1329,7 +1346,7 @@ public:
         PetscVecTools::WAXPY(difference, -1.0, new_solution, solution);
         VecNorm(difference, NORM_INFINITY, &l_inf_norm);
         TS_ASSERT_DELTA(l_inf_norm, 0.0, 4e-4);
-        VecDestroy(new_solution);
+        PetscTools::Destroy(new_solution);
 
         /*
          * Solve with initial guess should take 52 iterations but the solver
@@ -1353,7 +1370,7 @@ public:
         TS_ASSERT_DELTA(l_inf_norm, 22.43, 2.0);
 #endif
 
-        VecDestroy(new_solution);
+        PetscTools::Destroy(new_solution);
 
         /*
          * Solve with initial guess and tolerance-based stop criteria takes 52 iterations
@@ -1367,14 +1384,14 @@ public:
         VecNorm(difference, NORM_INFINITY, &l_inf_norm);
         TS_ASSERT_DELTA(l_inf_norm, 0.0, 4e-4);
 
-        VecDestroy(solution);
-        VecDestroy(new_solution);
-        VecDestroy(difference);
+        PetscTools::Destroy(solution);
+        PetscTools::Destroy(new_solution);
+        PetscTools::Destroy(difference);
 
-        MatDestroy(system_matrix);
-        VecDestroy(system_rhs);
-        VecDestroy(parallel_layout);
-        VecDestroy(guess);
+        PetscTools::Destroy(system_matrix);
+        PetscTools::Destroy(system_rhs);
+        PetscTools::Destroy(parallel_layout);
+        PetscTools::Destroy(guess);
     }
 
     void TestFixedNumberOfIterationsRelativeToleranceCoverage() throw (Exception)
@@ -1435,15 +1452,15 @@ public:
         PetscVecTools::WAXPY(difference, -1.0, new_solution, solution);
         VecNorm(difference, NORM_INFINITY, &l_inf_norm);
         TS_ASSERT_DELTA(l_inf_norm, 0.0, 1e-3);
-        VecDestroy(new_solution);
+        PetscTools::Destroy(new_solution);
 
-        VecDestroy(solution);
-        VecDestroy(difference);
+        PetscTools::Destroy(solution);
+        PetscTools::Destroy(difference);
 
-        MatDestroy(system_matrix);
-        VecDestroy(system_rhs);
-        VecDestroy(parallel_layout);
-        VecDestroy(guess);
+        PetscTools::Destroy(system_matrix);
+        PetscTools::Destroy(system_rhs);
+        PetscTools::Destroy(parallel_layout);
+        PetscTools::Destroy(guess);
     }
 
     void TestSolveZerosInitialGuessForSmallRhs() throw(Exception)
@@ -1470,8 +1487,8 @@ public:
         TS_ASSERT_DELTA(solution_vector_repl[0], 0.0, 1e-6);
         TS_ASSERT_DELTA(solution_vector_repl[1], 0.0, 1e-6);
 
-        VecDestroy(init_cond);
-        VecDestroy(solution_vector);
+        PetscTools::Destroy(init_cond);
+        PetscTools::Destroy(solution_vector);
     }
 
     /** See #1834 */
@@ -1493,7 +1510,7 @@ public:
 
         Vec solution_vector;
         solution_vector = ls.Solve(); // SHOULD fail with an error, but doesn't
-        VecDestroy(solution_vector);
+        PetscTools::Destroy(solution_vector);
     }
 
     // This test should be the last in the suite
@@ -1508,7 +1525,7 @@ public:
         ls.SetPcType("ilu"); //Not really -- see above
         Vec solution_vector3;
         solution_vector3 = ls.Solve();
-        VecDestroy(solution_vector3);
+        PetscTools::Destroy(solution_vector3);
 
 #if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x.x
         const KSPType solver;
@@ -1526,5 +1543,7 @@ public:
         TS_ASSERT( strcmp(pc,"jacobi")==0 );
     }
     // The above test should be last in the suite
+    
+    ///\todo #1994 Test exits abnormally with PETSc 3.2
 };
 #endif //_TESTLINEARSYSTEM_HPP_

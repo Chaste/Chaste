@@ -408,7 +408,7 @@ public:
             TS_ASSERT_DELTA(extracellular_potential[index], 0, 0.06);
         }
 
-        VecDestroy(monodomain_results);
+        PetscTools::Destroy(monodomain_results);
     }
 
 

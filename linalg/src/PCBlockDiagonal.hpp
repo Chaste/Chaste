@@ -46,7 +46,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
  * @param x unpreconditioned residual.
  * @param y preconditioned residual. y = inv(M)*x
  */
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 1) //PETSc 3.1
+#if (PETSC_VERSION_MAJOR == 3 && (PETSC_VERSION_MINOR == 1 || PETSC_VERSION_MINOR ==  2) ) //PETSc 3.1
 PetscErrorCode PCBlockDiagonalApply(PC pc_context, Vec x, Vec y);
 #else
 PetscErrorCode PCBlockDiagonalApply(void* pc_context, Vec x, Vec y);

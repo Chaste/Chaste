@@ -307,9 +307,9 @@ private:
                 writer.AdvanceAlongUnlimitedDimension();
             }
         }
-        VecDestroy(petsc_data_1);
-        VecDestroy(petsc_data_2);
-        VecDestroy(petsc_data_3);
+        PetscTools::Destroy(petsc_data_1);
+        PetscTools::Destroy(petsc_data_2);
+        PetscTools::Destroy(petsc_data_3);
         writer.Close();
     }
 
@@ -401,9 +401,9 @@ public:
             TS_ASSERT_EQUALS(unlimited_values[i], i);
         }
 
-        VecDestroy(petsc_data_1);
-        VecDestroy(petsc_data_2);
-        VecDestroy(petsc_data_3);
+        PetscTools::Destroy(petsc_data_1);
+        PetscTools::Destroy(petsc_data_2);
+        PetscTools::Destroy(petsc_data_3);
         reader.Close();
     }
 
@@ -438,7 +438,7 @@ public:
         TS_ASSERT_THROWS_THIS(reader.GetVariableOverTimeOverMultipleNodes("Node",0,10),
                 "The file does not contain time dependent data");
 
-        VecDestroy(data);
+        PetscTools::Destroy(data);
         reader.Close();
 
         // Missing dir
@@ -487,8 +487,8 @@ public:
         TS_ASSERT_THROWS_THIS(reader.GetVariableOverNodes(data_too_big, "Node", 0/*timestep*/),
                 "Could not read data because Vec is the wrong size"); //Data too big
 
-        VecDestroy(data);
-        VecDestroy(data_too_big);
+        PetscTools::Destroy(data);
+        PetscTools::Destroy(data_too_big);
         reader.Close();
     }
 
@@ -511,7 +511,7 @@ public:
         Vec data = factory.CreateVec();
         TS_ASSERT_THROWS_THIS(reader.GetVariableOverNodes(data, "Node", 1/*timestep*/),
                 "You can only get a vector for complete data");
-        VecDestroy(data);
+        PetscTools::Destroy(data);
 
         std::vector<unsigned> nodes=reader.GetIncompleteNodeMap();
         TS_ASSERT_EQUALS(nodes.size(), 3U);

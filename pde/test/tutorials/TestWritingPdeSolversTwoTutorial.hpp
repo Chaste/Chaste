@@ -249,7 +249,7 @@ public:
     /* Destructor */
     ~ExplicitHeatEquationSolver()
     {
-        MatDestroy(mRhsMatrix);
+        PetscTools::Destroy(mRhsMatrix);
     }
 };
 /* That's all that needs to be written to write your own solver using the solver hierarchy
@@ -317,8 +317,8 @@ public:
         TS_ASSERT_DELTA(result_repl[220], 0.019512, 1e-4);
 
         // Tidy up
-        VecDestroy(initial_condition);
-        VecDestroy(result);
+        PetscTools::Destroy(initial_condition);
+        PetscTools::Destroy(result);
     }
 };
 

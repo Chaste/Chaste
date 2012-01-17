@@ -790,7 +790,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning
         MatRestoreRow(connectivity_matrix, row_global_index, &row_num_nz,&column_indices, PETSC_NULL);
     }
 
-    MatDestroy(connectivity_matrix);
+    PetscTools::Destroy(connectivity_matrix);
 
     // Convert to an adjacency matrix
     Mat adj_matrix;
@@ -809,10 +809,10 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning
     MatPartitioningSetFromOptions(part);
     IS new_process_numbers;
     MatPartitioningApply(part, &new_process_numbers);
-    MatPartitioningDestroy(part);
+    MatPartitioningDestroy(PETSC_DESTROY_PARAM(part));
 
     /// It seems to be free-ing local_ia and local_ja as a side effect
-    MatDestroy(adj_matrix);
+    PetscTools::Destroy(adj_matrix);
 
     PetscTools::Barrier();
     if (PetscTools::AmMaster())
@@ -878,9 +878,9 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning
     }
     delete[] global_range;
 
-    AODestroy(ordering);
-    ISDestroy(new_process_numbers);
-    ISDestroy(new_global_node_indices);
+    AODestroy(PETSC_DESTROY_PARAM(ordering));
+    ISDestroy(PETSC_DESTROY_PARAM(new_process_numbers));
+    ISDestroy(PETSC_DESTROY_PARAM(new_global_node_indices));
 
     PetscTools::Barrier();
     if (PetscTools::AmMaster())

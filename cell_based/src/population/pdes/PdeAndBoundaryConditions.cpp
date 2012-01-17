@@ -106,7 +106,7 @@ void PdeAndBoundaryConditions<DIM>::DestroySolution()
 {
     if (mSolution)
     {
-        VecDestroy(mSolution);
+        PetscTools::Destroy(mSolution);
     }
 }
 

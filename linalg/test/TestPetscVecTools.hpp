@@ -90,11 +90,11 @@ public:
             TS_ASSERT_EQUALS(dist_2nd_var_vec[index],         index.Global+1);
         }
 
-        VecDestroy(interleaved_vec);
-        VecDestroy(first_variable_vec);
-        VecDestroy(second_variable_vec);
-        VecScatterDestroy(first_variable_context);
-        VecScatterDestroy(second_variable_context);
+        PetscTools::Destroy(interleaved_vec);
+        PetscTools::Destroy(first_variable_vec);
+        PetscTools::Destroy(second_variable_vec);
+        VecScatterDestroy(PETSC_DESTROY_PARAM(first_variable_context));
+        VecScatterDestroy(PETSC_DESTROY_PARAM(second_variable_context));
     }
 
     void TestInterleavedVecGather()
@@ -142,11 +142,11 @@ public:
             TS_ASSERT_EQUALS(dist_inter_vec_2nd_var[index],         index.Global+1 );
         }
 
-        VecDestroy(interleaved_vec);
-        VecDestroy(first_variable_vec);
-        VecDestroy(second_variable_vec);
-        VecScatterDestroy(first_variable_context);
-        VecScatterDestroy(second_variable_context);
+        PetscTools::Destroy(interleaved_vec);
+        PetscTools::Destroy(first_variable_vec);
+        PetscTools::Destroy(second_variable_vec);
+        VecScatterDestroy(PETSC_DESTROY_PARAM(first_variable_context));
+        VecScatterDestroy(PETSC_DESTROY_PARAM(second_variable_context));
     }
 };
 

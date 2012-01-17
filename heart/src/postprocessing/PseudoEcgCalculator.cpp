@@ -97,10 +97,10 @@ double PseudoEcgCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::ComputePseudoEc
     }
     catch (Exception &e)
     {
-        VecDestroy(solution_at_one_time_step);
+        PetscTools::Destroy(solution_at_one_time_step);
         throw e;
     }
-    VecDestroy(solution_at_one_time_step);
+    PetscTools::Destroy(solution_at_one_time_step);
     return pseudo_ecg_at_one_timestep;
 }
 

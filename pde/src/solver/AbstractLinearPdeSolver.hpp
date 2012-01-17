@@ -165,7 +165,7 @@ void AbstractLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::InitialiseFor
 
             this->mpLinearSystem = new LinearSystem(template_vec, preallocation);
 
-            VecDestroy(template_vec);
+            PetscTools::Destroy(template_vec);
         }
         else
         {

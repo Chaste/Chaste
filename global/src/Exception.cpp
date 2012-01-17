@@ -30,7 +30,10 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include <petsc.h>
 
 #include "Exception.hpp"
-//#include "LogFile.hpp"
+
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
+typedef PetscBool PetscTruth;
+#endif
 
 Exception::Exception(const std::string& rMessage,
                      const std::string& rFilename, unsigned lineNumber)
@@ -95,12 +98,8 @@ void Exception::Terminate(const std::string& rMessage, const std::string& rFilen
     /*
      * Check if we're running in parallel.
      */
-///\todo #1994 Turn into typedef
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
-    PetscBool is_there;
-#else
+
     PetscTruth is_there;
-#endif
     PetscInitialized(&is_there);
     if (is_there)
     {

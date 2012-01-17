@@ -208,7 +208,7 @@ public:
         H5Pclose(plist_id);
         H5Fclose(file_id);
 
-        VecDestroy(a_vec);
+        PetscTools::Destroy(a_vec);
     }
 
     void TestReadAndChecksumHdf5()
@@ -312,8 +312,8 @@ public:
         TS_ASSERT(!CompareFilesViaHdf5DataReaderGlobalNorm("hdf5", "hdf5_test_multi_column", true,
             "io/test/data", "hdf5_test_full_format_extended", false));
 
-        VecDestroy(petsc_data_1);
-        VecDestroy(petsc_data_2);
+        PetscTools::Destroy(petsc_data_1);
+        PetscTools::Destroy(petsc_data_2);
     }
 
     void TestHdf5DataWriterNonEvenRowDistribution() throw(Exception)
@@ -383,8 +383,8 @@ public:
         TS_ASSERT(CompareFilesViaHdf5DataReader("hdf5", "hdf5_non_even_row_dist", true,
                                                 "io/test/data", "hdf5_test_multi_column", false));
 
-        VecDestroy(petsc_data_1);
-        VecDestroy(petsc_data_2);
+        PetscTools::Destroy(petsc_data_1);
+        PetscTools::Destroy(petsc_data_2);
     }
 
     void TestHdf5DataWriterFullFormatIncomplete() throw(Exception)
@@ -464,9 +464,9 @@ public:
         TS_ASSERT(CompareFilesViaHdf5DataReader("hdf5", "hdf5_test_full_format_incomplete", true,
                                                 "io/test/data", "hdf5_test_full_format_incomplete_bigendian", false));
 
-        VecDestroy(petsc_data_1);
-        VecDestroy(petsc_data_2);
-        VecDestroy(petsc_data_3);
+        PetscTools::Destroy(petsc_data_1);
+        PetscTools::Destroy(petsc_data_2);
+        PetscTools::Destroy(petsc_data_3);
     }
 
     void TestHdf5DataWriterFullFormat() throw(Exception)
@@ -538,9 +538,9 @@ public:
          TS_ASSERT(CompareFilesViaHdf5DataReader("hdf5", "hdf5_test_full_format", true,
                                                  "io/test/data", "hdf5_test_full_format", false));
 
-        VecDestroy(petsc_data_1);
-        VecDestroy(petsc_data_2);
-        VecDestroy(petsc_data_3);
+        PetscTools::Destroy(petsc_data_1);
+        PetscTools::Destroy(petsc_data_2);
+        PetscTools::Destroy(petsc_data_3);
     }
 
     void TestHdf5DataWriterFullFormatStriped() throw(Exception)
@@ -625,9 +625,9 @@ public:
         TS_ASSERT(CompareFilesViaHdf5DataReader("hdf5", "hdf5_test_full_format_striped", true,
                                                 "io/test/data", "hdf5_test_full_format_striped", false));
 
-        VecDestroy(node_number);
-        VecDestroy(petsc_data_long);
-        VecDestroy(petsc_data_short);
+        PetscTools::Destroy(node_number);
+        PetscTools::Destroy(petsc_data_long);
+        PetscTools::Destroy(petsc_data_short);
     }
 
     void TestHdf5DataWriterFullFormatStripedWith3Variables() throw(Exception)
@@ -679,7 +679,7 @@ public:
 
         TS_ASSERT(CompareFilesViaHdf5DataReader("hdf5", "hdf5_test_full_format_striped_3vars", true,
                                                 "io/test/data", "hdf5_test_full_format_striped_3vars", false));
-        VecDestroy(petsc_data);
+        PetscTools::Destroy(petsc_data);
     }
 
     void TestHdf5DataWriterFullFormatStripedIncomplete() throw(Exception)
@@ -750,7 +750,7 @@ public:
         TS_ASSERT(CompareFilesViaHdf5DataReader("hdf5", "hdf5_test_full_format_striped_incomplete", true,
                                                 "io/test/data", "hdf5_test_full_format_striped_incomplete", false));
 
-        VecDestroy(petsc_data_long);
+        PetscTools::Destroy(petsc_data_long);
         writer.Close();
 
         // Now cover two exceptions: one is the unsupported PutStripedVector for incomplete data and 3 vars...
@@ -768,7 +768,7 @@ public:
         TS_ASSERT_THROWS_THIS(writer.PutStripedVector(three_variable_IDs, petsc_data_3vars),
                                 "The PutStripedVector functionality for incomplete data is supported for only 2 stripes");
 
-        VecDestroy(petsc_data_3vars);
+        PetscTools::Destroy(petsc_data_3vars);
         writer.Close();
 
         // ...and one is the case when we pass in a short vector to the PutStripedVector method
@@ -779,7 +779,7 @@ public:
         Vec petsc_data_1var = factory.CreateVec(1);
         TS_ASSERT_THROWS_THIS(writer.PutStripedVector(one_ID, petsc_data_1var),
                                 "The PutStripedVector method requires at least two variables ID. If only one is needed, use PutVector method instead");
-        VecDestroy(petsc_data_1var);
+        PetscTools::Destroy(petsc_data_1var);
     }
 
     void TestNonImplementedFeatures()
@@ -839,8 +839,8 @@ public:
 
         writer.Close();
 
-        VecDestroy(petsc_data_long);
-        VecDestroy(petsc_data_short);
+        PetscTools::Destroy(petsc_data_long);
+        PetscTools::Destroy(petsc_data_short);
     }
 
     /**
@@ -959,7 +959,7 @@ public:
         Vec petsc_data_short=factory.CreateVec();
         TS_ASSERT_THROWS_THIS(mpTestWriter->PutVector(0, petsc_data_short),
                 "Vector size doesn\'t match fixed dimension");
-        VecDestroy(petsc_data_short);
+        PetscTools::Destroy(petsc_data_short);
 
         mpTestWriter->Close();
         delete mpTestWriter;
@@ -1080,9 +1080,9 @@ public:
                 "Trying to advance along an unlimited dimension without having defined any");
 
         writer.Close();
-        VecDestroy(petsc_data_short);
-        VecDestroy(node_number);
-        VecDestroy(petsc_data_long);
+        PetscTools::Destroy(petsc_data_short);
+        PetscTools::Destroy(node_number);
+        PetscTools::Destroy(petsc_data_long);
     }
 
     /**
@@ -1175,9 +1175,9 @@ public:
 
         // Close and test
         writer.Close();
-        VecDestroy(node_petsc);
-        VecDestroy(ik_petsc);
-        VecDestroy(ina_petsc);
+        PetscTools::Destroy(node_petsc);
+        PetscTools::Destroy(ik_petsc);
+        PetscTools::Destroy(ina_petsc);
 
         TS_ASSERT(CompareFilesViaHdf5DataReader("hdf5", "hdf5_test_full_format", true,
                                                 "io/test/data", "hdf5_test_full_format_extended", false));
@@ -1265,8 +1265,8 @@ public:
 
         writer.Close();
 
-        VecDestroy(petsc_data_short);
-        VecDestroy(petsc_data_long);
+        PetscTools::Destroy(petsc_data_short);
+        PetscTools::Destroy(petsc_data_long);
         TS_ASSERT(CompareFilesViaHdf5DataReaderGlobalNorm("hdf5", "hdf5_permuted", true,
                                                 "io/test/data", "hdf5_unpermuted", false));
         TS_ASSERT(CompareFilesViaHdf5DataReader("hdf5", "hdf5_permuted", true,
@@ -1332,9 +1332,9 @@ public:
         TS_ASSERT(CompareFilesViaHdf5DataReader("hdf5", "hdf5_test_full_format_incomplete_using_matrix", true,
                                                 "io/test/data", "hdf5_test_full_format_incomplete", false));
 
-        VecDestroy(petsc_data_1);
-        VecDestroy(petsc_data_2);
-        VecDestroy(petsc_data_3);
+        PetscTools::Destroy(petsc_data_1);
+        PetscTools::Destroy(petsc_data_2);
+        PetscTools::Destroy(petsc_data_3);
     }
 
     void TestHdf5DataWriterFullFormatStripedIncompleteUsingMatrix() throw(Exception)
@@ -1393,7 +1393,7 @@ public:
         TS_ASSERT(CompareFilesViaHdf5DataReader("hdf5", "hdf5_test_full_format_striped_incomplete_using_matrix", true,
                                                 "io/test/data", "hdf5_test_full_format_striped_incomplete", false));
 
-        VecDestroy(petsc_data_long);
+        PetscTools::Destroy(petsc_data_long);
     }
 
     void TestHdf5BigFiles() throw(Exception)

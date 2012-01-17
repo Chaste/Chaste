@@ -204,7 +204,7 @@ public:
             TS_ASSERT_EQUALS(extended_bidomain_tissue.rGetIntracellularStimulusCacheReplicatedSecondCell()[node_index], 0);
         }
 
-        VecDestroy(extended_vec);
+        PetscTools::Destroy(extended_vec);
     }
 
     /**This test checks heterogeneous conductivities*/
@@ -431,7 +431,7 @@ public:
         TS_ASSERT_EQUALS(extended_bidomain_tissue.rGetGgapCacheReplicated()[probe_node_2],9143.0);//within second cuboid
         TS_ASSERT_EQUALS(extended_bidomain_tissue.rGetGgapCacheReplicated()[probe_node_3],586.0);//elsewhere
 
-        VecDestroy(vector);
+        PetscTools::Destroy(vector);
     }
 
     void TestExtendedBidomainTissueParameters() throw (Exception)

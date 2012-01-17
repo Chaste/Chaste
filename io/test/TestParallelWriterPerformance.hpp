@@ -75,7 +75,7 @@ public:
             parallel_writer.AdvanceAlongUnlimitedDimension();
         }
 
-        VecDestroy(petsc_vec);
+        PetscTools::Destroy(petsc_vec);
     }
 };
 

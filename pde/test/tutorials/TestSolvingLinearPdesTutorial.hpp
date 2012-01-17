@@ -284,7 +284,7 @@ public:
         }
 
         /* All PETSc {{{Vec}}}s should be destroyed when they are no longer needed, or you will have a memory leak. */
-        VecDestroy(result);
+        PetscTools::Destroy(result);
     }
 
     /*
@@ -372,9 +372,9 @@ public:
         }
 
         /* All PETSc vectors should be destroyed when they are no longer needed. */
-        VecDestroy(initial_condition);
-        VecDestroy(solution);
-        VecDestroy(static_solution);
+        PetscTools::Destroy(initial_condition);
+        PetscTools::Destroy(solution);
+        PetscTools::Destroy(static_solution);
     }
 };
 

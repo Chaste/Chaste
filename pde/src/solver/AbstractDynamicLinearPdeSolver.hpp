@@ -431,7 +431,7 @@ Vec AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Solve()
         if (solution != mInitialCondition)
         {
             HeartEventHandler::BeginEvent(HeartEventHandler::COMMUNICATION);
-            VecDestroy(solution);
+            PetscTools::Destroy(solution);
             HeartEventHandler::EndEvent(HeartEventHandler::COMMUNICATION);
         }
         solution = next_solution;

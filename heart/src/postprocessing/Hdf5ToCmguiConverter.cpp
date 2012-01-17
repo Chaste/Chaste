@@ -116,9 +116,9 @@ void Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM>::Write(std::string type)
            delete all_data[var];
         }
     }
-    VecDestroy(data);
-    VecDestroy(data_phie);
-    VecDestroy(data_second_cell);
+    PetscTools::Destroy(data);
+    PetscTools::Destroy(data_phie);
+    PetscTools::Destroy(data_second_cell);
 
     if (PetscTools::AmMaster())
     {

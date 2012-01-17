@@ -168,7 +168,7 @@ public:
         /*
          * All PETSc {{{Vec}}}s should be destroyed when they are no longer needed.
          */
-        VecDestroy(initial_condition);
+        PetscTools::Destroy(initial_condition);
     }
 };
 #endif /*TESTSOLVINGLINEARPARABOLICPDESYSTEMSWITHCOUPLEDODESYSTEMSTUTORIAL_HPP_*/

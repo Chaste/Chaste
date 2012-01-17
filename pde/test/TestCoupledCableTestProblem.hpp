@@ -385,7 +385,7 @@ public:
             }
         }
 
-        VecDestroy(result);
+        PetscTools::Destroy(result);
     }
 };
 

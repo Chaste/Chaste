@@ -594,7 +594,7 @@ void CardiacElectroMechanicsProblem<DIM>::Solve()
                 LOG(2, "  ..");
             }
 
-            VecDestroy(initial_voltage);
+            PetscTools::Destroy(initial_voltage);
             initial_voltage = voltage;
         }
 
@@ -767,7 +767,7 @@ void CardiacElectroMechanicsProblem<DIM>::Solve()
         }
         delete p_cmgui_writer;
     }
-    VecDestroy(voltage);
+    PetscTools::Destroy(voltage);
     delete p_electrics_solver;
 
     MechanicsEventHandler::EndEvent(MechanicsEventHandler::ALL);

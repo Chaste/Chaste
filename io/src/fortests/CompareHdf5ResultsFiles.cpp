@@ -139,8 +139,8 @@ bool CompareFilesViaHdf5DataReader(std::string pathname1, std::string filename1,
                 }
             }
         }
-        VecDestroy(data1);
-        VecDestroy(data2);
+        PetscTools::Destroy(data1);
+        PetscTools::Destroy(data2);
     }
     else
     {
@@ -226,8 +226,8 @@ bool CompareFilesViaHdf5DataReaderGlobalNorm(std::string pathname1, std::string 
         }
     }
 
-    VecDestroy(data1);
-    VecDestroy(data2);
+    PetscTools::Destroy(data1);
+    PetscTools::Destroy(data2);
 
     return is_the_same;
 }

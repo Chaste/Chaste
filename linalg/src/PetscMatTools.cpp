@@ -116,7 +116,7 @@ void PetscMatTools::ZeroRowsWithValueOnDiagonal(Mat matrix, std::vector<unsigned
     IS is;
     ISCreateGeneral(PETSC_COMM_WORLD, rRows.size(), rows, &is);
     MatZeroRows(matrix, is, &diagonalValue);
-    ISDestroy(is);
+    ISDestroy(PETSC_DESTROY_PARAM(is));
     /*
      *
 [2]PETSC ERROR: MatMissingDiagonal_SeqAIJ() line 1011 in src/mat/impls/aij/seq/aij.c
@@ -159,6 +159,8 @@ void PetscMatTools::ZeroRowsWithValueOnDiagonal(Mat matrix, std::vector<unsigned
         AssembleFinal(matrix);
     }
     */
+#elif (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 2)
+    MatZeroRows(matrix, rRows.size(), rows, diagonalValue , NULL, NULL);
 #else
     MatZeroRows(matrix, rRows.size(), rows, diagonalValue);
 #endif
@@ -374,7 +376,7 @@ bool PetscMatTools::CheckEquality(const Mat mat1, const Mat mat2, double tol)
 #endif
     PetscReal norm;
     MatNorm(y, NORM_INFINITY, &norm);
-    MatDestroy(y);
+    PetscTools::Destroy(y);
 
     return (norm < tol);
 }
@@ -388,6 +390,6 @@ bool PetscMatTools::CheckSymmetry(const Mat matrix, double tol)
     MatTranspose(matrix, MAT_INITIAL_MATRIX, &trans);
 #endif
     bool is_symmetric = PetscMatTools::CheckEquality(matrix, trans, tol);
-    MatDestroy(trans);
+    PetscTools::Destroy(trans);
     return is_symmetric;
 }

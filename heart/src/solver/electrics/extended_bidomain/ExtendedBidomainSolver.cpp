@@ -213,8 +213,8 @@ ExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::~ExtendedBidomainSolver()
 
     if(mVecForConstructingRhs)
     {
-        VecDestroy(mVecForConstructingRhs);
-        MatDestroy(mMassMatrix);
+        PetscTools::Destroy(mVecForConstructingRhs);
+        PetscTools::Destroy(mMassMatrix);
     }
 }
 
