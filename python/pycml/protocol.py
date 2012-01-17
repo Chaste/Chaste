@@ -455,6 +455,15 @@ class Protocol(processors.ModelModifier):
         raise ProtocolError('Applying protocol created an invalid model:\n  '
                             + '\n  '.join(map(str, errors)))
     
+    def _check_if_output(self, old_var, new_var):
+        """A variable is being replaced.  If the original was an output, make the new one instead."""
+        if old_var in self.outputs:
+            self.outputs.remove(old_var)
+            self.outputs.add(new_var)
+        if old_var in self._vector_outputs:
+            self._vector_outputs.remove(old_var)
+            self._vector_outputs.add(new_var)
+    
     def _split_all_odes(self):
         """The free variable has been units-converted, so adjust all ODEs to account for this.
         
@@ -477,9 +486,7 @@ class Protocol(processors.ModelModifier):
                 new_var = self._replace_variable(old_var, old_var.get_units(), allow_existing=True)
                 new_var.initial_value = old_var.initial_value
                 del old_var.initial_value
-                if old_var in self.outputs:
-                    self.outputs.remove(old_var)
-                    self.outputs.add(new_var)
+                self._check_if_output(old_var, new_var)
                 # Add a new variable to assign the RHS to, with units of the original derivative
                 deriv_name = self._uniquify_var_name(u'd_%s_d_%s' % (old_var.name, free_var.name), old_var.component)
                 orig_ode = old_var.get_all_expr_dependencies()[0]
