@@ -342,7 +342,6 @@ void PetscTools::ReadPetscObject(Mat& rMat, const std::string& rOutputFileFullPa
     MatLoad(rMat,view);
 #else
     MatLoad(view, MATMPIAIJ, &rMat);
-    PetscViewerDestroy(view);
 #endif
 
     PetscViewerDestroy(PETSC_DESTROY_PARAM(view));
