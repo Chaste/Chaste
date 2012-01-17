@@ -535,8 +535,6 @@ CompressibleNonlinearElasticitySolver<DIM>::CompressibleNonlinearElasticitySolve
     {
         EXCEPTION("SolidMechanicsProblemDefinition object contains incompressible material laws");
     }
-
-    this->Initialise();
 }
 
 

@@ -670,7 +670,6 @@ IncompressibleNonlinearElasticitySolver<DIM>::IncompressibleNonlinearElasticityS
         EXCEPTION("SolidMechanicsProblemDefinition object contains compressible material laws");
     }
 
-    this->Initialise();
     FormInitialGuess();
 }
 
