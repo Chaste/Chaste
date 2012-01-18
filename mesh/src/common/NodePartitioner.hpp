@@ -31,6 +31,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include <set>
 
+#include "AbstractMesh.hpp"
 #include "AbstractMeshReader.hpp"
 
 /**
@@ -42,6 +43,18 @@ class NodePartitioner
 public:
 
     /**
+      * Specialised method to compute a parallel partitioning of a given mesh
+      * (called by ComputeMeshPartitioning, based on the value of mMetisPartitioning)
+      *
+      * @param rMeshReader is the reader pointing to the mesh to be read in and partitioned
+      * @param rMesh is the original mesh (so that we can set the DistributedVectorFactory up
+      * @param rNodesOwned is an empty set to be filled with the indices of nodes owned by this process
+      */
+     static void DumbPartitioning(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
+                           AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
+                           std::set<unsigned>& rNodesOwned);
+
+    /**
      * Specialised method to compute a parallel partitioning of a given mesh
      * (called by ComputeMeshPartitioning, based on the value of mMetisPartitioning
      *
@@ -51,7 +64,7 @@ public:
      * @param rProcessorsOffset a vector of length NumProcs to be filled with the index of the lowest indexed node owned by each process
      *
      */
-    static void MetisLibraryNodePartitioning(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
+    static void MetisLibraryPartitioning(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
                                              std::vector<unsigned>& rNodesPermutation,
                                              std::set<unsigned>& rNodesOwned,
                                              std::vector<unsigned>& rProcessorsOffset);

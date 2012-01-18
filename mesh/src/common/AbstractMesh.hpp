@@ -52,6 +52,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class AbstractMesh : boost::noncopyable
 {
+    template <unsigned A_DIMENSION, unsigned B_DIMENSION> friend class NodePartitioner; ///\todo 2004 remove this
     template <unsigned A_DIMENSION> friend class NodesOnlyMesh; //NodesOnlyMesh is able to grab the node information in order to copy
 private:
     /**

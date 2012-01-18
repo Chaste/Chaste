@@ -50,8 +50,34 @@ extern void METIS_PartMeshNodal(int*, int*, int*, int*, int*, int*, int*, int*, 
 #include <parmetis.h>
 
 
+
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::MetisLibraryNodePartitioning(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
+void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::DumbPartitioning(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
+                                                               AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
+                                                               std::set<unsigned>& rNodesOwned)
+{
+    //Note that if there is not DistributedVectorFactory in the mesh, then a dumb partition based
+    //on rMesh.GetNumNodes() is applied automatically.
+    //If there is a DistributedVectorFactory then that one will be returned
+    if (rMesh.GetDistributedVectorFactory()->GetProblemSize() != rMesh.GetNumNodes())
+    {
+        ///\todo #2004 Can we reset stuff?  Do we need to?  Probably not, so just fix the test which throws this exception
+        rMesh.mpDistributedVectorFactory=NULL;
+        EXCEPTION("The distributed vector factory size in the mesh doesn't match the total number of nodes.");
+    }
+
+    for (unsigned node_index = rMesh.GetDistributedVectorFactory()->GetLow();
+       node_index < rMesh.GetDistributedVectorFactory()->GetHigh();
+       node_index++)
+    {
+         rNodesOwned.insert(node_index);
+    }
+}
+
+
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::MetisLibraryPartitioning(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
                                                                            std::vector<unsigned>& rNodesPermutation,
                                                                            std::set<unsigned>& rNodesOwned,
                                                                            std::vector<unsigned>& rProcessorsOffset)

@@ -346,15 +346,6 @@ private:
                                  std::set<unsigned>& rElementsOwned,
                                  std::vector<unsigned>& rProcessorsOffset);
 
-   /**
-     * Specialised method to compute a parallel partitioning of a given mesh
-     * (called by ComputeMeshPartitioning, based on the value of mMetisPartitioning)
-     *
-     * @param rMeshReader is the reader pointing to the mesh to be read in and partitioned
-     * @param rNodesOwned is an empty set to be filled with the indices of nodes owned by this process
-     */
-    void DumbNodePartitioning(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
-                              std::set<unsigned>& rNodesOwned);
     /**
       * Specialised method to compute a parallel partitioning of a given mesh with the ParMetis library
       * (called by ComputeMeshPartitioning, based on the value of mMetisPartitioning)
@@ -366,7 +357,7 @@ private:
       * @param rProcessorsOffset a vector of length NumProcs to be filled with the index of the lowest indexed node owned by each process
       *
       */
-     void ParMetisLibraryNodePartitioning(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
+     void ParMetisLibraryNodeAndElementPartitioning(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
                                           std::set<unsigned>& rElementsOwned,
                                           std::set<unsigned>& rNodesOwned,
                                           std::set<unsigned>& rHaloNodesOwned,

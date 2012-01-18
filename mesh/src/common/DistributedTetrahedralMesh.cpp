@@ -97,10 +97,10 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ComputeMeshPartitioning
     if (mMetisPartitioning==DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY && PetscTools::IsParallel())
     {
         /*
-         *  With ParMetisLibraryNodePartitioning we compute the element partition first
+         *  With ParMetisLibraryNodeAndElementPartitioning we compute the element partition first
          *  and then we work out the node ownership.
          */
-        ParMetisLibraryNodePartitioning(rMeshReader, rElementsOwned, rNodesOwned, rHaloNodesOwned, rProcessorsOffset);
+        ParMetisLibraryNodeAndElementPartitioning(rMeshReader, rElementsOwned, rNodesOwned, rHaloNodesOwned, rProcessorsOffset);
     }
     else
     {
@@ -109,7 +109,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ComputeMeshPartitioning
          */
         if (mMetisPartitioning==DistributedTetrahedralMeshPartitionType::METIS_LIBRARY && PetscTools::IsParallel())
         {
-            NodePartitioner<ELEMENT_DIM, SPACE_DIM>::MetisLibraryNodePartitioning(rMeshReader, this->mNodesPermutation, rNodesOwned, rProcessorsOffset);
+            NodePartitioner<ELEMENT_DIM, SPACE_DIM>::MetisLibraryPartitioning(rMeshReader, this->mNodesPermutation, rNodesOwned, rProcessorsOffset);
         }
         else if (mMetisPartitioning==DistributedTetrahedralMeshPartitionType::PETSC_MAT_PARTITION && PetscTools::IsParallel())
         {
@@ -117,7 +117,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ComputeMeshPartitioning
         }
         else
         {
-            DumbNodePartitioning(rMeshReader, rNodesOwned);
+            NodePartitioner<ELEMENT_DIM, SPACE_DIM>::DumbPartitioning(rMeshReader, *this, rNodesOwned);
         }
 
         if ( rMeshReader.HasNclFile() )
@@ -642,37 +642,6 @@ Node<SPACE_DIM> * DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNodeOrH
     //Not here
     EXCEPTION("Requested node/halo " << index << " does not belong to processor " << PetscTools::GetMyRank());
 }
-
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::DumbNodePartitioning(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
-                                                                              std::set<unsigned>& rNodesOwned)
-{
-    if (this->mpDistributedVectorFactory)
-    {
-        // A distribution is given by the factory
-        if (this->mpDistributedVectorFactory->GetProblemSize() != mTotalNumNodes)
-        {
-            // Reset stuff
-            this->mpDistributedVectorFactory = NULL;
-            this->mTotalNumNodes = 0u;
-            this->mTotalNumElements = 0u;
-            this->mTotalNumBoundaryElements = 0u;
-            EXCEPTION("The distributed vector factory size in the mesh doesn't match the total number of nodes.");
-        }
-    }
-    else
-    {
-        this->mpDistributedVectorFactory = new DistributedVectorFactory(mTotalNumNodes);
-    }
-    for (unsigned node_index = this->mpDistributedVectorFactory->GetLow();
-         node_index < this->mpDistributedVectorFactory->GetHigh();
-         node_index++)
-    {
-         rNodesOwned.insert(node_index);
-    }
-}
-
-
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ReorderNodes()
@@ -1231,7 +1200,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::Scale(const double xFac
 
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodePartitioning(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
+void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndElementPartitioning(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
                                                                                        std::set<unsigned>& rElementsOwned,
                                                                                        std::set<unsigned>& rNodesOwned,
                                                                                        std::set<unsigned>& rHaloNodesOwned,
