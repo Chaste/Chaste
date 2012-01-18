@@ -192,6 +192,9 @@ public:
     // Test the functionality specific to SolidMechanicsProblemDefinition
     void TestSolidMechanicsProblemDefinition() throw(Exception)
     {
+        TS_ASSERT_EQUALS(SolidMechanicsProblemDefinition<2>::FREE,DBL_MAX);
+        TS_ASSERT_LESS_THAN(0,SolidMechanicsProblemDefinition<2>::FREE);
+
         QuadraticMesh<2> mesh(0.5, 1.0, 1.0);
 
         SolidMechanicsProblemDefinition<2> problem_defn(mesh);
@@ -221,16 +224,23 @@ public:
 
         std::vector<c_vector<double,2> > locations;
         c_vector<double,2> location = zero_vector<double>(2);
+        // Node 0 is to be placed at (0,0)
         locations.push_back(location);
+
+        // Node 4 is to be placed at (0,0.1)
         location(1)=0.1;
         locations.push_back(location);
+
+        // Node 8 is to be placed at (0.1,0.1)
         location(0)=0.1;
         locations.push_back(location);
 
+        // Node 9 is to be placed at (0.5,FREE)
         location(0)=0.5;
         location(1)=SolidMechanicsProblemDefinition<2>::FREE;
         locations.push_back(location);
 
+        // Node 9 is to be placed at (FREE,1.5)
         location(0)=SolidMechanicsProblemDefinition<2>::FREE;
         location(1)=1.5;
         locations.push_back(location);
