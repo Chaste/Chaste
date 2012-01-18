@@ -489,7 +489,7 @@ void CardiacElectroMechanicsProblem<DIM>::Solve()
     if (mWriteOutput)
     {
         mpMechanicsSolver->SetWriteOutput();
-        mpMechanicsSolver->WriteCurrentDeformation("solution",mech_writer_counter);
+        mpMechanicsSolver->WriteCurrentSpatialSolution("solution","nodes",mech_writer_counter);
 
         p_cmgui_writer = new CmguiDeformedSolutionsWriter<DIM>(mOutputDirectory+"/deformation/cmgui",
                                                                "solution",
@@ -696,7 +696,7 @@ void CardiacElectroMechanicsProblem<DIM>::Solve()
             // write deformed position
             mech_writer_counter++;
             mpMechanicsSolver->SetWriteOutput();
-            mpMechanicsSolver->WriteCurrentDeformation("solution",mech_writer_counter);
+            mpMechanicsSolver->WriteCurrentSpatialSolution("solution","nodes",mech_writer_counter);
 
             p_cmgui_writer->WriteDeformationPositions(rGetDeformedPosition(), counter);
 

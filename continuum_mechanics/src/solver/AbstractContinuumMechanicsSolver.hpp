@@ -39,6 +39,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "PetscException.hpp"
 #include "GaussianQuadratureRule.hpp"
 #include "PetscTools.hpp"
+#include "MechanicsEventHandler.hpp"
+
 
 /**
  *  General base class for continuum mechanics solvers
@@ -62,8 +64,14 @@ protected:
     /** Output file handler. */
     OutputFileHandler* mpOutputFileHandler;
 
-    /** Deformed position: mDeformedPosition[i](j) = x_j for node i. */
-    std::vector<c_vector<double,DIM> > mDeformedPosition;
+    /** Spatial solution:
+     *  For solids problems, mSpatialSolution[i](j) = x_j (new position) for node i.
+     *  For fluids problems, mSpatialSolution[i](j) = u_j (flow) for node i. */
+    std::vector<c_vector<double,DIM> > mSpatialSolution;
+
+    /** Pressures solution at each vertex of the mesh. Only valid if mCompressibilityType==INCOMPRESSIBLE. */
+    std::vector<double> mPressureSolution;
+
 
     /**
      * The current solution, in the form (assuming 2d):
@@ -154,26 +162,39 @@ protected:
     Mat mPreconditionMatrix;
 
 public:
-    /** Constructor */
+    /** Constructor
+     *  @param rQuadMesh the mesh
+     *  @param outputDirectory output directory name
+     *  @param compressibilityType 'INCOMPRESSIBLE' or 'COMPRESSIBLE' */
     AbstractContinuumMechanicsSolver(QuadraticMesh<DIM>& rQuadMesh,
                                      std::string outputDirectory,
                                      CompressibilityType compressibilityType);
 
     /** Destructor */
-    ~AbstractContinuumMechanicsSolver();
+    virtual ~AbstractContinuumMechanicsSolver();
 
     /**
-     * Write the current deformation of the nodes.
+     * Write the spatial solution (deformed position if solids, flow if fluids) at the nodes
      *
      * @param fileName (stem)
      * @param counterToAppend append a counter to the file name
+     * @param extension to append at end.
      *
      * For example:
-     * WriteCurrentDeformation("solution") --> file called "solution.nodes"
-     * WriteCurrentDeformation("solution",3) --> file called "solution_3.nodes"
+     * WriteCurrentSpatialSolution("solution","nodes") --> file called "solution.nodes"
+     * WriteCurrentSpatialSolution("solution","nodes",3) --> file called "solution_3.nodes"
      */
-    void WriteCurrentDeformation(std::string fileName, int counterToAppend=-1);
+    void WriteCurrentSpatialSolution(std::string fileName, std::string fileExtension, int counterToAppend=-1);
 
+    /**
+     * Write the pressure solution. Only valid if mCompressibilityType==INCOMPRESSIBLE.
+     *
+     * @param counterToAppend append a counter to the file name
+     *
+     * WriteCurrentPressureSolution() --> file called "pressure.txt"
+     * WriteCurrentPressureSolution(3) --> file called "pressure_3.txt"
+     */
+    void WriteCurrentPressureSolution( int counterToAppend=-1);
 
     /**
      * Set whether to write any output.
@@ -192,9 +213,15 @@ public:
     }
 
     /**
-     * Get the deformed position. Note: return_value[i](j) = x_j for node i.
+     * Get the spatial solution. For solids problems this will be the deformed position,
+     * for fluids problems this will be the flow.
      */
-    std::vector<c_vector<double,DIM> >& rGetDeformedPosition();
+    virtual std::vector<c_vector<double,DIM> >& rGetSpatialSolution()=0;
+
+    /**
+     *  Get the pressure, for each vertex in the mesh. Only valid if mCompressibilityType==INCOMPRESSIBLE
+     */
+    std::vector<double>& rGetPressures();
 
 };
 
@@ -267,7 +294,9 @@ AbstractContinuumMechanicsSolver<DIM>::~AbstractContinuumMechanicsSolver()
 }
 
 template<unsigned DIM>//, bool MIXED_PROBLEM>
-void AbstractContinuumMechanicsSolver<DIM>::WriteCurrentDeformation(std::string fileName, int counterToAppend)
+void AbstractContinuumMechanicsSolver<DIM>::WriteCurrentSpatialSolution(std::string fileName,
+                                                                        std::string fileExtension,
+                                                                        int counterToAppend)
 {
     // Only write output if the flag mWriteOutput has been set
     if (!mWriteOutput)
@@ -281,22 +310,53 @@ void AbstractContinuumMechanicsSolver<DIM>::WriteCurrentDeformation(std::string 
     {
         file_name << "_" << counterToAppend;
     }
-    file_name << ".nodes";
+    file_name << "." << fileExtension;
 
     out_stream p_file = mpOutputFileHandler->OpenOutputFile(file_name.str());
 
-    std::vector<c_vector<double,DIM> >& r_deformed_position = rGetDeformedPosition();
-    for (unsigned i=0; i<r_deformed_position.size(); i++)
+    std::vector<c_vector<double,DIM> >& r_spatial_solution = rGetSpatialSolution();
+    for (unsigned i=0; i<r_spatial_solution.size(); i++)
     {
         for (unsigned j=0; j<DIM; j++)
         {
-            *p_file << r_deformed_position[i](j) << " ";
+            *p_file << r_spatial_solution[i](j) << " ";
         }
         *p_file << "\n";
     }
     p_file->close();
 }
 
+template<unsigned DIM>//, bool MIXED_PROBLEM>
+void AbstractContinuumMechanicsSolver<DIM>::WriteCurrentPressureSolution(int counterToAppend)
+{
+    // Only write output if the flag mWriteOutput has been set
+    if (!mWriteOutput)
+    {
+        return;
+    }
+
+    std::stringstream file_name;
+    file_name << "pressure";
+    if (counterToAppend >= 0)
+    {
+        file_name << "_" << counterToAppend;
+    }
+    file_name << ".txt";
+
+    out_stream p_file = mpOutputFileHandler->OpenOutputFile(file_name.str());
+
+    std::vector<double>& r_pressure = this->rGetPressures();
+    for (unsigned i=0; i<r_pressure.size(); i++)
+    {
+        for (unsigned j=0; j<DIM; j++)
+        {
+            *p_file << this->mrQuadMesh.GetNode(i)->rGetLocation()[j] << " ";
+        }
+
+        *p_file << r_pressure[i] << "\n";
+    }
+    p_file->close();
+}
 
 template<unsigned DIM>//, bool MIXED_PROBLEM>
 void AbstractContinuumMechanicsSolver<DIM>::SetWriteOutput(bool writeOutput)
@@ -308,21 +368,20 @@ void AbstractContinuumMechanicsSolver<DIM>::SetWriteOutput(bool writeOutput)
     mWriteOutput = writeOutput;
 }
 
-template<unsigned DIM>//, bool MIXED_PROBLEM>
-std::vector<c_vector<double,DIM> >& AbstractContinuumMechanicsSolver<DIM>::rGetDeformedPosition()
+
+template<unsigned DIM>
+std::vector<double>& AbstractContinuumMechanicsSolver<DIM>::rGetPressures()
 {
-    mDeformedPosition.resize(mrQuadMesh.GetNumNodes(), zero_vector<double>(DIM));
-    for (unsigned i=0; i<mrQuadMesh.GetNumNodes(); i++)
+    mPressureSolution.clear();
+    mPressureSolution.resize(this->mrQuadMesh.GetNumVertices());
+
+    for (unsigned i=0; i<this->mrQuadMesh.GetNumVertices(); i++)
     {
-        for (unsigned j=0; j<DIM; j++)
-        {
-            mDeformedPosition[i](j) = mrQuadMesh.GetNode(i)->rGetLocation()[j] + mCurrentSolution[DIM*i+j];
-        }
+        mPressureSolution[i] = this->mCurrentSolution[DIM*this->mrQuadMesh.GetNumNodes() + i];
     }
-    return mDeformedPosition;
+    return mPressureSolution;
 }
 
-//// Do output functions first, then this. Also, why is Initialise called in subclasses, not AbstractNonlinElasSolver?
 
 template<unsigned DIM>
 void AbstractContinuumMechanicsSolver<DIM>::AllocateMatrixMemory()

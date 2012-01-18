@@ -385,6 +385,20 @@ public:
      * The final file is [fileName]_[counterToAppend].strain
      */
     void WriteCurrentDeformationGradients(std::string fileName, int counterToAppend);
+
+
+    /**
+     * Implemented method, returns the deformed position.
+     * Note: return_value[i](j) = x_j for node i.
+     */
+    std::vector<c_vector<double,DIM> >& rGetSpatialSolution();
+
+    /**
+     * Get the deformed position. Note: return_value[i](j) = x_j for node i. Just
+     * calls rGetSpatialSolution().
+     */
+    std::vector<c_vector<double,DIM> >& rGetDeformedPosition();
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -972,11 +986,11 @@ void AbstractNonlinearElasticitySolver<DIM>::Solve(double tol,
     }
 
 
-    this->WriteCurrentDeformation("initial");
+    this->WriteCurrentSpatialSolution("initial", "nodes");
 
     if (mWriteOutputEachNewtonIteration)
     {
-        this->WriteCurrentDeformation("newton_iteration", 0);
+        this->WriteCurrentSpatialSolution("newton_iteration", "nodes", 0);
     }
 
     // Compute residual
@@ -1024,7 +1038,7 @@ void AbstractNonlinearElasticitySolver<DIM>::Solve(double tol,
         #endif
         if (mWriteOutputEachNewtonIteration)
         {
-            this->WriteCurrentDeformation("newton_iteration", iteration_number);
+            this->WriteCurrentSpatialSolution("newton_iteration", "nodes", iteration_number);
         }
 
         mNumNewtonIterations = iteration_number;
@@ -1048,7 +1062,29 @@ void AbstractNonlinearElasticitySolver<DIM>::Solve(double tol,
     }
 
     // Write the final solution
-    this->WriteCurrentDeformation("solution");
+    this->WriteCurrentSpatialSolution("solution", "nodes");
+}
+
+
+template<unsigned DIM>
+std::vector<c_vector<double,DIM> >& AbstractNonlinearElasticitySolver<DIM>::rGetSpatialSolution()
+{
+    this->mSpatialSolution.clear();
+    this->mSpatialSolution.resize(this->mrQuadMesh.GetNumNodes(), zero_vector<double>(DIM));
+    for (unsigned i=0; i<this->mrQuadMesh.GetNumNodes(); i++)
+    {
+        for (unsigned j=0; j<DIM; j++)
+        {
+            this->mSpatialSolution[i](j) = this->mrQuadMesh.GetNode(i)->rGetLocation()[j] + this->mCurrentSolution[DIM*i+j];
+        }
+    }
+    return this->mSpatialSolution;
+}
+
+template<unsigned DIM>
+std::vector<c_vector<double,DIM> >& AbstractNonlinearElasticitySolver<DIM>::rGetDeformedPosition()
+{
+    return rGetSpatialSolution();
 }
 
 

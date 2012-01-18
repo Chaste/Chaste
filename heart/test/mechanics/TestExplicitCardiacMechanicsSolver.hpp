@@ -133,8 +133,8 @@ public:
         IncompressibleExplicitSolver2d expl_solver(NONPHYSIOL2,mesh,problem_defn,"TestCompareExplAndImplCardiacSolversStretch_Exp");
         IncompressibleImplicitSolver2d impl_solver(NONPHYSIOL2,mesh,problem_defn,"TestCompareExplAndImplCardiacSolversStretch_Imp");
 
-        expl_solver.WriteCurrentDeformation("solution",0);
-        impl_solver.WriteCurrentDeformation("solution",0);
+        expl_solver.WriteCurrentSpatialSolution("solution","nodes",0);
+        impl_solver.WriteCurrentSpatialSolution("solution","nodes",0);
 
         unsigned counter = 1;
 
@@ -149,12 +149,12 @@ public:
             expl_solver.SetWriteOutput(false);
             expl_solver.Solve(t,t+dt,dt);
             expl_solver.SetWriteOutput();
-            expl_solver.WriteCurrentDeformation("solution",counter);
+            expl_solver.WriteCurrentSpatialSolution("solution","nodes",counter);
 
             impl_solver.SetWriteOutput(false);
             impl_solver.Solve(t,t+dt,dt);
             impl_solver.SetWriteOutput();
-            impl_solver.WriteCurrentDeformation("solution",counter);
+            impl_solver.WriteCurrentSpatialSolution("solution","nodes",counter);
 
             // the solutions turn out to be very close to each other
             for(unsigned i=0; i<mesh.GetNumNodes(); i++)
