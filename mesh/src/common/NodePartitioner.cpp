@@ -27,15 +27,135 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 */
 #include <cassert>
 
-#include "petscao.h"
-
+#include "Exception.hpp"
 #include "NodePartitioner.hpp"
 #include "PetscMatTools.hpp"
 #include "PetscTools.hpp"
 #include "Timer.hpp"
 
+#include "petscao.h"
+
+/*
+ * The following definition fixes an odd incompatibility of METIS 4.0 and Chaste. Since
+ * the library was compiled with a plain-C compiler, it fails to link using a C++ compiler.
+ * Note that METIS 4.0 fails to compile with g++ or icpc, so a C compiler should be used.
+ *
+ * Somebody had this problem before: http://www-users.cs.umn.edu/~karypis/.discus/messages/15/113.html?1119486445
+ *
+ * Note that it is necessary to define the function header before the #include statement.
+*/
+extern "C" {
+extern void METIS_PartMeshNodal(int*, int*, int*, int*, int*, int*, int*, int*, int*);
+}
+#include <parmetis.h>
 
 
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::MetisLibraryNodePartitioning(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
+                                                                           std::vector<unsigned>& rNodesPermutation,
+                                                                           std::set<unsigned>& rNodesOwned,
+                                                                           std::vector<unsigned>& rProcessorsOffset)
+{
+    assert(PetscTools::IsParallel());
+
+    assert(ELEMENT_DIM==2 || ELEMENT_DIM==3); // Metis works with triangles and tetras
+
+    int nn = rMeshReader.GetNumNodes();
+    idxtype* npart = new idxtype[nn];
+    assert(npart != NULL);
+
+    //Only the master process will access the element data and perform the partitioning
+    if (PetscTools::AmMaster())
+    {
+        int ne = rMeshReader.GetNumElements();
+        idxtype* elmnts = new idxtype[ne * (ELEMENT_DIM+1)];
+        assert(elmnts != NULL);
+
+        unsigned counter=0;
+        for (unsigned element_number = 0; element_number < rMeshReader.GetNumElements(); element_number++)
+        {
+            ElementData element_data = rMeshReader.GetNextElementData();
+
+            for (unsigned i=0; i<ELEMENT_DIM+1; i++)
+            {
+                elmnts[counter++] = element_data.NodeIndices[i];
+            }
+        }
+        rMeshReader.Reset();
+
+        int etype;
+
+        switch (ELEMENT_DIM)
+        {
+            case 2:
+                etype = 1; //1 is Metis speak for triangles
+                break;
+            case 3:
+                etype = 2; //2 is Metis speak for tetrahedra
+                break;
+            default:
+                NEVER_REACHED;
+        }
+
+        int numflag = 0; //0 means C-style numbering is assumed
+        int nparts = PetscTools::GetNumProcs();
+        int edgecut;
+        idxtype* epart = new idxtype[ne];
+        assert(epart != NULL);
+
+        Timer::Reset();
+        METIS_PartMeshNodal(&ne, &nn, elmnts, &etype, &numflag, &nparts, &edgecut, epart, npart);//, wgetflag, vwgt);
+        //Timer::Print("METIS call");
+
+        delete[] elmnts;
+        delete[] epart;
+    }
+
+    //Here's the new bottle-neck: share all the node ownership data
+    //idxtype is normally int (see metis-4.0/Lib/struct.h 17-22)
+    assert(sizeof(idxtype) == sizeof(int));
+    MPI_Bcast(npart /*data*/, nn /*size*/, MPI_INT, 0 /*From Master*/, PETSC_COMM_WORLD);
+
+    assert(rProcessorsOffset.size() == 0); // Making sure the vector is empty. After calling resize() only newly created memory will be initialised to 0.
+    rProcessorsOffset.resize(PetscTools::GetNumProcs(), 0);
+
+    for (unsigned node_index=0; node_index<rMeshReader.GetNumNodes(); node_index++)
+    {
+        unsigned part_read = npart[node_index];
+
+        // METIS output says I own this node
+        if (part_read == PetscTools::GetMyRank())
+        {
+            rNodesOwned.insert(node_index);
+        }
+
+        // Offset is defined as the first node owned by a processor. We compute it incrementally.
+        // i.e. if node_index belongs to proc 3 (of 6) we have to shift the processors 4, 5, and 6
+        // offset a position.
+        for (unsigned proc=part_read+1; proc<PetscTools::GetNumProcs(); proc++)
+        {
+            rProcessorsOffset[proc]++;
+        }
+    }
+
+    /*
+     *  Once we know the offsets we can compute the permutation vector
+     */
+    std::vector<unsigned> local_index(PetscTools::GetNumProcs(), 0);
+
+    rNodesPermutation.resize(rMeshReader.GetNumNodes());
+
+    for (unsigned node_index=0; node_index<rMeshReader.GetNumNodes(); node_index++)
+    {
+        unsigned part_read = npart[node_index];
+
+        rNodesPermutation[node_index] = rProcessorsOffset[part_read] + local_index[part_read];
+
+        local_index[part_read]++;
+    }
+
+    delete[] npart;
+}
 
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

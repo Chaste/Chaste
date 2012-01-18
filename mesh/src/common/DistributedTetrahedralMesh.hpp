@@ -43,18 +43,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #define UNASSIGNED_NODE UINT_MAX
 
-/*
- * The following definition fixes an odd incompatibility of METIS 4.0 and Chaste. Since
- * the library was compiled with a plain-C compiler, it fails to link using a C++ compiler.
- * Note that METIS 4.0 fails to compile with g++ or icpc, so a C compiler should be used.
- *
- * Somebody had this problem before: http://www-users.cs.umn.edu/~karypis/.discus/messages/15/113.html?1119486445
- *
- * Note that it is necessary to define the function header before the #include statement.
-*/
-extern "C" {
-extern void METIS_PartMeshNodal(int*, int*, int*, int*, int*, int*, int*, int*, int*);
-}
 #include <parmetis.h>
 
 /**
@@ -358,7 +346,7 @@ private:
                                  std::set<unsigned>& rElementsOwned,
                                  std::vector<unsigned>& rProcessorsOffset);
 
-    /**
+   /**
      * Specialised method to compute a parallel partitioning of a given mesh
      * (called by ComputeMeshPartitioning, based on the value of mMetisPartitioning)
      *
@@ -367,33 +355,6 @@ private:
      */
     void DumbNodePartitioning(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
                               std::set<unsigned>& rNodesOwned);
-
-
-    /**
-     * Specialised method to compute a parallel partitioning of a given mesh
-     * (called by ComputeMeshPartitioning, based on the value of mMetisPartitioning
-     *
-     * @param rMeshReader is the reader pointing to the mesh to be read in and partitioned
-     * @param rNodesOwned is an empty set to be filled with the indices of nodes owned by this process
-     * @param rProcessorsOffset a vector of length NumProcs to be filled with the index of the lowest indexed node owned by each process
-     *
-     */
-    void MetisLibraryNodePartitioning(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
-                                      std::set<unsigned>& rNodesOwned,
-                                      std::vector<unsigned>& rProcessorsOffset);
-
-    /**
-     * Specialised method to compute a parallel partitioning of a given mesh
-     * (called by ComputeMeshPartitioning, based on the value of mMetisPartitioning
-     *
-     * @param rMeshReader is the reader pointing to the mesh to be read in and partitioned
-     * @param rNodesOwned is an empty set to be filled with the indices of nodes owned by this process
-     * @param rProcessorsOffset a vector of length NumProcs to be filled with the index of the lowest indexed node owned by each process
-     *
-     */
-    void PetscMatrixPartitioning(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
-                                 std::set<unsigned>& rNodesOwned,
-                                 std::vector<unsigned>& rProcessorsOffset);
     /**
       * Specialised method to compute a parallel partitioning of a given mesh with the ParMetis library
       * (called by ComputeMeshPartitioning, based on the value of mMetisPartitioning)
