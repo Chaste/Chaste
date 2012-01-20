@@ -609,7 +609,7 @@ public:
                                                         problem_defn,
                                                         "");
 
-        solver.AssembleSystem(false,true);
+        solver.AssembleSystem(true,true);
         unsigned N = solver.mNumDofs;
 
         Vec test_vec = PetscTools::CreateAndSetVec(N, 0.0);

@@ -1,6 +1,9 @@
 TestAbstractContinuumMechanicsAssembler.hpp
 TestCompressibleNonlinearElasticitySolver.hpp
+TestContinuumMechanicsNeumannBcsAssembler.hpp
 TestIncompressibleNonlinearElasticitySolver.hpp
 TestMaterialLaws.hpp
 TestNonlinearElasticityTools.hpp
 TestProblemDefinitions.hpp
+TestStokesFlowAssembler.hpp
+TestStokesFlowSolver.hpp

@@ -41,6 +41,18 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "PetscTools.hpp"
 #include "MechanicsEventHandler.hpp"
 
+/**
+ *  Simple enumeration for options that can be passed into
+ *  AbstractContinuumMechanicsSolver::ApplyDirichletBoundaryConditions().
+ *  See documentation for this method.
+ */
+typedef enum _ApplyDirichletBcsType
+{
+    LINEAR_PROBLEM,
+    NONLINEAR_PROBLEM_APPLY_TO_RESIDUAL_ONLY,
+    NONLINEAR_PROBLEM_APPLY_TO_EVERYTHING,
+} ApplyDirichletBcsType;
+
 
 /**
  *  General base class for continuum mechanics solvers
@@ -103,12 +115,6 @@ protected:
      */
     unsigned mNumDofs;
 
-
-    /**
-     * Allocates memory for the matrices and vectors
-     */
-    void AllocateMatrixMemory();
-
     /**
      * Residual vector nonlinear problems.
      *
@@ -150,6 +156,40 @@ protected:
      * Precondition matrix for the linear system.
      */
     Mat mPreconditionMatrix;
+
+
+    /**
+     * Allocates memory for the matrices and vectors
+     */
+    void AllocateMatrixMemory();
+
+
+    /**
+     * Apply the Dirichlet boundary conditions to the linear system.
+     *
+     * The first input parameter should be one of the following
+     *   LINEAR_PROBLEM -- indicating the overall problem is linear, and in which
+     *     case the BCs will be applied to both the matrix and vector of the
+     *     linear system
+     *   NONLINEAR_PROBLEM_APPLY_TO_RESIDUAL_ONLY -- indicating the overall problem is nonlinear
+     *     and here only the residual vector will be altered (apply the Dirichlet boundary
+     *     conditions to the residual vector involves setting appropriate components to the
+     *     difference between the current value and the correct value).
+     *
+     *   NONLINEAR_PROBLEM_APPLY_TO_EVERYTHING -- indicating the overall problem is nonlinear,
+     *     and here, the residual vector will be altered, as will the matrix and RHS vector
+     *     (see documentation on mResidualVector for why there is a separate residual vector
+     *     and RHS vector).
+     *
+     *  The second parameter should be true if the overall problem is symmetric, in which case
+     *  boundary conditions will be applied keeping the matrix symmetric (if the matrix is being
+     *  altered). See in-code comments for how this is done.
+     *
+     *  @param type see above
+     *  @param symmetricProblem see above
+     */
+    void ApplyDirichletBoundaryConditions(ApplyDirichletBcsType type, bool symmetricProblem);
+
 
 public:
     /**
@@ -258,7 +298,7 @@ AbstractContinuumMechanicsSolver<DIM>::AbstractContinuumMechanicsSolver(Quadrati
     mpQuadratureRule = new GaussianQuadratureRule<DIM>(3);
     mpBoundaryQuadratureRule = new GaussianQuadratureRule<DIM-1>(3);
 
-    this->mCurrentSolution.resize(mNumDofs, 0.0);
+    mCurrentSolution.resize(mNumDofs, 0.0);
 }
 
 
@@ -282,10 +322,10 @@ AbstractContinuumMechanicsSolver<DIM>::~AbstractContinuumMechanicsSolver()
         PetscTools::Destroy(mLinearSystemRhsVector);
         PetscTools::Destroy(mSystemLhsMatrix);
         PetscTools::Destroy(mPreconditionMatrix);
-        if (mCompressibilityType==COMPRESSIBLE)
-        {
-            PetscTools::Destroy(mDirichletBoundaryConditionsVector);
-        }
+    }
+    if (mDirichletBoundaryConditionsVector)
+    {
+        PetscTools::Destroy(mDirichletBoundaryConditionsVector);
     }
 }
 
@@ -341,12 +381,12 @@ void AbstractContinuumMechanicsSolver<DIM>::WriteCurrentPressureSolution(int cou
 
     out_stream p_file = mpOutputFileHandler->OpenOutputFile(file_name.str());
 
-    std::vector<double>& r_pressure = this->rGetPressures();
+    std::vector<double>& r_pressure = rGetPressures();
     for (unsigned i=0; i<r_pressure.size(); i++)
     {
         for (unsigned j=0; j<DIM; j++)
         {
-            *p_file << this->mrQuadMesh.GetNode(i)->rGetLocation()[j] << " ";
+            *p_file << mrQuadMesh.GetNode(i)->rGetLocation()[j] << " ";
         }
 
         *p_file << r_pressure[i] << "\n";
@@ -369,14 +409,169 @@ template<unsigned DIM>
 std::vector<double>& AbstractContinuumMechanicsSolver<DIM>::rGetPressures()
 {
     mPressureSolution.clear();
-    mPressureSolution.resize(this->mrQuadMesh.GetNumVertices());
+    mPressureSolution.resize(mrQuadMesh.GetNumVertices());
 
-    for (unsigned i=0; i<this->mrQuadMesh.GetNumVertices(); i++)
+    for (unsigned i=0; i<mrQuadMesh.GetNumVertices(); i++)
     {
-        mPressureSolution[i] = this->mCurrentSolution[DIM*this->mrQuadMesh.GetNumNodes() + i];
+        mPressureSolution[i] = mCurrentSolution[DIM*mrQuadMesh.GetNumNodes() + i];
     }
     return mPressureSolution;
 }
+
+/*
+ * This method applies the appropriate BCs to the residual and/or linear system
+ *
+ * For the latter, and second input parameter==true, the BCs are imposed in such a way as
+ * to ensure that a symmetric linear system remains symmetric. For each row with boundary condition
+ * applied, both the row and column are zero'd and the RHS vector modified to take into account the
+ * zero'd column.
+ *
+ * Suppose we have a matrix
+ * [a b c] [x] = [ b1 ]
+ * [d e f] [y]   [ b2 ]
+ * [g h i] [z]   [ b3 ]
+ * and we want to apply the boundary condition x=v without losing symmetry if the matrix is
+ * symmetric. We apply the boundary condition
+ * [1 0 0] [x] = [ v  ]
+ * [d e f] [y]   [ b2 ]
+ * [g h i] [z]   [ b3 ]
+ * and then zero the column as well, adding a term to the RHS to take account for the
+ * zero-matrix components
+ * [1 0 0] [x] = [ v  ] - v[ 0 ]
+ * [0 e f] [y]   [ b2 ]    [ d ]
+ * [0 h i] [z]   [ b3 ]    [ g ]
+ * Note the last term is the first column of the matrix, with one component zeroed, and
+ * multiplied by the boundary condition value. This last term is then stored in
+ * mDirichletBoundaryConditionsVector, and in general is equal to:
+ * SUM_{d=1..D} v_d a'_d
+ * where v_d is the boundary value of boundary condition d (d an index into the matrix),
+ * and a'_d is the dth-column of the matrix but with the d-th component zeroed, and where
+ * there are D boundary conditions
+ */
+template<unsigned DIM>
+void AbstractContinuumMechanicsSolver<DIM>::ApplyDirichletBoundaryConditions(ApplyDirichletBcsType type, bool symmetricProblem)
+{
+    std::vector<unsigned> rows;
+    std::vector<double> values;
+
+    // Whether to apply symmetrically, ie alter columns as well as rows (see comment above)
+    bool applySymmetrically = (type!=NONLINEAR_PROBLEM_APPLY_TO_RESIDUAL_ONLY) && symmetricProblem;
+
+    if (applySymmetrically)
+    {
+        if(mDirichletBoundaryConditionsVector==NULL)
+        {
+            VecDuplicate(mResidualVector, &mDirichletBoundaryConditionsVector);
+        }
+
+        PetscVecTools::Zero(mDirichletBoundaryConditionsVector);
+        PetscMatTools::Finalise(mSystemLhsMatrix);
+    }
+
+    ///////////////////////////////////////
+    // collect the entries to be altered
+    ///////////////////////////////////////
+
+    for (unsigned i=0; i<mrProblemDefinition.rGetDirichletNodes().size(); i++)
+    {
+        unsigned node_index = mrProblemDefinition.rGetDirichletNodes()[i];
+
+        for (unsigned j=0; j<DIM; j++)
+        {
+            double dirichlet_val = mrProblemDefinition.rGetDirichletNodeValues()[i](j); // problem defn returns DISPLACEMENTS here
+
+            if(dirichlet_val != ContinuumMechanicsProblemDefinition<DIM>::FREE)
+            {
+                double val;
+                unsigned dof_index = DIM*node_index+j;
+
+                if(type == LINEAR_PROBLEM)
+                {
+                    val = dirichlet_val;
+                }
+                else
+                {
+                    // The boundary conditions on the NONLINEAR SYSTEM are x=boundary_values
+                    // on the boundary nodes. However:
+                    // The boundary conditions on the LINEAR SYSTEM at each Newton step (Ju=f,
+                    // where J is the Jacobian, u the negative update vector and f is the residual) is:
+                    // u=current_soln-boundary_values on the boundary nodes
+                    val = mCurrentSolution[dof_index] - dirichlet_val;
+                }
+                rows.push_back(dof_index);
+                values.push_back(val);
+            }
+        }
+    }
+
+    ///////////////////////////////////////
+    // do the alterations
+    ///////////////////////////////////////
+
+    if (applySymmetrically)
+    {
+        // Modify the matrix columns
+        for (unsigned i=0; i<rows.size(); i++)
+        {
+            unsigned col = rows[i];
+            double minus_value = -values[i];
+
+            // Get a vector which will store the column of the matrix (column d, where d is
+            // the index of the row (and column) to be altered for the boundary condition.
+            // Since the matrix is symmetric when get row number "col" and treat it as a column.
+            // PETSc uses compressed row format and therefore getting rows is far more efficient
+            // than getting columns.
+            Vec matrix_col = PetscMatTools::GetMatrixRowDistributed(mSystemLhsMatrix,col);
+
+            // Zero the correct entry of the column
+            PetscVecTools::SetElement(matrix_col, col, 0.0);
+
+            // Set up the RHS Dirichlet boundary conditions vector
+            // Eg, for a boundary node at the zeroth node (x_0 = value), this is equal to
+            //   -value*[0 a_21 a_31 .. a_N1]
+            // and will be added to the RHS.
+            PetscVecTools::AddScaledVector(mDirichletBoundaryConditionsVector, matrix_col, minus_value);
+            PetscTools::Destroy(matrix_col);
+        }
+    }
+
+    if (type!=NONLINEAR_PROBLEM_APPLY_TO_RESIDUAL_ONLY) // ie doing a whole linear system
+    {
+        // Now zero the appropriate rows and columns of the matrix. If the matrix is symmetric we apply the
+        // boundary conditions in a way the symmetry isn't lost (rows and columns). If not only the row is
+        // zeroed.
+        if (applySymmetrically)
+        {
+            PetscMatTools::ZeroRowsAndColumnsWithValueOnDiagonal(mSystemLhsMatrix, rows, 1.0);
+            PetscMatTools::ZeroRowsAndColumnsWithValueOnDiagonal(mPreconditionMatrix, rows, 1.0);
+
+            // Apply the RHS boundary conditions modification if required.
+            PetscVecTools::AddScaledVector(mLinearSystemRhsVector, mDirichletBoundaryConditionsVector, 1.0);
+        }
+        else
+        {
+            PetscMatTools::ZeroRowsWithValueOnDiagonal(mSystemLhsMatrix, rows, 1.0);
+            PetscMatTools::ZeroRowsWithValueOnDiagonal(mPreconditionMatrix, rows, 1.0);
+        }
+    }
+
+    if (type!=LINEAR_PROBLEM)
+    {
+        for (unsigned i=0; i<rows.size(); i++)
+        {
+            PetscVecTools::SetElement(mResidualVector, rows[i], values[i]);
+        }
+    }
+
+    if (type!=NONLINEAR_PROBLEM_APPLY_TO_RESIDUAL_ONLY)
+    {
+        for (unsigned i=0; i<rows.size(); i++)
+        {
+            PetscVecTools::SetElement(mLinearSystemRhsVector, rows[i], values[i]);
+        }
+    }
+}
+
 
 
 template<unsigned DIM>
@@ -387,10 +582,9 @@ void AbstractContinuumMechanicsSolver<DIM>::AllocateMatrixMemory()
     ///////////////////////////
     mResidualVector = PetscTools::CreateVec(mNumDofs);
     VecDuplicate(mResidualVector, &mLinearSystemRhsVector);
-    if (mCompressibilityType == COMPRESSIBLE)
-    {
-        VecDuplicate(mResidualVector, &mDirichletBoundaryConditionsVector);
-    }
+    // the one is only allocated if it will be needed (in ApplyDirichletBoundaryConditions),
+    // depending on whether the matrix is kept symmetric.
+    mDirichletBoundaryConditionsVector = NULL;
 
     ///////////////////////////
     // two matrices

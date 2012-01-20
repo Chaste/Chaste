@@ -165,23 +165,7 @@ protected:
      */
     virtual void AssembleSystem(bool assembleResidual, bool assembleLinearSystem)=0;
 
-    /**
-     * Apply the Dirichlet boundary conditions to the linear system.
-     *
-     * This will always apply the Dirichlet boundary conditions to the residual vector
-     * (basically, setting a component to the difference between the current value and
-     * the correct value).
-     *
-     * If the boolean parameter is true, this will apply the boundary conditions to the
-     * Jacobian and the linear system RHS vector (which should be equal to the residual
-     * on entering this function). In the compressible case the boundary conditions are
-     * applied by zeroing both rows and columns of the Jacobian matrix (to maintain)
-     * symmetry, which means additional changes are needed for the RHS vector.
-     *
-     * @param applyToMatrix Whether to apply the boundary conditions to the linear system
-     *     (as well as the residual).
-     */
-    void ApplyDirichletBoundaryConditions(bool applyToMatrix);
+
 
     /**
      * To be called at the end of AssembleSystem. Calls (Petsc) assemble methods on the
@@ -412,145 +396,12 @@ public:
 ///////////////////////////////////////////////////////////////////////////////////
 
 
-/*
- * This method applies the appropriate BCs to the residual vector, and possible also the linear system.
- *
- * For the latter, in the compressible case, the BCs are imposed in such a way as to ensure that a
- * symmetric linear system remains symmetric. For each row with boundary condition applied, both the
- * row and column are zero'd and the RHS vector modified to take into account the zero'd column.
- *
- * Suppose we have a matrix
- * [a b c] [x] = [ b1 ]
- * [d e f] [y]   [ b2 ]
- * [g h i] [z]   [ b3 ]
- * and we want to apply the boundary condition x=v without losing symmetry if the matrix is
- * symmetric. We apply the boundary condition
- * [1 0 0] [x] = [ v  ]
- * [d e f] [y]   [ b2 ]
- * [g h i] [z]   [ b3 ]
- * and then zero the column as well, adding a term to the RHS to take account for the
- * zero-matrix components
- * [1 0 0] [x] = [ v  ] - v[ 0 ]
- * [0 e f] [y]   [ b2 ]    [ d ]
- * [0 h i] [z]   [ b3 ]    [ g ]
- * Note the last term is the first column of the matrix, with one component zeroed, and
- * multiplied by the boundary condition value. This last term is then stored in
- * rLinearSystem.rGetDirichletBoundaryConditionsVector(), and in general form is the
- * SUM_{d=1..D} v_d a'_d
- * where v_d is the boundary value of boundary condition d (d an index into the matrix),
- * and a'_d is the dth-column of the matrix but with the d-th component zeroed, and where
- * there are D boundary conditions
- */
-template<unsigned DIM>
-void AbstractNonlinearElasticitySolver<DIM>::ApplyDirichletBoundaryConditions(bool applyToLinearSystem)
-{
-    assert(this->mResidualVector); // BCs will be added to all the time
-    if (applyToLinearSystem)
-    {
-        assert(mrJacobianMatrix);
-        assert(this->mLinearSystemRhsVector);
-    }
-
-    // The boundary conditions on the NONLINEAR SYSTEM are x=boundary_values
-    // on the boundary nodes. However:
-    // The boundary conditions on the LINEAR SYSTEM  Ju=f, where J is the
-    // u the negative update vector and f is the residual is
-    // u=current_soln-boundary_values on the boundary nodes
-
-    std::vector<unsigned> rows;
-    std::vector<double> values;
-
-    // Whether to apply symmetrically, ie alter columns as well as rows (see comment above)
-    bool applySymmetrically = (applyToLinearSystem) && (this->mCompressibilityType==COMPRESSIBLE);
-
-    if (applySymmetrically)
-    {
-        assert(applyToLinearSystem);
-        PetscVecTools::Zero(this->mDirichletBoundaryConditionsVector);
-        PetscMatTools::Finalise(mrJacobianMatrix);
-    }
-
-    for (unsigned i=0; i<mrProblemDefinition.rGetDirichletNodes().size(); i++)
-    {
-        unsigned node_index = mrProblemDefinition.rGetDirichletNodes()[i];
-
-        for (unsigned j=0; j<DIM; j++)
-        {
-            double disp = mrProblemDefinition.rGetDirichletNodeValues()[i](j); // problem defn returns DISPLACEMENTS here
-
-            if(disp != SolidMechanicsProblemDefinition<DIM>::FREE)
-            {
-                unsigned dof_index = DIM*node_index+j;
-                rows.push_back(dof_index);
-                values.push_back(this->mCurrentSolution[dof_index] - disp);
-            }
-        }
-    }
-
-    if (applySymmetrically)
-    {
-        // Modify the matrix columns
-        for (unsigned i=0; i<rows.size(); i++)
-        {
-            unsigned col = rows[i];
-            double minus_value = -values[i];
-
-            // Get a vector which will store the column of the matrix (column d, where d is
-            // the index of the row (and column) to be altered for the boundary condition.
-            // Since the matrix is symmetric when get row number "col" and treat it as a column.
-            // PETSc uses compressed row format and therefore getting rows is far more efficient
-            // than getting columns.
-            Vec matrix_col = PetscMatTools::GetMatrixRowDistributed(mrJacobianMatrix,col);
-
-            // Zero the correct entry of the column
-            PetscVecTools::SetElement(matrix_col, col, 0.0);
-
-            // Set up the RHS Dirichlet boundary conditions vector
-            // Assuming one boundary at the zeroth node (x_0 = value), this is equal to
-            //   -value*[0 a_21 a_31 .. a_N1]
-            // and will be added to the RHS.
-            PetscVecTools::AddScaledVector(this->mDirichletBoundaryConditionsVector, matrix_col, minus_value);
-            PetscTools::Destroy(matrix_col);
-        }
-    }
-
-    if (applyToLinearSystem)
-    {
-        // Now zero the appropriate rows and columns of the matrix. If the matrix is symmetric we apply the
-        // boundary conditions in a way the symmetry isn't lost (rows and columns). If not only the row is
-        // zeroed.
-        if (applySymmetrically)
-        {
-            PetscMatTools::ZeroRowsAndColumnsWithValueOnDiagonal(mrJacobianMatrix, rows, 1.0);
-            PetscMatTools::ZeroRowsAndColumnsWithValueOnDiagonal(this->mPreconditionMatrix, rows, 1.0);
-
-            // Apply the RHS boundary conditions modification if required.
-            PetscVecTools::AddScaledVector(this->mLinearSystemRhsVector, this->mDirichletBoundaryConditionsVector, 1.0);
-        }
-        else
-        {
-            PetscMatTools::ZeroRowsWithValueOnDiagonal(mrJacobianMatrix, rows, 1.0);
-            PetscMatTools::ZeroRowsWithValueOnDiagonal(this->mPreconditionMatrix, rows, 1.0);
-        }
-    }
-
-    for (unsigned i=0; i<rows.size(); i++)
-    {
-        PetscVecTools::SetElement(this->mResidualVector, rows[i], values[i]);
-    }
-
-    if (applyToLinearSystem)
-    {
-        for (unsigned i=0; i<rows.size(); i++)
-        {
-            PetscVecTools::SetElement(this->mLinearSystemRhsVector, rows[i], values[i]);
-        }
-    }
-}
-
 template<unsigned DIM>
 void AbstractNonlinearElasticitySolver<DIM>::FinishAssembleSystem(bool assembleResidual, bool assembleJacobian)
 {
+    //todo: first param is probably reduntant?
+    assert(assembleResidual);
+
     if (assembleResidual)
     {
         PetscVecTools::Finalise(this->mResidualVector);
@@ -564,7 +415,14 @@ void AbstractNonlinearElasticitySolver<DIM>::FinishAssembleSystem(bool assembleR
     }
 
     // Apply Dirichlet boundary conditions
-    ApplyDirichletBoundaryConditions(assembleJacobian);
+    if(assembleJacobian)
+    {
+        this->ApplyDirichletBoundaryConditions(NONLINEAR_PROBLEM_APPLY_TO_EVERYTHING, this->mCompressibilityType==COMPRESSIBLE);
+    }
+    else if (assembleResidual)
+    {
+        this->ApplyDirichletBoundaryConditions(NONLINEAR_PROBLEM_APPLY_TO_RESIDUAL_ONLY, this->mCompressibilityType==COMPRESSIBLE);
+    }
 
     if (assembleResidual)
     {
