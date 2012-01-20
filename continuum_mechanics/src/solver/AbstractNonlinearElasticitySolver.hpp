@@ -99,8 +99,11 @@ protected:
      */
     SolidMechanicsProblemDefinition<DIM>& mrProblemDefinition;
 
+    /**
+     * Reference to the matrix 'mLhsSystemMatrix' in the parent class, named as the jacobian,
+     * just to make code clearer.
+     */
     Mat& mrJacobianMatrix;
-//    Vec& mrResidualVector;
 
     /**
      * Absolute tolerance for linear systems. Can be set by calling

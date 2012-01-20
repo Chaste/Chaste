@@ -55,6 +55,7 @@ protected:
      */
     QuadraticMesh<DIM>& mrQuadMesh;
 
+    /** Problem definition class - contains info on boundary conditions, etc */
     ContinuumMechanicsProblemDefinition<DIM>& mrProblemDefinition;
 
     /** Whether to write any output. */
@@ -104,22 +105,19 @@ protected:
 
 
     /**
-     * Allocates memory for the Jacobian and preconditioner matrices (larger number of
-     * non-zeros per row than with say linear problems)
+     * Allocates memory for the matrices and vectors
      */
     void AllocateMatrixMemory();
 
     /**
-     * Residual vector for the full nonlinear system, also the RHS vector in the linear
-     * system used to solve the nonlinear problem using Newton's method.
-     */
-    Vec mResidualVector;
-
-    /**
-     * The RHS side in the linear system that is solved each Newton iteration. Since Newton's method
-     * is Ju = f, where J is the Jacobian, u the (negative of the) update and f the residual, it might seem necessary
-     * to store this as well as the residual. However, when applying Dirichlet boundary conditions in
-     * the compressible case, we alter the rows of the matrix, but also alter the columns in order to
+     * Residual vector nonlinear problems.
+     *
+     * Since the residual in nonlinear problems is usually also the RHS vector in the linear
+     * system, it may seem unncessary to also have the member variable mLinearSystemRhsVector.
+     *
+     * However: Newton's method is Ju = f, where J is the Jacobian, u the (negative of the) update
+     * and f the residual, but when applying Dirichlet boundary conditions in
+     * the compressible case, we alter the rows of the matrix and also alter the columns in order to
      * maintain symmetry. This requires making further changes to the right-hand vector, meaning that
      * it no longer properly represents the residual. Hence, we have to use two vectors.
      *
@@ -129,7 +127,12 @@ protected:
      *  - apply BCs to f.
      *  - alter the linear system from Ju=f to (J*)u=f* which enforces the dirichlet boundary conditions but enforces them symmetrically.
      *
-     * mLinearSystemRhsVector represents f*.
+     * mLinearSystemRhsVector below represents f*.
+     */
+    Vec mResidualVector;
+
+    /**
+     * The RHS side in the linear system that is solved each Newton iteration.
      */
     Vec mLinearSystemRhsVector;
 
@@ -145,21 +148,6 @@ protected:
 
     /**
      * Precondition matrix for the linear system.
-     *
-     * In the incompressible case:
-     * the preconditioner is the petsc LU factorisation of
-     *
-     * Jp = [A B] in displacement-pressure block form,
-     *      [C M]
-     *
-     * where the A, B and C are the matrices in the normal jacobian,
-     * i.e.
-     *
-     * J  = [A B]
-     *      [C 0]
-     *
-     * and M is the MASS MATRIX (ie integral phi_i phi_j dV, where phi_i are the
-     * pressure basis functions).
      */
     Mat mPreconditionMatrix;
 
@@ -183,8 +171,8 @@ public:
      * Write the spatial solution (deformed position if solids, flow if fluids) at the nodes
      *
      * @param fileName (stem)
-     * @param counterToAppend append a counter to the file name
-     * @param extension to append at end.
+     * @param fileCxtension to append at end.
+     * @param counterToAppend append a counter to the file name (defaults to nothing appended).
      *
      * For example:
      * WriteCurrentSpatialSolution("solution","nodes") --> file called "solution.nodes"
