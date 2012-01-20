@@ -58,7 +58,7 @@ void CompressibleNonlinearElasticitySolver<DIM>::AssembleSystem(bool assembleRes
     }
     if (assembleJacobian)
     {
-        PetscMatTools::Zero(this->mJacobianMatrix);
+        PetscMatTools::Zero(this->mrJacobianMatrix);
         PetscMatTools::Zero(this->mPreconditionMatrix);
     }
 
@@ -108,7 +108,7 @@ void CompressibleNonlinearElasticitySolver<DIM>::AssembleSystem(bool assembleRes
 
             if (assembleJacobian)
             {
-                PetscMatTools::AddMultipleValues<STENCIL_SIZE>(this->mJacobianMatrix, p_indices, a_elem);
+                PetscMatTools::AddMultipleValues<STENCIL_SIZE>(this->mrJacobianMatrix, p_indices, a_elem);
                 PetscMatTools::AddMultipleValues<STENCIL_SIZE>(this->mPreconditionMatrix, p_indices, a_elem_precond);
             }
 
@@ -140,7 +140,7 @@ void CompressibleNonlinearElasticitySolver<DIM>::AssembleSystem(bool assembleRes
 
             if (assembleJacobian)
             {
-                PetscMatTools::AddMultipleValues<BOUNDARY_STENCIL_SIZE>(this->mJacobianMatrix, p_indices, a_boundary_elem);
+                PetscMatTools::AddMultipleValues<BOUNDARY_STENCIL_SIZE>(this->mrJacobianMatrix, p_indices, a_boundary_elem);
                 PetscMatTools::AddMultipleValues<BOUNDARY_STENCIL_SIZE>(this->mPreconditionMatrix, p_indices, a_boundary_elem);
             }
 

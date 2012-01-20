@@ -177,7 +177,7 @@ public:
                                                         "");
         solver.AssembleSystem(true, true);
 
-        TS_ASSERT(PetscMatTools::CheckSymmetry(solver.mJacobianMatrix));
+        TS_ASSERT(PetscMatTools::CheckSymmetry(solver.mrJacobianMatrix));
 
         // cover exception
         MooneyRivlinMaterialLaw<3> incomp_law(2.0,2.0);
@@ -221,7 +221,7 @@ public:
         double h = 1e-6;
 
         int lo, hi;
-        MatGetOwnershipRange(solver.mJacobianMatrix, &lo, &hi);
+        MatGetOwnershipRange(solver.mrJacobianMatrix, &lo, &hi);
 
         for (unsigned j=0; j<num_dofs; j++)
         {
@@ -237,7 +237,7 @@ public:
             {
                 if ((lo<=(int)i) && ((int)i<hi))
                 {
-                    double analytic_matrix_val = PetscMatTools::GetElement(solver.mJacobianMatrix,i,j);
+                    double analytic_matrix_val = PetscMatTools::GetElement(solver.mrJacobianMatrix,i,j);
                     double numerical_matrix_val = (perturbed_rhs[i] - rhs_vec[i])/h;
                     if ((fabs(analytic_matrix_val)>1e-6) && (fabs(numerical_matrix_val)>1e-6))
                     {
@@ -296,7 +296,7 @@ public:
             {
                 if ((lo<=(int)i) && ((int)i<hi))
                 {
-                    double analytic_matrix_val = PetscMatTools::GetElement(solver.mJacobianMatrix,i,j);
+                    double analytic_matrix_val = PetscMatTools::GetElement(solver.mrJacobianMatrix,i,j);
                     double numerical_matrix_val = (perturbed_rhs[i] - rhs_vec2[i])/h;
                     if ((fabs(analytic_matrix_val)>1e-6) && (fabs(numerical_matrix_val)>1e-6))
                     {
@@ -550,7 +550,7 @@ public:
         }
 
         // Check that the last matrix was symmetric
-        TS_ASSERT(PetscMatTools::CheckSymmetry(solver.mJacobianMatrix));
+        TS_ASSERT(PetscMatTools::CheckSymmetry(solver.mrJacobianMatrix));
 
         ////////////////////////////////////////////////////////////////////
         // Completely separately, we now test the AssembleOnBoundaryElement
@@ -619,7 +619,7 @@ public:
         {
             PetscVecTools::SetElement(test_vec, i, 1.0);
 
-            MatMult(solver.mJacobianMatrix,test_vec,product_vec);
+            MatMult(solver.mrJacobianMatrix,test_vec,product_vec);
             double vT_J_v;
             VecDot(product_vec, test_vec, &vT_J_v);
             //std::cout << vT_J_v << " ";

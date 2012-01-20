@@ -166,7 +166,7 @@ public:
         double h = 1e-6;
 
         int lo, hi;
-        MatGetOwnershipRange(solver.mJacobianMatrix, &lo, &hi);
+        MatGetOwnershipRange(solver.mrJacobianMatrix, &lo, &hi);
 
         for (unsigned j=0; j<num_dofs; j++)
         {
@@ -182,7 +182,7 @@ public:
             {
                 if ((lo<=(int)i) && ((int)i<hi))
                 {
-                    double analytic_matrix_val = PetscMatTools::GetElement(solver.mJacobianMatrix,i,j);
+                    double analytic_matrix_val = PetscMatTools::GetElement(solver.mrJacobianMatrix,i,j);
                     double numerical_matrix_val = (perturbed_rhs[i] - rhs_vec[i])/h;
                     if ((fabs(analytic_matrix_val)>1e-6) && (fabs(numerical_matrix_val)>1e-6))
                     {
@@ -231,7 +231,7 @@ public:
             {
                 if ((lo<=(int)i) && ((int)i<hi))
                 {
-                    double analytic_matrix_val = PetscMatTools::GetElement(solver.mJacobianMatrix,i,j);
+                    double analytic_matrix_val = PetscMatTools::GetElement(solver.mrJacobianMatrix,i,j);
                     double numerical_matrix_val = (perturbed_rhs[i] - rhs_vec2[i])/h;
                     if ((fabs(analytic_matrix_val)>1e-6) && (fabs(numerical_matrix_val)>1e-6))
                     {

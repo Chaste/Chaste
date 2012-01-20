@@ -99,6 +99,9 @@ protected:
      */
     SolidMechanicsProblemDefinition<DIM>& mrProblemDefinition;
 
+    Mat& mrJacobianMatrix;
+//    Vec& mrResidualVector;
+
     /**
      * Absolute tolerance for linear systems. Can be set by calling
      * SetKspAbsoluteTolerances(), but default to -1, in which case
@@ -147,7 +150,7 @@ protected:
 
     /**
      * Assemble the residual vector and/or Jacobian matrix (using the current solution stored
-     * in mCurrentSolution, output going to mResidualVector and/or mJacobianMatrix).
+     * in mCurrentSolution, output going to mResidualVector and/or mrJacobianMatrix).
      *
      * Must be overridden in concrete derived classes.
      *
@@ -441,7 +444,7 @@ void AbstractNonlinearElasticitySolver<DIM>::ApplyDirichletBoundaryConditions(bo
     assert(this->mResidualVector); // BCs will be added to all the time
     if (applyToLinearSystem)
     {
-        assert(this->mJacobianMatrix);
+        assert(mrJacobianMatrix);
         assert(this->mLinearSystemRhsVector);
     }
 
@@ -461,7 +464,7 @@ void AbstractNonlinearElasticitySolver<DIM>::ApplyDirichletBoundaryConditions(bo
     {
         assert(applyToLinearSystem);
         PetscVecTools::Zero(this->mDirichletBoundaryConditionsVector);
-        PetscMatTools::Finalise(this->mJacobianMatrix);
+        PetscMatTools::Finalise(mrJacobianMatrix);
     }
 
     for (unsigned i=0; i<mrProblemDefinition.rGetDirichletNodes().size(); i++)
@@ -494,7 +497,7 @@ void AbstractNonlinearElasticitySolver<DIM>::ApplyDirichletBoundaryConditions(bo
             // Since the matrix is symmetric when get row number "col" and treat it as a column.
             // PETSc uses compressed row format and therefore getting rows is far more efficient
             // than getting columns.
-            Vec matrix_col = PetscMatTools::GetMatrixRowDistributed(this->mJacobianMatrix,col);
+            Vec matrix_col = PetscMatTools::GetMatrixRowDistributed(mrJacobianMatrix,col);
 
             // Zero the correct entry of the column
             PetscVecTools::SetElement(matrix_col, col, 0.0);
@@ -515,7 +518,7 @@ void AbstractNonlinearElasticitySolver<DIM>::ApplyDirichletBoundaryConditions(bo
         // zeroed.
         if (applySymmetrically)
         {
-            PetscMatTools::ZeroRowsAndColumnsWithValueOnDiagonal(this->mJacobianMatrix, rows, 1.0);
+            PetscMatTools::ZeroRowsAndColumnsWithValueOnDiagonal(mrJacobianMatrix, rows, 1.0);
             PetscMatTools::ZeroRowsAndColumnsWithValueOnDiagonal(this->mPreconditionMatrix, rows, 1.0);
 
             // Apply the RHS boundary conditions modification if required.
@@ -523,7 +526,7 @@ void AbstractNonlinearElasticitySolver<DIM>::ApplyDirichletBoundaryConditions(bo
         }
         else
         {
-            PetscMatTools::ZeroRowsWithValueOnDiagonal(this->mJacobianMatrix, rows, 1.0);
+            PetscMatTools::ZeroRowsWithValueOnDiagonal(mrJacobianMatrix, rows, 1.0);
             PetscMatTools::ZeroRowsWithValueOnDiagonal(this->mPreconditionMatrix, rows, 1.0);
         }
     }
@@ -551,7 +554,7 @@ void AbstractNonlinearElasticitySolver<DIM>::FinishAssembleSystem(bool assembleR
     }
     if (assembleJacobian)
     {
-        PetscMatTools::SwitchWriteMode(this->mJacobianMatrix);
+        PetscMatTools::SwitchWriteMode(mrJacobianMatrix);
         PetscMatTools::SwitchWriteMode(this->mPreconditionMatrix);
 
         VecCopy(this->mResidualVector, this->mLinearSystemRhsVector);
@@ -566,7 +569,7 @@ void AbstractNonlinearElasticitySolver<DIM>::FinishAssembleSystem(bool assembleR
     }
     if (assembleJacobian)
     {
-        PetscMatTools::Finalise(this->mJacobianMatrix);
+        PetscMatTools::Finalise(mrJacobianMatrix);
         PetscMatTools::Finalise(this->mPreconditionMatrix);
         PetscVecTools::Finalise(this->mLinearSystemRhsVector);
     }
@@ -656,7 +659,7 @@ double AbstractNonlinearElasticitySolver<DIM>::TakeNewtonStep()
     PC pc;
     KSPGetPC(solver, &pc);
 
-    KSPSetOperators(solver, this->mJacobianMatrix, this->mPreconditionMatrix, DIFFERENT_NONZERO_PATTERN /*in precond between successive solves*/);
+    KSPSetOperators(solver, mrJacobianMatrix, this->mPreconditionMatrix, DIFFERENT_NONZERO_PATTERN /*in precond between successive solves*/);
 
     if (this->mCompressibilityType==COMPRESSIBLE)
     {
@@ -669,7 +672,7 @@ double AbstractNonlinearElasticitySolver<DIM>::TakeNewtonStep()
         //PetscOptionsSetValue("-pc_factor_shift_positive_definite", "");
 
         //// for debugging only
-        //assert( PetscMatTools::CheckSymmetry(this->mJacobianMatrix) );
+        //assert( PetscMatTools::CheckSymmetry(mrJacobianMatrix) );
     }
     else
     {
@@ -718,7 +721,7 @@ double AbstractNonlinearElasticitySolver<DIM>::TakeNewtonStep()
 //    {
 //        for(unsigned j=0; j<mNumDofs; j++)
 //        {
-//            *p_file << PetscMatTools::GetElement(this->mJacobianMatrix, i, j) << " ";
+//            *p_file << PetscMatTools::GetElement(mrJacobianMatrix, i, j) << " ";
 //        }
 //        *p_file << "\n";
 //    }
@@ -950,8 +953,9 @@ AbstractNonlinearElasticitySolver<DIM>::AbstractNonlinearElasticitySolver(Quadra
                                                                           SolidMechanicsProblemDefinition<DIM>& rProblemDefinition,
                                                                           std::string outputDirectory,
                                                                           CompressibilityType compressibilityType)
-    : AbstractContinuumMechanicsSolver<DIM>(rQuadMesh, outputDirectory, compressibilityType),
+    : AbstractContinuumMechanicsSolver<DIM>(rQuadMesh, rProblemDefinition, outputDirectory, compressibilityType),
       mrProblemDefinition(rProblemDefinition),
+      mrJacobianMatrix(this->mSystemLhsMatrix),
       mKspAbsoluteTol(-1),
       mWriteOutputEachNewtonIteration(false),
       mNumNewtonIterations(0),

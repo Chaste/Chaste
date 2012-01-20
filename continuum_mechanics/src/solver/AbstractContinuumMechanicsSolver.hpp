@@ -29,7 +29,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #ifndef ABSTRACTCONTINUUMMECHANICSSOLVER_HPP_
 #define ABSTRACTCONTINUUMMECHANICSSOLVER_HPP_
 
-
+#include "ContinuumMechanicsProblemDefinition.hpp"
 #include "CompressibilityType.hpp"
 #include "LinearSystem.hpp"
 #include "OutputFileHandler.hpp"
@@ -54,6 +54,8 @@ protected:
      * as quadratic bases are used.
      */
     QuadraticMesh<DIM>& mrQuadMesh;
+
+    ContinuumMechanicsProblemDefinition<DIM>& mrProblemDefinition;
 
     /** Whether to write any output. */
     bool mWriteOutput;
@@ -134,7 +136,7 @@ protected:
     /**
      * Jacobian matrix of the nonlinear system, LHS matrix for the linear system.
      */
-    Mat mJacobianMatrix;
+    Mat mSystemLhsMatrix;
 
     /**
      * Helper vector (see ApplyDirichletBoundaryConditions code).
@@ -162,11 +164,15 @@ protected:
     Mat mPreconditionMatrix;
 
 public:
-    /** Constructor
+    /**
+     *  Constructor
      *  @param rQuadMesh the mesh
+     *  @param rProblemDefinition problem definition object
      *  @param outputDirectory output directory name
-     *  @param compressibilityType 'INCOMPRESSIBLE' or 'COMPRESSIBLE' */
+     *  @param compressibilityType 'INCOMPRESSIBLE' or 'COMPRESSIBLE'
+     */
     AbstractContinuumMechanicsSolver(QuadraticMesh<DIM>& rQuadMesh,
+                                     ContinuumMechanicsProblemDefinition<DIM>& rProblemDefinition,
                                      std::string outputDirectory,
                                      CompressibilityType compressibilityType);
 
@@ -228,16 +234,18 @@ public:
 
 template<unsigned DIM>//, bool MIXED_PROBLEM>
 AbstractContinuumMechanicsSolver<DIM>::AbstractContinuumMechanicsSolver(QuadraticMesh<DIM>& rQuadMesh,
+                                                                        ContinuumMechanicsProblemDefinition<DIM>& rProblemDefinition,
                                                                         std::string outputDirectory,
                                                                         CompressibilityType compressibilityType)
     : mrQuadMesh(rQuadMesh),
+      mrProblemDefinition(rProblemDefinition),
       mOutputDirectory(outputDirectory),
       mpOutputFileHandler(NULL),
       mpQuadratureRule(NULL),
       mpBoundaryQuadratureRule(NULL),
       mCompressibilityType(compressibilityType),
       mResidualVector(NULL),
-      mJacobianMatrix(NULL),
+      mSystemLhsMatrix(NULL),
       mPreconditionMatrix(NULL)
 {
     assert(DIM==2 || DIM==3);
@@ -284,7 +292,7 @@ AbstractContinuumMechanicsSolver<DIM>::~AbstractContinuumMechanicsSolver()
     {
         PetscTools::Destroy(mResidualVector);
         PetscTools::Destroy(mLinearSystemRhsVector);
-        PetscTools::Destroy(mJacobianMatrix);
+        PetscTools::Destroy(mSystemLhsMatrix);
         PetscTools::Destroy(mPreconditionMatrix);
         if (mCompressibilityType==COMPRESSIBLE)
         {
@@ -386,6 +394,9 @@ std::vector<double>& AbstractContinuumMechanicsSolver<DIM>::rGetPressures()
 template<unsigned DIM>
 void AbstractContinuumMechanicsSolver<DIM>::AllocateMatrixMemory()
 {
+    ///////////////////////////
+    // three vectors
+    ///////////////////////////
     mResidualVector = PetscTools::CreateVec(mNumDofs);
     VecDuplicate(mResidualVector, &mLinearSystemRhsVector);
     if (mCompressibilityType == COMPRESSIBLE)
@@ -393,19 +404,21 @@ void AbstractContinuumMechanicsSolver<DIM>::AllocateMatrixMemory()
         VecDuplicate(mResidualVector, &mDirichletBoundaryConditionsVector);
     }
 
+    ///////////////////////////
+    // two matrices
+    ///////////////////////////
+
     if (DIM==2)
     {
         // 2D: N elements around a point => 7N+3 non-zeros in that row? Assume N<=10 (structured mesh would have N_max=6) => 73.
         unsigned num_non_zeros = std::min(75u, mNumDofs);
 
-        PetscTools::SetupMat(mJacobianMatrix, mNumDofs, mNumDofs, num_non_zeros, PETSC_DECIDE, PETSC_DECIDE);
+        PetscTools::SetupMat(mSystemLhsMatrix, mNumDofs, mNumDofs, num_non_zeros, PETSC_DECIDE, PETSC_DECIDE);
         PetscTools::SetupMat(mPreconditionMatrix, mNumDofs, mNumDofs, num_non_zeros, PETSC_DECIDE, PETSC_DECIDE);
     }
     else
     {
         assert(DIM==3);
-
-        // 3D: N elements around a point. nz < (3*10+6)N (lazy estimate). Better estimate is 23N+4?. Assume N<20 => 500ish
 
         // in 3d we get the number of containing elements for each node and use that to obtain an upper bound
         // for the number of non-zeros for each DOF associated with that node.
@@ -446,7 +459,7 @@ void AbstractContinuumMechanicsSolver<DIM>::AllocateMatrixMemory()
 
         /// We want to allocate different numbers of non-zeros per row, which means
         /// PetscTools::SetupMat isn't that useful. We could call
-        //PetscTools::SetupMat(mJacobianMatrix, mNumDofs, mNumDofs, 0, PETSC_DECIDE, PETSC_DECIDE);
+        //PetscTools::SetupMat(mSystemLhsMatrix, mNumDofs, mNumDofs, 0, PETSC_DECIDE, PETSC_DECIDE);
         //PetscTools::SetupMat(mPreconditionMatrix, mNumDofs, mNumDofs, 0, PETSC_DECIDE, PETSC_DECIDE);
         /// but we would get warnings due to the lack allocation
 
@@ -455,20 +468,20 @@ void AbstractContinuumMechanicsSolver<DIM>::AllocateMatrixMemory()
         // In the future, when parallelising, remember to think about MAT_IGNORE_OFF_PROC_ENTRIES (see #1682)
 
 #if (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 2) //PETSc 2.2
-        MatCreate(PETSC_COMM_WORLD,PETSC_DECIDE,PETSC_DECIDE,mNumDofs,mNumDofs,&mJacobianMatrix);
+        MatCreate(PETSC_COMM_WORLD,PETSC_DECIDE,PETSC_DECIDE,mNumDofs,mNumDofs,&mSystemLhsMatrix);
         MatCreate(PETSC_COMM_WORLD,PETSC_DECIDE,PETSC_DECIDE,mNumDofs,mNumDofs,&mPreconditionMatrix);
 #else //New API
-        MatCreate(PETSC_COMM_WORLD,&mJacobianMatrix);
+        MatCreate(PETSC_COMM_WORLD,&mSystemLhsMatrix);
         MatCreate(PETSC_COMM_WORLD,&mPreconditionMatrix);
-        MatSetSizes(mJacobianMatrix,PETSC_DECIDE,PETSC_DECIDE,mNumDofs,mNumDofs);
+        MatSetSizes(mSystemLhsMatrix,PETSC_DECIDE,PETSC_DECIDE,mNumDofs,mNumDofs);
         MatSetSizes(mPreconditionMatrix,PETSC_DECIDE,PETSC_DECIDE,mNumDofs,mNumDofs);
 #endif
 
         if (PetscTools::IsSequential())
         {
-            MatSetType(mJacobianMatrix, MATSEQAIJ);
+            MatSetType(mSystemLhsMatrix, MATSEQAIJ);
             MatSetType(mPreconditionMatrix, MATSEQAIJ);
-            MatSeqAIJSetPreallocation(mJacobianMatrix,     PETSC_NULL, num_non_zeros_each_row);
+            MatSeqAIJSetPreallocation(mSystemLhsMatrix,    PETSC_NULL, num_non_zeros_each_row);
             MatSeqAIJSetPreallocation(mPreconditionMatrix, PETSC_NULL, num_non_zeros_each_row);
         }
         else
@@ -484,13 +497,13 @@ void AbstractContinuumMechanicsSolver<DIM>::AllocateMatrixMemory()
                 zero[i] = 0;
             }
 
-            MatSetType(mJacobianMatrix, MATMPIAIJ);
+            MatSetType(mSystemLhsMatrix, MATMPIAIJ);
             MatSetType(mPreconditionMatrix, MATMPIAIJ);
-            MatMPIAIJSetPreallocation(mJacobianMatrix,     PETSC_NULL, num_non_zeros_each_row_this_proc, PETSC_NULL, num_non_zeros_each_row_this_proc);
+            MatMPIAIJSetPreallocation(mSystemLhsMatrix,    PETSC_NULL, num_non_zeros_each_row_this_proc, PETSC_NULL, num_non_zeros_each_row_this_proc);
             MatMPIAIJSetPreallocation(mPreconditionMatrix, PETSC_NULL, num_non_zeros_each_row_this_proc, PETSC_NULL, num_non_zeros_each_row_this_proc);
         }
 
-        MatSetFromOptions(mJacobianMatrix);
+        MatSetFromOptions(mSystemLhsMatrix);
         MatSetFromOptions(mPreconditionMatrix);
 
         //unsigned total_non_zeros = 0;
