@@ -82,6 +82,39 @@ class Protocol(processors.ModelModifier):
         proto_units = doc.model.get_standard_units().copy()
         proto.parse_protocol(proto_file_path, proto_units)
         proto.modify_model()
+    
+    @staticmethod
+    def find_required_annotations(proto_file_path):
+        """Parse a protocol XML file and determine what model annotations will be required."""
+        proto_docs = []
+        model_nss = {}
+        terms = set()
+        # First load all the XMLs
+        def load_proto(path):
+            proto_xml = amara_parse_cellml(path)
+            assert hasattr(proto_xml, u'protocol')
+            model_nss.update(proto_xml.xmlns_prefixes)
+            proto_docs.append(proto_xml)
+            for proto_import in getattr(proto_xml.protocol, u'import_', []):
+                # Relative URIs must be resolved relative to this protocol file
+                source = proto_import.source
+                if not os.path.isabs(source):
+                    source = os.path.join(os.path.dirname(path), source)
+                load_proto(source)
+        load_proto(proto_file_path)
+        # Now analyse them
+        for proto in proto_docs:
+            for ci_elt in (proto.xml_xpath(u'//m:ci') + proto.xml_xpath(u'//proto:name') + 
+                           proto.xml_xpath(u'//proto:*/@name')):
+                varname = str(ci_elt).strip()
+                if u':' in varname:
+                    parts = varname.split(':')
+                    if parts[-2] in model_nss:
+                        terms.add((parts[-2], parts[-1]))
+        # Display results
+        print "Required terms:"
+        for term in sorted(terms):
+            print "   ", term[0] + ':' + term[1]
 
     def parse_protocol(self, proto_file_path, proto_units, prefix='', units_only=False):
         """Parse a protocol XML file and set up our data structures accordingly."""
@@ -852,3 +885,10 @@ def apply_protocol_file(doc, proto_file_path):
         Protocol.apply_protocol_file(doc, proto_file_path)
     else:
         raise ProtocolError("Unexpected protocol file extension for file: " + proto_file_path)
+
+if __name__ == '__main__':
+    # Analyse the supplied protocol file to determine model annotations required
+    if len(sys.argv) < 2:
+        print "Usage:", sys.argv[0], "<protocol.xml>"
+        sys.exit(1)
+    Protocol.find_required_annotations(sys.argv[1])
