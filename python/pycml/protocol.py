@@ -88,7 +88,6 @@ class Protocol(processors.ModelModifier):
         """Parse a protocol XML file and determine what model annotations will be required."""
         proto_docs = []
         model_nss = {}
-        terms = set()
         # First load all the XMLs
         def load_proto(path):
             proto_xml = amara_parse_cellml(path)
@@ -103,18 +102,37 @@ class Protocol(processors.ModelModifier):
                 load_proto(source)
         load_proto(proto_file_path)
         # Now analyse them
-        for proto in proto_docs:
-            for ci_elt in (proto.xml_xpath(u'//m:ci') + proto.xml_xpath(u'//proto:name') + 
-                           proto.xml_xpath(u'//proto:*/@name')):
-                varname = str(ci_elt).strip()
+        def get_var_names(proto):
+            var_names = set([unicode(e).strip() for e in
+                             proto.xml_xpath(u'//m:ci') + proto.xml_xpath(u'//proto:name')
+                             + proto.xml_xpath(u'/*/*/proto:specifyOutputVariable/@name')])
+            optional_names = set()
+            for input in proto.xml_xpath(u'/*/*/proto:specifyInputVariable'):
+                if hasattr(input, u'initial_value'):
+                    optional_names.add(unicode(input.name).strip())
+                else:
+                    var_names.add(unicode(input.name).strip())
+            var_names -= optional_names
+            return var_names, optional_names
+        def check_names(names, term_set):
+            for varname in names:
                 if u':' in varname:
                     parts = varname.split(':')
                     if parts[-2] in model_nss:
-                        terms.add((parts[-2], parts[-1]))
+                        term_set.add((parts[-2], parts[-1]))
+        terms, opt_terms = set(), set()
+        for proto in proto_docs:
+            var_names, optional_names = get_var_names(proto)
+            check_names(var_names, terms)
+            check_names(optional_names, opt_terms)
         # Display results
-        print "Required terms:"
+        print "Terms required by protocol %s:" % proto_file_path
         for term in sorted(terms):
             print "   ", term[0] + ':' + term[1]
+        if opt_terms:
+            print "Optional terms:"
+            for term in sorted(opt_terms):
+                print "   ", term[0] + ':' + term[1]
 
     def parse_protocol(self, proto_file_path, proto_units, prefix='', units_only=False):
         """Parse a protocol XML file and set up our data structures accordingly."""
