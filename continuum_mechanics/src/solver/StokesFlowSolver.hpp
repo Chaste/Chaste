@@ -43,8 +43,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #define STOKES_VERBOSE
 
 /**
- * Finite element solver for Stokes flow problems.
- * \todo improve documentation (#1956)
+ * Finite element solver for Stokes flow problems
  */
 template<unsigned DIM>
 class StokesFlowSolver : public AbstractContinuumMechanicsSolver<DIM>
@@ -333,6 +332,7 @@ void StokesFlowSolver<DIM>::AssembleSystem()
     PetscMatTools::SwitchWriteMode(this->mSystemLhsMatrix);
     PetscMatTools::SwitchWriteMode(this->mPreconditionMatrix);
 
+///\todo! Do we really want a symmetric matrix (the true below) - can't use CG after all..
     // Apply Dirichlet boundary conditions
     this->ApplyDirichletBoundaryConditions(LINEAR_PROBLEM, true);
 

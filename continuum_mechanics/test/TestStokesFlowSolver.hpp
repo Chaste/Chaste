@@ -37,12 +37,11 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "QuadraticMesh.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "Warnings.hpp"
+#include "NumericFileComparison.hpp"
 
-
-// TODO: test matrix is symmetric (after doing boundary conditions in a
-// symmetric way, add 3d test, check stokes answers, finish and check dox
+// add 3d test, check stokes answers.
 //
-// Why not parallel, use CG
+// Why not parallel
 //
 // Better preconditioner (mass matrix in C-block),
 
@@ -180,11 +179,14 @@ public:
 
         // test output files
         std::string results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "PipeStokesFlow";
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "/pressure.txt continuum_mechanics/test/data/PipeStokesFlow/pressure.txt").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "/flow_solution.nodes continuum_mechanics/test/data/PipeStokesFlow/flow_solution.nodes").c_str()), 0);
+        NumericFileComparison comp1(results_dir + "/flow_solution.nodes", "continuum_mechanics/test/data/PipeStokesFlow/flow_solution.nodes");
+        TS_ASSERT(comp1.CompareFiles(1e-3));
+
+        NumericFileComparison comp2(results_dir + "/pressure.txt", "continuum_mechanics/test/data/PipeStokesFlow/pressure.txt");
+        TS_ASSERT(comp1.CompareFiles(1e-3));
 
         solver.WriteCurrentPressureSolution(10);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "/pressure_10.txt continuum_mechanics/test/data/PipeStokesFlow/pressure.txt").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "/pressure_10.txt " + results_dir + "/pressure.txt").c_str()), 0);
     }
 
     /*

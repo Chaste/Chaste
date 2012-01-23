@@ -57,7 +57,7 @@ typedef enum _ApplyDirichletBcsType
 /**
  *  General base class for continuum mechanics solvers
  */
-template<unsigned DIM>//, bool MIXED_PROBLEM>
+template<unsigned DIM>
 class AbstractContinuumMechanicsSolver
 {
 protected:
@@ -260,7 +260,7 @@ public:
 };
 
 
-template<unsigned DIM>//, bool MIXED_PROBLEM>
+template<unsigned DIM>
 AbstractContinuumMechanicsSolver<DIM>::AbstractContinuumMechanicsSolver(QuadraticMesh<DIM>& rQuadMesh,
                                                                         ContinuumMechanicsProblemDefinition<DIM>& rProblemDefinition,
                                                                         std::string outputDirectory,
@@ -302,7 +302,7 @@ AbstractContinuumMechanicsSolver<DIM>::AbstractContinuumMechanicsSolver(Quadrati
 }
 
 
-template<unsigned DIM>//, bool MIXED_PROBLEM>
+template<unsigned DIM>
 AbstractContinuumMechanicsSolver<DIM>::~AbstractContinuumMechanicsSolver()
 {
     if (mpOutputFileHandler)
@@ -329,7 +329,7 @@ AbstractContinuumMechanicsSolver<DIM>::~AbstractContinuumMechanicsSolver()
     }
 }
 
-template<unsigned DIM>//, bool MIXED_PROBLEM>
+template<unsigned DIM>
 void AbstractContinuumMechanicsSolver<DIM>::WriteCurrentSpatialSolution(std::string fileName,
                                                                         std::string fileExtension,
                                                                         int counterToAppend)
@@ -362,7 +362,7 @@ void AbstractContinuumMechanicsSolver<DIM>::WriteCurrentSpatialSolution(std::str
     p_file->close();
 }
 
-template<unsigned DIM>//, bool MIXED_PROBLEM>
+template<unsigned DIM>
 void AbstractContinuumMechanicsSolver<DIM>::WriteCurrentPressureSolution(int counterToAppend)
 {
     // Only write output if the flag mWriteOutput has been set
@@ -394,7 +394,7 @@ void AbstractContinuumMechanicsSolver<DIM>::WriteCurrentPressureSolution(int cou
     p_file->close();
 }
 
-template<unsigned DIM>//, bool MIXED_PROBLEM>
+template<unsigned DIM>
 void AbstractContinuumMechanicsSolver<DIM>::SetWriteOutput(bool writeOutput)
 {
     if (writeOutput && (mOutputDirectory==""))
