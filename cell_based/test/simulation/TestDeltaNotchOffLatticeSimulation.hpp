@@ -105,14 +105,6 @@ public:
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
         p_data->SetNumCellsAndVars(p_mesh->GetNumNodes(), 3);
         p_data->SetCellPopulation(&cell_population);
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
-        {
-            p_data->SetValue(0.0, cell_population.GetLocationIndexUsingCell(*cell_iter), 0);
-            p_data->SetValue(1.0, cell_population.GetLocationIndexUsingCell(*cell_iter), 1);
-            p_data->SetValue(1.0, cell_population.GetLocationIndexUsingCell(*cell_iter), 2);
-        }
 
         // Create and configure cell-based simulation
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
@@ -167,16 +159,6 @@ public:
         p_data->SetNumCellsAndVars(p_mesh->GetNumElements(), 3);
         p_data->SetCellPopulation(&cell_population);
 
-        // Set initial conditions
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
-        {
-            p_data->SetValue(0.0, cell_population.GetLocationIndexUsingCell(*cell_iter), 0);
-            p_data->SetValue(1.0, cell_population.GetLocationIndexUsingCell(*cell_iter), 1);
-            p_data->SetValue(1.0, cell_population.GetLocationIndexUsingCell(*cell_iter), 2);
-        }
-
         // Create and configure cell-based simulation
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDeltaNotchVertex2D");
@@ -227,14 +209,6 @@ public:
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
         p_data->SetNumCellsAndVars(p_mesh->GetNumNodes(), 3);
         p_data->SetCellPopulation(&cell_population);
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
-        {
-            p_data->SetValue(0.0, cell_population.GetLocationIndexUsingCell(*cell_iter), 0);
-            p_data->SetValue(1.0, cell_population.GetLocationIndexUsingCell(*cell_iter), 1);
-            p_data->SetValue(1.0, cell_population.GetLocationIndexUsingCell(*cell_iter), 2);
-        }
 
         // Create and configure cell-based simulation
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
@@ -288,16 +262,6 @@ public:
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
         p_data->SetNumCellsAndVars(p_mesh->GetNumElements(), 3);
         p_data->SetCellPopulation(&cell_population);
-
-        // Set initial conditions
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
-        {
-            p_data->SetValue(0.0, cell_population.GetLocationIndexUsingCell(*cell_iter), 0);
-            p_data->SetValue(1.0, cell_population.GetLocationIndexUsingCell(*cell_iter), 1);
-            p_data->SetValue(1.0, cell_population.GetLocationIndexUsingCell(*cell_iter), 2);
-        }
 
         // Create and configure cell-based simulation
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);

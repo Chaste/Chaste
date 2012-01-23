@@ -47,7 +47,19 @@ DeltaNotchOffLatticeSimulation<DIM>::~DeltaNotchOffLatticeSimulation()
 }
 
 template<unsigned DIM>
+void DeltaNotchOffLatticeSimulation<DIM>::SetupSolve()
+{
+    UpdateCellwiseData();
+}
+
+template<unsigned DIM>
 void DeltaNotchOffLatticeSimulation<DIM>::PostSolve()
+{
+    UpdateCellwiseData();
+}
+
+template<unsigned DIM>
+void DeltaNotchOffLatticeSimulation<DIM>::UpdateCellwiseData()
 {
     // Make sure the cell population is updated
     this->mrCellPopulation.Update();
