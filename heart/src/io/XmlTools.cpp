@@ -356,18 +356,22 @@ void XmlTools::FindElements(xercesc::DOMElement* pContextElement,
                             std::vector<xercesc::DOMElement*>& rResults,
                             unsigned depth)
 {
-    xercesc::DOMNodeList* p_child_elts = pContextElement->getElementsByTagName(X(rNames[depth]));
-    unsigned num_children = p_child_elts->getLength();
-    for (unsigned i=0; i<num_children; i++)
+    for (xercesc::DOMNode* p_node = pContextElement->getFirstChild();
+         p_node != NULL;
+         p_node = p_node->getNextSibling())
     {
-        xercesc::DOMElement* p_child_elt = static_cast<xercesc::DOMElement*>(p_child_elts->item(i));
-        if (depth == rNames.size() - 1)
+        if (p_node->getNodeType() == xercesc::DOMNode::ELEMENT_NODE &&
+            X2C(p_node->getLocalName()) == rNames[depth])
         {
-            rResults.push_back(p_child_elt);
-        }
-        else
-        {
-            FindElements(p_child_elt, rNames, rResults, depth+1);
+            xercesc::DOMElement* p_child_elt = static_cast<xercesc::DOMElement*>(p_node);
+            if (depth == rNames.size() - 1)
+            {
+                rResults.push_back(p_child_elt);
+            }
+            else
+            {
+                FindElements(p_child_elt, rNames, rResults, depth+1);
+            }
         }
     }
 }
