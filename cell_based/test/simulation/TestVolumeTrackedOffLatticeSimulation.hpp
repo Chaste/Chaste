@@ -112,6 +112,19 @@ public:
         // Create a contact inhibition simulator
         VolumeTrackedOffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestNodeBasedSimulationWithVolumeTracked");
+        simulator.SetEndTime(simulator.GetDt()/2.0);
+
+        // Run simulation
+        simulator.Solve();
+
+        // Test that the volumes of the cells are correct in CellwiseData
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), p_data->GetValue(*cell_iter,0), 1e-4);
+        }
+
         simulator.SetEndTime(1.0);
 
         // Run simulation
@@ -168,22 +181,35 @@ public:
         // Create a contact inhibition simulator
         VolumeTrackedOffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestMeshBasedSimulationWithVolumeTracked");
-        simulator.SetEndTime(1.0);
         simulator.AddForce(p_force);
+        simulator.SetEndTime(simulator.GetDt()/2.0);
 
-        // Run simulation
-        simulator.Solve();
+         // Run simulation
+         simulator.Solve();
 
-        // Test that the volumes of the cells are correct in CellwiseData
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
-        {
-            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), p_data->GetValue(*cell_iter,0), 1e-4);
-        }
+         // Test that the volumes of the cells are correct in CellwiseData
+         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+              cell_iter != cell_population.End();
+              ++cell_iter)
+         {
+             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), p_data->GetValue(*cell_iter,0), 1e-4);
+         }
 
-        // Tidy up
-        CellwiseData<2>::Destroy();
+         simulator.SetEndTime(1.0);
+
+         // Run simulation
+         simulator.Solve();
+
+         // Test that the volumes of the cells are correct in CellwiseData
+         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+              cell_iter != cell_population.End();
+              ++cell_iter)
+         {
+             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), p_data->GetValue(*cell_iter,0), 1e-4);
+         }
+
+         // Tidy up
+         CellwiseData<2>::Destroy();
     }
 
     void TestVertexBasedSimulationWithContactInhibition()
@@ -225,22 +251,36 @@ public:
         // Create a contact inhibition simulator
         VolumeTrackedOffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestVertexBasedSimulationWithVolumeTracked");
-        simulator.SetEndTime(1.0);
         simulator.AddForce(p_nagai_honda_force);
 
-        // Run simulation
-        simulator.Solve();
+        simulator.SetEndTime(simulator.GetDt()/2.0);
 
-        // Test that the volumes of the cells are correct in CellwiseData
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
-        {
-            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), p_data->GetValue(*cell_iter,0), 1e-4);
-        }
+         // Run simulation
+         simulator.Solve();
 
-        // Tidy up
-        CellwiseData<2>::Destroy();
+         // Test that the volumes of the cells are correct in CellwiseData
+         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+              cell_iter != cell_population.End();
+              ++cell_iter)
+         {
+             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), p_data->GetValue(*cell_iter,0), 1e-4);
+         }
+
+         simulator.SetEndTime(1.0);
+
+         // Run simulation
+         simulator.Solve();
+
+         // Test that the volumes of the cells are correct in CellwiseData
+         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+              cell_iter != cell_population.End();
+              ++cell_iter)
+         {
+             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), p_data->GetValue(*cell_iter,0), 1e-4);
+         }
+
+         // Tidy up
+         CellwiseData<2>::Destroy();
     }
 
     void TestVolumeTrackedOffLatticeSimulationArchiving() throw (Exception)

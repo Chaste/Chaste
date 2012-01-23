@@ -84,10 +84,18 @@ public:
         // Create some cells, each with a cell-cycle model that incorporates a Delta-Notch ODE system
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
+
+        // Initial condition for delta, notch, mean_delta
+        std::vector<double> initial_conditions;
+        initial_conditions.push_back(1.0);
+        initial_conditions.push_back(1.0);
+        initial_conditions.push_back(0.0);
+
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
             p_model->SetCellProliferativeType(DIFFERENTIATED);
+            p_model->SetInitialConditions(initial_conditions);
             p_model->SetDimension(2);
             p_model->SetMaxTransitGenerations(UINT_MAX);
             CellPtr p_cell(new Cell(p_state, p_model));

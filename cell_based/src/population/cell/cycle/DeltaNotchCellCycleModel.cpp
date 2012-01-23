@@ -89,11 +89,26 @@ void DeltaNotchCellCycleModel::Initialise()
     assert(mpCell != NULL);
 
     mpOdeSystem = new DeltaNotchOdeSystem;
-    mpOdeSystem->SetStateVariables(mpOdeSystem->GetInitialConditions());
+    if(mInitialConditions == std::vector<double>())
+    {
+        mpOdeSystem->SetStateVariables(mpOdeSystem->GetInitialConditions());
+    }
+    else
+    {
+        mpOdeSystem->SetStateVariables(mInitialConditions);
+
+    }
 
     StochasticDurationGenerationBasedCellCycleModel::Initialise();
 
     SetLastTime(mBirthTime);
+}
+
+
+void DeltaNotchCellCycleModel::SetInitialConditions(std::vector<double> initialConditions)
+{
+    assert(initialConditions.size() == 3);
+    mInitialConditions = initialConditions;
 }
 
 void DeltaNotchCellCycleModel::UpdateDeltaNotch()

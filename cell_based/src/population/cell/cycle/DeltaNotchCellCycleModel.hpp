@@ -64,6 +64,11 @@ private:
         archive & boost::serialization::base_object<CellCycleModelOdeHandler>(*this);
     }
 
+    /*
+     * The initial condition for delta, notch, mean_delta
+     */
+    std::vector<double> mInitialConditions;
+
 public:
 
     /**
@@ -87,6 +92,11 @@ public:
      * This overridden method sets up a new Delta-Notch ODE system.
      */
     void Initialise();
+
+    /**
+     * Set the initial conditions for delta, notch, mean_delta.
+     */
+    void SetInitialConditions(std::vector<double> initialConditions);
 
     /**
      * Overridden UpdateCellCyclePhase() method.
