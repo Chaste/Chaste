@@ -45,9 +45,9 @@ DeltaNotchOdeSystem::DeltaNotchOdeSystem(double meanDelta, std::vector<double> s
      * to file at each time step alongside the others, and visualized.
      */
 
-//    SetDefaultInitialCondition(0, 1.0); // soon overwritten
-//    SetDefaultInitialCondition(1, 1.0); // soon overwritten
-//    SetDefaultInitialCondition(2, 0.5);
+    SetDefaultInitialCondition(0, 1.0); // soon overwritten
+    SetDefaultInitialCondition(1, 1.0); // soon overwritten
+    SetDefaultInitialCondition(2, 0.5);
 
     if (stateVariables != std::vector<double>())
     {
