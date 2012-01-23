@@ -266,16 +266,20 @@ public:
         // Current site in cell 0; target site in cell 1
         contribution = surface_area_constraint.EvaluateHamiltonianContribution(5, 9, cell_population);
         TS_ASSERT_DELTA(contribution, 2.0*2.0*gamma, 1e-6);
+
+        // Current site in cell 0; target site in cell 1 (diagonal neighbour)
+        contribution = surface_area_constraint.EvaluateHamiltonianContribution(5, 8, cell_population);
+        TS_ASSERT_DELTA(contribution, 2.0*2.0*gamma, 1e-6);
     }
 
-    void noTestSurfaceAreaConstraintPottsUpdateRuleIn3d() throw (Exception)
+    void TestSurfaceAreaConstraintPottsUpdateRuleIn3d() throw (Exception)
     {
-        // Create a simple 2D PottsMesh with 2 elements
-        PottsMeshGenerator<3> generator(4, 2, 2, 2, 1, 2, 4, 1, 2, true);
+        // Create a simple 3D PottsMesh with 2 elements
+        PottsMeshGenerator<3> generator(4, 2, 2, 4, 1, 2, 4, 1, 2, true);
         PottsMesh<3>* p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2u);
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 32u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 64u);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -303,19 +307,27 @@ public:
                               "The current node and target node must not be in the same element.");
 
         // Both points lie within cell medium
-        TS_ASSERT_THROWS_THIS(surface_area_constraint.EvaluateHamiltonianContribution(16, 17, cell_population),
+        TS_ASSERT_THROWS_THIS(surface_area_constraint.EvaluateHamiltonianContribution(8, 9, cell_population),
                                "At least one of the current node or target node must be in an element.");
 
         // Current site in cell 0; target site in cell medium Cell on edge of domain
-        double contribution = surface_area_constraint.EvaluateHamiltonianContribution(9, 17, cell_population);
+        double contribution = surface_area_constraint.EvaluateHamiltonianContribution(4, 8, cell_population);
         TS_ASSERT_DELTA(contribution, 4.0*4.0*gamma, 1e-6);
 
-        // Current site in cell medium; target site in cell 0
-        contribution = surface_area_constraint.EvaluateHamiltonianContribution(17, 9, cell_population);
+        // Current site in cell medium; target site in cell 1
+        contribution = surface_area_constraint.EvaluateHamiltonianContribution(10, 6, cell_population);
         TS_ASSERT_DELTA(contribution, 0.0, 1e-6);
 
         // Current site in cell 0; target site in cell 1
-        contribution = surface_area_constraint.EvaluateHamiltonianContribution(9, 10, cell_population);
+        contribution = surface_area_constraint.EvaluateHamiltonianContribution(17, 18, cell_population);
+        TS_ASSERT_DELTA(contribution, 4.0*4.0*gamma, 1e-6);
+
+        // Current site in cell 0; target site in cell 1 (diagonal switch)
+        contribution = surface_area_constraint.EvaluateHamiltonianContribution(1, 18, cell_population);
+        TS_ASSERT_DELTA(contribution, 4.0*4.0*gamma, 1e-6);
+
+        // Current site in cell 0; target site in medium
+        contribution = surface_area_constraint.EvaluateHamiltonianContribution(5, 9, cell_population);
         TS_ASSERT_DELTA(contribution, 4.0*4.0*gamma, 1e-6);
     }
 

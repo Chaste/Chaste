@@ -49,8 +49,8 @@ double SurfaceAreaConstraintPottsUpdateRule<DIM>::EvaluateHamiltonianContributio
 {
     double delta_H = 0.0;
 
-    // This method only works in 2D at present
-    assert(DIM == 2);
+    // This method only works in 2D and 3D at present
+    assert( (DIM == 2) || (DIM == 3) );
 
     std::set<unsigned> containing_elements = rCellPopulation.GetNode(currentNodeIndex)->rGetContainingElementIndices();
     std::set<unsigned> new_location_containing_elements = rCellPopulation.GetNode(targetNodeIndex)->rGetContainingElementIndices();
@@ -108,28 +108,59 @@ double SurfaceAreaConstraintPottsUpdateRule<DIM>::EvaluateHamiltonianContributio
             }
         }
     }
-    assert(neighbours_in_same_element_as_current_node<5);
-    assert(neighbours_in_same_element_as_target_node<5);
 
-    double change_in_surface_area[5] = {4,2,0,-2,-4};
-
-    if (current_node_contained) // current node is in an element
+    if(DIM == 2)
     {
-        unsigned current_element = (*containing_elements.begin());
-        double current_surface_area = rCellPopulation.rGetMesh().GetSurfaceAreaOfElement(current_element);
-        double current_surface_area_difference = current_surface_area - mMatureCellTargetSurfaceArea;
-        double current_surface_area_difference_after_switch = current_surface_area_difference + change_in_surface_area[neighbours_in_same_element_as_current_node];
+        assert(neighbours_in_same_element_as_current_node<5);
+        assert(neighbours_in_same_element_as_target_node<5);
 
-        delta_H += mDeformationEnergyParameter*(current_surface_area_difference_after_switch*current_surface_area_difference_after_switch - current_surface_area_difference*current_surface_area_difference);
+        double change_in_surface_area[5] = {4,2,0,-2,-4};
+
+        if (current_node_contained) // current node is in an element
+        {
+            unsigned current_element = (*containing_elements.begin());
+            double current_surface_area = rCellPopulation.rGetMesh().GetSurfaceAreaOfElement(current_element);
+            double current_surface_area_difference = current_surface_area - mMatureCellTargetSurfaceArea;
+            double current_surface_area_difference_after_switch = current_surface_area_difference + change_in_surface_area[neighbours_in_same_element_as_current_node];
+
+            delta_H += mDeformationEnergyParameter*(current_surface_area_difference_after_switch*current_surface_area_difference_after_switch - current_surface_area_difference*current_surface_area_difference);
+        }
+        if (target_node_contained) // target node is in an element
+        {
+            unsigned target_element = (*new_location_containing_elements.begin());
+            double target_surface_area = rCellPopulation.rGetMesh().GetSurfaceAreaOfElement(target_element);
+            double target_surface_area_difference = target_surface_area - mMatureCellTargetSurfaceArea;
+            double target_surface_area_difference_after_switch = target_surface_area_difference - change_in_surface_area[neighbours_in_same_element_as_target_node];
+
+            delta_H += mDeformationEnergyParameter*(target_surface_area_difference_after_switch*target_surface_area_difference_after_switch - target_surface_area_difference*target_surface_area_difference);
+        }
     }
-    if (target_node_contained) // target node is in an element
+    else if(DIM==3)
     {
-        unsigned target_element = (*new_location_containing_elements.begin());
-        double target_surface_area = rCellPopulation.rGetMesh().GetSurfaceAreaOfElement(target_element);
-        double target_surface_area_difference = target_surface_area - mMatureCellTargetSurfaceArea;
-        double target_surface_area_difference_after_switch = target_surface_area_difference - change_in_surface_area[neighbours_in_same_element_as_target_node];
+        assert(neighbours_in_same_element_as_current_node<7);
+        assert(neighbours_in_same_element_as_target_node<7);
 
-        delta_H += mDeformationEnergyParameter*(target_surface_area_difference_after_switch*target_surface_area_difference_after_switch - target_surface_area_difference*target_surface_area_difference);
+        double change_in_surface_area[7] = {6,4,2,0,-2,-4,-6};
+
+        if (current_node_contained) // current node is in an element
+        {
+            unsigned current_element = (*containing_elements.begin());
+            double current_surface_area = rCellPopulation.rGetMesh().GetSurfaceAreaOfElement(current_element);
+            double current_surface_area_difference = current_surface_area - mMatureCellTargetSurfaceArea;
+            double current_surface_area_difference_after_switch = current_surface_area_difference + change_in_surface_area[neighbours_in_same_element_as_current_node];
+
+            delta_H += mDeformationEnergyParameter*(current_surface_area_difference_after_switch*current_surface_area_difference_after_switch - current_surface_area_difference*current_surface_area_difference);
+        }
+        if (target_node_contained) // target node is in an element
+        {
+            unsigned target_element = (*new_location_containing_elements.begin());
+            double target_surface_area = rCellPopulation.rGetMesh().GetSurfaceAreaOfElement(target_element);
+            double target_surface_area_difference = target_surface_area - mMatureCellTargetSurfaceArea;
+            double target_surface_area_difference_after_switch = target_surface_area_difference - change_in_surface_area[neighbours_in_same_element_as_target_node];
+
+            delta_H += mDeformationEnergyParameter*(target_surface_area_difference_after_switch*target_surface_area_difference_after_switch - target_surface_area_difference*target_surface_area_difference);
+        }
+
     }
 
     return delta_H;
