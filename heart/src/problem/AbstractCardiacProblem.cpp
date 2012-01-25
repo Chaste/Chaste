@@ -462,8 +462,8 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Solve()
             {
 #ifndef NDEBUG
                 PetscTools::ReplicateException(true);
-                throw e;
 #endif
+                throw e;
             }
 #ifndef NDEBUG
             PetscTools::ReplicateException(false);
@@ -481,11 +481,7 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Solve()
                  * freed somewhere else (e.g. in the destructor). Later, in this while loop
                  * we will set initial_condition = mSolution (or, if this is a resumed solution
                  * it may also have been done when initial_condition was created). mSolution
-<<<<<<< .mine
-                 * is going to be cleaned up in the constructor. So, only PetscTools::Destroy(
-=======
-                 * is going to be cleaned up in the destructor. So, only VecDestroy
->>>>>>> .r14623
+                 * is going to be cleaned up in the destructor. So, only PetscTools::Destroy(
                  * initial_condition when it is not equal to mSolution (see #1695).
                  */
                 PetscTools::Destroy(initial_condition);

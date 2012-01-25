@@ -54,8 +54,22 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
 typedef PetscBool PetscTruth;
-#define PETSC_DESTROY_PARAM(x) &x ///\todo #1994 Remove
+/**
+ * This macro is for converting a pre-PETSc3.2 "Destroy" function call (which involves an object, such as 
+ * PetscViewerDestroy(VecView view) ) to a PETSc3.2 destroy via pointer call. 
+ * Note that we only use this macro for calls which appear rarely in the code.  Please destroy Vec and Mat objects
+ * via the overloaded PetscTools::Destroy methods.
+ * @param x The object to destroy
+ */
+#define PETSC_DESTROY_PARAM(x) &x
 #else
+/**
+ * This macro is for converting a pre-PETSc3.2 "Destroy" function call (which involves an object, such as 
+ * PetscViewerDestroy(VecView view) ) to a PETSc3.2 destroy via pointer call. 
+ * Note that we only use this macro for calls which appear rarely in the code.  Please destroy Vec and Mat objects
+ * via the overloaded PetscTools::Destroy methods.
+ * @param x The object to destroy
+ */
 #define PETSC_DESTROY_PARAM(x) x
 #endif
 

@@ -64,7 +64,7 @@ private:
         archive & boost::serialization::base_object<CellCycleModelOdeHandler>(*this);
     }
 
-    /*
+    /**
      * The initial condition for delta, notch, mean_delta
      */
     std::vector<double> mInitialConditions;
@@ -95,6 +95,7 @@ public:
 
     /**
      * Set the initial conditions for delta, notch, mean_delta.
+     * @param initialConditions are the initial conditions
      */
     void SetInitialConditions(std::vector<double> initialConditions);
 

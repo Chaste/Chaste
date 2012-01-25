@@ -50,7 +50,7 @@ double SurfaceAreaConstraintPottsUpdateRule<DIM>::EvaluateHamiltonianContributio
     double delta_H = 0.0;
 
     // This method only works in 2D and 3D at present
-    assert( (DIM == 2) || (DIM == 3) );
+    assert(DIM == 2 || DIM == 3);
 
     std::set<unsigned> containing_elements = rCellPopulation.GetNode(currentNodeIndex)->rGetContainingElementIndices();
     std::set<unsigned> new_location_containing_elements = rCellPopulation.GetNode(targetNodeIndex)->rGetContainingElementIndices();

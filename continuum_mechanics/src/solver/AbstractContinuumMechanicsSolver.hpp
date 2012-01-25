@@ -211,7 +211,7 @@ public:
      * Write the spatial solution (deformed position if solids, flow if fluids) at the nodes
      *
      * @param fileName (stem)
-     * @param fileCxtension to append at end.
+     * @param fileExtension to append at end.
      * @param counterToAppend append a counter to the file name (defaults to nothing appended).
      *
      * For example:
