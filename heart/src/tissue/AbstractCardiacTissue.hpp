@@ -559,6 +559,8 @@ public:
     template<class Archive>
     void LoadCardiacCells(Archive & archive, const unsigned int version)
     {
+        assert(!mHasPurkinje);
+
         DistributedVectorFactory* p_factory;
         DistributedVectorFactory* p_mesh_factory = this->mpMesh->GetDistributedVectorFactory();
         archive & p_factory;
@@ -687,11 +689,6 @@ public:
             {
                 assert(mHaloCellsDistributed[halo_position->second] == NULL);
                 mHaloCellsDistributed[halo_position->second] = p_cell;
-                if (mHasPurkinje)
-                {
-                    ///\todo #1898
-                    NEVER_REACHED;
-                }
             }
             else
             {
