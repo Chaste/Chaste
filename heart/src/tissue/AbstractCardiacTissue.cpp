@@ -129,9 +129,11 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacTissue(
     HeartEventHandler::BeginEvent(HeartEventHandler::COMMUNICATION);
     mIionicCacheReplicated.Resize( pCellFactory->GetNumberOfCells() );
     mIntracellularStimulusCacheReplicated.Resize( pCellFactory->GetNumberOfCells() );
+
     if (mHasPurkinje)
     {
         mPurkinjeIionicCacheReplicated.Resize( pCellFactory->GetNumberOfCells() );
+        mPurkinjeIntracellularStimulusCacheReplicated.Resize( pCellFactory->GetNumberOfCells() );
     }
     HeartEventHandler::EndEvent(HeartEventHandler::COMMUNICATION);
 
@@ -454,11 +456,24 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SetUpHaloCells(AbstractCardia
 template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
 void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existingSolution, double time, double nextTime, bool updateVoltage)
 {
+    if(mHasPurkinje)
+    {
+        // can't do Purkinje and operator splitting
+        assert(!updateVoltage);
+        // The code below assumes Purkinje is are monodomain, so the vector has two stripes.
+        // The assert will fail the first time bidomain purkinje is coded - need to decide what
+        // ordering the three stripes (V, V_purk, phi_e) are in
+        assert(PetscVecTools::GetSize(existingSolution)==2*mpMesh->GetNumNodes());
+    }
+
     HeartEventHandler::BeginEvent(HeartEventHandler::SOLVE_ODES);
 
     DistributedVector dist_solution = mpDistributedVectorFactory->CreateDistributedVector(existingSolution);
-    DistributedVector::Stripe voltage(dist_solution, 0);
 
+    /////////////////////////////////////////////////////////////
+    // Solve cell models (except purkinje cell models)
+    /////////////////////////////////////////////////////////////
+    DistributedVector::Stripe voltage(dist_solution, 0);
     try
     {
         for (DistributedVector::Iterator index = dist_solution.Begin();
@@ -496,12 +511,51 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
         throw e;
     }
 
+    /////////////////////////////////////////////////////////////
+    // Solve purkinje cell models
+    /////////////////////////////////////////////////////////////
+    if(mHasPurkinje)
+    {
+        DistributedVector::Stripe purkinje_voltage(dist_solution, 1);
+        try
+        {
+            for (DistributedVector::Iterator index = dist_solution.Begin();
+                 index != dist_solution.End();
+                 ++index)
+            {
+                // overwrite the voltage with the input value
+                mPurkinjeCellsDistributed[index.Local]->SetVoltage( purkinje_voltage[index] );
+
+                // solve
+                // Note: Voltage is not be updated. The voltage is updated in the PDE solve.
+                mPurkinjeCellsDistributed[index.Local]->ComputeExceptVoltage(time, nextTime);
+
+                // update the Iionic and stimulus caches
+                UpdatePurkinjeCaches(index.Global, index.Local, nextTime);
+            }
+
+            if(updateVoltage)
+            {
+                dist_solution.Restore();
+            }
+        }
+        catch (Exception &e)
+        {
+            PetscTools::ReplicateException(true);
+            throw e;
+        }
+    }
+
+
+
     PetscTools::ReplicateException(false);
     HeartEventHandler::EndEvent(HeartEventHandler::SOLVE_ODES);
 
     // Communicate new state variable values to halo nodes
     if (mExchangeHalos)
     {
+        assert(!mHasPurkinje);
+
         for ( unsigned rank_offset = 1; rank_offset < PetscTools::GetNumProcs(); rank_offset++ )
         {
             unsigned send_to      = (PetscTools::GetMyRank() + rank_offset) % (PetscTools::GetNumProcs());
@@ -610,8 +664,15 @@ ReplicatableVector& AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::rGetIntracellu
 template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
 ReplicatableVector& AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::rGetPurkinjeIionicCacheReplicated()
 {
-    EXCEPT_IF_NOT(mHasPurkinje);
+    assert(mHasPurkinje);
     return mPurkinjeIionicCacheReplicated;
+}
+
+template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+ReplicatableVector& AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::rGetPurkinjeIntracellularStimulusCacheReplicated()
+{
+    assert(mHasPurkinje);
+    return mPurkinjeIntracellularStimulusCacheReplicated;
 }
 
 template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
@@ -619,10 +680,14 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::UpdateCaches(unsigned globalI
 {
     mIionicCacheReplicated[globalIndex] = mCellsDistributed[localIndex]->GetIIonic();
     mIntracellularStimulusCacheReplicated[globalIndex] = mCellsDistributed[localIndex]->GetIntracellularStimulus(nextTime);
-    if (mHasPurkinje)
-    {
-        mPurkinjeIionicCacheReplicated[globalIndex] = mPurkinjeCellsDistributed[localIndex]->GetIIonic();
-    }
+}
+
+template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::UpdatePurkinjeCaches(unsigned globalIndex, unsigned localIndex, double nextTime)
+{
+    assert(mHasPurkinje);
+    mPurkinjeIionicCacheReplicated[globalIndex] = mPurkinjeCellsDistributed[localIndex]->GetIIonic();
+    mPurkinjeIntracellularStimulusCacheReplicated[globalIndex] = mPurkinjeCellsDistributed[localIndex]->GetIntracellularStimulus(nextTime);
 }
 
 template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
@@ -633,6 +698,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::ReplicateCaches()
     if (mHasPurkinje)
     {
         mPurkinjeIionicCacheReplicated.Replicate(mpDistributedVectorFactory->GetLow(), mpDistributedVectorFactory->GetHigh());
+        mPurkinjeIntracellularStimulusCacheReplicated.Replicate(mpDistributedVectorFactory->GetLow(), mpDistributedVectorFactory->GetHigh());
     }
 }
 

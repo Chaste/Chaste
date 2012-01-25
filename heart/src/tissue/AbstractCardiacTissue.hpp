@@ -255,6 +255,12 @@ protected:
      */
     ReplicatableVector mIntracellularStimulusCacheReplicated;
 
+    /**
+     *  Cache containing all the stimulus currents for each Purkinje node,
+     *  replicated over all processes.
+     */
+    ReplicatableVector mPurkinjeIntracellularStimulusCacheReplicated;
+
     /** Local pointer to the HeartConfig singleton instance, for convenience. */
     HeartConfig* mpConfig;
 
@@ -447,6 +453,9 @@ public:
     /** Get the entire Purkinje ionic current cache */
     ReplicatableVector& rGetPurkinjeIionicCacheReplicated();
 
+    /** Get the entire Purkinje stimulus current cache */
+    ReplicatableVector& rGetPurkinjeIntracellularStimulusCacheReplicated();
+
 
     /**
      * Update the Iionic and intracellular stimulus caches.
@@ -456,6 +465,15 @@ public:
      * @param nextTime  the next PDE time point, at which to evaluate the stimulus current
      */
     void UpdateCaches(unsigned globalIndex, unsigned localIndex, double nextTime);
+
+    /**
+     * Update the Iionic and intracellular stimulus caches for Purkinje cells.
+     *
+     * @param globalIndex  global index of the entry to update
+     * @param localIndex  local index of the entry to update
+     * @param nextTime  the next PDE time point, at which to evaluate the stimulus current
+     */
+    void UpdatePurkinjeCaches(unsigned globalIndex, unsigned localIndex, double nextTime);
 
     /**
      *  Replicate the Iionic and intracellular stimulus caches.
