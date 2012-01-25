@@ -33,7 +33,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 template<unsigned DIM>
 FibreReader<DIM>::FibreReader(FileFinder& rFileFinder, FibreFileType fibreFileType)
-   : mFileIsBinary(false) // overwritten by ReadNumLinesOfDataFromFile() if applicable.
+   : mFileIsBinary(false), // overwritten by ReadNumLinesOfDataFromFile() if applicable.
+     mNextIndex(0u)
 {
     if (fibreFileType == AXISYM)
     {
@@ -70,10 +71,11 @@ void FibreReader<DIM>::GetAllAxi(std::vector< c_vector<double, DIM> >& direction
     {
         EXCEPTION("Use GetAllOrtho when reading orthotropic fibres");
     }
+    direction.reserve(mNumLinesOfData);
     for (unsigned i=0; i<mNumLinesOfData; i++)
     {
         c_vector<double, DIM> temp_vector;
-        GetNextFibreVector(temp_vector, false);
+        GetFibreVector(i, temp_vector, false);
         direction.push_back(temp_vector);
     }
 }
@@ -118,7 +120,7 @@ void FibreReader<DIM>::GetNextFibreSheetAndNormalMatrix(c_matrix<double,DIM,DIM>
 {
     if (mNumItemsPerLine != DIM*DIM)
     {
-        EXCEPTION("Use GetNextFibreVector when reading axisymmetric fibres");
+        EXCEPTION("Use GetFibreVector when reading axisymmetric fibres");
     }
 
     if (mFileIsBinary)
@@ -171,35 +173,49 @@ void FibreReader<DIM>::GetNextFibreSheetAndNormalMatrix(c_matrix<double,DIM,DIM>
 }
 
 template<unsigned DIM>
-void FibreReader<DIM>::GetNextFibreVector(c_vector<double,DIM>& rFibreVector,
-                                          bool checkNormalised)
+void FibreReader<DIM>::GetFibreVector(unsigned fibreIndex,
+                                      c_vector<double,DIM>& rFibreVector,
+                                      bool checkNormalised)
 {
     if (mNumItemsPerLine != DIM)
     {
         EXCEPTION("Use GetNextFibreSheetAndNormalMatrix when reading orthotropic fibres");
     }
+    if (fibreIndex < mNextIndex)
+    {
+        EXCEPTION("Fibre reads must be monotonically increasing; " << fibreIndex
+                  << " is before expected next index " << mNextIndex);
+    }
 
     if (mFileIsBinary)
     {
-        //Take mNumItemsPerLine from the ifstream
+        // Skip to the desired index
+        mDataFile.seekg((fibreIndex-mNextIndex)*mNumItemsPerLine*sizeof(double), std::ios::cur);
+        // Take mNumItemsPerLine from the ifstream
         mDataFile.read((char*)&rFibreVector[0], mNumItemsPerLine*sizeof(double));
+        mNextIndex = fibreIndex+1;
     }
     else
     {
-        unsigned num_entries = GetTokensAtNextLine();
-        if(num_entries < mNumItemsPerLine)
+        unsigned num_entries = 0u;
+        while (fibreIndex >= mNextIndex)
+        {
+            num_entries = GetTokensAtNextLine();
+            mNextIndex++;
+        }
+        if (num_entries < mNumItemsPerLine)
         {
             EXCEPTION("A line is incomplete in " << mFilePath
                           << " - each line should contain " << DIM << " entries");
         }
-        for(unsigned i=0; i<DIM; i++)
+        for (unsigned i=0; i<DIM; i++)
         {
             rFibreVector(i) = mTokens[i];
         }
     }
 
 
-    if(checkNormalised && fabs(norm_2(rFibreVector)-1)>1e-4)
+    if (checkNormalised && fabs(norm_2(rFibreVector)-1)>1e-4)
     {
         EXCEPTION("Read vector " << rFibreVector << " from file "
                       << mFilePath << " which is not normalised (tolerance 1e-4)");

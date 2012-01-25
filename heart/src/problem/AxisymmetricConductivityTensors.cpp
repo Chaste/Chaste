@@ -102,29 +102,10 @@ void AxisymmetricConductivityTensors<ELEMENT_DIM, SPACE_DIM>::Init(AbstractTetra
 
         unsigned local_element_index = 0;
 
-        int previous_global_index=-1;
-
         for (typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator it = this->mpMesh->GetElementIteratorBegin();
              it != this->mpMesh->GetElementIteratorEnd();
              ++it)
         {
-            if (this->mUseFibreOrientation)
-            {
-                int current_fibre_global_index = (int) it->GetIndex();
-
-                // Assumption about ElementIterator returning elements in ascending order is wrong
-                // if this fails
-                assert(current_fibre_global_index > previous_global_index);
-
-                for (int fibre_index=previous_global_index; fibre_index<current_fibre_global_index-1; fibre_index++)
-                {
-                    this->mFileReader->GetNextFibreVector(fibre_vector);
-                }
-
-                previous_global_index = current_fibre_global_index;
-            }
-
-
             /*
              *  For every element of the mesh we compute its tensor like (from
              * "Laminar Arrangement of VentricularMyocites Influences Electrical
@@ -166,10 +147,10 @@ void AxisymmetricConductivityTensors<ELEMENT_DIM, SPACE_DIM>::Init(AbstractTetra
                 }
             }
 
-
             if (this->mUseFibreOrientation)
             {
-                this->mFileReader->GetNextFibreVector(fibre_vector);
+                unsigned current_fibre_global_index = it->GetIndex();
+                this->mFileReader->GetFibreVector(current_fibre_global_index, fibre_vector);
             }
 
             this->mTensors.push_back( conductivity_matrix(1,1) * identity_matrix<double>(SPACE_DIM) +

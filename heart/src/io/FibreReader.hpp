@@ -68,6 +68,9 @@ private:
     /** How many items we expect to find per line: DIM for axisymmetric, DIM*DIM for orthotropic */
     unsigned mNumItemsPerLine;
 
+    /** The next index we expect to read from the file. */
+    unsigned mNextIndex;
+
     /** Vector which entries read from a line in a file is put into. */
     std::vector<double> mTokens;
 
@@ -120,17 +123,20 @@ public:
     void GetNextFibreSheetAndNormalMatrix(c_matrix<double,DIM,DIM>& rFibreMatrix, bool checkOrthogonality=true);
 
     /**
-     * Read the next fibre direction vector from the file.  Must only be used when
+     * Read a fibre direction vector from the file.  Must only be used when
      * reading an axisymmetric file.  These have lines of the form
      * \code
      *  fibre0 fibre1 fibre2
      * \endcode
      *
+     * @param fibreIndex  which fibre vector to read.  Note that vectors must be read
+     *     in monotonically increasing order, so subsequent calls to this method must
+     *     always pass a strictly greater index.  They may skip vectors, however.
      * @param rFibreVector  vector to be filled in
      * @param checkNormalised  if true, checks if the read vector is normalised
      *   and throws an exception if not
      */
-    void GetNextFibreVector(c_vector<double,DIM>& rFibreVector, bool checkNormalised=true);
+    void GetFibreVector(unsigned fibreIndex, c_vector<double,DIM>& rFibreVector, bool checkNormalised=true);
 
     /**
      *  Get the number of lines of data in the file - this is the value read from
