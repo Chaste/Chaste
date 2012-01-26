@@ -180,7 +180,7 @@ public:
      *
      * @param pElement  the parent element
      */
-    static std::vector<xercesc::DOMElement*> GetChildElements(xercesc::DOMElement* pElement);
+    static std::vector<xercesc::DOMElement*> GetChildElements(const xercesc::DOMElement* pElement);
 
     /**
      * Find all elements matching the given path from this context element.
@@ -188,7 +188,7 @@ public:
      * @param pContextElement  the root element to search from
      * @param rPath  where to search.  This should be a '/'-separated path of element names.
      */
-    static std::vector<xercesc::DOMElement*> FindElements(xercesc::DOMElement* pContextElement,
+    static std::vector<xercesc::DOMElement*> FindElements(const xercesc::DOMElement* pContextElement,
                                                           const std::string& rPath);
 
     /**
@@ -200,7 +200,7 @@ public:
      * @param rResults  vector to be filled in with matching elements
      * @param depth  for managing recursion; should not be provided by users
      */
-    static void FindElements(xercesc::DOMElement* pContextElement,
+    static void FindElements(const xercesc::DOMElement* pContextElement,
                              const std::vector<std::string>& rNames,
                              std::vector<xercesc::DOMElement*>& rResults,
                              unsigned depth=0);

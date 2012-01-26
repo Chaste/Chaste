@@ -335,7 +335,7 @@ xercesc::DOMElement* XmlTools::SetNamespace(xercesc::DOMDocument* pDocument,
 }
 
 
-std::vector<xercesc::DOMElement*> XmlTools::GetChildElements(xercesc::DOMElement* pElement)
+std::vector<xercesc::DOMElement*> XmlTools::GetChildElements(const xercesc::DOMElement* pElement)
 {
     std::vector<xercesc::DOMElement*> children;
     for (xercesc::DOMNode* p_node = pElement->getFirstChild();
@@ -351,7 +351,7 @@ std::vector<xercesc::DOMElement*> XmlTools::GetChildElements(xercesc::DOMElement
 }
 
 
-void XmlTools::FindElements(xercesc::DOMElement* pContextElement,
+void XmlTools::FindElements(const xercesc::DOMElement* pContextElement,
                             const std::vector<std::string>& rNames,
                             std::vector<xercesc::DOMElement*>& rResults,
                             unsigned depth)
@@ -376,7 +376,7 @@ void XmlTools::FindElements(xercesc::DOMElement* pContextElement,
     }
 }
 
-std::vector<xercesc::DOMElement*> XmlTools::FindElements(xercesc::DOMElement* pContextElement,
+std::vector<xercesc::DOMElement*> XmlTools::FindElements(const xercesc::DOMElement* pContextElement,
                                                          const std::string& rPath)
 {
     std::vector<xercesc::DOMElement*> results;
