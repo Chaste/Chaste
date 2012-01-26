@@ -559,8 +559,6 @@ public:
     template<class Archive>
     void LoadCardiacCells(Archive & archive, const unsigned int version)
     {
-        assert(!mHasPurkinje);
-
         DistributedVectorFactory* p_factory;
         DistributedVectorFactory* p_mesh_factory = this->mpMesh->GetDistributedVectorFactory();
         archive & p_factory;

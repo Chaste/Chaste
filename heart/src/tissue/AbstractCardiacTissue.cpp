@@ -664,14 +664,14 @@ ReplicatableVector& AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::rGetIntracellu
 template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
 ReplicatableVector& AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::rGetPurkinjeIionicCacheReplicated()
 {
-    assert(mHasPurkinje);
+    EXCEPT_IF_NOT(mHasPurkinje);
     return mPurkinjeIionicCacheReplicated;
 }
 
 template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
 ReplicatableVector& AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::rGetPurkinjeIntracellularStimulusCacheReplicated()
 {
-    assert(mHasPurkinje);
+    EXCEPT_IF_NOT(mHasPurkinje);
     return mPurkinjeIntracellularStimulusCacheReplicated;
 }
 
