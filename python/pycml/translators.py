@@ -249,6 +249,14 @@ class CellMLTranslator(object):
         if len(self.free_vars) > 1:
             self.error(["Model has more than one free variable; exiting.",
                         "Free vars:" + str(self.free_vars)])
+        if len(self.free_vars) == 0:
+            if self.model.get_option('protocol'):
+                # We may be dealing with an algebraic model; check for an Unknown variable
+                for var in self.model.get_all_variables():
+                    if var.get_type() == VarTypes.Unknown:
+                        self.free_vars.append(var)
+            if len(self.free_vars) != 1:
+                self.error(["Model has no free variable; exiting."])
         # If only a single component, don't add it to variable names
         self.single_component = (len(getattr(self.model, u'component', [])) == 1)
         # Find the (index of the) transmembrane potential
@@ -1791,7 +1799,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
                                                      ('pycml:output-variable', NSS['pycml']),
                                                      'yes')
             def write_output_info(output):
-                if output.get_type() == VarTypes.Free:
+                if output.get_type() in [VarTypes.Free, VarTypes.Unknown]:
                     self.writeln('UNSIGNED_UNSET, FREE', indent=False, nl=False)
                 elif output.get_type() == VarTypes.State:
                     self.writeln(self.state_vars.index(output), ', STATE', indent=False, nl=False)
