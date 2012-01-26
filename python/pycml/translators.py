@@ -1811,6 +1811,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
                     write_output_info(output)
                     self.writeln(')', self.STMT_END, indent=False)
                 self.writeln()
+            outputs = set(outputs)
             #1925 - outputs that are vectors
             prop = ('pycml:output-vector', NSS['pycml'])
             vector_names = set(cellml_metadata.get_targets(self.model, None,
@@ -1829,6 +1830,16 @@ class CellMLToChasteTranslator(CellMLTranslator):
                     write_output_info(output)
                     self.writeln(')', self.STMT_END, indent=False)
                 self.writeln()
+                outputs.update(vector_outputs)
+            #1910 - SED-ML name mappings
+            prop = ('pycml:alias', NSS['pycml'])
+            aliased_vars = cellml_metadata.find_variables(self.model, prop, None)
+            prop = cellml_metadata.create_rdf_node(prop)
+            for var in aliased_vars:
+                assert var in outputs
+                source = cellml_metadata.create_rdf_node(fragment_id=var.cmeta_id)
+                for alias in cellml_metadata.get_targets(self.model, source, prop):
+                    self.writeln('this->mNameMap["', alias, '"] = "', self.var_display_name(var), '";')
         # Lookup table generation, if not in a singleton
         if self.use_lookup_tables and not self.separate_lut_class:
             self.output_lut_generation()
@@ -5100,6 +5111,8 @@ def get_options(args, default_options=None):
                       action='callback', callback=protocol_callback, type='string', nargs=1,
                       help="[experimental] specify a simulation protocol to apply to"
                       " the model prior to translation")
+    parser.add_option('--protocol-options', action='store', type='string',
+                      help="[experimental] extra options for the protocol")
     # Settings for lookup tables
     lookup_type_choices = ['entry-below', 'nearest-neighbour', 'linear-interpolation']
     parser.add_option('--lookup-type', choices=lookup_type_choices,

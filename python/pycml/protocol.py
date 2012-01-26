@@ -408,6 +408,13 @@ class Protocol(processors.ModelModifier):
         for var, oxmeta_name in self._pending_oxmeta_assignments:
             var.set_oxmeta_name(oxmeta_name)
     
+    def add_alias(self, var, alias):
+        """Add an alias name for a variable.
+        
+        This is used by the SED-ML support to map XPath expressions to the names in the generated code.
+        """
+        var.add_rdf_annotation(('pycml:alias', NSS['pycml']), alias, allow_dup=True)
+    
     def specify_as_output(self, var, units):
         """Specify the given variable within the model as a protocol output.
         
