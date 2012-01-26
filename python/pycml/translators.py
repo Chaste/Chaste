@@ -253,7 +253,10 @@ class CellMLTranslator(object):
         self.single_component = (len(getattr(self.model, u'component', [])) == 1)
         # Find the (index of the) transmembrane potential
         self.v_variable = v_variable
-        self.v_variable_name = (v_variable.component.name, v_variable.name)
+        if self.v_variable:
+            self.v_variable_name = (v_variable.component.name, v_variable.name)
+        else:
+            self.v_variable = None
         for i, var in enumerate(self.state_vars):
             if var is v_variable:
                 self.v_index = i
@@ -451,7 +454,7 @@ class CellMLTranslator(object):
         else:
             name = var.name
         iface = getattr(self.model, 'interface_component_name', '#N/A#')
-        if iface in name:
+        if name.startswith(iface):
             name = name[len(iface)+2:]
         return name
 
@@ -1754,7 +1757,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         self.output_comment('Time units: ', self.free_vars[0].units, '\n')
         self.writeln('this->mpSystemInfo = OdeSystemInformation<',
                      self.class_name, '>::Instance();')
-        if self.v_index == -1:
+        if self.v_index == -1 and self.v_variable:
             self.writeln('this->mVoltageIndex = GetAnyVariableIndex("',
                          self.var_display_name(self.v_variable), '");')
         if self.config.options.include_dt_in_tables:
@@ -2863,7 +2866,8 @@ class CellMLToChasteTranslator(CellMLTranslator):
                 add_oxmeta_ioput('membrane_stimulus_current_'+n, ms, 'in')
             add_oxmeta_ioput('membrane_stimulus_current_amplitude', current_units, 'out')
 
-        config.V_variable = generator.add_input(config.V_variable, mV)
+        if config.V_variable:
+            config.V_variable = generator.add_input(config.V_variable, mV)
         ionic_vars = config.i_ionic_vars
         if ionic_vars:
             i_ionic = generator.add_output_function('i_ionic', 'plus', ionic_vars, current_units)
@@ -4863,7 +4867,7 @@ class ConfigurationStore(object):
                 raise ConfigurationError('The name of V must contain both component and variable name')
         self.V_variable = self._find_var('membrane_voltage', self.V_definitions)
         DEBUG('config', 'Found V', self.V_variable)
-        if not self.V_variable:
+        if not self.V_variable and not self.options.protocol:
             raise ConfigurationError('No transmembrane potential found; check your configuration')
         return self.V_variable
     
@@ -5246,16 +5250,18 @@ def run():
     config.expose_variables()
 
     class_name = options.class_name
-    if options.augment_class_name and not class_name:
-        class_name = u'CML_' + doc.model.name.replace('-', '_')
-        if options.pe:
-            class_name += '_pe'
-        if options.lut:
-            class_name += '_lut'
-        if options.maple_output:
-            class_name += '_be'
-        if options.use_modifiers:
-            class_name += '_sens'
+    if not class_name:
+        class_name = doc.model.name.replace('-', '_')
+        if options.augment_class_name:
+            class_name = u'CML_' + class_name
+            if options.pe:
+                class_name += '_pe'
+            if options.lut:
+                class_name += '_lut'
+            if options.maple_output:
+                class_name += '_be'
+            if options.use_modifiers:
+                class_name += '_sens'
     if options.protocol:
         # Try to avoid OdeSystemInformation conflicts
         class_name += "_Proto_" + os.path.splitext(os.path.basename(options.protocol))[0]

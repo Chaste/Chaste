@@ -216,14 +216,14 @@ if options.dynamically_loadable:
     essential_options.append('-y')
 
 # What options should be passed on to PyCml?
-pycml_options = filter(lambda a: not a.endswith('.cellml'), args)
+pycml_options = filter(lambda a: a.startswith('-'), args)
 if not pycml_options:
     pycml_options = default_options
 pycml_options.extend(essential_options)
 
 # Models to process
 models = []
-for model in filter(lambda a: a.endswith('.cellml'), args):
+for model in filter(lambda a: not a.startswith('-'), args):
     if os.path.exists(model):
         models.append(os.path.abspath(model))
     else:
