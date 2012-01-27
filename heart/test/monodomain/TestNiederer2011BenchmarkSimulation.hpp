@@ -105,14 +105,6 @@ class TestNiederer2011BenchmarkSimulation : public CxxTest::TestSuite
 private:
     void RunBenchMark(double h, double dt, double endTime)
     {
-        if(    !( (h==0.05) || (h==0.02) || (h==0.01) )
-            || !( (dt==0.05) || (dt==0.01) || (dt==0.005) )
-            || (endTime < 10)
-            || (endTime > 50) )
-        {
-            EXCEPTION("Bad input?");
-        }
-
         TetrahedralMesh<3,3> mesh;
 
         mesh.ConstructRegularSlabMesh(h, 2.0, 0.7, 0.3);
