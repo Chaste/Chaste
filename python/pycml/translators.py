@@ -1847,7 +1847,11 @@ class CellMLToChasteTranslator(CellMLTranslator):
                 assert var in outputs
                 source = cellml_metadata.create_rdf_node(fragment_id=var.cmeta_id)
                 for alias in cellml_metadata.get_targets(self.model, source, prop):
-                    self.writeln('this->mNameMap["', alias, '"] = "', self.var_display_name(var), '";')
+                    if var.get_type() in [VarTypes.Free, VarTypes.Unknown]:
+                        name = 'time' #1910 TODO!
+                    else:
+                        name = self.var_display_name(var)
+                    self.writeln('this->mNameMap["', alias, '"] = "', name, '";')
         # Lookup table generation, if not in a singleton
         if self.use_lookup_tables and not self.separate_lut_class:
             self.output_lut_generation()
