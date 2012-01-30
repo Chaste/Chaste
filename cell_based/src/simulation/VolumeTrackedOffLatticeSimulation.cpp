@@ -54,7 +54,7 @@ void VolumeTrackedOffLatticeSimulation<DIM>::SetupSolve()
 }
 
 template<unsigned DIM>
-void VolumeTrackedOffLatticeSimulation<DIM>::PostSolve()
+void VolumeTrackedOffLatticeSimulation<DIM>::UpdateAtEndOfTimeStep()
 {
     UpdateCellwiseData();
 }

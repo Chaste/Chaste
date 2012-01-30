@@ -189,20 +189,26 @@ protected:
     unsigned DoCellRemoval();
 
     /**
-     * A method for subclasses to do something at the end of each timestep
+     * A method for subclasses to do something at the end of each timestep.
      */
-    virtual void PostSolve();
+    virtual void UpdateAtEndOfTimeStep()
+    {
+    }
 
     /**
      * A method for subclasses to do something at before the start of the time loop.
      */
-    virtual void SetupSolve();
+    virtual void SetupSolve()
+    {
+    }
 
     /**
      * This method may be overridden in subclasses to do something
      * at the end of each time loop.
      */
-    virtual void AfterSolve();
+    virtual void UpdateAtEndOfSolve()
+    {
+    }
 
     /**
      * A child class can overload this if they want the simulation to stop

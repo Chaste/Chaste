@@ -159,9 +159,9 @@ public:
     virtual void SetupSolve();
 
     /**
-     * Overridden AfterSolve() method to close the cell velocities file.
+     * Overridden UpdateAtEndOfSolve() method to close the cell velocities file.
      */
-    virtual void AfterSolve();
+    virtual void UpdateAtEndOfSolve();
 
     /**
      * Overridden OutputAdditionalSimulationSetup() method to output the force and cell

@@ -115,7 +115,7 @@ protected:
     /**
      * Initialise mCellPdeElementMap.
      *
-     * This method is only called within SetupSolve(), but is written as a separate method
+     * This method is only called Solve(), but is written as a separate method
      * for testing purposes.
      */
     void InitialiseCellPdeElementMap();
@@ -163,7 +163,7 @@ public:
 
     /**
      * Open results files and write initial conditions to file.
-     * Called by AbstractCellBasedSimulation::SetupSolve().
+     * Called by AbstractCellBasedSimulation::Solve().
      *
      * @param outputDirectory the output directory, relative to where Chaste output is stored
      */
@@ -171,7 +171,7 @@ public:
 
     /**
      * Close results files.
-     * Called by AbstractCellBasedSimulation::AfterSolve().
+     * Called by AbstractCellBasedSimulation::Solve().
      */
     void CloseResultsFiles();
 

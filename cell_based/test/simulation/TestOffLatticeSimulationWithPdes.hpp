@@ -103,7 +103,7 @@ private:
 public:
 
     /*
-     * A two-part test for the PostSolve() method.
+     * A two-part test for the UpdateAtEndOfTimeStep() method.
      *
      * Firstly, test the PDE solver using the problem del squared C = 1
      * on the unit disc, with boundary condition C=1 on r=1, which has
@@ -112,7 +112,7 @@ public:
      * Secondly, test that cells' hypoxic durations are correctly updated when a
      * nutrient distribution is prescribed.
      */
-    void TestPostSolve() throw(Exception)
+    void TestUpdateAtEndOfTimeStep() throw(Exception)
     {
         EXIT_IF_PARALLEL;
 
@@ -151,7 +151,7 @@ public:
         p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1);
         p_data->SetCellPopulation(&cell_population);
 
-        // Since values are first passed in to CellwiseData before it is updated in PostSolve(),
+        // Since values are first passed in to CellwiseData before it is updated in UpdateAtEndOfTimeStep(),
         // we must initialise it here to avoid memory errors
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
@@ -160,7 +160,7 @@ public:
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestPostSolveMethod");
+        simulator.SetOutputDirectory("TestUpdateAtEndOfTimeStepMethod");
         simulator.SetEndTime(2.0/120.0);
 
         // Set up PDE and pass to simulation via handler
@@ -672,7 +672,7 @@ public:
         p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 2);
         p_data->SetCellPopulation(&cell_population);
 
-        // Since values are first passed in to CellwiseData before it is updated in PostSolve(),
+        // Since values are first passed in to CellwiseData before it is updated in UpdateAtEndOfTimeStep(),
         // we need to pass it some initial conditions to avoid memory errors
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
@@ -843,7 +843,7 @@ public:
         p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1);
         p_data->SetCellPopulation(&cell_population);
 
-        // Since values are first passed in to CellwiseData before it is updated in PostSolve(),
+        // Since values are first passed in to CellwiseData before it is updated in UpdateAtEndOfTimeStep(),
         // we need to pass it some initial conditions to avoid memory errors
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
@@ -1109,7 +1109,7 @@ public:
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestPostSolveMethod");
+        simulator.SetOutputDirectory("TestUpdateAtEndOfTimeStepMethod");
 
         // Create PDE and pass to simulation via handler
         SimplePdeForTesting pde;
@@ -1232,7 +1232,7 @@ public:
         p_data->SetCellPopulation(&cell_population);
 
         /*
-         * Since values are first passed in to CellwiseData before it is updated in PostSolve(),
+         * Since values are first passed in to CellwiseData before it is updated in UpdateAtEndOfTimeStep(),
          * we need to pass it some initial conditions to avoid memory errors.
          */
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
@@ -1305,7 +1305,7 @@ public:
         p_data->SetCellPopulation(&cell_population);
 
         /*
-         * Since values are first passed in to CellwiseData before it is updated in PostSolve(),
+         * Since values are first passed in to CellwiseData before it is updated in UpdateAtEndOfTimeStep(),
          * we need to pass it some initial conditions to avoid memory errors.
          */
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
@@ -1433,7 +1433,7 @@ public:
         centre_of_mesh[1] = 5.0;
 
         /*
-         * Since values are first passed in to CellwiseData before it is updated in PostSolve(),
+         * Since values are first passed in to CellwiseData before it is updated in UpdateAtEndOfTimeStep(),
          * we need to pass it some initial conditions to avoid memory errors.
          */
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
@@ -1540,7 +1540,7 @@ public:
         p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1);
         p_data->SetCellPopulation(&cell_population);
 
-        // Since values are first passed in to CellwiseData before it is updated in PostSolve(),
+        // Since values are first passed in to CellwiseData before it is updated in UpdateAtEndOfTimeStep(),
         // we need to pass it some initial conditions to avoid memory errors
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
@@ -1622,7 +1622,7 @@ public:
         centre_of_mesh[1] = 5.0;
 
         /*
-         * Since values are first passed in to CellwiseData before it is updated in PostSolve(),
+         * Since values are first passed in to CellwiseData before it is updated in UpdateAtEndOfTimeStep(),
          * we need to pass it some initial conditions to avoid memory errors.
          */
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
@@ -1709,7 +1709,7 @@ public:
         centre_of_mesh[2] = 5.0;
 
         /*
-         * Since values are first passed in to CellwiseData before it is updated in PostSolve(),
+         * Since values are first passed in to CellwiseData before it is updated in UpdateAtEndOfTimeStep(),
          * we need to pass it some initial conditions to avoid memory errors.
          */
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)

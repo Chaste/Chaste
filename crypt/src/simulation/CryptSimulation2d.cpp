@@ -211,11 +211,8 @@ void CryptSimulation2d::SetupSolve()
     }
 }
 
-void CryptSimulation2d::PostSolve()
+void CryptSimulation2d::UpdateAtEndOfTimeStep()
 {
-    // First call method on base class
-    OffLatticeSimulation<2>::PostSolve();
-
     SimulationTime* p_time = SimulationTime::Instance();
 
     if ((p_time->GetTimeStepsElapsed()+1)%mSamplingTimestepMultiple == 0)
@@ -234,10 +231,10 @@ void CryptSimulation2d::PostSolve()
     }
 }
 
-void CryptSimulation2d::AfterSolve()
+void CryptSimulation2d::UpdateAtEndOfSolve()
 {
     // First call method on base class
-    OffLatticeSimulation<2>::AfterSolve();
+    OffLatticeSimulation<2>::UpdateAtEndOfSolve();
 
     /*
      * If there are any cells in the simulation, and mWriteBetaCatenin has been set

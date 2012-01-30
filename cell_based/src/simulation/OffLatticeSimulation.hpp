@@ -117,9 +117,9 @@ protected:
     virtual void SetupSolve();
 
     /**
-     * Overridden AfterSolve() method to close the node velocities file.
+     * Overridden UpdateAtEndOfSolve() method to close the node velocities file.
      */
-    virtual void AfterSolve();
+    virtual void UpdateAtEndOfSolve();
 
     /**
      * Overridden CalculateCellDivisionVector() method for determining how cell division occurs.

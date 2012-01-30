@@ -70,7 +70,7 @@ private:
     }
 public:
 
-    void TestPostSolveNodeBased() throw(Exception)
+    void TestUpdateAtEndOfTimeStepNodeBased() throw(Exception)
     {
         EXIT_IF_PARALLEL;
 
@@ -116,7 +116,7 @@ public:
 
         // Create and configure cell-based simulation
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestDeltaNotchNodeBasedPostSolve");
+        simulator.SetOutputDirectory("TestDeltaNotchNodeBasedUpdateAtEndOfTimeStep");
         simulator.SetEndTime(0.01);
 
         // Set up force law and add to simulation
@@ -136,7 +136,7 @@ public:
         CellwiseData<2>::Destroy();
     }
 
-    void TestPostSolveVertex() throw (Exception)
+    void TestUpdateAtEndOfTimeStepVertex() throw (Exception)
     {
         EXIT_IF_PARALLEL;
 
@@ -187,7 +187,7 @@ public:
         CellwiseData<2>::Destroy();
     }
 
-    void TestPostSolveMeshBased() throw (Exception)
+    void TestUpdateAtEndOfTimeStepMeshBased() throw (Exception)
     {
         EXIT_IF_PARALLEL;
 
@@ -220,7 +220,7 @@ public:
 
         // Create and configure cell-based simulation
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestDeltaNotchMeshBasedPostSolve");
+        simulator.SetOutputDirectory("TestDeltaNotchMeshBasedUpdateAtEndOfTimeStep");
         simulator.SetEndTime(0.01);
 
         // Set up force law and add to simulation

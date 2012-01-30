@@ -53,7 +53,7 @@ void DeltaNotchOffLatticeSimulation<DIM>::SetupSolve()
 }
 
 template<unsigned DIM>
-void DeltaNotchOffLatticeSimulation<DIM>::PostSolve()
+void DeltaNotchOffLatticeSimulation<DIM>::UpdateAtEndOfTimeStep()
 {
     UpdateCellwiseData();
 }

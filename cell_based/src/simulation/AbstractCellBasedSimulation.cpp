@@ -242,36 +242,6 @@ std::vector<double> AbstractCellBasedSimulation<DIM>::GetNodeLocation(const unsi
 }
 
 template<unsigned DIM>
-void AbstractCellBasedSimulation<DIM>::SetupSolve()
-{
-    if (mpCellBasedPdeHandler != NULL)
-    {
-        mpCellBasedPdeHandler->OpenResultsFiles(this->mSimulationOutputDirectory);
-        *this->mpVizSetupFile << "PDE \n";
-    }
-}
-
-template<unsigned DIM>
-void AbstractCellBasedSimulation<DIM>::PostSolve()
-{
-    if (mpCellBasedPdeHandler != NULL)
-    {
-        CellBasedEventHandler::BeginEvent(CellBasedEventHandler::PDE);
-        mpCellBasedPdeHandler->SolvePdeAndWriteResultsToFile(this->mSamplingTimestepMultiple);
-        CellBasedEventHandler::EndEvent(CellBasedEventHandler::PDE);
-    }
-}
-
-template<unsigned DIM>
-void AbstractCellBasedSimulation<DIM>::AfterSolve()
-{
-    if (mpCellBasedPdeHandler != NULL)
-    {
-        mpCellBasedPdeHandler->CloseResultsFiles();
-    }
-}
-
-template<unsigned DIM>
 void AbstractCellBasedSimulation<DIM>::Solve()
 {
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::EVERYTHING);
@@ -297,10 +267,9 @@ void AbstractCellBasedSimulation<DIM>::Solve()
         {
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(mEndTime, num_time_steps);
         }
-
     }
 
-    if (mOutputDirectory=="")
+    if (mOutputDirectory == "")
     {
         EXCEPTION("OutputDirectory not set");
     }
@@ -320,6 +289,13 @@ void AbstractCellBasedSimulation<DIM>::Solve()
     mrCellPopulation.CreateOutputFiles(results_directory+"/", false);
 
     mpVizSetupFile = output_file_handler.OpenOutputFile("results.vizsetup");
+
+    // If any PDEs have been defined, set up results files to store their solution
+    if (mpCellBasedPdeHandler != NULL)
+    {
+        mpCellBasedPdeHandler->OpenResultsFiles(this->mSimulationOutputDirectory);
+        *this->mpVizSetupFile << "PDE \n";
+    }
 
     SetupSolve();
 
@@ -358,8 +334,16 @@ void AbstractCellBasedSimulation<DIM>::Solve()
         // Update cell locations and topology
         UpdateCellLocationsAndTopology();
 
-        // Call PostSolve(), which may be implemented by child classes (eg to solve PDEs)
-        PostSolve();
+        // If any PDEs have been defined, solve them and store their solution in results files
+        if (mpCellBasedPdeHandler != NULL)
+        {
+            CellBasedEventHandler::BeginEvent(CellBasedEventHandler::PDE);
+            mpCellBasedPdeHandler->SolvePdeAndWriteResultsToFile(this->mSamplingTimestepMultiple);
+            CellBasedEventHandler::EndEvent(CellBasedEventHandler::PDE);
+        }
+
+        // Call UpdateAtEndOfTimeStep(), which may be implemented by child classes
+        UpdateAtEndOfTimeStep();
 
         // Increment simulation time here, so results files look sensible
         p_simulation_time->IncrementTimeOneStep();
@@ -379,7 +363,13 @@ void AbstractCellBasedSimulation<DIM>::Solve()
     // NB cell birth/death still need to be checked because they may be spatially-dependent.
     UpdateCellPopulation();
 
-    AfterSolve();
+    // If any PDEs have been defined, close the results files storing their solution
+    if (mpCellBasedPdeHandler != NULL)
+    {
+        mpCellBasedPdeHandler->CloseResultsFiles();
+    }
+
+    UpdateAtEndOfSolve();
 
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::OUTPUT);
 

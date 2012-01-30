@@ -127,19 +127,19 @@ protected:
     void SetupSolve();
 
     /**
-     * Overridden PostSolve() method.
+     * Overridden UpdateAtEndOfTimeStep() method.
      *
      * Write current beta catenin results to file if required.
      */
-    void PostSolve();
+    void UpdateAtEndOfTimeStep();
 
     /**
-     * Overridden AfterSolve() method.
+     * Overridden UpdateAtEndOfSolve() method.
      *
      * Closes beta catenin results file if required, then calls
      * the base class method.
      */
-    void AfterSolve();
+    void UpdateAtEndOfSolve();
 
 public:
 

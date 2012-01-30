@@ -63,9 +63,9 @@ private :
     void SetupSolve();
 
     /**
-     * Overridden PostSolve() method. Calls UpdateCellwiseData().
+     * Overridden UpdateAtEndOfTimeStep() method. Calls UpdateCellwiseData().
      */
-    void PostSolve();
+    void UpdateAtEndOfTimeStep();
 
     /**
      * Compute the volume of each cell in the population and store these in the CellwiseData singleton.
