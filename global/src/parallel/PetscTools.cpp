@@ -186,7 +186,7 @@ Vec PetscTools::CreateVec(int size, int localSize, bool ignoreOffProcEntries)
 
     if (ignoreOffProcEntries)
     {
-#if (PETSC_VERSION_MAJOR == 3)
+#if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x.x
         VecSetOption(ret, VEC_IGNORE_OFF_PROC_ENTRIES, PETSC_TRUE);
 #else
         VecSetOption(ret, VEC_IGNORE_OFF_PROC_ENTRIES);
@@ -280,7 +280,7 @@ void PetscTools::SetupMat(Mat& rMat, int numRows, int numColumns,
         }
         else
         {
-#if (PETSC_VERSION_MAJOR == 3)
+#if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x.x
             MatSetOption(rMat, MAT_IGNORE_OFF_PROC_ENTRIES, PETSC_TRUE);
 #else
             MatSetOption(rMat, MAT_IGNORE_OFF_PROC_ENTRIES);
@@ -381,7 +381,7 @@ void PetscTools::ReadPetscObject(Vec& rVec, const std::string& rOutputFileFullPa
                           type, &view);
     if (rParallelLayout == NULL)
     {
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 2)
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
     	VecCreate(PETSC_COMM_WORLD,&rVec);
     	VecSetType(rVec,VECMPI);
     	VecLoad(rVec,view);
@@ -392,7 +392,7 @@ void PetscTools::ReadPetscObject(Vec& rVec, const std::string& rOutputFileFullPa
     else
     {
         VecDuplicate(rParallelLayout, &rVec);
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 2)
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
         VecLoad(rVec,view);
 #else
         VecLoadIntoVector(view, rVec);

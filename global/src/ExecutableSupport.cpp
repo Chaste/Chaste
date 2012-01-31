@@ -263,5 +263,6 @@ void ExecutableSupport::Print(const std::string& rMessage)
 
 void ExecutableSupport::FinalizePetsc()
 {
+    ///\todo #1994 Causes memory failure (and seg fault) in PETSc 3.2
     PetscFinalize();
 }

@@ -118,11 +118,11 @@ void PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalCreate(KSP& rKspObject, s
     {
         phi_e_bath_rows[index] = 2*rBathNodes[index] + 1;
     }
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 2)
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
     /**\todo #1994
      * I am not sure if we need to use PETSC_OWN_POINTER or PETSC_USE_POINTER - Arash
      */
-    ISCreateGeneral(PETSC_COMM_WORLD, rBathNodes.size(), phi_e_bath_rows, PETSC_OWN_POINTER,&A22_bath_rows);
+    ISCreateGeneral(PETSC_COMM_WORLD, rBathNodes.size(), phi_e_bath_rows, PETSC_OWN_POINTER, &A22_bath_rows);
  #else
     ISCreateGeneralWithArray(PETSC_COMM_WORLD, rBathNodes.size(), phi_e_bath_rows, &A22_bath_rows);
 #endif
@@ -172,7 +172,7 @@ void PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalCreate(KSP& rKspObject, s
         IS& A11_columns=A11_all_rows;
         ISCreateStride(PETSC_COMM_WORLD, high-low, 2*low, 2, &A11_local_rows); /// \todo: #1082 OK in parallel. Use as an example for the other two blocks
 
-#if (PETSC_VERSION_MAJOR == 3 && (PETSC_VERSION_MINOR == 1 || PETSC_VERSION_MINOR ==  2) ) //PETSc 3.1
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 1) //PETSc 3.1 or later
         MatGetSubMatrix(system_matrix, A11_local_rows, A11_columns,
             MAT_INITIAL_MATRIX, &mPCContext.A11_matrix_subblock);
 #else
@@ -195,7 +195,7 @@ void PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalCreate(KSP& rKspObject, s
         IS& A22_B1_local_rows = A22_tissue_rows; // wrong in parallel, need to give local rows
         IS& A22_B1_columns = A22_tissue_rows;
 
-#if (PETSC_VERSION_MAJOR == 3 && (PETSC_VERSION_MINOR == 1 || PETSC_VERSION_MINOR ==  2) ) //PETSc 3.1
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 1) //PETSc 3.1 or later
         MatGetSubMatrix(system_matrix, A22_B1_local_rows, A22_B1_columns,
             MAT_INITIAL_MATRIX, &mPCContext.A22_B1_matrix_subblock);
 #else
@@ -217,7 +217,7 @@ void PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalCreate(KSP& rKspObject, s
         IS& A22_B2_local_rows = A22_bath_rows; // wrong in parallel, need to give local rows
         IS& A22_B2_columns = A22_bath_rows;
 
-#if (PETSC_VERSION_MAJOR == 3 && (PETSC_VERSION_MINOR == 1 || PETSC_VERSION_MINOR ==  2) ) //PETSc 3.1
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 1) //PETSc 3.1 or later
         MatGetSubMatrix(system_matrix, A22_B2_local_rows, A22_B2_columns,
             MAT_INITIAL_MATRIX, &mPCContext.A22_B2_matrix_subblock);
 #else
@@ -281,7 +281,7 @@ void PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalSetUp()
     PCSetUp(mPCContext.PC_amg_A22_B2);
 }
 
-#if (PETSC_VERSION_MAJOR == 3 && (PETSC_VERSION_MINOR == 1 || PETSC_VERSION_MINOR ==  2) ) //PETSc 3.1
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 1) //PETSc 3.1 or later
 PetscErrorCode PCTwoLevelsBlockDiagonalApply(PC pc_object, Vec x, Vec y)
 {
   void* pc_context;

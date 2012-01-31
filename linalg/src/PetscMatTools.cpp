@@ -97,13 +97,11 @@ void PetscMatTools::ZeroRowsWithValueOnDiagonal(Mat matrix, std::vector<unsigned
      * when the row is zeroed, and if there is a next timestep, the memory will have to reallocated when
      * assembly to done again. This can kill performance. The following makes sure the zeroed rows are kept.
      */
-#if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x.x
- #if (PETSC_VERSION_MINOR == 0)
-    MatSetOption(matrix, MAT_KEEP_ZEROED_ROWS, PETSC_TRUE);
- #else
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 1) //PETSc 3.1 or later
     MatSetOption(matrix, MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE);
- #endif
-#else
+#elif (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 0) //PETSc 3.0
+    MatSetOption(matrix, MAT_KEEP_ZEROED_ROWS, PETSC_TRUE);
+#else //PETSc 2.x.x
     MatSetOption(matrix, MAT_KEEP_ZEROED_ROWS);
 #endif
 
@@ -159,7 +157,7 @@ void PetscMatTools::ZeroRowsWithValueOnDiagonal(Mat matrix, std::vector<unsigned
         AssembleFinal(matrix);
     }
     */
-#elif (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 2)
+#elif (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
     MatZeroRows(matrix, rRows.size(), rows, diagonalValue , NULL, NULL);
 #else
     MatZeroRows(matrix, rRows.size(), rows, diagonalValue);
@@ -384,10 +382,10 @@ bool PetscMatTools::CheckEquality(const Mat mat1, const Mat mat2, double tol)
 bool PetscMatTools::CheckSymmetry(const Mat matrix, double tol)
 {
     Mat trans;
-#if PETSC_VERSION_MAJOR==2
-    MatTranspose(matrix, &trans);
-#else
+#if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x.x
     MatTranspose(matrix, MAT_INITIAL_MATRIX, &trans);
+#else
+    MatTranspose(matrix, &trans);
 #endif
     bool is_symmetric = PetscMatTools::CheckEquality(matrix, trans, tol);
     PetscTools::Destroy(trans);

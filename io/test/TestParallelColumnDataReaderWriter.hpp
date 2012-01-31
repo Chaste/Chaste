@@ -124,13 +124,13 @@ public:
         TS_ASSERT_THROWS_NOTHING(mpParallelWriter->AdvanceAlongUnlimitedDimension());
 
         // Change the data
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 2)
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
         VecSqrtAbs(var1);
 #else
         VecSqrt(var1);
 #endif
         VecAbs(var2);
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 2)
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
         VecSqrtAbs(var2);
 #else
         VecSqrt(var2);

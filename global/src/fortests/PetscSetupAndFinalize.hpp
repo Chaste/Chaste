@@ -113,6 +113,7 @@ public:
     /** Clean up PETSc after running all tests. */
     bool tearDownWorld()
     {
+        ///\todo #1994 Causes memory failure (and seg fault) in PETSc 3.2
         PETSCEXCEPT(PetscFinalize());
         return true;
     }

@@ -131,7 +131,7 @@ void PCLDUFactorisation::PCLDUFactorisationCreate(KSP& rKspObject)
         ISCreateStride(PETSC_COMM_WORLD, high-low, 2*low, 2, &A11_local_rows);
         ISCreateStride(PETSC_COMM_WORLD, global_size, 0, 2, &A11_columns);
 
-#if (PETSC_VERSION_MAJOR == 3 && (PETSC_VERSION_MINOR == 1 || PETSC_VERSION_MINOR ==  2) ) //PETSc 3.1
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 1) //PETSc 3.1 or later
         MatGetSubMatrix(system_matrix, A11_local_rows, A11_local_rows,
             MAT_INITIAL_MATRIX, &mPCContext.A11_matrix_subblock);
 #else
@@ -155,7 +155,7 @@ void PCLDUFactorisation::PCLDUFactorisationCreate(KSP& rKspObject)
         ISCreateStride(PETSC_COMM_WORLD, high-low, 2*low+1, 2, &A22_local_rows);
         ISCreateStride(PETSC_COMM_WORLD, global_size, 1, 2, &A22_columns);
 
-#if (PETSC_VERSION_MAJOR == 3 && (PETSC_VERSION_MINOR == 1 || PETSC_VERSION_MINOR ==  2) ) //PETSc 3.1
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 1) //PETSc 3.1 or later
         MatGetSubMatrix(system_matrix, A22_local_rows, A22_local_rows,
             MAT_INITIAL_MATRIX, &mPCContext.A22_matrix_subblock);
 #else
@@ -179,7 +179,7 @@ void PCLDUFactorisation::PCLDUFactorisationCreate(KSP& rKspObject)
         IS B_columns;
         ISCreateStride(PETSC_COMM_WORLD, high-low, 2*low, 2, &B_local_rows);
 
-#if (PETSC_VERSION_MAJOR == 3 && (PETSC_VERSION_MINOR == 1 || PETSC_VERSION_MINOR ==  2) ) //PETSc 3.1
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 1) //PETSc 3.1 or later
         ISCreateStride(PETSC_COMM_WORLD, high-low, 2*low+1, 2, &B_columns);
         MatGetSubMatrix(system_matrix, B_local_rows, B_columns,
             MAT_INITIAL_MATRIX, &mPCContext.B_matrix_subblock);
@@ -197,21 +197,21 @@ void PCLDUFactorisation::PCLDUFactorisationCreate(KSP& rKspObject)
      * Experimental (#1082): in PP removing the mass matrix from the A22 block seems to work better.
      *                       This is equivalent to do A22 = A22 + B in this implementation.
      */
-// #if (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 2) //PETSc 2.2
+//#if (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 2) //PETSc 2.2
 //     PetscScalar petsc_one = 1.0;
 //     MatAXPY(&petsc_one, mPCContext.B_matrix_subblock, mPCContext.A22_matrix_subblock, DIFFERENT_NONZERO_PATTERN);
 // #else
 //     MatAXPY(mPCContext.A22_matrix_subblock, 1.0, mPCContext.B_matrix_subblock, DIFFERENT_NONZERO_PATTERN);
-// #endif
+//#endif
 
 //     // Shift the block
-// #if (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 2) //PETSc 2.2
+//#if (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 2) //PETSc 2.2
 //     PetscScalar shift = -1e-8;
 //     MatShift(&shift, mPCContext.A22_matrix_subblock);
 // #else
 //     PetscScalar shift = -1e-8;
 //     MatShift(mPCContext.A22_matrix_subblock, shift);
-// #endif
+//#endif
 
     PCSetType(mPetscPCObject, PCSHELL);
 #if (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 2) //PETSc 2.2
@@ -312,7 +312,7 @@ void PCLDUFactorisation::PCLDUFactorisationSetUp()
     PCSetFromOptions(mPCContext.PC_amg_A22);
     PCSetUp(mPCContext.PC_amg_A22);
 }
-#if (PETSC_VERSION_MAJOR == 3 && (PETSC_VERSION_MINOR == 1 || PETSC_VERSION_MINOR ==  2) ) //PETSc 3.1
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 1) //PETSc 3.1 or later
 PetscErrorCode PCLDUFactorisationApply(PC pc_object, Vec x, Vec y)
 {
   void* pc_context;

@@ -271,7 +271,7 @@ LinearSystem::~LinearSystem()
         PetscTools::Destroy(mDirichletBoundaryConditionsVector);
     }
 
-#if (PETSC_VERSION_MAJOR == 3)
+#if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x.x
     if (mpConvergenceTestContext)
     {
         KSPDefaultConvergedDestroy(mpConvergenceTestContext);
@@ -987,7 +987,7 @@ Vec LinearSystem::Solve(Vec lhsGuess)
             KSPSetNormType(mKspSolver, KSP_NORM_PRECONDITIONED);
 #endif
 
-#if (PETSC_VERSION_MAJOR == 3)
+#if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x.x
             if (!mpConvergenceTestContext)
             {
                 KSPDefaultConvergedCreate(&mpConvergenceTestContext);
@@ -1090,13 +1090,13 @@ Vec LinearSystem::Solve(Vec lhsGuess)
             }
 
             KSPSetNormType(mKspSolver, KSP_NO_NORM);
-#elif (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 2)
+#elif (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
             KSPSetNormType(mKspSolver, KSP_NORM_NONE);
 #else
             KSPSetNormType(mKspSolver, KSP_NORM_NO);
 #endif
 
-#if (PETSC_VERSION_MAJOR != 3)
+#if (PETSC_VERSION_MAJOR == 2)
             KSPSetConvergenceTest(mKspSolver, KSPSkipConverged, PETSC_NULL);
 #endif
 

@@ -208,22 +208,22 @@ void PetscVecTools::DoInterleavedVecScatter(Vec interleavedVec, VecScatter first
 
 
 //    //PETSc-3.x.x or PETSc-2.3.3
-//    #if ( (PETSC_VERSION_MAJOR == 3) || (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 3 && PETSC_VERSION_SUBMINOR == 3)) //2.3.3 or 3.x.x
-//        VecScatterBegin(firstVariableScatterContext, interleavedVec, firstVariableVec, INSERT_VALUES, SCATTER_FORWARD);
-//        VecScatterEnd(firstVariableScatterContext, interleavedVec, firstVariableVec, INSERT_VALUES, SCATTER_FORWARD);
-//    #else
-//        VecScatterBegin(interleavedVec, firstVariableVec, INSERT_VALUES, SCATTER_FORWARD, firstVariableScatterContext);
-//        VecScatterEnd(interleavedVec, firstVariableVec, INSERT_VALUES, SCATTER_FORWARD, firstVariableScatterContext);
-//    #endif
+//#if ( (PETSC_VERSION_MAJOR == 3) || (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 3 && PETSC_VERSION_SUBMINOR == 3)) //2.3.3 or 3.x.x
+//    VecScatterBegin(firstVariableScatterContext, interleavedVec, firstVariableVec, INSERT_VALUES, SCATTER_FORWARD);
+//    VecScatterEnd(firstVariableScatterContext, interleavedVec, firstVariableVec, INSERT_VALUES, SCATTER_FORWARD);
+//#else
+//    VecScatterBegin(interleavedVec, firstVariableVec, INSERT_VALUES, SCATTER_FORWARD, firstVariableScatterContext);
+//    VecScatterEnd(interleavedVec, firstVariableVec, INSERT_VALUES, SCATTER_FORWARD, firstVariableScatterContext);
+//#endif
 //
 //    //PETSc-3.x.x or PETSc-2.3.3
-//    #if ( (PETSC_VERSION_MAJOR == 3) || (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 3 && PETSC_VERSION_SUBMINOR == 3)) //2.3.3 or 3.x.x
-//        VecScatterBegin(secondVariableScatterContefirstVariableScatterContextt, interleavedVec, secondVariableVec, INSERT_VALUES, SCATTER_FORWARD);
-//        VecScatterEnd(secondVariableScatterContefirstVariableScatterContextt, interleavedVec, secondVariableVec, INSERT_VALUES, SCATTER_FORWARD);
-//    #else
-//        VecScatterBegin(interleavedVec, secondVariableVec, INSERT_VALUES, SCATTER_FORWARD, secondVariableScatterContefirstVariableScatterContextt);
-//        VecScatterEnd(interleavedVec, secondVariableVec, INSERT_VALUES, SCATTER_FORWARD, secondVariableScatterContefirstVariableScatterContextt);
-//   #endif
+//#if ( (PETSC_VERSION_MAJOR == 3) || (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 3 && PETSC_VERSION_SUBMINOR == 3)) //2.3.3 or 3.x.x
+//    VecScatterBegin(secondVariableScatterContefirstVariableScatterContextt, interleavedVec, secondVariableVec, INSERT_VALUES, SCATTER_FORWARD);
+//    VecScatterEnd(secondVariableScatterContefirstVariableScatterContextt, interleavedVec, secondVariableVec, INSERT_VALUES, SCATTER_FORWARD);
+//#else
+//    VecScatterBegin(interleavedVec, secondVariableVec, INSERT_VALUES, SCATTER_FORWARD, secondVariableScatterContefirstVariableScatterContextt);
+//    VecScatterEnd(interleavedVec, secondVariableVec, INSERT_VALUES, SCATTER_FORWARD, secondVariableScatterContefirstVariableScatterContextt);
+//#endif
 }
 
 void PetscVecTools::DoInterleavedVecGather(Vec interleavedVec, VecScatter firstVariableScatterContext, Vec firstVariableVec, VecScatter secondVariableScatterContext, Vec secondVariableVec)
