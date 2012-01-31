@@ -1159,7 +1159,7 @@ public:
 
         ls.SetPcType("ldufactorisation");
         solution = ls.Solve(/*no guess provided*/);
-        unsigned ldu_its = 0;//ls.GetNumIterations();
+        unsigned ldu_its = ls.GetNumIterations();
         PetscTools::Destroy(solution);
 
         ls.SetPcType("bjacobi");
