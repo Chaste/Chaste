@@ -1053,7 +1053,8 @@ public:
         p_cell_model->SetCellProliferativeType(STEM);
         CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
         p_cell->InitialiseCellCycleModel();
-        p_cell->SetAncestor(2u);
+        MAKE_PTR_ARGS(CellAncestor, p_cell_ancestor, (2u));
+        p_cell->SetAncestor(p_cell_ancestor);
 
         p_simulation_time->IncrementTimeOneStep();
         p_simulation_time->IncrementTimeOneStep();

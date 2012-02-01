@@ -787,11 +787,13 @@ public:
         cell_population.SetOutputVoronoiData(true);
         cell_population.SetOutputCellPopulationVolumes(true);
         cell_population.SetOutputCellVolumes(true);
-        cell_population.SetOutputCellAncestors(true);
         cell_population.SetOutputCellMutationStates(true);
         cell_population.SetOutputCellProliferativeTypes(true);
         cell_population.SetOutputCellAges(true);
         cell_population.SetOutputCellCyclePhases(true);
+
+        cell_population.SetCellAncestorsToLocationIndices();
+        cell_population.SetOutputCellAncestors(true);
 
         // This method is usually called by Update()
         cell_population.CreateVoronoiTessellation();
@@ -812,6 +814,7 @@ public:
         TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellpopulationareas.dat       cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/cellpopulationareas.dat").c_str()), 0);
         TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellareas.dat         cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/cellareas.dat").c_str()), 0);
         TS_ASSERT_EQUALS(system(("diff " + results_dir + "voronoi.dat           cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/voronoi.dat").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizancestors   cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/results.vizancestors").c_str()), 0);
 
         // Test the GetCellMutationStateCount function: there should only be healthy cells
         std::vector<unsigned> cell_mutation_states = cell_population.GetCellMutationStateCount();

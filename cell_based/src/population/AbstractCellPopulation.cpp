@@ -29,6 +29,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "AbstractCellPopulation.hpp"
 #include "AbstractOdeBasedCellCycleModel.hpp"
 #include "Exception.hpp"
+#include "SmartPointers.hpp"
 
 template<unsigned DIM>
 AbstractCellPopulation<DIM>::AbstractCellPopulation(std::vector<CellPtr>& rCells,
@@ -131,7 +132,8 @@ void AbstractCellPopulation<DIM>::SetCellAncestorsToLocationIndices()
 {
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter=this->Begin(); cell_iter!=this->End(); ++cell_iter)
     {
-        cell_iter->SetAncestor(mCellLocationMap[(*cell_iter).get()]);
+    	MAKE_PTR_ARGS(CellAncestor, p_cell_ancestor, (mCellLocationMap[(*cell_iter).get()]));
+        cell_iter->SetAncestor(p_cell_ancestor);
     }
 }
 

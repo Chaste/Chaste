@@ -512,16 +512,18 @@ public:
         std::set<unsigned> remaining_ancestors = node_based_cell_population.GetCellAncestors();
         TS_ASSERT_EQUALS(remaining_ancestors.size(), 5u);
 
-        // Test that the set correctly represents a monoclonal population
-        for (AbstractCellPopulation<2>::Iterator cell_iter=node_based_cell_population.Begin();
-             cell_iter!=node_based_cell_population.End();
-             ++cell_iter)
-        {
-            // Set all cells to have the same ancestor...
-            cell_iter->SetAncestor(1u);
-        }
-        remaining_ancestors = node_based_cell_population.GetCellAncestors();
-        TS_ASSERT_EQUALS(remaining_ancestors.size(), 1u);
+        // This is commented as we cant reallocate cell ancestors see #1515
+//        // Test that the set correctly represents a monoclonal population
+//        for (AbstractCellPopulation<2>::Iterator cell_iter=node_based_cell_population.Begin();
+//             cell_iter!=node_based_cell_population.End();
+//             ++cell_iter)
+//        {
+//            // Set all cells to have the same ancestor...
+//        	MAKE_PTR_ARGS(CellAncestor, p_cell_ancestor, (1u));
+//            cell_iter->SetAncestor(p_cell_ancestor);
+//        }
+//        remaining_ancestors = node_based_cell_population.GetCellAncestors();
+//        TS_ASSERT_EQUALS(remaining_ancestors.size(), 1u);
     }
 
     void TestGetLocationOfCellCentreAndGetWidth() throw (Exception)
@@ -614,7 +616,6 @@ public:
         node_based_cell_population.GetCellUsingLocationIndex(2)->SetMutationState(p_apc2);
         node_based_cell_population.GetCellUsingLocationIndex(3)->SetMutationState(p_bcat1);
         node_based_cell_population.GetCellUsingLocationIndex(4)->AddCellProperty(p_apoptotic_state);
-        node_based_cell_population.SetCellAncestorsToLocationIndices();
 
         node_based_cell_population.rGetMesh().SetCellRadius(0, 3.0);
         node_based_cell_population.rGetMesh().SetCellRadius(1, 2.0);
@@ -644,9 +645,11 @@ public:
         node_based_cell_population.SetOutputCellMutationStates(true);
         node_based_cell_population.SetOutputCellProliferativeTypes(true);
         node_based_cell_population.SetOutputCellCyclePhases(true);
-        node_based_cell_population.SetOutputCellAncestors(true);
         node_based_cell_population.SetOutputCellAges(true);
         node_based_cell_population.SetOutputCellVolumes(true);
+
+        node_based_cell_population.SetOutputCellAncestors(true);
+        node_based_cell_population.SetCellAncestorsToLocationIndices();
 
         TS_ASSERT_THROWS_NOTHING(node_based_cell_population.CreateOutputFiles(output_directory, false));
 
@@ -729,11 +732,13 @@ public:
         OutputFileHandler output_file_handler(output_directory, false);
 
         cell_population.SetOutputCellVolumes(true);
-        cell_population.SetOutputCellAncestors(true);
         cell_population.SetOutputCellMutationStates(true);
         cell_population.SetOutputCellProliferativeTypes(true);
         cell_population.SetOutputCellAges(true);
         cell_population.SetOutputCellCyclePhases(true);
+
+        cell_population.SetCellAncestorsToLocationIndices();
+        cell_population.SetOutputCellAncestors(true);
 
         TS_ASSERT_THROWS_NOTHING(cell_population.CreateOutputFiles(output_directory, false));
 

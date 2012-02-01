@@ -58,7 +58,6 @@ Cell::Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
     : mCanDivide(false),
       mCellPropertyCollection(cellPropertyCollection),
       mpCellCycleModel(pCellCycleModel),
-      mAncestor(UNSIGNED_UNSET), // Has to be set by a SetAncestor() call (usually from CellPopulation)
       mDeathTime(DBL_MAX), // This has to be initialised for archiving
       mStartOfApoptosisTime(DBL_MAX),
       mApoptosisTime(0.25), // cell takes 15 min to fully undergo apoptosis
@@ -283,14 +282,34 @@ void Cell::Kill()
     mIsDead = true;
 }
 
-void Cell::SetAncestor(unsigned ancestorIndex)
+void Cell::SetAncestor(boost::shared_ptr<AbstractCellProperty> pCellAncestor)
 {
-    mAncestor = ancestorIndex;
+	if (!pCellAncestor->IsSubType<CellAncestor>())
+	{
+		EXCEPTION("Attempting to give cell a cell ancestor which is not a CellAncestor");
+	}
+
+	// You can only set ancestors once.
+	CellPropertyCollection ancestor_collection = mCellPropertyCollection.GetPropertiesType<CellAncestor>();
+	assert(ancestor_collection.GetSize() == 0);
+
+	AddCellProperty(pCellAncestor);
 }
 
 unsigned Cell::GetAncestor() const
 {
-    return mAncestor;
+    CellPropertyCollection ancestor_collection = mCellPropertyCollection.GetPropertiesType<CellAncestor>();
+
+    assert(ancestor_collection.GetSize() <= 1);
+    if (ancestor_collection.GetSize() == 0)
+    {
+    	return UNSIGNED_UNSET;
+    	//EXCEPTION("SetAncestor must be called before GetAncestor. You may want to call SetCellAncestorsToLocationIndices on the cell population.");
+    }
+
+    boost::shared_ptr<CellAncestor> p_label = boost::static_pointer_cast<CellAncestor>(ancestor_collection.GetProperty());
+
+    return p_label->GetAncestor();
 }
 
 unsigned Cell::GetCellId() const
@@ -331,7 +350,6 @@ CellPtr Cell::Divide()
 
     // Initialise properties of daughter cell
     p_new_cell->GetCellCycleModel()->InitialiseDaughterCell();
-    p_new_cell->SetAncestor(GetAncestor());
 
     return p_new_cell;
 }

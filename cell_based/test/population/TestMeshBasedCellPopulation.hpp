@@ -47,6 +47,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "BetaCateninOneHitCellMutationState.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "CellLabel.hpp"
+#include "CellAncestor.hpp"
 #include "CellPropertyRegistry.hpp"
 #include "SmartPointers.hpp"
 
@@ -684,11 +685,13 @@ public:
         // Test set methods
         cell_population.SetOutputCellPopulationVolumes(true);
         cell_population.SetOutputCellVolumes(true);
-        cell_population.SetOutputCellAncestors(true);
         cell_population.SetOutputCellMutationStates(true);
         cell_population.SetOutputCellProliferativeTypes(true);
         cell_population.SetOutputCellAges(true);
         cell_population.SetOutputCellCyclePhases(true);
+
+        cell_population.SetCellAncestorsToLocationIndices();
+        cell_population.SetOutputCellAncestors(true);
 
         // This method is usually called by Update()
         cell_population.CreateVoronoiTessellation();
@@ -710,6 +713,7 @@ public:
         TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellareas.dat         cell_based/test/data/TestCellPopulationWritersIn2d/cellareas.dat").c_str()), 0);
         TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellmutationstates.dat         cell_based/test/data/TestCellPopulationWritersIn2d/cellmutationstates.dat").c_str()), 0);
         TS_ASSERT_EQUALS(system(("diff " + results_dir + "voronoi.dat           cell_based/test/data/TestCellPopulationWritersIn2d/voronoi.dat").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizancestors   cell_based/test/data/TestCellPopulationWritersIn2d/results.vizancestors").c_str()), 0);
 
         // Test the GetCellMutationStateCount function
         std::vector<unsigned> cell_mutation_states = cell_population.GetCellMutationStateCount();
@@ -787,11 +791,13 @@ public:
         cell_population.SetOutputVoronoiData(true);
         cell_population.SetOutputCellPopulationVolumes(true);
         cell_population.SetOutputCellVolumes(true);
-        cell_population.SetOutputCellAncestors(true);
         cell_population.SetOutputCellMutationStates(true);
         cell_population.SetOutputCellProliferativeTypes(true);
         cell_population.SetOutputCellAges(true);
         cell_population.SetOutputCellCyclePhases(true);
+
+        cell_population.SetCellAncestorsToLocationIndices();
+        cell_population.SetOutputCellAncestors(true);
 
         // This method is usually called by Update()
         cell_population.CreateVoronoiTessellation();
@@ -813,6 +819,7 @@ public:
         TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellareas.dat         cell_based/test/data/TestCellPopulationWritersIn3d/cellareas.dat").c_str()), 0);
         TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellmutationstates.dat         cell_based/test/data/TestCellPopulationWritersIn3d/cellmutationstates.dat").c_str()), 0);
         TS_ASSERT_EQUALS(system(("diff " + results_dir + "voronoi.dat           cell_based/test/data/TestCellPopulationWritersIn3d/voronoi.dat").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizancestors   cell_based/test/data/TestCellPopulationWritersIn3d/results.vizancestors").c_str()), 0);
 
         // Test the GetCellMutationStateCount function
         std::vector<unsigned> cell_mutation_states = cell_population.GetCellMutationStateCount();
@@ -1079,16 +1086,18 @@ public:
         std::set<unsigned> remaining_ancestors = cell_population.GetCellAncestors();
         TS_ASSERT_EQUALS(remaining_ancestors.size(), 5u);
 
-        // Test that the set correctly represents a monoclonal population
-        for (AbstractCellPopulation<2>::Iterator cell_iter=cell_population.Begin();
-             cell_iter!=cell_population.End();
-             ++cell_iter)
-        {
-            // Set all cells to have the same ancestor
-            cell_iter->SetAncestor(1u);
-        }
-        remaining_ancestors = cell_population.GetCellAncestors();
-        TS_ASSERT_EQUALS(remaining_ancestors.size(), 1u);
+        // This is commented as we cant reallocate cell ancestors see #1515
+//        // Test that the set correctly represents a monoclonal population
+//        for (AbstractCellPopulation<2>::Iterator cell_iter=cell_population.Begin();
+//             cell_iter!=cell_population.End();
+//             ++cell_iter)
+//        {
+//            // Set all cells to have the same ancestor
+//        	MAKE_PTR_ARGS(CellAncestor, p_cell_ancestor, (1u));
+//            cell_iter->SetAncestor(p_cell_ancestor);
+//        }
+//        remaining_ancestors = cell_population.GetCellAncestors();
+//        TS_ASSERT_EQUALS(remaining_ancestors.size(), 1u);
     }
 
     void TestIsCellAssociatedWithADeletedLocation() throw (Exception)

@@ -86,7 +86,6 @@ public:
         NodeBasedCellPopulation<3> node_based_cell_population(mesh, cells);
         node_based_cell_population.SetMechanicsCutOffLength(1.5);
         node_based_cell_population.SetOutputCellProliferativeTypes(true);
-        node_based_cell_population.SetOutputCellAncestors(true);
 
         // Set up cell-based simulation
         OffLatticeSimulation<3> simulator(node_based_cell_population);

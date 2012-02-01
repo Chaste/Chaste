@@ -139,7 +139,6 @@ public:
         cell_population.SetOutputCellMutationStates(true);
         cell_population.SetOutputCellProliferativeTypes(true);
         cell_population.SetOutputCellCyclePhases(true);
-        cell_population.SetOutputCellAncestors(true);
         cell_population.SetOutputCellAges(true);
         cell_population.SetOutputCellVolumes(true);
         cell_population.SetOutputCellVariables(true);
@@ -229,7 +228,6 @@ public:
         cell_population.SetMechanicsCutOffLength(1.5);
 
         cell_population.SetOutputCellProliferativeTypes(true);
-        cell_population.SetOutputCellAncestors(true);
         cell_population.SetOutputCellMutationStates(true);
         cell_population.SetOutputCellIdData(true);
         cell_population.SetOutputCellCyclePhases(true);

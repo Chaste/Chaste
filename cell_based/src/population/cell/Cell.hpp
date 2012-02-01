@@ -39,11 +39,14 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "CellProliferativeTypes.hpp"
 #include "AbstractCellMutationState.hpp"
 #include "CellLabel.hpp"
+#include "CellAncestor.hpp"
+
 #include "ApoptoticCellProperty.hpp"
 #include "AbstractCellCycleModel.hpp"
 #include "SimulationTime.hpp"
 #include "CellPropertyRegistry.hpp"
 #include "CellPropertyCollection.hpp"
+#include "SmartPointers.hpp"
 
 class AbstractCellCycleModel; // Circular definition (cells need to know about cycle models and vice-versa).
 
@@ -86,7 +89,6 @@ private:
         archive & mApoptosisTime;
         archive & mIsDead;
         archive & mIsLogged;
-        archive & mAncestor;
         archive & mCellId;
         archive & mMaxCellId;
     }
@@ -98,9 +100,6 @@ protected:
 
     /** The cell's cell-cycle model. */
     AbstractCellCycleModel* mpCellCycleModel;
-
-    /** An index which is inherited by all children of this cell. */
-    unsigned mAncestor;
 
     /** An identifier which is unique to this cell. */
     unsigned mCellId;
@@ -329,12 +328,12 @@ public:
     /**
      * Give the Cell an index which it passes to its children.
      *
-     * @param ancestorIndex the cell's ancestor index
+     * @param pCellAncestor the cell's ancestor
      */
-    void SetAncestor(unsigned ancestorIndex);
+    void SetAncestor(boost::shared_ptr<AbstractCellProperty> pCellAncestor);
 
     /**
-     * @return The ancestor index, inherited from parents or set using the method above,
+     * @return The ancestor object, inherited from parents or set using the method above,
      * used for monoclonality experiments.
      */
     unsigned GetAncestor() const;

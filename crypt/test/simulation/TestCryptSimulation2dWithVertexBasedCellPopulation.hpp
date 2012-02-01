@@ -807,7 +807,6 @@ public:
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
 
         // Set crypt to output cell types and cell ancestors
-        crypt.SetOutputCellMutationStates(true);
         crypt.SetOutputCellAncestors(true);
 
         // Create an instance of a Wnt concentration
