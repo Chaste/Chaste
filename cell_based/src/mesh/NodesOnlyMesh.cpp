@@ -42,7 +42,7 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<
         Node<SPACE_DIM>* p_node_copy = new Node<SPACE_DIM>(i, location);
         this->mNodes.push_back(p_node_copy);
 
-        mCellRadii.push_back(1.0);
+        mCellRadii.push_back(0.5);
 
     }
 }
