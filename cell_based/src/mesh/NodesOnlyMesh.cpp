@@ -151,7 +151,7 @@ unsigned NodesOnlyMesh<SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNewNode)
     {
         mCellRadii.resize(new_node_index+1);
     }
-    SetCellRadius(new_node_index, 1.0);
+    SetCellRadius(new_node_index, 0.5);
 
     return new_node_index;
 }
