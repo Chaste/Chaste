@@ -1065,6 +1065,9 @@ public:
 
         TS_ASSERT_EQUALS(p_cell->GetAncestor(), 2u);
         TS_ASSERT_EQUALS(p_cell2->GetAncestor(), 2u);
+
+        //Coverage of SetAncesctor method
+        TS_ASSERT_THROWS_THIS(p_cell->SetAncestor(p_healthy_state), "Attempting to give cell a cell ancestor which is not a CellAncestor");
     }
 
     void TestCellId() throw (Exception)

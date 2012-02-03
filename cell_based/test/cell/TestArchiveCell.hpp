@@ -83,6 +83,12 @@ public:
             p_simulation_time->IncrementTimeOneStep();
 
             TS_ASSERT_EQUALS(p_cell->GetAge(), 0.5);
+            TS_ASSERT_EQUALS(p_cell->GetAncestor(), UNSIGNED_UNSET);
+
+            // set ancestor
+            MAKE_PTR_ARGS(CellAncestor, p_cell_ancestor, (2u));
+            p_cell->SetAncestor(p_cell_ancestor);
+            TS_ASSERT_EQUALS(p_cell->GetAncestor(), 2u);
 
             // Create an output archive
             std::ofstream ofs(archive_filename.c_str());
@@ -128,18 +134,20 @@ public:
             TS_ASSERT_EQUALS(p_model->GetCell(), p_cell);
 
             CellPropertyCollection& collection = p_cell->rGetCellPropertyCollection();
-            TS_ASSERT_EQUALS(collection.GetSize(), 2u);
+            TS_ASSERT_EQUALS(collection.GetSize(), 3u);
             TS_ASSERT_EQUALS(collection.HasProperty<WildTypeCellMutationState>(), true);
             TS_ASSERT_EQUALS(collection.HasProperty<ApcOneHitCellMutationState>(), false);
             TS_ASSERT_EQUALS(collection.HasProperty<ApcTwoHitCellMutationState>(), false);
             TS_ASSERT_EQUALS(collection.HasProperty<CellLabel>(), true);
             TS_ASSERT_EQUALS(collection.HasPropertyType<AbstractCellProperty>(), true);
             TS_ASSERT_EQUALS(collection.HasPropertyType<AbstractCellMutationState>(), true);
+            TS_ASSERT_EQUALS(collection.HasPropertyType<CellAncestor>(), true);
+            TS_ASSERT_EQUALS(p_cell->GetAncestor(), 2u);
 
             for (CellPropertyCollection::Iterator it = collection.Begin(); it != collection.End(); ++it)
             {
                 TS_ASSERT_EQUALS(collection.HasProperty(*it), true);
-                TS_ASSERT((*it)->IsType<WildTypeCellMutationState>() || (*it)->IsType<CellLabel>());
+                TS_ASSERT((*it)->IsType<WildTypeCellMutationState>() || (*it)->IsType<CellLabel>() || (*it)->IsType<CellAncestor>());
             }
         }
     }
