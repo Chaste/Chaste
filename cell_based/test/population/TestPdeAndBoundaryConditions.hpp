@@ -303,7 +303,7 @@ public:
         TS_ASSERT_EQUALS(pde_and_bc.IsNeumannBoundaryCondition(), true);
     }
 
-    void noTestWithAveragedSourcePde() throw(Exception)
+    void TestWithAveragedSourcePde() throw(Exception)
     {
         // Set up cell population
         EXIT_IF_PARALLEL; //HoneycombMeshGenerator doesn't work in parallel
