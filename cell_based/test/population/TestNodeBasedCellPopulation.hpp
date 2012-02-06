@@ -598,7 +598,7 @@ public:
              cell_iter != node_based_cell_population.End();
              ++cell_iter)
         {
-            TS_ASSERT_DELTA(node_based_cell_population.GetVolumeOfCell(*cell_iter), M_PI, 1e-6);
+            TS_ASSERT_DELTA(node_based_cell_population.GetVolumeOfCell(*cell_iter), M_PI*pow(node_based_cell_population.rGetMesh().GetCellRadius(node_based_cell_population.GetNodeCorrespondingToCell(*cell_iter)->GetIndex()),2), 1e-6);
         }
 
         // For coverage of WriteResultsToFiles()

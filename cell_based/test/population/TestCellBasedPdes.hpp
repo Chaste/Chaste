@@ -372,7 +372,8 @@ public:
         TS_ASSERT_EQUALS(pde.mCellDensityOnCoarseElements.size(), 2u);
 
         // The first element has area 0.5*10*10 = 50 and there are 5*5 = 25 cells, so the cell density is 25/50 = 0.5
-        TS_ASSERT_DELTA(pde.mCellDensityOnCoarseElements[0], 0.5, 1e-6);
+        // The radius of each node is 0.5 and the density is normalized with cell area (1/4.0) in `VolumeDependentAveragedSourcePde`.
+        TS_ASSERT_DELTA(pde.mCellDensityOnCoarseElements[0], 0.5/4.0, 1e-6);
 
         // The first element doesn't contain any cells, so the cell density is zero
         TS_ASSERT_DELTA(pde.mCellDensityOnCoarseElements[1], 0.0, 1e-6);
@@ -387,7 +388,7 @@ public:
         }
 
         pde.SetupSourceTerms(coarse_mesh, &cell_pde_element_map);
-        TS_ASSERT_DELTA(pde.mCellDensityOnCoarseElements[0], 0.5, 1e-6);
+        TS_ASSERT_DELTA(pde.mCellDensityOnCoarseElements[0], 0.5/4.0, 1e-6);
         TS_ASSERT_DELTA(pde.mCellDensityOnCoarseElements[1], 0.0, 1e-6);
     }
 

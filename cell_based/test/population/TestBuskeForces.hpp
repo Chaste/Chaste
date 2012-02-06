@@ -61,6 +61,8 @@ public:
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
+        mesh.SetCellRadius(0u,1.0);
+        mesh.SetCellRadius(1u,1.0);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -139,6 +141,8 @@ public:
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
+        mesh.SetCellRadius(0u,1.0);
+        mesh.SetCellRadius(1u,1.0);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -218,6 +222,8 @@ public:
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
+        mesh.SetCellRadius(0u,1.0);
+        mesh.SetCellRadius(1u,1.0);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -284,6 +290,8 @@ public:
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
+        mesh.SetCellRadius(0u,1.0);
+        mesh.SetCellRadius(1u,1.0);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -354,6 +362,9 @@ public:
 
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(nodes);
+        mesh.SetCellRadius(0u,1.0);
+        mesh.SetCellRadius(1u,1.0);
+        mesh.SetCellRadius(2u,1.0);
 
         // Create cells
         std::vector<CellPtr> cells;

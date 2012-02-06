@@ -209,6 +209,7 @@ public:
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(BuskeCompressionForce<2>, buske_compression_force);
+        buske_compression_force->SetCompressionEnergyParameter(0.01);
         simulator.AddForce(buske_compression_force);
 
         simulator.Solve();
@@ -265,6 +266,7 @@ public:
         MAKE_PTR(BuskeCompressionForce<2>, p_buske_compression_force);
         MAKE_PTR(BuskeElasticForce<2>, p_buske_elastic_force);
         MAKE_PTR(BuskeAdhesiveForce<2>, p_buske_adhesive_force);
+        p_buske_compression_force->SetCompressionEnergyParameter(0.01);
         simulator.AddForce(p_buske_compression_force);
         simulator.AddForce(p_buske_elastic_force);
         simulator.AddForce(p_buske_adhesive_force);
@@ -280,7 +282,7 @@ public:
         EXIT_IF_PARALLEL; // HoneycombMeshGenerator doesn't work in parallel
 
         // Create a simple mesh with two nodes
-        HoneycombMeshGenerator generator_buske(2, 1, 0, 1.0);
+        HoneycombMeshGenerator generator_buske(2, 1, 0, 0.9);
         TetrahedralMesh<2,2>* p_generating_mesh_buske = generator_buske.GetMesh();
 
         // Convert this to a NodesOnlyMesh
@@ -312,9 +314,9 @@ public:
         // Solve
         simulator.Solve();
 
-        // The nodes should be about 1.7 apart as this is the minimum of the sum of the energies.
-        TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()[0], -0.3596,  1e-4);
-        TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(1)->rGetLocation()[0], 1.3596,  1e-4);
+        // The nodes should be about 0.85 apart as this is the minimum of the sum of the energies.
+        TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()[0], 0.0155,  1e-4);
+        TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(1)->rGetLocation()[0], 0.8844,  1e-4);
     }
 };
 

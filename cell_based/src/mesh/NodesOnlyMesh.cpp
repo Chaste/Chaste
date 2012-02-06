@@ -42,7 +42,7 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<
         Node<SPACE_DIM>* p_node_copy = new Node<SPACE_DIM>(i, location);
         this->mNodes.push_back(p_node_copy);
 
-        mCellRadii.push_back(1.0);
+        mCellRadii.push_back(0.5);
 
     }
 }
@@ -151,7 +151,7 @@ unsigned NodesOnlyMesh<SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNewNode)
     {
         mCellRadii.resize(new_node_index+1);
     }
-    SetCellRadius(new_node_index, 1.0);
+    SetCellRadius(new_node_index, 0.5);
 
     return new_node_index;
 }

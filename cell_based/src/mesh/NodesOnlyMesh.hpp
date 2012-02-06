@@ -45,7 +45,7 @@ private:
 
     /**
      * Vector of radii of cells corresponding to nodes.
-     * Each radius is set to 1.0 by default in the method
+     * Each radius is set to 0.5 by default in the method
      * ConstructNodesWithoutMesh()
      */
     std::vector<double> mCellRadii;

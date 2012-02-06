@@ -239,7 +239,7 @@ public:
 
         unsigned num_nodes = 3;
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), num_nodes);
-        TS_ASSERT_DELTA(mesh.GetCellRadius(2), 1.0, 1e-4);
+        TS_ASSERT_DELTA(mesh.GetCellRadius(2), 0.5, 1e-4);
     }
 
     void TestDeleteNodesAndRemesh() throw (Exception)
@@ -295,13 +295,13 @@ public:
         mesh.AddNode(new Node<2>(0, true, 6.0, 6.0)); //This node pointer is added to the mesh and deleted by the destructor
 
         // Check the most recently deleted node now has the correct cell radius
-        TS_ASSERT_DELTA(mesh.GetCellRadius(3), 1.0, 1e-4);
+        TS_ASSERT_DELTA(mesh.GetCellRadius(3), 0.5, 1e-4);
 
         // Now we have deleted/reused 3, and deleted 1 and 6.
         // The new nodes are:
         // New:     0     1     2     3     4     5
         // Old:     0     2 (new3)    4     5     7
-        // Radius:  1     3     1.0     5     6     8
+        // Radius:  1     3     0.5     5     6     8
 
         NodeMap map(8);
         mesh.ReMesh(map);
@@ -316,7 +316,7 @@ public:
 
         TS_ASSERT_DELTA(mesh.GetCellRadius(0), 1.0, 1e-4);
         TS_ASSERT_DELTA(mesh.GetCellRadius(1), 3.0, 1e-4);
-        TS_ASSERT_DELTA(mesh.GetCellRadius(2), 1.0, 1e-4);
+        TS_ASSERT_DELTA(mesh.GetCellRadius(2), 0.5, 1e-4);
         TS_ASSERT_DELTA(mesh.GetCellRadius(3), 5.0, 1e-4);
         TS_ASSERT_DELTA(mesh.GetCellRadius(4), 6.0, 1e-4);
         TS_ASSERT_DELTA(mesh.GetCellRadius(5), 8.0, 1e-4);
