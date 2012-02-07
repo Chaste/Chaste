@@ -30,9 +30,17 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "NodesOnlyMesh.hpp"
 
 template<unsigned SPACE_DIM>
+NodesOnlyMesh<SPACE_DIM>::NodesOnlyMesh()
+		: MutableMesh<SPACE_DIM, SPACE_DIM>(),
+		  mpBoxCollection(NULL)
+{
+}
+
+template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<SPACE_DIM>*>& rNodes)
 {
     this->Clear();
+    mpBoxCollection = NULL;
 
     for (unsigned i=0; i<rNodes.size(); i++)
     {
@@ -75,6 +83,49 @@ void NodesOnlyMesh<SPACE_DIM>::SetCellRadius(unsigned index, double radius)
 {
     assert(index < mCellRadii.size());
     mCellRadii[index] = radius;
+}
+
+template<unsigned SPACE_DIM>
+BoxCollection<SPACE_DIM>* NodesOnlyMesh<SPACE_DIM>::GetBoxCollection()
+{
+	return mpBoxCollection;
+}
+
+template<unsigned SPACE_DIM>
+void NodesOnlyMesh<SPACE_DIM>::ClearBoxCollection()
+{
+	if(mpBoxCollection != NULL)
+	{
+		delete mpBoxCollection;
+	}
+	mpBoxCollection = NULL;
+}
+
+template<unsigned SPACE_DIM>
+void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize)
+{
+	mpBoxCollection = new BoxCollection<SPACE_DIM>(cutOffLength, domainSize);
+	mpBoxCollection->SetupLocalBoxesHalfOnly();
+
+	//Put the nodes in the boxes.
+    for (unsigned i=0; i< this->GetNumNodes(); i++)
+    {
+        unsigned box_index = mpBoxCollection->CalculateContainingBox(this->GetNode(i));
+        mpBoxCollection->rGetBox(box_index).AddNode(this->GetNode(i));
+    }
+}
+
+template<unsigned SPACE_DIM>
+void NodesOnlyMesh<SPACE_DIM>::SetMaximumInteractionDistance(double maximumInteractionDistance)
+{
+	mMaximumInteractionDistance = maximumInteractionDistance;
+}
+
+template<unsigned SPACE_DIM>
+void NodesOnlyMesh<SPACE_DIM>::CalculateNodePairs(std::set<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs)
+{
+	assert(mpBoxCollection != NULL);
+	mpBoxCollection->CalculateNodePairs(this->mNodes, rNodePairs);
 }
 
 template<unsigned SPACE_DIM>

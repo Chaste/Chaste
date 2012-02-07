@@ -133,6 +133,17 @@ public:
         std::vector<CellPtr> cells_copy(cells);
         NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
 
+        // Check box collection gets setup properly.
+        c_vector<double, 4> domainSize;
+        for (unsigned i=0; i< 2 ;i++)
+        {
+        	domainSize[2*i] = -10.0;
+        	domainSize[2*i+1] = 10.0;
+        }
+        node_based_cell_population.SplitUpIntoBoxes(1.2, domainSize);
+
+        TS_ASSERT_EQUALS(node_based_cell_population.GetBoxCollection()->GetNumBoxes(), 289u);
+
         TS_ASSERT_EQUALS(node_based_cell_population.GetNumNodes(), mesh.GetNumNodes());
         TS_ASSERT_EQUALS(node_based_cell_population.rGetCells().size(), num_cells);
 

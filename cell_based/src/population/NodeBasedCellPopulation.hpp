@@ -53,9 +53,6 @@ protected:
 
 private:
 
-    /** Pointer to a Node box collection. */
-    BoxCollection<DIM>* mpBoxCollection;
-
     /** Vector of minimal spatial positions in each dimension. */
     c_vector<double, DIM> mMinSpatialPositions;
 
@@ -210,7 +207,7 @@ public:
     unsigned RemoveDeadCells();
 
     /**
-     * Reset the member variables #mNodePairs and #mpBoxCollection.
+     * Reset the member variables #mNodePairs and mpBoxCollection in the underlying mesh.
      */
     void Clear();
 

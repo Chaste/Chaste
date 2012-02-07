@@ -31,7 +31,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
-
+#include "BoxCollection.hpp"
 #include "MutableMesh.hpp"
 
 /**
@@ -49,6 +49,19 @@ private:
      * ConstructNodesWithoutMesh()
      */
     std::vector<double> mCellRadii;
+
+    /**
+     * A pointer to a box collection. Used to calculate neighbourhood information
+     * for nodes in the mesh
+     */
+    BoxCollection<SPACE_DIM>* mpBoxCollection;
+
+    /**
+     * The maximum interaction distance for two nodes. Defines the maximum
+     * distance between two `neighbouring` nodes.
+     */
+    double mMaximumInteractionDistance;
+
 
     friend class TestNodesOnlyMesh;
 
@@ -77,6 +90,11 @@ private:
     }
 
 public:
+
+    /**
+     * Default constructor to initialise BoxCollection to NULL.
+     */
+    NodesOnlyMesh();
 
     /**
      * Construct the mesh using only nodes. No mesh is created, but the nodes are stored.
@@ -121,6 +139,40 @@ public:
      * @param radius the cell radius
      */
     void SetCellRadius(unsigned index, double radius);
+
+    /**
+     * Get mpBoxCollection
+     *
+     * @return mpBoxCollection
+     */
+    BoxCollection<SPACE_DIM>* GetBoxCollection();
+
+    /**
+     * Clear the BoxCollection
+     */
+    void ClearBoxCollection();
+
+    /**
+     * Set up the box collection
+     *
+     * @param cutOffLength the cut off length for node neighbours
+     * @param domainSize the size of the domain containing the nodes.
+     */
+    void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize);
+
+    /**
+     * Set the maximum interaction distance between nodes
+     *
+     * @param maximumInteractionDistance the maximum distance between two neighbouring nodes
+     */
+    void SetMaximumInteractionDistance(double maximumInteractionDistance);
+
+    /**
+     * Calculate pairs of nodes using the BoxCollection
+     *
+     * @param rNodePairs reference to the set of node pairs to populate.
+     */
+    void CalculateNodePairs(std::set<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs);
 
     /**
      * Overridden ReMesh() method.

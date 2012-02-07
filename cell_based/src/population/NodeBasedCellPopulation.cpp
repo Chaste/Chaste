@@ -37,7 +37,6 @@ NodeBasedCellPopulation<DIM>::NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh,
                                       bool deleteMesh)
     : AbstractCentreBasedCellPopulation<DIM>(rCells, locationIndices),
       mrMesh(rMesh),
-      mpBoxCollection(NULL),
       mDeleteMesh(deleteMesh),
       mMechanicsCutOffLength(DBL_MAX)
 {
@@ -48,7 +47,6 @@ template<unsigned DIM>
 NodeBasedCellPopulation<DIM>::NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh)
     : AbstractCentreBasedCellPopulation<DIM>(),
       mrMesh(rMesh),
-      mpBoxCollection(NULL),
       mDeleteMesh(true),
       mMechanicsCutOffLength(DBL_MAX) // will be set by serialize() method
 {
@@ -80,8 +78,6 @@ const NodesOnlyMesh<DIM>& NodeBasedCellPopulation<DIM>::rGetMesh() const
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::Clear()
 {
-    delete mpBoxCollection;
-    mpBoxCollection = NULL;
     mNodePairs.clear();
 }
 
@@ -112,14 +108,7 @@ void NodeBasedCellPopulation<DIM>::Validate()
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::SplitUpIntoBoxes(double cutOffLength, c_vector<double, 2*DIM> domainSize)
 {
-    mpBoxCollection = new BoxCollection<DIM>(cutOffLength, domainSize);
-    mpBoxCollection->SetupLocalBoxesHalfOnly();
-
-    for (unsigned i=0; i<mrMesh.GetNumNodes(); i++)
-    {
-        unsigned box_index = mpBoxCollection->CalculateContainingBox(this->GetNode(i));
-        mpBoxCollection->rGetBox(box_index).AddNode(this->GetNode(i));
-    }
+	mrMesh.SetUpBoxCollection(cutOffLength, domainSize);
 }
 
 template<unsigned DIM>
@@ -206,10 +195,7 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 
     mrMesh.SetMeshHasChangedSinceLoading();
 
-    if (mpBoxCollection != NULL)
-    {
-        delete mpBoxCollection;
-    }
+    mrMesh.ClearBoxCollection();
 
     FindMaxAndMin();
 
@@ -233,15 +219,10 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
      * Allocates memory for mpBoxCollection and does the splitting
      * and putting nodes into boxes.
      */
-    SplitUpIntoBoxes(mMechanicsCutOffLength, domain_size);
 
-    std::vector<Node<DIM>*> nodes;
-    for (unsigned index=0; index<mrMesh.GetNumNodes(); index++)
-    {
-        Node<DIM>* p_node = mrMesh.GetNode(index);
-        nodes.push_back(p_node);
-    }
-    mpBoxCollection->CalculateNodePairs(nodes, mNodePairs);
+    mrMesh.SetUpBoxCollection(mMechanicsCutOffLength, domain_size);
+
+    mrMesh.CalculateNodePairs(mNodePairs);
 }
 
 template<unsigned DIM>
@@ -287,7 +268,7 @@ unsigned NodeBasedCellPopulation<DIM>::GetNumNodes()
 template<unsigned DIM>
 BoxCollection<DIM>* NodeBasedCellPopulation<DIM>::GetBoxCollection()
 {
-    return mpBoxCollection;
+    return mrMesh.GetBoxCollection();
 }
 
 template<unsigned DIM>

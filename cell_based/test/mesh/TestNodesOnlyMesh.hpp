@@ -213,6 +213,9 @@ public:
         mesh.SetCellRadius(0, 1.0);
         mesh.SetCellRadius(1, 2.0);
 
+        // Coverage
+        mesh.SetMaximumInteractionDistance(1.0);
+
         TS_ASSERT_DELTA(mesh.GetCellRadius(0), 1.0, 1e-6);
         TS_ASSERT_DELTA(mesh.GetCellRadius(1), 2.0, 1e-6);
 
