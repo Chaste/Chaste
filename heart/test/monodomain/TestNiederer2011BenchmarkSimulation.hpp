@@ -36,6 +36,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "PlaneStimulusCellFactory.hpp"
 #include "TenTusscher2006Epi.hpp"
 #include "TenTusscher2006EpiBackwardEuler.hpp"
+#include "NumericFileComparison.hpp"
 
 /* This test provides the code for, and runs one simulation of, the benchmark problem defined in
  * the paper:
@@ -170,9 +171,21 @@ private:
         DistributedVectorFactory factory(mesh.GetNumNodes());
         Vec voltage = factory.CreateVec();
 
-        std::vector<double> activation_times(mesh.GetNumNodes(), -1.0);
         unsigned the_node = 0; //corner node
+        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        {
+         
+            double x = mesh.GetNode(i)->rGetLocation()[0];
+            double y = mesh.GetNode(i)->rGetLocation()[1];
+            double z = mesh.GetNode(i)->rGetLocation()[2];
+            if( fabs(x-2.0) + fabs(y-0.7) + fabs(z-0.3) < 1e-8)
+            {
+                the_node = i;
+            }
+        } 
 
+        std::vector<double> activation_times(mesh.GetNumNodes(), -1.0);
+        std::vector<double> last_negative_voltage(mesh.GetNumNodes(), 1.0);
         for(unsigned timestep=0; timestep<num_timesteps; timestep++)
         {
             reader.GetVariableOverNodes(voltage, "V", timestep);
@@ -183,32 +196,35 @@ private:
                 double V = voltage_repl[i];
                 if(V > 0 && activation_times[i] < 0.0)
                 {
-                    activation_times[i] = timestep*printing_dt;
-
-                    double x = mesh.GetNode(i)->rGetLocation()[0];
-                    double y = mesh.GetNode(i)->rGetLocation()[1];
-                    double z = mesh.GetNode(i)->rGetLocation()[2];
-                    if( fabs(x-2.0) + fabs(y-0.7) + fabs(z-0.3) < 1e-8)
-                    {
-                        the_node = i;
-                    }
+                    double old = last_negative_voltage[i];
+                    assert(old < 0);
+                    activation_times[i] = (timestep-V/(V-old))*printing_dt;
+                } 
+                else if (V<=0)
+                {
+                    last_negative_voltage[i]=V;
                 }
             }
         }
 
-        std::cout << "h, dt = " << h << ", " << dt << "\n\t";
-        std::cout << "activation_times[" << the_node << "] = " << activation_times[the_node] << "\n";
-
+        if (PetscTools::AmMaster())
+        {
+            std::cout << "h, dt = " << h << ", " << dt << "\n\t";
+            std::cout << "activation_times[" << the_node << "] = " << activation_times[the_node] << "\n";
+        }
         OutputFileHandler handler("ActivationMaps", false);
         std::stringstream output_file;
         output_file << "activation" << "_h" << h << "_dt" << dt << ".dat";
-        out_stream p_file = handler.OpenOutputFile(output_file.str());
-
-        for(unsigned i=0; i<activation_times.size(); i++)
+        if (PetscTools::AmMaster())
         {
-            *p_file << activation_times[i] << "\n";
+            out_stream p_file = handler.OpenOutputFile(output_file.str());
+    
+            for(unsigned i=0; i<activation_times.size(); i++)
+            {
+                *p_file << activation_times[i] << "\n";
+            }
+            p_file->close();
         }
-        p_file->close();
 
         for(unsigned i=0; i<activation_times.size(); i++)
         {
@@ -238,8 +254,12 @@ public:
 
         // test the activation times produced match those given for the Niederer et al paper
         std::string results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "ActivationMaps";
-        std::string command = "diff " + results_dir + "/activation_h0.05_dt0.01.dat heart/test/data/benchmark_data_orig/activation_time_h0.05_dt0.01.dat";
-        TS_ASSERT_EQUALS(system(command.c_str()), 0);
+        std::string output_file = results_dir + "/activation_h0.05_dt0.01.dat";
+        std::string base_file = "heart/test/data/benchmark_data_orig/activation_time_h0.05_dt0.01.dat";
+   
+        NumericFileComparison num_comp(output_file, base_file);
+        TS_ASSERT(num_comp.CompareFiles(1.5e-3)); //Absolute difference of 1.5 microsecond is tolerated
+         
     }
 };
 
