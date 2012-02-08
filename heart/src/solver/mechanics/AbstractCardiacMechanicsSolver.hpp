@@ -490,7 +490,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetVariableFibreShee
     mpVariableFibreSheetDirections = new std::vector<c_matrix<double,DIM,DIM> >(num_entries, zero_matrix<double>(DIM,DIM));
     for(unsigned index=0; index<num_entries; index++)
     {
-        reader.GetNextFibreSheetAndNormalMatrix( (*mpVariableFibreSheetDirections)[index] );
+        reader.GetFibreSheetAndNormalMatrix(index, (*mpVariableFibreSheetDirections)[index] );
     }
 }
 

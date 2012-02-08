@@ -95,7 +95,7 @@ void FibreReader<DIM>::GetAllOrtho(std::vector< c_vector<double, DIM> >& first_d
     for (unsigned i=0; i<mNumLinesOfData; i++)
     {
         c_matrix<double, DIM, DIM> temp_matrix;
-        GetNextFibreSheetAndNormalMatrix(temp_matrix, true);
+        GetFibreSheetAndNormalMatrix(i, temp_matrix, true);
 
         //Note that although the matrix appears row-wise in the ascii .ortho file,
         //for convenience it is stored column-wise.
@@ -115,22 +115,36 @@ void FibreReader<DIM>::GetAllOrtho(std::vector< c_vector<double, DIM> >& first_d
 
 }
 template<unsigned DIM>
-void FibreReader<DIM>::GetNextFibreSheetAndNormalMatrix(c_matrix<double,DIM,DIM>& rFibreMatrix,
-                                                        bool checkOrthogonality)
+void FibreReader<DIM>::GetFibreSheetAndNormalMatrix(unsigned fibreIndex,
+                                                    c_matrix<double,DIM,DIM>& rFibreMatrix,
+                                                    bool checkOrthogonality)
 {
     if (mNumItemsPerLine != DIM*DIM)
     {
         EXCEPTION("Use GetFibreVector when reading axisymmetric fibres");
     }
-
+    if (fibreIndex < mNextIndex)
+    {
+        EXCEPTION("Fibre reads must be monotonically increasing; " << fibreIndex
+                << " is before expected next index " << mNextIndex);
+    }
     if (mFileIsBinary)
     {
-        //Take mNumItemsPerLine from the ifstream
+
+        // Skip to the desired index
+        mDataFile.seekg((fibreIndex-mNextIndex)*mNumItemsPerLine*sizeof(double), std::ios::cur);
+        // Take mNumItemsPerLine from the ifstream
         mDataFile.read((char*)&(rFibreMatrix(0,0)), mNumItemsPerLine*sizeof(double));
+        mNextIndex = fibreIndex+1;
     }
     else
     {
-        unsigned num_entries = GetTokensAtNextLine();
+        unsigned num_entries = 0u;
+        while (fibreIndex >= mNextIndex)
+        {
+             num_entries = GetTokensAtNextLine();
+             mNextIndex++;
+        }
         if(num_entries < mNumItemsPerLine)
         {
             EXCEPTION("A line is incomplete in " << mFilePath
@@ -179,7 +193,7 @@ void FibreReader<DIM>::GetFibreVector(unsigned fibreIndex,
 {
     if (mNumItemsPerLine != DIM)
     {
-        EXCEPTION("Use GetNextFibreSheetAndNormalMatrix when reading orthotropic fibres");
+        EXCEPTION("Use GetFibreSheetAndNormalMatrix when reading orthotropic fibres");
     }
     if (fibreIndex < mNextIndex)
     {

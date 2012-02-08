@@ -104,7 +104,7 @@ public:
 
 
     /**
-     * Read the next fibre direction matrix from the file.  Must only be used when
+     * Read a fibre direction matrix from the file.  Must only be used when
      * reading an orthotropic file.  These have lines of the form
      * \code
      *  fibre0 fibre1 fibre2 sheet0 sheet1 sheet2 normal0 normal1 normal2
@@ -116,11 +116,14 @@ public:
      *     [ fibre2   sheet2   normal2  ]
      * \endcode
      *
+     * @param fibreIndex  which fibre vector to read.  Note that vectors must be read
+     *     in monotonically increasing order, so subsequent calls to this method must
+     *     always pass a strictly greater index.  They may skip vectors, however.
      * @param rFibreMatrix  matrix to be filled in
      * @param checkOrthogonality  if true, checks if the matrix is orthogonal
      *    and throws an exception if not
      */
-    void GetNextFibreSheetAndNormalMatrix(c_matrix<double,DIM,DIM>& rFibreMatrix, bool checkOrthogonality=true);
+    void GetFibreSheetAndNormalMatrix(unsigned fibreIndex, c_matrix<double,DIM,DIM>& rFibreMatrix, bool checkOrthogonality=true);
 
     /**
      * Read a fibre direction vector from the file.  Must only be used when
