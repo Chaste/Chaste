@@ -536,11 +536,9 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
         }
         catch (Exception &e)
         {
-            // This code will be needed in the future, not being covered now.
-            // Add a test which covers this, eg  by doing a simulation with a bad stimulus for one of the
-            // Purkinje cells - stimulating with the wrong choice of sign say. Do after
-            // AbstractCardiacProblem has been finished to allow the user to easily set up purkinje
-            // problems
+            ///\todo #2017 This code will be needed in the future, not being covered now.
+            /// Add a test which covers this, e.g.  by doing a simulation with a bad stimulus for one of the
+            /// Purkinje cells - stimulating with the wrong choice of sign say.
 
             NEVER_REACHED;
             //PetscTools::ReplicateException(true);
