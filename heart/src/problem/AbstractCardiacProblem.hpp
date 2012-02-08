@@ -541,7 +541,7 @@ public:
     AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM> & rGetMesh();
 
     /**
-     * @return the cardiac PDE used
+     * @return the cardiac tissue object used
      */
     AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>* GetTissue();
 
@@ -758,12 +758,11 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::LoadExtraArchive
     }
 
     // Are we a bidomain problem?
-    if (PROBLEM_DIM == 2)
+    BidomainProblem<ELEMENT_DIM>* p_bidomain_problem = dynamic_cast<BidomainProblem<ELEMENT_DIM>*>(this);
+    if (p_bidomain_problem)
     {
         assert(ELEMENT_DIM == SPACE_DIM);
-        BidomainProblem<ELEMENT_DIM>* p_problem = dynamic_cast<BidomainProblem<ELEMENT_DIM>*>(this);
-        assert(p_problem);
-        p_problem->LoadExtraArchiveForBidomain(archive, version);
+        p_bidomain_problem->LoadExtraArchiveForBidomain(archive, version);
     }
 }
 

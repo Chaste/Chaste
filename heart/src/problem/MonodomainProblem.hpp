@@ -62,14 +62,14 @@ class MonodomainProblem : public AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, 
     }
 
 protected:
-    /** The monodomain PDE object */
+    /** The monodomain tissue object. */
     MonodomainTissue<ELEMENT_DIM,SPACE_DIM>* mpMonodomainTissue;
 
 public:
-    /** Create our monodomain PDE */
+    /** Create our monodomain tissue. */
     AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>* CreateCardiacTissue();
 
-    /** Create an suitable solver for monodomain problems */
+    /** Create an suitable solver for monodomain problems. */
     AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, 1>* CreateSolver();
 
 public:
