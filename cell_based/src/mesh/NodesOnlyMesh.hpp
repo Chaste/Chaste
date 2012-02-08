@@ -97,6 +97,11 @@ public:
     NodesOnlyMesh();
 
     /**
+     * Over-written destructor to delete pointer to BoxCollection
+     */
+    ~NodesOnlyMesh();
+
+    /**
      * Construct the mesh using only nodes. No mesh is created, but the nodes are stored.
      * The original vector of nodes is deep-copied: new node objects are made with are
      * independent of the pointers in the input so that they can be safely deleted.

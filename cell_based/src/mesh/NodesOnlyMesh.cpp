@@ -37,6 +37,13 @@ NodesOnlyMesh<SPACE_DIM>::NodesOnlyMesh()
 }
 
 template<unsigned SPACE_DIM>
+NodesOnlyMesh<SPACE_DIM>::~NodesOnlyMesh()
+{
+	Clear();
+	ClearBoxCollection();
+}
+
+template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<SPACE_DIM>*>& rNodes)
 {
     this->Clear();
