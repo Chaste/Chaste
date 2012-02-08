@@ -533,16 +533,18 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
                 // update the Iionic and stimulus caches
                 UpdatePurkinjeCaches(index.Global, index.Local, nextTime);
             }
-
-            if(updateVoltage)
-            {
-                dist_solution.Restore();
-            }
         }
         catch (Exception &e)
         {
-            PetscTools::ReplicateException(true);
-            throw e;
+            // This code will be needed in the future, not being covered now.
+            // Add a test which covers this, eg  by doing a simulation with a bad stimulus for one of the
+            // Purkinje cells - stimulating with the wrong choice of sign say. Do after
+            // AbstractCardiacProblem has been finished to allow the user to easily set up purkinje
+            // problems
+
+            NEVER_REACHED;
+            //PetscTools::ReplicateException(true);
+            //throw e;
         }
     }
 
@@ -693,13 +695,18 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::UpdatePurkinjeCaches(unsigned
 template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
 void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::ReplicateCaches()
 {
+    // ReplicateCaches only needed for SVI (and non-matrix based assembly which is no longer in code)
+    // which is not implemented with purkinje. See commented code below if introducing this.
+    assert(!mHasPurkinje);
+
     mIionicCacheReplicated.Replicate(mpDistributedVectorFactory->GetLow(), mpDistributedVectorFactory->GetHigh());
     mIntracellularStimulusCacheReplicated.Replicate(mpDistributedVectorFactory->GetLow(), mpDistributedVectorFactory->GetHigh());
-    if (mHasPurkinje)
-    {
-        mPurkinjeIionicCacheReplicated.Replicate(mpDistributedVectorFactory->GetLow(), mpDistributedVectorFactory->GetHigh());
-        mPurkinjeIntracellularStimulusCacheReplicated.Replicate(mpDistributedVectorFactory->GetLow(), mpDistributedVectorFactory->GetHigh());
-    }
+
+    //if (mHasPurkinje)
+    //{
+    //    mPurkinjeIionicCacheReplicated.Replicate(mpDistributedVectorFactory->GetLow(), mpDistributedVectorFactory->GetHigh());
+    //    mPurkinjeIntracellularStimulusCacheReplicated.Replicate(mpDistributedVectorFactory->GetLow(), mpDistributedVectorFactory->GetHigh());
+    //}
 }
 
 template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
