@@ -33,6 +33,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 import os
 import signal
 import sys
+import time
 
 sim = '-s' in sys.argv
 if '-d' in sys.argv:
@@ -41,23 +42,55 @@ if '-d' in sys.argv:
 else:
     kill_dir = os.path.realpath(os.getcwd())
 
-print "Killing processes owned by", os.getuid(), "in", kill_dir
+our_uid = os.getuid()
+our_pid = os.getpid()
 
-for pid in os.listdir('/proc/'):
-    if pid[0] in "0123456789":
-        try:
-            s = os.stat('/proc/' + pid)
-            if s.st_uid == os.getuid():
-                cwd = os.path.realpath('/proc/' + pid + '/cwd')
-                if cwd == kill_dir and int(pid) != os.getpid():
-                    print pid, "is running from our dir as",
-                    f = open('/proc/' + pid + '/cmdline')
-                    cmdline = f.read().split('\x00')[:-1]
-                    f.close()
-                    print cmdline[0:3]
-                    if not sim:
-                        os.kill(int(pid), signal.SIGTERM)
-                        print " ** SENT SIGTERM  mwa ha ha"
-        except OSError:
-            # We can't read all our processes; that's ok
-            pass
+print "Killing processes owned by", our_uid, "in", kill_dir
+
+def check_pid(pid):
+    """Get information about the given process (pid is a string).
+
+    Returns a list with the command line elements if it's
+    running as our_uid in the kill_dir, or None otherwise.
+    """
+    result = None
+    try:
+        s = os.stat('/proc/' + pid)
+        if s.st_uid == our_uid:
+            cwd = os.path.realpath('/proc/' + pid + '/cwd')
+            if cwd == kill_dir and int(pid) != our_pid:
+                f = open('/proc/' + pid + '/cmdline')
+                cmdline = f.read().split('\x00')[:-1]
+                f.close()
+                result = cmdline
+    except OSError:
+        # We can't read all our processes; that's ok
+        pass
+    return result
+
+test_pids = filter(lambda pid: pid[0] in "0123456789", os.listdir('/proc'))
+
+# First, try killing off scons
+for pid in test_pids:
+    cmdline = check_pid(pid)
+    if cmdline is not None:
+        if len(cmdline) > 1 and 'scons' in cmdline[1]:
+            print "SCons is running as PID", pid
+            if not sim:
+                os.kill(int(pid), signal.SIGTERM)
+                print "  ** Killing (sent SIGTERM)"
+                # Now sleep for a bit to let it die
+                time.sleep(10) # seconds
+                # Then re-check running proceses
+                test_pids = filter(lambda pid: pid[0] in "0123456789",
+                                   os.listdir('/proc'))
+                break
+
+# Next, try killing everything still running
+for pid in test_pids:
+    cmdline = check_pid(pid)
+    if cmdline is not None:
+        print pid, "is running from our dir as", cmdline[0:3]
+        if not sim:
+            os.kill(int(pid), signal.SIGTERM)
+            print "  ** Killing (sent SIGTERM)"
