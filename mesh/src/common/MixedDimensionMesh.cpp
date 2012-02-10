@@ -59,7 +59,7 @@ void MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader(Abstrac
     {
         ElementData element_data = rMeshReader.GetNextCableElementData();
         //Convert the node indices from the original to the permuted
-        if ( this->mNodesPermutation.empty() == false)
+        if (!this->mNodesPermutation.empty())
         {
             for (unsigned j=0; j<2; j++) // cables are always 1d
             {
@@ -104,7 +104,7 @@ void MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader(Abstrac
                 }
             }
 
-            Element<1u, SPACE_DIM>* p_element = new Element<1u,SPACE_DIM>(element_index, nodes);
+            Element<1u, SPACE_DIM>* p_element = new Element<1u,SPACE_DIM>(element_index, nodes, false);
             RegisterCableElement(element_index);
             this->mCableElements.push_back(p_element);
 
@@ -118,6 +118,7 @@ void MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader(Abstrac
 
     rMeshReader.Reset();
 }
+
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::RegisterCableElement(unsigned index)
 {

@@ -52,8 +52,9 @@ public:
      *
      * @param index  the index of the element in the mesh
      * @param rNodes  the nodes owned by the element
+     * @param registerWithNodes  whether to tell the nodes that they are contained in this element
      */
-    Element(unsigned index, const std::vector<Node<SPACE_DIM>*>& rNodes);
+    Element(unsigned index, const std::vector<Node<SPACE_DIM>*>& rNodes, bool registerWithNodes=true);
 
     /**
      * "Copy" constructor which allows a new index to be specified.
