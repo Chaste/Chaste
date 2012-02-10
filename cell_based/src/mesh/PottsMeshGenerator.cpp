@@ -34,13 +34,9 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
                                             unsigned numNodesDeep, unsigned numElementsDeep, unsigned elementDepth,
                                             bool startAtBottomLeft, bool isPeriodicInX, bool isPeriodicInY ,bool isPeriodicInZ)
 {
-    assert(numElementsAcross > 0);
-    assert(numElementsUp > 0);
-    assert(elementWidth > 0);
-    assert(elementHeight > 0);
-    assert(numElementsDeep > 0);
+    assert(numNodesAcross > 0);
+    assert(numNodesUp > 0);
     assert(numNodesDeep > 0);
-    assert(elementDepth > 0);
 
     assert(numElementsAcross*elementWidth <= numNodesAcross);
     assert(numElementsUp*elementHeight <= numNodesUp);

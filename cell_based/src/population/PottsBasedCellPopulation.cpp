@@ -349,7 +349,7 @@ void PottsBasedCellPopulation<DIM>::WriteResultsToFiles()
     {
         unsigned elem_index = this->GetLocationIndexUsingCell(*cell_iter);
 
-        // Hack that covers the case where the element is associated with a cell that has just been killed (#11DIM9)
+        // Hack that covers the case where the element is associated with a cell that has just been killed (#1129)
         bool elem_corresponds_to_dead_cell = false;
 
         if (this->mLocationCellMap[elem_index])
