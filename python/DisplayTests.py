@@ -75,7 +75,7 @@ def index(req):
         output.append('\n    <li><a href="%s/recent?type=%s">%s</a></li>'
                         % (_our_url, tests_type, text))
     output.append("""</ul>
-    <p>Branch builds: (<a style='text-decoration: underline; color: blue;' onclick="toggle_visibility('branch-list');">toggle visibility</a>)</p>
+    <p>Branch/project builds: (<a style='text-decoration: underline; color: blue;' onclick="toggle_visibility('branch-list');">toggle visibility</a>)</p>
     <ul id='branch-list' style='display:none;'>""")
     for tests_type in branch_types:
         output.append('\n    <li><a href="%s/recent?type=%s">Recent %s builds.</a></li>' %
