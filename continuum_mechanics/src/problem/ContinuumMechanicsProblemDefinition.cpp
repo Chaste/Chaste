@@ -26,6 +26,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
+#include <limits>
 
 #include "ContinuumMechanicsProblemDefinition.hpp"
 #include "AbstractIncompressibleMaterialLaw.hpp"
@@ -33,7 +34,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 
 
 template<unsigned DIM>
-const double ContinuumMechanicsProblemDefinition<DIM>::FREE = DBL_MAX;
+const double ContinuumMechanicsProblemDefinition<DIM>::FREE = std::numeric_limits<double>::max();
 
 template<unsigned DIM>
 ContinuumMechanicsProblemDefinition<DIM>::ContinuumMechanicsProblemDefinition(QuadraticMesh<DIM>& rMesh)
