@@ -192,8 +192,8 @@ public:
     // Test the functionality specific to SolidMechanicsProblemDefinition
     void TestSolidMechanicsProblemDefinition() throw(Exception)
     {
-        TS_ASSERT_EQUALS(ContinuumMechanicsProblemDefinition<2>::FREE, DBL_MAX);
-        TS_ASSERT_LESS_THAN(0, ContinuumMechanicsProblemDefinition<2>::FREE);
+        TS_ASSERT_EQUALS(SolidMechanicsProblemDefinition<2>::FREE, DBL_MAX);
+        TS_ASSERT_LESS_THAN(0, SolidMechanicsProblemDefinition<2>::FREE);
 
         QuadraticMesh<2> mesh(0.5, 1.0, 1.0);
 
@@ -237,11 +237,11 @@ public:
 
         // Node 9 is to be placed at (0.5,FREE)
         location(0) = 0.5;
-        location(1) = ContinuumMechanicsProblemDefinition<2>::FREE;
+        location(1) = SolidMechanicsProblemDefinition<2>::FREE;
         locations.push_back(location);
 
         // Node 9 is to be placed at (FREE,1.5)
-        location(0) = ContinuumMechanicsProblemDefinition<2>::FREE;
+        location(0) = SolidMechanicsProblemDefinition<2>::FREE;
         location(1) = 1.5;
         locations.push_back(location);
 
@@ -266,8 +266,8 @@ public:
         TS_ASSERT_EQUALS(problem_defn.rGetDirichletNodes()[3], 9u);
         TS_ASSERT_EQUALS(problem_defn.rGetDirichletNodes()[4], 10u);
         TS_ASSERT_DELTA(problem_defn.rGetDirichletNodeValues()[3](0), 0.5 - mesh.GetNode(9)->rGetLocation()[0], 1e-12);
-        TS_ASSERT_DELTA(problem_defn.rGetDirichletNodeValues()[3](1), ContinuumMechanicsProblemDefinition<2>::FREE, 1e-12);
-        TS_ASSERT_DELTA(problem_defn.rGetDirichletNodeValues()[4](0), ContinuumMechanicsProblemDefinition<2>::FREE, 1e-12);
+        TS_ASSERT_DELTA(problem_defn.rGetDirichletNodeValues()[3](1), SolidMechanicsProblemDefinition<2>::FREE, 1e-12);
+        TS_ASSERT_DELTA(problem_defn.rGetDirichletNodeValues()[4](0), SolidMechanicsProblemDefinition<2>::FREE, 1e-12);
         TS_ASSERT_DELTA(problem_defn.rGetDirichletNodeValues()[4](1), 1.5 - mesh.GetNode(10)->rGetLocation()[1], 1e-12);
 
 
@@ -393,10 +393,10 @@ public:
         fixed_flows.push_back(flow);
 
         flow(0) = 0.5;
-        flow(1) = ContinuumMechanicsProblemDefinition<2>::FREE;
+        flow(1) = StokesFlowProblemDefinition<2>::FREE;
         fixed_flows.push_back(flow);
 
-        flow(0) = ContinuumMechanicsProblemDefinition<2>::FREE;
+        flow(0) = StokesFlowProblemDefinition<2>::FREE;
         flow(1) = 1.5;
         fixed_flows.push_back(flow);
 
@@ -421,8 +421,8 @@ public:
         TS_ASSERT_EQUALS(problem_defn.rGetDirichletNodes()[3], 9u);
         TS_ASSERT_EQUALS(problem_defn.rGetDirichletNodes()[4], 10u);
         TS_ASSERT_DELTA(problem_defn.rGetDirichletNodeValues()[3](0), 0.5, 1e-12);
-        TS_ASSERT_DELTA(problem_defn.rGetDirichletNodeValues()[3](1), ContinuumMechanicsProblemDefinition<2>::FREE, 1e-12);
-        TS_ASSERT_DELTA(problem_defn.rGetDirichletNodeValues()[4](0), ContinuumMechanicsProblemDefinition<2>::FREE, 1e-12);
+        TS_ASSERT_DELTA(problem_defn.rGetDirichletNodeValues()[3](1), StokesFlowProblemDefinition<2>::FREE, 1e-12);
+        TS_ASSERT_DELTA(problem_defn.rGetDirichletNodeValues()[4](0), StokesFlowProblemDefinition<2>::FREE, 1e-12);
         TS_ASSERT_DELTA(problem_defn.rGetDirichletNodeValues()[4](1), 1.5, 1e-12);
 
         // should not throw anything
