@@ -110,17 +110,24 @@ unsigned AbstractCellBasedSimulation<DIM>::DoCellBirth()
         {
             if (cell_iter->ReadyToDivide())
             {
-                // Create a new cell
-                CellPtr p_new_cell = cell_iter->Divide();
+                try
+                {
+                    // Create a new cell
+                    CellPtr p_new_cell = cell_iter->Divide();
 
-                // Call method that determines how cell division occurs and returns a vector
-                c_vector<double, DIM> new_location = CalculateCellDivisionVector(*cell_iter);
+                    // Call method that determines how cell division occurs and returns a vector
+                    c_vector<double, DIM> new_location = CalculateCellDivisionVector(*cell_iter);
 
-                // Add new cell to the cell population
-                mrCellPopulation.AddCell(p_new_cell, new_location, *cell_iter);
+                    // Add new cell to the cell population
+                    mrCellPopulation.AddCell(p_new_cell, new_location, *cell_iter);
 
-                // Update counter
-                num_births_this_step++;
+                    // Update counter
+                    num_births_this_step++;
+                }
+                catch (Exception& e)
+                {
+                    // Don't do anything
+                }
             }
         }
     }
