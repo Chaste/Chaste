@@ -220,7 +220,7 @@ void OnLatticeSimulation<DIM>::OutputAdditionalSimulationSetup(out_stream& rPara
             (*iter)->OutputUpdateRuleInfo(rParamsFile);
         }
     }
-    else
+    else if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
     {
         std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > > collection =
             static_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->rGetUpdateRuleCollection();
@@ -231,6 +231,10 @@ void OnLatticeSimulation<DIM>::OutputAdditionalSimulationSetup(out_stream& rPara
         {
             (*iter)->OutputUpdateRuleInfo(rParamsFile);
         }
+    }
+    else
+    {
+    	//\todo define the method for `MultipleCaBasedCellPopulation`
     }
     *rParamsFile << "\t</UpdateRules>\n";
 }
