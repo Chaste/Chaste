@@ -29,6 +29,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "PottsBasedCellPopulation.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "Warnings.hpp"
+#include "CellwiseData.hpp"
 
 // Needed to convert mesh in order to write nodes to VTK (visualize as glyphs)
 #include "VtkMeshWriter.hpp"
@@ -568,7 +569,18 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile()
     cell_mutation_states.reserve(num_nodes);
     cell_labels.reserve(num_nodes);
     elem_ids.reserve(num_nodes);
+    std::vector<std::vector<double> > cellwise_data;
 
+    if (CellwiseData<DIM>::Instance()->IsSetUp())
+    {
+        CellwiseData<DIM>* p_data = CellwiseData<DIM>::Instance();
+        unsigned num_variables = p_data->GetNumVariables();
+        for (unsigned var=0; var<num_variables; var++)
+        {
+            std::vector<double> cellwise_data_var(num_nodes);
+            cellwise_data.push_back(cellwise_data_var);
+        }
+    }
     for (typename AbstractMesh<DIM,DIM>::NodeIterator iter = mrMesh.GetNodeIteratorBegin();
          iter != mrMesh.GetNodeIteratorEnd();
          ++iter)
@@ -612,6 +624,17 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile()
                 }
                 cell_labels.push_back(cell_label);
             }
+            if (CellwiseData<DIM>::Instance()->IsSetUp())
+            {
+                //unsigned node_index = this->GetLocationIndexUsingCell(p_cell);
+
+                CellwiseData<DIM>* p_data = CellwiseData<DIM>::Instance();
+                unsigned num_variables = p_data->GetNumVariables();
+                for (unsigned var=0; var<num_variables; var++)
+                {
+                    cellwise_data[var][iter->GetIndex()] = p_data->GetValue(p_cell, var);
+                }
+            }
         }
     }
 
@@ -627,6 +650,17 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         mesh_writer.AddPointData("Mutation states", cell_mutation_states);
         assert(cell_labels.size() == num_nodes);
         mesh_writer.AddPointData("Cell labels", cell_labels);
+    }
+
+    if (CellwiseData<DIM>::Instance()->IsSetUp())
+    {
+        for (unsigned var=0; var<cellwise_data.size(); var++)
+        {
+            std::stringstream data_name;
+            data_name << "Cellwise data " << var;
+            std::vector<double> cellwise_data_var = cellwise_data[var];
+            mesh_writer.AddPointData(data_name.str(), cellwise_data_var);
+        }
     }
 
     /*

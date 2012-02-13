@@ -53,6 +53,7 @@ class CellBasedPdeHandler : public Identifiable
     // Allow tests to access private members, in order to test computation of private functions
     friend class TestCellBasedPdeHandler;
     friend class TestOffLatticeSimulationWithPdes;
+    friend class TestOnLatticeSimulationWithPdes;
 
 private:
 
