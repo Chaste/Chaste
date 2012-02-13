@@ -816,7 +816,7 @@ public:
                 fixed_nodes.push_back(i);
                 c_vector<double,2> new_position;
                 new_position(0) = 0;
-                new_position(1) = SolidMechanicsProblemDefinition<2>::FREE;
+                new_position(1) = ContinuumMechanicsProblemDefinition<2>::FREE;
                 locations.push_back(new_position);
             }
         }

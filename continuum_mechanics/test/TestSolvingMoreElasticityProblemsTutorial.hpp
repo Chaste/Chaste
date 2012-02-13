@@ -212,7 +212,7 @@ public:
                 fixed_nodes.push_back(i);
                 /* ..and define y to be 0 but x is fixed */
                 c_vector<double,2> new_location;
-                new_location(0) = SolidMechanicsProblemDefinition<2>::FREE;
+                new_location(0) = ContinuumMechanicsProblemDefinition<2>::FREE;
                 new_location(1) = 0.0;
                 locations.push_back(new_location);
             }
