@@ -357,6 +357,8 @@ public:
 
     void TestPdeOutput() throw(Exception)
     {
+    	EXIT_IF_PARALLEL;
+
         OutputFileHandler handler("TestPottsBasedCellPopulationWithPdes", false);
         std::string results_dir = handler.GetOutputDirectoryFullPath() + "results_from_time_0";
 

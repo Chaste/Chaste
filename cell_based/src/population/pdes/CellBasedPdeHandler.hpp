@@ -135,6 +135,36 @@ protected:
      */
     void WriteAverageRadialPdeSolution(double time);
 
+    /**
+     * Whether we have a NodeBasedCellPopulation
+     *
+     * @return whether mpCellPopulation is of the type NodeBasedCellPopulation
+     */
+    bool IsNodeBasedCellPopulation();
+
+    /**
+     * Whether we have a MeshBasedCellPopulation
+     *
+     * @return whether mpCellPopulation is of the type MeshBasedCellPopulation
+     */
+    bool IsMeshBasedCellPopulation();
+
+    /**
+     * Whether we have a PottsBasedCellPopulation
+     *
+     * @return whether mpCellPopulation is of the type PottsBasedCellPopulation
+     */
+    bool IsPottsBasedCellPopulation();
+
+    /**
+     * Whether we have a MeshBasedCellPopulationWithGhostNodes
+     *
+     * @return whether mpCellPopulation is of the type MeshBasedCellPopulationWithGhostNodes
+     */
+    bool IsMeshBasedCellPopulationWithGhostNodes();
+
+
+
 public:
 
     /**
