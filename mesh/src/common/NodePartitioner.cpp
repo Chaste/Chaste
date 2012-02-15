@@ -32,6 +32,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "PetscMatTools.hpp"
 #include "PetscTools.hpp"
 #include "Timer.hpp"
+#include "TrianglesMeshReader.hpp"
 
 #include "petscao.h"
 
@@ -52,8 +53,7 @@ extern void METIS_PartMeshNodal(int*, int*, int*, int*, int*, int*, int*, int*, 
 
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::DumbPartitioning(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
-                                                               AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
+void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::DumbPartitioning(AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
                                                                std::set<unsigned>& rNodesOwned)
 {
     //Note that if there is not DistributedVectorFactory in the mesh, then a dumb partition based
@@ -65,8 +65,8 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::DumbPartitioning(AbstractMeshReade
     }
 
     for (unsigned node_index = rMesh.GetDistributedVectorFactory()->GetLow();
-       node_index < rMesh.GetDistributedVectorFactory()->GetHigh();
-       node_index++)
+         node_index < rMesh.GetDistributedVectorFactory()->GetHigh();
+         node_index++)
     {
          rNodesOwned.insert(node_index);
     }
@@ -83,6 +83,22 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::MetisLibraryPartitioning(AbstractM
     assert(PetscTools::IsParallel());
 
     assert(ELEMENT_DIM==2 || ELEMENT_DIM==3); // Metis works with triangles and tetras
+
+    //Metis 4.0 cannot partition second order meshes, see #1930
+    TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>* p_mesh_reader=dynamic_cast<TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>*>(&rMeshReader);
+
+    unsigned order_of_elements = 1;
+    if (p_mesh_reader)
+    {
+        //A triangles mesh reader will let you read with non-linear elements
+        order_of_elements = p_mesh_reader->GetOrderOfElements();
+    }
+
+    // If it is a quadratic TrianglesMeshReader
+    if (order_of_elements == 2)
+    {
+        EXCEPTION("Metis cannot partition a quadratic mesh.");
+    }
 
     int nn = rMeshReader.GetNumNodes();
     idxtype* npart = new idxtype[nn];

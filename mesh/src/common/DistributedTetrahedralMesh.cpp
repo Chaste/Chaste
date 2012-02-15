@@ -105,7 +105,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ComputeMeshPartitioning
     else
     {
         /*
-         *  Otherwise we compute the node partition and then we workout element distribution
+         *  Otherwise we compute the node partition and then we work out element distribution
          */
         if (mMetisPartitioning==DistributedTetrahedralMeshPartitionType::METIS_LIBRARY && PetscTools::IsParallel())
         {
@@ -117,7 +117,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ComputeMeshPartitioning
         }
         else
         {
-            NodePartitioner<ELEMENT_DIM, SPACE_DIM>::DumbPartitioning(rMeshReader, *this, rNodesOwned);
+            NodePartitioner<ELEMENT_DIM, SPACE_DIM>::DumbPartitioning(*this, rNodesOwned);
         }
 
         if ( rMeshReader.HasNclFile() )
