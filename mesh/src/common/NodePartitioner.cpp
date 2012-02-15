@@ -61,8 +61,6 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::DumbPartitioning(AbstractMeshReade
     //If there is a DistributedVectorFactory then that one will be returned
     if (rMesh.GetDistributedVectorFactory()->GetProblemSize() != rMesh.GetNumNodes())
     {
-        ///\todo #2004 Can we reset stuff?  Do we need to?  Probably not, so just fix the test which throws this exception
-        rMesh.mpDistributedVectorFactory=NULL;
         EXCEPTION("The distributed vector factory size in the mesh doesn't match the total number of nodes.");
     }
 

@@ -434,6 +434,7 @@ public:
         mesh.SetDistributedVectorFactory(p_wrong_factory2);
         TS_ASSERT_THROWS_THIS(mesh.ConstructFromMeshReader(mesh_reader),
                               "The distributed vector factory size in the mesh doesn't match the total number of nodes.");
+        mesh.mpDistributedVectorFactory=NULL;
         delete p_wrong_factory2;
 
         // OK call
