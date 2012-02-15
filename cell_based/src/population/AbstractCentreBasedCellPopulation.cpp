@@ -126,6 +126,12 @@ bool AbstractCentreBasedCellPopulation<DIM>::IsGhostNode(unsigned index)
 }
 
 template<unsigned DIM>
+bool AbstractCentreBasedCellPopulation<DIM>::IsParticle(unsigned index)
+{
+    return false;
+}
+
+template<unsigned DIM>
 void AbstractCentreBasedCellPopulation<DIM>::GenerateCellResults(unsigned locationIndex,
                                                              std::vector<unsigned>& rCellProliferativeTypeCounter,
                                                              std::vector<unsigned>& rCellCyclePhaseCounter)
@@ -145,6 +151,7 @@ void AbstractCentreBasedCellPopulation<DIM>::GenerateCellResults(unsigned locati
 template<unsigned DIM>
 void AbstractCentreBasedCellPopulation<DIM>::GenerateCellResultsAndWriteToFiles()
 {
+
     // Set up cell type counter
     unsigned num_cell_types = this->mCellProliferativeTypeCount.size();
     std::vector<unsigned> cell_type_counter(num_cell_types);
@@ -172,7 +179,9 @@ void AbstractCentreBasedCellPopulation<DIM>::GenerateCellResultsAndWriteToFiles(
         }
 
         // Write cell data to file
-        if (!(this->GetNode(node_index)->IsDeleted()) && !node_corresponds_to_dead_cell)
+        if (!(this->GetNode(node_index)->IsDeleted())
+        		&& !node_corresponds_to_dead_cell
+        		&& !(this->IsParticle(node_index)))
         {
             this->GenerateCellResults(node_index, cell_type_counter, cell_cycle_phase_counter);
         }

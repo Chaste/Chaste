@@ -103,19 +103,21 @@ private:
 
 
 protected:
-    /**
-     * Move the node with a given index to a new point in space.
-     *
-     * @param nodeIndex the index of the node to be moved
-     * @param rNewLocation the new target location of the node
-     */
-    void SetNode(unsigned nodeIndex, ChastePoint<DIM>& rNewLocation);
 
-private:
+#undef COVERAGE_IGNORE // Avoid prototypes being treated as code by gcov
+    /**
+     * Update mIsParticle if required by a remesh.
+     *
+     * @param rMap A map between node indices before and after remesh
+     */
+    virtual void UpdateParticlesAfterReMesh(NodeMap& rMap);
+
     /**
      * Check consistency of our internal data structures.
      */
-    void Validate();
+    virtual void Validate();
+
+private:
 
     /**
      * Method for Initially Splitting up cell population into neighbouring boxes, to decrease runtime.
@@ -143,6 +145,14 @@ private:
 public:
 
     /**
+     * Move the node with a given index to a new point in space.
+     *
+     * @param nodeIndex the index of the node to be moved
+     * @param rNewLocation the new target location of the node
+     */
+    void SetNode(unsigned nodeIndex, ChastePoint<DIM>& rNewLocation);
+
+    /**
      * Default constructor.
      *
      * Note that the cell population will take responsibility for freeing the memory used by the nodes.
@@ -151,11 +161,13 @@ public:
      * @param rCells a vector of cells
      * @param locationIndices an optional vector of location indices that correspond to real cells
      * @param deleteMesh whether to delete nodes-only mesh in destructor
+     * @param call Validate() in the constructor or not
      */
     NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh,
                             std::vector<CellPtr>& rCells,
                             const std::vector<unsigned> locationIndices=std::vector<unsigned>(),
-                            bool deleteMesh=false);
+                            bool deleteMesh=false,
+                            bool validate=true);
 
     /**
      * Constructor for use by the de-serializer.

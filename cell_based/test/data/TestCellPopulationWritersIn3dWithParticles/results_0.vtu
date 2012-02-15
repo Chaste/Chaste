@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian">
+  <UnstructuredGrid>
+    <Piece NumberOfPoints="13"                   NumberOfCells="0"                   >
+      <PointData>
+        <DataArray type="Float64" Name="Cell types" format="appended" RangeMin="-2"                   RangeMax="0"                    offset="0"                   />
+        <DataArray type="Float64" Name="Ancestors" format="appended" RangeMin="-2"                   RangeMax="4"                    offset="144"                 />
+        <DataArray type="Float64" Name="Mutation states" format="appended" RangeMin="-2"                   RangeMax="0"                    offset="288"                 />
+        <DataArray type="Float64" Name="Ages" format="appended" RangeMin="-2"                   RangeMax="4"                    offset="432"                 />
+        <DataArray type="Float64" Name="Cycle phases" format="appended" RangeMin="-2"                   RangeMax="4"                    offset="576"                 />
+        <DataArray type="Float64" Name="Cell radii" format="appended" RangeMin="0"                    RangeMax="0.5"                  offset="720"                 />
+      </PointData>
+      <CellData>
+        <DataArray type="Float64" Name="Non-particles" format="appended" RangeMin="0"                    RangeMax="1"                    offset="864"                 />
+      </CellData>
+      <Points>
+        <DataArray type="Float64" Name="Vertex positions" NumberOfComponents="3" format="appended" RangeMin="0"                    RangeMax="3.4641016151"         offset="1008"                />
+      </Points>
+      <Cells>
+        <DataArray type="Int64" Name="connectivity" format="appended" RangeMin=""                     RangeMax=""                     offset="1432"                />
+        <DataArray type="Int64" Name="offsets" format="appended" RangeMin=""                     RangeMax=""                     offset="1440"                />
+        <DataArray type="UInt8" Name="types" format="appended" RangeMin=""                     RangeMax=""                     offset="1448"                />
+      </Cells>
+    </Piece>
+  </UnstructuredGrid>
+  <AppendedData encoding="base64">
+   _aAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAAAAAADAAAAAAAAAAMAAAAAAAAAAwAAAAAAAAADAAAAAAAAAAMAAAAAAAAAAwAAAAAAAAADAaAAAAAAAAAAAAAAAAAAAAAAA8D8AAAAAAAAAQAAAAAAAAAhAAAAAAAAAEEAAAAAAAAAAwAAAAAAAAADAAAAAAAAAAMAAAAAAAAAAwAAAAAAAAADAAAAAAAAAAMAAAAAAAAAAwAAAAAAAAADAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAAAAAADAAAAAAAAAAMAAAAAAAAAAwAAAAAAAAADAAAAAAAAAAMAAAAAAAAAAwAAAAAAAAADAaAAAAAAAAAAAAAAAAAAAAAAA8D8AAAAAAAAAQAAAAAAAAAhAAAAAAAAAEEAAAAAAAAAAwAAAAAAAAADAAAAAAAAAAMAAAAAAAAAAwAAAAAAAAADAAAAAAAAAAMAAAAAAAAAAwAAAAAAAAADAaAAAAAAAAAAAABBAAAAAAAAAEEAAAAAAAAAQQAAAAAAAABBAAAAAAAAAEEAAAAAAAAAAwAAAAAAAAADAAAAAAAAAAMAAAAAAAAAAwAAAAAAAAADAAAAAAAAAAMAAAAAAAAAAwAAAAAAAAADAaAAAAAAAAAAAAOA/AAAAAAAA4D8AAAAAAADgPwAAAAAAAOA/AAAAAAAA4D8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADwPwAAAAAAAPA/AAAAAAAA8D8AAAAAAADwPwAAAAAAAPA/AAAAAAAA8D8AAAAAAADwPwAAAAAAAPA/OAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPA/AAAAAAAA8D8AAAAAAAAAAAAAAAAAAPA/AAAAAAAAAAAAAAAAAADwPwAAAAAAAAAAAAAAAAAA8D8AAAAAAADwPwAAAAAAAOA/AAAAAAAA4D8AAAAAAADgPwAAAAAAAPC/AAAAAAAA8L8AAAAAAADwvwAAAAAAAABAAAAAAAAA8L8AAAAAAADwvwAAAAAAAABAAAAAAAAAAEAAAAAAAADwvwAAAAAAAPC/AAAAAAAAAEAAAAAAAADwvwAAAAAAAPC/AAAAAAAA8L8AAAAAAAAAQAAAAAAAAABAAAAAAAAA8L8AAAAAAAAAQAAAAAAAAABAAAAAAAAAAEAAAAAAAAAAQAAAAAAAAPC/AAAAAAAAAEAAAAAAAAAAQA==AAAAAA==AAAAAA==AAAAAA==
+  </AppendedData>
+</VTKFile>
+
+<!-- Created by Chaste version 3.0.14896 (with uncommitted modifications) on Tue, 14 Feb 2012 18:31:51 +0000.  Chaste was built on Tue, 14 Feb 2012 18:31:12 +0000 by machine (uname) 'Linux DTC216-silver 2.6.32-21-generic #32-Ubuntu SMP Fri Apr 16 08:09:38 UTC 2010 x86_64' using settings: default, no Chaste libraries.
+-->

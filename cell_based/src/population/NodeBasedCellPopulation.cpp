@@ -34,13 +34,17 @@ template<unsigned DIM>
 NodeBasedCellPopulation<DIM>::NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh,
                                       std::vector<CellPtr>& rCells,
                                       const std::vector<unsigned> locationIndices,
-                                      bool deleteMesh)
+                                      bool deleteMesh,
+                                      bool validate)
     : AbstractCentreBasedCellPopulation<DIM>(rCells, locationIndices),
       mrMesh(rMesh),
       mDeleteMesh(deleteMesh),
       mMechanicsCutOffLength(DBL_MAX)
 {
+	if (validate)
+	{
     Validate();
+	}
 }
 
 template<unsigned DIM>
@@ -169,6 +173,8 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 
     if (!map.IsIdentityMap())
     {
+    	UpdateParticlesAfterReMesh(map);
+
         // Update the mappings between cells and location indices
         std::map<Cell*, unsigned> old_map = this->mCellLocationMap;
 
@@ -263,6 +269,11 @@ template<unsigned DIM>
 unsigned NodeBasedCellPopulation<DIM>::GetNumNodes()
 {
     return mrMesh.GetNumAllNodes();
+}
+
+template<unsigned DIM>
+void NodeBasedCellPopulation<DIM>::UpdateParticlesAfterReMesh(NodeMap& rMap)
+{
 }
 
 template<unsigned DIM>

@@ -39,6 +39,7 @@ population/TestBuskeForces.hpp
 population/TestMeshBasedCellPopulation.hpp
 population/TestMeshBasedCellPopulationWithGhostNodes.hpp
 population/TestNodeBasedCellPopulation.hpp
+population/TestNodeBasedCellPopulationWithParticles.hpp
 population/TestNodeBasedCellPopulationWithBuskeUpdate.hpp
 population/TestPdeAndBoundaryConditions.hpp
 population/TestPottsBasedCellPopulation.hpp

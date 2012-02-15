@@ -187,6 +187,16 @@ public:
     virtual bool IsGhostNode(unsigned index);
 
     /**
+     * Find if a given node is a particle. The method always returns false
+     * but is overridden in NodeBasedCellPopulationWithParticles.
+     *
+     * @param index the global index of a specified node
+     *
+     * @return whether the node is a particle
+     */
+    virtual bool IsParticle(unsigned index);
+
+    /**
      * @return mMeinekeDivisionSeparation
      */
     double GetMeinekeDivisionSeparation();
