@@ -55,7 +55,7 @@ public:
 
         if(PetscTools::GetNumProcs() == 1)
         {
-            TS_ASSERT_EQUALS(nodes_owned.size(), 291u);
+            TS_ASSERT_EQUALS(nodes_owned.size(), 289u);
         }
         else if(PetscTools::GetNumProcs() == 2)
         {
@@ -87,6 +87,8 @@ public:
 
     void TestMetisMeshPartitioning() throw (Exception)
     {
+        EXIT_IF_SEQUENTIAL //Doesn't make sense to try and partition in sequential
+
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic",2,1, false);
         std::vector<unsigned> nodes_permutation;
         std::set<unsigned> nodes_owned;
