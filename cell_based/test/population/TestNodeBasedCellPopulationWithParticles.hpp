@@ -549,107 +549,104 @@ public:
 			}
 	    }
 
-	void TestCellPopulationWritersIn3dWithParticles() throw(Exception)
-	    {
-	        // Set up SimulationTime (needed if VTK is used)
-	        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
-
-	        // Resetting the Maximum cell Id to zero (to account for previous tests)
-	        Cell::ResetMaxCellId();
-
-	        // Create a simple 3D mesh with some particles
-	        std::vector<Node<3>*> nodes;
-	        nodes.push_back(new Node<3>(0,  true,  0.0, 0.0, 0.0));
-	        nodes.push_back(new Node<3>(1,  true,  1.0, 1.0, 0.0));
-	        nodes.push_back(new Node<3>(2,  true,  1.0, 0.0, 1.0));
-	        nodes.push_back(new Node<3>(3,  true,  0.0, 1.0, 1.0));
-	        nodes.push_back(new Node<3>(4,  false, 0.5, 0.5, 0.5));
-	        nodes.push_back(new Node<3>(5,  false, -1.0, -1.0, -1.0));
-	        nodes.push_back(new Node<3>(6,  false,  2.0, -1.0, -1.0));
-	        nodes.push_back(new Node<3>(7,  false,  2.0,  2.0, -1.0));
-	        nodes.push_back(new Node<3>(8,  false, -1.0,  2.0, -1.0));
-	        nodes.push_back(new Node<3>(9,  false, -1.0, -1.0,  2.0));
-	        nodes.push_back(new Node<3>(10, false,  2.0, -1.0,  2.0));
-	        nodes.push_back(new Node<3>(11, false,  2.0,  2.0,  2.0));
-	        nodes.push_back(new Node<3>(12, false, -1.0,  2.0,  2.0));
-
-			// Convert this to a NodesOnlyMesh
-			MAKE_PTR(NodesOnlyMesh<3>, p_mesh);
-			p_mesh->ConstructNodesWithoutMesh(nodes);
-
-	        std::vector<unsigned> location_indices;
-	        for (unsigned index=0; index<5; index++)
-	        {
-	            location_indices.push_back(index);
-	        }
-
-	        // Set up cells
-	        std::vector<CellPtr> cells;
-	        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
-	        cells_generator.GenerateGivenLocationIndices(cells, location_indices);
-
-	        cells[4]->AddCellProperty(CellPropertyRegistry::Instance()->Get<ApoptoticCellProperty>()); // coverage
-
-	        TS_ASSERT_EQUALS(cells[4]->HasCellProperty<ApoptoticCellProperty>(), true);
-
-	        // Create cell population
-	        NodeBasedCellPopulationWithParticles<3> cell_population(*p_mesh, cells, location_indices);
-
-	        TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "NodeBasedCellPopulationWithParticles-3");
-
-	        // Test set methods
-	        cell_population.SetOutputCellVolumes(true);
-	        cell_population.SetOutputCellMutationStates(true);
-	        cell_population.SetOutputCellProliferativeTypes(true);
-	        cell_population.SetOutputCellAges(true);
-	        cell_population.SetOutputCellCyclePhases(true);
-
-	        cell_population.SetCellAncestorsToLocationIndices();
-	        cell_population.SetOutputCellAncestors(true);
-
-
-	        std::string output_directory = "TestCellPopulationWritersIn3dWithParticles";
-	        OutputFileHandler output_file_handler(output_directory, false);
-
-	        cell_population.CreateOutputFiles(output_directory, false);
-	        cell_population.WriteResultsToFiles();
-	        cell_population.CloseOutputFiles();
-
-	        // Compare output with saved files of what they should look like
-	        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
-
-	        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.viznodes      cell_based/test/data/TestCellPopulationWritersIn3dWithParticles/results.viznodes").c_str()), 0);
-	        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizcelltypes  cell_based/test/data/TestCellPopulationWritersIn3dWithParticles/results.vizcelltypes").c_str()), 0);
-	        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizancestors   cell_based/test/data/TestCellPopulationWritersIn3dWithParticles/results.vizancestors").c_str()), 0);
-
-	        // Test the GetCellMutationStateCount function: there should only be healthy cells
-	        std::vector<unsigned> cell_mutation_states = cell_population.GetCellMutationStateCount();
-	        TS_ASSERT_EQUALS(cell_mutation_states.size(), 4u);
-	        TS_ASSERT_EQUALS(cell_mutation_states[0], 5u);
-	        TS_ASSERT_EQUALS(cell_mutation_states[1], 0u);
-	        TS_ASSERT_EQUALS(cell_mutation_states[2], 0u);
-	        TS_ASSERT_EQUALS(cell_mutation_states[3], 0u);
-
-	        // Test the GetCellProliferativeTypeCount function - we should have 4 stem cells and 1 dead cell (for coverage)
-	        std::vector<unsigned> cell_types = cell_population.rGetCellProliferativeTypeCount();
-	        TS_ASSERT_EQUALS(cell_types.size(), 3u);
-	        TS_ASSERT_EQUALS(cell_types[0], 5u);
-	        TS_ASSERT_EQUALS(cell_types[1], 0u);
-	        TS_ASSERT_EQUALS(cell_types[2], 0u);
-
-	        // Test that the cell population parameters are output correctly
-	        out_stream parameter_file = output_file_handler.OpenOutputFile("results.parameters");
-
-	        // Write cell population parameters to file
-	        cell_population.OutputCellPopulationParameters(parameter_file);
-	        parameter_file->close();
-
-	        // Compare output with saved files of what they should look like
-	        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.parameters         cell_based/test/data/TestCellPopulationWritersIn3dWithParticles/results.parameters").c_str()), 0);
-
-	        // Tidy up
-	        CellwiseData<3>::Destroy();
-	    }
+//	void TestCellPopulationWritersIn3dWithParticles() throw(Exception)
+//	    {
+//	        // Set up SimulationTime (needed if VTK is used)
+//	        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+//
+//	        // Resetting the Maximum cell Id to zero (to account for previous tests)
+//	        Cell::ResetMaxCellId();
+//
+//	        // Create a simple 3D mesh with some particles
+//	        std::vector<Node<3>*> nodes;
+//	        nodes.push_back(new Node<3>(0,  true,  0.0, 0.0, 0.0));
+//	        nodes.push_back(new Node<3>(1,  true,  1.0, 1.0, 0.0));
+//	        nodes.push_back(new Node<3>(2,  true,  1.0, 0.0, 1.0));
+//	        nodes.push_back(new Node<3>(3,  true,  0.0, 1.0, 1.0));
+//	        nodes.push_back(new Node<3>(4,  false, 0.5, 0.5, 0.5));
+//	        nodes.push_back(new Node<3>(5,  false, -1.0, -1.0, -1.0));
+//	        nodes.push_back(new Node<3>(6,  false,  2.0, -1.0, -1.0));
+//	        nodes.push_back(new Node<3>(7,  false,  2.0,  2.0, -1.0));
+//	        nodes.push_back(new Node<3>(8,  false, -1.0,  2.0, -1.0));
+//	        nodes.push_back(new Node<3>(9,  false, -1.0, -1.0,  2.0));
+//	        nodes.push_back(new Node<3>(10, false,  2.0, -1.0,  2.0));
+//	        nodes.push_back(new Node<3>(11, false,  2.0,  2.0,  2.0));
+//	        nodes.push_back(new Node<3>(12, false, -1.0,  2.0,  2.0));
+//
+//			// Convert this to a NodesOnlyMesh
+//			MAKE_PTR(NodesOnlyMesh<3>, p_mesh);
+//			p_mesh->ConstructNodesWithoutMesh(nodes);
+//
+//	        std::vector<unsigned> location_indices;
+//	        for (unsigned index=0; index<5; index++)
+//	        {
+//	            location_indices.push_back(index);
+//	        }
+//
+//	        // Set up cells
+//	        std::vector<CellPtr> cells;
+//	        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
+//	        cells_generator.GenerateGivenLocationIndices(cells, location_indices);
+//
+//	        cells[4]->AddCellProperty(CellPropertyRegistry::Instance()->Get<ApoptoticCellProperty>()); // coverage
+//
+//	        TS_ASSERT_EQUALS(cells[4]->HasCellProperty<ApoptoticCellProperty>(), true);
+//
+//	        // Create cell population
+//	        NodeBasedCellPopulationWithParticles<3> cell_population(*p_mesh, cells, location_indices);
+//
+//	        TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "NodeBasedCellPopulationWithParticles-3");
+//
+//	        // Test set methods
+//	        cell_population.SetOutputCellVolumes(true);
+//	        cell_population.SetOutputCellMutationStates(true);
+//	        cell_population.SetOutputCellProliferativeTypes(true);
+//	        cell_population.SetOutputCellAges(true);
+//	        cell_population.SetOutputCellCyclePhases(true);
+//
+//	        cell_population.SetCellAncestorsToLocationIndices();
+//	        cell_population.SetOutputCellAncestors(true);
+//
+//
+//	        std::string output_directory = "TestCellPopulationWritersIn3dWithParticles";
+//	        OutputFileHandler output_file_handler(output_directory, false);
+//
+//	        cell_population.CreateOutputFiles(output_directory, false);
+//	        cell_population.WriteResultsToFiles();
+//	        cell_population.CloseOutputFiles();
+//
+//	        // Compare output with saved files of what they should look like
+//	        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+//
+//	        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.viznodes      cell_based/test/data/TestCellPopulationWritersIn3dWithParticles/results.viznodes").c_str()), 0);
+//	        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizcelltypes  cell_based/test/data/TestCellPopulationWritersIn3dWithParticles/results.vizcelltypes").c_str()), 0);
+//	        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizancestors   cell_based/test/data/TestCellPopulationWritersIn3dWithParticles/results.vizancestors").c_str()), 0);
+//
+//	        // Test the GetCellMutationStateCount function: there should only be healthy cells
+//	        std::vector<unsigned> cell_mutation_states = cell_population.GetCellMutationStateCount();
+//	        TS_ASSERT_EQUALS(cell_mutation_states.size(), 4u);
+//	        TS_ASSERT_EQUALS(cell_mutation_states[0], 5u);
+//	        TS_ASSERT_EQUALS(cell_mutation_states[1], 0u);
+//	        TS_ASSERT_EQUALS(cell_mutation_states[2], 0u);
+//	        TS_ASSERT_EQUALS(cell_mutation_states[3], 0u);
+//
+//	        // Test the GetCellProliferativeTypeCount function - we should have 4 stem cells and 1 dead cell (for coverage)
+//	        std::vector<unsigned> cell_types = cell_population.rGetCellProliferativeTypeCount();
+//	        TS_ASSERT_EQUALS(cell_types.size(), 3u);
+//	        TS_ASSERT_EQUALS(cell_types[0], 5u);
+//	        TS_ASSERT_EQUALS(cell_types[1], 0u);
+//	        TS_ASSERT_EQUALS(cell_types[2], 0u);
+//
+//	        // Test that the cell population parameters are output correctly
+//	        out_stream parameter_file = output_file_handler.OpenOutputFile("results.parameters");
+//
+//	        // Write cell population parameters to file
+//	        cell_population.OutputCellPopulationParameters(parameter_file);
+//	        parameter_file->close();
+//
+//	        // Compare output with saved files of what they should look like
+//	        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.parameters         cell_based/test/data/TestCellPopulationWritersIn3dWithParticles/results.parameters").c_str()), 0);
+//	    }
 
 	 void TestArchivingCellPopulation() throw (Exception)
 	    {
