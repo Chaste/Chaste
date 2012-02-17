@@ -247,6 +247,12 @@ public:
         // Create a cell population
         NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
 
+        // For coverage
+        for (unsigned i=0; i<mesh.GetNumAllNodes(); i++)
+        {
+            TS_ASSERT_EQUALS(node_based_cell_population.IsParticle(i), false);
+        }
+
         // Create a new cell, DON'T set the node index, set birth time=-1
         FixedDurationGenerationBasedCellCycleModel* p_model2 = new FixedDurationGenerationBasedCellCycleModel();
         p_model2->SetCellProliferativeType(STEM);

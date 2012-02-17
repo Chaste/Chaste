@@ -248,16 +248,18 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile()
     std::vector<double> cell_radii(num_nodes);
     std::vector<std::vector<double> > cellwise_data;
 
-    if (CellwiseData<DIM>::Instance()->IsSetUp())
-    {
-        CellwiseData<DIM>* p_data = CellwiseData<DIM>::Instance();
-        unsigned num_variables = p_data->GetNumVariables();
-        for (unsigned var=0; var<num_variables; var++)
-        {
-            std::vector<double> cellwise_data_var(num_nodes);
-            cellwise_data.push_back(cellwise_data_var);
-        }
-    }
+    // CellwiseData does not deal with particles, similarly to the situation for ghost nodes see #1975
+    assert(!CellwiseData<DIM>::Instance()->IsSetUp());
+//    if (CellwiseData<DIM>::Instance()->IsSetUp())
+//    {
+//        CellwiseData<DIM>* p_data = CellwiseData<DIM>::Instance();
+//        unsigned num_variables = p_data->GetNumVariables();
+//        for (unsigned var=0; var<num_variables; var++)
+//        {
+//            std::vector<double> cellwise_data_var(num_nodes);
+//            cellwise_data.push_back(cellwise_data_var);
+//        }
+//    }
 
     // Loop over nodes
 
@@ -299,15 +301,6 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile()
 			{
 				double cell_radius = this->mrMesh.GetCellRadius(node_index);
 				cell_radii[node_index] = cell_radius;
-			}
-			if (CellwiseData<DIM>::Instance()->IsSetUp())
-			{
-				CellwiseData<DIM>* p_data = CellwiseData<DIM>::Instance();
-				unsigned num_variables = p_data->GetNumVariables();
-				for (unsigned var=0; var<num_variables; var++)
-				{
-					cellwise_data[var][node_index] = p_data->GetValue(cell_iter, var);
-				}
 			}
         }
         else
@@ -361,16 +354,16 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile()
     {
         mesh_writer.AddPointData("Cell radii", cell_radii);
     }
-    if (CellwiseData<DIM>::Instance()->IsSetUp())
-    {
-        for (unsigned var=0; var<cellwise_data.size(); var++)
-        {
-            std::stringstream data_name;
-            data_name << "Cellwise data " << var;
-            std::vector<double> cellwise_data_var = cellwise_data[var];
-            mesh_writer.AddPointData(data_name.str(), cellwise_data_var);
-        }
-    }
+//    if (CellwiseData<DIM>::Instance()->IsSetUp())
+//    {
+//        for (unsigned var=0; var<cellwise_data.size(); var++)
+//        {
+//            std::stringstream data_name;
+//            data_name << "Cellwise data " << var;
+//            std::vector<double> cellwise_data_var = cellwise_data[var];
+//            mesh_writer.AddPointData(data_name.str(), cellwise_data_var);
+//        }
+//    }
 
     mesh_writer.WriteFilesUsingMesh(this->mrMesh);
 

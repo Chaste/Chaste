@@ -650,6 +650,118 @@ public:
 	        // Tidy up
 	        CellwiseData<3>::Destroy();
 	    }
+
+	 void TestArchivingCellPopulation() throw (Exception)
+	    {
+	        FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
+	        std::string archive_file = "node_based_cell_population_with_particles.arch";
+	        ArchiveLocationInfo::SetMeshFilename("node_based_cell_population_with_particles_mesh");
+
+	        {
+	            // Need to set up time
+	            unsigned num_steps = 10;
+	            SimulationTime* p_simulation_time = SimulationTime::Instance();
+	            p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, num_steps+1);
+
+	            // Create a simple mesh
+	            TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
+	            TetrahedralMesh<2,2> generating_mesh;
+	            generating_mesh.ConstructFromMeshReader(mesh_reader);
+
+	            // Convert this to a NodesOnlyMesh
+	            NodesOnlyMesh<2> mesh;
+	            mesh.ConstructNodesWithoutMesh(generating_mesh);
+
+	            // Create cells
+	            std::vector<CellPtr> cells;
+	            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+	            cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+	            // Create a cell population
+	            NodeBasedCellPopulationWithParticles<2>* const p_cell_population = new NodeBasedCellPopulationWithParticles<2>(mesh, cells);
+
+	            // Cells have been given birth times of 0, -1, -2, -3, -4.
+	            // loop over them to run to time 0.0;
+	            for (AbstractCellPopulation<2>::Iterator cell_iter = p_cell_population->Begin();
+	                cell_iter != p_cell_population->End();
+	                ++cell_iter)
+	            {
+	                cell_iter->ReadyToDivide();
+	            }
+
+	            p_cell_population->SetMechanicsCutOffLength(1.5);
+
+	            // Create an output archive
+	            ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
+	            boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
+
+	            // Write the cell population to the archive
+	            (*p_arch) << static_cast<const SimulationTime&>(*p_simulation_time);
+	            (*p_arch) << p_cell_population;
+
+
+	            // Tidy up
+	            SimulationTime::Destroy();
+	            delete p_cell_population;
+	        }
+
+	        {
+	            // Need to set up time
+	            unsigned num_steps = 10;
+
+	            SimulationTime* p_simulation_time = SimulationTime::Instance();
+	            p_simulation_time->SetStartTime(0.0);
+	            p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, num_steps+1);
+	            p_simulation_time->IncrementTimeOneStep();
+
+	            NodeBasedCellPopulationWithParticles<2>* p_cell_population;
+
+	            // Restore the cell population
+	            ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
+	            boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
+
+	            (*p_arch) >> *p_simulation_time;
+	            (*p_arch) >> p_cell_population;
+
+	            // Cells have been given birth times of 0, -1, -2, -3, -4.
+	            // this checks that individual cells and their models are archived.
+	            unsigned counter = 0;
+
+	            for (AbstractCellPopulation<2>::Iterator cell_iter = p_cell_population->Begin();
+	                 cell_iter != p_cell_population->End();
+	                 ++cell_iter)
+	            {
+	                TS_ASSERT_DELTA(cell_iter->GetAge(), (double)(counter), 1e-7);
+	                counter++;
+	            }
+
+	            // Check the simulation time has been restored (through the cell)
+	            TS_ASSERT_EQUALS(p_simulation_time->GetTime(), 0.0);
+
+	            // Check the cell population has been restored
+	            TS_ASSERT_EQUALS(p_cell_population->rGetCells().size(), 5u);
+
+	            TS_ASSERT_DELTA(p_cell_population->GetMechanicsCutOffLength(), 1.5, 1e-6);
+
+	            // Check number of nodes
+	            TS_ASSERT_EQUALS(p_cell_population->GetNumNodes(), 5u);
+
+	            // Check some node positions
+	            TS_ASSERT_EQUALS(p_cell_population->GetNode(3)->GetIndex(), 3u);
+	            TS_ASSERT_EQUALS(p_cell_population->GetNode(4)->GetIndex(), 4u);
+
+	            TS_ASSERT_DELTA(p_cell_population->GetNode(3)->rGetLocation()[0], 0.0, 1e-9);
+	            TS_ASSERT_DELTA(p_cell_population->GetNode(3)->rGetLocation()[1], 1.0, 1e-9);
+	            TS_ASSERT_DELTA(p_cell_population->GetNode(4)->rGetLocation()[0], 0.5, 1e-9);
+	            TS_ASSERT_DELTA(p_cell_population->GetNode(4)->rGetLocation()[1], 0.5, 1e-9);
+
+	            // Check the member variables have been restored
+	            TS_ASSERT_DELTA(p_cell_population->GetMechanicsCutOffLength(), 1.5, 1e-9);
+
+	            // Tidy up
+	            delete p_cell_population;
+	        }
+	    }
 };
 
 #endif /*TESTNODEBASEDCELLPOPULATIONWITHPARTICLES_HPP_*/
