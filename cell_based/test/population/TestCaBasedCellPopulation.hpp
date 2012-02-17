@@ -1543,14 +1543,15 @@ public:
         // Update the cell positions once, using unit timestep
         cell_population.UpdateCellLocations(1.0);
 
-        // At this point cells should be located at sites 3, 4, 5, 6, 7
+        // At this point cells should be located at sites 0, 4, 5, 6, 7
         for (unsigned i=0; i<num_nodes; i++)
         {
-            bool expected_empty_site = (i < 3 || i > 7);
+            bool expected_empty_site = ((i > 0 && i < 4) || i > 7);
             TS_ASSERT_EQUALS(cell_population.IsEmptySite(i), expected_empty_site);
         }
 
         // For coverage, update nodes in a random order
+        ///\todo Should that be DO NOT ...?
         cell_population.SetUpdateNodesInRandomOrder(false);
 
         // Update the cell positions again, using unit timestep

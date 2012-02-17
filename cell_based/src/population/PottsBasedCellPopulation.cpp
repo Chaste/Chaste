@@ -212,8 +212,8 @@ void PottsBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
     // Randomly permute mUpdateRuleCollection if specified
     if (this->mIterateRandomlyOverUpdateRuleCollection)
     {
-        /// \todo #1942 this call will invalidate the state of the Random Number Generator
-        std::random_shuffle(mUpdateRuleCollection.begin(), mUpdateRuleCollection.end());
+        // Randomly permute mUpdateRuleCollection
+    	p_gen->Shuffle(mUpdateRuleCollection);
     }
 
     for (unsigned i=0; i<num_nodes*mNumSweepsPerTimestep; i++)

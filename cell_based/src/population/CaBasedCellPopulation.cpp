@@ -106,8 +106,7 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
     if (this->mIterateRandomlyOverUpdateRuleCollection)
     {
         // Randomly permute mUpdateRuleCollection
-        /// \todo #1942 this call will invalidate the state of the Random Number Generator
-        std::random_shuffle(mUpdateRuleCollection.begin(), mUpdateRuleCollection.end());
+    	RandomNumberGenerator::Instance()->Shuffle(mUpdateRuleCollection);
     }
 
     for (typename std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > >::iterator update_iter = mUpdateRuleCollection.begin();
@@ -124,8 +123,8 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
             {
                 cells_vector.push_back(*cell_iter);
             }
-            /// \todo #1942 this call will invalidate the state of the Random Number Generator
-            std::random_shuffle(cells_vector.begin(), cells_vector.end());
+
+            RandomNumberGenerator::Instance()->Shuffle(cells_vector);
 
             for (unsigned i=0; i<cells_vector.size(); i++)
             {

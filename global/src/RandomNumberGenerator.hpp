@@ -29,6 +29,8 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #ifndef RANDOMNUMBERGENERATORS_HPP_
 #define RANDOMNUMBERGENERATORS_HPP_
 
+#include <boost/shared_ptr.hpp>
+
 #include "ChasteSerialization.hpp"
 #include "SerializableSingleton.hpp"
 #include <boost/serialization/split_member.hpp>
@@ -158,6 +160,32 @@ public:
      */
     unsigned randMod(unsigned base);
 
+
+    /**
+     * Produce a permutation of the integers and non-empty std::vector, using the Knuth-algorithm
+     * (also called the Fisher-Yates algorithm), a linear time unbiased method.
+     * The values are shuffled in place.
+     *
+     * @param rValues  the intial values and the output permutation of shuffled values.  Must be non-empty
+     */
+
+    template <class T>
+    void Shuffle(std::vector<boost::shared_ptr<T> >& rValues)
+    {
+        unsigned num = rValues.size();
+        if (num == 0)
+        {
+        	return;
+        }
+    	for (unsigned end=num-1; end>0; end--)
+        {
+            // Pick a random integer from {0,..,end}
+            unsigned k = RandomNumberGenerator::Instance()->randMod(end+1);
+            boost::shared_ptr<T> temp = rValues[end];
+            rValues[end] = rValues[k];
+            rValues[k] = temp;
+        }
+    }
     /**
      * Produce a permutation of the integers 0,1,..,num-1, using the Knuth-algorithm
      * (also called the Fisher-Yates algorithm), a linear time unbiased method.

@@ -94,7 +94,7 @@ void RandomNumberGenerator::Reseed(int seed)
 
 void RandomNumberGenerator::Shuffle(unsigned num, std::vector<unsigned>& rValues)
 {
-    rValues.resize(num);
+	rValues.resize(num);
     for (unsigned i=0; i<num; i++)
     {
         rValues[i] = i;
