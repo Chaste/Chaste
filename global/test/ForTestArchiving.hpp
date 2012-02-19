@@ -40,6 +40,7 @@ public:
     BaseClass();
     virtual ~BaseClass();
     virtual void Hello()=0;
+
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {

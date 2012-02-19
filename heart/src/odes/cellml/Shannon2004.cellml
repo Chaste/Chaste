@@ -282,7 +282,13 @@ http://www.cellml.org/
             </rdf:Description>
          </rdf:RDF>
       </variable>		  
-      <variable name="Nao" units="millimolar" initial_value="140" public_interface="out"/>
+      <variable name="Nao" units="millimolar" initial_value="140" public_interface="out" cmeta:id="extracellular_sodium_concentration">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#extracellular_sodium_concentration">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#extracellular_sodium_concentration"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
       <variable name="Cao" units="millimolar" initial_value="1.8" public_interface="out" cmeta:id="extracellular_calcium_concentration">
          <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
             <rdf:Description rdf:about="#extracellular_calcium_concentration">
@@ -1842,7 +1848,7 @@ http://www.cellml.org/
                <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_slow_delayed_rectifier_potassium_current_conductance"/>
             </rdf:Description>
          </rdf:RDF>
-      </variable>   
+      </variable>
       <variable name="Fx_Ks_jct" units="dimensionless" initial_value="0.11"/>
       <variable name="Fx_Ks_SL" units="dimensionless" initial_value="0.89"/>
       <variable name="E_Ks_jct" units="millivolt"/>
@@ -4659,7 +4665,13 @@ http://www.cellml.org/
    </component>
    <component name="Jleak_SR">
       <variable name="j_leak_SR" units="millimolar_per_millisecond" public_interface="out"/>
-      <variable name="KSRleak" units="per_millisecond" initial_value="5.348e-6"/>
+	  <variable name="KSRleak" initial_value="5.348e-6" units="per_millisecond" cmeta:id="SR_leak_current_max">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#SR_leak_current_max">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#SR_leak_current_max"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>		  
       <variable name="Ca_jct" units="millimolar" public_interface="in"/>
       <variable name="Ca_SR" units="millimolar" public_interface="in"/>
       <math xmlns="http://www.w3.org/1998/Math/MathML">

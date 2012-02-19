@@ -121,10 +121,7 @@ public:
                                                   &cell_factory,
                                                   &problem_defn,
                                                   "TestCardiacEmHomogeneousEverythingCompressible");
-
         problem.Solve();
-
-
         std::vector<c_vector<double,2> >& r_deformed_position = problem.rGetDeformedPosition();
 
         // not sure how easy is would be determine what the deformation should be
