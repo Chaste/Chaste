@@ -260,6 +260,12 @@ public:
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(nodes);
 
+        // Failing test
+//        unsigned boundary_nodes = mesh.GetNumBoundaryNodes();
+//        NodeMap node_map(8);
+//        mesh.ReMesh(node_map);
+//        TS_ASSERT_EQUALS(mesh.GetNumBoundaryNodes(), boundary_nodes);
+
         // Free memory - the constructor does a deep copy of its input
         for (unsigned i=0; i<nodes.size(); i++)
         {
