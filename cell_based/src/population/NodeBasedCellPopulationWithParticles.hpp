@@ -127,8 +127,7 @@ public:
      * a two vectors of forces on cells and particles and a time step over which
      * to integrate the equations of motion.
      *
-     * @param rNodeForcesOnCells  forces on cells
-     * @param rNodeForcesOnParticles  forces on particles
+     * @param rNodeForces  forces on cells
      * @param dt  time step
      */
     void UpdateNodeLocations(const std::vector< c_vector<double, DIM> >& rNodeForces, double dt);

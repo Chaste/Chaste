@@ -692,39 +692,6 @@ public:
         TS_ASSERT_EQUALS((static_cast<MeshBasedCellPopulation<1>* >(&(simulator.rGetCellPopulation())))->rGetMesh().GetNumElements(), initial_num_elements + 1);
     }
 
-    void TestMeshBasedMonolayer() throw(Exception)
-    {
-        // Create a large 2D mesh
-        HoneycombMeshGenerator generator(50, 20, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
-
-        // Create some cells
-        std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), DIFFERENTIATED);
-
-        // Create a mesh-based cell population
-        MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-
-        // Create a cell-based simulation
-        OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestMeshBasedMonolayer");
-        simulator.SetEndTime(1.0);
-
-        // Create a linear spring force and add it to the cell-based simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
-        p_linear_force->SetCutOffLength(1.5);
-        simulator.AddForce(p_linear_force);
-
-        // Run the simulation and test that the correct exceptions are thrown
-        TS_ASSERT_THROWS_THIS(simulator.Solve(),
-            "Simulation has produced an element with zero area.  Please re-run with a cutoff on your forces");
-
-        CellBasedEventHandler::Reset();
-    }
-
-
-
     void TestSettingEndTimeIssue() throw(Exception)
     {
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(0.1, 1);

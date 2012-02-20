@@ -161,7 +161,7 @@ public:
      * @param rCells a vector of cells
      * @param locationIndices an optional vector of location indices that correspond to real cells
      * @param deleteMesh whether to delete nodes-only mesh in destructor
-     * @param call Validate() in the constructor or not
+     * @param validate whether to call Validate() in the constructor or not
      */
     NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh,
                             std::vector<CellPtr>& rCells,

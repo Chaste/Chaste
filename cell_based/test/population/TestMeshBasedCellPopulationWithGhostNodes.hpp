@@ -41,7 +41,6 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
-#include "CellwiseData.hpp"
 #include "SmartPointers.hpp"
 
 class TestMeshBasedCellPopulationWithGhostNodes : public AbstractCellBasedTestSuite
@@ -840,9 +839,6 @@ public:
 
         // Compare output with saved files of what they should look like
         TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.parameters         cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/results.parameters").c_str()), 0);
-
-        // Tidy up
-        CellwiseData<3>::Destroy();
     }
 
     void TestVoronoiAreasAndPerimetersWithGhostNodes() throw (Exception)

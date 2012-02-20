@@ -40,6 +40,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "OutputFileHandler.hpp"
 #include "PetscTools.hpp"
 #include "RandomNumberGenerator.hpp"
+#include "Warnings.hpp"
 
 // Jonathan Shewchuk's triangle and Hang Si's tetgen
 #define REAL double
@@ -1072,11 +1073,12 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ImportFromMesher(MESHER_IO& mesher
         {
             if (SPACE_DIM == 2)
             {
-                throw e; // Triangle has produced a zero-area element (due to very long edges)
+                WARNING("Triangle has produced a zero area (collinear) element");
             }
-
-            // when (SPACE_DIM == 3);
-            // Tetgen is feeding us lies
+            else
+            {
+                WARNING("Tetgen has produced a zero volume (coplanar) element");
+            }
         }
     }
 
