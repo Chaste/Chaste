@@ -213,6 +213,7 @@ components = ['python', 'global', 'io', 'linalg', 'mesh', 'ode', 'pde', 'continu
 for comp in components[:]:
     if not os.path.isdir(comp):
         components.remove(comp)
+        del comp_deps[comp]
 Export('components', 'comp_deps')
 
 # Virtual component aliasing all core components
