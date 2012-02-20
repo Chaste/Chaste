@@ -226,10 +226,11 @@ public:
         // These results are from time 0.25.
         std::vector<double> node_a_location = crypt_projection_simulator.GetNodeLocation(257);
         std::vector<double> node_b_location = crypt_projection_simulator.GetNodeLocation(503);
+
         c_vector<double, 2> distance_between;
         distance_between(0) = node_a_location[0] - node_b_location[0];
         distance_between(1) = node_a_location[1] - node_b_location[1];
-        TS_ASSERT_DELTA(norm_2(distance_between), 0.5759, 1e-3);
+        TS_ASSERT_DELTA(norm_2(distance_between), 0.5730, 1e-3);
 
         // Test the Wnt concentration result
         WntConcentration<2>* p_wnt = WntConcentration<2>::Instance();
