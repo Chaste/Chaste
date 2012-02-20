@@ -43,6 +43,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "GeneralisedLinearSpringForce.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "SmartPointers.hpp"
+#include "NumericFileComparison.hpp"
 
 class TestDiscreteSystemForceCalculator : public AbstractCellBasedTestSuite
 {
@@ -234,7 +235,8 @@ public:
         OutputFileHandler handler(output_directory, false);
         std::string results_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/results.vizstress";
 
-        TS_ASSERT_EQUALS(system(("cmp " + results_file + " cell_based/test/data/TestDiscreteSystemForceCalculator/results.vizstress").c_str()), 0);
+        NumericFileComparison node_velocities(results_file, "cell_based/test/data/TestDiscreteSystemForceCalculator/results.vizstress");
+        TS_ASSERT(node_velocities.CompareFiles(1e-4));
 
         // Run a simulation to generate some results.viz<other things> files
         // so the visualizer can display the results.vizstress file.
@@ -244,7 +246,7 @@ public:
         simulator.AddForce(p_force);
 
         simulator.SetEndTime(0.05);
-        simulator.SetOutputDirectory(output_directory);
+        simulator.SetOutputDirectory(output_directory+"_rerun");
         simulator.Solve();
     }
 };
