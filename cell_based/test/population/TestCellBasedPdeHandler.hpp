@@ -511,7 +511,7 @@ public:
         CellBasedPdeHandler<2> pde_handler(&cell_population);
 
         TS_ASSERT_THROWS_THIS(pde_handler.OpenResultsFiles(output_directory),
-            "Trying to solve a PDE on a NodeBasedCellPopulation without setting up a coarse mesh. Try calling UseCoarsePdeMesh().");
+                "Trying to solve a PDE on a cell population that doesn't have a mesh. Try calling UseCoarsePdeMesh().");
 
         // Use a coarse PDE mesh since we are using a node-based cell population
         AveragedSourcePde<2> pde(cell_population, -0.1);

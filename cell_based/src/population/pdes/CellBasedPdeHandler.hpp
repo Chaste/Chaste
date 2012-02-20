@@ -136,34 +136,15 @@ protected:
     void WriteAverageRadialPdeSolution(double time);
 
     /**
-     * Whether we have a NodeBasedCellPopulation
-     *
-     * @return whether mpCellPopulation is of the type NodeBasedCellPopulation
+     * @return Whether the population being used supports solving a PDE
      */
-    bool IsNodeBasedCellPopulation();
+    bool SupportsSolvingPde();
 
     /**
-     * Whether we have a MeshBasedCellPopulation
-     *
-     * @return whether mpCellPopulation is of the type MeshBasedCellPopulation
+     * @return Whether the population being used requires the use of separate `coarse` mesh to
+     * solve PDEs
      */
-    bool IsMeshBasedCellPopulation();
-
-    /**
-     * Whether we have a PottsBasedCellPopulation
-     *
-     * @return whether mpCellPopulation is of the type PottsBasedCellPopulation
-     */
-    bool IsPottsBasedCellPopulation();
-
-    /**
-     * Whether we have a MeshBasedCellPopulationWithGhostNodes
-     *
-     * @return whether mpCellPopulation is of the type MeshBasedCellPopulationWithGhostNodes
-     */
-    bool IsMeshBasedCellPopulationWithGhostNodes();
-
-
+    bool PdeSolveNeedsCoarseMesh();
 
 public:
 

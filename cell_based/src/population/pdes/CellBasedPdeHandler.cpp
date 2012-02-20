@@ -49,8 +49,7 @@ CellBasedPdeHandler<DIM>::CellBasedPdeHandler(AbstractCellPopulation<DIM>* pCell
 {
     // We must be using a NodeBasedCellPopulation or MeshBasedCellPopulation, with at least one cell
     ///\todo change to exceptions (#1891)
-    assert(IsNodeBasedCellPopulation() || IsMeshBasedCellPopulation() || IsPottsBasedCellPopulation() );
-    assert(!IsMeshBasedCellPopulationWithGhostNodes());
+    assert(SupportsSolvingPde());
     assert(mpCellPopulation->GetNumRealCells() != 0);
 }
 
@@ -140,13 +139,9 @@ template<unsigned DIM>
 void CellBasedPdeHandler<DIM>::OpenResultsFiles(std::string outputDirectory)
 {
     // If using a NodeBasedCellPopulation or a PottsBasedCellPopulation, mpCoarsePdeMesh must be set up
-    if (IsNodeBasedCellPopulation() && mpCoarsePdeMesh==NULL)
+    if (PdeSolveNeedsCoarseMesh() && mpCoarsePdeMesh==NULL)
     {
-        EXCEPTION("Trying to solve a PDE on a NodeBasedCellPopulation without setting up a coarse mesh. Try calling UseCoarsePdeMesh().");
-    }
-    if (IsPottsBasedCellPopulation() && mpCoarsePdeMesh==NULL)
-    {
-        EXCEPTION("Trying to solve a PDE on a PottsBasedCellPopulation without setting up a coarse mesh. Try calling UseCoarsePdeMesh().");
+        EXCEPTION("Trying to solve a PDE on a cell population that doesn't have a mesh. Try calling UseCoarsePdeMesh().");
     }
 
     if (mpCoarsePdeMesh != NULL)
@@ -694,27 +689,20 @@ void CellBasedPdeHandler<DIM>::OutputParameters(out_stream& rParamsFile)
 }
 
 template<unsigned DIM>
-bool CellBasedPdeHandler<DIM>::IsNodeBasedCellPopulation()
+bool CellBasedPdeHandler<DIM>::SupportsSolvingPde()
 {
-	return (dynamic_cast<NodeBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL);
+    bool node_based = (dynamic_cast<NodeBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL);
+    bool mesh_based = (dynamic_cast<MeshBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL);
+    bool potts_based =(dynamic_cast<PottsBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL);
+    bool mesh_ghost = (dynamic_cast<MeshBasedCellPopulationWithGhostNodes<DIM>*>(mpCellPopulation) != NULL);
+
+    return ((node_based || mesh_based || potts_based) && !mesh_ghost);
 }
 
 template<unsigned DIM>
-bool CellBasedPdeHandler<DIM>::IsMeshBasedCellPopulation()
+bool CellBasedPdeHandler<DIM>::PdeSolveNeedsCoarseMesh()
 {
-	return (dynamic_cast<MeshBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL);
-}
-
-template<unsigned DIM>
-bool CellBasedPdeHandler<DIM>::IsPottsBasedCellPopulation()
-{
-	return (dynamic_cast<PottsBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL);
-}
-
-template<unsigned DIM>
-bool CellBasedPdeHandler<DIM>::IsMeshBasedCellPopulationWithGhostNodes()
-{
-	return (dynamic_cast<MeshBasedCellPopulationWithGhostNodes<DIM>*>(mpCellPopulation) != NULL);
+    return ((dynamic_cast<NodeBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL) || (dynamic_cast<PottsBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL));
 }
 
 // Serialization for Boost >= 1.36

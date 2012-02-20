@@ -163,7 +163,7 @@ public:
         simulator.AddPottsUpdateRule(p_adhesion_update_rule);
 
         // Solve the system
-        TS_ASSERT_THROWS_THIS(simulator.Solve(), "Trying to solve a PDE on a PottsBasedCellPopulation without setting up a coarse mesh. Try calling UseCoarsePdeMesh().");
+        TS_ASSERT_THROWS_THIS(simulator.Solve(), "Trying to solve a PDE on a cell population that doesn't have a mesh. Try calling UseCoarsePdeMesh().");
 
         // Tidy up
         CellwiseData<2>::Destroy();
