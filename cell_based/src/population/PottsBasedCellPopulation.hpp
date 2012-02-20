@@ -33,6 +33,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "PottsMesh.hpp"
 #include "VertexMesh.hpp"
 #include "AbstractPottsUpdateRule.hpp"
+#include "MutableMesh.hpp"
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -70,6 +71,12 @@ private:
      * and can be accessed by calling GetElementTessellation().
      */
     VertexMesh<DIM,DIM>* mpElementTessellation;
+
+    /**
+     * Pointer to a MutableMesh that can be created from the nodes of the PottsMesh in
+     * order to solve PDEs on the population.
+     */
+    MutableMesh<DIM,DIM>* mpMutableMesh;
 
     /** Results file for elements. */
     out_stream mpVizElementsFile;
@@ -381,6 +388,16 @@ public:
      * Get a reference to mpElementTessellation.
      */
     VertexMesh<DIM,DIM>* GetElementTessellation();
+
+    /**
+     * Create a mutable mesh from the nodes of the Potts mesh. Used for solving PDEs
+     */
+    void CreateMutableMesh();
+
+    /**
+     * @return the Mutable Mesh
+     */
+    MutableMesh<DIM,DIM>* GetMutableMesh();
 };
 
 #include "SerializationExportWrapper.hpp"

@@ -73,6 +73,7 @@ PottsBasedCellPopulation<DIM>::PottsBasedCellPopulation(PottsMesh<DIM>& rMesh,
     : AbstractOnLatticeCellPopulation<DIM>(rCells, locationIndices, deleteMesh),
       mrMesh(rMesh),
       mpElementTessellation(NULL),
+      mpMutableMesh(NULL),
       mTemperature(0.1),
       mNumSweepsPerTimestep(1)
 {
@@ -88,6 +89,7 @@ PottsBasedCellPopulation<DIM>::PottsBasedCellPopulation(PottsMesh<DIM>& rMesh)
     : AbstractOnLatticeCellPopulation<DIM>(),
       mrMesh(rMesh),
       mpElementTessellation(NULL),
+      mpMutableMesh(NULL),
       mTemperature(0.1),
       mNumSweepsPerTimestep(1)
 {
@@ -97,6 +99,8 @@ template<unsigned DIM>
 PottsBasedCellPopulation<DIM>::~PottsBasedCellPopulation()
 {
     delete mpElementTessellation;
+
+    delete mpMutableMesh;
 
     if (this->mDeleteMesh)
     {
@@ -508,6 +512,29 @@ VertexMesh<DIM,DIM>* PottsBasedCellPopulation<DIM>::GetElementTessellation()
 {
 //    assert(mpElementTessellation != NULL);
     return mpElementTessellation;
+}
+
+template<unsigned DIM>
+void PottsBasedCellPopulation<DIM>::CreateMutableMesh()
+{
+    delete mpMutableMesh;
+
+    // Get the nodes of the PottsMesh
+    std::vector<Node<DIM>*> nodes;
+    for (unsigned node_index=0; node_index<mrMesh.GetNumNodes(); node_index++)
+    {
+      c_vector<double, DIM> location = mrMesh.GetNode(node_index)->rGetLocation();
+      nodes.push_back(new Node<DIM>(node_index, location));
+    }
+
+    mpMutableMesh = new MutableMesh<DIM,DIM>(nodes);
+}
+
+template<unsigned DIM>
+MutableMesh<DIM,DIM>* PottsBasedCellPopulation<DIM>::GetMutableMesh()
+{
+    assert(mpMutableMesh);
+    return mpMutableMesh;
 }
 
 template<unsigned DIM>

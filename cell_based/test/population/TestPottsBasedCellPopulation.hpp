@@ -44,6 +44,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "WildTypeCellMutationState.hpp"
 #include "SmartPointers.hpp"
 #include "CellLabel.hpp"
+#include "MutableMesh.hpp"
 
 class TestPottsBasedCellPopulation : public AbstractCellBasedTestSuite
 {
@@ -657,6 +658,29 @@ public:
             // Tidy up
             delete p_cell_population;
         }
+    }
+
+    void TestMakeMutableMeshForPdes() throw(Exception)
+    {
+        // Create a simple 2D PottsMesh
+        PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+        // Create cell population
+        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        cell_population.CreateMutableMesh();
+
+        MutableMesh<2,2>* p_mutable_mesh = cell_population.GetMutableMesh();
+
+        //Check it has the correct number of nodes and elements
+        TS_ASSERT_EQUALS(p_mutable_mesh->GetNumNodes(), p_mesh->GetNumNodes());
+        TS_ASSERT_EQUALS(p_mutable_mesh->GetNumElements(), 18u);
     }
 };
 
