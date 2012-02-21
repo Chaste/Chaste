@@ -797,15 +797,18 @@ def _getTestSummary(test_set_dir, build):
         overall_status, colour = _getTestStatus(test_set_dir, build, True)
     return overall_status, colour
 
+_sconstruct_traceback_re = re.compile(r'  File ".*SConstruct", line ')
 def _checkBuildFailure(test_set_dir, overall_status, colour):
     """Check whether the build failed, and return a new status if it did."""
     found_semget = False
+    found_done_building = False
     try:
         log = file(os.path.join(test_set_dir, 'build.log'), 'r')
         for line in log:
             if (line.startswith('scons: building terminated because of errors.')
                 or line.strip().endswith('(errors occurred during build).')
-                or line.startswith('  File "SConstruct", line ')):
+                or _sconstruct_traceback_re.match(line)
+                or line.startswith('Traceback (most recent call last):')):
                 overall_status = 'Build failed (check build log for ": ***").  ' + overall_status
                 colour = 'red'
                 break
@@ -814,6 +817,13 @@ def _checkBuildFailure(test_set_dir, overall_status, colour):
                 if colour == 'green':
                     colour = 'orange'
                 found_semget = True
+            if not found_done_building and line.startswith('scons: done building targets.'):
+                found_done_building = True
+        else:
+            if not found_done_building:
+                # Something went wrong that we didn't spot
+                overall_status = "Build failed (didn't complete).  " + overall_status
+                colour = 'red'
         log.close()
     except:
         # Build log may not exists for old builds
