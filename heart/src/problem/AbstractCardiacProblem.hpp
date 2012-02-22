@@ -423,7 +423,15 @@ protected:
      */
     virtual AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>* CreateSolver() =0;
 
-protected:
+    /**
+     * Subclasses must override this method to create a suitable mesh object.
+     *
+     * Only needed if the subclass needs something other than a DistributedTetrahedralMesh.
+     *
+     * This class will take responsibility for freeing the object when it is finished with.
+     */
+    virtual void CreateMeshFromHeartConfig();
+
     /**
      * CardiacElectroMechanicsProblem needs access to #mpWriter.
      */

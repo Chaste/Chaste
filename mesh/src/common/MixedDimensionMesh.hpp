@@ -130,7 +130,7 @@ public:
     /** Definition of cable element Iterator type. */
     typedef typename std::vector<Element<1, SPACE_DIM> *>::const_iterator CableElementIterator;
 
-        /**
+    /**
      * Return a pointer to the first boundary element in the mesh.
      */
     CableElementIterator GetCableElementIteratorBegin() const;

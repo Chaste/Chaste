@@ -114,14 +114,14 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Initialise()
         {
             if (HeartConfig::Instance()->GetLoadMesh())
             {
-                mpMesh = new DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>(HeartConfig::Instance()->GetMeshPartitioning());
+                CreateMeshFromHeartConfig();
                 std::auto_ptr<AbstractMeshReader<ELEMENT_DIM, SPACE_DIM> > p_mesh_reader
                     = GenericMeshReader<ELEMENT_DIM, SPACE_DIM>(HeartConfig::Instance()->GetMeshName());
                 mpMesh->ConstructFromMeshReader(*p_mesh_reader);
             }
             else if (HeartConfig::Instance()->GetCreateMesh())
             {
-                mpMesh = new DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>(HeartConfig::Instance()->GetMeshPartitioning());
+                CreateMeshFromHeartConfig();
                 assert(HeartConfig::Instance()->GetSpaceDimension()==SPACE_DIM);
                 double inter_node_space = HeartConfig::Instance()->GetInterNodeSpace();
 
@@ -195,6 +195,12 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Initialise()
     // For Bidomain with bath, this is where we set up the electrodes
 
     SetElectrodes();
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::CreateMeshFromHeartConfig()
+{
+    mpMesh = new DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>(HeartConfig::Instance()->GetMeshPartitioning());
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
