@@ -1033,21 +1033,6 @@
           <xs:documentation>Optional list of current-scaling heterogeneities in cells at given locations (cuboids or transmural layers).</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="ConductivityHeterogeneities" minOccurs="0">
-        <xs:annotation>
-          <xs:documentation>Optional list of conductivity heterogeneitis at nodes in given locations (cuboids or transmural layers).</xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name="ConductivityHeterogeneity" type="conductivity_heterogeneity_type"
-              minOccurs="0" maxOccurs="unbounded">
-              <xs:annotation>
-                <xs:documentation>Defines a conductivity heterogeneity (non-default value) at nodes in a given location (cuboid or transmural layer).</xs:documentation>
-              </xs:annotation>
-            </xs:element>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
       <xs:element name="OutputDirectory" type="xs:string" minOccurs="0">
         <xs:annotation>
           <xs:documentation>Name of the output directory in which to store the results files.  This will be created as a subfolder of the environmental variable CHASTE_TEST_OUTPUT if set. If CHASTE_TEST_OUTPUT is not set, results will be found relative to a 'testoutput' folder in the current directory.
@@ -1162,6 +1147,21 @@ Since the data from the original simulation will be included in the output, this
         <xs:annotation>
           <xs:documentation>Bath or fluid-filled cavity conductivity. Measured in mS/cm.</xs:documentation>
         </xs:annotation>
+      </xs:element>
+      <xs:element name="ConductivityHeterogeneities" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Optional list of conductivity heterogeneitis at nodes in given locations (cuboids or transmural layers).</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ConductivityHeterogeneity" type="conductivity_heterogeneity_type"
+              minOccurs="0" maxOccurs="unbounded">
+              <xs:annotation>
+                <xs:documentation>Defines a conductivity heterogeneity (non-default value) at nodes in a given location (cuboid or transmural layer).</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
       </xs:element>
       <xs:element name="SurfaceAreaToVolumeRatio" type="inverse_length_type" minOccurs="0">
         <xs:annotation>

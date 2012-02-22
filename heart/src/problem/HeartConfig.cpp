@@ -145,6 +145,16 @@ public:
      */
     static void CheckForIluPreconditioner(xercesc::DOMDocument* pDocument,
                                           xercesc::DOMElement* pRootElement);
+
+    /**
+     * Release 3.1 moved the ConductivityHeterogeneities element from Simulation to
+     * Physiological, to be next to the default conductivity definitions.
+     *
+     * @param pDocument  the DOM document containing the tree to be transformed
+     * @param pRootElement  the root of the tree to be transformed
+     */
+    static void MoveConductivityHeterogeneities(xercesc::DOMDocument* pDocument,
+                                                xercesc::DOMElement* pRootElement);
 };
 
 //
@@ -405,6 +415,10 @@ boost::shared_ptr<cp::chaste_parameters_type> HeartConfig::ReadFile(const std::s
         {
             XmlTransforms::TransformArchiveDirectory(p_doc.get(), p_root_elt);
             XmlTransforms::CheckForIluPreconditioner(p_doc.get(), p_root_elt);
+        }
+        if (version < 3001) // Changes made in release 3.1
+        {
+            XmlTransforms::MoveConductivityHeterogeneities(p_doc.get(), p_root_elt);
         }
         if (version < 3001) // Not the latest release
         {
@@ -1265,8 +1279,8 @@ bool HeartConfig::GetConductivityHeterogeneitiesProvided() const
     CheckSimulationIsDefined("ConductivityHeterogeneities");
     try
     {
-        DecideLocation( & mpUserParameters->Simulation()->ConductivityHeterogeneities(),
-                        & mpDefaultParameters->Simulation()->ConductivityHeterogeneities(),
+        DecideLocation( & mpUserParameters->Physiological().ConductivityHeterogeneities(),
+                        & mpDefaultParameters->Physiological().ConductivityHeterogeneities(),
                         "ConductivityHeterogeneities");
         return true;
     }
@@ -1283,12 +1297,12 @@ void HeartConfig::GetConductivityHeterogeneities(
         std::vector< c_vector<double,3> >& extraConductivities) const
 {
     CheckSimulationIsDefined("ConductivityHeterogeneities");
-    XSD_ANON_SEQUENCE_TYPE(cp::simulation_type, ConductivityHeterogeneities, ConductivityHeterogeneity)&
-         conductivity_heterogeneity = DecideLocation( & mpUserParameters->Simulation()->ConductivityHeterogeneities(),
-                                                      & mpDefaultParameters->Simulation()->ConductivityHeterogeneities(),
+    XSD_ANON_SEQUENCE_TYPE(cp::physiological_type, ConductivityHeterogeneities, ConductivityHeterogeneity)&
+         conductivity_heterogeneity = DecideLocation( & mpUserParameters->Physiological().ConductivityHeterogeneities(),
+                                                      & mpDefaultParameters->Physiological().ConductivityHeterogeneities(),
                                                       "ConductivityHeterogeneities")->get().ConductivityHeterogeneity();
 
-    for (XSD_ANON_ITERATOR_TYPE(cp::simulation_type, ConductivityHeterogeneities, ConductivityHeterogeneity) i = conductivity_heterogeneity.begin();
+    for (XSD_ANON_ITERATOR_TYPE(cp::physiological_type, ConductivityHeterogeneities, ConductivityHeterogeneity) i = conductivity_heterogeneity.begin();
          i != conductivity_heterogeneity.end();
          ++i)
     {
@@ -1310,7 +1324,7 @@ void HeartConfig::GetConductivityHeterogeneities(
             ChastePoint<DIM> chaste_point_b ( radii.x(), radii.y(), radii.z() );
             conductivitiesHeterogeneityAreas.push_back(boost::shared_ptr<AbstractChasteRegion<DIM> >   (  new ChasteEllipsoid<DIM> ( chaste_point_a, chaste_point_b )) );
         }
-        else if(ht.Location().EpiLayer().present() || ht.Location().MidLayer().present() || ht.Location().EndoLayer().present() )
+        else if (ht.Location().EpiLayer().present() || ht.Location().MidLayer().present() || ht.Location().EndoLayer().present() )
         {
             ///\todo When this is implemented, then we require an example in ChasteParametersFullFormat.xml
             EXCEPTION("Definition of transmural layers is not allowed for conductivities heterogeneities, you may use fibre orientation support instead");
@@ -2323,7 +2337,7 @@ void HeartConfig::SetConductivityHeterogeneities(std::vector<ChasteCuboid<3> >& 
     assert ( conductivityAreas.size() == intraConductivities.size() );
     assert ( intraConductivities.size() == extraConductivities.size());
 
-    XSD_ANON_SEQUENCE_TYPE(cp::simulation_type, ConductivityHeterogeneities, ConductivityHeterogeneity) heterogeneities_container;
+    XSD_ANON_SEQUENCE_TYPE(cp::physiological_type, ConductivityHeterogeneities, ConductivityHeterogeneity) heterogeneities_container;
 
     for (unsigned region_index=0; region_index<conductivityAreas.size(); region_index++)
     {
@@ -2358,10 +2372,10 @@ void HeartConfig::SetConductivityHeterogeneities(std::vector<ChasteCuboid<3> >& 
         heterogeneities_container.push_back(ht);
     }
 
-    XSD_ANON_TYPE(cp::simulation_type, ConductivityHeterogeneities) heterogeneities_object;
+    XSD_ANON_TYPE(cp::physiological_type, ConductivityHeterogeneities) heterogeneities_object;
     heterogeneities_object.ConductivityHeterogeneity(heterogeneities_container);
 
-    mpUserParameters->Simulation()->ConductivityHeterogeneities().set(heterogeneities_object);
+    mpUserParameters->Physiological().ConductivityHeterogeneities().set(heterogeneities_object);
 }
 
 void HeartConfig::SetConductivityHeterogeneitiesEllipsoid(std::vector<ChasteEllipsoid<3> >& conductivityAreas,
@@ -2371,7 +2385,7 @@ void HeartConfig::SetConductivityHeterogeneitiesEllipsoid(std::vector<ChasteElli
     assert ( conductivityAreas.size() == intraConductivities.size() );
     assert ( intraConductivities.size() == extraConductivities.size());
 
-    XSD_ANON_SEQUENCE_TYPE(cp::simulation_type, ConductivityHeterogeneities, ConductivityHeterogeneity) heterogeneities_container;
+    XSD_ANON_SEQUENCE_TYPE(cp::physiological_type, ConductivityHeterogeneities, ConductivityHeterogeneity) heterogeneities_container;
 
     for (unsigned region_index=0; region_index<conductivityAreas.size(); region_index++)
     {
@@ -2406,10 +2420,10 @@ void HeartConfig::SetConductivityHeterogeneitiesEllipsoid(std::vector<ChasteElli
         heterogeneities_container.push_back(ht);
     }
 
-    XSD_ANON_TYPE(cp::simulation_type, ConductivityHeterogeneities) heterogeneities_object;
+    XSD_ANON_TYPE(cp::physiological_type, ConductivityHeterogeneities) heterogeneities_object;
     heterogeneities_object.ConductivityHeterogeneity(heterogeneities_container);
 
-    mpUserParameters->Simulation()->ConductivityHeterogeneities().set(heterogeneities_object);
+    mpUserParameters->Physiological().ConductivityHeterogeneities().set(heterogeneities_object);
 }
 
 void HeartConfig::SetOutputDirectory(const std::string& rOutputDirectory)
@@ -3341,6 +3355,23 @@ void XmlTransforms::CheckForIluPreconditioner(xercesc::DOMDocument* pDocument,
         {
             EXCEPTION("PETSc does not have a parallel implementation of ilu, so we no longer allow it as an option.  Use bjacobi instead.");
         }
+    }
+}
+
+void XmlTransforms::MoveConductivityHeterogeneities(xercesc::DOMDocument* pDocument,
+                                                    xercesc::DOMElement* pRootElement)
+{
+    std::vector<xercesc::DOMElement*> p_elt_list = XmlTools::FindElements(
+            pRootElement,
+            "Simulation/ConductivityHeterogeneities");
+    if (p_elt_list.size() > 0)
+    {
+        assert(p_elt_list.size() == 1); // Asserted by schema
+        xercesc::DOMNode* p_parent = p_elt_list[0]->getParentNode();
+        xercesc::DOMNode* p_child = p_parent->removeChild(p_elt_list[0]);
+        std::vector<xercesc::DOMElement*> p_phys_list = XmlTools::FindElements(pRootElement, "Physiological");
+        assert(p_phys_list.size() == 1); // Asserted by schema
+        p_phys_list[0]->appendChild(p_child);
     }
 }
 

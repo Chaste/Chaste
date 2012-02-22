@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ChasteParameters
-	xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/3_0"
+	xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/3_1"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="https://chaste.comlab.ox.ac.uk/nss/parameters/3_0 ../../../src/io/ChasteParameters_3_0.xsd">
+    xsi:schemaLocation="https://chaste.comlab.ox.ac.uk/nss/parameters/3_1 ../../../src/io/ChasteParameters_3_1.xsd">
  
     <!-- See also ChasteParametersResumeSimulationFullFormat.xml -->       
     
@@ -229,7 +229,41 @@
 			     </CellHeterogeneity>	-->
 		    
 		</CellHeterogeneities>		
+				
+		<!-- 
+			Output 
+		-->
+		<!-- Where to store the output (relative to CHASTE_TEST_OUTPUT) -->
+		<OutputDirectory>ChasteResults</OutputDirectory>
+		<!-- Prefix for output files -->
+		<OutputFilenamePrefix>SimulationResults</OutputFilenamePrefix>
+		<!-- Set to "yes" for writing data from parallel simulations with the original mesh
+          ordering.  This slows down parallel simulations, but means that the output data are unpermuted and
+          could be visualised on the original mesh.  Default value is "no" -->
+		<OutputUsingOriginalNodeOrdering>yes</OutputUsingOriginalNodeOrdering>
+		<!-- Optional list of variables to output alongside Vm etc.  These names should match those in the CellML -->  
+		<OutputVariables>
+		    <Var name="CaI"/>
+		    <Var name="Nai"/>
+		    <Var name="Ki"/>
+		</OutputVariables>
 		
+		<!-- Optionally specify post-processing to visualizer(s) -->
+		<OutputVisualizer meshalyzer="no" vtk="yes" cmgui="no" parallel_vtk="yes" precision="16"/>
+
+		<!-- Optionally specify a frequency for checkpointing -->
+		<CheckpointSimulation timestep="20.0" unit="ms" max_checkpoints_on_disk="3"/>
+				
+	</Simulation>
+	
+	<Physiological>
+	    <!--
+	        Conductivities: Longitudinal (along fibre), Transverse (in sheet), Normal (between sheets)
+	    -->
+	    <IntracellularConductivities longi="1.75" trans="1.75" normal="1.75" unit="mS/cm"/>
+	    <ExtracellularConductivities longi="7.0"  trans="7.0"  normal="7.0" unit="mS/cm"/>
+	    <BathConductivity unit="mS/cm"> 7.0 </BathConductivity>
+	    
 		<ConductivityHeterogeneities>
 		    <!-- Specify scaling factors for conductivities in heterogeneous regions -->
 		    <!-- If two regions overlap, the last one wins -->
@@ -293,43 +327,9 @@
 
  		<!-- Conductivity heterogeneities in transmural regions are valid XML but are not implemented -->
 
-		</ConductivityHeterogeneities>		
-
-		<!-- 
-			Output 
-		-->
-		<!-- Where to store the output (relative to CHASTE_TEST_OUTPUT) -->
-		<OutputDirectory>ChasteResults</OutputDirectory>
-		<!-- Prefix for output files -->
-		<OutputFilenamePrefix>SimulationResults</OutputFilenamePrefix>
-		<!-- Set to "yes" for writing data from parallel simulations with the original mesh
-          ordering.  This slows down parallel simulations, but means that the output data are unpermuted and
-          could be visualised on the original mesh.  Default value is "no" -->
-		<OutputUsingOriginalNodeOrdering>yes</OutputUsingOriginalNodeOrdering>
-		<!-- Optional list of variables to output alongside Vm etc.  These names should match those in the CellML -->  
-		<OutputVariables>
-		    <Var name="CaI"/>
-		    <Var name="Nai"/>
-		    <Var name="Ki"/>
-		</OutputVariables>
+		</ConductivityHeterogeneities>
 		
-		<!-- Optionally specify post-processing to visualizer(s) -->
-		<OutputVisualizer meshalyzer="no" vtk="yes" cmgui="no" parallel_vtk="yes" precision="16"/>
-
-		<!-- Optionally specify a frequency for checkpointing -->
-		<CheckpointSimulation timestep="20.0" unit="ms" max_checkpoints_on_disk="3"/>
-				
-	</Simulation>
-	
-	<Physiological>
-	    <!--
-	        Conductivities: Longitudinal (along fibre), Transverse (in sheet), Normal (between sheets)
-	    -->
-	    <IntracellularConductivities longi="1.75" trans="1.75" normal="1.75" unit="mS/cm"/>
-	    <ExtracellularConductivities longi="7.0"  trans="7.0"  normal="7.0" unit="mS/cm"/>
-	    <BathConductivity unit="mS/cm"> 7.0 </BathConductivity>
-	    
-	    <!-- PDE reaction/diffusion parameters -->
+		<!-- PDE reaction/diffusion parameters -->
 	    <SurfaceAreaToVolumeRatio unit="1/cm"> 1400 </SurfaceAreaToVolumeRatio> <!-- usually denoted Chi or A_m in mono-/bidomain PDEs -->
 	    <Capacitance unit="uF/cm^2"> 1.0 </Capacitance> <!-- usually denoted C_m in mono-/bidomain PDEs -->
 	    
