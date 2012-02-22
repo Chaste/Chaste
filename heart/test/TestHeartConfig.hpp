@@ -271,6 +271,7 @@ public:
         TS_ASSERT(HeartConfig::Instance()->HasPurkinje());
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetPurkinjeCapacitance(), 1.5);
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetPurkinjeSurfaceAreaToVolumeRatio(), 8000.0);
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetPurkinjeConductivity(), 2.5);
 
         /// \todo: refactor from here until the end of the test into a different test
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersLoadMesh.xml");
@@ -1176,6 +1177,10 @@ public:
         TS_ASSERT_DIFFERS(HeartConfig::Instance()->GetPurkinjeSurfaceAreaToVolumeRatio(), 1234.0);
         HeartConfig::Instance()->SetPurkinjeSurfaceAreaToVolumeRatio(1234.0);
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetPurkinjeSurfaceAreaToVolumeRatio(), 1234.0);
+
+        TS_ASSERT_DIFFERS(HeartConfig::Instance()->GetPurkinjeConductivity(), 1234.5);
+        HeartConfig::Instance()->SetPurkinjeConductivity(1234.5);
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetPurkinjeConductivity(), 1234.5);
 
 
         // This is a temporary internal boolean until we're happy that users can be let loose on the functionality!

@@ -112,12 +112,14 @@ boost::shared_ptr<cp::chaste_parameters_type> CreateDefaultParameters()
     XSD_CREATE_WITH_FIXED_ATTR1(cp::capacitance_type, capacitance, 1.0, "uF/cm^2");
     phys_params.Capacitance().set(capacitance);
 
-    cp::purkinje_physiological_type purk_phys_params;
-    XSD_CREATE_WITH_FIXED_ATTR1(cp::inverse_length_type, purk_Am, 2800, "1/cm");
-    purk_phys_params.SurfaceAreaToVolumeRatio().set(purk_Am);
-    XSD_CREATE_WITH_FIXED_ATTR1(cp::capacitance_type, purk_Cm, 1.0, "uF/cm^2");
-    purk_phys_params.Capacitance().set(purk_Cm);
-    phys_params.Purkinje().set(purk_phys_params);
+    cp::purkinje_physiological_type purkinje_phys_params;
+    XSD_CREATE_WITH_FIXED_ATTR1(cp::inverse_length_type, purkinje_Am, 2800, "1/cm");
+    purkinje_phys_params.SurfaceAreaToVolumeRatio().set(purkinje_Am);
+    XSD_CREATE_WITH_FIXED_ATTR1(cp::capacitance_type, purkinje_Cm, 1.0, "uF/cm^2");
+    purkinje_phys_params.Capacitance().set(purkinje_Cm);
+    XSD_CREATE_WITH_FIXED_ATTR1(cp::conductivity_type, purkinje_conductivity, 1.75, "mS/cm");
+    purkinje_phys_params.Conductivity().set(purkinje_conductivity);
+    phys_params.Purkinje().set(purkinje_phys_params);
 
     // Numerical parameters
     cp::numerical_type numerical_params;

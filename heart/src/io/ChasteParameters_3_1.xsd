@@ -1337,6 +1337,11 @@ situations.  See https://chaste.comlab.ox.ac.uk/cgi-bin/trac.cgi/wiki/ChasteGuid
           <xs:documentation>The surface capacitance for Purkinje myocytes.</xs:documentation>
         </xs:annotation>
       </xs:element>
+      <xs:element minOccurs="0" name="Conductivity" type="conductivity_type">
+        <xs:annotation>
+          <xs:documentation>The default conductivity for Purkinje fibres.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:all>
   </xs:complexType>
   <xs:complexType name="purkinje_simulation_type"/>

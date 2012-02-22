@@ -1270,7 +1270,7 @@ public:
 
     /**
      * Set the surface capacitance for Purkinje myocytes.
-     * @param capacitance Purkinje capacitance (Cm)
+     * @param capacitance  Purkinje capacitance (Cm) (units uF/cm^2)
      */
     void SetPurkinjeCapacitance(double capacitance);
 
@@ -1281,9 +1281,20 @@ public:
 
     /**
      * Set the surface area to volume ratio for Purkinje fibres.
-     * @param ratio The ratio (Am)
+     * @param ratio  the ratio (Am) (units 1/cm)
      */
     void SetPurkinjeSurfaceAreaToVolumeRatio(double ratio);
+
+    /**
+     * Get the default conductivity for Purkinje fibres.
+     */
+    double GetPurkinjeConductivity();
+
+    /**
+     * Set the default conductivity for Purkinje fibres.
+     * @param capacitance  Purkinje conductivity (units mS/cm)
+     */
+    void SetPurkinjeConductivity(double conductivity);
 
 private:
     // Only to be accessed by the tests

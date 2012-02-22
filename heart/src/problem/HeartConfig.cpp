@@ -3334,11 +3334,7 @@ double HeartConfig::GetPurkinjeCapacitance()
 
 void HeartConfig::SetPurkinjeCapacitance(double capacitance)
 {
-    if (!mpUserParameters->Physiological().Purkinje().present())
-    {
-        cp::purkinje_physiological_type purk_phys_params;
-        mpUserParameters->Physiological().Purkinje().set(purk_phys_params);
-    }
+    ENSURE_SECTION_PRESENT(mpUserParameters->Physiological().Purkinje(), cp::purkinje_physiological_type);
     XSD_CREATE_WITH_FIXED_ATTR1(cp::capacitance_type, purk_Cm, capacitance, "uF/cm^2");
     mpUserParameters->Physiological().Purkinje()->Capacitance().set(purk_Cm);
 }
@@ -3361,13 +3357,31 @@ double HeartConfig::GetPurkinjeSurfaceAreaToVolumeRatio()
 
 void HeartConfig::SetPurkinjeSurfaceAreaToVolumeRatio(double ratio)
 {
-    if (!mpUserParameters->Physiological().Purkinje().present())
-    {
-        cp::purkinje_physiological_type purk_phys_params;
-        mpUserParameters->Physiological().Purkinje().set(purk_phys_params);
-    }
+    ENSURE_SECTION_PRESENT(mpUserParameters->Physiological().Purkinje(), cp::purkinje_physiological_type);
     XSD_CREATE_WITH_FIXED_ATTR1(cp::inverse_length_type, purk_Am, ratio, "1/cm");
     mpUserParameters->Physiological().Purkinje()->SurfaceAreaToVolumeRatio().set(purk_Am);
+}
+
+double HeartConfig::GetPurkinjeConductivity()
+{
+    if (mpUserParameters->Physiological().Purkinje().present() &&
+        mpUserParameters->Physiological().Purkinje()->Conductivity().present())
+    {
+        return mpUserParameters->Physiological().Purkinje()->Conductivity().get();
+    }
+    else if (mpDefaultParameters->Physiological().Purkinje().present() &&
+             mpDefaultParameters->Physiological().Purkinje()->Conductivity().present())
+    {
+        return mpDefaultParameters->Physiological().Purkinje()->Conductivity().get();
+    }
+    NEVER_REACHED;
+}
+
+void HeartConfig::SetPurkinjeConductivity(double conductivity)
+{
+    ENSURE_SECTION_PRESENT(mpUserParameters->Physiological().Purkinje(), cp::purkinje_physiological_type);
+    XSD_CREATE_WITH_FIXED_ATTR1(cp::conductivity_type, purkinje_conductivity, conductivity, "mS/cm");
+    mpUserParameters->Physiological().Purkinje()->Conductivity().set(purkinje_conductivity);
 }
 
 /**********************************************************************
