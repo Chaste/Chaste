@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<cp:ChasteParameters xmlns:cp="https://chaste.comlab.ox.ac.uk/nss/parameters/2_2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://chaste.comlab.ox.ac.uk/nss/parameters/2_2 ../../../src/io/ChasteParameters_2_2.xsd">
+<cp:ChasteParameters xmlns:cp="https://chaste.comlab.ox.ac.uk/nss/parameters/3_1" xmlns:cp20="https://chaste.comlab.ox.ac.uk/nss/parameters/2_0" xmlns:cp21="https://chaste.comlab.ox.ac.uk/nss/parameters/2_1" xmlns:cp22="https://chaste.comlab.ox.ac.uk/nss/parameters/2_2" xmlns:cp23="https://chaste.comlab.ox.ac.uk/nss/parameters/2_3" xmlns:cp30="https://chaste.comlab.ox.ac.uk/nss/parameters/3_0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ChasteParameters_1_1.xsd" xsi:schemaLocation="https://chaste.comlab.ox.ac.uk/nss/parameters/3_1 ChasteParameters_3_1.xsd https://chaste.comlab.ox.ac.uk/nss/parameters/2_0 ChasteParameters_2_0.xsd https://chaste.comlab.ox.ac.uk/nss/parameters/2_1 ChasteParameters_2_1.xsd https://chaste.comlab.ox.ac.uk/nss/parameters/2_2 ChasteParameters_2_2.xsd https://chaste.comlab.ox.ac.uk/nss/parameters/2_3 ChasteParameters_2_3.xsd https://chaste.comlab.ox.ac.uk/nss/parameters/3_0 ChasteParameters_3_0.xsd">
 
   <cp:Simulation>
     <cp:SpaceDimension>3</cp:SpaceDimension>
@@ -20,6 +20,10 @@
     <cp:BathConductivity unit="mS/cm">7</cp:BathConductivity>
     <cp:SurfaceAreaToVolumeRatio unit="1/cm">1</cp:SurfaceAreaToVolumeRatio>
     <cp:Capacitance unit="uF/cm^2">1</cp:Capacitance>
+    <cp:Purkinje>
+      <cp:SurfaceAreaToVolumeRatio unit="1/cm">2800</cp:SurfaceAreaToVolumeRatio>
+      <cp:Capacitance unit="uF/cm^2">1</cp:Capacitance>
+    </cp:Purkinje>
   </cp:Physiological>
 
   <cp:Numerical>

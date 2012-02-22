@@ -3297,6 +3297,79 @@ unsigned HeartConfig::GetEvaluateNumItsEveryNSolves()
     return mEvaluateNumItsEveryNSolves;
 }
 
+//
+// Purkinje methods
+//
+
+bool HeartConfig::HasPurkinje()
+{
+    CheckSimulationIsDefined("Purkinje");
+    try
+    {
+        return DecideLocation( & mpUserParameters->Simulation()->Purkinje(),
+                               & mpDefaultParameters->Simulation()->Purkinje(),
+                               "Purkinje")->present();
+    }
+    catch (Exception &e)
+    {
+        // No element
+        return false;
+    }
+}
+
+double HeartConfig::GetPurkinjeCapacitance()
+{
+    if (mpUserParameters->Physiological().Purkinje().present() &&
+        mpUserParameters->Physiological().Purkinje()->Capacitance().present())
+    {
+        return mpUserParameters->Physiological().Purkinje()->Capacitance().get();
+    }
+    else if (mpDefaultParameters->Physiological().Purkinje().present() &&
+             mpDefaultParameters->Physiological().Purkinje()->Capacitance().present())
+    {
+        return mpDefaultParameters->Physiological().Purkinje()->Capacitance().get();
+    }
+    NEVER_REACHED;
+}
+
+void HeartConfig::SetPurkinjeCapacitance(double capacitance)
+{
+    if (!mpUserParameters->Physiological().Purkinje().present())
+    {
+        cp::purkinje_physiological_type purk_phys_params;
+        mpUserParameters->Physiological().Purkinje().set(purk_phys_params);
+    }
+    XSD_CREATE_WITH_FIXED_ATTR1(cp::capacitance_type, purk_Cm, capacitance, "uF/cm^2");
+    mpUserParameters->Physiological().Purkinje()->Capacitance().set(purk_Cm);
+}
+
+
+double HeartConfig::GetPurkinjeSurfaceAreaToVolumeRatio()
+{
+    if (mpUserParameters->Physiological().Purkinje().present() &&
+        mpUserParameters->Physiological().Purkinje()->SurfaceAreaToVolumeRatio().present())
+    {
+        return mpUserParameters->Physiological().Purkinje()->SurfaceAreaToVolumeRatio().get();
+    }
+    else if (mpDefaultParameters->Physiological().Purkinje().present() &&
+             mpDefaultParameters->Physiological().Purkinje()->SurfaceAreaToVolumeRatio().present())
+    {
+        return mpDefaultParameters->Physiological().Purkinje()->SurfaceAreaToVolumeRatio().get();
+    }
+    NEVER_REACHED;
+}
+
+void HeartConfig::SetPurkinjeSurfaceAreaToVolumeRatio(double ratio)
+{
+    if (!mpUserParameters->Physiological().Purkinje().present())
+    {
+        cp::purkinje_physiological_type purk_phys_params;
+        mpUserParameters->Physiological().Purkinje().set(purk_phys_params);
+    }
+    XSD_CREATE_WITH_FIXED_ATTR1(cp::inverse_length_type, purk_Am, ratio, "1/cm");
+    mpUserParameters->Physiological().Purkinje()->SurfaceAreaToVolumeRatio().set(purk_Am);
+}
+
 /**********************************************************************
  *                                                                    *
  *                                                                    *

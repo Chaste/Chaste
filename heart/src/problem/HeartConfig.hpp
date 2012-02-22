@@ -1254,6 +1254,37 @@ public:
      */
     std::map<std::string, std::pair<double, double> > GetIc50Values();
 
+    //
+    // Purkinje-related methods
+    //
+
+    /**
+     * Get whether this simulation contains a Purkinje system.
+     */
+    bool HasPurkinje();
+
+    /**
+     * Get the surface capacitance for Purkinje myocytes.
+     */
+    double GetPurkinjeCapacitance();
+
+    /**
+     * Set the surface capacitance for Purkinje myocytes.
+     * @param capacitance Purkinje capacitance (Cm)
+     */
+    void SetPurkinjeCapacitance(double capacitance);
+
+    /**
+     * Get the surface area to volume ratio for Purkinje fibres.
+     */
+    double GetPurkinjeSurfaceAreaToVolumeRatio();
+
+    /**
+     * Set the surface area to volume ratio for Purkinje fibres.
+     * @param ratio The ratio (Am)
+     */
+    void SetPurkinjeSurfaceAreaToVolumeRatio(double ratio);
+
 private:
     // Only to be accessed by the tests
     friend class TestHeartConfig;

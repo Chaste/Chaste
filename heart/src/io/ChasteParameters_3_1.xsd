@@ -1005,6 +1005,11 @@
           <xs:documentation>The domain/type of the simulation.  "Mono" = monodomain.  "Bi" = bidomain.</xs:documentation>
         </xs:annotation>
       </xs:element>
+      <xs:element minOccurs="0" name="Purkinje" type="purkinje_simulation_type">
+        <xs:annotation>
+          <xs:documentation>If this element is present then the simulation will include the Purkinje system, and the mesh must define the Purkinje fibres.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
       <xs:element name="Mesh" type="mesh_type" minOccurs="0">
         <xs:annotation>
           <xs:documentation>Mesh can be loaded from file or a semi-structured 1D, 2D or 3D cuboid
@@ -1178,6 +1183,12 @@ Since the data from the original simulation will be included in the output, this
           <xs:documentation>Optionally specify parameters for a drug effect conductance block model.</xs:documentation>
         </xs:annotation>
       </xs:element>
+      <xs:element minOccurs="0" name="Purkinje" type="purkinje_physiological_type">
+        <xs:annotation>
+          <xs:documentation>Optionally specify physiological parameters of the Purkinje system.
+Note that the presence of this element does not imply that the simulation will actually involve Purkinje fibres - see the Simulation/Purkinje element for that.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:all>
   </xs:complexType>
   <xs:complexType name="numerical_type">
@@ -1314,4 +1325,19 @@ situations.  See https://chaste.comlab.ox.ac.uk/cgi-bin/trac.cgi/wiki/ChasteGuid
       <xs:documentation>Main XML component for either running a new simulation (with "Simulation" specified) or resuming a simulation from a checkpoint (with "ResumeSimulation" specified).</xs:documentation>
     </xs:annotation>
   </xs:element>
+  <xs:complexType name="purkinje_physiological_type">
+    <xs:all>
+      <xs:element minOccurs="0" name="SurfaceAreaToVolumeRatio" type="inverse_length_type">
+        <xs:annotation>
+          <xs:documentation>The surface area to volume ratio for Purkinje fibres.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Capacitance" type="capacitance_type">
+        <xs:annotation>
+          <xs:documentation>The surface capacitance for Purkinje myocytes.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="purkinje_simulation_type"/>
 </xs:schema>

@@ -267,6 +267,10 @@ public:
         TS_ASSERT_EQUALS(ic50s["membrane_rapid_delayed_rectifier_potassium_current"].first, 5);
         TS_ASSERT_EQUALS(ic50s["membrane_rapid_delayed_rectifier_potassium_current"].second, 1.0);
 
+        // Purkinje methods
+        TS_ASSERT(HeartConfig::Instance()->HasPurkinje());
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetPurkinjeCapacitance(), 1.5);
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetPurkinjeSurfaceAreaToVolumeRatio(), 8000.0);
 
         /// \todo: refactor from here until the end of the test into a different test
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersLoadMesh.xml");
@@ -1162,6 +1166,18 @@ public:
         HeartConfig::Instance()->SetIc50Value("current", 55.0);
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetIc50Values().size(), 2u);
 
+        //Purkinje specific setters
+        TS_ASSERT(!HeartConfig::Instance()->HasPurkinje());
+
+        TS_ASSERT_DIFFERS(HeartConfig::Instance()->GetPurkinjeCapacitance(), 1.5);
+        HeartConfig::Instance()->SetPurkinjeCapacitance(1.5);
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetPurkinjeCapacitance(), 1.5);
+
+        TS_ASSERT_DIFFERS(HeartConfig::Instance()->GetPurkinjeSurfaceAreaToVolumeRatio(), 1234.0);
+        HeartConfig::Instance()->SetPurkinjeSurfaceAreaToVolumeRatio(1234.0);
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetPurkinjeSurfaceAreaToVolumeRatio(), 1234.0);
+
+
         // This is a temporary internal boolean until we're happy that users can be let loose on the functionality!
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetUseMassLumping(), false);
         HeartConfig::Instance()->SetUseMassLumping();
@@ -1586,13 +1602,17 @@ public:
         HeartConfig::Reset();
         HeartConfig::Instance()->SetUseFixedSchemaLocation(false);
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersRelease3_0.xml");
-        ///\todo #1915 Add something for Purkinje
+        TS_ASSERT(!HeartConfig::Instance()->HasPurkinje());
+        TS_ASSERT_DELTA(HeartConfig::Instance()->GetPurkinjeCapacitance(), 1.0, 1e-10);
+        TS_ASSERT_DELTA(HeartConfig::Instance()->GetPurkinjeSurfaceAreaToVolumeRatio(), 2800.0, 1e-10);
 
         // Check that release 3.0 xml can be loaded with latest schema
         HeartConfig::Reset();
         HeartConfig::Instance()->SetUseFixedSchemaLocation(true);
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersRelease3_0.xml");
-        ///\todo #1915 Add something for Purkinje
+        TS_ASSERT(!HeartConfig::Instance()->HasPurkinje());
+        TS_ASSERT_DELTA(HeartConfig::Instance()->GetPurkinjeCapacitance(), 1.0, 1e-10);
+        TS_ASSERT_DELTA(HeartConfig::Instance()->GetPurkinjeSurfaceAreaToVolumeRatio(), 2800.0, 1e-10);
     }
 
     /**

@@ -60,6 +60,10 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
         <BathConductivity unit="mS/cm"> 7.0 </BathConductivity>
         <SurfaceAreaToVolumeRatio unit="1/cm"> 1400 </SurfaceAreaToVolumeRatio>
         <Capacitance unit="uF/cm^2"> 1.0 </Capacitance>
+        <Purkinje>
+            <SurfaceAreaToVolumeRatio unit="1/cm"> 8000 </SurfaceAreaToVolumeRatio>
+            <Capacitance unit="uF/cm^2"> 1.0 </Capacitance>
+        </Purkinje>
     </Physiological>
 
     <Numerical>
@@ -107,6 +111,13 @@ boost::shared_ptr<cp::chaste_parameters_type> CreateDefaultParameters()
     phys_params.SurfaceAreaToVolumeRatio().set(surface_area_to_volume_ratio);
     XSD_CREATE_WITH_FIXED_ATTR1(cp::capacitance_type, capacitance, 1.0, "uF/cm^2");
     phys_params.Capacitance().set(capacitance);
+
+    cp::purkinje_physiological_type purk_phys_params;
+    XSD_CREATE_WITH_FIXED_ATTR1(cp::inverse_length_type, purk_Am, 2800, "1/cm");
+    purk_phys_params.SurfaceAreaToVolumeRatio().set(purk_Am);
+    XSD_CREATE_WITH_FIXED_ATTR1(cp::capacitance_type, purk_Cm, 1.0, "uF/cm^2");
+    purk_phys_params.Capacitance().set(purk_Cm);
+    phys_params.Purkinje().set(purk_phys_params);
 
     // Numerical parameters
     cp::numerical_type numerical_params;

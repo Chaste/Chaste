@@ -14,6 +14,8 @@
 	    <SimulationDuration unit="ms">10.0</SimulationDuration>
 	    <Domain>Mono</Domain> <!-- Mono, Bi or BiWithBath  -->
 	    
+	    <Purkinje/> <!-- Doesn't do anything yet; see #1915 -->
+	    
 		<!-- 
 			Mesh definition 
 		-->
@@ -263,7 +265,7 @@
 	    <IntracellularConductivities longi="1.75" trans="1.75" normal="1.75" unit="mS/cm"/>
 	    <ExtracellularConductivities longi="7.0"  trans="7.0"  normal="7.0" unit="mS/cm"/>
 	    <BathConductivity unit="mS/cm"> 7.0 </BathConductivity>
-	    
+		
 		<ConductivityHeterogeneities>
 		    <!-- Specify scaling factors for conductivities in heterogeneous regions -->
 		    <!-- If two regions overlap, the last one wins -->
@@ -340,6 +342,13 @@
 	        <!-- Hill coefficient defaults to 1.0 -->
 	        <IC50 current="membrane_rapid_delayed_rectifier_potassium_current">5</IC50>
 	    </ApplyDrug>
+
+		<!-- Parameters for the Purkinje system, if present -->
+		<Purkinje>
+			<Capacitance unit="uF/cm^2"> 1.5 </Capacitance>
+			<SurfaceAreaToVolumeRatio unit="1/cm"> 8000 </SurfaceAreaToVolumeRatio>
+		</Purkinje>
+		
 	</Physiological>
 
 	<Numerical>
