@@ -37,7 +37,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "UblasIncludes.hpp"
 
 #include "ArchiveLocationInfo.hpp"
-#include "ChasteParameters_3_0.hpp"
+#include "ChasteParameters_3_1.hpp"
 
 #include "AbstractStimulusFunction.hpp"
 // These are needed here for Boost < 1.37
@@ -55,7 +55,7 @@ along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 #include "ChasteSerializationVersion.hpp"
 #include <boost/serialization/split_member.hpp>
 
-namespace cp = chaste::parameters::v3_0;
+namespace cp = chaste::parameters::v3_1;
 
 // Forward declaration to avoid circular includes
 class HeartFileFinder;
