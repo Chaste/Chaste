@@ -1292,7 +1292,7 @@ public:
 
     /**
      * Set the default conductivity for Purkinje fibres.
-     * @param capacitance  Purkinje conductivity (units mS/cm)
+     * @param conductivity  Purkinje conductivity (units mS/cm)
      */
     void SetPurkinjeConductivity(double conductivity);
 

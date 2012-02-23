@@ -23,6 +23,7 @@
     <cp:Purkinje>
       <cp:SurfaceAreaToVolumeRatio unit="1/cm">2800</cp:SurfaceAreaToVolumeRatio>
       <cp:Capacitance unit="uF/cm^2">1</cp:Capacitance>
+      <cp:Conductivity unit="mS/cm">1.75</cp:Conductivity>
     </cp:Purkinje>
   </cp:Physiological>
 
