@@ -202,6 +202,10 @@ private:
          * pass it the LHS matrix of the linear system, and tell it to assemble. We also declare
          * one of our purpose-built `RhsMatrixAssemblers`, pass it the matrix `mRhsMatrix`, and
          * tell it to assemble.
+         *
+         * '''Important note''': if any of the assemblers will require the current solution (ie solution
+         * at the current timestep), this needs to be passed to the assembler, as in the commented
+         * line below.
          */
         if(computeMatrix)
         {
@@ -212,7 +216,9 @@ private:
             mass_matrix_assembler.AssembleMatrix();
 
             rhs_matrix_assembler.SetMatrixToAssemble(mRhsMatrix);
+            //rhs_matrix_assembler.SetCurrentSolution(currentSolution);
             rhs_matrix_assembler.AssembleMatrix();
+
 
             this->mpLinearSystem->FinaliseLhsMatrix(); // (Petsc communication)
             PetscMatTools::Finalise(mRhsMatrix);       // (Petsc communication)
