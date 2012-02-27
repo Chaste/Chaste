@@ -443,14 +443,14 @@ public:
     }
 
     /*
-     * Simulation with regularised lid driven cavity, u=1-x^4, on the top.
+     * Simulation with regularised lid driven cavity u=1-x^4 on the top.
      */
     void TestStokesWithLidCavity() throw(Exception)
     {
         EXIT_IF_PARALLEL; // defined in PetscTools
 
         // Set up a mesh on [-1 1]x[-1 1]
-        unsigned num_elem = 20;
+        unsigned num_elem = 5;
         QuadraticMesh<2> mesh(2.0/num_elem, 2.0, 2.0);
         mesh.Translate(-1.0, -1.0);
 
@@ -470,15 +470,16 @@ public:
                 c_vector<double,2> flow = zero_vector<double>(2);
                 dirichlet_flow.push_back(flow);
             }
-            else if (y == 1.0) // this doesn't include corners
+            else if (y == 1.0) // this doesnt include corners
             {
                 dirichlet_nodes.push_back(i);
                 c_vector<double,2> flow = zero_vector<double>(2);
 
-                flow(0) = 1;//-x*x*x*x;
+                flow(0) = 1-x*x*x*x;
                 flow(1) = 0.0;
                 dirichlet_flow.push_back(flow);
             }
+
         }
 
         assert(dirichlet_flow.size()== 8*num_elem);
@@ -492,16 +493,9 @@ public:
         StokesFlowSolver<2> solver(mesh, problem_defn, "LidCavityStokesFlow");
 
         // Uncomment to make errors smaller
-        // solver.SetKspAbsoluteTolerance(1e-12);
+        //solver.SetKspAbsoluteTolerance(1e-12);
 
         solver.Solve();
-
-        OutputFileHandler handler("LidCavityStokesFlow", false);
-        out_stream p_file = handler.OpenOutputFile("nodes.txt");
-        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
-        {
-            *p_file << mesh.GetNode(i)->rGetLocation()[0] << " " << mesh.GetNode(i)->rGetLocation()[1] << "\n";
-        }
 
         ///\todo Test something
     }
