@@ -112,7 +112,7 @@ public:
         TS_ASSERT_EQUALS(static_cast<FixedDurationGenerationBasedCellCycleModel*>(p_cell->GetCellCycleModel())->GetGeneration(), 0u);
 
         // Test cell property collection
-        TS_ASSERT_EQUALS(p_cell->rGetCellPropertyCollection().GetSize(), 2u);
+        TS_ASSERT_EQUALS(p_cell->rGetCellPropertyCollection().GetSize(), 3u);
         TS_ASSERT_EQUALS(p_cell->rGetCellPropertyCollection().HasProperty(p_wild_type), true);
         TS_ASSERT_EQUALS(p_cell->rGetCellPropertyCollection().HasProperty(p_label), true);
         TS_ASSERT_EQUALS(p_cell->rGetCellPropertyCollection().HasProperty(p_apc2_mutation), false);
@@ -121,6 +121,7 @@ public:
         TS_ASSERT_EQUALS(p_cell->HasCellProperty<ApcTwoHitCellMutationState>(), false);
         TS_ASSERT_EQUALS(p_cell->rGetCellPropertyCollection().HasPropertyType<AbstractCellProperty>(), true);
         TS_ASSERT_EQUALS(p_cell->rGetCellPropertyCollection().HasPropertyType<AbstractCellMutationState>(), true);
+        TS_ASSERT_EQUALS(p_cell->rGetCellPropertyCollection().HasPropertyType<CellId>(), true);
 
         // Test creating another cell with the same cell property collection
         TS_ASSERT_EQUALS(p_wild_type->GetCellCount(), 1u);
@@ -172,7 +173,7 @@ public:
         TS_ASSERT_DELTA(p_daughter_cell->GetAge(), 0.0, 1e-9);
 
         // Test cell property collection has been inherited correctly during division
-        TS_ASSERT_EQUALS(p_daughter_cell->rGetCellPropertyCollection().GetSize(), 2u);
+        TS_ASSERT_EQUALS(p_daughter_cell->rGetCellPropertyCollection().GetSize(), 3u);
 
         TS_ASSERT_EQUALS(p_daughter_cell->rGetCellPropertyCollection().HasProperty(p_wild_type), true);
         TS_ASSERT_EQUALS(p_daughter_cell->rGetCellPropertyCollection().HasProperty(p_apc2_mutation), false);
@@ -181,6 +182,7 @@ public:
         TS_ASSERT_EQUALS(p_daughter_cell->HasCellProperty<ApcTwoHitCellMutationState>(), false);
         TS_ASSERT_EQUALS(p_daughter_cell->rGetCellPropertyCollection().HasPropertyType<AbstractCellProperty>(), true);
         TS_ASSERT_EQUALS(p_daughter_cell->rGetCellPropertyCollection().HasPropertyType<AbstractCellMutationState>(), true);
+        TS_ASSERT_EQUALS(p_cell->rGetCellPropertyCollection().HasPropertyType<CellId>(), true);
 
         TS_ASSERT(&(p_daughter_cell->rGetCellPropertyCollection()) != &(p_cell->rGetCellPropertyCollection()));
 
@@ -1080,7 +1082,7 @@ public:
     void TestCellId() throw (Exception)
     {
         // Resetting the Maximum cell Id to zero (to account for previous tests)
-        Cell::ResetMaxCellId();
+        CellId::ResetMaxCellId();
 
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(25, 2);
@@ -1096,6 +1098,8 @@ public:
         p_simulation_time->IncrementTimeOneStep();
 
         TS_ASSERT_EQUALS(p_cell->ReadyToDivide(), true);
+
+        TS_ASSERT_EQUALS(p_cell->GetCellId(), 0u);
 
         CellPtr p_cell2 = p_cell->Divide();
 

@@ -51,6 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "CellLabel.hpp"
+#include "CellId.hpp"
 #include "CellPropertyRegistry.hpp"
 #include "CellwiseData.hpp"
 #include "SmartPointers.hpp"
@@ -562,7 +563,7 @@ public:
 	        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
 	        // Resetting the Maximum cell Id to zero (to account for previous tests)
-	        Cell::ResetMaxCellId();
+	        CellId::ResetMaxCellId();
 
 	        // Create a simple 3D mesh with some particles
 	        std::vector<Node<3>*> nodes;

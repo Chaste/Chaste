@@ -55,6 +55,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WildTypeCellMutationState.hpp"
 #include "CellLabel.hpp"
 #include "CellAncestor.hpp"
+#include "CellId.hpp"
 #include "CellPropertyRegistry.hpp"
 #include "SmartPointers.hpp"
 
@@ -632,7 +633,7 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Resetting the Maximum cell Id to zero (to account for previous tests)
-        Cell::ResetMaxCellId();
+        CellId::ResetMaxCellId();
 
         // Create a simple mesh
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
@@ -757,7 +758,7 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Resetting the Maximum cell Id to zero (to account for previous tests)
-        Cell::ResetMaxCellId();
+        CellId::ResetMaxCellId();
 
         // Create a simple 3D mesh
         std::vector<Node<3>*> nodes;

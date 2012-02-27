@@ -47,6 +47,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellMutationState.hpp"
 #include "CellLabel.hpp"
 #include "CellAncestor.hpp"
+#include "CellId.hpp"
+
 
 #include "ApoptoticCellProperty.hpp"
 #include "AbstractCellCycleModel.hpp"
@@ -96,8 +98,6 @@ private:
         archive & mApoptosisTime;
         archive & mIsDead;
         archive & mIsLogged;
-        archive & mCellId;
-        archive & mMaxCellId;
     }
 
 protected:
@@ -107,12 +107,6 @@ protected:
 
     /** The cell's cell-cycle model. */
     AbstractCellCycleModel* mpCellCycleModel;
-
-    /** An identifier which is unique to this cell. */
-    unsigned mCellId;
-
-    /** maximum cell identifier. */
-    static unsigned mMaxCellId;
 
     /** When the cell will/did die. */
     double mDeathTime;
@@ -349,11 +343,6 @@ public:
      * @return The cell identifier.
      */
     unsigned GetCellId() const;
-
-    /**
-     * Reset the current max ID.
-     */
-    static void ResetMaxCellId();
 };
 
 

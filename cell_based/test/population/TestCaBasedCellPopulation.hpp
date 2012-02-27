@@ -48,6 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "SmartPointers.hpp"
 #include "AdvectionCaUpdateRule.hpp"
+#include "CellId.hpp"
 
 class TestCaBasedCellPopulation : public AbstractCellBasedTestSuite
 {
@@ -325,7 +326,7 @@ public:
     void TestWriteResultsToFileAndOutputCellPopulationParameters()
     {
         // Resetting the maximum cell ID to zero (to account for previous tests)
-        Cell::ResetMaxCellId();
+        CellId::ResetMaxCellId();
 
         std::string output_directory = "TestCaBasedCellPopulationWriters";
         OutputFileHandler output_file_handler(output_directory, false);

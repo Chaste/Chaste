@@ -51,6 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WildTypeCellMutationState.hpp"
 #include "SmartPointers.hpp"
 #include "CellLabel.hpp"
+#include "CellId.hpp"
 #include "MutableMesh.hpp"
 
 class TestPottsBasedCellPopulation : public AbstractCellBasedTestSuite
@@ -393,7 +394,7 @@ public:
     void TestWriteResultsToFileAndOutputCellPopulationParameters()
     {
         // Resetting the maximum cell ID to zero (to account for previous tests)
-        Cell::ResetMaxCellId();
+        CellId::ResetMaxCellId();
 
         std::string output_directory = "TestPottsBasedCellPopulationWriters";
         OutputFileHandler output_file_handler(output_directory, false);

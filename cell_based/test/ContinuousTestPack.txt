@@ -2,6 +2,7 @@ cell/TestArchiveCell.hpp
 cell/TestCell.hpp
 cell/TestCellCycleModelOdeSolver.hpp
 cell/TestCellMutationStates.hpp
+cell/TestCellProperties.hpp
 cell/TestCellPropertyCollection.hpp
 cell/TestCellPropertyRegistry.hpp
 cell/TestCellsGenerator.hpp

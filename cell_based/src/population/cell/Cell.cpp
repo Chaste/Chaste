@@ -36,8 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Cell.hpp"
 #include "ApoptoticCellProperty.hpp"
 
-unsigned Cell::mMaxCellId = 0;
-
 /**
  * null_deleter means "doesn't delete" rather than "deletes nulls".
  *
@@ -84,8 +82,14 @@ Cell::Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
 
     mpCellCycleModel->SetCell(CellPtr(this, null_deleter()));
 
-    // Set cell identifier
-    mCellId = ++ mMaxCellId -1;
+
+    if (!mCellPropertyCollection.HasPropertyType<CellId>())
+    {
+		// Set cell identifier this will be called all the time unless the constructor is called through archiving
+		MAKE_PTR(CellId, p_cell_id);
+		p_cell_id->AssignCellId();
+		mCellPropertyCollection.AddProperty(p_cell_id);
+    }
 
     if (!pMutationState->IsSubType<AbstractCellMutationState>())
     {
@@ -314,19 +318,20 @@ unsigned Cell::GetAncestor() const
     	//EXCEPTION("SetAncestor must be called before GetAncestor. You may want to call SetCellAncestorsToLocationIndices on the cell population.");
     }
 
-    boost::shared_ptr<CellAncestor> p_label = boost::static_pointer_cast<CellAncestor>(ancestor_collection.GetProperty());
+    boost::shared_ptr<CellAncestor> p_ancestor = boost::static_pointer_cast<CellAncestor>(ancestor_collection.GetProperty());
 
-    return p_label->GetAncestor();
+    return p_ancestor->GetAncestor();
 }
 
 unsigned Cell::GetCellId() const
 {
-    return mCellId;
-}
+	CellPropertyCollection cell_id_collection = mCellPropertyCollection.GetPropertiesType<CellId>();
 
-void Cell::ResetMaxCellId()
-{
-    mMaxCellId = 0;
+	assert(cell_id_collection.GetSize() == 1);
+
+	boost::shared_ptr<CellId> p_cell_id = boost::static_pointer_cast<CellId>(cell_id_collection.GetProperty());
+
+	return p_cell_id->GetCellId();
 }
 
 bool Cell::ReadyToDivide()
@@ -351,10 +356,12 @@ CellPtr Cell::Divide()
 
     // Reset properties of parent cell
     mpCellCycleModel->ResetForDivision();
+    // Remove the CellId from the daughter cell a new one will be assigned in the constructor
+    CellPropertyCollection daughter_property_collection = mCellPropertyCollection;
+    daughter_property_collection.RemoveProperty<CellId>();
 
     // Create daughter cell
-    CellPtr p_new_cell(new Cell(GetMutationState(), mpCellCycleModel->CreateCellCycleModel(), false, mCellPropertyCollection));
-
+    CellPtr p_new_cell(new Cell(GetMutationState(), mpCellCycleModel->CreateCellCycleModel(), false, daughter_property_collection));
     // Initialise properties of daughter cell
     p_new_cell->GetCellCycleModel()->InitialiseDaughterCell();
 

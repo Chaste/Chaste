@@ -60,6 +60,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WntCellCycleModel.hpp"
 #include "TysonNovakCellCycleModel.hpp"
 #include "CellLabel.hpp"
+#include "CellId.hpp"
 #include "CellPropertyRegistry.hpp"
 #include "SmartPointers.hpp"
 #include "SimpleWntCellCycleModel.hpp"
@@ -1041,7 +1042,7 @@ public:
     void TestCellIdOutput() throw (Exception)
     {
         // Resetting the Maximum cell Id to zero (to account for previous tests)
-        Cell::ResetMaxCellId();
+        CellId::ResetMaxCellId();
 
         // Create mesh
         double crypt_length = 22.0;
