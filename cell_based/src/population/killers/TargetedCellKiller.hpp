@@ -102,7 +102,7 @@ public:
      * Loop over cells and start apoptosis randomly, based on the user-set
      * probability.
      */
-    void TestAndLabelCellsForApoptosisOrDeath();
+    void CheckAndLabelCellsForApoptosisOrDeath();
 
     /**
      * Overridden OutputCellKillerParameters() method.

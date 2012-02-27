@@ -47,13 +47,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * A cell killer that randomly kills cells based on the user set probability.
  *
  * The probability passed into the constructor will be the probability
- * of any cell dying whenever TestAndLabelCellsForApoptosis() is called.
+ * of any cell dying whenever CheckAndLabelCellsForApoptosis() is called.
  *
- * Note this does take into account timesteps - the input probability is the
+ * Note this does take into account time steps - the input probability is the
  * probability that in an hour's worth of trying, the cell killer will have
- * successfully killed a given cell. In the method TestAndLabelSingleCellForApoptosis()
+ * successfully killed a given cell. In the method CheckAndLabelSingleCellForApoptosis()
  * this probability is used to calculate the probability that the cell is killed
  * at a given time step.
+ *
+ * We assume a constant time step and that there are an integer number (n = 1/dt)
+ * of time steps per hour. We also assume that this method is called every time step
+ * and that the probabilities of dying at different times are independent.
  */
 template<unsigned DIM>
 class RandomCellKiller : public AbstractCellKiller<DIM>
@@ -104,13 +108,13 @@ public:
      *
      * @param pCell the cell to test for apoptosis
      */
-    void TestAndLabelSingleCellForApoptosis(CellPtr pCell);
+    void CheckAndLabelSingleCellForApoptosis(CellPtr pCell);
 
     /**
      * Loop over cells and start apoptosis randomly, based on the user-set
      * probability.
      */
-    void TestAndLabelCellsForApoptosisOrDeath();
+    void CheckAndLabelCellsForApoptosisOrDeath();
 
     /**
      * Overridden OutputCellKillerParameters() method.

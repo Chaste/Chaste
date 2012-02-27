@@ -87,7 +87,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Cartesian coordinates by the equation (''x''/20)^2^ + (''y''/10)^2^ < 1. To
  * implement this we define a new cell killer class, {{{MyCellKiller}}},
  * which inherits from {{{AbstractCellKiller}}} and overrides the
- * {{{TestAndLabelCellsForApoptosisOrDeath()}}} method.
+ * {{{CheckAndLabelCellsForApoptosisOrDeath()}}} method.
  *
  * Note that usually this code would be separated out into a separate declaration in
  * a .hpp file and definition in a .cpp file.
@@ -111,10 +111,10 @@ public:
         : AbstractCellKiller<2>(pCellPopulation)
     {}
 
-    /* The second public method overrides {{{TestAndLabelCellsForApoptosisOrDeath()}}}.
+    /* The second public method overrides {{{CheckAndLabelCellsForApoptosisOrDeath()}}}.
      * This method iterates over all cells in the population, and calls {{{Kill()}}} on
      * any cell whose centre is located outside the ellipse (''x''/20)^2^ + (''y''/10)^2^ < 1. */
-    void TestAndLabelCellsForApoptosisOrDeath()
+    void CheckAndLabelCellsForApoptosisOrDeath()
     {
         for (AbstractCellPopulation<2>::Iterator cell_iter = this->mpCellPopulation->Begin();
             cell_iter != this->mpCellPopulation->End();
@@ -221,8 +221,8 @@ public:
         MyCellKiller my_cell_killer(&cell_population);
 
         /* To test that we have implemented the cell killer correctly, we call the
-         * overridden method {{{TestAndLabelCellsForApoptosisOrDeath}}}... */
-        my_cell_killer.TestAndLabelCellsForApoptosisOrDeath();
+         * overridden method {{{CheckAndLabelCellsForApoptosisOrDeath}}}... */
+        my_cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
         /* ... and check that any cell whose centre is located outside the ellipse
          * (''x''/20)^2^ + (''y''/10)^2^ < 1 has indeed been labelled as dead. */

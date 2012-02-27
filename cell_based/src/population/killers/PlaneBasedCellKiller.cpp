@@ -59,7 +59,7 @@ const c_vector<double, DIM>& PlaneBasedCellKiller<DIM>::rGetNormalToPlane() cons
 }
 
 template<unsigned DIM>
-void PlaneBasedCellKiller<DIM>::TestAndLabelCellsForApoptosisOrDeath()
+void PlaneBasedCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
 {
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
          cell_iter != this->mpCellPopulation->End();

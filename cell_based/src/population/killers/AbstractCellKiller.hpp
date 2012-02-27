@@ -87,7 +87,7 @@ public:
      * which should be about to undergo programmed death, or Kill()
      * on any cell which should die immediately.
      */
-    virtual void TestAndLabelCellsForApoptosisOrDeath()=0;
+    virtual void CheckAndLabelCellsForApoptosisOrDeath()=0;
 
     /**
      * Get a pointer to the cell population.

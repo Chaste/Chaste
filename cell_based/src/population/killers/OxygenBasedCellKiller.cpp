@@ -43,7 +43,7 @@ OxygenBasedCellKiller<SPACE_DIM>::OxygenBasedCellKiller(AbstractCellPopulation<S
 }
 
 template<unsigned SPACE_DIM>
-void OxygenBasedCellKiller<SPACE_DIM>::TestAndLabelSingleCellForApoptosis(CellPtr pCell)
+void OxygenBasedCellKiller<SPACE_DIM>::CheckAndLabelSingleCellForApoptosis(CellPtr pCell)
 {
     if (pCell->HasCellProperty<ApoptoticCellProperty>() && !(pCell->HasApoptosisBegun()))
     {
@@ -52,13 +52,13 @@ void OxygenBasedCellKiller<SPACE_DIM>::TestAndLabelSingleCellForApoptosis(CellPt
 }
 
 template<unsigned SPACE_DIM>
-void OxygenBasedCellKiller<SPACE_DIM>::TestAndLabelCellsForApoptosisOrDeath()
+void OxygenBasedCellKiller<SPACE_DIM>::CheckAndLabelCellsForApoptosisOrDeath()
 {
     for (typename AbstractCellPopulation<SPACE_DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
         cell_iter != this->mpCellPopulation->End();
         ++cell_iter)
     {
-        TestAndLabelSingleCellForApoptosis(*cell_iter);
+        CheckAndLabelSingleCellForApoptosis(*cell_iter);
     }
 }
 

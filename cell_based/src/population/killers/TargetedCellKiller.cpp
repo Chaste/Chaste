@@ -56,7 +56,7 @@ unsigned TargetedCellKiller<DIM>::GetBloodLust() const
 }
 
 template<unsigned DIM>
-void TargetedCellKiller<DIM>::TestAndLabelCellsForApoptosisOrDeath()
+void TargetedCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
 {
     if ( !mBloodLust || this->mpCellPopulation->GetNumRealCells()==0 || this->mpCellPopulation->GetNumRealCells()<mTargetIndex+1)
     {

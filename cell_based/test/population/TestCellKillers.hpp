@@ -88,7 +88,7 @@ public:
         TS_ASSERT_EQUALS(single_cell_killer.GetIdentifier(), "TargetedCellKiller-2");
 
         // Check that some of the vector of cells reach apotosis
-        single_cell_killer.TestAndLabelCellsForApoptosisOrDeath();
+        single_cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
         std::set<double> old_locations;
 
@@ -175,14 +175,14 @@ public:
         unsigned max_tries = 0;
         while (!(*r_cells.begin())->HasApoptosisBegun() && max_tries<99)
         {
-            random_cell_killer.TestAndLabelSingleCellForApoptosis(*r_cells.begin());
+            random_cell_killer.CheckAndLabelSingleCellForApoptosis(*r_cells.begin());
             max_tries++;
         }
         TS_ASSERT_DIFFERS(max_tries, 99u);
         TS_ASSERT_DIFFERS(max_tries, 0u);
 
         // Check that some of the vector of cells reach apotosis
-        random_cell_killer.TestAndLabelCellsForApoptosisOrDeath();
+        random_cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
         std::set< double > old_locations;
 
@@ -289,14 +289,14 @@ public:
 
         TS_ASSERT_EQUALS(oxygen_based_cell_killer.GetIdentifier(), "OxygenBasedCellKiller-2");
 
-        TS_ASSERT_THROWS_NOTHING(oxygen_based_cell_killer.TestAndLabelSingleCellForApoptosis(*r_cells.begin()));
+        TS_ASSERT_THROWS_NOTHING(oxygen_based_cell_killer.CheckAndLabelSingleCellForApoptosis(*r_cells.begin()));
 
         // Check that a single cell reaches apoptosis
         TS_ASSERT_EQUALS((*r_cells.begin())->HasApoptosisBegun(), false);
 
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_state(CellPropertyRegistry::Instance()->Get<ApoptoticCellProperty>());
         (*r_cells.begin())->AddCellProperty(p_apoptotic_state);
-        oxygen_based_cell_killer.TestAndLabelSingleCellForApoptosis(*r_cells.begin());
+        oxygen_based_cell_killer.CheckAndLabelSingleCellForApoptosis(*r_cells.begin());
 
         TS_ASSERT((*r_cells.begin())->HasApoptosisBegun());
 
@@ -355,7 +355,7 @@ public:
         c_vector<double, 1> point;
         point(0) = 10.0;
         PlaneBasedCellKiller<1> cell_killer(&cell_population, point, unit_vector<double>(1,0)); // x<10
-        cell_killer.TestAndLabelCellsForApoptosisOrDeath();
+        cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
         // Check that cells were labelled for death correctly
         for (AbstractCellPopulation<1>::Iterator cell_iter = cell_population.Begin();
@@ -404,7 +404,7 @@ public:
 
         // Create cell killer and kill cells
         PlaneBasedCellKiller<2> cell_killer(&cell_population, zero_vector<double>(2), unit_vector<double>(2,1)); // y<0
-        cell_killer.TestAndLabelCellsForApoptosisOrDeath();
+        cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
         // Check that cells were labelled for death correctly
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
@@ -450,7 +450,7 @@ public:
 
         // Create cell killer
         PlaneBasedCellKiller<3> cell_killer(&cell_population,  zero_vector<double>(3), unit_vector<double>(3,2)); // z<0
-        cell_killer.TestAndLabelCellsForApoptosisOrDeath();
+        cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
         // Check that cells were labelled for death correctly
         for (AbstractCellPopulation<3>::Iterator cell_iter = cell_population.Begin();

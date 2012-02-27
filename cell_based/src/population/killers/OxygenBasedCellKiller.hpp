@@ -77,13 +77,13 @@ public:
      *
      * @param pCell  the cell to test for apoptosis.
      */
-    void TestAndLabelSingleCellForApoptosis(CellPtr pCell);
+    void CheckAndLabelSingleCellForApoptosis(CellPtr pCell);
 
     /**
      * Loop over cells and start apoptosis if the cell has been undergone
      * a prolonged period of hypoxia.
      */
-    virtual void TestAndLabelCellsForApoptosisOrDeath();
+    virtual void CheckAndLabelCellsForApoptosisOrDeath();
 
     /**
      * Overridden OutputCellKillerParameters() method.

@@ -68,7 +68,7 @@ double SloughingCellKiller<DIM>::GetSloughWidth() const
 
 
 template<unsigned DIM>
-void SloughingCellKiller<DIM>::TestAndLabelCellsForApoptosisOrDeath()
+void SloughingCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
 {
     switch (DIM)
     {

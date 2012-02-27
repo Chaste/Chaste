@@ -74,7 +74,7 @@ public:
         // Create cell killer and kill cells
         SloughingCellKiller<2> sloughing_cell_killer(&cell_population, 0.5, true, 0.5);
 
-        sloughing_cell_killer.TestAndLabelCellsForApoptosisOrDeath();
+        sloughing_cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
         TS_ASSERT_EQUALS(sloughing_cell_killer.GetIdentifier(), "SloughingCellKiller-2");
 
@@ -129,7 +129,7 @@ public:
         // Create cell killer and kill cells
         SloughingCellKiller<2> sloughing_cell_killer(&cell_population, 0.5);
 
-        sloughing_cell_killer.TestAndLabelCellsForApoptosisOrDeath();
+        sloughing_cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
         // Check that cells were labelled for death correctly
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
@@ -178,7 +178,7 @@ public:
 
         // Create cell killer and kill cells
         SloughingCellKiller<1> sloughing_cell_killer(&cell_population, crypt_length);
-        sloughing_cell_killer.TestAndLabelCellsForApoptosisOrDeath();
+        sloughing_cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
         // Check that cells were labelled for death correctly
         for (AbstractCellPopulation<1>::Iterator cell_iter = cell_population.Begin();
@@ -226,7 +226,7 @@ public:
         SloughingCellKiller<3> sloughing_cell_killer(&cell_population, 1.0); // number is irrelevent as long as its positive.
 
         // Check that an exception is thrown, as this method is not yet implemented in 3D
-        TS_ASSERT_THROWS_THIS(sloughing_cell_killer.TestAndLabelCellsForApoptosisOrDeath(), "SloughingCellKiller is not yet implemented in 3D");
+        TS_ASSERT_THROWS_THIS(sloughing_cell_killer.CheckAndLabelCellsForApoptosisOrDeath(), "SloughingCellKiller is not yet implemented in 3D");
     }
 
     void TestArchivingOfSloughingCellKiller() throw (Exception)
@@ -301,7 +301,7 @@ public:
 
         // Create cell killer and kill cells
         RadialSloughingCellKiller radial_cell_killer(&cell_population, centre, radius);
-        radial_cell_killer.TestAndLabelCellsForApoptosisOrDeath();
+        radial_cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
         // Check that cells were labelled for death correctly
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();

@@ -154,7 +154,7 @@ unsigned AbstractCellBasedSimulation<DIM>::DoCellRemoval()
          killer_iter != mCellKillers.end();
          ++killer_iter)
     {
-        (*killer_iter)->TestAndLabelCellsForApoptosisOrDeath();
+        (*killer_iter)->CheckAndLabelCellsForApoptosisOrDeath();
     }
 
     num_deaths_this_step += mrCellPopulation.RemoveDeadCells();
