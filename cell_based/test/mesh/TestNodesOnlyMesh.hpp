@@ -267,11 +267,11 @@ public:
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(nodes);
 
-        // Failing test
-//        unsigned boundary_nodes = mesh.GetNumBoundaryNodes();
-//        NodeMap node_map(8);
-//        mesh.ReMesh(node_map);
-//        TS_ASSERT_EQUALS(mesh.GetNumBoundaryNodes(), boundary_nodes);
+        // Test that there are never any boundary nodes
+        TS_ASSERT_EQUALS(mesh.GetNumBoundaryNodes(), 0u);
+        NodeMap node_map(8);
+        mesh.ReMesh(node_map);
+        TS_ASSERT_EQUALS(mesh.GetNumBoundaryNodes(), 0u);
 
         // Free memory - the constructor does a deep copy of its input
         for (unsigned i=0; i<nodes.size(); i++)
@@ -279,7 +279,7 @@ public:
             delete nodes[i];
         }
 
-        // Set radius of cells from 1 to 8
+        // Set radii of cells from 1 to 8
         for (unsigned i=0; i<nodes.size(); i++)
         {
             mesh.SetCellRadius(i, i+1);
@@ -288,8 +288,10 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 8u);
 
         // Delete from interior
+        TS_ASSERT_DELTA(mesh.GetCellRadius(6), 7.0, 1e-4);
         mesh.DeleteNode(6);
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 7u);
+        TS_ASSERT_EQUALS(mesh.GetCellRadius(6), DOUBLE_UNSET);
 
         // Delete from edge
         mesh.DeleteNode(1);

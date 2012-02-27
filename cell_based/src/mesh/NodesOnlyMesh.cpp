@@ -65,7 +65,6 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<
         this->mNodes.push_back(p_node_copy);
 
         mCellRadii.push_back(0.5);
-
     }
 }
 
@@ -172,36 +171,14 @@ void NodesOnlyMesh<SPACE_DIM>::ReMesh(NodeMap& map)
     // Remove current data
     this->Clear();
 
-    // Replace radius data, if need be
+    // Replace radius data
     mCellRadii = old_cell_radii;
 
-    // Construct the nodes and boundary nodes
+    // Construct the nodes
     for (unsigned node_index=0; node_index<old_node_locations.size(); node_index++)
     {
         Node<SPACE_DIM>* p_node = new Node<SPACE_DIM>(node_index, old_node_locations[node_index], false);
         this->mNodes.push_back(p_node);
-
-        // As we're in 1D, the boundary nodes are simply at either end of the mesh
-        if (node_index==0 || node_index==old_node_locations.size()-1)
-        {
-            this->mBoundaryNodes.push_back(p_node);
-        }
-    }
-
-    // Create a map between node indices and node locations
-    std::map<double, unsigned> location_index_map;
-    for (unsigned i=0; i<this->mNodes.size(); i++)
-    {
-        location_index_map[this->mNodes[i]->rGetLocation()[0]] = this->mNodes[i]->GetIndex();
-    }
-
-    // Use this map to generate a vector of node indices that are ordered spatially
-    std::vector<unsigned> node_indices_ordered_spatially;
-    for (std::map<double, unsigned>::iterator iter = location_index_map.begin();
-         iter != location_index_map.end();
-         ++iter)
-    {
-        node_indices_ordered_spatially.push_back(iter->second);
     }
 }
 
@@ -233,10 +210,11 @@ void NodesOnlyMesh<SPACE_DIM>::DeleteNode(unsigned index)
     this->mDeletedNodeIndices.push_back(index);
 
     /**
-     * Note: we do not need to update mCellRadii here, since if the
+     * Note: we may not need to update mCellRadii here, since if the
      * node index is ever re-used when a new node is added, mCellRadii
      * will be updated correctly.
      */
+    mCellRadii[index] = DOUBLE_UNSET;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
