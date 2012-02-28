@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTCELLPROPERTIES_HPP_
-#define TESTCELLPROPERTIES_HPP_
+#ifndef TESTCELLBASEDCELLPROPERTIES_HPP_
+#define TESTCELLBASEDCELLPROPERTIES_HPP_
 
 #include <cxxtest/TestSuite.h>
 
@@ -52,7 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "SmartPointers.hpp"
 
-class TestCellProperties : public AbstractCellBasedTestSuite
+class TestCellBasedCellProperties : public AbstractCellBasedTestSuite
 {
 public:
 
@@ -124,4 +124,4 @@ public:
     }
 };
 
-#endif /* TESTCELLPROPERTIES_HPP_ */
+#endif /* TESTCELLBASEDCELLPROPERTIES_HPP_ */

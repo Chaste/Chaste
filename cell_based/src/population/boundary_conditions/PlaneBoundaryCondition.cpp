@@ -36,7 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PlaneBoundaryCondition.hpp"
 #include "AbstractCentreBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
-#include "Debug.hpp"
 
 template<unsigned DIM>
 PlaneBoundaryCondition<DIM>::PlaneBoundaryCondition(AbstractCellPopulation<DIM>* pCellPopulation,
