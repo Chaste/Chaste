@@ -43,7 +43,8 @@ CylindricalHoneycombMeshGenerator::CylindricalHoneycombMeshGenerator(unsigned nu
 	mDomainWidth = numNodesAlongWidth*scaleFactor;
 	mNumCellWidth = numNodesAlongWidth; //*1 because cells are considered to be size one
 	mNumCellLength = numNodesAlongLength;
-  // The code below won't work in parallel
+
+    // The code below won't work in parallel
     assert(PetscTools::IsSequential());
 
     // An older version of the constructor might allow the wrong argument through to the scale factor
@@ -85,7 +86,7 @@ CylindricalHoneycombMeshGenerator::CylindricalHoneycombMeshGenerator(unsigned nu
     // Write node file
     out_stream p_node_file = output_file_handler.OpenOutputFile(mMeshFilename+".node");
     (*p_node_file) << std::scientific;
-    //(*p_node_file) << std::setprecision(20);
+    (*p_node_file) << std::setprecision(20);
     (*p_node_file) << num_nodes << "\t2\t0\t1" << std::endl;
 
     unsigned node = 0;
@@ -203,7 +204,6 @@ CylindricalHoneycombMeshGenerator::CylindricalHoneycombMeshGenerator(unsigned nu
     TrianglesMeshReader<2,2> mesh_reader(output_dir + mMeshFilename);
     mpMesh = new Cylindrical2dMesh(mDomainWidth);
     mpMesh->ConstructFromMeshReader(mesh_reader);
-    //NodeMap map(mpMesh->GetNumNodes());
 
     // Make the mesh cylindrical (we use Triangle library mode inside this ReMesh call)
     mpMesh->ReMesh();
