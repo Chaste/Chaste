@@ -242,7 +242,7 @@ class BuildType(object):
         Note: various places assume this includes a trailing slash.
         Note2: the builder script also has this path hardcoded.
         """
-        return 'testoutput/'
+        return 'test_summary' + os.sep
 
     def SetNumProcesses(self, np):
         """Set the number of parallel processes to run."""
