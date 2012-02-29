@@ -85,7 +85,7 @@ public:
             // And the parent folder name
             FileFinder parent("global/src", RelativeTo::ChasteSourceRoot);
             TS_ASSERT_EQUALS(file_finder.GetParent().GetAbsolutePath(), parent.GetAbsolutePath());
-            
+
             // Check we can construct from a Boost path or a string
             TS_ASSERT_EQUALS(FileFinder(fs::path(file_name)).GetAbsolutePath(), abs_path);
             TS_ASSERT_EQUALS(FileFinder(file_name).GetAbsolutePath(), abs_path);
@@ -228,6 +228,33 @@ public:
         FileFinder::StopFaking();
         path.SetPath("file", RelativeTo::ChasteSourceRoot);
         TS_ASSERT_EQUALS(path.GetAbsolutePath(), std::string(ChasteBuildRootDir()) + "file");
+    }
+
+    void TestRemove()
+    {
+        // We shouldn't be able to remove unsafe files, if possible
+        FileFinder bad1a("global/src", RelativeTo::ChasteSourceRoot);
+        FileFinder bad1b("/", RelativeTo::Absolute);
+        TS_ASSERT_THROWS_CONTAINS(bad1a.Remove(), "is not located within the Chaste test output folder.");
+        TS_ASSERT_THROWS_CONTAINS(bad1b.Remove(), "is not located within the Chaste test output folder.");
+        FileFinder bad2("../..", RelativeTo::ChasteTestOutput);
+        TS_ASSERT_THROWS_CONTAINS(bad2.Remove(), "contains a dangerous path component.");
+
+        // We can delete individual files
+        OutputFileHandler handler("TestFileFinder/TestRemove");
+        handler.OpenOutputFile("delete_me");
+        FileFinder file = handler.FindFile("delete_me");
+        TS_ASSERT(file.Exists());
+        file.Remove();
+        TS_ASSERT(!file.Exists());
+
+        // We can recursively delete folders
+        FileFinder dir("TestFileFinder", RelativeTo::ChasteTestOutput);
+        FileFinder subdir("TestFileFinder/TestRemove", RelativeTo::ChasteTestOutput);
+        TS_ASSERT(subdir.Exists());
+        dir.Remove();
+        TS_ASSERT(!subdir.Exists());
+        TS_ASSERT(!dir.Exists());
     }
 };
 

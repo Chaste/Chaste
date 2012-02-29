@@ -189,6 +189,13 @@ public:
     FileFinder GetParent() const;
 
     /**
+     * Recursively remove this file or folder.
+     * Since this is a potentially very dangerous operation, only locations under the Chaste
+     * test output folder may be removed.
+     */
+    void Remove() const;
+
+    /**
      * Test whether a path is absolute. Currently just checks whether the first character is '/'.
      *
      * @param rPath The path to test

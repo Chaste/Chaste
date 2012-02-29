@@ -51,24 +51,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class TestOutputFileHandler : public CxxTest::TestSuite
 {
-    /*
-     * "rm -rf" equivalent.
-     */
-    void RemoveAll(const fs::path& rPath)
-    {
-        // First recursively remove any children
-        if (fs::is_directory(rPath))
-        {
-            fs::directory_iterator end_iter;
-            for (fs::directory_iterator dir_iter(rPath); dir_iter != end_iter; ++dir_iter)
-            {
-                RemoveAll(dir_iter->path());
-            }
-        }
-        // Now remove the item itself
-        fs::remove(rPath);
-    }
-
 public:
 
     void TestHandler() throw(Exception)
@@ -132,7 +114,7 @@ public:
             TS_ASSERT(test_folder.Exists());
             if (PetscTools::AmMaster())
             {
-                RemoveAll(test_folder.GetAbsolutePath());
+                test_folder.Remove();
             }
         }
 
@@ -151,7 +133,7 @@ public:
             // Erase it
             if (PetscTools::AmMaster())
             {
-                RemoveAll(test_folder);
+                FileFinder(test_folder).Remove();
             }
         }
 

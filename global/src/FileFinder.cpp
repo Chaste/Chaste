@@ -187,6 +187,45 @@ FileFinder FileFinder::GetParent() const
                       RelativeTo::Absolute);
 }
 
+
+/**
+ * Recursively remove the given path.
+ * @param rPath
+ */
+void RemoveAll(const fs::path& rPath)
+{
+    // First recursively remove any children
+    if (fs::is_directory(rPath))
+    {
+        fs::directory_iterator end_iter;
+        for (fs::directory_iterator dir_iter(rPath); dir_iter != end_iter; ++dir_iter)
+        {
+            RemoveAll(dir_iter->path());
+        }
+    }
+    // Now remove the item itself
+    fs::remove(rPath);
+}
+
+void FileFinder::Remove() const
+{
+    // Test for bad paths
+    const std::string test_output(OutputFileHandler::GetChasteTestOutputDirectory());
+    if (mAbsPath.substr(0, test_output.length()) != test_output)
+    {
+        EXCEPTION("Cannot remove location '" << mAbsPath
+                  << "' as it is not located within the Chaste test output folder.");
+    }
+    if (mAbsPath.find("..") != std::string::npos)
+    {
+        EXCEPTION("Cannot remove location '" << mAbsPath
+                  << "' as it contains a dangerous path component.");
+    }
+    // Do the removal
+    RemoveAll(mAbsPath);
+}
+
+
 bool FileFinder::IsAbsolutePath(const std::string& rPath)
 {
     return fs::path(rPath).is_complete();
