@@ -33,24 +33,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "GetCurrentWorkingDirectory.hpp"
+#ifndef BOOSTFILESYSTEM_HPP_
+#define BOOSTFILESYSTEM_HPP_
 
-#include "Exception.hpp"
-#include "BoostFilesystem.hpp"
+/**
+ * @file  Include the Boost Filesystem library headers,
+ * and set up the 'fs' namespace alias.
+ * This header also ensures that we use version 2 of the library.
+ */
 
-std::string GetCurrentWorkingDirectory()
-{
-    fs::path cwd;
-    try
-    {
-        cwd = fs::current_path();
-    }
-    catch (...)
-    {
-#define COVERAGE_IGNORE
-        // Not sure what could cause this, but just in case...
-        EXCEPTION("Unable to determine current working directory");
-#undef COVERAGE_IGNORE
-    }
-    return cwd.string();
-}
+#define BOOST_FILESYSTEM_VERSION 2
+
+#include <boost/filesystem.hpp>
+#include <boost/filesystem/fstream.hpp>
+
+namespace fs = boost::filesystem;
+
+#endif // BOOSTFILESYSTEM_HPP_

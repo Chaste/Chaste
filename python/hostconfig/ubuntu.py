@@ -88,7 +88,7 @@ else:
     boost_suffix = ''
 
 other_libraries = libs_for_petsc + \
-                  ['boost_serialization'+boost_suffix, 'xerces-c',
+                  ['boost_serialization'+boost_suffix, 'boost_filesystem'+boost_suffix, 'xerces-c',
                    'hdf5', 'z',
                    'parmetis', 'metis']
 

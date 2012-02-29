@@ -85,6 +85,12 @@ public:
             // And the parent folder name
             FileFinder parent("global/src", RelativeTo::ChasteSourceRoot);
             TS_ASSERT_EQUALS(file_finder.GetParent().GetAbsolutePath(), parent.GetAbsolutePath());
+            
+            // Check we can construct from a Boost path or a string
+            TS_ASSERT_EQUALS(FileFinder(fs::path(file_name)).GetAbsolutePath(), abs_path);
+            TS_ASSERT_EQUALS(FileFinder(file_name).GetAbsolutePath(), abs_path);
+            TS_ASSERT_EQUALS(FileFinder(abs_path).GetAbsolutePath(), abs_path);
+            TS_ASSERT_EQUALS(FileFinder("global/src/FileFinder.hpp").GetAbsolutePath(), abs_path);
         }
 
         {

@@ -34,13 +34,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "FileFinder.hpp"
+
+#include <cassert>
+
+#include "BoostFilesystem.hpp"
 #include "ChasteBuildRoot.hpp"
-#include "OutputFileHandler.hpp"
 #include "Exception.hpp"
 #include "GetCurrentWorkingDirectory.hpp"
-#include <fstream>
-#include <cassert>
-#include <sys/stat.h>
+#include "OutputFileHandler.hpp"
 
 bool FileFinder::msFaking = false;
 
@@ -62,6 +63,11 @@ FileFinder::FileFinder(const std::string& rRelativePath, RelativeTo::Value relat
 FileFinder::FileFinder(const std::string& rLeafName, const FileFinder& rParentOrSibling)
 {
     SetPath(rLeafName, rParentOrSibling);
+}
+
+FileFinder::FileFinder(const fs::path& rPath)
+{
+    SetPath(fs::complete(rPath).string(), RelativeTo::Absolute);
 }
 
 void FileFinder::SetPath(const std::string& rRelativePath, RelativeTo::Value relativeTo)
@@ -134,43 +140,17 @@ void FileFinder::SetPath(const std::string& rLeafName, const FileFinder& rParent
 
 bool FileFinder::Exists() const
 {
-    struct stat our_stats;
-    int retcode = stat(GetAbsolutePath().c_str(), &our_stats);
-    return (retcode == 0);
+    return fs::exists(GetAbsolutePath());
 }
 
 bool FileFinder::IsFile() const
 {
-    bool result;
-    struct stat our_stats;
-    int retcode = stat(GetAbsolutePath().c_str(), &our_stats);
-    if (retcode == 0)
-    {
-        result = S_ISREG(our_stats.st_mode);
-    }
-    else
-    {
-        // If it doesn't exist, it isn't a file
-        result = false;
-    }
-    return result;
+    return fs::is_regular(GetAbsolutePath());
 }
 
 bool FileFinder::IsDir() const
 {
-    bool result;
-    struct stat our_stats;
-    int retcode = stat(GetAbsolutePath().c_str(), &our_stats);
-    if (retcode == 0)
-    {
-        result = S_ISDIR(our_stats.st_mode);
-    }
-    else
-    {
-        // If it doesn't exist, it isn't a directory
-        result = false;
-    }
-    return result;
+    return fs::is_directory(GetAbsolutePath());
 }
 
 std::string FileFinder::GetAbsolutePath() const
@@ -182,46 +162,41 @@ bool FileFinder::IsNewerThan(const FileFinder& rOtherEntity) const
 {
     assert(Exists());
     assert(rOtherEntity.Exists());
-    struct stat our_stats, other_stats;
-    stat(GetAbsolutePath().c_str(), &our_stats);
-    stat(rOtherEntity.GetAbsolutePath().c_str(), &other_stats);
-    return our_stats.st_mtime > other_stats.st_mtime;
+    return fs::last_write_time(GetAbsolutePath()) > fs::last_write_time(rOtherEntity.GetAbsolutePath());
 }
 
 std::string FileFinder::GetLeafName() const
 {
-    std::string full_name = GetAbsolutePath();
-    size_t slash = full_name.rfind('/');
-    EXCEPT_IF_NOT(slash != std::string::npos);
-    return full_name.substr(slash+1);
+    return fs::path(GetAbsolutePath()).leaf();
 }
 
 std::string FileFinder::GetLeafNameNoExtension() const
 {
-    std::string leaf_name = GetLeafName();
-    size_t dot = leaf_name.rfind('.');
-    return leaf_name.substr(0,dot);
+    return fs::basename(GetAbsolutePath());
 }
 
 FileFinder FileFinder::GetParent() const
 {
-    std::string full_name = GetAbsolutePath();
-    size_t limit = full_name.length() > 1 ? full_name.length() - 2 : std::string::npos;
-    size_t slash = full_name.rfind('/', limit);
-    EXCEPT_IF_NOT(slash != std::string::npos);
-    return FileFinder(full_name.substr(0, slash), RelativeTo::Absolute);
+    fs::path our_path(GetAbsolutePath());
+    if (IsDir())
+    {
+        our_path = our_path.branch_path(); // Otherwise trailing slash causes issues
+    }
+    EXCEPT_IF_NOT(our_path.has_branch_path());
+    return FileFinder(our_path.branch_path().string(),
+                      RelativeTo::Absolute);
 }
 
 bool FileFinder::IsAbsolutePath(const std::string& rPath)
 {
-    return rPath[0]=='/';
+    return fs::path(rPath).is_complete();
 }
 
 void FileFinder::ReplaceSpacesWithUnderscores(std::string& rPath)
 {
-    for(std::string::iterator it = rPath.begin(); it != rPath.end(); ++it)
+    for (std::string::iterator it = rPath.begin(); it != rPath.end(); ++it)
     {
-        if(*it == ' ')
+        if (*it == ' ')
         {
             *it = '_';
         }
@@ -230,9 +205,9 @@ void FileFinder::ReplaceSpacesWithUnderscores(std::string& rPath)
 
 void FileFinder::ReplaceUnderscoresWithSpaces(std::string& rPath)
 {
-    for(std::string::iterator it = rPath.begin(); it != rPath.end(); ++it)
+    for (std::string::iterator it = rPath.begin(); it != rPath.end(); ++it)
     {
-        if(*it == '_')
+        if (*it == '_')
         {
             *it = ' ';
         }

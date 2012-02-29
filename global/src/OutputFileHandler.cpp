@@ -36,13 +36,52 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 
 #include <cstdlib>
-#include <sys/stat.h>
 
-#include "PetscTools.hpp"
-#include "Exception.hpp"
 #include "ArchiveLocationInfo.hpp"
-#include "GetCurrentWorkingDirectory.hpp"
+#include "BoostFilesystem.hpp"
+#include "Exception.hpp"
 #include "FileFinder.hpp"
+#include "GetCurrentWorkingDirectory.hpp"
+#include "PetscTools.hpp"
+
+
+// The name of the Chaste signature file
+const char* CHASTE_SIG_FILE = ".chaste_deletable_folder";
+
+/**
+ * Recursively remove the contents of the given folder, but leave any hidden
+ * files present at the top level.
+ *
+ * @param rPath  path to the directory to clean
+ * @param isTop  whether this is the top level directory
+ */
+void CleanFolder(const fs::path& rPath, bool isTop=true)
+{
+    assert(fs::is_directory(rPath));
+    fs::directory_iterator end_iter;
+    // First recursively remove the children
+    for (fs::directory_iterator dir_iter(rPath); dir_iter != end_iter; ++dir_iter)
+    {
+        if (fs::is_directory(dir_iter->status()))
+        {
+            CleanFolder(dir_iter->path(), false);
+        }
+        else
+        {
+            const fs::path& r_item_path(dir_iter->path());
+            if (!isTop || r_item_path.leaf()[0] != '.')
+            {
+                fs::remove(r_item_path);
+            }
+        }
+    }
+    // Now remove the folder itself, if not top
+    if (!isTop)
+    {
+        fs::remove(rPath);
+    }
+}
+
 
 OutputFileHandler::OutputFileHandler(const std::string &rDirectory,
                                      bool cleanOutputDirectory)
@@ -52,6 +91,7 @@ OutputFileHandler::OutputFileHandler(const std::string &rDirectory,
     {
         EXCEPTION("Will not create directory: " + rDirectory +
                   " due to it potentially being above, and cleaning, CHASTE_TEST_OUTPUT.");
+        // Note: in Boost 1.48 and above we can use 'canonical' to check this better
     }
 
     mDirectory = MakeFoldersAndReturnFullPath(rDirectory);
@@ -59,19 +99,16 @@ OutputFileHandler::OutputFileHandler(const std::string &rDirectory,
     // Clean the directory (default)
     if (rDirectory != "" && cleanOutputDirectory) // Don't clean CHASTE_TEST_OUTPUT
     {
-        std::string command = "test -e " + mDirectory + ".chaste_deletable_folder";
-        int return_value = system(command.c_str());
-        if (return_value != 0)
+        FileFinder signature_file(mDirectory + CHASTE_SIG_FILE, RelativeTo::Absolute);
+        if (!signature_file.Exists())
         {
-            EXCEPTION("Cannot delete " + mDirectory + " because signature file \".chaste_deletable_folder\" is not present.");
+            EXCEPTION("Cannot delete " + mDirectory + " because signature file \"" + CHASTE_SIG_FILE + "\" is not present.");
         }
 
         // Are we the master process? Only the master should delete files
         if (PetscTools::AmMaster())
         {
-            // Remove whatever was there before
-            // Note that the /* part prevents removal of hidden files (.filename), which is useful in NFS systems
-            ABORT_IF_NON0(system, "rm -rf " + mDirectory + "/*");
+            CleanFolder(mDirectory);
         }
         // Wait for master to finish before going on to use the directory.
         PetscTools::Barrier("OutputFileHandler");
@@ -81,79 +118,67 @@ OutputFileHandler::OutputFileHandler(const std::string &rDirectory,
 std::string OutputFileHandler::GetChasteTestOutputDirectory()
 {
     char *chaste_test_output = getenv("CHASTE_TEST_OUTPUT");
-    std::string directory_root;
+    FileFinder directory_root;
     if (chaste_test_output == NULL || *chaste_test_output == 0)
     {
         // Default to 'testoutput' folder within the current directory
-        directory_root = GetCurrentWorkingDirectory() + "/testoutput/";
+        directory_root.SetPath("testoutput", RelativeTo::CWD);
     }
     else
     {
-        if (*chaste_test_output != '/')
-        {
-            // It's a relative path; prepend with the CWD
-            directory_root = GetCurrentWorkingDirectory() + "/" + chaste_test_output;
-        }
-        else
-        {
-#define COVERAGE_IGNORE
-            // This branch is never taken on the build machines, because CHASTE_TEST_OUTPUT is set to a relative path.
-            directory_root = std::string(chaste_test_output);
-#undef COVERAGE_IGNORE
-        }
+        directory_root.SetPath(chaste_test_output, RelativeTo::AbsoluteOrCwd);
     }
-    AddTrailingSlash(directory_root);
 
-    return directory_root;
+    return directory_root.GetAbsolutePath();
 }
 
 std::string OutputFileHandler::MakeFoldersAndReturnFullPath(const std::string& rDirectory) const
 {
-    std::string directory_root = GetChasteTestOutputDirectory();
-    std::string directories_to_add = rDirectory; // Get from a const to something we can mess with.
-    AddTrailingSlash(directories_to_add);
-    std::string directory = directory_root + directories_to_add;
+    fs::path output_root(GetChasteTestOutputDirectory());
+    fs::path rel_path(rDirectory);
+    
+    if (!rel_path.empty() && (*(--rel_path.end())) == ".")
+    {
+        // rDirectory has a trailing slash, which gives an unhelpful last component
+        rel_path.remove_leaf();
+    }
 
     // Are we the master process? Only the master should make any new directories
     if (PetscTools::AmMaster())
     {
-        // If necessary make the ChasteTestOutputDirectory - don't make it deleteable by Chaste
-        std::string command = "test -d " + directory_root;
-        int return_value = system(command.c_str());
-        if (return_value!=0)
+        try
         {
-            // We make as many folders as necessary here
-            ABORT_IF_NON0(system, "mkdir -p " + directory_root);
-        }
-
-        // Now make all the sub-folders requested one-by-one and add the .chaste_deletable_folder file to them
-        std::string remaining_directories = directories_to_add;
-        std::string directory_to_add = "";
-
-        // Create the output directory structure one folder at a time
-        while (remaining_directories.find("/") != std::string::npos)
-        {
-            size_t found = remaining_directories.find_first_of("/");
-            directory_to_add += remaining_directories.substr(0,found+1);
-            remaining_directories = remaining_directories.substr(found+1);
-
-            command = "test -d " + directory_root + directory_to_add;
-            return_value = system(command.c_str());
-            if (return_value!=0)
+            // If necessary make the ChasteTestOutputDirectory - don't make it deleteable by Chaste
+            if (!fs::exists(output_root))
             {
-                // We make only the next folder here
-                ABORT_IF_NON0(system, "mkdir -p " + directory_root + directory_to_add);
-
-                // Put the Chaste signature file into this folder
-                ABORT_IF_NON0(system, "touch " + directory_root + directory_to_add + ".chaste_deletable_folder");
+                fs::create_directories(output_root);
             }
+
+            // Now make all the sub-folders requested one-by-one and add the .chaste_deletable_folder file to them
+            fs::path next_folder(output_root);
+            for (fs::path::iterator path_iter = rel_path.begin(); path_iter != rel_path.end(); ++path_iter)
+            {
+                next_folder /= *path_iter;
+                if (!fs::is_directory(next_folder))
+                {
+                    fs::create_directory(next_folder);
+                    // Add the Chaste signature file
+                    fs::ofstream sig_file(next_folder / CHASTE_SIG_FILE);
+                }
+            }
+        }
+        catch (const fs::filesystem_error& e)
+        {
+            TERMINATE(std::string("Error making test output folder: ") + e.what());
         }
     }
 
     // Wait for master to finish before going on to use the directory.
     PetscTools::Barrier("OutputFileHandler::MakeFoldersAndReturnFullPath");
 
-    return directory;
+    std::string path_with_slash = (output_root / rel_path).string();
+    AddTrailingSlash(path_with_slash);
+    return path_with_slash;
 }
 
 std::string OutputFileHandler::GetOutputDirectoryFullPath() const
@@ -203,12 +228,22 @@ FileFinder OutputFileHandler::CopyFileTo(const FileFinder& rSourceFile) const
     {
         EXCEPTION("Can only copy single files:\n" << rSourceFile.GetAbsolutePath() << " is not a file.");
     }
+    fs::path from_path(rSourceFile.GetAbsolutePath());
+    fs::path to_path(GetOutputDirectoryFullPath());
+    to_path /= from_path.leaf();
     if (PetscTools::AmMaster())
     {
-        ABORT_IF_NON0(system, "cp " + rSourceFile.GetAbsolutePath() + " " + GetOutputDirectoryFullPath());
+        try
+        {
+            fs::copy_file(from_path, to_path);
+        }
+        catch (const fs::filesystem_error& e)
+        {
+            TERMINATE(std::string("Error copying file '") + rSourceFile.GetAbsolutePath() + "': " + e.what());
+        }
     }
     PetscTools::Barrier("OutputFileHandler::CopyFileTo");
-    return FindFile(rSourceFile.GetLeafName());
+    return FileFinder(to_path.string(), RelativeTo::Absolute);
 }
 
 FileFinder OutputFileHandler::FindFile(std::string leafName) const
