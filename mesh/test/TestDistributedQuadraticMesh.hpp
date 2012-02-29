@@ -101,11 +101,32 @@ public:
         std::set<unsigned> nodes_owned;
         std::vector<unsigned> processor_offset;
 
-        typedef NodePartitioner<2, 2> Partioner2D;
+        typedef NodePartitioner<2, 2> Partitioner2D;
 
-        TS_ASSERT_THROWS_THIS(Partioner2D::MetisLibraryPartitioning(mesh_reader, nodes_permutation, nodes_owned, processor_offset),
+        TS_ASSERT_THROWS_THIS(Partitioner2D::MetisLibraryPartitioning(mesh_reader, nodes_permutation, nodes_owned, processor_offset),
                               "Metis cannot partition a quadratic mesh.");
     }
+
+    void TestPetscMatrixPartitioning() throw (Exception)
+    {
+        EXIT_IF_SEQUENTIAL //Doesn't make sense to try and partition in sequential
+
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic",2,1, false);
+        std::vector<unsigned> nodes_permutation;
+        std::set<unsigned> nodes_owned;
+        std::vector<unsigned> processor_offset;
+
+        typedef NodePartitioner<2, 2> Partitioner2D;
+        Partitioner2D::PetscMatrixPartitioning(mesh_reader, nodes_permutation, nodes_owned, processor_offset);
+
+        for(std::set<unsigned>::iterator iter = nodes_owned.begin();
+            iter != nodes_owned.end();
+            ++iter)
+        {
+        //    std::cout << (*iter) << " " << PetscTools::GetMyRank() << std::endl;
+        }
+    }
+
 };
 
 #endif // TESTDISTRIBUTEDQUADRATICMESH_HPP_

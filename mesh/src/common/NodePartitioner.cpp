@@ -247,8 +247,10 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
     }
 
     // In the loop below we assume that there exist edges between any pair of nodes in an element. This is
-    // a reasonable assumption for triangles and tetrahedra. This won't be the case for squares or hexahedra
-    // (or higher order elements). We allow ELEMENT_DIM smaller than SPACE_DIM in case this is a 2D mesh in
+    // a reasonable assumption for triangles and tetrahedra. This won't be the case for quadratic simplices,
+    // squares or hexahedra (or higher order elements), leading to slightly suboptimal partitions in these
+    // cases.
+    // We allow ELEMENT_DIM smaller than SPACE_DIM in case this is a 2D mesh in
     // a 3D space.
     assert(SPACE_DIM >= ELEMENT_DIM);
 
@@ -265,7 +267,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
             element_data = rMeshReader.GetNextElementData();
         }
 
-        for (unsigned i=0; i<ELEMENT_DIM+1; i++)
+        for (unsigned i=0; i<element_data.NodeIndices.size(); i++)
         {
             unsigned row = element_data.NodeIndices[i];
             for (unsigned j=0; j<i; j++)
