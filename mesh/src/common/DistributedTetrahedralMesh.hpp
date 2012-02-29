@@ -284,6 +284,17 @@ public:
      */
     virtual ChasteCuboid<SPACE_DIM> CalculateBoundingBox() const;
 
+    /**
+     * Calculate the bounding box (width extremes for all dimensions of the mesh.
+     * Overridden in Distributed case
+     * \todo Should be const
+     *
+     * @return The minimum and maximum edge lengths in the mesh
+     *
+     */
+    virtual c_vector<double, 2> CalculateMinMaxEdgeLengths();
+
+
 protected:
     /**
      * Overridden solve node mapping method.

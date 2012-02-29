@@ -1521,6 +1521,18 @@ ChasteCuboid<SPACE_DIM> DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::Calc
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+c_vector<double, 2> DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMinMaxEdgeLengths()
+{
+    c_vector<double, 2> local_min_max =  AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMinMaxEdgeLengths();
+    c_vector<double, 2> global_min_max;
+
+    MPI_Allreduce(&local_min_max[0], &global_min_max[0], 1, MPI_DOUBLE, MPI_MIN, PETSC_COMM_WORLD);
+    MPI_Allreduce(&local_min_max[1], &global_min_max[1], 1, MPI_DOUBLE, MPI_MAX, PETSC_COMM_WORLD);
+
+    return global_min_max;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 typename DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::HaloNodeIterator DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetHaloNodeIteratorBegin() const
 {
     return mHaloNodes.begin();

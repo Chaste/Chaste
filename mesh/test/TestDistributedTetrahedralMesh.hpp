@@ -294,7 +294,12 @@ public:
                 // I don't own this element do I?
             }
         }
-        TS_ASSERT_EQUALS(mesh.CalculateMaximumNodeConnectivityPerProcess(), 3U);
+
+        //Connectivity is normally 3 (if we own at least 2 local nodes)
+        if (mesh.GetNumLocalNodes() >= 2)
+        {
+            TS_ASSERT_EQUALS(mesh.CalculateMaximumNodeConnectivityPerProcess(), 3U);
+        }
     }
 
     void TestConstructFromMeshReader2DWithoutReordering()
@@ -761,6 +766,8 @@ public:
 
     void TestEverythingIsAssignedParMetisLibraryBinaryFiles()
     {
+        ///\todo This test fails in CheckEverythingIsAssigned with 10 or more processes
+
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements_binary");
         DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
         mesh.ConstructFromMeshReader(mesh_reader);
@@ -1775,8 +1782,8 @@ public:
                 std::stringstream ss;
                 ss << elem_index;
                 std::string elem_string(ss.str());
-                system(("grep -i '" + elem_string + " 0 0' " + output_dir + "par_efficient_cube_2mm_12_elements_cmgui.exelem > " + output_dir + "element_" + elem_string + "_efficient ").c_str());
-                system(("grep -i '" + elem_string + " 0 0' " + output_dir + "seq_cube_2mm_12_elements_cmgui.exelem > " + output_dir + "element_" + elem_string + "_sequential ").c_str());
+                system(("grep 'Element:\t" + elem_string + " 0 0' " + output_dir + "par_efficient_cube_2mm_12_elements_cmgui.exelem > " + output_dir + "element_" + elem_string + "_efficient ").c_str());
+                system(("grep 'Element:\t" + elem_string + " 0 0' " + output_dir + "seq_cube_2mm_12_elements_cmgui.exelem > " + output_dir + "element_" + elem_string + "_sequential ").c_str());
             }
         }
         PetscTools::Barrier();
@@ -1784,7 +1791,7 @@ public:
         TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" " + output_dir + "seq_sorted.tetras " + output_dir + "par_eff_sorted.tetras").c_str()), 0);
         TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" " + output_dir + "seq_sorted.tri " + output_dir + "par_eff_sorted.tri").c_str()), 0);
 
-        //compare teh cmgui element, one element at a time.
+        //compare the cmgui elements, one element file at a time.
         for (unsigned elem_index = 1; elem_index<=sequential_mesh.GetNumAllElements(); elem_index++)
         {
             std::stringstream ss;
@@ -1973,7 +1980,6 @@ public:
 
     void TestCalculateEdgeLengths() throw (Exception)
     {
-        EXIT_IF_PARALLEL;///\todo #2046
         {
             TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
             DistributedTetrahedralMesh<3,3> mesh;
