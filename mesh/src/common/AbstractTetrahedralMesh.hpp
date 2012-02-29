@@ -544,7 +544,17 @@ public:
                                  std::vector<std::vector<unsigned> >& rNodesToReceivePerProcess);
 
 
-    //////////////////////////////////////////////////////////////////////
+     /**
+      * Calculate the bounding box (width extremes for all dimensions of the mesh.
+      * Overridden in Distributed case
+      * \todo Should be const
+      *
+      * @return The minimum and maximum edge lengths in the mesh
+      *
+      */
+     virtual c_vector<double, 2> CalculateMinMaxEdgeLengths();
+
+     //////////////////////////////////////////////////////////////////////
     //                         Nested classes                           //
     //////////////////////////////////////////////////////////////////////
 
@@ -720,6 +730,7 @@ bool AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ElementIterator::IsAllowed
 {
     return !(mSkipDeletedElements && (*this)->IsDeleted());
 }
+
 
 
 #endif /*ABSTRACTTETRAHEDRALMESH_HPP_*/

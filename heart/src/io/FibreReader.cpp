@@ -259,7 +259,7 @@ unsigned FibreReader<DIM>::GetTokensAtNextLine()
         if (line.empty() && mDataFile.eof())
         {
             mDataFile.close();
-            std::string error =   "End of file " + mFilePath + " reached. Either file contains less "
+            std::string error =   "End of file " + mFilePath + " reached. Either file contains fewer "
                                 + "definitions than defined in header, or one of the GetNext[..] methods "
                                 + "has been called too often";
             EXCEPTION(error);

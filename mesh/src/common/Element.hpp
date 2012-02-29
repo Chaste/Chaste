@@ -123,6 +123,11 @@ public:
     double CalculateQuality();
 
     /**
+     * The maximum and minimum edge lengths
+     */
+    c_vector <double, 2> CalculateMinMaxEdgeLengths();
+
+    /**
      * Calculate the interpolation weights: the vector
      *  (1-xi(0)-xi(1)-xi(2), xi(0), xi(1), xi(2))
      * (in the 3D case) for a given point. (see CalculateXi() documentation)

@@ -367,7 +367,7 @@ public:
     /**
      * Zero several rows of the matrix, putting a given value in the diagonal entries.
      *
-     * *Massively* less expensive than zeroing each matrix rowindividually
+     * *Massively* less expensive than zeroing each matrix row individually
      *
      * @param rRows std::vector of rows to be zeroed
      * @param diagonalValue value to put in the diagonal entries (of the zeroed rows)

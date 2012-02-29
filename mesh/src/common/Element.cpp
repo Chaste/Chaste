@@ -200,6 +200,31 @@ double Element<ELEMENT_DIM, SPACE_DIM>::CalculateQuality()
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+c_vector <double, 2> Element<ELEMENT_DIM, SPACE_DIM>::CalculateMinMaxEdgeLengths()
+{
+    c_vector <double, 2> min_max;
+    min_max[0] = DBL_MAX; //Min initialised to very large
+    min_max[1] = 0.0;     //Max initialised to zero
+    for (unsigned i=0; i<=ELEMENT_DIM; i++)
+    {
+        c_vector<double, SPACE_DIM> loc_i = this->GetNodeLocation(i);
+        for (unsigned j=i+1; j<=ELEMENT_DIM; j++)
+        {
+            double length = norm_2(this->GetNodeLocation(j) - loc_i);
+            if (length < min_max[0])
+            {
+                min_max[0] = length;
+            }
+            if (length > min_max[1])
+            {
+                min_max[1] = length;
+            }
+        }
+    }
+    return min_max;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM+1> Element<ELEMENT_DIM, SPACE_DIM>::CalculateInterpolationWeights(const ChastePoint<SPACE_DIM>& rTestPoint)
 {
     //Can only test if it's a tetrahedal mesh in 3d, triangles in 2d...

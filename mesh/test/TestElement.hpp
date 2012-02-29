@@ -521,9 +521,9 @@ public:
     void TestCircum2d()
     {
         std::vector<Node<2>*> equilateral_nodes;
-        equilateral_nodes.push_back(new Node<2>(0, false, 2.0, 0.0));
-        equilateral_nodes.push_back(new Node<2>(1, false, -1.0,sqrt(3)));
-        equilateral_nodes.push_back(new Node<2>(2, false, -1.0,-sqrt(3)));
+        equilateral_nodes.push_back(new Node<2>(0, false, 2.0,   0.0));
+        equilateral_nodes.push_back(new Node<2>(1, false, -1.0,  sqrt(3.0)));
+        equilateral_nodes.push_back(new Node<2>(2, false, -1.0, -sqrt(3.0)));
 
         Element<2,2> equilateral_element(0, equilateral_nodes);
 
@@ -551,6 +551,15 @@ public:
         TS_ASSERT_DELTA(sqrt(circum2[2]), 1.0/sqrt(2.0), 1e-7);
 
         TS_ASSERT_DELTA(right_angle_element.CalculateQuality(), 4.0*sqrt(3.0)/9.0, 1e-7);
+
+
+        c_vector<double, 2> equilateral_min_max = equilateral_element.CalculateMinMaxEdgeLengths();
+        TS_ASSERT_DELTA(equilateral_min_max[0], 2*sqrt(3.0), 1e-5);
+        TS_ASSERT_DELTA(equilateral_min_max[1], 2*sqrt(3.0), 1e-5);
+        c_vector<double, 2> right_angle_min_max = right_angle_element.CalculateMinMaxEdgeLengths();
+        TS_ASSERT_DELTA(right_angle_min_max[0], 1.0, 1e-5);
+        TS_ASSERT_DELTA(right_angle_min_max[1], sqrt(2.0), 1e-5);
+
 
         for (unsigned i=0; i<equilateral_nodes.size(); i++)
         {
@@ -599,6 +608,13 @@ public:
         TS_ASSERT_DELTA(sqrt(circum2[3]), sqrt(3.0)/2.0, 1e-7);
 
         TS_ASSERT_DELTA(right_angle_element.CalculateQuality(), 0.5, 1e-7);
+
+        c_vector<double, 2> min_max = element.CalculateMinMaxEdgeLengths();
+        TS_ASSERT_DELTA(min_max[0], 2*sqrt(2.0), 1e-5);
+        TS_ASSERT_DELTA(min_max[1], 2*sqrt(2.0), 1e-5);
+        c_vector<double, 2> right_angle_min_max = right_angle_element.CalculateMinMaxEdgeLengths();
+        TS_ASSERT_DELTA(right_angle_min_max[0], 1.0, 1e-5);
+        TS_ASSERT_DELTA(right_angle_min_max[1], sqrt(2.0), 1e-5);
 
         for (unsigned i=0; i<right_angle_nodes.size(); i++)
         {

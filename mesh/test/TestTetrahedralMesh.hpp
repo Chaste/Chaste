@@ -838,19 +838,16 @@ public:
             mesh.CheckOutwardNormals();
         }
         {
-            std::cout << "Constructed 2d with stagger" << std::endl;
             TetrahedralMesh<2,2> mesh;
             mesh.ConstructRectangularMesh(2,3);
             mesh.CheckOutwardNormals();
         }
         {
-            std::cout << "Constructed 2d without stagger" << std::endl;
             TetrahedralMesh<2,2> mesh;
             mesh.ConstructRectangularMesh(2,3,false);
             mesh.CheckOutwardNormals();
         }
         {
-            std::cout << "Constructed 3d" << std::endl;
             TetrahedralMesh<3,3> mesh;
             mesh.ConstructCuboid(2,3,4);
             mesh.CheckOutwardNormals();
@@ -1873,6 +1870,33 @@ public:
 //        }
     }
 
+
+    void TestCalculateEdgeLengths() throw (Exception)
+    {
+        {
+            TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
+            TetrahedralMesh<3,3> mesh;
+            mesh.ConstructFromMeshReader(mesh_reader);
+            c_vector <double, 2> edge_len = mesh.CalculateMinMaxEdgeLengths();
+            TS_ASSERT_DELTA(edge_len[0], 0.1, 1e-4);
+            TS_ASSERT_DELTA(edge_len[1], 0.2828, 1e-4);
+        }
+        {
+            TetrahedralMesh<2,2> mesh;
+            mesh.ConstructRectangularMesh(2,3);
+            c_vector <double, 2> edge_len = mesh.CalculateMinMaxEdgeLengths();
+            TS_ASSERT_DELTA(edge_len[0], 1.0, 1e-5);
+            TS_ASSERT_DELTA(edge_len[1], sqrt(2.0), 1e-5);
+        }
+        {
+            TrianglesMeshReader<2,3> mesh_reader("mesh/test/data/disk_in_3d");
+            TetrahedralMesh<2,3> mesh;
+            mesh.ConstructFromMeshReader(mesh_reader);
+            c_vector <double, 2> edge_len = mesh.CalculateMinMaxEdgeLengths();
+            TS_ASSERT_DELTA(edge_len[0], 0.0628, 1e-4);
+            TS_ASSERT_DELTA(edge_len[1], 0.2010, 1e-4);
+        }
+    }
 
 };
 #endif //_TESTTETRAHEDRALMESH_HPP_

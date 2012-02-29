@@ -822,6 +822,30 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateNodeExchange(
     }
 
 }
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+c_vector<double, 2> AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMinMaxEdgeLengths()
+{
+
+    c_vector<double, 2> min_max;
+    min_max[0] = DBL_MAX;
+    min_max[1] = 0.0;
+    for (typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ElementIterator ele_iter = GetElementIteratorBegin();
+            ele_iter != GetElementIteratorEnd();
+            ++ele_iter)
+    {
+        c_vector<double, 2> ele_min_max = ele_iter->CalculateMinMaxEdgeLengths();
+        if (ele_min_max[0] < min_max[0])
+        {
+            min_max[0] = ele_min_max[0];
+        }
+        if (ele_min_max[1] > min_max[1])
+        {
+            min_max[1] = ele_min_max[1];
+        }
+    }
+    return min_max;
+}
+
 
 
 /////////////////////////////////////////////////////////////////////////////////////

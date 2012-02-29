@@ -1970,6 +1970,34 @@ public:
             mesh.CheckOutwardNormals();
         }
     }
+
+    void TestCalculateEdgeLengths() throw (Exception)
+    {
+        EXIT_IF_PARALLEL;///\todo #2046
+        {
+            TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
+            DistributedTetrahedralMesh<3,3> mesh;
+            mesh.ConstructFromMeshReader(mesh_reader);
+            c_vector <double, 2> edge_len = mesh.CalculateMinMaxEdgeLengths();
+            TS_ASSERT_DELTA(edge_len[0], 0.1, 1e-4);
+            TS_ASSERT_DELTA(edge_len[1], 0.2828, 1e-4);
+        }
+        {
+            DistributedTetrahedralMesh<2,2> mesh;
+            mesh.ConstructRectangularMesh(2,3);
+            c_vector <double, 2> edge_len = mesh.CalculateMinMaxEdgeLengths();
+            TS_ASSERT_DELTA(edge_len[0], 1.0, 1e-5);
+            TS_ASSERT_DELTA(edge_len[1], sqrt(2.0), 1e-5);
+        }
+        {
+            TrianglesMeshReader<2,3> mesh_reader("mesh/test/data/disk_in_3d");
+            DistributedTetrahedralMesh<2,3> mesh;
+            mesh.ConstructFromMeshReader(mesh_reader);
+            c_vector <double, 2> edge_len = mesh.CalculateMinMaxEdgeLengths();
+            TS_ASSERT_DELTA(edge_len[0], 0.0628, 1e-4);
+            TS_ASSERT_DELTA(edge_len[1], 0.2010, 1e-4);
+        }
+    }
 };
 
 #endif /*TESTDISTRIBUTEDTETRAHEDRALMESH_HPP_*/
