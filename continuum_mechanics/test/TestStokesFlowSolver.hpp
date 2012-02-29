@@ -397,10 +397,16 @@ public:
                 L_inf_error_flow[run] = std::max(L_inf_error_flow[run], max_diff);
             }
 
-            double x0 = mesh.GetNode(0)->rGetLocation()[0];
-            double y0 = mesh.GetNode(0)->rGetLocation()[1];
-            double exact_pressure_0 = 60.0*x0*x0*y0 -20.0*y0*y0*y0;
-            double pressure_diff = solver.rGetPressures()[0] - exact_pressure_0;
+            //Calculate the constant offset between the true solution and the numerical solution.
+            double pressure_diff = 0.0;
+            for (unsigned index = 0; index < mesh.GetNumVertices(); ++index)
+            {
+                double x = mesh.GetNode(index)->rGetLocation()[0];
+                double y = mesh.GetNode(index)->rGetLocation()[1];
+                double exact_pressure = 60.0*x*x*y -20.0*y*y*y;
+                pressure_diff += solver.rGetPressures()[index] - exact_pressure;
+            }
+            pressure_diff /= mesh.GetNumVertices();
 
             for (unsigned i=0; i<mesh.GetNumVertices(); i++)
             {
@@ -423,17 +429,17 @@ public:
 
         /* results are:
          *
-         * 2 1.15234 73.1818
-         * 4 0.352193 16.5878
-         * 8 0.0548267 3.61898
-         * 16 0.00787528 0.957452
-         * 32 0.00113687 0.225023
-         * 64 0.000153278, 0.0548126
+         * 2 1.15234 36.5909
+         * 4 0.352193 9.51735
+         * 8 0.0548267 1.86648
+         * 16 0.00787528 0.504425
+         * 32 0.00113687 0.117679
+         * 64 0.000153278 0.0287536
          *
          * Everything is converging. Large errors in p down to this being an odd problem?
          */
         double res_flow[6] = { 1.15234, 0.352193, 0.0548267, 0.00787528, 0.00113687, 0.000153278 };
-        double res_p[6] = { 73.1818, 16.5878, 3.61898, 0.957452, 0.225023, 0.0548126 };
+        double res_p[6] = { 36.5909, 9.51735, 1.86648, 0.504425, 0.117679, 0.0287536 };
         assert(num_runs <= 6);
         for(unsigned i=0; i<num_runs; i++)
         {
