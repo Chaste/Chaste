@@ -149,7 +149,9 @@ def AddBoost(basePath, version):
     conf.other_includepaths.append(os.path.join(basePath, 'include', inc))
     libpath = os.path.join(basePath, 'lib')
     conf.other_libpaths.append(libpath)
-    boost_libs = ['boost_serialization']
+    boost_libs = ['boost_serialization', 'boost_filesystem']
+    if float(version[:4]) >= 1.42:
+        boost_libs.append('boost_system')
     testlib = boost_libs[0]
     base = os.path.join(libpath, 'lib' + testlib)
     matches = glob.glob(base + '*.so')

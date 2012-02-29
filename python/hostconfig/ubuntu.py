@@ -82,13 +82,15 @@ else:
     libs_for_petsc.append('sidl')
 if petsc_ver >= 3.1:
     libs_for_petsc.remove('petsccontrib')
-if ubuntu_ver >= [9,10]:
-    boost_suffix = '-mt'
-else:
-    boost_suffix = ''
 
-other_libraries = libs_for_petsc + \
-                  ['boost_serialization'+boost_suffix, 'boost_filesystem'+boost_suffix, 'xerces-c',
+boost_libs = ['boost_serialization', 'boost_filesystem']
+if ubuntu_ver >= [10,10]:
+    boost_libs.append('boost_system')
+if ubuntu_ver >= [9,10]:
+    boost_libs = map(lambda l: l+'-mt', boost_libs)
+
+other_libraries = libs_for_petsc + boost_libs + \
+                  ['xerces-c',
                    'hdf5', 'z',
                    'parmetis', 'metis']
 
