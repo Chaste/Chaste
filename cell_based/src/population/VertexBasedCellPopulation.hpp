@@ -59,9 +59,6 @@ class VertexBasedCellPopulation : public AbstractOffLatticeCellPopulation<DIM>
 {
 private:
 
-    /** Vertex-based mesh associated with the cell population. */
-    MutableVertexMesh<DIM, DIM>& mrMesh;
-
     /**
      * Whether to delete the mesh when we are destroyed.
      * Needed if this cell population has been de-serialized.

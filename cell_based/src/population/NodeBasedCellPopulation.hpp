@@ -53,11 +53,6 @@ class NodeBasedCellPopulation : public AbstractCentreBasedCellPopulation<DIM>
     friend class TestNodeBasedCellPopulation;
     friend class TestBoxCollection;
 
-protected:
-
-    /** Reference to the mesh. */
-    NodesOnlyMesh<DIM>& mrMesh;
-
 private:
 
     /** Vector of minimal spatial positions in each dimension. */

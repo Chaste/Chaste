@@ -36,16 +36,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCentreBasedCellPopulation.hpp"
 
 template<unsigned DIM>
-AbstractCentreBasedCellPopulation<DIM>::AbstractCentreBasedCellPopulation(std::vector<CellPtr>& rCells,
+AbstractCentreBasedCellPopulation<DIM>::AbstractCentreBasedCellPopulation( AbstractMesh<DIM, DIM>& rMesh,
+																	std::vector<CellPtr>& rCells,
                                                                   const std::vector<unsigned> locationIndices)
-    : AbstractOffLatticeCellPopulation<DIM>(rCells, locationIndices),
+    : AbstractOffLatticeCellPopulation<DIM>(rMesh, rCells, locationIndices),
       mMeinekeDivisionSeparation(0.3) // educated guess
 {
 }
 
 template<unsigned DIM>
-AbstractCentreBasedCellPopulation<DIM>::AbstractCentreBasedCellPopulation()
-    : AbstractOffLatticeCellPopulation<DIM>(),
+AbstractCentreBasedCellPopulation<DIM>::AbstractCentreBasedCellPopulation(AbstractMesh<DIM, DIM>& rMesh)
+    : AbstractOffLatticeCellPopulation<DIM>(rMesh),
       mMeinekeDivisionSeparation(0.3) // educated guess
 {
 }

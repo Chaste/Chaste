@@ -69,9 +69,6 @@ class CaBasedCellPopulation : public AbstractOnLatticeCellPopulation<DIM>
 
 private:
 
-    /** Reference to the mesh associated with the cell population. */
-    TetrahedralMesh<DIM, DIM>& mrMesh;
-
     /** The update rules used to determine the new location of the cells. */
     std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > > mUpdateRuleCollection;
 

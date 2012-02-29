@@ -97,8 +97,6 @@ private:
 
 protected:
 #define COVERAGE_IGNORE // Avoid prototypes being treated as code by gcov
-    /** Reference to the mesh. */
-    MutableMesh<DIM, DIM>& mrMesh;
 
     /**
      * Pointer to a VertexMesh object that stores the Voronoi tessellation that is dual to

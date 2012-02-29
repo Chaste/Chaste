@@ -39,9 +39,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 
 template<unsigned DIM>
-AbstractCellPopulation<DIM>::AbstractCellPopulation(std::vector<CellPtr>& rCells,
+AbstractCellPopulation<DIM>::AbstractCellPopulation( AbstractMesh<DIM, DIM>& rMesh,
+									std::vector<CellPtr>& rCells,
                                     const std::vector<unsigned> locationIndices)
-    : mCells(rCells.begin(), rCells.end()),
+    : mrMesh(rMesh),
+      mCells(rCells.begin(), rCells.end()),
       mCentroid(zero_vector<double>(DIM)),
       mpCellPropertyRegistry(CellPropertyRegistry::Instance()->TakeOwnership()),
       mOutputCellIdData(false),
@@ -101,6 +103,12 @@ AbstractCellPopulation<DIM>::AbstractCellPopulation(std::vector<CellPtr>& rCells
     {
         mCellCyclePhaseCount[i] = 0;
     }
+}
+
+template<unsigned DIM>
+AbstractCellPopulation<DIM>::AbstractCellPopulation(AbstractMesh<DIM, DIM>& rMesh)
+			: mrMesh(rMesh)
+{
 }
 
 template<unsigned DIM>

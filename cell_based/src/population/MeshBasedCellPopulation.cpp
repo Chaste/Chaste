@@ -49,8 +49,7 @@ MeshBasedCellPopulation<DIM>::MeshBasedCellPopulation(MutableMesh<DIM, DIM>& rMe
                                       const std::vector<unsigned> locationIndices,
                                       bool deleteMesh,
                                       bool validate)
-    : AbstractCentreBasedCellPopulation<DIM>(rCells, locationIndices),
-      mrMesh(rMesh),
+    : AbstractCentreBasedCellPopulation<DIM>(rMesh, rCells, locationIndices),
       mpVoronoiTessellation(NULL),
       mDeleteMesh(deleteMesh),
       mUseAreaBasedDampingConstant(false),
@@ -60,7 +59,7 @@ MeshBasedCellPopulation<DIM>::MeshBasedCellPopulation(MutableMesh<DIM, DIM>& rMe
       mWriteVtkAsPoints(false)
 {
     // This must always be true
-    assert(this->mCells.size() <= mrMesh.GetNumNodes());
+    assert(this->mCells.size() <= this->mrMesh.GetNumNodes());
 
     if (validate)
     {
@@ -70,7 +69,7 @@ MeshBasedCellPopulation<DIM>::MeshBasedCellPopulation(MutableMesh<DIM, DIM>& rMe
 
 template<unsigned DIM>
 MeshBasedCellPopulation<DIM>::MeshBasedCellPopulation(MutableMesh<DIM, DIM>& rMesh)
-    : mrMesh(rMesh)
+    : AbstractCentreBasedCellPopulation<DIM>(rMesh)
 {
     mpVoronoiTessellation = NULL;
     mDeleteMesh = true;
@@ -83,7 +82,7 @@ MeshBasedCellPopulation<DIM>::~MeshBasedCellPopulation()
 
     if (mDeleteMesh)
     {
-        delete &mrMesh;
+        delete &this->mrMesh;
     }
 }
 
@@ -103,13 +102,13 @@ void MeshBasedCellPopulation<DIM>::SetAreaBasedDampingConstant(bool useAreaBased
 template<unsigned DIM>
 unsigned MeshBasedCellPopulation<DIM>::AddNode(Node<DIM>* pNewNode)
 {
-    return mrMesh.AddNode(pNewNode);
+    return static_cast<MutableMesh<DIM, DIM>& >((this->mrMesh)).AddNode(pNewNode);
 }
 
 template<unsigned DIM>
 void MeshBasedCellPopulation<DIM>::SetNode(unsigned nodeIndex, ChastePoint<DIM>& rNewLocation)
 {
-    mrMesh.SetNode(nodeIndex, rNewLocation, false);
+	static_cast<MutableMesh<DIM, DIM>&>((this->mrMesh)).SetNode(nodeIndex, rNewLocation, false);
 }
 
 template<unsigned DIM>
@@ -178,13 +177,13 @@ void MeshBasedCellPopulation<DIM>::Validate()
 template<unsigned DIM>
 MutableMesh<DIM, DIM>& MeshBasedCellPopulation<DIM>::rGetMesh()
 {
-    return mrMesh;
+    return static_cast<MutableMesh<DIM, DIM>& >((this->mrMesh));
 }
 
 template<unsigned DIM>
 const MutableMesh<DIM, DIM>& MeshBasedCellPopulation<DIM>::rGetMesh() const
 {
-    return mrMesh;
+    return static_cast<MutableMesh<DIM, DIM>& >((this->mrMesh));
 }
 
 template<unsigned DIM>
@@ -228,7 +227,7 @@ unsigned MeshBasedCellPopulation<DIM>::RemoveDeadCells()
 
             // Remove the node from the mesh
             num_removed++;
-            mrMesh.DeleteNodePriorToReMesh(this->mCellLocationMap[(*it).get()]);
+            static_cast<MutableMesh<DIM, DIM>&>((this->mrMesh)).DeleteNodePriorToReMesh(this->mCellLocationMap[(*it).get()]);
 
             // Update mappings between cells and location indices
             unsigned location_index_of_removed_node = this->mCellLocationMap[(*it).get()];
@@ -247,8 +246,8 @@ unsigned MeshBasedCellPopulation<DIM>::RemoveDeadCells()
 template<unsigned DIM>
 void MeshBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 {
-    NodeMap map(mrMesh.GetNumAllNodes());
-    mrMesh.ReMesh(map);
+    NodeMap map(static_cast<MutableMesh<DIM, DIM>&>((this->mrMesh)).GetNumAllNodes());
+    static_cast<MutableMesh<DIM, DIM>&>((this->mrMesh)).ReMesh(map);
 
     if (!map.IsIdentityMap())
     {
@@ -322,7 +321,7 @@ void MeshBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
     // Tessellate if needed
     TessellateIfNeeded();
 
-    mrMesh.SetMeshHasChangedSinceLoading();
+    static_cast<MutableMesh<DIM, DIM>&>((this->mrMesh)).SetMeshHasChangedSinceLoading();
 }
 
 template<unsigned DIM>
@@ -342,13 +341,13 @@ void MeshBasedCellPopulation<DIM>::TessellateIfNeeded()
 template<unsigned DIM>
 Node<DIM>* MeshBasedCellPopulation<DIM>::GetNode(unsigned index)
 {
-    return mrMesh.GetNode(index);
+    return this->mrMesh.GetNode(index);
 }
 
 template<unsigned DIM>
 unsigned MeshBasedCellPopulation<DIM>::GetNumNodes()
 {
-    return mrMesh.GetNumAllNodes();
+    return this->mrMesh.GetNumAllNodes();
 }
 
 template<unsigned DIM>
@@ -426,8 +425,8 @@ void MeshBasedCellPopulation<DIM>::WriteResultsToFiles()
     // Write element data to file
     *mpVizElementsFile << SimulationTime::Instance()->GetTime() << "\t";
 
-    for (typename MutableMesh<DIM,DIM>::ElementIterator elem_iter = mrMesh.GetElementIteratorBegin();
-         elem_iter != mrMesh.GetElementIteratorEnd();
+    for (typename MutableMesh<DIM,DIM>::ElementIterator elem_iter = static_cast<MutableMesh<DIM, DIM>&>((this->mrMesh)).GetElementIteratorBegin();
+         elem_iter != static_cast<MutableMesh<DIM, DIM>&>((this->mrMesh)).GetElementIteratorEnd();
          ++elem_iter)
     {
         bool element_contains_dead_cells_or_deleted_nodes = false;
@@ -584,9 +583,9 @@ void MeshBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         {
             // Make a copy of the nodes in a disposable mesh for writing
             std::vector<Node<DIM>* > nodes;
-            for (unsigned index=0; index<mrMesh.GetNumNodes(); index++)
+            for (unsigned index=0; index<this->mrMesh.GetNumNodes(); index++)
             {
-                Node<DIM>* p_node = mrMesh.GetNode(index);
+                Node<DIM>* p_node = this->mrMesh.GetNode(index);
                 nodes.push_back(p_node);
             }
 
@@ -750,7 +749,7 @@ void MeshBasedCellPopulation<DIM>::WriteCellPopulationVolumeResultsToFile()
     assert (this->mpVoronoiTessellation != NULL);
 
     // Don't use the Voronoi tessellation to calculate the total area of the mesh because it gives huge areas for boundary cells
-    double total_area = mrMesh.GetVolume();
+    double total_area = static_cast<MutableMesh<DIM, DIM>&>((this->mrMesh)).GetVolume();
     double apoptotic_area = 0.0;
 
     // Loop over elements of mpVoronoiTessellation
@@ -930,7 +929,7 @@ MeshBasedCellPopulation<DIM>::SpringIterator::SpringIterator(
     : mrCellPopulation(rCellPopulation),
       mEdgeIter(edgeIter)
 {
-    if (mEdgeIter!=mrCellPopulation.mrMesh.EdgesEnd())
+    if (mEdgeIter!=static_cast<MutableMesh<DIM, DIM>*>(&(this->mrCellPopulation.mrMesh))->EdgesEnd())
     {
         bool a_is_ghost = mrCellPopulation.IsGhostNode(mEdgeIter.GetNodeA()->GetIndex());
         bool b_is_ghost = mrCellPopulation.IsGhostNode(mEdgeIter.GetNodeB()->GetIndex());
@@ -945,13 +944,13 @@ MeshBasedCellPopulation<DIM>::SpringIterator::SpringIterator(
 template<unsigned DIM>
 typename MeshBasedCellPopulation<DIM>::SpringIterator MeshBasedCellPopulation<DIM>::SpringsBegin()
 {
-    return SpringIterator(*this, mrMesh.EdgesBegin());
+    return SpringIterator(*this, static_cast<MutableMesh<DIM, DIM>&>((this->mrMesh)).EdgesBegin());
 }
 
 template<unsigned DIM>
 typename MeshBasedCellPopulation<DIM>::SpringIterator MeshBasedCellPopulation<DIM>::SpringsEnd()
 {
-    return SpringIterator(*this, mrMesh.EdgesEnd());
+    return SpringIterator(*this, static_cast<MutableMesh<DIM, DIM>&>((this->mrMesh)).EdgesEnd());
 }
 
 /**
@@ -969,7 +968,7 @@ void MeshBasedCellPopulation<2>::CreateVoronoiTessellation()
         is_mesh_periodic = true;
     }
 
-    mpVoronoiTessellation = new VertexMesh<2, 2>(mrMesh, is_mesh_periodic);
+    mpVoronoiTessellation = new VertexMesh<2, 2>(static_cast<MutableMesh<2, 2> &>((this->mrMesh)), is_mesh_periodic);
 }
 
 /**
@@ -981,7 +980,7 @@ template<>
 void MeshBasedCellPopulation<3>::CreateVoronoiTessellation()
 {
     delete mpVoronoiTessellation;
-    mpVoronoiTessellation = new VertexMesh<3, 3>(mrMesh);
+    mpVoronoiTessellation = new VertexMesh<3, 3>(static_cast<MutableMesh<3, 3> &>((this->mrMesh)));
 }
 
 /**
@@ -1215,7 +1214,7 @@ template<unsigned DIM>
 double MeshBasedCellPopulation<DIM>::GetWidth(const unsigned& rDimension)
 {
     // Call GetWidth() on the mesh
-    double width = mrMesh.GetWidth(rDimension);
+    double width = this->mrMesh.GetWidth(rDimension);
     return width;
 }
 
@@ -1223,7 +1222,7 @@ template<unsigned DIM>
 std::set<unsigned> MeshBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsigned index)
 {
     // Get pointer to this node
-    Node<DIM>* p_node = mrMesh.GetNode(index);
+    Node<DIM>* p_node = this->mrMesh.GetNode(index);
 
     // Loop over containing elements
     std::set<unsigned> neighbouring_node_indices;
@@ -1232,7 +1231,7 @@ std::set<unsigned> MeshBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
          ++elem_iter)
     {
         // Get pointer to this containing element
-        Element<DIM,DIM>* p_element = mrMesh.GetElement(*elem_iter);
+        Element<DIM,DIM>* p_element = static_cast<MutableMesh<DIM, DIM>&>((this->mrMesh)).GetElement(*elem_iter);
 
         // Loop over nodes contained in this element
         for (unsigned i=0; i<p_element->GetNumNodes(); i++)

@@ -148,7 +148,7 @@ void NodeBasedCellPopulationWithParticles<DIM>::UpdateParticlePositions(const st
         if (this->mIsParticle[node_index])
         {
             ChastePoint<DIM> new_point(node_iter->rGetLocation() + dt*drdt[node_index]);
-            this->mrMesh.SetNode(node_index, new_point, false);
+            static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).SetNode(node_index, new_point, false);
         }
     }
 }
@@ -185,7 +185,7 @@ CellPtr NodeBasedCellPopulationWithParticles<DIM>::AddCell(CellPtr pNewCell, con
 
     // Then set the new cell radius in the NodesOnlyMesh
     unsigned node_index = this->GetLocationIndexUsingCell(p_created_cell);
-    this->mrMesh.SetCellRadius(node_index, 0.5);
+    static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).SetCellRadius(node_index, 0.5);
 
     // Update size of mIsParticle if necessary
     if (this->GetNumNodes() > this->mIsParticle.size())
@@ -306,7 +306,7 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile()
 			}
 			if (this->mOutputCellVolumes)
 			{
-				double cell_radius = this->mrMesh.GetCellRadius(node_index);
+				double cell_radius = static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).GetCellRadius(node_index);
 				cell_radii[node_index] = cell_radius;
 			}
         }
@@ -372,7 +372,7 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile()
 //        }
 //    }
 
-    mesh_writer.WriteFilesUsingMesh(this->mrMesh);
+    mesh_writer.WriteFilesUsingMesh(static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)));
 
     *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
     *(this->mpVtkMetaFile) << SimulationTime::Instance()->GetTimeStepsElapsed();

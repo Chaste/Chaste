@@ -43,8 +43,7 @@ NodeBasedCellPopulation<DIM>::NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh,
                                       const std::vector<unsigned> locationIndices,
                                       bool deleteMesh,
                                       bool validate)
-    : AbstractCentreBasedCellPopulation<DIM>(rCells, locationIndices),
-      mrMesh(rMesh),
+    : AbstractCentreBasedCellPopulation<DIM>(rMesh, rCells, locationIndices),
       mDeleteMesh(deleteMesh),
       mMechanicsCutOffLength(DBL_MAX)
 {
@@ -56,8 +55,7 @@ NodeBasedCellPopulation<DIM>::NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh,
 
 template<unsigned DIM>
 NodeBasedCellPopulation<DIM>::NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh)
-    : AbstractCentreBasedCellPopulation<DIM>(),
-      mrMesh(rMesh),
+    : AbstractCentreBasedCellPopulation<DIM>(rMesh),
       mDeleteMesh(true),
       mMechanicsCutOffLength(DBL_MAX) // will be set by serialize() method
 {
@@ -70,20 +68,20 @@ NodeBasedCellPopulation<DIM>::~NodeBasedCellPopulation()
     Clear();
     if (mDeleteMesh)
     {
-        delete &mrMesh;
+        delete &this->mrMesh;
     }
 }
 
 template<unsigned DIM>
 NodesOnlyMesh<DIM>& NodeBasedCellPopulation<DIM>::rGetMesh()
 {
-    return mrMesh;
+    return static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh));
 }
 
 template<unsigned DIM>
 const NodesOnlyMesh<DIM>& NodeBasedCellPopulation<DIM>::rGetMesh() const
 {
-    return mrMesh;
+    return static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh));
 }
 
 template<unsigned DIM>
@@ -119,7 +117,7 @@ void NodeBasedCellPopulation<DIM>::Validate()
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::SplitUpIntoBoxes(double cutOffLength, c_vector<double, 2*DIM> domainSize)
 {
-	mrMesh.SetUpBoxCollection(cutOffLength, domainSize);
+	static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).SetUpBoxCollection(cutOffLength, domainSize);
 }
 
 template<unsigned DIM>
@@ -133,7 +131,7 @@ void NodeBasedCellPopulation<DIM>::FindMaxAndMin()
         max_posn(i) = -DBL_MAX;
     }
 
-    for (unsigned i=0; i<mrMesh.GetNumNodes(); i++)
+    for (unsigned i=0; i<this->mrMesh.GetNumNodes(); i++)
     {
         c_vector<double, DIM> posn = this->GetNode(i)->rGetLocation();
 
@@ -163,20 +161,20 @@ void NodeBasedCellPopulation<DIM>::FindMaxAndMin()
 template<unsigned DIM>
 Node<DIM>* NodeBasedCellPopulation<DIM>::GetNode(unsigned index)
 {
-    return mrMesh.GetNode(index);
+    return this->mrMesh.GetNode(index);
 }
 
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::SetNode(unsigned nodeIndex, ChastePoint<DIM>& rNewLocation)
 {
-    mrMesh.GetNode(nodeIndex)->SetPoint(rNewLocation);
+	static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).GetNode(nodeIndex)->SetPoint(rNewLocation);
 }
 
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 {
-    NodeMap map(mrMesh.GetNumAllNodes());
-    mrMesh.ReMesh(map);
+    NodeMap map(this->mrMesh.GetNumAllNodes());
+    static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).ReMesh(map);
 
     if (!map.IsIdentityMap())
     {
@@ -206,9 +204,9 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
         this->Validate();
     }
 
-    mrMesh.SetMeshHasChangedSinceLoading();
+    static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).SetMeshHasChangedSinceLoading();
 
-    mrMesh.ClearBoxCollection();
+    static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).ClearBoxCollection();
 
     FindMaxAndMin();
 
@@ -233,9 +231,9 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
      * and putting nodes into boxes.
      */
 
-    mrMesh.SetUpBoxCollection(mMechanicsCutOffLength, domain_size);
+    static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).SetUpBoxCollection(mMechanicsCutOffLength, domain_size);
 
-    mrMesh.CalculateNodePairs(mNodePairs);
+    static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).CalculateNodePairs(mNodePairs);
 }
 
 template<unsigned DIM>
@@ -250,7 +248,7 @@ unsigned NodeBasedCellPopulation<DIM>::RemoveDeadCells()
         {
             // Remove the node from the mesh
             num_removed++;
-            mrMesh.DeleteNodePriorToReMesh(this->mCellLocationMap[(*it).get()]);
+            static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).DeleteNodePriorToReMesh(this->mCellLocationMap[(*it).get()]);
 
             // Update mappings between cells and location indices
             unsigned location_index_of_removed_node = this->mCellLocationMap[(*it).get()];
@@ -269,13 +267,13 @@ unsigned NodeBasedCellPopulation<DIM>::RemoveDeadCells()
 template<unsigned DIM>
 unsigned NodeBasedCellPopulation<DIM>::AddNode(Node<DIM>* pNewNode)
 {
-    return mrMesh.AddNode(pNewNode);
+    return static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).AddNode(pNewNode);
 }
 
 template<unsigned DIM>
 unsigned NodeBasedCellPopulation<DIM>::GetNumNodes()
 {
-    return mrMesh.GetNumAllNodes();
+    return static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).GetNumAllNodes();
 }
 
 template<unsigned DIM>
@@ -286,7 +284,7 @@ void NodeBasedCellPopulation<DIM>::UpdateParticlesAfterReMesh(NodeMap& rMap)
 template<unsigned DIM>
 BoxCollection<DIM>* NodeBasedCellPopulation<DIM>::GetBoxCollection()
 {
-    return mrMesh.GetBoxCollection();
+    return static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).GetBoxCollection();
 }
 
 template<unsigned DIM>
@@ -340,7 +338,7 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
     c_vector<double, DIM> node_i_location = this->GetNode(index)->rGetLocation();
 
     // Get the radius of the cell corresponding to this node
-    double radius_of_cell_i = mrMesh.GetCellRadius(index);
+    double radius_of_cell_i = static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).GetCellRadius(index);
 
     // Loop over cells in the population
     std::set<unsigned> neighbouring_node_indices;
@@ -364,7 +362,7 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
             double distance_between_nodes = norm_2(unit_vector);
 
             // Get the radius of the cell corresponding to this node
-            double radius_of_cell_j = mrMesh.GetCellRadius(node_j_index);
+            double radius_of_cell_j = static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).GetCellRadius(node_j_index);
 
             // If the cells are close enough to exert a force on each other...
             double max_interaction_distance = radius_of_cell_i + radius_of_cell_j;
@@ -385,7 +383,7 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
     unsigned node_index = this->GetLocationIndexUsingCell(pCell);
 
     // Get cell radius
-    double cell_radius = mrMesh.GetCellRadius(node_index);
+    double cell_radius = static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).GetCellRadius(node_index);
 
     // Get cell volume from radius
     double cell_volume = 0.0;
@@ -501,7 +499,7 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         }
         if (this->mOutputCellVolumes)
         {
-            double cell_radius = mrMesh.GetCellRadius(node_index);
+            double cell_radius = static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).GetCellRadius(node_index);
             cell_radii[node_index] = cell_radius;
         }
         if (CellwiseData<DIM>::Instance()->IsSetUp())
@@ -550,7 +548,7 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         }
     }
 
-    mesh_writer.WriteFilesUsingMesh(mrMesh);
+    mesh_writer.WriteFilesUsingMesh(static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)));
 
     *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
     *(this->mpVtkMetaFile) << SimulationTime::Instance()->GetTimeStepsElapsed();
@@ -572,7 +570,7 @@ CellPtr NodeBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_vector<d
     // Then set the new cell radius in the NodesOnlyMesh
     ///\todo set the correct cell radius and properly test this (#1808)
     unsigned node_index = this->GetLocationIndexUsingCell(p_created_cell);
-    mrMesh.SetCellRadius(node_index, 1.0);
+    static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).SetCellRadius(node_index, 1.0);
 
     // Return pointer to new cell
     return p_created_cell;

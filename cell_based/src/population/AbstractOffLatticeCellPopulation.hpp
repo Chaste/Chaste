@@ -82,9 +82,9 @@ protected:
     double mDampingConstantMutant;
 
     /**
-     * Constructor for use by archiving only.
+     * Constructor that just takes in a mesh.
      */
-    AbstractOffLatticeCellPopulation();
+    AbstractOffLatticeCellPopulation(AbstractMesh<DIM, DIM>& rMesh);
 
 public:
 
@@ -94,7 +94,8 @@ public:
      * @param rCells a vector of cells
      * @param locationIndices an optional vector of location indices that correspond to real cells
      */
-    AbstractOffLatticeCellPopulation(std::vector<CellPtr>& rCells,
+    AbstractOffLatticeCellPopulation( AbstractMesh<DIM, DIM>& rMesh,
+									std::vector<CellPtr>& rCells,
                                     const std::vector<unsigned> locationIndices=std::vector<unsigned>());
 
     /**

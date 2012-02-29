@@ -86,9 +86,9 @@ protected:
     bool mIterateRandomlyOverUpdateRuleCollection;
 
     /**
-     * Constructor for use by archiving only.
+     * Constructor that just takes in a mesh.
      */
-    AbstractOnLatticeCellPopulation();
+    AbstractOnLatticeCellPopulation(AbstractMesh<DIM, DIM>& rMesh);
 
 public:
 
@@ -100,7 +100,8 @@ public:
      * @param deleteMesh set to true if you want the cell population to free the mesh memory on destruction
      *            (defaults to false)
      */
-    AbstractOnLatticeCellPopulation(std::vector<CellPtr>& rCells,
+    AbstractOnLatticeCellPopulation(AbstractMesh<DIM, DIM>& rMesh,
+									std::vector<CellPtr>& rCells,
                                     const std::vector<unsigned> locationIndices=std::vector<unsigned>(),
                                     bool deleteMesh=false);
 

@@ -50,13 +50,12 @@ CaBasedCellPopulation<DIM>::CaBasedCellPopulation(TetrahedralMesh<DIM, DIM>& rMe
                                             const std::vector<unsigned> locationIndices,
                                             bool deleteMesh,
                                             bool validate)
-    : AbstractOnLatticeCellPopulation<DIM>(rCells, locationIndices),
-      mrMesh(rMesh),
+    : AbstractOnLatticeCellPopulation<DIM>(rMesh, rCells, locationIndices),
       mOnlyUseNearestNeighboursForDivision(false),
       mUseVonNeumannNeighbourhoods(false)
 {
     // This must always be true
-    assert(this->mCells.size() <= mrMesh.GetNumNodes());
+    assert(this->mCells.size() <= this->mrMesh.GetNumNodes());
 
     if (!locationIndices.empty())
     {
@@ -90,8 +89,7 @@ CaBasedCellPopulation<DIM>::CaBasedCellPopulation(TetrahedralMesh<DIM, DIM>& rMe
 
 template<unsigned DIM>
 CaBasedCellPopulation<DIM>::CaBasedCellPopulation(TetrahedralMesh<DIM, DIM>& rMesh)
-    : AbstractOnLatticeCellPopulation<DIM>(),
-      mrMesh(rMesh),
+    : AbstractOnLatticeCellPopulation<DIM>(rMesh),
       mOnlyUseNearestNeighboursForDivision(false),
       mUseVonNeumannNeighbourhoods(false)
 {
@@ -102,7 +100,7 @@ CaBasedCellPopulation<DIM>::~CaBasedCellPopulation()
 {
     if (this->mDeleteMesh)
     {
-        delete &mrMesh;
+        delete &this->mrMesh;
     }
 }
 
@@ -251,25 +249,25 @@ void CaBasedCellPopulation<DIM>::SetEmptySites(const std::set<unsigned>& rEmptyS
 template<unsigned DIM>
 TetrahedralMesh<DIM, DIM>& CaBasedCellPopulation<DIM>::rGetMesh()
 {
-    return mrMesh;
+    return static_cast<TetrahedralMesh<DIM, DIM>& >((this->mrMesh));
 }
 
 template<unsigned DIM>
 const TetrahedralMesh<DIM, DIM>& CaBasedCellPopulation<DIM>::rGetMesh() const
 {
-    return mrMesh;
+    return static_cast<TetrahedralMesh<DIM, DIM>& >((this->mrMesh));
 }
 
 template<unsigned DIM>
 Node<DIM>* CaBasedCellPopulation<DIM>::GetNode(unsigned index)
 {
-    return mrMesh.GetNode(index);
+    return this->mrMesh.GetNode(index);
 }
 
 template<unsigned DIM>
 unsigned CaBasedCellPopulation<DIM>::GetNumNodes()
 {
-    return mrMesh.GetNumAllNodes();
+    return this->mrMesh.GetNumAllNodes();
 }
 
 template<unsigned DIM>
@@ -452,7 +450,7 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile()
 //     * For now, we do an explicit conversion to NodesOnlyMesh. This can be written to VTK then visualized as glyphs.
 //     */
 //    NodesOnlyMesh<DIM> temp_mesh;
-//    temp_mesh.ConstructNodesWithoutMesh(mrMesh);
+//    temp_mesh.ConstructNodesWithoutMesh(static_cast<TetrahedralMesh<DIM, DIM> >((this->mrMesh)));
 //    mesh_writer.WriteFilesUsingMesh(temp_mesh);
 //
 //    *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
@@ -1001,7 +999,7 @@ template<unsigned DIM>
 double CaBasedCellPopulation<DIM>::GetWidth(const unsigned& rDimension)
 {
     // Call GetWidth() on the mesh
-    double width = mrMesh.GetWidth(rDimension);
+    double width = this->mrMesh.GetWidth(rDimension);
 
     return width;
 }

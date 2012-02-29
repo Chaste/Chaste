@@ -62,6 +62,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BetaCateninOneHitCellMutationState.hpp"
 #include "ApoptoticCellProperty.hpp"
 #include "CellLabel.hpp"
+#include "AbstractMesh.hpp"
 
 /**
  * An abstract facade class encapsulating a cell population.
@@ -101,6 +102,9 @@ private:
     }
 
 protected:
+
+    /** Reference to the mesh */
+    AbstractMesh<DIM, DIM>& mrMesh;
 
     /** List of cells */
     std::list<CellPtr> mCells;
@@ -206,13 +210,9 @@ protected:
     virtual void WriteVtkResultsToFile()=0;
 
     /**
-     * Constructor for use by archiving only. Please use the other constructor.
-     *
-     * Doesn't take in cells, since these are dealt with by the serialize method.
+	 * Constructor that just takes in a mesh.
      */
-    AbstractCellPopulation()
-    {
-    }
+    AbstractCellPopulation(AbstractMesh<DIM, DIM>& rMesh);
 
 public:
 
@@ -226,8 +226,9 @@ public:
      *     and the passed-in vector cleared.
      * @param locationIndices an optional vector of location indices that correspond to real cells
      */
-    AbstractCellPopulation(std::vector<CellPtr>& rCells,
-                           const std::vector<unsigned> locationIndices=std::vector<unsigned>());
+    AbstractCellPopulation( AbstractMesh<DIM, DIM>& rMesh,
+							std::vector<CellPtr>& rCells,
+                            const std::vector<unsigned> locationIndices=std::vector<unsigned>());
 
     /**
      * Base class with virtual methods needs a virtual destructor.

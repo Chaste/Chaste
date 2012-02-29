@@ -36,17 +36,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractOffLatticeCellPopulation.hpp"
 
 template<unsigned DIM>
-AbstractOffLatticeCellPopulation<DIM>::AbstractOffLatticeCellPopulation(std::vector<CellPtr>& rCells,
+AbstractOffLatticeCellPopulation<DIM>::AbstractOffLatticeCellPopulation( AbstractMesh<DIM, DIM>& rMesh,
+																	std::vector<CellPtr>& rCells,
                                                                   const std::vector<unsigned> locationIndices)
-    : AbstractCellPopulation<DIM>(rCells, locationIndices),
+    : AbstractCellPopulation<DIM>(rMesh, rCells, locationIndices),
       mDampingConstantNormal(1.0),
       mDampingConstantMutant(1.0)
 {
 }
 
 template<unsigned DIM>
-AbstractOffLatticeCellPopulation<DIM>::AbstractOffLatticeCellPopulation()
-    : AbstractCellPopulation<DIM>()
+AbstractOffLatticeCellPopulation<DIM>::AbstractOffLatticeCellPopulation(AbstractMesh<DIM, DIM>& rMesh)
+	: AbstractCellPopulation<DIM>(rMesh)
 {
 }
 

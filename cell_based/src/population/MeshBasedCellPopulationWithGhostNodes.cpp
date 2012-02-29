@@ -136,8 +136,8 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::UpdateGhostPositions(double dt)
     }
 
     // Calculate forces on ghost nodes
-    for (typename MutableMesh<DIM, DIM>::EdgeIterator edge_iterator = this->mrMesh.EdgesBegin();
-        edge_iterator != this->mrMesh.EdgesEnd();
+    for (typename MutableMesh<DIM, DIM>::EdgeIterator edge_iterator = static_cast<MutableMesh<DIM, DIM>&>((this->mrMesh)).EdgesBegin();
+        edge_iterator != static_cast<MutableMesh<DIM, DIM>&>((this->mrMesh)).EdgesEnd();
         ++edge_iterator)
     {
         unsigned nodeA_global_index = edge_iterator.GetNodeA()->GetIndex();
@@ -170,7 +170,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::UpdateGhostPositions(double dt)
         if (this->mIsGhostNode[node_index])
         {
             ChastePoint<DIM> new_point(node_iter->rGetLocation() + dt*drdt[node_index]);
-            this->mrMesh.SetNode(node_index, new_point, false);
+            static_cast<MutableMesh<DIM, DIM>&>((this->mrMesh)).SetNode(node_index, new_point, false);
         }
     }
 }

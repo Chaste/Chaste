@@ -69,9 +69,6 @@ class PottsBasedCellPopulation : public AbstractOnLatticeCellPopulation<DIM>
 
 private:
 
-    /** Potts-based mesh associated with the cell population. */
-    PottsMesh<DIM>& mrMesh;
-
     /**
      * Pointer to a VertexMesh object that stores the Element tessellation that is used to
      * visualize mrMesh. The tessellation is created by calling CreateElementTessellation()
