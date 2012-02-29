@@ -101,7 +101,7 @@ public:
      */
     void AssignCellId();
 
-    /*
+    /**
      * @return the maximum value of the cell identifier
      */
     unsigned GetMaxCellId() const;
@@ -111,7 +111,7 @@ public:
      */
     unsigned GetCellId() const;
 
-    /*
+    /**
      * Reset the maximum cell id to zero.
      */
     static void ResetMaxCellId();
