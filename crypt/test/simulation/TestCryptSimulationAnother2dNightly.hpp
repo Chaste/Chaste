@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTCRYPTSIMULATION2DNIGHTLY_HPP_
-#define TESTCRYPTSIMULATION2DNIGHTLY_HPP_
+#ifndef TESTCRYPTSIMULATIONANOTHER2DNIGHTLY_HPP_
+#define TESTCRYPTSIMULATIONANOTHER2DNIGHTLY_HPP_
 
 #include <cxxtest/TestSuite.h>
 
@@ -55,7 +55,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimpleWntCellCycleModel.hpp"
 #include "SmartPointers.hpp"
 
-class TestCryptSimulation2dNightly : public AbstractCellBasedTestSuite
+class TestCryptSimulationAnother2dNightly : public AbstractCellBasedTestSuite
 {
 private:
 
@@ -76,9 +76,10 @@ private:
     }
 
 public:
+
     /**
      * Sloughing with a sloughing cell killer and not turning
-     * into ghost nodes on a non-periodic mesh
+     * into ghost nodes on a non-periodic mesh.
      */
     void TestSloughingCellKillerOnNonPeriodicCrypt() throw (Exception)
     {
@@ -172,8 +173,6 @@ public:
         // (we have lost two rows of 7 but had a bit of birth too)
         TS_ASSERT_EQUALS(crypt.GetNumRealCells(), 85u);
     }
-
-
 
     void TestMonolayerWithCutoffPointAndNoGhosts() throw (Exception)
     {
@@ -306,4 +305,4 @@ public:
     }
 };
 
-#endif /*TESTCRYPTSIMULATION2DNIGHTLY_HPP_*/
+#endif /*TESTCRYPTSIMULATIONANOTHER2DNIGHTLY_HPP_*/
