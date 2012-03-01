@@ -95,6 +95,7 @@ public:
     /**
      * Default constructor.
      *
+     * @param rMesh a refernce to the mesh underlying the cell population
      * @param rCells a vector of cells
      * @param locationIndices an optional vector of location indices that correspond to real cells
      * @param deleteMesh set to true if you want the cell population to free the mesh memory on destruction

@@ -222,6 +222,7 @@ public:
      * @note Warning: the passed-in vector of cells will be emptied, even if the constructor
      * throws an exception!
      *
+     * @param rMesh a refernce to the mesh underlying the cell population
      * @param rCells a vector of cells.  Copies of the cells will be stored in the cell population,
      *     and the passed-in vector cleared.
      * @param locationIndices an optional vector of location indices that correspond to real cells

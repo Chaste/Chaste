@@ -91,6 +91,7 @@ public:
     /**
      * Default constructor.
      *
+     * @param rMesh a refernce to the mesh underlying the cell population
      * @param rCells a vector of cells
      * @param locationIndices an optional vector of location indices that correspond to real cells
      */
