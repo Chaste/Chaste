@@ -37,11 +37,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define BOOSTFILESYSTEM_HPP_
 
 /**
- * @file  Include the Boost Filesystem library headers,
+ * @file
+ * Include the Boost Filesystem library headers,
  * and set up the 'fs' namespace alias.
  * This header also ensures that we use version 2 of the library.
  */
 
+/** Which version of the library to use. */
 #define BOOST_FILESYSTEM_VERSION 2
 
 #include <boost/filesystem.hpp>
