@@ -89,6 +89,7 @@ public:
         // Check the CopyFileTo method
         FileFinder source_file("global/test/TestOutputFileHandler.hpp", RelativeTo::ChasteSourceRoot);
         TS_ASSERT(!handler2.FindFile("TestOutputFileHandler.hpp").Exists());
+        PetscTools::Barrier("TestOutputFileHandler-0");
         FileFinder dest_file = handler2.CopyFileTo(source_file);
         TS_ASSERT(dest_file.Exists());
         FileFinder missing_file("global/no_file", RelativeTo::ChasteSourceRoot);
@@ -112,6 +113,7 @@ public:
             // Make a folder and erase it - NB only master can erase files and check it is successful!
             OutputFileHandler handler4("whatever");
             TS_ASSERT(test_folder.Exists());
+            PetscTools::Barrier("TestOutputFileHandler-2b");
             if (PetscTools::AmMaster())
             {
                 test_folder.Remove();
@@ -129,6 +131,7 @@ public:
             // Make a folder
             OutputFileHandler handler5("whatever");
             TS_ASSERT(FileFinder(test_folder, RelativeTo::CWD).Exists());
+            PetscTools::Barrier("TestOutputFileHandler-3b");
 
             // Erase it
             if (PetscTools::AmMaster())
