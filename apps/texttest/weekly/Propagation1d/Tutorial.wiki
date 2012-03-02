@@ -85,7 +85,7 @@ We can change the geometry to be a tissue sheet:
 {{{
 #!xml
 <Mesh unit="cm">
-	<Sheet x="2.0" y="2.0" inter_node_space="0.03"/>    
+	<Sheet x="2.0" y="2.0" inter_node_space="0.04"/>    
 </Mesh>
 }}}
 
