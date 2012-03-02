@@ -86,6 +86,8 @@ other_libpaths = [chaste_libs_path+'lib',
 
 # The order of libraries in these lists matters!
 other_libraries = ['boost_serialization', 'boost_filesystem', 'xerces-c', 'hdf5', 'z', 'parmetis', 'metis']
+# If using Boost >= 1.42, uncomment the following line
+#other_libraries.append('boost_system')
 if os.path.exists(petsc_3_0_path):
     # Assume user has followed INSTALLATION.txt and has Fortran blas & lapack
     blas_lapack = ['flapack', 'fblas', 'gfortran', 'gfortranbegin']

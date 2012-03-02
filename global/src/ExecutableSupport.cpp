@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <iostream>
 #include <sstream>
-#include <sys/utsname.h>
+#include <sys/utsname.h> // For uname
 #include <hdf5.h>
 
 #include "CommandLineArguments.hpp"

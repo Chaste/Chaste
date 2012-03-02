@@ -85,10 +85,7 @@ public:
     /** Standard setup method for PETSc. */
     bool setUpWorld()
     {
-        /**
-         * The cxxtest_argc and cxxtest_argv variables are global, and filled in
-         * from the arguments passed to the cxxtest test suite runner.
-         */
+        // The CommandLineArguments instance is filled in by the cxxtest test suite runner.
         CommandLineArguments* p_args = CommandLineArguments::Instance();
         PETSCEXCEPT(PetscInitialize(p_args->p_argc, p_args->p_argv,
                                     PETSC_NULL, PETSC_NULL) );
