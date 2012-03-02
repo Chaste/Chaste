@@ -160,19 +160,12 @@ public:
         }
     }
 
-    void TestWeCanOnlyDeleteFoldersWeHaveMadeOurselves() throw(Exception)
+    void TestWeCanOnlyDeleteFoldersWeHaveMadeOurselves() throw(Exception, std::exception)
     {
         std::string test_folder = "cannot_delete_me";
         if (PetscTools::AmMaster())
         {
-            try
-            {
-                fs::create_directories(OutputFileHandler::GetChasteTestOutputDirectory() + test_folder);
-            }
-            catch (const fs::filesystem_error& e)
-            {
-                TERMINATE(e.what());
-            }
+            ABORT_IF_THROWS(fs::create_directories(OutputFileHandler::GetChasteTestOutputDirectory() + test_folder));
         }
         // Wait until directory has been created, and check it exists
         PetscTools::Barrier("TestWeCanOnlyDeleteFoldersWeHaveMadeOurselves-1");
@@ -184,7 +177,10 @@ public:
                                   "because signature file \".chaste_deletable_folder\" is not present");
 
         // Tidy up
-        fs::remove(cannot_delete.GetAbsolutePath());
+        if (PetscTools::AmMaster())
+        {
+            cannot_delete.Remove();
+        }
 
         // Now create a folder the proper way
         test_folder = "can_delete_me";

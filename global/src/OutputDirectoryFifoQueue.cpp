@@ -34,10 +34,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "OutputDirectoryFifoQueue.hpp"
-#include "OutputFileHandler.hpp"
 #include <cassert>
-#include <iostream>
+#include "OutputFileHandler.hpp"
 #include "Exception.hpp"
+#include "FileFinder.hpp"
 #include "PetscTools.hpp"
 
 OutputDirectoryFifoQueue::OutputDirectoryFifoQueue(const std::string& rBaseDirectory, unsigned queueMaxSize) :
@@ -57,10 +57,10 @@ std::string OutputDirectoryFifoQueue::CreateNextDir(const std::string& rSubdirec
 
     if (mQueue.size() == mQueueMaxSize)
     {
-        std::string directory_to_remove =  OutputFileHandler::GetChasteTestOutputDirectory() + mBaseDirectory + "/" + mQueue.front();
+        FileFinder dir_to_remove(mBaseDirectory + "/" + mQueue.front(), RelativeTo::ChasteTestOutput);
         if (PetscTools::AmMaster())
         {
-            ABORT_IF_NON0(system, "rm -rf "+directory_to_remove);
+            ABORT_IF_THROWS(dir_to_remove.Remove());
         }
         PetscTools::Barrier("OutputDirectoryFifoQueue::CreateNextDir");
 

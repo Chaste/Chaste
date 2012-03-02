@@ -165,7 +165,12 @@ private:
  *
  * @param message  explanatory message
  */
-#define TERMINATE(message) Exception::Terminate(message, __FILE__, __LINE__)
+#define TERMINATE(message)                           \
+    do {                                             \
+        std::stringstream msg_stream;                \
+        msg_stream << message;                       \
+        Exception::Terminate(msg_stream.str(), __FILE__, __LINE__); \
+    } while (false)
 
 /**
  * Use for control paths that will never be executed, just to make sure they aren't.
@@ -256,6 +261,23 @@ private:
     std::string _arg(arg);        \
     int ret = cmd(_arg.c_str());  \
     ABORT_IF_NON0_WITH_MSG(ret, "Error executing command: " #cmd "(" + _arg + ")") \
+    }
+
+/**
+ * Convenience function to convert an exception thrown by a single process into
+ * termination of the entire program.
+ *
+ * @param block  the block of code to execute
+ */
+#define ABORT_IF_THROWS(block)          \
+    try {                               \
+        block;                          \
+    } catch (const Exception& e) {      \
+        TERMINATE(e.GetMessage());      \
+    } catch (const std::exception &e) { \
+        TERMINATE(e.what());            \
+    } catch (...) {                     \
+        TERMINATE("Unexpected exception thrown."); \
     }
 
 /**

@@ -136,7 +136,7 @@ std::string OutputFileHandler::MakeFoldersAndReturnFullPath(const std::string& r
 {
     fs::path output_root(GetChasteTestOutputDirectory());
     fs::path rel_path(rDirectory);
-    
+
     if (!rel_path.empty() && (*(--rel_path.end())) == ".")
     {
         // rDirectory has a trailing slash, which gives an unhelpful last component
@@ -169,7 +169,7 @@ std::string OutputFileHandler::MakeFoldersAndReturnFullPath(const std::string& r
         }
         catch (const fs::filesystem_error& e)
         {
-            TERMINATE(std::string("Error making test output folder: ") + e.what());
+            TERMINATE("Error making test output folder: " << e.what());
         }
     }
 
@@ -239,7 +239,7 @@ FileFinder OutputFileHandler::CopyFileTo(const FileFinder& rSourceFile) const
         }
         catch (const fs::filesystem_error& e)
         {
-            TERMINATE(std::string("Error copying file '") + rSourceFile.GetAbsolutePath() + "': " + e.what());
+            TERMINATE("Error copying file '" << rSourceFile.GetAbsolutePath() << "': " << e.what());
         }
     }
     PetscTools::Barrier("OutputFileHandler::CopyFileTo");

@@ -37,10 +37,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTOUTPUTDIRECTORYFIFOQUEUE_HPP_
 
 #include <cxxtest/TestSuite.h>
-#include "PetscSetupAndFinalize.hpp"
 #include "OutputFileHandler.hpp"
 #include "OutputDirectoryFifoQueue.hpp"
+#include "FileFinder.hpp"
 #include "PetscTools.hpp"
+#include "PetscSetupAndFinalize.hpp"
 
 class TestOutputDirectoryFifoQueue : public CxxTest::TestSuite
 {
@@ -48,55 +49,67 @@ public:
 
     void TestQueueCreatesDirectories() throw (Exception)
     {
+        FileFinder checkpoints("checkpoints", RelativeTo::ChasteTestOutput);
         // Remove directory in case it was there from previous executions.
         if (PetscTools::AmMaster())
         {
-            ABORT_IF_NON0(system, "rm -rf " + OutputFileHandler::GetChasteTestOutputDirectory() + "/checkpoints");
+            ABORT_IF_THROWS(checkpoints.Remove());
         }
-        PetscTools::Barrier();
-        EXPECT_NON0(system, "test -d " + OutputFileHandler::GetChasteTestOutputDirectory() + "/checkpoints");
+        PetscTools::Barrier("TestQueueCreatesDirectories-1");
+        TS_ASSERT(!checkpoints.Exists());
+        PetscTools::Barrier("TestQueueCreatesDirectories-2");
 
-        OutputDirectoryFifoQueue fifo_queue("checkpoints",2);
-        EXPECT0(system, "test -d " + OutputFileHandler::GetChasteTestOutputDirectory() + "/checkpoints");
+        OutputDirectoryFifoQueue fifo_queue("checkpoints", 2);
+        TS_ASSERT(checkpoints.IsDir());
 
         fifo_queue.CreateNextDir("0.1");
-        EXPECT0(system, "test -d " + OutputFileHandler::GetChasteTestOutputDirectory() + "/checkpoints/0.1");
+        FileFinder dir1("0.1", checkpoints);
+        TS_ASSERT(dir1.IsDir());
 
         fifo_queue.CreateNextDir("0.2");
-        EXPECT0(system, "test -d " + OutputFileHandler::GetChasteTestOutputDirectory() + "/checkpoints/0.2");
+        FileFinder dir2("0.2", checkpoints);
+        TS_ASSERT(dir2.IsDir());
     }
 
     void TestQueueRemovesAndCreatesDirectories() throw (Exception)
     {
+        FileFinder checkpoints("checkpoints2", RelativeTo::ChasteTestOutput);
         // Remove directory in case it was there from previous executions.
-        OutputFileHandler handler("");
+        PetscTools::Barrier("TestQueueRemovesAndCreatesDirectories-0");
         if (PetscTools::AmMaster())
         {
-            ABORT_IF_NON0(system, "rm -rf " + OutputFileHandler::GetChasteTestOutputDirectory() + "/checkpoints");
+            ABORT_IF_THROWS(checkpoints.Remove());
         }
-        PetscTools::Barrier();
-        EXPECT_NON0(system, "test -d " + OutputFileHandler::GetChasteTestOutputDirectory() + "/checkpoints");
+        PetscTools::Barrier("TestQueueRemovesAndCreatesDirectories-1");
+        TS_ASSERT(!checkpoints.Exists());
+        PetscTools::Barrier("TestQueueRemovesAndCreatesDirectories-2");
 
-        OutputDirectoryFifoQueue fifo_queue("checkpoints",2);
-        EXPECT0(system, "test -d " + OutputFileHandler::GetChasteTestOutputDirectory() + "/checkpoints");
+        OutputDirectoryFifoQueue fifo_queue("checkpoints2", 2);
+        TS_ASSERT(checkpoints.IsDir());
 
         fifo_queue.CreateNextDir("0.1");
-        EXPECT0(system, "test -d " + OutputFileHandler::GetChasteTestOutputDirectory() + "/checkpoints/0.1");
+        FileFinder dir1("0.1", checkpoints);
+        TS_ASSERT(dir1.IsDir());
 
         fifo_queue.CreateNextDir("0.2");
-        EXPECT0(system, "test -d " + OutputFileHandler::GetChasteTestOutputDirectory() + "/checkpoints/0.1");
-        EXPECT0(system, "test -d " + OutputFileHandler::GetChasteTestOutputDirectory() + "/checkpoints/0.2");
+        FileFinder dir2("0.2", checkpoints);
+        TS_ASSERT(dir2.IsDir());
+        TS_ASSERT(dir1.IsDir());
 
+        PetscTools::Barrier("TestQueueRemovesAndCreatesDirectories-3");
         fifo_queue.CreateNextDir("0.3");
-        EXPECT_NON0(system, "test -d " + OutputFileHandler::GetChasteTestOutputDirectory() + "/checkpoints/0.1");
-        EXPECT0(system, "test -d " + OutputFileHandler::GetChasteTestOutputDirectory() + "/checkpoints/0.2");
-        EXPECT0(system, "test -d " + OutputFileHandler::GetChasteTestOutputDirectory() + "/checkpoints/0.3");
+        FileFinder dir3("0.3", checkpoints);
+        TS_ASSERT(dir3.IsDir());
+        TS_ASSERT(dir2.IsDir());
+        TS_ASSERT(!dir1.Exists());
 
+        PetscTools::Barrier("TestQueueRemovesAndCreatesDirectories-4");
         fifo_queue.CreateNextDir("0.4");
-        EXPECT_NON0(system, "test -d " + OutputFileHandler::GetChasteTestOutputDirectory() + "/checkpoints/0.1");
-        EXPECT_NON0(system, "test -d " + OutputFileHandler::GetChasteTestOutputDirectory() + "/checkpoints/0.2");
-        EXPECT0(system, "test -d " + OutputFileHandler::GetChasteTestOutputDirectory() + "/checkpoints/0.3");
-        EXPECT0(system, "test -d " + OutputFileHandler::GetChasteTestOutputDirectory() + "/checkpoints/0.4");
+        FileFinder dir4("0.4", checkpoints);
+        TS_ASSERT(dir4.IsDir());
+        TS_ASSERT(dir3.IsDir());
+        TS_ASSERT(!dir2.Exists());
+        TS_ASSERT(!dir1.Exists());
     }
 };
 
