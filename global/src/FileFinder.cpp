@@ -113,12 +113,15 @@ void FileFinder::SetPath(const std::string& rRelativePath, RelativeTo::Value rel
         mAbsPath = msFakePath + "/" + rRelativePath;
     }
 
-    if (IsDir())
+    // Remove any trailing /
+    std::string::iterator it = mAbsPath.end();
+    while (it != mAbsPath.begin() && *(--it) == '/')
     {
-        if (*(mAbsPath.end()-1) != '/')
-        {
-            mAbsPath = mAbsPath + "/";
-        }
+        // Iterator was decremented in the while test
+    }
+    if (it != mAbsPath.end() && (++it) != mAbsPath.end())
+    {
+        mAbsPath.erase(it, mAbsPath.end());
     }
 }
 
@@ -140,21 +143,25 @@ void FileFinder::SetPath(const std::string& rLeafName, const FileFinder& rParent
 
 bool FileFinder::Exists() const
 {
-    return fs::exists(GetAbsolutePath());
+    return fs::exists(mAbsPath);
 }
 
 bool FileFinder::IsFile() const
 {
-    return fs::is_regular(GetAbsolutePath());
+    return fs::is_regular(mAbsPath);
 }
 
 bool FileFinder::IsDir() const
 {
-    return fs::is_directory(GetAbsolutePath());
+    return fs::is_directory(mAbsPath);
 }
 
 std::string FileFinder::GetAbsolutePath() const
 {
+    if (IsDir())
+    {
+        return mAbsPath + '/';
+    }
     return mAbsPath;
 }
 
@@ -162,26 +169,22 @@ bool FileFinder::IsNewerThan(const FileFinder& rOtherEntity) const
 {
     assert(Exists());
     assert(rOtherEntity.Exists());
-    return fs::last_write_time(GetAbsolutePath()) > fs::last_write_time(rOtherEntity.GetAbsolutePath());
+    return fs::last_write_time(mAbsPath) > fs::last_write_time(rOtherEntity.mAbsPath);
 }
 
 std::string FileFinder::GetLeafName() const
 {
-    return fs::path(GetAbsolutePath()).leaf();
+    return fs::path(mAbsPath).leaf();
 }
 
 std::string FileFinder::GetLeafNameNoExtension() const
 {
-    return fs::basename(GetAbsolutePath());
+    return fs::basename(mAbsPath);
 }
 
 FileFinder FileFinder::GetParent() const
 {
-    fs::path our_path(GetAbsolutePath());
-    if (IsDir())
-    {
-        our_path = our_path.branch_path(); // Otherwise trailing slash causes issues
-    }
+    fs::path our_path(mAbsPath);
     EXCEPT_IF_NOT(our_path.has_branch_path());
     return FileFinder(our_path.branch_path().string(),
                       RelativeTo::Absolute);
@@ -211,10 +214,11 @@ void FileFinder::Remove() const
 {
     // Test for bad paths
     const std::string test_output(OutputFileHandler::GetChasteTestOutputDirectory());
-    if (mAbsPath.substr(0, test_output.length()) != test_output)
+    if (GetAbsolutePath().substr(0, test_output.length()) != test_output)
     {
         EXCEPTION("Cannot remove location '" << mAbsPath
-                  << "' as it is not located within the Chaste test output folder.");
+                  << "' as it is not located within the Chaste test output folder ("
+                  << test_output << ").");
     }
     if (mAbsPath.find("..") != std::string::npos)
     {

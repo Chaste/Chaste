@@ -85,7 +85,7 @@ public:
 
     /**
      * Default constructor for subclasses to use. They @b must call
-     * SetAbsolutePath() in their constructor.
+     * SetPath() in their constructor.
      *
      * This also allows classes to store a FileFinder instance that hasn't
      * been properly set up yet, and assign to it later using operator=.
@@ -156,8 +156,8 @@ public:
     /**
      * Get the absolute path to this file/dir.
      *
-     * If this is a directory that exists, the absolute path is guaranteed to end in a '/'.
-     * If the directory doesn't exist, it will depend on what was supplied to the constructor.
+     * If this is a directory that exists (at the instant of this call), the absolute path is
+     * guaranteed to end in a '/'.  Otherwise, the path is guaranteed not to end in a '/'.
      */
     std::string GetAbsolutePath() const;
 
@@ -172,14 +172,14 @@ public:
     /**
      * Get the leaf name of this file or directory.
      *
-     * i.e. the individual file or directory name and none of the preceding folders on its path.
+     * i.e. the individual file or directory name and none of the preceeding folders on its path.
      */
     std::string GetLeafName() const;
 
     /**
      * Get the leaf name of this file or directory, with any file extension removed.
      *
-     * i.e. the individual file or directory name and none of the preceding folders on its path.
+     * i.e. the individual file or directory name and none of the preceeding folders on its path.
      */
     std::string GetLeafNameNoExtension() const;
 
@@ -196,23 +196,23 @@ public:
     void Remove() const;
 
     /**
-     * Test whether a path is absolute. Currently just checks whether the first character is '/'.
+     * Test whether a path is absolute.
      *
-     * @param rPath The path to test
+     * @param rPath  the path to test
      */
     static bool IsAbsolutePath(const std::string& rPath);
 
     /**
      * Replace any spaces in a path or filename with underscores.
      *
-     * @param rPath  A path or file name
+     * @param rPath  a path or file name
      */
     static void ReplaceSpacesWithUnderscores(std::string& rPath);
 
     /**
      * Replace any underscores in a path or filename with spaces (for making titles etc.).
      *
-     * @param rPath  A path or file name
+     * @param rPath  a path or file name
      */
     static void ReplaceUnderscoresWithSpaces(std::string& rPath);
 

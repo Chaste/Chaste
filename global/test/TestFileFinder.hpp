@@ -180,12 +180,18 @@ public:
         TS_ASSERT(new_dir.IsDir());
         TS_ASSERT(!new_dir.IsFile());
         TS_ASSERT_EQUALS(new_dir.GetAbsolutePath(), handler.GetOutputDirectoryFullPath());
+        // Path for an existing dir will end in a '/'
+        TS_ASSERT_EQUALS(*(new_dir.GetAbsolutePath().rbegin()), '/');
 
         FileFinder missing_dir("TestFileFinder/SubDir", RelativeTo::ChasteTestOutput);
         TS_ASSERT(!missing_dir.Exists());
         TS_ASSERT(!missing_dir.IsDir());
         TS_ASSERT(!missing_dir.IsFile());
+        // Note no slash on the end of a missing dir's path
         TS_ASSERT_EQUALS(missing_dir.GetAbsolutePath(), handler.GetOutputDirectoryFullPath() + "SubDir");
+        // But once we create the dir it will have one, even with the same finder
+        OutputFileHandler sub_handler("TestFileFinder/SubDir");
+        TS_ASSERT_EQUALS(missing_dir.GetAbsolutePath(), handler.GetOutputDirectoryFullPath() + "SubDir/");
 
         // Check the parent folder works for directories too
         TS_ASSERT_EQUALS(missing_dir.GetParent().GetAbsolutePath(), new_dir.GetAbsolutePath());
@@ -235,8 +241,8 @@ public:
         // We shouldn't be able to remove unsafe files, if possible
         FileFinder bad1a("global/src", RelativeTo::ChasteSourceRoot);
         FileFinder bad1b("/", RelativeTo::Absolute);
-        TS_ASSERT_THROWS_CONTAINS(bad1a.Remove(), "is not located within the Chaste test output folder.");
-        TS_ASSERT_THROWS_CONTAINS(bad1b.Remove(), "is not located within the Chaste test output folder.");
+        TS_ASSERT_THROWS_CONTAINS(bad1a.Remove(), "is not located within the Chaste test output folder");
+        TS_ASSERT_THROWS_CONTAINS(bad1b.Remove(), "is not located within the Chaste test output folder");
         FileFinder bad2("../..", RelativeTo::ChasteTestOutput);
         TS_ASSERT_THROWS_CONTAINS(bad2.Remove(), "contains a dangerous path component.");
 
