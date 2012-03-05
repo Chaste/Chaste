@@ -203,16 +203,19 @@
       </xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:string">
-      <xs:enumeration value="Fox2002BackwardEuler"/>
-      <xs:enumeration value="LuoRudyIBackwardEuler"/>
-      <xs:enumeration value="LuoRudyI"/>
-      <xs:enumeration value="FaberRudy2000Optimised"/>
-      <xs:enumeration value="FaberRudy2000"/>
       <xs:enumeration value="DifrancescoNoble"/>
-      <xs:enumeration value="MahajanShiferaw"/>
+      <xs:enumeration value="Fox2002"/>
+      <xs:enumeration value="Fox2002BackwardEuler"/>
+      <xs:enumeration value="FaberRudy2000"/>
+      <xs:enumeration value="FaberRudy2000Optimised"/>
       <xs:enumeration value="HodgkinHuxley"/>
-      <xs:enumeration value="tenTusscher2006"/>
+      <xs:enumeration value="LuoRudyI"/>
+      <xs:enumeration value="LuoRudyIBackwardEuler"/>
+      <xs:enumeration value="MahajanShiferaw"/>
+      <xs:enumeration value="MahajanShiferawBackwardEuler"/>
       <xs:enumeration value="Maleckar"/>
+      <xs:enumeration value="tenTusscher2006"/>
+      <xs:enumeration value="tenTusscher2006BackwardEuler"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:complexType name="ionic_model_selection_type">

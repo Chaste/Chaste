@@ -42,7 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellMLToSharedLibraryConverter.hpp"
 #include "AbstractCardiacCellInterface.hpp"
 #include "Warnings.hpp"
-// This is needed to prevent the chaste_libs=0 build failing on tests that use a dynamically loaded CVODE model
+// This is needed to prevent the chaste_libs=0 build failing
+// on tests that use a dynamically loaded CVODE model
 #include "AbstractCvodeCell.hpp"
 
 template<unsigned SPACE_DIM>
@@ -161,6 +162,12 @@ AbstractCardiacCell* HeartConfigRelatedCellFactory<SPACE_DIM>::CreateCellWithInt
                 break;
             }
 
+            case(cp::ionic_models_available_type::Fox2002):
+            {
+                p_cell = new CellFoxModel2002FromCellML(this->mpSolver, intracellularStimulus);
+                break;
+            }
+
             case(cp::ionic_models_available_type::Fox2002BackwardEuler):
             {
                 p_cell = new CellFoxModel2002FromCellMLBackwardEuler(this->mpSolver, intracellularStimulus);
@@ -179,9 +186,21 @@ AbstractCardiacCell* HeartConfigRelatedCellFactory<SPACE_DIM>::CreateCellWithInt
                 break;
             }
 
+            case(cp::ionic_models_available_type::MahajanShiferawBackwardEuler):
+            {
+                p_cell = new CellMahajan2008FromCellMLBackwardEuler(this->mpSolver, intracellularStimulus);
+                break;
+            }
+
             case(cp::ionic_models_available_type::tenTusscher2006):
             {
                 p_cell = new CellTenTusscher2006EpiFromCellML(this->mpSolver, intracellularStimulus);
+                break;
+            }
+
+            case(cp::ionic_models_available_type::tenTusscher2006BackwardEuler):
+            {
+                p_cell = new CellTenTusscher2006EpiFromCellMLBackwardEuler(this->mpSolver, intracellularStimulus);
                 break;
             }
 
