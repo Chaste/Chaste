@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 #include "GetCurrentWorkingDirectory.hpp"
 #include "OutputFileHandler.hpp"
+#include "Warnings.hpp"
 
 bool FileFinder::msFaking = false;
 
@@ -182,12 +183,42 @@ std::string FileFinder::GetLeafNameNoExtension() const
     return fs::basename(mAbsPath);
 }
 
+std::string FileFinder::GetExtension() const
+{
+    return fs::extension(mAbsPath);
+}
+
 FileFinder FileFinder::GetParent() const
 {
     fs::path our_path(mAbsPath);
     EXCEPT_IF_NOT(our_path.has_branch_path());
     return FileFinder(our_path.branch_path().string(),
                       RelativeTo::Absolute);
+}
+
+
+FileFinder FileFinder::CopyTo(const FileFinder& rDest) const
+{
+    if (!Exists())
+    {
+        EXCEPTION("Cannot copy '" << mAbsPath << "' as it does not exist.");
+    }
+    if (!IsFile())
+    {
+        EXCEPTION("Only single files may be copied; " << mAbsPath << " is not a file.");
+    }
+    fs::path from_path(mAbsPath);
+    fs::path to_path(rDest.mAbsPath);
+    if (rDest.IsDir())
+    {
+        to_path /= from_path.leaf();
+    }
+    if (fs::exists(to_path))
+    {
+        fs::remove(to_path);
+    }
+    fs::copy_file(from_path, to_path);
+    return FileFinder(to_path);
 }
 
 
@@ -241,7 +272,104 @@ void FileFinder::Remove(bool force) const
         }
     }
     // Do the removal
-    RemoveAll(mAbsPath);
+    if (Exists())
+    {
+        RemoveAll(mAbsPath);
+    }
+}
+
+
+std::vector<FileFinder> FileFinder::FindMatches(const std::string& rPattern) const
+{
+    // Check for error/warning cases
+    if (!IsDir())
+    {
+        EXCEPTION("Cannot search for matching files in '" << mAbsPath << "' as it is not a directory.");
+    }
+    size_t len = rPattern.length();
+    size_t inner_star_pos = rPattern.find('*', 1);
+    if (inner_star_pos != std::string::npos && inner_star_pos < len - 1)
+    {
+        WARNING("A '*' only has special meaning at the start or end of a pattern.");
+    }
+
+    // Note initial or trailing *, and use of ?
+    std::string pattern(rPattern);
+    bool star_fini = false;
+    if (!pattern.empty() && *(pattern.rbegin()) == '*')
+    {
+        star_fini = true;
+        pattern = pattern.substr(0, len-1);
+        len--;
+    }
+    bool star_init = false;
+    if (!pattern.empty() && pattern[0] == '*')
+    {
+        star_init = true;
+        pattern = pattern.substr(1);
+        len--;
+    }
+    bool has_query = (pattern.find('?') != std::string::npos);
+    // Disallow a harder case to match
+    if (star_init && star_fini && has_query)
+    {
+        EXCEPTION("The '*' wildcard may not be used at both the start and end of the pattern if the '?' wildcard is also used.");
+    }
+
+    // Search the folder
+    std::vector<FileFinder> results;
+    if (!rPattern.empty())
+    {
+        fs::directory_iterator end_iter;
+        fs::path our_path(mAbsPath);
+        for (fs::directory_iterator dir_iter(our_path); dir_iter != end_iter; ++dir_iter)
+        {
+            std::string leafname = dir_iter->path().leaf();
+            size_t leaf_len = leafname.length();
+            if (leafname[0] != '.'  // Don't include hidden files
+                && leaf_len >= len) // Ignore stuff that can't match
+            {
+                if (!has_query) // Easier case
+                {
+                    size_t pos = leafname.find(pattern);
+                    if ((star_init || pos == 0) && (star_fini || pos + len == leaf_len))
+                    {
+                        results.push_back(FileFinder(our_path / leafname));
+                    }
+                }
+                else
+                {
+                    std::string match;
+                    if (star_init)
+                    {
+                        // Match against last len chars
+                        match = leafname.substr(leaf_len - len);
+                    }
+                    else
+                    {
+                        // Match against first len chars
+                        match = leafname.substr(0, len);
+                    }
+                    bool ok = true;
+                    for (std::string::const_iterator it_p=pattern.begin(), it_m=match.begin();
+                         it_p != pattern.end();
+                         ++it_p, ++it_m)
+                    {
+                        if (*it_p != '?' && *it_p != *it_m)
+                        {
+                            ok = false;
+                            break;
+                        }
+                    }
+                    if (ok)
+                    {
+                        results.push_back(FileFinder(our_path / leafname));
+                    }
+                }
+            }
+        }
+    }
+    return results;
 }
 
 

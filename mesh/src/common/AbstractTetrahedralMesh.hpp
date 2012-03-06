@@ -46,15 +46,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <string>
 #include <cassert>
+#include <boost/foreach.hpp>
 
 #include "AbstractMesh.hpp"
 #include "BoundaryElement.hpp"
 #include "Element.hpp"
+#include "GenericMeshReader.hpp"
 #include "AbstractMeshReader.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "TrianglesMeshWriter.hpp"
 #include "ArchiveLocationInfo.hpp"
-#include "GenericMeshReader.hpp"
+#include "FileFinder.hpp"
 
 
 /// Forward declaration which is going to be used for friendship
@@ -148,15 +150,19 @@ private:
             if (p_original_mesh_reader->IsFileFormatBinary())
             {
                 // Mesh is in binary format, we can just copy the files across ignoring the mesh reader
-                std::stringstream cp_command;
-                cp_command << "for filename in `ls " << this->GetMeshFileBaseName() << ".*`; do " <<
-                                 "extension=${filename##*.};" << // ##*. deletes basename and . from the filename (i.e. leaves only the extension (http://tldp.org/LDP/Bash-Beginners-Guide/html/sect_10_03.html)
-                                 "cp $filename " << ArchiveLocationInfo::GetArchiveDirectory() << ArchiveLocationInfo::GetMeshFilename() <<".$extension;" <<
-                              "done";
-
                 if (PetscTools::AmMaster())
                 {
-                    ABORT_IF_NON0(system, cp_command.str());
+                    FileFinder mesh_base(this->GetMeshFileBaseName());
+                    FileFinder mesh_folder = mesh_base.GetParent();
+                    std::string mesh_leaf_name = mesh_base.GetLeafNameNoExtension();
+                    std::vector<FileFinder> mesh_files = mesh_folder.FindMatches(mesh_leaf_name + ".*");
+                    FileFinder dest_dir(ArchiveLocationInfo::GetArchiveDirectory());
+                    BOOST_FOREACH(const FileFinder& r_mesh_file, mesh_files)
+                    {
+                        FileFinder dest_file(ArchiveLocationInfo::GetMeshFilename() + r_mesh_file.GetExtension(),
+                                             dest_dir);
+                        ABORT_IF_THROWS(r_mesh_file.CopyTo(dest_file));
+                    }
                 }
             }
             else

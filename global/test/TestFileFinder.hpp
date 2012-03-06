@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteBuildRoot.hpp"
 #include "OutputFileHandler.hpp"
 #include "GetCurrentWorkingDirectory.hpp"
+#include "Warnings.hpp"
 
 class TestFileFinder : public CxxTest::TestSuite
 {
@@ -82,10 +83,14 @@ public:
             // Check we can extract the leaf name
             TS_ASSERT_EQUALS(file_finder.GetLeafName(), "FileFinder.hpp");
             TS_ASSERT_EQUALS(file_finder.GetLeafNameNoExtension(), "FileFinder");
+            TS_ASSERT_EQUALS(file_finder.GetExtension(), ".hpp");
 
             // And the parent folder name
             FileFinder parent("global/src", RelativeTo::ChasteSourceRoot);
             TS_ASSERT_EQUALS(file_finder.GetParent().GetAbsolutePath(), parent.GetAbsolutePath());
+            TS_ASSERT_EQUALS(parent.GetLeafName(), "src");
+            TS_ASSERT_EQUALS(parent.GetLeafNameNoExtension(), "src");
+            TS_ASSERT_EQUALS(parent.GetExtension(), "");
 
             // Check we can construct from a Boost path or a string
             TS_ASSERT_EQUALS(FileFinder(fs::path(file_name)).GetAbsolutePath(), abs_path);
@@ -279,6 +284,89 @@ public:
         TS_ASSERT(!file.Exists());
         dir.Remove(true);
         TS_ASSERT(!dir.Exists());
+    }
+
+    void TestFindMatches() throw (Exception)
+    {
+        std::string dirname("TestFileFinder_TestFindMatches");
+        OutputFileHandler handler(dirname);
+        FileFinder dir(dirname, RelativeTo::ChasteTestOutput);
+
+        // Create some files to find
+        const unsigned N = 5;
+        for (unsigned i=0; i<N; ++i)
+        {
+            handler.OpenOutputFile("file", i, ".txt");
+        }
+
+        // ? matches a single character
+        std::vector<FileFinder> matches = dir.FindMatches("file?.txt");
+        TS_ASSERT_EQUALS(matches.size(), N);
+        // Trailing * matches anything
+        matches = dir.FindMatches("file*");
+        TS_ASSERT_EQUALS(matches.size(), N);
+        // Initial * matches anything
+        matches = dir.FindMatches("*txt");
+        TS_ASSERT_EQUALS(matches.size(), N);
+        // Hidden files are ignored
+        matches = dir.FindMatches("*");
+        TS_ASSERT_EQUALS(matches.size(), N);
+        // We can combine * & ? (to some extent)
+        matches = dir.FindMatches("*le?.t??");
+        TS_ASSERT_EQUALS(matches.size(), N);
+        matches = dir.FindMatches("????1.*");
+        TS_ASSERT_EQUALS(matches.size(), 1u);
+        // Empty pattern matches nothing
+        matches = dir.FindMatches("");
+        TS_ASSERT_EQUALS(matches.size(), 0u);
+
+        // Only initial or trailing * are supported
+        matches = dir.FindMatches("file*txt");
+        TS_ASSERT_EQUALS(matches.size(), 0u);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),
+                         "A '*' only has special meaning at the start or end of a pattern.");
+        Warnings::QuietDestroy();
+        // This sort of pattern is hard too
+        TS_ASSERT_THROWS_THIS(dir.FindMatches("*le?.t*"),
+                              "The '*' wildcard may not be used at both the start and end of the pattern if the '?' wildcard is also used.");
+
+        // Only works on folders
+        FileFinder file("file0.txt", dir);
+        TS_ASSERT_THROWS_CONTAINS(file.FindMatches("*"), "as it is not a directory.");
+    }
+
+    void TestCopying() throw (Exception)
+    {
+        FileFinder source("global/test/TestFileFinder.hpp", RelativeTo::ChasteSourceRoot);
+        std::string dest_dir_name("TestFileFinder_TestCopying");
+        OutputFileHandler handler(dest_dir_name);
+
+        // Copy to folder
+        FileFinder dest_dir(dest_dir_name, RelativeTo::ChasteTestOutput);
+        FileFinder expected_dest("TestFileFinder.hpp", dest_dir);
+        TS_ASSERT(!expected_dest.Exists());
+        FileFinder dest = source.CopyTo(dest_dir);
+        TS_ASSERT(dest.IsFile());
+        TS_ASSERT_EQUALS(dest.GetAbsolutePath(), expected_dest.GetAbsolutePath());
+
+        // Copy to existing file
+        dest = source.CopyTo(dest_dir);
+        TS_ASSERT(dest.IsFile());
+        TS_ASSERT_EQUALS(dest.GetAbsolutePath(), expected_dest.GetAbsolutePath());
+
+        // Copy to new name
+        expected_dest.SetPath("new_name", dest_dir);
+        TS_ASSERT(!expected_dest.Exists());
+        dest = source.CopyTo(expected_dest);
+        TS_ASSERT(dest.IsFile());
+        TS_ASSERT_EQUALS(dest.GetAbsolutePath(), expected_dest.GetAbsolutePath());
+
+        // Error cases
+        TS_ASSERT_THROWS_CONTAINS(FileFinder("global", RelativeTo::ChasteSourceRoot).CopyTo(dest),
+                                  "Only single files may be copied");
+        TS_ASSERT_THROWS_CONTAINS(FileFinder("global/no_file", RelativeTo::ChasteSourceRoot).CopyTo(dest),
+                                  "as it does not exist.");
     }
 };
 

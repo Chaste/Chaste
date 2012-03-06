@@ -109,7 +109,7 @@ public:
     /*
      * Define a particular test.
      */
-    void TestSchnackenbergSystemOnButterflyMesh()
+    void TestSchnackenbergSystemOnButterflyMesh() throw (Exception)
     {
         /* As usual, we first create a mesh. Here we are using a 2d mesh of a butterfly-shaped domain. */
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/butterfly");

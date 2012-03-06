@@ -184,9 +184,25 @@ public:
     std::string GetLeafNameNoExtension() const;
 
     /**
+     * Get the extension of the leaf name of this file or directory, if any.
+     * The '.' will be included in the extension if an extension exists.
+     */
+    std::string GetExtension() const;
+
+    /**
      * Get a finder for the folder containing this file or directory.
      */
     FileFinder GetParent() const;
+
+    /**
+     * Copy this file to the given destination.
+     * The destination may be a folder, or destination file name.  Only single files may be
+     * copied, not whole folders.
+     *
+     * @param rDest  where to copy to
+     * @return  a finder for the copied file
+     */
+    FileFinder CopyTo(const FileFinder& rDest) const;
 
     /**
      * Recursively remove this file or folder.
@@ -198,6 +214,19 @@ public:
      * @param force  whether to allow deletion of content not created by an OutputFileHandler
      */
     void Remove(bool force=false) const;
+
+    /**
+     * Find files in this folder matching a simple glob pattern.
+     * This method must be called on a FileFinder that points at a folder, and the pattern
+     * will be matched against file (or folder) names in that folder.  The pattern can use
+     * a subset of shell-style glob syntax.  A '?' anywhere in the string matches any single
+     * character at that position.  A '*' may be used at the start or end of the string to
+     * match any number of leading or trailing characters, respectively.
+     * Hidden files (names starting with a '.') will never be matched.
+     *
+     * @param rPattern  the pattern to match names against
+     */
+    std::vector<FileFinder> FindMatches(const std::string& rPattern) const;
 
     /**
      * Test whether a path is absolute.

@@ -35,6 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "HoneycombMeshGenerator.hpp"
+
+#include <boost/foreach.hpp>
 #include "TrianglesMeshReader.hpp"
 #include "OutputFileHandler.hpp"
 #include "RandomNumberGenerator.hpp"
@@ -217,14 +219,10 @@ HoneycombMeshGenerator::HoneycombMeshGenerator(unsigned numNodesAlongWidth, unsi
     mpMesh->ConstructFromMeshReader(mesh_reader);
 
     // Delete the temporary files
-    std::string command = "rm " + output_dir + mMeshFilename + ".*";
-    int return_value = system(command.c_str());
-    if (return_value != 0)
+    FileFinder output_dir_finder(output_dir);
+    BOOST_FOREACH(FileFinder temp_file, output_dir_finder.FindMatches(mMeshFilename + ".*"))
     {
-        // Can't figure out how to make this throw but seems as if it should be here?
-        #define COVERAGE_IGNORE
-        EXCEPTION("HoneycombMeshGenerator cannot delete temporary files\n");
-        #undef COVERAGE_IGNORE
+        temp_file.Remove(true);
     }
 
     // The original files have been deleted, it is better if the mesh object forgets about them

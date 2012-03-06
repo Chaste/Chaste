@@ -54,8 +54,6 @@ class TestCwd : public CxxTest::TestSuite
 public:
     void TestShowCwd()
     {
-        TS_ASSERT_EQUALS(system("pwd"), 0);
-        TS_ASSERT_EQUALS(system("ls -l io/test/data"), 0);
         std::string chaste_build_root(ChasteBuildRootDir());
         TS_ASSERT_EQUALS(GetCurrentWorkingDirectory() + "/", chaste_build_root);
     }

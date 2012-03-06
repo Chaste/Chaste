@@ -105,7 +105,6 @@ public:
      * CHASTE_TEST_OUTPUT, and defaults to "./testoutput" if it is not set.
      *
      * Attempts to return an absolute path, but may get confused by odd setups.
-     * Eventually we'll move to using boost::filesystem, which would be more robust.
      *
      * Static so an output file handler does not have to be created if the test output
      * directory is wanted for, say, reading a file.

@@ -36,7 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTARCHIVINGHELPERCLASSES_HPP_
 #define TESTARCHIVINGHELPERCLASSES_HPP_
 
-#include <cstdlib> // For 'system'
 #include <climits>
 #include <sys/stat.h> // For chmod()
 #include <cxxtest/TestSuite.h>
@@ -44,6 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/version.hpp>
+#include <boost/foreach.hpp>
 
 #include "ArchiveLocationInfo.hpp"
 #include "ArchiveOpener.hpp"
@@ -51,6 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 #include "GetCurrentWorkingDirectory.hpp"
 #include "OutputFileHandler.hpp"
+#include "FileFinder.hpp"
 
 // Save typing, and allow the use of these in cxxtest macros
 typedef ArchiveOpener<boost::archive::text_iarchive, std::ifstream> InputArchiveOpener;
@@ -194,25 +195,9 @@ public:
         // Cover the case of an archive in the chaste folder (i.e. a path relative to the working directory)
         if (PetscTools::IsSequential())
         {
-            // Make sure the file is not there before we do this
-            int return_val = system("test -e testoutput/archive_opener.arch*");
-            if (return_val == 0)
-            {
-                EXCEPTION("Unexpected file found; bailing out!");
-            }
-            {
-                // Write
-                FileFinder testoutput_dir("testoutput", RelativeTo::ChasteSourceRoot);
-                OutputArchiveOpener archive_opener_relative(testoutput_dir, "archive_opener.arch");
-            }
-            // Remove the file
-            EXPECT0(system, "rm -f testoutput/archive_opener.arch*");
-
-            {
-                // Read
-                FileFinder save_bidomain_dir("apps/texttest/chaste/resume_bidomain/save_bidomain", RelativeTo::ChasteSourceRoot);
-                InputArchiveOpener archive_opener_relative(save_bidomain_dir, "archive.arch");
-            }
+            // Read
+            FileFinder save_bidomain_dir("apps/texttest/chaste/resume_bidomain/save_bidomain", RelativeTo::ChasteSourceRoot);
+            InputArchiveOpener archive_opener_relative(save_bidomain_dir, "archive.arch");
         }
 
         PetscTools::Barrier(); // Make sure all processes have finished this test before proceeding
@@ -227,8 +212,7 @@ public:
         std::string archive_base_name = "archive_opener.arch";
 
         // Remove the process-specific archive for this process
-        std::string archive_path = ArchiveLocationInfo::GetProcessUniqueFilePath(archive_base_name);
-        EXPECT0(system, "rm -f " + archive_path);
+        FileFinder(ArchiveLocationInfo::GetProcessUniqueFilePath(archive_base_name)).Remove();
         TS_ASSERT_THROWS_CONTAINS(InputArchiveOpener archive_opener_in(archive_dir_finder, archive_base_name),
                                   "Cannot load secondary archive file: ");
         PetscTools::Barrier("TestArchiveOpenerExceptions-1");
@@ -236,8 +220,7 @@ public:
         // Remove the main archive
         if (PetscTools::AmMaster())
         {
-            archive_path = handler.GetOutputDirectoryFullPath() + archive_base_name;
-            ABORT_IF_NON0(system, "rm -f " + archive_path);
+            ABORT_IF_THROWS(handler.FindFile(archive_base_name).Remove());
         }
         PetscTools::Barrier("TestArchiveOpenerExceptions-2");
         TS_ASSERT_THROWS_CONTAINS(InputArchiveOpener archive_opener_in(archive_dir_finder, archive_base_name),
