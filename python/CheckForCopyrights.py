@@ -29,20 +29,6 @@ import os
 import re
 import sys
 
-# Check, apply or modify the copyright notice
-exts = ['.cpp', '.hpp', '.py', '.java']
-dir_ignores = ['build', 'cxxtest', 'testoutput', 'doc', 'projects']
-startchar_ignores = ['_', '.']
-exclusions = ['python/pycml/enum.py', 'python/pycml/pyparsing.py', 'python/pycml/schematron.py']
-
-apply_update = '-update' in sys.argv
-apply_new = '-new' in sys.argv
-
-chaste_dir = '.'
-if '-dir' in sys.argv: 
-    i = sys.argv.index('-dir')
-    chaste_dir = os.path.realpath(sys.argv[i+1])
-
 
 deprecated_notice = re.compile(r"""Copyright \(C\) University of Oxford, 2005-\d{4}
 
@@ -175,18 +161,27 @@ def CheckForCopyrightNotice(findStrOrRe, fileIn):
     else:
         found = findStrOrRe.search(file_text) is not None
     return found
+
+def UpdateFile(oldFilePath, newFilePath):
+    """Replace the contents of oldFilePath with newFilePath.
     
+    This removes the old file and renames the new to match, but also
+    transfers permissions etc.
+    """
+    perm = os.stat(oldFilePath).st_mode
+    os.rename(newFilePath, oldFilePath)
+    os.chmod(oldFilePath, perm)
+
 def ReplaceStringInFile(findRe, repStr, filePath):
-    """Replaces all strings matching findRe by repStr in file filePath"""
+    """Replaces all strings matching findRe by repStr in file filePath."""
     tempName = filePath+'~'
     input = open(filePath)
     output = open(tempName, 'w')
-
     s = input.read()
     output.write(findRe.sub(repStr, s))
     output.close()
     input.close()
-    os.rename(tempName, filePath)
+    UpdateFile(filePath, tempName)
     print 'Notice: replaced deprecated copyright notice in', filePath
 
 def HeadAppendStringInFile(appendString, filePath):
@@ -194,13 +189,12 @@ def HeadAppendStringInFile(appendString, filePath):
     tempName = filePath+'~'
     input = open(filePath)
     output = open(tempName, 'w')
-
     s = input.read()
     output.write(appendString)
     output.write(s)
     output.close()
     input.close()
-    os.rename(tempName, filePath)
+    UpdateFile(filePath, tempName)
     print 'Notice: applied copyright notice in ', filePath
 
    
@@ -251,41 +245,56 @@ def InspectFile(fileName):
         print 'Fix this by doing: python python/CheckForCopyrights.py -new'
         return False
 
-num_no_copyrights = 0
-num_copyrights = 0
-chaste_dir_len = len(os.path.join(chaste_dir, ''))
-for root, dirs, files in os.walk(chaste_dir):
-    relative_root = root[chaste_dir_len:]
-    # Check for ignored dirs
-    for dirname in dirs[:]:
-        if dirname in dir_ignores or dirname[0] in startchar_ignores:
-            dirs.remove(dirname)
-    # Check for source files
-    for file in files:
-        relative_path = os.path.join(relative_root, file)
-        name, ext = os.path.splitext(file)
-        if ((ext in exts or file=='SConscript' or file=='SConstruct') and
-            relative_path not in exclusions):
-            file_name = os.path.join(root, file)
-            if InspectFile(file_name) == False:
-                num_no_copyrights += 1
-            else:
-                num_copyrights += 1
 
-# Let the test summary script know
-if chaste_dir == ".":
-    dir = os.getcwd()
-else:
-    dir = chaste_dir
+if __name__ == '__main__':
+    # Check, apply or modify the copyright notices.
+    exts = ['.cpp', '.hpp', '.py', '.java', '.in']
+    dir_ignores = ['build', 'cxxtest', 'testoutput', 'doc', 'projects']
+    startchar_ignores = ['_', '.']
+    exclusions = ['python/pycml/enum.py', 'python/pycml/pyparsing.py', 'python/pycml/schematron.py']
     
-print "Copyright test run over ",dir," (",num_no_copyrights+num_copyrights,") files"
-if num_no_copyrights > 0:
-    print
-    print "The next line is for the benefit of the test summary scripts."
-    print "Failed",num_no_copyrights,"of",num_no_copyrights+num_copyrights,"tests"
-
-    # Return a non-zero exit code if orphans were found
-    sys.exit(num_no_copyrights)
-else:
-    print "Infrastructure test passed ok."
-
+    apply_update = '-update' in sys.argv
+    apply_new = '-new' in sys.argv
+    
+    chaste_dir = '.'
+    if '-dir' in sys.argv: 
+        i = sys.argv.index('-dir')
+        chaste_dir = os.path.realpath(sys.argv[i+1])
+    
+    num_no_copyrights = 0
+    num_copyrights = 0
+    chaste_dir_len = len(os.path.join(chaste_dir, ''))
+    for root, dirs, files in os.walk(chaste_dir):
+        relative_root = root[chaste_dir_len:]
+        # Check for ignored dirs
+        for dirname in dirs[:]:
+            if dirname in dir_ignores or dirname[0] in startchar_ignores:
+                dirs.remove(dirname)
+        # Check for source files
+        for file in files:
+            relative_path = os.path.join(relative_root, file)
+            name, ext = os.path.splitext(file)
+            if ((ext in exts or file=='SConscript' or file=='SConstruct') and
+                relative_path not in exclusions):
+                file_name = os.path.join(root, file)
+                if InspectFile(file_name) == False:
+                    num_no_copyrights += 1
+                else:
+                    num_copyrights += 1
+    
+    # Let the test summary script know
+    if chaste_dir == ".":
+        dir = os.getcwd()
+    else:
+        dir = chaste_dir
+        
+    print "Copyright test run over ",dir," (",num_no_copyrights+num_copyrights,") files"
+    if num_no_copyrights > 0:
+        print
+        print "The next line is for the benefit of the test summary scripts."
+        print "Failed",num_no_copyrights,"of",num_no_copyrights+num_copyrights,"tests"
+    
+        # Return a non-zero exit code if orphans were found
+        sys.exit(num_no_copyrights)
+    else:
+        print "Infrastructure test passed ok."

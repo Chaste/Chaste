@@ -85,20 +85,7 @@ void ExecutableSupport::ShowCopyright()
     // Only show one copy of copyright/header
     if (PetscTools::AmMaster())
     {
-        std::cout << "Copyright (C) University of Oxford, 2005-2012 \n\n\
-\
-Chaste is free software: you can redistribute it and/or modify \n\
-it under the terms of the Lesser GNU General Public License as published by \n\
-the Free Software Foundation, either version 2.1 of the License, or \n\
-(at your option) any later version. \n\n\
-\
-Chaste is distributed in the hope that it will be useful, \n\
-but WITHOUT ANY WARRANTY; without even the implied warranty of \n\
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the \n\
-Lesser GNU General Public License for more details. \n\n\
-\
-You should have received a copy of the Lesser GNU General Public License \n\
-along with Chaste.  If not, see <http://www.gnu.org/licenses/>.\n\n";
+        std::cout << ChasteBuildInfo::GetLicenceText() << std::endl;
 
         // Write provenance information to stdout
         std::cout << provenance_msg.str() << std::flush;

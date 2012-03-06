@@ -44,6 +44,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class ChasteBuildInfo
 {
 public:
+    /**
+     * @return The licence notice for Chaste.
+     */
+    static std::string GetLicenceText();
 
     /**
      * @return The path to the root directory of the Chaste source tree.

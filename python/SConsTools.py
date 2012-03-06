@@ -420,11 +420,16 @@ def GetVersionCpp(templateFilePath, env):
     command = env['build'].tools['xsd'] + ' version 2>&1'
     xsd_version_string = os.popen(command).readline().strip()
     xsd_version = xsd_version_string[-5:]
+    
+    from CheckForCopyrights import current_notice
+    licence = current_notice.replace('\nThis file is part of Chaste.\n', '')
+    licence = licence.replace('"', '\\"').replace('\n', '\\n')
 
     subst = {'example': '%(example)s',
              'chaste_root': chaste_root,
              'revision': chaste_revision,
              'wc_modified': str(wc_modified).lower(),
+             'licence': licence,
              'time_format': time_format,
              'time_size': len(build_time)+1,
              'build_time': build_time,
