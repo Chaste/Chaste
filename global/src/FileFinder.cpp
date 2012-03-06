@@ -256,24 +256,24 @@ void FileFinder::Remove(bool force) const
         EXCEPTION("Cannot remove location '" << mAbsPath
                   << "' as it contains a dangerous path component.");
     }
-    if (!force)
-    {
-        fs::path sig_file(mAbsPath);
-        if (IsFile())
-        {
-            // We need to look for the signature file in the parent folder
-            sig_file.remove_leaf();
-        }
-        sig_file /= OutputFileHandler::SIG_FILE_NAME;
-        if (!fs::exists(sig_file))
-        {
-            EXCEPTION("Cannot remove location '" << mAbsPath << "' because the signature file '"
-                      << OutputFileHandler::SIG_FILE_NAME << "' is not present.");
-        }
-    }
-    // Do the removal
     if (Exists())
     {
+        if (!force)
+        {
+            fs::path sig_file(mAbsPath);
+            if (IsFile())
+            {
+                // We need to look for the signature file in the parent folder
+                sig_file.remove_leaf();
+            }
+            sig_file /= OutputFileHandler::SIG_FILE_NAME;
+            if (!fs::exists(sig_file))
+            {
+                EXCEPTION("Cannot remove location '" << mAbsPath << "' because the signature file '"
+                          << OutputFileHandler::SIG_FILE_NAME << "' is not present.");
+            }
+        }
+        // Do the removal
         RemoveAll(mAbsPath);
     }
 }
