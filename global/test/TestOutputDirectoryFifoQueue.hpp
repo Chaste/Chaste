@@ -51,7 +51,7 @@ public:
     {
         FileFinder checkpoints("checkpoints", RelativeTo::ChasteTestOutput);
         // Remove directory in case it was there from previous executions.
-        if (PetscTools::AmMaster())
+        if (PetscTools::AmMaster() && checkpoints.Exists())
         {
             ABORT_IF_THROWS(checkpoints.Remove());
         }
@@ -76,7 +76,7 @@ public:
         FileFinder checkpoints("checkpoints2", RelativeTo::ChasteTestOutput);
         // Remove directory in case it was there from previous executions.
         PetscTools::Barrier("TestQueueRemovesAndCreatesDirectories-0");
-        if (PetscTools::AmMaster())
+        if (PetscTools::AmMaster() && checkpoints.Exists())
         {
             ABORT_IF_THROWS(checkpoints.Remove());
         }
