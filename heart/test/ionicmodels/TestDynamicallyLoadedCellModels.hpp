@@ -240,7 +240,7 @@ public:
         // What if the Chaste source tree is missing?
         FileFinder::FakePath(RelativeTo::ChasteSourceRoot, "/tmp/not-a-chaste-source-tree");
         TS_ASSERT_THROWS_THIS(converter.Convert(cellml_file),
-                              "No Chaste source tree found at '/tmp/not-a-chaste-source-tree/' - you need the source to use CellML models directly in Chaste.");
+                              "No Chaste source tree found at '/tmp/not-a-chaste-source-tree' - you need the source to use CellML models directly in Chaste.");
         FileFinder::StopFaking();
 
         // Or a required project is missing?
