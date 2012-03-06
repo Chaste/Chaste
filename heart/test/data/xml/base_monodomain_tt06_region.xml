@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ChasteParameters xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/2_1">
+<ChasteParameters xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/3_1">
 
 	<Simulation>       
 		<!-- 
@@ -8,9 +8,9 @@
 	    <SimulationDuration unit="ms">1.0</SimulationDuration>
 	    <Domain>Mono</Domain>
 	    <IonicModels>
-	    	<Default><Hardcoded>LuoRudyI</Hardcoded></Default>
+	    	<Default><Hardcoded>LuoRudyIBackwardEuler</Hardcoded></Default>
 			<Region> <!-- REGION 1 -->
-                <IonicModel><Hardcoded>tenTusscher2006</Hardcoded></IonicModel>
+                <IonicModel><Hardcoded>tenTusscher2006BackwardEuler</Hardcoded></IonicModel>
                 <Location unit="cm">
                     <Cuboid>
                         <LowerCoordinates x="-1.0" y="0.0" z="0.0"/>
@@ -79,7 +79,7 @@
 	</Physiological>
 
 	<Numerical>
-		<TimeSteps ode="0.001" pde="0.1" printing="0.1" unit="ms"/>
+		<TimeSteps ode="0.01" pde="0.1" printing="0.1" unit="ms"/>
 		<KSPTolerances>
 			<KSPRelative>1e-6</KSPRelative>
 		</KSPTolerances>

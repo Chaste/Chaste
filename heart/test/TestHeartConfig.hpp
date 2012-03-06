@@ -808,6 +808,34 @@ public:
         HeartConfig::Instance()->SetDomain(cp::domain_type::Bi);
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetDomain(), cp::domain_type::Bi);
 
+        HeartConfig::Instance()->SetDefaultIonicModel(cp::ionic_models_available_type::DifrancescoNoble);
+        TS_ASSERT(HeartConfig::Instance()->GetDefaultIonicModel().Hardcoded().present());
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetDefaultIonicModel().Hardcoded().get(), cp::ionic_models_available_type::DifrancescoNoble);
+
+        HeartConfig::Instance()->SetDefaultIonicModel(cp::ionic_models_available_type::FaberRudy2000);
+        TS_ASSERT(HeartConfig::Instance()->GetDefaultIonicModel().Hardcoded().present());
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetDefaultIonicModel().Hardcoded().get(), cp::ionic_models_available_type::FaberRudy2000);
+
+        HeartConfig::Instance()->SetDefaultIonicModel(cp::ionic_models_available_type::FaberRudy2000Optimised);
+        TS_ASSERT(HeartConfig::Instance()->GetDefaultIonicModel().Hardcoded().present());
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetDefaultIonicModel().Hardcoded().get(), cp::ionic_models_available_type::FaberRudy2000Optimised);
+
+        HeartConfig::Instance()->SetDefaultIonicModel(cp::ionic_models_available_type::Fox2002);
+        TS_ASSERT(HeartConfig::Instance()->GetDefaultIonicModel().Hardcoded().present());
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetDefaultIonicModel().Hardcoded().get(), cp::ionic_models_available_type::Fox2002);
+
+        HeartConfig::Instance()->SetDefaultIonicModel(cp::ionic_models_available_type::Fox2002BackwardEuler);
+        TS_ASSERT(HeartConfig::Instance()->GetDefaultIonicModel().Hardcoded().present());
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetDefaultIonicModel().Hardcoded().get(), cp::ionic_models_available_type::Fox2002BackwardEuler);
+
+        HeartConfig::Instance()->SetDefaultIonicModel(cp::ionic_models_available_type::HodgkinHuxley);
+        TS_ASSERT(HeartConfig::Instance()->GetDefaultIonicModel().Hardcoded().present());
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetDefaultIonicModel().Hardcoded().get(), cp::ionic_models_available_type::HodgkinHuxley);
+
+        HeartConfig::Instance()->SetDefaultIonicModel(cp::ionic_models_available_type::LuoRudyI);
+        TS_ASSERT(HeartConfig::Instance()->GetDefaultIonicModel().Hardcoded().present());
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetDefaultIonicModel().Hardcoded().get(), cp::ionic_models_available_type::LuoRudyI);
+
         HeartConfig::Instance()->SetDefaultIonicModel(cp::ionic_models_available_type::LuoRudyIBackwardEuler);
         TS_ASSERT(HeartConfig::Instance()->GetDefaultIonicModel().Hardcoded().present());
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetDefaultIonicModel().Hardcoded().get(), cp::ionic_models_available_type::LuoRudyIBackwardEuler);
@@ -816,17 +844,22 @@ public:
         TS_ASSERT(HeartConfig::Instance()->GetDefaultIonicModel().Hardcoded().present());
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetDefaultIonicModel().Hardcoded().get(), cp::ionic_models_available_type::MahajanShiferaw);
 
-        HeartConfig::Instance()->SetDefaultIonicModel(cp::ionic_models_available_type::HodgkinHuxley);
+        HeartConfig::Instance()->SetDefaultIonicModel(cp::ionic_models_available_type::MahajanShiferawBackwardEuler);
         TS_ASSERT(HeartConfig::Instance()->GetDefaultIonicModel().Hardcoded().present());
-        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetDefaultIonicModel().Hardcoded().get(), cp::ionic_models_available_type::HodgkinHuxley);
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetDefaultIonicModel().Hardcoded().get(), cp::ionic_models_available_type::MahajanShiferawBackwardEuler);
+
+        HeartConfig::Instance()->SetDefaultIonicModel(cp::ionic_models_available_type::Maleckar);
+        TS_ASSERT(HeartConfig::Instance()->GetDefaultIonicModel().Hardcoded().present());
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetDefaultIonicModel().Hardcoded().get(), cp::ionic_models_available_type::Maleckar);
 
         HeartConfig::Instance()->SetDefaultIonicModel(cp::ionic_models_available_type::tenTusscher2006);
         TS_ASSERT(HeartConfig::Instance()->GetDefaultIonicModel().Hardcoded().present());
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetDefaultIonicModel().Hardcoded().get(), cp::ionic_models_available_type::tenTusscher2006);
 
-        HeartConfig::Instance()->SetDefaultIonicModel(cp::ionic_models_available_type::DifrancescoNoble);
+        HeartConfig::Instance()->SetDefaultIonicModel(cp::ionic_models_available_type::tenTusscher2006BackwardEuler);
         TS_ASSERT(HeartConfig::Instance()->GetDefaultIonicModel().Hardcoded().present());
-        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetDefaultIonicModel().Hardcoded().get(), cp::ionic_models_available_type::DifrancescoNoble);
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetDefaultIonicModel().Hardcoded().get(), cp::ionic_models_available_type::tenTusscher2006BackwardEuler);
+
 
         TS_ASSERT(!HeartConfig::Instance()->GetConductivityHeterogeneitiesProvided());
 

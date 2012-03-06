@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ChasteParameters xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/2_0">
+<ChasteParameters xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/3_1">
 
 	<Simulation>       
 		<!-- 
@@ -9,7 +9,7 @@
 	    <Domain>Mono</Domain>
 	    <SpaceDimension>1</SpaceDimension>
 	    <IonicModels>
-	    	<Default><Hardcoded>Fox2002BackwardEuler</Hardcoded></Default>
+	    	<Default><Hardcoded>Fox2002</Hardcoded></Default>
     	</IonicModels>
 	    
 		<!-- 
@@ -44,7 +44,7 @@
     <Physiological>
     </Physiological>
 	<Numerical>
-		<TimeSteps ode="0.1" pde="0.1" printing="0.1" unit="ms"/>
+		<TimeSteps ode="0.001" pde="0.1" printing="0.1" unit="ms"/>
 	</Numerical>		
 		    
 </ChasteParameters>

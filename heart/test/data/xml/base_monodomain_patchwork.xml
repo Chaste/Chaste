@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ChasteParameters xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/2_0">
+<ChasteParameters xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/3_1">
 
 	<Simulation>       
 		<!-- 
@@ -10,22 +10,30 @@
 	    <SpaceDimension>3</SpaceDimension>
 	    
         <!-- 
-	 	Mesh definition 
-		-->
-		<!-- Note that this 3D cable is oriented in the z-direction, since that is the dimension which is split when constructing a 3D slab in parallel-->    
+	 	    Mesh definition 
+
+            Note that this 3D cable is oriented in the z-direction, 
+		    since that is the dimension which is split when constructing a 3D slab in parallel
+        -->    
 		<Mesh unit="cm">
 			<Slab x="0.1" y="0.1" z="1.5" inter_node_space="0.1"/>
 	  	</Mesh>
 	    
-	    
+	    <!-- 
+	        Put a different ionic model for each x-y plane slice of the cable. 
+	    -->
 	    <IonicModels>
-	    	<Default><Hardcoded>Fox2002BackwardEuler</Hardcoded></Default>
+	        <!-- Default model -->
+	    	<Default>
+	    	    <Hardcoded>Fox2002BackwardEuler</Hardcoded>
+	    	</Default>
+	        
 			<Region> <!-- REGION 1 -->
                 <IonicModel><Hardcoded>LuoRudyI</Hardcoded></IonicModel>
                 <Location unit="cm">
                     <Cuboid>
                         <LowerCoordinates x="0.0" y="0.0" z="0.0"/>
-                        <UpperCoordinates x="0.0" y="0.0" z="0.0"/>
+                        <UpperCoordinates x="0.1" y="0.1" z="0.0"/>
                     </Cuboid>
                 </Location>
             </Region><!-- REGION 1 -->
@@ -34,16 +42,16 @@
                 <Location unit="cm">
                     <Cuboid>
                         <LowerCoordinates x="0.0" y="0.0" z="0.1"/>
-                        <UpperCoordinates x="0.0" y="0.0" z="0.1"/>
+                        <UpperCoordinates x="0.1" y="0.1" z="0.1"/>
                     </Cuboid>
                 </Location>
             </Region><!-- REGION 2 -->
 			<Region> <!-- REGION 3 -->
-                <IonicModel><Hardcoded>LuoRudyI</Hardcoded></IonicModel>
+                <IonicModel><Hardcoded>tenTusscher2006</Hardcoded></IonicModel>
                 <Location unit="cm">
                     <Cuboid>
                         <LowerCoordinates x="0.0" y="0.0" z="0.2"/>
-                        <UpperCoordinates x="0.0" y="0.0" z="0.2"/>
+                        <UpperCoordinates x="0.1" y="0.1" z="0.2"/>
                     </Cuboid>
                 </Location>
             </Region><!-- REGION 3 -->
@@ -52,7 +60,7 @@
                 <Location unit="cm">
                     <Cuboid>
                         <LowerCoordinates x="0.0" y="0.0" z="0.3"/>
-                        <UpperCoordinates x="0.0" y="0.0" z="0.3"/>
+                        <UpperCoordinates x="0.1" y="0.1" z="0.3"/>
                     </Cuboid>
                 </Location>
             </Region><!-- REGION 4 -->
@@ -61,7 +69,7 @@
                 <Location unit="cm">
                     <Cuboid>
                         <LowerCoordinates x="0.0" y="0.0" z="0.4"/>
-                        <UpperCoordinates x="0.0" y="0.0" z="0.4"/>
+                        <UpperCoordinates x="0.1" y="0.1" z="0.4"/>
                     </Cuboid>
                 </Location>
             </Region><!-- REGION 5 -->
@@ -70,7 +78,7 @@
                 <Location unit="cm">
                     <Cuboid>
                         <LowerCoordinates x="0.0" y="0.0" z="0.5"/>
-                        <UpperCoordinates x="0.0" y="0.0" z="0.5"/>
+                        <UpperCoordinates x="0.1" y="0.1" z="0.5"/>
                     </Cuboid>
                 </Location>
             </Region><!-- REGION 6 -->
@@ -79,7 +87,7 @@
                 <Location unit="cm">
                     <Cuboid>
                         <LowerCoordinates x="0.0" y="0.0" z="0.6"/>
-                        <UpperCoordinates x="0.0" y="0.0" z="0.6"/>
+                        <UpperCoordinates x="0.1" y="0.1" z="0.6"/>
                     </Cuboid>
                 </Location>
             </Region><!-- REGION 7 -->
@@ -88,7 +96,7 @@
                 <Location unit="cm">
                     <Cuboid>
                         <LowerCoordinates x="0.0" y="0.0" z="0.7"/>
-                        <UpperCoordinates x="0.0" y="0.0" z="0.7"/>
+                        <UpperCoordinates x="0.1" y="0.1" z="0.7"/>
                     </Cuboid>
                 </Location>
             </Region><!-- REGION 8 -->
@@ -97,29 +105,38 @@
                 <Location unit="cm">
                     <Cuboid>
                         <LowerCoordinates x="0.0" y="0.0" z="0.8"/>
-                        <UpperCoordinates x="0.0" y="0.0" z="0.8"/>
+                        <UpperCoordinates x="0.1" y="0.1" z="0.8"/>
                     </Cuboid>
                 </Location>
             </Region><!-- REGION 9 -->
-            <Region> <!-- REGION 10 -->
+	        <Region> <!-- REGION 10 -->
+	            <IonicModel><Hardcoded>MahajanShiferawBackwardEuler</Hardcoded></IonicModel>
+                <Location unit="cm">
+                    <Cuboid>
+                        <LowerCoordinates x="0.0" y="0.0" z="0.9"/>
+                        <UpperCoordinates x="0.1" y="0.1" z="0.9"/>
+                    </Cuboid>
+                </Location>
+            </Region>
+            <Region> <!-- REGION 11 -->
                 <IonicModel><Dynamic>
                     <Path relative_to="chaste_source_root">heart/dynamic/libDynamicallyLoadableLr91.so</Path>
                 </Dynamic></IonicModel>
                 <Location unit="cm">
                     <Cuboid>
-                        <LowerCoordinates x="0.0" y="0.0" z="0.9"/>
-                        <UpperCoordinates x="0.0" y="0.0" z="1.0"/>
+                        <LowerCoordinates x="0.0" y="0.0" z="1.0"/>
+                        <UpperCoordinates x="0.1" y="0.1" z="1.1"/>
                     </Cuboid>
                 </Location>
             </Region>
-            <Region> <!-- REGION 11 -->
+            <Region> <!-- REGION 12 -->
                 <IonicModel><Dynamic>
                     <Path relative_to="chaste_test_output">DynamicallyLoadedModel/luo_rudy_1991_dyn.cellml</Path>
                 </Dynamic></IonicModel>
                 <Location unit="cm">
                     <Cuboid>
                         <LowerCoordinates x="0.0" y="0.0" z="1.1"/>
-                        <UpperCoordinates x="0.0" y="0.0" z="1.2"/>
+                        <UpperCoordinates x="0.1" y="0.1" z="1.2"/>
                     </Cuboid>
                 </Location>
             </Region>
@@ -173,7 +190,7 @@
 	</Physiological>
 
 	<Numerical>
-		<TimeSteps ode="0.01" pde="0.1" printing="0.1" unit="ms"/>
+		<TimeSteps ode="0.001" pde="0.1" printing="0.1" unit="ms"/>
 		<KSPTolerances>
 			<KSPRelative>1e-6</KSPRelative>
 		</KSPTolerances>

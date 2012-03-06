@@ -462,10 +462,10 @@ public:
 
     void TestCardiacSimulationKirsten() throw(Exception)
     {
-        CardiacSimulation simulation("heart/test/data/xml/base_monodomain_kirsten.xml");
+        CardiacSimulation simulation("heart/test/data/xml/base_monodomain_tt06_region.xml");
         std::string foldername = "Kirsten";
         TS_ASSERT(CompareFilesViaHdf5DataReaderGlobalNorm("heart/test/data/cardiac_simulations", "Kirsten", false,
-                                                          foldername, "SimulationResults", true));
+                                                          foldername, "SimulationResults", true, 5e-4)); // lower tolerance as comparing with non-backward-euler results.
     }
 
     void TestTransmuralCellularheterogeneities() throw(Exception)
@@ -475,8 +475,6 @@ public:
 
         TS_ASSERT( CompareFilesViaHdf5DataReaderGlobalNorm("heart/test/data/cardiac_simulations", "transmural_heterogeneities_results", false,
                    foldername, "SimulationResults", true));
-
-
     }
 
     void TestElectrodes() throw(Exception)
