@@ -406,9 +406,6 @@ public:
 template<unsigned DIM>
 void AbstractNonlinearElasticitySolver<DIM>::FinishAssembleSystem(bool assembleResidual, bool assembleJacobian)
 {
-    //todo: first param is probably reduntant?
-    assert(assembleResidual);
-
     if (assembleResidual)
     {
         PetscVecTools::Finalise(this->mResidualVector);
@@ -852,7 +849,6 @@ void AbstractNonlinearElasticitySolver<DIM>::Solve(double tol,
     // outward-facing
     if(mrProblemDefinition.GetTractionBoundaryConditionType()==PRESSURE_ON_DEFORMED && mCheckedOutwardNormals==false)
     {
-        std::cout << "checking...\n";
         this->mrQuadMesh.CheckOutwardNormals();
         mCheckedOutwardNormals = true;
     }

@@ -151,82 +151,115 @@ public:
      */
     void TestSolve3d() throw(Exception)
     {
-        unsigned num_elem_each_dir = 5;
-        QuadraticMesh<3> mesh(1.0/num_elem_each_dir, 1.0, 1.0, 1.0);
+        unsigned num_runs=4;
+        double l2_errors[4];
+        unsigned num_elem_each_dir[4] = {1,2,5,10};
 
-        // Neo-Hookean material law
-        MooneyRivlinMaterialLaw<3> law(ThreeDimensionalModelProblem::c1, 0.0);
-
-        // Define displacement boundary conditions
-        std::vector<unsigned> fixed_nodes;
-        std::vector<c_vector<double,3> > locations;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for(unsigned run=0; run<num_runs; run++)
         {
-            double X = mesh.GetNode(i)->rGetLocation()[0];
-            double Y = mesh.GetNode(i)->rGetLocation()[1];
-            double Z = mesh.GetNode(i)->rGetLocation()[2];
+            QuadraticMesh<3> mesh(1.0/num_elem_each_dir[run], 1.0, 1.0, 1.0);
 
-            // if X=0
-            if ( fabs(X)<1e-6)
+            // Neo-Hookean material law
+            MooneyRivlinMaterialLaw<3> law(ThreeDimensionalModelProblem::c1, 0.0);
+
+            // Define displacement boundary conditions
+            std::vector<unsigned> fixed_nodes;
+            std::vector<c_vector<double,3> > locations;
+            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {
-                fixed_nodes.push_back(i);
-                c_vector<double,3> new_position;
-                new_position(0) = 0.0;
-                new_position(1) = Y + Y*Y*ThreeDimensionalModelProblem::b/2.0;
-                new_position(2) = Z/((1+X*ThreeDimensionalModelProblem::a)*(1+Y*ThreeDimensionalModelProblem::b));
-                locations.push_back(new_position);
+                double X = mesh.GetNode(i)->rGetLocation()[0];
+                double Y = mesh.GetNode(i)->rGetLocation()[1];
+                double Z = mesh.GetNode(i)->rGetLocation()[2];
+
+                // if X=0
+                if ( fabs(X)<1e-6)
+                {
+                    fixed_nodes.push_back(i);
+                    c_vector<double,3> new_position;
+                    new_position(0) = 0.0;
+                    new_position(1) = Y + Y*Y*ThreeDimensionalModelProblem::b/2.0;
+                    new_position(2) = Z/((1+X*ThreeDimensionalModelProblem::a)*(1+Y*ThreeDimensionalModelProblem::b));
+                    locations.push_back(new_position);
+                }
+            }
+            assert(fixed_nodes.size()==(2*num_elem_each_dir[run]+1)*(2*num_elem_each_dir[run]+1));
+
+            // Define traction boundary conditions on all boundary elems that are not on X=0
+            std::vector<BoundaryElement<2,3>*> boundary_elems;
+            for (TetrahedralMesh<3,3>::BoundaryElementIterator iter
+                  = mesh.GetBoundaryElementIteratorBegin();
+                iter != mesh.GetBoundaryElementIteratorEnd();
+                ++iter)
+            {
+                if (fabs((*iter)->CalculateCentroid()[0])>1e-6)
+                {
+                    BoundaryElement<2,3>* p_element = *iter;
+                    boundary_elems.push_back(p_element);
+                }
+            }
+            assert(boundary_elems.size()==10*num_elem_each_dir[run]*num_elem_each_dir[run]);
+
+            SolidMechanicsProblemDefinition<3> problem_defn(mesh);
+            problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
+            problem_defn.SetFixedNodes(fixed_nodes, locations);
+            problem_defn.SetBodyForce(ThreeDimensionalModelProblem::GetBodyForce);
+            problem_defn.SetTractionBoundaryConditions(boundary_elems, ThreeDimensionalModelProblem::GetTraction);
+
+            IncompressibleNonlinearElasticitySolver<3> solver(mesh,
+                                                              problem_defn,
+                                                              "nonlin_elas_3d_10");
+
+            solver.Solve(1e-12); // note newton tolerance of 1e-12 needed for convergence to occur
+
+            solver.CreateCmguiOutput();
+
+            // Compare
+
+            l2_errors[run] = 0;
+
+            std::vector<c_vector<double,3> >& r_solution = solver.rGetDeformedPosition();
+            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+            {
+                double X = mesh.GetNode(i)->rGetLocation()[0];
+                double Y = mesh.GetNode(i)->rGetLocation()[1];
+                double Z = mesh.GetNode(i)->rGetLocation()[2];
+
+                double exact_x = X + X*X*ThreeDimensionalModelProblem::a/2.0;
+                double exact_y = Y + Y*Y*ThreeDimensionalModelProblem::b/2.0;
+                double exact_z = Z/((1+X*ThreeDimensionalModelProblem::a)*(1+Y*ThreeDimensionalModelProblem::b));
+
+                c_vector<double,3> error;
+                error(0) = r_solution[i](0) - exact_x;
+                error(1) = r_solution[i](1) - exact_y;
+                error(2) = r_solution[i](2) - exact_z;
+
+                l2_errors[run] += norm_2(error);
+
+                if(num_elem_each_dir[run]==5u)
+                {
+                    TS_ASSERT_DELTA(r_solution[i](0), exact_x, 1e-2);
+                    TS_ASSERT_DELTA(r_solution[i](1), exact_y, 1e-2);
+                    TS_ASSERT_DELTA(r_solution[i](2), exact_z, 1e-2);
+                }
+            }
+
+            l2_errors[run] /= mesh.GetNumNodes();
+
+            for (unsigned i=0; i<mesh.GetNumVertices(); i++)
+            {
+                TS_ASSERT_DELTA( solver.rGetPressures()[i]/(2*ThreeDimensionalModelProblem::c1), 1.0, 2e-1);
             }
         }
-        assert(fixed_nodes.size()==(2*num_elem_each_dir+1)*(2*num_elem_each_dir+1));
 
-        // Define traction boundary conditions on all boundary elems that are not on X=0
-        std::vector<BoundaryElement<2,3>*> boundary_elems;
-        for (TetrahedralMesh<3,3>::BoundaryElementIterator iter
-              = mesh.GetBoundaryElementIteratorBegin();
-            iter != mesh.GetBoundaryElementIteratorEnd();
-            ++iter)
-        {
-            if (fabs((*iter)->CalculateCentroid()[0])>1e-6)
-            {
-                BoundaryElement<2,3>* p_element = *iter;
-                boundary_elems.push_back(p_element);
-            }
-        }
-        assert(boundary_elems.size()==10*num_elem_each_dir*num_elem_each_dir);
+        //for(unsigned run=0; run<num_runs; run++)
+        //{
+        //    std::cout << 1.0/num_elem_each_dir[run] << " " << l2_errors[run] << "\n";
+        //}
 
-        SolidMechanicsProblemDefinition<3> problem_defn(mesh);
-        problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
-        problem_defn.SetFixedNodes(fixed_nodes, locations);
-        problem_defn.SetBodyForce(ThreeDimensionalModelProblem::GetBodyForce);
-        problem_defn.SetTractionBoundaryConditions(boundary_elems, ThreeDimensionalModelProblem::GetTraction);
-
-        IncompressibleNonlinearElasticitySolver<3> solver(mesh,
-                                                          problem_defn,
-                                                          "nonlin_elas_3d");
-
-        solver.Solve();
-
-        // Compare
-        std::vector<c_vector<double,3> >& r_solution = solver.rGetDeformedPosition();
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
-        {
-            double X = mesh.GetNode(i)->rGetLocation()[0];
-            double Y = mesh.GetNode(i)->rGetLocation()[1];
-            double Z = mesh.GetNode(i)->rGetLocation()[2];
-
-            double exact_x = X + X*X*ThreeDimensionalModelProblem::a/2.0;
-            double exact_y = Y + Y*Y*ThreeDimensionalModelProblem::b/2.0;
-            double exact_z = Z/((1+X*ThreeDimensionalModelProblem::a)*(1+Y*ThreeDimensionalModelProblem::b));
-
-            TS_ASSERT_DELTA(r_solution[i](0), exact_x, 1e-2);
-            TS_ASSERT_DELTA(r_solution[i](1), exact_y, 1e-2);
-            TS_ASSERT_DELTA(r_solution[i](2), exact_z, 1e-2);
-        }
-
-        for (unsigned i=0; i<mesh.GetNumVertices(); i++)
-        {
-            TS_ASSERT_DELTA( solver.rGetPressures()[i]/(2*ThreeDimensionalModelProblem::c1), 1.0, 2e-1);
-        }
+        TS_ASSERT_LESS_THAN(l2_errors[0], 0.0005)
+        TS_ASSERT_LESS_THAN(l2_errors[1], 5e-5);
+        TS_ASSERT_LESS_THAN(l2_errors[2], 2e-6);
+        TS_ASSERT_LESS_THAN(l2_errors[3], 4e-7);
     }
 
 
