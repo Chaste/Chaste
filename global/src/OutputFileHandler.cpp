@@ -45,8 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscTools.hpp"
 
 
-// The name of the Chaste signature file
-const char* CHASTE_SIG_FILE = ".chaste_deletable_folder";
+const std::string OutputFileHandler::SIG_FILE_NAME(".chaste_deletable_folder");
 
 /**
  * Recursively remove the contents of the given folder, but leave any hidden
@@ -99,10 +98,10 @@ OutputFileHandler::OutputFileHandler(const std::string &rDirectory,
     // Clean the directory (default)
     if (rDirectory != "" && cleanOutputDirectory) // Don't clean CHASTE_TEST_OUTPUT
     {
-        FileFinder signature_file(mDirectory + CHASTE_SIG_FILE, RelativeTo::Absolute);
+        FileFinder signature_file(mDirectory + SIG_FILE_NAME, RelativeTo::Absolute);
         if (!signature_file.Exists())
         {
-            EXCEPTION("Cannot delete " + mDirectory + " because signature file \"" + CHASTE_SIG_FILE + "\" is not present.");
+            EXCEPTION("Cannot delete " + mDirectory + " because signature file \"" + SIG_FILE_NAME + "\" is not present.");
         }
 
         // Are we the master process? Only the master should delete files
@@ -163,7 +162,7 @@ std::string OutputFileHandler::MakeFoldersAndReturnFullPath(const std::string& r
                 {
                     fs::create_directory(next_folder);
                     // Add the Chaste signature file
-                    fs::ofstream sig_file(next_folder / CHASTE_SIG_FILE);
+                    fs::ofstream sig_file(next_folder / SIG_FILE_NAME);
                 }
             }
         }

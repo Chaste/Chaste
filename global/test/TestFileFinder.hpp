@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 #include "FileFinder.hpp"
+#include "BoostFilesystem.hpp"
 #include "ChasteBuildRoot.hpp"
 #include "OutputFileHandler.hpp"
 #include "GetCurrentWorkingDirectory.hpp"
@@ -260,6 +261,23 @@ public:
         TS_ASSERT(subdir.Exists());
         dir.Remove();
         TS_ASSERT(!subdir.Exists());
+        TS_ASSERT(!dir.Exists());
+
+        // We can only delete (content in) folders created by an OutputFileHandler unless we force it
+        fs::create_directory(dir.GetAbsolutePath());
+        TS_ASSERT(dir.IsDir());
+        TS_ASSERT_THROWS_CONTAINS(dir.Remove(),
+                                  "because the signature file '.chaste_deletable_folder' is not present.");
+        TS_ASSERT(dir.IsDir());
+        file.SetPath("file", dir);
+        { std::ofstream(file.GetAbsolutePath().c_str()); }
+        TS_ASSERT(file.IsFile());
+        TS_ASSERT_THROWS_CONTAINS(file.Remove(),
+                                  "because the signature file '.chaste_deletable_folder' is not present.");
+        TS_ASSERT(file.IsFile());
+        file.Remove(true);
+        TS_ASSERT(!file.Exists());
+        dir.Remove(true);
         TS_ASSERT(!dir.Exists());
     }
 };

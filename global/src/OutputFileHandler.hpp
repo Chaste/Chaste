@@ -166,6 +166,9 @@ public:
      * @param leafName  the name of the file to find
      */
     FileFinder FindFile(std::string leafName) const;
+
+    /** The name of the Chaste signature file added to folders we create. */
+    const static std::string SIG_FILE_NAME;
 };
 
 #endif /*OUTPUTFILEHANDLER_HPP_*/

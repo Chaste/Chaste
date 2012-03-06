@@ -191,9 +191,13 @@ public:
     /**
      * Recursively remove this file or folder.
      * Since this is a potentially very dangerous operation, only locations under the Chaste
-     * test output folder may be removed.
+     * test output folder may be removed.  In addition, unless the optional parameter is true,
+     * only folders created by an OutputFileHandler, or the contents of such a folder, may be
+     * deleted.
+     *
+     * @param force  whether to allow deletion of content not created by an OutputFileHandler
      */
-    void Remove() const;
+    void Remove(bool force=false) const;
 
     /**
      * Test whether a path is absolute.

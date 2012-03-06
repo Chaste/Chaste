@@ -210,7 +210,7 @@ void RemoveAll(const fs::path& rPath)
     fs::remove(rPath);
 }
 
-void FileFinder::Remove() const
+void FileFinder::Remove(bool force) const
 {
     // Test for bad paths
     const std::string test_output(OutputFileHandler::GetChasteTestOutputDirectory());
@@ -224,6 +224,21 @@ void FileFinder::Remove() const
     {
         EXCEPTION("Cannot remove location '" << mAbsPath
                   << "' as it contains a dangerous path component.");
+    }
+    if (!force)
+    {
+        fs::path sig_file(mAbsPath);
+        if (IsFile())
+        {
+            // We need to look for the signature file in the parent folder
+            sig_file.remove_leaf();
+        }
+        sig_file /= OutputFileHandler::SIG_FILE_NAME;
+        if (!fs::exists(sig_file))
+        {
+            EXCEPTION("Cannot remove location '" << mAbsPath << "' because the signature file '"
+                      << OutputFileHandler::SIG_FILE_NAME << "' is not present.");
+        }
     }
     // Do the removal
     RemoveAll(mAbsPath);
