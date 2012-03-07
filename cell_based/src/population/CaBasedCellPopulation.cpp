@@ -54,6 +54,7 @@ CaBasedCellPopulation<DIM>::CaBasedCellPopulation(TetrahedralMesh<DIM, DIM>& rMe
       mOnlyUseNearestNeighboursForDivision(false),
       mUseVonNeumannNeighbourhoods(false)
 {
+	mpTetrahedralMesh = static_cast<TetrahedralMesh<DIM, DIM>* >(&(this->mrMesh));
     // This must always be true
     assert(this->mCells.size() <= this->mrMesh.GetNumNodes());
 
@@ -93,6 +94,7 @@ CaBasedCellPopulation<DIM>::CaBasedCellPopulation(TetrahedralMesh<DIM, DIM>& rMe
       mOnlyUseNearestNeighboursForDivision(false),
       mUseVonNeumannNeighbourhoods(false)
 {
+	mpTetrahedralMesh = static_cast<TetrahedralMesh<DIM, DIM>* >(&(this->mrMesh));
 }
 
 template<unsigned DIM>

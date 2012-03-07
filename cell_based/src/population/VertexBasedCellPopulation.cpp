@@ -47,10 +47,12 @@ VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM,
     : AbstractOffLatticeCellPopulation<DIM>(rMesh, rCells, locationIndices),
       mDeleteMesh(deleteMesh)
 {
+	mpMutableVertexMesh = static_cast<MutableVertexMesh<DIM, DIM>* >(&(this->mrMesh));
+
     // Check the mesh contains boundary nodes
     bool contains_boundary_nodes = false;
-    for (typename MutableVertexMesh<DIM,DIM>::NodeIterator node_iter = static_cast<MutableVertexMesh<DIM, DIM>& >((this->mrMesh)).GetNodeIteratorBegin();
-         node_iter != static_cast<MutableVertexMesh<DIM, DIM>& >((this->mrMesh)).GetNodeIteratorEnd();
+    for (typename MutableVertexMesh<DIM,DIM>::NodeIterator node_iter = mpMutableVertexMesh->GetNodeIteratorBegin();
+         node_iter != mpMutableVertexMesh->GetNodeIteratorEnd();
          ++node_iter)
     {
         if (node_iter->IsBoundaryNode())
@@ -58,7 +60,7 @@ VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM,
             contains_boundary_nodes = true;
         }
     }
-    //if (static_cast<MutableVertexMesh<DIM, DIM>& >((this->mrMesh)).GetNumBoundaryNodes() == 0)
+    //if (mpMutableVertexMesh->GetNumBoundaryNodes() == 0)
     ///\todo we should be able to do this, but mBoundaryNodes is not used in vertex meshes (#1558)
     if (!contains_boundary_nodes)
     {
@@ -77,6 +79,7 @@ VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM,
     : AbstractOffLatticeCellPopulation<DIM>(rMesh),
       mDeleteMesh(true)
 {
+	mpMutableVertexMesh = static_cast<MutableVertexMesh<DIM, DIM>* >(&(this->mrMesh));
 }
 
 template<unsigned DIM>
@@ -121,19 +124,19 @@ double VertexBasedCellPopulation<DIM>::GetDampingConstant(unsigned nodeIndex)
 template<unsigned DIM>
 MutableVertexMesh<DIM, DIM>& VertexBasedCellPopulation<DIM>::rGetMesh()
 {
-    return static_cast<MutableVertexMesh<DIM, DIM>& >((this->mrMesh));
+    return *mpMutableVertexMesh;
 }
 
 template<unsigned DIM>
 const MutableVertexMesh<DIM, DIM>& VertexBasedCellPopulation<DIM>::rGetMesh() const
 {
-    return static_cast<MutableVertexMesh<DIM, DIM>& >((this->mrMesh));
+    return *mpMutableVertexMesh;
 }
 
 template<unsigned DIM>
 VertexElement<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetElement(unsigned elementIndex)
 {
-    return static_cast<MutableVertexMesh<DIM, DIM>& >((this->mrMesh)).GetElement(elementIndex);
+    return mpMutableVertexMesh->GetElement(elementIndex);
 }
 
 template<unsigned DIM>
@@ -145,7 +148,7 @@ unsigned VertexBasedCellPopulation<DIM>::GetNumNodes()
 template<unsigned DIM>
 c_vector<double, DIM> VertexBasedCellPopulation<DIM>::GetLocationOfCellCentre(CellPtr pCell)
 {
-    return static_cast<MutableVertexMesh<DIM, DIM>& >((this->mrMesh)).GetCentroidOfElement(this->mCellLocationMap[pCell.get()]);
+    return mpMutableVertexMesh->GetCentroidOfElement(this->mCellLocationMap[pCell.get()]);
 }
 
 template<unsigned DIM>
@@ -157,25 +160,25 @@ Node<DIM>* VertexBasedCellPopulation<DIM>::GetNode(unsigned index)
 template<unsigned DIM>
 unsigned VertexBasedCellPopulation<DIM>::AddNode(Node<DIM>* pNewNode)
 {
-    return static_cast<MutableVertexMesh<DIM, DIM>& >((this->mrMesh)).AddNode(pNewNode);
+    return mpMutableVertexMesh->AddNode(pNewNode);
 }
 
 template<unsigned DIM>
 void VertexBasedCellPopulation<DIM>::SetNode(unsigned nodeIndex, ChastePoint<DIM>& rNewLocation)
 {
-	static_cast<MutableVertexMesh<DIM, DIM>& >((this->mrMesh)).SetNode(nodeIndex, rNewLocation);
+	mpMutableVertexMesh->SetNode(nodeIndex, rNewLocation);
 }
 
 template<unsigned DIM>
 VertexElement<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetElementCorrespondingToCell(CellPtr pCell)
 {
-    return static_cast<MutableVertexMesh<DIM, DIM>& >((this->mrMesh)).GetElement(this->mCellLocationMap[pCell.get()]);
+    return mpMutableVertexMesh->GetElement(this->mCellLocationMap[pCell.get()]);
 }
 
 template<unsigned DIM>
 unsigned VertexBasedCellPopulation<DIM>::GetNumElements()
 {
-    return static_cast<MutableVertexMesh<DIM, DIM>& >((this->mrMesh)).GetNumElements();
+    return mpMutableVertexMesh->GetNumElements();
 }
 
 template<unsigned DIM>
@@ -189,12 +192,12 @@ CellPtr VertexBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_vector
     if (norm_2(rCellDivisionVector) < DBL_EPSILON)
     {
         // If the cell division vector is the default zero vector, divide the element along the short axis
-        new_element_index = static_cast<MutableVertexMesh<DIM, DIM>& >((this->mrMesh)).DivideElementAlongShortAxis(p_element, true);
+        new_element_index = mpMutableVertexMesh->DivideElementAlongShortAxis(p_element, true);
     }
     else
     {
         // If the cell division vector has any non-zero component, divide the element along this axis
-        new_element_index = static_cast<MutableVertexMesh<DIM, DIM>& >((this->mrMesh)).DivideElementAlongGivenAxis(p_element, rCellDivisionVector, true);
+        new_element_index = mpMutableVertexMesh->DivideElementAlongGivenAxis(p_element, rCellDivisionVector, true);
     }
 
     // Associate the new cell with the element
@@ -220,7 +223,7 @@ unsigned VertexBasedCellPopulation<DIM>::RemoveDeadCells()
         {
             // Remove the element from the mesh
             num_removed++;
-            static_cast<MutableVertexMesh<DIM, DIM>& >((this->mrMesh)).DeleteElementPriorToReMesh(this->mCellLocationMap[(*it).get()]);
+            mpMutableVertexMesh->DeleteElementPriorToReMesh(this->mCellLocationMap[(*it).get()]);
             it = this->mCells.erase(it);
             --it;
         }
@@ -247,10 +250,10 @@ void VertexBasedCellPopulation<DIM>::UpdateNodeLocations(const std::vector< c_ve
          * rearrangement threshold and warn the user that a smaller timestep should be used. This
          * restriction ensures that vertex elements remain well defined (see #1376).
          */
-        if (norm_2(displacement) > 0.5*static_cast<MutableVertexMesh<DIM, DIM>& >((this->mrMesh)).GetCellRearrangementThreshold())
+        if (norm_2(displacement) > 0.5*mpMutableVertexMesh->GetCellRearrangementThreshold())
         {
             WARN_ONCE_ONLY("Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted so the motion has been restricted. Use a smaller timestep to avoid these warnings.");
-            displacement *= 0.5*static_cast<MutableVertexMesh<DIM, DIM>& >((this->mrMesh)).GetCellRearrangementThreshold()/norm_2(displacement);
+            displacement *= 0.5*mpMutableVertexMesh->GetCellRearrangementThreshold()/norm_2(displacement);
         }
 
         // Get new node location
@@ -278,9 +281,9 @@ bool VertexBasedCellPopulation<DIM>::IsCellAssociatedWithADeletedLocation(CellPt
 template<unsigned DIM>
 void VertexBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 {
-    VertexElementMap element_map(static_cast<MutableVertexMesh<DIM, DIM>& >((this->mrMesh)).GetNumAllElements());
+    VertexElementMap element_map(mpMutableVertexMesh->GetNumAllElements());
 
-    static_cast<MutableVertexMesh<DIM, DIM>& >((this->mrMesh)).ReMesh(element_map);
+    mpMutableVertexMesh->ReMesh(element_map);
 
     if (!element_map.IsIdentityMap())
     {
@@ -360,7 +363,7 @@ void VertexBasedCellPopulation<DIM>::WriteResultsToFiles()
 
     // Write Locations of T1Swaps to file
     *mpT1SwapLocationsFile << p_time->GetTime() << "\t";
-    std::vector< c_vector<double, DIM> > t1_swap_locations = static_cast<MutableVertexMesh<DIM, DIM>& >((this->mrMesh)).GetLocationsOfT1Swaps();
+    std::vector< c_vector<double, DIM> > t1_swap_locations = mpMutableVertexMesh->GetLocationsOfT1Swaps();
     *mpT1SwapLocationsFile << t1_swap_locations.size() << "\t";
     for (unsigned index = 0;  index < t1_swap_locations.size(); index++)
     {
@@ -370,11 +373,11 @@ void VertexBasedCellPopulation<DIM>::WriteResultsToFiles()
         }
     }
     *mpT1SwapLocationsFile << "\n";
-    static_cast<MutableVertexMesh<DIM, DIM>& >((this->mrMesh)).ClearLocationsOfT1Swaps();
+    mpMutableVertexMesh->ClearLocationsOfT1Swaps();
 
     // Write Locations of T3Swaps to file
     *mpT3SwapLocationsFile << p_time->GetTime() << "\t";
-    std::vector< c_vector<double, DIM> > t3_swap_locations = static_cast<MutableVertexMesh<DIM, DIM>& >((this->mrMesh)).GetLocationsOfT3Swaps();
+    std::vector< c_vector<double, DIM> > t3_swap_locations = mpMutableVertexMesh->GetLocationsOfT3Swaps();
     *mpT3SwapLocationsFile << t3_swap_locations.size() << "\t";
     for (unsigned index = 0;  index < t3_swap_locations.size(); index++)
     {
@@ -384,7 +387,7 @@ void VertexBasedCellPopulation<DIM>::WriteResultsToFiles()
         }
     }
     *mpT3SwapLocationsFile << "\n";
-    static_cast<MutableVertexMesh<DIM, DIM>& >((this->mrMesh)).ClearLocationsOfT3Swaps();
+    mpMutableVertexMesh->ClearLocationsOfT3Swaps();
 
     // Write element data to file
     *mpVizElementsFile << p_time->GetTime() << "\t";
@@ -407,7 +410,7 @@ void VertexBasedCellPopulation<DIM>::WriteResultsToFiles()
         // Write element data to file
         if (!(GetElement(elem_index)->IsDeleted()) && !elem_corresponds_to_dead_cell)
         {
-            VertexElement<DIM, DIM>* p_element = static_cast<MutableVertexMesh<DIM, DIM>& >((this->mrMesh)).GetElement(elem_index);
+            VertexElement<DIM, DIM>* p_element = mpMutableVertexMesh->GetElement(elem_index);
 
             unsigned num_nodes_in_element = p_element->GetNumNodes();
 
@@ -431,7 +434,7 @@ double VertexBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
     unsigned elem_index = this->GetLocationIndexUsingCell(pCell);
 
     // Get the cell's volume from the vertex mesh
-    double cell_volume = static_cast<MutableVertexMesh<DIM, DIM>& >((this->mrMesh)).GetVolumeOfElement(elem_index);
+    double cell_volume = mpMutableVertexMesh->GetVolumeOfElement(elem_index);
 
     return cell_volume;
 }
@@ -494,7 +497,7 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile()
     std::stringstream time;
     time << p_time->GetTimeStepsElapsed();
 
-    unsigned num_elements = static_cast<MutableVertexMesh<DIM, DIM>& >((this->mrMesh)).GetNumElements();
+    unsigned num_elements = mpMutableVertexMesh->GetNumElements();
     std::vector<double> cell_types(num_elements);
     std::vector<double> cell_ancestors(num_elements);
     std::vector<double> cell_mutation_states(num_elements);
@@ -515,8 +518,8 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile()
     }
 
     // Loop over vertex elements
-    for (typename VertexMesh<DIM,DIM>::VertexElementIterator elem_iter = static_cast<MutableVertexMesh<DIM, DIM>& >((this->mrMesh)).GetElementIteratorBegin();
-         elem_iter != static_cast<MutableVertexMesh<DIM, DIM>& >((this->mrMesh)).GetElementIteratorEnd();
+    for (typename VertexMesh<DIM,DIM>::VertexElementIterator elem_iter = mpMutableVertexMesh->GetElementIteratorBegin();
+         elem_iter != mpMutableVertexMesh->GetElementIteratorEnd();
          ++elem_iter)
     {
         // Get index of this element in the vertex mesh
@@ -553,7 +556,7 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         }
         if (this->mOutputCellVolumes)
         {
-            double cell_volume = static_cast<MutableVertexMesh<DIM, DIM>& >((this->mrMesh)).GetVolumeOfElement(elem_index);
+            double cell_volume = mpMutableVertexMesh->GetVolumeOfElement(elem_index);
             cell_volumes[elem_index] = cell_volume;
         }
         if (CellwiseData<DIM>::Instance()->IsSetUp())
@@ -603,7 +606,7 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         }
     }
 
-    mesh_writer.WriteVtkUsingMesh(static_cast<MutableVertexMesh<DIM, DIM>& >((this->mrMesh)), time.str());
+    mesh_writer.WriteVtkUsingMesh(*mpMutableVertexMesh, time.str());
     *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
     *(this->mpVtkMetaFile) << p_time->GetTimeStepsElapsed();
     *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
@@ -664,9 +667,9 @@ void VertexBasedCellPopulation<DIM>::GenerateCellResultsAndWriteToFiles()
 template<unsigned DIM>
 void VertexBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t<CellRearrangementThreshold>" << static_cast<MutableVertexMesh<DIM, DIM>& >((this->mrMesh)).GetCellRearrangementThreshold() << "</CellRearrangementThreshold>\n";
-    *rParamsFile << "\t\t<T2Threshold>" <<  static_cast<MutableVertexMesh<DIM, DIM>& >((this->mrMesh)).GetT2Threshold() << "</T2Threshold>\n";
-    *rParamsFile << "\t\t<CellRearrangementRatio>" << static_cast<MutableVertexMesh<DIM, DIM>& >((this->mrMesh)).GetCellRearrangementRatio() << "</CellRearrangementRatio>\n";
+    *rParamsFile << "\t\t<CellRearrangementThreshold>" << mpMutableVertexMesh->GetCellRearrangementThreshold() << "</CellRearrangementThreshold>\n";
+    *rParamsFile << "\t\t<T2Threshold>" <<  mpMutableVertexMesh->GetT2Threshold() << "</T2Threshold>\n";
+    *rParamsFile << "\t\t<CellRearrangementRatio>" << mpMutableVertexMesh->GetCellRearrangementRatio() << "</CellRearrangementRatio>\n";
 
     // Call method on direct parent class
     AbstractOffLatticeCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);
@@ -684,7 +687,7 @@ double VertexBasedCellPopulation<DIM>::GetWidth(const unsigned& rDimension)
 template<unsigned DIM>
 std::set<unsigned> VertexBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsigned index)
 {
-    return static_cast<MutableVertexMesh<DIM, DIM>& >((this->mrMesh)).GetNeighbouringNodeIndices(index);
+    return mpMutableVertexMesh->GetNeighbouringNodeIndices(index);
 }
 
 /////////////////////////////////////////////////////////////////////////////

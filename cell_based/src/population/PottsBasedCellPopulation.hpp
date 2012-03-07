@@ -76,6 +76,12 @@ private:
      */
     VertexMesh<DIM,DIM>* mpElementTessellation;
 
+    /*
+     * A static cast of the Abstract mesh from `AbstractCellPopulation`
+     * for use in this class
+     */
+    PottsMesh<DIM>* mpPottsMesh;
+
     /**
      * Pointer to a MutableMesh that can be created from the nodes of the PottsMesh in
      * order to solve PDEs on the population.

@@ -47,6 +47,7 @@ NodeBasedCellPopulation<DIM>::NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh,
       mDeleteMesh(deleteMesh),
       mMechanicsCutOffLength(DBL_MAX)
 {
+	mpNodesOnlyMesh = static_cast<NodesOnlyMesh<DIM>* >(&(this->mrMesh));
 	if (validate)
 	{
     Validate();
@@ -59,6 +60,7 @@ NodeBasedCellPopulation<DIM>::NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh)
       mDeleteMesh(true),
       mMechanicsCutOffLength(DBL_MAX) // will be set by serialize() method
 {
+	mpNodesOnlyMesh = static_cast<NodesOnlyMesh<DIM>* >(&(this->mrMesh));
     // No Validate() because the cells are not associated with the cell population yet in archiving
 }
 
@@ -75,13 +77,13 @@ NodeBasedCellPopulation<DIM>::~NodeBasedCellPopulation()
 template<unsigned DIM>
 NodesOnlyMesh<DIM>& NodeBasedCellPopulation<DIM>::rGetMesh()
 {
-    return static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh));
+    return *mpNodesOnlyMesh;
 }
 
 template<unsigned DIM>
 const NodesOnlyMesh<DIM>& NodeBasedCellPopulation<DIM>::rGetMesh() const
 {
-    return static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh));
+    return *mpNodesOnlyMesh;
 }
 
 template<unsigned DIM>
@@ -117,7 +119,7 @@ void NodeBasedCellPopulation<DIM>::Validate()
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::SplitUpIntoBoxes(double cutOffLength, c_vector<double, 2*DIM> domainSize)
 {
-	static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).SetUpBoxCollection(cutOffLength, domainSize);
+	mpNodesOnlyMesh->SetUpBoxCollection(cutOffLength, domainSize);
 }
 
 template<unsigned DIM>
@@ -167,14 +169,14 @@ Node<DIM>* NodeBasedCellPopulation<DIM>::GetNode(unsigned index)
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::SetNode(unsigned nodeIndex, ChastePoint<DIM>& rNewLocation)
 {
-	static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).GetNode(nodeIndex)->SetPoint(rNewLocation);
+	mpNodesOnlyMesh->GetNode(nodeIndex)->SetPoint(rNewLocation);
 }
 
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 {
     NodeMap map(this->mrMesh.GetNumAllNodes());
-    static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).ReMesh(map);
+    mpNodesOnlyMesh->ReMesh(map);
 
     if (!map.IsIdentityMap())
     {
@@ -204,9 +206,9 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
         this->Validate();
     }
 
-    static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).SetMeshHasChangedSinceLoading();
+    mpNodesOnlyMesh->SetMeshHasChangedSinceLoading();
 
-    static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).ClearBoxCollection();
+    mpNodesOnlyMesh->ClearBoxCollection();
 
     FindMaxAndMin();
 
@@ -231,9 +233,9 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
      * and putting nodes into boxes.
      */
 
-    static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).SetUpBoxCollection(mMechanicsCutOffLength, domain_size);
+    mpNodesOnlyMesh->SetUpBoxCollection(mMechanicsCutOffLength, domain_size);
 
-    static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).CalculateNodePairs(mNodePairs);
+    mpNodesOnlyMesh->CalculateNodePairs(mNodePairs);
 }
 
 template<unsigned DIM>
@@ -248,7 +250,7 @@ unsigned NodeBasedCellPopulation<DIM>::RemoveDeadCells()
         {
             // Remove the node from the mesh
             num_removed++;
-            static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).DeleteNodePriorToReMesh(this->mCellLocationMap[(*it).get()]);
+            mpNodesOnlyMesh->DeleteNodePriorToReMesh(this->mCellLocationMap[(*it).get()]);
 
             // Update mappings between cells and location indices
             unsigned location_index_of_removed_node = this->mCellLocationMap[(*it).get()];
@@ -267,13 +269,13 @@ unsigned NodeBasedCellPopulation<DIM>::RemoveDeadCells()
 template<unsigned DIM>
 unsigned NodeBasedCellPopulation<DIM>::AddNode(Node<DIM>* pNewNode)
 {
-    return static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).AddNode(pNewNode);
+    return mpNodesOnlyMesh->AddNode(pNewNode);
 }
 
 template<unsigned DIM>
 unsigned NodeBasedCellPopulation<DIM>::GetNumNodes()
 {
-    return static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).GetNumAllNodes();
+    return mpNodesOnlyMesh->GetNumAllNodes();
 }
 
 template<unsigned DIM>
@@ -284,7 +286,7 @@ void NodeBasedCellPopulation<DIM>::UpdateParticlesAfterReMesh(NodeMap& rMap)
 template<unsigned DIM>
 BoxCollection<DIM>* NodeBasedCellPopulation<DIM>::GetBoxCollection()
 {
-    return static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).GetBoxCollection();
+    return mpNodesOnlyMesh->GetBoxCollection();
 }
 
 template<unsigned DIM>
@@ -338,7 +340,7 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
     c_vector<double, DIM> node_i_location = this->GetNode(index)->rGetLocation();
 
     // Get the radius of the cell corresponding to this node
-    double radius_of_cell_i = static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).GetCellRadius(index);
+    double radius_of_cell_i = mpNodesOnlyMesh->GetCellRadius(index);
 
     // Loop over cells in the population
     std::set<unsigned> neighbouring_node_indices;
@@ -362,7 +364,7 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
             double distance_between_nodes = norm_2(unit_vector);
 
             // Get the radius of the cell corresponding to this node
-            double radius_of_cell_j = static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).GetCellRadius(node_j_index);
+            double radius_of_cell_j = mpNodesOnlyMesh->GetCellRadius(node_j_index);
 
             // If the cells are close enough to exert a force on each other...
             double max_interaction_distance = radius_of_cell_i + radius_of_cell_j;
@@ -383,7 +385,7 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
     unsigned node_index = this->GetLocationIndexUsingCell(pCell);
 
     // Get cell radius
-    double cell_radius = static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).GetCellRadius(node_index);
+    double cell_radius = mpNodesOnlyMesh->GetCellRadius(node_index);
 
     // Get cell volume from radius
     double cell_volume = 0.0;
@@ -499,7 +501,7 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         }
         if (this->mOutputCellVolumes)
         {
-            double cell_radius = static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).GetCellRadius(node_index);
+            double cell_radius = mpNodesOnlyMesh->GetCellRadius(node_index);
             cell_radii[node_index] = cell_radius;
         }
         if (CellwiseData<DIM>::Instance()->IsSetUp())
@@ -548,7 +550,7 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         }
     }
 
-    mesh_writer.WriteFilesUsingMesh(static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)));
+    mesh_writer.WriteFilesUsingMesh(*mpNodesOnlyMesh);
 
     *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
     *(this->mpVtkMetaFile) << SimulationTime::Instance()->GetTimeStepsElapsed();
@@ -570,7 +572,7 @@ CellPtr NodeBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_vector<d
     // Then set the new cell radius in the NodesOnlyMesh
     ///\todo set the correct cell radius and properly test this (#1808)
     unsigned node_index = this->GetLocationIndexUsingCell(p_created_cell);
-    static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).SetCellRadius(node_index, 1.0);
+    mpNodesOnlyMesh->SetCellRadius(node_index, 1.0);
 
     // Return pointer to new cell
     return p_created_cell;

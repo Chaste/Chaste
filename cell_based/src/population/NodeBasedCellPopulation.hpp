@@ -55,6 +55,11 @@ class NodeBasedCellPopulation : public AbstractCentreBasedCellPopulation<DIM>
 
 private:
 
+    /*
+     * Static cast of the mesh from AbstractCellPopulation
+     */
+    NodesOnlyMesh<DIM>* mpNodesOnlyMesh;
+
     /** Vector of minimal spatial positions in each dimension. */
     c_vector<double, DIM> mMinSpatialPositions;
 

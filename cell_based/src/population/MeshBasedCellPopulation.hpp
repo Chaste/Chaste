@@ -115,6 +115,11 @@ protected:
      */
     VertexMesh<DIM, DIM>* mpVoronoiTessellation;
 
+    /*
+     * Static cast of the mesh from AbstractCellPopulation
+     */
+    MutableMesh<DIM, DIM>* mpMutableMesh;
+
     /**
      * Whether to delete the mesh when we are destroyed.
      * Needed if this cell population has been de-serialized.

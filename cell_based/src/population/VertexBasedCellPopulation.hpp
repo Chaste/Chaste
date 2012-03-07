@@ -65,6 +65,12 @@ private:
      */
     bool mDeleteMesh;
 
+    /*
+     * A static cast of the Abstract mesh from `AbstractCellPopulation`
+     * for use in this class
+     */
+    MutableVertexMesh<DIM, DIM>* mpMutableVertexMesh;
+
     /** Results file for elements. */
     out_stream mpVizElementsFile;
 

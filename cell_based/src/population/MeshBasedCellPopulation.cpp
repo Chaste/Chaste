@@ -58,6 +58,7 @@ MeshBasedCellPopulation<DIM>::MeshBasedCellPopulation(MutableMesh<DIM, DIM>& rMe
       mOutputCellPopulationVolumes(false),
       mWriteVtkAsPoints(false)
 {
+	mpMutableMesh = static_cast<MutableMesh<DIM, DIM>* >(&(this->mrMesh));
     // This must always be true
     assert(this->mCells.size() <= this->mrMesh.GetNumNodes());
 
@@ -71,6 +72,7 @@ template<unsigned DIM>
 MeshBasedCellPopulation<DIM>::MeshBasedCellPopulation(MutableMesh<DIM, DIM>& rMesh)
     : AbstractCentreBasedCellPopulation<DIM>(rMesh)
 {
+	mpMutableMesh = static_cast<MutableMesh<DIM, DIM>* >(&(this->mrMesh));
     mpVoronoiTessellation = NULL;
     mDeleteMesh = true;
 }
@@ -102,7 +104,7 @@ void MeshBasedCellPopulation<DIM>::SetAreaBasedDampingConstant(bool useAreaBased
 template<unsigned DIM>
 unsigned MeshBasedCellPopulation<DIM>::AddNode(Node<DIM>* pNewNode)
 {
-    return static_cast<MutableMesh<DIM, DIM>& >((this->mrMesh)).AddNode(pNewNode);
+    return mpMutableMesh->AddNode(pNewNode);
 }
 
 template<unsigned DIM>
@@ -177,13 +179,13 @@ void MeshBasedCellPopulation<DIM>::Validate()
 template<unsigned DIM>
 MutableMesh<DIM, DIM>& MeshBasedCellPopulation<DIM>::rGetMesh()
 {
-    return static_cast<MutableMesh<DIM, DIM>& >((this->mrMesh));
+    return *mpMutableMesh;
 }
 
 template<unsigned DIM>
 const MutableMesh<DIM, DIM>& MeshBasedCellPopulation<DIM>::rGetMesh() const
 {
-    return static_cast<MutableMesh<DIM, DIM>& >((this->mrMesh));
+    return *mpMutableMesh;
 }
 
 template<unsigned DIM>

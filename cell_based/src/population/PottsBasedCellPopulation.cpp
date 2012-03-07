@@ -83,6 +83,7 @@ PottsBasedCellPopulation<DIM>::PottsBasedCellPopulation(PottsMesh<DIM>& rMesh,
       mTemperature(0.1),
       mNumSweepsPerTimestep(1)
 {
+	mpPottsMesh = static_cast<PottsMesh<DIM>* >(&(this->mrMesh));
     // Check each element has only one cell associated with it
     if (validate)
     {
@@ -98,6 +99,7 @@ PottsBasedCellPopulation<DIM>::PottsBasedCellPopulation(PottsMesh<DIM>& rMesh)
       mTemperature(0.1),
       mNumSweepsPerTimestep(1)
 {
+	mpPottsMesh = static_cast<PottsMesh<DIM>* >(&(this->mrMesh));
 }
 
 template<unsigned DIM>
@@ -116,25 +118,25 @@ PottsBasedCellPopulation<DIM>::~PottsBasedCellPopulation()
 template<unsigned DIM>
 PottsMesh<DIM>& PottsBasedCellPopulation<DIM>::rGetMesh()
 {
-    return static_cast<PottsMesh<DIM>& >((this->mrMesh));
+    return *mpPottsMesh;
 }
 
 template<unsigned DIM>
 const PottsMesh<DIM>& PottsBasedCellPopulation<DIM>::rGetMesh() const
 {
-    return static_cast<PottsMesh<DIM>& >((this->mrMesh));
+    return *mpPottsMesh;
 }
 
 template<unsigned DIM>
 PottsElement<DIM>* PottsBasedCellPopulation<DIM>::GetElement(unsigned elementIndex)
 {
-    return static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetElement(elementIndex);
+    return mpPottsMesh->GetElement(elementIndex);
 }
 
 template<unsigned DIM>
 unsigned PottsBasedCellPopulation<DIM>::GetNumElements()
 {
-    return static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetNumElements();
+    return mpPottsMesh->GetNumElements();
 }
 
 template<unsigned DIM>
@@ -152,13 +154,13 @@ unsigned PottsBasedCellPopulation<DIM>::GetNumNodes()
 template<unsigned DIM>
 c_vector<double, DIM> PottsBasedCellPopulation<DIM>::GetLocationOfCellCentre(CellPtr pCell)
 {
-    return static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetCentroidOfElement(this->mCellLocationMap[pCell.get()]);
+    return mpPottsMesh->GetCentroidOfElement(this->mCellLocationMap[pCell.get()]);
 }
 
 template<unsigned DIM>
 PottsElement<DIM>* PottsBasedCellPopulation<DIM>::GetElementCorrespondingToCell(CellPtr pCell)
 {
-    return static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetElement(this->mCellLocationMap[pCell.get()]);
+    return mpPottsMesh->GetElement(this->mCellLocationMap[pCell.get()]);
 }
 
 template<unsigned DIM>
@@ -168,7 +170,7 @@ CellPtr PottsBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_vector<
     PottsElement<DIM>* p_element = GetElementCorrespondingToCell(pParentCell);
 
     // Divide the element
-    unsigned new_element_index = static_cast<PottsMesh<DIM>& >((this->mrMesh)).DivideElement(p_element, true); // new element will be below the existing element
+    unsigned new_element_index = mpPottsMesh->DivideElement(p_element, true); // new element will be below the existing element
 
     // Associate the new cell with the element
     this->mCells.push_back(pNewCell);
@@ -193,7 +195,7 @@ unsigned PottsBasedCellPopulation<DIM>::RemoveDeadCells()
         {
             // Remove the element from the mesh
             num_removed++;
-            static_cast<PottsMesh<DIM>& >((this->mrMesh)).DeleteElement(this->mCellLocationMap[(*it).get()]);
+            mpPottsMesh->DeleteElement(this->mCellLocationMap[(*it).get()]);
             it = this->mCells.erase(it);
             --it;
         }
@@ -245,7 +247,7 @@ void PottsBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
         assert(p_node->GetNumContainingElements() <= 1);
 
         // Find a random available neighbouring node to overwrite current site
-        std::set<unsigned> neighbouring_node_indices = static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetMooreNeighbouringNodeIndices(node_index);
+        std::set<unsigned> neighbouring_node_indices = mpPottsMesh->GetMooreNeighbouringNodeIndices(node_index);
         unsigned neighbour_location_index;
 
         if (!neighbouring_node_indices.empty())
@@ -370,7 +372,7 @@ void PottsBasedCellPopulation<DIM>::WriteResultsToFiles()
         // Write node data to file
         if (!(GetElement(elem_index)->IsDeleted()) && !elem_corresponds_to_dead_cell)
         {
-            PottsElement<DIM>* p_element = static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetElement(elem_index);
+            PottsElement<DIM>* p_element = mpPottsMesh->GetElement(elem_index);
 
             unsigned num_nodes_in_element = p_element->GetNumNodes();
 
@@ -394,7 +396,7 @@ double PottsBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
     unsigned elem_index = this->GetLocationIndexUsingCell(pCell);
 
     // Get volume of this element in the Potts mesh
-    double cell_volume = static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetVolumeOfElement(elem_index);
+    double cell_volume = mpPottsMesh->GetVolumeOfElement(elem_index);
 
     return cell_volume;
 }
@@ -431,7 +433,7 @@ void PottsBasedCellPopulation<DIM>::WriteCellVolumeResultsToFile()
             *(this->mpCellVolumesFile) << cell_index << " ";
 
             // Write centroid location to file
-            c_vector<double, DIM> centroid_location = static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetCentroidOfElement(elem_index);
+            c_vector<double, DIM> centroid_location = mpPottsMesh->GetCentroidOfElement(elem_index);
 
             *(this->mpCellVolumesFile) << centroid_location[0] << " ";
             *(this->mpCellVolumesFile) << centroid_location[1] << " ";
@@ -613,8 +615,8 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile()
             cellwise_data.push_back(cellwise_data_var);
         }
     }
-    for (typename AbstractMesh<DIM,DIM>::NodeIterator iter = static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetNodeIteratorBegin();
-         iter != static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetNodeIteratorEnd();
+    for (typename AbstractMesh<DIM,DIM>::NodeIterator iter = mpPottsMesh->GetNodeIteratorBegin();
+         iter != mpPottsMesh->GetNodeIteratorEnd();
          ++iter)
     {
         std::set<unsigned> element_indices = iter->rGetContainingElementIndices();
@@ -700,7 +702,7 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile()
      * For now, we do an explicit conversion to NodesOnlyMesh. This can be written to VTK then visualized as glyphs.
      */
     NodesOnlyMesh<DIM> temp_mesh;
-    temp_mesh.ConstructNodesWithoutMesh(static_cast<PottsMesh<DIM>& >((this->mrMesh)));
+    temp_mesh.ConstructNodesWithoutMesh(*mpPottsMesh);
     mesh_writer.WriteFilesUsingMesh(temp_mesh);
 
     *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
