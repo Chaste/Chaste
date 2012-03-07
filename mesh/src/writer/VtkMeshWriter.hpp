@@ -44,6 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkPointData.h>
 #include <vtkTetra.h>
 #include <vtkTriangle.h>
+#include <vtkLine.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkUnstructuredGridWriter.h>
 #include <vtkXMLUnstructuredGridWriter.h>

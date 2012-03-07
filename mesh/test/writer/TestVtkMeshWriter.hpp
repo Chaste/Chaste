@@ -43,8 +43,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "TetrahedralMesh.hpp"
 #include "VtkMeshWriter.hpp"
-#include "PetscSetupAndFinalize.hpp"
 #include "DistributedTetrahedralMesh.hpp"
+#include "MixedDimensionMesh.hpp"
+#include "PetscSetupAndFinalize.hpp"
 #include <iostream>
 
 #ifdef CHASTE_VTK
@@ -451,6 +452,22 @@ public:
             TS_ASSERT_EQUALS(centroid_read.size(),centroid.size());
             ///\todo #1731 - need to read the tensors too.
         }
+#endif //CHASTE_VTK
+    }
+
+    void TestVtkMeshWriterForCables() throw(Exception)
+    {
+#ifdef CHASTE_VTK
+// Requires  "sudo aptitude install libvtk5-dev" or similar
+        std::string mesh_base("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
+        TrianglesMeshReader<2,2> reader(mesh_base);
+        MixedDimensionMesh<2,2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+        mesh.ConstructFromMeshReader(reader);
+
+        VtkMeshWriter<2,2> writer("TestVtkMeshWriter", "mixed_mesh_2d");
+        writer.WriteFilesUsingMesh(mesh);
+
+        ///\todo #2052 We can't yet test if the cables are written correctly, because we don't have the reader part.
 #endif //CHASTE_VTK
     }
 };

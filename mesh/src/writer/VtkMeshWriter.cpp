@@ -64,6 +64,9 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::MakeVtkMesh()
 {
     assert(SPACE_DIM==3 || SPACE_DIM == 2);
     assert(SPACE_DIM==ELEMENT_DIM);
+
+
+    //Construct nodes aka as Points
     vtkPoints* p_pts = vtkPoints::New(VTK_DOUBLE);
     p_pts->GetData()->SetName("Vertex positions");
     for (unsigned item_num=0; item_num<this->GetNumNodes(); item_num++)
@@ -76,9 +79,10 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::MakeVtkMesh()
         assert(current_item.size() == 3);
         p_pts->InsertPoint(item_num, current_item[0], current_item[1], current_item[2]);
     }
-
     mpVtkUnstructedMesh->SetPoints(p_pts);
     p_pts->Delete(); //Reference counted
+
+    //Construct elements aka Cells
     for (unsigned item_num=0; item_num<this->GetNumElements(); item_num++)
     {
         std::vector<unsigned> current_element = this->GetNextElement().NodeIndices; // this->mElementData[item_num];
@@ -94,6 +98,22 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::MakeVtkMesh()
         }
         vtkIdList* p_cell_id_list = p_cell->GetPointIds();
         for (unsigned j = 0; j < ELEMENT_DIM+1; ++j)
+        {
+            p_cell_id_list->SetId(j, current_element[j]);
+        }
+        mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
+        p_cell->Delete(); //Reference counted
+    }
+
+    //If necessary, construct cables
+    for (unsigned item_num=0; item_num<this->GetNumCableElements(); item_num++)
+    {
+        ///\todo #2052 We can't add radius data, because we can't distinguish which cells are cables
+        std::vector<unsigned> current_element = this->GetNextCableElement().NodeIndices;
+        assert(current_element.size() == 2);
+        vtkCell* p_cell=vtkLine::New();
+        vtkIdList* p_cell_id_list = p_cell->GetPointIds();
+        for (unsigned j = 0; j < 2; ++j)
         {
             p_cell_id_list->SetId(j, current_element[j]);
         }
