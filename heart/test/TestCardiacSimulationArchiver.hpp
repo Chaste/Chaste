@@ -1109,7 +1109,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForBcsOnNonMasterOnly/?* ./heart/test/
              it != mesh.GetElementIteratorEnd();
              ++it)
         {
-            it->SetRegion(HeartRegionCode::GetValidBathId());
+            it->SetAttribute(HeartRegionCode::GetValidBathId());
         }
         mesh.SetMeshHasChangedSinceLoading();
 

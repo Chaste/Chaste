@@ -129,7 +129,7 @@ public:
             double z = mesh.GetElement(i)->CalculateCentroid()[2];
             if( sqrt((x-0.05)*(x-0.05) + (y-0.05)*(y-0.05) + (z-0.05)*(z-0.05)) > 0.04 )
             {
-                mesh.GetElement(i)->SetRegion(HeartRegionCode::GetValidBathId());
+                mesh.GetElement(i)->SetAttribute(HeartRegionCode::GetValidBathId());
             }
         }
 
@@ -183,7 +183,7 @@ public:
             double y = mesh.GetElement(i)->CalculateCentroid()[1];
             if( sqrt((x-0.05)*(x-0.05) + (y-0.05)*(y-0.05)) > 0.02 )
             {
-                mesh.GetElement(i)->SetRegion(HeartRegionCode::GetValidBathId());
+                mesh.GetElement(i)->SetAttribute(HeartRegionCode::GetValidBathId());
             }
         }
 
@@ -252,7 +252,7 @@ public:
             double z = mesh.GetElement(i)->CalculateCentroid()[2];
             if( sqrt((x-0.1)*(x-0.1) + (y-0.1)*(y-0.1) + (z-0.1)*(z-0.1)) > 0.03)
             {
-                mesh.GetElement(i)->SetRegion(1);
+                mesh.GetElement(i)->SetAttribute(1);
             }
         }
 

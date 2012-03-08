@@ -136,7 +136,7 @@ public:
 
         try
         {
-            mesh.GetElement(0)->SetRegion(HeartRegionCode::GetValidBathId());
+            mesh.GetElement(0)->SetAttribute(HeartRegionCode::GetValidBathId());
         }
         catch(Exception& e)
         {
@@ -175,7 +175,7 @@ public:
             double x = mesh.GetElement(i)->CalculateCentroid()[0];
             if( (x<0.25) || (x>0.75) )
             {
-                mesh.GetElement(i)->SetRegion(HeartRegionCode::GetValidBathId());
+                mesh.GetElement(i)->SetAttribute(HeartRegionCode::GetValidBathId());
             }
         }
 
@@ -230,7 +230,7 @@ public:
 
         for(unsigned i=0; i<mesh.GetNumElements(); i++)
         {
-            mesh.GetElement(i)->SetRegion(HeartRegionCode::GetValidBathId());
+            mesh.GetElement(i)->SetAttribute(HeartRegionCode::GetValidBathId());
         }
 
         // create boundary conditions container
@@ -445,21 +445,21 @@ public:
             double y = iter->CalculateCentroid()[1];
             if( (x>0.3) && (x<0.6) && (y>0.3) && (y<0.6) )
             {
-                iter->SetRegion(0);
+                iter->SetAttribute(0);
             }
             else
             {
                 if (y<0.2)
                 {
-                    iter->SetRegion(2);
+                    iter->SetAttribute(2);
                 }
                 else if (y<0.7)
                 {
-                    iter->SetRegion(3);
+                    iter->SetAttribute(3);
                 }
                 else if (y<0.9)
                 {
-                    iter->SetRegion(4);
+                    iter->SetAttribute(4);
                 }
             }
         }
@@ -733,14 +733,14 @@ public:
                 double y = r_mesh.GetElement(i)->CalculateCentroid()[1];
                 if ( sqrt((x-0.05)*(x-0.05) + (y-0.05)*(y-0.05)) > 0.02 )
                 {
-                    TS_ASSERT(HeartRegionCode::IsRegionBath(r_mesh.GetElement(i)->GetRegion()));
+                    TS_ASSERT(HeartRegionCode::IsRegionBath(r_mesh.GetElement(i)->GetAttribute()));
                 }
                 else
                 {
-                    TS_ASSERT(HeartRegionCode::IsRegionTissue(r_mesh.GetElement(i)->GetRegion()));
+                    TS_ASSERT(HeartRegionCode::IsRegionTissue(r_mesh.GetElement(i)->GetAttribute()));
                 }
                 // Compare mesh before & after
-                TS_ASSERT_EQUALS(r_mesh.GetElement(i)->GetRegion(), p_mesh->GetElement(i)->GetRegion());
+                TS_ASSERT_EQUALS(r_mesh.GetElement(i)->GetAttribute(), p_mesh->GetElement(i)->GetAttribute());
                 TS_ASSERT_DELTA(x, p_mesh->GetElement(i)->CalculateCentroid()[0], 1e-12);
                 TS_ASSERT_DELTA(y, p_mesh->GetElement(i)->CalculateCentroid()[1], 1e-12);
             }
@@ -907,12 +907,12 @@ public:
             {
                 if ( expected_element_regions[iter->GetIndex()] == 'T')
                 {
-                     TS_ASSERT(HeartRegionCode::IsRegionTissue( iter->GetRegion() ));
+                     TS_ASSERT(HeartRegionCode::IsRegionTissue( iter->GetAttribute() ));
                 }
                 else
                 {
                      TS_ASSERT_EQUALS( expected_element_regions[iter->GetIndex()], 'B')
-                     TS_ASSERT(HeartRegionCode::IsRegionBath( iter->GetRegion() ));
+                     TS_ASSERT(HeartRegionCode::IsRegionBath( iter->GetAttribute() ));
                 }
             }
             // so the middle 5 nodes should be heart nodes

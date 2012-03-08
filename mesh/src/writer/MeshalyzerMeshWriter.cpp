@@ -354,7 +354,7 @@ void MeshalyzerMeshWriter<ELEMENT_DIM, SPACE_DIM>::AppendLocalDataToFiles()
                 }
             }
 
-            *p_element_file << iter->GetRegion() << "\n";
+            *p_element_file << iter->GetAttribute() << "\n";
         }
     }
     p_element_file->close();
@@ -384,7 +384,7 @@ void MeshalyzerMeshWriter<ELEMENT_DIM, SPACE_DIM>::AppendLocalDataToFiles()
                     }
                 }
 
-                *p_face_file << (*iter)->GetRegion() << "\n";
+                *p_face_file << (*iter)->GetAttribute() << "\n";
             }
         }
         p_face_file->close();

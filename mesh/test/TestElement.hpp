@@ -491,8 +491,8 @@ public:
             delete nodes_the_same[i];
         }
 
-        element.SetRegion(3);
-        TS_ASSERT_EQUALS(element.GetRegion(), 3u);
+        element.SetAttribute(3);
+        TS_ASSERT_EQUALS(element.GetAttribute(), 3u);
     }
 
     void TestCircum1d()
@@ -1010,8 +1010,8 @@ public:
 
         TS_ASSERT_SAME_DATA(indices_2, expected_indices_2, 6*sizeof(unsigned));
 
-        p_element->SetRegion(3);
-        TS_ASSERT_EQUALS(p_element->GetRegion(), 3u);
+        p_element->SetAttribute(3);
+        TS_ASSERT_EQUALS(p_element->GetAttribute(), 3u);
     }
 
 };

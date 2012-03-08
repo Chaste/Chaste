@@ -43,7 +43,7 @@ typedef unsigned HeartRegionType;
 /**
  * Codes that can be used to annotate regions of a cardiac mesh.
  *
- * See Node::GetRegion, Node::SetRegion, AbstractElement::GetRegion, AbstractElement::SetRegion.
+ * See Node::GetRegion, Node::SetRegion, AbstractElement::GetAttribute, AbstractElement::SetAttribute.
  *
  * Note: these constants are set explicitly to be of type unsigned, so as to match
  * the above methods.  Hence why we use a class instead of an enum - you can't

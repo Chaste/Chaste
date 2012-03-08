@@ -167,7 +167,7 @@ VertexElementData VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextElementWithFa
     }
 
     // Set attribute
-    elem_data.AttributeValue = (*(mpIters->pElemIter))->GetRegion();
+    elem_data.AttributeValue = (*(mpIters->pElemIter))->GetAttribute();
     ++(*(mpIters->pElemIter));
 
     return elem_data;
@@ -191,7 +191,7 @@ ElementData VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextElement()
         }
 
         // Set attribute
-        elem_data.AttributeValue = (*(mpIters->pElemIter))->GetRegion();
+        elem_data.AttributeValue = (*(mpIters->pElemIter))->GetAttribute();
         ++(*(mpIters->pElemIter));
 
         return elem_data;
@@ -376,7 +376,7 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
     // Write the element header
     unsigned num_elements = this->GetNumElements();
 
-    unsigned first_elem_attribute_value = (*(mpIters->pElemIter))->GetRegion();
+    unsigned first_elem_attribute_value = (*(mpIters->pElemIter))->GetAttribute();
     if (first_elem_attribute_value != 0)
     {
         num_attr = 1;

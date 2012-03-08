@@ -453,7 +453,7 @@ void PottsMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& rMesh
         {
             assert(rMeshReader.GetNumElementAttributes() == 1);
             unsigned attribute_value = element_data.AttributeValue;
-            p_element->SetRegion(attribute_value);
+            p_element->SetAttribute(attribute_value);
         }
     }
 

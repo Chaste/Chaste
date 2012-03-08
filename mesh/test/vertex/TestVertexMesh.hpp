@@ -710,8 +710,8 @@ public:
         TS_ASSERT_EQUALS(mesh2.GetElement(1)->GetNode(1), mesh2.GetNode(5));
 
         // Check element attributes
-        TS_ASSERT_EQUALS(mesh2.GetElement(0)->GetRegion(), 76u);
-        TS_ASSERT_EQUALS(mesh2.GetElement(1)->GetRegion(), 89u);
+        TS_ASSERT_EQUALS(mesh2.GetElement(0)->GetAttribute(), 76u);
+        TS_ASSERT_EQUALS(mesh2.GetElement(1)->GetAttribute(), 89u);
     }
 
     void TestMeshConstructionFromMeshReaderIndexedFromOne()
@@ -818,7 +818,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumFaces(), 4u);
 
         // Check element attributes
-        TS_ASSERT_EQUALS(mesh2.GetElement(0)->GetRegion(), 49u);
+        TS_ASSERT_EQUALS(mesh2.GetElement(0)->GetAttribute(), 49u);
     }
 
     void TestArchive2dVertexMesh()

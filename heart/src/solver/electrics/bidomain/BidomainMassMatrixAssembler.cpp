@@ -49,7 +49,7 @@ c_matrix<double,2*(DIM+1),2*(DIM+1)> BidomainMassMatrixAssembler<DIM>::ComputeMa
 {
     c_matrix<double,2*(DIM+1),2*(DIM+1)> ret = zero_matrix<double>(2*(DIM+1), 2*(DIM+1));
 
-    if (!HeartRegionCode::IsRegionBath( pElement->GetRegion() ))
+    if (!HeartRegionCode::IsRegionBath( pElement->GetAttribute() ))
     {
         c_matrix<double, DIM+1, DIM+1> basis_outer_prod = outer_prod(rPhi, rPhi);
 

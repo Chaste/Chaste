@@ -88,7 +88,7 @@ public:
                 TS_ASSERT_EQUALS(p_cable_elt->GetNodeGlobalIndex(1u), 56u + i);
                 TS_ASSERT_EQUALS(p_cable_elt->GetNode(0u), mesh.GetNode(55u + i));
                 TS_ASSERT_EQUALS(p_cable_elt->GetNode(1u), mesh.GetNode(56u + i));
-                TS_ASSERT_EQUALS(p_cable_elt->GetRegion(), i+1.5);
+                TS_ASSERT_EQUALS(p_cable_elt->GetAttribute(), i+1.5);
                 TS_ASSERT( mesh.CalculateDesignatedOwnershipOfCableElement(i) );
             }
 
@@ -116,7 +116,7 @@ public:
                     TS_ASSERT_EQUALS(p_cable_elt->GetNodeGlobalIndex(1u), 56u + i);
                     TS_ASSERT_EQUALS(p_cable_elt->GetNode(0u), mesh.GetNode(55u + i));
                     TS_ASSERT_EQUALS(p_cable_elt->GetNode(1u), mesh.GetNodeOrHaloNode(56u + i));
-                    TS_ASSERT_EQUALS(p_cable_elt->GetRegion(), i+1.5);
+                    TS_ASSERT_EQUALS(p_cable_elt->GetAttribute(), i+1.5);
                     TS_ASSERT( mesh.CalculateDesignatedOwnershipOfCableElement(i) ); // Designated owner of all these five, since we own node 0 (lowest index)
                 }
                 TS_ASSERT_THROWS_THIS(mesh.GetCableElement(6), "Requested cable element 6 does not belong to processor 0");
@@ -136,7 +136,7 @@ public:
                     TS_ASSERT_EQUALS(p_cable_elt->GetNodeGlobalIndex(1u), 56u + i);
                     TS_ASSERT_EQUALS(p_cable_elt->GetNode(0u), mesh.GetNodeOrHaloNode(55u + i));
                     TS_ASSERT_EQUALS(p_cable_elt->GetNode(1u), mesh.GetNode(56u + i));
-                    TS_ASSERT_EQUALS(p_cable_elt->GetRegion(), i+1.5);
+                    TS_ASSERT_EQUALS(p_cable_elt->GetAttribute(), i+1.5);
 
                     // Not designated owner of the first of these as node 0 is owned by process 0
                     if (i==5)
@@ -266,7 +266,7 @@ public:
             TS_ASSERT_EQUALS((*binary_iter)->GetNumNodes(), (*original_iter)->GetNumNodes());
             TS_ASSERT_EQUALS((*binary_iter)->GetNodeGlobalIndex(0u), (*original_iter)->GetNodeGlobalIndex(0u));
             TS_ASSERT_EQUALS((*binary_iter)->GetNodeGlobalIndex(1u), (*original_iter)->GetNodeGlobalIndex(1u));
-            TS_ASSERT_EQUALS((*binary_iter)->GetRegion(), (*original_iter)->GetRegion());
+            TS_ASSERT_EQUALS((*binary_iter)->GetAttribute(), (*original_iter)->GetAttribute());
 
             ++original_iter;
         }

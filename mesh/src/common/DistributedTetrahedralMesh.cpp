@@ -323,7 +323,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
             {
                 assert(rMeshReader.GetNumElementAttributes() == 1);
                 unsigned attribute_value = element_data.AttributeValue;
-                p_element->SetRegion(attribute_value);
+                p_element->SetAttribute(attribute_value);
             }
         }
     }
@@ -355,7 +355,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
                 {
                     assert(rMeshReader.GetNumElementAttributes() == 1);
                     unsigned attribute_value = element_data.AttributeValue;
-                    p_element->SetRegion(attribute_value);
+                    p_element->SetAttribute(attribute_value);
                 }
             }
         }
@@ -425,7 +425,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
             {
                 assert(rMeshReader.GetNumFaceAttributes() == 1);
                 unsigned attribute_value = face_data.AttributeValue;
-                p_boundary_element->SetRegion(attribute_value);
+                p_boundary_element->SetAttribute(attribute_value);
             }
         }
     }

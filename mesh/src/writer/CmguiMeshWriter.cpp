@@ -331,15 +331,15 @@ void CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM>::AppendLocalDataToFiles()
     {
         if ( this->mpDistributedMesh->CalculateDesignatedOwnershipOfElement(iter->GetIndex()))
         {
-            assert(iter->GetRegion() < mRegionNames.size());//segfault guard
+            assert(iter->GetAttribute() < mRegionNames.size());//segfault guard
 
-            *elem_files[iter->GetRegion()] << "Element:\t" << iter->GetIndex()+1 << " 0 0 Nodes:\t";
+            *elem_files[iter->GetAttribute()] << "Element:\t" << iter->GetIndex()+1 << " 0 0 Nodes:\t";
             for (unsigned i=0; i<this->mNodesPerElement; i++)
             {
-                *elem_files[iter->GetRegion()]  << iter->GetNodeGlobalIndex(i)+1 << "\t";
+                *elem_files[iter->GetAttribute()]  << iter->GetNodeGlobalIndex(i)+1 << "\t";
             }
 
-            *elem_files[iter->GetRegion()] << "\n";
+            *elem_files[iter->GetAttribute()] << "\n";
         }
     }
 

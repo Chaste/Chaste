@@ -184,7 +184,7 @@ ElementData AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextElemen
                 elem_data.NodeIndices[j] = mpMesh->IsMeshChanging() ? mpNodeMap->GetNewIndex(old_index) : old_index;
             }
             // Set attribute
-            elem_data.AttributeValue = (*(mpIters->pElemIter))->GetRegion();
+            elem_data.AttributeValue = (*(mpIters->pElemIter))->GetAttribute();
 
             ++(*(mpIters->pElemIter));
 
@@ -204,7 +204,7 @@ ElementData AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextElemen
                 {
                     elem_data.NodeIndices[j] = p_element->GetNodeGlobalIndex(j);
                 }
-                elem_data.AttributeValue = p_element->GetRegion();
+                elem_data.AttributeValue = p_element->GetAttribute();
             }
             else
             {
@@ -330,7 +330,7 @@ ElementData AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextCableE
             {
                 elem_data.NodeIndices[j] = p_element->GetNodeGlobalIndex(j);
             }
-            elem_data.AttributeValue = p_element->GetRegion();
+            elem_data.AttributeValue = p_element->GetAttribute();
         }
         else
         {
@@ -599,7 +599,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
                         raw_indices[j] = it->GetNodeGlobalIndex(j);
                     }
                     // Attribute value
-                    raw_indices[mNodesPerElement] = it->GetRegion();
+                    raw_indices[mNodesPerElement] = it->GetAttribute();
 
                     MPI_Send(raw_indices, mNodesPerElement+1, MPI_UNSIGNED, 0,
                              this->mNumNodes + index, //Elements sent with tags offset
@@ -645,7 +645,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
                         MPI_Send(raw_cable_element_indices, 2, MPI_UNSIGNED, 0,
                                  this->mNumNodes + this->mNumElements + this->mNumBoundaryElements + index, //Cable elements sent with tags offset even more
                                  PETSC_COMM_WORLD);
-                        double cable_radius = (*it)->GetRegion();
+                        double cable_radius = (*it)->GetAttribute();
                         //Assume this message doesn't overtake previous
                         MPI_Send(&cable_radius, 1, MPI_DOUBLE, 0,
                                  this->mNumNodes + this->mNumElements + this->mNumBoundaryElements + index, //Cable elements sent with tags offset even more

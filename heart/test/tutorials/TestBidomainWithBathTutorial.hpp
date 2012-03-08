@@ -100,8 +100,8 @@ public: // Tests should be public!
          * In most simulations there is one valid tissue identifier and one valid bath identifier
          * (for elements).
          * These can be obtained with
-         *  * {{{mesh.GetElement(i)->SetRegion(HeartRegionCode::GetValidTissueId());}}}
-         *  * {{{mesh.GetElement(i)->SetRegion(HeartRegionCode::GetValidBathId());}}}
+         *  * {{{mesh.GetElement(i)->SetAttribute(HeartRegionCode::GetValidTissueId());}}}
+         *  * {{{mesh.GetElement(i)->SetAttribute(HeartRegionCode::GetValidBathId());}}}
          *
          * If we want heterogeneous conductivities outside the heart (for example for torso and blood)
          * then we will need different identifiers
@@ -138,18 +138,18 @@ public: // Tests should be public!
                 if (y<0.05)
                 {
                     //Outside circle on the bottom
-                    mesh.GetElement(i)->SetRegion(bath_id1);
+                    mesh.GetElement(i)->SetAttribute(bath_id1);
                 }
                 else
                 {
                     //Outside circle on the top
-                    mesh.GetElement(i)->SetRegion(bath_id2);
+                    mesh.GetElement(i)->SetAttribute(bath_id2);
                 }
             }
             else
             {
                 //IDs default to 0, but we want to be safe
-                mesh.GetElement(i)->SetRegion(tissue_id);
+                mesh.GetElement(i)->SetAttribute(tissue_id);
             }
 
         }

@@ -1573,7 +1573,7 @@ public:
 
         for (unsigned i=0; i<mesh.GetNumElements(); i++)
         {
-            TS_ASSERT_EQUALS(mesh.GetElement(i)->GetRegion(), i%5+1);
+            TS_ASSERT_EQUALS(mesh.GetElement(i)->GetAttribute(), i%5+1);
         }
     }
 
@@ -1587,7 +1587,7 @@ public:
 
         for (unsigned i=0; i<mesh.GetNumElements(); i++)
         {
-            TS_ASSERT_EQUALS(mesh.GetElement(i)->GetRegion(), (i+1)%3+1);
+            TS_ASSERT_EQUALS(mesh.GetElement(i)->GetAttribute(), (i+1)%3+1);
         }
 
        TS_ASSERT_EQUALS(mesh_reader.GetNumFaceAttributes(), 1u);
@@ -1595,11 +1595,11 @@ public:
         bool read_zero_attribute = false;
         for (unsigned i=0; i<mesh.GetNumBoundaryElements(); i++)
         {
-            if (mesh.GetBoundaryElement(i)->GetRegion()==0U)
+            if (mesh.GetBoundaryElement(i)->GetAttribute()==0U)
             {
                 read_zero_attribute = true;
             }
-            TS_ASSERT_LESS_THAN(mesh.GetBoundaryElement(i)->GetRegion(), 4u);
+            TS_ASSERT_LESS_THAN(mesh.GetBoundaryElement(i)->GetAttribute(), 4u);
         }
         TS_ASSERT(read_zero_attribute);
     }
@@ -1614,7 +1614,7 @@ public:
 
         for (unsigned i=0; i<mesh.GetNumElements(); i++)
         {
-            TS_ASSERT_EQUALS(mesh.GetElement(i)->GetRegion(), 0u);
+            TS_ASSERT_EQUALS(mesh.GetElement(i)->GetAttribute(), 0u);
         }
 
         TS_ASSERT_EQUALS(mesh_reader.GetNumFaceAttributes(), 1u);
@@ -1627,11 +1627,11 @@ public:
         {
             if (i==99)
             {
-                TS_ASSERT_EQUALS(mesh.GetBoundaryElement(i)->GetRegion(), 2u);
+                TS_ASSERT_EQUALS(mesh.GetBoundaryElement(i)->GetAttribute(), 2u);
             }
             else
             {
-                TS_ASSERT_EQUALS(mesh.GetBoundaryElement(i)->GetRegion(), 1u);
+                TS_ASSERT_EQUALS(mesh.GetBoundaryElement(i)->GetAttribute(), 1u);
             }
         }
     }

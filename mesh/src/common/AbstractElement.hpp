@@ -61,8 +61,8 @@ protected:
     /** The index of this element within the mesh */
     unsigned mIndex;
 
-    /** A region ID. */
-    double mRegion;
+    /** An attribute (a value associated with the element) */
+    double mAttribute;
 
     /**
      * Whether this element has been deleted, and hence
@@ -221,16 +221,16 @@ public:
     bool IsFlagged() const;
 
     /**
-     * Set the element's region ID.
+     * Set an attribute (a value associated with the element)
      *
-     * @param region the element's new region ID
+     * @param attribute the attribute
      */
-    void SetRegion(double region);
+    void SetAttribute(double attribute);
 
     /**
-     * Get the element's region ID.
+     * Get the element's attribute value
      */
-    double GetRegion();
+    double GetAttribute();
 };
 
 #endif /*ABSTRACTELEMENT_HPP_*/
