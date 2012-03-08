@@ -76,7 +76,7 @@ private:
      */
     VertexMesh<DIM,DIM>* mpElementTessellation;
 
-    /*
+    /**
      * A static cast of the Abstract mesh from `AbstractCellPopulation`
      * for use in this class
      */

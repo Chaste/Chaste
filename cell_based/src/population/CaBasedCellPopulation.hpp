@@ -69,9 +69,7 @@ class CaBasedCellPopulation : public AbstractOnLatticeCellPopulation<DIM>
 
 private:
 
-    /*
-     * A static cast of the mesh from AbstractCellPopulation
-     */
+    /** A static cast of the mesh from AbstractCellPopulation */
     TetrahedralMesh<DIM, DIM>* mpTetrahedralMesh;
 
     /** The update rules used to determine the new location of the cells. */

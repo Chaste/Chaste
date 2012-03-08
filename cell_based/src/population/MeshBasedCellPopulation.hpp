@@ -115,9 +115,7 @@ protected:
      */
     VertexMesh<DIM, DIM>* mpVoronoiTessellation;
 
-    /*
-     * Static cast of the mesh from AbstractCellPopulation
-     */
+    /** Static cast of the mesh from AbstractCellPopulation */
     MutableMesh<DIM, DIM>* mpMutableMesh;
 
     /**

@@ -87,6 +87,8 @@ protected:
 
     /**
      * Constructor that just takes in a mesh.
+     * 
+     * @param rMesh the mesh for the cell population.
      */
     AbstractOnLatticeCellPopulation(AbstractMesh<DIM, DIM>& rMesh);
 

@@ -211,6 +211,8 @@ protected:
 
     /**
 	 * Constructor that just takes in a mesh.
+	 * 
+	 * @param rMesh the mesh for the population.
      */
     AbstractCellPopulation(AbstractMesh<DIM, DIM>& rMesh);
 

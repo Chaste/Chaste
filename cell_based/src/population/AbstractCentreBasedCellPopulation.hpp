@@ -74,6 +74,8 @@ protected:
 
     /**
      * Constructor that just takes in a mesh.
+     * 
+     * @param rMesh the mesh for the cell population.
      */
     AbstractCentreBasedCellPopulation(AbstractMesh<DIM, DIM>& rMesh);
 

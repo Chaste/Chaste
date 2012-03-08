@@ -65,7 +65,7 @@ private:
      */
     bool mDeleteMesh;
 
-    /*
+    /**
      * A static cast of the Abstract mesh from `AbstractCellPopulation`
      * for use in this class
      */
