@@ -39,6 +39,16 @@ EnsurePythonVersion(2,3)
 # We're also no longer compatible with SCons 0.96
 EnsureSConsVersion(0,97)
 
+# Avoid deprecation warnings by changing behaviour for new SCons versions
+scons_version_two = True
+try:
+    import SCons
+    if int(SCons.__version__[0]) < 2:
+        scons_version_two = False
+except:
+    scons_version_two = False
+
+
 Help("""
   Type: 'scons -c .' to remove all the compiled files (clean build),
         'scons' to do a default build,
@@ -401,7 +411,10 @@ if not isinstance(build, BuildTypes.DoxygenCoverage):
         if not os.path.exists(bld_dir):
             os.mkdir(bld_dir)
         script = os.path.join(toplevel_dir, 'SConscript')
-        test_log_files.append(SConscript(script, src_dir=toplevel_dir, build_dir=bld_dir, duplicate=0))
+        if scons_version_two:
+            test_log_files.append(SConscript(script, src_dir=toplevel_dir, variant_dir=bld_dir, duplicate=0))
+        else:
+            test_log_files.append(SConscript(script, src_dir=toplevel_dir, build_dir=bld_dir, duplicate=0))
     
     # Any user projects?
     for project in glob.glob('projects/*'):
@@ -420,8 +433,12 @@ if not isinstance(build, BuildTypes.DoxygenCoverage):
         if not os.path.exists(bld_dir):
             os.makedirs(bld_dir)
         script = os.path.join(project, 'SConscript')
-        test_log_files.append(SConscript(script, src_dir=project, build_dir=bld_dir, duplicate=0))
-    
+        
+        if scons_version_two:
+            test_log_files.append(SConscript(script, src_dir=project, variant_dir=bld_dir, duplicate=0))
+        else:
+            test_log_files.append(SConscript(script, src_dir=project, build_dir=bld_dir, duplicate=0))
+     
     # Calculate full library dependencies now we know what projects need
     if use_chaste_libs:
         SConsTools.DetermineLibraryDependencies(env, comp_deps)

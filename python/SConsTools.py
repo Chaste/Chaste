@@ -1052,6 +1052,7 @@ def DoComponentSConscript(component, otherVars):
                 lib = env.SharedLibrary(component, files + special_objects)
             else:
                 lib = None
+                env['CHASTE_LIBRARIES'][component] = lib
             libpath = '#linklib'
             # env['CHASTE_LIBRARIES'][component] is set by fasterSharedLibrary
         # Build the test library for this component
