@@ -106,19 +106,29 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::MakeVtkMesh()
     }
 
     //If necessary, construct cables
-    for (unsigned item_num=0; item_num<this->GetNumCableElements(); item_num++)
+    if (this->GetNumCableElements() > 0)
     {
-        ///\todo #2052 We can't add radius data, because we can't distinguish which cells are cables
-        std::vector<unsigned> current_element = this->GetNextCableElement().NodeIndices;
-        assert(current_element.size() == 2);
-        vtkCell* p_cell=vtkLine::New();
-        vtkIdList* p_cell_id_list = p_cell->GetPointIds();
-        for (unsigned j = 0; j < 2; ++j)
+        AugmentCellData();
+        //Make a blank cell radius data for the regular elements
+        std::vector<double> radii(this->GetNumElements(), 0.0);
+        for (unsigned item_num=0; item_num<this->GetNumCableElements(); item_num++)
         {
-            p_cell_id_list->SetId(j, current_element[j]);
+            ///\todo #2052 We can't add radius data, because we can't distinguish which cells are cables
+            ElementData cable_element_data = this->GetNextCableElement();
+            std::vector<unsigned> current_element = cable_element_data.NodeIndices;
+            radii.push_back(cable_element_data.AttributeValue);
+            assert(current_element.size() == 2);
+            vtkCell* p_cell=vtkLine::New();
+            vtkIdList* p_cell_id_list = p_cell->GetPointIds();
+            for (unsigned j = 0; j < 2; ++j)
+            {
+                p_cell_id_list->SetId(j, current_element[j]);
+            }
+            mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
+            p_cell->Delete(); //Reference counted
         }
-        mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
-        p_cell->Delete(); //Reference counted
+        AddCellData("Cable radius", radii);
+
     }
 }
 
@@ -171,6 +181,30 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddCellData(std::string dataName, std
     p_cell_data->AddArray(p_scalars);
     p_scalars->Delete(); //Reference counted
 }
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AugmentCellData()
+{
+    unsigned num_cell_arrays = mpVtkUnstructedMesh->GetCellData()->GetNumberOfArrays();
+    for (unsigned i = 0; i < num_cell_arrays; i++)
+    {
+        vtkDataArray* array = mpVtkUnstructedMesh->GetCellData()->GetArray(i);
+
+        //Check data was the correct size before the cables were added
+        assert(array->GetNumberOfTuples() == this->GetNumElements());
+
+        //Check that tuples of size 3 will be big enough for padding the rest of the data
+        assert(array->GetNumberOfComponents() <= 3);
+        double null_data[3] = {0.0, 0.0, 0.0};
+
+        //Pad data
+        for (unsigned new_index = 0; new_index <  this->GetNumCableElements(); new_index++)
+        {
+            array->InsertNextTuple(null_data);
+        }
+    }
+}
+
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddCellData(std::string dataName, std::vector<c_vector<double, SPACE_DIM> > dataPayload)

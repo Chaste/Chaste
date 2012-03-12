@@ -90,6 +90,16 @@ private:
      * VTK mesh structure.  Called by  WriteFiles().
      */
     void MakeVtkMesh();
+
+    /**
+     * At the time of adding VTK cell data, it is assumed that there is one piece of data
+     * for each element in the original mesh.  If the mesh is mixed-dimension (elements and
+     * cable elements) the VTK mesh makes no distinction between the two types of cells.
+     * All data associated with cells must be the same length as the overall number of cells.
+     * This method inspects each cell data component and adds dummy data to cover the cable elements.
+     */
+    void AugmentCellData();
+
 public:
 
     /**
@@ -106,16 +116,17 @@ public:
      */
     void WriteFiles();
 
-    /**
-     * Add a scalar data field to each element (known as "cell" in VTK).
-     * @param name is a meaningful name with which to annotate the data
-     * @param data is the data which should appear in the same order as the element numbering
-     * The length of the data vector is assumed to match the number of elements in the mesh.
-     * Checking cannot be done at this stage since the data is associated with an empty VTK mesh structure.
-     */
-    void AddCellData(std::string name, std::vector<double> data);
 
     /**
+      * Add a scalar data field to each element (known as "cell" in VTK).
+      * @param name is a meaningful name with which to annotate the data
+      * @param data is the data which should appear in the same order as the element numbering
+      * The length of the data vector is assumed to match the number of elements in the mesh.
+      * Checking cannot be done at this stage since the data is associated with an empty VTK mesh structure.
+      */
+     void AddCellData(std::string name, std::vector<double> data);
+
+     /**
      * Add a vector data field to each element (known as "cell" in VTK).
      * @param name is a meaningful name with which to annotate the data
      * @param data is the data which should appear in the same order as the element numbering

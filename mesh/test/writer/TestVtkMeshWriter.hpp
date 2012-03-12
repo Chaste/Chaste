@@ -464,7 +464,24 @@ public:
         MixedDimensionMesh<2,2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
         mesh.ConstructFromMeshReader(reader);
 
-        VtkMeshWriter<2,2> writer("TestVtkMeshWriter", "mixed_mesh_2d");
+        VtkMeshWriter<2,2> writer("TestVtkMeshWriter", "mixed_mesh_2d", false);
+
+        // Add element quality into the element "cell" data
+         std::vector<double> quality;
+         for (unsigned i=0; i<mesh.GetNumElements(); i++)
+         {
+             quality.push_back(mesh.GetElement(i)->CalculateQuality());
+         }
+         writer.AddCellData("Quality", quality);
+
+        // Add fibre type to "cell" data
+        std::vector< c_vector<double, 2> > centroid;
+        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        {
+            centroid.push_back(mesh.GetElement(i)->CalculateCentroid());
+        }
+        writer.AddCellData("Centroid", centroid);
+
         writer.WriteFilesUsingMesh(mesh);
 
         ///\todo #2052 We can't yet test if the cables are written correctly, because we don't have the reader part.
