@@ -465,20 +465,25 @@ public:
         mesh.ConstructFromMeshReader(reader);
 
         VtkMeshWriter<2,2> writer("TestVtkMeshWriter", "mixed_mesh_2d", false);
+        writer.SetParallelFiles(mesh);
 
         // Add element quality into the element "cell" data
          std::vector<double> quality;
-         for (unsigned i=0; i<mesh.GetNumElements(); i++)
+         for (DistributedTetrahedralMesh<2,2>::ElementIterator ele_iter = mesh.GetElementIteratorBegin();
+                ele_iter != mesh.GetElementIteratorEnd();
+                ++ele_iter)
          {
-             quality.push_back(mesh.GetElement(i)->CalculateQuality());
+             quality.push_back(ele_iter->CalculateQuality());
          }
          writer.AddCellData("Quality", quality);
 
         // Add fibre type to "cell" data
         std::vector< c_vector<double, 2> > centroid;
-        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        for (DistributedTetrahedralMesh<2,2>::ElementIterator ele_iter = mesh.GetElementIteratorBegin();
+               ele_iter != mesh.GetElementIteratorEnd();
+               ++ele_iter)
         {
-            centroid.push_back(mesh.GetElement(i)->CalculateCentroid());
+            centroid.push_back(ele_iter->CalculateCentroid());
         }
         writer.AddCellData("Centroid", centroid);
 
