@@ -242,6 +242,11 @@ public:
      * Initialise each cell's cell-cycle model.
      */
     void InitialiseCells();
+    
+    /**
+     * @return reference to the mesh, mrMesh.
+     */
+    AbstractMesh<DIM, DIM>& rGetMesh();
 
     /**
      * @return reference to mCells.

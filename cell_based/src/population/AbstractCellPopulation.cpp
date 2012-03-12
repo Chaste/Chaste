@@ -126,6 +126,12 @@ void AbstractCellPopulation<DIM>::InitialiseCells()
 }
 
 template<unsigned DIM>
+AbstractMesh<DIM, DIM>& AbstractCellPopulation<DIM>::rGetMesh()
+{
+    return mrMesh;
+}
+
+template<unsigned DIM>
 std::list<CellPtr>& AbstractCellPopulation<DIM>::rGetCells()
 {
     return mCells;
