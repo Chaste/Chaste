@@ -52,6 +52,10 @@ class TestCardiacElectroMechanicsProblemLong : public CxxTest::TestSuite
 public:
     void Test2dHardcodedResult() throw(Exception)
     {
+        EXIT_IF_PARALLEL; // see #1828
+
+
+
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-1000*1000);
 
         // run to 125 ms - about where the width is at its minimum (see figures
@@ -82,6 +86,10 @@ public:
 
     void Test2dVariableFibres() throw(Exception)
     {
+        EXIT_IF_PARALLEL; // see #1828
+
+
+
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-1000*1000);
 
         TetrahedralMesh<2,2> electrics_mesh;
@@ -140,6 +148,8 @@ public:
 
     void Test3d() throw(Exception)
     {
+        EXIT_IF_PARALLEL; // see #1828
+
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> cell_factory(-1000*1000);
 
         // set up two meshes of 1mm by 1mm by 1mm
@@ -181,6 +191,9 @@ public:
 
     void TestTwistingCube() throw(Exception)
     {
+        EXIT_IF_PARALLEL; // see #1828
+
+
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> cell_factory(-1000*1000);
 
         // set up two meshes of 1mm by 1mm by 1mm
@@ -248,7 +261,7 @@ public:
     // longer running, finer-mesh version of TestWithCompressibleApproach() in TestCardiacElectroMechanicsProblem.hpp
     void TestWithCompressibleApproachLong() throw(Exception)
     {
-        EXIT_IF_PARALLEL; // #1913 currently, the compressible preconditioner is ICC, which is only supported in sequential
+        EXIT_IF_PARALLEL; // #1828
 
         HeartEventHandler::Disable();
 
@@ -281,7 +294,7 @@ public:
     // other directions)
     void TestFibreRead() throw(Exception)
     {
-        EXIT_IF_PARALLEL; ///\todo #1913
+        EXIT_IF_PARALLEL; // #1828
 
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML,3> cell_factory(-5000*1000);
 

@@ -208,7 +208,7 @@ public:
     {
         double h=0.1;
         QuadraticMesh<1> mesh(h,h); // require a one-element mesh
-        unsigned size = 5; // 1*num_nodes + num_vertices;
+        unsigned size = 6;
 
         Vec vec = PetscTools::CreateVec(size);
         Mat mat;
@@ -229,25 +229,31 @@ public:
         ReplicatableVector vec_repl(vec);
         for(unsigned i=0; i<3; i++)
         {
-            TS_ASSERT_DELTA( vec_repl[i], 111*h, 1e-8 );
+            // spatial vars
+            TS_ASSERT_DELTA( vec_repl[2*i], 111*h, 1e-8 );
         }
-        for(unsigned i=3; i<5; i++)
+        for(unsigned i=0; i<2; i++)
         {
-            TS_ASSERT_DELTA( vec_repl[i], 222*h, 1e-8 );
+            // non-dummy pressure vars
+            TS_ASSERT_DELTA( vec_repl[2*i+1], 222*h, 1e-8 );
         }
+        // dummy pressure vars
+        TS_ASSERT_DELTA( vec_repl[5], 0.0, 1e-8 );
 
 
-        double correct_matrix[5][5] = { {2*h, 2*h, 2*h, 3*h, 3*h},
-                                        {2*h, 2*h, 2*h, 3*h, 3*h},
-                                        {2*h, 2*h, 2*h, 3*h, 3*h},
-                                        {3*h, 3*h, 3*h, 4*h, 4*h},
-                                        {3*h, 3*h, 3*h, 4*h, 4*h} };
+        double correct_matrix[6][6] = { {2*h, 3*h, 2*h, 3*h, 2*h, 0.0},
+                                        {3*h, 4*h, 3*h, 4*h, 3*h, 0.0},
+                                        {2*h, 3*h, 2*h, 3*h, 2*h, 0.0},
+                                        {3*h, 4*h, 3*h, 4*h, 3*h, 0.0},
+                                        {2*h, 3*h, 2*h, 3*h, 2*h, 0.0},
+                                        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0} };
+
 
         int lo, hi;
         MatGetOwnershipRange(mat, &lo, &hi);
         for (unsigned i=lo; i<(unsigned)hi; i++)
         {
-            for(unsigned j=0; j<5; j++)
+            for(unsigned j=0; j<6; j++)
             {
                 TS_ASSERT_DELTA( PetscMatTools::GetElement(mat,i,j), correct_matrix[i][j], 1e-8 );
             }
@@ -270,10 +276,10 @@ public:
         PetscTools::SetupMat(bad_size_mat, 67, 67, 10);
 
         assembler.SetVectorToAssemble(bad_size_vec, true);
-        TS_ASSERT_THROWS_CONTAINS(assembler.AssembleVector(), "Vector provided to be assembled has size 67, not expected size of 5");
+        TS_ASSERT_THROWS_CONTAINS(assembler.AssembleVector(), "Vector provided to be assembled has size 67, not expected size of 6");
 
         assembler.SetMatrixToAssemble(bad_size_mat, true);
-        TS_ASSERT_THROWS_CONTAINS(assembler.AssembleMatrix(), "Matrix provided to be assembled has size 67, not expected size of 5");
+        TS_ASSERT_THROWS_CONTAINS(assembler.AssembleMatrix(), "Matrix provided to be assembled has size 67, not expected size of 6");
 
         PetscTools::Destroy(mat);
         PetscTools::Destroy(vec);
@@ -288,9 +294,9 @@ public:
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2d_single_triangular_element_quadratic",2,2,false);
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        Vec vec = PetscTools::CreateVec(2*mesh.GetNumNodes()+mesh.GetNumVertices());
+        Vec vec = PetscTools::CreateVec(3*mesh.GetNumNodes());
         Mat mat;
-        PetscTools::SetupMat(mat, 2*mesh.GetNumNodes()+mesh.GetNumVertices(), 2*mesh.GetNumNodes()+mesh.GetNumVertices(), 2*mesh.GetNumNodes()+mesh.GetNumVertices());
+        PetscTools::SetupMat(mat, 3*mesh.GetNumNodes(),3*mesh.GetNumNodes(), 3*mesh.GetNumNodes());
 
         SimpleAssembler<2> assembler(&mesh, 2.0, 3.0, 4.0, 111.0, 222.0);
         assembler.SetVectorToAssemble(vec, true);
@@ -299,38 +305,45 @@ public:
         PetscMatTools::Finalise(mat);
 
         ReplicatableVector vec_repl(vec);
-        for(unsigned i=0; i<12; i++)
+        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            TS_ASSERT_DELTA( vec_repl[i], 111*0.5, 1e-8 );
+            TS_ASSERT_DELTA( vec_repl[3*i  ], 111*0.5, 1e-8 );
+            TS_ASSERT_DELTA( vec_repl[3*i+1], 111*0.5, 1e-8 );
         }
-        for(unsigned i=13; i<15; i++)
+        for(unsigned i=0; i<mesh.GetNumVertices(); i++)
         {
-            TS_ASSERT_DELTA( vec_repl[i], 222*0.5, 1e-8 );
+            TS_ASSERT_DELTA( vec_repl[3*i+2], 222*0.5, 1e-8 );
         }
 
-        c_matrix<double,15,15> correct_matrix;
-        for(unsigned i=0; i<12; i++)
+        // set up correct matrix: disp-disp entries have value 2h, disp-pressure entries
+        // have val 3h, and pressure-pressure entries have value 4h....
+        c_matrix<double,18,18> correct_matrix;
+        for(unsigned i=0; i<6; i++)
         {
-            for(unsigned j=0; j<12; j++)
+            for(unsigned j=0; j<6; j++)
             {
-                correct_matrix(i,j) = 2.0*0.5; // 0.5 is area of triangle
+                correct_matrix(3*i,  3*j)   = 2.0*0.5; // 0.5 is area of triangle
+                correct_matrix(3*i+1,3*j)   = 2.0*0.5; // 0.5 is area of triangle
+                correct_matrix(3*i,  3*j+1) = 2.0*0.5; // 0.5 is area of triangle
+                correct_matrix(3*i+1,3*j+1) = 2.0*0.5; // 0.5 is area of triangle
+
+                correct_matrix(3*i,  3*j+2) = 3.0*0.5; // 0.5 is area of triangle
+                correct_matrix(3*i+1,3*j+2) = 3.0*0.5; // 0.5 is area of triangle
+                correct_matrix(3*i+2,3*j)   = 3.0*0.5; // 0.5 is area of triangle
+                correct_matrix(3*i+2,3*j+1) = 3.0*0.5; // 0.5 is area of triangle
+
+                correct_matrix(3*i+2,3*j+2) = 4.0*0.5;
             }
         }
 
-        for(unsigned i=0; i<12; i++)
+        //...except for the fact that any entry corresponding to pressure on an non-internal node
+        //will have value 0
+        for(unsigned i=3; i<6; i++)
         {
-            for(unsigned j=12; j<15; j++)
+            for(unsigned j=0; j<18; j++)
             {
-                correct_matrix(i,j) = 3.0*0.5; // 0.5 is area of triangle
-                correct_matrix(j,i) = 3.0*0.5; // 0.5 is area of triangle
-            }
-        }
-
-        for(unsigned i=12; i<15; i++)
-        {
-            for(unsigned j=12; j<15; j++)
-            {
-                correct_matrix(i,j) = 4.0*0.5; // 0.5 is area of triangle
+                correct_matrix(3*i+2,j) = 0.0;
+                correct_matrix(j,3*i+2) = 0.0;
             }
         }
 
@@ -338,7 +351,7 @@ public:
         MatGetOwnershipRange(mat, &lo, &hi);
         for (unsigned i=lo; i<(unsigned)hi; i++)
         {
-            for(unsigned j=0; j<15; j++)
+            for(unsigned j=0; j<18; j++)
             {
                 TS_ASSERT_DELTA( PetscMatTools::GetElement(mat,i,j), correct_matrix(i,j), 1e-8 );
             }
@@ -355,9 +368,9 @@ public:
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/3D_Single_tetrahedron_element_quadratic",2,1,false);
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        Vec vec = PetscTools::CreateVec(3*mesh.GetNumNodes()+mesh.GetNumVertices());
+        Vec vec = PetscTools::CreateVec(4*mesh.GetNumNodes());
         Mat mat;
-        PetscTools::SetupMat(mat, 3*mesh.GetNumNodes()+mesh.GetNumVertices(), 3*mesh.GetNumNodes()+mesh.GetNumVertices(), 3*mesh.GetNumNodes()+mesh.GetNumVertices());
+        PetscTools::SetupMat(mat, 4*mesh.GetNumNodes(), 4*mesh.GetNumNodes(), 4*mesh.GetNumNodes());
 
         double vol = mesh.GetVolume(); // volume of element equals volume of mesh
 
@@ -368,39 +381,55 @@ public:
         PetscMatTools::Finalise(mat);
 
         ReplicatableVector vec_repl(vec);
-        for(unsigned i=0; i<30; i++)
+
+        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            TS_ASSERT_DELTA( vec_repl[i], 111.0, 1e-8 );
+            TS_ASSERT_DELTA( vec_repl[4*i  ], 111, 1e-8 );
+            TS_ASSERT_DELTA( vec_repl[4*i+1], 111, 1e-8 );
+            TS_ASSERT_DELTA( vec_repl[4*i+2], 111, 1e-8 );
         }
-        for(unsigned i=30; i<34; i++)
+        for(unsigned i=0; i<mesh.GetNumVertices(); i++)
         {
-            TS_ASSERT_DELTA( vec_repl[i], 222.0, 1e-8 );
+            TS_ASSERT_DELTA( vec_repl[4*i+3], 222, 1e-8 );
         }
 
-
-        c_matrix<double,34,34> correct_matrix;
-        for(unsigned i=0; i<30; i++)
+        c_matrix<double,40,40> correct_matrix;
+        // set up correct matrix: disp-disp entries have value 5, disp-pressure entries
+        // have val 10, and pressure-pressure entries have value 15....
+        for(unsigned i=0; i<10; i++)
         {
-            for(unsigned j=0; j<30; j++)
+            for(unsigned j=0; j<10; j++)
             {
-                correct_matrix(i,j) = 5.0;
+                correct_matrix(4*i,  4*j)   = 5;
+                correct_matrix(4*i+1,4*j)   = 5;
+                correct_matrix(4*i+2,4*j)   = 5;
+                correct_matrix(4*i,  4*j+1) = 5;
+                correct_matrix(4*i+1,4*j+1) = 5;
+                correct_matrix(4*i+2,4*j+1) = 5;
+                correct_matrix(4*i,  4*j+2) = 5;
+                correct_matrix(4*i+1,4*j+2) = 5;
+                correct_matrix(4*i+2,4*j+2) = 5;
+
+                correct_matrix(4*i,  4*j+3) = 10;
+                correct_matrix(4*i+1,4*j+3) = 10;
+                correct_matrix(4*i+2,4*j+3) = 10;
+
+                correct_matrix(4*i+3,4*j)   = 10;
+                correct_matrix(4*i+3,4*j+1) = 10;
+                correct_matrix(4*i+3,4*j+2) = 10;
+
+                correct_matrix(4*i+3,4*j+3) = 15;
             }
         }
 
-        for(unsigned i=0; i<30; i++)
+        //...except for the fact that any entry corresponding to pressure on an non-internal node
+        //will have value 0
+        for(unsigned i=4; i<10; i++)
         {
-            for(unsigned j=30; j<34; j++)
+            for(unsigned j=0; j<40; j++)
             {
-                correct_matrix(i,j) = 10.0;
-                correct_matrix(j,i) = 10.0;
-            }
-        }
-
-        for(unsigned i=30; i<34; i++)
-        {
-            for(unsigned j=30; j<34; j++)
-            {
-                correct_matrix(i,j) = 15.0;
+                correct_matrix(4*i+3,j) = 0.0;
+                correct_matrix(j,4*i+3) = 0.0;
             }
         }
 
@@ -430,7 +459,7 @@ public:
         assert(quadratic_mesh.GetNumVertices()==linear_mesh.GetNumNodes());
 
         Mat mat1;
-        PetscTools::SetupMat(mat1, 2*quadratic_mesh.GetNumNodes()+quadratic_mesh.GetNumVertices(), 2*quadratic_mesh.GetNumNodes()+quadratic_mesh.GetNumVertices(), 22);
+        PetscTools::SetupMat(mat1, 3*quadratic_mesh.GetNumNodes(), 3*quadratic_mesh.GetNumNodes(), 27);
         MyMatrixAssembler<2> assembler(&quadratic_mesh);
         assembler.SetMatrixToAssemble(mat1, true);
         assembler.Assemble();
@@ -464,11 +493,12 @@ public:
         MatGetOwnershipRange(mat1, &lo, &hi);
         for (unsigned i=lo; i<(unsigned)hi; i++)
         {
-            for(unsigned j=0; j<22; j++)
+            for(unsigned j=0; j<3*quadratic_mesh.GetNumNodes(); j++)
             {
-                if(i>=18 && j>=18)
+                if(i%3==2 && j%3==2 && (i-2)/3<4 && (j-2)/3<4) // the pressure-pressure block, excl pressure values at non-vertices
                 {
-                    TS_ASSERT_DELTA( PetscMatTools::GetElement(mat1,i,j), correct_matrix[i-18][j-18], 1e-5 );
+
+                    TS_ASSERT_DELTA( PetscMatTools::GetElement(mat1,i,j), correct_matrix[(i-2)/3][(j-2)/3], 1e-5 );
                 }
                 else
                 {

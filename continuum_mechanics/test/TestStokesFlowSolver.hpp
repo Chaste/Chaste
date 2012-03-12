@@ -63,8 +63,6 @@ public:
      */
     void TestStokesWithDirichletVerySimple() throw(Exception)
     {
-        EXIT_IF_PARALLEL; // defined in PetscTools
-
         for (unsigned run=0; run<2; run++)
         {
             // Set up a mesh on [0 1]x[0 1]
@@ -137,8 +135,6 @@ public:
      */
     void TestStokesWithImposedPipeCondition() throw(Exception)
     {
-        EXIT_IF_PARALLEL; // defined in PetscTools
-
         // Note: we could have num_elem=1 and test still pass, as FE solution is the same as the true
         // solution (analytic soln is in the FE space, ignoring linear solve errors. In fact, with
         // num_elem=1, the linear solve doesn't require the tolerance line below to be accurate
@@ -224,8 +220,6 @@ public:
      */
     void TestPoiseuilleFlow() throw(Exception)
     {
-        EXIT_IF_PARALLEL; // defined in PetscTools
-
         // set up a mesh on [0 1]x[0 1]
         unsigned num_elem = 10;
         QuadraticMesh<2> mesh(1.0/num_elem, 1.0, 1.0);
@@ -293,7 +287,7 @@ public:
 
         StokesFlowSolver<2> solver(mesh, problem_defn, "PoiseuilleFlow");
 
-        solver.SetKspAbsoluteTolerance(1e-8);
+        solver.SetKspAbsoluteTolerance(1e-10);
 
         solver.Solve();
 
@@ -330,8 +324,6 @@ public:
      */
     void TestConvergenceWithAnalyticSolution() throw(Exception)
     {
-        EXIT_IF_PARALLEL; // defined in PetscTools
-
         unsigned num_runs = 4;
         std::vector<double> L_inf_error_flow(num_runs, -1.0);
         std::vector<double> L_inf_error_p(num_runs, -1.0);
@@ -453,8 +445,6 @@ public:
      */
     void TestStokesWithLidCavity() throw(Exception)
     {
-        EXIT_IF_PARALLEL; // defined in PetscTools
-
         // Set up a mesh on [-1 1]x[-1 1]
         unsigned num_elem = 5;
         QuadraticMesh<2> mesh(2.0/num_elem, 2.0, 2.0);

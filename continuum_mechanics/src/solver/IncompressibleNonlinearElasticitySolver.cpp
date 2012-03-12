@@ -107,22 +107,18 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleSystem(bool assembleR
             {
                 for (unsigned j=0; j<DIM; j++)
                 {
-                    p_indices[DIM*i+j] = DIM*element.GetNodeGlobalIndex(i) + j;
+                    // note: DIM+1 is the problem dimension (= this->mProblemDimension)
+                    p_indices[DIM*i+j] = (DIM+1)*element.GetNodeGlobalIndex(i) + j;
                 }
             }
 
             for (unsigned i=0; i<NUM_VERTICES_PER_ELEMENT; i++)
             {
-                // At the moment we assume the vertices are the first num_vertices nodes in the list of nodes
-                // in the mesh. Hence:
+                // We assume the vertices are the first num_vertices nodes in the list of nodes
+                // in the element. Hence:
                 unsigned vertex_index = element.GetNodeGlobalIndex(i);
-                assert(vertex_index < this->mrQuadMesh.GetNumVertices());
-
-                // In the future (or currently with AlexW's adaptive quadratic mesh class (project work)), we
-                // will want to use this instead:
-                //unsigned vertex_index = this->mrQuadMesh.GetVertexIndexOfNode(element.GetNodeGlobalIndex(i));
-
-                p_indices[DIM*NUM_NODES_PER_ELEMENT + i] = DIM*this->mrQuadMesh.GetNumNodes() + vertex_index;
+                // note: DIM+1 is the problem dimension (= this->mProblemDimension)
+                p_indices[DIM*NUM_NODES_PER_ELEMENT + i] = (DIM+1)*vertex_index + DIM;
             }
 
             if (assembleJacobian)
@@ -153,13 +149,15 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleSystem(bool assembleR
             {
                 for (unsigned j=0; j<DIM; j++)
                 {
-                    p_indices[DIM*i+j] = DIM*r_boundary_element.GetNodeGlobalIndex(i) + j;
+                    // note: DIM+1, on the right hand side of the below, is the problem dimension (= this->mProblemDimension)
+                    p_indices[DIM*i+j] = (DIM+1)*r_boundary_element.GetNodeGlobalIndex(i) + j;
                 }
             }
 
             for (unsigned i=0; i<DIM /*vertices per boundary elem */; i++)
             {
-                p_indices[DIM*NUM_NODES_PER_BOUNDARY_ELEMENT + i] = DIM*this->mrQuadMesh.GetNumNodes() + r_boundary_element.GetNodeGlobalIndex(i);
+                // note: DIM+1, on the right hand side of the below, is the problem dimension (= this->mProblemDimension)
+                p_indices[DIM*NUM_NODES_PER_BOUNDARY_ELEMENT + i] = (DIM+1)*r_boundary_element.GetNodeGlobalIndex(i) + DIM;//  DIM*this->mrQuadMesh.GetNumNodes() + r_boundary_element.GetNodeGlobalIndex(i);
             }
 
             if (assembleJacobian)
@@ -181,6 +179,26 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleSystem(bool assembleR
                 assert(b_boundary_elem(7)==0);
             }
         }
+    }
+
+
+    if (assembleResidual)
+    {
+        PetscVecTools::Finalise(this->mResidualVector);
+    }
+    if (assembleJacobian)
+    {
+        PetscMatTools::SwitchWriteMode(this->mrJacobianMatrix);
+        PetscMatTools::SwitchWriteMode(this->mPreconditionMatrix);
+    }
+
+    if(assembleJacobian)
+    {
+       this->AddIdentityBlockForDummyPressureVariables(NONLINEAR_PROBLEM_APPLY_TO_EVERYTHING, false);
+    }
+    else if (assembleResidual)
+    {
+       this->AddIdentityBlockForDummyPressureVariables(NONLINEAR_PROBLEM_APPLY_TO_RESIDUAL_ONLY, false);
     }
 
     this->FinishAssembleSystem(assembleResidual, assembleJacobian);
@@ -219,7 +237,8 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
     {
         for (unsigned JJ=0; JJ<DIM; JJ++)
         {
-            element_current_displacements(JJ,II) = this->mCurrentSolution[DIM*rElement.GetNodeGlobalIndex(II) + JJ];
+            // note: DIM+1, on the right hand side of the below, is the problem dimension (= this->mProblemDimension)
+            element_current_displacements(JJ,II) = this->mCurrentSolution[(DIM+1)*rElement.GetNodeGlobalIndex(II) + JJ];
         }
     }
 
@@ -235,7 +254,8 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
         // will want to use this instead:
         //unsigned vertex_index = this->mrQuadMesh.GetVertexIndexOfNode( rElement.GetNodeGlobalIndex(II) );
 
-        element_current_pressures(II) = this->mCurrentSolution[DIM*this->mrQuadMesh.GetNumNodes() + vertex_index];
+        // note: DIM+1, on the right hand side of the below, is the problem dimension (= this->mProblemDimension)
+        element_current_pressures(II) = this->mCurrentSolution[(DIM+1)*vertex_index + DIM];
     }
 
     // Allocate memory for the basis functions values and derivative values
@@ -564,7 +584,8 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElement(
         {
             for (unsigned JJ=0; JJ<DIM; JJ++)
             {
-                element_current_displacements[II](JJ) = this->mCurrentSolution[DIM*rBoundaryElement.GetNodeGlobalIndex(II) + JJ];
+                // note: DIM+1 is the problem dimension (= this->mProblemDimension)
+                element_current_displacements[II](JJ) = this->mCurrentSolution[(DIM+1)*rBoundaryElement.GetNodeGlobalIndex(II) + JJ];
             }
         }
 
@@ -648,19 +669,17 @@ void IncompressibleNonlinearElasticitySolver<DIM>::FormInitialGuess()
         // Loop over vertices and set pressure solution to be zero-strain-pressure
         for (unsigned j=0; j<NUM_VERTICES_PER_ELEMENT; j++)
         {
-            // At the moment we assume the vertices are the first num_vertices nodes in the list of nodes
-            // in the mesh. Hence:
+            // We assume the vertices are the first num_vertices nodes in the list of nodes
+            // in the element. Hence:
             unsigned vertex_index = this->mrQuadMesh.GetElement(i)->GetNodeGlobalIndex(j);
-            assert(vertex_index < this->mrQuadMesh.GetNumVertices());
-
-            // In the future (or currently with AlexW's adaptive quadratic mesh class (project work)), we
-            // will want to use this instead:
-            //unsigned vertex_index = this->mrQuadMesh.GetVertexIndexOfNode(this->mrQuadMesh.GetElement(i)->GetNodeGlobalIndex(j));
-
-            this->mCurrentSolution[ DIM*this->mrQuadMesh.GetNumNodes() + vertex_index ] = zero_strain_pressure;
+            // note: DIM+1 is the problem dimension (= this->mProblemDimension)
+            this->mCurrentSolution[ (DIM+1)*vertex_index + DIM ] = zero_strain_pressure;
         }
     }
 }
+
+
+
 
 template<size_t DIM>
 IncompressibleNonlinearElasticitySolver<DIM>::IncompressibleNonlinearElasticitySolver(
@@ -680,19 +699,6 @@ IncompressibleNonlinearElasticitySolver<DIM>::IncompressibleNonlinearElasticityS
     FormInitialGuess();
 }
 
-
-template<size_t DIM>
-std::vector<double>& IncompressibleNonlinearElasticitySolver<DIM>::rGetPressures()
-{
-    mPressures.clear();
-    mPressures.resize(this->mrQuadMesh.GetNumVertices());
-
-    for (unsigned i=0; i<this->mrQuadMesh.GetNumVertices(); i++)
-    {
-        mPressures[i] = this->mCurrentSolution[DIM*this->mrQuadMesh.GetNumNodes() + i];
-    }
-    return mPressures;
-}
 
 //////////////////////////////////////////////////////////////////////
 // Explicit instantiation

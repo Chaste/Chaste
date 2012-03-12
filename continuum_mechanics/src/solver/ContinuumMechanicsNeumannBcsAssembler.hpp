@@ -148,9 +148,9 @@ void ContinuumMechanicsNeumannBcsAssembler<DIM>::DoAssemble()
         EXCEPTION("Vector to be assembled has not been set");
     }
 
-    if( PetscVecTools::GetSize(this->mVectorToAssemble) != DIM*mpMesh->GetNumNodes()+mpMesh->GetNumVertices() )
+    if( PetscVecTools::GetSize(this->mVectorToAssemble) != (DIM+1)*mpMesh->GetNumNodes() )
     {
-        EXCEPTION("Vector provided to be assembled has size " << PetscVecTools::GetSize(this->mVectorToAssemble) << ", not expected size of " << DIM*mpMesh->GetNumNodes()+mpMesh->GetNumVertices() << " (dim*num_nodes+num_vertices)");
+        EXCEPTION("Vector provided to be assembled has size " << PetscVecTools::GetSize(this->mVectorToAssemble) << ", not expected size of " << (DIM+1)*mpMesh->GetNumNodes() << " ((dim+1)*num_nodes)");
     }
 
     // Zero the matrix/vector if it is to be assembled
@@ -174,14 +174,14 @@ void ContinuumMechanicsNeumannBcsAssembler<DIM>::DoAssemble()
             {
                 for (unsigned j=0; j<DIM; j++)
                 {
-                    p_indices[DIM*i+j] = DIM*r_boundary_element.GetNodeGlobalIndex(i) + j;
+                    p_indices[DIM*i+j] = (DIM+1)*r_boundary_element.GetNodeGlobalIndex(i) + j;
                 }
             }
             // Note: The pressure block of b_elem will be zero, but this bit still needs to be
             // set to avoid memory leaks.
             for (unsigned i=0; i<DIM /*vertices per boundary elem */; i++)
             {
-                p_indices[DIM*NUM_NODES_PER_ELEMENT + i] = DIM*mpMesh->GetNumNodes() + r_boundary_element.GetNodeGlobalIndex(i);
+                p_indices[DIM*NUM_NODES_PER_ELEMENT + i] = (DIM+1)*r_boundary_element.GetNodeGlobalIndex(i)+DIM;
             }
 
             PetscVecTools::AddMultipleValues<STENCIL_SIZE>(this->mVectorToAssemble, p_indices, b_elem);

@@ -134,16 +134,6 @@ public:
             }
         }
         PetscTools::Barrier("TestCompareJacobians");
-
-//// default no longer allowed
-//        // coverage - test default material law works ok
-//        IncompressibleImplicitSolver2d another_solver(NHS, mesh,"",fixed_nodes);
-//        c_matrix<double,2,2> F = zero_matrix<double>(2,2);
-//        F(0,0)=F(1,1)=1.1;
-//        double pressure = 1;
-//        c_matrix<double,2,2> S;
-//        another_solver.mMaterialLaws[0]->Compute1stPiolaKirchoffStress(F,pressure,S);
-//        TS_ASSERT_DELTA(S(0,0), 1.5805, 1e-3);
     }
 
     // A test where we specify the 'resting' intracellular calcium concentration
@@ -181,6 +171,8 @@ public:
     // as it should do. Also has hardcoded tests
     void TestSpecifiedCalciumCompression() throw(Exception)
     {
+        EXIT_IF_PARALLEL; // see #1828
+
         // NOTE: test hardcoded for num_elem = 4
         QuadraticMesh<2> mesh(0.25, 1.0, 1.0);
         MooneyRivlinMaterialLaw<2> law(0.02);
@@ -275,6 +267,10 @@ public:
     // The stretches should be identical to in the above test, the deformation rotated.
     void TestDifferentFibreDirections() throw(Exception)
     {
+        EXIT_IF_PARALLEL; // see #1828
+
+
+
         for (unsigned run=1; run<=2; run++)
         {
             // NOTE: test hardcoded for num_elem = 4
@@ -411,7 +407,8 @@ public:
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             unsigned j=1;
-            solver.mCurrentSolution[2*i+j] = -0.1*mesh.GetNode(i)->rGetLocation()[j];
+            // note: the 3 here is DIM+1, the problem dim for incompressible problems
+            solver.mCurrentSolution[3*i+j] = -0.1*mesh.GetNode(i)->rGetLocation()[j];
         }
 
         // stretches should still be 1, F should be equal to [1,0;0,0.9]
@@ -430,7 +427,8 @@ public:
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             unsigned j=0;
-            solver.mCurrentSolution[2*i+j] = -0.2*mesh.GetNode(i)->rGetLocation()[j];
+            // note: the 3 here is DIM+1, the problem dim for incompressible problems
+            solver.mCurrentSolution[3*i+j] = -0.2*mesh.GetNode(i)->rGetLocation()[j];
         }
 
         // stretches should now be 0.8, F should be equal to [0.8,0;0,0.9]
@@ -449,6 +447,8 @@ public:
     // varying fibre directions per quad point.
     void TestDefineFibresPerQuadraturePoint()
     {
+        EXIT_IF_PARALLEL; // see #1828
+
         QuadraticMesh<2> mesh(0.25, 1.0, 1.0);
         MooneyRivlinMaterialLaw<2> law(0.02);
 

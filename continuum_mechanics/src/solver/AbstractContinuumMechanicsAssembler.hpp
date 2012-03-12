@@ -323,9 +323,9 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
         {
             EXCEPTION("Matrix to be assembled has not been set");
         }
-        if( PetscMatTools::GetSize(this->mMatrixToAssemble) != DIM*mpMesh->GetNumNodes()+mpMesh->GetNumVertices() )
+        if( PetscMatTools::GetSize(this->mMatrixToAssemble) != (DIM+1)*mpMesh->GetNumNodes() )
         {
-            EXCEPTION("Matrix provided to be assembled has size " << PetscMatTools::GetSize(this->mMatrixToAssemble) << ", not expected size of " << DIM*mpMesh->GetNumNodes()+mpMesh->GetNumVertices() << " (dim*num_nodes+num_vertices)");
+            EXCEPTION("Matrix provided to be assembled has size " << PetscMatTools::GetSize(this->mMatrixToAssemble) << ", not expected size of " << (DIM+1)*mpMesh->GetNumNodes() << " ((dim+1)*num_nodes)");
         }
     }
 
@@ -335,9 +335,9 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
         {
             EXCEPTION("Vector to be assembled has not been set");
         }
-        if( PetscVecTools::GetSize(this->mVectorToAssemble) != DIM*mpMesh->GetNumNodes()+mpMesh->GetNumVertices() )
+        if( PetscVecTools::GetSize(this->mVectorToAssemble) != (DIM+1)*mpMesh->GetNumNodes() )
         {
-            EXCEPTION("Vector provided to be assembled has size " << PetscVecTools::GetSize(this->mVectorToAssemble) << ", not expected size of " << DIM*mpMesh->GetNumNodes()+mpMesh->GetNumVertices() << " (dim*num_nodes+num_vertices)");
+            EXCEPTION("Vector provided to be assembled has size " << PetscVecTools::GetSize(this->mVectorToAssemble) << ", not expected size of " << (DIM+1)*mpMesh->GetNumNodes() << " ((dim+1)*num_nodes)");
         }
     }
 
@@ -375,13 +375,14 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
             {
                 for (unsigned j=0; j<DIM; j++)
                 {
-                    p_indices[DIM*i+j] = DIM*r_element.GetNodeGlobalIndex(i) + j;
+                    // DIM+1 on the right-hand side here is the problem dimension
+                    p_indices[DIM*i+j] = (DIM+1)*r_element.GetNodeGlobalIndex(i) + j;
                 }
             }
 
             for (unsigned i=0; i<NUM_VERTICES_PER_ELEMENT; i++)
             {
-                p_indices[DIM*NUM_NODES_PER_ELEMENT + i] = DIM*mpMesh->GetNumNodes() + r_element.GetNodeGlobalIndex(i);
+                p_indices[DIM*NUM_NODES_PER_ELEMENT + i] = (DIM+1)*r_element.GetNodeGlobalIndex(i)+DIM;
             }
 
             if (this->mMatrixToAssemble)

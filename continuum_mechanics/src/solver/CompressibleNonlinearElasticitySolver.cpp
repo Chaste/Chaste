@@ -91,6 +91,13 @@ void CompressibleNonlinearElasticitySolver<DIM>::AssembleSystem(bool assembleRes
 
         if (element.GetOwnership() == true)
         {
+            #ifdef MECH_VERY_VERBOSE
+            if (assembleJacobian) // && ((*iter).GetIndex()%500==0))
+            {
+                std::cout << "\r[" << PetscTools::GetMyRank() << "]: Element " << (*iter).GetIndex() << " of " << this->mrQuadMesh.GetNumElements() << std::flush;
+            }
+            #endif
+
             AssembleOnElement(element, a_elem, a_elem_precond, b_elem, assembleResidual, assembleJacobian);
 
             //// todo: assemble quickly by commenting the AssembleOnElement() and doing
@@ -125,6 +132,13 @@ void CompressibleNonlinearElasticitySolver<DIM>::AssembleSystem(bool assembleRes
             }
         }
     }
+
+//    if(assembleJacobian)
+//    {
+//       // PetscMatTools::Finalise(this->mrJacobianMatrix);
+//       // PetscMatTools::Display(this->mrJacobianMatrix);
+//        assert(0);
+//    }
 
     // Loop over specified boundary elements and compute surface traction terms
     c_vector<double, BOUNDARY_STENCIL_SIZE> b_boundary_elem;

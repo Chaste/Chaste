@@ -66,8 +66,6 @@ public:
      */
     void TestAssembler()  throw(Exception)
     {
-        EXIT_IF_PARALLEL; // defined in PetscTools
-
         QuadraticMesh<2> mesh;
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/canonical_triangle_quadratic", 2, 2, false);
         mesh.ConstructFromMeshReader(mesh_reader);
@@ -85,9 +83,9 @@ public:
 
         StokesFlowAssembler<2> assembler(&mesh, &problem_defn);
 
-        Vec vec = PetscTools::CreateVec(15);
+        Vec vec = PetscTools::CreateVec(18);
         Mat mat;
-        PetscTools::SetupMat(mat, 15, 15, 15);
+        PetscTools::SetupMat(mat, 18, 18, 18);
 
         assembler.SetVectorToAssemble(vec, true);
         assembler.SetMatrixToAssemble(mat, true);
@@ -121,42 +119,41 @@ public:
                             { -1.0/6.0, -1.0/3.0, -1.0/6.0},
                           };
 
-        c_matrix<double,15,15> exact_ael = zero_matrix<double>(15);
+        c_matrix<double,18,18> exact_A = zero_matrix<double>(18);
 
         // The diagonal 6x6 blocks
         for (unsigned i=0; i<6; i++)
         {
             for (unsigned j=0; j<6; j++)
             {
-                exact_ael(2*i,  2*j)   = mu*A[i][j];
-                exact_ael(2*i+1,2*j+1) = mu*A[i][j];
+                exact_A(3*i,  3*j)   = mu*A[i][j];
+                exact_A(3*i+1,3*j+1) = mu*A[i][j];
             }
         }
+
 
         // The 6x3 Blocks
         for (unsigned i=0; i<6; i++)
         {
             for (unsigned j=0; j<3; j++)
             {
-                exact_ael(2*i,12+j)   = -Bx[i][j];
-                exact_ael(2*i+1,12+j) = -By[i][j];
+                exact_A(3*i,3*j+2)   = -Bx[i][j];
+                exact_A(3*i+1,3*j+2) = -By[i][j];
                 //- as -Div(U)=0
-                exact_ael(12+j,2*i)   = -Bx[i][j];
-                exact_ael(12+j,2*i+1) = -By[i][j];
+                exact_A(3*j+2,3*i)   = -Bx[i][j];
+                exact_A(3*j+2,3*i+1) = -By[i][j];
             }
         }
-
 
         int lo, hi;
         MatGetOwnershipRange(mat, &lo, &hi);
         for (unsigned i=lo; i<(unsigned)hi; i++)
         {
-            for (unsigned j=0; j<15; j++)
+            for (unsigned j=0; j<18; j++)
             {
-                TS_ASSERT_DELTA(PetscMatTools::GetElement(mat,i,j), exact_ael(i,j), 1e-9);
+                TS_ASSERT_DELTA(PetscMatTools::GetElement(mat,i,j), exact_A(i,j), 1e-9);
             }
         }
-
         ReplicatableVector vec_repl(vec);
 
         // The first 6 entries in the vector correspond to nodes 0, 1, 2, i.e. the vertices.
@@ -165,8 +162,8 @@ public:
         // i-th QUADRATIC basis.
         for(unsigned i=0; i<3; i++)
         {
-            TS_ASSERT_DELTA(vec_repl[2*i],   g1*0.0, 1e-8);
-            TS_ASSERT_DELTA(vec_repl[2*i+1], g2*0.0, 1e-8);
+            TS_ASSERT_DELTA(vec_repl[3*i],   g1*0.0, 1e-8);
+            TS_ASSERT_DELTA(vec_repl[3*i+1], g2*0.0, 1e-8);
         }
 
         // The next 6 entries in the vector correspond to nodes 3, 4, 5, i.e. the internal edges.
@@ -175,15 +172,17 @@ public:
         // i-th QUADRATIC basis.
         for(unsigned i=3; i<6; i++)
         {
-            TS_ASSERT_DELTA(vec_repl[2*i],   g1/6.0, 1e-8);
-            TS_ASSERT_DELTA(vec_repl[2*i+1], g2/6.0, 1e-8);
+            TS_ASSERT_DELTA(vec_repl[3*i],   g1/6.0, 1e-8);
+            TS_ASSERT_DELTA(vec_repl[3*i+1], g2/6.0, 1e-8);
         }
 
         // The pressure-block of the RHS vector should be zero.
-        TS_ASSERT_DELTA(vec_repl[12], 0.0, 1e-9);
-        TS_ASSERT_DELTA(vec_repl[13], 0.0, 1e-9);
+        TS_ASSERT_DELTA(vec_repl[2], 0.0, 1e-9);
+        TS_ASSERT_DELTA(vec_repl[5], 0.0, 1e-9);
+        TS_ASSERT_DELTA(vec_repl[8], 0.0, 1e-9);
+        TS_ASSERT_DELTA(vec_repl[11], 0.0, 1e-9);
         TS_ASSERT_DELTA(vec_repl[14], 0.0, 1e-9);
-
+        TS_ASSERT_DELTA(vec_repl[17], 0.0, 1e-9);
 
         // Replace the body force with a functional body force (see MyBodyForce) above, and
         // assemble the vector again. This bit isn't so much to test the vector, but
@@ -191,15 +190,16 @@ public:
         // and passed into the force function - see asserts in MyBodyForce.
         mesh.Translate(0.5, 0.8);
 
-        assembler.SetVectorToAssemble(vec, true);
+        Vec vec2 = PetscTools::CreateVec(18);
+        assembler.SetVectorToAssemble(vec2, true);
         problem_defn.SetBodyForce(MyBodyForce);
         assembler.Assemble();
 
-        ReplicatableVector vec_repl2(vec);
+        ReplicatableVector vec_repl2(vec2);
         for(unsigned i=3; i<6; i++)
         {
-            TS_ASSERT_DELTA(vec_repl2[2*i],   10.0/6.0, 1e-8);
-            TS_ASSERT_DELTA(vec_repl2[2*i+1], 20.0/6.0, 1e-8);
+            TS_ASSERT_DELTA(vec_repl2[3*i],   10.0/6.0, 1e-8);
+            TS_ASSERT_DELTA(vec_repl2[3*i+1], 20.0/6.0, 1e-8);
         }
 
         PetscTools::Destroy(vec);

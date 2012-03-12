@@ -84,10 +84,6 @@ protected:
     /** Boundary stencil size. */
     static const size_t BOUNDARY_STENCIL_SIZE = DIM*NUM_NODES_PER_BOUNDARY_ELEMENT + DIM;
 
-    /**
-     * The solution pressures. mPressures[i] = pressure at node i (ie vertex i).
-     */
-    std::vector<double> mPressures;
 
     /**
      * Assemble residual or Jacobian on an element, using the current solution
@@ -185,11 +181,6 @@ public:
     ~IncompressibleNonlinearElasticitySolver()
     {
     }
-
-    /**
-     * Get pressures for each vertex.
-     */
-    std::vector<double>& rGetPressures();
 };
 
 #endif /*INCOMPRESSIBLENONLINEARELASTICITYSOLVER_HPP_*/

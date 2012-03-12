@@ -162,8 +162,6 @@ public:
      */
     void TestAssembleSystem3D() throw (Exception)
     {
-        EXIT_IF_PARALLEL; // #1913 currently, the compressible preconditioner is ICC, which is only supported in sequential
-
         QuadraticMesh<3> mesh;
         TrianglesMeshReader<3,3> mesh_reader1("mesh/test/data/3D_Single_tetrahedron_element_quadratic",2,1,false);
 
@@ -196,8 +194,6 @@ public:
     // Jacobian
     void TestAssembleSystem() throw (Exception)
     {
-        EXIT_IF_PARALLEL; // #1913 currently, the compressible preconditioner is ICC, which is only supported in sequential
-
         QuadraticMesh<2> mesh(1.0/2, 1.0, 1.0);
         CompressibleExponentialLaw<2> law;
 
@@ -337,8 +333,6 @@ public:
     // It just tests that nothing happens if zero force and tractions are given
     void TestWithZeroDisplacement() throw(Exception)
     {
-        EXIT_IF_PARALLEL; // #1913 currently, the compressible preconditioner is ICC, which is only supported in sequential
-
         QuadraticMesh<2> mesh;
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic",2,1,false);
         mesh.ConstructFromMeshReader(mesh_reader);
@@ -396,9 +390,6 @@ public:
      */
     void TestSolveForSimpleDeformationWithCompMooneyRivlin() throw(Exception)
     {
-        EXIT_IF_PARALLEL; // #1913 currently, the compressible preconditioner is ICC, which is only supported in sequential
-
-
         double c = 2.2;
         double d = 1.1;
         double alpha = 0.9;
@@ -504,8 +495,6 @@ public:
      */
     void TestAgainstExactNonlinearSolution() throw(Exception)
     {
-        EXIT_IF_PARALLEL; // #1913 currently, the compressible preconditioner is ICC, which is only supported in sequential
-
         unsigned num_elem = 10;
         QuadraticMesh<2> mesh(1.0/num_elem, 1.0, 1.0);
 
@@ -584,7 +573,16 @@ public:
         c_matrix<double,8,8> a_elem_incompressible;
         c_vector<double,8> b_elem_incompressible;
 
-        incompressible_solver.mCurrentSolution = solver.mCurrentSolution;
+        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        {
+            // spatial variables
+            for(unsigned j=0; j<2; j++)
+            {
+                incompressible_solver.mCurrentSolution[3*i+j] = solver.mCurrentSolution[2*i+j];
+            }
+            // pressure variable
+            incompressible_solver.mCurrentSolution[3*i+2] = 0.0;
+        }
 
         incompressible_solver.AssembleOnBoundaryElement(*(boundary_elems[0]), a_elem_incompressible, b_elem_incompressible, true, false, 0);
 
@@ -598,8 +596,7 @@ public:
 
     void TestCheckPositiveDefinitenessOfJacobianMatrix() throw(Exception)
     {
-        EXIT_IF_PARALLEL; // #1913 currently, the compressible preconditioner is ICC, which is only supported in sequential
-
+        EXIT_IF_PARALLEL; // deadlocks for some reason.. Fix if possible but given nature of test not a problem if only runs in sequential
 
         unsigned num_elem = 10;
 
@@ -619,21 +616,32 @@ public:
         solver.AssembleSystem(true,true);
         unsigned N = solver.mNumDofs;
 
-        Vec test_vec = PetscTools::CreateAndSetVec(N, 0.0);
-        Vec product_vec = PetscTools::CreateAndSetVec(N, 0.0);
+        // create some vectors, but make sure they have the same ownership range as
+        // the Jacobian matrix
+        Vec test_vec;
+        VecDuplicate(solver.mResidualVector, &test_vec);
+        Vec product_vec;
+        VecDuplicate(solver.mResidualVector, &product_vec);
+        PetscVecTools::Zero(test_vec);
+        PetscVecTools::Zero(product_vec);
+
+        int lo, hi;
+        VecGetOwnershipRange(test_vec, &lo, &hi);
 
         for(unsigned i=0; i<N; i++)
         {
-            PetscVecTools::SetElement(test_vec, i, 1.0);
+            if(int(i)<=lo && int(i)<hi)
+            {
+                PetscVecTools::SetElement(test_vec, i, 1.0);
 
-            MatMult(solver.mrJacobianMatrix,test_vec,product_vec);
-            double vT_J_v;
-            VecDot(product_vec, test_vec, &vT_J_v);
-            //std::cout << vT_J_v << " ";
-            TS_ASSERT_LESS_THAN(0.0, vT_J_v);
+                MatMult(solver.mrJacobianMatrix,test_vec,product_vec);
+                double vT_J_v = 0.0;
+                VecDot(product_vec, test_vec, &vT_J_v);
+                //std::cout << vT_J_v << " ";
+                TS_ASSERT_LESS_THAN(0.0, vT_J_v);
 
-            PetscVecTools::SetElement(test_vec, i, 0.0);
-
+                PetscVecTools::SetElement(test_vec, i, 0.0);
+            }
         }
 
         PetscTools::Destroy(test_vec);
@@ -644,7 +652,7 @@ public:
     // solver converges. Doesn't seem very robust.
     void TestSolveForSimpleDeformationWithExponentialLaw() throw(Exception)
     {
-        EXIT_IF_PARALLEL; // #1913 currently, the compressible preconditioner is ICC, which is only supported in sequential
+        EXIT_IF_PARALLEL; ///\todo #1828 diverges in parallel - fix
 
         unsigned num_elem = 5;
 
@@ -690,8 +698,6 @@ public:
      */
     void TestSolveUsingSlidingBoundaryConditions2d() throw(Exception)
     {
-        EXIT_IF_PARALLEL; // #1913 currently, the compressible preconditioner is ICC, which is only supported in sequential
-
         double c = 2.2;
         double d = 1.1;
         double alpha = 0.9;
@@ -788,8 +794,6 @@ public:
     // 3d sliding boundary conditions test
     void TestSolveUsingSlidingBoundaryConditions3d() throw(Exception)
     {
-        EXIT_IF_PARALLEL; // #1913 currently, the compressible preconditioner is ICC, which is only supported in sequential
-
         unsigned num_elem = 2;
 
         QuadraticMesh<3> mesh(1.0/num_elem, 1.0, 1.0, 1.0);
@@ -850,8 +854,6 @@ public:
 
     void TestWritingStrain() throw(Exception)
     {
-        EXIT_IF_PARALLEL; // #1913 currently, the compressible preconditioner is ICC, which is only supported in sequential
-
         QuadraticMesh<2> mesh(1.0, 1.0, 1.0);
 
         CompressibleMooneyRivlinMaterialLaw<2> law(1.0, 1.0);
@@ -903,7 +905,6 @@ public:
 
         solver.WriteCurrentDeformationGradients("shear_2d",0);
 
-
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
         std::string command = "diff " + test_output_directory
                               + "/TestWritingStrain/shear_2d_0.strain continuum_mechanics/test/data/shear_2d_0.strain";
@@ -912,8 +913,6 @@ public:
 
     void TestWritingStrain3d() throw(Exception)
     {
-        EXIT_IF_PARALLEL; // #1913 currently, the compressible preconditioner is ICC, which is only supported in sequential
-
         QuadraticMesh<3> mesh(1.0, 1.0, 1.0, 1.0);
 
         CompressibleMooneyRivlinMaterialLaw<3> law(1.0, 1.0);
@@ -923,12 +922,9 @@ public:
         SolidMechanicsProblemDefinition<3> problem_defn(mesh);
         problem_defn.SetMaterialLaw(COMPRESSIBLE,&law);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
-
         CompressibleNonlinearElasticitySolver<3> solver(mesh,
                                                         problem_defn,
                                                         "");
-
-
         double alpha = 1.1;
         double beta = 0.15;
         double gamma = 0.53;

@@ -123,6 +123,15 @@ protected:
     unsigned mNumDofs;
 
     /**
+     *  The problem dimension - the number of unknowns at each node.
+     *  For compressible problems, where only the deformation/flow is computed at each node, this is
+     *  equal to DIM
+     *  For incompressible problems, where pressure is computed as well, this is equal to DIM+1
+     *  (there is a pressure variable defined even for internal nodes at which pressure is not computed,
+     *  this is a dummy pressure variable -- done like this for parallelisation reasons).
+     */
+    unsigned mProblemDimension;
+    /**
      * Residual vector nonlinear problems.
      *
      * Since the residual in nonlinear problems is usually also the RHS vector in the linear
@@ -164,7 +173,6 @@ protected:
      */
     Mat mPreconditionMatrix;
 
-
     /**
      * Allocates memory for the matrices and vectors
      */
@@ -178,6 +186,7 @@ protected:
      *   LINEAR_PROBLEM -- indicating the overall problem is linear, and in which
      *     case the BCs will be applied to both the matrix and vector of the
      *     linear system
+     *
      *   NONLINEAR_PROBLEM_APPLY_TO_RESIDUAL_ONLY -- indicating the overall problem is nonlinear
      *     and here only the residual vector will be altered (apply the Dirichlet boundary
      *     conditions to the residual vector involves setting appropriate components to the
@@ -197,6 +206,36 @@ protected:
      */
     void ApplyDirichletBoundaryConditions(ApplyDirichletBcsType type, bool symmetricProblem);
 
+    /**
+     * For incompressible problems, we use the following ordering:
+     * [U0 V0 W0 P0 U1 V1 W1 P1 .. Un Vn Wn Pn]
+     * where (U V W) is the displacement, and P is the pressure.
+     * Therefore P is defined at every node; however for the solve, linear basis functions are used for
+     * the pressure, so pressure is solved for at each vertex, not at internal nodes (which are for
+     * quadratic basis functions).
+     *
+     * The presure variables for non-vertex nodes are therefore dummy variables. This method enforces the
+     * condition P_i=0, where i corresponds to a non-vertex node.
+     *
+     * The first input parameter should be one of the following
+     *   LINEAR_PROBLEM -- indicating the overall problem is linear, and in which
+     *     case the matrix will be altered (1 on diagonal, zeros assumed on rest of row)
+     *     and the rhs vector will be set to 0.
+     *
+     *   NONLINEAR_PROBLEM_APPLY_TO_RESIDUAL_ONLY -- indicating the overall problem is nonlinear
+     *     and here only the residual vector will be altered (sets the residual value of the appropriate
+     *     rows to P_i-0.0.
+     *
+     *   NONLINEAR_PROBLEM_APPLY_TO_EVERYTHING -- indicating the overall problem is nonlinear,
+     *     and here, the residual vector will be altered, as will the matrix and RHS vector
+     *     (see documentation on mResidualVector for why there is a separate residual vector
+     *     and RHS vector).
+
+     * @param type see above
+     * @param symmetricProblem whether symmetry should be maintained or not - keeping
+     *   symmetric is currently not implemented, so this must be false
+     */
+    void AddIdentityBlockForDummyPressureVariables(ApplyDirichletBcsType type, bool symmetricProblem);
 
 public:
     /**
@@ -291,14 +330,9 @@ AbstractContinuumMechanicsSolver<DIM>::AbstractContinuumMechanicsSolver(Quadrati
         mpOutputFileHandler = new OutputFileHandler(mOutputDirectory);
     }
 
-    if (mCompressibilityType==COMPRESSIBLE)
-    {
-        mNumDofs = DIM*mrQuadMesh.GetNumNodes();
-    }
-    else
-    {
-        mNumDofs = DIM*mrQuadMesh.GetNumNodes() + mrQuadMesh.GetNumVertices();
-    }
+    // see dox for mProblemDimension
+    mProblemDimension = mCompressibilityType==COMPRESSIBLE ? DIM : DIM+1;
+    mNumDofs = mProblemDimension*mrQuadMesh.GetNumNodes();
 
     AllocateMatrixMemory();
 
@@ -330,6 +364,7 @@ AbstractContinuumMechanicsSolver<DIM>::~AbstractContinuumMechanicsSolver()
         PetscTools::Destroy(mSystemLhsMatrix);
         PetscTools::Destroy(mPreconditionMatrix);
     }
+
     if (mDirichletBoundaryConditionsVector)
     {
         PetscTools::Destroy(mDirichletBoundaryConditionsVector);
@@ -415,12 +450,14 @@ void AbstractContinuumMechanicsSolver<DIM>::SetWriteOutput(bool writeOutput)
 template<unsigned DIM>
 std::vector<double>& AbstractContinuumMechanicsSolver<DIM>::rGetPressures()
 {
+    assert(mProblemDimension==DIM+1);
+
     mPressureSolution.clear();
     mPressureSolution.resize(mrQuadMesh.GetNumVertices());
 
     for (unsigned i=0; i<mrQuadMesh.GetNumVertices(); i++)
     {
-        mPressureSolution[i] = mCurrentSolution[DIM*mrQuadMesh.GetNumNodes() + i];
+        mPressureSolution[i] = mCurrentSolution[mProblemDimension*i + DIM];
     }
     return mPressureSolution;
 }
@@ -490,7 +527,7 @@ void AbstractContinuumMechanicsSolver<DIM>::ApplyDirichletBoundaryConditions(App
             if(dirichlet_val != ContinuumMechanicsProblemDefinition<DIM>::FREE)
             {
                 double val;
-                unsigned dof_index = DIM*node_index+j;
+                unsigned dof_index = mProblemDimension*node_index+j;
 
                 if(type == LINEAR_PROBLEM)
                 {
@@ -580,14 +617,52 @@ void AbstractContinuumMechanicsSolver<DIM>::ApplyDirichletBoundaryConditions(App
 }
 
 
+template<unsigned DIM>
+void AbstractContinuumMechanicsSolver<DIM>::AddIdentityBlockForDummyPressureVariables(ApplyDirichletBcsType type,
+                                                                                      bool symmetricProblem)
+{
+assert(symmetricProblem==false); // not implemented yet
+
+    assert(mCompressibilityType==INCOMPRESSIBLE);
+
+    int lo, hi;
+    VecGetOwnershipRange(mResidualVector, &lo, &hi);
+
+    for(unsigned i=0; i<mrQuadMesh.GetNumNodes(); i++)
+    {
+        if(mrQuadMesh.GetNode(i)->IsInternal())
+        {
+            unsigned row = (DIM+1)*i + DIM; // DIM+1 is the problem dimension
+            if(lo <= (int)row && (int)row < hi)
+            {
+                if(type!=LINEAR_PROBLEM)
+                {
+                    PetscVecTools::SetElement(mResidualVector, row, mCurrentSolution[row]-0.0);
+                }
+                if(type!=NONLINEAR_PROBLEM_APPLY_TO_RESIDUAL_ONLY) // ie doing a whole linear system
+                {
+                    double rhs_vector_val = type==LINEAR_PROBLEM ? 0.0 : mCurrentSolution[row]-0.0;
+                    PetscVecTools::SetElement(mLinearSystemRhsVector, row, rhs_vector_val);
+                    // this assumes the row is already zero, which is should be..
+                    PetscMatTools::SetElement(mSystemLhsMatrix, row, row, 1.0);
+                    PetscMatTools::SetElement(mPreconditionMatrix, row, row, 1.0);
+                }
+            }
+        }
+    }
+}
+
+
 
 template<unsigned DIM>
 void AbstractContinuumMechanicsSolver<DIM>::AllocateMatrixMemory()
 {
+    Vec template_vec = mrQuadMesh.GetDistributedVectorFactory()->CreateVec(mProblemDimension);
+
     ///////////////////////////
     // three vectors
     ///////////////////////////
-    mResidualVector = PetscTools::CreateVec(mNumDofs);
+    VecDuplicate(template_vec, &mResidualVector);
     VecDuplicate(mResidualVector, &mLinearSystemRhsVector);
     // the one is only allocated if it will be needed (in ApplyDirichletBoundaryConditions),
     // depending on whether the matrix is kept symmetric.
@@ -597,13 +672,18 @@ void AbstractContinuumMechanicsSolver<DIM>::AllocateMatrixMemory()
     // two matrices
     ///////////////////////////
 
+    int lo, hi;
+    VecGetOwnershipRange(mResidualVector, &lo, &hi);
+    PetscInt local_size = hi - lo;
+
+
     if (DIM==2)
     {
         // 2D: N elements around a point => 7N+3 non-zeros in that row? Assume N<=10 (structured mesh would have N_max=6) => 73.
         unsigned num_non_zeros = std::min(75u, mNumDofs);
 
-        PetscTools::SetupMat(mSystemLhsMatrix, mNumDofs, mNumDofs, num_non_zeros, PETSC_DECIDE, PETSC_DECIDE);
-        PetscTools::SetupMat(mPreconditionMatrix, mNumDofs, mNumDofs, num_non_zeros, PETSC_DECIDE, PETSC_DECIDE);
+        PetscTools::SetupMat(mSystemLhsMatrix, mNumDofs, mNumDofs, num_non_zeros, local_size, local_size);
+        PetscTools::SetupMat(mPreconditionMatrix, mNumDofs, mNumDofs, num_non_zeros, local_size, local_size);
     }
     else
     {
@@ -627,16 +707,19 @@ void AbstractContinuumMechanicsSolver<DIM>::AllocateMatrixMemory()
 
             num_non_zeros_upper_bound = std::min(num_non_zeros_upper_bound, mNumDofs);
 
-            num_non_zeros_each_row[DIM*i + 0] = num_non_zeros_upper_bound;
-            num_non_zeros_each_row[DIM*i + 1] = num_non_zeros_upper_bound;
-            num_non_zeros_each_row[DIM*i + 2] = num_non_zeros_upper_bound;
+            num_non_zeros_each_row[mProblemDimension*i + 0] = num_non_zeros_upper_bound;
+            num_non_zeros_each_row[mProblemDimension*i + 1] = num_non_zeros_upper_bound;
+            num_non_zeros_each_row[mProblemDimension*i + 2] = num_non_zeros_upper_bound;
 
             if (mCompressibilityType==INCOMPRESSIBLE)
             {
-                //Could do !mrQuadMesh.GetNode(i)->IsInternal()
-                if (i<mrQuadMesh.GetNumVertices()) // then this is a vertex
+                if(!mrQuadMesh.GetNode(i)->IsInternal())
                 {
-                    num_non_zeros_each_row[DIM*mrQuadMesh.GetNumNodes() + i] = num_non_zeros_upper_bound;
+                    num_non_zeros_each_row[mProblemDimension*i + 3] = num_non_zeros_upper_bound;
+                }
+                else
+                {
+                    num_non_zeros_each_row[mProblemDimension*i + 3] = 1;
                 }
             }
         }
@@ -657,13 +740,13 @@ void AbstractContinuumMechanicsSolver<DIM>::AllocateMatrixMemory()
         // In the future, when parallelising, remember to think about MAT_IGNORE_OFF_PROC_ENTRIES (see #1682)
 
 #if (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 2) //PETSc 2.2
-        MatCreate(PETSC_COMM_WORLD,PETSC_DECIDE,PETSC_DECIDE,mNumDofs,mNumDofs,&mSystemLhsMatrix);
-        MatCreate(PETSC_COMM_WORLD,PETSC_DECIDE,PETSC_DECIDE,mNumDofs,mNumDofs,&mPreconditionMatrix);
+        MatCreate(PETSC_COMM_WORLD,local_size,local_size,mNumDofs,mNumDofs,&mSystemLhsMatrix);
+        MatCreate(PETSC_COMM_WORLD,local_size,local_size,mNumDofs,mNumDofs,&mPreconditionMatrix);
 #else //New API
         MatCreate(PETSC_COMM_WORLD,&mSystemLhsMatrix);
         MatCreate(PETSC_COMM_WORLD,&mPreconditionMatrix);
-        MatSetSizes(mSystemLhsMatrix,PETSC_DECIDE,PETSC_DECIDE,mNumDofs,mNumDofs);
-        MatSetSizes(mPreconditionMatrix,PETSC_DECIDE,PETSC_DECIDE,mNumDofs,mNumDofs);
+        MatSetSizes(mSystemLhsMatrix,local_size,local_size,mNumDofs,mNumDofs);
+        MatSetSizes(mPreconditionMatrix,local_size,local_size,mNumDofs,mNumDofs);
 #endif
 
         if (PetscTools::IsSequential())
@@ -675,14 +758,15 @@ void AbstractContinuumMechanicsSolver<DIM>::AllocateMatrixMemory()
         }
         else
         {
-            PetscInt lo, hi;
-            VecGetOwnershipRange(mResidualVector, &lo, &hi);
-
-            int* num_non_zeros_each_row_this_proc = new int[hi-lo];
-            int* zero = new int[hi-lo];
-            for (unsigned i=0; i<unsigned(hi-lo); i++)
+            int* num_non_zeros_each_row_this_proc = new int[local_size];
+            int* zero = new int[local_size];
+            for (unsigned i=0; i<unsigned(local_size); i++)
             {
                 num_non_zeros_each_row_this_proc[i] = num_non_zeros_each_row[lo+i];
+                if(num_non_zeros_each_row_this_proc[i] > local_size)
+                {
+                    num_non_zeros_each_row_this_proc[i] = local_size;
+                }
                 zero[i] = 0;
             }
 

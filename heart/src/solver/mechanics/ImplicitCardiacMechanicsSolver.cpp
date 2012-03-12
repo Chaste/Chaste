@@ -89,7 +89,7 @@ void ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::InitialiseContractio
         }
         default:
         {
-            #define COVERAGE_IGNORE // currently all available contraction models are acceptable for implicit
+            #define COVERAGE_IGNORE
             EXCEPTION("Unknown or disallowed contraction model");
             #undef COVERAGE_IGNORE
         }

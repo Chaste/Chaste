@@ -79,12 +79,12 @@ public:
         ContinuumMechanicsNeumannBcsAssembler<2> assembler(&mesh, &problem_defn);
 
         TS_ASSERT_THROWS_THIS(assembler.AssembleVector(), "Vector to be assembled has not been set");
-        Vec bad_sized_vec = PetscTools::CreateVec(3*mesh.GetNumNodes()+mesh.GetNumVertices());
+        Vec bad_sized_vec = PetscTools::CreateVec(2);
         assembler.SetVectorToAssemble(bad_sized_vec, true);
-        TS_ASSERT_THROWS_THIS(assembler.AssembleVector(), "Vector provided to be assembled has size 21, not expected size of 15 (dim*num_nodes+num_vertices)");
+        TS_ASSERT_THROWS_THIS(assembler.AssembleVector(), "Vector provided to be assembled has size 2, not expected size of 18 ((dim+1)*num_nodes)");
 
 
-        Vec vec = PetscTools::CreateVec(2*mesh.GetNumNodes()+mesh.GetNumVertices());
+        Vec vec = PetscTools::CreateVec(3*mesh.GetNumNodes());
 
         assembler.SetVectorToAssemble(vec, true);
         assembler.AssembleVector();
@@ -101,25 +101,28 @@ public:
         TS_ASSERT_DELTA(vec_repl[1], t2/6.0, 1e-8);
 
         // node 1 is on the surface, and is a vertex
-        TS_ASSERT_DELTA(vec_repl[2], t1/6.0, 1e-8);
-        TS_ASSERT_DELTA(vec_repl[3], t2/6.0, 1e-8);
+        TS_ASSERT_DELTA(vec_repl[3], t1/6.0, 1e-8);
+        TS_ASSERT_DELTA(vec_repl[4], t2/6.0, 1e-8);
 
         // nodes 2, 3, 4 are not on the surface
         for(unsigned i=2; i<5; i++)
         {
-            TS_ASSERT_DELTA(vec_repl[2*i], 0.0, 1e-8);
-            TS_ASSERT_DELTA(vec_repl[2*i], 0.0, 1e-8);
+            TS_ASSERT_DELTA(vec_repl[3*i], 0.0, 1e-8);
+            TS_ASSERT_DELTA(vec_repl[3*i], 0.0, 1e-8);
         }
 
         // node 5 is on the surface, and is an interior node
-        TS_ASSERT_DELTA(vec_repl[10], 4*t1/6.0, 1e-8);
-        TS_ASSERT_DELTA(vec_repl[11], 4*t2/6.0, 1e-8);
+        TS_ASSERT_DELTA(vec_repl[15], 4*t1/6.0, 1e-8);
+        TS_ASSERT_DELTA(vec_repl[16], 4*t2/6.0, 1e-8);
 
 
         // the rest of the vector is the pressure block and should be zero.
-        TS_ASSERT_DELTA(vec_repl[12], 0.0, 1e-8);
-        TS_ASSERT_DELTA(vec_repl[13], 0.0, 1e-8);
+        TS_ASSERT_DELTA(vec_repl[2], 0.0, 1e-8);
+        TS_ASSERT_DELTA(vec_repl[5], 0.0, 1e-8);
+        TS_ASSERT_DELTA(vec_repl[8], 0.0, 1e-8);
+        TS_ASSERT_DELTA(vec_repl[11], 0.0, 1e-8);
         TS_ASSERT_DELTA(vec_repl[14], 0.0, 1e-8);
+        TS_ASSERT_DELTA(vec_repl[17], 0.0, 1e-8);
 
         PetscTools::Destroy(vec);
         PetscTools::Destroy(bad_sized_vec);
@@ -159,7 +162,7 @@ public:
         assert(boundary_elems.size()==2);
         problem_defn.SetTractionBoundaryConditions(boundary_elems, tractions);
 
-        Vec vec = PetscTools::CreateVec(3*mesh.GetNumNodes()+mesh.GetNumVertices());
+        Vec vec = PetscTools::CreateVec(4*mesh.GetNumNodes());
 
         ContinuumMechanicsNeumannBcsAssembler<3> assembler(&mesh, &problem_defn);
         assembler.SetVectorToAssemble(vec, true);
@@ -189,28 +192,28 @@ public:
                     }
 
                     // interior node on traction surface
-                    TS_ASSERT_DELTA(vec_repl[3*i],   num_surf_elems_contained_in * t1/6.0, 1e-8);
-                    TS_ASSERT_DELTA(vec_repl[3*i+1], num_surf_elems_contained_in * t2/6.0, 1e-8);
-                    TS_ASSERT_DELTA(vec_repl[3*i+2], num_surf_elems_contained_in * t3/6.0, 1e-8);
+                    TS_ASSERT_DELTA(vec_repl[4*i],   num_surf_elems_contained_in * t1/6.0, 1e-8);
+                    TS_ASSERT_DELTA(vec_repl[4*i+1], num_surf_elems_contained_in * t2/6.0, 1e-8);
+                    TS_ASSERT_DELTA(vec_repl[4*i+2], num_surf_elems_contained_in * t3/6.0, 1e-8);
                 }
                 else
                 {
-                    TS_ASSERT_DELTA(vec_repl[3*i],   0.0, 1e-8);
-                    TS_ASSERT_DELTA(vec_repl[3*i+1], 0.0, 1e-8);
-                    TS_ASSERT_DELTA(vec_repl[3*i+2], 0.0, 1e-8);
+                    TS_ASSERT_DELTA(vec_repl[4*i],   0.0, 1e-8);
+                    TS_ASSERT_DELTA(vec_repl[4*i+1], 0.0, 1e-8);
+                    TS_ASSERT_DELTA(vec_repl[4*i+2], 0.0, 1e-8);
                 }
             }
             else
             {
-                TS_ASSERT_DELTA(vec_repl[3*i],   0.0, 1e-8);
-                TS_ASSERT_DELTA(vec_repl[3*i+1], 0.0, 1e-8);
-                TS_ASSERT_DELTA(vec_repl[3*i+2], 0.0, 1e-8);
+                TS_ASSERT_DELTA(vec_repl[4*i],   0.0, 1e-8);
+                TS_ASSERT_DELTA(vec_repl[4*i+1], 0.0, 1e-8);
+                TS_ASSERT_DELTA(vec_repl[4*i+2], 0.0, 1e-8);
             }
         }
 
-        for(unsigned i=0; i<mesh.GetNumVertices(); i++)
+        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            TS_ASSERT_DELTA(vec_repl[3*mesh.GetNumNodes()+i],   0.0, 1e-8);
+            TS_ASSERT_DELTA(vec_repl[4*i+3],   0.0, 1e-8);
         }
 
         PetscTools::Destroy(vec);

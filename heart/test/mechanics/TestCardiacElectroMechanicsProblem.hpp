@@ -84,7 +84,7 @@ public:
     // ie x=alpha*X, y=beta*Y for some alpha, beta.
     void TestWithHomogeneousEverythingCompressible() throw(Exception)
     {
-        EXIT_IF_PARALLEL; // #1913 currently, the compressible preconditioner is ICC, which is only supported in sequential
+        EXIT_IF_PARALLEL; // see #1828
 
         EntirelyStimulatedTissueCellFactory cell_factory;
 
@@ -160,6 +160,8 @@ public:
     // we also test that alpha*beta = 1.0
     void TestWithHomogeneousEverythingIncompressible() throw(Exception)
     {
+        EXIT_IF_PARALLEL; ///\todo #1828
+
         EntirelyStimulatedTissueCellFactory cell_factory;
 
         TetrahedralMesh<2,2> electrics_mesh;
@@ -236,6 +238,10 @@ public:
     // These tests are older than the above tests..
     void TestImplicitNhs2dOneMechanicsElement() throw(Exception)
     {
+        EXIT_IF_PARALLEL; // see #1828
+
+
+
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-1000*1000);
 
         HeartConfig::Instance()->SetSimulationDuration(10.0);
@@ -290,6 +296,10 @@ public:
 
     void TestWithKerchoffs() throw(Exception)
     {
+        EXIT_IF_PARALLEL; // see #1828
+
+
+
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-1000*1000);
 
         HeartConfig::Instance()->SetSimulationDuration(20.0);
@@ -330,6 +340,10 @@ public:
     //
     void TestExplicitSolverWithNash2004() throw(Exception)
     {
+        EXIT_IF_PARALLEL; // see #1828
+
+
+
 #ifdef MECH_USE_HYPRE
         TS_FAIL("This test is known to fail with HYPRE - see comments in test");
         return;
@@ -368,7 +382,7 @@ public:
 
     void TestWithCompressibleApproach() throw(Exception)
     {
-        EXIT_IF_PARALLEL; // #1913 currently, the compressible preconditioner is ICC, which is only supported in sequential
+        EXIT_IF_PARALLEL; // #1828
 
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-1000*1000);
 

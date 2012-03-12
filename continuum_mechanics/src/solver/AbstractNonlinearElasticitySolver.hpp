@@ -529,12 +529,16 @@ double AbstractNonlinearElasticitySolver<DIM>::TakeNewtonStep()
     if (this->mCompressibilityType==COMPRESSIBLE)
     {
         KSPSetType(solver,KSPCG);
-        //PCSetType(pc, PCSOR);
-        PCSetType(pc, PCICC); /// \todo: #1913 this only works in sequential
-        PetscOptionsSetValue("-pc_factor_shift_positive_definite", "");
-
-        //needed for ICC preconditioner
-        //PetscOptionsSetValue("-pc_factor_shift_positive_definite", "");
+///\todo #1828 / #1913
+        if(PetscTools::IsSequential())
+        {
+            PCSetType(pc, PCICC);
+            PetscOptionsSetValue("-pc_factor_shift_positive_definite", "");
+        }
+        else
+        {
+            PCSetType(pc, PCBJACOBI);
+        }
 
         //// for debugging only
         //assert( PetscMatTools::CheckSymmetry(mrJacobianMatrix) );
@@ -605,9 +609,12 @@ double AbstractNonlinearElasticitySolver<DIM>::TakeNewtonStep()
     // max {1e-6 * initial_residual, 1e-12}
     if (mKspAbsoluteTol < 0)
     {
-        Vec temp = PetscTools::CreateVec(this->mNumDofs);
-        Vec temp2 = PetscTools::CreateVec(this->mNumDofs);
-        Vec linsys_residual = PetscTools::CreateVec(this->mNumDofs);
+        Vec temp;
+        VecDuplicate(this->mResidualVector, &temp);
+        Vec temp2;
+        VecDuplicate(this->mResidualVector, &temp2);
+        Vec linsys_residual;
+        VecDuplicate(this->mResidualVector, &linsys_residual);
 
         KSPInitialResidual(solver, solution, temp, temp2, linsys_residual, this->mLinearSystemRhsVector);
         double initial_resid_norm;
@@ -943,7 +950,7 @@ std::vector<c_vector<double,DIM> >& AbstractNonlinearElasticitySolver<DIM>::rGet
     {
         for (unsigned j=0; j<DIM; j++)
         {
-            this->mSpatialSolution[i](j) = this->mrQuadMesh.GetNode(i)->rGetLocation()[j] + this->mCurrentSolution[DIM*i+j];
+            this->mSpatialSolution[i](j) = this->mrQuadMesh.GetNode(i)->rGetLocation()[j] + this->mCurrentSolution[this->mProblemDimension*i+j];
         }
     }
     return this->mSpatialSolution;
@@ -1034,7 +1041,7 @@ void AbstractNonlinearElasticitySolver<DIM>::GetElementCentroidDeformationGradie
     {
         for (unsigned JJ=0; JJ<DIM; JJ++)
         {
-            element_current_displacements(JJ,II) = this->mCurrentSolution[DIM*rElement.GetNodeGlobalIndex(II) + JJ];
+            element_current_displacements(JJ,II) = this->mCurrentSolution[this->mProblemDimension*rElement.GetNodeGlobalIndex(II) + JJ];
         }
     }
 

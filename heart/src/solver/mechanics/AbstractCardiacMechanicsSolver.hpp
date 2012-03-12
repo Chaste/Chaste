@@ -438,7 +438,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ComputeDeformationGr
         {
             for (unsigned JJ=0; JJ<DIM; JJ++)
             {
-                element_current_displacements(JJ,II) = this->mCurrentSolution[DIM*p_elem->GetNodeGlobalIndex(II) + JJ];
+                element_current_displacements(JJ,II) = this->mCurrentSolution[this->mProblemDimension*p_elem->GetNodeGlobalIndex(II) + JJ];
             }
         }
 

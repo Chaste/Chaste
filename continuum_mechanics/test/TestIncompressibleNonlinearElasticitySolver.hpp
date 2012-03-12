@@ -159,7 +159,9 @@ public:
         // current solution should have been initialised to u=0, p=p0
         ///////////////////////////////////////////////////////////////////
         ReplicatableVector rhs_vec(solver.mResidualVector);
-        TS_ASSERT_EQUALS( rhs_vec.GetSize(), 2U*25U+9U );
+
+        TS_ASSERT_EQUALS( rhs_vec.GetSize(), 3U*25U);
+
         for (unsigned i=0; i<rhs_vec.GetSize(); i++)
         {
             TS_ASSERT_DELTA(rhs_vec[i], 0.0, 1e-12);
@@ -209,7 +211,7 @@ public:
         //////////////////////////////////////////////////////////
         // compare numerical and analytic jacobians again, this
         // time using a non-zero displacement, u=lambda x, v = mu y
-        // (lambda not equal to 1/nu), p = p0.
+        // (lambda not equal to 1/nu), p = x*y
         //////////////////////////////////////////////////////////
         double lambda = 1.2;
         double mu = 1.0/1.3;
@@ -218,8 +220,10 @@ public:
         solver.FormInitialGuess();
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            solver.rGetCurrentSolution()[2*i]   = (lambda-1)*mesh.GetNode(i)->rGetLocation()[0];
-            solver.rGetCurrentSolution()[2*i+1] = (mu-1)*mesh.GetNode(i)->rGetLocation()[1];
+            solver.rGetCurrentSolution()[3*i]   = (lambda-1)*mesh.GetNode(i)->rGetLocation()[0];
+            solver.rGetCurrentSolution()[3*i+1] = (mu-1)*mesh.GetNode(i)->rGetLocation()[1];
+            // should really be only setting this on vertices..
+            solver.rGetCurrentSolution()[3*i+2] = mesh.GetNode(i)->rGetLocation()[0]*mesh.GetNode(i)->rGetLocation()[1];
         }
 
         solver.AssembleSystem(true, true);
@@ -227,6 +231,22 @@ public:
 
         h=1e-8; // needs to be smaller for this one
 
+        // check identity block
+        for (unsigned i=mesh.GetNumVertices(); i<mesh.GetNumNodes(); i++)
+        {
+            assert(mesh.GetNode(i)->IsInternal());
+            unsigned row = 3*i+2;
+            if ((lo<=(int)row) && ((int)row<hi))
+            {
+                for(unsigned col=0; col<num_dofs; col++)
+                {
+                    double val = PetscMatTools::GetElement(solver.mrJacobianMatrix,row,col);
+                    TS_ASSERT_DELTA(val, (double)(row==col), 1e-12);
+                }
+            }
+        }
+
+        // compare with numerical jacobian
         for (unsigned j=0; j<num_dofs; j++)
         {
             solver.rGetCurrentSolution()[j] += h;
@@ -234,12 +254,14 @@ public:
 
             ReplicatableVector perturbed_rhs( solver.mResidualVector );
 
+
             for (unsigned i=0; i<num_dofs; i++)
             {
                 if ((lo<=(int)i) && ((int)i<hi))
                 {
                     double analytic_matrix_val = PetscMatTools::GetElement(solver.mrJacobianMatrix,i,j);
                     double numerical_matrix_val = (perturbed_rhs[i] - rhs_vec2[i])/h;
+
                     if ((fabs(analytic_matrix_val)>1e-6) && (fabs(numerical_matrix_val)>1e-6))
                     {
                         // relative error
@@ -251,6 +273,7 @@ public:
                         TS_ASSERT_DELTA(analytic_matrix_val, numerical_matrix_val, 1e-2);
                     }
                 }
+
             }
             solver.rGetCurrentSolution()[j] -= h;
         }
@@ -381,11 +404,13 @@ public:
                                                           problem_defn,
                                                           "");
 
-        unsigned num_nodes = 9;
+        // Recall variables in the solution vector are ordered
+        // [U0 V0 P0 U1 V1 P1 .. Un Vn Pn]
+        // with P_i a dummy pressure variable if node i is not a vertex
         // pressure for node 0 (in elem 0)
-        TS_ASSERT_DELTA(solver.rGetCurrentSolution()[2*num_nodes + 0], 2.0, 1e-6);
+        TS_ASSERT_DELTA(solver.rGetCurrentSolution()[2], 2.0, 1e-6);
         // pressure for node 3 (in elem 1)
-        TS_ASSERT_DELTA(solver.rGetCurrentSolution()[2*num_nodes + 3], 10.0, 1e-6);
+        TS_ASSERT_DELTA(solver.rGetCurrentSolution()[11], 10.0, 1e-6);
     }
 
     void TestSolve() throw(Exception)

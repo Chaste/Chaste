@@ -82,11 +82,6 @@ private:
      */
     void AssembleSystem();
 
-    /**
-     * Apply the Dirichlet boundary conditions to the linear system and preconditioner matrix.
-     */
-    void ApplyBoundaryConditions();
-
 public:
 
     /**
@@ -136,28 +131,6 @@ public:
 // Implementation
 ///////////////////////////////////////////////////////////////////////////////////
 
-template<unsigned DIM>
-void StokesFlowSolver<DIM>::ApplyBoundaryConditions()
-{
-    std::vector<unsigned> rows;
-    rows.resize(DIM*mrProblemDefinition.rGetDirichletNodes().size());
-
-    for (unsigned i=0; i<mrProblemDefinition.rGetDirichletNodes().size(); i++)
-    {
-        unsigned node_index = mrProblemDefinition.rGetDirichletNodes()[i];
-        for (unsigned j=0; j<DIM; j++)
-        {
-            unsigned dof_index = DIM*node_index + j;
-            rows[DIM*i + j] = dof_index;
-
-            double value = mrProblemDefinition.rGetDirichletNodeValues()[i](j);
-            PetscVecTools::SetElement(this->mLinearSystemRhsVector, dof_index, value);
-        }
-    }
-
-    PetscMatTools::ZeroRowsWithValueOnDiagonal(this->mSystemLhsMatrix, rows, 1.0);
-    PetscMatTools::ZeroRowsWithValueOnDiagonal(this->mPreconditionMatrix, rows, 1.0);
-}
 
 template<unsigned DIM>
 StokesFlowSolver<DIM>::StokesFlowSolver(QuadraticMesh<DIM>& rQuadMesh,
@@ -208,13 +181,16 @@ void StokesFlowSolver<DIM>::Solve()
     Vec solution;
     VecDuplicate(this->mLinearSystemRhsVector,&solution);
 
-
     KSP solver;
     KSPCreate(PETSC_COMM_WORLD,&solver);
-
+    PC pc;
+    KSPGetPC(solver, &pc);
     KSPSetOperators(solver, this->mSystemLhsMatrix, this->mPreconditionMatrix, DIFFERENT_NONZERO_PATTERN /*in precond between successive solves*/);
-
-    KSPSetType(solver, KSPGMRES);
+///\todo #1828 introduce better solvers
+    KSPSetType(solver,KSPCG);
+    PCSetType(pc, PCJACOBI);
+    KSPSetUp(solver);
+    KSPSetFromOptions(solver);
 
     if (mKspAbsoluteTol < 0)
     {
@@ -226,63 +202,8 @@ void StokesFlowSolver<DIM>::Solve()
         KSPSetTolerances(solver, 1e-16, mKspAbsoluteTol, PETSC_DEFAULT, 10000 /*max iter*/); //hopefully with the preconditioner this max is way too high
     }
 
-    unsigned num_restarts = 100;
-    KSPGMRESSetRestart(solver,num_restarts); // gmres num restarts
-
-    KSPSetFromOptions(solver);
-    KSPSetUp(solver);
-    #ifdef STOKES_VERBOSE
-    Timer::PrintAndReset("KSP Setup");
-    #endif
-
-    PC pc;
-    KSPGetPC(solver, &pc);
-
-/////// What was going on before, when hypre was being used...
-//    #ifndef *****
-    PCSetType(pc, PCBJACOBI); // BJACOBI = ILU on each block (block = part of matrix on each process)
-//    #else
-//    /////////////////////////////////////////////////////////////////////////////////////////////////////
-//    // Speed up linear solve time massively for larger simulations (in fact GMRES may stagnate without
-//    // this for larger problems), by using a AMG preconditioner -- needs HYPRE installed
-//    /////////////////////////////////////////////////////////////////////////////////////////////////////
-//    PetscOptionsSetValue("-pc_hypre_type", "boomeramg");
-//    // PetscOptionsSetValue("-pc_hypre_boomeramg_max_iter", "1");
-//    // PetscOptionsSetValue("-pc_hypre_boomeramg_strong_threshold", "0.0");
-//
-//    PCSetType(pc, PCHYPRE);
-//
-//    //PCBlockDiagonalMechanics* p_custom_pc = new PCBlockDiagonalMechanics(solver, r_precond_jac, mBlock1Size, mBlock2Size);
-//    //PCLDUFactorisationMechanics* p_custom_pc = new PCLDUFactorisationMechanics(solver, r_precond_jac, mBlock1Size, mBlock2Size);
-//    //remember to delete memory..
-//    //KSPSetPreconditionerSide(solver, PC_RIGHT);
-//    #endif
-
-    KSPSetFromOptions(solver);
-
     KSPSolve(solver,this->mLinearSystemRhsVector,solution);
 
-//    std::cout << "RHS\n";
-//    PetscVecTools::Display(this->mLinearSystemRhsVector);
-//
-//    std::cout << "Matrix\n";
-//    for (unsigned i=0; i<22; i++)
-//    {
-//        for (unsigned j=0; j<22; j++)
-//        {
-//            double val = PetscMatTools::GetElement(this->mSystemLhsMatrix, i, j);
-//            if (fabs(val)<1e-9)
-//            {
-//                val = 0.0;
-//            }
-//            std::cout << val << " ";
-//        }
-//        std::cout << "\n";
-//    }
-//
-//    PetscMatTools::Display(r_jac);
-//    std::cout << "Solution\n";
-//     PetscVecTools::Display(solution);
 
     KSPConvergedReason reason;
     KSPGetConvergedReason(solver,&reason);
@@ -341,6 +262,9 @@ void StokesFlowSolver<DIM>::AssembleSystem()
 
 ///\todo! Do we really want a symmetric matrix (the true below) - can't use CG after all..
     // Apply Dirichlet boundary conditions
+////\todo false here - could be true, but need to change method to keep symmetry..
+    this->AddIdentityBlockForDummyPressureVariables(LINEAR_PROBLEM, false);
+
     this->ApplyDirichletBoundaryConditions(LINEAR_PROBLEM, true);
 
     PetscVecTools::Finalise(this->mLinearSystemRhsVector);
@@ -363,7 +287,7 @@ std::vector<c_vector<double,DIM> >& StokesFlowSolver<DIM>::rGetSpatialSolution()
     {
         for (unsigned j=0; j<DIM; j++)
         {
-            this->mSpatialSolution[i](j) = this->mCurrentSolution[DIM*i+j];
+            this->mSpatialSolution[i](j) = this->mCurrentSolution[(DIM+1)*i+j];
         }
     }
     return this->mSpatialSolution;
