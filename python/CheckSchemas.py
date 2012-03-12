@@ -38,7 +38,7 @@ import difflib
 
 # Check XSD files for consistent schemas
 
-#dir_ignores = ['build', 'cxxtest', 'testoutput', 'doc', 'projects', 'global', 'linalg', 'ode', 'pde', 'docs', 'anim', 'link', 'linklib', 'cell_based', 'notforrelease_cell_based', 'python']
+#dir_ignores = ['build', 'cxxtest', 'testoutput', 'doc', 'projects', 'global', 'linalg', 'ode', 'pde', 'docs', 'anim', 'link', 'linklib', 'cell_based', 'notforrelease_cell_based', 'notforrelease_lung', 'python']
 # Important directories are heart, apps and notforrelease
 dir_ignores = ['build', 'cxxtest', 'testoutput', 'python']
 startchar_ignores = ['_', '.']

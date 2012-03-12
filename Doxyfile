@@ -93,7 +93,8 @@ INPUT                  =    heart/src \
                             cell_based/src \
                             crypt/src \
                             notforrelease/src \
-                            notforrelease_cell_based/src
+                            notforrelease_cell_based/src \
+                            notforrelease_lung/src
 
 FILE_PATTERNS          = *.cpp \
                          *.hpp
