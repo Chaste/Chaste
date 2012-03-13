@@ -269,71 +269,78 @@ void OffLatticeSimulation<DIM>::UpdateNodePositions(const std::vector< c_vector<
     // Write node velocities to file if required
     if (mOutputNodeVelocities)
     {
-        if (SimulationTime::Instance()->GetTimeStepsElapsed()%this->mSamplingTimestepMultiple == 0)
-        {
-            *mpNodeVelocitiesFile << SimulationTime::Instance()->GetTime() << "\t";
-            for (unsigned node_index=0; node_index<num_nodes; node_index++)
+        OutputFileHandler output_file_handler2(this->mSimulationOutputDirectory+"/", false);
+    	PetscTools::BeginRoundRobin();
+    	{
+            if(PetscTools::AmMaster() && SimulationTime::Instance()->GetTimeStepsElapsed()==0)
             {
-                // We should never encounter deleted nodes due to where this method is called by Solve()
-                assert(!this->mrCellPopulation.GetNode(node_index)->IsDeleted());
-
-                // Check that results should be written for this node
-                bool is_real_node = true;
-
-                if (dynamic_cast<AbstractCentreBasedCellPopulation<DIM>*>(&this->mrCellPopulation))
-                {
-                    if (static_cast<AbstractCentreBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->IsGhostNode(node_index))
-                    {
-                        // If this node is a ghost node then don't record its velocity
-                        is_real_node = false;
-                    }
-                    else
-                    {
-                        // We should never encounter nodes associated with dead cells due to where this method is called by Solve()
-                        assert(!this->mrCellPopulation.GetCellUsingLocationIndex(node_index)->IsDead());
-                    }
-                }
-
-                // Write node data to file
-                if (is_real_node)
-                {
-                    const c_vector<double,DIM>& position = this->mrCellPopulation.GetNode(node_index)->rGetLocation();
-                    double damping_constant = static_cast<AbstractOffLatticeCellPopulation<DIM>*>(&(this->mrCellPopulation))->GetDampingConstant(node_index);
-                    c_vector<double, DIM> velocity = this->mDt * rNodeForces[node_index] / damping_constant;
-
-                    *mpNodeVelocitiesFile << node_index  << " ";
-                    for (unsigned i=0; i<DIM; i++)
-                    {
-                        *mpNodeVelocitiesFile << position[i] << " ";
-                    }
-                    for (unsigned i=0; i<DIM; i++)
-                    {
-                        *mpNodeVelocitiesFile << velocity[i] << " ";
-                    }
-                }
+            	mpNodeVelocitiesFile = output_file_handler2.OpenOutputFile("nodevelocities.dat");
             }
-            *mpNodeVelocitiesFile << "\n";
-        }
+            else
+            {
+            	mpNodeVelocitiesFile = output_file_handler2.OpenOutputFile("nodevelocities.dat", std::ios::app);
+            }
+
+			if (SimulationTime::Instance()->GetTimeStepsElapsed()%this->mSamplingTimestepMultiple == 0)
+			{
+				*mpNodeVelocitiesFile << SimulationTime::Instance()->GetTime() << "\t";
+				for (unsigned node_index=0; node_index<num_nodes; node_index++)
+				{
+					// We should never encounter deleted nodes due to where this method is called by Solve()
+					assert(!this->mrCellPopulation.GetNode(node_index)->IsDeleted());
+
+					// Check that results should be written for this node
+					bool is_real_node = true;
+
+					if (dynamic_cast<AbstractCentreBasedCellPopulation<DIM>*>(&this->mrCellPopulation))
+					{
+						if (static_cast<AbstractCentreBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->IsGhostNode(node_index))
+						{
+							// If this node is a ghost node then don't record its velocity
+							is_real_node = false;
+						}
+						else
+						{
+							// We should never encounter nodes associated with dead cells due to where this method is called by Solve()
+							assert(!this->mrCellPopulation.GetCellUsingLocationIndex(node_index)->IsDead());
+						}
+					}
+
+					// Write node data to file
+					if (is_real_node)
+					{
+						const c_vector<double,DIM>& position = this->mrCellPopulation.GetNode(node_index)->rGetLocation();
+						double damping_constant = static_cast<AbstractOffLatticeCellPopulation<DIM>*>(&(this->mrCellPopulation))->GetDampingConstant(node_index);
+						c_vector<double, DIM> velocity = this->mDt * rNodeForces[node_index] / damping_constant;
+
+						*mpNodeVelocitiesFile << node_index  << " ";
+						for (unsigned i=0; i<DIM; i++)
+						{
+							*mpNodeVelocitiesFile << position[i] << " ";
+						}
+						for (unsigned i=0; i<DIM; i++)
+						{
+							*mpNodeVelocitiesFile << velocity[i] << " ";
+						}
+					}
+				}
+				*mpNodeVelocitiesFile << "\n";
+			}
+			mpNodeVelocitiesFile->close();
+    	}
     }
 }
 
 template<unsigned DIM>
 void OffLatticeSimulation<DIM>::SetupSolve()
 {
-    if (mOutputNodeVelocities)
-    {
-        OutputFileHandler output_file_handler2(this->mSimulationOutputDirectory+"/", false);
-        mpNodeVelocitiesFile = output_file_handler2.OpenOutputFile("nodevelocities.dat");
-    }
+	//No longer need to open velocities file as this is done in the UpdateNodePositions method.
 }
 
 template<unsigned DIM>
 void OffLatticeSimulation<DIM>::UpdateAtEndOfSolve()
 {
-    if (mOutputNodeVelocities)
-    {
-        mpNodeVelocitiesFile->close();
-    }
+	// Node velocities file is now closed in the UpdateNodePositions method.
 }
 
 template<unsigned DIM>
