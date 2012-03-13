@@ -198,31 +198,34 @@ c_vector<double, DIM> OffLatticeSimulation<DIM>::CalculateCellDivisionVector(Cel
 template<unsigned DIM>
 void OffLatticeSimulation<DIM>::WriteVisualizerSetupFile()
 {
-    for (unsigned i=0; i<this->mForceCollection.size(); i++)
-    {
-        boost::shared_ptr<AbstractForce<DIM> > p_force = this->mForceCollection[i];
-        if (boost::dynamic_pointer_cast<AbstractTwoBodyInteractionForce<DIM> >(p_force))
-        {
-            double cutoff = (boost::static_pointer_cast<AbstractTwoBodyInteractionForce<DIM> >(p_force))->GetCutOffLength();
-            *(this->mpVizSetupFile) << "Cutoff\t" << cutoff << "\n";
-        }
-    }
+	if(PetscTools::AmMaster())
+	{
+		for (unsigned i=0; i<this->mForceCollection.size(); i++)
+		{
+			boost::shared_ptr<AbstractForce<DIM> > p_force = this->mForceCollection[i];
+			if (boost::dynamic_pointer_cast<AbstractTwoBodyInteractionForce<DIM> >(p_force))
+			{
+				double cutoff = (boost::static_pointer_cast<AbstractTwoBodyInteractionForce<DIM> >(p_force))->GetCutOffLength();
+				*(this->mpVizSetupFile) << "Cutoff\t" << cutoff << "\n";
+			}
+		}
 
-    // This is a quick and dirty check to see if the mesh is periodic
-    if (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&this->mrCellPopulation))
-    {
-       if (dynamic_cast<Cylindrical2dMesh*>(&(dynamic_cast<MeshBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->rGetMesh())))
-       {
-           *this->mpVizSetupFile << "MeshWidth\t" << this->mrCellPopulation.GetWidth(0) << "\n";
-       }
-    }
-    else if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&this->mrCellPopulation))
-    {
-       if (dynamic_cast<Cylindrical2dVertexMesh*>(&(dynamic_cast<VertexBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->rGetMesh())))
-       {
-           *this->mpVizSetupFile << "MeshWidth\t" << this->mrCellPopulation.GetWidth(0) << "\n";
-       }
-    }
+		// This is a quick and dirty check to see if the mesh is periodic
+		if (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&this->mrCellPopulation))
+		{
+		   if (dynamic_cast<Cylindrical2dMesh*>(&(dynamic_cast<MeshBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->rGetMesh())))
+		   {
+			   *this->mpVizSetupFile << "MeshWidth\t" << this->mrCellPopulation.GetWidth(0) << "\n";
+		   }
+		}
+		else if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&this->mrCellPopulation))
+		{
+		   if (dynamic_cast<Cylindrical2dVertexMesh*>(&(dynamic_cast<VertexBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->rGetMesh())))
+		   {
+			   *this->mpVizSetupFile << "MeshWidth\t" << this->mrCellPopulation.GetWidth(0) << "\n";
+		   }
+		}
+	}
 }
 
 template<unsigned DIM>

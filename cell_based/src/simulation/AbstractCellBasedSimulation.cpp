@@ -302,13 +302,19 @@ void AbstractCellBasedSimulation<DIM>::Solve()
 
     mrCellPopulation.CreateOutputFiles(results_directory+"/", false);
 
-    mpVizSetupFile = output_file_handler.OpenOutputFile("results.vizsetup");
+    if(PetscTools::AmMaster())
+    {
+    	mpVizSetupFile = output_file_handler.OpenOutputFile("results.vizsetup");
+    }
 
     // If any PDEs have been defined, set up results files to store their solution
     if (mpCellBasedPdeHandler != NULL)
     {
         mpCellBasedPdeHandler->OpenResultsFiles(this->mSimulationOutputDirectory);
-        *this->mpVizSetupFile << "PDE \n";
+        if(PetscTools::AmMaster())
+        {
+        	*this->mpVizSetupFile << "PDE \n";
+        }
     }
 
     SetupSolve();
@@ -329,7 +335,10 @@ void AbstractCellBasedSimulation<DIM>::Solve()
     // Write initial conditions to file for the visualizer
     WriteVisualizerSetupFile();
 
-    *mpVizSetupFile << std::flush;
+    if(PetscTools::AmMaster())
+    {
+        *mpVizSetupFile << std::flush;
+    }
 
     mrCellPopulation.WriteResultsToFiles();
 
@@ -389,8 +398,11 @@ void AbstractCellBasedSimulation<DIM>::Solve()
 
     mrCellPopulation.CloseOutputFiles();
 
-    *mpVizSetupFile << "Complete\n";
-    mpVizSetupFile->close();
+    if(PetscTools::AmMaster())
+    {
+    	*mpVizSetupFile << "Complete\n";
+    	mpVizSetupFile->close();
+    }
 
     CellBasedEventHandler::EndEvent(CellBasedEventHandler::OUTPUT);
     CellBasedEventHandler::EndEvent(CellBasedEventHandler::EVERYTHING);
