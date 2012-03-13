@@ -191,7 +191,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AugmentCellData()
         vtkDataArray* array = mpVtkUnstructedMesh->GetCellData()->GetArray(i);
 
         //Check data was the correct size before the cables were added
-        assert(array->GetNumberOfTuples() == this->GetNumElements());
+        assert((unsigned)array->GetNumberOfTuples() == this->GetNumElements());
 
         //Check that tuples of size 3 will be big enough for padding the rest of the data
         assert(array->GetNumberOfComponents() <= 3);
