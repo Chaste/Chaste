@@ -35,7 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "VtkMeshWriter.hpp"
 #include "DistributedTetrahedralMesh.hpp"
-
+#include "MixedDimensionMesh.hpp"
+#include "Debug.hpp"
 #ifdef CHASTE_VTK
 ///////////////////////////////////////////////////////////////////////////////////
 // Implementation
@@ -113,7 +114,6 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::MakeVtkMesh()
         std::vector<double> radii(this->GetNumElements(), 0.0);
         for (unsigned item_num=0; item_num<this->GetNumCableElements(); item_num++)
         {
-            ///\todo #2052 We can't add radius data, because we can't distinguish which cells are cables
             ElementData cable_element_data = this->GetNextCableElement();
             std::vector<unsigned> current_element = cable_element_data.NodeIndices;
             radii.push_back(cable_element_data.AttributeValue);
@@ -191,14 +191,23 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AugmentCellData()
         vtkDataArray* array = mpVtkUnstructedMesh->GetCellData()->GetArray(i);
 
         //Check data was the correct size before the cables were added
-        assert((unsigned)array->GetNumberOfTuples() == this->GetNumElements());
+        unsigned num_cable_pads = this->GetNumCableElements();
+        if (mWriteParallelFiles)
+        {
+            assert((unsigned)array->GetNumberOfTuples() == this->mpDistributedMesh->GetNumLocalElements());
+            num_cable_pads =  this->mpMixedMesh->GetNumLocalCableElements()+1;
+        }
+        else
+        {
+            assert((unsigned)array->GetNumberOfTuples() == this->GetNumElements());
+        }
 
         //Check that tuples of size 3 will be big enough for padding the rest of the data
         assert(array->GetNumberOfComponents() <= 3);
         double null_data[3] = {0.0, 0.0, 0.0};
 
         //Pad data
-        for (unsigned new_index = 0; new_index <  this->GetNumCableElements(); new_index++)
+        for (unsigned new_index = 0; new_index <  num_cable_pads; new_index++)
         {
             array->InsertNextTuple(null_data);
         }
@@ -477,6 +486,7 @@ void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
 {
     //Have we got a parallel mesh?
     this->mpDistributedMesh = dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* >(&rMesh);
+    this->mpMixedMesh = dynamic_cast<MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* >(&rMesh);
 
     if ( PetscTools::IsSequential() || !mWriteParallelFiles || this->mpDistributedMesh == NULL )
     {
@@ -534,6 +544,31 @@ void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
             mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
             p_cell->Delete(); //Reference counted
         }
+        //If necessary, construct cables
+        if (this->mpMixedMesh )
+        {
+            AugmentCellData();
+            //Make a blank cell radius data for the regular elements
+            std::vector<double> radii(this->mpMixedMesh->GetNumLocalElements(), 0.0);
+            for (typename MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>::CableElementIterator elem_iter = this->mpMixedMesh->GetCableElementIteratorBegin();
+                 elem_iter != this->mpMixedMesh->GetCableElementIteratorEnd();
+                 ++elem_iter)
+            {
+                radii.push_back((*elem_iter)->GetAttribute());
+                vtkCell* p_cell=vtkLine::New();
+                vtkIdList* p_cell_id_list = p_cell->GetPointIds();
+                for (unsigned j = 0; j < 2; ++j)
+                {
+                    unsigned global_node_index = (*elem_iter)->GetNodeGlobalIndex(j);
+                    p_cell_id_list->SetId(j, mGlobalToNodeIndexMap[global_node_index]);
+                }
+                mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
+                p_cell->Delete(); //Reference counted
+            }
+            AddCellData("Cable radius", radii);
+        }
+
+
         //This block is to guard the mesh writers (vtkXMLPUnstructuredGridWriter) so that they
         //go out of scope, flush buffers and close files
         {
