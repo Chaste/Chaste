@@ -207,7 +207,9 @@ void AbstractCentreBasedCellPopulation<DIM>::WriteTimeAndNodeResultsToFiles()
     *this->mpVizBoundaryNodesFile << time << "\t";
 
     // Write node data to file
-    for (unsigned node_index=0; node_index<this->GetNumNodes(); node_index++)
+    for (typename AbstractMesh<DIM, DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
+    		node_iter != this->mrMesh.GetNodeIteratorEnd();
+    		++node_iter)
     {
         /*
          * Hack that covers the case where the node in an AbstractCentreBasedCellPopulation
@@ -215,21 +217,21 @@ void AbstractCentreBasedCellPopulation<DIM>::WriteTimeAndNodeResultsToFiles()
          * vertex visualizer when apoptotic cells are involved.
          */
         bool node_corresponds_to_dead_cell = false;
-        if (this->mLocationCellMap[node_index])
+        if (this->mLocationCellMap[node_iter->GetIndex()])
         {
-            node_corresponds_to_dead_cell = this->mLocationCellMap[node_index]->IsDead();
+            node_corresponds_to_dead_cell = this->mLocationCellMap[node_iter->GetIndex()]->IsDead();
         }
 
         // Write node data to file
-        if (!(this->GetNode(node_index)->IsDeleted()) && !node_corresponds_to_dead_cell)
+        if (!(node_iter->IsDeleted()) && !node_corresponds_to_dead_cell)
         {
-            const c_vector<double,DIM>& position = this->GetNode(node_index)->rGetLocation();
+            const c_vector<double,DIM>& position = node_iter->rGetLocation();
 
             for (unsigned i=0; i<DIM; i++)
             {
                 *this->mpVizNodesFile << position[i] << " ";
             }
-            *this->mpVizBoundaryNodesFile << this->GetNode(node_index)->IsBoundaryNode() << " ";
+            *this->mpVizBoundaryNodesFile << node_iter->IsBoundaryNode() << " ";
         }
     }
     *this->mpVizNodesFile << "\n";

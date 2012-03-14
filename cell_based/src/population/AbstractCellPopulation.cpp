@@ -598,17 +598,19 @@ void AbstractCellPopulation<DIM>::WriteTimeAndNodeResultsToFiles()
     *mpVizBoundaryNodesFile << time << "\t";
 
     // Write node data to file
-    for (unsigned node_index=0; node_index<GetNumNodes(); node_index++)
+    for (typename AbstractMesh<DIM, DIM>::NodeIterator node_iter = mrMesh.GetNodeIteratorBegin();
+    		node_iter != mrMesh.GetNodeIteratorEnd();
+    		++node_iter)
     {
-        if (!GetNode(node_index)->IsDeleted())
+        if (!node_iter->IsDeleted())
         {
-            const c_vector<double,DIM>& position = GetNode(node_index)->rGetLocation();
+            const c_vector<double,DIM>& position = node_iter->rGetLocation();
 
             for (unsigned i=0; i<DIM; i++)
             {
                 *mpVizNodesFile << position[i] << " ";
             }
-            *mpVizBoundaryNodesFile << GetNode(node_index)->IsBoundaryNode() << " ";
+            *mpVizBoundaryNodesFile << node_iter->IsBoundaryNode() << " ";
         }
     }
     *mpVizNodesFile << "\n";
