@@ -272,11 +272,7 @@ void OffLatticeSimulation<DIM>::UpdateNodePositions(const std::vector< c_vector<
         OutputFileHandler output_file_handler2(this->mSimulationOutputDirectory+"/", false);
     	PetscTools::BeginRoundRobin();
     	{
-            if(PetscTools::AmMaster() && SimulationTime::Instance()->GetTimeStepsElapsed()==0)
-            {
-            	mpNodeVelocitiesFile = output_file_handler2.OpenOutputFile("nodevelocities.dat");
-            }
-            else
+            if(!PetscTools::AmMaster() || SimulationTime::Instance()->GetTimeStepsElapsed()!=0)
             {
             	mpNodeVelocitiesFile = output_file_handler2.OpenOutputFile("nodevelocities.dat", std::ios::app);
             }
@@ -284,6 +280,7 @@ void OffLatticeSimulation<DIM>::UpdateNodePositions(const std::vector< c_vector<
 			if (SimulationTime::Instance()->GetTimeStepsElapsed()%this->mSamplingTimestepMultiple == 0)
 			{
 				*mpNodeVelocitiesFile << SimulationTime::Instance()->GetTime() << "\t";
+
 				for (unsigned node_index=0; node_index<num_nodes; node_index++)
 				{
 					// We should never encounter deleted nodes due to where this method is called by Solve()
@@ -334,13 +331,20 @@ void OffLatticeSimulation<DIM>::UpdateNodePositions(const std::vector< c_vector<
 template<unsigned DIM>
 void OffLatticeSimulation<DIM>::SetupSolve()
 {
-	//No longer need to open velocities file as this is done in the UpdateNodePositions method.
+    if (mOutputNodeVelocities && PetscTools::AmMaster())
+    {
+        OutputFileHandler output_file_handler2(this->mSimulationOutputDirectory+"/", false);
+        mpNodeVelocitiesFile = output_file_handler2.OpenOutputFile("nodevelocities.dat");
+    }
 }
 
 template<unsigned DIM>
 void OffLatticeSimulation<DIM>::UpdateAtEndOfSolve()
 {
-	// Node velocities file is now closed in the UpdateNodePositions method.
+    if (mOutputNodeVelocities)
+    {
+        mpNodeVelocitiesFile->close();
+    }
 }
 
 template<unsigned DIM>

@@ -201,41 +201,63 @@ void AbstractCentreBasedCellPopulation<DIM>::GenerateCellResultsAndWriteToFiles(
 template<unsigned DIM>
 void AbstractCentreBasedCellPopulation<DIM>::WriteTimeAndNodeResultsToFiles()
 {
-    double time = SimulationTime::Instance()->GetTime();
+    OutputFileHandler output_file_handler(this->mDirPath, false);
 
-    *this->mpVizNodesFile << time << "\t";
-    *this->mpVizBoundaryNodesFile << time << "\t";
-
-    // Write node data to file
-    for (typename AbstractMesh<DIM, DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
-    		node_iter != this->mrMesh.GetNodeIteratorEnd();
-    		++node_iter)
+    PetscTools::BeginRoundRobin();
     {
-        /*
-         * Hack that covers the case where the node in an AbstractCentreBasedCellPopulation
-         * is associated with a cell that has just been killed (#1129). This breaks the
-         * vertex visualizer when apoptotic cells are involved.
-         */
-        bool node_corresponds_to_dead_cell = false;
-        if (this->mLocationCellMap[node_iter->GetIndex()])
-        {
-            node_corresponds_to_dead_cell = this->mLocationCellMap[node_iter->GetIndex()]->IsDead();
-        }
+		if(!PetscTools::AmMaster() || SimulationTime::Instance()->GetTimeStepsElapsed()!=0)
+		{
+			this->mpVizNodesFile = output_file_handler.OpenOutputFile("results.viznodes", std::ios::app);
+			this->mpVizBoundaryNodesFile = output_file_handler.OpenOutputFile("results.vizboundarynodes", std::ios::app);
+		}
+		if(PetscTools::AmMaster())
+		{
+			double time = SimulationTime::Instance()->GetTime();
 
-        // Write node data to file
-        if (!(node_iter->IsDeleted()) && !node_corresponds_to_dead_cell)
-        {
-            const c_vector<double,DIM>& position = node_iter->rGetLocation();
+			*this->mpVizNodesFile << time << "\t";
+			*this->mpVizBoundaryNodesFile << time << "\t";
+		}
 
-            for (unsigned i=0; i<DIM; i++)
-            {
-                *this->mpVizNodesFile << position[i] << " ";
-            }
-            *this->mpVizBoundaryNodesFile << node_iter->IsBoundaryNode() << " ";
-        }
+
+		// Write node data to file
+		for (typename AbstractMesh<DIM, DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
+				node_iter != this->mrMesh.GetNodeIteratorEnd();
+				++node_iter)
+		{
+			/*
+			 * Hack that covers the case where the node in an AbstractCentreBasedCellPopulation
+			 * is associated with a cell that has just been killed (#1129). This breaks the
+			 * vertex visualizer when apoptotic cells are involved.
+			 */
+			bool node_corresponds_to_dead_cell = false;
+			if (this->mLocationCellMap[node_iter->GetIndex()])
+			{
+				node_corresponds_to_dead_cell = this->mLocationCellMap[node_iter->GetIndex()]->IsDead();
+			}
+
+			// Write node data to file
+			if (!(node_iter->IsDeleted()) && !node_corresponds_to_dead_cell)
+			{
+				const c_vector<double,DIM>& position = node_iter->rGetLocation();
+
+				for (unsigned i=0; i<DIM; i++)
+				{
+					*this->mpVizNodesFile << position[i] << " ";
+				}
+				*this->mpVizBoundaryNodesFile << node_iter->IsBoundaryNode() << " ";
+			}
+		}
+
+		if(PetscTools::AmTopMost())
+		{
+			*this->mpVizNodesFile << "\n";
+			*this->mpVizBoundaryNodesFile << "\n";
+		}
+
+		this->mpVizNodesFile->close();
+		this->mpVizBoundaryNodesFile->close();
     }
-    *this->mpVizNodesFile << "\n";
-    *this->mpVizBoundaryNodesFile << "\n";
+    PetscTools::EndRoundRobin();
 }
 
 template<unsigned DIM>
