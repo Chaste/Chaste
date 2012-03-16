@@ -604,7 +604,7 @@ void AbstractCellPopulation<DIM>::WriteTimeAndNodeResultsToFiles()
 
     PetscTools::BeginRoundRobin();
     {
-		if(!PetscTools::AmMaster() || SimulationTime::Instance()->GetTimeStepsElapsed()!=0)
+		if(!PetscTools::AmMaster() || SimulationTime::Instance()->IsEndTimeAndNumberOfTimeStepsSetUp())
 		{
 			mpVizNodesFile = output_file_handler.OpenOutputFile("results.viznodes", std::ios::app);
 			mpVizBoundaryNodesFile = output_file_handler.OpenOutputFile("results.vizboundarynodes", std::ios::app);
