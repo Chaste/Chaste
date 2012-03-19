@@ -302,9 +302,17 @@ void Cell::SetAncestor(boost::shared_ptr<AbstractCellProperty> pCellAncestor)
 
 	// You can only set ancestors once.
 	CellPropertyCollection ancestor_collection = mCellPropertyCollection.GetPropertiesType<CellAncestor>();
-	assert(ancestor_collection.GetSize() == 0);
+	if(ancestor_collection.GetSize() == 0)
+	{
+	    AddCellProperty(pCellAncestor);
+	}
+	else
+	{
+	    // Over-write the CellAncestor.
+	    RemoveCellProperty<CellAncestor>();
+	    AddCellProperty(pCellAncestor);
+	}
 
-	AddCellProperty(pCellAncestor);
 }
 
 unsigned Cell::GetAncestor() const

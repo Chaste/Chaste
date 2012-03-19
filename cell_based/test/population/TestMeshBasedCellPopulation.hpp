@@ -1095,17 +1095,17 @@ public:
         TS_ASSERT_EQUALS(remaining_ancestors.size(), 5u);
 
         // This is commented as we cant reallocate cell ancestors see #1515
-//        // Test that the set correctly represents a monoclonal population
-//        for (AbstractCellPopulation<2>::Iterator cell_iter=cell_population.Begin();
-//             cell_iter!=cell_population.End();
-//             ++cell_iter)
-//        {
-//            // Set all cells to have the same ancestor
-//        	MAKE_PTR_ARGS(CellAncestor, p_cell_ancestor, (1u));
-//            cell_iter->SetAncestor(p_cell_ancestor);
-//        }
-//        remaining_ancestors = cell_population.GetCellAncestors();
-//        TS_ASSERT_EQUALS(remaining_ancestors.size(), 1u);
+        // Test that the set correctly represents a monoclonal population
+        for (AbstractCellPopulation<2>::Iterator cell_iter=cell_population.Begin();
+             cell_iter!=cell_population.End();
+             ++cell_iter)
+        {
+            // Set all cells to have the same ancestor
+        	MAKE_PTR_ARGS(CellAncestor, p_cell_ancestor, (1u));
+            cell_iter->SetAncestor(p_cell_ancestor);
+        }
+        remaining_ancestors = cell_population.GetCellAncestors();
+        TS_ASSERT_EQUALS(remaining_ancestors.size(), 1u);
     }
 
     void TestIsCellAssociatedWithADeletedLocation() throw (Exception)
