@@ -84,11 +84,16 @@ private:
         TS_ASSERT_EQUALS(cell_population.rGetMesh().GetNumNodes(), mesh.GetNumNodes());
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), num_cells);
 
-        // Test set/get method of member variable
+        // Test set/get method of member variables
         TS_ASSERT_DELTA(cell_population.GetMeinekeDivisionSeparation(), 0.3, 1e-6);
         cell_population.SetMeinekeDivisionSeparation(0.5);
         TS_ASSERT_DELTA(cell_population.GetMeinekeDivisionSeparation(), 0.5, 1e-6);
         cell_population.SetMeinekeDivisionSeparation(0.3);
+
+        TS_ASSERT_DELTA(cell_population.GetAbsoluteMovementThreshold(), 0.5, 1e-6);
+        cell_population.SetAbsoluteMovementThreshold(1.5);
+        TS_ASSERT_DELTA(cell_population.GetAbsoluteMovementThreshold(), 1.5, 1e-6);
+        cell_population.SetMeinekeDivisionSeparation(0.5);
 
         unsigned counter = 0;
         for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = cell_population.Begin();

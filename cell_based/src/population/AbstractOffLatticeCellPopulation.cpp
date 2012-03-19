@@ -41,7 +41,8 @@ AbstractOffLatticeCellPopulation<DIM>::AbstractOffLatticeCellPopulation( Abstrac
                                                                   const std::vector<unsigned> locationIndices)
     : AbstractCellPopulation<DIM>(rMesh, rCells, locationIndices),
       mDampingConstantNormal(1.0),
-      mDampingConstantMutant(1.0)
+      mDampingConstantMutant(1.0),
+      mAbsoluteMovementThreshold(0.5)
 {
 }
 
@@ -66,6 +67,12 @@ void AbstractOffLatticeCellPopulation<DIM>::SetDampingConstantMutant(double damp
 }
 
 template<unsigned DIM>
+void AbstractOffLatticeCellPopulation<DIM>::SetAbsoluteMovementThreshold(double absoluteMovementThreshold)
+{
+    mAbsoluteMovementThreshold = absoluteMovementThreshold;
+}
+
+template<unsigned DIM>
 double AbstractOffLatticeCellPopulation<DIM>::GetDampingConstantNormal()
 {
     return mDampingConstantNormal;
@@ -75,6 +82,12 @@ template<unsigned DIM>
 double AbstractOffLatticeCellPopulation<DIM>::GetDampingConstantMutant()
 {
     return mDampingConstantMutant;
+}
+
+template<unsigned DIM>
+double AbstractOffLatticeCellPopulation<DIM>::GetAbsoluteMovementThreshold()
+{
+    return mAbsoluteMovementThreshold;
 }
 
 template<unsigned DIM>

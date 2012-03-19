@@ -48,6 +48,7 @@ template<unsigned DIM>
 AbstractCentreBasedCellPopulation<DIM>::AbstractCentreBasedCellPopulation(AbstractMesh<DIM, DIM>& rMesh)
     : AbstractOffLatticeCellPopulation<DIM>(rMesh),
       mMeinekeDivisionSeparation(0.3) // educated guess
+
 {
 }
 
@@ -96,14 +97,27 @@ void AbstractCentreBasedCellPopulation<DIM>::UpdateNodeLocations(const std::vect
          cell_iter != this->End();
          ++cell_iter)
     {
+
+
         // Get index of node associated with cell
         unsigned node_index = this->mCellLocationMap[(*cell_iter).get()];
 
         // Get damping constant for node
         double damping_const = this->GetDampingConstant(node_index);
 
+        // Get displacement
+        c_vector<double,DIM> displacement=dt*rNodeForces[node_index]/damping_const;
+
+/// \todo Check how the following lines affect the code before commit.
+
+//         // Throws an exception if the cell movement goes beyond mAbsoluteMovementThreshold
+//        if (norm_2(displacement) > mAbsoluteMovementThreshold)
+//        {
+//            EXCEPTION("Cells are moving more than the AbsoluteMovementThreshold. Use a smaller timestep to avoid this exception.");
+//        }
+
         // Get new node location
-        c_vector<double, DIM> new_node_location = this->GetNode(node_index)->rGetLocation() + dt*rNodeForces[node_index]/damping_const;
+        c_vector<double, DIM> new_node_location = this->GetNode(node_index)->rGetLocation() + displacement;
 
         // Create ChastePoint for new node location
         ChastePoint<DIM> new_point(new_node_location);
@@ -273,6 +287,7 @@ void AbstractCentreBasedCellPopulation<DIM>::SetMeinekeDivisionSeparation(double
     assert(divisionSeparation >= 0.0);
     mMeinekeDivisionSeparation = divisionSeparation;
 }
+
 
 template<unsigned DIM>
 void AbstractCentreBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)

@@ -64,6 +64,7 @@ private:
         archive & boost::serialization::base_object<AbstractCellPopulation<DIM> >(*this);
         archive & mDampingConstantNormal;
         archive & mDampingConstantMutant;
+        archive & mAbsoluteMovementThreshold;
     }
 
 protected:
@@ -80,6 +81,13 @@ protected:
      * Damping constant for mutant cells has units of kg s^-1.
      */
     double mDampingConstantMutant;
+
+    /**
+     * The absolute distance which a cell is permitted to move in one time-step.
+     * Movement beyond this threshold will trigger UpdateNodeLocations to throw an exception
+     *
+     */
+    double mAbsoluteMovementThreshold;
 
     /**
      * Constructor that just takes in a mesh.
@@ -160,6 +168,18 @@ public:
      * @param dampingConstantMutant  the new value of mDampingConstantMutant
      */
     void SetDampingConstantMutant(double dampingConstantMutant);
+
+    /**
+     * Set mAbsoluteMovementThreshold.
+     *
+     * @param absoluteMovementThreshold the new value of mAbsoluteMovementThreshold
+     */
+    void SetAbsoluteMovementThreshold(double absoluteMovementThreshold);
+
+    /**
+     * @return mAbsoluteMovementThreshold
+     */
+    double GetAbsoluteMovementThreshold();
 
     /**
      * @return mDampingConstantNormal
