@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_iarchive.hpp>
 
 #include "CellId.hpp"
+#include "CellData.hpp"
 
 #include "CellPropertyRegistry.hpp"
 
@@ -83,7 +84,7 @@ public:
     	OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "mutation.arch";
 
-        // Archive a mutation state
+        // Archive Cell ID
         {
         	CellId* p_cell_id = new CellId();
         	p_cell_id->AssignCellId();
@@ -102,7 +103,7 @@ public:
             delete p_cell_id;
         }
 
-        // Restore mutation state
+        // Restore cell ID
         {
             AbstractCellProperty* p_cell_id;
 
@@ -120,6 +121,72 @@ public:
 
             // Tidy up
             delete p_cell_id;
+        }
+    }
+
+    void TestCellDataMethods() throw(Exception)
+    {
+        MAKE_PTR_ARGS(CellData, p_cell_data,(2));
+
+        TS_ASSERT_THROWS_THIS(p_cell_data->GetCellData(0), "SetCellData must be called before using GetCellData");
+        TS_ASSERT_THROWS_THIS(p_cell_data->GetCellData(1), "SetCellData must be called before using GetCellData");
+        TS_ASSERT_THROWS_THIS(p_cell_data->GetCellData(2), "Request for variable above the number of variables stored.");
+
+        p_cell_data->SetCellData(0,1.0);
+        p_cell_data->SetCellData(1,2.0);
+        TS_ASSERT_THROWS_THIS(p_cell_data->SetCellData(2,3.0), "Attempted to set a variable above the number of variables stored.");
+
+        TS_ASSERT_DELTA(p_cell_data->GetCellData(0), 1.0, 1e-8);
+        TS_ASSERT_DELTA(p_cell_data->GetCellData(1), 2.0, 1e-8);
+        TS_ASSERT_THROWS_THIS(p_cell_data->GetCellData(2), "Request for variable above the number of variables stored.");
+    }
+
+    void TestArchiveCellData() throw(Exception)
+    {
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "cell_data.arch";
+
+        // Archive Cell data
+        {
+            CellData* p_cell_data = new CellData(2);
+
+            p_cell_data->SetCellData(0,1.0);
+            p_cell_data->SetCellData(1,2.0);
+
+            TS_ASSERT_DELTA(p_cell_data->GetCellData(0), 1.0, 1e-8);
+            TS_ASSERT_DELTA(p_cell_data->GetCellData(1), 2.0, 1e-8);
+            TS_ASSERT_THROWS_THIS(p_cell_data->GetCellData(2), "Request for variable above the number of variables stored.");
+
+            // Create an output archive
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Write the cell to the archive
+            const AbstractCellProperty* const p_const_cell_data = p_cell_data;
+            output_arch << p_const_cell_data;
+
+            delete p_cell_data;
+        }
+
+        // Restore Cell data
+        {
+            AbstractCellProperty* p_cell_data;
+
+            // Restore the Cell data
+            std::ifstream ifs(archive_filename.c_str());
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_cell_data;
+
+            CellData* p_real_cell_data = dynamic_cast<CellData*>(p_cell_data);
+            TS_ASSERT(p_real_cell_data != NULL);
+
+            TS_ASSERT_DELTA(p_real_cell_data->GetCellData(0), 1.0, 1e-8);
+            TS_ASSERT_DELTA(p_real_cell_data->GetCellData(1), 2.0, 1e-8);
+            TS_ASSERT_THROWS_THIS(p_real_cell_data->GetCellData(2), "Request for variable above the number of variables stored.");
+
+            // Tidy up
+            delete p_cell_data;
         }
     }
 };
