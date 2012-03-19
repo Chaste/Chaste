@@ -155,7 +155,7 @@ public:
         double l2_errors[4];
         unsigned num_elem_each_dir[4] = {1,2,5,10};
 
-        for(unsigned run=3; run<num_runs; run++)
+        for(unsigned run=0; run<num_runs; run++)
         {
             QuadraticMesh<3> mesh(1.0/num_elem_each_dir[run], 1.0, 1.0, 1.0);
 

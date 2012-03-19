@@ -539,9 +539,6 @@ double AbstractNonlinearElasticitySolver<DIM>::TakeNewtonStep()
         {
             PCSetType(pc, PCBJACOBI);
         }
-
-        //// for debugging only
-        //assert( PetscMatTools::CheckSymmetry(mrJacobianMatrix) );
     }
     else
     {

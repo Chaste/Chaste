@@ -253,24 +253,6 @@ public:
      *  Get the number of vertices, ie non-internal (non-quadratic), nodes.
      */
     unsigned GetNumVertices();
-
-
-//// These methods are required for the adaptive subclass of QuadraticMesh (projects work) to run.
-//// In that class the vertices are not assumed to be the first num_vertices nodes in this->mNodes.
-//// Therefore need a map from 'vertex index' to 'node index'. Used in the solvers
-//// Probably want to go to this design in the future.
-//    virtual unsigned GetVertexIndexOfNode(unsigned nodeIndex)
-//    {
-//        assert(nodeIndex < GetNumVertices());
-//        return nodeIndex;
-//    }
-//
-//    virtual unsigned GetNodeIndexOfVertex(unsigned vertexIndex)
-//    {
-//        assert(vertexIndex < GetNumVertices());
-//        return vertexIndex;
-//    }
-
 };
 
 #include "SerializationExportWrapper.hpp"

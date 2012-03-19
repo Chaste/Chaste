@@ -248,11 +248,6 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
         // At the moment we assume the vertices are the first num_vertices nodes in the list of nodes
         // in the mesh. Hence:
         unsigned vertex_index = rElement.GetNodeGlobalIndex(II);
-        assert(vertex_index < this->mrQuadMesh.GetNumVertices());
-
-        // In the future (or currently with AlexW's adaptive quadratic mesh class (project work)), we
-        // will want to use this instead:
-        //unsigned vertex_index = this->mrQuadMesh.GetVertexIndexOfNode( rElement.GetNodeGlobalIndex(II) );
 
         // note: DIM+1, on the right hand side of the below, is the problem dimension (= this->mProblemDimension)
         element_current_pressures(II) = this->mCurrentSolution[(DIM+1)*vertex_index + DIM];
