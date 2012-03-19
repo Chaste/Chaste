@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellLabel.hpp"
 #include "CellAncestor.hpp"
 #include "CellId.hpp"
-
+#include "CellData.hpp"
 
 #include "ApoptoticCellProperty.hpp"
 #include "AbstractCellCycleModel.hpp"

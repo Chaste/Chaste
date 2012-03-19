@@ -368,6 +368,15 @@ CellPtr Cell::Divide()
     CellPropertyCollection daughter_property_collection = mCellPropertyCollection;
     daughter_property_collection.RemoveProperty<CellId>();
 
+    // Copy any cell data (note we create a now object not just copying the pointer
+    if (daughter_property_collection.HasPropertyType<CellData>())
+    {
+        // See #1515
+        // Get the existing copy of the cell data it and remove it from the daughter cell
+
+        // Create a new cell data object and add this to the daughter cell
+    }
+
     // Create daughter cell
     CellPtr p_new_cell(new Cell(GetMutationState(), mpCellCycleModel->CreateCellCycleModel(), false, daughter_property_collection));
     // Initialise properties of daughter cell

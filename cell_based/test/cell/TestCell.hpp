@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "CellPropertyRegistry.hpp"
 #include "CellLabel.hpp"
+#include "CellData.hpp"
 #include "ApcTwoHitCellMutationState.hpp"
 #include "ApcOneHitCellMutationState.hpp"
 #include "StochasticDurationGenerationBasedCellCycleModel.hpp"
@@ -1106,6 +1107,45 @@ public:
         TS_ASSERT_EQUALS(p_cell->GetCellId(), 0u);
         TS_ASSERT_EQUALS(p_cell2->GetCellId(), 1u);
     }
+    void TestCellData() throw (Exception)
+    {
+        SimulationTime* p_simulation_time = SimulationTime::Instance();
+        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(25, 2);
+
+        boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+
+        FixedDurationGenerationBasedCellCycleModel* p_cell_model = new FixedDurationGenerationBasedCellCycleModel();
+        p_cell_model->SetCellProliferativeType(STEM);
+        CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
+        p_cell->InitialiseCellCycleModel();
+        MAKE_PTR_ARGS(CellData, p_cell_data, (2));
+        p_cell_data->SetCellData(0,1.0);
+        p_cell_data->SetCellData(1,2.0);
+
+        p_cell->AddCellProperty(p_cell_data);
+
+        p_simulation_time->IncrementTimeOneStep();
+        p_simulation_time->IncrementTimeOneStep();
+
+        TS_ASSERT_EQUALS(p_cell->ReadyToDivide(), true);
+
+        CellPtr p_cell2 = p_cell->Divide();
+
+        CellPropertyCollection cell_data_collection = p_cell->rGetCellPropertyCollection().GetPropertiesType<CellData>();
+        boost::shared_ptr<CellData> p_parentcell_data = boost::static_pointer_cast<CellData>(cell_data_collection.GetProperty());
+        p_parentcell_data->SetCellData(0, 3.0);
+
+        TS_ASSERT_EQUALS(p_parentcell_data->GetCellData(0), 3.0);
+        TS_ASSERT_EQUALS(p_parentcell_data->GetCellData(1), 2.0);
+
+        CellPropertyCollection cell2_data_collection = p_cell2->rGetCellPropertyCollection().GetPropertiesType<CellData>();
+        boost::shared_ptr<CellData> p_daughtercell_data = boost::static_pointer_cast<CellData>(cell2_data_collection.GetProperty());
+
+        // TODO See #1515
+        //TS_ASSERT_EQUALS(p_daughtercell_data->GetCellData(0), 1.0);
+        TS_ASSERT_EQUALS(p_daughtercell_data->GetCellData(1), 2.0);
+    }
+
 };
 
 #endif /*TESTCELL_HPP_*/
