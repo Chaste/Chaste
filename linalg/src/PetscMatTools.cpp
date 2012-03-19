@@ -34,7 +34,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "PetscMatTools.hpp"
+#include <algorithm>
 #include <cassert>
+
 
 ///////////////////////////////////////////////////////////////////////////////////
 // Implementation
@@ -177,64 +179,61 @@ void PetscMatTools::ZeroRowsAndColumnsWithValueOnDiagonal(Mat matrix, std::vecto
 {
     Finalise(matrix);
 
+    // sort the vector as we will be repeatedly searching for entries in it
+    std::sort(rRowColIndices.begin(), rRowColIndices.end());
+
     PetscInt lo, hi;
     GetOwnershipRange(matrix, lo, hi);
-    const unsigned num_cols = rRowColIndices.size();
-    std::vector<unsigned>* p_nonzero_rows_per_column = new std::vector<unsigned>[num_cols];
+    unsigned size = hi-lo;
 
-    /*
-     * For each column: collect all the row indices corresponding to a non-zero entry.
-     * We do all the columns at once, before doing the zeroing, as otherwise a
-     * MatAssemblyBegin() & MatAssemblyEnd() would have to be called after every
-     * MatSetValues and before the below MatGetValues.
-     *
-     * Note that looping over rows first and getting the column values in one hit is
-     * *much* more efficient than looping over columns first and calling GetElement
-     * for each entry!
-     */
-    PetscReal* col_values = new PetscReal[num_cols];
-    PetscInt* col_indices = new PetscInt[num_cols];
-    for (unsigned col=0; col<num_cols; col++)
-    {
-        col_indices[col] = rRowColIndices[col];
-    }
+    std::vector<unsigned>* cols_to_zero_per_row = new std::vector<unsigned>[size];
+
+    // collect the columns to be zeroed, for each row. We don't zero yet as we would
+    // then have to repeatedly call Finalise before each MatGetRow
     for (PetscInt row = lo; row < hi; row++)
     {
-        MatGetValues(matrix, 1, &row, num_cols, col_indices, col_values);
+        // get all the non-zero cols for this row
+        PetscInt num_cols;
+        const PetscInt* cols;
+        MatGetRow(matrix, row, &num_cols, &cols, PETSC_NULL);
 
-        for (unsigned index=0; index<num_cols; index++)
+        // see which of these cols are in the list of cols to be zeroed
+        for(PetscInt i=0; i<num_cols; i++)
         {
-            if (col_values[index] != 0)
+            if(std::binary_search(rRowColIndices.begin(), rRowColIndices.end(), cols[i]))
             {
-                p_nonzero_rows_per_column[index].push_back(row);
+                cols_to_zero_per_row[row-lo].push_back(cols[i]);
             }
         }
-    }
-    delete[] col_values;
-    delete[] col_indices;
 
-    // Now zero each column in turn
-    for (unsigned index=0; index<num_cols; index++)
+        // this must be called for each MatGetRow
+        MatRestoreRow(matrix, row, &num_cols, &cols, PETSC_NULL);
+    }
+
+    // Now zero columns of each row
+    for (PetscInt row = lo; row < hi; row++)
     {
-        // set those rows to be zero by calling MatSetValues
-        unsigned size = p_nonzero_rows_per_column[index].size();
-        PetscInt* rows = new PetscInt[size];
-        PetscInt cols[1];
-        double* zeros = new double[size];
+        unsigned num_cols_to_zero_this_row = cols_to_zero_per_row[row-lo].size();
 
-        cols[0] = rRowColIndices[index];
-
-        for (unsigned i=0; i<size; i++)
+        if(num_cols_to_zero_this_row>0)
         {
-            rows[i] = p_nonzero_rows_per_column[index][i];
-            zeros[i] = 0.0;
-        }
+            PetscInt* cols_to_zero = new PetscInt[num_cols_to_zero_this_row];
+            double* zeros = new double[num_cols_to_zero_this_row];
+            for(unsigned i=0; i<num_cols_to_zero_this_row; i++)
+            {
+                cols_to_zero[i] = cols_to_zero_per_row[row-lo][i];
+                zeros[i] = 0.0;
+            }
 
-        MatSetValues(matrix, size, rows, 1, cols, zeros, INSERT_VALUES);
-        delete [] rows;
-        delete [] zeros;
+            PetscInt rows[1];
+            rows[0] = row;
+            MatSetValues(matrix, 1, rows, num_cols_to_zero_this_row, cols_to_zero, zeros, INSERT_VALUES);
+            delete [] cols_to_zero;
+            delete [] zeros;
+        }
     }
-    delete[] p_nonzero_rows_per_column;
+
+    delete [] cols_to_zero_per_row;
 
     // Now zero the rows and add the diagonal entries
     ZeroRowsWithValueOnDiagonal(matrix, rRowColIndices, diagonalValue);

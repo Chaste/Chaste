@@ -105,6 +105,47 @@ public:
 
         PetscTools::Destroy(matrix);
     }
+
+    void TestZeroRowsAndColumnsWithValueOnDiagonal() throw (Exception)
+    {
+        Mat matrix;
+        const unsigned size = 5u;
+        PetscTools::SetupMat(matrix, size, size, size);
+        for (unsigned row=0; row<size; row++)
+        {
+            for (unsigned col=0; col<size; col++)
+            {
+                PetscMatTools::SetElement(matrix, row, col, 2.78);
+            }
+        }
+        PetscMatTools::Finalise(matrix);
+
+        std::vector<unsigned> rows;
+        rows.push_back(1);
+        rows.push_back(3);
+        rows.push_back(4);
+
+        PetscMatTools::ZeroRowsAndColumnsWithValueOnDiagonal(matrix, rows, 3.41);
+
+        double correct_mat[5][5] = { {2.78,    0, 2.78,    0,     0},
+                                     {   0, 3.41,    0,    0,     0},
+                                     {2.78,    0, 2.78,    0,     0},
+                                     {   0,    0,    0, 3.41,     0},
+                                     {   0,    0,    0,    0,  3.41}    };
+
+        PetscInt lo, hi;
+        PetscMatTools::GetOwnershipRange(matrix, lo, hi);
+
+        for(int i=lo; i<hi; i++)
+        {
+            for(unsigned j=0; j<size; j++)
+            {
+                TS_ASSERT_DELTA( PetscMatTools::GetElement(matrix, i, j), correct_mat[i][j], 1e-12);
+            }
+        }
+
+        PetscTools::Destroy(matrix);
+    }
 };
 
 #endif /*TESTPETSCMATTOOLS_HPP_*/
