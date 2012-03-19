@@ -596,7 +596,7 @@ public:
 
     void TestCheckPositiveDefinitenessOfJacobianMatrix() throw(Exception)
     {
-        EXIT_IF_PARALLEL; // deadlocks for some reason.. Fix if possible but given nature of test not a problem if only runs in sequential
+        EXIT_IF_PARALLEL; // deadlocks for some reason.. Fix if possible, but given nature of test not a problem if only runs in sequential
 
         unsigned num_elem = 10;
 
@@ -652,8 +652,6 @@ public:
     // solver converges. Doesn't seem very robust.
     void TestSolveForSimpleDeformationWithExponentialLaw() throw(Exception)
     {
-        EXIT_IF_PARALLEL; ///\todo #1828 diverges in parallel - fix
-
         unsigned num_elem = 5;
 
         QuadraticMesh<2> mesh(1.0/num_elem, 1.0, 1.0);
@@ -675,6 +673,10 @@ public:
                                                         problem_defn,
                                                         "CompressibleExponentialLawSolve");
 
+        // In parallel, this fails with the current solver / preconditioner combination (cg + bjacobi)
+        // although checked that matrix is positive definite. Fails because one of the blocks is
+        // not positive def? Get round this by using just jacobi preconditioning.
+        PetscOptionsSetValue("-pc_type","jacobi");
 
         solver.Solve();
 
