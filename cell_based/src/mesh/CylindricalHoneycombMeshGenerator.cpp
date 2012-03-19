@@ -88,7 +88,7 @@ CylindricalHoneycombMeshGenerator::CylindricalHoneycombMeshGenerator(unsigned nu
     // Write node file
     out_stream p_node_file = output_file_handler.OpenOutputFile(mMeshFilename+".node");
     (*p_node_file) << std::scientific;
-    (*p_node_file) << std::setprecision(20);
+    //(*p_node_file) << std::setprecision(20);
     (*p_node_file) << num_nodes << "\t2\t0\t1" << std::endl;
 
     unsigned node = 0;
