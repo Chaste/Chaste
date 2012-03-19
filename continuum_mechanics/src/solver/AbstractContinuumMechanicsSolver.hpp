@@ -667,6 +667,7 @@ void AbstractContinuumMechanicsSolver<DIM>::AllocateMatrixMemory()
     // the one is only allocated if it will be needed (in ApplyDirichletBoundaryConditions),
     // depending on whether the matrix is kept symmetric.
     mDirichletBoundaryConditionsVector = NULL;
+    PetscTools::Destroy(template_vec);
 
     ///////////////////////////
     // two matrices

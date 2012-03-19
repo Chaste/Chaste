@@ -203,6 +203,7 @@ public:
         }
 
         PetscTools::Destroy(vec);
+        PetscTools::Destroy(vec2);
         PetscTools::Destroy(mat);
     }
 };
