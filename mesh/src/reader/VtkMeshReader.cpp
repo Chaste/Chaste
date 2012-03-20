@@ -206,9 +206,14 @@ ElementData VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextElementData()
         EXCEPTION( "Trying to read data for an element that doesn't exist" );
     }
 
-    if ( !mpVtkUnstructuredGrid->GetCell(mElementsRead)->IsA("vtkTetra") )
+    if (SPACE_DIM == 3 && !mpVtkUnstructuredGrid->GetCell(mElementsRead)->IsA("vtkTetra") )
     {
         EXCEPTION("Element is not a vtkTetra");
+    }
+
+    if (SPACE_DIM == 2 && !mpVtkUnstructuredGrid->GetCell(mElementsRead)->IsA("vtkTriangle") )
+    {
+        EXCEPTION("Element is not a vtkTriangle");
     }
 
     ElementData next_element_data;

@@ -59,6 +59,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshReader.hpp"
 #include "TetrahedralMesh.hpp"
 #include "DistributedTetrahedralMesh.hpp"
+#include "MixedDimensionMesh.hpp"
 #include "VtkMeshWriter.hpp"
 #include "VtkMeshReader.hpp"
 #include "GenericMeshReader.hpp"
@@ -356,11 +357,11 @@ public:
     }
 
     /**
-    * Check that we can build a DistributedTetrahedralMesh using the VTK mesh reader.
-    */
-   void TestBuildDistributedTetrahedralMeshFromVtkMeshReader(void) throw(Exception)
-   {
-#ifdef CHASTE_VTK
+     * Check that we can build a DistributedTetrahedralMesh using the VTK mesh reader.
+     */
+    void TestBuildDistributedTetrahedralMeshFromVtkMeshReader(void) throw(Exception)
+    {
+ #ifdef CHASTE_VTK
         VtkMeshReader<3,3> mesh_reader("mesh/test/data/heart_decimation.vtu");
 
         DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
@@ -413,7 +414,53 @@ public:
         }
 
 #endif // CHASTE_VTK
-   }
+    }
+    /**
+     * Check that we can build a MixedDimensionMesh using the VTK mesh reader.
+     */
+    void TestBuild2DFromVtkMeshReader(void) throw(Exception)
+    {
+#ifdef CHASTE_VTK
+    VtkMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_1mm_200_elements.vtu");
+    TetrahedralMesh<2,2> mesh;
+    mesh.ConstructFromMeshReader(mesh_reader);
+
+    TS_ASSERT_EQUALS(mesh.GetNumNodes(), 121u);
+    TS_ASSERT_EQUALS(mesh.GetNumElements(), 200u);
+    // The 2D boundary element code is broken ---
+//    TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 40u);
+//    TS_ASSERT_EQUALS(mesh_reader.GetNumFaces(), 40u);
+    //mesh_reader.GetNextFaceData();
+
+    std::vector<c_vector<double, 2> > centroid;
+    mesh_reader.GetCellData("Centroid", centroid);
+
+    TS_ASSERT_EQUALS(centroid.size(), 200u);
+    TS_ASSERT_DELTA(centroid[0](0), 0.0033, 1e-4);
+    TS_ASSERT_DELTA(centroid[0](1), 0.0033, 1e-4);
+#endif // CHASTE_VTK
+    }
+    /**
+     * Check that we can build a MixedDimensionMesh using the VTK mesh reader.
+     */
+    void TestBuildMixedMeshTetrahedralMeshFromVtkMeshReader(void) throw(Exception)
+    {
+#ifdef CHASTE_VTK
+        VtkMeshReader<2,2> mesh_reader("mesh/test/data/mixed_dimension_meshes/mixed_mesh_2d.vtu");
+
+
+        MixedDimensionMesh<2,2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+        ///\todo Cables aren't recognised yet
+        TS_ASSERT_THROWS_THIS(mesh.ConstructFromMeshReader(mesh_reader),"Element is not a vtkTriangle");
+//
+//         // Check we have the right number of nodes & elements
+//         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 173u);
+//         TS_ASSERT_EQUALS(mesh.GetNumElements(), 610u);
+//         TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 312u);
+//
+}
+#endif // CHASTE_VTK
+
 };
 
 #endif /*TESTVTKMESHREADER_*/

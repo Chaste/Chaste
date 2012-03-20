@@ -105,6 +105,8 @@ private:
     unsigned mOrderOfElements;        /**< Order of the elements (i.e. linear, quadratic, cubic FE basis functions */
     unsigned mNodesPerElement;        /**< Number of nodes per element */
 
+    char* mExpectedElementType;       /**< VTK cell type (vtkTetra)*/
+
 public:
 
     /**
