@@ -100,13 +100,17 @@ public:
     virtual ~CellData();
 
     /**
-     * This assigns the cell id to be the maximum current cell id.
-     * It then increments mMaxCellData.
+     * This assigns the cell data.
+     * 
+     * @param variableNumber the index of the data to be set.
+     * @param data the value to set it to.
      */
     void SetCellData(unsigned variableNumber, double data);
 
     /**
      * Get data.
+     * 
+     * @param variableNumber the index of the data required.
      */
     double GetCellData(unsigned variableNumber) const;
 };
