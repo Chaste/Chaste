@@ -109,7 +109,8 @@
                     </Cuboid>
                 </Location>
             </Region><!-- REGION 9 -->
-	        <Region> <!-- REGION 10 -->
+        <!-- MahajanShiferawBackwardEuler produces an Floating Point Exception
+	        <Region> < REGION 10   >
 	            <IonicModel><Hardcoded>MahajanShiferawBackwardEuler</Hardcoded></IonicModel>
                 <Location unit="cm">
                     <Cuboid>
@@ -118,6 +119,7 @@
                     </Cuboid>
                 </Location>
             </Region>
+        -->
             <Region> <!-- REGION 11 -->
                 <IonicModel><Dynamic>
                     <Path relative_to="chaste_source_root">heart/dynamic/libDynamicallyLoadableLr91.so</Path>
@@ -125,7 +127,7 @@
                 <Location unit="cm">
                     <Cuboid>
                         <LowerCoordinates x="0.0" y="0.0" z="1.0"/>
-                        <UpperCoordinates x="0.1" y="0.1" z="1.1"/>
+                        <UpperCoordinates x="0.1" y="0.1" z="1.0"/>
                     </Cuboid>
                 </Location>
             </Region>
@@ -136,7 +138,7 @@
                 <Location unit="cm">
                     <Cuboid>
                         <LowerCoordinates x="0.0" y="0.0" z="1.1"/>
-                        <UpperCoordinates x="0.1" y="0.1" z="1.2"/>
+                        <UpperCoordinates x="0.1" y="0.1" z="1.1"/>
                     </Cuboid>
                 </Location>
             </Region>
