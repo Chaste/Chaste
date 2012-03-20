@@ -210,7 +210,10 @@ public:
      *    This can be easily done with texttest GUI. Run save_bidomain test to find that ChasteResults_10ms_arch_0.chaste
      *    contains differences (but NO other file). Highlight it and use the Save button on the window top left part.
      *
-scons build=GccOpt_hostconfig,boost=1-33-1  test_suite=heart/test/TestCardiacSimulationArchiver.hpp
+     * Note: from Chaste release 3.1 onward we no longer support Boost 1.33.
+     * The earliest version of Boost supported in 1.34
+     * 
+scons build=GccOpt_hostconfig,boost=1-34  test_suite=heart/test/TestCardiacSimulationArchiver.hpp
 cp -r /tmp/$USER/testoutput/save_bidomain/ ~/eclipse/workspace/Chaste/apps/texttest/chaste/resume_bidomain/
 cp -r /tmp/$USER/testoutput/SaveBidomain/ ~/eclipse/workspace/Chaste/apps/texttest/chaste/resume_bidomain/
      */
@@ -273,7 +276,10 @@ cp -r /tmp/$USER/testoutput/SaveBidomain/ ~/eclipse/workspace/Chaste/apps/textte
      *    This can be easily done with texttest GUI. Run save_monodomain test to find that ChasteResults_10ms_arch_0.chaste
      *    contains differences (but NO other file). Highlight it and use the Save button on the window top left part.
      *
-scons build=GccOpt_hostconfig,boost=1-33-1  test_suite=heart/test/TestCardiacSimulationArchiver.hpp
+     * Note: from Chaste release 3.1 onward we no longer support Boost 1.33.
+     * The earliest version of Boost supported in 1.34
+     *
+scons build=GccOpt_hostconfig,boost=1-34  test_suite=heart/test/TestCardiacSimulationArchiver.hpp
 cp -r /tmp/$USER/testoutput/save_monodomain/ ~/eclipse/workspace/Chaste/apps/texttest/chaste/resume_monodomain/
 cp -r /tmp/$USER/testoutput/SaveMonodomain/ ~/eclipse/workspace/Chaste/apps/texttest/chaste/resume_monodomain/
  */
@@ -528,7 +534,7 @@ public:
     /**
      * Run this in parallel (build=_3) to create the archive for TestLoadAsSequential.
      *
-scons build=GccOpt_hostconfig,boost=1-33-1_3 test_suite=heart/test/TestCardiacSimulationArchiver.hpp
+scons build=GccOpt_hostconfig,boost=1-34_3 test_suite=heart/test/TestCardiacSimulationArchiver.hpp
 cp /tmp/$USER/testoutput/TestCreateArchiveForLoadAsSequential/?* ./heart/test/data/checkpoint_migration/
      *
      * Sets up a simulation and archives it without solving at all.
@@ -626,7 +632,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForLoadAsSequential/?* ./heart/test/da
     /**
      * Run this in parallel (build=_3) to create the archive for TestLoadAsSequentialWithBath.
      *
-scons build=GccOpt_hostconfig,boost=1-33-1_3 test_suite=heart/test/TestCardiacSimulationArchiver.hpp
+scons build=GccOpt_hostconfig,boost=1-34_3 test_suite=heart/test/TestCardiacSimulationArchiver.hpp
 cp  /tmp/$USER/testoutput/TestCreateArchiveForLoadAsSequentialWithBath/?* ./heart/test/data/checkpoint_migration_with_bath/
 cp  /tmp/$USER/testoutput/TestCreateArchiveForLoadAsSequentialWithBathAndDistributedMesh/?* ./heart/test/data/checkpoint_migration_with_bath_and_distributed_mesh/
      */
@@ -876,7 +882,7 @@ private:
 public:
     /**
      * Run this in sequential to create the archive for TestLoadFromSequential.
-scons build=GccOpt_hostconfig,boost=1-33-1 test_suite=heart/test/TestCardiacSimulationArchiver.hpp
+scons build=GccOpt_hostconfig,boost=1-34 test_suite=heart/test/TestCardiacSimulationArchiver.hpp
 cp /tmp/$USER/testoutput/TestCreateArchiveForLoadFromSequential/?* ./heart/test/data/checkpoint_migration_from_seq/
      *
      * Sets up a simulation and archives it without solving at all.
@@ -950,7 +956,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForLoadFromSequential/?* ./heart/test/
 
     /**
      * Run this in sequential to create the archive for TestLoadFromSequentialWithBath.
-scons build=GccOpt_hostconfig,boost=1-33-1  test_suite=heart/test/TestCardiacSimulationArchiver.hpp
+scons build=GccOpt_hostconfig,boost=1-34  test_suite=heart/test/TestCardiacSimulationArchiver.hpp
 cp /tmp/$USER/testoutput/TestCreateArchiveForLoadFromSequentialWithBath/?* ./heart/test/data/checkpoint_migration_from_seq_with_bath/
      *
      * Sets up a simulation and archives it, solving for one PDE step first to set up default BCs.
@@ -1084,7 +1090,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForLoadFromSequentialWithBath/?* ./hea
      * has no boundary conditions, but at least one other process does.
      * We set a zero dirichlet boundary condition on the right end of a parallel 1d mesh.
      *
-scons build=GccOpt_hostconfig,boost=1-33-1_2  test_suite=heart/test/TestCardiacSimulationArchiver.hpp
+scons build=GccOpt_hostconfig,boost=1-34_2  test_suite=heart/test/TestCardiacSimulationArchiver.hpp
 cp /tmp/$USER/testoutput/TestCreateArchiveForBcsOnNonMasterOnly/?* ./heart/test/data/checkpoint_migration_bcs_on_non_master_only/
      */
     void TestCreateArchiveForBcsOnNonMasterOnly() throw (Exception)
@@ -1180,7 +1186,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForBcsOnNonMasterOnly/?* ./heart/test/
      * direct call of mpBoundaryConditionsContainer->MergeFromArchive in LoadExtraArchive.
      *
      * Run this in parallel (build=_2) to create the archive for TestMigrateAfterSolve.
-scons build=GccOpt_hostconfig,boost=1-33-1_2 test_suite=heart/test/TestCardiacSimulationArchiver.hpp
+scons build=GccOpt_hostconfig,boost=1-34_2 test_suite=heart/test/TestCardiacSimulationArchiver.hpp
 cp /tmp/$USER/testoutput/TestCreateArchiveForMigrateAfterSolve/archive/?* ./heart/test/data/checkpoint_migration_after_solve/
      */
     void TestCreateArchiveForMigrateAfterSolve() throw (Exception)
