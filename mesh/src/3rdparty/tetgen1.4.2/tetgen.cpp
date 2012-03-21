@@ -28624,6 +28624,9 @@ bool tetgenmesh::checktet4badqual(triface* testtet, bool enqflag)
   REAL N[4][3], A[4][4], rhs[4], D;
   REAL elen[6], circumcent[3];
   REAL bicent[3], offcent[3];
+  offcent[0] = 0.0; // Just to avoid uninitialised value warnings.
+  offcent[1] = 0.0; // Just to avoid uninitialised value warnings.
+  offcent[2] = 0.0; // Just to avoid uninitialised value warnings.
   REAL volume, L, cosd;
   REAL radius2, smlen2, ratio2;
   REAL dist, sdist, split;

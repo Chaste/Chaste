@@ -14,7 +14,7 @@
   <arg>--no-member-vars</arg>
 </command_line_args>
 
-<for_model id="shannon_wang_puglisi_weber_bers_2004_model_updated">
+<for_model id="shannon_2004">
   <lookup_tables>
     <lookup_table>
       <var type='config-name'>transmembrane_potential</var>

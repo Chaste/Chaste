@@ -107,18 +107,24 @@ METADATA_NAMES = frozenset(
      # I Ks
      'membrane_slow_delayed_rectifier_potassium_current',   
         'membrane_slow_delayed_rectifier_potassium_current_conductance',
-     # I NCX
-     'membrane_sodium_calcium_exchanger_current', 
-        'membrane_sodium_calcium_exchanger_current_conductance',     
-     # I to
-     'membrane_transient_outward_current',
-        'membrane_transient_outward_current_conductance',
-        'membrane_sodium_calcium_exchanger_current_maximum',
+     # I_Kur
+     'membrane_ultrarapid_delayed_rectifier_potassium_current',
+        'membrane_ultrarapid_delayed_rectifier_potassium_current_conductance',
      # I K1
      'membrane_inward_rectifier_potassium_current',     
         'membrane_inward_rectifier_potassium_current_conductance',
         'membrane_transient_outward_current_s_gate', 
         'membrane_transient_outward_current_r_gate',
+     # I NCX
+     'membrane_sodium_calcium_exchanger_current', 
+        'membrane_sodium_calcium_exchanger_current_conductance',
+     # I to
+     'membrane_transient_outward_current',
+        'membrane_transient_outward_current_conductance',
+        'membrane_fast_transient_outward_current',
+           'membrane_fast_transient_outward_current_conductance',
+        'membrane_slow_transient_outward_current',    
+           'membrane_slow_transient_outward_current_conductance',       
      # pumps and exchangers
       'membrane_sodium_potassium_pump_current_permeability',
       'calcium_pump_current_conductance', 
