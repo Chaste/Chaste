@@ -459,17 +459,17 @@ public:
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
-        std::string mesh_base("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
-        TrianglesMeshReader<2,2> reader(mesh_base);
-        MixedDimensionMesh<2,2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+        std::string mesh_base("mesh/test/data/mixed_dimension_meshes/cylinder");
+        TrianglesMeshReader<3,3> reader(mesh_base);
+        MixedDimensionMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
         mesh.ConstructFromMeshReader(reader);
 
-        VtkMeshWriter<2,2> writer("TestVtkMeshWriter", "mixed_mesh_2d", false);
+        VtkMeshWriter<3,3> writer("TestVtkMeshWriter", "mixed_mesh_3d", false);
         writer.SetParallelFiles(mesh);
 
         // Add element quality into the element "cell" data
          std::vector<double> quality;
-         for (DistributedTetrahedralMesh<2,2>::ElementIterator ele_iter = mesh.GetElementIteratorBegin();
+         for (DistributedTetrahedralMesh<3,3>::ElementIterator ele_iter = mesh.GetElementIteratorBegin();
                 ele_iter != mesh.GetElementIteratorEnd();
                 ++ele_iter)
          {
@@ -478,8 +478,8 @@ public:
          writer.AddCellData("Quality", quality);
 
         // Add fibre type to "cell" data
-        std::vector< c_vector<double, 2> > centroid;
-        for (DistributedTetrahedralMesh<2,2>::ElementIterator ele_iter = mesh.GetElementIteratorBegin();
+        std::vector< c_vector<double, 3> > centroid;
+        for (DistributedTetrahedralMesh<3,3>::ElementIterator ele_iter = mesh.GetElementIteratorBegin();
                ele_iter != mesh.GetElementIteratorEnd();
                ++ele_iter)
         {

@@ -195,7 +195,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AugmentCellData()
         if (mWriteParallelFiles)
         {
             assert((unsigned)array->GetNumberOfTuples() == this->mpDistributedMesh->GetNumLocalElements());
-            num_cable_pads =  this->mpMixedMesh->GetNumLocalCableElements()+1;
+            num_cable_pads =  this->mpMixedMesh->GetNumLocalCableElements();
         }
         else
         {

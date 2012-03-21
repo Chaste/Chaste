@@ -45,19 +45,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "VtkMeshReader.hpp"
 #include "Exception.hpp"
-
+#include "Debug.hpp"
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::VtkMeshReader(std::string pathBaseName) :
     mIndexFromZero(true),
     mNumNodes(0),
     mNumElements(0),
     mNumFaces(0),
+    mNumCableElements(0),
     mNodesRead(0),
     mElementsRead(0),
     mFacesRead(0),
     mBoundaryFacesRead(0),
+    mCableElementsRead(0),
     mNumElementAttributes(0),
     mNumFaceAttributes(0),
+    mNumCableElementAttributes(0),
     mOrderOfElements(1),
     mNodesPerElement(4)
 {
@@ -78,7 +81,39 @@ VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::VtkMeshReader(std::string pathBaseName) :
     mpVtkUnstructuredGrid = vtk_xml_unstructured_grid_reader->GetOutput();
 
     mNumNodes = vtk_xml_unstructured_grid_reader->GetNumberOfPoints();
-    mNumElements = vtk_xml_unstructured_grid_reader->GetNumberOfCells();
+
+    unsigned num_cells = vtk_xml_unstructured_grid_reader->GetNumberOfCells();
+
+    //Determine if we have multiple cell types - such as cable elements in addition to tets/triangles
+    vtkCellTypes* cell_types = vtkCellTypes::New();
+    mpVtkUnstructuredGrid->GetCellTypes(cell_types);
+
+    if(cell_types->GetNumberOfTypes() > 1)
+    {
+        for(unsigned cell_id = 0; cell_id < num_cells; ++cell_id)
+        {
+            if(mpVtkUnstructuredGrid->GetCellType(cell_id) == VTK_TETRA || mpVtkUnstructuredGrid->GetCellType(cell_id) == VTK_TRIANGLE)
+            {
+                ++mNumElements;
+                assert(mNumCableElements == 0); //We expect all the simplices first and then the cables at the end of the array
+            }
+            else if(mpVtkUnstructuredGrid->GetCellType(cell_id) == VTK_LINE)
+            {
+                ++mNumCableElements;
+            }
+            else
+            {
+                NEVER_REACHED;
+            }
+        }
+    }
+    else
+    {
+        //There is only 1 cell type, so all cells are elements
+        mNumElements = num_cells;
+    }
+
+    cell_types->Delete();
 
     // Extract the surface faces
     mpVtkGeometryFilter = vtkGeometryFilter::New();
@@ -96,12 +131,15 @@ VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::VtkMeshReader(vtkUnstructuredGrid* p_vtkUn
     mNumNodes(0),
     mNumElements(0),
     mNumFaces(0),
+    mNumCableElements(0),
     mNodesRead(0),
     mElementsRead(0),
     mFacesRead(0),
     mBoundaryFacesRead(0),
+    mCableElementsRead(0),
     mNumElementAttributes(0),
     mNumFaceAttributes(0),
+    mNumCableElementAttributes(0),
     mOrderOfElements(1),
     mNodesPerElement(4)
 {
@@ -131,6 +169,12 @@ unsigned VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNumElements() const
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNumCableElements() const
+{
+    return mNumCableElements;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNumNodes() const
 {
     return mNumNodes;
@@ -155,6 +199,12 @@ unsigned VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNumElementAttributes() const
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNumCableElementAttributes() const
+{
+    return mNumCableElementAttributes;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNumFaceAttributes() const
 {
     return mNumFaceAttributes;
@@ -163,14 +213,11 @@ unsigned VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNumFaceAttributes() const
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::Reset()
 {
-//    CloseFiles();
-//    OpenFiles();
-//    ReadHeaders();
-
     mNodesRead=0;
     mElementsRead=0;
     mFacesRead=0;
     mBoundaryFacesRead=0;
+    mCableElementsRead=0;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -206,12 +253,12 @@ ElementData VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextElementData()
         EXCEPTION( "Trying to read data for an element that doesn't exist" );
     }
 
-    if (SPACE_DIM == 3 && !mpVtkUnstructuredGrid->GetCell(mElementsRead)->IsA("vtkTetra") )
+    if (SPACE_DIM == 3 && mpVtkUnstructuredGrid->GetCellType(mElementsRead)!=VTK_TETRA )
     {
         EXCEPTION("Element is not a vtkTetra");
     }
 
-    if (SPACE_DIM == 2 && !mpVtkUnstructuredGrid->GetCell(mElementsRead)->IsA("vtkTriangle") )
+    if (SPACE_DIM == 2 && mpVtkUnstructuredGrid->GetCellType(mElementsRead)!=VTK_TRIANGLE )
     {
         EXCEPTION("Element is not a vtkTriangle");
     }
@@ -229,6 +276,34 @@ ElementData VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextElementData()
     mElementsRead++;
     return next_element_data;
 }
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+ElementData VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextCableElementData()
+{
+    PRINT_3_VARIABLES(mCableElementsRead, mNumCableElements, mNumElements);
+
+    if ( mCableElementsRead >=  mNumCableElements )
+    {
+        EXCEPTION( "Trying to read data for a cable element that doesn't exist" );
+    }
+
+    unsigned next_index = mNumElements + mCableElementsRead;
+    assert(mpVtkUnstructuredGrid->GetCellType(next_index)==VTK_LINE);
+
+    ElementData next_element_data;
+
+    for (unsigned i = 0; i < 2; i++)
+    {
+        next_element_data.NodeIndices.push_back(mpVtkUnstructuredGrid->GetCell(next_index)->GetPointId(i));
+    }
+
+    /// \todo #2052 Look at the radius data too
+    next_element_data.AttributeValue = 0;
+
+    mCableElementsRead++;
+    return next_element_data;
+}
+
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ElementData VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextFaceData()

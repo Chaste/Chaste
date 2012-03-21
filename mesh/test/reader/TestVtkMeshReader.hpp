@@ -441,25 +441,54 @@ public:
 #endif // CHASTE_VTK
     }
     /**
-     * Check that we can build a MixedDimensionMesh using the VTK mesh reader.
+     * Check that we can build a 2D MixedDimensionMesh using the VTK mesh reader.
+     */
+    void TestBuildMixedMesh2DFromVtkMeshReader(void) throw(Exception)
+    {
+#ifdef CHASTE_VTK
+        VtkMeshReader<2,2> mesh_reader("mesh/test/data/mixed_dimension_meshes/mixed_mesh_2d.vtu");
+        TS_ASSERT_EQUALS(mesh_reader.GetNumCableElements(), 10u);
+
+        MixedDimensionMesh<2,2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        // Check we have the right number of nodes & elements
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 121u);
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), 200u);
+//        TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 312u);
+        TS_ASSERT_EQUALS(mesh.GetNumCableElements(), 10u);
+
+        ///\todo Check radius data
+
+        //Cover exception - note that ConstructFromMeshReader has reset the reader
+        for (unsigned i=0; i<10; i++)
+        {
+            mesh_reader.GetNextCableElementData();
+        }
+        TS_ASSERT_THROWS_THIS(mesh_reader.GetNextCableElementData(), "Trying to read data for a cable element that doesn't exist");
+
+#endif // CHASTE_VTK
+    }
+    /**
+     * Check that we can build a 3D MixedDimensionMesh using the VTK mesh reader.
      */
     void TestBuildMixedMeshTetrahedralMeshFromVtkMeshReader(void) throw(Exception)
     {
 #ifdef CHASTE_VTK
-        VtkMeshReader<2,2> mesh_reader("mesh/test/data/mixed_dimension_meshes/mixed_mesh_2d.vtu");
+        VtkMeshReader<3,3> mesh_reader("mesh/test/data/mixed_dimension_meshes/mixed_mesh_3d.vtu");
+        TS_ASSERT_EQUALS(mesh_reader.GetNumCableElements(), 5u);
 
+        MixedDimensionMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+        mesh.ConstructFromMeshReader(mesh_reader);
 
-        MixedDimensionMesh<2,2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
-        ///\todo Cables aren't recognised yet
-        TS_ASSERT_THROWS_THIS(mesh.ConstructFromMeshReader(mesh_reader),"Element is not a vtkTriangle");
-//
-//         // Check we have the right number of nodes & elements
-//         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 173u);
-//         TS_ASSERT_EQUALS(mesh.GetNumElements(), 610u);
-//         TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 312u);
-//
-}
+        // Check we have the right number of nodes & elements
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 387u);
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), 1298u);
+        TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 621u);
+        TS_ASSERT_EQUALS(mesh.GetNumCableElements(), 5u);
+        ///\todo Check radius data
 #endif // CHASTE_VTK
+    }
 
 };
 

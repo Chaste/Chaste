@@ -91,22 +91,23 @@ private:
     unsigned mNumNodes;                /**< Number of nodes in the mesh */
     unsigned mNumElements;            /**< Number of elements in the mesh */
     unsigned mNumFaces;                /**< Number of faces in the mesh */
+    unsigned mNumCableElements;     /**< Number of cable elements in the mesh. */
 
     unsigned mNodesRead;            /**< Number of nodes read from file so far */
     unsigned mElementsRead;            /**< Number of elements read from file so far */
     unsigned mFacesRead;            /**< Number of faces read from file so far */
     unsigned mBoundaryFacesRead;    /**< Number of boundary faces read from file so far */
+    unsigned mCableElementsRead;    /**< Number of cable elements read in. */
+
 
     unsigned mNumNodeAttributes;     /**< Is the number of attributes stored at each node */
     unsigned mMaxNodeBdyMarker;     /**< Is the maximum node boundary marker */
     unsigned mNumElementAttributes; /**< Is the number of attributes stored for each element */
     unsigned mNumFaceAttributes;     /**< Is the number of attributes stored for each face */
+    unsigned mNumCableElementAttributes; /**< Is the number of attributes stored for each cable */
 
     unsigned mOrderOfElements;        /**< Order of the elements (i.e. linear, quadratic, cubic FE basis functions */
     unsigned mNodesPerElement;        /**< Number of nodes per element */
-
-    char* mExpectedElementType;       /**< VTK cell type (vtkTetra)*/
-
 public:
 
     /**
@@ -135,6 +136,11 @@ public:
     unsigned GetNumElements() const;
 
     /**
+     * Returns the mNumCableElements
+     */
+    unsigned GetNumCableElements() const;
+
+    /**
      * Returns mNumNodes
      */
     unsigned GetNumNodes() const;
@@ -153,6 +159,11 @@ public:
      * Returns mNumElementAttributes
      */
     unsigned GetNumElementAttributes() const;
+
+    /**
+     * Returns mNumCableElementAttributes
+     */
+    unsigned GetNumCableElementAttributes() const;
 
     /**
      * Returns mNumFaceAttributes
@@ -186,6 +197,11 @@ public:
      * Returns a vector of the nodes of each face in turn (synonym of GetNextEdgeData())
      */
     ElementData GetNextFaceData();
+
+    /**
+     * Returns a vector of the nodes of each face in turn (synonym of GetNextEdgeData())
+     */
+    ElementData GetNextCableElementData();
 
 
     /**
