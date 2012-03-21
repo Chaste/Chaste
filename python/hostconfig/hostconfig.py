@@ -444,6 +444,10 @@ def Configure(build):
         intel_lib_path = os.path.join(intel_path, 'lib')
         CheckPathExists(intel_lib_path, 'Intel compilers')
         libpaths.append(intel_lib_path)
+        # This is a bit of a hack to get version 12 working for #2059
+        intel_lib_path = os.path.join(intel_lib_path, 'intel64')
+        if os.path.exists(intel_lib_path):
+            libpaths.append(intel_lib_path)
     incpaths.extend(conf.other_includepaths)
     libpaths.extend(map(os.path.abspath, conf.other_libpaths))
     # Needed for dynamically loaded cell models
