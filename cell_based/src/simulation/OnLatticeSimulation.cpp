@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LogFile.hpp"
 #include "Version.hpp"
 #include "ExecutableSupport.hpp"
+#include "MultipleCaBasedCellPopulation.hpp"
 
 template<unsigned DIM>
 OnLatticeSimulation<DIM>::OnLatticeSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
@@ -64,6 +65,14 @@ void OnLatticeSimulation<DIM>::AddCaUpdateRule(boost::shared_ptr<AbstractCaUpdat
     if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
     {
         static_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->AddUpdateRule(pUpdateRule);
+    }
+}
+template<unsigned DIM>
+void OnLatticeSimulation<DIM>::AddMultipleCaUpdateRule(boost::shared_ptr<AbstractMultipleCaUpdateRule<DIM> > pUpdateRule)
+{
+    if (dynamic_cast<MultipleCaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
+    {
+        static_cast<MultipleCaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->AddUpdateRule(pUpdateRule);
     }
 }
 

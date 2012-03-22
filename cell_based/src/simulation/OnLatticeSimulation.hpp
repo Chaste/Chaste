@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedSimulation.hpp"
 #include "AbstractCaUpdateRule.hpp"
 #include "AbstractPottsUpdateRule.hpp"
+#include "AbstractMultipleCaUpdateRule.hpp"
 
 /**
  * Run an on-lattice 2D or 3D cell-based simulation.
@@ -139,6 +140,13 @@ public:
      * @param pUpdateRule shared pointer to a CA update rule law
      */
     void AddCaUpdateRule(boost::shared_ptr<AbstractCaUpdateRule<DIM> > pUpdateRule);
+
+    /**
+     * Add an update rule to be used in this simulation.
+     *
+     * @param pUpdateRule shared pointer to a multiple CA update rule law
+     */
+    void AddMultipleCaUpdateRule(boost::shared_ptr<AbstractMultipleCaUpdateRule<DIM> > pUpdateRule);
 
     /**
      * Add an update rule to be used in this simulation (use this to set the Hamiltonian).
