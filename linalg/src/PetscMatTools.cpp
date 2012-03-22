@@ -105,6 +105,10 @@ void PetscMatTools::ZeroRowsWithValueOnDiagonal(Mat matrix, std::vector<unsigned
      * Important! PETSc by default will destroy the sparsity structure for this row and deallocate memory
      * when the row is zeroed, and if there is a next timestep, the memory will have to reallocated when
      * assembly to done again. This can kill performance. The following makes sure the zeroed rows are kept.
+     *
+     * Note: if the following lines are called, then once MatZeroRows() is called below, there will be an
+     * error if some rows have no entries at all. Hence for problems with dummy variables, Stokes flow for
+     * example, the identity block needs to be added before dirichlet BCs.
      */
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 1) //PETSc 3.1 or later
     MatSetOption(matrix, MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE);
