@@ -194,11 +194,11 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleSystem(bool assembleR
 
     if(assembleJacobian)
     {
-       this->AddIdentityBlockForDummyPressureVariables(NONLINEAR_PROBLEM_APPLY_TO_EVERYTHING, false);
+       this->AddIdentityBlockForDummyPressureVariables(NONLINEAR_PROBLEM_APPLY_TO_EVERYTHING);
     }
     else if (assembleResidual)
     {
-       this->AddIdentityBlockForDummyPressureVariables(NONLINEAR_PROBLEM_APPLY_TO_RESIDUAL_ONLY, false);
+       this->AddIdentityBlockForDummyPressureVariables(NONLINEAR_PROBLEM_APPLY_TO_RESIDUAL_ONLY);
     }
 
     this->FinishAssembleSystem(assembleResidual, assembleJacobian);
