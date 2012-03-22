@@ -40,7 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractCellBasedSimulation.hpp"
-#include "AbstractCaUpdateRule.hpp"
 #include "AbstractPottsUpdateRule.hpp"
 #include "AbstractMultipleCaUpdateRule.hpp"
 
@@ -133,13 +132,6 @@ public:
     OnLatticeSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
                         bool deleteCellPopulationInDestructor=false,
                         bool initialiseCells=true);
-
-    /**
-     * Add an update rule to be used in this simulation.
-     *
-     * @param pUpdateRule shared pointer to a CA update rule law
-     */
-    void AddCaUpdateRule(boost::shared_ptr<AbstractCaUpdateRule<DIM> > pUpdateRule);
 
     /**
      * Add an update rule to be used in this simulation.

@@ -25,8 +25,6 @@ mesh/TestPottsMeshReader.hpp
 odes/TestAlarcon2004OxygenBasedCellCycleOdeSystem.hpp
 odes/TestDeltaNotchOdeSystem.hpp
 odes/TestTysonNovak2001OdeSystem.hpp
-population/TestCaBasedCellPopulation.hpp
-population/TestCaUpdateRules.hpp
 population/TestCellBasedPdeHandler.hpp
 population/TestCellBasedPdes.hpp
 population/TestCellPopulationBoundaryConditions.hpp
@@ -57,7 +55,6 @@ simulation/TestOffLatticeSimulationWithNodeBasedCellPopulationIn3d.hpp
 simulation/TestOffLatticeSimulationWithPdes.hpp
 simulation/TestOffLatticeSimulationWithBuskeForces.hpp
 simulation/TestOffLatticeSimulationWithVertexBasedCellPopulation.hpp
-simulation/TestOnLatticeSimulationWithCaBasedCellPopulation.hpp
 simulation/TestOnLatticeSimulationWithMultipleCaBasedCellPopulation.hpp
 simulation/TestOnLatticeSimulationWithPdes.hpp
 simulation/TestOnLatticeSimulationWithPottsBasedCellPopulation.hpp

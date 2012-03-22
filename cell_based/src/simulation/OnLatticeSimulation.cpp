@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "OnLatticeSimulation.hpp"
-#include "CaBasedCellPopulation.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "CellBasedEventHandler.hpp"
 #include "LogFile.hpp"
@@ -59,14 +58,6 @@ OnLatticeSimulation<DIM>::OnLatticeSimulation(AbstractCellPopulation<DIM>& rCell
     this->mDt = 0.1; // 6 minutes
 }
 
-template<unsigned DIM>
-void OnLatticeSimulation<DIM>::AddCaUpdateRule(boost::shared_ptr<AbstractCaUpdateRule<DIM> > pUpdateRule)
-{
-    if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
-    {
-        static_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->AddUpdateRule(pUpdateRule);
-    }
-}
 template<unsigned DIM>
 void OnLatticeSimulation<DIM>::AddMultipleCaUpdateRule(boost::shared_ptr<AbstractMultipleCaUpdateRule<DIM> > pUpdateRule)
 {
@@ -196,7 +187,7 @@ template<unsigned DIM>
 void OnLatticeSimulation<DIM>::UpdateCellPopulation()
 {
     bool update_cell_population_this_timestep = true;
-    if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
+    if (dynamic_cast<MultipleCaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
     {
         /*
          * If mInitialiseCells is false, then the simulation has been loaded from an archive.
@@ -236,12 +227,12 @@ void OnLatticeSimulation<DIM>::OutputAdditionalSimulationSetup(out_stream& rPara
             (*iter)->OutputUpdateRuleInfo(rParamsFile);
         }
     }
-    else if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
+    else if (dynamic_cast<MultipleCaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
     {
-        std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > > collection =
-            static_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->rGetUpdateRuleCollection();
+        std::vector<boost::shared_ptr<AbstractMultipleCaUpdateRule<DIM> > > collection =
+            static_cast<MultipleCaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->rGetUpdateRuleCollection();
 
-        for (typename std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > >::iterator iter = collection.begin();
+        for (typename std::vector<boost::shared_ptr<AbstractMultipleCaUpdateRule<DIM> > >::iterator iter = collection.begin();
              iter != collection.end();
              ++iter)
         {
