@@ -309,7 +309,7 @@ public:
             double exact_pressure = 2*(1-x) + 1;
 
             // solution is in FE space
-            TS_ASSERT_DELTA( solver.rGetPressures()[i], exact_pressure, 1e-7);
+            TS_ASSERT_DELTA( solver.rGetPressures()[i], exact_pressure, 1e-5);
         }
 
     }

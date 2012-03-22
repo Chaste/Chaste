@@ -180,17 +180,12 @@ void StokesFlowSolver<DIM>::Solve()
 
     Vec solution;
     VecDuplicate(this->mLinearSystemRhsVector,&solution);
+    PetscVecTools::Zero(solution);
 
     KSP solver;
     KSPCreate(PETSC_COMM_WORLD,&solver);
-    PC pc;
-    KSPGetPC(solver, &pc);
-    KSPSetOperators(solver, this->mSystemLhsMatrix, this->mPreconditionMatrix, DIFFERENT_NONZERO_PATTERN /*in precond between successive solves*/);
-///\todo #1828 introduce better solvers
-    KSPSetType(solver,KSPCG);
-    PCSetType(pc, PCJACOBI);
-    KSPSetUp(solver);
-    KSPSetFromOptions(solver);
+    KSPSetOperators(solver, this->mSystemLhsMatrix, this->mSystemLhsMatrix, DIFFERENT_NONZERO_PATTERN /*in precond between successive solves*/);
+    KSPSetType(solver, KSPGMRES);
 
     if (mKspAbsoluteTol < 0)
     {
@@ -201,14 +196,46 @@ void StokesFlowSolver<DIM>::Solve()
     {
         KSPSetTolerances(solver, 1e-16, mKspAbsoluteTol, PETSC_DEFAULT, 10000 /*max iter*/); //hopefully with the preconditioner this max is way too high
     }
+    unsigned num_restarts = 100;
+    KSPGMRESSetRestart(solver,num_restarts); // gmres num restarts
+
+    PC pc;
+    KSPGetPC(solver, &pc);
+    PCSetType(pc, PCJACOBI);
+
+    KSPSetUp(solver);
+
+    KSPSetFromOptions(solver);
+
+//    ///// For printing matrix when debugging
+//    OutputFileHandler handler("TEMP");
+//    out_stream p_file = handler.OpenOutputFile("matrix.txt");
+//    for(unsigned i=0; i<this->mNumDofs; i++)
+//    {
+//        for(unsigned j=0; j<this->mNumDofs; j++)
+//        {
+//            *p_file << PetscMatTools::GetElement(this->mSystemLhsMatrix, i, j) << " ";
+//        }
+//        *p_file << "\n";
+//    }
+//    p_file->close();
+//
+//    out_stream p_file2 = handler.OpenOutputFile("rhs.txt");
+//    for(unsigned i=0; i<this->mNumDofs; i++)
+//    {
+//        *p_file2 << PetscVecTools::GetElement(this->mLinearSystemRhsVector, i) << "\n";
+//    }
+//    p_file2->close();
+
+    #ifdef STOKES_VERBOSE
+    Timer::PrintAndReset("KSP Setup");
+    #endif
 
     KSPSolve(solver,this->mLinearSystemRhsVector,solution);
-
 
     KSPConvergedReason reason;
     KSPGetConvergedReason(solver,&reason);
     KSPEXCEPT(reason);
-    std::cout << "Converged Reason = " << reason << "\n" << std::flush;
 
     #ifdef STOKES_VERBOSE
     Timer::PrintAndReset("KSP Solve");
@@ -219,7 +246,6 @@ void StokesFlowSolver<DIM>::Solve()
 
     MechanicsEventHandler::EndEvent(MechanicsEventHandler::SOLVE);
 
-///\todo: three copies?!
     // Copy solution into the std::vector
     ReplicatableVector solution_repl(solution);
     for (unsigned i=0; i<this->mNumDofs; i++)
@@ -260,11 +286,14 @@ void StokesFlowSolver<DIM>::AssembleSystem()
     PetscMatTools::SwitchWriteMode(this->mSystemLhsMatrix);
     PetscMatTools::SwitchWriteMode(this->mPreconditionMatrix);
 
-///\todo! Do we really want a symmetric matrix (the true below) - can't use CG after all..
-    // Apply Dirichlet boundary conditions
-////\todo false here - could be true, but need to change method to keep symmetry..
-    this->AddIdentityBlockForDummyPressureVariables(LINEAR_PROBLEM, false);
-
+    // Note: maintaining symmetry for Dirichlet BCs is possible at the moment (the second parameter)
+    // but doing so for the identity block is not yet implemented (the second parameter must be false)
+    // Not sure if maintaining symmetry is worth it - may allow CG to work, but matrix is indefinite
+    // so GC not guaranteed to work..
+    //
+    // Note: the identity block needs to be added before the BCs - see comments in
+    // PetscMatTools::ZeroRowsWithValueOnDiagonal()
+    this->AddIdentityBlockForDummyPressureVariables(LINEAR_PROBLEM);
     this->ApplyDirichletBoundaryConditions(LINEAR_PROBLEM, true);
 
     PetscVecTools::Finalise(this->mLinearSystemRhsVector);

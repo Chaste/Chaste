@@ -202,7 +202,6 @@ protected:
      *  altered). See in-code comments for how this is done.
      *
      *  @param type see above
-     *  @param symmetricProblem see above
      */
     void ApplyDirichletBoundaryConditions(ApplyDirichletBcsType type, bool symmetricProblem);
 
@@ -230,12 +229,15 @@ protected:
      *     and here, the residual vector will be altered, as will the matrix and RHS vector
      *     (see documentation on mResidualVector for why there is a separate residual vector
      *     and RHS vector).
-
-     * @param type see above
-     * @param symmetricProblem whether symmetry should be maintained or not - keeping
-     *   symmetric is currently not implemented, so this must be false
+     *
+     *  Note the row (and columns) for the dummy variables are not explicitly zeroed, as they
+     *  are assumed to be zero already - in a finite element assembly nothing will have been
+     *  written to the rows or columns corresponding to dummy variables. Hence this method
+     *  always maintains symmetry.
+     *
+     *  @param type see above
      */
-    void AddIdentityBlockForDummyPressureVariables(ApplyDirichletBcsType type, bool symmetricProblem);
+    void AddIdentityBlockForDummyPressureVariables(ApplyDirichletBcsType type);
 
 public:
     /**
@@ -618,11 +620,8 @@ void AbstractContinuumMechanicsSolver<DIM>::ApplyDirichletBoundaryConditions(App
 
 
 template<unsigned DIM>
-void AbstractContinuumMechanicsSolver<DIM>::AddIdentityBlockForDummyPressureVariables(ApplyDirichletBcsType type,
-                                                                                      bool symmetricProblem)
+void AbstractContinuumMechanicsSolver<DIM>::AddIdentityBlockForDummyPressureVariables(ApplyDirichletBcsType type)
 {
-assert(symmetricProblem==false); // not implemented yet
-
     assert(mCompressibilityType==INCOMPRESSIBLE);
 
     int lo, hi;
