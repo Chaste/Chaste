@@ -100,14 +100,16 @@ private:
     unsigned mCableElementsRead;    /**< Number of cable elements read in. */
 
 
-    unsigned mNumNodeAttributes;     /**< Is the number of attributes stored at each node */
+    unsigned mNumNodeAttributes;    /**< Is the number of attributes stored at each node */
     unsigned mMaxNodeBdyMarker;     /**< Is the maximum node boundary marker */
     unsigned mNumElementAttributes; /**< Is the number of attributes stored for each element */
-    unsigned mNumFaceAttributes;     /**< Is the number of attributes stored for each face */
+    unsigned mNumFaceAttributes;    /**< Is the number of attributes stored for each face */
     unsigned mNumCableElementAttributes; /**< Is the number of attributes stored for each cable */
 
-    unsigned mOrderOfElements;        /**< Order of the elements (i.e. linear, quadratic, cubic FE basis functions */
-    unsigned mNodesPerElement;        /**< Number of nodes per element */
+    unsigned mOrderOfElements;      /**< Order of the elements (i.e. linear, quadratic, cubic FE basis functions */
+    unsigned mNodesPerElement;      /**< Number of nodes per element */
+
+    int mVtkCellType;               /**< Enumerated as VTK_TETRA in 3D and VTK_TRIANGLE in 2D.  The VTK method GetCellType() returns an int, but this is documented as being non-negative */
 public:
 
     /**
