@@ -169,7 +169,7 @@ public:
         diffusion_update_rule_parameter_file->close();
 
         std::string diffusion_update_rule_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + diffusion_update_rule_results_dir + "diffusion_update_rule_results.parameters projects/VascularTumour/test/data/TestCaUpdateRules/diffusion_update_rule_results.parameters").c_str()), 0);
+        TS_ASSERT_EQUALS(system(("diff " + diffusion_update_rule_results_dir + "diffusion_update_rule_results.parameters cell_based/test/data/TestMultipleCaUpdateRules/diffusion_update_rule_results.parameters").c_str()), 0);
     }
 };
 
