@@ -310,7 +310,11 @@ protected:
      */
     virtual void PostNewtonStep(unsigned counter, double normResidual);
 
-
+    /**
+     *  Solve method which uses a nonlinear solver coded in this class (as opposed
+     *  to the SNES solver. Private, user should call Solve()
+     *  @param tol absolute solver used in nonlinear solve
+     */
     void SolveNonSnes(double tol=-1.0);
 
 

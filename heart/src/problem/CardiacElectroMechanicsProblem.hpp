@@ -165,11 +165,6 @@ protected :
     void WriteWatchedLocationData(double time, Vec voltage);
 
 
-//// #1245
-//    std::vector<BoundaryElement<DIM-1,DIM>*>* mpImpactRegion;
-//    std::vector<c_vector<double,DIM> > mImpactTractions;
-//    void ApplyImpactTractions(double time);
-
 public :
 
     /**
@@ -243,8 +238,6 @@ public :
      */
     c_matrix<double,DIM,DIM>& rGetModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,DIM,DIM>& rOriginalConductivity);
 
-//// #1245
-//    void SetImpactRegion(std::vector<BoundaryElement<DIM-1,DIM>*>& rImpactRegion);
 
     /**
      * Called in Solve() before the time loop

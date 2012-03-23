@@ -193,39 +193,7 @@ c_matrix<double,DIM,DIM>& CardiacElectroMechanicsProblem<DIM>::rGetModifiedCondu
 }
 
 
-//
-//
-//// #1245
-//template<unsigned DIM>
-//void CardiacElectroMechanicsProblem<DIM>::SetImpactRegion(std::vector<BoundaryElement<DIM-1,DIM>*>& rImpactRegion)
-//{
-//    assert(mpImpactRegion == NULL);
-//    mpImpactRegion = &rImpactRegion;
-//}
-//
-//// #1245
-//template<unsigned DIM>
-//void CardiacElectroMechanicsProblem<DIM>::ApplyImpactTractions(double time)
-//{
-//    if(mpImpactRegion==NULL)
-//    {
-//        return;
-//    }
-//
-//    double start_time = 10;
-//    double end_time = 20;
-//    double magnitude = 1.5;
-//    unsigned direction = 1;
-//
-//    c_vector<double,DIM> traction = zero_vector<double>(DIM);
-//    if( (time>=start_time) && (time<=end_time) )
-//    {
-//        traction(direction) = magnitude;
-//    }
-//    mImpactTractions.clear();
-//    mImpactTractions.resize(mpImpactRegion->size(), traction);
-//    mpCardiacMechSolver->SetSurfaceTractionBoundaryConditions(*mpImpactRegion, mImpactTractions);
-//}
+
 
 template<unsigned DIM>
 CardiacElectroMechanicsProblem<DIM>::CardiacElectroMechanicsProblem(
@@ -526,13 +494,24 @@ void CardiacElectroMechanicsProblem<DIM>::Solve()
 
     PrepareForSolve();
 
+//// For attempting to improve Newton convergence by quadratically extrapolating from
+//// last two solutions to guess next solution. Needs further investigation - appears
+//// to improve convergence but lead to decreased robustness
+//    std::vector<double> current_solution_previous_time_step = mpMechanicsSolver->rGetCurrentSolution();
+//    std::vector<double> current_solution_second_last_time_step = mpMechanicsSolver->rGetCurrentSolution();
+//    bool first_step = true;
+
     while (!stepper.IsTimeAtEnd())
     {
         LOG(2, "\nCurrent time = " << stepper.GetTime());
-        #ifdef MECH_VERBOSE // defined in AbstractNonlinearElasticitySolver
-        // also output time to screen as newton solve information will be output
-        std::cout << "\n\n ** Current time = " << stepper.GetTime() << "\n";
-        #endif
+        #define COVERAGE_IGNORE
+        if(   CommandLineArguments::Instance()->OptionExists("-mech_verbose")
+           || CommandLineArguments::Instance()->OptionExists("-mech_very_verbose"))
+        {
+            // also output time to screen as newton solve information will be output
+            std::cout << "\n\n ** Current time = " << stepper.GetTime() << "\n";
+        }
+        #undef COVERAGE_IGNORE
 
         /////////////////////////////////////////////////////////////////////////////////////
         ////
@@ -677,8 +656,25 @@ void CardiacElectroMechanicsProblem<DIM>::Solve()
         // the traction say is time-dependent).
         mpMechanicsSolver->SetCurrentTime(stepper.GetTime());
 
-//// #1245
-//        ApplyImpactTractions(stepper.GetTime());
+
+//// For attempting to improve Newton convergence by quadratically extrapolating from
+//// last two solutions to guess next solution. See comments above
+//        for(unsigned i=0; i<mpMechanicsSolver->rGetCurrentSolution().size(); i++)
+//        {
+//            double current = mpMechanicsSolver->rGetCurrentSolution()[i];
+//            double previous = current_solution_previous_time_step[i];
+//            double second_last = current_solution_second_last_time_step[i];
+//            //double guess = 2*current - previous;
+//            double guess = 3*current - 3*previous + second_last;
+//
+//            if(!first_step)
+//            {
+//                current_solution_second_last_time_step[i] = current_solution_previous_time_step[i];
+//            }
+//            current_solution_previous_time_step[i] = mpMechanicsSolver->rGetCurrentSolution()[i];
+//            mpMechanicsSolver->rGetCurrentSolution()[i] = guess;
+//        }
+//        first_step = false;
 
         MechanicsEventHandler::BeginEvent(MechanicsEventHandler::ALL_MECH);
         mpCardiacMechSolver->Solve(stepper.GetTime(), stepper.GetNextTime(), mpProblemDefinition->GetContractionModelOdeTimestep());

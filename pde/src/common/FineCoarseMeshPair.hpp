@@ -42,8 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QuadraturePointsGroup.hpp"
 #include "GaussianQuadratureRule.hpp"
 #include "Warnings.hpp"
-
-//#define FINECOARSEMESHPAIR_VERBOSE
+#include "CommandLineArguments.hpp"
 
 /**
  * At the beginning of a two mesh simulation we need to figure out and store
@@ -63,7 +62,7 @@ struct ElementAndWeights
  * This class is used to set up interpolation information from one mesh to the other.
  *
  * At the moment the functionality is very much based on the four information-transfers required in
- * cardiac electromechanics problems
+ * cardiac electro-mechanics problems
  *
  * (i)   Calcium (or voltage) to induce deformation:
  *          FINE(electrics) MESH NODEs  --->  COARSE(mechanics) MESH QUADRATURE POINTS
@@ -99,6 +98,11 @@ struct ElementAndWeights
  *          mesh_pair.SetUpBoxesOnFineMesh();
  *          mesh_pair.ComputeFineElementsAndWeightsForCoarseNodes(false);
  *          mesh_pair.rGetElementsAndWeights();
+ *
+ *
+ * To see progression for any of these methods, run test from the command line with '-mesh_pair_verbose' as
+ * a command line parameter
+ *
  */
 template <unsigned DIM>
 class FineCoarseMeshPair
@@ -139,18 +143,6 @@ private:
      * points which were found to be outside the fine mesh.
      */
     std::vector<c_vector<double,DIM+1> > mNotInMeshNearestElementWeights;
-
-//    /** 4 values,
-//     *   [0] number of points for which the containing element was found quickly (the element was
-//     *       in the same box as the point,
-//     *   [1] number of points for which the containing element was found more slowly (the element
-//     *       was not the same box as the point, but one of the neighbouring boxes),
-//     *   [2] num points found very slowly (the elemment was not in a neighbouring box, but somewhere else)
-//     *   [3] num points not in the searched mesh at all
-//     *
-//     *  Note mCounters[3] = mNotInMesh.size() = mNotInMeshNearestElementWeights.size();
-//     */
-//    std::vector<unsigned> mStatisticsCounters;
 
     /**
      * 2 values,

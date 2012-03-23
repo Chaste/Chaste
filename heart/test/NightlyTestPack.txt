@@ -14,6 +14,7 @@ monodomain/TestMonodomainExactSolution.hpp
 monodomain/TestOperatorSplittingMonodomainSolverLong.hpp
 monodomain/TestMonodomainWithTimeAdaptivityLong.hpp
 mechanics/TestCardiacElectroMechanicsProblemLong.hpp
+mechanics/TestCardiacElectroMechanicsOnAnnulus.hpp
 TestPapillaryFibreCalculatorLong.hpp
 performance/Test1dBidomainProblemForEfficiency.hpp
 performance/TestPerformance.hpp

@@ -197,16 +197,23 @@ void FineCoarseMeshPair<DIM>::ComputeFineElementsAndWeightsForCoarseQuadPoints(G
     // Resize the elements and weights vector.
     mFineMeshElementsAndWeights.resize(quad_point_posns.Size());
 
-    #ifdef FINECOARSEMESHPAIR_VERBOSE
-    std::cout << "\nComputing fine elements and weights for coarse quad points\n";
-    #endif
+    #define COVERAGE_IGNORE
+    if(CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
+    {
+        std::cout << "\nComputing fine elements and weights for coarse quad points\n";
+    }
+    #undef COVERAGE_IGNORE
+
 
     ResetStatisticsVariables();
     for (unsigned i=0; i<quad_point_posns.Size(); i++)
     {
-        #ifdef FINECOARSEMESHPAIR_VERBOSE
-        std::cout << "\r " << i << " of " << quad_point_posns.Size() << std::flush;
-        #endif
+        #define COVERAGE_IGNORE
+        if(CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
+        {
+            std::cout << "\r " << i << " of " << quad_point_posns.Size() << std::flush;
+        }
+        #undef COVERAGE_IGNORE
 
         // Get the box this point is in
         unsigned box_for_this_point = mpFineMeshBoxCollection->CalculateContainingBox( quad_point_posns.Get(i) );
@@ -234,16 +241,23 @@ void FineCoarseMeshPair<DIM>::ComputeFineElementsAndWeightsForCoarseNodes(bool s
     // Resize the elements and weights vector.
     mFineMeshElementsAndWeights.resize(mrCoarseMesh.GetNumNodes());
 
-    #ifdef FINECOARSEMESHPAIR_VERBOSE
-    std::cout << "\nComputing fine elements and weights for coarse nodes\n";
-    #endif
+    #define COVERAGE_IGNORE
+    if(CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
+    {
+        std::cout << "\nComputing fine elements and weights for coarse nodes\n";
+    }
+    #undef COVERAGE_IGNORE
+
 
     ResetStatisticsVariables();
     for (unsigned i=0; i<mrCoarseMesh.GetNumNodes(); i++)
     {
-        #ifdef FINECOARSEMESHPAIR_VERBOSE
-        std::cout << "\r " << i << " of " << mrCoarseMesh.GetNumNodes() << std::flush;
-        #endif
+        #define COVERAGE_IGNORE
+        if(CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
+        {
+            std::cout << "\r " << i << " of " << mrCoarseMesh.GetNumNodes() << std::flush;
+        }
+        #undef COVERAGE_IGNORE
 
         Node<DIM>* p_node = mrCoarseMesh.GetNode(i);
 
@@ -369,18 +383,24 @@ void FineCoarseMeshPair<DIM>::ComputeCoarseElementsForFineNodes(bool safeMode)
         EXCEPTION("Call SetUpBoxesOnCoarseMesh() before ComputeCoarseElementsForFineNodes()");
     }
 
-    #ifdef FINECOARSEMESHPAIR_VERBOSE
-    std::cout << "\nComputing coarse elements for fine nodes\n";
-    #endif
+    #define COVERAGE_IGNORE
+    if(CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
+    {
+        std::cout << "\nComputing coarse elements for fine nodes\n";
+    }
+    #undef COVERAGE_IGNORE
 
     mCoarseElementsForFineNodes.resize(mrFineMesh.GetNumNodes());
 
     ResetStatisticsVariables();
     for (unsigned i=0; i<mCoarseElementsForFineNodes.size(); i++)
     {
-        #ifdef FINECOARSEMESHPAIR_VERBOSE
-        std::cout << "\r " << i << " of " << mCoarseElementsForFineNodes.size() << std::flush;
-        #endif
+        #define COVERAGE_IGNORE
+        if(CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
+        {
+            std::cout << "\r " << i << " of " << mCoarseElementsForFineNodes.size() << std::flush;
+        }
+        #undef COVERAGE_IGNORE
 
         ChastePoint<DIM> point = mrFineMesh.GetNode(i)->GetPoint();
 
@@ -399,18 +419,24 @@ void FineCoarseMeshPair<DIM>::ComputeCoarseElementsForFineElementCentroids(bool 
         EXCEPTION("Call SetUpBoxesOnCoarseMesh() before ComputeCoarseElementsForFineElementCentroids()");
     }
 
-    #ifdef FINECOARSEMESHPAIR_VERBOSE
-    std::cout << "\nComputing coarse elements for fine element centroids\n";
-    #endif
+    #define COVERAGE_IGNORE
+    if(CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
+    {
+        std::cout << "\nComputing coarse elements for fine element centroids\n";
+    }
+    #undef COVERAGE_IGNORE
 
     mCoarseElementsForFineElementCentroids.resize(mrFineMesh.GetNumElements());
 
     ResetStatisticsVariables();
     for (unsigned i=0; i<mrFineMesh.GetNumElements(); i++)
     {
-        #ifdef FINECOARSEMESHPAIR_VERBOSE
-        std::cout << "\r " << i << " of " << mrFineMesh.GetNumElements() << std::flush;
-        #endif
+        #define COVERAGE_IGNORE
+        if(CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
+        {
+            std::cout << "\r " << i << " of " << mrFineMesh.GetNumElements() << std::flush;
+        }
+        #undef COVERAGE_IGNORE
 
         c_vector<double,DIM> point_cvec = mrFineMesh.GetElement(i)->CalculateCentroid();
         ChastePoint<DIM> point(point_cvec);
