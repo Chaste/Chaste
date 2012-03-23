@@ -64,22 +64,22 @@ extern PetscErrorCode KSPInitialResidual(KSP,Vec,Vec,Vec,Vec,Vec);
 #endif
 
 
-//////////////////////////////////////////////////////////////
-//  Globals functions used by the SNES solver
-//////////////////////////////////////////////////////////////
-template<unsigned DIM>
-PetscErrorCode AbstractNonlinearElasticitySolver_ComputeResidual(SNES snes,
-                                                                 Vec currentGuess,
-                                                                 Vec residualVector,
-                                                                 void* pContext);
-
-template<unsigned DIM>
-PetscErrorCode AbstractNonlinearElasticitySolver_ComputeJacobian(SNES snes,
-                                                                 Vec currentGuess,
-                                                                 Mat* pGlobalJacobian,
-                                                                 Mat* pPreconditioner,
-                                                                 MatStructure* pMatStructure,
-                                                                 void* pContext);
+////////////////////////////////////////////////////////////////
+////  Globals functions used by the SNES solver
+////////////////////////////////////////////////////////////////
+//template<unsigned DIM>
+//PetscErrorCode AbstractNonlinearElasticitySolver_ComputeResidual(SNES snes,
+//                                                                 Vec currentGuess,
+//                                                                 Vec residualVector,
+//                                                                 void* pContext);
+//
+//template<unsigned DIM>
+//PetscErrorCode AbstractNonlinearElasticitySolver_ComputeJacobian(SNES snes,
+//                                                                 Vec currentGuess,
+//                                                                 Mat* pGlobalJacobian,
+//                                                                 Mat* pPreconditioner,
+//                                                                 MatStructure* pMatStructure,
+//                                                                 void* pContext);
 
 
 /**
@@ -324,11 +324,11 @@ protected:
     //    These methods form the SNES nonlinear solver
     //
     /////////////////////////////////////////////////////////////
-public: // need to be public as are called by global functions
-    void ComputeResidual(Vec currentGuess, Vec residualVector);
-    void ComputeJacobian(Vec currentGuess, Mat* pJacobian);
-private:
-    void SolveSnes();
+//public: // need to be public as are called by global functions
+//    void ComputeResidual(Vec currentGuess, Vec residualVector);
+//    void ComputeJacobian(Vec currentGuess, Mat* pJacobian);
+//private:
+//    void SolveSnes();
 
 public:
 
