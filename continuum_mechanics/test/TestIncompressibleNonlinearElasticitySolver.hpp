@@ -129,6 +129,7 @@ public:
         IncompressibleNonlinearElasticitySolver<3> solver(mesh,
                                                           problem_defn,
                                                           "");
+
         solver.AssembleSystem(true, true);
 
         // cover exception
@@ -887,7 +888,8 @@ public:
 
 
         // coverage
-        solver.SetKspAbsoluteTolerance(1e-10);
+        solver.SetKspAbsoluteTolerance(1e-8);
+        solver.SetVerbose();
 
         solver.Solve();
         TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(), 3u); // 'hardcoded' answer, protects against Jacobian getting messed up

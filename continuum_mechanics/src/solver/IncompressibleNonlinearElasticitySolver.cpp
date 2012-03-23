@@ -59,6 +59,7 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleSystem(bool assembleR
     // Zero the matrix/vector if it is to be assembled
     if (assembleResidual)
     {
+        PetscVecTools::Finalise(this->mResidualVector);
         PetscVecTools::Zero(this->mResidualVector);
     }
     if (assembleJacobian)
@@ -78,12 +79,13 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleSystem(bool assembleR
          iter != this->mrQuadMesh.GetElementIteratorEnd();
          ++iter)
     {
-        #ifdef MECH_VERY_VERBOSE
-        if (assembleJacobian) // && ((*iter).GetIndex()%500==0))
+        #define COVERAGE_IGNORE
+        // note: if assembleJacobian only
+        if(CommandLineArguments::Instance()->OptionExists("-mech_very_verbose") && assembleJacobian)
         {
             std::cout << "\r[" << PetscTools::GetMyRank() << "]: Element " << (*iter).GetIndex() << " of " << this->mrQuadMesh.GetNumElements() << std::flush;
         }
-        #endif
+        #undef COVERAGE_IGNORE
 
         Element<DIM, DIM>& element = *iter;
 

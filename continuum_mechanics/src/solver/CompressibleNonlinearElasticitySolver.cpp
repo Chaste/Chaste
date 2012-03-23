@@ -61,6 +61,7 @@ void CompressibleNonlinearElasticitySolver<DIM>::AssembleSystem(bool assembleRes
     // Zero the matrix/vector if it is to be assembled
     if (assembleResidual)
     {
+        PetscVecTools::Finalise(this->mResidualVector);
         PetscVecTools::Zero(this->mResidualVector);
     }
     if (assembleJacobian)
@@ -84,12 +85,13 @@ void CompressibleNonlinearElasticitySolver<DIM>::AssembleSystem(bool assembleRes
 
         if (element.GetOwnership() == true)
         {
-            #ifdef MECH_VERY_VERBOSE
-            if (assembleJacobian) // && ((*iter).GetIndex()%500==0))
+            #define COVERAGE_IGNORE
+            // note: if assembleJacobian only
+            if(CommandLineArguments::Instance()->OptionExists("-mech_very_verbose") && assembleJacobian)
             {
                 std::cout << "\r[" << PetscTools::GetMyRank() << "]: Element " << (*iter).GetIndex() << " of " << this->mrQuadMesh.GetNumElements() << std::flush;
             }
-            #endif
+            #undef COVERAGE_IGNORE
 
             AssembleOnElement(element, a_elem, a_elem_precond, b_elem, assembleResidual, assembleJacobian);
 
@@ -301,6 +303,8 @@ void CompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
 
         this->ComputeStressAndStressDerivative(p_material_law, C, inv_C, 0.0, rElement.GetIndex(), current_quad_point_global_index,
                                                T, dTdE, assembleJacobian);
+
+
 
         // Residual vector
         if (assembleResidual)

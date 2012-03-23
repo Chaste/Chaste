@@ -49,16 +49,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QuadraticBasisFunction.hpp"
 #include "SolidMechanicsProblemDefinition.hpp"
 #include "DeformedBoundaryElement.hpp"
-
-//#define MECH_VERBOSE      // Print output on how nonlinear solve is progressing
-//#define MECH_VERY_VERBOSE // See number of elements done whilst assembling vectors or matrices
-//#define MECH_USE_HYPRE    // uses HYPRE to solve linear systems, requires PETSc to be installed with HYPRE
-//#define MECH_KSP_MONITOR  // Print residual norm each iteration in linear solve (ie -ksp_monitor).
-
-
-#ifdef MECH_VERBOSE
+#include "CommandLineArguments.hpp"
 #include "Timer.hpp"
-#endif
+#include "petscsnes.h"
+
+
+//#define MECH_USE_HYPRE    // uses HYPRE to solve linear systems, requires PETSc to be installed with HYPRE
+
 
 
 // Bizarrely PETSc 2.2 has this, but doesn't put it in the petscksp.h header...
@@ -66,6 +63,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extern PetscErrorCode KSPInitialResidual(KSP,Vec,Vec,Vec,Vec,Vec);
 #endif
 
+
+//////////////////////////////////////////////////////////////
+//  Globals functions used by the SNES solver
+//////////////////////////////////////////////////////////////
+template<unsigned DIM>
+PetscErrorCode AbstractNonlinearElasticitySolver_ComputeResidual(SNES snes,
+                                                                 Vec currentGuess,
+                                                                 Vec residualVector,
+                                                                 void* pContext);
+
+template<unsigned DIM>
+PetscErrorCode AbstractNonlinearElasticitySolver_ComputeJacobian(SNES snes,
+                                                                 Vec currentGuess,
+                                                                 Mat* pGlobalJacobian,
+                                                                 Mat* pPreconditioner,
+                                                                 MatStructure* pMatStructure,
+                                                                 void* pContext);
 
 
 /**
@@ -152,11 +166,16 @@ protected:
     double mCurrentTime;
 
 
-
     /** Whether the boundary elements of the mesh have been checked for whether
      *  the ordering if such that the normals are outward-facing
      */
     bool mCheckedOutwardNormals;
+
+    /**
+     * If the command line argument "-mech_verbose" or "-mech_very_verbose" is given than this bool will be
+     * set to true and lots of details about each nonlinear solve (including timing breakdowns) will be printed out.
+     */
+    bool mVerbose;
 
     /**
      * Assemble the residual vector and/or Jacobian matrix (using the current solution stored
@@ -182,6 +201,56 @@ protected:
      * @param assembleLinearSystem see documentation for AssembleSystem
      */
     virtual void FinishAssembleSystem(bool assembleResidual, bool assembleLinearSystem);
+
+
+    /**
+     * Compute the deformation gradient at the centroid at an element
+     * @param rElement The element
+     * @param rDeformationGradient Reference to a matrix, which will be filled in
+     * by this method.
+     */
+    void GetElementCentroidDeformationGradient(Element<DIM,DIM>& rElement,
+                                               c_matrix<double,DIM,DIM>& rDeformationGradient);
+
+    /**
+     * Simple (one-line function which just calls ComputeStressAndStressDerivative() on the
+     * material law given, using C,  inv(C), and p as the input and with rT and rDTdE as the
+     * output. Overloaded by other assemblers (eg cardiac mechanics) which need to add extra
+     * terms to the stress.
+     *
+     * @param pMaterialLaw The material law for this element
+     * @param rC The Lagrangian deformation tensor (F^T F)
+     * @param rInvC The inverse of C. Should be computed by the user.
+     * @param pressure The current pressure
+     * @param elementIndex Index of the current element
+     * @param currentQuadPointGlobalIndex The index (assuming an outer loop over elements and an inner
+     *   loop over quadrature points), of the current quadrature point.
+     * @param rT The stress will be returned in this parameter
+     * @param rDTdE the stress derivative will be returned in this parameter, assuming
+     *   the final parameter is true
+     * @param computeDTdE A boolean flag saying whether the stress derivative is
+     *   required or not.
+     */
+    virtual void ComputeStressAndStressDerivative(AbstractMaterialLaw<DIM>* pMaterialLaw,
+                                                  c_matrix<double,DIM,DIM>& rC,
+                                                  c_matrix<double,DIM,DIM>& rInvC,
+                                                  double pressure,
+                                                  unsigned elementIndex,
+                                                  unsigned currentQuadPointGlobalIndex,
+                                                  c_matrix<double,DIM,DIM>& rT,
+                                                  FourthOrderTensor<DIM,DIM,DIM,DIM>& rDTdE,
+                                                  bool computeDTdE)
+    {
+        // Just call the method on the material law
+        pMaterialLaw->ComputeStressAndStressDerivative(rC,rInvC,pressure,rT,rDTdE,computeDTdE);
+    }
+
+
+    /////////////////////////////////////////////////////////////
+    //
+    //    These methods form the non-SNES nonlinear solver
+    //
+    /////////////////////////////////////////////////////////////
 
     /**
      * Set up the residual vector (using the current solution), and get its
@@ -246,47 +315,20 @@ protected:
      */
     virtual void PostNewtonStep(unsigned counter, double normResidual);
 
-    /**
-     * Compute the deformation gradient at the centroid at an element
-     * @param rElement The element
-     * @param rDeformationGradient Reference to a matrix, which will be filled in
-     * by this method.
-     */
-    void GetElementCentroidDeformationGradient(Element<DIM,DIM>& rElement,
-                                               c_matrix<double,DIM,DIM>& rDeformationGradient);
 
-    /**
-     * Simple (one-line function which just calls ComputeStressAndStressDerivative() on the
-     * material law given, using C,  inv(C), and p as the input and with rT and rDTdE as the
-     * output. Overloaded by other assemblers (eg cardiac mechanics) which need to add extra
-     * terms to the stress.
-     *
-     * @param pMaterialLaw The material law for this element
-     * @param rC The Lagrangian deformation tensor (F^T F)
-     * @param rInvC The inverse of C. Should be computed by the user.
-     * @param pressure The current pressure
-     * @param elementIndex Index of the current element
-     * @param currentQuadPointGlobalIndex The index (assuming an outer loop over elements and an inner
-     *   loop over quadrature points), of the current quadrature point.
-     * @param rT The stress will be returned in this parameter
-     * @param rDTdE the stress derivative will be returned in this parameter, assuming
-     *   the final parameter is true
-     * @param computeDTdE A boolean flag saying whether the stress derivative is
-     *   required or not.
-     */
-    virtual void ComputeStressAndStressDerivative(AbstractMaterialLaw<DIM>* pMaterialLaw,
-                                                  c_matrix<double,DIM,DIM>& rC,
-                                                  c_matrix<double,DIM,DIM>& rInvC,
-                                                  double pressure,
-                                                  unsigned elementIndex,
-                                                  unsigned currentQuadPointGlobalIndex,
-                                                  c_matrix<double,DIM,DIM>& rT,
-                                                  FourthOrderTensor<DIM,DIM,DIM,DIM>& rDTdE,
-                                                  bool computeDTdE)
-    {
-        // Just call the method on the material law
-        pMaterialLaw->ComputeStressAndStressDerivative(rC,rInvC,pressure,rT,rDTdE,computeDTdE);
-    }
+    void SolveNonSnes(double tol=-1.0);
+
+
+    /////////////////////////////////////////////////////////////
+    //
+    //    These methods form the SNES nonlinear solver
+    //
+    /////////////////////////////////////////////////////////////
+public: // need to be public as are called by global functions
+    void ComputeResidual(Vec currentGuess, Vec residualVector);
+    void ComputeJacobian(Vec currentGuess, Mat* pJacobian);
+private:
+    void SolveSnes();
 
 public:
 
@@ -314,12 +356,8 @@ public:
      * Solve the problem.
      *
      * @param tol tolerance used in Newton solve (defaults to -1.0)
-     * @param maxNumNewtonIterations (defaults to INT_MAX)
-     * @param quitIfNoConvergence (defaults to true)
      */
-    void Solve(double tol=-1.0,
-               unsigned maxNumNewtonIterations=INT_MAX,
-               bool quitIfNoConvergence=true);
+    void Solve(double tol=-1.0);
 
 
     /**
@@ -396,12 +434,46 @@ public:
      */
     std::vector<c_vector<double,DIM> >& rGetDeformedPosition();
 
+    /**
+     *  Set the solver to solver to write non-linear solve progress at it solves each
+     *  nonlinear system. Can also be called by using the command line parameter "-mech_verbose"
+     */
+    void SetVerbose(bool verbose = true);
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////
-// Implementation
+// Implementation: first, the non-nonlinear-solve methods
 ///////////////////////////////////////////////////////////////////////////////////
 
+template<unsigned DIM>
+AbstractNonlinearElasticitySolver<DIM>::AbstractNonlinearElasticitySolver(QuadraticMesh<DIM>& rQuadMesh,
+                                                                          SolidMechanicsProblemDefinition<DIM>& rProblemDefinition,
+                                                                          std::string outputDirectory,
+                                                                          CompressibilityType compressibilityType)
+    : AbstractContinuumMechanicsSolver<DIM>(rQuadMesh, rProblemDefinition, outputDirectory, compressibilityType),
+      mrProblemDefinition(rProblemDefinition),
+      mrJacobianMatrix(this->mSystemLhsMatrix),
+      mKspAbsoluteTol(-1),
+      mWriteOutputEachNewtonIteration(false),
+      mNumNewtonIterations(0),
+      mCurrentTime(0.0),
+      mCheckedOutwardNormals(false)
+{
+      mVerbose = (CommandLineArguments::Instance()->OptionExists("-mech_verbose") ||
+                  CommandLineArguments::Instance()->OptionExists("-mech_very_verbose") );
+}
+
+template<unsigned DIM>
+AbstractNonlinearElasticitySolver<DIM>::~AbstractNonlinearElasticitySolver()
+{
+}
+
+template<unsigned DIM>
+void AbstractNonlinearElasticitySolver<DIM>::SetVerbose(bool verbose)
+{
+    mVerbose = verbose;
+}
 
 template<unsigned DIM>
 void AbstractNonlinearElasticitySolver<DIM>::FinishAssembleSystem(bool assembleResidual, bool assembleJacobian)
@@ -438,503 +510,6 @@ void AbstractNonlinearElasticitySolver<DIM>::FinishAssembleSystem(bool assembleR
         PetscMatTools::Finalise(this->mPreconditionMatrix);
         PetscVecTools::Finalise(this->mLinearSystemRhsVector);
     }
-}
-
-template<unsigned DIM>
-double AbstractNonlinearElasticitySolver<DIM>::ComputeResidualAndGetNorm(bool allowException)
-{
-    if (!allowException)
-    {
-        // Assemble the residual
-        AssembleSystem(true, false);
-    }
-    else
-    {
-        try
-        {
-            // Try to assemble the residual using this current solution
-            AssembleSystem(true, false);
-        }
-        catch(Exception& e)
-        {
-            // If fail (because e.g. ODEs fail to solve, or strains are too large for material law), return infinity
-            return DBL_MAX;
-        }
-    }
-
-    // Return the scaled norm of the residual
-    return CalculateResidualNorm();
-}
-
-template<unsigned DIM>
-double AbstractNonlinearElasticitySolver<DIM>::CalculateResidualNorm()
-{
-    double norm;
-    VecNorm(this->mResidualVector, NORM_2, &norm);
-    return norm/this->mNumDofs;
-}
-
-template<unsigned DIM>
-void AbstractNonlinearElasticitySolver<DIM>::VectorSum(std::vector<double>& rX,
-                                                       ReplicatableVector& rY,
-                                                       double a,
-                                                       std::vector<double>& rZ)
-{
-    assert(rX.size()==rY.GetSize());
-    assert(rY.GetSize()==rZ.size());
-    for (unsigned i=0; i<rX.size(); i++)
-    {
-        rZ[i] = rX[i] + a*rY[i];
-    }
-}
-
-
-template<unsigned DIM>
-double AbstractNonlinearElasticitySolver<DIM>::TakeNewtonStep()
-{
-    #ifdef MECH_VERBOSE
-    Timer::Reset();
-    #endif
-
-    /////////////////////////////////////////////////////////////
-    // Assemble Jacobian (and preconditioner)
-    /////////////////////////////////////////////////////////////
-    MechanicsEventHandler::BeginEvent(MechanicsEventHandler::ASSEMBLE);
-    AssembleSystem(true, true);
-    MechanicsEventHandler::EndEvent(MechanicsEventHandler::ASSEMBLE);
-    #ifdef MECH_VERBOSE
-    Timer::PrintAndReset("AssembleSystem");
-    #endif
-
-    ///////////////////////////////////////////////////////////////////
-    //
-    // Solve the linear system.
-    // Three alternatives
-    //   (a) Incompressible: GMRES with ILU preconditioner (or bjacobi=ILU on each process) [default]. Very poor on large problems.
-    //   (b) Incompressible: GMRES with AMG preconditioner. Uncomment #define MECH_USE_HYPRE above. Requires Petsc3 with HYPRE installed.
-    //   (c) Compressible: CG with ???
-    ///////////////////////////////////////////////////////////////////
-    MechanicsEventHandler::BeginEvent(MechanicsEventHandler::SOLVE);
-
-    Vec solution;
-    VecDuplicate(this->mResidualVector,&solution);
-
-    KSP solver;
-    KSPCreate(PETSC_COMM_WORLD,&solver);
-    PC pc;
-    KSPGetPC(solver, &pc);
-
-    KSPSetOperators(solver, mrJacobianMatrix, this->mPreconditionMatrix, DIFFERENT_NONZERO_PATTERN /*in precond between successive solves*/);
-
-    if (this->mCompressibilityType==COMPRESSIBLE)
-    {
-        KSPSetType(solver,KSPCG);
-///\todo #1828 / #1913
-        if(PetscTools::IsSequential())
-        {
-            PCSetType(pc, PCICC);
-            PetscOptionsSetValue("-pc_factor_shift_positive_definite", "");
-        }
-        else
-        {
-            PCSetType(pc, PCBJACOBI);
-        }
-    }
-    else
-    {
-        unsigned num_restarts = 100;
-        KSPSetType(solver,KSPGMRES);
-        KSPGMRESSetRestart(solver,num_restarts);
-
-        #ifndef MECH_USE_HYPRE
-            PCSetType(pc, PCBJACOBI); // BJACOBI = ILU on each block (block = part of matrix on each process)
-        #else
-            /////////////////////////////////////////////////////////////////////////////////////////////////////
-            // Speed up linear solve time massively for larger simulations (in fact GMRES may stagnate without
-            // this for larger problems), by using a AMG preconditioner -- needs HYPRE installed
-            /////////////////////////////////////////////////////////////////////////////////////////////////////
-            PetscOptionsSetValue("-pc_hypre_type", "boomeramg");
-            // PetscOptionsSetValue("-pc_hypre_boomeramg_max_iter", "1");
-            // PetscOptionsSetValue("-pc_hypre_boomeramg_strong_threshold", "0.0");
-
-            PCSetType(pc, PCHYPRE);
-            KSPSetPreconditionerSide(solver, PC_RIGHT);
-
-            // other possible preconditioners..
-            //PCBlockDiagonalMechanics* p_custom_pc = new PCBlockDiagonalMechanics(solver, this->mPreconditionMatrix, mBlock1Size, mBlock2Size);
-            //PCLDUFactorisationMechanics* p_custom_pc = new PCLDUFactorisationMechanics(solver, this->mPreconditionMatrix, mBlock1Size, mBlock2Size);
-            //remember to delete memory..
-            //KSPSetPreconditionerSide(solver, PC_RIGHT);
-        #endif
-    }
-
-
-
-
-    #ifdef MECH_KSP_MONITOR
-    PetscOptionsSetValue("-ksp_monitor","");
-    //PetscOptionsSetValue("-ksp_norm_type","natural");
-    #endif
-
-    KSPSetFromOptions(solver);
-    KSPSetUp(solver);
-
-
-//    ///// For printing matrix when debugging
-//    OutputFileHandler handler("TEMP");
-//    out_stream p_file = handler.OpenOutputFile("matrix.txt");
-//    for(unsigned i=0; i<mNumDofs; i++)
-//    {
-//        for(unsigned j=0; j<mNumDofs; j++)
-//        {
-//            *p_file << PetscMatTools::GetElement(mrJacobianMatrix, i, j) << " ";
-//        }
-//        *p_file << "\n";
-//    }
-//    p_file->close();
-//
-//    out_stream p_file2 = handler.OpenOutputFile("rhs.txt");
-//    for(unsigned i=0; i<mNumDofs; i++)
-//    {
-//        *p_file2 << PetscVecTools::GetElement(mLinearSystemRhsVector, i) << "\n";
-//    }
-//    p_file2->close();
-
-
-    // Set the linear system absolute tolerance.
-    // This is either the user provided value, or set to
-    // max {1e-6 * initial_residual, 1e-12}
-    if (mKspAbsoluteTol < 0)
-    {
-        Vec temp;
-        VecDuplicate(this->mResidualVector, &temp);
-        Vec temp2;
-        VecDuplicate(this->mResidualVector, &temp2);
-        Vec linsys_residual;
-        VecDuplicate(this->mResidualVector, &linsys_residual);
-
-        KSPInitialResidual(solver, solution, temp, temp2, linsys_residual, this->mLinearSystemRhsVector);
-        double initial_resid_norm;
-        VecNorm(linsys_residual, NORM_2, &initial_resid_norm);
-
-        PetscTools::Destroy(temp);
-        PetscTools::Destroy(temp2);
-        PetscTools::Destroy(linsys_residual);
-
-        double ksp_rel_tol = 1e-6;
-        double absolute_tol = ksp_rel_tol * initial_resid_norm;
-        if(absolute_tol < 1e-12)
-        {
-            absolute_tol = 1e-12;
-        }
-        KSPSetTolerances(solver, 1e-16, absolute_tol, PETSC_DEFAULT, PETSC_DEFAULT /* max iters */); // Note, max iters seems to be 1000 whatever we give here
-    }
-    else
-    {
-        KSPSetTolerances(solver, 1e-16, mKspAbsoluteTol, PETSC_DEFAULT, PETSC_DEFAULT /* max iters */); // Note, max iters seems to be 1000 whatever we give here
-    }
-
-    #ifdef MECH_VERBOSE
-    Timer::PrintAndReset("KSP Setup");
-    #endif
-
-    KSPSolve(solver,this->mLinearSystemRhsVector,solution);
-
-    /////////////////////////////////////////////
-    // Error checking for linear solve
-    /////////////////////////////////////////////
-
-    // warn if ksp reports failure
-    KSPConvergedReason reason;
-    KSPGetConvergedReason(solver,&reason);
-
-    if(reason != KSP_DIVERGED_ITS)
-    {
-        // Throw an exception if the solver failed for any reason other than DIVERGED_ITS.
-        // This is not covered as would be difficult to cover - requires a bad matrix to
-        // assembled, for example.
-        #define COVERAGE_IGNORE
-        KSPEXCEPT(reason);
-        #undef COVERAGE_IGNORE
-    }
-    else
-    {
-        // DIVERGED_ITS just means it didn't converge in the given maximum number of iterations,
-        // which is potentially not a problem, as the nonlinear solver may (and often will) still converge.
-        // Just warn once.
-        // (Very difficult to cover in normal tests, requires relative and absolute ksp tols to be very small, there
-        // is no interface for setting both of these. Could be covered by setting up a problem the solver
-        // finds difficult to solve, but this would be overkill.)
-        #define COVERAGE_IGNORE
-        WARN_ONCE_ONLY("Linear solve (within a mechanics solve) didn't converge, but this may not stop nonlinear solve converging")
-        #undef COVERAGE_IGNORE
-    }
-
-    // quit if no ksp iterations were done
-    int num_iters;
-    KSPGetIterationNumber(solver, &num_iters);
-    if (num_iters==0)
-    {
-        PetscTools::Destroy(solution);
-        KSPDestroy(PETSC_DESTROY_PARAM(solver));
-        EXCEPTION("KSP Absolute tolerance was too high, linear system wasn't solved - there will be no decrease in Newton residual. Decrease KspAbsoluteTolerance");
-    }
-
-
-    #ifdef MECH_VERBOSE
-    Timer::PrintAndReset("KSP Solve");
-    std::cout << "[" << PetscTools::GetMyRank() << "]: Num iterations = " << num_iters << "\n" << std::flush;
-    #endif
-
-    MechanicsEventHandler::EndEvent(MechanicsEventHandler::SOLVE);
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Update the solution
-    //  Newton method:       sol = sol - update, where update=Jac^{-1}*residual
-    //  Newton with damping: sol = sol - s*update, where s is chosen
-    //   such that |residual(sol)| is minimised. Damping is important to
-    //   avoid initial divergence.
-    //
-    // Normally, finding the best s from say 0.05,0.1,0.2,..,1.0 is cheap,
-    // but this is not the case in cardiac electromechanics calculations.
-    // Therefore, we initially check s=1 (expected to be the best most of the
-    // time, then s=0.9. If the norm of the residual increases, we assume
-    // s=1 is the best. Otherwise, check s=0.8 to see if s=0.9 is a local min.
-    ///////////////////////////////////////////////////////////////////////////
-    MechanicsEventHandler::BeginEvent(MechanicsEventHandler::UPDATE);
-    double new_norm_resid = UpdateSolutionUsingLineSearch(solution);
-    MechanicsEventHandler::EndEvent(MechanicsEventHandler::UPDATE);
-
-    PetscTools::Destroy(solution);
-    KSPDestroy(PETSC_DESTROY_PARAM(solver));
-
-    return new_norm_resid;
-}
-
-template<unsigned DIM>
-void AbstractNonlinearElasticitySolver<DIM>::PrintLineSearchResult(double s, double residNorm)
-{
-    #ifdef MECH_VERBOSE
-    std::cout << "\tTesting s = " << s << ", |f| = " << residNorm << "\n" << std::flush;
-    #endif
-}
-
-template<unsigned DIM>
-double AbstractNonlinearElasticitySolver<DIM>::UpdateSolutionUsingLineSearch(Vec solution)
-{
-    double initial_norm_resid = CalculateResidualNorm();
-    #ifdef MECH_VERBOSE
-    std::cout << "\tInitial |f| [corresponding to s=0] is " << initial_norm_resid << "\n"  << std::flush;
-    #endif
-
-    ReplicatableVector update(solution);
-
-    std::vector<double> old_solution = this->mCurrentSolution;
-
-    std::vector<double> damping_values; // = {1.0, 0.9, .., 0.2, 0.1, 0.05} ie size 11
-    for (unsigned i=10; i>=1; i--)
-    {
-        damping_values.push_back((double)i/10.0);
-    }
-    damping_values.push_back(0.05);
-    assert(damping_values.size()==11);
-
-    //// Try s=1 and see what the residual-norm is
-    // let mCurrentSolution = old_solution - damping_val[0]*update; and compute residual
-    unsigned index = 0;
-    VectorSum(old_solution, update, -damping_values[index], this->mCurrentSolution);
-    double current_resid_norm = ComputeResidualAndGetNorm(true);
-    PrintLineSearchResult(damping_values[index], current_resid_norm);
-
-    //// Try s=0.9 and see what the residual-norm is
-    // let mCurrentSolution = old_solution - damping_val[1]*update; and compute residual
-    index = 1;
-    VectorSum(old_solution, update, -damping_values[index], this->mCurrentSolution);
-    double next_resid_norm = ComputeResidualAndGetNorm(true);
-    PrintLineSearchResult(damping_values[index], next_resid_norm);
-
-    index = 2;
-    // While f(s_next) < f(s_current), [f = residnorm], keep trying new damping values,
-    // ie exit thus loop when next norm of the residual first increases
-    while (    (next_resid_norm==DBL_MAX) // the residual is returned as infinity if the deformation is so large to cause exceptions in the material law/EM contraction model
-            || ( (next_resid_norm < current_resid_norm) && (index<damping_values.size()) ) )
-    {
-        current_resid_norm = next_resid_norm;
-
-        // let mCurrentSolution = old_solution - damping_val*update; and compute residual
-        VectorSum(old_solution, update, -damping_values[index], this->mCurrentSolution);
-        next_resid_norm = ComputeResidualAndGetNorm(true);
-        PrintLineSearchResult(damping_values[index], next_resid_norm);
-
-        index++;
-    }
-
-    unsigned best_index;
-
-    if (index==damping_values.size() && (next_resid_norm < current_resid_norm))
-    {
-        // Difficult to come up with large forces/tractions such that it had to
-        // test right down to s=0.05, but overall doesn't fail.
-        // The possible damping values have been manually temporarily altered to
-        // get this code to be called, it appears to work correctly. Even if it
-        // didn't tests wouldn't fail, they would just be v. slightly less efficient.
-        #define COVERAGE_IGNORE
-        // if we exited because we got to the end of the possible damping values, the
-        // best one was the last one (excl the final index++ at the end)
-        current_resid_norm = next_resid_norm;
-        best_index = index-1;
-        #undef COVERAGE_IGNORE
-    }
-    else
-    {
-        // else the best one must have been the second last one (excl the final index++ at the end)
-        // (as we would have exited when the resid norm first increased)
-        best_index = index-2;
-    }
-
-    // Check out best was better than the original residual-norm
-    if (initial_norm_resid < current_resid_norm)
-    {
-        #define COVERAGE_IGNORE
-        // Have to use an assert/exit here as the following exception causes a seg fault (in cardiac mech problems?)
-        // Don't know why
-        std::cout << "CHASTE ERROR: (AbstractNonlinearElasticitySolver.hpp): Residual does not appear to decrease in newton direction, quitting.\n" << std::flush;
-        exit(0);
-        //EXCEPTION("Residual does not appear to decrease in newton direction, quitting");
-        #undef COVERAGE_IGNORE
-    }
-
-    #ifdef MECH_VERBOSE
-    std::cout << "\tBest s = " << damping_values[best_index] << "\n"  << std::flush;
-    #endif
-    VectorSum(old_solution, update, -damping_values[best_index], this->mCurrentSolution);
-
-    return current_resid_norm;
-}
-
-template<unsigned DIM>
-void AbstractNonlinearElasticitySolver<DIM>::PostNewtonStep(unsigned counter, double normResidual)
-{
-}
-
-template<unsigned DIM>
-AbstractNonlinearElasticitySolver<DIM>::AbstractNonlinearElasticitySolver(QuadraticMesh<DIM>& rQuadMesh,
-                                                                          SolidMechanicsProblemDefinition<DIM>& rProblemDefinition,
-                                                                          std::string outputDirectory,
-                                                                          CompressibilityType compressibilityType)
-    : AbstractContinuumMechanicsSolver<DIM>(rQuadMesh, rProblemDefinition, outputDirectory, compressibilityType),
-      mrProblemDefinition(rProblemDefinition),
-      mrJacobianMatrix(this->mSystemLhsMatrix),
-      mKspAbsoluteTol(-1),
-      mWriteOutputEachNewtonIteration(false),
-      mNumNewtonIterations(0),
-      mCurrentTime(0.0),
-      mCheckedOutwardNormals(false)
-{
-}
-
-template<unsigned DIM>
-AbstractNonlinearElasticitySolver<DIM>::~AbstractNonlinearElasticitySolver()
-{
-}
-
-template<unsigned DIM>
-void AbstractNonlinearElasticitySolver<DIM>::Solve(double tol,
-                                                   unsigned maxNumNewtonIterations,
-                                                   bool quitIfNoConvergence)
-{
-    // check the problem definition is set up correctly (and fully).
-    mrProblemDefinition.Validate();
-
-    // If the problem includes specified pressures on deformed surfaces (as opposed
-    // to specified tractions), the code needs to compute normals, and they need
-    // to be consistently all facing outward (or all facing inward). Check the undeformed
-    // mesh boundary elements has nodes that are ordered so that all normals are
-    // outward-facing
-    if(mrProblemDefinition.GetTractionBoundaryConditionType()==PRESSURE_ON_DEFORMED && mCheckedOutwardNormals==false)
-    {
-        this->mrQuadMesh.CheckOutwardNormals();
-        mCheckedOutwardNormals = true;
-    }
-
-
-    this->WriteCurrentSpatialSolution("initial", "nodes");
-
-    if (mWriteOutputEachNewtonIteration)
-    {
-        this->WriteCurrentSpatialSolution("newton_iteration", "nodes", 0);
-    }
-
-    // Compute residual
-    double norm_resid = ComputeResidualAndGetNorm(false);
-    #ifdef MECH_VERBOSE
-    std::cout << "\nNorm of residual is " << norm_resid << "\n";
-    #endif
-
-    mNumNewtonIterations = 0;
-    unsigned iteration_number = 1;
-
-    if (tol < 0) // i.e. if wasn't passed in as a parameter
-    {
-        tol = NEWTON_REL_TOL*norm_resid;
-
-        #define COVERAGE_IGNORE // not going to have tests in cts for everything
-        if (tol > MAX_NEWTON_ABS_TOL)
-        {
-            tol = MAX_NEWTON_ABS_TOL;
-        }
-        if (tol < MIN_NEWTON_ABS_TOL)
-        {
-            tol = MIN_NEWTON_ABS_TOL;
-        }
-        #undef COVERAGE_IGNORE
-    }
-
-    #ifdef MECH_VERBOSE
-    std::cout << "Solving with tolerance " << tol << "\n";
-    #endif
-
-    while (norm_resid > tol && iteration_number<=maxNumNewtonIterations)
-    {
-        #ifdef MECH_VERBOSE
-        std::cout <<  "\n-------------------\n"
-                  <<   "Newton iteration " << iteration_number
-                  << ":\n-------------------\n";
-        #endif
-
-        // take newton step (and get returned residual)
-        norm_resid = TakeNewtonStep();
-
-        #ifdef MECH_VERBOSE
-        std::cout << "Norm of residual is " << norm_resid << "\n";
-        #endif
-        if (mWriteOutputEachNewtonIteration)
-        {
-            this->WriteCurrentSpatialSolution("newton_iteration", "nodes", iteration_number);
-        }
-
-        mNumNewtonIterations = iteration_number;
-
-        PostNewtonStep(iteration_number,norm_resid);
-
-        iteration_number++;
-        if (iteration_number==20)
-        {
-            #define COVERAGE_IGNORE
-            EXCEPTION("Not converged after 20 newton iterations, quitting");
-            #undef COVERAGE_IGNORE
-        }
-    }
-
-    if ((norm_resid > tol) && quitIfNoConvergence)
-    {
-        #define COVERAGE_IGNORE
-        EXCEPTION("Failed to converge");
-        #undef COVERAGE_IGNORE
-    }
-
-    // Write the final solution
-    this->WriteCurrentSpatialSolution("solution", "nodes");
 }
 
 
@@ -995,12 +570,6 @@ void AbstractNonlinearElasticitySolver<DIM>::WriteCurrentDeformationGradients(st
         *p_file << "\n";
     }
     p_file->close();
-}
-
-template<unsigned DIM>
-unsigned AbstractNonlinearElasticitySolver<DIM>::GetNumNewtonIterations()
-{
-    return mNumNewtonIterations;
 }
 
 template<unsigned DIM>
@@ -1097,6 +666,632 @@ void AbstractNonlinearElasticitySolver<DIM>::GetElementCentroidDeformationGradie
 //        this->ComputeStressAndStressDerivative(p_material_law, C, inv_C, 0.0, rElement.GetIndex(), current_quad_point_global_index,
 //                                               T, dTdE, assembleJacobian);
 }
+
+
+
+template<unsigned DIM>
+void AbstractNonlinearElasticitySolver<DIM>::Solve(double tol)
+{
+
+    // check the problem definition is set up correctly (and fully).
+    mrProblemDefinition.Validate();
+
+    // If the problem includes specified pressures on deformed surfaces (as opposed
+    // to specified tractions), the code needs to compute normals, and they need
+    // to be consistently all facing outward (or all facing inward). Check the undeformed
+    // mesh boundary elements has nodes that are ordered so that all normals are
+    // outward-facing
+    if(mrProblemDefinition.GetTractionBoundaryConditionType()==PRESSURE_ON_DEFORMED && mCheckedOutwardNormals==false)
+    {
+        this->mrQuadMesh.CheckOutwardNormals();
+        mCheckedOutwardNormals = true;
+    }
+
+    // Write the initial solution
+    this->WriteCurrentSpatialSolution("initial", "nodes");
+
+//    if( ! CommandLineArguments::Instance()->OptionExists("-mech_use_snes"))
+//    {
+        SolveNonSnes(tol);
+//    }
+//    else
+//    {
+//        SolveSnes();
+//    }
+
+    // Write the final solution
+    this->WriteCurrentSpatialSolution("solution", "nodes");
+
+}
+
+////////////////////////////////////////////////////////////////////
+//  The code for the non-SNES solver - maybe remove all this
+//  as SNES solver appears better
+////////////////////////////////////////////////////////////////////
+
+template<unsigned DIM>
+double AbstractNonlinearElasticitySolver<DIM>::ComputeResidualAndGetNorm(bool allowException)
+{
+    if (!allowException)
+    {
+        // Assemble the residual
+        AssembleSystem(true, false);
+    }
+    else
+    {
+        try
+        {
+            // Try to assemble the residual using this current solution
+            AssembleSystem(true, false);
+        }
+        catch(Exception& e)
+        {
+            // If fail (because e.g. ODEs fail to solve, or strains are too large for material law), return infinity
+            return DBL_MAX;
+        }
+    }
+
+    // Return the scaled norm of the residual
+    return CalculateResidualNorm();
+}
+
+template<unsigned DIM>
+double AbstractNonlinearElasticitySolver<DIM>::CalculateResidualNorm()
+{
+    double norm;
+    VecNorm(this->mResidualVector, NORM_2, &norm);
+    return norm/this->mNumDofs;
+}
+
+template<unsigned DIM>
+void AbstractNonlinearElasticitySolver<DIM>::VectorSum(std::vector<double>& rX,
+                                                       ReplicatableVector& rY,
+                                                       double a,
+                                                       std::vector<double>& rZ)
+{
+    assert(rX.size()==rY.GetSize());
+    assert(rY.GetSize()==rZ.size());
+    for (unsigned i=0; i<rX.size(); i++)
+    {
+        rZ[i] = rX[i] + a*rY[i];
+    }
+}
+
+
+template<unsigned DIM>
+double AbstractNonlinearElasticitySolver<DIM>::TakeNewtonStep()
+{
+    if(mVerbose)
+    {
+        Timer::Reset();
+    }
+
+    /////////////////////////////////////////////////////////////
+    // Assemble Jacobian (and preconditioner)
+    /////////////////////////////////////////////////////////////
+    MechanicsEventHandler::BeginEvent(MechanicsEventHandler::ASSEMBLE);
+    AssembleSystem(true, true);
+    MechanicsEventHandler::EndEvent(MechanicsEventHandler::ASSEMBLE);
+    if(mVerbose)
+    {
+        Timer::PrintAndReset("AssembleSystem");
+    }
+
+    ///////////////////////////////////////////////////////////////////
+    //
+    // Solve the linear system.
+    // Three alternatives
+    //   (a) Incompressible: GMRES with ILU preconditioner (or bjacobi=ILU on each process) [default]. Very poor on large problems.
+    //   (b) Incompressible: GMRES with AMG preconditioner. Uncomment #define MECH_USE_HYPRE above. Requires Petsc3 with HYPRE installed.
+    //   (c) Compressible: CG with ???
+    ///////////////////////////////////////////////////////////////////
+    MechanicsEventHandler::BeginEvent(MechanicsEventHandler::SOLVE);
+
+    Vec solution;
+    VecDuplicate(this->mResidualVector,&solution);
+
+    KSP solver;
+    KSPCreate(PETSC_COMM_WORLD,&solver);
+    PC pc;
+    KSPGetPC(solver, &pc);
+
+    KSPSetOperators(solver, mrJacobianMatrix, this->mPreconditionMatrix, DIFFERENT_NONZERO_PATTERN /*in precond between successive solves*/);
+
+    if (this->mCompressibilityType==COMPRESSIBLE)
+    {
+        KSPSetType(solver,KSPCG);
+///\todo #1828 / #1913
+        if(PetscTools::IsSequential())
+        {
+            PCSetType(pc, PCICC);
+            PetscOptionsSetValue("-pc_factor_shift_positive_definite", "");
+        }
+        else
+        {
+            PCSetType(pc, PCBJACOBI);
+        }
+    }
+    else
+    {
+        unsigned num_restarts = 100;
+        KSPSetType(solver,KSPGMRES);
+        KSPGMRESSetRestart(solver,num_restarts);
+
+        #ifndef MECH_USE_HYPRE
+            PCSetType(pc, PCBJACOBI); // BJACOBI = ILU on each block (block = part of matrix on each process)
+        #else
+            /////////////////////////////////////////////////////////////////////////////////////////////////////
+            // Speed up linear solve time massively for larger simulations (in fact GMRES may stagnate without
+            // this for larger problems), by using a AMG preconditioner -- needs HYPRE installed
+            /////////////////////////////////////////////////////////////////////////////////////////////////////
+            PetscOptionsSetValue("-pc_hypre_type", "boomeramg");
+            // PetscOptionsSetValue("-pc_hypre_boomeramg_max_iter", "1");
+            // PetscOptionsSetValue("-pc_hypre_boomeramg_strong_threshold", "0.0");
+
+            PCSetType(pc, PCHYPRE);
+            KSPSetPreconditionerSide(solver, PC_RIGHT);
+
+            // other possible preconditioners..
+            //PCBlockDiagonalMechanics* p_custom_pc = new PCBlockDiagonalMechanics(solver, this->mPreconditionMatrix, mBlock1Size, mBlock2Size);
+            //PCLDUFactorisationMechanics* p_custom_pc = new PCLDUFactorisationMechanics(solver, this->mPreconditionMatrix, mBlock1Size, mBlock2Size);
+            //remember to delete memory..
+            //KSPSetPreconditionerSide(solver, PC_RIGHT);
+        #endif
+    }
+
+
+    //PetscOptionsSetValue("-ksp_monitor","");
+    //PetscOptionsSetValue("-ksp_norm_type","natural");
+
+    KSPSetFromOptions(solver);
+    KSPSetUp(solver);
+
+
+
+
+    // Set the linear system absolute tolerance.
+    // This is either the user provided value, or set to
+    // max {1e-6 * initial_residual, 1e-12}
+    if (mKspAbsoluteTol < 0)
+    {
+        Vec temp;
+        VecDuplicate(this->mResidualVector, &temp);
+        Vec temp2;
+        VecDuplicate(this->mResidualVector, &temp2);
+        Vec linsys_residual;
+        VecDuplicate(this->mResidualVector, &linsys_residual);
+
+        KSPInitialResidual(solver, solution, temp, temp2, linsys_residual, this->mLinearSystemRhsVector);
+        double initial_resid_norm;
+        VecNorm(linsys_residual, NORM_2, &initial_resid_norm);
+
+        PetscTools::Destroy(temp);
+        PetscTools::Destroy(temp2);
+        PetscTools::Destroy(linsys_residual);
+
+        double ksp_rel_tol = 1e-6;
+        double absolute_tol = ksp_rel_tol * initial_resid_norm;
+        if(absolute_tol < 1e-12)
+        {
+            absolute_tol = 1e-12;
+        }
+        KSPSetTolerances(solver, 1e-16, absolute_tol, PETSC_DEFAULT, PETSC_DEFAULT /* max iters */); // Note, max iters seems to be 1000 whatever we give here
+    }
+    else
+    {
+        KSPSetTolerances(solver, 1e-16, mKspAbsoluteTol, PETSC_DEFAULT, PETSC_DEFAULT /* max iters */); // Note, max iters seems to be 1000 whatever we give here
+    }
+
+    if(mVerbose)
+    {
+        Timer::PrintAndReset("KSP Setup");
+    }
+
+    KSPSolve(solver,this->mLinearSystemRhsVector,solution);
+
+//    ///// For printing matrix when debugging
+//    OutputFileHandler handler("TEMP",false);
+//    std::stringstream ss;
+//    static unsigned counter = 0;
+//    ss << "all_" << counter++ << ".txt";
+//    out_stream p_file = handler.OpenOutputFile(ss.str());
+//    *p_file << std::setprecision(10);
+//    for(unsigned i=0; i<this->mNumDofs; i++)
+//    {
+//        for(unsigned j=0; j<this->mNumDofs; j++)
+//        {
+//            *p_file << PetscMatTools::GetElement(mrJacobianMatrix, i, j) << " ";
+//        }
+//        *p_file << PetscVecTools::GetElement(this->mLinearSystemRhsVector, i) << " ";
+//        *p_file << PetscVecTools::GetElement(solution, i) << "\n";
+//    }
+//    p_file->close();
+
+
+    /////////////////////////////////////////////
+    // Error checking for linear solve
+    /////////////////////////////////////////////
+
+    // warn if ksp reports failure
+    KSPConvergedReason reason;
+    KSPGetConvergedReason(solver,&reason);
+
+    if(reason != KSP_DIVERGED_ITS)
+    {
+        // Throw an exception if the solver failed for any reason other than DIVERGED_ITS.
+        // This is not covered as would be difficult to cover - requires a bad matrix to
+        // assembled, for example.
+        #define COVERAGE_IGNORE
+        KSPEXCEPT(reason);
+        #undef COVERAGE_IGNORE
+    }
+    else
+    {
+        // DIVERGED_ITS just means it didn't converge in the given maximum number of iterations,
+        // which is potentially not a problem, as the nonlinear solver may (and often will) still converge.
+        // Just warn once.
+        // (Very difficult to cover in normal tests, requires relative and absolute ksp tols to be very small, there
+        // is no interface for setting both of these. Could be covered by setting up a problem the solver
+        // finds difficult to solve, but this would be overkill.)
+        #define COVERAGE_IGNORE
+        WARN_ONCE_ONLY("Linear solve (within a mechanics solve) didn't converge, but this may not stop nonlinear solve converging")
+        #undef COVERAGE_IGNORE
+    }
+
+    // quit if no ksp iterations were done
+    int num_iters;
+    KSPGetIterationNumber(solver, &num_iters);
+    if (num_iters==0)
+    {
+        PetscTools::Destroy(solution);
+        KSPDestroy(PETSC_DESTROY_PARAM(solver));
+        EXCEPTION("KSP Absolute tolerance was too high, linear system wasn't solved - there will be no decrease in Newton residual. Decrease KspAbsoluteTolerance");
+    }
+
+
+    if(mVerbose)
+    {
+        Timer::PrintAndReset("KSP Solve");
+        std::cout << "[" << PetscTools::GetMyRank() << "]: Num iterations = " << num_iters << "\n" << std::flush;
+    }
+
+    MechanicsEventHandler::EndEvent(MechanicsEventHandler::SOLVE);
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Update the solution
+    //  Newton method:       sol = sol - update, where update=Jac^{-1}*residual
+    //  Newton with damping: sol = sol - s*update, where s is chosen
+    //   such that |residual(sol)| is minimised. Damping is important to
+    //   avoid initial divergence.
+    //
+    // Normally, finding the best s from say 0.05,0.1,0.2,..,1.0 is cheap,
+    // but this is not the case in cardiac electromechanics calculations.
+    // Therefore, we initially check s=1 (expected to be the best most of the
+    // time, then s=0.9. If the norm of the residual increases, we assume
+    // s=1 is the best. Otherwise, check s=0.8 to see if s=0.9 is a local min.
+    ///////////////////////////////////////////////////////////////////////////
+    MechanicsEventHandler::BeginEvent(MechanicsEventHandler::UPDATE);
+    double new_norm_resid = UpdateSolutionUsingLineSearch(solution);
+    MechanicsEventHandler::EndEvent(MechanicsEventHandler::UPDATE);
+
+    PetscTools::Destroy(solution);
+    KSPDestroy(PETSC_DESTROY_PARAM(solver));
+
+    return new_norm_resid;
+}
+
+template<unsigned DIM>
+void AbstractNonlinearElasticitySolver<DIM>::PrintLineSearchResult(double s, double residNorm)
+{
+    if(mVerbose)
+    {
+        std::cout << "\tTesting s = " << s << ", |f| = " << residNorm << "\n" << std::flush;
+    }
+}
+
+template<unsigned DIM>
+double AbstractNonlinearElasticitySolver<DIM>::UpdateSolutionUsingLineSearch(Vec solution)
+{
+    double initial_norm_resid = CalculateResidualNorm();
+    if(mVerbose)
+    {
+        std::cout << "\tInitial |f| [corresponding to s=0] is " << initial_norm_resid << "\n"  << std::flush;
+    }
+
+    ReplicatableVector update(solution);
+
+    std::vector<double> old_solution = this->mCurrentSolution;
+
+    std::vector<double> damping_values; // = {1.0, 0.9, .., 0.2, 0.1, 0.05} ie size 11
+    for (unsigned i=10; i>=1; i--)
+    {
+        damping_values.push_back((double)i/10.0);
+    }
+    damping_values.push_back(0.05);
+    assert(damping_values.size()==11);
+
+    //// Try s=1 and see what the residual-norm is
+    // let mCurrentSolution = old_solution - damping_val[0]*update; and compute residual
+    unsigned index = 0;
+    VectorSum(old_solution, update, -damping_values[index], this->mCurrentSolution);
+    double current_resid_norm = ComputeResidualAndGetNorm(true);
+    PrintLineSearchResult(damping_values[index], current_resid_norm);
+
+    //// Try s=0.9 and see what the residual-norm is
+    // let mCurrentSolution = old_solution - damping_val[1]*update; and compute residual
+    index = 1;
+    VectorSum(old_solution, update, -damping_values[index], this->mCurrentSolution);
+    double next_resid_norm = ComputeResidualAndGetNorm(true);
+    PrintLineSearchResult(damping_values[index], next_resid_norm);
+
+    index = 2;
+    // While f(s_next) < f(s_current), [f = residnorm], keep trying new damping values,
+    // ie exit thus loop when next norm of the residual first increases
+    while (    (next_resid_norm==DBL_MAX) // the residual is returned as infinity if the deformation is so large to cause exceptions in the material law/EM contraction model
+            || ( (next_resid_norm < current_resid_norm) && (index<damping_values.size()) ) )
+    {
+        current_resid_norm = next_resid_norm;
+
+        // let mCurrentSolution = old_solution - damping_val*update; and compute residual
+        VectorSum(old_solution, update, -damping_values[index], this->mCurrentSolution);
+        next_resid_norm = ComputeResidualAndGetNorm(true);
+        PrintLineSearchResult(damping_values[index], next_resid_norm);
+
+        index++;
+    }
+
+    unsigned best_index;
+
+    if (index==damping_values.size() && (next_resid_norm < current_resid_norm))
+    {
+        // Difficult to come up with large forces/tractions such that it had to
+        // test right down to s=0.05, but overall doesn't fail.
+        // The possible damping values have been manually temporarily altered to
+        // get this code to be called, it appears to work correctly. Even if it
+        // didn't tests wouldn't fail, they would just be v. slightly less efficient.
+        #define COVERAGE_IGNORE
+        // if we exited because we got to the end of the possible damping values, the
+        // best one was the last one (excl the final index++ at the end)
+        current_resid_norm = next_resid_norm;
+        best_index = index-1;
+        #undef COVERAGE_IGNORE
+    }
+    else
+    {
+        // else the best one must have been the second last one (excl the final index++ at the end)
+        // (as we would have exited when the resid norm first increased)
+        best_index = index-2;
+    }
+
+    // Check out best was better than the original residual-norm
+    if (initial_norm_resid < current_resid_norm)
+    {
+        #define COVERAGE_IGNORE
+        // Have to use an assert/exit here as the following exception causes a seg fault (in cardiac mech problems?)
+        // Don't know why
+        std::cout << "CHASTE ERROR: (AbstractNonlinearElasticitySolver.hpp): Residual does not appear to decrease in newton direction, quitting.\n" << std::flush;
+        exit(0);
+        //EXCEPTION("Residual does not appear to decrease in newton direction, quitting");
+        #undef COVERAGE_IGNORE
+    }
+
+    if(mVerbose)
+    {
+        std::cout << "\tBest s = " << damping_values[best_index] << "\n"  << std::flush;
+    }
+
+    VectorSum(old_solution, update, -damping_values[best_index], this->mCurrentSolution);
+
+    return current_resid_norm;
+}
+
+template<unsigned DIM>
+void AbstractNonlinearElasticitySolver<DIM>::PostNewtonStep(unsigned counter, double normResidual)
+{
+}
+
+
+template<unsigned DIM>
+void AbstractNonlinearElasticitySolver<DIM>::SolveNonSnes(double tol)
+{
+    if (mWriteOutputEachNewtonIteration)
+    {
+        this->WriteCurrentSpatialSolution("newton_iteration", "nodes", 0);
+    }
+
+    // Compute residual
+    double norm_resid = ComputeResidualAndGetNorm(false);
+    if(mVerbose)
+    {
+        std::cout << "\nNorm of residual is " << norm_resid << "\n";
+    }
+
+    mNumNewtonIterations = 0;
+    unsigned iteration_number = 1;
+
+    if (tol < 0) // i.e. if wasn't passed in as a parameter
+    {
+        tol = NEWTON_REL_TOL*norm_resid;
+
+        #define COVERAGE_IGNORE // not going to have tests in cts for everything
+        if (tol > MAX_NEWTON_ABS_TOL)
+        {
+            tol = MAX_NEWTON_ABS_TOL;
+        }
+        if (tol < MIN_NEWTON_ABS_TOL)
+        {
+            tol = MIN_NEWTON_ABS_TOL;
+        }
+        #undef COVERAGE_IGNORE
+    }
+
+    if(mVerbose)
+    {
+        std::cout << "Solving with tolerance " << tol << "\n";
+    }
+
+    while (norm_resid > tol)
+    {
+        if(mVerbose)
+        {
+            std::cout <<  "\n-------------------\n"
+                      <<   "Newton iteration " << iteration_number
+                      << ":\n-------------------\n";
+        }
+
+        // take newton step (and get returned residual)
+        norm_resid = TakeNewtonStep();
+
+        if(mVerbose)
+        {
+            std::cout << "Norm of residual is " << norm_resid << "\n";
+        }
+
+        if (mWriteOutputEachNewtonIteration)
+        {
+            this->WriteCurrentSpatialSolution("newton_iteration", "nodes", iteration_number);
+        }
+
+        mNumNewtonIterations = iteration_number;
+
+        PostNewtonStep(iteration_number,norm_resid);
+
+        iteration_number++;
+        if (iteration_number==20)
+        {
+            #define COVERAGE_IGNORE
+            EXCEPTION("Not converged after 20 newton iterations, quitting");
+            #undef COVERAGE_IGNORE
+        }
+    }
+
+    if (norm_resid > tol)
+    {
+        #define COVERAGE_IGNORE
+        EXCEPTION("Failed to converge");
+        #undef COVERAGE_IGNORE
+    }
+}
+
+
+
+template<unsigned DIM>
+unsigned AbstractNonlinearElasticitySolver<DIM>::GetNumNewtonIterations()
+{
+    return mNumNewtonIterations;
+}
+
+
+
+//////////////////////////////////////////////////////////////
+//  SNES version of the nonlinear solver
+//////////////////////////////////////////////////////////////
+
+
+//template<unsigned DIM>
+//void AbstractNonlinearElasticitySolver<DIM>::SolveSnes()
+//{
+//    // Set up solution guess for residuals
+//    Vec initial_guess = PetscTools::CreateVec(this->mCurrentSolution);
+//
+//    SNES snes;
+//
+//    SNESCreate(PETSC_COMM_WORLD, &snes);
+//    SNESSetFunction(snes, this->mResidualVector, &AbstractNonlinearElasticitySolver_ComputeResidual<DIM>, this);
+//    SNESSetJacobian(snes, mrJacobianMatrix, mrJacobianMatrix, &AbstractNonlinearElasticitySolver_ComputeJacobian<DIM>, this);
+//    SNESSetType(snes,SNESLS);
+//    SNESSetTolerances(snes,1.0e-5,1.0e-5,1.0e-5,PETSC_DEFAULT,PETSC_DEFAULT);
+//    SNESSetMaxLinearSolveFailures(snes,1000);
+//
+//    if(mVerbose)
+//    {
+//        PetscOptionsSetValue("-snes_monitor","");
+//    }
+//    SNESSetFromOptions(snes);
+//
+//#if (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 2) //PETSc 2.2
+//    SNESSolve(snes, initial_guess);
+//#else
+//    SNESSolve(snes, PETSC_NULL, initial_guess);
+//#endif
+//
+//    SNESConvergedReason reason;
+//    SNESGetConvergedReason(snes,&reason);
+//#define COVERAGE_IGNORE
+//    if (reason < 0)
+//    {
+//        std::stringstream reason_stream;
+//        reason_stream << reason;
+//        VecDestroy(initial_guess);
+//        SNESDestroy(snes);
+//        EXCEPTION("Nonlinear Solver did not converge. PETSc reason code:"+reason_stream.str()+" .");
+//    }
+//#undef COVERAGE_IGNORE
+//
+//    PetscInt num_iters;
+//    SNESGetIterationNumber(snes,&num_iters);
+//    mNumNewtonIterations = num_iters;
+//
+//    VecDestroy(initial_guess);
+//    SNESDestroy(snes);
+//}
+//
+//
+//template<unsigned DIM>
+//void AbstractNonlinearElasticitySolver<DIM>::ComputeResidual(Vec currentGuess, Vec residualVector)
+//{
+//    ReplicatableVector guess_repl(currentGuess);
+//    for(unsigned i=0; i<guess_repl.GetSize(); i++)
+//    {
+//        this->mCurrentSolution[i] = guess_repl[i];
+//    }
+//    AssembleSystem(true,false);
+//    VecCopy(this->mResidualVector, residualVector);
+//}
+//
+//template<unsigned DIM>
+//void AbstractNonlinearElasticitySolver<DIM>::ComputeJacobian(Vec currentGuess, Mat* pJacobian)
+//{
+//    assert(mrJacobianMatrix==*pJacobian);
+//    MechanicsEventHandler::BeginEvent(MechanicsEventHandler::ASSEMBLE);
+//    ReplicatableVector guess_repl(currentGuess);
+//    for(unsigned i=0; i<guess_repl.GetSize(); i++)
+//    {
+//        this->mCurrentSolution[i] = guess_repl[i];
+//    }
+//
+//    AssembleSystem(false,true);
+//    MechanicsEventHandler::EndEvent(MechanicsEventHandler::ASSEMBLE);
+//}
+//
+//
+//
+//template<unsigned DIM>
+//PetscErrorCode AbstractNonlinearElasticitySolver_ComputeResidual(SNES snes,
+//                                                                      Vec currentGuess,
+//                                                                      Vec residualVector,
+//                                                                      void* pContext)
+//{
+//    // Extract the solver from the void*
+//    AbstractNonlinearElasticitySolver<DIM>* p_solver = (AbstractNonlinearElasticitySolver<DIM>*)pContext;
+//    p_solver->ComputeResidual(currentGuess, residualVector);
+//    return 0;
+//}
+//
+//template<unsigned DIM>
+//PetscErrorCode AbstractNonlinearElasticitySolver_ComputeJacobian(SNES snes,
+//                                                                 Vec currentGuess,
+//                                                                 Mat* pGlobalJacobian,
+//                                                                 Mat* pPreconditioner,
+//                                                                 MatStructure* pMatStructure,
+//                                                                 void* pContext)
+//{
+//    // Extract the solver from the void*
+//    AbstractNonlinearElasticitySolver<DIM>* p_solver = (AbstractNonlinearElasticitySolver<DIM>*) pContext;
+//    p_solver->ComputeJacobian(currentGuess, pGlobalJacobian);
+//    return 0;
+//}
+
 
 // Constant setting definitions
 

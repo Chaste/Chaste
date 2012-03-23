@@ -67,7 +67,7 @@ typedef enum _ApplyDirichletBcsType
 template<unsigned DIM>
 class AbstractContinuumMechanicsSolver
 {
-protected:
+public:
     /**
      * The mesh to be solved on. Requires 6 nodes per triangle (or 10 per tetrahedron)
      * as quadratic bases are used.
@@ -202,6 +202,7 @@ protected:
      *  altered). See in-code comments for how this is done.
      *
      *  @param type see above
+     *  @param symmetricProblem see above
      */
     void ApplyDirichletBoundaryConditions(ApplyDirichletBcsType type, bool symmetricProblem);
 
