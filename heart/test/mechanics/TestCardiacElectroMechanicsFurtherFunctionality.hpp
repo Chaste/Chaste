@@ -55,9 +55,6 @@ class TestCardiacElectroMechanicsFurtherFunctionality : public CxxTest::TestSuit
 public:
     void TestDeterminingWatchedNodes() throw(Exception)
     {
-        EXIT_IF_PARALLEL; // see #1828
-
-
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-1000*1000);
 
         HeartConfig::Instance()->SetSimulationDuration(1.0);
@@ -103,9 +100,6 @@ public:
     // SAC activity and increased voltage
     void TestWithMechanoElectricFeedback() throw (Exception)
     {
-        EXIT_IF_PARALLEL; // see #1828
-
-
         PlaneStimulusCellFactory<CML_noble_varghese_kohl_noble_1998_basic_with_sac, 2> cell_factory(0.0);
 
         // set up two meshes of 1mm by 1mm by 1mm
@@ -203,10 +197,6 @@ public:
     // also here we say that the deformation DOES affect conductivity.
     void TestWithMefAndAlteredConductivitesHeterogeneousStretch() throw (Exception)
     {
-
-        EXIT_IF_PARALLEL; // see #1828
-
-
         // irrelevant, not going to call solve
         PlaneStimulusCellFactory<CML_noble_varghese_kohl_noble_1998_basic_with_sac, 2> cell_factory(0.0);
 
@@ -331,9 +321,6 @@ public:
     // wave should travel a little bit faster.
     void TestDeformationAffectingConductivity() throw(Exception)
     {
-        EXIT_IF_PARALLEL; // see #1828
-
-
         unsigned num_stimulated_nodes[2];
 
         for(unsigned sim=0; sim<2; sim++)
@@ -436,8 +423,6 @@ public:
 
     void TestCardiacElectroMechanicsHeterogeneousMaterialLaws() throw(Exception)
     {
-        EXIT_IF_PARALLEL; ///\todo #1828
-
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-5000*1000);
 
         TetrahedralMesh<2,2> electrics_mesh;
