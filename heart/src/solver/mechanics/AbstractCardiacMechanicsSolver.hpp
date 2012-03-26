@@ -305,17 +305,29 @@ AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AbstractCardiacMechanicsS
      mOdeTimestep(DBL_MAX)
 {
     // compute total num quad points
-    mTotalQuadPoints = rQuadMesh.GetNumElements()*this->mpQuadratureRule->GetNumQuadPoints();
+    unsigned num_quad_pts_per_element = this->mpQuadratureRule->GetNumQuadPoints();
+    mTotalQuadPoints = rQuadMesh.GetNumElements()*num_quad_pts_per_element;
 
-    // create the data at each quad point. The child class will set the contraction models
-    for(unsigned i=0; i<mTotalQuadPoints; i++)
+
+    for (typename AbstractTetrahedralMesh<DIM, DIM>::ElementIterator iter = this->mrQuadMesh.GetElementIteratorBegin();
+         iter != this->mrQuadMesh.GetElementIteratorEnd();
+         ++iter)
     {
-        DataAtQuadraturePoint data_at_quad_point;
-        data_at_quad_point.ContractionModel = NULL;
-        data_at_quad_point.Stretch = 1.0;
-        data_at_quad_point.StretchLastTimeStep = 1.0;
+        Element<DIM, DIM>& element = *iter;
 
-        mQuadPointToDataAtQuadPointMap[i] = data_at_quad_point;
+        if (element.GetOwnership() == true)
+        {
+            for(unsigned j=0; j<num_quad_pts_per_element; j++)
+            {
+                unsigned quad_pt_global_index = element.GetIndex()*num_quad_pts_per_element + j;
+                DataAtQuadraturePoint data_at_quad_point;
+                data_at_quad_point.ContractionModel = NULL;
+                data_at_quad_point.Stretch = 1.0;
+                data_at_quad_point.StretchLastTimeStep = 1.0;
+
+                mQuadPointToDataAtQuadPointMap[quad_pt_global_index] = data_at_quad_point;
+            }
+        }
     }
 
     // initialise the iterator to point at the beginning
@@ -365,7 +377,12 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetCalciumAndVoltage
         input_parameters.intracellularCalciumConcentration = rCalciumConcentrations[i];
         input_parameters.voltage = rVoltages[i];
 
-        mQuadPointToDataAtQuadPointMap[i].ContractionModel->SetInputParameters(input_parameters);
+///\todo #1828 / #1211 don't pass in entire vector
+        std::map<unsigned,DataAtQuadraturePoint>::iterator iter = mQuadPointToDataAtQuadPointMap.find(i);
+        if(iter != mQuadPointToDataAtQuadPointMap.end())
+        {
+            iter->second.ContractionModel->SetInputParameters(input_parameters);
+        }
     }
 }
 

@@ -64,8 +64,6 @@ class TestImplicitCardiacMechanicsSolver : public CxxTest::TestSuite
 public:
     void TestCompareJacobians() throw(Exception)
     {
-        EXIT_IF_PARALLEL; // see #1828
-
         QuadraticMesh<2> mesh(1.0, 1.0, 1.0);
         MooneyRivlinMaterialLaw<2> law(0.02);
 
@@ -143,8 +141,6 @@ public:
     // iterations
     void TestWithZeroActiveTension() throw(Exception)
     {
-        EXIT_IF_PARALLEL; // see #1828
-
         QuadraticMesh<2> mesh(0.125, 1.0, 1.0);
         MooneyRivlinMaterialLaw<2> law(0.02);
 
@@ -175,8 +171,6 @@ public:
     // as it should do. Also has hardcoded tests
     void TestSpecifiedCalciumCompression() throw(Exception)
     {
-        EXIT_IF_PARALLEL; // see #1828
-
         // NOTE: test hardcoded for num_elem = 4
         QuadraticMesh<2> mesh(0.25, 1.0, 1.0);
         MooneyRivlinMaterialLaw<2> law(0.02);
@@ -214,8 +208,6 @@ public:
         // a hardcoded test here. Node that 24 is the top-right corner node,
         TS_ASSERT_DELTA( solver.rGetDeformedPosition()[24](0), 0.9480, 1e-2); //different results in 3dp with different preconditioners
         TS_ASSERT_DELTA( solver.rGetDeformedPosition()[24](1), 1.0516, 1e-2); //different results in 3dp with different preconditioners
-
-        std::map<unsigned,DataAtQuadraturePoint>& r_map = solver.rGetQuadPointToDataAtQuadPointMap();
 
 //// removing this test, its a pain to maintain as it requires refitting the cubic
 //        // the lambdas should be less than 1 (ie compression), and also
@@ -262,7 +254,11 @@ public:
 //        }
 
         // hardcoded test
-        TS_ASSERT_DELTA(r_map[34].Stretch, 0.9737, 2e-3);
+        std::map<unsigned,DataAtQuadraturePoint>::iterator iter = solver.rGetQuadPointToDataAtQuadPointMap().find(34);
+        if(iter != solver.rGetQuadPointToDataAtQuadPointMap().end()) //ie because some processes won't own this in parallel
+        {
+            TS_ASSERT_DELTA(iter->second.Stretch, 0.9737, 2e-3);
+        }
     }
 
     // Same as above test but has fibres in Y-direction (and bottom surface fixed - so results are the same),
@@ -271,8 +267,6 @@ public:
     // The stretches should be identical to in the above test, the deformation rotated.
     void TestDifferentFibreDirections() throw(Exception)
     {
-        EXIT_IF_PARALLEL; // see #1828
-
         for (unsigned run=1; run<=2; run++)
         {
             // NOTE: test hardcoded for num_elem = 4
@@ -332,19 +326,19 @@ public:
             TS_ASSERT_DELTA( solver.rGetDeformedPosition()[24](1), 0.9429, 1e-2);
             TS_ASSERT_DELTA( solver.rGetDeformedPosition()[24](0), 1.0565, 1e-2);
 
-            std::map<unsigned,DataAtQuadraturePoint>& r_map = solver.rGetQuadPointToDataAtQuadPointMap();
-            TS_ASSERT_DELTA(r_map[34].Stretch, 0.9693, 1e-3);  // ** different value to previous test - attributing the difference in results to the fact mesh isn't rotation-invariant
+            std::map<unsigned,DataAtQuadraturePoint>::iterator iter = solver.rGetQuadPointToDataAtQuadPointMap().find(34);
+            if(iter != solver.rGetQuadPointToDataAtQuadPointMap().end()) //ie because some processes won't own this in parallel
+            {
+                TS_ASSERT_DELTA(iter->second.Stretch, 0.9693, 1e-3);  // ** different value to previous test - attributing the difference in results to the fact mesh isn't rotation-invariant
+            }
         }
     }
-
 
 
     // cover all other contraction model options which are allowed but not been used in a test
     // so far (or in TestExplicitCardiacMechanicsSolver)
     void TestCoverage() throw(Exception)
     {
-        EXIT_IF_PARALLEL; // see #1828
-
         QuadraticMesh<2> mesh(1.0, 1.0, 1.0);
 
         MooneyRivlinMaterialLaw<2> law(1);
@@ -364,8 +358,6 @@ public:
 
     void TestComputeDeformationGradientAndStretchesEachElement() throw(Exception)
     {
-        EXIT_IF_PARALLEL; // see #1828
-
         QuadraticMesh<2> mesh(1.0, 1.0, 1.0);
 
         MooneyRivlinMaterialLaw<2> law(1);
@@ -446,8 +438,6 @@ public:
     // varying fibre directions per quad point.
     void TestDefineFibresPerQuadraturePoint()
     {
-        EXIT_IF_PARALLEL; // see #1828
-
         QuadraticMesh<2> mesh(0.25, 1.0, 1.0);
         MooneyRivlinMaterialLaw<2> law(0.02);
 
@@ -488,8 +478,11 @@ public:
         TS_ASSERT_DELTA( solver.rGetDeformedPosition()[24](1), 0.9429, 1e-2);
         TS_ASSERT_DELTA( solver.rGetDeformedPosition()[24](0), 1.0565, 1e-2);
 
-        std::map<unsigned,DataAtQuadraturePoint>& r_map = solver.rGetQuadPointToDataAtQuadPointMap();
-        TS_ASSERT_DELTA(r_map[34].Stretch, 0.9693, 1e-3);
+        std::map<unsigned,DataAtQuadraturePoint>::iterator iter = solver.rGetQuadPointToDataAtQuadPointMap().find(34);
+        if(iter != solver.rGetQuadPointToDataAtQuadPointMap().end()) //ie because some processes won't own this in parallel
+        {
+            TS_ASSERT_DELTA(iter->second.Stretch, 0.9693, 1e-3);
+        }
     }
 
 
