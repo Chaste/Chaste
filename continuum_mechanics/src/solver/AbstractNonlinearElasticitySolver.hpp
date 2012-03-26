@@ -64,22 +64,42 @@ extern PetscErrorCode KSPInitialResidual(KSP,Vec,Vec,Vec,Vec,Vec);
 #endif
 
 
-////////////////////////////////////////////////////////////////
-////  Globals functions used by the SNES solver
-////////////////////////////////////////////////////////////////
-//template<unsigned DIM>
-//PetscErrorCode AbstractNonlinearElasticitySolver_ComputeResidual(SNES snes,
-//                                                                 Vec currentGuess,
-//                                                                 Vec residualVector,
-//                                                                 void* pContext);
-//
-//template<unsigned DIM>
-//PetscErrorCode AbstractNonlinearElasticitySolver_ComputeJacobian(SNES snes,
-//                                                                 Vec currentGuess,
-//                                                                 Mat* pGlobalJacobian,
-//                                                                 Mat* pPreconditioner,
-//                                                                 MatStructure* pMatStructure,
-//                                                                 void* pContext);
+//////////////////////////////////////////////////////////////
+//  Globals functions used by the SNES solver
+//////////////////////////////////////////////////////////////
+
+/**
+ *  Global function that will be called by the SNES solver
+ *
+ *  @param snes snes solver
+ *  @param currentGuess current guess
+ *  @param residualVector residual vector to be computed
+ *  @param pContext this pointer can be converted to a ptr to the original caller, ie the
+ *  AbstractNonlinearElasticitySolver class
+ */
+template<unsigned DIM>
+PetscErrorCode AbstractNonlinearElasticitySolver_ComputeResidual(SNES snes,
+                                                                 Vec currentGuess,
+                                                                 Vec residualVector,
+                                                                 void* pContext);
+
+/**
+ *  Global function that will be called by the SNES solver
+ *
+ *  @param snes snes solver
+ *  @param currentGuess current guess
+ *  @param pGlobalJacobian jacobian matrix to be computed
+ *  @param pPreconditioner preconditioner matrix to be computed
+ *  @param pContext this pointer can be converted to a ptr to the original caller, ie the
+ *  AbstractNonlinearElasticitySolver class
+ */
+template<unsigned DIM>
+PetscErrorCode AbstractNonlinearElasticitySolver_ComputeJacobian(SNES snes,
+                                                                 Vec currentGuess,
+                                                                 Mat* pGlobalJacobian,
+                                                                 Mat* pPreconditioner,
+                                                                 MatStructure* pMatStructure,
+                                                                 void* pContext);
 
 
 /**
@@ -180,10 +200,19 @@ protected:
     bool mCheckedOutwardNormals;
 
     /**
-     * If the command line argument "-mech_verbose" or "-mech_very_verbose" is given than this bool will be
-     * set to true and lots of details about each nonlinear solve (including timing breakdowns) will be printed out.
+     * If SetVerbose() is called, or the command line argument "-mech_verbose" or "-mech_very_verbose" is given,
+     * than this bool will be  set to true and lots of details about each nonlinear solve (including timing breakdowns)
+     * will be printed out
      */
     bool mVerbose;
+
+    /**
+     * If SetUseSnesSolver() is called, or the command line argument "-mech_use_snes" is given,
+     * the Petsc SNES solver (nonlinear solver) will be used.
+     *
+     * WORK IN PROGRESS see #2027
+     */
+    bool mUseSnesSolver;
 
     /**
      * Assemble the residual vector and/or Jacobian matrix (using the current solution stored
@@ -341,11 +370,29 @@ protected:
     //    These methods form the SNES nonlinear solver
     //
     /////////////////////////////////////////////////////////////
-//public: // need to be public as are called by global functions
-//    void ComputeResidual(Vec currentGuess, Vec residualVector);
-//    void ComputeJacobian(Vec currentGuess, Mat* pJacobian);
-//private:
-//    void SolveSnes();
+public: // need to be public as are called by global functions
+    /**
+     * Public method for computing the residual that will be called, effectively,
+     * by the SNES solver
+     * @param currentGuess Input, the current guess for the solution
+     * @param residualVector Output, the residual vector given this guess.
+     */
+    void ComputeResidual(Vec currentGuess, Vec residualVector);
+
+    /**
+     * Public method for computing the jacobian that will be called, effectively,
+     * by the SNES solver
+     * @param currentGuess Input, the current guess for the solution
+     * @param residualVector Output, the jacobian matrix at this guess
+     */
+    void ComputeJacobian(Vec currentGuess, Mat* pJacobian);
+
+private:
+    /**
+     * Alternative solve method which uses a Petsc SNES solver.
+     * Private, user should call Solve()
+     */
+    void SolveSnes();
 
 public:
 
@@ -372,7 +419,7 @@ public:
     /**
      * Solve the problem.
      *
-     * @param tol tolerance used in Newton solve (defaults to -1.0)
+     * @param tol tolerance used in Newton solve (defaults to -1.0). Not used in SNES solves.
      */
     void Solve(double tol=-1.0);
 
@@ -452,12 +499,24 @@ public:
     std::vector<c_vector<double,DIM> >& rGetDeformedPosition();
 
     /**
-     *  Set the solver to solver to write non-linear solve progress at it solves each
-     *  nonlinear system. Can also be called by using the command line parameter "-mech_verbose"
+     * Set the solver to solver to write non-linear solve progress at it solves each
+     * nonlinear system. Can also be called by using the command line parameter "-mech_verbose"
      * @param verbose  true to set verbosity level to "verbose"
      */
-    void SetVerbose(bool verbose = true);
+    void SetVerbose(bool verbose = true)
+    {
+        mVerbose = verbose;
+    }
 
+    /**
+     * Set whether to use the SNES nonlinear solver or not.
+     * Can also be called by using the command line parameter "-mech_use_snes"
+     * @param useSnesSolver whether to use the snes solver or not
+     */
+    void SetUseSnesSolver(bool useSnesSolver = true)
+    {
+        mUseSnesSolver = useSnesSolver;
+    }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -481,6 +540,8 @@ AbstractNonlinearElasticitySolver<DIM>::AbstractNonlinearElasticitySolver(Quadra
       mVerbose = (CommandLineArguments::Instance()->OptionExists("-mech_verbose") ||
                   CommandLineArguments::Instance()->OptionExists("-mech_very_verbose") );
 
+      mUseSnesSolver = CommandLineArguments::Instance()->OptionExists("-mech_use_snes");
+
       mChangeOfBasisMatrix = identity_matrix<double>(DIM,DIM);
 }
 
@@ -489,11 +550,6 @@ AbstractNonlinearElasticitySolver<DIM>::~AbstractNonlinearElasticitySolver()
 {
 }
 
-template<unsigned DIM>
-void AbstractNonlinearElasticitySolver<DIM>::SetVerbose(bool verbose)
-{
-    mVerbose = verbose;
-}
 
 template<unsigned DIM>
 void AbstractNonlinearElasticitySolver<DIM>::FinishAssembleSystem(bool assembleResidual, bool assembleJacobian)
@@ -698,14 +754,14 @@ void AbstractNonlinearElasticitySolver<DIM>::Solve(double tol)
     // Write the initial solution
     this->WriteCurrentSpatialSolution("initial", "nodes");
 
-//    if( ! CommandLineArguments::Instance()->OptionExists("-mech_use_snes"))
-//    {
+    if(mUseSnesSolver)
+    {
+        SolveSnes();
+    }
+    else
+    {
         SolveNonSnes(tol);
-//    }
-//    else
-//    {
-//        SolveSnes();
-//    }
+    }
 
     // Write the final solution
     this->WriteCurrentSpatialSolution("solution", "nodes");
@@ -1196,109 +1252,121 @@ unsigned AbstractNonlinearElasticitySolver<DIM>::GetNumNewtonIterations()
 //////////////////////////////////////////////////////////////
 
 
-//template<unsigned DIM>
-//void AbstractNonlinearElasticitySolver<DIM>::SolveSnes()
-//{
-//    // Set up solution guess for residuals
-//    Vec initial_guess = PetscTools::CreateVec(this->mCurrentSolution);
-//
-//    SNES snes;
-//
-//    SNESCreate(PETSC_COMM_WORLD, &snes);
-//    SNESSetFunction(snes, this->mResidualVector, &AbstractNonlinearElasticitySolver_ComputeResidual<DIM>, this);
-//    SNESSetJacobian(snes, mrJacobianMatrix, mrJacobianMatrix, &AbstractNonlinearElasticitySolver_ComputeJacobian<DIM>, this);
-//    SNESSetType(snes,SNESLS);
-//    SNESSetTolerances(snes,1.0e-5,1.0e-5,1.0e-5,PETSC_DEFAULT,PETSC_DEFAULT);
-//    SNESSetMaxLinearSolveFailures(snes,1000);
-//
-//    if(mVerbose)
-//    {
-//        PetscOptionsSetValue("-snes_monitor","");
-//    }
-//    SNESSetFromOptions(snes);
-//
-//#if (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 2) //PETSc 2.2
-//    SNESSolve(snes, initial_guess);
-//#else
-//    SNESSolve(snes, PETSC_NULL, initial_guess);
-//#endif
-//
-//    SNESConvergedReason reason;
-//    SNESGetConvergedReason(snes,&reason);
-//#define COVERAGE_IGNORE
-//    if (reason < 0)
-//    {
-//        std::stringstream reason_stream;
-//        reason_stream << reason;
-//        VecDestroy(initial_guess);
-//        SNESDestroy(snes);
-//        EXCEPTION("Nonlinear Solver did not converge. PETSc reason code:"+reason_stream.str()+" .");
-//    }
-//#undef COVERAGE_IGNORE
-//
-//    PetscInt num_iters;
-//    SNESGetIterationNumber(snes,&num_iters);
-//    mNumNewtonIterations = num_iters;
-//
-//    VecDestroy(initial_guess);
-//    SNESDestroy(snes);
-//}
-//
-//
-//template<unsigned DIM>
-//void AbstractNonlinearElasticitySolver<DIM>::ComputeResidual(Vec currentGuess, Vec residualVector)
-//{
-//    ReplicatableVector guess_repl(currentGuess);
-//    for(unsigned i=0; i<guess_repl.GetSize(); i++)
-//    {
-//        this->mCurrentSolution[i] = guess_repl[i];
-//    }
-//    AssembleSystem(true,false);
-//    VecCopy(this->mResidualVector, residualVector);
-//}
-//
-//template<unsigned DIM>
-//void AbstractNonlinearElasticitySolver<DIM>::ComputeJacobian(Vec currentGuess, Mat* pJacobian)
-//{
-//    assert(mrJacobianMatrix==*pJacobian);
-//    MechanicsEventHandler::BeginEvent(MechanicsEventHandler::ASSEMBLE);
-//    ReplicatableVector guess_repl(currentGuess);
-//    for(unsigned i=0; i<guess_repl.GetSize(); i++)
-//    {
-//        this->mCurrentSolution[i] = guess_repl[i];
-//    }
-//
-//    AssembleSystem(false,true);
-//    MechanicsEventHandler::EndEvent(MechanicsEventHandler::ASSEMBLE);
-//}
-//
-//
-//
-//template<unsigned DIM>
-//PetscErrorCode AbstractNonlinearElasticitySolver_ComputeResidual(SNES snes,
-//                                                                      Vec currentGuess,
-//                                                                      Vec residualVector,
-//                                                                      void* pContext)
-//{
-//    // Extract the solver from the void*
-//    AbstractNonlinearElasticitySolver<DIM>* p_solver = (AbstractNonlinearElasticitySolver<DIM>*)pContext;
-//    p_solver->ComputeResidual(currentGuess, residualVector);
-//    return 0;
-//}
-//
-//template<unsigned DIM>
-//PetscErrorCode AbstractNonlinearElasticitySolver_ComputeJacobian(SNES snes,
-//                                                                 Vec currentGuess,
-//                                                                 Mat* pGlobalJacobian,
-//                                                                 Mat* pPreconditioner,
-//                                                                 MatStructure* pMatStructure,
-//                                                                 void* pContext)
-//{
-//    // Extract the solver from the void*
-//    AbstractNonlinearElasticitySolver<DIM>* p_solver = (AbstractNonlinearElasticitySolver<DIM>*) pContext;
-//    p_solver->ComputeJacobian(currentGuess, pGlobalJacobian);
-//    return 0;
-//}
+template<unsigned DIM>
+void AbstractNonlinearElasticitySolver<DIM>::SolveSnes()
+{
+    // Set up solution guess for residuals
+    Vec initial_guess;
+    VecDuplicate(this->mResidualVector, &initial_guess);
+    double* p_initial_guess;
+    VecGetArray(initial_guess, &p_initial_guess);
+    int lo, hi;
+    VecGetOwnershipRange(initial_guess, &lo, &hi);
+    for (int global_index=lo; global_index<hi; global_index++)
+    {
+        int local_index = global_index - lo;
+        p_initial_guess[local_index] = this->mCurrentSolution[global_index];
+    }
+    VecRestoreArray(initial_guess, &p_initial_guess);
+
+
+    SNES snes;
+
+    SNESCreate(PETSC_COMM_WORLD, &snes);
+    SNESSetFunction(snes, this->mResidualVector, &AbstractNonlinearElasticitySolver_ComputeResidual<DIM>, this);
+    SNESSetJacobian(snes, mrJacobianMatrix, mrJacobianMatrix, &AbstractNonlinearElasticitySolver_ComputeJacobian<DIM>, this);
+    SNESSetType(snes,SNESLS);
+    SNESSetTolerances(snes,1.0e-5,1.0e-5,1.0e-5,PETSC_DEFAULT,PETSC_DEFAULT);
+    SNESSetMaxLinearSolveFailures(snes,1000);
+
+    if(mVerbose)
+    {
+        PetscOptionsSetValue("-snes_monitor","");
+    }
+    SNESSetFromOptions(snes);
+
+#if (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 2) //PETSc 2.2
+    SNESSolve(snes, initial_guess);
+#else
+    SNESSolve(snes, PETSC_NULL, initial_guess);
+#endif
+
+    SNESConvergedReason reason;
+    SNESGetConvergedReason(snes,&reason);
+#define COVERAGE_IGNORE
+    if (reason < 0)
+    {
+        std::stringstream reason_stream;
+        reason_stream << reason;
+        VecDestroy(initial_guess);
+        SNESDestroy(snes);
+        EXCEPTION("Nonlinear Solver did not converge. PETSc reason code:"+reason_stream.str()+" .");
+    }
+#undef COVERAGE_IGNORE
+
+    PetscInt num_iters;
+    SNESGetIterationNumber(snes,&num_iters);
+    mNumNewtonIterations = num_iters;
+
+    VecDestroy(initial_guess);
+    SNESDestroy(snes);
+}
+
+
+template<unsigned DIM>
+void AbstractNonlinearElasticitySolver<DIM>::ComputeResidual(Vec currentGuess, Vec residualVector)
+{
+    ReplicatableVector guess_repl(currentGuess);
+    for(unsigned i=0; i<guess_repl.GetSize(); i++)
+    {
+        this->mCurrentSolution[i] = guess_repl[i];
+    }
+    AssembleSystem(true,false);
+    VecCopy(this->mResidualVector, residualVector);
+}
+
+template<unsigned DIM>
+void AbstractNonlinearElasticitySolver<DIM>::ComputeJacobian(Vec currentGuess, Mat* pJacobian)
+{
+    assert(mrJacobianMatrix==*pJacobian);
+    MechanicsEventHandler::BeginEvent(MechanicsEventHandler::ASSEMBLE);
+    ReplicatableVector guess_repl(currentGuess);
+    for(unsigned i=0; i<guess_repl.GetSize(); i++)
+    {
+        this->mCurrentSolution[i] = guess_repl[i];
+    }
+
+    AssembleSystem(false,true);
+    MechanicsEventHandler::EndEvent(MechanicsEventHandler::ASSEMBLE);
+}
+
+
+
+template<unsigned DIM>
+PetscErrorCode AbstractNonlinearElasticitySolver_ComputeResidual(SNES snes,
+                                                                      Vec currentGuess,
+                                                                      Vec residualVector,
+                                                                      void* pContext)
+{
+    // Extract the solver from the void*
+    AbstractNonlinearElasticitySolver<DIM>* p_solver = (AbstractNonlinearElasticitySolver<DIM>*)pContext;
+    p_solver->ComputeResidual(currentGuess, residualVector);
+    return 0;
+}
+
+template<unsigned DIM>
+PetscErrorCode AbstractNonlinearElasticitySolver_ComputeJacobian(SNES snes,
+                                                                 Vec currentGuess,
+                                                                 Mat* pGlobalJacobian,
+                                                                 Mat* pPreconditioner,
+                                                                 MatStructure* pMatStructure,
+                                                                 void* pContext)
+{
+    // Extract the solver from the void*
+    AbstractNonlinearElasticitySolver<DIM>* p_solver = (AbstractNonlinearElasticitySolver<DIM>*) pContext;
+    p_solver->ComputeJacobian(currentGuess, pGlobalJacobian);
+    return 0;
+}
 
 
 // Constant setting definitions

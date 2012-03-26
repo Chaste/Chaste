@@ -495,101 +495,112 @@ public:
      */
     void TestAgainstExactNonlinearSolution() throw(Exception)
     {
-        unsigned num_elem = 10;
-        QuadraticMesh<2> mesh(1.0/num_elem, 1.0, 1.0);
-
-        CompressibleMooneyRivlinMaterialLaw<2> law(C_PARAM,D_PARAM);
-
-        std::vector<unsigned> fixed_nodes = NonlinearElasticityTools<2>::GetNodesByComponentValue(mesh,0,0);
-
-        std::vector<BoundaryElement<1,2>*> boundary_elems;
-        for (TetrahedralMesh<2,2>::BoundaryElementIterator iter
-              = mesh.GetBoundaryElementIteratorBegin();
-            iter != mesh.GetBoundaryElementIteratorEnd();
-            ++iter)
+        for(unsigned run = 0; run < 2; run++)
         {
-            // get all boundary elems except those on X=0
-            if (fabs((*iter)->CalculateCentroid()[0])>1e-6)
+            unsigned num_elem = 10;
+            QuadraticMesh<2> mesh(1.0/num_elem, 1.0, 1.0);
+
+            CompressibleMooneyRivlinMaterialLaw<2> law(C_PARAM,D_PARAM);
+
+            std::vector<unsigned> fixed_nodes = NonlinearElasticityTools<2>::GetNodesByComponentValue(mesh,0,0);
+
+            std::vector<BoundaryElement<1,2>*> boundary_elems;
+            for (TetrahedralMesh<2,2>::BoundaryElementIterator iter
+                  = mesh.GetBoundaryElementIteratorBegin();
+                iter != mesh.GetBoundaryElementIteratorEnd();
+                ++iter)
             {
-                BoundaryElement<1,2>* p_element = *iter;
-                boundary_elems.push_back(p_element);
+                // get all boundary elems except those on X=0
+                if (fabs((*iter)->CalculateCentroid()[0])>1e-6)
+                {
+                    BoundaryElement<1,2>* p_element = *iter;
+                    boundary_elems.push_back(p_element);
+                }
             }
-        }
-        assert(boundary_elems.size()==3*num_elem);
+            assert(boundary_elems.size()==3*num_elem);
 
 
-        SolidMechanicsProblemDefinition<2> problem_defn(mesh);
-        problem_defn.SetMaterialLaw(COMPRESSIBLE,&law);
-        problem_defn.SetZeroDisplacementNodes(fixed_nodes);
-        problem_defn.SetBodyForce(MyBodyForce);
-        problem_defn.SetTractionBoundaryConditions(boundary_elems, MyTraction);
+            SolidMechanicsProblemDefinition<2> problem_defn(mesh);
+            problem_defn.SetMaterialLaw(COMPRESSIBLE,&law);
+            problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+            problem_defn.SetBodyForce(MyBodyForce);
+            problem_defn.SetTractionBoundaryConditions(boundary_elems, MyTraction);
 
-        CompressibleNonlinearElasticitySolver<2> solver(mesh,
-                                                        problem_defn,
-                                                        "comp_nonlin_elas_exact_soln");
+            CompressibleNonlinearElasticitySolver<2> solver(mesh,
+                                                            problem_defn,
+                                                            "comp_nonlin_elas_exact_soln");
 
 
-        solver.Solve();
-
-        std::vector<c_vector<double,2> >& r_solution = solver.rGetDeformedPosition();
-
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
-        {
-            double X = mesh.GetNode(i)->rGetLocation()[0];
-            double Y = mesh.GetNode(i)->rGetLocation()[1];
-
-            double exact_x = Q_PARAM*(X + 0.5*A_PARAM*X*X);
-            double exact_y = Y/(1+A_PARAM*X);
-
-            TS_ASSERT_DELTA(r_solution[i](0), exact_x, 1e-4);
-            TS_ASSERT_DELTA(r_solution[i](1), exact_y, 1e-4);
-        }
-
-        // Check that the last matrix was symmetric
-        TS_ASSERT(PetscMatTools::CheckSymmetry(solver.mrJacobianMatrix));
-
-        ////////////////////////////////////////////////////////////////////
-        // Completely separately, we now test the AssembleOnBoundaryElement
-        // method for the situation where a normal pressure on the deformed surface
-        // is chosen. This is tested in the incompressible case by solving
-        // a full problem and testing against an exact solution, here we just
-        // check that AssembleOnBoundaryElement in the compressible solver matches
-        // AssembleOnBoundaryElement in the incompressible solve
-        ////////////////////////////////////////////////////////////////////
-        double pressure = 12.32423;
-        problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, pressure);
-
-        c_matrix<double,6,6> a_elem;
-        c_vector<double,6> b_elem;
-        solver.AssembleOnBoundaryElement(*(boundary_elems[0]), a_elem, b_elem, true, false, 0);
-
-        MooneyRivlinMaterialLaw<2> mooney_rivlin_incompressible(1.0);
-        problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&mooney_rivlin_incompressible);
-
-        IncompressibleNonlinearElasticitySolver<2> incompressible_solver(mesh,
-                                                                         problem_defn,
-                                                                         "");
-
-        c_matrix<double,8,8> a_elem_incompressible;
-        c_vector<double,8> b_elem_incompressible;
-
-        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
-        {
-            // spatial variables
-            for(unsigned j=0; j<2; j++)
+            if(run==1)
             {
-                incompressible_solver.mCurrentSolution[3*i+j] = solver.mCurrentSolution[2*i+j];
+                solver.SetUseSnesSolver();
             }
-            // pressure variable
-            incompressible_solver.mCurrentSolution[3*i+2] = 0.0;
-        }
 
-        incompressible_solver.AssembleOnBoundaryElement(*(boundary_elems[0]), a_elem_incompressible, b_elem_incompressible, true, false, 0);
+            solver.Solve();
 
-        // incompressible_b = [compressible_b  0 0 ]
-        for(unsigned i=0; i<6; i++)
-        {
-            TS_ASSERT_DELTA( b_elem_incompressible(i), b_elem(i), 1e-12 );
+            std::vector<c_vector<double,2> >& r_solution = solver.rGetDeformedPosition();
+
+            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+            {
+                double X = mesh.GetNode(i)->rGetLocation()[0];
+                double Y = mesh.GetNode(i)->rGetLocation()[1];
+
+                double exact_x = Q_PARAM*(X + 0.5*A_PARAM*X*X);
+                double exact_y = Y/(1+A_PARAM*X);
+
+                TS_ASSERT_DELTA(r_solution[i](0), exact_x, 1e-4);
+                TS_ASSERT_DELTA(r_solution[i](1), exact_y, 1e-4);
+            }
+
+            if(run==0)
+            {
+                // Check that the last matrix was symmetric
+                TS_ASSERT(PetscMatTools::CheckSymmetry(solver.mrJacobianMatrix));
+
+                ////////////////////////////////////////////////////////////////////
+                // Completely separately, we now test the AssembleOnBoundaryElement
+                // method for the situation where a normal pressure on the deformed surface
+                // is chosen. This is tested in the incompressible case by solving
+                // a full problem and testing against an exact solution, here we just
+                // check that AssembleOnBoundaryElement in the compressible solver matches
+                // AssembleOnBoundaryElement in the incompressible solve
+                ////////////////////////////////////////////////////////////////////
+                double pressure = 12.32423;
+                problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, pressure);
+
+                c_matrix<double,6,6> a_elem;
+                c_vector<double,6> b_elem;
+                solver.AssembleOnBoundaryElement(*(boundary_elems[0]), a_elem, b_elem, true, false, 0);
+
+                MooneyRivlinMaterialLaw<2> mooney_rivlin_incompressible(1.0);
+                problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&mooney_rivlin_incompressible);
+
+                IncompressibleNonlinearElasticitySolver<2> incompressible_solver(mesh,
+                                                                                 problem_defn,
+                                                                                 "");
+
+                c_matrix<double,8,8> a_elem_incompressible;
+                c_vector<double,8> b_elem_incompressible;
+
+                for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+                {
+                    // spatial variables
+                    for(unsigned j=0; j<2; j++)
+                    {
+                        incompressible_solver.mCurrentSolution[3*i+j] = solver.mCurrentSolution[2*i+j];
+                    }
+                    // pressure variable
+                    incompressible_solver.mCurrentSolution[3*i+2] = 0.0;
+                }
+
+                incompressible_solver.AssembleOnBoundaryElement(*(boundary_elems[0]), a_elem_incompressible, b_elem_incompressible, true, false, 0);
+
+                // incompressible_b = [compressible_b  0 0 ]
+                for(unsigned i=0; i<6; i++)
+                {
+                    TS_ASSERT_DELTA( b_elem_incompressible(i), b_elem(i), 1e-12 );
+                }
+            }
         }
     }
 
