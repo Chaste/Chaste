@@ -53,7 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  is), and also from AbstractCardiacMechanicsSolverInterface which just declares this classes
  *  main public methods.
  *
- *  Overloads ComputeStressAndStressDerivative() which adds on the active tension term to the stress. The
+ *  Overloads AddActiveStressAndStressDerivative() which adds on the active tension term to the stress. The
  *  child classes hold the contraction models and need to implement a method for getting the active tension from
  *  the model.
  */
@@ -102,8 +102,6 @@ protected:
      */
     bool mFibreSheetDirectionsDefinedByQuadraturePoint;
 
-    /** (Pointer to) the fibre-sheet matrix for the current element being assembled on */
-    c_matrix<double,DIM,DIM>* mpCurrentElementFibreSheetMatrix;
     /** The fibre direction for the current element being assembled on */
     c_vector<double,DIM> mCurrentElementFibreDirection;
 
@@ -114,38 +112,40 @@ protected:
     virtual bool IsImplicitSolver()=0;
 
     /**
-     *  Overloaded ComputeStressAndStressDerivative(), which computes the passive part of the
-     *  stress as normal but also calls on the contraction model to get the active stress and
-     *  adds it on.
+     *  Overloaded AddActiveStressAndStressDerivative(), which calls on the contraction model to get
+     *  the active stress and add it on to the stress tensor
      *
-     *  @param pMaterialLaw The material law for this element
      *  @param rC The Lagrangian deformation tensor (F^T F)
-     *  @param rInvC The inverse of C. Should be computed by the user.
-     *  @param pressure The current pressure
      *  @param elementIndex Index of the current element
      *  @param currentQuadPointGlobalIndex The index (assuming an outer loop over elements and an inner
      *    loop over quadrature points), of the current quadrature point.
-     *  @param rT The stress will be returned in this parameter
-     *  @param rDTdE the stress derivative will be returned in this parameter, assuming
+     *  @param rT The stress to be added to
+     *  @param rDTdE the stress derivative to be added to, assuming
      *    the final parameter is true
-     *  @param computeDTdE A boolean flag saying whether the stress derivative is
-     *    required or not.
+     *  @param addToDTdE A boolean flag saying whether the stress derivative is
+     *   required or not.
      */
-    void ComputeStressAndStressDerivative(AbstractMaterialLaw<DIM>* pMaterialLaw,
-                                          c_matrix<double,DIM,DIM>& rC,
-                                          c_matrix<double,DIM,DIM>& rInvC,
-                                          double pressure,
-                                          unsigned elementIndex,
-                                          unsigned currentQuadPointGlobalIndex,
-                                          c_matrix<double,DIM,DIM>& rT,
-                                          FourthOrderTensor<DIM,DIM,DIM,DIM>& rDTdE,
-                                          bool computeDTdE);
+    void AddActiveStressAndStressDerivative(c_matrix<double,DIM,DIM>& rC,
+                                            unsigned elementIndex,
+                                            unsigned currentQuadPointGlobalIndex,
+                                            c_matrix<double,DIM,DIM>& rT,
+                                            FourthOrderTensor<DIM,DIM,DIM,DIM>& rDTdE,
+                                            bool addToDTdE);
 
+
+    /**
+     *  Over-ridden method which sets up an internal variable in the parent class, using
+     *  the provided fibre-sheet direction information.
+     *
+     *  @param elementIndex element global index
+     *  @param currentQuadPointGlobalIndex quad point global index
+     */
+    void SetupChangeOfBasisMatrix(unsigned elementIndex, unsigned currentQuadPointGlobalIndex);
 
 
 
     /**
-     *  Pure method called in AbstractCardiacMechanicsSolver::ComputeStressAndStressDerivative(), which needs to provide
+     *  Pure method called in AbstractCardiacMechanicsSolver::AddActiveStressAndStressDerivative(), which needs to provide
      *  the active tension (and other info if implicit (if the contraction model depends on stretch
      *  or stretch rate)) at a particular quadrature point. Takes in the current fibre stretch.
      *
@@ -324,40 +324,41 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetCalciumAndVoltage
     }
 }
 
+
 template<class ELASTICITY_SOLVER,unsigned DIM>
-void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ComputeStressAndStressDerivative(AbstractMaterialLaw<DIM>* pMaterialLaw,
-                                                                                             c_matrix<double,DIM,DIM>& rC,
-                                                                                             c_matrix<double,DIM,DIM>& rInvC,
-                                                                                             double pressure,
-                                                                                             unsigned elementIndex,
-                                                                                             unsigned currentQuadPointGlobalIndex,
-                                                                                             c_matrix<double,DIM,DIM>& rT,
-                                                                                             FourthOrderTensor<DIM,DIM,DIM,DIM>& rDTdE,
-                                                                                             bool assembleJacobian)
+void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetupChangeOfBasisMatrix(unsigned elementIndex,
+                                                                                     unsigned currentQuadPointGlobalIndex)
 {
     if(!mpVariableFibreSheetDirections) // constant fibre directions
     {
-        mpCurrentElementFibreSheetMatrix = &mConstantFibreSheetDirections;
+        this->mChangeOfBasisMatrix = mConstantFibreSheetDirections;
     }
     else if(!mFibreSheetDirectionsDefinedByQuadraturePoint) // fibre directions defined for each mechanics mesh element
     {
-        mpCurrentElementFibreSheetMatrix = &(*mpVariableFibreSheetDirections)[elementIndex];
+        this->mChangeOfBasisMatrix = (*mpVariableFibreSheetDirections)[elementIndex];
     }
     else // fibre directions defined for each mechanics mesh quadrature point
     {
-        mpCurrentElementFibreSheetMatrix = &(*mpVariableFibreSheetDirections)[currentQuadPointGlobalIndex];
+        this->mChangeOfBasisMatrix = (*mpVariableFibreSheetDirections)[currentQuadPointGlobalIndex];
     }
+}
 
+
+
+template<class ELASTICITY_SOLVER,unsigned DIM>
+void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndStressDerivative(c_matrix<double,DIM,DIM>& rC,
+                                                                                               unsigned elementIndex,
+                                                                                               unsigned currentQuadPointGlobalIndex,
+                                                                                               c_matrix<double,DIM,DIM>& rT,
+                                                                                               FourthOrderTensor<DIM,DIM,DIM,DIM>& rDTdE,
+                                                                                               bool addToDTdE)
+{
     for(unsigned i=0; i<DIM; i++)
     {
-        mCurrentElementFibreDirection(i) = (*mpCurrentElementFibreSheetMatrix)(i,0);
+        mCurrentElementFibreDirection(i) = this->mChangeOfBasisMatrix(i,0);
     }
 
-    // 1. Compute T and dTdE for the PASSIVE part of the strain energy.
-    pMaterialLaw->SetChangeOfBasisMatrix(*mpCurrentElementFibreSheetMatrix);
-    pMaterialLaw->ComputeStressAndStressDerivative(rC,rInvC,pressure,rT,rDTdE,assembleJacobian);
-
-    // 2. Compute the active tension and add to the stress and stress-derivative
+    //Compute the active tension and add to the stress and stress-derivative
     double I4 = inner_prod(mCurrentElementFibreDirection, prod(rC, mCurrentElementFibreDirection));
     double lambda = sqrt(I4);
 
@@ -365,7 +366,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ComputeStressAndStre
     double d_act_tension_dlam = 0.0;     // Set and used if assembleJacobian==true
     double d_act_tension_d_dlamdt = 0.0; // Set and used if assembleJacobian==true
 
-    GetActiveTensionAndTensionDerivs(lambda, currentQuadPointGlobalIndex, assembleJacobian,
+    GetActiveTensionAndTensionDerivs(lambda, currentQuadPointGlobalIndex, addToDTdE,
                                      active_tension, d_act_tension_dlam, d_act_tension_d_dlamdt);
 
     // amend the stress and dTdE using the active tension
@@ -378,7 +379,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ComputeStressAndStre
 
     rT += (active_tension/I4)*outer_prod(mCurrentElementFibreDirection,mCurrentElementFibreDirection);
 
-    if(assembleJacobian)
+    if(addToDTdE)
     {
         for (unsigned M=0; M<DIM; M++)
         {
@@ -427,10 +428,10 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ComputeDeformationGr
         Element<DIM,DIM>* p_elem = this->mrQuadMesh.GetElement(elem_index);
 
         // get the fibre direction for this element
-        mpCurrentElementFibreSheetMatrix = mpVariableFibreSheetDirections ? &(*mpVariableFibreSheetDirections)[elem_index] : &mConstantFibreSheetDirections;
+        SetupChangeOfBasisMatrix(elem_index, 0); // 0 is quad index, and doesn't matter as checked that fibres not defined by quad pt above.
         for(unsigned i=0; i<DIM; i++)
         {
-            mCurrentElementFibreDirection(i) = (*mpCurrentElementFibreSheetMatrix)(i,0);
+            mCurrentElementFibreDirection(i) = this->mChangeOfBasisMatrix(i,0);
         }
 
         // get the displacement at this element

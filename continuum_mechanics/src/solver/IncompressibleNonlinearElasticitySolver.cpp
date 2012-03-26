@@ -365,8 +365,15 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
 
         double detF = Determinant(F);
 
-        this->ComputeStressAndStressDerivative(p_material_law, C, inv_C, pressure, rElement.GetIndex(), current_quad_point_global_index,
-                                               T, dTdE, assembleJacobian);
+        // Compute the passive stress, and dTdE corresponding to passive stress
+        this->SetupChangeOfBasisMatrix(rElement.GetIndex(), current_quad_point_global_index);
+        p_material_law->SetChangeOfBasisMatrix(this->mChangeOfBasisMatrix);
+        p_material_law->ComputeStressAndStressDerivative(C, inv_C, pressure, T, dTdE, assembleJacobian);
+
+        // Add any active stresses, if there are any. Requires subclasses to overload this method,
+        // see for example the cardiac mechanics assemblers.
+        this->AddActiveStressAndStressDerivative(C, rElement.GetIndex(), current_quad_point_global_index,
+                                                 T, dTdE, assembleJacobian);
 
         // Residual vector
         if (assembleResidual)

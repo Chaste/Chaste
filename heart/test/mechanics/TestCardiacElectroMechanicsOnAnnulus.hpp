@@ -145,7 +145,10 @@ public:
 
        problem.Solve();
 
-       // we don't test anything, we mainly just want to verify it solves OK
+       // we don't really anything, we mainly just want to verify it solves OK. Hardcoded test
+       // of deformed position of top of circle, to check nothing has changed.
+       TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](0), -0.0002, 1e-4);
+       TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](1),  0.4693, 1e-4);
 
 
        MechanicsEventHandler::Headings();
@@ -154,22 +157,3 @@ public:
 };
 
 #endif // TESTCARDIACELECTROMECHANICSONANNULUS_HPP_
-
-/*
-
-Exact fibre directions HACKED IN!
-
-chaste, no LU
-       Assemble            Solve           Update          AllMech          NonMech           Output            Total
-   3.510 (  3%)   112.848 ( 91%)     1.738 (  1%)   118.772 ( 96%)     5.172 (  4%)     0.156 (  0%)   124.228 (100%)  (seconds)
-
-chaste, LU
-       Assemble            Solve           Update          AllMech          NonMech           Output            Total
-   3.531 (  3%)   101.908 ( 90%)     1.771 (  2%)   107.875 ( 95%)     5.474 (  5%)     0.206 (  0%)   113.691 (100%)  (seconds)
-
-snes, LU
-       Assemble            Solve           Update          AllMech          NonMech           Output            Total
-   0.000 (  0%)     0.000 (  0%)     0.000 (  0%)     5.194 ( 48%)     5.316 ( 49%)     0.171 (  2%)    10.896 (100%)
-
- */
-
