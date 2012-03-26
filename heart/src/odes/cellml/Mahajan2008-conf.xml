@@ -6,7 +6,7 @@
     <lookup_table>
       <var type='config-name'>transmembrane_potential</var>
       <min>-120.0001</min>
-      <max>299.9999</max>
+      <max>289.9999</max>
     </lookup_table>
   </lookup_tables>
 </for_model>
