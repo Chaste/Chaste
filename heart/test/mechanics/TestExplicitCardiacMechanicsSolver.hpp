@@ -57,6 +57,8 @@ class TestExplicitCardiacMechanicsSolver : public CxxTest::TestSuite
 public:
     void TestWithSimpleContractionModel() throw(Exception)
     {
+        EXIT_IF_PARALLEL; // see #1828
+
         QuadraticMesh<2> mesh(0.25, 1.0, 1.0);
         MooneyRivlinMaterialLaw<2> law(1);
 
@@ -92,6 +94,8 @@ public:
     // are identical
     void TestCompareImplicitAndExplicitWithStretchIndependentContractionModel() throw(Exception)
     {
+        EXIT_IF_PARALLEL; // see #1828
+
         QuadraticMesh<2> mesh(0.25, 1.0, 1.0);
 
         MooneyRivlinMaterialLaw<2> law(1);
@@ -126,6 +130,8 @@ public:
     // with stretch-dependent contraction models the implicit and explicit schemes can be similar
     void TestCompareImplicitAndExplicitWithStretchDependentContractionModel() throw(Exception)
     {
+        EXIT_IF_PARALLEL; // see #1828
+
         QuadraticMesh<2> mesh(0.25, 1.0, 1.0);
 
         MooneyRivlinMaterialLaw<2> law(1);
@@ -191,6 +197,8 @@ public:
     // cover all other contraction model options which are allowed but not been used in a test so far
     void TestCoverage() throw(Exception)
     {
+        EXIT_IF_PARALLEL; // see #1828
+
         QuadraticMesh<2> mesh(1.0, 1.0, 1.0);
 
         MooneyRivlinMaterialLaw<2> law(1);

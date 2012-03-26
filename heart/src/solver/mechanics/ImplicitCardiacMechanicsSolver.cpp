@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
 ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ImplicitCardiacMechanicsSolver(
-                                  ContractionModelName contractionModel,
+                                  ContractionModelName contractionModelName,
                                   QuadraticMesh<DIM>& rQuadMesh,
                                   SolidMechanicsProblemDefinition<DIM>& rProblemDefinition,
                                   std::string outputDirectory)
@@ -48,68 +48,54 @@ ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ImplicitCardiacMechanicsS
                                                             rProblemDefinition,
                                                             outputDirectory)
 {
-    InitialiseContractionModels(contractionModel);
-
-    // initialise stores
-    mStretchesLastTimeStep.resize(this->mTotalQuadPoints, 1.0);
+    InitialiseContractionModels(contractionModelName);
 }
 
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
-void ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::InitialiseContractionModels(ContractionModelName contractionModel)
+void ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::InitialiseContractionModels(ContractionModelName contractionModelName)
 {
-    switch(contractionModel)
+    for(std::map<unsigned,DataAtQuadraturePoint>::iterator iter = this->mQuadPointToDataAtQuadPointMap.begin();
+        iter != this->mQuadPointToDataAtQuadPointMap.end();
+        iter++)
     {
-        case NONPHYSIOL1:
-        case NONPHYSIOL2:
-        case NONPHYSIOL3:
+        AbstractContractionModel* p_contraction_model;
+
+        switch(contractionModelName)
         {
-            unsigned option = (contractionModel==NONPHYSIOL1 ? 1 : (contractionModel==NONPHYSIOL2? 2 : 3));
-            for(unsigned i=0; i<this->mTotalQuadPoints; i++)
+            case NONPHYSIOL1:
+            case NONPHYSIOL2:
+            case NONPHYSIOL3:
             {
-                this->mContractionModelSystems.push_back(new NonPhysiologicalContractionModel(option));
+                unsigned option = (contractionModelName==NONPHYSIOL1 ? 1 : (contractionModelName==NONPHYSIOL2? 2 : 3));
+                p_contraction_model = new NonPhysiologicalContractionModel(option);
+                break;
             }
-            break;
-        }
-        case NHS:
-        {
-            for(unsigned i=0; i<this->mTotalQuadPoints; i++)
+            case NHS:
             {
-                this->mContractionModelSystems.push_back(new NhsModelWithBackwardSolver);
+                p_contraction_model = new NhsModelWithBackwardSolver;
+                break;
             }
-            break;
-        }
-        case KERCHOFFS2003: //stretch dependent
-        {
-            for(unsigned i=0; i<this->mTotalQuadPoints; i++)
+            case KERCHOFFS2003: //stretch dependent
             {
-                this->mContractionModelSystems.push_back(new Kerchoffs2003ContractionModel());
+                p_contraction_model = new Kerchoffs2003ContractionModel;
+                break;
             }
-            break;
+            default:
+            {
+                #define COVERAGE_IGNORE
+                EXCEPTION("Unknown or disallowed contraction model");
+                #undef COVERAGE_IGNORE
+            }
         }
-        default:
-        {
-            #define COVERAGE_IGNORE
-            EXCEPTION("Unknown or disallowed contraction model");
-            #undef COVERAGE_IGNORE
-        }
+
+        iter->second.ContractionModel = p_contraction_model;
     }
 }
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
 ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::~ImplicitCardiacMechanicsSolver()
 {
-    for(unsigned i=0; i<this->mContractionModelSystems.size(); i++)
-    {
-        delete this->mContractionModelSystems[i];
-    }
-}
-
-
-template<class ELASTICITY_SOLVER,unsigned DIM>
-std::vector<double>& ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::rGetFibreStretches()
-{
-    return this->mStretches;
 }
 
 
@@ -134,12 +120,16 @@ void ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Solve(double time, d
     }
 
     // now update state variables, and set lambda at last timestep. Note
-    // lambda was set in AssembleOnElement
-    for(unsigned i=0; i<this->mContractionModelSystems.size(); i++)
+    // stretches were set in AssembleOnElement
+    for(std::map<unsigned,DataAtQuadraturePoint>::iterator iter = this->mQuadPointToDataAtQuadPointMap.begin();
+        iter != this->mQuadPointToDataAtQuadPointMap.end();
+        iter++)
     {
-         this->mContractionModelSystems[i]->UpdateStateVariables();
-         mStretchesLastTimeStep[i] = this->mStretches[i];
+        AbstractContractionModel* p_contraction_model = iter->second.ContractionModel;
+        iter->second.StretchLastTimeStep = iter->second.Stretch;
+        p_contraction_model->UpdateStateVariables();
     }
+
 }
 
 
@@ -152,15 +142,20 @@ void ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::GetActiveTensionAndT
                                                                                              double& rDerivActiveTensionWrtLambda,
                                                                                              double& rDerivActiveTensionWrtDLambdaDt)
 {
+    // The iterator should be pointing to the right place (note: it is incremented at the end of this method)
+    // This iterator is used so that we don't have to search the map
+    assert(this->mMapIterator->first==currentQuadPointGlobalIndex);
+
+    DataAtQuadraturePoint& r_data_at_quad_point = this->mMapIterator->second;
+
     // save this fibre stretch
-    this->mStretches[currentQuadPointGlobalIndex] = currentFibreStretch;
+    r_data_at_quad_point.Stretch = currentFibreStretch;
 
     // compute dlam/dt
-    double dlam_dt = (currentFibreStretch-mStretchesLastTimeStep[currentQuadPointGlobalIndex])/(this->mNextTime-this->mCurrentTime);
+    double dlam_dt = (currentFibreStretch-r_data_at_quad_point.StretchLastTimeStep)/(this->mNextTime-this->mCurrentTime);
 
-    AbstractContractionModel* p_contraction_model = this->mContractionModelSystems[currentQuadPointGlobalIndex];
-
-    // Set this stretch and stretch rate
+    // Set this stretch and stretch rate on contraction model
+    AbstractContractionModel* p_contraction_model = r_data_at_quad_point.ContractionModel;
     p_contraction_model->SetStretchAndStretchRate(currentFibreStretch, dlam_dt);
 
     // Call RunDoNotUpdate() on the contraction model to solve it using this stretch, and get the active tension
@@ -207,18 +202,13 @@ void ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::GetActiveTensionAndT
         rDerivActiveTensionWrtDLambdaDt = (active_tension_at_dlamdt_plus_h - rActiveTension)/h2;
     }
 
-    // Re-set the stretch and stretch rate and recompute the active tension so that
-    // if this guess turns out to the solution, we can just update the state variables
-    //  -- not needed as AssembleSystem(true,false) [ie assemble residual] is
-    //     called in ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Solve() above
-    //     after the solve and before the update.
-    //  -- The SetActiveTensionInitialGuess() would make this very fast
-    //     (compared to AssembleSystem(true,false) above), but the NHS class uses the last
-    //     active tension as the initial guess anyway..
-    //p_contraction_model->SetStretchAndStretchRate(currentFibreStretch, dlam_dt);
-    //p_contraction_model->SetActiveTensionInitialGuess(rActiveTension);   // this line would now need a cast
-    //p_contraction_model->RunDoNotUpdate(this->mCurrentTime,this->mNextTime,this->mOdeTimestep);
-    //assert( fabs(p_contraction_model->GetNextActiveTension()-rActiveTension)<1e-8);
+    // increment the iterator
+    this->mMapIterator++;
+    if(this->mMapIterator==this->mQuadPointToDataAtQuadPointMap.end())
+    {
+        this->mMapIterator = this->mQuadPointToDataAtQuadPointMap.begin();
+    }
+
 }
 
 

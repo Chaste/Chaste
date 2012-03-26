@@ -61,23 +61,12 @@ class ImplicitCardiacMechanicsSolver : public AbstractCardiacMechanicsSolver<ELA
 friend class TestImplicitCardiacMechanicsSolver;
 
 private:
-    /** The stretch in the fibre direction at the last timestep, in order
-     *  to compute the stretch rate.
-     *  Note the indexing: the i-th entry corresponds to the i-th global
-     *  quad point, when looping over elements and then quad points
-     */
-    std::vector<double> mStretchesLastTimeStep;
-
-    /** The current stretch ratio (in the fibre direction). Note the indexing:
-     *  the i-th entry corresponds to the i-th global quad point, when looping
-     *  over elements and then quad points
-     */
-
     /** This solver is an implicit solver (overloaded pure method) */
     bool IsImplicitSolver()
     {
         return true;
     }
+
     /**
      *  A method called by AbstractCardiacMechanicsSolver::AssembleOnElement(), providing
      *  the active tension (and other info) at a particular quadrature point. This version uses C to
@@ -101,21 +90,21 @@ private:
 
     /**
      * Initialise contraction models for each quadrature point
-     * @param contractionModel The name of the contraction model (from the enumeration ContractionModel
+     * @param contractionModelName The name of the contraction model (from the enumeration ContractionModel
      * defined in AbstractContactionModel)
      */
-    void InitialiseContractionModels(ContractionModelName contractionModel);
+    void InitialiseContractionModels(ContractionModelName contractionModelName);
 
 public:
     /**
      * Constructor
      *
-     * @param contractionModel The contraction model.
+     * @param contractionModelName The contraction model.
      * @param rQuadMesh A reference to the mesh.
      * @param rProblemDefinition Object defining body force and boundary conditions
      * @param outputDirectory The output directory, relative to TEST_OUTPUT
      */
-    ImplicitCardiacMechanicsSolver(ContractionModelName contractionModel,
+    ImplicitCardiacMechanicsSolver(ContractionModelName contractionModelName,
                                    QuadraticMesh<DIM>& rQuadMesh,
                                    SolidMechanicsProblemDefinition<DIM>& rProblemDefinition,
                                    std::string outputDirectory);
@@ -124,16 +113,6 @@ public:
      *  Destructor
      */
     virtual ~ImplicitCardiacMechanicsSolver();
-
-
-    /**
-     *  Get lambda (the stretch ratio).
-     *  NOTE: the i-th entry of this vector is assumed to be the i-th quad point
-     *  obtained by looping over cells in the obvious way and then looping over
-     *  quad points. These quad points, in the same order, can be obtained by
-     *  using the QuadraturePointsGroup class.
-     */
-    std::vector<double>& rGetFibreStretches();
 
     /**
      *  Solve for the deformation using quasi-static nonlinear elasticity.

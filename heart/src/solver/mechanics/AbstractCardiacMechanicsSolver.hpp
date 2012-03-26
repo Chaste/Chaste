@@ -45,6 +45,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCardiacMechanicsSolverInterface.hpp"
 
+
+/**
+ *  This struct is used to collect the three things that are stored for
+ *  each physical quadrature point: a contraction model, the stretch at that
+ *  point, and the stretch at the last time-step (used to compute
+ *  stretch rate).
+ */
+typedef struct DataAtQuadraturePoint_
+{
+    AbstractContractionModel* ContractionModel;
+    double Stretch;
+    double StretchLastTimeStep;
+
+} DataAtQuadraturePoint;
+
+
 /**
  *  AbstractCardiacMechanicsSolver
  *
@@ -63,19 +79,22 @@ class AbstractCardiacMechanicsSolver : public ELASTICITY_SOLVER, public Abstract
 protected:
     static const unsigned NUM_VERTICES_PER_ELEMENT = ELASTICITY_SOLVER::NUM_VERTICES_PER_ELEMENT; /**< Useful const from base class */
 
-    /**
-     *  Vector of contraction model (pointers). One for each quadrature point.
-     *  Note the indexing: the i-th entry corresponds to the i-th global quad
-     *  point, when looping over elements and then quad points
-     */
-    std::vector<AbstractContractionModel*> mContractionModelSystems;
 
     /**
-     *  Stored stretches (in fibre direction, at each quadrature point). Should be stored
-     *  when GetActiveTensionAndTensionDerivs() is called, and can be used either in that
-     *  timestep (implicit solver), or the next timestep (explicit solver)
+     *  A map from the index of a quadrature point to the data (contraction
+     *  model, stretch, stretch at the last time-step) at that quad point.
+     *  Note that there is no vector of all the quadrature points of the mesh;
+     *  the quad pointindex is the index that would be obtained by looping over
+     *  elements and then looping over quad points.
      */
-    std::vector<double> mStretches;
+    std::map<unsigned,DataAtQuadraturePoint> mQuadPointToDataAtQuadPointMap;
+
+    /**
+     *  An iterator to the map, used to avoid having to repeatedly search the map.
+     */
+    std::map<unsigned,DataAtQuadraturePoint>::iterator mMapIterator;
+
+
 
     /** Total number of quad points in the (mechanics) mesh */
     unsigned mTotalQuadPoints;
@@ -175,7 +194,7 @@ public:
                                    std::string outputDirectory);
 
     /**
-     *  Destructor just deletes memory if it was allocated
+     *  Destructor
      */
     ~AbstractCardiacMechanicsSolver();
 
@@ -190,6 +209,14 @@ public:
     virtual GaussianQuadratureRule<DIM>* GetQuadratureRule()
     {
         return this->mpQuadratureRule;
+    }
+
+    /**
+     * Access mQuadPointToDataAtQuadPointMap. See doxygen for this variable
+     */
+    std::map<unsigned,DataAtQuadraturePoint>& rGetQuadPointToDataAtQuadPointMap()
+    {
+        return mQuadPointToDataAtQuadPointMap;
     }
 
 
@@ -280,8 +307,19 @@ AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AbstractCardiacMechanicsS
     // compute total num quad points
     mTotalQuadPoints = rQuadMesh.GetNumElements()*this->mpQuadratureRule->GetNumQuadPoints();
 
-    // initialise the store of fibre stretches
-    mStretches.resize(mTotalQuadPoints, 1.0);
+    // create the data at each quad point. The child class will set the contraction models
+    for(unsigned i=0; i<mTotalQuadPoints; i++)
+    {
+        DataAtQuadraturePoint data_at_quad_point;
+        data_at_quad_point.ContractionModel = NULL;
+        data_at_quad_point.Stretch = 1.0;
+        data_at_quad_point.StretchLastTimeStep = 1.0;
+
+        mQuadPointToDataAtQuadPointMap[i] = data_at_quad_point;
+    }
+
+    // initialise the iterator to point at the beginning
+    mMapIterator = mQuadPointToDataAtQuadPointMap.begin();
 
     // initialise fibre/sheet direction matrix to be the identity, fibres in X-direction, and sheet in XY-plane
     mConstantFibreSheetDirections = zero_matrix<double>(DIM,DIM);
@@ -297,6 +335,13 @@ AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AbstractCardiacMechanicsS
 template<class ELASTICITY_SOLVER,unsigned DIM>
 AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::~AbstractCardiacMechanicsSolver()
 {
+    for(std::map<unsigned,DataAtQuadraturePoint>::iterator iter = mQuadPointToDataAtQuadPointMap.begin();
+        iter != mQuadPointToDataAtQuadPointMap.end();
+        iter++)
+    {
+        delete iter->second.ContractionModel;
+    }
+
     if(mpVariableFibreSheetDirections)
     {
         delete mpVariableFibreSheetDirections;
@@ -310,8 +355,8 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetCalciumAndVoltage
                                                                                  std::vector<double>& rVoltages)
 
 {
-    assert(rCalciumConcentrations.size() == this->mTotalQuadPoints);
-    assert(rVoltages.size() == this->mTotalQuadPoints);
+    assert(rCalciumConcentrations.size() == mTotalQuadPoints);
+    assert(rVoltages.size() == mTotalQuadPoints);
 
     ContractionModelInputParameters input_parameters;
 
@@ -320,7 +365,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetCalciumAndVoltage
         input_parameters.intracellularCalciumConcentration = rCalciumConcentrations[i];
         input_parameters.voltage = rVoltages[i];
 
-        mContractionModelSystems[i]->SetInputParameters(input_parameters);
+        mQuadPointToDataAtQuadPointMap[i].ContractionModel->SetInputParameters(input_parameters);
     }
 }
 

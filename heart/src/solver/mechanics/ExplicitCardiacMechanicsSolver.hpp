@@ -69,7 +69,6 @@ private:
         return false;
     }
 
-
     /**
      *  Get the active tension and other info at the given quadrature point. This is an explicit
      *  solver so just sets the active tension, it doesn't set the derivatives. It stores the
@@ -91,21 +90,21 @@ private:
 
     /**
      * Initialise contraction models for each quadrature point
-     * @param contractionModel The name of the contraction model (from the enumeration ContractionModel
+     * @param contractionModelName The name of the contraction model (from the enumeration ContractionModel
      * defined in AbstractContactionModel)
      */
-    void InitialiseContractionModels(ContractionModelName contractionModel);
+    void InitialiseContractionModels(ContractionModelName contractionModelName);
 
 public:
     /**
      * Constructor
      *
-     * @param contractionModel The contraction model.
+     * @param contractionModelName The contraction model.
      * @param rQuadMesh A reference to the mesh.
      * @param rProblemDefinition Object defining body force and boundary conditions
      * @param outputDirectory The output directory, relative to TEST_OUTPUT
      */
-    ExplicitCardiacMechanicsSolver(ContractionModelName contractionModel,
+    ExplicitCardiacMechanicsSolver(ContractionModelName contractionModelName,
                                    QuadraticMesh<DIM>& rQuadMesh,
                                    SolidMechanicsProblemDefinition<DIM>& rProblemDefinition,
                                    std::string outputDirectory);
