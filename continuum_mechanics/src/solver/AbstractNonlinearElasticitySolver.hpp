@@ -383,9 +383,10 @@ public: // need to be public as are called by global functions
      * Public method for computing the jacobian that will be called, effectively,
      * by the SNES solver
      * @param currentGuess Input, the current guess for the solution
-     * @param residualVector Output, the jacobian matrix at this guess
+     * @param pJacobian Output, the jacobian matrix at this guess
+     * @param pPreconditioner Output, the preconditioner matrix
      */
-    void ComputeJacobian(Vec currentGuess, Mat* pJacobian);
+    void ComputeJacobian(Vec currentGuess, Mat* pJacobian, Mat* pPreconditioner);
 
 private:
     /**
@@ -1274,7 +1275,7 @@ void AbstractNonlinearElasticitySolver<DIM>::SolveSnes()
 
     SNESCreate(PETSC_COMM_WORLD, &snes);
     SNESSetFunction(snes, this->mResidualVector, &AbstractNonlinearElasticitySolver_ComputeResidual<DIM>, this);
-    SNESSetJacobian(snes, mrJacobianMatrix, mrJacobianMatrix, &AbstractNonlinearElasticitySolver_ComputeJacobian<DIM>, this);
+    SNESSetJacobian(snes, mrJacobianMatrix, this->mPreconditionMatrix, &AbstractNonlinearElasticitySolver_ComputeJacobian<DIM>, this);
     SNESSetType(snes,SNESLS);
     SNESSetTolerances(snes,1.0e-5,1.0e-5,1.0e-5,PETSC_DEFAULT,PETSC_DEFAULT);
     SNESSetMaxLinearSolveFailures(snes,1000);
@@ -1326,9 +1327,12 @@ void AbstractNonlinearElasticitySolver<DIM>::ComputeResidual(Vec currentGuess, V
 }
 
 template<unsigned DIM>
-void AbstractNonlinearElasticitySolver<DIM>::ComputeJacobian(Vec currentGuess, Mat* pJacobian)
+void AbstractNonlinearElasticitySolver<DIM>::ComputeJacobian(Vec currentGuess, Mat* pJacobian, Mat* pPreconditioner)
 {
+    // check Petsc data corresponds to internal Mats
     assert(mrJacobianMatrix==*pJacobian);
+    assert(this->mPreconditionMatrix==*pPreconditioner);
+
     MechanicsEventHandler::BeginEvent(MechanicsEventHandler::ASSEMBLE);
     ReplicatableVector guess_repl(currentGuess);
     for(unsigned i=0; i<guess_repl.GetSize(); i++)
@@ -1364,7 +1368,7 @@ PetscErrorCode AbstractNonlinearElasticitySolver_ComputeJacobian(SNES snes,
 {
     // Extract the solver from the void*
     AbstractNonlinearElasticitySolver<DIM>* p_solver = (AbstractNonlinearElasticitySolver<DIM>*) pContext;
-    p_solver->ComputeJacobian(currentGuess, pGlobalJacobian);
+    p_solver->ComputeJacobian(currentGuess, pGlobalJacobian, pPreconditioner);
     return 0;
 }
 

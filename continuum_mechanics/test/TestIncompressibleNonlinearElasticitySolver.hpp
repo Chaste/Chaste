@@ -609,106 +609,115 @@ public:
      */
     void TestWithFunctionalData() throw(Exception)
     {
-        MechanicsEventHandler::Reset();
-
-        unsigned num_elem = 5;
-        QuadraticMesh<2> mesh(1.0/num_elem, 1.0, 1.0);
-
-        MooneyRivlinMaterialLaw<2> law(MATERIAL_PARAM);
-
-        std::vector<unsigned> fixed_nodes
-          = NonlinearElasticityTools<2>::GetNodesByComponentValue(mesh,0,0);
-
-
-        std::vector<BoundaryElement<1,2>*> boundary_elems;
-        for (TetrahedralMesh<2,2>::BoundaryElementIterator iter
-              = mesh.GetBoundaryElementIteratorBegin();
-            iter != mesh.GetBoundaryElementIteratorEnd();
-            ++iter)
+        for(unsigned run=0; run<2; run++)
         {
-            // get all boundary elems except those on X=0
-            if (fabs((*iter)->CalculateCentroid()[0])>1e-6)
+            MechanicsEventHandler::Reset();
+
+            unsigned num_elem = 5;
+            QuadraticMesh<2> mesh(1.0/num_elem, 1.0, 1.0);
+
+            MooneyRivlinMaterialLaw<2> law(MATERIAL_PARAM);
+
+            std::vector<unsigned> fixed_nodes
+              = NonlinearElasticityTools<2>::GetNodesByComponentValue(mesh,0,0);
+
+
+            std::vector<BoundaryElement<1,2>*> boundary_elems;
+            for (TetrahedralMesh<2,2>::BoundaryElementIterator iter
+                  = mesh.GetBoundaryElementIteratorBegin();
+                iter != mesh.GetBoundaryElementIteratorEnd();
+                ++iter)
             {
-                BoundaryElement<1,2>* p_element = *iter;
-                boundary_elems.push_back(p_element);
+                // get all boundary elems except those on X=0
+                if (fabs((*iter)->CalculateCentroid()[0])>1e-6)
+                {
+                    BoundaryElement<1,2>* p_element = *iter;
+                    boundary_elems.push_back(p_element);
+                }
+            }
+            assert(boundary_elems.size()==3*num_elem);
+
+            SolidMechanicsProblemDefinition<2> problem_defn(mesh);
+
+
+            problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
+            problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+            problem_defn.SetBodyForce(MyBodyForce);
+            problem_defn.SetTractionBoundaryConditions(boundary_elems, MyTraction);
+
+            IncompressibleNonlinearElasticitySolver<2> solver(mesh,
+                                                              problem_defn,
+                                                              "nonlin_elas_functional_data");
+            if(run==1)
+            {
+                solver.SetUseSnesSolver();
+            }
+
+            // this test requires the time to be set to t=1 to pass (see comment
+            // in and MyBodyForce() and MyTraction()
+            solver.SetCurrentTime(1.0);
+
+            // cover the option of writing output for each iteration
+            solver.SetWriteOutputEachNewtonIteration();
+
+            solver.Solve();
+
+            if(run==0)
+            {
+                // matrix might have (small) errors introduced if this fails
+                TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(), 3u); // 'hardcoded' answer, protects against Jacobian getting messed up
+            }
+
+            // check CreateCmguiOutput() - call and check output files were written.
+            solver.CreateCmguiOutput();
+
+            std::vector<c_vector<double,2> >& r_solution = solver.rGetDeformedPosition();
+
+            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+            {
+                double X = mesh.GetNode(i)->rGetLocation()[0];
+                double Y = mesh.GetNode(i)->rGetLocation()[1];
+
+                double exact_x = X + 0.5*ALPHA*X*X;
+                double exact_y = Y/(1+ALPHA*X);
+
+                TS_ASSERT_DELTA(r_solution[i](0), exact_x, 1e-4);
+                TS_ASSERT_DELTA(r_solution[i](1), exact_y, 1e-4);
+            }
+
+            for (unsigned i=0; i<solver.rGetPressures().size(); i++)
+            {
+                TS_ASSERT_DELTA( solver.rGetPressures()[i]/(2*MATERIAL_PARAM), 1.0, 1e-3);
+            }
+
+            MechanicsEventHandler::Headings();
+            MechanicsEventHandler::Report();
+
+            if(run==0)
+            {
+                // Check output files were created: the standard output files initial.nodes and solution.nodes, the extra newton iteration
+                // output files created as SetWriteOutputEachNewtonIteration() was called above, and the cmgui files created as
+                // CreateCmguiOutput() was called above.
+                std::string command
+                   = "ls " + OutputFileHandler::GetChasteTestOutputDirectory() + "nonlin_elas_functional_data/initial.nodes > /dev/null";
+                TS_ASSERT_EQUALS(system(command.c_str()), 0);
+                command = "ls " + OutputFileHandler::GetChasteTestOutputDirectory() + "nonlin_elas_functional_data/solution.nodes > /dev/null";
+                TS_ASSERT_EQUALS(system(command.c_str()), 0);
+                command = "ls " + OutputFileHandler::GetChasteTestOutputDirectory() + "nonlin_elas_functional_data/newton_iteration_3.nodes > /dev/null";
+                TS_ASSERT_EQUALS(system(command.c_str()), 0);
+                command = "ls " + OutputFileHandler::GetChasteTestOutputDirectory() + "nonlin_elas_functional_data/cmgui/solution_0.exelem > /dev/null";
+                TS_ASSERT_EQUALS(system(command.c_str()), 0);
+                command = "ls " + OutputFileHandler::GetChasteTestOutputDirectory() + "nonlin_elas_functional_data/cmgui/solution_0.exnode > /dev/null";
+                TS_ASSERT_EQUALS(system(command.c_str()), 0);
+                command = "ls " + OutputFileHandler::GetChasteTestOutputDirectory() + "nonlin_elas_functional_data/cmgui/solution_1.exnode > /dev/null";
+                TS_ASSERT_EQUALS(system(command.c_str()), 0);
+
+                solver.rGetCurrentSolution().clear();
+                solver.rGetCurrentSolution().resize(solver.mNumDofs, 0.0);
+                solver.SetKspAbsoluteTolerance(1); // way too high
+                TS_ASSERT_THROWS_CONTAINS(solver.Solve(), "KSP Absolute tolerance was too high");
             }
         }
-        assert(boundary_elems.size()==3*num_elem);
-
-        SolidMechanicsProblemDefinition<2> problem_defn(mesh);
-
-
-        problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
-        problem_defn.SetZeroDisplacementNodes(fixed_nodes);
-        problem_defn.SetBodyForce(MyBodyForce);
-        problem_defn.SetTractionBoundaryConditions(boundary_elems, MyTraction);
-
-
-
-        IncompressibleNonlinearElasticitySolver<2> solver(mesh,
-                                                          problem_defn,
-                                                          "nonlin_elas_functional_data");
-
-
-        // this test requires the time to be set to t=1 to pass (see comment
-        // in and MyBodyForce() and MyTraction()
-        solver.SetCurrentTime(1.0);
-
-        // cover the option of writing output for each iteration
-        solver.SetWriteOutputEachNewtonIteration();
-
-        solver.Solve();
-
-        // matrix might have (small) errors introduced if this fails
-        TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(), 3u); // 'hardcoded' answer, protects against Jacobian getting messed up
-
-        // check CreateCmguiOutput() - call and check output files were written.
-        solver.CreateCmguiOutput();
-
-        std::vector<c_vector<double,2> >& r_solution = solver.rGetDeformedPosition();
-
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
-        {
-            double X = mesh.GetNode(i)->rGetLocation()[0];
-            double Y = mesh.GetNode(i)->rGetLocation()[1];
-
-            double exact_x = X + 0.5*ALPHA*X*X;
-            double exact_y = Y/(1+ALPHA*X);
-
-            TS_ASSERT_DELTA(r_solution[i](0), exact_x, 1e-4);
-            TS_ASSERT_DELTA(r_solution[i](1), exact_y, 1e-4);
-        }
-
-        for (unsigned i=0; i<solver.rGetPressures().size(); i++)
-        {
-            TS_ASSERT_DELTA( solver.rGetPressures()[i]/(2*MATERIAL_PARAM), 1.0, 1e-3);
-        }
-
-        MechanicsEventHandler::Headings();
-        MechanicsEventHandler::Report();
-
-
-        // Check output files were created: the standard output files initial.nodes and solution.nodes, the extra newton iteration
-        // output files created as SetWriteOutputEachNewtonIteration() was called above, and the cmgui files created as
-        // CreateCmguiOutput() was called above.
-        std::string command
-           = "ls " + OutputFileHandler::GetChasteTestOutputDirectory() + "nonlin_elas_functional_data/initial.nodes > /dev/null";
-        TS_ASSERT_EQUALS(system(command.c_str()), 0);
-        command = "ls " + OutputFileHandler::GetChasteTestOutputDirectory() + "nonlin_elas_functional_data/solution.nodes > /dev/null";
-        TS_ASSERT_EQUALS(system(command.c_str()), 0);
-        command = "ls " + OutputFileHandler::GetChasteTestOutputDirectory() + "nonlin_elas_functional_data/newton_iteration_3.nodes > /dev/null";
-        TS_ASSERT_EQUALS(system(command.c_str()), 0);
-        command = "ls " + OutputFileHandler::GetChasteTestOutputDirectory() + "nonlin_elas_functional_data/cmgui/solution_0.exelem > /dev/null";
-        TS_ASSERT_EQUALS(system(command.c_str()), 0);
-        command = "ls " + OutputFileHandler::GetChasteTestOutputDirectory() + "nonlin_elas_functional_data/cmgui/solution_0.exnode > /dev/null";
-        TS_ASSERT_EQUALS(system(command.c_str()), 0);
-        command = "ls " + OutputFileHandler::GetChasteTestOutputDirectory() + "nonlin_elas_functional_data/cmgui/solution_1.exnode > /dev/null";
-        TS_ASSERT_EQUALS(system(command.c_str()), 0);
-
-        solver.rGetCurrentSolution().clear();
-        solver.rGetCurrentSolution().resize(solver.mNumDofs, 0.0);
-        solver.SetKspAbsoluteTolerance(1); // way too high
-        TS_ASSERT_THROWS_CONTAINS(solver.Solve(), "KSP Absolute tolerance was too high");
     }
 
     /*
@@ -916,7 +925,7 @@ public:
 
         for (unsigned i=0; i<mesh.GetNumVertices(); i++)
         {
-            TS_ASSERT_DELTA( solver.rGetPressures()[i], 2*c1*lambda*lambda, 1e-5 );
+            TS_ASSERT_DELTA( solver.rGetPressures()[i], 2*c1*lambda*lambda, 1e-4 );
         }
 
 
