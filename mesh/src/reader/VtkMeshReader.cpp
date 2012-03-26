@@ -170,12 +170,13 @@ VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::VtkMeshReader(vtkUnstructuredGrid* p_vtkUn
     mpVtkGeometryFilter->Update();
 
     mNumFaces = mpVtkGeometryFilter->GetOutput()->GetNumberOfCells();
-    if (SPACE_DIM == 2)
-    {
-        mNodesPerElement = 3;
-        mVtkCellType = VTK_TRIANGLE;
-        mNumFaces = 0; ///\todo Make the above filter work in 2D
-    }
+    assert (SPACE_DIM == 3);
+//    if (SPACE_DIM == 2)
+//    {
+//        mNodesPerElement = 3;
+//        mVtkCellType = VTK_TRIANGLE;
+//        mNumFaces = 0; ///\todo Make the above filter work in 2D
+//    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

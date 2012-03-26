@@ -436,6 +436,7 @@ public:
     /**
      *  Set the solver to solver to write non-linear solve progress at it solves each
      *  nonlinear system. Can also be called by using the command line parameter "-mech_verbose"
+     * @param verbose  true to set verbosity level to "verbose"
      */
     void SetVerbose(bool verbose = true);
 

@@ -64,6 +64,10 @@ private:
      */
     double mDiffusionParameter;
 
+    /**
+     * The timestep (units?) for this probability
+     * \todo #2066
+     */ 
     double mDt;
 
     friend class boost::serialization::access;
@@ -118,13 +122,13 @@ public:
 
 
    //    /**
-//      * @return the time step (mDt) defined in the calculation of the probability of a cell moving to a certain site
+//      * \todo #2066 return the time step (mDt) defined in the calculation of the probability of a cell moving to a certain site
 //      */
 //    double GetTimeStep();
 //
 //
 //    /**
-//      * @define the time step (dt) defined in the calculation of the probability of a cell moving to a certain site
+//      * \todo #2066 define the time step (dt) defined in the calculation of the probability of a cell moving to a certain site
 //      */
 //    void SetTimeStep(double dt);
 

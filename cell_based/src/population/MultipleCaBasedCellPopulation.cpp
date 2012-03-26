@@ -64,7 +64,9 @@ void MultipleCaBasedCellPopulation<DIM>::Validate()
     {
         if (validated_nodes[i] > 1)
         {
-            EXCEPTION("Node " << i << " appears to have " << validated_nodes[i] << " cells associated with it");
+            NEVER_REACHED;
+            ///\todo #2066 - This exception is not covered
+            //EXCEPTION("Node " << i << " appears to have " << validated_nodes[i] << " cells associated with it");
         }
         else if (validated_nodes[i] < 1)
         {
