@@ -509,6 +509,11 @@ public:
         unsigned num_elem = 5;
 
         QuadraticMesh<2> mesh(1.0/num_elem, 1.0, 1.0);
+
+//        TrianglesMeshReader<2,2> reader("mesh/test/data/square_128_elements_quadratic_reordered",2,1,false);
+//        mesh.ConstructFromMeshReader(reader);
+
+
         MooneyRivlinMaterialLaw<2> law(c1);
 
         std::vector<unsigned> fixed_nodes;
@@ -550,17 +555,50 @@ public:
         problem_defn.SetFixedNodes(fixed_nodes, locations);
         problem_defn.SetTractionBoundaryConditions(boundary_elems, tractions);
 
-
-
         IncompressibleNonlinearElasticitySolver<2> solver(mesh,
                                                           problem_defn,
                                                           "nonlin_elas_non_zero_bcs");
 
+        /////////////////////////////////////////////////////////////////
+        // Provide the exact solution as the initial guess and check
+        // residual is (nearly) exactly zero (as the solution is in
+        // the FEM space, the FEM solution, assuming the nonlinear
+        // system was solved exactly, is the exact solution
+        /////////////////////////////////////////////////////////////////
 
-        // coverage
-        solver.SetKspAbsoluteTolerance(1e-10);
+        std::vector<double> old_current_soln = solver.rGetCurrentSolution();
+
+        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        {
+            double exact_x = (1.0/lambda)*mesh.GetNode(i)->rGetLocation()[0];
+            double exact_y = lambda*mesh.GetNode(i)->rGetLocation()[1];
+
+            solver.rGetCurrentSolution()[3*i] = exact_x - mesh.GetNode(i)->rGetLocation()[0];
+            solver.rGetCurrentSolution()[3*i+1] = exact_y - mesh.GetNode(i)->rGetLocation()[1];
+
+            if(mesh.GetNode(i)->IsInternal())
+            {
+                solver.rGetCurrentSolution()[3*i+2] =  0.0;
+            }
+            else
+            {
+                solver.rGetCurrentSolution()[3*i+2] =  2*c1*lambda*lambda;
+            }
+        }
 
         solver.Solve();
+
+        TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(), 0u); // initial guess was solution
+
+        ///////////////////////////////////////////////////////////////////////////
+        // Now solve properly
+        ///////////////////////////////////////////////////////////////////////////
+
+        solver.rGetCurrentSolution() = old_current_soln;
+        // coverage
+        solver.SetKspAbsoluteTolerance(1e-10);
+        solver.Solve();
+
         TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(), 3u); // 'hardcoded' answer, protects against Jacobian getting messed up
 
         std::vector<c_vector<double,2> >& r_solution = solver.rGetDeformedPosition();
@@ -932,6 +970,114 @@ public:
         MechanicsEventHandler::Headings();
         MechanicsEventHandler::Report();
     }
+
+
+    // same set up as TestSolveWithNonZeroBoundaryConditions, here we test
+    // that the simulation works fine if the internal nodes are not assumed to
+    // have indices greater than vertex nodes
+    void TestWithReordering() throw(Exception)
+    {
+        double lambda = 0.85;
+        double c1 = 1.0;
+
+        std::vector<double> soln_normal;
+        std::vector<double> soln_reordered;
+
+        double end_residual_norm_normal;
+        double end_residual_norm_reordered;
+
+        for(unsigned run=0; run<2; run++)
+        {
+            std::string mesh_file = (run==0 ? "mesh/test/data/square_128_elements_quadratic" : "mesh/test/data/square_128_elements_quadratic_reordered");
+
+            QuadraticMesh<2> mesh;
+            TrianglesMeshReader<2,2> reader(mesh_file,2,1,false);
+            mesh.ConstructFromMeshReader(reader);
+
+            // same BCs as in test mentioned above
+            MooneyRivlinMaterialLaw<2> law(c1);
+            std::vector<unsigned> fixed_nodes;
+            std::vector<c_vector<double,2> > locations;
+            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+            {
+                if ( fabs(mesh.GetNode(i)->rGetLocation()[0])<1e-6)
+                {
+                    fixed_nodes.push_back(i);
+                    c_vector<double,2> new_position;
+                    new_position(0) = 0;
+                    new_position(1) = lambda*mesh.GetNode(i)->rGetLocation()[1];
+                    locations.push_back(new_position);
+                }
+            }
+
+            std::vector<BoundaryElement<1,2>*> boundary_elems;
+            std::vector<c_vector<double,2> > tractions;
+            c_vector<double,2> traction;
+            traction(0) = 2*c1*(pow(lambda,-1) - lambda*lambda*lambda);
+            traction(1) = 0;
+            for (TetrahedralMesh<2,2>::BoundaryElementIterator iter
+                  = mesh.GetBoundaryElementIteratorBegin();
+                iter != mesh.GetBoundaryElementIteratorEnd();
+                ++iter)
+            {
+                if (fabs((*iter)->CalculateCentroid()[0] - 1.0)<1e-4)
+                {
+                    BoundaryElement<1,2>* p_element = *iter;
+                    boundary_elems.push_back(p_element);
+                    tractions.push_back(traction);
+                }
+            }
+
+            SolidMechanicsProblemDefinition<2> problem_defn(mesh);
+            problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
+            problem_defn.SetFixedNodes(fixed_nodes, locations);
+            problem_defn.SetTractionBoundaryConditions(boundary_elems, tractions);
+
+            IncompressibleNonlinearElasticitySolver<2> solver(mesh,
+                                                              problem_defn,
+                                                              "");
+
+            solver.Solve();
+
+            if(run==0)
+            {
+                soln_normal = solver.rGetCurrentSolution();
+                end_residual_norm_normal = solver.ComputeResidualAndGetNorm(false);
+            }
+            else
+            {
+                soln_reordered = solver.rGetCurrentSolution();
+                end_residual_norm_reordered = solver.ComputeResidualAndGetNorm(false);
+            }
+        }
+
+        // check the end residual norms were the same
+        // Need to do relative error as they will both be very small;
+        double rel_error = fabs(end_residual_norm_normal-end_residual_norm_reordered)/end_residual_norm_reordered;
+        TS_ASSERT_LESS_THAN(rel_error, 0.01);
+
+
+        // The two meshes are the same except the nodes 4 and 81 have been swapped around.
+        // Hence, the solutions should be the same except for the unknowns at these nodes
+        for(unsigned i=0; i<289 /*num total nodes*/; i++)
+        {
+            if(i!=4 && i!=81)
+            {
+                for(unsigned j=0; j<3; j++) // [u,v,p] unknowns
+                {
+                    TS_ASSERT_DELTA(soln_normal[3*i+j], soln_reordered[3*i+j], 1e-7);
+                }
+            }
+        }
+
+        // Check the solution at nodes 4 and 81
+        for(unsigned j=0; j<3; j++) // [u,v,p] unknowns
+        {
+            TS_ASSERT_DELTA(soln_normal[3*4+j],  soln_reordered[3*81+j], 1e-7);
+            TS_ASSERT_DELTA(soln_normal[3*81+j], soln_reordered[3*4+j],  1e-7);
+        }
+    }
+
 };
 
 #endif /*TESTINCOMPRESSIBLENONLINEARELASTICITYSOLVER_HPP_*/
