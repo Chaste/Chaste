@@ -731,26 +731,21 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::InitialiseWriter
     // I think this is impossible to trip; certainly it's very difficult!
     assert(!mpWriter);
 
-    try
+    FileFinder h5_file(OutputFileHandler::GetChasteTestOutputDirectory() + HeartConfig::Instance()->GetOutputDirectory()
+                       + "/" + HeartConfig::Instance()->GetOutputFilenamePrefix() + ".h5",
+                       RelativeTo::Absolute);
+
+    if (extend_file && !h5_file.Exists())
     {
-        mpWriter = new Hdf5DataWriter(*mpMesh->GetDistributedVectorFactory(),
-                                      HeartConfig::Instance()->GetOutputDirectory(),
-                                      HeartConfig::Instance()->GetOutputFilenamePrefix(),
-                                      !extend_file, // don't clear directory if extension requested
-                                      extend_file);
-    }
-    catch (Exception& e)
-    {
-        // The constructor only throws an Exception if we're extending
-        assert(extend_file);
-        // Tried to extend and failed, so just create from scratch
         extend_file = false;
-        mpWriter = new Hdf5DataWriter(*mpMesh->GetDistributedVectorFactory(),
-                                      HeartConfig::Instance()->GetOutputDirectory(),
-                                      HeartConfig::Instance()->GetOutputFilenamePrefix(),
-                                      !extend_file,
-                                      extend_file);
     }
+
+    mpWriter = new Hdf5DataWriter(*mpMesh->GetDistributedVectorFactory(),
+                                  HeartConfig::Instance()->GetOutputDirectory(),
+                                  HeartConfig::Instance()->GetOutputFilenamePrefix(),
+                                  !extend_file, // don't clear directory if extension requested
+                                  extend_file);
+
 
     // Define columns, or get the variable IDs from the writer
     DefineWriterColumns(extend_file);
@@ -765,7 +760,6 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::InitialiseWriter
             HeartConfig::Instance()->SetOutputUsingOriginalNodeOrdering(false);
         }
     }
-
 
     if (!extend_file)
     {
