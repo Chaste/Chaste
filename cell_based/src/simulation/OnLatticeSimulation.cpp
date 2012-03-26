@@ -200,7 +200,9 @@ void OnLatticeSimulation<DIM>::UpdateCellPopulation()
          */
         if (!this->mInitialiseCells && (SimulationTime::Instance()->GetTimeStepsElapsed() == 0))
         {
-            update_cell_population_this_timestep = false;
+            NEVER_REACHED;
+            ///\todo #2066 This code should be covered by  cell_based/test/simulation/TestOnLatticeSimulationWithMultipleCaBasedCellPopulation.hpp TestLoad
+//            update_cell_population_this_timestep = false;
         }
     }
 

@@ -41,8 +41,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VtkMeshWriter.hpp"
 #include "NodesOnlyMesh.hpp"
 #include "Exception.hpp"
-//#include "Debug.hpp"
-
 
 template<unsigned DIM>
 void MultipleCaBasedCellPopulation<DIM>::Validate()
@@ -392,17 +390,19 @@ void MultipleCaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
             double random_number = p_gen->ranf();
 
             double total_probability = neighbouring_node_propensities[0];
-            unsigned counter = 0u;
-
+            unsigned counter = 1u;
+            
+            ///\todo #2066 This would be less prone to error if it were a for loop
             while ((total_probability < random_number) && (counter < num_neighbours))
             {
-                counter++;
+                ///\todo #2066 At this point we need to know that counter < num_neighbours
                 total_probability += neighbouring_node_propensities[counter];
+                counter++; 
             }
 
-            if (counter < num_neighbours)
+            if (counter < num_neighbours)///\todo #2066 Check this!
             {
-				unsigned chosen_neighbour_location_index = neighbouring_node_indices_vector[counter];
+				unsigned chosen_neighbour_location_index = neighbouring_node_indices_vector[counter-1];///\todo #2066 Check this!
 
 				/*
 				 * Move the cell to new location
