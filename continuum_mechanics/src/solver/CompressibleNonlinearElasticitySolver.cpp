@@ -301,13 +301,10 @@ void CompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
         inv_C = Inverse(C);
         inv_F = Inverse(F);
 
-        // Compute the passive stress, and dTdE corresponding to passive stress
-        p_material_law->ComputeStressAndStressDerivative(C, inv_C, 0.0, T, dTdE, assembleJacobian);
+        this->ComputeStressAndStressDerivative(p_material_law, C, inv_C, 0.0, rElement.GetIndex(), current_quad_point_global_index,
+                                               T, dTdE, assembleJacobian);
 
-        // Add any active stresses, if there are any. Requires subclasses to overload this method,
-        // see for example the cardiac mechanics assemblers.
-        this->AddActiveStressAndStressDerivative(C, rElement.GetIndex(), current_quad_point_global_index,
-                                                 T, dTdE, assembleJacobian);
+
 
         // Residual vector
         if (assembleResidual)

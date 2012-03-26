@@ -213,31 +213,36 @@ protected:
                                                c_matrix<double,DIM,DIM>& rDeformationGradient);
 
     /**
-     * Add on the active component to the stress (and maybe also to the stress-derivative).
-     * This is called after getting the passive stress and stress-derivative from
-     * a material law.
+     * Simple (one-line function which just calls ComputeStressAndStressDerivative() on the
+     * material law given, using C,  inv(C), and p as the input and with rT and rDTdE as the
+     * output. Overloaded by other assemblers (eg cardiac mechanics) which need to add extra
+     * terms to the stress.
      *
-     * This method does nothing but can be overloaded by the other solvers, see eg cardiac
-     * mechanics solvers.
-     *
+     * @param pMaterialLaw The material law for this element
      * @param rC The Lagrangian deformation tensor (F^T F)
+     * @param rInvC The inverse of C. Should be computed by the user.
+     * @param pressure The current pressure
      * @param elementIndex Index of the current element
      * @param currentQuadPointGlobalIndex The index (assuming an outer loop over elements and an inner
      *   loop over quadrature points), of the current quadrature point.
-     * @param rT The stress to be added to
-     * @param rDTdE the stress derivative to be added to, assuming
+     * @param rT The stress will be returned in this parameter
+     * @param rDTdE the stress derivative will be returned in this parameter, assuming
      *   the final parameter is true
-     * @param addToDTdE A boolean flag saying whether the stress derivative is
+     * @param computeDTdE A boolean flag saying whether the stress derivative is
      *   required or not.
      */
-    virtual void AddActiveStressAndStressDerivative(c_matrix<double,DIM,DIM>& rC,
-                                                    unsigned elementIndex,
-                                                    unsigned currentQuadPointGlobalIndex,
-                                                    c_matrix<double,DIM,DIM>& rT,
-                                                    FourthOrderTensor<DIM,DIM,DIM,DIM>& rDTdE,
-                                                    bool addToDTdE)
+    virtual void ComputeStressAndStressDerivative(AbstractMaterialLaw<DIM>* pMaterialLaw,
+                                                  c_matrix<double,DIM,DIM>& rC,
+                                                  c_matrix<double,DIM,DIM>& rInvC,
+                                                  double pressure,
+                                                  unsigned elementIndex,
+                                                  unsigned currentQuadPointGlobalIndex,
+                                                  c_matrix<double,DIM,DIM>& rT,
+                                                  FourthOrderTensor<DIM,DIM,DIM,DIM>& rDTdE,
+                                                  bool computeDTdE)
     {
-        // does nothing - subclass needs to overload this if there are active stresses
+        // Just call the method on the material law
+        pMaterialLaw->ComputeStressAndStressDerivative(rC,rInvC,pressure,rT,rDTdE,computeDTdE);
     }
 
 
@@ -613,6 +618,11 @@ void AbstractNonlinearElasticitySolver<DIM>::GetElementCentroidDeformationGradie
 
     // Allocate memory for the basis functions values and derivative values
     static c_matrix<double, DIM, NUM_NODES_PER_ELEMENT> grad_quad_phi;
+
+//    // Get the material law
+//    AbstractCompressibleMaterialLaw<DIM>* p_material_law
+//       = this->mrProblemDefinition.GetCompressibleMaterialLaw(rElement.GetIndex());
+
     static c_matrix<double,DIM,DIM> grad_u; // grad_u = (du_i/dX_M)
 
     // we need the point in the canonical element which corresponds to the centroid of the
@@ -653,6 +663,13 @@ void AbstractNonlinearElasticitySolver<DIM>::GetElementCentroidDeformationGradie
             rDeformationGradient(i,M) = (i==M?1:0) + grad_u(i,M);
         }
     }
+//
+//        C = prod(trans(F),F);
+//        inv_C = Inverse(C);
+//        inv_F = Inverse(F);
+//
+//        this->ComputeStressAndStressDerivative(p_material_law, C, inv_C, 0.0, rElement.GetIndex(), current_quad_point_global_index,
+//                                               T, dTdE, assembleJacobian);
 }
 
 
