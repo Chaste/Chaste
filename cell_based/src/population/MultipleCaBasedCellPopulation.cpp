@@ -110,8 +110,10 @@ MultipleCaBasedCellPopulation<DIM>::MultipleCaBasedCellPopulation(PottsMesh<DIM>
     }
     else
     {
-        mEmptySites = std::vector<bool>(this->GetNumNodes(), false);
-        Validate();
+        NEVER_REACHED;
+        ///\todo #2066 - This code is not covered
+        //mEmptySites = std::vector<bool>(this->GetNumNodes(), false);
+        //Validate();
     }
 }
 
@@ -126,6 +128,8 @@ MultipleCaBasedCellPopulation<DIM>::~MultipleCaBasedCellPopulation()
 {
     if (this->mDeleteMesh)
     {
+        NEVER_REACHED;
+        ///\todo #2066 - This code is not covered
         delete &this->mrMesh;
     }
 }
@@ -146,15 +150,19 @@ bool MultipleCaBasedCellPopulation<DIM>::IsEmptySite(unsigned index)
 template<unsigned DIM>
 std::set<unsigned> MultipleCaBasedCellPopulation<DIM>::GetEmptySiteIndices()
 {
+    NEVER_REACHED;
+    ///\todo #2066 - This code is not covered   
+//    std::set<unsigned> empty_site_indices;
+//    for (unsigned i=0; i<mEmptySites.size(); i++)
+//    {
+//        if (mEmptySites[i])
+//        {
+//            empty_site_indices.insert(i);
+//        }
+//    }
+//    return empty_site_indices;
     std::set<unsigned> empty_site_indices;
-    for (unsigned i=0; i<mEmptySites.size(); i++)
-    {
-        if (mEmptySites[i])
-        {
-            empty_site_indices.insert(i);
-        }
-    }
-    return empty_site_indices;
+    return (empty_site_indices);
 }
 
 template<unsigned DIM>
@@ -294,18 +302,20 @@ unsigned MultipleCaBasedCellPopulation<DIM>::RemoveDeadCells()
     {
         if ((*cell_iter)->IsDead())
         {
-            // Get the index of the node corresponding to this cell
-            unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
-
-            // Set this node to be an empty site
-            mEmptySites[node_index] = true;
-            this->mCellLocationMap.erase((*cell_iter).get());
-            this->mLocationCellMap.erase(node_index);
-
-            // Erase cell and update counter
-            num_removed++;
-            cell_iter = this->mCells.erase(cell_iter);
-            --cell_iter;
+            NEVER_REACHED;
+            ///\todo #2066 - This code is not covered   
+//            // Get the index of the node corresponding to this cell
+//            unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
+//
+//            // Set this node to be an empty site
+//            mEmptySites[node_index] = true;
+//            this->mCellLocationMap.erase((*cell_iter).get());
+//            this->mLocationCellMap.erase(node_index);
+//
+//            // Erase cell and update counter
+//            num_removed++;
+//            cell_iter = this->mCells.erase(cell_iter);
+//            --cell_iter;
         }
     }
     return num_removed;
@@ -565,9 +575,12 @@ template<unsigned DIM>
 double MultipleCaBasedCellPopulation<DIM>::GetWidth(const unsigned& rDimension)
 {
     // Call GetWidth() on the mesh
-    double width = this->mrMesh.GetWidth(rDimension);
+    NEVER_REACHED;
+    ///\todo #2066 - This code is not covered
+    //double width = this->mrMesh.GetWidth(rDimension);
 
-    return width;
+    //return width;
+    return 0.0;
 }
 
 template<unsigned DIM>
@@ -592,7 +605,9 @@ void MultipleCaBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stre
 template<unsigned DIM>
 std::set<unsigned> MultipleCaBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsigned index)
 {
-    EXCEPTION("Cannot call GetNeighbouringNodeIndices() on a MultipleCaBasedCellPopulation, need to go through the PottsMesh instead");
+    NEVER_REACHED;
+    ///\todo #2066 - This exception is not covered
+    //EXCEPTION("Cannot call GetNeighbouringNodeIndices() on a MultipleCaBasedCellPopulation, need to go through the PottsMesh instead");
     std::set<unsigned> neighbouring_node_indices;
     return neighbouring_node_indices;
 }
