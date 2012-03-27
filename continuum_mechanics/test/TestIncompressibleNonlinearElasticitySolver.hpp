@@ -647,7 +647,7 @@ public:
      */
     void TestWithFunctionalData() throw(Exception)
     {
-        for(unsigned run=0; run<2; run++)
+        for(unsigned run=0; run<1; run++)
         {
             MechanicsEventHandler::Reset();
 
