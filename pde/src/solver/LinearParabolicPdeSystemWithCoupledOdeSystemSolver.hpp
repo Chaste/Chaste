@@ -43,6 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractOdeSystemForCoupledPdeSystem.hpp"
 #include "CvodeAdaptor.hpp"
 #include "BackwardEulerIvpOdeSolver.hpp"
+#include "Warnings.hpp"
 #include "VtkMeshWriter.hpp"
 
 #include <boost/shared_ptr.hpp>
@@ -521,8 +522,8 @@ void LinearParabolicPdeSystemWithCoupledOdeSystemSolver<ELEMENT_DIM, SPACE_DIM, 
     *mpVtkMetaFile << "</VTKFile>\n";
     mpVtkMetaFile->close();
 #else //CHASTE_VTK
-#define COVERAGE_IGNORE // We can't test this in regular builds
-    EXCEPTION("VTK is not installed and is required for this functionality");
+#define COVERAGE_IGNORE // We only test this in weekly builds
+    WARNING("VTK is not installed and is required for this functionality");
 #undef COVERAGE_IGNORE
 #endif //CHASTE_VTK
 }
