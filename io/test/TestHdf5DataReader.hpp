@@ -471,7 +471,21 @@ public:
         writer.AdvanceAlongUnlimitedDimension();
 
         writer.Close();
-        TS_ASSERT_THROWS_CONTAINS(Hdf5DataReader reader2("hdf5_reader", "hdf5_wrong_name"),"Hdf5DataReader could not open ");
+
+        // Test some exceptions
+        {
+            // Check for a missing file exception
+            TS_ASSERT_THROWS_CONTAINS(Hdf5DataReader reader2("hdf5_reader", "hdf5_wrong_name"),
+                                      "as it does not exist");
+
+            // Check for a wrong file format exception
+            OutputFileHandler file_handler("hdf5_reader",false);
+            out_stream p_wrong_format = file_handler.OpenOutputFile("hdf5_wrong_format.h5");
+            p_wrong_format->close();
+            TS_ASSERT_THROWS_CONTAINS(Hdf5DataReader reader2("hdf5_reader", "hdf5_wrong_format"),
+                                      "H5Fopen error code");
+        }
+
         Hdf5DataReader reader("hdf5_reader", "hdf5_test_overtime_exceptions");
 
         TS_ASSERT_THROWS_NOTHING(reader.GetVariableOverTime("Node", 99/*node*/));

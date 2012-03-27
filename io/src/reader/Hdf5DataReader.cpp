@@ -85,14 +85,22 @@ void Hdf5DataReader::CommonConstructor(const FileFinder& rDirectory, const std::
     assert(*(mDirectory.end()-1) == '/'); // paranoia
 
     std::string file_name = results_dir + mBaseName + ".h5";
+    FileFinder h5_file(file_name,RelativeTo::Absolute);
+
+    if (!h5_file.Exists())
+    {
+        EXCEPTION("Hdf5DataReader could not open " + file_name + " , as it does not exist.");
+    }
 
     // Open the file and the main dataset
     mFileId = H5Fopen(file_name.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
 
     if (mFileId <= 0)
     {
-        EXCEPTION("Hdf5DataReader could not open " + file_name);
+        EXCEPTION("Hdf5DataReader could not open " << file_name <<
+                  " , H5Fopen error code = " << mFileId);
     }
+
     mVariablesDatasetId = H5Dopen(mFileId, "Data");
 
     hid_t variables_dataspace = H5Dget_space(mVariablesDatasetId);

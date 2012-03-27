@@ -93,6 +93,13 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
         hid_t property_list_id = H5Pcreate(H5P_FILE_ACCESS);
         H5Pset_fapl_mpio(property_list_id, PETSC_COMM_WORLD, MPI_INFO_NULL);
 
+        FileFinder h5_file(file_name,RelativeTo::Absolute);
+
+        if (!h5_file.Exists())
+        {
+            EXCEPTION("Hdf5DataWriter could not open " + file_name + " , as it does not exist.");
+        }
+
         // Open the file and free the property list
         mFileId = H5Fopen(file_name.c_str(), H5F_ACC_RDWR, property_list_id);
         H5Pclose(property_list_id);
@@ -100,7 +107,8 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
         if (mFileId < 0)
         {
             mDatasetId = 0;
-            EXCEPTION("Hdf5DataWriter could not open " + file_name);
+            EXCEPTION("Hdf5DataWriter could not open " << file_name <<
+                      " , H5Fopen error code = " << mFileId);
         }
 
         // Open the main dataset, and figure out its size/shape
@@ -472,7 +480,8 @@ void Hdf5DataWriter::EndDefineMode()
     H5Pclose(property_list_id);
     if (mFileId < 0)
     {
-        EXCEPTION("Hdf5DataWriter could not create " + file_name);
+        EXCEPTION("Hdf5DataWriter could not create " << file_name <<
+                  " , H5Fcreate error code = " << mFileId);
     }
     mIsInDefineMode = false;
 

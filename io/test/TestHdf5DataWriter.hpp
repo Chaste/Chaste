@@ -1129,15 +1129,25 @@ public:
         DistributedVectorFactory factory(number_nodes);
 
         // Test some exceptions
-        TS_ASSERT_THROWS_THIS(Hdf5DataWriter writer(factory, "hdf5", "hdf5_test_full_format", true, true),
-                              "You are asking to delete a file and then extend it, change arguments to constructor.");
+        {
+            TS_ASSERT_THROWS_THIS(Hdf5DataWriter writer(factory, "hdf5", "hdf5_test_full_format", true, true),
+                                  "You are asking to delete a file and then extend it, change arguments to constructor.");
 
-        TS_ASSERT_THROWS_CONTAINS(Hdf5DataWriter writer(factory, "hdf5", "absent_file", false, true),
-                                  "Hdf5DataWriter could not open");
+            // Check for a wrong file format exception
+            OutputFileHandler file_handler("hdf5",false);
+            out_stream p_wrong_format = file_handler.OpenOutputFile("hdf5_wrong_format.h5");
+            *p_wrong_format << "gobbledegook" << std::endl;
+            p_wrong_format->close();
+            TS_ASSERT_THROWS_CONTAINS(Hdf5DataWriter writer(factory, "hdf5", "hdf5_wrong_format", false, true),
+                                      "H5Fopen error code");
 
-        TS_ASSERT_THROWS_THIS(Hdf5DataWriter writer(factory, "hdf5", "hdf5_test_multi_column", false, true),
-                              "Tried to open a datafile for extending which doesn't have an unlimited dimension.");
+            TS_ASSERT_THROWS_CONTAINS(Hdf5DataWriter writer(factory, "hdf5", "absent_file", false, true),
+                                      "as it does not exist");
 
+            TS_ASSERT_THROWS_THIS(Hdf5DataWriter writer(factory, "hdf5", "hdf5_test_multi_column", false, true),
+                                  "Tried to open a datafile for extending which doesn't have an unlimited dimension.");
+
+        }
         // Open the real file
         Hdf5DataWriter writer(factory, "hdf5", "hdf5_test_full_format", false, true);
 

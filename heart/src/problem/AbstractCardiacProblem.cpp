@@ -731,26 +731,28 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::InitialiseWriter
     // I think this is impossible to trip; certainly it's very difficult!
     assert(!mpWriter);
 
-    try
+    if (extend_file)
     {
-        mpWriter = new Hdf5DataWriter(*mpMesh->GetDistributedVectorFactory(),
-                                      HeartConfig::Instance()->GetOutputDirectory(),
-                                      HeartConfig::Instance()->GetOutputFilenamePrefix(),
-                                      !extend_file, // don't clear directory if extension requested
-                                      extend_file);
+        FileFinder h5_file(OutputFileHandler::GetChasteTestOutputDirectory() + HeartConfig::Instance()->GetOutputDirectory()
+                       + "/" + HeartConfig::Instance()->GetOutputFilenamePrefix() + ".h5",
+                       RelativeTo::Absolute);
+        //We are going to test for existence before creating the file.
+        //Therefore we should make sure that this existence test is thread-safe.
+        //(If another process creates the file too early then we may get the wrong answer to the
+        //existence question).
+        PetscTools::Barrier("InitialiseWriter::Extension check");
+        if (!h5_file.Exists())
+        {
+            extend_file = false;
+        }
+        PetscTools::Barrier("InitialiseWriter::Extension check");
     }
-    catch (Exception& e)
-    {
-        // The constructor only throws an Exception if we're extending
-        assert(extend_file);
-        // Tried to extend and failed, so just create from scratch
-        extend_file = false;
-        mpWriter = new Hdf5DataWriter(*mpMesh->GetDistributedVectorFactory(),
-                                      HeartConfig::Instance()->GetOutputDirectory(),
-                                      HeartConfig::Instance()->GetOutputFilenamePrefix(),
-                                      !extend_file,
-                                      extend_file);
-    }
+    mpWriter = new Hdf5DataWriter(*mpMesh->GetDistributedVectorFactory(),
+                                  HeartConfig::Instance()->GetOutputDirectory(),
+                                  HeartConfig::Instance()->GetOutputFilenamePrefix(),
+                                  !extend_file, // don't clear directory if extension requested
+                                  extend_file);
+
 
     // Define columns, or get the variable IDs from the writer
     DefineWriterColumns(extend_file);
@@ -765,7 +767,6 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::InitialiseWriter
             HeartConfig::Instance()->SetOutputUsingOriginalNodeOrdering(false);
         }
     }
-
 
     if (!extend_file)
     {
