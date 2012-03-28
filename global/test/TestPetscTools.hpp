@@ -374,6 +374,13 @@ public:
 
         PetscTools::Destroy(petsc_vec_uneven);
     }
+
+    void TestHasParMetis()
+    {
+        //This just covers the method, as there is no other way to test if ParMetis is available.
+        std::cout << "Testing to see if Petsc is configured with ParMetis support. " << std::endl;
+        PetscTools::HasParMetis();
+    }
 };
 
 #endif /*TESTPETSCTOOLS_HPP_*/

@@ -408,4 +408,19 @@ void PetscTools::ReadPetscObject(Vec& rVec, const std::string& rOutputFileFullPa
     PetscViewerDestroy(PETSC_DESTROY_PARAM(view));
 }
 
+bool PetscTools::HasParMetis()
+{
+    MatPartitioning part;
+    MatPartitioningCreate(PETSC_COMM_WORLD, &part);
+
+#if (PETSC_VERSION_MAJOR == 2 || (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR < 2))
+    PetscErrorCode parmetis_installed_error = MatPartitioningSetType(part,MAT_PARTITIONING_PARMETIS);
+#else
+    PetscErrorCode parmetis_installed_error = MatPartitioningSetType(part,MATPARTITIONINGPARMETIS);
+#endif
+
+    return (parmetis_installed_error == 0);
+}
+
+
 

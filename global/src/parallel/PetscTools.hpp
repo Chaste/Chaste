@@ -287,6 +287,13 @@ public:
     static void ReadPetscObject(Vec& rVec, const std::string& rOutputFileFullPath, Vec rParallelLayout=NULL);
 
     /**
+     * Checks if Petsc has been configured with ParMetis partioning support.
+     *
+     * @returns true If ParMetis partioning is available
+     */
+    static bool HasParMetis();
+
+    /**
      * Destroy method
      * Note that PETSc 3.1 and previous destroy based on a PETSc object
      * but PETSc 3.2 and later destroy based on a pointer to a PETSc object
@@ -316,7 +323,7 @@ public:
 #else
         MatDestroy(rMat);
 #endif   
-     }        
+     }
 };
 
 #endif /*PETSCTOOLS_HPP_*/

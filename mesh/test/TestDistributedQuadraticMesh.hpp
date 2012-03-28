@@ -111,7 +111,23 @@ public:
     {
         EXIT_IF_SEQUENTIAL //Doesn't make sense to try and partition in sequential
 
+        if(!PetscTools::HasParMetis())
+        {
+            std::cout << "\n\nWarning: ParMetis is not installed. Mesh partitioning not tested." << std::endl;
+            return;
+        }
+
+        //// Note: if this test is run with square_128_elements_quadratic and num_procs > 2, the
+        //// partition returned is junk. Have verified that this is just due to the mesh being
+        //// very coarse - if the following is used to create a finer mesh, the partition looks
+        //// fine for num_procs up to 6 (at least).
+        //QuadraticMesh<2> mesh0(0.01,1.0,1.0);
+        //TrianglesMeshWriter<2,2> writer("", "quad_mesh");
+        //writer.WriteFilesUsingMesh(mesh0);
+        //TrianglesMeshReader<2,2> mesh_reader("../../../../tmp/rafb/testoutput/quad_mesh",2,1,false);
+
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic",2,1, false);
+
         std::vector<unsigned> nodes_permutation;
         std::set<unsigned> nodes_owned;
         std::vector<unsigned> processor_offset;
@@ -119,14 +135,71 @@ public:
         typedef NodePartitioner<2, 2> Partitioner2D;
         Partitioner2D::PetscMatrixPartitioning(mesh_reader, nodes_permutation, nodes_owned, processor_offset);
 
+        if(PetscTools::GetNumProcs() != 2)
+        {
+            return;
+        }
+
+        QuadraticMesh<2> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        // Compute the centre of mass (average position of all the nodes) for each processor,
+        // and check that all the nodes are within a certain distance of the centre of mass.
+        c_vector<double,2> centre_of_mass = zero_vector<double>(2);
+        unsigned counter = 0;
         for(std::set<unsigned>::iterator iter = nodes_owned.begin();
             iter != nodes_owned.end();
             ++iter)
         {
-        //    std::cout << (*iter) << " " << PetscTools::GetMyRank() << std::endl;
+            double x = mesh.GetNode(*iter)->rGetLocation()[0];
+            double y = mesh.GetNode(*iter)->rGetLocation()[1];
+
+            centre_of_mass(0) += x;
+            centre_of_mass(1) += y;
+
+            counter++;
         }
+        centre_of_mass(0) /= counter;
+        centre_of_mass(1) /= counter;
+
+        for(std::set<unsigned>::iterator iter = nodes_owned.begin();
+                    iter != nodes_owned.end();
+                    ++iter)
+        {
+            double dx = mesh.GetNode(*iter)->rGetLocation()[0] - centre_of_mass(0);
+            double dy = mesh.GetNode(*iter)->rGetLocation()[1] - centre_of_mass(1);
+
+            double dist_to_centre_of_mass = sqrt(dx*dx + dy*dy);
+            TS_ASSERT_LESS_THAN(dist_to_centre_of_mass, 0.66);
+        }
+
+        //// For visualising the partition - see the matlab / octave code below
+        //OutputFileHandler handler("TestDistributedQuadMeshPartitioning");
+        //std::stringstream ss;
+        //ss << "res_" << PetscTools::GetNumProcs() << "_" << PetscTools::GetMyRank() << ".txt";
+        //out_stream p_file = handler.OpenOutputFile(ss.str());
+        //
+        //for(std::set<unsigned>::iterator iter = nodes_owned.begin();
+        //    iter != nodes_owned.end();
+        //    ++iter)
+        //{
+        //    *p_file << mesh.GetNode(*iter)->rGetLocation()[0] << " "
+        //              << mesh.GetNode(*iter)->rGetLocation()[1] << std::endl;
+        //}
+        //p_file->close();
     }
 
 };
+
+/*
+function viz_partition(N)
+col = {'*', 'r*', 'k*', 'm*', 'g*', 'y*'};
+figure; hold on;
+for i=0:N-1
+  file = ['/tmp/rafb/testoutput/TestDistributedQuadMeshPartitioning/res_',num2str(N),'_',num2str(i),'.txt'];
+  d = load(file);
+  plot(d(:,1),d(:,2),col{i+1});
+end;
+*/
 
 #endif // TESTDISTRIBUTEDQUADRATICMESH_HPP_

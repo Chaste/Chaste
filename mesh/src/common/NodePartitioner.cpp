@@ -40,8 +40,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscTools.hpp"
 #include "Timer.hpp"
 #include "TrianglesMeshReader.hpp"
-
+#include "Warnings.hpp"
 #include "petscao.h"
+#include "petscmat.h"
 
 /*
  * The following definition fixes an odd incompatibility of METIS 4.0 and Chaste. Since
@@ -214,6 +215,13 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
     assert(PetscTools::IsParallel());
     assert(ELEMENT_DIM==2 || ELEMENT_DIM==3); // Metis works with triangles and tetras
 
+    if(!PetscTools::HasParMetis()) //We must have ParMetis support compiled into Petsc
+    {
+        #define COVERAGE_IGNORE
+        WARNING("Petsc had not been installed with ParMetis support.");
+        #undef COVERAGE_IGNORE
+    }
+
     unsigned num_nodes = rMeshReader.GetNumNodes();
     PetscInt num_procs = PetscTools::GetNumProcs();
     unsigned local_proc_index = PetscTools::GetMyRank();
@@ -343,6 +351,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
     MatPartitioningSetAdjacency(part, adj_matrix);
     MatPartitioningSetFromOptions(part);
     IS new_process_numbers;
+
     MatPartitioningApply(part, &new_process_numbers);
     MatPartitioningDestroy(PETSC_DESTROY_PARAM(part));
 
@@ -433,6 +442,7 @@ template class NodePartitioner<1,3>;
 template class NodePartitioner<2,2>;
 template class NodePartitioner<2,3>;
 template class NodePartitioner<3,3>;
+
 
 
 
