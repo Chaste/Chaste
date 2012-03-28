@@ -117,11 +117,21 @@ public:
                 TS_ASSERT_DELTA(solver.rGetVelocities()[i](1), -y, 1e-8);
             }
 
-            for (unsigned i=0; i<mesh.GetNumVertices(); i++)
+            // test the pressures
+            std::vector<double>& r_pressures = solver.rGetPressures();
+            for (unsigned i=0; i<r_pressures.size(); i++)
             {
-                // solution is in finite element space, so FEM solution will be exact,
-                // apart from linear solver errors
-                TS_ASSERT_DELTA(solver.rGetPressures()[i], 1.0, 1e-8);
+                if(! mesh.GetNode(i)->IsInternal())
+                {
+                    // solution is in finite element space, so FEM solution will be exact,
+                    // apart from linear solver errors
+                    TS_ASSERT_DELTA(r_pressures[i], 1.0, 1e-8);
+                }
+                else
+                {
+                    // dummy variable
+                    TS_ASSERT_DELTA(r_pressures[i], 0.0, 1e-8);
+                }
             }
 
             // check the matrix is symmetric even after Dirichlet BCs have been applied
@@ -192,15 +202,20 @@ public:
             TS_ASSERT_DELTA(solver.rGetVelocities()[i](1), exact_flow_y, 1e-8);
         }
 
-        for (unsigned i=0; i<mesh.GetNumVertices(); i++)
-        {
-            double x = mesh.GetNode(i)->rGetLocation()[0];
-            double exact_pressure = 2*(1-x);
 
-            // solution is in finite element space, so FEM solution will be exact,
-            // apart from linear solver errors
-            TS_ASSERT_DELTA( solver.rGetPressures()[i], exact_pressure, 1e-8);
+        std::vector<double>& r_pressures = solver.rGetPressures();
+        for (unsigned i=0; i<r_pressures.size(); i++)
+        {
+            if(! mesh.GetNode(i)->IsInternal())
+            {
+                double x = mesh.GetNode(i)->rGetLocation()[0];
+            	double exact_pressure = 2*(1-x);
+                // solution is in finite element space, so FEM solution will be exact,
+                // apart from linear solver errors
+                TS_ASSERT_DELTA(r_pressures[i], exact_pressure, 1e-8);
+            }
         }
+
 
         // test output files
         std::string results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "PipeStokesFlow";
@@ -303,15 +318,18 @@ public:
             TS_ASSERT_DELTA(solver.rGetVelocities()[i](1), exact_flow_y, 1e-7);
         }
 
-        for (unsigned i=0; i<mesh.GetNumVertices(); i++)
+        std::vector<double>& r_pressures = solver.rGetPressures();
+        for (unsigned i=0; i<r_pressures.size(); i++)
         {
-            double x = mesh.GetNode(i)->rGetLocation()[0];
-            double exact_pressure = 2*(1-x) + 1;
+            if(! mesh.GetNode(i)->IsInternal())
+            {
+                double x = mesh.GetNode(i)->rGetLocation()[0];
+                double exact_pressure = 2*(1-x) + 1;
 
-            // solution is in FE space
-            TS_ASSERT_DELTA( solver.rGetPressures()[i], exact_pressure, 1e-5);
+                // solution is in FE space
+                TS_ASSERT_DELTA(r_pressures[i], exact_pressure, 1e-5);
+            }
         }
-
     }
 
 
@@ -390,26 +408,34 @@ public:
             }
 
             //Calculate the constant offset between the true solution and the numerical solution.
+            std::vector<double>& r_pressures = solver.rGetPressures();
+
             double pressure_diff = 0.0;
-            for (unsigned index = 0; index < mesh.GetNumVertices(); ++index)
+            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {
-                double x = mesh.GetNode(index)->rGetLocation()[0];
-                double y = mesh.GetNode(index)->rGetLocation()[1];
-                double exact_pressure = 60.0*x*x*y -20.0*y*y*y;
-                pressure_diff += solver.rGetPressures()[index] - exact_pressure;
+                if(! mesh.GetNode(i)->IsInternal())
+                {
+                    double x = mesh.GetNode(i)->rGetLocation()[0];
+                    double y = mesh.GetNode(i)->rGetLocation()[1];
+                    double exact_pressure = 60.0*x*x*y -20.0*y*y*y;
+                    pressure_diff += r_pressures[i] - exact_pressure;
+                }
             }
             pressure_diff /= mesh.GetNumVertices();
 
-            for (unsigned i=0; i<mesh.GetNumVertices(); i++)
+            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {
-                double x = mesh.GetNode(i)->rGetLocation()[0];
-                double y = mesh.GetNode(i)->rGetLocation()[1];
+                if(! mesh.GetNode(i)->IsInternal())
+                {
+                    double x = mesh.GetNode(i)->rGetLocation()[0];
+                    double y = mesh.GetNode(i)->rGetLocation()[1];
 
-                double exact_pressure = 60.0*x*x*y -20.0*y*y*y;
+                    double exact_pressure = 60.0*x*x*y -20.0*y*y*y;
 
-                //TS_ASSERT_DELTA( solver.rGetPressures()[i], exact_pressure + pressure_diff, 1e-0);
+                    //TS_ASSERT_DELTA( r_pressures[i], exact_pressure + pressure_diff, 1e-0);
 
-                L_inf_error_p[run] = std::max(L_inf_error_p[run], fabs(solver.rGetPressures()[i] - exact_pressure - pressure_diff));
+                    L_inf_error_p[run] = std::max(L_inf_error_p[run], fabs(r_pressures[i] - exact_pressure - pressure_diff));
+                }
             }
         }
 

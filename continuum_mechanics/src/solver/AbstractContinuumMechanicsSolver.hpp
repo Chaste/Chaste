@@ -271,6 +271,10 @@ public:
 
     /**
      * Write the pressure solution. Only valid if mCompressibilityType==INCOMPRESSIBLE.
+     * Writes the pressure for ALL nodes on the mesh, including internal nodes (as these are not assumed to
+     * be have indices greater than vertex nodes). As linear basis functions are used for pressure, the
+     * pressure solution is only computed at the vertices, and pressure dummy variables are used at internal
+     * nodes, hence for each internal node, 0 will be written to file.
      *
      * @param counterToAppend append a counter to the file name
      *
@@ -302,7 +306,12 @@ public:
     virtual std::vector<c_vector<double,DIM> >& rGetSpatialSolution()=0;
 
     /**
-     *  Get the pressure, for each vertex in the mesh. Only valid if mCompressibilityType==INCOMPRESSIBLE
+     *  Get the pressure, for each NODE in the mesh. If the node is an internal node of the quadratic mesh
+     *  the pressure is not computed at this node (as linear basis functions are used for the pressure, so
+     *  pressures unknowns are only present at vertices), so a dummy pressure value of 0 is returned in this
+     *  vector.
+     *
+     *  Only valid if mCompressibilityType==INCOMPRESSIBLE
      */
     std::vector<double>& rGetPressures();
 
@@ -456,10 +465,14 @@ std::vector<double>& AbstractContinuumMechanicsSolver<DIM>::rGetPressures()
     assert(mProblemDimension==DIM+1);
 
     mPressureSolution.clear();
-    mPressureSolution.resize(mrQuadMesh.GetNumVertices());
+    mPressureSolution.resize(mrQuadMesh.GetNumNodes());
 
-    for (unsigned i=0; i<mrQuadMesh.GetNumVertices(); i++)
+    for (unsigned i=0; i<mrQuadMesh.GetNumNodes(); i++)
     {
+        if(mrQuadMesh.GetNode(i)->IsInternal())
+        {
+            assert(fabs(mPressureSolution[i])<1e-8);
+        }
         mPressureSolution[i] = mCurrentSolution[mProblemDimension*i + DIM];
     }
     return mPressureSolution;

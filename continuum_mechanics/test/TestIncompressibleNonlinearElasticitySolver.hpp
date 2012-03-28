@@ -376,10 +376,18 @@ public:
 
         // check the final pressure
         std::vector<double>& r_pressures = solver.rGetPressures();
-        TS_ASSERT_EQUALS(r_pressures.size(), mesh.GetNumVertices());
+        TS_ASSERT_EQUALS(r_pressures.size(), mesh.GetNumNodes());
         for (unsigned i=0; i<r_pressures.size(); i++)
         {
-            TS_ASSERT_DELTA(r_pressures[i], 2*c1, 1e-6);
+            if(! mesh.GetNode(i)->IsInternal())
+            {
+                TS_ASSERT_DELTA(r_pressures[i], 2*c1, 1e-6);
+            }
+            else
+            {
+                // dummy variable
+                TS_ASSERT_DELTA(r_pressures[i], 0.0, 1e-6);
+            }
         }
     }
 
@@ -619,11 +627,20 @@ public:
             TS_ASSERT_DELTA( r_solution[i](1), exact_y, 1e-5 );
         }
 
-        for (unsigned i=0; i<mesh.GetNumVertices(); i++)
+        std::vector<double>& r_pressures = solver.rGetPressures();
+        TS_ASSERT_EQUALS(r_pressures.size(), mesh.GetNumNodes());
+        for (unsigned i=0; i<r_pressures.size(); i++)
         {
-            TS_ASSERT_DELTA( solver.rGetPressures()[i], 2*c1*lambda*lambda, 1e-5 );
+            if(! mesh.GetNode(i)->IsInternal())
+            {
+                TS_ASSERT_DELTA(r_pressures[i], 2*c1*lambda*lambda, 1e-5);
+            }
+            else
+            {
+                // dummy variable
+                TS_ASSERT_DELTA(r_pressures[i], 0.0, 1e-6);
+            }
         }
-
 
         MechanicsEventHandler::Headings();
         MechanicsEventHandler::Report();
@@ -724,9 +741,17 @@ public:
                 TS_ASSERT_DELTA(r_solution[i](1), exact_y, 1e-4);
             }
 
-            for (unsigned i=0; i<solver.rGetPressures().size(); i++)
+            std::vector<double>& r_pressures = solver.rGetPressures();
+            for (unsigned i=0; i<r_pressures.size(); i++)
             {
-                TS_ASSERT_DELTA( solver.rGetPressures()[i]/(2*MATERIAL_PARAM), 1.0, 1e-3);
+                if(! mesh.GetNode(i)->IsInternal())
+                {
+                    TS_ASSERT_DELTA( r_pressures[i]/(2*MATERIAL_PARAM), 1.0, 1e-3);
+                }
+                else
+                {
+                    TS_ASSERT_DELTA( r_pressures[i], 0.0, 1e-3);
+                }
             }
 
             MechanicsEventHandler::Headings();
@@ -839,11 +864,21 @@ public:
             TS_ASSERT_DELTA( r_solution[i](1), exact_y, 1e-3 );
         }
 
-        for (unsigned i=0; i<mesh.GetNumVertices(); i++)
+        // check the final pressure
+        std::vector<double>& r_pressures = solver.rGetPressures();
+        TS_ASSERT_EQUALS(r_pressures.size(), mesh.GetNumNodes());
+        for (unsigned i=0; i<r_pressures.size(); i++)
         {
-            TS_ASSERT_DELTA( solver.rGetPressures()[i], 2*c1*lambda*lambda, 5e-2 );
+            if(! mesh.GetNode(i)->IsInternal())
+            {
+                TS_ASSERT_DELTA(r_pressures[i], 2*c1*lambda*lambda, 5e-2 );
+            }
+            else
+            {
+                // dummy variable
+                TS_ASSERT_DELTA(r_pressures[i], 0.0, 1e-8);
+            }
         }
-
 
         MechanicsEventHandler::Headings();
         MechanicsEventHandler::Report();
@@ -962,11 +997,15 @@ public:
             TS_ASSERT_DELTA( r_solution[i](1), exact_y, 1e-5 );
         }
 
-        for (unsigned i=0; i<mesh.GetNumVertices(); i++)
-        {
-            TS_ASSERT_DELTA( solver.rGetPressures()[i], 2*c1*lambda*lambda, 1e-4 );
-        }
 
+        std::vector<double>& r_pressures = solver.rGetPressures();
+        for (unsigned i=0; i<r_pressures.size(); i++)
+        {
+            if(! mesh.GetNode(i)->IsInternal())
+            {
+                TS_ASSERT_DELTA(r_pressures[i], 2*c1*lambda*lambda, 1e-4 );
+            }
+        }
 
         MechanicsEventHandler::Headings();
         MechanicsEventHandler::Report();

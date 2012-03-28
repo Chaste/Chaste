@@ -198,8 +198,10 @@ public:
          * Matlab or Octave, you could do: `x=load('solution.nodes'); plot(x(:,1),x(:,2),'k*')`. For Cmgui output, see below.
          *
          * To get the actual solution from the solver, use these two methods. Note that the first
-         * gets the deformed position (ie the new location, not the displacement), and will be of size
-         * num_total_nodes; the second will be of size num_vertices.
+         * gets the deformed position (ie the new location, not the displacement). They are both of size
+         * num_total_nodes. Since pressure is not computed at internal nodes (linear basis functions are
+         * used for pressure), the pressure value in the following vector is set to 0 for indices corresponding
+         * to internal nodes.
          */
         std::vector<c_vector<double,2> >& r_deformed_positions = solver.rGetDeformedPosition();
         std::vector<double>& r_pressures = solver.rGetPressures();
