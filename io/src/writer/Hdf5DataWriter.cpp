@@ -89,16 +89,15 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
         std::string file_name = results_dir + mBaseName + ".h5";
 
-        // Set up a property list saying how we'll open the file
-        hid_t property_list_id = H5Pcreate(H5P_FILE_ACCESS);
-        H5Pset_fapl_mpio(property_list_id, PETSC_COMM_WORLD, MPI_INFO_NULL);
-
         FileFinder h5_file(file_name,RelativeTo::Absolute);
-
         if (!h5_file.Exists())
         {
             EXCEPTION("Hdf5DataWriter could not open " + file_name + " , as it does not exist.");
         }
+
+        // Set up a property list saying how we'll open the file
+        hid_t property_list_id = H5Pcreate(H5P_FILE_ACCESS);
+        H5Pset_fapl_mpio(property_list_id, PETSC_COMM_WORLD, MPI_INFO_NULL);
 
         // Open the file and free the property list
         mFileId = H5Fopen(file_name.c_str(), H5F_ACC_RDWR, property_list_id);
