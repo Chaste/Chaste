@@ -54,9 +54,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 typedef struct DataAtQuadraturePoint_
 {
-    AbstractContractionModel* ContractionModel;
-    double Stretch;
-    double StretchLastTimeStep;
+    AbstractContractionModel* ContractionModel; /**< Pointer to contraction model at this quadrature point */
+    double Stretch; /**< Stretch (in fibre direction) at this quadrature point */
+    double StretchLastTimeStep; /**< Stretch (in fibre direction) at the previous timestep, at this quadrature point */
 
 } DataAtQuadraturePoint;
 
