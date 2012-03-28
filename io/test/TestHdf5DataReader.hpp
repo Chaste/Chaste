@@ -38,11 +38,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
+#include "Hdf5DataWriter.hpp"
+#include "Hdf5DataReader.hpp"
 #include "PetscSetupAndFinalize.hpp"
 #include "OutputFileHandler.hpp"
 #include "PetscTools.hpp"
-#include "Hdf5DataWriter.hpp"
-#include "Hdf5DataReader.hpp"
 #include "DistributedVectorFactory.hpp"
 
 class TestHdf5DataReader : public CxxTest::TestSuite
