@@ -86,6 +86,9 @@ protected:
      *  Note that there is no vector of all the quadrature points of the mesh;
      *  the quad pointindex is the index that would be obtained by looping over
      *  elements and then looping over quad points.
+     *
+     *  DISTRIBUTED - only holds data for the quad points within elements
+     *  owned by this process.
      */
     std::map<unsigned,DataAtQuadraturePoint> mQuadPointToDataAtQuadPointMap;
 
