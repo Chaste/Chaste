@@ -288,6 +288,10 @@ protected:
     {
     }
 
+    void SetKspSolverAndPcType(KSP solver);
+
+
+
     /////////////////////////////////////////////////////////////
     //
     //    These methods form the non-SNES nonlinear solver
@@ -855,61 +859,17 @@ double AbstractNonlinearElasticitySolver<DIM>::TakeNewtonStep()
 
     KSP solver;
     KSPCreate(PETSC_COMM_WORLD,&solver);
-    PC pc;
-    KSPGetPC(solver, &pc);
 
     KSPSetOperators(solver, mrJacobianMatrix, this->mPreconditionMatrix, DIFFERENT_NONZERO_PATTERN /*in precond between successive solves*/);
 
-    if (this->mCompressibilityType==COMPRESSIBLE)
-    {
-        KSPSetType(solver,KSPCG);
-///\todo #1828 / #1913
-        if(PetscTools::IsSequential())
-        {
-            PCSetType(pc, PCICC);
-            PetscOptionsSetValue("-pc_factor_shift_positive_definite", "");
-        }
-        else
-        {
-            PCSetType(pc, PCBJACOBI);
-        }
-    }
-    else
-    {
-        unsigned num_restarts = 100;
-        KSPSetType(solver,KSPGMRES);
-        KSPGMRESSetRestart(solver,num_restarts);
-
-        #ifndef MECH_USE_HYPRE
-            PCSetType(pc, PCBJACOBI); // BJACOBI = ILU on each block (block = part of matrix on each process)
-        #else
-            /////////////////////////////////////////////////////////////////////////////////////////////////////
-            // Speed up linear solve time massively for larger simulations (in fact GMRES may stagnate without
-            // this for larger problems), by using a AMG preconditioner -- needs HYPRE installed
-            /////////////////////////////////////////////////////////////////////////////////////////////////////
-            PetscOptionsSetValue("-pc_hypre_type", "boomeramg");
-            // PetscOptionsSetValue("-pc_hypre_boomeramg_max_iter", "1");
-            // PetscOptionsSetValue("-pc_hypre_boomeramg_strong_threshold", "0.0");
-
-            PCSetType(pc, PCHYPRE);
-            KSPSetPreconditionerSide(solver, PC_RIGHT);
-
-            // other possible preconditioners..
-            //PCBlockDiagonalMechanics* p_custom_pc = new PCBlockDiagonalMechanics(solver, this->mPreconditionMatrix, mBlock1Size, mBlock2Size);
-            //PCLDUFactorisationMechanics* p_custom_pc = new PCLDUFactorisationMechanics(solver, this->mPreconditionMatrix, mBlock1Size, mBlock2Size);
-            //remember to delete memory..
-            //KSPSetPreconditionerSide(solver, PC_RIGHT);
-        #endif
-    }
-
+    // Set the type of KSP solver (CG, GMRES etc) and preconditioner (ILU, HYPRE, etc)
+    SetKspSolverAndPcType(solver);
 
     //PetscOptionsSetValue("-ksp_monitor","");
     //PetscOptionsSetValue("-ksp_norm_type","natural");
 
     KSPSetFromOptions(solver);
     KSPSetUp(solver);
-
-
 
 
     // Set the linear system absolute tolerance.
@@ -1042,6 +1002,57 @@ double AbstractNonlinearElasticitySolver<DIM>::TakeNewtonStep()
 
     return new_norm_resid;
 }
+
+
+template<unsigned DIM>
+void AbstractNonlinearElasticitySolver<DIM>::SetKspSolverAndPcType(KSP solver)
+{
+    PC pc;
+    KSPGetPC(solver, &pc);
+
+    if (this->mCompressibilityType==COMPRESSIBLE)
+    {
+        KSPSetType(solver,KSPCG);
+        if(PetscTools::IsSequential())
+        {
+            PCSetType(pc, PCICC);
+            PetscOptionsSetValue("-pc_factor_shift_positive_definite", "");
+        }
+        else
+        {
+            PCSetType(pc, PCBJACOBI);
+        }
+    }
+    else
+    {
+        unsigned num_restarts = 100;
+        KSPSetType(solver,KSPGMRES);
+        KSPGMRESSetRestart(solver,num_restarts);
+
+        #ifndef MECH_USE_HYPRE
+            PCSetType(pc, PCBJACOBI); // BJACOBI = ILU on each block (block = part of matrix on each process)
+        #else
+            /////////////////////////////////////////////////////////////////////////////////////////////////////
+            // Speed up linear solve time massively for larger simulations (in fact GMRES may stagnate without
+            // this for larger problems), by using a AMG preconditioner -- needs HYPRE installed
+            /////////////////////////////////////////////////////////////////////////////////////////////////////
+            PetscOptionsSetValue("-pc_hypre_type", "boomeramg");
+            // PetscOptionsSetValue("-pc_hypre_boomeramg_max_iter", "1");
+            // PetscOptionsSetValue("-pc_hypre_boomeramg_strong_threshold", "0.0");
+
+            PCSetType(pc, PCHYPRE);
+            KSPSetPreconditionerSide(solver, PC_RIGHT);
+
+            // other possible preconditioners..
+            //PCBlockDiagonalMechanics* p_custom_pc = new PCBlockDiagonalMechanics(solver, this->mPreconditionMatrix, mBlock1Size, mBlock2Size);
+            //PCLDUFactorisationMechanics* p_custom_pc = new PCLDUFactorisationMechanics(solver, this->mPreconditionMatrix, mBlock1Size, mBlock2Size);
+            //remember to delete memory..
+            //KSPSetPreconditionerSide(solver, PC_RIGHT);
+        #endif
+    }
+}
+
+
 
 template<unsigned DIM>
 void AbstractNonlinearElasticitySolver<DIM>::PrintLineSearchResult(double s, double residNorm)
@@ -1280,6 +1291,11 @@ void AbstractNonlinearElasticitySolver<DIM>::SolveSnes()
     SNESSetType(snes,SNESLS);
     SNESSetTolerances(snes,1e-5,1e-5,1e-5,PETSC_DEFAULT,PETSC_DEFAULT);
     SNESSetMaxLinearSolveFailures(snes,100);
+
+    KSP solver;
+    SNESGetKSP(snes, &solver);
+
+    SetKspSolverAndPcType(solver);
 
     if(mVerbose)
     {
