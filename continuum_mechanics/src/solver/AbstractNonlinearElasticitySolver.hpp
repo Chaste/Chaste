@@ -288,8 +288,15 @@ protected:
     {
     }
 
+    /**
+     * Set the KSP type (CG, GMRES, etc) and the preconditioner type (ILU, ICC etc). Depends on
+     * incompressible or not, and other factors.
+     *
+     * ///\todo #2057 Make better choices here...
+     *
+     * @param solver KSP solver object (Petsc object)
+     */
     void SetKspSolverAndPcType(KSP solver);
-
 
 
     /////////////////////////////////////////////////////////////
@@ -1003,7 +1010,9 @@ double AbstractNonlinearElasticitySolver<DIM>::TakeNewtonStep()
     return new_norm_resid;
 }
 
-
+///////////////////////////////////////
+///\todo #2057 Make better choices..
+///////////////////////////////////////
 template<unsigned DIM>
 void AbstractNonlinearElasticitySolver<DIM>::SetKspSolverAndPcType(KSP solver)
 {
@@ -1295,6 +1304,7 @@ void AbstractNonlinearElasticitySolver<DIM>::SolveSnes()
     KSP solver;
     SNESGetKSP(snes, &solver);
 
+    // Set the type of KSP solver (CG, GMRES etc) and preconditioner (ILU, HYPRE, etc)
     SetKspSolverAndPcType(solver);
 
     if(mVerbose)
