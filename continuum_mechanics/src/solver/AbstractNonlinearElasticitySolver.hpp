@@ -555,10 +555,8 @@ AbstractNonlinearElasticitySolver<DIM>::~AbstractNonlinearElasticitySolver()
 template<unsigned DIM>
 void AbstractNonlinearElasticitySolver<DIM>::FinishAssembleSystem(bool assembleResidual, bool assembleJacobian)
 {
-    if (assembleResidual)
-    {
-        PetscVecTools::Finalise(this->mResidualVector);
-    }
+    PetscVecTools::Finalise(this->mResidualVector);
+
     if (assembleJacobian)
     {
         PetscMatTools::SwitchWriteMode(mrJacobianMatrix);
