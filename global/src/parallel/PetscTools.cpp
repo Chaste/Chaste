@@ -419,6 +419,7 @@ bool PetscTools::HasParMetis()
     PetscErrorCode parmetis_installed_error = MatPartitioningSetType(part,MATPARTITIONINGPARMETIS);
 #endif
 
+    MatPartitioningDestroy(PETSC_DESTROY_PARAM(part));
     return (parmetis_installed_error == 0);
 }
 
