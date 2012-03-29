@@ -495,7 +495,7 @@ public:
      */
     void TestAgainstExactNonlinearSolution() throw(Exception)
     {
-        for(unsigned run = 0; run < 1; run++)
+        for(unsigned run = 0; run < 2; run++)
         {
             unsigned num_elem = 10;
             QuadraticMesh<2> mesh(1.0/num_elem, 1.0, 1.0);

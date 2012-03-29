@@ -1267,16 +1267,19 @@ void AbstractNonlinearElasticitySolver<DIM>::SolveSnes()
         p_initial_guess[local_index] = this->mCurrentSolution[global_index];
     }
     VecRestoreArray(initial_guess, &p_initial_guess);
+    PetscVecTools::Finalise(initial_guess);
 
+    Vec snes_residual_vec;
+    VecDuplicate(this->mResidualVector, &snes_residual_vec);
 
     SNES snes;
 
     SNESCreate(PETSC_COMM_WORLD, &snes);
-    SNESSetFunction(snes, this->mResidualVector, &AbstractNonlinearElasticitySolver_ComputeResidual<DIM>, this);
+    SNESSetFunction(snes, snes_residual_vec, &AbstractNonlinearElasticitySolver_ComputeResidual<DIM>, this);
     SNESSetJacobian(snes, mrJacobianMatrix, this->mPreconditionMatrix, &AbstractNonlinearElasticitySolver_ComputeJacobian<DIM>, this);
     SNESSetType(snes,SNESLS);
-    SNESSetTolerances(snes,1.0e-5,1.0e-5,1.0e-5,PETSC_DEFAULT,PETSC_DEFAULT);
-    SNESSetMaxLinearSolveFailures(snes,1000);
+    SNESSetTolerances(snes,1e-5,1e-5,1e-5,PETSC_DEFAULT,PETSC_DEFAULT);
+    SNESSetMaxLinearSolveFailures(snes,100);
 
     if(mVerbose)
     {
@@ -1346,9 +1349,9 @@ void AbstractNonlinearElasticitySolver<DIM>::ComputeJacobian(Vec currentGuess, M
 
 template<unsigned DIM>
 PetscErrorCode AbstractNonlinearElasticitySolver_ComputeResidual(SNES snes,
-                                                                      Vec currentGuess,
-                                                                      Vec residualVector,
-                                                                      void* pContext)
+                                                                 Vec currentGuess,
+                                                                 Vec residualVector,
+                                                                 void* pContext)
 {
     // Extract the solver from the void*
     AbstractNonlinearElasticitySolver<DIM>* p_solver = (AbstractNonlinearElasticitySolver<DIM>*)pContext;
