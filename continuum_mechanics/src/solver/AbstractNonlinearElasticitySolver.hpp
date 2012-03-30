@@ -1307,6 +1307,7 @@ void AbstractNonlinearElasticitySolver<DIM>::SolveSnes()
         std::stringstream reason_stream;
         reason_stream << reason;
         PetscTools::Destroy(initial_guess);
+        PetscTools::Destroy(snes_residual_vec);
         SNESDestroy(PETSC_DESTROY_PARAM(snes));
         EXCEPTION("Nonlinear Solver did not converge. PETSc reason code:"+reason_stream.str()+" .");
     }
@@ -1317,6 +1318,7 @@ void AbstractNonlinearElasticitySolver<DIM>::SolveSnes()
     mNumNewtonIterations = num_iters;
 
     PetscTools::Destroy(initial_guess);
+    PetscTools::Destroy(snes_residual_vec);
     SNESDestroy(PETSC_DESTROY_PARAM(snes));
 }
 
