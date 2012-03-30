@@ -49,7 +49,8 @@ ContinuumMechanicsProblemDefinition<DIM>::ContinuumMechanicsProblemDefinition(Qu
       mDensity(1.0),
       mBodyForceType(CONSTANT_BODY_FORCE),
       mConstantBodyForce(zero_vector<double>(DIM)),
-      mTractionBoundaryConditionType(NO_TRACTIONS)
+      mTractionBoundaryConditionType(NO_TRACTIONS),
+      mVerboseDuringSolve(false)
 {
 }
 

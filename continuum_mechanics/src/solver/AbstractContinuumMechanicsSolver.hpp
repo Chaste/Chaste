@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "GaussianQuadratureRule.hpp"
 #include "PetscTools.hpp"
 #include "MechanicsEventHandler.hpp"
+#include "CommandLineArguments.hpp"
 
 /**
  *  Simple enumeration for options that can be passed into
@@ -140,6 +141,13 @@ protected:
      * Number of degrees of freedom (equal to mProblemDim*num_nodes)
      */
     unsigned mNumDofs;
+
+    /**
+     * If SetVerboseDuringSolve() is called on the problem definition class, or the command line argument
+     * "-mech_verbose" or "-mech_very_verbose" is given, than this bool will be  set to true and lots
+     * of details about each nonlinear solve (including timing breakdowns) will be printed out
+     */
+    bool mVerbose;
 
     /**
      * Residual vector nonlinear problems.
@@ -345,6 +353,10 @@ AbstractContinuumMechanicsSolver<DIM>::AbstractContinuumMechanicsSolver(Quadrati
       mPreconditionMatrix(NULL)
 {
     assert(DIM==2 || DIM==3);
+
+    mVerbose = (mrProblemDefinition.GetVerboseDuringSolve() ||
+                CommandLineArguments::Instance()->OptionExists("-mech_verbose") ||
+                CommandLineArguments::Instance()->OptionExists("-mech_very_verbose") );
 
     mWriteOutput = (mOutputDirectory != "");
     if (mWriteOutput)

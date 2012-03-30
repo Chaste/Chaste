@@ -48,8 +48,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StokesFlowPreconditionerAssembler.hpp"
 #include "ContinuumMechanicsNeumannBcsAssembler.hpp"
 
-#define STOKES_VERBOSE
-
 /**
  * Finite element solver for Stokes flow problems
  */
@@ -168,17 +166,20 @@ void StokesFlowSolver<DIM>::Solve()
 {
     mrProblemDefinition.Validate();
 
-    #ifdef STOKES_VERBOSE
-    Timer::Reset();
-    #endif
+    if(this->mVerbose)
+    {
+        Timer::Reset();
+    }
 
     // Assemble Jacobian (and preconditioner)
     MechanicsEventHandler::BeginEvent(MechanicsEventHandler::ASSEMBLE);
     AssembleSystem();
     MechanicsEventHandler::EndEvent(MechanicsEventHandler::ASSEMBLE);
-    #ifdef STOKES_VERBOSE
-    Timer::PrintAndReset("AssembleSystem");
-    #endif
+
+    if(this->mVerbose)
+    {
+        Timer::PrintAndReset("AssembleSystem");
+    }
 
     /*
      * Solve the linear system using PETSc GMRES and an LU factorisation
@@ -236,9 +237,10 @@ void StokesFlowSolver<DIM>::Solve()
 //    }
 //    p_file2->close();
 
-    #ifdef STOKES_VERBOSE
-    Timer::PrintAndReset("KSP Setup");
-    #endif
+    if(this->mVerbose)
+    {
+        Timer::PrintAndReset("KSP Setup");
+    }
 
     KSPSolve(solver,this->mLinearSystemRhsVector,solution);
 
@@ -246,12 +248,13 @@ void StokesFlowSolver<DIM>::Solve()
     KSPGetConvergedReason(solver,&reason);
     KSPEXCEPT(reason);
 
-    #ifdef STOKES_VERBOSE
-    Timer::PrintAndReset("KSP Solve");
-    int num_iters;
-    KSPGetIterationNumber(solver, &num_iters);
-    std::cout << "[" << PetscTools::GetMyRank() << "]: Num iterations = " << num_iters << "\n" << std::flush;
-    #endif
+    if(this->mVerbose)
+    {
+        Timer::PrintAndReset("KSP Solve");
+        int num_iters;
+        KSPGetIterationNumber(solver, &num_iters);
+        std::cout << "[" << PetscTools::GetMyRank() << "]: Num iterations = " << num_iters << "\n" << std::flush;
+    }
 
     MechanicsEventHandler::EndEvent(MechanicsEventHandler::SOLVE);
 

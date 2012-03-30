@@ -96,6 +96,9 @@ public:
             problem_defn.SetViscosity(mu);
             problem_defn.SetPrescribedFlowNodes(dirichlet_nodes, dirichlet_flow);
 
+            // coverage
+            problem_defn.SetVerboseDuringSolve();
+
             StokesFlowSolver<2> solver(mesh, problem_defn, "SimpleStokesFlow");
 
             if(run==1)

@@ -49,7 +49,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QuadraticBasisFunction.hpp"
 #include "SolidMechanicsProblemDefinition.hpp"
 #include "DeformedBoundaryElement.hpp"
-#include "CommandLineArguments.hpp"
 #include "Timer.hpp"
 #include "petscsnes.h"
 
@@ -198,13 +197,6 @@ protected:
      *  the ordering if such that the normals are outward-facing
      */
     bool mCheckedOutwardNormals;
-
-    /**
-     * If SetVerboseDuringSolve() is called on the problem definition class, or the command line argument
-     * "-mech_verbose" or "-mech_very_verbose" is given, than this bool will be  set to true and lots
-     * of details about each nonlinear solve (including timing breakdowns) will be printed out
-     */
-    bool mVerbose;
 
     /**
      * If SetUsingSnesSolver() is called on the problem definition class, or the command line argument
@@ -527,10 +519,6 @@ AbstractNonlinearElasticitySolver<DIM>::AbstractNonlinearElasticitySolver(Quadra
       mCurrentTime(0.0),
       mCheckedOutwardNormals(false)
 {
-    mVerbose = (mrProblemDefinition.GetVerboseDuringSolve() ||
-                CommandLineArguments::Instance()->OptionExists("-mech_verbose") ||
-                CommandLineArguments::Instance()->OptionExists("-mech_very_verbose") );
-
     mUseSnesSolver = (mrProblemDefinition.GetSolveUsingSnes() ||
                       CommandLineArguments::Instance()->OptionExists("-mech_use_snes") );
 
@@ -869,7 +857,7 @@ void AbstractNonlinearElasticitySolver<DIM>::VectorSum(std::vector<double>& rX,
 template<unsigned DIM>
 double AbstractNonlinearElasticitySolver<DIM>::TakeNewtonStep()
 {
-    if(mVerbose)
+    if(this->mVerbose)
     {
         Timer::Reset();
     }
@@ -880,7 +868,7 @@ double AbstractNonlinearElasticitySolver<DIM>::TakeNewtonStep()
     MechanicsEventHandler::BeginEvent(MechanicsEventHandler::ASSEMBLE);
     AssembleSystem(true, true);
     MechanicsEventHandler::EndEvent(MechanicsEventHandler::ASSEMBLE);
-    if(mVerbose)
+    if(this->mVerbose)
     {
         Timer::PrintAndReset("AssembleSystem");
     }
@@ -946,7 +934,7 @@ double AbstractNonlinearElasticitySolver<DIM>::TakeNewtonStep()
         KSPSetTolerances(solver, 1e-16, mKspAbsoluteTol, PETSC_DEFAULT, PETSC_DEFAULT /* max iters */); // Note, max iters seems to be 1000 whatever we give here
     }
 
-    if(mVerbose)
+    if(this->mVerbose)
     {
         Timer::PrintAndReset("KSP Setup");
     }
@@ -1013,7 +1001,7 @@ double AbstractNonlinearElasticitySolver<DIM>::TakeNewtonStep()
     }
 
 
-    if(mVerbose)
+    if(this->mVerbose)
     {
         Timer::PrintAndReset("KSP Solve");
         std::cout << "[" << PetscTools::GetMyRank() << "]: Num iterations = " << num_iters << "\n" << std::flush;
@@ -1048,7 +1036,7 @@ double AbstractNonlinearElasticitySolver<DIM>::TakeNewtonStep()
 template<unsigned DIM>
 void AbstractNonlinearElasticitySolver<DIM>::PrintLineSearchResult(double s, double residNorm)
 {
-    if(mVerbose)
+    if(this->mVerbose)
     {
         std::cout << "\tTesting s = " << s << ", |f| = " << residNorm << "\n" << std::flush;
     }
@@ -1058,7 +1046,7 @@ template<unsigned DIM>
 double AbstractNonlinearElasticitySolver<DIM>::UpdateSolutionUsingLineSearch(Vec solution)
 {
     double initial_norm_resid = CalculateResidualNorm();
-    if(mVerbose)
+    if(this->mVerbose)
     {
         std::cout << "\tInitial |f| [corresponding to s=0] is " << initial_norm_resid << "\n"  << std::flush;
     }
@@ -1140,7 +1128,7 @@ double AbstractNonlinearElasticitySolver<DIM>::UpdateSolutionUsingLineSearch(Vec
         #undef COVERAGE_IGNORE
     }
 
-    if(mVerbose)
+    if(this->mVerbose)
     {
         std::cout << "\tBest s = " << damping_values[best_index] << "\n"  << std::flush;
     }
@@ -1166,7 +1154,7 @@ void AbstractNonlinearElasticitySolver<DIM>::SolveNonSnes(double tol)
 
     // Compute residual
     double norm_resid = ComputeResidualAndGetNorm(false);
-    if(mVerbose)
+    if(this->mVerbose)
     {
         std::cout << "\nNorm of residual is " << norm_resid << "\n";
     }
@@ -1190,14 +1178,14 @@ void AbstractNonlinearElasticitySolver<DIM>::SolveNonSnes(double tol)
         #undef COVERAGE_IGNORE
     }
 
-    if(mVerbose)
+    if(this->mVerbose)
     {
         std::cout << "Solving with tolerance " << tol << "\n";
     }
 
     while (norm_resid > tol)
     {
-        if(mVerbose)
+        if(this->mVerbose)
         {
             std::cout <<  "\n-------------------\n"
                       <<   "Newton iteration " << iteration_number
@@ -1207,7 +1195,7 @@ void AbstractNonlinearElasticitySolver<DIM>::SolveNonSnes(double tol)
         // take newton step (and get returned residual)
         norm_resid = TakeNewtonStep();
 
-        if(mVerbose)
+        if(this->mVerbose)
         {
             std::cout << "Norm of residual is " << norm_resid << "\n";
         }
@@ -1289,7 +1277,7 @@ void AbstractNonlinearElasticitySolver<DIM>::SolveSnes()
     // Set the type of KSP solver (CG, GMRES etc) and preconditioner (ILU, HYPRE, etc)
     SetKspSolverAndPcType(solver);
 
-    if(mVerbose)
+    if(this->mVerbose)
     {
         PetscOptionsSetValue("-snes_monitor","");
     }

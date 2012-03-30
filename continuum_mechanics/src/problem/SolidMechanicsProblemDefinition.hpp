@@ -74,9 +74,6 @@ private:
     /** Whether the solver will use Petsc SNES or not. See dox for Set method below */
     bool mSolveUsingSnes;
 
-    /** Whether the solver will be verbose or not. See dox for Set method below */
-    bool mVerboseDuringSolve;
-
     /**
      *  Helper function for checking whether a dynamic_cast succeeded or not, and throwing an exception
      *  if it failed.
@@ -178,7 +175,7 @@ public:
     // The following methods set parameters used by the solver class
     // (AbstractNonlinearElasticitySolver). It is not ideal that they are
     // stored in this class - it would be nicer if this class was just about
-    // the problem, not how it is solver - but in the abscence of a globally
+    // the problem, not how it is solver - but in the absence of a globally
     // accessible config class, this is the best place.
     ///////////////////////////////////////////////////////////////////////////
 
@@ -193,32 +190,12 @@ public:
     }
 
     /**
-     * Tell the solver to be verbose (print details on how the nonlinear solve is progressing), or not.
-     * @param verboseDuringSolve be verbose or not.
-     */
-    void SetVerboseDuringSolve(bool verboseDuringSolve = true)
-    {
-        mVerboseDuringSolve = verboseDuringSolve;
-    }
-
-    /**
      *  Get whether solver should use Petsc SNES nonlinear solver or not
      */
     bool GetSolveUsingSnes()
     {
         return mSolveUsingSnes;
     }
-
-    /**
-     *  Get whether the solver should be verbose or not
-     */
-    bool GetVerboseDuringSolve()
-    {
-        return mVerboseDuringSolve;
-    }
-
-//    bool SetSolverKspTolerance(bool solveUsingSnes);
-
 };
 
 

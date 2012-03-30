@@ -361,9 +361,6 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
         PetscMatTools::Zero(this->mMatrixToAssemble);
     }
 
-//todo!
-//mpPreconditionMatrixLinearSystem->ZeroLhsMatrix();
-
     c_matrix<double, STENCIL_SIZE, STENCIL_SIZE> a_elem = zero_matrix<double>(STENCIL_SIZE,STENCIL_SIZE);
     c_vector<double, STENCIL_SIZE> b_elem = zero_vector<double>(STENCIL_SIZE);
 
@@ -401,8 +398,6 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
             {
                 PetscMatTools::AddMultipleValues<STENCIL_SIZE>(this->mMatrixToAssemble, p_indices, a_elem);
             }
-
-//mpPreconditionMatrixLinearSystem->AddLhsMultipleValues(p_indices, a_elem_precond);
 
             if (this->mAssembleVector)
             {

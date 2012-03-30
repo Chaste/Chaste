@@ -129,6 +129,8 @@ protected:
     /** The values at the nodes with Dirichlet boundary conditions (displacement  */
     std::vector<c_vector<double,DIM> > mDirichletNodeValues;
 
+    /** Whether the solver will be verbose or not. See dox for Set method below */
+    bool mVerboseDuringSolve;
 
 public:
     /**
@@ -141,7 +143,6 @@ public:
     virtual ~ContinuumMechanicsProblemDefinition()
     {
     }
-
 
     /**
      *  Set the density
@@ -280,6 +281,24 @@ public:
      * Derived classes can override but should call this version as well.
      */
     virtual void Validate();
+
+    /**
+     * Tell the solver to be verbose (print details on how the solve is progressing), or not.
+     * @param verboseDuringSolve be verbose or not.
+     */
+    void SetVerboseDuringSolve(bool verboseDuringSolve = true)
+    {
+        mVerboseDuringSolve = verboseDuringSolve;
+    }
+
+    /**
+     *  Get whether the solver should be verbose or not
+     */
+    bool GetVerboseDuringSolve()
+    {
+        return mVerboseDuringSolve;
+    }
+
 };
 
 
