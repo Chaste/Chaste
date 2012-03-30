@@ -200,17 +200,15 @@ protected:
     bool mCheckedOutwardNormals;
 
     /**
-     * If SetVerbose() is called, or the command line argument "-mech_verbose" or "-mech_very_verbose" is given,
-     * than this bool will be  set to true and lots of details about each nonlinear solve (including timing breakdowns)
-     * will be printed out
+     * If SetVerboseDuringSolve() is called on the problem definition class, or the command line argument
+     * "-mech_verbose" or "-mech_very_verbose" is given, than this bool will be  set to true and lots
+     * of details about each nonlinear solve (including timing breakdowns) will be printed out
      */
     bool mVerbose;
 
     /**
-     * If SetUseSnesSolver() is called, or the command line argument "-mech_use_snes" is given,
-     * the Petsc SNES solver (nonlinear solver) will be used.
-     *
-     * WORK IN PROGRESS see #2027
+     * If SetUsingSnesSolver() is called on the problem definition class, or the command line argument
+     *  "-mech_use_snes" is given the Petsc SNES solver (nonlinear solver) will be used.
      */
     bool mUseSnesSolver;
 
@@ -509,26 +507,6 @@ public:
      * calls rGetSpatialSolution().
      */
     std::vector<c_vector<double,DIM> >& rGetDeformedPosition();
-
-    /**
-     * Set the solver to solver to write non-linear solve progress at it solves each
-     * nonlinear system. Can also be called by using the command line parameter "-mech_verbose"
-     * @param verbose  true to set verbosity level to "verbose"
-     */
-    void SetVerbose(bool verbose = true)
-    {
-        mVerbose = verbose;
-    }
-
-    /**
-     * Set whether to use the SNES nonlinear solver or not.
-     * Can also be called by using the command line parameter "-mech_use_snes"
-     * @param useSnesSolver whether to use the snes solver or not
-     */
-    void SetUseSnesSolver(bool useSnesSolver = true)
-    {
-        mUseSnesSolver = useSnesSolver;
-    }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -549,12 +527,14 @@ AbstractNonlinearElasticitySolver<DIM>::AbstractNonlinearElasticitySolver(Quadra
       mCurrentTime(0.0),
       mCheckedOutwardNormals(false)
 {
-      mVerbose = (CommandLineArguments::Instance()->OptionExists("-mech_verbose") ||
-                  CommandLineArguments::Instance()->OptionExists("-mech_very_verbose") );
+    mVerbose = (mrProblemDefinition.GetVerboseDuringSolve() ||
+                CommandLineArguments::Instance()->OptionExists("-mech_verbose") ||
+                CommandLineArguments::Instance()->OptionExists("-mech_very_verbose") );
 
-      mUseSnesSolver = CommandLineArguments::Instance()->OptionExists("-mech_use_snes");
+    mUseSnesSolver = (mrProblemDefinition.GetSolveUsingSnes() ||
+                      CommandLineArguments::Instance()->OptionExists("-mech_use_snes") );
 
-      mChangeOfBasisMatrix = identity_matrix<double>(DIM,DIM);
+    mChangeOfBasisMatrix = identity_matrix<double>(DIM,DIM);
 }
 
 template<unsigned DIM>

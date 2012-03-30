@@ -356,6 +356,24 @@ public:
         TS_ASSERT_THROWS_THIS(problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&comp_mooney_rivlin_law),"Compressibility type was declared as INCOMPRESSIBLE but a compressible material law was given");
         TS_ASSERT_THROWS_THIS(problem_defn.SetMaterialLaw(COMPRESSIBLE,&incomp_mooney_rivlin_law),"Incompressibility type was declared as COMPRESSIBLE but an incompressible material law was given");
 
+        ///////////////////////////////
+        // solver stuff
+        ///////////////////////////////
+        TS_ASSERT_EQUALS(problem_defn.GetSolveUsingSnes(), false);
+        TS_ASSERT_EQUALS(problem_defn.GetVerboseDuringSolve(), false);
+
+        problem_defn.SetSolveUsingSnes();
+        problem_defn.SetVerboseDuringSolve();
+
+        TS_ASSERT_EQUALS(problem_defn.GetSolveUsingSnes(), true);
+        TS_ASSERT_EQUALS(problem_defn.GetVerboseDuringSolve(), true);
+
+        problem_defn.SetSolveUsingSnes(false);
+        problem_defn.SetVerboseDuringSolve(false);
+
+        TS_ASSERT_EQUALS(problem_defn.GetSolveUsingSnes(), false);
+        TS_ASSERT_EQUALS(problem_defn.GetVerboseDuringSolve(), false);
+
     }
 
     void TestStokesFlowProblemDefinition() throw(Exception)

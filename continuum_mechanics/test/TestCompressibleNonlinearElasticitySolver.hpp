@@ -526,15 +526,15 @@ public:
             problem_defn.SetBodyForce(MyBodyForce);
             problem_defn.SetTractionBoundaryConditions(boundary_elems, MyTraction);
 
+            if(run==1)
+            {
+                problem_defn.SetSolveUsingSnes();
+            }
+
             CompressibleNonlinearElasticitySolver<2> solver(mesh,
                                                             problem_defn,
                                                             "comp_nonlin_elas_exact_soln");
 
-
-            if(run==1)
-            {
-                solver.SetUseSnesSolver();
-            }
 
             solver.Solve();
 

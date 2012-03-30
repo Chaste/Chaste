@@ -700,14 +700,15 @@ public:
             problem_defn.SetBodyForce(MyBodyForce);
             problem_defn.SetTractionBoundaryConditions(boundary_elems, MyTraction);
 
+            if(run==1)
+            {
+                problem_defn.SetVerboseDuringSolve(); // coverage
+                problem_defn.SetSolveUsingSnes();
+            }
+
             IncompressibleNonlinearElasticitySolver<2> solver(mesh,
                                                               problem_defn,
                                                               "nonlin_elas_functional_data");
-            if(run==1)
-            {
-                solver.SetVerbose(); // coverage
-                solver.SetUseSnesSolver();
-            }
 
             // this test requires the time to be set to t=1 to pass (see comment
             // in and MyBodyForce() and MyTraction()
@@ -964,6 +965,8 @@ public:
         problem_defn.SetFixedNodes(fixed_nodes, locations);
         problem_defn.SetTractionBoundaryConditions(boundary_elems, tractions);
 
+        // coverage
+        problem_defn.SetVerboseDuringSolve();
 
         IncompressibleNonlinearElasticitySolver<2> solver(mesh,
                                                           problem_defn,
@@ -972,7 +975,6 @@ public:
 
         // coverage
         solver.SetKspAbsoluteTolerance(1e-8);
-        solver.SetVerbose();
 
         solver.Solve();
         TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(), 3u); // 'hardcoded' answer, protects against Jacobian getting messed up
