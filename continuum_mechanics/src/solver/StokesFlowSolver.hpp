@@ -45,6 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscVecTools.hpp"
 #include "StokesFlowProblemDefinition.hpp"
 #include "StokesFlowAssembler.hpp"
+#include "StokesFlowPreconditionerAssembler.hpp"
 #include "ContinuumMechanicsNeumannBcsAssembler.hpp"
 
 #define STOKES_VERBOSE
@@ -63,6 +64,12 @@ private:
 
     /** Assembler for computing volume integral part of matrix and RHS vector */
     StokesFlowAssembler<DIM>* mpStokesFlowAssembler;
+
+    /** Assembler for computing volume integral part of preconditioner matrix (which
+     *  is the same as the system matrix except has a mass matrix in the pressure-pressure
+     *  block
+     */
+    StokesFlowPreconditionerAssembler<DIM>* mpStokesFlowPreconditionerAssembler;
 
     /**
      *  Assembler for adding the surface integral arising from natural
@@ -144,6 +151,7 @@ StokesFlowSolver<DIM>::StokesFlowSolver(QuadraticMesh<DIM>& rQuadMesh,
     assert(!mrProblemDefinition.rGetDirichletNodes().empty());
 
     mpStokesFlowAssembler = new StokesFlowAssembler<DIM>(&this->mrQuadMesh, &mrProblemDefinition);
+    mpStokesFlowPreconditionerAssembler = new StokesFlowPreconditionerAssembler<DIM>(&this->mrQuadMesh, &mrProblemDefinition);
     mpNeumannBcsAssembler = new ContinuumMechanicsNeumannBcsAssembler<DIM>(&this->mrQuadMesh, &mrProblemDefinition);
 }
 
@@ -151,6 +159,7 @@ template<unsigned DIM>
 StokesFlowSolver<DIM>::~StokesFlowSolver()
 {
     delete mpStokesFlowAssembler;
+    delete mpStokesFlowPreconditionerAssembler;
     delete mpNeumannBcsAssembler;
 }
 
@@ -184,7 +193,7 @@ void StokesFlowSolver<DIM>::Solve()
 
     KSP solver;
     KSPCreate(PETSC_COMM_WORLD,&solver);
-    KSPSetOperators(solver, this->mSystemLhsMatrix, this->mSystemLhsMatrix, DIFFERENT_NONZERO_PATTERN /*in precond between successive solves*/);
+    KSPSetOperators(solver, this->mSystemLhsMatrix, this->mPreconditionMatrix, DIFFERENT_NONZERO_PATTERN /*in precond between successive solves*/);
     KSPSetType(solver, KSPGMRES);
 
     if (mKspAbsoluteTol < 0)
@@ -275,9 +284,8 @@ void StokesFlowSolver<DIM>::AssembleSystem()
     mpStokesFlowAssembler->SetVectorToAssemble(this->mLinearSystemRhsVector, true);
     mpStokesFlowAssembler->Assemble();
 
-///\todo! don't use the same assembler for this, use one that puts in C=M...
-    mpStokesFlowAssembler->SetMatrixToAssemble(this->mPreconditionMatrix, true);
-    mpStokesFlowAssembler->AssembleMatrix();
+    mpStokesFlowPreconditionerAssembler->SetMatrixToAssemble(this->mPreconditionMatrix, true);
+    mpStokesFlowPreconditionerAssembler->AssembleMatrix();
 
     mpNeumannBcsAssembler->SetVectorToAssemble(this->mLinearSystemRhsVector, false /*don't zero!*/);
     mpNeumannBcsAssembler->AssembleVector();
