@@ -62,7 +62,18 @@ typedef enum _ApplyDirichletBcsType
 
 
 /**
- *  General base class for continuum mechanics solvers
+ *  General base class for continuum mechanics solvers. Deals with memory allocation,
+ *  writing to file, applying boundary conditions, and adding an identity block (see below)
+ *
+ *  Note: the PROBLEM DIMENSION depends on DIM and whether a compressible or incompressible
+ *  problem is being solved.
+ *  (i) Compressible: mProblemDimension is set to DIM, and the ordering of the unknowns is, for
+ *  2D say: [U1 V1 U2 V2 .. Un Vn]
+ *  (ii) Incompressible: Here we have spatial unknowns (at all nodes of the QuadraticMesh) and
+ *  pressure unknowns (only at the vertices, as linear bases are). We choose mProblemDim = DIM+1,
+ *  use (for parallelisation reasons) the ordering [U1 V1 P1 , .. , Un Vn, Pn], introducing dummy
+ *  variables for pressure unknowns at internal hences, with the equation Pi=0 at these nodes,
+ *  hence the need for an identity block to be added the corresponding parts of the matrix.
  */
 template<unsigned DIM>
 class AbstractContinuumMechanicsSolver
@@ -116,21 +127,20 @@ protected:
     CompressibilityType mCompressibilityType;
 
     /**
-     * Number of degrees of freedom (equal to, in the incompressible case:
-     * DIM*N + M if quadratic-linear bases are used, where there are N total
-     * nodes and M vertices; or DIM*N in the compressible case).
-     */
-    unsigned mNumDofs;
-
-    /**
      *  The problem dimension - the number of unknowns at each node.
      *  For compressible problems, where only the deformation/flow is computed at each node, this is
      *  equal to DIM
      *  For incompressible problems, where pressure is computed as well, this is equal to DIM+1
      *  (there is a pressure variable defined even for internal nodes at which pressure is not computed,
-     *  this is a dummy pressure variable -- done like this for parallelisation reasons).
+     *  this is a dummy pressure variable -- done like this for parallelisation reasons. See above).
      */
     unsigned mProblemDimension;
+
+    /**
+     * Number of degrees of freedom (equal to mProblemDim*num_nodes)
+     */
+    unsigned mNumDofs;
+
     /**
      * Residual vector nonlinear problems.
      *

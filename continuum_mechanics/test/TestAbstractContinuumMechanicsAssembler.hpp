@@ -45,8 +45,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshReader.hpp"
 
 
+
+///////////////////////////////////////////////////////////////////////////////////
+//
+//
+//   See comments about ordering in AbstractContinuumMechanicsAssembler
+//
+//
+///////////////////////////////////////////////////////////////////////////////////
+
+
 // NOTE: The tests in TestStokesFlowAssembler also, essentially, test that this class is performing
 // correctly.
+
 
 template<unsigned DIM>
 class SimpleAssembler : public AbstractContinuumMechanicsAssembler<DIM,true,true>

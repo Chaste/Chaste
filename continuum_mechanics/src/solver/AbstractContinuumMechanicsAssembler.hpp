@@ -52,18 +52,26 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  Abstract class for assembling volume-integral parts of matrices and vectors in continuum
  *  mechanics problems.
  *
- *  For such problems, the matrix has the form
+ *  For such problems, the matrix has, essentially, the form
  *  [A     B1]
  *  [B2^T  C ]
  *  (where often B1=B2 and C=0) and the vector has the form
  *  [b1]
  *  [b2]
+ *  A is the spatial-spatial part, B1 the spatial-pressure part, etc.
  *
  *  Currently B1=B2 is assumed, this can be changed in the future.
  *
  *  This class works in the same way as the volume assembler in pde (AbstractFeVolumeIntegralAssembler),
  *  except the concrete class has to provide up to 6 methods, for each of the blocks A,B1,B2 and for b1
  *  and b2.
+ *
+ *  NOTE: The elemental matrix and vector is as above. The full matrix and vector uses a completely
+ *  different ordering: for parallelisation reasons the pressure variables are interleaved with the
+ *  spatial variables and dummy pressure variables are used for internal nodes. For example, in 2d,
+ *  the ordering is
+ *  [U1 V1 P1 , .. , Un Vn, Pn]
+ *  where n is the total number of nodes.
  *
  */
 template<unsigned DIM, bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX>
@@ -106,7 +114,7 @@ protected:
 
     /**
      *  For a continuum mechanics problem in mixed form (displacement-pressure or velocity-pressure), the matrix
-     *  has the form
+     *  has the form (except see comments about ordering above)
      *  [A     B1]
      *  [B2^T  C ]
      *  (where often B1=B2 and C=0). The function is related to the spatial-spatial block, ie matrix A.
@@ -133,7 +141,7 @@ protected:
 
     /**
      *  For a continuum mechanics problem in mixed form (displacement-pressure or velocity-pressure), the matrix
-     *  has the form
+     *  has the form (except see comments about ordering above)
      *  [A     B1]
      *  [B2^T  C ]
      *  (where often B1=B2 and C=0). The function is related to the spatial-pressure block, ie matrix B1. If
@@ -166,7 +174,7 @@ protected:
 
     /**
      *  For a continuum mechanics problem in mixed form (displacement-pressure or velocity-pressure), the matrix
-     *  has the form
+     *  has the form (except see comments about ordering above)
      *  [A     B1]
      *  [B2^T  C ]
      *  (where often B1=B2 and C=0). The function is related to the pressure-pressure block, ie matrix C.
@@ -194,7 +202,7 @@ protected:
 
     /**
      *  For a continuum mechanics problem in mixed form (displacement-pressure or velocity-pressure), the matrix
-     *  has the form
+     *  has the form (except see comments about ordering above)
      *  [A     B1]
      *  [B2^T  C ]
      *  (where often B1=B2 and C=0) and the vector has the form
@@ -225,7 +233,7 @@ protected:
 
     /**
      *  For a continuum mechanics problem in mixed form (displacement-pressure or velocity-pressure), the matrix
-     *  has the form
+     *  has the form (except see comments about ordering above)
      *  [A     B1]
      *  [B2^T  C ]
      *  (where often B1=B2 and C=0) and the vector has the form
@@ -344,10 +352,12 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
     // Zero the matrix/vector if it is to be assembled
     if (this->mAssembleVector && this->mZeroVectorBeforeAssembly)
     {
+        PetscVecTools::Finalise(this->mVectorToAssemble);
         PetscVecTools::Zero(this->mVectorToAssemble);
     }
     if (this->mAssembleMatrix && this->mZeroMatrixBeforeAssembly)
     {
+        PetscMatTools::Finalise(this->mMatrixToAssemble);
         PetscMatTools::Zero(this->mMatrixToAssemble);
     }
 
@@ -370,6 +380,8 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
         {
             AssembleOnElement(r_element, a_elem, b_elem);
 
+            // Note that a different ordering is used for the elemental matrix compared to the global matrix.
+            // See comments about ordering above.
             unsigned p_indices[STENCIL_SIZE];
             for (unsigned i=0; i<NUM_NODES_PER_ELEMENT; i++)
             {

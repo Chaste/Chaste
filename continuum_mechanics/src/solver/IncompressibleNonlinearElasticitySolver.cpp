@@ -104,6 +104,12 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleSystem(bool assembleR
             //    }
             //}
 
+
+            /////////////////////////////////////////////////////////////////////////////////////////
+            // See comments about ordering at the elemental level vs ordering of the global mat/vec
+            // in eg AbstractContinuumMechanicsAssembler
+            /////////////////////////////////////////////////////////////////////////////////////////
+
             unsigned p_indices[STENCIL_SIZE];
             for (unsigned i=0; i<NUM_NODES_PER_ELEMENT; i++)
             {

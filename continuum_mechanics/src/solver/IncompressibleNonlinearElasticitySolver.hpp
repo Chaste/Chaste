@@ -88,7 +88,8 @@ protected:
     /**
      * Assemble residual or Jacobian on an element, using the current solution
      * stored in mCurrrentSolution. The ordering assumed is (in 2d)
-     * rBElem = [u0 v0 u1 v1 .. u5 v5 p0 p1 p2].
+     * rBElem = [u0 v0 u1 v1 .. u5 v5 p0 p1 p2]. (This ordering in used at the element
+     * level, but not in the global matrix/vector).
      *
      * @param rElement The element to assemble on.
      * @param rAElem The element's contribution to the LHS matrix is returned in this
@@ -136,14 +137,12 @@ protected:
 
     /**
      * Set up the current guess to be the solution given no displacement.
-     * The current solution (in 2d) is order as
-     * [u1 v1 u2 v2 ... uN vN p1 p2 .. pM]
-     * (where there are N total nodes and M vertices)
-     * so the initial guess is
-     * [0 0 0 0 ... 0 0 p1 p2 .. pM]
-     * where p_i are such that T is zero (depends on material law).
+
+     * The initial guess is zero for spatial variables, 0 for
+     * dummy pressure variables, and the appropriate choice of pressure
+     * such that the initial stress is zero (depends on material law)
      *
-     * In a homogeneous problem, all p_i are the same.
+     * In a homogeneous problem, all (the non-dummy) pressures are the same.
      * In a heterogeneous problem, p for a given vertex is the
      * zero-strain-pressure for ONE of the elements containing that
      * vertex (which element containing the vertex is reached LAST). In

@@ -44,13 +44,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  Assembler for setting up (volume-integral parts of) the matrix and vector used in
  *  the FEM discretisation of Stokes' Flow.
  *
- *  The matrix has the block-form
+ *  The matrix has the block-form (except see comment below)
  *  [A   B]
  *  [B^T 0]
- *  and the vector has the block form
+ *  and the vector has the block form (except see comment below)
  *  [b]
  *  [0]
  *
+ *  NOTE: The elemental matrix and vector is as above. The full matrix and vector uses a completely
+ *  different ordering: for parallelisation reasons the pressure variables are interleaved with the
+ *  spatial variables and dummy pressure variables are used for internal nodes. For example, in 2d,
+ *  the ordering is
+ *  [U1 V1 P1 , .. , Un Vn, Pn]
+ *  where n is the total number of nodes.
  */
 template<unsigned DIM>
 class StokesFlowAssembler : public AbstractContinuumMechanicsAssembler<DIM,true,true>
@@ -78,7 +84,7 @@ private:
     StokesFlowProblemDefinition<DIM>* mpProblemDefinition;
 
     /**
-     *  The matrix has the form
+     *  The matrix has the form (except see comments about ordering above)
      *  [A    B ]
      *  [B^T  0 ]
      *  The function is related to the spatial-spatial block, ie matrix A.
@@ -126,7 +132,7 @@ private:
     }
 
     /**
-     *  The matrix has the form
+     *  The matrix has the form (except see comments about ordering above)
      *  [A    B ]
      *  [B^T  0 ]
      *  The function is related to the spatial-pressure block, ie matrix B.
@@ -174,7 +180,7 @@ private:
 
 
     /**
-     *  The matrix has the form
+     *  The matrix has the form (except see comments about ordering above)
      *  [A    B ]
      *  [B^T  0 ]
      *  and the vector has the form

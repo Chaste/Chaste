@@ -316,6 +316,7 @@ std::vector<c_vector<double,DIM> >& StokesFlowSolver<DIM>::rGetSpatialSolution()
     {
         for (unsigned j=0; j<DIM; j++)
         {
+            // DIM+1 is the problem dimension
             this->mSpatialSolution[i](j) = this->mCurrentSolution[(DIM+1)*i+j];
         }
     }

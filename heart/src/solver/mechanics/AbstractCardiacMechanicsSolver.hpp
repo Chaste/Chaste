@@ -504,6 +504,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ComputeDeformationGr
         {
             for (unsigned JJ=0; JJ<DIM; JJ++)
             {
+                // mProblemDimension = DIM for compressible elasticity and DIM+1 for incompressible elasticity
                 element_current_displacements(JJ,II) = this->mCurrentSolution[this->mProblemDimension*p_elem->GetNodeGlobalIndex(II) + JJ];
             }
         }
