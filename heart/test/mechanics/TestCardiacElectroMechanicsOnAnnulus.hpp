@@ -106,8 +106,7 @@ public:
             }
         }
 
-//// ///\todo #2027 investigate SNES by introducing longer end time
-       HeartConfig::Instance()->SetSimulationDuration(20.0);
+       HeartConfig::Instance()->SetSimulationDuration(400.0);
 
        ElectroMechanicsProblemDefinition<2> problem_defn(mechanics_mesh);
 
@@ -118,23 +117,30 @@ public:
 
        problem_defn.SetVariableFibreSheetDirectionsFile("heart/test/data/fibre_tests/circular_annulus_960_elements.ortho", false);
 
-//// ///\todo #2027 introduce internal pressure
-//       std::vector<BoundaryElement<1,2>*> boundary_elems;
-//       for (TetrahedralMesh<2,2>::BoundaryElementIterator iter
-//               = mechanics_mesh.GetBoundaryElementIteratorBegin();
-//             iter != mechanics_mesh.GetBoundaryElementIteratorEnd();
-//             ++iter)
-//       {
-//            ChastePoint<2> centroid = (*iter)->CalculateCentroid();
-//            double r = sqrt( centroid[0]*centroid[0] + centroid[1]*centroid[1] );
-//
-//            if (r < 0.4)
-//            {
-//                BoundaryElement<1,2>* p_element = *iter;
-//                boundary_elems.push_back(p_element);
-//            }
-//       }
-//       problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, -1);
+       // The snes solver seems more robust...
+       problem_defn.SetSolveUsingSnes();
+       //problem_defn.SetVerboseDuringSolve();
+
+       // This is a 2d problem, so a direct solve (LU factorisation) is possible and will speed things up
+       // markedly (might be able to remove this line after #2057 is done..)
+       PetscOptionsSetValue("-pc_type", "lu");
+
+       std::vector<BoundaryElement<1,2>*> boundary_elems;
+       for (TetrahedralMesh<2,2>::BoundaryElementIterator iter
+               = mechanics_mesh.GetBoundaryElementIteratorBegin();
+             iter != mechanics_mesh.GetBoundaryElementIteratorEnd();
+             ++iter)
+       {
+            ChastePoint<2> centroid = (*iter)->CalculateCentroid();
+            double r = sqrt( centroid[0]*centroid[0] + centroid[1]*centroid[1] );
+
+            if (r < 0.4)
+            {
+                BoundaryElement<1,2>* p_element = *iter;
+                boundary_elems.push_back(p_element);
+            }
+       }
+       problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, -1.0 /*1 KPa is about 8mmHg*/);
 
        CardiacElectroMechanicsProblem<2> problem(COMPRESSIBLE,
                                                  &electrics_mesh,
@@ -145,10 +151,11 @@ public:
 
        problem.Solve();
 
-       // we don't really anything, we mainly just want to verify it solves OK. Hardcoded test
-       // of deformed position of top of circle, to check nothing has changed.
-       TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](0), -0.0002, 1e-4);
-       TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](1),  0.4693, 1e-4);
+       // we don't really anything, we mainly just want to verify it solves OK past the initial and through
+       // the cycle. Have visualised.
+       // Hardcoded test of deformed position of top of circle, to check nothing has changed.
+       TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](0),  0.000,  1e-3);
+       TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](1),  0.6020, 1e-3);
 
 
        MechanicsEventHandler::Headings();

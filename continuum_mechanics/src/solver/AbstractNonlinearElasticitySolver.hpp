@@ -758,6 +758,60 @@ void AbstractNonlinearElasticitySolver<DIM>::Solve(double tol)
 
 }
 
+
+///////////////////////////////////////
+///\todo #2057 Make better choices..
+///////////////////////////////////////
+template<unsigned DIM>
+void AbstractNonlinearElasticitySolver<DIM>::SetKspSolverAndPcType(KSP solver)
+{
+    PC pc;
+    KSPGetPC(solver, &pc);
+
+    if (this->mCompressibilityType==COMPRESSIBLE)
+    {
+        KSPSetType(solver,KSPCG);
+        if(PetscTools::IsSequential())
+        {
+            PCSetType(pc, PCICC);
+            PetscOptionsSetValue("-pc_factor_shift_positive_definite", "");
+        }
+        else
+        {
+            PCSetType(pc, PCBJACOBI);
+        }
+    }
+    else
+    {
+        unsigned num_restarts = 100;
+        KSPSetType(solver,KSPGMRES);
+        KSPGMRESSetRestart(solver,num_restarts);
+
+        #ifndef MECH_USE_HYPRE
+            PCSetType(pc, PCBJACOBI); // BJACOBI = ILU on each block (block = part of matrix on each process)
+        #else
+            /////////////////////////////////////////////////////////////////////////////////////////////////////
+            // Speed up linear solve time massively for larger simulations (in fact GMRES may stagnate without
+            // this for larger problems), by using a AMG preconditioner -- needs HYPRE installed
+            /////////////////////////////////////////////////////////////////////////////////////////////////////
+            PetscOptionsSetValue("-pc_hypre_type", "boomeramg");
+            // PetscOptionsSetValue("-pc_hypre_boomeramg_max_iter", "1");
+            // PetscOptionsSetValue("-pc_hypre_boomeramg_strong_threshold", "0.0");
+
+            PCSetType(pc, PCHYPRE);
+            KSPSetPreconditionerSide(solver, PC_RIGHT);
+
+            // other possible preconditioners..
+            //PCBlockDiagonalMechanics* p_custom_pc = new PCBlockDiagonalMechanics(solver, this->mPreconditionMatrix, mBlock1Size, mBlock2Size);
+            //PCLDUFactorisationMechanics* p_custom_pc = new PCLDUFactorisationMechanics(solver, this->mPreconditionMatrix, mBlock1Size, mBlock2Size);
+            //remember to delete memory..
+            //KSPSetPreconditionerSide(solver, PC_RIGHT);
+        #endif
+    }
+}
+
+
+
 ////////////////////////////////////////////////////////////////////
 //  The code for the non-SNES solver - maybe remove all this
 //  as SNES solver appears better
@@ -989,58 +1043,6 @@ double AbstractNonlinearElasticitySolver<DIM>::TakeNewtonStep()
 
     return new_norm_resid;
 }
-
-///////////////////////////////////////
-///\todo #2057 Make better choices..
-///////////////////////////////////////
-template<unsigned DIM>
-void AbstractNonlinearElasticitySolver<DIM>::SetKspSolverAndPcType(KSP solver)
-{
-    PC pc;
-    KSPGetPC(solver, &pc);
-
-    if (this->mCompressibilityType==COMPRESSIBLE)
-    {
-        KSPSetType(solver,KSPCG);
-        if(PetscTools::IsSequential())
-        {
-            PCSetType(pc, PCICC);
-            PetscOptionsSetValue("-pc_factor_shift_positive_definite", "");
-        }
-        else
-        {
-            PCSetType(pc, PCBJACOBI);
-        }
-    }
-    else
-    {
-        unsigned num_restarts = 100;
-        KSPSetType(solver,KSPGMRES);
-        KSPGMRESSetRestart(solver,num_restarts);
-
-        #ifndef MECH_USE_HYPRE
-            PCSetType(pc, PCBJACOBI); // BJACOBI = ILU on each block (block = part of matrix on each process)
-        #else
-            /////////////////////////////////////////////////////////////////////////////////////////////////////
-            // Speed up linear solve time massively for larger simulations (in fact GMRES may stagnate without
-            // this for larger problems), by using a AMG preconditioner -- needs HYPRE installed
-            /////////////////////////////////////////////////////////////////////////////////////////////////////
-            PetscOptionsSetValue("-pc_hypre_type", "boomeramg");
-            // PetscOptionsSetValue("-pc_hypre_boomeramg_max_iter", "1");
-            // PetscOptionsSetValue("-pc_hypre_boomeramg_strong_threshold", "0.0");
-
-            PCSetType(pc, PCHYPRE);
-            KSPSetPreconditionerSide(solver, PC_RIGHT);
-
-            // other possible preconditioners..
-            //PCBlockDiagonalMechanics* p_custom_pc = new PCBlockDiagonalMechanics(solver, this->mPreconditionMatrix, mBlock1Size, mBlock2Size);
-            //PCLDUFactorisationMechanics* p_custom_pc = new PCLDUFactorisationMechanics(solver, this->mPreconditionMatrix, mBlock1Size, mBlock2Size);
-            //remember to delete memory..
-            //KSPSetPreconditionerSide(solver, PC_RIGHT);
-        #endif
-    }
-}
-
 
 
 template<unsigned DIM>
@@ -1326,6 +1328,10 @@ void AbstractNonlinearElasticitySolver<DIM>::SolveSnes()
 template<unsigned DIM>
 void AbstractNonlinearElasticitySolver<DIM>::ComputeResidual(Vec currentGuess, Vec residualVector)
 {
+    // Note: AssembleSystem() assumes the current solution is in this->mCurrentSolution and assembles
+    // this->mResiduaVector and/or this->mrJacobianMatrix. Since PETSc wants us to use the input
+    // currentGuess, and write the output to residualVector, we have to copy do some copies below.
+
     ReplicatableVector guess_repl(currentGuess);
     for(unsigned i=0; i<guess_repl.GetSize(); i++)
     {
@@ -1338,6 +1344,12 @@ void AbstractNonlinearElasticitySolver<DIM>::ComputeResidual(Vec currentGuess, V
 template<unsigned DIM>
 void AbstractNonlinearElasticitySolver<DIM>::ComputeJacobian(Vec currentGuess, Mat* pJacobian, Mat* pPreconditioner)
 {
+    // Note: AssembleSystem() assumes the current solution is in this->mCurrentSolution and assembles
+    // this->mResiduaVector and/or this->mrJacobianMatrix.
+    // We need to copy the input currentGuess into the local mCurrentGuess.
+    // We don't have to copy mrJacobianMatrix to pJacobian, which would be expensive, as they will
+    // point to the same memory.
+
     // check Petsc data corresponds to internal Mats
     assert(mrJacobianMatrix==*pJacobian);
     assert(this->mPreconditionMatrix==*pPreconditioner);

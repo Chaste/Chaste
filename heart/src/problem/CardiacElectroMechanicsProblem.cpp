@@ -505,7 +505,8 @@ void CardiacElectroMechanicsProblem<DIM>::Solve()
     {
         LOG(2, "\nCurrent time = " << stepper.GetTime());
         #define COVERAGE_IGNORE
-        if(   CommandLineArguments::Instance()->OptionExists("-mech_verbose")
+        if(   mpProblemDefinition->GetVerboseDuringSolve()
+           || CommandLineArguments::Instance()->OptionExists("-mech_verbose")
            || CommandLineArguments::Instance()->OptionExists("-mech_very_verbose"))
         {
             // also output time to screen as newton solve information will be output
