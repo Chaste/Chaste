@@ -422,15 +422,15 @@ public:
     {
 #ifdef CHASTE_VTK
     VtkMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_1mm_200_elements.vtu");
+
+    TS_ASSERT_EQUALS(mesh_reader.GetNumFaces(), 40u);
+
     TetrahedralMesh<2,2> mesh;
     mesh.ConstructFromMeshReader(mesh_reader);
 
     TS_ASSERT_EQUALS(mesh.GetNumNodes(), 121u);
     TS_ASSERT_EQUALS(mesh.GetNumElements(), 200u);
-    // The 2D boundary element code is broken ---
-//    TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 40u);
-//    TS_ASSERT_EQUALS(mesh_reader.GetNumFaces(), 40u);
-    //mesh_reader.GetNextFaceData();
+    TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 40u);
 
     std::vector<c_vector<double, 2> > centroid;
     mesh_reader.GetCellData("Centroid", centroid);
@@ -448,6 +448,7 @@ public:
 #ifdef CHASTE_VTK
         VtkMeshReader<2,2> mesh_reader("mesh/test/data/mixed_dimension_meshes/mixed_mesh_2d.vtu");
         TS_ASSERT_EQUALS(mesh_reader.GetNumCableElements(), 10u);
+        TS_ASSERT_EQUALS(mesh_reader.GetNumCableElementAttributes(), 1u);
 
         MixedDimensionMesh<2,2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
         mesh.ConstructFromMeshReader(mesh_reader);
@@ -455,16 +456,14 @@ public:
         // Check we have the right number of nodes & elements
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 121u);
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 200u);
-        ///\todo Fix face filtering in 2D        TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 312u);
-        TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 0u);
+        TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 40u);
         TS_ASSERT_EQUALS(mesh.GetNumCableElements(), 10u);
-
-        ///\todo Check radius data
 
         //Cover exception - note that ConstructFromMeshReader has reset the reader
         for (unsigned i=0; i<10; i++)
         {
-            mesh_reader.GetNextCableElementData();
+            ElementData element_data = mesh_reader.GetNextCableElementData();
+            TS_ASSERT_EQUALS(element_data.AttributeValue, i + 1.5);
         }
         TS_ASSERT_THROWS_THIS(mesh_reader.GetNextCableElementData(), "Trying to read data for a cable element that doesn't exist");
 
@@ -478,6 +477,7 @@ public:
 #ifdef CHASTE_VTK
         VtkMeshReader<3,3> mesh_reader("mesh/test/data/mixed_dimension_meshes/mixed_mesh_3d.vtu");
         TS_ASSERT_EQUALS(mesh_reader.GetNumCableElements(), 5u);
+        TS_ASSERT_EQUALS(mesh_reader.GetNumCableElementAttributes(), 1u);
 
         MixedDimensionMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
         mesh.ConstructFromMeshReader(mesh_reader);
@@ -488,7 +488,14 @@ public:
         ///\todo This should be 616. 621 includes 5 cables in the face filter. TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 621u);
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 0u);
         TS_ASSERT_EQUALS(mesh.GetNumCableElements(), 5u);
-        ///\todo Check radius data
+
+
+        for (MixedDimensionMesh<3,3>::CableElementIterator iter = mesh.GetCableElementIteratorBegin();
+                     iter != mesh.GetCableElementIteratorEnd();
+                     ++iter)
+        {
+            TS_ASSERT_EQUALS((*iter)->GetAttribute(), 2.0);
+        }
 #endif // CHASTE_VTK
     }
 

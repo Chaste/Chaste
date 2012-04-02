@@ -63,6 +63,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkGeometryFilter.h>
 #include <vtkGenericGeometryFilter.h>
 #include <vtkDataCompressor.h>
+#include <vtkFeatureEdges.h>
+#include <vtkDataSetSurfaceFilter.h>
+
 
 #include "UblasVectorInclude.hpp"
 #include "AbstractMeshReader.hpp"
@@ -81,8 +84,11 @@ private:
     /** vtkUnstructuredGrid object: the rest of the class acts as an interface to this */
     vtkUnstructuredGrid* mpVtkUnstructuredGrid;
 
-    /** vtkGeometry filter object to extract the surface elements */
+    /** VTK geometry filter object to extract the surface elements */
     vtkGeometryFilter* mpVtkGeometryFilter;
+
+    /** VTK edge filter object to extract the boundary elements in 2D*/
+    vtkFeatureEdges* mpVtkFilterEdges;
 
     bool mIndexFromZero;             /**< True if input data is numbered from zero, false otherwise */
 
@@ -110,6 +116,14 @@ private:
     unsigned mNodesPerElement;      /**< Number of nodes per element */
 
     int mVtkCellType;               /**< Enumerated as VTK_TETRA in 3D and VTK_TRIANGLE in 2D.  The VTK method GetCellType() returns an int, but this is documented as being non-negative */
+
+    /**
+     * Common constructor which uses the vtkUnstructuredGrid object.  The main constructors
+     * need to make sure that mpVtkUnstructuredGrid is assigned properly.
+     *
+     */
+    void CommonConstructor();
+
 public:
 
     /**
@@ -126,6 +140,8 @@ public:
      * @param p_vtkUnstructuredGrid Pointer to a vtkUnstructuredGrid object
      */
     VtkMeshReader(vtkUnstructuredGrid* p_vtkUnstructuredGrid);
+
+
 
     /**
      * Destructor

@@ -80,24 +80,30 @@ VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::VtkMeshReader(std::string pathBaseName) :
     vtk_xml_unstructured_grid_reader->SetFileName( pathBaseName.c_str() );
     vtk_xml_unstructured_grid_reader->Update();
     mpVtkUnstructuredGrid = vtk_xml_unstructured_grid_reader->GetOutput();
+    CommonConstructor();
+    vtk_xml_unstructured_grid_reader->Delete();
+}
 
-    mNumNodes = vtk_xml_unstructured_grid_reader->GetNumberOfPoints();
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::CommonConstructor()
+{
 
-    unsigned num_cells = vtk_xml_unstructured_grid_reader->GetNumberOfCells();
-
+    mNumNodes = mpVtkUnstructuredGrid->GetNumberOfPoints();
+    unsigned num_cells = mpVtkUnstructuredGrid->GetNumberOfCells();
 
     if (SPACE_DIM == 2)
     {
         mNodesPerElement = 3;
         mVtkCellType = VTK_TRIANGLE;
-        mNumFaces = 0; ///\todo Make the above filter work in 2D
     }
+
     //Determine if we have multiple cell types - such as cable elements in addition to tets/triangles
     vtkCellTypes* cell_types = vtkCellTypes::New();
     mpVtkUnstructuredGrid->GetCellTypes(cell_types);
 
     if(cell_types->GetNumberOfTypes() > 1)
     {
+        mNumCableElementAttributes = 1;
         for(unsigned cell_id = 0; cell_id < num_cells; ++cell_id)
         {
             if(mpVtkUnstructuredGrid->GetCellType(cell_id) == mVtkCellType)
@@ -125,19 +131,29 @@ VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::VtkMeshReader(std::string pathBaseName) :
 
 
     // Extract the surface faces
-    mpVtkGeometryFilter = vtkGeometryFilter::New();
-    mpVtkGeometryFilter->SetInput(mpVtkUnstructuredGrid);
-    mpVtkGeometryFilter->Update();
-    mNumFaces = mpVtkGeometryFilter->GetOutput()->GetNumberOfCells();
-    ///\todo #2052 The boundary face filter includes the cable elements
-    if (mNumCableElements > 0)
+    if (SPACE_DIM == 2)
     {
-        //Stop reading faces
-        mNumFaces =0;
+        vtkDataSetSurfaceFilter* p_surface = vtkDataSetSurfaceFilter::New();
+        p_surface->SetInput(mpVtkUnstructuredGrid);
+        mpVtkFilterEdges = vtkFeatureEdges::New();
+        mpVtkFilterEdges->SetInput(p_surface->GetOutput());
+        mpVtkFilterEdges->Update();
+        mNumFaces = mpVtkFilterEdges->GetOutput()->GetNumberOfCells();
+        p_surface->Delete();
     }
-
-
-    vtk_xml_unstructured_grid_reader->Delete();
+    else
+    {
+        mpVtkGeometryFilter = vtkGeometryFilter::New();
+        mpVtkGeometryFilter->SetInput(mpVtkUnstructuredGrid);
+        mpVtkGeometryFilter->Update();
+        mNumFaces = mpVtkGeometryFilter->GetOutput()->GetNumberOfCells();
+        ///\todo #2052 The boundary face filter includes the cable elements
+        if (mNumCableElements > 0)
+        {
+            //Stop reading faces
+            mNumFaces =0;
+        }
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -160,29 +176,20 @@ VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::VtkMeshReader(vtkUnstructuredGrid* p_vtkUn
     mVtkCellType(VTK_TETRA)
 {
     mpVtkUnstructuredGrid = p_vtkUnstructuredGrid;
-
-    mNumNodes = mpVtkUnstructuredGrid->GetNumberOfPoints();
-    mNumElements = mpVtkUnstructuredGrid->GetNumberOfCells();
-
-    // Extract the surface faces
-    mpVtkGeometryFilter = vtkGeometryFilter::New();
-    mpVtkGeometryFilter->SetInput(mpVtkUnstructuredGrid);
-    mpVtkGeometryFilter->Update();
-
-    mNumFaces = mpVtkGeometryFilter->GetOutput()->GetNumberOfCells();
-    assert (SPACE_DIM == 3);
-//    if (SPACE_DIM == 2)
-//    {
-//        mNodesPerElement = 3;
-//        mVtkCellType = VTK_TRIANGLE;
-//        mNumFaces = 0; ///\todo Make the above filter work in 2D
-//    }
+    CommonConstructor();
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::~VtkMeshReader()
 {
-    mpVtkGeometryFilter->Delete();
+    if (SPACE_DIM == 3)
+    {
+        mpVtkGeometryFilter->Delete();
+    }
+    else
+    {
+        mpVtkFilterEdges->Delete();
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -313,8 +320,8 @@ ElementData VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextCableElementData()
         next_element_data.NodeIndices.push_back(mpVtkUnstructuredGrid->GetCell(next_index)->GetPointId(i));
     }
 
-    /// \todo #2052 Look at the radius data too
-    next_element_data.AttributeValue = 0;
+    vtkDataArray *p_scalars = mpVtkUnstructuredGrid->GetCellData()->GetArray( "Cable radius" );
+    next_element_data.AttributeValue = p_scalars->GetTuple(next_index)[0];
 
     mCableElementsRead++;
     return next_element_data;
@@ -331,11 +338,20 @@ ElementData VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextFaceData()
 
     ElementData next_face_data;
 
-    for (unsigned i = 0; i < (mNodesPerElement-1); i++)
+    if (SPACE_DIM == 3)
     {
-        next_face_data.NodeIndices.push_back(mpVtkGeometryFilter->GetOutput()->GetCell(mBoundaryFacesRead)->GetPointId(i));
+        for (unsigned i = 0; i < (mNodesPerElement-1); i++)
+        {
+            next_face_data.NodeIndices.push_back(mpVtkGeometryFilter->GetOutput()->GetCell(mBoundaryFacesRead)->GetPointId(i));
+        }
     }
-
+    else
+    {
+        for (unsigned i = 0; i < (mNodesPerElement-1); i++)
+        {
+            next_face_data.NodeIndices.push_back(mpVtkFilterEdges->GetOutput()->GetCell(mBoundaryFacesRead)->GetPointId(i));
+        }
+    }
     mBoundaryFacesRead++;
     return next_face_data;
 }
