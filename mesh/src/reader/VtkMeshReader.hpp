@@ -103,6 +103,7 @@ private:
     unsigned mElementsRead;            /**< Number of elements read from file so far */
     unsigned mFacesRead;            /**< Number of faces read from file so far */
     unsigned mBoundaryFacesRead;    /**< Number of boundary faces read from file so far */
+    unsigned mBoundaryFacesSkipped; /**< Number of (not) boundary faces skipped */
     unsigned mCableElementsRead;    /**< Number of cable elements read in. */
 
 
