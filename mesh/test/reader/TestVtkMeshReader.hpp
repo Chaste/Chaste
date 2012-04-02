@@ -476,6 +476,7 @@ public:
     {
 #ifdef CHASTE_VTK
         VtkMeshReader<3,3> mesh_reader("mesh/test/data/mixed_dimension_meshes/mixed_mesh_3d.vtu");
+        TS_ASSERT_EQUALS(mesh_reader.GetNumFaces(), 616u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumCableElements(), 5u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumCableElementAttributes(), 1u);
 
@@ -485,8 +486,7 @@ public:
         // Check we have the right number of nodes & elements
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 387u);
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 1298u);
-        ///\todo This should be 616. 621 includes 5 cables in the face filter. TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 621u);
-        TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 0u);
+        TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 616u);
         TS_ASSERT_EQUALS(mesh.GetNumCableElements(), 5u);
 
 

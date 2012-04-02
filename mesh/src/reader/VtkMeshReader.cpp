@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "VtkMeshReader.hpp"
 #include "Exception.hpp"
-
+#include "Debug.hpp"
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::VtkMeshReader(std::string pathBaseName) :
     mIndexFromZero(true),
@@ -146,13 +146,22 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::CommonConstructor()
         mpVtkGeometryFilter = vtkGeometryFilter::New();
         mpVtkGeometryFilter->SetInput(mpVtkUnstructuredGrid);
         mpVtkGeometryFilter->Update();
-        mNumFaces = mpVtkGeometryFilter->GetOutput()->GetNumberOfCells();
-        ///\todo #2052 The boundary face filter includes the cable elements
+
         if (mNumCableElements > 0)
         {
-            //Stop reading faces
-            mNumFaces =0;
+            //The boundary face filter includes the cable elements - get rid of them
+            vtkPolyData* p_data = mpVtkGeometryFilter->GetOutput();
+            for (unsigned i=0; i<p_data->GetNumberOfCells(); i++)
+            {
+                if (p_data->GetCellType(i) == VTK_LINE)
+                {
+                    p_data->DeleteCell(i);
+                }
+            }
+            p_data->RemoveDeletedCells();
         }
+        mNumFaces = mpVtkGeometryFilter->GetOutput()->GetNumberOfCells();
+
     }
 }
 
