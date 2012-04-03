@@ -136,7 +136,8 @@ void CompressibleNonlinearElasticitySolver<DIM>::AssembleSystem(bool assembleRes
         for (unsigned bc_index=0; bc_index<this->mrProblemDefinition.rGetTractionBoundaryElements().size(); bc_index++)
         {
             BoundaryElement<DIM-1,DIM>& r_boundary_element = *(this->mrProblemDefinition.rGetTractionBoundaryElements()[bc_index]);
-            AssembleOnBoundaryElement(r_boundary_element, a_boundary_elem, b_boundary_elem, assembleResidual, assembleJacobian, bc_index);
+
+            this->AssembleOnBoundaryElement(r_boundary_element, a_boundary_elem, b_boundary_elem, assembleResidual, assembleJacobian, bc_index);
 
             unsigned p_indices[BOUNDARY_STENCIL_SIZE];
             for (unsigned i=0; i<NUM_NODES_PER_BOUNDARY_ELEMENT; i++)
@@ -421,122 +422,10 @@ void CompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
     rAElemPrecond.clear();
     if (assembleJacobian)
     {
-//        for (unsigned index1=0; index1<NUM_NODES_PER_ELEMENT; index1++)
-//        {
-//            for (unsigned index2=0; index2<NUM_NODES_PER_ELEMENT; index2++)
-//            {
-//                for (unsigned dim=0; dim<DIM; dim++)
-//                {
-//                    rAElemPrecond(NUM_NODES_PER_ELEMENT*dim + index1, NUM_NODES_PER_ELEMENT*dim + index2)
-//                        = rAElem(NUM_NODES_PER_ELEMENT*dim + index1, NUM_NODES_PER_ELEMENT*dim + index2);
-//                }
-//            }
-//        }
         rAElemPrecond = rAElem;
     }
 }
 
-template<size_t DIM>
-void CompressibleNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElement(
-            BoundaryElement<DIM-1,DIM>& rBoundaryElement,
-            c_matrix<double,BOUNDARY_STENCIL_SIZE,BOUNDARY_STENCIL_SIZE>& rAelem,
-            c_vector<double,BOUNDARY_STENCIL_SIZE>& rBelem,
-            bool assembleResidual,
-            bool assembleJacobian,
-            unsigned boundaryConditionIndex)
-{
-    rAelem.clear();
-    rBelem.clear();
-
-    if (assembleJacobian && !assembleResidual)
-    {
-        // Nothing to do
-        return;
-    }
-
-    c_vector<double, DIM> weighted_direction;
-    double jacobian_determinant;
-    // note: jacobian determinant may be over-written below
-    this->mrQuadMesh.GetWeightedDirectionForBoundaryElement(rBoundaryElement.GetIndex(), weighted_direction, jacobian_determinant);
-
-    // If the boundary condition is of type PRESSURE_ON_DEFORMED (specified pressures to be
-    // applied in the normal direction on the *deformed* surface, we need to integrate over the
-    // current deformed boundary element, as well as work out the deformed outward normal so
-    // it can be multiplied by the pressure.
-    c_vector<double,DIM> deformed_normal;
-    if (this->mrProblemDefinition.GetTractionBoundaryConditionType()==PRESSURE_ON_DEFORMED)
-    {
-        // collect the current displacements of the vertices (not all the nodes) of the element
-        static std::vector<c_vector<double,DIM> > element_current_displacements(DIM/*num vertices in the element*/);
-        for (unsigned II=0; II<DIM/*num vertices per boundary element*/; II++)
-        {
-            for (unsigned JJ=0; JJ<DIM; JJ++)
-            {
-                element_current_displacements[II](JJ) = this->mCurrentSolution[DIM*rBoundaryElement.GetNodeGlobalIndex(II) + JJ];
-            }
-        }
-        // set up the deformed element
-        this->mDeformedBoundaryElement.ApplyUndeformedElementAndDisplacement(&rBoundaryElement, element_current_displacements);
-        // recompute the jacobian determinant for the deformed element
-        this->mDeformedBoundaryElement.CalculateWeightedDirection(weighted_direction, jacobian_determinant);
-        // compute deformed normal
-        deformed_normal = this->mDeformedBoundaryElement.CalculateNormal();
-    }
-
-    c_vector<double,NUM_NODES_PER_BOUNDARY_ELEMENT> phi;
-
-    for (unsigned quad_index=0; quad_index<this->mpBoundaryQuadratureRule->GetNumQuadPoints(); quad_index++)
-    {
-        double wJ = jacobian_determinant * this->mpBoundaryQuadratureRule->GetWeight(quad_index);
-
-        const ChastePoint<DIM-1>& quad_point = this->mpBoundaryQuadratureRule->rGetQuadPoint(quad_index);
-
-        QuadraticBasisFunction<DIM-1>::ComputeBasisFunctions(quad_point, phi);
-
-        // Get the required traction, interpolating X (slightly inefficiently,
-        // as interpolating using quad bases) if necessary
-        c_vector<double,DIM> traction = zero_vector<double>(DIM);
-        switch (this->mrProblemDefinition.GetTractionBoundaryConditionType())
-        {
-            case FUNCTIONAL_TRACTION:
-            {
-                c_vector<double,DIM> X = zero_vector<double>(DIM);
-                for (unsigned node_index=0; node_index<NUM_NODES_PER_BOUNDARY_ELEMENT; node_index++)
-                {
-                    X += phi(node_index)*this->mrQuadMesh.GetNode( rBoundaryElement.GetNodeGlobalIndex(node_index) )->rGetLocation();
-                }
-                traction = this->mrProblemDefinition.EvaluateTractionFunction(X, this->mCurrentTime);
-                break;
-            }
-            case ELEMENTWISE_TRACTION:
-            {
-                traction = this->mrProblemDefinition.rGetElementwiseTractions()[boundaryConditionIndex];
-                break;
-            }
-            case PRESSURE_ON_DEFORMED:
-            {
-                // see comments above re. PRESSURE_ON_DEFORMED
-                traction = this->mrProblemDefinition.GetNormalPressure()*deformed_normal;
-                break;
-            }
-            default:
-                NEVER_REACHED;
-        }
-
-
-        for (unsigned index=0; index<NUM_NODES_PER_BOUNDARY_ELEMENT*DIM; index++)
-        {
-            unsigned spatial_dim = index%DIM;
-            unsigned node_index = (index-spatial_dim)/DIM;
-
-            assert(node_index < NUM_NODES_PER_BOUNDARY_ELEMENT);
-
-            rBelem(index) -=   traction(spatial_dim)
-                             * phi(node_index)
-                             * wJ;
-        }
-    }
-}
 
 template<size_t DIM>
 CompressibleNonlinearElasticitySolver<DIM>::CompressibleNonlinearElasticitySolver(QuadraticMesh<DIM>& rQuadMesh,

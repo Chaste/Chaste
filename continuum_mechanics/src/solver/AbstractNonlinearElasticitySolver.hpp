@@ -48,7 +48,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractMaterialLaw.hpp"
 #include "QuadraticBasisFunction.hpp"
 #include "SolidMechanicsProblemDefinition.hpp"
-#include "DeformedBoundaryElement.hpp"
 #include "Timer.hpp"
 #include "petscsnes.h"
 
@@ -118,6 +117,12 @@ protected:
     /** Number of nodes per boundary element. */
     static const size_t NUM_NODES_PER_BOUNDARY_ELEMENT = DIM*(DIM+1)/2; // assuming quadratic
 
+    /** Boundary stencil size. Note this is just the number of spatial unknowns on the boundary
+     *  element, because the boundary integral terms (in either compressible or incompressible
+     *  formulations) (i) do not involve pressure and (ii) do not appear in the pressure
+     *  equations (the constraint equations). */
+    static const size_t BOUNDARY_STENCIL_SIZE = DIM*NUM_NODES_PER_BOUNDARY_ELEMENT;
+
     /**
      * Maximum absolute tolerance for Newton solve. The Newton solver uses the absolute tolerance
      * corresponding to the specified relative tolerance, but has a max and min allowable absolute
@@ -175,16 +180,6 @@ protected:
     /** Number of Newton iterations taken in last solve. */
     unsigned mNumNewtonIterations;
 
-
-    /**
-     *  For a particular type of boundary condition - prescribed pressures acting on the deformed
-     *  surface, we need to do surface integrals over the deformed surface. This object is a helper
-     *  object for this, it takes in a base boundary element and a set of displacements, and
-     *  sets up the deformed boundary element. Only used if
-     *  mProblemDefinition.GetTractionBoundaryConditionType()==PRESSURE_ON_DEFORMED)
-     */
-    DeformedBoundaryElement<DIM-1,DIM> mDeformedBoundaryElement;
-
     /**
      * This solver is for static problems, however the body force or surface tractions
      * could be a function of time. The user should call SetCurrentTime() if this is
@@ -203,6 +198,17 @@ protected:
      *  "-mech_use_snes" is given the Petsc SNES solver (nonlinear solver) will be used.
      */
     bool mUseSnesSolver;
+
+    /**
+     * Set the KSP type (CG, GMRES, etc) and the preconditioner type (ILU, ICC etc). Depends on
+     * incompressible or not, and other factors.
+     *
+     * ///\todo #2057 Make better choices here...
+     *
+     * @param solver KSP solver object (Petsc object)
+     */
+    void SetKspSolverAndPcType(KSP solver);
+
 
     /**
      * Assemble the residual vector and/or Jacobian matrix (using the current solution stored
@@ -229,6 +235,12 @@ protected:
      */
     virtual void FinishAssembleSystem(bool assembleResidual, bool assembleLinearSystem);
 
+
+    ////////////////////////////////////////////
+    //
+    // Element level methods
+    //
+    ////////////////////////////////////////////
 
     /**
      * Compute the deformation gradient at the centroid at an element
@@ -278,16 +290,58 @@ protected:
     {
     }
 
-    /**
-     * Set the KSP type (CG, GMRES, etc) and the preconditioner type (ILU, ICC etc). Depends on
-     * incompressible or not, and other factors.
-     *
-     * ///\todo #2057 Make better choices here...
-     *
-     * @param solver KSP solver object (Petsc object)
-     */
-    void SetKspSolverAndPcType(KSP solver);
 
+
+    /**
+     * Compute the term from the surface integral of s*phi, where s is
+     * a specified non-zero surface traction (ie Neumann boundary condition)
+     * to be added to the residual vector.
+     *
+     * Calls AssembleOnBoundaryElementPressureOnDeformed() if appropriate
+     *
+     * @param rBoundaryElement the boundary element to be integrated on
+     * @param rAelem The element's contribution to the LHS matrix is returned. There is no
+     *     need to zero this matrix before calling.
+     * @param rBelem The element's contribution to the RHS vector is returned. There is no
+     *     need to zero this vector before calling.
+     * @param assembleResidual A bool stating whether to assemble the residual vector.
+     * @param assembleJacobian A bool stating whether to assemble the Jacobian matrix.
+     * @param boundaryConditionIndex index of this boundary (in the vectors
+     *     in the problem definition object, in which the boundary conditions are
+     *     stored
+     */
+    void AssembleOnBoundaryElement(BoundaryElement<DIM-1, DIM>& rBoundaryElement,
+                                           c_matrix<double, BOUNDARY_STENCIL_SIZE, BOUNDARY_STENCIL_SIZE>& rAelem,
+                                           c_vector<double, BOUNDARY_STENCIL_SIZE>& rBelem,
+                                           bool assembleResidual,
+                                           bool assembleJacobian,
+                                           unsigned boundaryConditionIndex);
+
+    /**
+     *  Alternative version of AssembleOnBoundaryElement which is used for problems where a normal pressure
+     *  is applied to the deformed body. The traction then depends on the current deformation, specifically
+     *  s = -det(F)*P*F^{-T}N.
+     *
+     *  To compute F we have to find the volume element containing this surface element and use this in the
+     *  computation. See comments in implementation for more details.
+     *
+     * @param rBoundaryElement the boundary element to be integrated on
+     * @param rAelem The element's contribution to the LHS matrix is returned. There is no
+     *     need to zero this matrix before calling.
+     * @param rBelem The element's contribution to the RHS vector is returned. There is no
+     *     need to zero this vector before calling.
+     * @param assembleResidual A bool stating whether to assemble the residual vector.
+     * @param assembleJacobian A bool stating whether to assemble the Jacobian matrix.
+     * @param boundaryConditionIndex index of this boundary (in the vectors
+     *     in the problem definition object, in which the boundary conditions are
+     *     stored
+     */
+    void AssembleOnBoundaryElementPressureOnDeformed(BoundaryElement<DIM-1,DIM>& rBoundaryElement,
+                                                     c_matrix<double,BOUNDARY_STENCIL_SIZE,BOUNDARY_STENCIL_SIZE>& rAelem,
+                                                     c_vector<double,BOUNDARY_STENCIL_SIZE>& rBelem,
+                                                     bool assembleResidual,
+                                                     bool assembleJacobian,
+                                                     unsigned boundaryConditionIndex);
 
     /////////////////////////////////////////////////////////////
     //
@@ -645,6 +699,11 @@ void AbstractNonlinearElasticitySolver<DIM>::CreateCmguiOutput()
     writer.WriteCmguiScript(); // writes LoadSolutions.com
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////
+// Methods at the 'element level'.
+///////////////////////////////////////////////////////////////////////////////////
+
 template<unsigned DIM>
 void AbstractNonlinearElasticitySolver<DIM>::GetElementCentroidDeformationGradient(Element<DIM,DIM>& rElement,
                                                                                    c_matrix<double,DIM,DIM>& rDeformationGradient)
@@ -708,6 +767,254 @@ void AbstractNonlinearElasticitySolver<DIM>::GetElementCentroidDeformationGradie
         }
     }
 }
+
+
+
+template<unsigned DIM>
+void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElement(
+            BoundaryElement<DIM-1,DIM>& rBoundaryElement,
+            c_matrix<double,BOUNDARY_STENCIL_SIZE,BOUNDARY_STENCIL_SIZE>& rAelem,
+            c_vector<double,BOUNDARY_STENCIL_SIZE>& rBelem,
+            bool assembleResidual,
+            bool assembleJacobian,
+            unsigned boundaryConditionIndex)
+{
+    if(this->mrProblemDefinition.GetTractionBoundaryConditionType() == PRESSURE_ON_DEFORMED)
+    {
+        AssembleOnBoundaryElementPressureOnDeformed(rBoundaryElement, rAelem, rBelem,
+                                                    assembleResidual, assembleJacobian, boundaryConditionIndex);
+        return;
+    }
+
+    rAelem.clear();
+    rBelem.clear();
+
+    if (assembleJacobian && !assembleResidual)
+    {
+        // Nothing to do
+        return;
+    }
+
+    c_vector<double, DIM> weighted_direction;
+    double jacobian_determinant;
+    this->mrQuadMesh.GetWeightedDirectionForBoundaryElement(rBoundaryElement.GetIndex(), weighted_direction, jacobian_determinant);
+
+    c_vector<double,NUM_NODES_PER_BOUNDARY_ELEMENT> phi;
+
+    for (unsigned quad_index=0; quad_index<this->mpBoundaryQuadratureRule->GetNumQuadPoints(); quad_index++)
+    {
+        double wJ = jacobian_determinant * this->mpBoundaryQuadratureRule->GetWeight(quad_index);
+
+        const ChastePoint<DIM-1>& quad_point = this->mpBoundaryQuadratureRule->rGetQuadPoint(quad_index);
+
+        QuadraticBasisFunction<DIM-1>::ComputeBasisFunctions(quad_point, phi);
+
+        // Get the required traction, interpolating X (slightly inefficiently,
+        // as interpolating using quad bases) if necessary
+        c_vector<double,DIM> traction = zero_vector<double>(DIM);
+        switch (this->mrProblemDefinition.GetTractionBoundaryConditionType())
+        {
+            case FUNCTIONAL_TRACTION:
+            {
+                c_vector<double,DIM> X = zero_vector<double>(DIM);
+                for (unsigned node_index=0; node_index<NUM_NODES_PER_BOUNDARY_ELEMENT; node_index++)
+                {
+                    X += phi(node_index)*this->mrQuadMesh.GetNode( rBoundaryElement.GetNodeGlobalIndex(node_index) )->rGetLocation();
+                }
+                traction = this->mrProblemDefinition.EvaluateTractionFunction(X, this->mCurrentTime);
+                break;
+            }
+            case ELEMENTWISE_TRACTION:
+            {
+                traction = this->mrProblemDefinition.rGetElementwiseTractions()[boundaryConditionIndex];
+                break;
+            }
+            default:
+                NEVER_REACHED;
+        }
+
+
+        for (unsigned index=0; index<NUM_NODES_PER_BOUNDARY_ELEMENT*DIM; index++)
+        {
+            unsigned spatial_dim = index%DIM;
+            unsigned node_index = (index-spatial_dim)/DIM;
+
+            assert(node_index < NUM_NODES_PER_BOUNDARY_ELEMENT);
+
+            rBelem(index) -=   traction(spatial_dim)
+                             * phi(node_index)
+                             * wJ;
+        }
+    }
+}
+
+
+template<unsigned DIM>
+void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElementPressureOnDeformed(
+            BoundaryElement<DIM-1,DIM>& rBoundaryElement,
+            c_matrix<double,BOUNDARY_STENCIL_SIZE,BOUNDARY_STENCIL_SIZE>& rAelem,
+            c_vector<double,BOUNDARY_STENCIL_SIZE>& rBelem,
+            bool assembleResidual,
+            bool assembleJacobian,
+            unsigned boundaryConditionIndex)
+{
+    assert(this->mrProblemDefinition.GetTractionBoundaryConditionType()==PRESSURE_ON_DEFORMED);
+
+    rAelem.clear();
+    rBelem.clear();
+
+    if (assembleJacobian && !assembleResidual)
+    {
+        // Nothing to do
+        return;
+    }
+
+    c_vector<double, DIM> weighted_direction;
+    double jacobian_determinant;
+    // note: jacobian determinant may be over-written below
+    this->mrQuadMesh.GetWeightedDirectionForBoundaryElement(rBoundaryElement.GetIndex(), weighted_direction, jacobian_determinant);
+
+
+    ///////////////////////////////////////////////////////
+    // Find the volume element of the mesh which
+    // contains this boundary element
+    ///////////////////////////////////////////////////////
+
+    Element<DIM,DIM>* p_containing_vol_element = NULL;
+
+    std::set<unsigned> potential_elements = rBoundaryElement.GetNode(0)->rGetContainingElementIndices();
+    for(std::set<unsigned>::iterator iter = potential_elements.begin();
+        iter != potential_elements.end();
+        iter++)
+    {
+        p_containing_vol_element = this->mrQuadMesh.GetElement(*iter);
+
+        bool this_vol_ele_contains_surf_ele = true;
+        // loop over the nodes of boundary element and see if they are in the volume element
+        for(unsigned i=1; i<NUM_NODES_PER_BOUNDARY_ELEMENT; i++) // don't need to start at 0, given looping over contain elems of node 0
+        {
+            unsigned surf_element_node_index = rBoundaryElement.GetNodeGlobalIndex(i);
+            bool found_this_node = false;
+            for(unsigned j=0; j<p_containing_vol_element->GetNumNodes(); j++)
+            {
+                unsigned vol_element_node_index = p_containing_vol_element->GetNodeGlobalIndex(j);
+                if(surf_element_node_index == vol_element_node_index)
+                {
+                    found_this_node = true;
+                    break;
+                }
+            }
+            if(!found_this_node)
+            {
+                this_vol_ele_contains_surf_ele = false;
+                break;
+            }
+        }
+        if(this_vol_ele_contains_surf_ele)
+        {
+            break;
+        }
+    }
+
+    // We require the volume element to compute F, which requires grad_phi on the volume element. For this we will
+    // need the inverse jacobian for the volume element
+    static c_matrix<double,DIM,DIM> jacobian_vol_element;
+    static c_matrix<double,DIM,DIM> inverse_jacobian_vol_element;
+    double jacobian_determinant_vol_element;
+    this->mrQuadMesh.GetInverseJacobianForElement(p_containing_vol_element->GetIndex(), jacobian_vol_element, jacobian_determinant_vol_element, inverse_jacobian_vol_element);
+
+    // Get the current displacements at each node of the volume element, to be used in computing F
+    static c_matrix<double,DIM,NUM_NODES_PER_ELEMENT> element_current_displacements;
+    for (unsigned II=0; II<NUM_NODES_PER_ELEMENT; II++)
+    {
+        for (unsigned JJ=0; JJ<DIM; JJ++)
+        {
+            element_current_displacements(JJ,II) = this->mCurrentSolution[this->mProblemDimension*p_containing_vol_element->GetNodeGlobalIndex(II) + JJ];
+        }
+    }
+
+
+    // We will need both {grad phi_i} for the quadratic bases of the volume element, for computing F..
+    static c_matrix<double, DIM, NUM_NODES_PER_ELEMENT> grad_quad_phi_vol_element;
+    // ..the phi_i for each of the quadratic bases of the surface element, for the standard FE assembly part.
+    c_vector<double,NUM_NODES_PER_BOUNDARY_ELEMENT> quad_phi_surf_element;
+
+    c_matrix<double,DIM,DIM> F;
+    c_matrix<double,DIM,DIM> invF;
+
+    for (unsigned quad_index=0; quad_index<this->mpBoundaryQuadratureRule->GetNumQuadPoints(); quad_index++)
+    {
+        double wJ = jacobian_determinant * this->mpBoundaryQuadratureRule->GetWeight(quad_index);
+
+        // Get the quadrature point on this surface element (in canonical space) - so eg, for a 2D problem,
+        // the quad point is in 1D space
+        const ChastePoint<DIM-1>& quadrature_point = this->mpBoundaryQuadratureRule->rGetQuadPoint(quad_index);
+        QuadraticBasisFunction<DIM-1>::ComputeBasisFunctions(quadrature_point, quad_phi_surf_element);
+
+        // We will need the xi coordinates of this quad point in the volume element. We could do this by figuring
+        // out how the nodes of the surface element are ordered in the list of nodes in the volume element,
+        // however it is less fiddly to compute directly. Firstly, compute the corresponding physical location
+        // of the quad point, by interpolating
+        c_vector<double,DIM> X = zero_vector<double>(DIM);
+        for (unsigned node_index=0; node_index<NUM_NODES_PER_BOUNDARY_ELEMENT; node_index++)
+        {
+            X += quad_phi_surf_element(node_index)*rBoundaryElement.GetNode(node_index)->rGetLocation();
+        }
+
+
+        // Now compute the xi coordinates of the quad point in the volume element
+        c_vector<double,DIM+1> weight = p_containing_vol_element->CalculateInterpolationWeights(X);
+        c_vector<double,DIM> xi;
+        for(unsigned i=0; i<DIM; i++)
+        {
+            xi(i) = weight(i+1); // Note, in 2d say, weights = [1-xi(0)-xi(1), xi(0), xi(1)]
+        }
+
+        // check one of the weights was zero, as the quad point is on the boundary of the volume element
+        if(DIM==2)
+        {
+            assert( (fabs(weight(0))<1e-6) || (fabs(weight(1))<1e-6) || (fabs(weight(2))<1e-6) );
+        }
+        else
+        {
+            assert( (fabs(weight(0))<1e-6) || (fabs(weight(1))<1e-6) || (fabs(weight(2))<1e-6)  || (fabs(weight(3))<1e-6) );
+        }
+
+        // Now we can compute the grad_phi and then interpolate F
+        QuadraticBasisFunction<DIM>::ComputeTransformedBasisFunctionDerivatives(xi, inverse_jacobian_vol_element, grad_quad_phi_vol_element);
+
+        F = identity_matrix<double>(DIM,DIM);
+        for (unsigned node_index=0; node_index<NUM_NODES_PER_ELEMENT; node_index++)
+        {
+            for (unsigned i=0; i<DIM; i++)
+            {
+                for (unsigned M=0; M<DIM; M++)
+                {
+                    F(i,M) += grad_quad_phi_vol_element(M,node_index)*element_current_displacements(i,node_index);
+                }
+            }
+        }
+
+        // Compute the traction
+        double detF = Determinant(F);
+        invF = Inverse(F);
+        c_vector<double,DIM> traction = detF*this->mrProblemDefinition.GetNormalPressure()*prod(trans(invF),rBoundaryElement.CalculateNormal());
+
+        // assemble
+        for (unsigned index=0; index<NUM_NODES_PER_BOUNDARY_ELEMENT*DIM; index++)
+        {
+            unsigned spatial_dim = index%DIM;
+            unsigned node_index = (index-spatial_dim)/DIM;
+
+            assert(node_index < NUM_NODES_PER_BOUNDARY_ELEMENT);
+
+            rBelem(index) -=   traction(spatial_dim)
+                             * quad_phi_surf_element(node_index)
+                             * wJ;
+        }
+    }
+}
+
 
 
 

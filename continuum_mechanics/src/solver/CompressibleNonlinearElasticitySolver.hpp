@@ -109,32 +109,6 @@ protected:
                                    bool assembleJacobian);
 
     /**
-     * Compute the term from the surface integral of s*phi, where s is
-     * a specified non-zero surface traction (ie Neumann boundary condition)
-     * to be added to the Rhs vector.
-     *
-     * @param rBoundaryElement the boundary element to be integrated on
-     * @param rAelem The element's contribution to the LHS matrix is returned in this
-     *     n by n matrix, where n is the no. of nodes in this element. There is no
-     *     need to zero this matrix before calling.
-     * @param rBelem The element's contribution to the RHS vector is returned in this
-     *     vector of length n, the no. of nodes in this element. There is no
-     *     need to zero this vector before calling.
-     * @param assembleResidual A bool stating whether to assemble the residual vector.
-     * @param assembleJacobian A bool stating whether to assemble the Jacobian matrix.
-     * @param boundaryConditionIndex index of this boundary (in the vectors
-     *     in the problem definition object, in which the boundary conditions are
-     *     stored
-     */
-    virtual void AssembleOnBoundaryElement(BoundaryElement<DIM-1, DIM>& rBoundaryElement,
-                                           c_matrix<double, BOUNDARY_STENCIL_SIZE, BOUNDARY_STENCIL_SIZE>& rAelem,
-                                           c_vector<double, BOUNDARY_STENCIL_SIZE>& rBelem,
-                                           bool assembleResidual,
-                                           bool assembleJacobian,
-                                           unsigned boundaryConditionIndex);
-
-
-    /**
      * Assemble the residual vector (using the current solution stored
      * in mCurrentSolution, output going to mpLinearSystem->rGetRhsVector),
      * or Jacobian matrix (using the current solution stored in

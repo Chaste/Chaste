@@ -579,8 +579,8 @@ public:
                                                                                  problem_defn,
                                                                                  "");
 
-                c_matrix<double,8,8> a_elem_incompressible;
-                c_vector<double,8> b_elem_incompressible;
+                c_matrix<double,6,6> a_elem_incompressible;
+                c_vector<double,6> b_elem_incompressible;
 
                 for(unsigned i=0; i<mesh.GetNumNodes(); i++)
                 {
@@ -595,7 +595,6 @@ public:
 
                 incompressible_solver.AssembleOnBoundaryElement(*(boundary_elems[0]), a_elem_incompressible, b_elem_incompressible, true, false, 0);
 
-                // incompressible_b = [compressible_b  0 0 ]
                 for(unsigned i=0; i<6; i++)
                 {
                     TS_ASSERT_DELTA( b_elem_incompressible(i), b_elem(i), 1e-12 );

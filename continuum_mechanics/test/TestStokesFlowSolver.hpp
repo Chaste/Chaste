@@ -47,11 +47,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NumericFileComparison.hpp"
 
 // add 3d test, add test to TestStokesWithLidCavity
-//
-// Why not parallel
-//
-// Better preconditioner (mass matrix in C-block),
-
 
 class TestStokesFlowSolver : public CxxTest::TestSuite
 {

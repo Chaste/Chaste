@@ -143,14 +143,15 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleSystem(bool assembleR
     }
 
     // Loop over specified boundary elements and compute surface traction terms
-    c_vector<double, BOUNDARY_STENCIL_SIZE> b_boundary_elem;
+    c_vector<double, BOUNDARY_STENCIL_SIZE> b_boundary_elem; // note BOUNDARY_STENCIL_SIZE = DIM*NUM_BOUNDARY_NODES, as all pressure block is zero
     c_matrix<double, BOUNDARY_STENCIL_SIZE, BOUNDARY_STENCIL_SIZE> a_boundary_elem;
     if (this->mrProblemDefinition.GetTractionBoundaryConditionType() != NO_TRACTIONS)
     {
         for (unsigned bc_index=0; bc_index<this->mrProblemDefinition.rGetTractionBoundaryElements().size(); bc_index++)
         {
             BoundaryElement<DIM-1,DIM>& r_boundary_element = *(this->mrProblemDefinition.rGetTractionBoundaryElements()[bc_index]);
-            AssembleOnBoundaryElement(r_boundary_element, a_boundary_elem, b_boundary_elem, assembleResidual, assembleJacobian, bc_index);
+
+            this->AssembleOnBoundaryElement(r_boundary_element, a_boundary_elem, b_boundary_elem, assembleResidual, assembleJacobian, bc_index);
 
             unsigned p_indices[BOUNDARY_STENCIL_SIZE];
             for (unsigned i=0; i<NUM_NODES_PER_BOUNDARY_ELEMENT; i++)
@@ -162,12 +163,6 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleSystem(bool assembleR
                 }
             }
 
-            for (unsigned i=0; i<DIM /*vertices per boundary elem */; i++)
-            {
-                // note: DIM+1, on the right hand side of the below, is the problem dimension (= this->mProblemDimension)
-                p_indices[DIM*NUM_NODES_PER_BOUNDARY_ELEMENT + i] = (DIM+1)*r_boundary_element.GetNodeGlobalIndex(i) + DIM;
-            }
-
             if (assembleJacobian)
             {
                 PetscMatTools::AddMultipleValues<BOUNDARY_STENCIL_SIZE>(this->mrJacobianMatrix, p_indices, a_boundary_elem);
@@ -177,14 +172,6 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleSystem(bool assembleR
             if (assembleResidual)
             {
                 PetscVecTools::AddMultipleValues<BOUNDARY_STENCIL_SIZE>(this->mResidualVector, p_indices, b_boundary_elem);
-            }
-
-            // Some extra checking
-            if (DIM==2)
-            {
-                assert(8==BOUNDARY_STENCIL_SIZE);
-                assert(b_boundary_elem(6)==0);
-                assert(b_boundary_elem(7)==0);
             }
         }
     }
@@ -556,271 +543,6 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
         }
     }
 }
-
-template<size_t DIM>
-void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElement(
-            BoundaryElement<DIM-1,DIM>& rBoundaryElement,
-            c_matrix<double,BOUNDARY_STENCIL_SIZE,BOUNDARY_STENCIL_SIZE>& rAelem,
-            c_vector<double,BOUNDARY_STENCIL_SIZE>& rBelem,
-            bool assembleResidual,
-            bool assembleJacobian,
-            unsigned boundaryConditionIndex)
-{
-    rAelem.clear();
-    rBelem.clear();
-
-    if (assembleJacobian && !assembleResidual)
-    {
-        // Nothing to do
-        return;
-    }
-
-    c_vector<double, DIM> weighted_direction;
-    double jacobian_determinant;
-    // note: jacobian determinant may be over-written below
-    this->mrQuadMesh.GetWeightedDirectionForBoundaryElement(rBoundaryElement.GetIndex(), weighted_direction, jacobian_determinant);
-
-
-    // If the boundary condition is of type PRESSURE_ON_DEFORMED (specified pressures to be
-    // applied in the normal direction on the *deformed* surface, we need to integrate over the
-    // current deformed boundary element, as well as work out the deformed outward normal so
-    // it can be multiplied by the pressure.
-    c_vector<double,DIM> deformed_normal;
-    if (this->mrProblemDefinition.GetTractionBoundaryConditionType()==PRESSURE_ON_DEFORMED)
-    {
-        // collect the current displacements of the vertices (not all the nodes) of the element
-        static std::vector<c_vector<double,DIM> > element_current_displacements(DIM/*num vertices in the element*/);
-        for (unsigned II=0; II<DIM/*num vertices per boundary element*/; II++)
-        {
-            for (unsigned JJ=0; JJ<DIM; JJ++)
-            {
-                // note: DIM+1 is the problem dimension (= this->mProblemDimension)
-                element_current_displacements[II](JJ) = this->mCurrentSolution[(DIM+1)*rBoundaryElement.GetNodeGlobalIndex(II) + JJ];
-            }
-        }
-
-        // collect the current displacements of the vertices (not all the nodes) of the element
-        this->mDeformedBoundaryElement.ApplyUndeformedElementAndDisplacement(&rBoundaryElement, element_current_displacements);
-        // recompute the jacobian determinant for the deformed element
-        this->mDeformedBoundaryElement.CalculateWeightedDirection(weighted_direction, jacobian_determinant);
-        // compute deformed normal
-        deformed_normal = this->mDeformedBoundaryElement.CalculateNormal();
-    }
-
-
-
-    c_vector<double,NUM_NODES_PER_BOUNDARY_ELEMENT> phi;
-
-    for (unsigned quad_index=0; quad_index<this->mpBoundaryQuadratureRule->GetNumQuadPoints(); quad_index++)
-    {
-        double wJ = jacobian_determinant * this->mpBoundaryQuadratureRule->GetWeight(quad_index);
-
-        const ChastePoint<DIM-1>& quad_point = this->mpBoundaryQuadratureRule->rGetQuadPoint(quad_index);
-
-        QuadraticBasisFunction<DIM-1>::ComputeBasisFunctions(quad_point, phi);
-
-        // Get the required traction, interpolating X (slightly inefficiently, as interpolating
-        // using quad bases) if necessary
-        c_vector<double,DIM> traction = zero_vector<double>(DIM);
-
-        switch (this->mrProblemDefinition.GetTractionBoundaryConditionType())
-        {
-            case FUNCTIONAL_TRACTION:
-            {
-                c_vector<double,DIM> X = zero_vector<double>(DIM);
-                for (unsigned node_index=0; node_index<NUM_NODES_PER_BOUNDARY_ELEMENT; node_index++)
-                {
-                    X += phi(node_index)*this->mrQuadMesh.GetNode( rBoundaryElement.GetNodeGlobalIndex(node_index) )->rGetLocation();
-                }
-                traction = this->mrProblemDefinition.EvaluateTractionFunction(X, this->mCurrentTime);
-                break;
-            }
-            case ELEMENTWISE_TRACTION:
-            {
-                traction = this->mrProblemDefinition.rGetElementwiseTractions()[boundaryConditionIndex];
-                break;
-            }
-            case PRESSURE_ON_DEFORMED:
-            {
-                // see comments above re. PRESSURE_ON_DEFORMED
-                traction = this->mrProblemDefinition.GetNormalPressure()*deformed_normal;
-                break;
-            }
-            default:
-                NEVER_REACHED;
-        }
-
-        for (unsigned index=0; index<NUM_NODES_PER_BOUNDARY_ELEMENT*DIM; index++)
-        {
-            unsigned spatial_dim = index%DIM;
-            unsigned node_index = (index-spatial_dim)/DIM;
-
-            assert(node_index < NUM_NODES_PER_BOUNDARY_ELEMENT);
-
-            rBelem(index) -=   traction(spatial_dim)
-                             * phi(node_index)
-                             * wJ;
-        }
-    }
-}
-
-
-////\todo #1818 implementing alternative approach
-//template<size_t DIM>
-//void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElementPressureOnDeformed(
-//            BoundaryElement<DIM-1,DIM>& rBoundaryElement,
-//            c_matrix<double,BOUNDARY_STENCIL_SIZE,BOUNDARY_STENCIL_SIZE>& rAelem,
-//            c_vector<double,BOUNDARY_STENCIL_SIZE>& rBelem,
-//            bool assembleResidual,
-//            bool assembleJacobian,
-//            unsigned boundaryConditionIndex)
-//{
-//
-//    assert(this->mrProblemDefinition.GetTractionBoundaryConditionType()==PRESSURE_ON_DEFORMED);
-//
-//    rAelem.clear();
-//    rBelem.clear();
-//
-//    if (assembleJacobian && !assembleResidual)
-//    {
-//        // Nothing to do
-//        return;
-//    }
-//
-//    c_vector<double, DIM> weighted_direction;
-//    double jacobian_determinant;
-//    // note: jacobian determinant may be over-written below
-//    this->mrQuadMesh.GetWeightedDirectionForBoundaryElement(rBoundaryElement.GetIndex(), weighted_direction, jacobian_determinant);
-//
-//    unsigned containing_volume_element_index;
-//
-//    Element<DIM,DIM>* p_containing_vol_element = NULL;
-//
-//    std::set<unsigned> potential_elements = rBoundaryElement.GetNode(0)->rGetContainingElementIndices();
-//    for(std::set<unsigned>::iterator iter = potential_elements.begin();
-//        iter != potential_elements.end();
-//        iter++)
-//    {
-//        p_containing_vol_element = this->mrQuadMesh.GetElement(*iter);
-//
-//        bool this_vol_ele_contains_surf_ele = true;
-//        for(unsigned i=1; i<NUM_NODES_PER_BOUNDARY_ELEMENT; i++) // don't need to start at 0
-//        {
-//            unsigned surf_element_node_index = rBoundaryElement.GetNodeGlobalIndex(i);
-//            bool found_this_node = false;
-//            for(unsigned j=0; j<p_containing_vol_element->GetNumNodes(); j++)
-//            {
-//                unsigned vol_element_node_index = p_containing_vol_element->GetNodeGlobalIndex(j);
-//                if(surf_element_node_index == vol_element_node_index)
-//                {
-//                    found_this_node = true;
-//                    break;
-//                }
-//            }
-//            if(!found_this_node)
-//            {
-//                this_vol_ele_contains_surf_ele = false;
-//                break;
-//            }
-//        }
-//        if(this_vol_ele_contains_surf_ele)
-//        {
-//            containing_volume_element_index = *iter;
-//            break;
-//        }
-//    }
-//
-//    static c_matrix<double,DIM,DIM> jacobian_vol_element;
-//    static c_matrix<double,DIM,DIM> inverse_jacobian_vol_element;
-//    double jacobian_determinant_vol_element;
-//    this->mrQuadMesh.GetInverseJacobianForElement(p_containing_vol_element->GetIndex(), jacobian_vol_element, jacobian_determinant_vol_element, inverse_jacobian_vol_element);
-//    static c_matrix<double, DIM, NUM_NODES_PER_ELEMENT> grad_quad_phi_vol_element;
-//
-//
-//
-//    static c_matrix<double,DIM,NUM_NODES_PER_ELEMENT> element_current_displacements;
-//    for (unsigned II=0; II<NUM_NODES_PER_ELEMENT; II++)
-//    {
-//        for (unsigned JJ=0; JJ<DIM; JJ++)
-//        {
-//            // note: DIM+1, on the right hand side of the below, is the problem dimension (= this->mProblemDimension)
-//            element_current_displacements(JJ,II) = this->mCurrentSolution[(DIM+1)*p_containing_vol_element->GetNodeGlobalIndex(II) + JJ];
-//        }
-//    }
-//
-//
-//    c_vector<double,NUM_NODES_PER_BOUNDARY_ELEMENT> quad_phi_surf_element;
-//    c_matrix<double,DIM,DIM> F;
-//    c_matrix<double,DIM,DIM> invF;
-//
-//    for (unsigned quad_index=0; quad_index<this->mpBoundaryQuadratureRule->GetNumQuadPoints(); quad_index++)
-//    {
-//        double wJ = jacobian_determinant * this->mpBoundaryQuadratureRule->GetWeight(quad_index);
-//
-//        const ChastePoint<DIM-1>& quad_point_surf_elem = this->mpBoundaryQuadratureRule->rGetQuadPoint(quad_index);
-//        QuadraticBasisFunction<DIM-1>::ComputeBasisFunctions(quad_point_surf_elem, quad_phi_surf_element);
-//
-//        c_vector<double,DIM> X = zero_vector<double>(DIM);
-//        // interpolate X (using the vertices and the /linear/ bases, as no curvilinear elements
-//        for (unsigned node_index=0; node_index<NUM_NODES_PER_BOUNDARY_ELEMENT; node_index++)
-//        {
-//            X += quad_phi_surf_element(node_index)*rBoundaryElement.GetNode(node_index)->rGetLocation();
-//        }
-//
-//
-//
-//        c_vector<double,DIM+1> weight = p_containing_vol_element->CalculateInterpolationWeights(X);
-//        c_vector<double,DIM> quadrature_point_vol_element;
-//        for(unsigned i=0; i<DIM; i++)
-//        {
-//            quadrature_point_vol_element(i) = weight(i+1);
-//        }
-//
-//        if(DIM==2)
-//        {
-//            assert( (fabs(weight(0))<1e-6) || (fabs(weight(1))<1e-6) || (fabs(weight(2))<1e-6) );
-//        }
-//        else
-//        {
-//            assert( (fabs(weight(0))<1e-6) || (fabs(weight(1))<1e-6) || (fabs(weight(2))<1e-6)  || (fabs(weight(3))<1e-6) );
-//        }
-//
-//        QuadraticBasisFunction<DIM>::ComputeTransformedBasisFunctionDerivatives(quadrature_point_vol_element, inverse_jacobian_vol_element, grad_quad_phi_vol_element);
-//
-//        F = identity_matrix<double>(DIM,DIM);
-//
-//        for (unsigned node_index=0; node_index<NUM_NODES_PER_ELEMENT; node_index++)
-//        {
-//            for (unsigned i=0; i<DIM; i++)
-//            {
-//                for (unsigned M=0; M<DIM; M++)
-//                {
-//                    F(i,M) += grad_quad_phi_vol_element(M,node_index)*element_current_displacements(i,node_index);
-//                }
-//            }
-//        }
-//
-//        double detF = Determinant(F);
-//
-//        invF = Inverse(F);
-//
-//        c_vector<double,DIM> traction = detF*this->mrProblemDefinition.GetNormalPressure()*prod(trans(invF),rBoundaryElement.CalculateNormal());
-//
-//
-//        for (unsigned index=0; index<NUM_NODES_PER_BOUNDARY_ELEMENT*DIM; index++)
-//        {
-//            unsigned spatial_dim = index%DIM;
-//            unsigned node_index = (index-spatial_dim)/DIM;
-//
-//            assert(node_index < NUM_NODES_PER_BOUNDARY_ELEMENT);
-//
-//            rBelem(index) -=   traction(spatial_dim)
-//                             * quad_phi_surf_element(node_index)
-//                             * wJ;
-//        }
-//    }
-//}
-//
 
 
 
