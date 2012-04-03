@@ -135,6 +135,14 @@ protected:
                                            bool assembleJacobian,
                                            unsigned boundaryConditionIndex);
 
+////\todo #1818 implementing alternative approach
+//    virtual void AssembleOnBoundaryElementPressureOnDeformed(BoundaryElement<DIM-1,DIM>& rBoundaryElement,
+//                                                            c_matrix<double,BOUNDARY_STENCIL_SIZE,BOUNDARY_STENCIL_SIZE>& rAelem,
+//                                                            c_vector<double,BOUNDARY_STENCIL_SIZE>& rBelem,
+//                                                            bool assembleResidual,
+//                                                            bool assembleJacobian,
+//                                                            unsigned boundaryConditionIndex);
+
     /**
      * Set up the current guess to be the solution given no displacement.
 
