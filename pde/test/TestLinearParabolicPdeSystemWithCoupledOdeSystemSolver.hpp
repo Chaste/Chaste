@@ -357,13 +357,10 @@ public:
                 "SetInitialCondition() must be called prior to SolveAndWriteResultsToFile()");
         solver.SetInitialCondition(initial_condition);
 
-#ifdef CHASTE_VTK
         solver.SolveAndWriteResultsToFile();
-        ///\todo #1967 Check that the file was output and has expected content
-#else // CHASTE_VTK
-        TS_ASSERT_THROWS_THIS(solver.SolveAndWriteResultsToFile(),
-                "VTK is not installed and is required for this functionality");
-#endif // CHASTE_VTK
+//#ifdef CHASTE_VTK
+///\todo #1967 Check that the file was output and has expected content
+//#endif // CHASTE_VTK
 
         // Tidy up
         PetscTools::Destroy(initial_condition);
