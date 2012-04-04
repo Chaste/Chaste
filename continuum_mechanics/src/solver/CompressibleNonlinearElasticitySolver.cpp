@@ -137,6 +137,13 @@ void CompressibleNonlinearElasticitySolver<DIM>::AssembleSystem(bool assembleRes
         {
             BoundaryElement<DIM-1,DIM>& r_boundary_element = *(this->mrProblemDefinition.rGetTractionBoundaryElements()[bc_index]);
 
+            // If the BCs are tractions applied on a given surface, the boundary integral is independent of u,
+            // so a_boundary_elem will be zero (no contribution to jacobian).
+            // If the BCs are normal pressure applied to the deformed body, the boundary depends on the deformation,
+            // so there is a contribution to the jacobian, and a_boundary_elem is non-zero. Note however that
+            // the AssembleOnBoundaryElement() method might decide not to include this, as it can actually
+            // cause divergence if the current guess is not close to the true solution
+
             this->AssembleOnBoundaryElement(r_boundary_element, a_boundary_elem, b_boundary_elem, assembleResidual, assembleJacobian, bc_index);
 
             unsigned p_indices[BOUNDARY_STENCIL_SIZE];

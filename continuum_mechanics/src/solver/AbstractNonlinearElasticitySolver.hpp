@@ -49,6 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QuadraticBasisFunction.hpp"
 #include "SolidMechanicsProblemDefinition.hpp"
 #include "Timer.hpp"
+#include "Debug.hpp"
 #include "petscsnes.h"
 
 
@@ -200,6 +201,13 @@ protected:
     bool mUseSnesSolver;
 
     /**
+     *  The last damping value used in the current nonlinear (non-snes) solve. If near 1.0, this indicates
+     *  that the current guess is near the solution. Initialised to 0.0 at the beginning of each Newton
+     *  step.
+     */
+    double mLastDampingValue;
+
+    /**
      * Set the KSP type (CG, GMRES, etc) and the preconditioner type (ILU, ICC etc). Depends on
      * incompressible or not, and other factors.
      *
@@ -297,7 +305,7 @@ protected:
      * a specified non-zero surface traction (ie Neumann boundary condition)
      * to be added to the residual vector.
      *
-     * Calls AssembleOnBoundaryElementPressureOnDeformed() if appropriate
+     * Calls AssembleOnBoundaryElementForPressureOnDeformedBc() if appropriate
      *
      * @param rBoundaryElement the boundary element to be integrated on
      * @param rAelem The element's contribution to the LHS matrix is returned. There is no
@@ -316,6 +324,22 @@ protected:
                                            bool assembleResidual,
                                            bool assembleJacobian,
                                            unsigned boundaryConditionIndex);
+
+
+    /**
+     * When pressure-on-deformed-body boundary conditions are used:
+     *
+     * For some reason the use of the jacobian corresponding to the pressure term doesn't help
+     * (makes things worse!) if the current guess is not close enough to the solution, and can
+     * lead to immediate divergence. It will lead to faster convergence once close enough to the
+     * solution. This method contains the logic used to decide whether to include the jacobian
+     * for this term or not.
+     *
+     * We only assemble the contribution to the matrix if the last damping value is
+     * close enough to 1 (non-snes solver). This will current always return false if the snes solver
+     * is being used
+     */
+    bool ShouldAssembleMatrixTermForPressureOnDeformedBc();
 
     /**
      *  Alternative version of AssembleOnBoundaryElement which is used for problems where a normal pressure
@@ -336,12 +360,12 @@ protected:
      *     in the problem definition object, in which the boundary conditions are
      *     stored
      */
-    void AssembleOnBoundaryElementPressureOnDeformed(BoundaryElement<DIM-1,DIM>& rBoundaryElement,
-                                                     c_matrix<double,BOUNDARY_STENCIL_SIZE,BOUNDARY_STENCIL_SIZE>& rAelem,
-                                                     c_vector<double,BOUNDARY_STENCIL_SIZE>& rBelem,
-                                                     bool assembleResidual,
-                                                     bool assembleJacobian,
-                                                     unsigned boundaryConditionIndex);
+    void AssembleOnBoundaryElementForPressureOnDeformedBc(BoundaryElement<DIM-1,DIM>& rBoundaryElement,
+                                                          c_matrix<double,BOUNDARY_STENCIL_SIZE,BOUNDARY_STENCIL_SIZE>& rAelem,
+                                                          c_vector<double,BOUNDARY_STENCIL_SIZE>& rBelem,
+                                                          bool assembleResidual,
+                                                          bool assembleJacobian,
+                                                          unsigned boundaryConditionIndex);
 
     /////////////////////////////////////////////////////////////
     //
@@ -571,7 +595,8 @@ AbstractNonlinearElasticitySolver<DIM>::AbstractNonlinearElasticitySolver(Quadra
       mWriteOutputEachNewtonIteration(false),
       mNumNewtonIterations(0),
       mCurrentTime(0.0),
-      mCheckedOutwardNormals(false)
+      mCheckedOutwardNormals(false),
+      mLastDampingValue(0.0)
 {
     mUseSnesSolver = (mrProblemDefinition.GetSolveUsingSnes() ||
                       CommandLineArguments::Instance()->OptionExists("-mech_use_snes") );
@@ -781,8 +806,8 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElement(
 {
     if(this->mrProblemDefinition.GetTractionBoundaryConditionType() == PRESSURE_ON_DEFORMED)
     {
-        AssembleOnBoundaryElementPressureOnDeformed(rBoundaryElement, rAelem, rBelem,
-                                                    assembleResidual, assembleJacobian, boundaryConditionIndex);
+        AssembleOnBoundaryElementForPressureOnDeformedBc(rBoundaryElement, rAelem, rBelem,
+                                                         assembleResidual, assembleJacobian, boundaryConditionIndex);
         return;
     }
 
@@ -848,9 +873,23 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElement(
     }
 }
 
+template<unsigned DIM>
+bool AbstractNonlinearElasticitySolver<DIM>::ShouldAssembleMatrixTermForPressureOnDeformedBc()
+{
+    if(mUseSnesSolver)
+    {
+        ///\todo #1818 do something better here..
+        return false;
+    }
+    else
+    {
+        return (mLastDampingValue >= 0.5);
+    }
+
+}
 
 template<unsigned DIM>
-void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElementPressureOnDeformed(
+void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElementForPressureOnDeformedBc(
             BoundaryElement<DIM-1,DIM>& rBoundaryElement,
             c_matrix<double,BOUNDARY_STENCIL_SIZE,BOUNDARY_STENCIL_SIZE>& rAelem,
             c_vector<double,BOUNDARY_STENCIL_SIZE>& rBelem,
@@ -862,12 +901,6 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElementPressureOn
 
     rAelem.clear();
     rBelem.clear();
-
-    if (assembleJacobian && !assembleResidual)
-    {
-        // Nothing to do
-        return;
-    }
 
     c_vector<double, DIM> weighted_direction;
     double jacobian_determinant;
@@ -916,6 +949,21 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElementPressureOn
         }
     }
 
+    std::vector<unsigned> surf_to_vol_map(NUM_NODES_PER_BOUNDARY_ELEMENT,100);
+    for(unsigned i=0; i<NUM_NODES_PER_BOUNDARY_ELEMENT; i++)
+    {
+        unsigned index = rBoundaryElement.GetNodeGlobalIndex(i);
+        for(unsigned j=0; j<NUM_NODES_PER_ELEMENT; j++)
+        {
+            if(p_containing_vol_element->GetNodeGlobalIndex(j)==index)
+            {
+                surf_to_vol_map[i] = j;
+                break;
+            }
+        }
+    }
+
+
     // We require the volume element to compute F, which requires grad_phi on the volume element. For this we will
     // need the inverse jacobian for the volume element
     static c_matrix<double,DIM,DIM> jacobian_vol_element;
@@ -941,6 +989,8 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElementPressureOn
 
     c_matrix<double,DIM,DIM> F;
     c_matrix<double,DIM,DIM> invF;
+
+    c_vector<double,DIM> normal = rBoundaryElement.CalculateNormal();
 
     for (unsigned quad_index=0; quad_index<this->mpBoundaryQuadratureRule->GetNumQuadPoints(); quad_index++)
     {
@@ -998,19 +1048,85 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElementPressureOn
         // Compute the traction
         double detF = Determinant(F);
         invF = Inverse(F);
-        c_vector<double,DIM> traction = detF*this->mrProblemDefinition.GetNormalPressure()*prod(trans(invF),rBoundaryElement.CalculateNormal());
 
-        // assemble
-        for (unsigned index=0; index<NUM_NODES_PER_BOUNDARY_ELEMENT*DIM; index++)
+        if(assembleResidual)
         {
-            unsigned spatial_dim = index%DIM;
-            unsigned node_index = (index-spatial_dim)/DIM;
+            c_vector<double,DIM> traction = detF*this->mrProblemDefinition.GetNormalPressure()*prod(trans(invF),normal);
 
-            assert(node_index < NUM_NODES_PER_BOUNDARY_ELEMENT);
+            // assemble
+            for (unsigned index=0; index<NUM_NODES_PER_BOUNDARY_ELEMENT*DIM; index++)
+            {
+                unsigned spatial_dim = index%DIM;
+                unsigned node_index = (index-spatial_dim)/DIM;
 
-            rBelem(index) -=   traction(spatial_dim)
-                             * quad_phi_surf_element(node_index)
-                             * wJ;
+                assert(node_index < NUM_NODES_PER_BOUNDARY_ELEMENT);
+
+                rBelem(index) -=   traction(spatial_dim)
+                                 * quad_phi_surf_element(node_index)
+                                 * wJ;
+            }
+        }
+
+
+
+        if(assembleJacobian && ShouldAssembleMatrixTermForPressureOnDeformedBc())
+        {
+            static FourthOrderTensor<DIM,DIM,DIM,DIM> tensor1;
+            for(unsigned N=0; N<DIM; N++)
+            {
+                for(unsigned e=0; e<DIM; e++)
+                {
+                    for(unsigned M=0; M<DIM; M++)
+                    {
+                        for(unsigned d=0; d<DIM; d++)
+                        {
+                            tensor1(N,e,M,d) = invF(N,e)*invF(M,d) - invF(M,e)*invF(N,d);
+                        }
+                    }
+                }
+            }
+
+            static FourthOrderTensor<NUM_NODES_PER_BOUNDARY_ELEMENT,DIM,DIM,DIM> tensor2;
+
+            for(unsigned J=0; J<NUM_NODES_PER_BOUNDARY_ELEMENT; J++)
+            {
+                for(unsigned e=0; e<DIM; e++)
+                {
+                    for(unsigned M=0; M<DIM; M++)
+                    {
+                        for(unsigned d=0; d<DIM; d++)
+                        {
+                            tensor2(J,e,M,d) = 0.0;
+
+                            for(unsigned N=0; N<DIM; N++)
+                            {
+                                tensor2(J,e,M,d) += tensor1(N,e,M,d)*grad_quad_phi_vol_element(N,surf_to_vol_map[J]);
+                            }
+                        }
+                    }
+                }
+            }
+            for (unsigned index1=0; index1<NUM_NODES_PER_BOUNDARY_ELEMENT*DIM; index1++)
+            {
+                unsigned spatial_dim1 = index1%DIM;
+                unsigned node_index1 = (index1-spatial_dim1)/DIM;
+
+                for (unsigned index2=0; index2<NUM_NODES_PER_BOUNDARY_ELEMENT*DIM; index2++)
+                {
+                    unsigned spatial_dim2 = index2%DIM;
+                    unsigned node_index2 = (index2-spatial_dim2)/DIM;
+
+                    for(unsigned M=0; M<DIM; M++)
+                    {
+                        rAelem(index1,index2) -=    this->mrProblemDefinition.GetNormalPressure()
+                                                  * detF
+                                                  * tensor2(node_index2,spatial_dim2,M,spatial_dim1)
+                                                  * normal(M)
+                                                  * quad_phi_surf_element(node_index1)
+                                                  * wJ;
+                    }
+                }
+            }
         }
     }
 }
@@ -1442,6 +1558,7 @@ double AbstractNonlinearElasticitySolver<DIM>::UpdateSolutionUsingLineSearch(Vec
 
     VectorSum(old_solution, update, -damping_values[best_index], this->mCurrentSolution);
 
+    mLastDampingValue = damping_values[best_index];
     return current_resid_norm;
 }
 
@@ -1454,6 +1571,8 @@ void AbstractNonlinearElasticitySolver<DIM>::PostNewtonStep(unsigned counter, do
 template<unsigned DIM>
 void AbstractNonlinearElasticitySolver<DIM>::SolveNonSnes(double tol)
 {
+    mLastDampingValue = 0;
+
     if (mWriteOutputEachNewtonIteration)
     {
         this->WriteCurrentSpatialSolution("newton_iteration", "nodes", 0);

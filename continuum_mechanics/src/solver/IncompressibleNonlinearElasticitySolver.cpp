@@ -145,12 +145,19 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleSystem(bool assembleR
     // Loop over specified boundary elements and compute surface traction terms
     c_vector<double, BOUNDARY_STENCIL_SIZE> b_boundary_elem; // note BOUNDARY_STENCIL_SIZE = DIM*NUM_BOUNDARY_NODES, as all pressure block is zero
     c_matrix<double, BOUNDARY_STENCIL_SIZE, BOUNDARY_STENCIL_SIZE> a_boundary_elem;
+
     if (this->mrProblemDefinition.GetTractionBoundaryConditionType() != NO_TRACTIONS)
     {
         for (unsigned bc_index=0; bc_index<this->mrProblemDefinition.rGetTractionBoundaryElements().size(); bc_index++)
         {
             BoundaryElement<DIM-1,DIM>& r_boundary_element = *(this->mrProblemDefinition.rGetTractionBoundaryElements()[bc_index]);
 
+            // If the BCs are tractions applied on a given surface, the boundary integral is independent of u,
+            // so a_boundary_elem will be zero (no contribution to jacobian).
+            // If the BCs are normal pressure applied to the deformed body, the boundary depends on the deformation,
+            // so there is a contribution to the jacobian, and a_boundary_elem is non-zero. Note however that
+            // the AssembleOnBoundaryElement() method might decide not to include this, as it can actually
+            // cause divergence if the current guess is not close to the true solution
             this->AssembleOnBoundaryElement(r_boundary_element, a_boundary_elem, b_boundary_elem, assembleResidual, assembleJacobian, bc_index);
 
             unsigned p_indices[BOUNDARY_STENCIL_SIZE];

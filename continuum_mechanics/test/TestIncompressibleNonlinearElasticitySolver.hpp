@@ -151,22 +151,45 @@ public:
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
 
         IncompressibleNonlinearElasticitySolver<2> solver(mesh,
-                                                         problem_defn,
-                                                         "");
-        solver.AssembleSystem(true, true);
+                                                          problem_defn,
+                                                          "");
 
         ///////////////////////////////////////////////////////////////////
         // test whether residual vector is currently zero (as
         // current solution should have been initialised to u=0, p=p0
         ///////////////////////////////////////////////////////////////////
+        solver.AssembleSystem(true, true);
+        ReplicatableVector rhs_vec0(solver.mResidualVector);
+
+        TS_ASSERT_EQUALS( rhs_vec0.GetSize(), 3U*25U);
+
+        for (unsigned i=0; i<rhs_vec0.GetSize(); i++)
+        {
+            TS_ASSERT_DELTA(rhs_vec0[i], 0.0, 1e-12);
+        }
+
+        ///////////////////////////////////////////////////////////////////
+        // Include pressure-on-deformed-body boundary conditions, which
+        // add contributions to residual and jacobian
+        ///////////////////////////////////////////////////////////////////
+        std::vector<BoundaryElement<1,2>*> boundary_elems;
+        double pressure = 3.0;
+
+        for (TetrahedralMesh<2,2>::BoundaryElementIterator iter
+              = mesh.GetBoundaryElementIteratorBegin();
+            iter != mesh.GetBoundaryElementIteratorEnd();
+            ++iter)
+        {
+            BoundaryElement<1,2>* p_element = *iter;
+            boundary_elems.push_back(p_element);
+        }
+
+        problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, pressure);
+
+        solver.mLastDampingValue = 1.0;
+        solver.AssembleSystem(true, true); // See comments in AbstractNonlinearElasticitySolver::ShouldAssembleMatrixTermForPressureOnDeformedBc
         ReplicatableVector rhs_vec(solver.mResidualVector);
 
-        TS_ASSERT_EQUALS( rhs_vec.GetSize(), 3U*25U);
-
-        for (unsigned i=0; i<rhs_vec.GetSize(); i++)
-        {
-            TS_ASSERT_DELTA(rhs_vec[i], 0.0, 1e-12);
-        }
 
         ///////////////////////////////////////////////////////////////////
         // compute numerical Jacobian and compare with analytic jacobian
