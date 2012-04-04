@@ -370,12 +370,14 @@ void MultipleCaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
 
                 if (IsEmptySite(*iter))
             	{
-                	// Iterating over the update rules - so far we have only the chemotaxis rule
+                	// Iterating over the update rule
                     for (typename std::vector<boost::shared_ptr<AbstractMultipleCaUpdateRule<DIM> > >::iterator iterRule = mUpdateRuleCollection.begin();
                          iterRule != mUpdateRuleCollection.end();
                          ++iterRule)
                     {
                     	probability_of_moving = (*iterRule)->EvaluateProbability(node_index, *iter, *this, dt, 1);
+                        assert(probability_of_moving <= 1.0); // Todo Change to exception warn about timestep and parameterd
+                        assert(probability_of_moving >= 0.0); // Todo Change to exception warn about timestep and parameterd
                     }
 
                     probability_of_not_moving -= probability_of_moving;
@@ -386,8 +388,8 @@ void MultipleCaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
             		neighbouring_node_propensities.push_back(0.0);
             	}
 			}
-            //assert(probability_of_not_moving <= 1.0);
-            //assert(probability_of_not_moving >= 0.0);
+            assert(probability_of_not_moving <= 1.0); // Todo Change to exception warn about timestep and parameterd
+            assert(probability_of_not_moving >= 0.0); // Todo Change to exception warn about timestep and parameterd
 
         	/*
         	 * \todo Rescale so sum of probabilities = 1 (make sure sum of probabilities <1)

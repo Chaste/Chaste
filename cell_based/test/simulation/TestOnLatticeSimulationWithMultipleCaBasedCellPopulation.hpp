@@ -199,8 +199,8 @@ public:
         OnLatticeSimulation<2> simulator(cell_population);
         std::string output_directory = "TestMultipleCaSingleCellRandomMovement";
         simulator.SetOutputDirectory(output_directory);
-        simulator.SetDt(2);
-        simulator.SetEndTime(400);
+        simulator.SetDt(0.1);
+        simulator.SetEndTime(40);
 
         /*
          * Adding update rule(s).
@@ -254,8 +254,8 @@ public:
         OnLatticeSimulation<2> simulator(cell_population);
         std::string output_directory = "TestMultipleCaMonolayerWithBirth";
         simulator.SetOutputDirectory(output_directory);
-        simulator.SetDt(2);
-        simulator.SetEndTime(400);
+        simulator.SetDt(0.1);
+        simulator.SetEndTime(40);
 
         // Adding update rule(s).
         MAKE_PTR(DiffusionMultipleCaUpdateRule<2u>, p_diffusion_update_rule);
@@ -267,10 +267,10 @@ public:
         simulator.Solve();
 
         // Check the number of cells
-        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 182u);///\todo #2066 Check this!
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 17u);///\todo #2066 Check this!
 
         // Test no deaths and some births
-        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 180u);///\todo #2066 Check this!
+        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 15u);///\todo #2066 Check this!
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
 
 
