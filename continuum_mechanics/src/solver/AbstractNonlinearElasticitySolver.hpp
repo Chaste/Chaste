@@ -226,7 +226,7 @@ protected:
      *
      * @param solver KSP solver object (Petsc object)
      */
-    void SetKspSolverAndPcType(KSP solver);
+    virtual void SetKspSolverAndPcType(KSP solver);
 
 
 
