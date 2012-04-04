@@ -202,8 +202,8 @@ protected:
 
     /**
      *  The last damping value used in the current nonlinear (non-snes) solve. If near 1.0, this indicates
-     *  that the current guess is near the solution. Initialised to 0.0 at the beginning of each Newton
-     *  step.
+     *  that the current guess is near the solution. Initialised to 0.0 at the beginning of each nonlinear
+     *  solve.
      */
     double mLastDampingValue;
 
@@ -878,8 +878,16 @@ bool AbstractNonlinearElasticitySolver<DIM>::ShouldAssembleMatrixTermForPressure
 {
     if(mUseSnesSolver)
     {
-        ///\todo #1818 do something better here..
-        return false;
+        // although not using this in the first few steps might be useful when the deformation
+        // is large, the snes solver is more robust, so we have this on all the time. (Also because
+        // for cardiac problems and in timesteps after the initial large deformation, we want this on
+        // in the first step
+        return true;
+
+        // could do something like this, if make the snes a member variable
+        //PetscInt iteration_number;
+        //SNESGetIterationNumber(mSnes,&iteration_number);
+        //return (iteration_number >= 3);
     }
     else
     {
@@ -949,7 +957,8 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElementForPressur
         }
     }
 
-    std::vector<unsigned> surf_to_vol_map(NUM_NODES_PER_BOUNDARY_ELEMENT,100);
+    // Find the local node index in the volume element for each node in the boundary element
+    std::vector<unsigned> surf_to_vol_map(NUM_NODES_PER_BOUNDARY_ELEMENT);
     for(unsigned i=0; i<NUM_NODES_PER_BOUNDARY_ELEMENT; i++)
     {
         unsigned index = rBoundaryElement.GetNodeGlobalIndex(i);
@@ -986,11 +995,18 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElementForPressur
     static c_matrix<double, DIM, NUM_NODES_PER_ELEMENT> grad_quad_phi_vol_element;
     // ..the phi_i for each of the quadratic bases of the surface element, for the standard FE assembly part.
     c_vector<double,NUM_NODES_PER_BOUNDARY_ELEMENT> quad_phi_surf_element;
+    // We need this too, which is obtained by taking a subset of grad_quad_phi_vol_element
+    static c_matrix<double, DIM, NUM_NODES_PER_BOUNDARY_ELEMENT> grad_quad_phi_surf_element;
 
     c_matrix<double,DIM,DIM> F;
     c_matrix<double,DIM,DIM> invF;
 
     c_vector<double,DIM> normal = rBoundaryElement.CalculateNormal();
+    c_matrix<double,1,DIM> normal_as_mat;
+    for(unsigned i=0; i<DIM; i++)
+    {
+        normal_as_mat(0,i) = normal(i);
+    }
 
     for (unsigned quad_index=0; quad_index<this->mpBoundaryQuadratureRule->GetNumQuadPoints(); quad_index++)
     {
@@ -1045,7 +1061,6 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElementForPressur
             }
         }
 
-        // Compute the traction
         double detF = Determinant(F);
         invF = Inverse(F);
 
@@ -1068,9 +1083,19 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElementForPressur
         }
 
 
-
+        // Sometimes we don't include the analytic jacobian for this integral
+        // in the jacobian that is assembled - the ShouldAssembleMatrixTermForPressureOnDeformedBc()
+        // bit below - see the documentation for this method to see why.
         if(assembleJacobian && ShouldAssembleMatrixTermForPressureOnDeformedBc())
         {
+            for(unsigned II=0; II<NUM_NODES_PER_BOUNDARY_ELEMENT; II++)
+            {
+                for(unsigned N=0; N<DIM; N++)
+                {
+                    grad_quad_phi_surf_element(N,II) = grad_quad_phi_vol_element(N,surf_to_vol_map[II]);
+                }
+            }
+
             static FourthOrderTensor<DIM,DIM,DIM,DIM> tensor1;
             for(unsigned N=0; N<DIM; N++)
             {
@@ -1086,26 +1111,15 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElementForPressur
                 }
             }
 
+            // tensor2(II,e,M,d) = tensor1(N,e,M,d)*grad_quad_phi_surf_element(N,II)
             static FourthOrderTensor<NUM_NODES_PER_BOUNDARY_ELEMENT,DIM,DIM,DIM> tensor2;
+            tensor2.template SetAsContractionOnFirstDimension<DIM>( trans(grad_quad_phi_surf_element), tensor1);
 
-            for(unsigned J=0; J<NUM_NODES_PER_BOUNDARY_ELEMENT; J++)
-            {
-                for(unsigned e=0; e<DIM; e++)
-                {
-                    for(unsigned M=0; M<DIM; M++)
-                    {
-                        for(unsigned d=0; d<DIM; d++)
-                        {
-                            tensor2(J,e,M,d) = 0.0;
+            // tensor3 is really a third-order tensor
+            // tensor3(II,e,0,d) = tensor2(II,e,M,d)*normal(M)
+            static FourthOrderTensor<NUM_NODES_PER_BOUNDARY_ELEMENT,DIM,1,DIM> tensor3;
+            tensor3.template SetAsContractionOnThirdDimension<DIM>( normal_as_mat, tensor2);
 
-                            for(unsigned N=0; N<DIM; N++)
-                            {
-                                tensor2(J,e,M,d) += tensor1(N,e,M,d)*grad_quad_phi_vol_element(N,surf_to_vol_map[J]);
-                            }
-                        }
-                    }
-                }
-            }
             for (unsigned index1=0; index1<NUM_NODES_PER_BOUNDARY_ELEMENT*DIM; index1++)
             {
                 unsigned spatial_dim1 = index1%DIM;
@@ -1116,15 +1130,11 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElementForPressur
                     unsigned spatial_dim2 = index2%DIM;
                     unsigned node_index2 = (index2-spatial_dim2)/DIM;
 
-                    for(unsigned M=0; M<DIM; M++)
-                    {
-                        rAelem(index1,index2) -=    this->mrProblemDefinition.GetNormalPressure()
-                                                  * detF
-                                                  * tensor2(node_index2,spatial_dim2,M,spatial_dim1)
-                                                  * normal(M)
-                                                  * quad_phi_surf_element(node_index1)
-                                                  * wJ;
-                    }
+                    rAelem(index1,index2) -=    this->mrProblemDefinition.GetNormalPressure()
+                                              * detF
+                                              * tensor3(node_index2,spatial_dim2,0,spatial_dim1)
+                                              * quad_phi_surf_element(node_index1)
+                                              * wJ;
                 }
             }
         }

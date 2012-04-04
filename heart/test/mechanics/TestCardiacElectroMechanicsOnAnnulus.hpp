@@ -123,7 +123,7 @@ public:
 
        // This is a 2d problem, so a direct solve (LU factorisation) is possible and will speed things up
        // markedly (might be able to remove this line after #2057 is done..)
-       PetscOptionsSetValue("-pc_type", "lu");
+       //PetscOptionsSetValue("-pc_type", "lu"); // removed - see comments at the end of #1818.
 
        std::vector<BoundaryElement<1,2>*> boundary_elems;
        for (TetrahedralMesh<2,2>::BoundaryElementIterator iter
