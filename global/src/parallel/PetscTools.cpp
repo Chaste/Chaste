@@ -410,6 +410,14 @@ void PetscTools::ReadPetscObject(Vec& rVec, const std::string& rOutputFileFullPa
 
 bool PetscTools::HasParMetis()
 {
+#ifdef __INTEL_COMPILER
+    //Old versions of the intel compiler can result in a PETSC ERROR and the program aborting if parmetis is checked for before 
+    //some other calls to Petsc are made. This nasty hack ensures that the HasParMetis method always works on Intel
+    Mat mat;
+    PetscTools::SetupMat(mat, 1, 1, 1);
+    PetscTools::Destroy(mat);
+#endif
+    
     MatPartitioning part;
     MatPartitioningCreate(PETSC_COMM_WORLD, &part);
 
