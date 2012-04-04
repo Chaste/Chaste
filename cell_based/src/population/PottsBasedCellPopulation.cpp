@@ -177,7 +177,7 @@ CellPtr PottsBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_vector<
 
     // Update location cell map
     CellPtr p_created_cell = this->mCells.back();
-    this->mLocationCellMap[new_element_index] = p_created_cell;
+    this->SetCellUsingLocationIndex(new_element_index,p_created_cell);
     this->mCellLocationMap[p_created_cell.get()] = new_element_index;
     return p_created_cell;
 }
@@ -364,9 +364,9 @@ void PottsBasedCellPopulation<DIM>::WriteResultsToFiles()
         // Hack that covers the case where the element is associated with a cell that has just been killed (#1129)
         bool elem_corresponds_to_dead_cell = false;
 
-        if (this->mLocationCellMap[elem_index])
+        if (this->IsCellAttachedToLocationIndex(elem_index))
         {
-            elem_corresponds_to_dead_cell = this->mLocationCellMap[elem_index]->IsDead();
+            elem_corresponds_to_dead_cell = this->GetCellUsingLocationIndex(elem_index)->IsDead();
         }
 
         // Write node data to file
@@ -417,9 +417,9 @@ void PottsBasedCellPopulation<DIM>::WriteCellVolumeResultsToFile()
         // Hack that covers the case where the element is associated with a cell that has just been killed (#1129)
         bool elem_corresponds_to_dead_cell = false;
 
-        if (this->mLocationCellMap[elem_index])
+        if (this->IsCellAttachedToLocationIndex(elem_index))
         {
-            elem_corresponds_to_dead_cell = this->mLocationCellMap[elem_index]->IsDead();
+            elem_corresponds_to_dead_cell = this->GetCellUsingLocationIndex(elem_index)->IsDead();
         }
 
         // Write node data to file
@@ -640,7 +640,7 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile()
             unsigned element_index = *(element_indices.begin());
             elem_ids.push_back((double)element_index);
 
-            CellPtr p_cell = this->mLocationCellMap[element_index];
+            CellPtr p_cell = this->GetCellUsingLocationIndex(element_index);
             double cell_type = p_cell->GetCellCycleModel()->GetCellProliferativeType();
             cell_types.push_back(cell_type);
 

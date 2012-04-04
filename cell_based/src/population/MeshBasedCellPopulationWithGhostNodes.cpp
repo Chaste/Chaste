@@ -323,7 +323,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile()
             if (!this->IsGhostNode(node_index))
             {
                 // Get the cell corresponding to this element
-                CellPtr p_cell = this->mLocationCellMap[node_index];
+                CellPtr p_cell = this->GetCellUsingLocationIndex(node_index);
 
                 if (this->mOutputCellAncestors)
                 {

@@ -77,7 +77,7 @@ CellPtr AbstractCentreBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const 
     this->mCells.push_back(pNewCell);
 
     // Update mappings between cells and location indices
-    this->mLocationCellMap[new_node_index] = pNewCell;
+    this->SetCellUsingLocationIndex(new_node_index,pNewCell);
     this->mCellLocationMap[pNewCell.get()] = new_node_index;
 
     return pNewCell;
@@ -195,9 +195,9 @@ void AbstractCentreBasedCellPopulation<DIM>::GenerateCellResultsAndWriteToFiles(
     {
         // Hack that covers the case where the node is associated with a cell that has just been killed (#1129)
         bool node_corresponds_to_dead_cell = false;
-        if (this->mLocationCellMap[node_index])
+        if (this->IsCellAttachedToLocationIndex(node_index))
         {
-            node_corresponds_to_dead_cell = this->mLocationCellMap[node_index]->IsDead();
+            node_corresponds_to_dead_cell = this->GetCellUsingLocationIndex(node_index)->IsDead();
         }
 
         // Write cell data to file
@@ -238,15 +238,16 @@ void AbstractCentreBasedCellPopulation<DIM>::WriteTimeAndNodeResultsToFiles()
 				node_iter != this->mrMesh.GetNodeIteratorEnd();
 				++node_iter)
 		{
-			/*
+
+		    /*
 			 * Hack that covers the case where the node in an AbstractCentreBasedCellPopulation
 			 * is associated with a cell that has just been killed (#1129). This breaks the
 			 * vertex visualizer when apoptotic cells are involved.
 			 */
 			bool node_corresponds_to_dead_cell = false;
-			if (this->mLocationCellMap[node_iter->GetIndex()])
+			if (this->IsCellAttachedToLocationIndex(node_iter->GetIndex()))
 			{
-				node_corresponds_to_dead_cell = this->mLocationCellMap[node_iter->GetIndex()]->IsDead();
+				node_corresponds_to_dead_cell = this->GetCellUsingLocationIndex(node_iter->GetIndex())->IsDead();
 			}
 
 			// Write node data to file

@@ -283,7 +283,7 @@ CellPtr MultipleCaBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_ve
 
     // Update location cell map
     CellPtr p_created_cell = this->mCells.back();
-    this->mLocationCellMap[daughter_node_index] = p_created_cell;
+    this->SetCellUsingLocationIndex(daughter_node_index,p_created_cell);
     this->mCellLocationMap[p_created_cell.get()] = daughter_node_index;
 
     //Set node to be occupied
@@ -419,7 +419,7 @@ void MultipleCaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
 				/*
 				 * Move the cell to new location
 				 */
-			    this->mLocationCellMap[chosen_neighbour_location_index] = *cell_iter;
+				this->SetCellUsingLocationIndex(chosen_neighbour_location_index,*cell_iter);
 			    this->mCellLocationMap[(*cell_iter).get()] = chosen_neighbour_location_index;
 	            this->mLocationCellMap.erase(node_index);
 
@@ -487,9 +487,9 @@ void MultipleCaBasedCellPopulation<DIM>::WriteResultsToFiles()
 
         bool node_corresponds_to_dead_cell = false;
 
-        if (this->mLocationCellMap[node_index])
+        if (this->IsCellAttachedToLocationIndex(node_index))
         {
-            node_corresponds_to_dead_cell = this->mLocationCellMap[node_index]->IsDead();
+            node_corresponds_to_dead_cell = this->GetCellUsingLocationIndex(node_index)->IsDead();
         }
 
         // Write node data to file

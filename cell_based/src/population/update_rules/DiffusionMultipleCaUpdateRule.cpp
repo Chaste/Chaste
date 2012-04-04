@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "DiffusionMultipleCaUpdateRule.hpp"
-//#include "Debug.hpp"
 
 template<unsigned DIM>
 DiffusionMultipleCaUpdateRule<DIM>::DiffusionMultipleCaUpdateRule()

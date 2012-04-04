@@ -199,7 +199,7 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
             assert(!map.IsDeleted(old_node_index));
 
             unsigned new_node_index = map.GetNewIndex(old_node_index);
-            this->mLocationCellMap[new_node_index] = *it;
+            this->SetCellUsingLocationIndex(new_node_index,*it);
             this->mCellLocationMap[(*it).get()] = new_node_index;
         }
 

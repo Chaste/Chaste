@@ -272,7 +272,7 @@ void MeshBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
             assert(!map.IsDeleted(old_node_index));
 
             unsigned new_node_index = map.GetNewIndex(old_node_index);
-            this->mLocationCellMap[new_node_index] = *it;
+            this->SetCellUsingLocationIndex(new_node_index,*it);
             this->mCellLocationMap[(*it).get()] = new_node_index;
         }
 
@@ -443,9 +443,9 @@ void MeshBasedCellPopulation<DIM>::WriteResultsToFiles()
                 element_contains_dead_cells_or_deleted_nodes = true;
                 break;
             }
-            else if (this->mLocationCellMap[node_index])
+            else if (this->IsCellAttachedToLocationIndex(node_index))
             {
-                if (this->mLocationCellMap[node_index]->IsDead())
+                if (this->GetCellUsingLocationIndex(node_index)->IsDead())
                 {
                     element_contains_dead_cells_or_deleted_nodes = true;
                     break;
@@ -622,7 +622,7 @@ void MeshBasedCellPopulation<DIM>::WriteVtkResultsToFile()
             assert(!this->IsGhostNode(node_index));
 
             // Get the cell corresponding to this element
-            CellPtr p_cell = this->mLocationCellMap[node_index];
+            CellPtr p_cell = this->GetCellUsingLocationIndex(node_index);
 
             // Get this cell-cycle model
             AbstractCellCycleModel* p_model = p_cell->GetCellCycleModel();
@@ -769,7 +769,7 @@ void MeshBasedCellPopulation<DIM>::WriteCellPopulationVolumeResultsToFile()
         if (!this->IsGhostNode(node_index))
         {
             // Get the cell corresponding to this node
-            CellPtr p_cell =  this->mLocationCellMap[node_index];
+            CellPtr p_cell =  this->GetCellUsingLocationIndex(node_index);
 
             // Only bother calculating the area/volume of apoptotic cells
             bool cell_is_apoptotic = p_cell->HasCellProperty<ApoptoticCellProperty>();
@@ -833,7 +833,7 @@ void MeshBasedCellPopulation<DIM>::WriteCellVolumeResultsToFile()
             *(this->mpCellVolumesFile) << node_index << " ";
 
             // Get the cell corresponding to this node
-            CellPtr p_cell = this->mLocationCellMap[node_index];
+            CellPtr p_cell = this->GetCellUsingLocationIndex(node_index);
 
             // Write cell ID to file
             unsigned cell_index = p_cell->GetCellId();

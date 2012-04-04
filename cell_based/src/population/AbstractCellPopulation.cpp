@@ -75,7 +75,7 @@ AbstractCellPopulation<DIM>::AbstractCellPopulation( AbstractMesh<DIM, DIM>& rMe
     for (unsigned i=0; it != mCells.end(); ++it, ++i)
     {
         unsigned index = locationIndices.empty() ? i : locationIndices[i]; // assume that the ordering matches
-        mLocationCellMap[index] = *it;
+        SetCellUsingLocationIndex(index,*it);
         mCellLocationMap[(*it).get()] = index;
 
         // Give each cell a pointer to the property registry (we have taken ownership in this constructor).
@@ -230,6 +230,27 @@ CellPtr AbstractCellPopulation<DIM>::GetCellUsingLocationIndex(unsigned index)
     {
         EXCEPTION("Location index input argument does not correspond to a Cell");
     }
+}
+
+template<unsigned DIM>
+bool AbstractCellPopulation<DIM>::IsCellAttachedToLocationIndex(unsigned index)
+{
+    // Check if pointer to cell is NULL
+    if (mLocationCellMap[index])
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+template<unsigned DIM>
+void AbstractCellPopulation<DIM>::SetCellUsingLocationIndex(unsigned index, CellPtr pCell)
+{
+    // This currently assumes a one to one relationship between cells
+    mLocationCellMap[index]= pCell;
 }
 
 template<unsigned DIM>
@@ -411,7 +432,7 @@ void AbstractCellPopulation<DIM>::GenerateCellResults(unsigned locationIndex,
 {
     unsigned colour = STEM_COLOUR;
 
-    CellPtr p_cell = mLocationCellMap[locationIndex];
+    CellPtr p_cell = GetCellUsingLocationIndex(locationIndex);
 
     if (mOutputCellCyclePhases)
     {
@@ -647,7 +668,6 @@ template<unsigned DIM>
 void AbstractCellPopulation<DIM>::WriteResultsToFiles()
 {
     WriteTimeAndNodeResultsToFiles();
-
     double time = SimulationTime::Instance()->GetTime();
 
     *mpVizCellProliferativeTypesFile << time << "\t";
@@ -681,9 +701,7 @@ void AbstractCellPopulation<DIM>::WriteResultsToFiles()
     {
         WriteCellVolumeResultsToFile();
     }
-
     GenerateCellResultsAndWriteToFiles();
-
     // Write logged cell data if required
     if (mOutputCellIdData)
     {

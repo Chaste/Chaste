@@ -782,12 +782,10 @@ public:
         cells_generator.GenerateGivenLocationIndices(cells, location_indices);
 
         cells[4]->AddCellProperty(CellPropertyRegistry::Instance()->Get<ApoptoticCellProperty>()); // coverage
-
         TS_ASSERT_EQUALS(cells[4]->HasCellProperty<ApoptoticCellProperty>(), true);
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<3> cell_population(mesh, cells, location_indices);
-
         TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "MeshBasedCellPopulationWithGhostNodes-3");
 
         // Test set methods
@@ -807,7 +805,6 @@ public:
 
         std::string output_directory = "TestCellPopulationWritersIn3dWithGhostNodes";
         OutputFileHandler output_file_handler(output_directory, false);
-
         cell_population.CreateOutputFiles(output_directory, false);
         cell_population.WriteResultsToFiles();
         cell_population.CloseOutputFiles();

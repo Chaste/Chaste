@@ -205,7 +205,7 @@ CellPtr VertexBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_vector
 
     // Update location cell map
     CellPtr p_created_cell = this->mCells.back();
-    this->mLocationCellMap[new_element_index] = p_created_cell;
+    this->SetCellUsingLocationIndex(new_element_index,p_created_cell);
     this->mCellLocationMap[p_created_cell.get()] = new_element_index;
     return p_created_cell;
 }
@@ -314,7 +314,7 @@ void VertexBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
             {
                 unsigned new_elem_index = element_map.GetNewIndex(old_elem_index);
 
-                this->mLocationCellMap[new_elem_index] = *cell_iter;
+                this->SetCellUsingLocationIndex(new_elem_index,*cell_iter);
                 this->mCellLocationMap[(*cell_iter).get()] = new_elem_index;
             }
         }
@@ -402,9 +402,9 @@ void VertexBasedCellPopulation<DIM>::WriteResultsToFiles()
         // Hack that covers the case where the element is associated with a cell that has just been killed (#1129)
         bool elem_corresponds_to_dead_cell = false;
 
-        if (this->mLocationCellMap[elem_index])
+        if (this->IsCellAttachedToLocationIndex(elem_index))
         {
-            elem_corresponds_to_dead_cell = this->mLocationCellMap[elem_index]->IsDead();
+            elem_corresponds_to_dead_cell = this->GetCellUsingLocationIndex(elem_index)->IsDead();
         }
 
         // Write element data to file
@@ -457,9 +457,9 @@ void VertexBasedCellPopulation<DIM>::WriteCellVolumeResultsToFile()
         // Hack that covers the case where the element is associated with a cell that has just been killed (#1129)
         bool elem_corresponds_to_dead_cell = false;
 
-        if (this->mLocationCellMap[elem_index])
+        if (this->IsCellAttachedToLocationIndex(elem_index))
         {
-            elem_corresponds_to_dead_cell = this->mLocationCellMap[elem_index]->IsDead();
+            elem_corresponds_to_dead_cell = this->GetCellUsingLocationIndex(elem_index)->IsDead();
         }
 
         // Write node data to file
@@ -526,7 +526,7 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         unsigned elem_index = elem_iter->GetIndex();
 
         // Get the cell corresponding to this element
-        CellPtr p_cell = this->mLocationCellMap[elem_index];
+        CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
         assert(p_cell);
 
         if (this->mOutputCellAncestors)

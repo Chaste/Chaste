@@ -413,6 +413,26 @@ public:
     CellPtr GetCellUsingLocationIndex(unsigned index);
 
     /**
+     * Returns whether or not a cell is associated with a location index
+     *
+     * @param index the location index
+     *
+     * @return the cell.
+     */
+    bool IsCellAttachedToLocationIndex(unsigned index);
+
+    /**
+     * Set the cell corresponding to a given location index.
+     *
+     * Currently assumes there is one cell for each location index.
+     *
+     * @param index the location index
+     * @param pCell the cell.
+     */
+    void SetCellUsingLocationIndex(unsigned index, CellPtr pCell);
+
+
+    /**
      * Get the location index corresponding to a given cell.
      *
      * Currently assumes there is one cell for each location index, and they are ordered identically in their vectors.
