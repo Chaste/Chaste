@@ -180,6 +180,12 @@ public:
 
         TS_ASSERT_DELTA(problem_defn.GetNormalPressure(), 3423.342, 1e-12);
 
+        problem_defn.SetPressureScaling(10.0/43.0);
+        TS_ASSERT_DELTA(problem_defn.GetNormalPressure(), 3423.342*10/43, 1e-12);
+
+        problem_defn.SetPressureScaling(1);
+
+
         ++iter;
         boundary_elements.push_back(*iter);
         problem_defn.SetTractionBoundaryConditions(boundary_elements, AnotherFunction);

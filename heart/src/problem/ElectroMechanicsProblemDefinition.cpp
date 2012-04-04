@@ -43,7 +43,8 @@ ElectroMechanicsProblemDefinition<DIM>::ElectroMechanicsProblemDefinition(Quadra
       mDeformationAffectsConductivity(false),
       mDeformationAffectsCellModels(false),
       mpDefaultMaterialLaw(NULL),
-      mReadFibreSheetInformationFromFile(false)
+      mReadFibreSheetInformationFromFile(false),
+      mNumIncrementsForInitialDeformation(1)
 {
 }
 

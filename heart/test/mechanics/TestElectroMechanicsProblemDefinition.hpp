@@ -94,6 +94,11 @@ public:
         TS_ASSERT_EQUALS(problem_defn.GetFibreSheetDirectionsFile(), "some_file.orthoquad");
         TS_ASSERT_EQUALS(problem_defn.GetFibreSheetDirectionsDefinedPerQuadraturePoint(), true);
 
+        TS_ASSERT_EQUALS(problem_defn.GetNumIncrementsForInitialDeformation(), 1u);
+        problem_defn.SetNumIncrementsForInitialDeformation(4);
+        TS_ASSERT_EQUALS(problem_defn.GetNumIncrementsForInitialDeformation(), 4u);
+
+
         // shouldn't throw
         problem_defn.SetDeformationAffectsElectrophysiology(false,false);
         problem_defn.Validate();

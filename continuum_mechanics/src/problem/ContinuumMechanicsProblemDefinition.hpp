@@ -114,6 +114,11 @@ protected:
      *  boundary elements (only used if mTractionBoundaryConditionType is set appropriately) */
     double mNormalPressure;
 
+    /** If the user asks this class to increment the pressure, the variable mNormalPressure will be altered
+     *  depending on which increment it is. Here we store the original (full) pressure.
+     */
+    double mOriginalNormalPressure;
+
     /** The tractions as a function of space and time (only used if mTractionBoundaryConditionType is set appropriately) */
     c_vector<double,DIM> (*mpTractionBoundaryConditionFunction)(c_vector<double,DIM>& rX, double t);
 
@@ -267,6 +272,20 @@ public:
      */
     double GetNormalPressure();
 
+    /**
+     * Set the value that will be returned by GetNormalPressure() to be a fraction
+     * of its full value.
+     *
+     * Note: you don't have to take into account previous calls when calling this.
+     *  SetPressureScaling(0.1);
+     *  SetPressureScaling(1);
+     * will lead to the original pressure being used
+     *
+     * (Error if GetTractionBoundaryConditionType()!=PRESSURE_ON_DEFORMED)
+     *
+     * @param scaleFactor scale factor
+     */
+    void SetPressureScaling(double scaleFactor);
 
     /**
      * Evaluate the traction boundary condition function (error if GetTractionBoundaryConditionType()!=FUNCTIONAL_TRACTION)

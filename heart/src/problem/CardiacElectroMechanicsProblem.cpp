@@ -434,6 +434,11 @@ void CardiacElectroMechanicsProblem<DIM>::Solve()
         Initialise();
     }
 
+    bool verbose_during_solve = (    mpProblemDefinition->GetVerboseDuringSolve()
+                                  || CommandLineArguments::Instance()->OptionExists("-mech_verbose")
+                                  || CommandLineArguments::Instance()->OptionExists("-mech_very_verbose"));
+
+
     mpProblemDefinition->Validate();
 
     boost::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>);
@@ -482,17 +487,43 @@ void CardiacElectroMechanicsProblem<DIM>::Solve()
     ////
     ////////////////////////////////////////////////////////////////
 
-    LOG(2, "\nSolving mechanics for initial deformation");
+    LOG(2, "\nSolving for initial deformation");
+    #define COVERAGE_IGNORE
+    if(verbose_during_solve)
+    {
+        std::cout << "\n\n ** Solving for initial deformation\n";
+    }
+    #undef COVERAGE_IGNORE
+
     mpMechanicsSolver->SetWriteOutput(false);
-    // make sure the mechanics solver knows the current time (in case
-    // the traction say is time-dependent).
-    mpMechanicsSolver->SetCurrentTime(stepper.GetTime());
+
+    mpMechanicsSolver->SetCurrentTime(0.0);
     MechanicsEventHandler::BeginEvent(MechanicsEventHandler::ALL_MECH);
+
     mpMechanicsSolver->SetIncludeActiveTension(false);
-    mpMechanicsSolver->Solve();
+
+    unsigned total_newton_iters = 0;
+    for(unsigned index=1; index<=mpProblemDefinition->GetNumIncrementsForInitialDeformation(); index++)
+    {
+        #define COVERAGE_IGNORE
+        if(verbose_during_solve)
+        {
+            std::cout << "    Increment " << index << " of " << mpProblemDefinition->GetNumIncrementsForInitialDeformation() << "\n";
+        }
+        #undef COVERAGE_IGNORE
+
+        if(mpProblemDefinition->GetTractionBoundaryConditionType()==PRESSURE_ON_DEFORMED)
+        {
+            mpProblemDefinition->SetPressureScaling(((double)index)/mpProblemDefinition->GetNumIncrementsForInitialDeformation());
+        }
+        mpMechanicsSolver->Solve();
+
+        total_newton_iters += mpMechanicsSolver->GetNumNewtonIterations();
+    }
+
     mpMechanicsSolver->SetIncludeActiveTension(true);
     MechanicsEventHandler::EndEvent(MechanicsEventHandler::ALL_MECH);
-    LOG(2, "    Number of newton iterations = " << mpMechanicsSolver->GetNumNewtonIterations());
+    LOG(2, "    Number of newton iterations = " << total_newton_iters);
 
 
     unsigned mech_writer_counter = 0;
@@ -521,8 +552,6 @@ void CardiacElectroMechanicsProblem<DIM>::Solve()
     }
 
 
-
-
     PrepareForSolve();
 
 //// For attempting to improve Newton convergence by quadratically extrapolating from
@@ -536,9 +565,7 @@ void CardiacElectroMechanicsProblem<DIM>::Solve()
     {
         LOG(2, "\nCurrent time = " << stepper.GetTime());
         #define COVERAGE_IGNORE
-        if(   mpProblemDefinition->GetVerboseDuringSolve()
-           || CommandLineArguments::Instance()->OptionExists("-mech_verbose")
-           || CommandLineArguments::Instance()->OptionExists("-mech_very_verbose"))
+        if(verbose_during_solve)
         {
             // also output time to screen as newton solve information will be output
             std::cout << "\n\n ** Current time = " << stepper.GetTime() << "\n";
