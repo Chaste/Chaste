@@ -139,7 +139,7 @@ void ContinuumMechanicsProblemDefinition<DIM>::SetTractionBoundaryConditions(std
 }
 
 template<unsigned DIM>
-void ContinuumMechanicsProblemDefinition<DIM>::SetTractionBoundaryConditions(std::vector<BoundaryElement<DIM-1,DIM>*> rTractionBoundaryElements,
+void ContinuumMechanicsProblemDefinition<DIM>::SetTractionBoundaryConditions(std::vector<BoundaryElement<DIM-1,DIM>*>& rTractionBoundaryElements,
                                                                              c_vector<double,DIM> (*pFunction)(c_vector<double,DIM>& rX, double t))
 {
     mTractionBoundaryConditionType=FUNCTIONAL_TRACTION;
@@ -149,7 +149,7 @@ void ContinuumMechanicsProblemDefinition<DIM>::SetTractionBoundaryConditions(std
 
 
 template<unsigned DIM>
-void ContinuumMechanicsProblemDefinition<DIM>::SetApplyNormalPressureOnDeformedSurface(std::vector<BoundaryElement<DIM-1,DIM>*> rTractionBoundaryElements,
+void ContinuumMechanicsProblemDefinition<DIM>::SetApplyNormalPressureOnDeformedSurface(std::vector<BoundaryElement<DIM-1,DIM>*>& rTractionBoundaryElements,
                                                                                        double normalPressure)
 {
     mTractionBoundaryConditionType = PRESSURE_ON_DEFORMED;

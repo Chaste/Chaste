@@ -66,6 +66,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  except the concrete class has to provide up to 6 methods, for each of the blocks A,B1,B2 and for b1
  *  and b2.
  *
+ *  The assembler is main used for fluids - currently it is used for assembling the matrix for Stokes
+ *  flow [A B ; B^T 0], and the preconditioner for Stokes flow [A, B; B^T M], and will be useful for
+ *  further fluids assemblies, and could be used for mixed-problem incompressible linear elasticity.
+ *  We DON'T use this assembler in the incompressible nonlinear elasticity solver, because even though
+ *  the matrix is of the right form, things like stress and stress-derivative need to be computed at
+ *  the AssembleOnElement level and the assembly is in general too complex for this class to be used.
+ *
  *  NOTE: The elemental matrix and vector is as above. The full matrix and vector uses a completely
  *  different ordering: for parallelisation reasons the pressure variables are interleaved with the
  *  spatial variables and dummy pressure variables are used for internal nodes. For example, in 2d,

@@ -533,6 +533,14 @@ public:
 
         // writes solution_0.exnode and solution_0.exelem using the mesh
         writer.WriteInitialMesh();
+        writer.WriteInitialMesh("some_other_name");
+
+        std::string results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "TestCmguiDeformedSolutionsWriter";
+
+        TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" " + results_dir + "/solution_0.exnode " + results_dir + "/some_other_name.exnode").c_str()), 0);
+        // we shouldn't really have called WriteInitialMesh() twice on the same writer. If we had used different writers
+        // we could also check the exelem files are the same here (the second one isn't created due to WriteInitialMesh
+        // being called twice
 
         // set up a deformed positions vector
         std::vector<c_vector<double,2> > deformed_positions(mesh.GetNumNodes(), zero_vector<double>(2));
@@ -558,8 +566,6 @@ public:
         deformed_positions.push_back(zero_vector<double>(2));
 
         TS_ASSERT_THROWS_CONTAINS(writer.WriteDeformationPositions(deformed_positions, 3), "The size of rDeformedPositions does not match the number of nodes in the mesh");
-
-        std::string results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "TestCmguiDeformedSolutionsWriter";
 
         std::string node_file1 = results_dir + "/solution_0.exnode";
         std::string node_file2 = "mesh/test/data/TestCmguiDeformedSolutionsWriter/solution_0.exnode";

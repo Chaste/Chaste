@@ -460,11 +460,10 @@ void CardiacElectroMechanicsProblem<DIM>::Solve()
 
     CmguiDeformedSolutionsWriter<DIM>* p_cmgui_writer = NULL;
 
-    unsigned mech_writer_counter = 0;
     if (mWriteOutput)
     {
         mpMechanicsSolver->SetWriteOutput();
-        mpMechanicsSolver->WriteCurrentSpatialSolution("solution","nodes",mech_writer_counter);
+        mpMechanicsSolver->WriteCurrentSpatialSolution("undeformed","nodes");
 
         p_cmgui_writer = new CmguiDeformedSolutionsWriter<DIM>(mOutputDirectory+"/deformation/cmgui",
                                                                "solution",
@@ -473,8 +472,37 @@ void CardiacElectroMechanicsProblem<DIM>::Solve()
         std::vector<std::string> fields;
         fields.push_back("V");
         p_cmgui_writer->SetAdditionalFieldNames(fields);
-        p_cmgui_writer->WriteInitialMesh();
+        p_cmgui_writer->WriteInitialMesh("undeformed");
+    }
 
+    /////////////////////////////////////////////////////////////////
+    ////
+    ////  Solve a static problem which might involve finding
+    ////  equilibrium state given initial internal pressures etc
+    ////
+    ////////////////////////////////////////////////////////////////
+
+    LOG(2, "\nSolving mechanics for initial deformation");
+    mpMechanicsSolver->SetWriteOutput(false);
+    // make sure the mechanics solver knows the current time (in case
+    // the traction say is time-dependent).
+    mpMechanicsSolver->SetCurrentTime(stepper.GetTime());
+    MechanicsEventHandler::BeginEvent(MechanicsEventHandler::ALL_MECH);
+    mpMechanicsSolver->SetIncludeActiveTension(false);
+    mpMechanicsSolver->Solve();
+    mpMechanicsSolver->SetIncludeActiveTension(true);
+    MechanicsEventHandler::EndEvent(MechanicsEventHandler::ALL_MECH);
+    LOG(2, "    Number of newton iterations = " << mpMechanicsSolver->GetNumNewtonIterations());
+
+
+    unsigned mech_writer_counter = 0;
+
+    if (mWriteOutput)
+    {
+        LOG(2, "  Writing output");
+        mpMechanicsSolver->SetWriteOutput();
+        mpMechanicsSolver->WriteCurrentSpatialSolution("solution","nodes",mech_writer_counter);
+        p_cmgui_writer->WriteDeformationPositions(rGetDeformedPosition(), mech_writer_counter);
 
         if(!mNoElectricsOutput)
         {
@@ -491,6 +519,9 @@ void CardiacElectroMechanicsProblem<DIM>::Solve()
             WriteWatchedLocationData(stepper.GetTime(), initial_voltage);
         }
     }
+
+
+
 
     PrepareForSolve();
 
@@ -763,11 +794,11 @@ void CardiacElectroMechanicsProblem<DIM>::Solve()
     {
         if(mNoElectricsOutput)
         {
-            p_cmgui_writer->WriteCmguiScript();
+            p_cmgui_writer->WriteCmguiScript("","undeformed");
         }
         else
         {
-            p_cmgui_writer->WriteCmguiScript("../../electrics/cmgui_output/voltage_mechanics_mesh");
+            p_cmgui_writer->WriteCmguiScript("../../electrics/cmgui_output/voltage_mechanics_mesh","undeformed");
         }
         delete p_cmgui_writer;
     }

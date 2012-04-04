@@ -108,17 +108,30 @@ public:
 
         QuadraticMesh<2> mechanics_mesh(0.1, 0.1, 0.1);
 
-        // fix the nodes on x=0
-        std::vector<unsigned> fixed_nodes
-          = NonlinearElasticityTools<2>::GetNodesByComponentValue(mechanics_mesh,0,0);
-
         HeartConfig::Instance()->SetSimulationDuration(1.0);
 
         ElectroMechanicsProblemDefinition<2> problem_defn(mechanics_mesh);
         problem_defn.SetContractionModel(NASH2004,1.0);
         problem_defn.SetUseDefaultCardiacMaterialLaw(INCOMPRESSIBLE);
-        problem_defn.SetZeroDisplacementNodes(fixed_nodes);
         problem_defn.SetMechanicsSolveTimestep(1.0);
+
+        std::vector<unsigned> fixed_nodes;
+        std::vector<c_vector<double,2> > locations;
+        for ( TetrahedralMesh<2,2>::BoundaryNodeIterator iter = mechanics_mesh.GetBoundaryNodeIteratorBegin();
+              iter != mechanics_mesh.GetBoundaryNodeIteratorEnd();
+              ++iter)
+        {
+            double X = (*iter)->rGetLocation()[0];
+            double Y = (*iter)->rGetLocation()[1];
+
+            fixed_nodes.push_back((*iter)->GetIndex());
+
+            c_vector<double,2> new_position;
+            new_position(0) = 1.2*X;
+            new_position(1) = Y/1.2;
+            locations.push_back(new_position);
+        }
+        problem_defn.SetFixedNodes(fixed_nodes, locations);
 
         // Set deformation not affecting conductivity, but affecting cell models.
         problem_defn.SetDeformationAffectsElectrophysiology(false,true);
@@ -133,7 +146,7 @@ public:
         problem.Initialise();
 
         // hack into the mechanics solver and set up the current solution so that it corresponds to
-        // the square of tissue being stretched
+        // the square of tissue being stretched - see comment below
         for(unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
         {
             double X = mechanics_mesh.GetNode(i)->rGetLocation()[0];
@@ -164,9 +177,9 @@ public:
         }
 
 
-        // Note after one timestep the tissue will have returned to the resting state as there are no
-        // forces and no way at the moment of passing fixed-displacement boundary conditions down to the mech
-        // solver. *Note: the 'no way at the moment' part of this statement is now out-of-date*
+        // Now we call Solve. The solver will, before the first timestep, first the equilibrium solution
+        // given BCs and loading, which obviously won't require any newton steps as the current solution
+        // was manually set to the right thing above. Then it will solve one timestep.
         problem.Solve();
 
         // Get the voltage at the start and end of the simulation, check the stretch was passed down to the
@@ -193,7 +206,7 @@ public:
         PetscTools::Destroy(end_voltage);
     }
 
-    // Similar to first part of above test, except the deformation isn't just constant stretch, and
+    // Similar to first part of above test, except the deformation is not homogeneous, and
     // also here we say that the deformation DOES affect conductivity.
     void TestWithMefAndAlteredConductivitesHeterogeneousStretch() throw (Exception)
     {
@@ -286,33 +299,6 @@ public:
                 TS_ASSERT_DELTA(r_tensor(1,1), default_conductivity*inverse_C(1,1), 1e-9);
             }
         }
-
-
-        problem.Solve();
-
-        // Get the voltage at the start and end of the simulation, check the stretch was passed down to the
-        // cell model and caused increased voltage -- same as in above test - we are basically testing
-        // that MEF works when conductivities are altered too.
-
-        Hdf5DataReader reader("TestNobleSacActivatedByStretchTissue/electrics", "voltage");
-        unsigned num_timesteps = reader.GetUnlimitedDimensionValues().size();
-        TS_ASSERT_EQUALS(num_timesteps, 2u);
-
-        Vec start_voltage = PetscTools::CreateVec(36);
-        Vec end_voltage = PetscTools::CreateVec(36);
-        reader.GetVariableOverNodes(start_voltage, "V", 0);
-        reader.GetVariableOverNodes(end_voltage, "V", 1);
-        ReplicatableVector start_voltage_repl(start_voltage);
-        ReplicatableVector end_voltage_repl(end_voltage);
-
-        for(unsigned i=0; i<start_voltage_repl.GetSize(); i++)
-        {
-            TS_ASSERT_LESS_THAN(start_voltage_repl[i], -90.0);
-            TS_ASSERT_LESS_THAN(-90, end_voltage_repl[i]);
-        }
-
-        PetscTools::Destroy(start_voltage);
-        PetscTools::Destroy(end_voltage);
     }
 
     // Run a where the domain in long and thin, and held squashed in the X-direction, by Dirichlet

@@ -314,10 +314,13 @@ void CompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
         p_material_law->SetChangeOfBasisMatrix(this->mChangeOfBasisMatrix);
         p_material_law->ComputeStressAndStressDerivative(C, inv_C, 0.0, T, dTdE, assembleJacobian);
 
-        // Add any active stresses, if there are any. Requires subclasses to overload this method,
-        // see for example the cardiac mechanics assemblers.
-        this->AddActiveStressAndStressDerivative(C, rElement.GetIndex(), current_quad_point_global_index,
-                                                 T, dTdE, assembleJacobian);
+        if(this->mIncludeActiveTension)
+        {
+            // Add any active stresses, if there are any. Requires subclasses to overload this method,
+            // see for example the cardiac mechanics assemblers.
+            this->AddActiveStressAndStressDerivative(C, rElement.GetIndex(), current_quad_point_global_index,
+                                                     T, dTdE, assembleJacobian);
+        }
 
         // Residual vector
         if (assembleResidual)

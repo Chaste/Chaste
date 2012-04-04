@@ -102,7 +102,15 @@ PetscErrorCode AbstractNonlinearElasticitySolver_ComputeJacobian(SNES snes,
 
 
 /**
- * Abstract nonlinear elasticity solver.
+ * Abstract nonlinear elasticity solver. IncompressibleNonlinearElasticityAssembler and
+ * CompressibleNonlinearElasticityAssembler inherit from this class.
+ *
+ * The class is both a solver AND a assembler: the AssembleOnElement(), AssembleSystem() methods
+ * are hardcoded into this class. In principle something like AbstractContinuumMechanicsAssembler
+ * could have been used as a member variable [that class is used for assembling fluids matrices etc]
+ * but nonlinear elasticity is too complex for the that class to be used, as things like stress and
+ * stress-derivative need to be computed at the AssembleOnElement level, things like
+ * pressure-on-deformed-surface are deformation dependent boundary conditions, etc. *
  */
 template<unsigned DIM>
 class AbstractNonlinearElasticitySolver : public AbstractContinuumMechanicsSolver<DIM>
@@ -207,6 +215,9 @@ protected:
      */
     double mLastDampingValue;
 
+
+    bool mIncludeActiveTension;
+
     /**
      * Set the KSP type (CG, GMRES, etc) and the preconditioner type (ILU, ICC etc). Depends on
      * incompressible or not, and other factors.
@@ -216,6 +227,9 @@ protected:
      * @param solver KSP solver object (Petsc object)
      */
     void SetKspSolverAndPcType(KSP solver);
+
+
+
 
 
     /**
@@ -319,11 +333,11 @@ protected:
      *     stored
      */
     void AssembleOnBoundaryElement(BoundaryElement<DIM-1, DIM>& rBoundaryElement,
-                                           c_matrix<double, BOUNDARY_STENCIL_SIZE, BOUNDARY_STENCIL_SIZE>& rAelem,
-                                           c_vector<double, BOUNDARY_STENCIL_SIZE>& rBelem,
-                                           bool assembleResidual,
-                                           bool assembleJacobian,
-                                           unsigned boundaryConditionIndex);
+                                   c_matrix<double, BOUNDARY_STENCIL_SIZE, BOUNDARY_STENCIL_SIZE>& rAelem,
+                                   c_vector<double, BOUNDARY_STENCIL_SIZE>& rBelem,
+                                   bool assembleResidual,
+                                   bool assembleJacobian,
+                                   unsigned boundaryConditionIndex);
 
 
     /**
@@ -504,6 +518,11 @@ public:
     void Solve(double tol=-1.0);
 
 
+    void SetIncludeActiveTension(bool includeActiveTension = true)
+    {
+        mIncludeActiveTension = includeActiveTension;
+    }
+
     /**
      * Get number of Newton iterations taken in last solve.
      */
@@ -596,7 +615,8 @@ AbstractNonlinearElasticitySolver<DIM>::AbstractNonlinearElasticitySolver(Quadra
       mNumNewtonIterations(0),
       mCurrentTime(0.0),
       mCheckedOutwardNormals(false),
-      mLastDampingValue(0.0)
+      mLastDampingValue(0.0),
+      mIncludeActiveTension(true)
 {
     mUseSnesSolver = (mrProblemDefinition.GetSolveUsingSnes() ||
                       CommandLineArguments::Instance()->OptionExists("-mech_use_snes") );

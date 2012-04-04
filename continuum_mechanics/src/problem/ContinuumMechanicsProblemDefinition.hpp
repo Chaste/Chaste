@@ -235,7 +235,7 @@ public:
      * @param rTractionBoundaryElements the boundary elements
      * @param pFunction the traction function (a function of space and time, returning a vector)
      */
-    void SetTractionBoundaryConditions(std::vector<BoundaryElement<DIM-1,DIM>*> rTractionBoundaryElements,
+    void SetTractionBoundaryConditions(std::vector<BoundaryElement<DIM-1,DIM>*>& rTractionBoundaryElements,
                                        c_vector<double,DIM> (*pFunction)(c_vector<double,DIM>& rX, double t));
 
     /**
@@ -245,7 +245,7 @@ public:
      * @param rTractionBoundaryElements The boundary elements
      * @param normalPressure the corresponding pressure
      */
-    void SetApplyNormalPressureOnDeformedSurface(std::vector<BoundaryElement<DIM-1,DIM>*> rTractionBoundaryElements,
+    void SetApplyNormalPressureOnDeformedSurface(std::vector<BoundaryElement<DIM-1,DIM>*>& rTractionBoundaryElements,
                                                  double normalPressure);
 
     /**

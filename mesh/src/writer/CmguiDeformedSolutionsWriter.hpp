@@ -108,8 +108,12 @@ public:
 
     /**
      *  Write [basename]_0.exnode, [basename]_0.exelem using the quadratic mesh
+     *  If the optional argument fileName is given, writes [fileName].exnode
+     *  and [fileName].exelem instead
+     *
+     *  @param fileName Optional file name (stem).
      */
-    void WriteInitialMesh();
+    void WriteInitialMesh(std::string fileName = "");
 
     /**
      *  Write [basename]_i.exnode using the given deformed positions
@@ -124,14 +128,20 @@ public:
      *  Writes a small cmgui script called LoadSolutions.com, for loading the output that has been written.
      *  Assumes the output was solution_0.exnode .. solution_N.exnode, where N is the counter that was
      *  given in the last call to WriteDeformationPositions()
+     *
      *  @param fieldBaseName If there is a field to visualise on top of the deforming mesh, give it's
      *    path (relative to the cmgui deformation directory), and filename prefix. Leave empty
      *    if no field to visualise.
      *    For example,
      *      WriteCmguiScript("../../electrics/cmgui_output/voltage_mechanics_mesh");
      *    for the script to read files voltage_mechanics_mesh_0.exnode .. voltage_mechanics_mesh_N.exnode.
+     *
+     *  @param undeformedBaseName is assumed to be "solution_0.exnode" and .exelem unless this optional
+     *    parameter is given. Depends on what parameters were given to WriteInitialMesh(). If
+     *    undeformedBaseName the time given to plot the undeformed shape is set to -1, otherwise
+     *    it is set to 0.
      */
-    void WriteCmguiScript(std::string fieldBaseName="");
+    void WriteCmguiScript(std::string fieldBaseName="", std::string undeformedBaseName="");
 
     /**
      *  For a simulation that has already been run, convert the chaste output to cmgui format.
