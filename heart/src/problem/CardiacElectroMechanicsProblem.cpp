@@ -213,7 +213,8 @@ CardiacElectroMechanicsProblem<DIM>::CardiacElectroMechanicsProblem(
         mNoElectricsOutput(false),
         mIsWatchedLocation(false),
         mWatchedElectricsNodeIndex(UNSIGNED_UNSET),
-        mWatchedMechanicsNodeIndex(UNSIGNED_UNSET)
+        mWatchedMechanicsNodeIndex(UNSIGNED_UNSET),
+        mNumTimestepsToOutputDeformationGradients(UNSIGNED_UNSET)
 {
     // Do some initial set up...
     // However, NOTE, we don't use either the passed in meshes or the problem_definition.
@@ -549,6 +550,11 @@ void CardiacElectroMechanicsProblem<DIM>::Solve()
         {
             WriteWatchedLocationData(stepper.GetTime(), initial_voltage);
         }
+
+        if(mNumTimestepsToOutputDeformationGradients!=UNSIGNED_UNSET)
+        {
+            mpMechanicsSolver->WriteCurrentDeformationGradients("deformation_gradient",mech_writer_counter);
+        }
     }
 
 
@@ -773,6 +779,11 @@ void CardiacElectroMechanicsProblem<DIM>::Solve()
                 WriteWatchedLocationData(stepper.GetTime(), voltage);
             }
             OnEndOfTimeStep(counter);
+
+            if(mNumTimestepsToOutputDeformationGradients!=UNSIGNED_UNSET && counter%mNumTimestepsToOutputDeformationGradients==0)
+            {
+                mpMechanicsSolver->WriteCurrentDeformationGradients("deformation_gradient",mech_writer_counter);
+            }
         }
         MechanicsEventHandler::EndEvent(MechanicsEventHandler::OUTPUT);
 
@@ -811,7 +822,7 @@ void CardiacElectroMechanicsProblem<DIM>::Solve()
         // Note: this calculates the data on ALL nodes of the mechanics mesh (incl internal,
         // non-vertex ones), which won't be used if linear CMGUI visualisation
         // of the mechanics solution is used.
-        VoltageInterpolaterOntoMechanicsMesh<DIM> cnverter(*mpElectricsMesh,*mpMechanicsMesh,input_dir,"voltage");
+        VoltageInterpolaterOntoMechanicsMesh<DIM> converter(*mpElectricsMesh,*mpMechanicsMesh,input_dir,"voltage");
 
         // reset to the default value
         HeartConfig::Instance()->SetOutputDirectory(config_directory);
@@ -859,6 +870,16 @@ void CardiacElectroMechanicsProblem<DIM>::SetWatchedPosition(c_vector<double,DIM
 {
     mIsWatchedLocation = true;
     mWatchedLocation = watchedLocation;
+}
+
+template<unsigned DIM>
+void CardiacElectroMechanicsProblem<DIM>::SetOutputDeformationGradients(bool outputDeformationGradients, double timeStep)
+{
+    mNumTimestepsToOutputDeformationGradients = (unsigned) floor((timeStep/mpProblemDefinition->GetMechanicsSolveTimestep())+0.5);
+    if(fabs(mNumTimestepsToOutputDeformationGradients*mpProblemDefinition->GetMechanicsSolveTimestep() - timeStep) > 1e-6)
+    {
+        EXCEPTION("Timestep provided for SetOutputDeformationGradients() is not a multiple of mechanics solve timestep");
+    }
 }
 
 

@@ -121,7 +121,7 @@ public:
         // the following is just for coverage - applying a zero pressure so has no effect on deformation
         std::vector<BoundaryElement<1,2>*> boundary_elems;
         boundary_elems.push_back(* (mechanics_mesh.GetBoundaryElementIteratorBegin()));
-        problem_defn.problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, 0.0);
+        problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, 0.0);
 
         HeartConfig::Instance()->SetSimulationDuration(10.0);
 
@@ -257,6 +257,10 @@ public:
         pos(1) = 0.0;
 
         problem.SetWatchedPosition(pos);
+
+        TS_ASSERT_THROWS_CONTAINS(problem.SetOutputDeformationGradients(true, 3.4),"not a multiple");
+
+        problem.SetOutputDeformationGradients(true, 3.0);
         problem.Solve();
 
         // test by checking the length of the tissue against hardcoded value
@@ -270,6 +274,15 @@ public:
 
         // check electrics output was written
         std::string command = "ls " + handler.GetOutputDirectoryFullPath() + "/electrics";
+        TS_ASSERT_EQUALS(system(command.c_str()), 0);
+
+        command = "ls " + handler.GetOutputDirectoryFullPath() + "/deformation/deformation_gradient_0.strain";
+        TS_ASSERT_EQUALS(system(command.c_str()), 0);
+
+        command = "ls " + handler.GetOutputDirectoryFullPath() + "/deformation/deformation_gradient_3.strain";
+        TS_ASSERT_EQUALS(system(command.c_str()), 0);
+
+        command = "ls " + handler.GetOutputDirectoryFullPath() + "/deformation/deformation_gradient_6.strain";
         TS_ASSERT_EQUALS(system(command.c_str()), 0);
 
 

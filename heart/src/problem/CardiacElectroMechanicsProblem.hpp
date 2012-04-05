@@ -139,6 +139,9 @@ protected :
     /** File where watched location info is written */
     out_stream mpWatchedLocationFile;
 
+    /** How often to print the deformation gradients to file (if ever) */
+    unsigned mNumTimestepsToOutputDeformationGradients;
+
     /** A vector of stretches (in the fibre direction), one for each element in the mechanics mesh */
     std::vector<double> mStretchesForEachMechanicsElement;
     /** A vector of deformation gradients (each entry a matrix), one for each element in the mechanics mesh */
@@ -224,6 +227,15 @@ public :
      *  @param watchedLocation  location (x,y,z) in space.  Watched node is the closest to this point.
      */
     void SetWatchedPosition(c_vector<double,DIM> watchedLocation);
+
+    /**
+     *  Call this for a files containing the deformation gradients (F), evaluated at the
+     *  centroids of element, to be written.
+     *
+     *  @param outputDeformationGradients whether to write this or not
+     *  @param timestep how often to write this. Must be a multiple of the mechanics timestep.
+     */
+    void SetOutputDeformationGradients(bool outputDeformationGradients, double timestep);
 
     /** @return the current deformed position of the nodes */
     std::vector<c_vector<double,DIM> >& rGetDeformedPosition();

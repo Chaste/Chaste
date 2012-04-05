@@ -106,7 +106,7 @@ public:
             }
         }
 
-       HeartConfig::Instance()->SetSimulationDuration(15.0);
+       HeartConfig::Instance()->SetSimulationDuration(30.0);
 
        ElectroMechanicsProblemDefinition<2> problem_defn(mechanics_mesh);
 
@@ -153,7 +153,10 @@ public:
                                                  &problem_defn,
                                                  "TestEmOnAnnulus");
 
+       problem.SetOutputDeformationGradients(true, 10.0);
+
        problem.Solve();
+
 
        // we don't really anything, we mainly just want to verify it solves OK past the initial and through
        // the cycle. Have visualised.
