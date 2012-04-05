@@ -98,6 +98,7 @@ public:
         problem_defn.SetNumIncrementsForInitialDeformation(4);
         TS_ASSERT_EQUALS(problem_defn.GetNumIncrementsForInitialDeformation(), 4u);
 
+        TS_ASSERT_THROWS_THIS(problem_defn.SetNumIncrementsForInitialDeformation(0), "Number of increments for initial deformation must be 1 or more");
 
         // shouldn't throw
         problem_defn.SetDeformationAffectsElectrophysiology(false,false);

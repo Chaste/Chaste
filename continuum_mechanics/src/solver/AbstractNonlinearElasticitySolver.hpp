@@ -216,6 +216,13 @@ protected:
     double mLastDampingValue;
 
 
+   /**
+    * Whether to call AddActiveStressAndStressDerivative() when computing stresses or not.
+    *
+    * Subclasses, such as the cardiac mechanics solvers, may implement the above method to add
+    * active contributions to the stress. However, sometimes we might want to switch this off.
+    * Defaults to true.
+    */
     bool mIncludeActiveTension;
 
     /**
@@ -517,7 +524,15 @@ public:
      */
     void Solve(double tol=-1.0);
 
-
+    /**
+     * Whether to call AddActiveStressAndStressDerivative() when computing stresses or not.
+     *
+     * Subclasses, such as the cardiac mechanics solvers, may implement the above method to add
+     * active contributions to the stress. However, sometimes we might want to switch this off,
+     * which is what this function is for - will generally be called with includeActiveTension=false
+     *
+     * @param includeActiveTension whether to include active tension
+     */
     void SetIncludeActiveTension(bool includeActiveTension = true)
     {
         mIncludeActiveTension = includeActiveTension;
@@ -1059,11 +1074,13 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElementForPressur
         // check one of the weights was zero, as the quad point is on the boundary of the volume element
         if(DIM==2)
         {
-            assert( (fabs(weight(0))<1e-6) || (fabs(weight(1))<1e-6) || (fabs(weight(2))<1e-6) );
+            assert( DIM!=2 || (fabs(weight(0))<1e-6) || (fabs(weight(1))<1e-6) || (fabs(weight(2))<1e-6) );
         }
         else
         {
-            assert( (fabs(weight(0))<1e-6) || (fabs(weight(1))<1e-6) || (fabs(weight(2))<1e-6)  || (fabs(weight(3))<1e-6) );
+            #define COVERAGE_IGNORE
+            assert( DIM!=3 || (fabs(weight(0))<1e-6) || (fabs(weight(1))<1e-6) || (fabs(weight(2))<1e-6)  || (fabs(weight(3))<1e-6) );
+            #undef COVERAGE_IGNORE
         }
 
         // Now we can compute the grad_phi and then interpolate F

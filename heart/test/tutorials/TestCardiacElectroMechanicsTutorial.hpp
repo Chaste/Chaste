@@ -577,7 +577,7 @@ public:
         ReplicatableVector voltage_repl(voltage);
         for(unsigned i=0; i<voltage_repl.GetSize(); i++)
         {
-            TS_ASSERT_DELTA(voltage_repl[i], -81.9142, 1e-3);
+            TS_ASSERT_DELTA(voltage_repl[i], -81.9080, 1e-3);
         }
         PetscTools::Destroy(voltage);
 

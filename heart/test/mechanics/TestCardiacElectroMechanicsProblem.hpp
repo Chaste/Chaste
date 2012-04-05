@@ -118,6 +118,11 @@ public:
         problem_defn.SetFixedNodes(fixed_nodes, fixed_node_locations);
         problem_defn.SetMechanicsSolveTimestep(1.0);
 
+        // the following is just for coverage - applying a zero pressure so has no effect on deformation
+        std::vector<BoundaryElement<1,2>*> boundary_elems;
+        boundary_elems.push_back(* (mechanics_mesh.GetBoundaryElementIteratorBegin()));
+        problem_defn.problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, 0.0);
+
         HeartConfig::Instance()->SetSimulationDuration(10.0);
 
         CardiacElectroMechanicsProblem<2> problem(COMPRESSIBLE,
