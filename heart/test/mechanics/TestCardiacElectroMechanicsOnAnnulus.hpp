@@ -106,7 +106,7 @@ public:
             }
         }
 
-       HeartConfig::Instance()->SetSimulationDuration(30.0);
+       HeartConfig::Instance()->SetSimulationDuration(400.0);
 
        ElectroMechanicsProblemDefinition<2> problem_defn(mechanics_mesh);
 
@@ -141,9 +141,6 @@ public:
             }
        }
        problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, -1.0 /*1 KPa is about 8mmHg*/);
-
-//       problem_defn.SetCavityPressure(boundary_elems, -1.0 /*1 KPa is about 8mmHg*/);
-//       problem_defn.SetCavityPressure(boundary_elems, DiastolicFillingPressureFunction);
        problem_defn.SetNumIncrementsForInitialDeformation(3);
 
        CardiacElectroMechanicsProblem<2> problem(COMPRESSIBLE,
