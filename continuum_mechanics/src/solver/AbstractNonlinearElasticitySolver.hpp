@@ -1015,7 +1015,8 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElement(
             bool assembleJacobian,
             unsigned boundaryConditionIndex)
 {
-    if(this->mrProblemDefinition.GetTractionBoundaryConditionType() == PRESSURE_ON_DEFORMED)
+    if(   this->mrProblemDefinition.GetTractionBoundaryConditionType() == PRESSURE_ON_DEFORMED
+       || this->mrProblemDefinition.GetTractionBoundaryConditionType() == FUNCTIONAL_PRESSURE_ON_DEFORMED)
     {
         AssembleOnBoundaryElementForPressureOnDeformedBc(rBoundaryElement, rAelem, rBelem,
                                                          assembleResidual, assembleJacobian, boundaryConditionIndex);
@@ -1116,7 +1117,8 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElementForPressur
             bool assembleJacobian,
             unsigned boundaryConditionIndex)
 {
-    assert(this->mrProblemDefinition.GetTractionBoundaryConditionType()==PRESSURE_ON_DEFORMED);
+    assert(   this->mrProblemDefinition.GetTractionBoundaryConditionType()==PRESSURE_ON_DEFORMED
+           || this->mrProblemDefinition.GetTractionBoundaryConditionType()==FUNCTIONAL_PRESSURE_ON_DEFORMED);
 
     rAelem.clear();
     rBelem.clear();
@@ -1219,6 +1221,21 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElementForPressur
         normal_as_mat(0,i) = normal(i);
     }
 
+    double normal_pressure;
+    switch (this->mrProblemDefinition.GetTractionBoundaryConditionType())
+    {
+        case PRESSURE_ON_DEFORMED:
+            normal_pressure = this->mrProblemDefinition.GetNormalPressure();
+            break;
+        case FUNCTIONAL_PRESSURE_ON_DEFORMED:
+            normal_pressure = this->mrProblemDefinition.EvaluateNormalPressureFunction(this->mCurrentTime);
+            break;
+        default:
+            NEVER_REACHED;
+    }
+
+
+
     for (unsigned quad_index=0; quad_index<this->mpBoundaryQuadratureRule->GetNumQuadPoints(); quad_index++)
     {
         double wJ = jacobian_determinant * this->mpBoundaryQuadratureRule->GetWeight(quad_index);
@@ -1279,7 +1296,7 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElementForPressur
 
         if(assembleResidual)
         {
-            c_vector<double,DIM> traction = detF*this->mrProblemDefinition.GetNormalPressure()*prod(trans(invF),normal);
+            c_vector<double,DIM> traction = detF*normal_pressure*prod(trans(invF),normal);
 
             // assemble
             for (unsigned index=0; index<NUM_NODES_PER_BOUNDARY_ELEMENT*DIM; index++)
@@ -1343,7 +1360,7 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElementForPressur
                     unsigned spatial_dim2 = index2%DIM;
                     unsigned node_index2 = (index2-spatial_dim2)/DIM;
 
-                    rAelem(index1,index2) -=    this->mrProblemDefinition.GetNormalPressure()
+                    rAelem(index1,index2) -=    normal_pressure
                                               * detF
                                               * tensor3(node_index2,spatial_dim2,0,spatial_dim1)
                                               * quad_phi_surf_element(node_index1)

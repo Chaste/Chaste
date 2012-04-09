@@ -60,6 +60,11 @@ c_vector<double,2> AnotherFunction(c_vector<double,2>& rX, double t)
     return body_force;
 }
 
+double PressureFunction(double t)
+{
+    return 3*t;
+}
+
 
 // Helper function for creating std vectors. Ugly, but makes things below much neater (avoids many, many push_backs).
 template<class T>
@@ -193,6 +198,10 @@ public:
 
         TS_ASSERT_DELTA(problem_defn.EvaluateTractionFunction(X,t)(0), 5.0,  1e-12);
         TS_ASSERT_DELTA(problem_defn.EvaluateTractionFunction(X,t)(1), 55.0, 1e-12);
+
+        problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elements, PressureFunction);
+        TS_ASSERT_EQUALS(problem_defn.GetTractionBoundaryConditionType(), FUNCTIONAL_PRESSURE_ON_DEFORMED);
+        TS_ASSERT_DELTA(problem_defn.EvaluateNormalPressureFunction(3.64455), 3*3.64455, 1e-12);
 
         std::vector<unsigned> fixed_nodes;
         fixed_nodes.push_back(0);

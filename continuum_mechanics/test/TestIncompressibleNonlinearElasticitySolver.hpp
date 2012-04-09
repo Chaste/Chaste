@@ -109,6 +109,16 @@ c_vector<double,2> MyTraction(c_vector<double,2>& location, double t)
     return traction;
 }
 
+// see TestSolveWithPressureBcsOnDeformedSurface()
+double MyPressureFunction(double t)
+{
+    // the hardcoded value 1.32317 comes from outputting
+    // double pressure = (2*c1*(pow(lambda,-1) - lambda*lambda*lambda))/lambda;
+    return 1.32317 + 100*(t-1.0);
+}
+
+
+
 class TestIncompressibleNonlinearElasticitySolver : public CxxTest::TestSuite
 {
 public:
@@ -856,90 +866,122 @@ public:
      */
     void TestSolveWithPressureBcsOnDeformedSurface() throw(Exception)
     {
-        MechanicsEventHandler::Reset();
+        std::vector<double> soln_first_run;
 
-        double lambda = 0.85;
-        double c1 = 1.0;
-        unsigned num_elem = 10;
-
-        QuadraticMesh<2> mesh(1.0/num_elem, 1.0, 1.0);
-        MooneyRivlinMaterialLaw<2> law(c1);
-
-        std::vector<unsigned> fixed_nodes;
-        std::vector<c_vector<double,2> > locations;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for(unsigned run = 0; run < 1; run++)
         {
-            if ( fabs(mesh.GetNode(i)->rGetLocation()[0])<1e-6)
+            MechanicsEventHandler::Reset();
+
+            double lambda = 0.85;
+            double c1 = 1.0;
+            unsigned num_elem = 10;
+
+            QuadraticMesh<2> mesh(1.0/num_elem, 1.0, 1.0);
+            MooneyRivlinMaterialLaw<2> law(c1);
+
+            std::vector<unsigned> fixed_nodes;
+            std::vector<c_vector<double,2> > locations;
+            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {
-                fixed_nodes.push_back(i);
-                c_vector<double,2> new_position;
-                new_position(0) = (lambda/sqrt(2)) * mesh.GetNode(i)->rGetLocation()[1];
-                new_position(1) = (lambda/sqrt(2)) * mesh.GetNode(i)->rGetLocation()[1];
-                locations.push_back(new_position);
+                if ( fabs(mesh.GetNode(i)->rGetLocation()[0])<1e-6)
+                {
+                    fixed_nodes.push_back(i);
+                    c_vector<double,2> new_position;
+                    new_position(0) = (lambda/sqrt(2)) * mesh.GetNode(i)->rGetLocation()[1];
+                    new_position(1) = (lambda/sqrt(2)) * mesh.GetNode(i)->rGetLocation()[1];
+                    locations.push_back(new_position);
+                }
             }
-        }
 
-        std::vector<BoundaryElement<1,2>*> boundary_elems;
-        double pressure = (2*c1*(pow(lambda,-1) - lambda*lambda*lambda))/lambda;
+            std::vector<BoundaryElement<1,2>*> boundary_elems;
+            double pressure = (2*c1*(pow(lambda,-1) - lambda*lambda*lambda))/lambda;
 
-        for (TetrahedralMesh<2,2>::BoundaryElementIterator iter
-              = mesh.GetBoundaryElementIteratorBegin();
-            iter != mesh.GetBoundaryElementIteratorEnd();
-            ++iter)
-        {
-            if (fabs((*iter)->CalculateCentroid()[0] - 1.0)<1e-4)
+            for (TetrahedralMesh<2,2>::BoundaryElementIterator iter
+                  = mesh.GetBoundaryElementIteratorBegin();
+                iter != mesh.GetBoundaryElementIteratorEnd();
+                ++iter)
             {
-                BoundaryElement<1,2>* p_element = *iter;
-                boundary_elems.push_back(p_element);
+                if (fabs((*iter)->CalculateCentroid()[0] - 1.0)<1e-4)
+                {
+                    BoundaryElement<1,2>* p_element = *iter;
+                    boundary_elems.push_back(p_element);
+                }
             }
-        }
-        assert(boundary_elems.size()==num_elem);
+            assert(boundary_elems.size()==num_elem);
 
-        SolidMechanicsProblemDefinition<2> problem_defn(mesh);
+            SolidMechanicsProblemDefinition<2> problem_defn(mesh);
 
-        problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
-        problem_defn.SetFixedNodes(fixed_nodes, locations);
-        problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, pressure);
+            problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
+            problem_defn.SetFixedNodes(fixed_nodes, locations);
 
-        IncompressibleNonlinearElasticitySolver<2> solver(mesh,
-                                                          problem_defn,
-                                                          "nonlin_elas_pressure_on_deformed");
-
-
-        solver.Solve();
-
-        std::vector<c_vector<double,2> >& r_solution = solver.rGetDeformedPosition();
-
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
-        {
-            double exact_x_before_rotation = (1.0/lambda)*mesh.GetNode(i)->rGetLocation()[0];
-            double exact_y_before_rotation = lambda*mesh.GetNode(i)->rGetLocation()[1];
-
-            double exact_x = (1.0/sqrt(2))*( exact_x_before_rotation + exact_y_before_rotation);
-            double exact_y = (1.0/sqrt(2))*(-exact_x_before_rotation + exact_y_before_rotation);
-
-            TS_ASSERT_DELTA( r_solution[i](0), exact_x, 1e-3 );
-            TS_ASSERT_DELTA( r_solution[i](1), exact_y, 1e-3 );
-        }
-
-        // check the final pressure
-        std::vector<double>& r_pressures = solver.rGetPressures();
-        TS_ASSERT_EQUALS(r_pressures.size(), mesh.GetNumNodes());
-        for (unsigned i=0; i<r_pressures.size(); i++)
-        {
-            if(! mesh.GetNode(i)->IsInternal())
+            // the two variants of SetApplyNormalPressureOnDeformedSurface(). MyPressureFunction
+            // will return the same value as that in the variable pressure IF the current time
+            // is set to 1.0.
+            if(run==0)
             {
-                TS_ASSERT_DELTA(r_pressures[i], 2*c1*lambda*lambda, 5e-2 );
+                problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, pressure);
             }
             else
             {
-                // dummy variable
-                TS_ASSERT_DELTA(r_pressures[i], 0.0, 1e-8);
+                problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, MyPressureFunction);
             }
-        }
 
-        MechanicsEventHandler::Headings();
-        MechanicsEventHandler::Report();
+            IncompressibleNonlinearElasticitySolver<2> solver(mesh,
+                                                              problem_defn,
+                                                              "nonlin_elas_pressure_on_deformed");
+
+            if(run==1)
+            {
+                solver.SetCurrentTime(1.0);
+                // To speed up this test, we provide the correct answer as the initial guess for
+                // the second run.
+                solver.rGetCurrentSolution() = soln_first_run;
+            }
+
+            solver.Solve();
+
+            if(run==0)
+            {
+                soln_first_run = solver.rGetCurrentSolution();
+            }
+            else
+            {
+                TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(), 0u);
+            }
+
+            std::vector<c_vector<double,2> >& r_solution = solver.rGetDeformedPosition();
+
+            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+            {
+                double exact_x_before_rotation = (1.0/lambda)*mesh.GetNode(i)->rGetLocation()[0];
+                double exact_y_before_rotation = lambda*mesh.GetNode(i)->rGetLocation()[1];
+
+                double exact_x = (1.0/sqrt(2))*( exact_x_before_rotation + exact_y_before_rotation);
+                double exact_y = (1.0/sqrt(2))*(-exact_x_before_rotation + exact_y_before_rotation);
+
+                TS_ASSERT_DELTA( r_solution[i](0), exact_x, 1e-3 );
+                TS_ASSERT_DELTA( r_solution[i](1), exact_y, 1e-3 );
+            }
+
+            // check the final pressure
+            std::vector<double>& r_pressures = solver.rGetPressures();
+            TS_ASSERT_EQUALS(r_pressures.size(), mesh.GetNumNodes());
+            for (unsigned i=0; i<r_pressures.size(); i++)
+            {
+                if(! mesh.GetNode(i)->IsInternal())
+                {
+                    TS_ASSERT_DELTA(r_pressures[i], 2*c1*lambda*lambda, 5e-2 );
+                }
+                else
+                {
+                    // dummy variable
+                    TS_ASSERT_DELTA(r_pressures[i], 0.0, 1e-8);
+                }
+            }
+
+            MechanicsEventHandler::Headings();
+            MechanicsEventHandler::Report();
+        }
     }
 
 

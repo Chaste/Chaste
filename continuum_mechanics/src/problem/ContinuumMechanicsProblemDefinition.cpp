@@ -159,6 +159,16 @@ void ContinuumMechanicsProblemDefinition<DIM>::SetApplyNormalPressureOnDeformedS
 
 }
 
+template<unsigned DIM>
+void ContinuumMechanicsProblemDefinition<DIM>::SetApplyNormalPressureOnDeformedSurface(std::vector<BoundaryElement<DIM-1,DIM>*>& rTractionBoundaryElements,
+                                                                                       double (*pFunction)(double t))
+{
+    mTractionBoundaryConditionType = FUNCTIONAL_PRESSURE_ON_DEFORMED;
+    mTractionBoundaryElements = rTractionBoundaryElements;
+    mpNormalPressureFunction = pFunction;
+}
+
+
 
 
 template<unsigned DIM>
@@ -217,6 +227,13 @@ c_vector<double,DIM> ContinuumMechanicsProblemDefinition<DIM>::EvaluateTractionF
 {
     assert(mTractionBoundaryConditionType==FUNCTIONAL_TRACTION);
     return (*mpTractionBoundaryConditionFunction)(rX,t);
+}
+
+template<unsigned DIM>
+double ContinuumMechanicsProblemDefinition<DIM>::EvaluateNormalPressureFunction(double t)
+{
+    assert(mTractionBoundaryConditionType==FUNCTIONAL_PRESSURE_ON_DEFORMED);
+    return (*mpNormalPressureFunction)(t);
 }
 
 template<unsigned DIM>

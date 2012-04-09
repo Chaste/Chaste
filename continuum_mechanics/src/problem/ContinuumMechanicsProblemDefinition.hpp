@@ -60,7 +60,8 @@ typedef enum TractionBoundaryConditionType_
     NO_TRACTIONS,
     ELEMENTWISE_TRACTION,
     FUNCTIONAL_TRACTION,
-    PRESSURE_ON_DEFORMED
+    PRESSURE_ON_DEFORMED,
+    FUNCTIONAL_PRESSURE_ON_DEFORMED
 } TractionBoundaryConditionType;
 
 
@@ -121,6 +122,10 @@ protected:
 
     /** The tractions as a function of space and time (only used if mTractionBoundaryConditionType is set appropriately) */
     c_vector<double,DIM> (*mpTractionBoundaryConditionFunction)(c_vector<double,DIM>& rX, double t);
+
+    /** The normal pressure as a function if time (only used if mTractionBoundaryConditionType is set appropriately) */
+    double (*mpNormalPressureFunction)(double t);
+
 
     ///////////////////////////////////////////
     // Dirichlet boundary conditions
@@ -253,6 +258,19 @@ public:
     void SetApplyNormalPressureOnDeformedSurface(std::vector<BoundaryElement<DIM-1,DIM>*>& rTractionBoundaryElements,
                                                  double normalPressure);
 
+
+
+    /**
+     * Set traction (Neumann) boundary conditions. This version says that pressures should be applied
+     * on surfaces in the DEFORMED body in the outward normal direction, and here the pressure is specified
+     * in FUNCTIONAL FORM
+     *
+     * @param rTractionBoundaryElements The boundary elements
+     * @param pFunction the pressure function (a function of time, returning a double)
+     */
+    void SetApplyNormalPressureOnDeformedSurface(std::vector<BoundaryElement<DIM-1,DIM>*>& rTractionBoundaryElements,
+                                                 double (*pFunction)(double t));
+
     /**
      * Get the vector of traction boundary elements
      */
@@ -294,6 +312,14 @@ public:
      * @param t current time
      */
     c_vector<double,DIM> EvaluateTractionFunction(c_vector<double,DIM>& rX, double t);
+
+    /**
+     * Evaluate the pressure boundary condition function (error if GetTractionBoundaryConditionType()!=FUNCTIONAL_PRESSURE_ON_DEFORMED)
+     *
+     * @param t current time
+     */
+    double EvaluateNormalPressureFunction(double t);
+
 
     /**
      * Check all variables are set appropriately. Exceptions are thrown if any are not.
