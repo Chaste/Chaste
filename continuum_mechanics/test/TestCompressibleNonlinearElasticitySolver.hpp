@@ -400,7 +400,7 @@ public:
 
         double traction_value = 2*w1*alpha + 2*w3*alpha*beta*beta;
 
-        unsigned num_elem = 10;
+        unsigned num_elem = 5;
 
         QuadraticMesh<2> mesh(1.0/num_elem, 1.0, 1.0);
         CompressibleMooneyRivlinMaterialLaw<2> law(c, d);
@@ -449,7 +449,7 @@ public:
                                                         "comp_nonlin_compMR_simple");
 
         // Coverage
-        solver.SetKspAbsoluteTolerance(1e-12);
+        solver.SetKspAbsoluteTolerance(1e-10);
 
         solver.SetComputeAverageStressPerElementDuringSolve();
 

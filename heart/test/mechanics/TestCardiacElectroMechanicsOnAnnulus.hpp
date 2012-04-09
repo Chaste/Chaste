@@ -150,7 +150,7 @@ public:
                                                  &problem_defn,
                                                  "TestEmOnAnnulus");
 
-       problem.SetOutputDeformationGradients(true, 10.0);
+       problem.SetOutputDeformationGradientsAndStress(10.0);
 
        problem.Solve();
 

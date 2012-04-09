@@ -214,7 +214,7 @@ CardiacElectroMechanicsProblem<DIM>::CardiacElectroMechanicsProblem(
         mIsWatchedLocation(false),
         mWatchedElectricsNodeIndex(UNSIGNED_UNSET),
         mWatchedMechanicsNodeIndex(UNSIGNED_UNSET),
-        mNumTimestepsToOutputDeformationGradients(UNSIGNED_UNSET)
+        mNumTimestepsToOutputDeformationGradientsAndStress(UNSIGNED_UNSET)
 {
     // Do some initial set up...
     // However, NOTE, we don't use either the passed in meshes or the problem_definition.
@@ -502,6 +502,10 @@ void CardiacElectroMechanicsProblem<DIM>::Solve()
     MechanicsEventHandler::BeginEvent(MechanicsEventHandler::ALL_MECH);
 
     mpMechanicsSolver->SetIncludeActiveTension(false);
+    if(mNumTimestepsToOutputDeformationGradientsAndStress!=UNSIGNED_UNSET)
+    {
+        mpMechanicsSolver->SetComputeAverageStressPerElementDuringSolve(true);
+    }
 
     unsigned total_newton_iters = 0;
     for(unsigned index=1; index<=mpProblemDefinition->GetNumIncrementsForInitialDeformation(); index++)
@@ -551,9 +555,10 @@ void CardiacElectroMechanicsProblem<DIM>::Solve()
             WriteWatchedLocationData(stepper.GetTime(), initial_voltage);
         }
 
-        if(mNumTimestepsToOutputDeformationGradients!=UNSIGNED_UNSET)
+        if(mNumTimestepsToOutputDeformationGradientsAndStress!=UNSIGNED_UNSET)
         {
             mpMechanicsSolver->WriteCurrentDeformationGradients("deformation_gradient",mech_writer_counter);
+            mpMechanicsSolver->WriteCurrentAverageElementStresses("second_PK",mech_writer_counter);
         }
     }
 
@@ -566,6 +571,10 @@ void CardiacElectroMechanicsProblem<DIM>::Solve()
 //    std::vector<double> current_solution_previous_time_step = mpMechanicsSolver->rGetCurrentSolution();
 //    std::vector<double> current_solution_second_last_time_step = mpMechanicsSolver->rGetCurrentSolution();
 //    bool first_step = true;
+
+
+    // reset this to false, may be reset again below
+    mpMechanicsSolver->SetComputeAverageStressPerElementDuringSolve(false);
 
     while (!stepper.IsTimeAtEnd())
     {
@@ -721,6 +730,12 @@ void CardiacElectroMechanicsProblem<DIM>::Solve()
         // the traction say is time-dependent).
         mpMechanicsSolver->SetCurrentTime(stepper.GetTime());
 
+        // see if we will need to output stresses at the end of this timestep
+        if(    mNumTimestepsToOutputDeformationGradientsAndStress!=UNSIGNED_UNSET
+            && (counter+1)%mNumTimestepsToOutputDeformationGradientsAndStress == 0 )
+        {
+            mpMechanicsSolver->SetComputeAverageStressPerElementDuringSolve(true);
+        }
 
 //// For attempting to improve Newton convergence by quadratically extrapolating from
 //// last two solutions to guess next solution. See comments above
@@ -780,10 +795,12 @@ void CardiacElectroMechanicsProblem<DIM>::Solve()
             }
             OnEndOfTimeStep(counter);
 
-            if(mNumTimestepsToOutputDeformationGradients!=UNSIGNED_UNSET && counter%mNumTimestepsToOutputDeformationGradients==0)
+            if(mNumTimestepsToOutputDeformationGradientsAndStress!=UNSIGNED_UNSET && counter%mNumTimestepsToOutputDeformationGradientsAndStress==0)
             {
                 mpMechanicsSolver->WriteCurrentDeformationGradients("deformation_gradient",mech_writer_counter);
+                mpMechanicsSolver->WriteCurrentAverageElementStresses("second_PK",mech_writer_counter);
             }
+            mpMechanicsSolver->SetComputeAverageStressPerElementDuringSolve(false);
         }
         MechanicsEventHandler::EndEvent(MechanicsEventHandler::OUTPUT);
 
@@ -873,12 +890,12 @@ void CardiacElectroMechanicsProblem<DIM>::SetWatchedPosition(c_vector<double,DIM
 }
 
 template<unsigned DIM>
-void CardiacElectroMechanicsProblem<DIM>::SetOutputDeformationGradients(bool outputDeformationGradients, double timeStep)
+void CardiacElectroMechanicsProblem<DIM>::SetOutputDeformationGradientsAndStress(double timeStep)
 {
-    mNumTimestepsToOutputDeformationGradients = (unsigned) floor((timeStep/mpProblemDefinition->GetMechanicsSolveTimestep())+0.5);
-    if(fabs(mNumTimestepsToOutputDeformationGradients*mpProblemDefinition->GetMechanicsSolveTimestep() - timeStep) > 1e-6)
+    mNumTimestepsToOutputDeformationGradientsAndStress = (unsigned) floor((timeStep/mpProblemDefinition->GetMechanicsSolveTimestep())+0.5);
+    if(fabs(mNumTimestepsToOutputDeformationGradientsAndStress*mpProblemDefinition->GetMechanicsSolveTimestep() - timeStep) > 1e-6)
     {
-        EXCEPTION("Timestep provided for SetOutputDeformationGradients() is not a multiple of mechanics solve timestep");
+        EXCEPTION("Timestep provided for SetOutputDeformationGradientsAndStress() is not a multiple of mechanics solve timestep");
     }
 }
 
