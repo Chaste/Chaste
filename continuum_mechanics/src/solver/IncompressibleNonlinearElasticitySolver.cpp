@@ -287,6 +287,12 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
     static c_matrix<double, DIM, NUM_NODES_PER_ELEMENT> temp_matrix;
     static c_matrix<double,NUM_NODES_PER_ELEMENT,DIM> grad_quad_phi_times_invF;
 
+
+    if(this->mSetComputeAverageStressPerElement)
+    {
+        this->mAverageStressesPerElement[rElement.GetIndex()] = zero_vector<double>(DIM*(DIM+1)/2);
+    }
+
     // Loop over Gauss points
     for (unsigned quadrature_index=0; quadrature_index < this->mpQuadratureRule->GetNumQuadPoints(); quadrature_index++)
     {
@@ -378,6 +384,10 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
                                                      T, dTdE, assembleJacobian);
         }
 
+        if(this->mSetComputeAverageStressPerElement)
+        {
+            this->AddStressToAverageStressPerElement(T,rElement.GetIndex());
+        }
 
         // Residual vector
         if (assembleResidual)
@@ -551,6 +561,15 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
             {
                 rAElemPrecond(i,j) = 0.0;
             }
+        }
+    }
+
+
+    if(this->mSetComputeAverageStressPerElement)
+    {
+        for(unsigned i=0; i<DIM*(DIM+1)/2; i++)
+        {
+            this->mAverageStressesPerElement[rElement.GetIndex()](i) /= this->mpQuadratureRule->GetNumQuadPoints();
         }
     }
 }

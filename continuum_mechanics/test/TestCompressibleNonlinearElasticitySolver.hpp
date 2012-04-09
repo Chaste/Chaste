@@ -400,7 +400,7 @@ public:
 
         double traction_value = 2*w1*alpha + 2*w3*alpha*beta*beta;
 
-        unsigned num_elem = 5;
+        unsigned num_elem = 10;
 
         QuadraticMesh<2> mesh(1.0/num_elem, 1.0, 1.0);
         CompressibleMooneyRivlinMaterialLaw<2> law(c, d);
@@ -449,7 +449,48 @@ public:
                                                         "comp_nonlin_compMR_simple");
 
         // Coverage
-        solver.SetKspAbsoluteTolerance(1e-10);
+        solver.SetKspAbsoluteTolerance(1e-12);
+
+        solver.SetComputeAverageStressPerElementDuringSolve();
+
+        /////////////////////////////////////////////////////////////////
+        // Provide the exact solution as the initial guess and check
+        // residual is (nearly) exactly zero (as the solution is in
+        // the FEM space, the FEM solution, assuming the nonlinear
+        // system was solved exactly, is the exact solution
+        /////////////////////////////////////////////////////////////////
+
+        std::vector<double> old_current_soln = solver.rGetCurrentSolution();
+
+        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        {
+            double exact_x = alpha*mesh.GetNode(i)->rGetLocation()[0];
+            double exact_y = beta*mesh.GetNode(i)->rGetLocation()[1];
+
+            solver.rGetCurrentSolution()[2*i]   = exact_x - mesh.GetNode(i)->rGetLocation()[0];
+            solver.rGetCurrentSolution()[2*i+1] = exact_y - mesh.GetNode(i)->rGetLocation()[1];
+        }
+
+        solver.Solve();
+
+        TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(), 0u); // initial guess was solution
+
+        // test stresses. The 1st PK stress should satisfy S = [s(0) 0 ; 0 0], where s is the
+        // applied traction. This has to be multiplied by F^{-T} to get the 2nd PK stress.
+        assert(solver.mAverageStressesPerElement.size()==mesh.GetNumElements());
+        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        {
+            TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,0), traction(0)/alpha, 1e-8);
+            TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(1,0), 0.0, 1e-8);
+            TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,1), 0.0, 1e-8);
+            TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(1,1), 0.0, 1e-8);
+        }
+
+
+        ///////////////////////////////////////////////////////////////////////////
+        // Now solve properly
+        ///////////////////////////////////////////////////////////////////////////
+        solver.rGetCurrentSolution() = old_current_soln;
 
         solver.Solve();
 
@@ -469,6 +510,18 @@ public:
 
             TS_ASSERT_DELTA( r_solution[i](0), exact_x, 1e-5 );
             TS_ASSERT_DELTA( r_solution[i](1), exact_y, 1e-5 );
+        }
+
+        // check the stresses (averaged over each quad point). The alpha below is for converting
+        // from 1st PK stress (for which we have SN=s => S(0,0) = traction_value) to 2nd PK stress,
+        // using T = SF^{-T}
+        assert(solver.mAverageStressesPerElement.size()==mesh.GetNumElements());
+        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        {
+            TS_ASSERT_DELTA((solver.GetAverageStressPerElement(i)(0,0)*alpha - traction_value)/traction_value, 0.0, 5e-4);
+            TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(1,0), 0.0, 5e-4);
+            TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,1), 0.0, 5e-4);
+            TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,1), 0.0, 5e-4);
         }
 
         MechanicsEventHandler::Headings();
@@ -980,6 +1033,151 @@ public:
         // no output directory given, cover a return statement in WriteCurrentDeformationGradients()
         solver.WriteCurrentDeformationGradients("wont_be_written",0);
     }
+
+
+    void TestWritingStress3dAndExceptions() throw(Exception)
+    {
+        QuadraticMesh<3> mesh(1.0, 1.0, 1.0, 1.0);
+
+        CompressibleMooneyRivlinMaterialLaw<3> law(1.0, 1.0);
+
+        std::vector<unsigned> fixed_nodes;
+        fixed_nodes.push_back(0);
+
+        SolidMechanicsProblemDefinition<3> problem_defn(mesh);
+        problem_defn.SetMaterialLaw(COMPRESSIBLE,&law);
+        problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+
+        // cover a return statement where nothing happens if no output directory set
+        CompressibleNonlinearElasticitySolver<3> solver_0(mesh,
+                                                          problem_defn,
+                                                          "");
+
+        solver_0.SetComputeAverageStressPerElementDuringSolve();
+        solver_0.WriteCurrentAverageElementStresses("wont_be_written",0);
+
+
+
+        CompressibleNonlinearElasticitySolver<3> solver(mesh,
+                                                        problem_defn,
+                                                        "TestWritingStress");
+
+        // cover an exception
+        TS_ASSERT_THROWS_CONTAINS(solver.WriteCurrentAverageElementStresses("wont_be_written",0), "Call SetComputeAverageStressPerElementDuringSolve() before solve");
+
+        // test method, but not through calling Solve. Tests where SetComputeAverageStressPerElementDuringSolve() is
+        // called and then Solve() is called are TestSolveForSimpleDeformationWithCompMooneyRivlin above (homogeneous
+        // stress/strain) and the corresponding homogeneous stress/strain incompressible test.
+        //
+        solver.SetComputeAverageStressPerElementDuringSolve();
+
+        assert(solver.mAverageStressesPerElement.size()==6u);
+        for(unsigned i=0; i<6; i++)
+        {
+            solver.mAverageStressesPerElement[i] = zero_vector<double>(6);
+        }
+
+        c_matrix<double,3,3> T;
+        T(0,0) = 0.043;
+        T(1,1) = 0.564;
+        T(2,2) = 0.243;
+        T(0,1) = 0.43;
+        T(1,0) = 0.43;
+        T(0,2) = 0.03;
+        T(2,0) = 0.03;
+        T(1,2) = 1.03;
+        T(2,1) = 1.03;
+
+        solver.AddStressToAverageStressPerElement(T,0);
+
+        solver.AddStressToAverageStressPerElement(T,1);
+        solver.AddStressToAverageStressPerElement(T,1);
+
+        T(2,2) = 10.243;
+
+        solver.AddStressToAverageStressPerElement(T,2);
+
+        for(unsigned i=0; i<6; i++)
+        {
+            solver.mAverageStressesPerElement[3](i) = i;
+        }
+
+        T(2,2) = 0.243;
+        double corrrect_T3[3][3] = { {0, 1, 2}, {1, 3, 4}, {2, 4, 5} };
+
+
+        for(unsigned i=0; i<3; i++)
+        {
+            for(unsigned j=0; j<3; j++)
+            {
+                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(0)(i,j), T(i,j), 1e-12);
+                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(1)(i,j), 2*T(i,j), 1e-12);
+                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(3)(i,j), corrrect_T3[i][j], 1e-12);
+                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(4)(i,j), 0.0, 1e-12);
+                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(5)(i,j), 0.0, 1e-12);
+            }
+        }
+
+        T(2,2) = 10.243;
+
+        for(unsigned i=0; i<3; i++)
+        {
+            for(unsigned j=0; j<3; j++)
+            {
+                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(2)(i,j), T(i,j), 1e-12);
+            }
+        }
+
+        solver.WriteCurrentAverageElementStresses("some_stresses_3d",10);
+
+        std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
+        std::string command = "diff " + test_output_directory
+                              + "/TestWritingStress/some_stresses_3d_10.stress continuum_mechanics/test/data/some_stresses_3d_10.stress";
+        TS_ASSERT_EQUALS(system(command.c_str()), 0);
+    }
+
+    // quick 2d test that complements above test
+    void TestWritingStress2d() throw(Exception)
+    {
+        QuadraticMesh<2> mesh(1.0, 1.0, 1.0);
+        CompressibleMooneyRivlinMaterialLaw<2> law(1.0, 1.0);
+
+        std::vector<unsigned> fixed_nodes;
+        fixed_nodes.push_back(0);
+
+        SolidMechanicsProblemDefinition<2> problem_defn(mesh);
+        problem_defn.SetMaterialLaw(COMPRESSIBLE,&law);
+        problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+
+        CompressibleNonlinearElasticitySolver<2> solver(mesh,
+                                                        problem_defn,
+                                                        "");
+
+        solver.SetComputeAverageStressPerElementDuringSolve();
+
+        assert(solver.mAverageStressesPerElement.size()==2u);
+        for(unsigned i=0; i<2; i++)
+        {
+            solver.mAverageStressesPerElement[i] = zero_vector<double>(3);
+        }
+
+        c_matrix<double,2,2> T;
+        T(0,0) = 0.043;
+        T(1,1) = 0.564;
+        T(0,1) = 0.43;
+        T(1,0) = 0.43;
+        solver.AddStressToAverageStressPerElement(T,0);
+
+        for(unsigned i=0; i<2; i++)
+        {
+            for(unsigned j=0; j<2; j++)
+            {
+                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(0)(i,j), T(i,j), 1e-12);
+                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(1)(i,j), 0.0, 1e-12);
+            }
+        }
+    }
+
 };
 
 #endif /* TESTCOMPRESSIBLENONLINEARELASTICITYSOLVER_HPP_ */

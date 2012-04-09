@@ -225,6 +225,30 @@ protected:
     */
     bool mIncludeActiveTension;
 
+	/** 
+	 * The user may request that the stress for each element (averaged over quadrature point stresses)
+	 * are saved during the Solve; this bool states this (defaults to false).
+	 */
+    bool mSetComputeAverageStressPerElement;
+    
+    /**
+     * If the stresses for each element (averaged over quadrature point stresses)
+     * are two be stored, they are stored in this variable.
+     * Note to save memory we just don't store the lower half of the stress,
+     * as the stress is symmetric, hence this is a vector of 6 (in 3d) variables
+     * rather than a 3d matrix.
+     */
+    std::vector<c_vector<double,DIM*(DIM+1)/2> > mAverageStressesPerElement;
+    
+    /**
+     *  Add the given stress tensor to the store of average stresses.
+     *  mSetComputeAverageStressPerElement must be true
+     * 
+     *  @param rT 2nd PK stress (matrix is assumed symmetric)
+     *  @param elementIndex element index
+     */
+    void AddStressToAverageStressPerElement(c_matrix<double,DIM,DIM>& rT, unsigned elementIndex);
+
     /**
      * Set the KSP type (CG, GMRES, etc) and the preconditioner type (ILU, ICC etc). Depends on
      * incompressible or not, and other factors.
@@ -234,9 +258,6 @@ protected:
      * @param solver KSP solver object (Petsc object)
      */
     virtual void SetKspSolverAndPcType(KSP solver);
-
-
-
 
 
     /**
@@ -593,12 +614,32 @@ public:
      * F00 F01 F02 F10 F11 F12 F20 F21 F22.
      *
      * @param fileName The file name stem
-     * @param counterToAppend Number to append in the filename.
+     * @param counterToAppend (Optional) number to append in the filename.
      *
      * The final file is [fileName]_[counterToAppend].strain
      */
-    void WriteCurrentDeformationGradients(std::string fileName, int counterToAppend);
+    void WriteCurrentDeformationGradients(std::string fileName, int counterToAppend = -1);
 
+	/**
+	 * The user may request that the stress for each element (averaged over quadrature point stresses)
+	 * are saved during the Solve(), by calling this.
+	 */
+    void SetComputeAverageStressPerElementDuringSolve(bool setComputeAverageStressPerElement = true);
+    
+    /**
+     * If SetComputeAverageStressPerElementDuringSolve() was called before the Solve(), then 
+     * this method can be used to print the average stresses to file)
+     *
+     * Each line of the output file corresponds to one element: the DIM*DIM matrix will be written
+     * as one line, using the ordering:
+     * T00 T01 T02 T10 T11 T12 T20 T21 T22.
+     *
+     * @param fileName The file name stem
+     * @param counterToAppend (Optional) number to append in the filename.
+     *
+     * The final file is [fileName]_[counterToAppend].stress
+     */
+    void WriteCurrentAverageElementStresses(std::string fileName, int counterToAppend = -1);
 
     /**
      * Implemented method, returns the deformed position.
@@ -611,6 +652,15 @@ public:
      * calls rGetSpatialSolution().
      */
     std::vector<c_vector<double,DIM> >& rGetDeformedPosition();
+
+	/**
+     * If SetComputeAverageStressPerElementDuringSolve() was called before the Solve(), then 
+     * this method can be used to get the average stress for a particular
+     * element.
+     * 
+     * @param elementIndex elementIndex
+	 */
+    c_matrix<double,DIM,DIM> GetAverageStressPerElement(unsigned elementIndex);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -631,7 +681,8 @@ AbstractNonlinearElasticitySolver<DIM>::AbstractNonlinearElasticitySolver(Quadra
       mCurrentTime(0.0),
       mCheckedOutwardNormals(false),
       mLastDampingValue(0.0),
-      mIncludeActiveTension(true)
+      mIncludeActiveTension(true),
+      mSetComputeAverageStressPerElement(false)
 {
     mUseSnesSolver = (mrProblemDefinition.GetSolveUsingSnes() ||
                       CommandLineArguments::Instance()->OptionExists("-mech_use_snes") );
@@ -740,6 +791,48 @@ void AbstractNonlinearElasticitySolver<DIM>::WriteCurrentDeformationGradients(st
     p_file->close();
 }
 
+
+template<unsigned DIM>
+void AbstractNonlinearElasticitySolver<DIM>::WriteCurrentAverageElementStresses(std::string fileName, int counterToAppend)
+{
+    if (!this->mWriteOutput)
+    {
+        return;
+    }
+
+    if(!mSetComputeAverageStressPerElement)
+    {
+        EXCEPTION("Call SetComputeAverageStressPerElementDuringSolve() before solve if calling WriteCurrentAverageElementStresses()");
+    }
+
+    std::stringstream file_name;
+    file_name << fileName;
+    if (counterToAppend >= 0)
+    {
+        file_name << "_" << counterToAppend;
+    }
+    file_name << ".stress";
+
+    out_stream p_file = this->mpOutputFileHandler->OpenOutputFile(file_name.str());
+
+    assert(mAverageStressesPerElement.size()==this->mrQuadMesh.GetNumElements());
+
+    for(unsigned i=0; i<mAverageStressesPerElement.size(); i++)
+    {
+        c_matrix<double,DIM,DIM> stress = GetAverageStressPerElement(i);
+        for(unsigned j=0; j<DIM; j++)
+        {
+            for(unsigned k=0; k<DIM; k++)
+            {
+                *p_file << stress(j,k) << " ";
+            }
+        }
+        *p_file << "\n";
+    }
+    p_file->close();
+}
+
+
 template<unsigned DIM>
 void AbstractNonlinearElasticitySolver<DIM>::CreateCmguiOutput()
 {
@@ -757,6 +850,89 @@ void AbstractNonlinearElasticitySolver<DIM>::CreateCmguiOutput()
     writer.WriteInitialMesh(); // this writes solution_0.exnode and .exelem
     writer.WriteDeformationPositions(r_deformed_positions, 1); // this writes the final solution as solution_1.exnode
     writer.WriteCmguiScript(); // writes LoadSolutions.com
+}
+
+
+template<unsigned DIM>
+void AbstractNonlinearElasticitySolver<DIM>::SetComputeAverageStressPerElementDuringSolve(bool setComputeAverageStressPerElement)
+{
+    mSetComputeAverageStressPerElement = setComputeAverageStressPerElement;
+    if(mAverageStressesPerElement.size()==0)
+    {
+        mAverageStressesPerElement.resize(this->mrQuadMesh.GetNumElements(), zero_vector<double>(DIM*(DIM+1)/2));
+    }
+}
+
+template<unsigned DIM>
+void AbstractNonlinearElasticitySolver<DIM>::AddStressToAverageStressPerElement(c_matrix<double,DIM,DIM>& rT, unsigned elemIndex)
+{
+    assert(mSetComputeAverageStressPerElement);
+    assert(elemIndex<this->mrQuadMesh.GetNumElements());
+
+	// In 2d the matrix is
+	// [T00 T01]
+	// [T10 T11]
+	// where T01 = T10. We store this as a vector
+	// [T00 T01 T11]
+	//
+	// Similarly, for 3d we store
+	// [T00 T01 T02 T11 T12 T22]
+    for(unsigned i=0; i<DIM*(DIM+1)/2; i++)
+    {
+        unsigned row;
+        unsigned col;
+        if(DIM==2)
+        {
+            row = i<=1 ? 0 : 1;
+            col = i==0 ? 0 : 1;
+        }
+        else // DIM==3
+        {
+            row = i<=2 ? 0 : (i<=4? 1 : 2);
+            col = i==0 ? 0 : (i==1 || i==3? 1 : 2);
+        }
+
+        this->mAverageStressesPerElement[elemIndex](i) += rT(row,col);
+    }
+}
+
+
+template<unsigned DIM>
+c_matrix<double,DIM,DIM> AbstractNonlinearElasticitySolver<DIM>::GetAverageStressPerElement(unsigned elementIndex)
+{
+    if(!mSetComputeAverageStressPerElement)
+    {
+        EXCEPTION("Call SetComputeAverageStressPerElementDuringSolve() before solve if calling rGetAverageStressesPerElement()");
+    }
+    assert(elementIndex<this->mrQuadMesh.GetNumElements());
+
+    c_matrix<double,DIM,DIM> stress;
+
+	// In 2d the matrix is
+	// [T00 T01]
+	// [T10 T11]
+	// where T01 = T10, and was stored as
+	// [T00 T01 T11]
+	//
+	// Similarly, for 3d the matrix was stored as
+	// [T00 T01 T02 T11 T12 T22]
+    if(DIM==2)
+    {
+        stress(0,0) = mAverageStressesPerElement[elementIndex](0);
+        stress(1,0) = stress(0,1) = mAverageStressesPerElement[elementIndex](1);
+        stress(1,1) = mAverageStressesPerElement[elementIndex](2);
+    }
+    else
+    {
+        stress(0,0) = mAverageStressesPerElement[elementIndex](0);
+        stress(1,0) = stress(0,1) = mAverageStressesPerElement[elementIndex](1);
+        stress(2,0) = stress(0,2) = mAverageStressesPerElement[elementIndex](2);
+        stress(1,1) = mAverageStressesPerElement[elementIndex](3);
+        stress(2,1) = stress(1,2) = mAverageStressesPerElement[elementIndex](4);
+        stress(2,2) = mAverageStressesPerElement[elementIndex](5);
+    }
+
+    return stress;
 }
 
 
