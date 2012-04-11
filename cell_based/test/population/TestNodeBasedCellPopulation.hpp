@@ -502,52 +502,49 @@ public:
 
     void TestSettingCellAncestors() throw (Exception)
     {
-        // Create a simple mesh
+        // Create a small node-based cell population
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
         TetrahedralMesh<2,2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
-
-        // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(generating_mesh);
 
-        // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
-        // Create a cell population
-        NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
-        // Test that the cell population makes all cells fix the node index as ancestor
-        node_based_cell_population.SetCellAncestorsToLocationIndices();
+        // Test that the cell population makes each cell fix the corresponding node index as its ancestor
+        cell_population.SetCellAncestorsToLocationIndices();
 
         unsigned counter = 0;
-        for (AbstractCellPopulation<2>::Iterator cell_iter = node_based_cell_population.Begin();
-             cell_iter != node_based_cell_population.End();
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
              ++cell_iter)
         {
-            TS_ASSERT_EQUALS(cell_iter->GetAncestor(), node_based_cell_population.GetLocationIndexUsingCell(*cell_iter));
+            TS_ASSERT_EQUALS(cell_iter->GetAncestor(), cell_population.GetLocationIndexUsingCell(*cell_iter));
             counter ++;
         }
         TS_ASSERT_EQUALS(counter, 5u);
 
-        // Test that we can recover remaining number of ancestors
-        std::set<unsigned> remaining_ancestors = node_based_cell_population.GetCellAncestors();
+        // Test that we can recover the remaining number of ancestors
+        std::set<unsigned> remaining_ancestors = cell_population.GetCellAncestors();
         TS_ASSERT_EQUALS(remaining_ancestors.size(), 5u);
 
-        // This is commented as we cant reallocate cell ancestors see #1515
-//        // Test that the set correctly represents a monoclonal population
-//        for (AbstractCellPopulation<2>::Iterator cell_iter=node_based_cell_population.Begin();
-//             cell_iter!=node_based_cell_population.End();
-//             ++cell_iter)
-//        {
-//            // Set all cells to have the same ancestor...
-//        	MAKE_PTR_ARGS(CellAncestor, p_cell_ancestor, (1u));
-//            cell_iter->SetAncestor(p_cell_ancestor);
-//        }
-//        remaining_ancestors = node_based_cell_population.GetCellAncestors();
-//        TS_ASSERT_EQUALS(remaining_ancestors.size(), 1u);
+        // Reallocate ancestors
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            // Set all cells to have the same ancestor
+            MAKE_PTR_ARGS(CellAncestor, p_cell_ancestor, (1u));
+            cell_iter->SetAncestor(p_cell_ancestor);
+        }
+
+        // Test that the cell population now shares a common ancestor
+        remaining_ancestors = cell_population.GetCellAncestors();
+        TS_ASSERT_EQUALS(remaining_ancestors.size(), 1u);
     }
 
     void TestGetLocationOfCellCentreAndGetWidth() throw (Exception)
