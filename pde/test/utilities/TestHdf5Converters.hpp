@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DistributedTetrahedralMesh.hpp"
 #include "TrianglesMeshReader.hpp"
 
+
 #ifdef CHASTE_VTK
 #define _BACKWARD_BACKWARD_WARNING_H 1 // Cut out the strstream deprecated warning for now (gcc4.3)
 #include <vtkVersion.h>
@@ -84,6 +85,7 @@ public:
     {
 #ifdef CHASTE_VTK // Requires  "sudo aptitude install libvtk5-dev" or similar
         std::string working_directory = "TestHdf5ToVtkConverter_bidomain";
+        std::string working_directory2 = "TestHdf5ToVtkConverter_bidomain2";
         OutputFileHandler handler(working_directory);
 
         /*
@@ -99,7 +101,21 @@ public:
 
         // Convert
         Hdf5ToVtkConverter<3,3> converter(working_directory, "cube_2mm_12_elements", &mesh, false, true);
+        std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
 
+        // Now do something else before reading back...
+
+        {
+            //NOTE: Interleaved test
+            
+            // Show that trying to write .pvtu files from a TetrahedralMesh gives a warning (but writes anyway)
+            CopyToTestOutputDirectory("pde/test/data/cube_2mm_12_elements.h5",
+                                  working_directory2);
+            Hdf5ToVtkConverter<3,3> converter2(working_directory2, "cube_2mm_12_elements", &mesh, true, true);
+            
+            //The reading part of this test is below
+        }
+            
         /*
          * Note that VTK is not thread-safe. The master process has spawned
          * a child to write the mesh and may still be writing! This barrier
@@ -107,7 +123,6 @@ public:
          */
         PetscTools::Barrier();
 
-        std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
 
         VtkMeshReader<3,3> vtk_mesh_reader(test_output_directory + working_directory
                                            + "/vtk_output/cube_2mm_12_elements.vtu");
@@ -135,11 +150,14 @@ public:
         TS_ASSERT_DELTA(phi_at_last[6],  0.0, 1e-3);
         TS_ASSERT_DELTA(phi_at_last[11], 0.0, 1e-3);
 
-        // Show that trying to write .pvtu files from a TetrahedralMesh gives a warning (but writes anyway)
-        Hdf5ToVtkConverter<3,3> converter2(working_directory, "cube_2mm_12_elements", &mesh, true, true);
-        VtkMeshReader<3,3> vtk_mesh_reader2(test_output_directory + working_directory
-                                            + "/vtk_output/cube_2mm_12_elements.vtu");
-        TS_ASSERT_EQUALS(vtk_mesh_reader2.GetNumNodes(), 12u);
+        {
+            //NOTE: Interleaved test
+            //The writing part of this test is above
+            VtkMeshReader<3,3> vtk_mesh_reader2(test_output_directory + working_directory2
+                                                + "/vtk_output/cube_2mm_12_elements.vtu");
+            TS_ASSERT_EQUALS(vtk_mesh_reader2.GetNumNodes(), 12u);
+        }
+
 #endif //CHASTE_VTK
     }
 
