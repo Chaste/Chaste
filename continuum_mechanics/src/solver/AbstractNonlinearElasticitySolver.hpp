@@ -623,6 +623,8 @@ public:
 	/**
 	 * The user may request that the stress for each element (averaged over quadrature point stresses)
 	 * are saved during the Solve(), by calling this.
+	 *
+	 * @param setComputeAverageStressPerElement whether to compute stresses (defaults to true)
 	 */
     void SetComputeAverageStressPerElementDuringSolve(bool setComputeAverageStressPerElement = true);
     

@@ -382,6 +382,15 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
         // Test for ownership first, since it's pointless to test the criterion on something which we might know nothing about.
         if ( r_element.GetOwnership() == true  /*&& ElementAssemblyCriterion(r_element)==true*/ )
         {
+            #define COVERAGE_IGNORE
+            // note: if assemble matrix only
+            if(CommandLineArguments::Instance()->OptionExists("-mech_very_verbose") && this->mAssembleMatrix)
+            {
+                std::cout << "\r[" << PetscTools::GetMyRank() << "]: Element " << r_element.GetIndex() << " of " << mpMesh->GetNumElements() << std::flush;
+            }
+            #undef COVERAGE_IGNORE
+
+
             AssembleOnElement(r_element, a_elem, b_elem);
 
             // Note that a different ordering is used for the elemental matrix compared to the global matrix.
@@ -401,7 +410,8 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
                 p_indices[DIM*NUM_NODES_PER_ELEMENT + i] = (DIM+1)*r_element.GetNodeGlobalIndex(i)+DIM;
             }
 
-            if (this->mMatrixToAssemble)
+
+            if (this->mAssembleMatrix)
             {
                 PetscMatTools::AddMultipleValues<STENCIL_SIZE>(this->mMatrixToAssemble, p_indices, a_elem);
             }

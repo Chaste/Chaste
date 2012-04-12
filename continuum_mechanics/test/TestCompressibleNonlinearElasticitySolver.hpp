@@ -1062,8 +1062,9 @@ public:
                                                         problem_defn,
                                                         "TestWritingStress");
 
-        // cover an exception
-        TS_ASSERT_THROWS_CONTAINS(solver.WriteCurrentAverageElementStresses("wont_be_written",0), "Call SetComputeAverageStressPerElementDuringSolve() before solve");
+        // cover exceptions
+        TS_ASSERT_THROWS_CONTAINS(solver.GetAverageStressPerElement(0), "Call SetComputeAverageStressPerElementDuringSolve() before solve if calling rGetAverageStressesPerElement()");
+        TS_ASSERT_THROWS_CONTAINS(solver.WriteCurrentAverageElementStresses("wont_be_written",0), "Call SetComputeAverageStressPerElementDuringSolve() before solve if calling WriteCurrentAverageElementStresses()");
 
         // test method, but not through calling Solve. Tests where SetComputeAverageStressPerElementDuringSolve() is
         // called and then Solve() is called are TestSolveForSimpleDeformationWithCompMooneyRivlin above (homogeneous

@@ -868,10 +868,8 @@ public:
     {
         std::vector<double> soln_first_run;
 
-        for(unsigned run = 0; run < 1; run++)
+        for(unsigned run=0; run<2; run++)
         {
-            MechanicsEventHandler::Reset();
-
             double lambda = 0.85;
             double c1 = 1.0;
             unsigned num_elem = 10;
@@ -934,7 +932,8 @@ public:
             {
                 solver.SetCurrentTime(1.0);
                 // To speed up this test, we provide the correct answer as the initial guess for
-                // the second run.
+                // the second run. Note: the second run may still take an iteration or two, as the
+                // final newton solve tolerance may be different (eg if relative tolerance)
                 solver.rGetCurrentSolution() = soln_first_run;
             }
 
@@ -943,10 +942,6 @@ public:
             if(run==0)
             {
                 soln_first_run = solver.rGetCurrentSolution();
-            }
-            else
-            {
-                TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(), 0u);
             }
 
             std::vector<c_vector<double,2> >& r_solution = solver.rGetDeformedPosition();
@@ -978,9 +973,6 @@ public:
                     TS_ASSERT_DELTA(r_pressures[i], 0.0, 1e-8);
                 }
             }
-
-            MechanicsEventHandler::Headings();
-            MechanicsEventHandler::Report();
         }
     }
 
