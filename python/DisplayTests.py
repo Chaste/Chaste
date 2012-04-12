@@ -940,7 +940,7 @@ def _statusColour(status, build):
 _time_re = re.compile(r"Command execution time: ([0-9.]+) seconds")
 _states = ['Other', 'Compile', 'Object dependency analysis', 'CxxTest generation', 'PyCml execution', 'Test running']
 _state_res = map(re.compile,
-                 [r"mpicxx ",
+                 [r"[^ ]*mpicxx ",
                   r"BuildTest\(\[",
                   r"cxxtest/cxxtestgen.py",
                   r"RunPyCml\(\[",
