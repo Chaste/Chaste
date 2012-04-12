@@ -858,6 +858,11 @@ void AbstractNonlinearElasticitySolver<DIM>::CreateCmguiOutput()
 template<unsigned DIM>
 void AbstractNonlinearElasticitySolver<DIM>::SetComputeAverageStressPerElementDuringSolve(bool setComputeAverageStressPerElement)
 {
+    if(PetscTools::IsParallel())
+    {
+        EXCEPTION("SetComputeAverageStressPerElementDuringSolve() is not yet implemented for parallel simulations");
+    }
+
     mSetComputeAverageStressPerElement = setComputeAverageStressPerElement;
     if(mAverageStressesPerElement.size()==0)
     {
