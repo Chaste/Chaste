@@ -47,6 +47,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NobleVargheseKohlNoble1998WithSac.hpp"
 #include "NumericFileComparison.hpp"
 #include "Hdf5DataReader.hpp"
+#include "ZeroStimulusCellFactory.hpp"
+
+// linear increase from 0 to 1KPa in 100ms
+double LinearPressureFunction(double t)
+{
+    if(t>=100)
+    {
+        return -1;
+    }
+    return -t/100.0;
+}
 
 // small region stimulus, essentially irrelevant
 class PointStimulus2dCellFactory : public AbstractCardiacCellFactory<2>
@@ -80,7 +91,90 @@ public:
 class TestCardiacElectroMechanicsOnAnnulus : public CxxTest::TestSuite
 {
 public:
-    void TestOnAnnulus() throw (Exception)
+    void TestDynamicExpansionNoElectroMechanics() throw (Exception)
+    {
+        TetrahedralMesh<2,2> electrics_mesh;
+        QuadraticMesh<2> mechanics_mesh;
+
+        // could (should?) use finer electrics mesh (if there was electrical activity occurring)
+        // but keeping electrics simulation time down
+        TrianglesMeshReader<2,2> reader1("mesh/test/data/annuli/circular_annulus_960_elements");
+        electrics_mesh.ConstructFromMeshReader(reader1);
+
+        TrianglesMeshReader<2,2> reader2("mesh/test/data/annuli/circular_annulus_960_elements_quad",2 /*quadratic elements*/);
+        mechanics_mesh.ConstructFromMeshReader(reader2);
+
+        ZeroStimulusCellFactory<CellLuoRudy1991FromCellML,2> cell_factory;
+
+        std::vector<unsigned> fixed_nodes;
+        for(unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        {
+            double x = mechanics_mesh.GetNode(i)->rGetLocation()[0];
+            double y = mechanics_mesh.GetNode(i)->rGetLocation()[1];
+
+            if (fabs(x)<1e-6 && fabs(y+0.5)<1e-6)  // fixed point (0.0,-0.5)
+            {
+                fixed_nodes.push_back(i);
+            }
+        }
+
+        HeartConfig::Instance()->SetSimulationDuration(110.0);
+
+        ElectroMechanicsProblemDefinition<2> problem_defn(mechanics_mesh);
+
+        problem_defn.SetContractionModel(KERCHOFFS2003,0.1);
+        problem_defn.SetUseDefaultCardiacMaterialLaw(COMPRESSIBLE);
+        problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+        problem_defn.SetMechanicsSolveTimestep(1.0);
+
+        problem_defn.SetVariableFibreSheetDirectionsFile("heart/test/data/fibre_tests/circular_annulus_960_elements.ortho", false);
+
+        // The snes solver seems more robust...
+        problem_defn.SetSolveUsingSnes();
+        //problem_defn.SetVerboseDuringSolve();
+
+        // This is a 2d problem, so a direct solve (LU factorisation) is possible and will speed things up
+        // markedly (might be able to remove this line after #2057 is done..)
+        //PetscOptionsSetValue("-pc_type", "lu"); // removed - see comments at the end of #1818.
+
+        std::vector<BoundaryElement<1,2>*> boundary_elems;
+        for (TetrahedralMesh<2,2>::BoundaryElementIterator iter
+               = mechanics_mesh.GetBoundaryElementIteratorBegin();
+              iter != mechanics_mesh.GetBoundaryElementIteratorEnd();
+              ++iter)
+        {
+             ChastePoint<2> centroid = (*iter)->CalculateCentroid();
+             double r = sqrt( centroid[0]*centroid[0] + centroid[1]*centroid[1] );
+
+             if (r < 0.4)
+             {
+                 BoundaryElement<1,2>* p_element = *iter;
+                 boundary_elems.push_back(p_element);
+             }
+        }
+        problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, LinearPressureFunction);
+
+        CardiacElectroMechanicsProblem<2> problem(COMPRESSIBLE,
+                                                  &electrics_mesh,
+                                                  &mechanics_mesh,
+                                                  &cell_factory,
+                                                  &problem_defn,
+                                                  "TestEmOnAnnulusDiastolicFilling");
+        problem.SetOutputDeformationGradientsAndStress(10);
+        problem.Solve();
+
+        // we don't really test anything.
+        // Hardcoded test of deformed position of top of circle, to check nothing has changed.
+        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](0), 0.0011, 1e-3);
+        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](1), 0.6073, 1e-3);
+
+        MechanicsEventHandler::Headings();
+        MechanicsEventHandler::Report();
+    }
+
+
+
+    void TestStaticExpansionAndElectroMechanics() throw (Exception)
     {
         TetrahedralMesh<2,2> electrics_mesh;
         QuadraticMesh<2> mechanics_mesh;
@@ -106,31 +200,31 @@ public:
             }
         }
 
-       HeartConfig::Instance()->SetSimulationDuration(400.0);
+        HeartConfig::Instance()->SetSimulationDuration(400.0);
 
-       ElectroMechanicsProblemDefinition<2> problem_defn(mechanics_mesh);
+        ElectroMechanicsProblemDefinition<2> problem_defn(mechanics_mesh);
 
-       problem_defn.SetContractionModel(KERCHOFFS2003,0.1);
-       problem_defn.SetUseDefaultCardiacMaterialLaw(COMPRESSIBLE);
-       problem_defn.SetZeroDisplacementNodes(fixed_nodes);
-       problem_defn.SetMechanicsSolveTimestep(1.0);
+        problem_defn.SetContractionModel(KERCHOFFS2003,0.1);
+        problem_defn.SetUseDefaultCardiacMaterialLaw(COMPRESSIBLE);
+        problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+        problem_defn.SetMechanicsSolveTimestep(1.0);
 
-       problem_defn.SetVariableFibreSheetDirectionsFile("heart/test/data/fibre_tests/circular_annulus_960_elements.ortho", false);
+        problem_defn.SetVariableFibreSheetDirectionsFile("heart/test/data/fibre_tests/circular_annulus_960_elements.ortho", false);
 
-       // The snes solver seems more robust...
-       problem_defn.SetSolveUsingSnes();
-       //problem_defn.SetVerboseDuringSolve();
+        // The snes solver seems more robust...
+        problem_defn.SetSolveUsingSnes();
+        //problem_defn.SetVerboseDuringSolve();
 
-       // This is a 2d problem, so a direct solve (LU factorisation) is possible and will speed things up
-       // markedly (might be able to remove this line after #2057 is done..)
-       //PetscOptionsSetValue("-pc_type", "lu"); // removed - see comments at the end of #1818.
+        // This is a 2d problem, so a direct solve (LU factorisation) is possible and will speed things up
+        // markedly (might be able to remove this line after #2057 is done..)
+        //PetscOptionsSetValue("-pc_type", "lu"); // removed - see comments at the end of #1818.
 
-       std::vector<BoundaryElement<1,2>*> boundary_elems;
-       for (TetrahedralMesh<2,2>::BoundaryElementIterator iter
+        std::vector<BoundaryElement<1,2>*> boundary_elems;
+        for (TetrahedralMesh<2,2>::BoundaryElementIterator iter
                = mechanics_mesh.GetBoundaryElementIteratorBegin();
              iter != mechanics_mesh.GetBoundaryElementIteratorEnd();
              ++iter)
-       {
+        {
             ChastePoint<2> centroid = (*iter)->CalculateCentroid();
             double r = sqrt( centroid[0]*centroid[0] + centroid[1]*centroid[1] );
 
@@ -139,31 +233,31 @@ public:
                 BoundaryElement<1,2>* p_element = *iter;
                 boundary_elems.push_back(p_element);
             }
-       }
-       problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, -1.0 /*1 KPa is about 8mmHg*/);
-       problem_defn.SetNumIncrementsForInitialDeformation(3);
+        }
+        problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, -1.0 /*1 KPa is about 8mmHg*/);
+        problem_defn.SetNumIncrementsForInitialDeformation(3);
 
-       CardiacElectroMechanicsProblem<2> problem(COMPRESSIBLE,
+        CardiacElectroMechanicsProblem<2> problem(COMPRESSIBLE,
                                                  &electrics_mesh,
                                                  &mechanics_mesh,
                                                  &cell_factory,
                                                  &problem_defn,
                                                  "TestEmOnAnnulus");
 
-       problem.SetOutputDeformationGradientsAndStress(10.0);
+        problem.SetOutputDeformationGradientsAndStress(10.0);
 
-       problem.Solve();
-
-
-       // we don't really anything, we mainly just want to verify it solves OK past the initial and through
-       // the cycle. Have visualised.
-       // Hardcoded test of deformed position of top of circle, to check nothing has changed.
-       TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](0),  0.000,  1e-3);
-       TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](1),  0.6020, 1e-3);
+        problem.Solve();
 
 
-       MechanicsEventHandler::Headings();
-       MechanicsEventHandler::Report();
+        // we don't really anything, we mainly just want to verify it solves OK past the initial and through
+        // the cycle. Have visualised.
+        // Hardcoded test of deformed position of top of circle, to check nothing has changed.
+        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](0),  0.000,  1e-3);
+        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](1),  0.6020, 1e-3);
+
+
+        MechanicsEventHandler::Headings();
+        MechanicsEventHandler::Report();
     }
 };
 
