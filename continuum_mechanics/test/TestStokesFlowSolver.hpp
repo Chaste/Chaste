@@ -467,7 +467,7 @@ public:
     // Using this top to compare with independently written code.
     // Alternatively, could use u=1-x^4 on the top (with geometry [-1,1]^2)
     // and compare with plots in Andy Wathen's fluids FEM book
-    void TestStokesWithLidCavity() throw(Exception)
+    void TestStokesWithLidDrivenCavity() throw(Exception)
     {
         unsigned num_elem = 5;
         QuadraticMesh<2> mesh(1.0/num_elem, 1.0, 1.0);
@@ -483,7 +483,7 @@ public:
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
 
-            if (y == 1.0) 
+            if (y == 1.0)
             {
                 dirichlet_nodes.push_back(i);
                 c_vector<double,2> flow = zero_vector<double>(2);
@@ -506,7 +506,7 @@ public:
         problem_defn.SetViscosity(mu);
         problem_defn.SetPrescribedFlowNodes(dirichlet_nodes, dirichlet_flow);
 
-        StokesFlowSolver<2> solver(mesh, problem_defn, "LidCavityStokesFlow");
+        StokesFlowSolver<2> solver(mesh, problem_defn, "LidDrivenCavityStokesFlow");
 
         // Uncomment to make errors smaller
         solver.SetKspAbsoluteTolerance(1e-10);
@@ -534,7 +534,7 @@ public:
         }
 
         // at the moment, one way of visualising this is to hack AbstractContinuumMechanicsSolver::WriteCurrentSpatialSolution()
-        // to write node locations as well as the flow, then do for example, in matlab, s=load('LidCavityStokesFlow/flow_solution.nodes');
+        // to write node locations as well as the flow, then do for example, in matlab, s=load('LidDrivenCavityStokesFlow/flow_solution.nodes');
         // and quiver(s(:,1),s(:,2),s(:,3),s(:,4),0.2);
 
         // have visualised and compared to Raf's libmesh Stokes results, looks very similar
@@ -563,6 +563,138 @@ public:
 
         TS_ASSERT_DELTA(min_p, -5.009, 1e-2);
         TS_ASSERT_DELTA(max_p,  9.352, 1e-2);
+    }
+
+
+// this test works if the matrix is not told to be kept symmetric when ApplyDirichletBoundaryConditions() is called - something
+// is wrong with ApplyDirichletBoundaryConditions() when ApplyDirichletBcsType==LINEAR and DIM==3. Remove the 'donot' in the
+// name of the test when this is fixed
+
+    // solve problem for which solution is u=(x,y,-2z), p=const.
+    void dontrunTestStokesSimple3d() throw(Exception)
+    {
+        unsigned num_elem = 2;
+        QuadraticMesh<3> mesh(1.0/num_elem, 1.0, 1.0, 1.0);
+
+        // Dynamic viscosity
+        double mu = 1.0;
+
+        // Boundary flow
+        std::vector<unsigned> dirichlet_nodes;
+        std::vector<c_vector<double,3> > dirichlet_flow;
+
+        for ( TetrahedralMesh<3,3>::BoundaryNodeIterator iter = mesh.GetBoundaryNodeIteratorBegin();
+              iter != mesh.GetBoundaryNodeIteratorEnd();
+              ++iter)
+        {
+            double x = (*iter)->rGetLocation()[0];
+            double y = (*iter)->rGetLocation()[1];
+            double z = (*iter)->rGetLocation()[2];
+
+            c_vector<double,3> flow = zero_vector<double>(3);
+
+            flow(0) = x;
+            flow(1) = y;
+            flow(2) = -2*z;
+
+            dirichlet_nodes.push_back((*iter)->GetIndex());
+            dirichlet_flow.push_back(flow);
+        }
+
+        StokesFlowProblemDefinition<3> problem_defn(mesh);
+        problem_defn.SetViscosity(mu);
+        problem_defn.SetPrescribedFlowNodes(dirichlet_nodes, dirichlet_flow);
+
+        StokesFlowSolver<3> solver(mesh, problem_defn, "3dSimple");
+
+        solver.Solve();
+
+        std::vector<c_vector<double,3> >& r_solution = solver.rGetVelocities();
+
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        {
+            double x = mesh.GetNode(i)->rGetLocation()[0];
+            double y = mesh.GetNode(i)->rGetLocation()[1];
+            double z = mesh.GetNode(i)->rGetLocation()[2];
+
+            TS_ASSERT_DELTA(r_solution[i](0), x,  1e-6);
+            TS_ASSERT_DELTA(r_solution[i](1), y,  1e-6);
+            TS_ASSERT_DELTA(r_solution[i](2), -2*z, 1e-6);
+        }
+
+        // test the pressures
+        std::vector<double>& r_pressures = solver.rGetPressures();
+        bool first = true;
+        double value;
+        for (unsigned i=0; i<r_pressures.size(); i++)
+        {
+            if(! mesh.GetNode(i)->IsInternal())
+            {
+                if(first)
+                {
+                    value = r_pressures[i];
+                    first = false;
+                }
+                else
+                {
+                    TS_ASSERT_DELTA(r_pressures[i], value, 5e-5);
+                }
+            }
+            else
+            {
+                // dummy variable
+                TS_ASSERT_DELTA(r_pressures[i], 0.0, 1e-8);
+            }
+        }
+    }
+
+    // this test works if the matrix is not told to be kept symmetric when ApplyDirichletBoundaryConditions() is called - something
+    // is wrong with ApplyDirichletBoundaryConditions() when ApplyDirichletBcsType==LINEAR and DIM==3. Remove the 'donot' in the
+    // name of the test when this is fixed
+    //
+    // It is also slow because of #2083 - might have to be a nightly test until this ticket is done.
+
+    void dontrunTestStokesWithLidDrivenCavity3d() throw(Exception)
+    {
+        unsigned num_elem = 5;
+        QuadraticMesh<3> mesh(1.0/num_elem, 1.0, 1.0, 1.0);
+
+        // Dynamic viscosity
+        double mu = 1.0;
+
+        // Boundary flow
+        std::vector<unsigned> dirichlet_nodes;
+        std::vector<c_vector<double,3> > dirichlet_flow;
+
+        for ( TetrahedralMesh<3,3>::BoundaryNodeIterator iter = mesh.GetBoundaryNodeIteratorBegin();
+              iter != mesh.GetBoundaryNodeIteratorEnd();
+              ++iter)
+        {
+            double x = (*iter)->rGetLocation()[0];
+            double y = (*iter)->rGetLocation()[1];
+            double z = (*iter)->rGetLocation()[2];
+
+            c_vector<double,3> flow = zero_vector<double>(3);
+
+            if (fabs(z-1.0)<1e-6)
+            {
+                flow(0) = x*(1-x)*y*(1-y);
+            }
+
+            dirichlet_nodes.push_back((*iter)->GetIndex());
+            dirichlet_flow.push_back(flow);
+        }
+
+        StokesFlowProblemDefinition<3> problem_defn(mesh);
+        problem_defn.SetViscosity(mu);
+        problem_defn.SetPrescribedFlowNodes(dirichlet_nodes, dirichlet_flow);
+
+        StokesFlowSolver<3> solver(mesh, problem_defn, "LidDrivenCavityStokesFlow3d");
+
+//        // Uncomment to make errors smaller
+//        solver.SetKspAbsoluteTolerance(1e-10);
+
+        solver.Solve();
     }
 };
 
