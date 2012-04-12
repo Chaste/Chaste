@@ -517,6 +517,8 @@ public:
         double max_u = -DBL_MAX;
         double min_v = DBL_MAX;
         double max_v = -DBL_MAX;
+        double min_p = DBL_MAX;
+        double max_p = -DBL_MAX;
 
         std::vector<c_vector<double,2> >& r_flow = solver.rGetVelocities();
         std::vector<double>& r_pressures = solver.rGetPressures();
@@ -527,6 +529,8 @@ public:
             max_u = std::max(max_u, r_flow[i](0));
             min_v = std::min(min_v, r_flow[i](1));
             max_v = std::max(max_v, r_flow[i](1));
+            min_p = std::min(min_p, r_pressures[i]);
+            max_p = std::max(max_p, r_pressures[i]);
         }
 
         // at the moment, one way of visualising this is to hack AbstractContinuumMechanicsSolver::WriteCurrentSpatialSolution()
@@ -556,6 +560,9 @@ public:
                 TS_ASSERT_DELTA(r_flow[i](1),  0.047, 1e-3);
             }
         }
+
+        TS_ASSERT_DELTA(min_p, -5.009, 1e-2);
+        TS_ASSERT_DELTA(max_p,  9.352, 1e-2);
     }
 };
 
