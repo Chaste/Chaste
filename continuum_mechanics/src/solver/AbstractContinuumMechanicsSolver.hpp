@@ -429,6 +429,10 @@ void AbstractContinuumMechanicsSolver<DIM>::WriteCurrentSpatialSolution(std::str
     std::vector<c_vector<double,DIM> >& r_spatial_solution = rGetSpatialSolution();
     for (unsigned i=0; i<r_spatial_solution.size(); i++)
     {
+//        for (unsigned j=0; j<DIM; j++)
+//        {
+//            *p_file << mrQuadMesh.GetNode(i)->rGetLocation()[j] << " ";
+//        }
         for (unsigned j=0; j<DIM; j++)
         {
             *p_file << r_spatial_solution[i](j) << " ";
