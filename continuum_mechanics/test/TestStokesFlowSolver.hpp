@@ -332,7 +332,6 @@ public:
 
 
 
-///\todo #1959 This might not be a great test problem; discuss with Dave Kay.
 
     /*
      * Solution is u = [20xy^3, 5x^4-5y^4], p = 60x^2y-20y^3+const.
@@ -464,15 +463,14 @@ public:
         }
     }
 
-    /*
-     * Simulation with regularised lid driven cavity u=1-x^4 on the top.
-     */
+    // Simulation with regularised lid driven cavity, u=x(1-x) on top
+    // Using this top to compare with independently written code.
+    // Alternatively, could use u=1-x^4 on the top (with geometry [-1,1]^2)
+    // and compare with plots in Andy Wathen's fluids FEM book
     void TestStokesWithLidCavity() throw(Exception)
     {
-        // Set up a mesh on [-1 1]x[-1 1]
         unsigned num_elem = 5;
-        QuadraticMesh<2> mesh(2.0/num_elem, 2.0, 2.0);
-        mesh.Translate(-1.0, -1.0);
+        QuadraticMesh<2> mesh(1.0/num_elem, 1.0, 1.0);
 
         // Dynamic viscosity
         double mu = 1.0;
@@ -484,27 +482,25 @@ public:
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
-            if (x == -1.0 || x == 1.0 || y == -1.0)
-            {
-                dirichlet_nodes.push_back(i);
-                c_vector<double,2> flow = zero_vector<double>(2);
-                dirichlet_flow.push_back(flow);
-            }
-            else if (y == 1.0) // this doesnt include corners
+
+            if (y == 1.0) 
             {
                 dirichlet_nodes.push_back(i);
                 c_vector<double,2> flow = zero_vector<double>(2);
 
-                flow(0) = 1-x*x*x*x;
+                flow(0) = x*(1-x);
                 flow(1) = 0.0;
                 dirichlet_flow.push_back(flow);
             }
-
+            else if (x == 0.0 || x == 1.0 || y == 0.0)
+            {
+                dirichlet_nodes.push_back(i);
+                c_vector<double,2> flow = zero_vector<double>(2);
+                flow(0) = 0.0;
+                flow(1) = 0.0;
+                dirichlet_flow.push_back(flow);
+            }
         }
-
-        assert(dirichlet_flow.size()== 8*num_elem);
-
-        c_vector<double,2> body_force = zero_vector<double>(2);
 
         StokesFlowProblemDefinition<2> problem_defn(mesh);
         problem_defn.SetViscosity(mu);
@@ -513,11 +509,53 @@ public:
         StokesFlowSolver<2> solver(mesh, problem_defn, "LidCavityStokesFlow");
 
         // Uncomment to make errors smaller
-        //solver.SetKspAbsoluteTolerance(1e-12);
+        solver.SetKspAbsoluteTolerance(1e-10);
 
         solver.Solve();
 
-        ///\todo Test something
+        double min_u = DBL_MAX;
+        double max_u = -DBL_MAX;
+        double min_v = DBL_MAX;
+        double max_v = -DBL_MAX;
+
+        std::vector<c_vector<double,2> >& r_flow = solver.rGetVelocities();
+        std::vector<double>& r_pressures = solver.rGetPressures();
+
+        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        {
+            min_u = std::min(min_u, r_flow[i](0));
+            max_u = std::max(max_u, r_flow[i](0));
+            min_v = std::min(min_v, r_flow[i](1));
+            max_v = std::max(max_v, r_flow[i](1));
+        }
+
+        // at the moment, one way of visualising this is to hack AbstractContinuumMechanicsSolver::WriteCurrentSpatialSolution()
+        // to write node locations as well as the flow, then do for example, in matlab, s=load('LidCavityStokesFlow/flow_solution.nodes');
+        // and quiver(s(:,1),s(:,2),s(:,3),s(:,4),0.2);
+
+        // have visualised and compared to Raf's libmesh Stokes results, looks very similar
+
+        // max u should be exactly 0.25 (dirichlet bc value)
+        TS_ASSERT_DELTA(max_u, 0.25, 1e-8);
+
+        // compare with Raf's libmesh Stokes, on same resolution mesh for which
+        // min u = -0.04590, min v = -0.07382, max v = 0.07804
+        TS_ASSERT_DELTA(min_u, -0.0459, 1e-3);
+        TS_ASSERT_DELTA(min_v, -0.075, 5e-3);
+        TS_ASSERT_DELTA(max_v,  0.075, 5e-3);
+
+        // find a node in the interior for which u and v both not small
+        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        {
+            double x = mesh.GetNode(i)->rGetLocation()[0];
+            double y = mesh.GetNode(i)->rGetLocation()[1];
+            if(fabs(x-0.3)<1e-6 && fabs(y-0.6)<1e-6)
+            {
+                //at this node raf's solver returns (-0.033649 0.04652)
+                TS_ASSERT_DELTA(r_flow[i](0), -0.035, 1e-3);
+                TS_ASSERT_DELTA(r_flow[i](1),  0.047, 1e-3);
+            }
+        }
     }
 };
 
