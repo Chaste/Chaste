@@ -77,8 +77,7 @@ def kill_test(pid=None, exe=None):
     processes to see if they are instances of exe, and recursively kill them
     if so.
     
-    Requires 'easy_install psutil' to function.  Requires psutil >= 0.2.0 for
-    killing by exe name.
+    Requires 'easy_install psutil' to function.
     """
     # Recursive kill of pid
     if pid:
@@ -91,7 +90,7 @@ def kill_test(pid=None, exe=None):
         except (psutil.NoSuchProcess, OSError):
             pass
     # Kill by name
-    if exe and map(int, psutil.__version__.split('.')[:2]) >= [0,2]:
+    if exe:
         #print "Killing", exe
         for proc in psutil.process_iter():
             try:
