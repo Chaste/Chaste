@@ -146,6 +146,7 @@ std::vector<double> AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNe
         assert( mpDistributedMesh != NULL );
 
         MPI_Status status;
+        status.MPI_ERROR = MPI_SUCCESS; //For MPICH2
         // do receive, convert to std::vector on master
         MPI_Recv(raw_coords, SPACE_DIM, MPI_DOUBLE, MPI_ANY_SOURCE, mNodeCounterForParallelMesh, PETSC_COMM_WORLD, &status);
         assert(status.MPI_ERROR == MPI_SUCCESS);

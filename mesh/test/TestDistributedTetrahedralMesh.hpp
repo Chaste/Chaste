@@ -636,30 +636,35 @@ public:
         p_gen->Reseed(0);
         p_gen->Shuffle(num_elts,random_order);
 
-        unsigned my_entry;
-        unsigned neighbours_entry;
 
-        int num_procs = PetscTools::GetNumProcs();
-        int my_rank = PetscTools::GetMyRank();
-        int source_rank = (my_rank + num_procs - 1) % num_procs;
-        int destination_rank = (my_rank + 1) % num_procs;
-        int my_tag;
-        int source_tag;
-
-        MPI_Status status;
-
-        for (unsigned element_number = 0; element_number < num_elts; element_number++)
+        if (PetscTools::IsParallel())
         {
-            my_entry = random_order[element_number];
+            //Check all processes have the same random shuffle
+            int num_procs = PetscTools::GetNumProcs();
+            int my_rank = PetscTools::GetMyRank();
+            int source_rank = (my_rank + num_procs - 1) % num_procs;
+            int destination_rank = (my_rank + 1) % num_procs;
+            int my_tag;
+            int source_tag;
+    
+            MPI_Status status;
+    
+            for (unsigned element_number = 0; element_number < num_elts; element_number++)
+            {
+                unsigned my_entry = random_order[element_number];
+    
+                my_tag = my_rank + num_elts*element_number;
+                source_tag = source_rank + num_elts*element_number;
+    
+                //This may not work sequentially on some versions of MPI (MPICH2)
+                MPI_Send( &my_entry, 1, MPI_UNSIGNED, destination_rank, my_tag, PETSC_COMM_WORLD );
 
-            my_tag = my_rank + num_elts*element_number;
-            source_tag = source_rank + num_elts*element_number;
-
-            MPI_Send( &my_entry, 1, MPI_UNSIGNED, destination_rank, my_tag, PETSC_COMM_WORLD );
-            MPI_Recv( &neighbours_entry, 1, MPI_UNSIGNED, source_rank, source_tag, PETSC_COMM_WORLD, &status );
-            PetscTools::Barrier();
-
-            TS_ASSERT_EQUALS( my_entry, neighbours_entry );
+                unsigned neighbours_entry;
+                MPI_Recv( &neighbours_entry, 1, MPI_UNSIGNED, source_rank, source_tag, PETSC_COMM_WORLD, &status );
+                PetscTools::Barrier();
+    
+                TS_ASSERT_EQUALS( my_entry, neighbours_entry );
+            }
         }
     }
 
