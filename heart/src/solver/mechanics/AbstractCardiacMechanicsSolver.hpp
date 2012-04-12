@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTCARDIACMECHANICSSOLVER_HPP_
 #define ABSTRACTCARDIACMECHANICSSOLVER_HPP_
 
+#include <map>
 #include "IncompressibleNonlinearElasticitySolver.hpp"
 #include "CompressibleNonlinearElasticitySolver.hpp"
 #include "QuadraticBasisFunction.hpp"
