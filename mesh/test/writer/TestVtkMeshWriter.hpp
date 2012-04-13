@@ -45,6 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VtkMeshWriter.hpp"
 #include "DistributedTetrahedralMesh.hpp"
 #include "MixedDimensionMesh.hpp"
+#include "QuadraticMesh.hpp"
 #include "PetscSetupAndFinalize.hpp"
 #include <iostream>
 
@@ -490,6 +491,119 @@ public:
         writer.WriteFilesUsingMesh(mesh);
 
         ///\todo #2052 We can't yet test if the cables are written correctly, because we don't have the reader part.
+#endif //CHASTE_VTK
+    }
+
+    void TestVtkMeshWriterForQuadraticMesh2D() throw(Exception)
+    {
+#ifdef CHASTE_VTK
+// Requires  "sudo aptitude install libvtk5-dev" or similar
+        TrianglesMeshReader<2,2> reader("mesh/test/data/2D_0_to_1mm_200_elements");
+        QuadraticMesh<2> mesh;
+        mesh.ConstructFromLinearMeshReader(reader);
+
+        VtkMeshWriter<2,2> writer("TestVtkMeshWriter", "2D_0_to_1mm_200_elements_quadratic", false);
+
+        // Add distance from origin into the node "point" data
+        std::vector<double> distance;
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        {
+            distance.push_back(norm_2(mesh.GetNode(i)->rGetLocation()));
+        }
+        writer.AddPointData("Distance from origin", distance);
+
+        // Add fibre type to "point" data
+        std::vector< c_vector<double, 2> > location;
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        {
+            location.push_back(mesh.GetNode(i)->rGetLocation());
+        }
+        writer.AddPointData("Location", location);
+
+        // Add element quality into the element "cell" data
+        std::vector<double> quality;
+        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        {
+            quality.push_back(mesh.GetElement(i)->CalculateQuality());
+        }
+        writer.AddCellData("Quality", quality);
+
+        // Add fibre type to "cell" data
+        std::vector< c_vector<double, 2> > centroid;
+        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        {
+            centroid.push_back(mesh.GetElement(i)->CalculateCentroid());
+        }
+        writer.AddCellData("Centroid", centroid);
+
+
+        writer.WriteFilesUsingMesh(mesh);
+
+        {
+            // Check that the reader can see it
+            VtkMeshReader<2,2> vtk_reader(OutputFileHandler::GetChasteTestOutputDirectory() + "TestVtkMeshWriter/2D_0_to_1mm_200_elements_quadratic.vtu");
+            TS_ASSERT_EQUALS(vtk_reader.GetNumNodes(), mesh.GetNumNodes());
+            TS_ASSERT_EQUALS(vtk_reader.GetNumElements(), mesh.GetNumElements());
+
+            // Check that it has the correct data
+            std::vector<double> distance_read;
+            vtk_reader.GetPointData("Distance from origin", distance_read);
+            for (unsigned i=0; i<distance_read.size(); i++)
+            {
+                TS_ASSERT_EQUALS(distance[i], distance_read[i]);
+            }
+            std::vector<c_vector<double,2> > location_read;
+            vtk_reader.GetPointData("Location", location_read);
+            for (unsigned i=0; i<location_read.size(); i++)
+            {
+                for (unsigned j=0; j<2; j++)
+                {
+                    TS_ASSERT_EQUALS(location[i][j], location_read[i][j]);
+                }
+            }
+            std::vector<double> quality_read;
+            vtk_reader.GetCellData("Quality", quality_read);
+            for (unsigned i=0; i<quality_read.size(); i++)
+            {
+                TS_ASSERT_EQUALS(quality[i], quality_read[i]);
+            }
+            std::vector<c_vector<double,2> > centroid_read;
+            vtk_reader.GetCellData("Centroid", centroid_read);
+            for (unsigned i=0; i<centroid_read.size(); i++)
+            {
+                for (unsigned j=0; j<2; j++)
+                {
+                    TS_ASSERT_EQUALS(centroid[i][j], centroid_read[i][j]);
+                }
+            }
+        }
+#endif //CHASTE_VTK
+    }
+
+    void TestBasicQuadraticVtkMeshWriter() throw(Exception)
+    {
+#ifdef CHASTE_VTK
+// Requires  "sudo aptitude install libvtk5-dev" or similar
+        TrianglesMeshReader<3,3> reader("mesh/test/data/cube_2mm_12_elements");
+        QuadraticMesh<3> mesh;
+        mesh.ConstructFromLinearMeshReader(reader);
+
+        VtkMeshWriter<3,3> writer("TestVtkMeshWriter", "cube_2mm_12_elements_quadratic", false);
+
+        TS_ASSERT_THROWS_NOTHING(writer.WriteFilesUsingMesh(mesh));
+
+        //1.6K uncompressed, 1.3K compressed
+        std::string results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "TestVtkMeshWriter/";
+
+        {
+            //Check that the reader can see it
+            VtkMeshReader<3,3> vtk_reader(results_dir+"cube_2mm_12_elements_quadratic.vtu");
+            TS_ASSERT_EQUALS(vtk_reader.GetNumNodes(), mesh.GetNumNodes());
+            TS_ASSERT_EQUALS(vtk_reader.GetNumElements(), mesh.GetNumElements());
+
+            //TODO: The reader can open a quadratic vtu file, but not construct a QuadraticMesh
+            //further tests of the written output should be made once this is supported.
+        }
 #endif //CHASTE_VTK
     }
 };
