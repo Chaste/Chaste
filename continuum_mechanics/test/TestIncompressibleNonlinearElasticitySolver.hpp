@@ -397,6 +397,7 @@ public:
         TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(), 0u);
 
         TS_ASSERT_THROWS_CONTAINS(solver.CreateCmguiOutput(), "No output directory was given");
+        TS_ASSERT_THROWS_CONTAINS(solver.CreateVtkOutput(), "No output directory was given");
 
         // get deformed position
         std::vector<c_vector<double,2> >& r_deformed_position
@@ -807,6 +808,9 @@ public:
             // check CreateCmguiOutput() - call and check output files were written.
             solver.CreateCmguiOutput();
 
+            // check CreateVtkOutput() - call and later check that output files were written
+            solver.CreateVtkOutput();
+
             std::vector<c_vector<double,2> >& r_solution = solver.rGetDeformedPosition();
 
             for (unsigned i=0; i<mesh.GetNumNodes(); i++)
@@ -854,6 +858,10 @@ public:
                 command = "ls " + OutputFileHandler::GetChasteTestOutputDirectory() + "nonlin_elas_functional_data/cmgui/solution_0.exnode > /dev/null";
                 TS_ASSERT_EQUALS(system(command.c_str()), 0);
                 command = "ls " + OutputFileHandler::GetChasteTestOutputDirectory() + "nonlin_elas_functional_data/cmgui/solution_1.exnode > /dev/null";
+                TS_ASSERT_EQUALS(system(command.c_str()), 0);
+
+                //Check the Vtk file
+                command = "ls " + OutputFileHandler::GetChasteTestOutputDirectory() + "nonlin_elas_functional_data/vtk/solution.vtu > /dev/null";
                 TS_ASSERT_EQUALS(system(command.c_str()), 0);
 
                 solver.rGetCurrentSolution().clear();
@@ -1223,6 +1231,31 @@ public:
         }
     }
 
+    //This is purely to ensure converage of vtk output in 3d
+    void TestVtkConverage3d() throw(Exception)
+    {
+       QuadraticMesh<3> mesh;
+       TrianglesMeshReader<3,3> mesh_reader1("mesh/test/data/3D_Single_tetrahedron_element_quadratic",2,1,false);
+       mesh.ConstructFromMeshReader(mesh_reader1);
+       NashHunterPoleZeroLaw<3> law;
+
+       std::vector<unsigned> fixed_nodes;
+       fixed_nodes.push_back(0);
+
+       SolidMechanicsProblemDefinition<3> problem_defn(mesh);
+       problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
+       problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+
+       IncompressibleNonlinearElasticitySolver<3> solver(mesh,
+                                                         problem_defn,
+                                                         "TestIncompressibleNonlinearElasticitySolver");
+       solver.Solve();
+       solver.CreateVtkOutput();
+
+       //Check the Vtk file
+       std::string command = "ls " + OutputFileHandler::GetChasteTestOutputDirectory() + "nonlin_elas_functional_data/vtk/solution.vtu > /dev/null";
+       TS_ASSERT_EQUALS(system(command.c_str()), 0);
+    }
 };
 
 #endif /*TESTINCOMPRESSIBLENONLINEARELASTICITYSOLVER_HPP_*/
