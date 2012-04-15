@@ -237,6 +237,7 @@ public:
                                                           problem_defn,
                                                           "ElasticitySlidingBcsExample");
         solver.Solve();
+        solver.CreateCmguiOutput();
 
         /* Check the node at (1,0) has moved but has stayed on Y=0 */
         TS_ASSERT_LESS_THAN(1.0, solver.rGetDeformedPosition()[10](0));
@@ -287,7 +288,7 @@ public:
         /* We will (later) apply Neumann boundary conditions to surface elements which lie below Y=0,
          * and these are collected here. (Minor, subtle, comment: we don't bother here checking Y>-0.9,
          * so the surface elements collected here include the ones on the Dirichlet boundary. This doesn't
-         * matter as the Dirichlet boundary conditions to the nonlinear system and essentially overwrite
+         * matter as the Dirichlet boundary conditions to the nonlinear system essentially overwrite
          * an Neumann-related effects).
          */
         std::vector<BoundaryElement<1,2>*> boundary_elems;
@@ -350,6 +351,7 @@ public:
          * final time
          */
         solver.Solve();
+        solver.CreateCmguiOutput();
     }
 };
 

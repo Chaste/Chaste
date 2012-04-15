@@ -828,6 +828,13 @@ void AbstractNonlinearElasticitySolver<DIM>::WriteCurrentAverageElementStresses(
     for(unsigned i=0; i<mAverageStressesPerElement.size(); i++)
     {
         c_matrix<double,DIM,DIM> stress = GetAverageStressPerElement(i);
+//        c_vector<double,DIM> centroid = this->mrQuadMesh.GetElement(i)->CalculateCentroid();
+//
+//        for(unsigned j=0; j<DIM; j++)
+//        {
+//            *p_file << centroid(j) << " ";
+//        }
+
         for(unsigned j=0; j<DIM; j++)
         {
             for(unsigned k=0; k<DIM; k++)

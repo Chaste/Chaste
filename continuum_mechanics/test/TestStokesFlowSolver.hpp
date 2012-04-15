@@ -52,7 +52,7 @@ class TestStokesFlowSolver : public CxxTest::TestSuite
 {
 public:
     /*
-     * Solution is u = [x, -y], p = const (= 1 as applying zero-Neumann on RHS).
+     * Solution is u = [x, -y], p = const (= 10 as applying zero-Neumann on RHS).
      * Dirichlet BC applied on three sides, zero-Neumann on the other (so pressure is fully defined)
      * Just two elements.
      */
@@ -65,7 +65,7 @@ public:
             QuadraticMesh<2> mesh(1.0/num_elem, 1.0, 1.0);
 
             // Dynamic viscosity
-            double mu = 1.0;
+            double mu = 10.0;
 
             // Boundary flow
             std::vector<unsigned> dirichlet_nodes;
@@ -123,7 +123,7 @@ public:
                 {
                     // solution is in finite element space, so FEM solution will be exact,
                     // apart from linear solver errors
-                    TS_ASSERT_DELTA(r_pressures[i], 1.0, 1e-8);
+                    TS_ASSERT_DELTA(r_pressures[i], 10.0, 1e-7);
                 }
                 else
                 {
@@ -329,8 +329,6 @@ public:
             }
         }
     }
-
-
 
 
     /*
@@ -566,14 +564,10 @@ public:
     }
 
 
-// this test works if the matrix is not told to be kept symmetric when ApplyDirichletBoundaryConditions() is called - something
-// is wrong with ApplyDirichletBoundaryConditions() when ApplyDirichletBcsType==LINEAR and DIM==3. Remove the 'donot' in the
-// name of the test when this is fixed
-
     // solve problem for which solution is u=(x,y,-2z), p=const.
-    void dontrunTestStokesSimple3d() throw(Exception)
+    void TestStokesSimple3d() throw(Exception)
     {
-        unsigned num_elem = 2;
+        unsigned num_elem = 1;
         QuadraticMesh<3> mesh(1.0/num_elem, 1.0, 1.0, 1.0);
 
         // Dynamic viscosity
@@ -646,55 +640,6 @@ public:
                 TS_ASSERT_DELTA(r_pressures[i], 0.0, 1e-8);
             }
         }
-    }
-
-    // this test works if the matrix is not told to be kept symmetric when ApplyDirichletBoundaryConditions() is called - something
-    // is wrong with ApplyDirichletBoundaryConditions() when ApplyDirichletBcsType==LINEAR and DIM==3. Remove the 'donot' in the
-    // name of the test when this is fixed
-    //
-    // It is also slow because of #2083 - might have to be a nightly test until this ticket is done.
-
-    void dontrunTestStokesWithLidDrivenCavity3d() throw(Exception)
-    {
-        unsigned num_elem = 5;
-        QuadraticMesh<3> mesh(1.0/num_elem, 1.0, 1.0, 1.0);
-
-        // Dynamic viscosity
-        double mu = 1.0;
-
-        // Boundary flow
-        std::vector<unsigned> dirichlet_nodes;
-        std::vector<c_vector<double,3> > dirichlet_flow;
-
-        for ( TetrahedralMesh<3,3>::BoundaryNodeIterator iter = mesh.GetBoundaryNodeIteratorBegin();
-              iter != mesh.GetBoundaryNodeIteratorEnd();
-              ++iter)
-        {
-            double x = (*iter)->rGetLocation()[0];
-            double y = (*iter)->rGetLocation()[1];
-            double z = (*iter)->rGetLocation()[2];
-
-            c_vector<double,3> flow = zero_vector<double>(3);
-
-            if (fabs(z-1.0)<1e-6)
-            {
-                flow(0) = x*(1-x)*y*(1-y);
-            }
-
-            dirichlet_nodes.push_back((*iter)->GetIndex());
-            dirichlet_flow.push_back(flow);
-        }
-
-        StokesFlowProblemDefinition<3> problem_defn(mesh);
-        problem_defn.SetViscosity(mu);
-        problem_defn.SetPrescribedFlowNodes(dirichlet_nodes, dirichlet_flow);
-
-        StokesFlowSolver<3> solver(mesh, problem_defn, "LidDrivenCavityStokesFlow3d");
-
-//        // Uncomment to make errors smaller
-//        solver.SetKspAbsoluteTolerance(1e-10);
-
-        solver.Solve();
     }
 };
 

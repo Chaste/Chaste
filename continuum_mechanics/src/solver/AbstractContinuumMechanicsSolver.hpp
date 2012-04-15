@@ -564,7 +564,7 @@ void AbstractContinuumMechanicsSolver<DIM>::ApplyDirichletBoundaryConditions(App
 
         for (unsigned j=0; j<DIM; j++)
         {
-            double dirichlet_val = mrProblemDefinition.rGetDirichletNodeValues()[i](j); // problem defn returns DISPLACEMENTS here
+            double dirichlet_val = mrProblemDefinition.rGetDirichletNodeValues()[i](j);
 
             if(dirichlet_val != ContinuumMechanicsProblemDefinition<DIM>::FREE)
             {

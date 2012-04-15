@@ -179,12 +179,12 @@ void PetscMatTools::ZeroRowsWithValueOnDiagonal(Mat matrix, std::vector<unsigned
 }
 
 
-void PetscMatTools::ZeroRowsAndColumnsWithValueOnDiagonal(Mat matrix, std::vector<unsigned>& rRowColIndices, double diagonalValue)
+void PetscMatTools::ZeroRowsAndColumnsWithValueOnDiagonal(Mat matrix, std::vector<unsigned> rowColIndices, double diagonalValue)
 {
     Finalise(matrix);
 
     // sort the vector as we will be repeatedly searching for entries in it
-    std::sort(rRowColIndices.begin(), rRowColIndices.end());
+    std::sort(rowColIndices.begin(), rowColIndices.end());
 
     PetscInt lo, hi;
     GetOwnershipRange(matrix, lo, hi);
@@ -204,7 +204,7 @@ void PetscMatTools::ZeroRowsAndColumnsWithValueOnDiagonal(Mat matrix, std::vecto
         // see which of these cols are in the list of cols to be zeroed
         for(PetscInt i=0; i<num_cols; i++)
         {
-            if(std::binary_search(rRowColIndices.begin(), rRowColIndices.end(), cols[i]))
+            if(std::binary_search(rowColIndices.begin(), rowColIndices.end(), cols[i]))
             {
                 cols_to_zero_per_row[row-lo].push_back(cols[i]);
             }
@@ -240,7 +240,7 @@ void PetscMatTools::ZeroRowsAndColumnsWithValueOnDiagonal(Mat matrix, std::vecto
     delete [] cols_to_zero_per_row;
 
     // Now zero the rows and add the diagonal entries
-    ZeroRowsWithValueOnDiagonal(matrix, rRowColIndices, diagonalValue);
+    ZeroRowsWithValueOnDiagonal(matrix, rowColIndices, diagonalValue);
 }
 
 void PetscMatTools::ZeroColumn(Mat matrix, PetscInt col)
