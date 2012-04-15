@@ -221,16 +221,6 @@ public:
     template<size_t MATRIX_SIZE>
     static void AddMultipleValues(Mat matrix, unsigned* matrixRowAndColIndices, c_matrix<double, MATRIX_SIZE, MATRIX_SIZE>& rSmallMatrix)
     {
-//        MatInfo info;
-//        double  mal, nz_a, nz_u;
-//
-//        MatGetInfo(matrix,MAT_LOCAL,&info);
-//        mal  = info.mallocs;
-//        nz_a = info.nz_allocated;
-//        std::cout << "\nBefore\nmallocs = " << info.mallocs << ", nz allocated = " <<  info.nz_allocated << ", "
-//                  << "nz used " << info.nz_used << ", nz unneeded " << info.nz_unneeded << "\n";
-
-
         PetscInt matrix_row_indices[MATRIX_SIZE];
         PetscInt num_rows_owned = 0;
         PetscInt global_row;
@@ -282,14 +272,6 @@ public:
                          values,
                          ADD_VALUES);
         }
-//
-//
-//
-//        MatGetInfo(matrix,MAT_LOCAL,&info);
-//        mal  = info.mallocs;
-//        nz_a = info.nz_allocated;
-//        std::cout << "\nAfter:\nmallocs = " << info.mallocs << ", nz allocated = " <<  info.nz_allocated << ", "
-//                  << "nz used " << info.nz_used << ", nz unneeded " << info.nz_unneeded << "\n";
     }
 };
 

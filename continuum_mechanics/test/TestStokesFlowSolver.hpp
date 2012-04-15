@@ -567,7 +567,7 @@ public:
     // solve problem for which solution is u=(x,y,-2z), p=const.
     void TestStokesSimple3d() throw(Exception)
     {
-        unsigned num_elem = 1;
+        unsigned num_elem = 2;
         QuadraticMesh<3> mesh(1.0/num_elem, 1.0, 1.0, 1.0);
 
         // Dynamic viscosity
@@ -601,6 +601,7 @@ public:
 
         StokesFlowSolver<3> solver(mesh, problem_defn, "3dSimple");
 
+        solver.SetKspAbsoluteTolerance(1e-12);
         solver.Solve();
 
         std::vector<c_vector<double,3> >& r_solution = solver.rGetVelocities();
@@ -611,8 +612,8 @@ public:
             double y = mesh.GetNode(i)->rGetLocation()[1];
             double z = mesh.GetNode(i)->rGetLocation()[2];
 
-            TS_ASSERT_DELTA(r_solution[i](0), x,  1e-6);
-            TS_ASSERT_DELTA(r_solution[i](1), y,  1e-6);
+            TS_ASSERT_DELTA(r_solution[i](0), x,    1e-6);
+            TS_ASSERT_DELTA(r_solution[i](1), y,    1e-6);
             TS_ASSERT_DELTA(r_solution[i](2), -2*z, 1e-6);
         }
 
