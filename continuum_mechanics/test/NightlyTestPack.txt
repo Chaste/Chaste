@@ -1,3 +1,4 @@
 TestIncompressibleNonlinearElasticitySolverLong.hpp
 TestSolvingElasticityProblemsTutorial.hpp
 TestSolvingMoreElasticityProblemsTutorial.hpp
+TestStokesFlowSolverLong.hpp
