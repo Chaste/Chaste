@@ -292,10 +292,10 @@ BoxCollection<DIM>* NodeBasedCellPopulation<DIM>::GetBoxCollection()
 template<unsigned DIM>
 std::set< std::pair<Node<DIM>*, Node<DIM>* > >& NodeBasedCellPopulation<DIM>::rGetNodePairs()
 {
-    if (mNodePairs.empty())
-    {
-        EXCEPTION("No node pairs set up, rGetNodePairs probably called before Update");
-    }
+//    if (mNodePairs.empty())
+//    {
+//        EXCEPTION("No node pairs set up, rGetNodePairs probably called before Update");
+//    }
     return mNodePairs;
 }
 

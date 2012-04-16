@@ -199,10 +199,6 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 5u);
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 5u);
 
-        // Throws exception as update hasn't been called so no node pairs set up yet
-        TS_ASSERT_THROWS_THIS(cell_population.rGetNodePairs(),
-                "No node pairs set up, rGetNodePairs probably called before Update");
-
         // Throws exception as the cut-off length hasn't been set and has its default value of DBL_MAX
         TS_ASSERT_THROWS_THIS(cell_population.Update(),
                 "NodeBasedCellPopulation cannot create boxes if the cut-off length has not been set - Call SetMechanicsCutOffLength on the CellPopulation ensuring it is larger than GetCutOffLength() on the force law");
@@ -212,6 +208,12 @@ public:
 
         std::set< std::pair<Node<2>*, Node<2>* > >& r_node_pairs = cell_population.rGetNodePairs();
         r_node_pairs.clear();
+
+
+        cell_population.SetMechanicsCutOffLength(1e-3);
+        cell_population.Update();
+        TS_ASSERT(cell_population.rGetNodePairs().empty());
+
     }
 
     void TestAddCell()
