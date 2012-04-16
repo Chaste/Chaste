@@ -92,7 +92,7 @@ protected:
     /** Whether to write any output. */
     bool mWriteOutput;
 
-    /** Where to write output, relative to CHASTE_TESTOUTPUT. */
+    /** Where to write output, relative to CHASTE_TEST_OUTPUT. */
     std::string mOutputDirectory;
 
     /** Output file handler. */
@@ -257,6 +257,25 @@ protected:
      *  @param type see above
      */
     void AddIdentityBlockForDummyPressureVariables(ApplyDirichletBcsType type);
+
+
+    /**
+     * For incompressible problems, we use the following ordering:
+     * [U0 V0 W0 P0 U1 V1 W1 P1 .. Un Vn Wn Pn]
+     * where (U V W) is the displacement, and P is the pressure.
+     * Therefore P is defined at every node; however for the solve, linear basis functions are used for
+     * the pressure, so pressure is solved for at each vertex, not at internal nodes (which are for
+     * quadratic basis functions).
+     *
+     * The above method, AddIdentityBlockForDummyPressureVariables(), enforces the
+     * condition P_i=0, where i corresponds to a non-vertex node.
+     *
+     * AFTER the solve, this method can be used to remove the dummy values, but looping over all
+     * edges, and linearly interpolating the pressure at the two vertices onto the internal node.
+     *
+     * This method assumes each internal node is midway between the two vertices.
+     */
+    void RemovePressureDummyValuesThroughLinearInterpolation();
 
 public:
     /**
@@ -495,13 +514,59 @@ std::vector<double>& AbstractContinuumMechanicsSolver<DIM>::rGetPressures()
 
     for (unsigned i=0; i<mrQuadMesh.GetNumNodes(); i++)
     {
-        if(mrQuadMesh.GetNode(i)->IsInternal())
-        {
-            assert(fabs(mPressureSolution[i])<1e-8);
-        }
         mPressureSolution[i] = mCurrentSolution[mProblemDimension*i + DIM];
     }
     return mPressureSolution;
+}
+
+
+template<unsigned DIM>
+void AbstractContinuumMechanicsSolver<DIM>::RemovePressureDummyValuesThroughLinearInterpolation()
+{
+    assert(mProblemDimension==DIM+1);
+
+    // For quadratic triangles, node 3 is between nodes 1 and 2, node 4 is between 0 and 2, etc
+    unsigned internal_nodes_2d[3] = {3,4,5};
+    unsigned neighbouring_vertices_2d[3][2] = { {1,2}, {2,0}, {0,1} };
+
+    // ordering for quadratic tetrahedra
+    unsigned internal_nodes_3d[6] = {4,5,6,7,8,9};
+    unsigned neighbouring_vertices_3d[6][2] = { {0,1}, {1,2}, {0,2}, {0,3}, {1,3}, {2,3} };
+
+    unsigned num_internal_nodes_per_element = DIM==2 ? 3 : 6;
+
+    // loop over elements, then loop over edges.
+    for (typename AbstractTetrahedralMesh<DIM,DIM>::ElementIterator iter = mrQuadMesh.GetElementIteratorBegin();
+         iter != mrQuadMesh.GetElementIteratorEnd();
+         ++iter)
+    {
+    	for(unsigned i=0; i<num_internal_nodes_per_element; i++)
+    	{
+    		unsigned global_index;
+    		double left_val;
+    		double right_val;
+
+    		if(DIM==2)
+    		{
+				global_index = iter->GetNodeGlobalIndex( internal_nodes_2d[i] );
+				unsigned vertex_0_global_index =iter->GetNodeGlobalIndex( neighbouring_vertices_2d[i][0] );
+				unsigned vertex_1_global_index =iter->GetNodeGlobalIndex( neighbouring_vertices_2d[i][1] );
+				left_val = mCurrentSolution[mProblemDimension*vertex_0_global_index + DIM];
+				right_val = mCurrentSolution[mProblemDimension*vertex_1_global_index + DIM];
+    		}
+    		else
+    		{
+				global_index = iter->GetNodeGlobalIndex( internal_nodes_3d[i] );
+				unsigned vertex_0_global_index =iter->GetNodeGlobalIndex( neighbouring_vertices_3d[i][0] );
+				unsigned vertex_1_global_index =iter->GetNodeGlobalIndex( neighbouring_vertices_3d[i][1] );
+				left_val = mCurrentSolution[mProblemDimension*vertex_0_global_index + DIM];
+				right_val = mCurrentSolution[mProblemDimension*vertex_1_global_index + DIM];
+    		}
+
+    		// this line assumes the internal node is midway between the two vertices
+    		mCurrentSolution[mProblemDimension*global_index + DIM] =  0.5 * (left_val + right_val);
+    	}
+    }
 }
 
 /*

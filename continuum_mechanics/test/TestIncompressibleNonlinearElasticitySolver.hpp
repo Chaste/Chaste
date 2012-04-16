@@ -414,15 +414,7 @@ public:
         TS_ASSERT_EQUALS(r_pressures.size(), mesh.GetNumNodes());
         for (unsigned i=0; i<r_pressures.size(); i++)
         {
-            if(! mesh.GetNode(i)->IsInternal())
-            {
-                TS_ASSERT_DELTA(r_pressures[i], 2*c1, 1e-6);
-            }
-            else
-            {
-                // dummy variable
-                TS_ASSERT_DELTA(r_pressures[i], 0.0, 1e-6);
-            }
+            TS_ASSERT_DELTA(r_pressures[i], 2*c1, 1e-6);
         }
     }
 
@@ -695,15 +687,7 @@ public:
         TS_ASSERT_EQUALS(r_pressures.size(), mesh.GetNumNodes());
         for (unsigned i=0; i<r_pressures.size(); i++)
         {
-            if(! mesh.GetNode(i)->IsInternal())
-            {
-                TS_ASSERT_DELTA(r_pressures[i], 2*c1*lambda*lambda, 1e-5);
-            }
-            else
-            {
-                // dummy variable
-                TS_ASSERT_DELTA(r_pressures[i], 0.0, 1e-6);
-            }
+            TS_ASSERT_DELTA(r_pressures[i], 2*c1*lambda*lambda, 1e-5);
         }
 
         if(PetscTools::IsSequential()) // see #2084
@@ -828,14 +812,7 @@ public:
             std::vector<double>& r_pressures = solver.rGetPressures();
             for (unsigned i=0; i<r_pressures.size(); i++)
             {
-                if(! mesh.GetNode(i)->IsInternal())
-                {
-                    TS_ASSERT_DELTA( r_pressures[i]/(2*MATERIAL_PARAM), 1.0, 1e-3);
-                }
-                else
-                {
-                    TS_ASSERT_DELTA( r_pressures[i], 0.0, 1e-3);
-                }
+                TS_ASSERT_DELTA( r_pressures[i]/(2*MATERIAL_PARAM), 1.0, 1e-3);
             }
 
             MechanicsEventHandler::Headings();
@@ -983,15 +960,7 @@ public:
             TS_ASSERT_EQUALS(r_pressures.size(), mesh.GetNumNodes());
             for (unsigned i=0; i<r_pressures.size(); i++)
             {
-                if(! mesh.GetNode(i)->IsInternal())
-                {
-                    TS_ASSERT_DELTA(r_pressures[i], 2*c1*lambda*lambda, 5e-2 );
-                }
-                else
-                {
-                    // dummy variable
-                    TS_ASSERT_DELTA(r_pressures[i], 0.0, 1e-8);
-                }
+                TS_ASSERT_DELTA(r_pressures[i], 2*c1*lambda*lambda, 5e-2 );
             }
         }
     }
@@ -1114,10 +1083,7 @@ public:
         std::vector<double>& r_pressures = solver.rGetPressures();
         for (unsigned i=0; i<r_pressures.size(); i++)
         {
-            if(! mesh.GetNode(i)->IsInternal())
-            {
-                TS_ASSERT_DELTA(r_pressures[i], 2*c1*lambda*lambda, 1e-4 );
-            }
+            TS_ASSERT_DELTA(r_pressures[i], 2*c1*lambda*lambda, 1e-4 );
         }
 
         MechanicsEventHandler::Headings();
@@ -1255,6 +1221,98 @@ public:
        //Check the Vtk file
        std::string command = "ls " + OutputFileHandler::GetChasteTestOutputDirectory() + "nonlin_elas_functional_data/vtk/solution.vtu > /dev/null";
        TS_ASSERT_EQUALS(system(command.c_str()), 0);
+    }
+
+
+    // The incompressible elasticity (and fluids) solvers remove the dummy pressure solutions (p=0 at internal nodes)
+    // after the solve by linearly interpolating from vertices. Here we test this directly - in particular in 3d as the
+    // 3d tests use constant pressure solutions so it is important to check with non-constant pressure
+    // at the vertices.
+    void TestRemoveDummyPressure() throw(Exception)
+    {
+    	// 2d version
+    	{
+			QuadraticMesh<2> mesh(1.0/5, 1.0, 1.0);
+
+			std::vector<unsigned> fixed_nodes;
+			fixed_nodes.push_back(0);
+			MooneyRivlinMaterialLaw<2> law(1);
+			SolidMechanicsProblemDefinition<2> problem_defn(mesh);
+			problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
+			problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+
+			IncompressibleNonlinearElasticitySolver<2> solver(mesh,
+															  problem_defn,
+															  "");
+
+
+			for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+			{
+				if(! mesh.GetNode(i)->IsInternal())
+				{
+					double x = mesh.GetNode(i)->rGetLocation()[0];
+					double y = mesh.GetNode(i)->rGetLocation()[1];
+					// p defined as a linear function of (x,y) at vertices
+					solver.rGetCurrentSolution()[3*i+2] = 5.6234534 + 2.2432*x + 7.3432*y;
+				}
+			}
+
+			solver.RemovePressureDummyValuesThroughLinearInterpolation();
+
+			for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+			{
+				double x = mesh.GetNode(i)->rGetLocation()[0];
+				double y = mesh.GetNode(i)->rGetLocation()[1];
+
+				TS_ASSERT_DELTA(solver.rGetCurrentSolution()[3*i  ], 0.0, 1e-8);
+				TS_ASSERT_DELTA(solver.rGetCurrentSolution()[3*i+1], 0.0, 1e-8);
+
+			    // p should be correct at all nodes, since linearly interpolated a linear function
+			    TS_ASSERT_DELTA(solver.rGetCurrentSolution()[3*i+2], 5.6234534 + 2.2432*x + 7.3432*y, 1e-8);
+			}
+    	}
+
+    	// 3d version
+    	{
+			QuadraticMesh<3> mesh(1.0/5, 1.0, 1.0, 2.0);
+
+			std::vector<unsigned> fixed_nodes;
+			fixed_nodes.push_back(0);
+			MooneyRivlinMaterialLaw<3> law(1,1);
+			SolidMechanicsProblemDefinition<3> problem_defn(mesh);
+			problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
+			problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+
+			IncompressibleNonlinearElasticitySolver<3> solver(mesh,
+															  problem_defn,
+															  "");
+
+
+			for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+			{
+				if(! mesh.GetNode(i)->IsInternal())
+				{
+					double x = mesh.GetNode(i)->rGetLocation()[0];
+					double y = mesh.GetNode(i)->rGetLocation()[1];
+					double z = mesh.GetNode(i)->rGetLocation()[2];
+					solver.rGetCurrentSolution()[4*i+3] = 5.6234534 + 2.2432*x + 7.3432*y + 6.24523*z;
+				}
+			}
+
+			solver.RemovePressureDummyValuesThroughLinearInterpolation();
+
+			for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+			{
+				double x = mesh.GetNode(i)->rGetLocation()[0];
+				double y = mesh.GetNode(i)->rGetLocation()[1];
+				double z = mesh.GetNode(i)->rGetLocation()[2];
+
+				TS_ASSERT_DELTA(solver.rGetCurrentSolution()[4*i  ], 0.0, 1e-8);
+                TS_ASSERT_DELTA(solver.rGetCurrentSolution()[4*i+1], 0.0, 1e-8);
+                TS_ASSERT_DELTA(solver.rGetCurrentSolution()[4*i+2], 0.0, 1e-8);
+                TS_ASSERT_DELTA(solver.rGetCurrentSolution()[4*i+3], 5.6234534 + 2.2432*x + 7.3432*y + 6.24523*z, 1e-8);
+			}
+    	}
     }
 };
 

@@ -75,7 +75,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  * Specify TRACTION BOUNDARY CONDITIONS (if non-zero) on the rest of the boundary -- tractions are forces per unit area applied
  *  the rest of the surface of the deformable object.
  *
- *  '''VERY IMPORTANT NOTE:''' Make sure you read the comment about HYPRE below before going to 3D or refining the meshes in these tests.
+ *  '''VERY IMPORTANT NOTE:''' For incompressible problems, make sure you read the comment about HYPRE below before going to
+ *  3D or refining meshes in these tests.
  *
  * '''Another note:''' mechanics problems are not currently implemented to scale in parallel yet.
  *
@@ -114,10 +115,11 @@ public:
      *
      * All the mechanics solvers solve for the deformation using the finite element method with QUADRATIC
      * basis functions for the deformation. This necessitates the use of a `QuadraticMesh` - such meshes have
-     * extra nodes that aren't vertices of elements, in this case midway along each edge. The displacement
+     * extra nodes that aren't vertices of elements, in this case midway along each edge. (The displacement
      * is solved for at ''each node'' in the mesh (including internal [non-vertex] nodes), whereas the pressure
-     * is only solved for at each vertex. (In FEM terms, quadratic interpolation for displacement, linear
-     * interpolation for pressure, which is required for stability).
+     * is only solved for at each vertex - in FEM terms, quadratic interpolation for displacement, linear
+     * interpolation for pressure, which is required for stability. The pressure at internal nodes is computed
+     * by linear interpolation).
      *
      */
     void TestSimpleIncompressibleProblem() throw(Exception)
@@ -199,9 +201,7 @@ public:
          *
          * To get the actual solution from the solver, use these two methods. Note that the first
          * gets the deformed position (ie the new location, not the displacement). They are both of size
-         * num_total_nodes. Since pressure is not computed at internal nodes (linear basis functions are
-         * used for pressure), the pressure value in the following vector is set to 0 for indices corresponding
-         * to internal nodes.
+         * num_total_nodes.
          */
         std::vector<c_vector<double,2> >& r_deformed_positions = solver.rGetDeformedPosition();
         std::vector<double>& r_pressures = solver.rGetPressures();
@@ -228,17 +228,16 @@ public:
         TS_ASSERT_DELTA(r_deformed_positions[node_index](1), -0.1129, 1e-3);
         TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(), 4u);
     }
-        /* ''Exercise'': convert to a compressible solver and compare the resultant deformations.
-         * The next tutorial describes how to solve for a compressible deformation,
-         * but the changes are essentially trivial: `IncompressibleNonlinearElasticitySolver` needs to be changed to
-         * `CompressibleNonlinearElasticitySolver`, the line `problem_defn.SetMaterialLaw(..)` needs changing, and
-         * the material law itself should be of type `AbstractCompressibleMaterialLaw`. An example is
-         * `CompressibleMooneyRivlinMaterialLaw`. Also `solver.rGetPressures()` doesn't exist (or make sense)
-         * when the solver is an `CompressibleNonlinearElasticitySolver`.
-         */
+    /* ''Exercise'': convert to a compressible solver and compare the resultant deformations.
+	 * The next tutorial describes how to solve for a compressible deformation,
+	 * but the changes are essentially trivial: `IncompressibleNonlinearElasticitySolver` needs to be changed to
+	 * `CompressibleNonlinearElasticitySolver`, the line `problem_defn.SetMaterialLaw(..)` needs changing, and
+	 * the material law itself should be of type `AbstractCompressibleMaterialLaw`. An example is
+	 * `CompressibleMooneyRivlinMaterialLaw`. Also `solver.rGetPressures()` doesn't exist (or make sense)
+	 * when the solver is an `CompressibleNonlinearElasticitySolver`.
+	 */
 
-    /*
-     * == Incompressible deformation: 2D shape hanging under gravity with a balancing traction ==
+    /* == Incompressible deformation: 2D shape hanging under gravity with a balancing traction ==
      *
      * We now repeat the above test but include a traction on the bottom surface (Y=0). We apply this
      * in the inward direction so that is counters (somewhat) the effect of gravity.
@@ -340,8 +339,7 @@ public:
      *
      * To switch on HYPRE, open the file `continuum_mechanics/src/solver/AbstractNonlinearElasticitySolver` and uncomment the line
      * #define MECH_USE_HYPRE
-     * near the top of the file (currently: line 53).
-     * (There are other things that can be uncommented here, which provide more verbose mechanics output).
+     * near the top of the file (currently: line 57).
      *
      * Note: PETSc unfortunately doesn't quit if you try to use HYPRE without it being installed, but it spew lots of error messages.
      *

@@ -248,10 +248,7 @@ public:
             std::vector<double>& r_pressures = solver.rGetPressures();
             for (unsigned i=0; i<r_pressures.size(); i++)
             {
-                if(! mesh.GetNode(i)->IsInternal())
-                {
-                    TS_ASSERT_DELTA(r_pressures[i]/(2*ThreeDimensionalModelProblem::c1), 1.0, 2e-1);
-                }
+                TS_ASSERT_DELTA(r_pressures[i]/(2*ThreeDimensionalModelProblem::c1), 1.0, 2e-1);
             }
         }
 
@@ -391,10 +388,7 @@ public:
         std::vector<double>& r_pressures = solver.rGetPressures();
         for (unsigned i=0; i<r_pressures.size(); i++)
         {
-            if(! mesh.GetNode(i)->IsInternal())
-            {
-                TS_ASSERT_DELTA(r_pressures[i], 2*c1*lambda*lambda, 0.05);
-            }
+            TS_ASSERT_DELTA(r_pressures[i], 2*c1*lambda*lambda, 0.05);
         }
     }
 };

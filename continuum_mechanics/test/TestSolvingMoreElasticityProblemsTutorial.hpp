@@ -91,7 +91,7 @@ public:
 
         /* Use a different material law this time, an exponential material law.
          * The material law needs to inherit from `AbstractIncompressibleMaterialLaw`,
-         * and there are a few implemented, see `pde/src/problem` */
+         * and there are a few implemented, see `continuum_mechanics/src/problem/material_laws` */
         ExponentialMaterialLaw<2> law(1.0, 0.5); // First parameter is 'a', second 'b', in W=a*exp(b(I1-3))
         /* Now specify the fixed nodes, and their new locations. Create `std::vector`s for each. */
         std::vector<unsigned> fixed_nodes;
@@ -161,7 +161,7 @@ public:
 
         /* Another quick check */
         TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(), 6u);
-        /* Visualise as before.`
+        /* Visualise as before.
          *
          * '''Advanced:''' Note that the function `MyTraction` takes in time, which it didn't use. In the above it would have been called
          * with t=0. The current time can be set using `SetCurrentTime()`. The idea is that the user may want to solve a
@@ -313,6 +313,15 @@ public:
 
         /* Set the fixed nodes and gravity */
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+
+        /* The elasticity solvers have two nonlinear solvers implemented, one hand-coded and one which uses PETSc's SNES
+         * solver. The latter is not the default but can be more robust (and will probably be the default in later
+         * versions). This is how it can be used.
+         */
+        problem_defn.SetSolveUsingSnes(); // alternatively, run from the command line (see ChasteGuides/RunningExecutablesFromCommandLine) with "-mech_use_snes"
+        /* This line tells the solver to output info about the nonlinear solve as it progresses, and can be used with
+         * or without the SNES option above. */
+        problem_defn.SetVerboseDuringSolve(); // alternatively, run from the command line (see ChasteGuides/RunningExecutablesFromCommandLine) with "-mech_verbose"
 
         c_vector<double,2> gravity;
         gravity(0) = 0;

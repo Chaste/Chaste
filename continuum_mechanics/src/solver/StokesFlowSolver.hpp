@@ -265,6 +265,11 @@ void StokesFlowSolver<DIM>::Solve()
         this->mCurrentSolution[i] = solution_repl[i];
     }
 
+    // Remove pressure dummy values (P=0 at internal nodes, which should have been
+    // been the result of the solve above), by linear interpolating from vertices of 
+    // edges to the internal node
+    this->RemovePressureDummyValuesThroughLinearInterpolation();
+
     PetscTools::Destroy(solution);
     KSPDestroy(PETSC_DESTROY_PARAM(solver));
 

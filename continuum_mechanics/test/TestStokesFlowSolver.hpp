@@ -119,17 +119,9 @@ public:
             std::vector<double>& r_pressures = solver.rGetPressures();
             for (unsigned i=0; i<r_pressures.size(); i++)
             {
-                if(! mesh.GetNode(i)->IsInternal())
-                {
-                    // solution is in finite element space, so FEM solution will be exact,
-                    // apart from linear solver errors
-                    TS_ASSERT_DELTA(r_pressures[i], 10.0, 1e-7);
-                }
-                else
-                {
-                    // dummy variable
-                    TS_ASSERT_DELTA(r_pressures[i], 0.0, 1e-8);
-                }
+            	// solution is in finite element space, so FEM solution will be exact,
+                // apart from linear solver errors
+                TS_ASSERT_DELTA(r_pressures[i], 10.0, 1e-7);
             }
 
             // check the matrix is symmetric even after Dirichlet BCs have been applied
@@ -204,14 +196,11 @@ public:
         std::vector<double>& r_pressures = solver.rGetPressures();
         for (unsigned i=0; i<r_pressures.size(); i++)
         {
-            if(! mesh.GetNode(i)->IsInternal())
-            {
-                double x = mesh.GetNode(i)->rGetLocation()[0];
-            	double exact_pressure = 2*(1-x);
-                // solution is in finite element space, so FEM solution will be exact,
-                // apart from linear solver errors
-                TS_ASSERT_DELTA(r_pressures[i], exact_pressure, 1e-8);
-            }
+            double x = mesh.GetNode(i)->rGetLocation()[0];
+          	double exact_pressure = 2*(1-x);
+            // solution is in finite element space, so FEM solution will be exact,
+            // apart from linear solver errors
+            TS_ASSERT_DELTA(r_pressures[i], exact_pressure, 1e-8);
         }
 
 
@@ -319,14 +308,11 @@ public:
         std::vector<double>& r_pressures = solver.rGetPressures();
         for (unsigned i=0; i<r_pressures.size(); i++)
         {
-            if(! mesh.GetNode(i)->IsInternal())
-            {
-                double x = mesh.GetNode(i)->rGetLocation()[0];
-                double exact_pressure = 2*(1-x) + 1;
+        	double x = mesh.GetNode(i)->rGetLocation()[0];
+            double exact_pressure = 2*(1-x) + 1;
 
-                // solution is in FE space
-                TS_ASSERT_DELTA(r_pressures[i], exact_pressure, 1e-5);
-            }
+            // solution is in FE space
+            TS_ASSERT_DELTA(r_pressures[i], exact_pressure, 1e-5);
         }
     }
 
@@ -408,29 +394,19 @@ public:
             double pressure_diff = 0.0;
             for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {
-                if(! mesh.GetNode(i)->IsInternal())
-                {
-                    double x = mesh.GetNode(i)->rGetLocation()[0];
-                    double y = mesh.GetNode(i)->rGetLocation()[1];
-                    double exact_pressure = 60.0*x*x*y -20.0*y*y*y;
-                    pressure_diff += r_pressures[i] - exact_pressure;
-                }
+                double x = mesh.GetNode(i)->rGetLocation()[0];
+                double y = mesh.GetNode(i)->rGetLocation()[1];
+                double exact_pressure = 60.0*x*x*y -20.0*y*y*y;
+                pressure_diff += r_pressures[i] - exact_pressure;
             }
             pressure_diff /= mesh.GetNumVertices();
 
             for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {
-                if(! mesh.GetNode(i)->IsInternal())
-                {
-                    double x = mesh.GetNode(i)->rGetLocation()[0];
-                    double y = mesh.GetNode(i)->rGetLocation()[1];
-
-                    double exact_pressure = 60.0*x*x*y -20.0*y*y*y;
-
-                    //TS_ASSERT_DELTA( r_pressures[i], exact_pressure + pressure_diff, 1e-0);
-
-                    L_inf_error_p[run] = std::max(L_inf_error_p[run], fabs(r_pressures[i] - exact_pressure - pressure_diff));
-                }
+                double x = mesh.GetNode(i)->rGetLocation()[0];
+                double y = mesh.GetNode(i)->rGetLocation()[1];
+                double exact_pressure = 60.0*x*x*y -20.0*y*y*y;
+                L_inf_error_p[run] = std::max(L_inf_error_p[run], fabs(r_pressures[i] - exact_pressure - pressure_diff));
             }
         }
 
@@ -443,17 +419,16 @@ public:
         /* results are:
          *
          * 2 1.15234 36.5909
-         * 4 0.352193 9.51735
-         * 8 0.0548267 1.86648
-         * 16 0.00787528 0.504425
-         * 32 0.00113687 0.117679
-         * 64 0.000153278 0.0287536
+         * 4 0.352193 9.58345
+         * 8 0.0548267 1.87473
+         * 16 0.00787528 0.526508
+         * 32 0.00113687 0.145555
          *
          * Everything is converging. Large errors in p down to this being an odd problem?
          */
-        double res_flow[6] = { 1.15234, 0.352193, 0.0548267, 0.00787528, 0.00113687, 0.000153278 };
-        double res_p[6] = { 36.5909, 9.51735, 1.86648, 0.504425, 0.117679, 0.0287536 };
-        assert(num_runs <= 6);
+        double res_flow[5] = { 1.15234, 0.352193, 0.0548267, 0.00787528, 0.00113687 };
+        double res_p[5] = { 36.5909, 9.58345, 1.87473, 0.526508, 0.145555};
+        assert(num_runs <= 5);
         for(unsigned i=0; i<num_runs; i++)
         {
             TS_ASSERT_DELTA( L_inf_error_flow[i], res_flow[i], 1e-3);
@@ -623,23 +598,15 @@ public:
         double value;
         for (unsigned i=0; i<r_pressures.size(); i++)
         {
-            if(! mesh.GetNode(i)->IsInternal())
-            {
-                if(first)
-                {
-                    value = r_pressures[i];
-                    first = false;
-                }
-                else
-                {
-                    TS_ASSERT_DELTA(r_pressures[i], value, 5e-5);
-                }
-            }
-            else
-            {
-                // dummy variable
-                TS_ASSERT_DELTA(r_pressures[i], 0.0, 1e-8);
-            }
+            if(first)
+			{
+				value = r_pressures[i];
+				first = false;
+			}
+			else
+			{
+				TS_ASSERT_DELTA(r_pressures[i], value, 5e-5);
+			}
         }
     }
 };

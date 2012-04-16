@@ -1474,6 +1474,14 @@ void AbstractNonlinearElasticitySolver<DIM>::Solve(double tol)
         SolveNonSnes(tol);
     }
 
+    // Remove pressure dummy values (P=0 at internal nodes, which should have been
+    // been the result of the solve above), by linear interpolating from vertices of 
+    // edges to the internal node of the edge
+    if(this->mCompressibilityType==INCOMPRESSIBLE)
+    {
+    	this->RemovePressureDummyValuesThroughLinearInterpolation();
+    }
+
     // Write the final solution
     this->WriteCurrentSpatialSolution("solution", "nodes");
 
@@ -1486,6 +1494,11 @@ void AbstractNonlinearElasticitySolver<DIM>::Solve(double tol)
 template<unsigned DIM>
 void AbstractNonlinearElasticitySolver<DIM>::SetKspSolverAndPcType(KSP solver)
 {
+    // Three alternatives
+    //   (a) Incompressible: GMRES with ILU preconditioner (or bjacobi=ILU on each process) [default]. Very poor on large problems.
+    //   (b) Incompressible: GMRES with AMG preconditioner. Uncomment #define MECH_USE_HYPRE above. Requires Petsc3 with HYPRE installed.
+    //   (c) Compressible: CG with ???
+
     PC pc;
     KSPGetPC(solver, &pc);
 
@@ -1607,12 +1620,7 @@ double AbstractNonlinearElasticitySolver<DIM>::TakeNewtonStep()
     }
 
     ///////////////////////////////////////////////////////////////////
-    //
     // Solve the linear system.
-    // Three alternatives
-    //   (a) Incompressible: GMRES with ILU preconditioner (or bjacobi=ILU on each process) [default]. Very poor on large problems.
-    //   (b) Incompressible: GMRES with AMG preconditioner. Uncomment #define MECH_USE_HYPRE above. Requires Petsc3 with HYPRE installed.
-    //   (c) Compressible: CG with ???
     ///////////////////////////////////////////////////////////////////
     MechanicsEventHandler::BeginEvent(MechanicsEventHandler::SOLVE);
 
