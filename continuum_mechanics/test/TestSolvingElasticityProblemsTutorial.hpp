@@ -240,7 +240,8 @@ public:
     /* == Incompressible deformation: 2D shape hanging under gravity with a balancing traction ==
      *
      * We now repeat the above test but include a traction on the bottom surface (Y=0). We apply this
-     * in the inward direction so that is counters (somewhat) the effect of gravity.
+     * in the inward direction so that is counters (somewhat) the effect of gravity. We also show how stresses
+     * and strains can be written to file.
      */
     void TestIncompressibleProblemWithTractions() throw(Exception)
     {
@@ -300,8 +301,31 @@ public:
         IncompressibleNonlinearElasticitySolver<2> solver(mesh,
                                                           problem_defn,
                                                           "IncompressibleElasticityWithTractionsTutorial");
+
+        /* In this test we also output the stress and strain. For the former, we have to tell the solver to store
+         * the stresses that are computed during the solve. This currently only works in parallel.
+         */
+        if(PetscTools::IsSequential()) // see #2084
+        {
+        	solver.SetComputeAverageStressPerElementDuringSolve();
+        }
+
         /* Call `Solve()` */
         solver.Solve();
+
+        /* Write the final deformation gradients to file. The i-th line of this file provides the deformation gradient F,
+         * written as 'F(0,0) F(0,1) F(1,0) F(1,1)', evaluated at the centroid of the i-th element.
+         */
+        solver.WriteCurrentDeformationGradients("deformation_grad");
+        /* Since we called `SetComputeAverageStressPerElementDuringSolve`, we can write the stresses to file too. However,
+         * note that for each element this is not the stress evaluated at the centroid, but the mean average of the stresses
+         * evaluated at the quadrature points - for technical cardiac electromechanics reasons, it is difficult to
+         * define the stress at non-quadrature points.
+         */
+        if(PetscTools::IsSequential()) // see #2084
+        {
+        	solver.WriteCurrentAverageElementStresses("2nd_PK_stress");
+        }
 
         /* Another quick check */
         TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(), 3u); // 3 rather than 4 this time

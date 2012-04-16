@@ -260,7 +260,7 @@ public:
 
         TS_ASSERT_THROWS_CONTAINS(problem.SetOutputDeformationGradientsAndStress(3.4),"not a multiple");
 
-        if(PetscTools::IsSequential())
+        if(PetscTools::IsSequential()) // #2084
         {
         	problem.SetOutputDeformationGradientsAndStress(3.0);
         }

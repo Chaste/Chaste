@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * = Cardiac Electro-mechanical Problems (cont.) =
  *
- * It is worth running this test suite with build=GccOpt_ndebug
+ * It is worth running this test suite with `build=GccOpt_ndebug`
  *
  * The same includes as the previous tutorial */
 #include <cxxtest/TestSuite.h>
@@ -289,7 +289,7 @@ public:
             }
         }
 
-        /* Increase this to see contraction */
+        /* Increase this end time to see more contraction */
         HeartConfig::Instance()->SetSimulationDuration(30.0);
 
         ElectroMechanicsProblemDefinition<2> problem_defn(mechanics_mesh);
@@ -346,13 +346,13 @@ public:
 
         /* If we want stresses and strains output, we can do the following. The deformation gradients and 2nd PK stresses
          * for each element will be written at the requested times. This currently only works in sequential simulations. */
-        if(PetscTools::IsSequential())
+        if(PetscTools::IsSequential()) // #2084
         {
         	problem.SetOutputDeformationGradientsAndStress(10.0 /*how often (in ms) to write - should be a multiple of mechanics timestep*/);
         }
 
-        /* Since this test involves a large deformation at t=0, several Newton iterations are required. Try running
-         * from the command line with "-mech_verbose"
+        /* Since this test involves a large deformation at t=0, several Newton iterations are required. To see how the nonlinear
+         * solve is progressing, you can run from the binary from the command line with the command line argument "-mech_verbose".
          */
 
         problem.Solve();
