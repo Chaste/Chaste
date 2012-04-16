@@ -27,4 +27,5 @@ tutorials/TestBidomainWithBathAndFibresTutorial.hpp
 tutorials/TestMonodomain3dExampleTutorial.hpp
 tutorials/TestCardiacCheckpointingAndRestartingTutorial.hpp
 tutorials/TestCardiacElectroMechanicsTutorial.hpp
+tutorials/TestAnotherCardiacElectroMechanicsTutorial.hpp
 TestStreeterFibreGeneratorNightly.hpp

@@ -921,13 +921,13 @@ void AbstractNonlinearElasticitySolver<DIM>::CreateVtkOutput()
 template<unsigned DIM>
 void AbstractNonlinearElasticitySolver<DIM>::SetComputeAverageStressPerElementDuringSolve(bool setComputeAverageStressPerElement)
 {
-    if(PetscTools::IsParallel())
+    if(setComputeAverageStressPerElement && PetscTools::IsParallel())
     {
         EXCEPTION("SetComputeAverageStressPerElementDuringSolve() is not yet implemented for parallel simulations");
     }
 
     mSetComputeAverageStressPerElement = setComputeAverageStressPerElement;
-    if(mAverageStressesPerElement.size()==0)
+    if(setComputeAverageStressPerElement && mAverageStressesPerElement.size()==0)
     {
         mAverageStressesPerElement.resize(this->mrQuadMesh.GetNumElements(), zero_vector<double>(DIM*(DIM+1)/2));
     }

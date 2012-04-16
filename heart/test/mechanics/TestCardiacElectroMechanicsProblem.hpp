@@ -260,7 +260,10 @@ public:
 
         TS_ASSERT_THROWS_CONTAINS(problem.SetOutputDeformationGradientsAndStress(3.4),"not a multiple");
 
-        problem.SetOutputDeformationGradientsAndStress(3.0);
+        if(PetscTools::IsSequential())
+        {
+        	problem.SetOutputDeformationGradientsAndStress(3.0);
+        }
         problem.Solve();
 
         // test by checking the length of the tissue against hardcoded value
@@ -276,23 +279,26 @@ public:
         std::string command = "ls " + handler.GetOutputDirectoryFullPath() + "/electrics";
         TS_ASSERT_EQUALS(system(command.c_str()), 0);
 
-        command = "ls " + handler.GetOutputDirectoryFullPath() + "/deformation/deformation_gradient_0.strain";
-        TS_ASSERT_EQUALS(system(command.c_str()), 0);
+        if(PetscTools::IsSequential())
+        {
+			command = "ls " + handler.GetOutputDirectoryFullPath() + "/deformation/deformation_gradient_0.strain";
+			TS_ASSERT_EQUALS(system(command.c_str()), 0);
 
-        command = "ls " + handler.GetOutputDirectoryFullPath() + "/deformation/deformation_gradient_3.strain";
-        TS_ASSERT_EQUALS(system(command.c_str()), 0);
+			command = "ls " + handler.GetOutputDirectoryFullPath() + "/deformation/deformation_gradient_3.strain";
+			TS_ASSERT_EQUALS(system(command.c_str()), 0);
 
-        command = "ls " + handler.GetOutputDirectoryFullPath() + "/deformation/deformation_gradient_6.strain";
-        TS_ASSERT_EQUALS(system(command.c_str()), 0);
+			command = "ls " + handler.GetOutputDirectoryFullPath() + "/deformation/deformation_gradient_6.strain";
+			TS_ASSERT_EQUALS(system(command.c_str()), 0);
 
-        command = "ls " + handler.GetOutputDirectoryFullPath() + "/deformation/second_PK_0.stress";
-        TS_ASSERT_EQUALS(system(command.c_str()), 0);
+			command = "ls " + handler.GetOutputDirectoryFullPath() + "/deformation/second_PK_0.stress";
+			TS_ASSERT_EQUALS(system(command.c_str()), 0);
 
-        command = "ls " + handler.GetOutputDirectoryFullPath() + "/deformation/second_PK_3.stress";
-        TS_ASSERT_EQUALS(system(command.c_str()), 0);
+			command = "ls " + handler.GetOutputDirectoryFullPath() + "/deformation/second_PK_3.stress";
+			TS_ASSERT_EQUALS(system(command.c_str()), 0);
 
-        command = "ls " + handler.GetOutputDirectoryFullPath() + "/deformation/second_PK_6.stress";
-        TS_ASSERT_EQUALS(system(command.c_str()), 0);
+			command = "ls " + handler.GetOutputDirectoryFullPath() + "/deformation/second_PK_6.stress";
+			TS_ASSERT_EQUALS(system(command.c_str()), 0);
+        }
 
 
         // coverage

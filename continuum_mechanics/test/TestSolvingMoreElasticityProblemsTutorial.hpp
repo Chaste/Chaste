@@ -316,12 +316,14 @@ public:
 
         /* The elasticity solvers have two nonlinear solvers implemented, one hand-coded and one which uses PETSc's SNES
          * solver. The latter is not the default but can be more robust (and will probably be the default in later
-         * versions). This is how it can be used.
+         * versions). This is how it can be used. (This option can also be called if the compiled binary is run from
+         * the command line (see ChasteGuides/RunningBinariesFromCommandLine) using the option "-mech_use_snes").
          */
-        problem_defn.SetSolveUsingSnes(); // alternatively, run from the command line (see ChasteGuides/RunningExecutablesFromCommandLine) with "-mech_use_snes"
+        problem_defn.SetSolveUsingSnes();
         /* This line tells the solver to output info about the nonlinear solve as it progresses, and can be used with
-         * or without the SNES option above. */
-        problem_defn.SetVerboseDuringSolve(); // alternatively, run from the command line (see ChasteGuides/RunningExecutablesFromCommandLine) with "-mech_verbose"
+         * or without the SNES option above. The corresponding command line option is "-mech_verbose"
+         */
+        problem_defn.SetVerboseDuringSolve();
 
         c_vector<double,2> gravity;
         gravity(0) = 0;

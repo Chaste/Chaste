@@ -160,7 +160,6 @@ public:
                                                   &cell_factory,
                                                   &problem_defn,
                                                   "TestEmOnAnnulusDiastolicFilling");
-        problem.SetOutputDeformationGradientsAndStress(10);
         problem.Solve();
 
         // we don't really test anything.
@@ -244,7 +243,6 @@ public:
                                                  &problem_defn,
                                                  "TestEmOnAnnulus");
 
-        problem.SetOutputDeformationGradientsAndStress(10.0);
 
         problem.Solve();
 
