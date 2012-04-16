@@ -42,7 +42,7 @@ AbstractOffLatticeCellPopulation<DIM>::AbstractOffLatticeCellPopulation( Abstrac
     : AbstractCellPopulation<DIM>(rMesh, rCells, locationIndices),
       mDampingConstantNormal(1.0),
       mDampingConstantMutant(1.0),
-      mAbsoluteMovementThreshold(0.5)
+      mAbsoluteMovementThreshold(2.0)
 {
 }
 

@@ -108,13 +108,11 @@ void AbstractCentreBasedCellPopulation<DIM>::UpdateNodeLocations(const std::vect
         // Get displacement
         c_vector<double,DIM> displacement=dt*rNodeForces[node_index]/damping_const;
 
-/// \todo Check how the following lines affect the code before commit.
-
-//         // Throws an exception if the cell movement goes beyond mAbsoluteMovementThreshold
-//        if (norm_2(displacement) > mAbsoluteMovementThreshold)
-//        {
-//            EXCEPTION("Cells are moving more than the AbsoluteMovementThreshold. Use a smaller timestep to avoid this exception.");
-//        }
+        // Throws an exception if the cell movement goes beyond mAbsoluteMovementThreshold
+        if (norm_2(displacement) > this->mAbsoluteMovementThreshold)
+        {
+            EXCEPTION("Cells are moving more than the AbsoluteMovementThreshold. Use a smaller timestep to avoid this exception.");
+        }
 
         // Get new node location
         c_vector<double, DIM> new_node_location = this->GetNode(node_index)->rGetLocation() + displacement;

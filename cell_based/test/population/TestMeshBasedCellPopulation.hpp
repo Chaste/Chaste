@@ -90,7 +90,7 @@ private:
         TS_ASSERT_DELTA(cell_population.GetMeinekeDivisionSeparation(), 0.5, 1e-6);
         cell_population.SetMeinekeDivisionSeparation(0.3);
 
-        TS_ASSERT_DELTA(cell_population.GetAbsoluteMovementThreshold(), 0.5, 1e-6);
+        TS_ASSERT_DELTA(cell_population.GetAbsoluteMovementThreshold(), 2.0, 1e-6);
         cell_population.SetAbsoluteMovementThreshold(1.5);
         TS_ASSERT_DELTA(cell_population.GetAbsoluteMovementThreshold(), 1.5, 1e-6);
         cell_population.SetMeinekeDivisionSeparation(0.5);

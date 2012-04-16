@@ -361,6 +361,47 @@ public:
         delete p_simulator1;
         delete p_simulator2;
     }
+
+    /**
+    * Create a simulation of a NodeBasedCellPopulation to test movement threshold.
+    *
+    */
+    void TestMovementThreshold() throw (Exception)
+    {
+        // Creates nodes and mesh
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0,  false,  0.0, 0.0));
+        nodes.push_back(new Node<2>(0,  false,  0.0, 0.3));
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
+
+        // Create a node based cell population
+        NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
+        node_based_cell_population.SetMechanicsCutOffLength(1.5);
+        node_based_cell_population.SetAbsoluteMovementThreshold(1e-6);
+
+        // Set up cell-based simulation
+        OffLatticeSimulation<2> simulator(node_based_cell_population);
+        simulator.SetEndTime(0.1);
+        simulator.SetOutputDirectory("TestOffLatticeSimulationWithNodeBasedCellPopulationThreshold");
+
+        // Create a force law and pass it to the simulation
+        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        p_linear_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_linear_force);
+
+        // Solve
+        TS_ASSERT_THROWS_THIS(simulator.Solve(), "Cells are moving more than the AbsoluteMovementThreshold. Use a smaller timestep to avoid this exception.");
+
+        // Tidy up
+        delete nodes[0];
+        delete nodes[1];
+    }
 };
 
 #endif /*TESTOFFLATTICESIMULATIONWITHNODEBASEDCELLPOPULATION_HPP_*/
