@@ -1141,8 +1141,7 @@ public:
         CellPropertyCollection cell2_data_collection = p_cell2->rGetCellPropertyCollection().GetPropertiesType<CellData>();
         boost::shared_ptr<CellData> p_daughtercell_data = boost::static_pointer_cast<CellData>(cell2_data_collection.GetProperty());
 
-        // TODO See #1515
-        //TS_ASSERT_EQUALS(p_daughtercell_data->GetCellData(0), 1.0);
+        TS_ASSERT_EQUALS(p_daughtercell_data->GetCellData(0), 1.0);
         TS_ASSERT_EQUALS(p_daughtercell_data->GetCellData(1), 2.0);
     }
 

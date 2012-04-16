@@ -364,20 +364,28 @@ CellPtr Cell::Divide()
 
     // Reset properties of parent cell
     mpCellCycleModel->ResetForDivision();
-    // Remove the CellId from the daughter cell a new one will be assigned in the constructor
+
+    // Create copy of cell property collection to modify for daughter cell
     CellPropertyCollection daughter_property_collection = mCellPropertyCollection;
+
+    // Remove the CellId from the daughter cell a new one will be assigned in the constructor
     daughter_property_collection.RemoveProperty<CellId>();
 
-    // Copy any cell data (note we create a now object not just copying the pointer
+    // Copy any cell data (note we create a new object not just copying the pointer)
     if (daughter_property_collection.HasPropertyType<CellData>())
     {
-        // See #1515
         // Get the existing copy of the cell data it and remove it from the daughter cell
+    	CellPropertyCollection cell_data_collection = daughter_property_collection.GetPropertiesType<CellData>();
+    	assert(cell_data_collection.GetSize() == 1); //We should only have at most one cell data per cell
+    	boost::shared_ptr<CellData> p_cell_data = boost::static_pointer_cast<CellData>(cell_data_collection.GetProperty());
+    	daughter_property_collection.RemoveProperty(p_cell_data);
 
-        // Create a new cell data object and add this to the daughter cell
+    	// Create a new cell data object and add this to the daughter cell
+    	MAKE_PTR_ARGS(CellData, p_daughter_cell_data, (*p_cell_data));
+		daughter_property_collection.AddProperty(p_daughter_cell_data);
     }
 
-    // Create daughter cell
+    // Create daughter cell with modified cell property collection
     CellPtr p_new_cell(new Cell(GetMutationState(), mpCellCycleModel->CreateCellCycleModel(), false, daughter_property_collection));
     // Initialise properties of daughter cell
     p_new_cell->GetCellCycleModel()->InitialiseDaughterCell();
