@@ -1627,7 +1627,7 @@ A mathematical treatment of integrated Ca dynamics within the ventricular myocyt
    </component>
    <component xmlns="http://www.cellml.org/cellml/1.0#" name="IKs">
       <variable cmeta:id="membrane_slow_delayed_rectifier_potassium_current" name="i_Ks" units="microA_per_microF" public_interface="out">
- <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
             <rdf:Description rdf:about="#membrane_slow_delayed_rectifier_potassium_current">
                <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_slow_delayed_rectifier_potassium_current"/>
             </rdf:Description>
@@ -1635,6 +1635,13 @@ A mathematical treatment of integrated Ca dynamics within the ventricular myocyt
       </variable>	
       <variable name="i_Ks_jct" units="microA_per_microF"/>
       <variable name="i_Ks_SL" units="microA_per_microF"/>
+      <variable name="G_Ks_Max" units="milliS_per_microF" initial_value="0.07" cmeta:id="membrane_slow_delayed_rectifier_potassium_current_conductance">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#membrane_slow_delayed_rectifier_potassium_current_conductance">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_slow_delayed_rectifier_potassium_current_conductance"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
       <variable name="G_Ks_SL" units="milliS_per_microF"/>
       <variable name="G_Ks_jct" units="milliS_per_microF"/>
       <variable name="Fx_Ks_jct" units="dimensionless" initial_value="0.11"/>
@@ -1699,7 +1706,7 @@ A mathematical treatment of integrated Ca dynamics within the ventricular myocyt
             <ci>G_Ks_jct</ci>
             <apply>
                <times/>
-               <cn cellml:units="milliS_per_microF">0.07</cn>
+               <ci>G_Ks_Max</ci>
                <apply>
                   <plus/>
                   <cn cellml:units="dimensionless">0.057</cn>
@@ -1734,7 +1741,7 @@ A mathematical treatment of integrated Ca dynamics within the ventricular myocyt
             <ci>G_Ks_SL</ci>
             <apply>
                <times/>
-               <cn cellml:units="milliS_per_microF">0.07</cn>
+               <ci>G_Ks_Max</ci>
                <apply>
                   <plus/>
                   <cn cellml:units="dimensionless">0.057</cn>

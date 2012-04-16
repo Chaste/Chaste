@@ -48,6 +48,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestModifiers : public CxxTest::TestSuite
 {
 public:
+    void TestAccessingParametersWithoutModifiers() throw(Exception)
+    {
+        boost::shared_ptr<ZeroStimulus> p_stimulus(new ZeroStimulus());
+        boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
+        CellShannon2004FromCellML* p_shannon = new CellShannon2004FromCellML(p_solver, p_stimulus);
+
+        // We should now have all of the following methods available as an alternative to using 'modifiers'
+        TS_ASSERT_DELTA(p_shannon->GetParameter("membrane_fast_sodium_current_conductance"),16.0,1e-5);
+        TS_ASSERT_DELTA(p_shannon->GetParameter("membrane_L_type_calcium_current_conductance"),5.4e-4,1e-5);
+        TS_ASSERT_DELTA(p_shannon->GetParameter("membrane_rapid_delayed_rectifier_potassium_current_conductance"),0.03,1e-5);
+        TS_ASSERT_DELTA(p_shannon->GetParameter("membrane_slow_delayed_rectifier_potassium_current_conductance"),0.07,1e-5);
+     }
+
     void TestAssigningModifiersToACellModel() throw(Exception)
     {
         boost::shared_ptr<ZeroStimulus> p_stimulus(new ZeroStimulus());
@@ -56,6 +69,7 @@ public:
 
         TS_ASSERT_EQUALS(p_shannon->HasModifier("Alan"), false);
         TS_ASSERT_THROWS_THIS(p_shannon->GetModifier("Alan"), "There is no modifier called Alan in this model.");
+
 
         // Default modifier shouldn't do anything to the value inputted to calc()
         TS_ASSERT_EQUALS(p_shannon->HasModifier("membrane_rapid_delayed_rectifier_potassium_current_conductance"), true);
