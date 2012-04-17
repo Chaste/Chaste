@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomNumberGenerator.hpp"
 
 /**
- * A stochastic cell-cycle model where Cells keep dividing with a stochastic cell cycle duration.
+ * A stochastic cell-cycle model where Cells keep dividing with a stochastic cell cycle duration drawn from a uniform distribution.
  */
 class StochasticDurationCellCycleModel : public AbstractSimpleCellCycleModel
 {
