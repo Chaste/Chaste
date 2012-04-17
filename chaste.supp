@@ -426,7 +426,7 @@
 }
 
 {
-   Memory problem in Tetgen with quadratic meshs
+   Memory problem in Tetgen with quadratic meshes
    Memcheck:Cond
    fun:_ZN6tetgen10tetgenmesh13pointtraverseEv
    fun:_ZN6tetgen10tetgenmesh8outnodesEPNS_8tetgenioE
@@ -436,3 +436,12 @@
    fun:_ZN23AbstractTetrahedralMeshILj3ELj3EE24ConstructRegularSlabMeshEdddd
 }
 
+{
+   Memory problem in Tetgen with quadratic meshes - different entry point
+   Memcheck:Cond
+   fun:_ZN6tetgen10tetgenmesh13pointtraverseEv
+   fun:_ZN6tetgen10tetgenmesh8outnodesEPNS_8tetgenioE
+   fun:_ZN6tetgen14tetrahedralizeEPNS_14tetgenbehaviorEPNS_8tetgenioES3_S3_S3_
+   fun:_ZN6tetgen14tetrahedralizeEPcPNS_8tetgenioES2_S2_S2_
+   fun:_ZN13QuadraticMeshILj3EE29ConstructFromLinearMeshReaderER18AbstractMeshReaderILj3ELj3EE
+}
