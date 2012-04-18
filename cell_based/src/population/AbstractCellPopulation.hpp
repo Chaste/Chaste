@@ -110,7 +110,7 @@ protected:
     std::list<CellPtr> mCells;
 
     /** Map location (node or VertexElement) indices back to cells */
-    std::map<unsigned, CellPtr> mLocationCellMap;
+    std::map<unsigned, std::set<CellPtr> > mLocationCellMap;
 
     /** Map cells to location (node or VertexElement) indices */
     std::map<Cell*, unsigned> mCellLocationMap;
@@ -403,14 +403,24 @@ public:
     /**
      * Get the cell corresponding to a given location index.
      *
-     * Currently assumes there is one cell for each location index, and they are ordered identically in their vectors.
-     * An assertion fails if not.
+     * his method assumes that there is at most one cell attached to a location index and an assertion fails if not.
      *
      * @param index the location index
      *
      * @return the cell.
      */
     CellPtr GetCellUsingLocationIndex(unsigned index);
+
+    /**
+     * Get the set of cells corresponding to a given location index.
+     *
+     * Note the set may be empty.
+     *
+     * @param index the location index
+     *
+     * @return the set of cells.
+     */
+    std::set<CellPtr> GetCellsUsingLocationIndex(unsigned index);
 
     /**
      * Returns whether or not a cell is associated with a location index
@@ -424,19 +434,33 @@ public:
     /**
      * Set the cell corresponding to a given location index.
      *
-     * Currently assumes there is one cell for each location index.
+     * Assumes there is one cell for each location index and replaces any existing cell attached to the location index.
      *
      * @param index the location index
      * @param pCell the cell.
      */
     void SetCellUsingLocationIndex(unsigned index, CellPtr pCell);
 
+    /**
+     * Adds a cell to a given location index.
+     *
+     * @param index the location index
+     * @param pCell the cell.
+     */
+    void AddCellUsingLocationIndex(unsigned index, CellPtr pCell);
+
+    /**
+     * Removes a cell from a given location index.
+     *
+     * @param index the location index
+     * @param pCell the cell.
+     */
+    void RemoveCellUsingLocationIndex(unsigned index, CellPtr pCell);
 
     /**
      * Get the location index corresponding to a given cell.
      *
-     * Currently assumes there is one cell for each location index, and they are ordered identically in their vectors.
-     * An assertion fails if not.
+     * Assumes there is one location index for each cell and an assertion fails if not.
      *
      * @param pCell the cell
      *

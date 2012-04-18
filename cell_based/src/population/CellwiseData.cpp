@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellwiseData.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "CellPropertyCollection.hpp"
-#include "Debug.hpp"
+
 template<unsigned DIM>
 CellwiseData<DIM>* CellwiseData<DIM>::mpInstance = NULL;
 

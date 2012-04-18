@@ -218,39 +218,78 @@ const std::vector<unsigned>& AbstractCellPopulation<DIM>::rGetCellCyclePhaseCoun
 template<unsigned DIM>
 CellPtr AbstractCellPopulation<DIM>::GetCellUsingLocationIndex(unsigned index)
 {
-    // Get a pointer to the cell corresponding to this location index
-    CellPtr p_cell = mLocationCellMap[index];
+    // Get the set of pointers to cells corresponding to this location index
+    std::set<CellPtr> cells = mLocationCellMap[index];
 
-    // Unless this pointer is null, return the cell
-    if (p_cell)
+    // If there is only one cell attached return the cell. Note currently only one cell per index.
+    if (cells.size()==1)
     {
-        return p_cell;
+        return *(cells.begin());
     }
-    else
+    if (cells.size()==0)
     {
         EXCEPTION("Location index input argument does not correspond to a Cell");
     }
+    else
+    {
+        EXCEPTION("Multiple cells are attached to a single location index.");
+    }
+}
+
+template<unsigned DIM>
+std::set<CellPtr> AbstractCellPopulation<DIM>::GetCellsUsingLocationIndex(unsigned index)
+{
+    // Return the set of pointers to cells corresponding to this location index, note the set may be empty.
+    return mLocationCellMap[index];
 }
 
 template<unsigned DIM>
 bool AbstractCellPopulation<DIM>::IsCellAttachedToLocationIndex(unsigned index)
 {
-    // Check if pointer to cell is NULL
-    if (mLocationCellMap[index])
+    // Get the set of pointers to cells corresponding to this location index
+    std::set<CellPtr> cells = mLocationCellMap[index];
+
+    // check if there is a cell attached to the location index.
+    if (cells.size()==0)
     {
-        return true;
+        return false;
     }
     else
     {
-        return false;
+        return true;
     }
 }
 
 template<unsigned DIM>
 void AbstractCellPopulation<DIM>::SetCellUsingLocationIndex(unsigned index, CellPtr pCell)
 {
-    // This currently assumes a one to one relationship between cells
-    mLocationCellMap[index]= pCell;
+    // This method assumes a one to one relationship between cells and location indices
+
+    // First remove any cell at this location index
+    mLocationCellMap[index].clear();
+    // Replace with new cell
+    mLocationCellMap[index].insert(pCell);
+}
+
+template<unsigned DIM>
+void AbstractCellPopulation<DIM>::AddCellUsingLocationIndex(unsigned index, CellPtr pCell)
+{
+    mLocationCellMap[index].insert(pCell);
+}
+
+template<unsigned DIM>
+void AbstractCellPopulation<DIM>::RemoveCellUsingLocationIndex(unsigned index, CellPtr pCell)
+{
+    std::set<CellPtr>::iterator cell_iter = mLocationCellMap[index].find(pCell);
+
+    if (cell_iter == mLocationCellMap[index].end())
+    {
+        EXCEPTION("Tried to remove a cell which is not attached to the given location index");
+    }
+    else
+    {
+        mLocationCellMap[index].erase(cell_iter);
+    }
 }
 
 template<unsigned DIM>

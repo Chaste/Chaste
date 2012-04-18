@@ -103,6 +103,74 @@ public:
         }
     }
 
+    /*
+     * This test checks that cell populations with multiple cells per lattice site are dealt with correctly.
+     */
+    void TestMultipleCellExceptions() throw (Exception)
+    {
+        // Create a simple 2D PottsMesh with 4 nodes
+        PottsMeshGenerator<2> generator(2, 0, 0, 2, 0, 0);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, 2);
+
+        std::vector<unsigned> location_indices;
+        location_indices.push_back(0);
+        location_indices.push_back(3);
+
+        // Create cell population
+        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+
+        // Check cells are in the correct location
+        TS_ASSERT(cell_population.IsCellAttachedToLocationIndex(0));
+        TS_ASSERT(!cell_population.IsCellAttachedToLocationIndex(1));
+        TS_ASSERT(!cell_population.IsCellAttachedToLocationIndex(2));
+        TS_ASSERT(cell_population.IsCellAttachedToLocationIndex(3));
+
+        TS_ASSERT_THROWS_NOTHING(cell_population.GetCellUsingLocationIndex(0));
+        TS_ASSERT_THROWS_THIS(cell_population.GetCellUsingLocationIndex(1),"Location index input argument does not correspond to a Cell");
+        TS_ASSERT_THROWS_THIS(cell_population.GetCellUsingLocationIndex(2),"Location index input argument does not correspond to a Cell");
+        TS_ASSERT_THROWS_NOTHING(cell_population.GetCellUsingLocationIndex(3));
+
+        // Now remove first cell from lattice 0 and move it to lattice 3
+        cell_population.RemoveCellUsingLocationIndex(0,cells[0]);
+
+        // Coverage as cell is no longer there.
+        TS_ASSERT_THROWS_THIS(cell_population.RemoveCellUsingLocationIndex(0,cells[0]),
+                              "Tried to remove a cell which is not attached to the given location index");
+
+        cell_population.AddCellUsingLocationIndex(3,cells[0]);
+
+        // Check cells are in the correct locations
+        TS_ASSERT(!cell_population.IsCellAttachedToLocationIndex(0));
+        TS_ASSERT(!cell_population.IsCellAttachedToLocationIndex(1));
+        TS_ASSERT(!cell_population.IsCellAttachedToLocationIndex(2));
+        TS_ASSERT(cell_population.IsCellAttachedToLocationIndex(3));
+
+        TS_ASSERT_THROWS_THIS(cell_population.GetCellUsingLocationIndex(0),"Location index input argument does not correspond to a Cell");
+        TS_ASSERT_THROWS_THIS(cell_population.GetCellUsingLocationIndex(1),"Location index input argument does not correspond to a Cell");
+        TS_ASSERT_THROWS_THIS(cell_population.GetCellUsingLocationIndex(2),"Location index input argument does not correspond to a Cell");
+        TS_ASSERT_THROWS_THIS(cell_population.GetCellUsingLocationIndex(3),"Multiple cells are attached to a single location index.");
+
+        //Check GetCellsUsingLocationIndex
+        std::set<CellPtr> cells_on_lattice = cell_population.GetCellsUsingLocationIndex(3);
+        TS_ASSERT_EQUALS(cells_on_lattice.size(),2u);
+
+        unsigned index = 1; // Note CellId starts at 1 due to above test
+        for (std::set<CellPtr>::iterator iter = cells_on_lattice.begin();
+             iter != cells_on_lattice.end();
+             iter++)
+        {
+            TS_ASSERT_EQUALS((*iter)->GetCellId(),index);
+            index++;
+        }
+        TS_ASSERT_EQUALS(cells[0]->GetCellId(),1u);
+        TS_ASSERT_EQUALS(cells[1]->GetCellId(),2u);
+    }
+
     void TestWriteResultsToFileAndOutputCellPopulationParameters()
     {
         // Resetting the maximum cell ID to zero (to account for previous tests)
@@ -215,94 +283,7 @@ public:
 //        }
 //    }
 //
-//    void NoTestValidate() throw (Exception)
-//    {
-//        // Create a simple potts-based mesh
-//        PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
-//        PottsMesh<2>* p_mesh = generator.GetMesh();
-//
-//        // Create cells
-//        std::vector<CellPtr> cells;
-//        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-//        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements()-1);
-//
-//        std::vector<unsigned> cell_location_indices;
-//        for (unsigned i=0; i<cells.size(); i++)
-//        {
-//            cell_location_indices.push_back(i);
-//        }
-//
-//        // This should throw an exception as the number of cells does not equal the number of elements
-//        std::vector<CellPtr> cells_copy(cells);
-//        TS_ASSERT_THROWS_THIS(MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells_copy),
-//                "Element 3 does not appear to have a cell associated with it");
-//
-//        MAKE_PTR(WildTypeCellMutationState, p_state);
-//        FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-//        p_model->SetCellProliferativeType(STEM);
-//        CellPtr p_cell(new Cell(p_state, p_model));
-//
-//        double birth_time = 0.0 - p_mesh->GetNumElements()-1;
-//        p_cell->SetBirthTime(birth_time);
-//
-//        cells.push_back(p_cell);
-//        cell_location_indices.push_back(p_mesh->GetNumElements()-1);
-//
-//        // This should pass as the number of cells equals the number of elements
-//        std::vector<CellPtr> cells_copy2(cells);
-//        TS_ASSERT_THROWS_NOTHING(MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells_copy2));
-//
-//        // Create cell population
-//        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells);
-//
-//        // Check correspondence between elements and cells
-//        for (PottsMesh<2>::PottsElementIterator iter = p_mesh->GetElementIteratorBegin();
-//             iter != p_mesh->GetElementIteratorEnd();
-//             ++iter)
-//        {
-//            std::set<unsigned> expected_node_indices;
-//            unsigned expected_index = iter->GetIndex();
-//
-//            for (unsigned i=0; i<iter->GetNumNodes(); i++)
-//            {
-//                expected_node_indices.insert(iter->GetNodeGlobalIndex(i));
-//            }
-//
-//            std::set<unsigned> actual_node_indices;
-//            unsigned elem_index = iter->GetIndex();
-//            CellPtr p_cell = cell_population.GetCellUsingLocationIndex(elem_index);
-//            PottsElement<2>* p_actual_element = cell_population.GetElementCorrespondingToCell(p_cell);
-//            unsigned actual_index = p_actual_element->GetIndex();
-//
-//            for (unsigned i=0; i<p_actual_element->GetNumNodes(); i++)
-//            {
-//                actual_node_indices.insert(p_actual_element->GetNodeGlobalIndex(i));
-//            }
-//
-//            TS_ASSERT_EQUALS(actual_index, expected_index);
-//            TS_ASSERT_EQUALS(actual_node_indices, expected_node_indices);
-//        }
-//
-//        // Create another simple potts-based mesh
-//        PottsMeshGenerator<2> generator2(4, 2, 2, 4, 2, 2);
-//        PottsMesh<2>* p_mesh2 = generator2.GetMesh();
-//
-//        // Create cells
-//        std::vector<CellPtr> cells2;
-//        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator2;
-//        cells_generator2.GenerateBasic(cells2, p_mesh2->GetNumElements()+1);
-//
-//        std::vector<unsigned> cell_location_indices2;
-//        for (unsigned i=0; i<cells2.size(); i++)
-//        {
-//            cell_location_indices2.push_back(i%p_mesh2->GetNumElements()); // Element 0 will have 2 cells
-//        }
-//
-//        // This should throw an exception as the number of cells
-//        // does not equal the number of elements
-//        TS_ASSERT_THROWS_THIS(MultipleCaBasedCellPopulation<2> cell_population2(*p_mesh2, cells2, false, true, cell_location_indices2),
-//                "Element 0 appears to have 2 cells associated with it");
-//    }
+
 //
 //    void NoTestRemoveDeadCellsAndUpdate() throw(Exception)
 //    {
