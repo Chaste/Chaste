@@ -59,7 +59,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BetaCateninOneHitCellMutationState.hpp"
 #include "CellLabel.hpp"
 #include "SmartPointers.hpp"
-
+#include "Debug.hpp"
 /**
  * This class contains tests for methods on the class CellwiseData.
  */
@@ -92,15 +92,16 @@ public:
         TS_ASSERT_EQUALS(CellwiseData<2>::Instance()->IsSetUp(), false);
         TS_ASSERT_THROWS_THIS(p_data->SetCellPopulation(&cell_population),"SetCellPopulation must be called after SetNumCellsAndVars()");
 
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1);
+        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
 
-        TS_ASSERT_EQUALS(CellwiseData<2>::Instance()->IsSetUp(), false);
+		TS_ASSERT_EQUALS(CellwiseData<2>::Instance()->IsSetUp(), false);
 
         p_data->SetCellPopulation(&cell_population);
 
         TS_ASSERT_EQUALS(CellwiseData<2>::Instance()->IsSetUp(), true);
 
         TS_ASSERT_EQUALS(CellwiseData<2>::Instance()->GetNumVariables(), 1u);
+
 
         p_data->SetValue(1.23, mesh.GetNode(0)->GetIndex());
         AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
@@ -140,7 +141,6 @@ public:
             TS_ASSERT_THROWS_THIS(p_data->GetValue(*cell_iter,1),
                     "Request for variable above mNumberOfVariables. Call SetNumCellsAndVars() to increase it.");
         }
-
         TS_ASSERT_THROWS_THIS(p_data->SetValue(0.0, 0, 1),
                 "Request for variable above mNumberOfVariables. Call SetNumCellsAndVars() to increase it.");
 
@@ -152,7 +152,7 @@ public:
 
         p_data = CellwiseData<2>::Instance();
 
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 2);
+        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 2, &cell_population);
         p_data->SetCellPopulation(&cell_population);
 
         TS_ASSERT_THROWS_THIS(p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1),"SetNumCellsAndVars() must be called before setting the CellPopulation (and after a Destroy)");
@@ -172,7 +172,7 @@ public:
 
         // Other values should have been initialised to zero
         ++cell_iter2;
-        TS_ASSERT_DELTA(p_data->GetValue(*cell_iter2, 0), 0.0, 1e-12);
+        TS_ASSERT_THROWS_THIS(p_data->GetValue(*cell_iter2, 0),"SetCellData must be called before using GetCellData");
 
         // Tidy up
         CellwiseData<2>::Destroy();
@@ -194,7 +194,7 @@ public:
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
 
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1);
+        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
         TS_ASSERT_THROWS_THIS(p_data->SetCellPopulation(&cell_population),
                 "CellwiseData does not work with ghost nodes.");
 
@@ -229,7 +229,7 @@ public:
         {
             // Set up the data store
             CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-            p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1);
+            p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
             p_data->SetCellPopulation(&cell_population);
 
             // Put some data in
@@ -326,7 +326,7 @@ public:
         {
             // Set up the data store
             CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-            p_data->SetNumCellsAndVars(p_cell_population->GetNumRealCells(), 1);
+            p_data->SetNumCellsAndVars(p_cell_population->GetNumRealCells(), 1, p_cell_population);
             p_data->SetCellPopulation(p_cell_population);
 
             // Put some data in

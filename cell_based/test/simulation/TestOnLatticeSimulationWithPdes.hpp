@@ -132,7 +132,7 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1);
+        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
         p_data->SetCellPopulation(&cell_population);
 
         /*
@@ -194,7 +194,7 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1);
+        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
         p_data->SetCellPopulation(&cell_population);
 
         /*
@@ -300,7 +300,7 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 2);
+        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 2, &cell_population);
         p_data->SetCellPopulation(&cell_population);
 
         /*

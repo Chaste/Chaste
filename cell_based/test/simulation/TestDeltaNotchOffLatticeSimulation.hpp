@@ -118,7 +118,7 @@ public:
 
         // Create and initialize CellwiseData
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(p_mesh->GetNumNodes(), 3);
+        p_data->SetNumCellsAndVars(p_mesh->GetNumNodes(), 3, &cell_population);
         p_data->SetCellPopulation(&cell_population);
 
         // Create and configure cell-based simulation
@@ -171,7 +171,7 @@ public:
 
         // Create and initialize CellwiseData
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(p_mesh->GetNumElements(), 3);
+        p_data->SetNumCellsAndVars(p_mesh->GetNumElements(), 3, &cell_population);
         p_data->SetCellPopulation(&cell_population);
 
         // Create and configure cell-based simulation
@@ -222,7 +222,7 @@ public:
 
         // Create and initialize CellwiseData
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(p_mesh->GetNumNodes(), 3);
+        p_data->SetNumCellsAndVars(p_mesh->GetNumNodes(), 3, &cell_population);
         p_data->SetCellPopulation(&cell_population);
 
         // Create and configure cell-based simulation
@@ -275,7 +275,7 @@ public:
 
         // Create and initialize CellwiseData
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(p_mesh->GetNumElements(), 3);
+        p_data->SetNumCellsAndVars(p_mesh->GetNumElements(), 3, &cell_population);
         p_data->SetCellPopulation(&cell_population);
 
         // Create and configure cell-based simulation

@@ -228,7 +228,7 @@ public:
         EXIT_IF_PARALLEL;
 
         // Create a simple 2D PottsMesh
-        PottsMeshGenerator<2> generator(50, 0, 0, 50, 0, 0);
+        PottsMeshGenerator<2> generator(100, 0, 0, 100, 0, 0);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Create cells

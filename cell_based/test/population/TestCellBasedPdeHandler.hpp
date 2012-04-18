@@ -507,7 +507,7 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1);
+        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
         p_data->SetCellPopulation(&cell_population);
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
@@ -555,7 +555,7 @@ public:
 
         CellwiseData<2>::Destroy();
         CellwiseData<2>* p_data2 = CellwiseData<2>::Instance();
-        p_data2->SetNumCellsAndVars(cell_population2.GetNumRealCells(), 1);
+        p_data2->SetNumCellsAndVars(cell_population2.GetNumRealCells(), 1, &cell_population2);
         p_data2->SetCellPopulation(&cell_population2);
         for (unsigned i=0; i<p_mesh2->GetNumNodes(); i++)
         {
@@ -591,7 +591,7 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1);
+        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
         p_data->SetCellPopulation(&cell_population);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
@@ -639,7 +639,7 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1);
+        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
         p_data->SetCellPopulation(&cell_population);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
@@ -697,7 +697,7 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1);
+        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
         p_data->SetCellPopulation(&cell_population);
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
@@ -765,7 +765,7 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1);
+        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
         p_data->SetCellPopulation(&cell_population);
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
@@ -830,7 +830,7 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1);
+        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
         p_data->SetCellPopulation(&cell_population);
 
         // Pass initial conditions into CellwiseData to avoid memory errors
@@ -900,7 +900,7 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 2);
+        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 2, &cell_population);
         p_data->SetCellPopulation(&cell_population);
 
         // Pass initial conditions into CellwiseData to avoid memory errors
@@ -1028,7 +1028,7 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 2);
+        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 2, &cell_population);
         p_data->SetCellPopulation(&cell_population);
 
         // Pass initial conditions into CellwiseData to avoid memory errors

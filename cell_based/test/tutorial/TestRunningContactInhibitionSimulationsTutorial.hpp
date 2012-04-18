@@ -166,7 +166,7 @@ public:
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
         /* the first thing we do is set the number of variables we with to use {{{CellwiseData}}} to track, we do this by passing the number
          * of cells in the simulation and the number of variables to  the {{{SetNumCellsAndVars}}} method.*/
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1);
+        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
         /* We then pass the cell population to the {{{CellwiseData}}} object so the size of the data can vary over time.
          * The simulation won't run without the cell population set.*/
         p_data->SetCellPopulation(&cell_population);
@@ -288,7 +288,7 @@ public:
          * we use the singleton class {{{CellwiseData}}}. Here, we just initialise it with one variable
          * and associate it with the cell population: */
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1);
+        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
         p_data->SetCellPopulation(&cell_population);
 
         /*  Then, we define the contact {{{VolumeTrackedOffLatticeSimulation}}} class, that automatically updates the volumes of the cells
@@ -387,7 +387,7 @@ public:
          * we use the singleton class {{{CellwiseData}}}. Here, we just initialise it with one variable
          * and associate it with the cell population. This time each cell is associated with a vertex element. */
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1);
+        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
         p_data->SetCellPopulation(&cell_population);
 
         /*  Then, we define the {{{VolumeTrackedOffLatticeSimulation}}} class, that automatically updates the volumes of the cells

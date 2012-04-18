@@ -35,7 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CellwiseData.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
-
+#include "CellPropertyCollection.hpp"
+#include "Debug.hpp"
 template<unsigned DIM>
 CellwiseData<DIM>* CellwiseData<DIM>::mpInstance = NULL;
 
@@ -63,6 +64,22 @@ CellwiseData<DIM>::CellwiseData()
 template<unsigned DIM>
 CellwiseData<DIM>::~CellwiseData()
 {
+//	if(mpCellPopulation != NULL)
+//	{
+//
+//		for( typename AbstractCellPopulation<DIM>::Iterator cell_iter = mpCellPopulation->Begin();
+//				cell_iter != mpCellPopulation->End();
+//				++cell_iter)
+//		{
+//			CellPropertyCollection collection = cell_iter->rGetCellPropertyCollection();
+//			if (collection.HasProperty<CellData>())
+//			{
+//				collection.RemoveProperty<CellData>();
+//			}
+//		}
+//		MARK;
+//	}
+//	MARK;
 }
 
 template<unsigned DIM>
@@ -93,9 +110,9 @@ double CellwiseData<DIM>::GetValue(CellPtr pCell, unsigned variableNumber)
     assert(mpCellPopulation != NULL);
     assert(mAllocatedMemory);
 
-    unsigned location_index = mpCellPopulation->GetLocationIndexUsingCell(pCell);
-    unsigned vector_index = location_index*mNumberOfVariables + variableNumber;
-    return mData[vector_index];
+    CellPropertyCollection cell_data_collection = pCell->rGetCellPropertyCollection().GetPropertiesType<CellData>();
+	boost::shared_ptr<CellData> p_cell_data = boost::static_pointer_cast<CellData>(cell_data_collection.GetProperty());
+	return p_cell_data->GetCellData(variableNumber);
 }
 
 template<unsigned DIM>
@@ -107,9 +124,13 @@ void CellwiseData<DIM>::SetValue(double value, unsigned locationIndex, unsigned 
         EXCEPTION("Request for variable above mNumberOfVariables. Call SetNumCellsAndVars() to increase it.");
     }
 
-    unsigned vector_index = locationIndex*mNumberOfVariables + variableNumber;
-    assert(vector_index < mData.size());
-    mData[vector_index] = value;
+    // Get the cell associated with locationIndex
+    CellPtr p_cell = mpCellPopulation->GetCellUsingLocationIndex(locationIndex);
+
+    CellPropertyCollection cell_data_collection = p_cell->rGetCellPropertyCollection().GetPropertiesType<CellData>();
+    boost::shared_ptr<CellData> p_cell_data = boost::static_pointer_cast<CellData>(cell_data_collection.GetProperty());
+    p_cell_data->SetCellData(variableNumber, value);
+
 }
 
 template<unsigned DIM>
@@ -135,19 +156,39 @@ AbstractCellPopulation<DIM>& CellwiseData<DIM>::rGetCellPopulation()
 }
 
 template<unsigned DIM>
-void CellwiseData<DIM>::SetNumCellsAndVars(unsigned numCells, unsigned numberOfVariables)
+void CellwiseData<DIM>::SetNumCellsAndVars(unsigned numCells, unsigned numberOfVariables, AbstractCellPopulation<DIM>* pCellPopulation)
 {
     if (mpCellPopulation!=NULL)
     {
         EXCEPTION("SetNumCellsAndVars() must be called before setting the CellPopulation (and after a Destroy)");
     }
 
+    assert(pCellPopulation != NULL);
+    assert(numCells == pCellPopulation->GetNumRealCells());
     assert(numberOfVariables > 0);
     assert(mAllocatedMemory == false);
 
     mNumberOfVariables = numberOfVariables;
-    mData.clear();
-    mData.resize(numCells * mNumberOfVariables, 0.0);
+
+    for( typename AbstractCellPopulation<DIM>::Iterator cell_iter = pCellPopulation->Begin();
+    		cell_iter != pCellPopulation->End();
+    		++cell_iter)
+    {
+//    	CellPropertyCollection cell_property_collection = (*cell_iter)->rGetCellPropertyCollection();
+//    	CellPropertyCollection cell_data_collection = cell_property_collection.GetPropertiesType<CellData>();
+//    	assert(cell_data_collection.GetSize() == 0);
+
+
+    	CellPropertyCollection& collection = cell_iter->rGetCellPropertyCollection();
+		if (collection.HasProperty<CellData>())
+		{
+			collection.RemoveProperty<CellData>();
+		}
+		assert(collection.GetPropertiesType<CellData>().GetSize() == 0);
+
+    	MAKE_PTR_ARGS(CellData, p_cell_data, (numberOfVariables));
+    	cell_iter->AddCellProperty(p_cell_data);
+    }
 
     mAllocatedMemory = true;
 }

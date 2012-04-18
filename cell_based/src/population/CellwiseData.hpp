@@ -160,8 +160,9 @@ public:
      *
      * @param numCells number of cells in the cell population
      * @param numVars number of variables
+     * @param pCellPopulation the cell population - this is a temporary variable and will be removed on re-factor see ticket #1515
      */
-    void SetNumCellsAndVars(unsigned numCells, unsigned numVars);
+    void SetNumCellsAndVars(unsigned numCells, unsigned numVars, AbstractCellPopulation<DIM>* pCellPopulation = NULL);
 
     /**
      * Force the data to return given values for all cells (only for testing).
