@@ -59,6 +59,8 @@ public:
         TS_ASSERT_DELTA(p_shannon->GetParameter("membrane_L_type_calcium_current_conductance"),5.4e-4,1e-5);
         TS_ASSERT_DELTA(p_shannon->GetParameter("membrane_rapid_delayed_rectifier_potassium_current_conductance"),0.03,1e-5);
         TS_ASSERT_DELTA(p_shannon->GetParameter("membrane_slow_delayed_rectifier_potassium_current_conductance"),0.07,1e-5);
+
+        delete p_shannon;
      }
 
     void TestAssigningModifiersToACellModel() throw(Exception)
