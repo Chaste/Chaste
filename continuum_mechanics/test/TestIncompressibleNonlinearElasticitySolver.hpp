@@ -837,9 +837,11 @@ public:
                 command = "ls " + OutputFileHandler::GetChasteTestOutputDirectory() + "nonlin_elas_functional_data/cmgui/solution_1.exnode > /dev/null";
                 TS_ASSERT_EQUALS(system(command.c_str()), 0);
 
+                #ifdef CHASTE_VTK
                 //Check the Vtk file
                 command = "ls " + OutputFileHandler::GetChasteTestOutputDirectory() + "nonlin_elas_functional_data/vtk/solution.vtu > /dev/null";
                 TS_ASSERT_EQUALS(system(command.c_str()), 0);
+                #endif
 
                 solver.rGetCurrentSolution().clear();
                 solver.rGetCurrentSolution().resize(solver.mNumDofs, 0.0);
@@ -1219,8 +1221,10 @@ public:
        solver.CreateVtkOutput();
 
        //Check the Vtk file
+       #ifdef CHASTE_VTK
        std::string command = "ls " + OutputFileHandler::GetChasteTestOutputDirectory() + "nonlin_elas_functional_data/vtk/solution.vtu > /dev/null";
        TS_ASSERT_EQUALS(system(command.c_str()), 0);
+       #endif
     }
 
 

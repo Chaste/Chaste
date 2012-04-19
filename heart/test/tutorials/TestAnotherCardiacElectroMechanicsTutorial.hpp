@@ -364,6 +364,9 @@ public:
          */
 
     }
+    /*
+     * '''More examples:''' For a 3d ellipsoid geometry test, see heart/test/mechanics/TestCardiacElectroMechanicsOnEllipsoid.hpp
+     */
 };
 
 #endif /* TESTANOTHERCARDIACELECTROMECHANICSTUTORIAL_HPP_ */

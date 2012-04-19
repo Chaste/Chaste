@@ -36,11 +36,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VtkMeshWriter.hpp"
 #include "DistributedTetrahedralMesh.hpp"
 #include "MixedDimensionMesh.hpp"
+
+#ifdef CHASTE_VTK
 #include "vtkQuadraticTetra.h"
 #include "vtkQuadraticTriangle.h"
 
 
-#ifdef CHASTE_VTK
 ///////////////////////////////////////////////////////////////////////////////////
 // Implementation
 ///////////////////////////////////////////////////////////////////////////////////

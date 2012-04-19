@@ -50,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QuadraticBasisFunction.hpp"
 #include "SolidMechanicsProblemDefinition.hpp"
 #include "Timer.hpp"
-#include "Debug.hpp"
+#include "VtkMeshWriter.hpp"
 #include "petscsnes.h"
 
 
@@ -626,12 +626,12 @@ public:
      */
     void WriteCurrentDeformationGradients(std::string fileName, int counterToAppend = -1);
 
-	/**
-	 * The user may request that the stress for each element (averaged over quadrature point stresses)
-	 * are saved during the Solve(), by calling this.
-	 *
-	 * @param setComputeAverageStressPerElement whether to compute stresses (defaults to true)
-	 */
+    /**
+     * The user may request that the stress for each element (averaged over quadrature point stresses)
+     * are saved during the Solve(), by calling this.
+     *
+     * @param setComputeAverageStressPerElement whether to compute stresses (defaults to true)
+     */
     void SetComputeAverageStressPerElementDuringSolve(bool setComputeAverageStressPerElement = true);
     
     /**
@@ -661,13 +661,13 @@ public:
      */
     std::vector<c_vector<double,DIM> >& rGetDeformedPosition();
 
-	/**
+    /**
      * If SetComputeAverageStressPerElementDuringSolve() was called before the Solve(), then 
      * this method can be used to get the average stress for a particular
      * element.
      * 
      * @param elementIndex elementIndex
-	 */
+     */
     c_matrix<double,DIM,DIM> GetAverageStressPerElement(unsigned elementIndex);
 };
 
@@ -873,9 +873,9 @@ void AbstractNonlinearElasticitySolver<DIM>::CreateVtkOutput()
 {
     if (this->mOutputDirectory=="")
     {
-        EXCEPTION("No output directory was given so no output was written, cannot convert to cmgui format");
+        EXCEPTION("No output directory was given so no output was written, cannot convert to VTK format");
     }
-
+#ifdef CHASTE_VTK
     VtkMeshWriter<DIM, DIM> mesh_writer(this->mOutputDirectory + "/vtk", "solution", true);
 
     //Output the deformed node locations. Note that these are output as PointData,
@@ -916,6 +916,7 @@ void AbstractNonlinearElasticitySolver<DIM>::CreateVtkOutput()
     mesh_writer.AddCellData("Attribute", element_attribute);
 
     mesh_writer.WriteFilesUsingMesh(this->mrQuadMesh);
+#endif
 }
 
 template<unsigned DIM>
@@ -939,14 +940,14 @@ void AbstractNonlinearElasticitySolver<DIM>::AddStressToAverageStressPerElement(
     assert(mSetComputeAverageStressPerElement);
     assert(elemIndex<this->mrQuadMesh.GetNumElements());
 
-	// In 2d the matrix is
-	// [T00 T01]
-	// [T10 T11]
-	// where T01 = T10. We store this as a vector
-	// [T00 T01 T11]
-	//
-	// Similarly, for 3d we store
-	// [T00 T01 T02 T11 T12 T22]
+    // In 2d the matrix is
+    // [T00 T01]
+    // [T10 T11]
+    // where T01 = T10. We store this as a vector
+    // [T00 T01 T11]
+    //
+    // Similarly, for 3d we store
+    // [T00 T01 T02 T11 T12 T22]
     for(unsigned i=0; i<DIM*(DIM+1)/2; i++)
     {
         unsigned row;
@@ -978,14 +979,14 @@ c_matrix<double,DIM,DIM> AbstractNonlinearElasticitySolver<DIM>::GetAverageStres
 
     c_matrix<double,DIM,DIM> stress;
 
-	// In 2d the matrix is
-	// [T00 T01]
-	// [T10 T11]
-	// where T01 = T10, and was stored as
-	// [T00 T01 T11]
-	//
-	// Similarly, for 3d the matrix was stored as
-	// [T00 T01 T02 T11 T12 T22]
+    // In 2d the matrix is
+    // [T00 T01]
+    // [T10 T11]
+    // where T01 = T10, and was stored as
+    // [T00 T01 T11]
+    //
+    // Similarly, for 3d the matrix was stored as
+    // [T00 T01 T02 T11 T12 T22]
     if(DIM==2)
     {
         stress(0,0) = mAverageStressesPerElement[elementIndex](0);
@@ -1668,11 +1669,11 @@ double AbstractNonlinearElasticitySolver<DIM>::TakeNewtonStep()
         {
             absolute_tol = 1e-12;
         }
-        KSPSetTolerances(solver, 1e-16, absolute_tol, PETSC_DEFAULT, PETSC_DEFAULT /* max iters */); // Note, max iters seems to be 1000 whatever we give here
+        KSPSetTolerances(solver, 1e-16, absolute_tol, PETSC_DEFAULT, 1000 /* max iters */); // Note: some machines - max iters seems to be 1000 whatever we give here
     }
     else
     {
-        KSPSetTolerances(solver, 1e-16, mKspAbsoluteTol, PETSC_DEFAULT, PETSC_DEFAULT /* max iters */); // Note, max iters seems to be 1000 whatever we give here
+        KSPSetTolerances(solver, 1e-16, mKspAbsoluteTol, PETSC_DEFAULT, 1000 /* max iters */); // Note: some machines - max iters seems to be 1000 whatever we give here
     }
 
     if(this->mVerbose)
@@ -2015,11 +2016,13 @@ void AbstractNonlinearElasticitySolver<DIM>::SolveSnes()
     SNESSetTolerances(snes,1e-5,1e-5,1e-5,PETSC_DEFAULT,PETSC_DEFAULT);
     SNESSetMaxLinearSolveFailures(snes,100);
 
-    KSP solver;
-    SNESGetKSP(snes, &solver);
+    KSP ksp;
+    SNESGetKSP(snes, &ksp);
+
+    KSPSetTolerances(ksp, PETSC_DEFAULT, PETSC_DEFAULT, PETSC_DEFAULT, 1000 /* max iters */); // Note: some machines - max iters seems to be 1000 whatever we give here
 
     // Set the type of KSP solver (CG, GMRES etc) and preconditioner (ILU, HYPRE, etc)
-    SetKspSolverAndPcType(solver);
+    SetKspSolverAndPcType(ksp);
 
     if(this->mVerbose)
     {
@@ -2028,6 +2031,7 @@ void AbstractNonlinearElasticitySolver<DIM>::SolveSnes()
     SNESSetFromOptions(snes);
 
 #if (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 2) //PETSc 2.2
+    //int ierr = 
     SNESSolve(snes, initial_guess);
 #else
     SNESSolve(snes, PETSC_NULL, initial_guess);

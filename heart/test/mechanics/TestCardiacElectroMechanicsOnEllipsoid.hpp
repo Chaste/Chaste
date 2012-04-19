@@ -1,0 +1,224 @@
+
+
+#ifndef TESTONELLIPSOID_HPP_
+#define TESTONELLIPSOID_HPP_
+
+
+#include <cxxtest/TestSuite.h>
+#include "CardiacElectroMechanicsProblem.hpp"
+#include "LuoRudy1991.hpp"
+#include "TrianglesMeshReader.hpp"
+#include "TrianglesMeshWriter.hpp"
+#include "PetscSetupAndFinalize.hpp"
+
+
+// a helper method for computing the average edge length (in cm) of a given mesh
+template<unsigned DIM>
+double ComputeAverageEdgeLength(TetrahedralMesh<DIM,DIM>& rMesh)
+{
+    unsigned num_edges = 0;
+    double average_edge_length = 0.0;
+    for(TetrahedralMesh<3,3>::EdgeIterator iter = rMesh.EdgesBegin();
+        iter != rMesh.EdgesEnd();
+        ++iter)
+    {
+        double edge_length = norm_2(iter.GetNodeA()->rGetLocation() - iter.GetNodeB()->rGetLocation());
+        average_edge_length += edge_length;
+        num_edges++;
+    }
+    average_edge_length /= num_edges;
+    return average_edge_length;
+}
+
+
+
+class ApexStimulusCellFactory : public AbstractCardiacCellFactory<3>
+{
+private:
+    boost::shared_ptr<SimpleStimulus> mpStimulus;
+    double mZvalueToStimulateBelow;
+
+public:
+    ApexStimulusCellFactory(double zValueToStimulateBelow)
+        : AbstractCardiacCellFactory<3>(),
+          mpStimulus(new SimpleStimulus(-1000.0*200, 0.5)),
+          mZvalueToStimulateBelow(zValueToStimulateBelow)
+    {
+    }
+
+    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned node)
+    {
+        // Stimulate the apex
+        if (GetMesh()->GetNode(node)->rGetLocation()[2] < mZvalueToStimulateBelow)
+        {
+            return new CellLuoRudy1991FromCellML(mpSolver,mpStimulus);
+        }
+        else
+        {
+            return new CellLuoRudy1991FromCellML(mpSolver,mpZeroStimulus);
+        }
+    }
+};
+
+
+// Obviously only run this test with build=GccOpt_ndebug.
+//
+// To watch progress, run from the command line with -mech_very_verbose -mesh_pair_verbose
+
+class TestCardiacElectroMechanicsOnEllipsoid : public CxxTest::TestSuite
+{
+public:
+    void TestOnEllipsoid() throw(Exception)
+    {
+        /////////////////////////////////////////////////////////////
+        //
+        //   Read the meshes for electrics and mechanics.
+        //   Also output mesh resolutions
+        //
+        //   Note: the electrics mesh is a bit too coarse to expect
+        //   accurate propagation velocities
+        //
+        //
+        /////////////////////////////////////////////////////////////
+        TetrahedralMesh<3,3> electrics_mesh;
+        QuadraticMesh<3> mechanics_mesh;
+
+        {
+            TrianglesMeshReader<3,3> reader1("mesh/test/data/ellipsoid_15811_elements");
+            electrics_mesh.ConstructFromMeshReader(reader1);
+
+            TrianglesMeshReader<3,3> reader2("mesh/test/data/ellipsoid_8225_elements_quad",
+                                             2 /*quadratic elements*/,
+                                             2 /*quadratic boundary elements*/);
+            mechanics_mesh.ConstructFromMeshReader(reader2);
+        }
+
+        double average_edge_length_electrics = ComputeAverageEdgeLength<3>(electrics_mesh);
+        double average_edge_length_mechanics = ComputeAverageEdgeLength<3>(mechanics_mesh);
+        std::cout << "Average edge length of electrics and mechanics meshes are, respectively: "
+                  << average_edge_length_electrics << " " << average_edge_length_mechanics << "\n";
+
+
+        ////////////////////////////////////////////////////////////////
+        //
+        // Dirichlet boundary conditions: fix base in Z-direction,
+        // which one point fixed in all directions to remove rotations
+        //
+        ////////////////////////////////////////////////////////////////
+        double base_threshold = 0.0;
+        std::vector<unsigned> fixed_nodes;
+        std::vector<c_vector<double,3> > locations;
+
+        bool first = true;
+        for(unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        {
+            double x = mechanics_mesh.GetNode(i)->rGetLocation()[0];
+            double y = mechanics_mesh.GetNode(i)->rGetLocation()[1];
+            double z = mechanics_mesh.GetNode(i)->rGetLocation()[2];
+            if (z >= base_threshold)
+            {
+                fixed_nodes.push_back(i);
+                c_vector<double,3> new_location;
+
+                if(first)
+                {
+                    new_location(0) = x;
+                    new_location(1) = y;
+                    first = false;
+                }
+                else
+                {
+                    new_location(0) = SolidMechanicsProblemDefinition<3>::FREE;
+                    new_location(1) = SolidMechanicsProblemDefinition<3>::FREE;
+                }
+
+                new_location(2)= z;
+                locations.push_back(new_location);
+            }
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////
+        //
+        // Find the boundary elements on the endocardium (using knowledge on
+        // the geometry)
+        //
+        ////////////////////////////////////////////////////////////////////////////////
+
+        double a_endo = 0.25;
+        double b_endo = 0.35;
+        double c_endo = 0.85;
+
+        std::vector<BoundaryElement<2,3>*> boundary_elems;
+        for (TetrahedralMesh<3,3>::BoundaryElementIterator iter
+                = mechanics_mesh.GetBoundaryElementIteratorBegin();
+              iter != mechanics_mesh.GetBoundaryElementIteratorEnd();
+              ++iter)
+        {
+            ChastePoint<3> centroid = (*iter)->CalculateCentroid();
+            if(centroid[2]<0)
+            {
+                Node<3>* p_node = (*iter)->GetNode(0);
+                double x = p_node->rGetLocation()[0];
+                double y = p_node->rGetLocation()[1];
+                double z = p_node->rGetLocation()[2];
+
+                double v = sqrt(x*x/(a_endo*a_endo) + y*y/(b_endo*b_endo) + (z*z)/(c_endo*c_endo));
+
+                if (fabs(v-1.0)<0.2 && z > -0.9)
+                {
+                    BoundaryElement<2,3>* p_element = *iter;
+                    boundary_elems.push_back(p_element);
+                }
+            }
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////
+        //
+        // Other config
+        //
+        ////////////////////////////////////////////////////////////////////////////////
+
+        double apex_stim_threshold = -0.95;
+        ApexStimulusCellFactory cell_factory(apex_stim_threshold);
+
+        HeartConfig::Instance()->SetOdeTimeStep(0.005);
+        HeartConfig::Instance()->SetSimulationDuration(200.0); // see comment below on mechanics timestep
+
+        ElectroMechanicsProblemDefinition<3> problem_defn(mechanics_mesh);
+        problem_defn.SetContractionModel(KERCHOFFS2003,0.1);
+        problem_defn.SetUseDefaultCardiacMaterialLaw(COMPRESSIBLE);
+
+        problem_defn.SetMechanicsSolveTimestep(1.0);   // runs through contraction, fails during repolarisation at about 300ms
+        //problem_defn.SetMechanicsSolveTimestep(0.1); // runs through entire cycle but takes very very long time - todo: adaptive mechanics timestep
+        problem_defn.SetSolveUsingSnes();
+
+        problem_defn.SetFixedNodes(fixed_nodes,locations);
+        problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, -1.0);
+        problem_defn.SetNumIncrementsForInitialDeformation(7);
+
+        problem_defn.SetVariableFibreSheetDirectionsFile("heart/test/data/fibre_tests/ellipsoid_8225_elements.ortho", false);
+
+
+
+        ////////////////////////////////////////////////////////////////////////////////
+        //
+        // Solve
+        //
+        ////////////////////////////////////////////////////////////////////////////////
+        CardiacElectroMechanicsProblem<3> problem(COMPRESSIBLE,
+                                                  &electrics_mesh,
+                                                  &mechanics_mesh,
+                                                  &cell_factory,
+                                                  &problem_defn,
+                                                  "TestCardiacElectroMechanicsEllipsoid");
+
+
+        // problem.SetNoElectricsOutput();
+
+        problem.Solve();
+    }
+
+};
+
+
+#endif // TESTONELLIPSOID_HPP_
