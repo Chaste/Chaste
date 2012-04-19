@@ -242,7 +242,8 @@ public:
          * a non-physical (or not very physical) situation, or just because the current guess is quite far
          * from the solution and the solver can't find the solution (this can occur in nonlinear elasticity
          * problems if the loading is large, for example). Current work in progress is on making the solver
-         * more robust, and also on parallelising the solver.
+         * more robust, and also on parallelising the solver. Once option when a solve fails is to decrease the
+         * mechanics timestep.
          */
 
         /* Ignore the following, it is just to check nothing has changed. */
