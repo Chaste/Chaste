@@ -164,7 +164,7 @@ public:
 
         // we don't really test anything.
         // Hardcoded test of deformed position of top of circle, to check nothing has changed.
-        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](0), 0.0011, 1e-3);
+        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](0), 0.0014, 1e-3);
         TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](1), 0.6073, 1e-3);
 
         MechanicsEventHandler::Headings();
@@ -250,8 +250,8 @@ public:
         // we don't really anything, we mainly just want to verify it solves OK past the initial and through
         // the cycle. Have visualised.
         // Hardcoded test of deformed position of top of circle, to check nothing has changed.
-        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](0),  0.000,  1e-3);
-        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](1),  0.6020, 1e-3);
+        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](0), 0.0014, 1e-3);
+        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](1), 0.6020, 1e-3);
 
 
         MechanicsEventHandler::Headings();
