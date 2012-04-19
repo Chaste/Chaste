@@ -258,10 +258,9 @@ public:
 
         problem.SetWatchedPosition(pos);
 
-        TS_ASSERT_THROWS_CONTAINS(problem.SetOutputDeformationGradientsAndStress(3.4),"not a multiple");
-
         if(PetscTools::IsSequential()) // #2084
         {
+            TS_ASSERT_THROWS_CONTAINS(problem.SetOutputDeformationGradientsAndStress(3.4),"not a multiple");
         	problem.SetOutputDeformationGradientsAndStress(3.0);
         }
         problem.Solve();
