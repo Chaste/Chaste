@@ -243,7 +243,6 @@ public:
                                                  &problem_defn,
                                                  "TestEmOnAnnulus");
 
-        problem_defn.SetVerboseDuringSolve();
         problem.Solve();
 
 
