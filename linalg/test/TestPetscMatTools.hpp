@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Tests methods in the PETSc helper class PetscMatTools that are not directly related to LinearSystem.
  */
-class TestPetscVecTools : public CxxTest::TestSuite
+class TestPetscMatTools : public CxxTest::TestSuite
 {
 public:
     void TestEqualityCheck() throw (Exception)
