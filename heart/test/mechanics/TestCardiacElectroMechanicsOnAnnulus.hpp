@@ -131,7 +131,7 @@ public:
 
         // The snes solver seems more robust...
         problem_defn.SetSolveUsingSnes();
-        //problem_defn.SetVerboseDuringSolve();
+        problem_defn.SetVerboseDuringSolve(); // #2091
 
         // This is a 2d problem, so a direct solve (LU factorisation) is possible and will speed things up
         // markedly (might be able to remove this line after #2057 is done..)
@@ -212,7 +212,7 @@ public:
 
         // The snes solver seems more robust...
         problem_defn.SetSolveUsingSnes();
-        //problem_defn.SetVerboseDuringSolve();
+        problem_defn.SetVerboseDuringSolve(); // #2091
 
         // This is a 2d problem, so a direct solve (LU factorisation) is possible and will speed things up
         // markedly (might be able to remove this line after #2057 is done..)
@@ -243,7 +243,7 @@ public:
                                                  &problem_defn,
                                                  "TestEmOnAnnulus");
 
-
+        problem_defn.SetVerboseDuringSolve();
         problem.Solve();
 
 
