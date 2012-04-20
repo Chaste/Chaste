@@ -282,11 +282,6 @@ void StokesFlowSolver<DIM>::Solve()
 template<unsigned DIM>
 void StokesFlowSolver<DIM>::AssembleSystem()
 {
-    PetscVecTools::Zero(this->mLinearSystemRhsVector);
-    PetscMatTools::Zero(this->mSystemLhsMatrix);
-    PetscMatTools::Zero(this->mPreconditionMatrix);
-
-
     // Use assembler to assemble volume integral part....
     mpStokesFlowAssembler->SetMatrixToAssemble(this->mSystemLhsMatrix, true);
     mpStokesFlowAssembler->SetVectorToAssemble(this->mLinearSystemRhsVector, true);

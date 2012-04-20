@@ -359,12 +359,14 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
     // Zero the matrix/vector if it is to be assembled
     if (this->mAssembleVector && this->mZeroVectorBeforeAssembly)
     {
-        PetscVecTools::Finalise(this->mVectorToAssemble);
+        // Note PetscVecTools::Finalise(this->mVectorToAssemble); on an unused matrix
+        // would "compress" data add make any pre-allocated entries redundant.
         PetscVecTools::Zero(this->mVectorToAssemble);
     }
     if (this->mAssembleMatrix && this->mZeroMatrixBeforeAssembly)
     {
-        PetscMatTools::Finalise(this->mMatrixToAssemble);
+        // Note PetscMatTools::Finalise(this->mMatrixToAssemble); on an unused matrix
+        // would "compress" data add make any pre-allocated entries redundant.
         PetscMatTools::Zero(this->mMatrixToAssemble);
     }
 
