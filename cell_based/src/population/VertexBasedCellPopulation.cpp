@@ -172,7 +172,7 @@ void VertexBasedCellPopulation<DIM>::SetNode(unsigned nodeIndex, ChastePoint<DIM
 template<unsigned DIM>
 VertexElement<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetElementCorrespondingToCell(CellPtr pCell)
 {
-    return mpMutableVertexMesh->GetElement(this->mCellLocationMap[pCell.get()]);
+    return mpMutableVertexMesh->GetElement(this->GetLocationIndexUsingCell(pCell));
 }
 
 template<unsigned DIM>
@@ -223,7 +223,7 @@ unsigned VertexBasedCellPopulation<DIM>::RemoveDeadCells()
         {
             // Remove the element from the mesh
             num_removed++;
-            mpMutableVertexMesh->DeleteElementPriorToReMesh(this->mCellLocationMap[(*it).get()]);
+            mpMutableVertexMesh->DeleteElementPriorToReMesh(this->GetLocationIndexUsingCell((*it)));
             it = this->mCells.erase(it);
             --it;
         }
@@ -288,6 +288,7 @@ void VertexBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
     if (!element_map.IsIdentityMap())
     {
         // Fix up the mappings between CellPtrs and VertexElements
+        ///\todo We want to make these maps private, so we need a better way of doing the code below.
         std::map<Cell*, unsigned> old_map = this->mCellLocationMap;
 
         this->mCellLocationMap.clear();
@@ -315,7 +316,6 @@ void VertexBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
                 unsigned new_elem_index = element_map.GetNewIndex(old_elem_index);
 
                 this->SetCellUsingLocationIndex(new_elem_index,*cell_iter);
-                this->mCellLocationMap[(*cell_iter).get()] = new_elem_index;
             }
         }
 
@@ -349,7 +349,9 @@ void VertexBasedCellPopulation<DIM>::Validate()
 
         if (validated_element[i] > 1)
         {
-            EXCEPTION("Element " << i << " appears to have " << validated_element[i] << " cells associated with it");
+            // This should never be reached as you can only set one cell per element index.
+            NEVER_REACHED;
+            //EXCEPTION("Element " << i << " appears to have " << validated_element[i] << " cells associated with it");
         }
     }
 }

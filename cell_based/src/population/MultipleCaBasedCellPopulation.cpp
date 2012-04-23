@@ -209,13 +209,13 @@ unsigned MultipleCaBasedCellPopulation<DIM>::GetNumNodes()
 template<unsigned DIM>
 c_vector<double, DIM> MultipleCaBasedCellPopulation<DIM>::GetLocationOfCellCentre(CellPtr pCell)
 {
-    return this->mrMesh.GetNode(this->mCellLocationMap[pCell.get()])->rGetLocation();
+    return this->mrMesh.GetNode(this->GetLocationIndexUsingCell(pCell))->rGetLocation();
 }
 
 template<unsigned DIM>
 Node<DIM>* MultipleCaBasedCellPopulation<DIM>::GetNodeCorrespondingToCell(CellPtr pCell)
 {
-    return this->mrMesh.GetNode(this->mCellLocationMap[pCell.get()]);
+    return this->mrMesh.GetNode(this->GetLocationIndexUsingCell(pCell));
 }
 
 //template<unsigned DIM>
@@ -284,7 +284,6 @@ CellPtr MultipleCaBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_ve
     // Update location cell map
     CellPtr p_created_cell = this->mCells.back();
     this->SetCellUsingLocationIndex(daughter_node_index,p_created_cell);
-    this->mCellLocationMap[p_created_cell.get()] = daughter_node_index;
 
     //Set node to be occupied
     mEmptySites[daughter_node_index] = false;
@@ -309,8 +308,7 @@ unsigned MultipleCaBasedCellPopulation<DIM>::RemoveDeadCells()
 //
 //            // Set this node to be an empty site
 //            mEmptySites[node_index] = true;
-//            this->mCellLocationMap.erase((*cell_iter).get());
-//            this->mLocationCellMap.erase(node_index);
+//            this->RemoveCellUsingLocationIndex(node_index, (*cell_iter))
 //
 //            // Erase cell and update counter
 //            num_removed++;
@@ -419,9 +417,7 @@ void MultipleCaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
 				/*
 				 * Move the cell to new location
 				 */
-				this->SetCellUsingLocationIndex(chosen_neighbour_location_index,*cell_iter);
-			    this->mCellLocationMap[(*cell_iter).get()] = chosen_neighbour_location_index;
-	            this->mLocationCellMap.erase(node_index);
+				this->MoveCellInLocationMap((*cell_iter), node_index, chosen_neighbour_location_index);
 
 			    mEmptySites[chosen_neighbour_location_index] = false;
 			    mEmptySites[node_index] = true;

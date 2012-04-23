@@ -137,12 +137,24 @@ public:
 
         // Now remove first cell from lattice 0 and move it to lattice 3
         cell_population.RemoveCellUsingLocationIndex(0,cells[0]);
+        cell_population.AddCellUsingLocationIndex(3,cells[0]);
+
+        // Make sure the maps have been set properly.
+        TS_ASSERT_EQUALS(cell_population.GetCellsUsingLocationIndex(0).size(),0u);
+        TS_ASSERT_EQUALS(cell_population.GetCellsUsingLocationIndex(3).size(),2u);
+        TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(cells[0]), 3u);
+
+        // Try moving one of the cells
+        cell_population.MoveCellInLocationMap(cells[1], 3, 0);
+        TS_ASSERT_EQUALS(cell_population.GetCellsUsingLocationIndex(0).size(),1u);
+        TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(cells[1]), 0u);
+
+        // Now move it back
+        cell_population.MoveCellInLocationMap(cells[1], 0, 3);
 
         // Coverage as cell is no longer there.
         TS_ASSERT_THROWS_THIS(cell_population.RemoveCellUsingLocationIndex(0,cells[0]),
-                              "Tried to remove a cell which is not attached to the given location index");
-
-        cell_population.AddCellUsingLocationIndex(3,cells[0]);
+                             "Tried to remove a cell which is not attached to the given location index");
 
         // Check cells are in the correct locations
         TS_ASSERT(!cell_population.IsCellAttachedToLocationIndex(0));

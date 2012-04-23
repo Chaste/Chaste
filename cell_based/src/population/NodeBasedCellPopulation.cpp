@@ -103,7 +103,7 @@ void NodeBasedCellPopulation<DIM>::Validate()
 
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter=this->Begin(); cell_iter!=this->End(); ++cell_iter)
     {
-        unsigned node_index = this->mCellLocationMap[(*cell_iter).get()];
+        unsigned node_index = this->GetLocationIndexUsingCell((*cell_iter));
         validated_node[node_index] = true;
     }
 
@@ -183,6 +183,7 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
     	UpdateParticlesAfterReMesh(map);
 
         // Update the mappings between cells and location indices
+    	///\todo we want to make mCellLocationMap private - we need to find a better way of doing this
         std::map<Cell*, unsigned> old_map = this->mCellLocationMap;
 
         // Remove any dead pointers from the maps (needed to avoid archiving errors)
@@ -200,7 +201,6 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 
             unsigned new_node_index = map.GetNewIndex(old_node_index);
             this->SetCellUsingLocationIndex(new_node_index,*it);
-            this->mCellLocationMap[(*it).get()] = new_node_index;
         }
 
         this->Validate();
@@ -250,12 +250,11 @@ unsigned NodeBasedCellPopulation<DIM>::RemoveDeadCells()
         {
             // Remove the node from the mesh
             num_removed++;
-            mpNodesOnlyMesh->DeleteNodePriorToReMesh(this->mCellLocationMap[(*it).get()]);
+            mpNodesOnlyMesh->DeleteNodePriorToReMesh(this->GetLocationIndexUsingCell((*it)));
 
             // Update mappings between cells and location indices
-            unsigned location_index_of_removed_node = this->mCellLocationMap[(*it).get()];
-            this->mCellLocationMap.erase((*it).get());
-            this->mLocationCellMap.erase(location_index_of_removed_node);
+            unsigned location_index_of_removed_node = this->GetLocationIndexUsingCell((*it));
+            this->RemoveCellUsingLocationIndex(location_index_of_removed_node, (*it));
 
             // Update vector of cells
             it = this->mCells.erase(it);

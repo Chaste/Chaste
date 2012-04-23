@@ -264,17 +264,23 @@ template<unsigned DIM>
 void AbstractCellPopulation<DIM>::SetCellUsingLocationIndex(unsigned index, CellPtr pCell)
 {
     // This method assumes a one to one relationship between cells and location indices
+    if(mLocationCellMap[index].size()!=0 || mCellLocationMap.find(pCell.get())!=mCellLocationMap.end())
+    {
+        EXCEPTION("Trying to set Cell-Location map for a cell that has already been set. Consider using `AddCellUsingLocationIndex`");
+    }
 
-    // First remove any cell at this location index
-    mLocationCellMap[index].clear();
     // Replace with new cell
     mLocationCellMap[index].insert(pCell);
+
+    // Do other half of the map
+    mCellLocationMap[pCell.get()] = index;
 }
 
 template<unsigned DIM>
 void AbstractCellPopulation<DIM>::AddCellUsingLocationIndex(unsigned index, CellPtr pCell)
 {
     mLocationCellMap[index].insert(pCell);
+    mCellLocationMap[pCell.get()] = index;
 }
 
 template<unsigned DIM>
@@ -289,12 +295,26 @@ void AbstractCellPopulation<DIM>::RemoveCellUsingLocationIndex(unsigned index, C
     else
     {
         mLocationCellMap[index].erase(cell_iter);
+        mCellLocationMap.erase((*cell_iter).get());
     }
+}
+
+template<unsigned DIM>
+void AbstractCellPopulation<DIM>::MoveCellInLocationMap(CellPtr pCell, unsigned old_index, unsigned new_index)
+{
+    // Remove the cell from its current location
+    RemoveCellUsingLocationIndex(old_index, pCell);
+
+    // Add it to the new location
+    AddCellUsingLocationIndex(new_index, pCell);
 }
 
 template<unsigned DIM>
 unsigned AbstractCellPopulation<DIM>::GetLocationIndexUsingCell(CellPtr pCell)
 {
+    // Check the cell is in the map.
+    assert(this->mCellLocationMap.find(pCell.get()) != this->mCellLocationMap.end());
+
     return mCellLocationMap[pCell.get()];
 }
 

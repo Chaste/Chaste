@@ -74,8 +74,10 @@ template<unsigned DIM>
 class AbstractCellPopulation : public Identifiable
 {
 private:
+
     /** Needed for serialization. */
     friend class boost::serialization::access;
+
     /**
      * Serialize the object and its member variables.
      *
@@ -103,17 +105,17 @@ private:
 
 protected:
 
-    /** Reference to the mesh */
-    AbstractMesh<DIM, DIM>& mrMesh;
-
-    /** List of cells */
-    std::list<CellPtr> mCells;
-
     /** Map location (node or VertexElement) indices back to cells */
     std::map<unsigned, std::set<CellPtr> > mLocationCellMap;
 
     /** Map cells to location (node or VertexElement) indices */
     std::map<Cell*, unsigned> mCellLocationMap;
+
+    /** Reference to the mesh */
+    AbstractMesh<DIM, DIM>& mrMesh;
+
+    /** List of cells */
+    std::list<CellPtr> mCells;
 
     /** Current cell type counts */
     std::vector<unsigned> mCellProliferativeTypeCount;
@@ -456,6 +458,15 @@ public:
      * @param pCell the cell.
      */
     void RemoveCellUsingLocationIndex(unsigned index, CellPtr pCell);
+
+    /**
+     * Change the location index of a cell in mLocationCellMap and mCellLocationMap
+     *
+     * @param pCell the cell to move
+     * @param old_index the old location index
+     * @param new_index the new location index
+     */
+    void MoveCellInLocationMap(CellPtr pCell, unsigned old_index, unsigned new_index);
 
     /**
      * Get the location index corresponding to a given cell.

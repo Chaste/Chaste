@@ -76,7 +76,7 @@ void NodeBasedCellPopulationWithBuskeUpdate<DIM>::UpdateNodeLocations(const std:
          ++cell_iter)
     {
         // Get index of node associated with cell
-        unsigned node_index = this->mCellLocationMap[(*cell_iter).get()];
+        unsigned node_index = this->GetLocationIndexUsingCell((*cell_iter));
 
         // Get the location of this node
         c_vector<double, DIM> node_i_location = this->GetNode(node_index)->rGetLocation();
@@ -162,7 +162,7 @@ void NodeBasedCellPopulationWithBuskeUpdate<DIM>::UpdateNodeLocations(const std:
          ++cell_iter)
     {
         // Get index of node associated with cell
-        unsigned node_index = this->mCellLocationMap[(*cell_iter).get()];
+        unsigned node_index = this->GetLocationIndexUsingCell((*cell_iter));
 
         c_vector<double, DIM> new_node_location;
 

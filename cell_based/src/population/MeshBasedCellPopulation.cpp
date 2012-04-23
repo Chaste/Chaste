@@ -229,12 +229,11 @@ unsigned MeshBasedCellPopulation<DIM>::RemoveDeadCells()
 
             // Remove the node from the mesh
             num_removed++;
-            static_cast<MutableMesh<DIM, DIM>&>((this->mrMesh)).DeleteNodePriorToReMesh(this->mCellLocationMap[(*it).get()]);
+            static_cast<MutableMesh<DIM, DIM>&>((this->mrMesh)).DeleteNodePriorToReMesh(this->GetLocationIndexUsingCell((*it)));
 
             // Update mappings between cells and location indices
-            unsigned location_index_of_removed_node = this->mCellLocationMap[(*it).get()];
-            this->mCellLocationMap.erase((*it).get());
-            this->mLocationCellMap.erase(location_index_of_removed_node);
+            unsigned location_index_of_removed_node = this->GetLocationIndexUsingCell((*it));
+            this->RemoveCellUsingLocationIndex(location_index_of_removed_node, (*it));
 
             // Update vector of cells
             it = this->mCells.erase(it);
@@ -273,7 +272,6 @@ void MeshBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 
             unsigned new_node_index = map.GetNewIndex(old_node_index);
             this->SetCellUsingLocationIndex(new_node_index,*it);
-            this->mCellLocationMap[(*it).get()] = new_node_index;
         }
 
         this->Validate();
@@ -1050,7 +1048,7 @@ void MeshBasedCellPopulation<DIM>::CheckCellPointers()
         assert(p_model);
 
         // Check cell exists in cell population
-        unsigned node_index = this->mCellLocationMap[p_cell.get()];
+        unsigned node_index = this->GetLocationIndexUsingCell(p_cell);
         std::cout << "Cell at node " << node_index << " addr " << p_cell << std::endl << std::flush;
         CellPtr p_cell_in_cell_population = this->GetCellUsingLocationIndex(node_index);
 #define COVERAGE_IGNORE //Debugging code.  Shouldn't fail under normal conditions
@@ -1084,7 +1082,7 @@ void MeshBasedCellPopulation<DIM>::CheckCellPointers()
             assert(p_cell);
             AbstractCellCycleModel* p_model = p_cell->GetCellCycleModel();
             assert(p_model);
-            unsigned node_index = this->mCellLocationMap[p_cell.get()];
+            unsigned node_index = this->GetLocationIndexUsingCell(p_cell);
             std::cout << "Cell at node " << node_index << " addr " << p_cell << std::endl << std::flush;
 
 #define COVERAGE_IGNORE //Debugging code.  Shouldn't fail under normal conditions

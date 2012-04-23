@@ -61,9 +61,8 @@ c_vector<double, DIM> AbstractCentreBasedCellPopulation<DIM>::GetLocationOfCellC
 template<unsigned DIM>
 Node<DIM>* AbstractCentreBasedCellPopulation<DIM>::GetNodeCorrespondingToCell(CellPtr pCell)
 {
-    assert(this->mCellLocationMap.find(pCell.get()) != this->mCellLocationMap.end());
-
-    return this->GetNode(this->mCellLocationMap[pCell.get()]);
+    unsigned index = this->GetLocationIndexUsingCell(pCell);
+    return this->GetNode(index);
 }
 
 template<unsigned DIM>
@@ -97,10 +96,8 @@ void AbstractCentreBasedCellPopulation<DIM>::UpdateNodeLocations(const std::vect
          cell_iter != this->End();
          ++cell_iter)
     {
-
-
         // Get index of node associated with cell
-        unsigned node_index = this->mCellLocationMap[(*cell_iter).get()];
+        unsigned node_index = this->GetLocationIndexUsingCell((*cell_iter));
 
         // Get damping constant for node
         double damping_const = this->GetDampingConstant(node_index);

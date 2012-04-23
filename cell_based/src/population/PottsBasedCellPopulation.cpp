@@ -66,7 +66,9 @@ void PottsBasedCellPopulation<DIM>::Validate()
 
         if (validated_element[i] > 1)
         {
-            EXCEPTION("Element " << i << " appears to have " << validated_element[i] << " cells associated with it");
+            // This should never be reached as you can only set one cell per element index.
+            NEVER_REACHED;
+            //EXCEPTION("Element " << i << " appears to have " << validated_element[i] << " cells associated with it");
         }
     }
 }
@@ -154,13 +156,13 @@ unsigned PottsBasedCellPopulation<DIM>::GetNumNodes()
 template<unsigned DIM>
 c_vector<double, DIM> PottsBasedCellPopulation<DIM>::GetLocationOfCellCentre(CellPtr pCell)
 {
-    return mpPottsMesh->GetCentroidOfElement(this->mCellLocationMap[pCell.get()]);
+    return mpPottsMesh->GetCentroidOfElement(this->GetLocationIndexUsingCell(pCell));
 }
 
 template<unsigned DIM>
 PottsElement<DIM>* PottsBasedCellPopulation<DIM>::GetElementCorrespondingToCell(CellPtr pCell)
 {
-    return mpPottsMesh->GetElement(this->mCellLocationMap[pCell.get()]);
+    return mpPottsMesh->GetElement(this->GetLocationIndexUsingCell(pCell));
 }
 
 template<unsigned DIM>
@@ -178,7 +180,6 @@ CellPtr PottsBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_vector<
     // Update location cell map
     CellPtr p_created_cell = this->mCells.back();
     this->SetCellUsingLocationIndex(new_element_index,p_created_cell);
-    this->mCellLocationMap[p_created_cell.get()] = new_element_index;
     return p_created_cell;
 }
 
@@ -195,7 +196,7 @@ unsigned PottsBasedCellPopulation<DIM>::RemoveDeadCells()
         {
             // Remove the element from the mesh
             num_removed++;
-            mpPottsMesh->DeleteElement(this->mCellLocationMap[(*it).get()]);
+            mpPottsMesh->DeleteElement(this->GetLocationIndexUsingCell((*it)));
             it = this->mCells.erase(it);
             --it;
         }

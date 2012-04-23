@@ -203,7 +203,7 @@ CellPtr MeshBasedCellPopulationWithGhostNodes<DIM>::AddCell(CellPtr pNewCell, co
     assert(p_created_cell == pNewCell);
 
     // Update size of mIsGhostNode if necessary
-    unsigned new_node_index = this->mCellLocationMap[p_created_cell.get()];
+    unsigned new_node_index = this->GetLocationIndexUsingCell(p_created_cell);
 
     if (this->GetNumNodes() > this->mIsGhostNode.size())
     {
@@ -225,7 +225,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::Validate()
     // Look through all of the cells and record what node they are associated with.
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter=this->Begin(); cell_iter!=this->End(); ++cell_iter)
     {
-        unsigned node_index = this->mCellLocationMap[(*cell_iter).get()];
+        unsigned node_index = this->GetLocationIndexUsingCell((*cell_iter));
 
         // If the node attached to this cell is labelled as a ghost node, then throw an error
         if (mIsGhostNode[node_index])
