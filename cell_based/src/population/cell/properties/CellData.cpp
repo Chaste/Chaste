@@ -45,7 +45,7 @@ CellData::~CellData()
 {
 }
 
-void CellData::SetCellData(unsigned variableNumber, double data)
+void CellData::SetItem(unsigned variableNumber, double data)
 {
     if (variableNumber >= mCellData.size())
     {
@@ -54,7 +54,7 @@ void CellData::SetCellData(unsigned variableNumber, double data)
     mCellData[variableNumber] = data;
 }
 
-double CellData::GetCellData(unsigned variableNumber) const
+double CellData::GetItem(unsigned variableNumber) const
 {
     if (variableNumber >= mCellData.size())
     {
@@ -62,7 +62,7 @@ double CellData::GetCellData(unsigned variableNumber) const
     }
 	if (mCellData[variableNumber]==DBL_MAX)
 	{
-		EXCEPTION("SetCellData must be called before using GetCellData");
+		EXCEPTION("SetItem must be called before using GetItem");
 	}
     return mCellData[variableNumber];
 }

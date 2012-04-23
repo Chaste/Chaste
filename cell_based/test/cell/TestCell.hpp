@@ -1119,8 +1119,11 @@ public:
         CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
         p_cell->InitialiseCellCycleModel();
         MAKE_PTR_ARGS(CellData, p_cell_data, (2));
-        p_cell_data->SetCellData(0,1.0);
-        p_cell_data->SetCellData(1,2.0);
+        p_cell_data->SetItem(0,1.0);
+        p_cell_data->SetItem(1,2.0);
+
+        //Before adding the CellData to the cell
+        TS_ASSERT_THROWS_THIS(p_cell->GetCellData(), "No CellData attached to this cell");
 
         p_cell->AddCellProperty(p_cell_data);
 
@@ -1133,16 +1136,16 @@ public:
 
         CellPropertyCollection cell_data_collection = p_cell->rGetCellPropertyCollection().GetPropertiesType<CellData>();
         boost::shared_ptr<CellData> p_parentcell_data = boost::static_pointer_cast<CellData>(cell_data_collection.GetProperty());
-        p_parentcell_data->SetCellData(0, 3.0);
+        p_parentcell_data->SetItem(0, 3.0);
 
-        TS_ASSERT_EQUALS(p_parentcell_data->GetCellData(0), 3.0);
-        TS_ASSERT_EQUALS(p_parentcell_data->GetCellData(1), 2.0);
+        TS_ASSERT_EQUALS(p_cell->GetCellData()->GetItem(0), 3.0);
+        TS_ASSERT_EQUALS(p_cell->GetCellData()->GetItem(1), 2.0);
 
         CellPropertyCollection cell2_data_collection = p_cell2->rGetCellPropertyCollection().GetPropertiesType<CellData>();
         boost::shared_ptr<CellData> p_daughtercell_data = boost::static_pointer_cast<CellData>(cell2_data_collection.GetProperty());
 
-        TS_ASSERT_EQUALS(p_daughtercell_data->GetCellData(0), 1.0);
-        TS_ASSERT_EQUALS(p_daughtercell_data->GetCellData(1), 2.0);
+        TS_ASSERT_EQUALS(p_daughtercell_data->GetItem(0), 1.0);
+        TS_ASSERT_EQUALS(p_daughtercell_data->GetItem(1), 2.0);
     }
 
 };

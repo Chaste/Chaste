@@ -105,14 +105,14 @@ public:
      * @param variableNumber the index of the data to be set.
      * @param data the value to set it to.
      */
-    void SetCellData(unsigned variableNumber, double data);
+    void SetItem(unsigned variableNumber, double data);
 
     /**
      * Get data.
      * 
      * @param variableNumber the index of the data required.
      */
-    double GetCellData(unsigned variableNumber) const;
+    double GetItem(unsigned variableNumber) const;
 };
 
 #include "SerializationExportWrapper.hpp"

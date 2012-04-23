@@ -92,9 +92,7 @@ double CellwiseData<DIM>::GetValue(CellPtr pCell, unsigned variableNumber)
 
     assert(IsSetUp());
 
-    CellPropertyCollection cell_data_collection = pCell->rGetCellPropertyCollection().GetPropertiesType<CellData>();
-	boost::shared_ptr<CellData> p_cell_data = boost::static_pointer_cast<CellData>(cell_data_collection.GetProperty());
-	return p_cell_data->GetCellData(variableNumber);
+	return pCell->GetCellData()->GetItem(variableNumber);
 }
 
 template<unsigned DIM>
@@ -109,10 +107,7 @@ void CellwiseData<DIM>::SetValue(double value, unsigned locationIndex, unsigned 
     // Get the cell associated with locationIndex
     CellPtr p_cell = mpCellPopulation->GetCellUsingLocationIndex(locationIndex);
 
-    CellPropertyCollection cell_data_collection = p_cell->rGetCellPropertyCollection().GetPropertiesType<CellData>();
-    boost::shared_ptr<CellData> p_cell_data = boost::static_pointer_cast<CellData>(cell_data_collection.GetProperty());
-    p_cell_data->SetCellData(variableNumber, value);
-
+	p_cell->GetCellData()->SetItem(variableNumber, value);
 }
 
 template<unsigned DIM>
@@ -134,7 +129,7 @@ void CellwiseData<DIM>::SetPopulationAndNumVars(AbstractCellPopulation<DIM>* pCe
 
 	if (IsSetUp())
 	{
-		EXCEPTION("Cant call SetPopulationAndNumVars() once CellwiseData is setup.");
+		EXCEPTION("Can't call SetPopulationAndNumVars() once CellwiseData is setup.");
 	}
 
 	mpCellPopulation = pCellPopulation;
@@ -169,7 +164,7 @@ void CellwiseData<DIM>::SetConstantDataForTesting(std::vector<double>& rValues)
 {
     mConstantDataForTesting = rValues;
     mUseConstantDataForTesting = true;
-    mNumberOfVariables = 1;
+    mNumberOfVariables = rValues.size();
 }
 
 template<unsigned DIM>

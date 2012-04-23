@@ -186,6 +186,28 @@ boost::shared_ptr<AbstractCellMutationState> Cell::GetMutationState() const
     return boost::static_pointer_cast<AbstractCellMutationState>(mutation_state_collection.GetProperty());
 }
 
+boost::shared_ptr<CellData> Cell::GetCellData() const
+{
+	 if (mCellPropertyCollection.HasPropertyType<CellData>())
+	 {
+		 CellPropertyCollection cell_data_collection = mCellPropertyCollection.GetPropertiesType<CellData>();
+
+		/*
+		 * Note: In its current form the code requires each cell to have exactly
+		 * one CellData object. This is reflected in the assertion below.
+		 */
+		assert(cell_data_collection.GetSize() <= 1);
+
+		return boost::static_pointer_cast<CellData>(cell_data_collection.GetProperty());
+	 }
+	 else
+	 {
+		 ///\todo #1515 All cells should have data
+		 EXCEPTION("No CellData attached to this cell");
+	 }
+}
+
+
 CellPropertyCollection& Cell::rGetCellPropertyCollection()
 {
     return mCellPropertyCollection;
@@ -375,9 +397,7 @@ CellPtr Cell::Divide()
     if (daughter_property_collection.HasPropertyType<CellData>())
     {
         // Get the existing copy of the cell data it and remove it from the daughter cell
-    	CellPropertyCollection cell_data_collection = daughter_property_collection.GetPropertiesType<CellData>();
-    	assert(cell_data_collection.GetSize() == 1); //We should only have at most one cell data per cell
-    	boost::shared_ptr<CellData> p_cell_data = boost::static_pointer_cast<CellData>(cell_data_collection.GetProperty());
+    	boost::shared_ptr<CellData> p_cell_data = GetCellData();
     	daughter_property_collection.RemoveProperty(p_cell_data);
 
     	// Create a new cell data object and add this to the daughter cell

@@ -145,7 +145,7 @@ public:
 
         p_data->SetPopulationAndNumVars(&cell_population, 2);
 
-        TS_ASSERT_THROWS_THIS(p_data->SetPopulationAndNumVars(&cell_population, 1),"Cant call SetPopulationAndNumVars() once CellwiseData is setup.");
+        TS_ASSERT_THROWS_THIS(p_data->SetPopulationAndNumVars(&cell_population, 1),"Can't call SetPopulationAndNumVars() once CellwiseData is setup.");
 
         TS_ASSERT_EQUALS(CellwiseData<2>::Instance()->IsSetUp(), true);
 
@@ -163,7 +163,7 @@ public:
 
         // Other values should have been initialised to zero
         ++cell_iter2;
-        TS_ASSERT_THROWS_THIS(p_data->GetValue(*cell_iter2, 0),"SetCellData must be called before using GetCellData");
+        TS_ASSERT_THROWS_THIS(p_data->GetValue(*cell_iter2, 0),"SetItem must be called before using GetItem");
 
         // Tidy up
         CellwiseData<2>::Destroy();

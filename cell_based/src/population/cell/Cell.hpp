@@ -207,6 +207,11 @@ public:
     boost::shared_ptr<AbstractCellMutationState> GetMutationState() const;
 
     /**
+     * Get the CellData associated with the cell.
+     */
+    boost::shared_ptr<CellData> GetCellData() const;
+
+    /**
      * Set the cell's current mutation state.
      *
      * @param pMutationState the cell's new mutation state

@@ -128,17 +128,17 @@ public:
     {
         MAKE_PTR_ARGS(CellData, p_cell_data,(2));
 
-        TS_ASSERT_THROWS_THIS(p_cell_data->GetCellData(0), "SetCellData must be called before using GetCellData");
-        TS_ASSERT_THROWS_THIS(p_cell_data->GetCellData(1), "SetCellData must be called before using GetCellData");
-        TS_ASSERT_THROWS_THIS(p_cell_data->GetCellData(2), "Request for variable above the number of variables stored.");
+        TS_ASSERT_THROWS_THIS(p_cell_data->GetItem(0), "SetItem must be called before using GetItem");
+        TS_ASSERT_THROWS_THIS(p_cell_data->GetItem(1), "SetItem must be called before using GetItem");
+        TS_ASSERT_THROWS_THIS(p_cell_data->GetItem(2), "Request for variable above the number of variables stored.");
 
-        p_cell_data->SetCellData(0,1.0);
-        p_cell_data->SetCellData(1,2.0);
-        TS_ASSERT_THROWS_THIS(p_cell_data->SetCellData(2,3.0), "Attempted to set a variable above the number of variables stored.");
+        p_cell_data->SetItem(0,1.0);
+        p_cell_data->SetItem(1,2.0);
+        TS_ASSERT_THROWS_THIS(p_cell_data->SetItem(2,3.0), "Attempted to set a variable above the number of variables stored.");
 
-        TS_ASSERT_DELTA(p_cell_data->GetCellData(0), 1.0, 1e-8);
-        TS_ASSERT_DELTA(p_cell_data->GetCellData(1), 2.0, 1e-8);
-        TS_ASSERT_THROWS_THIS(p_cell_data->GetCellData(2), "Request for variable above the number of variables stored.");
+        TS_ASSERT_DELTA(p_cell_data->GetItem(0), 1.0, 1e-8);
+        TS_ASSERT_DELTA(p_cell_data->GetItem(1), 2.0, 1e-8);
+        TS_ASSERT_THROWS_THIS(p_cell_data->GetItem(2), "Request for variable above the number of variables stored.");
     }
 
     void TestArchiveCellData() throw(Exception)
@@ -150,12 +150,12 @@ public:
         {
             CellData* p_cell_data = new CellData(2);
 
-            p_cell_data->SetCellData(0,1.0);
-            p_cell_data->SetCellData(1,2.0);
+            p_cell_data->SetItem(0,1.0);
+            p_cell_data->SetItem(1,2.0);
 
-            TS_ASSERT_DELTA(p_cell_data->GetCellData(0), 1.0, 1e-8);
-            TS_ASSERT_DELTA(p_cell_data->GetCellData(1), 2.0, 1e-8);
-            TS_ASSERT_THROWS_THIS(p_cell_data->GetCellData(2), "Request for variable above the number of variables stored.");
+            TS_ASSERT_DELTA(p_cell_data->GetItem(0), 1.0, 1e-8);
+            TS_ASSERT_DELTA(p_cell_data->GetItem(1), 2.0, 1e-8);
+            TS_ASSERT_THROWS_THIS(p_cell_data->GetItem(2), "Request for variable above the number of variables stored.");
 
             // Create an output archive
             std::ofstream ofs(archive_filename.c_str());
@@ -181,9 +181,9 @@ public:
             CellData* p_real_cell_data = dynamic_cast<CellData*>(p_cell_data);
             TS_ASSERT(p_real_cell_data != NULL);
 
-            TS_ASSERT_DELTA(p_real_cell_data->GetCellData(0), 1.0, 1e-8);
-            TS_ASSERT_DELTA(p_real_cell_data->GetCellData(1), 2.0, 1e-8);
-            TS_ASSERT_THROWS_THIS(p_real_cell_data->GetCellData(2), "Request for variable above the number of variables stored.");
+            TS_ASSERT_DELTA(p_real_cell_data->GetItem(0), 1.0, 1e-8);
+            TS_ASSERT_DELTA(p_real_cell_data->GetItem(1), 2.0, 1e-8);
+            TS_ASSERT_THROWS_THIS(p_real_cell_data->GetItem(2), "Request for variable above the number of variables stored.");
 
             // Tidy up
             delete p_cell_data;

@@ -101,29 +101,7 @@ AbstractCellCycleModel* Alarcon2004OxygenBasedCellCycleModel::CreateCellCycleMod
      */
     assert(mpOdeSystem);
     bool is_labelled = mpCell->HasCellProperty<CellLabel>();
-    switch (mDimension)
-    {
-        case 1:
-        {
-            const unsigned DIM = 1;
-            p_model->SetOdeSystem(new Alarcon2004OxygenBasedCellCycleOdeSystem(CellwiseData<DIM>::Instance()->GetValue(mpCell,0), is_labelled));
-            break;
-        }
-        case 2:
-        {
-            const unsigned DIM = 2;
-            p_model->SetOdeSystem(new Alarcon2004OxygenBasedCellCycleOdeSystem(CellwiseData<DIM>::Instance()->GetValue(mpCell,0), is_labelled));
-            break;
-        }
-        case 3:
-        {
-            const unsigned DIM = 3;
-            p_model->SetOdeSystem(new Alarcon2004OxygenBasedCellCycleOdeSystem(CellwiseData<DIM>::Instance()->GetValue(mpCell,0), is_labelled));
-            break;
-        }
-        default:
-            NEVER_REACHED;
-    }
+	p_model->SetOdeSystem(new Alarcon2004OxygenBasedCellCycleOdeSystem(mpCell->GetCellData()->GetItem(0), is_labelled));
     p_model->SetStateVariables(mpOdeSystem->rGetStateVariables());
 
     return p_model;
@@ -136,29 +114,7 @@ void Alarcon2004OxygenBasedCellCycleModel::Initialise()
 
     bool is_labelled = mpCell->HasCellProperty<CellLabel>();
 
-    switch (mDimension)
-    {
-        case 1:
-        {
-            const unsigned DIM = 1;
-            mpOdeSystem = new Alarcon2004OxygenBasedCellCycleOdeSystem(CellwiseData<DIM>::Instance()->GetValue(mpCell,0), is_labelled);
-            break;
-        }
-        case 2:
-        {
-            const unsigned DIM = 2;
-            mpOdeSystem = new Alarcon2004OxygenBasedCellCycleOdeSystem(CellwiseData<DIM>::Instance()->GetValue(mpCell,0), is_labelled);
-            break;
-        }
-        case 3:
-        {
-            const unsigned DIM = 3;
-            mpOdeSystem = new Alarcon2004OxygenBasedCellCycleOdeSystem(CellwiseData<DIM>::Instance()->GetValue(mpCell,0), is_labelled);
-            break;
-        }
-        default:
-            NEVER_REACHED;
-    }
+    mpOdeSystem = new Alarcon2004OxygenBasedCellCycleOdeSystem(mpCell->GetCellData()->GetItem(0), is_labelled);
 
     mpOdeSystem->SetStateVariables(mpOdeSystem->GetInitialConditions());
 }
@@ -166,29 +122,8 @@ void Alarcon2004OxygenBasedCellCycleModel::Initialise()
 void Alarcon2004OxygenBasedCellCycleModel::AdjustOdeParameters(double currentTime)
 {
     // Pass this time step's oxygen concentration into the solver as a constant over this timestep
-    switch (mDimension)
-    {
-        case 1:
-        {
-            const unsigned DIM = 1;
-            mpOdeSystem->rGetStateVariables()[5] = CellwiseData<DIM>::Instance()->GetValue(mpCell, 0);
-            break;
-        }
-        case 2:
-        {
-            const unsigned DIM = 2;
-            mpOdeSystem->rGetStateVariables()[5] = CellwiseData<DIM>::Instance()->GetValue(mpCell, 0);
-            break;
-        }
-        case 3:
-        {
-            const unsigned DIM = 3;
-            mpOdeSystem->rGetStateVariables()[5] = CellwiseData<DIM>::Instance()->GetValue(mpCell, 0);
-            break;
-        }
-        default:
-            NEVER_REACHED;
-    }
+
+	mpOdeSystem->rGetStateVariables()[5] = mpCell->GetCellData()->GetItem(0);
 
     // Use whether the cell is currently labelled as another input
     bool is_labelled = mpCell->HasCellProperty<CellLabel>();

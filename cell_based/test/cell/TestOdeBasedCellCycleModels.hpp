@@ -53,7 +53,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ApcTwoHitCellMutationState.hpp"
 #include "BetaCateninOneHitCellMutationState.hpp"
 
-#include "CellwiseData.hpp"
 #include "OutputFileHandler.hpp"
 #include "CheckReadyToDivideAndPhaseIsUpdated.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
@@ -258,13 +257,15 @@ public:
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(30.0, 3);
 
         // Set up oxygen_concentration
-        std::vector<double> oxygen_concentration;
-        oxygen_concentration.push_back(1.0);
+        double oxygen_concentration = 1.0;
 
-        // For coverage, we create 1D, 2D and 3D instances
-        CellwiseData<1>::Instance()->SetConstantDataForTesting(oxygen_concentration);
-        CellwiseData<2>::Instance()->SetConstantDataForTesting(oxygen_concentration);
-        CellwiseData<3>::Instance()->SetConstantDataForTesting(oxygen_concentration);
+        /*
+         * Create some CellData and pass this to all cells. Usually all cells have separate
+         * CellData objects but here we use one for simple testing.
+         */
+		MAKE_PTR_ARGS(CellData, p_cell_data, (1));
+		p_cell_data->SetItem(0, oxygen_concentration);
+
 
         // Create cell-cycle models
         Alarcon2004OxygenBasedCellCycleModel* p_model_1d = new Alarcon2004OxygenBasedCellCycleModel();
@@ -283,12 +284,15 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
 
         CellPtr p_cell_1d(new Cell(p_state, p_model_1d));
+        p_cell_1d->AddCellProperty(p_cell_data);
         p_cell_1d->InitialiseCellCycleModel();
 
         CellPtr p_cell_2d(new Cell(p_state, p_model_2d));
+        p_cell_2d->AddCellProperty(p_cell_data);
         p_cell_2d->InitialiseCellCycleModel();
 
         CellPtr p_cell_3d(new Cell(p_state, p_model_3d));
+        p_cell_3d->AddCellProperty(p_cell_data);
         p_cell_3d->InitialiseCellCycleModel();
 
         // For coverage, we create another cell-cycle model that is identical to p_model_2d except for the ODE solver
@@ -301,6 +305,7 @@ public:
         p_other_model_2d->SetCellProliferativeType(STEM);
 
         CellPtr p_other_cell_2d(new Cell(p_state, p_other_model_2d));
+        p_other_cell_2d->AddCellProperty(p_cell_data);
         p_other_cell_2d->InitialiseCellCycleModel();
 
         // Check oxygen concentration is correct in cell-cycle model
@@ -314,14 +319,17 @@ public:
         Alarcon2004OxygenBasedCellCycleModel* p_model_1d_2 = static_cast<Alarcon2004OxygenBasedCellCycleModel*> (p_model_1d->CreateCellCycleModel());
         p_model_1d_2->SetCellProliferativeType(STEM);
         CellPtr p_cell_1d_2(new Cell(p_state, p_model_1d_2));
+        p_cell_1d_2->AddCellProperty(p_cell_data);
 
         Alarcon2004OxygenBasedCellCycleModel* p_model_2d_2 = static_cast<Alarcon2004OxygenBasedCellCycleModel*> (p_model_2d->CreateCellCycleModel());
         p_model_2d_2->SetCellProliferativeType(STEM);
         CellPtr p_cell_2d_2(new Cell(p_state, p_model_2d_2));
+        p_cell_2d_2->AddCellProperty(p_cell_data);
 
         Alarcon2004OxygenBasedCellCycleModel* p_model_3d_2 = static_cast<Alarcon2004OxygenBasedCellCycleModel*> (p_model_3d->CreateCellCycleModel());
         p_model_3d_2->SetCellProliferativeType(STEM);
         CellPtr p_cell_3d_2(new Cell(p_state, p_model_3d_2));
+        p_cell_3d_2->AddCellProperty(p_cell_data);
 
         p_simulation_time->IncrementTimeOneStep();
         TS_ASSERT_EQUALS(p_model_1d->ReadyToDivide(), false);
@@ -337,25 +345,19 @@ public:
 
         TS_ASSERT_THROWS_NOTHING(p_model_2d->ResetForDivision());
 
-        // Tidy up
-        CellwiseData<2>::Destroy();
-
         // For coverage, create a 1D model
-        CellwiseData<1>::Instance()->SetConstantDataForTesting(oxygen_concentration);
         Alarcon2004OxygenBasedCellCycleModel* p_cell_model3 = new Alarcon2004OxygenBasedCellCycleModel();
         p_cell_model3->SetDimension(1);
         p_cell_model3->SetCellProliferativeType(STEM);
 
         CellPtr p_cell3(new Cell(p_state, p_cell_model3));
+        p_cell3->AddCellProperty(p_cell_data);
         p_cell3->InitialiseCellCycleModel();
 
         TS_ASSERT_DELTA(p_cell_model3->GetProteinConcentrations()[5], 1.0, 1e-5);
         TS_ASSERT_EQUALS(p_cell_model3->ReadyToDivide(), false);
         p_simulation_time->IncrementTimeOneStep();
         TS_ASSERT_EQUALS(p_cell_model3->ReadyToDivide(), false);
-
-        // Tidy up
-        CellwiseData<1>::Destroy();
     }
 
     void TestArchiveTysonNovakCellCycleModels()
@@ -424,9 +426,15 @@ public:
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "Alarcon2004OxygenBasedCellCycleModel.arch";
 
-        std::vector<double> oxygen_concentration;
-        oxygen_concentration.push_back(1.0);
-        CellwiseData<1>::Instance()->SetConstantDataForTesting(oxygen_concentration);
+        // Set up oxygen_concentration
+        double oxygen_concentration = 1.0;
+
+        /*
+         * Create some CellData and pass this to all cells. Usually all cells have separate
+         * CellData objects but here we use one for simple testing.
+         */
+		MAKE_PTR_ARGS(CellData, p_cell_data, (1));
+		p_cell_data->SetItem(0, oxygen_concentration);
 
         {
             // We must set up SimulationTime to avoid memory leaks
@@ -443,6 +451,7 @@ public:
             // We must create a cell to be able to initialise the cell cycle model's ODE system
             MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
+            p_cell->AddCellProperty(p_cell_data);
             p_cell->InitialiseCellCycleModel();
 
             std::ofstream ofs(archive_filename.c_str());
@@ -481,7 +490,6 @@ public:
 
             // Avoid memory leaks
             delete p_model2;
-            CellwiseData<1>::Destroy();
         }
     }
 
