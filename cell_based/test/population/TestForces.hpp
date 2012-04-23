@@ -52,6 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RepulsionForce.hpp"
 #include "NagaiHondaForce.hpp"
 #include "WelikyOsterForce.hpp"
+#include "DiffusionForce.hpp"
 #include "CellwiseData.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "ApcOneHitCellMutationState.hpp"
@@ -1200,6 +1201,197 @@ public:
             delete nodes[i];
         }
     }
+
+    void TestDiffusionForceIn1D()
+    {
+        // Set up time parameters
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
+
+        // Create a 1D mesh with nodes equally spaced a unit distance apart
+        MutableMesh<1,1> mesh;
+        mesh.ConstructLinearMesh(5);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 1> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes(), std::vector<unsigned>(), DIFFERENTIATED);
+
+        // Create cell population
+        std::vector<CellPtr> cells_copy(cells);
+        MeshBasedCellPopulation<1> cell_population(mesh, cells);
+
+        // Create force law object
+        DiffusionForce<1> diffusion_force;
+
+        // Initialise a vector of node forces
+        std::vector<c_vector<double, 1> > node_forces;
+        node_forces.reserve(cell_population.GetNumNodes());
+
+        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        {
+            node_forces.push_back(zero_vector<double>(1));
+        }
+
+        // Compute forces on nodes
+        diffusion_force.AddForceContribution(node_forces, cell_population);
+
+        // Test Set and Get methods for the diffusion force
+        TS_ASSERT_DELTA(diffusion_force.GetCutOffLength(), 10.0, 1e-10);
+        TS_ASSERT_DELTA(diffusion_force.GetDiffusionConstant(), 0.01, 1e-10);
+        diffusion_force.SetCutOffLength(20.0);
+        diffusion_force.SetDiffusionConstant(0.1);
+        TS_ASSERT_DELTA(diffusion_force.GetCutOffLength(), 20.0, 1e-10);
+        TS_ASSERT_DELTA(diffusion_force.GetDiffusionConstant(), 0.1, 1e-10);
+        diffusion_force.SetCutOffLength(10.0);
+        diffusion_force.SetDiffusionConstant(0.01);
+    }
+
+    void TestDiffusionForceIn2D()
+    {
+        // Define the seed
+        RandomNumberGenerator::Instance()->Reseed(0);
+
+        // Set up time parameters
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
+
+        // Create a NodeBasedCellPopulation
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+
+        // Convert this to a NodesOnlyMesh
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+        cell_population.SetMechanicsCutOffLength(100.0);
+        cell_population.Update(); //Needs to be called separately as not in a simulation
+
+        // Create force law object
+        DiffusionForce<2> diffusion_force;
+
+        // Initialise a vector of node forces
+        std::vector<c_vector<double, 2> > node_forces;
+        node_forces.reserve(cell_population.GetNumNodes());
+
+        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        {
+            node_forces.push_back(zero_vector<double>(2));
+        }
+
+        double variance;
+        // Loop over time iterations
+        unsigned number_iteration=1000u;
+        for (unsigned i=0; i<number_iteration; i++)
+        {
+            // Re-initialize the force on node zero
+            node_forces[0]=zero_vector<double>(2);
+
+            // Compute forces on nodes
+            diffusion_force.AddForceContribution(node_forces, cell_population);
+
+            // Calculate the variance
+            variance+=pow(norm_2(node_forces[0]),2);
+        }
+
+        int dim=2;
+        variance/=number_iteration*2*dim*diffusion_force.GetDiffusionConstant()*SimulationTime::Instance()->GetTimeStep();
+        TS_ASSERT_DELTA(variance,1.0,1e-1)
+    }
+
+    void TestDiffusionForceIn3D()
+    {
+        // Define the seed
+        RandomNumberGenerator::Instance()->Reseed(0);
+
+        // Set up time parameters
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
+
+        // Create a NodeBasedCellPopulation
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, true, 0.0, 0.0));
+
+        // Convert this to a NodesOnlyMesh
+        NodesOnlyMesh<3> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        NodeBasedCellPopulation<3> cell_population(mesh, cells);
+        cell_population.SetMechanicsCutOffLength(100.0);
+        cell_population.Update(); //Needs to be called separately as not in a simulation
+
+        // Create force law object
+        DiffusionForce<3> diffusion_force;
+
+        // Initialise a vector of node forces
+        std::vector<c_vector<double, 3> > node_forces;
+        node_forces.reserve(cell_population.GetNumNodes());
+
+        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        {
+            node_forces.push_back(zero_vector<double>(3));
+        }
+
+        double variance;
+        // Loop over time iterations
+        unsigned number_iteration=1000u;
+        for (unsigned i=0; i<number_iteration; i++)
+        {
+            // Re-initialize the force on node zero
+            node_forces[0]=zero_vector<double>(3);
+
+            // Compute forces on nodes
+            diffusion_force.AddForceContribution(node_forces, cell_population);
+
+            // Calculate the variance
+            variance+=pow(norm_2(node_forces[0]),2);
+        }
+
+        int dim=3;
+        variance/=number_iteration*2*dim*diffusion_force.GetDiffusionConstant()*SimulationTime::Instance()->GetTimeStep();
+        TS_ASSERT_DELTA(variance,1.0,1e-1)
+    }
+
+    void TestDiffusionForceArchiving() throw (Exception)
+        {
+            OutputFileHandler handler("archive", false);
+            std::string archive_filename = handler.GetOutputDirectoryFullPath() + "DiffusionForce.arch";
+
+            {
+                DiffusionForce<2> force;
+
+                std::ofstream ofs(archive_filename.c_str());
+                boost::archive::text_oarchive output_arch(ofs);
+
+                // Serialize via pointer to most abstract class possible
+                AbstractForce<2>* const p_force = &force;
+                output_arch << p_force;
+            }
+
+            {
+                AbstractForce<2>* p_force;
+
+                // Create an input archive
+                std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+                boost::archive::text_iarchive input_arch(ifs);
+
+                // Restore from the archive
+                input_arch >> p_force;
+
+                // Test member variables
+                TS_ASSERT_DELTA((static_cast<DiffusionForce<2>*>(p_force))->GetCutOffLength(), 10.0, 1e-6);
+                TS_ASSERT_DELTA((static_cast<DiffusionForce<2>*>(p_force))->GetDiffusionConstant(), 0.01, 1e-6);
+
+                // Tidy up
+                delete p_force;
+            }
+        }
 };
 
 #endif /*TESTFORCES_HPP_*/
