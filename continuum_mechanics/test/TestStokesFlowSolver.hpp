@@ -609,6 +609,65 @@ public:
 			}
         }
     }
+    
+        void TestStokesWithLidDrivenCavity3d() throw(Exception)
+    {
+        unsigned num_elem = 5;
+        QuadraticMesh<3> mesh(1.0/num_elem, 1.0, 1.0, 1.0);
+
+        // Dynamic viscosity
+        double mu = 1.0;
+
+        // Boundary flow
+        std::vector<unsigned> dirichlet_nodes;
+        std::vector<c_vector<double,3> > dirichlet_flow;
+
+        for ( TetrahedralMesh<3,3>::BoundaryNodeIterator iter = mesh.GetBoundaryNodeIteratorBegin();
+              iter != mesh.GetBoundaryNodeIteratorEnd();
+              ++iter)
+        {
+            double x = (*iter)->rGetLocation()[0];
+            double y = (*iter)->rGetLocation()[1];
+            double z = (*iter)->rGetLocation()[2];
+
+            c_vector<double,3> flow = zero_vector<double>(3);
+
+            if (fabs(z-1.0)<1e-6)
+            {
+                flow(0) = x*(1-x)*y*(1-y);
+            }
+
+            dirichlet_nodes.push_back((*iter)->GetIndex());
+            dirichlet_flow.push_back(flow);
+        }
+
+        StokesFlowProblemDefinition<3> problem_defn(mesh);
+        problem_defn.SetViscosity(mu);
+        problem_defn.SetPrescribedFlowNodes(dirichlet_nodes, dirichlet_flow);
+
+        StokesFlowSolver<3> solver(mesh, problem_defn, "LidDrivenCavityStokesFlow3d");
+
+//        // Uncomment to make errors smaller
+//        solver.SetKspAbsoluteTolerance(1e-10);
+
+        solver.Solve();
+
+        std::vector<c_vector<double,3> >& r_solution = solver.rGetVelocities();
+
+        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        {
+            double x = mesh.GetNode(i)->rGetLocation()[0];
+            double y = mesh.GetNode(i)->rGetLocation()[1];
+            double z = mesh.GetNode(i)->rGetLocation()[2];
+            if((fabs(x-0.6)<1e-6) && (fabs(y-0.6)<1e-6) && (fabs(z-0.6)<1e-6))
+            {
+                TS_ASSERT_DELTA(r_solution[i](0), -8.5990e-03, 1e-4);
+                TS_ASSERT_DELTA(r_solution[i](1),  1.3326e-04, 1e-5);
+                TS_ASSERT_DELTA(r_solution[i](2), -5.1343e-03, 1e-4);
+            }
+        }
+    }
+    
 };
 
 #endif // TESTSTOKESFLOWSOLVER_HPP_
