@@ -59,14 +59,11 @@ private:
     /** A pointer to a CellPopulation so a cell's node can be found */
     AbstractCellPopulation<DIM>* mpCellPopulation;
 
-    /** Allocated memory for mData object */
+    /** Allocated memory for stored data in CellData objects */
     bool mAllocatedMemory;
 
     /** Number of variables per node to be stored */
     unsigned mNumberOfVariables;
-
-    /** Store of the data */
-    std::vector<double> mData;
 
     /** Helper member storing constant data. Used in tests. */
     std::vector<double> mConstantDataForTesting;
@@ -92,7 +89,6 @@ private:
             archive & mpCellPopulation;
             archive & mAllocatedMemory;
             archive & mNumberOfVariables;
-            archive & mData;
             archive & mConstantDataForTesting;
             archive & mUseConstantDataForTesting;
         }
@@ -143,26 +139,17 @@ public:
     void SetValue(double value, unsigned locationIndex, unsigned variableNumber=0);
 
     /**
-     * Set the CellPopulation. Must be called before GetValue().
-     *
-     * @param pCellPopulation pointer to the CellPopulation
-     */
-    void SetCellPopulation(AbstractCellPopulation<DIM>* pCellPopulation);
-
-    /**
      * @return reference to the CellPopulation.
      */
     AbstractCellPopulation<DIM>& rGetCellPopulation();
 
     /**
-     * Set the number of cells and number of variables to be stored per cell. The constructor
-     * assumes 1 variable so this method only really needs to be called if numVars > 1.
+     * Set the number of cells and number of variables to be stored per cell. This can only be called once so the number of variables does not change.
      *
-     * @param numCells number of cells in the cell population
      * @param numVars number of variables
-     * @param pCellPopulation the cell population - this is a temporary variable and will be removed on re-factor see ticket #1515
+     * @param pCellPopulation the cell population
      */
-    void SetNumCellsAndVars(unsigned numCells, unsigned numVars, AbstractCellPopulation<DIM>* pCellPopulation = NULL);
+    void SetPopulationAndNumVars(AbstractCellPopulation<DIM>* pCellPopulation, unsigned numberOfVariables);
 
     /**
      * Force the data to return given values for all cells (only for testing).
@@ -175,13 +162,6 @@ public:
      * Is the instance in existence and fully set up
      */
     bool IsSetUp();
-
-    /**
-     * Reallocate size of mData according to the number of cells in the CellPopulation
-     * member variable. Needed because of possible cell division and cell death over
-     * the course of each time step.
-     */
-    void ReallocateMemory();
 
     /**
      * @return mNumberOfVariables

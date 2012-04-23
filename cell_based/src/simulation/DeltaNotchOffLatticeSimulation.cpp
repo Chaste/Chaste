@@ -71,9 +71,6 @@ void DeltaNotchOffLatticeSimulation<DIM>::UpdateCellwiseData()
     // Make sure the cell population is updated
     this->mrCellPopulation.Update();
 
-    // Prepare CellwiseData by reallocating memory according to the number of cells
-    CellwiseData<DIM>::Instance()->ReallocateMemory();
-
     // First store each cell's Notch and Delta concentrations in CellwiseData
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mrCellPopulation.Begin();
          cell_iter != this->mrCellPopulation.End();

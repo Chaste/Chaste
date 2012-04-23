@@ -118,8 +118,7 @@ public:
 
         // Create and initialize CellwiseData
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(p_mesh->GetNumNodes(), 3, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 3);
 
         // Create and configure cell-based simulation
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
@@ -171,8 +170,7 @@ public:
 
         // Create and initialize CellwiseData
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(p_mesh->GetNumElements(), 3, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 3);
 
         // Create and configure cell-based simulation
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
@@ -222,8 +220,7 @@ public:
 
         // Create and initialize CellwiseData
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(p_mesh->GetNumNodes(), 3, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 3);
 
         // Create and configure cell-based simulation
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
@@ -275,8 +272,7 @@ public:
 
         // Create and initialize CellwiseData
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(p_mesh->GetNumElements(), 3, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 3);
 
         // Create and configure cell-based simulation
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);

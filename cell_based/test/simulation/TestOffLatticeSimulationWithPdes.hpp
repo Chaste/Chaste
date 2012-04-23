@@ -155,8 +155,7 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 1);
 
         // Since values are first passed in to CellwiseData before it is updated in UpdateAtEndOfTimeStep(),
         // we must initialise it here to avoid memory errors
@@ -262,8 +261,8 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 1);
+
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             p_data->SetValue(1.0, p_mesh->GetNode(i)->GetIndex());
@@ -379,8 +378,8 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 1);
+
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             p_data->SetValue(1.0, p_mesh->GetNode(i)->GetIndex());
@@ -470,8 +469,8 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 2, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 2);
+
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             p_data->SetValue(1.0, p_mesh->GetNode(i)->GetIndex(), 0);
@@ -566,8 +565,7 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 1);
 
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
@@ -676,8 +674,7 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 2, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 2);
 
         // Since values are first passed in to CellwiseData before it is updated in UpdateAtEndOfTimeStep(),
         // we need to pass it some initial conditions to avoid memory errors
@@ -847,8 +844,7 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 1);
 
         // Since values are first passed in to CellwiseData before it is updated in UpdateAtEndOfTimeStep(),
         // we need to pass it some initial conditions to avoid memory errors
@@ -955,8 +951,8 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 1);
+
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             p_data->SetValue(1.0, p_mesh->GetNode(i)->GetIndex());
@@ -1031,8 +1027,8 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<3>* p_data = CellwiseData<3>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 1);
+
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             p_data->SetValue(1.0, mesh.GetNode(i)->GetIndex());
@@ -1107,8 +1103,8 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 1);
+
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             p_data->SetValue(1.0, mesh.GetNode(i)->GetIndex());
@@ -1235,8 +1231,8 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 1);
+
 
         /*
          * Since values are first passed in to CellwiseData before it is updated in UpdateAtEndOfTimeStep(),
@@ -1308,8 +1304,8 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 1);
+
 
         /*
          * Since values are first passed in to CellwiseData before it is updated in UpdateAtEndOfTimeStep(),
@@ -1432,8 +1428,7 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 1);
 
         c_vector<double,2> centre_of_mesh;
         centre_of_mesh[0] = 5.0;
@@ -1544,8 +1539,7 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<1>* p_data = CellwiseData<1>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 1);
 
         // Since values are first passed in to CellwiseData before it is updated in UpdateAtEndOfTimeStep(),
         // we need to pass it some initial conditions to avoid memory errors
@@ -1621,8 +1615,7 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 1);
 
         c_vector<double,2> centre_of_mesh;
         centre_of_mesh[0] = 5.0;
@@ -1707,8 +1700,7 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<3>* p_data = CellwiseData<3>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 1);
 
         c_vector<double,3> centre_of_mesh;
         centre_of_mesh[0] = 5.0;

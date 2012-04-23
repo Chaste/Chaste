@@ -288,8 +288,7 @@ public:
 
         // Need to set this up for the chemotactic force.
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 1);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             double x = p_mesh->GetNode(i)->rGetLocation()[0];

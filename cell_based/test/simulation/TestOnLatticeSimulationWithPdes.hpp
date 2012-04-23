@@ -132,8 +132,7 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 1);
 
         /*
          * Since values are first passed in to CellwiseData before it is updated in UpdateAtEndOfTimeStep(),
@@ -194,8 +193,7 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 1);
 
         /*
          * Since values are first passed in to CellwiseData before it is updated in UpdateAtEndOfTimeStep(),
@@ -300,8 +298,7 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 2, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 2);
 
         /*
          * Since values are first passed in to CellwiseData before it is updated in UpdateAtEndOfTimeStep(),

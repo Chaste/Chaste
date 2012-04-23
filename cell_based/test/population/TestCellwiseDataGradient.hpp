@@ -73,8 +73,7 @@ public:
 
         // Set up data: C(x,y) = x^2
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 1);
 
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
@@ -114,8 +113,7 @@ public:
         // C(x,y) = const
         //////////////////////////////////
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 1);
 
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
@@ -207,8 +205,7 @@ public:
 //
 //        // Create an instance of CellwiseData and associate it with the cell population
 //        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-//        p_data->SetNumCellsAndVars(cell_population.GetNumNodes(), 1, &cell_population);
-//        p_data->SetCellPopulation(&cell_population);
+//        p_data->SetPopulationAndNumVars(&cell_population, 1);
 //
 //        //////////////////////////////////
 //        // C(x,y) = x^2 - y^2

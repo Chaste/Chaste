@@ -159,8 +159,8 @@ public:
          * end of the time step by a method on {{{DeltaNotchOffLatticeSimulation}}}.
          */
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(p_mesh->GetNumElements(), 3, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 3);
+
         /* We choose to initialise the concentrations to random levels in each cell. */
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
@@ -241,8 +241,8 @@ public:
         cell_population.SetOutputCellAges(true);
 
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(p_mesh->GetNumNodes(), 3, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 3);
+
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)

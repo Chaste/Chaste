@@ -507,8 +507,7 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 1);
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             p_data->SetValue(1.0, mesh.GetNode(i)->GetIndex());
@@ -555,8 +554,7 @@ public:
 
         CellwiseData<2>::Destroy();
         CellwiseData<2>* p_data2 = CellwiseData<2>::Instance();
-        p_data2->SetNumCellsAndVars(cell_population2.GetNumRealCells(), 1, &cell_population2);
-        p_data2->SetCellPopulation(&cell_population2);
+        p_data2->SetPopulationAndNumVars(&cell_population2, 1);
         for (unsigned i=0; i<p_mesh2->GetNumNodes(); i++)
         {
             p_data2->SetValue(1.0, p_mesh2->GetNode(i)->GetIndex());
@@ -591,8 +589,7 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 1);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             p_data->SetValue(RandomNumberGenerator::Instance()->ranf(), p_mesh->GetNode(i)->GetIndex());
@@ -639,8 +636,8 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 1);
+
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             p_data->SetValue(RandomNumberGenerator::Instance()->ranf(), p_mesh->GetNode(i)->GetIndex());
@@ -697,8 +694,7 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 1);
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             p_data->SetValue(1.0, mesh.GetNode(i)->GetIndex());
@@ -765,8 +761,7 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 1);
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             p_data->SetValue(1.0, mesh.GetNode(i)->GetIndex());
@@ -830,9 +825,7 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
-
+        p_data->SetPopulationAndNumVars(&cell_population, 1);
         // Pass initial conditions into CellwiseData to avoid memory errors
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
@@ -900,8 +893,7 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 2, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 2);
 
         // Pass initial conditions into CellwiseData to avoid memory errors
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
@@ -1028,8 +1020,7 @@ public:
 
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 2, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 2);
 
         // Pass initial conditions into CellwiseData to avoid memory errors
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)

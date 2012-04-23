@@ -212,8 +212,7 @@ public:
          * are (in this case, one variable per cell, namely the oxygen concentration), and
          * the cell population.
          */
-        CellwiseData<2>::Instance()->SetNumCellsAndVars(cell_population.GetNumRealCells(),1, &cell_population);
-        CellwiseData<2>::Instance()->SetCellPopulation(&cell_population);
+        CellwiseData<2>::Instance()->SetPopulationAndNumVars(&cell_population,1);
         /*
          * Then we have to initialise the oxygen concentration for each node (to 1.0), by
          * calling {{{SetValue}}}. This takes in the concentration, and the location index

@@ -683,8 +683,8 @@ public:
 
         // Coverage of writing CellwiseData to VTK
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 2, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 2);
+
         for (unsigned var=0; var<2; var++)
         {
             for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
@@ -788,8 +788,7 @@ public:
 
         // Coverage of writing CellwiseData to VTK
         CellwiseData<3>* p_data = CellwiseData<3>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 2, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 2);
         for (unsigned var=0; var<2; var++)
         {
             for (AbstractCellPopulation<3>::Iterator cell_iter = cell_population.Begin();

@@ -113,8 +113,7 @@ public:
 
         // Initialize CellwiseData
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 1);
 
         // Create a contact inhibition simulator
         VolumeTrackedOffLatticeSimulation<2> simulator(cell_population);
@@ -182,8 +181,7 @@ public:
 
         // Initialize CellwiseData
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 1);
 
         // Create a contact inhibition simulator
         VolumeTrackedOffLatticeSimulation<2> simulator(cell_population);
@@ -252,8 +250,7 @@ public:
 
         // Initialize CellwiseData
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumElements(), 1, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 1);
 
         // Create a contact inhibition simulator
         VolumeTrackedOffLatticeSimulation<2> simulator(cell_population);
@@ -327,8 +324,7 @@ public:
 
         // Initialize CellwiseData
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 1);
 
         // Create a contact inhibition simulator
         VolumeTrackedOffLatticeSimulation<2> simulator(cell_population);

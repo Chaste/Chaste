@@ -64,22 +64,6 @@ CellwiseData<DIM>::CellwiseData()
 template<unsigned DIM>
 CellwiseData<DIM>::~CellwiseData()
 {
-//	if(mpCellPopulation != NULL)
-//	{
-//
-//		for( typename AbstractCellPopulation<DIM>::Iterator cell_iter = mpCellPopulation->Begin();
-//				cell_iter != mpCellPopulation->End();
-//				++cell_iter)
-//		{
-//			CellPropertyCollection collection = cell_iter->rGetCellPropertyCollection();
-//			if (collection.HasProperty<CellData>())
-//			{
-//				collection.RemoveProperty<CellData>();
-//			}
-//		}
-//		MARK;
-//	}
-//	MARK;
 }
 
 template<unsigned DIM>
@@ -97,7 +81,7 @@ double CellwiseData<DIM>::GetValue(CellPtr pCell, unsigned variableNumber)
 {
     if (variableNumber >= mNumberOfVariables)
     {
-        EXCEPTION("Request for variable above mNumberOfVariables. Call SetNumCellsAndVars() to increase it.");
+        EXCEPTION("Request for variable above mNumberOfVariables.");
     }
 
     // To test a cell and cell-cycle models without a cell population
@@ -107,8 +91,6 @@ double CellwiseData<DIM>::GetValue(CellPtr pCell, unsigned variableNumber)
     }
 
     assert(IsSetUp());
-    assert(mpCellPopulation != NULL);
-    assert(mAllocatedMemory);
 
     CellPropertyCollection cell_data_collection = pCell->rGetCellPropertyCollection().GetPropertiesType<CellData>();
 	boost::shared_ptr<CellData> p_cell_data = boost::static_pointer_cast<CellData>(cell_data_collection.GetProperty());
@@ -121,7 +103,7 @@ void CellwiseData<DIM>::SetValue(double value, unsigned locationIndex, unsigned 
     assert(IsSetUp());
     if (variableNumber >= mNumberOfVariables)
     {
-        EXCEPTION("Request for variable above mNumberOfVariables. Call SetNumCellsAndVars() to increase it.");
+        EXCEPTION("Request for variable above mNumberOfVariables.");
     }
 
     // Get the cell associated with locationIndex
@@ -134,51 +116,34 @@ void CellwiseData<DIM>::SetValue(double value, unsigned locationIndex, unsigned 
 }
 
 template<unsigned DIM>
-void CellwiseData<DIM>::SetCellPopulation(AbstractCellPopulation<DIM>* pCellPopulation)
-{
-    if (dynamic_cast<MeshBasedCellPopulationWithGhostNodes<DIM>*>(pCellPopulation))
-    {
-        EXCEPTION("CellwiseData does not work with ghost nodes.");
-    }
-
-    if (mAllocatedMemory == false)
-    {
-        EXCEPTION("SetCellPopulation must be called after SetNumCellsAndVars()");
-    }
-
-    mpCellPopulation = pCellPopulation;
-}
-
-template<unsigned DIM>
 AbstractCellPopulation<DIM>& CellwiseData<DIM>::rGetCellPopulation()
 {
     return *mpCellPopulation;
 }
 
 template<unsigned DIM>
-void CellwiseData<DIM>::SetNumCellsAndVars(unsigned numCells, unsigned numberOfVariables, AbstractCellPopulation<DIM>* pCellPopulation)
+void CellwiseData<DIM>::SetPopulationAndNumVars(AbstractCellPopulation<DIM>* pCellPopulation, unsigned numberOfVariables)
 {
-    if (mpCellPopulation!=NULL)
-    {
-        EXCEPTION("SetNumCellsAndVars() must be called before setting the CellPopulation (and after a Destroy)");
-    }
-
     assert(pCellPopulation != NULL);
-    assert(numCells == pCellPopulation->GetNumRealCells());
     assert(numberOfVariables > 0);
-    assert(mAllocatedMemory == false);
 
+	if (dynamic_cast<MeshBasedCellPopulationWithGhostNodes<DIM>*>(pCellPopulation))
+	{
+		EXCEPTION("CellwiseData does not work with ghost nodes.");
+	}
+
+	if (IsSetUp())
+	{
+		EXCEPTION("Cant call SetPopulationAndNumVars() once CellwiseData is setup.");
+	}
+
+	mpCellPopulation = pCellPopulation;
     mNumberOfVariables = numberOfVariables;
 
     for( typename AbstractCellPopulation<DIM>::Iterator cell_iter = pCellPopulation->Begin();
     		cell_iter != pCellPopulation->End();
     		++cell_iter)
     {
-//    	CellPropertyCollection cell_property_collection = (*cell_iter)->rGetCellPropertyCollection();
-//    	CellPropertyCollection cell_data_collection = cell_property_collection.GetPropertiesType<CellData>();
-//    	assert(cell_data_collection.GetSize() == 0);
-
-
     	CellPropertyCollection& collection = cell_iter->rGetCellPropertyCollection();
 		if (collection.HasProperty<CellData>())
 		{
@@ -197,21 +162,6 @@ template<unsigned DIM>
 bool CellwiseData<DIM>::IsSetUp()
 {
     return ((mAllocatedMemory) && (mpInstance!=NULL) && (mpCellPopulation!=NULL));
-}
-
-template<unsigned DIM>
-void CellwiseData<DIM>::ReallocateMemory()
-{
-    assert(mAllocatedMemory==true);
-    assert(mpCellPopulation!=NULL);
-
-    unsigned num_cells = mpCellPopulation->GetNumRealCells();
-
-    if (mData.size() != num_cells*mNumberOfVariables)
-    {
-        mData.clear();
-        mData.resize(num_cells*mNumberOfVariables, 0.0);
-    }
 }
 
 template<unsigned DIM>

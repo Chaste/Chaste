@@ -258,9 +258,6 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
         assert(mPdeAndBcCollection[pde_index]->HasAveragedSourcePde() == using_coarse_pde_mesh);
     }
 
-    // Clear CellwiseData
-    CellwiseData<DIM>::Instance()->ReallocateMemory();
-
     // Make sure the cell population is in a nice state
     mpCellPopulation->Update();
 

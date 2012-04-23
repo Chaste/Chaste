@@ -72,9 +72,6 @@ void VolumeTrackedOffLatticeSimulation<DIM>::UpdateCellwiseData()
     // Make sure the cell population is updated
     this->mrCellPopulation.Update();
 
-    // Prepare CellwiseData by reallocating memory according to the number of cells
-    CellwiseData<DIM>::Instance()->ReallocateMemory();
-
     /**
      * This hack is needed because in the case of a MeshBasedCellPopulation in which
      * multiple cell divisions have occurred over one time step, the Voronoi tessellation

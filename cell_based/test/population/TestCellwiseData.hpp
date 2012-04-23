@@ -90,18 +90,12 @@ public:
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
 
         TS_ASSERT_EQUALS(CellwiseData<2>::Instance()->IsSetUp(), false);
-        TS_ASSERT_THROWS_THIS(p_data->SetCellPopulation(&cell_population),"SetCellPopulation must be called after SetNumCellsAndVars()");
 
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
-
-		TS_ASSERT_EQUALS(CellwiseData<2>::Instance()->IsSetUp(), false);
-
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 1);
 
         TS_ASSERT_EQUALS(CellwiseData<2>::Instance()->IsSetUp(), true);
 
         TS_ASSERT_EQUALS(CellwiseData<2>::Instance()->GetNumVariables(), 1u);
-
 
         p_data->SetValue(1.23, mesh.GetNode(0)->GetIndex());
         AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
@@ -111,7 +105,7 @@ public:
         ++cell_iter;
         TS_ASSERT_DELTA(p_data->GetValue(*cell_iter), 2.23, 1e-12);
 
-        // Test ReallocateMemory method
+        // Test that CellData objects are copied correctly on cell division.
         MAKE_PTR(WildTypeCellMutationState, p_state);
 
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
@@ -125,9 +119,6 @@ public:
         new_cell_location[1] = 0.3;
         cell_population.AddCell(p_new_cell, new_cell_location, cells[0] /*random choice of parent*/);
 
-        TS_ASSERT_THROWS_NOTHING(p_data->ReallocateMemory());
-        TS_ASSERT_EQUALS(p_data->mData.size(), cell_population.rGetMesh().GetNumNodes());
-
         // Coverage
         std::vector<double> constant_value;
         constant_value.push_back(1.579);
@@ -139,10 +130,10 @@ public:
         {
             TS_ASSERT_DELTA(p_data->GetValue(*cell_iter), 1.579, 1e-12);
             TS_ASSERT_THROWS_THIS(p_data->GetValue(*cell_iter,1),
-                    "Request for variable above mNumberOfVariables. Call SetNumCellsAndVars() to increase it.");
+                    "Request for variable above mNumberOfVariables.");
         }
         TS_ASSERT_THROWS_THIS(p_data->SetValue(0.0, 0, 1),
-                "Request for variable above mNumberOfVariables. Call SetNumCellsAndVars() to increase it.");
+                "Request for variable above mNumberOfVariables.");
 
         p_data->Destroy();
 
@@ -152,10 +143,10 @@ public:
 
         p_data = CellwiseData<2>::Instance();
 
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 2, &cell_population);
-        p_data->SetCellPopulation(&cell_population);
+        p_data->SetPopulationAndNumVars(&cell_population, 2);
 
-        TS_ASSERT_THROWS_THIS(p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1),"SetNumCellsAndVars() must be called before setting the CellPopulation (and after a Destroy)");
+        TS_ASSERT_THROWS_THIS(p_data->SetPopulationAndNumVars(&cell_population, 1),"Cant call SetPopulationAndNumVars() once CellwiseData is setup.");
+
         TS_ASSERT_EQUALS(CellwiseData<2>::Instance()->IsSetUp(), true);
 
         TS_ASSERT_EQUALS(CellwiseData<2>::Instance()->GetNumVariables(), 2u);
@@ -194,8 +185,7 @@ public:
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
 
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
-        TS_ASSERT_THROWS_THIS(p_data->SetCellPopulation(&cell_population),
+        TS_ASSERT_THROWS_THIS(p_data->SetPopulationAndNumVars(&cell_population, 1),
                 "CellwiseData does not work with ghost nodes.");
 
         // Tidy up
@@ -229,8 +219,7 @@ public:
         {
             // Set up the data store
             CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-            p_data->SetNumCellsAndVars(cell_population.GetNumRealCells(), 1, &cell_population);
-            p_data->SetCellPopulation(&cell_population);
+            p_data->SetPopulationAndNumVars(&cell_population, 1);
 
             // Put some data in
             unsigned i = 0;
@@ -326,8 +315,7 @@ public:
         {
             // Set up the data store
             CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-            p_data->SetNumCellsAndVars(p_cell_population->GetNumRealCells(), 1, p_cell_population);
-            p_data->SetCellPopulation(p_cell_population);
+            p_data->SetPopulationAndNumVars(p_cell_population, 1);
 
             // Put some data in
             unsigned i = 0;
