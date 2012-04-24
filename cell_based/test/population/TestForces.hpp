@@ -1300,6 +1300,12 @@ public:
         int dim=2;
         variance/=number_iteration*2*dim*diffusion_force.GetDiffusionConstant()*SimulationTime::Instance()->GetTimeStep();
         TS_ASSERT_DELTA(variance,1.0,1e-1)
+
+        // When the node-only mesh goes out of scope, then it's a different set of nodes that get destroyed
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
     }
 
     void TestDiffusionForceIn3D()
@@ -1356,6 +1362,12 @@ public:
         int dim=3;
         variance/=number_iteration*2*dim*diffusion_force.GetDiffusionConstant()*SimulationTime::Instance()->GetTimeStep();
         TS_ASSERT_DELTA(variance,1.0,1e-1)
+
+        // When the node-only mesh goes out of scope, then it's a different set of nodes that get destroyed
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
     }
 
     void TestDiffusionForceArchiving() throw (Exception)
