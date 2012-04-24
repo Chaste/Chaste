@@ -227,6 +227,8 @@ public:
         //problem_defn.SetMechanicsSolveTimestep(0.1); // runs through entire cycle but takes very very long time - todo: adaptive mechanics timestep
         problem_defn.SetSolveUsingSnes();
 
+        problem_defn.SetVerboseDuringSolve();
+
         problem_defn.SetFixedNodes(fixed_nodes,locations);
         problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, -1.0);
         problem_defn.SetNumIncrementsForInitialDeformation(7);

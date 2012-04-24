@@ -234,7 +234,7 @@ public:
             }
         }
         problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, -1.0 /*1 KPa is about 8mmHg*/);
-        problem_defn.SetNumIncrementsForInitialDeformation(3);
+        problem_defn.SetNumIncrementsForInitialDeformation(5);
 
         CardiacElectroMechanicsProblem<2> problem(COMPRESSIBLE,
                                                  &electrics_mesh,
