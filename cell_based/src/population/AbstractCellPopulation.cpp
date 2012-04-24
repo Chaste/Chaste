@@ -295,7 +295,7 @@ void AbstractCellPopulation<DIM>::RemoveCellUsingLocationIndex(unsigned index, C
     else
     {
         mLocationCellMap[index].erase(cell_iter);
-        mCellLocationMap.erase((*cell_iter).get());
+        mCellLocationMap.erase(pCell.get());
     }
 }
 
