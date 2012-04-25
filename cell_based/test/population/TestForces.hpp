@@ -1306,6 +1306,10 @@ public:
         {
             delete nodes[i];
         }
+
+        // Tidy up
+        SimulationTime::Destroy();
+        RandomNumberGenerator::Destroy();
     }
 
     void TestDiffusionForceIn3D()
@@ -1368,6 +1372,10 @@ public:
         {
             delete nodes[i];
         }
+
+        // Tidy up
+        SimulationTime::Destroy();
+        RandomNumberGenerator::Destroy();
     }
 
     void TestDiffusionForceArchiving() throw (Exception)

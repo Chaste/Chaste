@@ -65,6 +65,7 @@ double DiffusionForce<DIM>::GetCutOffLength()
 template<unsigned DIM>
 void DiffusionForce<DIM>::SetDiffusionConstant(double diffusionConstant)
 {
+	assert(diffusionConstant > 0.0);
     mDiffusionConstant = diffusionConstant;
 }
 
@@ -84,13 +85,6 @@ void DiffusionForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM>
         EXCEPTION("You should use the diffusion force with an OffLatticeCellPopulation.");
     }
 
-    /**
-     * Cast the cell population into an `AbstractOffLatticeCellPopulation` to access the
-     * `GetDampingConstant()` method.
-     */
-
-    AbstractOffLatticeCellPopulation<DIM>* pStaticCastCellPopulation = static_cast<AbstractOffLatticeCellPopulation<DIM>*>(&rCellPopulation);
-
     // Loop over the cells to add force components to the force vector.
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
          cell_iter != rCellPopulation.End();
@@ -101,7 +95,7 @@ void DiffusionForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM>
         c_vector<double, DIM> force_contribution;
         for (unsigned i=0; i<DIM; i++)
         {
-            double nu = pStaticCastCellPopulation->GetDampingConstant(node_index);
+            double nu = dynamic_cast<AbstractOffLatticeCellPopulation<DIM>*>(&rCellPopulation)->GetDampingConstant(node_index);
             double dt = SimulationTime::Instance()->GetTimeStep();
             double xi = RandomNumberGenerator::Instance()->StandardNormalRandomDeviate();
             force_contribution[i] = nu*sqrt(2.0*mDiffusionConstant*dt)/dt*xi;
