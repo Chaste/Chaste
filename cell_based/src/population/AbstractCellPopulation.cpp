@@ -263,10 +263,10 @@ bool AbstractCellPopulation<DIM>::IsCellAttachedToLocationIndex(unsigned index)
 template<unsigned DIM>
 void AbstractCellPopulation<DIM>::SetCellUsingLocationIndex(unsigned index, CellPtr pCell)
 {
-    // This method assumes a one to one relationship between cells and location indices
+    // If the location map has already been set we need to clear it.
     if(mLocationCellMap[index].size()!=0 || mCellLocationMap.find(pCell.get())!=mCellLocationMap.end())
     {
-        EXCEPTION("Trying to set Cell-Location map for a cell that has already been set. Consider using `AddCellUsingLocationIndex`");
+    	mLocationCellMap[index].clear();
     }
 
     // Replace with new cell

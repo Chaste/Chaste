@@ -213,7 +213,7 @@ protected:
 
     /**
 	 * Constructor that just takes in a mesh.
-	 * 
+	 *
 	 * @param rMesh the mesh for the population.
      */
     AbstractCellPopulation(AbstractMesh<DIM, DIM>& rMesh);
@@ -244,7 +244,7 @@ public:
      * Initialise each cell's cell-cycle model.
      */
     void InitialiseCells();
-    
+
     /**
      * @return reference to the mesh, mrMesh.
      */
@@ -437,6 +437,8 @@ public:
      * Set the cell corresponding to a given location index.
      *
      * Assumes there is one cell for each location index and replaces any existing cell attached to the location index.
+     * If you wish to attach an additional cell to a location index use AddCellUsingLocaitonIndex as SetCellUsingLocation
+     * Index will overwrite cells attached to this index.
      *
      * @param index the location index
      * @param pCell the cell.
@@ -503,9 +505,9 @@ public:
 
     /**
      * Get the volume (or area in 2D, or length in 1D) of a given cell.
-     * 
+     *
      * As this method is pure virtual, it must be overridden in subclasses.
-     * 
+     *
      * @param pCell boost shared pointer to a cell
      */
     virtual double GetVolumeOfCell(CellPtr pCell)=0;
