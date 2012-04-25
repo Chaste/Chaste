@@ -53,7 +53,7 @@ void PottsBasedCellPopulation<DIM>::Validate()
          cell_iter != this->End();
          ++cell_iter)
     {
-        unsigned elem_index = GetLocationIndexUsingCell(*cell_iter);
+        unsigned elem_index = this->GetLocationIndexUsingCell(*cell_iter);
         validated_element[elem_index]++;
     }
 
@@ -66,9 +66,7 @@ void PottsBasedCellPopulation<DIM>::Validate()
 
         if (validated_element[i] > 1)
         {
-            // This should never be reached as you can only set one cell per element index.
-            NEVER_REACHED;
-            //EXCEPTION("Element " << i << " appears to have " << validated_element[i] << " cells associated with it");
+            EXCEPTION("Element " << i << " appears to have " << validated_element[i] << " cells associated with it");
         }
     }
 }

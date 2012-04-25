@@ -239,7 +239,7 @@ public:
         // This should throw an exception as the number of cells
         // does not equal the number of elements
         TS_ASSERT_THROWS_THIS(VertexBasedCellPopulation<2> cell_population2(*p_mesh2, cells2, false, true, cell_location_indices2),
-                "Trying to set Cell-Location map for a cell that has already been set. Consider using `AddCellUsingLocationIndex`");
+                "Element 0 appears to have 2 cells associated with it");
     }
 
     void TestGetDampingConstant()

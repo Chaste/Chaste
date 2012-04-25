@@ -264,9 +264,12 @@ template<unsigned DIM>
 void AbstractCellPopulation<DIM>::SetCellUsingLocationIndex(unsigned index, CellPtr pCell)
 {
     // If the location map has already been set we need to clear it.
-    if(mLocationCellMap[index].size()!=0 || mCellLocationMap.find(pCell.get())!=mCellLocationMap.end())
+    //if(mLocationCellMap[index].size()!=0 || mCellLocationMap.find(pCell.get())!=mCellLocationMap.end())
     {
+    	// Clear the maps
     	mLocationCellMap[index].clear();
+
+    	mCellLocationMap.erase(pCell.get());
     }
 
     // Replace with new cell
