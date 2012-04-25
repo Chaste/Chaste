@@ -94,7 +94,7 @@ debug = int(ARGUMENTS.get('debug', 0))
 Export('debug')
 
 # The type of build to perform (see python/BuildTypes.py for options)
-build_type = ARGUMENTS.get('build', ARGUMENTS.get('b','default'))
+build_type = ARGUMENTS.get('build', ARGUMENTS.get('b', 'default'))
 build = BuildTypes.GetBuildType(build_type)
 build.SetRevision(ARGUMENTS.get('revision', ''))
 build.debug = debug
@@ -486,6 +486,13 @@ if test_summary and not compile_only:
     # Remove old results. Note that this command gets run before anything is built.
     #for oldfile in os.listdir(output_dir):
     #    os.remove(os.path.join(output_dir, oldfile))
+    # Record some additional info in an extra file there
+    info_file = open(os.path.join(output_dir, 'info.log'), 'w')
+    info_file.write('Targets:')
+    for target in COMMAND_LINE_TARGETS:
+        info_file.write(' ' + target)
+    info_file.write('\nArguments: ' + str(ARGUMENTS) + '\n')
+    info_file.close()
     # Add a summary generator to the list of things for scons to do
     show_output_folder = False
     if isinstance(build, BuildTypes.Coverage):
