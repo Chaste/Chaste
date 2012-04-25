@@ -350,8 +350,7 @@ void VertexBasedCellPopulation<DIM>::Validate()
         if (validated_element[i] > 1)
         {
             // This should never be reached as you can only set one cell per element index.
-            NEVER_REACHED;
-            //EXCEPTION("Element " << i << " appears to have " << validated_element[i] << " cells associated with it");
+            EXCEPTION("Element " << i << " appears to have " << validated_element[i] << " cells associated with it");
         }
     }
 }
