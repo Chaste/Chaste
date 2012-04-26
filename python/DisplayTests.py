@@ -232,11 +232,13 @@ def _recent(req, type='', start=0, **filters):
 
     def add_nav_links():
         if start > 0:
+            output.append(_linkRecent('First page', type, start=0, **filters) + " ")
             output.append(_linkRecent('Previous page', type, start=start-n_per_page, **filters) + " ")
         if filters:
             output.append(_linkRecent('Remove filters', type, start=0) + " ")
         if total_num_of_builds > start+n_per_page:
-            output.append(_linkRecent('Next page', type, start=start+n_per_page, **filters))
+            output.append(_linkRecent('Next page', type, start=start+n_per_page, **filters) + " ")
+            output.append(_linkRecent('Last page', type, start=total_num_of_builds-n_per_page, **filters) + " ")
 
     output = []
     add_nav_links()
