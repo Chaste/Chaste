@@ -48,6 +48,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulation.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
+#include "PottsBasedCellPopulation.hpp"
+#include "PottsMeshGenerator.hpp"
 #include "ChemotacticForce.hpp"
 #include "RepulsionForce.hpp"
 #include "NagaiHondaForce.hpp"
@@ -476,6 +478,17 @@ public:
 
         std::string weliky_force_results_dir = output_file_handler.GetOutputDirectoryFullPath();
         TS_ASSERT_EQUALS(system(("diff " + weliky_force_results_dir + "weliky_results.parameters cell_based/test/data/TestForces/weliky_results.parameters").c_str()), 0);
+
+        // Test with DiffusionForce
+		DiffusionForce<2> diffusion_force;
+		TS_ASSERT_EQUALS(diffusion_force.GetIdentifier(), "DiffusionForce-2");
+
+		out_stream diffusion_force_parameter_file = output_file_handler.OpenOutputFile("diffusion_results.parameters");
+		diffusion_force.OutputForceParameters(diffusion_force_parameter_file);
+		diffusion_force_parameter_file->close();
+
+		std::string diffusion_force_results_dir = output_file_handler.GetOutputDirectoryFullPath();
+		TS_ASSERT_EQUALS(system(("diff " + diffusion_force_results_dir + "diffusion_results.parameters cell_based/test/data/TestForces/diffusion_results.parameters").c_str()), 0);
     }
 
     void TestGeneralisedLinearSpringForceArchiving() throw (Exception)

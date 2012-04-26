@@ -52,7 +52,9 @@ class DiffusionForce : public AbstractForce<DIM>
 
 private :
 
-    /** Diffusion constant */
+    /**
+     * Diffusion constant.
+     */
     double mDiffusionConstant;
 
     /**
@@ -86,9 +88,9 @@ public :
     ~DiffusionForce();
 
     /**
-     * Method to set the Diffusion constant.
+     * Use a diffusion constant for the cells
      *
-     * @params diffusionConstant the value to assign to the diffusion constant.
+     * @param diffusionConstant the diffusion constant to use
      */
     void SetDiffusionConstant(double diffusionConstant);
 

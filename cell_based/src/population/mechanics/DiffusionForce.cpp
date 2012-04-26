@@ -79,12 +79,6 @@ template<unsigned DIM>
 void DiffusionForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
                           AbstractCellPopulation<DIM>& rCellPopulation)
 {
-	// Check that the cell population is OffLattice.
-    if (dynamic_cast<AbstractOffLatticeCellPopulation<DIM>*>(&rCellPopulation)==NULL)
-    {
-        EXCEPTION("You should use the diffusion force with an OffLatticeCellPopulation.");
-    }
-
     // Loop over the cells to add force components to the force vector.
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
          cell_iter != rCellPopulation.End();
