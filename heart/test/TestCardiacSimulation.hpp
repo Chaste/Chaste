@@ -254,9 +254,9 @@ public:
         TS_ASSERT(CompareFilesViaHdf5DataReader("heart/test/data/cardiac_simulations", "save_bidomain_short_results", false,
                                                 foldername, "SimulationResults", true, 1e-6));
 
-        std::string command = "test -e " +  OutputFileHandler::GetChasteTestOutputDirectory() + foldername + "_checkpoints/0.2ms/" + foldername + "_0.2ms/archive.arch.0";
-        int return_value = system(command.c_str());
-        TS_ASSERT_EQUALS(return_value,0);
+        FileFinder file(foldername + "_checkpoints/0.2ms/" + foldername + "_0.2ms/archive.arch.0",
+                        RelativeTo::ChasteTestOutput);
+        TS_ASSERT(file.Exists());
     }
 
     // requires TestCardiacSimulationArchiveBidomain() to have been run
@@ -286,9 +286,9 @@ public:
         TS_ASSERT( CompareFilesViaHdf5DataReader("heart/test/data/cardiac_simulations", "save_monodomain_short_results", false,
                                                  foldername, "SimulationResults", true, 1e-6));
 
-        std::string command = "test -e " +  OutputFileHandler::GetChasteTestOutputDirectory() + foldername + "_checkpoints/0.2ms/" + foldername + "_0.2ms/archive.arch.0";
-        int return_value = system(command.c_str());
-        TS_ASSERT_EQUALS(return_value,0);
+        FileFinder file(foldername + "_checkpoints/0.2ms/" + foldername + "_0.2ms/archive.arch.0",
+                        RelativeTo::ChasteTestOutput);
+        TS_ASSERT(file.Exists());
     }
 
     // requires TestCardiacSimulationArchiveMonodomain() to have been run
@@ -317,9 +317,9 @@ public:
         TS_ASSERT( CompareFilesViaHdf5DataReader("heart/test/data/cardiac_simulations", "save_monodomain_dynamic", false,
                    foldername, "SimulationResults", true));
 
-        std::string command = "test -e " +  OutputFileHandler::GetChasteTestOutputDirectory() + foldername + "_checkpoints/0.2ms/" + foldername + "_0.2ms/archive.arch.0";
-        int return_value = system(command.c_str());
-        TS_ASSERT_EQUALS(return_value,0);
+        FileFinder file(foldername + "_checkpoints/0.2ms/" + foldername + "_0.2ms/archive.arch.0",
+                        RelativeTo::ChasteTestOutput);
+        TS_ASSERT(file.Exists());
 
         //resume the simulation
         {
@@ -334,7 +334,7 @@ public:
 
     /**
      * Note: from Chaste release 3.1 onward we no longer support Boost 1.33.
-     * The earliest version of Boost supported in 1.34
+     * The earliest version of Boost supported is 1.34
      * Run TestCardiacSimulationArchiveBidomain on 4 processors to create the archive for this test,
      * and copy it to the repository using:
      *

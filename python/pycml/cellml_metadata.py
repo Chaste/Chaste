@@ -86,6 +86,8 @@ METADATA_NAMES = frozenset(
         'rapid_time_dependent_potassium_current_Xr2_gate', 
      'slow_time_dependent_potassium_current_conductance',
         'slow_time_dependent_potassium_current_Xs_gate', 
+     'membrane_slow_inward_current',
+        'membrane_slow_inward_current_conductance',
      # MODERN metadata - labels all new models should be able to use.
      # I Na (fast)
      'membrane_fast_sodium_current', 

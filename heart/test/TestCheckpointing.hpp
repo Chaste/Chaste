@@ -45,6 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 #include "CompareHdf5ResultsFiles.hpp"
 #include "OutputFileHandler.hpp"
+#include "FileFinder.hpp"
 
 class TestCheckpointing : public CxxTest::TestSuite
 {
@@ -113,18 +114,27 @@ public:
 
         // Test that two directories have been created
         OutputFileHandler handler("");
-        EXPECT0(system, "test -d " + handler.GetOutputDirectoryFullPath() + "/SaveBi2DCheckPoint_checkpoints/0.1ms/SaveBi2DCheckPoint");
-        EXPECT0(system, "test -d " + handler.GetOutputDirectoryFullPath() + "/SaveBi2DCheckPoint_checkpoints/0.1ms/SaveBi2DCheckPoint_0.1ms");
-        EXPECT0(system, "test -d " + handler.GetOutputDirectoryFullPath() + "/SaveBi2DCheckPoint_checkpoints/0.2ms/SaveBi2DCheckPoint");
-        EXPECT0(system, "test -d " + handler.GetOutputDirectoryFullPath() + "/SaveBi2DCheckPoint_checkpoints/0.2ms/SaveBi2DCheckPoint_0.2ms");
+        FileFinder directory_finder("SaveBi2DCheckPoint_checkpoints/0.1ms/SaveBi2DCheckPoint",RelativeTo::ChasteTestOutput);
+        TS_ASSERT(directory_finder.IsDir());
+        directory_finder.SetPath("SaveBi2DCheckPoint_checkpoints/0.1ms/SaveBi2DCheckPoint_0.1ms",RelativeTo::ChasteTestOutput);
+        TS_ASSERT(directory_finder.IsDir());
+        directory_finder.SetPath("SaveBi2DCheckPoint_checkpoints/0.2ms/SaveBi2DCheckPoint",RelativeTo::ChasteTestOutput);
+        TS_ASSERT(directory_finder.IsDir());
+        directory_finder.SetPath("SaveBi2DCheckPoint_checkpoints/0.2ms/SaveBi2DCheckPoint_0.2ms",RelativeTo::ChasteTestOutput);
+        TS_ASSERT(directory_finder.IsDir());
 
-        // Test the content of one of them
-        EXPECT0(system, "test -e " + handler.GetOutputDirectoryFullPath() + "/SaveBi2DCheckPoint_checkpoints/0.2ms/SaveBi2DCheckPoint_0.2ms/AbstractCardiacProblem_mSolution.h5");
-        EXPECT0(system, "test -e " + handler.GetOutputDirectoryFullPath() + "/SaveBi2DCheckPoint_checkpoints/0.2ms/SaveBi2DCheckPoint_0.2ms/ChasteParameters.xml");
-        EXPECT0(system, "test -e " + handler.GetOutputDirectoryFullPath() + "/SaveBi2DCheckPoint_checkpoints/0.2ms/SaveBi2DCheckPoint_0.2ms/mesh.ele");
-        EXPECT0(system, "test -e " + handler.GetOutputDirectoryFullPath() + "/SaveBi2DCheckPoint_checkpoints/0.2ms/SaveBi2DCheckPoint_0.2ms/mesh.edge");
-        EXPECT0(system, "test -e " + handler.GetOutputDirectoryFullPath() + "/SaveBi2DCheckPoint_checkpoints/0.2ms/SaveBi2DCheckPoint_0.2ms/mesh.node");
-        EXPECT0(system, "test -e " + handler.GetOutputDirectoryFullPath() + "/SaveBi2DCheckPoint_checkpoints/0.2ms/SaveBi2DCheckPoint_0.2ms/archive.arch");
+        FileFinder file_finder("SaveBi2DCheckPoint_checkpoints/0.2ms/SaveBi2DCheckPoint_0.2ms/AbstractCardiacProblem_mSolution.h5",RelativeTo::ChasteTestOutput);
+        TS_ASSERT(file_finder.IsFile());
+        file_finder.SetPath("SaveBi2DCheckPoint_checkpoints/0.2ms/SaveBi2DCheckPoint_0.2ms/ChasteParameters.xml",RelativeTo::ChasteTestOutput);
+        TS_ASSERT(file_finder.IsFile());
+        file_finder.SetPath("SaveBi2DCheckPoint_checkpoints/0.2ms/SaveBi2DCheckPoint_0.2ms/mesh.ele",RelativeTo::ChasteTestOutput);
+        TS_ASSERT(file_finder.IsFile());
+        file_finder.SetPath("SaveBi2DCheckPoint_checkpoints/0.2ms/SaveBi2DCheckPoint_0.2ms/mesh.edge",RelativeTo::ChasteTestOutput);
+        TS_ASSERT(file_finder.IsFile());
+        file_finder.SetPath("SaveBi2DCheckPoint_checkpoints/0.2ms/SaveBi2DCheckPoint_0.2ms/mesh.node",RelativeTo::ChasteTestOutput);
+        TS_ASSERT(file_finder.IsFile());
+        file_finder.SetPath("SaveBi2DCheckPoint_checkpoints/0.2ms/SaveBi2DCheckPoint_0.2ms/archive.arch",RelativeTo::ChasteTestOutput);
+        TS_ASSERT(file_finder.IsFile());
     }
 
     void TestCheckpointingGeneratesSameResults()
