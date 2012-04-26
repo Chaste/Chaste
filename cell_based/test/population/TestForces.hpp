@@ -48,8 +48,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulation.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
-#include "PottsBasedCellPopulation.hpp"
-#include "PottsMeshGenerator.hpp"
 #include "ChemotacticForce.hpp"
 #include "RepulsionForce.hpp"
 #include "NagaiHondaForce.hpp"
