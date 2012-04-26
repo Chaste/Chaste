@@ -542,7 +542,7 @@ def CreateXsdBuilder(build, buildenv, fakeIt=False):
         return rc
 
     if fakeIt:
-        XsdAction = SCons.Script.Touch('$TARGET')
+        XsdAction = buildenv.Action('@echo -n')
     else:
         XsdAction = buildenv.Action(RunXsd)
     def XsdEmitter(target, source, env):
