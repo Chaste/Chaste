@@ -43,6 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Hdf5ToTxtConverter.hpp"
 #include "PetscTools.hpp"
 #include "OutputFileHandler.hpp"
+#include "FileFinder.hpp"
 #include "TetrahedralMesh.hpp"
 #include "DistributedTetrahedralMesh.hpp"
 #include "TrianglesMeshReader.hpp"
@@ -61,16 +62,13 @@ private:
     // Copies a file (relative to Chaste home to CHASTE_TEST_OUTPUT/dir
     void CopyToTestOutputDirectory(std::string file, std::string dir)
     {
+        OutputFileHandler handler(dir);
+        FileFinder file_finder(file, RelativeTo::ChasteSourceRoot);
+
         if (PetscTools::AmMaster())
         {
-            std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
-            std::string command = "mkdir -p " + test_output_directory + dir;
-            int return_value;
-            return_value = system(command.c_str());
-            assert(return_value == 0);
-            command = "cp " + file + " " + test_output_directory + dir+"/";
-            return_value = system(command.c_str());
-            assert(return_value == 0);
+            FileFinder copied_file = handler.CopyFileTo(file_finder);
+            TS_ASSERT(copied_file.IsFile());
         }
         PetscTools::Barrier();
     }
@@ -86,7 +84,6 @@ public:
 #ifdef CHASTE_VTK // Requires  "sudo aptitude install libvtk5-dev" or similar
         std::string working_directory = "TestHdf5ToVtkConverter_bidomain";
         std::string working_directory2 = "TestHdf5ToVtkConverter_bidomain2";
-        OutputFileHandler handler(working_directory);
 
         /*
          * Firstly, copy the .h5 file to CHASTE_TEST_OUTPUT/TestHdf5ToVtkConverter_bidomain,
@@ -169,7 +166,6 @@ public:
     {
 #ifdef CHASTE_VTK // Requires  "sudo aptitude install libvtk5-dev" or similar
         std::string working_directory = "TestHdf5ToVtkConverter_monodomain2D";
-        OutputFileHandler handler(working_directory);
 
         /*
          * Firstly, copy the .h5 file to CHASTE_TEST_OUTPUT/TestHdf5ToVtkConverter_monodomain2D,
@@ -251,7 +247,6 @@ public:
     void TestBidomainTxtConversion3D() throw(Exception)
     {
         std::string working_directory = "TestHdf5ToTxtConverter_bidomain";
-        OutputFileHandler handler(working_directory);
 
         /*
          * Firstly, copy the .h5 file to CHASTE_TEST_OUTPUT/TestHdf5ToTxtConverter_bidomain,

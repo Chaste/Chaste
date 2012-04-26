@@ -43,6 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Hdf5ToCmguiConverter.hpp"
 #include "PetscTools.hpp"
 #include "OutputFileHandler.hpp"
+#include "FileFinder.hpp"
 #include "HeartConfig.hpp"
 #include "TetrahedralMesh.hpp"
 #include "DistributedTetrahedralMesh.hpp"
@@ -62,16 +63,13 @@ private:
     // Copies a file (relative to Chaste home to CHASTE_TEST_OUTPUT/dir
     void CopyToTestOutputDirectory(std::string file, std::string dir)
     {
+        OutputFileHandler handler(dir);
+        FileFinder file_finder(file, RelativeTo::ChasteSourceRoot);
+
         if (PetscTools::AmMaster())
         {
-            std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
-            std::string command = "mkdir -p " + test_output_directory + dir;
-            int return_value;
-            return_value = system(command.c_str());
-            assert(return_value == 0);
-            command = "cp " + file + " " + test_output_directory + dir+"/";
-            return_value = system(command.c_str());
-            assert(return_value == 0);
+            FileFinder copied_file = handler.CopyFileTo(file_finder);
+            TS_ASSERT(copied_file.IsFile());
         }
         PetscTools::Barrier();
     }
@@ -79,8 +77,6 @@ private:
 public:
     void TestMonodomainMeshalyzerConversion() throw(Exception)
     {
-        OutputFileHandler handler("TestHdf5ToMeshalyzerConverter");
-
         // Firstly, copy ./heart/test/data/MonoDg01d/*.h5 to CHASTE_TEST_OUTPUT/TestHdf5ToMeshalyzerConverter,
         // as that is where the reader reads from.
         CopyToTestOutputDirectory("heart/test/data/Monodomain1d/MonodomainLR91_1d.h5",
@@ -110,8 +106,6 @@ public:
 
     void TestBidomainMeshalyzerConversion() throw(Exception)
     {
-        OutputFileHandler handler("TestHdf5ToMeshalyzerConverter");
-
         /*
          * Firstly, copy the .h5 file to CHASTE_TEST_OUTPUT/TestHdf5ToMeshalyzerConverter,
          * as that is where the reader reads from.
@@ -149,8 +143,6 @@ public:
     // This test covers the case when the hdf5 file contains 3 variables (e.g., after solving a problem with PROBLEM_DIM=3)
     void TestMeshalyzerConversion3Variables() throw(Exception)
     {
-        OutputFileHandler handler("TestMeshalyzerConversion3Variables");
-
         /*
          * Firstly, copy the .h5 file to CHASTE_TEST_OUTPUT/TestHdf5ToMeshalyzerConverter,
          * as that is where the reader reads from.
@@ -196,7 +188,6 @@ public:
     void TestMeshalyzerConversionLotsOfVariables() throw(Exception)
     {
         std::string output_dir = "TestHdf5ToMeshalyzerConversionManyVariables";
-        OutputFileHandler handler(output_dir);
 
         /*
          * Firstly, copy the .h5 file to CHASTE_TEST_OUTPUT/TestHdf5ToMeshalyzerConverter,
@@ -242,7 +233,6 @@ public:
     void TestCmguiConversionLotsOfVariables() throw(Exception)
     {
         std::string output_dir = "TestHdf5ToCmguiConversionManyVariables";
-        OutputFileHandler handler(output_dir);
 
         /*
          * Firstly, copy the .h5 file to CHASTE_TEST_OUTPUT/TestHdf5ToCmguiConverter,
@@ -276,7 +266,6 @@ public:
     void TestMonodomainCmguiConversion3D() throw(Exception)
     {
         std::string working_directory = "TestHdf5ToCmguiConverter_monodomain";
-        OutputFileHandler handler(working_directory);
 
         /*
          * Firstly, copy the .h5 file to CHASTE_TEST_OUTPUT/TestHdf5ToCmguiConverter_monodomain,
@@ -314,7 +303,6 @@ public:
     void TestBidomainCmguiConversion3D() throw(Exception)
     {
         std::string working_directory = "TestHdf5ToCmguiConverter_bidomain";
-        OutputFileHandler handler(working_directory);
 
         /*
          * Firstly, copy the .h5 file to CHASTE_TEST_OUTPUT/TestHdf5ToCmguiConverter_bidomain,
@@ -346,7 +334,6 @@ public:
     void TestBidomainWithBathCmguiConversion1D() throw(Exception)
     {
         std::string working_directory = "TestBidomainWithBathCmguiConversion1D";
-        OutputFileHandler handler(working_directory);
 
         /*
          * Firstly, copy the .h5 file to CHASTE_TEST_OUTPUT/TestBidomainWithBathCmguiConversion1D,
@@ -398,7 +385,6 @@ public:
     void TestMonodomainCmguiConversion2D() throw(Exception)
     {
         std::string working_directory = "TestHdf5ToCmguiConverter_monodomain2D";
-        OutputFileHandler handler(working_directory);
 
         /*
          * Firstly, copy the .h5 file to CHASTE_TEST_OUTPUT/TestHdf5ToCmguiConverter_monodomain2D,
@@ -432,7 +418,6 @@ public:
     void TestBidomainCmguiConversion1D() throw(Exception)
     {
         std::string working_directory = "TestHdf5ToCmguiConverter_bidomain1D";
-        OutputFileHandler handler(working_directory);
 
         /*
          * Firstly, copy the .h5 file to CHASTE_TEST_OUTPUT/TestHdf5ToCmguiConverter_bidomain1D,
@@ -465,7 +450,6 @@ public:
     void TestCmguiConversion1DWith3Variables() throw(Exception)
     {
         std::string working_directory = "TestHdf5ToCmguiConverter3Vars";
-        OutputFileHandler handler(working_directory);
 
         /*
          * Firstly, copy the .h5 file to CHASTE_TEST_OUTPUT/TestHdf5ToCmguiConverter3Vars,

@@ -39,8 +39,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include <iostream>
 #include "VoltageInterpolaterOntoMechanicsMesh.hpp"
+#include "FileFinder.hpp"
 #include "PetscSetupAndFinalize.hpp"
-
 
 class TestVoltageInterpolaterOntoMechanicsMesh : public CxxTest::TestSuite
 {
@@ -48,16 +48,13 @@ private :
     // copies a file (relative to Chaste home to CHASTE_TEST_OUTPUT/dir
     void CopyToTestOutputDirectory(std::string file, std::string dir)
     {
+        OutputFileHandler handler(dir);
+        FileFinder file_finder(file, RelativeTo::ChasteSourceRoot);
+
         if (PetscTools::AmMaster())
         {
-            std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
-            std::string command = "mkdir -p " + test_output_directory + dir;
-            int return_value;
-            return_value = system(command.c_str());
-            assert(return_value==0);
-            command = "cp " + file + " " + test_output_directory + dir+"/";
-            return_value = system(command.c_str());
-            assert(return_value==0);
+            FileFinder copied_file = handler.CopyFileTo(file_finder);
+            TS_ASSERT(copied_file.IsFile());
         }
         PetscTools::Barrier();
     }
@@ -65,8 +62,6 @@ public:
 
     void TestWith1dData(void) throw (Exception)
     {
-        OutputFileHandler handler("TestVoltageInterpolater1d");
-
         // firstly, copy ./heart/test/data/MonoDg01d/*.h5 to CHASTE_TEST_OUTPUT/TestVoltageInterpolater1d,
         // as that is where the interpolater reads and writes to
         CopyToTestOutputDirectory("heart/test/data/Monodomain1d/MonodomainLR91_1d.h5",
@@ -136,8 +131,6 @@ public:
     // the data in this test came from TestCardiacElectroMechanicsProblem::TestImplicitNhs2dOneMechanicsElement()
     void TestWith2dData(void) throw (Exception)
     {
-        OutputFileHandler handler("TestVoltageInterpolater2d");
-
         // firstly, copy .h5 file to CHASTE_TEST_OUTPUT/TestVoltageInterpolater2d,
         // as that is where the interpolater reads and writes to
         CopyToTestOutputDirectory("heart/test/data/Monodomain2d.h5",
