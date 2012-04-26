@@ -43,7 +43,7 @@ import time
 import itertools
 import re
 
-# Compatability with Python 2.3
+# Compatibility with Python 2.3
 try:
     set = set
 except NameError:
@@ -175,6 +175,9 @@ def _recent(req, type='', start=0, **filters):
     dir = os.path.join(_tests_dir, type)
     if not os.path.isdir(dir):
         return _error(type+' is not a valid type of test.')
+
+    # What keys may be used to filter the builds list    
+    poss_filters = ['build_type', 'machine', 'targets']
     
     n_per_page = 20 # Number of builds to display per page
     if _db_module and not req.form.getfirst('nocache', False):
@@ -183,12 +186,13 @@ def _recent(req, type='', start=0, **filters):
         db.FastUpdate()
         total_num_of_builds = db.CountResults()
         params = []
+        where = []
         if filters:
-            where = []
             for filter_name, filter_value in filters.items():
-                if filter_name in ['build_type', 'machine']:
+                if filter_name in poss_filters:
                     where.append(filter_name + '=?')
                     params.append(filter_value)
+        if where:
             where = ' where ' + ' and '.join(where)
         else:
             where = ''
@@ -198,7 +202,7 @@ def _recent(req, type='', start=0, **filters):
                               ' limit ? offset ?' % where, params)
         def gen_row(cur=cur):
             for row in cur:
-                yield (row['revision'], row['machine'], row['build_type'],
+                yield (row['revision'], row['machine'], row['build_type'], row['targets'],
                        time.mktime(row['finished'].timetuple()), row['status'], row['colour'])
     else:
         # Parse the directory structure within dir into a list of builds
@@ -223,16 +227,19 @@ def _recent(req, type='', start=0, **filters):
                     old_revision = revision
                 build = _getBuildObject(build_types_module, build_type)
                 test_set_dir = _testResultsDir(type, revision, machine, build_type)
-                overall_status, colour = _getTestSummary(test_set_dir, build)
-                yield (revision, machine, build_type, finished, overall_status, colour)
+                targets, overall_status, colour = _getTestSummary(test_set_dir, build)
+                yield (revision, machine, build_type, targets, finished, overall_status, colour)
+
+    def add_nav_links():
+        if start > 0:
+            output.append(_linkRecent('Previous page', type, start=start-n_per_page, **filters) + " ")
+        if filters:
+            output.append(_linkRecent('Remove filters', type, start=0) + " ")
+        if total_num_of_builds > start+n_per_page:
+            output.append(_linkRecent('Next page', type, start=start+n_per_page, **filters))
 
     output = []
-    if start > 0:
-        output.append(_linkRecent('Previous page', type, start=start-n_per_page, **filters) + " ")
-    if filters:
-        output.append(_linkRecent('Remove filters', type, start=start) + " ")
-    if total_num_of_builds > start+n_per_page:
-        output.append(_linkRecent('Next page', type, start=start+n_per_page, **filters))
+    add_nav_links()
     output.append("""\
     <table border="1">
         <tr>
@@ -240,6 +247,7 @@ def _recent(req, type='', start=0, **filters):
           <th>Revision</th>
           <th>Build Type</th>
           <th>Machine</th>
+          <th>Targets</th>
           <th>Status</th>
         </tr>
 """)
@@ -247,7 +255,7 @@ def _recent(req, type='', start=0, **filters):
     bgcols = ["white", "#eedd82"]
     bgcol_index = 0
     old_revision = -1
-    for revision, machine, build_type, finished, overall_status, colour in gen_row():
+    for revision, machine, build_type, targets, finished, overall_status, colour in gen_row():
         if type == 'nightly':
             date = time.strftime('%d/%m/%Y', time.localtime(finished))
         else:
@@ -256,33 +264,27 @@ def _recent(req, type='', start=0, **filters):
             bgcol_index = 1 - bgcol_index
             old_revision = revision
         subs = {'bgcol': bgcols[bgcol_index], 'status_col': colour,
-                'date': date, 'machine': machine,
-                'rev': _linkRevision(revision),
+                'date': date, 'machine': machine, 'targets': targets or 'default',
+                'rev': _linkRevision(revision, changes=True),
                 'build_type': _linkBuildType(build_type, revision),
                 'status': _linkSummary(overall_status, type, revision, machine, build_type)}
-        for poss_filter in ['build_type', 'machine']:
+        for poss_filter in poss_filters:
             if poss_filter not in filters:
                 new_filters = filters.copy()
                 new_filters[poss_filter] = locals()[poss_filter]
-                subs[poss_filter] += ' [' + _linkRecent('filter', type, start, **new_filters) + ']'
+                subs[poss_filter] += ' [' + _linkRecent('filter', type, 0, **new_filters) + ']'
         output.append("""\
         <tr>
           <td style='background-color: %(bgcol)s;'>%(date)s</td>
           <td style='background-color: %(bgcol)s;'>%(rev)s</td>
           <td style='background-color: %(bgcol)s;'>%(build_type)s</td>
           <td style='background-color: %(bgcol)s;'>%(machine)s</td>
+          <td style='background-color: %(bgcol)s;'>%(targets)s</td>
           <td style='background-color: %(status_col)s;'>%(status)s</td>
         </tr>
 """ % subs)
     output.append("  </table>\n")
-
-    if start > 0:
-        output.append(_linkRecent('Previous page', type, start=start-n_per_page, **filters) + " ")
-    if filters:
-        output.append(_linkRecent('Remove filters', type, start=start) + " ")
-    if total_num_of_builds > start+n_per_page:
-        output.append(_linkRecent('Next page', type, start=start+n_per_page, **filters))
-
+    add_nav_links()
     if type == 'nightly':
         output.append('<p><a href="/out/latest-nightly">Latest nightly build log.</a></p>')
     elif type == 'continuous':
@@ -323,6 +325,7 @@ def _summary(req, type, revision, machine=None, buildType=None):
         buildTypesModule = _importBuildTypesModule(revision)
         build = _getBuildObject(buildTypesModule, buildType)
     testsuite_status, overall_status, colour, runtime, graphs = _getTestStatus(test_set_dir, build)
+    targets = _getBuildTargets(test_set_dir)
     # Store overall status for the standalone script case
     if _standalone:
         global _overall_status
@@ -363,6 +366,7 @@ def _summary(req, type, revision, machine=None, buildType=None):
     Overall status: %s<br />
     Build type: %s<br />
     Machine: %s<br />
+    Targets: %s<br />
     %s
     <table border="1">
         <tr>
@@ -371,8 +375,8 @@ def _summary(req, type, revision, machine=None, buildType=None):
           <th>Run Time</th>
           %s
         </tr>
-""" % (_linkRevision(revision), date, _colourText(overall_status, colour),
-           _linkBuildType(buildType, revision), machine, build_log, extra_cols))
+""" % (_linkRevision(revision, changes=True), date, _colourText(overall_status, colour),
+       _linkBuildType(buildType, revision), machine, targets, build_log, extra_cols))
     
     # Display the status of each test suite, in alphabetical order
     testsuites = testsuite_status.keys()
@@ -783,12 +787,13 @@ _testSummaryRegexp = re.compile(r' *Overall status: <span style="color: (\w+);">
 def _getTestSummary(test_set_dir, build):
     """
     Return a summary of the status of tests in the given directory,
-    as a tuple of strings (overall_status, colour).
+    as a tuple of strings (targets, overall_status, colour).
 
     Does this by parsing the index.html page in the directory, looking
     for the overall status line.
     If this file doesn't exist or parsing fails, will fall back to
     using _getTestStatus.
+    Target information is retrieved from the info.log file, if present.
     """
     index_path = os.path.join(test_set_dir, 'index.html')
     parsed_ok = False
@@ -809,7 +814,27 @@ def _getTestSummary(test_set_dir, build):
             overall_status, colour = _checkBuildFailure(test_set_dir, overall_status, colour)
     if not parsed_ok:
         overall_status, colour = _getTestStatus(test_set_dir, build, True)
-    return overall_status, colour
+    targets = _getBuildTargets(test_set_dir)
+    return targets, overall_status, colour
+
+def _getBuildTargets(resultsDir):
+    """Get the targets that were requested on the build command line, if known.
+    
+    It parses the info.log file, if present, to obtain them.
+    """
+    targets = ''
+    info_path = os.path.join(resultsDir, 'info.log')
+    try:
+        info_file = open(info_path)
+        for line in info_file:
+            if line.startswith('Targets:'):
+                targets = line[8:].strip()
+                break
+        info_file.close()
+    except:
+        pass
+    return targets
+
 
 _sconstruct_traceback_re = re.compile(r'  File ".*SConstruct", line ')
 def _checkBuildFailure(test_set_dir, overall_status, colour):
@@ -870,8 +895,7 @@ def _getTestStatus(test_set_dir, build, summary=False):
             testsuite_status[testsuite] = d['status']
             if not summary:
                 runtime[testsuite] = d['runtime']
-    overall_status, colour = _overallStatus(testsuite_status,
-                                              build)
+    overall_status, colour = _overallStatus(testsuite_status, build)
 
     # Check for build failure
     overall_status, colour = _checkBuildFailure(test_set_dir, overall_status, colour)
@@ -915,7 +939,7 @@ def _overallStatus(statuses, build):
         else:
             warnstr = ""
         if components:
-            warnstr += " (" + ','.join(components) + ")"
+            warnstr += " (" + ', '.join(components) + ")"
         result = "Failed %d out of %d test suites%s" % (failed, total, warnstr)
         colour = "red"
     elif warnings > 0:
@@ -996,20 +1020,26 @@ def _linkRecent(text, type, start, **filters):
         query += '&amp;%s=%s' % extra_arg
     return '<a href="%s/%s">%s</a>' % (_our_url, query, text)
 
-def _linkRevision(revision):
+def _linkRevision(revision, changes=False):
     "Return a link tag to the source browser for this revision."
-    if revision == 'working copy':
+    try:
+        revision = int(revision)
+    except:
         return revision
-    return '<a href="%s?rev=%s">%s</a>' % (_source_browser_url,
-                                             revision, revision)
+    link = '<a href="%s?rev=%d">%d</a>' % (_source_browser_url, revision, revision)
+    if changes:
+        link += ' [%s]' % _linkChangeset(revision, 'changes')
+    return link
 
-def _linkChangeset(revision):
+def _linkChangeset(revision, text=None):
     """Return a link tag to the changes in this revision."""
     try:
         revision = int(revision)
     except:
         return revision
-    return '<a href="%schangeset/%d">%d</a>' % (_trac_url, revision, revision)
+    if text is None:
+        text = str(revision)
+    return '<a href="%schangeset/%d">%s</a>' % (_trac_url, revision, text)
 
 def _linkBuildType(buildType, revision):
     "Return a link tag to the detailed info page for this build type."
@@ -1030,7 +1060,7 @@ def _linkSummary(text, type, revision, machine, buildType):
     return '<a href="%s/summary?%s">%s</a>' % (_our_url, query, text)
 
 def _linkTestSuite(type, revision, machine, buildType, testsuite,
-                       status, runtime, build, linkText=None):
+                   status, runtime, build, linkText=None):
     """
     Return a link tag to a page displaying the output from a single
     test suite.
@@ -1049,7 +1079,7 @@ def _linkTestSuite(type, revision, machine, buildType, testsuite,
     return link
 
 def _linkGraph(type, revision, machine, buildType, graphFilename,
-                   linkText='Profile callgraph'):
+               linkText='Profile callgraph'):
     """
     Return a link tag in a <td> to the graphics file which contains the graph.
     """

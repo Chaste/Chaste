@@ -1345,7 +1345,10 @@ def GetBuildType(buildType):
         # Check failing tests
         classname = 'GccDebug'
         extras = ['onlytests', 'Failing'] + extras
-    exec "obj = %s('%s')" % (classname, buildType)
+    try:
+        exec "obj = %s('%s')" % (classname, buildType)
+    except Exception, e:
+        raise ValueError("Invalid build type '%s': %s" % (buildType, str(e)))
     
     for extra in extras:
         if extra == 'report':
