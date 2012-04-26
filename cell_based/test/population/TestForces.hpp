@@ -1295,7 +1295,7 @@ public:
             node_forces.push_back(zero_vector<double>(2));
         }
 
-        double variance;
+        double variance=0.0;
         // Loop over time iterations
         unsigned number_iteration=1000u;
         for (unsigned i=0; i<number_iteration; i++)
@@ -1310,9 +1310,9 @@ public:
             variance+=pow(norm_2(node_forces[0]),2);
         }
 
-        int dim=2;
-        variance/=number_iteration*2*dim*diffusion_force.GetDiffusionConstant()*SimulationTime::Instance()->GetTimeStep();
-        TS_ASSERT_DELTA(variance,1.0,1e-1)
+        int dim = 2;
+        variance /= number_iteration*2*dim*diffusion_force.GetDiffusionConstant()*SimulationTime::Instance()->GetTimeStep();
+        TS_ASSERT_DELTA(variance, 1.0, 1e-1)
 
         // When the node-only mesh goes out of scope, then it's a different set of nodes that get destroyed
         for (unsigned i=0; i<nodes.size(); i++)
@@ -1361,7 +1361,7 @@ public:
             node_forces.push_back(zero_vector<double>(3));
         }
 
-        double variance;
+        double variance=0.0;
         // Loop over time iterations
         unsigned number_iteration=1000u;
         for (unsigned i=0; i<number_iteration; i++)
@@ -1377,8 +1377,8 @@ public:
         }
 
         int dim=3;
-        variance/=number_iteration*2*dim*diffusion_force.GetDiffusionConstant()*SimulationTime::Instance()->GetTimeStep();
-        TS_ASSERT_DELTA(variance,1.0,1e-1)
+        variance /= number_iteration*2*dim*diffusion_force.GetDiffusionConstant()*SimulationTime::Instance()->GetTimeStep();
+        TS_ASSERT_DELTA(variance, 1.0, 1e-1)
 
         // When the node-only mesh goes out of scope, then it's a different set of nodes that get destroyed
         for (unsigned i=0; i<nodes.size(); i++)
