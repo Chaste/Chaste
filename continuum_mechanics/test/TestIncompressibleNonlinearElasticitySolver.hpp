@@ -823,25 +823,24 @@ public:
                 // Check output files were created: the standard output files initial.nodes and solution.nodes, the extra newton iteration
                 // output files created as SetWriteOutputEachNewtonIteration() was called above, and the cmgui files created as
                 // CreateCmguiOutput() was called above.
-                std::string command
-                   = "ls " + OutputFileHandler::GetChasteTestOutputDirectory() + "nonlin_elas_functional_data/initial.nodes > /dev/null";
-                TS_ASSERT_EQUALS(system(command.c_str()), 0);
-                command = "ls " + OutputFileHandler::GetChasteTestOutputDirectory() + "nonlin_elas_functional_data/solution.nodes > /dev/null";
-                TS_ASSERT_EQUALS(system(command.c_str()), 0);
-                command = "ls " + OutputFileHandler::GetChasteTestOutputDirectory() + "nonlin_elas_functional_data/newton_iteration_3.nodes > /dev/null";
-                TS_ASSERT_EQUALS(system(command.c_str()), 0);
-                command = "ls " + OutputFileHandler::GetChasteTestOutputDirectory() + "nonlin_elas_functional_data/cmgui/solution_0.exelem > /dev/null";
-                TS_ASSERT_EQUALS(system(command.c_str()), 0);
-                command = "ls " + OutputFileHandler::GetChasteTestOutputDirectory() + "nonlin_elas_functional_data/cmgui/solution_0.exnode > /dev/null";
-                TS_ASSERT_EQUALS(system(command.c_str()), 0);
-                command = "ls " + OutputFileHandler::GetChasteTestOutputDirectory() + "nonlin_elas_functional_data/cmgui/solution_1.exnode > /dev/null";
-                TS_ASSERT_EQUALS(system(command.c_str()), 0);
+                FileFinder init_file("nonlin_elas_functional_data/initial.nodes", RelativeTo::ChasteTestOutput);
+                TS_ASSERT(init_file.Exists());
+                FileFinder nodes_file("nonlin_elas_functional_data/solution.nodes", RelativeTo::ChasteTestOutput);
+				TS_ASSERT(nodes_file.Exists());
+                FileFinder newton_file("nonlin_elas_functional_data/newton_iteration_3.nodes", RelativeTo::ChasteTestOutput);
+				TS_ASSERT(newton_file.Exists());
+                FileFinder exelem_file("nonlin_elas_functional_data/solution_0.exelem", RelativeTo::ChasteTestOutput);
+				TS_ASSERT(exelem_file.Exists());
+                FileFinder exnode0_file("nonlin_elas_functional_data/solution_0.exnode", RelativeTo::ChasteTestOutput);
+				TS_ASSERT(exnode0_file.Exists());
+                FileFinder exnode1_file("nonlin_elas_functional_data/solution_1.exnode", RelativeTo::ChasteTestOutput);
+				TS_ASSERT(exnode1_file.Exists());
 
-                #ifdef CHASTE_VTK
-                //Check the Vtk file
-                command = "ls " + OutputFileHandler::GetChasteTestOutputDirectory() + "nonlin_elas_functional_data/vtk/solution.vtu > /dev/null";
-                TS_ASSERT_EQUALS(system(command.c_str()), 0);
-                #endif
+#ifdef CHASTE_VTK
+                //Check the VTK file exists
+                FileFinder vtk_file("nonlin_elas_functional_data/vtk/solution.vtu", RelativeTo::ChasteTestOutput);
+                TS_ASSERT(vtk_file.Exists());
+#endif
 
                 solver.rGetCurrentSolution().clear();
                 solver.rGetCurrentSolution().resize(solver.mNumDofs, 0.0);
@@ -1199,8 +1198,8 @@ public:
         }
     }
 
-    //This is purely to ensure converage of vtk output in 3d
-    void TestVtkConverage3d() throw(Exception)
+    //This is purely to ensure coverage of vtk output in 3d
+    void TestVtkCoverage3d() throw(Exception)
     {
        QuadraticMesh<3> mesh;
        TrianglesMeshReader<3,3> mesh_reader1("mesh/test/data/3D_Single_tetrahedron_element_quadratic",2,1,false);
@@ -1220,11 +1219,11 @@ public:
        solver.Solve();
        solver.CreateVtkOutput();
 
-       //Check the Vtk file
-       #ifdef CHASTE_VTK
-       std::string command = "ls " + OutputFileHandler::GetChasteTestOutputDirectory() + "nonlin_elas_functional_data/vtk/solution.vtu > /dev/null";
-       TS_ASSERT_EQUALS(system(command.c_str()), 0);
-       #endif
+#ifdef CHASTE_VTK
+		//Check the VTK file exists
+		FileFinder vtk_file("nonlin_elas_functional_data/vtk/solution.vtu", RelativeTo::ChasteTestOutput);
+		TS_ASSERT(vtk_file.Exists());
+#endif
     }
 
 

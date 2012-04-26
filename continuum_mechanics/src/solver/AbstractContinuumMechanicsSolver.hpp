@@ -48,6 +48,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscTools.hpp"
 #include "MechanicsEventHandler.hpp"
 #include "CommandLineArguments.hpp"
+#include "VtkMeshWriter.hpp"
+
 
 /**
  *  Simple enumeration for options that can be passed into
@@ -232,7 +234,7 @@ protected:
      * the pressure, so pressure is solved for at each vertex, not at internal nodes (which are for
      * quadratic basis functions).
      *
-     * The presure variables for non-vertex nodes are therefore dummy variables. This method enforces the
+     * The pressure variables for non-vertex nodes are therefore dummy variables. This method enforces the
      * condition P_i=0, where i corresponds to a non-vertex node.
      *
      * The first input parameter should be one of the following
@@ -326,6 +328,11 @@ public:
      * @param writeOutput (defaults to true)
      */
     void SetWriteOutput(bool writeOutput=true);
+
+    /**
+     * Convert the output to vtk format (placed in a folder called vtk in the output directory).
+     */
+    void CreateVtkOutput();
 
     /**
      * Get the current solution vector (advanced use only - for getting the deformed position use
@@ -501,6 +508,57 @@ void AbstractContinuumMechanicsSolver<DIM>::SetWriteOutput(bool writeOutput)
         EXCEPTION("Can't write output if no output directory was given in constructor");
     }
     mWriteOutput = writeOutput;
+}
+
+template<unsigned DIM>
+void AbstractContinuumMechanicsSolver<DIM>::CreateVtkOutput()
+{
+    if (this->mOutputDirectory=="")
+    {
+        EXCEPTION("No output directory was given so no output was written, cannot convert to VTK format");
+    }
+#ifdef CHASTE_VTK
+    VtkMeshWriter<DIM, DIM> mesh_writer(this->mOutputDirectory + "/vtk", "solution", true);
+
+    //Output the deformed node locations. Note that these are output as PointData,
+    //the deformed mesh can be viewed in Paraview by applying a `Calculator` filter,
+    //selecting `Coordinate Results` and specifying `iHat*x0 + jHat*x1 + kHat*x2`
+    //in the calculation field.
+    std::vector<c_vector<double,DIM> >& deformed_soln = this->rGetSpatialSolution();
+
+    std::vector<double> deformed_x;
+    std::vector<double> deformed_y;
+    std::vector<double> deformed_z;
+
+    for(unsigned i = 0; i < deformed_soln.size(); ++i)
+    {
+        deformed_x.push_back(deformed_soln[i][0]);
+        deformed_y.push_back(deformed_soln[i][1]);
+        if(DIM == 3)
+        {
+            deformed_z.push_back(deformed_soln[i][2]);
+        }
+    }
+
+    mesh_writer.AddPointData("x0", deformed_x);
+    mesh_writer.AddPointData("x1", deformed_y);
+    if(DIM == 3)
+    {
+        mesh_writer.AddPointData("x2", deformed_z);
+    }
+
+    //Output the element attribute as cell data.
+    std::vector<double> element_attribute;
+    for(typename QuadraticMesh<DIM>::ElementIterator iter = this->mrQuadMesh.GetElementIteratorBegin();
+        iter != this->mrQuadMesh.GetElementIteratorEnd();
+        ++iter)
+    {
+        element_attribute.push_back(iter->GetAttribute());
+    }
+    mesh_writer.AddCellData("Attribute", element_attribute);
+
+    mesh_writer.WriteFilesUsingMesh(this->mrQuadMesh);
+#endif
 }
 
 

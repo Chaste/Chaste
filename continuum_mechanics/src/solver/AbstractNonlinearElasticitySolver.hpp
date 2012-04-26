@@ -45,12 +45,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ReplicatableVector.hpp"
 #include "FourthOrderTensor.hpp"
 #include "CmguiDeformedSolutionsWriter.hpp"
-#include "VtkMeshWriter.hpp"
 #include "AbstractMaterialLaw.hpp"
 #include "QuadraticBasisFunction.hpp"
 #include "SolidMechanicsProblemDefinition.hpp"
 #include "Timer.hpp"
-#include "VtkMeshWriter.hpp"
 #include "petscsnes.h"
 
 
@@ -607,11 +605,6 @@ public:
      */
     void CreateCmguiOutput();
 
-    /**
-     * Convert the output to vtk format (placed in a folder called vtk in the output directory).
-     */
-    void CreateVtkOutput();
-
 
     /**
      * Write the deformation gradients for each element (evaluated at the centroids of each element)
@@ -865,58 +858,6 @@ void AbstractNonlinearElasticitySolver<DIM>::CreateCmguiOutput()
     writer.WriteInitialMesh(); // this writes solution_0.exnode and .exelem
     writer.WriteDeformationPositions(r_deformed_positions, 1); // this writes the final solution as solution_1.exnode
     writer.WriteCmguiScript(); // writes LoadSolutions.com
-}
-
-
-template<unsigned DIM>
-void AbstractNonlinearElasticitySolver<DIM>::CreateVtkOutput()
-{
-    if (this->mOutputDirectory=="")
-    {
-        EXCEPTION("No output directory was given so no output was written, cannot convert to VTK format");
-    }
-#ifdef CHASTE_VTK
-    VtkMeshWriter<DIM, DIM> mesh_writer(this->mOutputDirectory + "/vtk", "solution", true);
-
-    //Output the deformed node locations. Note that these are output as PointData,
-    //the deformed mesh can be viewed in Paraview by applying a `Calculator` filter,
-    //selecting `Coordinate Results` and specifying `iHat*x0 + jHat*x1 + kHat*x2`
-    //in the calculation field.
-    std::vector<c_vector<double,DIM> >& deformed_soln = this->rGetSpatialSolution();
-
-    std::vector<double> deformed_x;
-    std::vector<double> deformed_y;
-    std::vector<double> deformed_z;
-
-    for(unsigned i = 0; i < deformed_soln.size(); ++i)
-    {
-        deformed_x.push_back(deformed_soln[i][0]);
-        deformed_y.push_back(deformed_soln[i][1]);
-        if(DIM == 3)
-        {
-            deformed_z.push_back(deformed_soln[i][2]);
-        }
-    }
-
-    mesh_writer.AddPointData("x0", deformed_x);
-    mesh_writer.AddPointData("x1", deformed_y);
-    if(DIM == 3)
-    {
-        mesh_writer.AddPointData("x2", deformed_z);
-    }
-
-    //Output the element attribute as cell data.
-    std::vector<double> element_attribute;
-    for(typename QuadraticMesh<DIM>::ElementIterator iter = this->mrQuadMesh.GetElementIteratorBegin();
-        iter != this->mrQuadMesh.GetElementIteratorEnd();
-        ++iter)
-    {
-        element_attribute.push_back(iter->GetAttribute());
-    }
-    mesh_writer.AddCellData("Attribute", element_attribute);
-
-    mesh_writer.WriteFilesUsingMesh(this->mrQuadMesh);
-#endif
 }
 
 template<unsigned DIM>

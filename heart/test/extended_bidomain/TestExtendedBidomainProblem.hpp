@@ -269,10 +269,8 @@ public:
             }
 
             //check the extra files for extra variables are there (the content is tested in the converter's tests)
-            std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
-            std::string command = "ls " + test_output_directory + dir
-                       + "/output/"+ filename +"_"+ output_variables[i] + ".dat ";
-             TS_ASSERT_EQUALS(system(command.c_str()), 0);
+            FileFinder file(dir + "/output/"+ filename +"_"+ output_variables[i] + ".dat", RelativeTo::ChasteTestOutput);
+            TS_ASSERT(file.Exists());
         }
     }
 };

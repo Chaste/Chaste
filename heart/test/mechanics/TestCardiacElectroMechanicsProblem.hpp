@@ -274,29 +274,18 @@ public:
         NumericFileComparison comparer(handler.GetOutputDirectoryFullPath() + "watched.txt","heart/test/data/good_watched.txt");
         TS_ASSERT(comparer.CompareFiles(1e-2));
 
-        // check electrics output was written
-        std::string command = "ls " + handler.GetOutputDirectoryFullPath() + "/electrics";
-        TS_ASSERT_EQUALS(system(command.c_str()), 0);
+        FileFinder electrics_dir = handler.FindFile("electrics");
+        TS_ASSERT(electrics_dir.IsDir());
 
         if(PetscTools::IsSequential())
         {
-			command = "ls " + handler.GetOutputDirectoryFullPath() + "/deformation/deformation_gradient_0.strain";
-			TS_ASSERT_EQUALS(system(command.c_str()), 0);
-
-			command = "ls " + handler.GetOutputDirectoryFullPath() + "/deformation/deformation_gradient_3.strain";
-			TS_ASSERT_EQUALS(system(command.c_str()), 0);
-
-			command = "ls " + handler.GetOutputDirectoryFullPath() + "/deformation/deformation_gradient_6.strain";
-			TS_ASSERT_EQUALS(system(command.c_str()), 0);
-
-			command = "ls " + handler.GetOutputDirectoryFullPath() + "/deformation/second_PK_0.stress";
-			TS_ASSERT_EQUALS(system(command.c_str()), 0);
-
-			command = "ls " + handler.GetOutputDirectoryFullPath() + "/deformation/second_PK_3.stress";
-			TS_ASSERT_EQUALS(system(command.c_str()), 0);
-
-			command = "ls " + handler.GetOutputDirectoryFullPath() + "/deformation/second_PK_6.stress";
-			TS_ASSERT_EQUALS(system(command.c_str()), 0);
+        	// check electrics output was written
+            TS_ASSERT(handler.FindFile("deformation/deformation_gradient_0.strain").Exists());
+            TS_ASSERT(handler.FindFile("deformation/deformation_gradient_3.strain").Exists());
+            TS_ASSERT(handler.FindFile("deformation/deformation_gradient_6.strain").Exists());
+            TS_ASSERT(handler.FindFile("deformation/second_PK_0.stress").Exists());
+            TS_ASSERT(handler.FindFile("deformation/second_PK_3.stress").Exists());
+            TS_ASSERT(handler.FindFile("deformation/second_PK_6.stress").Exists());
         }
 
 

@@ -486,6 +486,14 @@ public:
 
         solver.Solve();
 
+        solver.CreateVtkOutput();
+#ifdef CHASTE_VTK
+		//Check the VTK file exists
+		FileFinder vtk_file("LidDrivenCavityStokesFlow/vtk/solution.vtu", RelativeTo::ChasteTestOutput);
+		TS_ASSERT(vtk_file.Exists());
+#endif
+
+
         double min_u = DBL_MAX;
         double max_u = -DBL_MAX;
         double min_v = DBL_MAX;
@@ -651,6 +659,12 @@ public:
 //        solver.SetKspAbsoluteTolerance(1e-10);
 
         solver.Solve();
+        solver.CreateVtkOutput();
+#ifdef CHASTE_VTK
+		//Check the VTK file exists
+		FileFinder vtk_file("LidDrivenCavityStokesFlow3d/vtk/solution.vtu", RelativeTo::ChasteTestOutput);
+		TS_ASSERT(vtk_file.Exists());
+#endif
 
         std::vector<c_vector<double,3> >& r_solution = solver.rGetVelocities();
 

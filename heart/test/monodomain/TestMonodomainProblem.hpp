@@ -230,7 +230,8 @@ public:
         monodomain_problem.GetTissue();
 
         // check a progress report exists
-        TS_ASSERT_EQUALS(system(("ls " + OutputFileHandler::GetChasteTestOutputDirectory() + "MonoProblem1d/").c_str()), 0);
+        OutputFileHandler handler("MonoProblem1d", false);
+        TS_ASSERT(handler.FindFile("progress_status.txt").Exists());
     }
 
 
@@ -323,7 +324,9 @@ public:
         monodomain_problem.GetTissue();
 
         // check a progress report exists
-        TS_ASSERT_EQUALS(system(("ls " + OutputFileHandler::GetChasteTestOutputDirectory() + "MonoProblem1din3d/").c_str()), 0);
+        OutputFileHandler handler("MonoProblem1din3d", false);
+        TS_ASSERT(handler.FindFile("progress_status.txt").Exists());
+
     }
 
     // NOTE: This test uses NON-PHYSIOLOGICAL parameters values (conductivities,
@@ -1093,8 +1096,9 @@ public:
                 //Shouldn't differ from the original run at all
                 TS_ASSERT_DELTA(voltage_replicated[index], mVoltageReplicated1d2ms[index],  5e-11);
             }
-            // check a progress report (or something) exists - in a noisy way
-            TS_ASSERT_EQUALS(system(("ls " + OutputFileHandler::GetChasteTestOutputDirectory() + "MonoProblemArchive/").c_str()), 0);
+            // check a progress report exists
+            OutputFileHandler handler("MonoProblemArchive", false);
+            TS_ASSERT(handler.FindFile("progress_status.txt").Exists());
 
             // check output file contains results for the whole simulation
             TS_ASSERT(CompareFilesViaHdf5DataReader("MonoProblemArchive", "MonodomainLR91_1d", true,
