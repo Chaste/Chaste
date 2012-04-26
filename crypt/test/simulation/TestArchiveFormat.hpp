@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellBasedSimulationArchiver.hpp"
 
 #include <iomanip>
+#include <boost/foreach.hpp>
 #include "CryptSimulation2d.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "CylindricalHoneycombMeshGenerator.hpp"
@@ -92,18 +93,17 @@ public:
         // Simulation time at which the stored results were archived
         double t = 150;
 
-        // Open a new directory
-        OutputFileHandler file_handler(test_to_profile, true);
-
         // The archive must be copied from crypt/test/data/<test_to_profile>
-        // to the testoutput directory to continue running the simulation
-        std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
-        std::string test_data_directory = "crypt/test/data/" + test_to_profile +"/";
-        std::string command = "cp -Rf --remove-destination " + test_data_directory +" "+ test_output_directory +"/";
+        FileFinder test_data_directory("crypt/test/data/" + test_to_profile + "/archive",RelativeTo::ChasteSourceRoot);
+        TS_ASSERT(test_data_directory.IsDir());
 
-        // Test that the above command was implemented successfully
-        int return_value = system(command.c_str());
-        TS_ASSERT_EQUALS(return_value, 0);
+        // to the testoutput/archive directory to continue running the simulation
+        OutputFileHandler archive_handler(test_to_profile + "/archive");
+
+        BOOST_FOREACH(FileFinder temp_file, test_data_directory.FindMatches("*"))
+        {
+            archive_handler.CopyFileTo(temp_file);
+        }
 
         // Load and run crypt simulation
         CryptSimulation2d* p_simulator = CellBasedSimulationArchiver<2, CryptSimulation2d>::Load(test_to_profile,t);
