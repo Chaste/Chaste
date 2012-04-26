@@ -124,7 +124,7 @@ protected:
     GaussianQuadratureRule<DIM-1>* mpBoundaryQuadratureRule;
 
     /**
-     * This is equal to either COMPRESSIBLE or INCOMPRESSIBLE (see enumeration defined at top of file)
+     * This is equal to either COMPRESSIBLE or INCOMPRESSIBLE (see enumeration class)
      * and is only used in computing mNumDofs and allocating matrix memory.
      */
     CompressibilityType mCompressibilityType;
@@ -331,8 +331,9 @@ public:
 
     /**
      * Convert the output to vtk format (placed in a folder called vtk in the output directory).
+     * @param spatialSolutionName is used to identify the spatial solution as a velocity, displacement...
      */
-    void CreateVtkOutput();
+    void CreateVtkOutput(std::string spatialSolutionName="Spatial solution");
 
     /**
      * Get the current solution vector (advanced use only - for getting the deformed position use
@@ -511,7 +512,7 @@ void AbstractContinuumMechanicsSolver<DIM>::SetWriteOutput(bool writeOutput)
 }
 
 template<unsigned DIM>
-void AbstractContinuumMechanicsSolver<DIM>::CreateVtkOutput()
+void AbstractContinuumMechanicsSolver<DIM>::CreateVtkOutput(std::string spatialSolutionName)
 {
     if (this->mOutputDirectory=="")
     {
@@ -520,31 +521,11 @@ void AbstractContinuumMechanicsSolver<DIM>::CreateVtkOutput()
 #ifdef CHASTE_VTK
     VtkMeshWriter<DIM, DIM> mesh_writer(this->mOutputDirectory + "/vtk", "solution", true);
 
-    //Output the deformed node locations. Note that these are output as PointData,
-    //the deformed mesh can be viewed in Paraview by applying a `Calculator` filter,
-    //selecting `Coordinate Results` and specifying `iHat*x0 + jHat*x1 + kHat*x2`
-    //in the calculation field.
-    std::vector<c_vector<double,DIM> >& deformed_soln = this->rGetSpatialSolution();
+	mesh_writer.AddPointData(spatialSolutionName, this->rGetSpatialSolution());
 
-    std::vector<double> deformed_x;
-    std::vector<double> deformed_y;
-    std::vector<double> deformed_z;
-
-    for(unsigned i = 0; i < deformed_soln.size(); ++i)
+    if (mCompressibilityType==INCOMPRESSIBLE)
     {
-        deformed_x.push_back(deformed_soln[i][0]);
-        deformed_y.push_back(deformed_soln[i][1]);
-        if(DIM == 3)
-        {
-            deformed_z.push_back(deformed_soln[i][2]);
-        }
-    }
-
-    mesh_writer.AddPointData("x0", deformed_x);
-    mesh_writer.AddPointData("x1", deformed_y);
-    if(DIM == 3)
-    {
-        mesh_writer.AddPointData("x2", deformed_z);
+    	mesh_writer.AddPointData("Pressure", rGetPressures());
     }
 
     //Output the element attribute as cell data.

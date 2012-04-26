@@ -397,7 +397,7 @@ public:
         TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(), 0u);
 
         TS_ASSERT_THROWS_CONTAINS(solver.CreateCmguiOutput(), "No output directory was given");
-        TS_ASSERT_THROWS_CONTAINS(solver.CreateVtkOutput(), "No output directory was given");
+        TS_ASSERT_THROWS_CONTAINS(solver.CreateVtkOutput("Displacement"), "No output directory was given");
 
         // get deformed position
         std::vector<c_vector<double,2> >& r_deformed_position
@@ -793,7 +793,7 @@ public:
             solver.CreateCmguiOutput();
 
             // check CreateVtkOutput() - call and later check that output files were written
-            solver.CreateVtkOutput();
+            solver.CreateVtkOutput("Displacement");
 
             std::vector<c_vector<double,2> >& r_solution = solver.rGetDeformedPosition();
 
@@ -829,11 +829,11 @@ public:
 				TS_ASSERT(nodes_file.Exists());
                 FileFinder newton_file("nonlin_elas_functional_data/newton_iteration_3.nodes", RelativeTo::ChasteTestOutput);
 				TS_ASSERT(newton_file.Exists());
-                FileFinder exelem_file("nonlin_elas_functional_data/solution_0.exelem", RelativeTo::ChasteTestOutput);
+                FileFinder exelem_file("nonlin_elas_functional_data/cmgui/solution_0.exelem", RelativeTo::ChasteTestOutput);
 				TS_ASSERT(exelem_file.Exists());
-                FileFinder exnode0_file("nonlin_elas_functional_data/solution_0.exnode", RelativeTo::ChasteTestOutput);
+                FileFinder exnode0_file("nonlin_elas_functional_data/cmgui/solution_0.exnode", RelativeTo::ChasteTestOutput);
 				TS_ASSERT(exnode0_file.Exists());
-                FileFinder exnode1_file("nonlin_elas_functional_data/solution_1.exnode", RelativeTo::ChasteTestOutput);
+                FileFinder exnode1_file("nonlin_elas_functional_data/cmgui/solution_1.exnode", RelativeTo::ChasteTestOutput);
 				TS_ASSERT(exnode1_file.Exists());
 
 #ifdef CHASTE_VTK
@@ -1217,7 +1217,7 @@ public:
                                                          problem_defn,
                                                          "TestIncompressibleNonlinearElasticitySolver");
        solver.Solve();
-       solver.CreateVtkOutput();
+       solver.CreateVtkOutput("Displacement");
 
 #ifdef CHASTE_VTK
 		//Check the VTK file exists

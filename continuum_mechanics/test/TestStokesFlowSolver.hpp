@@ -486,7 +486,7 @@ public:
 
         solver.Solve();
 
-        solver.CreateVtkOutput();
+        solver.CreateVtkOutput("Velocity");
 #ifdef CHASTE_VTK
 		//Check the VTK file exists
 		FileFinder vtk_file("LidDrivenCavityStokesFlow/vtk/solution.vtu", RelativeTo::ChasteTestOutput);
@@ -659,7 +659,7 @@ public:
 //        solver.SetKspAbsoluteTolerance(1e-10);
 
         solver.Solve();
-        solver.CreateVtkOutput();
+        solver.CreateVtkOutput("Velocity");
 #ifdef CHASTE_VTK
 		//Check the VTK file exists
 		FileFinder vtk_file("LidDrivenCavityStokesFlow3d/vtk/solution.vtu", RelativeTo::ChasteTestOutput);
