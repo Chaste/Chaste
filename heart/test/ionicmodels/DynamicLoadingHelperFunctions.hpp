@@ -42,55 +42,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscTools.hpp"
 #include "OutputFileHandler.hpp"
 #include "FileFinder.hpp"
-#include "Exception.hpp"
 #include "DynamicCellModelLoader.hpp"
 #include "AbstractCardiacCellInterface.hpp"
 #include "EulerIvpOdeSolver.hpp"
 #include "SimpleStimulus.hpp"
 #include "AbstractDynamicallyLoadableEntity.hpp"
-
-/**
- * Create a PyCml options file for the given model.
- *
- * @param rHandler  where to create the file
- * @param rModelName  base name of the model file (which will be "rModelName.cellml")
- * @param rArgs  extra command-line arguments for the model conversion
- * @param rExtraXml  any extra XML to go in the config file (e.g. LT settings)
- */
-void CreateOptionsFile(const OutputFileHandler& rHandler,
-                       const std::string& rModelName,
-                       const std::vector<std::string>& rArgs,
-                       const std::string& rExtraXml="")
-{
-    if (PetscTools::AmMaster())
-    {
-        out_stream p_optfile = rHandler.OpenOutputFile(rModelName + "-conf.xml");
-        (*p_optfile) << "<?xml version='1.0'?>" << std::endl
-                     << "<pycml_config>" << std::endl
-                     << "<command_line_args>" << std::endl;
-        for (unsigned i=0; i<rArgs.size(); i++)
-        {
-            (*p_optfile) << "<arg>" << rArgs[i] << "</arg>" << std::endl;
-        }
-        (*p_optfile) << "</command_line_args>" << std::endl
-                     << rExtraXml
-                     << "</pycml_config>" << std::endl;
-        p_optfile->close();
-    }
-    PetscTools::Barrier("CreateOptionsFile");
-}
-
-/**
- * Copy a file.
- *
- * @param rDestDir  the folder to copy to
- * @param rSourceFile  the file to copy
- */
-void CopyFile(const OutputFileHandler& rDestDir,
-              const FileFinder& rSourceFile)
-{
-    rDestDir.CopyFileTo(rSourceFile);
-}
 
 /**
  * Create a new cell object from a cell model loader.

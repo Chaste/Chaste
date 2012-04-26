@@ -316,6 +316,7 @@ public:
 #endif
     }
 
+
     void TestArchiving() throw(Exception)
     {
 #ifdef CHASTE_CAN_CHECKPOINT_DLLS

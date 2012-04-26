@@ -199,9 +199,10 @@ public:
 
         TS_ASSERT_EQUALS(num_nodes,num_nodes_from_file);
 
-        std::string command = "wc -l " + filename;
-        int result = system(command.c_str());
-        std::cout<<result<<std::endl;
+        // Nothing appears to be tested here, so commenting it out to remove a system call.
+//        std::string command = "wc -l " + filename;
+//        int result = system(command.c_str());
+//        std::cout<<result<<std::endl;
     }
 
     void TestTrianglesToCoolGraphicsViaMesh()

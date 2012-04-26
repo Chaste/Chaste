@@ -55,6 +55,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCardiacCell.hpp"
 #include "DistributedVectorFactory.hpp"
 #include "Warnings.hpp"
+#include "CellMLToSharedLibraryConverter.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
 
@@ -64,29 +65,29 @@ class TestCardiacSimulation : public CxxTest::TestSuite
     {
         HeartEventHandler::Reset();
     }
-
-    void CreateOptionsFile(const OutputFileHandler& rHandler,
-                           const std::string& rModelName,
-                           const std::vector<std::string>& rArgs,
-                           const std::string& rExtraXml="")
-    {
-        if (PetscTools::AmMaster())
-        {
-            out_stream p_optfile = rHandler.OpenOutputFile(rModelName + "-conf.xml");
-            (*p_optfile) << "<?xml version='1.0'?>" << std::endl
-                         << "<pycml_config>" << std::endl
-                         << "<command_line_args>" << std::endl;
-            for (unsigned i=0; i<rArgs.size(); i++)
-            {
-                (*p_optfile) << "<arg>" << rArgs[i] << "</arg>" << std::endl;
-            }
-            (*p_optfile) << "</command_line_args>" << std::endl
-                         << rExtraXml
-                         << "</pycml_config>" << std::endl;
-            p_optfile->close();
-        }
-        PetscTools::Barrier("CreateOptionsFile");
-    }
+//
+//    void CreateOptionsFile(const OutputFileHandler& rHandler,
+//                           const std::string& rModelName,
+//                           const std::vector<std::string>& rArgs,
+//                           const std::string& rExtraXml="")
+//    {
+//        if (PetscTools::AmMaster())
+//        {
+//            out_stream p_optfile = rHandler.OpenOutputFile(rModelName + "-conf.xml");
+//            (*p_optfile) << "<?xml version='1.0'?>" << std::endl
+//                         << "<pycml_config>" << std::endl
+//                         << "<command_line_args>" << std::endl;
+//            for (unsigned i=0; i<rArgs.size(); i++)
+//            {
+//                (*p_optfile) << "<arg>" << rArgs[i] << "</arg>" << std::endl;
+//            }
+//            (*p_optfile) << "</command_line_args>" << std::endl
+//                         << rExtraXml
+//                         << "</pycml_config>" << std::endl;
+//            p_optfile->close();
+//        }
+//        PetscTools::Barrier("CreateOptionsFile");
+//    }
 public:
 
     void TestMono1dSmall() throw(Exception)
@@ -524,7 +525,7 @@ public:
         PetscTools::Barrier("TestExceptions");
         std::vector<std::string> args;
         args.push_back("--cvode");
-        CreateOptionsFile(handler_cvode, "luo_rudy_1991_dyn", args);
+        CellMLToSharedLibraryConverter::CreateOptionsFile(handler_cvode, "luo_rudy_1991_dyn", args);
         TS_ASSERT_THROWS_THIS(CardiacSimulation simulation("heart/test/data/xml/dynamic_cvode_model.xml"),
                               "CVODE cannot be used as a cell model solver in tissue simulations: do not use the --cvode flag.");
 #endif

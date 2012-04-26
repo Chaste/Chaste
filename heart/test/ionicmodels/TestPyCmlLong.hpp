@@ -198,23 +198,23 @@ private:
         // Copy CellML file (and .out if present) into output dir
         OutputFileHandler handler(rOutputDirName, false);
         FileFinder cellml_file("heart/test/data/cellml/" + rModelName + ".cellml", RelativeTo::ChasteSourceRoot);
-        CopyFile(handler, cellml_file);
+        handler.CopyFileTo(cellml_file);
         FileFinder out_file("heart/test/data/cellml/" + rModelName + ".out", RelativeTo::ChasteSourceRoot);
         if (out_file.Exists())
         {
-            CopyFile(handler, out_file);
+            handler.CopyFileTo(out_file);
         }
 
         // Create options file
         std::vector<std::string> args(rArgs);
 //        args.push_back("--profile");
+        CellMLToSharedLibraryConverter converter(true);
         if (!args.empty())
         {
-            CreateOptionsFile(handler, rModelName, args);
+            converter.CreateOptionsFile(handler, rModelName, args);
         }
 
         // Do the conversion
-        CellMLToSharedLibraryConverter converter(true);
         FileFinder copied_file(rOutputDirName + "/" + rModelName + ".cellml", RelativeTo::ChasteTestOutput);
         DynamicCellModelLoader* p_loader = converter.Convert(copied_file);
         // Apply a stimulus of -40 uA/cm^2 - should work for all models

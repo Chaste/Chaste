@@ -86,7 +86,7 @@ public:
      * @param rArgs  extra command-line arguments for the model conversion
      * @param rExtraXml  any extra XML to go in the config file (e.g. LT settings)
      */
-    void CreateOptionsFile(const OutputFileHandler& rHandler,
+    static void CreateOptionsFile(const OutputFileHandler& rHandler,
                            const std::string& rModelName,
                            const std::vector<std::string>& rArgs,
                            const std::string& rExtraXml="");
