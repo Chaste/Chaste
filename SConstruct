@@ -129,25 +129,22 @@ Export('all_tests')
 compile_only = int(ARGUMENTS.get('compile_only', ARGUMENTS.get('co', 0)))
 Export('compile_only')
 
-# To run a single test suite only, give its path (relative to the Chaste
-# root) as the test_suite=<path> argument.
+# To run a specific test suite only, give the path (relative to the Chaste root) as the test_suite=<path> argument.
 # This will force the test suite to be run even if the source is unchanged.
-single_test_suite = ARGUMENTS.get('test_suite', ARGUMENTS.get('ts', ''))
-if single_test_suite:
-    single_test_suite = single_test_suite.split(os.path.sep)
-    if (len(single_test_suite)<2):
-        raise ValueError('Path to test suite is too short')
-    for i in [-2, -3, -4]:
-        if single_test_suite[i] == 'test':
-            single_test_suite_dir = single_test_suite[i-1]
-            single_test_suite = os.path.sep.join(single_test_suite[i+1:])
+# To run multiple tests in this way, separate the paths by commas.
+requested_tests = filter(None, ARGUMENTS.get('test_suite', ARGUMENTS.get('ts', '')).split(','))
+for test_idx, test_path in enumerate(requested_tests):
+    parts = test_path.split(os.path.sep)
+    if len(parts) < 3:
+        raise ValueError('Path to test suite "%s" is too short' % test_path)
+    for path_idx in range(-2, -len(parts), -1):
+        if parts[path_idx] == 'test':
+            requested_tests[test_idx] = (parts[path_idx-1], os.path.sep.join(parts[path_idx+1:]))
             break
     else:
-        raise ValueError('Test suite is not in a test folder')
-    #print single_test_suite, single_test_suite_dir
-else:
-    single_test_suite_dir = ''
-Export('single_test_suite', 'single_test_suite_dir')
+        raise ValueError('Test suite "%s" is not in a test folder' % test_path)
+    #print requested_tests
+Export('requested_tests')
 
 # Force re-running of all (selected) tests even if the source is unchanged.
 force_test_runs = int(ARGUMENTS.get('force_test_runs', 0))
@@ -314,7 +311,7 @@ env['CHASTE_LIBRARIES'] = {}
 env['CHASTE_OBJECTS'] = {}
 env['UPDATE_CHASTE_PROVENANCE'] = update_provenance
 
-if not single_test_suite:
+if not requested_tests:
     # Default is to build all components, but not user projects
     Default(components)
 
@@ -471,8 +468,9 @@ def RequestedProjects():
     for targ in COMMAND_LINE_TARGETS:
         if str(targ).startswith('projects'):
             projects.append(str(targ))
-    if single_test_suite_dir and single_test_suite_dir in os.listdir('projects'):
-        projects.append(os.path.join('projects', single_test_suite_dir))
+    for req_test in requested_tests:
+        if req_test[0] in os.listdir('projects'):
+            projects.append(os.path.join('projects', req_test[0]))
     return projects
 
 # Test summary generation

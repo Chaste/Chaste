@@ -304,17 +304,16 @@ def DetermineLibraryDependencies(env, partialGraph):
     partialGraph.update(full_graph)
 
 
-def FindTestsToRun(env, build, BUILD_TARGETS,
-                   singleTestSuite, singleTestSuiteDir, allTests,
+def FindTestsToRun(env, build, BUILD_TARGETS, otherVars,
                    component=None, project=None):
     """Find header files defining tests to run.
 
     One of component or project must be specified; this says which Chaste
     component or user project to hunt for tests in.
 
-    If singleTestSuite is set, and singleTestSuiteDir is equal to component
-    (or project), then just run the requested test.
-    If instead allTests is True, then find all tests listed in test packs
+    If otherVars['requested_tests'] is set, then just run those requested test(s)
+    that are in this component (or project).
+    If instead otherVars['all_tests'] is True, then find all tests listed in test packs
     in this component/project.
     Otherwise, if this component (or project) is being built (determined by
     checking BUILD_TARGETS) then search for all tests listed in the test packs
@@ -330,16 +329,16 @@ def FindTestsToRun(env, build, BUILD_TARGETS,
     else:
         component = project
     # Check for a single test
-    if singleTestSuite:
-        #print singleTestSuite, singleTestSuiteDir
-        if singleTestSuiteDir == component:
-            testfiles.add(singleTestSuite)
-            # Remove any old test output file to force a re-run
-            try:
-                base = os.path.splitext(singleTestSuite)[0]
-                os.remove(base + '.log')
-            except OSError:
-                pass
+    if otherVars['requested_tests']:
+        for test_comp, test_path in otherVars['requested_tests']:
+            if test_comp == component:
+                testfiles.add(test_path)
+                # Remove any old test output file to force a re-run
+                try:
+                    base = os.path.splitext(test_path)[0]
+                    os.remove(base + '.log')
+                except OSError:
+                    pass
     else:
         # Are we building this component/project?
         test_this_comp = False
@@ -365,7 +364,7 @@ def FindTestsToRun(env, build, BUILD_TARGETS,
                 test_this_comp = True
                 break
         if test_this_comp:
-            if allTests:
+            if otherVars['all_tests']:
                 pack_names = set()
             else:
                 pack_names = set(build.TestPacks())
@@ -879,9 +878,7 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
     # A list of test suites to run will be found in a test/<name>TestPack.txt file, one per line.
     # Alternatively, a single test suite may have been specified on the command line.
     testfiles = FindTestsToRun(env, otherVars['build'], otherVars['BUILD_TARGETS'],
-                               otherVars['single_test_suite'],
-                               otherVars['single_test_suite_dir'],
-                               otherVars['all_tests'],
+                               otherVars,
                                project=projectName)
     if otherVars['debug']:
         print "  Will run tests:", map(str, testfiles)
@@ -1023,9 +1020,7 @@ def DoComponentSConscript(component, otherVars):
     # file, one per line.
     # Alternatively, a single test suite may have been specified on the command line.
     testfiles = FindTestsToRun(env, otherVars['build'], otherVars['BUILD_TARGETS'],
-                               otherVars['single_test_suite'],
-                               otherVars['single_test_suite_dir'],
-                               otherVars['all_tests'],
+                               otherVars,
                                component=component)
     if otherVars['debug']:
         print "  Will run tests:", map(str, testfiles)

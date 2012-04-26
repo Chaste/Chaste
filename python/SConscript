@@ -49,11 +49,7 @@ os.chdir(curdir)
 # A list of test suites to run will be found in a test/<name>TestPack.txt
 # file, one per line.
 # Alternatively, a single test suite may have been specified on the command line.
-testfiles = SConsTools.FindTestsToRun(env, build, BUILD_TARGETS,
-                                      single_test_suite,
-                                      single_test_suite_dir,
-                                      all_tests,
-                                      component='python')
+testfiles = SConsTools.FindTestsToRun(env, build, BUILD_TARGETS, globals(), component='python')
 
 # Test runner for Python tests needs to use a source scanner
 # to find what Python files we depend on.
