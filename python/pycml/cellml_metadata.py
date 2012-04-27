@@ -109,6 +109,8 @@ METADATA_NAMES = frozenset(
      # I Ks
      'membrane_slow_delayed_rectifier_potassium_current',   
         'membrane_slow_delayed_rectifier_potassium_current_conductance',
+        'membrane_slow_delayed_rectifier_potassium_current_xs1_gate_tau', # (really scaling factor for tau)
+        'membrane_slow_delayed_rectifier_potassium_current_xs2_gate_tau', # (really scaling factor for tau)
      # I_Kur
      'membrane_ultrarapid_delayed_rectifier_potassium_current',
         'membrane_ultrarapid_delayed_rectifier_potassium_current_conductance',
