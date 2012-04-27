@@ -146,8 +146,8 @@ public:
     /**
      * Set the number of cells and number of variables to be stored per cell. This can only be called once so the number of variables does not change.
      *
-     * @param numVars number of variables
      * @param pCellPopulation the cell population
+     * @param numberOfVariables number of variables
      */
     void SetPopulationAndNumVars(AbstractCellPopulation<DIM>* pCellPopulation, unsigned numberOfVariables);
 
