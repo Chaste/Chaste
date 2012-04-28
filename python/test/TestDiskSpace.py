@@ -50,7 +50,7 @@ class TestDiskSpace(unittest.TestCase):
             return
         gb = 1024*1024*1024
         source_free_gb = du(__file__).free / gb
-        test_free_gb = du(os.getenv('CHASTE_TEST_OUTPUT', os.curdir)).free / gb
+        test_free_gb = du(os.path.abspath(os.getenv('CHASTE_TEST_OUTPUT', os.curdir))).free / gb
         print "Free space on Chaste source partition: %dGB" % source_free_gb
         print "Free space on Chaste test output partition: %dGB" % test_free_gb 
         self.failIf(source_free_gb < 10,
