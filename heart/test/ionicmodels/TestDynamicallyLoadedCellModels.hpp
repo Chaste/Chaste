@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sys/stat.h> // For chmod()
 
 #include <cxxtest/TestSuite.h>
-
+#include <boost/assign.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include "ChasteSerialization.hpp"
@@ -58,6 +58,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteBuildRoot.hpp"
 #include "HeartConfig.hpp"
 #include "FileFinder.hpp"
+#include "CellMLLoader.hpp"
 #include "HeartFileFinder.hpp"
 #include "CellMLToSharedLibraryConverter.hpp"
 #include "AbstractDynamicallyLoadableEntity.hpp"
@@ -316,6 +317,29 @@ public:
 #endif
     }
 
+    void TestCellmlConverterWithHelperMethod() throw(Exception)
+    {
+        // Copy CellML file into output dir
+        std::string model = "LuoRudy1991";
+
+        FileFinder cellml_file("heart/src/odes/cellml/" + model + ".cellml", RelativeTo::ChasteSourceRoot);
+        {
+            OutputFileHandler handler("TestCardiacCellMLLoader");
+            std::vector<std::string> options = boost::assign::list_of("--cvode")("--expose-annotated-variables");
+            CellMLLoader loader(cellml_file, handler, options);
+            boost::shared_ptr<AbstractCardiacCell> p_cell = loader.LoadCardiacCellFromCellML();
+            TS_ASSERT_EQUALS(p_cell->GetSystemName(),"luo_rudy_1991");
+        }
+#ifdef CHASTE_CVODE
+        {
+            OutputFileHandler handler("TestCvodeCellMLLoader");
+            std::vector<std::string> options = boost::assign::list_of("--expose-annotated-variables");
+            CellMLLoader loader(cellml_file, handler, options);
+            boost::shared_ptr<AbstractCvodeCell> p_cell = loader.LoadCvodeCellFromCellML();
+            TS_ASSERT_EQUALS(p_cell->GetSystemName(),"luo_rudy_1991");
+        }
+#endif
+    }
 
     void TestArchiving() throw(Exception)
     {
