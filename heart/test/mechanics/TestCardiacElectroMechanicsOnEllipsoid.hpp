@@ -105,6 +105,8 @@ class TestCardiacElectroMechanicsOnEllipsoid : public CxxTest::TestSuite
 public:
     void TestOnEllipsoid() throw(Exception)
     {
+        EXIT_IF_PARALLEL; // needs investigation, possibly related to #2057
+
         /////////////////////////////////////////////////////////////
         //
         //   Read the meshes for electrics and mechanics.
@@ -217,7 +219,7 @@ public:
         ApexStimulusCellFactory cell_factory(apex_stim_threshold);
 
         HeartConfig::Instance()->SetOdeTimeStep(0.005);
-        HeartConfig::Instance()->SetSimulationDuration(200.0); // see comment below on mechanics timestep
+        HeartConfig::Instance()->SetSimulationDuration(70.0); // see comment below on mechanics timestep
 
         ElectroMechanicsProblemDefinition<3> problem_defn(mechanics_mesh);
         problem_defn.SetContractionModel(KERCHOFFS2003,0.1);
