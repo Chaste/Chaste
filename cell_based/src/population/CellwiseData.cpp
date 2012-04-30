@@ -92,7 +92,6 @@ double CellwiseData<DIM>::GetValue(CellPtr pCell, unsigned variableNumber)
     }
 
  //   assert(IsSetUp());  -- Temporarily remove, since there are places where we are bypassing mConstantDataForTesting
-
 	return pCell->GetCellData()->GetItem(variableNumber);
 }
 

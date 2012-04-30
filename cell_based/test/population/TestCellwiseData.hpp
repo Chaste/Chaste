@@ -119,22 +119,6 @@ public:
         new_cell_location[1] = 0.3;
         cell_population.AddCell(p_new_cell, new_cell_location, cells[0] /*random choice of parent*/);
 
-        // Coverage
-        std::vector<double> constant_value;
-        constant_value.push_back(1.579);
-        p_data->SetConstantDataForTesting(constant_value);
-
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
-        {
-            TS_ASSERT_DELTA(p_data->GetValue(*cell_iter), 1.579, 1e-12);
-            TS_ASSERT_THROWS_THIS(p_data->GetValue(*cell_iter,1),
-                    "Request for variable above mNumberOfVariables.");
-        }
-        TS_ASSERT_THROWS_THIS(p_data->SetValue(0.0, 0, 1),
-                "Request for variable above mNumberOfVariables.");
-
         p_data->Destroy();
 
         TS_ASSERT_EQUALS(CellwiseData<2>::Instance()->IsSetUp(), false);

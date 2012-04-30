@@ -253,22 +253,20 @@ public:
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
+        double lo_oxygen_concentration = 0.0;
+        MAKE_PTR_ARGS(CellData, p_cell_ox_data, (1));
+        p_cell_ox_data->SetItem(0, lo_oxygen_concentration);
+
         // Set some model parameters for the cell-cycle model
         for (unsigned index=0; index < cells.size(); index++)
         {
             cells[index]->GetCellCycleModel()->SetStemCellG1Duration(8.0);
             cells[index]->GetCellCycleModel()->SetTransitCellG1Duration(8.0);
+            cells[index]->AddCellProperty(p_cell_ox_data);
         }
 
         // Create cell population
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
-
-        // Before we can do anything with the cell killer, we need to set up CellwiseData
-        std::vector<double> oxygen_concentration;
-
-        // Set the oxygen concentration to be zero
-        oxygen_concentration.push_back(0.0);
-        CellwiseData<2>::Instance()->SetConstantDataForTesting(oxygen_concentration);
 
         OxygenBasedCellKiller<2> bad_cell_killer(&cell_population);
 

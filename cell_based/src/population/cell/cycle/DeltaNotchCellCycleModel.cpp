@@ -123,13 +123,14 @@ void DeltaNotchCellCycleModel::UpdateDeltaNotch()
     assert(mpOdeSystem != NULL);
     assert(mpCell != NULL);
 
+//    double mean_delta = mpCell->GetCellData()->GetItem(2);
     double mean_delta;
     switch (mDimension)
     {
         case 1:
         {
             const unsigned DIM = 1;
-            mean_delta = CellwiseData<DIM>::Instance()->GetValue(mpCell, 0);
+            mean_delta = CellwiseData<DIM>::Instance()->GetValue(mpCell, 0);  ///\todo Should these be 0=Notch, 1=Delta 2=MeanDelta ?
             break;
         }
         case 2:

@@ -81,6 +81,9 @@ public:
         DeltaNotchCellCycleModel* p_diff_model = new DeltaNotchCellCycleModel;
         p_diff_model->SetCellProliferativeType(DIFFERENTIATED);
         p_diff_model->SetDimension(1);
+        MAKE_PTR_ARGS(CellData, p_diff_cell_data, (1));
+        p_diff_cell_data->SetItem(0, 100);
+
 
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
 
@@ -91,6 +94,7 @@ public:
         p_transit_cell->InitialiseCellCycleModel();
 
         CellPtr p_diff_cell(new Cell(p_healthy_state, p_diff_model));
+        p_diff_cell->AddCellProperty(p_diff_cell_data);
         p_diff_cell->InitialiseCellCycleModel();
 
         SimulationTime* p_simulation_time = SimulationTime::Instance();
