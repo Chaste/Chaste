@@ -49,13 +49,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM>
 class DiffusionForce : public AbstractForce<DIM>
 {
-
 private :
 
     /**
      * Diffusion constant.
      */
     double mDiffusionConstant;
+
+    /**
+	 * Absolute temperature (in Kelvin).
+	 */
+	double mAbsoluteTemperature;
+
+	/**
+	 * Viscosity of media. We assume that this is measured in units of
+	 * kg microns^(-1) h^(-1), and that cell diameters are scaled with
+	 * a characteristic length of 1 micron.
+	 */
+	double mViscosity;
 
     /**
      * Mechanics cut off length.
@@ -71,6 +82,8 @@ private :
     {
         archive & boost::serialization::base_object<AbstractForce<DIM> >(*this);
         archive & mDiffusionConstant;
+        archive & mAbsoluteTemperature;
+        archive & mViscosity;
         archive & mMechanicsCutOffLength;
     }
 
@@ -78,7 +91,6 @@ public :
 
     /**
      * Constructor.
-     *
      */
     DiffusionForce();
 
@@ -88,15 +100,31 @@ public :
     ~DiffusionForce();
 
     /**
-     * Use a diffusion constant for the cells
+     * Set the diffusion constant for the cells.
      *
      * @param diffusionConstant the diffusion constant to use
      */
     void SetDiffusionConstant(double diffusionConstant);
 
     /**
-     * Use a cutoff point, ie specify zero force if two cells are greater
-     * than the cutoff distance apart
+     * Set the absolute temperature, which affects the
+     * diffusion constant.
+     *
+     * @param absoluteTemperature the temperature in Kelvin
+     */
+    void SetAbsoluteTemperature(double absoluteTemperature);
+
+    /**
+      * Set the media viscosity (dynamic), which affects the
+      * diffusion constant.
+      *
+      * @param viscosity the viscosity
+      */
+    void SetViscosity(double viscosity);
+
+    /**
+     * Use a cutoff point, i.e. specify zero force if two cells are greater
+     * than the cutoff distance apart.
      *
      * @param cutOffLength the cutoff to use
      */
@@ -108,6 +136,20 @@ public :
      * @return mDiffusionConstant
      */
     double GetDiffusionConstant();
+
+    /**
+	 * Get the absolute temperature.
+	 *
+	 * @return mAbsoluteTemperature
+	 */
+    double GetAbsoluteTemperature();
+
+    /**
+ 	 * Get the viscosity.
+ 	 *
+ 	 * @return mViscosity
+ 	 */
+    double GetViscosity();
 
     /**
      * Get the cutoff length.

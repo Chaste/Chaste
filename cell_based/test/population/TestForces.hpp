@@ -1206,7 +1206,7 @@ public:
         TS_ASSERT_THROWS_THIS(weliky_oster_force.AddForceContribution(node_forces, cell_population),
                 "WelikyOsterForce is to be used with a VertexBasedCellPopulation only");
 
-        // When the node-only mesh goes out of scope, then it's a different set of nodes that get destroyed
+        // When the mesh goes out of scope, then it's a different set of nodes that get destroyed
         for (unsigned i=0; i<nodes.size(); i++)
         {
             delete nodes[i];
@@ -1219,8 +1219,11 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
 
         // Create a 1D mesh with nodes equally spaced a unit distance apart
-        MutableMesh<1,1> mesh;
-        mesh.ConstructLinearMesh(5);
+        MutableMesh<1,1> generating_mesh;
+        generating_mesh.ConstructLinearMesh(5);
+
+        NodesOnlyMesh<1> mesh;
+        mesh.ConstructNodesWithoutMesh(generating_mesh);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -1229,7 +1232,7 @@ public:
 
         // Create cell population
         std::vector<CellPtr> cells_copy(cells);
-        MeshBasedCellPopulation<1> cell_population(mesh, cells);
+        NodeBasedCellPopulation<1> cell_population(mesh, cells);
 
         // Create force law object
         DiffusionForce<1> diffusion_force;
@@ -1249,12 +1252,21 @@ public:
         // Test Set and Get methods for the diffusion force
         TS_ASSERT_DELTA(diffusion_force.GetCutOffLength(), 10.0, 1e-10);
         TS_ASSERT_DELTA(diffusion_force.GetDiffusionConstant(), 0.01, 1e-10);
+        TS_ASSERT_DELTA(diffusion_force.GetViscosity(), 3.204e-6, 1e-10);
+        TS_ASSERT_DELTA(diffusion_force.GetAbsoluteTemperature(), 296.0, 1e-10);
+
         diffusion_force.SetCutOffLength(20.0);
         diffusion_force.SetDiffusionConstant(0.1);
+        diffusion_force.SetViscosity(0.01);
+        diffusion_force.SetAbsoluteTemperature(100.0);
         TS_ASSERT_DELTA(diffusion_force.GetCutOffLength(), 20.0, 1e-10);
         TS_ASSERT_DELTA(diffusion_force.GetDiffusionConstant(), 0.1, 1e-10);
+        TS_ASSERT_DELTA(diffusion_force.GetViscosity(), 0.01, 1e-10);
+        TS_ASSERT_DELTA(diffusion_force.GetAbsoluteTemperature(), 100.0, 1e-10);
         diffusion_force.SetCutOffLength(10.0);
         diffusion_force.SetDiffusionConstant(0.01);
+        diffusion_force.SetViscosity(3.204e-6);
+        diffusion_force.SetAbsoluteTemperature(296.0);
     }
 
     void TestDiffusionForceIn2D()
@@ -1282,37 +1294,38 @@ public:
         cell_population.Update(); //Needs to be called separately as not in a simulation
 
         // Create force law object
-        DiffusionForce<2> diffusion_force;
+        DiffusionForce<2> force;
 
         // Initialise a vector of node forces
         std::vector<c_vector<double, 2> > node_forces;
         node_forces.reserve(cell_population.GetNumNodes());
-
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
             node_forces.push_back(zero_vector<double>(2));
         }
 
-        double variance=0.0;
         // Loop over time iterations
-        unsigned number_iteration=1000u;
-        for (unsigned i=0; i<number_iteration; i++)
+        double variance = 0.0;
+        unsigned num_iterations = 1000;
+        for (unsigned i=0; i<num_iterations; i++)
         {
             // Re-initialize the force on node zero
-            node_forces[0]=zero_vector<double>(2);
+            node_forces[0] = zero_vector<double>(2);
 
             // Compute forces on nodes
-            diffusion_force.AddForceContribution(node_forces, cell_population);
+            force.AddForceContribution(node_forces, cell_population);
 
             // Calculate the variance
-            variance+=pow(norm_2(node_forces[0]),2);
+            variance += pow(norm_2(node_forces[0]),2);
         }
 
-        int dim = 2;
-        variance /= number_iteration*2*dim*diffusion_force.GetDiffusionConstant()*SimulationTime::Instance()->GetTimeStep();
+        double correct_diffusion_coefficient =
+        		1.3806488e-23 * force.GetAbsoluteTemperature() / (6 * M_PI * force.GetViscosity() * cell_population.rGetMesh().GetCellRadius(0) );
+        unsigned dim = 2;
+        variance /= num_iterations*2*dim*correct_diffusion_coefficient*SimulationTime::Instance()->GetTimeStep();
         TS_ASSERT_DELTA(variance, 1.0, 1e-1)
 
-        // When the node-only mesh goes out of scope, then it's a different set of nodes that get destroyed
+        // When the mesh goes out of scope, then it's a different set of nodes that get destroyed
         for (unsigned i=0; i<nodes.size(); i++)
         {
             delete nodes[i];
@@ -1348,7 +1361,7 @@ public:
         cell_population.Update(); //Needs to be called separately as not in a simulation
 
         // Create force law object
-        DiffusionForce<3> diffusion_force;
+        DiffusionForce<3> force;
 
         // Initialise a vector of node forces
         std::vector<c_vector<double, 3> > node_forces;
@@ -1359,26 +1372,29 @@ public:
             node_forces.push_back(zero_vector<double>(3));
         }
 
-        double variance=0.0;
+        double variance = 0.0;
+
         // Loop over time iterations
-        unsigned number_iteration=1000u;
-        for (unsigned i=0; i<number_iteration; i++)
+        unsigned num_iterations = 1000;
+        for (unsigned i=0; i<num_iterations; i++)
         {
             // Re-initialize the force on node zero
-            node_forces[0]=zero_vector<double>(3);
+            node_forces[0] = zero_vector<double>(3);
 
             // Compute forces on nodes
-            diffusion_force.AddForceContribution(node_forces, cell_population);
+            force.AddForceContribution(node_forces, cell_population);
 
             // Calculate the variance
-            variance+=pow(norm_2(node_forces[0]),2);
+            variance += pow(norm_2(node_forces[0]),2);
         }
 
-        int dim=3;
-        variance /= number_iteration*2*dim*diffusion_force.GetDiffusionConstant()*SimulationTime::Instance()->GetTimeStep();
+        double correct_diffusion_coefficient =
+                		1.3806488e-23 * force.GetAbsoluteTemperature() / (6 * M_PI * force.GetViscosity() * cell_population.rGetMesh().GetCellRadius(0) );
+        unsigned dim = 3;
+        variance /= num_iterations*2*dim*correct_diffusion_coefficient*SimulationTime::Instance()->GetTimeStep();
         TS_ASSERT_DELTA(variance, 1.0, 1e-1)
 
-        // When the node-only mesh goes out of scope, then it's a different set of nodes that get destroyed
+        // When the mesh goes out of scope, then it's a different set of nodes that get destroyed
         for (unsigned i=0; i<nodes.size(); i++)
         {
             delete nodes[i];
@@ -1390,39 +1406,41 @@ public:
     }
 
     void TestDiffusionForceArchiving() throw (Exception)
-        {
-            OutputFileHandler handler("archive", false);
-            std::string archive_filename = handler.GetOutputDirectoryFullPath() + "DiffusionForce.arch";
+	{
+		OutputFileHandler handler("archive", false);
+		std::string archive_filename = handler.GetOutputDirectoryFullPath() + "DiffusionForce.arch";
 
-            {
-                DiffusionForce<2> force;
+		{
+			DiffusionForce<2> force;
 
-                std::ofstream ofs(archive_filename.c_str());
-                boost::archive::text_oarchive output_arch(ofs);
+			std::ofstream ofs(archive_filename.c_str());
+			boost::archive::text_oarchive output_arch(ofs);
 
-                // Serialize via pointer to most abstract class possible
-                AbstractForce<2>* const p_force = &force;
-                output_arch << p_force;
-            }
+			// Serialize via pointer to most abstract class possible
+			AbstractForce<2>* const p_force = &force;
+			output_arch << p_force;
+		}
 
-            {
-                AbstractForce<2>* p_force;
+		{
+			AbstractForce<2>* p_force;
 
-                // Create an input archive
-                std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
-                boost::archive::text_iarchive input_arch(ifs);
+			// Create an input archive
+			std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+			boost::archive::text_iarchive input_arch(ifs);
 
-                // Restore from the archive
-                input_arch >> p_force;
+			// Restore from the archive
+			input_arch >> p_force;
 
-                // Test member variables
-                TS_ASSERT_DELTA((static_cast<DiffusionForce<2>*>(p_force))->GetCutOffLength(), 10.0, 1e-6);
-                TS_ASSERT_DELTA((static_cast<DiffusionForce<2>*>(p_force))->GetDiffusionConstant(), 0.01, 1e-6);
+			// Test member variables
+			TS_ASSERT_DELTA((static_cast<DiffusionForce<2>*>(p_force))->GetCutOffLength(), 10.0, 1e-6);
+			TS_ASSERT_DELTA((static_cast<DiffusionForce<2>*>(p_force))->GetDiffusionConstant(), 0.01, 1e-6);
+			TS_ASSERT_DELTA((static_cast<DiffusionForce<2>*>(p_force))->GetAbsoluteTemperature(), 296.0, 1e-6);
+			TS_ASSERT_DELTA((static_cast<DiffusionForce<2>*>(p_force))->GetViscosity(), 3.204e-6, 1e-6);
 
-                // Tidy up
-                delete p_force;
-            }
-        }
+			// Tidy up
+			delete p_force;
+		}
+	}
 };
 
 #endif /*TESTFORCES_HPP_*/

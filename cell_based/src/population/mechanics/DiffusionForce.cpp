@@ -34,11 +34,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "DiffusionForce.hpp"
+#include "NodeBasedCellPopulation.hpp"
 
 template<unsigned DIM>
 DiffusionForce<DIM>::DiffusionForce()
     : AbstractForce<DIM>(),
       mDiffusionConstant(0.01),
+      mAbsoluteTemperature(296.0), // default to room temperature
+      mViscosity(3.204e-6), // default to viscosity of water at room temperature in (using microns and hours)
       mMechanicsCutOffLength(10.0)
 {
 }
@@ -76,23 +79,74 @@ double DiffusionForce<DIM>::GetDiffusionConstant()
 }
 
 template<unsigned DIM>
+void DiffusionForce<DIM>::SetAbsoluteTemperature(double newValue)
+{
+	assert(newValue > 0.0);
+    mAbsoluteTemperature = newValue;
+}
+
+template<unsigned DIM>
+double DiffusionForce<DIM>::GetAbsoluteTemperature()
+{
+    return mAbsoluteTemperature;
+}
+
+template<unsigned DIM>
+void DiffusionForce<DIM>::SetViscosity(double newValue)
+{
+	assert(newValue > 0.0);
+    mViscosity = newValue;
+}
+
+template<unsigned DIM>
+double DiffusionForce<DIM>::GetViscosity()
+{
+    return mViscosity;
+}
+
+template<unsigned DIM>
 void DiffusionForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
                           AbstractCellPopulation<DIM>& rCellPopulation)
 {
-    // Loop over the cells to add force components to the force vector.
+    double dt = SimulationTime::Instance()->GetTimeStep();
+
+    // Loop over the cells
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
          cell_iter != rCellPopulation.End();
          ++cell_iter)
     {
-        int node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
+    	// Get the radius, damping constant and node index associated with this cell
+        unsigned node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
+        double nu = dynamic_cast<AbstractOffLatticeCellPopulation<DIM>*>(&rCellPopulation)->GetDampingConstant(node_index);
+        double cell_radius = dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation)->rGetMesh().GetCellRadius(node_index);
+
+        /*
+         * Compute the diffusion coefficient D as D = k*T/(6*pi*eta*r), where
+         *
+         * k = Boltzmann's constant,
+         * T = absolute temperature,
+         * eta = dynamic viscosity,
+         * r = cell radius.
+         */
+        double boltzmann_constant = 1.3806488e-23;
+        double diffusion_const_scaling = boltzmann_constant*mAbsoluteTemperature/(6.0*mViscosity*M_PI);
+        double diffusion_constant = diffusion_const_scaling/cell_radius;
 
         c_vector<double, DIM> force_contribution;
         for (unsigned i=0; i<DIM; i++)
         {
-            double nu = dynamic_cast<AbstractOffLatticeCellPopulation<DIM>*>(&rCellPopulation)->GetDampingConstant(node_index);
-            double dt = SimulationTime::Instance()->GetTimeStep();
-            double xi = RandomNumberGenerator::Instance()->StandardNormalRandomDeviate();
-            force_contribution[i] = nu*sqrt(2.0*mDiffusionConstant*dt)/dt*xi;
+            /*
+             * The force on this cell is scaled with the timestep such that when it is
+             * used in the discretised equation of motion for the cell, we obtain the
+             * correct formula
+             *
+             * x_new = x_old + sqrt(2*D*dt)*W
+             *
+             * where W is a standard normal random variable.
+             */
+        	double xi = RandomNumberGenerator::Instance()->StandardNormalRandomDeviate();
+
+            force_contribution[i] = (nu*sqrt(2.0*diffusion_constant*dt)/dt)*xi;
         }
         rForces[node_index] += force_contribution;
     }
