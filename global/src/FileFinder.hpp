@@ -67,22 +67,7 @@ struct RelativeTo
  */
 class FileFinder
 {
-private:
-
-    /** The absolute path to our file. */
-    std::string mAbsPath;
-
-    /** Whether to fake one of the fixed paths, e.g. ChasteSourceRoot. */
-    static bool msFaking;
-
-    /** Which path to fake. */
-    static RelativeTo::Value msFakeWhat;
-
-    /** The fake value of the faked path. */
-    static std::string msFakePath;
-
 public:
-
     /**
      * Default constructor for subclasses to use. They @b must call
      * SetPath() in their constructor.
@@ -131,6 +116,11 @@ public:
     void SetPath(const std::string& rPath, RelativeTo::Value relativeTo);
 
     /**
+     * Test whether this FileFinder has been given a path.
+     */
+    bool IsPathSet() const;
+
+    /**
      * Change this FileFinder to point at a new location, relative to some file or directory.
      *
      * @param rLeafName  the leaf name of the file/dir to find
@@ -152,6 +142,13 @@ public:
      * Are we pointing at a directory?
      */
     bool IsDir() const;
+
+    /**
+     * If this is a file, whether it has size zero.
+     * If this is a folder, whether it contains no non-hidden items.
+     * If this doesn't exist, throws.
+     */
+    bool IsEmpty() const;
 
     /**
      * Get the absolute path to this file/dir.
@@ -261,6 +258,19 @@ public:
      * Stop faking one of the fixed paths.
      */
     static void StopFaking();
+
+private:
+    /** The absolute path to our file. */
+    std::string mAbsPath;
+
+    /** Whether to fake one of the fixed paths, e.g. ChasteSourceRoot. */
+    static bool msFaking;
+
+    /** Which path to fake. */
+    static RelativeTo::Value msFakeWhat;
+
+    /** The fake value of the faked path. */
+    static std::string msFakePath;
 };
 
 #endif /*FILEFINDER_HPP_*/

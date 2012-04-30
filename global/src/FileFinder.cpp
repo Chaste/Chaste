@@ -50,9 +50,11 @@ RelativeTo::Value FileFinder::msFakeWhat = RelativeTo::Absolute;
 
 std::string FileFinder::msFakePath = "";
 
+const std::string UNSET_PATH("UNSET!");
+
 
 FileFinder::FileFinder()
-    : mAbsPath("UNSET!")
+    : mAbsPath(UNSET_PATH)
 {
 }
 
@@ -126,6 +128,11 @@ void FileFinder::SetPath(const std::string& rRelativePath, RelativeTo::Value rel
     }
 }
 
+bool FileFinder::IsPathSet() const
+{
+    return mAbsPath != UNSET_PATH;
+}
+
 void FileFinder::SetPath(const std::string& rLeafName, const FileFinder& rParentOrSibling)
 {
     if (!rParentOrSibling.Exists())
@@ -155,6 +162,32 @@ bool FileFinder::IsFile() const
 bool FileFinder::IsDir() const
 {
     return fs::is_directory(mAbsPath);
+}
+
+bool FileFinder::IsEmpty() const
+{
+    bool empty = true;
+    if (IsFile())
+    {
+        empty = (fs::file_size(mAbsPath) == 0u);
+    }
+    else if (IsDir())
+    {
+        fs::directory_iterator end_iter;
+        for (fs::directory_iterator dir_iter(mAbsPath); dir_iter != end_iter; ++dir_iter)
+        {
+            if (dir_iter->path().leaf().substr(0, 1) != ".")
+            {
+                empty = false;
+                break;
+            }
+        }
+    }
+    else
+    {
+        EXCEPTION("The path '" << mAbsPath << "' does not exist.");
+    }
+    return empty;
 }
 
 std::string FileFinder::GetAbsolutePath() const

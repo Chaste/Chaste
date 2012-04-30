@@ -57,6 +57,8 @@ public:
             TS_ASSERT(file_finder.Exists());
             TS_ASSERT(file_finder.IsFile());
             TS_ASSERT(!file_finder.IsDir());
+            TS_ASSERT(!file_finder.IsEmpty());
+            TS_ASSERT(file_finder.IsPathSet());
 
             // Check the path is as expected
             std::string abs_path = ChasteBuildRootDir() + file_name;
@@ -113,7 +115,8 @@ public:
             std::string abs_path = handler.GetOutputDirectoryFullPath() + file_name;
             TS_ASSERT_EQUALS(file_finder.GetAbsolutePath(), abs_path);
 
-            // Check finding a sibling fails
+            // Check finding a sibling and testing for emptiness fail
+            TS_ASSERT_THROWS_THIS(file_finder.IsEmpty(), "The path '" + abs_path + "' does not exist.");
             TS_ASSERT_THROWS_THIS(FileFinder("sibling", file_finder),
                                   "Reference path '" + abs_path + "' does not exist.");
 
@@ -121,10 +124,12 @@ public:
             out_stream fp = handler.OpenOutputFile(file_name);
             fp->close();
             TS_ASSERT(file_finder.Exists());
+            TS_ASSERT(file_finder.IsEmpty());
 
             // Finding a sibling is now ok
             FileFinder sibling("sibling", file_finder);
             TS_ASSERT_EQUALS(sibling.GetAbsolutePath(), handler.GetOutputDirectoryFullPath() + "sibling");
+            TS_ASSERT(sibling.IsPathSet());
 
             // Check when providing an absolute path
             FileFinder file_finder2(abs_path, RelativeTo::Absolute);
@@ -165,6 +170,8 @@ public:
         TS_ASSERT(dir.Exists());
         TS_ASSERT(dir.IsDir());
         TS_ASSERT(!dir.IsFile());
+        TS_ASSERT(!dir.IsEmpty());
+        TS_ASSERT(dir.IsPathSet());
         std::string abs_path = std::string(ChasteBuildRootDir()) + "global/";
         TS_ASSERT_EQUALS(dir.GetAbsolutePath(), abs_path);
 
@@ -184,6 +191,7 @@ public:
         FileFinder new_dir("TestFileFinder", RelativeTo::ChasteTestOutput);
         TS_ASSERT(new_dir.Exists());
         TS_ASSERT(new_dir.IsDir());
+        TS_ASSERT(new_dir.IsEmpty());
         TS_ASSERT(!new_dir.IsFile());
         TS_ASSERT_EQUALS(new_dir.GetAbsolutePath(), handler.GetOutputDirectoryFullPath());
         // Path for an existing dir will end in a '/'
@@ -196,7 +204,7 @@ public:
         // Note no slash on the end of a missing dir's path
         TS_ASSERT_EQUALS(missing_dir.GetAbsolutePath(), handler.GetOutputDirectoryFullPath() + "SubDir");
         // But once we create the dir it will have one, even with the same finder
-        OutputFileHandler sub_handler("TestFileFinder/SubDir");
+        OutputFileHandler sub_handler(missing_dir);
         TS_ASSERT_EQUALS(missing_dir.GetAbsolutePath(), handler.GetOutputDirectoryFullPath() + "SubDir/");
 
         // Check the parent folder works for directories too
@@ -367,6 +375,14 @@ public:
                                   "Only single files may be copied");
         TS_ASSERT_THROWS_CONTAINS(FileFinder("global/no_file", RelativeTo::ChasteSourceRoot).CopyTo(dest),
                                   "as it does not exist.");
+    }
+
+    void TestDefaultConstructor() throw (Exception)
+    {
+        FileFinder unset;
+        TS_ASSERT(!unset.IsPathSet());
+        unset.SetPath("", RelativeTo::ChasteSourceRoot);
+        TS_ASSERT(unset.IsPathSet());
     }
 };
 

@@ -82,15 +82,42 @@ void CleanFolder(const fs::path& rPath, bool isTop=true)
 }
 
 
-OutputFileHandler::OutputFileHandler(const std::string &rDirectory,
+OutputFileHandler::OutputFileHandler(const std::string& rDirectory,
                                      bool cleanOutputDirectory)
+{
+    CommonConstructor(rDirectory, cleanOutputDirectory);
+}
+
+
+OutputFileHandler::OutputFileHandler(const FileFinder& rDirectory,
+                                     bool cleanOutputDirectory)
+{
+    std::string chaste_test_output = GetChasteTestOutputDirectory();
+    std::string abs_path = rDirectory.GetAbsolutePath();
+    if (abs_path.substr(0, chaste_test_output.length()) != chaste_test_output)
+    {
+        EXCEPTION("The location provided to OutputFileHandler must be inside CHASTE_TEST_OUTPUT; '"
+                  << abs_path << "' is not under '" << chaste_test_output << "'.");
+    }
+    std::string relative_path = abs_path.substr(chaste_test_output.length());
+    CommonConstructor(relative_path, cleanOutputDirectory);
+}
+
+
+void OutputFileHandler::CommonConstructor(const std::string &rDirectory,
+                                          bool cleanOutputDirectory)
 {
     // Is it a valid request for a directory?
     if (rDirectory.find("..") != std::string::npos)
     {
         EXCEPTION("Will not create directory: " + rDirectory +
                   " due to it potentially being above, and cleaning, CHASTE_TEST_OUTPUT.");
-        // Note: in Boost 1.48 and above we can use 'canonical' to check this better
+        // Note: in Boost 1.48 and above we could use 'canonical' to check this better
+    }
+    if (FileFinder::IsAbsolutePath(rDirectory))
+    {
+        EXCEPTION("The constructor argument to OutputFileHandler must be a relative path; '"
+                  << rDirectory << "' is absolute.");
     }
 
     mDirectory = MakeFoldersAndReturnFullPath(rDirectory);

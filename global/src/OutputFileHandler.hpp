@@ -53,36 +53,7 @@ typedef std::auto_ptr<std::ofstream> out_stream;
  */
 class OutputFileHandler
 {
-private:
-
-    std::string mDirectory; ///< The directory to store output files in (always ends in "/")
-
-    /**
-     * Takes a reference to a string and adds a trailing slash if one is not already present
-     *
-     * @param rDirectory  The directory name to add a trailing slash to.
-     */
-    static void AddTrailingSlash(std::string& rDirectory);
-
-    /**
-     * Check that the desired output directory exists and is writable by us.
-     * Create it if needed.
-     * Return the full pathname of the output directory.
-     *
-     * The environment variable CHASTE_TEST_OUTPUT will be examined.  If it is set
-     * and non-empty it is taken to be a directory where test output should be stored.
-     * Otherwise the current directory is used.
-     *
-     * @note Contains a barrier, so must be called collectively.
-     *
-     * @param rDirectory  pathname of the output directory, relative to where Chaste
-     *         output will be stored (user shouldn't care about this).
-     * @return full pathname to the output directory
-     */
-    std::string MakeFoldersAndReturnFullPath(const std::string& rDirectory) const;
-
 public:
-
     /**
      * Create an OutputFileHandler that will create output files in the given directory.
      * The directory name should be relative to the place where Chaste test output is
@@ -97,6 +68,21 @@ public:
      * @param cleanOutputDirectory  whether to remove any existing files in the output directory
      */
     OutputFileHandler(const std::string& rDirectory,
+                      bool cleanOutputDirectory = true);
+
+    /**
+     * Create an OutputFileHandler that will create output files in the given directory.
+     * This must be located inside the folder where Chaste test output is stored, and will typically
+     * be obtained with the FindFile method of this class from a parent handler.
+     *
+     * Will check that the directory exists and create it if needed.
+     *
+     * @note This MUST be called collectively, since it contains a barrier call.
+     *
+     * @param rDirectory  the directory to put output files in
+     * @param cleanOutputDirectory  whether to remove any existing files in the output directory
+     */
+    OutputFileHandler(const FileFinder& rDirectory,
                       bool cleanOutputDirectory = true);
 
     /**
@@ -168,6 +154,43 @@ public:
 
     /** The name of the Chaste signature file added to folders we create. */
     const static std::string SIG_FILE_NAME;
+
+private:
+
+    std::string mDirectory; ///< The directory to store output files in (always ends in "/")
+
+    /**
+     * Functionality common to both constructors.
+     *
+     * @param rDirectory  relative path to the directory to put output files in
+     * @param cleanOutputDirectory  whether to remove any existing files in the output directory
+     */
+    void CommonConstructor(const std::string& rDirectory,
+                           bool cleanOutputDirectory);
+
+    /**
+     * Takes a reference to a string and adds a trailing slash if one is not already present
+     *
+     * @param rDirectory  The directory name to add a trailing slash to.
+     */
+    static void AddTrailingSlash(std::string& rDirectory);
+
+    /**
+     * Check that the desired output directory exists and is writable by us.
+     * Create it if needed.
+     * Return the full pathname of the output directory.
+     *
+     * The environment variable CHASTE_TEST_OUTPUT will be examined.  If it is set
+     * and non-empty it is taken to be a directory where test output should be stored.
+     * Otherwise the current directory is used.
+     *
+     * @note Contains a barrier, so must be called collectively.
+     *
+     * @param rDirectory  pathname of the output directory, relative to where Chaste
+     *         output will be stored (user shouldn't care about this).
+     * @return full pathname to the output directory
+     */
+    std::string MakeFoldersAndReturnFullPath(const std::string& rDirectory) const;
 };
 
 #endif /*OUTPUTFILEHANDLER_HPP_*/

@@ -68,7 +68,13 @@ public:
         TS_ASSERT_EQUALS(full_dir.substr(full_dir.length()-dir.length()-1), dir+"/");
         TS_ASSERT_EQUALS(full_dir.substr(0, full_dir.length()-dir.length()-1), handler_path);
 
-        // Check that both can create files
+        // We can also create handlers from a FileFinder (provided it points to a location in CHASTE_TEST_OUTPUT)
+        OutputFileHandler handler3(handler.FindFile("testhandler2"));
+        full_dir = handler3.GetOutputDirectoryFullPath();
+        TS_ASSERT_EQUALS(full_dir.substr(full_dir.length()-dir.length()-2), dir+"2/");
+        TS_ASSERT_EQUALS(full_dir.substr(0, full_dir.length()-dir.length()-2), handler_path);
+
+        // Check that all three handlers can create files
         out_stream p_file_stream;
         p_file_stream = handler.OpenOutputFile("test_file", std::ios::out);
         TS_ASSERT(FileFinder(handler_path + "test_file").Exists());
@@ -82,9 +88,16 @@ public:
         p_file_stream = handler2.OpenOutputFile("test_", 34, ".txt");
         TS_ASSERT(FileFinder(handler2.GetOutputDirectoryFullPath() + "test_34.txt").Exists());
 
+        p_file_stream = handler3.OpenOutputFile("test_file");
+        TS_ASSERT(FileFinder(handler3.GetOutputDirectoryFullPath() + "test_file").Exists());
+
         // This should try to write files to /, which isn't allowed (we hope!)
-        TS_ASSERT_THROWS_CONTAINS(OutputFileHandler handler3("../../../../../../../../../../../../../../../", false),
+        TS_ASSERT_THROWS_CONTAINS(OutputFileHandler bad_handler("../../../../../../../../../../../../../../../", false),
                                   "due to it potentially being above, and cleaning, CHASTE_TEST_OUTPUT.");
+        TS_ASSERT_THROWS_CONTAINS(OutputFileHandler bad_handler("/", false),
+                                  "The constructor argument to OutputFileHandler must be a relative path");
+        TS_ASSERT_THROWS_CONTAINS(OutputFileHandler bad_handler(FileFinder("/"), false),
+                                  "The location provided to OutputFileHandler must be inside CHASTE_TEST_OUTPUT");
 
         // Check the CopyFileTo method
         FileFinder source_file("global/test/TestOutputFileHandler.hpp", RelativeTo::ChasteSourceRoot);
@@ -158,6 +171,10 @@ public:
             fs::remove(dir_path + ".chaste_deletable_folder");
             fs::remove(dir_path);
         }
+
+        // Check behaviour of FindFile("")
+        FileFinder handler_self = handler.FindFile("");
+        TS_ASSERT_EQUALS(handler_self.GetAbsolutePath(), handler.GetOutputDirectoryFullPath());
     }
 
     void TestWeCanOnlyDeleteFoldersWeHaveMadeOurselves() throw(Exception, std::exception)
