@@ -311,12 +311,12 @@ public:
         p_cell->InitialiseCellCycleModel();
 
         // Set up constant oxygen_concentration
-        std::vector<double> low_oxygen_concentration;
-        std::vector<double> high_oxygen_concentration;
-        low_oxygen_concentration.push_back(0.0);
-        high_oxygen_concentration.push_back(1.0);
-
-        CellwiseData<2>::Instance()->SetConstantDataForTesting(low_oxygen_concentration);
+        double lo_oxygen_concentration=0.0;
+        double hi_oxygen_concentration=1.0;
+        
+        MAKE_PTR_ARGS(CellData, p_cell_ox_data, (1));
+        p_cell_ox_data->SetItem(0, lo_oxygen_concentration);
+        p_cell->AddCellProperty(p_cell_ox_data);
 
         p_model->ReadyToDivide();
         TS_ASSERT_DELTA(p_model->GetCurrentHypoxicDuration(), 0.0, 1e-12);
@@ -327,14 +327,14 @@ public:
         TS_ASSERT_DELTA(p_model->GetCurrentHypoxicDuration(), 1.0, 1e-12);
         TS_ASSERT_DELTA(p_model->GetCurrentHypoxiaOnsetTime(), 0.0, 1e-12);
 
-        CellwiseData<2>::Instance()->SetConstantDataForTesting(high_oxygen_concentration);
+        p_cell_ox_data->SetItem(0, hi_oxygen_concentration);
 
         p_simulation_time->IncrementTimeOneStep(); // t=2.0
         p_model->ReadyToDivide();
         TS_ASSERT_DELTA(p_model->GetCurrentHypoxicDuration(), 0.0, 1e-12);
         TS_ASSERT_DELTA(p_model->GetCurrentHypoxiaOnsetTime(), 2.0, 1e-12);
 
-        CellwiseData<2>::Instance()->SetConstantDataForTesting(low_oxygen_concentration);
+        p_cell_ox_data->SetItem(0, lo_oxygen_concentration);
         p_simulation_time->IncrementTimeOneStep(); // t=3.0
         p_model->ReadyToDivide();
         TS_ASSERT_DELTA(p_model->GetCurrentHypoxicDuration(), 1.0, 1e-12);
@@ -348,11 +348,6 @@ public:
         p_simulation_time->SetStartTime(0.0);
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(4.0*18.0, num_steps);
 
-        // Set up constant oxygen concentration
-        std::vector<double> oxygen_concentration;
-        oxygen_concentration.push_back(1.0);
-        CellwiseData<2>::Instance()->SetConstantDataForTesting(oxygen_concentration);
-
         TS_ASSERT_THROWS_NOTHING(SimpleOxygenBasedCellCycleModel model);
 
         // Create cell-cycle models and cells
@@ -361,6 +356,8 @@ public:
         p_hepa_one_model->SetCellProliferativeType(STEM);
 
         CellPtr p_hepa_one_cell(new Cell(p_state, p_hepa_one_model));
+        p_cell_ox_data->SetItem(0, hi_oxygen_concentration);
+        p_hepa_one_cell->AddCellProperty(p_cell_ox_data);
         p_hepa_one_cell->InitialiseCellCycleModel();
 
         SimpleOxygenBasedCellCycleModel* p_diff_model = new SimpleOxygenBasedCellCycleModel;
@@ -374,6 +371,7 @@ public:
 
         CellPtr p_diff_cell(new Cell(p_state, p_diff_model));
         p_diff_cell->InitialiseCellCycleModel();
+        p_diff_cell->AddCellProperty(p_cell_ox_data);
 
         // Check that the cell cycle phase and ready to divide
         // are updated correctly
@@ -414,8 +412,9 @@ public:
         p_cell_model->SetCellProliferativeType(STEM);
         CellPtr p_apoptotic_cell(new Cell(p_state, p_cell_model));
 
-        // Set up constant oxygen_concentration
-        CellwiseData<2>::Instance()->SetConstantDataForTesting(low_oxygen_concentration);
+        // Set up oxygen_concentration
+        p_cell_ox_data->SetItem(0, lo_oxygen_concentration);
+        p_apoptotic_cell->AddCellProperty(p_cell_ox_data);
 
         // Force the cell to be apoptotic
         for (unsigned i=0; i<num_steps; i++)
@@ -432,38 +431,33 @@ public:
         TS_ASSERT_EQUALS(p_apoptotic_cell->HasCellProperty<ApoptoticCellProperty>(), true);
         TS_ASSERT_EQUALS(p_cell_model->GetCurrentHypoxicDuration(), 2.04);
 
-        // Tidy up
-        CellwiseData<2>::Destroy();
-
+        ///\todo  #1515  Are these needed?
         // For coverage, create a 1D model
-        CellwiseData<1>::Instance()->SetConstantDataForTesting(oxygen_concentration);
 
         SimpleOxygenBasedCellCycleModel* p_cell_model1d = new SimpleOxygenBasedCellCycleModel;
         p_cell_model1d->SetDimension(1);
         p_cell_model1d->SetCellProliferativeType(STEM);
         CellPtr p_cell1d(new Cell(p_state, p_cell_model1d));
+        p_cell_ox_data->SetItem(0, hi_oxygen_concentration);
+        p_cell1d->AddCellProperty(p_cell_ox_data);
 
         p_cell1d->InitialiseCellCycleModel();
 
         TS_ASSERT_EQUALS(p_cell_model1d->ReadyToDivide(), false);
 
-        // Tidy up
-        CellwiseData<1>::Destroy();
-
         // For coverage, create a 3D model
-        CellwiseData<3>::Instance()->SetConstantDataForTesting(oxygen_concentration);
 
         SimpleOxygenBasedCellCycleModel* p_cell_model3d = new SimpleOxygenBasedCellCycleModel;
         p_cell_model3d->SetDimension(3);
         p_cell_model3d->SetCellProliferativeType(STEM);
         CellPtr p_cell3d(new Cell(p_state, p_cell_model3d));
+        p_cell_ox_data->SetItem(0, hi_oxygen_concentration);
+        p_cell3d->AddCellProperty(p_cell_ox_data);
 
         p_cell3d->InitialiseCellCycleModel();
 
         TS_ASSERT_EQUALS(p_cell_model3d->ReadyToDivide(), false);
 
-        // Tidy up
-        CellwiseData<3>::Destroy();
     }
 
     void TestContactInhibitionCellCycleModel() throw(Exception)
@@ -493,13 +487,12 @@ public:
 
         p_cell->InitialiseCellCycleModel();
 
-        // Set up constant volume for inhibition test
-        std::vector<double> low_volume;
-        std::vector<double> high_volume;
-        low_volume.push_back(0.0);
-        high_volume.push_back(1.0);
+        double lo_volume = 0.0;
+        double hi_volume = 1.0;
+        MAKE_PTR_ARGS(CellData, p_volume_data, (1));
+        p_cell->AddCellProperty(p_volume_data);
 
-        CellwiseData<2>::Instance()->SetConstantDataForTesting(low_volume);
+        p_volume_data->SetItem(0, lo_volume);
 
         p_model->ReadyToDivide();
         TS_ASSERT_DELTA(p_model->GetCurrentQuiescentDuration(), 0.0, 1e-12);
@@ -510,14 +503,13 @@ public:
         TS_ASSERT_DELTA(p_model->GetCurrentQuiescentDuration(), 1.0, 1e-12);
         TS_ASSERT_DELTA(p_model->GetCurrentQuiescentOnsetTime(), 0.0, 1e-12);
 
-        CellwiseData<2>::Instance()->SetConstantDataForTesting(high_volume);
-
+        p_volume_data->SetItem(0, hi_volume);
         p_simulation_time->IncrementTimeOneStep(); // t=2.0
         p_model->ReadyToDivide();
         TS_ASSERT_DELTA(p_model->GetCurrentQuiescentDuration(), 0.0, 1e-12);
         TS_ASSERT_DELTA(p_model->GetCurrentQuiescentOnsetTime(), 2.0, 1e-12);
 
-        CellwiseData<2>::Instance()->SetConstantDataForTesting(low_volume);
+        p_volume_data->SetItem(0, lo_volume);
         p_simulation_time->IncrementTimeOneStep(); // t=3.0
         p_model->ReadyToDivide();
         TS_ASSERT_DELTA(p_model->GetCurrentQuiescentDuration(), 1.0, 1e-12);
@@ -532,9 +524,7 @@ public:
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0*24.0, num_steps);
 
         // Set up constant cell volume
-        std::vector<double> cell_volume;
-        cell_volume.push_back(1.0);
-        CellwiseData<2>::Instance()->SetConstantDataForTesting(cell_volume);
+        p_volume_data->SetItem(0, hi_volume);
 
         // Create cell-cycle models and cells
         ContactInhibitionCellCycleModel* p_hepa_one_model = new ContactInhibitionCellCycleModel;
@@ -545,6 +535,7 @@ public:
         p_hepa_one_model->SetEquilibriumVolume(1.0);
 
         CellPtr p_hepa_one_cell(new Cell(p_state, p_hepa_one_model));
+        p_hepa_one_cell->AddCellProperty(p_volume_data);
         p_hepa_one_cell->InitialiseCellCycleModel();
 
         ContactInhibitionCellCycleModel* p_diff_model = new ContactInhibitionCellCycleModel;
@@ -554,6 +545,7 @@ public:
         p_diff_model->SetEquilibriumVolume(1.0);
 
         CellPtr p_diff_cell(new Cell(p_state, p_diff_model));
+        p_diff_cell->AddCellProperty(p_volume_data);
         p_diff_cell->InitialiseCellCycleModel();
 
         // Check that the cell cycle phase and ready to divide are updated correctly
@@ -581,11 +573,8 @@ public:
         TS_ASSERT_EQUALS(p_hepa_one_model2->ReadyToDivide(), false);
         TS_ASSERT_EQUALS(p_hepa_one_model2->GetCurrentCellCyclePhase(), M_PHASE);
 
-        // Tidy up
-        CellwiseData<2>::Destroy();
-
+        ///\todo  #1515  Are these needed?
         // For coverage, create a 1D model
-        CellwiseData<1>::Instance()->SetConstantDataForTesting(cell_volume);
 
         ContactInhibitionCellCycleModel* p_cell_model1d = new ContactInhibitionCellCycleModel;
         p_cell_model1d->SetDimension(1);
@@ -594,15 +583,13 @@ public:
         p_cell_model1d->SetEquilibriumVolume(1.0);
 
         CellPtr p_cell1d(new Cell(p_state, p_cell_model1d));
+        p_cell1d->AddCellProperty(p_volume_data);
+        p_volume_data->SetItem(0, hi_volume);
         p_cell1d->InitialiseCellCycleModel();
 
         TS_ASSERT_EQUALS(p_cell_model1d->ReadyToDivide(), false);
 
-        // Tidy up
-        CellwiseData<1>::Destroy();
-
         // For coverage, create a 3D model
-        CellwiseData<3>::Instance()->SetConstantDataForTesting(cell_volume);
 
         ContactInhibitionCellCycleModel* p_cell_model3d = new ContactInhibitionCellCycleModel;
         p_cell_model3d->SetDimension(3);
@@ -611,12 +598,12 @@ public:
         p_cell_model3d->SetEquilibriumVolume(1.0);
 
         CellPtr p_cell3d(new Cell(p_state, p_cell_model3d));
+        p_cell3d->AddCellProperty(p_volume_data);
+        p_volume_data->SetItem(0, hi_volume);
         p_cell3d->InitialiseCellCycleModel();
 
         TS_ASSERT_EQUALS(p_cell_model3d->ReadyToDivide(), false);
 
-        // Tidy up
-        CellwiseData<3>::Destroy();
     }
 
     void TestStochasticOxygenBasedCellCycleModel() throw(Exception)

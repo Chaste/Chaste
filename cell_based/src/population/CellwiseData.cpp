@@ -53,7 +53,7 @@ CellwiseData<DIM>* CellwiseData<DIM>::Instance()
 template<unsigned DIM>
 CellwiseData<DIM>::CellwiseData()
     : mpCellPopulation(NULL),
-      mAllocatedMemory(false),
+      mAllocatedMemory(true),
       mNumberOfVariables(UNSIGNED_UNSET),
       mUseConstantDataForTesting(false)
 {
@@ -84,13 +84,14 @@ double CellwiseData<DIM>::GetValue(CellPtr pCell, unsigned variableNumber)
         EXCEPTION("Request for variable above mNumberOfVariables.");
     }
 
+
     // To test a cell and cell-cycle models without a cell population
     if (mUseConstantDataForTesting)
     {
         return mConstantDataForTesting[variableNumber];
     }
 
-    assert(IsSetUp());
+ //   assert(IsSetUp());  -- Temporarily remove, since there are places where we are bypassing mConstantDataForTesting
 
 	return pCell->GetCellData()->GetItem(variableNumber);
 }
@@ -150,13 +151,12 @@ void CellwiseData<DIM>::SetPopulationAndNumVars(AbstractCellPopulation<DIM>* pCe
     	cell_iter->AddCellProperty(p_cell_data);
     }
 
-    mAllocatedMemory = true;
 }
 
 template<unsigned DIM>
 bool CellwiseData<DIM>::IsSetUp()
 {
-    return ((mAllocatedMemory) && (mpInstance!=NULL) && (mpCellPopulation!=NULL));
+    return ((mpInstance!=NULL) && (mpCellPopulation!=NULL));
 }
 
 template<unsigned DIM>

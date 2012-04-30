@@ -60,7 +60,7 @@ private:
     AbstractCellPopulation<DIM>* mpCellPopulation;
 
     /** Allocated memory for stored data in CellData objects */
-    bool mAllocatedMemory;
+    bool mAllocatedMemory; ///\todo #1515 this is now redundant
 
     /** Number of variables per node to be stored */
     unsigned mNumberOfVariables;
