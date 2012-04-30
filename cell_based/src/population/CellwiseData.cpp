@@ -54,7 +54,7 @@ template<unsigned DIM>
 CellwiseData<DIM>::CellwiseData()
     : mpCellPopulation(NULL),
       mAllocatedMemory(true),
-      mNumberOfVariables(UNSIGNED_UNSET),
+      mNumberOfVariables(UNSIGNED_UNSET), ///\todo This is a big positive number - It should be zero so that we can comparison test against
       mUseConstantDataForTesting(false)
 {
     // Make sure there's only one instance - enforces correct serialization
@@ -88,7 +88,7 @@ double CellwiseData<DIM>::GetValue(CellPtr pCell, unsigned variableNumber)
     // To test a cell and cell-cycle models without a cell population
     if (mUseConstantDataForTesting)
     {
-        return mConstantDataForTesting[variableNumber];
+        NEVER_REACHED;
     }
 
  //   assert(IsSetUp());  -- Temporarily remove, since there are places where we are bypassing mConstantDataForTesting
@@ -99,6 +99,7 @@ template<unsigned DIM>
 void CellwiseData<DIM>::SetValue(double value, unsigned locationIndex, unsigned variableNumber)
 {
     assert(IsSetUp());
+
     if (variableNumber >= mNumberOfVariables)
     {
         EXCEPTION("Request for variable above mNumberOfVariables.");
@@ -156,14 +157,6 @@ template<unsigned DIM>
 bool CellwiseData<DIM>::IsSetUp()
 {
     return ((mpInstance!=NULL) && (mpCellPopulation!=NULL));
-}
-
-template<unsigned DIM>
-void CellwiseData<DIM>::SetConstantDataForTesting(std::vector<double>& rValues)
-{
-    mConstantDataForTesting = rValues;
-    mUseConstantDataForTesting = true;
-    mNumberOfVariables = rValues.size();
 }
 
 template<unsigned DIM>

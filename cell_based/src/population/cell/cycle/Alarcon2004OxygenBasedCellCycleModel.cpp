@@ -35,7 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Alarcon2004OxygenBasedCellCycleModel.hpp"
 
-#include "CellwiseData.hpp"
 #include "CellLabel.hpp"
 #include "Exception.hpp"
 

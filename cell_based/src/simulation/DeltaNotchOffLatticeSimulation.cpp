@@ -84,7 +84,7 @@ void DeltaNotchOffLatticeSimulation<DIM>::UpdateCellwiseData()
 
         // Note that the state variables must be in the same order as listed in DeltaNotchOdeSystem
         CellwiseData<DIM>::Instance()->SetValue(this_notch, index, 0);
-        CellwiseData<DIM>::Instance()->SetValue(this_delta, index, 1);
+        CellwiseData<DIM>::Instance()->SetValue(this_delta, index, 1);  ///\todo Warning this it probably too high
     }
 
     // Next iterate over the population to compute and store each cell's neighbouring Delta concentration in CellwiseData
@@ -118,7 +118,7 @@ void DeltaNotchOffLatticeSimulation<DIM>::UpdateCellwiseData()
                 double this_delta = CellwiseData<DIM>::Instance()->GetValue(p_cell, 1);
                 mean_delta += this_delta/neighbour_indices.size();
             }
-            CellwiseData<DIM>::Instance()->SetValue(mean_delta, index, 2);
+            CellwiseData<DIM>::Instance()->SetValue(mean_delta, index, 2); ///\todo Warning this it probably too high
         }
     }
 }

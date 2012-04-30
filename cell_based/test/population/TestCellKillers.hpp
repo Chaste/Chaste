@@ -331,7 +331,6 @@ public:
         }
 
         TS_ASSERT(new_locations == old_locations);
-        CellwiseData<2>::Destroy();
     }
 
     void TestPlaneBasedCellKillerIn1d() throw(Exception)

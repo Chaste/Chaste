@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define SIMPLEOXYGENBASEDCELLCYCLEMODEL_HPP_
 
 #include "AbstractSimpleCellCycleModel.hpp"
-#include "CellwiseData.hpp"
 
 /**
  * Simple oxygen-based cell-cycle model.

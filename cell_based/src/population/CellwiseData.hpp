@@ -69,7 +69,7 @@ private:
     std::vector<double> mConstantDataForTesting;
 
     /** Helper member storing whether mConstantDataForTesting is used. */
-    bool mUseConstantDataForTesting;
+    bool mUseConstantDataForTesting;  ///\todo #1515 this is now redundant
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -151,12 +151,6 @@ public:
      */
     void SetPopulationAndNumVars(AbstractCellPopulation<DIM>* pCellPopulation, unsigned numberOfVariables);
 
-    /**
-     * Force the data to return given values for all cells (only for testing).
-     *
-     * @param rValues vector of CellwiseData values
-     */
-    void SetConstantDataForTesting(std::vector<double>& rValues);
 
     /**
      * Is the instance in existence and fully set up

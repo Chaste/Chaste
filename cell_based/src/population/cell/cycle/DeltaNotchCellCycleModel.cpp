@@ -35,7 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "UblasIncludes.hpp"
 #include "DeltaNotchCellCycleModel.hpp"
-#include "CellwiseData.hpp"
 #include "CellCycleModelOdeSolver.hpp"
 #include "CvodeAdaptor.hpp"
 #include "Exception.hpp"
@@ -123,31 +122,7 @@ void DeltaNotchCellCycleModel::UpdateDeltaNotch()
     assert(mpOdeSystem != NULL);
     assert(mpCell != NULL);
 
-//    double mean_delta = mpCell->GetCellData()->GetItem(2);
-    double mean_delta;
-    switch (mDimension)
-    {
-        case 1:
-        {
-            const unsigned DIM = 1;
-            mean_delta = CellwiseData<DIM>::Instance()->GetValue(mpCell, 2);
-            break;
-        }
-        case 2:
-        {
-            const unsigned DIM = 2;
-            mean_delta = CellwiseData<DIM>::Instance()->GetValue(mpCell, 2);
-            break;
-        }
-        case 3:
-        {
-            const unsigned DIM = 3;
-            mean_delta = CellwiseData<DIM>::Instance()->GetValue(mpCell, 2);
-            break;
-        }
-        default:
-            NEVER_REACHED;
-    }
+    double mean_delta = mpCell->GetCellData()->GetItem(0);
 
     mpOdeSystem->rGetStateVariables()[2] = mean_delta;
 

@@ -57,16 +57,13 @@ public:
     ///\todo test correct behaviour of ODE system and state variables
     void TestCorrectBehaviour() throw(Exception)
     {
-        std::vector<double> constant_data(1.0);
-        CellwiseData<1>::Instance()->SetConstantDataForTesting(constant_data);
-        CellwiseData<2>::Instance()->SetConstantDataForTesting(constant_data);
-        CellwiseData<3>::Instance()->SetConstantDataForTesting(constant_data);
-
         TS_ASSERT_THROWS_NOTHING(DeltaNotchCellCycleModel cell_model3);
 
         DeltaNotchCellCycleModel* p_stem_model = new DeltaNotchCellCycleModel;
         p_stem_model->SetCellProliferativeType(STEM);
         p_stem_model->SetDimension(2);
+        MAKE_PTR_ARGS(CellData, p_stem_cell_data, (1));
+        p_stem_cell_data->SetItem(0, 0.0);
 
         // Change G1 duration for this model
         p_stem_model->SetStemCellG1Duration(1.0);
@@ -74,23 +71,27 @@ public:
         DeltaNotchCellCycleModel* p_transit_model = new DeltaNotchCellCycleModel;
         p_transit_model->SetCellProliferativeType(TRANSIT);
         p_transit_model->SetDimension(3);
+        MAKE_PTR_ARGS(CellData, p_transit_cell_data, (1));
+        p_transit_cell_data->SetItem(0, 0.0);
 
         // Change G1 duration for this model
-        p_stem_model->SetTransitCellG1Duration(1.0);
+        p_stem_model->SetTransitCellG1Duration(1.0);  ///\todo Is this a copy and paste error?
 
         DeltaNotchCellCycleModel* p_diff_model = new DeltaNotchCellCycleModel;
         p_diff_model->SetCellProliferativeType(DIFFERENTIATED);
         p_diff_model->SetDimension(1);
         MAKE_PTR_ARGS(CellData, p_diff_cell_data, (1));
-        p_diff_cell_data->SetItem(0, 100);
+        p_diff_cell_data->SetItem(0, 0.0);
 
 
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
 
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_stem_model));
+        p_stem_cell->AddCellProperty(p_stem_cell_data);
         p_stem_cell->InitialiseCellCycleModel();
 
         CellPtr p_transit_cell(new Cell(p_healthy_state, p_transit_model));
+        p_transit_cell->AddCellProperty(p_transit_cell_data);
         p_transit_cell->InitialiseCellCycleModel();
 
         CellPtr p_diff_cell(new Cell(p_healthy_state, p_diff_model));
@@ -117,16 +118,11 @@ public:
         TS_ASSERT_DELTA(p_diff_model->GetDelta(), 1.0, 1e-4);
         TS_ASSERT_DELTA(p_diff_model->GetMeanNeighbouringDelta(), 0.0, 1e-4);
 
-        // Tidy up
-        CellwiseData<2>::Destroy();
     }
 
     ///\todo test archiving of ODE system and state variables
     void TestArchiveDeltaNotchCellCycleModel()
     {
-        std::vector<double> constant_data(1.0);
-        CellwiseData<2>::Instance()->SetConstantDataForTesting(constant_data);
-
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "delta_notch_cell_cycle.arch";
 
@@ -144,6 +140,10 @@ public:
             MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
 
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
+            MAKE_PTR_ARGS(CellData, p_cell_data, (1));
+            p_cell_data->SetItem(0, 0.0);
+            p_cell->AddCellProperty(p_cell_data);
+
             p_cell->InitialiseCellCycleModel();
             p_cell->SetBirthTime(-1.1);
             p_simulation_time->IncrementTimeOneStep();
@@ -197,9 +197,6 @@ public:
             TS_ASSERT_EQUALS(p_model->GetCellProliferativeType(), TRANSIT);
             TS_ASSERT_DELTA(p_model->GetSDuration(), 5.0, 1e-12);
         }
-
-        // Tidy up
-        CellwiseData<1>::Destroy();
     }
 
     void TestCellCycleModelOutputParameters()

@@ -1111,7 +1111,6 @@ public:
 
             // Avoid memory leaks
             delete p_model2;
-            CellwiseData<1>::Destroy();
         }
     }
 

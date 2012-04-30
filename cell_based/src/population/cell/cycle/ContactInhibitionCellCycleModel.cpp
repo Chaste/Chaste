@@ -35,7 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ContactInhibitionCellCycleModel.hpp"
 #include "CellLabel.hpp"
-#include "CellwiseData.hpp"
 
 ContactInhibitionCellCycleModel::ContactInhibitionCellCycleModel()
     : AbstractSimpleCellCycleModel(),
@@ -54,30 +53,7 @@ void ContactInhibitionCellCycleModel::UpdateCellCyclePhase()
     }
 
     // Get cell volume
-    double cell_volume;
-    switch (mDimension)
-    {
-        case 1:
-        {
-            const unsigned DIM = 1;
-            cell_volume = CellwiseData<DIM>::Instance()->GetValue(mpCell, 0);
-            break;
-        }
-        case 2:
-        {
-            const unsigned DIM = 2;
-            cell_volume = CellwiseData<DIM>::Instance()->GetValue(mpCell, 0);
-            break;
-        }
-        case 3:
-        {
-            const unsigned DIM = 3;
-            cell_volume = CellwiseData<DIM>::Instance()->GetValue(mpCell, 0);
-            break;
-        }
-        default:
-            NEVER_REACHED;
-    }
+    double cell_volume = mpCell->GetCellData()->GetItem(0);
 
     // Removes the cell label
     mpCell->RemoveCellProperty<CellLabel>();
