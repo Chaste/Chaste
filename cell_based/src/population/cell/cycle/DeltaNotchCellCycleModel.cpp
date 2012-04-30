@@ -130,19 +130,19 @@ void DeltaNotchCellCycleModel::UpdateDeltaNotch()
         case 1:
         {
             const unsigned DIM = 1;
-            mean_delta = CellwiseData<DIM>::Instance()->GetValue(mpCell, 0);  ///\todo Should these be 0=Notch, 1=Delta 2=MeanDelta ?
+            mean_delta = CellwiseData<DIM>::Instance()->GetValue(mpCell, 2);
             break;
         }
         case 2:
         {
             const unsigned DIM = 2;
-            mean_delta = CellwiseData<DIM>::Instance()->GetValue(mpCell, 0);
+            mean_delta = CellwiseData<DIM>::Instance()->GetValue(mpCell, 2);
             break;
         }
         case 3:
         {
             const unsigned DIM = 3;
-            mean_delta = CellwiseData<DIM>::Instance()->GetValue(mpCell, 0);
+            mean_delta = CellwiseData<DIM>::Instance()->GetValue(mpCell, 2);
             break;
         }
         default:

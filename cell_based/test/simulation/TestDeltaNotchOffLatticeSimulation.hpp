@@ -142,6 +142,81 @@ public:
         CellwiseData<2>::Destroy();
     }
 
+    void TestDeltaNotchSimpleOde() throw(Exception)
+	{
+		EXIT_IF_PARALLEL;
+
+		// Two cells close to each other
+		std::vector<Node<2>* > nodes;
+		nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+		nodes.push_back(new Node<2>(1, false, 0.5, 0.0));
+
+		NodesOnlyMesh<2> mesh;
+		mesh.ConstructNodesWithoutMesh(nodes);
+
+		// Create some cells, each with a cell-cycle model that incorporates a Delta-Notch ODE system
+		std::vector<CellPtr> cells;
+		MAKE_PTR(WildTypeCellMutationState, p_state);
+
+		// Initial condition for delta, notch, mean_delta
+		std::vector<double> initial_conditions;
+		initial_conditions.push_back(1.0);
+		initial_conditions.push_back(1.0);
+		initial_conditions.push_back(1.0);
+
+		for (unsigned i=0; i< mesh.GetNumNodes(); i++)
+		{
+			DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
+			p_model->SetCellProliferativeType(DIFFERENTIATED);
+			p_model->SetInitialConditions(initial_conditions);
+			p_model->SetDimension(2);
+			p_model->SetMaxTransitGenerations(UINT_MAX);
+			CellPtr p_cell(new Cell(p_state, p_model));
+			double birth_time = 0.0;
+			p_cell->SetBirthTime(birth_time);
+			cells.push_back(p_cell);
+		}
+
+		// Create cell population
+		NodeBasedCellPopulation<2> cell_population(mesh, cells);
+		cell_population.SetMechanicsCutOffLength(1.5);
+		cell_population.SetCellAncestorsToLocationIndices();
+
+		// Create and initialize CellwiseData
+		CellwiseData<2>* p_data = CellwiseData<2>::Instance();
+		p_data->SetPopulationAndNumVars(&cell_population, 3);
+
+		// Create and configure cell-based simulation
+		DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
+		simulator.SetOutputDirectory("TestDeltaNotchSimpleOdeSimulation");
+		simulator.SetEndTime(0.01);
+
+		// Run simulation
+		simulator.Solve();
+
+		// Check that the levels of delta and notch are roughly equal in each cell.
+
+		// Get the cell
+
+
+		TS_ASSERT_DELTA(p_data->GetValue(cells[0],0), p_data->GetValue(cells[1],0), 1e-4);
+		TS_ASSERT_DELTA(p_data->GetValue(cells[0],1), p_data->GetValue(cells[1],1), 1e-4);
+
+		for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+				cell_iter != cell_population.End();
+				++cell_iter)
+		{
+			// Check the values agree with solutions obtained from Matlab
+			TS_ASSERT_DELTA((*cell_iter)->GetCellData()->GetItem(0), 0.9999, 1e-4);
+
+			///\todo This fails because the state variables do not appear to be being updated properly see #1995
+			//TS_ASSERT_DELTA((*cell_iter)->GetCellData()->GetItem(1), 0.9901, 1e-4);
+		}
+
+		// Tidy up
+		CellwiseData<2>::Destroy();
+	}
+
     void TestUpdateAtEndOfTimeStepVertex() throw (Exception)
     {
         EXIT_IF_PARALLEL;
