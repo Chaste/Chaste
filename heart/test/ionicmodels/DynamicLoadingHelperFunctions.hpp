@@ -58,7 +58,7 @@ AbstractCardiacCellInterface* CreateCellWithStandardStimulus(DynamicCellModelLoa
                                                              double magnitude=-25.5) // uA/cm^2
 {
     // Set stimulus
-    double duration  = 2.0; // ms
+    double duration = 2.0; // ms
     double when = 50.0; // ms
     boost::shared_ptr<AbstractStimulusFunction> p_stimulus(new SimpleStimulus(magnitude, duration, when));
     boost::shared_ptr<AbstractIvpOdeSolver> p_solver(new EulerIvpOdeSolver);

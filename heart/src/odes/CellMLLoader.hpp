@@ -37,70 +37,81 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CELLMLLOADER_HPP_
 
 #include <vector>
+#include <string>
 #include <boost/shared_ptr.hpp>
+#include <boost/logic/tribool.hpp>
 
 #include "FileFinder.hpp"
 #include "OutputFileHandler.hpp"
 #include "AbstractCardiacCell.hpp"
+#include "AbstractCvodeCell.hpp"
 #include "CellMLToSharedLibraryConverter.hpp"
 
-#ifdef CHASTE_CVODE
-#include "AbstractCvodeCell.hpp"
-#endif
-
 /**
- * A helper class which will dynamically load a cellML file and
- * provide a method to get a pointer to an AbstractCardiacCell
- * (or AbstractCvodeCell if CVODE is enabled).
+ * A helper class which will dynamically load a CellML file and provide a method to get a pointer
+ * to a new AbstractCardiacCell (or AbstractCvodeCell if CVODE is enabled).
+ *
+ * Note that you cannot call both LoadCardiacCell and LoadCvodeCell on the same object, since there
+ * would be filename conflicts trying to create different classes in the same output folder.  Create
+ * a second loader with a different rOutputFileHandler parameter if you need both kinds of cell.
  */
 class CellMLLoader
 {
+public:
+    /**
+     * Create a new loader for a CellML model.
+     *
+     * @param rCellMLFile  the location of a CellML file to load on the fly
+     * @param rOutputFileHandler  where to put the generated files
+     * @param rOptions  any options to be passed to PyCML e.g. "--expose-annotated-variables"
+     */
+    CellMLLoader(const FileFinder& rCellMLFile,
+                 const OutputFileHandler& rOutputFileHandler,
+                 const std::vector<std::string>& rOptions);
+
+    /**
+     * Make an AbstractCardiacCell, which will be solved with a (Forward)Euler solver,
+     * and uses the default stimulus from the CellML file (if present).
+     * @return a pointer to the cell
+     */
+    boost::shared_ptr<AbstractCardiacCell> LoadCardiacCell(void);
+
+#ifdef CHASTE_CVODE
+    /**
+     * Make an AbstractCvodeCell, using the default stimulus from the CellML file (if present).
+     * @return a pointer to the cell
+     */
+    boost::shared_ptr<AbstractCvodeCell> LoadCvodeCell(void);
+#endif
+
 private:
-    /** The location of the cellml file to convert */
+    /** The location of the CellML file to convert */
     FileFinder mCellMLFile;
 
     /** The location of an output folder to put the converted file and shared library in */
     OutputFileHandler mOutputFileHandler;
 
-    /** A vector of options to be passed to the cellML converter (PyCML) e.g. "--expose-annotated-variables" */
+    /** A vector of options to be passed to the CellML converter (PyCML) e.g. "--expose-annotated-variables" */
     std::vector<std::string> mOptions;
 
     /** The converter we will use */
     boost::shared_ptr<CellMLToSharedLibraryConverter> mpConverter;
 
+    /** Whether we are building 'normal' (false) or 'CVODE' (true) cells. */
+    boost::logic::tribool mUseCvode;
+
     /**
      * A method to make a new cell model which is then cast in the public methods to the relevant type.
-     * It copies the cellML file to the #mOutputFileHandler location,
+     * It copies the CellML file to the #mOutputFileHandler location,
      * writes an options file, converts to .hpp and .cpp, makes a shared library, and loads the cell.
      *
-     * @param makeCvodeCell  Whether this cell should be an AbstractCvodeCell (false = AbstractCardiacCell)
+     * Note that on any subsequent calls, the shared library will already exist, and so the conversion
+     * will not be performed, making the method much faster.
+     *
+     * @param makeCvodeCell  whether this cell should be an AbstractCvodeCell (false = AbstractCardiacCell)
      * @return a pointer to an AbstractCardiacCellInterface which can be cast as required.
      */
     AbstractCardiacCellInterface* LoadCellMLFile(bool makeCvodeCell);
-
-public:
-    /**
-     * Constructor
-     *
-     * @param rCellMLFile  The location of a CellML file to load on the fly
-     * @param rOutputFileHandler  An output directory to do the conversion in
-     * @param options  Any options to be passed to PyCML e.g. "--expose-annotated-variables"
-     */
-    CellMLLoader(const FileFinder& rCellMLFile, const OutputFileHandler& rOutputFileHandler, const std::vector<std::string>& options);
-
-    /**
-     * Make an AbstractCardiacCell, makes a (Forward)Euler solver, and uses a default CellML stimulus if present.
-     * @return a pointer to the cell
-     */
-    boost::shared_ptr<AbstractCardiacCell> LoadCardiacCellFromCellML(void);
-
-#ifdef CHASTE_CVODE
-    /**
-     * Make an AbstractCvodeCell, uses a default CellML stimulus if present.
-     * @return a pointer to the cell
-     */
-    boost::shared_ptr<AbstractCvodeCell> LoadCvodeCellFromCellML(void);
-#endif
 };
 
 #endif // CELLMLLOADER_HPP_

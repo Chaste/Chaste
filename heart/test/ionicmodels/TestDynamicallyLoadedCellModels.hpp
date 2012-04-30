@@ -51,16 +51,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RunAndCheckIonicModels.hpp"
 #include "DynamicLoadingHelperFunctions.hpp"
 
-#include "SimpleStimulus.hpp"
-#include "EulerIvpOdeSolver.hpp"
 #include "DynamicCellModelLoader.hpp"
 #include "DynamicModelLoaderRegistry.hpp"
+#include "CellMLLoader.hpp"
+#include "CellMLToSharedLibraryConverter.hpp"
+
+#include "SimpleStimulus.hpp"
+#include "EulerIvpOdeSolver.hpp"
 #include "ChasteBuildRoot.hpp"
 #include "HeartConfig.hpp"
 #include "FileFinder.hpp"
-#include "CellMLLoader.hpp"
 #include "HeartFileFinder.hpp"
-#include "CellMLToSharedLibraryConverter.hpp"
+
 #include "AbstractDynamicallyLoadableEntity.hpp"
 #include "AbstractCardiacCellInterface.hpp"
 #include "AbstractCvodeCell.hpp"
@@ -153,6 +155,48 @@ private:
     }
 
 public:
+    /**
+     * This test demonstrates the easiest way to load a single cell model from CellML,
+     * using the CellMLLoader class.
+     */
+    void TestCellmlLoaderClass() throw(Exception)
+    {
+        FileFinder cellml_file("heart/src/odes/cellml/LuoRudy1991.cellml", RelativeTo::ChasteSourceRoot);
+        // Stimulus to use for simulation, so it matches other tests in this suite
+        boost::shared_ptr<AbstractStimulusFunction> p_stimulus(new SimpleStimulus(-25.5, 2.0, 50.0));
+        {
+            OutputFileHandler handler("TestCardiacCellMLLoader");
+            // Note that the --cvode flag will be ignored since we call the LoadCardiacCell method.
+            std::vector<std::string> options = boost::assign::list_of("--cvode")("--expose-annotated-variables");
+            CellMLLoader loader(cellml_file, handler, options);
+            boost::shared_ptr<AbstractCardiacCell> p_cell = loader.LoadCardiacCell();
+            TS_ASSERT_EQUALS(p_cell->GetSystemName(), "luo_rudy_1991");
+            p_cell->SetStimulusFunction(p_stimulus);
+            SimulateLr91AndCompare(p_cell.get());
+
+            // We can't now call LoadCvodeCell on this loader
+#ifdef CHASTE_CVODE
+            TS_ASSERT_THROWS_THIS(loader.LoadCvodeCell(),
+                                  "You cannot call both LoadCvodeCell and LoadCardiacCell on the same CellMLLoader.");
+#endif
+        }
+#ifdef CHASTE_CVODE
+        {
+            OutputFileHandler handler("TestCvodeCellMLLoader");
+            std::vector<std::string> options = boost::assign::list_of("--expose-annotated-variables");
+            CellMLLoader loader(cellml_file, handler, options);
+            boost::shared_ptr<AbstractCvodeCell> p_cell = loader.LoadCvodeCell();
+            TS_ASSERT_EQUALS(p_cell->GetSystemName(), "luo_rudy_1991");
+            p_cell->SetStimulusFunction(p_stimulus);
+            SimulateLr91AndCompare(p_cell.get(), 1.0); // Large tolerance due to different ODE solver
+
+            // We can't now call LoadCardiacCell on this loader
+            TS_ASSERT_THROWS_THIS(loader.LoadCardiacCell(),
+                                  "You cannot call both LoadCvodeCell and LoadCardiacCell on the same CellMLLoader.");
+        }
+#endif
+    }
+
     /**
      * This is based on TestOdeSolverForLR91WithDelayedSimpleStimulus from
      * TestIonicModels.hpp.
@@ -313,30 +357,6 @@ public:
             converter.CreateOptionsFile(handler3, model, args, for_model);
             p_loader = converter.Convert(copied_file3);
             RunLr91Test(*p_loader, 0u, true, 1, 70); // Large tolerance due to different ODE solver
-        }
-#endif
-    }
-
-    void TestCellmlConverterWithHelperMethod() throw(Exception)
-    {
-        // Copy CellML file into output dir
-        std::string model = "LuoRudy1991";
-
-        FileFinder cellml_file("heart/src/odes/cellml/" + model + ".cellml", RelativeTo::ChasteSourceRoot);
-        {
-            OutputFileHandler handler("TestCardiacCellMLLoader");
-            std::vector<std::string> options = boost::assign::list_of("--cvode")("--expose-annotated-variables");
-            CellMLLoader loader(cellml_file, handler, options);
-            boost::shared_ptr<AbstractCardiacCell> p_cell = loader.LoadCardiacCellFromCellML();
-            TS_ASSERT_EQUALS(p_cell->GetSystemName(),"luo_rudy_1991");
-        }
-#ifdef CHASTE_CVODE
-        {
-            OutputFileHandler handler("TestCvodeCellMLLoader");
-            std::vector<std::string> options = boost::assign::list_of("--expose-annotated-variables");
-            CellMLLoader loader(cellml_file, handler, options);
-            boost::shared_ptr<AbstractCvodeCell> p_cell = loader.LoadCvodeCellFromCellML();
-            TS_ASSERT_EQUALS(p_cell->GetSystemName(),"luo_rudy_1991");
         }
 #endif
     }

@@ -34,44 +34,61 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "CellMLLoader.hpp"
+
+#include <algorithm>
 #include "EulerIvpOdeSolver.hpp"
 
-CellMLLoader::CellMLLoader(const FileFinder& rCellMLFile, const OutputFileHandler& rOutputFileHandler, const std::vector<std::string>& options)
+CellMLLoader::CellMLLoader(const FileFinder& rCellMLFile, const OutputFileHandler& rOutputFileHandler, const std::vector<std::string>& rOptions)
     : mCellMLFile(rCellMLFile),
       mOutputFileHandler(rOutputFileHandler),
-      mOptions(options)
+      mOptions(rOptions),
+      mpConverter(new CellMLToSharedLibraryConverter(true)), // Builds using just the 'heart' component
+      mUseCvode(boost::logic::indeterminate)
 {
-    mpConverter.reset(new CellMLToSharedLibraryConverter(true)); // Just 'true' will make in heart/dynamic
 }
 
 AbstractCardiacCellInterface* CellMLLoader::LoadCellMLFile(bool makeCvodeCell)
 {
-    // Firstly remove or add the "--cvode" option to get the desired cell type.
-    std::vector<std::string>::iterator it;
-    for (it=mOptions.begin(); it!=mOptions.end(); ++it)
+    std::string model_name = mCellMLFile.GetLeafNameNoExtension();
+    FileFinder copied_model = mOutputFileHandler.FindFile(mCellMLFile.GetLeafName());
+
+    // If this is the first call, set up to do the conversion
+    if (boost::logic::indeterminate(mUseCvode))
     {
-        if (*it=="--cvode")
+        mUseCvode = makeCvodeCell;
+
+        // Remove or add the "--cvode" option to get the desired cell type
+        std::vector<std::string>::iterator it = std::find(mOptions.begin(), mOptions.end(), "--cvode");
+        if (!makeCvodeCell && it != mOptions.end())
         {
             mOptions.erase(it);
         }
+        if (makeCvodeCell && it == mOptions.end())
+        {
+            mOptions.push_back("--cvode");
+        }
+
+        // Create an options file and put it in the output directory with the CellML file
+        mpConverter->CreateOptionsFile(mOutputFileHandler, model_name, mOptions);
+        mOutputFileHandler.CopyFileTo(mCellMLFile);
     }
-    if (makeCvodeCell)
+    // If however we've made a cell before, check that we're making the same type this time
+    else if (makeCvodeCell != mUseCvode)
     {
-        mOptions.push_back("--cvode");
+        EXCEPTION("You cannot call both LoadCvodeCell and LoadCardiacCell on the same CellMLLoader.");
     }
 
-    // Create an options file and put it in the output directory with the cellml file
-    std::string model_name = mCellMLFile.GetLeafNameNoExtension();
-    mpConverter->CreateOptionsFile(mOutputFileHandler, model_name, mOptions);
-    FileFinder copied_model = mOutputFileHandler.CopyFileTo(mCellMLFile);
-
-    // Convert the cellML to a shared library
+    // Convert the CellML to a shared library (no-op if shared library exists)
     DynamicCellModelLoader* p_loader = mpConverter->Convert(copied_model);
 
     // Use the shared library to load a concrete cell
     boost::shared_ptr<AbstractStimulusFunction> p_stimulus;
-    // Put in a Forward Euler as a default for normal cells (will be safely ignored for Cvode).
     boost::shared_ptr<EulerIvpOdeSolver> p_solver;
+    if (!makeCvodeCell)
+    {
+        // Put in a Forward Euler solver as a default for normal cells
+        p_solver.reset(new EulerIvpOdeSolver);
+    }
     AbstractCardiacCellInterface* p_loaded_cell = p_loader->CreateCell(p_solver, p_stimulus);
 
     // If the CellML file has a default stimulus we may as well use it.
@@ -82,7 +99,7 @@ AbstractCardiacCellInterface* CellMLLoader::LoadCellMLFile(bool makeCvodeCell)
     return p_loaded_cell;
 }
 
-boost::shared_ptr<AbstractCardiacCell> CellMLLoader::LoadCardiacCellFromCellML(void)
+boost::shared_ptr<AbstractCardiacCell> CellMLLoader::LoadCardiacCell(void)
 {
     AbstractCardiacCellInterface* p_loaded_cell = LoadCellMLFile(false);
     boost::shared_ptr<AbstractCardiacCell> p_model(dynamic_cast<AbstractCardiacCell*>(p_loaded_cell));
@@ -90,7 +107,7 @@ boost::shared_ptr<AbstractCardiacCell> CellMLLoader::LoadCardiacCellFromCellML(v
 }
 
 #ifdef CHASTE_CVODE
-boost::shared_ptr<AbstractCvodeCell> CellMLLoader::LoadCvodeCellFromCellML(void)
+boost::shared_ptr<AbstractCvodeCell> CellMLLoader::LoadCvodeCell(void)
 {
     AbstractCardiacCellInterface* p_loaded_cell = LoadCellMLFile(true);
     boost::shared_ptr<AbstractCvodeCell> p_model(dynamic_cast<AbstractCvodeCell*>(p_loaded_cell));
