@@ -467,8 +467,8 @@ def Configure(build):
     if hasattr(conf, 'ModifyBuild') and callable(conf.ModifyBuild):
         conf.ModifyBuild(build)
     
+    print "Using hostconfig settings from", os.path.splitext(conf.__file__)[0] + ".py"
     if build.debug:
-        print "Using hostconfig settings from", conf.__name__, ":"
         for name in dir(conf):
             item = getattr(conf, name)
             if name[0] != '_' and type(item) != types.FunctionType:
