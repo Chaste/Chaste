@@ -215,6 +215,11 @@ public:
 
 		// Tidy up
 		CellwiseData<2>::Destroy();
+		
+		for(unsigned i=0; i<nodes.size(); i++)
+		{
+			delete nodes[i];
+		}
 	}
 
     void TestUpdateAtEndOfTimeStepVertex() throw (Exception)
