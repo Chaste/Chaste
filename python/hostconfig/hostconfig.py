@@ -467,7 +467,8 @@ def Configure(build):
     if hasattr(conf, 'ModifyBuild') and callable(conf.ModifyBuild):
         conf.ModifyBuild(build)
     
-    print "Using hostconfig settings from", os.path.splitext(conf.__file__)[0] + ".py"
+    if not build.quiet:
+        print "Using hostconfig settings from", os.path.splitext(conf.__file__)[0] + ".py"
     if build.debug:
         for name in dir(conf):
             item = getattr(conf, name)

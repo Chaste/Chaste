@@ -98,6 +98,7 @@ build_type = ARGUMENTS.get('build', ARGUMENTS.get('b', 'default'))
 build = BuildTypes.GetBuildType(build_type)
 build.SetRevision(ARGUMENTS.get('revision', ''))
 build.debug = debug
+build.quiet = GetOption('silent') or dyn_libs_only
 Export('build')
 
 # Whether to use static or shared libraries
