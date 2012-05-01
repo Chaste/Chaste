@@ -140,6 +140,13 @@ public:
 
         TS_ASSERT_DELTA(p_data->GetValue(*cell_iter2, 1), 3.23, 1e-12);
 
+        TS_ASSERT_THROWS_THIS(p_data->GetValue(*cell_iter2, 2),
+                    "Request for variable above mNumberOfVariables.");
+        TS_ASSERT_THROWS_THIS(p_data->SetValue(0.0, 0, 2),
+                "Request for variable above mNumberOfVariables.");
+
+
+
         p_data->SetValue(4.23, mesh.GetNode(1)->GetIndex(), 1);
         ++cell_iter2;
 
@@ -355,6 +362,32 @@ public:
             delete (&cell_population);
         }
     }
+    
+//    void TestNoCellwiseData()
+//    {
+//        // Set up simulation time
+//        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+//
+//        // Create a simple mesh
+//        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
+//        MutableMesh<2,2> mesh;
+//        mesh.ConstructFromMeshReader(mesh_reader);
+//
+//        // Set up cells, one for each node. Give each a birth time of -node_index, so the age = node_index
+//        std::vector<CellPtr> cells;
+//        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+//        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+//
+//        // Create a cell population
+//        MeshBasedCellPopulation<2> cell_population(mesh, cells);
+//        
+//        MAKE_PTR_ARGS(CellData, p_cell_data, (1));  
+//        cell_population.AddNewPropertyToAllCells(p_cell_data);
+//        
+//        AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+//        cell_iter->GetData->SetItem(0, 1.0);
+//    
+//    }
 };
 
 #endif /*TESTCELLWISEDATA_HPP_*/

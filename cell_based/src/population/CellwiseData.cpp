@@ -54,7 +54,7 @@ template<unsigned DIM>
 CellwiseData<DIM>::CellwiseData()
     : mpCellPopulation(NULL),
       mAllocatedMemory(true),
-      mNumberOfVariables(UNSIGNED_UNSET), ///\todo This is a big positive number - It should be zero so that we can comparison test against
+      mNumberOfVariables(0u), ///\todo This is a big positive number - It should be zero so that we can comparison test against
       mUseConstantDataForTesting(false)
 {
     // Make sure there's only one instance - enforces correct serialization
@@ -91,7 +91,7 @@ double CellwiseData<DIM>::GetValue(CellPtr pCell, unsigned variableNumber)
         NEVER_REACHED;
     }
 
- //   assert(IsSetUp());  -- Temporarily remove, since there are places where we are bypassing mConstantDataForTesting
+    assert(IsSetUp());  //-- Temporarily remove, since there are places where we are bypassing mConstantDataForTesting
 	return pCell->GetCellData()->GetItem(variableNumber);
 }
 

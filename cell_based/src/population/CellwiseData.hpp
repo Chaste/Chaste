@@ -66,7 +66,7 @@ private:
     unsigned mNumberOfVariables;
 
     /** Helper member storing constant data. Used in tests. */
-    std::vector<double> mConstantDataForTesting;
+    std::vector<double> mConstantDataForTesting; ///\todo #1515 this is now redundant
 
     /** Helper member storing whether mConstantDataForTesting is used. */
     bool mUseConstantDataForTesting;  ///\todo #1515 this is now redundant
