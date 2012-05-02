@@ -363,31 +363,42 @@ public:
         }
     }
     
-//    void TestNoCellwiseData()
-//    {
-//        // Set up simulation time
-//        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
-//
-//        // Create a simple mesh
-//        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-//        MutableMesh<2,2> mesh;
-//        mesh.ConstructFromMeshReader(mesh_reader);
-//
-//        // Set up cells, one for each node. Give each a birth time of -node_index, so the age = node_index
-//        std::vector<CellPtr> cells;
-//        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-//        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
-//
-//        // Create a cell population
-//        MeshBasedCellPopulation<2> cell_population(mesh, cells);
-//        
-//        MAKE_PTR_ARGS(CellData, p_cell_data, (1));  
-//        cell_population.AddNewPropertyToAllCells(p_cell_data);
-//        
-//        AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-//        cell_iter->GetData->SetItem(0, 1.0);
-//    
-//    }
+    ///\todo #1515 This test doesn't use CellwiseData and should move into another test suite when CellwiseData is redundant
+    void TestAddCellData()
+    {
+        // Set up simulation time
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+
+        // Create a simple mesh
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
+        MutableMesh<2,2> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        // Set up cells, one for each node. Give each a birth time of -node_index, so the age = node_index
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        // Create a cell population
+        MeshBasedCellPopulation<2> cell_population(mesh, cells);
+        
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        p_cell_data->SetItem(0, 100.0);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
+        
+        //Check that the data made it there and that copies of the data are independent
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+                 cell_iter != cell_population.End();
+                 ++cell_iter)
+        {   
+            TS_ASSERT_EQUALS(cell_iter->GetCellData()->GetItem(0), 100.0);
+            cell_iter->GetCellData()->SetItem(0, 1.0);
+        }
+        
+        //Try it again
+        TS_ASSERT_THROWS_THIS(cell_population.AddClonedDataToAllCells(p_cell_data),
+            "AddClonedDataToAllCells() assumes that cells have no data");
+    }
 };
 
 #endif /*TESTCELLWISEDATA_HPP_*/

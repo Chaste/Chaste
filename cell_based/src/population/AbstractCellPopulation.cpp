@@ -126,6 +126,23 @@ void AbstractCellPopulation<DIM>::InitialiseCells()
 }
 
 template<unsigned DIM>
+void AbstractCellPopulation<DIM>::AddClonedDataToAllCells(boost::shared_ptr<CellData> pCellData) 
+{
+     
+    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter=this->Begin(); cell_iter!=this->End(); ++cell_iter)
+    {
+        CellPropertyCollection& r_collection = cell_iter->rGetCellPropertyCollection();
+        if (r_collection.HasProperty<CellData>())
+        {
+            EXCEPTION("AddClonedDataToAllCells() assumes that cells have no data");
+        }
+        MAKE_PTR_ARGS(CellData, p_cell_data, (*pCellData)); //Invokes copy constructor for CellData 
+        cell_iter->AddCellProperty(p_cell_data);
+    }
+}     
+
+
+template<unsigned DIM>
 AbstractMesh<DIM, DIM>& AbstractCellPopulation<DIM>::rGetMesh()
 {
     return mrMesh;

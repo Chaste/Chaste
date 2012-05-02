@@ -244,6 +244,12 @@ public:
      * Initialise each cell's cell-cycle model.
      */
     void InitialiseCells();
+    
+    /**
+     * Add a (copy) of a cell data to all cells in the population
+     * @param pCellData is the data which is going to be replicated and a fresh copy added to each cell
+     */
+    void AddClonedDataToAllCells(boost::shared_ptr<CellData> pCellData); 
 
     /**
      * @return reference to the mesh, mrMesh.
