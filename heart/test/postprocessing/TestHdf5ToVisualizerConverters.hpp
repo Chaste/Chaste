@@ -66,12 +66,8 @@ private:
         OutputFileHandler handler(dir);
         FileFinder file_finder(file, RelativeTo::ChasteSourceRoot);
 
-        if (PetscTools::AmMaster())
-        {
-            FileFinder copied_file = handler.CopyFileTo(file_finder);
-            TS_ASSERT(copied_file.IsFile());
-        }
-        PetscTools::Barrier();
+        FileFinder copied_file = handler.CopyFileTo(file_finder);
+        TS_ASSERT(copied_file.IsFile());
     }
 
 public:

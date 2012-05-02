@@ -140,6 +140,8 @@ public:
     /**
      * Copy the given file to this output directory.
      *
+     * @note This MUST be called collectively, since it contains a barrier call.
+     *
      * @param rSourceFile  the file to copy
      * @return the copied file
      */
