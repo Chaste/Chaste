@@ -295,6 +295,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile()
         std::vector<double> cell_volumes(num_elements);
         std::vector<std::vector<double> > cellwise_data;
 
+        ///\todo #1515 
         // This code is commented code is because Cellwise Data can't deal with ghost nodes see #1975
         assert(!CellwiseData<DIM>::Instance()->IsSetUp());
         //if (CellwiseData<DIM>::Instance()->IsSetUp())
@@ -355,6 +356,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile()
                     double cell_volume = this->mpVoronoiTessellation->GetVolumeOfElement(elem_index);
                     cell_volumes[elem_index] = cell_volume;
                 }
+                ///\todo #1515 
                 // This code is commented  because Cellwise Data can't deal with ghost nodes see #1975
                 assert(!CellwiseData<DIM>::Instance()->IsSetUp());
                 //if (CellwiseData<DIM>::Instance()->IsSetUp())
@@ -421,6 +423,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile()
         {
             mesh_writer.AddCellData("Cell volumes", cell_volumes);
         }
+        ///\todo #1515 
         // This code is commented code is because Cellwise Data can't deal with ghost nodes see #1975
         assert(!CellwiseData<DIM>::Instance()->IsSetUp());
 //if (CellwiseData<DIM>::Instance()->IsSetUp())

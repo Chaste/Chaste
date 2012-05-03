@@ -416,7 +416,7 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
         // Store the PDE solution in an accessible form
         ReplicatableVector solution_repl(p_pde_and_bc->GetSolution());
 
-        // Having solved the PDE, now update CellwiseData
+        // Having solved the PDE, now update CellData
         for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = mpCellPopulation->Begin();
              cell_iter != mpCellPopulation->End();
              ++cell_iter)
@@ -445,8 +445,7 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
             {
                 solution_at_node = solution_repl[node_index];
             }
-
-            CellwiseData<DIM>::Instance()->SetValue(solution_at_node, node_index, pde_index);
+            cell_iter->GetCellData()->SetItem(pde_index, solution_at_node);
         }
     }
 
@@ -555,7 +554,7 @@ void CellBasedPdeHandler<DIM>::WritePdeSolution(double time)
                         }
 
                         CellPtr p_cell = mpCellPopulation->GetCellUsingLocationIndex(nearest_node_index);
-                        double solution = CellwiseData<DIM>::Instance()->GetValue(p_cell, pde_index);
+                        double solution = p_cell->GetCellData()->GetItem(pde_index);
                         (*mpVizPdeSolutionResultsFile) << solution << " ";
                     }
                 }
@@ -573,7 +572,7 @@ void CellBasedPdeHandler<DIM>::WritePdeSolution(double time)
                     {
                         (*mpVizPdeSolutionResultsFile) << position[i] << " ";
                     }
-                    double solution = CellwiseData<DIM>::Instance()->GetValue(*cell_iter, pde_index);
+                    double solution = cell_iter->GetCellData()->GetItem(pde_index);
                     (*mpVizPdeSolutionResultsFile) << solution << " ";
                 }
             }

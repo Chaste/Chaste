@@ -94,11 +94,8 @@ void VolumeTrackedOffLatticeSimulation<DIM>::UpdateCellwiseData()
         // Get the volume of this cell
         double cell_volume = this->mrCellPopulation.GetVolumeOfCell(*cell_iter);
 
-        // Get the location index corresponding to this cell
-        unsigned location_index = this->mrCellPopulation.GetLocationIndexUsingCell(*cell_iter);
-
-        // Store the cell's volume in CellwiseData
-        CellwiseData<DIM>::Instance()->SetValue(cell_volume, location_index, 0);
+        // Store the cell's volume in CellData
+        cell_iter->GetCellData()->SetItem(0, cell_volume);
     }
 }
 

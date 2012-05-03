@@ -56,35 +56,33 @@ DeltaNotchOffLatticeSimulation<DIM>::~DeltaNotchOffLatticeSimulation()
 template<unsigned DIM>
 void DeltaNotchOffLatticeSimulation<DIM>::SetupSolve()
 {
-    UpdateCellwiseData();
+    UpdateCellData();
 }
 
 template<unsigned DIM>
 void DeltaNotchOffLatticeSimulation<DIM>::UpdateAtEndOfTimeStep()
 {
-    UpdateCellwiseData();
+    UpdateCellData();
 }
 
 template<unsigned DIM>
-void DeltaNotchOffLatticeSimulation<DIM>::UpdateCellwiseData()
+void DeltaNotchOffLatticeSimulation<DIM>::UpdateCellData()
 {
     // Make sure the cell population is updated
     this->mrCellPopulation.Update();
 
-    // First store each cell's Notch and Delta concentrations in CellwiseData
+    // First store each cell's Notch and Delta concentrations in CellData
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mrCellPopulation.Begin();
          cell_iter != this->mrCellPopulation.End();
          ++cell_iter)
     {
-        unsigned index = this->mrCellPopulation.GetLocationIndexUsingCell(*cell_iter);
-
         DeltaNotchCellCycleModel* p_model = static_cast<DeltaNotchCellCycleModel*>(cell_iter->GetCellCycleModel());
         double this_delta = p_model->GetDelta();
         double this_notch = p_model->GetNotch();
 
         // Note that the state variables must be in the same order as listed in DeltaNotchOdeSystem
-        CellwiseData<DIM>::Instance()->SetValue(this_notch, index, 0);
-        CellwiseData<DIM>::Instance()->SetValue(this_delta, index, 1);  ///\todo Warning this it probably too high
+        cell_iter->GetCellData()->SetItem(0, this_notch);
+        cell_iter->GetCellData()->SetItem(1, this_delta);///\todo Warning Elsewhere we are only reading back item 0 as the mean_delta
     }
 
     // Next iterate over the population to compute and store each cell's neighbouring Delta concentration in CellwiseData
@@ -115,10 +113,10 @@ void DeltaNotchOffLatticeSimulation<DIM>::UpdateCellwiseData()
                  ++iter)
             {
                 CellPtr p_cell = this->mrCellPopulation.GetCellUsingLocationIndex(*iter);
-                double this_delta = CellwiseData<DIM>::Instance()->GetValue(p_cell, 1);
+                double this_delta = p_cell->GetCellData()->GetItem(1);
                 mean_delta += this_delta/neighbour_indices.size();
             }
-            CellwiseData<DIM>::Instance()->SetValue(mean_delta, index, 2); ///\todo Warning this it probably too high
+            cell_iter->GetCellData()->SetItem(2, mean_delta);///\todo Warning Elsewhere we are reading back item 0 as the mean_delta
         }
     }
 }

@@ -64,6 +64,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 
+#include "Debug.hpp"
+
+
+
 class SimplePdeForTesting : public AbstractLinearEllipticPde<2,2>
 {
 public:
@@ -505,14 +509,16 @@ public:
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
         cell_population.SetMechanicsCutOffLength(1.5);
 
-        // Set up CellwiseData and associate it with the cell population
+        //MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        //p_cell_data->SetItem(0, 1.0);
+        //cell_population.AddClonedDataToAllCells(p_cell_data);
+		// Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
         p_data->SetPopulationAndNumVars(&cell_population, 1);
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             p_data->SetValue(1.0, mesh.GetNode(i)->GetIndex());
         }
-
         // Create a PDE handler object using this cell population
         CellBasedPdeHandler<2> pde_handler(&cell_population);
 
@@ -551,6 +557,7 @@ public:
         cells_generator2.GenerateBasic(cells2, p_mesh2->GetNumNodes());
 
         MeshBasedCellPopulation<2> cell_population2(*p_mesh2, cells2);
+        //cell_population2.AddClonedDataToAllCells(p_cell_data);
 
         CellwiseData<2>::Destroy();
         CellwiseData<2>* p_data2 = CellwiseData<2>::Instance();
@@ -587,9 +594,16 @@ public:
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
+        //MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        //p_cell_data->SetItem(0, 1.0);
+        //cell_population.AddClonedDataToAllCells(p_cell_data);
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
         p_data->SetPopulationAndNumVars(&cell_population, 1);
+//        for (unsigned i=0; i<cells.size(); i++)
+//        {
+//            cells[i]->GetCellData()->SetItem(0, RandomNumberGenerator::Instance()->ranf());
+//        }
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             p_data->SetValue(RandomNumberGenerator::Instance()->ranf(), p_mesh->GetNode(i)->GetIndex());
@@ -634,10 +648,16 @@ public:
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
+        //MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        //p_cell_data->SetItem(0, 1.0);
+        //cell_population.AddClonedDataToAllCells(p_cell_data);
         // Set up CellwiseData and associate it with the cell population
         CellwiseData<2>* p_data = CellwiseData<2>::Instance();
         p_data->SetPopulationAndNumVars(&cell_population, 1);
-
+//        for (unsigned i=0; i<cells.size(); i++)
+//        {
+//            cells[i]->GetCellData()->SetItem(0, RandomNumberGenerator::Instance()->ranf());
+//        }
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             p_data->SetValue(RandomNumberGenerator::Instance()->ranf(), p_mesh->GetNode(i)->GetIndex());
@@ -667,9 +687,6 @@ public:
 
         // Close result file ourselves
         pde_handler.mpVizPdeSolutionResultsFile->close();
-
-        // Tidy up
-        CellwiseData<2>::Destroy();
     }
 
     void TestSolvePdeAndWriteResultsToFileWithoutCoarsePdeMeshDirichlet() throw(Exception)
@@ -692,13 +709,9 @@ public:
         // Set up cell population
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
-        // Set up CellwiseData and associate it with the cell population
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 1);
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
-        {
-            p_data->SetValue(1.0, mesh.GetNode(i)->GetIndex());
-        }
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        p_cell_data->SetItem(0, 1.0);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         // Create a PDE handler object using this cell population
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -732,11 +745,8 @@ public:
             double analytic_solution = 1.0 - 0.25*(1 - pow(radius,2.0));
 
             // Test that PDE solver is working correctly
-            TS_ASSERT_DELTA(p_data->GetValue(*cell_iter), analytic_solution, 0.02);
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), analytic_solution, 0.02);
         }
-
-        // Tidy up
-        CellwiseData<2>::Destroy();
     }
 
     void TestSolvePdeAndWriteResultsToFileWithoutCoarsePdeMeshNeumann() throw(Exception)
@@ -759,13 +769,9 @@ public:
         // Set up cell population
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
-        // Set up CellwiseData and associate it with the cell population
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 1);
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
-        {
-            p_data->SetValue(1.0, mesh.GetNode(i)->GetIndex());
-        }
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        p_cell_data->SetItem(0, 1.0);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         // Create a PDE handler object using this cell population
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -796,11 +802,8 @@ public:
              ++cell_iter)
         {
             // Test that PDE solver is working correctly
-            TS_ASSERT_DELTA(p_data->GetValue(*cell_iter), 0.0, 0.02);
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), 0.0, 0.02);
         }
-
-        // Tidy up
-        CellwiseData<2>::Destroy();
     }
 
     void TestSolvePdeAndWriteResultsToFileCoarsePdeMeshBoundaryConditions() throw(Exception)
@@ -823,14 +826,9 @@ public:
 
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
-        // Set up CellwiseData and associate it with the cell population
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 1);
-        // Pass initial conditions into CellwiseData to avoid memory errors
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
-        {
-            p_data->SetValue(1.0, mesh.GetNode(i)->GetIndex(),0);
-        }
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        p_cell_data->SetItem(0, 1.0);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         // Create a PDE handler object using this cell population
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -866,12 +864,9 @@ public:
         {
             if (cell_population.GetNodeCorrespondingToCell(*cell_iter)->IsBoundaryNode())
             {
-                TS_ASSERT_DELTA(p_data->GetValue(*cell_iter), 1.0, 1e-1);
+                TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), 1.0, 1e-1);
             }
         }
-
-        // Tidy up
-        CellwiseData<2>::Destroy();
     }
 
     void TestSolvePdeAndWriteResultsToFileWithCoarsePdeMesh() throw(Exception)
@@ -891,16 +886,10 @@ public:
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Set up CellwiseData and associate it with the cell population
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 2);
-
-        // Pass initial conditions into CellwiseData to avoid memory errors
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
-        {
-            p_data->SetValue(1.0, p_mesh->GetNode(i)->GetIndex(),0);
-            p_data->SetValue(1.0, p_mesh->GetNode(i)->GetIndex(),1);
-        }
+        MAKE_PTR_ARGS(CellData, p_cell_data, (2)); 
+        p_cell_data->SetItem(0, 1.0);
+        p_cell_data->SetItem(1, 1.0);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         // Create a PDE handler object using this cell population
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -987,8 +976,8 @@ public:
             double min1 = std::min(pde_solution1[node_0_index], pde_solution1[node_1_index]);
             min1 = std::min(min1, pde_solution1[node_2_index]);
 
-            double value0_at_cell = CellwiseData<2>::Instance()->GetValue(*cell_iter, 0);
-            double value1_at_cell = CellwiseData<2>::Instance()->GetValue(*cell_iter, 1);
+            double value0_at_cell = cell_iter->GetCellData()->GetItem(0);
+            double value1_at_cell = cell_iter->GetCellData()->GetItem(1);
 
             TS_ASSERT_LESS_THAN_EQUALS(value1_at_cell, value0_at_cell);
             TS_ASSERT_LESS_THAN_EQUALS(min0, value0_at_cell + DBL_EPSILON);
@@ -996,9 +985,6 @@ public:
             TS_ASSERT_LESS_THAN_EQUALS(min1, value1_at_cell + DBL_EPSILON);
             TS_ASSERT_LESS_THAN_EQUALS(value1_at_cell, max1 + DBL_EPSILON);
         }
-
-        // Tidy up
-        CellwiseData<2>::Destroy();
     }
 
     void TestCoarseSourceMeshWithNeumannIsNotImplemented() throw(Exception)
@@ -1018,16 +1004,10 @@ public:
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Set up CellwiseData and associate it with the cell population
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 2);
-
-        // Pass initial conditions into CellwiseData to avoid memory errors
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
-        {
-            p_data->SetValue(1.0, p_mesh->GetNode(i)->GetIndex(),0);
-            p_data->SetValue(1.0, p_mesh->GetNode(i)->GetIndex(),1);
-        }
+        MAKE_PTR_ARGS(CellData, p_cell_data, (2)); 
+        p_cell_data->SetItem(0, 1.0);
+        p_cell_data->SetItem(1, 1.0);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         // Create a PDE handler object using this cell population
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -1051,9 +1031,6 @@ public:
         // Test that the correct exception is thrown
         TS_ASSERT_THROWS_THIS(pde_handler.SolvePdeAndWriteResultsToFile(1),
             "Neumann BCs not yet implemented when using a coarse PDE mesh");
-
-        // Tidy up
-        CellwiseData<2>::Destroy();
     }
 };
 

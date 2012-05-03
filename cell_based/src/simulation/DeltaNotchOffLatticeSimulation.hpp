@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * Subclass of OffLatticeSimulation in which the mean levels of Delta in neighbouring cells
- * are computed and stored in CellwiseData for use in DeltaNotchOdeSystem in a centre-based
+ * are computed and stored in CellData for use in DeltaNotchOdeSystem in a centre-based
  * cell population.
  */
 template<unsigned DIM>
@@ -66,7 +66,7 @@ private :
     }
 
     /**
-     * Overridden SetupSolve() method. Calls UpdateCellwiseData().
+     * Overridden SetupSolve() method. Calls UpdateCellData().
      */
     void SetupSolve();
 
@@ -78,7 +78,7 @@ private :
     /**
      * Compute the volume of each cell in the population and store these in the CellwiseData singleton.
      */
-    void UpdateCellwiseData();
+    void UpdateCellData();
 
 public:
 
