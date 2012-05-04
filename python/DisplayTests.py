@@ -1050,7 +1050,7 @@ def _linkBuildType(buildType, revision):
     except:
         return buildType
     query = 'buildType?buildType=%s&revision=%d' % (buildType, revision)
-    return '<a href="%s/%s">%s</a>' % (_our_url, query, buildType)
+    return '<a href="%s/%s">%s</a>' % (_our_url, query, buildType.replace(',', ', '))
 
 def _linkSummary(text, type, revision, machine, buildType):
     """
