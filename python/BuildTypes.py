@@ -170,23 +170,23 @@ class BuildType(object):
         if status == 'OK':
             return 'All tests passed'
         elif status == 'Unknown':
-            return 'Test output unrecognised'
+            return 'Test output unrecognised (RED)'
         elif status == 'MPI':
             return 'MPI semaphore error'
         elif status == 'Killed':
-            return 'Test exceeded time limit'
+            return 'Test exceeded time limit (RED)'
+        elif status == 'Setup':
+            return 'Test setup failed (RED)'
         else:
             return status.replace('_', '/') + ' tests failed (RED)'
 
     def EncodeStatus(self, exitCode, logFile):
         """Encode the output from a test program as a status string.
         
-        Parses the output looking for a line
-        'Failed (\d+) of (\d+) tests?'; if one is found then the
-        testsuite failed and the status string is '\1_\2'.
-        Otherwise if the output contains as many 'OK!' lines as
-        the number of processes running then the test suite is 
-        deemed to have passed.
+        Parses the output looking for a line 'Failed (\d+) of (\d+) tests?';
+        if one is found then the testsuite failed and the status string is '\1_\2'.
+        Otherwise if the output contains as many 'OK!' lines as the number of processes
+        running then the test suite is deemed to have passed.
         If neither type of line is found (e.g. due to premature termination)
         then the status is 'Unknown'.
         """
@@ -195,9 +195,10 @@ class BuildType(object):
         import re
         failed_tests = re.compile('Failed (\d+) of (\d+) tests?')
         ok, ok_count = re.compile('OK!'), 0
-        infrastructure_ok = re.compile('Infrastructure test passed ok.')
+        infrastructure_ok = 'Infrastructure test passed ok.'
         mpi_error = 'semget failed for setnum = '
         test_killed = 'Test killed due to exceeding time limit'
+        setup_failed = 'cxxtest/cxxtest/RealDescriptions.cpp:5: Warning: Error setting up world'
 
         first_line = True
         for line in logFile:
@@ -210,15 +211,16 @@ class BuildType(object):
             if m:
                 status = '%d_%d' % (int(m.group(1)), int(m.group(2)))
                 break
-            m = ok.match(line)
-            if m:
+            if ok.match(line):
                 ok_count += 1
-            m = infrastructure_ok.match(line)
-            if m:
+            if line.startswith(infrastructure_ok):
                 ok_count = self._num_processes
                 break
             if line.startswith(test_killed):
                 status = 'Killed'
+                break
+            if line.startswith(setup_failed):
+                status = 'Setup'
                 break
         
         if ok_count > 0 and status == 'Unknown':
@@ -602,7 +604,7 @@ class GoogleProfile(GccDebug):
         """
         ret = ''
         if status[-5:] == '_prof':
-            ret = 'Profiler failed.  (RED)'
+            ret = 'Profiler failed. (RED) '
             status = status[:-5]
         return ret + super(GoogleProfile, self).DisplayStatus(status)
 
@@ -717,11 +719,11 @@ class MemoryTesting(GccDebug):
         if status == 'OK':
             return 'No leaks found'
         elif status == 'Unknown':
-            return 'Test output unrecognised'
+            return 'Test output unrecognised (RED)'
         elif status == 'Warn':
             return 'Possible leak found'
         elif status == 'Killed':
-            return 'Test exceeded time limit'
+            return 'Test exceeded time limit (RED)'
         else:
             return 'Memory leaks found (RED)'
 
@@ -1143,7 +1145,7 @@ class FleMemoryTesting(FleDebug):
         if status == 'OK':
             return 'No leaks found'
         elif status == 'Unknown':
-            return 'Test output unrecognised'
+            return 'Test output unrecognised (RED)'
         elif status == 'Warn':
             return 'Possible leak found'
         else:

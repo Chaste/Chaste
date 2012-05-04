@@ -1039,6 +1039,10 @@ def DoComponentSConscript(component, otherVars):
     if use_chaste_libs:
         if otherVars['static_libs']:
             lib = env.StaticLibrary(component, files + special_objects)
+            # Add explicit dependencies on the Chaste libraries we use too,
+            # so this library and its tests will be re-linked if they change
+            env.Depends(lib, map(lambda lib: '#lib/lib%s.a' % lib,
+                                 env['CHASTE_COMP_DEPS'][component]))
             lib = env.Install('#lib', lib)
             libpath = '#lib'
             env['CHASTE_LIBRARIES'][component] = lib[0]
@@ -1077,7 +1081,7 @@ def DoComponentSConscript(component, otherVars):
     #lib_deps = map(lambda lib: '#lib/lib%s.so' % lib, chaste_libs) # all libs
     lib_deps = lib # only this lib
     #linklib_deps = map(lambda lib: '#linklib/lib%s.so' % lib, chaste_libs)
-    
+
     # Collect a list of test log files to use as dependencies for the test
     # summary generation
     test_log_files = []

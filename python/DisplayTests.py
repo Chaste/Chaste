@@ -268,7 +268,7 @@ def _recent(req, type='', start=0, **filters):
         subs = {'bgcol': bgcols[bgcol_index], 'status_col': colour,
                 'date': date, 'machine': machine, 'targets': targets or 'default',
                 'rev': _linkRevision(revision, changes=True),
-                'build_type': _linkBuildType(build_type, revision),
+                'build_type': _linkBuildType(build_type, revision, wrappableText=True),
                 'status': _linkSummary(overall_status, type, revision, machine, build_type)}
         for poss_filter in poss_filters:
             if poss_filter not in filters:
@@ -597,7 +597,7 @@ def _profileHistory(req, n=20):
     for rev, bt in revbts:
         if builds.has_key((rev, bt)):
             output.append('    <th colspan="%d">%s</th>\n'
-                          % (len(builds[(rev, bt)]), _linkBuildType(bt, rev)))
+                          % (len(builds[(rev, bt)]), _linkBuildType(bt, rev, wrappableText=True)))
     output.append('  </tr>\n  <tr><th>Machine</th>\n')
     for rev, bt in revbts:
         for machine in builds.get((rev, bt), []):
@@ -1043,14 +1043,17 @@ def _linkChangeset(revision, text=None):
         text = str(revision)
     return '<a href="%schangeset/%d">%s</a>' % (_trac_url, revision, text)
 
-def _linkBuildType(buildType, revision):
+def _linkBuildType(buildType, revision, wrappableText=False):
     "Return a link tag to the detailed info page for this build type."
     try:
         revision = int(revision)
     except:
         return buildType
+    link_text = buildType
+    if wrappableText:
+        link_text = link_text.replace(',', ', ')
     query = 'buildType?buildType=%s&revision=%d' % (buildType, revision)
-    return '<a href="%s/%s">%s</a>' % (_our_url, query, buildType.replace(',', ', '))
+    return '<a href="%s/%s">%s</a>' % (_our_url, query, link_text)
 
 def _linkSummary(text, type, revision, machine, buildType):
     """
