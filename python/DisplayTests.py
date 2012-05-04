@@ -439,8 +439,8 @@ def buildType(req, buildType, revision=None):
     Command to run '%s': %s<br />
     </p>
 """ % (buildType, rev_text, build.CompilerType(),
-           build.CcFlags(), build.LinkFlags(),
-           test_packs, testsuite_exe, testsuite_cmd)
+       _getCcFlags(build), build.LinkFlags(),
+       test_packs, testsuite_exe, testsuite_cmd)
     if buildType.startswith('acceptance') or buildType.startswith('longacceptance') :
         page_body += """
     <p>This build was actually used just to run the acceptance tests.</p>
@@ -1009,6 +1009,16 @@ def _parseBuildTimings(logfilename):
     result['Total'] = sum(times)
     return result
 
+
+def _getCcFlags(build):
+    """A wrapper for BuildType.CcFlags that copes with ValueError being raised.
+    
+    This happens with the GccOptNative build type, since the compile flags are machine-specific.
+    """
+    try:
+        return build.CcFlags()
+    except ValueError:
+        return "[machine specific optimisations are applied]"
 
 
 #####################################################################
