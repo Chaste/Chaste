@@ -162,10 +162,22 @@ public:
                                                   "TestEmOnAnnulusDiastolicFilling");
         problem.Solve();
 
-        // we don't really test anything.
-        // Hardcoded test of deformed position of top of circle, to check nothing has changed.
-        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](0), 0.0011, 1e-3);
-        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](1), 0.6073, 1e-3);
+        // We don't really test anything, we mainly just want to verify it solves OK past the initial and through
+        // the cycle. Have visualised.
+        //
+        // Hardcoded test of deformed position of top node of the annulus, to check nothing has changed and that
+        // different systems give the same result.
+        // HOWEVER, note that we can't just do something like:
+        //// TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](0), 0.0011, 1e-3);
+        //// TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](1), 0.6073, 1e-3);
+        // because different systems give different results, because we have only fixed one point, which means that
+        // the solution is only defined up to a rotation. On some systems a slightly rotated solution is found, for
+        // some reason. Look at the *distance* of the top node from the fixed point instead.
+
+        double x_top = problem.rGetDeformedPosition()[2](0);
+        double y_top = problem.rGetDeformedPosition()[2](1);
+        double dist_to_fixed_point = sqrt( (x_top-0.0)*(x_top-0.0) + (y_top + 0.5)*(y_top + 0.5) );
+        TS_ASSERT_DELTA(dist_to_fixed_point, 1.107, 1e-2);
 
         MechanicsEventHandler::Headings();
         MechanicsEventHandler::Report();
@@ -246,12 +258,22 @@ public:
         problem.Solve();
 
 
-        // we don't really anything, we mainly just want to verify it solves OK past the initial and through
+        // We don't really test anything, we mainly just want to verify it solves OK past the initial and through
         // the cycle. Have visualised.
-        // Hardcoded test of deformed position of top of circle, to check nothing has changed.
-        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](0), 0.0014, 1e-3);
-        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](1), 0.6020, 1e-3);
+        //
+        // Hardcoded test of deformed position of top node of the annulus, to check nothing has changed and that
+        // different systems give the same result.
+        // HOWEVER, note that we can't just do something like:
+        //// TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](0), 0.0014, 1e-3);
+        //// TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](1), 0.6020, 1e-3);
+        // because different systems give different results, because we have only fixed one point, which means that
+        // the solution is only defined up to a rotation. On some systems a slightly rotated solution is found, for
+        // some reason. Look at the *distance* of the top node from the fixed point instead.
 
+        double x_top = problem.rGetDeformedPosition()[2](0);
+        double y_top = problem.rGetDeformedPosition()[2](1);
+        double dist_to_fixed_point = sqrt( (x_top-0.0)*(x_top-0.0) + (y_top + 0.5)*(y_top + 0.5) );
+        TS_ASSERT_DELTA(dist_to_fixed_point, 1.102, 1e-2);
 
         MechanicsEventHandler::Headings();
         MechanicsEventHandler::Report();
