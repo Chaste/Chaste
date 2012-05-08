@@ -61,36 +61,36 @@ c_vector<double, 3> Create_c_vector(double x, double y, double z)
 
 c_vector<double,3> CalculateEigenvectorForSmallestNonzeroEigenvalue(c_matrix<double, 3, 3>& rA)
 {
-    int info;
-    c_vector<double, 3> eigenvalues_real_part;
-    c_vector<double, 3> eigenvalues_imaginary_part;
-    c_vector<double, 4*3 > workspace;
-    c_matrix<double, 3, 3> right_eigenvalues;
+    PetscBLASInt info;
+    c_vector<PetscReal, 3> eigenvalues_real_part;
+    c_vector<PetscReal, 3> eigenvalues_imaginary_part;
+    c_vector<PetscScalar, 4*3 > workspace;
+    c_matrix<PetscScalar, 3, 3> right_eigenvalues;
 
     char dont_compute_left_evectors = 'N';
     char compute_right_evectors = 'V';
 
-    int matrix_size = 3;
-    int matrix_ld = matrix_size;
-    int workspace_size = 4*matrix_size;
+    PetscBLASInt matrix_size = 3;
+    PetscBLASInt matrix_ld = matrix_size;
+    PetscBLASInt workspace_size = 4*matrix_size;
 
-    c_matrix<double, 3, 3> a_transpose;
+    c_matrix<PetscScalar, 3, 3> a_transpose;
     noalias(a_transpose) = trans(rA);
 
     // PETSc alias for dgeev or dgeev_
     LAPACKgeev_(&dont_compute_left_evectors, &compute_right_evectors,
-           &matrix_size, a_transpose.data(),&matrix_ld,
-           eigenvalues_real_part.data(), eigenvalues_imaginary_part.data(),
-           NULL, &matrix_ld,
-           right_eigenvalues.data(),&matrix_ld,
-           workspace.data(),&workspace_size,
-           &info);
+                &matrix_size, a_transpose.data(), &matrix_ld,
+                eigenvalues_real_part.data(), eigenvalues_imaginary_part.data(),
+                NULL, &matrix_ld,
+                right_eigenvalues.data(), &matrix_ld,
+                workspace.data(), &workspace_size,
+                &info);
     assert(info==0);
 
     // If this fails a complex eigenvalue was found
     assert(norm_2(eigenvalues_imaginary_part) < DBL_EPSILON);
 
-    unsigned index_of_smallest=UINT_MAX;
+    unsigned index_of_smallest = UINT_MAX;
     double min_eigenvalue = DBL_MAX;
 
     for (unsigned i=0; i<3; i++)
