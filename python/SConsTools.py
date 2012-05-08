@@ -124,6 +124,57 @@ def FindSourceFiles(env, rootDir, ignoreDirs=[], dirsOnly=False, includeRoot=Fal
     return source_files, source_dirs
 
 
+def FasterSharedLibrary(env, library, sources, **args):
+    """Override SharedLibrary to update the libs in '#linklib' only if the symbols change.
+    This is to avoid rebuilding binaries when a shared library has changes.
+    
+    Use it like:
+    env['BUILDERS']['OriginalSharedLibrary'] = env['BUILDERS']['SharedLibrary']
+    env['BUILDERS']['SharedLibrary'] = FasterSharedLibrary
+    
+    This would be MUCH simpler to implement if we could override the
+    signature to be used for the SharedLibrary node itself directly. That is
+    certainly possible, but would rely on the internal structure of SCons.
+    
+    Based on http://www.scons.org/wiki/SharedLibrarySignatureOverride.
+    """
+    # SCons version compatibility
+    if type(library) != type([]):
+        library = [library]
+    # Use the 'quicker' shallow copy method!
+    envContentSig = env.Clone()
+    scons_ver = env._get_major_minor_revision(SCons.__version__)
+    if scons_ver < (1,0,0):
+        envContentSig.TargetSignatures('content')
+    else:
+        envContentSig.Decider('MD5-timestamp')
+
+    cat = env.OriginalSharedLibrary(library, sources)
+
+    # Copy all the latest libraries to ONE directory for our convenience.
+    # Could modify the above to build directly to this dir instead.
+    catLib = env.Install('#lib', cat)
+
+    # Now generate the 'interface' file, using the content signature for its target
+    catIF = envContentSig.Command(
+        '%s.if' % library[0],
+        catLib,
+        'nm --extern-only $SOURCES | cut -c 12- | sort > $TARGET')
+
+    # Install command to copy lib to #linklib, where the link actually occurs.
+    # Explicitly make this depend only on the catIF file, which has a target content signature.
+    # Thus only if the global symbol list changes is the library copied, and any programs re-linked.
+    catLink = env.Command(
+        '#linklib/${SHLIBPREFIX}%s${SHLIBSUFFIX}' % library[0],
+        '',
+        Copy('$TARGET', str(catLib[0])))
+    envContentSig.Depends(catLink, catIF)
+    # Record the library to link against
+    env['CHASTE_LIBRARIES'][library[0]] = catLink[0]
+
+    return cat
+
+
 def BuildTest(target, source, env):
     """A builder for test executables.
 

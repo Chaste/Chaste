@@ -330,10 +330,8 @@ env['BUILDERS']['RunTest'] = runtest
 env['BUILDERS']['BuildTest'] = Builder(action=SConsTools.BuildTest)
 
 # Faster builds of shared libraries
-import fasterSharedLibrary
-fasterSharedLibrary.Copy = Copy # Bit of a hack this!
 env['BUILDERS']['OriginalSharedLibrary'] = env['BUILDERS']['SharedLibrary']
-env['BUILDERS']['SharedLibrary'] = fasterSharedLibrary.fasterSharedLibrary
+env['BUILDERS']['SharedLibrary'] = SConsTools.FasterSharedLibrary
 
 # Builder for generating C++ code from XML Schema files
 SConsTools.CreateXsdBuilder(build, env, dyn_libs_only)
