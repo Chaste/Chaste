@@ -1450,7 +1450,14 @@ void AbstractNonlinearElasticitySolver<DIM>::SetKspSolverAndPcType(KSP solver)
         if(PetscTools::IsSequential())
         {
             PCSetType(pc, PCICC);
+//Note that PetscOptionsSetValue is dangerous because we can't easily do
+//regression testing.  If a name changes, then the behaviour of the code changes
+//because it won't recognise the old name.  However, it won't fail to compile/run.
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 1) //PETSc 3.1 or later
+            PetscOptionsSetValue("-pc_factor_shift_type", "positive_definite");            
+#else
             PetscOptionsSetValue("-pc_factor_shift_positive_definite", "");
+#endif
         }
         else
         {

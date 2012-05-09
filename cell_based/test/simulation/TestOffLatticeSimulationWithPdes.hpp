@@ -210,10 +210,10 @@ public:
             SimpleOxygenBasedCellCycleModel* p_oxygen_model = static_cast<SimpleOxygenBasedCellCycleModel*> (p_abstract_model);
 
             // First part of test - check that PDE solver is working correctly
-            TS_ASSERT_DELTA(p_data->GetValue(*cell_iter), analytic_solution, 1e-2);
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), analytic_solution, 1e-2);
 
             // Second part of test - check that each cell's hypoxic duration is correctly updated
-            if (p_data->GetValue(*cell_iter) >= p_oxygen_model->GetHypoxicConcentration())
+            if (cell_iter->GetCellData()->GetItem(0) >= p_oxygen_model->GetHypoxicConcentration())
             {
                 TS_ASSERT_DELTA(p_oxygen_model->GetCurrentHypoxicDuration(), 0.0, 1e-5);
             }
@@ -417,7 +417,7 @@ public:
         std::vector<double> node_5_location = simulator.GetNodeLocation(5);
         TS_ASSERT_DELTA(node_5_location[0], 0.6576, 1e-4);
         TS_ASSERT_DELTA(node_5_location[1], 1.1358, 1e-4);
-        TS_ASSERT_DELTA(p_data->GetValue(simulator.rGetCellPopulation().GetCellUsingLocationIndex(5)), 0.9702, 1e-4);
+        TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(5))->GetCellData()->GetItem(0), 0.9702, 1e-4);
 
         // Tidy up
         CellwiseData<2>::Destroy();
@@ -516,10 +516,10 @@ public:
         std::vector<double> node_5_location = simulator.GetNodeLocation(5);
         TS_ASSERT_DELTA(node_5_location[0], 0.6576, 1e-4);
         TS_ASSERT_DELTA(node_5_location[1], 1.1358, 1e-4);
-        TS_ASSERT_DELTA(p_data->GetValue(simulator.rGetCellPopulation().GetCellUsingLocationIndex(5),0), 0.9702, 1e-4);
-        TS_ASSERT_DELTA(p_data->GetValue(simulator.rGetCellPopulation().GetCellUsingLocationIndex(5),1), 0.0000, 1e-4);
-        TS_ASSERT_LESS_THAN(p_data->GetValue(simulator.rGetCellPopulation().GetCellUsingLocationIndex(5),1),
-                            p_data->GetValue(simulator.rGetCellPopulation().GetCellUsingLocationIndex(5),0));
+        CellPtr p_cell_at_5 = simulator.rGetCellPopulation().GetCellUsingLocationIndex(5);
+        TS_ASSERT_DELTA(p_cell_at_5->GetCellData()->GetItem(0), 0.9702, 1e-4);
+        TS_ASSERT_DELTA(p_cell_at_5->GetCellData()->GetItem(1), 0.0000, 1e-4);
+        TS_ASSERT_LESS_THAN(p_cell_at_5->GetCellData()->GetItem(1), p_cell_at_5->GetCellData()->GetItem(0));
 
         // Tidy up
         CellwiseData<2>::Destroy();
@@ -797,8 +797,8 @@ public:
             double min1 = std::min(pde_solution1[p_element->GetNodeGlobalIndex(0)], pde_solution1[p_element->GetNodeGlobalIndex(1)]);
             min1 = std::min(min1, pde_solution1[p_element->GetNodeGlobalIndex(2)]);
 
-            double value0_at_cell = CellwiseData<2>::Instance()->GetValue(*cell_iter, 0);
-            double value1_at_cell = CellwiseData<2>::Instance()->GetValue(*cell_iter, 1);
+            double value0_at_cell = cell_iter->GetCellData()->GetItem(0);
+            double value1_at_cell = cell_iter->GetCellData()->GetItem(1);
 
             TS_ASSERT_LESS_THAN_EQUALS(value1_at_cell, value0_at_cell);
             TS_ASSERT_LESS_THAN_EQUALS(min0, value0_at_cell + DBL_EPSILON);
@@ -902,9 +902,9 @@ public:
         // Test CellwiseData was set up correctly
         TS_ASSERT_EQUALS(CellwiseData<2>::Instance()->IsSetUp(), true);
 
-        // Test the CellwiseData result
-        TS_ASSERT_DELTA(p_data->GetValue(p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(5)), 0.9604, 1e-4);
-        TS_ASSERT_DELTA(p_data->GetValue(p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(15)), 0.9584, 1e-4);
+        // Test the CellData result
+        TS_ASSERT_DELTA((p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(5))->GetCellData()->GetItem(0), 0.9604, 1e-4);
+        TS_ASSERT_DELTA((p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(15))->GetCellData()->GetItem(0), 0.9584, 1e-4);
 
         // Run cell-based simulation
         delete p_simulator;
@@ -1143,7 +1143,7 @@ public:
             double analytic_solution = end_time - 0.25*(1 - pow(radius,2.0));
 
             // Test that PDE solver is working correctly
-            TS_ASSERT_DELTA(p_data->GetValue(*cell_iter), analytic_solution, 0.02);
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), analytic_solution, 0.02);
         }
 
         // Tidy up
@@ -1349,7 +1349,7 @@ public:
 
             double analytic_solution = 1.0;
             // Test that PDE solver is working correctly
-            TS_ASSERT_DELTA(p_data->GetValue(*cell_iter), analytic_solution, 1e-2);
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), analytic_solution, 1e-2);
         }
 
         // Find centre of cell population
@@ -1659,8 +1659,8 @@ public:
         simulator.Solve();
 
         // Test solution is unchanged at first two cells
-        TS_ASSERT_DELTA(p_data->GetValue(*(cell_population.Begin())), 0.9543, 1e-4);
-        TS_ASSERT_DELTA(p_data->GetValue(*(++cell_population.Begin())), 0.9589, 1e-4);
+        TS_ASSERT_DELTA(  (cell_population.Begin())->GetCellData()->GetItem(0), 0.9543, 1e-4);
+        TS_ASSERT_DELTA((++cell_population.Begin())->GetCellData()->GetItem(0), 0.9589, 1e-4);
 
         // Tidy up
         CellwiseData<2>::Destroy();
@@ -1744,8 +1744,8 @@ public:
         simulator.Solve();
 
         // Test solution is unchanged at first two cells
-        TS_ASSERT_DELTA(p_data->GetValue(*(cell_population.Begin())), 1.000, 1e-4);
-        TS_ASSERT_DELTA(p_data->GetValue(*(++cell_population.Begin())), 1.000, 1e-4);
+        TS_ASSERT_DELTA(  (cell_population.Begin())->GetCellData()->GetItem(0), 1.0, 1e-4);
+        TS_ASSERT_DELTA((++cell_population.Begin())->GetCellData()->GetItem(0), 1.0, 1e-4);
 
         // Tidy up
         CellwiseData<3>::Destroy();

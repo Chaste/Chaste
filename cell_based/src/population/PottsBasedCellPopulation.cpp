@@ -665,7 +665,7 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile()
                 unsigned num_variables = p_data->GetNumVariables();
                 for (unsigned var=0; var<num_variables; var++)
                 {
-                    cellwise_data[var][iter->GetIndex()] = p_data->GetValue(p_cell, var);
+                    cellwise_data[var][iter->GetIndex()] = p_cell->GetCellData()->GetItem(var);
                 }
             }
         }

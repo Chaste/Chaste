@@ -567,7 +567,7 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile()
 
             for (unsigned var=0; var<num_variables; var++)
             {
-                cellwise_data[var][elem_index] = p_data->GetValue(p_cell, var);
+                cellwise_data[var][elem_index] = p_cell->GetCellData()->GetItem(var);
             }
         }
     }

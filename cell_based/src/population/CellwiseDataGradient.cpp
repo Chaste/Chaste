@@ -90,8 +90,8 @@ void CellwiseDataGradient<DIM>::SetupGradients()
 
             // If no ghost element, get PDE solution
             CellPtr p_cell = p_cell_population->GetCellUsingLocationIndex(node_global_index);
-            double pde_solution = CellwiseData<DIM>::Instance()->GetValue(p_cell, 0);
-
+            double pde_solution = p_cell->GetCellData()->GetItem(0);
+ 
             // Interpolate gradient
             for (unsigned i=0; i<DIM; i++)
             {

@@ -123,12 +123,12 @@ public:
         // Run simulation
         simulator.Solve();
 
-        // Test that the volumes of the cells are correct in CellwiseData
+        // Test that the volumes of the cells are correct in CellData
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
-            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), p_data->GetValue(*cell_iter,0), 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), cell_iter->GetCellData()->GetItem(0), 1e-4);
         }
 
         simulator.SetEndTime(1.0);
@@ -136,12 +136,12 @@ public:
         // Run simulation
         simulator.Solve();
 
-        // Test that the volumes of the cells are correct in CellwiseData
+        // Test that the volumes of the cells are correct in CellData
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
-            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), p_data->GetValue(*cell_iter,0), 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), cell_iter->GetCellData()->GetItem(0), 1e-4);
         }
 
         // Tidy up
@@ -197,7 +197,7 @@ public:
               cell_iter != cell_population.End();
               ++cell_iter)
          {
-             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), p_data->GetValue(*cell_iter,0), 1e-4);
+             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem(0), 1e-4);
          }
 
          simulator.SetEndTime(1.0);
@@ -210,7 +210,7 @@ public:
               cell_iter != cell_population.End();
               ++cell_iter)
          {
-             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), p_data->GetValue(*cell_iter,0), 1e-4);
+             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem(0), 1e-4);
          }
 
          // Tidy up
@@ -267,7 +267,7 @@ public:
               cell_iter != cell_population.End();
               ++cell_iter)
          {
-             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), p_data->GetValue(*cell_iter,0), 1e-4);
+             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem(0), 1e-4);
          }
 
          simulator.SetEndTime(1.0);
@@ -280,7 +280,7 @@ public:
               cell_iter != cell_population.End();
               ++cell_iter)
          {
-             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), p_data->GetValue(*cell_iter,0), 1e-4);
+             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem(0), 1e-4);
          }
 
          // Tidy up

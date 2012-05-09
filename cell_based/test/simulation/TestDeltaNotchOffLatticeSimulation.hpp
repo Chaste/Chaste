@@ -199,8 +199,8 @@ public:
 		// Get the cell
 
 
-		TS_ASSERT_DELTA(p_data->GetValue(cells[0],0), p_data->GetValue(cells[1],0), 1e-4);
-		TS_ASSERT_DELTA(p_data->GetValue(cells[0],1), p_data->GetValue(cells[1],1), 1e-4);
+		TS_ASSERT_DELTA(cells[0]->GetCellData()->GetItem(0), cells[1]->GetCellData()->GetItem(0), 1e-4);
+		TS_ASSERT_DELTA(cells[0]->GetCellData()->GetItem(1), cells[1]->GetCellData()->GetItem(1), 1e-4);
 
 		for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
 				cell_iter != cell_population.End();

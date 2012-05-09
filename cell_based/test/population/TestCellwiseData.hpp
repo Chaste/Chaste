@@ -99,11 +99,11 @@ public:
 
         p_data->SetValue(1.23, mesh.GetNode(0)->GetIndex());
         AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-        TS_ASSERT_DELTA(p_data->GetValue(*cell_iter), 1.23, 1e-12);
+        TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), 1.23, 1e-12);
 
         p_data->SetValue(2.23, mesh.GetNode(1)->GetIndex());
         ++cell_iter;
-        TS_ASSERT_DELTA(p_data->GetValue(*cell_iter), 2.23, 1e-12);
+        TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), 2.23, 1e-12);
 
         // Test that CellData objects are copied correctly on cell division.
         MAKE_PTR(WildTypeCellMutationState, p_state);
@@ -138,10 +138,10 @@ public:
         p_data->SetValue(3.23, mesh.GetNode(0)->GetIndex(), 1);
         AbstractCellPopulation<2>::Iterator cell_iter2 = cell_population.Begin();
 
-        TS_ASSERT_DELTA(p_data->GetValue(*cell_iter2, 1), 3.23, 1e-12);
+        TS_ASSERT_DELTA(cell_iter2->GetCellData()->GetItem(1), 3.23, 1e-12);
 
-        TS_ASSERT_THROWS_THIS(p_data->GetValue(*cell_iter2, 2),
-                    "Request for variable above mNumberOfVariables.");
+        TS_ASSERT_THROWS_THIS(cell_iter2->GetCellData()->GetItem(2),
+                    "Request for variable above the number of variables stored.");
         TS_ASSERT_THROWS_THIS(p_data->SetValue(0.0, 0, 2),
                 "Request for variable above mNumberOfVariables.");
 
@@ -150,11 +150,11 @@ public:
         p_data->SetValue(4.23, mesh.GetNode(1)->GetIndex(), 1);
         ++cell_iter2;
 
-        TS_ASSERT_DELTA(p_data->GetValue(*cell_iter2, 1), 4.23, 1e-12);
+        TS_ASSERT_DELTA(cell_iter2->GetCellData()->GetItem(1), 4.23, 1e-12);
 
         // Other values should have been initialised to zero
         ++cell_iter2;
-        TS_ASSERT_THROWS_THIS(p_data->GetValue(*cell_iter2, 0),"SetItem must be called before using GetItem");
+        TS_ASSERT_THROWS_THIS(cell_iter2->GetCellData()->GetItem(0),"SetItem must be called before using GetItem");
 
         // Tidy up
         CellwiseData<2>::Destroy();
@@ -259,7 +259,7 @@ public:
                  cell_iter != cell_population.End();
                  ++cell_iter)
             {
-                TS_ASSERT_DELTA(p_data->GetValue(*cell_iter, 0u), (double) cell_population.GetLocationIndexUsingCell(*cell_iter), 1e-12);
+                TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), (double) cell_population.GetLocationIndexUsingCell(*cell_iter), 1e-12);
             }
 
             // Tidy up
@@ -354,7 +354,7 @@ public:
                  cell_iter != cell_population.End();
                  ++cell_iter)
             {
-                TS_ASSERT_DELTA(p_data->GetValue(*cell_iter, 0u), (double) cell_population.GetLocationIndexUsingCell(*cell_iter), 1e-12);
+                TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), (double) cell_population.GetLocationIndexUsingCell(*cell_iter), 1e-12);
             }
 
             // Tidy up

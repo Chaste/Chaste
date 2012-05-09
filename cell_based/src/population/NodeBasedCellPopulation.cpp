@@ -509,7 +509,7 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
             unsigned num_variables = p_data->GetNumVariables();
             for (unsigned var=0; var<num_variables; var++)
             {
-                cellwise_data[var][node_index] = p_data->GetValue(*cell_iter, var);
+                cellwise_data[var][node_index] =  cell_iter->GetCellData()->GetItem(var);
             }
         }
     }

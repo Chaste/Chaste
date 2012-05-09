@@ -638,7 +638,7 @@ void CellBasedPdeHandler<DIM>::WriteAverageRadialPdeSolution(double time)
         {
             if (iter->first > lower_radius && iter->first <= radius_intervals[i])
             {
-                average_solution += CellwiseData<DIM>::Instance()->GetValue(iter->second);
+                average_solution += (iter->second)->GetCellData()->GetItem(0);
                 counter++;
             }
         }

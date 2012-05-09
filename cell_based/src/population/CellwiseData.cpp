@@ -77,25 +77,6 @@ void CellwiseData<DIM>::Destroy()
 }
 
 template<unsigned DIM>
-double CellwiseData<DIM>::GetValue(CellPtr pCell, unsigned variableNumber)
-{
-    if (variableNumber >= mNumberOfVariables)
-    {
-        EXCEPTION("Request for variable above mNumberOfVariables.");
-    }
-
-
-    // To test a cell and cell-cycle models without a cell population
-    if (mUseConstantDataForTesting)
-    {
-        NEVER_REACHED;
-    }
-
-    assert(IsSetUp());  //-- Temporarily remove, since there are places where we are bypassing mConstantDataForTesting
-	return pCell->GetCellData()->GetItem(variableNumber);
-}
-
-template<unsigned DIM>
 void CellwiseData<DIM>::SetValue(double value, unsigned locationIndex, unsigned variableNumber)
 {
     assert(IsSetUp());

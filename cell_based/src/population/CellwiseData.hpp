@@ -120,16 +120,6 @@ public:
     static void Destroy();
 
     /**
-     * Get the value of CellwiseData for a given cell and variable number.
-     *
-     * @param pCell the cell
-     * @param variableNumber the index of CellwiseData whose value is required (defaults to zero)
-     *
-     * @return the value of CellwiseData.
-     */
-    double GetValue(CellPtr pCell, unsigned variableNumber=0);
-
-    /**
      * Set the value for a given location index and variable number.
      *
      * @param value the value to set

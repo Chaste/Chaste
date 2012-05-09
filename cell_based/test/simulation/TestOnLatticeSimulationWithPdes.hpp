@@ -241,7 +241,7 @@ public:
 
             double analytic_solution = 1.0;
             // Test that PDE solver is working correctly
-            TS_ASSERT_DELTA(p_data->GetValue(*cell_iter), analytic_solution, 1e-2);
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), analytic_solution, 1e-2);
         }
 
         // Find centre of cell population
@@ -352,8 +352,8 @@ public:
             double analytic_solution = 1.0;
 
             // Test that PDE solver is working correctly on both pdes
-            TS_ASSERT_DELTA(p_data->GetValue(*cell_iter, 0), analytic_solution, 1e-2);
-            TS_ASSERT_DELTA(p_data->GetValue(*cell_iter, 1), analytic_solution, 1e-2);
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), analytic_solution, 1e-2);
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(1), analytic_solution, 1e-2);
         }
         // Tidy up
         CellwiseData<2>::Destroy();
