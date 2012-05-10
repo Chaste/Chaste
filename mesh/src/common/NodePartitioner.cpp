@@ -303,6 +303,17 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
 
     unsigned num_local_nodes = connectivity_matrix_hi - connectivity_matrix_lo;
 
+    /* PETSc MatCreateMPIAdj and parMETIS rely on adjacency arrays
+     * Named here:      xadj            adjncy
+     * parMETIS name:   xadj            adjncy    (see S4.2 in parMETIS manual)
+     * PETSc name:      i               j         (see MatCreateMPIAdj in PETSc manual)
+     *
+     * The adjacency information of all nodes is listed in the main array, adjncy.  Since each node
+     * has a variable number of adjacent nodes, the array xadj is used to store the index (in adjncy) where
+     * this information starts.  Since xadj[i] is the start of node i's information, xadj[i+1] marks the end.
+     *
+     *
+     */
     MatInfo matrix_info;
     MatGetInfo(connectivity_matrix, MAT_LOCAL, &matrix_info);
     unsigned local_num_nz = (unsigned) matrix_info.nz_used;
@@ -310,24 +321,24 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
     size_t size = (num_local_nodes+1)*sizeof(PetscInt);
     void* ptr;
     PetscMalloc(size, &ptr);
-    PetscInt* local_ia = (PetscInt*) ptr;
+    PetscInt* xadj = (PetscInt*) ptr;
     size = local_num_nz*sizeof(PetscInt);
     PetscMalloc(size, &ptr);
-    PetscInt* local_ja = (PetscInt*) ptr;
+    PetscInt* adjncy = (PetscInt*) ptr;
 
     PetscInt row_num_nz;
     const PetscInt* column_indices;
 
-    local_ia[0]=0;
+    xadj[0]=0;
     for (PetscInt row_global_index=connectivity_matrix_lo; row_global_index<connectivity_matrix_hi; row_global_index++)
     {
         MatGetRow(connectivity_matrix, row_global_index, &row_num_nz, &column_indices, PETSC_NULL);
 
         unsigned row_local_index = row_global_index - connectivity_matrix_lo;
-        local_ia[row_local_index+1] = local_ia[row_local_index] + row_num_nz;
+        xadj[row_local_index+1] = xadj[row_local_index] + row_num_nz;
         for (PetscInt col_index=0; col_index<row_num_nz; col_index++)
         {
-           local_ja[local_ia[row_local_index] + col_index] =  column_indices[col_index];
+           adjncy[xadj[row_local_index] + col_index] =  column_indices[col_index];
         }
 
         MatRestoreRow(connectivity_matrix, row_global_index, &row_num_nz,&column_indices, PETSC_NULL);
@@ -337,7 +348,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
 
     // Convert to an adjacency matrix
     Mat adj_matrix;
-    MatCreateMPIAdj(PETSC_COMM_WORLD, num_local_nodes, num_nodes, local_ia, local_ja, PETSC_NULL, &adj_matrix);
+    MatCreateMPIAdj(PETSC_COMM_WORLD, num_local_nodes, num_nodes, xadj, adjncy, PETSC_NULL, &adj_matrix);
 
     PetscTools::Barrier();
     if (PetscTools::AmMaster())
@@ -355,7 +366,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
     MatPartitioningApply(part, &new_process_numbers);
     MatPartitioningDestroy(PETSC_DESTROY_PARAM(part));
 
-    /// It seems to be free-ing local_ia and local_ja as a side effect
+    /// It seems to be free-ing xadj and adjncy as a side effect
     PetscTools::Destroy(adj_matrix);
 
     PetscTools::Barrier();

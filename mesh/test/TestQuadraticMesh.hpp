@@ -34,6 +34,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _TESTQUADRATICMESH_HPP_
 #define _TESTQUADRATICMESH_HPP_
+extern "C" {
+extern void METIS_NodeND(int*, int*, int*, int*, int*, int*, int*);
+}
+#include <parmetis.h>
 
 #include <cxxtest/TestSuite.h>
 #include <boost/archive/text_oarchive.hpp>
@@ -865,10 +869,8 @@ public:
     }
 
 
-    std::vector<unsigned> CalculateMatrixFill(QuadraticMesh<2>& rMesh)
+    void CalculateConnectivityMatrix(Mat& matrix, QuadraticMesh<2>& rMesh)
     {
-        //Get some statistics about matrix fill
-        Mat matrix;
         PetscTools::SetupMat(matrix, rMesh.GetNumNodes(), rMesh.GetNumNodes(), 17);
         for (TetrahedralMesh<2,2>::ElementIterator iter
                     = rMesh.GetElementIteratorBegin();
@@ -887,9 +889,17 @@ public:
             }
         }
         PetscMatTools::Finalise(matrix);
-        //PetscMatTools::Display(matrix);
+    }
+
+    std::vector<unsigned> CalculateMatrixFill(QuadraticMesh<2>& rMesh)
+    {
+        //Get some statistics about matrix fill
+        Mat matrix;
+
+        CalculateConnectivityMatrix(matrix, rMesh);
 
         std::vector<unsigned> upper_hist(rMesh.GetNumNodes(), 0.0);
+        double error_sum = 0;
 
         PetscInt lo, hi;
         PetscMatTools::GetOwnershipRange(matrix, lo, hi);
@@ -903,6 +913,7 @@ public:
             {
                 if (column_indices[col] >= row)
                 {
+                    error_sum += (column_indices[col] - row)*(column_indices[col] - row);
                     upper_hist[ column_indices[col] - row]++;
                 }
             }
@@ -912,6 +923,11 @@ public:
 
         std::vector<unsigned> global_hist(rMesh.GetNumNodes());
         MPI_Allreduce( &upper_hist[0], &global_hist[0], rMesh.GetNumNodes(), MPI_UNSIGNED, MPI_SUM, PETSC_COMM_WORLD);
+
+        double global_error_sum = 0;
+        MPI_Allreduce( &error_sum, &global_error_sum, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+
+        std::cout << "Error sum = " << global_error_sum << "\n";
 
         return global_hist;
     }
@@ -933,6 +949,70 @@ public:
 
         //Get some statistics about matrix fill
         std::vector<unsigned> upper_hist_after = CalculateMatrixFill(quad_mesh);
+
+        // Try out metis fill-in reduction
+
+        Mat connectivity_matrix;
+        CalculateConnectivityMatrix(connectivity_matrix, quad_mesh);
+        PetscInt connectivity_matrix_lo;
+        PetscInt connectivity_matrix_hi;
+        MatGetOwnershipRange(connectivity_matrix, &connectivity_matrix_lo, &connectivity_matrix_hi);
+        PetscInt num_local_nodes = connectivity_matrix_hi - connectivity_matrix_lo;
+
+        MatInfo matrix_info;
+        MatGetInfo(connectivity_matrix, MAT_LOCAL, &matrix_info);
+        unsigned local_num_nz = (unsigned) matrix_info.nz_used;
+
+        idxtype *xadj=new idxtype[num_local_nodes+1];
+        idxtype* adjncy = new idxtype[local_num_nz];
+        //PRINT_2_VARIABLES(num_local_nodes+1, local_num_nz);
+        PetscInt row_num_nz;
+        const PetscInt* column_indices;
+
+        xadj[0]=0;
+        for (PetscInt row_global_index=connectivity_matrix_lo; row_global_index<connectivity_matrix_hi; row_global_index++)
+        {
+            MatGetRow(connectivity_matrix, row_global_index, &row_num_nz, &column_indices, PETSC_NULL);
+
+            unsigned row_local_index = row_global_index - connectivity_matrix_lo;
+            xadj[row_local_index+1] = xadj[row_local_index] + row_num_nz;
+            for (PetscInt col_index=0; col_index<row_num_nz; col_index++)
+            {
+               adjncy[xadj[row_local_index] + col_index] =  column_indices[col_index];
+            }
+
+            MatRestoreRow(connectivity_matrix, row_global_index, &row_num_nz,&column_indices, PETSC_NULL);
+        }
+
+        PetscTools::Destroy(connectivity_matrix);
+        //PRINT_3_VARIABLES(xadj[0],xadj[288],xadj[289])
+        ///\todo Get this bit to work in parallel
+        EXIT_IF_PARALLEL;
+        ///\todo Get this bit to work in serial!
+        idxtype vtxdist[2]; //PetscTools::GetNumProcs()
+        vtxdist[0]=0;
+        vtxdist[1]=connectivity_matrix_hi;
+        idxtype options[4];
+        options[0] = 0; // This is the first element of an array of up to 4 options, but 0 means take the defaults
+        options[3] = 0;
+        idxtype* order=new idxtype[num_local_nodes];
+        idxtype* sizes=new idxtype[PetscTools::GetNumProcs()*2];
+
+        //int numflag = 0; // METIS speak for C-style numbering
+        //MPI_Comm communicator = PETSC_COMM_WORLD;
+        //ParMETIS_V3_NodeND(vtxdist, xadj, adjncy, &numflag, options, order, sizes, &communicator);
+
+        idxtype* perm=new idxtype[num_local_nodes];
+        idxtype* iperm=new idxtype[num_local_nodes];
+        //METIS_NodeND(&num_local_nodes, xadj, adjncy, NULL, NULL, perm, iperm);
+        delete [] perm;
+        delete [] iperm;
+
+
+        delete [] order;
+        delete [] sizes;
+        delete [] xadj;
+        delete [] adjncy;
 
         OutputFileHandler handler("TestQuadraticMesh", false);
         if (PetscTools::AmMaster())
