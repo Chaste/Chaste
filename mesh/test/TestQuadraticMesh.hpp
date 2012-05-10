@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "ArchiveOpener.hpp"
 #include "Warnings.hpp"
+#include "PetscMatTools.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
 class TestQuadraticMesh : public CxxTest::TestSuite
@@ -863,6 +864,94 @@ public:
 #endif //CHASTE_VTK
     }
 
+
+    std::vector<unsigned> CalculateMatrixFill(QuadraticMesh<2>& rMesh)
+    {
+        //Get some statistics about matrix fill
+        Mat matrix;
+        PetscTools::SetupMat(matrix, rMesh.GetNumNodes(), rMesh.GetNumNodes(), 17);
+        for (TetrahedralMesh<2,2>::ElementIterator iter
+                    = rMesh.GetElementIteratorBegin();
+                    iter != rMesh.GetElementIteratorEnd();
+                    ++iter)
+        {
+            for (unsigned i=0; i<iter->GetNumNodes(); i++)
+            {
+                unsigned global_index1 = iter->GetNodeGlobalIndex(i);
+                for (unsigned j=i; j<iter->GetNumNodes(); j++)
+                {
+                    unsigned global_index2 = iter->GetNodeGlobalIndex(j);
+                    PetscMatTools::SetElement(matrix, global_index1, global_index2, 1.0);
+                    PetscMatTools::SetElement(matrix, global_index2, global_index1, 1.0);
+                }
+            }
+        }
+        PetscMatTools::Finalise(matrix);
+        //PetscMatTools::Display(matrix);
+
+        std::vector<unsigned> upper_hist(rMesh.GetNumNodes(), 0.0);
+
+        PetscInt lo, hi;
+        PetscMatTools::GetOwnershipRange(matrix, lo, hi);
+        for (PetscInt row=lo; row<hi; row++)
+        {
+            PetscInt num_entries;
+            const PetscInt* column_indices;
+            const PetscScalar* values;
+            MatGetRow(matrix, row, &num_entries, &column_indices, &values);
+            for (PetscInt col=0; col<num_entries; col++)
+            {
+                if (column_indices[col] >= row)
+                {
+                    upper_hist[ column_indices[col] - row]++;
+                }
+            }
+            MatRestoreRow(matrix, row, &num_entries, &column_indices, &values);
+        }
+        PetscTools::Destroy(matrix);
+
+        std::vector<unsigned> global_hist(rMesh.GetNumNodes());
+        MPI_Allreduce( &upper_hist[0], &global_hist[0], rMesh.GetNumNodes(), MPI_UNSIGNED, MPI_SUM, PETSC_COMM_WORLD);
+
+        return global_hist;
+    }
+    /*
+     * Permute nodes so that interior nodes are no longer at the end of the node vector
+     */
+    void TestPermuteNodes(void) throw (Exception)
+    {
+        // Quadratics mesh - with different ordering
+        QuadraticMesh<2> quad_mesh;
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic",2,1,false);
+        quad_mesh.ConstructFromMeshReader(mesh_reader);
+
+        std::vector<unsigned> upper_hist = CalculateMatrixFill(quad_mesh);
+        ///\todo #2106 Do some good permuting, not bad permuting.
+        //std::vector<unsigned> permutation;
+        //quad_mesh.Permute(permutation);
+        quad_mesh.PermuteNodes();
+
+        //Get some statistics about matrix fill
+        std::vector<unsigned> upper_hist_after = CalculateMatrixFill(quad_mesh);
+
+        OutputFileHandler handler("TestQuadraticMesh", false);
+        if (PetscTools::AmMaster())
+        {
+            out_stream p_file_stream;
+            p_file_stream = handler.OpenOutputFile("hist.txt");
+            for (unsigned i = 0 ; i< quad_mesh.GetNumNodes(); i++)
+
+            {
+                *p_file_stream<<i<<"\t"<<upper_hist[i]<<"\t"<<upper_hist_after[i]<<"\n";
+            }
+            p_file_stream->close();
+        }
+        //TrianglesMeshWriter<2,2> mesh_writer("TestQuadraticMesh", "square_reordered", false);
+        //mesh_writer.WriteFilesUsingMesh(quad_mesh);
+
+
+
+    }
 };
 
 #endif // _TESTQUADRATICMESH_HPP_
