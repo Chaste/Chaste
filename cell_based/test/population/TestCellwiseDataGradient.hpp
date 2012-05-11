@@ -72,17 +72,19 @@ public:
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
         // Set up data: C(x,y) = x^2
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 1);
-
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        p_cell_data->SetItem(0, DOUBLE_UNSET);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
+        
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
-            p_data->SetValue(x*x, mesh.GetNode(i)->GetIndex());
+            CellPtr p_cell = cell_population.GetCellUsingLocationIndex(mesh.GetNode(i)->GetIndex());
+            p_cell->GetCellData()->SetItem(0, x*x);
         }
 
         CellwiseDataGradient<2> gradient;
-        gradient.SetupGradients();
+        gradient.SetupGradients(cell_population);
 
         // With the algorithm being used, the numerical gradient is (1,0)
         // for each of the nodes
@@ -91,8 +93,6 @@ public:
             TS_ASSERT_DELTA(gradient.rGetGradient(i)(0), 1.0, 1e-9);
             TS_ASSERT_DELTA(gradient.rGetGradient(i)(1), 0.0, 1e-9);
         }
-
-        CellwiseData<2>::Destroy();
     }
 
 
@@ -112,16 +112,12 @@ public:
         //////////////////////////////////
         // C(x,y) = const
         //////////////////////////////////
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 1);
-
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
-        {
-            p_data->SetValue(1.0, mesh.GetNode(i)->GetIndex());
-        }
-
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        p_cell_data->SetItem(0, 1.0);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
+        
         CellwiseDataGradient<2> gradient;
-        gradient.SetupGradients();
+        gradient.SetupGradients(cell_population);
 
         // Check gradient
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
@@ -137,11 +133,12 @@ public:
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
-            p_data->SetValue(x-y, mesh.GetNode(i)->GetIndex());
+            CellPtr p_cell = cell_population.GetCellUsingLocationIndex(mesh.GetNode(i)->GetIndex());
+            p_cell->GetCellData()->SetItem(0, x-y);
         }
 
         // Check gradient
-        gradient.SetupGradients();
+        gradient.SetupGradients(cell_population);
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             TS_ASSERT_DELTA(gradient.rGetGradient(i)(0),  1.0, 1e-9);
@@ -155,11 +152,12 @@ public:
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
-            p_data->SetValue(x*x - y*y, mesh.GetNode(i)->GetIndex());
+            CellPtr p_cell = cell_population.GetCellUsingLocationIndex(mesh.GetNode(i)->GetIndex());
+            p_cell->GetCellData()->SetItem(0, x*x - y*y);
         }
 
         // Check gradient - here there is some numerical error
-        gradient.SetupGradients();
+        gradient.SetupGradients(cell_population);
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
@@ -175,7 +173,6 @@ public:
             TS_ASSERT_DELTA(gradient.rGetGradient(i)(1), -2*y, tol);
         }
 
-        CellwiseData<2>::Destroy();
     }
 
 //    void TestCellwiseDataGradientWithGhostNodes() throw(Exception)
@@ -228,7 +225,7 @@ public:
 //
 //        // The corner nodes are special because they have no adjacent real elements
 //        CellwiseDataGradient<2> gradient;
-//        gradient.SetupGradients();
+//        gradient.SetupGradients(cell_population);
 //        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
 //        {
 //            double x = mesh.GetNode(i)->rGetLocation()[0];

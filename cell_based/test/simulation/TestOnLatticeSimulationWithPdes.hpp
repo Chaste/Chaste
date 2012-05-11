@@ -296,21 +296,10 @@ public:
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Set up CellwiseData and associate it with the cell population
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 2);
-
-        /*
-         * Since values are first passed in to CellwiseData before it is updated in UpdateAtEndOfTimeStep(),
-         * we need to pass it some initial conditions to avoid memory errors.
-         */
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
-        {
-            p_data->SetValue(1.0 , cell_population.GetLocationIndexUsingCell(*cell_iter), 0);
-            p_data->SetValue(1.0 , cell_population.GetLocationIndexUsingCell(*cell_iter), 1);
-        }
+        MAKE_PTR_ARGS(CellData, p_cell_data, (2)); 
+        p_cell_data->SetItem(0, 1.0);
+        p_cell_data->SetItem(1, 1.0);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
@@ -355,8 +344,6 @@ public:
             TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), analytic_solution, 1e-2);
             TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(1), analytic_solution, 1e-2);
         }
-        // Tidy up
-        CellwiseData<2>::Destroy();
     }
 
     void TestPdeOutput() throw(Exception)

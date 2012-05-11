@@ -54,7 +54,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WildTypeCellMutationState.hpp"
 #include "CellLabel.hpp"
 #include "CellPropertyRegistry.hpp"
-#include "CellwiseData.hpp"
 #include "SmartPointers.hpp"
 
 class TestNodeBasedCellPopulation : public AbstractCellBasedTestSuite
@@ -647,16 +646,18 @@ public:
         node_based_cell_population.SetOutputCellIdData(true);
         TS_ASSERT_EQUALS(node_based_cell_population.GetOutputCellIdData(), true);
 
-        // Coverage of writing CellwiseData to VTK
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&node_based_cell_population, 2);
+        // Coverage of writing CellData to VTK
+        MAKE_PTR_ARGS(CellData, p_cell_data, (2)); 
+        p_cell_data->SetItem(0, DOUBLE_UNSET);
+        p_cell_data->SetItem(1, DOUBLE_UNSET);
+        node_based_cell_population.AddClonedDataToAllCells(p_cell_data);
         for (unsigned var=0; var<2; var++)
         {
             for (AbstractCellPopulation<2>::Iterator cell_iter = node_based_cell_population.Begin();
                  cell_iter != node_based_cell_population.End();
                  ++cell_iter)
             {
-                p_data->SetValue((double) 3.0*var, node_based_cell_population.GetLocationIndexUsingCell(*cell_iter), var);
+                cell_iter->GetCellData()->SetItem(var, (double) 3.0*var);
             }
         }
 
@@ -720,9 +721,6 @@ public:
 
         // Compare output with saved files of what they should look like
         TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.parameters         cell_based/test/data/TestNodeBasedCellPopulationWriters2d/results.parameters").c_str()), 0);
-
-        // Tidy up
-        CellwiseData<2>::Destroy();
     }
 
     void TestNodeBasedCellPopulationOutputWriters3d()

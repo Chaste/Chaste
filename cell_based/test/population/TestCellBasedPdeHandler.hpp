@@ -51,7 +51,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
-#include "CellwiseData.hpp"
 #include "CellwiseSourcePde.hpp"
 #include "SimpleUniformSourcePde.hpp"
 #include "ConstBoundaryCondition.hpp"
@@ -505,20 +504,14 @@ public:
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
-
+        TS_ASSERT_EQUALS(cells.size(), mesh.GetNumNodes());
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
         cell_population.SetMechanicsCutOffLength(1.5);
 
-        //MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        //p_cell_data->SetItem(0, 1.0);
-        //cell_population.AddClonedDataToAllCells(p_cell_data);
-		// Set up CellwiseData and associate it with the cell population
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 1);
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
-        {
-            p_data->SetValue(1.0, mesh.GetNode(i)->GetIndex());
-        }
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        p_cell_data->SetItem(0, 1.0);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
+
         // Create a PDE handler object using this cell population
         CellBasedPdeHandler<2> pde_handler(&cell_population);
 
@@ -557,15 +550,8 @@ public:
         cells_generator2.GenerateBasic(cells2, p_mesh2->GetNumNodes());
 
         MeshBasedCellPopulation<2> cell_population2(*p_mesh2, cells2);
-        //cell_population2.AddClonedDataToAllCells(p_cell_data);
 
-        CellwiseData<2>::Destroy();
-        CellwiseData<2>* p_data2 = CellwiseData<2>::Instance();
-        p_data2->SetPopulationAndNumVars(&cell_population2, 1);
-        for (unsigned i=0; i<p_mesh2->GetNumNodes(); i++)
-        {
-            p_data2->SetValue(1.0, p_mesh2->GetNode(i)->GetIndex());
-        }
+        cell_population2.AddClonedDataToAllCells(p_cell_data);
 
         CellBasedPdeHandler<2> pde_handler2(&cell_population2);
         pde_handler2.OpenResultsFiles(output_directory);
@@ -575,9 +561,6 @@ public:
         TS_ASSERT(file_finder3.IsFile());
 
         pde_handler2.CloseResultsFiles();
-
-        // Tidy up
-        CellwiseData<2>::Destroy();
     }
 
     void TestWriteAverageRadialPdeSolution() throw(Exception)
@@ -594,19 +577,15 @@ public:
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        //MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        //p_cell_data->SetItem(0, 1.0);
-        //cell_population.AddClonedDataToAllCells(p_cell_data);
-        // Set up CellwiseData and associate it with the cell population
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 1);
-//        for (unsigned i=0; i<cells.size(); i++)
-//        {
-//            cells[i]->GetCellData()->SetItem(0, RandomNumberGenerator::Instance()->ranf());
-//        }
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        //Put random data on the cells
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        p_cell_data->SetItem(0, DOUBLE_UNSET);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
         {
-            p_data->SetValue(RandomNumberGenerator::Instance()->ranf(), p_mesh->GetNode(i)->GetIndex());
+            cell_iter->GetCellData()->SetItem(0, RandomNumberGenerator::Instance()->ranf());
         }
 
         // Create a PDE handler object using this cell population
@@ -629,9 +608,6 @@ public:
 
         // Close result file ourselves
         pde_handler.mpAverageRadialPdeSolutionResultsFile->close();
-
-        // Tidy up
-        CellwiseData<2>::Destroy();
     }
 
     void TestWritePdeSolution() throw(Exception)
@@ -648,19 +624,15 @@ public:
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        //MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        //p_cell_data->SetItem(0, 1.0);
-        //cell_population.AddClonedDataToAllCells(p_cell_data);
-        // Set up CellwiseData and associate it with the cell population
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 1);
-//        for (unsigned i=0; i<cells.size(); i++)
-//        {
-//            cells[i]->GetCellData()->SetItem(0, RandomNumberGenerator::Instance()->ranf());
-//        }
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        //Put random data on the cells
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        p_cell_data->SetItem(0, DOUBLE_UNSET);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
         {
-            p_data->SetValue(RandomNumberGenerator::Instance()->ranf(), p_mesh->GetNode(i)->GetIndex());
+            cell_iter->GetCellData()->SetItem(0, RandomNumberGenerator::Instance()->ranf());
         }
 
         // Create a PDE handler object using this cell population

@@ -206,22 +206,15 @@ public:
         /*
          * Recall that in the Wnt-based crypt simulation tutorial, we defined a singleton class
          * which cell-cycles used to get the Wnt concentration. Here, we do something similar
-         * using the {{{CellwiseData}}} singleton class, which stores the
+         * using the {{{CellData}}} class, which stores the
          * value of the current nutrient concentration for each cell. We have to
-         * tell the {{{CellwiseData}}} object how many cells and variables per cell there
-         * are (in this case, one variable per cell, namely the oxygen concentration), and
-         * the cell population.
+         * tell the {{{CellData}}} class that there is one variable per cell, namely the oxygen 
+         * concentration.  We initialise the oxygen concentration for each node (to 1.0), by
+         * calling {{{SetItem}}}.
          */
-        CellwiseData<2>::Instance()->SetPopulationAndNumVars(&cell_population,1);
-        /*
-         * Then we have to initialise the oxygen concentration for each node (to 1.0), by
-         * calling {{{SetValue}}}. This takes in the concentration, and the location index
-         * corresponding to the cell which this concentration is for.
-         */
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
-        {
-            CellwiseData<2>::Instance()->SetValue(1.0, p_mesh->GetNode(i)->GetIndex());
-        }
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        p_cell_data->SetItem(0, 1.0);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         /*
          * Next we instantiate an instance of the PDE class which we defined above.
@@ -303,11 +296,6 @@ public:
          * We call {{{Solve()}}} on the simulator to run the simulation.
          */
         simulator.Solve();
-
-        /*
-         * Finally, we call {{{Destroy()}}} on the singleton {{{CellwiseData}}} class.
-         */
-        CellwiseData<2>::Destroy();
     }
     /*
      * EMPTYLINE

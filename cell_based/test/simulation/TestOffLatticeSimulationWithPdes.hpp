@@ -153,16 +153,10 @@ public:
         // Set up cell population
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
-        // Set up CellwiseData and associate it with the cell population
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 1);
-
-        // Since values are first passed in to CellwiseData before it is updated in UpdateAtEndOfTimeStep(),
-        // we must initialise it here to avoid memory errors
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
-        {
-            p_data->SetValue(1.0, mesh.GetNode(i)->GetIndex());
-        }
+        // Set up cell data on the cell population
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        p_cell_data->SetItem(0, 1.0);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -222,9 +216,6 @@ public:
                 TS_ASSERT_DELTA(p_oxygen_model->GetCurrentHypoxicDuration(), 2/120.0, 1e-5);
             }
         }
-
-        // Tidy up
-        CellwiseData<2>::Destroy();
     }
 
     void TestWithOxygen() throw(Exception)
@@ -259,14 +250,10 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetOutputCellPopulationVolumes(true); // record the spheroid radius and apoptotic radius
 
-        // Set up CellwiseData and associate it with the cell population
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 1);
-
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
-        {
-            p_data->SetValue(1.0, p_mesh->GetNode(i)->GetIndex());
-        }
+        // Set up cell data on the cell population
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        p_cell_data->SetItem(0, 1.0);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -295,9 +282,6 @@ public:
 
         // Run cell-based simulation
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
-
-        // Tidy up
-        CellwiseData<2>::Destroy();
     }
 
     /*
@@ -376,14 +360,11 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetOutputCellPopulationVolumes(true); // record the spheroid radius and apoptotic radius
 
-        // Set up CellwiseData and associate it with the cell population
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 1);
+        // Set up cell data on the cell population
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        p_cell_data->SetItem(0, 1.0);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
-        {
-            p_data->SetValue(1.0, p_mesh->GetNode(i)->GetIndex());
-        }
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -418,9 +399,6 @@ public:
         TS_ASSERT_DELTA(node_5_location[0], 0.6576, 1e-4);
         TS_ASSERT_DELTA(node_5_location[1], 1.1358, 1e-4);
         TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(5))->GetCellData()->GetItem(0), 0.9702, 1e-4);
-
-        // Tidy up
-        CellwiseData<2>::Destroy();
     }
 
     void TestWithPointwiseTwoSource() throw(Exception)
@@ -467,15 +445,11 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetOutputCellPopulationVolumes(true); // record the spheroid radius and apoptotic radius
 
-        // Set up CellwiseData and associate it with the cell population
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 2);
-
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
-        {
-            p_data->SetValue(1.0, p_mesh->GetNode(i)->GetIndex(), 0);
-            p_data->SetValue(1.0, p_mesh->GetNode(i)->GetIndex(), 1);
-        }
+        // Set up cell data on the cell population
+        MAKE_PTR_ARGS(CellData, p_cell_data, (2)); 
+        p_cell_data->SetItem(0, 1.0);
+        p_cell_data->SetItem(1, 1.0);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -520,9 +494,6 @@ public:
         TS_ASSERT_DELTA(p_cell_at_5->GetCellData()->GetItem(0), 0.9702, 1e-4);
         TS_ASSERT_DELTA(p_cell_at_5->GetCellData()->GetItem(1), 0.0000, 1e-4);
         TS_ASSERT_LESS_THAN(p_cell_at_5->GetCellData()->GetItem(1), p_cell_at_5->GetCellData()->GetItem(0));
-
-        // Tidy up
-        CellwiseData<2>::Destroy();
     }
 
     void TestSpheroidStatistics() throw (Exception)
@@ -563,14 +534,10 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetOutputCellPopulationVolumes(true); // record the spheroid radius and apoptotic radius
 
-        // Set up CellwiseData and associate it with the cell population
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 1);
-
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
-        {
-            p_data->SetValue(1.0, p_mesh->GetNode(i)->GetIndex());
-        }
+        // Set up cell data on the cell population
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        p_cell_data->SetItem(0, 1.0);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -636,9 +603,6 @@ public:
 
         // Coverage
         TS_ASSERT_THROWS_NOTHING(pde_handler.WriteAverageRadialPdeSolution(SimulationTime::Instance()->GetTime()));
-
-        // Tidy up
-        CellwiseData<2>::Destroy();
     }
 
     void TestCoarseSourceMesh() throw(Exception)
@@ -672,17 +636,11 @@ public:
         // Set up cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Set up CellwiseData and associate it with the cell population
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 2);
-
-        // Since values are first passed in to CellwiseData before it is updated in UpdateAtEndOfTimeStep(),
-        // we need to pass it some initial conditions to avoid memory errors
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
-        {
-            p_data->SetValue(1.0, p_mesh->GetNode(i)->GetIndex(),0);
-            p_data->SetValue(1.0, p_mesh->GetNode(i)->GetIndex(),1);
-        }
+        // Set up cell data on the cell population
+        MAKE_PTR_ARGS(CellData, p_cell_data, (2)); 
+        p_cell_data->SetItem(0, 1.0);
+        p_cell_data->SetItem(1, 1.0);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -806,9 +764,6 @@ public:
             TS_ASSERT_LESS_THAN_EQUALS(min1, value1_at_cell + DBL_EPSILON);
             TS_ASSERT_LESS_THAN_EQUALS(value1_at_cell, max1 + DBL_EPSILON);
         }
-
-        // Tidy up
-        CellwiseData<2>::Destroy();
     }
 
     void TestArchivingWithSimplePde() throw (Exception)
@@ -842,16 +797,10 @@ public:
         // Set up cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Set up CellwiseData and associate it with the cell population
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 1);
-
-        // Since values are first passed in to CellwiseData before it is updated in UpdateAtEndOfTimeStep(),
-        // we need to pass it some initial conditions to avoid memory errors
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
-        {
-            p_data->SetValue(1.0, p_mesh->GetNode(i)->GetIndex());
-        }
+        // Set up cell data on the cell population
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        p_cell_data->SetItem(0, 1.0);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -899,16 +848,12 @@ public:
         TS_ASSERT_DELTA(node_15_location[0], 0.4976, 1e-4);
         TS_ASSERT_DELTA(node_15_location[1], 2.5977, 1e-4);
 
-        // Test CellwiseData was set up correctly
-        TS_ASSERT_EQUALS(CellwiseData<2>::Instance()->IsSetUp(), true);
-
         // Test the CellData result
         TS_ASSERT_DELTA((p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(5))->GetCellData()->GetItem(0), 0.9604, 1e-4);
         TS_ASSERT_DELTA((p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(15))->GetCellData()->GetItem(0), 0.9584, 1e-4);
 
-        // Run cell-based simulation
+        // Tidy up
         delete p_simulator;
-        CellwiseData<2>::Destroy();
     }
 
     /**
@@ -949,14 +894,11 @@ public:
         // Set up cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Set up CellwiseData and associate it with the cell population
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 1);
+        // Set up cell data on the cell population
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        p_cell_data->SetItem(0, 1.0);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
-        {
-            p_data->SetValue(1.0, p_mesh->GetNode(i)->GetIndex());
-        }
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -996,7 +938,6 @@ public:
 
         // Tidy up
         delete p_simulator;
-        CellwiseData<2>::Destroy();
     }
 
     void Test3DOffLatticeSimulationWithPdes() throw(Exception)
@@ -1025,14 +966,11 @@ public:
         // Set up cell population
         MeshBasedCellPopulation<3> cell_population(mesh, cells);
 
-        // Set up CellwiseData and associate it with the cell population
-        CellwiseData<3>* p_data = CellwiseData<3>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 1);
+        // Set up cell data on the cell population
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        p_cell_data->SetItem(0, 1.0);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
-        {
-            p_data->SetValue(1.0, mesh.GetNode(i)->GetIndex());
-        }
 
         // Set up cell-based simulation
         OffLatticeSimulation<3> simulator(cell_population);
@@ -1062,9 +1000,6 @@ public:
 
         // Run cell-based simulation
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
-
-        // Tidy up
-        CellwiseData<3>::Destroy();
     }
 
     /**
@@ -1101,14 +1036,10 @@ public:
         // Set up cell population
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
-        // Set up CellwiseData and associate it with the cell population
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 1);
-
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
-        {
-            p_data->SetValue(1.0, mesh.GetNode(i)->GetIndex());
-        }
+        // Set up cell data on the cell population
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        p_cell_data->SetItem(0, 1.0);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -1145,9 +1076,6 @@ public:
             // Test that PDE solver is working correctly
             TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), analytic_solution, 0.02);
         }
-
-        // Tidy up
-        CellwiseData<2>::Destroy();
     }
 
     void TestOffLatticeSimulationWithPdesParameterOutputMethods() throw (Exception)
@@ -1229,19 +1157,10 @@ public:
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
         cell_population.SetMechanicsCutOffLength(1.5);
 
-        // Set up CellwiseData and associate it with the cell population
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 1);
-
-
-        /*
-         * Since values are first passed in to CellwiseData before it is updated in UpdateAtEndOfTimeStep(),
-         * we need to pass it some initial conditions to avoid memory errors.
-         */
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
-        {
-            p_data->SetValue(5.0, mesh.GetNode(i)->GetIndex(), 0);
-        }
+        // Set up cell data on the cell population
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        p_cell_data->SetItem(0, 5.0);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -1264,9 +1183,6 @@ public:
         simulator.AddForce(p_linear_force);
 
         TS_ASSERT_THROWS_THIS(simulator.Solve(), "Trying to solve a PDE on a cell population that doesn't have a mesh. Try calling UseCoarsePdeMesh().");
-
-        // Tidy up
-        CellwiseData<2>::Destroy();
     }
 
     void TestNodeBasedWithCoarseMesh() throw(Exception)
@@ -1302,19 +1218,10 @@ public:
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
         cell_population.SetMechanicsCutOffLength(1.5);
 
-        // Set up CellwiseData and associate it with the cell population
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 1);
-
-
-        /*
-         * Since values are first passed in to CellwiseData before it is updated in UpdateAtEndOfTimeStep(),
-         * we need to pass it some initial conditions to avoid memory errors.
-         */
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
-        {
-            p_data->SetValue(1.0, mesh.GetNode(i)->GetIndex(), 0);
-        }
+        // Set up cell data on the cell population
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        p_cell_data->SetItem(0, 1.0);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -1383,9 +1290,6 @@ public:
             TS_ASSERT_LESS_THAN(containing_element_index, p_coarse_mesh->GetNumElements());
             TS_ASSERT_EQUALS(containing_element_index, simulator.GetCellBasedPdeHandler()->FindCoarseElementContainingCell(*cell_iter));
         }
-
-        // Tidy up
-        CellwiseData<2>::Destroy();
     }
 
     void TestVolumeDependentAveragedPde() throw(Exception)
@@ -1426,16 +1330,17 @@ public:
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
         cell_population.SetMechanicsCutOffLength(1.5);
 
-        // Set up CellwiseData and associate it with the cell population
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 1);
+        // Set up cell data on the cell population
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        p_cell_data->SetItem(0, DOUBLE_UNSET);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         c_vector<double,2> centre_of_mesh;
         centre_of_mesh[0] = 5.0;
         centre_of_mesh[1] = 5.0;
 
         /*
-         * Since values are first passed in to CellwiseData before it is updated in UpdateAtEndOfTimeStep(),
+         * Since values are first passed in to CellData before it is updated in UpdateAtEndOfTimeStep(),
          * we need to pass it some initial conditions to avoid memory errors.
          */
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
@@ -1447,8 +1352,8 @@ public:
             {
                 initial_condition = 1.0;
             }
-
-            p_data->SetValue(initial_condition, mesh.GetNode(i)->GetIndex(),0);
+            CellPtr p_cell = cell_population.GetCellUsingLocationIndex(mesh.GetNode(i)->GetIndex());
+            p_cell->GetCellData()->SetItem(0,initial_condition);
         }
 
         // Set up cell-based simulation
@@ -1502,9 +1407,6 @@ public:
 
             TS_ASSERT_DELTA(uptake_rate, expected_uptake, 1e-4);
         }
-
-        // Tidy up
-        CellwiseData<2>::Destroy();
     }
 
     void TestCoarsePdeSolutionOnNodeBased1d() throw(Exception)
@@ -1537,16 +1439,10 @@ public:
         NodeBasedCellPopulation<1> cell_population(mesh, cells);
         cell_population.SetMechanicsCutOffLength(1.5);
 
-        // Set up CellwiseData and associate it with the cell population
-        CellwiseData<1>* p_data = CellwiseData<1>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 1);
-
-        // Since values are first passed in to CellwiseData before it is updated in UpdateAtEndOfTimeStep(),
-        // we need to pass it some initial conditions to avoid memory errors
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
-        {
-            p_data->SetValue(1.0, mesh.GetNode(i)->GetIndex(),0);
-        }
+        // Set up cell data on the cell population
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        p_cell_data->SetItem(0, 1.0);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         // Set up cell-based simulation
         OffLatticeSimulation<1> simulator(cell_population);
@@ -1572,8 +1468,6 @@ public:
         simulator.Solve();
 
         // Tidy up
-        CellwiseData<1>::Destroy();
-
         // When the mesh goes out of scope, then it's a different set of nodes that get destroyed
         for (unsigned i=0; i<nodes.size(); i++)
         {
@@ -1613,16 +1507,17 @@ public:
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
         cell_population.SetMechanicsCutOffLength(1.5);
 
-        // Set up CellwiseData and associate it with the cell population
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 1);
+        // Set up cell data on the cell population
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        p_cell_data->SetItem(0, DOUBLE_UNSET);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         c_vector<double,2> centre_of_mesh;
         centre_of_mesh[0] = 5.0;
         centre_of_mesh[1] = 5.0;
 
         /*
-         * Since values are first passed in to CellwiseData before it is updated in UpdateAtEndOfTimeStep(),
+         * Since values are first passed in to CellData before it is updated in UpdateAtEndOfTimeStep(),
          * we need to pass it some initial conditions to avoid memory errors.
          */
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
@@ -1634,8 +1529,8 @@ public:
             {
                 initial_condition = 1.0;
             }
-
-            p_data->SetValue(initial_condition, mesh.GetNode(i)->GetIndex(),0);
+            CellPtr p_cell = cell_population.GetCellUsingLocationIndex(mesh.GetNode(i)->GetIndex());
+            p_cell->GetCellData()->SetItem(0,initial_condition);
         }
 
         // Set up cell-based simulation
@@ -1661,9 +1556,6 @@ public:
         // Test solution is unchanged at first two cells
         TS_ASSERT_DELTA(  (cell_population.Begin())->GetCellData()->GetItem(0), 0.9543, 1e-4);
         TS_ASSERT_DELTA((++cell_population.Begin())->GetCellData()->GetItem(0), 0.9589, 1e-4);
-
-        // Tidy up
-        CellwiseData<2>::Destroy();
     }
 
     void TestCoarsePdeSolutionOnNodeBased3d() throw(Exception)
@@ -1698,9 +1590,10 @@ public:
         NodeBasedCellPopulation<3> cell_population(mesh, cells);
         cell_population.SetMechanicsCutOffLength(1.5);
 
-        // Set up CellwiseData and associate it with the cell population
-        CellwiseData<3>* p_data = CellwiseData<3>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 1);
+        // Set up cell data on the cell population
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        p_cell_data->SetItem(0, DOUBLE_UNSET);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         c_vector<double,3> centre_of_mesh;
         centre_of_mesh[0] = 5.0;
@@ -1708,7 +1601,7 @@ public:
         centre_of_mesh[2] = 5.0;
 
         /*
-         * Since values are first passed in to CellwiseData before it is updated in UpdateAtEndOfTimeStep(),
+         * Since values are first passed in to CellData before it is updated in UpdateAtEndOfTimeStep(),
          * we need to pass it some initial conditions to avoid memory errors.
          */
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
@@ -1720,8 +1613,8 @@ public:
             {
                 initial_condition = 1.0;
             }
-
-            p_data->SetValue(initial_condition, mesh.GetNode(i)->GetIndex(),0);
+            CellPtr p_cell = cell_population.GetCellUsingLocationIndex(mesh.GetNode(i)->GetIndex());
+            p_cell->GetCellData()->SetItem(0,initial_condition);
         }
 
         // Set up cell-based simulation
@@ -1746,9 +1639,6 @@ public:
         // Test solution is unchanged at first two cells
         TS_ASSERT_DELTA(  (cell_population.Begin())->GetCellData()->GetItem(0), 1.0, 1e-4);
         TS_ASSERT_DELTA((++cell_population.Begin())->GetCellData()->GetItem(0), 1.0, 1e-4);
-
-        // Tidy up
-        CellwiseData<3>::Destroy();
     }
 };
 

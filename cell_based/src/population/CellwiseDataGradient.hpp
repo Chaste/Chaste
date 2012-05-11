@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CELLWISEDATAGRADIENT_HPP_
 #define CELLWISEDATAGRADIENT_HPP_
 
-#include "CellwiseData.hpp"
+#include <MeshBasedCellPopulation.hpp>
 
 /**
  *  A class for calculating the gradients of the CellwiseData.
@@ -59,8 +59,10 @@ public:
      * This is done by averaging the gradients at all the containing (non-ghost)
      * elements for that node. Note that the gradients are piecewise constant-
      * constant in each element
+     * 
+     * @param rCellPopulation population on which to calculate gradients - must be instantiation of MeshBasedCellPopulation
      */
-    void SetupGradients();
+    void SetupGradients(AbstractCellPopulation<DIM>& rCellPopulation);
 
     /**
      * Get the gradient at a given node. Not set up for ghost nodes.

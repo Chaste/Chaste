@@ -97,12 +97,12 @@ public:
 
         TS_ASSERT_EQUALS(CellwiseData<2>::Instance()->GetNumVariables(), 1u);
 
-        p_data->SetValue(1.23, mesh.GetNode(0)->GetIndex());
         AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        cell_iter->GetCellData()->SetItem(0, 1.23);
         TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), 1.23, 1e-12);
 
-        p_data->SetValue(2.23, mesh.GetNode(1)->GetIndex());
         ++cell_iter;
+        cell_iter->GetCellData()->SetItem(0, 2.23);
         TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), 2.23, 1e-12);
 
         // Test that CellData objects are copied correctly on cell division.
@@ -135,20 +135,17 @@ public:
 
         TS_ASSERT_EQUALS(CellwiseData<2>::Instance()->GetNumVariables(), 2u);
 
-        p_data->SetValue(3.23, mesh.GetNode(0)->GetIndex(), 1);
         AbstractCellPopulation<2>::Iterator cell_iter2 = cell_population.Begin();
-
+        cell_iter2->GetCellData()->SetItem(1, 3.23);       
         TS_ASSERT_DELTA(cell_iter2->GetCellData()->GetItem(1), 3.23, 1e-12);
 
         TS_ASSERT_THROWS_THIS(cell_iter2->GetCellData()->GetItem(2),
                     "Request for variable above the number of variables stored.");
-        TS_ASSERT_THROWS_THIS(p_data->SetValue(0.0, 0, 2),
-                "Request for variable above mNumberOfVariables.");
 
 
 
-        p_data->SetValue(4.23, mesh.GetNode(1)->GetIndex(), 1);
         ++cell_iter2;
+        cell_iter2->GetCellData()->SetItem(1, 4.23);       
 
         TS_ASSERT_DELTA(cell_iter2->GetCellData()->GetItem(1), 4.23, 1e-12);
 
@@ -218,7 +215,7 @@ public:
                  cell_iter != cell_population.End();
                  ++cell_iter)
             {
-                p_data->SetValue((double) i, cell_population.GetLocationIndexUsingCell(*cell_iter), 0);
+                cell_iter->GetCellData()->SetItem(0, (double) i);
                 i++;
             }
 
@@ -314,7 +311,7 @@ public:
                  cell_iter != p_cell_population->End();
                  ++cell_iter)
             {
-                p_data->SetValue((double) i, p_cell_population->GetLocationIndexUsingCell(*cell_iter), 0);
+                cell_iter->GetCellData()->SetItem(0, (double) i);
                 i++;
             }
 

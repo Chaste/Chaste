@@ -681,9 +681,11 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetOutputCellIdData(), true);
         TS_ASSERT_EQUALS(cell_population.GetWriteVtkAsPoints(), true);
 
-        // Coverage of writing CellwiseData to VTK
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 2);
+        // Coverage of writing CellData to VTK
+        MAKE_PTR_ARGS(CellData, p_cell_data, (2));
+        p_cell_data->SetItem(0, DOUBLE_UNSET);
+        p_cell_data->SetItem(1, DOUBLE_UNSET);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         for (unsigned var=0; var<2; var++)
         {
@@ -691,7 +693,7 @@ public:
                  cell_iter != cell_population.End();
                  ++cell_iter)
             {
-                p_data->SetValue((double) 3.0*var, cell_population.GetLocationIndexUsingCell(*cell_iter), var);
+                cell_iter->GetCellData()->SetItem(var, (double) 3.0*var);
             }
         }
 
@@ -786,16 +788,18 @@ public:
 
         TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "MeshBasedCellPopulation-3");
 
-        // Coverage of writing CellwiseData to VTK
-        CellwiseData<3>* p_data = CellwiseData<3>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 2);
+        // Coverage of writing CellData to VTK
+        MAKE_PTR_ARGS(CellData, p_cell_data, (2)); 
+        p_cell_data->SetItem(0, DOUBLE_UNSET);
+        p_cell_data->SetItem(1, DOUBLE_UNSET);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
         for (unsigned var=0; var<2; var++)
         {
             for (AbstractCellPopulation<3>::Iterator cell_iter = cell_population.Begin();
                  cell_iter != cell_population.End();
                  ++cell_iter)
             {
-                p_data->SetValue((double) 3.0*var, cell_population.GetLocationIndexUsingCell(*cell_iter), var);
+                cell_iter->GetCellData()->SetItem(var, (double) 3.0*var);
             }
         }
 

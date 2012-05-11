@@ -541,8 +541,7 @@ void MeshBasedCellPopulation<DIM>::WriteVtkResultsToFile()
             }
             if (CellwiseData<DIM>::Instance()->IsSetUp())
             {
-                CellwiseData<DIM>* p_data = CellwiseData<DIM>::Instance();
-                for (unsigned var=0; var<p_data->GetNumVariables(); var++)
+                for (unsigned var=0; var<CellwiseData<DIM>::Instance()->GetNumVariables(); var++)
                 {
                     cellwise_data[var][node_index] = cell_iter->GetCellData()->GetItem(var);
                 }
@@ -652,8 +651,7 @@ void MeshBasedCellPopulation<DIM>::WriteVtkResultsToFile()
             }
             if (CellwiseData<DIM>::Instance()->IsSetUp())
             {
-                CellwiseData<DIM>* p_data = CellwiseData<DIM>::Instance();
-                for (unsigned var=0; var<p_data->GetNumVariables(); var++)
+                for (unsigned var=0; var<CellwiseData<DIM>::Instance()->GetNumVariables(); var++)
                 {
                     cellwise_data[var][elem_index] = p_cell->GetCellData()->GetItem(var);
                 }

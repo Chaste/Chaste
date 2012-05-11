@@ -509,8 +509,7 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile()
 
     if (CellwiseData<DIM>::Instance()->IsSetUp())
     {
-        CellwiseData<DIM>* p_data = CellwiseData<DIM>::Instance();
-        unsigned num_variables = p_data->GetNumVariables();
+        unsigned num_variables = CellwiseData<DIM>::Instance()->GetNumVariables();
         for (unsigned var=0; var<num_variables; var++)
         {
             std::vector<double> cellwise_data_var(num_elements);
@@ -562,8 +561,7 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         }
         if (CellwiseData<DIM>::Instance()->IsSetUp())
         {
-            CellwiseData<DIM>* p_data = CellwiseData<DIM>::Instance();
-            unsigned num_variables = p_data->GetNumVariables();
+            unsigned num_variables = CellwiseData<DIM>::Instance()->GetNumVariables();
 
             for (unsigned var=0; var<num_variables; var++)
             {

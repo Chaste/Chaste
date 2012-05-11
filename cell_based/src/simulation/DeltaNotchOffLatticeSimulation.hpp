@@ -76,7 +76,7 @@ private :
     void UpdateAtEndOfTimeStep();
 
     /**
-     * Compute the volume of each cell in the population and store these in the CellwiseData singleton.
+     * Compute the volume of each cell in the population and store these in CellData.
      */
     void UpdateCellData();
 

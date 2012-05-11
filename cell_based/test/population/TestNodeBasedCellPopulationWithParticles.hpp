@@ -53,7 +53,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellLabel.hpp"
 #include "CellId.hpp"
 #include "CellPropertyRegistry.hpp"
-#include "CellwiseData.hpp"
 #include "SmartPointers.hpp"
 
 class TestNodeBasedCellPopulationWithParticles : public AbstractCellBasedTestSuite

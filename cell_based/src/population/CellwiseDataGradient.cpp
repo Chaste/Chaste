@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CellwiseDataGradient.hpp"
 #include "LinearBasisFunction.hpp"
+#include "CellwiseData.hpp" ///\todo #1515
 
 template<unsigned DIM>
 c_vector<double, DIM>& CellwiseDataGradient<DIM>::rGetGradient(unsigned nodeIndex)
@@ -44,13 +45,13 @@ c_vector<double, DIM>& CellwiseDataGradient<DIM>::rGetGradient(unsigned nodeInde
 
 
 template<unsigned DIM>
-void CellwiseDataGradient<DIM>::SetupGradients()
+void CellwiseDataGradient<DIM>::SetupGradients(AbstractCellPopulation<DIM>& rCellPopulation)
 {
-    MeshBasedCellPopulation<DIM>* p_cell_population = static_cast<MeshBasedCellPopulation<DIM>*>(&(CellwiseData<DIM>::Instance()->rGetCellPopulation()));
-    TetrahedralMesh<DIM,DIM>& r_mesh = p_cell_population->rGetMesh();
+    MeshBasedCellPopulation<DIM>* pCellPopulation = static_cast<MeshBasedCellPopulation<DIM>*>(&(rCellPopulation));
+    TetrahedralMesh<DIM,DIM>& r_mesh = pCellPopulation->rGetMesh();
 
     // Initialise gradients size
-    unsigned num_nodes = p_cell_population->GetNumNodes();
+    unsigned num_nodes = pCellPopulation->GetNumNodes();
     mGradients.resize(num_nodes, zero_vector<double>(DIM));
 
     // The constant gradients at each element
@@ -80,16 +81,16 @@ void CellwiseDataGradient<DIM>::SetupGradients()
             unsigned node_global_index = r_elem.GetNodeGlobalIndex(node_index);
 
             // This code is commented because CelwiseData Can't deal with ghost nodes see #1975
-            assert(p_cell_population->IsGhostNode(node_global_index) == false);
+            assert(pCellPopulation->IsGhostNode(node_global_index) == false);
             //// Check whether ghost element
-            //if (p_cell_population->IsGhostNode(node_global_index) == true)
+            //if (pCellPopulation->IsGhostNode(node_global_index) == true)
             //{
             //    is_ghost_element = true;
             //    break;
             //}
 
             // If no ghost element, get PDE solution
-            CellPtr p_cell = p_cell_population->GetCellUsingLocationIndex(node_global_index);
+            CellPtr p_cell = pCellPopulation->GetCellUsingLocationIndex(node_global_index);
             double pde_solution = p_cell->GetCellData()->GetItem(0);
  
             // Interpolate gradient
@@ -112,11 +113,11 @@ void CellwiseDataGradient<DIM>::SetupGradients()
     }
 
     // Divide to obtain average gradient
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = p_cell_population->Begin();
-         cell_iter != p_cell_population->End();
+    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = pCellPopulation->Begin();
+         cell_iter != pCellPopulation->End();
          ++cell_iter)
     {
-        unsigned node_global_index = p_cell_population->GetLocationIndexUsingCell(*cell_iter);
+        unsigned node_global_index = pCellPopulation->GetLocationIndexUsingCell(*cell_iter);
 
         if (!num_real_elems_for_node[node_global_index] > 0)
         {
@@ -124,7 +125,7 @@ void CellwiseDataGradient<DIM>::SetupGradients()
             // This code is commented because CellwiseData Can't deal with ghost nodes so won't ever come into this statement see #1975
             //// The node is a real node which is not in any real element
             //// but should be connected to some cells (if more than one cell in mesh)
-            //Node<DIM>& this_node = *(p_cell_population->GetNodeCorrespondingToCell(*cell_iter));
+            //Node<DIM>& this_node = *(pCellPopulation->GetNodeCorrespondingToCell(*cell_iter));
             //
             //mGradients[node_global_index] = zero_vector<double>(DIM);
             //unsigned num_real_adjacent_nodes = 0;
@@ -145,7 +146,7 @@ void CellwiseDataGradient<DIM>::SetupGradients()
             //        unsigned adjacent_node_global_index = r_adjacent_elem.GetNodeGlobalIndex(local_node_index);
             //
             //        // If not a ghost node and not the node we started with
-            //        if (    !(p_cell_population->IsGhostNode(adjacent_node_global_index))
+            //        if (    !(pCellPopulation->IsGhostNode(adjacent_node_global_index))
             //             && adjacent_node_global_index != node_global_index )
             //        {
             //
@@ -153,7 +154,7 @@ void CellwiseDataGradient<DIM>::SetupGradients()
             //            Node<DIM>& adjacent_node = *(r_mesh.GetNode(adjacent_node_global_index));
             //
             //            double this_cell_concentration = CellwiseData<DIM>::Instance()->GetValue(*cell_iter, 0);
-            //            CellPtr p_adjacent_cell = p_cell_population->GetCellUsingLocationIndex(adjacent_node_global_index);
+            //            CellPtr p_adjacent_cell = pCellPopulation->GetCellUsingLocationIndex(adjacent_node_global_index);
             //            double adjacent_cell_concentration = CellwiseData<DIM>::Instance()->GetValue(p_adjacent_cell, 0);
             //
             //            c_vector<double, DIM> gradient_contribution = zero_vector<double>(DIM);

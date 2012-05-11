@@ -53,7 +53,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NagaiHondaForce.hpp"
 #include "WelikyOsterForce.hpp"
 #include "DiffusionForce.hpp"
-#include "CellwiseData.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "ApcOneHitCellMutationState.hpp"
 #include "ApcTwoHitCellMutationState.hpp"
@@ -554,14 +553,16 @@ public:
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Set up cellwise data and associate it with the cell population
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 1);
-
+        // Set up cell data on the cell population
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        p_cell_data->SetItem(0, DOUBLE_UNSET);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             double x = p_mesh->GetNode(i)->rGetLocation()[0];
-            p_data->SetValue(x/50.0, p_mesh->GetNode(i)->GetIndex());
+            CellPtr p_cell = cell_population.GetCellUsingLocationIndex(p_mesh->GetNode(i)->GetIndex());
+            p_cell->GetCellData()->SetItem(0, x/50.0);
+ 
         }
 
         ChemotacticForce<2> chemotactic_force;

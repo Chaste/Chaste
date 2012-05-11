@@ -41,7 +41,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
-#include "CellwiseData.hpp"
 #include "CellsGenerator.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
@@ -805,9 +804,11 @@ public:
         cell_population.SetOutputCellAges(true);
         cell_population.SetOutputCellVolumes(true);
 
-        // Coverage of writing CellwiseData to VTK
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 2);
+        // Coverage of writing CellData to VTK
+        MAKE_PTR_ARGS(CellData, p_cell_data, (2)); 
+        p_cell_data->SetItem(0, DOUBLE_UNSET);
+        p_cell_data->SetItem(1, DOUBLE_UNSET);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         for (unsigned var=0; var<2; var++)
         {
@@ -815,7 +816,7 @@ public:
                  cell_iter != cell_population.End();
                  ++cell_iter)
             {
-                p_data->SetValue((double) 3.0*var, cell_population.GetLocationIndexUsingCell(*cell_iter), var);
+                cell_iter->GetCellData()->SetItem(var, (double) 3.0*var);
             }
         }
 
@@ -858,9 +859,6 @@ public:
 
         // For coverage
         TS_ASSERT_THROWS_NOTHING(cell_population.WriteResultsToFiles());
-
-        // Tidy up
-        CellwiseData<2>::Destroy();
 
         // Test that the cell population parameters are output correctly
         out_stream parameter_file = output_file_handler.OpenOutputFile("results.parameters");

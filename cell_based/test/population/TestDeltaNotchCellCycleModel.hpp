@@ -47,7 +47,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "CheckReadyToDivideAndPhaseIsUpdated.hpp"
 #include "WildTypeCellMutationState.hpp"
-#include "CellwiseData.hpp"
 #include "SmartPointers.hpp"
 
 class TestDeltaNotchCellCycleModel : public AbstractCellBasedTestSuite

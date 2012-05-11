@@ -61,9 +61,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * two ODEs to describe the evolution in concentrations of Delta and Notch in each cell. The ODE
  * for Notch includes a reaction term that depends on the mean Delta concentration among neighbouring
  * cells. Thus in this simulation each cell needs to be able to access information about its
- * neighbours. We use the {{{CellwiseData}}} singleton to facilitate this, and introduce a subclass
+ * neighbours. We use the {{{CellData}}} class to facilitate this, and introduce a subclass
  * of {{{OffLatticeSimulation}}} called {{{DeltaNotchOffLatticeSimulation}}} to handle the updating
- * of {{{CellwiseData}}} at each time step as cell neighbours change.
+ * of {{{CellData}}} at each time step as cell neighbours change.
  *
  * EMPTYLINE
  *
@@ -88,14 +88,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * The next header file defines a simple stochastic cell-cycle model that includes the functionality
  * for solving each cell's Delta/Notch signalling ODE system at each time step, using information about neighbouring
- * cells through the {{{CellwiseData}}} singleton. We note that in this simple cell-cycle model, the
+ * cells through the {{{CellData}}} class. We note that in this simple cell-cycle model, the
  * proliferative status of each cell is unaffected by its Delta/Notch activity; such dependence could
  * easily be introduced given an appropriate model of this coupling.
  */
 #include "DeltaNotchCellCycleModel.hpp"
 /*
  * The next header file defines the class that simulates the evolution of a {{{CellPopulation}}},
- * specialized to deal with updating of the {{{CellwiseData}}} singleton to deal with Delta-Notch
+ * specialized to deal with updating of the {{{CellData}}} class to deal with Delta-Notch
  * signalling between cells.
  */
 #include "DeltaNotchOffLatticeSimulation.hpp"
@@ -150,7 +150,7 @@ public:
         cell_population.SetOutputCellVolumes(true);
         cell_population.SetOutputCellVariables(true);
 
-        /* As we are using the {{{CellwiseData}}} singleton to store the information about each cell required to
+        /* As we are using the {{{CellData}}} class to store the information about each cell required to
          * solve the Delta/Notch ODE system, we must first instantiate this singleton and associate it with the
          * cell population. Note that we set the number of variables to 3. This is because each cell's ODE system
          * comprises two ODEs describing Delta/Notch activity, and an additional 'dummy' ODE with zero reaction term
@@ -158,17 +158,21 @@ public:
          * remains constant for the purposes of solving the ODE system over each time step, but is updated at the
          * end of the time step by a method on {{{DeltaNotchOffLatticeSimulation}}}.
          */
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 3);
+
+        MAKE_PTR_ARGS(CellData, p_cell_data, (3)); 
+        p_cell_data->SetItem(0, DOUBLE_UNSET);
+        p_cell_data->SetItem(1, DOUBLE_UNSET);
+        p_cell_data->SetItem(2, DOUBLE_UNSET);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         /* We choose to initialise the concentrations to random levels in each cell. */
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
-            p_data->SetValue(RandomNumberGenerator::Instance()->ranf(), cell_population.GetLocationIndexUsingCell(*cell_iter), 0);
-            p_data->SetValue(RandomNumberGenerator::Instance()->ranf(), cell_population.GetLocationIndexUsingCell(*cell_iter), 1);
-            p_data->SetValue(RandomNumberGenerator::Instance()->ranf(), cell_population.GetLocationIndexUsingCell(*cell_iter), 2);
+            cell_iter->GetCellData()->SetItem(0, RandomNumberGenerator::Instance()->ranf());
+            cell_iter->GetCellData()->SetItem(1, RandomNumberGenerator::Instance()->ranf());
+            cell_iter->GetCellData()->SetItem(2, RandomNumberGenerator::Instance()->ranf());
         }
 
         /* We are now in a position to create and configure the cell-based simulation object, pass a force law to it,
@@ -182,9 +186,6 @@ public:
         simulator.AddForce(p_force);
 
         simulator.Solve();
-
-        /* Finally, as before, we call {{{Destroy()}}} on any singleton classes. */
-        CellwiseData<2>::Destroy();
     }
 
     /*
@@ -240,16 +241,20 @@ public:
         cell_population.SetOutputCellCyclePhases(true);
         cell_population.SetOutputCellAges(true);
 
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 3);
+        MAKE_PTR_ARGS(CellData, p_cell_data, (3)); 
+        p_cell_data->SetItem(0, DOUBLE_UNSET);
+        p_cell_data->SetItem(1, DOUBLE_UNSET);
+        p_cell_data->SetItem(2, DOUBLE_UNSET);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
+        /* We choose to initialise the concentrations to random levels in each cell. */
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
-            p_data->SetValue(RandomNumberGenerator::Instance()->ranf(), cell_population.GetLocationIndexUsingCell(*cell_iter), 0);
-            p_data->SetValue(RandomNumberGenerator::Instance()->ranf(), cell_population.GetLocationIndexUsingCell(*cell_iter), 1);
-            p_data->SetValue(RandomNumberGenerator::Instance()->ranf(), cell_population.GetLocationIndexUsingCell(*cell_iter), 2);
+            cell_iter->GetCellData()->SetItem(0, RandomNumberGenerator::Instance()->ranf());
+            cell_iter->GetCellData()->SetItem(1, RandomNumberGenerator::Instance()->ranf());
+            cell_iter->GetCellData()->SetItem(2, RandomNumberGenerator::Instance()->ranf());
         }
 
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
@@ -263,9 +268,6 @@ public:
         simulator.AddForce(p_force);
 
         simulator.Solve();
-
-        /* Finally, as before, we call {{{Destroy()}}} on any singleton classes. */
-        CellwiseData<2>::Destroy();
 
         /* To avoid memory leaks, we also delete any pointers we created in the test. */
         delete p_mesh;

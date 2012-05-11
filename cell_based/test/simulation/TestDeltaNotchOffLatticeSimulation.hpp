@@ -116,9 +116,12 @@ public:
         cell_population.SetMechanicsCutOffLength(1.5);
         cell_population.SetCellAncestorsToLocationIndices();
 
-        // Create and initialize CellwiseData
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 3);
+        // Create and initialize CellData
+        MAKE_PTR_ARGS(CellData, p_cell_data, (3)); 
+        p_cell_data->SetItem(0, DOUBLE_UNSET);
+        p_cell_data->SetItem(1, DOUBLE_UNSET);
+        p_cell_data->SetItem(2, DOUBLE_UNSET);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         // Create and configure cell-based simulation
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
@@ -137,9 +140,6 @@ public:
 //        TS_ASSERT_DELTA(p_data->GetValue(cells[0],0),0.9384,1e-4);
 //        TS_ASSERT_DELTA(p_data->GetValue(cells[1],0),0.9990,1e-4);
 //        TS_ASSERT_DELTA(p_data->GetValue(cells[2],0),0.9588,1e-4);
-
-        // Tidy up
-        CellwiseData<2>::Destroy();
     }
 
     void TestDeltaNotchSimpleOde() throw(Exception)
@@ -182,9 +182,12 @@ public:
 		cell_population.SetMechanicsCutOffLength(1.5);
 		cell_population.SetCellAncestorsToLocationIndices();
 
-		// Create and initialize CellwiseData
-		CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-		p_data->SetPopulationAndNumVars(&cell_population, 3);
+        // Create and initialize CellData
+        MAKE_PTR_ARGS(CellData, p_cell_data, (3)); 
+        p_cell_data->SetItem(0, DOUBLE_UNSET);
+        p_cell_data->SetItem(1, DOUBLE_UNSET);
+        p_cell_data->SetItem(2, DOUBLE_UNSET);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
 		// Create and configure cell-based simulation
 		DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
@@ -214,8 +217,6 @@ public:
 		}
 
 		// Tidy up
-		CellwiseData<2>::Destroy();
-		
 		for(unsigned i=0; i<nodes.size(); i++)
 		{
 			delete nodes[i];
@@ -248,9 +249,12 @@ public:
         // Create cell-based population object
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Create and initialize CellwiseData
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 3);
+        // Create and initialize CellData
+        MAKE_PTR_ARGS(CellData, p_cell_data, (3)); 
+        p_cell_data->SetItem(0, DOUBLE_UNSET);
+        p_cell_data->SetItem(1, DOUBLE_UNSET);
+        p_cell_data->SetItem(2, DOUBLE_UNSET);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         // Create and configure cell-based simulation
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
@@ -268,8 +272,6 @@ public:
 //                TS_ASSERT_DELTA(p_data->GetValue(cells[1],0),0.9990,5e-4);
 //        TS_ASSERT_DELTA(p_data->GetValue(cells[2],0),0.9589,5e-4);
 
-        // Tidy up
-        CellwiseData<2>::Destroy();
     }
 
     void TestUpdateAtEndOfTimeStepMeshBased() throw (Exception)
@@ -298,9 +300,12 @@ public:
         // Create cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Create and initialize CellwiseData
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 3);
+        // Create and initialize CellData
+        MAKE_PTR_ARGS(CellData, p_cell_data, (3)); 
+        p_cell_data->SetItem(0, DOUBLE_UNSET);
+        p_cell_data->SetItem(1, DOUBLE_UNSET);
+        p_cell_data->SetItem(2, DOUBLE_UNSET);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         // Create and configure cell-based simulation
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
@@ -319,9 +324,6 @@ public:
 //        TS_ASSERT_DELTA(p_data->GetValue(cells[0],0),0.9384,1e-4);
 //        TS_ASSERT_DELTA(p_data->GetValue(cells[1],0),0.9990,1e-4);
 //        TS_ASSERT_DELTA(p_data->GetValue(cells[2],0),0.9588,1e-4);
-
-        // Tidy up
-        CellwiseData<2>::Destroy();
     }
 
     void TestArchiving() throw (Exception)
@@ -350,9 +352,12 @@ public:
         // Create cell-based population object
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Create and initialize CellwiseData
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 3);
+        // Create and initialize CellData
+        MAKE_PTR_ARGS(CellData, p_cell_data, (3)); 
+        p_cell_data->SetItem(0, DOUBLE_UNSET);
+        p_cell_data->SetItem(1, DOUBLE_UNSET);
+        p_cell_data->SetItem(2, DOUBLE_UNSET);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         // Create and configure cell-based simulation
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);

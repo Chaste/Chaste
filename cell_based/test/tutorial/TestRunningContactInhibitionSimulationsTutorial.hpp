@@ -81,7 +81,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * The next header file defines the contact inhibition cell-cycle model that inherits from {{{AbstractSimpleCellCycleModel}}}.
  * The duration of the G1 phase depends on the deviation from a target volume (or area/length in 2D/1D): if the volume is
  * lower than a given fraction of the target volume, the G1 phase continues. The target volume and the critical fraction
- * are indicated in the user's Test file, and compared to the real volumes stored in {{{CellwiseData}}}, a singleton class.
+ * are indicated in the user's Test file, and compared to the real volumes stored in {{{CellData}}}, a singleton class.
  * This model allows for quiescence imposed by transient periods of high stress, followed by relaxation. Note that
  * in this cell cycle model, quiescence is implemented only by extending the G1 phase. Therefore, if a cell
  * is compressed during G2 or S phases then it will still divide, and thus cells whose volumes are smaller
@@ -91,7 +91,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /*
  * The next header is the simulation class corresponding to the contact inhibition cell-cycle model.
- * The essential difference with other simulation classes is that {{{CellwiseData}}} is updated with the
+ * The essential difference with other simulation classes is that {{{CellData}}} are updated with the
  * volumes each cell (either the volume of the Voronoi elements or vertex element depending on population type).
  */
 #include "VolumeTrackedOffLatticeSimulation.hpp"
@@ -159,17 +159,19 @@ public:
         cell_population.SetOutputCellMutationStates(true);
 
         /* To keep track of the volumes of the cells that are used in the contact inhibition cell-cycle,
-         * we use the singleton class {{{CellwiseData}}}. Here, we just initialise it with one variable
+         * we use the {{{CellData}}} class. Here, we just initialise it with one variable
          * and associate it with the cell population. */
 
-        /* This creates the instance of {{{CellwiseData}}}: */
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        /* the first thing we do is set the number of variables we wish to use {{{CellwiseData}}} to track, we do this by passing the
-         * population and the number of variables to  the {{{SetPopulationAndNumVars}}} method.*/
-        p_data->SetPopulationAndNumVars(&cell_population, 1);
+        /* This creates the instance of {{{CellData}}}: */
+        // Create and initialize CellData
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        p_cell_data->SetItem(0, DOUBLE_UNSET);
+        /* We set the number of variables we wish to use {{{CellData}}} to track, and add a copy of this data
+         * to all cells in the population with the  {{{AddClonedDataToAllCells}}} method.*/
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         /* Then, we define the contact {{{VolumeTrackedOffLatticeSimulation}}} class, that automatically updates the volumes of the cells
-         * in {{{CellwiseData}}}. We also set up the output directory, the end time and the output multiple.
+         * in {{{CellData}}}. We also set up the output directory, the end time and the output multiple.
          */
         VolumeTrackedOffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestContactInhibitionInBox");
@@ -215,9 +217,6 @@ public:
 
         /* To run the simulation, we call {{{Solve()}}}. */
         simulator.Solve();
-
-        /* Finally, as in previous cell-based Chaste tutorials, we call {{{Destroy()}}} on the singleton classes. */
-        CellwiseData<2>::Destroy();
     }
     /*
      * EMPTYLINE
@@ -282,13 +281,14 @@ public:
         cell_population.SetOutputCellMutationStates(true);
 
         /* To keep track of the volumes of the cells that are used in the contact inhibition cell-cycle,
-         * we use the singleton class {{{CellwiseData}}}. Here, we just initialise it with one variable
-         * and associate it with the cell population: */
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 1);
+         * we use the {{{CellData}}} class. Here, we just initialise it with one variable
+         * and copy it to all the cell in the population: */
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        p_cell_data->SetItem(0, DOUBLE_UNSET);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         /*  Then, we define the contact {{{VolumeTrackedOffLatticeSimulation}}} class, that automatically updates the volumes of the cells
-         * in {{{CellwiseData}}}. We also set up the output directory, the end time and the output multiple.
+         * in {{{CellData}}}. We also set up the output directory, the end time and the output multiple.
          */
         VolumeTrackedOffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestContactInhibitionTumourInBox");
@@ -328,9 +328,6 @@ public:
 
         /* To run the simulation, we call {{{Solve()}}}. */
         simulator.Solve();
-
-        /* Finally, as in previous cell-based Chaste tutorials, we call {{{Destroy()}}} on the singleton classes. */
-        CellwiseData<2>::Destroy();
     }
     /*
      * EMPTYLINE
@@ -380,14 +377,15 @@ public:
         cell_population.SetOutputCellMutationStates(true);
 
         /* To keep track of the volumes of the cells that are used in the contact inhibition cell-cycle,
-         * we use the singleton class {{{CellwiseData}}}. Here, we just initialise it with one variable
+         * we use the class {{{CellData}}} class. Here, we just initialise it with one variable
          * and associate it with the cell population. This time each cell is associated with a vertex element. */
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 1);
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        p_cell_data->SetItem(0, DOUBLE_UNSET);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
 
         /*  Then, we define the {{{VolumeTrackedOffLatticeSimulation}}} class, that automatically updates the volumes of the cells
-         * in {{{CellwiseData}}}. We also set up the output directory, the end time and the output multiple.
+         * in {{{CellData}}}. We also set up the output directory, the end time and the output multiple.
          */
         VolumeTrackedOffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestVertexContactInhibition");
@@ -401,9 +399,6 @@ public:
 
         /* To run the simulation, we call {{{Solve()}}}. */
         simulator.Solve();
-
-        /* Finally, as in previous cell-based Chaste tutorials, we call {{{Destroy()}}} on any singleton classes. */
-        CellwiseData<2>::Destroy();
     }
     /*
      * EMPTYLINE

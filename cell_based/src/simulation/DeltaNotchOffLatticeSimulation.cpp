@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "MeshBasedCellPopulation.hpp"
-#include "CellwiseData.hpp"
 #include "DeltaNotchCellCycleModel.hpp"
 
 template<unsigned DIM>
@@ -104,7 +103,7 @@ void DeltaNotchOffLatticeSimulation<DIM>::UpdateCellData()
             neighbour_indices = static_cast<VertexBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->rGetMesh().GetNeighbouringElementIndices(index);
         }
 
-        // Compute this cell's average neighbouring Delta concentration and store in CellwiseData
+        // Compute this cell's average neighbouring Delta concentration and store in CellData
         if (!neighbour_indices.empty())
         {
             double mean_delta = 0.0;

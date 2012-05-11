@@ -59,7 +59,7 @@ void ChemotacticForce<DIM>::AddForceContribution(std::vector<c_vector<double, DI
                                                  AbstractCellPopulation<DIM>& rCellPopulation)
 {
     CellwiseDataGradient<DIM> gradients;
-    gradients.SetupGradients();
+    gradients.SetupGradients(rCellPopulation);
 
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
          cell_iter != rCellPopulation.End();

@@ -40,7 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BoundaryConditionsContainer.hpp"
 #include "SimpleLinearEllipticSolver.hpp"
 #include "CellBasedPdeSolver.hpp"
-#include "CellwiseData.hpp"
 #include "Exception.hpp"
 
 template<unsigned DIM>
