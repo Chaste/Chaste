@@ -869,7 +869,7 @@ public:
     }
 
 
-    void CalculateConnectivityMatrix(Mat& matrix, QuadraticMesh<2>& rMesh)
+    void CalculateConnectivityMatrix(Mat& matrix, AbstractTetrahedralMesh<2,2>& rMesh)
     {
         PetscTools::SetupMat(matrix, rMesh.GetNumNodes(), rMesh.GetNumNodes(), 17);
         for (TetrahedralMesh<2,2>::ElementIterator iter
@@ -880,7 +880,7 @@ public:
             for (unsigned i=0; i<iter->GetNumNodes(); i++)
             {
                 unsigned global_index1 = iter->GetNodeGlobalIndex(i);
-                for (unsigned j=i; j<iter->GetNumNodes(); j++)
+                for (unsigned j=i+1; j<iter->GetNumNodes(); j++)
                 {
                     unsigned global_index2 = iter->GetNodeGlobalIndex(j);
                     PetscMatTools::SetElement(matrix, global_index1, global_index2, 1.0);
@@ -891,7 +891,7 @@ public:
         PetscMatTools::Finalise(matrix);
     }
 
-    std::vector<unsigned> CalculateMatrixFill(QuadraticMesh<2>& rMesh)
+    std::vector<unsigned> CalculateMatrixFill(AbstractTetrahedralMesh<2,2>& rMesh)
     {
         //Get some statistics about matrix fill
         Mat matrix;
@@ -919,7 +919,6 @@ public:
             }
             MatRestoreRow(matrix, row, &num_entries, &column_indices, &values);
         }
-        PetscTools::Destroy(matrix);
 
         std::vector<unsigned> global_hist(rMesh.GetNumNodes());
         MPI_Allreduce( &upper_hist[0], &global_hist[0], rMesh.GetNumNodes(), MPI_UNSIGNED, MPI_SUM, PETSC_COMM_WORLD);
@@ -998,13 +997,13 @@ public:
         idxtype* order=new idxtype[num_local_nodes];
         idxtype* sizes=new idxtype[PetscTools::GetNumProcs()*2];
 
-        //int numflag = 0; // METIS speak for C-style numbering
-        //MPI_Comm communicator = PETSC_COMM_WORLD;
-        //ParMETIS_V3_NodeND(vtxdist, xadj, adjncy, &numflag, options, order, sizes, &communicator);
+        int numflag = 0; // METIS speak for C-style numbering
+//        MPI_Comm communicator = PETSC_COMM_WORLD;
+//        ParMETIS_V3_NodeND(vtxdist, xadj, adjncy, &numflag, options, order, sizes, &communicator);
 
-        idxtype* perm=new idxtype[num_local_nodes];
-        idxtype* iperm=new idxtype[num_local_nodes];
-        //METIS_NodeND(&num_local_nodes, xadj, adjncy, NULL, NULL, perm, iperm);
+        idxtype* perm=new idxtype[3*num_local_nodes];
+        idxtype* iperm=new idxtype[3*num_local_nodes];
+        METIS_NodeND(&num_local_nodes, xadj, adjncy, &numflag, options, perm, iperm);
         delete [] perm;
         delete [] iperm;
 
