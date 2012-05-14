@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * Subclass of OffLatticeSimulation in which the volume of the cells is used in
- * a CellwiseData structure for contact inhibition below a threshold volume.
+ * a CellData structure for contact inhibition below a threshold volume.
  */
 template<unsigned DIM>
 class VolumeTrackedOffLatticeSimulation : public OffLatticeSimulation<DIM>
@@ -65,19 +65,19 @@ private :
     }
 
     /**
-     * Overridden SetupSolve() method. Calls UpdateCellwiseData().
+     * Overridden SetupSolve() method. Calls UpdateCellData().
      */
     void SetupSolve();
 
     /**
-     * Overridden UpdateAtEndOfTimeStep() method. Calls UpdateCellwiseData().
+     * Overridden UpdateAtEndOfTimeStep() method. Calls UpdateCellData().
      */
     void UpdateAtEndOfTimeStep();
 
     /**
-     * Compute the volume of each cell in the population and store these in the CellwiseData singleton.
+     * Compute the volume of each cell in the population and store these in the CellData.
      */
-    void UpdateCellwiseData();
+    void UpdateCellData();
 
 public:
 

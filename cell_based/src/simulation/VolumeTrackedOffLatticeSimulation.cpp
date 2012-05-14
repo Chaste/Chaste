@@ -35,7 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "VolumeTrackedOffLatticeSimulation.hpp"
 #include "MeshBasedCellPopulation.hpp"
-#include "CellwiseData.hpp"
 
 template<unsigned DIM>
 VolumeTrackedOffLatticeSimulation<DIM>::VolumeTrackedOffLatticeSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
@@ -54,20 +53,20 @@ template<unsigned DIM>
 void VolumeTrackedOffLatticeSimulation<DIM>::SetupSolve()
 {
     /*
-     * We must update CellwiseData in SetupSolve(), otherwise it will not have been
+     * We must update CellData in SetupSolve(), otherwise it will not have been
      * fully initialised by the time we enter the main time loop.
      */
-    UpdateCellwiseData();
+    UpdateCellData();
 }
 
 template<unsigned DIM>
 void VolumeTrackedOffLatticeSimulation<DIM>::UpdateAtEndOfTimeStep()
 {
-    UpdateCellwiseData();
+    UpdateCellData();
 }
 
 template<unsigned DIM>
-void VolumeTrackedOffLatticeSimulation<DIM>::UpdateCellwiseData()
+void VolumeTrackedOffLatticeSimulation<DIM>::UpdateCellData()
 {
     // Make sure the cell population is updated
     this->mrCellPopulation.Update();

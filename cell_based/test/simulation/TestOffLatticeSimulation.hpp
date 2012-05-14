@@ -49,7 +49,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
-#include "CellwiseData.hpp"
 #include "ChemotacticForce.hpp"
 #include "RandomCellKiller.hpp"
 #include "PlaneBoundaryCondition.hpp"

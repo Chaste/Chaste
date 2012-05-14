@@ -51,7 +51,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NagaiHondaForce.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "DeltaNotchOffLatticeSimulation.hpp"
-#include "CellwiseData.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "Warnings.hpp"

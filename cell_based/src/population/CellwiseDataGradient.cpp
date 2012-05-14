@@ -35,7 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CellwiseDataGradient.hpp"
 #include "LinearBasisFunction.hpp"
-#include "CellwiseData.hpp" ///\todo #1515
 
 template<unsigned DIM>
 c_vector<double, DIM>& CellwiseDataGradient<DIM>::rGetGradient(unsigned nodeIndex)

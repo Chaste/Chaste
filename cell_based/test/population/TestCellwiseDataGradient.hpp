@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshReader.hpp"
 
 /**
- * This class contains tests for methods on the class CellwiseData.
+ * This class contains tests for methods on the class CellwiseDataGradient.
  */
 class TestCellwiseDataGradient : public AbstractCellBasedTestSuite
 {

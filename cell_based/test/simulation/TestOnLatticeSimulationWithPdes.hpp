@@ -130,19 +130,20 @@ public:
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Set up CellwiseData and associate it with the cell population
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 1);
+        // Create and initialize CellData
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        p_cell_data->SetItem(0, DOUBLE_UNSET);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         /*
-         * Since values are first passed in to CellwiseData before it is updated in UpdateAtEndOfTimeStep(),
-         * we need to pass it some initial conditions to avoid memory errors.
+         * Since values are first passed in to CellData before it is updated in UpdateAtEndOfTimeStep(),
+         * we need to pass it some initial conditions.
          */
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
-            p_data->SetValue(cell_population.GetLocationIndexUsingCell(*cell_iter), cell_population.GetLocationIndexUsingCell(*cell_iter), 0);
+            cell_iter->GetCellData()->SetItem(0, cell_population.GetLocationIndexUsingCell(*cell_iter));
         }
 
         // Set up cell-based simulation
@@ -170,9 +171,6 @@ public:
 
         // Solve the system
         TS_ASSERT_THROWS_THIS(simulator.Solve(), "Trying to solve a PDE on a cell population that doesn't have a mesh. Try calling UseCoarsePdeMesh().");
-
-        // Tidy up
-        CellwiseData<2>::Destroy();
     }
 
     void TestPottsBasedWithCoarseMesh() throw(Exception)
@@ -191,19 +189,20 @@ public:
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Set up CellwiseData and associate it with the cell population
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 1);
-
+        // Create and initialize CellData
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        p_cell_data->SetItem(0, DOUBLE_UNSET);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
+        
         /*
-         * Since values are first passed in to CellwiseData before it is updated in UpdateAtEndOfTimeStep(),
-         * we need to pass it some initial conditions to avoid memory errors.
+         * Since values are first passed in to CellData before it is updated in UpdateAtEndOfTimeStep(),
+         * we need to pass it some initial conditions.
          */
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
-            p_data->SetValue(cell_population.GetLocationIndexUsingCell(*cell_iter), cell_population.GetLocationIndexUsingCell(*cell_iter), 0);
+            cell_iter->GetCellData()->SetItem(0, cell_population.GetLocationIndexUsingCell(*cell_iter));
         }
 
         // Set up cell-based simulation
@@ -275,9 +274,6 @@ public:
             TS_ASSERT_LESS_THAN(containing_element_index, p_coarse_mesh->GetNumElements());
             TS_ASSERT_EQUALS(containing_element_index, simulator.GetCellBasedPdeHandler()->FindCoarseElementContainingCell(*cell_iter));
         }
-
-        // Tidy up
-        CellwiseData<2>::Destroy();
     }
 
     void TestPottsBasedWithCoarseMeshTwoEquations() throw(Exception)
