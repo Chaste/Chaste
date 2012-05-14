@@ -507,15 +507,12 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile()
     std::vector<std::vector<double> > cellwise_data;
 
     unsigned num_cell_data_items = 0;
-    try
+    if (this->Begin()->HasCellData())
     {
         //We assume that the first cell is representative of all cells
         num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
     }
-    catch (Exception& e)
-    {
-        //No cell data
-    }
+
     for (unsigned var=0; var<num_cell_data_items; var++)
     {
         std::vector<double> cellwise_data_var(num_elements);

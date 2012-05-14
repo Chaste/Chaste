@@ -1123,6 +1123,7 @@ public:
         p_cell_data->SetItem(1,2.0);
 
         //Before adding the CellData to the cell
+        TS_ASSERT_EQUALS(p_cell->HasCellData(), false);
         TS_ASSERT_THROWS_THIS(p_cell->GetCellData(), "No CellData attached to this cell");
 
         p_cell->AddCellProperty(p_cell_data);
@@ -1138,6 +1139,7 @@ public:
         boost::shared_ptr<CellData> p_parentcell_data = boost::static_pointer_cast<CellData>(cell_data_collection.GetProperty());
         p_parentcell_data->SetItem(0, 3.0);
 
+        TS_ASSERT_EQUALS(p_cell->HasCellData(), true);
         TS_ASSERT_EQUALS(p_cell->GetCellData()->GetItem(0), 3.0);
         TS_ASSERT_EQUALS(p_cell->GetCellData()->GetItem(1), 2.0);
 

@@ -207,7 +207,14 @@ public:
     boost::shared_ptr<AbstractCellMutationState> GetMutationState() const;
 
     /**
+     * @return whether there is CellData associated with this cell.
+     */
+    bool HasCellData() const;
+
+    /**
      * Get the CellData associated with the cell.
+     *
+     * @return a pointer to the cell data
      */
     boost::shared_ptr<CellData> GetCellData() const;
 

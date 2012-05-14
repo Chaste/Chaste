@@ -256,14 +256,10 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile()
 
     // CellData does not deal with particles, similarly to the situation for ghost nodes see #1975
     unsigned num_cell_data_items = 0;
-    try
+    if (this->Begin()->HasCellData())
     {
         //We assume that the first cell is representative of all cells
         num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
-    }
-    catch (Exception& e)
-    {
-        //No cell data
     }
 
     assert(num_cell_data_items == 0);

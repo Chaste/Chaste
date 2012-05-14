@@ -186,9 +186,15 @@ boost::shared_ptr<AbstractCellMutationState> Cell::GetMutationState() const
     return boost::static_pointer_cast<AbstractCellMutationState>(mutation_state_collection.GetProperty());
 }
 
+bool Cell::HasCellData() const
+{
+    return mCellPropertyCollection.HasPropertyType<CellData>();
+}
+
+
 boost::shared_ptr<CellData> Cell::GetCellData() const
 {
-	 if (mCellPropertyCollection.HasPropertyType<CellData>())
+	 if (HasCellData())
 	 {
 		 CellPropertyCollection cell_data_collection = mCellPropertyCollection.GetPropertiesType<CellData>();
 
