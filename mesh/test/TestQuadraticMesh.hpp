@@ -919,7 +919,8 @@ public:
             }
             MatRestoreRow(matrix, row, &num_entries, &column_indices, &values);
         }
-
+        PetscTools::Destroy(matrix);
+        
         std::vector<unsigned> global_hist(rMesh.GetNumNodes());
         MPI_Allreduce( &upper_hist[0], &global_hist[0], rMesh.GetNumNodes(), MPI_UNSIGNED, MPI_SUM, PETSC_COMM_WORLD);
 
@@ -941,13 +942,11 @@ public:
         quad_mesh.ConstructFromMeshReader(mesh_reader);
 
         std::vector<unsigned> upper_hist = CalculateMatrixFill(quad_mesh);
-        ///\todo #2106 Do some good permuting, not bad permuting.
-        //std::vector<unsigned> permutation;
-        //quad_mesh.Permute(permutation);
+
         quad_mesh.PermuteNodes();
 
         //Get some statistics about matrix fill
-        std::vector<unsigned> upper_hist_after = CalculateMatrixFill(quad_mesh);
+        std::vector<unsigned> upper_hist_random = CalculateMatrixFill(quad_mesh);
 
         // Try out metis fill-in reduction
 
@@ -1004,6 +1003,14 @@ public:
         idxtype* perm=new idxtype[3*num_local_nodes];
         idxtype* iperm=new idxtype[3*num_local_nodes];
         METIS_NodeND(&num_local_nodes, xadj, adjncy, &numflag, options, perm, iperm);
+        
+        std::vector<unsigned> permutation;
+        std::vector<unsigned> ipermutation;
+        for (int i=0; i<num_local_nodes; i++)
+        {
+            ipermutation.push_back(iperm[i]);
+        }
+
         delete [] perm;
         delete [] iperm;
 
@@ -1013,6 +1020,11 @@ public:
         delete [] xadj;
         delete [] adjncy;
 
+        ///\todo #2106 Do some good permuting, not bad permuting.
+        //quad_mesh.PermuteNodes(permutation);
+        quad_mesh.PermuteNodes(ipermutation);
+        std::vector<unsigned> upper_hist_metis = CalculateMatrixFill(quad_mesh);
+
         OutputFileHandler handler("TestQuadraticMesh", false);
         if (PetscTools::AmMaster())
         {
@@ -1021,7 +1033,7 @@ public:
             for (unsigned i = 0 ; i< quad_mesh.GetNumNodes(); i++)
 
             {
-                *p_file_stream<<i<<"\t"<<upper_hist[i]<<"\t"<<upper_hist_after[i]<<"\n";
+                *p_file_stream<<i<<"\t"<<upper_hist[i]<<"\t"<<upper_hist_random[i]<<"\t"<<upper_hist_metis[i]<<"\n";
             }
             p_file_stream->close();
         }
