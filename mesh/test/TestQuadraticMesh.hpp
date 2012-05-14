@@ -988,9 +988,9 @@ public:
         ///\todo Get this bit to work in parallel
         EXIT_IF_PARALLEL;
         ///\todo Get this bit to work in serial!
-        idxtype vtxdist[2]; //PetscTools::GetNumProcs()
-        vtxdist[0]=0;
-        vtxdist[1]=connectivity_matrix_hi;
+//        idxtype vtxdist[2]; //PetscTools::GetNumProcs()
+//        vtxdist[0]=0;
+//        vtxdist[1]=connectivity_matrix_hi;
         idxtype options[4];
         options[0] = 0; // This is the first element of an array of up to 4 options, but 0 means take the defaults
         options[3] = 0;
