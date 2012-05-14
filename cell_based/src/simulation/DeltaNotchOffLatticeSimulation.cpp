@@ -84,7 +84,7 @@ void DeltaNotchOffLatticeSimulation<DIM>::UpdateCellData()
         cell_iter->GetCellData()->SetItem(1, this_delta);///\todo Warning Elsewhere we are only reading back item 0 as the mean_delta
     }
 
-    // Next iterate over the population to compute and store each cell's neighbouring Delta concentration in CellwiseData
+    // Next iterate over the population to compute and store each cell's neighbouring Delta concentration in CellData
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mrCellPopulation.Begin();
          cell_iter != this->mrCellPopulation.End();
          ++cell_iter)

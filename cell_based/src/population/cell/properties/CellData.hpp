@@ -113,6 +113,12 @@ public:
      * @param variableNumber the index of the data required.
      */
     double GetItem(unsigned variableNumber) const;
+
+    /**
+     * Get number of data items
+     * 
+     */
+    unsigned GetNumItems() const;
 };
 
 #include "SerializationExportWrapper.hpp"

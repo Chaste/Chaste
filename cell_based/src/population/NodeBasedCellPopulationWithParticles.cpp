@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "NodeBasedCellPopulationWithParticles.hpp"
-#include "CellwiseData.hpp"
 #include "VtkMeshWriter.hpp"
 
 template<unsigned DIM>
@@ -255,13 +254,20 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile()
     std::vector<double> cell_radii(num_nodes);
     std::vector<std::vector<double> > cellwise_data;
 
-    // CellwiseData does not deal with particles, similarly to the situation for ghost nodes see #1975
-    assert(!CellwiseData<DIM>::Instance()->IsSetUp());
-//    if (CellwiseData<DIM>::Instance()->IsSetUp())
-//    {
-//        CellwiseData<DIM>* p_data = CellwiseData<DIM>::Instance();
-//        unsigned num_variables = p_data->GetNumVariables();
-//        for (unsigned var=0; var<num_variables; var++)
+    // CellData does not deal with particles, similarly to the situation for ghost nodes see #1975
+    unsigned num_cell_data_items = 0;
+    try
+    {
+        //We assume that the first cell is representative of all cells
+        num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+    }
+    catch (Exception& e)
+    {
+        //No cell data
+    }
+
+    assert(num_cell_data_items == 0);
+//        for (unsigned var=0; var<num_cell_data_items; var++)
 //        {
 //            std::vector<double> cellwise_data_var(num_nodes);
 //            cellwise_data.push_back(cellwise_data_var);
@@ -361,8 +367,8 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile()
     {
         mesh_writer.AddPointData("Cell radii", cell_radii);
     }
-//    if (CellwiseData<DIM>::Instance()->IsSetUp())
-//    {
+    if (num_cell_data_items > 0)
+    {
 //        for (unsigned var=0; var<cellwise_data.size(); var++)
 //        {
 //            std::stringstream data_name;
@@ -370,7 +376,7 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile()
 //            std::vector<double> cellwise_data_var = cellwise_data[var];
 //            mesh_writer.AddPointData(data_name.str(), cellwise_data_var);
 //        }
-//    }
+    }
 
     mesh_writer.WriteFilesUsingMesh(static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)));
 

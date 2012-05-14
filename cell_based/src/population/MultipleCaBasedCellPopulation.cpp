@@ -656,7 +656,7 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile()
             {
                 cell_cycle_phases[node_index] = cell_ptr->GetCellCycleModel()->GetCurrentCellCyclePhase();
             }
-            ///\todo #1515 #2032 Add CellwiseData:  if (CellwiseData<DIM>::Instance()->IsSetUp())
+            ///\todo #1515 #2032 Add CellData
         }
     }
 

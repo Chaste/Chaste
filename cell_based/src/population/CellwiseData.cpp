@@ -81,10 +81,7 @@ void CellwiseData<DIM>::SetValue(double value, unsigned locationIndex, unsigned 
 {
     assert(IsSetUp());
 
-    if (variableNumber >= mNumberOfVariables)
-    {
-        EXCEPTION("Request for variable above mNumberOfVariables.");
-    }
+    assert(variableNumber < mNumberOfVariables);
 
     // Get the cell associated with locationIndex
     CellPtr p_cell = mpCellPopulation->GetCellUsingLocationIndex(locationIndex);

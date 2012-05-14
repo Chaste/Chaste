@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "NodeBasedCellPopulation.hpp"
-#include "CellwiseData.hpp"
 #include "VtkMeshWriter.hpp"
 
 template<unsigned DIM>
@@ -454,15 +453,23 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
     std::vector<double> cell_radii(num_nodes);
     std::vector<std::vector<double> > cellwise_data;
 
-    if (CellwiseData<DIM>::Instance()->IsSetUp())
+    unsigned num_cell_data_items = 0;
+    try
     {
-        unsigned num_variables = CellwiseData<DIM>::Instance()->GetNumVariables();
-        for (unsigned var=0; var<num_variables; var++)
-        {
-            std::vector<double> cellwise_data_var(num_nodes);
-            cellwise_data.push_back(cellwise_data_var);
-        }
+        //We assume that the first cell is representative of all cells
+        num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
     }
+    catch (Exception& e)
+    {
+        //No cell data
+    }
+
+    for (unsigned var=0; var<num_cell_data_items; var++)
+    {
+        std::vector<double> cellwise_data_var(num_nodes);
+        cellwise_data.push_back(cellwise_data_var);
+    }
+
 
     // Loop over cells
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
@@ -502,14 +509,12 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
             double cell_radius = mpNodesOnlyMesh->GetCellRadius(node_index);
             cell_radii[node_index] = cell_radius;
         }
-        if (CellwiseData<DIM>::Instance()->IsSetUp())
+
+        for (unsigned var=0; var<num_cell_data_items; var++)
         {
-            unsigned num_variables = CellwiseData<DIM>::Instance()->GetNumVariables();
-            for (unsigned var=0; var<num_variables; var++)
-            {
-                cellwise_data[var][node_index] =  cell_iter->GetCellData()->GetItem(var);
-            }
+            cellwise_data[var][node_index] =  cell_iter->GetCellData()->GetItem(var);
         }
+
     }
 
     if (this->mOutputCellProliferativeTypes)
@@ -536,7 +541,7 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
     {
         mesh_writer.AddPointData("Cell radii", cell_radii);
     }
-    if (CellwiseData<DIM>::Instance()->IsSetUp())
+    if (num_cell_data_items > 0)
     {
         for (unsigned var=0; var<cellwise_data.size(); var++)
         {

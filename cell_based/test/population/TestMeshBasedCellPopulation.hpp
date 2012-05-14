@@ -745,9 +745,6 @@ public:
         TS_ASSERT_EQUALS(cell_types[1], 0u);
         TS_ASSERT_EQUALS(cell_types[2], 0u);
 
-        // Tidy up
-        CellwiseData<2>::Destroy();
-
         // Test that the cell population parameters are output correctly
         out_stream parameter_file = output_file_handler.OpenOutputFile("results.parameters");
 

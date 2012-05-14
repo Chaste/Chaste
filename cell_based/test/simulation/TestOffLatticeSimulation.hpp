@@ -287,17 +287,14 @@ public:
         simulator.AddForce(p_linear_force);
 
         // Need to set this up for the chemotactic force.
-        CellwiseData<2>* p_data = CellwiseData<2>::Instance();
-        p_data->SetPopulationAndNumVars(&cell_population, 1);
-//        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-//        p_cell_data->SetItem(0, DOUBLE_UNSET);
-//        cell_population.AddClonedDataToAllCells(p_cell_data);
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        p_cell_data->SetItem(0, DOUBLE_UNSET);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             double x = p_mesh->GetNode(i)->rGetLocation()[0];
-//            CellPtr p_cell = cell_population.GetCellUsingLocationIndex(p_mesh->GetNode(i)->GetIndex());
-//            p_cell->GetCellData()->SetItem(0, x/50.0);
-            p_data->SetValue(x/50.0, p_mesh->GetNode(i)->GetIndex());
+            CellPtr p_cell = cell_population.GetCellUsingLocationIndex(p_mesh->GetNode(i)->GetIndex());
+            p_cell->GetCellData()->SetItem(0, x/50.0);
         }
 
         MAKE_PTR(ChemotacticForce<2>, p_chemotactic_force);

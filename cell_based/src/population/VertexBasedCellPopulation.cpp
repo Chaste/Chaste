@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "VertexBasedCellPopulation.hpp"
-#include "CellwiseData.hpp"
 #include "VertexMeshWriter.hpp"
 #include "Warnings.hpp"
 
@@ -507,14 +506,20 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile()
     std::vector<double> cell_volumes(num_elements);
     std::vector<std::vector<double> > cellwise_data;
 
-    if (CellwiseData<DIM>::Instance()->IsSetUp())
+    unsigned num_cell_data_items = 0;
+    try
     {
-        unsigned num_variables = CellwiseData<DIM>::Instance()->GetNumVariables();
-        for (unsigned var=0; var<num_variables; var++)
-        {
-            std::vector<double> cellwise_data_var(num_elements);
-            cellwise_data.push_back(cellwise_data_var);
-        }
+        //We assume that the first cell is representative of all cells
+        num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+    }
+    catch (Exception& e)
+    {
+        //No cell data
+    }
+    for (unsigned var=0; var<num_cell_data_items; var++)
+    {
+        std::vector<double> cellwise_data_var(num_elements);
+        cellwise_data.push_back(cellwise_data_var);
     }
 
     // Loop over vertex elements
@@ -559,14 +564,9 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile()
             double cell_volume = mpMutableVertexMesh->GetVolumeOfElement(elem_index);
             cell_volumes[elem_index] = cell_volume;
         }
-        if (CellwiseData<DIM>::Instance()->IsSetUp())
+        for (unsigned var=0; var<num_cell_data_items; var++)
         {
-            unsigned num_variables = CellwiseData<DIM>::Instance()->GetNumVariables();
-
-            for (unsigned var=0; var<num_variables; var++)
-            {
-                cellwise_data[var][elem_index] = p_cell->GetCellData()->GetItem(var);
-            }
+            cellwise_data[var][elem_index] = p_cell->GetCellData()->GetItem(var);
         }
     }
 
@@ -594,7 +594,7 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile()
     {
         mesh_writer.AddCellData("Cell volumes", cell_volumes);
     }
-    if (CellwiseData<DIM>::Instance()->IsSetUp())
+    if (num_cell_data_items > 0)
     {
         for (unsigned var=0; var<cellwise_data.size(); var++)
         {

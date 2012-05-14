@@ -67,6 +67,11 @@ double CellData::GetItem(unsigned variableNumber) const
     return mCellData[variableNumber];
 }
 
+unsigned CellData::GetNumItems() const
+{
+    return mCellData.size();
+}
+
 
 #include "SerializationExportWrapperForCpp.hpp"
 // Declare identifier for the serializer

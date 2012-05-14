@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "MeshBasedCellPopulation.hpp"
-#include "CellwiseData.hpp"
 #include "TrianglesMeshWriter.hpp"
 #include "VtkMeshWriter.hpp"
 #include "CellBasedEventHandler.hpp"
@@ -493,14 +492,21 @@ void MeshBasedCellPopulation<DIM>::WriteVtkResultsToFile()
     std::vector<double> cell_cycle_phases(num_points);
     std::vector<std::vector<double> > cellwise_data;
 
-    if (CellwiseData<DIM>::Instance()->IsSetUp())
+    unsigned num_cell_data_items = 0;
+    try
     {
-        CellwiseData<DIM>* p_data = CellwiseData<DIM>::Instance();
-        for (unsigned var=0; var<p_data->GetNumVariables(); var++)
-        {
-            std::vector<double> cellwise_data_var(num_points);
-            cellwise_data.push_back(cellwise_data_var);
-        }
+        //We assume that the first cell is representative of all cells
+        num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+    }
+    catch (Exception& e)
+    {
+        //No cell data
+    }
+
+    for (unsigned var=0; var<num_cell_data_items; var++)
+    {
+        std::vector<double> cellwise_data_var(num_points);
+        cellwise_data.push_back(cellwise_data_var);
     }
 
     if (mWriteVtkAsPoints)
@@ -539,12 +545,9 @@ void MeshBasedCellPopulation<DIM>::WriteVtkResultsToFile()
             {
                 cell_cycle_phases[node_index] = p_model->GetCurrentCellCyclePhase();
             }
-            if (CellwiseData<DIM>::Instance()->IsSetUp())
+            for (unsigned var=0; var<num_cell_data_items; var++)
             {
-                for (unsigned var=0; var<CellwiseData<DIM>::Instance()->GetNumVariables(); var++)
-                {
-                    cellwise_data[var][node_index] = cell_iter->GetCellData()->GetItem(var);
-                }
+                cellwise_data[var][node_index] = cell_iter->GetCellData()->GetItem(var);
             }
         }
 
@@ -568,7 +571,7 @@ void MeshBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         {
             mesh_writer.AddPointData("Cycle phases", cell_cycle_phases);
         }
-        if (CellwiseData<DIM>::Instance()->IsSetUp())
+        if (num_cell_data_items > 0)
         {
             for (unsigned var=0; var<cellwise_data.size(); var++)
             {
@@ -649,12 +652,9 @@ void MeshBasedCellPopulation<DIM>::WriteVtkResultsToFile()
             {
                 cell_volumes[elem_index] = mpVoronoiTessellation->GetVolumeOfElement(elem_index);
             }
-            if (CellwiseData<DIM>::Instance()->IsSetUp())
+            for (unsigned var=0; var<num_cell_data_items; var++)
             {
-                for (unsigned var=0; var<CellwiseData<DIM>::Instance()->GetNumVariables(); var++)
-                {
-                    cellwise_data[var][elem_index] = p_cell->GetCellData()->GetItem(var);
-                }
+                cellwise_data[var][elem_index] = p_cell->GetCellData()->GetItem(var);
             }
         }
 
@@ -682,7 +682,7 @@ void MeshBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         {
             mesh_writer.AddCellData("Cell volumes", cell_volumes);
         }
-        if (CellwiseData<DIM>::Instance()->IsSetUp())
+        if (num_cell_data_items > 0)
         {
             for (unsigned var=0; var<cellwise_data.size(); var++)
             {

@@ -139,6 +139,8 @@ public:
         TS_ASSERT_DELTA(p_cell_data->GetItem(0), 1.0, 1e-8);
         TS_ASSERT_DELTA(p_cell_data->GetItem(1), 2.0, 1e-8);
         TS_ASSERT_THROWS_THIS(p_cell_data->GetItem(2), "Request for variable above the number of variables stored.");
+        TS_ASSERT_EQUALS(p_cell_data->GetNumItems(), 2u);
+        
     }
 
     void TestArchiveCellData() throw(Exception)

@@ -36,7 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PottsBasedCellPopulation.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "Warnings.hpp"
-#include "CellwiseData.hpp"
 
 // Needed to convert mesh in order to write nodes to VTK (visualize as glyphs)
 #include "VtkMeshWriter.hpp"
@@ -604,14 +603,21 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile()
     elem_ids.reserve(num_nodes);
     std::vector<std::vector<double> > cellwise_data;
 
-    if (CellwiseData<DIM>::Instance()->IsSetUp())
+    unsigned num_cell_data_items = 0;
+    try
     {
-        unsigned num_variables = CellwiseData<DIM>::Instance()->GetNumVariables();
-        for (unsigned var=0; var<num_variables; var++)
-        {
-            std::vector<double> cellwise_data_var(num_nodes);
-            cellwise_data.push_back(cellwise_data_var);
-        }
+        //We assume that the first cell is representative of all cells
+        num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+    }
+    catch (Exception& e)
+    {
+        //No cell data
+    }
+
+    for (unsigned var=0; var<num_cell_data_items; var++)
+    {
+        std::vector<double> cellwise_data_var(num_nodes);
+        cellwise_data.push_back(cellwise_data_var);
     }
     for (typename AbstractMesh<DIM,DIM>::NodeIterator iter = mpPottsMesh->GetNodeIteratorBegin();
          iter != mpPottsMesh->GetNodeIteratorEnd();
@@ -656,13 +662,9 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile()
                 }
                 cell_labels.push_back(cell_label);
             }
-            if (CellwiseData<DIM>::Instance()->IsSetUp())
+            for (unsigned var=0; var<num_cell_data_items; var++)
             {
-                unsigned num_variables = CellwiseData<DIM>::Instance()->GetNumVariables();
-                for (unsigned var=0; var<num_variables; var++)
-                {
-                    cellwise_data[var][iter->GetIndex()] = p_cell->GetCellData()->GetItem(var);
-                }
+                cellwise_data[var][iter->GetIndex()] = p_cell->GetCellData()->GetItem(var);
             }
         }
     }
@@ -681,7 +683,7 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         mesh_writer.AddPointData("Cell labels", cell_labels);
     }
 
-    if (CellwiseData<DIM>::Instance()->IsSetUp())
+    if (num_cell_data_items > 0)
     {
         for (unsigned var=0; var<cellwise_data.size(); var++)
         {
