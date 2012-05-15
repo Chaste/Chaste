@@ -44,7 +44,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CellBasedPdeHandler.hpp"
 #include "AbstractCellKiller.hpp"
-#include "CellwiseData.hpp"
 #include "RandomNumberGenerator.hpp"
 
 /**
@@ -85,9 +84,6 @@ private:
     {
         SerializableSingleton<SimulationTime>* p_time_wrapper = SimulationTime::Instance()->GetSerializationWrapper();
         archive & p_time_wrapper;
-
-        SerializableSingleton<CellwiseData<DIM> >* p_cellwise_data_wrapper = CellwiseData<DIM>::Instance()->GetSerializationWrapper();
-        archive & p_cellwise_data_wrapper;
 
         SerializableSingleton<RandomNumberGenerator>* p_rng_wrapper = RandomNumberGenerator::Instance()->GetSerializationWrapper();
         archive & p_rng_wrapper;
