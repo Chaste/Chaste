@@ -80,23 +80,28 @@ import re
 import sys
 import types
 
-# Do we have any machine-specific config?
+# A local.py file in this folder overrides everything
 try:
-    import machines
-    conf = machines.config_module()
+    import local as conf
 except ImportError:
-    # How about distro-specific config?
+    # Do we have any machine-specific config for our host name?
     try:
-        fp = open('/etc/issue')
-        distro = fp.read().split()[0].lower()
-        fp.close()
-        (file, pathname, desc) = imp.find_module(distro, ['python/hostconfig'])
+        import machines
+        conf = machines.config_module()
+    except ImportError:
+        # How about distro-specific config?
         try:
-            conf = imp.load_module(distro, file, pathname, desc)
-        finally:
-            file.close()
-    except (ImportError, IOError):
-        import default as conf
+            fp = open('/etc/issue')
+            distro = fp.read().split()[0].lower()
+            fp.close()
+            (file, pathname, desc) = imp.find_module(distro, ['python/hostconfig'])
+            try:
+                conf = imp.load_module(distro, file, pathname, desc)
+            finally:
+                file.close()
+        except (ImportError, IOError):
+            # Fall-back to default settings
+            import default as conf
 
 
 # This is a bit ugly at present: SConstruct calls configure() to fill
