@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 #include "TimeStepper.hpp"
 #include "VectorHelperFunctions.hpp"
+#include "MathsCustomFunctions.hpp" // For tolerance check.
 
 #include <iostream>
 #include <sstream>
@@ -184,63 +185,124 @@ void CvodeAdaptor::SetupCvode(AbstractOdeSystem* pOdeSystem,
     assert(rInitialY.size() == pOdeSystem->GetNumberOfStateVariables());
     assert(maxStep > 0.0);
 
-    mInitialValues = N_VMake_Serial(rInitialY.size(), &(rInitialY[0]));
-    assert(NV_DATA_S(mInitialValues) == &(rInitialY[0]));
-    assert(!NV_OWN_DATA_S(mInitialValues));
-//    std::cout << " Initial values: "; N_VPrint_Serial(mInitialValues);
+    /** Initial conditions for the ODE solver. */
+    N_Vector initial_values = N_VMake_Serial(rInitialY.size(), &(rInitialY[0]));
+    assert(NV_DATA_S(initial_values) == &(rInitialY[0]));
+    assert(!NV_OWN_DATA_S(initial_values));
+//    std::cout << " Initial values: "; N_VPrint_Serial(initial_values);
 //    std::cout << " Rtol: " << mRelTol << ", Atol: " << mAbsTol << std::endl;
 //    std::cout << " Start: " << startTime << " max dt=" << maxStep << std::endl << std::flush;
 
-    mpCvodeMem = CVodeCreate(CV_BDF, CV_NEWTON);
-    if (mpCvodeMem == NULL) EXCEPTION("Failed to SetupCvode CVODE");
-    // Set error handler
-    CVodeSetErrHandlerFn(mpCvodeMem, CvodeErrorHandler, NULL);
-    // Set the user data
-    mData.pSystem = pOdeSystem;
-    mData.pY = &rInitialY;
-#if CHASTE_SUNDIALS_VERSION >= 20400
-    CVodeSetUserData(mpCvodeMem, (void*)(&mData));
-#else
-    CVodeSetFdata(mpCvodeMem, (void*)(&mData));
-#endif
-    // Setup CVODE
-#if CHASTE_SUNDIALS_VERSION >= 20400
-    CVodeInit(mpCvodeMem, CvodeRhsAdaptor, startTime, mInitialValues);
-    CVodeSStolerances(mpCvodeMem, mRelTol, mAbsTol);
-#else
-    CVodeMalloc(mpCvodeMem, CvodeRhsAdaptor, startTime, mInitialValues,
-                CV_SS, mRelTol, &mAbsTol);
-#endif
-    CVodeSetMaxStep(mpCvodeMem, maxStep);
-    // Set the rootfinder function if wanted
-    if (mCheckForRoots)
+    // Find out if we need to (re-)initialise
+    bool reinit = !mpCvodeMem || mAutoReset || !mLastSolutionState || !CompareDoubles::WithinAnyTolerance(startTime, mLastSolutionTime);
+    if (!reinit)
     {
-#if CHASTE_SUNDIALS_VERSION >= 20400
-        CVodeRootInit(mpCvodeMem, 1, CvodeRootAdaptor);
-#else
-        CVodeRootInit(mpCvodeMem, 1, CvodeRootAdaptor, (void*)(&mData));
-#endif
+        const unsigned size = GetVectorSize(rInitialY);
+        for (unsigned i=0; i<size; i++)
+        {
+            if (!CompareDoubles::WithinAnyTolerance(GetVectorComponent(mLastSolutionState, i), GetVectorComponent(rInitialY, i)))
+            {
+                reinit = true;
+                break;
+            }
+        }
     }
+
+    if (!mpCvodeMem) // First run of this solver, set up CVODE memory
+    {
+        //std::cout << "First Run\n" << std::flush;
+        mpCvodeMem = CVodeCreate(CV_BDF, CV_NEWTON);
+        if (mpCvodeMem == NULL) EXCEPTION("Failed to SetupCvode CVODE");
+        // Set error handler
+        CVodeSetErrHandlerFn(mpCvodeMem, CvodeErrorHandler, NULL);
+        // Set the user data
+        mData.pSystem = pOdeSystem;
+        mData.pY = &rInitialY;
+        #if CHASTE_SUNDIALS_VERSION >= 20400
+            CVodeSetUserData(mpCvodeMem, (void*)(&mData));
+        #else
+            CVodeSetFdata(mpCvodeMem, (void*)(&mData));
+        #endif
+
+        // Setup CVODE
+        #if CHASTE_SUNDIALS_VERSION >= 20400
+            CVodeInit(mpCvodeMem, CvodeRhsAdaptor, startTime, initial_values);
+            CVodeSStolerances(mpCvodeMem, mRelTol, mAbsTol);
+        #else
+            CVodeMalloc(mpCvodeMem, CvodeRhsAdaptor, startTime, initial_values,
+                        CV_SS, mRelTol, &mAbsTol);
+        #endif
+
+        // Set the rootfinder function if wanted
+        if (mCheckForRoots)
+        {
+            #if CHASTE_SUNDIALS_VERSION >= 20400
+                CVodeRootInit(mpCvodeMem, 1, CvodeRootAdaptor);
+            #else
+                CVodeRootInit(mpCvodeMem, 1, CvodeRootAdaptor, (void*)(&mData));
+            #endif
+        }
+        // Attach a linear solver for Newton iteration
+        CVDense(mpCvodeMem, rInitialY.size());
+    }
+    else if (reinit) // Could be new ODE system, or new Y values
+    {
+        //std::cout << "Re-initialise\n" << std::flush;
+        // Set the user data
+        mData.pSystem = pOdeSystem; // stays the same on a re-initialize
+        mData.pY = &rInitialY; // changes on a re-initialize
+        #if CHASTE_SUNDIALS_VERSION >= 20400
+            CVodeSetUserData(mpCvodeMem, (void*)(&mData));
+        #else
+            CVodeSetFdata(mpCvodeMem, (void*)(&mData));
+        #endif
+
+        // Setup CVODE
+        #if CHASTE_SUNDIALS_VERSION >= 20400
+            CVodeInit(mpCvodeMem, CvodeRhsAdaptor, startTime, initial_values);
+            CVodeSStolerances(mpCvodeMem, mRelTol, mAbsTol);
+        #else
+            CVodeMalloc(mpCvodeMem, CvodeRhsAdaptor, startTime, initial_values,
+                        CV_SS, mRelTol, &mAbsTol);
+        #endif
+
+        // Attach a linear solver for Newton iteration
+        CVDense(mpCvodeMem, rInitialY.size());
+    }
+//    else
+//    {
+//        std::cout << "No CVODE RESET\n"<<std::flush;
+//    }
+
+    CVodeSetMaxStep(mpCvodeMem, maxStep);
     // Change max steps if wanted
     if (mMaxSteps > 0)
     {
         CVodeSetMaxNumSteps(mpCvodeMem, mMaxSteps);
+        CVodeSetMaxErrTestFails(mpCvodeMem, 15);
     }
-    // Attach a linear solver for Newton iteration
-    CVDense(mpCvodeMem, rInitialY.size());
 }
 
 void CvodeAdaptor::FreeCvodeMemory()
 {
-//    assert(!NV_OWN_DATA_STL(mInitialValues));
-//    std::vector<double>* pVec = NV_DATA_STL(mInitialValues);
-//    double val = (*pVec)[0];
-    N_VDestroy_Serial(mInitialValues); mInitialValues = NULL;
-//    std::cout << "  a: " << val << ", b: " << (*pVec)[0] << std::endl;
-
     CVodeFree(&mpCvodeMem);
 }
 
+
+void CvodeAdaptor::SetAutoReset(bool autoReset)
+{
+    mAutoReset = autoReset;
+    if (mAutoReset)
+    {
+        ResetSolver();
+    }
+}
+
+void CvodeAdaptor::ResetSolver()
+{
+    // Doing this makes the SetupCvode think it needs to reset things.
+    DeleteVector(mLastSolutionState);
+}
 
 void CvodeAdaptor::CvodeError(int flag, const char * msg)
 {
@@ -272,7 +334,7 @@ OdeSolution CvodeAdaptor::Solve(AbstractOdeSystem* pOdeSystem,
     SetupCvode(pOdeSystem, rYValues, startTime, maxStep);
 
     TimeStepper stepper(startTime, endTime, timeSampling);
-    N_Vector yout = mInitialValues;
+    N_Vector yout = N_VMake_Serial(rYValues.size(), &(rYValues[0]));
 
     // Set up ODE solution
     OdeSolution solutions;
@@ -308,7 +370,7 @@ OdeSolution CvodeAdaptor::Solve(AbstractOdeSystem* pOdeSystem,
 
     int ierr = CVodeGetLastStep(mpCvodeMem, &mLastInternalStepSize);
     assert(ierr == CV_SUCCESS); ierr=ierr; // avoid unused var warning
-    FreeCvodeMemory();
+    RecordStoppingPoint(endTime, yout);
 
     return solutions;
 }
@@ -330,7 +392,7 @@ void CvodeAdaptor::Solve(AbstractOdeSystem* pOdeSystem,
 
     SetupCvode(pOdeSystem, rYValues, startTime, maxStep);
 
-    N_Vector yout = mInitialValues;
+    N_Vector yout = N_VMake_Serial(rYValues.size(), &(rYValues[0]));
     double tend;
     int ierr = CVode(mpCvodeMem, endTime, yout, &tend, CV_NORMAL);
     if (ierr<0)
@@ -353,17 +415,41 @@ void CvodeAdaptor::Solve(AbstractOdeSystem* pOdeSystem,
 
     ierr = CVodeGetLastStep(mpCvodeMem, &mLastInternalStepSize);
     assert(ierr == CV_SUCCESS); ierr=ierr; // avoid unused var warning
-    FreeCvodeMemory();
+    RecordStoppingPoint(tend, yout);
 }
 
 CvodeAdaptor::CvodeAdaptor(double relTol, double absTol)
     : AbstractIvpOdeSolver(),
-      mpCvodeMem(NULL), mInitialValues(NULL),
-      mRelTol(relTol), mAbsTol(absTol),
+      mpCvodeMem(NULL),
+      mRelTol(relTol),
+      mAbsTol(absTol),
       mLastInternalStepSize(-0.0),
       mMaxSteps(0),
-      mCheckForRoots(false)
+      mCheckForRoots(false),
+      mLastSolutionState(NULL),
+      mLastSolutionTime(0.0),
+      mAutoReset(true)
 {
+}
+
+CvodeAdaptor::~CvodeAdaptor()
+{
+    FreeCvodeMemory();
+    DeleteVector(mLastSolutionState);
+}
+
+void CvodeAdaptor::RecordStoppingPoint(double stopTime, N_Vector yEnd)
+{
+//    if (!mAutoReset)
+//    {
+        const unsigned size = GetVectorSize(yEnd);
+        CreateVectorIfEmpty(mLastSolutionState, size);
+        for (unsigned i=0; i<size; i++)
+        {
+            SetVectorComponent(mLastSolutionState, i, GetVectorComponent(yEnd, i));
+        }
+        mLastSolutionTime = stopTime;
+    //}
 }
 
 void CvodeAdaptor::SetTolerances(double relTol, double absTol)

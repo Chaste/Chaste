@@ -41,6 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCvodeSystem.hpp"
 #include "Exception.hpp"
 #include "VectorHelperFunctions.hpp"
+#include "MathsCustomFunctions.hpp" // For tolerance comparison
 #include "TimeStepper.hpp"
 #include "CvodeAdaptor.hpp" // For CvodeErrorHandler
 
@@ -195,7 +196,7 @@ void AbstractCvodeSystem::Solve(realtype tStart,
     ierr = CVodeGetLastStep(mpCvodeMem, &mLastInternalStepSize);
     assert(ierr == CV_SUCCESS); ierr=ierr; // avoid unused var warning
 
-    RecordStoppingPoint(tEnd);
+    RecordStoppingPoint(cvode_stopped_at);
 
     VerifyStateVariables();
 }
@@ -233,17 +234,13 @@ double AbstractCvodeSystem::GetLastStepSize()
     return mLastInternalStepSize;
 }
 
-
-bool Differs(double v1, double v2)
-{
-    return fabs(v1 - v2) > DBL_EPSILON;
-}
-
-
 void AbstractCvodeSystem::SetAutoReset(bool autoReset)
 {
     mAutoReset = autoReset;
-    ResetSolver();
+    if (mAutoReset)
+    {
+        ResetSolver();
+    }
 }
 
 
@@ -261,13 +258,13 @@ void AbstractCvodeSystem::SetupCvode(N_Vector initialConditions,
     assert(maxDt >= 0.0);
 
     // Find out if we need to (re-)initialise
-    bool reinit = !mpCvodeMem || mAutoReset || !mLastSolutionState || Differs(tStart, mLastSolutionTime);
+    bool reinit = !mpCvodeMem || mAutoReset || !mLastSolutionState || !CompareDoubles::WithinAnyTolerance(tStart, mLastSolutionTime);
     if (!reinit)
     {
         const unsigned size = GetNumberOfStateVariables();
         for (unsigned i=0; i<size; i++)
         {
-            if (Differs(GetVectorComponent(mLastSolutionState, i), GetVectorComponent(mStateVariables, i)))
+            if (!CompareDoubles::WithinAnyTolerance(GetVectorComponent(mLastSolutionState, i), GetVectorComponent(mStateVariables, i)))
             {
                 reinit = true;
                 break;
@@ -308,6 +305,7 @@ void AbstractCvodeSystem::SetupCvode(N_Vector initialConditions,
                     CV_SS, mRelTol, &mAbsTol);
 #endif
     }
+
     // Set max dt and change max steps if wanted
     CVodeSetMaxStep(mpCvodeMem, maxDt);
     if (mMaxSteps > 0)

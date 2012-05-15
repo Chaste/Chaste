@@ -200,7 +200,6 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Initialise()
     mCurrentTime = 0.0;
 
     // For Bidomain with bath, this is where we set up the electrodes
-
     SetElectrodes();
 }
 

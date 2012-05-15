@@ -84,6 +84,9 @@ public:
         TS_ASSERT_DELTA(solutions.rGetSolutions()[end][0], 0.9615, 1e-4);
         TS_ASSERT_DELTA(solutions.rGetSolutions()[end][1], 0.0107, 1e-4);
         TS_ASSERT_DELTA(solutions.rGetSolutions()[end][2], mean_delta, 1e-4);
+#else
+        std::cout << "CVODE is not enabled. " << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
 #endif //CHASTE_CVODE
     }
 

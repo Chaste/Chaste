@@ -112,9 +112,6 @@ private:
     /** Pointer to the CVODE memory block. */
     void* mpCvodeMem;
 
-    /** Initial conditions for the ODE solver. */
-    N_Vector mInitialValues;
-
     /** The CVODE data structure. */
     CvodeData mData;
 
@@ -135,6 +132,22 @@ private:
 
     /** Whether to check for stopping events. */
     bool mCheckForRoots;
+
+    /** Remember where the last solve got to so we know whether to re-initialise. */
+    N_Vector mLastSolutionState;
+
+    /** Remember where the last solve got to so we know whether to re-initialise. */
+    double mLastSolutionTime;
+
+    /** Whether to automatically reset CVODE on each Solve call. */
+    bool mAutoReset;
+
+    /**
+     * Record where the last solve got to so we know whether to re-initialise.
+     * @param stopTime  the finishing time
+     * @param yEnd  the state variables at this time
+     */
+    void RecordStoppingPoint(double stopTime, N_Vector yEnd);
 
 protected:
 
@@ -178,6 +191,12 @@ public:
     CvodeAdaptor(double relTol=1e-4, double absTol=1e-6);
 
     /**
+     * Destructor.
+     * Frees memory.
+     */
+    ~CvodeAdaptor();
+
+    /**
      * Set relative and absolute tolerances; both scalars.
      * If no parameters are given, tolerances will be reset to default values.
      *
@@ -200,6 +219,27 @@ public:
      * Get the last step size used internally by CVODE in the last Solve call
      */
     double GetLastStepSize();
+
+    /**
+     * Set whether to automatically re-initialise CVODE on every call to Solve, or
+     * whether to attempt to guess when re-initialisation is needed.  See also
+     * ResetSolver.
+     *
+     * @param autoReset  whether to reset on every Solve
+     */
+    void SetAutoReset(bool autoReset);
+
+    /**
+     * Successive calls to Solve will attempt to intelligently determine whether
+     * to re-initialise the internal CVODE solver, or whether we are simply
+     * extending the previous solution forward in time.  This mechanism compares
+     * the state vector to its previous value, and the start time to the end of
+     * the last solve, which captures most cases where re-initialisation is
+     * required.  However, changes to the RHS function can also require this, and
+     * cannot be automatically detected.  In such cases users must call this
+     * function to force re-initialisation.
+     */
+    void ResetSolver();
 
     /**
      * Solve the given ODE system, returning the solution at sampling intervals.

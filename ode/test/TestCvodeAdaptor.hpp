@@ -162,7 +162,10 @@ public:
         solver.SetTolerances(1e-5, 1e-5);
         TS_ASSERT_DELTA(solver.GetRelativeTolerance(), 1e-5, 1e-12);
         TS_ASSERT_DELTA(solver.GetAbsoluteTolerance(), 1e-5, 1e-12);
-#endif // CHASTE_CVODE
+#else
+        std::cout << "CVODE is not enabled. " << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
+#endif //CHASTE_CVODE
     }
 
     void TestOnOde1() throw (Exception)
@@ -172,7 +175,10 @@ public:
         HelperTestOde1(1.0, 2.0, 0.01);
         HelperTestOde1(-1.0, 2.0, 2);
         HelperTestOde1(0.0, 0.4, 0.34);
-#endif // CHASTE_CVODE
+#else
+        std::cout << "CVODE is not enabled. " << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
+#endif //CHASTE_CVODE
     }
 
     void TestGlobalError() throw (Exception)
@@ -198,7 +204,53 @@ public:
         double global_error = 1e-3;
 
         TS_ASSERT_DELTA(testvalue, exact_solution, global_error);
-#endif // CHASTE_CVODE
+#else
+        std::cout << "CVODE is not enabled. " << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
+#endif //CHASTE_CVODE
+    }
+
+    void TestMultipleCalls() throw (Exception)
+    {
+#ifdef CHASTE_CVODE
+        OdeFirstOrder ode_system;
+
+        double h_value = 0.01;
+
+        CvodeAdaptor solver;
+        solver.SetMaxSteps(1000);
+        OdeSolution solutions;
+        std::vector<double> state_variables = ode_system.GetInitialConditions();
+
+        double exact_solution = exp(2);
+        double global_error = 1e-3;
+
+        {   // Solve in two steps with reset
+            solver.Solve(&ode_system, state_variables, 0.0, 1.0, h_value, 0.1);
+            solutions = solver.Solve(&ode_system, state_variables, 1.0, 2.0, h_value, 0.1);
+            int last = solutions.GetNumberOfTimeSteps();
+            double testvalue = solutions.rGetSolutions()[last][0];
+
+            TS_ASSERT_DELTA(testvalue, exact_solution, global_error);
+        }
+
+        state_variables = ode_system.GetInitialConditions();
+        solver.ResetSolver();
+
+        {   // Solve in two steps without reset
+            solver.Solve(&ode_system, state_variables, 0.0, 1.0, h_value, 0.1);
+            solver.SetAutoReset(false);
+            solutions = solver.Solve(&ode_system, state_variables, 1.0, 2.0, h_value, 0.1);
+            int last = solutions.GetNumberOfTimeSteps();
+            double testvalue = solutions.rGetSolutions()[last][0];
+
+            TS_ASSERT_DELTA(testvalue, exact_solution, global_error);
+        }
+
+#else
+        std::cout << "CVODE is not enabled. " << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
+#endif //CHASTE_CVODE
     }
 
     void TestGlobalErrorSystemOf2Equations() throw (Exception)
@@ -222,13 +274,14 @@ public:
         double exact_solution[2];
         exact_solution[0] = sin(2);
         exact_solution[1] = cos(2);
-
-        /// \todo #890 Work this out properly
         double global_error = 1e-3;
 
         TS_ASSERT_DELTA(testvalue[0], exact_solution[0], global_error);
         TS_ASSERT_DELTA(testvalue[1], exact_solution[1], global_error);
-#endif // CHASTE_CVODE
+#else
+        std::cout << "CVODE is not enabled. " << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
+#endif //CHASTE_CVODE
     }
 
     void TestWithStoppingEvent() throw (Exception)
@@ -259,20 +312,26 @@ public:
         TS_ASSERT_LESS_THAN( solutions.rGetSolutions()[num_timesteps][0], 0);
 
         TS_ASSERT_DELTA(solver.GetLastStepSize(), 0.1, 1e-6);
-
+        std::cout << "1st with Exception\n"<< std::flush;
         // If we try to continue, the stopping event is still true, which is an error
         TS_ASSERT_THROWS_THIS(solutions = solver.Solve(&ode_system, state_variables, 0.0, 2.0, 0.1, 0.01),
                 "(Solve with sampling) Stopping event is true for initial condition");
 
         // Alternative Solve method
         state_variables = ode_system.GetInitialConditions();
+
+        std::cout << "2nd Solve\n"<< std::flush;
         solver.Solve(&ode_system, state_variables, 0.0, 2.0, 0.01);
         TS_ASSERT_EQUALS(solver.StoppingEventOccurred(), true);
-        TS_ASSERT_DELTA(solver.GetStoppingTime(), M_PI_2, 0.01)
+        TS_ASSERT_DELTA(solver.GetStoppingTime(), M_PI_2, 0.01);
+        std::cout << "2nd with Exception\n"<< std::flush;
         // If we try to continue, the stopping event is still true, which is an error
         TS_ASSERT_THROWS_THIS(solver.Solve(&ode_system, state_variables, 0.0, 2.0, 0.1),
                 "(Solve) Stopping event is true for initial condition");
-#endif // CHASTE_CVODE
+#else
+        std::cout << "CVODE is not enabled. " << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
+#endif //CHASTE_CVODE
     }
 
     void TestWithRootFunction() throw (Exception)
@@ -309,7 +368,10 @@ public:
         solver.Solve(&ode_system, state_variables, 0.0, 2.0, 0.1);
         TS_ASSERT_EQUALS(solver.StoppingEventOccurred(), true);
         TS_ASSERT_DELTA(solver.GetStoppingTime(), M_PI_2, 1e-4)
-#endif // CHASTE_CVODE
+#else
+        std::cout << "CVODE is not enabled. " << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
+#endif //CHASTE_CVODE
     }
 
     void TestExceptions() throw(Exception)
@@ -340,7 +402,10 @@ public:
         state_variables = ode_system.GetInitialConditions();
         TS_ASSERT_THROWS_THIS(solver.Solve(&ode_system, state_variables, 0.0, 2.0, 0.1),
                 "CVODE failed to solve system: CV_RTFUNC_FAIL");
-#endif // CHASTE_CVODE
+#else
+        std::cout << "CVODE is not enabled. " << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
+#endif //CHASTE_CVODE
     }
 
     void TestArchivingCvodeAdaptorSolver() throw(Exception)
@@ -381,7 +446,10 @@ public:
 
             delete p_cvode_solver;
         }
-#endif // CHASTE_CVODE
+#else
+        std::cout << "CVODE is not enabled. " << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
+#endif //CHASTE_CVODE
     }
 
 };

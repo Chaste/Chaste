@@ -499,9 +499,16 @@ public:
     virtual void PreSolveChecks();
 
     /**
-     * Perhaps this should be a method of AbstractCardiacTissue??
+     *
+     * This method sets the initial condition for the PDE by getting the
+     * voltages (V) from the cell models at the nodes.
+     *
+     * If the problem dimension is two (Bidomain) the second variable (phi_e) is set to zero.
+     *
      * This is virtual so BidomainProblem can overwrite V to zero for bath nodes, if
      * there are any.
+     *
+     * \todo Perhaps this should be a method of AbstractCardiacTissue??
      */
     virtual Vec CreateInitialCondition();
 

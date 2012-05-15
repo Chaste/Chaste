@@ -92,6 +92,9 @@ public:
         TS_ASSERT_DELTA(solutions.rGetSolutions()[end][0], 67.5011, 1e-4);
         TS_ASSERT_DELTA(solutions.rGetSolutions()[end][1], 67.5011, 1e-4);
         TS_ASSERT_DELTA(solutions.rGetSolutions()[end][2], wnt_level, 1e-4);
+#else
+        std::cout << "CVODE is not enabled. " << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
 #endif //CHASTE_CVODE
     }
 
@@ -127,6 +130,9 @@ public:
         TS_ASSERT_DELTA(solutions.rGetSolutions()[end][0], 433.1155, 1e-4);
         TS_ASSERT_DELTA(solutions.rGetSolutions()[end][1], 433.1155, 1e-4);
         TS_ASSERT_DELTA(solutions.rGetSolutions()[end][2], wnt_level, 1e-4);
+#else
+        std::cout << "CVODE is not enabled. " << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
 #endif //CHASTE_CVODE
     }
 
@@ -162,6 +168,9 @@ public:
         TS_ASSERT_DELTA(solutions.rGetSolutions()[end][0], 67.5011, 1e-4);
         TS_ASSERT_DELTA(solutions.rGetSolutions()[end][1], 824.0259, 1e-4);
         TS_ASSERT_DELTA(solutions.rGetSolutions()[end][2], wnt_level, 1e-4);
+#else
+        std::cout << "CVODE is not enabled. " << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
 #endif //CHASTE_CVODE
     }
 
@@ -217,6 +226,9 @@ public:
             // Tidy up
             delete p_ode_system;
         }
+#else
+        std::cout << "CVODE is not enabled. " << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
 #endif //CHASTE_CVODE
     }
 };
