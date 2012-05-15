@@ -338,7 +338,7 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile()
         }
        }
 
-    mesh_writer.AddCellData("Non-particles", particles);
+    mesh_writer.AddPointData("Non-particles", particles);
     if (this->mOutputCellProliferativeTypes)
     {
         mesh_writer.AddPointData("Cell types", cell_types);
