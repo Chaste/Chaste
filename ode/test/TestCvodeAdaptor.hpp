@@ -247,6 +247,18 @@ public:
             TS_ASSERT_DELTA(testvalue, exact_solution, global_error);
         }
 
+        state_variables = ode_system.GetInitialConditions();
+        solver.SetAutoReset(true);
+
+        {   // Solve in two steps with reset again
+            solver.Solve(&ode_system, state_variables, 0.0, 1.0, h_value, 0.1);
+            solutions = solver.Solve(&ode_system, state_variables, 1.0, 2.0, h_value, 0.1);
+            int last = solutions.GetNumberOfTimeSteps();
+            double testvalue = solutions.rGetSolutions()[last][0];
+
+            TS_ASSERT_DELTA(testvalue, exact_solution, global_error);
+        }
+
 #else
         std::cout << "CVODE is not enabled. " << std::endl;
         std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
