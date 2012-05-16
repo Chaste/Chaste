@@ -70,7 +70,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Contains a group of cells and associated methods.
  *
  */
-template<unsigned DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
 class AbstractCellPopulation : public Identifiable
 {
 private:
@@ -112,7 +112,7 @@ protected:
     std::map<Cell*, unsigned> mCellLocationMap;
 
     /** Reference to the mesh */
-    AbstractMesh<DIM, DIM>& mrMesh;
+    AbstractMesh<ELEMENT_DIM, SPACE_DIM>& mrMesh;
 
     /** List of cells */
     std::list<CellPtr> mCells;
@@ -124,7 +124,7 @@ protected:
     std::vector<unsigned> mCellCyclePhaseCount;
 
     /** Population centroid */
-    c_vector<double, DIM> mCentroid;
+    c_vector<double, SPACE_DIM> mCentroid;
 
     /** Results file for node visualization */
     out_stream mpVizNodesFile;
@@ -216,7 +216,7 @@ protected:
 	 *
 	 * @param rMesh the mesh for the population.
      */
-    AbstractCellPopulation(AbstractMesh<DIM, DIM>& rMesh);
+    AbstractCellPopulation(AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh);
 
 public:
 
@@ -231,7 +231,7 @@ public:
      *     and the passed-in vector cleared.
      * @param locationIndices an optional vector of location indices that correspond to real cells
      */
-    AbstractCellPopulation( AbstractMesh<DIM, DIM>& rMesh,
+    AbstractCellPopulation( AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
 							std::vector<CellPtr>& rCells,
                             const std::vector<unsigned> locationIndices=std::vector<unsigned>());
 
@@ -254,7 +254,7 @@ public:
     /**
      * @return reference to the mesh, mrMesh.
      */
-    AbstractMesh<DIM, DIM>& rGetMesh();
+    AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rGetMesh();
 
     /**
      * @return reference to mCells.
@@ -278,7 +278,7 @@ public:
      * @param pCell the cell
      * @return the location of the cell
      */
-    virtual c_vector<double, DIM> GetLocationOfCellCentre(CellPtr pCell)=0;
+    virtual c_vector<double, SPACE_DIM> GetLocationOfCellCentre(CellPtr pCell)=0;
 
     /**
      * Get a pointer to the node with a given index.
@@ -289,7 +289,7 @@ public:
      * @param index  global index of the specified node
      * @return a pointer to the node with a given index.
      */
-    virtual Node<DIM>* GetNode(unsigned index)=0;
+    virtual Node<SPACE_DIM>* GetNode(unsigned index)=0;
 
     /**
      * Move the node with a given index to a new point in space.
@@ -300,7 +300,7 @@ public:
      * @param nodeIndex the index of the node to be moved
      * @param rNewLocation the new target location of the node
      */
-    virtual void SetNode(unsigned nodeIndex, ChastePoint<DIM>& rNewLocation)=0;
+    virtual void SetNode(unsigned nodeIndex, ChastePoint<SPACE_DIM>& rNewLocation)=0;
 
     /**
      * Helper method for establishing if a cell is real.
@@ -329,7 +329,7 @@ public:
      *
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way).
      */
-    virtual CellPtr AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell=CellPtr())=0;
+    virtual CellPtr AddCell(CellPtr pNewCell, const c_vector<double,SPACE_DIM>& rCellDivisionVector, CellPtr pParentCell=CellPtr())=0;
 
     class Iterator; // Forward declaration; see below
 
@@ -532,7 +532,7 @@ public:
     /**
      * Returns the centroid of the cell population.
      */
-    c_vector<double, DIM> GetCentroidOfCellPopulation();
+    c_vector<double, SPACE_DIM> GetCentroidOfCellPopulation();
 
     /**
      * Use an output file handler to create output files for visualizer and post-processing.
@@ -707,7 +707,7 @@ public:
      * @return The width (maximum distance to centroid) of the cell population
      *     in each dimension
      */
-    c_vector<double,DIM> GetSizeOfCellPopulation();
+    c_vector<double,SPACE_DIM> GetSizeOfCellPopulation();
 
     /**
      * Iterator class allows one to iterate over cells in the cell population.
@@ -735,7 +735,7 @@ public:
          *
          * @param rOther iterator with which comparison is made
          */
-        inline bool operator!=(const AbstractCellPopulation<DIM>::Iterator& rOther);
+        inline bool operator!=(const AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator& rOther);
 
         /**
          * Prefix increment operator.
@@ -808,28 +808,28 @@ TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractCellPopulation)
 //         Iterator class implementation - most methods are inlined         //
 //////////////////////////////////////////////////////////////////////////////
 
-template<unsigned DIM>
-CellPtr AbstractCellPopulation<DIM>::Iterator::operator*()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+CellPtr AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator::operator*()
 {
     assert(!IsAtEnd());
     return *mCellIter;
 }
 
-template<unsigned DIM>
-CellPtr AbstractCellPopulation<DIM>::Iterator::operator->()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+CellPtr AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator::operator->()
 {
     assert(!IsAtEnd());
     return *mCellIter;
 }
 
-template<unsigned DIM>
-bool AbstractCellPopulation<DIM>::Iterator::operator!=(const AbstractCellPopulation<DIM>::Iterator& rOther)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator::operator!=(const AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator& rOther)
 {
     return mCellIter != rOther.mCellIter;
 }
 
-template<unsigned DIM>
-typename AbstractCellPopulation<DIM>::Iterator& AbstractCellPopulation<DIM>::Iterator::operator++()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator& AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator::operator++()
 {
     do
     {
@@ -840,20 +840,20 @@ typename AbstractCellPopulation<DIM>::Iterator& AbstractCellPopulation<DIM>::Ite
     return (*this);
 }
 
-template<unsigned DIM>
-bool AbstractCellPopulation<DIM>::Iterator::IsRealCell()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator::IsRealCell()
 {
     return !( mrCellPopulation.IsCellAssociatedWithADeletedLocation(*mCellIter) || (*this)->IsDead() );
 }
 
-template<unsigned DIM>
-bool AbstractCellPopulation<DIM>::Iterator::IsAtEnd()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator::IsAtEnd()
 {
     return mCellIter == mrCellPopulation.rGetCells().end();
 }
 
-template<unsigned DIM>
-AbstractCellPopulation<DIM>::Iterator::Iterator(AbstractCellPopulation& rCellPopulation, std::list<CellPtr>::iterator cellIter)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator::Iterator(AbstractCellPopulation& rCellPopulation, std::list<CellPtr>::iterator cellIter)
     : mrCellPopulation(rCellPopulation),
       mCellIter(cellIter)
 {
@@ -872,14 +872,14 @@ AbstractCellPopulation<DIM>::Iterator::Iterator(AbstractCellPopulation& rCellPop
     }
 }
 
-template<unsigned DIM>
-typename AbstractCellPopulation<DIM>::Iterator AbstractCellPopulation<DIM>::Begin()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Begin()
 {
     return Iterator(*this, this->mCells.begin());
 }
 
-template<unsigned DIM>
-typename AbstractCellPopulation<DIM>::Iterator AbstractCellPopulation<DIM>::End()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::End()
 {
     return Iterator(*this, this->mCells.end());
 }
