@@ -83,6 +83,12 @@ void OffLatticeSimulation<DIM>::AddCellPopulationBoundaryCondition(boost::shared
 }
 
 template<unsigned DIM>
+void OffLatticeSimulation<DIM>::RemoveAllCellPopulationBoundaryConditions()
+{
+	mBoundaryConditions.clear();
+}
+
+template<unsigned DIM>
 void OffLatticeSimulation<DIM>::UpdateCellLocationsAndTopology()
 {
     // Calculate forces

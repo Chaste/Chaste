@@ -179,7 +179,7 @@ c_vector<double, DIM> GeneralisedLinearSpringForce<DIM>::CalculateForceBetweenNo
     }
 
     rest_length = a_rest_length + b_rest_length;
-    assert(rest_length <= 1.0+1e-12); ///\todo #1884 Magic number: would "<= 1.0" do?
+    //assert(rest_length <= 1.0+1e-12); ///\todo #1884 Magic number: would "<= 1.0" do?
 
 
     // Although in this class the 'spring constant' is a constant parameter, in

@@ -181,6 +181,11 @@ public:
     void AddCellPopulationBoundaryCondition(boost::shared_ptr<AbstractCellPopulationBoundaryCondition<DIM> >  pBoundaryCondition);
 
     /**
+     * Method to remove all the cell population boundary conditions
+     */
+    void RemoveAllCellPopulationBoundaryConditions();
+
+    /**
      * @return mOutputNodeVelocities
      */
     bool GetOutputNodeVelocities();

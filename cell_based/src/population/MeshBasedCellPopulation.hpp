@@ -131,6 +131,11 @@ protected:
      */
     std::set<std::pair<CellPtr,CellPtr> > mMarkedSprings;
 
+    /**
+     * Keeps track of the rest lengths of springs if these are being used in the simulation.
+     */
+    std::map<std::pair<unsigned,unsigned>, double> mSpringRestLengths;
+
     /** Results file for elements. */
     out_stream mpVizElementsFile;
 
@@ -592,6 +597,11 @@ public:
      * @return the set of neighbouring node indices.
      */
     std::set<unsigned> GetNeighbouringNodeIndices(unsigned index);
+
+    /**
+     * Populate mSpringRestLengths by looping over all springs and calculating the current length
+     */
+    void CalculateRestLengths();
 
     /**
      *  Return the rest length for a given spring

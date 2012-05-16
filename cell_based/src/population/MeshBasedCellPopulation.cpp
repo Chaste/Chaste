@@ -1243,10 +1243,58 @@ std::set<unsigned> MeshBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
 }
 
 template<unsigned DIM>
+void MeshBasedCellPopulation<DIM>::CalculateRestLengths()
+{
+	mSpringRestLengths.clear();
+
+    // Iterate over all springs and add calculate separation of adjacent  node pairs
+    for (SpringIterator spring_iterator = SpringsBegin();
+         spring_iterator != SpringsEnd();
+         ++spring_iterator)
+    {
+    	// Note that nodeA_global_index is always less than nodeB_global_index
+    	Node<DIM>* p_nodeA = spring_iterator.GetNodeA();
+    	Node<DIM>* p_nodeB = spring_iterator.GetNodeB();
+
+        unsigned nodeA_global_index = p_nodeA->GetIndex();
+        unsigned nodeB_global_index = p_nodeB->GetIndex();
+
+        // Calculate the distance between nodes
+        c_vector<double, DIM> node_a_location = p_nodeA->rGetLocation();
+        c_vector<double, DIM> node_b_location = p_nodeB->rGetLocation();
+
+       double separation = norm_2(rGetMesh().GetVectorFromAtoB(node_a_location, node_b_location));
+
+       std::pair<unsigned,unsigned> node_pair (nodeA_global_index, nodeB_global_index) ;
+
+       mSpringRestLengths[node_pair]= separation;
+    }
+	mHasVariableRestLength = true;
+}
+
+template<unsigned DIM>
 double MeshBasedCellPopulation<DIM>::GetRestLength(unsigned indexA, unsigned indexB)
 {
-//	if ()
-	return 1.0;
+    if (mHasVariableRestLength)
+    {
+    	std::pair<unsigned,unsigned> node_pair (indexA, indexB) ;
+
+    	std::map<std::pair<unsigned,unsigned>, double>::const_iterator  iter = mSpringRestLengths.find(node_pair);
+
+    	if (iter != mSpringRestLengths.end() )
+    	{
+    		// Return the stored rest length.
+    		return iter->second;
+    	}
+    	else
+    	{
+    		EXCEPTION("Tried to get a rest length of an edge that doesn't exist. You can only use varaible rest lengths if SetUpdateCellPopulationRule is set on the simulation.");
+    	}
+    }
+    else
+    {
+    	return 1.0;
+    }
 }
 
 

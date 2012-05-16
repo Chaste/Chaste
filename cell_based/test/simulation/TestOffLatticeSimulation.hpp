@@ -317,7 +317,7 @@ public:
             TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
             MutableMesh<2,2> mesh;
             mesh.ConstructFromMeshReader(mesh_reader);
-            mesh.Scale(9,9);
+            mesh.Scale(8,8);
 
             // Create cells
             std::vector<CellPtr> cells;
@@ -326,12 +326,14 @@ public:
 
             // Create a cell population
             MeshBasedCellPopulation<2> cell_population(mesh, cells);
+            // Calculate the rest lengths of the spings assuming that the current configuration is in equilibrium.
+            cell_population.CalculateRestLengths();
 
             // Set up cell-based simulation
             OffLatticeSimulation<2> simulator(cell_population);
             simulator.SetOutputDirectory("TestOffLatticeSimulationWithVariableRestLengths");
             simulator.SetEndTime(0.5);
-            // Turn off remeshing so we only have the same mesh connectivity over time.
+            // Turn off remeshing so we only have the same mesh connectivity over time this is needed to use the variable rest length
             simulator.SetUpdateCellPopulationRule(false);
 
             // Create some force laws and pass them to the simulation
@@ -340,7 +342,63 @@ public:
 
             simulator.Solve();
 
-            // Check that the mesh Doesn't Move
+            // Check nothing has moved
+            TS_ASSERT_DELTA(simulator.GetNodeLocation(0)[0], 0.0, 1e-6);
+            TS_ASSERT_DELTA(simulator.GetNodeLocation(0)[0], 0.0, 1e-6);
+
+            TS_ASSERT_DELTA(simulator.GetNodeLocation(1)[0], 8.0, 1e-6);
+            TS_ASSERT_DELTA(simulator.GetNodeLocation(1)[1], 0.0, 1e-6);
+
+            TS_ASSERT_DELTA(simulator.GetNodeLocation(2)[0], 8.0, 1e-6);
+            TS_ASSERT_DELTA(simulator.GetNodeLocation(2)[1], 8.0, 1e-6);
+
+            TS_ASSERT_DELTA(simulator.GetNodeLocation(3)[0], 0.0, 1e-6);
+            TS_ASSERT_DELTA(simulator.GetNodeLocation(3)[1], 8.0, 1e-6);
+
+            // Create some boundary conditions and pass them to the simulation
+            c_vector<double,2> point = zero_vector<double>(2);
+            c_vector<double,2> normal = zero_vector<double>(2);
+            normal(1) = -1.0;
+            MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc1, (&cell_population, point, normal)); // y>0
+            simulator.AddCellPopulationBoundaryCondition(p_bc1);
+            point(1) = 7.5;
+            normal(1) = 1.0;
+            MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc2, (&cell_population, point, normal)); // y<7.5
+            simulator.AddCellPopulationBoundaryCondition(p_bc2);
+
+            simulator.SetEndTime(1.0);
+            simulator.Solve();
+
+            // Check top has shifted down
+            TS_ASSERT_DELTA(simulator.GetNodeLocation(0)[0], -0.0207, 1e-3);
+            TS_ASSERT_DELTA(simulator.GetNodeLocation(0)[1], 0.0, 1e-6);
+
+            TS_ASSERT_DELTA(simulator.GetNodeLocation(1)[0], 8.0207, 1e-3);
+            TS_ASSERT_DELTA(simulator.GetNodeLocation(1)[1], 0.0, 1e-6);
+
+            TS_ASSERT_DELTA(simulator.GetNodeLocation(2)[0], 8.1097, 1e-3);
+            TS_ASSERT_DELTA(simulator.GetNodeLocation(2)[1], 7.5, 1e-6);
+
+            TS_ASSERT_DELTA(simulator.GetNodeLocation(3)[0], -0.1097, 1e-3);
+            TS_ASSERT_DELTA(simulator.GetNodeLocation(3)[1], 7.5, 1e-6);
+
+            simulator.RemoveAllCellPopulationBoundaryConditions();
+            simulator.AddCellPopulationBoundaryCondition(p_bc1);
+            simulator.SetEndTime(10.0);
+            simulator.Solve();
+
+            // Check has relaxed back to original shape
+            TS_ASSERT_DELTA(simulator.GetNodeLocation(0)[0], 0.0, 1e-3);
+			TS_ASSERT_DELTA(simulator.GetNodeLocation(0)[1], 0.0, 1e-3);
+
+			TS_ASSERT_DELTA(simulator.GetNodeLocation(1)[0], 8.0, 1e-3);
+			TS_ASSERT_DELTA(simulator.GetNodeLocation(1)[1], 0.0, 1e-3);
+
+			TS_ASSERT_DELTA(simulator.GetNodeLocation(2)[0], 8.0, 1e-3);
+			TS_ASSERT_DELTA(simulator.GetNodeLocation(2)[1], 8.0, 1e-2);
+
+			TS_ASSERT_DELTA(simulator.GetNodeLocation(3)[0], 0.0, 1e-3);
+			TS_ASSERT_DELTA(simulator.GetNodeLocation(3)[1], 8.0, 1e-2);
         }
 
 
