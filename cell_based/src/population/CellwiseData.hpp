@@ -120,15 +120,6 @@ public:
     static void Destroy();
 
     /**
-     * Set the value for a given location index and variable number.
-     *
-     * @param value the value to set
-     * @param locationIndex the location index
-     * @param variableNumber the index of CellwiseData whose value is set (defaults to zero)
-     */
-    void SetValue(double value, unsigned locationIndex, unsigned variableNumber=0);
-
-    /**
      * @return reference to the CellPopulation.
      */
     AbstractCellPopulation<DIM>& rGetCellPopulation();

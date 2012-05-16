@@ -77,19 +77,6 @@ void CellwiseData<DIM>::Destroy()
 }
 
 template<unsigned DIM>
-void CellwiseData<DIM>::SetValue(double value, unsigned locationIndex, unsigned variableNumber)
-{
-    assert(IsSetUp());
-
-    assert(variableNumber < mNumberOfVariables);
-
-    // Get the cell associated with locationIndex
-    CellPtr p_cell = mpCellPopulation->GetCellUsingLocationIndex(locationIndex);
-
-	p_cell->GetCellData()->SetItem(variableNumber, value);
-}
-
-template<unsigned DIM>
 AbstractCellPopulation<DIM>& CellwiseData<DIM>::rGetCellPopulation()
 {
     return *mpCellPopulation;

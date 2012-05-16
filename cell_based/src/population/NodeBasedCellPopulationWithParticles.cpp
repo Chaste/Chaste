@@ -258,8 +258,10 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile()
     unsigned num_cell_data_items = 0;
     if (this->Begin()->HasCellData())
     {
-        //We assume that the first cell is representative of all cells
-        num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+        NEVER_REACHED;
+//            // This code is commented  because CellData can't deal with ghost nodes see #1975
+//        //We assume that the first cell is representative of all cells
+//        num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
     }
 
     assert(num_cell_data_items == 0);
