@@ -35,78 +35,75 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractOffLatticeCellPopulation.hpp"
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractOffLatticeCellPopulation( AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
+template<unsigned DIM>
+AbstractOffLatticeCellPopulation<DIM>::AbstractOffLatticeCellPopulation( AbstractMesh<DIM, DIM>& rMesh,
 																	std::vector<CellPtr>& rCells,
                                                                   const std::vector<unsigned> locationIndices)
-    : AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>(rMesh, rCells, locationIndices),
+    : AbstractCellPopulation<DIM>(rMesh, rCells, locationIndices),
       mDampingConstantNormal(1.0),
       mDampingConstantMutant(1.0),
       mAbsoluteMovementThreshold(2.0)
 {
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractOffLatticeCellPopulation(AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
-	: AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>(rMesh)
+template<unsigned DIM>
+AbstractOffLatticeCellPopulation<DIM>::AbstractOffLatticeCellPopulation(AbstractMesh<DIM, DIM>& rMesh)
+	: AbstractCellPopulation<DIM>(rMesh)
 {
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetDampingConstantNormal(double dampingConstantNormal)
+template<unsigned DIM>
+void AbstractOffLatticeCellPopulation<DIM>::SetDampingConstantNormal(double dampingConstantNormal)
 {
     assert(dampingConstantNormal > 0.0);
     mDampingConstantNormal = dampingConstantNormal;
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetDampingConstantMutant(double dampingConstantMutant)
+template<unsigned DIM>
+void AbstractOffLatticeCellPopulation<DIM>::SetDampingConstantMutant(double dampingConstantMutant)
 {
     assert(dampingConstantMutant > 0.0);
     mDampingConstantMutant = dampingConstantMutant;
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetAbsoluteMovementThreshold(double absoluteMovementThreshold)
+template<unsigned DIM>
+void AbstractOffLatticeCellPopulation<DIM>::SetAbsoluteMovementThreshold(double absoluteMovementThreshold)
 {
     mAbsoluteMovementThreshold = absoluteMovementThreshold;
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetDampingConstantNormal()
+template<unsigned DIM>
+double AbstractOffLatticeCellPopulation<DIM>::GetDampingConstantNormal()
 {
     return mDampingConstantNormal;
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetDampingConstantMutant()
+template<unsigned DIM>
+double AbstractOffLatticeCellPopulation<DIM>::GetDampingConstantMutant()
 {
     return mDampingConstantMutant;
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetAbsoluteMovementThreshold()
+template<unsigned DIM>
+double AbstractOffLatticeCellPopulation<DIM>::GetAbsoluteMovementThreshold()
 {
     return mAbsoluteMovementThreshold;
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
+template<unsigned DIM>
+void AbstractOffLatticeCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t<DampingConstantNormal>" << mDampingConstantNormal << "</DampingConstantNormal>\n";
     *rParamsFile << "\t\t<DampingConstantMutant>" << mDampingConstantMutant << "</DampingConstantMutant>\n";
 
     // Call method on direct parent class
-    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationParameters(rParamsFile);
+    AbstractCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);
 }
 
 /////////////////////////////////////////////////////////////////////
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////
 
-template class AbstractOffLatticeCellPopulation<1,1>;
-template class AbstractOffLatticeCellPopulation<1,2>;
-template class AbstractOffLatticeCellPopulation<1,3>;
-template class AbstractOffLatticeCellPopulation<2,2>;
-template class AbstractOffLatticeCellPopulation<2,3>;
-template class AbstractOffLatticeCellPopulation<3,3>;
+template class AbstractOffLatticeCellPopulation<1>;
+template class AbstractOffLatticeCellPopulation<2>;
+template class AbstractOffLatticeCellPopulation<3>;

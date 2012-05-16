@@ -45,8 +45,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * An abstract facade class encapsulating an off-lattice (centre- or
  * vertex-based) cell population.
  */
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
-class AbstractOffLatticeCellPopulation : public AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>
+template<unsigned DIM>
+class AbstractOffLatticeCellPopulation : public AbstractCellPopulation<DIM>
 {
 private:
 
@@ -61,7 +61,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractCellPopulation<DIM> >(*this);
         archive & mDampingConstantNormal;
         archive & mDampingConstantMutant;
         archive & mAbsoluteMovementThreshold;
@@ -94,7 +94,7 @@ protected:
      * 
      * @param rMesh the mesh for the cell population.
      */
-    AbstractOffLatticeCellPopulation(AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh);
+    AbstractOffLatticeCellPopulation(AbstractMesh<DIM, DIM>& rMesh);
 
 public:
 
@@ -105,7 +105,7 @@ public:
      * @param rCells a vector of cells
      * @param locationIndices an optional vector of location indices that correspond to real cells
      */
-    AbstractOffLatticeCellPopulation( AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
+    AbstractOffLatticeCellPopulation( AbstractMesh<DIM, DIM>& rMesh,
 									std::vector<CellPtr>& rCells,
                                     const std::vector<unsigned> locationIndices=std::vector<unsigned>());
 
@@ -118,7 +118,7 @@ public:
      * @param pNewNode pointer to the new node
      * @return global index of new node in cell population.
      */
-    virtual unsigned AddNode(Node<SPACE_DIM>* pNewNode)=0;
+    virtual unsigned AddNode(Node<DIM>* pNewNode)=0;
 
     /**
      * Move the node with a given index to a new point in space.
@@ -129,7 +129,7 @@ public:
      * @param nodeIndex the index of the node to be moved
      * @param rNewLocation the new target location of the node
      */
-    virtual void SetNode(unsigned nodeIndex, ChastePoint<SPACE_DIM>& rNewLocation)=0;
+    virtual void SetNode(unsigned nodeIndex, ChastePoint<DIM>& rNewLocation)=0;
 
     /**
      * Update the location of each node in the cell population given
@@ -142,7 +142,7 @@ public:
      * @param rNodeForces  forces on nodes
      * @param dt time step
      */
-    virtual void UpdateNodeLocations(const std::vector< c_vector<double, SPACE_DIM> >& rNodeForces, double dt)=0;
+    virtual void UpdateNodeLocations(const std::vector< c_vector<double, DIM> >& rNodeForces, double dt)=0;
 
     /**
      * Get the damping constant for this node - ie d in drdt = F/d.
