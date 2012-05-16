@@ -86,11 +86,14 @@ private:
         mpVoronoiTessellation = NULL;
 
         archive & mMarkedSprings;
+        archive & mSpringRestLengths;
         archive & mUseAreaBasedDampingConstant;
         archive & mAreaBasedDampingConstantParameter;
         archive & mOutputVoronoiData;
         archive & mOutputCellPopulationVolumes;
         archive & mWriteVtkAsPoints;
+        archive & mHasVariableRestLength;
+
 
         this->Validate();
     }

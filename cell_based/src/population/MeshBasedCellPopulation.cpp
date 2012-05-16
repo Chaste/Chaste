@@ -1288,7 +1288,7 @@ double MeshBasedCellPopulation<DIM>::GetRestLength(unsigned indexA, unsigned ind
     	}
     	else
     	{
-    		EXCEPTION("Tried to get a rest length of an edge that doesn't exist. You can only use varaible rest lengths if SetUpdateCellPopulationRule is set on the simulation.");
+    		EXCEPTION("Tried to get a rest length of an edge that doesn't exist. You can only use variable rest lengths if SetUpdateCellPopulationRule is set on the simulation.");
     	}
     }
     else
