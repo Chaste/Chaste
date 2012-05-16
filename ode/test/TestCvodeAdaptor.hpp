@@ -248,6 +248,20 @@ public:
         }
 
         state_variables = ode_system.GetInitialConditions();
+        solver.ResetSolver();
+
+        // Altering the state variables should also force a reset
+        {
+            solver.Solve(&ode_system, state_variables, 0.0, 1.0, h_value, 0.1);
+            state_variables[0] += 0.00001;
+            solutions = solver.Solve(&ode_system, state_variables, 1.0, 2.0, h_value, 0.1);
+            int last = solutions.GetNumberOfTimeSteps();
+            double testvalue = solutions.rGetSolutions()[last][0];
+
+            TS_ASSERT_DELTA(testvalue, exact_solution, global_error);
+        }
+
+        state_variables = ode_system.GetInitialConditions();
         solver.SetAutoReset(true);
 
         {   // Solve in two steps with reset again

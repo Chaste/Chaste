@@ -180,7 +180,8 @@ void CvodeErrorHandler(int errorCode, const char *module, const char *function,
 
 void CvodeAdaptor::SetupCvode(AbstractOdeSystem* pOdeSystem,
                               std::vector<double>& rInitialY,
-                              double startTime, double maxStep)
+                              double startTime,
+                              double maxStep)
 {
     assert(rInitialY.size() == pOdeSystem->GetNumberOfStateVariables());
     assert(maxStep > 0.0);
@@ -257,12 +258,11 @@ void CvodeAdaptor::SetupCvode(AbstractOdeSystem* pOdeSystem,
             CVodeSetFdata(mpCvodeMem, (void*)(&mData));
         #endif
 
-        // Setup CVODE
         #if CHASTE_SUNDIALS_VERSION >= 20400
-            CVodeInit(mpCvodeMem, CvodeRhsAdaptor, startTime, initial_values);
+            CVodeReInit(mpCvodeMem, startTime, initial_values);
             CVodeSStolerances(mpCvodeMem, mRelTol, mAbsTol);
         #else
-            CVodeMalloc(mpCvodeMem, CvodeRhsAdaptor, startTime, initial_values,
+            CVodeReInit(mpCvodeMem, AbstractCvodeSystemRhsAdaptor, startTime, initial_values,
                         CV_SS, mRelTol, &mAbsTol);
         #endif
 
@@ -281,11 +281,16 @@ void CvodeAdaptor::SetupCvode(AbstractOdeSystem* pOdeSystem,
         CVodeSetMaxNumSteps(mpCvodeMem, mMaxSteps);
         CVodeSetMaxErrTestFails(mpCvodeMem, 15);
     }
+    DeleteVector(initial_values);
 }
 
 void CvodeAdaptor::FreeCvodeMemory()
 {
-    CVodeFree(&mpCvodeMem);
+    if (mpCvodeMem)
+    {
+        CVodeFree(&mpCvodeMem);
+    }
+    mpCvodeMem = NULL;
 }
 
 
@@ -351,6 +356,7 @@ OdeSolution CvodeAdaptor::Solve(AbstractOdeSystem* pOdeSystem,
         if (ierr<0)
         {
             FreeCvodeMemory();
+            DeleteVector(yout);
             CvodeError(ierr, "CVODE failed to solve system");
         }
         // Store solution
@@ -371,6 +377,7 @@ OdeSolution CvodeAdaptor::Solve(AbstractOdeSystem* pOdeSystem,
     int ierr = CVodeGetLastStep(mpCvodeMem, &mLastInternalStepSize);
     assert(ierr == CV_SUCCESS); ierr=ierr; // avoid unused var warning
     RecordStoppingPoint(endTime, yout);
+    DeleteVector(yout);
 
     return solutions;
 }
@@ -398,6 +405,7 @@ void CvodeAdaptor::Solve(AbstractOdeSystem* pOdeSystem,
     if (ierr<0)
     {
         FreeCvodeMemory();
+        DeleteVector(yout);
         CvodeError(ierr, "CVODE failed to solve system");
     }
     if (ierr == CV_ROOT_RETURN)
@@ -416,6 +424,7 @@ void CvodeAdaptor::Solve(AbstractOdeSystem* pOdeSystem,
     ierr = CVodeGetLastStep(mpCvodeMem, &mLastInternalStepSize);
     assert(ierr == CV_SUCCESS); ierr=ierr; // avoid unused var warning
     RecordStoppingPoint(tend, yout);
+    DeleteVector(yout);
 }
 
 CvodeAdaptor::CvodeAdaptor(double relTol, double absTol)
@@ -440,8 +449,8 @@ CvodeAdaptor::~CvodeAdaptor()
 
 void CvodeAdaptor::RecordStoppingPoint(double stopTime, N_Vector yEnd)
 {
-//    if (!mAutoReset)
-//    {
+    if (!mAutoReset)
+    {
         const unsigned size = GetVectorSize(yEnd);
         CreateVectorIfEmpty(mLastSolutionState, size);
         for (unsigned i=0; i<size; i++)
@@ -449,7 +458,7 @@ void CvodeAdaptor::RecordStoppingPoint(double stopTime, N_Vector yEnd)
             SetVectorComponent(mLastSolutionState, i, GetVectorComponent(yEnd, i));
         }
         mLastSolutionTime = stopTime;
-    //}
+    }
 }
 
 void CvodeAdaptor::SetTolerances(double relTol, double absTol)

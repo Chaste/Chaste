@@ -355,6 +355,7 @@ public:
     {
 #ifdef CHASTE_CVODE
         ParameterisedCvode ode;
+
         // First solve with an automatic reset at each Solve call
         for (unsigned i=0; i<10; i++)
         {
@@ -362,6 +363,7 @@ public:
             ode.Solve(i, i+1.0, 1.0);
         }
         TS_ASSERT_DELTA(ode.GetStateVariable(0u), 45.0, 1e-12);
+
         // Now don't reset unless state or time change
         ode.SetStateVariable(0u, 0.0);
         ode.SetAutoReset(false);
@@ -371,6 +373,7 @@ public:
             ode.Solve(i, i+1.0, 1.0);
         }
         TS_ASSERT_DELTA(ode.GetStateVariable(0u), 40.9074, 1e-1); // Note: wrong answer!
+
         // Explicit reset when parameter changes
         ode.SetStateVariable(0u, 0.0);
         for (unsigned i=0; i<10; i++)
@@ -379,12 +382,22 @@ public:
             ode.ResetSolver();
             ode.Solve(i, i+1.0, 1.0);
         }
+
         TS_ASSERT_DELTA(ode.GetStateVariable(0u), 45.0, 1e-12);
         // Auto reset when state changes
         ode.SetStateVariable(0u, 0.0);
         ode.SetParameter("a", 1.0);
         ode.Solve(10.0, 15.0, 1.0);
         TS_ASSERT_DELTA(ode.GetStateVariable(0u), 5.0, 1e-12);
+
+        // Explicit reset when parameter changes
+        ode.SetStateVariable(0u, 0.0);
+        for (unsigned i=0; i<10; i++)
+        {
+            ode.SetParameter("a", i); // dy/dx = i
+            ode.SetAutoReset(true);
+            ode.Solve(i, i+1.0, 1.0);
+        }
 #else
         std::cout << "Cvode is not enabled.\n";
 #endif // CHASTE_CVODE
