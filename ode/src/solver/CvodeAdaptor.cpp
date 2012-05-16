@@ -262,7 +262,7 @@ void CvodeAdaptor::SetupCvode(AbstractOdeSystem* pOdeSystem,
             CVodeReInit(mpCvodeMem, startTime, initial_values);
             CVodeSStolerances(mpCvodeMem, mRelTol, mAbsTol);
         #else
-            CVodeReInit(mpCvodeMem, AbstractCvodeSystemRhsAdaptor, startTime, initial_values,
+            CVodeReInit(mpCvodeMem, CvodeRhsAdaptor, startTime, initial_values,
                         CV_SS, mRelTol, &mAbsTol);
         #endif
 
