@@ -309,6 +309,40 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
     }
 
+    /**
+         * Test a cell-based simulation with multiple forces.
+         */
+        void TestOffLatticeSimulationWithVariableRestLengths() throw (Exception)
+        {
+            TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
+            MutableMesh<2,2> mesh;
+            mesh.ConstructFromMeshReader(mesh_reader);
+            mesh.Scale(9,9);
+
+            // Create cells
+            std::vector<CellPtr> cells;
+            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(),DIFFERENTIATED);
+
+            // Create a cell population
+            MeshBasedCellPopulation<2> cell_population(mesh, cells);
+
+            // Set up cell-based simulation
+            OffLatticeSimulation<2> simulator(cell_population);
+            simulator.SetOutputDirectory("TestOffLatticeSimulationWithVariableRestLengths");
+            simulator.SetEndTime(0.5);
+            // Turn off remeshing so we only have the same mesh connectivity over time.
+            simulator.SetUpdateCellPopulationRule(false);
+
+            // Create some force laws and pass them to the simulation
+            MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+            simulator.AddForce(p_linear_force);
+
+            simulator.Solve();
+
+            // Check that the mesh Doesn't Move
+        }
+
 
     /**
      * Test a cell-based simulation with a periodic mesh.

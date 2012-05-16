@@ -280,8 +280,8 @@ double SimpleWntCellCycleModel::GetWntTransitThreshold()
 
 void SimpleWntCellCycleModel::SetWntTransitThreshold(double wntTransitThreshold)
 {
-    assert(wntTransitThreshold <= 1.0);
-    assert(wntTransitThreshold >= 0.0);
+    //assert(wntTransitThreshold <= 1.0);
+    //assert(wntTransitThreshold >= 0.0);
     mWntTransitThreshold = wntTransitThreshold;
 }
 
@@ -292,8 +292,8 @@ double SimpleWntCellCycleModel::GetWntLabelledThreshold()
 
 void SimpleWntCellCycleModel::SetWntLabelledThreshold(double wntLabelledThreshold)
 {
-    assert(wntLabelledThreshold <= 1.0);
-    assert(wntLabelledThreshold >= 0.0);
+//    assert(wntLabelledThreshold <= 1.0);
+//    assert(wntLabelledThreshold >= 0.0);
     mWntLabelledThreshold = wntLabelledThreshold;
 }
 

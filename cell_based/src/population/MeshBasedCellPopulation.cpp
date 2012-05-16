@@ -55,7 +55,8 @@ MeshBasedCellPopulation<DIM>::MeshBasedCellPopulation(MutableMesh<DIM, DIM>& rMe
       mAreaBasedDampingConstantParameter(0.1),
       mOutputVoronoiData(false),
       mOutputCellPopulationVolumes(false),
-      mWriteVtkAsPoints(false)
+      mWriteVtkAsPoints(false),
+      mHasVariableRestLength(false)
 {
 	mpMutableMesh = static_cast<MutableMesh<DIM, DIM>* >(&(this->mrMesh));
     // This must always be true
@@ -1240,6 +1241,14 @@ std::set<unsigned> MeshBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
     }
     return neighbouring_node_indices;
 }
+
+template<unsigned DIM>
+double MeshBasedCellPopulation<DIM>::GetRestLength(unsigned indexA, unsigned indexB)
+{
+//	if ()
+	return 1.0;
+}
+
 
 /////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation

@@ -114,6 +114,11 @@ c_vector<double, DIM> GeneralisedLinearSpringForce<DIM>::CalculateForceBetweenNo
 
     double rest_length = 1.0;
 
+    if (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation))
+    {
+    	rest_length = static_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation)->GetRestLength(nodeAGlobalIndex, nodeBGlobalIndex);
+    }
+
     CellPtr p_cell_A = rCellPopulation.GetCellUsingLocationIndex(nodeAGlobalIndex);
     CellPtr p_cell_B = rCellPopulation.GetCellUsingLocationIndex(nodeBGlobalIndex);
 

@@ -155,6 +155,9 @@ protected:
     /** Whether to write cells as points in VTK. */
     bool mWriteVtkAsPoints;
 
+    /** Whether springs have variable rest lengths. */
+    bool mHasVariableRestLength;
+
 #undef COVERAGE_IGNORE // Avoid prototypes being treated as code by gcov
 
     /**
@@ -589,6 +592,14 @@ public:
      * @return the set of neighbouring node indices.
      */
     std::set<unsigned> GetNeighbouringNodeIndices(unsigned index);
+
+    /**
+     *  Return the rest length for a given spring
+     *
+     *  @param indexA index of first node in pair
+     *  @param indexB index of second node in pair
+     */
+    double GetRestLength(unsigned indexA, unsigned indexB);
 };
 #undef COVERAGE_IGNORE // Avoid prototypes being treated as code by gcov
 
