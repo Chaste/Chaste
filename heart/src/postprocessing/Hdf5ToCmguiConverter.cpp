@@ -196,7 +196,8 @@ void Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM>::WriteCmguiScript()
 
         *p_script_file << "# Read the mesh \n"
                        << "gfx read node "<<HeartConfig::Instance()->GetOutputFilenamePrefix()<<".exnode \n"
-                       << "gfx read elem "<<HeartConfig::Instance()->GetOutputFilenamePrefix()<<".exelem generate_faces_and_lines \n" // note the mesh file name is taken from HeartConfig...
+                       << "gfx read elem "<<HeartConfig::Instance()->GetOutputFilenamePrefix()<<".exelem \n" // note the mesh file name is taken from HeartConfig...
+                       << "gfx define faces egroup "<<HeartConfig::Instance()->GetOutputFilenamePrefix()<<"\n"
                        << "# Create a window \n"
                        << "gfx cre win 1 \n"
                        << "# Modify the scene (obtained by gfx list g_element XXXX commands) to visualize first var on lines and nodes \n"

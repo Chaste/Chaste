@@ -1,7 +1,8 @@
-# Created by Chaste version 2.1.10890 on Mon, 22 Nov 2010 05:09:03 +0000.  Chaste was built on Mon, 22 Nov 2010 05:08:50 +0000 by machine (uname) 'Linux compphys11 2.6.32-25-generic #45-Ubuntu SMP Sat Oct 16 19:52:42 UTC 2010 x86_64' using settings: default_2, no Chaste libraries.
+# Created by Chaste version 3.0.15619 (with uncommitted modifications) on Thu, 17 May 2012 10:21:59 +0000.  Chaste was built on Thu, 17 May 2012 09:51:27 +0000 by machine (uname) 'Linux compphys11 3.0.0-19-generic #33-Ubuntu SMP Thu Apr 19 19:05:14 UTC 2012 x86_64' using settings: default, no Chaste libraries.
 # Read the mesh 
 gfx read node SimulationResults.exnode 
-gfx read elem SimulationResults.exelem generate_faces_and_lines 
+gfx read elem SimulationResults.exelem 
+gfx define faces egroup SimulationResults
 # Create a window 
 gfx cre win 1 
 # Modify the scene (obtained by gfx list g_element XXXX commands) to visualize first var on lines and nodes 
