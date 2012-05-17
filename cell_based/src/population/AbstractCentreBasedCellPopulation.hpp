@@ -45,8 +45,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * An abstract facade class encapsulating a centre-based cell population, in which
  * each cell corresponds to a Node.
  */
-template<unsigned DIM>
-class AbstractCentreBasedCellPopulation : public AbstractOffLatticeCellPopulation<DIM>
+template<unsigned ELEMENT_DIM, unsigned  SPACE_DIM=ELEMENT_DIM>
+class AbstractCentreBasedCellPopulation : public AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>
 {
 private:
     /** Needed for serialization. */
@@ -60,12 +60,11 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractOffLatticeCellPopulation<DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM> >(*this);
         archive & mMeinekeDivisionSeparation;
     }
 
 protected:
-
     /**
      * Initial separation placement of mother/daughter cells at birth.
      * Has units of cell size at equilibrium rest length
@@ -77,7 +76,7 @@ protected:
      * 
      * @param rMesh the mesh for the cell population.
      */
-    AbstractCentreBasedCellPopulation(AbstractMesh<DIM, DIM>& rMesh);
+    AbstractCentreBasedCellPopulation(AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh);
 
     /**
      * Write the current results to mpVtkMetaFile.
@@ -96,7 +95,7 @@ public:
      * @param rCells a vector of cells
      * @param locationIndices an optional vector of location indices that correspond to real cells
      */
-    AbstractCentreBasedCellPopulation( AbstractMesh<DIM, DIM>& rMesh,
+    AbstractCentreBasedCellPopulation( AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
 										std::vector<CellPtr>& rCells,
                                       const std::vector<unsigned> locationIndices=std::vector<unsigned>());
 
@@ -108,7 +107,7 @@ public:
      *
      * @return the location of the node corresponding to this cell.
      */
-    c_vector<double, DIM> GetLocationOfCellCentre(CellPtr pCell);
+    c_vector<double, SPACE_DIM> GetLocationOfCellCentre(CellPtr pCell);
 
     /**
      * Get a pointer to the node corresponding to a given cell.
@@ -117,7 +116,7 @@ public:
      *
      * @return address of the node
      */
-    Node<DIM>* GetNodeCorrespondingToCell(CellPtr pCell);
+    Node<SPACE_DIM>* GetNodeCorrespondingToCell(CellPtr pCell);
 
     /**
      * Add a new cell to the cell population.
@@ -128,7 +127,7 @@ public:
      *
      * @return address of cell as it appears in the cell list
      */
-    CellPtr AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell=CellPtr());
+    CellPtr AddCell(CellPtr pNewCell, const c_vector<double,SPACE_DIM>& rCellDivisionVector, CellPtr pParentCell=CellPtr());
 
     /**
      * Overridden IsCellAssociatedWithADeletedLocation() method.
@@ -145,7 +144,7 @@ public:
      * @param rNodeForces a vector containing the force on each node in the cell population
      * @param dt the time step
      */
-    virtual void UpdateNodeLocations(const std::vector< c_vector<double, DIM> >& rNodeForces, double dt);
+    virtual void UpdateNodeLocations(const std::vector< c_vector<double, SPACE_DIM> >& rNodeForces, double dt);
 
     /**
      * Overridden GetDampingConstant() method.
