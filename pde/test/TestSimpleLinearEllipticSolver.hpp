@@ -57,8 +57,30 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "AbstractBoundaryConditionsContainerImplementation.hpp"
 #include "BoundaryConditionsContainerImplementation.hpp"
-
 #include "PetscSetupAndFinalize.hpp"
+
+
+class SomePde : public AbstractLinearEllipticPde<2,2>
+{
+public:
+    double ComputeConstantInUSourceTerm(const ChastePoint<2>& rX, Element<2,2>* )
+    {
+        double dist = sqrt( fabs(rX[0]-0.75)*fabs(rX[0]-0.75) + fabs(rX[1]-0.75)*fabs(rX[1]-0.75));
+        return 0.1*exp(-10*dist*dist);
+    }
+
+    double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<2>&, Element<2,2>* )
+    {
+        return 0.0;
+    }
+
+    c_matrix<double, 2, 2> ComputeDiffusionTerm(const ChastePoint<2>& )
+    {
+        return identity_matrix<double>(2);
+    }
+};
+
+
 
 class TestSimpleLinearEllipticSolver : public CxxTest::TestSuite
 {
@@ -645,6 +667,85 @@ public:
 
         // Coverage
         TS_ASSERT(solver.GetLinearSystem()!=NULL);
+
+        PetscTools::Destroy(result);
+    }
+
+
+
+    // #2033
+    // Periodic BCs are implemented but not being applied to the linear systems in any assembler
+    // This test will pass if the following two things are done:
+    //   (1) The ApplyPeriodicBcsToLinearProblem() line is uncommented in AbstractAssemblerSolverHybrid.cpp
+    //   (2) This test is run with '-ksp_type gmres' - periodic BCs are not being implemented at the
+    //       moment in such a way that the matrix is kept symmetric, hence CG will diverge.
+    // Todo: Alter ApplyPeriodicBcsToLinearProblem() so that it keeps matrix symmetric, then
+    //       replace ApplyDirichletToLinearProblem() calls in all assemblers to a call to a new method
+    //       ApplyDirichletAndPeriodicBcsToLinearProblem(). Then this test just pass.
+    //
+    void dont_Test2dHeatEquationWithPeriodicBcs()
+    {
+        TetrahedralMesh<2,2> mesh;
+        double width = 1.0;
+        mesh.ConstructRegularSlabMesh(0.1, width, width);
+
+        // Instantiate PDE object
+        SomePde pde;
+
+        std::vector<std::pair<unsigned,unsigned> > identified_nodes; // for the test
+
+        // Boundary conditions
+        BoundaryConditionsContainer<2,2,1> bcc;
+        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        {
+            double x = mesh.GetNode(i)->rGetLocation()[0];
+            double y = mesh.GetNode(i)->rGetLocation()[1];
+            if(fabs(x)<1e-6)
+            {
+                for(unsigned j=0; j<mesh.GetNumNodes(); j++)
+                {
+                    double x2 = mesh.GetNode(j)->rGetLocation()[0];
+                    double y2 = mesh.GetNode(j)->rGetLocation()[1];
+                    if( (fabs(x2-width)<1e-6) && (fabs(y-y2)<1e-6) )
+                    {
+                        std::pair<unsigned,unsigned> pair;
+                        pair.first = i;
+                        pair.second = j;
+                        identified_nodes.push_back(pair);
+
+                        bcc.AddPeriodicBoundaryCondition(mesh.GetNode(i), mesh.GetNode(j));
+                    }
+                }
+            }
+
+            if( (fabs(x-0.5)<1e-6) && (fabs(y)<1e-6) )
+            {
+                ConstBoundaryCondition<2>* p_boundary_condition = new ConstBoundaryCondition<2>(0.0);
+                bcc.AddDirichletBoundaryCondition(mesh.GetNode(i), p_boundary_condition);
+            }
+        }
+
+        // Solver
+        SimpleLinearEllipticSolver<2,2> solver(&mesh,&pde,&bcc);
+
+        Vec result = solver.Solve();
+
+        // write solution to file for visualisation
+        ReplicatableVector res_repl(result);
+        OutputFileHandler handler("PeriodicBcs");
+        out_stream p_file = handler.OpenOutputFile("result.txt");
+        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        {
+            *p_file << mesh.GetNode(i)->rGetLocation()[0] << " " << mesh.GetNode(i)->rGetLocation()[1] << " " << res_repl[i] << "\n";
+        }
+        p_file->close();
+
+        // test the periodicity has been enforced
+        assert(identified_nodes.size()>0);
+        for(unsigned i=0; i<identified_nodes.size(); i++)
+        {
+            TS_ASSERT_DELTA(res_repl[identified_nodes[i].first], res_repl[identified_nodes[i].second], 1e-8);
+        }
 
         PetscTools::Destroy(result);
     }

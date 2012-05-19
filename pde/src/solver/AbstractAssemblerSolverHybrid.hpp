@@ -146,6 +146,9 @@ void AbstractAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, INTERPOL
     // add Dirichlet BCs
     mpBoundaryConditions->ApplyDirichletToLinearProblem(*pLinearSystem, true);
 
+//// #2033 - see Test2dHeatEquationWithPeriodicBcs in TestSimpleLinearEllipticSolver.hpp
+    //mpBoundaryConditions->ApplyPeriodicBcsToLinearProblem(*pLinearSystem, true);
+
     pLinearSystem->FinaliseRhsVector();
     pLinearSystem->FinaliseLhsMatrix();
 }

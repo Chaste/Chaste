@@ -80,6 +80,9 @@ private:
     std::map< const BoundaryElement<ELEMENT_DIM-1, SPACE_DIM> *, const AbstractBoundaryCondition<SPACE_DIM>* >*
         mpNeumannMap[PROBLEM_DIM]; /**< List (map) of Neumann boundary conditions. */
 
+    /** Nodes to be identified when periodic boundary conditions are applied */
+    std::map< const Node<SPACE_DIM> *, const Node<SPACE_DIM> * >*  mpPeriodicBcMap[PROBLEM_DIM];
+
     /**
      * Neumann boundary condition iterator.
      */
@@ -151,6 +154,22 @@ public:
                                      const AbstractBoundaryCondition<SPACE_DIM>* pBoundaryCondition,
                                      unsigned indexOfUnknown = 0);
 
+
+    /**
+     *  Add a periodic boundary condition: provide two nodes to be identified when solving for the
+     *  given unknown.
+     *  @param pNode1 node 1
+     *  @param pNode2 node 2
+     *  @param indexOfUnknown index of the unknown, defaults to zero.
+     *
+     *  This method doesn't just identify the nodes for good, so it needs to be called for each
+     *  unknown that periodic BCs are being applied to.
+     */
+    void AddPeriodicBoundaryCondition(const Node<SPACE_DIM>* pNode1,
+                                      const Node<SPACE_DIM>* pNode2,
+                                      unsigned indexOfUnknown = 0);
+
+
     /**
      * This function defines zero Dirichlet boundary conditions on every boundary node
      * of the mesh.
@@ -200,6 +219,24 @@ public:
     void ApplyDirichletToLinearProblem(LinearSystem& rLinearSystem,
                                        bool applyToMatrix = true,
                                        bool applyToRhsVector = true);
+
+
+
+    /**
+     *  Alter the given linear system to satisfy periodic boundary conditions.
+     *
+     *  For one of the two nodes that have been identified, the row corresponding to the
+     *  unknown which has periodic BCs, for one of the nodes, ie replaced with
+     *  [0 0 0 ... -1 0 0 .. 0 1 0 .. 0]
+     *  where the 1 is the diagonal entry and the -1 on the column corresponding to that
+     *  unknown and the other node.
+     *
+     *  The entry in the RHS vector is zeroed.
+     *
+     */
+    void ApplyPeriodicBcsToLinearProblem(LinearSystem& rLinearSystem,
+                                         bool applyToMatrix = true,
+                                         bool applyToRhsVector = true);
 
     /**
      * Alter the residual vector for a nonlinear system to satisfy

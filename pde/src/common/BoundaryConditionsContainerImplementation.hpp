@@ -42,8 +42,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DistributedVector.hpp"
 #include "ReplicatableVector.hpp"
 #include "ConstBoundaryCondition.hpp"
-
 #include "HeartEventHandler.hpp"
+#include "PetscMatTools.hpp"
+
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::BoundaryConditionsContainer(bool deleteConditions)
@@ -57,6 +58,8 @@ BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::BoundaryConditio
 
         mAnyNonZeroNeumannConditionsForUnknown[index_of_unknown] = false;
         mLastNeumannCondition[index_of_unknown] = mpNeumannMap[index_of_unknown]->begin();
+
+        mpPeriodicBcMap[index_of_unknown] = new std::map< const Node<SPACE_DIM> *, const Node<SPACE_DIM> * >;
     }
 
     // This zero boundary condition is only used in AddNeumannBoundaryCondition
@@ -89,6 +92,7 @@ BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::~BoundaryConditi
             neumann_iterator++;
         }
         delete(mpNeumannMap[i]);
+        delete(mpPeriodicBcMap[i]);
     }
 
     delete mpZeroBoundaryCondition;
@@ -113,6 +117,19 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AddDirichle
 
     (*(this->mpDirichletMap[indexOfUnknown]))[pBoundaryNode] = pBoundaryCondition;
 }
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AddPeriodicBoundaryCondition(const Node<SPACE_DIM>* pNode1,
+                                                                                                  const Node<SPACE_DIM>* pNode2,
+                                                                                                  unsigned indexOfUnknown)
+{
+    assert(indexOfUnknown < PROBLEM_DIM);
+    assert(pNode1->IsBoundaryNode());
+    assert(pNode2->IsBoundaryNode());
+
+    (*(this->mpPeriodicBcMap[indexOfUnknown]))[pNode1] = pNode2;
+}
+
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AddNeumannBoundaryCondition( const BoundaryElement<ELEMENT_DIM-1, SPACE_DIM> * pBoundaryElement,
@@ -300,7 +317,7 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ApplyDirich
                 double value = this->mDirichIterator->second->GetValue(this->mDirichIterator->first->GetPoint());
                 assert(value != DBL_MAX);
 
-                unsigned row = PROBLEM_DIM*node_index + index_of_unknown; // assumes vm and phie equations are interleaved
+                unsigned row = PROBLEM_DIM*node_index + index_of_unknown;
                 dirichlet_conditions[row] = value;
 
                 this->mDirichIterator++;
@@ -399,6 +416,78 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ApplyDirich
 
     HeartEventHandler::EndEvent(HeartEventHandler::DIRICHLET_BCS);
 }
+
+
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ApplyPeriodicBcsToLinearProblem(LinearSystem& rLinearSystem,
+                                                                                                     bool applyToMatrix,
+                                                                                                     bool applyToRhsVector)
+{
+    bool has_periodic_bcs = false;
+    for (unsigned i=0; i<PROBLEM_DIM; i++)
+    {
+        if (!mpPeriodicBcMap[i]->empty())
+        {
+            has_periodic_bcs = true;
+            break;
+        }
+    }
+
+    if(!has_periodic_bcs)
+    {
+        return;
+    }
+
+    if(applyToMatrix)
+    {
+        std::vector<unsigned> rows_to_zero;
+        for (unsigned index_of_unknown=0; index_of_unknown<PROBLEM_DIM; index_of_unknown++)
+        {
+            for(typename std::map< const Node<SPACE_DIM> *, const Node<SPACE_DIM> * >::const_iterator iter = mpPeriodicBcMap[index_of_unknown]->begin();
+                iter != mpPeriodicBcMap[index_of_unknown]->end();
+                ++iter)
+            {
+                unsigned node_index_1 = iter->first->GetIndex();
+                unsigned row_index_1 = PROBLEM_DIM*node_index_1 + index_of_unknown;
+                rows_to_zero.push_back(row_index_1);
+            }
+        }
+
+        rLinearSystem.ZeroMatrixRowsWithValueOnDiagonal(rows_to_zero, 1.0);
+
+        for (unsigned index_of_unknown=0; index_of_unknown<PROBLEM_DIM; index_of_unknown++)
+        {
+            for(typename std::map< const Node<SPACE_DIM> *, const Node<SPACE_DIM> * >::const_iterator iter = mpPeriodicBcMap[index_of_unknown]->begin();
+                iter != mpPeriodicBcMap[index_of_unknown]->end();
+                ++iter)
+            {
+                unsigned node_index_1 = iter->first->GetIndex();
+                unsigned node_index_2 = iter->second->GetIndex();
+
+                unsigned mat_index1 = PROBLEM_DIM*node_index_1 + index_of_unknown;
+                unsigned mat_index2 = PROBLEM_DIM*node_index_2 + index_of_unknown;
+                PetscMatTools::SetElement(rLinearSystem.rGetLhsMatrix(), mat_index1, mat_index2, -1.0);
+            }
+        }
+    }
+
+    if(applyToRhsVector)
+    {
+        for (unsigned index_of_unknown=0; index_of_unknown<PROBLEM_DIM; index_of_unknown++)
+        {
+            for(typename std::map< const Node<SPACE_DIM> *, const Node<SPACE_DIM> * >::const_iterator iter = mpPeriodicBcMap[index_of_unknown]->begin();
+                iter != mpPeriodicBcMap[index_of_unknown]->end();
+                ++iter)
+            {
+                unsigned node_index = iter->first->GetIndex();
+                unsigned row_index = PROBLEM_DIM*node_index + index_of_unknown;
+                rLinearSystem.SetRhsVectorElement(row_index, 0.0);
+            }
+        }
+    }
+}
+
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ApplyDirichletToNonlinearResidual(

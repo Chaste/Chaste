@@ -220,19 +220,19 @@ public:
     void TestApplyToLinearSystem()
     {
         const int SIZE = 10;
-        LinearSystem some_system(SIZE, SIZE);
+        LinearSystem system(SIZE, SIZE);
         for (int i=0; i<SIZE; i++)
         {
             for (int j=0; j<SIZE; j++)
             {
                 // LHS matrix is all 1s
-                some_system.SetMatrixElement(i,j,1);
+                system.SetMatrixElement(i,j,1);
             }
             // RHS vector is all 2s
-            some_system.SetRhsVectorElement(i,2);
+            system.SetRhsVectorElement(i,2);
         }
 
-        some_system.AssembleIntermediateLinearSystem();
+        system.AssembleIntermediateLinearSystem();
 
         Node<3>* nodes_array[SIZE];
         BoundaryConditionsContainer<3,3,1> bcc3;
@@ -251,17 +251,17 @@ public:
         //////////////////////////
 
         // apply dirichlet bcs to matrix but not rhs vector
-        bcc3.ApplyDirichletToLinearProblem(some_system, true, false);
-        ReplicatableVector vec_repl(some_system.GetRhsVector());
+        bcc3.ApplyDirichletToLinearProblem(system, true, false);
+        ReplicatableVector vec_repl(system.GetRhsVector());
         for (unsigned i=0; i<(unsigned)SIZE; i++)
         {
             TS_ASSERT_EQUALS(vec_repl[i], 2.0);
         }
 
         // now apply to the rhs vector
-        bcc3.ApplyDirichletToLinearProblem(some_system, false, true);
+        bcc3.ApplyDirichletToLinearProblem(system, false, true);
 
-        some_system.AssembleFinalLinearSystem();
+        system.AssembleFinalLinearSystem();
 
         //////////////////////////
         // 2007 AD code from here
@@ -279,30 +279,35 @@ public:
          *
          */
         /// \todo: this is very naughty. Must be checked in parallel as well.
-        if (PetscTools::IsSequential())
+        PetscInt lo, hi;
+        PetscMatTools::GetOwnershipRange(system.rGetLhsMatrix(), lo, hi);
+        for(int row=lo; row<hi; row++)
         {
-            for (int row=0; row<SIZE-1; row++)
+            if(row<SIZE-1)
             {
                 for (int column=0; column<row; column++)
                 {
-                    TS_ASSERT_EQUALS(some_system.GetMatrixElement(row,column), 0);
+                    TS_ASSERT_EQUALS(system.GetMatrixElement(row,column), 0);
                 }
 
-                TS_ASSERT_EQUALS(some_system.GetMatrixElement(row,row), 1);
+                TS_ASSERT_EQUALS(system.GetMatrixElement(row,row), 1);
 
                 for (int column=row+1; column<SIZE; column++)
                 {
-                    TS_ASSERT_EQUALS(some_system.GetMatrixElement(row,column), 0);
+                    TS_ASSERT_EQUALS(system.GetMatrixElement(row,column), 0);
                 }
             }
 
-            for (int column=0; column<SIZE; column++)
+            if(row==SIZE-1)
             {
-                TS_ASSERT_EQUALS(some_system.GetMatrixElement(SIZE-1,column), 1);
+            	for (int column=0; column<SIZE; column++)
+            	{
+            		TS_ASSERT_EQUALS(system.GetMatrixElement(row,column), 1);
+            	}
             }
         }
 
-        Vec solution = some_system.Solve();
+        Vec solution = system.Solve();
 
         DistributedVectorFactory factory(solution);
         DistributedVector d_solution = factory.CreateDistributedVector( solution );
@@ -324,21 +329,21 @@ public:
     void TestApplyToSymmetricLinearSystem()
     {
         const int SIZE = 10;
-        LinearSystem some_system(SIZE, SIZE);
-        some_system.SetMatrixIsSymmetric(true);
+        LinearSystem system(SIZE, SIZE);
+        system.SetMatrixIsSymmetric(true);
 
         for (int i=0; i<SIZE; i++)
         {
             for (int j=0; j<SIZE; j++)
             {
                 // LHS matrix is all 1s
-                some_system.SetMatrixElement(i,j,1);
+                system.SetMatrixElement(i,j,1);
             }
             // RHS vector is all 2s
-            some_system.SetRhsVectorElement(i,2);
+            system.SetRhsVectorElement(i,2);
         }
 
-        some_system.AssembleIntermediateLinearSystem();
+        system.AssembleIntermediateLinearSystem();
 
         Node<3>* nodes_array[SIZE];
         BoundaryConditionsContainer<3,3,1> bcc3;
@@ -351,9 +356,9 @@ public:
                 new ConstBoundaryCondition<3>(-1);
             bcc3.AddDirichletBoundaryCondition(nodes_array[i], p_boundary_condition);
         }
-        bcc3.ApplyDirichletToLinearProblem(some_system);
+        bcc3.ApplyDirichletToLinearProblem(system);
 
-        some_system.AssembleFinalLinearSystem();
+        system.AssembleFinalLinearSystem();
 
         /*
          * Based on the original system and the boundary conditions applied in a symmetric
@@ -366,24 +371,24 @@ public:
          *      0 0 0 ... 1
          */
         int lo, hi;
-        some_system.GetOwnershipRange(lo, hi);
+        system.GetOwnershipRange(lo, hi);
 
         for (int row=lo; row<hi; row++)
         {
             for (int column=0; column<row; column++)
             {
-                TS_ASSERT_EQUALS(some_system.GetMatrixElement(row,column), 0);
+                TS_ASSERT_EQUALS(system.GetMatrixElement(row,column), 0);
             }
 
-            TS_ASSERT_EQUALS(some_system.GetMatrixElement(row,row), 1);
+            TS_ASSERT_EQUALS(system.GetMatrixElement(row,row), 1);
 
             for (int column=row+1; column<SIZE; column++)
             {
-                TS_ASSERT_EQUALS(some_system.GetMatrixElement(row,column), 0);
+                TS_ASSERT_EQUALS(system.GetMatrixElement(row,column), 0);
             }
         }
 
-        Vec solution = some_system.Solve();
+        Vec solution = system.Solve();
 
         DistributedVectorFactory factory(solution);
         DistributedVector d_solution = factory.CreateDistributedVector( solution );
@@ -592,22 +597,22 @@ public:
 
         DistributedVectorFactory factory(SIZE);
         Vec template_vec = factory.CreateVec(2);
-        LinearSystem some_system(template_vec, 2*SIZE);
+        LinearSystem system(template_vec, 2*SIZE);
         PetscTools::Destroy(template_vec);
 
-        //LinearSystem some_system(2*SIZE);
+        //LinearSystem system(2*SIZE);
         for (int i = 0; i < 2*SIZE; i++)
         {
             for (int j = 0; j < 2*SIZE; j++)
             {
                 // LHS matrix is all 1s
-                some_system.SetMatrixElement(i,j,1);
+                system.SetMatrixElement(i,j,1);
             }
             // RHS vector is all 2s
-            some_system.SetRhsVectorElement(i,2);
+            system.SetRhsVectorElement(i,2);
         }
 
-        some_system.AssembleIntermediateLinearSystem();
+        system.AssembleIntermediateLinearSystem();
 
         Node<3>* nodes_array[SIZE];
         BoundaryConditionsContainer<3,3,2> bcc32;
@@ -626,9 +631,9 @@ public:
             bcc32.AddDirichletBoundaryCondition(nodes_array[i], p_boundary_condition0, 0);
             bcc32.AddDirichletBoundaryCondition(nodes_array[i], p_boundary_condition1, 1);
         }
-        bcc32.ApplyDirichletToLinearProblem(some_system);
+        bcc32.ApplyDirichletToLinearProblem(system);
 
-        some_system.AssembleFinalLinearSystem();
+        system.AssembleFinalLinearSystem();
 
         /*
          * Matrix should now look like
@@ -640,7 +645,7 @@ public:
          * and rhs vector looks like b=(-1, -2, -1, -2, ..., -1, -2, 2, 2)
          * so solution of Ax = b is  x=(-1, -2, -1, -2, ..., -1, -2, ?, ?).
          */
-        Vec solution = some_system.Solve();
+        Vec solution = system.Solve();
         DistributedVector d_solution = factory.CreateDistributedVector(solution);
         DistributedVector::Stripe solution0(d_solution,0);
         DistributedVector::Stripe solution1(d_solution,1);
@@ -671,22 +676,22 @@ public:
 
         DistributedVectorFactory factory(SIZE);
         Vec template_vec = factory.CreateVec(3);
-        LinearSystem some_system(template_vec, 3*SIZE);
+        LinearSystem system(template_vec, 3*SIZE);
         PetscTools::Destroy(template_vec);
 
-        //LinearSystem some_system(3*SIZE);
+        //LinearSystem system(3*SIZE);
         for (int i = 0; i < 3*SIZE; i++)
         {
             for (int j = 0; j < 3*SIZE; j++)
             {
                 // LHS matrix is all 1s
-                some_system.SetMatrixElement(i,j,1);
+                system.SetMatrixElement(i,j,1);
             }
             // RHS vector is all 2s
-            some_system.SetRhsVectorElement(i,2);
+            system.SetRhsVectorElement(i,2);
         }
 
-        some_system.AssembleIntermediateLinearSystem();
+        system.AssembleIntermediateLinearSystem();
 
         Node<3>* nodes_array[SIZE];
         BoundaryConditionsContainer<3,3,3> bcc33;
@@ -709,11 +714,11 @@ public:
             bcc33.AddDirichletBoundaryCondition(nodes_array[i], p_boundary_condition1, 1);
             bcc33.AddDirichletBoundaryCondition(nodes_array[i], p_boundary_condition2, 2);
         }
-        bcc33.ApplyDirichletToLinearProblem(some_system);
+        bcc33.ApplyDirichletToLinearProblem(system);
 
-        some_system.AssembleFinalLinearSystem();
+        system.AssembleFinalLinearSystem();
 
-        Vec solution = some_system.Solve();
+        Vec solution = system.Solve();
 
         DistributedVector d_solution = factory.CreateDistributedVector(solution);
         DistributedVector::Stripe solution0(d_solution,0);
@@ -818,6 +823,123 @@ public:
         PetscTools::Destroy(solution);
         PetscTools::Destroy(residual);
     }
+
+    void TestPerdiodicBoundaryConditions()
+    {
+        const int SIZE = 5;
+
+        DistributedVectorFactory factory(SIZE);
+        Vec template_vec = factory.CreateVec(2);
+        LinearSystem system(template_vec, 2*SIZE);
+        PetscTools::Destroy(template_vec);
+
+        //LinearSystem system(2*SIZE);
+        for (int i = 0; i < 2*SIZE; i++)
+        {
+            for (int j = 0; j < 2*SIZE; j++)
+            {
+                // LHS matrix is all 2s
+                system.SetMatrixElement(i,j,2);
+            }
+            // RHS vector is all 3s
+            system.SetRhsVectorElement(i,3);
+        }
+
+        system.AssembleIntermediateLinearSystem();
+
+        Node<3>* nodes[SIZE];
+        BoundaryConditionsContainer<3,3,2> bcc;
+
+        for (unsigned i=0; i<SIZE-1; i++)
+        {
+            nodes[i] = new Node<3>(i,true);
+        }
+
+        bcc.AddPeriodicBoundaryCondition(nodes[0], nodes[1], 0);
+        bcc.AddPeriodicBoundaryCondition(nodes[0], nodes[1], 1);
+        bcc.AddPeriodicBoundaryCondition(nodes[2], nodes[3], 1);
+
+        bcc.ApplyPeriodicBcsToLinearProblem(system, true, true);
+
+        system.AssembleFinalLinearSystem();
+
+        ReplicatableVector rhs_repl(system.rGetRhsVector());
+        TS_ASSERT_DELTA(rhs_repl[0], 0.0, 1e-12); // node 0, variable 0
+        TS_ASSERT_DELTA(rhs_repl[1], 0.0, 1e-12); // node 0, variable 1
+        TS_ASSERT_DELTA(rhs_repl[2], 3.0, 1e-12);
+        TS_ASSERT_DELTA(rhs_repl[3], 3.0, 1e-12);
+        TS_ASSERT_DELTA(rhs_repl[4], 3.0, 1e-12);
+        TS_ASSERT_DELTA(rhs_repl[5], 0.0, 1e-12); // node 2, variable 1
+        TS_ASSERT_DELTA(rhs_repl[6], 3.0, 1e-12);
+        TS_ASSERT_DELTA(rhs_repl[7], 3.0, 1e-12);
+        TS_ASSERT_DELTA(rhs_repl[8], 3.0, 1e-12);
+        TS_ASSERT_DELTA(rhs_repl[9], 3.0, 1e-12);
+
+
+        //
+        //  Matrix should have
+        //   row 0 altered to be [1, 0 -1, 0, 0, ..., 0]
+        //   row 1 altered to be [0, 1, 0 -1, 0, ..., 0]
+        //   row 5 altered to be [0, 0, 0, 0, 0, 1, 0, -1, 0, 0]
+        //   All other rows just [2, 2, ..., 2]
+
+        Mat& r_mat = system.rGetLhsMatrix();
+
+        PetscInt lo, hi;
+        PetscMatTools::GetOwnershipRange(r_mat, lo, hi);
+        for(int i=lo; i<hi; i++)
+        {
+        	if(i==0 || i==1 || i==5)
+        	{
+        		unsigned col_one;
+        		unsigned col_minus_one;
+
+        		if(i==0)
+        		{
+        			col_one = 0;
+        			col_minus_one = 2;
+        		}
+        		else if(i==1)
+        		{
+        			col_one = 1;
+        			col_minus_one = 3;
+        		}
+        		else
+        		{
+        			col_one = 5;
+        			col_minus_one = 7;
+        		}
+
+
+        		for(unsigned j=0; j<2*SIZE; j++)
+        		{
+        			double val = 0.0;
+        			if(j==col_one)
+        			{
+        				val = 1.0;
+        			}
+        			if(j==col_minus_one)
+        			{
+        				val = -1.0;
+        			}
+        			TS_ASSERT_DELTA( PetscMatTools::GetElement(r_mat, i, j), val, 1e-12);
+        		}
+        	}
+        	else
+        	{
+        		for(unsigned j=0; j<2*SIZE; j++)
+        		{
+        			TS_ASSERT_DELTA( PetscMatTools::GetElement(r_mat, i, j), 2.0, 1e-12);
+        		}
+        	}
+        }
+
+        for (unsigned i=0; i<SIZE-1; i++)
+        {
+            delete nodes[i];
+        }
+    }
+
 
     void TestArchiving()
     {
