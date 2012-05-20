@@ -156,18 +156,14 @@ public:
 
 
     /**
-     *  Add a periodic boundary condition: provide two nodes to be identified when solving for the
-     *  given unknown.
+     *  Add a periodic boundary condition: provide two nodes to be identified when solving
      *  @param pNode1 node 1
      *  @param pNode2 node 2
-     *  @param indexOfUnknown index of the unknown, defaults to zero.
      *
-     *  This method doesn't just identify the nodes for good, so it needs to be called for each
-     *  unknown that periodic BCs are being applied to.
+     *  This method identifies the nodes for all unknowns, so doesn't have to be called for each unknown.
      */
     void AddPeriodicBoundaryCondition(const Node<SPACE_DIM>* pNode1,
-                                      const Node<SPACE_DIM>* pNode2,
-                                      unsigned indexOfUnknown = 0);
+                                      const Node<SPACE_DIM>* pNode2);
 
 
     /**

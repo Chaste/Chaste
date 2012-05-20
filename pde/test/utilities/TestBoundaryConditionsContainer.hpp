@@ -855,9 +855,8 @@ public:
             nodes[i] = new Node<3>(i,true);
         }
 
-        bcc.AddPeriodicBoundaryCondition(nodes[0], nodes[1], 0);
-        bcc.AddPeriodicBoundaryCondition(nodes[0], nodes[1], 1);
-        bcc.AddPeriodicBoundaryCondition(nodes[2], nodes[3], 1);
+        bcc.AddPeriodicBoundaryCondition(nodes[0], nodes[1]);
+        bcc.AddPeriodicBoundaryCondition(nodes[2], nodes[3]);
 
         bcc.ApplyPeriodicBcsToLinearProblem(system, true, true);
 
@@ -868,7 +867,7 @@ public:
         TS_ASSERT_DELTA(rhs_repl[1], 0.0, 1e-12); // node 0, variable 1
         TS_ASSERT_DELTA(rhs_repl[2], 3.0, 1e-12);
         TS_ASSERT_DELTA(rhs_repl[3], 3.0, 1e-12);
-        TS_ASSERT_DELTA(rhs_repl[4], 3.0, 1e-12);
+        TS_ASSERT_DELTA(rhs_repl[4], 0.0, 1e-12); // node 2, variable 0
         TS_ASSERT_DELTA(rhs_repl[5], 0.0, 1e-12); // node 2, variable 1
         TS_ASSERT_DELTA(rhs_repl[6], 3.0, 1e-12);
         TS_ASSERT_DELTA(rhs_repl[7], 3.0, 1e-12);
@@ -880,6 +879,7 @@ public:
         //  Matrix should have
         //   row 0 altered to be [1, 0 -1, 0, 0, ..., 0]
         //   row 1 altered to be [0, 1, 0 -1, 0, ..., 0]
+        //   row 4 altered to be [0, 0, 0, 0, 1, 0, -1, 0, 0, 0]
         //   row 5 altered to be [0, 0, 0, 0, 0, 1, 0, -1, 0, 0]
         //   All other rows just [2, 2, ..., 2]
 
@@ -889,27 +889,10 @@ public:
         PetscMatTools::GetOwnershipRange(r_mat, lo, hi);
         for(int i=lo; i<hi; i++)
         {
-        	if(i==0 || i==1 || i==5)
+        	if(i==0 || i==1 || i==4 || i==5)
         	{
-        		unsigned col_one;
-        		unsigned col_minus_one;
-
-        		if(i==0)
-        		{
-        			col_one = 0;
-        			col_minus_one = 2;
-        		}
-        		else if(i==1)
-        		{
-        			col_one = 1;
-        			col_minus_one = 3;
-        		}
-        		else
-        		{
-        			col_one = 5;
-        			col_minus_one = 7;
-        		}
-
+        		unsigned col_one = i;
+        		unsigned col_minus_one = i+2;
 
         		for(unsigned j=0; j<2*SIZE; j++)
         		{

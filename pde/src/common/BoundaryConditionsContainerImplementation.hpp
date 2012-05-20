@@ -120,14 +120,18 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AddDirichle
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AddPeriodicBoundaryCondition(const Node<SPACE_DIM>* pNode1,
-                                                                                                  const Node<SPACE_DIM>* pNode2,
-                                                                                                  unsigned indexOfUnknown)
+                                                                                                  const Node<SPACE_DIM>* pNode2)
 {
-    assert(indexOfUnknown < PROBLEM_DIM);
     assert(pNode1->IsBoundaryNode());
     assert(pNode2->IsBoundaryNode());
 
-    (*(this->mpPeriodicBcMap[indexOfUnknown]))[pNode1] = pNode2;
+    // will assume the periodic BC is to be applied to ALL unknowns, can't really imagine a
+    // situation where this isn't going to be true. If necessary can easily change this method
+    // to take in the index of the unknown
+    for(unsigned i=0; i<PROBLEM_DIM; i++)
+    {
+    	(*(this->mpPeriodicBcMap[i]))[pNode1] = pNode2;
+    }
 }
 
 
