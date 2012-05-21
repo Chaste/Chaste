@@ -62,6 +62,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BetaCateninOneHitCellMutationState.hpp"
 #include "ApoptoticCellProperty.hpp"
 #include "CellLabel.hpp"
+#include "CellData.hpp"
 #include "AbstractMesh.hpp"
 
 /**
@@ -250,6 +251,14 @@ public:
      * @param pCellData is the data which is going to be replicated and a fresh copy added to each cell
      */
     void AddClonedDataToAllCells(boost::shared_ptr<CellData> pCellData); 
+
+
+    /**
+     * Add an item of cell data to every cell in the population
+     * @param dataName is the name associated with the data
+     * @param dataValue is the value of the data, initially the same for each cell
+     */
+    void SetDataOnAllCells(const std::string& dataName, double dataValue);
 
     /**
      * @return reference to the mesh, mrMesh.

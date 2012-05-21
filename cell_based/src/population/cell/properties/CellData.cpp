@@ -33,7 +33,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-
+//#include <algorithm>
 #include "CellData.hpp"
 
 CellData::CellData(unsigned numVariables)
@@ -108,6 +108,19 @@ double CellData::GetItem(unsigned variableNumber) const
 unsigned CellData::GetNumItems() const
 {
     return mCellData.size();
+}
+
+std::vector<std::string> CellData::GetKeys() const
+{
+    std::vector<std::string> keys;
+    //Note: Does the order of the keys matter.  If so, then sort the vector + Doxygen
+    for (std::map<std::string, double>::const_iterator it = mCellData.begin(); it != mCellData.end(); ++it)
+    {
+        keys.push_back(it->first);
+    }
+
+    // We assume that the iterator is returning sorted keys sort(keys.begin(), keys.end());
+    return keys;
 }
 
 

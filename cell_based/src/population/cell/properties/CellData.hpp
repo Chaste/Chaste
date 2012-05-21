@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/shared_ptr.hpp>
 #include <map>
 #include <string>
+#include <vector>
 
 #include "AbstractCellProperty.hpp"
 #include "ChasteSerialization.hpp"
@@ -136,6 +137,12 @@ public:
      * 
      */
     unsigned GetNumItems() const;
+    /**
+     * Get all keys
+     * These are sorted in lexicographical/alphabetic order (so that the order is independent of any map iteration method)
+     *
+     */
+    std::vector<std::string> GetKeys() const;
 };
 
 #include "SerializationExportWrapper.hpp"

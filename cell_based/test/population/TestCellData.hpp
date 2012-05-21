@@ -201,7 +201,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
         
         MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem(0, 100.0);
+        p_cell_data->SetItem("variable", 100.0);
         cell_population.AddClonedDataToAllCells(p_cell_data);
         
         //Check that the data made it there and that copies of the data are independent
@@ -209,10 +209,25 @@ public:
                  cell_iter != cell_population.End();
                  ++cell_iter)
         {   
-            TS_ASSERT_EQUALS(cell_iter->GetCellData()->GetItem(0), 100.0);
-            cell_iter->GetCellData()->SetItem(0, 1.0);
+            TS_ASSERT_EQUALS(cell_iter->GetCellData()->GetItem("variable"), 100.0);
+            cell_iter->GetCellData()->SetItem("variable", 1.0);
         }
         
+
+        cell_population.SetDataOnAllCells("added variable", 200.0);
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+                 cell_iter != cell_population.End();
+                 ++cell_iter)
+        {
+            TS_ASSERT_EQUALS(cell_iter->GetCellData()->GetItem("added variable"), 200.0);
+            cell_iter->GetCellData()->SetItem("added variable", 1.0);
+        }
+
+        std::vector<std::string> keys = cell_population.Begin()->GetCellData()->GetKeys();
+        TS_ASSERT_EQUALS(keys.size(), 2u);
+        TS_ASSERT_EQUALS(keys[0], "added variable");
+        TS_ASSERT_EQUALS(keys[1], "variable");
+
         //Try it again
         TS_ASSERT_THROWS_THIS(cell_population.AddClonedDataToAllCells(p_cell_data),
             "AddClonedDataToAllCells() assumes that cells have no data");
