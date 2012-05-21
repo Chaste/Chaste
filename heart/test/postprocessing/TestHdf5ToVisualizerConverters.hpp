@@ -254,7 +254,7 @@ public:
 
         // Check validity of cmgui script
         std::string command_script = "diff -a -I \"Created by Chaste\" " + test_output_directory + output_dir
-                                     +"/cmgui_output/script.com"
+                                     +"/cmgui_output/LoadSolutions.com"
                                      + " heart/test/data/many_variables/CmguiValidScript.com";
         TS_ASSERT_EQUALS(system(command_script.c_str()), 0);
     }
@@ -291,7 +291,7 @@ public:
 
         // Check validity of cmgui script
         std::string command_script = "diff -a -I \"Created by Chaste\" " + test_output_directory
-                                     + working_directory +"/cmgui_output/script.com"
+                                     + working_directory +"/cmgui_output/LoadSolutions.com"
                                      + " heart/test/data/CmguiData/monodomain/monodomain3dValidScript.com";
         TS_ASSERT_EQUALS(system(command_script.c_str()), 0);
     }

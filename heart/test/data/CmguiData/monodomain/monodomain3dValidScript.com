@@ -1,7 +1,9 @@
-# Created by Chaste version 3.0.15619 (with uncommitted modifications) on Thu, 17 May 2012 10:21:59 +0000.  Chaste was built on Thu, 17 May 2012 09:51:27 +0000 by machine (uname) 'Linux compphys11 3.0.0-19-generic #33-Ubuntu SMP Thu Apr 19 19:05:14 UTC 2012 x86_64' using settings: default, no Chaste libraries.
+# Created by Chaste version 3.0.15620 (with uncommitted modifications) on Mon, 21 May 2012 10:16:28 +0000.  Chaste was built on Mon, 21 May 2012 10:16:14 +0000 by machine (uname) 'Linux compphys11 3.0.0-19-generic #33-Ubuntu SMP Thu Apr 19 19:05:14 UTC 2012 x86_64' using settings: default, no Chaste libraries.
 # Read the mesh 
 gfx read node SimulationResults.exnode 
 gfx read elem SimulationResults.exelem 
+# NOTE: the instruction: 'gfx define faces egroup' is known to work with Cmgui version 2.8 or higher 
+# an alternative that works with Cmgui version < 2.8 is 'gfx read ele FILE generate_faces_and_lines' without the 'gfx define faces' instruction
 gfx define faces egroup SimulationResults
 # Create a window 
 gfx cre win 1 

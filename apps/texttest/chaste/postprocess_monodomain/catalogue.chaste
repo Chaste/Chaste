@@ -60,7 +60,7 @@ The following new files/directories were created:
 ------------MaxUpstrokeVelocityMap_-30.dat
 ------------NodalTraces_V.dat
 ------------UpstrokeTimeMap_-30.dat
-------------script.com
+------------LoadSolutions.com
 --------output
 ------------.chaste_deletable_folder
 ------------3dResults_V.dat
