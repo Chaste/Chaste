@@ -45,6 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "MutableVertexMesh.hpp"
 #include "VertexBasedCellPopulation.hpp"
+#include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "HoneycombMeshGenerator.hpp"
@@ -64,6 +65,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AveragedSourcePde.hpp"
 #include "VolumeDependentAveragedSourcePde.hpp"
 #include "SmartPointers.hpp"
+
+#include "Debug.hpp"
 
 class SimplePdeForTesting : public AbstractLinearEllipticPde<2,2>
 {
@@ -770,6 +773,88 @@ public:
             TS_ASSERT_LESS_THAN_EQUALS(value0_at_cell, max0 + DBL_EPSILON);
             TS_ASSERT_LESS_THAN_EQUALS(min1, value1_at_cell + DBL_EPSILON);
             TS_ASSERT_LESS_THAN_EQUALS(value1_at_cell, max1 + DBL_EPSILON);
+        }
+    }
+
+    void TestCoarseSourceMeshWithGhostNodes() throw(Exception)
+    {
+        EXIT_IF_PARALLEL;
+
+        // Set up mesh
+        HoneycombMeshGenerator generator(5, 5, 0);
+        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes()-1);
+
+        std::vector<unsigned> cell_location_indices;
+        for (unsigned i=0; i<cells.size(); i++)
+        {
+            cell_location_indices.push_back(i);
+        }
+
+        // Passes as the cell population constructor automatically works out which
+        // cells are ghost nodes using the mesh and cell_location_indices
+        MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, cell_location_indices);
+
+        // Set up cell data on the cell population
+        MAKE_PTR_ARGS(CellData, p_cell_data, (2));
+        p_cell_data->SetItem(0, 1.0);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
+
+        // Set up cell-based simulation
+        OffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestCoarseSourceMeshWithGhostNodes");
+        simulator.SetEndTime(0.05);
+
+        CellBasedPdeHandler<2> pde_handler(&cell_population);
+
+        // Set up PDE and pass to handler
+        AveragedSourcePde<2> pde(cell_population, 0.0);
+        ConstBoundaryCondition<2> bc(1.0);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        pde_handler.AddPdeAndBc(&pde_and_bc);
+
+        // Pass PDE handler to simulation
+        ChastePoint<2> lower(0.0, 0.0);
+        ChastePoint<2> upper(50.0, 50.0);
+        ChasteCuboid<2> cuboid(lower, upper);
+        pde_handler.UseCoarsePdeMesh(10.0, cuboid, true);
+        pde_handler.SetImposeBcsOnCoarseBoundary(false);
+        simulator.SetCellBasedPdeHandler(&pde_handler);
+
+        // Create a force law and pass it to the simulation
+        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        p_linear_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_linear_force);
+
+        TetrahedralMesh<2,2>* p_coarse_mesh = pde_handler.GetCoarsePdeMesh();
+
+        // Test FindCoarseElementContainingCell() and initialisation of mCellPdeElementMap
+        simulator.GetCellBasedPdeHandler()->InitialiseCellPdeElementMap();
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            unsigned containing_element_index = simulator.GetCellBasedPdeHandler()->mCellPdeElementMap[*cell_iter];
+            TS_ASSERT_LESS_THAN(containing_element_index, p_coarse_mesh->GetNumElements());
+            TS_ASSERT_EQUALS(containing_element_index, simulator.GetCellBasedPdeHandler()->FindCoarseElementContainingCell(*cell_iter));
+        }
+
+        // Run cell-based simulation
+        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+
+        // Test solution is constant
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+
+            double analytic_solution = 1.0;
+            // Test that PDE solver is working correctly
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), analytic_solution, 1e-2);
         }
     }
 
