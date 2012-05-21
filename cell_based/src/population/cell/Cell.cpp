@@ -208,7 +208,7 @@ boost::shared_ptr<CellData> Cell::GetCellData() const
 	 }
 	 else
 	 {
-		 ///\todo #1515 All cells should have data
+		 ///\todo #2115 All cells should have data
 		 EXCEPTION("No CellData attached to this cell");
 	 }
 }

@@ -418,7 +418,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile()
         {
             mesh_writer.AddCellData("Cell volumes", cell_volumes);
         }
-        ///\todo #1515 
+        ///\todo #1975
         // This code is commented code is because Cellwise Data can't deal with ghost nodes see #1975
         if (num_cell_data_items > 0)
         {

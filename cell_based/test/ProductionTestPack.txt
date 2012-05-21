@@ -11,7 +11,7 @@ odes/TestTysonNovak2001OdeSystem.hpp
 simulation/TestOffLatticeSimulation3d.hpp
 simulation/TestOffLatticeSimulationWithPdes.hpp
 population/TestCellKillers.hpp
-population/TestCellwiseData.hpp
+population/TestCellData.hpp
 population/TestMeshBasedCellPopulation.hpp
 population/TestNodeBasedCellPopulation.hpp
 population/TestPdeAndBoundaryConditions.hpp
