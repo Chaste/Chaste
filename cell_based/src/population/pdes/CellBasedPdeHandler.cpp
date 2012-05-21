@@ -55,7 +55,6 @@ CellBasedPdeHandler<DIM>::CellBasedPdeHandler(AbstractCellPopulation<DIM>* pCell
 {
     // We must be using a NodeBasedCellPopulation or MeshBasedCellPopulation, with at least one cell
     ///\todo change to exceptions (#1891)
-    //assert(SupportsSolvingPde());
     assert(mpCellPopulation->GetNumRealCells() != 0);
 }
 
@@ -709,17 +708,6 @@ void CellBasedPdeHandler<DIM>::OutputParameters(out_stream& rParamsFile)
     *rParamsFile << "\t\t<SetBcsOnCoarseBoundary>" << mSetBcsOnCoarseBoundary << "</SetBcsOnCoarseBoundary>\n";
     *rParamsFile << "\t\t<NumRadialIntervals>" << mNumRadialIntervals << "</NumRadialIntervals>\n";
     *rParamsFile << "\t\t</" << type << ">\n";
-}
-
-template<unsigned DIM>
-bool CellBasedPdeHandler<DIM>::SupportsSolvingPde()
-{
-    bool node_based = (dynamic_cast<NodeBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL);
-    bool mesh_based = (dynamic_cast<MeshBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL);
-    bool potts_based =(dynamic_cast<PottsBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL);
-    bool mesh_ghost = (dynamic_cast<MeshBasedCellPopulationWithGhostNodes<DIM>*>(mpCellPopulation) != NULL);
-
-    return ((node_based || mesh_based || potts_based) && !mesh_ghost);
 }
 
 template<unsigned DIM>

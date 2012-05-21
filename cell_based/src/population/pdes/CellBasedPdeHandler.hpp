@@ -144,11 +144,6 @@ protected:
     void WriteAverageRadialPdeSolution(double time);
 
     /**
-     * @return Whether the population being used supports solving a PDE
-     */
-    bool SupportsSolvingPde();
-
-    /**
      * @return Whether the population being used requires the use of separate `coarse` mesh to
      * solve PDEs
      */
@@ -273,6 +268,7 @@ public:
      *
      * @param stepSize horizontal and vertical distance between mesh points
      * @param meshCuboid the cuboid defining the size and location of the mesh.
+     * @param centreOnCellPopulation whether to centre the coarse mesh on the centre of the cell population.
      */
     virtual void UseCoarsePdeMesh(double stepSize, ChasteCuboid<DIM> meshCuboid, bool centreOnCellPopulation = false);
 
