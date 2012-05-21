@@ -44,6 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellPopulation.hpp"
 #include "PdeAndBoundaryConditions.hpp"
 #include "TetrahedralMesh.hpp"
+#include "ChasteCuboid.hpp"
 #include "Identifiable.hpp"
 
 /**
@@ -271,9 +272,9 @@ public:
      * Solve the PDE problem on a coarse mesh.
      *
      * @param stepSize horizontal and vertical distance between mesh points
-     * @param meshWidth width and height of the mesh
+     * @param meshCuboid the cuboid defining the size and location of the mesh.
      */
-    virtual void UseCoarsePdeMesh(double stepSize, double meshWidth);
+    virtual void UseCoarsePdeMesh(double stepSize, ChasteCuboid<DIM> meshCuboid, bool centreOnCellPopulation = false);
 
     /**
      * Pass a PDE and associated boundary conditions to the simulation.

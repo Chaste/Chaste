@@ -63,8 +63,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 
-#include "Debug.hpp"
-
 
 
 class SimplePdeForTesting : public AbstractLinearEllipticPde<2,2>
@@ -266,7 +264,10 @@ public:
             p_pde_handler->AddPdeAndBc(&pde_and_bc);
 
             // Test UseCoarsePdeMesh() again
-            p_pde_handler->UseCoarsePdeMesh(3.0, 9.0);
+            ChastePoint<2> lower(0.0, 0.0);
+            ChastePoint<2> upper(9.0, 9.0);
+            ChasteCuboid<2> cuboid(lower, upper);
+            p_pde_handler->UseCoarsePdeMesh(3.0, cuboid, true);
 
             // Create an output archive
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -335,7 +336,10 @@ public:
         CellBasedPdeHandler<2> pde_handler(&cell_population);
 
         // Test that UseCoarsePdeMesh() throws an exception if no PDEs are specified
-        TS_ASSERT_THROWS_THIS(pde_handler.UseCoarsePdeMesh(3.0, 9.0),
+        ChastePoint<2> lower(0.0, 0.0);
+        ChastePoint<2> upper(9.0, 9.0);
+        ChasteCuboid<2> cuboid(lower, upper);
+        TS_ASSERT_THROWS_THIS(pde_handler.UseCoarsePdeMesh(3.0, cuboid, true),
             "mPdeAndBcCollection should be populated prior to calling UseCoarsePdeMesh().");
 
         // Set up PDE and pass to handler
@@ -345,7 +349,7 @@ public:
         pde_handler.AddPdeAndBc(&pde_and_bc);
 
         // Test UseCoarsePdeMesh() again
-        pde_handler.UseCoarsePdeMesh(3.0, 9.0);
+        pde_handler.UseCoarsePdeMesh(3.0, cuboid, true);
 
         // Test that the coarse mesh has the correct number of nodes and elements
         TetrahedralMesh<2,2>* p_coarse_mesh = pde_handler.GetCoarsePdeMesh();
@@ -373,7 +377,7 @@ public:
         PdeAndBoundaryConditions<2> pde_and_bc2(&pde2, &bc2, false);
         pde_handler.AddPdeAndBc(&pde_and_bc2);
 
-        TS_ASSERT_THROWS_THIS(pde_handler.UseCoarsePdeMesh(3.0, 9.0),
+        TS_ASSERT_THROWS_THIS(pde_handler.UseCoarsePdeMesh(3.0, cuboid, true),
             "UseCoarsePdeMesh() should only be called if averaged-source PDEs are specified.");
 
         // Now test the 1D case
@@ -397,7 +401,10 @@ public:
         PdeAndBoundaryConditions<1> pde_and_bc_1d(&pde_1d, &bc_1d, false);
         pde_handler_1d.AddPdeAndBc(&pde_and_bc_1d);
 
-        pde_handler_1d.UseCoarsePdeMesh(3.0, 9.0);
+        ChastePoint<1> lower1(0.0);
+        ChastePoint<1> upper1(9.0);
+        ChasteCuboid<1> cuboid1(lower1, upper1);
+        pde_handler_1d.UseCoarsePdeMesh(3.0, cuboid1, true);
 
         // Test that the coarse mesh has the correct number of nodes and elements
         TetrahedralMesh<1,1>* p_coarse_mesh_1d = pde_handler_1d.GetCoarsePdeMesh();
@@ -425,7 +432,11 @@ public:
         PdeAndBoundaryConditions<3> pde_and_bc_3d(&pde_3d, &bc_3d, false);
         pde_handler_3d.AddPdeAndBc(&pde_and_bc_3d);
 
-        pde_handler_3d.UseCoarsePdeMesh(3.0, 9.0);
+        ChastePoint<3> lower3(0.0, 0.0, 0.0);
+        ChastePoint<3> upper3(9.0, 9.0, 9.0);
+        ChasteCuboid<3> cuboid3(lower3, upper3);
+
+        pde_handler_3d.UseCoarsePdeMesh(3.0, cuboid3, true);
 
         // Test that the coarse mesh has the correct number of nodes and elements
         TetrahedralMesh<3,3>* p_coarse_mesh_3d = pde_handler_3d.GetCoarsePdeMesh();
@@ -440,6 +451,53 @@ public:
         }
     }
 
+    void TestUseCoarsePdeMeshNotCentredOnPopulation() throw(Exception)
+    {
+        EXIT_IF_PARALLEL;
+
+        // Create a cell population
+        HoneycombMeshGenerator generator(4, 4, 0);
+        MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+        cell_population.SetMechanicsCutOffLength(1.5);
+
+        // Create a PDE handler object using this cell population
+        CellBasedPdeHandler<2> pde_handler(&cell_population);
+
+        // Test that UseCoarsePdeMesh() throws an exception if no PDEs are specified
+        ChastePoint<2> lower(0.0, 0.0);
+        ChastePoint<2> upper(9.0, 9.0);
+        ChasteCuboid<2> cuboid(lower, upper);
+
+        // Set up PDE and pass to handler
+        AveragedSourcePde<2> pde(cell_population, -0.1);
+        ConstBoundaryCondition<2> bc(1.0);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        pde_handler.AddPdeAndBc(&pde_and_bc);
+
+        // Test UseCoarsePdeMesh() again
+        pde_handler.UseCoarsePdeMesh(3.0, cuboid);
+
+        // Check that the centre of the mesh co-incides with centre of the cuboid.
+        c_vector<double,2> centre_of_coarse_mesh = zero_vector<double>(2);
+        for (unsigned i=0; i<pde_handler.GetCoarsePdeMesh()->GetNumNodes(); i++)
+        {
+            centre_of_coarse_mesh += pde_handler.GetCoarsePdeMesh()->GetNode(i)->rGetLocation();
+        }
+        centre_of_coarse_mesh /= pde_handler.GetCoarsePdeMesh()->GetNumNodes();
+
+        c_vector<double,2> centre_of_cuboid = 0.5*(lower.rGetLocation() + upper.rGetLocation());
+
+        TS_ASSERT_DELTA(norm_2(centre_of_cuboid - centre_of_coarse_mesh), 0.0,  1e-4);
+
+    }
     void TestInitialiseCellPdeElementMapAndFindCoarseElementContainingCell() throw(Exception)
     {
         EXIT_IF_PARALLEL;
@@ -473,7 +531,11 @@ public:
         pde_handler.AddPdeAndBc(&pde_and_bc);
 
         // Use a coarse PDE mesh
-        pde_handler.UseCoarsePdeMesh(3.0, 9.0);
+        ChastePoint<2> lower(0.0, 0.0);
+        ChastePoint<2> upper(9.0, 9.0);
+        ChasteCuboid<2> cuboid(lower, upper);
+
+        pde_handler.UseCoarsePdeMesh(3.0, cuboid, true);
 
         // Test that mCellPdeElementMap is initialised correctly
         pde_handler.InitialiseCellPdeElementMap();
@@ -523,7 +585,12 @@ public:
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_handler.AddPdeAndBc(&pde_and_bc);
-        pde_handler.UseCoarsePdeMesh(3.0, 9.0);
+
+        ChastePoint<2> lower(0.0, 0.0);
+        ChastePoint<2> upper(9.0, 9.0);
+        ChasteCuboid<2> cuboid(lower, upper);
+
+        pde_handler.UseCoarsePdeMesh(3.0, cuboid, true);
 
         // For coverage, call SetWriteAverageRadialPdeSolution() prior to output
         pde_handler.SetWriteAverageRadialPdeSolution(5, true);
@@ -813,7 +880,10 @@ public:
         pde_handler.AddPdeAndBc(&pde_and_bc);
 
         // Solve PDEs on a coarse mesh
-        pde_handler.UseCoarsePdeMesh(10.0, 50.0);
+        ChastePoint<2> lower(0.0, 0.0);
+        ChastePoint<2> upper(50.0, 50.0);
+        ChasteCuboid<2> cuboid(lower, upper);
+        pde_handler.UseCoarsePdeMesh(10.0, cuboid, true);
         pde_handler.SetImposeBcsOnCoarseBoundary(false);
 
         // For coverage, provide an initial guess for the solution
@@ -878,7 +948,10 @@ public:
         pde_handler.AddPdeAndBc(&pde_and_bc2);
 
         // Solve PDEs on a coarse mesh
-        pde_handler.UseCoarsePdeMesh(10.0, 50.0);
+        ChastePoint<2> lower(0.0, 0.0);
+        ChastePoint<2> upper(50.0, 50.0);
+        ChasteCuboid<2> cuboid(lower, upper);
+        pde_handler.UseCoarsePdeMesh(10.0, cuboid, true);
         pde_handler.SetImposeBcsOnCoarseBoundary(false);
 
         // Open result file ourselves
@@ -997,7 +1070,10 @@ public:
         pde_handler.AddPdeAndBc(&pde_and_bc2);
 
         // Solve PDEs on a coarse mesh
-        pde_handler.UseCoarsePdeMesh(10.0, 50.0);
+        ChastePoint<2> lower(0.0, 0.0);
+        ChastePoint<2> upper(50.0, 50.0);
+        ChasteCuboid<2> cuboid(lower, upper);
+        pde_handler.UseCoarsePdeMesh(10.0, cuboid, true);
         pde_handler.SetImposeBcsOnCoarseBoundary(false);
 
         // Test that the correct exception is thrown

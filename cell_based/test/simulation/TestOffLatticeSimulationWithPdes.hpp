@@ -665,7 +665,10 @@ public:
         pde_handler.AddPdeAndBc(&pde_and_bc2);
 
         // Pass PDE handler to simulation
-        pde_handler.UseCoarsePdeMesh(10.0, 50.0);
+        ChastePoint<2> lower(0.0, 0.0);
+        ChastePoint<2> upper(50.0, 50.0);
+        ChasteCuboid<2> cuboid(lower, upper);
+        pde_handler.UseCoarsePdeMesh(10.0, cuboid, true);
         pde_handler.SetImposeBcsOnCoarseBoundary(false);
         simulator.SetCellBasedPdeHandler(&pde_handler);
 
@@ -1239,7 +1242,10 @@ public:
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
         pde_handler.AddPdeAndBc(&pde_and_bc);
-        pde_handler.UseCoarsePdeMesh(10.0, 50.0);
+        ChastePoint<2> lower(0.0, 0.0);
+        ChastePoint<2> upper(50.0, 50.0);
+        ChasteCuboid<2> cuboid(lower, upper);
+        pde_handler.UseCoarsePdeMesh(10.0, cuboid, true);
         pde_handler.SetImposeBcsOnCoarseBoundary(false);
 
         simulator.SetCellBasedPdeHandler(&pde_handler);
@@ -1329,7 +1335,10 @@ public:
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
         pde_handler.AddPdeAndBc(&pde_and_bc);
-        pde_handler.UseCoarsePdeMesh(10.0, 50.0);
+        ChastePoint<2> lower(0.0, 0.0);
+        ChastePoint<2> upper(50.0, 50.0);
+        ChasteCuboid<2> cuboid(lower, upper);
+        pde_handler.UseCoarsePdeMesh(10.0, cuboid, true);
         //pde_handler.SetImposeBcsOnCoarseBoundary(false);
 
         simulator.SetCellBasedPdeHandler(&pde_handler);
@@ -1455,8 +1464,10 @@ public:
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
         pde_handler.AddPdeAndBc(&pde_and_bc);
-
-        pde_handler.UseCoarsePdeMesh(10.0, 50.0);
+        ChastePoint<2> lower(0.0, 0.0);
+        ChastePoint<2> upper(50.0, 50.0);
+        ChasteCuboid<2> cuboid(lower, upper);
+        pde_handler.UseCoarsePdeMesh(10.0, cuboid, true);
         pde_handler.SetImposeBcsOnCoarseBoundary(false);
         simulator.SetCellBasedPdeHandler(&pde_handler);
 
@@ -1545,7 +1556,10 @@ public:
 
         unsigned num_nodes = pow(2,3);
         double mesh_size = 2.0/(double)(num_nodes-1);
-        pde_handler.UseCoarsePdeMesh(mesh_size, 2.0);
+        ChastePoint<1> lower(0.0);
+        ChastePoint<1> upper(2.0);
+        ChasteCuboid<1> cuboid(lower, upper);
+        pde_handler.UseCoarsePdeMesh(mesh_size, cuboid, true);
 
         simulator.SetCellBasedPdeHandler(&pde_handler);
 
@@ -1632,7 +1646,10 @@ public:
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
         pde_handler.AddPdeAndBc(&pde_and_bc);
-        pde_handler.UseCoarsePdeMesh(10.0, 50.0);
+        ChastePoint<2> lower(0.0, 0.0);
+        ChastePoint<2> upper(50.0, 50.0);
+        ChasteCuboid<2> cuboid(lower, upper);
+        pde_handler.UseCoarsePdeMesh(10.0, cuboid, true);
         pde_handler.SetImposeBcsOnCoarseBoundary(false);
 
         simulator.SetCellBasedPdeHandler(&pde_handler);
@@ -1716,7 +1733,10 @@ public:
 
         CellBasedPdeHandler<3> pde_handler(&cell_population);
         pde_handler.AddPdeAndBc(&pde_and_bc);
-        pde_handler.UseCoarsePdeMesh(10.0, 50.0);
+        ChastePoint<3> lower(0.0, 0.0, 0.0);
+        ChastePoint<3> upper(50.0, 50.0, 50.0);
+        ChasteCuboid<3> cuboid(lower, upper);
+        pde_handler.UseCoarsePdeMesh(10.0, cuboid, true);
         pde_handler.SetImposeBcsOnCoarseBoundary(false);
         simulator.SetCellBasedPdeHandler(&pde_handler);
 

@@ -198,7 +198,7 @@ void CellBasedPdeHandler<DIM>::CloseResultsFiles()
 }
 
 template<unsigned DIM>
-void CellBasedPdeHandler<DIM>::UseCoarsePdeMesh(double stepSize, double meshWidth)
+void CellBasedPdeHandler<DIM>::UseCoarsePdeMesh(double stepSize, ChasteCuboid<DIM> meshCuboid, bool centreOnCellPopulation)
 {
     // If solving PDEs on a coarse mesh, each PDE must have an averaged source term
     if (mPdeAndBcCollection.empty())
@@ -218,29 +218,50 @@ void CellBasedPdeHandler<DIM>::UseCoarsePdeMesh(double stepSize, double meshWidt
     switch (DIM)
     {
         case 1:
-            mpCoarsePdeMesh->ConstructRegularSlabMesh(stepSize, meshWidth);
+            mpCoarsePdeMesh->ConstructRegularSlabMesh(stepSize, meshCuboid.GetWidth(0));
             break;
         case 2:
-            mpCoarsePdeMesh->ConstructRegularSlabMesh(stepSize, meshWidth, meshWidth);
+            mpCoarsePdeMesh->ConstructRegularSlabMesh(stepSize, meshCuboid.GetWidth(0), meshCuboid.GetWidth(1));
             break;
         case 3:
-            mpCoarsePdeMesh->ConstructRegularSlabMesh(stepSize, meshWidth, meshWidth, meshWidth);
+            mpCoarsePdeMesh->ConstructRegularSlabMesh(stepSize, meshCuboid.GetWidth(0), meshCuboid.GetWidth(1), meshCuboid.GetWidth(2));
             break;
         default:
             NEVER_REACHED;
     }
 
-    // Find the centre of the coarse PDE mesh
-    c_vector<double,DIM> centre_of_coarse_mesh = zero_vector<double>(DIM);
-    for (unsigned i=0; i<mpCoarsePdeMesh->GetNumNodes(); i++)
+    if(centreOnCellPopulation)
     {
-        centre_of_coarse_mesh += mpCoarsePdeMesh->GetNode(i)->rGetLocation();
-    }
-    centre_of_coarse_mesh /= mpCoarsePdeMesh->GetNumNodes();
+        // Find the centre of the coarse PDE mesh
+        c_vector<double,DIM> centre_of_coarse_mesh = zero_vector<double>(DIM);
+        for (unsigned i=0; i<mpCoarsePdeMesh->GetNumNodes(); i++)
+        {
+            centre_of_coarse_mesh += mpCoarsePdeMesh->GetNode(i)->rGetLocation();
+        }
+        centre_of_coarse_mesh /= mpCoarsePdeMesh->GetNumNodes();
 
-    // Translate the centre of coarse PDE mesh to the centre of the cell population
-    c_vector<double,DIM> centre_of_cell_population = mpCellPopulation->GetCentroidOfCellPopulation();
-    mpCoarsePdeMesh->Translate(centre_of_cell_population - centre_of_coarse_mesh);
+        // Translate the centre of coarse PDE mesh to the centre of the cell population
+        c_vector<double,DIM> centre_of_cell_population = mpCellPopulation->GetCentroidOfCellPopulation();
+        mpCoarsePdeMesh->Translate(centre_of_cell_population - centre_of_coarse_mesh);
+    }
+    else
+    {
+        // Get centroid of meshCuboid
+        ChastePoint<DIM> upper = meshCuboid.rGetUpperCorner();
+        ChastePoint<DIM> lower = meshCuboid.rGetLowerCorner();
+        c_vector<double,DIM> centre_of_cuboid = 0.5*(upper.rGetLocation() + lower.rGetLocation());
+
+        // Find the centre of the coarse PDE mesh
+        c_vector<double,DIM> centre_of_coarse_mesh = zero_vector<double>(DIM);
+        for (unsigned i=0; i<mpCoarsePdeMesh->GetNumNodes(); i++)
+        {
+            centre_of_coarse_mesh += mpCoarsePdeMesh->GetNode(i)->rGetLocation();
+        }
+        centre_of_coarse_mesh /= mpCoarsePdeMesh->GetNumNodes();
+
+        mpCoarsePdeMesh->Translate(centre_of_cuboid - centre_of_coarse_mesh);
+    }
+
 }
 
 template<unsigned DIM>
