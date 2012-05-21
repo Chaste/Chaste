@@ -41,6 +41,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Must be included before other cell_based headers
 #include "CellBasedSimulationArchiver.hpp"
 
+#include "NagaiHondaForce.hpp"
+#include "HoneycombVertexMeshGenerator.hpp"
+#include "MutableVertexMesh.hpp"
+#include "VertexBasedCellPopulation.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "HoneycombMeshGenerator.hpp"
@@ -1280,6 +1284,89 @@ public:
         // Test that the two centres match
         c_vector<double,2> centre_diff = centre_of_cell_population - centre_of_coarse_pde_mesh;
         TS_ASSERT_DELTA(norm_2(centre_diff), 0.0, 1e-4);
+
+        // Test FindCoarseElementContainingCell() and initialisation of mCellPdeElementMap
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+            cell_iter != cell_population.End();
+            ++cell_iter)
+        {
+            unsigned containing_element_index = simulator.GetCellBasedPdeHandler()->mCellPdeElementMap[*cell_iter];
+            TS_ASSERT_LESS_THAN(containing_element_index, p_coarse_mesh->GetNumElements());
+            TS_ASSERT_EQUALS(containing_element_index, simulator.GetCellBasedPdeHandler()->FindCoarseElementContainingCell(*cell_iter));
+        }
+    }
+
+    void TestVertexBasedWithCoarseMesh() throw(Exception)
+    {
+        EXIT_IF_PARALLEL;
+
+        /// Create a simple 2D VertexMesh
+        HoneycombVertexMeshGenerator generator(5, 3);
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Set up cell data on the cell population
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1));
+        p_cell_data->SetItem(0, 1.0);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
+
+        // Set up cell-based simulation
+        OffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestVertexBasedCellPopulationWithCoarseMeshPDE");
+        simulator.SetEndTime(0.01);
+
+        // Set up PDE and pass to simulation via handler (zero uptake to check analytic solution)
+        AveragedSourcePde<2> pde(cell_population, 0.0);
+        ConstBoundaryCondition<2> bc(1.0);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+
+        CellBasedPdeHandler<2> pde_handler(&cell_population);
+        pde_handler.AddPdeAndBc(&pde_and_bc);
+        pde_handler.UseCoarsePdeMesh(10.0, 50.0);
+        //pde_handler.SetImposeBcsOnCoarseBoundary(false);
+
+        simulator.SetCellBasedPdeHandler(&pde_handler);
+
+        // Create a force law and pass it to the simulation
+        MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
+        simulator.AddForce(p_nagai_honda_force);
+
+        // Find centre of coarse PDE mesh
+        c_vector<double,2> centre_of_coarse_pde_mesh = zero_vector<double>(2);
+        TetrahedralMesh<2,2>* p_coarse_mesh = simulator.GetCellBasedPdeHandler()->GetCoarsePdeMesh();
+        for (unsigned i=0; i<p_coarse_mesh->GetNumNodes(); i++)
+        {
+            centre_of_coarse_pde_mesh += p_coarse_mesh->GetNode(i)->rGetLocation();
+        }
+        centre_of_coarse_pde_mesh /= p_coarse_mesh->GetNumNodes();
+
+        // Find centre of cell population
+        c_vector<double,2> centre_of_cell_population = cell_population.GetCentroidOfCellPopulation();
+
+        // Test that the two centres match
+        c_vector<double,2> centre_diff = centre_of_cell_population - centre_of_coarse_pde_mesh;
+        TS_ASSERT_DELTA(norm_2(centre_diff), 0.0, 1e-4);
+
+        // Solve the system
+        simulator.Solve();
+
+        // Test solution is constant
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            double analytic_solution = 1.0;
+            // Test that PDE solver is working correctly
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), analytic_solution, 1e-2);
+        }
+
 
         // Test FindCoarseElementContainingCell() and initialisation of mCellPdeElementMap
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();

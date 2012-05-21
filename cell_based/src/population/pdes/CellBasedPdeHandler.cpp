@@ -55,7 +55,7 @@ CellBasedPdeHandler<DIM>::CellBasedPdeHandler(AbstractCellPopulation<DIM>* pCell
 {
     // We must be using a NodeBasedCellPopulation or MeshBasedCellPopulation, with at least one cell
     ///\todo change to exceptions (#1891)
-    assert(SupportsSolvingPde());
+    //assert(SupportsSolvingPde());
     assert(mpCellPopulation->GetNumRealCells() != 0);
 }
 
@@ -305,7 +305,7 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
             {
                 // Get the set of coarse element indices that contain cells
                 std::set<unsigned> coarse_element_indices_in_map;
-                for (typename AbstractCentreBasedCellPopulation<DIM>::Iterator cell_iter = mpCellPopulation->Begin();
+                for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = mpCellPopulation->Begin();
                      cell_iter != mpCellPopulation->End();
                      ++cell_iter)
                 {
