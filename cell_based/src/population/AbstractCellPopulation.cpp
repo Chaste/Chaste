@@ -245,7 +245,7 @@ CellPtr AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellUsingLocationInde
     }
     if (cells.size()==0)
     {
-        EXCEPTION("Location index input argument does not correspond to a Cell");
+    	EXCEPTION("Location index input argument does not correspond to a Cell");
     }
     else
     {

@@ -66,7 +66,7 @@ void ContactInhibitionCellCycleModel::UpdateCellCyclePhase()
 
         if (cell_volume < quiescent_volume)
         {
-            // Update the duration of the current period of hypoxia
+            // Update the duration of the current period of contact inhibition.
             mCurrentQuiescentDuration = SimulationTime::Instance()->GetTime() - mCurrentQuiescentOnsetTime;
             mG1Duration += dt;
             mpCell->AddCellProperty(CellPropertyRegistry::Instance()->Get<CellLabel>());

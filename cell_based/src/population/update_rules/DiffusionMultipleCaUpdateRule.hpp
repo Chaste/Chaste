@@ -49,6 +49,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * A diffusion update rule for use in cell-based simulations
  * using the cellular MultipleCa model.
+ *
+ * The probability of moving to an adjacent lattice site is
+ *
+ * D*delta_t/(2*delta_x*delta_x)
+ *
+ * Where D is the mDiffusionParameter.
+ * delta_t is the timestep.
+ * delta_x is the separation of the two lattice sites.
+ *
  */
 template<unsigned DIM>
 class DiffusionMultipleCaUpdateRule : public AbstractMultipleCaUpdateRule<DIM>

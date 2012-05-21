@@ -213,6 +213,24 @@ public:
     c_vector<double, DIM> GetLocationOfCellCentre(CellPtr pCell);
 
     /**
+     * Overridden AddCellUsingLocationIndex method to add a cell to a given location index.
+     * Also updates mEmptySites
+     *
+     * @param index the location index
+     * @param pCell the cell.
+     */
+    void AddCellUsingLocationIndex(unsigned index, CellPtr pCell);
+
+    /**
+     * Overridden AddCellUsingLocationIndex method to remove a cell from a given location index.
+     * Also updates mEmptySites
+     *
+     * @param index the location index
+     * @param pCell the cell.
+     */
+    void RemoveCellUsingLocationIndex(unsigned index, CellPtr pCell);
+
+    /**
      * Get a pointer to the node corresponding to a given CellPtr.
      *
      * @param pCell the cell

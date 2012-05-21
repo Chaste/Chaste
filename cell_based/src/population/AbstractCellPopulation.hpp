@@ -457,7 +457,7 @@ public:
      * @param index the location index
      * @param pCell the cell.
      */
-    void AddCellUsingLocationIndex(unsigned index, CellPtr pCell);
+    virtual void AddCellUsingLocationIndex(unsigned index, CellPtr pCell);
 
     /**
      * Removes a cell from a given location index.
@@ -465,7 +465,7 @@ public:
      * @param index the location index
      * @param pCell the cell.
      */
-    void RemoveCellUsingLocationIndex(unsigned index, CellPtr pCell);
+    virtual void RemoveCellUsingLocationIndex(unsigned index, CellPtr pCell);
 
     /**
      * Change the location index of a cell in mLocationCellMap and mCellLocationMap

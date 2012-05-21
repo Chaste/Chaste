@@ -218,6 +218,22 @@ Node<DIM>* MultipleCaBasedCellPopulation<DIM>::GetNodeCorrespondingToCell(CellPt
     return this->mrMesh.GetNode(this->GetLocationIndexUsingCell(pCell));
 }
 
+template<unsigned DIM>
+void MultipleCaBasedCellPopulation<DIM>::AddCellUsingLocationIndex(unsigned index, CellPtr pCell)
+{
+	AbstractCellPopulation<DIM,DIM>::AddCellUsingLocationIndex(index, pCell);
+
+	mEmptySites[index] = false;
+}
+
+template<unsigned DIM>
+void MultipleCaBasedCellPopulation<DIM>::RemoveCellUsingLocationIndex(unsigned index, CellPtr pCell)
+{
+	AbstractCellPopulation<DIM,DIM>::RemoveCellUsingLocationIndex(index, pCell);
+
+	mEmptySites[index] = true;
+}
+
 //template<unsigned DIM>
 //double MultipleCaBasedCellPopulation<DIM>::GetProbabilityOfDivisionIntoTargetSite(unsigned parentNodeIndex, unsigned targetIndex, unsigned numNeighbours)
 //{
@@ -301,19 +317,15 @@ unsigned MultipleCaBasedCellPopulation<DIM>::RemoveDeadCells()
     {
         if ((*cell_iter)->IsDead())
         {
-            NEVER_REACHED;
-            ///\todo #2066 - This code is not covered   
-//            // Get the index of the node corresponding to this cell
-//            unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
-//
-//            // Set this node to be an empty site
-//            mEmptySites[node_index] = true;
-//            this->RemoveCellUsingLocationIndex(node_index, (*cell_iter))
-//
-//            // Erase cell and update counter
-//            num_removed++;
-//            cell_iter = this->mCells.erase(cell_iter);
-//            --cell_iter;
+            // Get the index of the node corresponding to this cell
+            unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
+
+            RemoveCellUsingLocationIndex(node_index, (*cell_iter));
+
+            // Erase cell and update counter
+            num_removed++;
+            cell_iter = this->mCells.erase(cell_iter);
+            --cell_iter;
         }
     }
     return num_removed;
@@ -374,8 +386,15 @@ void MultipleCaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                          ++iterRule)
                     {
                     	probability_of_moving = (*iterRule)->EvaluateProbability(node_index, *iter, *this, dt, 1);
-                        assert(probability_of_moving <= 1.0); // Todo Change to exception warn about timestep and parameters
-                        assert(probability_of_moving >= 0.0); // Todo Change to exception warn about timestep and parameters
+                    	if (probability_of_moving < 0)
+                        {
+                        	EXCEPTION("The probability of cellular movement is smaller than zero. In order to prevent it from happening you should change your time step and parameters");
+                        }
+
+                        if (probability_of_moving > 1)
+                        {
+                        	EXCEPTION("The probability of the cellular movement is bigger than one. In order to prevent it from happening you should change your time step and parameters");
+                        }
                     }
 
                     probability_of_not_moving -= probability_of_moving;
@@ -386,12 +405,15 @@ void MultipleCaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
             		neighbouring_node_propensities.push_back(0.0);
             	}
 			}
-            assert(probability_of_not_moving <= 1.0); // Todo Change to exception warn about timestep and parameters
-            assert(probability_of_not_moving >= 0.0); // Todo Change to exception warn about timestep and parameters
+            if (probability_of_not_moving < 0)
+            {
+            	EXCEPTION("The probability of the cell not moving is smaller than zero. In order to prevent it from happening you should change your time step and parameters");
+            }
 
-        	/*
-        	 * \todo Rescale so sum of probabilities = 1 (make sure sum of probabilities <1)
-        	 */
+            if (probability_of_not_moving > 1)
+            {
+            	EXCEPTION("The probability of the cell not moving is bigger than one. In order to prevent it from happening you should change your time step and parameters");
+            }
 
         	/*
         	 * Sample random number to specify which move to make
@@ -403,14 +425,14 @@ void MultipleCaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
             unsigned counter = 1u;
             
             ///\todo #2066 This would be less prone to error if it were a for loop
-            while ((total_probability < random_number) && (counter < num_neighbours))
+            while ((total_probability < random_number) && (counter < num_neighbours+1))
             {
                 ///\todo #2066 At this point we need to know that counter < num_neighbours
                 total_probability += neighbouring_node_propensities[counter];
                 counter++; 
             }
 
-            if (counter < num_neighbours)///\todo #2066 Check this!
+            if (counter < num_neighbours+1)///\todo #2066 Check this!
             {
 				unsigned chosen_neighbour_location_index = neighbouring_node_indices_vector[counter-1];///\todo #2066 Check this!
 
@@ -418,9 +440,6 @@ void MultipleCaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
 				 * Move the cell to new location
 				 */
 				this->MoveCellInLocationMap((*cell_iter), node_index, chosen_neighbour_location_index);
-
-			    mEmptySites[chosen_neighbour_location_index] = false;
-			    mEmptySites[node_index] = true;
             }
             //else stay in the same location
 		}

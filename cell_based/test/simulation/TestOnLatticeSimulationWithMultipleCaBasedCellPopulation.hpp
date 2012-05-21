@@ -69,7 +69,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "DiffusionMultipleCaUpdateRule.hpp"
 
-
 //  class SimplePdeForTesting : public AbstractLinearEllipticPde<2,2>
 //    {
 //    public:
@@ -179,8 +178,14 @@ public:
     {
         EXIT_IF_PARALLEL;
 
+        // timestep and size of domain to let us calculate the probabilities of movement.
+        double delta_t = 1;
+        double diffusion_parameter = 0.1;
+        unsigned num_runs = 2000;
+        unsigned location_of_cell[9] = {0,0,0,0,0,0,0,0,0};
+
         // Create a simple 2D PottsMesh
-        PottsMeshGenerator<2> generator(5, 0, 0, 10, 0, 0);
+        PottsMeshGenerator<2> generator(3, 0, 0, 3, 0, 0);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Create cells
@@ -190,7 +195,7 @@ public:
 
         // Specify where cells lie
         std::vector<unsigned> location_indices;
-        location_indices.push_back(0u);
+        location_indices.push_back(4u);
 
         // Create cell population
         MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
@@ -199,36 +204,68 @@ public:
         OnLatticeSimulation<2> simulator(cell_population);
         std::string output_directory = "TestMultipleCaSingleCellRandomMovement";
         simulator.SetOutputDirectory(output_directory);
-        simulator.SetDt(0.1);
-        simulator.SetEndTime(40);
+        simulator.SetDt(delta_t);
+        simulator.SetEndTime(delta_t);
 
         /*
          * Adding update rule(s).
          */
         MAKE_PTR(DiffusionMultipleCaUpdateRule<2>, p_diffusion_update_rule);
-        p_diffusion_update_rule->SetDiffusionParameter(0.5);
+        p_diffusion_update_rule->SetDiffusionParameter(diffusion_parameter);
         simulator.AddMultipleCaUpdateRule(p_diffusion_update_rule);
 
-        // Run simulation
-        simulator.Solve();
+        for (unsigned i=1; i <= num_runs; i++)
+        {
+        	simulator.SetEndTime(delta_t*i);
+        	// Run simulation
+        	simulator.Solve();
 
-        // Check that the same number of cells
+        	TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 1u);
+        	AbstractCellPopulation<2>::Iterator cell_iter = simulator.rGetCellPopulation().Begin();
+
+			unsigned cell_location = simulator.rGetCellPopulation().GetLocationIndexUsingCell(*cell_iter);
+        	assert(cell_location<9);
+        	location_of_cell[cell_location]++;
+
+        	// Reset the position of the cell
+        	simulator.rGetCellPopulation().MoveCellInLocationMap(*cell_iter,cell_location,4u);
+
+			assert(simulator.rGetCellPopulation().GetLocationIndexUsingCell(*cell_iter)==4u);
+
+        }
+
+        // Check that still have only one cell
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 1u);
-
-        // Test no births or deaths
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
+
+        // TODO Check that its moving correctly
+        double probability_of_occupation[9];
+
+        for (unsigned i=0; i<9; i++)
+        {
+        	probability_of_occupation[i] = (double) location_of_cell[i]/(double) num_runs;
+        }
+
+        // Note that these simulations are stochastic o tolerances are relatively loose
+        TS_ASSERT_DELTA(probability_of_occupation[0],diffusion_parameter*delta_t/4.0, 1e-2);
+        TS_ASSERT_DELTA(probability_of_occupation[1],diffusion_parameter*delta_t/2.0, 1e-2);
+        TS_ASSERT_DELTA(probability_of_occupation[2],diffusion_parameter*delta_t/4.0, 1e-2);
+        TS_ASSERT_DELTA(probability_of_occupation[3],diffusion_parameter*delta_t/2.0, 1e-2);
+        TS_ASSERT_DELTA(probability_of_occupation[4],1.0 - 3.0 * diffusion_parameter*delta_t, 1e-2);
+        TS_ASSERT_DELTA(probability_of_occupation[5],diffusion_parameter*delta_t/2.0, 1e-2);
+        TS_ASSERT_DELTA(probability_of_occupation[6],diffusion_parameter*delta_t/4.0, 1e-2);
+        TS_ASSERT_DELTA(probability_of_occupation[7],diffusion_parameter*delta_t/2.0, 1e-2);
+        TS_ASSERT_DELTA(probability_of_occupation[8],diffusion_parameter*delta_t/4.0, 1e-2);
+
     }
-
-
-//////////////////////////////////////////////////////////////////////////////////////////
 
     void TestCaMonolayerWithBirth() throw (Exception)
     {
         EXIT_IF_PARALLEL;
 
         // Create a simple 2D PottsMesh
-        PottsMeshGenerator<2> generator(100, 0, 0, 100, 0, 0);
+        PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Create cells
@@ -238,17 +275,11 @@ public:
 
         // Specify where cells lie
         std::vector<unsigned> location_indices;
-        location_indices.push_back(1225u);
-        location_indices.push_back(1226u);
+        location_indices.push_back(50u);
+        location_indices.push_back(51u);
 
         // Create cell population
         MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
-        cell_population.SetOutputCellIdData(true);
-        cell_population.SetOutputCellMutationStates(true);
-        cell_population.SetOutputCellProliferativeTypes(true);
-        cell_population.SetOutputCellCyclePhases(true);
-        cell_population.SetOutputCellAncestors(true);
-        cell_population.SetOutputCellAges(true);
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
@@ -284,332 +315,73 @@ public:
         TS_ASSERT(vtk_file.Exists());
 
         // Final file
-        FileFinder vtk_file2(results_dir + "results_from_time_0/results_200.vtu", RelativeTo::Absolute);
+        FileFinder vtk_file2(results_dir + "results_from_time_0/results_400.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file2.Exists());
  #endif //CHASTE_VTK
 
     }
 
-//    void TestPottsMonolayerWithNonRandomSweep() throw (Exception)
-//    {
-//        // Create a simple 2D PottsMesh
-//        PottsMeshGenerator<2> generator(6, 2, 2, 6, 2, 2);
-//        PottsMesh<2>* p_mesh = generator.GetMesh();
-//
-//        // Create cells
-//        std::vector<CellPtr> cells;
-//        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-//        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), DIFFERENTIATED);
-//
-//        // Create cell population
-//        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
-//        cell_population.SetUpdateNodesInRandomOrder(false);
-//
-//        // Set up cell-based simulation
-//        OnLatticeSimulation<2> simulator(cell_population);
-//        simulator.SetOutputDirectory("TestSimplePottsMonolayerWithRandomSweep");
-//        simulator.SetEndTime(0.1);
-//
-//        // Create update rules and pass to the simulation
-//        MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
-//        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
-//        MAKE_PTR(AdhesionPottsUpdateRule<2>, p_adhesion_update_rule);
-//        simulator.AddPottsUpdateRule(p_adhesion_update_rule);
-//
-//        // Run simulation
-//        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
-//    }
-//
-//    void TestPottsMonolayerWithDeath() throw (Exception)
-//    {
-//        // Create a simple 2D PottsMesh
-//        PottsMeshGenerator<2> generator(16, 4, 4, 24, 8, 2);
-//        PottsMesh<2>* p_mesh = generator.GetMesh();
-//
-//        // Create cells
-//        std::vector<CellPtr> cells;
-//        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-//        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), DIFFERENTIATED);
-//
-//        // Create cell population
-//        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
-//
-//        // Set up cell-based simulation
-//        OnLatticeSimulation<2> simulator(cell_population);
-//        simulator.SetOutputDirectory("TestPottsMonolayerWithDeath");
-//        simulator.SetDt(0.1);
-//        simulator.SetEndTime(1.0);
-//
-//        // Create update rules and pass to the simulation
-//        MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
-//        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
-//        MAKE_PTR(AdhesionPottsUpdateRule<2>, p_adhesion_update_rule);
-//        simulator.AddPottsUpdateRule(p_adhesion_update_rule);
-//
-//        // Create cell killer and pass in to simulation
-//        c_vector<double,2> point = zero_vector<double>(2);
-//        point(1) = 16.0;
-//        c_vector<double,2> normal = zero_vector<double>(2);
-//        normal(1) = 1.0;
-//        MAKE_PTR_ARGS(PlaneBasedCellKiller<2>, p_killer, (&cell_population, point, normal));
-//        simulator.AddCellKiller(p_killer);
-//
-//        // Run simulation
-//        simulator.Solve();
-//
-//        // Check the number of cells
-//        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 20u);
-//
-//        // Test no births or deaths
-//        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
-//        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 12u);
-//    }
-//
-//
-//    void TestPottsMonolayerCellSorting() throw (Exception)
-//    {
-//        // Create a simple 2D PottsMesh
-//        PottsMeshGenerator<2> generator(30, 4, 4, 30, 4, 4);
-//        PottsMesh<2>* p_mesh = generator.GetMesh();
-//
-//        // Create cells
-//        std::vector<CellPtr> cells;
-//        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-//        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), DIFFERENTIATED);
-//
-//        // Make this pointer first as if we move it after creating the cell population the label numbers aren't tracked
-//        MAKE_PTR(CellLabel, p_label);
-//        RandomlyLabelCells(cells, p_label, 0.5);
-//
-//        // Create cell population
-//        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
-//        cell_population.SetOutputCellMutationStates(true); // So outputs the labelled cells
-//
-//        // Set up cell-based simulation
-//        OnLatticeSimulation<2> simulator(cell_population);
-//        simulator.SetOutputDirectory("TestPottsCellSorting");
-//        simulator.SetDt(0.1);
-//        simulator.SetEndTime(1.0);
-//
-//        // Create update rules and pass to the simulation
-//        MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
-//        p_volume_constraint_update_rule->SetMatureCellTargetVolume(16);
-//        p_volume_constraint_update_rule->SetDeformationEnergyParameter(0.2);
-//        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
-//
-//        MAKE_PTR(DifferentialAdhesionPottsUpdateRule<2>, p_differential_adhesion_update_rule);
-//        p_differential_adhesion_update_rule->SetLabelledCellLabelledCellAdhesionEnergyParameter(0.16);
-//        p_differential_adhesion_update_rule->SetLabelledCellCellAdhesionEnergyParameter(0.11);
-//        p_differential_adhesion_update_rule->SetCellCellAdhesionEnergyParameter(0.02);
-//        p_differential_adhesion_update_rule->SetLabelledCellBoundaryAdhesionEnergyParameter(0.16);
-//        p_differential_adhesion_update_rule->SetCellBoundaryAdhesionEnergyParameter(0.16);
-//        simulator.AddPottsUpdateRule(p_differential_adhesion_update_rule);
-//
-//        // Run simulation
-//        simulator.Solve();
-//
-//        // Check that the same number of cells
-//        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 16u);
-//
-//        // Test no births or deaths
-//        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
-//        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
-//#ifdef CHASTE_VTK
-//        //Test that VTK writer has produced some files
-//        OutputFileHandler handler("TestPottsCellSorting", false);
-//        std::string results_dir = handler.GetOutputDirectoryFullPath();
-//        // Initial condition file
-//        FileFinder vtk_file(results_dir + "results_from_time_0/results_0.vtu", RelativeTo::Absolute);
-//        TS_ASSERT(vtk_file.Exists());
-//
-//        // Final file
-//        FileFinder vtk_file2(results_dir + "results_from_time_0/results_10.vtu", RelativeTo::Absolute);
-//        TS_ASSERT(vtk_file2.Exists());
-// #endif //CHASTE_VTK
-//    }
-//
-//    void TestPottsSpheroidWithNoBirthOrDeath() throw (Exception)
-//    {
-//        // Create a simple 3D PottsMesh
-//        PottsMeshGenerator<3> generator(10, 2, 2, 10, 2, 2, 10, 2, 2);
-//        PottsMesh<3>* p_mesh = generator.GetMesh();
-//
-//        // Create cells
-//        std::vector<CellPtr> cells;
-//        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
-//        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), DIFFERENTIATED);
-//
-//        // Create cell population
-//        PottsBasedCellPopulation<3> cell_population(*p_mesh, cells);
-//
-//        // Set up cell-based simulation
-//        OnLatticeSimulation<3> simulator(cell_population);
-//        simulator.SetOutputDirectory("TestSimplePottsSpheroid");
-//        simulator.SetEndTime(1.0);
-//
-//        // Create update rules and pass to the simulation
-//        MAKE_PTR(VolumeConstraintPottsUpdateRule<3>, p_volume_constraint_update_rule);
-//        p_volume_constraint_update_rule->SetMatureCellTargetVolume(8);
-//        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
-//        MAKE_PTR(AdhesionPottsUpdateRule<3>, p_adhesion_update_rule);
-//        simulator.AddPottsUpdateRule(p_adhesion_update_rule);
-//
-//        // Run simulation
-//        simulator.Solve();
-//
-//        // Check that the same number of cells
-//        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 8u);
-//
-//        // Test no births or deaths
-//        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
-//        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
-//    }
-//
-//    void TestPottsChemotaxis() throw (Exception)
-//    {
-//        // Create a simple 3D PottsMesh
-//        PottsMeshGenerator<3> generator(12, 1, 2, 6, 1, 2, 6, 1, 2, false, true, true, true);
-//        PottsMesh<3>* p_mesh = generator.GetMesh();
-//
-//        // Create cells
-//        std::vector<CellPtr> cells;
-//        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
-//        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), DIFFERENTIATED);
-//
-//        // Create cell population
-//        PottsBasedCellPopulation<3> cell_population(*p_mesh, cells);
-//
-//        // Set up cell-based simulation
-//        OnLatticeSimulation<3> simulator(cell_population);
-//        simulator.SetOutputDirectory("TestPottsChemotaxis");
-//        simulator.SetSamplingTimestepMultiple(10);
-//        simulator.SetEndTime(50.0);
-//
-//        // Create update rules and pass to the simulation
-//        MAKE_PTR(VolumeConstraintPottsUpdateRule<3>, p_volume_constraint_update_rule);
-//        p_volume_constraint_update_rule->SetMatureCellTargetVolume(8);
-//        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
-//        MAKE_PTR(AdhesionPottsUpdateRule<3>, p_adhesion_update_rule);
-//        simulator.AddPottsUpdateRule(p_adhesion_update_rule);
-//        MAKE_PTR(ChemotaxisPottsUpdateRule<3>, p_chemotaxis_update_rule);
-//        simulator.AddPottsUpdateRule(p_chemotaxis_update_rule);
-//
-//        // Run simulation
-//        simulator.Solve();
-//
-//        // Check that the same number of cells
-//        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 1u);
-//
-//        // Test no births or deaths
-//        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
-//        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
-//    }
-//
-//
-//    void TestRandomIterationOverUpdateRules() throw (Exception)
-//    {
-//        // Create a simple 2D PottsMesh
-//        PottsMeshGenerator<2> generator(8, 1, 4, 10, 1, 4);
-//        PottsMesh<2>* p_mesh = generator.GetMesh();
-//
-//        // Create cells
-//        std::vector<CellPtr> cells;
-//        CellsGenerator<StochasticDurationGenerationBasedCellCycleModel, 2> cells_generator;
-//        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), STEM);
-//
-//        // Create cell population
-//        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
-//        cell_population.SetIterateRandomlyOverUpdateRuleCollection(true);
-//
-//        // Set up cell-based simulation
-//        OnLatticeSimulation<2> simulator(cell_population);
-//        simulator.SetOutputDirectory("TestPottsMonolayerWithBirth");
-//        simulator.SetDt(0.1);
-//        simulator.SetEndTime(20);
-//        simulator.SetSamplingTimestepMultiple(20);
-//
-//        // Create update rules and pass to the simulation
-//        MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
-//        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
-//        MAKE_PTR(AdhesionPottsUpdateRule<2>, p_adhesion_update_rule);
-//        simulator.AddPottsUpdateRule(p_adhesion_update_rule);
-//
-//        // Run simulation
-//        simulator.Solve();
-//
-//        // Check the number of cells
-//        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 3u);
-//
-//        // Test no deaths and some births
-//        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 2u);
-//        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
-//    }
-//
-//    void TestPottsSpheroidCellSorting() throw (Exception)
-//    {
-//        // Create a simple 3D PottsMesh
-//        unsigned domain_size = 10;
-//        unsigned element_number = 4;
-//        unsigned element_size = 2;
-//
-//        PottsMeshGenerator<3> generator(domain_size, element_number, element_size, domain_size, element_number, element_size, domain_size, element_number, element_size);
-//        PottsMesh<3>* p_mesh = generator.GetMesh();
-//
-//        // Create cells
-//        std::vector<CellPtr> cells;
-//        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
-//        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), DIFFERENTIATED);
-//
-//        // Make this pointer first as if we move it after creating the cell population the label numbers aren't tracked
-//        MAKE_PTR(CellLabel, p_label);
-//        RandomlyLabelCells(cells, p_label, 0.5);
-//
-//        // Create cell population
-//        PottsBasedCellPopulation<3> cell_population(*p_mesh, cells);
-//        cell_population.SetOutputCellMutationStates(true); // So outputs the labelled cells
-//
-//        // Set up cell-based simulation
-//        OnLatticeSimulation<3> simulator(cell_population);
-//        simulator.SetOutputDirectory("TestPotts3DCellSorting");
-//        simulator.SetDt(0.1);
-//        simulator.SetEndTime(1.0);
-//
-//        // Create update rules and pass to the simulation
-//        MAKE_PTR(VolumeConstraintPottsUpdateRule<3>, p_volume_constraint_update_rule);
-//        p_volume_constraint_update_rule->SetMatureCellTargetVolume(element_size*element_size*element_size);
-//        p_volume_constraint_update_rule->SetDeformationEnergyParameter(0.2);
-//        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
-//
-//        MAKE_PTR(DifferentialAdhesionPottsUpdateRule<3>, p_differential_adhesion_update_rule);
-//        p_differential_adhesion_update_rule->SetLabelledCellLabelledCellAdhesionEnergyParameter(0.16);
-//        p_differential_adhesion_update_rule->SetLabelledCellCellAdhesionEnergyParameter(0.11);
-//        p_differential_adhesion_update_rule->SetCellCellAdhesionEnergyParameter(0.02);
-//        p_differential_adhesion_update_rule->SetLabelledCellBoundaryAdhesionEnergyParameter(0.16);
-//        p_differential_adhesion_update_rule->SetCellBoundaryAdhesionEnergyParameter(0.16);
-//        simulator.AddPottsUpdateRule(p_differential_adhesion_update_rule);
-//
-//        // Run simulation
-//        simulator.Solve();
-//
-//        // Check that the same number of cells
-//        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 64u);
-//
-//        // Test no births or deaths
-//        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
-//        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
-//#ifdef CHASTE_VTK
-//        //Test that VTK writer has produced some files
-//        OutputFileHandler handler("TestPotts3DCellSorting", false);
-//        std::string results_dir = handler.GetOutputDirectoryFullPath();
-//        // Initial condition file
-//        FileFinder vtk_file(results_dir + "results_from_time_0/results_0.vtu", RelativeTo::Absolute);
-//        TS_ASSERT(vtk_file.Exists());
-//
-//        // Final file
-//        FileFinder vtk_file2(results_dir + "results_from_time_0/results_10.vtu", RelativeTo::Absolute);
-//        TS_ASSERT(vtk_file2.Exists());
-// #endif //CHASTE_VTK
-//    }
+    void TestCaMonolayerWithDeath() throw (Exception)
+    {
+        EXIT_IF_PARALLEL;
+
+
+        // Create a simple 2D PottsMesh
+        PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), DIFFERENTIATED);
+
+        // Specify where cells lie
+        std::vector<unsigned> location_indices;
+        for (unsigned index=0; index<p_mesh->GetNumNodes(); index++)
+        {
+        	location_indices.push_back(index);
+        }
+        TS_ASSERT_EQUALS(location_indices.size(),p_mesh->GetNumNodes());
+
+        // Create cell population
+        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+
+        // Set up cell-based simulation
+        OnLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestMultipleCaMonolayerWithDeath");
+        simulator.SetDt(0.1);
+        simulator.SetEndTime(0.1); //only one step as only care about cells being killed
+
+        // No movement rule as only care about cell death
+
+        // Add a cell Killer that will kill all cells in the top half of the domain
+        MAKE_PTR_ARGS(PlaneBasedCellKiller<2>, p_killer, (&cell_population, 4.5*unit_vector<double>(2,1), unit_vector<double>(2,1))); //v>4.5
+        simulator.AddCellKiller(p_killer);
+
+        // Run simulation
+        simulator.Solve();
+
+        // Check the number of cells
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 50u);
+
+        // Test no deaths and some births
+        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
+        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 50u);
+
+        // Check cells above y=5.5 (i.e. above index 50) have been killed and removed.
+        for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+        {
+        	if(i<50)
+        	{
+        		TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetCellUsingLocationIndex(i)->GetCellId(),31+i);
+        	}
+        	else
+        	{
+        		TS_ASSERT_THROWS_THIS(simulator.rGetCellPopulation().GetCellUsingLocationIndex(i),"Location index input argument does not correspond to a Cell");
+        	}
+        }
+    }
+
 //
 //    void TestStandardResultForArchivingTestsBelow() throw (Exception)
 //    {
