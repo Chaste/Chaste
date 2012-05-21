@@ -68,6 +68,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "AbstractCellPopulation.hpp"
 
+#include "Debug.hpp"
+
 class SimplePdeForTesting : public AbstractLinearEllipticPde<2,2>
 {
 public:
@@ -329,10 +331,22 @@ public:
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
         pde_handler.AddPdeAndBc(&pde_and_bc);
+
+        // Create coarse mesh and centre it on the centre of the Potts Mesh
+        c_vector<double,2> centre_of_potts_mesh = zero_vector<double>(2);
+        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        {
+            centre_of_potts_mesh += p_mesh->GetNode(i)->rGetLocation();
+        }
+        centre_of_potts_mesh /= p_mesh->GetNumNodes();
         ChastePoint<2> lower(0.0, 0.0);
         ChastePoint<2> upper(50.0, 50.0);
+
+        c_vector<double, 2> translation = 0.5*(lower.rGetLocation() + upper.rGetLocation()) - centre_of_potts_mesh;
+        lower.rGetLocation() -= translation;
+        upper.rGetLocation() -= translation;
         ChasteCuboid<2> cuboid(lower, upper);
-        pde_handler.UseCoarsePdeMesh(10.0, cuboid, true);
+        pde_handler.UseCoarsePdeMesh(10.0, cuboid);
         pde_handler.SetImposeBcsOnCoarseBoundary(true);
 
         simulator.SetCellBasedPdeHandler(&pde_handler);
@@ -355,15 +369,6 @@ public:
             TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), analytic_solution, 1e-2);
         }
 
-        // Find centre of cell population
-        c_vector<double,2> centre_of_cell_population = zero_vector<double>(2);
-
-        for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
-        {
-            centre_of_cell_population += simulator.rGetCellPopulation().GetNode(i)->rGetLocation();
-        }
-        centre_of_cell_population /= simulator.rGetCellPopulation().GetNumNodes();
-
         // Find centre of coarse PDE mesh
         c_vector<double,2> centre_of_coarse_pde_mesh = zero_vector<double>(2);
         TetrahedralMesh<2,2>* p_coarse_mesh = simulator.GetCellBasedPdeHandler()->GetCoarsePdeMesh();
@@ -372,9 +377,9 @@ public:
             centre_of_coarse_pde_mesh += p_coarse_mesh->GetNode(i)->rGetLocation();
         }
         centre_of_coarse_pde_mesh /= p_coarse_mesh->GetNumNodes();
+        c_vector<double,2> centre_diff = centre_of_coarse_pde_mesh - centre_of_potts_mesh;
 
         // Test that the two centres match
-        c_vector<double,2> centre_diff = centre_of_cell_population - centre_of_coarse_pde_mesh;
         TS_ASSERT_DELTA(norm_2(centre_diff), 0.0, 1e-4);
 
         // Test FindCoarseElementContainingCell() and initialisation of mCellPdeElementMap
