@@ -391,6 +391,17 @@ public:
             TS_ASSERT_LESS_THAN(containing_element_index, p_coarse_mesh->GetNumElements());
             TS_ASSERT_EQUALS(containing_element_index, simulator.GetCellBasedPdeHandler()->FindCoarseElementContainingCell(*cell_iter));
         }
+
+        // Test solution is constant
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            double analytic_solution = 1.0;
+
+            // Test that PDE solver is working correctly on both pdes
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), analytic_solution, 1e-2);
+        }
     }
 
     void TestPottsBasedWithCoarseMeshTwoEquations() throw(Exception)
