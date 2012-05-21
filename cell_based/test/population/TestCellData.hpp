@@ -43,21 +43,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fstream>
 
+#include "AbstractCellBasedTestSuite.hpp"
+#include "MeshBasedCellPopulation.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "ArchiveOpener.hpp"
-#include "ArchiveLocationInfo.hpp"
-#include "VertexBasedCellPopulation.hpp"
-#include "HoneycombVertexMeshGenerator.hpp"
-#include "MeshBasedCellPopulationWithGhostNodes.hpp"
-#include "HoneycombMeshGenerator.hpp"
-#include "AbstractCellBasedTestSuite.hpp"
-#include "WildTypeCellMutationState.hpp"
-#include "ApcOneHitCellMutationState.hpp"
-#include "ApcTwoHitCellMutationState.hpp"
-#include "BetaCateninOneHitCellMutationState.hpp"
-#include "CellLabel.hpp"
-#include "SmartPointers.hpp"
+
 
 /**
  * This class contains tests for methods on the cell property CellData.
@@ -127,7 +118,7 @@ public:
             cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
             // Create a cell population
-            MeshBasedCellPopulation<2>* p_cell_population = new MeshBasedCellPopulation<2>(mesh, cells);
+            MeshBasedCellPopulation<2>* const p_cell_population = new MeshBasedCellPopulation<2>(mesh, cells);
 
             MAKE_PTR_ARGS(CellData, p_cell_data, (1));
             p_cell_data->SetItem(0, DOUBLE_UNSET);
