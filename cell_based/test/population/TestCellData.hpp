@@ -80,24 +80,37 @@ public:
         p_cell_data->SetItem(1, DOUBLE_UNSET);
         cell_population.AddClonedDataToAllCells(p_cell_data);
 
+        //First cell
         AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
         cell_iter->GetCellData()->SetItem(0, 1.23);
         TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), 1.23, 1e-12);
 
+        //Second cell
         ++cell_iter;
         cell_iter->GetCellData()->SetItem(0, 2.23);
         TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), 2.23, 1e-12);
-
 
         cell_iter->GetCellData()->SetItem(1, 3.23);
         TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(1), 3.23, 1e-12);
 
         TS_ASSERT_THROWS_THIS(cell_iter->GetCellData()->GetItem(2),
-                    "Request for variable above the number of variables stored.");
+                    "The item Var2 is not stored");
 
-        // Other values should have been initialised to zero
+        //Third cell
+        // All values should have been initialised using the "UNSET" clone above
         ++cell_iter;
-        TS_ASSERT_THROWS_THIS(cell_iter->GetCellData()->GetItem(0),"SetItem must be called before using GetItem");
+        TS_ASSERT_THROWS_THIS(cell_iter->GetCellData()->GetItem(0),"The item Var0 has not yet been set");
+        //New overloaded methods
+        cell_iter->GetCellData()->SetItem("Var0", 1.23);
+        TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("Var0"), 1.23, 1e-12);
+        TS_ASSERT_EQUALS(cell_iter->GetCellData()->GetNumItems(), 2u);
+        cell_iter->GetCellData()->SetItem("NotVar0", 0.23);
+        TS_ASSERT_EQUALS(cell_iter->GetCellData()->GetNumItems(), 3u);
+        TS_ASSERT_THROWS_THIS(cell_iter->GetCellData()->GetItem("Dave"),
+                    "The item Dave is not stored");
+        TS_ASSERT_EQUALS(cell_iter->GetCellData()->GetNumItems(), 3u);
+
+
     }
 
 

@@ -37,31 +37,31 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CELLDATA_HPP_
 
 #include <boost/shared_ptr.hpp>
+#include <map>
+#include <string>
+
 #include "AbstractCellProperty.hpp"
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
-#include <boost/serialization/vector.hpp>
+#include <boost/serialization/map.hpp>
 #include "Exception.hpp"
 
 class CellData;
 
 /**
- * Cell id class.
+ * CellData class.
  *
- * Each Cell owns a CellPropertyCollection, which may include a shared pointer
- * to an object of this type. When a Cell divides a new object is created with
- * the new cell id.
+ * Each Cell owns a CellData property
  *
- * The CellData object that stores the value of a the cell identifier.
  */
 class CellData : public AbstractCellProperty
 {
 private:
 
     /**
-     * Cell Id
+     * Cell data
      */
-    std::vector<double> mCellData;
+    std::map<std::string, double> mCellData;
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -90,7 +90,7 @@ public:
     /**
      * Constructor.
      *
-     * @param numVariables the number of variables to be stored of the ancestor of this cell.
+     * @param numVariables the number of variables to be stored in this cell (NOW IGNORED).
      */
     CellData(unsigned numVariables);
 
@@ -101,6 +101,7 @@ public:
 
     /**
      * This assigns the cell data.
+     * \todo #2115 This method is to be deprecated.
      * 
      * @param variableNumber the index of the data to be set.
      * @param data the value to set it to.
@@ -108,11 +109,27 @@ public:
     void SetItem(unsigned variableNumber, double data);
 
     /**
+     * This assigns the cell data.
+     *
+     * @param variableName the index of the data to be set.
+     * @param data the value to set it to.
+     */
+    void SetItem(const std::string& variableName, double data);
+
+    /**
      * Get data.
+     * \todo #2115 This method is to be deprecated.
      * 
      * @param variableNumber the index of the data required.
      */
     double GetItem(unsigned variableNumber) const;
+
+    /**
+     * Get data.
+     *
+     * @param variableName the index of the data required.
+     */
+    double GetItem(const std::string& variableName) const;
 
     /**
      * Get number of data items

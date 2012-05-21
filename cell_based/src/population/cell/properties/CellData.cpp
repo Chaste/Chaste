@@ -33,38 +33,76 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+
 #include "CellData.hpp"
 
 CellData::CellData(unsigned numVariables)
     : AbstractCellProperty()
+///\todo #2115 numVariables is now ignored
 {
-    mCellData.assign(numVariables, DBL_MAX);
 }
 
 CellData::~CellData()
 {
 }
 
+void CellData::SetItem(const std::string& variableName, double data)
+{
+    mCellData[variableName] = data;
+}
+
 void CellData::SetItem(unsigned variableNumber, double data)
 {
-    if (variableNumber >= mCellData.size())
+    switch (variableNumber)
     {
-        EXCEPTION("Attempted to set a variable above the number of variables stored.");
+        case 0:
+            SetItem("Var0", data);
+            break;
+        case 1:
+            SetItem("Var1", data);
+            break;
+        case 2:
+            SetItem("Var2", data);
+            break;
+        default:
+            NEVER_REACHED;
     }
-    mCellData[variableNumber] = data;
+}
+
+double CellData::GetItem(const std::string& variableName) const
+{
+    //Note that mCellData[variableName] is not const.
+    //If variableName is not a key, then mCellData[variableName] will create a new item in the map
+    //and increase the size by one.  Using a const_iterator ensures that the map remains const.
+    std::map<std::string, double>::const_iterator it = mCellData.find(variableName);
+    if (it == mCellData.end())
+    {
+        EXCEPTION("The item " << variableName << " is not stored");
+    }
+    if (it->second == DOUBLE_UNSET)
+    {
+        EXCEPTION("The item " << variableName << " has not yet been set");
+    }
+    return(it->second);
 }
 
 double CellData::GetItem(unsigned variableNumber) const
 {
-    if (variableNumber >= mCellData.size())
+    switch (variableNumber)
     {
-        EXCEPTION("Request for variable above the number of variables stored.");
+        case 0:
+            return GetItem("Var0");
+            break;
+        case 1:
+            return GetItem("Var1");
+            break;
+        case 2:
+            return GetItem("Var2");
+            break;
+        default:
+            NEVER_REACHED;
     }
-	if (mCellData[variableNumber]==DBL_MAX)
-	{
-		EXCEPTION("SetItem must be called before using GetItem");
-	}
-    return mCellData[variableNumber];
+
 }
 
 unsigned CellData::GetNumItems() const
