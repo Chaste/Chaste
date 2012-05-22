@@ -95,7 +95,7 @@ MultipleCaBasedCellPopulation<DIM>::MultipleCaBasedCellPopulation(PottsMesh<DIM>
         for (unsigned i=0; i<locationIndices.size(); i++)
         {
             mAvailableSpaces[locationIndices[i]]--;
-            if (mAvailableSpaces[locationIndices[i]] < 0)
+            if (mAvailableSpaces[locationIndices[i]] < 0u)
             {
             	EXCEPTION("One of the lattice sites has more cells than the carrying capacity. Check the initial cell locations.");
             }
@@ -201,7 +201,7 @@ void MultipleCaBasedCellPopulation<DIM>::AddCellUsingLocationIndex(unsigned inde
 
 	mAvailableSpaces[index]--;
 
-	assert(mAvailableSpaces[index]>=0);
+	assert(mAvailableSpaces[index]>=0u);
 }
 
 template<unsigned DIM>
