@@ -160,9 +160,9 @@ public:
          */
 
         MAKE_PTR_ARGS(CellData, p_cell_data, (3)); 
-        p_cell_data->SetItem(0, DOUBLE_UNSET);
-        p_cell_data->SetItem(1, DOUBLE_UNSET);
-        p_cell_data->SetItem(2, DOUBLE_UNSET);
+        p_cell_data->SetItem("notch", DOUBLE_UNSET);
+        p_cell_data->SetItem("delta", DOUBLE_UNSET);
+        p_cell_data->SetItem("mean delta", DOUBLE_UNSET);
         cell_population.AddClonedDataToAllCells(p_cell_data);
 
         /* We choose to initialise the concentrations to random levels in each cell. */
@@ -170,9 +170,9 @@ public:
              cell_iter != cell_population.End();
              ++cell_iter)
         {
-            cell_iter->GetCellData()->SetItem(0, RandomNumberGenerator::Instance()->ranf());
-            cell_iter->GetCellData()->SetItem(1, RandomNumberGenerator::Instance()->ranf());
-            cell_iter->GetCellData()->SetItem(2, RandomNumberGenerator::Instance()->ranf());
+            cell_iter->GetCellData()->SetItem("notch", RandomNumberGenerator::Instance()->ranf());
+            cell_iter->GetCellData()->SetItem("delta", RandomNumberGenerator::Instance()->ranf());
+            cell_iter->GetCellData()->SetItem("mean delta", RandomNumberGenerator::Instance()->ranf());
         }
 
         /* We are now in a position to create and configure the cell-based simulation object, pass a force law to it,
@@ -242,9 +242,9 @@ public:
         cell_population.SetOutputCellAges(true);
 
         MAKE_PTR_ARGS(CellData, p_cell_data, (3)); 
-        p_cell_data->SetItem(0, DOUBLE_UNSET);
-        p_cell_data->SetItem(1, DOUBLE_UNSET);
-        p_cell_data->SetItem(2, DOUBLE_UNSET);
+        p_cell_data->SetItem("notch", DOUBLE_UNSET);
+        p_cell_data->SetItem("delta", DOUBLE_UNSET);
+        p_cell_data->SetItem("mean delta", DOUBLE_UNSET);
         cell_population.AddClonedDataToAllCells(p_cell_data);
 
         /* We choose to initialise the concentrations to random levels in each cell. */
@@ -252,9 +252,9 @@ public:
              cell_iter != cell_population.End();
              ++cell_iter)
         {
-            cell_iter->GetCellData()->SetItem(0, RandomNumberGenerator::Instance()->ranf());
-            cell_iter->GetCellData()->SetItem(1, RandomNumberGenerator::Instance()->ranf());
-            cell_iter->GetCellData()->SetItem(2, RandomNumberGenerator::Instance()->ranf());
+            cell_iter->GetCellData()->SetItem("notch", RandomNumberGenerator::Instance()->ranf());
+            cell_iter->GetCellData()->SetItem("delta", RandomNumberGenerator::Instance()->ranf());
+            cell_iter->GetCellData()->SetItem("mean delta", RandomNumberGenerator::Instance()->ranf());
         }
 
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);

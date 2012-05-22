@@ -122,7 +122,7 @@ void DeltaNotchCellCycleModel::UpdateDeltaNotch()
     assert(mpOdeSystem != NULL);
     assert(mpCell != NULL);
 
-    double mean_delta = mpCell->GetCellData()->GetItem(0);
+    double mean_delta = mpCell->GetCellData()->GetItem("notch"); ///\todo #1995 This is erroneous.  It obviously ought to be "mean delta" 
 
     mpOdeSystem->rGetStateVariables()[2] = mean_delta;
 

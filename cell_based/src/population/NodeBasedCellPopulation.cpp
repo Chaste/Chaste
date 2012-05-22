@@ -454,10 +454,12 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
     std::vector<std::vector<double> > cellwise_data;
 
     unsigned num_cell_data_items = 0;
+    std::vector<std::string> cell_data_names;
     if (this->Begin()->HasCellData())
     {
         //We assume that the first cell is representative of all cells
         num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+        cell_data_names = this->Begin()->GetCellData()->GetKeys();
     }
 
     for (unsigned var=0; var<num_cell_data_items; var++)
@@ -508,7 +510,7 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
 
         for (unsigned var=0; var<num_cell_data_items; var++)
         {
-            cellwise_data[var][node_index] =  cell_iter->GetCellData()->GetItem(var);
+            cellwise_data[var][node_index] = cell_iter->GetCellData()->GetItem(cell_data_names[var]); 
         }
 
     }
@@ -541,10 +543,7 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
     {
         for (unsigned var=0; var<cellwise_data.size(); var++)
         {
-            std::stringstream data_name;
-            data_name << "Cellwise data " << var;
-            std::vector<double> cellwise_data_var = cellwise_data[var];
-            mesh_writer.AddPointData(data_name.str(), cellwise_data_var);
+            mesh_writer.AddPointData(cell_data_names[var], cellwise_data[var]);
         }
     }
 

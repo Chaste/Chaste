@@ -117,9 +117,9 @@ public:
 
         // Create and initialize CellData
         MAKE_PTR_ARGS(CellData, p_cell_data, (3)); 
-        p_cell_data->SetItem(0, DOUBLE_UNSET);
-        p_cell_data->SetItem(1, DOUBLE_UNSET);
-        p_cell_data->SetItem(2, DOUBLE_UNSET);
+        p_cell_data->SetItem("notch", DOUBLE_UNSET);
+        p_cell_data->SetItem("delta", DOUBLE_UNSET);
+        p_cell_data->SetItem("mean delta", DOUBLE_UNSET);
         cell_population.AddClonedDataToAllCells(p_cell_data);
 
         // Create and configure cell-based simulation
@@ -133,7 +133,7 @@ public:
         simulator.AddForce(p_force);
 
         // Run simulation
-        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        simulator.Solve();
 
         // Check levels in cell 0 ///\todo see #1995
 //        TS_ASSERT_DELTA(p_data->GetValue(cells[0],0),0.9384,1e-4);
@@ -183,9 +183,9 @@ public:
 
         // Create and initialize CellData
         MAKE_PTR_ARGS(CellData, p_cell_data, (3)); 
-        p_cell_data->SetItem(0, DOUBLE_UNSET);
-        p_cell_data->SetItem(1, DOUBLE_UNSET);
-        p_cell_data->SetItem(2, DOUBLE_UNSET);
+        p_cell_data->SetItem("notch", DOUBLE_UNSET);
+        p_cell_data->SetItem("delta", DOUBLE_UNSET);
+        p_cell_data->SetItem("mean delta", DOUBLE_UNSET);
         cell_population.AddClonedDataToAllCells(p_cell_data);
 
 		// Create and configure cell-based simulation
@@ -201,18 +201,18 @@ public:
 		// Get the cell
 
 
-		TS_ASSERT_DELTA(cells[0]->GetCellData()->GetItem(0), cells[1]->GetCellData()->GetItem(0), 1e-4);
-		TS_ASSERT_DELTA(cells[0]->GetCellData()->GetItem(1), cells[1]->GetCellData()->GetItem(1), 1e-4);
+		TS_ASSERT_DELTA(cells[0]->GetCellData()->GetItem("notch"), cells[1]->GetCellData()->GetItem("notch"), 1e-4);
+		TS_ASSERT_DELTA(cells[0]->GetCellData()->GetItem("delta"), cells[1]->GetCellData()->GetItem("delta"), 1e-4);
 
 		for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
 				cell_iter != cell_population.End();
 				++cell_iter)
 		{
 			// Check the values agree with solutions obtained from Matlab
-			TS_ASSERT_DELTA((*cell_iter)->GetCellData()->GetItem(0), 0.9999, 1e-4);
+			TS_ASSERT_DELTA((*cell_iter)->GetCellData()->GetItem("notch"), 0.9999, 1e-4);
 
 			///\todo This fails because the state variables do not appear to be being updated properly see #1995
-			//TS_ASSERT_DELTA((*cell_iter)->GetCellData()->GetItem(1), 0.9901, 1e-4);
+			//TS_ASSERT_DELTA((*cell_iter)->GetCellData()->GetItem("delta"), 0.9901, 1e-4);
 		}
 
 		// Tidy up
@@ -282,9 +282,9 @@ public:
 
         // Create and initialise CellData
         MAKE_PTR_ARGS(CellData, p_cell_data, (3));
-        p_cell_data->SetItem(0, DOUBLE_UNSET);
-        p_cell_data->SetItem(1, DOUBLE_UNSET);
-        p_cell_data->SetItem(2, DOUBLE_UNSET);
+        p_cell_data->SetItem("notch", DOUBLE_UNSET);
+        p_cell_data->SetItem("delta", DOUBLE_UNSET);
+        p_cell_data->SetItem("mean delta", DOUBLE_UNSET);
         cell_population.AddClonedDataToAllCells(p_cell_data);
 
         // Set up the simulation
@@ -378,9 +378,9 @@ public:
 
         // Create and initialize CellData
         MAKE_PTR_ARGS(CellData, p_cell_data, (3));
-        p_cell_data->SetItem(0, DOUBLE_UNSET);
-        p_cell_data->SetItem(1, DOUBLE_UNSET);
-        p_cell_data->SetItem(2, DOUBLE_UNSET);
+        p_cell_data->SetItem("notch", DOUBLE_UNSET);
+        p_cell_data->SetItem("delta", DOUBLE_UNSET);
+        p_cell_data->SetItem("mean delta", DOUBLE_UNSET);
         cell_population.AddClonedDataToAllCells(p_cell_data);
 
         // Set up the simulation
@@ -442,9 +442,9 @@ public:
 
         // Create and initialize CellData
         MAKE_PTR_ARGS(CellData, p_cell_data, (3)); 
-        p_cell_data->SetItem(0, DOUBLE_UNSET);
-        p_cell_data->SetItem(1, DOUBLE_UNSET);
-        p_cell_data->SetItem(2, DOUBLE_UNSET);
+        p_cell_data->SetItem("notch", DOUBLE_UNSET);
+        p_cell_data->SetItem("delta", DOUBLE_UNSET);
+        p_cell_data->SetItem("mean delta", DOUBLE_UNSET);
         cell_population.AddClonedDataToAllCells(p_cell_data);
 
         // Create and configure cell-based simulation
@@ -493,9 +493,9 @@ public:
 
         // Create and initialize CellData
         MAKE_PTR_ARGS(CellData, p_cell_data, (3)); 
-        p_cell_data->SetItem(0, DOUBLE_UNSET);
-        p_cell_data->SetItem(1, DOUBLE_UNSET);
-        p_cell_data->SetItem(2, DOUBLE_UNSET);
+        p_cell_data->SetItem("notch", DOUBLE_UNSET);
+        p_cell_data->SetItem("delta", DOUBLE_UNSET);
+        p_cell_data->SetItem("mean delta", DOUBLE_UNSET);
         cell_population.AddClonedDataToAllCells(p_cell_data);
 
         // Create and configure cell-based simulation
@@ -545,9 +545,9 @@ public:
 
         // Create and initialize CellData
         MAKE_PTR_ARGS(CellData, p_cell_data, (3)); 
-        p_cell_data->SetItem(0, DOUBLE_UNSET);
-        p_cell_data->SetItem(1, DOUBLE_UNSET);
-        p_cell_data->SetItem(2, DOUBLE_UNSET);
+        p_cell_data->SetItem("notch", DOUBLE_UNSET);
+        p_cell_data->SetItem("delta", DOUBLE_UNSET);
+        p_cell_data->SetItem("mean delta", DOUBLE_UNSET);
         cell_population.AddClonedDataToAllCells(p_cell_data);
 
         // Create and configure cell-based simulation

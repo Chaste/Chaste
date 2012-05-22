@@ -62,7 +62,7 @@ public:
         p_stem_model->SetCellProliferativeType(STEM);
         p_stem_model->SetDimension(2);
         MAKE_PTR_ARGS(CellData, p_stem_cell_data, (1));
-        p_stem_cell_data->SetItem(0, 0.0);
+        p_stem_cell_data->SetItem("notch", 0.0); ///\todo #1995 "mean delta"
 
         // Change G1 duration for this model
         p_stem_model->SetStemCellG1Duration(1.0);
@@ -71,7 +71,7 @@ public:
         p_transit_model->SetCellProliferativeType(TRANSIT);
         p_transit_model->SetDimension(3);
         MAKE_PTR_ARGS(CellData, p_transit_cell_data, (1));
-        p_transit_cell_data->SetItem(0, 0.0);
+        p_transit_cell_data->SetItem("notch", 0.0); ///\todo #1995 "mean delta"
 
         // Change G1 duration for this model
         p_stem_model->SetTransitCellG1Duration(1.0);  ///\todo Is this a copy and paste error?
@@ -80,7 +80,7 @@ public:
         p_diff_model->SetCellProliferativeType(DIFFERENTIATED);
         p_diff_model->SetDimension(1);
         MAKE_PTR_ARGS(CellData, p_diff_cell_data, (1));
-        p_diff_cell_data->SetItem(0, 0.0);
+        p_diff_cell_data->SetItem("notch", 0.0); ///\todo #1995 "mean delta"
 
 
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
@@ -140,7 +140,7 @@ public:
 
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
             MAKE_PTR_ARGS(CellData, p_cell_data, (1));
-            p_cell_data->SetItem(0, 0.0);
+            p_cell_data->SetItem("notch", 0.0); ///\todo #1995 "mean delta"
             p_cell->AddCellProperty(p_cell_data);
 
             p_cell->InitialiseCellCycleModel();

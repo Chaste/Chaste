@@ -80,8 +80,8 @@ void DeltaNotchOffLatticeSimulation<DIM>::UpdateCellData()
         double this_notch = p_model->GetNotch();
 
         // Note that the state variables must be in the same order as listed in DeltaNotchOdeSystem
-        cell_iter->GetCellData()->SetItem(0, this_notch);
-        cell_iter->GetCellData()->SetItem(1, this_delta);///\todo Warning Elsewhere we are only reading back item 0 as the mean_delta
+        cell_iter->GetCellData()->SetItem("notch", this_notch);
+        cell_iter->GetCellData()->SetItem("delta", this_delta);
     }
 
     // Next iterate over the population to compute and store each cell's neighbouring Delta concentration in CellData
@@ -112,10 +112,10 @@ void DeltaNotchOffLatticeSimulation<DIM>::UpdateCellData()
                  ++iter)
             {
                 CellPtr p_cell = this->mrCellPopulation.GetCellUsingLocationIndex(*iter);
-                double this_delta = p_cell->GetCellData()->GetItem(1);
+                double this_delta = p_cell->GetCellData()->GetItem("delta");
                 mean_delta += this_delta/neighbour_indices.size();
             }
-            cell_iter->GetCellData()->SetItem(2, mean_delta);///\todo Warning Elsewhere we are reading back item 0 as the mean_delta
+            cell_iter->GetCellData()->SetItem("mean delta", mean_delta);
         }
     }
 }
