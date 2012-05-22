@@ -100,7 +100,9 @@ public:
         // to the testoutput/archive directory to continue running the simulation
         OutputFileHandler archive_handler(test_to_profile + "/archive");
 
-        BOOST_FOREACH(FileFinder temp_file, test_data_directory.FindMatches("*"))
+        // Following is done in two lines to avoid a bug in Intel compiler v12.0
+        std::vector<FileFinder> temp_files = test_data_directory.FindMatches("*");
+        BOOST_FOREACH(FileFinder temp_file, temp_files)
         {
             archive_handler.CopyFileTo(temp_file);
         }
