@@ -43,6 +43,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChastePoint.hpp"
 
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/set.hpp>
+#include "ChasteSerialization.hpp"
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class AbstractTetrahedralMesh;
 
@@ -83,6 +87,28 @@ private:
 
     /** Set of node attributes*/
     std::vector<double> mNodeAttributes;
+
+    /** Needed for serialization. */
+    friend class boost::serialization::access;
+    /**
+     * Archive the member variables.
+     *
+     * @param archive the archive
+     * @param version the current version of this class
+     */
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+        archive & mIndex;
+        archive & mRegion;
+        archive & mLocation;
+        archive & mIsBoundaryNode;
+        archive & mIsInternal;
+        archive & mIsDeleted;
+        archive & mElementIndices;
+        archive & mBoundaryElementIndices;
+        archive & mNodeAttributes;
+    }
 
     /**
      * Extraction of commonality between the constructors.
@@ -453,5 +479,48 @@ public:
     }
 };
 
+namespace boost
+{
+namespace serialization
+{
+/**
+ * Serialize information required to construct a Node.
+ */
+template<class Archive, unsigned DIM>
+inline void save_construct_data(
+    Archive & ar, const Node<DIM> * t, const BOOST_PFTO unsigned int file_version)
+{
+    // Save data required to construct instance
+    c_vector<double, DIM> location = t->rGetLocation();
+    ar << location;
+
+    unsigned index = t->GetIndex();
+    ar << index;
+
+    bool is_boundary = t->IsBoundaryNode();
+    ar << is_boundary;
+}
+/**
+ * De-serialize constructor parameters and initialize a Cell.
+ */
+template<class Archive, unsigned DIM>
+inline void load_construct_data(
+    Archive & ar, Node<DIM> * t, const unsigned int file_version)
+{
+    // Retrieve data from archive required to construct new instance of Node
+    c_vector<double,DIM> location;
+    ar >> location;
+
+    unsigned index;
+    ar >> index;
+
+    bool is_boundary;
+    ar >> is_boundary;
+
+    // Invoke inplace constructor to initialise instance
+    ::new(t)Node<DIM>(index, location, is_boundary);
+}
+}
+} // namespace ...
 
 #endif //_NODE_HPP_
