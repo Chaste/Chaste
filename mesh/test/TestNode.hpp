@@ -41,10 +41,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TetrahedralMesh.hpp"
 #include <cxxtest/TestSuite.h>
 
-
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
-
 class TestNode : public CxxTest::TestSuite
 {
 public:
@@ -231,50 +227,6 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNode(1)->IsFlagged(mesh), true);
         TS_ASSERT_EQUALS(mesh.GetNode(2)->IsFlagged(mesh), true);
         TS_ASSERT_EQUALS(mesh.GetNode(3)->IsFlagged(mesh), false);
-    }
-
-    void TestArchiveNode()
-    {
-        OutputFileHandler handler("archive", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "cell.arch";
-
-    	{
-        	// Create an output archive
-			std::ofstream ofs(archive_filename.c_str());
-			boost::archive::text_oarchive output_arch(ofs);
-
-			c_vector<double, 3> location;
-			location[0] = 0.0;
-			location[1] = 1.0;
-			location[2] = 2.0;
-
-			Node<3>* p_node = new Node<3>(0,location, true);
-
-			p_node->AddNodeAttribute(5.0);
-
-
-			// Write the node to file
-			output_arch << p_node;
-    	}
-
-    	{
-            // Restore the cell
-            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
-            boost::archive::text_iarchive input_arch(ifs);
-
-            Node<3>* p_node;
-
-            input_arch >> p_node;
-
-            TS_ASSERT_EQUALS(p_node->rGetLocation()[0], 0.0);
-            TS_ASSERT_EQUALS(p_node->rGetLocation()[1], 1.0);
-            TS_ASSERT_EQUALS(p_node->rGetLocation()[2], 2.0);
-
-            TS_ASSERT_EQUALS(p_node->IsBoundaryNode(), true);
-
-            TS_ASSERT_EQUALS(p_node->rGetNodeAttributes()[0], 5.0);
-
-    	}
     }
 
 };
