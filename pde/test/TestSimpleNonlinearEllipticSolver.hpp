@@ -103,7 +103,7 @@ double one_bc(const ChastePoint<2>& p)
 class TestSimpleNonlinearEllipticSolver : public CxxTest::TestSuite
 {
 public:
-    void xxxTestNumericalAgainstAnalyticJacobian()
+    void TestNumericalAgainstAnalyticJacobian()
     {
         // Create mesh from mesh reader
         TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
@@ -125,7 +125,7 @@ public:
         TS_ASSERT( solver.VerifyJacobian(1e-3) );
     }
 
-    void xxxTestWithHeatEquation1D()
+    void TestWithHeatEquation1D()
     {
         // Create mesh from mesh reader
         TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
@@ -161,7 +161,7 @@ public:
         PetscTools::Destroy(answer);
     }
 
-    void xxxTestWithHeatEquation1DAndNeumannBCs()
+    void TestWithHeatEquation1DAndNeumannBCs()
     {
         // Create mesh from mesh reader
         TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
@@ -204,7 +204,7 @@ public:
         PetscTools::Destroy(answer);
     }
 
-    void xxxTestWithHeatEquation1D2()
+    void TestWithHeatEquation1D2()
     {
         // Create mesh from mesh reader
         TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
@@ -292,7 +292,7 @@ public:
         PetscTools::Destroy(answer);
     }
 
-    void xxxTestWithHeatEquation1D4()
+    void TestWithHeatEquation1D4()
     {
         // Create mesh from mesh reader
         TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
@@ -338,7 +338,7 @@ public:
         PetscTools::Destroy(answer);
     }
 
-    void xxxTestWithHeatEquation1D5()
+    void TestWithHeatEquation1D5()
     {
         // Create mesh from mesh reader
         TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
@@ -387,7 +387,7 @@ public:
         PetscTools::Destroy(answer);
     }
 
-    void xxxTestWithHeatEquation1DAndNeumannBCs2()
+    void TestWithHeatEquation1DAndNeumannBCs2()
     {
         // Create mesh from mesh reader
         TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
@@ -436,7 +436,7 @@ public:
         PetscTools::Destroy(answer);
     }
 
-    void xxxTestHeatEquationWithNeumannOnUnitDisc()
+    void TestHeatEquationWithNeumannOnUnitDisc()
     {
         // Create mesh from mesh reader
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_522_elements");
@@ -483,7 +483,7 @@ public:
         PetscTools::Destroy(answer);
     }
 
-    void xxxTestWithHeatEquation2DAndNeumannBCs()
+    void TestWithHeatEquation2DAndNeumannBCs()
     {
         // Create mesh from mesh reader
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
@@ -550,7 +550,7 @@ public:
         PetscTools::Destroy(answer);
     }
 
-    void xxxTest2dOnUnitSquare()
+    void Test2dOnUnitSquare()
     {
         // Create mesh from mesh reader
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
@@ -648,7 +648,7 @@ public:
         PetscTools::Destroy(answer);
     }
 
-    void xxxTestNasty2dEquationOnUnitSquare()
+    void TestNasty2dEquationOnUnitSquare()
     {
         // Create mesh from mesh reader
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
