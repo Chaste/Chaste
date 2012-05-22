@@ -94,11 +94,11 @@ MultipleCaBasedCellPopulation<DIM>::MultipleCaBasedCellPopulation(PottsMesh<DIM>
         // Create a set of node indices corresponding to empty sites
         for (unsigned i=0; i<locationIndices.size(); i++)
         {
-            mAvailableSpaces[locationIndices[i]]--;
-            if (mAvailableSpaces[locationIndices[i]] < 0u)
+            if (mAvailableSpaces[locationIndices[i]] == 0u)
             {
             	EXCEPTION("One of the lattice sites has more cells than the carrying capacity. Check the initial cell locations.");
             }
+            mAvailableSpaces[locationIndices[i]]--;
         }
     }
     else
@@ -137,7 +137,7 @@ std::vector<unsigned>& MultipleCaBasedCellPopulation<DIM>::rGetAvailableSpaces()
 template<unsigned DIM>
 bool MultipleCaBasedCellPopulation<DIM>::IsSiteAvailable(unsigned index)
 {
-    return (mAvailableSpaces[index]>0);
+    return (mAvailableSpaces[index]>0u);
 }
 
 template<unsigned DIM>
@@ -197,11 +197,12 @@ Node<DIM>* MultipleCaBasedCellPopulation<DIM>::GetNodeCorrespondingToCell(CellPt
 template<unsigned DIM>
 void MultipleCaBasedCellPopulation<DIM>::AddCellUsingLocationIndex(unsigned index, CellPtr pCell)
 {
-	AbstractCellPopulation<DIM,DIM>::AddCellUsingLocationIndex(index, pCell);
-
+	if (mAvailableSpaces[index]==0u)
+	{
+		EXCEPTION("No available spaces at location index " << index << ".");
+	}
 	mAvailableSpaces[index]--;
-
-	assert(mAvailableSpaces[index]>=0u);
+	AbstractCellPopulation<DIM,DIM>::AddCellUsingLocationIndex(index, pCell);
 }
 
 template<unsigned DIM>
