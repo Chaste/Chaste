@@ -57,10 +57,10 @@ The following new files/directories were created:
 ------------ChasteParameters.xml
 ------------ConductionVelocityFromNode10.dat
 ------------ConductionVelocityFromNode20.dat
+------------LoadSolutions.com
 ------------MaxUpstrokeVelocityMap_-30.dat
 ------------NodalTraces_V.dat
 ------------UpstrokeTimeMap_-30.dat
-------------LoadSolutions.com
 --------output
 ------------.chaste_deletable_folder
 ------------3dResults_V.dat

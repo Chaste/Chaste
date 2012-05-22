@@ -7,6 +7,7 @@ The following new files/directories were created:
 ------------.chaste_deletable_folder
 ------------ChasteDefaults.xml
 ------------ChasteParameters.xml
+------------LoadSolutions.com
 ------------Monodomain_2d.exelem
 ------------Monodomain_2d.exnode
 ------------Monodomain_2d_0.exnode
@@ -211,7 +212,6 @@ The following new files/directories were created:
 ------------Monodomain_2d_98.exnode
 ------------Monodomain_2d_99.exnode
 ------------Monodomain_2d_times.info
-------------LoadSolutions.com
 
 The following existing files/directories changed their contents:
 <Test Directory>
