@@ -886,6 +886,57 @@ public:
         TS_ASSERT_DELTA(width_y, 1.0, 1e-6);
     }
 
+    void TestAddCellDataToPopulation()
+    {
+        // Set up simulation time
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+
+        // Create a simple mesh
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
+        MutableMesh<2,2> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        // Set up cells, one for each node. Give each a birth time of -node_index, so the age = node_index
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        // Create a cell population
+        MeshBasedCellPopulation<2> cell_population(mesh, cells);
+        
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
+        p_cell_data->SetItem("variable", 100.0);
+        cell_population.AddClonedDataToAllCells(p_cell_data);
+        
+        //Check that the data made it there and that copies of the data are independent
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+                 cell_iter != cell_population.End();
+                 ++cell_iter)
+        {   
+            TS_ASSERT_EQUALS(cell_iter->GetCellData()->GetItem("variable"), 100.0);
+            cell_iter->GetCellData()->SetItem("variable", 1.0);
+        }
+        
+
+        cell_population.SetDataOnAllCells("added variable", 200.0);
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+                 cell_iter != cell_population.End();
+                 ++cell_iter)
+        {
+            TS_ASSERT_EQUALS(cell_iter->GetCellData()->GetItem("added variable"), 200.0);
+            cell_iter->GetCellData()->SetItem("added variable", 1.0);
+        }
+
+        std::vector<std::string> keys = cell_population.Begin()->GetCellData()->GetKeys();
+        TS_ASSERT_EQUALS(keys.size(), 2u);
+        TS_ASSERT_EQUALS(keys[0], "added variable");
+        TS_ASSERT_EQUALS(keys[1], "variable");
+
+        //Try it again
+        TS_ASSERT_THROWS_THIS(cell_population.AddClonedDataToAllCells(p_cell_data),
+            "AddClonedDataToAllCells() assumes that cells have no data");
+    }
+
     // This test checks that the cells and nodes are correctly archived.
     void TestArchivingMeshBasedCellPopulation() throw (Exception)
     {
@@ -915,15 +966,26 @@ public:
 
             // Create the cell population
             MeshBasedCellPopulation<2>* const p_cell_population = new MeshBasedCellPopulation<2>(mesh, cells);
+            
+            //Add cell data
+            MAKE_PTR_ARGS(CellData, p_cell_data, (1));
+            p_cell_data->SetItem(0, DOUBLE_UNSET);
+            p_cell_population->AddClonedDataToAllCells(p_cell_data);
 
+            TS_ASSERT_THROWS_THIS(p_cell_population->Begin()->GetCellData()->GetItem(0), 
+                                "The item Var0 has not yet been set");
+            
             // Cells have been given birth times of 0, -1, -2, -3, -4.
             // loop over them to run to time 0.0;
+            unsigned index_for_data = 0;
             for (AbstractCellPopulation<2>::Iterator cell_iter=p_cell_population->Begin();
                  cell_iter!=p_cell_population->End();
                  ++cell_iter)
             {
                 cell_iter->ReadyToDivide();
                 cell_locations.push_back(p_cell_population->GetLocationOfCellCentre(*cell_iter));
+                cell_iter->GetCellData()->SetItem(0, (double) index_for_data);
+                index_for_data++;
             }
 
             std::pair<CellPtr,CellPtr> cell_pair_0_1 = p_cell_population->CreateCellPair(p_cell_population->GetCellUsingLocationIndex(0), p_cell_population->GetCellUsingLocationIndex(1));
@@ -971,6 +1033,7 @@ public:
                 TS_ASSERT_DELTA(cell_iter->GetAge(),(double)(counter),1e-7);
                 TS_ASSERT_DELTA(p_cell_population->GetLocationOfCellCentre(*cell_iter)[0], cell_locations[counter][0], 1e-9);
                 TS_ASSERT_DELTA(p_cell_population->GetLocationOfCellCentre(*cell_iter)[1], cell_locations[counter][1], 1e-9);
+                TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), (double) p_cell_population->GetLocationIndexUsingCell(*cell_iter), 1e-12);
                 counter++;
             }
 

@@ -431,33 +431,6 @@ public:
         TS_ASSERT_EQUALS(p_apoptotic_cell->HasCellProperty<ApoptoticCellProperty>(), true);
         TS_ASSERT_EQUALS(p_cell_model->GetCurrentHypoxicDuration(), 2.04);
 
-//        ///\todo  #1515  Are these needed?
-//        // For coverage, create a 1D model
-//
-//        SimpleOxygenBasedCellCycleModel* p_cell_model1d = new SimpleOxygenBasedCellCycleModel;
-//        p_cell_model1d->SetDimension(1);
-//        p_cell_model1d->SetCellProliferativeType(STEM);
-//        CellPtr p_cell1d(new Cell(p_state, p_cell_model1d));
-//        p_cell_ox_data->SetItem(0, hi_oxygen_concentration);
-//        p_cell1d->AddCellProperty(p_cell_ox_data);
-//
-//        p_cell1d->InitialiseCellCycleModel();
-//
-//        TS_ASSERT_EQUALS(p_cell_model1d->ReadyToDivide(), false);
-//
-//        // For coverage, create a 3D model
-//
-//        SimpleOxygenBasedCellCycleModel* p_cell_model3d = new SimpleOxygenBasedCellCycleModel;
-//        p_cell_model3d->SetDimension(3);
-//        p_cell_model3d->SetCellProliferativeType(STEM);
-//        CellPtr p_cell3d(new Cell(p_state, p_cell_model3d));
-//        p_cell_ox_data->SetItem(0, hi_oxygen_concentration);
-//        p_cell3d->AddCellProperty(p_cell_ox_data);
-//
-//        p_cell3d->InitialiseCellCycleModel();
-//
-//        TS_ASSERT_EQUALS(p_cell_model3d->ReadyToDivide(), false);
-
     }
 
     void TestContactInhibitionCellCycleModel() throw(Exception)
@@ -573,36 +546,6 @@ public:
         TS_ASSERT_EQUALS(p_hepa_one_model2->ReadyToDivide(), false);
         TS_ASSERT_EQUALS(p_hepa_one_model2->GetCurrentCellCyclePhase(), M_PHASE);
 
-//        ///\todo  #1515  Are these needed?
-//        // For coverage, create a 1D model
-//
-//        ContactInhibitionCellCycleModel* p_cell_model1d = new ContactInhibitionCellCycleModel;
-//        p_cell_model1d->SetDimension(1);
-//        p_cell_model1d->SetCellProliferativeType(STEM);
-//        p_cell_model1d->SetQuiescentVolumeFraction(0.5);
-//        p_cell_model1d->SetEquilibriumVolume(1.0);
-//
-//        CellPtr p_cell1d(new Cell(p_state, p_cell_model1d));
-//        p_cell1d->AddCellProperty(p_volume_data);
-//        p_volume_data->SetItem(0, hi_volume);
-//        p_cell1d->InitialiseCellCycleModel();
-//
-//        TS_ASSERT_EQUALS(p_cell_model1d->ReadyToDivide(), false);
-//
-//        // For coverage, create a 3D model
-//
-//        ContactInhibitionCellCycleModel* p_cell_model3d = new ContactInhibitionCellCycleModel;
-//        p_cell_model3d->SetDimension(3);
-//        p_cell_model3d->SetCellProliferativeType(STEM);
-//        p_cell_model3d->SetQuiescentVolumeFraction(0.5);
-//        p_cell_model3d->SetEquilibriumVolume(1.0);
-//
-//        CellPtr p_cell3d(new Cell(p_state, p_cell_model3d));
-//        p_cell3d->AddCellProperty(p_volume_data);
-//        p_volume_data->SetItem(0, hi_volume);
-//        p_cell3d->InitialiseCellCycleModel();
-//
-//        TS_ASSERT_EQUALS(p_cell_model3d->ReadyToDivide(), false);
 
     }
 
@@ -768,34 +711,6 @@ public:
         p_cell2->InitialiseCellCycleModel();
 
         TS_ASSERT_DELTA(p_cell_model2->GetG2Duration(), 1e20, 1e-4);
-
-//        ///\todo #1515 Do we need this?
-//        // For coverage, create a 1D model
-//
-//        StochasticOxygenBasedCellCycleModel* p_cell_model1d = new StochasticOxygenBasedCellCycleModel;
-//        p_cell_model1d->SetDimension(1);
-//        p_cell_model1d->SetCellProliferativeType(STEM);
-//        CellPtr p_cell1d(new Cell(p_state, p_cell_model1d));
-//        p_cell_ox_data->SetItem(0, lo_oxygen_concentration);
-//        p_cell1d->AddCellProperty(p_cell_ox_data);
-//
-//        p_cell1d->InitialiseCellCycleModel();
-//
-//        TS_ASSERT_EQUALS(p_cell_model1d->ReadyToDivide(), false);
-//
-//
-//        // For coverage, create a 3D model
-//
-//        StochasticOxygenBasedCellCycleModel* p_cell_model3d = new StochasticOxygenBasedCellCycleModel;
-//        p_cell_model3d->SetDimension(3);
-//        p_cell_model3d->SetCellProliferativeType(STEM);
-//        CellPtr p_cell3d(new Cell(p_state, p_cell_model3d));
-//        p_cell_ox_data->SetItem(0, lo_oxygen_concentration);
-//        p_cell3d->AddCellProperty(p_cell_ox_data);
-//        p_cell3d->InitialiseCellCycleModel();
-//
-//        TS_ASSERT_EQUALS(p_cell_model3d->ReadyToDivide(), false);
-
     }
 
     void TestArchiveFixedDurationGenerationBasedCellCycleModel() throw (Exception)
