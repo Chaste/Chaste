@@ -190,14 +190,12 @@ void CmguiDeformedSolutionsWriter<DIM>::WriteCmguiScript(std::string fieldBaseNa
     if(undeformedBaseName != "")
     {
         *p_script_file << "gfx read ele " << undeformedBaseName << "\n";
-        *p_script_file << "gfx define faces egroup "<<undeformedBaseName<<"\n";
     }
     else
     {
         *p_script_file << "gfx read ele " << this->mBaseName << "_0\n";
-        *p_script_file << "gfx define faces egroup "<<this->mBaseName<<"\n";
     }
-
+    *p_script_file << "gfx define faces egroup "<<this->mBaseName<<"\n";
     *p_script_file << "gfx cr win\n\n";
     p_script_file->close();
 }

@@ -593,6 +593,7 @@ public:
 
         // Coverage
         writer.WriteCmguiScript("myfield");
+        TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" " + results_dir + "/LoadSolutions.com mesh/test/data/TestCmguiDeformedSolutionsWriter/LoadSolutions_MyField.com").c_str()), 0);
     }
 
     void TestCmguiDeformedSolutionsWriter2dQuadraticViz() throw(Exception)
