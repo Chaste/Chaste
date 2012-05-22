@@ -149,23 +149,6 @@ bool AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsParticle(unsig
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResults(unsigned locationIndex,
-                                                             std::vector<unsigned>& rCellProliferativeTypeCounter,
-                                                             std::vector<unsigned>& rCellCyclePhaseCounter)
-{
-    if (IsGhostNode(locationIndex) == true)
-    {
-        *(this->mpVizCellProliferativeTypesFile) << INVISIBLE_COLOUR << " ";
-    }
-    else
-    {
-        AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResults(locationIndex,
-                                                 rCellProliferativeTypeCounter,
-                                                 rCellCyclePhaseCounter);
-    }
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResultsAndWriteToFiles()
 {
 
@@ -200,7 +183,15 @@ void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResu
         		&& !node_corresponds_to_dead_cell
         		&& !(this->IsParticle(node_index)))
         {
-            this->GenerateCellResults(node_index, cell_type_counter, cell_cycle_phase_counter);
+
+        	if (IsGhostNode(node_index) == true)
+            {
+                *(this->mpVizCellProliferativeTypesFile) << INVISIBLE_COLOUR << " ";
+            }
+            else
+            {
+            	GenerateCellResults(this->GetCellUsingLocationIndex(node_index),cell_type_counter,cell_cycle_phase_counter);
+            }
         }
     }
 

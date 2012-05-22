@@ -528,18 +528,18 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::CloseOutputFiles()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResults(unsigned locationIndex,
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResults(CellPtr pCell,
                                               std::vector<unsigned>& rCellProliferativeTypeCounter,
                                               std::vector<unsigned>& rCellCyclePhaseCounter)
 {
-    unsigned colour = STEM_COLOUR;
+	unsigned location_index = this->GetLocationIndexUsingCell(pCell);
 
-    CellPtr p_cell = GetCellUsingLocationIndex(locationIndex);
+    unsigned colour = STEM_COLOUR;
 
     if (mOutputCellCyclePhases)
     {
         // Update rCellCyclePhaseCounter
-        switch (p_cell->GetCellCycleModel()->GetCurrentCellCyclePhase())
+        switch (pCell->GetCellCycleModel()->GetCurrentCellCyclePhase())
         {
             case G_ZERO_PHASE:
                 rCellCyclePhaseCounter[0]++;
@@ -559,13 +559,13 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResults(unsigne
             default:
                 NEVER_REACHED;
         }
-        *mpVizCellProliferativePhasesFile << p_cell->GetCellCycleModel()->GetCurrentCellCyclePhase() << " ";
+        *mpVizCellProliferativePhasesFile << pCell->GetCellCycleModel()->GetCurrentCellCyclePhase() << " ";
     }
 
     if (mOutputCellAncestors)
     {
         // Set colour dependent on cell ancestor and write to file
-        colour = p_cell->GetAncestor();
+        colour = pCell->GetAncestor();
         if (colour == UNSIGNED_UNSET)
         {
             // Set the file to -1 to mark this case.
@@ -576,7 +576,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResults(unsigne
     }
 
     // Set colour dependent on cell type
-    switch (p_cell->GetCellCycleModel()->GetCellProliferativeType())
+    switch (pCell->GetCellCycleModel()->GetCellProliferativeType())
     {
         case STEM:
             colour = STEM_COLOUR;
@@ -606,32 +606,32 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResults(unsigne
     if (mOutputCellMutationStates)
     {
         // Set colour dependent on cell mutation state
-        if (!p_cell->GetMutationState()->IsType<WildTypeCellMutationState>())
+        if (!pCell->GetMutationState()->IsType<WildTypeCellMutationState>())
         {
-            colour = p_cell->GetMutationState()->GetColour();
+            colour = pCell->GetMutationState()->GetColour();
         }
-        if (p_cell->HasCellProperty<CellLabel>())
+        if (pCell->HasCellProperty<CellLabel>())
         {
-            CellPropertyCollection collection = p_cell->rGetCellPropertyCollection().GetProperties<CellLabel>();
+            CellPropertyCollection collection = pCell->rGetCellPropertyCollection().GetProperties<CellLabel>();
             boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(collection.GetProperty());
             colour = p_label->GetColour();
         }
     }
 
-    if (p_cell->HasCellProperty<ApoptoticCellProperty>() || p_cell->HasApoptosisBegun())
+    if (pCell->HasCellProperty<ApoptoticCellProperty>() || pCell->HasApoptosisBegun())
     {
         // For any type of cell set the colour to this if it is undergoing apoptosis
         colour = APOPTOSIS_COLOUR;
     }
 
     // Write cell variable data to file if required
-    if (mOutputCellVariables && dynamic_cast<AbstractOdeBasedCellCycleModel*>(p_cell->GetCellCycleModel()) )
+    if (mOutputCellVariables && dynamic_cast<AbstractOdeBasedCellCycleModel*>(pCell->GetCellCycleModel()) )
     {
         // Write location index corresponding to cell
-        *mpCellVariablesFile << locationIndex << " ";
+        *mpCellVariablesFile << location_index << " ";
 
         // Write cell variables
-        std::vector<double> proteins = (static_cast<AbstractOdeBasedCellCycleModel*>(p_cell->GetCellCycleModel()))->GetProteinConcentrations();
+        std::vector<double> proteins = (static_cast<AbstractOdeBasedCellCycleModel*>(pCell->GetCellCycleModel()))->GetProteinConcentrations();
         for (unsigned i=0; i<proteins.size(); i++)
         {
             *mpCellVariablesFile << proteins[i] << " ";
@@ -642,10 +642,10 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResults(unsigne
     if (mOutputCellAges)
     {
         // Write location index corresponding to cell
-        *mpCellAgesFile << locationIndex << " ";
+        *mpCellAgesFile << location_index << " ";
 
         // Write cell location
-        c_vector<double, SPACE_DIM> cell_location = GetLocationOfCellCentre(p_cell);
+        c_vector<double, SPACE_DIM> cell_location = GetLocationOfCellCentre(pCell);
 
         for (unsigned i=0; i<SPACE_DIM; i++)
         {
@@ -653,7 +653,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResults(unsigne
         }
 
         // Write cell age
-        *mpCellAgesFile << p_cell->GetAge() << " ";
+        *mpCellAgesFile << pCell->GetAge() << " ";
     }
 
     *mpVizCellProliferativeTypesFile << colour << " ";
@@ -803,7 +803,9 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles()
     {
         WriteCellVolumeResultsToFile();
     }
+
     GenerateCellResultsAndWriteToFiles();
+
     // Write logged cell data if required
     if (mOutputCellIdData)
     {

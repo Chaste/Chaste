@@ -554,7 +554,7 @@ void MultipleCaBasedCellPopulation<DIM>::GenerateCellResultsAndWriteToFiles()
          cell_iter != this->End();
          ++cell_iter)
     {
-        this->GenerateCellResults(this->GetLocationIndexUsingCell(*cell_iter), cell_type_counter, cell_cycle_phase_counter);
+        this->GenerateCellResults(*cell_iter, cell_type_counter, cell_cycle_phase_counter);
     }
 
     this->WriteCellResultsToFiles(cell_type_counter, cell_cycle_phase_counter);

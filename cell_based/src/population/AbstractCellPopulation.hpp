@@ -570,11 +570,11 @@ public:
     /**
      * Generate results for a given cell in the current cell population state to output files.
      *
-     * @param locationIndex location index of the cell
+     * @param pCell pointer to the cell
      * @param rCellProliferativeTypeCounter cell type counter
      * @param rCellCyclePhaseCounter cell cycle phase counter
      */
-    virtual void GenerateCellResults(unsigned locationIndex,
+    virtual void GenerateCellResults(CellPtr pCell,
                              std::vector<unsigned>& rCellProliferativeTypeCounter,
                              std::vector<unsigned>& rCellCyclePhaseCounter);
 
