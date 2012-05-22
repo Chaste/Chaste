@@ -55,7 +55,7 @@ void MultipleCaBasedCellPopulation<DIM>::Validate()
         unsigned node_index = GetLocationIndexUsingCell(*cell_iter);
         validated_nodes[node_index]++;
         //Check nodes with cells are marked as non-empty
-        assert(mEmptySites[node_index] == false);
+        assert(mAvailableSpaces[node_index] < mLatticeCarryingCapacity);
     }
 
     for (unsigned i=0; i<validated_nodes.size(); i++)
@@ -69,7 +69,7 @@ void MultipleCaBasedCellPopulation<DIM>::Validate()
         else if (validated_nodes[i] < 1)
         {
             //Check nodes without cells are marked as empty
-            assert(mEmptySites[i] == true);
+            assert(mAvailableSpaces[i] == mLatticeCarryingCapacity);
         }
     }
 }
@@ -78,41 +78,34 @@ template<unsigned DIM>
 MultipleCaBasedCellPopulation<DIM>::MultipleCaBasedCellPopulation(PottsMesh<DIM>& rMesh,
                                                         std::vector<CellPtr>& rCells,
                                                         const std::vector<unsigned> locationIndices,
+                                                        unsigned latticeCarryingCapacity,
                                                         bool deleteMesh,
                                                         bool validate)
-    : AbstractOnLatticeCellPopulation<DIM>(rMesh, rCells, locationIndices, deleteMesh)
+    : AbstractOnLatticeCellPopulation<DIM>(rMesh, rCells, locationIndices, deleteMesh),
+      mLatticeCarryingCapacity(latticeCarryingCapacity)
 {
+    mAvailableSpaces = std::vector<unsigned>(this->GetNumNodes(), latticeCarryingCapacity);
+
     // This must always be true
-    assert(this->mCells.size() <= this->mrMesh.GetNumNodes());
+    assert(this->mCells.size() <= this->mrMesh.GetNumNodes()*latticeCarryingCapacity);
 
     if (!locationIndices.empty())
     {
         // Create a set of node indices corresponding to empty sites
-        std::set<unsigned> node_indices;
-        std::set<unsigned> location_indices;
-        std::set<unsigned> empty_site_indices;
-
-        for (unsigned i=0; i<this->GetNumNodes(); i++)
-        {
-            node_indices.insert(this->GetNode(i)->GetIndex());
-        }
         for (unsigned i=0; i<locationIndices.size(); i++)
         {
-            location_indices.insert(locationIndices[i]);
+            mAvailableSpaces[locationIndices[i]]--;
+            if (mAvailableSpaces[locationIndices[i]] < 0)
+            {
+            	EXCEPTION("One of the lattice sites has more cells than the carrying capacity. Check the initial cell locations.");
+            }
         }
-
-        std::set_difference(node_indices.begin(), node_indices.end(),
-                            location_indices.begin(), location_indices.end(),
-                            std::inserter(empty_site_indices, empty_site_indices.begin()));
-
-        // This method finishes and then calls Validate()
-        SetEmptySites(empty_site_indices);
     }
     else
     {
-        NEVER_REACHED;
+        NEVER_REACHED; // Need to cover the case of no  locationIndices being pased
         ///\todo #2066 - This code is not covered
-        //mEmptySites = std::vector<bool>(this->GetNumNodes(), false);
+        //mAvailableSpaces = std::vector<bool>(this->GetNumNodes(), false);
         //Validate();
     }
 }
@@ -136,15 +129,15 @@ MultipleCaBasedCellPopulation<DIM>::~MultipleCaBasedCellPopulation()
 
 
 template<unsigned DIM>
-std::vector<bool>& MultipleCaBasedCellPopulation<DIM>::rGetEmptySites()
+std::vector<unsigned>& MultipleCaBasedCellPopulation<DIM>::rGetAvailableSpaces()
 {
-    return mEmptySites;
+    return mAvailableSpaces;
 }
 
 template<unsigned DIM>
-bool MultipleCaBasedCellPopulation<DIM>::IsEmptySite(unsigned index)
+bool MultipleCaBasedCellPopulation<DIM>::IsSiteAvailable(unsigned index)
 {
-    return mEmptySites[index];
+    return (mAvailableSpaces[index]>0);
 }
 
 template<unsigned DIM>
@@ -153,9 +146,9 @@ std::set<unsigned> MultipleCaBasedCellPopulation<DIM>::GetEmptySiteIndices()
     NEVER_REACHED;
     ///\todo #2066 - This code is not covered   
 //    std::set<unsigned> empty_site_indices;
-//    for (unsigned i=0; i<mEmptySites.size(); i++)
+//    for (unsigned i=0; i<mAvailableSpaces.size(); i++)
 //    {
-//        if (mEmptySites[i])
+//        if (mAvailableSpaces[i])
 //        {
 //            empty_site_indices.insert(i);
 //        }
@@ -163,23 +156,6 @@ std::set<unsigned> MultipleCaBasedCellPopulation<DIM>::GetEmptySiteIndices()
 //    return empty_site_indices;
     std::set<unsigned> empty_site_indices;
     return (empty_site_indices);
-}
-
-template<unsigned DIM>
-void MultipleCaBasedCellPopulation<DIM>::SetEmptySites(const std::set<unsigned>& rEmptySiteIndices)
-{
-    // Reinitialise all entries of mEmptySites to false
-    mEmptySites = std::vector<bool>(this->mrMesh.GetNumNodes(), false);
-
-    // Update mEmptySites
-    for (std::set<unsigned>::iterator iter = rEmptySiteIndices.begin();
-         iter != rEmptySiteIndices.end();
-         ++iter)
-    {
-        mEmptySites[*iter] = true;
-    }
-
-    Validate();
 }
 
 template<unsigned DIM>
@@ -223,7 +199,9 @@ void MultipleCaBasedCellPopulation<DIM>::AddCellUsingLocationIndex(unsigned inde
 {
 	AbstractCellPopulation<DIM,DIM>::AddCellUsingLocationIndex(index, pCell);
 
-	mEmptySites[index] = false;
+	mAvailableSpaces[index]--;
+
+	assert(mAvailableSpaces[index]>=0);
 }
 
 template<unsigned DIM>
@@ -231,14 +209,10 @@ void MultipleCaBasedCellPopulation<DIM>::RemoveCellUsingLocationIndex(unsigned i
 {
 	AbstractCellPopulation<DIM,DIM>::RemoveCellUsingLocationIndex(index, pCell);
 
-	mEmptySites[index] = true;
-}
+	mAvailableSpaces[index]++;
 
-//template<unsigned DIM>
-//double MultipleCaBasedCellPopulation<DIM>::GetProbabilityOfDivisionIntoTargetSite(unsigned parentNodeIndex, unsigned targetIndex, unsigned numNeighbours)
-//{
-//    return 1.0/((double) numNeighbours);
-//}
+	assert(mAvailableSpaces[index]<=mLatticeCarryingCapacity);
+}
 
 template<unsigned DIM>
 CellPtr MultipleCaBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell)
@@ -269,7 +243,7 @@ CellPtr MultipleCaBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_ve
     unsigned count = 0;
     while (count < num_neighbours)
     {
-        bool is_empty_site = IsEmptySite(*neighbour_iter);
+        bool is_empty_site = IsSiteAvailable(*neighbour_iter);
 
         if (is_empty_site)
         {
@@ -299,10 +273,8 @@ CellPtr MultipleCaBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_ve
 
     // Update location cell map
     CellPtr p_created_cell = this->mCells.back();
-    this->SetCellUsingLocationIndex(daughter_node_index,p_created_cell);
+    AddCellUsingLocationIndex(daughter_node_index,p_created_cell);
 
-    //Set node to be occupied
-    mEmptySites[daughter_node_index] = false;
     return p_created_cell;
 }
 
@@ -357,7 +329,7 @@ void MultipleCaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
 		 * Loop over neighbours and calculate probability of moving (make sure all probabilities are <1)
 		 */
 		unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
-		assert(!IsEmptySite(node_index));
+		assert(!IsSiteAvailable(node_index));
 
 		// Find a random available neighbouring node to overwrite current site
 		std::set<unsigned> neighbouring_node_indices = static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetMooreNeighbouringNodeIndices(node_index);
@@ -378,7 +350,7 @@ void MultipleCaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
             {
                 neighbouring_node_indices_vector.push_back(*iter);
 
-                if (IsEmptySite(*iter))
+                if (IsSiteAvailable(*iter))
             	{
                 	// Iterating over the update rule
                     for (typename std::vector<boost::shared_ptr<AbstractMultipleCaUpdateRule<DIM> > >::iterator iterRule = mUpdateRuleCollection.begin();
@@ -649,7 +621,7 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile()
 
     for (unsigned node_index = 0; node_index < static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetNumNodes(); node_index++)
     {
-        if (mEmptySites[node_index] == false)
+        if (mLatticeCarryingCapacity - mAvailableSpaces[node_index] == 1u) // Only have one cell
         {
             CellPtr cell_ptr = this->GetCellUsingLocationIndex(node_index);
             cell_ids[node_index] = cell_ptr->GetCellId();

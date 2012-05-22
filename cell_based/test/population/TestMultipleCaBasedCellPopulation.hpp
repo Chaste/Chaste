@@ -78,6 +78,9 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), p_mesh->GetNumNodes());
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), location_indices.size());
 
+
+        //TODO this doesnt do anything as
+        TS_ASSERT_EQUALS(cells.size(),0u);
         AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
         for (unsigned i=0; i<cells.size(); i++)
         {
@@ -103,87 +106,129 @@ public:
         }
     }
 
+   void TestConstructorWithMultipleCellsPerSite() throw(Exception)
+    {
+		// Create a simple 2D PottsMesh
+		PottsMeshGenerator<2> generator(2, 0, 0, 1, 0, 0);
+		PottsMesh<2>* p_mesh = generator.GetMesh();
+
+		// Create cells
+		std::vector<CellPtr> cells;
+		CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+		cells_generator.GenerateBasicRandom(cells, 3u, DIFFERENTIATED);
+
+		// Specify where cells lie
+		std::vector<unsigned> location_indices;
+		location_indices.push_back(0u);
+		location_indices.push_back(0u);
+		location_indices.push_back(1u);
+
+		// Create cell population
+		MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices,2);
+
+		// Test Cells in correct location
+		TS_ASSERT_EQUALS(cell_population.GetCellsUsingLocationIndex(0).size(), 2u);
+		TS_ASSERT_EQUALS(cell_population.GetCellsUsingLocationIndex(1).size(), 1u);
+
+		TS_ASSERT_EQUALS(cell_population.GetNumRealCells(),3u);
+		AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+		TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter), 0u);
+		++cell_iter;
+		TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter), 0u);
+		++cell_iter;
+		TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter), 1u);
+
+		// Test that the mesh and cells are correctly assigned
+		TS_ASSERT_EQUALS(&(cell_population.rGetMesh()), p_mesh);
+		TS_ASSERT_EQUALS(cell_population.GetNumNodes(), p_mesh->GetNumNodes());
+		TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), location_indices.size());
+
+    }
+
     /*
      * This test checks that cell populations with multiple cells per lattice site are dealt with correctly.
      */
-    void TestMultipleCellExceptions() throw (Exception)
+   void TestMultipleCellExceptions() throw (Exception)
     {
-        // Create a simple 2D PottsMesh with 4 nodes
-        PottsMeshGenerator<2> generator(2, 0, 0, 2, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+	   // Resetting the Maximum cell Id to zero (to account for previous tests)
+       CellId::ResetMaxCellId();
 
-        // Create cells
-        std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, 2);
+		// Create a simple 2D PottsMesh with 4 nodes
+		PottsMeshGenerator<2> generator(2, 0, 0, 2, 0, 0);
+		PottsMesh<2>* p_mesh = generator.GetMesh();
 
-        std::vector<unsigned> location_indices;
-        location_indices.push_back(0);
-        location_indices.push_back(3);
+		// Create cells
+		std::vector<CellPtr> cells;
+		CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+		cells_generator.GenerateBasic(cells, 2);
 
-        // Create cell population
-        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+		std::vector<unsigned> location_indices;
+		location_indices.push_back(0);
+		location_indices.push_back(3);
 
-        // Check cells are in the correct location
-        TS_ASSERT(cell_population.IsCellAttachedToLocationIndex(0));
-        TS_ASSERT(!cell_population.IsCellAttachedToLocationIndex(1));
-        TS_ASSERT(!cell_population.IsCellAttachedToLocationIndex(2));
-        TS_ASSERT(cell_population.IsCellAttachedToLocationIndex(3));
+		// Create cell population
+		MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
 
-        TS_ASSERT_THROWS_NOTHING(cell_population.GetCellUsingLocationIndex(0));
-        TS_ASSERT_THROWS_THIS(cell_population.GetCellUsingLocationIndex(1),"Location index input argument does not correspond to a Cell");
-        TS_ASSERT_THROWS_THIS(cell_population.GetCellUsingLocationIndex(2),"Location index input argument does not correspond to a Cell");
-        TS_ASSERT_THROWS_NOTHING(cell_population.GetCellUsingLocationIndex(3));
+		// Check cells are in the correct location
+		TS_ASSERT(cell_population.IsCellAttachedToLocationIndex(0));
+		TS_ASSERT(!cell_population.IsCellAttachedToLocationIndex(1));
+		TS_ASSERT(!cell_population.IsCellAttachedToLocationIndex(2));
+		TS_ASSERT(cell_population.IsCellAttachedToLocationIndex(3));
 
-        // Now remove first cell from lattice 0 and move it to lattice 3
-        cell_population.RemoveCellUsingLocationIndex(0,cells[0]);
-        cell_population.AddCellUsingLocationIndex(3,cells[0]);
+		TS_ASSERT_THROWS_NOTHING(cell_population.GetCellUsingLocationIndex(0));
+		TS_ASSERT_THROWS_THIS(cell_population.GetCellUsingLocationIndex(1),"Location index input argument does not correspond to a Cell");
+		TS_ASSERT_THROWS_THIS(cell_population.GetCellUsingLocationIndex(2),"Location index input argument does not correspond to a Cell");
+		TS_ASSERT_THROWS_NOTHING(cell_population.GetCellUsingLocationIndex(3));
 
-        // Make sure the maps have been set properly.
-        TS_ASSERT_EQUALS(cell_population.GetCellsUsingLocationIndex(0).size(),0u);
-        TS_ASSERT_EQUALS(cell_population.GetCellsUsingLocationIndex(3).size(),2u);
-        TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(cells[0]), 3u);
+		// Now remove first cell from lattice 0 and move it to lattice 3
+		cell_population.RemoveCellUsingLocationIndex(0,cells[0]);
+		cell_population.AddCellUsingLocationIndex(3,cells[0]);
 
-        // Try moving one of the cells
-        cell_population.MoveCellInLocationMap(cells[1], 3, 0);
-        TS_ASSERT_EQUALS(cell_population.GetCellsUsingLocationIndex(0).size(),1u);
-        TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(cells[1]), 0u);
+		// Make sure the maps have been set properly.
+		TS_ASSERT_EQUALS(cell_population.GetCellsUsingLocationIndex(0).size(),0u);
+		TS_ASSERT_EQUALS(cell_population.GetCellsUsingLocationIndex(3).size(),2u);
+		TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(cells[0]), 3u);
 
-        // Now move it back
-        cell_population.MoveCellInLocationMap(cells[1], 0, 3);
+		// Try moving one of the cells
+		cell_population.MoveCellInLocationMap(cells[1], 3, 0);
+		TS_ASSERT_EQUALS(cell_population.GetCellsUsingLocationIndex(0).size(),1u);
+		TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(cells[1]), 0u);
 
-        // Coverage as cell is no longer there.
-        TS_ASSERT_THROWS_THIS(cell_population.RemoveCellUsingLocationIndex(0,cells[0]),
-                             "Tried to remove a cell which is not attached to the given location index");
+		// Now move it back
+		cell_population.MoveCellInLocationMap(cells[1], 0, 3);
 
-        // Check cells are in the correct locations
-        TS_ASSERT(!cell_population.IsCellAttachedToLocationIndex(0));
-        TS_ASSERT(!cell_population.IsCellAttachedToLocationIndex(1));
-        TS_ASSERT(!cell_population.IsCellAttachedToLocationIndex(2));
-        TS_ASSERT(cell_population.IsCellAttachedToLocationIndex(3));
+		// Coverage as cell is no longer there.
+		TS_ASSERT_THROWS_THIS(cell_population.RemoveCellUsingLocationIndex(0,cells[0]),
+							 "Tried to remove a cell which is not attached to the given location index");
 
-        TS_ASSERT_THROWS_THIS(cell_population.GetCellUsingLocationIndex(0),"Location index input argument does not correspond to a Cell");
-        TS_ASSERT_THROWS_THIS(cell_population.GetCellUsingLocationIndex(1),"Location index input argument does not correspond to a Cell");
-        TS_ASSERT_THROWS_THIS(cell_population.GetCellUsingLocationIndex(2),"Location index input argument does not correspond to a Cell");
-        TS_ASSERT_THROWS_THIS(cell_population.GetCellUsingLocationIndex(3),"Multiple cells are attached to a single location index.");
+		// Check cells are in the correct locations
+		TS_ASSERT(!cell_population.IsCellAttachedToLocationIndex(0));
+		TS_ASSERT(!cell_population.IsCellAttachedToLocationIndex(1));
+		TS_ASSERT(!cell_population.IsCellAttachedToLocationIndex(2));
+		TS_ASSERT(cell_population.IsCellAttachedToLocationIndex(3));
 
-        //Check GetCellsUsingLocationIndex
-        std::set<CellPtr> cells_on_lattice = cell_population.GetCellsUsingLocationIndex(3);
-        TS_ASSERT_EQUALS(cells_on_lattice.size(),2u);
+		TS_ASSERT_THROWS_THIS(cell_population.GetCellUsingLocationIndex(0),"Location index input argument does not correspond to a Cell");
+		TS_ASSERT_THROWS_THIS(cell_population.GetCellUsingLocationIndex(1),"Location index input argument does not correspond to a Cell");
+		TS_ASSERT_THROWS_THIS(cell_population.GetCellUsingLocationIndex(2),"Location index input argument does not correspond to a Cell");
+		TS_ASSERT_THROWS_THIS(cell_population.GetCellUsingLocationIndex(3),"Multiple cells are attached to a single location index.");
 
-        unsigned index = 1; // Note CellId starts at 1 due to above test
-        for (std::set<CellPtr>::iterator iter = cells_on_lattice.begin();
-             iter != cells_on_lattice.end();
-             iter++)
-        {
-            TS_ASSERT_EQUALS((*iter)->GetCellId(),index);
-            index++;
-        }
-        TS_ASSERT_EQUALS(cells[0]->GetCellId(),1u);
-        TS_ASSERT_EQUALS(cells[1]->GetCellId(),2u);
+		//Check GetCellsUsingLocationIndex
+		std::set<CellPtr> cells_on_lattice = cell_population.GetCellsUsingLocationIndex(3);
+		TS_ASSERT_EQUALS(cells_on_lattice.size(),2u);
+
+		unsigned index = 0;
+		for (std::set<CellPtr>::iterator iter = cells_on_lattice.begin();
+			 iter != cells_on_lattice.end();
+			 iter++)
+		{
+			TS_ASSERT_EQUALS((*iter)->GetCellId(),index);
+			index++;
+		}
+		TS_ASSERT_EQUALS(cells[0]->GetCellId(),0u);
+		TS_ASSERT_EQUALS(cells[1]->GetCellId(),1u);
     }
 
-    void TestWriteResultsToFileAndOutputCellPopulationParameters()
+   void TestWriteResultsToFileAndOutputCellPopulationParameters()
     {
         // Resetting the maximum cell ID to zero (to account for previous tests)
         CellId::ResetMaxCellId();
@@ -264,7 +309,7 @@ public:
 
     }
 
-//    void NoTestIsCellAssociatedWithADeletedLocation() throw (Exception)
+//   void TestIsCellAssociatedWithADeletedLocation() throw (Exception)
 //    {
 //        // Create a Potts-based cell population but do not try to validate
 //        PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
@@ -297,7 +342,7 @@ public:
 //
 
 //
-//    void NoTestRemoveDeadCellsAndUpdate() throw(Exception)
+//   void TestRemoveDeadCellsAndUpdate() throw(Exception)
 //    {
 //        // Create a simple 2D PottsMesh
 //        PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
@@ -326,7 +371,7 @@ public:
 //    }
 //
 
-//    void NoTestUpdateCellLocations()
+//   void TestUpdateCellLocations()
 //    {
 //        // Create a simple 2D PottsMesh with two cells
 //        PottsMeshGenerator<2> generator(4, 2, 2, 2, 1, 2);
@@ -359,7 +404,7 @@ public:
 //        TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(1)->GetNumNodes(), 7u);
 //    }
 //
-    void TestAddCell() throw(Exception)
+   void TestAddCell() throw(Exception)
     {
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
@@ -414,7 +459,7 @@ public:
 //        TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(1)->GetNodeGlobalIndex(1), 3u);
     }
 
-    void TestAddCellToManyCells() throw(Exception)
+   void TestAddCellToManyCells() throw(Exception)
     {
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
@@ -448,7 +493,7 @@ public:
                 "No free space to divide.");
     }
 
-//    void NoTestUpdateCellLocations()
+//   void TestUpdateCellLocations()
 //    {
 //        // Create a simple 2D PottsMesh with two cells
 //        PottsMeshGenerator<2> generator(4, 2, 2, 2, 1, 2);
@@ -480,7 +525,7 @@ public:
 //        TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(0)->GetNumNodes(), 1u);
 //        TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(1)->GetNumNodes(), 7u);
 //    }
-//    void NoTestUpdateCellLocationsRandomly()
+//   void TestUpdateCellLocationsRandomly()
 //    {
 //        // Create a simple 2D PottsMesh with two cells
 //        PottsMeshGenerator<2> generator(4, 2, 2, 2, 1, 2);
@@ -515,7 +560,7 @@ public:
 //    }
 //
 //    ///\todo implement this test (#1666)
-////    void NoTestVoronoiMethods()
+////   void TestVoronoiMethods()
 ////    {
 ////        // Create a simple 2D PottsMesh
 ////        PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
@@ -541,7 +586,7 @@ public:
 ////    }
 //
 //
-//    void NoTestNodeAndMeshMethods() throw(Exception)
+//   void TestNodeAndMeshMethods() throw(Exception)
 //    {
 //        // Create a Potts-based cell population
 //        PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
@@ -595,7 +640,7 @@ public:
 //            "Cannot call GetNeighbouringNodeIndices() on a MultipleCaBasedCellPopulation, need to go through the PottsMesh instead");
 //    }
 //
-//    void NoTestGetLocationOfCellCentre() throw (Exception)
+//   void TestGetLocationOfCellCentre() throw (Exception)
 //    {
 //        // Create a Potts-based cell population
 //        PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
@@ -624,7 +669,7 @@ public:
 //        }
 //    }
 //
-//    void NoTestAddingUpdateRules() throw(Exception)
+//   void TestAddingUpdateRules() throw(Exception)
 //    {
 //        // Create a simple 2D PottsMesh with one cell
 //        PottsMeshGenerator<2> generator(2, 1, 2, 2, 1, 2);
@@ -652,7 +697,7 @@ public:
 //        TS_ASSERT_EQUALS((*update_rule_collection[0]).GetIdentifier(), "VolumeConstraintPottsUpdateRule-2");
 //    }
 //
-//    void NoTestArchiving() throw(Exception)
+//   void TestArchiving() throw(Exception)
 //    {
 //        FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
 //        std::string archive_file = "potts_cell_population_2d.arch";

@@ -182,7 +182,7 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
 
                 // Work out whether this node lies on any edge of the mesh
                 bool on_south_edge = (node_index < numNodesAcross);
-                bool on_north_edge = (node_index > numNodesAcross*(numNodesUp - 1) - 1);
+                bool on_north_edge = ((int) node_index > (int)numNodesAcross*((int)numNodesUp - 1) - 1);
                 bool on_west_edge = (node_index%numNodesAcross == 0);
                 bool on_east_edge = (node_index%numNodesAcross == numNodesAcross - 1);
 
@@ -267,6 +267,7 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
                 {
                     if (available_neighbours[i])
                     {
+
                         assert(moore_neighbour_indices_vector[i] < nodes.size());
                         moore_neighbours[node_index].insert(moore_neighbour_indices_vector[i]);
                     }
@@ -580,7 +581,7 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
 
                 // Work out whether this node lies on any edge of the mesh
                 bool on_south_edge = (node_index < numNodesAcross);
-                bool on_north_edge = (node_index > numNodesAcross*(numNodesUp - 1) - 1);
+                bool on_north_edge = ((int)node_index > (int)numNodesAcross*((int)numNodesUp - 1) - 1);
                 bool on_west_edge = (node_index%numNodesAcross == 0);
                 bool on_east_edge = (node_index%numNodesAcross == numNodesAcross - 1);
 

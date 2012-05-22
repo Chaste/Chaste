@@ -325,6 +325,8 @@ public:
     {
         EXIT_IF_PARALLEL;
 
+        // Resetting the maximum cell ID to zero (to account for previous tests)
+        CellId::ResetMaxCellId();
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
@@ -373,7 +375,7 @@ public:
         {
         	if(i<50)
         	{
-        		TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetCellUsingLocationIndex(i)->GetCellId(),31+i);
+        		TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetCellUsingLocationIndex(i)->GetCellId(),i);
         	}
         	else
         	{
@@ -381,7 +383,6 @@ public:
         	}
         }
     }
-
 //
 //    void TestStandardResultForArchivingTestsBelow() throw (Exception)
 //    {

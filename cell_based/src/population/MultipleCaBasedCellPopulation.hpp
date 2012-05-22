@@ -72,14 +72,18 @@ class MultipleCaBasedCellPopulation : public AbstractOnLatticeCellPopulation<DIM
 
 private:
 
+
+    /** The carying capacity (number of cells allowed per site) */
+    unsigned mLatticeCarryingCapacity;
+
     /** Results file for cell locations. */
     out_stream mpVizLocationsFile;
 
     /** The update rules used to determine the new location of the cells. */
     std::vector<boost::shared_ptr<AbstractMultipleCaUpdateRule<DIM> > > mUpdateRuleCollection;
 
-    /** Records whether (for each node) the node is an empty site or not. */
-    std::vector<bool> mEmptySites;
+    /** Records for each node the node the number of spaces available. */
+    std::vector<unsigned> mAvailableSpaces;
 
     /**
      * Set the empty sites by taking in a set of which nodes indices are empty sites.
@@ -105,8 +109,9 @@ private:
     {
 #define COVERAGE_IGNORE
         archive & boost::serialization::base_object<AbstractOnLatticeCellPopulation<DIM> >(*this);
+        archive & mLatticeCarryingCapacity;
         archive & mUpdateRuleCollection;
-        archive & mEmptySites;
+        archive & mAvailableSpaces;
 
 #undef COVERAGE_IGNORE
     }
@@ -132,14 +137,16 @@ public:
      *
      * @param rMesh reference to a PottsMesh
      * @param rCells reference to a vector of CellPtrs
+     * @param locationIndices an optional vector of location indices that correspond to real cells
+     * @param latticeCarryingCapacity an optional parameter to allow more than one cell per site
      * @param deleteMesh set to true if you want the cell population to free the mesh memory on destruction
      *                   (defaults to false)
      * @param validate whether to validate the cell population when it is created (defaults to true)
-     * @param locationIndices an optional vector of location indices that correspond to real cells
      */
     MultipleCaBasedCellPopulation(PottsMesh<DIM>& rMesh,
                                   std::vector<CellPtr>& rCells,
                                   const std::vector<unsigned> locationIndices=std::vector<unsigned>(),
+                                  unsigned latticeCarryingCapacity=1u,
                                   bool deleteMesh=false,
                                   bool validate=true);
 
@@ -156,19 +163,18 @@ public:
     virtual ~MultipleCaBasedCellPopulation();
 
     /**
-     * @return #mEmptySites.
+     * @return mAvailableSpaces.
      */
-    std::vector<bool>& rGetEmptySites();
+    std::vector<unsigned>& rGetAvailableSpaces();
 
     /**
-     * Find if a given node is an empty site. The abstract method always returns false
-     * but is overridden in subclasses.
+     * Find if a given node Has space available.
      *
      * @param index the global index of a specified node
      *
      * @return whether the node is an empty site
      */
-    bool IsEmptySite(unsigned index);
+    bool IsSiteAvailable(unsigned index);
 
     /**
      * @return the indices of those nodes that are empty sites.
@@ -214,7 +220,7 @@ public:
 
     /**
      * Overridden AddCellUsingLocationIndex method to add a cell to a given location index.
-     * Also updates mEmptySites
+     * Also updates mAvailableSpaces
      *
      * @param index the location index
      * @param pCell the cell.
@@ -223,7 +229,7 @@ public:
 
     /**
      * Overridden AddCellUsingLocationIndex method to remove a cell from a given location index.
-     * Also updates mEmptySites
+     * Also updates mAvailableSpaces
      *
      * @param index the location index
      * @param pCell the cell.

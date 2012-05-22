@@ -71,12 +71,14 @@ AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulation( Abstract
     }
 
     // Set up the map between location indices and cells
-    std::list<CellPtr>::iterator it = mCells.begin();
+	mLocationCellMap.clear();
+	mCellLocationMap.clear();
+
+	std::list<CellPtr>::iterator it = mCells.begin();
     for (unsigned i=0; it != mCells.end(); ++it, ++i)
     {
         unsigned index = locationIndices.empty() ? i : locationIndices[i]; // assume that the ordering matches
-        SetCellUsingLocationIndex(index,*it);
-        mCellLocationMap[(*it).get()] = index;
+        AddCellUsingLocationIndex(index,*it);
 
         // Give each cell a pointer to the property registry (we have taken ownership in this constructor).
         (*it)->rGetCellPropertyCollection().SetCellPropertyRegistry(mpCellPropertyRegistry.get());
