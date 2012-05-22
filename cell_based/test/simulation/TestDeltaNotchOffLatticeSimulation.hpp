@@ -224,6 +224,7 @@ public:
 
     void TestHeterogeneousDeltaNotchOnUntetheredTwoCellSystem()
     {
+        EXIT_IF_PARALLEL;
         // Two cells close to each other
         std::vector<Node<2>* > nodes;
         nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
@@ -319,6 +320,7 @@ public:
 
     void TestHomogeneousDeltaNotchOnUntetheredTwoCellSystem()
     {
+        EXIT_IF_PARALLEL;
         // Two cells close to each other
         std::vector<Node<2>* > nodes;
         nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
