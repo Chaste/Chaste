@@ -135,96 +135,20 @@ public:
         // Run simulation
         simulator.Solve();
 
-        // Check levels in cell 0 ///\todo see #1995
-//        TS_ASSERT_DELTA(p_data->GetValue(cells[0],0),0.9384,1e-4);
-//        TS_ASSERT_DELTA(p_data->GetValue(cells[1],0),0.9990,1e-4);
-//        TS_ASSERT_DELTA(p_data->GetValue(cells[2],0),0.9588,1e-4);
+//        // Check levels in cell 0 \todo #1995
+//        double notch = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetNotch();
+//        TS_ASSERT_DELTA(notch, 0.9384, 1e-04);
+//        double delta = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetDelta();
+//        TS_ASSERT_DELTA(delta, 0.9990, 1e-04);
+//        double mean_delta = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetMeanNeighbouringDelta();
+//        TS_ASSERT_DELTA(mean_delta, 0.9588, 1e-04);
+
     }
-
-    void TestDeltaNotchSimpleOde() throw(Exception)
-	{
-		EXIT_IF_PARALLEL;
-
-		// Two cells close to each other
-		std::vector<Node<2>* > nodes;
-		nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
-		nodes.push_back(new Node<2>(1, false, 0.5, 0.0));
-
-		NodesOnlyMesh<2> mesh;
-		mesh.ConstructNodesWithoutMesh(nodes);
-
-		// Create some cells, each with a cell-cycle model that incorporates a Delta-Notch ODE system
-		std::vector<CellPtr> cells;
-		MAKE_PTR(WildTypeCellMutationState, p_state);
-
-		// Initial condition for delta, notch, mean_delta
-		std::vector<double> initial_conditions;
-		initial_conditions.push_back(1.0);
-		initial_conditions.push_back(1.0);
-		initial_conditions.push_back(1.0);
-
-		for (unsigned i=0; i< mesh.GetNumNodes(); i++)
-		{
-			DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
-			p_model->SetCellProliferativeType(DIFFERENTIATED);
-			p_model->SetInitialConditions(initial_conditions);
-			p_model->SetDimension(2);
-			p_model->SetMaxTransitGenerations(UINT_MAX);
-			CellPtr p_cell(new Cell(p_state, p_model));
-			double birth_time = 0.0;
-			p_cell->SetBirthTime(birth_time);
-			cells.push_back(p_cell);
-		}
-
-		// Create cell population
-		NodeBasedCellPopulation<2> cell_population(mesh, cells);
-		cell_population.SetMechanicsCutOffLength(1.5);
-		cell_population.SetCellAncestorsToLocationIndices();
-
-        // Create and initialize CellData
-        MAKE_PTR_ARGS(CellData, p_cell_data, (3)); 
-        p_cell_data->SetItem("notch", DOUBLE_UNSET);
-        p_cell_data->SetItem("delta", DOUBLE_UNSET);
-        p_cell_data->SetItem("mean delta", DOUBLE_UNSET);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
-
-		// Create and configure cell-based simulation
-		DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
-		simulator.SetOutputDirectory("TestDeltaNotchSimpleOdeSimulation");
-		simulator.SetEndTime(0.01);
-
-		// Run simulation
-		simulator.Solve();
-
-		// Check that the levels of delta and notch are roughly equal in each cell.
-
-		// Get the cell
-
-
-		TS_ASSERT_DELTA(cells[0]->GetCellData()->GetItem("notch"), cells[1]->GetCellData()->GetItem("notch"), 1e-4);
-		TS_ASSERT_DELTA(cells[0]->GetCellData()->GetItem("delta"), cells[1]->GetCellData()->GetItem("delta"), 1e-4);
-
-		for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-				cell_iter != cell_population.End();
-				++cell_iter)
-		{
-			// Check the values agree with solutions obtained from Matlab
-			TS_ASSERT_DELTA((*cell_iter)->GetCellData()->GetItem("notch"), 0.9999, 1e-4);
-
-			///\todo This fails because the state variables do not appear to be being updated properly see #1995
-			//TS_ASSERT_DELTA((*cell_iter)->GetCellData()->GetItem("delta"), 0.9901, 1e-4);
-		}
-
-		// Tidy up
-		for(unsigned i=0; i<nodes.size(); i++)
-		{
-			delete nodes[i];
-		}
-	}
 
     void TestHeterogeneousDeltaNotchOnUntetheredTwoCellSystem()
     {
         EXIT_IF_PARALLEL;
+
         // Two cells close to each other
         std::vector<Node<2>* > nodes;
         nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
@@ -251,10 +175,11 @@ public:
         p_model->SetDimension(2);
         p_model->SetInitialConditions(starter_conditions);
 
-        // Avoid synchronicity by randomising the birth times across the population
+        // Ensure that all cells have birth time of zero in order to avoid
+        // problems during the ODE solve of the ReadyToDivide() call, prior to
+        // entering the main simulation timeloop
         CellPtr p_cell(new Cell(p_state, p_model));
-        double birth_time = -RandomNumberGenerator::Instance()->ranf()*12.0;
-        p_cell->SetBirthTime(birth_time);
+        p_cell->SetBirthTime(0.0);
         cells.push_back(p_cell);
 
         // Cell #2:
@@ -271,10 +196,11 @@ public:
         p_model_2->SetDimension(2);
         p_model_2->SetInitialConditions(starter_conditions_2);
 
-        // Avoid synchronicity by randomising the birth times across the population
+        // Ensure that all cells have birth time of zero in order to avoid
+        // problems during the ODE solve of the ReadyToDivide() call, prior to
+        // entering the main simulation timeloop
         CellPtr p_cell_2(new Cell(p_state, p_model_2));
-        birth_time = -RandomNumberGenerator::Instance()->ranf()*12.0;
-        p_cell_2->SetBirthTime(birth_time);
+        p_cell_2->SetBirthTime(0.0);
         cells.push_back(p_cell_2);
 
         // Create the cell population
@@ -290,8 +216,7 @@ public:
         // Set up the simulation
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("DeltaNotchTwoCellTest_heterogee");
-        //simulator.SetEndTime(10.0);
-        simulator.SetEndTime(0.1); //#1995
+        simulator.SetEndTime(10.0);
 
         // Define the radius of interaction as we're dealing with a node-based simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
@@ -307,14 +232,14 @@ public:
         CellPtr p_cell_1b = cell_population.GetCellUsingLocationIndex(1);
 
         // Check that the simulation converges on the expected values
-//        double notch_0b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_0b->GetCellCycleModel())->GetNotch();
-//        TS_ASSERT_DELTA(notch_0b, 0.9640326, 1e-04);  //Default solution at t=10
-//        double delta_0b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_0b->GetCellCycleModel())->GetDelta();
-//        TS_ASSERT_DELTA(delta_0b, 0.0122205, 1e-04);  //Default solution at t=10
-//        double notch_1b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_1b->GetCellCycleModel())->GetNotch();
-//        TS_ASSERT_DELTA(notch_1b, 0.0261745, 1e-04);  //Default solution at t=10
-//        double delta_1b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_1b->GetCellCycleModel())->GetDelta();
-//        TS_ASSERT_DELTA(delta_1b, 0.8151536, 1e-04);  //Default solution at t=10
+        double notch_0b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_0b->GetCellCycleModel())->GetNotch();
+        TS_ASSERT_DELTA(notch_0b, 0.9640326, 1e-02);  //Default solution at t=10
+        double delta_0b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_0b->GetCellCycleModel())->GetDelta();
+        TS_ASSERT_DELTA(delta_0b, 0.0122205, 1e-04);  //Default solution at t=10
+        double notch_1b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_1b->GetCellCycleModel())->GetNotch();
+        TS_ASSERT_DELTA(notch_1b, 0.0261745, 1e-03);  //Default solution at t=10
+        double delta_1b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_1b->GetCellCycleModel())->GetDelta();
+        TS_ASSERT_DELTA(delta_1b, 0.8151536, 1e-02);  //Default solution at t=10
 
         // Tidy up
         for(unsigned i=0; i<nodes.size(); i++)
@@ -326,6 +251,7 @@ public:
     void TestHomogeneousDeltaNotchOnUntetheredTwoCellSystem()
     {
         EXIT_IF_PARALLEL;
+
         // Two cells close to each other
         std::vector<Node<2>* > nodes;
         nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
@@ -352,10 +278,11 @@ public:
         p_model->SetDimension(2);
         p_model->SetInitialConditions(starter_conditions);
 
-        // Avoid synchronicity by randomising the birth times across the population
+        // Ensure that all cells have birth time of zero in order to avoid
+        // problems during the ODE solve of the ReadyToDivide() call, prior to
+        // entering the main simulation timeloop
         CellPtr p_cell(new Cell(p_state, p_model));
-        double birth_time = -RandomNumberGenerator::Instance()->ranf()*12.0;
-        p_cell->SetBirthTime(birth_time);
+        p_cell->SetBirthTime(0.0);
         cells.push_back(p_cell);
 
         // Cell #2:
@@ -372,10 +299,11 @@ public:
         p_model_2->SetDimension(2);
         p_model_2->SetInitialConditions(starter_conditions_2);
 
-        // Avoid synchronicity by randomising the birth times across the population
+        // Ensure that all cells have birth time of zero in order to avoid
+        // problems during the ODE solve of the ReadyToDivide() call, prior to
+        // entering the main simulation timeloop
         CellPtr p_cell_2(new Cell(p_state, p_model_2));
-        birth_time = -RandomNumberGenerator::Instance()->ranf()*12.0;
-        p_cell_2->SetBirthTime(birth_time);
+        p_cell_2->SetBirthTime(0.0);
         cells.push_back(p_cell_2);
 
         // Create the cell population
@@ -391,8 +319,7 @@ public:
         // Set up the simulation
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("DeltaNotchTwoCellTest_homgee");
-        simulator.SetEndTime(0.5);
-        //simulator.SetEndTime(10.0); ///\todo #1995
+        simulator.SetEndTime(10.0);
 
         // Define the radius of interaction as we're dealing with a node-based simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
@@ -407,15 +334,16 @@ public:
         CellPtr p_cell_0b = cell_population.GetCellUsingLocationIndex(0);
         CellPtr p_cell_1b = cell_population.GetCellUsingLocationIndex(1);
 
-        // Check that the simulation converges on the expected values for the DN trunk simulation
-//        double notch_0b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_0b->GetCellCycleModel())->GetNotch();
-//        TS_ASSERT_DELTA(notch_0b, 0.3538417, 1e-04);  //Default solution at t=10
-//        double delta_0b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_0b->GetCellCycleModel())->GetDelta();
-//        TS_ASSERT_DELTA(delta_0b, 0.0740040, 1e-04);  //Default solution at t=10
-//        double notch_1b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_1b->GetCellCycleModel())->GetNotch();
-//        TS_ASSERT_DELTA(notch_1b, 0.3538417, 1e-04);  //Default solution at t=10
-//        double delta_1b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_1b->GetCellCycleModel())->GetDelta();
-//        TS_ASSERT_DELTA(delta_1b, 0.0740040, 1e-04);  //Default solution at t=10
+        // Check that the simulation converges on the expected values
+        double notch_0b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_0b->GetCellCycleModel())->GetNotch();
+        TS_ASSERT_DELTA(notch_0b, 0.3538417, 1e-04);  //Default solution at t=10
+        double delta_0b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_0b->GetCellCycleModel())->GetDelta();
+        TS_ASSERT_DELTA(delta_0b, 0.0740040, 1e-04);  //Default solution at t=10
+        double notch_1b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_1b->GetCellCycleModel())->GetNotch();
+        TS_ASSERT_DELTA(notch_1b, 0.3538417, 1e-04);  //Default solution at t=10
+        double delta_1b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_1b->GetCellCycleModel())->GetDelta();
+        TS_ASSERT_DELTA(delta_1b, 0.0740040, 1e-04);  //Default solution at t=10
+
         // Tidy up
         for(unsigned i=0; i<nodes.size(); i++)
         {
@@ -467,10 +395,14 @@ public:
 
         // Run simulation
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
- ///\todo see #1995
-//        TS_ASSERT_DELTA(p_data->GetValue(cells[0],0),0.9386,5e-4);
-//                TS_ASSERT_DELTA(p_data->GetValue(cells[1],0),0.9990,5e-4);
-//        TS_ASSERT_DELTA(p_data->GetValue(cells[2],0),0.9589,5e-4);
+
+//        // Check levels in cell 0 \todo #1995
+//        double notch = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetNotch();
+//        TS_ASSERT_DELTA(notch, 0.9386, 5e-04);
+//        double delta = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetDelta();
+//        TS_ASSERT_DELTA(delta, 0.9990, 5e-04);
+//        double mean_delta = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetMeanNeighbouringDelta();
+//        TS_ASSERT_DELTA(mean_delta, 0.9589, 5e-04);
 
     }
 
@@ -510,7 +442,7 @@ public:
         // Create and configure cell-based simulation
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDeltaNotchMeshBasedUpdateAtEndOfTimeStep");
-        simulator.SetEndTime(0.01);
+        simulator.SetEndTime(0.02);
 
         // Set up force law and add to simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
@@ -520,10 +452,14 @@ public:
         // Run simulation
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
 
-        // Check levels in cell 0 ///\todo see #1995
-//        TS_ASSERT_DELTA(p_data->GetValue(cells[0],0),0.9384,1e-4);
-//        TS_ASSERT_DELTA(p_data->GetValue(cells[1],0),0.9990,1e-4);
-//        TS_ASSERT_DELTA(p_data->GetValue(cells[2],0),0.9588,1e-4);
+//        // Check levels in cell 0 \todo #1995
+//        double notch = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetNotch();
+//        TS_ASSERT_DELTA(notch, 0.9384, 5e-04);
+//        double delta = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetDelta();
+//        TS_ASSERT_DELTA(delta, 0.9990, 5e-04);
+//        double mean_delta = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetMeanNeighbouringDelta();
+//        TS_ASSERT_DELTA(mean_delta, 0.9588, 5e-04);
+
     }
 
     void TestArchiving() throw (Exception)
