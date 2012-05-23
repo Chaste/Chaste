@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CvodeAdaptor.hpp"
 #include "Exception.hpp"
 
+
 DeltaNotchCellCycleModel::DeltaNotchCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : CellCycleModelOdeHandler(DOUBLE_UNSET, pOdeSolver)
 {
@@ -86,6 +87,7 @@ void DeltaNotchCellCycleModel::UpdateCellCyclePhase()
 {
     assert(SimulationTime::Instance()->IsStartTimeSetUp());
     UpdateDeltaNotch();
+    SolveOdeToTime(SimulationTime::Instance()->GetTime());
     AbstractSimpleCellCycleModel::UpdateCellCyclePhase();
 }
 
@@ -102,7 +104,6 @@ void DeltaNotchCellCycleModel::Initialise()
     else
     {
         mpOdeSystem->SetStateVariables(mInitialConditions);
-
     }
 
     StochasticDurationGenerationBasedCellCycleModel::Initialise();
@@ -122,11 +123,8 @@ void DeltaNotchCellCycleModel::UpdateDeltaNotch()
     assert(mpOdeSystem != NULL);
     assert(mpCell != NULL);
 
-    double mean_delta = mpCell->GetCellData()->GetItem("notch"); ///\todo #1995 This is erroneous.  It obviously ought to be "mean delta" 
-
+    double mean_delta = mpCell->GetCellData()->GetItem("mean delta");
     mpOdeSystem->rGetStateVariables()[2] = mean_delta;
-
-    SolveOdeToTime(SimulationTime::Instance()->GetTime());
 }
 
 double DeltaNotchCellCycleModel::GetNotch()
