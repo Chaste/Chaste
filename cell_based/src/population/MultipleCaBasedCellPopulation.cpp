@@ -584,45 +584,61 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile()
     time << SimulationTime::Instance()->GetTimeStepsElapsed();
     VtkMeshWriter<DIM, DIM> mesh_writer(this->mDirPath, "results_"+time.str(), false);
 
-    unsigned num_nodes = GetNumNodes();
-    std::vector<double> cell_types(num_nodes, -1.0);
-    std::vector<double> cell_mutation_states(num_nodes, -1.0);
-    std::vector<double> cell_labels(num_nodes, -1.0);
-    std::vector<double> cell_ids(num_nodes, -1.0);
-    std::vector<double> cell_ancestors(num_nodes, -1.0);
-    std::vector<double> cell_ages(num_nodes, -1.0);
-    std::vector<double> cell_cycle_phases(num_nodes, -1.0);
+    unsigned num_cells = this->GetNumRealCells();
+    std::vector<double> cell_types(num_cells, -1.0);
+    std::vector<double> cell_mutation_states(num_cells, -1.0);
+    std::vector<double> cell_labels(num_cells, -1.0);
+    std::vector<double> cell_ids(num_cells, -1.0);
+    std::vector<double> cell_ancestors(num_cells, -1.0);
+    std::vector<double> cell_ages(num_cells, -1.0);
+    std::vector<double> cell_cycle_phases(num_cells, -1.0);
+    std::vector<Node<DIM>*> nodes;
 
-    for (unsigned node_index = 0; node_index < static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetNumNodes(); node_index++)
+    unsigned cell = 0u;
+
+    for (std::list<CellPtr>::iterator iter = this->mCells.begin();
+            iter != this->mCells.end();
+            ++iter)
     {
-        if (mLatticeCarryingCapacity - mAvailableSpaces[node_index] == 1u) // Only have one cell
-        {
-            CellPtr cell_ptr = this->GetCellUsingLocationIndex(node_index);
-            cell_ids[node_index] = cell_ptr->GetCellId();
+            CellPtr cell_ptr = *iter;
+            cell_ids[cell] = cell_ptr->GetCellId();
+
+            c_vector<double, DIM> coords = GetLocationOfCellCentre(*iter);
+
+            // Move the coordinate slighly so can visualise all cells in a lattice site
+            RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
+
+            for( unsigned i=0; i<DIM; i++)
+            {
+                coords[i] += p_gen->ranf(); // This assumes all sites are 1 appart;
+            }
+            nodes.push_back(new Node<DIM>(cell, coords, false));
 
             if (this->mOutputCellAncestors)
             {
                 double ancestor_index = (cell_ptr->GetAncestor() == UNSIGNED_UNSET) ? (-1.0) : (double)cell_ptr->GetAncestor();
-                cell_ancestors[node_index] = ancestor_index;
+                cell_ancestors[cell] = ancestor_index;
             }
             if (this->mOutputCellProliferativeTypes)
             {
-                cell_types[node_index] =  cell_ptr->GetCellCycleModel()->GetCellProliferativeType();
+                cell_types[cell] =  cell_ptr->GetCellCycleModel()->GetCellProliferativeType();
             }
             if (this->mOutputCellMutationStates)
             {
-                cell_mutation_states[node_index] = cell_ptr->GetMutationState()->GetColour();
+                cell_mutation_states[cell] = cell_ptr->GetMutationState()->GetColour();
             }
             if (this->mOutputCellAges)
             {
-                cell_ages[node_index] = cell_ptr->GetAge();
+                cell_ages[cell] = cell_ptr->GetAge();
             }
             if (this->mOutputCellCyclePhases)
             {
-                cell_cycle_phases[node_index] = cell_ptr->GetCellCycleModel()->GetCurrentCellCyclePhase();
+                cell_cycle_phases[cell] = cell_ptr->GetCellCycleModel()->GetCurrentCellCyclePhase();
             }
+
+            cell ++;
+
             ///\todo #2032 Add CellData
-        }
     }
 
     //Cell IDs can be used to threshold out the empty lattice sites (which have ID=-1)
@@ -660,7 +676,7 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile()
      * For now, we do an explicit conversion to NodesOnlyMesh. This can be written to VTK then visualized as glyphs.
      */
     NodesOnlyMesh<DIM> temp_mesh;
-    temp_mesh.ConstructNodesWithoutMesh(static_cast<PottsMesh<DIM>& >((this->mrMesh)));
+    temp_mesh.ConstructNodesWithoutMesh(nodes);
     mesh_writer.WriteFilesUsingMesh(temp_mesh);
 
     *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
@@ -668,6 +684,12 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile()
     *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
     *(this->mpVtkMetaFile) << time.str();
     *(this->mpVtkMetaFile) << ".vtu\"/>\n";
+
+    // Tidy up
+    for (unsigned i=0; i<nodes.size(); i++)
+    {
+        delete nodes[i];
+    }
 #endif //CHASTE_VTK
 }
 

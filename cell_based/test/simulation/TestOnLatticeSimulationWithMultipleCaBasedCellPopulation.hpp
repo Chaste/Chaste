@@ -384,50 +384,6 @@ public:
         }
     }
 
-    void TestMultipleCaMultipleCellsWithNoMovement() throw (Exception)
-    {
-          EXIT_IF_PARALLEL;
-
-          // Create a simple 2D PottsMesh
-          PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
-          PottsMesh<2>* p_mesh = generator.GetMesh();
-
-          // Create cells
-          std::vector<CellPtr> cells;
-          CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-          cells_generator.GenerateBasicRandom(cells, 30u, DIFFERENTIATED);
-
-          // Specify where cells lie
-          std::vector<unsigned> location_indices;
-          for (unsigned index=0; index<30; index++)
-          {
-             location_indices.push_back(49u);
-          }
-
-          // Create cell population
-          MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 30);
-
-          // Set up cell-based simulation
-          OnLatticeSimulation<2> simulator(cell_population);
-          std::string output_directory = "TestMultipleCaMultipleCellWithNoMovement";
-          simulator.SetOutputDirectory(output_directory);
-          simulator.SetDt(1);
-          simulator.SetEndTime(100);
-
-          // Run simulation
-          simulator.Solve();
-
-          TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 30u);
-
-          for( AbstractCellPopulation<2>::Iterator iter = cell_population.Begin();
-                  iter!= cell_population.End(); ++iter)
-          {
-              TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*iter), 49u);
-
-          }
-
-    }
-
     void TestMultipleCaMultipleCellsRandomMovement() throw (Exception)
     {
         /*
@@ -445,24 +401,27 @@ public:
          // Create cells
          std::vector<CellPtr> cells;
          CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-         cells_generator.GenerateBasicRandom(cells, 30u, DIFFERENTIATED);
+         cells_generator.GenerateBasicRandom(cells, 40u, DIFFERENTIATED);
 
-         // Specify where cells lie
+         // Specify where cells lie 4 cells in the first ten sites
          std::vector<unsigned> location_indices;
-         for (unsigned index=0; index<30; index++)
+         for (unsigned index=0; index<10u; index++)
          {
-            location_indices.push_back(49u);
+            location_indices.push_back(index);
+            location_indices.push_back(index);
+            location_indices.push_back(index);
+            location_indices.push_back(index);
          }
 
          // Create cell population
-         MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 30);
+         MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 4u);
 
          // Set up cell-based simulation
          OnLatticeSimulation<2> simulator(cell_population);
          std::string output_directory = "TestMultipleCaMultipleCellRandomMovement";
          simulator.SetOutputDirectory(output_directory);
          simulator.SetDt(1);
-         simulator.SetEndTime(100);
+         simulator.SetEndTime(10);
 
          /*
           * Adding update rule(s).
@@ -474,9 +433,57 @@ public:
          // Run simulation
          simulator.Solve();
 
-         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 30u);
+         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 40u);
 
     }
+
+    void TestMultipleCaMultipleCellsRandomMovementIn3d() throw (Exception)
+    {
+       EXIT_IF_PARALLEL;
+
+        // Create a simple 3D PottsMesh
+        PottsMeshGenerator<3> generator(10, 0, 0, 10, 0, 0, 10, 0, 0);
+        PottsMesh<3>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, 40u, DIFFERENTIATED);
+
+        // Specify where cells lie 4 cells in the first ten sites
+        std::vector<unsigned> location_indices;
+        for (unsigned index=0; index<10u; index++)
+        {
+           location_indices.push_back(index);
+           location_indices.push_back(index);
+           location_indices.push_back(index);
+           location_indices.push_back(index);
+        }
+
+        // Create cell population
+        MultipleCaBasedCellPopulation<3> cell_population(*p_mesh, cells, location_indices, 4u);
+
+        // Set up cell-based simulation
+        OnLatticeSimulation<3> simulator(cell_population);
+        std::string output_directory = "TestMultipleCaMultipleCellRandomMovementIn3d";
+        simulator.SetOutputDirectory(output_directory);
+        simulator.SetDt(1);
+        simulator.SetEndTime(100);
+
+        /*
+         * Adding update rule(s).
+         */
+        MAKE_PTR(DiffusionMultipleCaUpdateRule<3>, p_diffusion_update_rule);
+        p_diffusion_update_rule->SetDiffusionParameter(0.1);
+        simulator.AddMultipleCaUpdateRule(p_diffusion_update_rule);
+
+        // Run simulation
+        simulator.Solve();
+
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 40u);
+
+    }
+
 
     void TestMultipleCellsPerLatticeSiteWithBirth() throw (Exception)
     {
@@ -619,7 +626,7 @@ public:
 }
 
 //
-//    void TestStandardResultForArchivingTestsBelow() throw (Exception)
+//    void NoTestStandardResultForArchivingTestsBelow() throw (Exception)
 //    {
 //        // Create a simple 2D PottsMesh
 //        PottsMeshGenerator<2> generator(10, 1, 4, 10, 1, 4);
@@ -663,7 +670,7 @@ public:
 //        TS_ASSERT_EQUALS(element_1->GetNode(15)->GetIndex(), 25u);
 //    }
 //
-//    void TestSave() throw (Exception)
+//    void NoTestSave() throw (Exception)
 //    {
 //        // Create a simple 2D PottsMesh
 //        PottsMeshGenerator<2> generator(10, 1, 4, 10, 1, 4);
@@ -697,7 +704,7 @@ public:
 //        CellBasedSimulationArchiver<2, OnLatticeSimulation<2> >::Save(&simulator);
 //    }
 //
-//    void TestLoad() throw (Exception)
+//    void NoTestLoad() throw (Exception)
 //    {
 //        // Load the simulation from the TestSave method above and
 //        // run it from 10.0 to 15.0
