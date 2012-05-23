@@ -167,7 +167,7 @@ public:
 		location_indices.push_back(3);
 
 		// Create cell population
-		MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+		MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 2);
 
 		// Check cells are in the correct location
 		TS_ASSERT(cell_population.IsCellAttachedToLocationIndex(0));

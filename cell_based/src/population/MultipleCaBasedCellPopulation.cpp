@@ -94,11 +94,11 @@ MultipleCaBasedCellPopulation<DIM>::MultipleCaBasedCellPopulation(PottsMesh<DIM>
         // Create a set of node indices corresponding to empty sites
         for (unsigned i=0; i<locationIndices.size(); i++)
         {
-            if (mAvailableSpaces[locationIndices[i]] == 0u)
+            mAvailableSpaces[locationIndices[i]]--;
+            if (mAvailableSpaces[locationIndices[i]] < 0u)
             {
             	EXCEPTION("One of the lattice sites has more cells than the carrying capacity. Check the initial cell locations.");
             }
-            mAvailableSpaces[locationIndices[i]]--;
         }
     }
     else
@@ -137,7 +137,7 @@ std::vector<unsigned>& MultipleCaBasedCellPopulation<DIM>::rGetAvailableSpaces()
 template<unsigned DIM>
 bool MultipleCaBasedCellPopulation<DIM>::IsSiteAvailable(unsigned index)
 {
-    return (mAvailableSpaces[index]>0u);
+    return (mAvailableSpaces[index]>0);
 }
 
 template<unsigned DIM>
@@ -197,7 +197,7 @@ Node<DIM>* MultipleCaBasedCellPopulation<DIM>::GetNodeCorrespondingToCell(CellPt
 template<unsigned DIM>
 void MultipleCaBasedCellPopulation<DIM>::AddCellUsingLocationIndex(unsigned index, CellPtr pCell)
 {
-	if (mAvailableSpaces[index]==0u)
+if (mAvailableSpaces[index]==0u)
 	{
 		EXCEPTION("No available spaces at location index " << index << ".");
 	}
@@ -303,17 +303,6 @@ unsigned MultipleCaBasedCellPopulation<DIM>::RemoveDeadCells()
     }
     return num_removed;
 }
-//template<unsigned DIM>
-//double MultipleCaBasedCellPopulation<DIM>::CalculateProbabilityOfMoving(unsigned node_index, unsigned node_neighbour_index, double dt)
-//{
-//    c_vector<double, DIM> node_index_location = this->GetNode(node_index)->rGetLocation();
-//    c_vector<double, DIM> node_neighbour_location = this->GetNode(node_neighbour_index)->rGetLocation();
-//
-//    /*
-//     * \todo 0.5 in the formula must be replaced by a parameter D to be read from a file
-//     */
-//    return(0.01*dt/(2* pow(norm_2(this->rGetMesh().GetVectorFromAtoB(node_index_location, node_neighbour_location)), 2)));
-//}
 
 template<unsigned DIM>
 void MultipleCaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
@@ -330,7 +319,6 @@ void MultipleCaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
 		 * Loop over neighbours and calculate probability of moving (make sure all probabilities are <1)
 		 */
 		unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
-		assert(!IsSiteAvailable(node_index));
 
 		// Find a random available neighbouring node to overwrite current site
 		std::set<unsigned> neighbouring_node_indices = static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetMooreNeighbouringNodeIndices(node_index);
@@ -397,17 +385,15 @@ void MultipleCaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
             double total_probability = neighbouring_node_propensities[0];
             unsigned counter = 1u;
             
-            ///\todo #2066 This would be less prone to error if it were a for loop
             while ((total_probability < random_number) && (counter < num_neighbours+1))
             {
-                ///\todo #2066 At this point we need to know that counter < num_neighbours
-                total_probability += neighbouring_node_propensities[counter];
+               total_probability += neighbouring_node_propensities[counter];
                 counter++; 
             }
 
-            if (counter < num_neighbours+1)///\todo #2066 Check this!
+            if (counter < num_neighbours+1)
             {
-				unsigned chosen_neighbour_location_index = neighbouring_node_indices_vector[counter-1];///\todo #2066 Check this!
+				unsigned chosen_neighbour_location_index = neighbouring_node_indices_vector[counter-1];
 
 				/*
 				 * Move the cell to new location
@@ -471,21 +457,8 @@ void MultipleCaBasedCellPopulation<DIM>::WriteResultsToFiles()
     {
         unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
 
-        // Hack that covers the case where the element is associated with a cell that has just been killed (#1129)
-
-        bool node_corresponds_to_dead_cell = false;
-
-        if (this->IsCellAttachedToLocationIndex(node_index))
-        {
-            node_corresponds_to_dead_cell = this->GetCellUsingLocationIndex(node_index)->IsDead();
-        }
-
-        // Write node data to file
-        if (!node_corresponds_to_dead_cell)
-        {
-            // Write the index of the of Node the cell is associated with.
-            *mpVizLocationsFile << node_index << " ";
-        }
+        // Write the index of the of Node the cell is associated with.
+        *mpVizLocationsFile << node_index << " ";
     }
     *mpVizLocationsFile << "\n";
 

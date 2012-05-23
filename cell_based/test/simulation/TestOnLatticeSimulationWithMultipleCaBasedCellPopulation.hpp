@@ -383,6 +383,241 @@ public:
         	}
         }
     }
+
+    void TestMultipleCaMultipleCellsWithNoMovement() throw (Exception)
+    {
+          EXIT_IF_PARALLEL;
+
+          // Create a simple 2D PottsMesh
+          PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
+          PottsMesh<2>* p_mesh = generator.GetMesh();
+
+          // Create cells
+          std::vector<CellPtr> cells;
+          CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+          cells_generator.GenerateBasicRandom(cells, 30u, DIFFERENTIATED);
+
+          // Specify where cells lie
+          std::vector<unsigned> location_indices;
+          for (unsigned index=0; index<30; index++)
+          {
+             location_indices.push_back(49u);
+          }
+
+          // Create cell population
+          MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 30);
+
+          // Set up cell-based simulation
+          OnLatticeSimulation<2> simulator(cell_population);
+          std::string output_directory = "TestMultipleCaMultipleCellWithNoMovement";
+          simulator.SetOutputDirectory(output_directory);
+          simulator.SetDt(1);
+          simulator.SetEndTime(100);
+
+          // Run simulation
+          simulator.Solve();
+
+          TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 30u);
+
+          for( AbstractCellPopulation<2>::Iterator iter = cell_population.Begin();
+                  iter!= cell_population.End(); ++iter)
+          {
+              TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*iter), 49u);
+
+          }
+
+    }
+
+    void TestMultipleCaMultipleCellsRandomMovement() throw (Exception)
+    {
+        /*
+         * RandomMovement has been tested in TestMultipleCaSingleCellRandomMovement for one cell
+         * per lattice site.
+         * This test is just to ensure that the above test works when there are multiple cells per lattice site.
+         */
+
+        EXIT_IF_PARALLEL;
+
+         // Create a simple 2D PottsMesh
+         PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
+         PottsMesh<2>* p_mesh = generator.GetMesh();
+
+         // Create cells
+         std::vector<CellPtr> cells;
+         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+         cells_generator.GenerateBasicRandom(cells, 30u, DIFFERENTIATED);
+
+         // Specify where cells lie
+         std::vector<unsigned> location_indices;
+         for (unsigned index=0; index<30; index++)
+         {
+            location_indices.push_back(49u);
+         }
+
+         // Create cell population
+         MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 30);
+
+         // Set up cell-based simulation
+         OnLatticeSimulation<2> simulator(cell_population);
+         std::string output_directory = "TestMultipleCaMultipleCellRandomMovement";
+         simulator.SetOutputDirectory(output_directory);
+         simulator.SetDt(1);
+         simulator.SetEndTime(100);
+
+         /*
+          * Adding update rule(s).
+          */
+         MAKE_PTR(DiffusionMultipleCaUpdateRule<2>, p_diffusion_update_rule);
+         p_diffusion_update_rule->SetDiffusionParameter(0.1);
+         simulator.AddMultipleCaUpdateRule(p_diffusion_update_rule);
+
+         // Run simulation
+         simulator.Solve();
+
+         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 30u);
+
+    }
+
+    void TestMultipleCellsPerLatticeSiteWithBirth() throw (Exception)
+    {
+
+        /*
+         * Cellular birth has been tested in TestMultipleCaSingleCellWithBirth for one cell per lattice site.
+         * This test  adds to the above by further testing cellular birth considering multiple cells per lattice site.
+         * A  two-lattice mesh was created and only one lattice had free space to add one daughter cell.
+         */
+
+          EXIT_IF_PARALLEL;
+
+          // Create a simple 2D PottsMesh
+          PottsMeshGenerator<2> generator(2, 0, 0, 1, 0, 0);
+          PottsMesh<2>* p_mesh = generator.GetMesh();
+
+          // Create cells
+          std::vector<CellPtr> cells;
+          CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+          cells_generator.GenerateBasicRandom(cells, 3u, STEM);
+
+          // Specify where cells lie
+          std::vector<unsigned> location_indices;
+          location_indices.push_back(0u);
+          location_indices.push_back(0u);
+          location_indices.push_back(1u);
+
+
+          // Create cell population
+          MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 2);
+
+          // Set up cell-based simulation
+          OnLatticeSimulation<2> simulator(cell_population);
+          std::string output_directory = "TestMultipleCellsPerLatticeSiteWithBirth";
+          simulator.SetOutputDirectory(output_directory);
+          simulator.SetDt(0.1);
+          simulator.SetEndTime(40);
+
+          // Adding update rule(s).
+          MAKE_PTR(DiffusionMultipleCaUpdateRule<2u>, p_diffusion_update_rule);
+          p_diffusion_update_rule->SetDiffusionParameter(0.5);
+
+          simulator.AddMultipleCaUpdateRule(p_diffusion_update_rule);
+
+          // Run simulation
+          simulator.Solve();
+
+          // Check the number of cells
+          TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 4u);
+
+          // Test no deaths and some births
+          TS_ASSERT_EQUALS(simulator.GetNumBirths(), 1u);
+          TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
+
+
+    #ifdef CHASTE_VTK
+          //Test that VTK writer has produced a file
+          OutputFileHandler output_file_handler(output_directory, false);
+          std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+          // Initial condition file
+          FileFinder vtk_file(results_dir + "results_from_time_0/results_0.vtu", RelativeTo::Absolute);
+          TS_ASSERT(vtk_file.Exists());
+
+          // Final file
+          FileFinder vtk_file2(results_dir + "results_from_time_0/results_400.vtu", RelativeTo::Absolute);
+          TS_ASSERT(vtk_file2.Exists());
+    #endif //CHASTE_VTK
+
+    }
+
+    void TestMultipleCellsPerLatticeSiteWithDeath() throw (Exception)
+    {
+        /*
+         * Cellular death has been tested in TestCaMonolayerWithDeath for one cell per lattice site.
+         * This test is just to ensure that the above test works when there are multiple cells per lattice site.
+         */
+
+        EXIT_IF_PARALLEL;
+
+        // Resetting the maximum cell ID to zero (to account for previous tests)
+        CellId::ResetMaxCellId();
+
+        // Create a simple 2D PottsMesh
+        PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, 2*p_mesh->GetNumNodes(), DIFFERENTIATED);
+
+        // Specify where cells lie
+        std::vector<unsigned> location_indices;
+        for (unsigned index=0; index<p_mesh->GetNumNodes(); index++)
+        {
+          //adding two cells per lattice site
+          location_indices.push_back(index);
+          location_indices.push_back(index);
+        }
+        TS_ASSERT_EQUALS(location_indices.size(),2*p_mesh->GetNumNodes());
+
+        // Create cell population
+        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 2);
+
+        // Set up cell-based simulation
+        OnLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestMultipleCellsPerLatticeSiteWithDeath");
+        simulator.SetDt(0.1);
+        simulator.SetEndTime(0.1); //only one step as only care about cells being killed
+
+        // No movement rule as only care about cell death
+
+        // Add a cell Killer that will kill all cells in the top half of the domain
+        MAKE_PTR_ARGS(PlaneBasedCellKiller<2>, p_killer, (&cell_population, 4.5*unit_vector<double>(2,1), unit_vector<double>(2,1))); //v>4.5
+        simulator.AddCellKiller(p_killer);
+
+        // Run simulation
+        simulator.Solve();
+
+        // Check the number of cells
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 100u);
+
+        // Test no deaths and some births
+        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
+        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 100u);
+
+        // Check cells above y=5.5 (i.e. above index 50) have been killed and removed.
+        for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+        {
+         if(i<50)
+         {
+             TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetCellsUsingLocationIndex(i).size(),2u);
+         }
+         else
+         {
+             TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetCellsUsingLocationIndex(i).size(),0u);
+         }
+        }
+}
+
 //
 //    void TestStandardResultForArchivingTestsBelow() throw (Exception)
 //    {
