@@ -264,7 +264,7 @@ public:
          * CellData objects but here we use one for simple testing.
          */
 		MAKE_PTR_ARGS(CellData, p_cell_data, (1));
-		p_cell_data->SetItem(0, oxygen_concentration);
+		p_cell_data->SetItem("oxygen", oxygen_concentration);
 
 
         // Create cell-cycle models
@@ -434,7 +434,7 @@ public:
          * CellData objects but here we use one for simple testing.
          */
 		MAKE_PTR_ARGS(CellData, p_cell_data, (1));
-		p_cell_data->SetItem(0, oxygen_concentration);
+		p_cell_data->SetItem("oxygen", oxygen_concentration);
 
         {
             // We must set up SimulationTime to avoid memory leaks

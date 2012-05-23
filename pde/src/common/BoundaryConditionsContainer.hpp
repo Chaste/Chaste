@@ -228,6 +228,13 @@ public:
      *  unknown and the other node.
      *
      *  The entry in the RHS vector is zeroed.
+     * 
+     *  @param rLinearSystem Linear system on which to apply boundary conditions
+     *
+     *  @param applyToMatrix This optional parameter can be set as false to
+     *  ensure that the matrix of the linear system is not updated. To
+     *  be used when the matrix does not change between time steps.
+     *  @param applyToRhsVector Similarly, whether to apply the changes to the RHS vector (b in Ax=b).
      *
      */
     void ApplyPeriodicBcsToLinearProblem(LinearSystem& rLinearSystem,

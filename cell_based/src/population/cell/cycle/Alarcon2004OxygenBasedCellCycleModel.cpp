@@ -100,7 +100,7 @@ AbstractCellCycleModel* Alarcon2004OxygenBasedCellCycleModel::CreateCellCycleMod
      */
     assert(mpOdeSystem);
     bool is_labelled = mpCell->HasCellProperty<CellLabel>();
-	p_model->SetOdeSystem(new Alarcon2004OxygenBasedCellCycleOdeSystem(mpCell->GetCellData()->GetItem(0), is_labelled));
+	p_model->SetOdeSystem(new Alarcon2004OxygenBasedCellCycleOdeSystem(mpCell->GetCellData()->GetItem("oxygen"), is_labelled));
     p_model->SetStateVariables(mpOdeSystem->rGetStateVariables());
 
     return p_model;
@@ -113,7 +113,7 @@ void Alarcon2004OxygenBasedCellCycleModel::Initialise()
 
     bool is_labelled = mpCell->HasCellProperty<CellLabel>();
 
-    mpOdeSystem = new Alarcon2004OxygenBasedCellCycleOdeSystem(mpCell->GetCellData()->GetItem(0), is_labelled);
+    mpOdeSystem = new Alarcon2004OxygenBasedCellCycleOdeSystem(mpCell->GetCellData()->GetItem("oxygen"), is_labelled);
 
     mpOdeSystem->SetStateVariables(mpOdeSystem->GetInitialConditions());
 }
@@ -122,7 +122,7 @@ void Alarcon2004OxygenBasedCellCycleModel::AdjustOdeParameters(double currentTim
 {
     // Pass this time step's oxygen concentration into the solver as a constant over this timestep
 
-	mpOdeSystem->rGetStateVariables()[5] = mpCell->GetCellData()->GetItem(0);
+	mpOdeSystem->rGetStateVariables()[5] = mpCell->GetCellData()->GetItem("oxygen");
 
     // Use whether the cell is currently labelled as another input
     bool is_labelled = mpCell->HasCellProperty<CellLabel>();

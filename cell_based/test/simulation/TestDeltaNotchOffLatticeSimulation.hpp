@@ -316,6 +316,11 @@ public:
 //        double delta_1b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_1b->GetCellCycleModel())->GetDelta();
 //        TS_ASSERT_DELTA(delta_1b, 0.8151536, 1e-04);  //Default solution at t=10
 
+        // Tidy up
+        for(unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
     }
 
     void TestHomogeneousDeltaNotchOnUntetheredTwoCellSystem()
@@ -411,7 +416,11 @@ public:
 //        TS_ASSERT_DELTA(notch_1b, 0.3538417, 1e-04);  //Default solution at t=10
 //        double delta_1b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_1b->GetCellCycleModel())->GetDelta();
 //        TS_ASSERT_DELTA(delta_1b, 0.0740040, 1e-04);  //Default solution at t=10
-
+        // Tidy up
+        for(unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
     }
 
     void TestUpdateAtEndOfTimeStepVertex() throw (Exception)
