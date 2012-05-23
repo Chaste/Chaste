@@ -32,8 +32,8 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-#ifndef TESTPOTTSUPDATERULES_HPP_
-#define TESTPOTTSUPDATERULES_HPP_
+#ifndef TESTMULTIPLLECAUPDATERULES_HPP_
+#define TESTMULTIPLLECAUPDATERULES_HPP_
 
 #include <cxxtest/TestSuite.h>
 
@@ -53,7 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulation.hpp"
 #include "SmartPointers.hpp"
 
-class TestUpdateRules : public AbstractCellBasedTestSuite
+class TestMulitpleCaUpdateRules : public AbstractCellBasedTestSuite
 {
 public:
 
