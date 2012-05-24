@@ -197,8 +197,6 @@ void Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM>::WriteCmguiScript()
         *p_script_file << "# Read the mesh \n"
                        << "gfx read node "<<HeartConfig::Instance()->GetOutputFilenamePrefix()<<".exnode \n"
                        << "gfx read elem "<<HeartConfig::Instance()->GetOutputFilenamePrefix()<<".exelem \n" // note the mesh file name is taken from HeartConfig...
-                       << "# NOTE: the instruction: 'gfx define faces egroup' is known to work with Cmgui version 2.8 or higher \n"
-                       << "# an alternative that works with Cmgui version < 2.8 is 'gfx read ele FILE generate_faces_and_lines' without the 'gfx define faces' instruction\n"
                        << "gfx define faces egroup "<<HeartConfig::Instance()->GetOutputFilenamePrefix()<<"\n"
                        << "# Create a window \n"
                        << "gfx cre win 1 \n"
