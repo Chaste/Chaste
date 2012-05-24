@@ -7,5 +7,6 @@ for ($i=0; $i<=2; $i++) {
 }
 gfx read ele solution_0
 gfx define faces egroup solution
+gfx modify g_element solution lines select_on material default spectrum default selected_material default_selected;
 gfx cr win
 

@@ -194,6 +194,7 @@ void CmguiDeformedSolutionsWriter<DIM>::WriteCmguiScript(std::string fieldBaseNa
         *p_script_file << "gfx read ele " << this->mBaseName << "_0\n";
     }
     *p_script_file << "gfx define faces egroup "<<this->mBaseName<<"\n";
+    *p_script_file << "gfx modify g_element "<<this->mBaseName<<" lines select_on material default spectrum default selected_material default_selected;\n";
     *p_script_file << "gfx cr win\n\n";
     p_script_file->close();
 }
