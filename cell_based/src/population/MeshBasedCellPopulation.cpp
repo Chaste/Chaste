@@ -650,7 +650,7 @@ void MeshBasedCellPopulation<DIM>::WriteVtkResultsToFile()
             }
             for (unsigned var=0; var<num_cell_data_items; var++)
             {
-                cellwise_data[var][elem_index] = p_cell->GetCellData()->GetItem(var);
+                cellwise_data[var][elem_index] = p_cell->GetCellData()->GetItem(cell_data_names[var]);
             }
         }
 
@@ -682,10 +682,7 @@ void MeshBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         {
             for (unsigned var=0; var<cellwise_data.size(); var++)
             {
-                std::stringstream data_name;
-                data_name << "Cellwise data " << var;
-                std::vector<double> cellwise_data_var = cellwise_data[var];
-                mesh_writer.AddCellData(data_name.str(), cellwise_data_var);
+                mesh_writer.AddCellData(cell_data_names[var], cellwise_data[var]);
             }
         }
 

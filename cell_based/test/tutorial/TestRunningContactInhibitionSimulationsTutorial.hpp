@@ -164,8 +164,7 @@ public:
 
         /* This creates the instance of {{{CellData}}}: */
         // Create and initialize CellData
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem(0, DOUBLE_UNSET);
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1));
         /* We set the number of variables we wish to use {{{CellData}}} to track, and add a copy of this data
          * to all cells in the population with the  {{{AddClonedDataToAllCells}}} method.*/
         cell_population.AddClonedDataToAllCells(p_cell_data);
@@ -283,8 +282,7 @@ public:
         /* To keep track of the volumes of the cells that are used in the contact inhibition cell-cycle,
          * we use the {{{CellData}}} class. Here, we just initialise it with one variable
          * and copy it to all the cell in the population: */
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem(0, DOUBLE_UNSET);
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1));
         cell_population.AddClonedDataToAllCells(p_cell_data);
 
         /*  Then, we define the contact {{{VolumeTrackedOffLatticeSimulation}}} class, that automatically updates the volumes of the cells
@@ -379,8 +377,7 @@ public:
         /* To keep track of the volumes of the cells that are used in the contact inhibition cell-cycle,
          * we use the class {{{CellData}}} class. Here, we just initialise it with one variable
          * and associate it with the cell population. This time each cell is associated with a vertex element. */
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem(0, DOUBLE_UNSET);
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1));
         cell_population.AddClonedDataToAllCells(p_cell_data);
 
 

@@ -73,7 +73,6 @@ public:
 
         // Set up data: C(x,y) = x^2
         MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem(0, DOUBLE_UNSET);
         cell_population.AddClonedDataToAllCells(p_cell_data);
         
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)

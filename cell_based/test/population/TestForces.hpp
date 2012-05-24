@@ -555,7 +555,6 @@ public:
 
         // Set up cell data on the cell population
         MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem(0, DOUBLE_UNSET);
         cell_population.AddClonedDataToAllCells(p_cell_data);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {

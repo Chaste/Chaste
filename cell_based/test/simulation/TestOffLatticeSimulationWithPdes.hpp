@@ -287,7 +287,7 @@ public:
         simulator.AddCellKiller(p_killer);
 
         // Run cell-based simulation
-        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        simulator.Solve();
     }
 
     /*
@@ -1512,7 +1512,6 @@ public:
 
         // Set up cell data on the cell population
         MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem(0, DOUBLE_UNSET);
         cell_population.AddClonedDataToAllCells(p_cell_data);
 
         c_vector<double,2> centre_of_mesh;
@@ -1694,7 +1693,6 @@ public:
 
         // Set up cell data on the cell population
         MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem(0, DOUBLE_UNSET);
         cell_population.AddClonedDataToAllCells(p_cell_data);
 
         c_vector<double,2> centre_of_mesh;
@@ -1780,7 +1778,6 @@ public:
 
         // Set up cell data on the cell population
         MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem(0, DOUBLE_UNSET);
         cell_population.AddClonedDataToAllCells(p_cell_data);
 
         c_vector<double,3> centre_of_mesh;

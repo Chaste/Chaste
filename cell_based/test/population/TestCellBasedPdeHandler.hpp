@@ -646,7 +646,6 @@ public:
 
         //Put random data on the cells
         MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem(0, DOUBLE_UNSET);
         cell_population.AddClonedDataToAllCells(p_cell_data);
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
@@ -693,7 +692,6 @@ public:
 
         //Put random data on the cells
         MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem(0, DOUBLE_UNSET);
         cell_population.AddClonedDataToAllCells(p_cell_data);
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();

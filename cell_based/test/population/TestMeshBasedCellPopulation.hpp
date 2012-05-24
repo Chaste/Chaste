@@ -682,10 +682,7 @@ public:
 
         // Coverage of writing CellData to VTK
         MAKE_PTR_ARGS(CellData, p_cell_data, (2));
-        p_cell_data->SetItem(0, DOUBLE_UNSET);
-        p_cell_data->SetItem(1, DOUBLE_UNSET);
         cell_population.AddClonedDataToAllCells(p_cell_data);
-
         for (unsigned var=0; var<2; var++)
         {
             for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
@@ -786,8 +783,6 @@ public:
 
         // Coverage of writing CellData to VTK
         MAKE_PTR_ARGS(CellData, p_cell_data, (2)); 
-        p_cell_data->SetItem(0, DOUBLE_UNSET);
-        p_cell_data->SetItem(1, DOUBLE_UNSET);
         cell_population.AddClonedDataToAllCells(p_cell_data);
         for (unsigned var=0; var<2; var++)
         {

@@ -382,25 +382,19 @@ void MultipleCaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
             RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
             double random_number = p_gen->ranf();
 
-            double total_probability = neighbouring_node_propensities[0];
-            unsigned counter = 1u;
-            
-            while ((total_probability < random_number) && (counter < num_neighbours+1))
+            double total_probability = 0.0;
+            for(unsigned counter = 0; counter<num_neighbours; counter++)
             {
-               total_probability += neighbouring_node_propensities[counter];
-                counter++; 
+                total_probability += neighbouring_node_propensities[counter];
+                if (total_probability >= random_number)
+                {
+                    //Move the cell to this neighbour location
+                    unsigned chosen_neighbour_location_index = neighbouring_node_indices_vector[counter];
+                    this->MoveCellInLocationMap((*cell_iter), node_index, chosen_neighbour_location_index);
+                    break;
+                }
             }
-
-            if (counter < num_neighbours+1)
-            {
-				unsigned chosen_neighbour_location_index = neighbouring_node_indices_vector[counter-1];
-
-				/*
-				 * Move the cell to new location
-				 */
-				this->MoveCellInLocationMap((*cell_iter), node_index, chosen_neighbour_location_index);
-            }
-            //else stay in the same location
+            //If loop completes with total_probability < random_number then stay in the same location
 		}
 		else
 		{

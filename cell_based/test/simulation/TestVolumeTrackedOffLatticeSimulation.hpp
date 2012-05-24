@@ -113,7 +113,6 @@ public:
 
         // Set up cell data on the cell population
         MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem(0, DOUBLE_UNSET);
         cell_population.AddClonedDataToAllCells(p_cell_data);
  
         // Create a contact inhibition simulator
@@ -178,8 +177,7 @@ public:
         p_force->SetCutOffLength(1.5);
 
         // Set up cell data on the cell population
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem(0, DOUBLE_UNSET);
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1));
         cell_population.AddClonedDataToAllCells(p_cell_data);
 
         // Create a contact inhibition simulator
@@ -245,8 +243,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
 
         // Set up cell data on the cell population
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem(0, DOUBLE_UNSET);
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1));
         cell_population.AddClonedDataToAllCells(p_cell_data);
 
         // Create a contact inhibition simulator
@@ -317,8 +314,7 @@ public:
         p_force->SetCutOffLength(1.5);
 
         // Set up cell data on the cell population
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem(0, DOUBLE_UNSET);
+        MAKE_PTR_ARGS(CellData, p_cell_data, (1));
         cell_population.AddClonedDataToAllCells(p_cell_data);
  
         // Create a contact inhibition simulator
