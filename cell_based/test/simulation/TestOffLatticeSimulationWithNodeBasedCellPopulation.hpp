@@ -396,7 +396,8 @@ public:
         simulator.AddForce(p_linear_force);
 
         // Solve
-        TS_ASSERT_THROWS_THIS(simulator.Solve(), "Cells are moving more than the AbsoluteMovementThreshold. Use a smaller timestep to avoid this exception.");
+        TS_ASSERT_THROWS_CONTAINS(simulator.Solve(),
+                "which is more than the AbsoluteMovementThreshold:");
 
         // Tidy up
         delete nodes[0];
