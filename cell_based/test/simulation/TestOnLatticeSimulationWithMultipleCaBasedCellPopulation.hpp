@@ -357,7 +357,10 @@ public:
         // No movement rule as only care about cell death
 
         // Add a cell Killer that will kill all cells in the top half of the domain
-        MAKE_PTR_ARGS(PlaneBasedCellKiller<2>, p_killer, (&cell_population, 4.5*unit_vector<double>(2,1), unit_vector<double>(2,1))); //v>4.5
+        c_vector<double,2> point = zero_vector<double>(2);
+        point[1] = 4.5;
+        c_vector<double,2> normal = unit_vector<double>(2,1); 
+        MAKE_PTR_ARGS(PlaneBasedCellKiller<2>, p_killer, (&cell_population, point, normal)); //v>4.5
         simulator.AddCellKiller(p_killer);
 
         // Run simulation
@@ -598,7 +601,10 @@ public:
         // No movement rule as only care about cell death
 
         // Add a cell Killer that will kill all cells in the top half of the domain
-        MAKE_PTR_ARGS(PlaneBasedCellKiller<2>, p_killer, (&cell_population, 4.5*unit_vector<double>(2,1), unit_vector<double>(2,1))); //v>4.5
+        c_vector<double,2> point = zero_vector<double>(2);
+        point[1] = 4.5;
+        c_vector<double,2> normal = unit_vector<double>(2,1); 
+        MAKE_PTR_ARGS(PlaneBasedCellKiller<2>, p_killer, (&cell_population, point, normal)); //v>4.5
         simulator.AddCellKiller(p_killer);
 
         // Run simulation
