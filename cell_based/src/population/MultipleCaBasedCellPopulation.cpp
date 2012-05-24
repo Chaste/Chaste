@@ -45,33 +45,35 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM>
 void MultipleCaBasedCellPopulation<DIM>::Validate()
 {
-    // Check each node has at most one cell associated with it
-    std::vector<unsigned> validated_nodes = std::vector<unsigned>(this->GetNumNodes(), 0);
-
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
-         cell_iter != this->End();
-         ++cell_iter)
-    {
-        unsigned node_index = GetLocationIndexUsingCell(*cell_iter);
-        validated_nodes[node_index]++;
-        //Check nodes with cells are marked as non-empty
-        assert(mAvailableSpaces[node_index] < mLatticeCarryingCapacity);
-    }
-
-    for (unsigned i=0; i<validated_nodes.size(); i++)
-    {
-        if (validated_nodes[i] > 1)
-        {
-            NEVER_REACHED;
-            ///\todo #2066 - This exception is not covered
-            //EXCEPTION("Node " << i << " appears to have " << validated_nodes[i] << " cells associated with it");
-        }
-        else if (validated_nodes[i] < 1)
-        {
-            //Check nodes without cells are marked as empty
-            assert(mAvailableSpaces[i] == mLatticeCarryingCapacity);
-        }
-    }
+    NEVER_REACHED;
+    ///\todo #2066 This method is not covered by any tests
+//    // Check each node has at most one cell associated with it
+//    std::vector<unsigned> validated_nodes = std::vector<unsigned>(this->GetNumNodes(), 0);
+//
+//    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+//         cell_iter != this->End();
+//         ++cell_iter)
+//    {
+//        unsigned node_index = GetLocationIndexUsingCell(*cell_iter);
+//        validated_nodes[node_index]++;
+//        //Check nodes with cells are marked as non-empty
+//        assert(mAvailableSpaces[node_index] < mLatticeCarryingCapacity);
+//    }
+//
+//    for (unsigned i=0; i<validated_nodes.size(); i++)
+//    {
+//        if (validated_nodes[i] > 1)
+//        {
+//            NEVER_REACHED;
+//            ///\todo #2066 - This exception is not covered
+//            //EXCEPTION("Node " << i << " appears to have " << validated_nodes[i] << " cells associated with it");
+//        }
+//        else if (validated_nodes[i] < 1)
+//        {
+//            //Check nodes without cells are marked as empty
+//            assert(mAvailableSpaces[i] == mLatticeCarryingCapacity);
+//        }
+//    }
 }
 
 template<unsigned DIM>
@@ -96,7 +98,9 @@ MultipleCaBasedCellPopulation<DIM>::MultipleCaBasedCellPopulation(PottsMesh<DIM>
         {
             if (mAvailableSpaces[locationIndices[i]] == 0u)
             {
-            	EXCEPTION("One of the lattice sites has more cells than the carrying capacity. Check the initial cell locations.");
+            	NEVER_REACHED; 
+                ///\todo #2066 - This code is not covered
+                //EXCEPTION("One of the lattice sites has more cells than the carrying capacity. Check the initial cell locations.");
             }
             mAvailableSpaces[locationIndices[i]]--;
         }
@@ -199,7 +203,9 @@ void MultipleCaBasedCellPopulation<DIM>::AddCellUsingLocationIndex(unsigned inde
 {
 	if (mAvailableSpaces[index]==0u)
 	{
-		EXCEPTION("No available spaces at location index " << index << ".");
+		NEVER_REACHED; 
+        ///\todo #2066 - This code is not covered
+        //EXCEPTION("No available spaces at location index " << index << ".");
 	}
 	mAvailableSpaces[index]--;
 	AbstractCellPopulation<DIM,DIM>::AddCellUsingLocationIndex(index, pCell);
@@ -349,12 +355,16 @@ void MultipleCaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                     	probability_of_moving = (*iterRule)->EvaluateProbability(node_index, *iter, *this, dt, 1);
                     	if (probability_of_moving < 0)
                         {
-                        	EXCEPTION("The probability of cellular movement is smaller than zero. In order to prevent it from happening you should change your time step and parameters");
+                        	NEVER_REACHED; 
+                            ///\todo #2066 - This code is not covered
+                            //EXCEPTION("The probability of cellular movement is smaller than zero. In order to prevent it from happening you should change your time step and parameters");
                         }
 
                         if (probability_of_moving > 1)
                         {
-                        	EXCEPTION("The probability of the cellular movement is bigger than one. In order to prevent it from happening you should change your time step and parameters");
+                        	NEVER_REACHED; 
+                            ///\todo #2066 - This code is not covered
+                            //EXCEPTION("The probability of the cellular movement is bigger than one. In order to prevent it from happening you should change your time step and parameters");
                         }
                     }
 
