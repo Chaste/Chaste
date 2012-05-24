@@ -185,8 +185,6 @@ void CmguiDeformedSolutionsWriter<DIM>::WriteCmguiScript(std::string fieldBaseNa
                    << field_string
                    << "}\n";
 
-    *p_script_file << "# NOTE: the instruction: 'gfx define faces egroup' is known to work with Cmgui version 2.8 or higher \n"
-    		       << "# an alternative that works with Cmgui version < 2.8 is 'gfx read ele FILE generate_faces_and_lines' without the 'gfx define faces' instruction\n";
     if(undeformedBaseName != "")
     {
         *p_script_file << "gfx read ele " << undeformedBaseName << "\n";

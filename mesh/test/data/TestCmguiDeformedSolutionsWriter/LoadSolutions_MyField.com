@@ -5,8 +5,6 @@ for ($i=0; $i<=2; $i++) {
   gfx read node solution_$i time $i
  gfx read node myfield_$i time $i
 }
-# NOTE: the instruction: 'gfx define faces egroup' is known to work with Cmgui version 2.8 or higher 
-# an alternative that works with Cmgui version < 2.8 is 'gfx read ele FILE generate_faces_and_lines' without the 'gfx define faces' instruction
 gfx read ele solution_0
 gfx define faces egroup solution
 gfx cr win
