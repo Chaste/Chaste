@@ -128,35 +128,20 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::InitialiseCells()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddClonedDataToAllCells(boost::shared_ptr<CellData> pCellData)
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetDataOnAllCells(unsigned var, double dataValue)
 {
-     
     for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter=this->Begin(); cell_iter!=this->End(); ++cell_iter)
     {
-        CellPropertyCollection& r_collection = cell_iter->rGetCellPropertyCollection();
-        if (r_collection.HasProperty<CellData>())
-        {
-            EXCEPTION("AddClonedDataToAllCells() assumes that cells have no data");
-        }
-        MAKE_PTR_ARGS(CellData, p_cell_data, (*pCellData)); //Invokes copy constructor for CellData 
-        cell_iter->AddCellProperty(p_cell_data);
+        cell_iter->GetCellData()->SetItem(var, dataValue);
     }
-}     
-
+}
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetDataOnAllCells(const std::string& dataName, double dataValue)
 {
     for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter=this->Begin(); cell_iter!=this->End(); ++cell_iter)
     {
-        if (!(cell_iter->HasCellData()))
-        {
-            NEVER_REACHED;
-            ///\todo #2115 EXCEPTION("");
-        }
-
-        cell_iter->GetCellData()->SetItem(dataName,dataValue);
+        cell_iter->GetCellData()->SetItem(dataName, dataValue);
     }
-
 }
 
 

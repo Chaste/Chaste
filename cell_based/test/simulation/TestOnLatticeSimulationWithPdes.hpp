@@ -134,10 +134,7 @@ public:
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Create and initialize CellData
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        cell_population.AddClonedDataToAllCells(p_cell_data);
-
+        // Initialize CellData
         /*
          * Since values are first passed in to CellData before it is updated in UpdateAtEndOfTimeStep(),
          * we need to pass it some initial conditions.
@@ -192,11 +189,7 @@ public:
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Create and initialize CellData
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem(0, DOUBLE_UNSET);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
-        
+        // Initialize CellData
         /*
          * Since values are first passed in to CellData before it is updated in UpdateAtEndOfTimeStep(),
          * we need to pass it some initial conditions.
@@ -301,11 +294,7 @@ public:
         // Create cell population
         MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
 
-        // Create and initialize CellData
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1));
-        p_cell_data->SetItem(0, DOUBLE_UNSET);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
-
+        // Initialize CellData
         /*
          * Since values are first passed in to CellData before it is updated in UpdateAtEndOfTimeStep(),
          * we need to pass it some initial conditions.
@@ -419,10 +408,8 @@ public:
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        MAKE_PTR_ARGS(CellData, p_cell_data, (2)); 
-        p_cell_data->SetItem(0, 1.0);
-        p_cell_data->SetItem(1, 1.0);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
+        cell_population.SetDataOnAllCells(0, 1.0);
+        cell_population.SetDataOnAllCells(1, 1.0);
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);

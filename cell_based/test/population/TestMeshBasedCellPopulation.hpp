@@ -681,8 +681,6 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetWriteVtkAsPoints(), true);
 
         // Coverage of writing CellData to VTK
-        MAKE_PTR_ARGS(CellData, p_cell_data, (2));
-        cell_population.AddClonedDataToAllCells(p_cell_data);
         for (unsigned var=0; var<2; var++)
         {
             for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
@@ -782,8 +780,6 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "MeshBasedCellPopulation-3");
 
         // Coverage of writing CellData to VTK
-        MAKE_PTR_ARGS(CellData, p_cell_data, (2)); 
-        cell_population.AddClonedDataToAllCells(p_cell_data);
         for (unsigned var=0; var<2; var++)
         {
             for (AbstractCellPopulation<3>::Iterator cell_iter = cell_population.Begin();
@@ -899,9 +895,7 @@ public:
         // Create a cell population
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
         
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem("variable", 100.0);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
+        cell_population.SetDataOnAllCells("variable", 100.0);
         
         //Check that the data made it there and that copies of the data are independent
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
@@ -926,10 +920,6 @@ public:
         TS_ASSERT_EQUALS(keys.size(), 2u);
         TS_ASSERT_EQUALS(keys[0], "added variable");
         TS_ASSERT_EQUALS(keys[1], "variable");
-
-        //Try it again
-        TS_ASSERT_THROWS_THIS(cell_population.AddClonedDataToAllCells(p_cell_data),
-            "AddClonedDataToAllCells() assumes that cells have no data");
     }
 
     // This test checks that the cells and nodes are correctly archived.
@@ -963,9 +953,7 @@ public:
             MeshBasedCellPopulation<2>* const p_cell_population = new MeshBasedCellPopulation<2>(mesh, cells);
             
             //Add cell data
-            MAKE_PTR_ARGS(CellData, p_cell_data, (1));
-            p_cell_data->SetItem(0, DOUBLE_UNSET);
-            p_cell_population->AddClonedDataToAllCells(p_cell_data);
+            p_cell_population->SetDataOnAllCells(0, DOUBLE_UNSET);
 
             TS_ASSERT_THROWS_THIS(p_cell_population->Begin()->GetCellData()->GetItem(0), 
                                 "The item Var0 has not yet been set");

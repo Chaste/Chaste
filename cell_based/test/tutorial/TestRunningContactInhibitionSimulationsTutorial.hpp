@@ -162,13 +162,6 @@ public:
          * we use the {{{CellData}}} class. Here, we just initialise it with one variable
          * and associate it with the cell population. */
 
-        /* This creates the instance of {{{CellData}}}: */
-        // Create and initialize CellData
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1));
-        /* We set the number of variables we wish to use {{{CellData}}} to track, and add a copy of this data
-         * to all cells in the population with the  {{{AddClonedDataToAllCells}}} method.*/
-        cell_population.AddClonedDataToAllCells(p_cell_data);
-
         /* Then, we define the contact {{{VolumeTrackedOffLatticeSimulation}}} class, that automatically updates the volumes of the cells
          * in {{{CellData}}}. We also set up the output directory, the end time and the output multiple.
          */
@@ -279,12 +272,6 @@ public:
         /* In order to visualize labelled cells (i.e those that are inhibited from division) you need to use the following command.*/
         cell_population.SetOutputCellMutationStates(true);
 
-        /* To keep track of the volumes of the cells that are used in the contact inhibition cell-cycle,
-         * we use the {{{CellData}}} class. Here, we just initialise it with one variable
-         * and copy it to all the cell in the population: */
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1));
-        cell_population.AddClonedDataToAllCells(p_cell_data);
-
         /*  Then, we define the contact {{{VolumeTrackedOffLatticeSimulation}}} class, that automatically updates the volumes of the cells
          * in {{{CellData}}}. We also set up the output directory, the end time and the output multiple.
          */
@@ -373,13 +360,6 @@ public:
 
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetOutputCellMutationStates(true);
-
-        /* To keep track of the volumes of the cells that are used in the contact inhibition cell-cycle,
-         * we use the class {{{CellData}}} class. Here, we just initialise it with one variable
-         * and associate it with the cell population. This time each cell is associated with a vertex element. */
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1));
-        cell_population.AddClonedDataToAllCells(p_cell_data);
-
 
         /*  Then, we define the {{{VolumeTrackedOffLatticeSimulation}}} class, that automatically updates the volumes of the cells
          * in {{{CellData}}}. We also set up the output directory, the end time and the output multiple.

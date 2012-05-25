@@ -254,15 +254,13 @@ public:
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         double lo_oxygen_concentration = 0.0;
-        MAKE_PTR_ARGS(CellData, p_cell_ox_data, (1));
-        p_cell_ox_data->SetItem(0, lo_oxygen_concentration);
 
         // Set some model parameters for the cell-cycle model
         for (unsigned index=0; index < cells.size(); index++)
         {
             cells[index]->GetCellCycleModel()->SetStemCellG1Duration(8.0);
             cells[index]->GetCellCycleModel()->SetTransitCellG1Duration(8.0);
-            cells[index]->AddCellProperty(p_cell_ox_data);
+            cells[index]->GetCellData()->SetItem(0, lo_oxygen_concentration);
         }
 
         // Create cell population

@@ -554,8 +554,6 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Set up cell data on the cell population
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        cell_population.AddClonedDataToAllCells(p_cell_data);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             double x = p_mesh->GetNode(i)->rGetLocation()[0];

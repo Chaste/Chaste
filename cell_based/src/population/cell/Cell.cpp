@@ -101,6 +101,13 @@ Cell::Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
         mCellPropertyCollection.AddProperty(pMutationState);
     }
 
+    if (!mCellPropertyCollection.HasPropertyType<CellData>())
+    {
+        // Add empty cell data
+        MAKE_PTR(CellData, p_cell_data);
+        mCellPropertyCollection.AddProperty(p_cell_data);
+    }
+    
     if (!archiving)
     {
         // Increment cell count for each cell property in mCellPropertyCollection
@@ -188,13 +195,14 @@ boost::shared_ptr<AbstractCellMutationState> Cell::GetMutationState() const
 
 bool Cell::HasCellData() const
 {
+    ///\todo #2115 This should always return true
     return mCellPropertyCollection.HasPropertyType<CellData>();
 }
 
 
 boost::shared_ptr<CellData> Cell::GetCellData() const
 {
-	 if (HasCellData())
+	 if (HasCellData())///\todo #2115 This should always return true
 	 {
 		 CellPropertyCollection cell_data_collection = mCellPropertyCollection.GetPropertiesType<CellData>();
 

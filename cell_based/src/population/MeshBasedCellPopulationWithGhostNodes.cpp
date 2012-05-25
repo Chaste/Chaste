@@ -295,13 +295,9 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile()
         std::vector<std::vector<double> > cellwise_data;
 
         unsigned num_cell_data_items = 0;
-        if (this->Begin()->HasCellData())
-        {
-            NEVER_REACHED;
-//            // This code is commented  because CellData can't deal with ghost nodes see #1975
-//            //We assume that the first cell is representative of all cells
+        // This code is commented  because CellData can't deal with ghost nodes see #1975
+//        //We assume that the first cell is representative of all cells
 //            num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
-        }
 
         for (unsigned var=0; var<num_cell_data_items; var++)
         {

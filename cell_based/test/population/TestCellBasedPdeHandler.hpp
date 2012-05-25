@@ -570,9 +570,7 @@ public:
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
         cell_population.SetMechanicsCutOffLength(1.5);
 
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem(0, 1.0);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
+        cell_population.SetDataOnAllCells(0, 1.0);
 
         // Create a PDE handler object using this cell population
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -618,7 +616,7 @@ public:
 
         MeshBasedCellPopulation<2> cell_population2(*p_mesh2, cells2);
 
-        cell_population2.AddClonedDataToAllCells(p_cell_data);
+        cell_population2.SetDataOnAllCells(0, 1.0);
 
         CellBasedPdeHandler<2> pde_handler2(&cell_population2);
         pde_handler2.OpenResultsFiles(output_directory);
@@ -645,8 +643,6 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         //Put random data on the cells
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        cell_population.AddClonedDataToAllCells(p_cell_data);
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
@@ -691,8 +687,6 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         //Put random data on the cells
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        cell_population.AddClonedDataToAllCells(p_cell_data);
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
@@ -746,9 +740,7 @@ public:
         // Set up cell population
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem(0, 1.0);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
+        cell_population.SetDataOnAllCells(0, 1.0);
 
         // Create a PDE handler object using this cell population
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -806,9 +798,7 @@ public:
         // Set up cell population
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem(0, 1.0);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
+        cell_population.SetDataOnAllCells(0, 1.0);
 
         // Create a PDE handler object using this cell population
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -863,9 +853,7 @@ public:
 
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem(0, 1.0);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
+        cell_population.SetDataOnAllCells(0, 1.0);
 
         // Create a PDE handler object using this cell population
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -926,10 +914,8 @@ public:
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        MAKE_PTR_ARGS(CellData, p_cell_data, (2)); 
-        p_cell_data->SetItem(0, 1.0);
-        p_cell_data->SetItem(1, 1.0);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
+        cell_population.SetDataOnAllCells(0, 1.0);
+        cell_population.SetDataOnAllCells(1, 1.0);
 
         // Create a PDE handler object using this cell population
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -1047,10 +1033,8 @@ public:
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        MAKE_PTR_ARGS(CellData, p_cell_data, (2)); 
-        p_cell_data->SetItem(0, 1.0);
-        p_cell_data->SetItem(1, 1.0);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
+        cell_population.SetDataOnAllCells(0, 1.0);
+        cell_population.SetDataOnAllCells(1, 1.0);
 
         // Create a PDE handler object using this cell population
         CellBasedPdeHandler<2> pde_handler(&cell_population);

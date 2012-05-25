@@ -72,9 +72,6 @@ public:
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
         // Set up data: C(x,y) = x^2
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        cell_population.AddClonedDataToAllCells(p_cell_data);
-        
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
@@ -111,9 +108,7 @@ public:
         //////////////////////////////////
         // C(x,y) = const
         //////////////////////////////////
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem(0, 1.0);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
+        cell_population.SetDataOnAllCells(0, 1.0);
         
         CellwiseDataGradient<2> gradient;
         gradient.SetupGradients(cell_population);

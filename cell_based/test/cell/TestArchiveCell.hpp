@@ -99,7 +99,7 @@ public:
 
             // Check properties set correctly
             CellPropertyCollection& final_collection = p_cell->rGetCellPropertyCollection();
-            TS_ASSERT_EQUALS(final_collection.GetSize(), 4u);
+            TS_ASSERT_EQUALS(final_collection.GetSize(), 5u);
             TS_ASSERT_EQUALS(final_collection.HasProperty<WildTypeCellMutationState>(), true);
             TS_ASSERT_EQUALS(final_collection.HasProperty<ApcOneHitCellMutationState>(), false);
             TS_ASSERT_EQUALS(final_collection.HasProperty<ApcTwoHitCellMutationState>(), false);
@@ -113,7 +113,8 @@ public:
             for (CellPropertyCollection::Iterator it = final_collection.Begin(); it != final_collection.End(); ++it)
             {
                 TS_ASSERT_EQUALS(final_collection.HasProperty(*it), true);
-                TS_ASSERT((*it)->IsType<WildTypeCellMutationState>() || (*it)->IsType<CellLabel>() || (*it)->IsType<CellAncestor>() || (*it)->IsType<CellId>());
+                TS_ASSERT((*it)->IsType<WildTypeCellMutationState>() || (*it)->IsType<CellLabel>() 
+                          || (*it)->IsType<CellAncestor>() || (*it)->IsType<CellId>() || (*it)->IsType<CellData>());
             }
 
             // Create an output archive
@@ -160,7 +161,7 @@ public:
             TS_ASSERT_EQUALS(p_model->GetCell(), p_cell);
 
             CellPropertyCollection& collection = p_cell->rGetCellPropertyCollection();
-            TS_ASSERT_EQUALS(collection.GetSize(), 4u);
+            TS_ASSERT_EQUALS(collection.GetSize(), 5u);
             TS_ASSERT_EQUALS(collection.HasProperty<WildTypeCellMutationState>(), true);
             TS_ASSERT_EQUALS(collection.HasProperty<ApcOneHitCellMutationState>(), false);
             TS_ASSERT_EQUALS(collection.HasProperty<ApcTwoHitCellMutationState>(), false);
@@ -174,7 +175,8 @@ public:
             for (CellPropertyCollection::Iterator it = collection.Begin(); it != collection.End(); ++it)
             {
                 TS_ASSERT_EQUALS(collection.HasProperty(*it), true);
-                TS_ASSERT((*it)->IsType<WildTypeCellMutationState>() || (*it)->IsType<CellLabel>() || (*it)->IsType<CellAncestor>() || (*it)->IsType<CellId>());
+                TS_ASSERT((*it)->IsType<WildTypeCellMutationState>() || (*it)->IsType<CellLabel>() ||
+                          (*it)->IsType<CellAncestor>() || (*it)->IsType<CellId>() || (*it)->IsType<CellData>());
             }
         }
     }

@@ -115,13 +115,6 @@ public:
         cell_population.SetMechanicsCutOffLength(1.5);
         cell_population.SetCellAncestorsToLocationIndices();
 
-        // Create and initialize CellData
-        MAKE_PTR_ARGS(CellData, p_cell_data, (3)); 
-        p_cell_data->SetItem("notch", DOUBLE_UNSET);
-        p_cell_data->SetItem("delta", DOUBLE_UNSET);
-        p_cell_data->SetItem("mean delta", DOUBLE_UNSET);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
-
         // Create and configure cell-based simulation
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDeltaNotchNodeBasedUpdateAtEndOfTimeStep");
@@ -205,13 +198,6 @@ public:
 
         // Create the cell population
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
-
-        // Create and initialise CellData
-        MAKE_PTR_ARGS(CellData, p_cell_data, (3));
-        p_cell_data->SetItem("notch", DOUBLE_UNSET);
-        p_cell_data->SetItem("delta", DOUBLE_UNSET);
-        p_cell_data->SetItem("mean delta", DOUBLE_UNSET);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         // Set up the simulation
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
@@ -309,13 +295,6 @@ public:
         // Create the cell population
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
-        // Create and initialize CellData
-        MAKE_PTR_ARGS(CellData, p_cell_data, (3));
-        p_cell_data->SetItem("notch", DOUBLE_UNSET);
-        p_cell_data->SetItem("delta", DOUBLE_UNSET);
-        p_cell_data->SetItem("mean delta", DOUBLE_UNSET);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
-
         // Set up the simulation
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("DeltaNotchTwoCellTest_homgee");
@@ -377,13 +356,6 @@ public:
         // Create cell-based population object
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Create and initialize CellData
-        MAKE_PTR_ARGS(CellData, p_cell_data, (3)); 
-        p_cell_data->SetItem("notch", DOUBLE_UNSET);
-        p_cell_data->SetItem("delta", DOUBLE_UNSET);
-        p_cell_data->SetItem("mean delta", DOUBLE_UNSET);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
-
         // Create and configure cell-based simulation
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDeltaNotchVertex2D");
@@ -431,13 +403,6 @@ public:
 
         // Create cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-
-        // Create and initialize CellData
-        MAKE_PTR_ARGS(CellData, p_cell_data, (3)); 
-        p_cell_data->SetItem("notch", DOUBLE_UNSET);
-        p_cell_data->SetItem("delta", DOUBLE_UNSET);
-        p_cell_data->SetItem("mean delta", DOUBLE_UNSET);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         // Create and configure cell-based simulation
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
@@ -487,13 +452,6 @@ public:
 
         // Create cell-based population object
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
-
-        // Create and initialize CellData
-        MAKE_PTR_ARGS(CellData, p_cell_data, (3)); 
-        p_cell_data->SetItem("notch", DOUBLE_UNSET);
-        p_cell_data->SetItem("delta", DOUBLE_UNSET);
-        p_cell_data->SetItem("mean delta", DOUBLE_UNSET);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         // Create and configure cell-based simulation
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);

@@ -61,8 +61,6 @@ public:
         DeltaNotchCellCycleModel* p_stem_model = new DeltaNotchCellCycleModel;
         p_stem_model->SetCellProliferativeType(STEM);
         p_stem_model->SetDimension(2);
-        MAKE_PTR_ARGS(CellData, p_stem_cell_data, (1));
-        p_stem_cell_data->SetItem("mean delta", 0.0); ///\todo #1995 "mean delta"
 
         // Change G1 duration for this model
         p_stem_model->SetStemCellG1Duration(1.0);
@@ -70,8 +68,6 @@ public:
         DeltaNotchCellCycleModel* p_transit_model = new DeltaNotchCellCycleModel;
         p_transit_model->SetCellProliferativeType(TRANSIT);
         p_transit_model->SetDimension(3);
-        MAKE_PTR_ARGS(CellData, p_transit_cell_data, (1));
-        p_transit_cell_data->SetItem("mean delta", 0.0); ///\todo #1995 "mean delta"
 
         // Change G1 duration for this model
         p_stem_model->SetTransitCellG1Duration(1.0);  ///\todo Is this a copy and paste error?
@@ -79,22 +75,19 @@ public:
         DeltaNotchCellCycleModel* p_diff_model = new DeltaNotchCellCycleModel;
         p_diff_model->SetCellProliferativeType(DIFFERENTIATED);
         p_diff_model->SetDimension(1);
-        MAKE_PTR_ARGS(CellData, p_diff_cell_data, (1));
-        p_diff_cell_data->SetItem("mean delta", 0.0); ///\todo #1995 "mean delta"
-
 
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
 
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_stem_model));
-        p_stem_cell->AddCellProperty(p_stem_cell_data);
+        p_stem_cell->GetCellData()->SetItem("mean delta", 0.0);
         p_stem_cell->InitialiseCellCycleModel();
 
         CellPtr p_transit_cell(new Cell(p_healthy_state, p_transit_model));
-        p_transit_cell->AddCellProperty(p_transit_cell_data);
+        p_transit_cell->GetCellData()->SetItem("mean delta", 0.0);
         p_transit_cell->InitialiseCellCycleModel();
 
         CellPtr p_diff_cell(new Cell(p_healthy_state, p_diff_model));
-        p_diff_cell->AddCellProperty(p_diff_cell_data);
+        p_diff_cell->GetCellData()->SetItem("mean delta", 0.0);
         p_diff_cell->InitialiseCellCycleModel();
 
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -139,10 +132,7 @@ public:
             MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
 
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
-            MAKE_PTR_ARGS(CellData, p_cell_data, (1));
-            p_cell_data->SetItem("mean delta", 0.0); ///\todo #1995 "mean delta"
-            p_cell->AddCellProperty(p_cell_data);
-
+            p_cell->GetCellData()->SetItem("mean delta", 0.0);
             p_cell->InitialiseCellCycleModel();
             p_cell->SetBirthTime(-1.1);
             p_simulation_time->IncrementTimeOneStep();

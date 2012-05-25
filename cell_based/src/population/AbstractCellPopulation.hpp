@@ -247,18 +247,20 @@ public:
     void InitialiseCells();
     
     /**
-     * Add a (copy) of a cell data to all cells in the population
-     * @param pCellData is the data which is going to be replicated and a fresh copy added to each cell
-     */
-    void AddClonedDataToAllCells(boost::shared_ptr<CellData> pCellData); 
-
-
-    /**
      * Add an item of cell data to every cell in the population
      * @param dataName is the name associated with the data
      * @param dataValue is the value of the data, initially the same for each cell
      */
     void SetDataOnAllCells(const std::string& dataName, double dataValue);
+
+    /**
+     * \todo #2115 This method is temporary, for use during work on ticket
+     * PLEASe REMEMBER TO DELETE
+     * Add an item of cell data to every cell in the population
+     * @param var is the name associated with the data
+     * @param dataValue is the value of the data, initially the same for each cell
+     */
+    void SetDataOnAllCells(unsigned var, double dataValue);
 
     /**
      * @return reference to the mesh, mrMesh.

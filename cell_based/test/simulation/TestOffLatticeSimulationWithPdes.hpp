@@ -160,9 +160,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
         // Set up cell data on the cell population
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem(0, 1.0);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
+        cell_population.SetDataOnAllCells(0, 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -257,9 +255,7 @@ public:
         cell_population.SetOutputCellPopulationVolumes(true); // record the spheroid radius and apoptotic radius
 
         // Set up cell data on the cell population
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem(0, 1.0);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
+        cell_population.SetDataOnAllCells(0, 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -367,10 +363,7 @@ public:
         cell_population.SetOutputCellPopulationVolumes(true); // record the spheroid radius and apoptotic radius
 
         // Set up cell data on the cell population
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem(0, 1.0);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
-
+        cell_population.SetDataOnAllCells(0, 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -452,10 +445,8 @@ public:
         cell_population.SetOutputCellPopulationVolumes(true); // record the spheroid radius and apoptotic radius
 
         // Set up cell data on the cell population
-        MAKE_PTR_ARGS(CellData, p_cell_data, (2)); 
-        p_cell_data->SetItem(0, 1.0);
-        p_cell_data->SetItem(1, 1.0);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
+        cell_population.SetDataOnAllCells(0, 1.0);
+        cell_population.SetDataOnAllCells(1, 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -541,9 +532,7 @@ public:
         cell_population.SetOutputCellPopulationVolumes(true); // record the spheroid radius and apoptotic radius
 
         // Set up cell data on the cell population
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem(0, 1.0);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
+        cell_population.SetDataOnAllCells(0, 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -643,10 +632,8 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Set up cell data on the cell population
-        MAKE_PTR_ARGS(CellData, p_cell_data, (2)); 
-        p_cell_data->SetItem(0, 1.0);
-        p_cell_data->SetItem(1, 1.0);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
+        cell_population.SetDataOnAllCells(0, 1.0);
+        cell_population.SetDataOnAllCells(1, 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -799,9 +786,7 @@ public:
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, cell_location_indices);
 
         // Set up cell data on the cell population
-        MAKE_PTR_ARGS(CellData, p_cell_data, (2));
-        p_cell_data->SetItem(0, 1.0);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
+        cell_population.SetDataOnAllCells(0, 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -889,9 +874,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Set up cell data on the cell population
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem(0, 1.0);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
+        cell_population.SetDataOnAllCells(0, 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -986,10 +969,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Set up cell data on the cell population
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem(0, 1.0);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
-
+        cell_population.SetDataOnAllCells(0, 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -1058,10 +1038,7 @@ public:
         MeshBasedCellPopulation<3> cell_population(mesh, cells);
 
         // Set up cell data on the cell population
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem(0, 1.0);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
-
+        cell_population.SetDataOnAllCells(0, 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<3> simulator(cell_population);
@@ -1128,9 +1105,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
         // Set up cell data on the cell population
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem(0, 1.0);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
+        cell_population.SetDataOnAllCells(0, 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -1249,9 +1224,7 @@ public:
         cell_population.SetMechanicsCutOffLength(1.5);
 
         // Set up cell data on the cell population
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem(0, 5.0);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
+        cell_population.SetDataOnAllCells(0, 5.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -1310,9 +1283,7 @@ public:
         cell_population.SetMechanicsCutOffLength(1.5);
 
         // Set up cell data on the cell population
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem(0, 1.0);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
+        cell_population.SetDataOnAllCells(0, 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -1403,9 +1374,7 @@ public:
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Set up cell data on the cell population
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1));
-        p_cell_data->SetItem(0, 1.0);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
+        cell_population.SetDataOnAllCells(0, 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -1511,13 +1480,9 @@ public:
         cell_population.SetMechanicsCutOffLength(1.5);
 
         // Set up cell data on the cell population
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        cell_population.AddClonedDataToAllCells(p_cell_data);
-
         c_vector<double,2> centre_of_mesh;
         centre_of_mesh[0] = 5.0;
         centre_of_mesh[1] = 5.0;
-
         /*
          * Since values are first passed in to CellData before it is updated in UpdateAtEndOfTimeStep(),
          * we need to pass it some initial conditions to avoid memory errors.
@@ -1532,7 +1497,7 @@ public:
                 initial_condition = 1.0;
             }
             CellPtr p_cell = cell_population.GetCellUsingLocationIndex(mesh.GetNode(i)->GetIndex());
-            p_cell->GetCellData()->SetItem(0,initial_condition);
+            p_cell->GetCellData()->SetItem(0, initial_condition);
         }
 
         // Set up cell-based simulation
@@ -1621,9 +1586,7 @@ public:
         cell_population.SetMechanicsCutOffLength(1.5);
 
         // Set up cell data on the cell population
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem(0, 1.0);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
+        cell_population.SetDataOnAllCells(0, 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<1> simulator(cell_population);
@@ -1692,13 +1655,9 @@ public:
         cell_population.SetMechanicsCutOffLength(1.5);
 
         // Set up cell data on the cell population
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        cell_population.AddClonedDataToAllCells(p_cell_data);
-
         c_vector<double,2> centre_of_mesh;
         centre_of_mesh[0] = 5.0;
         centre_of_mesh[1] = 5.0;
-
         /*
          * Since values are first passed in to CellData before it is updated in UpdateAtEndOfTimeStep(),
          * we need to pass it some initial conditions to avoid memory errors.
@@ -1777,14 +1736,10 @@ public:
         cell_population.SetMechanicsCutOffLength(1.5);
 
         // Set up cell data on the cell population
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        cell_population.AddClonedDataToAllCells(p_cell_data);
-
         c_vector<double,3> centre_of_mesh;
         centre_of_mesh[0] = 5.0;
         centre_of_mesh[1] = 5.0;
         centre_of_mesh[2] = 5.0;
-
         /*
          * Since values are first passed in to CellData before it is updated in UpdateAtEndOfTimeStep(),
          * we need to pass it some initial conditions to avoid memory errors.

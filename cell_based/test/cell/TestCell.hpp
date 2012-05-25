@@ -113,7 +113,7 @@ public:
         TS_ASSERT_EQUALS(static_cast<FixedDurationGenerationBasedCellCycleModel*>(p_cell->GetCellCycleModel())->GetGeneration(), 0u);
 
         // Test cell property collection
-        TS_ASSERT_EQUALS(p_cell->rGetCellPropertyCollection().GetSize(), 3u);
+        TS_ASSERT_EQUALS(p_cell->rGetCellPropertyCollection().GetSize(), 4u);
         TS_ASSERT_EQUALS(p_cell->rGetCellPropertyCollection().HasProperty(p_wild_type), true);
         TS_ASSERT_EQUALS(p_cell->rGetCellPropertyCollection().HasProperty(p_label), true);
         TS_ASSERT_EQUALS(p_cell->rGetCellPropertyCollection().HasProperty(p_apc2_mutation), false);
@@ -174,7 +174,7 @@ public:
         TS_ASSERT_DELTA(p_daughter_cell->GetAge(), 0.0, 1e-9);
 
         // Test cell property collection has been inherited correctly during division
-        TS_ASSERT_EQUALS(p_daughter_cell->rGetCellPropertyCollection().GetSize(), 3u);
+        TS_ASSERT_EQUALS(p_daughter_cell->rGetCellPropertyCollection().GetSize(), 4u);
 
         TS_ASSERT_EQUALS(p_daughter_cell->rGetCellPropertyCollection().HasProperty(p_wild_type), true);
         TS_ASSERT_EQUALS(p_daughter_cell->rGetCellPropertyCollection().HasProperty(p_apc2_mutation), false);
@@ -1118,15 +1118,13 @@ public:
         p_cell_model->SetCellProliferativeType(STEM);
         CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
         p_cell->InitialiseCellCycleModel();
-        MAKE_PTR_ARGS(CellData, p_cell_data, (2));
-        p_cell_data->SetItem(0,1.0);
-        p_cell_data->SetItem(1,2.0);
 
         //Before adding the CellData to the cell
-        TS_ASSERT_EQUALS(p_cell->HasCellData(), false);
-        TS_ASSERT_THROWS_THIS(p_cell->GetCellData(), "No CellData attached to this cell");
+        TS_ASSERT_EQUALS(p_cell->HasCellData(), true);
+        TS_ASSERT_THROWS_NOTHING(p_cell->GetCellData());
 
-        p_cell->AddCellProperty(p_cell_data);
+        p_cell->GetCellData()->SetItem(0, 1.0);
+        p_cell->GetCellData()->SetItem(1, 2.0);
 
         p_simulation_time->IncrementTimeOneStep();
         p_simulation_time->IncrementTimeOneStep();

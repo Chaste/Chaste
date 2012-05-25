@@ -126,8 +126,8 @@ public:
 
     void TestCellDataMethods() throw(Exception)
     {
-        MAKE_PTR_ARGS(CellData, p_cell_data,(2));
-
+        MAKE_PTR(CellData, p_cell_data);
+        
         TS_ASSERT_THROWS_THIS(p_cell_data->GetItem(0), "The item Var0 is not stored");
         TS_ASSERT_THROWS_THIS(p_cell_data->GetItem(1), "The item Var1 is not stored");
         TS_ASSERT_THROWS_THIS(p_cell_data->GetItem(2), "The item Var2 is not stored");
@@ -140,7 +140,6 @@ public:
         TS_ASSERT_DELTA(p_cell_data->GetItem(1), 2.0, 1e-8);
         TS_ASSERT_DELTA(p_cell_data->GetItem(2), 3.0, 1e-8);
         TS_ASSERT_EQUALS(p_cell_data->GetNumItems(), 3u);
-        
     }
 
     void TestArchiveCellData() throw(Exception)
@@ -150,7 +149,7 @@ public:
 
         // Archive Cell data
         {
-            CellData* p_cell_data = new CellData(2);
+            CellData* p_cell_data = new CellData;
 
             p_cell_data->SetItem(0,1.0);
             p_cell_data->SetItem(1,2.0);

@@ -805,9 +805,6 @@ public:
         cell_population.SetOutputCellVolumes(true);
 
         // Coverage of writing CellData to VTK
-        MAKE_PTR_ARGS(CellData, p_cell_data, (2)); 
-        cell_population.AddClonedDataToAllCells(p_cell_data);
-
         for (unsigned var=0; var<2; var++)
         {
             for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();

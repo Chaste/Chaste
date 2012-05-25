@@ -111,10 +111,6 @@ public:
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
         cell_population.SetMechanicsCutOffLength(1.5);
 
-        // Set up cell data on the cell population
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        cell_population.AddClonedDataToAllCells(p_cell_data);
- 
         // Create a contact inhibition simulator
         VolumeTrackedOffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestNodeBasedSimulationWithVolumeTracked");
@@ -175,10 +171,6 @@ public:
         // Create a force law
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
         p_force->SetCutOffLength(1.5);
-
-        // Set up cell data on the cell population
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1));
-        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         // Create a contact inhibition simulator
         VolumeTrackedOffLatticeSimulation<2> simulator(cell_population);
@@ -241,10 +233,6 @@ public:
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
-
-        // Set up cell data on the cell population
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1));
-        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         // Create a contact inhibition simulator
         VolumeTrackedOffLatticeSimulation<2> simulator(cell_population);
@@ -313,10 +301,6 @@ public:
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
         p_force->SetCutOffLength(1.5);
 
-        // Set up cell data on the cell population
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1));
-        cell_population.AddClonedDataToAllCells(p_cell_data);
- 
         // Create a contact inhibition simulator
         VolumeTrackedOffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestVolumeTrackedOffLatticeSimulationSaveAndLoad");

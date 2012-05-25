@@ -647,8 +647,6 @@ public:
         TS_ASSERT_EQUALS(node_based_cell_population.GetOutputCellIdData(), true);
 
         // Coverage of writing CellData to VTK
-        MAKE_PTR_ARGS(CellData, p_cell_data, (2)); 
-        node_based_cell_population.AddClonedDataToAllCells(p_cell_data);
         for (unsigned var=0; var<2; var++)
         {
             for (AbstractCellPopulation<2>::Iterator cell_iter = node_based_cell_population.Begin();

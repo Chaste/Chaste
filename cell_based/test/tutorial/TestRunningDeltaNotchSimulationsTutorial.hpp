@@ -159,12 +159,6 @@ public:
          * end of the time step by a method on {{{DeltaNotchOffLatticeSimulation}}}.
          */
 
-        MAKE_PTR_ARGS(CellData, p_cell_data, (3)); 
-        p_cell_data->SetItem("notch", DOUBLE_UNSET);
-        p_cell_data->SetItem("delta", DOUBLE_UNSET);
-        p_cell_data->SetItem("mean delta", DOUBLE_UNSET);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
-
         /* We choose to initialise the concentrations to random levels in each cell. */
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
@@ -240,12 +234,6 @@ public:
         cell_population.SetOutputCellIdData(true);
         cell_population.SetOutputCellCyclePhases(true);
         cell_population.SetOutputCellAges(true);
-
-        MAKE_PTR_ARGS(CellData, p_cell_data, (3)); 
-        p_cell_data->SetItem("notch", DOUBLE_UNSET);
-        p_cell_data->SetItem("delta", DOUBLE_UNSET);
-        p_cell_data->SetItem("mean delta", DOUBLE_UNSET);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
 
         /* We choose to initialise the concentrations to random levels in each cell. */
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();

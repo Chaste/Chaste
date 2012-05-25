@@ -204,17 +204,13 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         /*
-         * Recall that in the Wnt-based crypt simulation tutorial, we defined a singleton class
-         * which cell-cycles used to get the Wnt concentration. Here, we do something similar
-         * using the {{{CellData}}} class, which stores the
+         * Here we use the {{{CellData}}} class, which stores the
          * value of the current nutrient concentration for each cell. We have to
          * tell the {{{CellData}}} class that there is one variable per cell, namely the oxygen 
          * concentration.  We initialise the oxygen concentration for each node (to 1.0), by
          * calling {{{SetItem}}}.
          */
-        MAKE_PTR_ARGS(CellData, p_cell_data, (1)); 
-        p_cell_data->SetItem(0, 1.0);
-        cell_population.AddClonedDataToAllCells(p_cell_data);
+        cell_population.SetDataOnAllCells(0, 1.0);
 
         /*
          * Next we instantiate an instance of the PDE class which we defined above.
