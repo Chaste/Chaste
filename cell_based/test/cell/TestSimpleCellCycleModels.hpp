@@ -457,7 +457,7 @@ public:
 
         double lo_volume = 0.0;
         double hi_volume = 1.0;
-        p_cell->GetCellData()->SetItem(0, lo_volume);
+        p_cell->GetCellData()->SetItem("volume", lo_volume);
 
         p_model->ReadyToDivide();
         TS_ASSERT_DELTA(p_model->GetCurrentQuiescentDuration(), 0.0, 1e-12);
@@ -468,13 +468,13 @@ public:
         TS_ASSERT_DELTA(p_model->GetCurrentQuiescentDuration(), 1.0, 1e-12);
         TS_ASSERT_DELTA(p_model->GetCurrentQuiescentOnsetTime(), 0.0, 1e-12);
 
-        p_cell->GetCellData()->SetItem(0, hi_volume);
+        p_cell->GetCellData()->SetItem("volume", hi_volume);
         p_simulation_time->IncrementTimeOneStep(); // t=2.0
         p_model->ReadyToDivide();
         TS_ASSERT_DELTA(p_model->GetCurrentQuiescentDuration(), 0.0, 1e-12);
         TS_ASSERT_DELTA(p_model->GetCurrentQuiescentOnsetTime(), 2.0, 1e-12);
 
-        p_cell->GetCellData()->SetItem(0, lo_volume);
+        p_cell->GetCellData()->SetItem("volume", lo_volume);
         p_simulation_time->IncrementTimeOneStep(); // t=3.0
         p_model->ReadyToDivide();
         TS_ASSERT_DELTA(p_model->GetCurrentQuiescentDuration(), 1.0, 1e-12);
@@ -499,7 +499,7 @@ public:
 
         CellPtr p_hepa_one_cell(new Cell(p_state, p_hepa_one_model));
         // Set up cell volume
-        p_hepa_one_cell->GetCellData()->SetItem(0, hi_volume);       
+        p_hepa_one_cell->GetCellData()->SetItem("volume", hi_volume);       
         p_hepa_one_cell->InitialiseCellCycleModel();
 
         ContactInhibitionCellCycleModel* p_diff_model = new ContactInhibitionCellCycleModel;
@@ -509,7 +509,7 @@ public:
         p_diff_model->SetEquilibriumVolume(1.0);
 
         CellPtr p_diff_cell(new Cell(p_state, p_diff_model));
-        p_diff_cell->GetCellData()->SetItem(0, hi_volume);
+        p_diff_cell->GetCellData()->SetItem("volume", hi_volume);
         p_diff_cell->InitialiseCellCycleModel();
 
         // Check that the cell cycle phase and ready to divide are updated correctly

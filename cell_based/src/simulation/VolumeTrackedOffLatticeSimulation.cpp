@@ -94,8 +94,7 @@ void VolumeTrackedOffLatticeSimulation<DIM>::UpdateCellData()
         double cell_volume = this->mrCellPopulation.GetVolumeOfCell(*cell_iter);
 
         // Store the cell's volume in CellData
-///\todo #2115        cell_iter->GetCellData()->SetItem("volume", cell_volume);
-        cell_iter->GetCellData()->SetItem(0, cell_volume);
+        cell_iter->GetCellData()->SetItem("volume", cell_volume);
     }
 }
 

@@ -124,7 +124,7 @@ public:
              cell_iter != cell_population.End();
              ++cell_iter)
         {
-            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), cell_iter->GetCellData()->GetItem(0), 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), cell_iter->GetCellData()->GetItem("volume"), 1e-4);
         }
 
         simulator.SetEndTime(1.0);
@@ -137,7 +137,7 @@ public:
              cell_iter != cell_population.End();
              ++cell_iter)
         {
-            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), cell_iter->GetCellData()->GetItem(0), 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), cell_iter->GetCellData()->GetItem("volume"), 1e-4);
         }
     }
 
@@ -186,7 +186,7 @@ public:
               cell_iter != cell_population.End();
               ++cell_iter)
          {
-             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem(0), 1e-4);
+             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
          }
 
          simulator.SetEndTime(1.0);
@@ -199,7 +199,7 @@ public:
               cell_iter != cell_population.End();
               ++cell_iter)
          {
-             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem(0), 1e-4);
+             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
          }
     }
 
@@ -249,7 +249,7 @@ public:
               cell_iter != cell_population.End();
               ++cell_iter)
          {
-             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem(0), 1e-4);
+             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
          }
 
          simulator.SetEndTime(1.0);
@@ -262,7 +262,7 @@ public:
               cell_iter != cell_population.End();
               ++cell_iter)
          {
-             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem(0), 1e-4);
+             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
          }
     }
 

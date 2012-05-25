@@ -53,7 +53,7 @@ void ContactInhibitionCellCycleModel::UpdateCellCyclePhase()
     }
 
     // Get cell volume
-    double cell_volume = mpCell->GetCellData()->GetItem(0);
+    double cell_volume = mpCell->GetCellData()->GetItem("volume");
 
     // Removes the cell label
     mpCell->RemoveCellProperty<CellLabel>();
