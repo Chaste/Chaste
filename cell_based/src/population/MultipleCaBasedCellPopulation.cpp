@@ -378,12 +378,16 @@ void MultipleCaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
 			}
             if (probability_of_not_moving < 0)
             {
-            	EXCEPTION("The probability of the cell not moving is smaller than zero. In order to prevent it from happening you should change your time step and parameters");
+            	NEVER_REACHED;
+                ///\todo #2066 - This code is not covered
+                //EXCEPTION("The probability of the cell not moving is smaller than zero. In order to prevent it from happening you should change your time step and parameters");
             }
 
             if (probability_of_not_moving > 1)
             {
-            	EXCEPTION("The probability of the cell not moving is bigger than one. In order to prevent it from happening you should change your time step and parameters");
+                NEVER_REACHED;
+                ///\todo #2066 - This code is not covered
+            	//EXCEPTION("The probability of the cell not moving is bigger than one. In order to prevent it from happening you should change your time step and parameters");
             }
 
         	/*

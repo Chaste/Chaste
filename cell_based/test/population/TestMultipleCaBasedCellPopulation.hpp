@@ -216,14 +216,33 @@ public:
 		std::set<CellPtr> cells_on_lattice = cell_population.GetCellsUsingLocationIndex(3);
 		TS_ASSERT_EQUALS(cells_on_lattice.size(),2u);
 
-		unsigned index = 0;
+        bool found0 = false;
+        bool found1 = false;
+        bool foundother = false;
+        
+        //This set iterator is iterator in pointer order (the order of addresses in memory).  This
+        //order can be arbitrary 
 		for (std::set<CellPtr>::iterator iter = cells_on_lattice.begin();
 			 iter != cells_on_lattice.end();
 			 iter++)
 		{
-			TS_ASSERT_EQUALS((*iter)->GetCellId(),index);
-			index++;
+			if( (*iter)->GetCellId()==0u)
+            {
+                found0 = true;
+            }
+            else if ( (*iter)->GetCellId()==1u)
+            {
+                found1 = true;
+            }
+            else
+            {
+                foundother = true;
+            }
+            
 		}
+        TS_ASSERT(found0 && found1);
+        TS_ASSERT_EQUALS(foundother, false);
+        
 		TS_ASSERT_EQUALS(cells[0]->GetCellId(),0u);
 		TS_ASSERT_EQUALS(cells[1]->GetCellId(),1u);
     }

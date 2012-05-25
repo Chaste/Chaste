@@ -33,19 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-//#include <algorithm>
 #include "CellData.hpp"
 #include "Debug.hpp"
-
-CellData::CellData(unsigned numVariables)
-    : AbstractCellProperty()
-///\todo #2115 numVariables is now ignored
-{
-}
-
-CellData::~CellData()
-{
-}
 
 void CellData::SetItem(const std::string& variableName, double data)
 {
@@ -115,7 +104,7 @@ unsigned CellData::GetNumItems() const
 std::vector<std::string> CellData::GetKeys() const
 {
     std::vector<std::string> keys;
-    //Note: Does the order of the keys matter.  If so, then sort the vector + Doxygen
+    //Note: Does the order of the keys matter?  If so, then sort the vector + Doxygen
     for (std::map<std::string, double>::const_iterator it = mCellData.begin(); it != mCellData.end(); ++it)
     {
         keys.push_back(it->first);

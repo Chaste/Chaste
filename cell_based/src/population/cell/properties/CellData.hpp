@@ -82,23 +82,8 @@ private:
 public:
 
     /**
-     * Default constructor to be used by serialization.
+     * Constructor/destructor are default.
      */
-    CellData()
-    {
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param numVariables the number of variables to be stored in this cell (NOW IGNORED).
-     */
-    CellData(unsigned numVariables);
-
-    /**
-     * Destructor.
-     */
-    virtual ~CellData();
 
     /**
      * This assigns the cell data.
