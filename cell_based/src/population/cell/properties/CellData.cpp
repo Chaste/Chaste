@@ -51,9 +51,9 @@ void CellData::SetItem(unsigned variableNumber, double data)
         case 1:
             SetItem("Var1", data);
             break;
-        case 2:
-            SetItem("Var2", data);
-            break;
+//        case 2:
+//            SetItem("Var2", data);
+//            break;
         default:
             NEVER_REACHED;
     }
@@ -87,9 +87,9 @@ double CellData::GetItem(unsigned variableNumber) const
         case 1:
             return GetItem("Var1");
             break;
-        case 2:
-            return GetItem("Var2");
-            break;
+//        case 2:
+//            return GetItem("Var2");
+//            break;
         default:
             NEVER_REACHED;
     }

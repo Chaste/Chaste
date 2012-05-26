@@ -558,7 +558,7 @@ public:
         {
             double x = p_mesh->GetNode(i)->rGetLocation()[0];
             CellPtr p_cell = cell_population.GetCellUsingLocationIndex(p_mesh->GetNode(i)->GetIndex());
-            p_cell->GetCellData()->SetItem(0, x/50.0);
+            p_cell->GetCellData()->SetItem("nutrient", x/50.0);
  
         }
 

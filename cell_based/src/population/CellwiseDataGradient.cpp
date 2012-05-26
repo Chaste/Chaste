@@ -44,7 +44,7 @@ c_vector<double, DIM>& CellwiseDataGradient<DIM>::rGetGradient(unsigned nodeInde
 
 
 template<unsigned DIM>
-void CellwiseDataGradient<DIM>::SetupGradients(AbstractCellPopulation<DIM>& rCellPopulation)
+void CellwiseDataGradient<DIM>::SetupGradients(AbstractCellPopulation<DIM>& rCellPopulation, const std::string& rItemName)
 {
     MeshBasedCellPopulation<DIM>* pCellPopulation = static_cast<MeshBasedCellPopulation<DIM>*>(&(rCellPopulation));
     TetrahedralMesh<DIM,DIM>& r_mesh = pCellPopulation->rGetMesh();
@@ -74,10 +74,7 @@ void CellwiseDataGradient<DIM>::SetupGradients(AbstractCellPopulation<DIM>& rCel
         LinearBasisFunction<DIM>::ComputeTransformedBasisFunctionDerivatives(zero_point, inverse_jacobian, grad_phi);
 
         bool is_ghost_element = false;
-        
-        std::vector<std::string> keys = pCellPopulation->Begin()->GetCellData()->GetKeys();
-        assert (keys.size() == 1u);
-        
+                
         for (unsigned node_index=0; node_index<DIM+1; node_index++)
         {
             unsigned node_global_index = r_elem.GetNodeGlobalIndex(node_index);
@@ -93,7 +90,7 @@ void CellwiseDataGradient<DIM>::SetupGradients(AbstractCellPopulation<DIM>& rCel
 
             // If no ghost element, get PDE solution
             CellPtr p_cell = pCellPopulation->GetCellUsingLocationIndex(node_global_index);
-            double pde_solution = p_cell->GetCellData()->GetItem(keys[0]);
+            double pde_solution = p_cell->GetCellData()->GetItem(rItemName);
  
             // Interpolate gradient
             for (unsigned i=0; i<DIM; i++)

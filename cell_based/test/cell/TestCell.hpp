@@ -1123,8 +1123,8 @@ public:
         TS_ASSERT_EQUALS(p_cell->HasCellData(), true);
         TS_ASSERT_THROWS_NOTHING(p_cell->GetCellData());
 
-        p_cell->GetCellData()->SetItem(0, 1.0);
-        p_cell->GetCellData()->SetItem(1, 2.0);
+        p_cell->GetCellData()->SetItem("something", 1.0);
+        p_cell->GetCellData()->SetItem("some other thing", 2.0);
 
         p_simulation_time->IncrementTimeOneStep();
         p_simulation_time->IncrementTimeOneStep();
@@ -1135,17 +1135,17 @@ public:
 
         CellPropertyCollection cell_data_collection = p_cell->rGetCellPropertyCollection().GetPropertiesType<CellData>();
         boost::shared_ptr<CellData> p_parentcell_data = boost::static_pointer_cast<CellData>(cell_data_collection.GetProperty());
-        p_parentcell_data->SetItem(0, 3.0);
+        p_parentcell_data->SetItem("something", 3.0);
 
         TS_ASSERT_EQUALS(p_cell->HasCellData(), true);
-        TS_ASSERT_EQUALS(p_cell->GetCellData()->GetItem(0), 3.0);
-        TS_ASSERT_EQUALS(p_cell->GetCellData()->GetItem(1), 2.0);
+        TS_ASSERT_EQUALS(p_cell->GetCellData()->GetItem("something"), 3.0);
+        TS_ASSERT_EQUALS(p_cell->GetCellData()->GetItem("some other thing"), 2.0);
 
         CellPropertyCollection cell2_data_collection = p_cell2->rGetCellPropertyCollection().GetPropertiesType<CellData>();
         boost::shared_ptr<CellData> p_daughtercell_data = boost::static_pointer_cast<CellData>(cell2_data_collection.GetProperty());
 
-        TS_ASSERT_EQUALS(p_daughtercell_data->GetItem(0), 1.0);
-        TS_ASSERT_EQUALS(p_daughtercell_data->GetItem(1), 2.0);
+        TS_ASSERT_EQUALS(p_daughtercell_data->GetItem("something"), 1.0);
+        TS_ASSERT_EQUALS(p_daughtercell_data->GetItem("some other thing"), 2.0);
     }
 
 };

@@ -128,17 +128,15 @@ public:
     {
         MAKE_PTR(CellData, p_cell_data);
         
-        TS_ASSERT_THROWS_THIS(p_cell_data->GetItem(0), "The item Var0 is not stored");
-        TS_ASSERT_THROWS_THIS(p_cell_data->GetItem(1), "The item Var1 is not stored");
-        TS_ASSERT_THROWS_THIS(p_cell_data->GetItem(2), "The item Var2 is not stored");
+        TS_ASSERT_THROWS_THIS(p_cell_data->GetItem("thing1"), "The item thing1 is not stored");
 
-        p_cell_data->SetItem(0,1.0);
-        p_cell_data->SetItem(1,2.0);
-        p_cell_data->SetItem(2,3.0);
+        p_cell_data->SetItem("thing1", 1.0);
+        p_cell_data->SetItem("thing2", 2.0);
+        p_cell_data->SetItem("thing3", 3.0);
 
-        TS_ASSERT_DELTA(p_cell_data->GetItem(0), 1.0, 1e-8);
-        TS_ASSERT_DELTA(p_cell_data->GetItem(1), 2.0, 1e-8);
-        TS_ASSERT_DELTA(p_cell_data->GetItem(2), 3.0, 1e-8);
+        TS_ASSERT_DELTA(p_cell_data->GetItem("thing1"), 1.0, 1e-8);
+        TS_ASSERT_DELTA(p_cell_data->GetItem("thing2"), 2.0, 1e-8);
+        TS_ASSERT_DELTA(p_cell_data->GetItem("thing3"), 3.0, 1e-8);
         TS_ASSERT_EQUALS(p_cell_data->GetNumItems(), 3u);
     }
 
@@ -151,11 +149,11 @@ public:
         {
             CellData* p_cell_data = new CellData;
 
-            p_cell_data->SetItem(0,1.0);
-            p_cell_data->SetItem(1,2.0);
+            p_cell_data->SetItem("thing1",1.0);
+            p_cell_data->SetItem("thing2",2.0);
 
-            TS_ASSERT_DELTA(p_cell_data->GetItem(0), 1.0, 1e-8);
-            TS_ASSERT_DELTA(p_cell_data->GetItem(1), 2.0, 1e-8);
+            TS_ASSERT_DELTA(p_cell_data->GetItem("thing1"), 1.0, 1e-8);
+            TS_ASSERT_DELTA(p_cell_data->GetItem("thing2"), 2.0, 1e-8);
 
             // Create an output archive
             std::ofstream ofs(archive_filename.c_str());
@@ -181,8 +179,8 @@ public:
             CellData* p_real_cell_data = dynamic_cast<CellData*>(p_cell_data);
             TS_ASSERT(p_real_cell_data != NULL);
 
-            TS_ASSERT_DELTA(p_real_cell_data->GetItem(0), 1.0, 1e-8);
-            TS_ASSERT_DELTA(p_real_cell_data->GetItem(1), 2.0, 1e-8);
+            TS_ASSERT_DELTA(p_real_cell_data->GetItem("thing1"), 1.0, 1e-8);
+            TS_ASSERT_DELTA(p_real_cell_data->GetItem("thing2"), 2.0, 1e-8);
 
             // Tidy up
             delete p_cell_data;

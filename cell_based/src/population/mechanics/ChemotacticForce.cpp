@@ -59,7 +59,7 @@ void ChemotacticForce<DIM>::AddForceContribution(std::vector<c_vector<double, DI
                                                  AbstractCellPopulation<DIM>& rCellPopulation)
 {
     CellwiseDataGradient<DIM> gradients;
-    gradients.SetupGradients(rCellPopulation);
+    gradients.SetupGradients(rCellPopulation, "nutrient");
 
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
          cell_iter != rCellPopulation.End();
@@ -71,7 +71,7 @@ void ChemotacticForce<DIM>::AddForceContribution(std::vector<c_vector<double, DI
             unsigned node_global_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
 
             c_vector<double,DIM>& r_gradient = gradients.rGetGradient(node_global_index);
-            double nutrient_concentration = cell_iter->GetCellData()->GetItem(0);
+            double nutrient_concentration = cell_iter->GetCellData()->GetItem("nutrient");
             double magnitude_of_gradient = norm_2(r_gradient);
 
             double force_magnitude = GetChemotacticForceMagnitude(nutrient_concentration, magnitude_of_gradient);

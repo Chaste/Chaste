@@ -76,11 +76,11 @@ public:
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             CellPtr p_cell = cell_population.GetCellUsingLocationIndex(mesh.GetNode(i)->GetIndex());
-            p_cell->GetCellData()->SetItem(0, x*x);
+            p_cell->GetCellData()->SetItem("x^2", x*x);
         }
 
         CellwiseDataGradient<2> gradient;
-        gradient.SetupGradients(cell_population);
+        gradient.SetupGradients(cell_population, "x^2");
 
         // With the algorithm being used, the numerical gradient is (1,0)
         // for each of the nodes
@@ -108,10 +108,10 @@ public:
         //////////////////////////////////
         // C(x,y) = const
         //////////////////////////////////
-        cell_population.SetDataOnAllCells(0, 1.0);
+        cell_population.SetDataOnAllCells("const", 1.0);
         
         CellwiseDataGradient<2> gradient;
-        gradient.SetupGradients(cell_population);
+        gradient.SetupGradients(cell_population, "const");
 
         // Check gradient
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
@@ -121,25 +121,9 @@ public:
         }
 
         //////////////////////////////////
+        // Combined setup for
         // C(x,y) = x-y
-        //////////////////////////////////
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
-        {
-            double x = mesh.GetNode(i)->rGetLocation()[0];
-            double y = mesh.GetNode(i)->rGetLocation()[1];
-            CellPtr p_cell = cell_population.GetCellUsingLocationIndex(mesh.GetNode(i)->GetIndex());
-            p_cell->GetCellData()->SetItem(0, x-y);
-        }
-
-        // Check gradient
-        gradient.SetupGradients(cell_population);
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
-        {
-            TS_ASSERT_DELTA(gradient.rGetGradient(i)(0),  1.0, 1e-9);
-            TS_ASSERT_DELTA(gradient.rGetGradient(i)(1), -1.0, 1e-9);
-        }
-
-        //////////////////////////////////
+        // and
         // C(x,y) = x^2 - y^2
         //////////////////////////////////
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
@@ -147,11 +131,21 @@ public:
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
             CellPtr p_cell = cell_population.GetCellUsingLocationIndex(mesh.GetNode(i)->GetIndex());
-            p_cell->GetCellData()->SetItem(0, x*x - y*y);
+            p_cell->GetCellData()->SetItem("x-y",       x-y);
+            p_cell->GetCellData()->SetItem("x^2 - y^2", x*x - y*y);
         }
 
+        // Check gradient
+        gradient.SetupGradients(cell_population, "x-y");
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        {
+            TS_ASSERT_DELTA(gradient.rGetGradient(i)(0),  1.0, 1e-9);
+            TS_ASSERT_DELTA(gradient.rGetGradient(i)(1), -1.0, 1e-9);
+        }
+
+
         // Check gradient - here there is some numerical error
-        gradient.SetupGradients(cell_population);
+        gradient.SetupGradients(cell_population, "x^2 - y^2");
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
