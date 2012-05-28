@@ -247,7 +247,7 @@ public:
         	probability_of_occupation[i] = (double) location_of_cell[i]/(double) num_runs;
         }
 
-        // Note that these simulations are stochastic o tolerances are relatively loose
+        // Note that these simulations are stochastic and so the tolerances are relatively loose
         TS_ASSERT_DELTA(probability_of_occupation[0],diffusion_parameter*delta_t/4.0, 1e-2);
         TS_ASSERT_DELTA(probability_of_occupation[1],diffusion_parameter*delta_t/2.0, 1e-2);
         TS_ASSERT_DELTA(probability_of_occupation[2],diffusion_parameter*delta_t/4.0, 1e-2);
@@ -303,6 +303,16 @@ public:
         // Test no deaths and some births
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 15u);///\todo #2066 Check this!
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
+
+
+        // Now remove the update rules and check that only birth happens when the simulator runs again
+        simulator.RemoveAllPottsUpdateRules();
+        simulator.SetEndTime(50);
+        simulator.Solve();
+
+        // Check that the same number of cells
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 17u);
+
 
 
 #ifdef CHASTE_VTK

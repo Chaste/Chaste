@@ -167,6 +167,15 @@ public:
         // Test no births or deaths
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
+
+
+        // Now remove the update rules and check nothing happens when the simulator runs again
+        simulator.RemoveAllPottsUpdateRules();
+        simulator.SetEndTime(0.2);
+        simulator.Solve();
+
+        // Check that the same number of cells
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 4u);
     }
 
     void TestPottsMonolayerWithNonRandomSweep() throw (Exception)

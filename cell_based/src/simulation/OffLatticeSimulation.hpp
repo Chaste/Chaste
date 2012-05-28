@@ -174,6 +174,11 @@ public:
     void AddForce(boost::shared_ptr<AbstractForce<DIM> > pForce);
 
     /**
+     * Method to remove all the Forces
+     */
+    void RemoveAllForces();
+
+    /**
      * Add a cell population boundary condition to be used in this simulation.
      *
      * @param pBoundaryCondition pointer to a boundary condition

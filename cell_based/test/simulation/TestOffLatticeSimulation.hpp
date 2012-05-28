@@ -51,6 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "GeneralisedLinearSpringForce.hpp"
 #include "ChemotacticForce.hpp"
 #include "RandomCellKiller.hpp"
+#include "PlaneBasedCellKiller.hpp"
 #include "PlaneBoundaryCondition.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
@@ -258,6 +259,61 @@ public:
     }
 
     /**
+     * Test a cell-based simulation with multiple cell killers.
+     */
+    void TestOffLatticeSimulationWithMultipleCellKillers() throw (Exception)
+    {
+        // Create a simple mesh
+        int num_cells_depth = 5;
+        int num_cells_width = 5;
+        HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
+        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(),TRANSIT);
+
+        // Create a cell population
+        MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Set up cell-based simulation
+        OffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestOffLatticeSimulationWithMultipleCellKillers");
+        simulator.SetEndTime(0.5);
+
+        // Create a force law and pass it to the simulation
+        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        p_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_force);
+
+        // Add cell killers
+        MAKE_PTR_ARGS(PlaneBasedCellKiller<2>, p_killer_1, (&cell_population, zero_vector<double>(2), -unit_vector<double>(2,1))); // y<0
+        simulator.AddCellKiller(p_killer_1);
+
+        // Add cell killers
+		MAKE_PTR_ARGS(PlaneBasedCellKiller<2>, p_killer_2, (&cell_population, zero_vector<double>(2), -unit_vector<double>(2,0))); // x<0
+		simulator.AddCellKiller(p_killer_2);
+
+        simulator.SetUpdateCellPopulationRule(true);
+        simulator.Solve();
+
+        // Check that the number of nodes is equal to the number of cells
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), simulator.rGetCellPopulation().GetNumRealCells());
+
+        //Check that the correct number of cells are killed
+        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 7u);
+
+        // Now remove the killers and check no more cells are killed
+        simulator.RemoveAllCellKillers();
+        simulator.SetEndTime(1.0);
+
+        simulator.Solve();
+        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 7u);
+    }
+
+
+    /**
      * Test a cell-based simulation with multiple forces.
      */
     void TestOffLatticeSimulationWithMultipleForces() throw (Exception)
@@ -304,88 +360,98 @@ public:
         // For coverage of these 'Get' functions
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
+
+        // Now remove these forces and only have the spring force
+        simulator.RemoveAllForces();
+        simulator.AddForce(p_linear_force);
+        simulator.SetEndTime(1.0);
+
+        simulator.Solve();
+
+		// Check that the number of nodes is equal to the number of cells
+		TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), simulator.rGetCellPopulation().GetNumRealCells());
     }
 
     /**
-     * Test a cell-based simulation with multiple forces.
-     */
-    void TestOffLatticeSimulationWithVariableRestLengths() throw (Exception)
-    {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
-        MutableMesh<2,2> mesh;
-        mesh.ConstructFromMeshReader(mesh_reader);
-        mesh.Scale(8,8);
+	 * Test a cell-based simulation with multiple forces.
+	 */
+	void TestOffLatticeSimulationWithVariableRestLengths() throw (Exception)
+	{
+		TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
+		MutableMesh<2,2> mesh;
+		mesh.ConstructFromMeshReader(mesh_reader);
+		mesh.Scale(8,8);
 
-        // Create cells
-        std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(),DIFFERENTIATED);
+		// Create cells
+		std::vector<CellPtr> cells;
+		CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+		cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(),DIFFERENTIATED);
 
-        // Create a cell population
-        MeshBasedCellPopulation<2> cell_population(mesh, cells);
-        // Calculate the rest lengths of the spings assuming that the current configuration is in equilibrium.
-        cell_population.CalculateRestLengths();
+		// Create a cell population
+		MeshBasedCellPopulation<2> cell_population(mesh, cells);
+		// Calculate the rest lengths of the spings assuming that the current configuration is in equilibrium.
+		cell_population.CalculateRestLengths();
 
-        // Set up cell-based simulation
-        OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestOffLatticeSimulationWithVariableRestLengths");
-        simulator.SetEndTime(0.5);
-        // Turn off remeshing so we only have the same mesh connectivity over time this is needed to use the variable rest length
-        simulator.SetUpdateCellPopulationRule(false);
+		// Set up cell-based simulation
+		OffLatticeSimulation<2> simulator(cell_population);
+		simulator.SetOutputDirectory("TestOffLatticeSimulationWithVariableRestLengths");
+		simulator.SetEndTime(0.5);
+		// Turn off remeshing so we only have the same mesh connectivity over time this is needed to use the variable rest length
+		simulator.SetUpdateCellPopulationRule(false);
 
-        // Create some force laws and pass them to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
-        simulator.AddForce(p_linear_force);
+		// Create some force laws and pass them to the simulation
+		MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+		simulator.AddForce(p_linear_force);
 
-        simulator.Solve();
+		simulator.Solve();
 
-        // Check nothing has moved
-        TS_ASSERT_DELTA(simulator.GetNodeLocation(0)[0], 0.0, 1e-6);
-        TS_ASSERT_DELTA(simulator.GetNodeLocation(0)[0], 0.0, 1e-6);
+		// Check nothing has moved
+		TS_ASSERT_DELTA(simulator.GetNodeLocation(0)[0], 0.0, 1e-6);
+		TS_ASSERT_DELTA(simulator.GetNodeLocation(0)[0], 0.0, 1e-6);
 
-        TS_ASSERT_DELTA(simulator.GetNodeLocation(1)[0], 8.0, 1e-6);
-        TS_ASSERT_DELTA(simulator.GetNodeLocation(1)[1], 0.0, 1e-6);
+		TS_ASSERT_DELTA(simulator.GetNodeLocation(1)[0], 8.0, 1e-6);
+		TS_ASSERT_DELTA(simulator.GetNodeLocation(1)[1], 0.0, 1e-6);
 
-        TS_ASSERT_DELTA(simulator.GetNodeLocation(2)[0], 8.0, 1e-6);
-        TS_ASSERT_DELTA(simulator.GetNodeLocation(2)[1], 8.0, 1e-6);
+		TS_ASSERT_DELTA(simulator.GetNodeLocation(2)[0], 8.0, 1e-6);
+		TS_ASSERT_DELTA(simulator.GetNodeLocation(2)[1], 8.0, 1e-6);
 
-        TS_ASSERT_DELTA(simulator.GetNodeLocation(3)[0], 0.0, 1e-6);
-        TS_ASSERT_DELTA(simulator.GetNodeLocation(3)[1], 8.0, 1e-6);
+		TS_ASSERT_DELTA(simulator.GetNodeLocation(3)[0], 0.0, 1e-6);
+		TS_ASSERT_DELTA(simulator.GetNodeLocation(3)[1], 8.0, 1e-6);
 
-        // Create some boundary conditions and pass them to the simulation
-        c_vector<double,2> point = zero_vector<double>(2);
-        c_vector<double,2> normal = zero_vector<double>(2);
-        normal(1) = -1.0;
-        MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc1, (&cell_population, point, normal)); // y>0
-        simulator.AddCellPopulationBoundaryCondition(p_bc1);
-        point(1) = 7.5;
-        normal(1) = 1.0;
-        MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc2, (&cell_population, point, normal)); // y<7.5
-        simulator.AddCellPopulationBoundaryCondition(p_bc2);
+		// Create some boundary conditions and pass them to the simulation
+		c_vector<double,2> point = zero_vector<double>(2);
+		c_vector<double,2> normal = zero_vector<double>(2);
+		normal(1) = -1.0;
+		MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc1, (&cell_population, point, normal)); // y>0
+		simulator.AddCellPopulationBoundaryCondition(p_bc1);
+		point(1) = 7.5;
+		normal(1) = 1.0;
+		MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc2, (&cell_population, point, normal)); // y<7.5
+		simulator.AddCellPopulationBoundaryCondition(p_bc2);
 
-        simulator.SetEndTime(1.0);
-        simulator.Solve();
+		simulator.SetEndTime(1.0);
+		simulator.Solve();
 
-        // Check top has shifted down
-        TS_ASSERT_DELTA(simulator.GetNodeLocation(0)[0], -0.0207, 1e-3);
-        TS_ASSERT_DELTA(simulator.GetNodeLocation(0)[1], 0.0, 1e-6);
+		// Check top has shifted down
+		TS_ASSERT_DELTA(simulator.GetNodeLocation(0)[0], -0.0207, 1e-3);
+		TS_ASSERT_DELTA(simulator.GetNodeLocation(0)[1], 0.0, 1e-6);
 
-        TS_ASSERT_DELTA(simulator.GetNodeLocation(1)[0], 8.0207, 1e-3);
-        TS_ASSERT_DELTA(simulator.GetNodeLocation(1)[1], 0.0, 1e-6);
+		TS_ASSERT_DELTA(simulator.GetNodeLocation(1)[0], 8.0207, 1e-3);
+		TS_ASSERT_DELTA(simulator.GetNodeLocation(1)[1], 0.0, 1e-6);
 
-        TS_ASSERT_DELTA(simulator.GetNodeLocation(2)[0], 8.1097, 1e-3);
-        TS_ASSERT_DELTA(simulator.GetNodeLocation(2)[1], 7.5, 1e-6);
+		TS_ASSERT_DELTA(simulator.GetNodeLocation(2)[0], 8.1097, 1e-3);
+		TS_ASSERT_DELTA(simulator.GetNodeLocation(2)[1], 7.5, 1e-6);
 
-        TS_ASSERT_DELTA(simulator.GetNodeLocation(3)[0], -0.1097, 1e-3);
-        TS_ASSERT_DELTA(simulator.GetNodeLocation(3)[1], 7.5, 1e-6);
+		TS_ASSERT_DELTA(simulator.GetNodeLocation(3)[0], -0.1097, 1e-3);
+		TS_ASSERT_DELTA(simulator.GetNodeLocation(3)[1], 7.5, 1e-6);
 
-        simulator.RemoveAllCellPopulationBoundaryConditions();
-        simulator.AddCellPopulationBoundaryCondition(p_bc1);
-        simulator.SetEndTime(10.0);
-        simulator.Solve();
+		simulator.RemoveAllCellPopulationBoundaryConditions();
+		simulator.AddCellPopulationBoundaryCondition(p_bc1);
+		simulator.SetEndTime(10.0);
+		simulator.Solve();
 
-        // Check has relaxed back to original shape
-        TS_ASSERT_DELTA(simulator.GetNodeLocation(0)[0], 0.0, 1e-3);
+		// Check has relaxed back to original shape
+		TS_ASSERT_DELTA(simulator.GetNodeLocation(0)[0], 0.0, 1e-3);
 		TS_ASSERT_DELTA(simulator.GetNodeLocation(0)[1], 0.0, 1e-3);
 
 		TS_ASSERT_DELTA(simulator.GetNodeLocation(1)[0], 8.0, 1e-3);
@@ -396,7 +462,7 @@ public:
 
 		TS_ASSERT_DELTA(simulator.GetNodeLocation(3)[0], 0.0, 1e-3);
 		TS_ASSERT_DELTA(simulator.GetNodeLocation(3)[1], 8.0, 1e-2);
-    }
+	}
 
 
     /**

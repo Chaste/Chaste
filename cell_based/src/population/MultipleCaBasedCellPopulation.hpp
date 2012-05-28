@@ -350,6 +350,12 @@ public:
      */
     void AddUpdateRule(boost::shared_ptr<AbstractMultipleCaUpdateRule<DIM> > pUpdateRule);
 
+
+    /**
+     * Method to remove all the update rules
+     */
+    void RemoveAllUpdateRules();
+
     /**
      * Get the collection of update rules to be used in this simulation.
      *

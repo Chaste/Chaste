@@ -489,6 +489,12 @@ void PottsBasedCellPopulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractPott
 }
 
 template<unsigned DIM>
+void PottsBasedCellPopulation<DIM>::RemoveAllUpdateRules()
+{
+	mUpdateRuleCollection.clear();
+}
+
+template<unsigned DIM>
 const std::vector<boost::shared_ptr<AbstractPottsUpdateRule<DIM> > >& PottsBasedCellPopulation<DIM>::rGetUpdateRuleCollection() const
 {
     return mUpdateRuleCollection;

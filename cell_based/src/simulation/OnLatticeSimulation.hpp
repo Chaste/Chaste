@@ -141,11 +141,21 @@ public:
     void AddMultipleCaUpdateRule(boost::shared_ptr<AbstractMultipleCaUpdateRule<DIM> > pUpdateRule);
 
     /**
+     * Method to remove all the MultipleCaUpdateRules
+     */
+    void RemoveAllMultipleCaUpdateRules();
+
+    /**
      * Add an update rule to be used in this simulation (use this to set the Hamiltonian).
      *
      * @param pUpdateRule shared pointer to a Potts update rule law
      */
     void AddPottsUpdateRule(boost::shared_ptr<AbstractPottsUpdateRule<DIM> > pUpdateRule);
+
+	/**
+	 * Method to remove all the PottsUpdateRules
+	 */
+    void RemoveAllPottsUpdateRules();
 
     /**
      * Overridden OutputAdditionalSimulationSetup() method.

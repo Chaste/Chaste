@@ -77,6 +77,12 @@ void OffLatticeSimulation<DIM>::AddForce(boost::shared_ptr<AbstractForce<DIM> > 
 }
 
 template<unsigned DIM>
+void OffLatticeSimulation<DIM>::RemoveAllForces()
+{
+	mForceCollection.clear();
+}
+
+template<unsigned DIM>
 void OffLatticeSimulation<DIM>::AddCellPopulationBoundaryCondition(boost::shared_ptr<AbstractCellPopulationBoundaryCondition<DIM> > pBoundaryCondition)
 {
     mBoundaryConditions.push_back(pBoundaryCondition);

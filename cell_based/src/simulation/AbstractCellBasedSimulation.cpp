@@ -245,6 +245,12 @@ void AbstractCellBasedSimulation<DIM>::AddCellKiller(boost::shared_ptr<AbstractC
 }
 
 template<unsigned DIM>
+void AbstractCellBasedSimulation<DIM>::RemoveAllCellKillers()
+{
+	mCellKillers.clear();
+}
+
+template<unsigned DIM>
 std::vector<double> AbstractCellBasedSimulation<DIM>::GetNodeLocation(const unsigned& rNodeIndex)
 {
     std::vector<double> location;

@@ -359,6 +359,11 @@ public:
     void AddCellKiller(boost::shared_ptr<AbstractCellKiller<DIM> > pCellKiller);
 
     /**
+     * Method to remove all the cell killers
+     */
+    void RemoveAllCellKillers();
+
+    /**
      * Main solve method.
      *
      * This method sets up the simulation time, creates output files, and initialises the

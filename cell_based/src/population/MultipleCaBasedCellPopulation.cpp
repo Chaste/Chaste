@@ -557,7 +557,13 @@ double MultipleCaBasedCellPopulation<DIM>::GetWidth(const unsigned& rDimension)
 template<unsigned DIM>
 void MultipleCaBasedCellPopulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractMultipleCaUpdateRule<DIM> > pUpdateRule)
 {
-    mUpdateRuleCollection.push_back(pUpdateRule);
+	mUpdateRuleCollection.push_back(pUpdateRule);
+}
+
+template<unsigned DIM>
+void MultipleCaBasedCellPopulation<DIM>::RemoveAllUpdateRules()
+{
+	mUpdateRuleCollection.clear();
 }
 
 template<unsigned DIM>

@@ -68,12 +68,30 @@ void OnLatticeSimulation<DIM>::AddMultipleCaUpdateRule(boost::shared_ptr<Abstrac
 }
 
 template<unsigned DIM>
+void OnLatticeSimulation<DIM>::RemoveAllMultipleCaUpdateRules()
+{
+	if (dynamic_cast<MultipleCaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
+	{
+		static_cast<MultipleCaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->RemoveAllUpdateRules();
+	}
+}
+
+template<unsigned DIM>
 void OnLatticeSimulation<DIM>::AddPottsUpdateRule(boost::shared_ptr<AbstractPottsUpdateRule<DIM> > pUpdateRule)
 {
     if (dynamic_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
     {
         static_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->AddUpdateRule(pUpdateRule);
     }
+}
+
+template<unsigned DIM>
+void OnLatticeSimulation<DIM>::RemoveAllPottsUpdateRules()
+{
+	if (dynamic_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
+	{
+		static_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->RemoveAllUpdateRules();
+	}
 }
 
 template<unsigned DIM>
