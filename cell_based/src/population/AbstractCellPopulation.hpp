@@ -254,15 +254,6 @@ public:
     void SetDataOnAllCells(const std::string& dataName, double dataValue);
 
     /**
-     * \todo #2115 This method is temporary, for use during work on ticket
-     * PLEASe REMEMBER TO DELETE
-     * Add an item of cell data to every cell in the population
-     * @param var is the name associated with the data
-     * @param dataValue is the value of the data, initially the same for each cell
-     */
-    void SetDataOnAllCells(unsigned var, double dataValue);
-
-    /**
      * @return reference to the mesh, mrMesh.
      */
     AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rGetMesh();

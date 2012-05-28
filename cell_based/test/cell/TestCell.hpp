@@ -1120,7 +1120,6 @@ public:
         p_cell->InitialiseCellCycleModel();
 
         //Before adding the CellData to the cell
-        TS_ASSERT_EQUALS(p_cell->HasCellData(), true);
         TS_ASSERT_THROWS_NOTHING(p_cell->GetCellData());
 
         p_cell->GetCellData()->SetItem("something", 1.0);
@@ -1137,7 +1136,6 @@ public:
         boost::shared_ptr<CellData> p_parentcell_data = boost::static_pointer_cast<CellData>(cell_data_collection.GetProperty());
         p_parentcell_data->SetItem("something", 3.0);
 
-        TS_ASSERT_EQUALS(p_cell->HasCellData(), true);
         TS_ASSERT_EQUALS(p_cell->GetCellData()->GetItem("something"), 3.0);
         TS_ASSERT_EQUALS(p_cell->GetCellData()->GetItem("some other thing"), 2.0);
 

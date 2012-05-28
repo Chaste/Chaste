@@ -45,7 +45,8 @@ PdeAndBoundaryConditions<DIM>::PdeAndBoundaryConditions(AbstractLinearEllipticPd
       mpBoundaryCondition(pBoundaryCondition),
       mIsNeumannBoundaryCondition(isNeumannBoundaryCondition),
       mSolution(NULL),
-      mDeleteMemberPointersInDestructor(deleteMemberPointersInDestructor)
+      mDeleteMemberPointersInDestructor(deleteMemberPointersInDestructor),
+      mDependentVariableName("")
 {
     if (solution)
     {
@@ -124,6 +125,17 @@ void PdeAndBoundaryConditions<DIM>::SetUpSourceTermsForAveragedSourcePde(Tetrahe
     static_cast<AveragedSourcePde<DIM>*>(mpPde)->SetupSourceTerms(*pMesh, pCellPdeElementMap);
 }
 
+template<unsigned DIM>
+void PdeAndBoundaryConditions<DIM>::SetDependentVariableName(const std::string& rName)
+{
+    mDependentVariableName = rName;
+}
+
+template<unsigned DIM>
+std::string& PdeAndBoundaryConditions<DIM>::rGetDependentVariableName()
+{
+    return mDependentVariableName;
+}
 /////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////

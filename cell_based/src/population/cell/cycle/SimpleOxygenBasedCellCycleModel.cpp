@@ -70,7 +70,7 @@ void SimpleOxygenBasedCellCycleModel::UpdateCellCyclePhase()
         UpdateHypoxicDuration();
 
         // Get cell's oxygen concentration
-        double oxygen_concentration = mpCell->GetCellData()->GetItem(0);
+        double oxygen_concentration = mpCell->GetCellData()->GetItem("oxygen");
 
         AbstractSimpleCellCycleModel::UpdateCellCyclePhase();
 
@@ -129,7 +129,7 @@ void SimpleOxygenBasedCellCycleModel::UpdateHypoxicDuration()
     assert(!mpCell->HasApoptosisBegun());
 
     // Get cell's oxygen concentration
-    double oxygen_concentration = mpCell->GetCellData()->GetItem(0);
+    double oxygen_concentration = mpCell->GetCellData()->GetItem("oxygen");
 
     if (oxygen_concentration < mHypoxicConcentration)
     {

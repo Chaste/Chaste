@@ -34,30 +34,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "CellData.hpp"
-#include "Debug.hpp"
 
 void CellData::SetItem(const std::string& variableName, double data)
 {
     mCellData[variableName] = data;
 }
 
-void CellData::SetItem(unsigned variableNumber, double data)
-{
-    switch (variableNumber)
-    {
-        case 0:
-            SetItem("Var0", data);
-            break;
-        case 1:
-            SetItem("Var1", data);
-            break;
-//        case 2:
-//            SetItem("Var2", data);
-//            break;
-        default:
-            NEVER_REACHED;
-    }
-}
 
 double CellData::GetItem(const std::string& variableName) const
 {
@@ -67,7 +49,6 @@ double CellData::GetItem(const std::string& variableName) const
     std::map<std::string, double>::const_iterator it = mCellData.find(variableName);
     if (it == mCellData.end())
     {
-        PRINT_VECTOR(GetKeys());///\todo This is useful for #2115
         EXCEPTION("The item " << variableName << " is not stored");
     }
     if (it->second == DOUBLE_UNSET)
@@ -75,25 +56,6 @@ double CellData::GetItem(const std::string& variableName) const
         EXCEPTION("The item " << variableName << " has not yet been set");
     }
     return(it->second);
-}
-
-double CellData::GetItem(unsigned variableNumber) const
-{
-    switch (variableNumber)
-    {
-        case 0:
-            return GetItem("Var0");
-            break;
-        case 1:
-            return GetItem("Var1");
-            break;
-//        case 2:
-//            return GetItem("Var2");
-//            break;
-        default:
-            NEVER_REACHED;
-    }
-
 }
 
 unsigned CellData::GetNumItems() const

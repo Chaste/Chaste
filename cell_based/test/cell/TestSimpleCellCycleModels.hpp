@@ -313,7 +313,7 @@ public:
         // Set up oxygen_concentration
         double lo_oxygen_concentration=0.0;
         double hi_oxygen_concentration=1.0;      
-        p_cell->GetCellData()->SetItem(0, lo_oxygen_concentration);
+        p_cell->GetCellData()->SetItem("oxygen", lo_oxygen_concentration);
 
         p_model->ReadyToDivide();
         TS_ASSERT_DELTA(p_model->GetCurrentHypoxicDuration(), 0.0, 1e-12);
@@ -324,14 +324,14 @@ public:
         TS_ASSERT_DELTA(p_model->GetCurrentHypoxicDuration(), 1.0, 1e-12);
         TS_ASSERT_DELTA(p_model->GetCurrentHypoxiaOnsetTime(), 0.0, 1e-12);
 
-        p_cell->GetCellData()->SetItem(0, hi_oxygen_concentration);
+        p_cell->GetCellData()->SetItem("oxygen", hi_oxygen_concentration);
 
         p_simulation_time->IncrementTimeOneStep(); // t=2.0
         p_model->ReadyToDivide();
         TS_ASSERT_DELTA(p_model->GetCurrentHypoxicDuration(), 0.0, 1e-12);
         TS_ASSERT_DELTA(p_model->GetCurrentHypoxiaOnsetTime(), 2.0, 1e-12);
 
-        p_cell->GetCellData()->SetItem(0, lo_oxygen_concentration);
+        p_cell->GetCellData()->SetItem("oxygen", lo_oxygen_concentration);
         p_simulation_time->IncrementTimeOneStep(); // t=3.0
         p_model->ReadyToDivide();
         TS_ASSERT_DELTA(p_model->GetCurrentHypoxicDuration(), 1.0, 1e-12);
@@ -353,7 +353,7 @@ public:
         p_hepa_one_model->SetCellProliferativeType(STEM);
 
         CellPtr p_hepa_one_cell(new Cell(p_state, p_hepa_one_model));
-        p_hepa_one_cell->GetCellData()->SetItem(0, hi_oxygen_concentration);
+        p_hepa_one_cell->GetCellData()->SetItem("oxygen", hi_oxygen_concentration);
         p_hepa_one_cell->InitialiseCellCycleModel();
 
         SimpleOxygenBasedCellCycleModel* p_diff_model = new SimpleOxygenBasedCellCycleModel;
@@ -367,7 +367,7 @@ public:
 
         CellPtr p_diff_cell(new Cell(p_state, p_diff_model));
         p_diff_cell->InitialiseCellCycleModel();
-        p_diff_cell->GetCellData()->SetItem(0, hi_oxygen_concentration);
+        p_diff_cell->GetCellData()->SetItem("oxygen", hi_oxygen_concentration);
 
         // Check that the cell cycle phase and ready to divide
         // are updated correctly
@@ -409,7 +409,7 @@ public:
         CellPtr p_apoptotic_cell(new Cell(p_state, p_cell_model));
 
         // Set up oxygen_concentration
-        p_apoptotic_cell->GetCellData()->SetItem(0, lo_oxygen_concentration);
+        p_apoptotic_cell->GetCellData()->SetItem("oxygen", lo_oxygen_concentration);
 
         // Force the cell to be apoptotic
         for (unsigned i=0; i<num_steps; i++)
@@ -573,7 +573,7 @@ public:
         double hi_oxygen_concentration=1.0;
 
         CellPtr p_cell(new Cell(p_state, p_model));
-        p_cell->GetCellData()->SetItem(0, lo_oxygen_concentration);
+        p_cell->GetCellData()->SetItem("oxygen", lo_oxygen_concentration);
         p_cell->InitialiseCellCycleModel();
 
         p_model->ReadyToDivide();
@@ -585,13 +585,13 @@ public:
         TS_ASSERT_DELTA(p_model->GetCurrentHypoxicDuration(), 1.0, 1e-12);
         TS_ASSERT_DELTA(p_model->GetCurrentHypoxiaOnsetTime(), 0.0, 1e-12);
 
-        p_cell->GetCellData()->SetItem(0, hi_oxygen_concentration);
+        p_cell->GetCellData()->SetItem("oxygen", hi_oxygen_concentration);
         p_simulation_time->IncrementTimeOneStep(); // t=2.0
         p_model->ReadyToDivide();
         TS_ASSERT_DELTA(p_model->GetCurrentHypoxicDuration(), 0.0, 1e-12);
         TS_ASSERT_DELTA(p_model->GetCurrentHypoxiaOnsetTime(), 2.0, 1e-12);
 
-        p_cell->GetCellData()->SetItem(0, lo_oxygen_concentration);
+        p_cell->GetCellData()->SetItem("oxygen", lo_oxygen_concentration);
         p_simulation_time->IncrementTimeOneStep(); // t=3.0
         p_model->ReadyToDivide();
         TS_ASSERT_DELTA(p_model->GetCurrentHypoxicDuration(), 1.0, 1e-12);
@@ -618,11 +618,11 @@ public:
 
         // Create cell
         CellPtr p_hepa_one_cell(new Cell(p_state, p_hepa_one_model));
-        p_hepa_one_cell->GetCellData()->SetItem(0, hi_oxygen_concentration);
+        p_hepa_one_cell->GetCellData()->SetItem("oxygen", hi_oxygen_concentration);
         p_hepa_one_cell->InitialiseCellCycleModel();
 
         CellPtr p_diff_cell(new Cell(p_state, p_diff_model));
-        p_diff_cell->GetCellData()->SetItem(0, hi_oxygen_concentration);
+        p_diff_cell->GetCellData()->SetItem("oxygen", hi_oxygen_concentration);
         p_diff_cell->InitialiseCellCycleModel();
 
         // Check that the cell cycle phase and ready to divide
@@ -652,7 +652,7 @@ public:
         StochasticOxygenBasedCellCycleModel* p_hepa_one_model2 = static_cast <StochasticOxygenBasedCellCycleModel*> (p_hepa_one_model->CreateCellCycleModel());
         p_hepa_one_model2->SetCellProliferativeType(STEM);
         CellPtr p_hepa_one_cell2(new Cell(p_state, p_hepa_one_model2));
-        p_hepa_one_cell2->GetCellData()->SetItem(0, hi_oxygen_concentration);
+        p_hepa_one_cell2->GetCellData()->SetItem("oxygen", hi_oxygen_concentration);
         p_hepa_one_cell2->InitialiseCellCycleModel();
         TS_ASSERT_EQUALS(p_hepa_one_model2->ReadyToDivide(), false);
         TS_ASSERT_EQUALS(p_hepa_one_model2->GetCurrentCellCyclePhase(), M_PHASE);
@@ -668,7 +668,7 @@ public:
         p_cell_model->SetDimension(2);
         p_cell_model->SetCellProliferativeType(STEM);
         CellPtr p_apoptotic_cell(new Cell(p_state, p_cell_model));
-        p_apoptotic_cell->GetCellData()->SetItem(0, lo_oxygen_concentration);
+        p_apoptotic_cell->GetCellData()->SetItem("oxygen", lo_oxygen_concentration);
         p_apoptotic_cell->InitialiseCellCycleModel();
 
         // Force the cell to be apoptotic

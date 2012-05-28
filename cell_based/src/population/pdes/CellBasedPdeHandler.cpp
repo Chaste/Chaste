@@ -48,6 +48,7 @@ CellBasedPdeHandler<DIM>::CellBasedPdeHandler(AbstractCellPopulation<DIM>* pCell
     : mpCellPopulation(pCellPopulation),
       mWriteAverageRadialPdeSolution(false),
       mWriteDailyAverageRadialPdeSolution(false),
+      mAverageRadialSolutionVariableName(""),
       mSetBcsOnCoarseBoundary(true),
       mNumRadialIntervals(UNSIGNED_UNSET),
       mpCoarsePdeMesh(NULL),
@@ -95,14 +96,40 @@ TetrahedralMesh<DIM,DIM>* CellBasedPdeHandler<DIM>::GetCoarsePdeMesh()
 template<unsigned DIM>
 void CellBasedPdeHandler<DIM>::AddPdeAndBc(PdeAndBoundaryConditions<DIM>* pPdeAndBc)
 {
+    if(!mPdeAndBcCollection.empty() && (pPdeAndBc->rGetDependentVariableName()==""))
+    {
+        EXCEPTION("When adding more than one PDE to CellBasedPdeHandler set the dependent variable name using SetDependentVariableName(name).");
+    }
+    for (unsigned i=0; i< mPdeAndBcCollection.size(); i++)
+    {
+        if (pPdeAndBc->rGetDependentVariableName() == mPdeAndBcCollection[i]->rGetDependentVariableName())
+        {
+            EXCEPTION("The name "+ pPdeAndBc->rGetDependentVariableName()+ " has already been used in the PDE collection");
+        }
+    }
     mPdeAndBcCollection.push_back(pPdeAndBc);
 }
 
 template<unsigned DIM>
-Vec CellBasedPdeHandler<DIM>::GetPdeSolution(unsigned pdeIndex)
+Vec CellBasedPdeHandler<DIM>::GetPdeSolution(const std::string& rName)
 {
-    assert(pdeIndex<mPdeAndBcCollection.size());
-    return mPdeAndBcCollection[pdeIndex]->GetSolution();
+    if(rName != "")
+    {
+        for (unsigned i=0; i<mPdeAndBcCollection.size(); i++)
+        {
+            if (mPdeAndBcCollection[i]->rGetDependentVariableName() == rName)
+            {
+                return mPdeAndBcCollection[i]->GetSolution();
+            }
+        }
+
+        EXCEPTION("The PDE collection does not contain a PDE named " + rName);
+    }
+    else
+    {
+        assert(mPdeAndBcCollection.size()==1);
+        return mPdeAndBcCollection[0]->GetSolution();
+    }
 }
 
 template<unsigned DIM>
@@ -464,7 +491,7 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
             {
                 solution_at_node = solution_repl[node_index];
             }
-            cell_iter->GetCellData()->SetItem(pde_index, solution_at_node);
+            cell_iter->GetCellData()->SetItem(mPdeAndBcCollection[pde_index]->rGetDependentVariableName(), solution_at_node);
         }
     }
 
@@ -573,7 +600,7 @@ void CellBasedPdeHandler<DIM>::WritePdeSolution(double time)
                         }
 
                         CellPtr p_cell = mpCellPopulation->GetCellUsingLocationIndex(nearest_node_index);
-                        double solution = p_cell->GetCellData()->GetItem(pde_index);
+                        double solution = p_cell->GetCellData()->GetItem(mPdeAndBcCollection[pde_index]->rGetDependentVariableName());
                         (*mpVizPdeSolutionResultsFile) << solution << " ";
                     }
                 }
@@ -591,7 +618,7 @@ void CellBasedPdeHandler<DIM>::WritePdeSolution(double time)
                     {
                         (*mpVizPdeSolutionResultsFile) << position[i] << " ";
                     }
-                    double solution = cell_iter->GetCellData()->GetItem(pde_index);
+                    double solution = cell_iter->GetCellData()->GetItem(mPdeAndBcCollection[pde_index]->rGetDependentVariableName());
                     (*mpVizPdeSolutionResultsFile) << solution << " ";
                 }
             }
@@ -601,8 +628,9 @@ void CellBasedPdeHandler<DIM>::WritePdeSolution(double time)
 }
 
 template<unsigned DIM>
-void CellBasedPdeHandler<DIM>::SetWriteAverageRadialPdeSolution(unsigned numRadialIntervals, bool writeDailyResults)
+void CellBasedPdeHandler<DIM>::SetWriteAverageRadialPdeSolution(const std::string& rName, unsigned numRadialIntervals, bool writeDailyResults)
 {
+    mAverageRadialSolutionVariableName = rName;
     mWriteAverageRadialPdeSolution = true;
     mNumRadialIntervals = numRadialIntervals;
     mWriteDailyAverageRadialPdeSolution = writeDailyResults;
@@ -657,7 +685,7 @@ void CellBasedPdeHandler<DIM>::WriteAverageRadialPdeSolution(double time)
         {
             if (iter->first > lower_radius && iter->first <= radius_intervals[i])
             {
-                average_solution += (iter->second)->GetCellData()->GetItem(0);
+                average_solution += (iter->second)->GetCellData()->GetItem(mAverageRadialSolutionVariableName);
                 counter++;
             }
         }

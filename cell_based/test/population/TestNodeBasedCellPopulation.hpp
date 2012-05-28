@@ -647,15 +647,14 @@ public:
         TS_ASSERT_EQUALS(node_based_cell_population.GetOutputCellIdData(), true);
 
         // Coverage of writing CellData to VTK
-        for (unsigned var=0; var<2; var++)
+        for (AbstractCellPopulation<2>::Iterator cell_iter = node_based_cell_population.Begin();
+             cell_iter != node_based_cell_population.End();
+             ++cell_iter)
         {
-            for (AbstractCellPopulation<2>::Iterator cell_iter = node_based_cell_population.Begin();
-                 cell_iter != node_based_cell_population.End();
-                 ++cell_iter)
-            {
-                cell_iter->GetCellData()->SetItem(var, (double) 3.0*var);
-            }
+            cell_iter->GetCellData()->SetItem("var0", 0.0);
+            cell_iter->GetCellData()->SetItem("var1", 3.0);
         }
+
 
         // Test set methods
         std::string output_directory = "TestNodeBasedCellPopulationWriters2d";

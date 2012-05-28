@@ -193,32 +193,17 @@ boost::shared_ptr<AbstractCellMutationState> Cell::GetMutationState() const
     return boost::static_pointer_cast<AbstractCellMutationState>(mutation_state_collection.GetProperty());
 }
 
-bool Cell::HasCellData() const
-{
-    ///\todo #2115 This should always return true
-    return mCellPropertyCollection.HasPropertyType<CellData>();
-}
-
-
 boost::shared_ptr<CellData> Cell::GetCellData() const
 {
-	 if (HasCellData())///\todo #2115 This should always return true
-	 {
-		 CellPropertyCollection cell_data_collection = mCellPropertyCollection.GetPropertiesType<CellData>();
+    CellPropertyCollection cell_data_collection = mCellPropertyCollection.GetPropertiesType<CellData>();
 
-		/*
-		 * Note: In its current form the code requires each cell to have exactly
-		 * one CellData object. This is reflected in the assertion below.
-		 */
-		assert(cell_data_collection.GetSize() <= 1);
+    /*
+     * Note: In its current form the code requires each cell to have exactly
+     * one CellData object. This is reflected in the assertion below.
+     */
+    assert(cell_data_collection.GetSize() <= 1);
 
-		return boost::static_pointer_cast<CellData>(cell_data_collection.GetProperty());
-	 }
-	 else
-	 {
-		 ///\todo #2115 All cells should have data
-		 EXCEPTION("No CellData attached to this cell");
-	 }
+    return boost::static_pointer_cast<CellData>(cell_data_collection.GetProperty());
 }
 
 

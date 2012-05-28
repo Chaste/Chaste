@@ -681,14 +681,12 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetWriteVtkAsPoints(), true);
 
         // Coverage of writing CellData to VTK
-        for (unsigned var=0; var<2; var++)
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
         {
-            for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-                 cell_iter != cell_population.End();
-                 ++cell_iter)
-            {
-                cell_iter->GetCellData()->SetItem(var, (double) 3.0*var);
-            }
+            cell_iter->GetCellData()->SetItem("var1", (double) 0.0);
+            cell_iter->GetCellData()->SetItem("var2", (double) 3.0);
         }
 
         // Test set methods
@@ -780,14 +778,12 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "MeshBasedCellPopulation-3");
 
         // Coverage of writing CellData to VTK
-        for (unsigned var=0; var<2; var++)
+        for (AbstractCellPopulation<3>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
         {
-            for (AbstractCellPopulation<3>::Iterator cell_iter = cell_population.Begin();
-                 cell_iter != cell_population.End();
-                 ++cell_iter)
-            {
-                cell_iter->GetCellData()->SetItem(var, (double) 3.0*var);
-            }
+            cell_iter->GetCellData()->SetItem("a variable", 0.0);
+            cell_iter->GetCellData()->SetItem("another", 100.0);
         }
 
         // Test set methods
@@ -953,10 +949,10 @@ public:
             MeshBasedCellPopulation<2>* const p_cell_population = new MeshBasedCellPopulation<2>(mesh, cells);
             
             //Add cell data
-            p_cell_population->SetDataOnAllCells(0, DOUBLE_UNSET);
+            p_cell_population->SetDataOnAllCells("nothing", DOUBLE_UNSET);
 
-            TS_ASSERT_THROWS_THIS(p_cell_population->Begin()->GetCellData()->GetItem(0), 
-                                "The item Var0 has not yet been set");
+            TS_ASSERT_THROWS_THIS(p_cell_population->Begin()->GetCellData()->GetItem("nothing"),
+                                "The item nothing has not yet been set");
             
             // Cells have been given birth times of 0, -1, -2, -3, -4.
             // loop over them to run to time 0.0;
@@ -967,7 +963,7 @@ public:
             {
                 cell_iter->ReadyToDivide();
                 cell_locations.push_back(p_cell_population->GetLocationOfCellCentre(*cell_iter));
-                cell_iter->GetCellData()->SetItem(0, (double) index_for_data);
+                cell_iter->GetCellData()->SetItem("data", (double) index_for_data);
                 index_for_data++;
             }
 
@@ -1016,7 +1012,7 @@ public:
                 TS_ASSERT_DELTA(cell_iter->GetAge(),(double)(counter),1e-7);
                 TS_ASSERT_DELTA(p_cell_population->GetLocationOfCellCentre(*cell_iter)[0], cell_locations[counter][0], 1e-9);
                 TS_ASSERT_DELTA(p_cell_population->GetLocationOfCellCentre(*cell_iter)[1], cell_locations[counter][1], 1e-9);
-                TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), (double) p_cell_population->GetLocationIndexUsingCell(*cell_iter), 1e-12);
+                TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("data"), (double) p_cell_population->GetLocationIndexUsingCell(*cell_iter), 1e-12);
                 counter++;
             }
 

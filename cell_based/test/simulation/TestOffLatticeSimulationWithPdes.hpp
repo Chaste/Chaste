@@ -160,7 +160,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
         // Set up cell data on the cell population
-        cell_population.SetDataOnAllCells(0, 1.0);
+        cell_population.SetDataOnAllCells("oxygen", 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -174,8 +174,9 @@ public:
         SimplePdeForTesting pde;
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-
+        pde_and_bc.SetDependentVariableName("oxygen");
         pde_handler.AddPdeAndBc(&pde_and_bc);
+
         simulator.SetCellBasedPdeHandler(&pde_handler);
 
         /*
@@ -208,10 +209,10 @@ public:
             SimpleOxygenBasedCellCycleModel* p_oxygen_model = static_cast<SimpleOxygenBasedCellCycleModel*> (p_abstract_model);
 
             // First part of test - check that PDE solver is working correctly
-            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), analytic_solution, 1e-2);
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("oxygen"), analytic_solution, 1e-2);
 
             // Second part of test - check that each cell's hypoxic duration is correctly updated
-            if (cell_iter->GetCellData()->GetItem(0) >= p_oxygen_model->GetHypoxicConcentration())
+            if (cell_iter->GetCellData()->GetItem("oxygen") >= p_oxygen_model->GetHypoxicConcentration())
             {
                 TS_ASSERT_DELTA(p_oxygen_model->GetCurrentHypoxicDuration(), 0.0, 1e-5);
             }
@@ -255,7 +256,7 @@ public:
         cell_population.SetOutputCellPopulationVolumes(true); // record the spheroid radius and apoptotic radius
 
         // Set up cell data on the cell population
-        cell_population.SetDataOnAllCells(0, 1.0);
+        cell_population.SetDataOnAllCells("oxygen", 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -265,9 +266,11 @@ public:
         SimpleUniformSourcePde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        pde_and_bc.SetDependentVariableName("oxygen");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
         pde_handler.AddPdeAndBc(&pde_and_bc);
+
         simulator.SetCellBasedPdeHandler(&pde_handler);
 
         simulator.SetOutputDirectory("OffLatticeSimulationWithOxygen");
@@ -363,7 +366,7 @@ public:
         cell_population.SetOutputCellPopulationVolumes(true); // record the spheroid radius and apoptotic radius
 
         // Set up cell data on the cell population
-        cell_population.SetDataOnAllCells(0, 1.0);
+        cell_population.SetDataOnAllCells("oxygen", 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -374,6 +377,7 @@ public:
         CellwiseSourcePde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        pde_and_bc.SetDependentVariableName("oxygen");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
         pde_handler.AddPdeAndBc(&pde_and_bc);
@@ -397,7 +401,7 @@ public:
         std::vector<double> node_5_location = simulator.GetNodeLocation(5);
         TS_ASSERT_DELTA(node_5_location[0], 0.6576, 1e-4);
         TS_ASSERT_DELTA(node_5_location[1], 1.1358, 1e-4);
-        TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(5))->GetCellData()->GetItem(0), 0.9702, 1e-4);
+        TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(5))->GetCellData()->GetItem("oxygen"), 0.9702, 1e-4);
     }
 
     void TestWithPointwiseTwoSource() throw(Exception)
@@ -445,8 +449,8 @@ public:
         cell_population.SetOutputCellPopulationVolumes(true); // record the spheroid radius and apoptotic radius
 
         // Set up cell data on the cell population
-        cell_population.SetDataOnAllCells(0, 1.0);
-        cell_population.SetDataOnAllCells(1, 1.0);
+        cell_population.SetDataOnAllCells("oxygen", 1.0);
+        cell_population.SetDataOnAllCells("dunno", 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -459,12 +463,14 @@ public:
         CellwiseSourcePde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        pde_and_bc.SetDependentVariableName("oxygen");
         pde_handler.AddPdeAndBc(&pde_and_bc);
 
         // Set up second PDE and pass to handler
         CellwiseSourcePde<2> pde2(cell_population, -0.8);
         ConstBoundaryCondition<2> bc2(0.0);
         PdeAndBoundaryConditions<2> pde_and_bc2(&pde2, &bc2, true);
+        pde_and_bc2.SetDependentVariableName("dunno");
         pde_handler.AddPdeAndBc(&pde_and_bc2);
 
         // Pass PDE handler to simulation
@@ -488,9 +494,9 @@ public:
         TS_ASSERT_DELTA(node_5_location[0], 0.6576, 1e-4);
         TS_ASSERT_DELTA(node_5_location[1], 1.1358, 1e-4);
         CellPtr p_cell_at_5 = simulator.rGetCellPopulation().GetCellUsingLocationIndex(5);
-        TS_ASSERT_DELTA(p_cell_at_5->GetCellData()->GetItem(0), 0.9702, 1e-4);
-        TS_ASSERT_DELTA(p_cell_at_5->GetCellData()->GetItem(1), 0.0000, 1e-4);
-        TS_ASSERT_LESS_THAN(p_cell_at_5->GetCellData()->GetItem(1), p_cell_at_5->GetCellData()->GetItem(0));
+        TS_ASSERT_DELTA(p_cell_at_5->GetCellData()->GetItem("oxygen"), 0.9702, 1e-4);
+        TS_ASSERT_DELTA(p_cell_at_5->GetCellData()->GetItem("dunno"), 0.0000, 1e-4);
+        TS_ASSERT_LESS_THAN(p_cell_at_5->GetCellData()->GetItem("dunno"), p_cell_at_5->GetCellData()->GetItem("oxygen"));
     }
 
     void TestSpheroidStatistics() throw (Exception)
@@ -532,7 +538,7 @@ public:
         cell_population.SetOutputCellPopulationVolumes(true); // record the spheroid radius and apoptotic radius
 
         // Set up cell data on the cell population
-        cell_population.SetDataOnAllCells(0, 1.0);
+        cell_population.SetDataOnAllCells("oxygen", 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -543,10 +549,11 @@ public:
         SimpleUniformSourcePde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        pde_and_bc.SetDependentVariableName("oxygen");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
         pde_handler.AddPdeAndBc(&pde_and_bc);
-        pde_handler.SetWriteAverageRadialPdeSolution(5);
+        pde_handler.SetWriteAverageRadialPdeSolution("oxygen", 5);
         pde_handler.SetImposeBcsOnCoarseBoundary(false);
 
         simulator.SetCellBasedPdeHandler(&pde_handler);
@@ -632,8 +639,8 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Set up cell data on the cell population
-        cell_population.SetDataOnAllCells(0, 1.0);
-        cell_population.SetDataOnAllCells(1, 1.0);
+        cell_population.SetDataOnAllCells("oxygen", 1.0);
+        cell_population.SetDataOnAllCells("dunno", 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -646,11 +653,13 @@ public:
         AveragedSourcePde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        pde_and_bc.SetDependentVariableName("oxygen");
         pde_handler.AddPdeAndBc(&pde_and_bc);
 
         // Set up second PDE and pass to handler
         AveragedSourcePde<2> pde2(cell_population, -0.5);
         PdeAndBoundaryConditions<2> pde_and_bc2(&pde2, &bc, false);
+        pde_and_bc2.SetDependentVariableName("dunno");
         pde_handler.AddPdeAndBc(&pde_and_bc2);
 
         // Pass PDE handler to simulation
@@ -704,8 +713,8 @@ public:
 
         TS_ASSERT(p_coarse_mesh != NULL);
 
-        ReplicatableVector pde_solution0(simulator.GetCellBasedPdeHandler()->GetPdeSolution(0));
-        ReplicatableVector pde_solution1(simulator.GetCellBasedPdeHandler()->GetPdeSolution(1));
+        ReplicatableVector pde_solution0(simulator.GetCellBasedPdeHandler()->GetPdeSolution("oxygen"));
+        ReplicatableVector pde_solution1(simulator.GetCellBasedPdeHandler()->GetPdeSolution("dunno"));
 
         TS_ASSERT_EQUALS(pde_solution0.GetSize(),pde_solution1.GetSize());
 
@@ -751,8 +760,8 @@ public:
             double min1 = std::min(pde_solution1[p_element->GetNodeGlobalIndex(0)], pde_solution1[p_element->GetNodeGlobalIndex(1)]);
             min1 = std::min(min1, pde_solution1[p_element->GetNodeGlobalIndex(2)]);
 
-            double value0_at_cell = cell_iter->GetCellData()->GetItem(0);
-            double value1_at_cell = cell_iter->GetCellData()->GetItem(1);
+            double value0_at_cell = cell_iter->GetCellData()->GetItem("oxygen");
+            double value1_at_cell = cell_iter->GetCellData()->GetItem("dunno");
 
             TS_ASSERT_LESS_THAN_EQUALS(value1_at_cell, value0_at_cell);
             TS_ASSERT_LESS_THAN_EQUALS(min0, value0_at_cell + DBL_EPSILON);
@@ -786,7 +795,7 @@ public:
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, cell_location_indices);
 
         // Set up cell data on the cell population
-        cell_population.SetDataOnAllCells(0, 1.0);
+        cell_population.SetDataOnAllCells("nutrient", 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -799,6 +808,7 @@ public:
         AveragedSourcePde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        pde_and_bc.SetDependentVariableName("nutrient");
         pde_handler.AddPdeAndBc(&pde_and_bc);
 
         // Pass PDE handler to simulation
@@ -838,7 +848,7 @@ public:
 
             double analytic_solution = 1.0;
             // Test that PDE solver is working correctly
-            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), analytic_solution, 1e-2);
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient"), analytic_solution, 1e-2);
         }
     }
 
@@ -874,7 +884,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Set up cell data on the cell population
-        cell_population.SetDataOnAllCells(0, 1.0);
+        cell_population.SetDataOnAllCells("oxygen", 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -885,7 +895,7 @@ public:
         SimpleUniformSourcePde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-
+        pde_and_bc.SetDependentVariableName("oxygen");
         CellBasedPdeHandler<2> pde_handler(&cell_population);
         pde_handler.AddPdeAndBc(&pde_and_bc);
 
@@ -923,8 +933,8 @@ public:
         TS_ASSERT_DELTA(node_15_location[1], 2.5977, 1e-4);
 
         // Test the CellData result
-        TS_ASSERT_DELTA((p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(5))->GetCellData()->GetItem(0), 0.9604, 1e-4);
-        TS_ASSERT_DELTA((p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(15))->GetCellData()->GetItem(0), 0.9584, 1e-4);
+        TS_ASSERT_DELTA((p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(5))->GetCellData()->GetItem("oxygen"), 0.9604, 1e-4);
+        TS_ASSERT_DELTA((p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(15))->GetCellData()->GetItem("oxygen"), 0.9584, 1e-4);
 
         // Tidy up
         delete p_simulator;
@@ -969,7 +979,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Set up cell data on the cell population
-        cell_population.SetDataOnAllCells(0, 1.0);
+        cell_population.SetDataOnAllCells("oxygen", 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -980,6 +990,7 @@ public:
         CellwiseSourcePde<2> pde(cell_population, -0.03);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        pde_and_bc.SetDependentVariableName("oxygen");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
         pde_handler.AddPdeAndBc(&pde_and_bc);
@@ -1038,7 +1049,7 @@ public:
         MeshBasedCellPopulation<3> cell_population(mesh, cells);
 
         // Set up cell data on the cell population
-        cell_population.SetDataOnAllCells(0, 1.0);
+        cell_population.SetDataOnAllCells("oxygen", 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<3> simulator(cell_population);
@@ -1050,6 +1061,7 @@ public:
         SimpleUniformSourcePde<3> pde(-0.03);
         ConstBoundaryCondition<3> bc(1.0);
         PdeAndBoundaryConditions<3> pde_and_bc(&pde, &bc, false);
+        pde_and_bc.SetDependentVariableName("oxygen");
 
         CellBasedPdeHandler<3> pde_handler(&cell_population);
         pde_handler.AddPdeAndBc(&pde_and_bc);
@@ -1105,7 +1117,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
         // Set up cell data on the cell population
-        cell_population.SetDataOnAllCells(0, 1.0);
+        cell_population.SetDataOnAllCells("oxygen", 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -1115,6 +1127,7 @@ public:
         SimplePdeForTesting pde;
         FunctionalBoundaryCondition<2> functional_bc(&bc_func);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &functional_bc, false);
+        pde_and_bc.SetDependentVariableName("oxygen");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
         pde_handler.AddPdeAndBc(&pde_and_bc);
@@ -1140,7 +1153,7 @@ public:
             double analytic_solution = end_time - 0.25*(1 - pow(radius,2.0));
 
             // Test that PDE solver is working correctly
-            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), analytic_solution, 0.02);
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("oxygen"), analytic_solution, 0.02);
         }
     }
 
@@ -1224,7 +1237,7 @@ public:
         cell_population.SetMechanicsCutOffLength(1.5);
 
         // Set up cell data on the cell population
-        cell_population.SetDataOnAllCells(0, 5.0);
+        cell_population.SetDataOnAllCells("nutrient", 5.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -1235,6 +1248,7 @@ public:
         AveragedSourcePde<2> pde(cell_population, -1.0);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        pde_and_bc.SetDependentVariableName("nutrient");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
         pde_handler.AddPdeAndBc(&pde_and_bc);
@@ -1283,7 +1297,7 @@ public:
         cell_population.SetMechanicsCutOffLength(1.5);
 
         // Set up cell data on the cell population
-        cell_population.SetDataOnAllCells(0, 1.0);
+        cell_population.SetDataOnAllCells("nutrient", 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -1294,6 +1308,7 @@ public:
         AveragedSourcePde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        pde_and_bc.SetDependentVariableName("nutrient");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
         pde_handler.AddPdeAndBc(&pde_and_bc);
@@ -1321,7 +1336,7 @@ public:
 
             double analytic_solution = 1.0;
             // Test that PDE solver is working correctly
-            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), analytic_solution, 1e-2);
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient"), analytic_solution, 1e-2);
         }
 
         // Find centre of cell population
@@ -1374,7 +1389,7 @@ public:
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Set up cell data on the cell population
-        cell_population.SetDataOnAllCells(0, 1.0);
+        cell_population.SetDataOnAllCells("nutrient", 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -1385,6 +1400,7 @@ public:
         AveragedSourcePde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        pde_and_bc.SetDependentVariableName("nutrient");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
         pde_handler.AddPdeAndBc(&pde_and_bc);
@@ -1426,7 +1442,7 @@ public:
         {
             double analytic_solution = 1.0;
             // Test that PDE solver is working correctly
-            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), analytic_solution, 1e-2);
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient"), analytic_solution, 1e-2);
         }
 
 
@@ -1497,7 +1513,7 @@ public:
                 initial_condition = 1.0;
             }
             CellPtr p_cell = cell_population.GetCellUsingLocationIndex(mesh.GetNode(i)->GetIndex());
-            p_cell->GetCellData()->SetItem(0, initial_condition);
+            p_cell->GetCellData()->SetItem("nutrient", initial_condition);
         }
 
         // Set up cell-based simulation
@@ -1509,6 +1525,7 @@ public:
         VolumeDependentAveragedSourcePde<2> pde(cell_population, -0.01);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        pde_and_bc.SetDependentVariableName("nutrient");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
         pde_handler.AddPdeAndBc(&pde_and_bc);
@@ -1586,7 +1603,7 @@ public:
         cell_population.SetMechanicsCutOffLength(1.5);
 
         // Set up cell data on the cell population
-        cell_population.SetDataOnAllCells(0, 1.0);
+        cell_population.SetDataOnAllCells("nutrient", 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<1> simulator(cell_population);
@@ -1596,6 +1613,7 @@ public:
         AveragedSourcePde<1> pde(cell_population, -1.0);
         ConstBoundaryCondition<1> bc(0.0);
         PdeAndBoundaryConditions<1> pde_and_bc(&pde, &bc, false);
+        pde_and_bc.SetDependentVariableName("nutrient");
 
         CellBasedPdeHandler<1> pde_handler(&cell_population);
         pde_handler.AddPdeAndBc(&pde_and_bc);
@@ -1672,7 +1690,7 @@ public:
                 initial_condition = 1.0;
             }
             CellPtr p_cell = cell_population.GetCellUsingLocationIndex(mesh.GetNode(i)->GetIndex());
-            p_cell->GetCellData()->SetItem(0,initial_condition);
+            p_cell->GetCellData()->SetItem("nutrient",initial_condition);
         }
 
         // Set up cell-based simulation
@@ -1684,6 +1702,7 @@ public:
         AveragedSourcePde<2> pde(cell_population, -0.01);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        pde_and_bc.SetDependentVariableName("nutrient");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
         pde_handler.AddPdeAndBc(&pde_and_bc);
@@ -1699,8 +1718,8 @@ public:
         simulator.Solve();
 
         // Test solution is unchanged at first two cells
-        TS_ASSERT_DELTA(  (cell_population.Begin())->GetCellData()->GetItem(0), 0.9543, 1e-4);
-        TS_ASSERT_DELTA((++cell_population.Begin())->GetCellData()->GetItem(0), 0.9589, 1e-4);
+        TS_ASSERT_DELTA(  (cell_population.Begin())->GetCellData()->GetItem("nutrient"), 0.9543, 1e-4);
+        TS_ASSERT_DELTA((++cell_population.Begin())->GetCellData()->GetItem("nutrient"), 0.9589, 1e-4);
     }
 
     void TestCoarsePdeSolutionOnNodeBased3d() throw(Exception)
@@ -1754,7 +1773,7 @@ public:
                 initial_condition = 1.0;
             }
             CellPtr p_cell = cell_population.GetCellUsingLocationIndex(mesh.GetNode(i)->GetIndex());
-            p_cell->GetCellData()->SetItem(0,initial_condition);
+            p_cell->GetCellData()->SetItem("nutrient",initial_condition);
         }
 
         // Set up cell-based simulation
@@ -1766,6 +1785,7 @@ public:
         AveragedSourcePde<3> pde(cell_population, -0.01);
         ConstBoundaryCondition<3> bc(1.0);
         PdeAndBoundaryConditions<3> pde_and_bc(&pde, &bc, false);
+        pde_and_bc.SetDependentVariableName("nutrient");
 
         CellBasedPdeHandler<3> pde_handler(&cell_population);
         pde_handler.AddPdeAndBc(&pde_and_bc);
@@ -1780,8 +1800,8 @@ public:
         simulator.Solve();
 
         // Test solution is unchanged at first two cells
-        TS_ASSERT_DELTA(  (cell_population.Begin())->GetCellData()->GetItem(0), 1.0, 1e-4);
-        TS_ASSERT_DELTA((++cell_population.Begin())->GetCellData()->GetItem(0), 1.0, 1e-4);
+        TS_ASSERT_DELTA(  (cell_population.Begin())->GetCellData()->GetItem("nutrient"), 1.0, 1e-4);
+        TS_ASSERT_DELTA((++cell_population.Begin())->GetCellData()->GetItem("nutrient"), 1.0, 1e-4);
     }
 };
 

@@ -210,7 +210,7 @@ public:
          * concentration.  We initialise the oxygen concentration for each node (to 1.0), by
          * calling {{{SetItem}}}.
          */
-        cell_population.SetDataOnAllCells(0, 1.0);
+        cell_population.SetDataOnAllCells("oxygen", 1.0);
 
         /*
          * Next we instantiate an instance of the PDE class which we defined above.
@@ -247,8 +247,12 @@ public:
          * condition for each PDE (so that e.g. we cannot impose a zero-flux boundary condition
          * on some part of the boundary and a fixed-value boundary condition on the rest), although
          * the boundary condition itself can be made spatially varying or time-dependent.
+         *
+         * The PDE is tagged to show that the quantity to be solved for (the quantity of interest in
+         * the cells' data is "oxygen"
          */
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, is_neumann_bc);
+        pde_and_bc.SetDependentVariableName("oxygen");
 
         /*
          * After having created a {{{PdeAndBoundaryConditions}}} object, we then pass it

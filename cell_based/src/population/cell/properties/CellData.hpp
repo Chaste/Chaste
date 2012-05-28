@@ -87,28 +87,11 @@ public:
 
     /**
      * This assigns the cell data.
-     * \todo #2115 This method is to be deprecated.
-     * 
-     * @param variableNumber the index of the data to be set.
-     * @param data the value to set it to.
-     */
-    void SetItem(unsigned variableNumber, double data);
-
-    /**
-     * This assigns the cell data.
      *
      * @param variableName the index of the data to be set.
      * @param data the value to set it to.
      */
     void SetItem(const std::string& variableName, double data);
-
-    /**
-     * Get data.
-     * \todo #2115 This method is to be deprecated.
-     * 
-     * @param variableNumber the index of the data required.
-     */
-    double GetItem(unsigned variableNumber) const;
 
     /**
      * Get data.

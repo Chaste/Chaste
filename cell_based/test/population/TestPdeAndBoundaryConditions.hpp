@@ -145,6 +145,11 @@ public:
 
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, is_neumann_bc);
 
+        // Make sure it has no name
+        TS_ASSERT_EQUALS(pde_and_bc.rGetDependentVariableName(), "");
+        pde_and_bc.SetDependentVariableName("something");
+        TS_ASSERT_EQUALS(pde_and_bc.rGetDependentVariableName(), "something");
+
         // Test Get methods
         ChastePoint<2> point;
         point.rGetLocation()[0] = 0.0;
@@ -540,6 +545,7 @@ public:
             bool is_neumann_bc = false;
 
             PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, is_neumann_bc);
+            pde_and_bc.SetDependentVariableName("quantity");
 
             std::vector<double> data(10);
             for (unsigned i=0; i<10; i++)
@@ -571,6 +577,7 @@ public:
 
             // Test that the object was archived correctly
             TS_ASSERT_EQUALS(p_pde_and_bc->IsNeumannBoundaryCondition(), false);
+            TS_ASSERT_EQUALS(p_pde_and_bc->rGetDependentVariableName(), "quantity");
 
             ChastePoint<2> point;
             TS_ASSERT_DELTA(p_pde_and_bc->GetBoundaryCondition()->GetValue(point), 2.45, 1e-6);

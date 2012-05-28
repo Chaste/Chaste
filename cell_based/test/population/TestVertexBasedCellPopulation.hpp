@@ -805,14 +805,12 @@ public:
         cell_population.SetOutputCellVolumes(true);
 
         // Coverage of writing CellData to VTK
-        for (unsigned var=0; var<2; var++)
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
         {
-            for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-                 cell_iter != cell_population.End();
-                 ++cell_iter)
-            {
-                cell_iter->GetCellData()->SetItem(var, (double) 3.0*var);
-            }
+            cell_iter->GetCellData()->SetItem("var0", 0.0);
+            cell_iter->GetCellData()->SetItem("var1", 3.0);
         }
 
         std::string output_directory = "TestVertexBasedCellPopulationOutputWriters";

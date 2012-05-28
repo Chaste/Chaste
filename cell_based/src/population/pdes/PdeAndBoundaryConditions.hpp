@@ -77,6 +77,7 @@ private:
         archive & mpPde;
         archive & mpBoundaryCondition;
         archive & mIsNeumannBoundaryCondition;
+        archive & mDependentVariableName;
     }
 
     /** Pointer to a linear elliptic PDE object. */
@@ -93,6 +94,12 @@ private:
 
     /** Whether to delete member pointers in the destructor (used in archiving). */
     bool mDeleteMemberPointersInDestructor;
+
+    /** For use in PDEs where we know what the quantity for which we are solving is called,
+     * e.g. oxygen concentration.
+     */
+    std::string mDependentVariableName;
+
 
 public:
 
@@ -168,6 +175,21 @@ public:
      * @param pCellPdeElementMap map between cells and elements, from CellBasedPdeHandler
      */
     void SetUpSourceTermsForAveragedSourcePde(TetrahedralMesh<DIM,DIM>* pMesh, std::map< CellPtr, unsigned >* pCellPdeElementMap=NULL);
+
+    /**
+     * Set the name of the dependent variable.
+     *
+     * @param rName the name.
+     */
+    void SetDependentVariableName(const std::string& rName);
+
+    /**
+     * Get the name of the dependent variable.
+     *
+     * @return the name
+     */
+    std::string& rGetDependentVariableName();
+
 };
 
 #include "SerializationExportWrapper.hpp"

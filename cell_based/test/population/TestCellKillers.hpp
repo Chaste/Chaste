@@ -260,7 +260,7 @@ public:
         {
             cells[index]->GetCellCycleModel()->SetStemCellG1Duration(8.0);
             cells[index]->GetCellCycleModel()->SetTransitCellG1Duration(8.0);
-            cells[index]->GetCellData()->SetItem(0, lo_oxygen_concentration);
+            cells[index]->GetCellData()->SetItem("oxygen", lo_oxygen_concentration);
         }
 
         // Create cell population

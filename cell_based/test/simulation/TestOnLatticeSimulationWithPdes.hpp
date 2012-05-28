@@ -143,7 +143,7 @@ public:
              cell_iter != cell_population.End();
              ++cell_iter)
         {
-            cell_iter->GetCellData()->SetItem(0, cell_population.GetLocationIndexUsingCell(*cell_iter));
+            cell_iter->GetCellData()->SetItem("nutrient", cell_population.GetLocationIndexUsingCell(*cell_iter));
         }
 
         // Set up cell-based simulation
@@ -156,6 +156,7 @@ public:
         AveragedSourcePde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        pde_and_bc.SetDependentVariableName("nutrient");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
         pde_handler.AddPdeAndBc(&pde_and_bc);
@@ -198,7 +199,7 @@ public:
              cell_iter != cell_population.End();
              ++cell_iter)
         {
-            cell_iter->GetCellData()->SetItem(0, cell_population.GetLocationIndexUsingCell(*cell_iter));
+            cell_iter->GetCellData()->SetItem("nutrient", cell_population.GetLocationIndexUsingCell(*cell_iter));
         }
 
         // Set up cell-based simulation
@@ -211,6 +212,7 @@ public:
         AveragedSourcePde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        pde_and_bc.SetDependentVariableName("nutrient");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
         pde_handler.AddPdeAndBc(&pde_and_bc);
@@ -239,7 +241,7 @@ public:
 
             double analytic_solution = 1.0;
             // Test that PDE solver is working correctly
-            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), analytic_solution, 1e-2);
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient"), analytic_solution, 1e-2);
         }
 
         // Find centre of cell population
@@ -303,7 +305,7 @@ public:
              cell_iter != cell_population.End();
              ++cell_iter)
         {
-            cell_iter->GetCellData()->SetItem(0, cell_population.GetLocationIndexUsingCell(*cell_iter));
+            cell_iter->GetCellData()->SetItem("nutrient", cell_population.GetLocationIndexUsingCell(*cell_iter));
         }
 
         // Set up cell-based simulation
@@ -316,6 +318,7 @@ public:
         AveragedSourcePde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        pde_and_bc.SetDependentVariableName("nutrient");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
         pde_handler.AddPdeAndBc(&pde_and_bc);
@@ -354,7 +357,7 @@ public:
         {
             double analytic_solution = 1.0;
             // Test that PDE solver is working correctly
-            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), analytic_solution, 1e-2);
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient"), analytic_solution, 1e-2);
         }
 
         // Find centre of coarse PDE mesh
@@ -388,7 +391,7 @@ public:
             double analytic_solution = 1.0;
 
             // Test that PDE solver is working correctly on both pdes
-            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), analytic_solution, 1e-2);
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient"), analytic_solution, 1e-2);
         }
     }
 
@@ -408,8 +411,8 @@ public:
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        cell_population.SetDataOnAllCells(0, 1.0);
-        cell_population.SetDataOnAllCells(1, 1.0);
+        cell_population.SetDataOnAllCells("quantity 1", 1.0);
+        cell_population.SetDataOnAllCells("quantity 2", 1.0);
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
@@ -421,10 +424,12 @@ public:
         AveragedSourcePde<2> pde_1(cell_population, 0.0);
         ConstBoundaryCondition<2> bc_1(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc_1(&pde_1, &bc_1, false);
+        pde_and_bc_1.SetDependentVariableName("quantity 1");
 
         AveragedSourcePde<2> pde_2(cell_population, 0.0);
         ConstBoundaryCondition<2> bc_2(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc_2(&pde_2, &bc_2, false);
+        pde_and_bc_2.SetDependentVariableName("quantity 2");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
         pde_handler.AddPdeAndBc(&pde_and_bc_1);
@@ -454,8 +459,8 @@ public:
             double analytic_solution = 1.0;
 
             // Test that PDE solver is working correctly on both pdes
-            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), analytic_solution, 1e-2);
-            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(1), analytic_solution, 1e-2);
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("quantity 1"), analytic_solution, 1e-2);
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("quantity 2"), analytic_solution, 1e-2);
         }
     }
 

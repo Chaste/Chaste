@@ -81,6 +81,7 @@ private:
         archive & mWriteDailyAverageRadialPdeSolution;
         archive & mSetBcsOnCoarseBoundary;
         archive & mNumRadialIntervals;
+        archive & mAverageRadialSolutionVariableName;
     }
 
 protected:
@@ -102,6 +103,9 @@ protected:
 
     /** Whether to write the average radial PDE solution daily. */
     bool mWriteDailyAverageRadialPdeSolution;
+
+    /** The name of the quantity that gets averaged. */
+    std::string mAverageRadialSolutionVariableName;
 
     /** Whether to set the boundary condition on the edge of the coarse mesh rather than the cell population. */
     bool mSetBcsOnCoarseBoundary;
@@ -238,21 +242,24 @@ public:
     /**
      * Get the solution to the PDE at this time step.
      *
-     * @param pdeIndex The index of the PDE in the vector mPdeAndBcCollection
+     * @param rName The name of the dependent variable for the PDE in the vector mPdeAndBcCollection.
+     * This defaults to an empty string in the case there is only one PDE.
      */
-    virtual Vec GetPdeSolution(unsigned pdeIndex);
+    virtual Vec GetPdeSolution(const std::string& rName = "");
 
     /**
      * Write the final (and optionally also the daily) average
      * radial PDE solution to file.
      *
+     * @param rName The name of the quantity that we are averaging.
      * @param numRadialIntervals The number of radial intervals in which the average
      *                           PDE solution is calculated (defaults to 10)
      * @param writeDailyResults Whether to record the average radial PDE solution
      *                          at the end of each day of the simulation (defaults to false)
      */
-    void SetWriteAverageRadialPdeSolution(unsigned numRadialIntervals=10,
-                                          bool writeDailyResults=false);
+    void SetWriteAverageRadialPdeSolution(const std::string& rName,
+                                            unsigned numRadialIntervals=10,
+                                            bool writeDailyResults=false);
 
     /**
      * Impose the PDE boundary conditions on the edge of the cell population when using

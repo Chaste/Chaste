@@ -152,13 +152,13 @@ public:
         CellBasedPdeHandler<2> pde_handler(&cell_population);
 
         // Test set and get methods
-        pde_handler.SetWriteAverageRadialPdeSolution();
+        pde_handler.SetWriteAverageRadialPdeSolution("averaged quantity");
 
         TS_ASSERT_EQUALS(pde_handler.GetWriteAverageRadialPdeSolution(), true);
         TS_ASSERT_EQUALS(pde_handler.GetWriteDailyAverageRadialPdeSolution(), false);
         TS_ASSERT_EQUALS(pde_handler.GetNumRadialIntervals(), 10u);
 
-        pde_handler.SetWriteAverageRadialPdeSolution(5, true);
+        pde_handler.SetWriteAverageRadialPdeSolution("averaged quantity", 5, true);
 
         TS_ASSERT_EQUALS(pde_handler.GetWriteAverageRadialPdeSolution(), true);
         TS_ASSERT_EQUALS(pde_handler.GetWriteDailyAverageRadialPdeSolution(), true);
@@ -171,6 +171,7 @@ public:
         SimpleUniformSourcePde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        pde_and_bc.SetDependentVariableName("averaged quantity");
 
         unsigned num_nodes = mesh.GetNumNodes();
         std::vector<double> data(num_nodes);
@@ -187,7 +188,7 @@ public:
         TS_ASSERT_EQUALS(pde_handler.mPdeAndBcCollection[0]->IsNeumannBoundaryCondition(), false);
         TS_ASSERT_EQUALS(pde_handler.mPdeAndBcCollection[0]->HasAveragedSourcePde(), false);
 
-        ReplicatableVector solution(pde_handler.GetPdeSolution(0));
+        ReplicatableVector solution(pde_handler.GetPdeSolution());
 
         TS_ASSERT_EQUALS(solution.GetSize(), num_nodes);
         for (unsigned i=0; i<num_nodes; i++)
@@ -254,13 +255,14 @@ public:
             CellBasedPdeHandler<2>* const p_pde_handler = new CellBasedPdeHandler<2>(&cell_population);
 
             // Set member variables for testing
-            p_pde_handler->SetWriteAverageRadialPdeSolution(5, true);
+            p_pde_handler->SetWriteAverageRadialPdeSolution("averaged quantity", 5, true);
             p_pde_handler->SetImposeBcsOnCoarseBoundary(false);
 
             // Set up PDE and pass to handler
             AveragedSourcePde<2> pde(cell_population, -0.1);
             ConstBoundaryCondition<2> bc(1.0);
             PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+            pde_and_bc.SetDependentVariableName("averaged quantity");
             p_pde_handler->AddPdeAndBc(&pde_and_bc);
 
             // Test UseCoarsePdeMesh() again
@@ -302,6 +304,7 @@ public:
             TS_ASSERT_EQUALS(p_pde_handler->GetWriteDailyAverageRadialPdeSolution(), true);
             TS_ASSERT_EQUALS(p_pde_handler->GetImposeBcsOnCoarseBoundary(), false);
             TS_ASSERT_EQUALS(p_pde_handler->GetNumRadialIntervals(), 5u);
+            TS_ASSERT_EQUALS(p_pde_handler->mAverageRadialSolutionVariableName, "averaged quantity");
 
             ///\todo we currently do not archive mpCoarsePdeMesh - consider doing this (#1891)
             TS_ASSERT(p_pde_handler->GetCoarsePdeMesh() == NULL);
@@ -375,6 +378,7 @@ public:
         SimpleUniformSourcePde<2> pde2(-0.1);
         ConstBoundaryCondition<2> bc2(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc2(&pde2, &bc2, false);
+        pde_and_bc2.SetDependentVariableName("second variable");
         pde_handler.AddPdeAndBc(&pde_and_bc2);
 
         TS_ASSERT_THROWS_THIS(pde_handler.UseCoarsePdeMesh(3.0, cuboid, true),
@@ -570,7 +574,7 @@ public:
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
         cell_population.SetMechanicsCutOffLength(1.5);
 
-        cell_population.SetDataOnAllCells(0, 1.0);
+        cell_population.SetDataOnAllCells("variable", 1.0);
 
         // Create a PDE handler object using this cell population
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -582,6 +586,7 @@ public:
         AveragedSourcePde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        pde_and_bc.SetDependentVariableName("variable");
         pde_handler.AddPdeAndBc(&pde_and_bc);
 
         ChastePoint<2> lower(0.0, 0.0);
@@ -591,7 +596,7 @@ public:
         pde_handler.UseCoarsePdeMesh(3.0, cuboid, true);
 
         // For coverage, call SetWriteAverageRadialPdeSolution() prior to output
-        pde_handler.SetWriteAverageRadialPdeSolution(5, true);
+        pde_handler.SetWriteAverageRadialPdeSolution("variable", 5, true);
 
         // Test that output files are opened correctly
         pde_handler.OpenResultsFiles(output_directory);
@@ -616,7 +621,7 @@ public:
 
         MeshBasedCellPopulation<2> cell_population2(*p_mesh2, cells2);
 
-        cell_population2.SetDataOnAllCells(0, 1.0);
+        cell_population2.SetDataOnAllCells("another variable", 1.0);
 
         CellBasedPdeHandler<2> pde_handler2(&cell_population2);
         pde_handler2.OpenResultsFiles(output_directory);
@@ -647,13 +652,13 @@ public:
              cell_iter != cell_population.End();
              ++cell_iter)
         {
-            cell_iter->GetCellData()->SetItem(0, RandomNumberGenerator::Instance()->ranf());
+            cell_iter->GetCellData()->SetItem("averaged quantity", RandomNumberGenerator::Instance()->ranf());
         }
 
         // Create a PDE handler object using this cell population
         CellBasedPdeHandler<2> pde_handler(&cell_population);
 
-        pde_handler.SetWriteAverageRadialPdeSolution(2);
+        pde_handler.SetWriteAverageRadialPdeSolution("averaged quantity", 2);
 
         // Open result file ourselves
         OutputFileHandler output_file_handler("TestWriteAverageRadialPdeSolution", false);
@@ -691,7 +696,7 @@ public:
              cell_iter != cell_population.End();
              ++cell_iter)
         {
-            cell_iter->GetCellData()->SetItem(0, RandomNumberGenerator::Instance()->ranf());
+            cell_iter->GetCellData()->SetItem("variable", RandomNumberGenerator::Instance()->ranf());
         }
 
         // Create a PDE handler object using this cell population
@@ -701,6 +706,7 @@ public:
         SimpleUniformSourcePde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        pde_and_bc.SetDependentVariableName("variable");
         pde_handler.AddPdeAndBc(&pde_and_bc);
 
         // Open result file ourselves
@@ -740,7 +746,7 @@ public:
         // Set up cell population
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
-        cell_population.SetDataOnAllCells(0, 1.0);
+        cell_population.SetDataOnAllCells("variable", 1.0);
 
         // Create a PDE handler object using this cell population
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -749,6 +755,7 @@ public:
         SimplePdeForTesting pde;
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        pde_and_bc.SetDependentVariableName("variable");
 
         // For coverage, provide an initial guess for the solution
         std::vector<double> data(mesh.GetNumNodes());
@@ -774,7 +781,7 @@ public:
             double analytic_solution = 1.0 - 0.25*(1 - pow(radius,2.0));
 
             // Test that PDE solver is working correctly
-            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), analytic_solution, 0.02);
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("variable"), analytic_solution, 0.02);
         }
     }
 
@@ -798,7 +805,7 @@ public:
         // Set up cell population
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
-        cell_population.SetDataOnAllCells(0, 1.0);
+        cell_population.SetDataOnAllCells("", 1.0);
 
         // Create a PDE handler object using this cell population
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -807,6 +814,7 @@ public:
         CellwiseSourcePde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(0.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, true);
+
 
         // For coverage, provide an initial guess for the solution
         std::vector<double> data(mesh.GetNumNodes()+1);
@@ -829,7 +837,7 @@ public:
              ++cell_iter)
         {
             // Test that PDE solver is working correctly
-            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), 0.0, 0.02);
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(""), 0.0, 0.02);
         }
     }
 
@@ -853,7 +861,7 @@ public:
 
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
-        cell_population.SetDataOnAllCells(0, 1.0);
+        cell_population.SetDataOnAllCells("variable", 1.0);
 
         // Create a PDE handler object using this cell population
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -862,6 +870,7 @@ public:
         AveragedSourcePde<2> pde(cell_population, -0.01);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        pde_and_bc.SetDependentVariableName("variable");
 
         pde_handler.AddPdeAndBc(&pde_and_bc);
 
@@ -892,7 +901,7 @@ public:
         {
             if (cell_population.GetNodeCorrespondingToCell(*cell_iter)->IsBoundaryNode())
             {
-                TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(0), 1.0, 1e-1);
+                TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("variable"), 1.0, 1e-1);
             }
         }
     }
@@ -914,8 +923,8 @@ public:
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        cell_population.SetDataOnAllCells(0, 1.0);
-        cell_population.SetDataOnAllCells(1, 1.0);
+        cell_population.SetDataOnAllCells("quantity 1", 1.0);
+        cell_population.SetDataOnAllCells("quantity 2", 1.0);
 
         // Create a PDE handler object using this cell population
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -924,11 +933,16 @@ public:
         AveragedSourcePde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        pde_and_bc.SetDependentVariableName("quantity 1");
         pde_handler.AddPdeAndBc(&pde_and_bc);
 
         // Set up second PDE and pass to handler
         AveragedSourcePde<2> pde2(cell_population, -0.5);
         PdeAndBoundaryConditions<2> pde_and_bc2(&pde2, &bc, false);
+        TS_ASSERT_THROWS_THIS(pde_handler.AddPdeAndBc(&pde_and_bc2), "When adding more than one PDE to CellBasedPdeHandler set the dependent variable name using SetDependentVariableName(name).");
+        pde_and_bc2.SetDependentVariableName("quantity 1");
+        TS_ASSERT_THROWS_THIS(pde_handler.AddPdeAndBc(&pde_and_bc2), "The name quantity 1 has already been used in the PDE collection");
+        pde_and_bc2.SetDependentVariableName("quantity 2");
         pde_handler.AddPdeAndBc(&pde_and_bc2);
 
         // Solve PDEs on a coarse mesh
@@ -951,8 +965,9 @@ public:
         TetrahedralMesh<2,2>* p_coarse_mesh = pde_handler.GetCoarsePdeMesh();
         TS_ASSERT(p_coarse_mesh != NULL);
 
-        ReplicatableVector pde_solution0(pde_handler.GetPdeSolution(0));
-        ReplicatableVector pde_solution1(pde_handler.GetPdeSolution(1));
+        TS_ASSERT_THROWS_THIS(pde_handler.GetPdeSolution("quantity 3"), "The PDE collection does not contain a PDE named quantity 3");
+        ReplicatableVector pde_solution0(pde_handler.GetPdeSolution("quantity 1"));
+        ReplicatableVector pde_solution1(pde_handler.GetPdeSolution("quantity 2"));
 
         TS_ASSERT_EQUALS(pde_solution0.GetSize(), pde_solution1.GetSize());
 
@@ -1005,8 +1020,8 @@ public:
             double min1 = std::min(pde_solution1[node_0_index], pde_solution1[node_1_index]);
             min1 = std::min(min1, pde_solution1[node_2_index]);
 
-            double value0_at_cell = cell_iter->GetCellData()->GetItem(0);
-            double value1_at_cell = cell_iter->GetCellData()->GetItem(1);
+            double value0_at_cell = cell_iter->GetCellData()->GetItem("quantity 1");
+            double value1_at_cell = cell_iter->GetCellData()->GetItem("quantity 2");
 
             TS_ASSERT_LESS_THAN_EQUALS(value1_at_cell, value0_at_cell);
             TS_ASSERT_LESS_THAN_EQUALS(min0, value0_at_cell + DBL_EPSILON);
@@ -1033,8 +1048,8 @@ public:
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        cell_population.SetDataOnAllCells(0, 1.0);
-        cell_population.SetDataOnAllCells(1, 1.0);
+        cell_population.SetDataOnAllCells("first variable", 1.0);
+        cell_population.SetDataOnAllCells("second variable", 1.0);
 
         // Create a PDE handler object using this cell population
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -1043,12 +1058,14 @@ public:
         AveragedSourcePde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(0.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, true);
+        pde_and_bc.SetDependentVariableName("first variable");
         pde_handler.AddPdeAndBc(&pde_and_bc);
 
         // Set up second PDE and pass to handler
         AveragedSourcePde<2> pde2(cell_population, -0.5);
         ConstBoundaryCondition<2> bc2(0.0);
         PdeAndBoundaryConditions<2> pde_and_bc2(&pde2, &bc2, true);
+        pde_and_bc2.SetDependentVariableName("second variable");
         pde_handler.AddPdeAndBc(&pde_and_bc2);
 
         // Solve PDEs on a coarse mesh

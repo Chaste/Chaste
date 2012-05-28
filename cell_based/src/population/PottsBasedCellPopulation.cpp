@@ -611,12 +611,9 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile()
 
     unsigned num_cell_data_items = 0;
     std::vector<std::string> cell_data_names;
-    if (this->Begin()->HasCellData())
-    {
-        //We assume that the first cell is representative of all cells
-        num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
-        cell_data_names = this->Begin()->GetCellData()->GetKeys();
-    }
+    //We assume that the first cell is representative of all cells
+    num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+    cell_data_names = this->Begin()->GetCellData()->GetKeys();
 
     for (unsigned var=0; var<num_cell_data_items; var++)
     {
