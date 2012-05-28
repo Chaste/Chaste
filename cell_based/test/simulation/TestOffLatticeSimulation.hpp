@@ -288,11 +288,15 @@ public:
         simulator.AddForce(p_force);
 
         // Add cell killers
-        MAKE_PTR_ARGS(PlaneBasedCellKiller<2>, p_killer_1, (&cell_population, zero_vector<double>(2), -unit_vector<double>(2,1))); // y<0
+        c_vector<double,2> y_normal = zero_vector<double>(2);
+        y_normal[1] = -1.0;
+        MAKE_PTR_ARGS(PlaneBasedCellKiller<2>, p_killer_1, (&cell_population, zero_vector<double>(2), y_normal) ); // y<0
         simulator.AddCellKiller(p_killer_1);
 
         // Add cell killers
-		MAKE_PTR_ARGS(PlaneBasedCellKiller<2>, p_killer_2, (&cell_population, zero_vector<double>(2), -unit_vector<double>(2,0))); // x<0
+        c_vector<double,2> x_normal = zero_vector<double>(2);
+        x_normal[0] = -1.0;
+		MAKE_PTR_ARGS(PlaneBasedCellKiller<2>, p_killer_2, (&cell_population, zero_vector<double>(2), x_normal) ); // x<0
 		simulator.AddCellKiller(p_killer_2);
 
         simulator.SetUpdateCellPopulationRule(true);
