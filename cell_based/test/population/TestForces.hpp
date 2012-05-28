@@ -658,13 +658,61 @@ public:
         }
         repulsion_force.AddForceContribution(node_forces, cell_population);
 
-        // First two cells repel each other and second 2 cells are too far appart
+        /*
+         * First two cells repel each other and second 2 cells are too far appart.
+         * The radius of the cells is the default value, 0.5.
+         */
         TS_ASSERT_DELTA(node_forces[0][0], -34.5387, 1e-4);
         TS_ASSERT_DELTA(node_forces[0][1], 0.0, 1e-4);
         TS_ASSERT_DELTA(node_forces[1][0], 34.5387, 1e-4);
         TS_ASSERT_DELTA(node_forces[1][1], 0.0, 1e-4);
         TS_ASSERT_DELTA(node_forces[2][0], 0.0, 1e-4);
         TS_ASSERT_DELTA(node_forces[2][1], 0.0, 1e-4);
+
+        // Tests the calculation of the force with different cell radii
+        mesh.SetCellRadius(0u,10);
+        mesh.SetCellRadius(1u,10);
+        mesh.SetCellRadius(2u,10);
+
+        // Reset the vector of node forces
+        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        {
+            node_forces[i]=zero_vector<double>(2);
+        }
+
+        repulsion_force.AddForceContribution(node_forces, cell_population);
+
+		// All cells repel each other
+		TS_ASSERT_DELTA(node_forces[0][0], 15.0 * 20.0 * log(1 - 19.9/20)+15.0 * 20.0 * log(1 - 17.0/20), 1e-4);
+		TS_ASSERT_DELTA(node_forces[0][1], 0.0, 1e-4);
+		TS_ASSERT_DELTA(node_forces[1][0], -15.0 * 20.0 * log(1 - 19.9/20)+15.0 * 20.0 * log(1 - 17.1/20), 1e-4);
+		TS_ASSERT_DELTA(node_forces[1][1], 0.0, 1e-4);
+		TS_ASSERT_DELTA(node_forces[2][0], -15.0 * 20.0 * log(1 - 17.1/20)-15.0 * 20.0 * log(1 - 17.0/20), 1e-4);
+		TS_ASSERT_DELTA(node_forces[2][1], 0.0, 1e-4);
+
+		// Tests the calculation of the force with different cell radii
+		mesh.SetCellRadius(0u,0.2);
+		mesh.SetCellRadius(1u,0.2);
+		mesh.SetCellRadius(2u,0.2);
+
+		// Reset the vector of node forces
+		for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+		{
+			node_forces[i]=zero_vector<double>(2);
+		}
+
+		repulsion_force.AddForceContribution(node_forces, cell_population);
+
+		/*
+		 * First two cells repel each other and second 2 cells are too far apart.
+		 * The overlap is -0.3 and the spring stiffness is the default value 15.0.
+		 */
+		TS_ASSERT_DELTA(node_forces[0][0], 15.0 * 0.4 * log(1 -0.3/0.4), 1e-4);
+		TS_ASSERT_DELTA(node_forces[0][1], 0.0, 1e-4);
+		TS_ASSERT_DELTA(node_forces[1][0], -15.0 * 0.4 * log(1 -0.3/0.4), 1e-4);
+		TS_ASSERT_DELTA(node_forces[1][1], 0.0, 1e-4);
+		TS_ASSERT_DELTA(node_forces[2][0], 0.0, 1e-4);
+		TS_ASSERT_DELTA(node_forces[2][1], 0.0, 1e-4);
 
         // When the mesh goes out of scope, then it's a different set of nodes that get destroyed
         for (unsigned i=0; i<nodes.size(); i++)

@@ -569,7 +569,7 @@ CellPtr NodeBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_vector<d
     // Then set the new cell radius in the NodesOnlyMesh
     ///\todo set the correct cell radius and properly test this (#1808)
     unsigned node_index = this->GetLocationIndexUsingCell(p_created_cell);
-    mpNodesOnlyMesh->SetCellRadius(node_index, 1.0);
+    mpNodesOnlyMesh->SetCellRadius(node_index, 0.5);//#2100 Default the cell radius of 0.5
 
     // Return pointer to new cell
     return p_created_cell;

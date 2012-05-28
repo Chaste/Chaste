@@ -74,6 +74,16 @@ c_vector<double, DIM> GeneralisedLinearSpringForce<DIM>::CalculateForceBetweenNo
     c_vector<double, DIM> node_a_location = rCellPopulation.GetNode(nodeAGlobalIndex)->rGetLocation();
     c_vector<double, DIM> node_b_location = rCellPopulation.GetNode(nodeBGlobalIndex)->rGetLocation();
 
+	// Get the node radii for a NodeBasedCellPopulation
+    double node_a_radius;
+    double node_b_radius;
+
+    if (dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation))
+    {
+		node_a_radius = dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation)->rGetMesh().GetCellRadius(nodeAGlobalIndex);
+		node_b_radius = dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation)->rGetMesh().GetCellRadius(nodeBGlobalIndex);
+    }
+
     // Get the unit vector parallel to the line joining the two nodes
     c_vector<double, DIM> unit_difference;
     if (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation))
@@ -110,14 +120,22 @@ c_vector<double, DIM> GeneralisedLinearSpringForce<DIM>::CalculateForceBetweenNo
         }
     }
 
-    // Calculate the rest length of the spring connecting the two nodes
-
-    double rest_length = 1.0;
+    /*
+     * Calculate the rest length of the spring connecting the two nodes with a default
+     * value of 1.0.
+     */
+    double rest_length_final = 1.0;
 
     if (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation))
     {
-    	rest_length = static_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation)->GetRestLength(nodeAGlobalIndex, nodeBGlobalIndex);
+    	rest_length_final = static_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation)->GetRestLength(nodeAGlobalIndex, nodeBGlobalIndex);
     }
+    else if (dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation))
+    {
+    	rest_length_final = node_a_radius+node_b_radius;
+    }
+
+    double rest_length = rest_length_final;
 
     CellPtr p_cell_A = rCellPopulation.GetCellUsingLocationIndex(nodeAGlobalIndex);
     CellPtr p_cell_B = rCellPopulation.GetCellUsingLocationIndex(nodeBGlobalIndex);
@@ -144,7 +162,7 @@ c_vector<double, DIM> GeneralisedLinearSpringForce<DIM>::CalculateForceBetweenNo
             {
                 // Spring rest length increases from a small value to the normal rest length over 1 hour
                 double lambda = mMeinekeDivisionRestingSpringLength;
-                rest_length = lambda + (1.0 - lambda) * ageA/mMeinekeSpringGrowthDuration;
+                rest_length = lambda + (rest_length_final - lambda) * ageA/mMeinekeSpringGrowthDuration;
             }
             if (ageA + SimulationTime::Instance()->GetTimeStep() >= mMeinekeSpringGrowthDuration)
             {
@@ -154,14 +172,23 @@ c_vector<double, DIM> GeneralisedLinearSpringForce<DIM>::CalculateForceBetweenNo
         }
         else
         {
-            // Spring rest length increases from mDivisionRestingSpringLength to normal rest length, 1.0, over 1 hour
+            // Spring rest length increases from mDivisionRestingSpringLength to normal rest length over 1 hour
             double lambda = mMeinekeDivisionRestingSpringLength;
-            rest_length = lambda + (1.0 - lambda) * ageA/mMeinekeSpringGrowthDuration;
+            rest_length = lambda + (rest_length_final - lambda) * ageA/mMeinekeSpringGrowthDuration;
         }
     }
 
+    /*
+     * For apoptosis, progressively reduce the radius of the cell
+     */
     double a_rest_length = rest_length*0.5;
     double b_rest_length = a_rest_length;
+
+    if (dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation))
+    {
+        a_rest_length = (node_a_radius/(node_a_radius+node_b_radius))*rest_length;
+        b_rest_length = (node_b_radius/(node_a_radius+node_b_radius))*rest_length;
+    }
 
     /*
      * If either of the cells has begun apoptosis, then the length of the spring
@@ -199,14 +226,14 @@ c_vector<double, DIM> GeneralisedLinearSpringForce<DIM>::CalculateForceBetweenNo
         if (is_closer_than_rest_length) //overlap is negative
         {
             //log(x+1) is undefined for x<=-1
-            assert(overlap > -1);
-            c_vector<double, DIM> temp = spring_stiffness * unit_difference * log(1 + overlap);
+            assert(overlap > -rest_length_final);
+            c_vector<double, DIM> temp = spring_stiffness * unit_difference * rest_length_final* log(1.0 + overlap/rest_length_final);
             return temp;
         }
         else
         {
-            double alpha = 5;
-            c_vector<double, DIM> temp = spring_stiffness * unit_difference * overlap * exp(-alpha * overlap);
+            double alpha = 5.0;
+            c_vector<double, DIM> temp = spring_stiffness * unit_difference * overlap * exp(-alpha * overlap/rest_length_final);
             return temp;
         }
     }
