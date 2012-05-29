@@ -75,8 +75,8 @@ c_vector<double, DIM> GeneralisedLinearSpringForce<DIM>::CalculateForceBetweenNo
     c_vector<double, DIM> node_b_location = rCellPopulation.GetNode(nodeBGlobalIndex)->rGetLocation();
 
 	// Get the node radii for a NodeBasedCellPopulation
-    double node_a_radius;
-    double node_b_radius;
+    double node_a_radius=0.0;
+    double node_b_radius=0.0;
 
     if (dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation))
     {
@@ -132,7 +132,8 @@ c_vector<double, DIM> GeneralisedLinearSpringForce<DIM>::CalculateForceBetweenNo
     }
     else if (dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation))
     {
-    	rest_length_final = node_a_radius+node_b_radius;
+    	assert(node_a_radius > 0 && node_b_radius > 0);
+        rest_length_final = node_a_radius+node_b_radius;
     }
 
     double rest_length = rest_length_final;
@@ -186,6 +187,7 @@ c_vector<double, DIM> GeneralisedLinearSpringForce<DIM>::CalculateForceBetweenNo
 
     if (dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation))
     {
+        assert(node_a_radius > 0 && node_b_radius > 0);
         a_rest_length = (node_a_radius/(node_a_radius+node_b_radius))*rest_length;
         b_rest_length = (node_b_radius/(node_a_radius+node_b_radius))*rest_length;
     }

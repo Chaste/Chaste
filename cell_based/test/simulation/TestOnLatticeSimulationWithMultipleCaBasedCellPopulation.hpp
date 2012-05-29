@@ -257,6 +257,10 @@ public:
         TS_ASSERT_DELTA(probability_of_occupation[6],diffusion_parameter*delta_t/4.0, 1e-2);
         TS_ASSERT_DELTA(probability_of_occupation[7],diffusion_parameter*delta_t/2.0, 1e-2);
         TS_ASSERT_DELTA(probability_of_occupation[8],diffusion_parameter*delta_t/4.0, 1e-2);
+        
+        
+        //For coverage
+        simulator.RemoveAllMultipleCaUpdateRules();
 
     }
 
