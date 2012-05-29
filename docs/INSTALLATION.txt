@@ -229,13 +229,11 @@ Chaste-compatible C++ code from cardiac ionic cell models described in
 CellML.  This allows Chaste to make use of any such model.
 
 Starting with release 2.0, PyCml is now run in the default build of Chaste.
-You thus need to install its pre-requisites if you wish the relevant tests
-to pass.  You can still use Chaste without installing these packages, but
-some tests will fail.  See also README_CELLML.txt for more information about
-PyCml.
+You thus need to install its pre-requisites if you wish to use the heart
+component.  See also README_CELLML.txt for more information about PyCml.
 
-PyCml is a python tool, and also requires Amara, RNV, and the Redland RDF
-library.  All of these in turn require the expat library to parse XML.
+PyCml is a python tool, and also requires Amara, RNV, and an RDF library.
+All of these in turn require the expat library to parse XML.
 This is available in most Linux distributions, e.g.
   sudo aptitude install expat libexpat1-dev #(Ubuntu/Debian)
   sudo yum install expat expat-devel #(Fedora/RedHat)
@@ -258,10 +256,11 @@ Amara
 export PYTHONPATH=$PYTHONPATH:$CHASTE_LIBS/python
 cd $CHASTE_LIBS
 mkdir python
-# Before issuing the next two lines first check is you already have "easy_install"
+# Before issuing the next two lines first check if you already have "easy_install"
 wget http://peak.telecommunity.com/dist/ez_setup.py
 python ez_setup.py
 cd bin
+./easy_install "python-dateutil==1.5"
 ./easy_install "Amara==1.2.0.2"
 cd ..
 
