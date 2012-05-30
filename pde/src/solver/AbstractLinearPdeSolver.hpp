@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * AbstractStaticLinearPdeSolver and AbstractDynamicLinearPdeSolver.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
-class AbstractLinearPdeSolver : boost::noncopyable
+class AbstractLinearPdeSolver : private boost::noncopyable
 {
 protected:
 

@@ -71,7 +71,7 @@ typedef boost::shared_ptr<Cell> CellPtr;
  *
  * This class should not store any spatial information - cells are linked to space by the AbstractCellPopulation subclasses.
  */
-class Cell : boost::noncopyable, public boost::enable_shared_from_this<Cell>
+class Cell : private boost::noncopyable, public boost::enable_shared_from_this<Cell>
 {
 private:
 

@@ -57,7 +57,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Abstract base class for all meshes.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class AbstractMesh : boost::noncopyable
+class AbstractMesh : private boost::noncopyable
 {
     friend class TestDistributedTetrahedralMesh;
     template <unsigned A_DIMENSION> friend class NodesOnlyMesh; //NodesOnlyMesh is able to grab the node information in order to copy

@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 template <bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX>
-class AbstractFeAssemblerInterface  : boost::noncopyable
+class AbstractFeAssemblerInterface  : private boost::noncopyable
 {
 protected:
     /** The vector to be assembled (only used if CAN_ASSEMBLE_VECTOR == true). */

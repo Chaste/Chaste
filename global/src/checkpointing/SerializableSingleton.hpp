@@ -77,7 +77,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * GetSerializationWrapper again if you need a new wrapper for a subsequent save.
  */
 template<class SINGLETON_CLASS>
-class SerializableSingleton : boost::noncopyable
+class SerializableSingleton : private boost::noncopyable
 {
 public:
     /**

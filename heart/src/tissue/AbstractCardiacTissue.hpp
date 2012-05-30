@@ -75,7 +75,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * cells and putting them in replicated arrays for the PDE solvers to call.
  */
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
-class AbstractCardiacTissue : boost::noncopyable
+class AbstractCardiacTissue : private boost::noncopyable
 {
 private:
 

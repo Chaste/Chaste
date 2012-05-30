@@ -59,7 +59,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * started.  They can then be read by PETSc when it is initialised, and
  * by other code as required.
  */
-class CommandLineArguments : boost::noncopyable
+class CommandLineArguments : private boost::noncopyable
 {
 private:
 

@@ -88,7 +88,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Empty untemplated base class so that CardiacSimulation::GetSavedProblem can work.
  */
-class AbstractUntemplatedCardiacProblem : boost::noncopyable
+class AbstractUntemplatedCardiacProblem : private boost::noncopyable
 {
 public:
     /** Virtual destructor to make this class polymorphic */
