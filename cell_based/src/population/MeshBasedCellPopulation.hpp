@@ -211,7 +211,7 @@ public:
     /**
      * Destructor.
      */
-    ~MeshBasedCellPopulation();
+    virtual ~MeshBasedCellPopulation();
 
     /**
      * @return reference to  mrMesh.

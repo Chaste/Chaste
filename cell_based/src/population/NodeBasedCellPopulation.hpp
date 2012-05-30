@@ -186,7 +186,7 @@ public:
      *
      * Frees all our node memory.
      */
-    ~NodeBasedCellPopulation();
+    virtual ~NodeBasedCellPopulation();
 
     /**
      * @return reference to  mrMesh.
