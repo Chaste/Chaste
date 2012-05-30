@@ -136,7 +136,7 @@ public:
     /**
      *  Destructor just deletes the node map if memory has been allocated for it
      */
-    ~AbstractTetrahedralMeshWriter();
+    virtual ~AbstractTetrahedralMeshWriter();
 
     /**
      * Write a const mesh to file. Used by the serialization methods and avoids iterators...
