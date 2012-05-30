@@ -155,7 +155,7 @@ public:
     FileFinder FindFile(std::string leafName) const;
 
     /** The name of the Chaste signature file added to folders we create. */
-    const static std::string SIG_FILE_NAME;
+    static const std::string SIG_FILE_NAME;
 
 private:
 
