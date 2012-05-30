@@ -68,6 +68,16 @@ public:
         std::vector<double> dy(1);
         ode1.EvaluateYDerivatives(1.0, ode1.GetInitialConditions(),dy);
         TS_ASSERT_DELTA(dy[0], 1.0, tol);
+
+        // System name & free var info shouldn't fall over if there isn't any
+        boost::shared_ptr<const AbstractOdeSystemInformation> p_info = ode1.GetSystemInformation();
+
+        TS_ASSERT_EQUALS(ode1.GetSystemName(), "");
+        TS_ASSERT_EQUALS(p_info->GetSystemName(), "");
+
+        TS_ASSERT_EQUALS(p_info->GetFreeVariableName(), "");
+        TS_ASSERT_EQUALS(p_info->GetFreeVariableUnits(), "");
+
     }
 
     void TestOdeSystemTwo()
@@ -109,6 +119,9 @@ public:
 
         TS_ASSERT_EQUALS(ode.GetSystemName(), "ParameterisedOde");
         TS_ASSERT_EQUALS(p_info->GetSystemName(), "ParameterisedOde");
+
+        TS_ASSERT_EQUALS(p_info->GetFreeVariableName(), "time");
+        TS_ASSERT_EQUALS(p_info->GetFreeVariableUnits(), "ms");
 
         TS_ASSERT_EQUALS(ode.GetParameter(0), 0.0);
         TS_ASSERT_EQUALS(ode.GetNumberOfParameters(), 1u);

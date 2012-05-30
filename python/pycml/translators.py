@@ -2312,6 +2312,17 @@ class CellMLToChasteTranslator(CellMLTranslator):
         self.close_block()
         self.use_modifiers = use_modifiers
 
+    def output_protocol_solve_method(self):
+        """Output a Solve method used if we have an associated protocol."""
+        if self.use_protocol:
+            self.output_method_start('SolveModel', [self.TYPE_DOUBLE + 'endPoint'], 'void',
+                                     access='public')
+            self.open_block()
+            if self.state_vars:
+                self.writeln('SolveAndUpdateState(this->mFreeVariable, endPoint);')
+                self.writeln('this->mFreeVariable = endPoint;')
+            self.close_block()
+
     def output_evaluate_y_derivatives(self, method_name='EvaluateYDerivatives'):
         """Output the EvaluateYDerivatives method."""
         # Start code output
@@ -2643,6 +2654,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         End class definition, output ODE system information (to .cpp) and
         serialization code (to .hpp), and end the file.
         """
+        self.output_protocol_solve_method()
         # End main class
         self.set_indent(offset=-1)
         self.writeln_hpp('};\n\n')
@@ -2651,8 +2663,11 @@ class CellMLToChasteTranslator(CellMLTranslator):
         self.writeln('void OdeSystemInformation<', self.class_name,
                      '>::Initialise(void)')
         self.open_block()
-        self.output_comment('Time units: ', self.free_vars[0].units, '\n')
         self.writeln('this->mSystemName', self.EQ_ASSIGN, '"', self.model.name, '"', self.STMT_END)
+        self.writeln('this->mFreeVariableName', self.EQ_ASSIGN,
+                     '"', self.var_display_name(self.free_vars[0]), '"', self.STMT_END)
+        self.writeln('this->mFreeVariableUnits', self.EQ_ASSIGN,
+                     '"', self.free_vars[0].units, '"', self.STMT_END)
         self.writeln()
         def output_var(vector, var):
             self.writeln('this->m', vector, 'Names.push_back("', self.var_display_name(var), '");')
@@ -2929,7 +2944,7 @@ class CellMLToCvodeTranslator(CellMLToChasteTranslator):
     # Type of (a reference to) the state variable vector
     TYPE_VECTOR = 'N_Vector '
     TYPE_VECTOR_REF = 'N_Vector ' # CVODE's vector is actually a pointer type
-    
+        
     def vector_index(self, vector, i):
         """Return code for accessing the i'th index of vector."""
         return 'NV_Ith_S(' + vector + ', ' + str(i) + ')'

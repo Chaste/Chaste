@@ -46,13 +46,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * ODE system *class* (as opposed to an instance).
  *
  * The information available includes:
- *  - names of state variables
- *  - units of state variables
+ *  - a name for the system
+ *  - name & units of the free variable
+ *  - names & units of state variables
  *  - suggested initial conditions
- *  - names of (settable) parameters
- *  - units of (settable) parameters
- *  - names of derived quantities
- *  - units of derived quantities
+ *  - names & units of (settable) parameters
+ *  - names & units of derived quantities
  *
  * This class requires a subclass defining the Initialise method in order to set
  * up the information.  Developers may do this by defining their own subclass, but
@@ -67,6 +66,12 @@ class AbstractOdeSystemInformation
 protected:
     /** Human-friendly name for the ODE system */
     std::string mSystemName;
+
+    /** The name of the free variable. */
+    std::string mFreeVariableName;
+
+    /** The units of the free variable. */
+    std::string mFreeVariableUnits;
 
     /** State variable names */
     std::vector<std::string> mVariableNames;
@@ -118,6 +123,16 @@ public:
      * Get the name of this system of ODEs.
      */
     std::string GetSystemName() const;
+
+    /**
+     * Get the name of the free variable in this system of ODEs.
+     */
+    std::string GetFreeVariableName() const;
+
+    /**
+     * Get the units of the free variable in this system of ODEs.
+     */
+    std::string GetFreeVariableUnits() const;
 
     /**
      * Set the default initial conditions for the ODE system. This method DOES NOT change the

@@ -54,6 +54,16 @@ std::string AbstractOdeSystemInformation::GetSystemName() const
     return mSystemName;
 }
 
+std::string AbstractOdeSystemInformation::GetFreeVariableName() const
+{
+    return mFreeVariableName;
+}
+
+std::string AbstractOdeSystemInformation::GetFreeVariableUnits() const
+{
+    return mFreeVariableUnits;
+}
+
 void AbstractOdeSystemInformation::SetDefaultInitialConditions(const std::vector<double>& rInitialConditions)
 {
     assert(mInitialised);

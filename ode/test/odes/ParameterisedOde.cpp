@@ -76,6 +76,9 @@ void OdeSystemInformation<ParameterisedOde>::Initialise()
 {
     this->mSystemName = "ParameterisedOde";
 
+    this->mFreeVariableName = "time";
+    this->mFreeVariableUnits = "ms";
+
     this->mVariableNames.push_back("y");
     this->mVariableUnits.push_back("dimensionless");
     this->mInitialConditions.push_back(0.0);

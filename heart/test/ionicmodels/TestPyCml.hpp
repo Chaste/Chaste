@@ -105,9 +105,6 @@ class TestPyCml : public CxxTest::TestSuite
         rCell.SetParameter(0u, 0.1);
         TS_ASSERT_EQUALS(rCell.GetParameter(0u), 0.1);
         rCell.SetParameter(0u, 23.0);
-
-        // and the system name...
-        TS_ASSERT_EQUALS(rCell.GetSystemName(), "luo_rudy_1991");
     }
 
     template<typename VECTOR_TYPE>
@@ -118,6 +115,12 @@ class TestPyCml : public CxxTest::TestSuite
         TS_ASSERT_DELTA(rCell.GetAttribute("SuggestedCycleLength"), 750, 1e-12);
         TS_ASSERT(rCell.HasAttribute("SuggestedForwardEulerTimestep"));
         TS_ASSERT_DELTA(rCell.GetAttribute("SuggestedForwardEulerTimestep"), 0.005, 1e-12);
+
+        // The system name
+        TS_ASSERT_EQUALS(rCell.GetSystemName(), "luo_rudy_1991");
+        // Free variable
+        TS_ASSERT_EQUALS(rCell.GetSystemInformation()->GetFreeVariableName(), "environment_time");
+        TS_ASSERT_EQUALS(rCell.GetSystemInformation()->GetFreeVariableUnits(), "millisecond");
     }
 
     void CheckCai(AbstractCardiacCell& rCell, bool hasCai, double value=0.0)
