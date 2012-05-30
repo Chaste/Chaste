@@ -140,7 +140,7 @@ public:
     /**
      * Destructor.
      */
-    ~CellBasedPdeSolver();
+    virtual ~CellBasedPdeSolver();
 };
 
 #endif /*CELLBASEDPDESOLVER_HPP_*/

@@ -131,7 +131,7 @@ public:
     /**
      * Destructor
      */
-    ~AbstractFeSurfaceIntegralAssembler();
+    virtual ~AbstractFeSurfaceIntegralAssembler();
 
     /**
      * Reset the internal boundary conditions container pointer

@@ -123,7 +123,7 @@ public:
     /**
      * Destructor.
      */
-    ~GeneralisedLinearSpringForce();
+    virtual ~GeneralisedLinearSpringForce();
 
     /**
      * Return a multiplication factor for the spring constant, which

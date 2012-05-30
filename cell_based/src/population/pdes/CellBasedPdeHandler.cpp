@@ -510,8 +510,8 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
         if (mWriteDailyAverageRadialPdeSolution)
         {
             ///\todo Worry about round-off errors (#1891)
-            SimulationTime* p_time = SimulationTime::Instance();
-            double time_next_step = p_time->GetTime() + p_time->GetTimeStep();
+            p_time = SimulationTime::Instance();
+            time_next_step = p_time->GetTime() + p_time->GetTimeStep();
             unsigned num_timesteps_per_day = (unsigned) (DBL_EPSILON + 24/SimulationTime::Instance()->GetTimeStep());
             if ((p_time->GetTimeStepsElapsed()+1) % num_timesteps_per_day == 0)
             {
