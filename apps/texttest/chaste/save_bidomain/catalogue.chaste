@@ -8,7 +8,6 @@ The following new files/directories were created:
 --------provenance_info_0.txt
 --------output
 ------------.chaste_deletable_folder
-------------ChasteDefaults.xml
 ------------ChasteParameters.xml
 ------------SimulationResults_Phi_e.dat
 ------------SimulationResults_V.dat
@@ -28,7 +27,6 @@ The following new files/directories were created:
 ----------------progress_status.txt
 ----------------output
 --------------------.chaste_deletable_folder
---------------------ChasteDefaults.xml
 --------------------ChasteParameters.xml
 --------------------SimulationResults_Phi_e.dat
 --------------------SimulationResults_V.dat
@@ -39,7 +37,6 @@ The following new files/directories were created:
 ------------ChasteResults_10ms
 ----------------.chaste_deletable_folder
 ----------------AbstractCardiacProblem_mSolution.h5
-----------------ChasteDefaults.xml
 ----------------ChasteParameters.xml
 ----------------ChasteParameters_3_1.xsd
 ----------------archive.arch
@@ -59,7 +56,6 @@ The following new files/directories were created:
 ----------------progress_status.txt
 ----------------output
 --------------------.chaste_deletable_folder
---------------------ChasteDefaults.xml
 --------------------ChasteParameters.xml
 --------------------SimulationResults_Phi_e.dat
 --------------------SimulationResults_V.dat
@@ -70,7 +66,6 @@ The following new files/directories were created:
 ------------ChasteResults_6ms
 ----------------.chaste_deletable_folder
 ----------------AbstractCardiacProblem_mSolution.h5
-----------------ChasteDefaults.xml
 ----------------ChasteParameters.xml
 ----------------ChasteParameters_3_1.xsd
 ----------------archive.arch
@@ -90,7 +85,6 @@ The following new files/directories were created:
 ----------------progress_status.txt
 ----------------output
 --------------------.chaste_deletable_folder
---------------------ChasteDefaults.xml
 --------------------ChasteParameters.xml
 --------------------SimulationResults_Phi_e.dat
 --------------------SimulationResults_V.dat
@@ -101,7 +95,6 @@ The following new files/directories were created:
 ------------ChasteResults_8ms
 ----------------.chaste_deletable_folder
 ----------------AbstractCardiacProblem_mSolution.h5
-----------------ChasteDefaults.xml
 ----------------ChasteParameters.xml
 ----------------ChasteParameters_3_1.xsd
 ----------------archive.arch

@@ -177,12 +177,6 @@ public:
     void SetFixedSchemaLocations(const SchemaLocationsMap& rSchemaLocations);
 
     /**
-     * Allows users to override the built-in defaults.
-     * @param rFileName The name of the defaults file
-     */
-    void SetDefaultsFile(const std::string& rFileName);
-
-    /**
      * #mpUserParameters  is set to a new context associated with a parameters file
      * @param rFileName The name of the parameters file
      */
@@ -340,7 +334,7 @@ public:
      *
      * \todo There is no set method
      */
-     template<unsigned DIM>
+    template<unsigned DIM>
     void GetStimuli(std::vector<boost::shared_ptr<AbstractStimulusFunction> >& rStimuliApplied,
                     std::vector<boost::shared_ptr<AbstractChasteRegion<DIM> > >& rStimulatedAreas) const;
 
@@ -1284,15 +1278,8 @@ private:
     /*Constructor is private, since the class is only accessed by the singleton instance() method*/
     HeartConfig();
 
-    /** Pointer to parameters read from the user's input XML file
-     * (override those given by #mpDefaultParameters).
-     */
+    /** Pointer to parameters read from the user's input XML file  */
     boost::shared_ptr<cp::chaste_parameters_type> mpUserParameters;
-
-    /** Pointer to parameters read from the default input XML file (to be read before
-     * #mpUserParameters, but may be subsequently overridden).
-     */
-    boost::shared_ptr<cp::chaste_parameters_type> mpDefaultParameters;
 
     /** The single instance of the class */
     static std::auto_ptr<HeartConfig> mpInstance;
@@ -1385,18 +1372,6 @@ private:
      * is perfoming a single evaluation at the beginning of the simulation.
      */
     unsigned mEvaluateNumItsEveryNSolves;
-
-    /**
-     * DecideLocation is a convenience method used to get the correct parameter value
-     * from the defaults/parameters files.  It checks if the first value  is present and (if not)
-     * moves onto the second
-     *
-     * @param params_ptr  Pointer to quantity within the parameters file (checked first, since it will override a default)
-     * @param defaults_ptr  Pointer to quantity within the defaults file (used if there was no override)
-     * @param rNameParameter Name of quatity within params_ptr/defaults_ptr (so we can throw a meaningful exception if it's not found)
-     */
-    template<class TYPE>
-    TYPE* DecideLocation(TYPE* params_ptr, TYPE* defaults_ptr, const std::string& rNameParameter) const;
 
     /**
      * CheckSimulationIsDefined is a convience method for checking if the "<"Simulation">" element

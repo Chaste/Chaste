@@ -673,17 +673,12 @@ public:
         PetscTools::Barrier();
 
         // Checking that the following files don't exist in the output directory before calling Solve()
-        unsigned num_files=6;
-        std::string test_file_names[6]={"monodomain2d_mesh.pts", "monodomain2d_mesh.tri", "monodomain2d_V.dat",
-              "ChasteParameters.xml", "ChasteDefaults.xml", "ConductionVelocityFromNode0.dat"};
+        unsigned num_files = 5;
+        std::string test_file_names[5] = {"monodomain2d_mesh.pts", "monodomain2d_mesh.tri", "monodomain2d_V.dat",
+                                          "ChasteParameters.xml", "ConductionVelocityFromNode0.dat"};
         for (unsigned i=0; i<num_files; i++)
         {
-            std::string compare_command = "cmp -s ";
-            compare_command += handler.GetOutputDirectoryFullPath()+"/"+test_file_names[i];
-            compare_command += " ";
-            compare_command += "heart/test/data/Monodomain2d/";
-            compare_command += test_file_names[i];
-            TS_ASSERT_EQUALS(system(compare_command.c_str()), 512);//Not there
+            TS_ASSERT(!handler.FindFile(test_file_names[i]).Exists());
         }
 
         // now solve
@@ -693,7 +688,7 @@ public:
         // Compare output files
         for (unsigned i=0; i<num_files; i++)
         {
-            if(test_file_names[i] == "monodomain2d_V.dat")
+            if (test_file_names[i] == "monodomain2d_V.dat")
             {
                 /*
                  * Since we started using bjacobi as the default preconditioner, parallel and sequential tests
@@ -702,11 +697,7 @@ public:
                  *
                  * We will test that the file exists though.
                  */
-                std::ifstream vm_file;
-                std::string command = handler.GetOutputDirectoryFullPath()+"/"+test_file_names[i];
-                vm_file.open(command.c_str());
-                TS_ASSERT(vm_file.is_open());
-                vm_file.close();
+                TS_ASSERT(handler.FindFile(test_file_names[i]).Exists());
             }
             else
             {
@@ -716,8 +707,8 @@ public:
                 compare_command += "heart/test/data/Monodomain2d/";
                 compare_command += test_file_names[i];
 
-                //Compare the new test file with one from the repository
-                unsigned diff_result=system(compare_command.c_str());
+                // Compare the new test file with one from the repository
+                unsigned diff_result = system(compare_command.c_str());
 
                 /* In case of failure, compare with known working alternative.
                  * This is for backward compatibility with XSD 2-3, in which case the
@@ -725,7 +716,7 @@ public:
                  * but we can live with that if the XSD 2-3 users can.
                  */
 
-                if ((diff_result != 0) && (i==3|| i==4))
+                if ((diff_result != 0) && (i == 3))
                 {
                     compare_command += "_alt";
                     TS_ASSERT_EQUALS(system(compare_command.c_str()), 0);
@@ -873,14 +864,7 @@ public:
         //Info file
         TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" " + results_dir + "/monodomain3d_times.info heart/test/data/CmguiData/monodomain/monodomain3dValidData_times.info").c_str()), 0);
         //HeartConfig XML
-        std::string filename_param = results_dir + "ChasteParameters.xml";
-        std::ifstream file_param(filename_param.c_str());
-        TS_ASSERT(file_param.is_open());
-        file_param.close();
-        std::string filename_default = results_dir + "ChasteDefaults.xml";
-        std::ifstream file_default(filename_default.c_str());
-        TS_ASSERT(file_default.is_open());
-        file_default.close();
+        TS_ASSERT(FileFinder(results_dir + "ChasteParameters.xml").Exists());
 
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
@@ -912,14 +896,7 @@ public:
         TS_ASSERT_DELTA( v_at_last[1330], 34.5176, 1e-3 );
 
         //HeartConfig XML
-        filename_param = results_dir + "ChasteParameters.xml";
-        std::ifstream file_param2(filename_param.c_str());
-        TS_ASSERT(file_param2.is_open());
-        file_param2.close();
-        filename_default = results_dir + "ChasteDefaults.xml";
-        std::ifstream file_default2(filename_default.c_str());
-        TS_ASSERT(file_default2.is_open());
-        file_default2.close();
+        TS_ASSERT(FileFinder(results_dir + "ChasteParameters.xml").Exists());
 #endif //CHASTE_VTK
     }
 
@@ -978,7 +955,7 @@ public:
         // Throws because mesh filename is unset
         TS_ASSERT_THROWS_THIS(monodomain_problem.Initialise(),
                 "No mesh given: define it in XML parameters file or call SetMesh()\n"
-                "No Mesh provided (neither default nor user defined)");
+                "Assertion tripped: IsMeshProvided()");
 
         // Throws because initialise hasn't been called
         TS_ASSERT_THROWS_THIS(monodomain_problem.Solve(),"Cardiac tissue is null, Initialise() probably hasn\'t been called");

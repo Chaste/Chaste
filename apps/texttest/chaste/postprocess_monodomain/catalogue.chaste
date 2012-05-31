@@ -53,7 +53,6 @@ The following new files/directories were created:
 ------------3dResults_9.exnode
 ------------3dResults_times.info
 ------------Apd_90_-30_Map.dat
-------------ChasteDefaults.xml
 ------------ChasteParameters.xml
 ------------ConductionVelocityFromNode10.dat
 ------------ConductionVelocityFromNode20.dat
@@ -69,7 +68,6 @@ The following new files/directories were created:
 ------------3dResults_mesh.tri
 ------------3dResults_times.info
 ------------Apd_90_-30_Map.dat
-------------ChasteDefaults.xml
 ------------ChasteParameters.xml
 ------------ConductionVelocityFromNode10.dat
 ------------ConductionVelocityFromNode20.dat
@@ -80,5 +78,4 @@ The following new files/directories were created:
 ------------.chaste_deletable_folder
 ------------3dResults.vtu
 ------------3dResults_times.info
-------------ChasteDefaults.xml
 ------------ChasteParameters.xml

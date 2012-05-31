@@ -8,7 +8,6 @@ The following new files/directories were created:
 --------provenance_info_0.txt
 --------output
 ------------.chaste_deletable_folder
-------------ChasteDefaults.xml
 ------------ChasteParameters.xml
 ------------ConductionVelocityFromNode200.dat
 ------------SimulationResults_V.dat

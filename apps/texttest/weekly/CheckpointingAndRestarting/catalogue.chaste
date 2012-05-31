@@ -8,7 +8,6 @@ The following new files/directories were created:
 --------provenance_info_0.txt
 --------output
 ------------.chaste_deletable_folder
-------------ChasteDefaults.xml
 ------------ChasteParameters.xml
 ------------CheckpointingResults_Phi_e.dat
 ------------CheckpointingResults_V.dat
@@ -27,7 +26,6 @@ The following new files/directories were created:
 ----------------progress_status.txt
 ----------------output
 --------------------.chaste_deletable_folder
---------------------ChasteDefaults.xml
 --------------------ChasteParameters.xml
 --------------------CheckpointingResults_Phi_e.dat
 --------------------CheckpointingResults_V.dat
@@ -37,7 +35,6 @@ The following new files/directories were created:
 ------------ChasteResults_1ms
 ----------------.chaste_deletable_folder
 ----------------AbstractCardiacProblem_mSolution.h5
-----------------ChasteDefaults.xml
 ----------------ChasteParameters.xml
 ----------------ChasteParameters_3_1.xsd
 ----------------archive.arch
@@ -58,7 +55,6 @@ The following new files/directories were created:
 ----------------progress_status.txt
 ----------------output
 --------------------.chaste_deletable_folder
---------------------ChasteDefaults.xml
 --------------------ChasteParameters.xml
 --------------------CheckpointingResults_Phi_e.dat
 --------------------CheckpointingResults_V.dat
@@ -68,7 +64,6 @@ The following new files/directories were created:
 ------------ChasteResults_2ms
 ----------------.chaste_deletable_folder
 ----------------AbstractCardiacProblem_mSolution.h5
-----------------ChasteDefaults.xml
 ----------------ChasteParameters.xml
 ----------------ChasteParameters_3_1.xsd
 ----------------archive.arch
@@ -89,7 +84,6 @@ The following new files/directories were created:
 ----------------progress_status.txt
 ----------------output
 --------------------.chaste_deletable_folder
---------------------ChasteDefaults.xml
 --------------------ChasteParameters.xml
 --------------------CheckpointingResults_Phi_e.dat
 --------------------CheckpointingResults_V.dat
@@ -99,7 +93,6 @@ The following new files/directories were created:
 ------------ChasteResults_3ms
 ----------------.chaste_deletable_folder
 ----------------AbstractCardiacProblem_mSolution.h5
-----------------ChasteDefaults.xml
 ----------------ChasteParameters.xml
 ----------------ChasteParameters_3_1.xsd
 ----------------archive.arch
@@ -120,7 +113,6 @@ The following new files/directories were created:
 ----------------progress_status.txt
 ----------------output
 --------------------.chaste_deletable_folder
---------------------ChasteDefaults.xml
 --------------------ChasteParameters.xml
 --------------------CheckpointingResults_Phi_e.dat
 --------------------CheckpointingResults_V.dat
@@ -130,7 +122,6 @@ The following new files/directories were created:
 ------------ChasteResults_4ms
 ----------------.chaste_deletable_folder
 ----------------AbstractCardiacProblem_mSolution.h5
-----------------ChasteDefaults.xml
 ----------------ChasteParameters.xml
 ----------------ChasteParameters_3_1.xsd
 ----------------archive.arch
@@ -151,7 +142,6 @@ The following new files/directories were created:
 ----------------progress_status.txt
 ----------------output
 --------------------.chaste_deletable_folder
---------------------ChasteDefaults.xml
 --------------------ChasteParameters.xml
 --------------------CheckpointingResults_Phi_e.dat
 --------------------CheckpointingResults_V.dat
@@ -161,7 +151,6 @@ The following new files/directories were created:
 ------------ChasteResults_5ms
 ----------------.chaste_deletable_folder
 ----------------AbstractCardiacProblem_mSolution.h5
-----------------ChasteDefaults.xml
 ----------------ChasteParameters.xml
 ----------------ChasteParameters_3_1.xsd
 ----------------archive.arch

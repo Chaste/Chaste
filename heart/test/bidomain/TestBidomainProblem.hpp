@@ -545,15 +545,12 @@ public:
         // Test for post-processed output (and don't wipe the directory!)
         OutputFileHandler handler("BidomainFallsOver/output",false);
 
-        std::string files[7] = {"res_mesh.pts","res_mesh.cnnx","ChasteParameters.xml","ChasteDefaults.xml",
+        std::string files[6] = {"res_mesh.pts","res_mesh.cnnx","ChasteParameters.xml",
                                 "res_Phi_e.dat","res_V.dat","res_times.info"};
 
-        for(unsigned i=0; i<7; i++)
+        for(unsigned i=0; i<6; i++)
         {
-            std::string filename = handler.GetOutputDirectoryFullPath() + files[i];
-            std::ifstream file(filename.c_str());
-            TS_ASSERT(file.is_open());
-            file.close();
+            TS_ASSERT(handler.FindFile(files[i]).Exists());
         }
 #endif //NDEBUG Note that this test relies on the debug VerifyStateVariables() method throwing
     }
@@ -570,7 +567,7 @@ public:
         // Throws because mesh filename is unset
         TS_ASSERT_THROWS_THIS(bidomain_problem.Initialise(),
                 "No mesh given: define it in XML parameters file or call SetMesh()\n"
-                "No Mesh provided (neither default nor user defined)");
+                "Assertion tripped: IsMeshProvided()");
         HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
         TS_ASSERT_THROWS_NOTHING(bidomain_problem.Initialise());
 
@@ -687,14 +684,7 @@ public:
         //info file
         TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" " + results_dir + "/axi3d_times.info heart/test/data/CmguiData/bidomain/axi3d_times.info").c_str()), 0);
         //HeartConfig XML
-        std::string filename_param = results_dir + "ChasteParameters.xml";
-        std::ifstream file_param(filename_param.c_str());
-        TS_ASSERT(file_param.is_open());
-        file_param.close();
-        std::string filename_default = results_dir + "ChasteDefaults.xml";
-        std::ifstream file_default(filename_default.c_str());
-        TS_ASSERT(file_default.is_open());
-        file_default.close();
+        TS_ASSERT(FileFinder(results_dir + "ChasteParameters.xml").Exists());
 
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
@@ -728,14 +718,7 @@ public:
         TS_ASSERT_DELTA( v_at_last[0],   -83.6881, 1e-3 );
 
         //HeartConfig XML
-        filename_param = results_dir + "ChasteParameters.xml";
-        std::ifstream file_param2(filename_param.c_str());
-        TS_ASSERT(file_param2.is_open());
-        file_param2.close();
-        filename_default = results_dir + "ChasteDefaults.xml";
-        std::ifstream file_default2(filename_default.c_str());
-        TS_ASSERT(file_default2.is_open());
-        file_default2.close();
+        TS_ASSERT(FileFinder(results_dir + "ChasteParameters.xml").Exists());
 #endif //CHASTE_VTK
      }
 

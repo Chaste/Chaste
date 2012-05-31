@@ -54,6 +54,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HeartFileFinder.hpp"
 #include "Warnings.hpp"
 
+#include "Debug.hpp"
+
 class TestHeartConfig : public CxxTest::TestSuite
 {
 private:
@@ -65,7 +67,7 @@ private:
 public:
     void TestHeartConfigBasic() throw (Exception)
     {
-        double chi = HeartConfig::Instance()->mpDefaultParameters->Physiological().SurfaceAreaToVolumeRatio().get();
+        double chi = HeartConfig::Instance()->mpUserParameters->Physiological().SurfaceAreaToVolumeRatio().get();
         TS_ASSERT_EQUALS(chi, 1400);
 
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersFullFormat.xml");
@@ -85,10 +87,12 @@ public:
 
     void TestUserProvidedDifferentFromDefault() throw (Exception)
     {
-        HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersFullFormat.xml");
+        // Here we have defaults
+        TS_ASSERT(HeartConfig::Instance()->mpUserParameters->Simulation().present());
+        cp::simulation_type default_sim_elt = HeartConfig::Instance()->mpUserParameters->Simulation().get();
 
-        TS_ASSERT(HeartConfig::Instance()->mpDefaultParameters->Simulation().present());
-        cp::simulation_type default_sim_elt = HeartConfig::Instance()->mpDefaultParameters->Simulation().get();
+        // Now load real params
+        HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersFullFormat.xml");
 
         TS_ASSERT(default_sim_elt.IonicModels().present());
         TS_ASSERT(default_sim_elt.IonicModels()->Default().Hardcoded().present());
@@ -287,11 +291,6 @@ public:
         TS_ASSERT(HeartConfig::Instance()->GetLoadMesh());
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetMeshName(), "foo");
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetConductivityMedia(), cp::media_type::NoFibreOrientation);
-
-        //Try reading through an empty parameters file into a fully-populated default
-        HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteEmpty.xml");
-        HeartConfig::Instance()->SetDefaultsFile("heart/test/data/xml/ChasteParametersFullFormat.xml");
-        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetSimulationDuration(), 10.0);
     }
 
     void TestGetHeterogeneities() throw (Exception)
@@ -536,8 +535,8 @@ public:
     {
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteEmpty.xml");
         TS_ASSERT_EQUALS(HeartConfig::Instance()->IsMeshProvided(), false);
-        TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetLoadMesh(),"No Mesh provided (neither default nor user defined)");
-        TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetCreateMesh(), "No Mesh provided (neither default nor user defined)");
+        TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetLoadMesh(), "Assertion tripped: IsMeshProvided()");
+        TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetCreateMesh(), "Assertion tripped: IsMeshProvided()");
 
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersLoadMesh.xml");
         TS_ASSERT_EQUALS(HeartConfig::Instance()->IsMeshProvided(), true);
@@ -1423,8 +1422,11 @@ public:
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
             HeartConfig* p_heart_config = HeartConfig::Instance();
+            MARK;
             HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersResumeSimulationWrongDimension.xml");
+            MARK;
             TS_ASSERT_THROWS_THIS(input_arch >> (*p_heart_config), "Problem type and space dimension should match when restarting a simulation.");
+            MARK;
         }
 
         {
@@ -1473,7 +1475,7 @@ public:
 
     void TestExceptions() throw (Exception)
     {
-        TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->SetDefaultsFile("DoesNotExist.xml"),
+        TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->SetParametersFile("DoesNotExist.xml"),
                 "Missing file parsing configuration file: DoesNotExist.xml");
         HeartConfig::Reset();
         TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteInconsistent.xml"),
@@ -1554,7 +1556,6 @@ public:
         // Can release 1 xml be loaded with release 1 schema?
         HeartConfig::Reset();
         HeartConfig::Instance()->SetUseFixedSchemaLocation(false);
-        HeartConfig::Instance()->SetDefaultsFile("heart/test/data/xml/ChasteDefaultsRelease1.xml");
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersRelease1.xml");
 
         // Check that release 1 xml can be loaded with release 1.1 schema
@@ -1562,13 +1563,11 @@ public:
         HeartConfig::SchemaLocationsMap schema_locations;
         schema_locations[""] = std::string(ChasteBuildInfo::GetRootDir()) + "/heart/test/data/xml/ChasteParametersRelease1_1.xsd";
         HeartConfig::Instance()->SetFixedSchemaLocations(schema_locations);
-        HeartConfig::Instance()->SetDefaultsFile("heart/test/data/xml/ChasteDefaultsRelease1.xml");
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersRelease1.xml");
 
         // Check that release 1 xml can be loaded with latest schema
         HeartConfig::Reset();
         HeartConfig::Instance()->SetUseFixedSchemaLocation(true);
-        HeartConfig::Instance()->SetDefaultsFile("heart/test/data/xml/ChasteDefaultsRelease1.xml");
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersRelease1.xml");
         TS_ASSERT_EQUALS(HeartConfig::Instance()->IsPostProcessingSectionPresent(), false); // Comes from latest defaults
         TS_ASSERT_EQUALS(HeartConfig::Instance()->IsPostProcessingRequested(), false);
@@ -1576,13 +1575,11 @@ public:
         // Check that release 1.1 xml can be loaded with release 1.1 schema
         HeartConfig::Reset();
         HeartConfig::Instance()->SetUseFixedSchemaLocation(false);
-        HeartConfig::Instance()->SetDefaultsFile("heart/test/data/xml/ChasteDefaultsRelease1_1.xml");
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersRelease1_1.xml");
 
         // Check that release 1.1 xml can be loaded with latest schema
         HeartConfig::Reset();
         HeartConfig::Instance()->SetUseFixedSchemaLocation(true);
-        HeartConfig::Instance()->SetDefaultsFile("heart/test/data/xml/ChasteDefaultsRelease1_1.xml");
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersRelease1_1.xml");
         TS_ASSERT_EQUALS(HeartConfig::Instance()->IsPostProcessingSectionPresent(), true);
         TS_ASSERT_EQUALS(HeartConfig::Instance()->IsPostProcessingRequested(), false);
@@ -1590,13 +1587,11 @@ public:
         // Check that release 2.0 xml can be loaded with release 2.0 schema
         HeartConfig::Reset();
         HeartConfig::Instance()->SetUseFixedSchemaLocation(false);
-        HeartConfig::Instance()->SetDefaultsFile("heart/test/data/xml/ChasteDefaultsRelease2_0.xml");
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersRelease2_0.xml");
 
         // Check that release 2.0 xml can be loaded with latest schema
         HeartConfig::Reset();
         HeartConfig::Instance()->SetUseFixedSchemaLocation(true);
-        HeartConfig::Instance()->SetDefaultsFile("heart/test/data/xml/ChasteDefaultsRelease2_0.xml");
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersRelease2_0.xml");
         TS_ASSERT_EQUALS(HeartConfig::Instance()->IsPostProcessingSectionPresent(), true);
         TS_ASSERT_EQUALS(HeartConfig::Instance()->IsPostProcessingRequested(), false);
@@ -1671,7 +1666,6 @@ public:
         HeartConfig::SchemaLocationsMap schema_locations;
         schema_locations[""] = std::string(ChasteBuildInfo::GetRootDir()) + "/heart/test/data/xml/schema with spaces.xsd";
         HeartConfig::Instance()->SetFixedSchemaLocations(schema_locations);
-        HeartConfig::Instance()->SetDefaultsFile("heart/test/data/xml/ChasteDefaultsRelease1_1.xml");
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersRelease1_1.xml");
     }
 
@@ -1827,7 +1821,7 @@ public:
     void TestOutputVisualizerSettings() throw (Exception)
     {
         // Defaults file doesn't have the OutputVisualizer element
-        TS_ASSERT( ! HeartConfig::Instance()->mpDefaultParameters->Simulation()->OutputVisualizer().present());
+        TS_ASSERT( ! HeartConfig::Instance()->mpUserParameters->Simulation()->OutputVisualizer().present());
 
         // Parameters file which doesn't specify OutputVisualizer
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteEmpty.xml");
@@ -1897,7 +1891,7 @@ public:
     void TestAdaptivityVariables() throw (Exception)
     {
         // Defaults file doesn't have the AdaptivityParameters element
-        TS_ASSERT( ! HeartConfig::Instance()->mpDefaultParameters->Numerical().AdaptivityParameters().present() );
+        TS_ASSERT( ! HeartConfig::Instance()->mpUserParameters->Numerical().AdaptivityParameters().present() );
 
         // Parameters file which doesn't specify AdaptivityParameters
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteEmpty.xml");
@@ -1980,9 +1974,9 @@ public:
     void TestNoCheckpointingError() throw (Exception)
     {
         TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetCheckpointTimestep(),
-                              "No CheckpointSimulation provided (neither default nor user defined)");
+                              "Assertion tripped: GetCheckpointSimulation()");
         TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetMaxCheckpointsOnDisk(),
-                              "No CheckpointSimulation provided (neither default nor user defined)");
+                              "Assertion tripped: GetCheckpointSimulation()");
     }
 
 private:

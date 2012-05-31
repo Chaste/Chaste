@@ -5,7 +5,6 @@ The following new files/directories were created:
 --------provenance_info_0.txt
 --------cmgui_output
 ------------.chaste_deletable_folder
-------------ChasteDefaults.xml
 ------------ChasteParameters.xml
 ------------LoadSolutions.com
 ------------Monodomain_2d.exelem

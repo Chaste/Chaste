@@ -7,7 +7,6 @@ The following new files/directories were created:
 ------------.chaste_deletable_folder
 ------------Bidomain_3d.vtu
 ------------Bidomain_3d_times.info
-------------ChasteDefaults.xml
 ------------ChasteParameters.xml
 
 The following existing files/directories changed their contents:
