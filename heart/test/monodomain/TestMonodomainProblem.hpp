@@ -825,8 +825,6 @@ public:
             TS_ASSERT(vtk_file.Exists());
             FileFinder param_file(filepath  + "ChasteParameters.xml", RelativeTo::Absolute);
             TS_ASSERT(param_file.Exists());
-            FileFinder defaults_file(filepath  + "ChasteDefaults.xml", RelativeTo::Absolute);
-            TS_ASSERT(defaults_file.Exists());
             FileFinder info_file(basename  + "_times.info", RelativeTo::Absolute);
             TS_ASSERT(info_file.Exists());
          }
