@@ -185,7 +185,7 @@ public:
          */
         TS_ASSERT( CompareFilesViaHdf5DataReader("heart/test/data/extendedbidomain", "1DValid", false,
                                                  dir, filename, true,
-                                                 1.5e-3));
+                                                 1.7e-3));
     }
 
     // Test the functionality for outputing the values of requested cell state variables

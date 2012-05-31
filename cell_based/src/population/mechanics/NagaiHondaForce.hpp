@@ -107,7 +107,7 @@ public:
     /**
      * Destructor.
      */
-    ~NagaiHondaForce();
+    virtual ~NagaiHondaForce();
 
     /**
      * Overridden AddForceContribution() method.

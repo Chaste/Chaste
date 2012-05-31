@@ -465,6 +465,9 @@ def Configure(build):
         if hasattr(conf, 'icpc'):
             build.tools['mpicxx'] += ' -CC="'+conf.icpc+'"'
         intel_bin_path = os.path.join(intel_path, 'bin')
+        # This is a bit of a hack to get version 12 working for #2059
+        if os.path.exists(os.path.join(intel_bin_path, 'intel64')):
+            intel_bin_path = os.path.join(intel_bin_path, 'intel64')
         CheckPathExists(intel_bin_path, 'Intel compilers')
         build.tools['cxx'] = os.path.join(intel_bin_path, 'icpc')
         build.tools['ar'] = os.path.join(intel_bin_path, 'xiar')
