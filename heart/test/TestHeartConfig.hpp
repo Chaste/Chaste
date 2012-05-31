@@ -67,19 +67,19 @@ private:
 public:
     void TestHeartConfigBasic() throw (Exception)
     {
-        double chi = HeartConfig::Instance()->mpUserParameters->Physiological().SurfaceAreaToVolumeRatio().get();
+        double chi = HeartConfig::Instance()->mpParameters->Physiological().SurfaceAreaToVolumeRatio().get();
         TS_ASSERT_EQUALS(chi, 1400);
 
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersFullFormat.xml");
 
-        chi = HeartConfig::Instance()->mpUserParameters->Physiological().SurfaceAreaToVolumeRatio().get();
+        chi = HeartConfig::Instance()->mpParameters->Physiological().SurfaceAreaToVolumeRatio().get();
         TS_ASSERT_EQUALS(chi, 1400);
 
-        double capacitance = HeartConfig::Instance()->mpUserParameters->Physiological().Capacitance().get();
+        double capacitance = HeartConfig::Instance()->mpParameters->Physiological().Capacitance().get();
         TS_ASSERT_EQUALS(capacitance, 1.0);
 
-        double conductivity_1 = HeartConfig::Instance()->mpUserParameters->Physiological().IntracellularConductivities()->longi();
-        double conductivity_2 = HeartConfig::Instance()->mpUserParameters->Physiological().ExtracellularConductivities()->longi();
+        double conductivity_1 = HeartConfig::Instance()->mpParameters->Physiological().IntracellularConductivities()->longi();
+        double conductivity_2 = HeartConfig::Instance()->mpParameters->Physiological().ExtracellularConductivities()->longi();
 
         TS_ASSERT_EQUALS(conductivity_1, 1.75);
         TS_ASSERT_EQUALS(conductivity_2, 7.0);
@@ -88,8 +88,8 @@ public:
     void TestUserProvidedDifferentFromDefault() throw (Exception)
     {
         // Here we have defaults
-        TS_ASSERT(HeartConfig::Instance()->mpUserParameters->Simulation().present());
-        cp::simulation_type default_sim_elt = HeartConfig::Instance()->mpUserParameters->Simulation().get();
+        TS_ASSERT(HeartConfig::Instance()->mpParameters->Simulation().present());
+        cp::simulation_type default_sim_elt = HeartConfig::Instance()->mpParameters->Simulation().get();
 
         // Now load real params
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersFullFormat.xml");
@@ -99,8 +99,8 @@ public:
         cp::ionic_models_available_type default_ionic_model = default_sim_elt.IonicModels()->Default().Hardcoded().get();
         TS_ASSERT_EQUALS(default_ionic_model, cp::ionic_models_available_type::LuoRudyI);
 
-        TS_ASSERT(HeartConfig::Instance()->mpUserParameters->Simulation().present());
-        cp::simulation_type user_sim_elt = HeartConfig::Instance()->mpUserParameters->Simulation().get();
+        TS_ASSERT(HeartConfig::Instance()->mpParameters->Simulation().present());
+        cp::simulation_type user_sim_elt = HeartConfig::Instance()->mpParameters->Simulation().get();
         TS_ASSERT(user_sim_elt.IonicModels().present());
         TS_ASSERT(user_sim_elt.IonicModels()->Default().Hardcoded().present());
         cp::ionic_models_available_type user_ionic_model = user_sim_elt.IonicModels()->Default().Hardcoded().get();
@@ -535,8 +535,8 @@ public:
     {
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteEmpty.xml");
         TS_ASSERT_EQUALS(HeartConfig::Instance()->IsMeshProvided(), false);
-        TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetLoadMesh(), "Assertion tripped: IsMeshProvided()");
-        TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetCreateMesh(), "Assertion tripped: IsMeshProvided()");
+        TS_ASSERT_THROWS_CONTAINS(HeartConfig::Instance()->GetLoadMesh(), "No XML element Simulation/Mesh found in parameters when calling");
+        TS_ASSERT_THROWS_CONTAINS(HeartConfig::Instance()->GetCreateMesh(), "No XML element Simulation/Mesh found in parameters when calling");
 
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersLoadMesh.xml");
         TS_ASSERT_EQUALS(HeartConfig::Instance()->IsMeshProvided(), true);
@@ -1821,13 +1821,13 @@ public:
     void TestOutputVisualizerSettings() throw (Exception)
     {
         // Defaults file doesn't have the OutputVisualizer element
-        TS_ASSERT( ! HeartConfig::Instance()->mpUserParameters->Simulation()->OutputVisualizer().present());
+        TS_ASSERT( ! HeartConfig::Instance()->mpParameters->Simulation()->OutputVisualizer().present());
 
         // Parameters file which doesn't specify OutputVisualizer
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteEmpty.xml");
 
         // Read the user parameters directly - again element missing
-        TS_ASSERT( ! HeartConfig::Instance()->mpUserParameters->Simulation()->OutputVisualizer().present());
+        TS_ASSERT( ! HeartConfig::Instance()->mpParameters->Simulation()->OutputVisualizer().present());
 
         // And the normal Get methods
         TS_ASSERT( HeartConfig::Instance()->GetVisualizeWithMeshalyzer() );
@@ -1839,27 +1839,27 @@ public:
         // Set methods
         HeartConfig::Instance()->SetVisualizeWithMeshalyzer(false);
         TS_ASSERT( ! HeartConfig::Instance()->GetVisualizeWithMeshalyzer() );
-        TS_ASSERT_EQUALS(HeartConfig::Instance()->mpUserParameters->Simulation()->OutputVisualizer()->meshalyzer(),
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->mpParameters->Simulation()->OutputVisualizer()->meshalyzer(),
                          cp::yesno_type::no);
 
         HeartConfig::Instance()->SetVisualizeWithCmgui(true);
         TS_ASSERT( HeartConfig::Instance()->GetVisualizeWithCmgui() );
-        TS_ASSERT_EQUALS(HeartConfig::Instance()->mpUserParameters->Simulation()->OutputVisualizer()->cmgui(),
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->mpParameters->Simulation()->OutputVisualizer()->cmgui(),
                          cp::yesno_type::yes);
 
         HeartConfig::Instance()->SetVisualizeWithVtk(true);
         TS_ASSERT( HeartConfig::Instance()->GetVisualizeWithVtk() );
-        TS_ASSERT_EQUALS(HeartConfig::Instance()->mpUserParameters->Simulation()->OutputVisualizer()->vtk(),
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->mpParameters->Simulation()->OutputVisualizer()->vtk(),
                          cp::yesno_type::yes);
 
         HeartConfig::Instance()->SetVisualizeWithParallelVtk(true);
         TS_ASSERT( HeartConfig::Instance()->GetVisualizeWithParallelVtk() );
-        TS_ASSERT_EQUALS(HeartConfig::Instance()->mpUserParameters->Simulation()->OutputVisualizer()->parallel_vtk(),
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->mpParameters->Simulation()->OutputVisualizer()->parallel_vtk(),
                          cp::yesno_type::yes);
 
         HeartConfig::Instance()->SetVisualizerOutputPrecision(10u);
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetVisualizerOutputPrecision(), 10u);
-        TS_ASSERT_EQUALS(HeartConfig::Instance()->mpUserParameters->Simulation()->OutputVisualizer()->precision(), 10u);
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->mpParameters->Simulation()->OutputVisualizer()->precision(), 10u);
 
         // Setting one doesn't change the others...
         TS_ASSERT( HeartConfig::Instance()->GetVisualizeWithCmgui() );
@@ -1870,16 +1870,16 @@ public:
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersFullFormat.xml");
 
         // Now the element exists...
-        TS_ASSERT(HeartConfig::Instance()->mpUserParameters->Simulation()->OutputVisualizer().present());
-        TS_ASSERT_EQUALS(HeartConfig::Instance()->mpUserParameters->Simulation()->OutputVisualizer()->meshalyzer(),
+        TS_ASSERT(HeartConfig::Instance()->mpParameters->Simulation()->OutputVisualizer().present());
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->mpParameters->Simulation()->OutputVisualizer()->meshalyzer(),
                          cp::yesno_type::no);
-        TS_ASSERT_EQUALS(HeartConfig::Instance()->mpUserParameters->Simulation()->OutputVisualizer()->cmgui(),
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->mpParameters->Simulation()->OutputVisualizer()->cmgui(),
                          cp::yesno_type::no);
-        TS_ASSERT_EQUALS(HeartConfig::Instance()->mpUserParameters->Simulation()->OutputVisualizer()->vtk(),
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->mpParameters->Simulation()->OutputVisualizer()->vtk(),
                          cp::yesno_type::yes);
-        TS_ASSERT_EQUALS(HeartConfig::Instance()->mpUserParameters->Simulation()->OutputVisualizer()->parallel_vtk(),
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->mpParameters->Simulation()->OutputVisualizer()->parallel_vtk(),
                          cp::yesno_type::yes);
-        TS_ASSERT_EQUALS(HeartConfig::Instance()->mpUserParameters->Simulation()->OutputVisualizer()->precision(), 16u);
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->mpParameters->Simulation()->OutputVisualizer()->precision(), 16u);
 
         TS_ASSERT( ! HeartConfig::Instance()->GetVisualizeWithMeshalyzer() );
         TS_ASSERT( ! HeartConfig::Instance()->GetVisualizeWithCmgui() );
@@ -1891,13 +1891,13 @@ public:
     void TestAdaptivityVariables() throw (Exception)
     {
         // Defaults file doesn't have the AdaptivityParameters element
-        TS_ASSERT( ! HeartConfig::Instance()->mpUserParameters->Numerical().AdaptivityParameters().present() );
+        TS_ASSERT( ! HeartConfig::Instance()->mpParameters->Numerical().AdaptivityParameters().present() );
 
         // Parameters file which doesn't specify AdaptivityParameters
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteEmpty.xml");
 
         // Read the user parameters directly - again element missing
-        TS_ASSERT( ! HeartConfig::Instance()->mpUserParameters->Numerical().AdaptivityParameters().present() );
+        TS_ASSERT( ! HeartConfig::Instance()->mpParameters->Numerical().AdaptivityParameters().present() );
 
         // Get methods throw an exception
         TS_ASSERT_THROWS_ANYTHING( HeartConfig::Instance()->GetTargetErrorForAdaptivity() );
@@ -1913,7 +1913,7 @@ public:
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersFullFormat.xml");
 
         // Verify that the element is present
-        TS_ASSERT( HeartConfig::Instance()->mpUserParameters->Numerical().AdaptivityParameters().present() );
+        TS_ASSERT( HeartConfig::Instance()->mpParameters->Numerical().AdaptivityParameters().present() );
 
         // Get methods
         TS_ASSERT_DELTA( HeartConfig::Instance()->GetTargetErrorForAdaptivity(), 2.0, 1e-6 );
@@ -1957,9 +1957,9 @@ public:
         HeartConfig::Reset();
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteEmpty.xml");
 
-        TS_ASSERT( ! HeartConfig::Instance()->mpUserParameters->Numerical().AdaptivityParameters().present() );
+        TS_ASSERT( ! HeartConfig::Instance()->mpParameters->Numerical().AdaptivityParameters().present() );
         HeartConfig::Instance()->SetAdaptivityParameters(0.1, 0.5, 0.3, 0.01, 2.0, 100, 7);
-        TS_ASSERT( HeartConfig::Instance()->mpUserParameters->Numerical().AdaptivityParameters().present() );
+        TS_ASSERT( HeartConfig::Instance()->mpParameters->Numerical().AdaptivityParameters().present() );
 
         TS_ASSERT_DELTA( HeartConfig::Instance()->GetTargetErrorForAdaptivity(), 0.1, 1e-6 );
         TS_ASSERT_DELTA( HeartConfig::Instance()->GetSigmaForAdaptivity(), 0.5, 1e-6 );
@@ -1973,10 +1973,10 @@ public:
     // See #1807
     void TestNoCheckpointingError() throw (Exception)
     {
-        TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetCheckpointTimestep(),
-                              "Assertion tripped: GetCheckpointSimulation()");
-        TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetMaxCheckpointsOnDisk(),
-                              "Assertion tripped: GetCheckpointSimulation()");
+        TS_ASSERT_THROWS_CONTAINS(HeartConfig::Instance()->GetCheckpointTimestep(),
+                                  "No XML element Simulation/CheckpointSimulation found in parameters");
+        TS_ASSERT_THROWS_CONTAINS(HeartConfig::Instance()->GetMaxCheckpointsOnDisk(),
+                                  "No XML element Simulation/CheckpointSimulation found in parameters");
     }
 
 private:
@@ -2034,7 +2034,7 @@ public:
         dir1 = "TestHeartConfig_TestMergingParameters_resume_merged";
         dir2 = "TestHeartConfig_TestMergingParameters_resume_read";
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersResumeSimulationFullFormat.xml");
-        WriteParamsFile(HeartConfig::Instance()->mpUserParameters, "ChasteResults/" + dir1, file_name);
+        WriteParamsFile(HeartConfig::Instance()->mpParameters, "ChasteResults/" + dir1, file_name);
         // We need to read & then write the reference file, to avoid whitespace and namespace prefix differences
         WriteParamsFile(HeartConfig::Instance()->ReadFile("heart/test/data/xml/ChasteParametersResumeSimulationFullFormat.xml"),
                         "ChasteResults/" + dir2, file_name);

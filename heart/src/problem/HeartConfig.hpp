@@ -177,7 +177,7 @@ public:
     void SetFixedSchemaLocations(const SchemaLocationsMap& rSchemaLocations);
 
     /**
-     * #mpUserParameters  is set to a new context associated with a parameters file
+     * #mpParameters  is set to a new context associated with a parameters file
      * @param rFileName The name of the parameters file
      */
     void SetParametersFile(const std::string& rFileName);
@@ -1279,7 +1279,7 @@ private:
     HeartConfig();
 
     /** Pointer to parameters read from the user's input XML file  */
-    boost::shared_ptr<cp::chaste_parameters_type> mpUserParameters;
+    boost::shared_ptr<cp::chaste_parameters_type> mpParameters;
 
     /** The single instance of the class */
     static std::auto_ptr<HeartConfig> mpInstance;
@@ -1369,12 +1369,12 @@ private:
     /**
      * Perform a solve with convergence-based stop criteria every n solves
      * to decide how many iterations perform for the next n-1 solves. Default
-     * is perfoming a single evaluation at the beginning of the simulation.
+     * is performing a single evaluation at the beginning of the simulation.
      */
     unsigned mEvaluateNumItsEveryNSolves;
 
     /**
-     * CheckSimulationIsDefined is a convience method for checking if the "<"Simulation">" element
+     * CheckSimulationIsDefined is a convenience method for checking if the "<"Simulation">" element
      * has been defined and therefore is safe to use the Simulation().get() pointer to access
      * other data.
      *
@@ -1385,7 +1385,7 @@ private:
     void CheckSimulationIsDefined(std::string callingMethod="") const;
 
     /**
-     * CheckSimulationIsDefined is a convience method for checking if the "<"ResumeSimulation">" element
+     * CheckSimulationIsDefined is a convenience method for checking if the "<"ResumeSimulation">" element
      * has been defined and therefore is safe to use the ResumeSimulation().get() pointer to access
      * other data.
      *

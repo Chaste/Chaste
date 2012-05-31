@@ -114,6 +114,21 @@ using namespace xsd::cxx::tree;
         location.set(empty_item);              \
     }
 
+#include <boost/current_function.hpp>
+/**
+ * This macro gives a friendly-ish exception method if you call a Get method that is
+ * missing structure up the tree.
+ *
+ * @param test  the existence test code
+ * @param path  the XML path you're looking for
+ */
+#define CHECK_EXISTS(test, path)                                                         \
+    do {                                                                                 \
+        if (!test) {                                                                     \
+            EXCEPTION("No XML element " << path << " found in parameters when calling '" \
+                      << BOOST_CURRENT_FUNCTION << "'");                                 \
+    }} while (false)
+
 
 /**
  * A class of utility methods for transforming parameters files from previous versions
@@ -197,7 +212,7 @@ HeartConfig::HeartConfig()
     mUseFixedSchemaLocation = true;
     SetDefaultSchemaLocations();
 
-    mpUserParameters = CreateDefaultParameters();
+    mpParameters = CreateDefaultParameters();
     //CheckTimeSteps(); // necessity of this line of code is not tested -- remove with caution!
 
     //initialise the member variable of the layers
@@ -270,7 +285,7 @@ void HeartConfig::Write(bool useArchiveLocationInfo, std::string subfolderName)
     map["cp"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/3_1";
     map["cp"].schema = "ChasteParameters_3_1.xsd";
 
-    cp::ChasteParameters(*p_parameters_file, *mpUserParameters, map);
+    cp::ChasteParameters(*p_parameters_file, *mpParameters, map);
 
     // If we're archiving, try to save a copy of the latest schema too
     if (useArchiveLocationInfo)
@@ -284,14 +299,14 @@ void HeartConfig::LoadFromCheckpoint()
     /*
      *  This method implements the logic required by HeartConfig to be able to handle resuming a simulation via the executable.
      *
-     *  When the control reaches the method mpUserParameters points to the file specified as resuming parameters.
+     *  When the control reaches the method mpParameters points to the file specified as resuming parameters.
      *  However SetParametersFile() will set this variable to point to the archived parameters.
      *
-     *  We make a temporary copy of mpUserParameters so we don't lose its content.
-     *  At the end of the method we update the new mpUserParameters with the resuming parameters.
+     *  We make a temporary copy of mpParameters so we don't lose its content.
+     *  At the end of the method we update the new mpParameters with the resuming parameters.
      */
-    assert(mpUserParameters.use_count() > 0);
-    boost::shared_ptr<cp::chaste_parameters_type> p_new_parameters = mpUserParameters;
+    assert(mpParameters.use_count() > 0);
+    boost::shared_ptr<cp::chaste_parameters_type> p_new_parameters = mpParameters;
 
     /*
      *  When we unarchive a simulation, we load the old parameters file in order to inherit things such
@@ -302,7 +317,7 @@ void HeartConfig::LoadFromCheckpoint()
      *  if defined in the resume config file.
      */
     std::string parameters_filename_xml = ArchiveLocationInfo::GetArchiveDirectory() + "ChasteParameters.xml";
-    mpUserParameters = ReadFile(parameters_filename_xml);
+    mpParameters = ReadFile(parameters_filename_xml);
     mParametersFilePath.SetPath(parameters_filename_xml, RelativeTo::AbsoluteOrCwd);
 
     // Release 3.0 and earlier wrote a separate defaults file in the checkpoint
@@ -310,7 +325,7 @@ void HeartConfig::LoadFromCheckpoint()
     if (FileFinder(defaults_filename_xml).Exists())
     {
         boost::shared_ptr<cp::chaste_parameters_type> p_defaults = ReadFile(defaults_filename_xml);
-        MergeDefaults(mpUserParameters, p_defaults);
+        MergeDefaults(mpParameters, p_defaults);
     }
 
     HeartConfig::Instance()->SetCheckpointSimulation(false);
@@ -472,13 +487,13 @@ boost::shared_ptr<cp::chaste_parameters_type> HeartConfig::ReadFile(const std::s
     {
         std::cerr << e << std::endl;
         // Make sure we don't store invalid parameters
-        mpUserParameters.reset();
+        mpParameters.reset();
         EXCEPTION("XML parsing error in configuration file: " + rFileName);
     }
     catch (...)
     {
         // Make sure we don't store invalid parameters
-        mpUserParameters.reset();
+        mpParameters.reset();
         throw;
     }
 }
@@ -486,8 +501,8 @@ boost::shared_ptr<cp::chaste_parameters_type> HeartConfig::ReadFile(const std::s
 #include "Debug.hpp"
 void HeartConfig::SetParametersFile(const std::string& rFileName)
 {
-    mpUserParameters = ReadFile(rFileName);
-    MergeDefaults(mpUserParameters, CreateDefaultParameters());
+    mpParameters = ReadFile(rFileName);
+    MergeDefaults(mpParameters, CreateDefaultParameters());
     mParametersFilePath.SetPath(rFileName, RelativeTo::AbsoluteOrCwd);
 
     if (IsSimulationDefined())
@@ -516,17 +531,17 @@ void HeartConfig::UpdateParametersFromResumeSimulation(boost::shared_ptr<cp::cha
     // Stimulus definition.  For these we always replace any previous definitions (at least for now...)
     if (pResumeParameters->ResumeSimulation()->Stimuli().present())
     {
-        mpUserParameters->Simulation()->Stimuli().set(pResumeParameters->ResumeSimulation()->Stimuli().get());
+        mpParameters->Simulation()->Stimuli().set(pResumeParameters->ResumeSimulation()->Stimuli().get());
     }
 
     // Cell heterogeneities.  Note that while we copy the elements here, other code in CardiacSimulation actually updates
     // the loaded simulation to take account of the new settings.
     if (pResumeParameters->ResumeSimulation()->CellHeterogeneities().present())
     {
-        if (!mpUserParameters->Simulation()->CellHeterogeneities().present())
+        if (!mpParameters->Simulation()->CellHeterogeneities().present())
         {
             // Original parameters had no heterogeneities, so just copy the whole element
-            mpUserParameters->Simulation()->CellHeterogeneities().set(pResumeParameters->ResumeSimulation()->CellHeterogeneities().get());
+            mpParameters->Simulation()->CellHeterogeneities().set(pResumeParameters->ResumeSimulation()->CellHeterogeneities().get());
         }
         else
         {
@@ -534,7 +549,7 @@ void HeartConfig::UpdateParametersFromResumeSimulation(boost::shared_ptr<cp::cha
             XSD_SEQUENCE_TYPE(cp::cell_heterogeneities_type::CellHeterogeneity)&
                 new_seq = pResumeParameters->ResumeSimulation()->CellHeterogeneities()->CellHeterogeneity();
             XSD_SEQUENCE_TYPE(cp::cell_heterogeneities_type::CellHeterogeneity)&
-                orig_seq = mpUserParameters->Simulation()->CellHeterogeneities()->CellHeterogeneity();
+                orig_seq = mpParameters->Simulation()->CellHeterogeneities()->CellHeterogeneity();
             for (XSD_ITERATOR_TYPE(cp::cell_heterogeneities_type::CellHeterogeneity) i = new_seq.begin();
                  i != new_seq.end();
                  ++i)
@@ -561,7 +576,7 @@ void HeartConfig::UpdateParametersFromResumeSimulation(boost::shared_ptr<cp::cha
     // Numerical parameters may be overridden
     {
         cp::numerical_type& r_resume = pResumeParameters->Numerical();
-        cp::numerical_type& r_user = mpUserParameters->Numerical();
+        cp::numerical_type& r_user = mpParameters->Numerical();
         if (r_resume.TimeSteps().present())
         {
             r_user.TimeSteps().set(r_resume.TimeSteps().get());
@@ -589,7 +604,7 @@ void HeartConfig::UpdateParametersFromResumeSimulation(boost::shared_ptr<cp::cha
     {
         EnsurePostProcessingSectionPresent();
         cp::postprocessing_type& r_resume = pResumeParameters->PostProcessing().get();
-        cp::postprocessing_type& r_user = mpUserParameters->PostProcessing().get();
+        cp::postprocessing_type& r_user = mpParameters->PostProcessing().get();
         if (!r_resume.ActionPotentialDurationMap().empty())
         {
             r_user.ActionPotentialDurationMap() = r_resume.ActionPotentialDurationMap();
@@ -620,12 +635,12 @@ void HeartConfig::Reset()
 
 bool HeartConfig::IsSimulationDefined() const
 {
-    return mpUserParameters->Simulation().present();
+    return mpParameters->Simulation().present();
 }
 
 bool HeartConfig::IsSimulationResumed() const
 {
-    return mpUserParameters->ResumeSimulation().present();
+    return mpParameters->ResumeSimulation().present();
 }
 
 
@@ -649,11 +664,12 @@ unsigned HeartConfig::GetSpaceDimension() const
 {
     if (IsSimulationDefined())
     {
-        return mpUserParameters->Simulation()->SpaceDimension().get();
+        CHECK_EXISTS(mpParameters->Simulation()->SpaceDimension().present(), "Simulation/SpaceDimension");
+        return mpParameters->Simulation()->SpaceDimension().get();
     }
     else
     {
-        return mpUserParameters->ResumeSimulation()->SpaceDimension();
+        return mpParameters->ResumeSimulation()->SpaceDimension();
     }
 }
 
@@ -661,11 +677,12 @@ double HeartConfig::GetSimulationDuration() const
 {
     if (IsSimulationDefined())
     {
-        return mpUserParameters->Simulation()->SimulationDuration().get();
+        CHECK_EXISTS(mpParameters->Simulation()->SimulationDuration().present(), "Simulation/SimulationDuration");
+        return mpParameters->Simulation()->SimulationDuration().get();
     }
     else // IsSimulationResumed
     {
-        return mpUserParameters->ResumeSimulation()->SimulationDuration();
+        return mpParameters->ResumeSimulation()->SimulationDuration();
     }
 }
 
@@ -673,11 +690,12 @@ cp::domain_type HeartConfig::GetDomain() const
 {
     if (IsSimulationDefined())
     {
-        return mpUserParameters->Simulation()->Domain().get();
+        CHECK_EXISTS(mpParameters->Simulation()->Domain().present(), "Simulation/Domain");
+        return mpParameters->Simulation()->Domain().get();
     }
     else
     {
-        return mpUserParameters->ResumeSimulation()->Domain();
+        return mpParameters->ResumeSimulation()->Domain();
     }
 }
 
@@ -685,7 +703,7 @@ cp::ionic_model_selection_type HeartConfig::GetDefaultIonicModel() const
 {
     CheckSimulationIsDefined("DefaultIonicModel");
 
-    return mpUserParameters->Simulation()->IonicModels()->Default();
+    return mpParameters->Simulation()->IonicModels()->Default();
 }
 
 template<unsigned DIM>
@@ -697,7 +715,7 @@ void HeartConfig::GetIonicModelRegions(std::vector<boost::shared_ptr<AbstractCha
     ionicModels.clear();
 
     XSD_SEQUENCE_TYPE(cp::ionic_models_type::Region)&
-         regions = mpUserParameters->Simulation()->IonicModels()->Region();
+         regions = mpParameters->Simulation()->IonicModels()->Region();
 
     for (XSD_ITERATOR_TYPE(cp::ionic_models_type::Region) i = regions.begin();
          i != regions.end();
@@ -797,38 +815,38 @@ void HeartConfig::GetIonicModelRegions(std::vector<boost::shared_ptr<AbstractCha
 bool HeartConfig::IsMeshProvided() const
 {
     CheckSimulationIsDefined("Mesh");
-    return mpUserParameters->Simulation()->Mesh().present();
+    return mpParameters->Simulation()->Mesh().present();
 }
 
 bool HeartConfig::GetCreateMesh() const
 {
     CheckSimulationIsDefined("Mesh");
-    EXCEPT_IF_NOT(IsMeshProvided());
-    cp::mesh_type mesh = mpUserParameters->Simulation()->Mesh().get();
+    CHECK_EXISTS(IsMeshProvided(), "Simulation/Mesh");
+    cp::mesh_type mesh = mpParameters->Simulation()->Mesh().get();
     return (mesh.Slab().present() || mesh.Sheet().present() || mesh.Fibre().present());
 }
 
 bool HeartConfig::GetCreateSlab() const
 {
     CheckSimulationIsDefined("Mesh");
-    EXCEPT_IF_NOT(IsMeshProvided());
-    cp::mesh_type mesh = mpUserParameters->Simulation()->Mesh().get();
+    CHECK_EXISTS(IsMeshProvided(), "Simulation/Mesh");
+    cp::mesh_type mesh = mpParameters->Simulation()->Mesh().get();
     return (mesh.Slab().present());
 }
 
 bool HeartConfig::GetCreateSheet() const
 {
     CheckSimulationIsDefined("Mesh");
-    EXCEPT_IF_NOT(IsMeshProvided());
-    cp::mesh_type mesh = mpUserParameters->Simulation()->Mesh().get();
+    CHECK_EXISTS(IsMeshProvided(), "Simulation/Mesh");
+    cp::mesh_type mesh = mpParameters->Simulation()->Mesh().get();
     return (mesh.Sheet().present());
 }
 
 bool HeartConfig::GetCreateFibre() const
 {
     CheckSimulationIsDefined("Mesh");
-    EXCEPT_IF_NOT(IsMeshProvided());
-    cp::mesh_type mesh = mpUserParameters->Simulation()->Mesh().get();
+    CHECK_EXISTS(IsMeshProvided(), "Simulation/Mesh");
+    cp::mesh_type mesh = mpParameters->Simulation()->Mesh().get();
     return (mesh.Fibre().present());
 }
 
@@ -836,8 +854,8 @@ bool HeartConfig::GetCreateFibre() const
 bool HeartConfig::GetLoadMesh() const
 {
     CheckSimulationIsDefined("Mesh");
-    EXCEPT_IF_NOT(IsMeshProvided());
-    return (mpUserParameters->Simulation()->Mesh()->LoadMesh().present());
+    CHECK_EXISTS(IsMeshProvided(), "Simulation/Mesh");
+    return (mpParameters->Simulation()->Mesh()->LoadMesh().present());
 }
 
 void HeartConfig::GetSlabDimensions(c_vector<double, 3>& slabDimensions) const
@@ -849,7 +867,7 @@ void HeartConfig::GetSlabDimensions(c_vector<double, 3>& slabDimensions) const
         EXCEPTION("Tissue slabs can only be defined in 3D");
     }
 
-    optional<cp::slab_type, false> slab_dimensions = mpUserParameters->Simulation()->Mesh()->Slab();
+    optional<cp::slab_type, false> slab_dimensions = mpParameters->Simulation()->Mesh()->Slab();
 
     slabDimensions[0] = slab_dimensions->x();
     slabDimensions[1] = slab_dimensions->y();
@@ -865,7 +883,7 @@ void HeartConfig::GetSheetDimensions(c_vector<double, 2>& sheetDimensions) const
         EXCEPTION("Tissue sheets can only be defined in 2D");
     }
 
-    optional<cp::sheet_type, false> sheet_dimensions = mpUserParameters->Simulation()->Mesh()->Sheet();
+    optional<cp::sheet_type, false> sheet_dimensions = mpParameters->Simulation()->Mesh()->Sheet();
 
     sheetDimensions[0] = sheet_dimensions->x();
     sheetDimensions[1] = sheet_dimensions->y();
@@ -880,7 +898,7 @@ void HeartConfig::GetFibreLength(c_vector<double, 1>& fibreLength) const
         EXCEPTION("Tissue fibres can only be defined in 1D");
     }
 
-    optional<cp::fibre_type, false> fibre_length = mpUserParameters->Simulation()->Mesh()->Fibre();
+    optional<cp::fibre_type, false> fibre_length = mpParameters->Simulation()->Mesh()->Fibre();
 
     fibreLength[0] = fibre_length->x();
 }
@@ -888,18 +906,20 @@ void HeartConfig::GetFibreLength(c_vector<double, 1>& fibreLength) const
 double HeartConfig::GetInterNodeSpace() const
 {
     CheckSimulationIsDefined("InterNodeSpace");
-    assert(GetCreateMesh());
 
-    switch(GetSpaceDimension())
+    switch (GetSpaceDimension())
     {
         case 3:
-            return mpUserParameters->Simulation()->Mesh()->Slab()->inter_node_space();
+            CHECK_EXISTS(GetCreateSlab(), "Simulation/Mesh/Slab");
+            return mpParameters->Simulation()->Mesh()->Slab()->inter_node_space();
             break;
         case 2:
-            return mpUserParameters->Simulation()->Mesh()->Sheet()->inter_node_space();
+            CHECK_EXISTS(GetCreateSheet(), "Simulation/Mesh/Sheet");
+            return mpParameters->Simulation()->Mesh()->Sheet()->inter_node_space();
             break;
         case 1:
-            return mpUserParameters->Simulation()->Mesh()->Fibre()->inter_node_space();
+            CHECK_EXISTS(GetCreateFibre(), "Simulation/Mesh/Fibre");
+            return mpParameters->Simulation()->Mesh()->Fibre()->inter_node_space();
             break;
         default:
             NEVER_REACHED;
@@ -912,17 +932,17 @@ double HeartConfig::GetInterNodeSpace() const
 std::string HeartConfig::GetMeshName() const
 {
     CheckSimulationIsDefined("LoadMesh");
-    assert(GetLoadMesh());
+    CHECK_EXISTS(GetLoadMesh(), "Mesh/LoadMesh");
 
-    return mpUserParameters->Simulation()->Mesh()->LoadMesh()->name();
+    return mpParameters->Simulation()->Mesh()->LoadMesh()->name();
 }
 
 cp::media_type HeartConfig::GetConductivityMedia() const
 {
     CheckSimulationIsDefined("LoadMesh");
-    assert(GetLoadMesh());
+    CHECK_EXISTS(GetLoadMesh(), "Mesh/LoadMesh");
 
-    return mpUserParameters->Simulation()->Mesh()->LoadMesh()->conductivity_media();
+    return mpParameters->Simulation()->Mesh()->LoadMesh()->conductivity_media();
 }
 
 template <unsigned DIM>
@@ -931,14 +951,14 @@ void HeartConfig::GetStimuli(std::vector<boost::shared_ptr<AbstractStimulusFunct
 {
     CheckSimulationIsDefined("Stimuli");
 
-    if (!mpUserParameters->Simulation()->Stimuli().present())
+    if (!mpParameters->Simulation()->Stimuli().present())
     {
         // Finding no stimuli defined is allowed (although HeartConfigRelatedFactory does
         // throw an exception is no stimuli and no electrodes)
         return;
     }
 
-    XSD_SEQUENCE_TYPE(cp::stimuli_type::Stimulus) stimuli = mpUserParameters->Simulation()->Stimuli()->Stimulus();
+    XSD_SEQUENCE_TYPE(cp::stimuli_type::Stimulus) stimuli = mpParameters->Simulation()->Stimuli()->Stimulus();
 
     for (XSD_ITERATOR_TYPE(cp::stimuli_type::Stimulus) i = stimuli.begin();
          i != stimuli.end();
@@ -1071,14 +1091,13 @@ void HeartConfig::GetCellHeterogeneities(std::vector<boost::shared_ptr<AbstractC
 {
     CheckSimulationIsDefined("CellHeterogeneities");
 
-
-    if (!mpUserParameters->Simulation()->CellHeterogeneities().present())
+    if (!mpParameters->Simulation()->CellHeterogeneities().present())
     {
         // finding no heterogeneities defined is allowed
         return;
     }
     XSD_SEQUENCE_TYPE(cp::cell_heterogeneities_type::CellHeterogeneity) cell_heterogeneity
-            = mpUserParameters->Simulation()->CellHeterogeneities()->CellHeterogeneity();
+            = mpParameters->Simulation()->CellHeterogeneities()->CellHeterogeneity();
 
     bool user_supplied_negative_value = false;
     bool user_asking_for_transmural_layers = false;
@@ -1090,7 +1109,6 @@ void HeartConfig::GetCellHeterogeneities(std::vector<boost::shared_ptr<AbstractC
          ++i)
     {
         cp::cell_heterogeneity_type ht(*i);
-
 
         if (ht.Location().Cuboid().present())
         {
@@ -1241,7 +1259,7 @@ unsigned HeartConfig::GetMidLayerIndex()
 bool HeartConfig::GetConductivityHeterogeneitiesProvided() const
 {
     CheckSimulationIsDefined("ConductivityHeterogeneities");
-    return mpUserParameters->Physiological().ConductivityHeterogeneities().present();
+    return mpParameters->Physiological().ConductivityHeterogeneities().present();
 }
 
 template<unsigned DIM>
@@ -1251,8 +1269,9 @@ void HeartConfig::GetConductivityHeterogeneities(
         std::vector< c_vector<double,3> >& extraConductivities) const
 {
     CheckSimulationIsDefined("ConductivityHeterogeneities");
+    CHECK_EXISTS(GetConductivityHeterogeneitiesProvided(), "Physiological/ConductivityHeterogeneities");
     XSD_ANON_SEQUENCE_TYPE(cp::physiological_type, ConductivityHeterogeneities, ConductivityHeterogeneity)&
-         conductivity_heterogeneity = mpUserParameters->Physiological().ConductivityHeterogeneities()->ConductivityHeterogeneity();
+         conductivity_heterogeneity = mpParameters->Physiological().ConductivityHeterogeneities()->ConductivityHeterogeneity();
 
     for (XSD_ANON_ITERATOR_TYPE(cp::physiological_type, ConductivityHeterogeneities, ConductivityHeterogeneity) i = conductivity_heterogeneity.begin();
          i != conductivity_heterogeneity.end();
@@ -1322,26 +1341,28 @@ void HeartConfig::GetConductivityHeterogeneities(
 std::string HeartConfig::GetOutputDirectory() const
 {
     CheckSimulationIsDefined("Simulation/OutputDirectory");
-    return mpUserParameters->Simulation()->OutputDirectory().get();
+    CHECK_EXISTS(mpParameters->Simulation()->OutputDirectory().present(), "Simulation/OutputDirectory");
+    return mpParameters->Simulation()->OutputDirectory().get();
 }
 
 std::string HeartConfig::GetOutputFilenamePrefix() const
 {
     CheckSimulationIsDefined("Simulation/OutputFilenamePrefix");
-    return mpUserParameters->Simulation()->OutputFilenamePrefix().get();
+    CHECK_EXISTS(mpParameters->Simulation()->OutputFilenamePrefix().present(), "Simulation/OutputFilenamePrefix");
+    return mpParameters->Simulation()->OutputFilenamePrefix().get();
 }
 
 bool HeartConfig::GetOutputVariablesProvided() const
 {
     CheckSimulationIsDefined("OutputVariables");
-    return mpUserParameters->Simulation()->OutputVariables().present();
+    return mpParameters->Simulation()->OutputVariables().present();
 }
 
 void HeartConfig::GetOutputVariables(std::vector<std::string>& rOutputVariables) const
 {
-    CheckSimulationIsDefined("OutputVariables");
+    CHECK_EXISTS(GetOutputVariablesProvided(), "Simulation/OutputVariables");
     XSD_SEQUENCE_TYPE(cp::output_variables_type::Var)&
-         output_variables = mpUserParameters->Simulation()->OutputVariables()->Var();
+         output_variables = mpParameters->Simulation()->OutputVariables()->Var();
     rOutputVariables.clear();
 
     for (XSD_ITERATOR_TYPE(cp::output_variables_type::Var) i = output_variables.begin();
@@ -1356,10 +1377,11 @@ void HeartConfig::GetOutputVariables(std::vector<std::string>& rOutputVariables)
 }
 bool HeartConfig::GetOutputUsingOriginalNodeOrdering()
 {
+    CheckSimulationIsDefined("OutputUsingOriginalNodeOrdering");
     bool result = false;
-    if (mpUserParameters->Simulation()->OutputUsingOriginalNodeOrdering().present())
+    if (mpParameters->Simulation()->OutputUsingOriginalNodeOrdering().present())
     {
-        result = (mpUserParameters->Simulation()->OutputUsingOriginalNodeOrdering().get() == cp::yesno_type::yes);
+        result = (mpParameters->Simulation()->OutputUsingOriginalNodeOrdering().get() == cp::yesno_type::yes);
     }
     return result;
 }
@@ -1369,44 +1391,44 @@ bool HeartConfig::GetCheckpointSimulation() const
     bool result = false;
     if (IsSimulationDefined())
     {
-        result = mpUserParameters->Simulation()->CheckpointSimulation().present();
+        result = mpParameters->Simulation()->CheckpointSimulation().present();
     }
     else
     {
         ///\todo #1613 Figure out how this branch gets called, and whether it's really needed
         CheckResumeSimulationIsDefined("GetCheckpointSimulation");
-        result = mpUserParameters->ResumeSimulation()->CheckpointSimulation().present();
+        result = mpParameters->ResumeSimulation()->CheckpointSimulation().present();
     }
     return result;
 }
 
 double HeartConfig::GetCheckpointTimestep() const
 {
-    EXCEPT_IF_NOT(GetCheckpointSimulation());
+    CHECK_EXISTS(GetCheckpointSimulation(), "Simulation/CheckpointSimulation");
     if (IsSimulationDefined())
     {
-        return mpUserParameters->Simulation()->CheckpointSimulation()->timestep();
+        return mpParameters->Simulation()->CheckpointSimulation()->timestep();
     }
     else
     {
         ///\todo #1613 Figure out how this branch gets called, and whether it's really needed
         CheckResumeSimulationIsDefined("GetCheckpointTimestep");
-        return mpUserParameters->ResumeSimulation()->CheckpointSimulation()->timestep();
+        return mpParameters->ResumeSimulation()->CheckpointSimulation()->timestep();
     }
 }
 
 unsigned HeartConfig::GetMaxCheckpointsOnDisk() const
 {
-    EXCEPT_IF_NOT(GetCheckpointSimulation());
+    CHECK_EXISTS(GetCheckpointSimulation(), "Simulation/CheckpointSimulation");
     if (IsSimulationDefined())
     {
-        return mpUserParameters->Simulation()->CheckpointSimulation()->max_checkpoints_on_disk();
+        return mpParameters->Simulation()->CheckpointSimulation()->max_checkpoints_on_disk();
     }
     else
     {
         ///\todo #1613 Figure out how this branch gets called, and whether it's really needed
         CheckResumeSimulationIsDefined("GetMaxCheckpointsOnDisk");
-        return mpUserParameters->ResumeSimulation()->CheckpointSimulation()->max_checkpoints_on_disk();
+        return mpParameters->ResumeSimulation()->CheckpointSimulation()->max_checkpoints_on_disk();
     }
 }
 
@@ -1415,15 +1437,15 @@ HeartFileFinder HeartConfig::GetArchivedSimulationDir() const
 {
     CheckResumeSimulationIsDefined("GetArchivedSimulationDir");
 
-    return HeartFileFinder(mpUserParameters->ResumeSimulation()->ArchiveDirectory());
+    return HeartFileFinder(mpParameters->ResumeSimulation()->ArchiveDirectory());
 }
 
 
 void HeartConfig::GetIntracellularConductivities(c_vector<double, 3>& intraConductivities) const
 {
-    assert(mpUserParameters->Physiological().IntracellularConductivities().present());
+    CHECK_EXISTS(mpParameters->Physiological().IntracellularConductivities().present(), "Physiological/IntracellularConductivities");
     cp::conductivities_type intra_conductivities
-        = mpUserParameters->Physiological().IntracellularConductivities().get();
+        = mpParameters->Physiological().IntracellularConductivities().get();
     double intra_x_cond = intra_conductivities.longi();
     double intra_y_cond = intra_conductivities.trans();
     double intra_z_cond = intra_conductivities.normal();;
@@ -1438,9 +1460,9 @@ void HeartConfig::GetIntracellularConductivities(c_vector<double, 3>& intraCondu
 
 void HeartConfig::GetIntracellularConductivities(c_vector<double, 2>& intraConductivities) const
 {
-    assert(mpUserParameters->Physiological().IntracellularConductivities().present());
+    CHECK_EXISTS(mpParameters->Physiological().IntracellularConductivities().present(), "Physiological/IntracellularConductivities");
     cp::conductivities_type intra_conductivities
-        = mpUserParameters->Physiological().IntracellularConductivities().get();
+        = mpParameters->Physiological().IntracellularConductivities().get();
     double intra_x_cond = intra_conductivities.longi();
     double intra_y_cond = intra_conductivities.trans();
 
@@ -1452,9 +1474,9 @@ void HeartConfig::GetIntracellularConductivities(c_vector<double, 2>& intraCondu
 
 void HeartConfig::GetIntracellularConductivities(c_vector<double, 1>& intraConductivities) const
 {
-    assert(mpUserParameters->Physiological().IntracellularConductivities().present());
+    CHECK_EXISTS(mpParameters->Physiological().IntracellularConductivities().present(), "Physiological/IntracellularConductivities");
     cp::conductivities_type intra_conductivities
-        = mpUserParameters->Physiological().IntracellularConductivities().get();
+        = mpParameters->Physiological().IntracellularConductivities().get();
     double intra_x_cond = intra_conductivities.longi();
 
     intraConductivities[0] = intra_x_cond;
@@ -1462,9 +1484,9 @@ void HeartConfig::GetIntracellularConductivities(c_vector<double, 1>& intraCondu
 
 void HeartConfig::GetExtracellularConductivities(c_vector<double, 3>& extraConductivities) const
 {
-    assert(mpUserParameters->Physiological().ExtracellularConductivities().present());
+    CHECK_EXISTS(mpParameters->Physiological().ExtracellularConductivities().present(), "Physiological/ExtracellularConductivities");
     cp::conductivities_type extra_conductivities
-        = mpUserParameters->Physiological().ExtracellularConductivities().get();
+        = mpParameters->Physiological().ExtracellularConductivities().get();
     double extra_x_cond = extra_conductivities.longi();
     double extra_y_cond = extra_conductivities.trans();
     double extra_z_cond = extra_conductivities.normal();;
@@ -1479,9 +1501,9 @@ void HeartConfig::GetExtracellularConductivities(c_vector<double, 3>& extraCondu
 
 void HeartConfig::GetExtracellularConductivities(c_vector<double, 2>& extraConductivities) const
 {
-    assert(mpUserParameters->Physiological().ExtracellularConductivities().present());
+    CHECK_EXISTS(mpParameters->Physiological().ExtracellularConductivities().present(), "Physiological/ExtracellularConductivities");
     cp::conductivities_type extra_conductivities
-        = mpUserParameters->Physiological().ExtracellularConductivities().get();
+        = mpParameters->Physiological().ExtracellularConductivities().get();
     double extra_x_cond = extra_conductivities.longi();
     double extra_y_cond = extra_conductivities.trans();
 
@@ -1493,9 +1515,9 @@ void HeartConfig::GetExtracellularConductivities(c_vector<double, 2>& extraCondu
 
 void HeartConfig::GetExtracellularConductivities(c_vector<double, 1>& extraConductivities) const
 {
-    assert(mpUserParameters->Physiological().ExtracellularConductivities().present());
+    CHECK_EXISTS(mpParameters->Physiological().ExtracellularConductivities().present(), "Physiological/ExtracellularConductivities");
     cp::conductivities_type extra_conductivities
-        = mpUserParameters->Physiological().ExtracellularConductivities().get();
+        = mpParameters->Physiological().ExtracellularConductivities().get();
     double extra_x_cond = extra_conductivities.longi();
 
     extraConductivities[0] = extra_x_cond;
@@ -1515,7 +1537,8 @@ double HeartConfig::GetBathConductivity(unsigned bathRegion) const
     if (bathRegion == UINT_MAX)
     {
         /*bath conductivity mS/cm*/
-        return mpUserParameters->Physiological().BathConductivity().get();
+        CHECK_EXISTS(mpParameters->Physiological().BathConductivity().present(), "Physiological/BathConductivity");
+        return mpParameters->Physiological().BathConductivity().get();
     }
     else
     {
@@ -1530,7 +1553,8 @@ double HeartConfig::GetBathConductivity(unsigned bathRegion) const
         else
         {
             /*bath conductivity mS/cm*/
-            return mpUserParameters->Physiological().BathConductivity().get();
+            CHECK_EXISTS(mpParameters->Physiological().BathConductivity().present(), "Physiological/BathConductivity");
+            return mpParameters->Physiological().BathConductivity().get();
         }
     }
 }
@@ -1546,69 +1570,70 @@ const std::set<unsigned>&  HeartConfig::rGetBathIdentifiers()
 
 double HeartConfig::GetSurfaceAreaToVolumeRatio() const
 {
-    /*surface area to volume ratio: 1/cm*/
-    return mpUserParameters->Physiological().SurfaceAreaToVolumeRatio().get();
+    CHECK_EXISTS(mpParameters->Physiological().SurfaceAreaToVolumeRatio().present(), "Physiological/SurfaceAreaToVolumeRatio");
+    return mpParameters->Physiological().SurfaceAreaToVolumeRatio().get();
 }
 
 double HeartConfig::GetCapacitance() const
 {
-    //         capacitance                 : uF/cm^2
-    return mpUserParameters->Physiological().Capacitance().get();
+    CHECK_EXISTS(mpParameters->Physiological().Capacitance().present(), "Physiological/Capacitance");
+    return mpParameters->Physiological().Capacitance().get();
 }
 
 double HeartConfig::GetOdeTimeStep() const
 {
-    assert(mpUserParameters->Numerical().TimeSteps().present());
-    return mpUserParameters->Numerical().TimeSteps()->ode();
+    CHECK_EXISTS(mpParameters->Numerical().TimeSteps().present(), "Numerical/TimeSteps");
+    return mpParameters->Numerical().TimeSteps()->ode();
 }
 
 double HeartConfig::GetPdeTimeStep() const
 {
-    assert(mpUserParameters->Numerical().TimeSteps().present());
-    return mpUserParameters->Numerical().TimeSteps()->pde();
+    CHECK_EXISTS(mpParameters->Numerical().TimeSteps().present(), "Numerical/TimeSteps");
+    return mpParameters->Numerical().TimeSteps()->pde();
 }
 
 double HeartConfig::GetPrintingTimeStep() const
 {
-    assert(mpUserParameters->Numerical().TimeSteps().present());
-    return mpUserParameters->Numerical().TimeSteps()->printing();
+    CHECK_EXISTS(mpParameters->Numerical().TimeSteps().present(), "Numerical/TimeSteps");
+    return mpParameters->Numerical().TimeSteps()->printing();
 }
 
 bool HeartConfig::GetUseAbsoluteTolerance() const
 {
-    assert(mpUserParameters->Numerical().KSPTolerances().present());
-    return mpUserParameters->Numerical().KSPTolerances()->KSPAbsolute().present();
+    CHECK_EXISTS(mpParameters->Numerical().KSPTolerances().present(), "Numerical/KSPTolerances");
+    return mpParameters->Numerical().KSPTolerances()->KSPAbsolute().present();
 }
 
 double HeartConfig::GetAbsoluteTolerance() const
 {
-    assert(mpUserParameters->Numerical().KSPTolerances().present());
+    CHECK_EXISTS(mpParameters->Numerical().KSPTolerances().present(), "Numerical/KSPTolerances");
     if (!GetUseAbsoluteTolerance())
     {
         EXCEPTION("Absolute tolerance is not set in Chaste parameters");
     }
-    return mpUserParameters->Numerical().KSPTolerances()->KSPAbsolute().get();
+    return mpParameters->Numerical().KSPTolerances()->KSPAbsolute().get();
 }
 
 bool HeartConfig::GetUseRelativeTolerance() const
 {
-    assert(mpUserParameters->Numerical().KSPTolerances().present());
-    return mpUserParameters->Numerical().KSPTolerances()->KSPRelative().present();
+    CHECK_EXISTS(mpParameters->Numerical().KSPTolerances().present(), "Numerical/KSPTolerances");
+    return mpParameters->Numerical().KSPTolerances()->KSPRelative().present();
 }
 
 double HeartConfig::GetRelativeTolerance() const
 {
-    assert(mpUserParameters->Numerical().KSPTolerances().present());
+    CHECK_EXISTS(mpParameters->Numerical().KSPTolerances().present(), "Numerical/KSPTolerances");
     if (!GetUseRelativeTolerance())
     {
         EXCEPTION("Relative tolerance is not set in Chaste parameters");
     }
-    return mpUserParameters->Numerical().KSPTolerances()->KSPRelative().get();
+    return mpParameters->Numerical().KSPTolerances()->KSPRelative().get();
 }
 
 const char* HeartConfig::GetKSPSolver() const
 {
-    switch (mpUserParameters->Numerical().KSPSolver().get())
+    CHECK_EXISTS(mpParameters->Numerical().KSPSolver().present(), "Numerical/KSPSolver");
+    switch (mpParameters->Numerical().KSPSolver().get())
     {
         case cp::ksp_solver_type::gmres :
             return "gmres";
@@ -1626,7 +1651,8 @@ const char* HeartConfig::GetKSPSolver() const
 
 const char* HeartConfig::GetKSPPreconditioner() const
 {
-    switch ( mpUserParameters->Numerical().KSPPreconditioner().get() )
+    CHECK_EXISTS(mpParameters->Numerical().KSPPreconditioner().present(), "Numerical/KSPPreconditioner");
+    switch ( mpParameters->Numerical().KSPPreconditioner().get() )
     {
         case cp::ksp_preconditioner_type::jacobi :
             return "jacobi";
@@ -1655,7 +1681,8 @@ const char* HeartConfig::GetKSPPreconditioner() const
 
 DistributedTetrahedralMeshPartitionType::type HeartConfig::GetMeshPartitioning() const
 {
-    switch ( mpUserParameters->Numerical().MeshPartitioning().get() )
+    CHECK_EXISTS(mpParameters->Numerical().MeshPartitioning().present(), "Numerical/MeshPartitioning");
+    switch ( mpParameters->Numerical().MeshPartitioning().get() )
     {
         case cp::mesh_partitioning_type::dumb :
             return DistributedTetrahedralMeshPartitionType::DUMB;
@@ -1673,14 +1700,14 @@ DistributedTetrahedralMeshPartitionType::type HeartConfig::GetMeshPartitioning()
 
 bool HeartConfig::IsAdaptivityParametersPresent() const
 {
-    return mpUserParameters->Numerical().AdaptivityParameters().present();
+    return mpParameters->Numerical().AdaptivityParameters().present();
 }
 
 double HeartConfig::GetTargetErrorForAdaptivity() const
 {
     if ( IsAdaptivityParametersPresent() )
     {
-        return mpUserParameters->Numerical().AdaptivityParameters()->target_error();
+        return mpParameters->Numerical().AdaptivityParameters()->target_error();
     }
     else
     {
@@ -1692,7 +1719,7 @@ double HeartConfig::GetSigmaForAdaptivity() const
 {
     if ( IsAdaptivityParametersPresent() )
     {
-        return mpUserParameters->Numerical().AdaptivityParameters()->sigma();
+        return mpParameters->Numerical().AdaptivityParameters()->sigma();
     }
     else
     {
@@ -1704,7 +1731,7 @@ double HeartConfig::GetMaxEdgeLengthForAdaptivity() const
 {
     if ( IsAdaptivityParametersPresent() )
     {
-        return mpUserParameters->Numerical().AdaptivityParameters()->max_edge_length();
+        return mpParameters->Numerical().AdaptivityParameters()->max_edge_length();
     }
     else
     {
@@ -1716,7 +1743,7 @@ double HeartConfig::GetMinEdgeLengthForAdaptivity() const
 {
     if ( IsAdaptivityParametersPresent() )
     {
-        return mpUserParameters->Numerical().AdaptivityParameters()->min_edge_length();
+        return mpParameters->Numerical().AdaptivityParameters()->min_edge_length();
     }
     else
     {
@@ -1728,7 +1755,7 @@ double HeartConfig::GetGradationForAdaptivity() const
 {
     if ( IsAdaptivityParametersPresent() )
     {
-        return mpUserParameters->Numerical().AdaptivityParameters()->gradation();
+        return mpParameters->Numerical().AdaptivityParameters()->gradation();
     }
     else
     {
@@ -1740,7 +1767,7 @@ unsigned HeartConfig::GetMaxNodesForAdaptivity() const
 {
     if ( IsAdaptivityParametersPresent() )
     {
-        return mpUserParameters->Numerical().AdaptivityParameters()->max_nodes();
+        return mpParameters->Numerical().AdaptivityParameters()->max_nodes();
     }
     else
     {
@@ -1752,7 +1779,7 @@ unsigned HeartConfig::GetNumberOfAdaptiveSweeps() const
 {
     if ( IsAdaptivityParametersPresent() )
     {
-        return mpUserParameters->Numerical().AdaptivityParameters()->num_sweeps();
+        return mpParameters->Numerical().AdaptivityParameters()->num_sweeps();
     }
     else
     {
@@ -1766,12 +1793,12 @@ unsigned HeartConfig::GetNumberOfAdaptiveSweeps() const
 
 bool HeartConfig::IsPostProcessingSectionPresent() const
 {
-    return mpUserParameters->PostProcessing().present();
+    return mpParameters->PostProcessing().present();
 }
 
 void HeartConfig::EnsurePostProcessingSectionPresent()
 {
-    ENSURE_SECTION_PRESENT(mpUserParameters->PostProcessing(), cp::postprocessing_type);
+    ENSURE_SECTION_PRESENT(mpParameters->PostProcessing(), cp::postprocessing_type);
 }
 
 bool HeartConfig::IsPostProcessingRequested() const
@@ -1796,7 +1823,7 @@ bool HeartConfig::IsApdMapsRequested() const
     if (IsPostProcessingSectionPresent())
     {
         XSD_SEQUENCE_TYPE(cp::postprocessing_type::ActionPotentialDurationMap)&
-                apd_maps = mpUserParameters->PostProcessing()->ActionPotentialDurationMap();
+                apd_maps = mpParameters->PostProcessing()->ActionPotentialDurationMap();
         result = (apd_maps.begin() != apd_maps.end());
     }
     return result;
@@ -1804,11 +1831,11 @@ bool HeartConfig::IsApdMapsRequested() const
 
 void HeartConfig::GetApdMaps(std::vector<std::pair<double,double> >& apd_maps) const
 {
-    assert(IsApdMapsRequested());
+    CHECK_EXISTS(IsApdMapsRequested(), "PostProcessing/ActionPotentialDurationMap");
     apd_maps.clear();
 
     XSD_SEQUENCE_TYPE(cp::postprocessing_type::ActionPotentialDurationMap)&
-        apd_maps_sequence = mpUserParameters->PostProcessing()->ActionPotentialDurationMap();
+        apd_maps_sequence = mpParameters->PostProcessing()->ActionPotentialDurationMap();
 
     for (XSD_ITERATOR_TYPE(cp::postprocessing_type::ActionPotentialDurationMap) i = apd_maps_sequence.begin();
          i != apd_maps_sequence.end();
@@ -1826,18 +1853,18 @@ bool HeartConfig::IsUpstrokeTimeMapsRequested() const
     if (IsPostProcessingSectionPresent())
     {
         XSD_SEQUENCE_TYPE(cp::postprocessing_type::UpstrokeTimeMap)&
-            upstroke_map = mpUserParameters->PostProcessing()->UpstrokeTimeMap();
+            upstroke_map = mpParameters->PostProcessing()->UpstrokeTimeMap();
         result = (upstroke_map.begin() != upstroke_map.end());
     }
     return result;
 }
 void HeartConfig::GetUpstrokeTimeMaps (std::vector<double>& upstroke_time_maps) const
 {
-    assert(IsUpstrokeTimeMapsRequested());
+    CHECK_EXISTS(IsUpstrokeTimeMapsRequested(), "PostProcessing/UpstrokeTimeMap");
     assert(upstroke_time_maps.size() == 0);
 
     XSD_SEQUENCE_TYPE(cp::postprocessing_type::UpstrokeTimeMap)&
-        upstroke_maps_sequence = mpUserParameters->PostProcessing()->UpstrokeTimeMap();
+        upstroke_maps_sequence = mpParameters->PostProcessing()->UpstrokeTimeMap();
 
     for (XSD_ITERATOR_TYPE(cp::postprocessing_type::UpstrokeTimeMap) i = upstroke_maps_sequence.begin();
          i != upstroke_maps_sequence.end();
@@ -1853,7 +1880,7 @@ bool HeartConfig::IsMaxUpstrokeVelocityMapRequested() const
     if (IsPostProcessingSectionPresent())
     {
         XSD_SEQUENCE_TYPE(cp::postprocessing_type::MaxUpstrokeVelocityMap)&
-            max_upstroke_velocity_map = mpUserParameters->PostProcessing()->MaxUpstrokeVelocityMap();
+            max_upstroke_velocity_map = mpParameters->PostProcessing()->MaxUpstrokeVelocityMap();
         result = (max_upstroke_velocity_map.begin() != max_upstroke_velocity_map.end());
     }
     return result;
@@ -1861,11 +1888,11 @@ bool HeartConfig::IsMaxUpstrokeVelocityMapRequested() const
 
 void HeartConfig::GetMaxUpstrokeVelocityMaps(std::vector<double>& upstroke_velocity_maps) const
 {
-    assert(IsMaxUpstrokeVelocityMapRequested());
+    CHECK_EXISTS(IsMaxUpstrokeVelocityMapRequested(), "PostProcessing/MaxUpstrokeVelocityMap");
     assert(upstroke_velocity_maps.size() == 0);
 
     XSD_SEQUENCE_TYPE(cp::postprocessing_type::MaxUpstrokeVelocityMap)&
-        max_upstroke_velocity_maps_sequence = mpUserParameters->PostProcessing()->MaxUpstrokeVelocityMap();
+        max_upstroke_velocity_maps_sequence = mpParameters->PostProcessing()->MaxUpstrokeVelocityMap();
 
     for (XSD_ITERATOR_TYPE(cp::postprocessing_type::MaxUpstrokeVelocityMap) i = max_upstroke_velocity_maps_sequence.begin();
          i != max_upstroke_velocity_maps_sequence.end();
@@ -1881,7 +1908,7 @@ bool HeartConfig::IsConductionVelocityMapsRequested() const
     if (IsPostProcessingSectionPresent())
     {
         XSD_SEQUENCE_TYPE(cp::postprocessing_type::ConductionVelocityMap)&
-            cond_vel_maps = mpUserParameters->PostProcessing()->ConductionVelocityMap();
+            cond_vel_maps = mpParameters->PostProcessing()->ConductionVelocityMap();
         result = (cond_vel_maps.begin() != cond_vel_maps.end());
     }
     return result;
@@ -1889,11 +1916,11 @@ bool HeartConfig::IsConductionVelocityMapsRequested() const
 
 void HeartConfig::GetConductionVelocityMaps(std::vector<unsigned>& conduction_velocity_maps) const
 {
-    assert(IsConductionVelocityMapsRequested());
+    CHECK_EXISTS(IsConductionVelocityMapsRequested(), "PostProcessing/ConductionVelocityMap");
     assert(conduction_velocity_maps.size() == 0);
 
     XSD_SEQUENCE_TYPE(cp::postprocessing_type::ConductionVelocityMap)&
-        cond_vel_maps_sequence = mpUserParameters->PostProcessing()->ConductionVelocityMap();
+        cond_vel_maps_sequence = mpParameters->PostProcessing()->ConductionVelocityMap();
 
     for (XSD_ITERATOR_TYPE(cp::postprocessing_type::ConductionVelocityMap) i = cond_vel_maps_sequence.begin();
          i != cond_vel_maps_sequence.end();
@@ -1909,7 +1936,7 @@ bool HeartConfig::IsAnyNodalTimeTraceRequested() const
     if (IsPostProcessingSectionPresent())
     {
         XSD_SEQUENCE_TYPE(cp::postprocessing_type::TimeTraceAtNode)&
-            requested_nodes = mpUserParameters->PostProcessing()->TimeTraceAtNode();
+            requested_nodes = mpParameters->PostProcessing()->TimeTraceAtNode();
         result = (requested_nodes.begin() != requested_nodes.end());
     }
     return result;
@@ -1917,11 +1944,11 @@ bool HeartConfig::IsAnyNodalTimeTraceRequested() const
 
 void HeartConfig::GetNodalTimeTraceRequested(std::vector<unsigned>& rRequestedNodes) const
 {
-    assert(IsAnyNodalTimeTraceRequested());
+    CHECK_EXISTS(IsAnyNodalTimeTraceRequested(), "PostProcessing/TimeTraceAtNode");
     assert(rRequestedNodes.size() == 0);
 
     XSD_SEQUENCE_TYPE(cp::postprocessing_type::TimeTraceAtNode)&
-        req_nodes = mpUserParameters->PostProcessing()->TimeTraceAtNode();
+        req_nodes = mpParameters->PostProcessing()->TimeTraceAtNode();
 
     for (XSD_ITERATOR_TYPE(cp::postprocessing_type::TimeTraceAtNode) i = req_nodes.begin();
          i != req_nodes.end();
@@ -1938,7 +1965,7 @@ bool HeartConfig::IsPseudoEcgCalculationRequested() const
     if (IsPostProcessingSectionPresent())
     {
         XSD_SEQUENCE_TYPE(cp::postprocessing_type::PseudoEcgElectrodePosition)&
-            electrodes = mpUserParameters->PostProcessing()->PseudoEcgElectrodePosition();
+            electrodes = mpParameters->PostProcessing()->PseudoEcgElectrodePosition();
         result = (electrodes.begin() != electrodes.end());
     }
     return result;
@@ -1949,7 +1976,7 @@ void HeartConfig::GetPseudoEcgElectrodePositions(std::vector<ChastePoint<SPACE_D
 {
     rPseudoEcgElectrodePositions.clear();
     XSD_SEQUENCE_TYPE(cp::postprocessing_type::PseudoEcgElectrodePosition)&
-        electrodes = mpUserParameters->PostProcessing()->PseudoEcgElectrodePosition();
+        electrodes = mpParameters->PostProcessing()->PseudoEcgElectrodePosition();
     for (XSD_ITERATOR_TYPE(cp::postprocessing_type::PseudoEcgElectrodePosition) i = electrodes.begin();
          i != electrodes.end();
          ++i)
@@ -1967,7 +1994,7 @@ bool HeartConfig::IsOutputVisualizerPresent() const
 {
     CheckSimulationIsDefined("OutputVisualizer");
 
-    return mpUserParameters->Simulation()->OutputVisualizer().present();
+    return mpParameters->Simulation()->OutputVisualizer().present();
 }
 
 bool HeartConfig::GetVisualizeWithMeshalyzer() const
@@ -1978,7 +2005,7 @@ bool HeartConfig::GetVisualizeWithMeshalyzer() const
     }
     else
     {
-        return mpUserParameters->Simulation()->OutputVisualizer()->meshalyzer() == cp::yesno_type::yes;
+        return mpParameters->Simulation()->OutputVisualizer()->meshalyzer() == cp::yesno_type::yes;
     }
 }
 
@@ -1990,7 +2017,7 @@ bool HeartConfig::GetVisualizeWithCmgui() const
     }
     else
     {
-        return mpUserParameters->Simulation()->OutputVisualizer()->cmgui() == cp::yesno_type::yes;
+        return mpParameters->Simulation()->OutputVisualizer()->cmgui() == cp::yesno_type::yes;
     }
 }
 
@@ -2002,7 +2029,7 @@ bool HeartConfig::GetVisualizeWithParallelVtk() const
     }
     else
     {
-        return mpUserParameters->Simulation()->OutputVisualizer()->parallel_vtk() == cp::yesno_type::yes;
+        return mpParameters->Simulation()->OutputVisualizer()->parallel_vtk() == cp::yesno_type::yes;
     }
 }
 
@@ -2014,7 +2041,7 @@ bool HeartConfig::GetVisualizeWithVtk() const
     }
     else
     {
-        return mpUserParameters->Simulation()->OutputVisualizer()->vtk() == cp::yesno_type::yes;
+        return mpParameters->Simulation()->OutputVisualizer()->vtk() == cp::yesno_type::yes;
     }
 }
 
@@ -2026,14 +2053,14 @@ unsigned HeartConfig::GetVisualizerOutputPrecision()
     }
     else
     {
-        return mpUserParameters->Simulation()->OutputVisualizer()->precision();
+        return mpParameters->Simulation()->OutputVisualizer()->precision();
     }
 }
 
 
 bool HeartConfig::IsElectrodesPresent() const
 {
-    return mpUserParameters->Simulation()->Electrodes().present();
+    return mpParameters->Simulation()->Electrodes().present();
 }
 
 /*
@@ -2041,18 +2068,18 @@ bool HeartConfig::IsElectrodesPresent() const
  */
 void HeartConfig::SetSpaceDimension(unsigned spaceDimension)
 {
-    mpUserParameters->Simulation()->SpaceDimension().set(spaceDimension);
+    mpParameters->Simulation()->SpaceDimension().set(spaceDimension);
 }
 
 void HeartConfig::SetSimulationDuration(double simulationDuration)
 {
     XSD_CREATE_WITH_FIXED_ATTR1(cp::time_type, time, simulationDuration, "ms");
-    mpUserParameters->Simulation()->SimulationDuration().set(time);
+    mpParameters->Simulation()->SimulationDuration().set(time);
 }
 
 void HeartConfig::SetDomain(const cp::domain_type& rDomain)
 {
-    mpUserParameters->Simulation()->Domain().set(rDomain);
+    mpParameters->Simulation()->Domain().set(rDomain);
 }
 
 void HeartConfig::SetDefaultIonicModel(const cp::ionic_models_available_type& rIonicModel)
@@ -2060,55 +2087,55 @@ void HeartConfig::SetDefaultIonicModel(const cp::ionic_models_available_type& rI
     cp::ionic_model_selection_type ionic_model;
     ionic_model.Hardcoded(rIonicModel);
     cp::ionic_models_type container(ionic_model);
-    mpUserParameters->Simulation()->IonicModels().set(container);
+    mpParameters->Simulation()->IonicModels().set(container);
 }
 
 void HeartConfig::SetSlabDimensions(double x, double y, double z, double inter_node_space)
 {
-    if ( ! mpUserParameters->Simulation()->Mesh().present())
+    if ( ! mpParameters->Simulation()->Mesh().present())
     {
         XSD_CREATE_WITH_FIXED_ATTR(cp::mesh_type, mesh_to_load, "cm");
-        mpUserParameters->Simulation()->Mesh().set(mesh_to_load);
+        mpParameters->Simulation()->Mesh().set(mesh_to_load);
     }
 
     cp::slab_type slab_definition(x, y, z, inter_node_space);
-    mpUserParameters->Simulation()->Mesh()->Slab().set(slab_definition);
+    mpParameters->Simulation()->Mesh()->Slab().set(slab_definition);
 }
 
 void HeartConfig::SetSheetDimensions(double x, double y, double inter_node_space)
 {
-    if ( ! mpUserParameters->Simulation()->Mesh().present())
+    if ( ! mpParameters->Simulation()->Mesh().present())
     {
         XSD_CREATE_WITH_FIXED_ATTR(cp::mesh_type, mesh_to_load, "cm");
-        mpUserParameters->Simulation()->Mesh().set(mesh_to_load);
+        mpParameters->Simulation()->Mesh().set(mesh_to_load);
     }
 
     cp::sheet_type sheet_definition(x, y, inter_node_space);
-    mpUserParameters->Simulation()->Mesh()->Sheet().set(sheet_definition);
+    mpParameters->Simulation()->Mesh()->Sheet().set(sheet_definition);
 }
 
 void HeartConfig::SetFibreLength(double x, double inter_node_space)
 {
-    if ( ! mpUserParameters->Simulation()->Mesh().present())
+    if ( ! mpParameters->Simulation()->Mesh().present())
     {
         XSD_CREATE_WITH_FIXED_ATTR(cp::mesh_type, mesh_to_load, "cm");
-        mpUserParameters->Simulation()->Mesh().set(mesh_to_load);
+        mpParameters->Simulation()->Mesh().set(mesh_to_load);
     }
 
     cp::fibre_type fibre_definition(x, inter_node_space);
-    mpUserParameters->Simulation()->Mesh()->Fibre().set(fibre_definition);
+    mpParameters->Simulation()->Mesh()->Fibre().set(fibre_definition);
 }
 
 void HeartConfig::SetMeshFileName(std::string meshPrefix, cp::media_type fibreDefinition)
 {
-    if ( ! mpUserParameters->Simulation()->Mesh().present())
+    if ( ! mpParameters->Simulation()->Mesh().present())
     {
         XSD_CREATE_WITH_FIXED_ATTR(cp::mesh_type, mesh_to_load, "cm");
-        mpUserParameters->Simulation()->Mesh().set(mesh_to_load);
+        mpParameters->Simulation()->Mesh().set(mesh_to_load);
     }
 
     XSD_NESTED_TYPE(cp::mesh_type::LoadMesh) mesh_prefix(meshPrefix, fibreDefinition);
-    mpUserParameters->Simulation()->Mesh()->LoadMesh().set(mesh_prefix);
+    mpParameters->Simulation()->Mesh()->LoadMesh().set(mesh_prefix);
 }
 
 void HeartConfig::SetIonicModelRegions(std::vector<ChasteCuboid<3> >& rDefinedRegions,
@@ -2116,9 +2143,9 @@ void HeartConfig::SetIonicModelRegions(std::vector<ChasteCuboid<3> >& rDefinedRe
 {
     assert(rDefinedRegions.size() == rIonicModels.size());
     // You need to have defined a default model first...
-    assert(mpUserParameters->Simulation()->IonicModels().present());
+    assert(mpParameters->Simulation()->IonicModels().present());
     XSD_SEQUENCE_TYPE(cp::ionic_models_type::Region)&
-        regions = mpUserParameters->Simulation()->IonicModels()->Region();
+        regions = mpParameters->Simulation()->IonicModels()->Region();
     regions.clear();
     for (unsigned region_index=0; region_index<rDefinedRegions.size(); region_index++)
     {
@@ -2183,7 +2210,7 @@ void HeartConfig::SetConductivityHeterogeneities(std::vector<ChasteCuboid<3> >& 
     XSD_ANON_TYPE(cp::physiological_type, ConductivityHeterogeneities) heterogeneities_object;
     heterogeneities_object.ConductivityHeterogeneity(heterogeneities_container);
 
-    mpUserParameters->Physiological().ConductivityHeterogeneities().set(heterogeneities_object);
+    mpParameters->Physiological().ConductivityHeterogeneities().set(heterogeneities_object);
 }
 
 void HeartConfig::SetConductivityHeterogeneitiesEllipsoid(std::vector<ChasteEllipsoid<3> >& conductivityAreas,
@@ -2231,29 +2258,29 @@ void HeartConfig::SetConductivityHeterogeneitiesEllipsoid(std::vector<ChasteElli
     XSD_ANON_TYPE(cp::physiological_type, ConductivityHeterogeneities) heterogeneities_object;
     heterogeneities_object.ConductivityHeterogeneity(heterogeneities_container);
 
-    mpUserParameters->Physiological().ConductivityHeterogeneities().set(heterogeneities_object);
+    mpParameters->Physiological().ConductivityHeterogeneities().set(heterogeneities_object);
 }
 
 void HeartConfig::SetOutputDirectory(const std::string& rOutputDirectory)
 {
-    mpUserParameters->Simulation()->OutputDirectory().set(rOutputDirectory);
+    mpParameters->Simulation()->OutputDirectory().set(rOutputDirectory);
 }
 
 void HeartConfig::SetOutputFilenamePrefix(const std::string& rOutputFilenamePrefix)
 {
-    mpUserParameters->Simulation()->OutputFilenamePrefix().set(rOutputFilenamePrefix);
+    mpParameters->Simulation()->OutputFilenamePrefix().set(rOutputFilenamePrefix);
 }
 
 void HeartConfig::SetOutputVariables(const std::vector<std::string>& rOutputVariables)
 {
-    if ( ! mpUserParameters->Simulation()->OutputVariables().present())
+    if ( ! mpParameters->Simulation()->OutputVariables().present())
     {
         cp::output_variables_type variables_requested;
-        mpUserParameters->Simulation()->OutputVariables().set(variables_requested);
+        mpParameters->Simulation()->OutputVariables().set(variables_requested);
     }
 
     XSD_SEQUENCE_TYPE(cp::output_variables_type::Var)&
-        var_type_sequence = mpUserParameters->Simulation()->OutputVariables()->Var();
+        var_type_sequence = mpParameters->Simulation()->OutputVariables()->Var();
     //Erase or create a sequence
     var_type_sequence.clear();
 
@@ -2267,7 +2294,7 @@ void HeartConfig::SetOutputVariables(const std::vector<std::string>& rOutputVari
 void  HeartConfig::SetOutputUsingOriginalNodeOrdering(bool useOriginal)
 {
     //What if it doesn't exist?
-    mpUserParameters->Simulation()->OutputUsingOriginalNodeOrdering().set(useOriginal? cp::yesno_type::yes : cp::yesno_type::no);
+    mpParameters->Simulation()->OutputUsingOriginalNodeOrdering().set(useOriginal? cp::yesno_type::yes : cp::yesno_type::no);
 }
 
 void HeartConfig::SetCheckpointSimulation(bool saveSimulation, double checkpointTimestep, unsigned maxCheckpointsOnDisk)
@@ -2282,11 +2309,11 @@ void HeartConfig::SetCheckpointSimulation(bool saveSimulation, double checkpoint
                                     checkpointTimestep,
                                     maxCheckpointsOnDisk,
                                     "ms");
-        mpUserParameters->Simulation()->CheckpointSimulation().set(cs);
+        mpParameters->Simulation()->CheckpointSimulation().set(cs);
     }
     else
     {
-        mpUserParameters->Simulation()->CheckpointSimulation().reset();
+        mpParameters->Simulation()->CheckpointSimulation().reset();
     }
 
     CheckTimeSteps();
@@ -2302,7 +2329,7 @@ void HeartConfig::SetIntracellularConductivities(const c_vector<double, 3>& intr
                                 intraConductivities[2],
                                 "mS/cm");
 
-    mpUserParameters->Physiological().IntracellularConductivities().set(intra);
+    mpParameters->Physiological().IntracellularConductivities().set(intra);
 }
 
 void HeartConfig::SetIntracellularConductivities(const c_vector<double, 2>& intraConductivities)
@@ -2312,7 +2339,7 @@ void HeartConfig::SetIntracellularConductivities(const c_vector<double, 2>& intr
                                 intraConductivities[1],
                                 0.0, "mS/cm");
 
-    mpUserParameters->Physiological().IntracellularConductivities().set(intra);
+    mpParameters->Physiological().IntracellularConductivities().set(intra);
 }
 
 void HeartConfig::SetIntracellularConductivities(const c_vector<double, 1>& intraConductivities)
@@ -2321,7 +2348,7 @@ void HeartConfig::SetIntracellularConductivities(const c_vector<double, 1>& intr
                                 intraConductivities[0],
                                 0.0, 0.0, "mS/cm");
 
-    mpUserParameters->Physiological().IntracellularConductivities().set(intra);
+    mpParameters->Physiological().IntracellularConductivities().set(intra);
 }
 
 void HeartConfig::SetExtracellularConductivities(const c_vector<double, 3>& extraConductivities)
@@ -2332,7 +2359,7 @@ void HeartConfig::SetExtracellularConductivities(const c_vector<double, 3>& extr
                                 extraConductivities[2],
                                 "mS/cm");
 
-    mpUserParameters->Physiological().ExtracellularConductivities().set(extra);
+    mpParameters->Physiological().ExtracellularConductivities().set(extra);
 }
 
 void HeartConfig::SetExtracellularConductivities(const c_vector<double, 2>& extraConductivities)
@@ -2342,7 +2369,7 @@ void HeartConfig::SetExtracellularConductivities(const c_vector<double, 2>& extr
                                 extraConductivities[1],
                                 0.0, "mS/cm");
 
-    mpUserParameters->Physiological().ExtracellularConductivities().set(extra);
+    mpParameters->Physiological().ExtracellularConductivities().set(extra);
 }
 
 void HeartConfig::SetExtracellularConductivities(const c_vector<double, 1>& extraConductivities)
@@ -2351,13 +2378,13 @@ void HeartConfig::SetExtracellularConductivities(const c_vector<double, 1>& extr
                                 extraConductivities[0],
                                 0.0, 0.0, "mS/cm");
 
-    mpUserParameters->Physiological().ExtracellularConductivities().set(extra);
+    mpParameters->Physiological().ExtracellularConductivities().set(extra);
 }
 
 void HeartConfig::SetBathConductivity(double bathConductivity)
 {
     XSD_CREATE_WITH_FIXED_ATTR1(cp::conductivity_type, cond, bathConductivity, "mS/cm");
-    mpUserParameters->Physiological().BathConductivity().set(cond);
+    mpParameters->Physiological().BathConductivity().set(cond);
 }
 
 void HeartConfig::SetBathMultipleConductivities(std::map<unsigned, double> bathConductivities)
@@ -2396,13 +2423,13 @@ void HeartConfig::SetTissueAndBathIdentifiers(const std::set<unsigned>& tissueId
 void HeartConfig::SetSurfaceAreaToVolumeRatio(double ratio)
 {
     XSD_CREATE_WITH_FIXED_ATTR1(cp::inverse_length_type, ratio_object, ratio, "1/cm");
-    mpUserParameters->Physiological().SurfaceAreaToVolumeRatio().set(ratio_object);
+    mpParameters->Physiological().SurfaceAreaToVolumeRatio().set(ratio_object);
 }
 
 void HeartConfig::SetCapacitance(double capacitance)
 {
     XSD_CREATE_WITH_FIXED_ATTR1(cp::capacitance_type, capacitance_object, capacitance, "uF/cm^2");
-    mpUserParameters->Physiological().Capacitance().set(capacitance_object);
+    mpParameters->Physiological().Capacitance().set(capacitance_object);
 }
 
 
@@ -2411,7 +2438,7 @@ void HeartConfig::SetOdePdeAndPrintingTimeSteps(double odeTimeStep, double pdeTi
 {
     XSD_CREATE_WITH_FIXED_ATTR3(cp::time_steps_type, time_steps,
                                 odeTimeStep, pdeTimeStep, printingTimeStep, "ms");
-    mpUserParameters->Numerical().TimeSteps().set(time_steps);
+    mpParameters->Numerical().TimeSteps().set(time_steps);
     CheckTimeSteps();
 }
 
@@ -2477,18 +2504,18 @@ void HeartConfig::CheckTimeSteps() const
 
 void HeartConfig::SetUseRelativeTolerance(double relativeTolerance)
 {
-    ENSURE_SECTION_PRESENT(mpUserParameters->Numerical().KSPTolerances(), cp::ksp_tolerances_type);
+    ENSURE_SECTION_PRESENT(mpParameters->Numerical().KSPTolerances(), cp::ksp_tolerances_type);
     //Remove any reference to tolerances is user parameters
-    mpUserParameters->Numerical().KSPTolerances()->KSPAbsolute().reset();
-    mpUserParameters->Numerical().KSPTolerances()->KSPRelative().set(relativeTolerance);
+    mpParameters->Numerical().KSPTolerances()->KSPAbsolute().reset();
+    mpParameters->Numerical().KSPTolerances()->KSPRelative().set(relativeTolerance);
 }
 
 void HeartConfig::SetUseAbsoluteTolerance(double absoluteTolerance)
 {
-    ENSURE_SECTION_PRESENT(mpUserParameters->Numerical().KSPTolerances(), cp::ksp_tolerances_type);
+    ENSURE_SECTION_PRESENT(mpParameters->Numerical().KSPTolerances(), cp::ksp_tolerances_type);
     //Remove any reference to tolerances is user parameters
-    mpUserParameters->Numerical().KSPTolerances()->KSPRelative().reset();
-    mpUserParameters->Numerical().KSPTolerances()->KSPAbsolute().set(absoluteTolerance);
+    mpParameters->Numerical().KSPTolerances()->KSPRelative().reset();
+    mpParameters->Numerical().KSPTolerances()->KSPAbsolute().set(absoluteTolerance);
 }
 
 void HeartConfig::SetKSPSolver(const char* kspSolver)
@@ -2496,22 +2523,22 @@ void HeartConfig::SetKSPSolver(const char* kspSolver)
     /* Note that changes in these conditions need to be reflected in the Doxygen*/
     if ( strcmp(kspSolver, "gmres") == 0)
     {
-        mpUserParameters->Numerical().KSPSolver().set(cp::ksp_solver_type::gmres);
+        mpParameters->Numerical().KSPSolver().set(cp::ksp_solver_type::gmres);
         return;
     }
     if ( strcmp(kspSolver, "cg") == 0)
     {
-        mpUserParameters->Numerical().KSPSolver().set(cp::ksp_solver_type::cg);
+        mpParameters->Numerical().KSPSolver().set(cp::ksp_solver_type::cg);
         return;
     }
     if ( strcmp(kspSolver, "symmlq") == 0)
     {
-        mpUserParameters->Numerical().KSPSolver().set(cp::ksp_solver_type::symmlq);
+        mpParameters->Numerical().KSPSolver().set(cp::ksp_solver_type::symmlq);
         return;
     }
     if ( strcmp(kspSolver, "chebychev") == 0)
     {
-        mpUserParameters->Numerical().KSPSolver().set(cp::ksp_solver_type::chebychev);
+        mpParameters->Numerical().KSPSolver().set(cp::ksp_solver_type::chebychev);
         return;
     }
 
@@ -2523,47 +2550,47 @@ void HeartConfig::SetKSPPreconditioner(const char* kspPreconditioner)
     /* Note that changes in these conditions need to be reflected in the Doxygen*/
     if ( strcmp(kspPreconditioner, "jacobi") == 0)
     {
-        mpUserParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::jacobi);
+        mpParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::jacobi);
         return;
     }
     if ( strcmp(kspPreconditioner, "bjacobi") == 0)
     {
-        mpUserParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::bjacobi);
+        mpParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::bjacobi);
         return;
     }
     if ( strcmp(kspPreconditioner, "hypre") == 0)
     {
-        mpUserParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::hypre);
+        mpParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::hypre);
         return;
     }
     if ( strcmp(kspPreconditioner, "ml") == 0)
     {
-        mpUserParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::ml);
+        mpParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::ml);
         return;
     }
     if ( strcmp(kspPreconditioner, "spai") == 0)
     {
-        mpUserParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::spai);
+        mpParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::spai);
         return;
     }
     if ( strcmp(kspPreconditioner, "twolevelsblockdiagonal") == 0)
     {
-        mpUserParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::twolevelsblockdiagonal);
+        mpParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::twolevelsblockdiagonal);
         return;
     }
     if ( strcmp(kspPreconditioner, "blockdiagonal") == 0)
     {
-        mpUserParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::blockdiagonal);
+        mpParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::blockdiagonal);
         return;
     }
     if ( strcmp(kspPreconditioner, "ldufactorisation") == 0)
     {
-        mpUserParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::ldufactorisation);
+        mpParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::ldufactorisation);
         return;
     }
     if ( strcmp(kspPreconditioner, "none") == 0)
     {
-        mpUserParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::none);
+        mpParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::none);
         return;
     }
 
@@ -2575,22 +2602,22 @@ void HeartConfig::SetMeshPartitioning(const char* meshPartioningMethod)
     /* Note that changes in these conditions need to be reflected in the Doxygen*/
     if ( strcmp(meshPartioningMethod, "dumb") == 0)
     {
-        mpUserParameters->Numerical().MeshPartitioning().set(cp::mesh_partitioning_type::dumb);
+        mpParameters->Numerical().MeshPartitioning().set(cp::mesh_partitioning_type::dumb);
         return;
     }
     if ( strcmp(meshPartioningMethod, "metis") == 0)
     {
-        mpUserParameters->Numerical().MeshPartitioning().set(cp::mesh_partitioning_type::metis);
+        mpParameters->Numerical().MeshPartitioning().set(cp::mesh_partitioning_type::metis);
         return;
     }
     if ( strcmp(meshPartioningMethod, "parmetis") == 0)
     {
-        mpUserParameters->Numerical().MeshPartitioning().set(cp::mesh_partitioning_type::parmetis);
+        mpParameters->Numerical().MeshPartitioning().set(cp::mesh_partitioning_type::parmetis);
         return;
     }
     if ( strcmp(meshPartioningMethod, "petsc") == 0)
     {
-        mpUserParameters->Numerical().MeshPartitioning().set(cp::mesh_partitioning_type::petsc);
+        mpParameters->Numerical().MeshPartitioning().set(cp::mesh_partitioning_type::petsc);
         return;
     }
 
@@ -2617,17 +2644,17 @@ void HeartConfig::SetAdaptivityParameters(double targetError,
                                            gradation,
                                            maxNodes,
                                            numSweeps );
-    mpUserParameters->Numerical().AdaptivityParameters().set(element);
+    mpParameters->Numerical().AdaptivityParameters().set(element);
 
     if (IsAdaptivityParametersPresent())
     {
-        mpUserParameters->Numerical().AdaptivityParameters()->target_error(targetError);
-        mpUserParameters->Numerical().AdaptivityParameters()->sigma(sigma);
-        mpUserParameters->Numerical().AdaptivityParameters()->max_edge_length(maxEdgeLength);
-        mpUserParameters->Numerical().AdaptivityParameters()->min_edge_length(minEdgeLength);
-        mpUserParameters->Numerical().AdaptivityParameters()->gradation(gradation);
-        mpUserParameters->Numerical().AdaptivityParameters()->max_nodes(maxNodes);
-        mpUserParameters->Numerical().AdaptivityParameters()->num_sweeps(numSweeps);
+        mpParameters->Numerical().AdaptivityParameters()->target_error(targetError);
+        mpParameters->Numerical().AdaptivityParameters()->sigma(sigma);
+        mpParameters->Numerical().AdaptivityParameters()->max_edge_length(maxEdgeLength);
+        mpParameters->Numerical().AdaptivityParameters()->min_edge_length(minEdgeLength);
+        mpParameters->Numerical().AdaptivityParameters()->gradation(gradation);
+        mpParameters->Numerical().AdaptivityParameters()->max_nodes(maxNodes);
+        mpParameters->Numerical().AdaptivityParameters()->num_sweeps(numSweeps);
     }
 }
 
@@ -2712,7 +2739,7 @@ void HeartConfig::SetApdMaps(const std::vector<std::pair<double,double> >& apdMa
 {
     EnsurePostProcessingSectionPresent();
     XSD_SEQUENCE_TYPE(cp::postprocessing_type::ActionPotentialDurationMap)& apd_maps_sequence
-        = mpUserParameters->PostProcessing()->ActionPotentialDurationMap();
+        = mpParameters->PostProcessing()->ActionPotentialDurationMap();
     //Erase or create a sequence
     apd_maps_sequence.clear();
 
@@ -2730,7 +2757,7 @@ void HeartConfig::SetUpstrokeTimeMaps (std::vector<double>& upstrokeTimeMaps)
 {
     EnsurePostProcessingSectionPresent();
     XSD_SEQUENCE_TYPE(cp::postprocessing_type::UpstrokeTimeMap)& var_type_sequence
-        = mpUserParameters->PostProcessing()->UpstrokeTimeMap();
+        = mpParameters->PostProcessing()->UpstrokeTimeMap();
 
     //Erase or create a sequence
     var_type_sequence.clear();
@@ -2748,7 +2775,7 @@ void HeartConfig::SetMaxUpstrokeVelocityMaps (std::vector<double>& maxUpstrokeVe
 {
     EnsurePostProcessingSectionPresent();
     XSD_SEQUENCE_TYPE(cp::postprocessing_type::MaxUpstrokeVelocityMap)& max_upstroke_velocity_maps_sequence
-        = mpUserParameters->PostProcessing()->MaxUpstrokeVelocityMap();
+        = mpParameters->PostProcessing()->MaxUpstrokeVelocityMap();
 
     //Erase or create a sequence
     max_upstroke_velocity_maps_sequence.clear();
@@ -2769,7 +2796,7 @@ void HeartConfig::SetConductionVelocityMaps (std::vector<unsigned>& conductionVe
 {
     EnsurePostProcessingSectionPresent();
     XSD_SEQUENCE_TYPE(cp::postprocessing_type::ConductionVelocityMap)& conduction_velocity_maps_sequence
-        = mpUserParameters->PostProcessing()->ConductionVelocityMap();
+        = mpParameters->PostProcessing()->ConductionVelocityMap();
 
     //Erase or create a sequence
     conduction_velocity_maps_sequence.clear();
@@ -2785,7 +2812,7 @@ void HeartConfig::SetRequestedNodalTimeTraces (std::vector<unsigned>& requestedN
 {
     EnsurePostProcessingSectionPresent();
     XSD_SEQUENCE_TYPE(cp::postprocessing_type::TimeTraceAtNode)& requested_nodes_sequence
-        = mpUserParameters->PostProcessing()->TimeTraceAtNode();
+        = mpParameters->PostProcessing()->TimeTraceAtNode();
 
     //Erase or create a sequence
     requested_nodes_sequence.clear();
@@ -2802,7 +2829,7 @@ void HeartConfig::SetPseudoEcgElectrodePositions(const std::vector<ChastePoint<S
 {
     EnsurePostProcessingSectionPresent();
     XSD_SEQUENCE_TYPE(cp::postprocessing_type::PseudoEcgElectrodePosition)& electrodes_sequence
-        = mpUserParameters->PostProcessing()->PseudoEcgElectrodePosition();
+        = mpParameters->PostProcessing()->PseudoEcgElectrodePosition();
 
     //Erase or create a sequence
     electrodes_sequence.clear();
@@ -2823,14 +2850,14 @@ void HeartConfig::SetPseudoEcgElectrodePositions(const std::vector<ChastePoint<S
 
 void HeartConfig::EnsureOutputVisualizerExists()
 {
-    ENSURE_SECTION_PRESENT(mpUserParameters->Simulation()->OutputVisualizer(), cp::output_visualizer_type);
+    ENSURE_SECTION_PRESENT(mpParameters->Simulation()->OutputVisualizer(), cp::output_visualizer_type);
 }
 
 void HeartConfig::SetVisualizeWithMeshalyzer(bool useMeshalyzer)
 {
     EnsureOutputVisualizerExists();
 
-    mpUserParameters->Simulation()->OutputVisualizer()->meshalyzer(
+    mpParameters->Simulation()->OutputVisualizer()->meshalyzer(
         useMeshalyzer ? cp::yesno_type::yes : cp::yesno_type::no);
 }
 
@@ -2838,7 +2865,7 @@ void HeartConfig::SetVisualizeWithCmgui(bool useCmgui)
 {
     EnsureOutputVisualizerExists();
 
-    mpUserParameters->Simulation()->OutputVisualizer()->cmgui(
+    mpParameters->Simulation()->OutputVisualizer()->cmgui(
         useCmgui ? cp::yesno_type::yes : cp::yesno_type::no);
 }
 
@@ -2846,7 +2873,7 @@ void HeartConfig::SetVisualizeWithVtk(bool useVtk)
 {
     EnsureOutputVisualizerExists();
 
-    mpUserParameters->Simulation()->OutputVisualizer()->vtk(
+    mpParameters->Simulation()->OutputVisualizer()->vtk(
         useVtk ? cp::yesno_type::yes : cp::yesno_type::no);
 }
 
@@ -2854,7 +2881,7 @@ void HeartConfig::SetVisualizeWithParallelVtk(bool useParallelVtk)
 {
     EnsureOutputVisualizerExists();
 
-    mpUserParameters->Simulation()->OutputVisualizer()->parallel_vtk(
+    mpParameters->Simulation()->OutputVisualizer()->parallel_vtk(
         useParallelVtk ? cp::yesno_type::yes : cp::yesno_type::no);
 }
 
@@ -2862,7 +2889,7 @@ void HeartConfig::SetVisualizerOutputPrecision(unsigned numberOfDigits)
 {
     EnsureOutputVisualizerExists();
 
-    mpUserParameters->Simulation()->OutputVisualizer()->precision(numberOfDigits);
+    mpParameters->Simulation()->OutputVisualizer()->precision(numberOfDigits);
 }
 
 
@@ -2893,15 +2920,15 @@ void HeartConfig::SetElectrodeParameters(bool groundSecondElectrode,
                                      strength,
                                      start_time,
                                      duration_time );
-        mpUserParameters->Simulation()->Electrodes().set(element);
+        mpParameters->Simulation()->Electrodes().set(element);
     }
     else
     {
-        mpUserParameters->Simulation()->Electrodes()->GroundSecondElectrode(groundSecondElectrode ? cp::yesno_type::yes : cp::yesno_type::no);
-        mpUserParameters->Simulation()->Electrodes()->PerpendicularToAxis(axis);
-        mpUserParameters->Simulation()->Electrodes()->Strength(strength);
-        mpUserParameters->Simulation()->Electrodes()->StartTime(start_time);
-        mpUserParameters->Simulation()->Electrodes()->Duration(duration_time);
+        mpParameters->Simulation()->Electrodes()->GroundSecondElectrode(groundSecondElectrode ? cp::yesno_type::yes : cp::yesno_type::no);
+        mpParameters->Simulation()->Electrodes()->PerpendicularToAxis(axis);
+        mpParameters->Simulation()->Electrodes()->Strength(strength);
+        mpParameters->Simulation()->Electrodes()->StartTime(start_time);
+        mpParameters->Simulation()->Electrodes()->Duration(duration_time);
     }
 }
 
@@ -2915,9 +2942,9 @@ void HeartConfig::GetElectrodeParameters(bool& rGroundSecondElectrode,
     }
     else
     {
-        rGroundSecondElectrode = (mpUserParameters->Simulation()->Electrodes()->GroundSecondElectrode()==cp::yesno_type::yes);
+        rGroundSecondElectrode = (mpParameters->Simulation()->Electrodes()->GroundSecondElectrode()==cp::yesno_type::yes);
 
-        cp::axis_type axis = mpUserParameters->Simulation()->Electrodes()->PerpendicularToAxis();
+        cp::axis_type axis = mpParameters->Simulation()->Electrodes()->PerpendicularToAxis();
         if (axis==cp::axis_type::x)
         {
             rIndex = 0;
@@ -2931,9 +2958,9 @@ void HeartConfig::GetElectrodeParameters(bool& rGroundSecondElectrode,
             rIndex = 2;
         }
 
-        rMagnitude = mpUserParameters->Simulation()->Electrodes()->Strength();
-        rStartTime = mpUserParameters->Simulation()->Electrodes()->StartTime();
-        rDuration = mpUserParameters->Simulation()->Electrodes()->Duration();
+        rMagnitude = mpParameters->Simulation()->Electrodes()->Strength();
+        rStartTime = mpParameters->Simulation()->Electrodes()->StartTime();
+        rDuration = mpParameters->Simulation()->Electrodes()->Duration();
     }
 
 }
@@ -2942,9 +2969,9 @@ bool HeartConfig::GetUseStateVariableInterpolation() const
 {
     // If it's an older version parameters & defaults (we're loading a checkpoint) say 'no'
     bool result = false;
-    if (mpUserParameters->Numerical().UseStateVariableInterpolation().present())
+    if (mpParameters->Numerical().UseStateVariableInterpolation().present())
     {
-        result = mpUserParameters->Numerical().UseStateVariableInterpolation().get() == cp::yesno_type::yes;
+        result = mpParameters->Numerical().UseStateVariableInterpolation().get() == cp::yesno_type::yes;
     }
     return result;
 }
@@ -2953,11 +2980,11 @@ void HeartConfig::SetUseStateVariableInterpolation(bool useStateVariableInterpol
 {
     if (useStateVariableInterpolation)
     {
-        mpUserParameters->Numerical().UseStateVariableInterpolation().set(cp::yesno_type::yes);
+        mpParameters->Numerical().UseStateVariableInterpolation().set(cp::yesno_type::yes);
     }
     else
     {
-        mpUserParameters->Numerical().UseStateVariableInterpolation().set(cp::yesno_type::no);
+        mpParameters->Numerical().UseStateVariableInterpolation().set(cp::yesno_type::no);
     }
 }
 
@@ -2965,33 +2992,35 @@ void HeartConfig::SetUseStateVariableInterpolation(bool useStateVariableInterpol
 
 bool HeartConfig::HasDrugDose() const
 {
-    return mpUserParameters->Physiological().ApplyDrug().present();
+    return mpParameters->Physiological().ApplyDrug().present();
 }
 
 double HeartConfig::GetDrugDose() const
 {
-    return mpUserParameters->Physiological().ApplyDrug()->concentration();
+    CHECK_EXISTS(HasDrugDose(), "Physiological/ApplyDrug");
+    return mpParameters->Physiological().ApplyDrug()->concentration();
 }
 
 void HeartConfig::SetDrugDose(double drugDose)
 {
-    if (!mpUserParameters->Physiological().ApplyDrug().present())
+    if (!mpParameters->Physiological().ApplyDrug().present())
     {
         cp::apply_drug_type drug(drugDose);
-        mpUserParameters->Physiological().ApplyDrug().set(drug);
+        mpParameters->Physiological().ApplyDrug().set(drug);
     }
     else
     {
-        mpUserParameters->Physiological().ApplyDrug()->concentration(drugDose);
+        mpParameters->Physiological().ApplyDrug()->concentration(drugDose);
     }
 }
 
 std::map<std::string, std::pair<double, double> > HeartConfig::GetIc50Values()
 {
+    CHECK_EXISTS(HasDrugDose(), "Physiological/ApplyDrug");
     std::map<std::string, std::pair<double, double> > ic50s;
 
     XSD_SEQUENCE_TYPE(cp::apply_drug_type::IC50)&
-        ic50_seq = mpUserParameters->Physiological().ApplyDrug()->IC50();
+        ic50_seq = mpParameters->Physiological().ApplyDrug()->IC50();
 
     for (XSD_ITERATOR_TYPE(cp::apply_drug_type::IC50) i = ic50_seq.begin();
          i != ic50_seq.end();
@@ -3007,11 +3036,11 @@ std::map<std::string, std::pair<double, double> > HeartConfig::GetIc50Values()
 
 void HeartConfig::SetIc50Value(const std::string& rCurrentName, double ic50, double hill)
 {
-    if (!mpUserParameters->Physiological().ApplyDrug().present())
+    if (!mpParameters->Physiological().ApplyDrug().present())
     {
         SetDrugDose(0.0);
     }
-    XSD_SEQUENCE_TYPE(cp::apply_drug_type::IC50)& ic50_seq = mpUserParameters->Physiological().ApplyDrug()->IC50();
+    XSD_SEQUENCE_TYPE(cp::apply_drug_type::IC50)& ic50_seq = mpParameters->Physiological().ApplyDrug()->IC50();
     if (ic50_seq.empty())
     {
         // Erase or create a sequence
@@ -3092,59 +3121,53 @@ unsigned HeartConfig::GetEvaluateNumItsEveryNSolves()
 bool HeartConfig::HasPurkinje()
 {
     CheckSimulationIsDefined("Purkinje");
-    return mpUserParameters->Simulation()->Purkinje().present();
+    return mpParameters->Simulation()->Purkinje().present();
 }
 
 double HeartConfig::GetPurkinjeCapacitance()
 {
-    if (mpUserParameters->Physiological().Purkinje().present() &&
-        mpUserParameters->Physiological().Purkinje()->Capacitance().present())
-    {
-        return mpUserParameters->Physiological().Purkinje()->Capacitance().get();
-    }
-    NEVER_REACHED;
+    CHECK_EXISTS(mpParameters->Physiological().Purkinje().present(), "Physiological/Purkinje");
+    CHECK_EXISTS(mpParameters->Physiological().Purkinje()->Capacitance().present(),
+                 "Physiological/Purkinje/Capacitance");
+    return mpParameters->Physiological().Purkinje()->Capacitance().get();
 }
 
 void HeartConfig::SetPurkinjeCapacitance(double capacitance)
 {
-    ENSURE_SECTION_PRESENT(mpUserParameters->Physiological().Purkinje(), cp::purkinje_physiological_type);
+    ENSURE_SECTION_PRESENT(mpParameters->Physiological().Purkinje(), cp::purkinje_physiological_type);
     XSD_CREATE_WITH_FIXED_ATTR1(cp::capacitance_type, purk_Cm, capacitance, "uF/cm^2");
-    mpUserParameters->Physiological().Purkinje()->Capacitance().set(purk_Cm);
+    mpParameters->Physiological().Purkinje()->Capacitance().set(purk_Cm);
 }
 
 
 double HeartConfig::GetPurkinjeSurfaceAreaToVolumeRatio()
 {
-    if (mpUserParameters->Physiological().Purkinje().present() &&
-        mpUserParameters->Physiological().Purkinje()->SurfaceAreaToVolumeRatio().present())
-    {
-        return mpUserParameters->Physiological().Purkinje()->SurfaceAreaToVolumeRatio().get();
-    }
-    NEVER_REACHED;
+    CHECK_EXISTS(mpParameters->Physiological().Purkinje().present(), "Physiological/Purkinje");
+    CHECK_EXISTS(mpParameters->Physiological().Purkinje()->SurfaceAreaToVolumeRatio().present(),
+                 "Physiological/Purkinje/SurfaceAreaToVolumeRatio");
+    return mpParameters->Physiological().Purkinje()->SurfaceAreaToVolumeRatio().get();
 }
 
 void HeartConfig::SetPurkinjeSurfaceAreaToVolumeRatio(double ratio)
 {
-    ENSURE_SECTION_PRESENT(mpUserParameters->Physiological().Purkinje(), cp::purkinje_physiological_type);
+    ENSURE_SECTION_PRESENT(mpParameters->Physiological().Purkinje(), cp::purkinje_physiological_type);
     XSD_CREATE_WITH_FIXED_ATTR1(cp::inverse_length_type, purk_Am, ratio, "1/cm");
-    mpUserParameters->Physiological().Purkinje()->SurfaceAreaToVolumeRatio().set(purk_Am);
+    mpParameters->Physiological().Purkinje()->SurfaceAreaToVolumeRatio().set(purk_Am);
 }
 
 double HeartConfig::GetPurkinjeConductivity()
 {
-    if (mpUserParameters->Physiological().Purkinje().present() &&
-        mpUserParameters->Physiological().Purkinje()->Conductivity().present())
-    {
-        return mpUserParameters->Physiological().Purkinje()->Conductivity().get();
-    }
-    NEVER_REACHED;
+    CHECK_EXISTS(mpParameters->Physiological().Purkinje().present(), "Physiological/Purkinje");
+    CHECK_EXISTS(mpParameters->Physiological().Purkinje()->Conductivity().present(),
+            "Physiological/Purkinje/Conductivity");
+    return mpParameters->Physiological().Purkinje()->Conductivity().get();
 }
 
 void HeartConfig::SetPurkinjeConductivity(double conductivity)
 {
-    ENSURE_SECTION_PRESENT(mpUserParameters->Physiological().Purkinje(), cp::purkinje_physiological_type);
+    ENSURE_SECTION_PRESENT(mpParameters->Physiological().Purkinje(), cp::purkinje_physiological_type);
     XSD_CREATE_WITH_FIXED_ATTR1(cp::conductivity_type, purkinje_conductivity, conductivity, "mS/cm");
-    mpUserParameters->Physiological().Purkinje()->Conductivity().set(purkinje_conductivity);
+    mpParameters->Physiological().Purkinje()->Conductivity().set(purkinje_conductivity);
 }
 
 /**********************************************************************

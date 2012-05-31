@@ -953,9 +953,9 @@ public:
         TS_ASSERT_THROWS_THIS(monodomain_problem.Solve(),"Cardiac tissue is null, Initialise() probably hasn\'t been called");
 
         // Throws because mesh filename is unset
-        TS_ASSERT_THROWS_THIS(monodomain_problem.Initialise(),
+        TS_ASSERT_THROWS_CONTAINS(monodomain_problem.Initialise(),
                 "No mesh given: define it in XML parameters file or call SetMesh()\n"
-                "Assertion tripped: IsMeshProvided()");
+                "No XML element Simulation/Mesh found in parameters when calling");
 
         // Throws because initialise hasn't been called
         TS_ASSERT_THROWS_THIS(monodomain_problem.Solve(),"Cardiac tissue is null, Initialise() probably hasn\'t been called");
