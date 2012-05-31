@@ -1254,11 +1254,11 @@ public:
         // Tests for set functions of postprocessing
         HeartConfig::Reset();
 
-        TS_ASSERT_EQUALS(HeartConfig::Instance()->IsPostProcessingSectionPresent(), true); // It's in the defaults, but empty
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->IsPostProcessingSectionPresent(), false);
         TS_ASSERT_EQUALS(HeartConfig::Instance()->IsPostProcessingRequested(), false);
         TS_ASSERT_EQUALS(HeartConfig::Instance()->IsApdMapsRequested(), false);
         std::vector<std::pair<double,double> > apds, apd_maps;
-        apds.push_back(std::pair<double, double>(90,-30));//reploarisation percentage first, as per schema
+        apds.push_back(std::pair<double, double>(90,-30));//repolarisation percentage first, as per schema
         HeartConfig::Instance()->SetApdMaps(apds);
         TS_ASSERT_EQUALS(HeartConfig::Instance()->IsApdMapsRequested(), true);
         TS_ASSERT_EQUALS(HeartConfig::Instance()->IsPostProcessingRequested(), true);
@@ -1267,7 +1267,7 @@ public:
         TS_ASSERT_EQUALS(apd_maps[0].first,90);
         TS_ASSERT_EQUALS(apd_maps[0].second,-30);
 
-        apds[0].first = 80;//reploarisation percentage first, as per schema
+        apds[0].first = 80;//repolarisation percentage first, as per schema
         apds[0].second = -45;
         HeartConfig::Instance()->SetApdMaps(apds);
         TS_ASSERT_EQUALS(HeartConfig::Instance()->IsApdMapsRequested(), true);
@@ -1278,7 +1278,7 @@ public:
         TS_ASSERT_EQUALS(apd_maps[0].second,-45);
 
         HeartConfig::Reset();
-        TS_ASSERT_EQUALS(HeartConfig::Instance()->IsPostProcessingSectionPresent(), true); // It's in the defaults, but empty
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->IsPostProcessingSectionPresent(), false);
         TS_ASSERT_EQUALS(HeartConfig::Instance()->IsPostProcessingRequested(), false);
         TS_ASSERT_EQUALS(HeartConfig::Instance()->IsUpstrokeTimeMapsRequested(), false);
         std::vector<double> upstroke_time_map, upstroke_time_map_get;
@@ -1293,7 +1293,7 @@ public:
         TS_ASSERT_EQUALS(upstroke_time_map_get[1],55);
 
         HeartConfig::Reset();
-        TS_ASSERT_EQUALS(HeartConfig::Instance()->IsPostProcessingSectionPresent(), true); // It's in the defaults, but empty
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->IsPostProcessingSectionPresent(), false);
         TS_ASSERT_EQUALS(HeartConfig::Instance()->IsPostProcessingRequested(), false);
         TS_ASSERT_EQUALS(HeartConfig::Instance()->IsMaxUpstrokeVelocityMapRequested(), false);
         std::vector<double> upstroke_velocity_map, upstroke_velocity_map_get;
@@ -1308,7 +1308,7 @@ public:
         TS_ASSERT_EQUALS(upstroke_velocity_map_get[1],55);
 
         HeartConfig::Reset();
-        TS_ASSERT_EQUALS(HeartConfig::Instance()->IsPostProcessingSectionPresent(), true); // It's in the defaults, but empty
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->IsPostProcessingSectionPresent(), false);
         TS_ASSERT_EQUALS(HeartConfig::Instance()->IsPostProcessingRequested(), false);
         TS_ASSERT_EQUALS(HeartConfig::Instance()->IsConductionVelocityMapsRequested(), false);
         std::vector<unsigned> conduction_velocity_map, conduction_velocity_map_get;
@@ -1321,7 +1321,7 @@ public:
         TS_ASSERT_EQUALS(conduction_velocity_map_get[0],25u);
 
         HeartConfig::Reset();
-        TS_ASSERT_EQUALS(HeartConfig::Instance()->IsPostProcessingSectionPresent(), true); // It's in the defaults, but empty
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->IsPostProcessingSectionPresent(), false);
         TS_ASSERT_EQUALS(HeartConfig::Instance()->IsPostProcessingRequested(), false);
         TS_ASSERT_EQUALS(HeartConfig::Instance()->IsAnyNodalTimeTraceRequested(), false);
         std::vector<unsigned> requested_nodes, requested_nodes_get;
@@ -1336,7 +1336,7 @@ public:
         TS_ASSERT_EQUALS(requested_nodes_get[1],2545u);
 
         HeartConfig::Reset();
-        TS_ASSERT_EQUALS(HeartConfig::Instance()->IsPostProcessingSectionPresent(), true); // It's in the defaults, but empty
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->IsPostProcessingSectionPresent(), false);
         TS_ASSERT_EQUALS(HeartConfig::Instance()->IsPostProcessingRequested(), false);
         TS_ASSERT_EQUALS(HeartConfig::Instance()->IsPseudoEcgCalculationRequested(), false);
         std::vector<ChastePoint<3> > pseudo_ecg_parameters, pseudo_ecg_parameters_get;
@@ -1983,6 +1983,68 @@ public:
                               "No CheckpointSimulation provided (neither default nor user defined)");
         TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetMaxCheckpointsOnDisk(),
                               "No CheckpointSimulation provided (neither default nor user defined)");
+    }
+
+private:
+    void WriteParamsFile(boost::shared_ptr<cp::chaste_parameters_type> pParams,
+                         const std::string& rDirname,
+                         const std::string& rFilename)
+    {
+        OutputFileHandler handler(rDirname); // Create folder
+        out_stream p_parameters_file = handler.OpenOutputFile(rFilename);
+        TS_ASSERT(p_parameters_file->is_open());
+        ::xml_schema::namespace_infomap map;
+        map[""].schema = "ChasteParameters_1_1.xsd";
+        map["cp20"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/2_0";
+        map["cp20"].schema = "ChasteParameters_2_0.xsd";
+        map["cp21"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/2_1";
+        map["cp21"].schema = "ChasteParameters_2_1.xsd";
+        map["cp22"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/2_2";
+        map["cp22"].schema = "ChasteParameters_2_2.xsd";
+        map["cp23"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/2_3";
+        map["cp23"].schema = "ChasteParameters_2_3.xsd";
+        map["cp30"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/3_0";
+        map["cp30"].schema = "ChasteParameters_3_0.xsd";
+        map["cp"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/3_1";
+        map["cp"].schema = "ChasteParameters_3_1.xsd";
+        cp::ChasteParameters(*p_parameters_file, *pParams, map);
+    }
+
+public:
+    void TestMergingParameters() throw (Exception)
+    {
+        std::string base = OutputFileHandler::GetChasteTestOutputDirectory() + "ChasteResults/";
+        std::string file_name = "/ChasteParameters.xml";
+        // Reading in an empty parameters file should give you the defaults everywhere
+        HeartConfig::Instance()->Reset();
+        std::string dir1("TestHeartConfig_TestMergingParameters_reset");
+        std::string dir2("TestHeartConfig_TestMergingParameters_empty");
+        HeartConfig::Instance()->Write(false, dir1);
+        HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteEmpty.xml");
+        HeartConfig::Instance()->Write(false, dir2);
+        EXPECT0(system, "diff " + base + dir1 + file_name + " " + base + dir2 + file_name);
+
+        // Reading in a parameters file that specifies everything should give you that file
+        HeartConfig::Instance()->Reset();
+        dir1 = "TestHeartConfig_TestMergingParameters_full_merged";
+        dir2 = "TestHeartConfig_TestMergingParameters_full_read";
+        HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersFullFormat.xml");
+        HeartConfig::Instance()->Write(false, dir1);
+        // We need to read & then write the reference file, to avoid whitespace and namespace prefix differences
+        WriteParamsFile(HeartConfig::Instance()->ReadFile("heart/test/data/xml/ChasteParametersFullFormat.xml"),
+                        "ChasteResults/" + dir2, file_name);
+        EXPECT0(system, "diff " + base + dir1 + file_name + " " + base + dir2 + file_name);
+
+        // Check we deal with resuming too
+        HeartConfig::Instance()->Reset();
+        dir1 = "TestHeartConfig_TestMergingParameters_resume_merged";
+        dir2 = "TestHeartConfig_TestMergingParameters_resume_read";
+        HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersResumeSimulationFullFormat.xml");
+        WriteParamsFile(HeartConfig::Instance()->mpUserParameters, "ChasteResults/" + dir1, file_name);
+        // We need to read & then write the reference file, to avoid whitespace and namespace prefix differences
+        WriteParamsFile(HeartConfig::Instance()->ReadFile("heart/test/data/xml/ChasteParametersResumeSimulationFullFormat.xml"),
+                        "ChasteResults/" + dir2, file_name);
+        EXPECT0(system, "diff " + base + dir1 + file_name + " " + base + dir2 + file_name);
     }
 
 };

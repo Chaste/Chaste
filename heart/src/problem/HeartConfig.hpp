@@ -117,41 +117,15 @@ private:
     template<class Archive>
     void load(Archive & archive, const unsigned int version)
     {
-        /*
-         *  This method implements the logic required by HeartConfig to be able to handle resuming a simulation via the executable.
-         *
-         *  When the control reaches the method mpUserParameters and mpDefaultParameters point to the files specified as resuming parameters.
-         *  However SetDefaultsFile() and SetParametersFile() will set those variables to point to the archived parameters.
-         *
-         *  We make a temporary copy of mpUserParameters so we don't lose its content. At the end of the method we update the new mpUserParameters
-         *  with the resuming parameters.
-         */
-        assert(mpUserParameters.use_count() > 0);
-        boost::shared_ptr<cp::chaste_parameters_type> p_new_parameters = mpUserParameters;
-
-        std::string defaults_filename_xml = ArchiveLocationInfo::GetArchiveDirectory() + "ChasteDefaults.xml";
-        HeartConfig::Instance()->SetDefaultsFile(defaults_filename_xml);
-
-        /*
-         *  When we unarchive a simulation, we load the old parameters file in order to inherit things such
-         *  as default cell model, stimuli, heterogeneities, ... This has the side effect of inheriting the
-         *  <CheckpointSimulation> element (if defined).
-         *
-         *  We disable checkpointing definition coming from the unarchived config file. We will enable it again
-         *  if defined in the resume config file.
-         */
-        std::string parameters_filename_xml = ArchiveLocationInfo::GetArchiveDirectory() + "ChasteParameters.xml";
-        HeartConfig::Instance()->SetParametersFile(parameters_filename_xml);
-
-        HeartConfig::Instance()->SetCheckpointSimulation(false);
-
-        // If we are resuming a simulation, some parameters can be altered at this point.
-        if (p_new_parameters->ResumeSimulation().present())
-        {
-            UpdateParametersFromResumeSimulation(p_new_parameters);
-        }
+        LoadFromCheckpoint();
     }
     BOOST_SERIALIZATION_SPLIT_MEMBER()
+
+    /**
+     * This method is called by load() to do the actual work - we don't need the Boost archives
+     * since we load from our serialised XML.
+     */
+    void LoadFromCheckpoint();
 
     /**
      * When loading a simulation from archive, some parameters can get overridden by the content of the ResumeSimulation

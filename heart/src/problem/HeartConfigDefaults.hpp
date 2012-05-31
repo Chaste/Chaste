@@ -68,8 +68,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <SurfaceAreaToVolumeRatio unit="1/cm"> 1400 </SurfaceAreaToVolumeRatio>
         <Capacitance unit="uF/cm^2"> 1.0 </Capacitance>
         <Purkinje>
-            <SurfaceAreaToVolumeRatio unit="1/cm"> 8000 </SurfaceAreaToVolumeRatio>
+            <SurfaceAreaToVolumeRatio unit="1/cm"> 2800 </SurfaceAreaToVolumeRatio>
             <Capacitance unit="uF/cm^2"> 1.0 </Capacitance>
+            <Conductivity unit="mS/cm"> 1.75 </Conductivity>
         </Purkinje>
     </Physiological>
 
@@ -83,9 +84,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <MeshPartitioning>metis</MeshPartitioning>
         <UseStateVariableInterpolation>no</UseStateVariableInterpolation>
     </Numerical>
-
-    <PostProcessing>
-    </PostProcessing>
 </ChasteParameters>
 \endverbatim
  */
@@ -143,14 +141,84 @@ boost::shared_ptr<cp::chaste_parameters_type> CreateDefaultParameters()
     numerical_params.MeshPartitioning().set(mesh_partitioning);
     numerical_params.UseStateVariableInterpolation().set(cp::yesno_type::no);
 
-    // Postprocessing
-    cp::postprocessing_type postproc;
+    // Postprocessing - empty is equivalent to missing, so don't include it
+    //cp::postprocessing_type postproc;
 
     // Full default parameters
     boost::shared_ptr<cp::chaste_parameters_type> p_defaults(new cp::chaste_parameters_type(phys_params, numerical_params));
     p_defaults->Simulation().set(simulation_params);
-    p_defaults->PostProcessing().set(postproc);
+    //p_defaults->PostProcessing().set(postproc);
     return p_defaults;
+}
+
+
+#define MERGE_PARAM(path)                                 \
+    if (!pParams->path().present()) {                     \
+        if (pDefaults->path().present()) {                \
+            pParams->path().set(pDefaults->path().get()); \
+        }                                                 \
+    }
+#define ELSE_IF_DEFAULT(path)                             \
+    else if (pDefaults->path().present())
+
+void MergeDefaults(boost::shared_ptr<cp::chaste_parameters_type> pParams,
+                   boost::shared_ptr<cp::chaste_parameters_type> pDefaults)
+{
+    // Simulation and ResumeSimulation are mutually exclusive
+    if (!pParams->ResumeSimulation().present())
+    {
+        MERGE_PARAM(Simulation)
+        ELSE_IF_DEFAULT(Simulation) // Simulation() exists in both
+        {
+            MERGE_PARAM(Simulation()->SpaceDimension)
+            MERGE_PARAM(Simulation()->Domain)
+            MERGE_PARAM(Simulation()->IonicModels)
+            ELSE_IF_DEFAULT(Simulation()->IonicModels) // Simulation()->IonicModels() exists in both
+            {
+                //MERGE_PARAM(Simulation()->IonicModels()->Default) // This must be present if IonicModels is
+            }
+            MERGE_PARAM(Simulation()->OutputDirectory)
+            MERGE_PARAM(Simulation()->OutputFilenamePrefix)
+        }
+
+        // Physiological() is mandatory
+        //MERGE_PARAM(Physiological)
+        //ELSE_IF_DEFAULT(Physiological) // Physiological() exists in both
+        {
+            MERGE_PARAM(Physiological().IntracellularConductivities)
+            MERGE_PARAM(Physiological().ExtracellularConductivities)
+            MERGE_PARAM(Physiological().BathConductivity)
+            MERGE_PARAM(Physiological().SurfaceAreaToVolumeRatio)
+            MERGE_PARAM(Physiological().Capacitance)
+            MERGE_PARAM(Physiological().Purkinje)
+            ELSE_IF_DEFAULT(Physiological().Purkinje) // Physiological()->Purkinje() exists in both
+            {
+                MERGE_PARAM(Physiological().Purkinje()->SurfaceAreaToVolumeRatio)
+                MERGE_PARAM(Physiological().Purkinje()->Capacitance)
+                MERGE_PARAM(Physiological().Purkinje()->Conductivity)
+            }
+        }
+
+        // Numerical() is mandatory
+        //MERGE_PARAM(Numerical)
+        //ELSE_IF_DEFAULT(Numerical) // Numerical() exists in both
+        {
+            MERGE_PARAM(Numerical().TimeSteps)
+            MERGE_PARAM(Numerical().KSPTolerances)
+            ELSE_IF_DEFAULT(Numerical().KSPTolerances) // Numerical()->KSPTolerances() exists in both
+            {
+                // Note that we aren't allowed both absolute and relative tolerances
+                if (!pParams->Numerical().KSPTolerances()->KSPRelative().present())
+                {
+                    MERGE_PARAM(Numerical().KSPTolerances()->KSPAbsolute)
+                }
+            }
+            MERGE_PARAM(Numerical().KSPSolver)
+            MERGE_PARAM(Numerical().KSPPreconditioner)
+            MERGE_PARAM(Numerical().MeshPartitioning)
+            MERGE_PARAM(Numerical().UseStateVariableInterpolation)
+        }
+    }
 }
 
 #endif /*HEARTCONFIGDEFAULTS_HPP_*/

@@ -224,6 +224,8 @@ HeartConfig::~HeartConfig()
 {
 }
 
+
+///\todo #1613 remove
 void HeartConfig::SetDefaultsFile(const std::string& rFileName)
 {
     bool same_target = (mpUserParameters == mpDefaultParameters);
@@ -255,7 +257,7 @@ void HeartConfig::Write(bool useArchiveLocationInfo, std::string subfolderName)
         //Only the master process is writing the configuration files
         return;
     }
-    out_stream p_defaults_file( new std::ofstream( (output_dirname+"ChasteDefaults.xml").c_str() ) );
+    out_stream p_defaults_file( new std::ofstream( (output_dirname+"ChasteDefaults.xml").c_str() ) ); ///\todo remove
     out_stream p_parameters_file( new std::ofstream( (output_dirname+"ChasteParameters.xml").c_str() ) );
 
     if (!p_defaults_file->is_open() || !p_parameters_file->is_open())
@@ -291,6 +293,49 @@ void HeartConfig::Write(bool useArchiveLocationInfo, std::string subfolderName)
     if (useArchiveLocationInfo)
     {
         CopySchema(output_dirname);
+    }
+}
+
+void HeartConfig::LoadFromCheckpoint()
+{
+    /*
+     *  This method implements the logic required by HeartConfig to be able to handle resuming a simulation via the executable.
+     *
+     *  When the control reaches the method mpUserParameters and mpDefaultParameters point to the files specified as resuming parameters.
+     *  However SetDefaultsFile() and SetParametersFile() will set those variables to point to the archived parameters.
+     *
+     *  We make a temporary copy of mpUserParameters so we don't lose its content. At the end of the method we update the new mpUserParameters
+     *  with the resuming parameters.
+     */
+    assert(mpUserParameters.use_count() > 0);
+    boost::shared_ptr<cp::chaste_parameters_type> p_new_parameters = mpUserParameters;
+
+    /*
+     *  When we unarchive a simulation, we load the old parameters file in order to inherit things such
+     *  as default cell model, stimuli, heterogeneities, ... This has the side effect of inheriting the
+     *  <CheckpointSimulation> element (if defined).
+     *
+     *  We disable checkpointing definition coming from the unarchived config file. We will enable it again
+     *  if defined in the resume config file.
+     */
+    std::string parameters_filename_xml = ArchiveLocationInfo::GetArchiveDirectory() + "ChasteParameters.xml";
+    mpUserParameters = ReadFile(parameters_filename_xml);
+    mParametersFilePath.SetPath(parameters_filename_xml, RelativeTo::AbsoluteOrCwd);
+
+    // Release 3.0 and earlier wrote a separate defaults file in the checkpoint
+    std::string defaults_filename_xml = ArchiveLocationInfo::GetArchiveDirectory() + "ChasteDefaults.xml";
+    if (FileFinder(defaults_filename_xml).Exists())
+    {
+        boost::shared_ptr<cp::chaste_parameters_type> p_defaults = ReadFile(defaults_filename_xml);
+        MergeDefaults(mpUserParameters, p_defaults);
+    }
+
+    HeartConfig::Instance()->SetCheckpointSimulation(false);
+
+    // If we are resuming a simulation, some parameters can be altered at this point.
+    if (p_new_parameters->ResumeSimulation().present())
+    {
+        UpdateParametersFromResumeSimulation(p_new_parameters);
     }
 }
 
@@ -458,6 +503,7 @@ boost::shared_ptr<cp::chaste_parameters_type> HeartConfig::ReadFile(const std::s
 void HeartConfig::SetParametersFile(const std::string& rFileName)
 {
     mpUserParameters = ReadFile(rFileName);
+    MergeDefaults(mpUserParameters, CreateDefaultParameters());
     mParametersFilePath.SetPath(rFileName, RelativeTo::AbsoluteOrCwd);
 
     CheckTimeSteps(); // For consistency with SetDefaultsFile
@@ -1950,13 +1996,16 @@ bool HeartConfig::IsPostProcessingRequested() const
 }
 bool HeartConfig::IsApdMapsRequested() const
 {
-    assert(IsPostProcessingSectionPresent());
-
-    XSD_SEQUENCE_TYPE(cp::postprocessing_type::ActionPotentialDurationMap)&
-        apd_maps = DecideLocation( & mpUserParameters->PostProcessing(),
-                                   & mpDefaultParameters->PostProcessing(),
-                                   "ActionPotentialDurationMap")->get().ActionPotentialDurationMap();
-    return (apd_maps.begin() != apd_maps.end());
+    bool result = false;
+    if (IsPostProcessingSectionPresent())
+    {
+        XSD_SEQUENCE_TYPE(cp::postprocessing_type::ActionPotentialDurationMap)&
+            apd_maps = DecideLocation( & mpUserParameters->PostProcessing(),
+                                       & mpDefaultParameters->PostProcessing(),
+                                       "ActionPotentialDurationMap")->get().ActionPotentialDurationMap();
+        result = (apd_maps.begin() != apd_maps.end());
+    }
+    return result;
 }
 
 void HeartConfig::GetApdMaps(std::vector<std::pair<double,double> >& apd_maps) const
@@ -1981,13 +2030,16 @@ void HeartConfig::GetApdMaps(std::vector<std::pair<double,double> >& apd_maps) c
 
 bool HeartConfig::IsUpstrokeTimeMapsRequested() const
 {
-    assert(IsPostProcessingSectionPresent());
-
-    XSD_SEQUENCE_TYPE(cp::postprocessing_type::UpstrokeTimeMap)&
-        upstroke_map = DecideLocation( & mpUserParameters->PostProcessing(),
-                                       & mpDefaultParameters->PostProcessing(),
-                                       "UpstrokeTimeMap")->get().UpstrokeTimeMap();
-    return (upstroke_map.begin() != upstroke_map.end());
+    bool result = false;
+    if (IsPostProcessingSectionPresent())
+    {
+        XSD_SEQUENCE_TYPE(cp::postprocessing_type::UpstrokeTimeMap)&
+            upstroke_map = DecideLocation( & mpUserParameters->PostProcessing(),
+                                           & mpDefaultParameters->PostProcessing(),
+                                           "UpstrokeTimeMap")->get().UpstrokeTimeMap();
+        result = (upstroke_map.begin() != upstroke_map.end());
+    }
+    return result;
 }
 void HeartConfig::GetUpstrokeTimeMaps (std::vector<double>& upstroke_time_maps) const
 {
@@ -2009,14 +2061,16 @@ void HeartConfig::GetUpstrokeTimeMaps (std::vector<double>& upstroke_time_maps) 
 
 bool HeartConfig::IsMaxUpstrokeVelocityMapRequested() const
 {
-    assert(IsPostProcessingSectionPresent());
-
-    XSD_SEQUENCE_TYPE(cp::postprocessing_type::MaxUpstrokeVelocityMap)&
-        max_upstroke_velocity_map = DecideLocation( & mpUserParameters->PostProcessing(),
-                                                    & mpDefaultParameters->PostProcessing(),
-                                                    "MaxUpstrokeVelocityMap")->get().MaxUpstrokeVelocityMap();
-
-    return (max_upstroke_velocity_map.begin() != max_upstroke_velocity_map.end());
+    bool result = false;
+    if (IsPostProcessingSectionPresent())
+    {
+        XSD_SEQUENCE_TYPE(cp::postprocessing_type::MaxUpstrokeVelocityMap)&
+            max_upstroke_velocity_map = DecideLocation( & mpUserParameters->PostProcessing(),
+                                                        & mpDefaultParameters->PostProcessing(),
+                                                        "MaxUpstrokeVelocityMap")->get().MaxUpstrokeVelocityMap();
+        result = (max_upstroke_velocity_map.begin() != max_upstroke_velocity_map.end());
+    }
+    return result;
 }
 
 void HeartConfig::GetMaxUpstrokeVelocityMaps(std::vector<double>& upstroke_velocity_maps) const
@@ -2039,13 +2093,16 @@ void HeartConfig::GetMaxUpstrokeVelocityMaps(std::vector<double>& upstroke_veloc
 
 bool HeartConfig::IsConductionVelocityMapsRequested() const
 {
-    assert(IsPostProcessingSectionPresent());
-
-    XSD_SEQUENCE_TYPE(cp::postprocessing_type::ConductionVelocityMap)&
-        cond_vel_maps = DecideLocation( & mpUserParameters->PostProcessing(),
-                                        & mpDefaultParameters->PostProcessing(),
-                                        "ConductionVelocityMap")->get().ConductionVelocityMap();
-    return (cond_vel_maps.begin() != cond_vel_maps.end());
+    bool result = false;
+    if (IsPostProcessingSectionPresent())
+    {
+        XSD_SEQUENCE_TYPE(cp::postprocessing_type::ConductionVelocityMap)&
+            cond_vel_maps = DecideLocation( & mpUserParameters->PostProcessing(),
+                                            & mpDefaultParameters->PostProcessing(),
+                                            "ConductionVelocityMap")->get().ConductionVelocityMap();
+        result = (cond_vel_maps.begin() != cond_vel_maps.end());
+    }
+    return result;
 }
 
 void HeartConfig::GetConductionVelocityMaps(std::vector<unsigned>& conduction_velocity_maps) const
@@ -2068,13 +2125,16 @@ void HeartConfig::GetConductionVelocityMaps(std::vector<unsigned>& conduction_ve
 
 bool HeartConfig::IsAnyNodalTimeTraceRequested() const
 {
-    assert(IsPostProcessingSectionPresent());
-
-    XSD_SEQUENCE_TYPE(cp::postprocessing_type::TimeTraceAtNode)&
-        requested_nodes = DecideLocation( & mpUserParameters->PostProcessing(),
-                                        & mpDefaultParameters->PostProcessing(),
-                                        "TimeTraceAtNode")->get().TimeTraceAtNode();
-    return (requested_nodes.begin() != requested_nodes.end());
+    bool result = false;
+    if (IsPostProcessingSectionPresent())
+    {
+        XSD_SEQUENCE_TYPE(cp::postprocessing_type::TimeTraceAtNode)&
+            requested_nodes = DecideLocation( & mpUserParameters->PostProcessing(),
+                                            & mpDefaultParameters->PostProcessing(),
+                                            "TimeTraceAtNode")->get().TimeTraceAtNode();
+        result = (requested_nodes.begin() != requested_nodes.end());
+    }
+    return result;
 }
 
 void HeartConfig::GetNodalTimeTraceRequested(std::vector<unsigned>& rRequestedNodes) const
@@ -2098,13 +2158,16 @@ void HeartConfig::GetNodalTimeTraceRequested(std::vector<unsigned>& rRequestedNo
 
 bool HeartConfig::IsPseudoEcgCalculationRequested() const
 {
-    assert(IsPostProcessingSectionPresent());
-
-    XSD_SEQUENCE_TYPE(cp::postprocessing_type::PseudoEcgElectrodePosition)&
-        electrodes = DecideLocation( & mpUserParameters->PostProcessing(),
-                                     & mpDefaultParameters->PostProcessing(),
-                                     "PseudoEcgElectrodePosition")->get().PseudoEcgElectrodePosition();
-    return (electrodes.begin() != electrodes.end());
+    bool result = false;
+    if (IsPostProcessingSectionPresent())
+    {
+        XSD_SEQUENCE_TYPE(cp::postprocessing_type::PseudoEcgElectrodePosition)&
+            electrodes = DecideLocation( & mpUserParameters->PostProcessing(),
+                                         & mpDefaultParameters->PostProcessing(),
+                                         "PseudoEcgElectrodePosition")->get().PseudoEcgElectrodePosition();
+        result = (electrodes.begin() != electrodes.end());
+    }
+    return result;
 }
 
 template<unsigned SPACE_DIM>
