@@ -152,15 +152,35 @@ boost::shared_ptr<cp::chaste_parameters_type> CreateDefaultParameters()
 }
 
 
+/**
+ * If the given parameter is not present in the user parameters, but is in the defaults,
+ * then copy its value from defaults to user parameters.
+ *
+ * @param path  the XSD data model path to the given parameter
+ */
 #define MERGE_PARAM(path)                                 \
     if (!pParams->path().present()) {                     \
         if (pDefaults->path().present()) {                \
             pParams->path().set(pDefaults->path().get()); \
         }                                                 \
     }
+/**
+ * An "else if" clause that tests if the given parameter is present in the defaults.
+ *
+ * @param path  the XSD data model path to the given parameter
+ */
 #define ELSE_IF_DEFAULT(path)                             \
     else if (pDefaults->path().present())
 
+/**
+ * Merge the default parameters (as defined by CreateDefaultParameters above) into given
+ * user parameters.  Any parameter that is in the defaults but not the user parameters
+ * will have its value copied over.
+ *
+ * @param pParams  the user parameters
+ * @param pDefaults  the default parameters, which must have been created by CreateDefaultParameters
+ *    (or be a subset thereof) for this method to work as intended
+ */
 void MergeDefaults(boost::shared_ptr<cp::chaste_parameters_type> pParams,
                    boost::shared_ptr<cp::chaste_parameters_type> pDefaults)
 {

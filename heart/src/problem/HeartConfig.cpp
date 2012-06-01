@@ -1405,16 +1405,8 @@ bool HeartConfig::GetCheckpointSimulation() const
 double HeartConfig::GetCheckpointTimestep() const
 {
     CHECK_EXISTS(GetCheckpointSimulation(), "Simulation/CheckpointSimulation");
-    if (IsSimulationDefined())
-    {
-        return mpParameters->Simulation()->CheckpointSimulation()->timestep();
-    }
-    else
-    {
-        ///\todo #1613 Figure out how this branch gets called, and whether it's really needed
-        CheckResumeSimulationIsDefined("GetCheckpointTimestep");
-        return mpParameters->ResumeSimulation()->CheckpointSimulation()->timestep();
-    }
+    CHECK_EXISTS(IsSimulationDefined(), "Simulation");
+    return mpParameters->Simulation()->CheckpointSimulation()->timestep();
 }
 
 unsigned HeartConfig::GetMaxCheckpointsOnDisk() const
