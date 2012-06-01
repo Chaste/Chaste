@@ -1388,40 +1388,19 @@ bool HeartConfig::GetOutputUsingOriginalNodeOrdering()
 
 bool HeartConfig::GetCheckpointSimulation() const
 {
-    bool result = false;
-    if (IsSimulationDefined())
-    {
-        result = mpParameters->Simulation()->CheckpointSimulation().present();
-    }
-    else
-    {
-        ///\todo #1613 Figure out how this branch gets called, and whether it's really needed
-        CheckResumeSimulationIsDefined("GetCheckpointSimulation");
-        result = mpParameters->ResumeSimulation()->CheckpointSimulation().present();
-    }
-    return result;
+    return IsSimulationDefined() && mpParameters->Simulation()->CheckpointSimulation().present();
 }
 
 double HeartConfig::GetCheckpointTimestep() const
 {
     CHECK_EXISTS(GetCheckpointSimulation(), "Simulation/CheckpointSimulation");
-    CHECK_EXISTS(IsSimulationDefined(), "Simulation");
     return mpParameters->Simulation()->CheckpointSimulation()->timestep();
 }
 
 unsigned HeartConfig::GetMaxCheckpointsOnDisk() const
 {
     CHECK_EXISTS(GetCheckpointSimulation(), "Simulation/CheckpointSimulation");
-    if (IsSimulationDefined())
-    {
-        return mpParameters->Simulation()->CheckpointSimulation()->max_checkpoints_on_disk();
-    }
-    else
-    {
-        ///\todo #1613 Figure out how this branch gets called, and whether it's really needed
-        CheckResumeSimulationIsDefined("GetMaxCheckpointsOnDisk");
-        return mpParameters->ResumeSimulation()->CheckpointSimulation()->max_checkpoints_on_disk();
-    }
+    return mpParameters->Simulation()->CheckpointSimulation()->max_checkpoints_on_disk();
 }
 
 

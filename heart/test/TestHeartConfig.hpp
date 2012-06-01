@@ -1755,8 +1755,12 @@ public:
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetArchivedSimulationDir().GetAbsolutePath(),
                          OutputFileHandler::GetChasteTestOutputDirectory() + "ChasteResults_10ms");
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetSimulationDuration(), 20.0);
-        TS_ASSERT(HeartConfig::Instance()->GetCheckpointSimulation());
-        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetMaxCheckpointsOnDisk(),3u);
+        // These can't be called usefully until the simulation has been loaded (not just the resume parameters file)
+        TS_ASSERT(!HeartConfig::Instance()->GetCheckpointSimulation());
+        TS_ASSERT_THROWS_CONTAINS(HeartConfig::Instance()->GetMaxCheckpointsOnDisk(),
+                                  "No XML element Simulation/CheckpointSimulation found in parameters");
+        TS_ASSERT_THROWS_CONTAINS(HeartConfig::Instance()->GetCheckpointTimestep(),
+                                  "No XML element Simulation/CheckpointSimulation found in parameters");
 
         // Cover loads of methods where we ask for information that is not present in a ResumedSimulation
         TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetDefaultIonicModel(), "DefaultIonicModel information is not available in a resumed simulation.")
