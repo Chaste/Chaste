@@ -914,7 +914,7 @@ c_matrix<double,DIM,DIM> AbstractNonlinearElasticitySolver<DIM>::GetAverageStres
 {
     if(!mSetComputeAverageStressPerElement)
     {
-        EXCEPTION("Call SetComputeAverageStressPerElementDuringSolve() before solve if calling rGetAverageStressesPerElement()");
+        EXCEPTION("Call SetComputeAverageStressPerElementDuringSolve() before solve if calling GetAverageStressesPerElement()");
     }
     assert(elementIndex<this->mrQuadMesh.GetNumElements());
 

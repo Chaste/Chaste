@@ -1078,7 +1078,7 @@ public:
                                                         "TestWritingStress");
 
         // cover exceptions
-        TS_ASSERT_THROWS_CONTAINS(solver.GetAverageStressPerElement(0), "Call SetComputeAverageStressPerElementDuringSolve() before solve if calling rGetAverageStressesPerElement()");
+        TS_ASSERT_THROWS_CONTAINS(solver.GetAverageStressPerElement(0), "Call SetComputeAverageStressPerElementDuringSolve() before solve if calling GetAverageStressesPerElement()");
         TS_ASSERT_THROWS_CONTAINS(solver.WriteCurrentAverageElementStresses("wont_be_written",0), "Call SetComputeAverageStressPerElementDuringSolve() before solve if calling WriteCurrentAverageElementStresses()");
 
         // test method, but not through calling Solve. Tests where SetComputeAverageStressPerElementDuringSolve() is
