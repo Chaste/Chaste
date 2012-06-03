@@ -278,6 +278,8 @@ public:
 //
 //            TS_ASSERT_EQUALS(p_node->rGetNodeAttributes()[0], 5.0);
 //
+            delete p_node;
+            delete p_node_1d;
     	}
     }
 
