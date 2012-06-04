@@ -82,7 +82,7 @@ public:
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        cell_population.SetOutputCellMutationStates(true); // So outputs the labeled cells
+        cell_population.SetOutputCellMutationStates(true); // So outputs the labelled cells
 
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();

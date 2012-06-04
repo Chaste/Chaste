@@ -51,6 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChemotacticForce.hpp"
 #include "RepulsionForce.hpp"
 #include "NagaiHondaForce.hpp"
+#include "NagaiHondaDifferentialAdhesionForce.hpp"
 #include "WelikyOsterForce.hpp"
 #include "DiffusionForce.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
@@ -464,6 +465,17 @@ public:
 
         std::string nagai_force_results_dir = output_file_handler.GetOutputDirectoryFullPath();
         TS_ASSERT_EQUALS(system(("diff " + nagai_force_results_dir + "nagai_results.parameters cell_based/test/data/TestForces/nagai_results.parameters").c_str()), 0);
+
+        // Test with NagaiHondaDifferentialAdhesionForce
+        NagaiHondaDifferentialAdhesionForce<2> nagai_da_force;
+        TS_ASSERT_EQUALS(nagai_da_force.GetIdentifier(), "NagaiHondaDifferentialAdhesionForce-2");
+
+        out_stream nagai_da_force_parameter_file = output_file_handler.OpenOutputFile("nagai_da_results.parameters");
+        nagai_da_force.OutputForceParameters(nagai_force_parameter_file);
+        nagai_da_force_parameter_file->close();
+
+        std::string nagai_da_force_results_dir = output_file_handler.GetOutputDirectoryFullPath();
+        TS_ASSERT_EQUALS(system(("diff " + nagai_da_force_results_dir + "nagai_da_results.parameters cell_based/test/data/TestForces/nagai_da_results.parameters").c_str()), 0);
 
         // Test with WelikyOsterForce
         WelikyOsterForce<2> weliky_force;
@@ -1047,6 +1059,115 @@ public:
             TS_ASSERT_DELTA(static_cast<NagaiHondaForce<2>*>(p_force)->GetNagaiHondaCellCellAdhesionEnergyParameter(), 0.5, 1e-12);
             TS_ASSERT_DELTA(static_cast<NagaiHondaForce<2>*>(p_force)->GetNagaiHondaCellBoundaryAdhesionEnergyParameter(), 0.6, 1e-12);
             TS_ASSERT_DELTA(static_cast<NagaiHondaForce<2>*>(p_force)->GetMatureCellTargetArea(), 0.7, 1e-12);
+
+            // Tidy up
+            delete p_force;
+        }
+    }
+
+    void TestNagaiHondaDifferentialAdhesionForceMethods() throw (Exception)
+    {
+        // Create a simple 2D VertexMesh
+        HoneycombVertexMeshGenerator generator(3, 3);
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+        MAKE_PTR(CellLabel, p_label);
+
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Create a force system
+        NagaiHondaDifferentialAdhesionForce<2> force;
+
+        // Set member variables
+        force.SetNagaiHondaLabelledCellCellAdhesionEnergyParameter(9.1);
+        force.SetNagaiHondaLabelledCellLabelledCellAdhesionEnergyParameter(2.8);
+        force.SetNagaiHondaLabelledCellBoundaryAdhesionEnergyParameter(7.3);
+        force.SetNagaiHondaCellCellAdhesionEnergyParameter(6.4);
+        force.SetNagaiHondaCellBoundaryAdhesionEnergyParameter(0.6);
+
+        // Initialise a vector of new node forces
+        std::vector<c_vector<double, 2> > node_forces;
+        node_forces.reserve(cell_population.GetNumNodes());
+
+        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        {
+            node_forces.push_back(zero_vector<double>(2));
+        }
+
+        force.AddForceContribution(node_forces, cell_population);
+
+        // Test the case where the nodes are shared by a cell on the boundary that is not labelled
+        Node<2>* p_node_0 = p_mesh->GetElement(0)->GetNode(0);
+        Node<2>* p_node_4 = p_mesh->GetElement(0)->GetNode(1);
+        double adhesion_parameter_nodes_0_4 = force.GetAdhesionParameter(p_node_0, p_node_4, cell_population);
+        TS_ASSERT_DELTA(adhesion_parameter_nodes_0_4, 0.6, 1e-6);
+
+        // Test the case where the nodes are shared by 3 non-labelled cells
+        Node<2>* p_node_10 = p_mesh->GetElement(4)->GetNode(0);
+        Node<2>* p_node_14 = p_mesh->GetElement(4)->GetNode(1);
+        double adhesion_parameter_nodes_10_14 = force.GetAdhesionParameter(p_node_10, p_node_14, cell_population);
+        TS_ASSERT_DELTA(adhesion_parameter_nodes_10_14, 6.4, 1e-6);
+
+        // Test the case where the nodes are shared by a cell on the boundary that is labelled
+        cell_population.GetCellUsingLocationIndex(0)->AddCellProperty(p_label);
+        adhesion_parameter_nodes_0_4 = force.GetAdhesionParameter(p_node_0, p_node_4, cell_population);
+        TS_ASSERT_DELTA(adhesion_parameter_nodes_0_4, 7.3, 1e-6);
+
+        // Test the case where the nodes are shared by 1 labelled cell
+        cell_population.GetCellUsingLocationIndex(4)->AddCellProperty(p_label);
+        adhesion_parameter_nodes_10_14 = force.GetAdhesionParameter(p_node_10, p_node_14, cell_population);
+        TS_ASSERT_DELTA(adhesion_parameter_nodes_10_14, 9.1, 1e-6);
+
+        // Test the case where the nodes are shared by 2 labelled cells
+        for (unsigned i=0; i<cell_population.GetNumElements(); i++)
+        {
+            cell_population.GetCellUsingLocationIndex(i)->AddCellProperty(p_label);
+        }
+        adhesion_parameter_nodes_10_14 = force.GetAdhesionParameter(p_node_10, p_node_14, cell_population);
+        TS_ASSERT_DELTA(adhesion_parameter_nodes_10_14, 2.8, 1e-6);
+    }
+
+    void TestNagaiHondaDifferentialAdhesionForceArchiving() throw (Exception)
+    {
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "NagaiHondaDifferentialAdhesionForce.arch";
+
+        {
+            NagaiHondaDifferentialAdhesionForce<2> force;
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Set member variables
+            force.SetNagaiHondaLabelledCellCellAdhesionEnergyParameter(9.1);
+            force.SetNagaiHondaLabelledCellLabelledCellAdhesionEnergyParameter(2.8);
+            force.SetNagaiHondaLabelledCellBoundaryAdhesionEnergyParameter(7.3);
+
+            // Serialize via pointer to most abstract class possible
+            AbstractForce<2>* const p_force = &force;
+            output_arch << p_force;
+        }
+
+        {
+            AbstractForce<2>* p_force;
+
+            // Create an input archive
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            // Restore from the archive
+            input_arch >> p_force;
+
+            // Check member variables have been correctly archived
+            TS_ASSERT_DELTA(static_cast<NagaiHondaDifferentialAdhesionForce<2>*>(p_force)->GetNagaiHondaLabelledCellCellAdhesionEnergyParameter(), 9.1, 1e-12);
+            TS_ASSERT_DELTA(static_cast<NagaiHondaDifferentialAdhesionForce<2>*>(p_force)->GetNagaiHondaLabelledCellLabelledCellAdhesionEnergyParameter(), 2.8, 1e-12);
+            TS_ASSERT_DELTA(static_cast<NagaiHondaDifferentialAdhesionForce<2>*>(p_force)->GetNagaiHondaLabelledCellBoundaryAdhesionEnergyParameter(), 7.3, 1e-12);
 
             // Tidy up
             delete p_force;
