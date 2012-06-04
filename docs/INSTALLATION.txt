@@ -79,8 +79,7 @@ make all test
 
 # (optional) Build an optimised version of PETSc
 export PETSC_ARCH=linux-gnu-opt
-# ** note 'ifneeded' not 'yes' below **
-./config/configure.py --with-gnu-compilers==true --download-f-blas-lapack=1 --with-x=false --with-clanguage=cxx --download-hypre=ifneeded --download-openmpi=ifneeded --with-static-mpi=1 --CXXFLAGS="-fPIC -O3" --CFLAGS="-fPIC -O3" --with-debugging=0 --download-hdf5=ifneeded --download-parmetis=ifneeded
+./config/configure.py --with-gnu-compilers==true --download-f-blas-lapack=1 --with-x=false --with-clanguage=cxx --download-hypre=ifneeded --download-openmpi=yes --with-static-mpi=1 --CXXFLAGS="-fPIC -O3" --CFLAGS="-fPIC -O3" --with-debugging=0 --download-hdf5=ifneeded --download-parmetis=ifneeded
 make all test
 
 

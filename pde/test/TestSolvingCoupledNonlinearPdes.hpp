@@ -116,6 +116,10 @@ public:
     {
         mLambda = lambda;
     }
+
+    virtual ~MySimpleNonlinearCoupledSolver()
+    {
+    }
 };
 
 /**

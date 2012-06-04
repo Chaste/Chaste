@@ -85,7 +85,9 @@ other_libpaths = [chaste_libs_path+'lib',
                   parmetis_path]
 
 # The order of libraries in these lists matters!
+# Note that boost serialization sometimes has a different name: eg boost_serialization-gcc41
 other_libraries = ['boost_serialization', 'boost_filesystem', 'xerces-c', 'hdf5', 'z', 'parmetis', 'metis']
+
 # If using Boost >= 1.42, uncomment the following line
 #other_libraries.append('boost_system')
 if os.path.exists(petsc_3_0_path):
@@ -95,6 +97,7 @@ if os.path.exists(petsc_3_0_path):
 else:
     blas_lapack = ['f2clapack', 'f2cblas'] # Note: Lapack before BLAS
   # Note: parmetis before metis, hdf5 before z.
+
 # Note that boost serialization sometimes has a different name:
 # other_libraries = ['boost_serialization-gcc41', 'xerces-c', 'hdf5', 'z', 'parmetis', 'metis']
 
