@@ -279,22 +279,18 @@ public:
             cell_iter->GetCellCycleModel()->SetCellProliferativeType(STEM);
         }
 
-        TS_ASSERT_THROWS_NOTHING(OxygenBasedCellKiller<2> oxygen_based_cell_killer(&cell_population));
-
         OxygenBasedCellKiller<2> oxygen_based_cell_killer(&cell_population);
-
         TS_ASSERT_EQUALS(oxygen_based_cell_killer.GetIdentifier(), "OxygenBasedCellKiller-2");
-
-        TS_ASSERT_THROWS_NOTHING(oxygen_based_cell_killer.CheckAndLabelSingleCellForApoptosis(*r_cells.begin()));
+        oxygen_based_cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
         // Check that a single cell reaches apoptosis
         TS_ASSERT_EQUALS((*r_cells.begin())->HasApoptosisBegun(), false);
 
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_state(CellPropertyRegistry::Instance()->Get<ApoptoticCellProperty>());
         (*r_cells.begin())->AddCellProperty(p_apoptotic_state);
-        oxygen_based_cell_killer.CheckAndLabelSingleCellForApoptosis(*r_cells.begin());
+        oxygen_based_cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
-        TS_ASSERT((*r_cells.begin())->HasApoptosisBegun());
+        TS_ASSERT_EQUALS((*r_cells.begin())->HasApoptosisBegun(), true);
 
         // Increment time to a time after death
         p_simulation_time->IncrementTimeOneStep();

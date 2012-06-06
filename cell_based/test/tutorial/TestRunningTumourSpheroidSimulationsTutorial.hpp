@@ -103,11 +103,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellwiseSourcePde.hpp"
 #include "ConstBoundaryCondition.hpp"
 #include "CellBasedPdeHandler.hpp"
-/*
- * We also include a header file defining a cell killer, which implements the process of
- * hypoxia (low oxygen)-induced cell death.
- */
-#include "OxygenBasedCellKiller.hpp"
+
 /*
  * We use an {{{OffLatticeSimulation}}}.
  */

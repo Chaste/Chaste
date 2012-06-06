@@ -45,8 +45,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Alarcon2004OxygenBasedCellCycleOdeSystem.hpp"
 
 /**
- * Oxygen-dependent ODE-based cell-cycle model. Published by Alarcon et al.
- * (doi:10.1016/j.jtbi.2004.04.016).
+ * Oxygen-dependent ODE-based cell-cycle model.
+ *
+ *
+ *
+ * Published by Alarcon et al. (doi:10.1016/j.jtbi.2004.04.016).
  */
 class Alarcon2004OxygenBasedCellCycleModel : public AbstractOdeBasedCellCycleModel
 {

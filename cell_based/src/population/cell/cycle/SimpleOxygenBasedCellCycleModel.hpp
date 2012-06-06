@@ -57,7 +57,6 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractSimpleCellCycleModel>(*this);
-        archive & mTimeSpentInG1Phase;
         archive & mCurrentHypoxicDuration;
         archive & mCurrentHypoxiaOnsetTime;
         archive & mHypoxicConcentration;
@@ -66,12 +65,6 @@ private:
     }
 
 protected:
-
-    /**
-     * The time spent in G1 phase so far.
-     * Has units of hours.
-     */
-    double mTimeSpentInG1Phase;
 
     /**
      * How long the current period of hypoxia has lasted.

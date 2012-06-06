@@ -40,8 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 
 SimpleOxygenBasedCellCycleModel::SimpleOxygenBasedCellCycleModel()
-    : mTimeSpentInG1Phase(0.0),
-      mCurrentHypoxicDuration(0.0),
+    : mCurrentHypoxicDuration(0.0),
       mHypoxicConcentration(0.4),
       mQuiescentConcentration(1.0),
       mCriticalHypoxicDuration(2.0)
@@ -82,7 +81,6 @@ void SimpleOxygenBasedCellCycleModel::UpdateCellCyclePhase()
             if (oxygen_concentration < mQuiescentConcentration)
             {
                 mG1Duration += (1 - std::max(oxygen_concentration, 0.0)/mQuiescentConcentration)*dt;
-                mTimeSpentInG1Phase += dt;
             }
         }
     }
@@ -98,7 +96,7 @@ AbstractCellCycleModel* SimpleOxygenBasedCellCycleModel::CreateCellCycleModel()
      * its value from the parent.
      *
      * Note 1: some of the new cell-cycle model's member variables (namely
-     * mBirthTime, mCurrentCellCyclePhase, mReadyToDivide, mTimeSpentInG1Phase,
+     * mBirthTime, mCurrentCellCyclePhase, mReadyToDivide,
      * mCurrentHypoxicDuration, mCurrentHypoxiaOnsetTime) will already have been
      * correctly initialized in its constructor.
      *
