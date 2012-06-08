@@ -284,8 +284,13 @@ public:
         TS_ASSERT_DELTA(Trace(c),13.03+45+34,1e-10);
         TS_ASSERT_DELTA(SecondInvariant(c),0.5*(Trace(c)*Trace(c)-Trace(c_squared)),1e-10);
 
-        c_matrix<double, 4,4> d = identity_matrix<double>(4);
-        TS_ASSERT_DELTA(Trace(d),4,1e-10);
+        c_matrix<double, 4,4> d = zero_matrix<double>(4,4);
+        d(0,0) = 1.1;
+        d(1,1) = 2.2;
+        d(2,2) = 3.3;
+        d(3,3) = 4.4;
+        d(3,2) = 10;
+        TS_ASSERT_DELTA(Trace(d),11.0,1e-10);
     }
 
     // Get a row from a matrix
