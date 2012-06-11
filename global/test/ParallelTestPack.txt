@@ -3,4 +3,3 @@ TestGenericEventHandler.hpp
 TestOutputFileHandler.hpp
 TestReplicatableVector.hpp
 TestPetscTools.hpp
-TestObjectCommunicator.hpp
