@@ -120,7 +120,7 @@ public:
         mesh.Scale(0.2, 0.2);
 
         /* Next, we instantiate the PDE system to be solved. We pass the parameter values into the
-         * constructor. */
+         * constructor.  (The order is D,,1,,  D,,2,,  k,,1,,  k,,-1,,  k,,2,,  k,,3,,) */
         SchnackenbergCoupledPdeSystem<2> pde(1e-4, 1e-2, 0.1, 0.2, 0.3, 0.1);
 
         /*
@@ -128,7 +128,7 @@ public:
          * {{{ELEMENT_DIM}}}=2. We also have two unknowns u and v,
          * so in this case {{{PROBLEM_DIM}}}=2. The value of each boundary condition is
          * given by the spatially uniform steady state solution of the Schnackenberg system,
-         * given by u = (k,,1,, + k,,2,,)/k,,-1,,, v = k,,2,,k,,1,,^2^/k,,3,,(k,,1,, + k,,2,,)^2^.
+         * given by u = (k,,1,, + k,,2,,)/k,,-1,,, v = k,,2,,k,,-1,,^2^/k,,3,,(k,,1,, + k,,2,,)^2^.
          */
         BoundaryConditionsContainer<2,2,2> bcc;
         ConstBoundaryCondition<2>* p_bc_for_u = new ConstBoundaryCondition<2>(2.0);
