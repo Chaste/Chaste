@@ -42,6 +42,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <assert.h>
 
+// The classes that can be sent
+#include "Node.hpp"
+#include "Cell.hpp"
+
 /**
  * This is a helper method to enable classes that can be serialized to be sent using
  * PetSc MPI communication. The object is serialized in to a string of characters, and then
