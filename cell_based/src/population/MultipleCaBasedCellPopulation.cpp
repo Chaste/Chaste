@@ -91,27 +91,27 @@ MultipleCaBasedCellPopulation<DIM>::MultipleCaBasedCellPopulation(PottsMesh<DIM>
     // This must always be true
     assert(this->mCells.size() <= this->mrMesh.GetNumNodes()*latticeCarryingCapacity);
 
-    if (!locationIndices.empty())
+    if (locationIndices.empty())
+    {
+        //Validate();
+        EXCEPTION("No location indices being passed. Specify where cells lie before creating the cell population.");
+    }
+    else
     {
         // Create a set of node indices corresponding to empty sites
         for (unsigned i=0; i<locationIndices.size(); i++)
         {
             if (mAvailableSpaces[locationIndices[i]] == 0u)
             {
-            	NEVER_REACHED; 
-                ///\todo #2066 - This code is not covered
-                //EXCEPTION("One of the lattice sites has more cells than the carrying capacity. Check the initial cell locations.");
+                EXCEPTION("One of the lattice sites has more cells than the carrying capacity. Check the initial cell locations.");
             }
             mAvailableSpaces[locationIndices[i]]--;
         }
     }
-    else
-    {
-        NEVER_REACHED; // Need to cover the case of no  locationIndices being pased
-        ///\todo #2066 - This code is not covered
-        //mAvailableSpaces = std::vector<bool>(this->GetNumNodes(), false);
-        //Validate();
-    }
+//    if (validate)
+//    {
+//        Validate();
+//    }
 }
 
 template<unsigned DIM>
@@ -142,24 +142,6 @@ template<unsigned DIM>
 bool MultipleCaBasedCellPopulation<DIM>::IsSiteAvailable(unsigned index)
 {
     return (mAvailableSpaces[index]>0u);
-}
-
-template<unsigned DIM>
-std::set<unsigned> MultipleCaBasedCellPopulation<DIM>::GetEmptySiteIndices()
-{
-    NEVER_REACHED;
-    ///\todo #2066 - This code is not covered   
-//    std::set<unsigned> empty_site_indices;
-//    for (unsigned i=0; i<mAvailableSpaces.size(); i++)
-//    {
-//        if (mAvailableSpaces[i])
-//        {
-//            empty_site_indices.insert(i);
-//        }
-//    }
-//    return empty_site_indices;
-    std::set<unsigned> empty_site_indices;
-    return (empty_site_indices);
 }
 
 template<unsigned DIM>
@@ -203,9 +185,7 @@ void MultipleCaBasedCellPopulation<DIM>::AddCellUsingLocationIndex(unsigned inde
 {
 	if (mAvailableSpaces[index]==0u)
 	{
-		NEVER_REACHED; 
-        ///\todo #2066 - This code is not covered
-        //EXCEPTION("No available spaces at location index " << index << ".");
+        EXCEPTION("No available spaces at location index " << index << ".");
 	}
 	mAvailableSpaces[index]--;
 	AbstractCellPopulation<DIM,DIM>::AddCellUsingLocationIndex(index, pCell);
@@ -335,8 +315,7 @@ void MultipleCaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
 		{
 	        //neighbouring_node_indices_list.sort();
 		    unsigned num_neighbours = neighbouring_node_indices.size();
-
-			double probability_of_not_moving = 1.0;
+		    double probability_of_not_moving = 1.0;
 			double probability_of_moving = 0.0;
 
             for (std::set<unsigned>::iterator iter = neighbouring_node_indices.begin();
@@ -347,24 +326,20 @@ void MultipleCaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
 
                 if (IsSiteAvailable(*iter))
             	{
-                	// Iterating over the update rule
+                    // Iterating over the update rule
                     for (typename std::vector<boost::shared_ptr<AbstractMultipleCaUpdateRule<DIM> > >::iterator iterRule = mUpdateRuleCollection.begin();
                          iterRule != mUpdateRuleCollection.end();
                          ++iterRule)
                     {
-                    	probability_of_moving = (*iterRule)->EvaluateProbability(node_index, *iter, *this, dt, 1);
+                        probability_of_moving = (*iterRule)->EvaluateProbability(node_index, *iter, *this, dt, 1);
                     	if (probability_of_moving < 0)
                         {
-                        	NEVER_REACHED; 
-                            ///\todo #2066 - This code is not covered
-                            //EXCEPTION("The probability of cellular movement is smaller than zero. In order to prevent it from happening you should change your time step and parameters");
+                            EXCEPTION("The probability of cellular movement is smaller than zero. In order to prevent it from happening you should change your time step and parameters");
                         }
 
                         if (probability_of_moving > 1)
                         {
-                        	NEVER_REACHED; 
-                            ///\todo #2066 - This code is not covered
-                            //EXCEPTION("The probability of the cellular movement is bigger than one. In order to prevent it from happening you should change your time step and parameters");
+                            EXCEPTION("The probability of the cellular movement is bigger than one. In order to prevent it from happening you should change your time step and parameters");
                         }
                     }
 
@@ -378,16 +353,7 @@ void MultipleCaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
 			}
             if (probability_of_not_moving < 0)
             {
-            	NEVER_REACHED;
-                ///\todo #2066 - This code is not covered
-                //EXCEPTION("The probability of the cell not moving is smaller than zero. In order to prevent it from happening you should change your time step and parameters");
-            }
-
-            if (probability_of_not_moving > 1)
-            {
-                NEVER_REACHED;
-                ///\todo #2066 - This code is not covered
-            	//EXCEPTION("The probability of the cell not moving is bigger than one. In order to prevent it from happening you should change your time step and parameters");
+                EXCEPTION("The probability of the cell not moving is smaller than zero. In order to prevent it from happening you should change your time step and parameters");
             }
 
         	/*

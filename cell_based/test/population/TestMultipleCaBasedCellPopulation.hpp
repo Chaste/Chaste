@@ -46,6 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VolumeConstraintPottsUpdateRule.hpp"
 #include "PottsMeshGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "DiffusionMultipleCaUpdateRule.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "ArchiveOpener.hpp"
 #include "WildTypeCellMutationState.hpp"
@@ -117,13 +118,27 @@ public:
 		CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
 		cells_generator.GenerateBasicRandom(cells, 3u, DIFFERENTIATED);
 
-		// Specify where cells lie
-		std::vector<unsigned> location_indices;
-		location_indices.push_back(0u);
-		location_indices.push_back(0u);
-		location_indices.push_back(1u);
+        std::vector<unsigned> location_indices;
 
-		// Create cell population
+        // Create cell population to throw exceptions since no location indices are being passed
+        TS_ASSERT_THROWS_THIS(MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices,2),"No location indices being passed. Specify where cells lie before creating the cell population.");
+
+        cells_generator.GenerateBasicRandom(cells, 3u, DIFFERENTIATED);
+
+        // Specify where cells lie
+	    location_indices.push_back(0u);
+		location_indices.push_back(0u);
+		location_indices.push_back(0u);
+
+		// Create cell population to throw exceptions since we are trying to add more cells than the carrying capacity.
+		TS_ASSERT_THROWS_THIS(MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices,2), "One of the lattice sites has more cells than the carrying capacity. Check the initial cell locations.");
+
+        cells_generator.GenerateBasicRandom(cells, 3u, DIFFERENTIATED);
+
+   		//Change the initial cell location to avoid the above exception
+		location_indices[2]=1u;
+
+		//Create Cell Population
 		MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices,2);
 
 		// Test Cells in correct location
@@ -145,9 +160,9 @@ public:
 
     }
 
-    /*
-     * This test checks that cell populations with multiple cells per lattice site are dealt with correctly.
-     */
+   /*
+    * This test checks that cell populations with multiple cells per lattice site are dealt with correctly.
+    */
    void TestMultipleCellExceptions() throw (Exception)
     {
 	   // Resetting the Maximum cell Id to zero (to account for previous tests)
@@ -160,23 +175,24 @@ public:
 		// Create cells
 		std::vector<CellPtr> cells;
 		CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-		cells_generator.GenerateBasic(cells, 2);
+		cells_generator.GenerateBasic(cells, 3);
 
 		std::vector<unsigned> location_indices;
 		location_indices.push_back(0);
 		location_indices.push_back(3);
+		location_indices.push_back(1);
 
 		// Create cell population
 		MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 2);
 
 		// Check cells are in the correct location
 		TS_ASSERT(cell_population.IsCellAttachedToLocationIndex(0));
-		TS_ASSERT(!cell_population.IsCellAttachedToLocationIndex(1));
+		TS_ASSERT(cell_population.IsCellAttachedToLocationIndex(1));
 		TS_ASSERT(!cell_population.IsCellAttachedToLocationIndex(2));
 		TS_ASSERT(cell_population.IsCellAttachedToLocationIndex(3));
 
-		TS_ASSERT_THROWS_NOTHING(cell_population.GetCellUsingLocationIndex(0));
-		TS_ASSERT_THROWS_THIS(cell_population.GetCellUsingLocationIndex(1),"Location index input argument does not correspond to a Cell");
+		cell_population.GetCellUsingLocationIndex(0);
+		cell_population.GetCellUsingLocationIndex(1);
 		TS_ASSERT_THROWS_THIS(cell_population.GetCellUsingLocationIndex(2),"Location index input argument does not correspond to a Cell");
 		TS_ASSERT_THROWS_NOTHING(cell_population.GetCellUsingLocationIndex(3));
 
@@ -203,14 +219,18 @@ public:
 
 		// Check cells are in the correct locations
 		TS_ASSERT(!cell_population.IsCellAttachedToLocationIndex(0));
-		TS_ASSERT(!cell_population.IsCellAttachedToLocationIndex(1));
+		TS_ASSERT(cell_population.IsCellAttachedToLocationIndex(1));
 		TS_ASSERT(!cell_population.IsCellAttachedToLocationIndex(2));
 		TS_ASSERT(cell_population.IsCellAttachedToLocationIndex(3));
 
 		TS_ASSERT_THROWS_THIS(cell_population.GetCellUsingLocationIndex(0),"Location index input argument does not correspond to a Cell");
-		TS_ASSERT_THROWS_THIS(cell_population.GetCellUsingLocationIndex(1),"Location index input argument does not correspond to a Cell");
+        cell_population.GetCellUsingLocationIndex(1);
 		TS_ASSERT_THROWS_THIS(cell_population.GetCellUsingLocationIndex(2),"Location index input argument does not correspond to a Cell");
 		TS_ASSERT_THROWS_THIS(cell_population.GetCellUsingLocationIndex(3),"Multiple cells are attached to a single location index.");
+
+        // Now remove first cell from lattice 0 and move it to lattice 3
+        cell_population.RemoveCellUsingLocationIndex(1,cells[2]);
+        TS_ASSERT_THROWS_THIS(cell_population.AddCellUsingLocationIndex(3,cells[2]), "No available spaces at location index 3.");
 
 		//Check GetCellsUsingLocationIndex
 		std::set<CellPtr> cells_on_lattice = cell_population.GetCellsUsingLocationIndex(3);
@@ -512,71 +532,74 @@ public:
                 "No free space to divide.");
     }
 
-//   void TestUpdateCellLocations()
-//    {
-//        // Create a simple 2D PottsMesh with two cells
-//        PottsMeshGenerator<2> generator(4, 2, 2, 2, 1, 2);
-//        PottsMesh<2>* p_mesh = generator.GetMesh();
-//
-//        // Create cells
-//        std::vector<CellPtr> cells;
-//        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-//        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
-//
-//        // Create cell population
-//        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells);
-//
-//        // Set node selection to non-random lattice sweeping: this will loop over the nodes in index order
-//        TS_ASSERT_EQUALS(true, cell_population.GetUpdateNodesInRandomOrder());
-//        cell_population.SetUpdateNodesInRandomOrder(false);
-//
-//        // Increase temperature: allows swaps to be more likely
-//        TS_ASSERT_EQUALS(cell_population.GetTemperature(),0.1);
-//        cell_population.SetTemperature(10.0);
-//
-//        // Create a volume update rule and pass to the population
-//        MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
-//        cell_population.AddUpdateRule(p_volume_constraint_update_rule);
-//
-//        // Commence lattice sweeping, updating where necessary
-//        cell_population.UpdateCellLocations(1.0);
-//        TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 2u);
-//        TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(0)->GetNumNodes(), 1u);
-//        TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(1)->GetNumNodes(), 7u);
-//    }
-//   void TestUpdateCellLocationsRandomly()
-//    {
-//        // Create a simple 2D PottsMesh with two cells
-//        PottsMeshGenerator<2> generator(4, 2, 2, 2, 1, 2);
-//        PottsMesh<2>* p_mesh = generator.GetMesh();
-//
-//        // Create cells
-//        std::vector<CellPtr> cells;
-//        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-//        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
-//
-//        // Create cell population
-//        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells);
-//
-//        // Set node selection to random lattice sweeping and (for coverage) random iteration over update rules
-//        cell_population.SetUpdateNodesInRandomOrder(true);
-//        cell_population.SetIterateRandomlyOverUpdateRuleCollection(true);
-//
-//        // Increase temperature: allows swaps to be more likely
-//        TS_ASSERT_EQUALS(cell_population.GetTemperature(),0.1);
-//        cell_population.SetTemperature(10.0);
-//
-//        // Create a volume update rule and pass to the population
-//        MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
-//        cell_population.AddUpdateRule(p_volume_constraint_update_rule);
-//
-//        cell_population.UpdateCellLocations(1.0);
-//
-//        // Note that these results differ to those in the above test due to extra random numbers being called
-//        TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 2u);
-//        TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(0)->GetNumNodes(), 6u);
-//        TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(1)->GetNumNodes(), 2u);
-//    }
+   void TestUpdateCellLocationsExceptions()
+    {
+        // Create a simple 2D PottsMesh with two cells
+        PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, 1u);
+
+        std::vector<unsigned> location_indices;
+        unsigned initial_cell_index = 12u;
+        location_indices.push_back(initial_cell_index);
+
+        // Create cell population
+        MultipleCaBasedCellPopulation<2u> cell_population(*p_mesh, cells, location_indices);
+
+        // Set node selection to non-random lattice sweeping: this will loop over the nodes in index order
+        TS_ASSERT_EQUALS(true, cell_population.GetUpdateNodesInRandomOrder());
+        cell_population.SetUpdateNodesInRandomOrder(false);
+
+        // Create a multiplce Ca update rule and pass to the population
+        MAKE_PTR(DiffusionMultipleCaUpdateRule<2u>, p_diffusion_update_rule);
+        p_diffusion_update_rule->SetDiffusionParameter(1.0);
+        cell_population.AddUpdateRule(p_diffusion_update_rule);
+
+        // Commence lattice sweeping, updating where necessary
+        TS_ASSERT_THROWS_THIS(cell_population.UpdateCellLocations(-1.0),"The probability of cellular movement is smaller than zero. In order to prevent it from happening you should change your time step and parameters");
+        TS_ASSERT_THROWS_THIS(cell_population.UpdateCellLocations(5.0), "The probability of the cellular movement is bigger than one. In order to prevent it from happening you should change your time step and parameters");
+        TS_ASSERT_THROWS_THIS(cell_population.UpdateCellLocations(1.0), "The probability of the cell not moving is smaller than zero. In order to prevent it from happening you should change your time step and parameters");
+        TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 1u);
+
+    }
+
+      void TestUpdateCellLocationsRandomlyExceptions()
+    {
+        // Create a simple 2D PottsMesh with two cells
+        PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, 1);
+
+        std::vector<unsigned> location_indices;
+        unsigned initial_cell_index = 12u;
+        location_indices.push_back(initial_cell_index);
+
+        // Create cell population
+        MultipleCaBasedCellPopulation<2u> cell_population(*p_mesh, cells, location_indices);
+
+        // Set node selection to random lattice sweeping and (for coverage) random iteration over update rules
+        cell_population.SetUpdateNodesInRandomOrder(true);
+        cell_population.SetIterateRandomlyOverUpdateRuleCollection(true);
+
+        // Create a multiplce Ca update rule and pass to the population
+        MAKE_PTR(DiffusionMultipleCaUpdateRule<2u>, p_diffusion_update_rule);
+        p_diffusion_update_rule->SetDiffusionParameter(1.0);
+        cell_population.AddUpdateRule(p_diffusion_update_rule);
+
+        // Commence lattice sweeping, updating where necessary
+        TS_ASSERT_THROWS_THIS(cell_population.UpdateCellLocations(-1.0),"The probability of cellular movement is smaller than zero. In order to prevent it from happening you should change your time step and parameters");
+        TS_ASSERT_THROWS_THIS(cell_population.UpdateCellLocations(5.0), "The probability of the cellular movement is bigger than one. In order to prevent it from happening you should change your time step and parameters");
+        TS_ASSERT_THROWS_THIS(cell_population.UpdateCellLocations(1.0), "The probability of the cell not moving is smaller than zero. In order to prevent it from happening you should change your time step and parameters");
+        TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 1u);
+    }
 //
 //    ///\todo implement this test (#1666)
 ////   void TestVoronoiMethods()

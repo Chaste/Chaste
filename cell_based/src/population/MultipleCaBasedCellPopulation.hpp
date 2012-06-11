@@ -176,11 +176,6 @@ public:
      */
     bool IsSiteAvailable(unsigned index);
 
-    /**
-     * @return the indices of those nodes that are empty sites.
-     */
-    std::set<unsigned> GetEmptySiteIndices();
-
 
     /**
      * @return reference to #mrMesh.
