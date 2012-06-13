@@ -67,7 +67,7 @@ public:
      * @param tag a unique identifier tag for this communication
      */
     template<typename CLASS>
-    void SendObject(CLASS* p_object, unsigned destinationProcess, unsigned tag)
+    void SendObject(CLASS* const p_object, unsigned destinationProcess, unsigned tag)
     {
         // Create an output archive
         std::stringstream ss;
