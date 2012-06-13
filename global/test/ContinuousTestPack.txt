@@ -14,6 +14,7 @@ TestHeartEventHandler.hpp
 TestLogFile.hpp
 TestMathsCustomFunctions.hpp
 TestNumericFileComparison.hpp
+TestObjectCommunicator.hpp
 TestOutputDirectoryFifoQueue.hpp
 TestOutputFileHandler.hpp
 TestPetscEvents.hpp
