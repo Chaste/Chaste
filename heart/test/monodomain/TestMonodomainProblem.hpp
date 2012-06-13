@@ -828,6 +828,9 @@ public:
             FileFinder info_file(basename  + "_times.info", RelativeTo::Absolute);
             TS_ASSERT(info_file.Exists());
          }
+#else
+        std::cout << "This test ran, but did not test VTK-dependent functions as VTK visualization is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
 #endif //CHASTE_VTK
 
 
@@ -895,6 +898,9 @@ public:
 
         //HeartConfig XML
         TS_ASSERT(FileFinder(results_dir + "ChasteParameters.xml").Exists());
+#else
+        std::cout << "This test ran, but did not test VTK-dependent functions as VTK visualization is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
 #endif //CHASTE_VTK
     }
 
@@ -1233,7 +1239,10 @@ public:
         TS_ASSERT_DELTA( v_at_last[110],  13.146, 1e-3 );
         TS_ASSERT_DELTA( v_at_last[220], -83.855, 1e-3 );
 
-#endif // CHASTE_VTK
+#else
+        std::cout << "This test ran, but did not test VTK-dependent functions as VTK visualization is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
+#endif //CHASTE_VTK
 
     }
 

@@ -123,6 +123,9 @@ public:
             TS_ASSERT(vtk_file.Exists());
         }
 
+#else
+        std::cout << "This test ran, but did not test VTK-dependent functions as VTK visualization is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
 #endif //CHASTE_VTK
     }
 
@@ -184,6 +187,9 @@ public:
             TS_ASSERT(vtk_file.Exists());
         }
 
+#else
+        std::cout << "This test ran, but did not test VTK-dependent functions as VTK visualization is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
 #endif //CHASTE_VTK
     }
 
@@ -238,6 +244,9 @@ public:
             TS_ASSERT(vtk_file.Exists());
         }
 
+#else
+        std::cout << "This test ran, but did not test VTK-dependent functions as VTK visualization is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
 #endif //CHASTE_VTK
     }
 

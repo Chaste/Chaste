@@ -45,16 +45,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Provides a periodic square-wave stimulus, where the total net charge is zero for every stimulus.
  *
  * i.e.,
- *               ------
- *           |        |
- *              |        |
- *  ---------       |     -------------
- *                  |     |
- *                  |     |
- *                  ------
+ *         --------
+ *         |      |
+ *         |      |
+ *  --------      |      -------------
+ *                |      |
+ *                |      |
+ *                --------
  *
  *
- *           <----------->
+ *          <------------>
  *              Duration
  */
 class RegularStimulusZeroNetCharge : public RegularStimulus

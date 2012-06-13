@@ -84,7 +84,10 @@ public:
 #ifdef CHASTE_VTK
         TS_ASSERT_THROWS_NOTHING( MESH_READER3 mesh_reader("mesh/test/data/cube_2mm_12_elements.vtu") );
         TS_ASSERT_THROWS_ANYTHING( MESH_READER3 mesh_reader("mesh/test/data/nofile.vtu") );
-#endif // CHASTE_VTK
+#else
+        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
+#endif //CHASTE_VTK
     }
 
     /**
@@ -99,7 +102,10 @@ public:
 
         TS_ASSERT_EQUALS( vtk_unstructed_grid->GetNumberOfPoints(), 12 );
         TS_ASSERT_EQUALS( vtk_unstructed_grid->GetNumberOfCells(), 12 );
-#endif // CHASTE_VTK
+#else
+        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
+#endif //CHASTE_VTK
     }
 
     /**
@@ -131,7 +137,10 @@ public:
 
         TS_ASSERT_THROWS_THIS( next_node = mesh_reader.GetNextNode(),
                                "Trying to read data for a node that doesn't exist" );
-#endif // CHASTE_VTK
+#else
+        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
+#endif //CHASTE_VTK
     }
 
     void TestGetNextElementData(void) throw(Exception)
@@ -173,7 +182,10 @@ public:
         TS_ASSERT_THROWS_THIS( first_element_data = invalid_mesh_reader.GetNextElementData(),
                                "Element is not of expected type (vtkTetra/vtkTriangle)" );
 
-#endif // CHASTE_VTK
+#else
+        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
+#endif //CHASTE_VTK
     }
 
     void TestGetNextFaceData(void) throw(Exception)
@@ -213,10 +225,13 @@ public:
 
         TS_ASSERT_THROWS_THIS( next_face_data = mesh_reader.GetNextEdgeData(),
                                "Trying to read data for a boundary element that doesn't exist" );
-#endif // CHASTE_VTK
+#else
+        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
+#endif //CHASTE_VTK
     }
 
-    void TestConstructFromVtkUnstructuredGridObject()
+    void TestConstructFromVtkUnstructuredGridObject() throw(Exception)
     {
 #ifdef CHASTE_VTK
         VtkMeshReader<3,3> mesh_reader_1("mesh/test/data/cube_2mm_12_elements.vtu");
@@ -237,9 +252,13 @@ public:
         TS_ASSERT_DELTA( next_node[0] , 0.2 , 1e-6 );
         TS_ASSERT_DELTA( next_node[1] , 0.0 , 1e-6 );
         TS_ASSERT_DELTA( next_node[2] , 0.0 , 1e-6 );
-#endif // CHASTE_VTK
+#else
+        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
+#endif //CHASTE_VTK
     }
-    void TestGenericReader()
+
+    void TestGenericReader() throw(Exception)
     {
 #ifdef CHASTE_VTK
         std::auto_ptr<AbstractMeshReader<3,3> > p_mesh_reader = GenericMeshReader<3,3>("mesh/test/data/cube_2mm_12_elements.vtu");
@@ -261,7 +280,10 @@ public:
         // Exception coverage
         TS_ASSERT_THROWS_THIS((GenericMeshReader<3,3>("mesh/test/data/cube_2mm_12_elements.vtu", 2, 2)),
                               "Quadratic meshes are only supported in Triangles format.");
-#endif // CHASTE_VTK
+#else
+        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
+#endif //CHASTE_VTK
     }
 
     /**
@@ -353,7 +375,10 @@ public:
         TS_ASSERT_THROWS_ANYTHING( mesh_reader.GetPointData( "Non-existent data", not_there) );
         TS_ASSERT_THROWS_ANYTHING( mesh_reader.GetCellData( "Non-existent data", vectors_not_there) );
         TS_ASSERT_THROWS_ANYTHING( mesh_reader.GetPointData( "Non-existent data", vectors_not_there) );
-#endif // CHASTE_VTK
+#else
+        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
+#endif //CHASTE_VTK
     }
 
     /**
@@ -413,8 +438,12 @@ public:
             TS_ASSERT_EQUALS(iterator_node, mesh_node);
         }
 
-#endif // CHASTE_VTK
+#else
+        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
+#endif //CHASTE_VTK
     }
+
     /**
      * Check that we can build a MixedDimensionMesh using the VTK mesh reader.
      */
@@ -438,7 +467,10 @@ public:
     TS_ASSERT_EQUALS(centroid.size(), 200u);
     TS_ASSERT_DELTA(centroid[0](0), 0.0033, 1e-4);
     TS_ASSERT_DELTA(centroid[0](1), 0.0033, 1e-4);
-#endif // CHASTE_VTK
+#else
+        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
+#endif //CHASTE_VTK
     }
     /**
      * Check that we can build a 2D MixedDimensionMesh using the VTK mesh reader.
@@ -467,7 +499,10 @@ public:
         }
         TS_ASSERT_THROWS_THIS(mesh_reader.GetNextCableElementData(), "Trying to read data for a cable element that doesn't exist");
 
-#endif // CHASTE_VTK
+#else
+        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
+#endif //CHASTE_VTK
     }
     /**
      * Check that we can build a 3D MixedDimensionMesh using the VTK mesh reader.
@@ -496,7 +531,10 @@ public:
         {
             TS_ASSERT_EQUALS((*iter)->GetAttribute(), 2.0);
         }
-#endif // CHASTE_VTK
+#else
+        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
+#endif //CHASTE_VTK
     }
 
 };

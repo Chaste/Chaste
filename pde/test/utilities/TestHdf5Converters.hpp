@@ -151,6 +151,9 @@ public:
             TS_ASSERT_EQUALS(vtk_mesh_reader2.GetNumNodes(), 12u);
         }
 
+#else
+        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
 #endif //CHASTE_VTK
     }
 
@@ -233,6 +236,9 @@ public:
         VtkMeshReader<2,2> vtk_mesh_reader2(test_output_directory + working_directory
                                             + "/vtk_output/2D_0_to_1mm_400_elements.vtu");
         TS_ASSERT_EQUALS(vtk_mesh_reader2.GetNumNodes(), 221u);
+#else
+        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
 #endif //CHASTE_VTK
     }
 

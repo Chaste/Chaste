@@ -88,6 +88,9 @@ public:
             TS_ASSERT_EQUALS(mesh.GetNumElements(), vtk_mesh.GetNumElements());
             TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), vtk_mesh.GetNumBoundaryElements());
         }
+#else
+        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
 #endif //CHASTE_VTK
     }
 
@@ -103,6 +106,9 @@ public:
 
         TS_ASSERT_THROWS_THIS( writer.SetParallelFiles(mesh),
                                "Cannot write parallel files using a sequential mesh");
+#else
+        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
 #endif //CHASTE_VTK
     }
 
@@ -230,6 +236,9 @@ public:
                 }
             }
         }
+#else
+        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
 #endif //CHASTE_VTK
     }
 
@@ -292,6 +301,9 @@ public:
                 TS_ASSERT_EQUALS(rank_read[i], PetscTools::GetMyRank());
             }
         }
+#else
+        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
 #endif //CHASTE_VTK
     }
 
@@ -379,6 +391,9 @@ public:
                 }
             }
         }
+#else
+        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
 #endif //CHASTE_VTK
     }
 
@@ -453,6 +468,9 @@ public:
             TS_ASSERT_EQUALS(centroid_read.size(),centroid.size());
             ///\todo #1731 - need to read the tensors too.
         }
+#else
+        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
 #endif //CHASTE_VTK
     }
 
@@ -491,6 +509,9 @@ public:
         writer.WriteFilesUsingMesh(mesh);
 
         ///\todo #2052 We can't yet test if the cables are written correctly, because we don't have the reader part.
+#else
+        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
 #endif //CHASTE_VTK
     }
 
@@ -577,6 +598,9 @@ public:
                 }
             }
         }
+#else
+        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
 #endif //CHASTE_VTK
     }
 
@@ -604,6 +628,9 @@ public:
             //TODO: The reader can open a quadratic vtu file, but not construct a QuadraticMesh
             //further tests of the written output should be made once this is supported.
         }
+#else
+        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
 #endif //CHASTE_VTK
     }
 };

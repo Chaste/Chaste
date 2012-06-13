@@ -66,7 +66,7 @@ double UblasMatrixInfinityNorm(c_matrix<double,DIM,DIM> mat)
 class TestFibreReader : public CxxTest::TestSuite
 {
 public:
-    void TestOrthoReaderSetup()
+    void TestOrthoReaderSetup() throw(Exception)
     {
         FileFinder file_finder("heart/test/data/fibre_tests/random_fibres.ortho", RelativeTo::ChasteSourceRoot);
         FibreReader<2> fibre_reader(file_finder, ORTHO);
@@ -109,7 +109,7 @@ public:
         TS_ASSERT_THROWS_CONTAINS(fibre_reader.GetFibreSheetAndNormalMatrix(5u, fibre_matrix), "End of file")
    }
 
-    void TestOrthoReaderSkipping() // Cf above test
+    void TestOrthoReaderSkipping() throw(Exception) // Cf above test
     {
         FileFinder file_finder("heart/test/data/fibre_tests/random_fibres.ortho", RelativeTo::ChasteSourceRoot);
         FibreReader<2> fibre_reader(file_finder, ORTHO);
@@ -131,7 +131,7 @@ public:
         TS_ASSERT_DELTA(UblasMatrixInfinityNorm<2>(fibre_matrix-correct_matrix), 0, 1e-9);
     }
 
-    void TestAxiReaderSetup()
+    void TestAxiReaderSetup() throw(Exception)
     {
         FileFinder file_finder("heart/test/data/fibre_tests/random_fibres.axi", RelativeTo::ChasteSourceRoot);
         FibreReader<2> fibre_reader(file_finder, AXISYM);
@@ -163,7 +163,7 @@ public:
         TS_ASSERT_THROWS_CONTAINS(fibre_reader.GetFibreVector(4u, fibre_vector), "End of file")
     }
 
-    void TestAxiReaderSkipping() // Cf above test
+    void TestAxiReaderSkipping() throw(Exception) // Cf above test
     {
         FileFinder file_finder("heart/test/data/fibre_tests/random_fibres.axi", RelativeTo::ChasteSourceRoot);
         FibreReader<2> fibre_reader(file_finder, AXISYM);
@@ -179,7 +179,7 @@ public:
     }
 
 
-    void TestFibreConvenienceMethodsForVtk()
+    void TestFibreConvenienceMethodsForVtk() throw(Exception)
     {
 
         {
@@ -227,7 +227,8 @@ public:
             TS_ASSERT_DELTA(third[5][2], 0.0, 1e-10);//z
         }
     }
-    void TestFibretoVtk()
+
+    void TestFibretoVtk() throw(Exception)
     {
 #ifdef CHASTE_VTK
         //See TestConductivityTensors
@@ -265,10 +266,13 @@ public:
         vtk_file.open(command.c_str());
         TS_ASSERT(vtk_file.is_open());
         vtk_file.close();
-#endif
+#else
+        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
+#endif //CHASTE_VTK
     }
 
-    void TestFibreReaderExceptions()
+    void TestFibreReaderExceptions() throw(Exception)
     {
         c_matrix<double, 2, 2> fibre_matrix;
 

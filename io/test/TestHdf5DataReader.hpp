@@ -357,6 +357,10 @@ public:
 
         std::vector<double> i_k_values = reader.GetVariableOverTime("I_K", 15);
         std::vector<double> i_k_values_over_multiple = reader.GetVariableOverTimeOverMultipleNodes("I_K", 10, 19)[5];
+
+        // If 19 is 'one past the end' of the requested nodes, shouldn't this be of size 9 ??
+        TS_ASSERT_EQUALS(i_k_values_over_multiple.size(),10u);
+
         TS_ASSERT_THROWS_THIS(reader.GetVariableOverTimeOverMultipleNodes("I_K", 0, NUMBER_NODES+5),
                               "The file doesn't contain info for node 104");
 
@@ -556,10 +560,12 @@ public:
         }
 
         // Data not included
-        TS_ASSERT_THROWS_THIS(reader.GetVariableOverTime("Node", 22),"The incomplete file does not contain info of node 22");
+        TS_ASSERT_THROWS_THIS(reader.GetVariableOverTime("Node", 22),
+                              "The incomplete file does not contain info of node 22");
 
         // another exception
-        TS_ASSERT_THROWS_CONTAINS(reader.GetVariableOverTimeOverMultipleNodes("I_Na", 0, 1), "GetVariableOverTimeOverMultipleNodes() cannot be called using incomplete data sets");
+        TS_ASSERT_THROWS_CONTAINS(reader.GetVariableOverTimeOverMultipleNodes("I_Na", 0, 1),
+                                  "GetVariableOverTimeOverMultipleNodes() cannot be called using incomplete data sets");
     }
 };
 

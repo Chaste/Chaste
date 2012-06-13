@@ -64,6 +64,7 @@ private:
     /** The cached voltages vector */
     std::vector<double> mCachedVoltages;
 
+protected:
     /**
      * Read the voltages vector for the given node and cache it, returning a reference
      * to the cached vector.  If subsequently called with the same index, will return
@@ -73,7 +74,7 @@ private:
      *
      * @param globalNodeIndex  the index of the node to cache voltages for
      */
-    std::vector<double>& rCacheVoltages(unsigned globalNodeIndex);
+    std::vector<double>& rGetCachedVoltages(unsigned globalNodeIndex);
 
 public:
     /**

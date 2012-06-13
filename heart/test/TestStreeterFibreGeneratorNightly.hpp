@@ -192,7 +192,10 @@ public:
             ifs.close();
         }
         writer.WriteFilesUsingMesh(mesh);
-#endif
+#else
+        std::cout << "This test ran, but did not test VTK-dependent methods." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
+#endif //CHASTE_VTK
     }
 };
 

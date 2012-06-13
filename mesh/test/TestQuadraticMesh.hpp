@@ -865,6 +865,9 @@ public:
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Reading a (linear) tetrahedral mesh and converting it to a QuadraticMesh.  This involves making an external library call to Triangle/Tetgen in order to compute in internal nodes");
         TS_ASSERT_EQUALS(quad_mesh.GetNumNodes(), 1110u);
 
+#else
+        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
 #endif //CHASTE_VTK
     }
 
