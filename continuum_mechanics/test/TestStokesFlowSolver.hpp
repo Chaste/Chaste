@@ -210,10 +210,14 @@ public:
         TS_ASSERT(comp1.CompareFiles(1e-7));
 
         NumericFileComparison comp2(results_dir + "/pressure.txt", "continuum_mechanics/test/data/PipeStokesFlow/pressure.txt");
-        TS_ASSERT(comp1.CompareFiles(1e-7));
+        TS_ASSERT(comp2.CompareFiles(1e-7));
 
         solver.WriteCurrentPressureSolution(10);
+
         TS_ASSERT_EQUALS(system(("diff " + results_dir + "/pressure_10.txt " + results_dir + "/pressure.txt").c_str()), 0);
+        NumericFileComparison comp3(results_dir + "/pressure_10.txt", results_dir + "/pressure.txt");
+        TS_ASSERT(comp3.CompareFiles(1e-17));
+
     }
 
     /*

@@ -443,30 +443,35 @@ void AbstractContinuumMechanicsSolver<DIM>::WriteCurrentSpatialSolution(std::str
         return;
     }
 
-    std::stringstream file_name;
-    file_name << fileName;
-    if (counterToAppend >= 0)
+    if (PetscTools::AmMaster())
     {
-        file_name << "_" << counterToAppend;
-    }
-    file_name << "." << fileExtension;
+        std::stringstream file_name;
 
-    out_stream p_file = mpOutputFileHandler->OpenOutputFile(file_name.str());
-
-    std::vector<c_vector<double,DIM> >& r_spatial_solution = rGetSpatialSolution();
-    for (unsigned i=0; i<r_spatial_solution.size(); i++)
-    {
-//        for (unsigned j=0; j<DIM; j++)
-//        {
-//            *p_file << mrQuadMesh.GetNode(i)->rGetLocation()[j] << " ";
-//        }
-        for (unsigned j=0; j<DIM; j++)
+        file_name << fileName;
+        if (counterToAppend >= 0)
         {
-            *p_file << r_spatial_solution[i](j) << " ";
+            file_name << "_" << counterToAppend;
         }
-        *p_file << "\n";
+        file_name << "." << fileExtension;
+
+        out_stream p_file = mpOutputFileHandler->OpenOutputFile(file_name.str());
+
+        std::vector<c_vector<double,DIM> >& r_spatial_solution = rGetSpatialSolution();
+        for (unsigned i=0; i<r_spatial_solution.size(); i++)
+        {
+    //        for (unsigned j=0; j<DIM; j++)
+    //        {
+    //            *p_file << mrQuadMesh.GetNode(i)->rGetLocation()[j] << " ";
+    //        }
+            for (unsigned j=0; j<DIM; j++)
+            {
+                *p_file << r_spatial_solution[i](j) << " ";
+            }
+            *p_file << "\n";
+        }
+        p_file->close();
     }
-    p_file->close();
+    PetscTools::Barrier("WriteSpatial");
 }
 
 template<unsigned DIM>
@@ -478,29 +483,33 @@ void AbstractContinuumMechanicsSolver<DIM>::WriteCurrentPressureSolution(int cou
         return;
     }
 
-    std::stringstream file_name;
-    file_name << "pressure";
-    if (counterToAppend >= 0)
+    if (PetscTools::AmMaster())
     {
-        file_name << "_" << counterToAppend;
-    }
-    file_name << ".txt";
+        std::stringstream file_name;
 
-    out_stream p_file = mpOutputFileHandler->OpenOutputFile(file_name.str());
-
-    std::vector<double>& r_pressure = rGetPressures();
-    for (unsigned i=0; i<r_pressure.size(); i++)
-    {
-        for (unsigned j=0; j<DIM; j++)
+        file_name << "pressure";
+        if (counterToAppend >= 0)
         {
-            *p_file << mrQuadMesh.GetNode(i)->rGetLocation()[j] << " ";
+            file_name << "_" << counterToAppend;
         }
+        file_name << ".txt";
 
-        *p_file << r_pressure[i] << "\n";
+        out_stream p_file = mpOutputFileHandler->OpenOutputFile(file_name.str());
+
+        std::vector<double>& r_pressure = rGetPressures();
+        for (unsigned i=0; i<r_pressure.size(); i++)
+        {
+            for (unsigned j=0; j<DIM; j++)
+            {
+                *p_file << mrQuadMesh.GetNode(i)->rGetLocation()[j] << " ";
+            }
+
+            *p_file << r_pressure[i] << "\n";
+        }
+        p_file->close();
     }
-    p_file->close();
+    PetscTools::Barrier("WritePressure");
 }
-
 template<unsigned DIM>
 void AbstractContinuumMechanicsSolver<DIM>::SetWriteOutput(bool writeOutput)
 {
