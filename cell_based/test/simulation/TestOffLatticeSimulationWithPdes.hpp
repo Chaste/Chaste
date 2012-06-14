@@ -306,11 +306,9 @@ public:
 
         NumericFileComparison comp_nut(results_dir + "/results.vizpdesolution", "cell_based/test/data/OffLatticeSimulationWithOxygen/results.vizpdesolution");
         TS_ASSERT(comp_nut.CompareFiles());
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "/results.vizpdesolution cell_based/test/data/OffLatticeSimulationWithOxygen/results.vizpdesolution").c_str()), 0);
 
         NumericFileComparison comp_ele(results_dir + "/results.vizelements", "cell_based/test/data/OffLatticeSimulationWithOxygen/results.vizelements");
         TS_ASSERT(comp_ele.CompareFiles());
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "/results.vizelements cell_based/test/data/OffLatticeSimulationWithOxygen/results.vizelements").c_str()), 0);
 
         NumericFileComparison comp_nodes(results_dir + "/results.viznodes", "cell_based/test/data/OffLatticeSimulationWithOxygen/results.viznodes");
         TS_ASSERT(comp_nodes.CompareFiles(1e-15));
