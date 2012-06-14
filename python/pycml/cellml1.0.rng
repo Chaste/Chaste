@@ -1,0 +1,1000 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  RELAX NG schema for CellML 1.0
+  Author: Jonathan Cooper
+-->
+<!--
+  Copyright (C) University of Oxford, 2005-2009
+  
+  University of Oxford means the Chancellor, Masters and Scholars of the
+  University of Oxford, having an administrative office at Wellington
+  Square, Oxford OX1 2JD, UK.
+  
+  This file is part of Chaste.
+  
+  Chaste is free software: you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as published
+  by the Free Software Foundation, either version 2.1 of the License, or
+  (at your option) any later version.
+  
+  Chaste is distributed in the hope that it will be useful, but WITHOUT
+  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+  License for more details. The offer of Chaste under the terms of the
+  License is subject to the License being interpreted in accordance with
+  English Law and subject to any action against the University of Oxford
+  being under the jurisdiction of the English Courts.
+  
+  You should have received a copy of the GNU Lesser General Public License
+  along with Chaste. If not, see <http://www.gnu.org/licenses/>.
+-->
+<!--
+  TODO:
+   - Tidy metadata checking
+-->
+<!-- Core CellML namespaces -->
+<!-- Metadata-related namespaces -->
+<!-- Our extension namespaces (URIs may change) -->
+<!--
+  The 'no namespace' namespace, which is what will get used for
+  most CellML attributes. Note the spec is broken in rule 2.5.2.
+-->
+<grammar xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#" xmlns:bqs="http://www.cellml.org/bqs/1.0#" xmlns:cellml="http://www.cellml.org/cellml/1.0#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:cmeta="http://www.cellml.org/metadata/1.0#" xmlns:pe="https://chaste.comlab.ox.ac.uk/cellml/ns/partial-evaluation#" xmlns:mathml="http://www.w3.org/1998/Math/MathML" xmlns:oxmeta="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#" xmlns:lut="https://chaste.comlab.ox.ac.uk/cellml/ns/lookup-tables" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <!--
+    Some general notes:
+     - rule 2.5.2 conflicts with the standard interpretation of XML namespaces.  Oops
+     - No CellML elements contain text content
+  -->
+  <!--
+    Valid CellML identifiers (rule 2.4.1)
+    This is quite complex to get right.  The natural choice might
+    be xsd:ID, but the lexical space isn't that of NCName: identifiers
+    may start with a digit (yuck) and may not contain '.'.  Also
+    identifiers are not always unique across a document (use the
+    cmeta:id attribute for unique IDs).
+  -->
+  <define name="ident">
+    <data type="token">
+      <param name="pattern">_*[0-9a-zA-Z][_0-9a-zA-Z]*</param>
+    </data>
+  </define>
+  <!--
+    Extension namespaces are allowed (rule 2.4.3)
+    Foreign elements should not contain CellML elements or attributes. We disallow this entirely,
+    for technical reasons (id attribute conflicts).
+  -->
+  <define name="foreign-nodes">
+    <zeroOrMore>
+      <choice>
+        <ref name="foreign-attributes-non-local"/>
+        <ref name="foreign-elements"/>
+      </choice>
+    </zeroOrMore>
+  </define>
+  <define name="foreign-elements">
+    <zeroOrMore>
+      <element>
+        <anyName>
+          <except>
+            <nsName ns="http://www.cellml.org/cellml/1.0#"/>
+            <nsName ns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+            <nsName ns="http://www.w3.org/1998/Math/MathML"/>
+          </except>
+        </anyName>
+        <zeroOrMore>
+          <choice>
+            <zeroOrMore>
+              <ref name="foreign-elements"/>
+            </zeroOrMore>
+            <zeroOrMore>
+              <ref name="foreign-attributes"/>
+            </zeroOrMore>
+            <text/>
+          </choice>
+        </zeroOrMore>
+      </element>
+    </zeroOrMore>
+  </define>
+  <define name="foreign-attributes-non-local">
+    <zeroOrMore>
+      <attribute>
+        <anyName>
+          <except>
+            <nsName ns="http://www.cellml.org/cellml/1.0#"/>
+            <nsName ns=""/>
+            <name>cmeta:id</name>
+          </except>
+        </anyName>
+      </attribute>
+    </zeroOrMore>
+  </define>
+  <define name="foreign-attributes">
+    <zeroOrMore>
+      <attribute>
+        <anyName>
+          <except>
+            <nsName ns="http://www.cellml.org/cellml/1.0#"/>
+            <name>cmeta:id</name>
+          </except>
+        </anyName>
+      </attribute>
+    </zeroOrMore>
+  </define>
+  <!--
+    All CellML elements may take this attribute, so that they can be
+    referred to by metadata.
+  -->
+  <define name="cmeta.id">
+    <optional>
+      <attribute name="cmeta:id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+  </define>
+  <!--
+    Nodes that are common to every CellML element.
+    Wrap these in parens so they're easier to add in.
+  -->
+  <define name="common-nodes">
+    <interleave>
+      <ref name="foreign-nodes"/>
+      <ref name="cmeta.id"/>
+      <zeroOrMore>
+        <ref name="rdf.RDF"/>
+      </zeroOrMore>
+    </interleave>
+  </define>
+  <start>
+    <ref name="cellml.model"/>
+  </start>
+  <define name="cellml.model">
+    <element name="cellml:model">
+      <interleave>
+        <!-- Every model needs a name -->
+        <attribute name="name">
+          <ref name="ident"/>
+        </attribute>
+        <zeroOrMore>
+          <!--
+            Elements may appear in any order, although that given here
+            is recommended for CellML elements (rule 3.4.1).
+          -->
+          <ref name="cellml.units"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="cellml.component"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="cellml.group"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="cellml.connection"/>
+        </zeroOrMore>
+        <ref name="common-nodes"/>
+      </interleave>
+    </element>
+  </define>
+  <!-- CellML components (rule 3.4.2) -->
+  <define name="cellml.component">
+    <element name="cellml:component">
+      <interleave>
+        <!-- Every component needs a (unique) name -->
+        <attribute name="name">
+          <ref name="ident"/>
+        </attribute>
+        <zeroOrMore>
+          <!-- Again, order is not required, but is recommended. -->
+          <ref name="cellml.units"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="cellml.variable"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <!--
+            The use of multiple reaction elements is allowed but
+            discoraged (7.4.1.1).
+          -->
+          <ref name="cellml.reaction"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="mathml.math"/>
+        </zeroOrMore>
+        <ref name="common-nodes"/>
+      </interleave>
+    </element>
+  </define>
+  <!-- CellML variables (rule 3.4.3) -->
+  <define name="cellml.variable">
+    <element name="cellml:variable">
+      <!--
+        Each variable needs a name, which is unique within
+        the owning component (but not necessarily across a
+        whole model). 3.4.3.2
+      -->
+      <attribute name="name">
+        <ref name="ident"/>
+      </attribute>
+      <!--
+        Every variable must declare its units.
+        This must be an identifier (5.4.2) corresponding to one
+        of the standard units or a user-defined unit within the
+        current model or component (3.4.3.3).
+      -->
+      <attribute name="units">
+        <ref name="ident"/>
+      </attribute>
+      <!--
+        Interface values are optional, and can be one of
+        "in", "out" or "none" (default) (3.4.3.4 & 3.4.3.5).
+        They cannot both be "in" (4.3.4.6).
+      -->
+      <choice>
+        <group>
+          <attribute name="private_interface">
+            <value>in</value>
+          </attribute>
+          <optional>
+            <attribute name="public_interface">
+              <choice>
+                <value>out</value>
+                <value>none</value>
+              </choice>
+            </attribute>
+          </optional>
+        </group>
+        <group>
+          <attribute name="public_interface">
+            <value>in</value>
+          </attribute>
+          <optional>
+            <attribute name="private_interface">
+              <choice>
+                <value>out</value>
+                <value>none</value>
+              </choice>
+            </attribute>
+          </optional>
+        </group>
+        <group>
+          <optional>
+            <attribute name="private_interface">
+              <choice>
+                <value>out</value>
+                <value>none</value>
+              </choice>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="public_interface">
+              <choice>
+                <value>out</value>
+                <value>none</value>
+              </choice>
+            </attribute>
+          </optional>
+          <optional>
+            <!--
+              An initial value must be a real number (3.4.3.7) and
+              may not be defined on a variable which has either
+              interface set to "in" (3.4.3.8)
+            -->
+            <attribute name="initial_value">
+              <data type="double"/>
+            </attribute>
+          </optional>
+        </group>
+      </choice>
+      <ref name="common-nodes"/>
+    </element>
+  </define>
+  <!--
+    The CellML connection element specifies maps between variables
+    in different components.
+    See rules 3.4.4, 3.4.5
+  -->
+  <define name="cellml.connection">
+    <element name="cellml:connection">
+      <interleave>
+        <!-- Again order of elements is non-essential but recommended (3.4.4.1) -->
+        <!-- There must be exactly one map_components element (3.4.4.1) -->
+        <element name="cellml:map_components">
+          <!--
+            Components to map between must be specified (3.4.5.1).
+            They must refer to distinct (3.4.5.4) components within
+            the current model (3.4.5.2 & 3.4.5.3).
+            There must also be at most one connection between any 2 given
+            components.
+          -->
+          <attribute name="component_1">
+            <ref name="ident"/>
+          </attribute>
+          <attribute name="component_2">
+            <ref name="ident"/>
+          </attribute>
+          <ref name="common-nodes"/>
+        </element>
+        <oneOrMore>
+          <!-- There must be at least one map_variables element (3.4.4.1) -->
+          <element name="cellml:map_variables">
+            <!--
+              Variables to map must be specified (3.4.6.1).
+              The variable_1 attribute must equal the name of a variable
+              defined within component_1 (3.4.6.2); similarly for
+              variable_2 (3.4.6.3).
+              Allowed mappings are determined by the encapsulation
+              hierarchy (3.4.6.4), which is beyond the scope of RELAX NG.
+            -->
+            <attribute name="variable_1">
+              <ref name="ident"/>
+            </attribute>
+            <attribute name="variable_2">
+              <ref name="ident"/>
+            </attribute>
+            <ref name="common-nodes"/>
+          </element>
+        </oneOrMore>
+        <ref name="common-nodes"/>
+      </interleave>
+    </element>
+  </define>
+  <!-- User-defined units (see section 5 of the specification). -->
+  <define name="cellml.units">
+    <element name="cellml:units">
+      <interleave>
+        <!--
+          All units must be named (5.4.1.1).
+          The name must not be equal one of the names defined in the
+          standard dictionary of units.  It must also be unique across
+          all units within its parent element. (5.4.1.2)
+        -->
+        <attribute name="name">
+          <ref name="ident"/>
+        </attribute>
+        <ref name="common-nodes"/>
+        <choice>
+          <!--
+            If the base_units attribute has the value "yes" then only
+            foreign or metadata content is allowed (5.4.1.1).
+          -->
+          <attribute name="base_units">
+            <value>yes</value>
+          </attribute>
+          <interleave>
+            <optional>
+              <!--
+                If base_units is defined as "no" or is unspecified (5.4.1.3)
+                then the unit element must contain at least one units element
+                (5.4.1.1).
+              -->
+              <attribute name="base_units">
+                <value>no</value>
+              </attribute>
+            </optional>
+            <choice>
+              <oneOrMore>
+                <!-- Complex units definition, or simple units without offset -->
+                <element name="cellml:unit">
+                  <!--
+                    All unit elements must define a units attribute (5.4.2.1),
+                    which must reference a valid units name (5.4.2.2).
+                    Circular definitions are not allowed.
+                  -->
+                  <attribute name="units">
+                    <ref name="ident"/>
+                  </attribute>
+                  <optional>
+                    <!--
+                      The prefix, if present, must be an integer or a standard
+                      prefix name (e.g. centi, which is equivalent to -2).  The
+                      default is 0. (5.4.2.3)
+                    -->
+                    <attribute name="prefix">
+                      <choice>
+                        <data type="integer"/>
+                        <ref name="prefix-name"/>
+                      </choice>
+                    </attribute>
+                  </optional>
+                  <optional>
+                    <!--
+                      The exponent, if present, must be a real number, and
+                      defaults to 1.0. (5.4.2.4)
+                    -->
+                    <attribute name="exponent">
+                      <data type="double"/>
+                    </attribute>
+                  </optional>
+                  <optional>
+                    <!--
+                      The multiplier, if present, must be a real number, and
+                      defaults to 1.0. (5.4.2.5)
+                    -->
+                    <attribute name="multiplier">
+                      <data type="double"/>
+                    </attribute>
+                  </optional>
+                  <optional>
+                    <!--
+                      The offset, if present, must be a real number, and
+                      defaults to 0.0. (5.4.2.6)
+                      It must be omitted or zero except in a simple units
+                      definition (5.4.2.7).
+                    -->
+                    <attribute name="offset">
+                      <value type="decimal">0.0</value>
+                    </attribute>
+                  </optional>
+                  <ref name="common-nodes"/>
+                </element>
+              </oneOrMore>
+              <!--
+                Simple units definition with offset (5.4.2.7)
+                These have a non-zero value for the offset attribute, and
+                only a single unit element.
+              -->
+              <element name="cellml:unit">
+                <!--
+                  All unit elements must define a units attribute (5.4.2.1),
+                  which must reference a valid units name (5.4.2.2).
+                  Circular definitions are not allowed.
+                -->
+                <attribute name="units">
+                  <ref name="ident"/>
+                </attribute>
+                <optional>
+                  <!--
+                    The prefix, if present, must be an integer or a standard
+                    prefix name (e.g. centi, which is equivalent to -2).  The
+                    default is 0. (5.4.2.3)
+                  -->
+                  <attribute name="prefix">
+                    <choice>
+                      <data type="integer"/>
+                      <ref name="prefix-name"/>
+                    </choice>
+                  </attribute>
+                </optional>
+                <optional>
+                  <!--
+                    The exponent, if present, must be a real number, and
+                    defaults to 1.0. (5.4.2.4)
+                    It must be 1.0 if offset is non-zero (5.4.2.7).
+                  -->
+                  <attribute name="exponent">
+                    <value type="double">1.0</value>
+                  </attribute>
+                </optional>
+                <optional>
+                  <!--
+                    The multiplier, if present, must be a real number, and
+                    defaults to 1.0. (5.4.2.5)
+                  -->
+                  <attribute name="multiplier">
+                    <data type="double"/>
+                  </attribute>
+                </optional>
+                <optional>
+                  <!--
+                    The offset, if present, must be a real number, and
+                    defaults to 0.0. (5.4.2.6)
+                    It must be omitted or zero except in a simple units
+                    definition (5.4.2.7).
+                  -->
+                  <attribute name="offset">
+                    <data type="decimal">
+                      <except>
+                        <value type="decimal">0.0</value>
+                      </except>
+                    </data>
+                  </attribute>
+                </optional>
+                <ref name="common-nodes"/>
+              </element>
+            </choice>
+          </interleave>
+        </choice>
+      </interleave>
+    </element>
+  </define>
+  <!--
+    The set of names that may be used in the prefix attribute on a
+    unit element.
+  -->
+  <define name="prefix-name">
+    <choice>
+      <value>yotta</value>
+      <value>zetta</value>
+      <value>exa</value>
+      <value>peta</value>
+      <value>tera</value>
+      <value>giga</value>
+      <value>mega</value>
+      <value>kilo</value>
+      <value>hecto</value>
+      <value>deka</value>
+      <value>deci</value>
+      <value>centi</value>
+      <value>milli</value>
+      <value>micro</value>
+      <value>nano</value>
+      <value>pico</value>
+      <value>femto</value>
+      <value>atto</value>
+      <value>zepto</value>
+      <value>yocto</value>
+    </choice>
+  </define>
+  <!-- Groups (see section 6 of the specification) -->
+  <define name="cellml.group">
+    <element name="cellml:group">
+      <interleave>
+        <oneOrMore>
+          <!-- See 6.4.1.1 -->
+          <ref name="cellml.relationship_ref"/>
+        </oneOrMore>
+        <oneOrMore>
+          <ref name="cellml.component_ref"/>
+        </oneOrMore>
+        <ref name="common-nodes"/>
+      </interleave>
+    </element>
+  </define>
+  <!-- 6.4.2: the relationship_ref element -->
+  <define name="cellml.relationship_ref">
+    <element name="cellml:relationship_ref">
+      <interleave>
+        <!--
+          There must be a relationship attribute, either in the 'CellML
+          namespace' (meaning no NS) or a user namespace (6.4.2.1)
+          I haven't figured out how to describe user-defined relationships
+          yet.  The best way may be to make the relationship attr optional,
+          but this would then allow invalid models.  TODO
+          For the CellML namespace case, the value must be "containment" or
+          "encapsulation" (6.4.2.2)
+        -->
+        <choice>
+          <attribute name="relationship">
+            <value>encapsulation</value>
+          </attribute>
+          <group>
+            <!--
+              For a non-encapsulation relationship, a name attribute is also
+              permitted (6.4.2.3) to name a hierarchy.
+            -->
+            <attribute name="relationship">
+              <value>containment</value>
+            </attribute>
+            <optional>
+              <attribute name="name">
+                <ref name="ident"/>
+              </attribute>
+            </optional>
+          </group>
+        </choice>
+        <ref name="common-nodes"/>
+      </interleave>
+    </element>
+  </define>
+  <!-- 6.4.3: the component_ref element -->
+  <define name="cellml.component_ref">
+    <element name="cellml:component_ref">
+      <interleave>
+        <!--
+          The component attribute is mandatory; child elements are optional
+          (6.4.3.1).
+          The value of the component attribute should be the name of a
+          component defined in the current model (6.4.3.3)
+          The restrictions of 6.4.3.2 cannot be adequately expressed in
+          RELAX NG.
+        -->
+        <attribute name="component">
+          <ref name="ident"/>
+        </attribute>
+        <zeroOrMore>
+          <ref name="cellml.component_ref"/>
+        </zeroOrMore>
+        <ref name="common-nodes"/>
+      </interleave>
+    </element>
+  </define>
+  <!-- Reactions (see section 7 of the specification) -->
+  <define name="cellml.reaction">
+    <element name="cellml:reaction">
+      <interleave>
+        <optional>
+          <!--
+            There may be a reversible attribute, which can take the values
+            "yes" or "no", and defaults to "yes" (7.4.1.2).  It is recommended
+            to always specify a value.
+          -->
+          <attribute name="reversible">
+            <choice>
+              <value>yes</value>
+              <value>no</value>
+            </choice>
+          </attribute>
+        </optional>
+        <oneOrMore>
+          <!--
+            The recommended best practice is to define one variable_ref
+            element for each variable representing a chemical species that
+            participates in the reaction, and one variable_ref element for
+            the variable representing the rate of the reaction (7.4.1.1)
+          -->
+          <ref name="cellml.variable_ref"/>
+        </oneOrMore>
+        <ref name="common-nodes"/>
+      </interleave>
+    </element>
+  </define>
+  <!-- 7.4.2: the variable_ref element -->
+  <define name="cellml.variable_ref">
+    <element name="cellml:variable_ref">
+      <interleave>
+        <!--
+          The variable attribute must have a value equal to the name of
+          a variable defined in the current component (7.4.2.2).  A
+          variable must only be referenced once in a given reaction.
+        -->
+        <attribute name="variable">
+          <ref name="ident"/>
+        </attribute>
+        <!--
+          There must be at least one role element (7.4.2.1).  The
+          recommended best practice is to define one role element for
+          each role assumed by the chemical species represented by the
+          referenced variable.
+        -->
+        <choice>
+          <oneOrMore>
+            <element name="cellml:role">
+              <choice>
+                <group>
+                  <!-- The role attribute must take one of 7 values (7.4.3.2) -->
+                  <attribute name="role">
+                    <choice>
+                      <value>catalyst</value>
+                      <value>activator</value>
+                      <value>inhibitor</value>
+                      <value>modifier</value>
+                    </choice>
+                    <!-- Some unspecified effect -->
+                  </attribute>
+                  <optional>
+                    <!--
+                      The direction attribute defaults to "forward" (7.4.3.4),
+                      indicating the role of this variable when the reaction
+                      is running in the favoured direction.
+                    -->
+                    <attribute name="direction">
+                      <choice>
+                        <value>forward</value>
+                        <value>reverse</value>
+                        <value>both</value>
+                      </choice>
+                    </attribute>
+                  </optional>
+                  <optional>
+                    <!--
+                      Usually this will be an integer, but fractional values
+                      are allowed (7.4.3.6).
+                    -->
+                    <attribute name="stoichiometry">
+                      <data type="decimal"/>
+                    </attribute>
+                  </optional>
+                  <interleave>
+                    <zeroOrMore>
+                      <ref name="mathml.math"/>
+                    </zeroOrMore>
+                    <ref name="common-nodes"/>
+                  </interleave>
+                </group>
+                <interleave>
+                  <!-- The role attribute must take one of 7 values (7.4.3.2) -->
+                  <attribute name="role">
+                    <choice>
+                      <value>reactant</value>
+                      <value>product</value>
+                    </choice>
+                  </attribute>
+                  <optional>
+                    <!--
+                      Reactants and products must be described in the forward
+                      direction (7.4.3.5).
+                    -->
+                    <attribute name="direction">
+                      <value>forward</value>
+                    </attribute>
+                  </optional>
+                  <choice>
+                    <interleave>
+                      <!--
+                        This must refer to the name of a variable in the current
+                        component (7.4.3.7).  It must be unique across all role
+                        elements within the current component.
+                        It can only occur if the role is "reactant" or "product"
+                        (7.4.3.8).
+                      -->
+                      <attribute name="delta_variable">
+                        <ref name="ident"/>
+                      </attribute>
+                      <!--
+                        When a delta_variable attribute is present, there must
+                        be either a stoichiometry attribute or at least one math
+                        element (7.4.3.8).
+                      -->
+                      <choice>
+                        <!--
+                          Usually this will be an integer, but fractional values
+                          are allowed (7.4.3.6).
+                        -->
+                        <attribute name="stoichiometry">
+                          <data type="decimal"/>
+                        </attribute>
+                        <oneOrMore>
+                          <ref name="mathml.math"/>
+                        </oneOrMore>
+                      </choice>
+                    </interleave>
+                    <group>
+                      <optional>
+                        <attribute name="stoichiometry">
+                          <data type="decimal"/>
+                        </attribute>
+                      </optional>
+                      <zeroOrMore>
+                        <ref name="mathml.math"/>
+                      </zeroOrMore>
+                    </group>
+                  </choice>
+                  <ref name="common-nodes"/>
+                </interleave>
+              </choice>
+            </element>
+          </oneOrMore>
+          <element name="cellml:role">
+            <!--
+              The role attribute must take one of 7 values (7.4.3.2).
+              If the value is "rate" then the reference variable
+              represents the reaction rate, and no other roles can be
+              assigned to it.  Further, the delta_variable and
+              stoichiometry attributes are disallowed (7.4.3.3).
+            -->
+            <attribute name="role">
+              <value>rate</value>
+            </attribute>
+            <optional>
+              <!-- Rates must be specified in the forward direction (7.4.3.5) -->
+              <attribute name="direction">
+                <value>forward</value>
+              </attribute>
+            </optional>
+            <interleave>
+              <zeroOrMore>
+                <ref name="mathml.math"/>
+              </zeroOrMore>
+              <ref name="common-nodes"/>
+            </interleave>
+          </element>
+        </choice>
+        <ref name="common-nodes"/>
+      </interleave>
+    </element>
+  </define>
+  <!--
+    Almost any of MathML 2.0 is permitted.
+    There is however a CellML subset,
+    which is all that is required of conformant processing software.
+  -->
+  <!--
+    This part uses a schema generated from the MathML 2.0 DTD to
+    define the contents of math elements.
+  -->
+  <include href="mathml2.rng">
+    <a:documentation/>
+    <!--            Mathematics (section 4 of the specification)            # -->
+    <a:documentation/>
+    <!--
+      Restrict the attribute list for math elements, since in a CellML
+      document they're not top-level.
+    -->
+    <define name="attlist-mathml.math">
+      <ref name="MATHML.Common.attrib"/>
+    </define>
+    <!--
+      Presentation markup is NOT allowed except within annotation-xml.
+      However, that element may contain any XML, so we can just define
+      the presentation elements to not exist :)
+    -->
+    <define name="PresInCont">
+      <empty/>
+    </define>
+    <!-- We don't want to allow empty expressions -->
+    <define name="ContentExpression">
+      <oneOrMore>
+        <ref name="Content"/>
+      </oneOrMore>
+    </define>
+    <!-- Restrict what is allowable "any XML" so ID attrs don't conflict -->
+    <define name="any">
+      <zeroOrMore>
+        <choice>
+          <element>
+            <nsName ns="http://www.w3.org/1998/Math/MathML"/>
+            <zeroOrMore>
+              <attribute>
+                <nsName ns="http://www.w3.org/1998/Math/MathML"/>
+              </attribute>
+            </zeroOrMore>
+            <ref name="any"/>
+          </element>
+          <text/>
+        </choice>
+      </zeroOrMore>
+    </define>
+    <!--
+      We could restrict the content of ci to be a CellML identifier:
+      mathml.ci = element mathml:ci {
+        attlist-mathml.ci, ident
+      }
+      However, since later it will be checked that each ci element contains
+      the name of an existing variable, there isn't much point.
+    -->
+    <!-- Check numbers of operands using co-occurrence constraints -->
+    <define name="mathml.apply">
+      <element name="mathml:apply">
+        <ref name="attlist-mathml.apply"/>
+        <ref name="ApplyContentExpression"/>
+      </element>
+    </define>
+    <!--
+      I think some operators are wrongly classified in the MathML schema
+      Lets be more specific about the 'misc' operators
+    -->
+    <define name="copmisc">
+      <empty/>
+    </define>
+  </include>
+  <!-- Extra unary operators that were misc. -->
+  <define name="cop1ary" combine="choice">
+    <choice>
+      <ref name="mathml.root"/>
+      <ref name="mathml.log"/>
+      <ref name="mathml.minus"/>
+      <ref name="cseqop"/>
+      <ref name="cstatopmoment"/>
+      <ref name="clogicopquant"/>
+    </choice>
+  </define>
+  <!-- Be more specific for calculus operators -->
+  <define name="ccalcop1ary" combine="choice">
+    <choice>
+      <ref name="mathml.int"/>
+      <ref name="mathml.diff"/>
+      <ref name="mathml.partialdiff"/>
+      <ref name="mathml.divergence"/>
+      <ref name="mathml.grad"/>
+      <ref name="mathml.curl"/>
+      <ref name="mathml.laplacian"/>
+    </choice>
+  </define>
+  <define name="ccalcop2ary">
+    <ref name="mathml.partialdiff"/>
+  </define>
+  <!-- Extra binary operators that were misc. -->
+  <define name="cop2ary" combine="choice">
+    <choice>
+      <ref name="ccalcop2ary"/>
+      <ref name="mathml.minus"/>
+    </choice>
+  </define>
+  <!-- Restrict number of operands depending on the operator -->
+  <define name="c_operand">
+    <choice>
+      <ref name="ctoken"/>
+      <ref name="c0ary"/>
+      <ref name="cconstructor"/>
+      <ref name="cspecial"/>
+      <ref name="cother"/>
+    </choice>
+  </define>
+  <define name="c_not_oper">
+    <choice>
+      <ref name="cquantifier"/>
+      <ref name="csemantics"/>
+    </choice>
+  </define>
+  <define name="ApplyContentExpression">
+    <choice>
+      <interleave>
+        <group>
+          <ref name="cop1ary"/>
+          <ref name="c_operand"/>
+        </group>
+        <zeroOrMore>
+          <ref name="c_not_oper"/>
+        </zeroOrMore>
+      </interleave>
+      <interleave>
+        <group>
+          <choice>
+            <ref name="crel2ary"/>
+            <ref name="cop2ary"/>
+          </choice>
+          <ref name="c_operand"/>
+          <ref name="c_operand"/>
+        </group>
+        <zeroOrMore>
+          <ref name="c_not_oper"/>
+        </zeroOrMore>
+      </interleave>
+      <interleave>
+        <group>
+          <choice>
+            <ref name="crelnary"/>
+            <ref name="copnary"/>
+            <ref name="mathml.csymbol"/>
+          </choice>
+          <oneOrMore>
+            <ref name="c_operand"/>
+          </oneOrMore>
+        </group>
+        <zeroOrMore>
+          <ref name="c_not_oper"/>
+        </zeroOrMore>
+      </interleave>
+    </choice>
+  </define>
+  <!-- All cn elements must contain a cellml:units attribute -->
+  <define name="attlist-mathml.cn" combine="interleave">
+    <attribute name="cellml:units">
+      <ref name="ident"/>
+    </attribute>
+  </define>
+  <!-- Allow lookup table annotations -->
+  <define name="MATHML.Common.attrib" combine="interleave">
+    <zeroOrMore>
+      <attribute>
+        <nsName ns="https://chaste.comlab.ox.ac.uk/cellml/ns/lookup-tables"/>
+      </attribute>
+    </zeroOrMore>
+  </define>
+  <!-- This Schema doesn't say anything about allowable metadata. -->
+  <define name="rdf-any">
+    <a:documentation/>
+    <!--                              Metadata                              # -->
+    <a:documentation/>
+    <choice>
+      <element>
+        <anyName>
+          <except>
+            <nsName ns="http://www.w3.org/1998/Math/MathML"/>
+            <nsName ns="http://www.cellml.org/cellml/1.0#"/>
+          </except>
+        </anyName>
+        <zeroOrMore>
+          <attribute>
+            <anyName/>
+          </attribute>
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="rdf-any"/>
+        </zeroOrMore>
+      </element>
+      <text/>
+    </choice>
+  </define>
+  <define name="rdf.RDF">
+    <element name="rdf:RDF">
+      <zeroOrMore>
+        <attribute>
+          <anyName/>
+        </attribute>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="rdf-any"/>
+      </zeroOrMore>
+    </element>
+  </define>
+</grammar>

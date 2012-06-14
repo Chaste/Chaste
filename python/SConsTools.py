@@ -75,7 +75,7 @@ def FindSourceFiles(env, rootDir, ignoreDirs=[], dirsOnly=False, includeRoot=Fal
                     sourceExts=None):
     """Look for source files under rootDir.
     
-    Returns 2 lists: the first of source (.cpp, .xsd) files, and the second
+    Returns 2 lists: the first of source (.cpp, .xsd, .cellml) files, and the second
     of the directories in which they may be found.
     
     Optionally:
@@ -552,9 +552,9 @@ def CreateXsdBuilder(build, buildenv, fakeIt=False):
     
     Adds the converter as a source action to the C/C++ builders.
     
-    If fakeIt is True, doesn't actually run the converter, just touches the output
-    .cpp file.  This means that inner SCons runs for generating dynamically loadable
-    cell models don't try regenerating it unnecessarily.
+    If fakeIt is True, the builder doesn't actually run the converter.  This means
+    that inner SCons runs for generating dynamically loadable cell models don't try
+    regenerating it unnecessarily.
     """
     # Check if  'xsd' is really CodeSynthesis xsd...
     if not SCons.Script.GetOption('clean'):

@@ -1,0 +1,3450 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- MathML 2.0 DTD  ....................................................... -->
+<!-- file: mathml2.dtd -->
+<!--
+  MathML 2.0 DTD
+  
+  This is the Mathematical Markup Language (MathML) 2.0, an XML
+  application for describing mathematical notation and capturing
+  both its structure and content.
+  
+  Copyright &#xa9; 1998-2003 W3C&#xae; (MIT, ERCIM, Keio), All Rights 
+  Reserved. W3C liability, trademark, document use and software
+  licensing rules apply. 
+  
+  Permission to use, copy, modify and distribute the MathML 2.0 DTD and
+  its accompanying documentation for any purpose and without fee is
+  hereby granted in perpetuity, provided that the above copyright notice
+  and this paragraph appear in all copies.  The copyright holders make
+  no representation about the suitability of the DTD for any purpose.
+  
+  It is provided "as is" without expressed or implied warranty.
+  
+     Revision:   $Id: mathml2.dtd,v 1.12 2003/11/04 13:14:35 davidc Exp $
+  
+  This entity may be identified by the PUBLIC and SYSTEM identifiers:
+  
+    PUBLIC "-//W3C//DTD MathML 2.0//EN"
+    SYSTEM "mathml2.dtd"
+  
+  Revisions: editor and revision history at EOF
+-->
+<!--
+  Entity used to enable marked sections which enforces stricter
+  checking of MathML syntax rules		
+-->
+<!-- MathML Qualified Names module ............................... -->
+<grammar xmlns:mathml="http://www.w3.org/1998/Math/MathML" xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <define name="MATHML.xmlns.attrib">
+    <empty/>
+  </define>
+  <!-- Attributes shared by all elements  .......................... -->
+  <define name="MATHML.Common.attrib">
+    <optional>
+      <attribute name="xlink:href"/>
+    </optional>
+    <optional>
+      <attribute name="xlink:type"/>
+    </optional>
+    <optional>
+      <attribute name="class"/>
+    </optional>
+    <optional>
+      <attribute name="style"/>
+    </optional>
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="xref">
+        <data type="IDREF"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="other"/>
+    </optional>
+  </define>
+  <!-- Presentation element set  ................................... -->
+  <!-- Attribute definitions -->
+  <define name="att-fontsize">
+    <optional>
+      <attribute name="fontsize"/>
+    </optional>
+  </define>
+  <define name="att-fontweight">
+    <optional>
+      <attribute name="fontweight">
+        <choice>
+          <value>normal</value>
+          <value>bold</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+  <define name="att-fontstyle">
+    <optional>
+      <attribute name="fontstyle">
+        <choice>
+          <value>normal</value>
+          <value>italic</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+  <define name="att-fontfamily">
+    <optional>
+      <attribute name="fontfamily"/>
+    </optional>
+  </define>
+  <define name="att-color">
+    <optional>
+      <attribute name="color"/>
+    </optional>
+  </define>
+  <!-- MathML2 typographically-distinguished symbol attributes -->
+  <define name="att-mathvariant">
+    <optional>
+      <attribute name="mathvariant">
+        <choice>
+          <value>normal</value>
+          <value>bold</value>
+          <value>italic</value>
+          <value>bold-italic</value>
+          <value>double-struck</value>
+          <value>bold-fraktur</value>
+          <value>script</value>
+          <value>bold-script</value>
+          <value>fraktur</value>
+          <value>sans-serif</value>
+          <value>bold-sans-serif</value>
+          <value>sans-serif-italic</value>
+          <value>sans-serif-bold-italic</value>
+          <value>monospace</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+  <define name="att-mathsize">
+    <optional>
+      <attribute name="mathsize"/>
+    </optional>
+  </define>
+  <define name="att-mathcolor">
+    <optional>
+      <attribute name="mathcolor"/>
+    </optional>
+  </define>
+  <define name="att-mathbackground">
+    <optional>
+      <attribute name="mathbackground"/>
+    </optional>
+  </define>
+  <define name="att-fontinfo">
+    <ref name="att-fontsize"/>
+    <ref name="att-fontweight"/>
+    <ref name="att-fontstyle"/>
+    <ref name="att-fontfamily"/>
+    <ref name="att-color"/>
+    <ref name="att-mathvariant"/>
+    <ref name="att-mathsize"/>
+    <ref name="att-mathcolor"/>
+    <ref name="att-mathbackground"/>
+  </define>
+  <define name="att-form">
+    <optional>
+      <attribute name="form">
+        <choice>
+          <value>prefix</value>
+          <value>infix</value>
+          <value>postfix</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+  <define name="att-fence">
+    <optional>
+      <attribute name="fence">
+        <choice>
+          <value>true</value>
+          <value>false</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+  <define name="att-separator">
+    <optional>
+      <attribute name="separator">
+        <choice>
+          <value>true</value>
+          <value>false</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+  <define name="att-lspace">
+    <optional>
+      <attribute name="lspace"/>
+    </optional>
+  </define>
+  <define name="att-rspace">
+    <optional>
+      <attribute name="rspace"/>
+    </optional>
+  </define>
+  <define name="att-stretchy">
+    <optional>
+      <attribute name="stretchy">
+        <choice>
+          <value>true</value>
+          <value>false</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+  <define name="att-symmetric">
+    <optional>
+      <attribute name="symmetric">
+        <choice>
+          <value>true</value>
+          <value>false</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+  <define name="att-maxsize">
+    <optional>
+      <attribute name="maxsize"/>
+    </optional>
+  </define>
+  <define name="att-minsize">
+    <optional>
+      <attribute name="minsize"/>
+    </optional>
+  </define>
+  <define name="att-largeop">
+    <optional>
+      <attribute name="largeop">
+        <choice>
+          <value>true</value>
+          <value>false</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+  <define name="att-movablelimits">
+    <optional>
+      <attribute name="movablelimits">
+        <choice>
+          <value>true</value>
+          <value>false</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+  <define name="att-accent">
+    <optional>
+      <attribute name="accent">
+        <choice>
+          <value>true</value>
+          <value>false</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+  <define name="att-opinfo">
+    <ref name="att-form"/>
+    <ref name="att-fence"/>
+    <ref name="att-separator"/>
+    <ref name="att-lspace"/>
+    <ref name="att-rspace"/>
+    <ref name="att-stretchy"/>
+    <ref name="att-symmetric"/>
+    <ref name="att-maxsize"/>
+    <ref name="att-minsize"/>
+    <ref name="att-largeop"/>
+    <ref name="att-movablelimits"/>
+    <ref name="att-accent"/>
+  </define>
+  <define name="att-width">
+    <optional>
+      <attribute name="width"/>
+    </optional>
+  </define>
+  <define name="att-height">
+    <optional>
+      <attribute name="height"/>
+    </optional>
+  </define>
+  <define name="att-depth">
+    <optional>
+      <attribute name="depth"/>
+    </optional>
+  </define>
+  <define name="att-linebreak">
+    <optional>
+      <attribute name="linebreak"/>
+    </optional>
+  </define>
+  <define name="att-sizeinfo">
+    <ref name="att-width"/>
+    <ref name="att-height"/>
+    <ref name="att-depth"/>
+  </define>
+  <define name="att-lquote">
+    <optional>
+      <attribute name="lquote"/>
+    </optional>
+  </define>
+  <define name="att-rquote">
+    <optional>
+      <attribute name="rquote"/>
+    </optional>
+  </define>
+  <define name="att-linethickness">
+    <optional>
+      <attribute name="linethickness"/>
+    </optional>
+  </define>
+  <define name="att-scriptlevel">
+    <optional>
+      <attribute name="scriptlevel"/>
+    </optional>
+  </define>
+  <define name="att-displaystyle">
+    <optional>
+      <attribute name="displaystyle">
+        <choice>
+          <value>true</value>
+          <value>false</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+  <define name="att-scriptsizemultiplier">
+    <optional>
+      <attribute name="scriptsizemultiplier"/>
+    </optional>
+  </define>
+  <define name="att-scriptminsize">
+    <optional>
+      <attribute name="scriptminsize"/>
+    </optional>
+  </define>
+  <define name="att-background">
+    <optional>
+      <attribute name="background"/>
+    </optional>
+  </define>
+  <define name="att-veryverythinmathspace">
+    <optional>
+      <attribute name="veryverythinmathspace"/>
+    </optional>
+  </define>
+  <define name="att-verythinmathspace">
+    <optional>
+      <attribute name="verythinmathspace"/>
+    </optional>
+  </define>
+  <define name="att-thinmathspace">
+    <optional>
+      <attribute name="thinmathspace"/>
+    </optional>
+  </define>
+  <define name="att-mediummathspace">
+    <optional>
+      <attribute name="mediummathspace"/>
+    </optional>
+  </define>
+  <define name="att-thickmathspace">
+    <optional>
+      <attribute name="thickmathspace"/>
+    </optional>
+  </define>
+  <define name="att-verythickmathspace">
+    <optional>
+      <attribute name="verythickmathspace"/>
+    </optional>
+  </define>
+  <define name="att-veryverythickmathspace">
+    <optional>
+      <attribute name="veryverythickmathspace"/>
+    </optional>
+  </define>
+  <define name="att-open">
+    <optional>
+      <attribute name="open"/>
+    </optional>
+  </define>
+  <define name="att-close">
+    <optional>
+      <attribute name="close"/>
+    </optional>
+  </define>
+  <define name="att-separators">
+    <optional>
+      <attribute name="separators"/>
+    </optional>
+  </define>
+  <define name="att-subscriptshift">
+    <optional>
+      <attribute name="subscriptshift"/>
+    </optional>
+  </define>
+  <define name="att-superscriptshift">
+    <optional>
+      <attribute name="superscriptshift"/>
+    </optional>
+  </define>
+  <define name="att-accentunder">
+    <optional>
+      <attribute name="accentunder">
+        <choice>
+          <value>true</value>
+          <value>false</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+  <define name="att-align">
+    <optional>
+      <attribute name="align"/>
+    </optional>
+  </define>
+  <define name="att-numalign">
+    <optional>
+      <attribute name="numalign">
+        <choice>
+          <value>left</value>
+          <value>center</value>
+          <value>right</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+  <define name="att-denomalign">
+    <optional>
+      <attribute name="denomalign">
+        <choice>
+          <value>left</value>
+          <value>center</value>
+          <value>right</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+  <define name="att-rowalign-list">
+    <optional>
+      <attribute name="rowalign"/>
+    </optional>
+  </define>
+  <define name="att-columnalign-list">
+    <optional>
+      <attribute name="columnalign"/>
+    </optional>
+  </define>
+  <define name="att-rowalign">
+    <optional>
+      <attribute name="rowalign">
+        <choice>
+          <value>top</value>
+          <value>bottom</value>
+          <value>center</value>
+          <value>baseline</value>
+          <value>axis</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+  <define name="att-columnalign">
+    <optional>
+      <attribute name="columnalign">
+        <choice>
+          <value>left</value>
+          <value>center</value>
+          <value>right</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+  <define name="att-columnwidth">
+    <optional>
+      <attribute name="columnwidth"/>
+    </optional>
+  </define>
+  <define name="att-groupalign-list">
+    <optional>
+      <attribute name="groupalign"/>
+    </optional>
+  </define>
+  <define name="att-groupalign">
+    <optional>
+      <attribute name="groupalign">
+        <choice>
+          <value>left</value>
+          <value>right</value>
+          <value>center</value>
+          <value>decimalpoint</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+  <define name="att-alignmentscope">
+    <optional>
+      <attribute name="alignmentscope"/>
+    </optional>
+  </define>
+  <define name="att-rowspacing">
+    <optional>
+      <attribute name="rowspacing"/>
+    </optional>
+  </define>
+  <define name="att-columnspacing">
+    <optional>
+      <attribute name="columnspacing"/>
+    </optional>
+  </define>
+  <define name="att-rowlines">
+    <optional>
+      <attribute name="rowlines"/>
+    </optional>
+  </define>
+  <define name="att-columnlines">
+    <optional>
+      <attribute name="columnlines"/>
+    </optional>
+  </define>
+  <define name="att-frame">
+    <optional>
+      <attribute name="frame">
+        <choice>
+          <value>none</value>
+          <value>solid</value>
+          <value>dashed</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+  <define name="att-side">
+    <optional>
+      <attribute name="side">
+        <choice>
+          <value>left</value>
+          <value>right</value>
+          <value>leftoverlap</value>
+          <value>rightoverlap</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+  <define name="att-framespacing">
+    <optional>
+      <attribute name="framespacing"/>
+    </optional>
+  </define>
+  <define name="att-minlabelspacing">
+    <optional>
+      <attribute name="minlabelspacing"/>
+    </optional>
+  </define>
+  <define name="att-equalrows">
+    <optional>
+      <attribute name="equalrows">
+        <choice>
+          <value>true</value>
+          <value>false</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+  <define name="att-equalcolumns">
+    <optional>
+      <attribute name="equalcolumns">
+        <choice>
+          <value>true</value>
+          <value>false</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+  <define name="att-tableinfo">
+    <ref name="att-align"/>
+    <ref name="att-rowalign-list"/>
+    <ref name="att-columnalign-list"/>
+    <ref name="att-columnwidth"/>
+    <ref name="att-groupalign-list"/>
+    <ref name="att-alignmentscope"/>
+    <ref name="att-side"/>
+    <ref name="att-rowspacing"/>
+    <ref name="att-columnspacing"/>
+    <ref name="att-rowlines"/>
+    <ref name="att-columnlines"/>
+    <ref name="att-width"/>
+    <ref name="att-frame"/>
+    <ref name="att-framespacing"/>
+    <ref name="att-minlabelspacing"/>
+    <ref name="att-equalrows"/>
+    <ref name="att-equalcolumns"/>
+    <ref name="att-displaystyle"/>
+  </define>
+  <define name="att-rowspan">
+    <optional>
+      <attribute name="rowspan"/>
+    </optional>
+  </define>
+  <define name="att-columnspan">
+    <optional>
+      <attribute name="columnspan"/>
+    </optional>
+  </define>
+  <define name="att-edge">
+    <optional>
+      <attribute name="edge">
+        <choice>
+          <value>left</value>
+          <value>right</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+  <define name="att-actiontype">
+    <optional>
+      <attribute name="actiontype"/>
+    </optional>
+  </define>
+  <define name="att-selection">
+    <optional>
+      <attribute name="selection"/>
+    </optional>
+  </define>
+  <define name="att-name">
+    <optional>
+      <attribute name="name"/>
+    </optional>
+  </define>
+  <define name="att-alt">
+    <optional>
+      <attribute name="alt"/>
+    </optional>
+  </define>
+  <define name="att-index">
+    <optional>
+      <attribute name="index"/>
+    </optional>
+  </define>
+  <define name="att-bevelled">
+    <optional>
+      <attribute name="bevelled">
+        <choice>
+          <value>true</value>
+          <value>false</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+  <!-- Presentation schemata with content -->
+  <define name="ptoken">
+    <choice>
+      <ref name="mathml.mi"/>
+      <ref name="mathml.mn"/>
+      <ref name="mathml.mo"/>
+      <ref name="mathml.mtext"/>
+      <ref name="mathml.ms"/>
+    </choice>
+  </define>
+  <define name="attlist-mathml.mi" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-fontinfo"/>
+  </define>
+  <define name="attlist-mathml.mn" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-fontinfo"/>
+  </define>
+  <define name="attlist-mathml.mo" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-fontinfo"/>
+    <ref name="att-opinfo"/>
+  </define>
+  <define name="attlist-mathml.mtext" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-fontinfo"/>
+  </define>
+  <define name="attlist-mathml.ms" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-fontinfo"/>
+    <ref name="att-lquote"/>
+    <ref name="att-rquote"/>
+  </define>
+  <!-- Empty presentation schemata -->
+  <define name="petoken">
+    <ref name="mathml.mspace"/>
+  </define>
+  <define name="mathml.mspace">
+    <element name="mathml:mspace">
+      <ref name="attlist-mathml.mspace"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.mspace" combine="interleave">
+    <ref name="att-sizeinfo"/>
+    <ref name="att-linebreak"/>
+    <ref name="MATHML.Common.attrib"/>
+  </define>
+  <!-- Presentation: general layout schemata -->
+  <define name="pgenschema">
+    <choice>
+      <ref name="mathml.mrow"/>
+      <ref name="mathml.mfrac"/>
+      <ref name="mathml.msqrt"/>
+      <ref name="mathml.mroot"/>
+      <ref name="mathml.menclose"/>
+      <ref name="mathml.mstyle"/>
+      <ref name="mathml.merror"/>
+      <ref name="mathml.mpadded"/>
+      <ref name="mathml.mphantom"/>
+      <ref name="mathml.mfenced"/>
+    </choice>
+  </define>
+  <define name="attlist-mathml.mrow" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+  </define>
+  <define name="attlist-mathml.mfrac" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-bevelled"/>
+    <ref name="att-numalign"/>
+    <ref name="att-denomalign"/>
+    <ref name="att-linethickness"/>
+  </define>
+  <define name="attlist-mathml.msqrt" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+  </define>
+  <define name="attlist-mathml.menclose" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <optional>
+      <attribute name="notation" a:defaultValue="longdiv"/>
+    </optional>
+  </define>
+  <define name="attlist-mathml.mroot" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+  </define>
+  <define name="attlist-mathml.mstyle" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-fontinfo"/>
+    <ref name="att-opinfo"/>
+    <ref name="att-lquote"/>
+    <ref name="att-rquote"/>
+    <ref name="att-linethickness"/>
+    <ref name="att-scriptlevel"/>
+    <ref name="att-scriptsizemultiplier"/>
+    <ref name="att-scriptminsize"/>
+    <ref name="att-background"/>
+    <ref name="att-veryverythinmathspace"/>
+    <ref name="att-verythinmathspace"/>
+    <ref name="att-thinmathspace"/>
+    <ref name="att-mediummathspace"/>
+    <ref name="att-thickmathspace"/>
+    <ref name="att-verythickmathspace"/>
+    <ref name="att-veryverythickmathspace"/>
+    <ref name="att-open"/>
+    <ref name="att-close"/>
+    <ref name="att-separators"/>
+    <ref name="att-subscriptshift"/>
+    <ref name="att-superscriptshift"/>
+    <ref name="att-accentunder"/>
+    <ref name="att-tableinfo"/>
+    <ref name="att-rowspan"/>
+    <ref name="att-columnspan"/>
+    <ref name="att-edge"/>
+    <ref name="att-selection"/>
+    <ref name="att-bevelled"/>
+    <ref name="att-height"/>
+    <ref name="att-depth"/>
+  </define>
+  <define name="attlist-mathml.merror" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+  </define>
+  <define name="attlist-mathml.mpadded" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-sizeinfo"/>
+    <ref name="att-lspace"/>
+  </define>
+  <define name="attlist-mathml.mphantom" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+  </define>
+  <define name="attlist-mathml.mfenced" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-open"/>
+    <ref name="att-close"/>
+    <ref name="att-separators"/>
+  </define>
+  <!-- Presentation layout schemata: scripts and limits -->
+  <define name="pscrschema">
+    <choice>
+      <ref name="mathml.msub"/>
+      <ref name="mathml.msup"/>
+      <ref name="mathml.msubsup"/>
+      <ref name="mathml.munder"/>
+      <ref name="mathml.mover"/>
+      <ref name="mathml.munderover"/>
+      <ref name="mathml.mmultiscripts"/>
+    </choice>
+  </define>
+  <define name="attlist-mathml.msub" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-subscriptshift"/>
+  </define>
+  <define name="attlist-mathml.msup" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-superscriptshift"/>
+  </define>
+  <define name="attlist-mathml.msubsup" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-subscriptshift"/>
+    <ref name="att-superscriptshift"/>
+  </define>
+  <define name="attlist-mathml.munder" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-accentunder"/>
+  </define>
+  <define name="attlist-mathml.mover" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-accent"/>
+  </define>
+  <define name="attlist-mathml.munderover" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-accent"/>
+    <ref name="att-accentunder"/>
+  </define>
+  <define name="attlist-mathml.mmultiscripts" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-subscriptshift"/>
+    <ref name="att-superscriptshift"/>
+  </define>
+  <!-- Presentation layout schemata: empty elements for scripts -->
+  <define name="pscreschema">
+    <choice>
+      <ref name="mathml.mprescripts"/>
+      <ref name="mathml.none"/>
+    </choice>
+  </define>
+  <define name="mathml.mprescripts">
+    <element name="mathml:mprescripts">
+      <ref name="attlist-mathml.mprescripts"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.mprescripts" combine="interleave">
+    <ref name="MATHML.xmlns.attrib"/>
+  </define>
+  <define name="mathml.none">
+    <element name="mathml:none">
+      <ref name="attlist-mathml.none"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.none" combine="interleave">
+    <ref name="MATHML.xmlns.attrib"/>
+  </define>
+  <!-- Presentation layout schemata: tables -->
+  <!--
+    in strict mode only allow mtable at top level.
+    mtr ,mlabledtr and mtd only allowed inside mtable.
+  -->
+  <define name="ptabschema">
+    <ref name="mathml.mtable"/>
+  </define>
+  <define name="attlist-mathml.mtable" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-tableinfo"/>
+  </define>
+  <define name="attlist-mathml.mtr" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-rowalign"/>
+    <ref name="att-columnalign-list"/>
+    <ref name="att-groupalign-list"/>
+  </define>
+  <define name="attlist-mathml.mlabeledtr" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-rowalign"/>
+    <ref name="att-columnalign-list"/>
+    <ref name="att-groupalign-list"/>
+  </define>
+  <define name="attlist-mathml.mtd" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-rowalign"/>
+    <ref name="att-columnalign"/>
+    <ref name="att-groupalign-list"/>
+    <ref name="att-rowspan"/>
+    <ref name="att-columnspan"/>
+  </define>
+  <define name="plschema">
+    <choice>
+      <ref name="pgenschema"/>
+      <ref name="pscrschema"/>
+      <ref name="ptabschema"/>
+    </choice>
+  </define>
+  <!-- Empty presentation layout schemata -->
+  <define name="peschema">
+    <choice>
+      <ref name="mathml.maligngroup"/>
+      <ref name="mathml.malignmark"/>
+    </choice>
+  </define>
+  <define name="mathml.malignmark">
+    <element name="mathml:malignmark">
+      <ref name="attlist-mathml.malignmark"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.malignmark" combine="interleave">
+    <ref name="att-edge"/>
+  </define>
+  <define name="mathml.maligngroup">
+    <element name="mathml:maligngroup">
+      <ref name="attlist-mathml.maligngroup"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.maligngroup" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-groupalign"/>
+  </define>
+  <define name="mathml.mglyph">
+    <element name="mathml:mglyph">
+      <ref name="attlist-mathml.mglyph"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.mglyph" combine="interleave">
+    <ref name="att-alt"/>
+    <ref name="att-fontfamily"/>
+    <ref name="att-index"/>
+  </define>
+  <!-- Presentation action schemata -->
+  <define name="pactions">
+    <ref name="mathml.maction"/>
+  </define>
+  <define name="attlist-mathml.maction" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-actiontype"/>
+    <ref name="att-selection"/>
+  </define>
+  <!--
+    The following entity for substitution into
+    content constructs excludes elements that
+    are not valid as expressions.
+  -->
+  <define name="PresInCont">
+    <choice>
+      <ref name="ptoken"/>
+      <ref name="petoken"/>
+      <ref name="plschema"/>
+      <ref name="peschema"/>
+      <ref name="pactions"/>
+    </choice>
+  </define>
+  <!-- Presentation entity: all presentation constructs -->
+  <!--  In strict mode don't allow prescripts and none at top level. -->
+  <define name="Presentation">
+    <ref name="PresInCont"/>
+  </define>
+  <!-- Content element set  ........................................ -->
+  <!-- Attribute definitions -->
+  <define name="att-base">
+    <optional>
+      <attribute name="base" a:defaultValue="10"/>
+    </optional>
+  </define>
+  <define name="att-closure">
+    <optional>
+      <attribute name="closure" a:defaultValue="closed"/>
+    </optional>
+  </define>
+  <define name="att-definition">
+    <optional>
+      <attribute name="definitionURL" a:defaultValue=""/>
+    </optional>
+  </define>
+  <define name="att-encoding">
+    <optional>
+      <attribute name="encoding" a:defaultValue=""/>
+    </optional>
+  </define>
+  <define name="att-nargs">
+    <optional>
+      <attribute name="nargs" a:defaultValue="1"/>
+    </optional>
+  </define>
+  <define name="att-occurrence">
+    <optional>
+      <attribute name="occurrence" a:defaultValue="function-model"/>
+    </optional>
+  </define>
+  <define name="att-order">
+    <optional>
+      <attribute name="order" a:defaultValue="numeric"/>
+    </optional>
+  </define>
+  <define name="att-scope">
+    <optional>
+      <attribute name="scope" a:defaultValue="local"/>
+    </optional>
+  </define>
+  <define name="att-type">
+    <optional>
+      <attribute name="type"/>
+    </optional>
+  </define>
+  <!-- Content elements: leaf nodes -->
+  <define name="ctoken">
+    <choice>
+      <ref name="mathml.csymbol"/>
+      <ref name="mathml.ci"/>
+      <ref name="mathml.cn"/>
+    </choice>
+  </define>
+  <define name="attlist-mathml.ci" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-type"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="attlist-mathml.csymbol" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-encoding"/>
+    <ref name="att-type"/>
+    <ref name="att-definition"/>
+  </define>
+  <define name="attlist-mathml.cn" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-type"/>
+    <ref name="att-base"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <!-- Content elements: specials -->
+  <define name="cspecial">
+    <choice>
+      <ref name="mathml.apply"/>
+      <ref name="mathml.reln"/>
+      <ref name="mathml.lambda"/>
+    </choice>
+  </define>
+  <define name="attlist-mathml.apply" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+  </define>
+  <define name="attlist-mathml.reln" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+  </define>
+  <define name="attlist-mathml.lambda" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+  </define>
+  <!-- Content elements: others -->
+  <define name="cother">
+    <choice>
+      <ref name="mathml.condition"/>
+      <ref name="mathml.declare"/>
+      <ref name="mathml.sep"/>
+    </choice>
+  </define>
+  <define name="attlist-mathml.condition" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+  </define>
+  <define name="attlist-mathml.declare" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-type"/>
+    <ref name="att-scope"/>
+    <ref name="att-nargs"/>
+    <ref name="att-occurrence"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.sep">
+    <element name="mathml:sep">
+      <ref name="attlist-mathml.sep"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.sep" combine="interleave">
+    <ref name="MATHML.xmlns.attrib"/>
+  </define>
+  <!-- Content elements: semantic mapping -->
+  <!--
+    in strict mode only allow semantics at top level.
+    annotation and annotation-xml only allowed in semantics
+  -->
+  <define name="csemantics">
+    <ref name="mathml.semantics"/>
+  </define>
+  <define name="attlist-mathml.semantics" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="attlist-mathml.annotation" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="attlist-mathml.annotation-xml" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-encoding"/>
+  </define>
+  <!-- Content elements: constructors -->
+  <define name="cconstructor">
+    <choice>
+      <ref name="mathml.interval"/>
+      <ref name="mathml.list"/>
+      <ref name="mathml.matrix"/>
+      <ref name="mathml.matrixrow"/>
+      <ref name="mathml.set"/>
+      <ref name="mathml.vector"/>
+      <ref name="mathml.piecewise"/>
+    </choice>
+  </define>
+  <define name="attlist-mathml.interval" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-closure"/>
+  </define>
+  <define name="attlist-mathml.set" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-type"/>
+  </define>
+  <define name="attlist-mathml.list" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-order"/>
+  </define>
+  <define name="attlist-mathml.vector" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+  </define>
+  <define name="attlist-mathml.matrix" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+  </define>
+  <define name="attlist-mathml.matrixrow" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+  </define>
+  <define name="attlist-mathml.piecewise" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+  </define>
+  <define name="attlist-mathml.piece" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+  </define>
+  <define name="attlist-mathml.otherwise" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+  </define>
+  <!-- Content elements: symbols -->
+  <define name="c0ary">
+    <choice>
+      <ref name="mathml.integers"/>
+      <ref name="mathml.reals"/>
+      <ref name="mathml.rationals"/>
+      <ref name="mathml.naturalnumbers"/>
+      <ref name="mathml.complexes"/>
+      <ref name="mathml.primes"/>
+      <ref name="mathml.exponentiale"/>
+      <ref name="mathml.imaginaryi"/>
+      <ref name="mathml.notanumber"/>
+      <ref name="mathml.true"/>
+      <ref name="mathml.false"/>
+      <ref name="mathml.emptyset"/>
+      <ref name="mathml.pi"/>
+      <ref name="mathml.eulergamma"/>
+      <ref name="mathml.infinity"/>
+    </choice>
+  </define>
+  <define name="mathml.integers">
+    <element name="mathml:integers">
+      <ref name="attlist-mathml.integers"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.integers" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.reals">
+    <element name="mathml:reals">
+      <ref name="attlist-mathml.reals"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.reals" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.rationals">
+    <element name="mathml:rationals">
+      <ref name="attlist-mathml.rationals"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.rationals" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.naturalnumbers">
+    <element name="mathml:naturalnumbers">
+      <ref name="attlist-mathml.naturalnumbers"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.naturalnumbers" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.complexes">
+    <element name="mathml:complexes">
+      <ref name="attlist-mathml.complexes"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.complexes" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.primes">
+    <element name="mathml:primes">
+      <ref name="attlist-mathml.primes"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.primes" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.exponentiale">
+    <element name="mathml:exponentiale">
+      <ref name="attlist-mathml.exponentiale"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.exponentiale" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.imaginaryi">
+    <element name="mathml:imaginaryi">
+      <ref name="attlist-mathml.imaginaryi"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.imaginaryi" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.notanumber">
+    <element name="mathml:notanumber">
+      <ref name="attlist-mathml.notanumber"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.notanumber" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.true">
+    <element name="mathml:true">
+      <ref name="attlist-mathml.true"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.true" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.false">
+    <element name="mathml:false">
+      <ref name="attlist-mathml.false"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.false" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.emptyset">
+    <element name="mathml:emptyset">
+      <ref name="attlist-mathml.emptyset"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.emptyset" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.pi">
+    <element name="mathml:pi">
+      <ref name="attlist-mathml.pi"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.pi" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.eulergamma">
+    <element name="mathml:eulergamma">
+      <ref name="attlist-mathml.eulergamma"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.eulergamma" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.infinity">
+    <element name="mathml:infinity">
+      <ref name="attlist-mathml.infinity"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.infinity" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <!-- Content elements: operators -->
+  <define name="cfuncop1ary">
+    <choice>
+      <ref name="mathml.inverse"/>
+      <ref name="mathml.ident"/>
+      <ref name="mathml.domain"/>
+      <ref name="mathml.codomain"/>
+      <ref name="mathml.image"/>
+    </choice>
+  </define>
+  <define name="mathml.inverse">
+    <element name="mathml:inverse">
+      <ref name="attlist-mathml.inverse"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.inverse" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.domain">
+    <element name="mathml:domain">
+      <ref name="attlist-mathml.domain"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.domain" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.codomain">
+    <element name="mathml:codomain">
+      <ref name="attlist-mathml.codomain"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.codomain" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.image">
+    <element name="mathml:image">
+      <ref name="attlist-mathml.image"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.image" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="cfuncopnary">
+    <choice>
+      <ref name="mathml.fn"/>
+      <ref name="mathml.compose"/>
+    </choice>
+  </define>
+  <define name="attlist-mathml.fn" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.ident">
+    <element name="mathml:ident">
+      <ref name="attlist-mathml.ident"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.ident" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.compose">
+    <element name="mathml:compose">
+      <ref name="attlist-mathml.compose"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.compose" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="carithop1ary">
+    <choice>
+      <ref name="mathml.abs"/>
+      <ref name="mathml.conjugate"/>
+      <ref name="mathml.exp"/>
+      <ref name="mathml.factorial"/>
+      <ref name="mathml.arg"/>
+      <ref name="mathml.real"/>
+      <ref name="mathml.imaginary"/>
+      <ref name="mathml.floor"/>
+      <ref name="mathml.ceiling"/>
+    </choice>
+  </define>
+  <define name="mathml.exp">
+    <element name="mathml:exp">
+      <ref name="attlist-mathml.exp"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.exp" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.abs">
+    <element name="mathml:abs">
+      <ref name="attlist-mathml.abs"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.abs" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.arg">
+    <element name="mathml:arg">
+      <ref name="attlist-mathml.arg"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.arg" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.real">
+    <element name="mathml:real">
+      <ref name="attlist-mathml.real"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.real" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.imaginary">
+    <element name="mathml:imaginary">
+      <ref name="attlist-mathml.imaginary"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.imaginary" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.conjugate">
+    <element name="mathml:conjugate">
+      <ref name="attlist-mathml.conjugate"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.conjugate" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.factorial">
+    <element name="mathml:factorial">
+      <ref name="attlist-mathml.factorial"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.factorial" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.floor">
+    <element name="mathml:floor">
+      <ref name="attlist-mathml.floor"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.floor" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.ceiling">
+    <element name="mathml:ceiling">
+      <ref name="attlist-mathml.ceiling"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.ceiling" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="carithop1or2ary">
+    <ref name="mathml.minus"/>
+  </define>
+  <define name="mathml.minus">
+    <element name="mathml:minus">
+      <ref name="attlist-mathml.minus"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.minus" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="carithop2ary">
+    <choice>
+      <ref name="mathml.quotient"/>
+      <ref name="mathml.divide"/>
+      <ref name="mathml.power"/>
+      <ref name="mathml.rem"/>
+    </choice>
+  </define>
+  <define name="mathml.quotient">
+    <element name="mathml:quotient">
+      <ref name="attlist-mathml.quotient"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.quotient" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.divide">
+    <element name="mathml:divide">
+      <ref name="attlist-mathml.divide"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.divide" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.power">
+    <element name="mathml:power">
+      <ref name="attlist-mathml.power"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.power" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.rem">
+    <element name="mathml:rem">
+      <ref name="attlist-mathml.rem"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.rem" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="carithopnary">
+    <choice>
+      <ref name="mathml.plus"/>
+      <ref name="mathml.times"/>
+      <ref name="mathml.max"/>
+      <ref name="mathml.min"/>
+      <ref name="mathml.gcd"/>
+      <ref name="mathml.lcm"/>
+    </choice>
+  </define>
+  <define name="mathml.plus">
+    <element name="mathml:plus">
+      <ref name="attlist-mathml.plus"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.plus" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.max">
+    <element name="mathml:max">
+      <ref name="attlist-mathml.max"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.max" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.min">
+    <element name="mathml:min">
+      <ref name="attlist-mathml.min"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.min" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.times">
+    <element name="mathml:times">
+      <ref name="attlist-mathml.times"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.times" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.gcd">
+    <element name="mathml:gcd">
+      <ref name="attlist-mathml.gcd"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.gcd" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.lcm">
+    <element name="mathml:lcm">
+      <ref name="attlist-mathml.lcm"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.lcm" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="carithoproot">
+    <ref name="mathml.root"/>
+  </define>
+  <define name="mathml.root">
+    <element name="mathml:root">
+      <ref name="attlist-mathml.root"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.root" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="clogicopquant">
+    <choice>
+      <ref name="mathml.exists"/>
+      <ref name="mathml.forall"/>
+    </choice>
+  </define>
+  <define name="mathml.exists">
+    <element name="mathml:exists">
+      <ref name="attlist-mathml.exists"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.exists" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.forall">
+    <element name="mathml:forall">
+      <ref name="attlist-mathml.forall"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.forall" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="clogicopnary">
+    <choice>
+      <ref name="mathml.and"/>
+      <ref name="mathml.or"/>
+      <ref name="mathml.xor"/>
+    </choice>
+  </define>
+  <define name="mathml.and">
+    <element name="mathml:and">
+      <ref name="attlist-mathml.and"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.and" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.or">
+    <element name="mathml:or">
+      <ref name="attlist-mathml.or"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.or" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.xor">
+    <element name="mathml:xor">
+      <ref name="attlist-mathml.xor"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.xor" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="clogicop1ary">
+    <ref name="mathml.not"/>
+  </define>
+  <define name="mathml.not">
+    <element name="mathml:not">
+      <ref name="attlist-mathml.not"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.not" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="clogicop2ary">
+    <ref name="mathml.implies"/>
+  </define>
+  <define name="mathml.implies">
+    <element name="mathml:implies">
+      <ref name="attlist-mathml.implies"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.implies" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="ccalcop">
+    <choice>
+      <ref name="mathml.log"/>
+      <ref name="mathml.int"/>
+      <ref name="mathml.diff"/>
+      <ref name="mathml.partialdiff"/>
+      <ref name="mathml.divergence"/>
+      <ref name="mathml.grad"/>
+      <ref name="mathml.curl"/>
+      <ref name="mathml.laplacian"/>
+    </choice>
+  </define>
+  <define name="mathml.divergence">
+    <element name="mathml:divergence">
+      <ref name="attlist-mathml.divergence"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.divergence" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.grad">
+    <element name="mathml:grad">
+      <ref name="attlist-mathml.grad"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.grad" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.curl">
+    <element name="mathml:curl">
+      <ref name="attlist-mathml.curl"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.curl" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.laplacian">
+    <element name="mathml:laplacian">
+      <ref name="attlist-mathml.laplacian"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.laplacian" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.log">
+    <element name="mathml:log">
+      <ref name="attlist-mathml.log"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.log" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.int">
+    <element name="mathml:int">
+      <ref name="attlist-mathml.int"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.int" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.diff">
+    <element name="mathml:diff">
+      <ref name="attlist-mathml.diff"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.diff" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.partialdiff">
+    <element name="mathml:partialdiff">
+      <ref name="attlist-mathml.partialdiff"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.partialdiff" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="ccalcop1ary">
+    <ref name="mathml.ln"/>
+  </define>
+  <define name="mathml.ln">
+    <element name="mathml:ln">
+      <ref name="attlist-mathml.ln"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.ln" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="csetop1ary">
+    <ref name="mathml.card"/>
+  </define>
+  <define name="mathml.card">
+    <element name="mathml:card">
+      <ref name="attlist-mathml.card"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.card" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="csetop2ary">
+    <ref name="mathml.setdiff"/>
+  </define>
+  <define name="mathml.setdiff">
+    <element name="mathml:setdiff">
+      <ref name="attlist-mathml.setdiff"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.setdiff" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="csetopnary">
+    <choice>
+      <ref name="mathml.union"/>
+      <ref name="mathml.intersect"/>
+      <ref name="mathml.cartesianproduct"/>
+    </choice>
+  </define>
+  <define name="mathml.union">
+    <element name="mathml:union">
+      <ref name="attlist-mathml.union"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.union" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.intersect">
+    <element name="mathml:intersect">
+      <ref name="attlist-mathml.intersect"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.intersect" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.cartesianproduct">
+    <element name="mathml:cartesianproduct">
+      <ref name="attlist-mathml.cartesianproduct"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.cartesianproduct" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="cseqop">
+    <choice>
+      <ref name="mathml.sum"/>
+      <ref name="mathml.product"/>
+      <ref name="mathml.limit"/>
+    </choice>
+  </define>
+  <define name="mathml.sum">
+    <element name="mathml:sum">
+      <ref name="attlist-mathml.sum"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.sum" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.product">
+    <element name="mathml:product">
+      <ref name="attlist-mathml.product"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.product" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.limit">
+    <element name="mathml:limit">
+      <ref name="attlist-mathml.limit"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.limit" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="ctrigop">
+    <choice>
+      <ref name="mathml.sin"/>
+      <ref name="mathml.cos"/>
+      <ref name="mathml.tan"/>
+      <ref name="mathml.sec"/>
+      <ref name="mathml.csc"/>
+      <ref name="mathml.cot"/>
+      <ref name="mathml.sinh"/>
+      <ref name="mathml.cosh"/>
+      <ref name="mathml.tanh"/>
+      <ref name="mathml.sech"/>
+      <ref name="mathml.csch"/>
+      <ref name="mathml.coth"/>
+      <ref name="mathml.arcsin"/>
+      <ref name="mathml.arccos"/>
+      <ref name="mathml.arctan"/>
+      <ref name="mathml.arccosh"/>
+      <ref name="mathml.arccot"/>
+      <ref name="mathml.arccoth"/>
+      <ref name="mathml.arccsc"/>
+      <ref name="mathml.arccsch"/>
+      <ref name="mathml.arcsec"/>
+      <ref name="mathml.arcsech"/>
+      <ref name="mathml.arcsinh"/>
+      <ref name="mathml.arctanh"/>
+    </choice>
+  </define>
+  <define name="mathml.sin">
+    <element name="mathml:sin">
+      <ref name="attlist-mathml.sin"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.sin" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.cos">
+    <element name="mathml:cos">
+      <ref name="attlist-mathml.cos"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.cos" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.tan">
+    <element name="mathml:tan">
+      <ref name="attlist-mathml.tan"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.tan" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.sec">
+    <element name="mathml:sec">
+      <ref name="attlist-mathml.sec"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.sec" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.csc">
+    <element name="mathml:csc">
+      <ref name="attlist-mathml.csc"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.csc" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.cot">
+    <element name="mathml:cot">
+      <ref name="attlist-mathml.cot"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.cot" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.sinh">
+    <element name="mathml:sinh">
+      <ref name="attlist-mathml.sinh"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.sinh" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.cosh">
+    <element name="mathml:cosh">
+      <ref name="attlist-mathml.cosh"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.cosh" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.tanh">
+    <element name="mathml:tanh">
+      <ref name="attlist-mathml.tanh"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.tanh" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.sech">
+    <element name="mathml:sech">
+      <ref name="attlist-mathml.sech"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.sech" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.csch">
+    <element name="mathml:csch">
+      <ref name="attlist-mathml.csch"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.csch" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.coth">
+    <element name="mathml:coth">
+      <ref name="attlist-mathml.coth"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.coth" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.arcsin">
+    <element name="mathml:arcsin">
+      <ref name="attlist-mathml.arcsin"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.arcsin" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.arccos">
+    <element name="mathml:arccos">
+      <ref name="attlist-mathml.arccos"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.arccos" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.arctan">
+    <element name="mathml:arctan">
+      <ref name="attlist-mathml.arctan"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.arctan" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.arccosh">
+    <element name="mathml:arccosh">
+      <ref name="attlist-mathml.arccosh"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.arccosh" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.arccot">
+    <element name="mathml:arccot">
+      <ref name="attlist-mathml.arccot"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.arccot" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.arccoth">
+    <element name="mathml:arccoth">
+      <ref name="attlist-mathml.arccoth"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.arccoth" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.arccsc">
+    <element name="mathml:arccsc">
+      <ref name="attlist-mathml.arccsc"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.arccsc" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.arccsch">
+    <element name="mathml:arccsch">
+      <ref name="attlist-mathml.arccsch"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.arccsch" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.arcsec">
+    <element name="mathml:arcsec">
+      <ref name="attlist-mathml.arcsec"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.arcsec" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.arcsech">
+    <element name="mathml:arcsech">
+      <ref name="attlist-mathml.arcsech"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.arcsech" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.arcsinh">
+    <element name="mathml:arcsinh">
+      <ref name="attlist-mathml.arcsinh"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.arcsinh" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.arctanh">
+    <element name="mathml:arctanh">
+      <ref name="attlist-mathml.arctanh"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.arctanh" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="cstatopnary">
+    <choice>
+      <ref name="mathml.mean"/>
+      <ref name="mathml.sdev"/>
+      <ref name="mathml.variance"/>
+      <ref name="mathml.median"/>
+      <ref name="mathml.mode"/>
+    </choice>
+  </define>
+  <define name="mathml.mean">
+    <element name="mathml:mean">
+      <ref name="attlist-mathml.mean"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.mean" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.sdev">
+    <element name="mathml:sdev">
+      <ref name="attlist-mathml.sdev"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.sdev" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.variance">
+    <element name="mathml:variance">
+      <ref name="attlist-mathml.variance"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.variance" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.median">
+    <element name="mathml:median">
+      <ref name="attlist-mathml.median"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.median" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.mode">
+    <element name="mathml:mode">
+      <ref name="attlist-mathml.mode"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.mode" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="cstatopmoment">
+    <ref name="mathml.moment"/>
+  </define>
+  <define name="mathml.moment">
+    <element name="mathml:moment">
+      <ref name="attlist-mathml.moment"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.moment" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="clalgop1ary">
+    <choice>
+      <ref name="mathml.determinant"/>
+      <ref name="mathml.transpose"/>
+    </choice>
+  </define>
+  <define name="mathml.determinant">
+    <element name="mathml:determinant">
+      <ref name="attlist-mathml.determinant"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.determinant" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.transpose">
+    <element name="mathml:transpose">
+      <ref name="attlist-mathml.transpose"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.transpose" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="clalgop2ary">
+    <choice>
+      <ref name="mathml.vectorproduct"/>
+      <ref name="mathml.scalarproduct"/>
+      <ref name="mathml.outerproduct"/>
+    </choice>
+  </define>
+  <define name="mathml.vectorproduct">
+    <element name="mathml:vectorproduct">
+      <ref name="attlist-mathml.vectorproduct"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.vectorproduct" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.scalarproduct">
+    <element name="mathml:scalarproduct">
+      <ref name="attlist-mathml.scalarproduct"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.scalarproduct" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.outerproduct">
+    <element name="mathml:outerproduct">
+      <ref name="attlist-mathml.outerproduct"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.outerproduct" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="clalgopnary">
+    <ref name="mathml.selector"/>
+  </define>
+  <define name="mathml.selector">
+    <element name="mathml:selector">
+      <ref name="attlist-mathml.selector"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.selector" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <!-- Content elements: relations -->
+  <define name="cgenrel2ary">
+    <choice>
+      <ref name="mathml.neq"/>
+      <ref name="mathml.factorof"/>
+    </choice>
+  </define>
+  <define name="mathml.neq">
+    <element name="mathml:neq">
+      <ref name="attlist-mathml.neq"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.neq" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.factorof">
+    <element name="mathml:factorof">
+      <ref name="attlist-mathml.factorof"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.factorof" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="cgenrelnary">
+    <choice>
+      <ref name="mathml.eq"/>
+      <ref name="mathml.leq"/>
+      <ref name="mathml.lt"/>
+      <ref name="mathml.geq"/>
+      <ref name="mathml.gt"/>
+      <ref name="mathml.equivalent"/>
+      <ref name="mathml.approx"/>
+    </choice>
+  </define>
+  <define name="mathml.eq">
+    <element name="mathml:eq">
+      <ref name="attlist-mathml.eq"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.eq" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.equivalent">
+    <element name="mathml:equivalent">
+      <ref name="attlist-mathml.equivalent"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.equivalent" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.approx">
+    <element name="mathml:approx">
+      <ref name="attlist-mathml.approx"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.approx" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.gt">
+    <element name="mathml:gt">
+      <ref name="attlist-mathml.gt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.gt" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.lt">
+    <element name="mathml:lt">
+      <ref name="attlist-mathml.lt"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.lt" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.geq">
+    <element name="mathml:geq">
+      <ref name="attlist-mathml.geq"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.geq" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.leq">
+    <element name="mathml:leq">
+      <ref name="attlist-mathml.leq"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.leq" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="csetrel2ary">
+    <choice>
+      <ref name="mathml.in"/>
+      <ref name="mathml.notin"/>
+      <ref name="mathml.notsubset"/>
+      <ref name="mathml.notprsubset"/>
+    </choice>
+  </define>
+  <define name="mathml.in">
+    <element name="mathml:in">
+      <ref name="attlist-mathml.in"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.in" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.notin">
+    <element name="mathml:notin">
+      <ref name="attlist-mathml.notin"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.notin" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.notsubset">
+    <element name="mathml:notsubset">
+      <ref name="attlist-mathml.notsubset"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.notsubset" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.notprsubset">
+    <element name="mathml:notprsubset">
+      <ref name="attlist-mathml.notprsubset"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.notprsubset" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="csetrelnary">
+    <choice>
+      <ref name="mathml.subset"/>
+      <ref name="mathml.prsubset"/>
+    </choice>
+  </define>
+  <define name="mathml.subset">
+    <element name="mathml:subset">
+      <ref name="attlist-mathml.subset"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.subset" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="mathml.prsubset">
+    <element name="mathml:prsubset">
+      <ref name="attlist-mathml.prsubset"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.prsubset" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+  </define>
+  <define name="cseqrel2ary">
+    <ref name="mathml.tendsto"/>
+  </define>
+  <define name="mathml.tendsto">
+    <element name="mathml:tendsto">
+      <ref name="attlist-mathml.tendsto"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist-mathml.tendsto" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-definition"/>
+    <ref name="att-encoding"/>
+    <ref name="att-type"/>
+  </define>
+  <!-- Content elements: quantifiers -->
+  <define name="cquantifier">
+    <choice>
+      <ref name="mathml.lowlimit"/>
+      <ref name="mathml.uplimit"/>
+      <ref name="mathml.bvar"/>
+      <ref name="mathml.degree"/>
+      <ref name="mathml.logbase"/>
+      <ref name="mathml.momentabout"/>
+      <ref name="mathml.domainofapplication"/>
+    </choice>
+  </define>
+  <define name="attlist-mathml.lowlimit" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+  </define>
+  <define name="attlist-mathml.uplimit" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+  </define>
+  <define name="attlist-mathml.bvar" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+  </define>
+  <define name="attlist-mathml.degree" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+  </define>
+  <define name="attlist-mathml.logbase" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+  </define>
+  <define name="attlist-mathml.momentabout" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+  </define>
+  <define name="attlist-mathml.domainofapplication" combine="interleave">
+    <ref name="MATHML.Common.attrib"/>
+  </define>
+  <!-- Operator groups -->
+  <define name="cop1ary">
+    <choice>
+      <ref name="cfuncop1ary"/>
+      <ref name="carithop1ary"/>
+      <ref name="clogicop1ary"/>
+      <ref name="ccalcop1ary"/>
+      <ref name="ctrigop"/>
+      <ref name="clalgop1ary"/>
+      <ref name="csetop1ary"/>
+    </choice>
+  </define>
+  <define name="cop2ary">
+    <choice>
+      <ref name="carithop2ary"/>
+      <ref name="clogicop2ary"/>
+      <ref name="clalgop2ary"/>
+      <ref name="csetop2ary"/>
+    </choice>
+  </define>
+  <define name="copnary">
+    <choice>
+      <ref name="cfuncopnary"/>
+      <ref name="carithopnary"/>
+      <ref name="clogicopnary"/>
+      <ref name="csetopnary"/>
+      <ref name="cstatopnary"/>
+      <ref name="clalgopnary"/>
+    </choice>
+  </define>
+  <define name="copmisc">
+    <choice>
+      <ref name="carithoproot"/>
+      <ref name="carithop1or2ary"/>
+      <ref name="ccalcop"/>
+      <ref name="cseqop"/>
+      <ref name="cstatopmoment"/>
+      <ref name="clogicopquant"/>
+    </choice>
+  </define>
+  <!-- Relation groups -->
+  <define name="crel2ary">
+    <choice>
+      <ref name="cgenrel2ary"/>
+      <ref name="csetrel2ary"/>
+      <ref name="cseqrel2ary"/>
+    </choice>
+  </define>
+  <define name="crelnary">
+    <choice>
+      <ref name="cgenrelnary"/>
+      <ref name="csetrelnary"/>
+    </choice>
+  </define>
+  <!-- Content constructs: all -->
+  <define name="Content">
+    <choice>
+      <ref name="ctoken"/>
+      <ref name="cspecial"/>
+      <ref name="cother"/>
+      <ref name="csemantics"/>
+      <ref name="c0ary"/>
+      <ref name="cconstructor"/>
+      <ref name="cquantifier"/>
+      <ref name="cop1ary"/>
+      <ref name="cop2ary"/>
+      <ref name="copnary"/>
+      <ref name="copmisc"/>
+      <ref name="crel2ary"/>
+      <ref name="crelnary"/>
+    </choice>
+  </define>
+  <!-- Content constructs for substitution in presentation structures -->
+  <define name="ContInPres">
+    <choice>
+      <ref name="mathml.ci"/>
+      <ref name="mathml.csymbol"/>
+      <ref name="mathml.cn"/>
+      <ref name="c0ary"/>
+      <ref name="mathml.apply"/>
+      <ref name="mathml.fn"/>
+      <ref name="mathml.lambda"/>
+      <ref name="mathml.reln"/>
+      <ref name="cconstructor"/>
+      <ref name="mathml.semantics"/>
+      <ref name="mathml.declare"/>
+    </choice>
+  </define>
+  <!-- ............................................................. -->
+  <!--
+    Recursive definition for content of expressions. Include
+    presentation constructs at lowest level so presentation
+    layout schemata hold presentation or content elements.
+    Include content constructs at lowest level so content
+    elements hold PCDATA or presentation elements at leaf
+    level (for permitted substitutable elements in context)
+  -->
+  <!--
+    in strict mode don't allow presentation in content
+    except where allowed by chapter 5:
+    ci, cn, csymbol, semantics
+  -->
+  <define name="ContentExpression">
+    <zeroOrMore>
+      <ref name="Content"/>
+    </zeroOrMore>
+  </define>
+  <define name="semanticsContentExpression">
+    <zeroOrMore>
+      <choice>
+        <ref name="Content"/>
+        <ref name="PresInCont"/>
+        <ref name="mathml.annotation"/>
+        <ref name="mathml.annotation-xml"/>
+      </choice>
+    </zeroOrMore>
+  </define>
+  <define name="PresExpression">
+    <zeroOrMore>
+      <choice>
+        <ref name="Presentation"/>
+        <ref name="ContInPres"/>
+      </choice>
+    </zeroOrMore>
+  </define>
+  <define name="MathExpression">
+    <zeroOrMore>
+      <choice>
+        <ref name="PresInCont"/>
+        <ref name="ContInPres"/>
+      </choice>
+    </zeroOrMore>
+  </define>
+  <!-- PCDATA or MathML character elements -->
+  <define name="MathMLCharacters">
+    <choice>
+      <text/>
+      <ref name="mathml.mglyph"/>
+    </choice>
+  </define>
+  <!-- Content elements: tokens -->
+  <!-- (may contain embedded presentation constructs) -->
+  <define name="mathml.ci">
+    <element name="mathml:ci">
+      <ref name="attlist-mathml.ci"/>
+      <zeroOrMore>
+        <choice>
+          <ref name="MathMLCharacters"/>
+          <ref name="PresInCont"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="mathml.csymbol">
+    <element name="mathml:csymbol">
+      <ref name="attlist-mathml.csymbol"/>
+      <zeroOrMore>
+        <choice>
+          <ref name="MathMLCharacters"/>
+          <ref name="PresInCont"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="mathml.cn">
+    <element name="mathml:cn">
+      <ref name="attlist-mathml.cn"/>
+      <zeroOrMore>
+        <choice>
+          <ref name="MathMLCharacters"/>
+          <ref name="mathml.sep"/>
+          <ref name="PresInCont"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <!-- Content elements: special -->
+  <define name="mathml.apply">
+    <element name="mathml:apply">
+      <ref name="attlist-mathml.apply"/>
+      <ref name="ContentExpression"/>
+    </element>
+  </define>
+  <define name="mathml.reln">
+    <element name="mathml:reln">
+      <ref name="attlist-mathml.reln"/>
+      <ref name="ContentExpression"/>
+    </element>
+  </define>
+  <define name="mathml.lambda">
+    <element name="mathml:lambda">
+      <ref name="attlist-mathml.lambda"/>
+      <ref name="ContentExpression"/>
+    </element>
+  </define>
+  <!-- Content elements: other -->
+  <define name="mathml.condition">
+    <element name="mathml:condition">
+      <ref name="attlist-mathml.condition"/>
+      <ref name="ContentExpression"/>
+    </element>
+  </define>
+  <define name="mathml.declare">
+    <element name="mathml:declare">
+      <ref name="attlist-mathml.declare"/>
+      <ref name="ContentExpression"/>
+    </element>
+  </define>
+  <!-- Content elements: semantics -->
+  <define name="mathml.semantics">
+    <element name="mathml:semantics">
+      <ref name="attlist-mathml.semantics"/>
+      <ref name="semanticsContentExpression"/>
+    </element>
+  </define>
+  <define name="Annotation.content">
+    <text/>
+  </define>
+  <define name="mathml.annotation">
+    <element name="mathml:annotation">
+      <ref name="attlist-mathml.annotation"/>
+      <ref name="Annotation.content"/>
+    </element>
+  </define>
+  <define name="mathml.annotation-xml">
+    <element name="mathml:annotation-xml">
+      <ref name="attlist-mathml.annotation-xml"/>
+      <ref name="any"/>
+    </element>
+  </define>
+  <!-- Content elements: constructors -->
+  <define name="mathml.interval">
+    <element name="mathml:interval">
+      <ref name="attlist-mathml.interval"/>
+      <ref name="ContentExpression"/>
+    </element>
+  </define>
+  <define name="mathml.set">
+    <element name="mathml:set">
+      <ref name="attlist-mathml.set"/>
+      <ref name="ContentExpression"/>
+    </element>
+  </define>
+  <define name="mathml.list">
+    <element name="mathml:list">
+      <ref name="attlist-mathml.list"/>
+      <ref name="ContentExpression"/>
+    </element>
+  </define>
+  <define name="mathml.vector">
+    <element name="mathml:vector">
+      <ref name="attlist-mathml.vector"/>
+      <ref name="ContentExpression"/>
+    </element>
+  </define>
+  <define name="mathml.matrix">
+    <element name="mathml:matrix">
+      <ref name="attlist-mathml.matrix"/>
+      <ref name="ContentExpression"/>
+    </element>
+  </define>
+  <define name="mathml.matrixrow">
+    <element name="mathml:matrixrow">
+      <ref name="attlist-mathml.matrixrow"/>
+      <ref name="ContentExpression"/>
+    </element>
+  </define>
+  <define name="mathml.piecewise">
+    <element name="mathml:piecewise">
+      <ref name="attlist-mathml.piecewise"/>
+      <zeroOrMore>
+        <ref name="mathml.piece"/>
+      </zeroOrMore>
+      <optional>
+        <ref name="mathml.otherwise"/>
+      </optional>
+    </element>
+  </define>
+  <define name="mathml.piece">
+    <element name="mathml:piece">
+      <ref name="attlist-mathml.piece"/>
+      <ref name="ContentExpression"/>
+    </element>
+  </define>
+  <define name="mathml.otherwise">
+    <element name="mathml:otherwise">
+      <ref name="attlist-mathml.otherwise"/>
+      <ref name="ContentExpression"/>
+    </element>
+  </define>
+  <!-- Content elements: operator (user-defined) -->
+  <define name="mathml.fn">
+    <element name="mathml:fn">
+      <ref name="attlist-mathml.fn"/>
+      <ref name="ContentExpression"/>
+    </element>
+  </define>
+  <!-- Content elements: quantifiers -->
+  <define name="mathml.lowlimit">
+    <element name="mathml:lowlimit">
+      <ref name="attlist-mathml.lowlimit"/>
+      <ref name="ContentExpression"/>
+    </element>
+  </define>
+  <define name="mathml.uplimit">
+    <element name="mathml:uplimit">
+      <ref name="attlist-mathml.uplimit"/>
+      <ref name="ContentExpression"/>
+    </element>
+  </define>
+  <define name="mathml.bvar">
+    <element name="mathml:bvar">
+      <ref name="attlist-mathml.bvar"/>
+      <ref name="ContentExpression"/>
+    </element>
+  </define>
+  <define name="mathml.degree">
+    <element name="mathml:degree">
+      <ref name="attlist-mathml.degree"/>
+      <ref name="ContentExpression"/>
+    </element>
+  </define>
+  <define name="mathml.logbase">
+    <element name="mathml:logbase">
+      <ref name="attlist-mathml.logbase"/>
+      <ref name="ContentExpression"/>
+    </element>
+  </define>
+  <define name="mathml.momentabout">
+    <element name="mathml:momentabout">
+      <ref name="attlist-mathml.momentabout"/>
+      <ref name="ContentExpression"/>
+    </element>
+  </define>
+  <define name="mathml.domainofapplication">
+    <element name="mathml:domainofapplication">
+      <ref name="attlist-mathml.domainofapplication"/>
+      <ref name="ContentExpression"/>
+    </element>
+  </define>
+  <!-- ............................................................. -->
+  <!--
+    Presentation layout schemata contain tokens,
+    layout and content schemata.
+  -->
+  <!--
+    In strict mode enforce mfrac has exactly two children
+    same for msub etc
+  -->
+  <define name="onePresExpression">
+    <choice>
+      <ref name="Presentation"/>
+      <ref name="ContInPres"/>
+    </choice>
+  </define>
+  <define name="twoPresExpression">
+    <ref name="onePresExpression"/>
+    <ref name="onePresExpression"/>
+  </define>
+  <define name="threePresExpression">
+    <ref name="onePresExpression"/>
+    <ref name="onePresExpression"/>
+    <ref name="onePresExpression"/>
+  </define>
+  <define name="mtrPresExpression">
+    <zeroOrMore>
+      <choice>
+        <ref name="mathml.mtr"/>
+        <ref name="mathml.mlabeledtr"/>
+      </choice>
+    </zeroOrMore>
+  </define>
+  <define name="mtdPresExpression">
+    <zeroOrMore>
+      <ref name="mathml.mtd"/>
+    </zeroOrMore>
+  </define>
+  <define name="prscrPresExpression">
+    <ref name="onePresExpression"/>
+    <zeroOrMore>
+      <choice>
+        <ref name="onePresExpression"/>
+        <ref name="mathml.none"/>
+      </choice>
+      <choice>
+        <ref name="onePresExpression"/>
+        <ref name="mathml.none"/>
+      </choice>
+    </zeroOrMore>
+    <optional>
+      <ref name="mathml.mprescripts"/>
+      <zeroOrMore>
+        <choice>
+          <ref name="onePresExpression"/>
+          <ref name="mathml.none"/>
+        </choice>
+        <choice>
+          <ref name="onePresExpression"/>
+          <ref name="mathml.none"/>
+        </choice>
+      </zeroOrMore>
+    </optional>
+  </define>
+  <!-- By default keep them as they were in MathML 2.0 -->
+  <define name="mathml.mstyle">
+    <element name="mathml:mstyle">
+      <ref name="attlist-mathml.mstyle"/>
+      <ref name="PresExpression"/>
+    </element>
+  </define>
+  <define name="mathml.merror">
+    <element name="mathml:merror">
+      <ref name="attlist-mathml.merror"/>
+      <ref name="PresExpression"/>
+    </element>
+  </define>
+  <define name="mathml.mphantom">
+    <element name="mathml:mphantom">
+      <ref name="attlist-mathml.mphantom"/>
+      <ref name="PresExpression"/>
+    </element>
+  </define>
+  <define name="mathml.mrow">
+    <element name="mathml:mrow">
+      <ref name="attlist-mathml.mrow"/>
+      <ref name="PresExpression"/>
+    </element>
+  </define>
+  <define name="mathml.mfrac">
+    <element name="mathml:mfrac">
+      <ref name="attlist-mathml.mfrac"/>
+      <ref name="twoPresExpression"/>
+    </element>
+  </define>
+  <define name="mathml.msqrt">
+    <element name="mathml:msqrt">
+      <ref name="attlist-mathml.msqrt"/>
+      <ref name="PresExpression"/>
+    </element>
+  </define>
+  <define name="mathml.menclose">
+    <element name="mathml:menclose">
+      <ref name="attlist-mathml.menclose"/>
+      <ref name="PresExpression"/>
+    </element>
+  </define>
+  <define name="mathml.mroot">
+    <element name="mathml:mroot">
+      <ref name="attlist-mathml.mroot"/>
+      <ref name="twoPresExpression"/>
+    </element>
+  </define>
+  <define name="mathml.msub">
+    <element name="mathml:msub">
+      <ref name="attlist-mathml.msub"/>
+      <ref name="twoPresExpression"/>
+    </element>
+  </define>
+  <define name="mathml.msup">
+    <element name="mathml:msup">
+      <ref name="attlist-mathml.msup"/>
+      <ref name="twoPresExpression"/>
+    </element>
+  </define>
+  <define name="mathml.msubsup">
+    <element name="mathml:msubsup">
+      <ref name="attlist-mathml.msubsup"/>
+      <ref name="threePresExpression"/>
+    </element>
+  </define>
+  <define name="mathml.mmultiscripts">
+    <element name="mathml:mmultiscripts">
+      <ref name="attlist-mathml.mmultiscripts"/>
+      <ref name="prscrPresExpression"/>
+    </element>
+  </define>
+  <define name="mathml.munder">
+    <element name="mathml:munder">
+      <ref name="attlist-mathml.munder"/>
+      <ref name="twoPresExpression"/>
+    </element>
+  </define>
+  <define name="mathml.mover">
+    <element name="mathml:mover">
+      <ref name="attlist-mathml.mover"/>
+      <ref name="twoPresExpression"/>
+    </element>
+  </define>
+  <define name="mathml.munderover">
+    <element name="mathml:munderover">
+      <ref name="attlist-mathml.munderover"/>
+      <ref name="threePresExpression"/>
+    </element>
+  </define>
+  <define name="mathml.mtable">
+    <element name="mathml:mtable">
+      <ref name="attlist-mathml.mtable"/>
+      <ref name="mtrPresExpression"/>
+    </element>
+  </define>
+  <define name="mathml.mtr">
+    <element name="mathml:mtr">
+      <ref name="attlist-mathml.mtr"/>
+      <ref name="mtdPresExpression"/>
+    </element>
+  </define>
+  <define name="mathml.mlabeledtr">
+    <element name="mathml:mlabeledtr">
+      <ref name="attlist-mathml.mlabeledtr"/>
+      <ref name="mtdPresExpression"/>
+    </element>
+  </define>
+  <define name="mathml.mtd">
+    <element name="mathml:mtd">
+      <ref name="attlist-mathml.mtd"/>
+      <ref name="PresExpression"/>
+    </element>
+  </define>
+  <define name="mathml.maction">
+    <element name="mathml:maction">
+      <ref name="attlist-mathml.maction"/>
+      <ref name="PresExpression"/>
+    </element>
+  </define>
+  <define name="mathml.mfenced">
+    <element name="mathml:mfenced">
+      <ref name="attlist-mathml.mfenced"/>
+      <ref name="PresExpression"/>
+    </element>
+  </define>
+  <define name="mathml.mpadded">
+    <element name="mathml:mpadded">
+      <ref name="attlist-mathml.mpadded"/>
+      <ref name="PresExpression"/>
+    </element>
+  </define>
+  <!-- Presentation elements contain PCDATA or malignmark constructs. -->
+  <define name="mathml.mi">
+    <element name="mathml:mi">
+      <ref name="attlist-mathml.mi"/>
+      <zeroOrMore>
+        <choice>
+          <ref name="MathMLCharacters"/>
+          <ref name="mathml.malignmark"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="mathml.mn">
+    <element name="mathml:mn">
+      <ref name="attlist-mathml.mn"/>
+      <zeroOrMore>
+        <choice>
+          <ref name="MathMLCharacters"/>
+          <ref name="mathml.malignmark"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="mathml.mo">
+    <element name="mathml:mo">
+      <ref name="attlist-mathml.mo"/>
+      <zeroOrMore>
+        <choice>
+          <ref name="MathMLCharacters"/>
+          <ref name="mathml.malignmark"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="mathml.mtext">
+    <element name="mathml:mtext">
+      <ref name="attlist-mathml.mtext"/>
+      <zeroOrMore>
+        <choice>
+          <ref name="MathMLCharacters"/>
+          <ref name="mathml.malignmark"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="mathml.ms">
+    <element name="mathml:ms">
+      <ref name="attlist-mathml.ms"/>
+      <zeroOrMore>
+        <choice>
+          <ref name="MathMLCharacters"/>
+          <ref name="mathml.malignmark"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <!-- Browser interface definition  ............................... -->
+  <!-- Attributes for top-level element "math" -->
+  <define name="att-macros">
+    <optional>
+      <attribute name="macros"/>
+    </optional>
+  </define>
+  <define name="att-mode">
+    <optional>
+      <attribute name="mode"/>
+    </optional>
+  </define>
+  <define name="att-display">
+    <optional>
+      <attribute name="display" a:defaultValue="inline">
+        <choice>
+          <value>block</value>
+          <value>inline</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+  <define name="att-schemalocation">
+    <optional>
+      <attribute name="xsi:schemaLocation"/>
+    </optional>
+  </define>
+  <define name="att-topinfo">
+    <ref name="MATHML.Common.attrib"/>
+    <ref name="att-schemalocation"/>
+    <ref name="att-macros"/>
+    <ref name="att-mode"/>
+    <ref name="att-display"/>
+  </define>
+  <!-- Attributes for browser interface element -->
+  <define name="att-baseline">
+    <optional>
+      <attribute name="baseline"/>
+    </optional>
+  </define>
+  <define name="att-overflow">
+    <optional>
+      <attribute name="overflow" a:defaultValue="scroll">
+        <choice>
+          <value>scroll</value>
+          <value>elide</value>
+          <value>truncate</value>
+          <value>scale</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+  <define name="att-altimg">
+    <optional>
+      <attribute name="altimg"/>
+    </optional>
+  </define>
+  <define name="att-alttext">
+    <optional>
+      <attribute name="alttext"/>
+    </optional>
+  </define>
+  <define name="att-browif">
+    <ref name="att-type"/>
+    <ref name="att-name"/>
+    <ref name="att-height"/>
+    <ref name="att-width"/>
+    <ref name="att-baseline"/>
+    <ref name="att-overflow"/>
+    <ref name="att-altimg"/>
+    <ref name="att-alttext"/>
+  </define>
+  <!-- ............................................................. -->
+  <!--
+    The top-level element "math" contains MathML encoded
+    mathematics. The "math" element has the browser info
+    attributes iff it is also the browser interface element.
+  -->
+  <define name="mathml.math">
+    <element name="mathml:math">
+      <ref name="attlist-mathml.math"/>
+      <ref name="MathExpression"/>
+    </element>
+  </define>
+  <define name="attlist-mathml.math" combine="interleave">
+    <ref name="att-topinfo"/>
+    <ref name="att-browif"/>
+  </define>
+  <define name="any">
+    <zeroOrMore>
+      <choice>
+        <element>
+          <anyName/>
+          <zeroOrMore>
+            <attribute>
+              <anyName/>
+            </attribute>
+          </zeroOrMore>
+          <ref name="any"/>
+        </element>
+        <text/>
+      </choice>
+    </zeroOrMore>
+  </define>
+</grammar>
+<!-- MathML Character Entities .............................................. -->
+<!-- Entity sets from ISO Technical Report 9573-13 ..... -->
+<!-- Entity sets from informative annex to ISO 8879:1986 (SGML) ....... -->
+<!-- New characters defined by MathML ............................ -->
+<!-- MathML aliases for characters defined above ................. -->
+<!-- end of MathML Character Entity section -->
+<!--
+  Revision History:
+  
+  Initial draft (syntax = XML) 1997-05-09
+     Stephen Buswell
+  Revised 1997-05-14
+     Robert Miner
+  Revised 1997-06-29 and 1997-07-02
+     Stephen Buswell
+  Revised 1997-12-15
+     Stephen Buswell
+  Revised 1998-02-08
+     Stephen Buswell
+  Revised 1998-04-04
+     Stephen Buswell
+  Entities and small revisions 1999-02-21
+     David Carlisle
+  Added attribute definitionURL to ci and cn 1999-10-11
+     Nico Poppelier
+  Additions for MathML 2  1999-12-16
+     David Carlisle
+  Namespace support 2000-01-14
+     David Carlisle
+  XHTML Compatibility 2000-02-23
+     Murray Altheim
+  New content elements 2000-03-26
+     David Carlisle
+  Further revisions for MathML2 CR draft 2000-07-11
+     David Carlisle
+  Further revisions for MathML2 CR draft 2000-10-31		
+     David Carlisle		
+  Revisions for Unicode 3.2  2002-05-21		
+     David Carlisle		
+  Add width and side attributes to mtable (to align with the specification)  2002-06-05		
+     David Carlisle		
+  Use %XLINK.prefix rather than hardwired xlink:, add xlink:type 2002-06-12		
+     David Carlisle		
+  Add missing numalign and denomalign attributes for mfrac 2002-07-05		
+     David Carlisle		
+  Add MathMLstrict entity and related extra constraints 2002-12-05		
+     David Carlisle		
+  Add support for xi:schemaLocation 2003-04-05		
+     David Carlisle		
+  Removed actiontype from mstyle (to match spec) 2003-04-07		
+     David Carlisle		
+  Additional constraints for MathMLstrict code (From Simon		
+     Pepping on www-math list) 2003-05-22		
+     David Carlisle		
+  Add missing minlabelspacing attribute (From Simon		
+     Pepping on www-math list) 2003-05-22		
+     David Carlisle		
+  Removed restricted menclose notation checking from MathMLstrict 2003-09-08		
+     David Carlisle		
+  
+-->
+<!-- end of MathML 2.0 DTD  ................................................ -->
+<!-- ....................................................................... -->

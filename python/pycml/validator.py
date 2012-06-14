@@ -57,21 +57,41 @@ __version__ = "$Revision$"[11:-2]
 
 
 
+class ValidatorError(Exception):
+    """Base class for errors trying to run validator stages."""
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return repr(self.value)
+
+
+
 class CellMLValidator(object):
     def __init__(self, create_relaxng_validator=True):
         """Initialise a validator for CellML files."""
         # Create validator from RELAX NG schema
+        self.relaxng_validator = None
         if create_relaxng_validator:
-            self.relaxng_validator = RelaxNGValidator(os.path.join(pycml_path, 'cellml1.0.rnc'))
-        else:
-            self.relaxng_validator = None
+            schema_base = os.path.join(pycml_path, 'cellml1.0')
+            run_errors = []
+            for klass in [LxmlRelaxngValidator, RvpRelaxngValidator]:
+                try:
+                    self.relaxng_validator = klass(schema_base)
+                except ValidatorError, e:
+                    run_errors.append(e)
+                else:
+                    break
+            if not self.relaxng_validator:
+                msg = '\n\t'.join(["Unable to run a RELAX NG validator.  Please install lxml or rvp."]
+                                  + run_errors)
+                raise ValidatorError(msg)
 
     def quit(self):
         """
         Since using __del__ is precarious, we provide this method to allow
         the RVP process to be killed cleanly.  Call it when the validator
         is finished with, or you'll get an interesting error when the program
-        terminates.
+        terminates (if using RVP).
         """
         if self.relaxng_validator:
             self.relaxng_validator.quit()
@@ -163,18 +183,16 @@ class CellMLValidator(object):
         if res and not assume_valid:
             DEBUG('validator', 'Starting RELAX NG validation')
             res = self.relaxng_validator.validate(stream)
-            if not stream == sys.stdin and not stream == source:
-                stream.close()
             if stream == source:
                 source.seek(0)
+            elif not stream == sys.stdin:
+                stream.close()
             DEBUG('validator', 'Finished RELAX NG:', res)
 
         # Check further rules that can't be expressed by a (RELAX NG) schema.
         # We use our own Python code for this.
         if res:
             DEBUG('validator', 'Loading model with Amara')
-            if stream == source:
-                source.seek(0)
             doc = amara_parse_cellml(source)
             DEBUG('validator', 'Validating loaded model')
             res = doc.model.validate(assume_valid=assume_valid, **kw)
@@ -189,26 +207,59 @@ class CellMLValidator(object):
         if return_doc:
             return (res, doc)
         else:
-            doc.model.clean_up()
+            if doc:
+                doc.model.clean_up()
             return res
 
 
+class LxmlRelaxngValidator(object):
+    """
+    A RELAX NG validator built on top of lxml (http://lxml.de/validation.html#relaxng).
+    Can validate against schemas written in the XML syntax.
+    """
+    def __init__(self, schemaBase):
+        """Initialise the RELAX NG validator.
+        
+        Parses the schema into memory, and constructs lxml's validator object.
+        We are passed the path to the schema with no extension.
+        """
+        try:
+            from lxml import etree
+        except ImportError, e:
+            raise ValidatorError("Unable to import lxml: " + str(e))
+        fp = open(schemaBase + '.rng', 'r')
+        schema_doc = etree.parse(fp)
+        self._validator = etree.RelaxNG(schema_doc)
+    
+    def validate(self, stream):
+        """Validate an XML document, returning a boolean.
+        
+        stream should be a file-like object containing the document to be validated.
+        Returns True iff the document was valid."""
+        from lxml import etree
+        doc = etree.parse(stream)
+        res = self._validator.validate(doc)
+        # Report error details via the logger
+        logger = logging.getLogger('validator')
+        for e in self._validator.error_log:
+            logger.error(e)
+        return res
 
-class RelaxNGValidator(object):
+    def quit(self):
+        """Providing for compatibility with RvpRelaxngValidator; does nothing."""
+        pass
+
+
+class RvpRelaxngValidator(object):
     """
     A RELAX NG validator built on top of RVP (http://www.davidashen.net/rnv.html).
     Can validate against schemas written in the compact syntax.
     """
-    class RvpProtocolError(Exception):
-        """
-        Raised if the response from RVP is not understood.
-        """
-        def __init__(self, value):
-            self.value = value
-        def __str__(self):
-            return repr(self.value)
+    class RvpProtocolError(ValidatorError):
+        """Raised if the response from RVP is not understood."""
+        pass
 
-    def __init__(self, schema_filename):
+    def __init__(self, schemaBase):
         """Initialise the RELAX NG validator.
         Launches RVP as a parallel process.
         schema_filename should be the name of a file containing the RELAX NG schema, in compact syntax.
