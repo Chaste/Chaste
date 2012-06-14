@@ -46,17 +46,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 #include "NumericFileComparison.hpp"
 
-// add 3d test, add test to TestStokesWithLidCavity
 
 class TestStokesFlowSolver : public CxxTest::TestSuite
 {
 public:
     /*
-     * Solution is u = [x, -y], p = const (= 10 as applying zero-Neumann on RHS).
-     * Dirichlet BC applied on three sides, zero-Neumann on the other (so pressure is fully defined)
+     * Exact solution here is u = [x, -y], p = 20
+     * Dirichlet BC applied on three sides, zero-stress on the other (so pressure is fully defined)
      * Just two elements.
      */
-    void TestStokesWithDirichletVerySimple() throw(Exception)
+    void TestStokesExactSolutionSimple() throw(Exception)
     {
         for (unsigned run=0; run<2; run++)
         {
@@ -121,7 +120,7 @@ public:
             {
             	// solution is in finite element space, so FEM solution will be exact,
                 // apart from linear solver errors
-                TS_ASSERT_DELTA(r_pressures[i], 10.0, 1e-7);
+                TS_ASSERT_DELTA(r_pressures[i], 20.0, 1e-6);
             }
 
             // check the matrix is symmetric even after Dirichlet BCs have been applied
@@ -129,16 +128,79 @@ public:
         }
     }
 
+    // Exact solution for this problem is u = [y, -x], p = 0
+    // For this flow: sigma = mu(grad u + (grad u)^T) - pI = mu*0 - pI = -pI
+    // Again, exact solution is in FEM space so would work, up to
+    // linear solve tolerance, with 1 element
+    void TestStokesExactSolutionLessSimple() throw(Exception)
+    {
+        // Set up a mesh on [0 1]x[0 1]
+		unsigned num_elem = 3;
+		QuadraticMesh<2> mesh(1.0/num_elem, 1.0, 1.0);
+
+		// Dynamic viscosity
+		double mu = 10.0;
+
+		// Boundary flow
+		std::vector<unsigned> dirichlet_nodes;
+		std::vector<c_vector<double,2> > dirichlet_flow;
+		for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+		{
+			double x = mesh.GetNode(i)->rGetLocation()[0];
+			double y = mesh.GetNode(i)->rGetLocation()[1];
+
+			// Only apply on top and left boundaries (zero stress BCs on others)
+			if (x == 0.0 || y == 0.0)
+			{
+				dirichlet_nodes.push_back(i);
+				c_vector<double,2> flow = zero_vector<double>(2);
+
+				flow(0) = y;
+				flow(1) = -x;
+				dirichlet_flow.push_back(flow);
+			}
+		}
+
+		StokesFlowProblemDefinition<2> problem_defn(mesh);
+		problem_defn.SetViscosity(mu);
+		problem_defn.SetPrescribedFlowNodes(dirichlet_nodes, dirichlet_flow);
+
+		StokesFlowSolver<2> solver(mesh, problem_defn, "LessSimpleStokesFlow");
+
+		solver.SetKspAbsoluteTolerance(1e-12);
+
+		solver.Solve();
+
+		for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+		{
+			double x = mesh.GetNode(i)->rGetLocation()[0];
+			double y = mesh.GetNode(i)->rGetLocation()[1];
+
+			// solution is in finite element space, so FEM solution will be exact,
+			// apart from linear solver errors
+			TS_ASSERT_DELTA(solver.rGetVelocities()[i](0),  y, 1e-8);
+			TS_ASSERT_DELTA(solver.rGetVelocities()[i](1), -x, 1e-8);
+		}
+
+		// test the pressures
+		std::vector<double>& r_pressures = solver.rGetPressures();
+		for (unsigned i=0; i<r_pressures.size(); i++)
+		{
+			// solution is in finite element space, so FEM solution will be exact,
+			// apart from linear solver errors
+			TS_ASSERT_DELTA(r_pressures[i], 0.0, 1e-6);
+		}
+    }
+
+
     /*
-     * Solution is u = [y(1-y), 0], p = 2(1-x).
-     * Dirichlet BC applied on three sides, zero-Neumann on the other (so pressure is fully defined).
+     * Solution is u = [y(1-y), 0], p = 2(1-x) + const
+     * Dirichlet BC applied on all four sides
      */
     void TestStokesWithImposedPipeCondition() throw(Exception)
     {
         // Note: we could have num_elem=1 and test still pass, as FE solution is the same as the true
-        // solution (analytic soln is in the FE space, ignoring linear solve errors. In fact, with
-        // num_elem=1, the linear solve doesn't require the tolerance line below to be accurate
-        // enough for the test).
+        // solution (analytic soln is in the FE space, ignoring linear solve errors.
 
         // set up a mesh on [0 1]x[0 1]
         unsigned num_elem = 10;
@@ -154,7 +216,7 @@ public:
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
-            if (x == 0.0 || y == 0.0 || y == 1.0)
+            if (x == 0.0 || x==1.0 || y == 0.0 || y == 1.0) // should really be using a BoundaryNodeIterator
             {
                 dirichlet_nodes.push_back(i);
                 c_vector<double,2> flow = zero_vector<double>(2);
@@ -164,8 +226,6 @@ public:
                 dirichlet_flow.push_back(flow);
             }
         }
-
-        assert(dirichlet_flow.size() == 6*num_elem +1);
 
         c_vector<double,2> body_force = zero_vector<double>(2);
 
@@ -194,15 +254,19 @@ public:
 
 
         std::vector<double>& r_pressures = solver.rGetPressures();
-        for (unsigned i=0; i<r_pressures.size(); i++)
+
+        // determine what the constant is
+        double x = mesh.GetNode(0)->rGetLocation()[0];
+        double constant = r_pressures[0] - 2*(1-x);
+        // test the rest
+        for (unsigned i=1; i<r_pressures.size(); i++)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
-          	double exact_pressure = 2*(1-x);
+          	double exact_pressure = 2*(1-x) + constant;
             // solution is in finite element space, so FEM solution will be exact,
             // apart from linear solver errors
             TS_ASSERT_DELTA(r_pressures[i], exact_pressure, 1e-8);
         }
-
 
         // test output files
         std::string results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "PipeStokesFlow";
@@ -217,108 +281,104 @@ public:
         TS_ASSERT_EQUALS(system(("diff " + results_dir + "/pressure_10.txt " + results_dir + "/pressure.txt").c_str()), 0);
         NumericFileComparison comp3(results_dir + "/pressure_10.txt", results_dir + "/pressure.txt");
         TS_ASSERT(comp3.CompareFiles(1e-17));
-
     }
 
-    /*
-     * Solution is u = [y(1-y), 0], p = 2(2-x).
-     * Dirichlet BC applied on top and bottom, Neumann on the ends p(x=0)=3, p(x=1)=1.
-     */
-    void TestPoiseuilleFlow() throw(Exception)
+
+    // Exact solution for this problem is u = [y, -x], p = -3
+    // For this flow: sigma = mu(grad u + (grad u)^T) - pI = mu*0 - pI = -pI
+    // Again, exact solution is in FEM space so would work, up to
+    // linear solve tolerance, with 1 element
+    void TestStokesExactSolutionNonzeroNeumann() throw(Exception)
     {
-        // set up a mesh on [0 1]x[0 1]
-        unsigned num_elem = 10;
-        QuadraticMesh<2> mesh(1.0/num_elem, 1.0, 1.0);
+        // Set up a mesh on [0 1]x[0 1]
+		unsigned num_elem = 3;
+		QuadraticMesh<2> mesh(1.0/num_elem, 1.0, 1.0);
 
-        // Dynamic viscosity
-        double mu = 1.0;
+		// Dynamic viscosity
+		double mu = 10.0;
 
-        // Boundary flow
-        std::vector<unsigned> dirichlet_nodes;
-        std::vector<c_vector<double,2> > dirichlet_flow;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
-        {
-            double y=mesh.GetNode(i)->rGetLocation()[1];
+		// Boundary flow
+		std::vector<unsigned> dirichlet_nodes;
+		std::vector<c_vector<double,2> > dirichlet_flow;
+		for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+		{
+			double x = mesh.GetNode(i)->rGetLocation()[0];
+			double y = mesh.GetNode(i)->rGetLocation()[1];
 
-            // Fix top and bottom
-            if (y == 0.0 || y == 1.0)
-            {
-                dirichlet_nodes.push_back(i);
-                c_vector<double,2> flow = zero_vector<double>(2);
-                dirichlet_flow.push_back(flow);
-            }
-        }
-        assert(dirichlet_flow.size()== 4*num_elem+2);
+			// Only apply on top and left boundaries
+			if (x == 0.0 || y == 0.0)
+			{
+				dirichlet_nodes.push_back(i);
+				c_vector<double,2> flow = zero_vector<double>(2);
 
-        // Normal stress boundary
+				flow(0) = y;
+				flow(1) = -x;
+				dirichlet_flow.push_back(flow);
+			}
+		}
 
-        std::vector<BoundaryElement<1,2>*> boundary_elems;
-        std::vector<c_vector<double,2> > normal_stresses;
+        // apply non-zero Neumann BCs on right and top sides
+		std::vector<BoundaryElement<1,2>*> boundary_elems;
+		std::vector<c_vector<double,2> > stresses;
 
-        for (TetrahedralMesh<2,2>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
-             iter != mesh.GetBoundaryElementIteratorEnd();
-             ++iter)
-        {
-            if (fabs((*iter)->CalculateCentroid()[0]) < 1e-4)
-            {
-                BoundaryElement<1,2>* p_element = *iter;
-                boundary_elems.push_back(p_element);
+		for (TetrahedralMesh<2,2>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
+			 iter != mesh.GetBoundaryElementIteratorEnd();
+			 ++iter)
+		{
+			if (fabs((*iter)->CalculateCentroid()[0] - 1.0) < 1e-4)
+			{
+				BoundaryElement<1,2>* p_element = *iter;
+				boundary_elems.push_back(p_element);
 
-                c_vector<double,2> normal_stress = zero_vector<double>(2);
-                normal_stress[0] = 3;
+				c_vector<double,2> stress = zero_vector<double>(2);
+				stress(0) = 3.0; // stress = (3,0) = 3*normal
+				stresses.push_back(stress);
+			}
+			else if (fabs((*iter)->CalculateCentroid()[1] - 1.0) < 1e-4)
+			{
+				BoundaryElement<1,2>* p_element = *iter;
+				boundary_elems.push_back(p_element);
 
-                normal_stresses.push_back(normal_stress);
-            }
-            else if (fabs((*iter)->CalculateCentroid()[0] - 1.0) < 1e-4)
-            {
-                BoundaryElement<1,2>* p_element = *iter;
-                boundary_elems.push_back(p_element);
+				c_vector<double,2> stress = zero_vector<double>(2);
+				stress(1) = 3.0; // stress = (0,3) = 3*normal
+				stresses.push_back(stress);
+			}
+		}
+		assert(boundary_elems.size() == 2*num_elem);
 
-                c_vector<double,2> normal_stress = zero_vector<double>(2);
+		StokesFlowProblemDefinition<2> problem_defn(mesh);
+		problem_defn.SetViscosity(mu);
+		problem_defn.SetPrescribedFlowNodes(dirichlet_nodes, dirichlet_flow);
+		problem_defn.SetTractionBoundaryConditions(boundary_elems, stresses);
 
-                // This is negative because the outward pointing normal at this edge is opposite to the other edge
-                normal_stress[0] = -1;
+		StokesFlowSolver<2> solver(mesh, problem_defn, "StokesFlowNonZeroNeumann");
 
-                normal_stresses.push_back(normal_stress);
-            }
-        }
-        assert(boundary_elems.size() == 2*num_elem);
+		solver.SetKspAbsoluteTolerance(1e-12);
 
-        c_vector<double,2> body_force = zero_vector<double>(2);
+		solver.Solve();
 
-        StokesFlowProblemDefinition<2> problem_defn(mesh);
-        problem_defn.SetViscosity(mu);
-        problem_defn.SetTractionBoundaryConditions(boundary_elems, normal_stresses);
-        problem_defn.SetPrescribedFlowNodes(dirichlet_nodes, dirichlet_flow);
+		for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+		{
+			double x = mesh.GetNode(i)->rGetLocation()[0];
+			double y = mesh.GetNode(i)->rGetLocation()[1];
 
-        StokesFlowSolver<2> solver(mesh, problem_defn, "PoiseuilleFlow");
+			// solution is in finite element space, so FEM solution will be exact,
+			// apart from linear solver errors
+			TS_ASSERT_DELTA(solver.rGetVelocities()[i](0),  y, 1e-8);
+			TS_ASSERT_DELTA(solver.rGetVelocities()[i](1), -x, 1e-8);
+		}
 
-        solver.SetKspAbsoluteTolerance(1e-10);
-
-        solver.Solve();
-
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
-        {
-            double y = mesh.GetNode(i)->rGetLocation()[1];
-
-            double exact_flow_x = y*(1-y);
-            double exact_flow_y = 0.0;
-
-            // solution in FE space
-            TS_ASSERT_DELTA(solver.rGetVelocities()[i](0), exact_flow_x, 1e-7);
-            TS_ASSERT_DELTA(solver.rGetVelocities()[i](1), exact_flow_y, 1e-7);
-        }
-
-        std::vector<double>& r_pressures = solver.rGetPressures();
-        for (unsigned i=0; i<r_pressures.size(); i++)
-        {
-        	double x = mesh.GetNode(i)->rGetLocation()[0];
-            double exact_pressure = 2*(1-x) + 1;
-
-            // solution is in FE space
-            TS_ASSERT_DELTA(r_pressures[i], exact_pressure, 1e-5);
-        }
+		// test the pressures
+		std::vector<double>& r_pressures = solver.rGetPressures();
+		for (unsigned i=0; i<r_pressures.size(); i++)
+		{
+			// solution is in finite element space, so FEM solution will be exact,
+			// apart from linear solver errors
+			TS_ASSERT_DELTA(r_pressures[i], -3.0, 1e-6);
+		}
     }
+
+
 
 
     /*
@@ -422,16 +482,15 @@ public:
 
         /* results are:
          *
-         * 2 1.15234 36.5909
-         * 4 0.352193 9.58345
-         * 8 0.0548267 1.87473
-         * 16 0.00787528 0.526508
-         * 32 0.00113687 0.145555
-         *
-         * Everything is converging. Large errors in p down to this being an odd problem?
+         * 2 1.23348 54.5715
+         * 4 0.234975 15.5141
+         * 8 0.0342268 3.25636
+         * 16 0.00472192 0.951447
+         * 32 0.000673309 0.217258
+         * Everything is converging.
          */
-        double res_flow[5] = { 1.15234, 0.352193, 0.0548267, 0.00787528, 0.00113687 };
-        double res_p[5] = { 36.5909, 9.58345, 1.87473, 0.526508, 0.145555};
+        double res_flow[5] = { 1.23348, 0.234975, 0.0342268, 0.00472192, 0.000673309 };
+        double res_p[5] = { 54.5715, 15.5141, 3.25636, 0.951447, 0.217258};
         assert(num_runs <= 5);
         for(unsigned i=0; i<num_runs; i++)
         {
@@ -546,8 +605,8 @@ public:
             }
         }
 
-        TS_ASSERT_DELTA(min_p, -5.009, 1e-2);
-        TS_ASSERT_DELTA(max_p,  9.352, 1e-2);
+        TS_ASSERT_DELTA(min_p, -5.162, 1e-2);
+        TS_ASSERT_DELTA(max_p, 13.3394, 1e-2);
     }
 
 
@@ -622,7 +681,7 @@ public:
         }
     }
     
-        void TestStokesWithLidDrivenCavity3d() throw(Exception)
+    void TestStokesWithLidDrivenCavity3d() throw(Exception)
     {
         unsigned num_elem = 5;
         QuadraticMesh<3> mesh(1.0/num_elem, 1.0, 1.0, 1.0);
@@ -680,12 +739,11 @@ public:
             if((fabs(x-0.6)<1e-6) && (fabs(y-0.6)<1e-6) && (fabs(z-0.6)<1e-6))
             {
                 TS_ASSERT_DELTA(r_solution[i](0), -8.5990e-03, 1e-4);
-                TS_ASSERT_DELTA(r_solution[i](1),  1.3326e-04, 1e-5);
+                TS_ASSERT_DELTA(r_solution[i](1),  1.1331e-04, 1e-5);
                 TS_ASSERT_DELTA(r_solution[i](2), -5.1343e-03, 1e-4);
             }
         }
     }
-    
 };
 
 #endif // TESTSTOKESFLOWSOLVER_HPP_

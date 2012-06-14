@@ -83,6 +83,12 @@ public:
 
         StokesFlowAssembler<2> assembler(&mesh, &problem_defn);
 
+        // The tests below test the assembler against hand-calculated variables for 
+        // an OLD weak form (corresponding to different boundary conditions), not the 
+        // current Stokes weak form. This factor converts the assembler to use the old 
+        // weak form. See documentation for this variable for more details.
+        assembler.mScaleFactor = 0.0; 
+
         Vec vec = PetscTools::CreateVec(18);
         Mat mat;
         PetscTools::SetupMat(mat, 18, 18, 18);
