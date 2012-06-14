@@ -615,6 +615,13 @@ def CreatePyCmlBuilder(build, buildenv):
     -conf.xml file may be given to tune this process somewhat, by specifying extra
     arguments to be passed to ConvertCellModel.py; it will also be used as the
     configuration file for PyCml itself.
+    
+    The SCons environment variable PYCML_EXTRA_ARGS may also be used to pass additional
+    command-line arguments to ConvertCellModel.py.  This can be set in a project
+    SConscript file, by including lines like the following prior to the DoProjectSConscript
+    call:
+        env = SConsTools.CloneEnv(env)
+        env['PYCML_EXTRA_ARGS'] = ['--expose-annotated-variables']
     """
     def IsDynamicSource(source):
         parts = source[0].srcnode().path.split(os.path.sep)
@@ -633,6 +640,7 @@ def CreatePyCmlBuilder(build, buildenv):
     script = os.path.join(Dir('#').abspath, 'python', 'ConvertCellModel.py')
     def GetArgs(target, source, env):
         args = ['-A', '-p', '--output-dir', os.path.dirname(target[0].abspath)]
+        args.extend(env.get('PYCML_EXTRA_ARGS', []))
         if IsDynamicSource(source):
             # If we're creating a dynamic library, do things differently:
             # only create a single output .so.  The helper script will recognise
