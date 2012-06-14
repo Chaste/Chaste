@@ -231,13 +231,13 @@ Starting with release 2.0, PyCml is now run in the default build of Chaste.
 You thus need to install its pre-requisites if you wish to use the heart
 component.  See also README_CELLML.txt for more information about PyCml.
 
-PyCml is a python tool, and also requires Amara, RNV, and an RDF library.
+PyCml is a python tool, and also requires Amara, a RELAX NG validator, and an RDF library.
 All of these in turn require the expat library to parse XML.
 This is available in most Linux distributions, e.g.
-  sudo aptitude install expat libexpat1-dev #(Ubuntu/Debian)
+  sudo apt-get install expat libexpat1-dev #(Ubuntu/Debian)
   sudo yum install expat expat-devel #(Fedora/RedHat)
 You will also need the Python header files:
-  sudo aptitude install python-dev #(Ubuntu/Debian)
+  sudo apt-get install python-dev #(Ubuntu/Debian)
   sudo yum install python-devel #(Fedora/RedHat)
 
 To install Python libraries without root access, you need to create a
@@ -263,22 +263,22 @@ cd bin
 ./easy_install "Amara==1.2.0.2"
 cd ..
 
-RNV
----
+RELAX NG validator - lxml
+-------------------------
 
-wget "http://ftp.davidashen.net/PreTI/RNV/RNV.ZIP"
-unzip RNV.ZIP
-cd rnv-*
-make -f Makefile.gnu
-cp rvp $CHASTE_LIBS/bin/
-cd ..
-rm -f RNV.ZIP
+This is available in many Linux distributions, or via easy_install.  For example:
+
+sudo apt-get install python-lxml                     # Ubuntu, Debian
+sudo yum install python-lxml                         # Fedora
+easy_install --allow-hosts=lxml.de,*.python.org lxml # General
+
+See also http://lxml.de/installation.html.
 
 RDFLib
 ------
 
 If this is installed in your Linux distribution, it may be easiest to install from there, e.g.
-  sudo aptitude install python-librdf
+  sudo apt-get install python-librdf
 
 Otherwise, it is also available via easy_install:
   easy_install rdflib
