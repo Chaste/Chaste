@@ -265,6 +265,7 @@ class RvpRelaxngValidator(object):
         schema_filename should be the name of a file containing the RELAX NG schema, in compact syntax.
         """
         self._ws = re.compile('[^\t\n\r ]')
+        schema_filename = schemaBase + '.rnc'
         # Launch RVP
         try:
             self._rvp_pipe = subprocess.Popen(['rvp', schema_filename],
