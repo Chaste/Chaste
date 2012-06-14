@@ -7,7 +7,7 @@ Standards-Version: 3.7.2
 
 Package: chaste-source
 Architecture: all
-Depends: scons, g++, libopenmpi-dev, petsc-dev (>= 2.3.3-14), libhdf5-openmpi-dev, xsdcxx, libboost-serialization-dev, libboost-filesystem-dev, libparmetis-dev, libxerces-c2-dev, rnv (= 1.7.10-2chaste1) | rnv (= 1.7.10-1chaste1), python-amara, python-rdflib | python-librdf
+Depends: scons, g++, libopenmpi-dev, petsc-dev (>= 2.3.3-14), libhdf5-openmpi-dev, xsdcxx, libboost-serialization-dev, libboost-filesystem-dev, libparmetis-dev, libxerces-c2-dev, python-lxml, python-amara, python-rdflib | python-librdf
 Recommends: valgrind, libsundials-serial-dev, libvtk5-dev, libfltk1.1
 Suggests: libgoogle-perftools-dev, doxygen, graphviz, eclipse-cdt, gnuplot
 Description: general purpose computational biology simulation package
@@ -25,7 +25,7 @@ Description: general purpose computational biology simulation package
 
 Package: chaste-dependencies
 Architecture: all
-Depends: scons, g++, libopenmpi-dev, petsc-dev (>= 2.3.3-14), libhdf5-openmpi-dev, xsdcxx, libboost-serialization-dev, libboost-filesystem-dev, libparmetis-dev, libxerces-c2-dev, rnv (= 1.7.10-2chaste1) | rnv (= 1.7.10-1chaste1), python-amara, python-rdflib | python-librdf
+Depends: scons, g++, libopenmpi-dev, petsc-dev (>= 2.3.3-14), libhdf5-openmpi-dev, xsdcxx, libboost-serialization-dev, libboost-filesystem-dev, libparmetis-dev, libxerces-c2-dev, python-lxml, python-amara, python-rdflib | python-librdf
 Recommends: valgrind, libsundials-serial-dev, libpetsc2.3.3-dbg|libpetsc3.0.0-dbg|libpetsc3.1-dbg, libvtk5-dev, libfltk1.1
 Suggests: libgoogle-perftools-dev, doxygen, graphviz, eclipse-cdt, subversion, gnuplot
 Conflicts: libatlas-base-dev (>= 3.8.3), libatlas3gf-base (>= 3.8.3)
