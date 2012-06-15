@@ -348,6 +348,7 @@ public:
 
         models.push_back("aslanidi_model_2009");
         models.push_back("beeler_reuter_model_1977");
+        models.push_back("bondarenko_model_2004_apex");
         models.push_back("courtemanche_ramirez_nattel_model_1998");
         models.push_back("demir_model_1994");
         models.push_back("dokos_model_1996");
@@ -386,7 +387,6 @@ public:
 
         dirname = dirname + "-difficult";
         models.clear();
-        models.push_back("bondarenko_model_2004_apex");
         models.push_back("iyer_model_2004");
         models.push_back("iyer_model_2007");
         models.push_back("jafri_rice_winslow_model_1998");
