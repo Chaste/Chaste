@@ -52,6 +52,8 @@ PyParsing can then be used to process the Jacobian entries.
 """
 
 import logging
+import sys
+
 from pyparsing import *
 
 
@@ -258,18 +260,18 @@ class MOperator(MExpression):
         return hash(tuple(k))
 
     def is_complex(self):
-        complex = False
+        result = False
         nested_children = False
         for child in self._children:
             if child.is_complex():
-                complex = True
+                result = True
                 break
             if hasattr(child, '_children'):
                 nested_children = True
-        if not complex and (self._operator not in ['minus', 'plus', 'times', 'eq', 'neq', 'lt', 'leq', 'gt', 'geq']
-                            or len(self._children) > 2 or nested_children):
-            complex = True
-        return complex
+        if not result and (self._operator not in ['minus', 'plus', 'times', 'eq', 'neq', 'lt', 'leq', 'gt', 'geq']
+                           or len(self._children) > 2 or nested_children):
+            result = True
+        return result
 
     def normalize(self):
         """Make this expression properly tree-structured."""
@@ -385,14 +387,9 @@ func.setName('Function')
 func.setParseAction(MFunction)
 
 # Numbers can be given in scientific notation, with an optional sign.
-real_re = Regex(r'([0-9]+(\.[0-9]+(e[-+][0-9]+)?)?)|(\.[0-9]+(e[-+][0-9]+)?)')
+real_re = Regex(r'([0-9]+\.?([0-9]+(e[-+]?[0-9]+)?)?)|(\.[0-9]+(e[-+]?[0-9]+)?)')
 real_re.setName('Number')
 real_re.setParseAction(MNumber)
-uint = Word(nums)
-sci_e='e' + Optional(oneOf('- +')) + uint
-sci_dec='.' + uint + Optional(sci_e)
-real = Combine( (uint + Optional(sci_dec)) | sci_dec )
-real.setName('Number')
 
 # Operators.
 # All are left-associative, apart from:
@@ -417,7 +414,6 @@ for op in ['fact', 'expt', 'sign', 'prod', 'plus', 'rel', 'not', 'and', 'or', 'x
 
 # Base terms
 atom = func | var | real_re
-#atom = var | real
 
 
 class OpParseResults(object):
@@ -473,6 +469,19 @@ class MapleParser(object):
     
     The class has one method, parse, which parses a file-like object.
     """
+    
+    def __init__(self):
+        """Initialise the parser."""
+        # We just store the original stack limit here, so we can increase
+        # it for the lifetime of this object if needed for parsing, on the
+        # basis that if one expression needs to, several are likely to.
+        self._original_stack_limit = sys.getrecursionlimit()
+        self._stack_limit_multiplier = 1
+        
+    def __del__(self):
+        """Reset the stack limit if it changed."""
+        sys.setrecursionlimit(self._original_stack_limit)
+    
     def parse(self, stream, debug=False):
         """Parse some Maple output.
         
@@ -508,8 +517,11 @@ class MapleParser(object):
                 # This line is part of an expression...
                 s = s + line.strip()
                 if s[-1] == '\\':
-                    # remove the backslash
+                    # Explicit continuation: remove the backslash
                     s = s[:-1]
+                else:
+                    # Potentially implicit continuation: add whitespace to replace the '\n'
+                    s += ' '
             if in_header:
                 # This line is part of an entry header
                 s = s + line.strip()
@@ -540,16 +552,21 @@ class MapleParser(object):
     def _parse_expr(self, key, expr_str, results, debug_res):
         """Parse a single expression, and store the result under key."""
         self._debug("Parsing derivative", key)
-        old_limit = sys.getrecursionlimit()
-        try:
-            r = expr.parseString(expr_str)
-        except RuntimeError, msg:
-            self._debug("Got RuntimeError:", msg)
-            new_limit = int(old_limit * 1.5)
-            self._debug("Failed to parse with recursion limit of %d; increasing to %d" % (old_limit, new_limit))
-            sys.setrecursionlimit(new_limit)
-            r = expr.parseString(expr_str)
-            sys.setrecursionlimit(old_limit)
+        r = None
+        while self._stack_limit_multiplier < 3: # Magic number!
+            try:
+                r = expr.parseString(expr_str, parseAll=True)
+            except RuntimeError, msg:
+                self._debug("Got RuntimeError:", msg)
+                self._stack_limit_multiplier += 0.5
+                new_limit = int(self._stack_limit_multiplier * self._original_stack_limit)
+                self._debug("Increasing recursion limit to", new_limit)
+                sys.setrecursionlimit(new_limit)
+            else:
+                break # Parsed OK
+        if not r:
+            raise RuntimeError("Failed to parse expression even with a recursion limit of %d; giving up!"
+                               % (int(self._stack_limit_multiplier * self._original_stack_limit),))
         n = r[0].normalize()
         u = n.uniquify()
         debug_res[key] = (expr_str, r, n)
