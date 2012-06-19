@@ -51,7 +51,7 @@ public:
         {
             EXCEPTION(msg);
         }
-        catch (Exception e)
+        catch (Exception& e)
         {
             std::string e_msg = e.GetMessage();
             std::string::size_type e_len = e_msg.length();
