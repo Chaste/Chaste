@@ -50,7 +50,7 @@ RelativeTo::Value FileFinder::msFakeWhat = RelativeTo::Absolute;
 
 std::string FileFinder::msFakePath = "";
 
-const std::string UNSET_PATH("UNSET!");
+#define UNSET_PATH "UNSET!"
 
 
 FileFinder::FileFinder()
