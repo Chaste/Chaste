@@ -862,7 +862,7 @@ public:
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
         quad_mesh.ConstructFromMeshReader(mesh_reader);
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Reading a (linear) tetrahedral mesh and converting it to a QuadraticMesh.  This involves making an external library call to Triangle/Tetgen in order to compute in internal nodes");
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Reading a (linear) tetrahedral mesh and converting it to a QuadraticMesh.  This involves making an external library call to Triangle/Tetgen in order to compute internal nodes");
         TS_ASSERT_EQUALS(quad_mesh.GetNumNodes(), 1110u);
 
 #else

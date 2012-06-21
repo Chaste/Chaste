@@ -61,6 +61,8 @@ class AbstractMesh : private boost::noncopyable
 {
     friend class TestDistributedTetrahedralMesh;
     template <unsigned A_DIMENSION> friend class NodesOnlyMesh; //NodesOnlyMesh is able to grab the node information in order to copy
+    template <unsigned A_DIMENSION> friend class QuadraticMeshHelper;
+
 private:
     /**
      * Pure virtual solve node mapping method. For a node with a given global
