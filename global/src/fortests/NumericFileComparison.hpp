@@ -70,7 +70,7 @@ public:
         mFilename1(fileName1),
         mFilename2(fileName2)
     {
-        mpFile1 = new std::ifstream(fileName1.c_str());
+        mpFile1 = new std::ifstream(mFilename1.c_str());
 
         // If it doesn't exist - throw exception
         if (!mpFile1->is_open())
@@ -80,7 +80,7 @@ public:
             EXCEPTION("Couldn't open file: " + fileName1);
         }
 
-        mpFile2 = new std::ifstream(fileName2.c_str());
+        mpFile2 = new std::ifstream(mFilename2.c_str());
 
         // If it doesn't exist - throw exception
         if (!mpFile2->is_open())
@@ -119,9 +119,10 @@ public:
      * @param absTol  absolute tolerance on difference between numbers
      * @param ignoreFirstFewLines  how many lines to ignore from the comparison
      * @param relTol  relative tolerance on difference between numbers
+     * @param doTsAssert  Whether to throw a TS_ASSERT internally (switched off for testing only)
      */
     bool CompareFiles(double absTol=DBL_EPSILON, unsigned ignoreFirstFewLines=0,
-                      double relTol=DBL_EPSILON)
+                      double relTol=DBL_EPSILON, bool doTsAssert=true)
     {
         double data1;
         double data2;
@@ -192,16 +193,26 @@ public:
         }
         while (data1 != NOTHING_TO_READ && data2 != NOTHING_TO_READ); // If either is a NOTHING_TO_READ, then it means that there's nothing to read from the file
 
-        // Force CxxTest error if there were any major differences
-        TS_ASSERT_EQUALS(failures, 0u);
-        // If that assertion tripped...
-        if (failures > 0u)
+        if (doTsAssert)
         {
+            // Force CxxTest error if there were any major differences
+            TS_ASSERT_EQUALS(failures, 0u);
+            // If that assertion tripped...
+            if (failures > 0u)
+            {
 #define COVERAGE_IGNORE
-            // Report the paths to the files
-            TS_TRACE("Files " + mFilename1 + " and " + mFilename2 + " numerically differ.");
+                // Report the paths to the files
+                TS_TRACE("Files " + mFilename1 + " and " + mFilename2 + " numerically differ.");
 #undef COVERAGE_IGNORE
+            }
         }
+
+        // We want to reset the files to allow this method to be called again, with different tolerances for instance.
+        mpFile1->close();
+        mpFile2->close();
+        mpFile1->open(mFilename1.c_str());
+        mpFile2->open(mFilename2.c_str());
+
         return (failures==0);
     }
 };

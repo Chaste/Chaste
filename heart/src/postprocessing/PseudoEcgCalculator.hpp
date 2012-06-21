@@ -90,11 +90,11 @@ private:
     /**
      * Calculates the pseudo-ECG and returns its value at the given time step.
      *
-     * @param timeStep the time step where we want to calculate the pseudoecg
+     * @param timeStep the time step where we want to calculate the pseudo-ecg
      * @return the pseudo ECG at the given time step.
      *
      */
-    double ComputePseudoEcgAtOneTimeStep (unsigned timeStep);
+    double ComputePseudoEcgAtOneTimeStep(unsigned timeStep);
 
 public:
 
@@ -109,12 +109,12 @@ public:
      * @param makeAbsolute whether to make the path of directory absolute (using the OutputFileHandler)
      *
      */
-    PseudoEcgCalculator (AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh,
-                         const ChastePoint<SPACE_DIM>& rProbeElectrode,
-                         std::string directory,
-                         std::string hdf5File,
-                         std::string variableName = "V",
-                         bool makeAbsolute = true);
+    PseudoEcgCalculator(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh,
+                        const ChastePoint<SPACE_DIM>& rProbeElectrode,
+                        std::string directory,
+                        std::string hdf5File,
+                        std::string variableName = "V",
+                        bool makeAbsolute = true);
 
     /**
      * Destructor.

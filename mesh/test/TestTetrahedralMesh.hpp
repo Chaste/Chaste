@@ -743,7 +743,8 @@ public:
         // test other version of the method
         TetrahedralMesh<1,1> mesh2;
         unsigned wrong_step = width/2; // 39/2=19 not 19.5
-        TS_ASSERT_THROWS_THIS(mesh2.ConstructRegularSlabMesh(wrong_step, width),"Space step does not divide the size of the mesh");
+        TS_ASSERT_THROWS_THIS(mesh2.ConstructRegularSlabMesh(wrong_step, width),
+                "Space step does not divide the size of the mesh");
 
         mesh2.ConstructRegularSlabMesh(width/2.0, width);
         TS_ASSERT_DELTA(mesh2.GetVolume(), width, 1e-7);

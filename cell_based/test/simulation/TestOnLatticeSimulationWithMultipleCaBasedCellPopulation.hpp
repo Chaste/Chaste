@@ -45,7 +45,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ConstBoundaryCondition.hpp"
 #include "PetscSetupAndFinalize.hpp"
 //#include "ReplicatableVector.hpp"
-#include "NumericFileComparison.hpp"
 //#include "FunctionalBoundaryCondition.hpp"
 #include "AveragedSourcePde.hpp"
 

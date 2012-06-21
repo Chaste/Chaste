@@ -45,7 +45,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LuoRudy1991.hpp"
 #include "NonlinearElasticityTools.hpp"
 #include "NobleVargheseKohlNoble1998WithSac.hpp"
-#include "NumericFileComparison.hpp"
 #include "Hdf5DataReader.hpp"
 #include "NashHunterPoleZeroLaw.hpp"
 #include "CompressibleMooneyRivlinMaterialLaw.hpp"

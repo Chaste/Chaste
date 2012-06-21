@@ -54,6 +54,8 @@ public:
 
         NumericFileComparison different_data(base_file, noised_file);
         TS_ASSERT(different_data.CompareFiles(1e-4));
+
+        TS_ASSERT_EQUALS(different_data.CompareFiles(1e-9,0,1e-9,false), false);
     }
 
     void TestIgnoreHeader() throw(Exception)
@@ -63,6 +65,8 @@ public:
 
         NumericFileComparison same_data(boost_33_file, boost_34_file);
         TS_ASSERT(same_data.CompareFiles(5.1e-6, 1));
+
+        TS_ASSERT_EQUALS(same_data.CompareFiles(1e-9, 1,1e-9,false),false);
     }
 
     void TestIgnoreProvenanceComment() throw(Exception)

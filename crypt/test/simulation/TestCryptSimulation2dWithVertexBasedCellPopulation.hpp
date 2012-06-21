@@ -53,7 +53,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "CellBasedEventHandler.hpp"
 #include "Warnings.hpp"
-#include "NumericFileComparison.hpp"
 #include "SmartPointers.hpp"
 
 class TestCryptSimulation2dWithVertexBasedCellPopulation : public AbstractCellBasedTestSuite

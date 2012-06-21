@@ -50,7 +50,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomCellKiller.hpp"
 #include "SloughingCellKiller.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
-#include "NumericFileComparison.hpp"
 #include "CellBasedEventHandler.hpp"
 #include "LogFile.hpp"
 #include "ApcOneHitCellMutationState.hpp"
