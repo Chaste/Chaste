@@ -58,6 +58,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CompareHdf5ResultsFiles.hpp"
 #include "NumericFileComparison.hpp"
 #include "VtkMeshReader.hpp"
+#include "FileComparison.hpp"
 
 #include <sys/stat.h> // For chmod()
 
@@ -851,12 +852,11 @@ public:
         std::string elem_file1 = results_dir + "/monodomain3d.exelem";
         std::string elem_file2 = "heart/test/data/CmguiData/monodomain/monodomain3dValid.exelem";
 
-        bool comparison_result = CmguiMeshWriter<3,3>::CompareCmguiFiles(node_file1,node_file2);
-        TS_ASSERT(comparison_result);
-        comparison_result = CmguiMeshWriter<3,3>::CompareCmguiFiles(elem_file1,elem_file2);
-        TS_ASSERT(comparison_result);
-        //TS_ASSERT(CompareCmguiFiles(node_file1,node_file2));
-        //TS_ASSERT(CompareCmguiFiles(elem_file1,elem_file2));
+        FileComparison comparer(node_file1,node_file2);
+        TS_ASSERT(comparer.CompareFiles());
+
+        FileComparison comparer2(elem_file1,elem_file2);
+        TS_ASSERT(comparer2.CompareFiles());
 
         //TS_ASSERT_EQUALS(system(("cmp " + results_dir + "/monodomain3d.exelem heart/test/data/CmguiData/monodomain/monodomain3dValid.exelem").c_str()), 0);
         //TS_ASSERT_EQUALS(system(("cmp " + results_dir + "/monodomain3d.exnode heart/test/data/CmguiData/monodomain/monodomain3dValid.exnode").c_str()), 0);

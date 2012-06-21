@@ -38,6 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _TESTMESHWRITERS_HPP_
 
 #include <cxxtest/TestSuite.h>
+#include <iostream>
+
 #include "MemfemMeshReader.hpp"
 #include "FemlabMeshReader.hpp"
 #include "TrianglesMeshReader.hpp"
@@ -48,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CmguiMeshWriter.hpp"
 #include "CmguiDeformedSolutionsWriter.hpp"
 #include "QuadraticMesh.hpp"
-#include <iostream>
+#include "FileComparison.hpp"
 
 class TestMeshWriters : public CxxTest::TestSuite
 {
@@ -420,10 +422,11 @@ public:
         std::string elem_file1 = results_dir + "/cube_2mm_12_elements.exelem";
         std::string elem_file2 = "mesh/test/data/TestCmguiMeshWriter/cube_2mm_12_elements.exelem";
 
-        bool comparison_result = CmguiMeshWriter<3,3>::CompareCmguiFiles(node_file1,node_file2);
-        TS_ASSERT(comparison_result);
-        comparison_result = CmguiMeshWriter<3,3>::CompareCmguiFiles(elem_file1,elem_file2);
-        TS_ASSERT(comparison_result);
+        FileComparison comparer(node_file1,node_file2);
+        TS_ASSERT(comparer.CompareFiles());
+
+        FileComparison comparer2(elem_file1,elem_file2);
+        TS_ASSERT(comparer2.CompareFiles());
 
         //now test the set method for additional fields. We set two fields.
         CmguiMeshWriter<3,3> writer2("TestCmguiMeshWriterAdditionalHeaders3D", "cube_2mm_12_elements");
@@ -438,8 +441,8 @@ public:
         elem_file1 = results_dir2 + "/cube_2mm_12_elements.exelem";
         elem_file2 = "mesh/test/data/TestCmguiMeshWriter/cube_2mm_12_elements_additional_fields.exelem";
 
-        comparison_result = CmguiMeshWriter<3,3>::CompareCmguiFiles(elem_file1,elem_file2);
-        TS_ASSERT(comparison_result);
+        FileComparison comparer3(elem_file1,elem_file2);
+        TS_ASSERT(comparer3.CompareFiles());
     }
 
     void TestCmguiMeshWriter2D() throw(Exception)
@@ -459,11 +462,11 @@ public:
         std::string elem_file1 = results_dir + "/square_128_elements.exelem";
         std::string elem_file2 = "mesh/test/data/TestCmguiMeshWriter/square_128_elements.exelem";
 
-        bool comparison_result = CmguiMeshWriter<2,2>::CompareCmguiFiles(node_file1,node_file2);
-        TS_ASSERT(comparison_result);
+        FileComparison comparer(node_file1,node_file2);
+        TS_ASSERT(comparer.CompareFiles());
 
-        comparison_result =  CmguiMeshWriter<2,2>::CompareCmguiFiles(elem_file1,elem_file2);
-        TS_ASSERT(comparison_result);
+        FileComparison comparer2(elem_file1,elem_file2);
+        TS_ASSERT(comparer2.CompareFiles());
 
         //now test the set method for additional fields. We set two fields.
         CmguiMeshWriter<2,2> writer2("TestCmguiMeshWriterAdditionalHeaders2D", "square_128_elements");
@@ -478,9 +481,8 @@ public:
         elem_file1 = results_dir2 + "/square_128_elements.exelem";
         elem_file2 = "mesh/test/data/TestCmguiMeshWriter/square_128_elements_additional_fields.exelem";
 
-        comparison_result = CmguiMeshWriter<2,2>::CompareCmguiFiles(elem_file1,elem_file2);
-
-        TS_ASSERT(comparison_result);
+        FileComparison comparer3(elem_file1,elem_file2);
+        TS_ASSERT(comparer3.CompareFiles());
     }
 
     void TestCmguiMeshWriter1D() throw(Exception)
@@ -500,10 +502,11 @@ public:
         std::string elem_file1 = results_dir + "/1D_0_to_1_100_elements.exelem";
         std::string elem_file2 = "mesh/test/data/TestCmguiMeshWriter/1D_0_to_1_100_elements.exelem";
 
-        bool comparison_result =  CmguiMeshWriter<1,1>::CompareCmguiFiles(node_file1,node_file2);
-        TS_ASSERT(comparison_result);
-        comparison_result =  CmguiMeshWriter<1,1>::CompareCmguiFiles(elem_file1,elem_file2);
-        TS_ASSERT(comparison_result);
+        FileComparison comparer(node_file1,node_file2);
+        TS_ASSERT(comparer.CompareFiles());
+
+        FileComparison comparer2(elem_file1,elem_file2);
+        TS_ASSERT(comparer2.CompareFiles());
 
         // Now test the set method for additional fields. We set two fields.
         CmguiMeshWriter<1,1> writer2("TestCmguiMeshWriterAdditionalHeaders1D", "1D_0_to_1_100_elements");
@@ -518,8 +521,8 @@ public:
         elem_file1 = results_dir2 + "/1D_0_to_1_100_elements.exelem";
         elem_file2 = "mesh/test/data/TestCmguiMeshWriter/1D_0_to_1_100_elements_additional_fields.exelem";
 
-        comparison_result =  CmguiMeshWriter<1,1>::CompareCmguiFiles(elem_file1,elem_file2);
-        TS_ASSERT(comparison_result);
+        FileComparison comparer3(elem_file1,elem_file2);
+        TS_ASSERT(comparer3.CompareFiles());
     }
 
     void TestCmguiDeformedSolutionsWriter2dLinearViz() throw(Exception)
@@ -573,27 +576,31 @@ public:
         std::string elem_file1 = results_dir + "/solution_0.exelem";
         std::string elem_file2 = "mesh/test/data/TestCmguiDeformedSolutionsWriter/solution_0.exelem";
 
-        bool comparison_result = CmguiMeshWriter<2,2>::CompareCmguiFiles(node_file1,node_file2);
-        TS_ASSERT(comparison_result);
-        comparison_result = CmguiMeshWriter<2,2>::CompareCmguiFiles(elem_file1,elem_file2);
-        TS_ASSERT(comparison_result);
+        FileComparison comparer(node_file1,node_file2);
+        TS_ASSERT(comparer.CompareFiles());
+
+        FileComparison comparer2(elem_file1,elem_file2);
+        TS_ASSERT(comparer2.CompareFiles());
 
         node_file1 = results_dir + "/solution_1.exnode";
         node_file2 = "mesh/test/data/TestCmguiDeformedSolutionsWriter/solution_1.exnode";
         elem_file1 = results_dir + "/solution_2.exnode"; // Not actually an element file - a second node file to compare!
         elem_file2 = "mesh/test/data/TestCmguiDeformedSolutionsWriter/solution_2.exnode";
 
-        comparison_result = CmguiMeshWriter<2,2>::CompareCmguiFiles(node_file1,node_file2);
-        TS_ASSERT(comparison_result);
+        FileComparison comparer3(node_file1,node_file2);
+        TS_ASSERT(comparer3.CompareFiles());
 
-        comparison_result = CmguiMeshWriter<2,2>::CompareCmguiFiles(elem_file1,elem_file2);
-        TS_ASSERT(comparison_result);
+        FileComparison comparer4(elem_file1,elem_file2);
+        TS_ASSERT(comparer4.CompareFiles());
 
-        TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" " + results_dir + "/LoadSolutions.com mesh/test/data/TestCmguiDeformedSolutionsWriter/LoadSolutions.com").c_str()), 0);
+        FileComparison comparer5(results_dir + "/LoadSolutions.com","mesh/test/data/TestCmguiDeformedSolutionsWriter/LoadSolutions.com");
+        TS_ASSERT(comparer5.CompareFiles());
 
         // Coverage
         writer.WriteCmguiScript("myfield");
-        TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" " + results_dir + "/LoadSolutions.com mesh/test/data/TestCmguiDeformedSolutionsWriter/LoadSolutions_MyField.com").c_str()), 0);
+
+        FileComparison comparer6(results_dir + "/LoadSolutions.com","mesh/test/data/TestCmguiDeformedSolutionsWriter/LoadSolutions_MyField.com");
+        TS_ASSERT(comparer6.CompareFiles());
     }
 
     void TestCmguiDeformedSolutionsWriter2dQuadraticViz() throw(Exception)
@@ -647,21 +654,22 @@ public:
         std::string elem_file1 = results_dir + "/solution_2d_quadviz_0.exelem";
         std::string elem_file2 = "mesh/test/data/TestCmguiDeformedSolutionsWriter/solution_2d_quadviz_0.exelem";
 
-        bool comparison_result = CmguiMeshWriter<2,2>::CompareCmguiFiles(node_file1,node_file2);
-        TS_ASSERT(comparison_result);
-        comparison_result = CmguiMeshWriter<2,2>::CompareCmguiFiles(elem_file1,elem_file2);
-        TS_ASSERT(comparison_result);
+        FileComparison comparer(node_file1,node_file2);
+        TS_ASSERT(comparer.CompareFiles());
+
+        FileComparison comparer2(elem_file1,elem_file2);
+        TS_ASSERT(comparer2.CompareFiles());
 
         node_file1 = results_dir + "/solution_2d_quadviz_1.exnode";
         node_file2 = "mesh/test/data/TestCmguiDeformedSolutionsWriter/solution_2d_quadviz_1.exnode";
         elem_file1 = results_dir + "/solution_2d_quadviz_2.exnode"; // Not actually an element file - a second node file to compare!
         elem_file2 = "mesh/test/data/TestCmguiDeformedSolutionsWriter/solution_2d_quadviz_2.exnode";
 
-        comparison_result = CmguiMeshWriter<2,2>::CompareCmguiFiles(node_file1,node_file2);
-        TS_ASSERT(comparison_result);
+        FileComparison comparer3(node_file1,node_file2);
+        TS_ASSERT(comparer3.CompareFiles());
 
-        comparison_result = CmguiMeshWriter<2,2>::CompareCmguiFiles(elem_file1,elem_file2);
-        TS_ASSERT(comparison_result);
+        FileComparison comparer4(elem_file1,elem_file2);
+        TS_ASSERT(comparer4.CompareFiles());
     }
 
     void TestCmguiDeformedSolutionsWriter3dQuadraticViz() throw(Exception)
@@ -705,16 +713,17 @@ public:
         std::string elem_file1 = results_dir + "/solution_3d_quadviz_0.exelem";
         std::string elem_file2 = "mesh/test/data/TestCmguiDeformedSolutionsWriter/solution_3d_quadviz_0.exelem";
 
-        bool comparison_result = CmguiMeshWriter<2,2>::CompareCmguiFiles(node_file1,node_file2);
-        TS_ASSERT(comparison_result);
-        comparison_result = CmguiMeshWriter<2,2>::CompareCmguiFiles(elem_file1,elem_file2);
-        TS_ASSERT(comparison_result);
+        FileComparison comparer(node_file1,node_file2);
+        TS_ASSERT(comparer.CompareFiles());
+
+        FileComparison comparer2(elem_file1,elem_file2);
+        TS_ASSERT(comparer2.CompareFiles());
 
         node_file1 = results_dir + "/solution_3d_quadviz_1.exnode";
         node_file2 = "mesh/test/data/TestCmguiDeformedSolutionsWriter/solution_3d_quadviz_1.exnode";
 
-        comparison_result = CmguiMeshWriter<2,2>::CompareCmguiFiles(node_file1,node_file2);
-        TS_ASSERT(comparison_result);
+        FileComparison comparer3(node_file1,node_file2);
+        TS_ASSERT(comparer3.CompareFiles());
     }
 
     void TestCmguiDeformedSolutionsWriterConvertOutput() throw(Exception)
@@ -742,20 +751,22 @@ public:
         std::string elem_file1 = results_dir + "/solution_0.exelem";
         std::string elem_file2 = "mesh/test/data/TestCmguiDeformedSolutionsWriter/solution_0.exelem";
 
-        bool comparison_result = CmguiMeshWriter<2,2>::CompareCmguiFiles(node_file1,node_file2);
-        TS_ASSERT(comparison_result);
-        comparison_result = CmguiMeshWriter<2,2>::CompareCmguiFiles(elem_file1,elem_file2);
-        TS_ASSERT(comparison_result);
+        FileComparison comparer(node_file1,node_file2);
+        TS_ASSERT(comparer.CompareFiles());
+
+        FileComparison comparer2(elem_file1,elem_file2);
+        TS_ASSERT(comparer2.CompareFiles());
 
         node_file1 = results_dir + "/solution_1.exnode";
         node_file2 = "mesh/test/data/TestCmguiDeformedSolutionsWriter/solution_1.exnode";
         elem_file1 = results_dir + "/solution_2.exnode"; // Not actually an element file - a second node file to compare!
         elem_file2 = "mesh/test/data/TestCmguiDeformedSolutionsWriter/solution_2.exnode";
 
-        comparison_result = CmguiMeshWriter<2,2>::CompareCmguiFiles(node_file1,node_file2);
-        TS_ASSERT(comparison_result);
-        comparison_result = CmguiMeshWriter<2,2>::CompareCmguiFiles(elem_file1,elem_file2);
-        TS_ASSERT(comparison_result);
+        FileComparison comparer3(node_file1,node_file2);
+        TS_ASSERT(comparer3.CompareFiles());
+
+        FileComparison comparer4(elem_file1,elem_file2);
+        TS_ASSERT(comparer4.CompareFiles());
 
         TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" " + results_dir + "/LoadSolutions.com mesh/test/data/TestCmguiDeformedSolutionsWriter/LoadSolutions.com").c_str()), 0);
         // throws as is incomplete
@@ -782,7 +793,6 @@ public:
             TrianglesMeshWriter<1,1> mesh_writer(output_dir, file_from_reader, true);
             mesh_writer.WriteFilesUsingMeshReader(mesh_reader);
         }
-
 
         // Next, write using a mesh object
         {

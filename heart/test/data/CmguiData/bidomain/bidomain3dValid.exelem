@@ -1,3 +1,4 @@
+! Created by Chaste
 Group name: axi3d
 Shape.  Dimension=3, simplex(2;3)*simplex*simplex
  #Scale factor sets= 0

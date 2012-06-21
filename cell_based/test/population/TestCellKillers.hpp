@@ -51,6 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshReader.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
+#include "FileComparison.hpp"
 
 /**
  * This class contains tests for methods on classes
@@ -638,8 +639,14 @@ public:
         targeted_cell_killer.OutputCellKillerParameters(targeted_cell_killer_parameter_file);
         targeted_cell_killer_parameter_file->close();
 
-        std::string targeted_cell_killer_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + targeted_cell_killer_results_dir + "targeted_results.parameters cell_based/test/data/TestCellKillers/targeted_results.parameters").c_str()), 0);
+        {
+            // Compare the generated file in test output with a reference copy in the source code.
+            FileFinder generated = output_file_handler.FindFile("targeted_results.parameters");
+            FileFinder reference("cell_based/test/data/TestCellKillers/targeted_results.parameters",
+                    RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated, reference);
+            TS_ASSERT(comparer.CompareFiles());
+        }
 
         // Test with RandomCellKiller
         RandomCellKiller<2> random_cell_killer(NULL, 0.01);
@@ -649,8 +656,14 @@ public:
         random_cell_killer.OutputCellKillerParameters(random_cell_killer_parameter_file);
         random_cell_killer_parameter_file->close();
 
-        std::string random_cell_killer_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + random_cell_killer_results_dir + "random_results.parameters cell_based/test/data/TestCellKillers/random_results.parameters").c_str()), 0);
+        {
+            // Compare the generated file in test output with a reference copy in the source code.
+            FileFinder generated = output_file_handler.FindFile("random_results.parameters");
+            FileFinder reference("cell_based/test/data/TestCellKillers/random_results.parameters",
+                    RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated, reference);
+            TS_ASSERT(comparer.CompareFiles());
+        }
 
         // Test with OxygenBasedCellKiller
         OxygenBasedCellKiller<2> oxygen_cell_killer(NULL);
@@ -660,8 +673,14 @@ public:
         oxygen_cell_killer.OutputCellKillerParameters(oxygen_cell_killer_parameter_file);
         oxygen_cell_killer_parameter_file->close();
 
-        std::string oxygen_cell_killer_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + oxygen_cell_killer_results_dir + "oxygen_results.parameters cell_based/test/data/TestCellKillers/oxygen_results.parameters").c_str()), 0);
+        {
+            // Compare the generated file in test output with a reference copy in the source code.
+            FileFinder generated = output_file_handler.FindFile("oxygen_results.parameters");
+            FileFinder reference("cell_based/test/data/TestCellKillers/oxygen_results.parameters",
+                    RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated, reference);
+            TS_ASSERT(comparer.CompareFiles());
+        }
 
         // Test with PlaneBasedCellKiller
         PlaneBasedCellKiller<2> region_cell_killer(NULL, zero_vector<double>(2), unit_vector<double>(2,1)); // y<0;
@@ -671,8 +690,14 @@ public:
         region_cell_killer.OutputCellKillerParameters(region_cell_killer_parameter_file);
         region_cell_killer_parameter_file->close();
 
-        std::string region_cell_killer_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + region_cell_killer_results_dir + "region_results.parameters cell_based/test/data/TestCellKillers/region_results.parameters").c_str()), 0);
+        {
+            // Compare the generated file in test output with a reference copy in the source code.
+            FileFinder generated = output_file_handler.FindFile("region_results.parameters");
+            FileFinder reference("cell_based/test/data/TestCellKillers/region_results.parameters",
+                    RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated, reference);
+            TS_ASSERT(comparer.CompareFiles());
+        }
     }
 
 };

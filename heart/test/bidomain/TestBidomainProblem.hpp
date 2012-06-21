@@ -62,6 +62,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NumericFileComparison.hpp"
 #include "Electrodes.hpp"
 #include "SimpleBathProblemSetup.hpp"
+#include "FileComparison.hpp"
 
 #ifdef CHASTE_VTK
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
@@ -672,10 +673,11 @@ public:
         std::string elem_file1 = results_dir + "/axi3d.exelem";
         std::string elem_file2 = "heart/test/data/CmguiData/bidomain/bidomain3dValid.exelem";
 
-        bool comparison_result = CmguiMeshWriter<3,3>::CompareCmguiFiles(node_file1,node_file2);
-        TS_ASSERT(comparison_result);
-        comparison_result = CmguiMeshWriter<3,3>::CompareCmguiFiles(elem_file1,elem_file2);
-        TS_ASSERT(comparison_result);
+        FileComparison comparer(node_file1,node_file2);
+        TS_ASSERT(comparer.CompareFiles());
+
+        FileComparison comparer2(elem_file1,elem_file2);
+        TS_ASSERT(comparer2.CompareFiles());
 
         //...and a couple of data files as examples
         TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" " + results_dir + "/axi3d_61.exnode heart/test/data/CmguiData/bidomain/bidomain3dValidData61.exnode").c_str()), 0);

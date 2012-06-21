@@ -48,6 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CheckReadyToDivideAndPhaseIsUpdated.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "SmartPointers.hpp"
+#include "FileComparison.hpp"
 
 class TestDeltaNotchCellCycleModel : public AbstractCellBasedTestSuite
 {
@@ -201,8 +202,14 @@ public:
         cell_cycle_model.OutputCellCycleModelParameters(parameter_file);
         parameter_file->close();
 
-        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
-       // TS_ASSERT_EQUALS(system(("diff " + results_dir + "delta_notch_results.parameters cell_based/test/data/TestDeltaNotchCellCycleModel/delta_notch_results.parameters").c_str()), 0);
+        {
+            // Compare the generated file in test output with a reference copy in the source code.
+            FileFinder generated = output_file_handler.FindFile("delta_notch_results.parameters");
+            FileFinder reference("cell_based/test/data/TestCellCycleModels/delta_notch_results.parameters",
+                    RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated, reference);
+            TS_ASSERT(comparer.CompareFiles());
+        }
     }
 
     void TestCreateCopyCellCycleModel()

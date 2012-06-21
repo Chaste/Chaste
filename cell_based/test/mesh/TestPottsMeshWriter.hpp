@@ -48,6 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PottsMeshReader.hpp"
 #include "PottsMeshWriter.hpp"
 #include "VtkMeshWriter.hpp"
+#include "FileComparison.hpp"
 
 class TestPottsMeshWriter : public CxxTest::TestSuite
 {
@@ -69,9 +70,16 @@ public:
         std::string results_file1 = handler.GetOutputDirectoryFullPath() + "potts_mesh_2d.node";
         std::string results_file2 = handler.GetOutputDirectoryFullPath() + "potts_mesh_2d.cell";
 
-        // To ignore the provenance data we only go as far as
-        TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" " + results_file1 + " cell_based/test/data/TestPottsMeshWriter/potts_mesh_2d.node").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" " + results_file2 + " cell_based/test/data/TestPottsMeshWriter/potts_mesh_2d.cell").c_str()), 0);
+        {
+            FileComparison comparer(results_file1,
+                    "cell_based/test/data/TestPottsMeshWriter/potts_mesh_2d.node");
+            TS_ASSERT(comparer.CompareFiles());
+        }
+        {
+            FileComparison comparer(results_file2,
+                    "cell_based/test/data/TestPottsMeshWriter/potts_mesh_2d.cell");
+            TS_ASSERT(comparer.CompareFiles());
+        }
     }
 
     void TestPottsMeshWriter3d() throw(Exception)
@@ -90,9 +98,17 @@ public:
         std::string results_file1 = handler.GetOutputDirectoryFullPath() + "potts_mesh_3d.node";
         std::string results_file2 = handler.GetOutputDirectoryFullPath() + "potts_mesh_3d.cell";
 
-        // To ignore the provenance data we only go as far as
-        TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" " + results_file1 + " cell_based/test/data/TestPottsMeshWriter/potts_mesh_3d.node").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" " + results_file2 + " cell_based/test/data/TestPottsMeshWriter/potts_mesh_3d.cell").c_str()), 0);
+        {
+            FileComparison comparer(results_file1,
+                    "cell_based/test/data/TestPottsMeshWriter/potts_mesh_3d.node");
+            TS_ASSERT(comparer.CompareFiles());
+        }
+        {
+            FileComparison comparer(results_file2,
+                    "cell_based/test/data/TestPottsMeshWriter/potts_mesh_3d.cell");
+            TS_ASSERT(comparer.CompareFiles());
+        }
+
     }
 
     void TestReadingAndWritingElementAttributes() throw(Exception)

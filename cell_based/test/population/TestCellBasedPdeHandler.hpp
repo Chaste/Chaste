@@ -58,6 +58,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ReplicatableVector.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "AveragedSourcePde.hpp"
+#include "FileComparison.hpp"
 #include "NumericFileComparison.hpp"
 #include "FunctionalBoundaryCondition.hpp"
 #include "SmartPointers.hpp"
@@ -226,8 +227,14 @@ public:
         pde_handler.OutputParameters(pde_handler_parameter_file);
         pde_handler_parameter_file->close();
 
-        std::string pde_handler_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + pde_handler_results_dir + "CellBasedPdeHandler.parameters cell_based/test/data/TestCellBasedPdeHandler/CellBasedPdeHandler.parameters").c_str()), 0);
+        {
+            // Compare the generated file in test output with a reference copy in the source code.
+            FileFinder generated = output_file_handler.FindFile("CellBasedPdeHandler.parameters");
+            FileFinder reference("cell_based/test/data/TestCellBasedPdeHandler/CellBasedPdeHandler.parameters",
+                    RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated, reference);
+            TS_ASSERT(comparer.CompareFiles());
+        }
     }
 
     void TestArchiving() throw(Exception)

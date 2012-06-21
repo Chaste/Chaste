@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define ABSTRACTFILECOMPARISON_HPP_
 
 #include <string>
+#include "FileFinder.hpp"
 #include "OutputFileHandler.hpp"
 
 /**
@@ -45,6 +46,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class AbstractFileComparison
 {
 public:
+
+    /**
+     * Specify two files to compare, and open them for reading.
+     * Actual comparison is done by calling CompareFiles.
+     *
+     * @param rFileFinder1  first file
+     * @param rFileFinder2  second file
+     */
+    AbstractFileComparison(const FileFinder& rFileFinder1, const FileFinder& rFileFinder2):
+        mFilename1(rFileFinder1.GetAbsolutePath()),
+        mFilename2(rFileFinder2.GetAbsolutePath())
+    {
+        Setup();
+    }
+
     /**
      * Specify two files to compare, and open them for reading.
      * Actual comparison is done by calling CompareFiles.
@@ -56,28 +72,7 @@ public:
         mFilename1(fileName1),
         mFilename2(fileName2)
     {
-        mpFile1 = new std::ifstream(mFilename1.c_str());
-
-        // If it doesn't exist - throw exception
-        if (!mpFile1->is_open())
-        {
-            delete mpFile1;
-            mpFile1 = NULL;
-            EXCEPTION("Couldn't open file: " + fileName1);
-        }
-
-        mpFile2 = new std::ifstream(mFilename2.c_str());
-
-        // If it doesn't exist - throw exception
-        if (!mpFile2->is_open())
-        {
-            mpFile1->close();
-            delete mpFile1;
-            mpFile1 = NULL;
-            delete mpFile2;
-            mpFile2 = NULL;
-            EXCEPTION("Couldn't open file: " + fileName2);
-        }
+        Setup();
     }
 
     /**
@@ -105,6 +100,8 @@ protected:
     std::ifstream* mpFile1; /**< First file */
     std::ifstream* mpFile2; /**< Second file */
 
+    unsigned mLineNum; /**< Counter for the line number we are on (in FileComparision) */
+
     /**
      * This method closes and reopens files so that another CompareFiles() command can be run on the same object.
      */
@@ -115,6 +112,7 @@ protected:
         mpFile2->close();
         mpFile1->open(mFilename1.c_str());
         mpFile2->open(mFilename2.c_str());
+        mLineNum = 1u;
     }
 
     /**
@@ -130,7 +128,40 @@ protected:
             mpFile2->getline(buffer, 1024);
             TS_ASSERT(!mpFile1->fail()); // Here we assume there are at least "ignoreFirstFewLines" lines...
             TS_ASSERT(!mpFile2->fail()); // ...and that they are lines of no more than 1024 characters
+            mLineNum++;
         }
+    }
+
+private:
+    /**
+     * Private method called only by the two constructors.
+     */
+    void Setup()
+    {
+        mpFile1 = new std::ifstream(mFilename1.c_str());
+
+        // If it doesn't exist - throw exception
+        if (!mpFile1->is_open())
+        {
+            delete mpFile1;
+            mpFile1 = NULL;
+            EXCEPTION("Couldn't open file: " + mFilename1);
+        }
+
+        mpFile2 = new std::ifstream(mFilename2.c_str());
+
+        // If it doesn't exist - throw exception
+        if (!mpFile2->is_open())
+        {
+            mpFile1->close();
+            delete mpFile1;
+            mpFile1 = NULL;
+            delete mpFile2;
+            mpFile2 = NULL;
+            EXCEPTION("Couldn't open file: " + mFilename2);
+        }
+
+        mLineNum = 1u;
     }
 
 };

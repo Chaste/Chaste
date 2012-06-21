@@ -57,6 +57,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CheckReadyToDivideAndPhaseIsUpdated.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "SmartPointers.hpp"
+#include "FileComparison.hpp"
 
 /**
  * This class contains tests for methods on classes
@@ -492,8 +493,13 @@ public:
         alarcon_oxygen_based_cell_cycle_model.OutputCellCycleModelParameters(alarcon_oxygen_based_parameter_file);
         alarcon_oxygen_based_parameter_file->close();
 
-        std::string alarcon_oxygen_based_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + alarcon_oxygen_based_results_dir + "alarcon_oxygen_based_results.parameters cell_based/test/data/TestCellCycleModels/alarcon_oxygen_based_results.parameters").c_str()), 0);
+        {
+            FileFinder generated_file = output_file_handler.FindFile("alarcon_oxygen_based_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestCellCycleModels/alarcon_oxygen_based_results.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file,reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
 
         // Test with TysonNovakCellCycleModel
         TysonNovakCellCycleModel tyson_novak_based_cell_cycle_model;
@@ -503,8 +509,13 @@ public:
         tyson_novak_based_cell_cycle_model.OutputCellCycleModelParameters(tyson_novak_based_parameter_file);
         tyson_novak_based_parameter_file->close();
 
-        std::string tyson_novak_based_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + tyson_novak_based_results_dir + "tyson_novak_based_results.parameters cell_based/test/data/TestCellCycleModels/tyson_novak_based_results.parameters").c_str()), 0);
+        {
+            FileFinder generated_file = output_file_handler.FindFile("tyson_novak_based_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestCellCycleModels/tyson_novak_based_results.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file,reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
     }
 };
 

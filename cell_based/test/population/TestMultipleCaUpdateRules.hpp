@@ -52,6 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodesOnlyMesh.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "SmartPointers.hpp"
+#include "FileComparison.hpp"
 
 class TestMulitpleCaUpdateRules : public AbstractCellBasedTestSuite
 {
@@ -238,8 +239,12 @@ public:
         diffusion_update_rule.OutputUpdateRuleInfo(diffusion_update_rule_parameter_file);
         diffusion_update_rule_parameter_file->close();
 
-        std::string diffusion_update_rule_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + diffusion_update_rule_results_dir + "diffusion_update_rule_results.parameters cell_based/test/data/TestMultipleCaUpdateRules/diffusion_update_rule_results.parameters").c_str()), 0);
+        // Compare the generated file in test output with a reference copy in the source code.
+        FileFinder generated = output_file_handler.FindFile("diffusion_update_rule_results.parameters");
+        FileFinder reference("cell_based/test/data/TestMultipleCaUpdateRules/diffusion_update_rule_results.parameters",
+                RelativeTo::ChasteSourceRoot);
+        FileComparison comparer(generated, reference);
+        TS_ASSERT(comparer.CompareFiles());
     }
 };
 

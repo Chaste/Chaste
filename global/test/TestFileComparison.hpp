@@ -55,7 +55,20 @@ public:
 
         // Comparing two different files gives a failure.
         FileComparison different_data(base_file, noised_file);
+
         TS_ASSERT_EQUALS(different_data.CompareFiles(0,false), false);
+    }
+
+    void TestFileFinderInterface() throw(Exception)
+    {
+        FileFinder base_file("global/test/data/random_data.txt",
+                             RelativeTo::ChasteSourceRoot);
+        FileFinder noised_file("global/test/data/same_random_data_with_1e-4_noise.txt",
+                               RelativeTo::ChasteSourceRoot);
+
+        // Comparing identical files shows no difference
+        FileComparison same_data(base_file, noised_file);
+        TS_ASSERT_EQUALS(same_data.CompareFiles(0,false), false);
     }
 
     void TestIgnoreHeader() throw(Exception)
@@ -70,6 +83,12 @@ public:
 
         // Here we ignore the header line and test passes.
         TS_ASSERT_EQUALS(file_comparer.CompareFiles(1), true);
+
+        file_comparer.SetIgnoreCommentLines(false);
+
+        // Here we ignore the header line and test passes.
+        TS_ASSERT_EQUALS(file_comparer.CompareFiles(1,false), false);
+
     }
 };
 

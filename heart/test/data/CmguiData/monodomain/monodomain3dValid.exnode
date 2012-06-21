@@ -1,3 +1,4 @@
+! Created by Chaste
 Group name: monodomain3d
  #Fields=1
  1) coordinates, coordinate, rectangular cartesian, #Components=3

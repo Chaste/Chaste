@@ -658,15 +658,9 @@ public:
     virtual ~CmguiMeshWriter()
     {}
 
-    /**
-     * Compare two cmgui files, helper methods for tests. It will ignore the provenance lines of the files.
-     *
-     * @param rPath1 path to the first file from calling directory (or full absolute)
-     * @param rPath2 path to the second file from calling directory (or full absolute)
-     * @return true if the file are the same (except for the provenance lines), false otherwise
-     *
-     */
-    static bool CompareCmguiFiles(std::string& rPath1, std::string& rPath2);
+
+    // A method called CompareCmguiFiles() has been removed, please use FileComparison class instead.
+
 };
 
 #endif /*CMGUIWRITER_HPP_*/

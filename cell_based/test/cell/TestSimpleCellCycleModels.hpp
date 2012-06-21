@@ -58,6 +58,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BetaCateninOneHitCellMutationState.hpp"
 #include "CellLabel.hpp"
 #include "SmartPointers.hpp"
+#include "FileComparison.hpp"
 
 class TestSimpleCellCycleModels : public AbstractCellBasedTestSuite
 {
@@ -1028,8 +1029,13 @@ public:
         fixed_duration_generation_based_cell_cycle_model.OutputCellCycleModelParameters(fixed_duration_generation_based_parameter_file);
         fixed_duration_generation_based_parameter_file->close();
 
-        std::string fixed_duration_generation_based_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + fixed_duration_generation_based_results_dir + "fixed_duration_generation_based_results.parameters cell_based/test/data/TestCellCycleModels/fixed_duration_generation_based_results.parameters").c_str()), 0);
+        {
+            FileFinder generated_file = output_file_handler.FindFile("fixed_duration_generation_based_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestCellCycleModels/fixed_duration_generation_based_results.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file,reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
 
         // Test with StochasticDurationGenerationBasedCellCycleModel
         StochasticDurationGenerationBasedCellCycleModel stochastic_duration_generation_based_cell_cycle_model;
@@ -1039,8 +1045,13 @@ public:
         stochastic_duration_generation_based_cell_cycle_model.OutputCellCycleModelParameters(stochastic_duration_generation_based_parameter_file);
         stochastic_duration_generation_based_parameter_file->close();
 
-        std::string stochastic_duration_generation_based_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + stochastic_duration_generation_based_results_dir + "stochastic_duration_generation_based_results.parameters cell_based/test/data/TestCellCycleModels/stochastic_duration_generation_based_results.parameters").c_str()), 0);
+        {
+            FileFinder generated_file = output_file_handler.FindFile("stochastic_duration_generation_based_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestCellCycleModels/stochastic_duration_generation_based_results.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file,reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
 
         // Test with StochasticDurationCellCycleModel
         StochasticDurationCellCycleModel stochastic_duration_cell_cycle_model;
@@ -1050,8 +1061,13 @@ public:
         stochastic_duration_cell_cycle_model.OutputCellCycleModelParameters(stochastic_duration_parameter_file);
         stochastic_duration_parameter_file->close();
 
-        std::string stochastic_duration_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + stochastic_duration_results_dir + "stochastic_duration_results.parameters cell_based/test/data/TestCellCycleModels/stochastic_duration_results.parameters").c_str()), 0);
+        {
+            FileFinder generated_file = output_file_handler.FindFile("stochastic_duration_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestCellCycleModels/stochastic_duration_results.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file,reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
 
         // Test with SimpleOxygenBasedCellCycleModel
         SimpleOxygenBasedCellCycleModel simple_oxygen_based_cell_cycle_model;
@@ -1061,8 +1077,13 @@ public:
         simple_oxygen_based_cell_cycle_model.OutputCellCycleModelParameters(simple_oxygen_based_parameter_file);
         simple_oxygen_based_parameter_file->close();
 
-        std::string simple_oxygen_based_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + simple_oxygen_based_results_dir + "simple_oxygen_based_results.parameters cell_based/test/data/TestCellCycleModels/simple_oxygen_based_results.parameters").c_str()), 0);
+        {
+            FileFinder generated_file = output_file_handler.FindFile("simple_oxygen_based_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestCellCycleModels/simple_oxygen_based_results.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file,reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
 
         // Test with StochasticOxygenBasedCellCycleModel
         StochasticOxygenBasedCellCycleModel stochastic_oxygen_based_cell_cycle_model;
@@ -1072,8 +1093,13 @@ public:
         stochastic_oxygen_based_cell_cycle_model.OutputCellCycleModelParameters(stochastic_oxygen_based_parameter_file);
         stochastic_oxygen_based_parameter_file->close();
 
-        std::string stochastic_oxygen_based_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + stochastic_oxygen_based_results_dir + "stochastic_oxygen_based_results.parameters cell_based/test/data/TestCellCycleModels/stochastic_oxygen_based_results.parameters").c_str()), 0);
+        {
+            FileFinder generated_file = output_file_handler.FindFile("stochastic_oxygen_based_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestCellCycleModels/stochastic_oxygen_based_results.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file,reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
 
         // Test with ContactInhibitionCellCycleModel
         ContactInhibitionCellCycleModel contact_inhibition_cell_cycle_model;
@@ -1085,8 +1111,13 @@ public:
         contact_inhibition_cell_cycle_model.OutputCellCycleModelParameters(contact_inhibition_parameter_file);
         contact_inhibition_parameter_file->close();
 
-        std::string contact_inhibition_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + contact_inhibition_results_dir + "contact_inhibition_results.parameters cell_based/test/data/TestCellCycleModels/contact_inhibition_results.parameters").c_str()), 0);
+        {
+            FileFinder generated_file = output_file_handler.FindFile("contact_inhibition_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestCellCycleModels/contact_inhibition_results.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file,reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
     }
 };
 

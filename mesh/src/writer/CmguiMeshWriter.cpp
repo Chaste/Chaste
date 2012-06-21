@@ -371,25 +371,6 @@ std::ios_base::openmode CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetOpenMode(boo
     return mode;
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool CmguiMeshWriter<ELEMENT_DIM,SPACE_DIM>::CompareCmguiFiles(std::string& rPath1, std::string& rPath2)
-{
-    std::string compare_command = "diff --ignore-matching-lines=\"! \" ";
-    compare_command += rPath1;
-    compare_command += " ";
-    compare_command += rPath2;
-
-    // Compare the new test file with one from the repository
-    if (system(compare_command.c_str()) == 0)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
 /////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////////////

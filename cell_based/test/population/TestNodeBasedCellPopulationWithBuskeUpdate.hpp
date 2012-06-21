@@ -49,6 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "TrianglesMeshReader.hpp"
 #include "NodesOnlyMesh.hpp"
+#include "FileComparison.hpp"
 
 // The header file below must be included in any TEST(!) that uses Petsc
 #include "PetscSetupAndFinalize.hpp"
@@ -113,9 +114,12 @@ public:
         cell_population.OutputCellPopulationParameters(parameter_file);
         parameter_file->close();
 
-        // Compare output with saved files of what they should look like
-        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.parameters cell_based/test/data/TestNodeBasedCellPopulationWithBuskeUpdate/results.parameters").c_str()), 0);
+        // Compare the generated file in test output with a reference copy in the source code.
+        FileFinder generated = output_file_handler.FindFile("results.parameters");
+        FileFinder reference("cell_based/test/data/TestNodeBasedCellPopulationWithBuskeUpdate/results.parameters",
+                RelativeTo::ChasteSourceRoot);
+        FileComparison comparer(generated, reference);
+        TS_ASSERT(comparer.CompareFiles());
     }
 
     void TestArchivingCellPopulation() throw (Exception)

@@ -64,6 +64,18 @@ public:
     {
     }
 
+    /**
+     * Specify two files to compare, and open them for reading.
+     * Actual comparison is done by calling CompareFiles.
+     *
+     * @param rFileName1  first file
+     * @param rFileName2  second file
+     */
+    NumericFileComparison(const FileFinder& rFileName1, const FileFinder& rFileName2):
+       AbstractFileComparison(rFileName1,rFileName2)
+    {
+    }
+
 
     /**
      * Compare the files under both relative and absolute tolerances.

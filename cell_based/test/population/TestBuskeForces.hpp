@@ -50,6 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombMeshGenerator.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
+#include "FileComparison.hpp"
 
 class TestForcesNotForRelease : public AbstractCellBasedTestSuite
 {
@@ -435,8 +436,13 @@ public:
         buske_elastic_force.OutputForceParameters(buske_force_parameter_file);
         buske_force_parameter_file->close();
 
-        std::string buske_force_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + buske_force_results_dir + "buske_results.parameters cell_based/test/data/TestForcesNotForRelease/buske_results.parameters").c_str()), 0);
+        {
+            FileFinder generated = output_file_handler.FindFile("buske_results.parameters");
+            FileFinder reference("cell_based/test/data/TestForcesNotForRelease/buske_results.parameters",
+                    RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated, reference);
+            TS_ASSERT(comparer.CompareFiles());
+        }
 
         // Test with BuskeCompressionForce
         BuskeCompressionForce<2> buske_compression_force;
@@ -446,8 +452,14 @@ public:
         buske_compression_force.OutputForceParameters(buske_compression_force_parameter_file);
         buske_compression_force_parameter_file->close();
 
-        std::string buske_compression_force_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + buske_compression_force_results_dir + "buske_compression_results.parameters cell_based/test/data/TestForcesNotForRelease/buske_compression_results.parameters").c_str()), 0);
+        {
+            // Compare the generated file in test output with a reference copy in the source code.
+            FileFinder generated = output_file_handler.FindFile("buske_compression_results.parameters");
+            FileFinder reference("cell_based/test/data/TestForcesNotForRelease/buske_compression_results.parameters",
+                    RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated, reference);
+            TS_ASSERT(comparer.CompareFiles());
+        }
     }
 
     void TestBuskeAdhesiveForceArchiving() throw (Exception)

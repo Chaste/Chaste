@@ -69,7 +69,7 @@ double NonPhysiologicalContractionModel::GetActiveTension()
     else if(mOption==2)
     {
         // small error between them at lowest dt
-        // next dt, small diff between explicit at lowest dt, mostly due to first timestep
+        // next dt, small difference between explicit at lowest dt, mostly due to first timestep
         // largest dt (1ms) completely wrong after first timestep => solution translated across
         return fabs(5*mStretch*sin(mTime));
     }

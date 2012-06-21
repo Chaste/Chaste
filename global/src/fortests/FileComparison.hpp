@@ -39,9 +39,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * Compare files to check for any differences (in numeric and/or string values).
+ *
+ * By Default this class ignores all lines which (in both files) start with '#'.
  */
 class FileComparison : public AbstractFileComparison
 {
+private:
+    bool mIgnoreCommentLines;
 public:
 
     /**
@@ -52,10 +56,32 @@ public:
      * @param fileName2  second file
      */
     FileComparison(std::string fileName1, std::string fileName2):
-       AbstractFileComparison(fileName1,fileName2)
+       AbstractFileComparison(fileName1,fileName2),
+       mIgnoreCommentLines(true)
     {
     }
 
+    /**
+     * Specify two files to compare, and open them for reading.
+     * Actual comparison is done by calling CompareFiles.
+     *
+     * @param rFileName1  first file finder
+     * @param rFileName2  second file finder
+     */
+    FileComparison(const FileFinder& rFileName1, const FileFinder& rFileName2):
+       AbstractFileComparison(rFileName1,rFileName2),
+       mIgnoreCommentLines(true)
+    {
+    }
+
+    /**
+     * Whether or not we should ignore lines starting with '#'
+     * @param ignore  whether to ignore these lines (defaults to true)
+     */
+    void SetIgnoreCommentLines(bool ignore=true)
+    {
+        mIgnoreCommentLines = ignore;
+    }
 
     /**
      * Compare the files under both relative and absolute tolerances.
@@ -77,28 +103,45 @@ public:
         bool files_empty = false;
         do
         {
-            if (!(*mpFile1>>data1))
+            std::string buffer1;
+            std::string buffer2;
+            getline(*mpFile1,buffer1);
+            getline(*mpFile2,buffer2);
+
+            if (mIgnoreCommentLines)
             {
-                mpFile1->clear(); // reset the "failbit"
-                files_empty = true;
-            }
-            if (!(*mpFile2 >> data2))
-            {
-                mpFile2->clear(); // reset the "failbit"
-                files_empty = true;
+                // Check for lines starting with "#"
+                size_t found1 = buffer1.find("#");
+                size_t found2 = buffer2.find("#");
+                if (found1 == 0 && found2 == 0)
+                {
+                    continue;
+                }
+                // Check for lines starting with "!"
+                found1 = buffer1.find("!");
+                found2 = buffer2.find("!");
+                if (found1 == 0 && found2 == 0)
+                {
+                    continue;
+                }
             }
 
-            if (!(data1==data2) && !files_empty)
+            if (!(buffer1==buffer2) && !files_empty)
             {
                 if (failures++ < max_display_failures)
                 {
                     // Display error
-                    TS_TRACE("Data \"" + data1 + "\" != \"" + data2 + "\".");
+                    std::stringstream message;
+                    message << "Line " << mLineNum << " differs in files " << mFilename1 << " and " << mFilename2;
+                    TS_TRACE(message.str());
+                    TS_TRACE( buffer1 );
+                    TS_TRACE( buffer2 );
                 }
             }
+            mLineNum++;
         }
-        while (!files_empty);
-        // If either is a NOTHING_TO_READ, then it means that there's nothing to read from the file
+        while (mpFile1->good() && mpFile2->good());
+        // If either is not good(), then it means that there's nothing to read from the file, or a file input error.
 
         if (doTsAssert)
         {

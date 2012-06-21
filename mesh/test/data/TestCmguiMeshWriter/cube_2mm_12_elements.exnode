@@ -1,5 +1,4 @@
-! Ignored line in test comparison 
-! They will contain provenance data
+! Ignored line in test comparison, will contain provenance data
 Group name: cube_2mm_12_elements
  #Fields=1
  1) coordinates, coordinate, rectangular cartesian, #Components=3

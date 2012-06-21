@@ -57,6 +57,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PottsBasedCellPopulation.hpp"
 #include "ArchiveOpener.hpp"
 #include "ArchiveLocationInfo.hpp"
+#include "FileComparison.hpp"
 
 /**
  * This class contains tests for methods on classes inheriting from AbstractCellPopulationBoundaryCondition.
@@ -420,8 +421,14 @@ public:
         plane_boundary_condition.OutputCellPopulationBoundaryConditionParameters(plane_boundary_condition_parameter_file);
         plane_boundary_condition_parameter_file->close();
 
-        std::string plane_boundary_condition_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + plane_boundary_condition_results_dir + "plane_results.parameters cell_based/test/data/TestCellBoundaryConditionsOutputParameters/plane_results.parameters").c_str()), 0);
+        {
+            // Compare the generated file in test output with a reference copy in the source code.
+            FileFinder generated = output_file_handler.FindFile("plane_results.parameters");
+            FileFinder reference("cell_based/test/data/TestCellBoundaryConditionsOutputParameters/plane_results.parameters",
+                    RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated, reference);
+            TS_ASSERT(comparer.CompareFiles());
+        }
 
         // Test with SphereGeometryBoundaryCondition
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
@@ -444,15 +451,28 @@ public:
         sphere_boundary_condition.OutputCellPopulationBoundaryConditionParameters(sphere_boundary_condition_parameter_file);
         sphere_boundary_condition_parameter_file->close();
 
-        std::string sphere_boundary_condition_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + sphere_boundary_condition_results_dir + "sphere_results.parameters cell_based/test/data/TestCellBoundaryConditionsOutputParameters/sphere_results.parameters").c_str()), 0);
+        {
+            // Compare the generated file in test output with a reference copy in the source code.
+            FileFinder generated = output_file_handler.FindFile("sphere_results.parameters");
+            FileFinder reference("cell_based/test/data/TestCellBoundaryConditionsOutputParameters/sphere_results.parameters",
+                    RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated, reference);
+            TS_ASSERT(comparer.CompareFiles());
+        }
 
         // Test OutputCellPopulationBoundaryConditionInfo() method
         out_stream plane_boundary_condition_info_file = output_file_handler.OpenOutputFile("plane_results.info");
         plane_boundary_condition.OutputCellPopulationBoundaryConditionInfo(plane_boundary_condition_info_file);
         plane_boundary_condition_info_file->close();
 
-        TS_ASSERT_EQUALS(system(("diff " + plane_boundary_condition_results_dir + "plane_results.info cell_based/test/data/TestCellBoundaryConditionsOutputParameters/plane_results.info").c_str()), 0);
+        {
+            // Compare the generated file in test output with a reference copy in the source code.
+            FileFinder generated = output_file_handler.FindFile("plane_results.info");
+            FileFinder reference("cell_based/test/data/TestCellBoundaryConditionsOutputParameters/plane_results.info",
+                    RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated, reference);
+            TS_ASSERT(comparer.CompareFiles());
+        }
     }
 };
 
