@@ -9,6 +9,7 @@ TestDistributedVector.hpp
 TestException.hpp
 TestExecutableSupport.hpp
 TestFileFinder.hpp
+TestFileComparison.hpp
 TestGenericEventHandler.hpp
 TestHeartEventHandler.hpp
 TestLogFile.hpp

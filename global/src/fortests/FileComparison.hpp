@@ -32,24 +32,16 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-#ifndef NUMERICFILECOMPARISON_HPP_
-#define NUMERICFILECOMPARISON_HPP_
-
-#include <cfloat>
+#ifndef FILECOMPARISON_HPP_
+#define FILECOMPARISON_HPP_
 
 #include "AbstractFileComparison.hpp"
-#include "MathsCustomFunctions.hpp"
-
-#define A_WORD DBL_MAX
-#define NOTHING_TO_READ DBL_MIN
 
 /**
- * Compare files of numbers to see if they match to within a given tolerance.
+ * Compare files to check for any differences (in numeric and/or string values).
  */
-class NumericFileComparison : public AbstractFileComparison
+class FileComparison : public AbstractFileComparison
 {
-private:
-
 public:
 
     /**
@@ -59,7 +51,7 @@ public:
      * @param fileName1  first file
      * @param fileName2  second file
      */
-    NumericFileComparison(std::string fileName1, std::string fileName2):
+    FileComparison(std::string fileName1, std::string fileName2):
        AbstractFileComparison(fileName1,fileName2)
     {
     }
@@ -70,75 +62,43 @@ public:
      * The comparison only fails if neither tolerance holds.  The
      * default settings effectively require numbers to match exactly.
      *
-     * @param absTol  absolute tolerance on difference between numbers
      * @param ignoreFirstFewLines  how many lines to ignore from the comparison
-     * @param relTol  relative tolerance on difference between numbers
      * @param doTsAssert  Whether to throw a TS_ASSERT internally (switched off for testing only)
      */
-    bool CompareFiles(double absTol=DBL_EPSILON, unsigned ignoreFirstFewLines=0,
-                      double relTol=DBL_EPSILON, bool doTsAssert=true)
+    bool CompareFiles(unsigned ignoreFirstFewLines=0, bool doTsAssert=true)
     {
-        double data1;
-        double data2;
+        std::string data1;
+        std::string data2;
         unsigned failures = 0;
         unsigned max_display_failures = 10;
 
         SkipHeaderLines(ignoreFirstFewLines);
 
+        bool files_empty = false;
         do
         {
             if (!(*mpFile1>>data1))
             {
-                // Cannot read the next token from file as a number, so try a word instead
-                std::string word;
                 mpFile1->clear(); // reset the "failbit"
-                if (*mpFile1 >> word)
-                {
-                    data1 = A_WORD;
-                    if (word == "#" || word == "!")
-                    {
-                        // Ignore comment (up to 1024 characters until newline)
-                        mpFile1->ignore(1024, '\n');
-                    }
-                }
-                else
-                {
-                    mpFile1->clear(); // reset the "failbit"
-                    data1 = NOTHING_TO_READ;
-                }
+                files_empty = true;
             }
             if (!(*mpFile2 >> data2))
             {
-                // Cannot read the next token from file as a number, so try a word instead
-                std::string word;
                 mpFile2->clear(); // reset the "failbit"
-                if (*mpFile2 >> word)
-                {
-                    data2 = A_WORD;
-                    if (word == "#" || word == "!")
-                    {
-                        // Ignore comment (up to 1024 characters until newline)
-                        mpFile2->ignore(1024, '\n');
-                    }
-                }
-                else
-                {
-                    mpFile2->clear(); // reset the "failbit"
-                    data2 = NOTHING_TO_READ;
-                }
+                files_empty = true;
             }
 
-            bool ok = CompareDoubles::WithinAnyTolerance(data1, data2, relTol, absTol);
-            if (!ok)
+            if (!(data1==data2) && !files_empty)
             {
                 if (failures++ < max_display_failures)
                 {
                     // Display error
-                    CompareDoubles::WithinAnyTolerance(data1, data2, relTol, absTol, true);
+                    TS_TRACE("Data \"" + data1 + "\" != \"" + data2 + "\".");
                 }
             }
         }
-        while (data1 != NOTHING_TO_READ && data2 != NOTHING_TO_READ); // If either is a NOTHING_TO_READ, then it means that there's nothing to read from the file
+        while (!files_empty);
+        // If either is a NOTHING_TO_READ, then it means that there's nothing to read from the file
 
         if (doTsAssert)
         {
@@ -149,7 +109,7 @@ public:
             {
 #define COVERAGE_IGNORE
                 // Report the paths to the files
-                TS_TRACE("Files " + mFilename1 + " and " + mFilename2 + " numerically differ.");
+                TS_TRACE("Files " + mFilename1 + " and " + mFilename2 + " differ.");
 #undef COVERAGE_IGNORE
             }
         }
@@ -160,4 +120,4 @@ public:
     }
 };
 
-#endif /*NUMERICFILECOMPARISON_HPP_*/
+#endif /*FILECOMPARISON_HPP_*/
