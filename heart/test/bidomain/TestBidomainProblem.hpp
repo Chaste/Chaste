@@ -725,7 +725,7 @@ public:
 #endif //CHASTE_VTK
      }
 
-    // Test the functionality for outputing the values of requested cell state variables
+    // Test the functionality for outputting the values of requested cell state variables
     void TestBidomainProblemPrintsMultipleVariables() throw (Exception)
     {
         // Get the singleton in a clean state
@@ -784,6 +784,54 @@ public:
             }
         }
     }
+
+
+    // Test the functionality for outputting all state variables of a particular cell
+    void TestBidomainProblemPrintsAllStateVariables() throw (Exception)
+    {
+        // Get the singleton in a clean state
+        HeartConfig::Instance()->Reset();
+
+        // Set configuration file
+        HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/MultipleVariablesBidomain.xml");
+
+        //Override the output directory so that this test goes into a fresh place
+        HeartConfig::Instance()->SetOutputDirectory("AllStateVariablesBidomain");
+
+        {
+            //MultipleVariablesBidomain.xml uses FaberRudy.  Interrogate a model to get all the state variables
+            boost::shared_ptr<ZeroStimulus> p_stimulus(new ZeroStimulus());
+            boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
+            CellFaberRudy2000FromCellML temporary_fr2000_ode_system(p_solver, p_stimulus);
+            TS_ASSERT_EQUALS(temporary_fr2000_ode_system.rGetStateVariableNames().size(), 25u);
+
+
+            // Copy all the state variable names from the temporary cell into HeartConfig so that they are all printed
+            HeartConfig::Instance()->SetOutputVariables( temporary_fr2000_ode_system.rGetStateVariableNames() );
+        }
+
+        // Set up problem
+        PlaneStimulusCellFactory<CellFaberRudy2000FromCellML, 1> cell_factory;
+        BidomainProblem<1> bidomain_problem( &cell_factory );
+
+        // Solve
+        bidomain_problem.Initialise();
+        bidomain_problem.Solve();
+
+        // Get a reference to a reader object for the simulation results
+        Hdf5DataReader data_reader1 = bidomain_problem.GetDataReader();
+
+
+        // Get an obscure state variable
+        std::vector<double> obscure_at_5 = data_reader1.GetVariableOverTime("slow_delayed_rectifier_potassium_current_xs2_gate__xs2", 5);
+        TS_ASSERT_EQUALS( obscure_at_5.size(), 11u);
+        for (unsigned time_step=0; time_step<11; time_step++)
+        {
+            TS_ASSERT_DELTA( obscure_at_5[time_step], 0.0044, 1e-3); //Does not change over time at this node
+        }
+
+    }
+
 
     /*
      * Simple bidomain simulation to test against in the archiving tests below
