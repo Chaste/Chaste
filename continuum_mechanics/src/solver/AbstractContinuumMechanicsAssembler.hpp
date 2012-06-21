@@ -360,13 +360,13 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
     if (this->mAssembleVector && this->mZeroVectorBeforeAssembly)
     {
         // Note PetscVecTools::Finalise(this->mVectorToAssemble); on an unused matrix
-        // would "compress" data add make any pre-allocated entries redundant.
+        // would "compress" data and make any pre-allocated entries redundant.
         PetscVecTools::Zero(this->mVectorToAssemble);
     }
     if (this->mAssembleMatrix && this->mZeroMatrixBeforeAssembly)
     {
         // Note PetscMatTools::Finalise(this->mMatrixToAssemble); on an unused matrix
-        // would "compress" data add make any pre-allocated entries redundant.
+        // would "compress" data and make any pre-allocated entries redundant.
         PetscMatTools::Zero(this->mMatrixToAssemble);
     }
 
@@ -398,6 +398,7 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
             // Note that a different ordering is used for the elemental matrix compared to the global matrix.
             // See comments about ordering above.
             unsigned p_indices[STENCIL_SIZE];
+            // Work out the mapping for spatial terms
             for (unsigned i=0; i<NUM_NODES_PER_ELEMENT; i++)
             {
                 for (unsigned j=0; j<DIM; j++)
@@ -406,7 +407,7 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
                     p_indices[DIM*i+j] = (DIM+1)*r_element.GetNodeGlobalIndex(i) + j;
                 }
             }
-
+            // Work out the mapping for pressure terms
             for (unsigned i=0; i<NUM_VERTICES_PER_ELEMENT; i++)
             {
                 p_indices[DIM*NUM_NODES_PER_ELEMENT + i] = (DIM+1)*r_element.GetNodeGlobalIndex(i)+DIM;

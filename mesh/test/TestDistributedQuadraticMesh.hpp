@@ -41,10 +41,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <set>
 #include <vector>
 
+#include "DistributedQuadraticMesh.hpp"
 #include "NodePartitioner.hpp"
 #include "QuadraticMesh.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "PetscTools.hpp"
+
 #include "PetscSetupAndFinalize.hpp"
 
 
@@ -187,19 +189,86 @@ public:
         //              << mesh.GetNode(*iter)->rGetLocation()[1] << std::endl;
         //}
         //p_file->close();
+
+        /*
+        function viz_partition(N)
+        col = {'*', 'r*', 'k*', 'm*', 'g*', 'y*'};
+        figure; hold on;
+        for i=0:N-1
+          file = ['/tmp/rafb/testoutput/TestDistributedQuadMeshPartitioning/res_',num2str(N),'_',num2str(i),'.txt'];
+          d = load(file);
+          plot(d(:,1),d(:,2),col{i+1});
+        end;
+        */
     }
 
+
+    void TestConstructFromMeshReader2D() throw (Exception)
+    {
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic",2,1, false);
+        DistributedQuadraticMesh<2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        // Check we have the right number of nodes & elements
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 289u);
+        TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), 289u);
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), 128u);
+        TS_ASSERT_EQUALS(mesh.GetDistributedVectorFactory()->GetProblemSize(), 289u);
+        TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 32u);
+
+        for (AbstractTetrahedralMesh<2,2>::ElementIterator iter = mesh.GetElementIteratorBegin();
+             iter != mesh.GetElementIteratorEnd();
+             ++iter)
+        {
+            TS_ASSERT(iter->GetOwnership());
+        }
+
+        //Compare the DistributedQuadraticMesh to a normal QuadraticMesh
+        QuadraticMesh<2> seq_mesh;
+        seq_mesh.ConstructFromMeshReader(mesh_reader);
+
+        for (AbstractTetrahedralMesh<2,2>::ElementIterator iter = mesh.GetElementIteratorBegin();
+            iter != mesh.GetElementIteratorEnd();
+            ++iter)
+        {
+            unsigned element_index = iter->GetIndex();
+
+            Element<2,2>* p_sequ_element = seq_mesh.GetElement(element_index);
+            TS_ASSERT_EQUALS(element_index, p_sequ_element->GetIndex());
+            TS_ASSERT_EQUALS(iter->GetNumNodes(), p_sequ_element->GetNumNodes());
+
+            for (unsigned node_local_index=0; node_local_index < iter->GetNumNodes(); node_local_index++)
+            {
+                TS_ASSERT_EQUALS(iter->GetNodeGlobalIndex(node_local_index),
+                                 p_sequ_element->GetNodeGlobalIndex(node_local_index));
+
+                TS_ASSERT_EQUALS(iter->GetNode(node_local_index)->GetPoint()[0],
+                                 p_sequ_element->GetNode(node_local_index)->GetPoint()[0]);
+            }
+        }
+
+        for (AbstractTetrahedralMesh<2,2>::BoundaryElementIterator it=mesh.GetBoundaryElementIteratorBegin();
+            it!=mesh.GetBoundaryElementIteratorEnd();
+            ++it)
+        {
+            BoundaryElement<1,2>* p_para_boundary_element = *it;
+            unsigned boundary_element_index = p_para_boundary_element->GetIndex();
+
+            BoundaryElement<1,2>* p_sequ_boundary_element = seq_mesh.GetBoundaryElement(boundary_element_index);
+            TS_ASSERT_EQUALS(boundary_element_index, p_sequ_boundary_element->GetIndex());
+            TS_ASSERT_EQUALS(p_para_boundary_element->GetNumNodes(), p_sequ_boundary_element->GetNumNodes());
+
+            for (unsigned node_local_index=0; node_local_index < p_para_boundary_element->GetNumNodes(); node_local_index++)
+            {
+                TS_ASSERT_EQUALS(p_para_boundary_element->GetNodeGlobalIndex(node_local_index),
+                                 p_sequ_boundary_element->GetNodeGlobalIndex(node_local_index));
+
+                TS_ASSERT_EQUALS(p_para_boundary_element->GetNode(node_local_index)->GetPoint()[0],
+                                 p_sequ_boundary_element->GetNode(node_local_index)->GetPoint()[0]);
+            }
+        }
+    }
 };
 
-/*
-function viz_partition(N)
-col = {'*', 'r*', 'k*', 'm*', 'g*', 'y*'};
-figure; hold on;
-for i=0:N-1
-  file = ['/tmp/rafb/testoutput/TestDistributedQuadMeshPartitioning/res_',num2str(N),'_',num2str(i),'.txt'];
-  d = load(file);
-  plot(d(:,1),d(:,2),col{i+1});
-end;
-*/
 
 #endif // TESTDISTRIBUTEDQUADRATICMESH_HPP_

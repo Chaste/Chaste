@@ -144,7 +144,7 @@ public:
      *
      * @param rMeshReader the mesh reader
      */
-    void ConstructFromMeshReader(AbstractMeshReader<ELEMENT_DIM,SPACE_DIM>& rMeshReader);
+    virtual void ConstructFromMeshReader(AbstractMeshReader<ELEMENT_DIM,SPACE_DIM>& rMeshReader);
 
     /**
      * Get the number of nodes that are entirely owned by the local process.
@@ -185,7 +185,7 @@ public:
     unsigned GetNumElements() const;
 
     /**
-     * Get the type of mesh partition ing that is being used...
+     * Get the type of mesh partitioning that is being used...
      *
      * serialization uses this method.
      */
