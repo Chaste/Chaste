@@ -162,7 +162,8 @@ public:
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
         problem_defn.SetMechanicsSolveTimestep(1.0);
 
-        CardiacElectroMechanicsProblem<3> problem(INCOMPRESSIBLE,
+        CardiacElectroMechanicsProblem<3,1> problem(INCOMPRESSIBLE,
+												  MONODOMAIN,
                                                   &electrics_mesh,
                                                   &mechanics_mesh,
                                                   &cell_factory,
@@ -203,7 +204,8 @@ public:
         problem_defn.SetMechanicsSolveTimestep(1.0);
         problem_defn.SetVariableFibreSheetDirectionsFile("heart/test/data/fibre_tests/5by5by5_fibres_by_quadpt.orthoquad", true);
 
-        CardiacElectroMechanicsProblem<3> problem(INCOMPRESSIBLE,
+        CardiacElectroMechanicsProblem<3,1> problem(INCOMPRESSIBLE,
+												  MONODOMAIN,
                                                   &electrics_mesh,
                                                   &mechanics_mesh,
                                                   &cell_factory,
@@ -343,7 +345,8 @@ public:
         {
             HeartConfig::Instance()->SetSimulationDuration(20.0);
 
-            CardiacElectroMechanicsProblem<3> problem(COMPRESSIBLE,
+            CardiacElectroMechanicsProblem<3,1> problem(COMPRESSIBLE,
+													  MONODOMAIN,
                                                       &electrics_mesh,
                                                       &mechanics_mesh,
                                                       &cell_factory,
@@ -363,7 +366,8 @@ public:
             HeartConfig::Instance()->SetSimulationDuration(20.0);
             problem_defn.SetVariableFibreSheetDirectionsFile("heart/test/data/fibre_tests/alongX.ortho", false);
 
-            CardiacElectroMechanicsProblem<3> problem(COMPRESSIBLE,
+            CardiacElectroMechanicsProblem<3,1> problem(COMPRESSIBLE,
+													  MONODOMAIN,
                                                       &electrics_mesh,
                                                       &mechanics_mesh,
                                                       &cell_factory,
@@ -406,7 +410,8 @@ public:
             HeartConfig::Instance()->SetSimulationDuration(20.0);
             problem_defn.SetVariableFibreSheetDirectionsFile("heart/test/data/fibre_tests/alongY1.ortho", false);
 
-            CardiacElectroMechanicsProblem<3> problem(COMPRESSIBLE,
+            CardiacElectroMechanicsProblem<3,1> problem(COMPRESSIBLE,
+													  MONODOMAIN,
                                                       &electrics_mesh,
                                                       &mechanics_mesh,
                                                       &cell_factory,
@@ -427,7 +432,8 @@ public:
             HeartConfig::Instance()->SetSimulationDuration(20.0);
             problem_defn.SetVariableFibreSheetDirectionsFile("heart/test/data/fibre_tests/alongY2.ortho", false);
 
-            CardiacElectroMechanicsProblem<3> problem(COMPRESSIBLE,
+            CardiacElectroMechanicsProblem<3,1> problem(COMPRESSIBLE,
+												      MONODOMAIN,
                                                       &electrics_mesh,
                                                       &mechanics_mesh,
                                                       &cell_factory,
@@ -467,7 +473,8 @@ public:
             HeartConfig::Instance()->SetSimulationDuration(20.0);
             problem_defn.SetVariableFibreSheetDirectionsFile("heart/test/data/fibre_tests/alongZ.ortho", false);
 
-            CardiacElectroMechanicsProblem<3> problem(COMPRESSIBLE,
+            CardiacElectroMechanicsProblem<3,1> problem(COMPRESSIBLE,
+													  MONODOMAIN,
                                                       &electrics_mesh,
                                                       &mechanics_mesh,
                                                       &cell_factory,
