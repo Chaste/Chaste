@@ -194,6 +194,51 @@ c_matrix<double,DIM,DIM>& CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::rGe
 }
 
 
+/**
+ * Helper "function" for the constructor, to create the electrics sub-problem without dynamic_cast.
+ */
+template<unsigned DIM, unsigned PROBLEM_DIM>
+class CreateElectricsProblem
+{
+public:
+    /**
+     * The actual creation method.
+     * @param problemType
+     * @param pCellFactory
+     */
+    static AbstractCardiacProblem<DIM, DIM, PROBLEM_DIM>* Create(ElectricsProblemType problemType,
+                                                                 AbstractCardiacCellFactory<DIM>* pCellFactory);
+};
+
+template<unsigned DIM>
+class CreateElectricsProblem<DIM, 1u>
+{
+public:
+    static AbstractCardiacProblem<DIM, DIM, 1u>* Create(ElectricsProblemType problemType,
+                                                        AbstractCardiacCellFactory<DIM>* pCellFactory)
+    {
+        if (problemType == MONODOMAIN)
+        {
+            return new MonodomainProblem<DIM>(pCellFactory);
+        }
+        EXCEPTION("The second template parameter should be 2 when a bidomain problem is chosen");
+    }
+};
+
+template<unsigned DIM>
+class CreateElectricsProblem<DIM, 2u>
+{
+public:
+    static AbstractCardiacProblem<DIM, DIM, 2u>* Create(ElectricsProblemType problemType,
+                                                        AbstractCardiacCellFactory<DIM>* pCellFactory)
+    {
+        if (problemType == BIDOMAIN)
+        {
+            return new BidomainProblem<DIM>(pCellFactory);
+        }
+        EXCEPTION("The second template parameter should be 1 when a monodomain problem is chosen");
+    }
+};
 
 
 template<unsigned DIM, unsigned ELEC_PROB_DIM>
@@ -239,41 +284,9 @@ CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::CardiacElectroMechanicsProble
 
     // Create the monodomain problem.
     // **NOTE** WE ONLY USE THIS TO: set up the cells, get an initial condition
-    // (voltage) vector, and get an solver. We won't ever call solve on the Cardiac problem class
+    // (voltage) vector, and get a solver. We won't ever call Solve on the cardiac problem class
     assert(pCellFactory != NULL);
-    switch (electricsProblemType)
-    {
-		case MONODOMAIN:
-		{
-			if (ELEC_PROB_DIM!=1)
-			{
-				EXCEPTION("The second template parameter should be 1 when a monodomain problem is chosen");
-			}
-			MonodomainProblem<DIM>* mono_problem = new MonodomainProblem<DIM> (pCellFactory);
-			mpElectricsProblem = dynamic_cast<AbstractCardiacProblem<DIM,DIM,ELEC_PROB_DIM>*  > (mono_problem);
-			break;
-		}
-		case BIDOMAIN:
-		{
-			if (ELEC_PROB_DIM!=2)
-			{
-				EXCEPTION("The second template parameter should be 2 when a bidomain problem is chosen");
-			}
-			BidomainProblem<DIM>* bido_problem = new BidomainProblem<DIM> (pCellFactory);
-			mpElectricsProblem = dynamic_cast<AbstractCardiacProblem<DIM,DIM,ELEC_PROB_DIM>*  > (bido_problem);
-			break;
-		}
-//		case BIDOMAIN_WITH_BATH:
-//		{
-//			BidomainProblem<DIM>* bido_problem = new BidomainProblem<DIM> (pCellFactory, true);
-//			mpElectricsProblem = dynamic_cast<AbstractCardiacProblem<DIM,DIM,ELEC_PROB_DIM>*  > (bido_problem);
-//			break;
-//		}
-		default:
-		{
-			NEVER_REACHED;
-		}
-    }
+    mpElectricsProblem = CreateElectricsProblem<DIM,ELEC_PROB_DIM>::Create(electricsProblemType, pCellFactory);
 
     // check whether output is required
     mWriteOutput = (outputDirectory!="");
@@ -320,10 +333,10 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
     assert(mpElectricsMesh!=NULL);
     assert(mpMechanicsMesh!=NULL);
     assert(mpProblemDefinition!=NULL);
-
     assert(mpCardiacMechSolver==NULL);
 
-
+    ///\todo This is fragile: check how the TimeStepper does it, and possibly refactor the behaviour there
+    /// into a static helper method if it isn't already.
     mNumElecTimestepsPerMechTimestep = (unsigned) floor((mpProblemDefinition->GetMechanicsSolveTimestep()/HeartConfig::Instance()->GetPdeTimeStep())+0.5);
     if(fabs(mNumElecTimestepsPerMechTimestep*HeartConfig::Instance()->GetPdeTimeStep() - mpProblemDefinition->GetMechanicsSolveTimestep()) > 1e-6)
     {
