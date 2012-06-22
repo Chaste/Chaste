@@ -160,7 +160,8 @@ public:
          * class takes in whether an incompressible or compressible problem should be solved,
          * information about the geometry to be created, and the some information about the
          * mechanics: which contraction model to use, what ODE timestep to use with it, and how often
-         * to solve the mechanics.
+         * to solve the mechanics. In this class the equation that describes the electrics is assumed to be
+         * the monodomain one.
          */
         CardiacElectroMechProbRegularGeom<2> problem(INCOMPRESSIBLE,
                                                      0.1,  // width of square (cm)
@@ -261,9 +262,12 @@ public:
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
         problem_defn.SetMechanicsSolveTimestep(1.0);
 
-        /* Now create the problem class, passing in the meshes, the cell factory, and the problem_definition class,
-         * and call solve */
-        CardiacElectroMechanicsProblem<2> problem(INCOMPRESSIBLE,
+        /* Now create the problem class, passing in the compressibility type (COMPRESSIBLE or INCOMPRESSIBLE),
+         * the type of electrics propagation equation (MONODOMAIN in this case),the meshes, the cell factory, and the problem_definition class,
+         * and call solve. The first template parameter (2) is the dimension of the space, the second one is the number of unknowns
+         * in the electrics problem (1 for MONODOMAIN, 2 for BIDOMAIN)*/
+        CardiacElectroMechanicsProblem<2,1> problem(INCOMPRESSIBLE,
+												  MONODOMAIN,
                                                   &electrics_mesh,
                                                   &mechanics_mesh,
                                                   &cell_factory,
@@ -410,7 +414,8 @@ public:
         problem_defn.SetVariableFibreSheetDirectionsFile("heart/test/data/fibre_tests/5by5by5_fibres.orthoquad", true);
 
         /* Create the problem object */
-        CardiacElectroMechanicsProblem<3> problem(COMPRESSIBLE,
+        CardiacElectroMechanicsProblem<3,1> problem(COMPRESSIBLE,
+												  MONODOMAIN,
                                                   &electrics_mesh,
                                                   &mechanics_mesh,
                                                   &cell_factory,

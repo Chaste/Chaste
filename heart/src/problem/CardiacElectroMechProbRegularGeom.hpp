@@ -76,7 +76,8 @@ public:
                                       double mechanicsSolveTimestep,
                                       double contractionModelOdeTimeStep,
                                       std::string outputDirectory = "")
-        : CardiacElectroMechanicsProblem<DIM>(compressibilityType,
+        : CardiacElectroMechanicsProblem<DIM,1>(compressibilityType,
+											  MONODOMAIN,
                                               NULL, NULL,
                                               pCellFactory,
                                               NULL,

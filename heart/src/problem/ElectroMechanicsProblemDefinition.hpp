@@ -41,8 +41,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NashHunterPoleZeroLaw.hpp"
 #include "CompressibleExponentialLaw.hpp"
 
-
-
 /**
  *  Subclass of SolidMechanicsProblemDefinition with some cardiac-electro-mechanics-specific
  *  methods.

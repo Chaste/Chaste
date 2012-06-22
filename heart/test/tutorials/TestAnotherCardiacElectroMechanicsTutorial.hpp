@@ -212,7 +212,8 @@ public:
         /* Set the end time, create the problem, and solve */
         HeartConfig::Instance()->SetSimulationDuration(50.0);
 
-        CardiacElectroMechanicsProblem<2> problem(INCOMPRESSIBLE,
+        CardiacElectroMechanicsProblem<2,1> problem(INCOMPRESSIBLE,
+												  MONODOMAIN,
                                                   &electrics_mesh,
                                                   &mechanics_mesh,
                                                   &cell_factory,
@@ -338,7 +339,8 @@ public:
          */
         problem_defn.SetNumIncrementsForInitialDeformation(3);
 
-        CardiacElectroMechanicsProblem<2> problem(COMPRESSIBLE,
+        CardiacElectroMechanicsProblem<2,1> problem(COMPRESSIBLE,
+												  MONODOMAIN,
                                                   &electrics_mesh,
                                                   &mechanics_mesh,
                                                   &cell_factory,

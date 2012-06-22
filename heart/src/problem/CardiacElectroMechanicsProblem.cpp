@@ -54,10 +54,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ExplicitCardiacMechanicsSolver.hpp"
 #include "CmguiDeformedSolutionsWriter.hpp"
 #include "VoltageInterpolaterOntoMechanicsMesh.hpp"
+#include "BidomainProblem.hpp"
 
 
-template<unsigned DIM>
-void CardiacElectroMechanicsProblem<DIM>::DetermineWatchedNodes()
+template<unsigned DIM, unsigned ELEC_PROB_DIM>
+void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::DetermineWatchedNodes()
 {
     assert(mIsWatchedLocation);
 
@@ -140,8 +141,8 @@ void CardiacElectroMechanicsProblem<DIM>::DetermineWatchedNodes()
     mpWatchedLocationFile = handler.OpenOutputFile("watched.txt");
 }
 
-template<unsigned DIM>
-void CardiacElectroMechanicsProblem<DIM>::WriteWatchedLocationData(double time, Vec voltage)
+template<unsigned DIM, unsigned ELEC_PROB_DIM>
+void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::WriteWatchedLocationData(double time, Vec voltage)
 {
     assert(mIsWatchedLocation);
 
@@ -154,7 +155,7 @@ void CardiacElectroMechanicsProblem<DIM>::WriteWatchedLocationData(double time, 
     //// Removed the following which also took this nodes calcium concentration and printing, because (it isn't that
     //// important and) it won't work in parallel and has the hardcoded index issue described below.
     //     // Metadata is currently being added to CellML models and then this will be avoided by asking for Calcium.
-    //    double Ca = mpMonodomainProblem->GetMonodomainTissue()->GetCardiacCell(mWatchedElectricsNodeIndex)->GetIntracellularCalciumConcentration();
+    //    double Ca = mpElectricsProblem->GetMonodomainTissue()->GetCardiacCell(mWatchedElectricsNodeIndex)->GetIntracellularCalciumConcentration();
 
     *mpWatchedLocationFile << time << " ";
     for(unsigned i=0; i<DIM; i++)
@@ -165,8 +166,8 @@ void CardiacElectroMechanicsProblem<DIM>::WriteWatchedLocationData(double time, 
     mpWatchedLocationFile->flush();
 }
 
-template<unsigned DIM>
-c_matrix<double,DIM,DIM>& CardiacElectroMechanicsProblem<DIM>::rGetModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,DIM,DIM>& rOriginalConductivity)
+template<unsigned DIM, unsigned ELEC_PROB_DIM>
+c_matrix<double,DIM,DIM>& CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::rGetModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,DIM,DIM>& rOriginalConductivity)
 {
     if(mLastModifiedConductivity.first==elementIndex)
     {
@@ -195,9 +196,10 @@ c_matrix<double,DIM,DIM>& CardiacElectroMechanicsProblem<DIM>::rGetModifiedCondu
 
 
 
-template<unsigned DIM>
-CardiacElectroMechanicsProblem<DIM>::CardiacElectroMechanicsProblem(
+template<unsigned DIM, unsigned ELEC_PROB_DIM>
+CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::CardiacElectroMechanicsProblem(
             CompressibilityType compressibilityType,
+            ElectricsProblemType electricsProblemType,
             TetrahedralMesh<DIM,DIM>* pElectricsMesh,
             QuadraticMesh<DIM>* pMechanicsMesh,
             AbstractCardiacCellFactory<DIM>* pCellFactory,
@@ -237,9 +239,41 @@ CardiacElectroMechanicsProblem<DIM>::CardiacElectroMechanicsProblem(
 
     // Create the monodomain problem.
     // **NOTE** WE ONLY USE THIS TO: set up the cells, get an initial condition
-    // (voltage) vector, and get an solver. We won't ever call solve on the MonodomainProblem
+    // (voltage) vector, and get an solver. We won't ever call solve on the Cardiac problem class
     assert(pCellFactory != NULL);
-    mpMonodomainProblem = new MonodomainProblem<DIM>(pCellFactory);
+    switch (electricsProblemType)
+    {
+		case MONODOMAIN:
+		{
+			if (ELEC_PROB_DIM!=1)
+			{
+				EXCEPTION("The second template parameter should be 1 when a monodomain problem is chosen");
+			}
+			MonodomainProblem<DIM>* mono_problem = new MonodomainProblem<DIM> (pCellFactory);
+			mpElectricsProblem = dynamic_cast<AbstractCardiacProblem<DIM,DIM,ELEC_PROB_DIM>*  > (mono_problem);
+			break;
+		}
+		case BIDOMAIN:
+		{
+			if (ELEC_PROB_DIM!=2)
+			{
+				EXCEPTION("The second template parameter should be 2 when a bidomain problem is chosen");
+			}
+			BidomainProblem<DIM>* bido_problem = new BidomainProblem<DIM> (pCellFactory);
+			mpElectricsProblem = dynamic_cast<AbstractCardiacProblem<DIM,DIM,ELEC_PROB_DIM>*  > (bido_problem);
+			break;
+		}
+//		case BIDOMAIN_WITH_BATH:
+//		{
+//			BidomainProblem<DIM>* bido_problem = new BidomainProblem<DIM> (pCellFactory, true);
+//			mpElectricsProblem = dynamic_cast<AbstractCardiacProblem<DIM,DIM,ELEC_PROB_DIM>*  > (bido_problem);
+//			break;
+//		}
+		default:
+		{
+			NEVER_REACHED;
+		}
+    }
 
     // check whether output is required
     mWriteOutput = (outputDirectory!="");
@@ -262,8 +296,8 @@ CardiacElectroMechanicsProblem<DIM>::CardiacElectroMechanicsProblem(
 //    mpImpactRegion=NULL;
 }
 
-template<unsigned DIM>
-CardiacElectroMechanicsProblem<DIM>::~CardiacElectroMechanicsProblem()
+template<unsigned DIM, unsigned ELEC_PROB_DIM>
+CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::~CardiacElectroMechanicsProblem()
 {
     // NOTE if SetWatchedLocation but not Initialise has been called, mpWatchedLocationFile
     // will be uninitialised and using it will cause a seg fault. Hence the mpMechanicsMesh!=NULL
@@ -273,15 +307,15 @@ CardiacElectroMechanicsProblem<DIM>::~CardiacElectroMechanicsProblem()
         mpWatchedLocationFile->close();
     }
 
-    delete mpMonodomainProblem;
+    delete mpElectricsProblem;
     delete mpCardiacMechSolver;
     delete mpMeshPair;
 
     LogFile::Close();
 }
 
-template<unsigned DIM>
-void CardiacElectroMechanicsProblem<DIM>::Initialise()
+template<unsigned DIM, unsigned ELEC_PROB_DIM>
+void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
 {
     assert(mpElectricsMesh!=NULL);
     assert(mpMechanicsMesh!=NULL);
@@ -317,9 +351,9 @@ void CardiacElectroMechanicsProblem<DIM>::Initialise()
         DetermineWatchedNodes();
     }
 
-    // initialise monodomain problem
-    mpMonodomainProblem->SetMesh(mpElectricsMesh);
-    mpMonodomainProblem->Initialise();
+    // initialise electrics problem
+    mpElectricsProblem->SetMesh(mpElectricsMesh);
+    mpElectricsProblem->Initialise();
 
 
     if(mCompressibilityType==INCOMPRESSIBLE)
@@ -416,7 +450,7 @@ void CardiacElectroMechanicsProblem<DIM>::Initialise()
 
         // tell the abstract tissue class that the conductivities need to be modified, passing in this class
         // (which is of type AbstractConductivityModifier)
-        mpMonodomainProblem->GetMonodomainTissue()->SetConductivityModifier(this);
+        mpElectricsProblem->GetTissue()->SetConductivityModifier(this);
     }
 
     if(mWriteOutput)
@@ -426,8 +460,8 @@ void CardiacElectroMechanicsProblem<DIM>::Initialise()
     }
 }
 
-template<unsigned DIM>
-void CardiacElectroMechanicsProblem<DIM>::Solve()
+template<unsigned DIM, unsigned ELEC_PROB_DIM>
+void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
 {
     // initialise the meshes and mechanics solver
     if(mpCardiacMechSolver==NULL)
@@ -442,18 +476,18 @@ void CardiacElectroMechanicsProblem<DIM>::Solve()
 
     mpProblemDefinition->Validate();
 
-    boost::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>);
+    boost::shared_ptr<BoundaryConditionsContainer<DIM,DIM,ELEC_PROB_DIM> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,ELEC_PROB_DIM>);
     p_bcc->DefineZeroNeumannOnMeshBoundary(mpElectricsMesh, 0);
-    mpMonodomainProblem->SetBoundaryConditionsContainer(p_bcc);
+    mpElectricsProblem->SetBoundaryConditionsContainer(p_bcc);
 
     // get an electrics solver from the problem. Note that we don't call
     // Solve() on the CardiacProblem class, we do the looping here.
-    AbstractDynamicLinearPdeSolver<DIM,DIM,1>* p_electrics_solver
-       = mpMonodomainProblem->CreateSolver();
+    AbstractDynamicLinearPdeSolver<DIM,DIM,ELEC_PROB_DIM>* p_electrics_solver
+       = mpElectricsProblem->CreateSolver();
 
     // set up initial voltage etc
     Vec voltage=NULL; //This will be set and used later
-    Vec initial_voltage = mpMonodomainProblem->CreateInitialCondition();
+    Vec initial_voltage = mpElectricsProblem->CreateInitialCondition();
 
     unsigned num_quad_points = mpCardiacMechSolver->GetTotalNumQuadPoints();
     std::vector<double> interpolated_calcium_concs(num_quad_points, 0.0);
@@ -546,8 +580,8 @@ void CardiacElectroMechanicsProblem<DIM>::Solve()
             // inside HeartConfig to estimate total number of timesteps, so make
             // sure this is set to what we will use.
             HeartConfig::Instance()->SetPrintingTimeStep(mpProblemDefinition->GetMechanicsSolveTimestep());
-            mpMonodomainProblem->InitialiseWriter();
-            mpMonodomainProblem->WriteOneStep(stepper.GetTime(), initial_voltage);
+            mpElectricsProblem->InitialiseWriter();
+            mpElectricsProblem->WriteOneStep(stepper.GetTime(), initial_voltage);
         }
 
         if(mIsWatchedLocation)
@@ -603,7 +637,7 @@ void CardiacElectroMechanicsProblem<DIM>::Solve()
             //  If mpProblemDefinition->GetDeformationAffectsConductivity()==true:
             //  The deformation gradient needs to be set up but does not need to be passed to the tissue
             //  so that F is used to compute the conductivity. Instead this is
-            //  done through the line "mpMonodomainProblem->GetMonodomainTissue()->SetConductivityModifier(this);" line above, which means
+            //  done through the line "mpElectricsProblem->GetMonodomainTissue()->SetConductivityModifier(this);" line above, which means
             //  rGetModifiedConductivityTensor() will be called on this class by the tissue, which then uses the F
 
             mpCardiacMechSolver->ComputeDeformationGradientAndStretchInEachElement(mDeformationGradientsForEachMechanicsElement, mStretchesForEachMechanicsElement);
@@ -618,7 +652,7 @@ void CardiacElectroMechanicsProblem<DIM>::Solve()
             {
                 unsigned containing_elem = mpMeshPair->rGetCoarseElementsForFineNodes()[global_index];
                 double stretch = mStretchesForEachMechanicsElement[containing_elem];
-                mpMonodomainProblem->GetTissue()->GetCardiacCell(global_index)->SetStretch(stretch);
+                mpElectricsProblem->GetTissue()->GetCardiacCell(global_index)->SetStretch(stretch);
             }
         }
 
@@ -678,16 +712,16 @@ void CardiacElectroMechanicsProblem<DIM>::Solve()
 
         // collect all the calcium concentrations (from the cells, which are
         // distributed) in one (replicated) vector
-        ReplicatableVector calcium_repl(mpElectricsMesh->GetNumNodes());
+        ReplicatableVector calcium_repl(ELEC_PROB_DIM*mpElectricsMesh->GetNumNodes());
         PetscInt lo, hi;
         VecGetOwnershipRange(voltage, &lo, &hi);
-        for(int index=lo; index<hi; index++)
+        for(int index=lo; index<hi; index = index + ELEC_PROB_DIM)
         {
-            calcium_repl[index] = mpMonodomainProblem->GetTissue()->GetCardiacCell(index)->GetIntracellularCalciumConcentration();
+        	unsigned actual_index = (unsigned) index / ELEC_PROB_DIM;
+            calcium_repl[actual_index] = mpElectricsProblem->GetTissue()->GetCardiacCell(actual_index)->GetIntracellularCalciumConcentration();
         }
         PetscTools::Barrier();
         calcium_repl.Replicate(lo,hi);
-
 
         for(unsigned i=0; i<mpMeshPair->rGetElementsAndWeights().size(); i++)
         {
@@ -695,6 +729,7 @@ void CardiacElectroMechanicsProblem<DIM>::Solve()
             double interpolated_voltage = 0;
 
             Element<DIM,DIM>& element = *(mpElectricsMesh->GetElement(mpMeshPair->rGetElementsAndWeights()[i].ElementNum));
+
             for(unsigned node_index = 0; node_index<element.GetNumNodes(); node_index++)
             {
                 unsigned global_node_index = element.GetNodeGlobalIndex(node_index);
@@ -715,7 +750,6 @@ void CardiacElectroMechanicsProblem<DIM>::Solve()
         // set [Ca], V, t
         mpCardiacMechSolver->SetCalciumAndVoltage(interpolated_calcium_concs, interpolated_voltages);
         MechanicsEventHandler::EndEvent(MechanicsEventHandler::NON_MECH);
-
 
 
         /////////////////////////////////////////////////////////////////////////
@@ -785,8 +819,8 @@ void CardiacElectroMechanicsProblem<DIM>::Solve()
 
             if(!mNoElectricsOutput)
             {
-                mpMonodomainProblem->mpWriter->AdvanceAlongUnlimitedDimension();
-                mpMonodomainProblem->WriteOneStep(stepper.GetTime(), voltage);
+                mpElectricsProblem->mpWriter->AdvanceAlongUnlimitedDimension();
+                mpElectricsProblem->WriteOneStep(stepper.GetTime(), voltage);
             }
 
             if(mIsWatchedLocation)
@@ -813,8 +847,8 @@ void CardiacElectroMechanicsProblem<DIM>::Solve()
     if ((mWriteOutput) && (!mNoElectricsOutput))
     {
         HeartConfig::Instance()->Reset();
-        mpMonodomainProblem->mpWriter->Close();
-        delete mpMonodomainProblem->mpWriter;
+        mpElectricsProblem->mpWriter->Close();
+        delete mpElectricsProblem->mpWriter;
 
         std::string input_dir = mOutputDirectory+"/electrics";
 
@@ -865,8 +899,8 @@ void CardiacElectroMechanicsProblem<DIM>::Solve()
 
 
 
-template<unsigned DIM>
-double CardiacElectroMechanicsProblem<DIM>::Max(std::vector<double>& vec)
+template<unsigned DIM, unsigned ELEC_PROB_DIM>
+double CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Max(std::vector<double>& vec)
 {
     double max = -1e200;
     for(unsigned i=0; i<vec.size(); i++)
@@ -876,21 +910,21 @@ double CardiacElectroMechanicsProblem<DIM>::Max(std::vector<double>& vec)
     return max;
 }
 
-template<unsigned DIM>
-void CardiacElectroMechanicsProblem<DIM>::SetNoElectricsOutput()
+template<unsigned DIM, unsigned ELEC_PROB_DIM>
+void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::SetNoElectricsOutput()
 {
     mNoElectricsOutput = true;
 }
 
-template<unsigned DIM>
-void CardiacElectroMechanicsProblem<DIM>::SetWatchedPosition(c_vector<double,DIM> watchedLocation)
+template<unsigned DIM, unsigned ELEC_PROB_DIM>
+void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::SetWatchedPosition(c_vector<double,DIM> watchedLocation)
 {
     mIsWatchedLocation = true;
     mWatchedLocation = watchedLocation;
 }
 
-template<unsigned DIM>
-void CardiacElectroMechanicsProblem<DIM>::SetOutputDeformationGradientsAndStress(double timeStep)
+template<unsigned DIM, unsigned ELEC_PROB_DIM>
+void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::SetOutputDeformationGradientsAndStress(double timeStep)
 {
     mNumTimestepsToOutputDeformationGradientsAndStress = (unsigned) floor((timeStep/mpProblemDefinition->GetMechanicsSolveTimestep())+0.5);
     if(fabs(mNumTimestepsToOutputDeformationGradientsAndStress*mpProblemDefinition->GetMechanicsSolveTimestep() - timeStep) > 1e-6)
@@ -900,8 +934,8 @@ void CardiacElectroMechanicsProblem<DIM>::SetOutputDeformationGradientsAndStress
 }
 
 
-template<unsigned DIM>
-std::vector<c_vector<double,DIM> >& CardiacElectroMechanicsProblem<DIM>::rGetDeformedPosition()
+template<unsigned DIM, unsigned ELEC_PROB_DIM>
+std::vector<c_vector<double,DIM> >& CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::rGetDeformedPosition()
 {
     return mpMechanicsSolver->rGetDeformedPosition();
 }
@@ -914,5 +948,7 @@ std::vector<c_vector<double,DIM> >& CardiacElectroMechanicsProblem<DIM>::rGetDef
 /////////////////////////////////////////////////////////////////////
 
 //note: 1d incompressible material doesn't make sense
-template class CardiacElectroMechanicsProblem<2>;
-template class CardiacElectroMechanicsProblem<3>;
+template class CardiacElectroMechanicsProblem<2,1>;
+template class CardiacElectroMechanicsProblem<3,1>;
+template class CardiacElectroMechanicsProblem<2,2>;
+template class CardiacElectroMechanicsProblem<3,2>;

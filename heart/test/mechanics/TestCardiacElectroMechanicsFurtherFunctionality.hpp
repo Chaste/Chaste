@@ -135,7 +135,8 @@ public:
         // Set deformation not affecting conductivity, but affecting cell models.
         problem_defn.SetDeformationAffectsElectrophysiology(false,true);
 
-        CardiacElectroMechanicsProblem<2> problem(INCOMPRESSIBLE,
+        CardiacElectroMechanicsProblem<2,1> problem(INCOMPRESSIBLE,
+												  MONODOMAIN,
                                                   &electrics_mesh,
                                                   &mechanics_mesh,
                                                   &cell_factory,
@@ -168,7 +169,7 @@ public:
         // test directly that the conductivity hasn't been modified
         for(unsigned i=0; i<electrics_mesh.GetNumElements(); i++)
         {
-            const c_matrix<double,2,2>& r_tensor = problem.mpMonodomainProblem->GetMonodomainTissue()->rGetIntracellularConductivityTensor(i);
+            const c_matrix<double,2,2>& r_tensor = problem.mpElectricsProblem->GetTissue()->rGetIntracellularConductivityTensor(i);
             TS_ASSERT_DELTA(r_tensor(0,0), default_conductivity, 1e-9);
             TS_ASSERT_DELTA(r_tensor(0,1), 0.0,                  1e-9);
             TS_ASSERT_DELTA(r_tensor(1,0), 0.0,                  1e-9);
@@ -236,7 +237,8 @@ public:
         problem_defn.SetDeformationAffectsElectrophysiology(true,true);
 
 
-        CardiacElectroMechanicsProblem<2> problem(INCOMPRESSIBLE,
+        CardiacElectroMechanicsProblem<2,1> problem(INCOMPRESSIBLE,
+												  MONODOMAIN,
                                                   &electrics_mesh,
                                                   &mechanics_mesh,
                                                   &cell_factory,
@@ -278,7 +280,7 @@ public:
         for(unsigned i=0; i<electrics_mesh.GetNumElements(); i++)
         {
             // sigma = F^{-1} sigma_undef F^{-T},
-            const c_matrix<double,2,2>& r_tensor = problem.mpMonodomainProblem->GetMonodomainTissue()->rGetIntracellularConductivityTensor(i);
+            const c_matrix<double,2,2>& r_tensor = problem.mpElectricsProblem->GetTissue()->rGetIntracellularConductivityTensor(i);
             c_vector<double,2> centroid = electrics_mesh.GetElement(i)->CalculateCentroid();
             if(centroid(0)+centroid(1)<0.1)
             {
@@ -357,7 +359,8 @@ public:
             // Small enough end-time so that the wavefront doesn't reach the other side..
             HeartConfig::Instance()->SetSimulationDuration(5.0);
 
-            CardiacElectroMechanicsProblem<2> problem(INCOMPRESSIBLE,
+            CardiacElectroMechanicsProblem<2,1> problem(INCOMPRESSIBLE,
+													  MONODOMAIN,
                                                       &electrics_mesh,
                                                       &mechanics_mesh,
                                                       &cell_factory,
@@ -449,7 +452,8 @@ public:
         problem_defn.SetMaterialLaw(COMPRESSIBLE,laws);
 
 
-        CardiacElectroMechanicsProblem<2> problem(COMPRESSIBLE,
+        CardiacElectroMechanicsProblem<2,1> problem(COMPRESSIBLE,
+												  MONODOMAIN,
                                                   &electrics_mesh,
                                                   &mechanics_mesh,
                                                   &cell_factory,

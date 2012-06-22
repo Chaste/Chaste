@@ -75,6 +75,59 @@ public:
 class TestCardiacElectroMechanicsProblem : public CxxTest::TestSuite
 {
 public:
+
+    void TestExceptions() throw(Exception)
+    {
+        EntirelyStimulatedTissueCellFactory cell_factory;
+
+        TetrahedralMesh<2,2> electrics_mesh;
+        electrics_mesh.ConstructRegularSlabMesh(0.01, 0.05, 0.05);
+
+        QuadraticMesh<2> mechanics_mesh;
+        mechanics_mesh.ConstructRegularSlabMesh(0.025, 0.05, 0.05);
+        HeartConfig::Instance()->SetSimulationDuration(10.0);
+
+        ElectroMechanicsProblemDefinition<2> problem_defn(mechanics_mesh);
+        problem_defn.SetContractionModel(KERCHOFFS2003,1.0);
+        problem_defn.SetUseDefaultCardiacMaterialLaw(COMPRESSIBLE);
+        problem_defn.SetMechanicsSolveTimestep(1.0);
+
+        // Note that TS_ASSERT_THROWS_THIS won't compile if you just construct
+        // an object with two templates. This is because the macro thinks
+        // that the comma between the template parameters separates arguments, so it thinks
+        // there are 3 arguments and it is expecting 2
+        try
+        {
+			CardiacElectroMechanicsProblem<2,2> problem (COMPRESSIBLE,
+					MONODOMAIN,
+					&electrics_mesh,
+					&mechanics_mesh,
+					&cell_factory,
+					&problem_defn,
+					"blahblah");
+        }
+        catch (Exception e)
+        {
+            std::cout << e.GetMessage() << std::endl;
+            TS_ASSERT_EQUALS(e.GetShortMessage(), "The second template parameter should be 1 when a monodomain problem is chosen");
+        }
+
+        try
+        {
+			CardiacElectroMechanicsProblem<2,1> problem (COMPRESSIBLE,
+					BIDOMAIN,
+					&electrics_mesh,
+					&mechanics_mesh,
+					&cell_factory,
+					&problem_defn,
+					"blahblah");
+        }
+        catch (Exception e)
+        {
+            std::cout << e.GetMessage() << std::endl;
+            TS_ASSERT_EQUALS(e.GetShortMessage(), "The second template parameter should be 2 when a bidomain problem is chosen");
+        }
+    }
     // In this test all nodes are stimulated at the same time, hence
     // exactly the same active tension is generated at all nodes,
     // so the internal force in entirely homogeneous.
@@ -125,12 +178,13 @@ public:
 
         HeartConfig::Instance()->SetSimulationDuration(10.0);
 
-        CardiacElectroMechanicsProblem<2> problem(COMPRESSIBLE,
-                                                  &electrics_mesh,
-                                                  &mechanics_mesh,
-                                                  &cell_factory,
-                                                  &problem_defn,
-                                                  "TestCardiacEmHomogeneousEverythingCompressible");
+        CardiacElectroMechanicsProblem<2,1>   problem(COMPRESSIBLE,
+													  MONODOMAIN,
+													  &electrics_mesh,
+													  &mechanics_mesh,
+													  &cell_factory,
+													  &problem_defn,
+													  "TestCardiacEmHomogeneousEverythingCompressible");
         problem.Solve();
         std::vector<c_vector<double,2> >& r_deformed_position = problem.rGetDeformedPosition();
 
@@ -155,6 +209,88 @@ public:
             TS_ASSERT_DELTA( r_deformed_position[i](0), X * X_scale_factor, 1e-6);
             TS_ASSERT_DELTA( r_deformed_position[i](1), Y * Y_scale_factor, 1e-6);
         }
+    }
+
+    //This test is the same as above but with bidomain instead of monodomain
+    //Extracellular conductivities are set very high so the results should be the same
+    void TestWithHomogeneousEverythingCompressibleBidomain() throw(Exception)
+    {
+        EntirelyStimulatedTissueCellFactory cell_factory;
+
+        TetrahedralMesh<2,2> electrics_mesh;
+        electrics_mesh.ConstructRegularSlabMesh(0.01, 0.05, 0.05);
+
+        QuadraticMesh<2> mechanics_mesh;
+        mechanics_mesh.ConstructRegularSlabMesh(0.025, 0.05, 0.05);
+
+        std::vector<unsigned> fixed_nodes;
+        std::vector<c_vector<double,2> > fixed_node_locations;
+
+        // fix the node at the origin so that the solution is well-defined (ie unique)
+        fixed_nodes.push_back(0);
+        fixed_node_locations.push_back(zero_vector<double>(2));
+
+        // for the rest of the nodes, if they lie on X=0, fix x=0 but leave y free.
+        for(unsigned i=1 /*not 0*/; i<mechanics_mesh.GetNumNodes(); i++)
+        {
+            if(fabs(mechanics_mesh.GetNode(i)->rGetLocation()[0])<1e-6)
+            {
+                c_vector<double,2> new_position;
+                new_position(0) = 0.0;
+                new_position(1) = SolidMechanicsProblemDefinition<2>::FREE;
+                fixed_nodes.push_back(i);
+                fixed_node_locations.push_back(new_position);
+            }
+        }
+
+        ElectroMechanicsProblemDefinition<2> problem_defn(mechanics_mesh);
+        problem_defn.SetContractionModel(KERCHOFFS2003,1.0);
+        problem_defn.SetUseDefaultCardiacMaterialLaw(COMPRESSIBLE);
+        problem_defn.SetFixedNodes(fixed_nodes, fixed_node_locations);
+        problem_defn.SetMechanicsSolveTimestep(1.0);
+
+        // the following is just for coverage - applying a zero pressure so has no effect on deformation
+        std::vector<BoundaryElement<1,2>*> boundary_elems;
+        boundary_elems.push_back(* (mechanics_mesh.GetBoundaryElementIteratorBegin()));
+        problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, 0.0);
+
+        HeartConfig::Instance()->SetSimulationDuration(10.0);
+        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(1500,1500,1500));
+        //creates the EM problem with ELEC_PROB_SIM=2
+        CardiacElectroMechanicsProblem<2,2> problem(COMPRESSIBLE,
+												  BIDOMAIN,
+                                                  &electrics_mesh,
+                                                  &mechanics_mesh,
+                                                  &cell_factory,
+                                                  &problem_defn,
+                                                  "TestCardiacEmHomogeneousEverythingCompressibleBidomain");
+
+        problem.Solve();
+        std::vector<c_vector<double,2> >& r_deformed_position = problem.rGetDeformedPosition();
+
+        // not sure how easy is would be determine what the deformation should be
+        // exactly, but it certainly should be constant squash in X direction, constant
+        // stretch in Y.
+
+        // first, check node 8 starts is the far corner
+        assert(fabs(mechanics_mesh.GetNode(8)->rGetLocation()[0] - 0.05)<1e-8);
+        assert(fabs(mechanics_mesh.GetNode(8)->rGetLocation()[1] - 0.05)<1e-8);
+
+        double X_scale_factor = r_deformed_position[8](0)/0.05;
+        double Y_scale_factor = r_deformed_position[8](1)/0.05;
+
+        std::cout << "Scale_factors = " << X_scale_factor << " " << Y_scale_factor << ", product = " << X_scale_factor*Y_scale_factor<<"\n";
+
+        for(unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        {
+            double X = mechanics_mesh.GetNode(i)->rGetLocation()[0];
+            double Y = mechanics_mesh.GetNode(i)->rGetLocation()[1];
+
+            TS_ASSERT_DELTA( r_deformed_position[i](0), X * X_scale_factor, 1e-6);
+            TS_ASSERT_DELTA( r_deformed_position[i](1), Y * Y_scale_factor, 1e-6);
+        }
+
+        TS_ASSERT_EQUALS(problem.mpElectricsProblem->GetHasBath(), false);
     }
 
     // This test is virtually identical to the above test, except it uses
@@ -198,7 +334,8 @@ public:
 
         HeartConfig::Instance()->SetSimulationDuration(10.0);
 
-        CardiacElectroMechanicsProblem<2> problem(INCOMPRESSIBLE,
+        CardiacElectroMechanicsProblem<2,1> problem(INCOMPRESSIBLE,
+												  MONODOMAIN,
                                                   &electrics_mesh,
                                                   &mechanics_mesh,
                                                   &cell_factory,

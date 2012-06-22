@@ -244,7 +244,8 @@ public:
         // Solve
         //
         ////////////////////////////////////////////////////////////////////////////////
-        CardiacElectroMechanicsProblem<3> problem(COMPRESSIBLE,
+        CardiacElectroMechanicsProblem<3,1> problem(COMPRESSIBLE,
+												  MONODOMAIN,
                                                   &electrics_mesh,
                                                   &mechanics_mesh,
                                                   &cell_factory,

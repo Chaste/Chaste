@@ -442,7 +442,7 @@ protected:
     /**
      * CardiacElectroMechanicsProblem needs access to #mpWriter.
      */
-    template<unsigned DIM>
+    template<unsigned DIM, unsigned ELEC_PROB_DIM>
     friend class CardiacElectroMechanicsProblem;
     /**
      * The object to use to write results to disk.

@@ -77,7 +77,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *       - use this active tension in computing the stress for that guess of the deformation
  *  end
  */
-template<unsigned DIM>
+
+typedef enum ElectricsProblemType_
+{
+    MONODOMAIN,
+    BIDOMAIN
+    //BIDOMAIN_WITH_BATH
+    //EXTENDED_BIDOMAIN
+} ElectricsProblemType;
+
+template<unsigned DIM, unsigned ELEC_PROB_DIM=1>
 class CardiacElectroMechanicsProblem
     : public AbstractConductivityModifier<DIM,DIM> // this only inherits from this class so it can be passed to the tissue to
                                                    // allow deformation-based altering of the conductivity
@@ -91,7 +100,7 @@ protected :
     CompressibilityType mCompressibilityType;
 
     /** The cardiac problem class */
-    MonodomainProblem<DIM>* mpMonodomainProblem;
+    AbstractCardiacProblem<DIM,DIM,ELEC_PROB_DIM>* mpElectricsProblem;
 
     /** The mechanics solver - a pointer to the part that sees the cardiac mechanics interface bit.
      * (Object pointed to is the same as with mpMechanicsSolver) */
@@ -173,6 +182,7 @@ public :
     /**
      * Constructor.
      * @param compressibilityType Should be either INCOMPRESSIBLE or COMPRESSIBLE
+     * @param electricsProblemType the type of electrics problem (MONODOMAIN or BIDOMAIN)
      * @param pElectricsMesh  Mesh on which to solve electrics (Monodomain)
      * @param pMechanicsMesh  Mesh (2nd order) on which to solve mechanics
      * @param pCellFactory factory to use to create cells
@@ -180,6 +190,7 @@ public :
      * @param outputDirectory the output directory
      */
     CardiacElectroMechanicsProblem(CompressibilityType compressibilityType,
+								   ElectricsProblemType electricsProblemType,
                                    TetrahedralMesh<DIM,DIM>* pElectricsMesh,
                                    QuadraticMesh<DIM>* pMechanicsMesh,
                                    AbstractCardiacCellFactory<DIM>* pCellFactory,
