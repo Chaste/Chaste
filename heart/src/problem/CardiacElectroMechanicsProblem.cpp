@@ -210,6 +210,9 @@ public:
                                                                  AbstractCardiacCellFactory<DIM>* pCellFactory);
 };
 
+/**
+ * Specialization for monodomain problems
+ */
 template<unsigned DIM>
 class CreateElectricsProblem<DIM, 1u>
 {
@@ -225,6 +228,9 @@ public:
     }
 };
 
+/**
+ * Specialization for bidomain problems
+ */
 template<unsigned DIM>
 class CreateElectricsProblem<DIM, 2u>
 {

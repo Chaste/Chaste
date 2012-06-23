@@ -53,6 +53,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ElectroMechanicsProblemDefinition.hpp"
 
 /**
+ * Enumeration of the possible electrics problem types
+ * to be used in an EM problem.
+ */
+typedef enum ElectricsProblemType_
+{
+    MONODOMAIN,//!< MONODOMAIN
+    BIDOMAIN   //!< BIDOMAIN
+    //BIDOMAIN_WITH_BATH
+    //EXTENDED_BIDOMAIN
+} ElectricsProblemType;
+
+/**
  *  CardiacElectroMechanicsProblem
  *
  *  For solving full electro-mechanical problems.
@@ -77,14 +89,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *       - use this active tension in computing the stress for that guess of the deformation
  *  end
  */
-
-typedef enum ElectricsProblemType_
-{
-    MONODOMAIN,
-    BIDOMAIN
-    //BIDOMAIN_WITH_BATH
-    //EXTENDED_BIDOMAIN
-} ElectricsProblemType;
 
 template<unsigned DIM, unsigned ELEC_PROB_DIM=1>
 class CardiacElectroMechanicsProblem
