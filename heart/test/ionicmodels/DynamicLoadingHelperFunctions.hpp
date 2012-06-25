@@ -71,7 +71,7 @@ AbstractCardiacCellInterface* CreateCellWithStandardStimulus(DynamicCellModelLoa
     TS_ASSERT(p_entity != NULL);
     if (p_entity != NULL)
     {
-        TS_ASSERT_EQUALS(&rLoader, p_entity->GetLoader());
+        TS_ASSERT_EQUALS(&rLoader, p_entity->GetLoader().get());
     }
 
     return p_cell;

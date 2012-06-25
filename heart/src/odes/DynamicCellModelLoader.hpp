@@ -38,30 +38,38 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <string>
 #include <boost/shared_ptr.hpp>
+#include <boost/enable_shared_from_this.hpp>
 
 #include "AbstractCardiacCellInterface.hpp"
 #include "AbstractIvpOdeSolver.hpp"
 #include "AbstractStimulusFunction.hpp"
 
+// Forward reference
+class DynamicCellModelLoader;
+
+/** The main type for dealing with a loader instance. */
+typedef boost::shared_ptr<DynamicCellModelLoader> DynamicCellModelLoaderPtr;
+
 /**
  * This class takes care of loading cell models at run-time from .so files.
  *
- * Instantiate it with the path of a suitable .so file, then call CreateCell
- * to create individual cells.
+ * Instantiate it using the factory function Create with the path of a suitable .so file,
+ * then call CreateCell to create individual cells.
  */
-class DynamicCellModelLoader
+class DynamicCellModelLoader : public boost::enable_shared_from_this<DynamicCellModelLoader>
 {
 public:
     /**
      * Create a cell model loader by opening a loadable module (.so file) containing
      * a cell model.
      *
-     * @note This loader object must remain alive for as long as you want to use cells
-     * created with it, or you'll get a segfault.
+     * @note The loader object must remain alive for as long as you want to use cells
+     * created with it, or you'll get a segfault.  Hence the constructor is private,
+     * and this factory function must be used to create a loader.
      *
      * @param rLoadableModulePath  path to .so file
      */
-    DynamicCellModelLoader(const std::string& rLoadableModulePath);
+    static DynamicCellModelLoaderPtr Create(const std::string& rLoadableModulePath);
 
     /**
      * Destructor.  Closes the .so file.
@@ -73,14 +81,11 @@ public:
      *
      * The caller takes responsibility for deleting the cell when it's finished with.
      *
-     * @note This loader object must remain alive for as long as you want to use the cell,
-     * or you'll get a segfault.
-     *
      * @param pSolver  ODE solver used to simulate the cell
      * @param pStimulus  intracellular stimulus
      */
     AbstractCardiacCellInterface* CreateCell(boost::shared_ptr<AbstractIvpOdeSolver> pSolver,
-                                    boost::shared_ptr<AbstractStimulusFunction> pStimulus);
+                                             boost::shared_ptr<AbstractStimulusFunction> pStimulus);
 
     /**
      * @return the absolute path to the .so file we have loaded
@@ -88,6 +93,13 @@ public:
     const std::string GetLoadableModulePath() const;
 
 private:
+    /**
+     * Private constructor to ensure we're always stored in a shared pointer.
+     *
+     * @param rLoadableModulePath  path to .so file
+     */
+    DynamicCellModelLoader(const std::string& rLoadableModulePath);
+
     /** Handle for the loaded .so file */
     void* mpDynamicModule;
 
@@ -97,7 +109,7 @@ private:
      * @param pStimulus  intracellular stimulus
      */
     typedef AbstractCardiacCellInterface* CellCreationFunctionType(boost::shared_ptr<AbstractIvpOdeSolver> pSolver,
-                                                          boost::shared_ptr<AbstractStimulusFunction> pStimulus);
+                                                                   boost::shared_ptr<AbstractStimulusFunction> pStimulus);
 
     /** Our cell creation function */
     CellCreationFunctionType* mpCreationFunction;

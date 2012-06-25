@@ -37,8 +37,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractDynamicallyLoadableEntity.hpp"
 
 #include <dlfcn.h>  // For dealing with .so files
+#include <cassert>
 
 #include "Exception.hpp"
+
+DynamicCellModelLoaderPtr DynamicCellModelLoader::Create(const std::string& rLoadableModulePath)
+{
+    DynamicCellModelLoaderPtr p_loader(new DynamicCellModelLoader(rLoadableModulePath));
+    return p_loader;
+}
+
 
 DynamicCellModelLoader::DynamicCellModelLoader(const std::string& rLoadableModulePath)
     : mLoadableModulePath(rLoadableModulePath)
@@ -73,16 +81,14 @@ DynamicCellModelLoader::~DynamicCellModelLoader()
 }
 
 AbstractCardiacCellInterface* DynamicCellModelLoader::CreateCell(boost::shared_ptr<AbstractIvpOdeSolver> pSolver,
-                                                        boost::shared_ptr<AbstractStimulusFunction> pStimulus)
+                                                                 boost::shared_ptr<AbstractStimulusFunction> pStimulus)
 {
     AbstractCardiacCellInterface* p_cell = (*mpCreationFunction)(pSolver, pStimulus);
 
     AbstractDynamicallyLoadableEntity* p_entity = dynamic_cast<AbstractDynamicallyLoadableEntity*>(p_cell);
+    assert(p_entity != NULL);
+    p_entity->SetLoader(shared_from_this());
 
-    if (p_entity != NULL)
-    {
-        p_entity->SetLoader(this);
-    }
     return p_cell;
 }
 

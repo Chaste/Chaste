@@ -216,7 +216,7 @@ private:
 
         // Do the conversion
         FileFinder copied_file(rOutputDirName + "/" + rModelName + ".cellml", RelativeTo::ChasteTestOutput);
-        DynamicCellModelLoader* p_loader = converter.Convert(copied_file);
+        DynamicCellModelLoaderPtr p_loader = converter.Convert(copied_file);
         // Apply a stimulus of -40 uA/cm^2 - should work for all models
         boost::shared_ptr<AbstractCardiacCellInterface> p_cell(CreateCellWithStandardStimulus(*p_loader, -40.0));
 

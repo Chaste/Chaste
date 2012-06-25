@@ -39,17 +39,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory>
 #include <string>
 #include <map>
+#include <set>
+#include <boost/utility.hpp>
+#include <boost/weak_ptr.hpp>
 #include "DynamicCellModelLoader.hpp"
 #include "FileFinder.hpp"
 
+typedef boost::weak_ptr<DynamicCellModelLoader> DynamicCellModelLoaderWeakPtr;
+
 /**
- * When loading cell models dynamically, the loader object needs to be alive for as long
- * as cells created by it are alive.  Unfortunately, the HeartConfigRelatedCellFactory
- * is typically destroyed as soon as the cells have been created, prior to the simulation.
- * Hence, this class provides a static registry to keep track of the model loaders used.
- * It also ensures we don't load a given .so more than once.
+ * This class provides a static registry to keep track of the cell model loaders used,
+ * hence ensuring that we don't have a given .so loaded more than once at any given point.
  */
-class DynamicModelLoaderRegistry
+class DynamicModelLoaderRegistry : boost::noncopyable
 {
 public:
     /**
@@ -61,25 +63,32 @@ public:
      * Get the loader for the given .so file.
      * @param rPath  absolute path to the .so
      */
-    DynamicCellModelLoader* GetLoader(const std::string& rPath);
+    DynamicCellModelLoaderPtr GetLoader(const std::string& rPath);
 
     /**
      * Get the loader for the given .so file.
      * @param rFileFinder  finder for the .so file
      */
-    DynamicCellModelLoader* GetLoader(const FileFinder& rFileFinder);
+    DynamicCellModelLoaderPtr GetLoader(const FileFinder& rFileFinder);
 
     /**
-     * Destructor closes all loaded .so files.
+     * Schedule the given loader for deletion prior to loading any new .so.
+     *
+     * @param pLoader  the loader to schedule for deletion
      */
-    ~DynamicModelLoaderRegistry();
+    void ScheduleForDeletion(DynamicCellModelLoaderPtr pLoader);
 
 private:
     /**
      * Loaders for shared-library cell models.
+     * Weak pointers are used so that the registry doesn't keep loaders alive when all
+     * cells created from them have been destroyed.
      * Map is from absolute path of the library, to loader object.
      */
-    std::map<std::string, DynamicCellModelLoader*> mLoaders;
+    std::map<std::string, DynamicCellModelLoaderWeakPtr> mLoaders;
+
+    /** Loaders to be deleted before creating any new ones. */
+    std::set<DynamicCellModelLoaderPtr> mDeletableLoaders;
 
     /** The single instance of this class. */
     static std::auto_ptr<DynamicModelLoaderRegistry> mpInstance;
@@ -88,17 +97,6 @@ private:
      * Private constructor; all access should be via Instance().
      */
     DynamicModelLoaderRegistry();
-
-    /**
-     * Copy constructor.
-     */
-    DynamicModelLoaderRegistry(const DynamicModelLoaderRegistry&);
-
-    /**
-     * Overloaded assignment operator.
-     */
-    DynamicModelLoaderRegistry& operator= (const DynamicModelLoaderRegistry&);
-
 };
 
 #endif /*DYNAMICMODELLOADERREGISTRY_HPP_*/

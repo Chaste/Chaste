@@ -206,12 +206,12 @@ public:
         // Load the cell model dynamically
         std::string model_name = "libDynamicallyLoadableLr91.so";
         // All tests use the registry, as not doing so can lead to segfaults...
-        DynamicCellModelLoader* p_loader = DynamicModelLoaderRegistry::Instance()->GetLoader(
+        DynamicCellModelLoaderPtr p_loader = DynamicModelLoaderRegistry::Instance()->GetLoader(
             ChasteComponentBuildDir("heart") + "dynamic/" + model_name);
         RunLr91Test(*p_loader);
 
         // The .so also gets copied into the source folder
-        DynamicCellModelLoader* p_loader2 = DynamicModelLoaderRegistry::Instance()->GetLoader(
+        DynamicCellModelLoaderPtr p_loader2 = DynamicModelLoaderRegistry::Instance()->GetLoader(
             std::string(ChasteBuildRootDir()) + "heart/dynamic/" + model_name);
         RunLr91Test(*p_loader2);
     }
@@ -220,12 +220,12 @@ public:
     {
         // Try loading a .so that doesn't exist
         std::string file_name = "non-existent-file-we-hope";
-        TS_ASSERT_THROWS_CONTAINS(DynamicCellModelLoader loader(file_name),
+        TS_ASSERT_THROWS_CONTAINS(DynamicCellModelLoader::Create(file_name),
                                   "Unable to load .so file '" + file_name + "':");
 
         // Try loading a .so that doesn't define a cell model
         file_name = "libNotACellModel.so";
-        TS_ASSERT_THROWS_CONTAINS(DynamicCellModelLoader loader(ChasteComponentBuildDir("heart") + "dynamic/" + file_name),
+        TS_ASSERT_THROWS_CONTAINS(DynamicCellModelLoader::Create(ChasteComponentBuildDir("heart") + "dynamic/" + file_name),
                                   "Failed to load cell creation function from .so file");
     }
 
@@ -243,12 +243,12 @@ public:
         TS_ASSERT(cellml_file.Exists());
         FileFinder so_file(dirname + "/libluo_rudy_1991_dyn.so", RelativeTo::ChasteTestOutput);
         TS_ASSERT(!so_file.Exists());
-        DynamicCellModelLoader* p_loader = converter.Convert(cellml_file);
+        DynamicCellModelLoaderPtr p_loader = converter.Convert(cellml_file);
         SaveSoForArchivingTest(so_file);
         TS_ASSERT(so_file.Exists());
         TS_ASSERT(so_file.IsNewerThan(cellml_file));
         // Converting a .so should be a "no-op"
-        DynamicCellModelLoader* p_loader2 = converter.Convert(so_file);
+        DynamicCellModelLoaderPtr p_loader2 = converter.Convert(so_file);
         TS_ASSERT(so_file.Exists());
         TS_ASSERT(p_loader2 == p_loader);
         RunLr91Test(*p_loader, 0u);
@@ -325,7 +325,7 @@ public:
         converter.CreateOptionsFile(handler, model, args);
         // Ensure that conversion works if CWD != ChasteSourceRoot
         EXPECT0(chdir, "heart");
-        DynamicCellModelLoader* p_loader = converter.Convert(copied_file);
+        DynamicCellModelLoaderPtr p_loader = converter.Convert(copied_file);
         EXPECT0(chdir, "..");
         RunLr91Test(*p_loader, 0u, true, 0.01); // Implementation of lookup tables has improved...
         // Check the sources exist
@@ -369,7 +369,7 @@ public:
 
         // Get a loader for the .so and load a cell model
         CellMLToSharedLibraryConverter converter;
-        DynamicCellModelLoader* p_loader = converter.Convert(mArchivingModel);
+        DynamicCellModelLoaderPtr p_loader = converter.Convert(mArchivingModel);
         AbstractCardiacCellInterface* p_cell = CreateLr91CellFromLoader(*p_loader, 0u);
 
         // Archive it

@@ -92,7 +92,7 @@ void HeartConfigRelatedCellFactory<SPACE_DIM>::PreconvertCellmlFiles()
 }
 
 template<unsigned SPACE_DIM>
-DynamicCellModelLoader* HeartConfigRelatedCellFactory<SPACE_DIM>::LoadDynamicModel(
+DynamicCellModelLoaderPtr HeartConfigRelatedCellFactory<SPACE_DIM>::LoadDynamicModel(
         const cp::ionic_model_selection_type& rModel,
         bool isCollective)
 {
@@ -136,7 +136,7 @@ AbstractCardiacCell* HeartConfigRelatedCellFactory<SPACE_DIM>::CreateCellWithInt
         }
 #endif // CHASTE_CAN_CHECKPOINT_DLLS
         // Load model from shared library
-        DynamicCellModelLoader* p_loader = LoadDynamicModel(ionic_model, false);
+        DynamicCellModelLoaderPtr p_loader = LoadDynamicModel(ionic_model, false);
         AbstractCardiacCellInterface* p_loaded_cell = p_loader->CreateCell(this->mpSolver, intracellularStimulus);
         p_cell = dynamic_cast<AbstractCardiacCell*>(p_loaded_cell);
         if (!p_cell)

@@ -55,10 +55,10 @@ CellMLToSharedLibraryConverter::CellMLToSharedLibraryConverter(bool preserveGene
 {
 }
 
-DynamicCellModelLoader* CellMLToSharedLibraryConverter::Convert(const FileFinder& rFilePath,
-                                                                bool isCollective)
+DynamicCellModelLoaderPtr CellMLToSharedLibraryConverter::Convert(const FileFinder& rFilePath,
+                                                                  bool isCollective)
 {
-    DynamicCellModelLoader* p_loader;
+    DynamicCellModelLoaderPtr p_loader;
     std::string absolute_path = rFilePath.GetAbsolutePath();
     // Check the file exists
     if (!rFilePath.Exists())

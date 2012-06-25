@@ -79,7 +79,7 @@ AbstractCardiacCellInterface* CellMLLoader::LoadCellMLFile(bool makeCvodeCell)
     }
 
     // Convert the CellML to a shared library (no-op if shared library exists)
-    DynamicCellModelLoader* p_loader = mpConverter->Convert(copied_model);
+    DynamicCellModelLoaderPtr p_loader = mpConverter->Convert(copied_model);
 
     // Use the shared library to load a concrete cell
     boost::shared_ptr<AbstractStimulusFunction> p_stimulus;

@@ -75,8 +75,8 @@ public:
      *
      * @note If you do not pass isCollective=false, must be called collectively.
      */
-    DynamicCellModelLoader* Convert(const FileFinder& rFilePath,
-                                    bool isCollective=true);
+    DynamicCellModelLoaderPtr Convert(const FileFinder& rFilePath,
+                                      bool isCollective=true);
 
     /**
      * Create a PyCml options file for the given model.

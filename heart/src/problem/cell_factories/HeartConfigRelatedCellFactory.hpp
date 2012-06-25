@@ -143,8 +143,8 @@ private:
      * @param rModel  model to load
      * @param isCollective  whether we are being called collectively
      */
-    DynamicCellModelLoader* LoadDynamicModel(const cp::ionic_model_selection_type& rModel,
-                                             bool isCollective);
+    DynamicCellModelLoaderPtr LoadDynamicModel(const cp::ionic_model_selection_type& rModel,
+                                               bool isCollective);
 
 public:
     /**

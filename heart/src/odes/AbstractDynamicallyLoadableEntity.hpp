@@ -42,15 +42,31 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/split_member.hpp>
 
 /**
- * A mixin class for things that get loaded dynamically to maintain an association between instance objects and the shared library
- * they have been loaded from
+ * A mixin class for things that get loaded dynamically to maintain an association between instance objects
+ * and the shared library they have been loaded from.
  */
 class AbstractDynamicallyLoadableEntity
 {
+public:
+    /**
+     * @return a shared pointer to the loader
+     */
+    const DynamicCellModelLoaderPtr GetLoader() const;
+
+    /**
+     * Should only be called by a dynamic cell model loader
+     *
+     * @param pLoader a shared pointer to the loader
+     */
+    void SetLoader(DynamicCellModelLoaderPtr pLoader);
+
+    /** Virtual destructor to ensure we're polymorphic */
+    virtual ~AbstractDynamicallyLoadableEntity();
+
 private:
 
     /** The loader for our shared object file */
-    DynamicCellModelLoader* mpLoader;
+    DynamicCellModelLoaderPtr mpLoader;
 
     friend class boost::serialization::access;
     /**
@@ -79,22 +95,6 @@ private:
         SetLoader(DynamicModelLoaderRegistry::Instance()->GetLoader(so_path));
     }
     BOOST_SERIALIZATION_SPLIT_MEMBER()
-
-public:
-    /** Virtual destructor to ensure we're polymorphic */
-    virtual ~AbstractDynamicallyLoadableEntity();
-
-    /**
-     * @return a shared pointer to the loader
-     */
-    const DynamicCellModelLoader* GetLoader() const;
-
-    /**
-     * Should only be called by a dynamic cell model loader
-     *
-     * @param pLoader a shared pointer to the loader
-     */
-    void SetLoader(DynamicCellModelLoader* pLoader);
 };
 
 #endif /*ABSTRACTDYNAMICALLYLOADABLEENTITY_HPP_*/

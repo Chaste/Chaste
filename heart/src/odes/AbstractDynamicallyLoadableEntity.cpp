@@ -35,16 +35,26 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractDynamicallyLoadableEntity.hpp"
 
-void AbstractDynamicallyLoadableEntity::SetLoader(DynamicCellModelLoader* pLoader)
+#include "DynamicModelLoaderRegistry.hpp"
+
+void AbstractDynamicallyLoadableEntity::SetLoader(DynamicCellModelLoaderPtr pLoader)
 {
-   mpLoader = pLoader;
+    mpLoader = pLoader;
 }
 
-const DynamicCellModelLoader* AbstractDynamicallyLoadableEntity::GetLoader() const
+const DynamicCellModelLoaderPtr AbstractDynamicallyLoadableEntity::GetLoader() const
 {
     return mpLoader;
 }
 
 AbstractDynamicallyLoadableEntity::~AbstractDynamicallyLoadableEntity()
 {
+    if (mpLoader.unique())
+    {
+        // We're the last entity using this loader, but we don't want it killed on exit
+        // from this destructor, since other destructors of this object might still be
+        // executing.  So add it to the registry's "to be deleted" list, and it'll get
+        // removed prior to loading any other .so.
+        DynamicModelLoaderRegistry::Instance()->ScheduleForDeletion(mpLoader);
+    }
 }

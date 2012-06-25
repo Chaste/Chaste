@@ -45,32 +45,37 @@ DynamicModelLoaderRegistry* DynamicModelLoaderRegistry::Instance()
     return mpInstance.get();
 }
 
-DynamicCellModelLoader* DynamicModelLoaderRegistry::GetLoader(const std::string& rPath)
+DynamicCellModelLoaderPtr DynamicModelLoaderRegistry::GetLoader(const std::string& rPath)
 {
+    // Delete any waiting loaders
+    ///\todo #1957 causes segfaults
+    //mDeletableLoaders.clear();
+
+    DynamicCellModelLoaderPtr p_loader;
     // Have we opened this library already?
-    std::map<std::string, DynamicCellModelLoader*>::iterator it = mLoaders.find(rPath);
-    if (it == mLoaders.end())
+    std::map<std::string, DynamicCellModelLoaderWeakPtr>::iterator it = mLoaders.find(rPath);
+    if (it == mLoaders.end() || it->second.expired())
     {
-        // No
-        mLoaders[rPath] = new DynamicCellModelLoader(rPath);
+        // Not loaded, or no longer used
+        p_loader = DynamicCellModelLoader::Create(rPath);
+        mLoaders[rPath] = p_loader;
     }
-    return mLoaders[rPath];
+    else
+    {
+        p_loader = it->second.lock();
+    }
+    mDeletableLoaders.insert(p_loader); ///\todo #1957 remove when unloading working
+    return p_loader;
 }
 
-DynamicCellModelLoader* DynamicModelLoaderRegistry::GetLoader(const FileFinder& rFileFinder)
+DynamicCellModelLoaderPtr DynamicModelLoaderRegistry::GetLoader(const FileFinder& rFileFinder)
 {
     return GetLoader(rFileFinder.GetAbsolutePath());
 }
 
-DynamicModelLoaderRegistry::~DynamicModelLoaderRegistry()
+void DynamicModelLoaderRegistry::ScheduleForDeletion(DynamicCellModelLoaderPtr pLoader)
 {
-    for (std::map<std::string, DynamicCellModelLoader*>::iterator it=mLoaders.begin();
-         it != mLoaders.end();
-         ++it)
-    {
-        delete (it->second);
-    }
-    mLoaders.clear();
+    mDeletableLoaders.insert(pLoader);
 }
 
 DynamicModelLoaderRegistry::DynamicModelLoaderRegistry()
