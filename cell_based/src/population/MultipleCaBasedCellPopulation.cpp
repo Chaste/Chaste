@@ -46,34 +46,6 @@ template<unsigned DIM>
 void MultipleCaBasedCellPopulation<DIM>::Validate()
 {
     NEVER_REACHED;
-    ///\todo #2066 This method is not covered by any tests
-//    // Check each node has at most one cell associated with it
-//    std::vector<unsigned> validated_nodes = std::vector<unsigned>(this->GetNumNodes(), 0);
-//
-//    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
-//         cell_iter != this->End();
-//         ++cell_iter)
-//    {
-//        unsigned node_index = GetLocationIndexUsingCell(*cell_iter);
-//        validated_nodes[node_index]++;
-//        //Check nodes with cells are marked as non-empty
-//        assert(mAvailableSpaces[node_index] < mLatticeCarryingCapacity);
-//    }
-//
-//    for (unsigned i=0; i<validated_nodes.size(); i++)
-//    {
-//        if (validated_nodes[i] > 1)
-//        {
-//            NEVER_REACHED;
-//            ///\todo #2066 - This exception is not covered
-//            //EXCEPTION("Node " << i << " appears to have " << validated_nodes[i] << " cells associated with it");
-//        }
-//        else if (validated_nodes[i] < 1)
-//        {
-//            //Check nodes without cells are marked as empty
-//            assert(mAvailableSpaces[i] == mLatticeCarryingCapacity);
-//        }
-//    }
 }
 
 template<unsigned DIM>
@@ -93,7 +65,6 @@ MultipleCaBasedCellPopulation<DIM>::MultipleCaBasedCellPopulation(PottsMesh<DIM>
 
     if (locationIndices.empty())
     {
-        //Validate();
         EXCEPTION("No location indices being passed. Specify where cells lie before creating the cell population.");
     }
     else
@@ -108,10 +79,10 @@ MultipleCaBasedCellPopulation<DIM>::MultipleCaBasedCellPopulation(PottsMesh<DIM>
             mAvailableSpaces[locationIndices[i]]--;
         }
     }
-//    if (validate)
-//    {
-//        Validate();
-//    }
+    if (validate)
+    {
+        EXCEPTION("There is no validation for MultipleCaBasedCellPopulation.");
+    }
 }
 
 template<unsigned DIM>

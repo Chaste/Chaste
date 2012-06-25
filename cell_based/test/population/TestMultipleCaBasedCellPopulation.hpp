@@ -121,7 +121,8 @@ public:
         std::vector<unsigned> location_indices;
 
         // Create cell population to throw exceptions since no location indices are being passed
-        TS_ASSERT_THROWS_THIS(MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices,2),"No location indices being passed. Specify where cells lie before creating the cell population.");
+        TS_ASSERT_THROWS_THIS(MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 2),"No location indices being passed. Specify where cells lie before creating the cell population.");
+
 
         cells_generator.GenerateBasicRandom(cells, 3u, DIFFERENTIATED);
 
@@ -131,13 +132,17 @@ public:
 		location_indices.push_back(0u);
 
 		// Create cell population to throw exceptions since we are trying to add more cells than the carrying capacity.
-		TS_ASSERT_THROWS_THIS(MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices,2), "One of the lattice sites has more cells than the carrying capacity. Check the initial cell locations.");
+		TS_ASSERT_THROWS_THIS(MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 2), "One of the lattice sites has more cells than the carrying capacity. Check the initial cell locations.");
 
         cells_generator.GenerateBasicRandom(cells, 3u, DIFFERENTIATED);
 
    		//Change the initial cell location to avoid the above exception
 		location_indices[2]=1u;
 
+        // Create cell population to throw an exception when validate = true. There is no validation for MultipleCaBasedCellPopulation.
+        TS_ASSERT_THROWS_THIS(MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 2, false, true),"There is no validation for MultipleCaBasedCellPopulation.");
+
+        cells_generator.GenerateBasicRandom(cells, 3u, DIFFERENTIATED);
 		//Create Cell Population
 		MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices,2);
 
@@ -645,87 +650,7 @@ public:
         TS_ASSERT_THROWS_THIS(cell_population.UpdateCellLocations(1.0), "The probability of the cell not moving is smaller than zero. In order to prevent it from happening you should change your time step and parameters");
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 1u);
     }
-//
-//    ///\todo implement this test (#1666)
-////   void TestVoronoiMethods()
-////    {
-////        // Create a simple 2D PottsMesh
-////        PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
-////        PottsMesh<2>* p_mesh = generator.GetMesh();
-////
-////        // Create cells
-////        std::vector<CellPtr> cells;
-////        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-////        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
-////
-////        // Create cell population
-////        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells);
-////
-////        // Create element tessellation
-////        cell_population.CreateElementTessellation();
-////
-////        VertexMesh<2,2>* p_tessellation = cell_population.GetElementTessellation();
-////
-////        TS_ASSERT(p_tessellation != NULL);
-////
-////        TS_ASSERT_EQUALS(p_tessellation->GetNumNodes(), 25u);
-////        TS_ASSERT_EQUALS(p_tessellation->GetNumElements(), 16u);
-////    }
-//
-//
-//   void TestNodeAndMeshMethods() throw(Exception)
-//    {
-//        // Create a Potts-based cell population
-//        PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
-//        PottsMesh<2>* p_mesh = generator.GetMesh();
-//
-//        std::vector<CellPtr> cells;
-//        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-//        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
-//
-//        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells);
-//
-//        // Test GetNumNodes()
-//        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 16u);
-//
-//        // Test GetNode()
-//        for (unsigned index=0; index<cell_population.GetNumNodes(); index++)
-//        {
-//            Node<2>* p_node = cell_population.GetNode(index);
-//            TS_ASSERT_EQUALS(p_node->GetIndex(), index);
-//
-//            c_vector<double, 2> node_location = p_node->rGetLocation();
-//            double expected_x = (double)(index%4);
-//            double expected_y = (double)(index>3) + (double)(index>7) + (double)(index>11);
-//            TS_ASSERT_DELTA(node_location[0], expected_x, 1e-3);
-//            TS_ASSERT_DELTA(node_location[1], expected_y, 1e-3);
-//        }
-//
-//        // Test GetElement()
-//        for (unsigned index=0; index<cell_population.GetNumElements(); index++)
-//        {
-//            PottsElement<2>* p_element = cell_population.GetElement(index);
-//            TS_ASSERT_EQUALS(p_element->GetIndex(), index);
-//
-//            TS_ASSERT_EQUALS(p_element->GetNumNodes(), 4u);
-//        }
-//
-//        // Test SetNode()
-//        ChastePoint<2> unused_point;
-//        TS_ASSERT_THROWS_THIS(cell_population.SetNode(0, unused_point),
-//                              "SetNode() cannot be called on a subclass of AbstractOnLatticeCellPopulation.");
-//
-//        // Test GetWidth() method
-//        double width_x = cell_population.GetWidth(0);
-//        TS_ASSERT_DELTA(width_x, 3.0, 1e-4);
-//
-//        double width_y = cell_population.GetWidth(1);
-//        TS_ASSERT_DELTA(width_y, 3.0, 1e-4);
-//
-//        // Test GetNeighbouringNodeIndices() method
-//        TS_ASSERT_THROWS_THIS(cell_population.GetNeighbouringNodeIndices(10),
-//            "Cannot call GetNeighbouringNodeIndices() on a MultipleCaBasedCellPopulation, need to go through the PottsMesh instead");
-//    }
+
 //
 //   void TestGetLocationOfCellCentre() throw (Exception)
 //    {

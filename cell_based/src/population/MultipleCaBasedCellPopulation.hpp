@@ -141,14 +141,14 @@ public:
      * @param latticeCarryingCapacity an optional parameter to allow more than one cell per site
      * @param deleteMesh set to true if you want the cell population to free the mesh memory on destruction
      *                   (defaults to false)
-     * @param validate whether to validate the cell population when it is created (defaults to true)
+     * @param validate whether to validate the cell population when it is created (defaults to false as not used in CA simulations)
      */
     MultipleCaBasedCellPopulation(PottsMesh<DIM>& rMesh,
                                   std::vector<CellPtr>& rCells,
                                   const std::vector<unsigned> locationIndices=std::vector<unsigned>(),
                                   unsigned latticeCarryingCapacity=1u,
                                   bool deleteMesh=false,
-                                  bool validate=true);
+                                  bool validate=false);
 
     /**
      * Constructor for use by the de-serializer.
