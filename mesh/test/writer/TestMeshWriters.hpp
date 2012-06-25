@@ -185,13 +185,13 @@ public:
         unsigned num_nodes = mesh.GetNumNodes();
         unsigned num_nodes_from_file;
 
-        std::string filename = OutputFileHandler::GetChasteTestOutputDirectory() + "MeshFromTetgenViaMesh.pts";
+        std::string filename = mesh_writer.GetOutputDirectory() + "MeshFromTetgenViaMesh3.pts";
         std::ifstream meshalyzer_output_file;
         meshalyzer_output_file.open(filename.c_str());
         assert(meshalyzer_output_file.is_open());
         meshalyzer_output_file >> num_nodes_from_file;
 
-        TS_ASSERT_EQUALS(num_nodes,num_nodes_from_file);
+        TS_ASSERT_EQUALS(num_nodes, num_nodes_from_file);
 
         // Nothing appears to be tested here, so commenting it out to remove a system call.
 //        std::string command = "wc -l " + filename;
@@ -856,7 +856,7 @@ public:
         TrianglesMeshWriter<3,3> writer_from_mesh("TestMeshWriters", "simple_cube_binary_from_mesh", false);
         writer_from_mesh.SetWriteFilesAsBinary();
         writer_from_mesh.WriteFilesUsingMesh(mesh);
-        std::string results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "TestMeshWriter/";
+        std::string results_dir = writer_from_mesh.GetOutputDirectory();
 
         TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" " + results_dir + "/simple_cube_binary_from_reader.node mesh/test/data/simple_cube_binary.node").c_str()), 0);
         TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" " + results_dir + "/simple_cube_binary_from_reader.ele mesh/test/data/simple_cube_binary.ele").c_str()), 0);
