@@ -333,6 +333,8 @@ public:
      * Calculate the 'width' of any dimension of the cell population by calling
      * GetWidth() on the mesh.
      *
+     * Note this returns the size of the underlying mesh not the population of cells so here it will be the same for all time.
+     *
      * @param rDimension a dimension (0,1 or 2)
      * @return The maximum distance between any nodes in this dimension.
      */

@@ -94,12 +94,12 @@ MultipleCaBasedCellPopulation<DIM>::MultipleCaBasedCellPopulation(PottsMesh<DIM>
 template<unsigned DIM>
 MultipleCaBasedCellPopulation<DIM>::~MultipleCaBasedCellPopulation()
 {
-    if (this->mDeleteMesh)
-    {
-        NEVER_REACHED;
-        ///\todo #2066 - This code is not covered
-        delete &this->mrMesh;
-    }
+
+	// This is not needed unles we are de-serializing the cell population
+//    if (this->mDeleteMesh)
+//    {
+//        delete &this->mrMesh;
+//    }
 }
 
 
@@ -483,12 +483,9 @@ template<unsigned DIM>
 double MultipleCaBasedCellPopulation<DIM>::GetWidth(const unsigned& rDimension)
 {
     // Call GetWidth() on the mesh
-    NEVER_REACHED;
-    ///\todo #2066 - This code is not covered
-    //double width = this->mrMesh.GetWidth(rDimension);
+    double width = this->mrMesh.GetWidth(rDimension);
 
-    //return width;
-    return 0.0;
+    return width;
 }
 
 template<unsigned DIM>
@@ -519,9 +516,7 @@ void MultipleCaBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stre
 template<unsigned DIM>
 std::set<unsigned> MultipleCaBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsigned index)
 {
-    NEVER_REACHED;
-    ///\todo #2066 - This exception is not covered
-    //EXCEPTION("Cannot call GetNeighbouringNodeIndices() on a MultipleCaBasedCellPopulation, need to go through the PottsMesh instead");
+    EXCEPTION("Cannot call GetNeighbouringNodeIndices() on a MultipleCaBasedCellPopulation, need to go through the PottsMesh instead");
     std::set<unsigned> neighbouring_node_indices;
     return neighbouring_node_indices;
 }

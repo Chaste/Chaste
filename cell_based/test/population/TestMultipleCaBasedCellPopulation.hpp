@@ -105,6 +105,14 @@ public:
         {
             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter2), 1.0, 1e-6);
         }
+
+        // For Coverage of GetWidth() method Note this returns the size of the underlying mesh not the population of cells
+        TS_ASSERT_DELTA(cell_population.GetWidth(0),4.0,1e-12);
+        TS_ASSERT_DELTA(cell_population.GetWidth(1),4.0,1e-12);
+
+        // For coverage of GetNeighbouringNodeIndices() method
+        TS_ASSERT_THROWS_THIS(cell_population.GetNeighbouringNodeIndices(0),"Cannot call GetNeighbouringNodeIndices() on a MultipleCaBasedCellPopulation, need to go through the PottsMesh instead");
+
     }
 
    void TestConstructorWithMultipleCellsPerSite() throw(Exception)
