@@ -661,6 +661,7 @@ public:
 
         // Create crypt simulation from cell population
         CryptSimulation2d simulator(crypt);
+        simulator.SetEndTime(1.5);
 
         // Create a force laws and pass it to the simulation
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);

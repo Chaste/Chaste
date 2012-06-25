@@ -1769,6 +1769,7 @@ public:
 
         // Create crypt simulation from cell population
         CryptSimulation2d simulator(crypt);
+        simulator.SetEndTime(1.5);
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);

@@ -2,5 +2,5 @@
 		<UseJiggledBottomCells>0</UseJiggledBottomCells>
 		<OutputNodeVelocities>0</OutputNodeVelocities>
 		<Dt>0.002</Dt>
-		<EndTime>0</EndTime>
+		<EndTime>1.5</EndTime>
 		<SamplingTimestepMultiple>1</SamplingTimestepMultiple>
