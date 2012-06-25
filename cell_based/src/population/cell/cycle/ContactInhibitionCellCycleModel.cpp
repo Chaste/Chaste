@@ -82,7 +82,7 @@ void ContactInhibitionCellCycleModel::UpdateCellCyclePhase()
     double time_since_birth = GetAge();
     assert(time_since_birth >= 0);
 
-    if (mpCell->GetCellCycleModel()->GetCellProliferativeType()==DIFFERENTIATED)
+    if (mpCell->GetCellProliferativeType()==DIFFERENTIATED)
     {
         mCurrentCellCyclePhase = G_ZERO_PHASE;
     }
@@ -124,7 +124,6 @@ AbstractCellCycleModel* ContactInhibitionCellCycleModel::CreateCellCycleModel()
      */
     p_model->SetBirthTime(mBirthTime);
     p_model->SetDimension(mDimension);
-    p_model->SetCellProliferativeType(mCellProliferativeType);
     p_model->SetMinimumGapDuration(mMinimumGapDuration);
     p_model->SetStemCellG1Duration(mStemCellG1Duration);
     p_model->SetTransitCellG1Duration(mTransitCellG1Duration);

@@ -567,7 +567,7 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile()
             }
             if (this->mOutputCellProliferativeTypes)
             {
-                cell_types[cell] =  cell_ptr->GetCellCycleModel()->GetCellProliferativeType();
+                cell_types[cell] =  cell_ptr->GetCellProliferativeType();
             }
             if (this->mOutputCellMutationStates)
             {

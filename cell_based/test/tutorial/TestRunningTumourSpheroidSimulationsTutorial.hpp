@@ -167,8 +167,8 @@ public:
              */
             SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel;
             p_model->SetDimension(2);
-            p_model->SetCellProliferativeType(STEM);
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(STEM);
 
             /*
              * We also alter the default cell-cycle times.

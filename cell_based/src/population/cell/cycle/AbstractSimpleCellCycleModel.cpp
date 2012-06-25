@@ -59,7 +59,7 @@ void AbstractSimpleCellCycleModel::SetG1Duration()
 {
     assert(mpCell != NULL);
 
-    switch (mCellProliferativeType)
+    switch (mpCell->GetCellProliferativeType())
     {
         case STEM:
             mG1Duration = GetStemCellG1Duration();
@@ -87,7 +87,7 @@ void AbstractSimpleCellCycleModel::UpdateCellCyclePhase()
     double time_since_birth = GetAge();
     assert(time_since_birth >= 0);
 
-    if (mCellProliferativeType == DIFFERENTIATED)
+    if (mpCell->GetCellProliferativeType() == DIFFERENTIATED)
     {
         mCurrentCellCyclePhase = G_ZERO_PHASE;
     }

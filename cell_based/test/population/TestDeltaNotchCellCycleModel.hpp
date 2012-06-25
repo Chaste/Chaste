@@ -60,34 +60,34 @@ public:
         TS_ASSERT_THROWS_NOTHING(DeltaNotchCellCycleModel cell_model3);
 
         DeltaNotchCellCycleModel* p_stem_model = new DeltaNotchCellCycleModel;
-        p_stem_model->SetCellProliferativeType(STEM);
         p_stem_model->SetDimension(2);
 
         // Change G1 duration for this model
         p_stem_model->SetStemCellG1Duration(1.0);
 
         DeltaNotchCellCycleModel* p_transit_model = new DeltaNotchCellCycleModel;
-        p_transit_model->SetCellProliferativeType(TRANSIT);
         p_transit_model->SetDimension(3);
 
         // Change G1 duration for this model
         p_stem_model->SetTransitCellG1Duration(1.0);  ///\todo Is this a copy and paste error?
 
         DeltaNotchCellCycleModel* p_diff_model = new DeltaNotchCellCycleModel;
-        p_diff_model->SetCellProliferativeType(DIFFERENTIATED);
         p_diff_model->SetDimension(1);
 
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
 
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_stem_model));
+        p_stem_cell->SetCellProliferativeType(STEM);
         p_stem_cell->GetCellData()->SetItem("mean delta", 0.0);
         p_stem_cell->InitialiseCellCycleModel();
 
         CellPtr p_transit_cell(new Cell(p_healthy_state, p_transit_model));
+        p_transit_cell->SetCellProliferativeType(TRANSIT);
         p_transit_cell->GetCellData()->SetItem("mean delta", 0.0);
         p_transit_cell->InitialiseCellCycleModel();
 
         CellPtr p_diff_cell(new Cell(p_healthy_state, p_diff_model));
+        p_diff_cell->SetCellProliferativeType(DIFFERENTIATED);
         p_diff_cell->GetCellData()->SetItem("mean delta", 0.0);
         p_diff_cell->InitialiseCellCycleModel();
 
@@ -128,11 +128,11 @@ public:
 
             DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel;
             p_model->SetDimension(2);
-            p_model->SetCellProliferativeType(TRANSIT);
 
             MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
 
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
+            p_cell->SetCellProliferativeType(TRANSIT);
             p_cell->GetCellData()->SetItem("mean delta", 0.0);
             p_cell->InitialiseCellCycleModel();
             p_cell->SetBirthTime(-1.1);
@@ -152,7 +152,6 @@ public:
             TS_ASSERT_DELTA(p_model->GetBirthTime(), -1.1, 1e-12);
             TS_ASSERT_DELTA(p_model->GetAge(), 2.1, 1e-12);
             TS_ASSERT_EQUALS(p_model->GetCurrentCellCyclePhase(), G_ONE_PHASE);
-            TS_ASSERT_EQUALS(p_model->GetCellProliferativeType(), TRANSIT);
 
             RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
             random_number_test = p_gen->ranf();
@@ -184,7 +183,6 @@ public:
             TS_ASSERT_DELTA(p_model->GetBirthTime(), -1.1, 1e-12);
             TS_ASSERT_DELTA(p_model->GetAge(), 2.1, 1e-12);
             TS_ASSERT_EQUALS(p_model->GetCurrentCellCyclePhase(), G_ONE_PHASE);
-            TS_ASSERT_EQUALS(p_model->GetCellProliferativeType(), TRANSIT);
             TS_ASSERT_DELTA(p_model->GetSDuration(), 5.0, 1e-12);
         }
     }
@@ -230,7 +228,6 @@ public:
         p_model->SetDimension(2);
         p_model->SetGeneration(2);
         p_model->SetMaxTransitGenerations(10);
-        p_model->SetCellProliferativeType(STEM);
 
         // Create a copy
         DeltaNotchCellCycleModel* p_model2 = static_cast<DeltaNotchCellCycleModel*> (p_model->CreateCellCycleModel());
@@ -240,9 +237,8 @@ public:
         TS_ASSERT_EQUALS(p_model2->GetDimension(), 2u);
         TS_ASSERT_EQUALS(p_model2->GetGeneration(), 2u);
         TS_ASSERT_EQUALS(p_model2->GetMaxTransitGenerations(), 10u);
-        TS_ASSERT_EQUALS(p_model2->GetCellProliferativeType(), STEM);
 
-        // Destruct models.
+        // Destruct models
         delete p_model;
         delete p_model2;
     }

@@ -287,7 +287,6 @@ void CellBasedPdeHandler<DIM>::UseCoarsePdeMesh(double stepSize, ChasteCuboid<DI
 
         mpCoarsePdeMesh->Translate(centre_of_cuboid - centre_of_coarse_mesh);
     }
-
 }
 
 template<unsigned DIM>

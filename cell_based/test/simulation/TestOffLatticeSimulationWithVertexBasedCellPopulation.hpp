@@ -195,9 +195,9 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
 
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-        p_model->SetCellProliferativeType(TRANSIT);
 
         CellPtr p_cell(new Cell(p_state, p_model));
+        p_cell->SetCellProliferativeType(TRANSIT);
         double birth_time = -20.0; // divides straight away
         p_cell->SetBirthTime(birth_time);
         cells.push_back(p_cell);
@@ -247,7 +247,7 @@ public:
         {
             if (i==12)
             {
-                cells[i]->GetCellCycleModel()->SetCellProliferativeType(STEM);
+                cells[i]->SetCellProliferativeType(STEM);
                 cells[i]->SetBirthTime(-23.95);
             }
         }

@@ -91,6 +91,7 @@ private:
     {
         // These first four are also dealt with by {load,save}_construct_data
         archive & mCanDivide;
+        archive & mCellProliferativeType;
         archive & mpCellCycleModel;
         archive & mUndergoingApoptosis;
         archive & mDeathTime;
@@ -101,6 +102,9 @@ private:
     }
 
 protected:
+
+    /** The cell type - defined in CellProliferativeTypes.hpp. */
+    CellProliferativeType mCellProliferativeType;
 
     /** The cell's property collection. */
     CellPropertyCollection mCellPropertyCollection;
@@ -149,6 +153,18 @@ public:
      * Destructor, which frees the memory allocated for our cell-cycle model.
      */
     ~Cell();
+
+    /**
+     * Get method for #mCellProliferativeType.
+     */
+    CellProliferativeType GetCellProliferativeType() const;
+
+    /**
+     * Set method for #mCellProliferativeType.
+     *
+     * @param cellType the cell's type
+     */
+    void SetCellProliferativeType(CellProliferativeType cellType);
 
     /**
      * Set the birth time of the cell - can be negative so that your cells have an age when a simulation begins

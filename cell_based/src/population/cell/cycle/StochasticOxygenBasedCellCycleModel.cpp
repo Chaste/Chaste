@@ -101,7 +101,6 @@ AbstractCellCycleModel* StochasticOxygenBasedCellCycleModel::CreateCellCycleMode
      */
     p_model->SetBirthTime(mBirthTime);
     p_model->SetDimension(mDimension);
-    p_model->SetCellProliferativeType(mCellProliferativeType);
     p_model->SetMinimumGapDuration(mMinimumGapDuration);
     p_model->SetStemCellG1Duration(mStemCellG1Duration);
     p_model->SetTransitCellG1Duration(mTransitCellG1Duration);

@@ -64,7 +64,6 @@ AbstractCellCycleModel* StochasticDurationCellCycleModel::CreateCellCycleModel()
      * hence we do not set this member variable.
      */
     p_model->SetBirthTime(mBirthTime);
-    p_model->SetCellProliferativeType(mCellProliferativeType);
     p_model->SetMinimumGapDuration(mMinimumGapDuration);
     p_model->SetStemCellG1Duration(mStemCellG1Duration);
     p_model->SetTransitCellG1Duration(mTransitCellG1Duration);
@@ -79,7 +78,7 @@ void StochasticDurationCellCycleModel::SetG1Duration()
 {
     RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
 
-    switch (mCellProliferativeType)
+    switch (mpCell->GetCellProliferativeType())
     {
         case STEM:
             mG1Duration = GetStemCellG1Duration() + 2*p_gen->ranf(); // U[0,2]

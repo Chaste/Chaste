@@ -100,11 +100,11 @@ public:
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
-            p_model->SetCellProliferativeType(DIFFERENTIATED);
             p_model->SetInitialConditions(initial_conditions);
             p_model->SetDimension(2);
             p_model->SetMaxTransitGenerations(UINT_MAX);
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(DIFFERENTIATED);
             double birth_time = -RandomNumberGenerator::Instance()->ranf()*12.0;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
@@ -164,7 +164,6 @@ public:
 
         // Establish a DNCCM for each of the cells
         DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
-        p_model->SetCellProliferativeType(DIFFERENTIATED);
         p_model->SetDimension(2);
         p_model->SetInitialConditions(starter_conditions);
 
@@ -172,6 +171,7 @@ public:
         // problems during the ODE solve of the ReadyToDivide() call, prior to
         // entering the main simulation timeloop
         CellPtr p_cell(new Cell(p_state, p_model));
+        p_cell->SetCellProliferativeType(DIFFERENTIATED);
         p_cell->SetBirthTime(0.0);
         cells.push_back(p_cell);
 
@@ -185,7 +185,6 @@ public:
 
         // Establish a DNCCM for each of the cells
         DeltaNotchCellCycleModel* p_model_2= new DeltaNotchCellCycleModel();
-        p_model_2->SetCellProliferativeType(DIFFERENTIATED);
         p_model_2->SetDimension(2);
         p_model_2->SetInitialConditions(starter_conditions_2);
 
@@ -193,6 +192,7 @@ public:
         // problems during the ODE solve of the ReadyToDivide() call, prior to
         // entering the main simulation timeloop
         CellPtr p_cell_2(new Cell(p_state, p_model_2));
+        p_cell_2->SetCellProliferativeType(DIFFERENTIATED);
         p_cell_2->SetBirthTime(0.0);
         cells.push_back(p_cell_2);
 
@@ -260,7 +260,6 @@ public:
 
         // Establish a DNCCM for each of the cells
         DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
-        p_model->SetCellProliferativeType(DIFFERENTIATED);
         p_model->SetDimension(2);
         p_model->SetInitialConditions(starter_conditions);
 
@@ -268,6 +267,7 @@ public:
         // problems during the ODE solve of the ReadyToDivide() call, prior to
         // entering the main simulation timeloop
         CellPtr p_cell(new Cell(p_state, p_model));
+        p_cell->SetCellProliferativeType(DIFFERENTIATED);
         p_cell->SetBirthTime(0.0);
         cells.push_back(p_cell);
 
@@ -281,7 +281,6 @@ public:
 
         // Establish a DNCCM for each of the cells
         DeltaNotchCellCycleModel* p_model_2 = new DeltaNotchCellCycleModel();
-        p_model_2->SetCellProliferativeType(DIFFERENTIATED);
         p_model_2->SetDimension(2);
         p_model_2->SetInitialConditions(starter_conditions_2);
 
@@ -289,6 +288,7 @@ public:
         // problems during the ODE solve of the ReadyToDivide() call, prior to
         // entering the main simulation timeloop
         CellPtr p_cell_2(new Cell(p_state, p_model_2));
+        p_cell_2->SetCellProliferativeType(DIFFERENTIATED);
         p_cell_2->SetBirthTime(0.0);
         cells.push_back(p_cell_2);
 
@@ -344,10 +344,10 @@ public:
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
             DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
-            p_model->SetCellProliferativeType(DIFFERENTIATED);
-            p_model->SetDimension(2u);
+            p_model->SetDimension(2);
 
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(DIFFERENTIATED);
             double birth_time = -RandomNumberGenerator::Instance()->ranf()*12.0;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
@@ -392,10 +392,10 @@ public:
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
-            p_model->SetCellProliferativeType(DIFFERENTIATED);
             p_model->SetDimension(2);
 
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(DIFFERENTIATED);
             double birth_time = -RandomNumberGenerator::Instance()->ranf()*12.0;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
@@ -441,10 +441,10 @@ public:
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
             DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
-            p_model->SetCellProliferativeType(DIFFERENTIATED);
-            p_model->SetDimension(2u);
+            p_model->SetDimension(2);
 
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(DIFFERENTIATED);
             double birth_time = -1.0;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);

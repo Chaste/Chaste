@@ -69,11 +69,11 @@ public:
         TS_ASSERT_THROWS_NOTHING(FixedDurationGenerationBasedCellCycleModel model3);
 
         FixedDurationGenerationBasedCellCycleModel* p_stem_model = new FixedDurationGenerationBasedCellCycleModel;
-        p_stem_model->SetCellProliferativeType(STEM);
 
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
 
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_stem_model));
+        p_stem_cell->SetCellProliferativeType(STEM);
         p_stem_cell->InitialiseCellCycleModel();
 
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -93,24 +93,24 @@ public:
         TS_ASSERT_EQUALS(p_stem_model->GetMaxTransitGenerations(), 6u);
         p_stem_model->SetMaxTransitGenerations(3);
 
-        TS_ASSERT_EQUALS(p_stem_cell->GetCellCycleModel()->GetCellProliferativeType(),STEM);
+        TS_ASSERT_EQUALS(p_stem_cell->GetCellProliferativeType(),STEM);
 
         FixedDurationGenerationBasedCellCycleModel* p_transit_model = new FixedDurationGenerationBasedCellCycleModel;
-        p_transit_model->SetCellProliferativeType(TRANSIT);
 
         CellPtr p_transit_cell(new Cell(p_healthy_state, p_transit_model));
+        p_transit_cell->SetCellProliferativeType(TRANSIT);
         p_transit_cell->InitialiseCellCycleModel();
 
-        TS_ASSERT_EQUALS(p_transit_cell->GetCellCycleModel()->GetCellProliferativeType(),TRANSIT);
+        TS_ASSERT_EQUALS(p_transit_cell->GetCellProliferativeType(),TRANSIT);
         TS_ASSERT_EQUALS(p_transit_model->GetGeneration(), 0u);
 
         FixedDurationGenerationBasedCellCycleModel* p_diff_model = new FixedDurationGenerationBasedCellCycleModel;
-        p_diff_model->SetCellProliferativeType(DIFFERENTIATED);
 
         CellPtr p_diff_cell(new Cell(p_healthy_state, p_diff_model));
+        p_diff_cell->SetCellProliferativeType(DIFFERENTIATED);
         p_diff_cell->InitialiseCellCycleModel();
 
-        TS_ASSERT_EQUALS(p_diff_cell->GetCellCycleModel()->GetCellProliferativeType(),DIFFERENTIATED);
+        TS_ASSERT_EQUALS(p_diff_cell->GetCellProliferativeType(),DIFFERENTIATED);
         TS_ASSERT_EQUALS(p_diff_model->GetGeneration(), 0u);
 
         //First cycle
@@ -130,13 +130,13 @@ public:
         double hepa_one_cell_birth_time = p_simulation_time->GetTime();
 
         FixedDurationGenerationBasedCellCycleModel* p_hepa_one_model = new FixedDurationGenerationBasedCellCycleModel;
-        p_hepa_one_model->SetCellProliferativeType(STEM);
 
         // Change G1 Duration for this model
         p_hepa_one_model->SetStemCellG1Duration(8.0);
         p_hepa_one_model->SetTransitCellG1Duration(8.0);
 
         CellPtr p_hepa_one_cell(new Cell(p_healthy_state, p_hepa_one_model));
+        p_hepa_one_cell->SetCellProliferativeType(STEM);
         p_hepa_one_cell->InitialiseCellCycleModel();
 
         //Second cycle
@@ -174,31 +174,30 @@ public:
         TS_ASSERT_THROWS_NOTHING(StochasticDurationGenerationBasedCellCycleModel cell_model3);
 
         StochasticDurationGenerationBasedCellCycleModel* p_stem_model = new StochasticDurationGenerationBasedCellCycleModel;
-        p_stem_model->SetCellProliferativeType(STEM);
 
         // Change G1 Duration for this model
         p_stem_model->SetStemCellG1Duration(1.0);
 
         StochasticDurationGenerationBasedCellCycleModel* p_transit_model = new StochasticDurationGenerationBasedCellCycleModel;
-        p_transit_model->SetCellProliferativeType(TRANSIT);
 
         // Change G1 Duration for this model
         p_transit_model->SetTransitCellG1Duration(1.0);
 
         StochasticDurationGenerationBasedCellCycleModel* p_diff_model = new StochasticDurationGenerationBasedCellCycleModel;
-        p_diff_model->SetCellProliferativeType(DIFFERENTIATED);
 
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
 
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_stem_model));
+        p_stem_cell->SetCellProliferativeType(STEM);
         p_stem_cell->InitialiseCellCycleModel();
 
         CellPtr p_transit_cell(new Cell(p_healthy_state, p_transit_model));
+        p_transit_cell->SetCellProliferativeType(TRANSIT);
         p_transit_cell->InitialiseCellCycleModel();
 
         CellPtr p_diff_cell(new Cell(p_healthy_state, p_diff_model));
+        p_diff_cell->SetCellProliferativeType(DIFFERENTIATED);
         p_diff_cell->InitialiseCellCycleModel();
-
 
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         unsigned num_steps = 100;
@@ -217,11 +216,12 @@ public:
         }
 
         StochasticDurationGenerationBasedCellCycleModel* p_hepa_one_model = new StochasticDurationGenerationBasedCellCycleModel;
-        p_hepa_one_model->SetCellProliferativeType(STEM);
+
         // Change G1 Duration for this model
         p_hepa_one_model->SetStemCellG1Duration(1.0);
 
         CellPtr p_hepa_one_cell(new Cell(p_healthy_state, p_hepa_one_model));
+        p_hepa_one_cell->SetCellProliferativeType(STEM);
         p_hepa_one_cell->InitialiseCellCycleModel();
 
         for (unsigned i=0; i< num_steps; i++)
@@ -237,31 +237,30 @@ public:
         TS_ASSERT_THROWS_NOTHING(StochasticDurationCellCycleModel cell_model3);
 
         StochasticDurationCellCycleModel* p_stem_model = new StochasticDurationCellCycleModel;
-        p_stem_model->SetCellProliferativeType(STEM);
 
         // Change G1 Duration for this model
         p_stem_model->SetStemCellG1Duration(8.0);
 
         StochasticDurationCellCycleModel* p_transit_model = new StochasticDurationCellCycleModel;
-        p_transit_model->SetCellProliferativeType(TRANSIT);
 
         // Change G1 Duration for this model
         p_stem_model->SetTransitCellG1Duration(8.0);
 
         StochasticDurationCellCycleModel* p_diff_model = new StochasticDurationCellCycleModel;
-        p_diff_model->SetCellProliferativeType(DIFFERENTIATED);
 
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
 
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_stem_model));
+        p_stem_cell->SetCellProliferativeType(STEM);
         p_stem_cell->InitialiseCellCycleModel();
 
         CellPtr p_transit_cell(new Cell(p_healthy_state, p_transit_model));
+        p_transit_cell->SetCellProliferativeType(TRANSIT);
         p_transit_cell->InitialiseCellCycleModel();
 
         CellPtr p_diff_cell(new Cell(p_healthy_state, p_diff_model));
+        p_diff_cell->SetCellProliferativeType(DIFFERENTIATED);
         p_diff_cell->InitialiseCellCycleModel();
-
 
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         unsigned num_steps = 100;
@@ -280,9 +279,8 @@ public:
         }
 
         StochasticDurationCellCycleModel* p_hepa_one_model = new StochasticDurationCellCycleModel;
-        p_hepa_one_model->SetCellProliferativeType(STEM);
-
         CellPtr p_hepa_one_cell(new Cell(p_healthy_state, p_hepa_one_model));
+        p_hepa_one_cell->SetCellProliferativeType(STEM);
         p_hepa_one_cell->InitialiseCellCycleModel();
 
         for (unsigned i=0; i< num_steps; i++)
@@ -301,14 +299,13 @@ public:
 
         SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel;
         p_model->SetDimension(2);
-        p_model->SetCellProliferativeType(STEM);
 
         p_model->SetStemCellG1Duration(8.0);
         p_model->SetTransitCellG1Duration(8.0);
 
         MAKE_PTR(WildTypeCellMutationState, p_state);
         CellPtr p_cell(new Cell(p_state, p_model));
-
+        p_cell->SetCellProliferativeType(STEM);
         p_cell->InitialiseCellCycleModel();
 
         // Set up oxygen_concentration
@@ -351,15 +348,14 @@ public:
         // Create cell-cycle models and cells
         SimpleOxygenBasedCellCycleModel* p_hepa_one_model = new SimpleOxygenBasedCellCycleModel;
         p_hepa_one_model->SetDimension(2);
-        p_hepa_one_model->SetCellProliferativeType(STEM);
 
         CellPtr p_hepa_one_cell(new Cell(p_state, p_hepa_one_model));
+        p_hepa_one_cell->SetCellProliferativeType(STEM);
         p_hepa_one_cell->GetCellData()->SetItem("oxygen", hi_oxygen_concentration);
         p_hepa_one_cell->InitialiseCellCycleModel();
 
         SimpleOxygenBasedCellCycleModel* p_diff_model = new SimpleOxygenBasedCellCycleModel;
         p_diff_model->SetDimension(2);
-        p_diff_model->SetCellProliferativeType(DIFFERENTIATED);
 
         // Coverage
         TS_ASSERT_DELTA(p_diff_model->GetCriticalHypoxicDuration(), 2.0, 1e-6);
@@ -367,6 +363,7 @@ public:
         TS_ASSERT_DELTA(p_diff_model->GetCriticalHypoxicDuration(), 0.5, 1e-6);
 
         CellPtr p_diff_cell(new Cell(p_state, p_diff_model));
+        p_diff_cell->SetCellProliferativeType(DIFFERENTIATED);
         p_diff_cell->InitialiseCellCycleModel();
         p_diff_cell->GetCellData()->SetItem("oxygen", hi_oxygen_concentration);
 
@@ -406,8 +403,8 @@ public:
         // Create a cell with a simple oxygen-based cell-cycle model
         SimpleOxygenBasedCellCycleModel* p_cell_model = new SimpleOxygenBasedCellCycleModel;
         p_cell_model->SetDimension(2);
-        p_cell_model->SetCellProliferativeType(STEM);
         CellPtr p_apoptotic_cell(new Cell(p_state, p_cell_model));
+        p_apoptotic_cell->SetCellProliferativeType(STEM);
 
         // Set up oxygen_concentration
         p_apoptotic_cell->GetCellData()->SetItem("oxygen", lo_oxygen_concentration);
@@ -437,7 +434,6 @@ public:
 
         ContactInhibitionCellCycleModel* p_model = new ContactInhibitionCellCycleModel;
         p_model->SetDimension(2);
-        p_model->SetCellProliferativeType(STEM);
 
         p_model->SetStemCellG1Duration(8.0);
         p_model->SetTransitCellG1Duration(8.0);
@@ -453,7 +449,7 @@ public:
 
         MAKE_PTR(WildTypeCellMutationState, p_state);
         CellPtr p_cell(new Cell(p_state, p_model));
-
+        p_cell->SetCellProliferativeType(STEM);
         p_cell->InitialiseCellCycleModel();
 
         double lo_volume = 0.0;
@@ -489,27 +485,27 @@ public:
         p_simulation_time->SetStartTime(0.0);
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0*24.0, num_steps);
 
-
         // Create cell-cycle models and cells
         ContactInhibitionCellCycleModel* p_hepa_one_model = new ContactInhibitionCellCycleModel;
         p_hepa_one_model->SetDimension(2);
-        p_hepa_one_model->SetCellProliferativeType(STEM);
         p_hepa_one_model->SetBirthTime(0.0);
         p_hepa_one_model->SetQuiescentVolumeFraction(0.5);
         p_hepa_one_model->SetEquilibriumVolume(1.0);
 
         CellPtr p_hepa_one_cell(new Cell(p_state, p_hepa_one_model));
+        p_hepa_one_cell->SetCellProliferativeType(STEM);
+
         // Set up cell volume
         p_hepa_one_cell->GetCellData()->SetItem("volume", hi_volume);       
         p_hepa_one_cell->InitialiseCellCycleModel();
 
         ContactInhibitionCellCycleModel* p_diff_model = new ContactInhibitionCellCycleModel;
         p_diff_model->SetDimension(2);
-        p_diff_model->SetCellProliferativeType(DIFFERENTIATED);
         p_diff_model->SetQuiescentVolumeFraction(0.5);
         p_diff_model->SetEquilibriumVolume(1.0);
 
         CellPtr p_diff_cell(new Cell(p_state, p_diff_model));
+        p_diff_cell->SetCellProliferativeType(DIFFERENTIATED);
         p_diff_cell->GetCellData()->SetItem("volume", hi_volume);
         p_diff_cell->InitialiseCellCycleModel();
 
@@ -537,8 +533,6 @@ public:
 
         TS_ASSERT_EQUALS(p_hepa_one_model2->ReadyToDivide(), false);
         TS_ASSERT_EQUALS(p_hepa_one_model2->GetCurrentCellCyclePhase(), M_PHASE);
-
-
     }
 
     void TestStochasticOxygenBasedCellCycleModel() throw(Exception)
@@ -549,7 +543,6 @@ public:
 
         StochasticOxygenBasedCellCycleModel* p_model = new StochasticOxygenBasedCellCycleModel;
         p_model->SetDimension(2);
-        p_model->SetCellProliferativeType(STEM);
 
         p_model->SetStemCellG1Duration(8.0);
         p_model->SetTransitCellG1Duration(8.0);
@@ -574,6 +567,7 @@ public:
         double hi_oxygen_concentration=1.0;
 
         CellPtr p_cell(new Cell(p_state, p_model));
+        p_cell->SetCellProliferativeType(STEM);
         p_cell->GetCellData()->SetItem("oxygen", lo_oxygen_concentration);
         p_cell->InitialiseCellCycleModel();
 
@@ -611,18 +605,18 @@ public:
         // Create cell-cycle model
         StochasticOxygenBasedCellCycleModel* p_hepa_one_model = new StochasticOxygenBasedCellCycleModel;
         p_hepa_one_model->SetDimension(2);
-        p_hepa_one_model->SetCellProliferativeType(STEM);
 
         StochasticOxygenBasedCellCycleModel* p_diff_model = new StochasticOxygenBasedCellCycleModel;
         p_diff_model->SetDimension(2);
-        p_diff_model->SetCellProliferativeType(DIFFERENTIATED);
 
         // Create cell
         CellPtr p_hepa_one_cell(new Cell(p_state, p_hepa_one_model));
+        p_hepa_one_cell->SetCellProliferativeType(STEM);
         p_hepa_one_cell->GetCellData()->SetItem("oxygen", hi_oxygen_concentration);
         p_hepa_one_cell->InitialiseCellCycleModel();
 
         CellPtr p_diff_cell(new Cell(p_state, p_diff_model));
+        p_diff_cell->SetCellProliferativeType(DIFFERENTIATED);
         p_diff_cell->GetCellData()->SetItem("oxygen", hi_oxygen_concentration);
         p_diff_cell->InitialiseCellCycleModel();
 
@@ -651,8 +645,8 @@ public:
 
         // Check that cell division correctly resets the cell cycle phase
         StochasticOxygenBasedCellCycleModel* p_hepa_one_model2 = static_cast <StochasticOxygenBasedCellCycleModel*> (p_hepa_one_model->CreateCellCycleModel());
-        p_hepa_one_model2->SetCellProliferativeType(STEM);
         CellPtr p_hepa_one_cell2(new Cell(p_state, p_hepa_one_model2));
+        p_hepa_one_cell2->SetCellProliferativeType(STEM);
         p_hepa_one_cell2->GetCellData()->SetItem("oxygen", hi_oxygen_concentration);
         p_hepa_one_cell2->InitialiseCellCycleModel();
         TS_ASSERT_EQUALS(p_hepa_one_model2->ReadyToDivide(), false);
@@ -667,8 +661,8 @@ public:
         // Create a cell with a simple oxygen-based cell-cycle model
         StochasticOxygenBasedCellCycleModel* p_cell_model = new StochasticOxygenBasedCellCycleModel;
         p_cell_model->SetDimension(2);
-        p_cell_model->SetCellProliferativeType(STEM);
         CellPtr p_apoptotic_cell(new Cell(p_state, p_cell_model));
+        p_apoptotic_cell->SetCellProliferativeType(STEM);
         p_apoptotic_cell->GetCellData()->SetItem("oxygen", lo_oxygen_concentration);
         p_apoptotic_cell->InitialiseCellCycleModel();
 
@@ -689,12 +683,12 @@ public:
 
         StochasticOxygenBasedCellCycleModel* p_cell_model2 = new StochasticOxygenBasedCellCycleModel;
         p_cell_model2->SetDimension(2);
-        p_cell_model2->SetCellProliferativeType(STEM);
 
         // Coverage
         p_cell_model2->SetMinimumGapDuration(1e20);
 
         CellPtr p_cell2(new Cell(p_state, p_cell_model2));
+        p_cell2->SetCellProliferativeType(STEM);
         p_cell2->InitialiseCellCycleModel();
 
         TS_ASSERT_DELTA(p_cell_model2->GetG2Duration(), 1e20, 1e-4);
@@ -709,12 +703,10 @@ public:
             // We must set up SimulationTime to avoid memory leaks
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
-
             // As usual, we archive via a pointer to the most abstract class possible
             AbstractCellCycleModel* const p_model = new FixedDurationGenerationBasedCellCycleModel;
 
             p_model->SetDimension(2);
-            p_model->SetCellProliferativeType(TRANSIT);
             p_model->SetBirthTime(-1.0);
 
             std::ofstream ofs(archive_filename.c_str());
@@ -741,7 +733,6 @@ public:
             TS_ASSERT_DELTA(p_model2->GetBirthTime(), -1.0, 1e-12);
             TS_ASSERT_DELTA(p_model2->GetAge(), 1.0, 1e-12);
             TS_ASSERT_EQUALS(p_model2->GetCurrentCellCyclePhase(), M_PHASE);
-            TS_ASSERT_EQUALS(p_model2->GetCellProliferativeType(), TRANSIT);
             TS_ASSERT_EQUALS(p_model2->GetDimension(), 2u);
 
             // Avoid memory leaks
@@ -764,11 +755,7 @@ public:
             // As usual, we archive via a pointer to the most abstract class possible
             AbstractCellCycleModel* const p_model = new StochasticDurationGenerationBasedCellCycleModel;
             p_model->SetDimension(2);
-            p_model->SetCellProliferativeType(TRANSIT);
             p_model->SetTransitCellG1Duration(1.0);
-
-            static_cast<StochasticDurationGenerationBasedCellCycleModel*>(p_model)->SetG1Duration();
-            TS_ASSERT_DELTA(p_model->GetG1Duration(), 2.6803, 1e-4);
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -793,7 +780,6 @@ public:
 
             input_arch >> p_model2;
 
-            TS_ASSERT_DELTA(p_model2->GetG1Duration(), 2.6803, 1e-4);
             TS_ASSERT_DELTA(RandomNumberGenerator::Instance()->ranf(), random_number_test, 1e-6);
 
             // Avoid memory leaks
@@ -816,10 +802,6 @@ public:
             // As usual, we archive via a pointer to the most abstract class possible
             AbstractCellCycleModel* const p_model = new StochasticDurationCellCycleModel;
             p_model->SetDimension(2);
-            p_model->SetCellProliferativeType(TRANSIT);
-
-            static_cast<StochasticDurationCellCycleModel*>(p_model)->SetG1Duration();
-            TS_ASSERT_DELTA(p_model->GetG1Duration(), 3.6803, 1e-4);
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -844,7 +826,6 @@ public:
 
             input_arch >> p_model2;
 
-            TS_ASSERT_DELTA(p_model2->GetG1Duration(), 3.6803, 1e-4);
             TS_ASSERT_DELTA(RandomNumberGenerator::Instance()->ranf(), random_number_test, 1e-6);
 
             // Avoid memory leaks
@@ -864,7 +845,6 @@ public:
             // As usual, we archive via a pointer to the most abstract class possible
             AbstractCellCycleModel* const p_model = new SimpleOxygenBasedCellCycleModel;
             p_model->SetDimension(3);
-            p_model->SetCellProliferativeType(STEM);
 
             static_cast<SimpleOxygenBasedCellCycleModel*>(p_model)->SetHypoxicConcentration(0.8);
             static_cast<SimpleOxygenBasedCellCycleModel*>(p_model)->SetQuiescentConcentration(0.7);
@@ -916,7 +896,6 @@ public:
             // As usual, we archive via a pointer to the most abstract class possible
             AbstractCellCycleModel* const p_model = new StochasticOxygenBasedCellCycleModel;
             p_model->SetDimension(3);
-            p_model->SetCellProliferativeType(STEM);
 
             static_cast<StochasticOxygenBasedCellCycleModel*>(p_model)->SetHypoxicConcentration(0.8);
             static_cast<StochasticOxygenBasedCellCycleModel*>(p_model)->SetQuiescentConcentration(0.7);
@@ -976,7 +955,6 @@ public:
             AbstractCellCycleModel* const p_model = new ContactInhibitionCellCycleModel();
 
             p_model->SetDimension(1);
-            p_model->SetCellProliferativeType(STEM);
             p_model->SetBirthTime(-1.5);
 
             static_cast<ContactInhibitionCellCycleModel*>(p_model)->SetQuiescentVolumeFraction(0.5);
@@ -1004,7 +982,6 @@ public:
 
             TS_ASSERT_EQUALS(p_model2->GetCurrentCellCyclePhase(), M_PHASE);
             TS_ASSERT_EQUALS(p_model2->GetDimension(), 1u);
-            TS_ASSERT_EQUALS(p_model2->GetCellProliferativeType(), STEM);
             TS_ASSERT_DELTA(p_model2->GetBirthTime(), -1.5, 1e-12);
             TS_ASSERT_DELTA(p_model2->GetAge(), 1.5, 1e-12);
 

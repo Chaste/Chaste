@@ -249,8 +249,8 @@ public:
         {
             WntCellCycleModel* p_model = new WntCellCycleModel();
             p_model->SetDimension(2);
-            p_model->SetCellProliferativeType(STEM);
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(STEM);
             double birth_time = 0.0 - i;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
@@ -432,8 +432,8 @@ public:
         {
             WntCellCycleModel* p_model = new WntCellCycleModel();
             p_model->SetDimension(2);
-            p_model->SetCellProliferativeType(STEM);
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(STEM);
             double birth_time = 0.0 - i;
             p_cell->SetBirthTime(birth_time);
 

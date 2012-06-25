@@ -527,7 +527,7 @@ void MeshBasedCellPopulation<DIM>::WriteVtkResultsToFile()
             }
             if (this->mOutputCellProliferativeTypes)
             {
-                cell_types[node_index] = p_model->GetCellProliferativeType();
+                cell_types[node_index] = cell_iter->GetCellProliferativeType();
             }
             if (this->mOutputCellMutationStates)
             {
@@ -627,7 +627,7 @@ void MeshBasedCellPopulation<DIM>::WriteVtkResultsToFile()
             }
             if (this->mOutputCellProliferativeTypes)
             {
-                cell_types[elem_index] = p_model->GetCellProliferativeType();
+                cell_types[elem_index] = p_cell->GetCellProliferativeType();
             }
             if (this->mOutputCellMutationStates)
             {

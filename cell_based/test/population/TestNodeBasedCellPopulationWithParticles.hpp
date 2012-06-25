@@ -384,8 +384,8 @@ public:
 	        MAKE_PTR(WildTypeCellMutationState, p_state);
 
 	        FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-	        p_model->SetCellProliferativeType(STEM);
 	        CellPtr p_new_cell(new Cell(p_state, p_model));
+	        p_new_cell->SetCellProliferativeType(STEM);
 	        p_new_cell->SetBirthTime(0);
 
 	        c_vector<double,2> new_location;
@@ -405,8 +405,8 @@ public:
 	        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 70u);
 
 	        FixedDurationGenerationBasedCellCycleModel* p_model2 = new FixedDurationGenerationBasedCellCycleModel();
-	        p_model2->SetCellProliferativeType(STEM);
 	        CellPtr p_new_cell2(new Cell(p_state, p_model2));
+	        p_new_cell2->SetCellProliferativeType(STEM);
 	        p_new_cell2->SetBirthTime(0);
 
 	        c_vector<double,2> new_location2;
@@ -490,11 +490,11 @@ public:
 	            }
 
 	            p_cell_cycle_model->SetGeneration(generation);
-	            p_cell_cycle_model->SetCellProliferativeType(cell_type);
 
 	            boost::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
 
 	            CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
+	            p_cell->SetCellProliferativeType(cell_type);
 	            p_cell->SetBirthTime(birth_time);
 
 	            if (std::find(location_indices.begin(), location_indices.end(), i) != location_indices.end())

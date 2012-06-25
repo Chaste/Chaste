@@ -141,7 +141,6 @@ public:
         {
             SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
             p_model->SetDimension(2);
-            p_model->SetCellProliferativeType(STEM);
             p_model->SetHypoxicConcentration(0.9);
             p_model->SetQuiescentConcentration(0.9);
 
@@ -150,6 +149,7 @@ public:
             p_model->SetTransitCellG1Duration(8.0);
 
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(STEM);
 
             double birth_time = -RandomNumberGenerator::Instance()->ranf()*18.0;
             p_cell->SetBirthTime(birth_time);
@@ -238,13 +238,13 @@ public:
         {
             SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
             p_model->SetDimension(2);
-            p_model->SetCellProliferativeType(STEM);
 
             // Use non-default G1 durations
             p_model->SetStemCellG1Duration(8.0);
             p_model->SetTransitCellG1Duration(8.0);
 
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(STEM);
 
             double birth_time = -1.0 - ((double) i/p_mesh->GetNumNodes())*18.0;
             p_cell->SetBirthTime(birth_time);
@@ -336,8 +336,8 @@ public:
         {
             SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
             p_model->SetDimension(2);
-            p_model->SetCellProliferativeType(STEM);
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(STEM);
 
             // Use non-default G1 durations
             p_model->SetStemCellG1Duration(8.0);
@@ -419,13 +419,13 @@ public:
         {
             SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
             p_model->SetDimension(2);
-            p_model->SetCellProliferativeType(STEM);
 
             // Use non-default G1 durations
             p_model->SetStemCellG1Duration(8.0);
             p_model->SetTransitCellG1Duration(8.0);
 
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(STEM);
             double birth_time = -1.0 - ((double) i/p_mesh->GetNumNodes())*18.0;
             p_cell->SetBirthTime(birth_time);
 
@@ -514,13 +514,13 @@ public:
         {
             SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
             p_model->SetDimension(2);
-            p_model->SetCellProliferativeType(STEM);
 
             // Use non-default G1 durations
             p_model->SetStemCellG1Duration(8.0);
             p_model->SetTransitCellG1Duration(8.0);
 
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(STEM);
             p_cell->SetBirthTime(-0.1);
 
             // Label three neighbouring cells as apoptotic
@@ -620,13 +620,13 @@ public:
         {
             SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
             p_model->SetDimension(2);
-            p_model->SetCellProliferativeType(STEM);
 
             // Use non-default G1 durations
             p_model->SetStemCellG1Duration(8.0);
             p_model->SetTransitCellG1Duration(8.0);
 
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(STEM);
             double birth_time = -RandomNumberGenerator::Instance()->ranf()*18.0;
             p_cell->SetBirthTime(birth_time);
 
@@ -865,13 +865,13 @@ public:
         {
             SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
             p_model->SetDimension(2);
-            p_model->SetCellProliferativeType(STEM);
 
             // Use non-default G1 durations
             p_model->SetStemCellG1Duration(8.0);
             p_model->SetTransitCellG1Duration(8.0);
 
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(STEM);
             double birth_time = -1.0 - ((double) i/p_mesh->GetNumNodes())*18.0;
             p_cell->SetBirthTime(birth_time);
 
@@ -960,13 +960,13 @@ public:
         {
             SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
             p_model->SetDimension(2);
-            p_model->SetCellProliferativeType(STEM);
 
             // Use non-default G1 durations
             p_model->SetStemCellG1Duration(8.0);
             p_model->SetTransitCellG1Duration(8.0);
 
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(STEM);
             double birth_time = -1.0 - ((double) i/p_mesh->GetNumNodes())*18.0;
             p_cell->SetBirthTime(birth_time);
 
@@ -1102,11 +1102,11 @@ public:
         {
             SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
             p_model->SetDimension(2);
-            p_model->SetCellProliferativeType(DIFFERENTIATED);
             p_model->SetHypoxicConcentration(0.9);
             p_model->SetQuiescentConcentration(0.9);
 
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(DIFFERENTIATED);
             p_cell->SetBirthTime(-1.0);
             cells.push_back(p_cell);
         }
@@ -1222,9 +1222,9 @@ public:
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetDimension(2);
-            p_model->SetCellProliferativeType(DIFFERENTIATED);
 
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(DIFFERENTIATED);
             double birth_time = -RandomNumberGenerator::Instance()->ranf()*18.0;
             p_cell->SetBirthTime(birth_time);
 
@@ -1282,9 +1282,9 @@ public:
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetDimension(2);
-            p_model->SetCellProliferativeType(DIFFERENTIATED);
 
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(DIFFERENTIATED);
             double birth_time = -RandomNumberGenerator::Instance()->ranf()*18.0;
             p_cell->SetBirthTime(birth_time);
 
@@ -1481,9 +1481,9 @@ public:
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetDimension(2);
-            p_model->SetCellProliferativeType(DIFFERENTIATED);
 
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(DIFFERENTIATED);
             double birth_time = -RandomNumberGenerator::Instance()->ranf()*18.0;
             p_cell->SetBirthTime(birth_time);
 
@@ -1589,9 +1589,9 @@ public:
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetDimension(1);
-            p_model->SetCellProliferativeType(DIFFERENTIATED);
 
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(DIFFERENTIATED);
             double birth_time = -RandomNumberGenerator::Instance()->ranf()*18.0;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
@@ -1658,9 +1658,9 @@ public:
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetDimension(2);
-            p_model->SetCellProliferativeType(DIFFERENTIATED);
 
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(DIFFERENTIATED);
             double birth_time = -RandomNumberGenerator::Instance()->ranf()*18.0;
             p_cell->SetBirthTime(birth_time);
 
@@ -1740,9 +1740,9 @@ public:
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetDimension(3);
-            p_model->SetCellProliferativeType(DIFFERENTIATED);
 
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(DIFFERENTIATED);
             double birth_time = -RandomNumberGenerator::Instance()->ranf()*18.0;
             p_cell->SetBirthTime(birth_time);
 

@@ -60,13 +60,12 @@ void CheckReadyToDivideAndPhaseIsUpdated(AbstractCellCycleModel* pModel,
         g2Duration = pModel->GetG2Duration();
     }
 
-
     double age = pModel->GetAge();
 
     const double G1TOL = 1e-5; // how accurate the expected G1 duration is
 
     // If the G1 duration is incorrect, print out the mismatch
-    if ((pModel->GetCellProliferativeType() != DIFFERENTIATED) &&
+    if ((pModel->GetCell()->GetCellProliferativeType() != DIFFERENTIATED) &&
         (age >= pModel->GetMDuration()) &&
         (pModel->GetG1Duration() != DOUBLE_UNSET) &&
         (fabs(pModel->GetG1Duration() - g1Duration) > G1TOL))
@@ -76,7 +75,7 @@ void CheckReadyToDivideAndPhaseIsUpdated(AbstractCellCycleModel* pModel,
                   << std::endl;
     }
 
-    if (pModel->GetCellProliferativeType()==DIFFERENTIATED)
+    if (pModel->GetCell()->GetCellProliferativeType()==DIFFERENTIATED)
     {
         // If the cell is differentiated, then it must be in G0 phase and must never divide
         TS_ASSERT_EQUALS(pModel->ReadyToDivide(), false);

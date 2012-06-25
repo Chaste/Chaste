@@ -73,7 +73,6 @@ AbstractCellCycleModel* SingleOdeWntCellCycleModel::CreateCellCycleModel()
      */
     p_model->SetBirthTime(mBirthTime);
     p_model->SetDimension(mDimension);
-    p_model->SetCellProliferativeType(mCellProliferativeType);
     p_model->SetMinimumGapDuration(mMinimumGapDuration);
     p_model->SetStemCellG1Duration(mStemCellG1Duration);
     p_model->SetTransitCellG1Duration(mTransitCellG1Duration);
@@ -147,7 +146,7 @@ void SingleOdeWntCellCycleModel::ChangeCellProliferativeTypeDueToCurrentBetaCate
         cell_type = DIFFERENTIATED;
     }
 
-    mCellProliferativeType = cell_type;
+    mpCell->SetCellProliferativeType(cell_type);
 }
 
 double SingleOdeWntCellCycleModel::GetBetaCateninConcentration()

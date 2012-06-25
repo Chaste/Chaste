@@ -83,13 +83,13 @@ public:
         {
             SimpleWntCellCycleModel* p_model = new SimpleWntCellCycleModel;
             p_model->SetDimension(2);
-            p_model->SetCellProliferativeType(TRANSIT);
 
             double birth_time = - RandomNumberGenerator::Instance()->ranf()*
                                              ( p_model->GetTransitCellG1Duration()
                                                 + p_model->GetSG2MDuration() );
 
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(TRANSIT);
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
         }

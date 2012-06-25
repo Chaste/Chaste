@@ -646,7 +646,7 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile()
             elem_ids.push_back((double)element_index);
 
             CellPtr p_cell = this->GetCellUsingLocationIndex(element_index);
-            double cell_type = p_cell->GetCellCycleModel()->GetCellProliferativeType();
+            double cell_type = p_cell->GetCellProliferativeType();
             cell_types.push_back(cell_type);
 
             if (this->mOutputCellMutationStates)

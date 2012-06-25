@@ -92,9 +92,9 @@ void TysonNovakCellCycleModel::ResetForDivision()
 
 void TysonNovakCellCycleModel::InitialiseDaughterCell()
 {
-    if (mCellProliferativeType == STEM)
+    if (mpCell->GetCellProliferativeType() == STEM)
     {
-        mCellProliferativeType = TRANSIT;
+    	mpCell->SetCellProliferativeType(TRANSIT);
     }
 }
 
@@ -121,7 +121,6 @@ AbstractCellCycleModel* TysonNovakCellCycleModel::CreateCellCycleModel()
      * hence we do not set this member variable.
      */
     p_model->SetBirthTime(mBirthTime);
-    p_model->SetCellProliferativeType(mCellProliferativeType);
     p_model->SetMinimumGapDuration(mMinimumGapDuration);
     p_model->SetStemCellG1Duration(mStemCellG1Duration);
     p_model->SetTransitCellG1Duration(mTransitCellG1Duration);

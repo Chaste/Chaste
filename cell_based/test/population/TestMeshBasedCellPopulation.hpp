@@ -161,8 +161,8 @@ public:
         for (unsigned i=0; i<mesh.GetNumNodes()-1; i++)
         {
             AbstractCellCycleModel* p_cell_cycle_model = new FixedDurationGenerationBasedCellCycleModel();
-            p_cell_cycle_model->SetCellProliferativeType(STEM);
             CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
+            p_cell->SetCellProliferativeType(STEM);
             double birth_time = 0.0 - i;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
@@ -175,8 +175,8 @@ public:
 
         // Add another cell
         AbstractCellCycleModel* p_cell_cycle_model = new FixedDurationGenerationBasedCellCycleModel();
-        p_cell_cycle_model->SetCellProliferativeType(STEM);
         CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
+        p_cell->SetCellProliferativeType(STEM);
         double birth_time = -4.0;
         p_cell->SetBirthTime(birth_time);
         cells.push_back(p_cell);
@@ -351,8 +351,8 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
 
         FixedDurationGenerationBasedCellCycleModel* p_cell_cycle_model = new FixedDurationGenerationBasedCellCycleModel();
-        p_cell_cycle_model->SetCellProliferativeType(STEM);
         CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
+        p_cell->SetCellProliferativeType(STEM);
         p_cell->SetBirthTime(-1);
         c_vector<double,2> new_cell_location;
         new_cell_location[0] = 2;

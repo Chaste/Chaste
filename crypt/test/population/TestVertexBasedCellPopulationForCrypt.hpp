@@ -98,9 +98,9 @@ public:
         {
             WntCellCycleModel* p_cell_cycle_model = new WntCellCycleModel;
             p_cell_cycle_model->SetDimension(2);
-            p_cell_cycle_model->SetCellProliferativeType(DIFFERENTIATED);
 
             CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
+            p_cell->SetCellProliferativeType(DIFFERENTIATED);
             double birth_time = 0.0 - i;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);

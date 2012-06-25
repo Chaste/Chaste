@@ -553,7 +553,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResults(CellPtr
     }
 
     // Set colour dependent on cell type
-    switch (pCell->GetCellCycleModel()->GetCellProliferativeType())
+    switch (pCell->GetCellProliferativeType())
     {
         case STEM:
             colour = STEM_COLOUR;

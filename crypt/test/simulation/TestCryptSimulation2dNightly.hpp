@@ -245,7 +245,6 @@ public:
             MAKE_PTR(WildTypeCellMutationState, p_state);
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetGeneration(generation);
-            p_model->SetCellProliferativeType(cell_type);
 
             // Check the stem cell cycle time is still 24 hrs, otherwise
             // this test might not pass
@@ -254,6 +253,7 @@ public:
             TS_ASSERT_DELTA(p_model->GetSG2MDuration(), 10, 1e-12);
 
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(cell_type);
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
         }
@@ -286,7 +286,7 @@ public:
              cell_iter != crypt.End();
              ++cell_iter)
         {
-            CellProliferativeType type = cell_iter->GetCellCycleModel()->GetCellProliferativeType();
+            CellProliferativeType type = cell_iter->GetCellProliferativeType();
 
             if (type==STEM)
             {

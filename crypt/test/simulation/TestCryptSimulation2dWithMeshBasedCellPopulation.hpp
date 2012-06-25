@@ -515,7 +515,7 @@ public:
              cell_iter != crypt.End();
              ++cell_iter)
         {
-             TS_ASSERT(cell_iter->GetCellCycleModel()->GetCellProliferativeType() != DIFFERENTIATED);
+             TS_ASSERT(cell_iter->GetCellProliferativeType() != DIFFERENTIATED);
         }
 
         // Close the log file opened in this test

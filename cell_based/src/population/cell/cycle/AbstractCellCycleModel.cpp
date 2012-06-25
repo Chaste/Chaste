@@ -215,16 +215,6 @@ bool AbstractCellCycleModel::CanCellTerminallyDifferentiate()
     return true;
 }
 
-void AbstractCellCycleModel::SetCellProliferativeType(CellProliferativeType cellType)
-{
-    mCellProliferativeType = cellType;
-}
-
-CellProliferativeType AbstractCellCycleModel::GetCellProliferativeType() const
-{
-    return mCellProliferativeType;
-}
-
 void AbstractCellCycleModel::SetMinimumGapDuration(double minimumGapDuration)
 {
     assert(minimumGapDuration > 0.0);

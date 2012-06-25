@@ -67,36 +67,36 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
 
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-        p_model->SetCellProliferativeType(STEM);
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_model));
+        p_stem_cell->SetCellProliferativeType(STEM);
         p_stem_cell->InitialiseCellCycleModel();
         p_stem_cell->ReadyToDivide();
 
-        TS_ASSERT_EQUALS(p_stem_cell->GetCellCycleModel()->GetCellProliferativeType(),STEM);
+        TS_ASSERT_EQUALS(p_stem_cell->GetCellProliferativeType(),STEM);
 
-        p_stem_cell->GetCellCycleModel()->SetCellProliferativeType(TRANSIT);
+        p_stem_cell->SetCellProliferativeType(TRANSIT);
 
         p_stem_cell->ReadyToDivide();
 
-        TS_ASSERT_EQUALS(p_stem_cell->GetCellCycleModel()->GetCellProliferativeType(),TRANSIT);
+        TS_ASSERT_EQUALS(p_stem_cell->GetCellProliferativeType(),TRANSIT);
 
         // Test a Wnt dependent cell
         WntConcentration<2>::Instance()->SetConstantWntValueForTesting(0.0);
 
         WntCellCycleModel* p_cell_cycle_model1 = new WntCellCycleModel();
         p_cell_cycle_model1->SetDimension(2);
-        p_cell_cycle_model1->SetCellProliferativeType(TRANSIT);
         CellPtr p_wnt_cell(new Cell(p_healthy_state, p_cell_cycle_model1));
+        p_wnt_cell->SetCellProliferativeType(TRANSIT);
 
-        TS_ASSERT_EQUALS(p_wnt_cell->GetCellCycleModel()->GetCellProliferativeType(),TRANSIT);
+        TS_ASSERT_EQUALS(p_wnt_cell->GetCellProliferativeType(),TRANSIT);
 
         p_wnt_cell->InitialiseCellCycleModel();
 
-        TS_ASSERT_EQUALS(p_wnt_cell->GetCellCycleModel()->GetCellProliferativeType(),DIFFERENTIATED);
+        TS_ASSERT_EQUALS(p_wnt_cell->GetCellProliferativeType(),DIFFERENTIATED);
 
         p_wnt_cell->ReadyToDivide();
 
-        TS_ASSERT_EQUALS(p_wnt_cell->GetCellCycleModel()->GetCellProliferativeType(),DIFFERENTIATED);
+        TS_ASSERT_EQUALS(p_wnt_cell->GetCellProliferativeType(),DIFFERENTIATED);
 
         WntConcentration<2>::Instance()->SetConstantWntValueForTesting(1.0);
 
@@ -108,7 +108,7 @@ public:
 
         p_wnt_cell->ReadyToDivide();
 
-        TS_ASSERT_EQUALS(p_wnt_cell->GetCellCycleModel()->GetCellProliferativeType(),TRANSIT);
+        TS_ASSERT_EQUALS(p_wnt_cell->GetCellProliferativeType(),TRANSIT);
 
         // Tidy up
         WntConcentration<2>::Destroy();
@@ -133,8 +133,8 @@ public:
 
         WntCellCycleModel* p_cell_cycle_model1 = new WntCellCycleModel();
         p_cell_cycle_model1->SetDimension(2);
-        p_cell_cycle_model1->SetCellProliferativeType(TRANSIT);
         CellPtr p_wnt_cell(new Cell(p_healthy_state, p_cell_cycle_model1));
+        p_wnt_cell->SetCellProliferativeType(TRANSIT);
         p_wnt_cell->InitialiseCellCycleModel();
 
         double SG2MDuration = p_cell_cycle_model1->GetSG2MDuration();
@@ -221,8 +221,8 @@ public:
 
         StochasticWntCellCycleModel* p_cell_model = new StochasticWntCellCycleModel();
         p_cell_model->SetDimension(2);
-        p_cell_model->SetCellProliferativeType(TRANSIT);
         CellPtr p_wnt_cell(new Cell(p_healthy_state, p_cell_model));
+        p_wnt_cell->SetCellProliferativeType(TRANSIT);
         p_wnt_cell->InitialiseCellCycleModel();
 
         // These are the first three normal random with mean of usual G2 Duration (4hrs), s.d. 0.9 and this seed (0)
@@ -313,28 +313,28 @@ public:
 
         WntCellCycleModel* p_cell_cycle_model1 = new WntCellCycleModel();
         p_cell_cycle_model1->SetDimension(2);
-        p_cell_cycle_model1->SetCellProliferativeType(TRANSIT);
         CellPtr p_wnt_cell(new Cell(p_apc_one_hit_state, p_cell_cycle_model1));
+        p_wnt_cell->SetCellProliferativeType(TRANSIT);
         p_wnt_cell->InitialiseCellCycleModel();
 
         WntCellCycleModel* p_cell_cycle_model2 = new WntCellCycleModel();
         p_cell_cycle_model2->SetDimension(2);
-        p_cell_cycle_model2->SetCellProliferativeType(TRANSIT);
         CellPtr p_wnt_cell2(new Cell(p_bcat_one_hit_state, p_cell_cycle_model2));
+        p_wnt_cell2->SetCellProliferativeType(TRANSIT);
         p_wnt_cell2->InitialiseCellCycleModel();
 
         WntCellCycleModel* p_cell_cycle_model3 = new WntCellCycleModel();
         p_cell_cycle_model3->SetDimension(2);
-        p_cell_cycle_model3->SetCellProliferativeType(TRANSIT);
         CellPtr p_wnt_cell3(new Cell(p_apc_two_hit_state, p_cell_cycle_model3));
+        p_wnt_cell3->SetCellProliferativeType(TRANSIT);
         p_wnt_cell3->InitialiseCellCycleModel();
 
         WntCellCycleModel* p_cell_cycle_model4 = new WntCellCycleModel();
         p_cell_cycle_model4->SetDimension(2);
-        p_cell_cycle_model4->SetCellProliferativeType(TRANSIT);
         CellPropertyCollection collection;
         collection.AddProperty(p_label);
         CellPtr p_wnt_cell4(new Cell(p_wt_state, p_cell_cycle_model4, false, collection));
+        p_wnt_cell4->SetCellProliferativeType(TRANSIT);
         p_wnt_cell4->InitialiseCellCycleModel();
 
         TS_ASSERT_EQUALS(p_wnt_cell->ReadyToDivide(), false);

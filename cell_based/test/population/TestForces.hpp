@@ -799,9 +799,8 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
 
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-        p_model->SetCellProliferativeType(DIFFERENTIATED);
-
         CellPtr p_cell(new Cell(p_state, p_model));
+        p_cell->SetCellProliferativeType(DIFFERENTIATED);
         p_cell->SetBirthTime(-1.0);
         cells.push_back(p_cell);
 
@@ -924,8 +923,8 @@ public:
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
-        cells[0]->GetCellCycleModel()->SetCellProliferativeType(DIFFERENTIATED);
-        cells[4]->GetCellCycleModel()->SetCellProliferativeType(DIFFERENTIATED);
+        cells[0]->SetCellProliferativeType(DIFFERENTIATED);
+        cells[4]->SetCellProliferativeType(DIFFERENTIATED);
         for (unsigned i=0; i<cells.size(); i++)
         {
             double birth_time = 0.0 - 2*i;
@@ -1198,9 +1197,9 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-        p_model->SetCellProliferativeType(DIFFERENTIATED);
 
         CellPtr p_cell(new Cell(p_state, p_model));
+        p_cell->SetCellProliferativeType(DIFFERENTIATED);
         p_cell->SetBirthTime(-1.0);
         cells.push_back(p_cell);
 
@@ -1305,8 +1304,8 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-        p_model->SetCellProliferativeType(DIFFERENTIATED);
         CellPtr p_cell(new Cell(p_state, p_model));
+        p_cell->SetCellProliferativeType(DIFFERENTIATED);
         p_cell->SetBirthTime(-1.0);
         cells.push_back(p_cell);
 

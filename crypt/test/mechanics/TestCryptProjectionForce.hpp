@@ -88,8 +88,6 @@ public:
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-            p_model->SetCellProliferativeType(STEM);
-
             CellPtr p_cell(new Cell(p_state, p_model));
 
             if (i==4 || i==5)
@@ -100,6 +98,7 @@ public:
             {
                 p_cell->SetBirthTime(-10.0);
             }
+            p_cell->SetCellProliferativeType(STEM);
             cells.push_back(p_cell);
         }
 
@@ -271,9 +270,8 @@ public:
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-            p_model->SetCellProliferativeType(STEM);
-
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(STEM);
             p_cell->SetBirthTime(-10.0);
             cells.push_back(p_cell);
         }
@@ -355,9 +353,8 @@ public:
             for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {
                 FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-                p_model->SetCellProliferativeType(STEM);
-
                 CellPtr p_cell(new Cell(p_state, p_model));
+                p_cell->SetCellProliferativeType(STEM);
                 p_cell->SetBirthTime(-50.0);
                 cells.push_back(p_cell);
             }
@@ -415,7 +412,7 @@ private:
         for (unsigned i=0; i<rLocationIndices.size(); i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-            p_model->SetCellProliferativeType(STEM);
+
             CellPtr p_cell;
             if (i==60)
             {
@@ -426,6 +423,7 @@ private:
                 p_cell.reset(new Cell(p_state, p_model));
             }
             p_cell->SetBirthTime(-10);
+            p_cell->SetCellProliferativeType(STEM);
             rCells.push_back(p_cell);
         }
     }

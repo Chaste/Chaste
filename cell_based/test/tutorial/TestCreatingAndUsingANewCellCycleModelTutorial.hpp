@@ -140,7 +140,7 @@ private:
          * cell cycle, we set the G1 duration to {{{DBL_MAX}}}. */
         double uniform_random_number = RandomNumberGenerator::Instance()->ranf();
 
-        switch (mCellProliferativeType)
+        switch (mpCell->GetCellProliferativeType())
         {
             case STEM:
                 mG1Duration = -log(uniform_random_number)*GetStemCellG1Duration();
@@ -190,7 +190,6 @@ public:
         MyCellCycleModel* p_model = new MyCellCycleModel();
 
         p_model->SetBirthTime(mBirthTime);
-        p_model->SetCellProliferativeType(mCellProliferativeType);
         p_model->SetMinimumGapDuration(mMinimumGapDuration);
         p_model->SetStemCellG1Duration(mStemCellG1Duration);
         p_model->SetTransitCellG1Duration(mTransitCellG1Duration);
@@ -251,8 +250,8 @@ public:
         for (unsigned i=0; i<num_cells; i++)
         {
             MyCellCycleModel* p_cell_cycle_model = new MyCellCycleModel;
-            p_cell_cycle_model->SetCellProliferativeType(STEM);
             CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
+            p_cell->SetCellProliferativeType(STEM);
             p_cell->InitialiseCellCycleModel();
             cells.push_back(p_cell);
         }
@@ -271,8 +270,8 @@ public:
 
         /* Now construct another {{{MyCellCycleModel}}} and associated cell. */
         MyCellCycleModel* p_my_model = new MyCellCycleModel;
-        p_my_model->SetCellProliferativeType(TRANSIT);
         CellPtr p_my_cell(new Cell(p_state, p_my_model));
+        p_my_cell->SetCellProliferativeType(TRANSIT);
         p_my_cell->InitialiseCellCycleModel();
 
         /* Use the helper method {{{CheckReadyToDivideAndPhaseIsUpdated()}}} to
@@ -310,8 +309,8 @@ public:
 
             /* Create a cell with associated cell-cycle model. */
             MyCellCycleModel* p_model = new MyCellCycleModel;
-            p_model->SetCellProliferativeType(TRANSIT);
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(TRANSIT);
             p_cell->InitialiseCellCycleModel();
 
             /* Move forward two time steps. */
@@ -386,8 +385,8 @@ public:
         {
             /* For each node we create a cell with our cell-cycle model. */
             MyCellCycleModel* p_model = new MyCellCycleModel();
-            p_model->SetCellProliferativeType(STEM);
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(STEM);
 
             /* Now, we define a random birth time, chosen from [-T,0], where
              * T = t,,1,, + t,,2,,, where t,,1,, is a parameter representing the G,,1,, duration

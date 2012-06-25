@@ -87,9 +87,8 @@ public:
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-            p_model->SetCellProliferativeType(DIFFERENTIATED);
-
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(DIFFERENTIATED);
             double birth_time = 0.0 - elem_index;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);

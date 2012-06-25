@@ -80,8 +80,8 @@ public:
         for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-            p_model->SetCellProliferativeType(DIFFERENTIATED);
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
+            p_cell->SetCellProliferativeType(DIFFERENTIATED);
             double birth_time = 0.0 - node_index;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
@@ -145,8 +145,8 @@ public:
         for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-            p_model->SetCellProliferativeType(DIFFERENTIATED);
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
+            p_cell->SetCellProliferativeType(DIFFERENTIATED);
             double birth_time = 0.0 - node_index;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
@@ -235,11 +235,10 @@ public:
             // Do this here due to fixing #1972 and not wanting to change saved results
             p_model->SetStemCellG1Duration(1.0);
             p_model->SetTransitCellG1Duration(1.0);
-
-            p_model->SetCellProliferativeType(cell_type);
             p_model->SetGeneration(generation);
 
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
+            p_cell->SetCellProliferativeType(cell_type);
             p_cell->InitialiseCellCycleModel();
             p_cell->SetBirthTime(birth_time);
 
@@ -304,9 +303,9 @@ public:
             }
 
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-            p_model->SetCellProliferativeType(STEM);
 
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
+            p_cell->SetCellProliferativeType(STEM);
             p_cell->SetBirthTime(birth_time);
 
             cells.push_back(p_cell);
@@ -392,11 +391,10 @@ public:
             p_model->SetStemCellG1Duration(1.0);
             p_model->SetTransitCellG1Duration(1.0);
 
-
-            p_model->SetCellProliferativeType(cell_type);
             p_model->SetGeneration(generation);
 
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
+            p_cell->SetCellProliferativeType(cell_type);
             p_cell->InitialiseCellCycleModel();
             p_cell->SetBirthTime(birth_time);
 
@@ -483,9 +481,8 @@ public:
                 birth_time = 0;
             }
 
-            p_model->SetCellProliferativeType(cell_type);
-
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
+            p_cell->SetCellProliferativeType(cell_type);
             p_cell->SetBirthTime(birth_time);
 
             cells.push_back(p_cell);
@@ -565,7 +562,6 @@ public:
             }
 
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-            p_model->SetCellProliferativeType(cell_type);
             p_model->SetGeneration(generation);
 
             // The stem cell cycle time must still be 24 h, otherwise this test may not pass
@@ -574,6 +570,7 @@ public:
             TS_ASSERT_DELTA(p_model->GetSG2MDuration(), 10.0, 1e-12);
 
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
+            p_cell->SetCellProliferativeType(cell_type);
             p_cell->InitialiseCellCycleModel();
             p_cell->SetBirthTime(birth_time);
 
@@ -624,15 +621,15 @@ public:
 
             if (fabs(x) < 1e-2)
             {
-                TS_ASSERT_EQUALS(cell_iter->GetCellCycleModel()->GetCellProliferativeType(), STEM);
+                TS_ASSERT_EQUALS(cell_iter->GetCellProliferativeType(), STEM);
             }
             else if ((fabs(x-1) < 1e-2) || (fabs(x-2) < 1e-2))
             {
-                TS_ASSERT_EQUALS(cell_iter->GetCellCycleModel()->GetCellProliferativeType(), TRANSIT);
+                TS_ASSERT_EQUALS(cell_iter->GetCellProliferativeType(), TRANSIT);
             }
             else
             {
-                TS_ASSERT_EQUALS(cell_iter->GetCellCycleModel()->GetCellProliferativeType(), DIFFERENTIATED);
+                TS_ASSERT_EQUALS(cell_iter->GetCellProliferativeType(), DIFFERENTIATED);
             }
         }
     }
@@ -664,8 +661,8 @@ public:
             TS_ASSERT_DELTA(p_cell_cycle_model1->GetSG2MDuration(), 10.0, 1e-12);
 
             p_cell_cycle_model1->SetDimension(1);
-            p_cell_cycle_model1->SetCellProliferativeType(TRANSIT);
             CellPtr p_cell(new Cell(p_healthy_state, p_cell_cycle_model1));
+            p_cell->SetCellProliferativeType(TRANSIT);
             p_cell->SetBirthTime(0.0);
             cells.push_back(p_cell);
         }
@@ -781,10 +778,10 @@ public:
                 birth_time = 0;
             }
 
-            p_model->SetCellProliferativeType(cell_type);
             p_model->SetGeneration(generation);
 
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
+            p_cell->SetCellProliferativeType(cell_type);
             p_cell->SetBirthTime(birth_time);
 
             cells.push_back(p_cell);
@@ -930,10 +927,10 @@ public:
                 birth_time = 0; // hours
             }
 
-            p_model->SetCellProliferativeType(cell_type);
             p_model->SetGeneration(generation);
 
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
+            p_cell->SetCellProliferativeType(cell_type);
             p_cell->InitialiseCellCycleModel();
             p_cell->SetBirthTime(birth_time);
 

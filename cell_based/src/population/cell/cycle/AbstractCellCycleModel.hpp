@@ -85,7 +85,6 @@ private:
         archive & mG1Duration;
         archive & mReadyToDivide;
         archive & mDimension;
-        archive & mCellProliferativeType;
         archive & mMinimumGapDuration;
         archive & mStemCellG1Duration;
         archive & mTransitCellG1Duration;
@@ -125,12 +124,7 @@ protected:
     unsigned mDimension;
 
     /**
-     * The cell type - defined in CellProliferativeTypes.hpp.
-     */
-    CellProliferativeType mCellProliferativeType;
-
-    /**
-     * Minimum possbile duration of either of the gap phases (G1 or G2).
+     * Minimum possible duration of either of the gap phases (G1 or G2).
      * Has units of hours.
      *
      * Used to guarantee a strictly positive duration in cell-cycle models that
@@ -389,18 +383,6 @@ public:
      * Whether a cell with this cell-cycle model is able to fully (terminally) differentiate.
      */
     virtual bool CanCellTerminallyDifferentiate();
-
-    /**
-     * Get method for #mCellProliferativeType.
-     */
-    CellProliferativeType GetCellProliferativeType() const;
-
-    /**
-     * Set method for #mCellProliferativeType.
-     *
-     * @param cellType the cell's type
-     */
-    void SetCellProliferativeType(CellProliferativeType cellType);
 
     /**
      * @return mMinimumGapDuration

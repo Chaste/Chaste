@@ -88,10 +88,10 @@ public:
         {
             SimpleWntCellCycleModel* p_model = new SimpleWntCellCycleModel;
             p_model->SetDimension(2);
-            p_model->SetCellProliferativeType(TRANSIT);
             p_model->SetWntStemThreshold(0.95);
 
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(TRANSIT);
 
             p_cell->InitialiseCellCycleModel();
             double birth_time = - RandomNumberGenerator::Instance()->ranf()*

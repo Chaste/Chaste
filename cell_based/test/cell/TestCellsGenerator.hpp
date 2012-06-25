@@ -130,7 +130,7 @@ public:
             TS_ASSERT_LESS_THAN_EQUALS(cells[i]->GetBirthTime(), 0.0);
             TS_ASSERT_LESS_THAN_EQUALS(-24.0, cells[i]->GetBirthTime());
             TS_ASSERT_EQUALS(cells[i]->GetCellCycleModel()->GetDimension(), 2u);
-            TS_ASSERT_EQUALS(cells[i]->GetCellCycleModel()->GetCellProliferativeType(),TRANSIT);
+            TS_ASSERT_EQUALS(cells[i]->GetCellProliferativeType(),TRANSIT);
         }
 
         // Test exact random numbers as test re-seeds random number generator.
@@ -159,7 +159,7 @@ public:
             TS_ASSERT_LESS_THAN_EQUALS(cells[i]->GetBirthTime(), 0.0);
             TS_ASSERT_LESS_THAN_EQUALS(-24.0, cells[i]->GetBirthTime());
             TS_ASSERT_EQUALS(cells[i]->GetCellCycleModel()->GetDimension(), 2u);
-            TS_ASSERT_EQUALS(cells[i]->GetCellCycleModel()->GetCellProliferativeType(),TRANSIT);
+            TS_ASSERT_EQUALS(cells[i]->GetCellProliferativeType(),TRANSIT);
         }
 
         // Test exact random numbers as test re-seeds random number generator.

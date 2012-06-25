@@ -129,6 +129,16 @@ Cell::~Cell()
     delete mpCellCycleModel;
 }
 
+void Cell::SetCellProliferativeType(CellProliferativeType cellType)
+{
+    mCellProliferativeType = cellType;
+}
+
+CellProliferativeType Cell::GetCellProliferativeType() const
+{
+    return mCellProliferativeType;
+}
+
 void Cell::SetCellCycleModel(AbstractCellCycleModel* pCellCycleModel)
 {
     if (mpCellCycleModel != pCellCycleModel)
@@ -407,7 +417,9 @@ CellPtr Cell::Divide()
     // Create daughter cell with modified cell property collection
     CellPtr p_new_cell(new Cell(GetMutationState(), mpCellCycleModel->CreateCellCycleModel(), false, daughter_property_collection));
     // Initialise properties of daughter cell
+    p_new_cell->SetCellProliferativeType(mCellProliferativeType);
     p_new_cell->GetCellCycleModel()->InitialiseDaughterCell();
+
 
     return p_new_cell;
 }

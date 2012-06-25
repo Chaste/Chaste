@@ -69,8 +69,8 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
 
         TysonNovakCellCycleModel* p_model = new TysonNovakCellCycleModel();
-        p_model->SetCellProliferativeType(STEM);
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_model));
+        p_stem_cell->SetCellProliferativeType(STEM);
         p_stem_cell->InitialiseCellCycleModel();
 
         TS_ASSERT_EQUALS(p_stem_cell->ReadyToDivide(), false);
@@ -101,8 +101,8 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
 
         TysonNovakCellCycleModel* p_model = new TysonNovakCellCycleModel();
-        p_model->SetCellProliferativeType(STEM);
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_model));
+        p_stem_cell->SetCellProliferativeType(STEM);
         p_stem_cell->InitialiseCellCycleModel();
 
         std::vector<CellPtr> cells;
@@ -146,7 +146,7 @@ public:
             cell_iterator = cells.begin();
             while (cell_iterator < cells.end())
             {
-                switch ((*cell_iterator)->GetCellCycleModel()->GetCellProliferativeType())
+                switch ((*cell_iterator)->GetCellProliferativeType())
                 {
                     case STEM:
                         stem_cells[i]++;

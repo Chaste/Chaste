@@ -247,10 +247,9 @@ public:
             }
 
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-            p_model->SetCellProliferativeType(STEM);
             p_model->SetGeneration(0);
             CellPtr p_cell(new Cell(p_state, p_model));
-
+            p_cell->SetCellProliferativeType(STEM);
             p_cell->SetBirthTime(-RandomNumberGenerator::Instance()->ranf()*
                                  (p_model->GetStemCellG1Duration() + p_model->GetSG2MDuration()));
 

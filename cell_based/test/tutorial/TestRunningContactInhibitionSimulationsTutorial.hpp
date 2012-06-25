@@ -140,14 +140,15 @@ public:
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             ContactInhibitionCellCycleModel* p_cycle_model = new ContactInhibitionCellCycleModel();
-            p_cycle_model->SetCellProliferativeType(TRANSIT);
             p_cycle_model->SetDimension(2);
             p_cycle_model->SetBirthTime(-2.0*(double)i);
             p_cycle_model->SetQuiescentVolumeFraction(0.5);
             p_cycle_model->SetEquilibriumVolume(1.0);
 
             CellPtr p_cell(new Cell(p_state, p_cycle_model));
+            p_cell->SetCellProliferativeType(TRANSIT);
             p_cell->InitialiseCellCycleModel();
+
             cells.push_back(p_cell);
         }
 
@@ -242,24 +243,24 @@ public:
             if (i==1)
             {
                 StochasticDurationCellCycleModel* p_cycle_model = new StochasticDurationCellCycleModel();
-                p_cycle_model->SetCellProliferativeType(STEM);
                 p_cycle_model->SetBirthTime(-14.0);
                 p_cycle_model->SetStemCellG1Duration(1.0);
 
                 CellPtr p_cell(new Cell(p_state, p_cycle_model));
+                p_cell->SetCellProliferativeType(STEM);
                 p_cell->SetBirthTime(0.0);
                 cells.push_back(p_cell);
             }
             else
             {
                 ContactInhibitionCellCycleModel* p_cycle_model = new ContactInhibitionCellCycleModel();
-                p_cycle_model->SetCellProliferativeType(TRANSIT);
                 p_cycle_model->SetDimension(2);
                 p_cycle_model->SetBirthTime(-2.0*(double)i);
                 p_cycle_model->SetQuiescentVolumeFraction(0.8);
                 p_cycle_model->SetEquilibriumVolume(1.0);
 
                 CellPtr p_cell(new Cell(p_state, p_cycle_model));
+                p_cell->SetCellProliferativeType(TRANSIT);
                 p_cell->InitialiseCellCycleModel();
                 cells.push_back(p_cell);
             }
@@ -347,13 +348,13 @@ public:
         for (unsigned i=0; i<p_mesh->GetNumElements(); i++)
         {
             ContactInhibitionCellCycleModel* p_cycle_model = new ContactInhibitionCellCycleModel();
-            p_cycle_model->SetCellProliferativeType(TRANSIT);
             p_cycle_model->SetDimension(2);
             p_cycle_model->SetBirthTime(-(double)i - 2.0); // So all out of M phase
             p_cycle_model->SetQuiescentVolumeFraction(0.9);
             p_cycle_model->SetEquilibriumVolume(1.0);
 
             CellPtr p_cell(new Cell(p_state, p_cycle_model));
+            p_cell->SetCellProliferativeType(TRANSIT);
             p_cell->InitialiseCellCycleModel();
             cells.push_back(p_cell);
         }

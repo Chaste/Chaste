@@ -176,8 +176,8 @@ public:
 
         MAKE_PTR(WildTypeCellMutationState, p_state);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-        p_model->SetCellProliferativeType(STEM);
         CellPtr p_cell(new Cell(p_state, p_model));
+        p_cell->SetCellProliferativeType(STEM);
 
         double birth_time = 0.0 - p_mesh->GetNumElements()-1;
         p_cell->SetBirthTime(birth_time);
@@ -388,8 +388,8 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
 
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-        p_model->SetCellProliferativeType(STEM);
         CellPtr p_temp_cell(new Cell(p_state, p_model));
+        p_temp_cell->SetCellProliferativeType(STEM);
         p_temp_cell->SetBirthTime(-1);
 
         CellPtr p_new_cell = cell_population.AddCell(p_temp_cell, cell_division_vector, p_cell0);
@@ -468,9 +468,8 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-        p_model->SetCellProliferativeType(DIFFERENTIATED);
-
         CellPtr p_cell(new Cell(p_state, p_model));
+        p_cell->SetCellProliferativeType(DIFFERENTIATED);
         p_cell->SetBirthTime(-20.0);
         cells.push_back(p_cell);
 
@@ -488,8 +487,8 @@ public:
         cell_division_axis[1] = 0.0;
 
         FixedDurationGenerationBasedCellCycleModel* p_model2 = new FixedDurationGenerationBasedCellCycleModel();
-        p_model2->SetCellProliferativeType(STEM);
         CellPtr p_temp_cell(new Cell(p_state, p_model2));
+        p_temp_cell->SetCellProliferativeType(STEM);
         p_temp_cell->SetBirthTime(-1.0);
 
         CellPtr p_new_cell = cell_population.AddCell(p_temp_cell, cell_division_axis, p_cell);
@@ -544,9 +543,8 @@ public:
             }
 
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-            p_model->SetCellProliferativeType(cell_type);
-
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(cell_type);
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
         }
@@ -787,14 +785,14 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_state(cell_population.GetCellPropertyRegistry()->Get<ApoptoticCellProperty>());
         boost::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
 
-        cell_population.GetCellUsingLocationIndex(0)->GetCellCycleModel()->SetCellProliferativeType(TRANSIT);
+        cell_population.GetCellUsingLocationIndex(0)->SetCellProliferativeType(TRANSIT);
         cell_population.GetCellUsingLocationIndex(0)->AddCellProperty(p_label);
-        cell_population.GetCellUsingLocationIndex(1)->GetCellCycleModel()->SetCellProliferativeType(DIFFERENTIATED);
+        cell_population.GetCellUsingLocationIndex(1)->SetCellProliferativeType(DIFFERENTIATED);
         cell_population.GetCellUsingLocationIndex(1)->SetMutationState(p_apc1);
         cell_population.GetCellUsingLocationIndex(2)->SetMutationState(p_apc2);
         cell_population.GetCellUsingLocationIndex(3)->SetMutationState(p_bcat1);
         cell_population.GetCellUsingLocationIndex(4)->AddCellProperty(p_apoptotic_state);
-        cell_population.GetCellUsingLocationIndex(5)->GetCellCycleModel()->SetCellProliferativeType(STEM);
+        cell_population.GetCellUsingLocationIndex(5)->SetCellProliferativeType(STEM);
         cell_population.SetCellAncestorsToLocationIndices();
 
         cell_population.SetOutputCellMutationStates(true);

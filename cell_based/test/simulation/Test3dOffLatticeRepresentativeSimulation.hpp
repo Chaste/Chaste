@@ -190,8 +190,8 @@ public:
                                             ++real_node_iter)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-            p_model->SetCellProliferativeType(DIFFERENTIATED);
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(DIFFERENTIATED);
             cells.push_back(p_cell);
         }
 

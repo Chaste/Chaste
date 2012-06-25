@@ -131,10 +131,10 @@ public:
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
             DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
-            p_model->SetCellProliferativeType(DIFFERENTIATED);
             p_model->SetDimension(2);
 
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(DIFFERENTIATED);
             double birth_time = -RandomNumberGenerator::Instance()->ranf()*12.0;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
@@ -214,10 +214,10 @@ public:
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
-            p_model->SetCellProliferativeType(DIFFERENTIATED);
             p_model->SetDimension(2);
 
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(DIFFERENTIATED);
             double birth_time = -RandomNumberGenerator::Instance()->ranf()*12.0;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);

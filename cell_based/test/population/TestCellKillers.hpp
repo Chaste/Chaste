@@ -279,7 +279,7 @@ public:
              cell_iter != cell_population.End();
              ++cell_iter)
         {
-            cell_iter->GetCellCycleModel()->SetCellProliferativeType(STEM);
+            cell_iter->SetCellProliferativeType(STEM);
         }
 
         OxygenBasedCellKiller<2> oxygen_based_cell_killer(&cell_population);

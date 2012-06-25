@@ -484,8 +484,8 @@ public:
         // Create a new cell
         MAKE_PTR(WildTypeCellMutationState, p_state);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-        p_model->SetCellProliferativeType(STEM);
         CellPtr p_new_cell(new Cell(p_state, p_model));
+        p_new_cell->SetCellProliferativeType(STEM);
 
         // Add new cell to the cell population by dividing the cell
         AbstractCellPopulation<2>::Iterator cell_iter_1 = cell_population.Begin();
@@ -540,8 +540,8 @@ public:
         // Create a new cell
         MAKE_PTR(WildTypeCellMutationState, p_state);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-        p_model->SetCellProliferativeType(STEM);
         CellPtr p_new_cell(new Cell(p_state, p_model));
+        p_new_cell->SetCellProliferativeType(STEM);
 
         // Add new cell to the cell population by dividing the cell
         AbstractCellPopulation<2>::Iterator cell_iter_1 = cell_population.Begin();

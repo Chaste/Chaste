@@ -74,9 +74,9 @@ public:
 
         WntCellCycleModel* p_cell_cycle_model1 = new WntCellCycleModel();
         p_cell_cycle_model1->SetDimension(2);
-        p_cell_cycle_model1->SetCellProliferativeType(TRANSIT);
         boost::shared_ptr<AbstractCellMutationState> p_apc1(new ApcOneHitCellMutationState);
         CellPtr p_wnt_cell(new Cell(p_apc1, p_cell_cycle_model1));
+        p_wnt_cell->SetCellProliferativeType(TRANSIT);
         p_wnt_cell->InitialiseCellCycleModel();
 
         double s_g2_duration = p_cell_cycle_model1->GetSG2MDuration();
@@ -147,9 +147,9 @@ public:
 
         WntCellCycleModel* p_cell_cycle_model1 = new WntCellCycleModel();
         p_cell_cycle_model1->SetDimension(2);
-        p_cell_cycle_model1->SetCellProliferativeType(TRANSIT);
         boost::shared_ptr<AbstractCellMutationState> p_bcat1(new BetaCateninOneHitCellMutationState);
         CellPtr p_wnt_cell(new Cell(p_bcat1, p_cell_cycle_model1));
+        p_wnt_cell->SetCellProliferativeType(TRANSIT);
         p_wnt_cell->InitialiseCellCycleModel();
 
         double s_g2_duration = p_cell_cycle_model1->GetSG2MDuration();
@@ -221,9 +221,9 @@ public:
 
         WntCellCycleModel* p_cell_cycle_model1 = new WntCellCycleModel();
         p_cell_cycle_model1->SetDimension(2);
-        p_cell_cycle_model1->SetCellProliferativeType(TRANSIT);
         boost::shared_ptr<AbstractCellMutationState> p_apc2(new ApcTwoHitCellMutationState);
         CellPtr p_wnt_cell(new Cell(p_apc2, p_cell_cycle_model1));
+        p_wnt_cell->SetCellProliferativeType(TRANSIT);
         p_wnt_cell->InitialiseCellCycleModel();
 
         boost::shared_ptr<AbstractCellMutationState> p_this_state = p_wnt_cell->GetMutationState();

@@ -370,7 +370,6 @@ public:
             /* For each node we create a cell with our cell-cycle model and the wild-type cell mutation state.
              * We then add the property {{{MotileCellProperty}}} to a random selection of the cells, as follows. */
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-            p_model->SetCellProliferativeType(DIFFERENTIATED);
 
             CellPropertyCollection collection;
             if (RandomNumberGenerator::Instance()->ranf() < 0.2)
@@ -380,6 +379,7 @@ public:
             }
 
             CellPtr p_cell(new Cell(p_state, p_model, false, collection));
+            p_cell->SetCellProliferativeType(DIFFERENTIATED);
 
             /* Now, we define a random birth time, chosen from [-T,0], where
              * T = t,,1,, + t,,2,,, where t,,1,, is a parameter representing the G,,1,, duration

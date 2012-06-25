@@ -178,7 +178,7 @@ public:
         AbstractCellPopulation<1>::Iterator cell_iter = crypt.Begin();
 
         // Check is a stem cell
-        TS_ASSERT_EQUALS(cell_iter->GetCellCycleModel()->GetCellProliferativeType(), STEM);
+        TS_ASSERT_EQUALS(cell_iter->GetCellProliferativeType(), STEM);
 
         // Check initially at x=0
         TS_ASSERT_DELTA(crypt.GetLocationOfCellCentre(*cell_iter)[0], 0.0, 1e-6);
@@ -289,9 +289,9 @@ public:
 
         // Also move the second cell (which should be on y=0, and we make a transit cell)
         ++cell_iter;
-        TS_ASSERT_EQUALS(cell_iter->GetCellCycleModel()->GetCellProliferativeType(), STEM);
-        cell_iter->GetCellCycleModel()->SetCellProliferativeType(TRANSIT);
-        TS_ASSERT_EQUALS(cell_iter->GetCellCycleModel()->GetCellProliferativeType(), TRANSIT);
+        TS_ASSERT_EQUALS(cell_iter->GetCellProliferativeType(), STEM);
+        cell_iter->SetCellProliferativeType(TRANSIT);
+        TS_ASSERT_EQUALS(cell_iter->GetCellProliferativeType(), TRANSIT);
         TS_ASSERT_DELTA(crypt.GetLocationOfCellCentre(*cell_iter)[1], 0.0, 1e-6);
         crypt.GetNode(1)->rGetModifiableLocation()[1] = -0.1;
         TS_ASSERT_LESS_THAN(crypt.GetLocationOfCellCentre(*cell_iter)[1], 0.0);

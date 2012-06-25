@@ -634,11 +634,11 @@ public:
             }
 
             p_cell_cycle_model->SetGeneration(generation);
-            p_cell_cycle_model->SetCellProliferativeType(cell_type);
 
             boost::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
 
             CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
+            p_cell->SetCellProliferativeType(cell_type);
             p_cell->SetBirthTime(birth_time);
 
             if (std::find(location_indices.begin(), location_indices.end(), i) != location_indices.end())

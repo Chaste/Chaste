@@ -116,10 +116,10 @@ void CellsGenerator<CELL_CYCLE_MODEL,DIM>::GenerateBasic(std::vector<CellPtr>& r
     {
         CELL_CYCLE_MODEL* p_cell_cycle_model = new CELL_CYCLE_MODEL;
         p_cell_cycle_model->SetDimension(DIM);
-        p_cell_cycle_model->SetCellProliferativeType(cellProliferativeType);
 
         boost::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
         CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
+        p_cell->SetCellProliferativeType(cellProliferativeType);
 
         double birth_time;
         if (!locationIndices.empty())
@@ -150,10 +150,10 @@ void CellsGenerator<CELL_CYCLE_MODEL,DIM>::GenerateBasicRandom(std::vector<CellP
     {
         CELL_CYCLE_MODEL* p_cell_cycle_model = new CELL_CYCLE_MODEL;
         p_cell_cycle_model->SetDimension(DIM);
-        p_cell_cycle_model->SetCellProliferativeType(cellProliferativeType);
 
         boost::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
         CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
+        p_cell->SetCellProliferativeType(cellProliferativeType);
 
         double birth_time = -p_cell_cycle_model->GetAverageStemCellCycleTime()*RandomNumberGenerator::Instance()->ranf();
 
@@ -184,11 +184,11 @@ void CellsGenerator<CELL_CYCLE_MODEL,DIM>::GenerateGivenLocationIndices(std::vec
     {
         CELL_CYCLE_MODEL* p_cell_cycle_model = new CELL_CYCLE_MODEL;
         p_cell_cycle_model->SetDimension(DIM);
-        p_cell_cycle_model->SetCellProliferativeType(cellProliferativeType);
 
         boost::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
 
         CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
+        p_cell->SetCellProliferativeType(cellProliferativeType);
 
         double birth_time = 0.0 - locationIndices[i];
         p_cell->SetBirthTime(birth_time);

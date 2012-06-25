@@ -76,7 +76,6 @@ public:
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             StochasticDurationGenerationBasedCellCycleModel* p_model = new StochasticDurationGenerationBasedCellCycleModel();
-            p_model->SetCellProliferativeType(TRANSIT);
             p_model->SetMaxTransitGenerations(UINT_MAX);
             p_model->SetTransitCellG1Duration(1.0);
             p_model->SetStemCellG1Duration(1.0);
@@ -86,6 +85,7 @@ public:
                                  + p_model->GetSG2MDuration() );
 
             CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(TRANSIT);
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
         }

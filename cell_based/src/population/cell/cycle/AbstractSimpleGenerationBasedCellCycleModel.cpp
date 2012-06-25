@@ -51,9 +51,9 @@ void AbstractSimpleGenerationBasedCellCycleModel::ResetForDivision()
     mGeneration++;
     if (mGeneration > mMaxTransitGenerations)
     {
-        mCellProliferativeType = DIFFERENTIATED;
+        mpCell->SetCellProliferativeType(DIFFERENTIATED);
     }
-    if (mCellProliferativeType == STEM)
+    if (mpCell->GetCellProliferativeType() == STEM)
     {
         mGeneration = 0;
     }
@@ -75,10 +75,10 @@ void AbstractSimpleGenerationBasedCellCycleModel::InitialiseDaughterCell()
      * In generation-based cell-cycle models, the daughter cell
      * is always of type transit or differentiated.
      */
-    mCellProliferativeType = TRANSIT;
+    mpCell->SetCellProliferativeType(TRANSIT);
     if (mGeneration > mMaxTransitGenerations)
     {
-        mCellProliferativeType = DIFFERENTIATED;
+    	mpCell->SetCellProliferativeType(DIFFERENTIATED);
     }
     AbstractSimpleCellCycleModel::InitialiseDaughterCell();
 }

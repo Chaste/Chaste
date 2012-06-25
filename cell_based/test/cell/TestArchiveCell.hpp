@@ -77,7 +77,6 @@ public:
 
             // Create cell-cycle model
             FixedDurationGenerationBasedCellCycleModel* p_cell_model = new FixedDurationGenerationBasedCellCycleModel();
-            p_cell_model->SetCellProliferativeType(STEM);
 
             // Create cell property collection
             CellPropertyCollection collection;
@@ -86,6 +85,7 @@ public:
 
             // Create cell
             CellPtr p_cell(new Cell(p_healthy_state, p_cell_model, false, collection));
+            p_cell->SetCellProliferativeType(STEM);
             p_cell->InitialiseCellCycleModel();
             p_simulation_time->IncrementTimeOneStep();
 
@@ -155,7 +155,7 @@ public:
 
             TS_ASSERT_EQUALS(p_cell->GetAge(), 0.5);
             TS_ASSERT_EQUALS(static_cast<FixedDurationGenerationBasedCellCycleModel*>(p_cell->GetCellCycleModel())->GetGeneration(), 0u);
-            TS_ASSERT_EQUALS(p_cell->GetCellCycleModel()->GetCellProliferativeType(), STEM);
+            TS_ASSERT_EQUALS(p_cell->GetCellProliferativeType(), STEM);
 
             AbstractCellCycleModel* p_model = p_cell->GetCellCycleModel();
             TS_ASSERT_EQUALS(p_model->GetCell(), p_cell);
@@ -181,48 +181,6 @@ public:
         }
     }
 
-//    void TestFailingArchivingTest() throw(Exception)
-//    {
-//    	OutputFileHandler handler("archive", false);
-//		std::string archive_filename = handler.GetOutputDirectoryFullPath() + "cell.arch";
-//
-//		// Create and archive a cell cycle model
-//		{
-//			SimulationTime* p_simulation_time = SimulationTime::Instance();
-//			p_simulation_time->SetEndTimeAndNumberOfTimeSteps(2.0, 4);
-//
-//			// Create cell-cycle model
-//			FixedDurationGenerationBasedCellCycleModel* p_cell_model = new FixedDurationGenerationBasedCellCycleModel();
-//			p_cell_model->SetCellProliferativeType(STEM);
-//			p_cell_model->SetMDuration(60.0);
-//
-//			// Create an output archive
-//			std::ofstream ofs(archive_filename.c_str());
-//			boost::archive::text_oarchive output_arch(ofs);
-//
-//			// Write the cell cycle model to the archive
-//			output_arch << static_cast<const SimulationTime&> (*p_simulation_time);
-//			output_arch << p_cell_model;
-//
-//			// Tidy up
-//			SimulationTime::Destroy();
-//		}
-//
-//		// load the model.
-//		{
-//			SimulationTime* p_simulation_time = SimulationTime::Instance();
-//			p_simulation_time->SetStartTime(1.0);
-//			p_simulation_time->SetEndTimeAndNumberOfTimeSteps(2.0, 1); // will be restored
-//
-//			AbstractCellCycleModel* p_model;
-//
-//			std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
-//			boost::archive::text_iarchive input_arch(ifs);
-//
-//			input_arch >> *p_simulation_time;
-//			input_arch >> p_model;
-//		}
-//    }
 };
 
 #endif /*TESTARCHIVECELL_HPP_*/

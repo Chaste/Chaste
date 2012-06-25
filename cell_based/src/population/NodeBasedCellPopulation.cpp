@@ -481,7 +481,7 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         }
         if (this->mOutputCellProliferativeTypes)
         {
-            double cell_type = cell_iter->GetCellCycleModel()->GetCellProliferativeType();
+            double cell_type = cell_iter->GetCellProliferativeType();
             cell_types[node_index] = cell_type;
         }
         if (this->mOutputCellMutationStates)
