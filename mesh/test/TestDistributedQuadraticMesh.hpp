@@ -205,8 +205,15 @@ public:
 
     void TestConstructFromMeshReader2D() throw (Exception)
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic",2,1, false);
-        DistributedQuadraticMesh<2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+        EXIT_IF_PARALLEL; ///\todo #1930
+        if (!PetscTools::HasParMetis())
+        {
+            std::cout << "\n\nWarning: ParMetis is not installed. Mesh partitioning not tested." << std::endl;
+            return;
+        }
+
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic", 2, 1, false);
+        DistributedQuadraticMesh<2> mesh(DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Check we have the right number of nodes & elements

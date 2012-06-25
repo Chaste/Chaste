@@ -59,20 +59,18 @@ public:
 
     void TestMemfemToTetgen()
     {
-        TrianglesMeshWriter<3,3> mesh_writer("", "MeshFromMemfem");
+        // Clear the common output folder only in this test!
+        TrianglesMeshWriter<3,3> mesh_writer("TestMeshWriters", "MeshFromMemfem");
         MemfemMeshReader<3,3> import_mesh_reader("mesh/test/data/Memfem_slab");
-
         mesh_writer.WriteFilesUsingMeshReader(import_mesh_reader);
-        std::string output_dir = mesh_writer.GetOutputDirectory();
-        TrianglesMeshReader<3,3>* p_new_mesh_reader;
-        p_new_mesh_reader = new TrianglesMeshReader<3,3>(output_dir + "MeshFromMemfem");
 
-        delete p_new_mesh_reader;
+        std::string output_dir = mesh_writer.GetOutputDirectory();
+        TrianglesMeshReader<3,3> new_mesh_reader(output_dir + "MeshFromMemfem");
     }
 
     void TestFemlabToTriangles()
     {
-        TrianglesMeshWriter<2,2> mesh_writer("", "MeshFromFemlab");
+        TrianglesMeshWriter<2,2> mesh_writer("TestMeshWriters", "MeshFromFemlab", false);
 
         FemlabMeshReader<2,2> import_mesh_reader("mesh/test/data/",
                                                  "femlab_lshape_nodes.dat",
@@ -82,20 +80,17 @@ public:
         //TS_ASSERT_EQUALS(import_mesh_reader.GetNumFaces(), 54U); //Has internal faces
         TS_ASSERT_EQUALS(import_mesh_reader.GetNumFaces(), 40U); //Has no internal faces
         mesh_writer.WriteFilesUsingMeshReader(import_mesh_reader);
+
         std::string output_dir = mesh_writer.GetOutputDirectory();
-
-        TrianglesMeshReader<2,2>* p_new_mesh_reader;
-        p_new_mesh_reader = new TrianglesMeshReader<2,2>(output_dir + "MeshFromFemlab");
-        //TS_ASSERT_EQUALS(p_new_mesh_reader->GetNumFaces(), 54U); //No faces have been culled
-        TS_ASSERT_EQUALS(p_new_mesh_reader->GetNumFaces(), 40U); //No faces have been culled
-
-        delete p_new_mesh_reader;
+        TrianglesMeshReader<2,2> new_mesh_reader(output_dir + "MeshFromFemlab");
+        //TS_ASSERT_EQUALS(new_mesh_reader.GetNumFaces(), 54U); //No faces have been culled
+        TS_ASSERT_EQUALS(new_mesh_reader.GetNumFaces(), 40U); //No faces have been culled
     }
 
     void TestTrianglesToMeshalyzer1d()
     {
         TrianglesMeshReader<1,1> import_mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
-        MeshalyzerMeshWriter<1,1> mesh_writer("", "MeshFromTetgen");
+        MeshalyzerMeshWriter<1,1> mesh_writer("TestMeshWriters", "MeshFromTetgen1d", false);
 
         TS_ASSERT_THROWS_NOTHING(mesh_writer.WriteFilesUsingMeshReader(import_mesh_reader));
     }
@@ -103,7 +98,7 @@ public:
     void TestTrianglesToMeshalyzer2d()
     {
         TrianglesMeshReader<2,2> import_mesh_reader("mesh/test/data/2D_0_to_1mm_200_elements");
-        MeshalyzerMeshWriter<2,2> mesh_writer("", "MeshFromTetgen");
+        MeshalyzerMeshWriter<2,2> mesh_writer("TestMeshWriters", "MeshFromTetgen2d", false);
 
         TS_ASSERT_THROWS_NOTHING(mesh_writer.WriteFilesUsingMeshReader(import_mesh_reader));
     }
@@ -111,7 +106,7 @@ public:
     void TestTrianglesToMeshalyzer3d()
     {
         TrianglesMeshReader<3,3> import_mesh_reader("mesh/test/data/slab_138_elements");
-        MeshalyzerMeshWriter<3,3> mesh_writer("", "MeshFromTetgen");
+        MeshalyzerMeshWriter<3,3> mesh_writer("TestMeshWriters", "MeshFromTetgen3d", false);
 
         TS_ASSERT_THROWS_NOTHING(mesh_writer.WriteFilesUsingMeshReader(import_mesh_reader));
     }
@@ -119,7 +114,7 @@ public:
     void TestTrianglesToMeshalyzer1dIn3d()
     {
         TrianglesMeshReader<1,3> import_mesh_reader("mesh/test/data/trivial_1d_in_3d_mesh");
-        MeshalyzerMeshWriter<1,3> mesh_writer("", "Mesh");
+        MeshalyzerMeshWriter<1,3> mesh_writer("TestMeshWriters", "Mesh1dIn3d", false);
 
         TS_ASSERT_THROWS_NOTHING(mesh_writer.WriteFilesUsingMeshReader(import_mesh_reader));
     }
@@ -136,7 +131,7 @@ public:
 
     void TestFemlabtoTrianglesViaMesh()
     {
-        TrianglesMeshWriter<2,2> mesh_writer("", "MeshFromFemlabViaMesh");
+        TrianglesMeshWriter<2,2> mesh_writer("TestMeshWriters", "MeshFromFemlabViaMesh", false);
 
         FemlabMeshReader<2,2> import_mesh_reader("mesh/test/data/",
                                                  "femlab_lshape_nodes.dat",
@@ -151,17 +146,14 @@ public:
         mesh_writer.WriteFilesUsingMesh(mesh);
         std::string output_dir = mesh_writer.GetOutputDirectory();
 
-        TrianglesMeshReader<2,2>* p_new_mesh_reader;
-        p_new_mesh_reader = new TrianglesMeshReader<2,2>(output_dir + "MeshFromFemlabViaMesh");
-        TS_ASSERT_EQUALS(p_new_mesh_reader->GetNumFaces(), 40U); //Internal faces have been culled
-
-        delete p_new_mesh_reader;
+        TrianglesMeshReader<2,2> new_mesh_reader(output_dir + "MeshFromFemlabViaMesh");
+        TS_ASSERT_EQUALS(new_mesh_reader.GetNumFaces(), 40U); //Internal faces have been culled
     }
 
     void TestTrianglesToMeshalyzerViaMesh1d()
     {
         TrianglesMeshReader<1,1> import_mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
-        MeshalyzerMeshWriter<1,1> mesh_writer("", "MeshFromTetgenViaMesh");
+        MeshalyzerMeshWriter<1,1> mesh_writer("TestMeshWriters", "MeshFromTetgenViaMesh1", false);
 
         TetrahedralMesh<1,1> mesh;
         mesh.ConstructFromMeshReader(import_mesh_reader);
@@ -172,7 +164,7 @@ public:
     void TestTrianglesToMeshalyzerViaMesh2d()
     {
         TrianglesMeshReader<2,2> import_mesh_reader("mesh/test/data/2D_0_to_1mm_200_elements");
-        MeshalyzerMeshWriter<2,2> mesh_writer("", "MeshFromTetgenViaMesh");
+        MeshalyzerMeshWriter<2,2> mesh_writer("TestMeshWriters", "MeshFromTetgenViaMesh2", false);
 
         TetrahedralMesh<2,2> mesh;
         mesh.ConstructFromMeshReader(import_mesh_reader);
@@ -183,7 +175,7 @@ public:
     void TestTrianglesToMeshalyzerViaMesh3d()
     {
         TrianglesMeshReader<3,3> import_mesh_reader("mesh/test/data/slab_138_elements");
-        MeshalyzerMeshWriter<3,3> mesh_writer("", "MeshFromTetgenViaMesh");
+        MeshalyzerMeshWriter<3,3> mesh_writer("TestMeshWriters", "MeshFromTetgenViaMesh3", false);
 
         TetrahedralMesh<3,3> mesh;
         mesh.ConstructFromMeshReader(import_mesh_reader);
@@ -225,7 +217,7 @@ public:
         TetrahedralMesh<1,2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        TrianglesMeshWriter<1,2> mesh_writer("", "1dClosedMeshIn2dSpace");
+        TrianglesMeshWriter<1,2> mesh_writer("TestMeshWriters", "1dClosedMeshIn2dSpace", false);
 
         TS_ASSERT_THROWS_NOTHING(mesh_writer.WriteFilesUsingMesh(mesh));
 
@@ -246,7 +238,7 @@ public:
         TetrahedralMesh<1,2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        TrianglesMeshWriter<1,2> mesh_writer("", "1dMeshIn2dSpace");
+        TrianglesMeshWriter<1,2> mesh_writer("TestMeshWriters", "1dMeshIn2dSpace", false);
         mesh_writer.SetWriteFilesAsBinary();
 
         TS_ASSERT_THROWS_NOTHING(mesh_writer.WriteFilesUsingMesh(mesh));
@@ -270,10 +262,10 @@ public:
         mesh.ConstructFromMeshReader(mesh_reader);
         mesh.DeleteBoundaryNodeAt(0);
 
-        TrianglesMeshWriter<1,2> mesh_writer("", "1dMeshIn2dSpaceWithDeletedNode");
+        TrianglesMeshWriter<1,2> mesh_writer("TestMeshWriters", "1dMeshIn2dSpaceWithDeletedNode", false);
         TS_ASSERT_THROWS_NOTHING(mesh_writer.WriteFilesUsingMesh(mesh));
 
-        TrianglesMeshWriter<1,2> mesh_writer2("", "1dMeshIn2dSpaceWithDeletedNodeConst");
+        TrianglesMeshWriter<1,2> mesh_writer2("TestMeshWriters", "1dMeshIn2dSpaceWithDeletedNodeConst", false);
         //mesh_writer2.WriteFilesUsingMesh(static_cast<const MutableMesh<1,2> &>(mesh));
         mesh_writer2.WriteFilesUsingMesh(mesh);
 
@@ -296,7 +288,7 @@ public:
         TetrahedralMesh<2,3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        TrianglesMeshWriter<2,3> mesh_writer("", "2dClosedMeshIn3dSpace");
+        TrianglesMeshWriter<2,3> mesh_writer("TestMeshWriters", "2dClosedMeshIn3dSpace", false);
 
         TS_ASSERT_THROWS_NOTHING(mesh_writer.WriteFilesUsingMesh(mesh));
 
@@ -315,7 +307,7 @@ public:
         TetrahedralMesh<2,3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        TrianglesMeshWriter<2,3> mesh_writer("", "2dMeshIn3dSpace");
+        TrianglesMeshWriter<2,3> mesh_writer("TestMeshWriters", "2dMeshIn3dSpace", false);
         mesh_writer.SetWriteFilesAsBinary();
 
         TS_ASSERT_THROWS_NOTHING(mesh_writer.WriteFilesUsingMesh(mesh));
@@ -338,7 +330,7 @@ public:
         QuadraticMesh<1> mesh;
         TrianglesMeshReader<1,1> mesh_reader1("mesh/test/data/1D_0_to_1_10_elements_quadratic", 2, 1, false);
         mesh.ConstructFromMeshReader(mesh_reader1);
-        TrianglesMeshWriter<1,1> mesh_writer("", "1d_quadratic");
+        TrianglesMeshWriter<1,1> mesh_writer("TestMeshWriters", "1d_quadratic", false);
         TS_ASSERT_THROWS_NOTHING(mesh_writer.WriteFilesUsingMesh(mesh));
 
         std::string output_dir = mesh_writer.GetOutputDirectory();
@@ -362,7 +354,7 @@ public:
         QuadraticMesh<2> mesh;
         TrianglesMeshReader<2,2> mesh_reader1("mesh/test/data/square_128_elements_fully_quadratic", 2, 2, false);
         mesh.ConstructFromMeshReader(mesh_reader1);
-        TrianglesMeshWriter<2,2> mesh_writer("", "2d_quadratic");
+        TrianglesMeshWriter<2,2> mesh_writer("TestMeshWriters", "2d_quadratic", false);
         TS_ASSERT_THROWS_NOTHING(mesh_writer.WriteFilesUsingMesh(mesh));
 
         std::string output_dir = mesh_writer.GetOutputDirectory();
@@ -386,7 +378,7 @@ public:
         QuadraticMesh<3> mesh;
         TrianglesMeshReader<3,3> mesh_reader1("mesh/test/data/3D_Single_tetrahedron_element_quadratic", 2, 1, false);
         mesh.ConstructFromMeshReader(mesh_reader1);
-        TrianglesMeshWriter<3,3> mesh_writer("", "3d_quadratic");
+        TrianglesMeshWriter<3,3> mesh_writer("TestMeshWriters", "3d_quadratic", false);
         TS_ASSERT_THROWS_NOTHING(mesh_writer.WriteFilesUsingMesh(mesh));
 
         std::string output_dir = mesh_writer.GetOutputDirectory();
@@ -531,9 +523,9 @@ public:
         mesh.Scale(1.0, 2.0); // historical reasons
 
         CmguiDeformedSolutionsWriter<2> writer("TestCmguiDeformedSolutionsWriter",
-                                                "solution",
-                                                mesh,
-                                                WRITE_LINEAR_MESH);
+                                               "solution",
+                                               mesh,
+                                               WRITE_LINEAR_MESH);
 
         // writes solution_0.exnode and solution_0.exelem using the mesh
         writer.WriteInitialMesh();
@@ -615,9 +607,9 @@ public:
         }
 
         CmguiDeformedSolutionsWriter<2> writer("TestCmguiDeformedSolutionsWriterQuadViz",
-                                                "solution_2d_quadviz",
-                                                mesh,
-                                                WRITE_QUADRATIC_MESH);
+                                               "solution_2d_quadviz",
+                                               mesh,
+                                               WRITE_QUADRATIC_MESH);
 
         // Writes solution_0.exnode and solution_0.exelem using the mesh
         writer.WriteInitialMesh();
@@ -685,9 +677,9 @@ public:
         }
 
         CmguiDeformedSolutionsWriter<3> writer("TestCmguiDeformedSolutionsWriterQuadViz3d",
-                                                "solution_3d_quadviz",
-                                                mesh,
-                                                WRITE_QUADRATIC_MESH);
+                                               "solution_3d_quadviz",
+                                               mesh,
+                                               WRITE_QUADRATIC_MESH);
 
         // Writes solution_0.exnode and solution_0.exelem using the mesh
         writer.WriteInitialMesh();
@@ -855,13 +847,13 @@ public:
         /*Read as ascii*/
         TrianglesMeshReader<3,3> reader("mesh/test/data/simple_cube");
 
-        TrianglesMeshWriter<3,3> writer_from_reader("TestMeshWriter", "simple_cube_binary_from_reader", false);
+        TrianglesMeshWriter<3,3> writer_from_reader("TestMeshWriters", "simple_cube_binary_from_reader", false);
         writer_from_reader.SetWriteFilesAsBinary();
         writer_from_reader.WriteFilesUsingMeshReader(reader);
 
         TetrahedralMesh<3,3> mesh;
         mesh.ConstructFromMeshReader(reader);
-        TrianglesMeshWriter<3,3> writer_from_mesh("TestMeshWriter", "simple_cube_binary_from_mesh", false);
+        TrianglesMeshWriter<3,3> writer_from_mesh("TestMeshWriters", "simple_cube_binary_from_mesh", false);
         writer_from_mesh.SetWriteFilesAsBinary();
         writer_from_mesh.WriteFilesUsingMesh(mesh);
         std::string results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "TestMeshWriter/";

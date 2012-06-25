@@ -186,7 +186,7 @@ public:
     Node<SPACE_DIM>* GetNode(unsigned index) const;
 
     /**
-     * Get the node with a given index in the mesh (synonym of GetNode()).
+     * Get the node with a given index in the mesh (synonym of GetNode() unless overridden in a distributed mesh).
      *
      * @param index the global index of the node
      * @return a pointer to the node.

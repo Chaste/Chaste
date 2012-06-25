@@ -35,6 +35,29 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "QuadraticMeshHelper.hpp"
 
+#define SEEK_TO_CONTENT(methNameDirect, methNameIncrement, index) \
+    if (index > 0u) {                                             \
+        if (rMeshReader.IsFileFormatBinary()) {                   \
+            rMeshReader.methNameDirect(index - 1u);               \
+        } else {                                                  \
+            for (unsigned i=0; i<index-1u; ++i) {                 \
+                rMeshReader.methNameIncrement();                  \
+    } } }
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void SeekToElement(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
+                   unsigned elementIndex)
+{
+    SEEK_TO_CONTENT(GetElementData, GetNextElementData, elementIndex);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void SeekToBoundaryElement(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
+                           unsigned boundaryElementIndex)
+{
+    SEEK_TO_CONTENT(GetFaceData, GetNextFaceData, boundaryElementIndex);
+}
+
 template<unsigned DIM>
 void QuadraticMeshHelper<DIM>::AddInternalNodesToElements(AbstractTetrahedralMesh<DIM, DIM>* pMesh,
                                                           TrianglesMeshReader<DIM,DIM>* pMeshReader)
@@ -42,24 +65,30 @@ void QuadraticMeshHelper<DIM>::AddInternalNodesToElements(AbstractTetrahedralMes
     assert(pMesh);
     assert(pMeshReader);
 
-    pMeshReader->Reset();
-
-    // Add the extra nodes (1 extra node in 1D, 3 in 2D, 6 in 3D) to the element data
-    for (unsigned i=0; i<pMesh->GetNumElements(); i++)
+    if (pMesh->GetNumLocalElements() > 0u)
     {
-        std::vector<unsigned> nodes = pMeshReader->GetNextElementData().NodeIndices;
-        assert(nodes.size()==(DIM+1)*(DIM+2)/2);
-        assert(pMesh->GetElement(i)->GetNumNodes()==DIM+1); // element is initially linear
+        pMeshReader->Reset();
+        SeekToElement(*pMeshReader, pMesh->GetElementIteratorBegin()->GetIndex());
 
-        // Add extra nodes to make it a quad element
-        for (unsigned j=DIM+1; j<(DIM+1)*(DIM+2)/2; j++)
+        // Add the extra nodes (1 extra node in 1D, 3 in 2D, 6 in 3D) to the element data
+        for (typename AbstractTetrahedralMesh<DIM,DIM>::ElementIterator iter = pMesh->GetElementIteratorBegin();
+             iter != pMesh->GetElementIteratorEnd();
+             ++iter)
         {
-            pMesh->GetElement(i)->AddNode( pMesh->GetNode(nodes[j]) );
-            pMesh->GetNode(nodes[j])->AddElement(pMesh->GetElement(i)->GetIndex());
-            pMesh->GetNode(nodes[j])->MarkAsInternal();
+            std::vector<unsigned> nodes = pMeshReader->GetNextElementData().NodeIndices;
+            assert(nodes.size()==(DIM+1)*(DIM+2)/2);
+            assert(iter->GetNumNodes()==DIM+1); // Element is initially linear
+
+            // Add extra nodes to make it a quad element
+            for (unsigned j=DIM+1; j<(DIM+1)*(DIM+2)/2; j++)
+            {
+                Node<DIM>* p_node = pMesh->GetNodeOrHaloNode(nodes[j]);
+                iter->AddNode(p_node);
+                p_node->AddElement(iter->GetIndex());
+                p_node->MarkAsInternal();
+            }
         }
     }
-
 }
 
 template<unsigned DIM>
@@ -69,12 +98,13 @@ void QuadraticMeshHelper<DIM>::AddInternalNodesToBoundaryElements(AbstractTetrah
     assert(pMesh);
     assert(pMeshReader);
     // We only have boundary elements in 2d or 3d
-    if (DIM > 1)
+    if (DIM > 1 && pMesh->GetNumLocalBoundaryElements() > 0u)
     {
         // If the data is on disk our job is easy
         if (pMeshReader->GetOrderOfBoundaryElements() == 2u)
         {
             pMeshReader->Reset();
+            SeekToBoundaryElement(*pMeshReader, (*pMesh->GetBoundaryElementIteratorBegin())->GetIndex());
             for (typename AbstractTetrahedralMesh<DIM,DIM>::BoundaryElementIterator iter
                      = pMesh->GetBoundaryElementIteratorBegin();
                  iter != pMesh->GetBoundaryElementIteratorEnd();
@@ -87,7 +117,7 @@ void QuadraticMeshHelper<DIM>::AddInternalNodesToBoundaryElements(AbstractTetrah
 
                 for (unsigned j=DIM; j<DIM*(DIM+1)/2; j++)
                 {
-                    Node<DIM> *p_internal_node = pMesh->GetNode(nodes[j]);
+                    Node<DIM> *p_internal_node = pMesh->GetNodeOrHaloNode(nodes[j]);
                     AddNodeToBoundaryElement(pMesh, *iter, p_internal_node);
                 }
             }
@@ -117,6 +147,7 @@ void QuadraticMeshHelper<DIM>::AddNodesToBoundaryElements(AbstractTetrahedralMes
         if (boundary_element_file_has_containing_element_info)
         {
             pMeshReader->Reset();
+            SeekToBoundaryElement(*pMeshReader, (*pMesh->GetBoundaryElementIteratorBegin())->GetIndex());
         }
 
         for (typename AbstractTetrahedralMesh<DIM,DIM>::BoundaryElementIterator iter

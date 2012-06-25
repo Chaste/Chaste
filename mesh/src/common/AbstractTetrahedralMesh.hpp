@@ -340,6 +340,11 @@ public:
     virtual unsigned GetNumBoundaryElements() const;
 
     /**
+     * Get the number of local boundary elements that are in use on this process (only over-ridden when the mesh is distributed).
+     */
+    virtual unsigned GetNumLocalBoundaryElements() const;
+
+    /**
      * Get the total number of elements (including those marked as deleted).
      */
     unsigned GetNumAllElements() const;

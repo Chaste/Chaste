@@ -179,16 +179,18 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ComputeMeshPartitioning
                 bool element_owned = false;
                 std::set<unsigned> temp_halo_nodes;
 
-                for (unsigned i=0; i<ELEMENT_DIM+1; i++)
+                for (std::vector<unsigned>::const_iterator it = element_data.NodeIndices.begin();
+                     it != element_data.NodeIndices.end();
+                     ++it)
                 {
-                    if (rNodesOwned.find(element_data.NodeIndices[i]) != rNodesOwned.end())
+                    if (rNodesOwned.find(*it) != rNodesOwned.end())
                     {
                         element_owned = true;
                         rElementsOwned.insert(element_number);
                     }
                     else
                     {
-                        temp_halo_nodes.insert(element_data.NodeIndices[i]);
+                        temp_halo_nodes.insert(*it);
                     }
                 }
 
@@ -635,18 +637,18 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 Node<SPACE_DIM> * DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNodeOrHaloNode(unsigned index) const
 {
     std::map<unsigned, unsigned>::const_iterator node_position;
-    //First search the halo
+    // First search the halo (expected to be a smaller map so quicker)
     if ((node_position=mHaloNodesMapping.find(index)) != mHaloNodesMapping.end())
     {
         return mHaloNodes[node_position->second];
     }
-    //First search the owned node
+    // Next search the owned node
     if ((node_position=mNodesMapping.find(index)) != mNodesMapping.end())
     {
         //Found an owned node
         return this->mNodes[node_position->second];
     }
-    //Not here
+    // Not here
     EXCEPTION("Requested node/halo " << index << " does not belong to processor " << PetscTools::GetMyRank());
 }
 
@@ -1207,11 +1209,12 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::Scale(const double xFac
 
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndElementPartitioning(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
-                                                                                       std::set<unsigned>& rElementsOwned,
-                                                                                       std::set<unsigned>& rNodesOwned,
-                                                                                       std::set<unsigned>& rHaloNodesOwned,
-                                                                                       std::vector<unsigned>& rProcessorsOffset)
+void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndElementPartitioning(
+        AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
+        std::set<unsigned>& rElementsOwned,
+        std::set<unsigned>& rNodesOwned,
+        std::set<unsigned>& rHaloNodesOwned,
+        std::vector<unsigned>& rProcessorsOffset)
 {
     assert(PetscTools::IsParallel());
     assert(ELEMENT_DIM==2 || ELEMENT_DIM==3); // Metis works with triangles and tetras
@@ -1345,13 +1348,11 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
 
     unsigned num_nodes = rMeshReader.GetNumNodes();
 
-    //unsigned global_node_partition[num_nodes]; // initialised to UNASSIGNED (do #define UNASSIGNED -1
-    std::vector<unsigned> global_node_partition;
-    global_node_partition.resize(num_nodes, UNASSIGNED_NODE);
+    // Initialise with no nodes known
+    std::vector<unsigned> global_node_partition(num_nodes, UNASSIGNED_NODE);
 
     assert(rProcessorsOffset.size() == 0); // Making sure the vector is empty. After calling resize() only newly created memory will be initialised to 0.
     rProcessorsOffset.resize(PetscTools::GetNumProcs(), 0);
-
 
     /*
      *  Work out node distribution based on initial element distribution returned by ParMETIS
@@ -1367,10 +1368,11 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     {
         RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
         p_gen->Reseed(0);
-        p_gen->Shuffle(mTotalNumElements,element_access_order);
+        p_gen->Shuffle(mTotalNumElements, element_access_order);
     }
     else
     {
+        element_access_order.reserve(mTotalNumElements);
         for (unsigned element_number = 0; element_number < mTotalNumElements; element_number++)
         {
             element_access_order.push_back(element_number);
@@ -1394,20 +1396,22 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
             element_data = rMeshReader.GetNextElementData();
         }
 
-        for (unsigned i=0; i<ELEMENT_DIM+1; i++)
+        for (std::vector<unsigned>::const_iterator node_it = element_data.NodeIndices.begin();
+             node_it != element_data.NodeIndices.end();
+             ++node_it)
         {
             /*
              * For each node in this element, check whether it hasn't been assigned to another processor yet.
-             * If so, assign it to the owner the element. Otherwise, consider it halo.
+             * If so, assign it to the owner of the element. Otherwise, consider it halo.
              */
-            if ( global_node_partition[element_data.NodeIndices[i]] == UNASSIGNED_NODE )
+            if ( global_node_partition[*node_it] == UNASSIGNED_NODE )
             {
                 if (element_owner == local_proc_index)
                 {
-                    rNodesOwned.insert(element_data.NodeIndices[i]);
+                    rNodesOwned.insert(*node_it);
                 }
 
-                global_node_partition[element_data.NodeIndices[i]] = element_owner;
+                global_node_partition[*node_it] = element_owner;
 
                 // Offset is defined as the first node owned by a processor. We compute it incrementally.
                 // i.e. if node_index belongs to proc 3 (of 6) we have to shift the processors 4, 5, and 6
@@ -1421,10 +1425,10 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
             {
                 if (element_owner == local_proc_index)
                 {
-                    //if (rNodesOwned.find(element_data.NodeIndices[i]) == rNodesOwned.end())
-                    if (global_node_partition[element_data.NodeIndices[i]] != local_proc_index)
+                    //if (rNodesOwned.find(*node_it) == rNodesOwned.end())
+                    if (global_node_partition[*node_it] != local_proc_index)
                     {
-                        rHaloNodesOwned.insert(element_data.NodeIndices[i]);
+                        rHaloNodesOwned.insert(*node_it);
                     }
                 }
             }
@@ -1447,16 +1451,18 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
         bool element_owned = false;
         std::set<unsigned> temp_halo_nodes;
 
-        for (unsigned i=0; i<ELEMENT_DIM+1; i++)
+        for (std::vector<unsigned>::const_iterator node_it = element_data.NodeIndices.begin();
+             node_it != element_data.NodeIndices.end();
+             ++node_it)
         {
-            if (rNodesOwned.find(element_data.NodeIndices[i]) != rNodesOwned.end())
+            if (rNodesOwned.find(*node_it) != rNodesOwned.end())
             {
                 element_owned = true;
                 rElementsOwned.insert(element_number);
             }
             else
             {
-                temp_halo_nodes.insert(element_data.NodeIndices[i]);
+                temp_halo_nodes.insert(*node_it);
             }
         }
 
@@ -1478,7 +1484,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     for (unsigned node_index=0; node_index<this->GetNumNodes(); node_index++)
     {
         unsigned partition = global_node_partition[node_index];
-        assert(partition!=UNASSIGNED_NODE);
+        assert(partition != UNASSIGNED_NODE);
 
         this->mNodesPermutation[node_index] = rProcessorsOffset[partition] + local_index[partition];
 

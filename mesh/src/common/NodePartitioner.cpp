@@ -33,6 +33,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 #include <cassert>
+#include <algorithm>
 
 #include "Exception.hpp"
 #include "NodePartitioner.hpp"
@@ -218,6 +219,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
     if(!PetscTools::HasParMetis()) //We must have ParMetis support compiled into Petsc
     {
         #define COVERAGE_IGNORE
+        ///\todo (#1930)  Should this be stronger?
         WARNING("Petsc had not been installed with ParMetis support.");
         #undef COVERAGE_IGNORE
     }
@@ -410,11 +412,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
     //AOView(ordering, PETSC_VIEWER_STDOUT_WORLD);
 
     // Fill in rNodesOwned
-    ///\todo do something smarter with iterators...
-    for (unsigned i=0; i<my_num_nodes; i++)
-    {
-        rNodesOwned.insert(local_range[i]);
-    }
+    rNodesOwned.insert(local_range, local_range + my_num_nodes);
     delete[] local_range;
 
     // Once we know the offsets we can compute the permutation vector
@@ -426,11 +424,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
     AOPetscToApplication(ordering, num_nodes, global_range);
 
     rNodesPermutation.resize(num_nodes);
-
-    for (unsigned node_index=0; node_index<num_nodes; node_index++)
-    {
-        rNodesPermutation[node_index] = global_range[node_index];
-    }
+    std::copy(global_range, global_range+num_nodes, rNodesPermutation.begin());
     delete[] global_range;
 
     AODestroy(PETSC_DESTROY_PARAM(ordering));

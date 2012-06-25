@@ -101,13 +101,19 @@ unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNumAllElements() co
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNumAllBoundaryElements() const
+unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNumBoundaryElements() const
 {
     return mBoundaryElements.size();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNumBoundaryElements() const
+unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNumLocalBoundaryElements() const
+{
+    return GetNumBoundaryElements();
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNumAllBoundaryElements() const
 {
     return mBoundaryElements.size();
 }

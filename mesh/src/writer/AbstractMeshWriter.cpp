@@ -129,12 +129,10 @@ void AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMeshReader(
     ///Only triangles mesh readers know about cable elements
     mNumCableElements = mpMeshReader->GetNumCableElements();
 
-    if (!PetscTools::AmMaster())
+    if (PetscTools::AmMaster())
     {
-        return;
+        WriteFiles();
     }
-
-    WriteFiles();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

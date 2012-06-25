@@ -1,3 +1,4 @@
 TestDistributedTetrahedralMesh.hpp
+TestDistributedQuadraticMesh.hpp
 TestMixedDimensionMesh.hpp
 writer/TestVtkMeshWriter.hpp
