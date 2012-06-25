@@ -203,6 +203,8 @@ public:
 
         // Increment time to a time after cell death
         p_simulation_time->IncrementTimeOneStep();
+        TS_ASSERT_DELTA(p_simulation_time->GetTime(), 1.0, 1e-3);
+        TS_ASSERT_DELTA(death_time, 0.25, 1e-3);
         p_simulation_time->ResetEndTimeAndNumberOfTimeSteps(death_time+1.0, 1);
         p_simulation_time->IncrementTimeOneStep();
 

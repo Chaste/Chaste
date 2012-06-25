@@ -45,7 +45,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Version.hpp"
 #include "ExecutableSupport.hpp"
 #include "Exception.hpp"
-
 #include <typeinfo>
 
 template<unsigned DIM>
@@ -53,7 +52,7 @@ AbstractCellBasedSimulation<DIM>::AbstractCellBasedSimulation(AbstractCellPopula
                                               bool deleteCellPopulationInDestructor,
                                               bool initialiseCells)
     : mDt(DOUBLE_UNSET),
-      mEndTime(0.0),  // hours - this is set later on
+      mEndTime(DOUBLE_UNSET),  // hours - this is set later on
       mrCellPopulation(rCellPopulation),
       mDeleteCellPopulationInDestructor(deleteCellPopulationInDestructor),
       mInitialiseCells(initialiseCells),
@@ -271,8 +270,19 @@ void AbstractCellBasedSimulation<DIM>::Solve()
     SimulationTime* p_simulation_time = SimulationTime::Instance();
     double current_time = p_simulation_time->GetTime();
 
-    unsigned num_time_steps = (unsigned) ((mEndTime-current_time)/mDt+0.5);
+    assert(mDt != DOUBLE_UNSET);  //Subclass constructors take care of this
 
+    if (mEndTime == DOUBLE_UNSET)
+    {
+        EXCEPTION("SetEndTime has not yet been called.");
+    }
+
+    /*Note that mDt is used here for "ideal time step".  If this step doesn't divide the time remaining then
+     * a *different* time step will be taken by the time-stepper.  The real time-step (used in the SimulationTime
+     * singleton is currently not available to this class!
+     * Should we over-write the value of mDt, or should we change this behaviour? \todo #2159
+     */
+    unsigned num_time_steps = (unsigned) ((mEndTime-current_time)/mDt+0.5);
     if (current_time > 0) // use the reset function if necessary
     {
         p_simulation_time->ResetEndTimeAndNumberOfTimeSteps(mEndTime, num_time_steps);

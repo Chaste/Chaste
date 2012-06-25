@@ -1173,6 +1173,7 @@ public:
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetEndTime(0.5);
         TS_ASSERT_EQUALS(simulator.GetIdentifier(), "OffLatticeSimulation-2");
 
         // Set up PDE and pass to simulation via handler

@@ -776,6 +776,7 @@ public:
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetEndTime(0.5);
         TS_ASSERT_EQUALS(simulator.GetIdentifier(), "OffLatticeSimulation-2");
 
         //#1453 should have forces and cell killer included here to make it a better test.
@@ -851,7 +852,7 @@ public:
         unsigned initial_num_elements = (static_cast<MeshBasedCellPopulation<1>* >(&(simulator.rGetCellPopulation())))->rGetMesh().GetNumElements();
 
         // Run simulation for a short time
-        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        simulator.Solve();
 
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), initial_num_cells + 1);
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), initial_num_nodes + 1);
@@ -876,6 +877,9 @@ public:
         OffLatticeSimulation<2> simulator(cell_population);
 
         simulator.SetOutputDirectory("TestSettingEndTimeIssue");
+
+        TS_ASSERT_THROWS_THIS(simulator.Solve(), "SetEndTime has not yet been called.");
+
         simulator.SetEndTime(1.0);
         TS_ASSERT_THROWS_THIS(simulator.Solve(),
                 "End time and number of timesteps already setup. You should not use SimulationTime::SetEndTimeAndNumberOfTimeSteps in cell-based tests.");

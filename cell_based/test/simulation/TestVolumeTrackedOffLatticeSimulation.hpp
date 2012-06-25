@@ -114,6 +114,8 @@ public:
         // Create a contact inhibition simulator
         VolumeTrackedOffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestNodeBasedSimulationWithVolumeTracked");
+        //TS_ASSERT_EQUALS(simulator.GetEndTime(), 10.0);
+        TS_ASSERT_EQUALS(simulator.GetDt(), 1.0/120.0); //Default for off-lattice
         simulator.SetEndTime(simulator.GetDt()/2.0);
 
         // Run simulation
@@ -337,7 +339,7 @@ public:
         TS_ASSERT_DELTA(p_cell2->GetAge(), 1.01, 1e-4);
 
         // Run simulation
-        TS_ASSERT_THROWS_NOTHING(p_simulator->Solve());
+        p_simulator->Solve();
 
         // Tidy up
         delete p_simulator;
