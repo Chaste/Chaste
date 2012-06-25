@@ -380,35 +380,39 @@ public:
 //    }
 //
 
-//
-//   void TestRemoveDeadCellsAndUpdate() throw(Exception)
-//    {
-//        // Create a simple 2D PottsMesh
-//        PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
-//        PottsMesh<2>* p_mesh = generator.GetMesh();
-//
-//        // Create cells
-//        std::vector<CellPtr> cells;
-//        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-//        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
-//
-//        // Create cell population
-//        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells);
-//
-//        // Test RemoveDeadCells() method
-//        TS_ASSERT_EQUALS(cell_population.GetNumElements(), 4u);
-//
-//        cell_population.Begin()->Kill();
-//
-//        TS_ASSERT_EQUALS(cell_population.RemoveDeadCells(), 1u);
-//        TS_ASSERT_EQUALS(cell_population.GetNumElements(), 3u);
-//        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 3u);
-//        TS_ASSERT_EQUALS(p_mesh->GetNumAllElements(), 4u);
-//
-//        // Test that Update() throws no errors
-//        TS_ASSERT_THROWS_NOTHING(cell_population.Update());
-//    }
-//
+
+   void TestRemoveDeadCellsAndUpdate() throw(Exception)
+    {
+		// Create a simple 2D PottsMesh
+		PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
+		PottsMesh<2>* p_mesh = generator.GetMesh();
+
+		// Create cells
+		std::vector<CellPtr> cells;
+		CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+		cells_generator.GenerateBasic(cells, 2);
+
+		std::vector<unsigned> location_indices;
+		location_indices.push_back(12);
+		location_indices.push_back(13);
+
+		// Create cell population
+		MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+
+		// Test we have the correct number of cells and elements
+		TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 2u);
+
+        // Test RemoveDeadCells() method
+        cell_population.Begin()->Kill();
+
+        TS_ASSERT_EQUALS(cell_population.RemoveDeadCells(), 1u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 1u);
+        TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*(cell_population.Begin())),13u);
+
+        // Test that Update() throws no errors Note that for ths cell population Update doesn't actually do anything.
+        TS_ASSERT_THROWS_NOTHING(cell_population.Update());
+    }
+
 
 //   void TestUpdateCellLocations()
 //    {
@@ -534,8 +538,8 @@ public:
 
    void TestUpdateCellLocationsExceptions()
     {
-        // Create a simple 2D PottsMesh with two cells
-        PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
+        // Create a simple 2D PottsMesh with one cells
+        PottsMeshGenerator<2> generator(3, 0, 0, 3, 0, 0);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Create cells
@@ -544,7 +548,7 @@ public:
         cells_generator.GenerateBasic(cells, 1u);
 
         std::vector<unsigned> location_indices;
-        unsigned initial_cell_index = 12u;
+        unsigned initial_cell_index = 0u;
         location_indices.push_back(initial_cell_index);
 
         // Create cell population
@@ -564,7 +568,48 @@ public:
         TS_ASSERT_THROWS_THIS(cell_population.UpdateCellLocations(5.0), "The probability of the cellular movement is bigger than one. In order to prevent it from happening you should change your time step and parameters");
         TS_ASSERT_THROWS_THIS(cell_population.UpdateCellLocations(1.0), "The probability of the cell not moving is smaller than zero. In order to prevent it from happening you should change your time step and parameters");
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 1u);
+    }
 
+   // For coverage try move when all neighbours are occupied
+    void TestUpdateCellLocationsWhenFull()
+    {
+        // Create a simple 2D PottsMesh Full off cells
+        PottsMeshGenerator<2> generator(3, 0, 0, 3, 0, 0);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, 9u);
+
+        std::vector<unsigned> location_indices;
+        for (unsigned i=0; i<9; i++)
+        {
+        	location_indices.push_back(i);
+        }
+
+        // Create cell population
+        MultipleCaBasedCellPopulation<2u> cell_population(*p_mesh, cells, location_indices);
+
+        unsigned location_index = 0u;
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+			 cell_iter != cell_population.End();
+			 ++cell_iter, location_index++)
+		{
+        	TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter), location_index);
+
+		}
+
+        // Commence lattice sweeping, No cells will move
+        TS_ASSERT_THROWS_NOTHING(cell_population.UpdateCellLocations(0.1));
+
+        location_index = 0u;
+		for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+			 cell_iter != cell_population.End();
+			 ++cell_iter, location_index++)
+		{
+			TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter), location_index);
+		}
     }
 
       void TestUpdateCellLocationsRandomlyExceptions()
