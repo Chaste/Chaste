@@ -55,12 +55,14 @@ DeltaNotchOffLatticeSimulation<DIM>::~DeltaNotchOffLatticeSimulation()
 template<unsigned DIM>
 void DeltaNotchOffLatticeSimulation<DIM>::SetupSolve()
 {
+	OffLatticeSimulation<DIM>::SetupSolve();
     UpdateCellData();
 }
 
 template<unsigned DIM>
 void DeltaNotchOffLatticeSimulation<DIM>::UpdateAtEndOfTimeStep()
 {
+	OffLatticeSimulation<DIM>::UpdateAtEndOfTimeStep();
     UpdateCellData();
 }
 
@@ -117,6 +119,13 @@ void DeltaNotchOffLatticeSimulation<DIM>::UpdateCellData()
             }
             cell_iter->GetCellData()->SetItem("mean delta", mean_delta);
         }
+//        else
+//        {
+//            double this_delta = cell_iter->GetCellData()->GetItem("delta");
+//
+//            cell_iter->GetCellData()->SetItem("mean delta", mean_delta);
+//        }
+
     }
 }
 
