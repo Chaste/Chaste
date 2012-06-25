@@ -200,8 +200,8 @@ unsigned MeshBasedCellPopulation<DIM>::RemoveDeadCells()
         {
             // Check if this cell is in a marked spring
             std::vector<const std::pair<CellPtr,CellPtr>*> pairs_to_remove; // Pairs that must be purged
-            for (std::set<std::pair<CellPtr,CellPtr> >::iterator it1 = mMarkedSprings.begin();
-                 it1 != mMarkedSprings.end();
+            for (std::set<std::pair<CellPtr,CellPtr> >::iterator it1 = this->mMarkedSprings.begin();
+                 it1 != this->mMarkedSprings.end();
                  ++it1)
             {
                 const std::pair<CellPtr,CellPtr>& r_pair = *it1;
@@ -224,7 +224,7 @@ unsigned MeshBasedCellPopulation<DIM>::RemoveDeadCells()
                  pair_it != pairs_to_remove.end();
                  ++pair_it)
             {
-                mMarkedSprings.erase(**pair_it);
+                this->mMarkedSprings.erase(**pair_it);
             }
 
             // Remove the node from the mesh
@@ -279,8 +279,8 @@ void MeshBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 
     // Purge any marked springs that are no longer springs
     std::vector<const std::pair<CellPtr,CellPtr>*> springs_to_remove;
-    for (std::set<std::pair<CellPtr,CellPtr> >::iterator spring_it = mMarkedSprings.begin();
-         spring_it != mMarkedSprings.end();
+    for (std::set<std::pair<CellPtr,CellPtr> >::iterator spring_it = this->mMarkedSprings.begin();
+         spring_it != this->mMarkedSprings.end();
          ++spring_it)
     {
         CellPtr p_cell_1 = spring_it->first;
@@ -315,7 +315,7 @@ void MeshBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
          spring_it != springs_to_remove.end();
          ++spring_it)
     {
-        mMarkedSprings.erase(**spring_it);
+        this->mMarkedSprings.erase(**spring_it);
     }
 
     // Tessellate if needed
@@ -366,8 +366,8 @@ CellPtr MeshBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_vector<d
     assert(p_created_cell == pNewCell);
 
     // Mark spring between parent cell and new cell
-    std::pair<CellPtr,CellPtr> cell_pair = CreateCellPair(pParentCell, p_created_cell);
-    MarkSpring(cell_pair);
+    std::pair<CellPtr,CellPtr> cell_pair = this->CreateCellPair(pParentCell, p_created_cell);
+    this->MarkSpring(cell_pair);
 
     // Return pointer to new cell
     return p_created_cell;
@@ -1057,8 +1057,8 @@ void MeshBasedCellPopulation<DIM>::CheckCellPointers()
 #undef COVERAGE_IGNORE
 
     res = true;
-    for (std::set<std::pair<CellPtr,CellPtr> >::iterator it1 = mMarkedSprings.begin();
-         it1 != mMarkedSprings.end();
+    for (std::set<std::pair<CellPtr,CellPtr> >::iterator it1 = this->mMarkedSprings.begin();
+         it1 != this->mMarkedSprings.end();
          ++it1)
     {
         const std::pair<CellPtr,CellPtr>& r_pair = *it1;
@@ -1099,54 +1099,6 @@ void MeshBasedCellPopulation<DIM>::CheckCellPointers()
 #undef COVERAGE_IGNORE
     }
     assert(res);
-}
-
-template<unsigned DIM>
-std::pair<CellPtr,CellPtr> MeshBasedCellPopulation<DIM>::CreateCellPair(CellPtr pCell1, CellPtr pCell2)
-{
-    assert(pCell1);
-    assert(pCell2);
-
-    std::pair<CellPtr,CellPtr> cell_pair;
-
-    if (pCell1->GetCellId() < pCell2->GetCellId())
-    {
-        cell_pair.first = pCell1;
-        cell_pair.second = pCell2;
-    }
-    else
-    {
-        cell_pair.first = pCell2;
-        cell_pair.second = pCell1;
-    }
-    return cell_pair;
-}
-
-template<unsigned DIM>
-bool MeshBasedCellPopulation<DIM>::IsMarkedSpring(const std::pair<CellPtr,CellPtr>& rCellPair)
-{
-    // the pair should be ordered like this (CreateCellPair will ensure this)
-    assert(rCellPair.first->GetCellId() < rCellPair.second->GetCellId());
-
-    return mMarkedSprings.find(rCellPair) != mMarkedSprings.end();
-}
-
-template<unsigned DIM>
-void MeshBasedCellPopulation<DIM>::MarkSpring(std::pair<CellPtr,CellPtr>& rCellPair)
-{
-    // the pair should be ordered like this (CreateCellPair will ensure this)
-    assert(rCellPair.first->GetCellId() < rCellPair.second->GetCellId());
-
-    mMarkedSprings.insert(rCellPair);
-}
-
-template<unsigned DIM>
-void MeshBasedCellPopulation<DIM>::UnmarkSpring(std::pair<CellPtr,CellPtr>& rCellPair)
-{
-    // the pair should be ordered like this (CreateCellPair will ensure this)
-    assert(rCellPair.first->GetCellId() < rCellPair.second->GetCellId());
-
-    mMarkedSprings.erase(rCellPair);
 }
 
 template<unsigned DIM>

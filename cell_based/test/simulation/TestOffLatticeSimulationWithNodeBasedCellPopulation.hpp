@@ -280,12 +280,12 @@ public:
 
         // Check some results
         std::vector<double> node_3_location = simulator.GetNodeLocation(3);
-        TS_ASSERT_DELTA(node_3_location[0], 2.9062, 1e-4);
-        TS_ASSERT_DELTA(node_3_location[1], 0.0172, 1e-4);
+        TS_ASSERT_DELTA(node_3_location[0], 2.8705, 1e-4);
+        TS_ASSERT_DELTA(node_3_location[1], 0.0243, 1e-4);
 
         std::vector<double> node_4_location = simulator.GetNodeLocation(4);
-        TS_ASSERT_DELTA(node_4_location[0], 3.8102, 1e-4);
-        TS_ASSERT_DELTA(node_4_location[1], 0.000, 1e-4);
+        TS_ASSERT_DELTA(node_4_location[0], 3.8353, 1e-4);
+        TS_ASSERT_DELTA(node_4_location[1], 0.0167, 1e-4);
     }
 
     // Testing Save
@@ -354,12 +354,12 @@ public:
 
         // These results are from time 2.5 in TestStandardResultForArchivingTestBelow()
         std::vector<double> node_3_location = p_simulator2->GetNodeLocation(3);
-        TS_ASSERT_DELTA(node_3_location[0], 2.9062, 1e-4);
-        TS_ASSERT_DELTA(node_3_location[1], 0.0172, 1e-4);
+        TS_ASSERT_DELTA(node_3_location[0], 2.8705, 1e-4);
+        TS_ASSERT_DELTA(node_3_location[1], 0.0243, 1e-4);
 
         std::vector<double> node_4_location = p_simulator2->GetNodeLocation(4);
-        TS_ASSERT_DELTA(node_4_location[0], 3.8102, 1e-4);
-        TS_ASSERT_DELTA(node_4_location[1], 0.000, 1e-4);
+        TS_ASSERT_DELTA(node_4_location[0], 3.8353, 1e-4);
+        TS_ASSERT_DELTA(node_4_location[1], 0.0167, 1e-4);
 
         // Tidy up
         delete p_simulator1;

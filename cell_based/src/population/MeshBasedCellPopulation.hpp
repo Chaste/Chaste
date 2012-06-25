@@ -85,7 +85,6 @@ private:
         delete mpVoronoiTessellation;
         mpVoronoiTessellation = NULL;
 
-        archive & mMarkedSprings;
         archive & mSpringRestLengths;
         archive & mUseAreaBasedDampingConstant;
         archive & mAreaBasedDampingConstantParameter;
@@ -126,13 +125,6 @@ protected:
      * Needed if this cell population has been de-serialized.
      */
     bool mDeleteMesh;
-
-    /**
-     * Special springs that we want to keep track of for some reason.
-     * Currently used to track cells in the process of dividing
-     * (which are represented as two cells joined by a shorter spring).
-     */
-    std::set<std::pair<CellPtr,CellPtr> > mMarkedSprings;
 
     /**
      * Keeps track of the rest lengths of springs if these are being used in the simulation.
@@ -512,38 +504,6 @@ public:
      * Helper method for use in debugging.
      */
     void CheckCellPointers();
-
-    /**
-     * Helper method that returns a set of pointers to two given Cells.
-     * Used by the spring marking routines.
-     * Elements in the returned pair are ordered by cell ID number - the
-     * cell in the pair will have a smaller ID.
-     *
-     * @param pCell1 a Cell
-     * @param pCell2 a Cell
-     */
-    std::pair<CellPtr,CellPtr> CreateCellPair(CellPtr pCell1, CellPtr pCell2);
-
-    /**
-     * @param rCellPair a set of pointers to Cells
-     *
-     * @return whether the spring between two given cells is marked.
-     */
-    bool IsMarkedSpring(const std::pair<CellPtr,CellPtr>& rCellPair);
-
-    /**
-     * Mark the spring between the given cells.
-     *
-     * @param rCellPair a set of pointers to Cells
-     */
-    void MarkSpring(std::pair<CellPtr,CellPtr>& rCellPair);
-
-    /**
-     * Stop marking the spring between the given cells.
-     *
-     * @param rCellPair a set of pointers to Cells
-     */
-    void UnmarkSpring(std::pair<CellPtr,CellPtr>& rCellPair);
 
     /**
      * @return mAreaBasedDampingConstantParameter

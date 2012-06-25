@@ -153,29 +153,20 @@ c_vector<double, DIM> GeneralisedLinearSpringForce<DIM>::CalculateForceBetweenNo
      */
     if (ageA < mMeinekeSpringGrowthDuration && ageB < mMeinekeSpringGrowthDuration)
     {
-        if (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation))
-        {
-            MeshBasedCellPopulation<DIM>* p_static_cast_cell_population = static_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation);
+        AbstractCentreBasedCellPopulation<DIM>* p_static_cast_cell_population = static_cast<AbstractCentreBasedCellPopulation<DIM>*>(&rCellPopulation);
 
-            std::pair<CellPtr,CellPtr> cell_pair = p_static_cast_cell_population->CreateCellPair(p_cell_A, p_cell_B);
+        std::pair<CellPtr,CellPtr> cell_pair = p_static_cast_cell_population->CreateCellPair(p_cell_A, p_cell_B);
 
-            if (p_static_cast_cell_population->IsMarkedSpring(cell_pair))
-            {
-                // Spring rest length increases from a small value to the normal rest length over 1 hour
-                double lambda = mMeinekeDivisionRestingSpringLength;
-                rest_length = lambda + (rest_length_final - lambda) * ageA/mMeinekeSpringGrowthDuration;
-            }
-            if (ageA + SimulationTime::Instance()->GetTimeStep() >= mMeinekeSpringGrowthDuration)
-            {
-                // This spring is about to go out of scope
-                p_static_cast_cell_population->UnmarkSpring(cell_pair);
-            }
-        }
-        else
+        if (p_static_cast_cell_population->IsMarkedSpring(cell_pair))
         {
-            // Spring rest length increases from mDivisionRestingSpringLength to normal rest length over 1 hour
+            // Spring rest length increases from a small value to the normal rest length over 1 hour
             double lambda = mMeinekeDivisionRestingSpringLength;
             rest_length = lambda + (rest_length_final - lambda) * ageA/mMeinekeSpringGrowthDuration;
+        }
+        if (ageA + SimulationTime::Instance()->GetTimeStep() >= mMeinekeSpringGrowthDuration)
+        {
+            // This spring is about to go out of scope
+            p_static_cast_cell_population->UnmarkSpring(cell_pair);
         }
     }
 

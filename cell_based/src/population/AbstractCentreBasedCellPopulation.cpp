@@ -83,6 +83,54 @@ CellPtr AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCell(CellP
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::pair<CellPtr,CellPtr> AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CreateCellPair(CellPtr pCell1, CellPtr pCell2)
+{
+    assert(pCell1);
+    assert(pCell2);
+
+    std::pair<CellPtr,CellPtr> cell_pair;
+
+    if (pCell1->GetCellId() < pCell2->GetCellId())
+    {
+        cell_pair.first = pCell1;
+        cell_pair.second = pCell2;
+    }
+    else
+    {
+        cell_pair.first = pCell2;
+        cell_pair.second = pCell1;
+    }
+    return cell_pair;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsMarkedSpring(const std::pair<CellPtr,CellPtr>& rCellPair)
+{
+    // the pair should be ordered like this (CreateCellPair will ensure this)
+    assert(rCellPair.first->GetCellId() < rCellPair.second->GetCellId());
+
+    return mMarkedSprings.find(rCellPair) != mMarkedSprings.end();
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::MarkSpring(std::pair<CellPtr,CellPtr>& rCellPair)
+{
+    // the pair should be ordered like this (CreateCellPair will ensure this)
+    assert(rCellPair.first->GetCellId() < rCellPair.second->GetCellId());
+
+    mMarkedSprings.insert(rCellPair);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::UnmarkSpring(std::pair<CellPtr,CellPtr>& rCellPair)
+{
+    // the pair should be ordered like this (CreateCellPair will ensure this)
+    assert(rCellPair.first->GetCellId() < rCellPair.second->GetCellId());
+
+    mMarkedSprings.erase(rCellPair);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsCellAssociatedWithADeletedLocation(CellPtr pCell)
 {
     return GetNodeCorrespondingToCell(pCell)->IsDeleted();

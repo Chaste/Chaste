@@ -62,6 +62,7 @@ private:
     {
         archive & boost::serialization::base_object<AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM> >(*this);
         archive & mMeinekeDivisionSeparation;
+        archive & mMarkedSprings;
     }
 
 protected:
@@ -70,6 +71,13 @@ protected:
      * Has units of cell size at equilibrium rest length
      */
     double mMeinekeDivisionSeparation;
+
+    /**
+     * Special springs that we want to keep track of for some reason.
+     * Currently used to track cells in the process of dividing
+     * (which are represented as two cells joined by a shorter spring).
+     */
+    std::set<std::pair<CellPtr,CellPtr> > mMarkedSprings;
 
     /**
      * Constructor that just takes in a mesh.
@@ -128,6 +136,38 @@ public:
      * @return address of cell as it appears in the cell list
      */
     CellPtr AddCell(CellPtr pNewCell, const c_vector<double,SPACE_DIM>& rCellDivisionVector, CellPtr pParentCell=CellPtr());
+
+    /**
+     * Helper method that returns a set of pointers to two given Cells.
+     * Used by the spring marking routines.
+     * Elements in the returned pair are ordered by cell ID number - the
+     * cell in the pair will have a smaller ID.
+     *
+     * @param pCell1 a Cell
+     * @param pCell2 a Cell
+     */
+    std::pair<CellPtr,CellPtr> CreateCellPair(CellPtr pCell1, CellPtr pCell2);
+
+    /**
+     * @param rCellPair a set of pointers to Cells
+     *
+     * @return whether the spring between two given cells is marked.
+     */
+    bool IsMarkedSpring(const std::pair<CellPtr,CellPtr>& rCellPair);
+
+    /**
+     * Mark the spring between the given cells.
+     *
+     * @param rCellPair a set of pointers to Cells
+     */
+    void MarkSpring(std::pair<CellPtr,CellPtr>& rCellPair);
+
+    /**
+     * Stop marking the spring between the given cells.
+     *
+     * @param rCellPair a set of pointers to Cells
+     */
+    void UnmarkSpring(std::pair<CellPtr,CellPtr>& rCellPair);
 
     /**
      * Overridden IsCellAssociatedWithADeletedLocation() method.
