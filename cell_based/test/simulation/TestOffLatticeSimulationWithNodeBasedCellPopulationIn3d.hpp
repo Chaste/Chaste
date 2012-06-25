@@ -50,7 +50,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LogFile.hpp"
 #include "SmartPointers.hpp"
 #include "SphereGeometryBoundaryCondition.hpp"
+#include "PlaneBoundaryCondition.hpp"
 #include "StochasticDurationGenerationBasedCellCycleModel.hpp"
+
 
 class TestOffLatticeSimulationWithNodeBasedCellPopulationIn3d : public AbstractCellBasedTestSuite
 {
@@ -131,6 +133,76 @@ public:
             delete nodes[i];
         }
     }
+    void Test3dNodeBasedPlaneBoundary() throw (Exception)
+    {
+        // Create mesh
+        std::vector<Node<3>*> nodes;
+
+        nodes.push_back(new Node<3>(0u,  false,  1.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1u,  false,  -1.0, 0.0, 0.0));
+
+        // Convert this to a NodesOnlyMesh
+        NodesOnlyMesh<3> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<StochasticDurationGenerationBasedCellCycleModel, 3> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), TRANSIT);
+
+        // Create a node-based cell population
+        NodeBasedCellPopulation<3> node_based_cell_population(mesh, cells);
+        node_based_cell_population.SetMechanicsCutOffLength(1.5);
+        node_based_cell_population.SetOutputCellProliferativeTypes(true);
+
+        // Set up cell-based simulation
+        OffLatticeSimulation<3> simulator(node_based_cell_population);
+        simulator.SetOutputDirectory("NodeBased3dPlaneBoundary");
+        simulator.SetSamplingTimestepMultiple(120);
+        simulator.SetEndTime(10.0);
+
+        // Create a force law and pass it to the simulation
+        MAKE_PTR(GeneralisedLinearSpringForce<3>, p_linear_force);
+        p_linear_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_linear_force);
+
+        // Create a plane boundary and pass them to the simulation
+        c_vector<double,3> point_on_plane = zero_vector<double>(3);
+        c_vector<double,3> normal_to_plane = zero_vector<double>(3);
+        point_on_plane(0) = 0.5;
+        normal_to_plane(0) = 1.0;
+        //Restrict to x<1/2
+        MAKE_PTR_ARGS(PlaneBoundaryCondition<3>, p_boundary_condition, (&node_based_cell_population, point_on_plane, normal_to_plane));
+        simulator.AddCellPopulationBoundaryCondition(p_boundary_condition);
+
+        point_on_plane(0) = -0.5;
+        normal_to_plane(0) = -1.0;
+        //Restrict to x>-1/2
+        MAKE_PTR_ARGS(PlaneBoundaryCondition<3>, p_boundary_condition2, (&node_based_cell_population, point_on_plane, normal_to_plane));
+        simulator.AddCellPopulationBoundaryCondition(p_boundary_condition2);
+
+        // Run simulation
+        simulator.Solve();
+
+        // Check some results
+
+        for (AbstractCellPopulation<3>::Iterator cell_iter = simulator.rGetCellPopulation().Begin();
+                      cell_iter != simulator.rGetCellPopulation().End();
+                      ++cell_iter)
+        {
+            c_vector<double,3> node_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(*cell_iter);
+
+            TS_ASSERT_LESS_THAN(-0.5, node_location[0]);
+            TS_ASSERT_LESS_THAN(node_location[0], 0.5);
+        }
+
+        // clean up
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
+    }
+
 };
 
 #endif /*TESTOFFLATTICESIMULATIONWITHNODEBASEDCELLPOPULATIONIN3D_HPP_*/

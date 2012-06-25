@@ -129,10 +129,10 @@ public:
         // Test VerifyBoundaryCondition() method
         TS_ASSERT_EQUALS(boundary_condition.VerifyBoundaryCondition(), true);
 
-        // For coverage, test VerifyBoundaryCondition() method in the case DIM != 2
-        PlaneBoundaryCondition<3> plane_boundary_condition_3d(NULL, zero_vector<double>(3), unit_vector<double>(3,2));
-        TS_ASSERT_THROWS_THIS(plane_boundary_condition_3d.VerifyBoundaryCondition(),
-                              "PlaneBoundaryCondition is not yet implemented in 1D or 3D");
+        // For coverage, test VerifyBoundaryCondition() method in the case DIM = 1
+        PlaneBoundaryCondition<1> plane_boundary_condition_1d(NULL, zero_vector<double>(1), unit_vector<double>(1,0));
+        TS_ASSERT_THROWS_THIS(plane_boundary_condition_1d.VerifyBoundaryCondition(),
+                              "PlaneBoundaryCondition is not implemented in 1D");
     }
 
     void TestPlaneBoundaryConditionWithVertexBasedCellPopulation() throw(Exception)
@@ -193,10 +193,10 @@ public:
         // Test VerifyBoundaryCondition() method
         TS_ASSERT_EQUALS(boundary_condition.VerifyBoundaryCondition(), true);
 
-        // For coverage, test VerifyBoundaryCondition() method in the case DIM != 2
-        PlaneBoundaryCondition<3> plane_boundary_condition_3d(NULL, zero_vector<double>(3), unit_vector<double>(3,2));
-        TS_ASSERT_THROWS_THIS(plane_boundary_condition_3d.VerifyBoundaryCondition(),
-                              "PlaneBoundaryCondition is not yet implemented in 1D or 3D");
+        // For coverage, test VerifyBoundaryCondition() method in the case DIM == 1
+        PlaneBoundaryCondition<1> plane_boundary_condition_1d(NULL, zero_vector<double>(1), unit_vector<double>(1,0));
+        TS_ASSERT_THROWS_THIS(plane_boundary_condition_1d.VerifyBoundaryCondition(),
+                              "PlaneBoundaryCondition is not implemented in 1D");
     }
 
     void TestPlaneBoundaryConditionExceptions() throw(Exception)

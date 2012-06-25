@@ -72,7 +72,7 @@ void PlaneBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::vector< c_v
     assert((dynamic_cast<AbstractCentreBasedCellPopulation<DIM>*>(this->mpCellPopulation))
             || (dynamic_cast<VertexBasedCellPopulation<DIM>*>(this->mpCellPopulation)) );
 
-    if (DIM==2)
+    if (DIM != 1)
     {
         if(dynamic_cast<AbstractCentreBasedCellPopulation<DIM>*>(this->mpCellPopulation))
         {
@@ -85,15 +85,13 @@ void PlaneBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::vector< c_v
                 unsigned node_index = this->mpCellPopulation->GetLocationIndexUsingCell(*cell_iter);
                 Node<DIM>* p_node = this->mpCellPopulation->GetNode(node_index);
 
-                if (inner_prod(cell_location - mPointOnPlane,mNormalToPlane) > 0.0)
+                double signed_distance = inner_prod(cell_location - mPointOnPlane, mNormalToPlane);
+                if ( signed_distance > 0.0)
                 {
-                    c_vector<double, 2> tangent;
-                    tangent(0) = -mNormalToPlane(1);
-                    tangent(1) = mNormalToPlane(0);
 
-                    c_vector<double, 2> intersection = mPointOnPlane + inner_prod(tangent,cell_location- mPointOnPlane)*tangent;
-
-                    p_node->rGetModifiableLocation() = intersection;
+                    // For the closest point on the plane we travel from cell_location the signed_distance in the direction of -mNormalToPlane
+                    c_vector<double, DIM> nearest_point = cell_location - signed_distance*mNormalToPlane;
+                    p_node->rGetModifiableLocation() = nearest_point;
                 }
             }
         }
@@ -110,15 +108,12 @@ void PlaneBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::vector< c_v
                 Node<DIM>* p_node = pStaticCastCellPopulation->GetNode(node_index);
                 c_vector<double, DIM> node_location = p_node->rGetLocation();
 
-                if (inner_prod(node_location - mPointOnPlane,mNormalToPlane) > 0.0)
+                double signed_distance = inner_prod(node_location - mPointOnPlane, mNormalToPlane);
+                if (signed_distance > 0.0)
                 {
-                    c_vector<double, 2> tangent;
-                    tangent(0) = -mNormalToPlane(1);
-                    tangent(1) = mNormalToPlane(0);
-
-                    c_vector<double, 2> intersection = mPointOnPlane + inner_prod(tangent,node_location- mPointOnPlane)*tangent;
-
-                    p_node->rGetModifiableLocation() = intersection;
+                    // For the closest point on the plane we travel from cell_location the signed_distance in the direction of -mNormalToPlane
+                    c_vector<double, DIM> nearest_point = node_location - signed_distance*mNormalToPlane;
+                    p_node->rGetModifiableLocation() = nearest_point;
                 }
             }
         }
@@ -126,7 +121,9 @@ void PlaneBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::vector< c_v
     }
     else
     {
-        EXCEPTION("PlaneBoundaryCondition is not yet implemented in 1D or 3D");
+        // DIM == 1
+        NEVER_REACHED;
+        //PlaneBoundaryCondition::ImposeBoundaryCondition is not implemented in 1D
     }
 }
 
@@ -135,7 +132,11 @@ bool PlaneBoundaryCondition<DIM>::VerifyBoundaryCondition()
 {
     bool condition_satisfied = true;
 
-    if (DIM==2)
+    if (DIM == 1)
+    {
+        EXCEPTION("PlaneBoundaryCondition is not implemented in 1D");
+    }
+    else
     {
         for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
              cell_iter != this->mpCellPopulation->End();
@@ -143,16 +144,12 @@ bool PlaneBoundaryCondition<DIM>::VerifyBoundaryCondition()
         {
             c_vector<double, DIM> cell_location = this->mpCellPopulation->GetLocationOfCellCentre(*cell_iter);
 
-            if (inner_prod(cell_location - mPointOnPlane,mNormalToPlane) > 0.0)
+            if (inner_prod(cell_location - mPointOnPlane, mNormalToPlane) > 0.0)
             {
                 condition_satisfied = false;
                 break;
             }
         }
-    }
-    else
-    {
-        EXCEPTION("PlaneBoundaryCondition is not yet implemented in 1D or 3D");
     }
 
     return condition_satisfied;
