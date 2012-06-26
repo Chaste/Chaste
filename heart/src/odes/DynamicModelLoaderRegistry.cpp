@@ -64,7 +64,7 @@ DynamicCellModelLoaderPtr DynamicModelLoaderRegistry::GetLoader(const std::strin
     {
         p_loader = it->second.lock();
     }
-    mDeletableLoaders.insert(p_loader); ///\todo #1957 remove when unloading working
+    ScheduleForDeletion(p_loader); ///\todo #1957 remove when unloading working
     return p_loader;
 }
 

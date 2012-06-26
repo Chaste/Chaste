@@ -217,6 +217,11 @@ template<unsigned DIM>
 class CreateElectricsProblem<DIM, 1u>
 {
 public:
+    /**
+     * The actual creation method.
+     * @param problemType
+     * @param pCellFactory
+     */
     static AbstractCardiacProblem<DIM, DIM, 1u>* Create(ElectricsProblemType problemType,
                                                         AbstractCardiacCellFactory<DIM>* pCellFactory)
     {
@@ -235,6 +240,11 @@ template<unsigned DIM>
 class CreateElectricsProblem<DIM, 2u>
 {
 public:
+    /**
+     * The actual creation method.
+     * @param problemType
+     * @param pCellFactory
+     */
     static AbstractCardiacProblem<DIM, DIM, 2u>* Create(ElectricsProblemType problemType,
                                                         AbstractCardiacCellFactory<DIM>* pCellFactory)
     {

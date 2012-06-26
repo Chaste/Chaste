@@ -51,10 +51,13 @@ AbstractDynamicallyLoadableEntity::~AbstractDynamicallyLoadableEntity()
 {
     if (mpLoader.unique())
     {
+        ///\todo #1957
+#define COVERAGE_IGNORE
         // We're the last entity using this loader, but we don't want it killed on exit
         // from this destructor, since other destructors of this object might still be
         // executing.  So add it to the registry's "to be deleted" list, and it'll get
         // removed prior to loading any other .so.
         DynamicModelLoaderRegistry::Instance()->ScheduleForDeletion(mpLoader);
+#undef COVERAGE_IGNORE
     }
 }
