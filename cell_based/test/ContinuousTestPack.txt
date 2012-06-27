@@ -3,6 +3,7 @@ cell/TestCell.hpp
 cell/TestCellBasedCellProperties.hpp
 cell/TestCellCycleModelOdeSolver.hpp
 cell/TestCellMutationStates.hpp
+cell/TestCellProliferativeTypes.hpp
 cell/TestCellPropertyCollection.hpp
 cell/TestCellPropertyRegistry.hpp
 cell/TestCellsGenerator.hpp
