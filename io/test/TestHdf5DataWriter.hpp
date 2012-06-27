@@ -64,7 +64,7 @@ public:
 
         // Set up a property list saying how we'll open the file
         hid_t plist_id = H5Pcreate(H5P_FILE_ACCESS);
-        H5Pset_fapl_mpio(plist_id, PETSC_COMM_WORLD, MPI_INFO_NULL);
+        H5Pset_fapl_mpiposix(plist_id, PETSC_COMM_WORLD, 0);
 
         // Create a file (collectively) and free the property list
         hid_t file_id = H5Fcreate(file_name.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);
@@ -171,7 +171,7 @@ public:
 
         // Set up a property list saying how we'll open the file
         hid_t plist_id = H5Pcreate(H5P_FILE_ACCESS);
-        H5Pset_fapl_mpio(plist_id, PETSC_COMM_WORLD, MPI_INFO_NULL);
+        H5Pset_fapl_mpiposix(plist_id, PETSC_COMM_WORLD, 0);
 
         // Create a file (collectively) and free the property list
         hid_t file_id = H5Fcreate(file_name.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);
