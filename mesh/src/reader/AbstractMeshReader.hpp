@@ -237,21 +237,16 @@ public:
          *
          */
         ElementIterator(const std::set<unsigned>& rIndices,
-                        AbstractMeshReader* pReader)
-            : mpIndices(&rIndices),
-              mpReader(pReader)
+                        AbstractMeshReader* pReader);
+
+        /**
+         * Get the index of the item pointed at.
+         */
+        unsigned GetIndex() const
         {
-            if (mpIndices->empty())
-            {
-                mIndex = mpReader->GetNumElements();
-            }
-            else
-            {
-                mIndicesIterator = mpIndices->begin();
-                mIndex = 0;
-                CacheData(*mIndicesIterator, true);
-            }
+            return mIndex;
         }
+
     private:
        friend class boost::iterator_core_access;
 
@@ -267,31 +262,7 @@ public:
        /**
         * Increment the iterator to point at the next item in the file.
         */
-       void increment()
-       {
-           unsigned next_index;
-           if (mpIndices)
-           {
-               // Iterating over a subset
-               ++mIndicesIterator;
-               if (mIndicesIterator != mpIndices->end())
-               {
-                   next_index = *mIndicesIterator;
-               }
-               else
-               {
-                   // The subset is complete so skip to the end of the items so that we can be
-                   // compared to GetElementIteratorEnd
-                   next_index = mpReader->GetNumElements();
-               }
-           }
-           else
-           {
-               // Iterating over all items
-               next_index = mIndex + 1;
-           }
-           CacheData(next_index);
-       }
+       void increment();
 
        /**
         * Test whether two iterators point at the same item.

@@ -49,6 +49,7 @@ DistributedQuadraticMesh<DIM>::~DistributedQuadraticMesh()
 }
 
 
+#include "Debug.hpp"
 template<unsigned DIM>
 void DistributedQuadraticMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& rAbsMeshReader)
 {
@@ -73,9 +74,13 @@ void DistributedQuadraticMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<D
     DistributedTetrahedralMesh<DIM,DIM>::ConstructFromMeshReader(*p_mesh_reader);
     assert(this->GetNumBoundaryElements() > 0u);
 
+    MARK;
     QuadraticMeshHelper<DIM>::AddInternalNodesToElements(this, p_mesh_reader);
+    MARK;
     QuadraticMeshHelper<DIM>::AddInternalNodesToBoundaryElements(this, p_mesh_reader);
+    MARK;
     QuadraticMeshHelper<DIM>::CheckBoundaryElements(this);
+    MARK;
 }
 
 

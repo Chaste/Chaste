@@ -301,65 +301,30 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
         }
     }
 
-    if ( rMeshReader.IsFileFormatBinary() )
+    for (typename AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::ElementIterator elem_it
+             = rMeshReader.GetElementIteratorBegin(elements_owned);
+         elem_it != rMeshReader.GetElementIteratorEnd();
+         ++elem_it)
     {
-        // Binary format, we loop only over the elements we have been assigned
-        for (std::set<unsigned>::const_iterator elem_it=elements_owned.begin(); elem_it!=elements_owned.end(); elem_it++)
+        ElementData element_data = *elem_it;
+        unsigned global_element_index = elem_it.GetIndex();
+
+        std::vector<Node<SPACE_DIM>*> nodes;
+        for (unsigned j=0; j<ELEMENT_DIM+1; j++)
         {
-            unsigned global_element_index=*elem_it;
-            ElementData element_data;
-            element_data = rMeshReader.GetElementData(global_element_index);
-
-            std::vector<Node<SPACE_DIM>*> nodes;
-            for (unsigned j=0; j<ELEMENT_DIM+1; j++)
-            {
-                //because we have populated mNodes and mHaloNodes above, we can now use this method, which should never throw
-                nodes.push_back(this->GetNodeOrHaloNode(element_data.NodeIndices[j]));
-            }
-
-            RegisterElement(global_element_index);
-            Element<ELEMENT_DIM,SPACE_DIM>* p_element = new Element<ELEMENT_DIM,SPACE_DIM>(global_element_index, nodes);
-            this->mElements.push_back(p_element);
-
-            if (rMeshReader.GetNumElementAttributes() > 0)
-            {
-                assert(rMeshReader.GetNumElementAttributes() == 1);
-                double attribute_value = element_data.AttributeValue;
-                p_element->SetAttribute(attribute_value);
-            }
+            // Because we have populated mNodes and mHaloNodes above, we can now use this method, which should never throw
+            nodes.push_back(this->GetNodeOrHaloNode(element_data.NodeIndices[j]));
         }
-    }
-    else
-    {
-        // Load the elements owned by the processor
-        for (unsigned element_index=0; element_index < mTotalNumElements; element_index++)
+
+        RegisterElement(global_element_index);
+        Element<ELEMENT_DIM,SPACE_DIM>* p_element = new Element<ELEMENT_DIM,SPACE_DIM>(global_element_index, nodes);
+        this->mElements.push_back(p_element);
+
+        if (rMeshReader.GetNumElementAttributes() > 0)
         {
-            ElementData element_data;
-
-            element_data = rMeshReader.GetNextElementData();
-
-            // The element is owned by the processor
-            if (elements_owned.find(element_index) != elements_owned.end())
-            {
-                std::vector<Node<SPACE_DIM>*> nodes;
-                for (unsigned j=0; j<ELEMENT_DIM+1; j++)
-                {
-                    //because we have populated mNodes and mHaloNodes above, we can now use this method, which should never throw
-                    nodes.push_back(this->GetNodeOrHaloNode(element_data.NodeIndices[j]));
-                }
-
-                RegisterElement(element_index);
-
-                Element<ELEMENT_DIM,SPACE_DIM>* p_element = new Element<ELEMENT_DIM,SPACE_DIM>(element_index, nodes);
-                this->mElements.push_back(p_element);
-
-                if (rMeshReader.GetNumElementAttributes() > 0)
-                {
-                    assert(rMeshReader.GetNumElementAttributes() == 1);
-                    double attribute_value = element_data.AttributeValue;
-                    p_element->SetAttribute(attribute_value);
-                }
-            }
+            assert(rMeshReader.GetNumElementAttributes() == 1);
+            double attribute_value = element_data.AttributeValue;
+            p_element->SetAttribute(attribute_value);
         }
     }
 
@@ -415,7 +380,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
                     nodes[j]->SetAsBoundaryNode();
                     this->mBoundaryNodes.push_back(nodes[j]);
                 }
-                // Register the index that this bounday element will have with the node
+                // Register the index that this boundary element will have with the node
                 nodes[j]->AddBoundaryElement(face_index);
             }
 

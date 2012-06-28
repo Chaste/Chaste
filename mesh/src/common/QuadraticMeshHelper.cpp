@@ -68,23 +68,32 @@ void QuadraticMeshHelper<DIM>::AddInternalNodesToElements(AbstractTetrahedralMes
     if (pMesh->GetNumLocalElements() > 0u)
     {
         pMeshReader->Reset();
-        SeekToElement(*pMeshReader, pMesh->GetElementIteratorBegin()->GetIndex());
 
-        // Add the extra nodes (1 extra node in 1D, 3 in 2D, 6 in 3D) to the element data
+        // Create a set of element indices we own
+        std::set<unsigned> owned_element_indices;
         for (typename AbstractTetrahedralMesh<DIM,DIM>::ElementIterator iter = pMesh->GetElementIteratorBegin();
              iter != pMesh->GetElementIteratorEnd();
              ++iter)
         {
-            std::vector<unsigned> nodes = pMeshReader->GetNextElementData().NodeIndices;
+            owned_element_indices.insert(iter->GetIndex());
+        }
+
+        // Add the extra nodes (1 extra node in 1D, 3 in 2D, 6 in 3D) to the element data
+        for (typename AbstractMeshReader<DIM,DIM>::ElementIterator iter = pMeshReader->GetElementIteratorBegin(owned_element_indices);
+             iter != pMeshReader->GetElementIteratorEnd();
+             ++iter)
+        {
+            std::vector<unsigned> nodes = iter->NodeIndices;
             assert(nodes.size()==(DIM+1)*(DIM+2)/2);
-            assert(iter->GetNumNodes()==DIM+1); // Element is initially linear
+            Element<DIM,DIM>* p_element = pMesh->GetElement(iter.GetIndex());
+            assert(p_element->GetNumNodes()==DIM+1); // Element is initially linear
 
             // Add extra nodes to make it a quad element
             for (unsigned j=DIM+1; j<(DIM+1)*(DIM+2)/2; j++)
             {
                 Node<DIM>* p_node = pMesh->GetNodeOrHaloNode(nodes[j]);
-                iter->AddNode(p_node);
-                p_node->AddElement(iter->GetIndex());
+                p_element->AddNode(p_node);
+                p_node->AddElement(p_element->GetIndex());
                 p_node->MarkAsInternal();
             }
         }

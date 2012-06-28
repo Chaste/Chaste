@@ -172,6 +172,51 @@ typename AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::ElementIterator
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::ElementIterator::ElementIterator(const std::set<unsigned>& rIndices,
+                                                                             AbstractMeshReader* pReader)
+    : mpIndices(&rIndices),
+      mpReader(pReader)
+{
+    if (mpIndices->empty())
+    {
+        mIndex = mpReader->GetNumElements();
+    }
+    else
+    {
+        mIndicesIterator = mpIndices->begin();
+        mIndex = 0;
+        CacheData(*mIndicesIterator, true);
+    }
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::ElementIterator::increment()
+{
+    unsigned next_index;
+    if (mpIndices)
+    {
+        // Iterating over a subset
+        ++mIndicesIterator;
+        if (mIndicesIterator != mpIndices->end())
+        {
+            next_index = *mIndicesIterator;
+        }
+        else
+        {
+            // The subset is complete so skip to the end of the items so that we can be
+            // compared to GetElementIteratorEnd
+            next_index = mpReader->GetNumElements();
+        }
+    }
+    else
+    {
+        // Iterating over all items
+        next_index = mIndex + 1;
+    }
+    CacheData(next_index);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::ElementIterator::CacheData(unsigned index, bool firstRead)
 {
     assert(mpReader);

@@ -603,6 +603,7 @@ public:
                     elt_it != mesh_reader_ascii.GetElementIteratorEnd();
                     ++elt_it)
             {
+                TS_ASSERT_EQUALS(count, elt_it.GetIndex());
                 count++;
                 ascii_node_indices = *elt_it;
                 binary_node_indices = mesh_reader.GetNextElementData();
@@ -620,6 +621,7 @@ public:
                     elt_it != mesh_reader.GetElementIteratorEnd();
                     ++elt_it)
             {
+                TS_ASSERT_EQUALS(count, elt_it.GetIndex());
                 count++;
                 ascii_node_indices = mesh_reader_ascii.GetNextElementData();
                 binary_node_indices = *elt_it;
@@ -643,6 +645,7 @@ public:
                     elt_it != mesh_reader.GetElementIteratorEnd();
                     ++elt_it)
             {
+                TS_ASSERT_EQUALS(count*2u, elt_it.GetIndex());
                 count++;
                 binary_node_indices = *elt_it;
                 ascii_node_indices = mesh_reader_ascii.GetNextElementData();
@@ -669,6 +672,7 @@ public:
                     elt_it != mesh_reader_ascii.GetElementIteratorEnd();
                     ++elt_it)
             {
+                TS_ASSERT_EQUALS(count*2+1, elt_it.GetIndex());
                 count++;
                 ascii_node_indices = *elt_it;
                 // Skip even elements
