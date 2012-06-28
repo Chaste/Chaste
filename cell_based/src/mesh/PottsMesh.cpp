@@ -263,8 +263,8 @@ template<unsigned DIM>
 unsigned PottsMesh<DIM>::DivideElement(PottsElement<DIM>* pElement,
                                   bool placeOriginalElementBelow)
 {
-    ///\todo not implemented in 3d yet
-    assert(DIM==2);
+    /// Not implemented in 1d
+    assert(DIM==2 || DIM==3);
 
     // Store the number of nodes in the element (this changes when nodes are deleted from the element)
     unsigned num_nodes = pElement->GetNumNodes();
@@ -299,7 +299,7 @@ unsigned PottsMesh<DIM>::DivideElement(PottsElement<DIM>* pElement,
 
     /**
      * Remove the correct nodes from each element. If placeOriginalElementBelow is true,
-     * place the original element below (in the y direction) the new element; otherwise,
+     * place the original element below (in the y direction or z in 3d) the new element; otherwise,
      * place it above.
      */
     unsigned half_num_nodes = num_nodes/2; // This will round down
@@ -317,12 +317,12 @@ unsigned PottsMesh<DIM>::DivideElement(PottsElement<DIM>* pElement,
     {
         if (i<half_num_nodes)
         {
-            height_midpoint_1 += pElement->GetNode(i)->rGetLocation()[1];
+            height_midpoint_1 += pElement->GetNode(i)->rGetLocation()[DIM - 1];
             counter_1++;
         }
         else
         {
-            height_midpoint_2 += pElement->GetNode(i)->rGetLocation()[1];
+            height_midpoint_2 += pElement->GetNode(i)->rGetLocation()[DIM -1];
             counter_2++;
         }
     }

@@ -302,9 +302,9 @@ public:
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), DIFFERENTIATED);
 
-        // Make this pointer first as if we move it after creating the cell population the label numbers aren't tracked
-        MAKE_PTR(CellLabel, p_label);
-        RandomlyLabelCells(cells, p_label, 0.5);
+        // Randomly label some cells
+		boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
+		RandomlyLabelCells(cells, p_label, 0.5);
 
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
@@ -485,9 +485,9 @@ public:
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), DIFFERENTIATED);
 
-        // Make this pointer first as if we move it after creating the cell population the label numbers aren't tracked
-        MAKE_PTR(CellLabel, p_label);
-        RandomlyLabelCells(cells, p_label, 0.5);
+        // Randomly label some cells
+		boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
+		RandomlyLabelCells(cells, p_label, 0.5);
 
         // Create cell population
         PottsBasedCellPopulation<3> cell_population(*p_mesh, cells);
