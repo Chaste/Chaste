@@ -148,6 +148,59 @@ ElementData AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextCableElementData(
 }
 
 
+// Iterator-related methods
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+typename AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::ElementIterator
+    AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::GetElementIteratorBegin()
+{
+    return ElementIterator(0u, this);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+typename AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::ElementIterator
+    AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::GetElementIteratorBegin(const std::set<unsigned>& rIndices)
+{
+    return ElementIterator(rIndices, this);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+typename AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::ElementIterator
+    AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::GetElementIteratorEnd()
+{
+    return ElementIterator(GetNumElements(), this);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::ElementIterator::CacheData(unsigned index, bool firstRead)
+{
+    assert(mpReader);
+    assert(mIndex < index || mIndex == 0u || index == mpReader->GetNumElements());
+    if (index < mpReader->GetNumElements())
+    {
+        if (mpReader->IsFileFormatBinary())
+        {
+            mLastDataRead = mpReader->GetElementData(index);
+        }
+        else
+        {
+            if (firstRead)
+            {
+                assert(mIndex == 0u);
+                //ASCII at construction - do an initial read to make sure the line mIndex is read
+                mLastDataRead = mpReader->GetNextElementData();
+            }
+            //ASCII generic case, where we might need to skip some unread items
+            while (mIndex < index)
+            {
+                mLastDataRead = mpReader->GetNextElementData();
+                mIndex++;
+            }
+        }
+    }
+    mIndex = index;
+}
+
 /////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////////////

@@ -37,8 +37,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _ABSTRACTMESHREADER_HPP_
 #define _ABSTRACTMESHREADER_HPP_
 
-#include <vector>
 #include <string>
+#include <vector>
+#include <set>
+#include <cassert>
+#include <boost/iterator/iterator_facade.hpp>
+#include "Exception.hpp"
 
 /**
  * Helper structure that stores the nodes and any attribute value
@@ -111,16 +115,16 @@ public:
     /** Resets pointers to beginning*/
     virtual void Reset()=0;
 
-    /** Returns a vector of the node indices of each element (and any attribute infomation, if there is any) in turn */
+    /** Returns a vector of the node indices of each element (and any attribute information, if there is any) in turn */
     virtual ElementData GetNextElementData()=0;
 
-    /** Returns a vector of the node indices of each face (and any attribute/containment infomation, if there is any) in turn */
+    /** Returns a vector of the node indices of each face (and any attribute/containment information, if there is any) in turn */
     virtual ElementData GetNextFaceData()=0;
 
-    /** Returns a vector of the node indices of each cable element (and any attribute infomation, if there is any) in turn */
+    /** Returns a vector of the node indices of each cable element (and any attribute information, if there is any) in turn */
     virtual ElementData GetNextCableElementData();
 
-    /** Returns a vector of the node indices of each edge (and any attribute/containment infomation, if there is any) in turn (synonym of GetNextFaceData()) */
+    /** Returns a vector of the node indices of each edge (and any attribute/containment information, if there is any) in turn (synonym of GetNextFaceData()) */
     ElementData GetNextEdgeData();
 
 
@@ -136,7 +140,7 @@ public:
      *  Normally throws an exception.  Only implemented for tetrahedral mesh reader of binary files.
      *
      * @param index  The global element index
-     * @return a vector of the node indices of the element (and any attribute infomation, if there is any)
+     * @return a vector of the node indices of the element (and any attribute information, if there is any)
      */
     virtual ElementData GetElementData(unsigned index);
 
@@ -144,7 +148,7 @@ public:
      *  Normally throws an exception.  Only implemented for tetrahedral mesh reader of binary files.
      *
      * @param index  The global face index
-     * @return a vector of the node indices of the face (and any attribute/containment infomation, if there is any)
+     * @return a vector of the node indices of the face (and any attribute/containment information, if there is any)
      */
     virtual ElementData GetFaceData(unsigned index);
 
@@ -152,7 +156,7 @@ public:
      *  Synonym of GetFaceData(index)
      *
      * @param index  The global edge index
-     * @return a vector of the node indices of the edge (and any attribute/containment infomation, if there is any)
+     * @return a vector of the node indices of the edge (and any attribute/containment information, if there is any)
      */
     ElementData GetEdgeData(unsigned index);
 
@@ -161,7 +165,7 @@ public:
      *  that contain the node (only available for binary files).
      *
      * @param index  The global node index
-     * @return a vector of the node indices of the face (and any attribute/containment infomation, if there is any)
+     * @return a vector of the node indices of the face (and any attribute/containment information, if there is any)
      */
     virtual std::vector<unsigned> GetContainingElementIndices(unsigned index);
 
@@ -187,6 +191,175 @@ public:
      */
     virtual bool HasNclFile();
 
+    // Iterator classes
+
+    /**
+     * An iterator class for element data.
+     */
+    class ElementIterator : public boost::iterator_facade<ElementIterator, const ElementData,
+                                                          boost::single_pass_traversal_tag>
+    {
+    public:
+        /**
+         * Default constructor for an iterator that doesn't point to anything.
+         */
+        ElementIterator()
+            : mIndex(UNSIGNED_UNSET),
+              mpIndices(NULL),
+              mpReader(NULL)
+        {
+        }
+
+        /**
+         * Constructor for pointing to a specific item.
+         *
+         * Note that, in the case of an ASCII mesh file, this will actually
+         * start wherever the file pointer currently is.  The user is responsible
+         * for resetting the reader prior to creating an iterator.
+         *
+         * @param index  the index of the item to point at
+         * @param pReader  the mesh reader to iterate over
+         */
+        explicit ElementIterator(unsigned index,
+                                 AbstractMeshReader* pReader)
+            : mIndex(index),
+              mpIndices(NULL),
+              mpReader(pReader)
+        {
+            CacheData(mIndex, true);
+        }
+
+        /**
+         * Constructor for iterating over a subset of the items in the mesh.
+         *
+         * @param rIndices  a set of item indices over which to iterate
+         * @param pReader  the mesh reader to iterate over
+         *
+         */
+        ElementIterator(const std::set<unsigned>& rIndices,
+                        AbstractMeshReader* pReader)
+            : mpIndices(&rIndices),
+              mpReader(pReader)
+        {
+            if (mpIndices->empty())
+            {
+                mIndex = mpReader->GetNumElements();
+            }
+            else
+            {
+                mIndicesIterator = mpIndices->begin();
+                mIndex = 0;
+                CacheData(*mIndicesIterator, true);
+            }
+        }
+    private:
+       friend class boost::iterator_core_access;
+
+       /**
+        * Read the pointed-at item data (if we're pointing at anything) and cache it
+        * within the iterator, for use in dereference.
+        *
+        * @param index  the item to read
+        * @param firstRead  Set to true in the constructor.  This ensures that the line 0 is always read
+        */
+       void CacheData(unsigned index, bool firstRead = false);
+
+       /**
+        * Increment the iterator to point at the next item in the file.
+        */
+       void increment()
+       {
+           unsigned next_index;
+           if (mpIndices)
+           {
+               // Iterating over a subset
+               ++mIndicesIterator;
+               if (mIndicesIterator != mpIndices->end())
+               {
+                   next_index = *mIndicesIterator;
+               }
+               else
+               {
+                   // The subset is complete so skip to the end of the items so that we can be
+                   // compared to GetElementIteratorEnd
+                   next_index = mpReader->GetNumElements();
+               }
+           }
+           else
+           {
+               // Iterating over all items
+               next_index = mIndex + 1;
+           }
+           CacheData(next_index);
+       }
+
+       /**
+        * Test whether two iterators point at the same item.
+        * @param rOther  the other iterator
+        */
+       bool equal(const ElementIterator& rOther) const
+       {
+           return mIndex == rOther.mIndex;
+       }
+
+       /**
+        * Dereference this iterator to get the data for the item pointed at.
+        *
+        * Note that the returned reference is only valid for as long as this iterator
+        * is pointing at the item.
+        */
+       const ElementData& dereference() const
+       {
+           assert(mpReader);
+           assert(mIndex < mpReader->GetNumElements());
+           // This was cached in increment()
+           return mLastDataRead;
+       }
+
+       /** The index of the item pointed at. */
+       unsigned mIndex;
+
+       /** The set which we're iterating over, if we are iterating over a subset of the items. */
+       const std::set<unsigned>* mpIndices;
+
+       /** Iterator over the indices in that subset. */
+       std::set<unsigned>::const_iterator mIndicesIterator;
+
+
+
+       /** The mesh reader we're iterating over. */
+       AbstractMeshReader* mpReader;
+
+       /** Data for the last item read. */
+       ElementData mLastDataRead;
+
+
+    };
+
+    /**
+     * Return an iterator to the first element in the file.
+     *
+     * Note that, in the case of an ASCII mesh file, for efficiency this will actually
+     * start wherever the file pointer currently is.  The user is responsible
+     * for resetting the reader prior to calling GetElementIteratorBegin().
+     */
+    ElementIterator GetElementIteratorBegin();
+
+    /**
+     * Return an iterator over a set of elements whose indices are given
+     *
+     * @param rIndices  subset of indices
+     *
+     * Note that, in the case of an ASCII mesh file, for efficiency this will actually
+     * start wherever the file pointer currently is.  The user is responsible
+     * for resetting the reader prior to calling GetElementIteratorBegin().
+     */
+    ElementIterator GetElementIteratorBegin(const std::set<unsigned>& rIndices);
+
+    /**
+     * Return an iterator to (one past the) end of the element data.
+     */
+    ElementIterator GetElementIteratorEnd();
 };
 
 #endif //_ABSTRACTMESHREADER_HPP_
