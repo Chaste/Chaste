@@ -226,7 +226,8 @@ public:
 
         double should_be_Ta1 = system.GetNextActiveTension();
 
-        TS_ASSERT_EQUALS(Ta1, should_be_Ta1);
+        TS_ASSERT_DELTA(Ta1, should_be_Ta1, 1e-16); // on one system getting differences of 1e-22 for some reason
+
         TS_ASSERT_EQUALS(Ta2, should_be_Ta2);
 
         system.SetStretchAndStretchRate(0.6, 0.1);

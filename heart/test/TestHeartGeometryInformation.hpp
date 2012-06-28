@@ -257,17 +257,17 @@ public:
             //in the lv...
             if (x<=3)
             {
-                TS_ASSERT_EQUALS(info.CalculateRelativeWallPosition(index),(3.0-x)/3.0);
+                TS_ASSERT_DELTA(info.CalculateRelativeWallPosition(index),(3.0-x)/3.0,1e-12);
             }
             //..in the septum...
             else if ((x>3)&&(x<5))
             {
-                TS_ASSERT_EQUALS(info.CalculateRelativeWallPosition(index), 1.0/5.0);
+                TS_ASSERT_DELTA(info.CalculateRelativeWallPosition(index), 1.0/5.0, 1e-12);
             }
             //...and in the rv.
             else if (x>=5)
             {
-                TS_ASSERT_EQUALS(info.CalculateRelativeWallPosition(index),(x-5.0)/3.0);
+            	TS_ASSERT_DELTA(info.CalculateRelativeWallPosition(index),(x-5.0)/3.0,1e-12);
             }
         }
 

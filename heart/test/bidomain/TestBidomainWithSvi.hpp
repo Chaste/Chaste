@@ -187,7 +187,7 @@ public:
                 }
 
                 voltage_at_0_03_finest_mesh = final_voltage_ici[600];
-                TS_ASSERT_DELTA(voltage_at_0_03_finest_mesh, -65.2218, 1e-3); //hardcoded value
+                TS_ASSERT_DELTA(voltage_at_0_03_finest_mesh, -65.2218, 1e-2); //hardcoded value
             }
             else if(i==1)
             {
