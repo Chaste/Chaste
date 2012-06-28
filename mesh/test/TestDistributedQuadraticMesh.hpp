@@ -205,7 +205,7 @@ public:
 
     void TestConstructFromMeshReader2D() throw (Exception)
     {
-        EXIT_IF_PARALLEL;
+//        EXIT_IF_PARALLEL;
 //        if (!PetscTools::HasParMetis())
 //        {
 //            std::cout << "\n\nWarning: ParMetis is not installed. Mesh partitioning not tested." << std::endl;
@@ -231,6 +231,7 @@ public:
         }
 
         //Compare the DistributedQuadraticMesh to a normal QuadraticMesh
+        const std::vector<unsigned>& r_node_perm = mesh.rGetNodePermutation();
         QuadraticMesh<2> seq_mesh;
         seq_mesh.ConstructFromMeshReader(mesh_reader);
 
@@ -246,8 +247,12 @@ public:
 
             for (unsigned node_local_index=0; node_local_index < iter->GetNumNodes(); node_local_index++)
             {
-                TS_ASSERT_EQUALS(iter->GetNodeGlobalIndex(node_local_index),
-                                 p_sequ_element->GetNodeGlobalIndex(node_local_index));
+                unsigned node_global_index = p_sequ_element->GetNodeGlobalIndex(node_local_index);
+                if (!r_node_perm.empty())
+                {
+                    node_global_index = r_node_perm[node_global_index];
+                }
+                TS_ASSERT_EQUALS(iter->GetNodeGlobalIndex(node_local_index), node_global_index);
 
                 TS_ASSERT_EQUALS(iter->GetNode(node_local_index)->GetPoint()[0],
                                  p_sequ_element->GetNode(node_local_index)->GetPoint()[0]);
@@ -267,8 +272,12 @@ public:
 
             for (unsigned node_local_index=0; node_local_index < p_para_boundary_element->GetNumNodes(); node_local_index++)
             {
-                TS_ASSERT_EQUALS(p_para_boundary_element->GetNodeGlobalIndex(node_local_index),
-                                 p_sequ_boundary_element->GetNodeGlobalIndex(node_local_index));
+                unsigned node_global_index = p_sequ_boundary_element->GetNodeGlobalIndex(node_local_index);
+                if (!r_node_perm.empty())
+                {
+                    node_global_index = r_node_perm[node_global_index];
+                }
+                TS_ASSERT_EQUALS(p_para_boundary_element->GetNodeGlobalIndex(node_local_index), node_global_index);
 
                 TS_ASSERT_EQUALS(p_para_boundary_element->GetNode(node_local_index)->GetPoint()[0],
                                  p_sequ_boundary_element->GetNode(node_local_index)->GetPoint()[0]);

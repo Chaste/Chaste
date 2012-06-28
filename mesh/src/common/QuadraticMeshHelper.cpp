@@ -45,13 +45,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     } } }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void SeekToElement(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
-                   unsigned elementIndex)
-{
-    SEEK_TO_CONTENT(GetElementData, GetNextElementData, elementIndex);
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void SeekToBoundaryElement(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
                            unsigned boundaryElementIndex)
 {
@@ -78,6 +71,8 @@ void QuadraticMeshHelper<DIM>::AddInternalNodesToElements(AbstractTetrahedralMes
             owned_element_indices.insert(iter->GetIndex());
         }
 
+        const std::vector<unsigned>& r_node_perm = pMesh->rGetNodePermutation();
+
         // Add the extra nodes (1 extra node in 1D, 3 in 2D, 6 in 3D) to the element data
         for (typename AbstractMeshReader<DIM,DIM>::ElementIterator iter = pMeshReader->GetElementIteratorBegin(owned_element_indices);
              iter != pMeshReader->GetElementIteratorEnd();
@@ -91,7 +86,12 @@ void QuadraticMeshHelper<DIM>::AddInternalNodesToElements(AbstractTetrahedralMes
             // Add extra nodes to make it a quad element
             for (unsigned j=DIM+1; j<(DIM+1)*(DIM+2)/2; j++)
             {
-                Node<DIM>* p_node = pMesh->GetNodeOrHaloNode(nodes[j]);
+                unsigned node_index = nodes[j];
+                if (!r_node_perm.empty())
+                {
+                    node_index = r_node_perm[node_index];
+                }
+                Node<DIM>* p_node = pMesh->GetNodeOrHaloNode(node_index);
                 p_element->AddNode(p_node);
                 p_node->AddElement(p_element->GetIndex());
                 p_node->MarkAsInternal();
