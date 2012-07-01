@@ -261,13 +261,16 @@ public:
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
 
-        //The following lines are not relevant to this test but need to be there
         TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
         p_fine_mesh->ConstructRegularSlabMesh(1.0, 1.0, 1.0);
         TetrahedralMesh<2,2>* p_coarse_mesh = new TetrahedralMesh<2,2>();//unused in this test
         p_coarse_mesh->ConstructRegularSlabMesh(1.0, 1.0, 1.0);
         FineCoarseMeshPair<2>* p_pair = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh);//also unused in this test
         p_pair->SetUpBoxesOnFineMesh();
+
+        TetrahedralMesh<2,2>* p_coarse_mesh_big = new TetrahedralMesh<2,2>();//unused in this test
+        p_coarse_mesh_big->ConstructRegularSlabMesh(1.0, 3.0, 3.0);
+        FineCoarseMeshPair<2>* p_pair_wrong = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh_big);
         /////////////////////////////////////////////////////////////////////
 
         IncompressibleExplicitSolver2d expl_solver(NONPHYSIOL3,mesh,problem_defn,"");
@@ -286,6 +289,8 @@ public:
 
         // bad contraction model
         IncompressibleExplicitSolver2d solver(NHS,mesh,problem_defn,"");
+        TS_ASSERT_THROWS_THIS(solver.SetFineCoarseMeshPair(p_pair_wrong),
+        		"When setting a mesh pair into the solver, the coarse mesh of the mesh pair must be the same as the quadratic mesh");
         solver.SetFineCoarseMeshPair(p_pair);
         TS_ASSERT_THROWS_THIS(solver.Initialise(), "Unknown or stretch-rate-dependent contraction model");
 

@@ -399,7 +399,17 @@ public:
      */
     void DeleteCoarseBoxCollection();
 
+    /**
+     * Access the fine mesh of this mesh pair
+     * @return the fine mesh
+     */
     const TetrahedralMesh<DIM,DIM>& GetFineMesh() const;
+
+    /**
+     * Access the coarse mesh of this mesh pair
+     * @return the coarse mesh
+     */
+    const TetrahedralMesh<DIM,DIM>& GetCoarseMesh() const;
 
 };
 

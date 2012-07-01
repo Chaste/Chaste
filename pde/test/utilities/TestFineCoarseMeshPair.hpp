@@ -65,7 +65,9 @@ public:
         GaussianQuadratureRule<2> quad_rule(3);
         mesh_pair.ComputeFineElementsAndWeightsForCoarseQuadPoints(quad_rule, true);
 
+        //test get methods
         TS_ASSERT_EQUALS(mesh_pair.GetFineMesh().GetNumAllElements(), 4u);
+        TS_ASSERT_EQUALS(mesh_pair.GetCoarseMesh().GetNumAllElements(), 2u);
 
         // All coarse quadrature points should have been found in the fine mesh
         TS_ASSERT_EQUALS(mesh_pair.mNotInMesh.size(), 0u);

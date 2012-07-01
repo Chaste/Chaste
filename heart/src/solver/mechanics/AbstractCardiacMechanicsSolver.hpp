@@ -222,7 +222,9 @@ public:
     ~AbstractCardiacMechanicsSolver();
 
     /**
-     * Sets the fine-coarse mesh pair object so that the solver knows about electrics too
+     * Sets the fine-coarse mesh pair object so that the solver knows about electrics too.
+     * It checks that the coarse mesh of the fine-mesh pair has the same number of elements as
+     * the quad mesh of this object and throws an exception otherwise.
      *
      * @param pMeshPair the FineCoarseMeshPair object to be set
      */
@@ -348,6 +350,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Initialise()
 
     std::vector<ElementAndWeights<DIM> > fine_elements = mpMeshPair->rGetElementsAndWeights();
     assert(fine_elements.size()==mTotalQuadPoints);
+    assert(mpMeshPair!=NULL);
 
     for (typename AbstractTetrahedralMesh<DIM, DIM>::ElementIterator iter = this->mrQuadMesh.GetElementIteratorBegin();
          iter != this->mrQuadMesh.GetElementIteratorEnd();
@@ -398,6 +401,10 @@ template<class ELASTICITY_SOLVER,unsigned DIM>
 void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetFineCoarseMeshPair(FineCoarseMeshPair<DIM>* pMeshPair)
 {
 	assert(pMeshPair!=NULL);
+	if (pMeshPair->GetCoarseMesh().GetNumElements() != this->mrQuadMesh.GetNumElements())
+	{
+		EXCEPTION("When setting a mesh pair into the solver, the coarse mesh of the mesh pair must be the same as the quadratic mesh");
+	}
 	mpMeshPair = pMeshPair;
 }
 

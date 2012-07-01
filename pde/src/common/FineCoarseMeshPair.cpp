@@ -52,6 +52,12 @@ const TetrahedralMesh<DIM,DIM>& FineCoarseMeshPair<DIM>::GetFineMesh() const
 }
 
 template<unsigned DIM>
+const TetrahedralMesh<DIM,DIM>& FineCoarseMeshPair<DIM>::GetCoarseMesh() const
+{
+	return  mrCoarseMesh;
+}
+
+template<unsigned DIM>
 FineCoarseMeshPair<DIM>::~FineCoarseMeshPair()
 {
     DeleteFineBoxCollection();

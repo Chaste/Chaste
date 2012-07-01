@@ -53,7 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TimeStepper.hpp"
 #include "SimpleDataWriter.hpp"
 #include "Nash2004ContractionModel.hpp"
-
+#include "FakeBathContractionModel.hpp"
 #include "NhsModelWithBackwardSolver.hpp"
 
 // specify a functional form of lambda rather than get it from the mechanics.
@@ -707,6 +707,23 @@ public :
         // towards the end
         TS_ASSERT_DELTA(times[100000],1000,1e-3);
         TS_ASSERT_DELTA(active_tensions[100000],0.2496,1e-2);
+    }
+
+    void TestFakeBathContractionModel() throw(Exception)
+    {
+    	FakeBathContractionModel model1;
+        ContractionModelInputParameters input_parameters;
+        model1.SetInputParameters(input_parameters);
+        model1.SetStretchAndStretchRate(1.0, 0.0);
+        // call Run to set the end time = 0.0
+        model1.RunDoNotUpdate(-0.1,0,0.1);
+
+        TS_ASSERT_DELTA(model1.GetActiveTension(), 0.0, 1e-12);
+
+        model1.SetStretchAndStretchRate(0.8, 0.1);
+        model1.RunDoNotUpdate(0,1,0.1);
+
+        TS_ASSERT_DELTA(model1.GetActiveTension(), 0.0, 1e-12);
     }
 };
 #endif /*TESTCONTRACTIONMODELS_HPP_*/
