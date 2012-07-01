@@ -43,8 +43,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LinearBasisFunction.hpp"
 #include "AbstractContractionModel.hpp"
 #include "FibreReader.hpp"
-
+#include "FineCoarseMeshPair.hpp"
 #include "AbstractCardiacMechanicsSolverInterface.hpp"
+#include "HeartRegionCodes.hpp"
 
 
 /**
@@ -56,6 +57,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 typedef struct DataAtQuadraturePoint_
 {
     AbstractContractionModel* ContractionModel; /**< Pointer to contraction model at this quadrature point */
+    bool Active;/**<whether this quad point is active or not*/
     double Stretch; /**< Stretch (in fibre direction) at this quadrature point */
     double StretchLastTimeStep; /**< Stretch (in fibre direction) at the previous timestep, at this quadrature point */
 
@@ -85,7 +87,7 @@ protected:
      *  A map from the index of a quadrature point to the data (contraction
      *  model, stretch, stretch at the last time-step) at that quad point.
      *  Note that there is no vector of all the quadrature points of the mesh;
-     *  the quad pointindex is the index that would be obtained by looping over
+     *  the quad point index is the index that would be obtained by looping over
      *  elements and then looping over quad points.
      *
      *  DISTRIBUTED - only holds data for the quad points within elements
@@ -98,7 +100,9 @@ protected:
      */
     std::map<unsigned,DataAtQuadraturePoint>::iterator mMapIterator;
 
+    ContractionModelName mContractionModelName;
 
+    FineCoarseMeshPair<DIM>* mpMeshPair;
 
     /** Total number of quad points in the (mechanics) mesh */
     unsigned mTotalQuadPoints;
@@ -134,6 +138,7 @@ protected:
      */
     virtual bool IsImplicitSolver()=0;
 
+
     /**
      *  Overloaded AddActiveStressAndStressDerivative(), which calls on the contraction model to get
      *  the active stress and add it on to the stress tensor
@@ -165,6 +170,19 @@ protected:
      */
     void SetupChangeOfBasisMatrix(unsigned elementIndex, unsigned currentQuadPointGlobalIndex);
 
+    /**
+     * Sets relevant data at all quad points, including whether it is an active region or not.
+     * The contraction model is set to NULL.
+     * At the end, it calls InitialiseContractionModels in the child class to assign a proper model.
+     */
+    void Initialise();
+
+    /**
+     * Must assign a contraction model at each quad point.
+     * It has to assign fake-bath models to non-active regions
+     * @param contractionModelName the name of the contraction model.
+     */
+    virtual void InitialiseContractionModels(ContractionModelName contractionModelName) = 0;
 
 
     /**
@@ -194,6 +212,7 @@ public:
      * @param outputDirectory The output directory, relative to TEST_OUTPUT
      */
     AbstractCardiacMechanicsSolver(QuadraticMesh<DIM>& rQuadMesh,
+								   ContractionModelName contractionModelName,
                                    SolidMechanicsProblemDefinition<DIM>& rProblemDefinition,
                                    std::string outputDirectory);
 
@@ -202,6 +221,12 @@ public:
      */
     ~AbstractCardiacMechanicsSolver();
 
+    /**
+     * Sets the fine-coarse mesh pair object so that the solver knows about electrics too
+     *
+     * @param pMeshPair the FineCoarseMeshPair object to be set
+     */
+    void SetFineCoarseMeshPair(FineCoarseMeshPair<DIM>* pMeshPair);
 
     /** Get the total number of quad points in the mesh. Pure, implemented in concrete solver */
     unsigned GetTotalNumQuadPoints()
@@ -299,19 +324,30 @@ public:
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
 AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AbstractCardiacMechanicsSolver(QuadraticMesh<DIM>& rQuadMesh,
+																					  ContractionModelName contractionModelName,
                                                                                       SolidMechanicsProblemDefinition<DIM>& rProblemDefinition,
                                                                                       std::string outputDirectory)
    : ELASTICITY_SOLVER(rQuadMesh,
                        rProblemDefinition,
                        outputDirectory),
+     mContractionModelName(contractionModelName),
+     mpMeshPair(NULL),
      mCurrentTime(DBL_MAX),
      mNextTime(DBL_MAX),
      mOdeTimestep(DBL_MAX)
 {
+
+}
+
+template<class ELASTICITY_SOLVER,unsigned DIM>
+void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Initialise()
+{
     // compute total num quad points
     unsigned num_quad_pts_per_element = this->mpQuadratureRule->GetNumQuadPoints();
-    mTotalQuadPoints = rQuadMesh.GetNumElements()*num_quad_pts_per_element;
+    mTotalQuadPoints = this->mrQuadMesh.GetNumElements()*num_quad_pts_per_element;
 
+    std::vector<ElementAndWeights<DIM> > fine_elements = mpMeshPair->rGetElementsAndWeights();
+    assert(fine_elements.size()==mTotalQuadPoints);
 
     for (typename AbstractTetrahedralMesh<DIM, DIM>::ElementIterator iter = this->mrQuadMesh.GetElementIteratorBegin();
          iter != this->mrQuadMesh.GetElementIteratorEnd();
@@ -324,11 +360,20 @@ AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AbstractCardiacMechanicsS
             for(unsigned j=0; j<num_quad_pts_per_element; j++)
             {
                 unsigned quad_pt_global_index = element.GetIndex()*num_quad_pts_per_element + j;
+
                 DataAtQuadraturePoint data_at_quad_point;
                 data_at_quad_point.ContractionModel = NULL;
                 data_at_quad_point.Stretch = 1.0;
                 data_at_quad_point.StretchLastTimeStep = 1.0;
 
+               	if (mpMeshPair->GetFineMesh().GetElement(fine_elements[quad_pt_global_index].ElementNum)->GetAttribute() == HeartRegionCode::GetValidBathId())
+				{
+            		data_at_quad_point.Active = false;//bath
+            	}
+            	else
+            	{
+            		data_at_quad_point.Active = true;//tissue
+            	}
                 mQuadPointToDataAtQuadPointMap[quad_pt_global_index] = data_at_quad_point;
             }
         }
@@ -345,8 +390,16 @@ AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AbstractCardiacMechanicsS
     }
 
     mpVariableFibreSheetDirections = NULL;
+
+    InitialiseContractionModels(mContractionModelName);
 }
 
+template<class ELASTICITY_SOLVER,unsigned DIM>
+void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetFineCoarseMeshPair(FineCoarseMeshPair<DIM>* pMeshPair)
+{
+	assert(pMeshPair!=NULL);
+	mpMeshPair = pMeshPair;
+}
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
 AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::~AbstractCardiacMechanicsSolver()

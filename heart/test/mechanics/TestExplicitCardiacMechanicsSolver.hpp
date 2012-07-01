@@ -70,6 +70,19 @@ public:
         // NONPHYSIOL1 => NonphysiologicalContractionModel 1
         IncompressibleExplicitSolver2d solver(NONPHYSIOL1,mesh,problem_defn,"TestExplicitCardiacMech");
 
+        //The following lines are not relevant to this test but need to be there
+        TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        p_fine_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0);
+        TetrahedralMesh<2,2>* p_coarse_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        p_coarse_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0);
+        FineCoarseMeshPair<2>* p_pair = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh);//also unused in this test
+        p_pair->SetUpBoxesOnFineMesh();
+        p_pair->ComputeFineElementsAndWeightsForCoarseQuadPoints(*(solver.GetQuadratureRule()), false);
+        p_pair->DeleteFineBoxCollection();
+        solver.SetFineCoarseMeshPair(p_pair);
+        ///////////////////////////////////////////////////////////////////////////
+        solver.Initialise();
+
         // coverage
         QuadraturePointsGroup<2> quad_points(mesh, *(solver.GetQuadratureRule()));
 
@@ -86,6 +99,11 @@ public:
 
         TS_ASSERT_DELTA(solver.rGetDeformedPosition()[4](0),  0.8730, 1e-2);
         TS_ASSERT_DELTA(solver.rGetDeformedPosition()[4](1), -0.0867, 1e-2);
+
+        //in need of deletion even if all these 3 have no influence at all on this test
+        delete p_fine_mesh;
+        delete p_coarse_mesh;
+        delete p_pair;
     }
 
     // with stretch (and stretch-rate) independent contraction models the implicit and explicit schemes
@@ -102,9 +120,25 @@ public:
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
 
+        //The following lines are not relevant to this test but need to be there
+        TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        p_fine_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0);
+        TetrahedralMesh<2,2>* p_coarse_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        p_coarse_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0);
+        FineCoarseMeshPair<2>* p_pair = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh);//also unused in this test
+        p_pair->SetUpBoxesOnFineMesh();
+        /////////////////////////////////////////////////////////////////////
+
         // NONPHYSIOL 1 - contraction model is of the form sin(t)
         IncompressibleExplicitSolver2d expl_solver(NONPHYSIOL1,mesh,problem_defn,""/*"TestCompareExplAndImplCardiacSolvers_Exp"*/);
+        p_pair->ComputeFineElementsAndWeightsForCoarseQuadPoints(*(expl_solver.GetQuadratureRule()), false);
+        p_pair->DeleteFineBoxCollection();
+        expl_solver.SetFineCoarseMeshPair(p_pair);
+        expl_solver.Initialise();
+
         IncompressibleImplicitSolver2d impl_solver(NONPHYSIOL1,mesh,problem_defn,""/*"TestCompareExplAndImplCardiacSolvers_Imp"*/);
+        impl_solver.SetFineCoarseMeshPair(p_pair);
+        impl_solver.Initialise();
 
         double dt = 0.25;
         for(double t=0; t<3; t+=dt)
@@ -120,6 +154,11 @@ public:
                 TS_ASSERT_DELTA(expl_solver.rGetDeformedPosition()[i](1),  impl_solver.rGetDeformedPosition()[i](1), 1e-9);
             }
         }
+
+        //in need of deletion even if all these 3 have no influence at all on this test
+        delete p_fine_mesh;
+        delete p_coarse_mesh;
+        delete p_pair;
     }
 
 
@@ -136,9 +175,25 @@ public:
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
 
+        //The following lines are not relevant to this test but need to be there
+        TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        p_fine_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0);
+        TetrahedralMesh<2,2>* p_coarse_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        p_coarse_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0);
+        FineCoarseMeshPair<2>* p_pair = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh);//also unused in this test
+        p_pair->SetUpBoxesOnFineMesh();
+        /////////////////////////////////////////////////////////////////////
+
         // NONPHYSIOL 2 - contraction model is of the form lam*sin(t)
         IncompressibleExplicitSolver2d expl_solver(NONPHYSIOL2,mesh,problem_defn,"TestCompareExplAndImplCardiacSolversStretch_Exp");
+        p_pair->ComputeFineElementsAndWeightsForCoarseQuadPoints(*(expl_solver.GetQuadratureRule()), false);
+        p_pair->DeleteFineBoxCollection();
+        expl_solver.SetFineCoarseMeshPair(p_pair);
+        expl_solver.Initialise();
+
         IncompressibleImplicitSolver2d impl_solver(NONPHYSIOL2,mesh,problem_defn,"TestCompareExplAndImplCardiacSolversStretch_Imp");
+        impl_solver.SetFineCoarseMeshPair(p_pair);
+        impl_solver.Initialise();
 
         expl_solver.WriteCurrentSpatialSolution("solution","nodes",0);
         impl_solver.WriteCurrentSpatialSolution("solution","nodes",0);
@@ -186,6 +241,11 @@ public:
         // check there was significant deformation - node 4 is (1,0)
         TS_ASSERT_DELTA(mesh.GetNode(4)->rGetLocation()[0], 1.0, 1e-12);
         TS_ASSERT_LESS_THAN(impl_solver.rGetDeformedPosition()[4](0), 0.9);
+
+		//in need of deletion even if all these 3 have no influence at all on this test
+		delete p_fine_mesh;
+		delete p_coarse_mesh;
+		delete p_pair;
     }
 
     // cover all other contraction model options which are allowed but not been used in a test so far
@@ -201,13 +261,38 @@ public:
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
 
+        //The following lines are not relevant to this test but need to be there
+        TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        p_fine_mesh->ConstructRegularSlabMesh(1.0, 1.0, 1.0);
+        TetrahedralMesh<2,2>* p_coarse_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        p_coarse_mesh->ConstructRegularSlabMesh(1.0, 1.0, 1.0);
+        FineCoarseMeshPair<2>* p_pair = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh);//also unused in this test
+        p_pair->SetUpBoxesOnFineMesh();
+        /////////////////////////////////////////////////////////////////////
+
         IncompressibleExplicitSolver2d expl_solver(NONPHYSIOL3,mesh,problem_defn,"");
+        p_pair->ComputeFineElementsAndWeightsForCoarseQuadPoints(*(expl_solver.GetQuadratureRule()), false);
+        p_pair->DeleteFineBoxCollection();
+        expl_solver.SetFineCoarseMeshPair(p_pair);
+        expl_solver.Initialise();
 
         IncompressibleExplicitSolver2d expl_solver_with_nash(NASH2004,mesh,problem_defn,"");
+        expl_solver_with_nash.SetFineCoarseMeshPair(p_pair);
+        expl_solver_with_nash.Initialise();
+
         IncompressibleExplicitSolver2d expl_solver_with_kerchoffs(KERCHOFFS2003,mesh,problem_defn,"");
+        expl_solver_with_kerchoffs.SetFineCoarseMeshPair(p_pair);
+        expl_solver_with_kerchoffs.Initialise();
 
         // bad contraction model
-        TS_ASSERT_THROWS_THIS(IncompressibleExplicitSolver2d solver(NHS,mesh,problem_defn,""), "Unknown or stretch-rate-dependent contraction model");
+        IncompressibleExplicitSolver2d solver(NHS,mesh,problem_defn,"");
+        solver.SetFineCoarseMeshPair(p_pair);
+        TS_ASSERT_THROWS_THIS(solver.Initialise(), "Unknown or stretch-rate-dependent contraction model");
+
+		//in need of deletion even if all these 3 have no influence at all on this test
+		delete p_fine_mesh;
+		delete p_coarse_mesh;
+		delete p_pair;
     }
 };
 

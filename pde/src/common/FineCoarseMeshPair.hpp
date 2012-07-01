@@ -398,6 +398,9 @@ public:
      * ComputeCoarseElementsForFineNodes (etc) has been called.
      */
     void DeleteCoarseBoxCollection();
+
+    const TetrahedralMesh<DIM,DIM>& GetFineMesh() const;
+
 };
 
 #endif /*FINECOARSEMESHPAIR_HPP_*/

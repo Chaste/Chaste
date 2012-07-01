@@ -107,6 +107,14 @@ public:
      * @param tEnd  unused
      */
     void ComputeExceptVoltage(double tStart, double tEnd);
+
+    /**
+     * There is really no calcium here, so we override this method to return a dummy value (0)
+     * Implementing this with a  dummy implementation is needed by mechanics
+     *
+     * @return always zero
+     */
+    double GetIntracellularCalciumConcentration();
 };
 
 

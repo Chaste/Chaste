@@ -33,55 +33,28 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "FakeBathCell.hpp"
-#include "OdeSystemInformation.hpp"
 
-FakeBathCell::FakeBathCell(boost::shared_ptr<AbstractIvpOdeSolver> pSolver,
-                           boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus)
-    : AbstractCardiacCell(pSolver, 1, 0, pIntracellularStimulus)
-{
-    mpSystemInfo = OdeSystemInformation<FakeBathCell>::Instance();
-    Init();
-}
+#include "FakeBathContractionModel.hpp"
+#include <math.h>
 
-FakeBathCell::~FakeBathCell()
+#include <iostream>
+
+FakeBathContractionModel::FakeBathContractionModel()
+    : AbstractAlgebraicContractionModel()
 {
 }
 
-// This method should never be called, but we implement it with something sensible just in case...
-#define COVERAGE_IGNORE
-void FakeBathCell::EvaluateYDerivatives(double time, const std::vector<double> &rY, std::vector<double> &rDY)
-{
-    rDY[0] = 0.0;
-}
-#undef COVERAGE_IGNORE
 
-double FakeBathCell::GetIIonic(const std::vector<double>* pStateVariables)
-{
-    return 0.0;
-}
-
-void FakeBathCell::ComputeExceptVoltage(double tStart, double tEnd)
+void FakeBathContractionModel::SetInputParameters(ContractionModelInputParameters& rInputParameters)
 {
 }
 
-double FakeBathCell::GetIntracellularCalciumConcentration()
+void FakeBathContractionModel::SetStretchAndStretchRate(double stretch, double stretchRate)
+{
+}
+
+double FakeBathContractionModel::GetActiveTension()
 {
 	return 0.0;
 }
 
-template<>
-void OdeSystemInformation<FakeBathCell>::Initialise(void)
-{
-    // State variables
-    this->mVariableNames.push_back("Fake voltage");
-    this->mVariableUnits.push_back("mV");
-    this->mInitialConditions.push_back(0.0);
-
-    this->mInitialised = true;
-}
-
-
-// Serialization for Boost >= 1.36
-#include "SerializationExportWrapperForCpp.hpp"
-CHASTE_CLASS_EXPORT(FakeBathCell)

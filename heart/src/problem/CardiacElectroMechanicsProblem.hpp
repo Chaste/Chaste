@@ -59,8 +59,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 typedef enum ElectricsProblemType_
 {
     MONODOMAIN,//!< MONODOMAIN
-    BIDOMAIN   //!< BIDOMAIN
-    //BIDOMAIN_WITH_BATH
+    BIDOMAIN,   //!< BIDOMAIN
+    BIDOMAIN_WITH_BATH
     //EXTENDED_BIDOMAIN
 } ElectricsProblemType;
 
@@ -126,6 +126,7 @@ protected :
     ElectroMechanicsProblemDefinition<DIM>* mpProblemDefinition;
 
 
+    bool mHasBath;
     /** Class wrapping both meshes, useful for transferring information */
     FineCoarseMeshPair<DIM>* mpMeshPair;
 

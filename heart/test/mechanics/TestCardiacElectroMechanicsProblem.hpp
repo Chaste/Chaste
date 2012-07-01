@@ -373,6 +373,184 @@ public:
         TS_ASSERT_DELTA(X_scale_factor * Y_scale_factor, 1.0, 1e-6);
     }
 
+    //Here we test the presence of a bath in an Em problem
+    //We construct the electrics mesh in a  way that most of it is bath
+    // We then fix the only nodes in the mechanics mesh which are not bath
+    //and then we check that nothing moved
+    void TestMechanicsWithBidomainAndBathImplicit() throw(Exception)
+    {
+        EntirelyStimulatedTissueCellFactory cell_factory;
+
+        TetrahedralMesh<2,2> electrics_mesh;
+        electrics_mesh.ConstructRegularSlabMesh(0.01, 0.05, 0.05);
+
+        //make everything a bath node except for the x=0 line
+        for (TetrahedralMesh<2,2>::ElementIterator iter=electrics_mesh.GetElementIteratorBegin();
+             iter != electrics_mesh.GetElementIteratorEnd();
+            ++iter)
+        {
+            if ((*iter).CalculateCentroid()[0] > 0.001)
+            {
+                (*iter).SetAttribute(HeartRegionCode::GetValidBathId());
+            }
+            else
+            {
+                (*iter).SetAttribute(HeartRegionCode::GetValidTissueId());
+            }
+        }
+
+        QuadraticMesh<2> mechanics_mesh;
+        mechanics_mesh.ConstructRegularSlabMesh(0.025, 0.05, 0.05);
+
+        //store the original node positions
+        std::vector<c_vector<double,2> > original_node_position;
+        c_vector<double,2> pos = zero_vector<double>(2);
+        for(unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        {
+        	pos(0) = mechanics_mesh.GetNode(i)->rGetLocation()[0];
+        	pos(1) = mechanics_mesh.GetNode(i)->rGetLocation()[1];
+        	original_node_position.push_back(pos);
+        }
+
+        std::vector<unsigned> fixed_nodes;
+        std::vector<c_vector<double,2> > fixed_node_locations;
+
+        // fix the node at the origin so that the solution is well-defined (ie unique)
+        fixed_nodes.push_back(0);
+        fixed_node_locations.push_back(zero_vector<double>(2));
+
+        // for the rest of the nodes, if they lie on X=0, fix x=0 but leave y free.
+        for(unsigned i=1 /*not 0*/; i<mechanics_mesh.GetNumNodes(); i++)
+        {
+            if(fabs(mechanics_mesh.GetNode(i)->rGetLocation()[0])<1e-6)
+            {
+                c_vector<double,2> new_position;
+                new_position(0) = 0.0;
+                new_position(1) = SolidMechanicsProblemDefinition<2>::FREE;
+                fixed_nodes.push_back(i);
+                fixed_node_locations.push_back(new_position);
+            }
+        }
+
+        ElectroMechanicsProblemDefinition<2> problem_defn(mechanics_mesh);
+        problem_defn.SetContractionModel(KERCHOFFS2003,1.0);
+        problem_defn.SetUseDefaultCardiacMaterialLaw(COMPRESSIBLE);
+        problem_defn.SetFixedNodes(fixed_nodes, fixed_node_locations);
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01,0.1,1.0);
+        problem_defn.SetMechanicsSolveTimestep(1.0);
+
+        HeartConfig::Instance()->SetSimulationDuration(10.0);
+        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(1500,1500,1500));
+        CardiacElectroMechanicsProblem<2,2> problem(COMPRESSIBLE,
+												  BIDOMAIN_WITH_BATH,
+                                                  &electrics_mesh,
+                                                  &mechanics_mesh,
+                                                  &cell_factory,
+                                                  &problem_defn,
+                                                  "TestCardiacEmWithBath");
+
+        problem.Solve();
+        std::vector<c_vector<double,2> >& r_deformed_position = problem.rGetDeformedPosition();
+
+        // first, check node 8 starts is the far corner
+        assert(fabs(mechanics_mesh.GetNode(8)->rGetLocation()[0] - 0.05)<1e-8);
+        assert(fabs(mechanics_mesh.GetNode(8)->rGetLocation()[1] - 0.05)<1e-8);
+
+        for(unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        {
+            TS_ASSERT_DELTA( r_deformed_position[i](0), original_node_position[i](0), 1e-6);
+            TS_ASSERT_DELTA( r_deformed_position[i](1), original_node_position[i](1), 1e-6);
+        }
+    }
+
+
+    //This test is identical to the test above, just that we use a model that
+    void TestMechanicsWithBidomainAndBathExplicit() throw(Exception)
+    {
+        EntirelyStimulatedTissueCellFactory cell_factory;
+
+        TetrahedralMesh<2,2> electrics_mesh;
+        electrics_mesh.ConstructRegularSlabMesh(0.01, 0.05, 0.05);
+
+        //make everything a bath node except for the x=0 line
+        for (TetrahedralMesh<2,2>::ElementIterator iter=electrics_mesh.GetElementIteratorBegin();
+             iter != electrics_mesh.GetElementIteratorEnd();
+            ++iter)
+        {
+            if ((*iter).CalculateCentroid()[0] > 0.001)
+            {
+                (*iter).SetAttribute(HeartRegionCode::GetValidBathId());
+            }
+            else
+            {
+                (*iter).SetAttribute(HeartRegionCode::GetValidTissueId());
+            }
+        }
+
+        QuadraticMesh<2> mechanics_mesh;
+        mechanics_mesh.ConstructRegularSlabMesh(0.025, 0.05, 0.05);
+
+        //store the original node positions
+        std::vector<c_vector<double,2> > original_node_position;
+        c_vector<double,2> pos = zero_vector<double>(2);
+        for(unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        {
+        	pos(0) = mechanics_mesh.GetNode(i)->rGetLocation()[0];
+        	pos(1) = mechanics_mesh.GetNode(i)->rGetLocation()[1];
+        	original_node_position.push_back(pos);
+        }
+
+        std::vector<unsigned> fixed_nodes;
+        std::vector<c_vector<double,2> > fixed_node_locations;
+
+        // fix the node at the origin so that the solution is well-defined (ie unique)
+        fixed_nodes.push_back(0);
+        fixed_node_locations.push_back(zero_vector<double>(2));
+
+        // for the rest of the nodes, if they lie on X=0, fix x=0 but leave y free.
+        for(unsigned i=1 /*not 0*/; i<mechanics_mesh.GetNumNodes(); i++)
+        {
+            if(fabs(mechanics_mesh.GetNode(i)->rGetLocation()[0])<1e-6)
+            {
+                c_vector<double,2> new_position;
+                new_position(0) = 0.0;
+                new_position(1) = SolidMechanicsProblemDefinition<2>::FREE;
+                fixed_nodes.push_back(i);
+                fixed_node_locations.push_back(new_position);
+            }
+        }
+
+        ElectroMechanicsProblemDefinition<2> problem_defn(mechanics_mesh);
+        problem_defn.SetContractionModel(NASH2004,1.0);
+        problem_defn.SetUseDefaultCardiacMaterialLaw(INCOMPRESSIBLE);
+        problem_defn.SetFixedNodes(fixed_nodes, fixed_node_locations);
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01,0.1,1.0);
+        problem_defn.SetMechanicsSolveTimestep(1.0);
+
+        HeartConfig::Instance()->SetSimulationDuration(10.0);
+        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(1500,1500,1500));
+        CardiacElectroMechanicsProblem<2,2> problem(INCOMPRESSIBLE,
+												  BIDOMAIN_WITH_BATH,
+                                                  &electrics_mesh,
+                                                  &mechanics_mesh,
+                                                  &cell_factory,
+                                                  &problem_defn,
+                                                  "TestCardiacEmWithBath");
+
+        problem.Solve();
+        std::vector<c_vector<double,2> >& r_deformed_position = problem.rGetDeformedPosition();
+
+        // first, check node 8 starts is the far corner
+        assert(fabs(mechanics_mesh.GetNode(8)->rGetLocation()[0] - 0.05)<1e-8);
+        assert(fabs(mechanics_mesh.GetNode(8)->rGetLocation()[1] - 0.05)<1e-8);
+
+        for(unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        {
+            TS_ASSERT_DELTA( r_deformed_position[i](0), original_node_position[i](0), 1e-6);
+            TS_ASSERT_DELTA( r_deformed_position[i](1), original_node_position[i](1), 1e-6);
+        }
+    }
+
     // These tests are older than the above tests..
     void TestImplicitNhs2dOneMechanicsElement() throw(Exception)
     {

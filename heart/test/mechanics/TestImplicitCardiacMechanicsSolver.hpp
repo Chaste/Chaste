@@ -45,6 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QuadraturePointsGroup.hpp"
 #include "NonlinearElasticityTools.hpp"
 #include "ReplicatableVector.hpp"
+#include "TetrahedralMesh.hpp"
 
 
 // useful typedef
@@ -76,6 +77,19 @@ public:
 
         IncompressibleImplicitSolver2d solver(NHS,mesh,problem_defn,"");
 
+        //The following lines are not relevant to this test but need to be there
+        TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        p_fine_mesh->ConstructRegularSlabMesh(1.0,1.0,1.0);
+        TetrahedralMesh<2,2>* p_coarse_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        p_coarse_mesh->ConstructRegularSlabMesh(1.0,1.0,1.0);
+        FineCoarseMeshPair<2>* p_pair = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh);//also unused in this test
+        p_pair->SetUpBoxesOnFineMesh();
+        p_pair->ComputeFineElementsAndWeightsForCoarseQuadPoints(*(solver.GetQuadratureRule()), false);
+        p_pair->DeleteFineBoxCollection();
+        solver.SetFineCoarseMeshPair(p_pair);
+        ///////////////////////////////////////////////////////////////////////////
+
+        solver.Initialise();
         std::vector<double> calcium_conc(solver.GetTotalNumQuadPoints(), 0.0);
         std::vector<double> voltages(solver.GetTotalNumQuadPoints(), 0.0);
 
@@ -133,6 +147,11 @@ public:
                 }
             }
         }
+
+        //in need of deletion even if all these 3 have no influence at all on this test
+        delete p_fine_mesh;
+        delete p_coarse_mesh;
+        delete p_pair;
         PetscTools::Barrier("TestCompareJacobians");
     }
 
@@ -153,6 +172,19 @@ public:
 
         IncompressibleImplicitSolver2d solver(NHS,mesh,problem_defn,"ImplicitCardiacMech/ZeroActiveTension");
 
+        //The following lines are not relevant to this test but need to be there
+        TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        p_fine_mesh->ConstructRegularSlabMesh(0.125, 1.0, 1.0);
+        TetrahedralMesh<2,2>* p_coarse_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        p_coarse_mesh->ConstructRegularSlabMesh(0.125, 1.0, 1.0);
+        FineCoarseMeshPair<2>* p_pair = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh);//also unused in this test
+        p_pair->SetUpBoxesOnFineMesh();
+        p_pair->ComputeFineElementsAndWeightsForCoarseQuadPoints(*(solver.GetQuadratureRule()), false);
+        p_pair->DeleteFineBoxCollection();
+        solver.SetFineCoarseMeshPair(p_pair);
+        ///////////////////////////////////////////////////////////////////////////
+        solver.Initialise();
+
         TS_ASSERT_EQUALS(solver.GetTotalNumQuadPoints(), mesh.GetNumElements()*9u);
 
         // 0.0002 is the initial Ca conc in Lr91
@@ -163,6 +195,11 @@ public:
         solver.Solve(0,0.1,0.01);
 
         TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(), 0u);
+
+        //in need of deletion even if all these 3 have no influence at all on this test
+        delete p_fine_mesh;
+        delete p_coarse_mesh;
+        delete p_pair;
     }
 
 
@@ -187,6 +224,19 @@ public:
         IncompressibleImplicitSolver2d solver(NHS,mesh,problem_defn,"ImplicitCardiacMech/SpecifiedCaCompression");
         QuadraturePointsGroup<2> quad_points(mesh, *(solver.GetQuadratureRule()));
 
+        //The following lines are not relevant to this test but need to be there
+        TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        p_fine_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0);
+        TetrahedralMesh<2,2>* p_coarse_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        p_coarse_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0);
+        FineCoarseMeshPair<2>* p_pair = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh);//also unused in this test
+        p_pair->SetUpBoxesOnFineMesh();
+        p_pair->ComputeFineElementsAndWeightsForCoarseQuadPoints(*(solver.GetQuadratureRule()), false);
+        p_pair->DeleteFineBoxCollection();
+        solver.SetFineCoarseMeshPair(p_pair);
+        ///////////////////////////////////////////////////////////////////////////
+
+        solver.Initialise();
         std::vector<double> calcium_conc(solver.GetTotalNumQuadPoints());
         for(unsigned i=0; i<calcium_conc.size(); i++)
         {
@@ -259,6 +309,11 @@ public:
         {
             TS_ASSERT_DELTA(iter->second.Stretch, 0.9737, 2e-3);
         }
+
+        //in need of deletion even if all these 3 have no influence at all on this test
+        delete p_fine_mesh;
+        delete p_coarse_mesh;
+        delete p_pair;
     }
 
     // Same as above test but has fibres in Y-direction (and bottom surface fixed - so results are the same),
@@ -283,6 +338,19 @@ public:
             problem_defn.SetZeroDisplacementNodes(fixed_nodes);
 
             IncompressibleImplicitSolver2d solver(NHS,mesh,problem_defn,"ImplicitCardiacMech/FibresInYDirection");
+
+            //The following lines are not relevant to this test but need to be there
+            TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
+            p_fine_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0);
+            TetrahedralMesh<2,2>* p_coarse_mesh = new TetrahedralMesh<2,2>();//unused in this test
+            p_coarse_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0);
+            FineCoarseMeshPair<2>* p_pair = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh);//also unused in this test
+            p_pair->SetUpBoxesOnFineMesh();
+            p_pair->ComputeFineElementsAndWeightsForCoarseQuadPoints(*(solver.GetQuadratureRule()), false);
+            p_pair->DeleteFineBoxCollection();
+            solver.SetFineCoarseMeshPair(p_pair);
+            ///////////////////////////////////////////////////////////////////////////
+            solver.Initialise();
 
             if(run==1)
             {
@@ -331,6 +399,11 @@ public:
             {
                 TS_ASSERT_DELTA(iter->second.Stretch, 0.9693, 1e-3);  // ** different value to previous test - attributing the difference in results to the fact mesh isn't rotation-invariant
             }
+
+            //in need of deletion even if all these 3 have no influence at all on this test
+            delete p_fine_mesh;
+            delete p_coarse_mesh;
+            delete p_pair;
         }
     }
 
@@ -349,10 +422,30 @@ public:
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
 
+        //The following lines are not relevant to this test but need to be there
+        TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        p_fine_mesh->ConstructRegularSlabMesh(1.0, 1.0, 1.0);
+        TetrahedralMesh<2,2>* p_coarse_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        p_coarse_mesh->ConstructRegularSlabMesh(1.0, 1.0, 1.0);
+        FineCoarseMeshPair<2>* p_pair = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh);//also unused in this test
+        p_pair->SetUpBoxesOnFineMesh();
+
+        //////////////////////////////////////////////////////////////////
         IncompressibleImplicitSolver2d impl_solver1(KERCHOFFS2003,mesh,problem_defn,"");
+        p_pair->ComputeFineElementsAndWeightsForCoarseQuadPoints(*(impl_solver1.GetQuadratureRule()), false);
+        p_pair->DeleteFineBoxCollection();
+        impl_solver1.SetFineCoarseMeshPair(p_pair);
+        impl_solver1.Initialise();
         IncompressibleImplicitSolver2d impl_solver2(NONPHYSIOL3,mesh,problem_defn,"");
+        impl_solver2.SetFineCoarseMeshPair(p_pair);
+        impl_solver2.Initialise();
 
         // call with TS_ASSERT_THROWS_CONTAINS with any disallowed contraction models here:
+
+        //in need of deletion even if all these 3 have no influence at all on this test
+        delete p_fine_mesh;
+        delete p_coarse_mesh;
+        delete p_pair;
     }
 
 
@@ -369,6 +462,19 @@ public:
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
 
         IncompressibleImplicitSolver2d solver(KERCHOFFS2003,mesh,problem_defn,"");
+
+        //The following lines are not relevant to this test but need to be there
+        TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        p_fine_mesh->ConstructRegularSlabMesh(1.0, 1.0, 1.0);
+        TetrahedralMesh<2,2>* p_coarse_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        p_coarse_mesh->ConstructRegularSlabMesh(1.0, 1.0, 1.0);
+        FineCoarseMeshPair<2>* p_pair = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh);//also unused in this test
+        p_pair->SetUpBoxesOnFineMesh();
+        p_pair->ComputeFineElementsAndWeightsForCoarseQuadPoints(*(solver.GetQuadratureRule()), false);
+        p_pair->DeleteFineBoxCollection();
+        solver.SetFineCoarseMeshPair(p_pair);
+        ///////////////////////////////////////////////////////////////////////////
+        solver.Initialise();
 
         // compute the stretches, they should be 1
         std::vector<double> stretches(mesh.GetNumElements());
@@ -406,7 +512,8 @@ public:
         solver.ComputeDeformationGradientAndStretchInEachElement(deformation_gradients, stretches);
 
         c_matrix<double,2,2> correct_F = identity_matrix<double>(2);
-        correct_F(1,1) = 0.9;
+        correct_F(1,1) = 0.9;        //in need of deletion even if all these 3 have no influence at all on this test
+
         for(unsigned i=0; i<stretches.size(); i++)
         {
             TS_ASSERT_DELTA(stretches[i], 1.0, 1e-6);
@@ -431,6 +538,11 @@ public:
             double err = MatrixNorm(deformation_gradients[i]-correct_F);
             TS_ASSERT_DELTA(err, 0.0, 1e-10);
         }
+
+        //in need of deletion even if all these 3 have no influence at all on this test
+        delete p_fine_mesh;
+        delete p_coarse_mesh;
+        delete p_pair;
     }
 
     // this test defines a fibre direction for each quadrature point - but the fibres directions are all constant
@@ -451,6 +563,19 @@ public:
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
 
         IncompressibleImplicitSolver2d solver(NHS, mesh, problem_defn, "ImplicitCardiacMech/FibresInYDirectionDefinePerQuadPoint");
+
+        //The following lines are not relevant to this test but need to be there
+        TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        p_fine_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0);
+        TetrahedralMesh<2,2>* p_coarse_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        p_coarse_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0);
+        FineCoarseMeshPair<2>* p_pair = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh);//also unused in this test
+        p_pair->SetUpBoxesOnFineMesh();
+        p_pair->ComputeFineElementsAndWeightsForCoarseQuadPoints(*(solver.GetQuadratureRule()), false);
+        p_pair->DeleteFineBoxCollection();
+        solver.SetFineCoarseMeshPair(p_pair);
+        ///////////////////////////////////////////////////////////////////////////
+        solver.Initialise();
 
         TS_ASSERT_THROWS_CONTAINS( solver.SetVariableFibreSheetDirections("heart/test/data/fibre_tests/badheader_4by4mesh_fibres.orthoquad", true), "found 45430, expected 288");
         solver.SetVariableFibreSheetDirections("heart/test/data/fibre_tests/4by4mesh_fibres.orthoquad", true);
@@ -483,6 +608,11 @@ public:
         {
             TS_ASSERT_DELTA(iter->second.Stretch, 0.9693, 1e-3);
         }
+
+        //in need of deletion even if all these 3 have no influence at all on this test
+        delete p_fine_mesh;
+        delete p_coarse_mesh;
+        delete p_pair;
     }
 
 
@@ -526,7 +656,19 @@ public:
 //        problem_defn.SetZeroDisplacementNodes(fixed_nodes);
 //
 //        IncompressibleImplicitSolver2d solver(NHS, mesh, problem_defn, "ImplicitCardiacMech/CompareWithExplicit",&law);
-//
+//		  //The following lines are not relevant to this test but need to be there
+//		  TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
+//		  p_fine_mesh->ConstructRegularSlabMesh(0.125, 1.0, 1.0);
+//		  TetrahedralMesh<2,2>* p_coarse_mesh = new TetrahedralMesh<2,2>();//unused in this test
+//		  p_coarse_mesh->ConstructRegularSlabMesh(0.125, 1.0, 1.0);
+//		  FineCoarseMeshPair<2>* p_pair = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh);//also unused in this test
+//		  p_pair->SetUpBoxesOnFineMesh();
+//		  p_pair->ComputeFineElementsAndWeightsForCoarseQuadPoints(*(solver.GetQuadratureRule()), false);
+//		  p_pair->DeleteFineBoxCollection();
+//		  solver.SetFineCoarseMeshPair(p_pair);
+//		  ///////////////////////////////////////////////////////////////////////////
+//		  solver.Initialise();
+
 //        std::vector<double> calcium_conc(solver.GetTotalNumQuadPoints(), 1); // unrealistically large Ca (but note random material law used)
 //        std::vector<double> voltages(solver.GetTotalNumQuadPoints(), 0.0);
 //        solver.SetCalciumAndVoltage(calcium_conc, voltages);
@@ -540,6 +682,11 @@ public:
 //        // Hardcoded value for (0,1) node
 //        TS_ASSERT_DELTA(solver.rGetDeformedPosition()[72](0), -0.00465 /*dealii*/, 4e-4);
 //        TS_ASSERT_DELTA(solver.rGetDeformedPosition()[72](1),  1.00666 /*dealii*/, 1e-4);
+//
+//        //in need of deletion even if all these 3 have no influence at all on this test
+//        delete p_fine_mesh;
+//        delete p_coarse_mesh;
+//        delete p_pair;
 //    }
 };
 

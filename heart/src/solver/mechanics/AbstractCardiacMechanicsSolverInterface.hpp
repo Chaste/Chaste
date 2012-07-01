@@ -71,6 +71,9 @@ public:
     /** Get the quadrature rule used in the elements. */
     virtual GaussianQuadratureRule<DIM>* GetQuadratureRule()=0;
 
+    virtual void Initialise() = 0;
+
+    virtual void SetFineCoarseMeshPair(FineCoarseMeshPair<DIM>* pMeshPair) = 0;
 
     /**
      *  Set a constant fibre-sheet-normal direction (a matrix) to something other than the default (fibres in X-direction,

@@ -33,55 +33,61 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "FakeBathCell.hpp"
-#include "OdeSystemInformation.hpp"
+#ifndef _FAKEBATHCONTRACTIONMODEL_HPP_
+#define _FAKEBATHCONTRACTIONMODEL_HPP_
 
-FakeBathCell::FakeBathCell(boost::shared_ptr<AbstractIvpOdeSolver> pSolver,
-                           boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus)
-    : AbstractCardiacCell(pSolver, 1, 0, pIntracellularStimulus)
+#include "AbstractAlgebraicContractionModel.hpp"
+
+
+/**
+ * A fake contraction model that returns zero active tension always.
+ * It is useful to be placed in bath nodes within EM simulations
+ */
+class FakeBathContractionModel : public AbstractAlgebraicContractionModel
 {
-    mpSystemInfo = OdeSystemInformation<FakeBathCell>::Instance();
-    Init();
-}
 
-FakeBathCell::~FakeBathCell()
-{
-}
+public:
+    /**
+     * Constructor.
+     */
+    FakeBathContractionModel();
 
-// This method should never be called, but we implement it with something sensible just in case...
-#define COVERAGE_IGNORE
-void FakeBathCell::EvaluateYDerivatives(double time, const std::vector<double> &rY, std::vector<double> &rDY)
-{
-    rDY[0] = 0.0;
-}
-#undef COVERAGE_IGNORE
+    /**
+     *  Set the input parameters (none of which are used in this model)
+     *  @param rInputParameters Structure containing voltage, [Ca]_i.
+     */
+    void SetInputParameters(ContractionModelInputParameters& rInputParameters);
 
-double FakeBathCell::GetIIonic(const std::vector<double>* pStateVariables)
-{
-    return 0.0;
-}
+    /**
+     *  Set the fibre stretch and stretch-rate (none of these are used)
+     *  @param stretch stretch in the fibre direction
+     *  @param stretchRate rate of change of stretch in the fibre direction (not used in this model).
+     */
+    void SetStretchAndStretchRate(double stretch, double stretchRate);
 
-void FakeBathCell::ComputeExceptVoltage(double tStart, double tEnd)
-{
-}
+    /**
+     *  Get the active tension given the current stretch and time
+     *  It will return zero always (this is a fake contraction modoel)
+     */
+    double GetActiveTension();
 
-double FakeBathCell::GetIntracellularCalciumConcentration()
-{
-	return 0.0;
-}
+    /**
+     *  This model is stretch-rate-independent
+     */
+    bool IsStretchDependent()
+    {
+        return false;
+    }
 
-template<>
-void OdeSystemInformation<FakeBathCell>::Initialise(void)
-{
-    // State variables
-    this->mVariableNames.push_back("Fake voltage");
-    this->mVariableUnits.push_back("mV");
-    this->mInitialConditions.push_back(0.0);
-
-    this->mInitialised = true;
-}
+    /**
+     *  This model is stretch-rate-independent
+     */
+    bool IsStretchRateDependent()
+    {
+        return false;
+    }
+};
 
 
-// Serialization for Boost >= 1.36
-#include "SerializationExportWrapperForCpp.hpp"
-CHASTE_CLASS_EXPORT(FakeBathCell)
+#endif /*_FAKEBATHCONTRACTIONMODEL_HPP_*/
+

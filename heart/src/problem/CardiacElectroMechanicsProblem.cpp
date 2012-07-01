@@ -250,7 +250,11 @@ public:
     {
         if (problemType == BIDOMAIN)
         {
-            return new BidomainProblem<DIM>(pCellFactory);
+            return new BidomainProblem<DIM>(pCellFactory, false);//false-> no bath
+        }
+        if (problemType == BIDOMAIN_WITH_BATH)
+        {
+        	return new BidomainProblem<DIM>(pCellFactory, true);// true-> bath
         }
         EXCEPTION("The second template parameter should be 1 when a monodomain problem is chosen");
     }
@@ -272,6 +276,7 @@ CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::CardiacElectroMechanicsProble
         mpElectricsMesh(pElectricsMesh),
         mpMechanicsMesh(pMechanicsMesh),
         mpProblemDefinition(pProblemDefinition),
+        mHasBath(false),
         mpMeshPair(NULL),
         mNoElectricsOutput(false),
         mIsWatchedLocation(false),
@@ -304,6 +309,10 @@ CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::CardiacElectroMechanicsProble
     assert(pCellFactory != NULL);
     mpElectricsProblem = CreateElectricsProblem<DIM,ELEC_PROB_DIM>::Create(electricsProblemType, pCellFactory);
 
+    if (electricsProblemType == BIDOMAIN_WITH_BATH)
+    {
+    	mHasBath = true;
+    }
     // check whether output is required
     mWriteOutput = (outputDirectory!="");
     if(mWriteOutput)
@@ -429,8 +438,10 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
         }
     }
 
+
     mpMechanicsSolver = dynamic_cast<AbstractNonlinearElasticitySolver<DIM>*>(mpCardiacMechSolver);
     assert(mpMechanicsSolver);
+
 
     if(mpProblemDefinition->ReadFibreSheetDirectionsFromFile())
     {
@@ -445,7 +456,8 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
     mpMeshPair->ComputeFineElementsAndWeightsForCoarseQuadPoints(*(mpCardiacMechSolver->GetQuadratureRule()), false);
     mpMeshPair->DeleteFineBoxCollection();
 
-
+    mpCardiacMechSolver->SetFineCoarseMeshPair(mpMeshPair);
+    mpCardiacMechSolver->Initialise();
 
     if(mpProblemDefinition->GetDeformationAffectsConductivity() || mpProblemDefinition->GetDeformationAffectsCellModels())
     {
@@ -540,6 +552,17 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
                                                                WRITE_QUADRATIC_MESH);
         std::vector<std::string> fields;
         fields.push_back("V");
+        if(ELEC_PROB_DIM==2)
+        {
+        	fields.push_back("Phi_e");
+        	if (mHasBath==true)
+        	{
+                std::vector<std::string> names;
+                names.push_back("tissue");
+                names.push_back("bath");
+                p_cmgui_writer->SetRegionNames(names);
+        	}
+        }
         p_cmgui_writer->SetAdditionalFieldNames(fields);
         p_cmgui_writer->WriteInitialMesh("undeformed");
     }
@@ -888,7 +911,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
         //Hdf5ToMeshalyzerConverter<DIM,DIM> meshalyzer_converter(input_dir, "voltage", mpElectricsMesh);
 
         // convert output to CMGUI format
-        Hdf5ToCmguiConverter<DIM,DIM> cmgui_converter(input_dir,"voltage",mpElectricsMesh);
+        Hdf5ToCmguiConverter<DIM,DIM> cmgui_converter(input_dir,"voltage",mpElectricsMesh, mHasBath);
 
         // Write mesh in a suitable form for meshalyzer
         //std::string output_directory =  mOutputDirectory + "/electrics/output";

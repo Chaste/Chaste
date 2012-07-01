@@ -59,7 +59,7 @@ template<class ELASTICITY_SOLVER, unsigned DIM>
 class ImplicitCardiacMechanicsSolver : public AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>
 {
 friend class TestImplicitCardiacMechanicsSolver;
-
+friend class TestExplicitCardiacMechanicsSolver;//for comparison test
 private:
     /** This solver is an implicit solver (overloaded pure method) */
     bool IsImplicitSolver()
