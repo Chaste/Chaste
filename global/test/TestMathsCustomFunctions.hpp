@@ -46,11 +46,15 @@ public:
 
     void TestSmallPow() throw(Exception)
     {
-        for (unsigned i=0; i<9; i++)
+        for (unsigned i=0; i<10; i++)
         {
-            TS_ASSERT_DELTA(SmallPow(0.0, i), pow(0.0, double(i)), 1e-16);
+            TS_ASSERT_DELTA(SmallPow(0.0, i), pow(0.0, double(i)), DBL_EPSILON);
             TS_ASSERT_DELTA(SmallPow(-1.67e3, i), pow(-1.67e3, double(i)), 1e14);//(1e3)^10/DBL_EPSILON
-            TS_ASSERT_DELTA(SmallPow(75.0, i), pow(75.0, double(i)), 1e-16);
+            //Note the following should be within DBL_EPSILON on a 64-bit machine.  However,
+            //32-bit floating point accumulated errors push both SmallPow and pow away from integer values.
+            //There also seems to be 32-bit issue within TS_ASSERT_DELTA...
+            double diff = SmallPow(75.0, i) - pow(75.0, double(i));
+            TS_ASSERT_EQUALS(diff, 0.0);
         }
     }
 
