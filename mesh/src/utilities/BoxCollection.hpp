@@ -47,7 +47,8 @@ template<unsigned DIM>
 class Box
 {
 private:
-    /** Coordinates of the box, in the form (for 2D) (xmin, xmax, ymin, ymax) (etc). */
+
+	/** Coordinates of the box, in the form (for 2D) (xmin, xmax, ymin, ymax) (etc). */
     c_vector<double, 2*DIM> mMinAndMaxValues;
 
     /** Nodes contained in this box. */
@@ -102,6 +103,8 @@ template<unsigned DIM>
 class BoxCollection
 {
 private:
+    friend class TestBoxCollection;
+
     /** A vector of boxes to store rough node/element positions. */
     std::vector< Box<DIM> > mBoxes;
 

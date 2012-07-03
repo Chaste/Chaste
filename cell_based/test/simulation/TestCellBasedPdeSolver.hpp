@@ -72,7 +72,7 @@ public:
         bcc.AddDirichletBoundaryCondition(mesh.GetNode(2), p_boundary_condition);
         bcc.AddDirichletBoundaryCondition(mesh.GetNode(3), p_boundary_condition);
 
-        // Creat PDE solvers
+        // Create PDE solvers
         SimpleLinearEllipticSolver<2,2> simple_solver(&mesh, &pde, &bcc);
         CellBasedPdeSolver<2> pde_solver(&mesh, &pde, &bcc);
 

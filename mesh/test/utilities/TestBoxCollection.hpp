@@ -467,6 +467,39 @@ public:
         TS_ASSERT_EQUALS(local_boxes_to_box_48, correct_answer_48);
     }
 
+    /* This test insert to verify repeatability of BoxCollection floating point
+     * calculations.  Note that failure of this test on a given architecture implies
+     * the failure of node-based cell simulations
+     */
+    void TestLargeBoxCollection2d() throw (Exception)
+    {
+        double cut_off_length = 1e-3;
+
+        c_vector<double, 2*2> domain_size;
+        domain_size(0) = 0.0;
+        domain_size(1) = 1.0;
+        domain_size(2) = 0.0;
+        domain_size(3) = 1.0;
+
+        BoxCollection<2> box_collection(cut_off_length, domain_size);
+        TS_ASSERT_EQUALS(box_collection.mNumBoxesEachDirection[0], 1001u);
+        TS_ASSERT_EQUALS(box_collection.mNumBoxesEachDirection[1], 1001u);
+
+        c_vector<double, 2> probe;
+
+        probe(0)=0.0; probe(1)=0.0;
+        TS_ASSERT_EQUALS(box_collection.CalculateContainingBox(probe), 0u);
+
+        probe(0)=1.0; probe(1)=0.0;
+        TS_ASSERT_EQUALS(box_collection.CalculateContainingBox(probe), 1000u);
+
+        probe(0)=0.0; probe(1)=1.0;
+        TS_ASSERT_EQUALS(box_collection.CalculateContainingBox(probe), 1001000u);
+
+        probe(0)=1.0; probe(1)=1.0;
+        TS_ASSERT_EQUALS(box_collection.CalculateContainingBox(probe), 1002000u);
+
+    }
     void TestPairsReturned2d() throw (Exception)
     {
         std::vector< ChastePoint<2>* > points(10);
