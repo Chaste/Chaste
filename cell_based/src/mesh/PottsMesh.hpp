@@ -54,7 +54,7 @@ class PottsMeshWriter;
 #include "ArchiveLocationInfo.hpp"
 #include "PottsMeshReader.hpp"
 #include "PottsMeshWriter.hpp"
-#include "PottsElement.hpp"
+#include "MutableElement.hpp"
 
 /**
  * A Potts-based mesh class, for use in Cellular Potts model simulations.
@@ -65,8 +65,8 @@ class PottsMesh : public AbstractMesh<DIM, DIM>
     friend class TestPottsMesh;
 
 protected:
-    /** Vector of pointers to PottsElements. */
-    std::vector<PottsElement<DIM>*> mElements;
+    /** Vector of pointers to MutableElements. */
+    std::vector<MutableElement<DIM>*> mElements;
 
     /**
      * Indices of elements that have been marked as deleted.
@@ -157,19 +157,19 @@ public:
     //////////////////////////////////////////////////////////////////////
 
     /** Forward declaration */
-    class PottsElementIterator;
+    class MutableElementIterator;
 
     /**
      * Get an iterator to the first element in the mesh.
      *
      * @param skipDeletedElements whether to include deleted element
      */
-    inline PottsElementIterator GetElementIteratorBegin(bool skipDeletedElements=true);
+    inline MutableElementIterator GetElementIteratorBegin(bool skipDeletedElements=true);
 
     /**
      * Get an iterator to one past the last element in the mesh.
      */
-    inline PottsElementIterator GetElementIteratorEnd();
+    inline MutableElementIterator GetElementIteratorEnd();
 
     //////////////////////////////////////////////////////////////////////
     //                             Methods                              //
@@ -179,12 +179,12 @@ public:
      * Default constructor.
      *
      * @param nodes vector of pointers to nodes
-     * @param pottsElements vector of pointers to PottsElements
+     * @param pottsElements vector of pointers to MutableElements
      * @param vonNeumannNeighbouringNodeIndices vector of set of Moore Neighbours for each node
      * @param mooreNeighbouringNodeIndices vector of set of VonNeuman Neighbours for each node
      */
     PottsMesh(std::vector<Node<DIM>*> nodes,
-              std::vector<PottsElement<DIM>*> pottsElements,
+              std::vector<MutableElement<DIM>*> pottsElements,
               std::vector< std::set<unsigned> > vonNeumannNeighbouringNodeIndices,
               std::vector< std::set<unsigned> > mooreNeighbouringNodeIndices);
 
@@ -205,21 +205,21 @@ public:
     virtual unsigned GetNumNodes() const;
 
     /**
-     * @return the number of PottsElements in the mesh.
+     * @return the number of MutableElements in the mesh.
      */
     virtual unsigned GetNumElements() const;
 
     /**
-     * @return the number of PottsElements in the mesh, including those marked as deleted.
+     * @return the number of MutableElements in the mesh, including those marked as deleted.
      */
     unsigned GetNumAllElements() const;
 
     /**
-     * @param index  the global index of a specified PottsElement.
+     * @param index  the global index of a specified MutableElement.
      *
-     * @return a pointer to the PottsElement
+     * @return a pointer to the MutableElement
      */
-    PottsElement<DIM>* GetElement(unsigned index) const;
+    MutableElement<DIM>* GetElement(unsigned index) const;
 
     /**
      * Compute the centroid of an element.
@@ -259,22 +259,22 @@ public:
                                                     const c_vector<double, DIM>& rLocationB);
 
     /**
-     * Get the volume (or area in 2D, or length in 1D) of a PottsElement.
+     * Get the volume (or area in 2D, or length in 1D) of a MutableElement.
      *
      * This needs to be overridden in daughter classes for non-Euclidean metrics.
      *
-     * @param index  the global index of a specified PottsElement element
+     * @param index  the global index of a specified MutableElement element
      *
      * @return the volume of the element
      */
     virtual double GetVolumeOfElement(unsigned index);
 
     /**
-     * Compute the surface area (or perimeter in 2D) of a PottsElement.
+     * Compute the surface area (or perimeter in 2D) of a MutableElement.
      *
      * This needs to be overridden in daughter classes for non-Euclidean metrics.
      *
-     * @param index  the global index of a specified PottsElement
+     * @param index  the global index of a specified MutableElement
      *
      * @return the surfacearea of the element
      */
@@ -314,7 +314,7 @@ public:
      *
      * @return the index of the new element
      */
-    unsigned DivideElement(PottsElement<DIM>* pElement,
+    unsigned DivideElement(MutableElement<DIM>* pElement,
                            bool placeOriginalElementBelow=false);
 
     /**
@@ -324,7 +324,7 @@ public:
      *
      * @return the index of the new element in the mesh
      */
-    unsigned AddElement(PottsElement<DIM>* pNewElement);
+    unsigned AddElement(MutableElement<DIM>* pNewElement);
 
     //////////////////////////////////////////////////////////////////////
     //                         Nested classes                           //
@@ -335,7 +335,7 @@ public:
      *
      * \todo This is the same as in AbstractTetrahedralMesh and VertexMesh- merge? (#1379)
      */
-    class PottsElementIterator
+    class MutableElementIterator
     {
     public:
         /**
@@ -343,24 +343,24 @@ public:
          *
          * Make sure to use a reference for the result to avoid copying elements unnecessarily.
          */
-        inline PottsElement<DIM>& operator*();
+        inline MutableElement<DIM>& operator*();
 
         /**
          * Member access from a pointer.
          */
-        inline PottsElement<DIM>* operator->();
+        inline MutableElement<DIM>* operator->();
 
         /**
          * Comparison not-equal-to.
          *
          * @param rOther iterator with which comparison is made
          */
-        inline bool operator!=(const PottsMesh<DIM>::PottsElementIterator& rOther);
+        inline bool operator!=(const PottsMesh<DIM>::MutableElementIterator& rOther);
 
         /**
          * Prefix increment operator.
          */
-        inline PottsElementIterator& operator++();
+        inline MutableElementIterator& operator++();
 
         /**
          * Constructor for a new iterator.
@@ -372,8 +372,8 @@ public:
          * @param elementIter where to start iterating
          * @param skipDeletedElements whether to include deleted elements (defaults to true)
          */
-        PottsElementIterator(PottsMesh<DIM>& rMesh,
-                             typename std::vector<PottsElement<DIM> *>::iterator elementIter,
+        MutableElementIterator(PottsMesh<DIM>& rMesh,
+                             typename std::vector<MutableElement<DIM> *>::iterator elementIter,
                              bool skipDeletedElements=true);
 
     private:
@@ -381,7 +381,7 @@ public:
         PottsMesh<DIM>& mrMesh;
 
         /** The actual element iterator. */
-        typename std::vector<PottsElement<DIM> *>::iterator mElementIter;
+        typename std::vector<MutableElement<DIM> *>::iterator mElementIter;
 
         /** Whether to skip deleted elements. */
         bool mSkipDeletedElements;
@@ -402,43 +402,43 @@ public:
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(PottsMesh)
 
 //////////////////////////////////////////////////////////////////////////////
-// PottsElementIterator class implementation - most methods are inlined     //
+// MutableElementIterator class implementation - most methods are inlined     //
 //////////////////////////////////////////////////////////////////////////////
 
 template<unsigned DIM>
-typename PottsMesh<DIM>::PottsElementIterator PottsMesh<DIM>::GetElementIteratorBegin(
+typename PottsMesh<DIM>::MutableElementIterator PottsMesh<DIM>::GetElementIteratorBegin(
         bool skipDeletedElements)
 {
-    return PottsElementIterator(*this, mElements.begin(), skipDeletedElements);
+    return MutableElementIterator(*this, mElements.begin(), skipDeletedElements);
 }
 
 template<unsigned DIM>
-typename PottsMesh<DIM>::PottsElementIterator PottsMesh<DIM>::GetElementIteratorEnd()
+typename PottsMesh<DIM>::MutableElementIterator PottsMesh<DIM>::GetElementIteratorEnd()
 {
-    return PottsElementIterator(*this, mElements.end());
+    return MutableElementIterator(*this, mElements.end());
 }
 template<unsigned DIM>
-PottsElement<DIM>& PottsMesh<DIM>::PottsElementIterator::operator*()
+MutableElement<DIM>& PottsMesh<DIM>::MutableElementIterator::operator*()
 {
     assert(!IsAtEnd());
     return **mElementIter;
 }
 
 template<unsigned DIM>
-PottsElement<DIM>* PottsMesh<DIM>::PottsElementIterator::operator->()
+MutableElement<DIM>* PottsMesh<DIM>::MutableElementIterator::operator->()
 {
     assert(!IsAtEnd());
     return *mElementIter;
 }
 
 template<unsigned DIM>
-bool PottsMesh<DIM>::PottsElementIterator::operator!=(const PottsMesh<DIM>::PottsElementIterator& rOther)
+bool PottsMesh<DIM>::MutableElementIterator::operator!=(const PottsMesh<DIM>::MutableElementIterator& rOther)
 {
     return mElementIter != rOther.mElementIter;
 }
 
 template<unsigned DIM>
-typename PottsMesh<DIM>::PottsElementIterator& PottsMesh<DIM>::PottsElementIterator::operator++()
+typename PottsMesh<DIM>::MutableElementIterator& PottsMesh<DIM>::MutableElementIterator::operator++()
 {
     do
     {
@@ -450,9 +450,9 @@ typename PottsMesh<DIM>::PottsElementIterator& PottsMesh<DIM>::PottsElementItera
 }
 
 template<unsigned DIM>
-PottsMesh<DIM>::PottsElementIterator::PottsElementIterator(
+PottsMesh<DIM>::MutableElementIterator::MutableElementIterator(
         PottsMesh<DIM>& rMesh,
-        typename std::vector<PottsElement<DIM>*>::iterator elementIter,
+        typename std::vector<MutableElement<DIM>*>::iterator elementIter,
         bool skipDeletedElements)
     : mrMesh(rMesh),
       mElementIter(elementIter),
@@ -474,13 +474,13 @@ PottsMesh<DIM>::PottsElementIterator::PottsElementIterator(
 }
 
 template<unsigned DIM>
-bool PottsMesh<DIM>::PottsElementIterator::IsAtEnd()
+bool PottsMesh<DIM>::MutableElementIterator::IsAtEnd()
 {
     return mElementIter == mrMesh.mElements.end();
 }
 
 template<unsigned DIM>
-bool PottsMesh<DIM>::PottsElementIterator::IsAllowedElement()
+bool PottsMesh<DIM>::MutableElementIterator::IsAllowedElement()
 {
     return !(mSkipDeletedElements && (*this)->IsDeleted());
 }

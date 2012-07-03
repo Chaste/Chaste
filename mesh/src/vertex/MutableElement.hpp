@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef POTTSELEMENT_HPP_
-#define POTTSELEMENT_HPP_
+#ifndef MUTABLEELEMENT_HPP_
+#define MUTABLEELEMENT_HPP_
 
 #include "AbstractElement.hpp"
 
@@ -45,14 +45,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * An element class for use in the PottsMesh class.
  *
  * The main difference between this and the Element class is that a
- * PottsElement can have a variable number of nodes associated with
+ * MutableElement can have a variable number of nodes associated with
  * it and these represent the lattice sites contained in the element.
  * As they are just a collection of sites there is no concept of
  * Element Dimension.
  *
  */
 template<unsigned DIM>
-class PottsElement : public AbstractElement<DIM, DIM>
+class MutableElement : public AbstractElement<DIM, DIM>
 {
 private:
 
@@ -82,12 +82,12 @@ public:
      * @param index global index of the element
      * @param rNodes vector of Nodes associated with the element
      */
-    PottsElement(unsigned index, const std::vector<Node<DIM>*>& rNodes);
+    MutableElement(unsigned index, const std::vector<Node<DIM>*>& rNodes);
 
     /**
      * Destructor.
      */
-    ~PottsElement();
+    ~MutableElement();
 
     /**
      * Overridden RegisterWithNodes() method.
@@ -151,4 +151,4 @@ public:
     bool IsElementOnBoundary() const;
 };
 
-#endif /*POTTSELEMENT_HPP_*/
+#endif /*MUTABLEELEMENT_HPP_*/

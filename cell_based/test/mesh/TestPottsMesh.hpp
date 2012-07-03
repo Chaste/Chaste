@@ -136,9 +136,9 @@ public:
         nodes_elements[1].push_back(basic_nodes[4]);
         nodes_elements[1].push_back(basic_nodes[5]);
 
-        std::vector<PottsElement<2>*> basic_potts_elements;
-        basic_potts_elements.push_back(new PottsElement<2>(0, nodes_elements[0]));
-        basic_potts_elements.push_back(new PottsElement<2>(1, nodes_elements[1]));
+        std::vector<MutableElement<2>*> basic_potts_elements;
+        basic_potts_elements.push_back(new MutableElement<2>(0, nodes_elements[0]));
+        basic_potts_elements.push_back(new MutableElement<2>(1, nodes_elements[1]));
 
         // Make a PottsMesh
         PottsMesh<2> basic_potts_mesh(basic_nodes, basic_potts_elements, basic_von_neuman_neighbours, basic_moore_neighbours);
@@ -336,9 +336,9 @@ public:
         nodes_elements[1].push_back(basic_nodes[4]);
         nodes_elements[1].push_back(basic_nodes[5]);
 
-        std::vector<PottsElement<3>*> basic_potts_elements;
-        basic_potts_elements.push_back(new PottsElement<3>(0, nodes_elements[0]));
-        basic_potts_elements.push_back(new PottsElement<3>(1, nodes_elements[1]));
+        std::vector<MutableElement<3>*> basic_potts_elements;
+        basic_potts_elements.push_back(new MutableElement<3>(0, nodes_elements[0]));
+        basic_potts_elements.push_back(new MutableElement<3>(1, nodes_elements[1]));
 
         // Make a PottsMesh
         PottsMesh<3> basic_potts_mesh(basic_nodes, basic_potts_elements, basic_von_neuman_neighbours, basic_moore_neighbours);
@@ -421,8 +421,8 @@ public:
         nodes_element.push_back(basic_nodes[0]);
         nodes_element.push_back(basic_nodes[1]);
 
-        std::vector<PottsElement<2>*> basic_potts_elements;
-        basic_potts_elements.push_back(new PottsElement<2>(0, nodes_element));
+        std::vector<MutableElement<2>*> basic_potts_elements;
+        basic_potts_elements.push_back(new MutableElement<2>(0, nodes_element));
 
         // Make a PottsMesh
 
@@ -484,14 +484,14 @@ public:
         TS_ASSERT_EQUALS(iter_is_not_at_end, false);
     }
 
-    void TestPottsElementIterator() throw (Exception)
+    void TestMutableElementIterator() throw (Exception)
     {
         // Create mesh
         PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         unsigned counter = 0;
-        for (PottsMesh<2>::PottsElementIterator iter = p_mesh->GetElementIteratorBegin();
+        for (PottsMesh<2>::MutableElementIterator iter = p_mesh->GetElementIteratorBegin();
              iter != p_mesh->GetElementIteratorEnd();
              ++iter)
         {
@@ -507,7 +507,7 @@ public:
         p_mesh->GetElement(0)->MarkAsDeleted();
 
         counter = 0;
-        for (PottsMesh<2>::PottsElementIterator iter = p_mesh->GetElementIteratorBegin();
+        for (PottsMesh<2>::MutableElementIterator iter = p_mesh->GetElementIteratorBegin();
              iter != p_mesh->GetElementIteratorEnd();
              ++iter)
         {
@@ -525,7 +525,7 @@ public:
         PottsMesh<2> empty_mesh;
 
         // Since the mesh is empty, the iterator should be set to mrMesh.mNodes.end() when constructed
-        PottsMesh<2>::PottsElementIterator iter = empty_mesh.GetElementIteratorBegin();
+        PottsMesh<2>::MutableElementIterator iter = empty_mesh.GetElementIteratorBegin();
 
         /*
          * Check that the iterator is now at the end (we need to check this as a double-negative,
@@ -1376,8 +1376,8 @@ public:
             nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
         }
 
-        std::vector<PottsElement<2>*> elements;
-        elements.push_back(new PottsElement<2>(0, nodes_elem_0));
+        std::vector<MutableElement<2>*> elements;
+        elements.push_back(new MutableElement<2>(0, nodes_elem_0));
 
         std::vector< std::set<unsigned> > empty_vector;
         empty_vector.resize(nodes.size());
@@ -1389,13 +1389,13 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 1u);
 
         // Add a new element to the mesh
-        mesh.AddElement(new PottsElement<2>(1, nodes_elem_1));
+        mesh.AddElement(new MutableElement<2>(1, nodes_elem_1));
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 6u);
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 2u);
     }
 
-    void TestDividePottsElementIn2d() throw(Exception)
+    void TestDivideMutableElementIn2d() throw(Exception)
     {
         {
             // Original Element BELOW new element
@@ -1414,9 +1414,9 @@ public:
             nodes_elem_1.push_back(basic_nodes[3]);
             nodes_elem_1.push_back(basic_nodes[1]);
 
-            std::vector<PottsElement<2>*> basic_potts_elements;
-            basic_potts_elements.push_back(new PottsElement<2>(0, nodes_elem_0));
-            basic_potts_elements.push_back(new PottsElement<2>(1, nodes_elem_1));
+            std::vector<MutableElement<2>*> basic_potts_elements;
+            basic_potts_elements.push_back(new MutableElement<2>(0, nodes_elem_0));
+            basic_potts_elements.push_back(new MutableElement<2>(1, nodes_elem_1));
 
             std::vector< std::set<unsigned> > empty_vector;
             empty_vector.resize(basic_nodes.size());
@@ -1465,9 +1465,9 @@ public:
             nodes_elem_1.push_back(basic_nodes[3]);
             nodes_elem_1.push_back(basic_nodes[1]);
 
-            std::vector<PottsElement<2>*> basic_potts_elements;
-            basic_potts_elements.push_back(new PottsElement<2>(0, nodes_elem_0));
-            basic_potts_elements.push_back(new PottsElement<2>(1, nodes_elem_1));
+            std::vector<MutableElement<2>*> basic_potts_elements;
+            basic_potts_elements.push_back(new MutableElement<2>(0, nodes_elem_0));
+            basic_potts_elements.push_back(new MutableElement<2>(1, nodes_elem_1));
 
             std::vector< std::set<unsigned> > empty_vector;
             empty_vector.resize(basic_nodes.size());
@@ -1513,8 +1513,8 @@ public:
             std::vector<Node<2>*> nodes_elem;
             nodes_elem.push_back(basic_nodes[0]);
 
-            std::vector<PottsElement<2>*> basic_potts_elements;
-            basic_potts_elements.push_back(new PottsElement<2>(0, nodes_elem));
+            std::vector<MutableElement<2>*> basic_potts_elements;
+            basic_potts_elements.push_back(new MutableElement<2>(0, nodes_elem));
 
             std::vector< std::set<unsigned> > empty_vector;
             empty_vector.resize(basic_nodes.size());
@@ -1531,7 +1531,7 @@ public:
         }
     }
 
-    void TestDividePottsElementIn3d() throw(Exception)
+    void TestDivideMutableElementIn3d() throw(Exception)
 	{
 		{
 			// Original Element BELOW new element
@@ -1550,9 +1550,9 @@ public:
 			nodes_elem_1.push_back(basic_nodes[3]);
 			nodes_elem_1.push_back(basic_nodes[1]);
 
-			std::vector<PottsElement<3>*> basic_potts_elements;
-			basic_potts_elements.push_back(new PottsElement<3>(0, nodes_elem_0));
-			basic_potts_elements.push_back(new PottsElement<3>(1, nodes_elem_1));
+			std::vector<MutableElement<3>*> basic_potts_elements;
+			basic_potts_elements.push_back(new MutableElement<3>(0, nodes_elem_0));
+			basic_potts_elements.push_back(new MutableElement<3>(1, nodes_elem_1));
 
 			std::vector< std::set<unsigned> > empty_vector;
 			empty_vector.resize(basic_nodes.size());
@@ -1601,9 +1601,9 @@ public:
 			nodes_elem_1.push_back(basic_nodes[3]);
 			nodes_elem_1.push_back(basic_nodes[1]);
 
-			std::vector<PottsElement<3>*> basic_potts_elements;
-			basic_potts_elements.push_back(new PottsElement<3>(0, nodes_elem_0));
-			basic_potts_elements.push_back(new PottsElement<3>(1, nodes_elem_1));
+			std::vector<MutableElement<3>*> basic_potts_elements;
+			basic_potts_elements.push_back(new MutableElement<3>(0, nodes_elem_0));
+			basic_potts_elements.push_back(new MutableElement<3>(1, nodes_elem_1));
 
 			std::vector< std::set<unsigned> > empty_vector;
 			empty_vector.resize(basic_nodes.size());
@@ -1637,7 +1637,7 @@ public:
 		}
 	}
 
-    void TestDeleteAndDividePottsElement() throw(Exception)
+    void TestDeleteAndDivideMutableElement() throw(Exception)
     {
         // Make four nodes
         std::vector<Node<2>*> basic_nodes;
@@ -1653,9 +1653,9 @@ public:
         nodes_elem_1.push_back(basic_nodes[3]);
         nodes_elem_1.push_back(basic_nodes[1]);
 
-        std::vector<PottsElement<2>*> basic_potts_elements;
-        basic_potts_elements.push_back(new PottsElement<2>(0, nodes_elem_0));
-        basic_potts_elements.push_back(new PottsElement<2>(1, nodes_elem_1));
+        std::vector<MutableElement<2>*> basic_potts_elements;
+        basic_potts_elements.push_back(new MutableElement<2>(0, nodes_elem_0));
+        basic_potts_elements.push_back(new MutableElement<2>(1, nodes_elem_1));
 
         std::vector< std::set<unsigned> > empty_vector;
         empty_vector.resize(basic_nodes.size());

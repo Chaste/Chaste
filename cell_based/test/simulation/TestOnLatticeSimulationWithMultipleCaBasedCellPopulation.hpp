@@ -676,13 +676,13 @@ public:
 //        simulator.Solve();
 //
 //        // Check some results
-//        PottsElement<2>* element_0 = static_cast <PottsBasedCellPopulation<2>*>(&simulator.rGetCellPopulation())->GetElement(0u);
+//        MutableElement<2>* element_0 = static_cast <PottsBasedCellPopulation<2>*>(&simulator.rGetCellPopulation())->GetElement(0u);
 //        TS_ASSERT_EQUALS(element_0->GetNumNodes(), 16u);
 //        TS_ASSERT_EQUALS(element_0->GetNode(0)->GetIndex(), 34u);
 //        TS_ASSERT_EQUALS(element_0->GetNode(8)->GetIndex(), 24u);
 //        TS_ASSERT_EQUALS(element_0->GetNode(15)->GetIndex(), 32u);
 //
-//        PottsElement<2>* element_1 = static_cast <PottsBasedCellPopulation<2>*>(&simulator.rGetCellPopulation())->GetElement(1u);
+//        MutableElement<2>* element_1 = static_cast <PottsBasedCellPopulation<2>*>(&simulator.rGetCellPopulation())->GetElement(1u);
 //        TS_ASSERT_EQUALS(element_1->GetNumNodes(), 16u);
 //        TS_ASSERT_EQUALS(element_1->GetNode(0)->GetIndex(), 46u);
 //        TS_ASSERT_EQUALS(element_1->GetNode(8)->GetIndex(), 69u);
@@ -742,13 +742,13 @@ public:
 //        p_simulator2->Solve();
 //
 //        // These results are from time 20.0 in TestStandardResultForArchivingTestsBelow()
-//        PottsElement<2>* element_0 = static_cast <PottsBasedCellPopulation<2>*>(&p_simulator2->rGetCellPopulation())->GetElement(0u);
+//        MutableElement<2>* element_0 = static_cast <PottsBasedCellPopulation<2>*>(&p_simulator2->rGetCellPopulation())->GetElement(0u);
 //        TS_ASSERT_EQUALS(element_0->GetNumNodes(), 16u);
 //        TS_ASSERT_EQUALS(element_0->GetNode(0)->GetIndex(), 34u);
 //        TS_ASSERT_EQUALS(element_0->GetNode(8)->GetIndex(), 24u);
 //        TS_ASSERT_EQUALS(element_0->GetNode(15)->GetIndex(), 32u);
 //
-//        PottsElement<2>* element_1 = static_cast <PottsBasedCellPopulation<2>*>(&p_simulator2->rGetCellPopulation())->GetElement(1u);
+//        MutableElement<2>* element_1 = static_cast <PottsBasedCellPopulation<2>*>(&p_simulator2->rGetCellPopulation())->GetElement(1u);
 //        TS_ASSERT_EQUALS(element_1->GetNumNodes(), 16u);
 //        TS_ASSERT_EQUALS(element_1->GetNode(0)->GetIndex(), 46u);
 //        TS_ASSERT_EQUALS(element_1->GetNode(8)->GetIndex(), 69u);

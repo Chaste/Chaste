@@ -32,25 +32,25 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-#include "PottsElement.hpp"
+#include "MutableElement.hpp"
 #include "RandomNumberGenerator.hpp"
 #include <cassert>
 
 
 template<unsigned DIM>
-PottsElement<DIM>::PottsElement(unsigned index, const std::vector<Node<DIM>*>& rNodes)
+MutableElement<DIM>::MutableElement(unsigned index, const std::vector<Node<DIM>*>& rNodes)
     : AbstractElement<DIM,DIM>(index, rNodes)
 {
     RegisterWithNodes();
 }
 
 template<unsigned DIM>
-PottsElement<DIM>::~PottsElement()
+MutableElement<DIM>::~MutableElement()
 {
 }
 
 template<unsigned DIM>
-void PottsElement<DIM>::RegisterWithNodes()
+void MutableElement<DIM>::RegisterWithNodes()
 {
     for (unsigned i=0; i<this->mNodes.size(); i++)
     {
@@ -59,7 +59,7 @@ void PottsElement<DIM>::RegisterWithNodes()
 }
 
 template<unsigned DIM>
-void PottsElement<DIM>::MarkAsDeleted()
+void MutableElement<DIM>::MarkAsDeleted()
 {
     // Mark element as deleted
     this->mIsDeleted = true;
@@ -72,7 +72,7 @@ void PottsElement<DIM>::MarkAsDeleted()
 }
 
 template<unsigned DIM>
-void PottsElement<DIM>::ResetIndex(unsigned index)
+void MutableElement<DIM>::ResetIndex(unsigned index)
 {
     for (unsigned i=0; i<this->GetNumNodes(); i++)
     {
@@ -83,7 +83,7 @@ void PottsElement<DIM>::ResetIndex(unsigned index)
 }
 
 template<unsigned DIM>
-void PottsElement<DIM>::UpdateNode(const unsigned& rIndex, Node<DIM>* pNode)
+void MutableElement<DIM>::UpdateNode(const unsigned& rIndex, Node<DIM>* pNode)
 {
     assert(rIndex < this->mNodes.size());
 
@@ -98,7 +98,7 @@ void PottsElement<DIM>::UpdateNode(const unsigned& rIndex, Node<DIM>* pNode)
 }
 
 template<unsigned DIM>
-void PottsElement<DIM>::DeleteNode(const unsigned& rIndex)
+void MutableElement<DIM>::DeleteNode(const unsigned& rIndex)
 {
     assert(rIndex < this->mNodes.size());
 
@@ -110,7 +110,7 @@ void PottsElement<DIM>::DeleteNode(const unsigned& rIndex)
 }
 
 template<unsigned DIM>
-void PottsElement<DIM>::AddNode(Node<DIM>* pNode)
+void MutableElement<DIM>::AddNode(Node<DIM>* pNode)
 {
     // Add element to this node
     pNode->AddElement(this->mIndex);
@@ -120,7 +120,7 @@ void PottsElement<DIM>::AddNode(Node<DIM>* pNode)
 }
 
 template<unsigned DIM>
-unsigned PottsElement<DIM>::GetNodeLocalIndex(unsigned globalIndex) const
+unsigned MutableElement<DIM>::GetNodeLocalIndex(unsigned globalIndex) const
 {
     unsigned local_index = UINT_MAX;
     for (unsigned i=0; i<this->mNodes.size(); i++)
@@ -134,7 +134,7 @@ unsigned PottsElement<DIM>::GetNodeLocalIndex(unsigned globalIndex) const
 }
 
 template<unsigned DIM>
-bool PottsElement<DIM>::IsElementOnBoundary() const
+bool MutableElement<DIM>::IsElementOnBoundary() const
 {
     bool is_element_on_boundary = false;
     for (unsigned i=0; i<this->mNodes.size(); i++)
@@ -152,6 +152,6 @@ bool PottsElement<DIM>::IsElementOnBoundary() const
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////////////
 
-template class PottsElement<1>;
-template class PottsElement<2>;
-template class PottsElement<3>;
+template class MutableElement<1>;
+template class MutableElement<2>;
+template class MutableElement<3>;

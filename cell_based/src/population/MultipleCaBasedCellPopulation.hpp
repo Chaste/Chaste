@@ -118,7 +118,7 @@ private:
 
     /**
      * Check the consistency of internal data structures.
-     * Each PottsElement must have a CellPtr associated with it.
+     * Each MutableElement must have a CellPtr associated with it.
      */
     void Validate();
 
@@ -132,7 +132,7 @@ public:
     /**
      * Create a new cell population facade from a mesh and collection of cells.
      *
-     * There must be precisely one CellPtr for each PottsElement in
+     * There must be precisely one CellPtr for each MutableElement in
      * the mesh.
      *
      * @param rMesh reference to a PottsMesh

@@ -45,7 +45,7 @@ struct MeshPottsWriterIterators
     /** Iterator over nodes */
     typename AbstractMesh<SPACE_DIM,SPACE_DIM>::NodeIterator* pNodeIter;
     /** Iterator over potts elements */
-    typename PottsMesh<SPACE_DIM>::PottsElementIterator* pElemIter;
+    typename PottsMesh<SPACE_DIM>::MutableElementIterator* pElemIter;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -150,7 +150,7 @@ void PottsMeshWriter<SPACE_DIM>::WriteFilesUsingMesh(PottsMesh<SPACE_DIM>& rMesh
     typedef typename AbstractMesh<SPACE_DIM,SPACE_DIM>::NodeIterator NodeIterType;
     mpIters->pNodeIter = new NodeIterType(mpMesh->GetNodeIteratorBegin());
 
-    typedef typename PottsMesh<SPACE_DIM>::PottsElementIterator ElemIterType;
+    typedef typename PottsMesh<SPACE_DIM>::MutableElementIterator ElemIterType;
     mpIters->pElemIter = new ElemIterType(mpMesh->GetElementIteratorBegin());
 
     // Set up node map if we might have deleted nodes
