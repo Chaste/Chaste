@@ -104,7 +104,7 @@ public:
             TS_ASSERT_EQUALS(initial_conditions.size(), 3u);
             TS_ASSERT_DELTA(initial_conditions[0], 1.0, 1e-6);
             TS_ASSERT_DELTA(initial_conditions[1], 1.0, 1e-6);
-            TS_ASSERT_DELTA(initial_conditions[2], 0.5, 1e-6);
+            TS_ASSERT_DELTA(initial_conditions[2], 0.0, 1e-6);
 
             // Create an output archive
             std::ofstream ofs(archive_filename.c_str());
@@ -130,7 +130,7 @@ public:
             TS_ASSERT_EQUALS(initial_conditions.size(), 3u);
             TS_ASSERT_DELTA(initial_conditions[0], 1.0, 1e-6);
             TS_ASSERT_DELTA(initial_conditions[1], 1.0, 1e-6);
-            TS_ASSERT_DELTA(initial_conditions[2], 0.5, 1e-6);
+            TS_ASSERT_DELTA(initial_conditions[2], 0.0, 1e-6);
 
             // Tidy up
             delete p_ode_system;
