@@ -367,7 +367,20 @@ public:
         }
 
         std::set< std::pair<Node<1>*, Node<1>* > > pairs_returned;
-        box_collection.CalculateNodePairs(nodes,pairs_returned);
+        std::map<unsigned, std::set<unsigned> > neighbours_returned;
+        box_collection.CalculateNodePairs(nodes,pairs_returned, neighbours_returned);
+
+        std::map<unsigned, std::set<unsigned> > neighbours_should_be;
+        neighbours_should_be[0].insert(1);
+        neighbours_should_be[0].insert(2);
+        neighbours_should_be[1].insert(0);
+        neighbours_should_be[1].insert(2);
+        neighbours_should_be[2].insert(0);
+        neighbours_should_be[2].insert(1);
+        neighbours_should_be[2].insert(3);
+        neighbours_should_be[3].insert(2);
+
+        TS_ASSERT_EQUALS(neighbours_should_be, neighbours_returned);
 
         std::set< std::pair<Node<1>*, Node<1>* > > pairs_should_be;
         pairs_should_be.insert(std::pair<Node<1>*, Node<1>*>(nodes[0],nodes[1]));
@@ -540,7 +553,51 @@ public:
         }
 
         std::set< std::pair<Node<2>*, Node<2>* > > pairs_returned;
-        box_collection.CalculateNodePairs(nodes,pairs_returned);
+        std::map<unsigned, std::set<unsigned> > neighbours_returned;
+
+        box_collection.CalculateNodePairs(nodes,pairs_returned, neighbours_returned);
+
+        std::map<unsigned, std::set<unsigned> > neighbours_should_be;
+        neighbours_should_be[0].insert(1);
+        neighbours_should_be[1].insert(0);
+        neighbours_should_be[2].insert(3);
+        neighbours_should_be[2].insert(4);
+        neighbours_should_be[2].insert(5);
+        neighbours_should_be[2].insert(7);
+        neighbours_should_be[2].insert(8);
+        neighbours_should_be[3].insert(2);
+        neighbours_should_be[3].insert(4);
+        neighbours_should_be[3].insert(5);
+        neighbours_should_be[3].insert(7);
+        neighbours_should_be[3].insert(8);
+        neighbours_should_be[4].insert(2);
+        neighbours_should_be[4].insert(3);
+        neighbours_should_be[4].insert(5);
+        neighbours_should_be[4].insert(7);
+        neighbours_should_be[4].insert(8);
+        neighbours_should_be[5].insert(2);
+        neighbours_should_be[5].insert(3);
+        neighbours_should_be[5].insert(4);
+        neighbours_should_be[5].insert(6);
+        neighbours_should_be[5].insert(7);
+        neighbours_should_be[5].insert(8);
+        neighbours_should_be[6].insert(5);
+        neighbours_should_be[6].insert(7);
+        neighbours_should_be[6].insert(8);
+        neighbours_should_be[7].insert(2);
+        neighbours_should_be[7].insert(3);
+        neighbours_should_be[7].insert(4);
+        neighbours_should_be[7].insert(5);
+        neighbours_should_be[7].insert(6);
+        neighbours_should_be[7].insert(8);
+        neighbours_should_be[8].insert(2);
+        neighbours_should_be[8].insert(3);
+        neighbours_should_be[8].insert(4);
+        neighbours_should_be[8].insert(5);
+        neighbours_should_be[8].insert(6);
+        neighbours_should_be[8].insert(7);
+
+        TS_ASSERT_EQUALS(neighbours_should_be, neighbours_returned);
 
         std::set< std::pair<Node<2>*, Node<2>* > > pairs_should_be;
         pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[0],nodes[1]));

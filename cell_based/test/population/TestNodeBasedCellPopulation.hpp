@@ -444,6 +444,16 @@ public:
         TS_ASSERT_EQUALS(node_based_cell_population.GetNumRealCells(), 81u);
 
         // Test GetNeighbouringNodeIndices() method
+        TS_ASSERT_THROWS_THIS(node_based_cell_population.GetNeighbouringNodeIndices(50), "mNodeNeighbours not set up. Call Update() before GetNeighbouringNodeIndices()");
+
+        node_based_cell_population.SetMechanicsCutOffLength(1e-1);
+        node_based_cell_population.Update();
+
+        TS_ASSERT_THROWS_THIS(node_based_cell_population.GetNeighbouringNodeIndices(50), "mMechanicsCutOffLength is smaller than the sum of radius of cell 50 (0.1) and cell 10 (0.1). Make the cut-off larger to avoid errors.");
+
+        node_based_cell_population.SetMechanicsCutOffLength(1.2);
+        node_based_cell_population.Update();
+
         std::set<unsigned> node_50_neighbours = node_based_cell_population.GetNeighbouringNodeIndices(50);
 
         std::set<unsigned> expected_node_50_neighbours;

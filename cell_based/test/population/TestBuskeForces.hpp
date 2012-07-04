@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTFORCESNOTFORRELEASE_HPP_
-#define TESTFORCESNOTFORRELEASE_HPP_
+#ifndef TESTBUSKEFORCES_HPP_
+#define TESTBUSKEFORCES_HPP_
 
 #include <cxxtest/TestSuite.h>
 
@@ -52,7 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WildTypeCellMutationState.hpp"
 #include "FileComparison.hpp"
 
-class TestForcesNotForRelease : public AbstractCellBasedTestSuite
+class TestBuskeForces : public AbstractCellBasedTestSuite
 {
 public:
 
@@ -79,7 +79,7 @@ public:
 
         // Create a node-based cell population
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
-        cell_population.SetMechanicsCutOffLength(1.5);
+        cell_population.SetMechanicsCutOffLength(2.5);
         cell_population.Update();
 
         // Create force
@@ -159,7 +159,7 @@ public:
 
         // Create a node-based cell population
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
-        cell_population.SetMechanicsCutOffLength(1.5);
+        cell_population.SetMechanicsCutOffLength(2.5);
         cell_population.Update();
 
         // Create force
@@ -240,7 +240,9 @@ public:
 
         // Create a node-based cell population
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
-        cell_population.SetMechanicsCutOffLength(1.5);
+
+        // This is because cells have radius 1.0.
+        cell_population.SetMechanicsCutOffLength(2.5);
         cell_population.Update();
 
         // Create force
@@ -308,7 +310,7 @@ public:
 
         // Create a node-based cell population
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
-        cell_population.SetMechanicsCutOffLength(1.5);
+        cell_population.SetMechanicsCutOffLength(2.5);
         cell_population.Update();
 
         // Create force
@@ -381,7 +383,7 @@ public:
 
         // Create a node-based cell population
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
-        cell_population.SetMechanicsCutOffLength(1.5);
+        cell_population.SetMechanicsCutOffLength(2.5);
         cell_population.Update();
 
         // Create force
@@ -583,4 +585,4 @@ public:
     }
 };
 
-#endif /*TESTFORCESNOTFORRELEASE_HPP_*/
+#endif /*TESTBUSKEFORCES_HPP_*/

@@ -67,6 +67,9 @@ private:
     /** Node pairs for force calculations. */
     std::set< std::pair<Node<DIM>*, Node<DIM>* > > mNodePairs;
 
+    /** Indices of neighbours of local nodes. */
+    std::map<unsigned, std::set<unsigned> > mNodeNeighbours;
+
     /** Whether to delete the nodes-only mesh (taken in one of the constructors, defaults to false). */
     bool mDeleteMesh;
 

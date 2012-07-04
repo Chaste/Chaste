@@ -135,10 +135,10 @@ void NodesOnlyMesh<SPACE_DIM>::SetMaximumInteractionDistance(double maximumInter
 }
 
 template<unsigned SPACE_DIM>
-void NodesOnlyMesh<SPACE_DIM>::CalculateNodePairs(std::set<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs)
+void NodesOnlyMesh<SPACE_DIM>::CalculateNodePairs(std::set<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
 {
 	assert(mpBoxCollection != NULL);
-	mpBoxCollection->CalculateNodePairs(this->mNodes, rNodePairs);
+	mpBoxCollection->CalculateNodePairs(this->mNodes, rNodePairs, rNodeNeighbours);
 }
 
 template<unsigned SPACE_DIM>

@@ -94,6 +94,10 @@ public:
 
         // Call method
         double time_step = 0.01;
+        cell_population.SetMechanicsCutOffLength(1.2);
+        cell_population.Update();
+
+
         cell_population.UpdateNodeLocations(forces_on_nodes, time_step);
 
         // Check that node locations were correctly updated

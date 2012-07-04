@@ -53,7 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WildTypeCellMutationState.hpp"
 #include "PlaneBoundaryCondition.hpp"
 #include "SmartPointers.hpp"
-#include "Debug.hpp"
+
 
 class TestOffLatticeSimulationWithNodeBasedCellPopulation : public AbstractCellBasedTestSuite
 {
@@ -271,9 +271,6 @@ public:
         normal(1) =-1.0;
         MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc, (&node_based_cell_population, zero_vector<double>(2), normal)); // y>0
         simulator.AddCellPopulationBoundaryCondition(p_bc);
-
-        PRINT_VARIABLE(mesh.GetCellRadius(3));
-        PRINT_VARIABLE(mesh.GetCellRadius(4));
 
         // Solve
         simulator.Solve();

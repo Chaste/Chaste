@@ -68,7 +68,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "AbstractCellPopulation.hpp"
 
-#include "Debug.hpp"
 
 class SimplePdeForTesting : public AbstractLinearEllipticPde<2,2>
 {

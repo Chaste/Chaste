@@ -683,9 +683,11 @@ std::set<unsigned> BoxCollection<DIM>::GetLocalBoxes(unsigned boxIndex)
 }
 
 template<unsigned DIM>
-void BoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNodes, std::set<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs)
+void BoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNodes, std::set<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
 {
     rNodePairs.clear();
+    rNodeNeighbours.clear();
+
     for (unsigned node_index=0; node_index<rNodes.size(); node_index++)
     {
         // Get the box containing this node
@@ -716,11 +718,15 @@ void BoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNodes, std
                     if (other_node_index > node_index)
                     {
                         rNodePairs.insert(std::pair<Node<DIM>*, Node<DIM>*>(rNodes[node_index], rNodes[other_node_index]));
+                        rNodeNeighbours[node_index].insert(other_node_index);
+                        rNodeNeighbours[other_node_index].insert(node_index);
                     }
                 }
                 else
                 {
                     rNodePairs.insert(std::pair<Node<DIM>*, Node<DIM>*>(rNodes[node_index], rNodes[other_node_index]));
+                    rNodeNeighbours[node_index].insert(other_node_index);
+                    rNodeNeighbours[other_node_index].insert(node_index);
                 }
             }
         }

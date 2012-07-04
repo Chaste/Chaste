@@ -208,7 +208,7 @@ public:
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(0.75);
         simulator.AddForce(p_linear_force);
-        cell_population.SetMechanicsCutOffLength(1.0);
+        cell_population.SetMechanicsCutOffLength(1.5);
 
         // Run the simulation
         simulator.Solve();
@@ -304,9 +304,8 @@ public:
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(0.75);
         simulator.AddForce(p_linear_force);
-        cell_population.SetMechanicsCutOffLength(1.0);
 
-        // Run the simulation
+        cell_population.SetMechanicsCutOffLength(1.5);
         simulator.Solve();
 
         // Acquire cell pointers

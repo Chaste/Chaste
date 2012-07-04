@@ -234,7 +234,7 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 
     mpNodesOnlyMesh->SetUpBoxCollection(mMechanicsCutOffLength, domain_size);
 
-    mpNodesOnlyMesh->CalculateNodePairs(mNodePairs);
+    mpNodesOnlyMesh->CalculateNodePairs(mNodePairs, mNodeNeighbours);
 }
 
 template<unsigned DIM>
@@ -334,26 +334,31 @@ double NodeBasedCellPopulation<DIM>::GetWidth(const unsigned& rDimension)
 template<unsigned DIM>
 std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsigned index)
 {
-    // Get the location of this node
-    c_vector<double, DIM> node_i_location = this->GetNode(index)->rGetLocation();
+    // Check the mNodeNeighbours has been set up correctly.
+    if(mNodeNeighbours.empty())
+    {
+        EXCEPTION("mNodeNeighbours not set up. Call Update() before GetNeighbouringNodeIndices()");
+    }
 
-    // Get the radius of the cell corresponding to this node
+    std::set<unsigned> neighbouring_node_indices;
+
+    // Get location and radius of node
+    c_vector<double, DIM> node_i_location = this->GetNode(index)->rGetLocation();
     double radius_of_cell_i = mpNodesOnlyMesh->GetCellRadius(index);
 
-    // Loop over cells in the population
-    std::set<unsigned> neighbouring_node_indices;
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
-         cell_iter != this->End();
-         ++cell_iter)
-    {
-        // Get the node index corresponding to this cell
-        unsigned node_j_index = this->GetLocationIndexUsingCell(*cell_iter);
+    // Get set of 'candidate' neighbours.
+    std::set<unsigned> near_nodes = mNodeNeighbours.find(index)->second;
 
-        // Only return the neighbours, not the original node
-        if (node_j_index != index)
+    // Find which ones are actually close
+    for (std::set<unsigned>::iterator iter = near_nodes.begin();
+            iter != near_nodes.end();
+            ++iter)
+    {
+        // Be sure not to return the index itself.
+        if ((*iter) != index)
         {
             // Get the location of this node
-            c_vector<double, DIM> node_j_location = this->GetNode(node_j_index)->rGetLocation();
+            c_vector<double, DIM> node_j_location = this->GetNode((*iter))->rGetLocation();
 
             // Get the unit vector parallel to the line joining the two nodes (assuming no periodicities etc.)
             c_vector<double, DIM> unit_vector = node_i_location - node_j_location;
@@ -362,17 +367,63 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
             double distance_between_nodes = norm_2(unit_vector);
 
             // Get the radius of the cell corresponding to this node
-            double radius_of_cell_j = mpNodesOnlyMesh->GetCellRadius(node_j_index);
+            double radius_of_cell_j = mpNodesOnlyMesh->GetCellRadius((*iter));
 
             // If the cells are close enough to exert a force on each other...
             double max_interaction_distance = radius_of_cell_i + radius_of_cell_j;
+
+            // Make sure that the max_interaction distance is smaller than the box collection size
+            if(!(max_interaction_distance < mMechanicsCutOffLength))
+            {
+                EXCEPTION("mMechanicsCutOffLength is smaller than the sum of radius of cell " << index << " (" << radius_of_cell_i << ") and cell " << (*iter) << " (" << radius_of_cell_i <<"). Make the cut-off larger to avoid errors.");
+            }
             if (distance_between_nodes < max_interaction_distance)
             {
                 // ...then add this node index to the set of neighbouring node indices
-                neighbouring_node_indices.insert(node_j_index);
+                neighbouring_node_indices.insert((*iter));
             }
         }
     }
+
+//    // Get the location of this node
+//    c_vector<double, DIM> node_i_location = this->GetNode(index)->rGetLocation();
+//
+//    // Get the radius of the cell corresponding to this node
+//    double radius_of_cell_i = mpNodesOnlyMesh->GetCellRadius(index);
+//
+//    // Loop over cells in the population
+//    std::set<unsigned> neighbouring_node_indices;
+//    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+//         cell_iter != this->End();
+//         ++cell_iter)
+//    {
+//        // Get the node index corresponding to this cell
+//        unsigned node_j_index = this->GetLocationIndexUsingCell(*cell_iter);
+//
+//        // Only return the neighbours, not the original node
+//        if (node_j_index != index)
+//        {
+//            // Get the location of this node
+//            c_vector<double, DIM> node_j_location = this->GetNode(node_j_index)->rGetLocation();
+//
+//            // Get the unit vector parallel to the line joining the two nodes (assuming no periodicities etc.)
+//            c_vector<double, DIM> unit_vector = node_i_location - node_j_location;
+//
+//            // Calculate the distance between the two nodes
+//            double distance_between_nodes = norm_2(unit_vector);
+//
+//            // Get the radius of the cell corresponding to this node
+//            double radius_of_cell_j = mpNodesOnlyMesh->GetCellRadius(node_j_index);
+//
+//            // If the cells are close enough to exert a force on each other...
+//            double max_interaction_distance = radius_of_cell_i + radius_of_cell_j;
+//            if (distance_between_nodes < max_interaction_distance)
+//            {
+//                // ...then add this node index to the set of neighbouring node indices
+//                neighbouring_node_indices.insert(node_j_index);
+//            }
+//        }
+//    }
     return neighbouring_node_indices;
 }
 
