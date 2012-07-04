@@ -54,7 +54,7 @@ DeltaNotchOdeSystem::DeltaNotchOdeSystem(double meanDelta, std::vector<double> s
 
     SetDefaultInitialCondition(0, 1.0); // soon overwritten
     SetDefaultInitialCondition(1, 1.0); // soon overwritten
-    SetDefaultInitialCondition(2, 0.5);
+    SetDefaultInitialCondition(2, meanDelta);
 
     if (stateVariables != std::vector<double>())
     {
@@ -72,10 +72,9 @@ void DeltaNotchOdeSystem::EvaluateYDerivatives(double time, const std::vector<do
     double delta = rY[1];
     double mean_delta = rY[2];
 
-
     // The next two lines define the ODE system by Collier et al. (1996)
     double dx1 = mean_delta*mean_delta/(0.01 + mean_delta*mean_delta) - notch;
-    double dx2 = 1/(1 + 100*notch*notch) - delta;
+    double dx2 = 1.0/(1.0 + 100.0*notch*notch) - delta;
 
     rDY[0] = dx1;
     rDY[1] = dx2;
