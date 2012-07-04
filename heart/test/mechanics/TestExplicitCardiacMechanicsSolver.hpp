@@ -261,17 +261,16 @@ public:
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
 
-        TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();
         p_fine_mesh->ConstructRegularSlabMesh(1.0, 1.0, 1.0);
-        TetrahedralMesh<2,2>* p_coarse_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        TetrahedralMesh<2,2>* p_coarse_mesh = new TetrahedralMesh<2,2>();
         p_coarse_mesh->ConstructRegularSlabMesh(1.0, 1.0, 1.0);
-        FineCoarseMeshPair<2>* p_pair = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh);//also unused in this test
+        FineCoarseMeshPair<2>* p_pair = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh);
         p_pair->SetUpBoxesOnFineMesh();
 
-        TetrahedralMesh<2,2>* p_coarse_mesh_big = new TetrahedralMesh<2,2>();//unused in this test
+        TetrahedralMesh<2,2>* p_coarse_mesh_big = new TetrahedralMesh<2,2>();
         p_coarse_mesh_big->ConstructRegularSlabMesh(1.0, 3.0, 3.0);
         FineCoarseMeshPair<2>* p_pair_wrong = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh_big);
-        /////////////////////////////////////////////////////////////////////
 
         IncompressibleExplicitSolver2d expl_solver(NONPHYSIOL3,mesh,problem_defn,"");
         p_pair->ComputeFineElementsAndWeightsForCoarseQuadPoints(*(expl_solver.GetQuadratureRule()), false);
@@ -294,10 +293,11 @@ public:
         solver.SetFineCoarseMeshPair(p_pair);
         TS_ASSERT_THROWS_THIS(solver.Initialise(), "Unknown or stretch-rate-dependent contraction model");
 
-		//in need of deletion even if all these 3 have no influence at all on this test
 		delete p_fine_mesh;
 		delete p_coarse_mesh;
 		delete p_pair;
+		delete p_coarse_mesh_big;
+		delete p_pair_wrong;
     }
 };
 

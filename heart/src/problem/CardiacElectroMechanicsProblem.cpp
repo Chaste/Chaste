@@ -442,13 +442,6 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
     mpMechanicsSolver = dynamic_cast<AbstractNonlinearElasticitySolver<DIM>*>(mpCardiacMechSolver);
     assert(mpMechanicsSolver);
 
-
-    if(mpProblemDefinition->ReadFibreSheetDirectionsFromFile())
-    {
-       mpCardiacMechSolver->SetVariableFibreSheetDirections(mpProblemDefinition->GetFibreSheetDirectionsFile(),
-                                                            mpProblemDefinition->GetFibreSheetDirectionsDefinedPerQuadraturePoint());
-    }
-
     // set up mesh pair and determine the fine mesh elements and corresponding weights for each
     // quadrature point in the coarse mesh
     mpMeshPair = new FineCoarseMeshPair<DIM>(*mpElectricsMesh, *mpMechanicsMesh);
@@ -458,6 +451,13 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
 
     mpCardiacMechSolver->SetFineCoarseMeshPair(mpMeshPair);
     mpCardiacMechSolver->Initialise();
+
+    if(mpProblemDefinition->ReadFibreSheetDirectionsFromFile())
+    {
+       mpCardiacMechSolver->SetVariableFibreSheetDirections(mpProblemDefinition->GetFibreSheetDirectionsFile(),
+                                                            mpProblemDefinition->GetFibreSheetDirectionsDefinedPerQuadraturePoint());
+    }
+
 
     if(mpProblemDefinition->GetDeformationAffectsConductivity() || mpProblemDefinition->GetDeformationAffectsCellModels())
     {
