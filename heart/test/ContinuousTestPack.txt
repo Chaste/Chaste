@@ -19,6 +19,7 @@ ionicmodels/TestIonicModelsWithSacs.hpp
 ionicmodels/TestModifiers.hpp
 ionicmodels/TestPyCml.hpp
 ionicmodels/TestRushLarsen.hpp
+ionicmodels/TestSteadyStateRunner.hpp
 mechanics/TestCardiacElectroMechanicsProblem.hpp
 mechanics/TestCardiacElectroMechanicsFurtherFunctionality.hpp
 mechanics/TestContractionModels.hpp
