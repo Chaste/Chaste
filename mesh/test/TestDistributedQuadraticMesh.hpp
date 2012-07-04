@@ -115,7 +115,7 @@ public:
 
         if(!PetscTools::HasParMetis())
         {
-            std::cout << "\n\nWarning: ParMetis is not installed. Mesh partitioning not tested." << std::endl;
+            std::cout << "\n\nWarning: PETSc support for ParMetis is not installed. Mesh partitioning not tested." << std::endl;
             return;
         }
 
@@ -205,21 +205,40 @@ public:
 
     void TestConstructFromMeshReader2D() throw (Exception)
     {
-//        EXIT_IF_PARALLEL;
 //        if (!PetscTools::HasParMetis())
 //        {
-//            std::cout << "\n\nWarning: ParMetis is not installed. Mesh partitioning not tested." << std::endl;
+//            std::cout << "\n\nWarning: PETSc support for ParMetis is not installed. Mesh partitioning not tested." << std::endl;
 //            return;
 //        }
 
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic", 2, 1, false);
+        //DistributedQuadraticMesh<2> mesh(DistributedTetrahedralMeshPartitionType::PETSC_MAT_PARTITION);
         DistributedQuadraticMesh<2> mesh(DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
+        //DistributedQuadraticMesh<2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+       
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Check we have the right number of nodes & elements
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 289u);
         TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), 289u);
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 128u);
+        /**
+         * \todo #1930 - think of the right way to test this
+         * We ought to be able to see a difference between having the PETSc/ParMetis
+         * interface installed and not.
+         * mesh.GetNumLocalElements()
+         * Currently we get
+         *         NumLocalElements [min,max]
+         *         r16019           r16020ish 
+         *  Procs  PARMETIS_LIBRARY (nnodes=2)  PETSC_MAT_PARTITION DUMB
+         * -----   ---------------- ----------  ------------------- ----
+         * 1       [128, 128]                                       (one process gets 128 up until 7 procs)
+         * 2       [106, 109]       [66, 83]    [72, 72]            [93, 128]
+         * 3       [86,  92]        [49, 65]    [77, 95]            [63, 128]
+         * 4       [60,  94]        [39, 47]    [46, 74]            [49, 128]
+         * 5       [50,  68]        [30, 52]    [35, 64]            [39, 128]
+         * 
+         */
         TS_ASSERT_EQUALS(mesh.GetDistributedVectorFactory()->GetProblemSize(), 289u);
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 32u);
 

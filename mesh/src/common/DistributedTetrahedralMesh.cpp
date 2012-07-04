@@ -1249,7 +1249,19 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     rMeshReader.Reset();
 
     int numflag = 0; // METIS speak for C-style numbering
-    int ncommonnodes = 3; // Connectivity degree. Manual recommends 3 for meshes made exclusively of tetrahedra.
+    /* Connectivity degree. 
+     * Specifically, an GRAPH EDGE is placed between any two elements if and only if they share 
+     * at least this many nodes.
+     * 
+     * Manual recommends "for meshes containing only triangular, tetrahedral, 
+     * hexahedral, or rectangular elements, this parameter can be set to two, three, four, or two, respectively.
+     */
+    int ncommonnodes = 3; //Linear tetrahedra
+    if (ELEMENT_DIM == 2)
+    {
+        ncommonnodes = 2;
+    }     
+    
     MPI_Comm communicator = PETSC_COMM_WORLD;
 
     idxtype* xadj;
