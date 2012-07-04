@@ -100,8 +100,10 @@ protected:
      */
     std::map<unsigned,DataAtQuadraturePoint>::iterator mMapIterator;
 
+    /**The name of the contraction model to be used in all active quad points*/
     ContractionModelName mContractionModelName;
 
+    /** A mesh pair object that can be set by the user to inform the solver about the electrics mesh. */
     FineCoarseMeshPair<DIM>* mpMeshPair;
 
     /** Total number of quad points in the (mechanics) mesh */
@@ -208,6 +210,7 @@ public:
      * Constructor
      *
      * @param rQuadMesh A reference to the mesh.
+     * @param contractionModelName the name of the contraction model to be used
      * @param rProblemDefinition Object defining body force and boundary conditions
      * @param outputDirectory The output directory, relative to TEST_OUTPUT
      */

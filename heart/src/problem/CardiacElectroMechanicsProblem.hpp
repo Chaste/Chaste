@@ -125,8 +125,9 @@ protected :
     /** Object containing information about the problem to be solved */
     ElectroMechanicsProblemDefinition<DIM>* mpProblemDefinition;
 
-
+    /**Whether the mesh has a bath (non-active) region or not. False by default. */
     bool mHasBath;
+
     /** Class wrapping both meshes, useful for transferring information */
     FineCoarseMeshPair<DIM>* mpMeshPair;
 

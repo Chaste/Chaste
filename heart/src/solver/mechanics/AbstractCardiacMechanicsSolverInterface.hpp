@@ -71,8 +71,20 @@ public:
     /** Get the quadrature rule used in the elements. */
     virtual GaussianQuadratureRule<DIM>* GetQuadratureRule()=0;
 
+    /**
+     * Sets relevant data at all quad points, including whether it is an active region or not.
+     * The contraction model is set to NULL.
+     * At the end, it calls InitialiseContractionModels in the child class to assign a proper model.
+     */
     virtual void Initialise() = 0;
 
+    /**
+     * Sets the fine-coarse mesh pair object so that the solver knows about electrics too.
+     * It checks that the coarse mesh of the fine-mesh pair has the same number of elements as
+     * the quad mesh of this object and throws an exception otherwise.
+     *
+     * @param pMeshPair the FineCoarseMeshPair object to be set
+     */
     virtual void SetFineCoarseMeshPair(FineCoarseMeshPair<DIM>* pMeshPair) = 0;
 
     /**
