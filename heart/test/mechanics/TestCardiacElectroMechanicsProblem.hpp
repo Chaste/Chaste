@@ -211,8 +211,12 @@ public:
         }
     }
 
-    //This test is the same as above but with bidomain instead of monodomain
-    //Extracellular conductivities are set very high so the results should be the same
+    /* BEGIN_HOW_TO Cardiac/Electro-mechanics
+     * Run electro-mechanical simulations using bidomain instead of monodomain
+     *
+     * This test is the same as above but with bidomain instead of monodomain.
+     * Extracellular conductivities are set very high so the results should be the same.
+     */
     void TestWithHomogeneousEverythingCompressibleBidomain() throw(Exception)
     {
         EntirelyStimulatedTissueCellFactory cell_factory;
@@ -258,12 +262,12 @@ public:
         HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(1500,1500,1500));
         //creates the EM problem with ELEC_PROB_SIM=2
         CardiacElectroMechanicsProblem<2,2> problem(COMPRESSIBLE,
-												  BIDOMAIN,
-                                                  &electrics_mesh,
-                                                  &mechanics_mesh,
-                                                  &cell_factory,
-                                                  &problem_defn,
-                                                  "TestCardiacEmHomogeneousEverythingCompressibleBidomain");
+												    BIDOMAIN,
+                                                    &electrics_mesh,
+                                                    &mechanics_mesh,
+                                                    &cell_factory,
+                                                    &problem_defn,
+                                                    "TestCardiacEmHomogeneousEverythingCompressibleBidomain");
 
         problem.Solve();
         std::vector<c_vector<double,2> >& r_deformed_position = problem.rGetDeformedPosition();

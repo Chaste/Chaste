@@ -43,6 +43,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NumericFileComparison.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
+/*
+ * BEGIN_HOW_TO Cardiac/Problem Definition
+ * Generate fibre field definitions for cardiac geometries using a mathematical rule approach
+ *
+ */
 class TestStreeterFibreGenerator : public CxxTest::TestSuite
 {
 public:

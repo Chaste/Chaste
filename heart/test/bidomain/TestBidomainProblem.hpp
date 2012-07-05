@@ -788,7 +788,9 @@ public:
     }
 
 
-    // Test the functionality for outputting all state variables of a particular cell
+    /* BEGIN_HOW_TO Cardiac/Output
+     * Output all cell model state variables for the cell model used in a particular simulation
+     */
     void TestBidomainProblemPrintsAllStateVariables() throw (Exception)
     {
         // Get the singleton in a clean state
