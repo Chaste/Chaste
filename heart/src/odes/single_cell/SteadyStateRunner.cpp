@@ -43,12 +43,7 @@ void SteadyStateRunner::RunToSteadyStateImplementation()
     boost::shared_ptr<RegularStimulus> p_reg_stim =
                          boost::static_pointer_cast<RegularStimulus>(mpModel->GetStimulusFunction());
     const double pacing_cycle_length = p_reg_stim->GetPeriod(); //ms
-    double maximum_time_step = 1;   // Some thing (possibly dodginess in Cvode) means that this gives
-                                    // improved accuracy above letting it choose and tightening tolerances
-    if (p_reg_stim->GetDuration() < 1)
-    {
-        maximum_time_step = p_reg_stim->GetDuration();
-    }
+    double maximum_time_step = p_reg_stim->GetDuration();  // ms
 
     // Set up vectors to monitor progress
     std::vector<double> old_state_vars;

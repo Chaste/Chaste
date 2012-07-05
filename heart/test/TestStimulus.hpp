@@ -110,6 +110,11 @@ public:
                                          period,
                                          when);
 
+        // Cover a Get/Set for duration.
+        regular_stimulus.SetDuration(1.0);
+        TS_ASSERT_DELTA(regular_stimulus.GetDuration(),1.0,1e-9);
+        regular_stimulus.SetDuration(duration_of_stimulus);
+
         // Test get/set methods on RegularStimulus
         TS_ASSERT_DELTA(regular_stimulus.GetPeriod(),period,1e-9);
         regular_stimulus.SetPeriod(period + 100);

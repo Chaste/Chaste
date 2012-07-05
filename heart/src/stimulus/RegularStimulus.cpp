@@ -105,6 +105,11 @@ void RegularStimulus::SetPeriod(double period)
     mPeriod = period;
 }
 
+void RegularStimulus::SetDuration(double duration)
+{
+    mDuration = duration;
+}
+
 void RegularStimulus::SetStartTime(double startTime)
 {
     mStartTime = startTime;

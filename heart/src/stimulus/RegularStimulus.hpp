@@ -129,6 +129,13 @@ public:
     void SetPeriod(double period);
 
     /**
+     * set the length ('duration') of the stimulus.
+     *
+     * @param period  The stimulus duration to use.
+     */
+    void SetDuration(double duration);
+
+    /**
      * Set the stimulus to start at a particular time.
      *
      * @param startTime the time the stimulus should begin.
