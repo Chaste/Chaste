@@ -114,6 +114,7 @@ void QuadraticMeshHelper<DIM>::AddInternalNodesToBoundaryElements(AbstractTetrah
         {
             pMeshReader->Reset();
             SeekToBoundaryElement(*pMeshReader, (*pMesh->GetBoundaryElementIteratorBegin())->GetIndex());
+
             for (typename AbstractTetrahedralMesh<DIM,DIM>::BoundaryElementIterator iter
                      = pMesh->GetBoundaryElementIteratorBegin();
                  iter != pMesh->GetBoundaryElementIteratorEnd();
@@ -121,6 +122,12 @@ void QuadraticMeshHelper<DIM>::AddInternalNodesToBoundaryElements(AbstractTetrah
             {
                 std::vector<unsigned> nodes = pMeshReader->GetNextFaceData().NodeIndices;
 
+                if ( (*iter)->GetNumNodes()==DIM*(DIM+1)/2)
+                {
+                    //The Distributed mesh has constructed faces from the file already
+                    return;
+                    ///\todo #1930 but the Tet mesh hasn't...
+                }
                 assert((*iter)->GetNumNodes()==DIM); // so far just the vertices are in the boundary element
                 assert(nodes.size()==DIM*(DIM+1)/2); // check the reader has enough data
 

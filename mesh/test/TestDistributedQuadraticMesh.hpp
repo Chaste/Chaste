@@ -332,7 +332,7 @@ public:
         }
     }
 
-    void TestConstructFromMeshReader3DContainingElementInFile() throw (Exception)
+    void TestConstructFromMeshReader3DElementHintsInFile() throw (Exception)
     {
         /*
          * Note that these mesh files have
@@ -354,6 +354,29 @@ public:
         if (PetscTools::IsParallel())
         {
             TS_ASSERT_LESS_THAN(mesh.GetNumLocalElements(), mesh.GetNumElements());
+        }
+
+        BoundaryElement<2,3>* p_face = *(mesh.GetBoundaryElementIteratorBegin());
+        TS_ASSERT_EQUALS(p_face->GetNumNodes(), 6u);
+    }
+
+    void TestConstructFromMeshReader3DFullyQuadratic() throw(Exception)
+    {
+        // Read in the same quadratic mesh with /quadratic/ boundary elements
+        DistributedQuadraticMesh<3> mesh(DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
+        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_1626_elements_fully_quadratic",2,2,false);
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        // Check we have the right number of nodes & elements
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 2570u);
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), 1626u);
+        TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 390u);
+
+        // Check that it is not a dumb partition.
+        // (Dumb partitions with few processes require ownership of all the mesh by at least one process
+        if (PetscTools::IsParallel())
+        {
+           TS_ASSERT_LESS_THAN(mesh.GetNumLocalElements(), mesh.GetNumElements());
         }
 
         BoundaryElement<2,3>* p_face = *(mesh.GetBoundaryElementIteratorBegin());
