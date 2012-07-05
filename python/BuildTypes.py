@@ -56,7 +56,7 @@ class BuildType(object):
         self.build_type = buildType
         self._compiler_type = 'unknown'
         self._cc_flags = ['-Wall', '-Werror']
-        self._cc_flags.append('-Wnon-virtual-dtor') #See also #270 (StyleCheck)
+        self._cc_flags.extend(['-Wnon-virtual-dtor', '-Woverloaded-virtual', '-Wextra', '-Wno-unused-parameter'])
         self._link_flags = []
         self.rdynamic_link_flag = '-rdynamic'
         self._include_flag = ['-isystem']
@@ -961,115 +961,115 @@ class IntelAnsi(Intel):
         self.build_dir = 'intel_ansi'
 
 class GccPower(Gcc):
-  "GNU compiler on IBM POWER architecture."
-  def __init__(self, *args, **kwargs):
-    Gcc.__init__(self, *args, **kwargs)
-    self.tools['mpicxx'] = 'mpCC'
-    self.tools['mpirun'] = ''
-    self._cc_flags.append('-compiler g++')
-    self._cc_flags.append('-m64')
-    self._link_flags.append('-compiler g++')
-    self._link_flags.append('-m64')
-    self.build_dir = 'gccpower'
+    "GNU compiler on IBM POWER architecture."
+    def __init__(self, *args, **kwargs):
+        Gcc.__init__(self, *args, **kwargs)
+        self.tools['mpicxx'] = 'mpCC'
+        self.tools['mpirun'] = ''
+        self._cc_flags.append('-compiler g++')
+        self._cc_flags.append('-m64')
+        self._link_flags.append('-compiler g++')
+        self._link_flags.append('-m64')
+        self.build_dir = 'gccpower'
 
 class GccPowerDebug(GccPower):
-  "GNU compiler on IBM POWER with debugging."
-  def __init__(self, *args, **kwargs):
-    GccPower.__init__(self, *args, **kwargs)
-    self._cc_flags.append('-g')
-    self._link_flags.append('-g')
-    self.build_dir = 'gccpowerdebug'
+    "GNU compiler on IBM POWER with debugging."
+    def __init__(self, *args, **kwargs):
+        GccPower.__init__(self, *args, **kwargs)
+        self._cc_flags.append('-g')
+        self._link_flags.append('-g')
+        self.build_dir = 'gccpowerdebug'
 
 class CrayGcc(Gcc):
-  "Cray XT platform."
-  def __init__(self, *args, **kwargs):
-    Gcc.__init__(self, *args, **kwargs)
-    self.tools['mpicxx'] = 'CC'
+    "Cray XT platform."
+    def __init__(self, *args, **kwargs):
+        Gcc.__init__(self, *args, **kwargs)
+        self.tools['mpicxx'] = 'CC'
 # -Werror caused compilation failure for mesh/src/3rdparty/tetgen1.4.2/tetgen.cpp on HECToR phase2b with g++ 4.5.1
-    self._cc_flags = ['-Wall -Wnon-virtual-dtor']
-    self._cc_flags.append('-DMPICH_IGNORE_CXX_SEEK')
-    self._cc_flags.append('-ffast-math -funroll-loops -O3')
-    self.build_dir = 'craygcc'
+        self._cc_flags = ['-Wall -Wnon-virtual-dtor']
+        self._cc_flags.append('-DMPICH_IGNORE_CXX_SEEK')
+        self._cc_flags.append('-ffast-math -funroll-loops -O3')
+        self.build_dir = 'craygcc'
 
 class Pgi(BuildType):
-  "Portland compiler." 
-  def __init__(self, *args, **kwargs):
-    BuildType.__init__(self, *args, **kwargs)
-    self.build_dir = 'pgi'
-    self._include_flag = ['-I']
-    self._cc_flags = ['-g --no_using_std']
-    self._link_flags = ['']
-    self.rdynamic_link_flag = '-Bdynamic'
-    self.build_dir = 'pgi'
+    "Portland compiler." 
+    def __init__(self, *args, **kwargs):
+        BuildType.__init__(self, *args, **kwargs)
+        self.build_dir = 'pgi'
+        self._include_flag = ['-I']
+        self._cc_flags = ['-g --no_using_std']
+        self._link_flags = ['']
+        self.rdynamic_link_flag = '-Bdynamic'
+        self.build_dir = 'pgi'
 
 class PgiCray(Pgi):
-  "Portland compiler on Cray." 
-  def __init__(self, *args, **kwargs):
-    Pgi.__init__(self, *args, **kwargs)
-    self.tools['mpicxx'] = 'CC'
-    self._cc_flags.append('-DMPICH_IGNORE_CXX_SEEK')
-    self._cc_flags.append('-DBOOST_UBLAS_UNSUPPORTED_COMPILER=0')
-    self.build_dir = 'pgicray'
+    "Portland compiler on Cray." 
+    def __init__(self, *args, **kwargs):
+        Pgi.__init__(self, *args, **kwargs)
+        self.tools['mpicxx'] = 'CC'
+        self._cc_flags.append('-DMPICH_IGNORE_CXX_SEEK')
+        self._cc_flags.append('-DBOOST_UBLAS_UNSUPPORTED_COMPILER=0')
+        self.build_dir = 'pgicray'
 
 class PgiCrayOpt(PgiCray):
-  "Optimised Portland compiler on Cray."
-  def __init__(self, *args, **kwargs):
-    PgiCray.__init__(self, *args, **kwargs)
-    self._cc_flags.append('-fastsse')
-    self.build_dir = 'pgicrayopt'
+    "Optimised Portland compiler on Cray."
+    def __init__(self, *args, **kwargs):
+        PgiCray.__init__(self, *args, **kwargs)
+        self._cc_flags.append('-fastsse')
+        self.build_dir = 'pgicrayopt'
 
 class Pathscale(BuildType):
-  "Pathscale compiler." 
-  def __init__(self, *args, **kwargs):
-    BuildType.__init__(self, *args, **kwargs)
-    self._include_flag = ['-I']
-    self._cc_flags = ['-O3 -OPT:Ofast']
-    self.build_dir = 'pathscale'
+    "Pathscale compiler." 
+    def __init__(self, *args, **kwargs):
+        BuildType.__init__(self, *args, **kwargs)
+        self._include_flag = ['-I']
+        self._cc_flags = ['-O3 -OPT:Ofast']
+        self.build_dir = 'pathscale'
 
 class PathscaleCray(Pathscale):
-  "Pathscale compiler on Cray."
-  def __init__(self, *args, **kwargs):
-    Pathscale.__init__(self, *args, **kwargs)
-    self.tools['mpicxx'] = 'CC'
-    self._cc_flags.append('-DMPICH_IGNORE_CXX_SEEK')
-    self.build_dir = 'pathscalecray'
+    "Pathscale compiler on Cray."
+    def __init__(self, *args, **kwargs):
+        Pathscale.__init__(self, *args, **kwargs)
+        self.tools['mpicxx'] = 'CC'
+        self._cc_flags.append('-DMPICH_IGNORE_CXX_SEEK')
+        self.build_dir = 'pathscalecray'
 
 class Vacpp(BuildType):
-  "IBM Visual Age C++ compiler"
-  def __init__(self, *args, **kwargs):
-    BuildType.__init__(self, *args, **kwargs)
-    self.tools['mpicxx'] = 'mpCC'
-    self.tools['mpirun'] = 'poe'
-    self._cc_flags = ['-q64 -qhalt=w']
-    self._link_flags = ['-q64']
-    self._include_flag = ['-I']
-    self.build_dir = 'vacpp'
+    "IBM Visual Age C++ compiler"
+    def __init__(self, *args, **kwargs):
+        BuildType.__init__(self, *args, **kwargs)
+        self.tools['mpicxx'] = 'mpCC'
+        self.tools['mpirun'] = 'poe'
+        self._cc_flags = ['-q64 -qhalt=w']
+        self._link_flags = ['-q64']
+        self._include_flag = ['-I']
+        self.build_dir = 'vacpp'
 
 class VacppOpt(Vacpp):
-  "Optmized IBM build"
-  def __init__(self, *args, **kwargs):
-    Vacpp.__init__(self, *args, **kwargs)
-    self._cc_flags.append('-qarch=auto -qstrict -qhot -O3')
-    self.build_dir = 'vacppopt'
+    "Optmized IBM build"
+    def __init__(self, *args, **kwargs):
+        Vacpp.__init__(self, *args, **kwargs)
+        self._cc_flags.append('-qarch=auto -qstrict -qhot -O3')
+        self.build_dir = 'vacppopt'
 
 class Fle(BuildType):
-  "Intel compiler tools on FLE cluster."
-  def __init__(self, *args, **kwargs):
-    BuildType.__init__(self, *args, **kwargs)
-    self._compiler_type = 'intel'
-    # Turn off some warnings
-    self._cc_flags = ['-i-dynamic', '-wr470', '-wr186']
-    self._cc_flags.extend(['-O3', '-xW'])
-    self._cc_flags.extend(['-DNDEBUG'])
-    self._link_flags = ['-static-libgcc']
-    self.build_dir = 'fle'
-    # Intel compiler uses optimisation by default
-    self.is_optimised = True
+    "Intel compiler tools on FLE cluster."
+    def __init__(self, *args, **kwargs):
+        BuildType.__init__(self, *args, **kwargs)
+        self._compiler_type = 'intel'
+        # Turn off some warnings
+        self._cc_flags = ['-i-dynamic', '-wr470', '-wr186']
+        self._cc_flags.extend(['-O3', '-xW'])
+        self._cc_flags.extend(['-DNDEBUG'])
+        self._link_flags = ['-static-libgcc']
+        self.build_dir = 'fle'
+        # Intel compiler uses optimisation by default
+        self.is_optimised = True
 
-  def GetTestRunnerCommand(self, exefile, exeflags=''):
-    "Run test with a single processor environment"
-    return self.tools['mpirun'] + ' -machinefile /home/southern/.mpihosts' + ' -np ' \
-             + str(self._num_processes) + ' ' + exefile + ' ' + exeflags
+    def GetTestRunnerCommand(self, exefile, exeflags=''):
+        "Run test with a single processor environment"
+        return self.tools['mpirun'] + ' -machinefile /home/southern/.mpihosts' + ' -np ' \
+                 + str(self._num_processes) + ' ' + exefile + ' ' + exeflags
 
 class FleDebug(Fle):
     "Intel compilers with debugging enabled on FLE cluster."
@@ -1079,29 +1079,29 @@ class FleDebug(Fle):
         self.build_dir = 'fle_debug'
 
 class FleProfile(Fle):
-  "Intel compilers with no optimisation on FLE cluster."
-  def __init__(self, *args, **kwargs):
-    Fle.__init__(self, *args, **kwargs)
-    self._cc_flags.extend(['-p', '-g'])
-    self._link_flags.extend(['-p', '-g'])
-    self.build_dir = 'fle_profile'
+    "Intel compilers with no optimisation on FLE cluster."
+    def __init__(self, *args, **kwargs):
+        Fle.__init__(self, *args, **kwargs)
+        self._cc_flags.extend(['-p', '-g'])
+        self._link_flags.extend(['-p', '-g'])
+        self.build_dir = 'fle_profile'
 
 class FleItcProfile(Fle):
-  "Intel compilers with no optimisation on FLE cluster."
-  def __init__(self, *args, **kwargs):
-    Fle.__init__(self, *args, **kwargs)
-    self._cc_flags.extend(['-DITC'])
-    self._link_flags.extend(['-DITC', '-L/opt/intel/ict/3.0/itac/7.0/itac/lib_mpich', '-lVT', '-ldwarf', '-lelf', '-lnsl', '-lm', '-ldl', '-lpthread'])
-    self.build_dir = 'fle_itc_profile'
+    "Intel compilers with no optimisation on FLE cluster."
+    def __init__(self, *args, **kwargs):
+        Fle.__init__(self, *args, **kwargs)
+        self._cc_flags.extend(['-DITC'])
+        self._link_flags.extend(['-DITC', '-L/opt/intel/ict/3.0/itac/7.0/itac/lib_mpich', '-lVT', '-ldwarf', '-lelf', '-lnsl', '-lm', '-ldl', '-lpthread'])
+        self.build_dir = 'fle_itc_profile'
 
 class FleNonopt(Fle):
-  "Intel compilers with no optimisation on FLE cluster."
-  def __init__(self, *args, **kwargs):
-    Fle.__init__(self, *args, **kwargs)
-    self._cc_flags = ['-i-dynamic', '-wr470', '-wr186', '-O0']
-    self.build_dir = 'fle_nonopt'
-    self.is_optimised = False
-				    
+    "Intel compilers with no optimisation on FLE cluster."
+    def __init__(self, *args, **kwargs):
+        Fle.__init__(self, *args, **kwargs)
+        self._cc_flags = ['-i-dynamic', '-wr470', '-wr186', '-O0']
+        self.build_dir = 'fle_nonopt'
+        self.is_optimised = False
+
 class FleMemoryTesting(FleDebug):
     """
     Compile using intel compilers with debugging turned on, and run tests under valgrind on FLE cluster.
@@ -1348,7 +1348,7 @@ def GetBuildType(buildType):
         classname = 'GccDebug'
         extras = ['onlytests', 'Failing'] + extras
     try:
-        exec "obj = %s('%s')" % (classname, buildType)
+        obj = globals()[classname](buildType)
     except Exception, e:
         raise ValueError("Invalid build type '%s': %s" % (buildType, str(e)))
     

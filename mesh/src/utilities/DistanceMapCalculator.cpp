@@ -208,7 +208,7 @@ bool DistanceMapCalculator<ELEMENT_DIM, SPACE_DIM>::WorkOnLocalQueue(std::vector
 
         // Only act on nodes which haven't been acted on already
         // (It's possible that a better distance has been found and already been dealt with)
-        if (distance_when_queued == rNodeDistances[current_node_index]);
+        if (distance_when_queued == rNodeDistances[current_node_index])
         {
             mPopCounter++;
             Node<SPACE_DIM>* p_current_node = mrMesh.GetNode(current_node_index);

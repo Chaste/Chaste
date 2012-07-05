@@ -56,7 +56,7 @@ void AbstractCryptStatistics::LabelSPhaseCells()
             assert(cell_iter->GetMutationState()->IsType<WildTypeCellMutationState>());
 
             // Label this cell
-            if (!cell_iter->HasCellProperty<CellLabel>());
+            if (!cell_iter->HasCellProperty<CellLabel>())
             {
                 cell_iter->AddCellProperty(CellPropertyRegistry::Instance()->Get<CellLabel>());
             }
