@@ -69,6 +69,10 @@ public:
 
         std::vector<double> initial_conditions = ode_system.GetInitialConditions();
 
+        TS_ASSERT_DELTA(initial_conditions[0], 1.0, 1e-6);
+        TS_ASSERT_DELTA(initial_conditions[1], 1.0, 1e-6);
+        TS_ASSERT_DELTA(initial_conditions[2], 0.5, 1e-6);
+
         double start_time = std::clock();
         solutions = cvode_solver.Solve(&ode_system, initial_conditions, 0.0, 100.0, h_value, h_value);
         double end_time = std::clock();
@@ -98,7 +102,8 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "delta_notch_ode.arch";
 
         {
-            DeltaNotchOdeSystem ode_system;
+            double mean_delta = 0.5;
+            DeltaNotchOdeSystem ode_system(mean_delta);
 
             std::vector<double> initial_conditions = ode_system.GetInitialConditions();
             TS_ASSERT_EQUALS(initial_conditions.size(), 3u);
