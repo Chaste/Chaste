@@ -135,7 +135,7 @@ public:
      * @param orderOfBoundaryElements the order of each boundary element: 1 for linear, 2 for quadratic (defaults to 1. May
      *  or may not be different to orderOfElements (Note tetgen with the -o2 flag creates quadratic elements but doesn't
      *  create quadratic faces, hence the need for this third parameter)
-     * @param readContainingElementsForBoundaryElements Whether to read in the containing element infomation
+     * @param readContainingElementsForBoundaryElements Whether to read in the containing element information
      *  for each boundary element (in the .face file if tetgen was run with '-nn').
      */
     TrianglesMeshReader(std::string pathBaseName,
@@ -175,13 +175,13 @@ public:
     /** Returns a vector of the coordinates of each node in turn */
     std::vector<double> GetNextNode();
 
-    /** Returns a vector of the nodes of each element (and any attribute infomation, if there is any) in turn */
+    /** Returns a vector of the nodes of each element (and any attribute information, if there is any) in turn */
     ElementData GetNextElementData();
 
     /** Returns a vector of the nodes of each face in turn (synonym of GetNextEdgeData()) */
     ElementData GetNextFaceData();
 
-    /** Returns a vector of the node indices of each cable element (and any attribute infomation, if there is any) in turn */
+    /** Returns a vector of the node indices of each cable element (and any attribute information, if there is any) in turn */
     ElementData GetNextCableElementData();
 
 
@@ -225,7 +225,7 @@ public:
      *  Normally throws an exception.  Only implemented for tetrahedral mesh reader of binary files.
      *
      * @param index  The global element index
-     * @return a vector of the node indices of the element (and any attribute infomation, if there is any)
+     * @return a vector of the node indices of the element (and any attribute information, if there is any)
      */
     ElementData GetElementData(unsigned index);
 
@@ -233,7 +233,7 @@ public:
      *  Normally throws an exception.  Only implemented for tetrahedral mesh reader of binary files.
      *
      * @param index  The global face index
-     * @return a vector of the node indices of the face (and any attribute/containment infomation, if there is any)
+     * @return a vector of the node indices of the face (and any attribute/containment information, if there is any)
      */
     ElementData GetFaceData(unsigned index);
 
@@ -242,7 +242,7 @@ public:
      *  that contain the node (only available for binary files).
      *
      * @param index  The global node index
-     * @return a vector of the node indices of the face (and any attribute/containment infomation, if there is any)
+     * @return a vector of the node indices of the face (and any attribute/containment information, if there is any)
      */
     std::vector<unsigned> GetContainingElementIndices(unsigned index);
 

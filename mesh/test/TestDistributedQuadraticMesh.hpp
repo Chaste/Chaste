@@ -205,40 +205,42 @@ public:
 
     void TestConstructFromMeshReader2D() throw (Exception)
     {
-//        if (!PetscTools::HasParMetis())
-//        {
-//            std::cout << "\n\nWarning: PETSc support for ParMetis is not installed. Mesh partitioning not tested." << std::endl;
-//            return;
-//        }
-
+        /*
+         * Note that these mesh files have
+         *  - quadratic elements
+         *  - linear edges
+         *  - edge file doesn't say which element the edge belongs too
+         */
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic", 2, 1, false);
-        //DistributedQuadraticMesh<2> mesh(DistributedTetrahedralMeshPartitionType::PETSC_MAT_PARTITION);
         DistributedQuadraticMesh<2> mesh(DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
-        //DistributedQuadraticMesh<2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
-       
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Check we have the right number of nodes & elements
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 289u);
-        TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), 289u);
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 128u);
+        TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 32u);
+
         /**
-         * \todo #1930 - think of the right way to test this
-         * We ought to be able to see a difference between having the PETSc/ParMetis
-         * interface installed and not.
-         * mesh.GetNumLocalElements()
          * Currently we get
          *         NumLocalElements [min,max]
-         *         r16019           r16020ish 
-         *  Procs  PARMETIS_LIBRARY (nnodes=2)  PETSC_MAT_PARTITION DUMB
-         * -----   ---------------- ----------  ------------------- ----
-         * 1       [128, 128]                                       (one process gets 128 up until 7 procs)
-         * 2       [106, 109]       [66, 83]    [72, 72]            [93, 128]
-         * 3       [86,  92]        [49, 65]    [77, 95]            [63, 128]
-         * 4       [60,  94]        [39, 47]    [46, 74]            [49, 128]
-         * 5       [50,  68]        [30, 52]    [35, 64]            [39, 128]
+         *         r16019(nnodes=3) r16020(nnodes=2)
+         *  Procs  PARMETIS_LIBRARY PARMETIS_LIBRARY   PETSC_MAT_PARTITION DUMB
+         * -----   ---------------- ----------          ------------------- ----
+         * 1       [128, 128]                                               (one process gets 128 up until 7 procs)
+         * 2       [106, 109]       [66, 83]            [72, 72]            [93, 128]
+         * 3       [86,  92]        [49, 65]            [77, 95]            [63, 128]
+         * 4       [60,  94]        [39, 47]            [46, 74]            [49, 128]
+         * 5       [50,  68]        [30, 52]            [35, 64]            [39, 128]
          * 
          */
+        // Check that it is not a dumb partition.
+        // (Dumb partitions with few processes require ownership of all the mesh by at least one process
+        if (PetscTools::IsParallel())
+        {
+            TS_ASSERT_LESS_THAN(mesh.GetNumLocalElements(), mesh.GetNumElements());
+        }
+
+
         TS_ASSERT_EQUALS(mesh.GetDistributedVectorFactory()->GetProblemSize(), 289u);
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 32u);
 
@@ -288,6 +290,7 @@ public:
             BoundaryElement<1,2>* p_sequ_boundary_element = seq_mesh.GetBoundaryElement(boundary_element_index);
             TS_ASSERT_EQUALS(boundary_element_index, p_sequ_boundary_element->GetIndex());
             TS_ASSERT_EQUALS(p_para_boundary_element->GetNumNodes(), p_sequ_boundary_element->GetNumNodes());
+            TS_ASSERT_EQUALS(p_para_boundary_element->GetNumNodes(), 3u); //Quadratic edge
 
             for (unsigned node_local_index=0; node_local_index < p_para_boundary_element->GetNumNodes(); node_local_index++)
             {
@@ -303,6 +306,60 @@ public:
             }
         }
     }
+    void TestConstructFromMeshReader2DWithPetscSupport() throw (Exception)
+    {
+        if (!PetscTools::HasParMetis())
+        {
+            std::cout << "\n\nWarning: PETSc support for ParMetis is not installed. Mesh partitioning not tested." << std::endl;
+            return;
+        }
+
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic", 2, 1, false);
+        DistributedQuadraticMesh<2> mesh(DistributedTetrahedralMeshPartitionType::PETSC_MAT_PARTITION);
+
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        // Check we have the right number of nodes & elements
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 289u);
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), 128u);
+        TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 152u);
+
+        // Check that it is not a dumb partition.
+        // (Dumb partitions with few processes require ownership of all the mesh by at least one process
+        if (PetscTools::IsParallel())
+        {
+            TS_ASSERT_LESS_THAN(mesh.GetNumLocalElements(), mesh.GetNumElements());
+        }
+    }
+
+    void TestConstructFromMeshReader3DContainingElementInFile() throw (Exception)
+    {
+        /*
+         * Note that these mesh files have
+         *  - quadratic elements
+         *  - linear edges
+         *  - face file does say which element the face belongs too
+         */
+        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_152_elements_v3", 2, 1, true);
+        DistributedQuadraticMesh<3> mesh(DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        // Check we have the right number of nodes & elements
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 335u);
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), 152u);
+        TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 116u);
+
+        // Check that it is not a dumb partition.
+        // (Dumb partitions with few processes require ownership of all the mesh by at least one process
+        if (PetscTools::IsParallel())
+        {
+            TS_ASSERT_LESS_THAN(mesh.GetNumLocalElements(), mesh.GetNumElements());
+        }
+
+        BoundaryElement<2,3>* p_face = *(mesh.GetBoundaryElementIteratorBegin());
+        TS_ASSERT_EQUALS(p_face->GetNumNodes(), 6u);
+    }
+
 };
 
 

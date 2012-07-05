@@ -72,7 +72,6 @@ void DistributedQuadraticMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<D
 //    }
     DistributedTetrahedralMesh<DIM,DIM>::ConstructFromMeshReader(*p_mesh_reader);
     assert(this->GetNumBoundaryElements() > 0u);
-
     QuadraticMeshHelper<DIM>::AddInternalNodesToElements(this, p_mesh_reader);
     QuadraticMeshHelper<DIM>::AddInternalNodesToBoundaryElements(this, p_mesh_reader);
     QuadraticMeshHelper<DIM>::CheckBoundaryElements(this);

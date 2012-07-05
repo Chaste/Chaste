@@ -61,7 +61,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * @param orderOfBoundaryElements the order of each boundary element: 1 for linear, 2 for quadratic (defaults to 1. May
  *    or may not be different to orderOfElements (Note tetgen with the -o2 flag creates quadratic elements but doesn't
  *    create quadratic faces, hence the need for this third parameter)
- * @param readContainingElementsForBoundaryElements Whether to read in the containing element infomation
+ * @param readContainingElementsForBoundaryElements Whether to read in the containing element information
  *    for each boundary element (in the .face file if tetgen was run with '-nn').
  */
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

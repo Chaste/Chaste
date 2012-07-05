@@ -156,8 +156,12 @@ void QuadraticMeshHelper<DIM>::AddNodesToBoundaryElements(AbstractTetrahedralMes
         if (boundary_element_file_has_containing_element_info)
         {
             pMeshReader->Reset();
-            SeekToBoundaryElement(*pMeshReader, (*pMesh->GetBoundaryElementIteratorBegin())->GetIndex());
         }
+
+        ///\todo #1930 Until there is an interator_facade over boundary elements,
+        // we may need to skip through the boundary element file searching for containing elements hints.
+        // This counter keeps track of our position in the file.
+        unsigned next_face_on_file = 0u;
 
         for (typename AbstractTetrahedralMesh<DIM,DIM>::BoundaryElementIterator iter
                  = pMesh->GetBoundaryElementIteratorBegin();
@@ -188,7 +192,14 @@ void QuadraticMeshHelper<DIM>::AddNodesToBoundaryElements(AbstractTetrahedralMes
                 // We know what elem it should be in (but we'll still check the node indices match in case)
                 if (boundary_element_file_has_containing_element_info)
                 {
-                    elem_index = pMeshReader->GetNextFaceData().ContainingElement;
+                    unsigned face_index = (*iter)->GetIndex();
+                    ///\todo #1930 Once there is an interator_facade then we can do: elem_index = pMeshReader->GetFaceData(face_index).ContainingElement;
+                    do
+                    {
+                        elem_index = pMeshReader->GetNextFaceData().ContainingElement;
+                        next_face_on_file++;
+                    }
+                    while (face_index >= next_face_on_file);
                 }
 
                 Element<DIM,DIM>* p_element = pMesh->GetElement(elem_index);
