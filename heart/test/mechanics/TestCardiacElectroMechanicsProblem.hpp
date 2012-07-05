@@ -211,7 +211,7 @@ public:
         }
     }
 
-    /* BEGIN_HOW_TO Cardiac/Electro-mechanics
+    /* HOW_TO_TAG Cardiac/Electro-mechanics
      * Run electro-mechanical simulations using bidomain instead of monodomain
      *
      * This test is the same as above but with bidomain instead of monodomain.

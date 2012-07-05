@@ -788,7 +788,7 @@ public:
     }
 
 
-    /* BEGIN_HOW_TO Cardiac/Output
+    /* HOW_TO_TAG Cardiac/Output
      * Output all cell model state variables for the cell model used in a particular simulation
      */
     void TestBidomainProblemPrintsAllStateVariables() throw (Exception)
