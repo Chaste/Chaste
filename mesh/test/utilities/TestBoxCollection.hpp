@@ -379,6 +379,7 @@ public:
         neighbours_should_be[2].insert(1);
         neighbours_should_be[2].insert(3);
         neighbours_should_be[3].insert(2);
+        neighbours_should_be[4] = std::set<unsigned>();
 
         TS_ASSERT_EQUALS(neighbours_should_be, neighbours_returned);
 
@@ -596,6 +597,7 @@ public:
         neighbours_should_be[8].insert(5);
         neighbours_should_be[8].insert(6);
         neighbours_should_be[8].insert(7);
+        neighbours_should_be[9] = std::set<unsigned>();
 
         TS_ASSERT_EQUALS(neighbours_should_be, neighbours_returned);
 

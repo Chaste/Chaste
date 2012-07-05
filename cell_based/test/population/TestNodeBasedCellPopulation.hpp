@@ -449,7 +449,7 @@ public:
         node_based_cell_population.SetMechanicsCutOffLength(1e-1);
         node_based_cell_population.Update();
 
-        TS_ASSERT_THROWS_THIS(node_based_cell_population.GetNeighbouringNodeIndices(50), "mMechanicsCutOffLength is smaller than the sum of radius of cell 50 (0.1) and cell 10 (0.1). Make the cut-off larger to avoid errors.");
+        TS_ASSERT_THROWS_THIS(node_based_cell_population.GetNeighbouringNodeIndices(50), "mMechanicsCutOffLength is smaller than twice the radius of cell 50 (0.1) so interactions may be missed. Make the cut-off larger to avoid errors.");
 
         node_based_cell_population.SetMechanicsCutOffLength(1.2);
         node_based_cell_population.Update();
@@ -509,6 +509,87 @@ public:
         // Test that the numbers of nodes and cells has been updated
         TS_ASSERT_EQUALS(node_based_cell_population.GetNumNodes(), 82u);
         TS_ASSERT_EQUALS(node_based_cell_population.GetNumRealCells(), 82u);
+    }
+
+    void TestGetNeighbouringNodeIndices()
+    {
+        SimulationTime* p_simulation_time = SimulationTime::Instance();
+        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 1);
+
+        // Create a small node-based cell population
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2,2> generating_mesh;
+        generating_mesh.ConstructFromMeshReader(mesh_reader);
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(generating_mesh);
+
+        for (unsigned i=1; i<mesh.GetNumNodes(); i++)
+        {
+            mesh.SetCellRadius(i, 0.55);
+        }
+        // Make cell 0 smaller
+        mesh.SetCellRadius(0, 0.1);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        // Create a cell population
+        NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
+
+        // Test we have the right numbers of nodes and cells
+        TS_ASSERT_EQUALS(node_based_cell_population.GetNumNodes(), 5u);
+        TS_ASSERT_EQUALS(node_based_cell_population.GetNumRealCells(), 5u);
+
+        // Test GetNeighbouringNodeIndices() method
+        TS_ASSERT_THROWS_THIS(node_based_cell_population.GetNeighbouringNodeIndices(0), "mNodeNeighbours not set up. Call Update() before GetNeighbouringNodeIndices()");
+
+        node_based_cell_population.SetMechanicsCutOffLength(0.1);
+        node_based_cell_population.Update();
+
+        TS_ASSERT_THROWS_THIS(node_based_cell_population.GetNeighbouringNodeIndices(0), "mMechanicsCutOffLength is smaller than twice the radius of cell 0 (0.1) so interactions may be missed. Make the cut-off larger to avoid errors.");
+
+        node_based_cell_population.SetMechanicsCutOffLength(0.5);
+		node_based_cell_population.Update();
+
+		TS_ASSERT_THROWS_THIS(node_based_cell_population.GetNeighbouringNodeIndices(0), "mMechanicsCutOffLength is smaller than the sum of radius of cell 0 (0.1) and cell 4 (0.55). Make the cut-off larger to avoid errors.");
+
+
+
+        node_based_cell_population.SetMechanicsCutOffLength(1.2);
+        node_based_cell_population.Update();
+
+        //Test Corner Node should have no neighbours as small cell
+        std::set<unsigned> node_0_neighbours = node_based_cell_population.GetNeighbouringNodeIndices(0);
+
+        std::set<unsigned> expected_node_0_neighbours;
+
+        TS_ASSERT_EQUALS(node_0_neighbours.size(), 0u);
+        TS_ASSERT_EQUALS(node_0_neighbours, std::set<unsigned>());
+
+        //Test another corner node
+		std::set<unsigned> node_1_neighbours = node_based_cell_population.GetNeighbouringNodeIndices(1);
+
+		std::set<unsigned> expected_node_1_neighbours;
+		expected_node_1_neighbours.insert(2);
+		expected_node_1_neighbours.insert(4);
+
+		TS_ASSERT_EQUALS(node_1_neighbours.size(), expected_node_1_neighbours.size());
+		TS_ASSERT_EQUALS(node_1_neighbours, expected_node_1_neighbours);
+
+        //Test Centre node
+        std::set<unsigned> node_4_neighbours = node_based_cell_population.GetNeighbouringNodeIndices(4);
+
+        std::set<unsigned> expected_node_4_neighbours;
+        expected_node_4_neighbours.insert(1);
+        expected_node_4_neighbours.insert(2);
+        expected_node_4_neighbours.insert(3);
+
+        TS_ASSERT_EQUALS(node_4_neighbours.size(), expected_node_4_neighbours.size());
+        TS_ASSERT_EQUALS(node_4_neighbours, expected_node_4_neighbours);
+
+
     }
 
     void TestSettingCellAncestors() throw (Exception)
