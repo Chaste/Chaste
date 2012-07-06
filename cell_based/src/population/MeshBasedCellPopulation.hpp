@@ -55,8 +55,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * nodes in the mesh.
  *
  */
-template<unsigned DIM>
-class MeshBasedCellPopulation : public AbstractCentreBasedCellPopulation<DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
+class MeshBasedCellPopulation : public AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>
 {
     friend class TestMeshBasedCellPopulation;
 private:
@@ -76,7 +76,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractCentreBasedCellPopulation<DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM> >(*this);
 
         /*
          * In its current form the code does not allow the direct serialization
@@ -115,10 +115,10 @@ protected:
      * GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex()
      * and GetVoronoiElementIndexCorrespondingToDelaunayNodeIndex() on mpVoronoiTessellation.
      */
-    VertexMesh<DIM, DIM>* mpVoronoiTessellation;
+    VertexMesh<ELEMENT_DIM, SPACE_DIM>* mpVoronoiTessellation;
 
     /** Static cast of the mesh from AbstractCellPopulation */
-    MutableMesh<DIM, DIM>* mpMutableMesh;
+    MutableMesh<ELEMENT_DIM, SPACE_DIM>* mpMutableMesh;
 
     /**
      * Whether to delete the mesh when we are destroyed.
@@ -187,7 +187,7 @@ public:
      * @param deleteMesh set to true if you want the cell population to free the mesh memory on destruction
      * @param validate whether to validate the cell population
      */
-    MeshBasedCellPopulation(MutableMesh<DIM, DIM>& rMesh,
+    MeshBasedCellPopulation(MutableMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
                     std::vector<CellPtr>& rCells,
                     const std::vector<unsigned> locationIndices=std::vector<unsigned>(),
                     bool deleteMesh=false,
@@ -198,7 +198,7 @@ public:
      *
      * @param rMesh a mutable tetrahedral mesh.
      */
-    MeshBasedCellPopulation(MutableMesh<DIM, DIM>& rMesh);
+    MeshBasedCellPopulation(MutableMesh<ELEMENT_DIM, SPACE_DIM>& rMesh);
 
     /**
      * Destructor.
@@ -208,12 +208,12 @@ public:
     /**
      * @return reference to  mrMesh.
      */
-    MutableMesh<DIM, DIM>& rGetMesh();
+    MutableMesh<ELEMENT_DIM, SPACE_DIM>& rGetMesh();
 
     /**
      * @return const reference to mrMesh (used in archiving).
      */
-    const MutableMesh<DIM, DIM>& rGetMesh() const;
+    const MutableMesh<ELEMENT_DIM, SPACE_DIM>& rGetMesh() const;
 
     /** @return mUseAreaBasedDampingConstant. */
     bool UseAreaBasedDampingConstant();
@@ -233,7 +233,7 @@ public:
      * @param pNewNode pointer to the new node
      * @return global index of new node in cell population
      */
-    unsigned AddNode(Node<DIM>* pNewNode);
+    unsigned AddNode(Node<SPACE_DIM>* pNewNode);
 
     /**
      * Overridden SetNode() method.
@@ -243,7 +243,7 @@ public:
      * @param nodeIndex the index of the node to be moved
      * @param rNewLocation the new target location of the node
      */
-    void SetNode(unsigned nodeIndex, ChastePoint<DIM>& rNewLocation);
+    void SetNode(unsigned nodeIndex, ChastePoint<SPACE_DIM>& rNewLocation);
 
     /**
      * Overridden GetDampingConstant() method that includes the
@@ -287,7 +287,7 @@ public:
      *
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
      */
-    virtual CellPtr AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell);
+    virtual CellPtr AddCell(CellPtr pNewCell, const c_vector<double,SPACE_DIM>& rCellDivisionVector, CellPtr pParentCell);
 
     /**
      * Overridden CreateOutputFiles() method.
@@ -330,7 +330,7 @@ public:
      *
      * @return pointer to the Node with given index.
      */
-    Node<DIM>* GetNode(unsigned index);
+    Node<SPACE_DIM>* GetNode(unsigned index);
 
     /**
      * Overridden GetNumNodes() method.
@@ -377,7 +377,7 @@ public:
     /**
      * Get a reference to mpVoronoiTessellation.
      */
-    VertexMesh<DIM, DIM>* GetVoronoiTessellation();
+    VertexMesh<ELEMENT_DIM, SPACE_DIM>* GetVoronoiTessellation();
 
     /**
      * Get the volume (or area in 2D, or length in 1D) of the element of mpVoronoiTessellation associated with
@@ -441,12 +441,12 @@ public:
         /**
          * Get a pointer to the node in the mesh at end A of the spring.
          */
-        Node<DIM>* GetNodeA();
+        Node<SPACE_DIM>* GetNodeA();
 
         /**
          * Get a pointer to the node in the mesh at end B of the spring.
          */
-        Node<DIM>* GetNodeB();
+        Node<SPACE_DIM>* GetNodeB();
 
         /**
          * Get the cell at end A of the spring.
@@ -463,7 +463,7 @@ public:
          *
          * @param rOther SpringIterator with which comparison is made
          */
-        bool operator!=(const MeshBasedCellPopulation<DIM>::SpringIterator& rOther);
+        bool operator!=(const MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::SpringIterator& rOther);
 
         /**
          * Prefix increment operator.
@@ -476,7 +476,7 @@ public:
          * @param rCellPopulation the cell population
          * @param edgeIter iterator over edges in the mesh
          */
-        SpringIterator(MeshBasedCellPopulation<DIM>& rCellPopulation, typename MutableMesh<DIM,DIM>::EdgeIterator edgeIter);
+        SpringIterator(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation, typename MutableMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator edgeIter);
 
     private:
 
@@ -484,10 +484,10 @@ public:
         std::set<std::set<unsigned> > mSpringsVisited;
 
         /** The cell population member. */
-        MeshBasedCellPopulation<DIM>& mrCellPopulation;
+        MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>& mrCellPopulation;
 
         /** The edge iterator member. */
-        typename MutableMesh<DIM, DIM>::EdgeIterator mEdgeIter;
+        typename MutableMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator mEdgeIter;
     };
 
     /**
@@ -586,12 +586,12 @@ namespace serialization
 /**
  * Serialize information required to construct a MeshBasedCellPopulation.
  */
-template<class Archive, unsigned DIM>
+template<class Archive, unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 inline void save_construct_data(
-    Archive & ar, const MeshBasedCellPopulation<DIM> * t, const BOOST_PFTO unsigned int file_version)
+    Archive & ar, const MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM> * t, const BOOST_PFTO unsigned int file_version)
 {
     // Save data required to construct instance
-    const MutableMesh<DIM,DIM>* p_mesh = &(t->rGetMesh());
+    const MutableMesh<ELEMENT_DIM, SPACE_DIM>* p_mesh = &(t->rGetMesh());
     ar & p_mesh;
 }
 
@@ -599,16 +599,16 @@ inline void save_construct_data(
  * De-serialize constructor parameters and initialise a MeshBasedCellPopulation.
  * Loads the mesh from separate files.
  */
-template<class Archive, unsigned DIM>
+template<class Archive,  unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 inline void load_construct_data(
-    Archive & ar, MeshBasedCellPopulation<DIM> * t, const unsigned int file_version)
+    Archive & ar, MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM> * t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
-    MutableMesh<DIM,DIM>* p_mesh;
+    MutableMesh<ELEMENT_DIM, SPACE_DIM>* p_mesh;
     ar >> p_mesh;
 
     // Invoke inplace constructor to initialise instance
-    ::new(t)MeshBasedCellPopulation<DIM>(*p_mesh);
+    ::new(t)MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>(*p_mesh);
 }
 }
 } // namespace ...
