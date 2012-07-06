@@ -129,9 +129,9 @@ public:
     void SetPeriod(double period);
 
     /**
-     * set the length ('duration') of the stimulus.
+     * set the length ('duration') of the stimulus square wave.
      *
-     * @param period  The stimulus duration to use.
+     * @param duration  The stimulus duration to use.
      */
     void SetDuration(double duration);
 
