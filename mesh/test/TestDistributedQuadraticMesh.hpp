@@ -323,7 +323,7 @@ public:
         // Check we have the right number of nodes & elements
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 289u);
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 128u);
-        TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 152u);
+        TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 32u);
 
         // Check that it is not a dumb partition.
         // (Dumb partitions with few processes require ownership of all the mesh by at least one process
