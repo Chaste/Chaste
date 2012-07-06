@@ -154,12 +154,12 @@ public:
         problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, LinearPressureFunction);
 
         CardiacElectroMechanicsProblem<2,1> problem(COMPRESSIBLE,
-												  MONODOMAIN,
-                                                  &electrics_mesh,
-                                                  &mechanics_mesh,
-                                                  &cell_factory,
-                                                  &problem_defn,
-                                                  "TestEmOnAnnulusDiastolicFilling");
+                                                    MONODOMAIN,
+                                                    &electrics_mesh,
+                                                    &mechanics_mesh,
+                                                    &cell_factory,
+                                                    &problem_defn,
+                                                    "TestEmOnAnnulusDiastolicFilling");
         problem.Solve();
 
         // We don't really test anything, we mainly just want to verify it solves OK past the initial and through
@@ -249,12 +249,12 @@ public:
         problem_defn.SetNumIncrementsForInitialDeformation(5);
 
         CardiacElectroMechanicsProblem<2,1> problem(COMPRESSIBLE,
-												 MONODOMAIN,
-                                                 &electrics_mesh,
-                                                 &mechanics_mesh,
-                                                 &cell_factory,
-                                                 &problem_defn,
-                                                 "TestEmOnAnnulus");
+                                                    MONODOMAIN,
+                                                    &electrics_mesh,
+                                                    &mechanics_mesh,
+                                                    &cell_factory,
+                                                    &problem_defn,
+                                                    "TestEmOnAnnulus");
 
         problem.Solve();
 

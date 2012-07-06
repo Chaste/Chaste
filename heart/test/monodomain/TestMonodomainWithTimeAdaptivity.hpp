@@ -48,6 +48,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 
 
+/* HOW_TO_TAG Cardiac/Solver
+ * Run using (simple, user-defined) time-adaptivity
+ */
+
 // Toy controller which just goes alters the timestep from 0.01ms to 1ms after a given
 // threshold time.
 class FixedTimeAdaptivityController : public AbstractTimeAdaptivityController

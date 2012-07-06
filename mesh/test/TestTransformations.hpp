@@ -45,6 +45,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cmath>
 
+
+/* HOW_TO_TAG Mesh
+ * Apply transformations to meshes
+ */
 class TestTransformations : public CxxTest::TestSuite
 {
 public:

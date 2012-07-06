@@ -421,6 +421,10 @@ public:
 
 
 
+    /* HOW_TO_TAG Cardiac/Output
+     * Only output data for particular nodes
+     */
+
     ///////////////////////////////////////////////////////////////////
     // Solve a simple simulation and check the output was only
     // printed out at the correct times

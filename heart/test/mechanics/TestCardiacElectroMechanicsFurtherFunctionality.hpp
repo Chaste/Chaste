@@ -135,12 +135,12 @@ public:
         problem_defn.SetDeformationAffectsElectrophysiology(false,true);
 
         CardiacElectroMechanicsProblem<2,1> problem(INCOMPRESSIBLE,
-												  MONODOMAIN,
-                                                  &electrics_mesh,
-                                                  &mechanics_mesh,
-                                                  &cell_factory,
-                                                  &problem_defn,
-                                                  "TestNobleSacActivatedByStretchTissue");
+                                                    MONODOMAIN,
+                                                    &electrics_mesh,
+                                                    &mechanics_mesh,
+                                                    &cell_factory,
+                                                    &problem_defn,
+                                                    "TestNobleSacActivatedByStretchTissue");
 
         problem.Initialise();
 
@@ -237,12 +237,12 @@ public:
 
 
         CardiacElectroMechanicsProblem<2,1> problem(INCOMPRESSIBLE,
-												  MONODOMAIN,
-                                                  &electrics_mesh,
-                                                  &mechanics_mesh,
-                                                  &cell_factory,
-                                                  &problem_defn,
-                                                  "");
+                                                    MONODOMAIN,
+                                                    &electrics_mesh,
+                                                    &mechanics_mesh,
+                                                    &cell_factory,
+                                                    &problem_defn,
+                                                    "");
 
 
         problem.Initialise();
@@ -452,12 +452,12 @@ public:
 
 
         CardiacElectroMechanicsProblem<2,1> problem(COMPRESSIBLE,
-												  MONODOMAIN,
-                                                  &electrics_mesh,
-                                                  &mechanics_mesh,
-                                                  &cell_factory,
-                                                  &problem_defn,
-                                                  "TestCardiacElectroMechanicsHeterogeneousMaterialLaws" /* output directory */);
+                                                    MONODOMAIN,
+                                                    &electrics_mesh,
+                                                    &mechanics_mesh,
+                                                    &cell_factory,
+                                                    &problem_defn,
+                                                    "TestCardiacElectroMechanicsHeterogeneousMaterialLaws" /* output directory */);
 
 
         problem.Solve();

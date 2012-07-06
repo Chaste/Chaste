@@ -47,6 +47,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NumericFileComparison.hpp"
 
 
+/*
+ *  HOW_TO_TAG Continuum mechanics
+ *  Solve Stokes' flow problems (this functionality is work-in-progress).
+ *
+ */
 class TestStokesFlowSolver : public CxxTest::TestSuite
 {
 public:

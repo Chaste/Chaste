@@ -54,6 +54,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TenTusscher2006Epi.hpp"
 #include "Mahajan2008.hpp"
 
+
+/* HOW_TO_TAG Cardiac/Solver
+ * Run using operator-splitting
+ */
+
 // stimulate a block of cells (an interval in 1d, a block in a corner in 2d)
 template<unsigned DIM>
 class BlockCellFactory : public AbstractCardiacCellFactory<DIM>

@@ -930,6 +930,9 @@ public:
         }
     }
 
+    /* HOW_TO_TAG Continuum mechanics
+     * Write strain after solve
+     */
     void TestWritingStrain() throw(Exception)
     {
         QuadraticMesh<2> mesh(1.0, 1.0, 1.0);

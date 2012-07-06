@@ -621,6 +621,9 @@ public:
             }
         }
 
+        /* HOW_TO_TAG Continuum mechanics
+         * Get or output stresses during a solve
+         */
         if(PetscTools::IsSequential()) // see #2084
         {
             // get the solver to save the stresses on each element (averaged over quad point stresses)
@@ -1198,7 +1201,10 @@ public:
         }
     }
 
-    //This is purely to ensure coverage of vtk output in 3d
+    /* HOW_TO_TAG Continuum mechanics
+     * Write VTK output (for Paraview visualiser)
+     */
+    // This is purely to ensure coverage of vtk output in 3d
     void TestVtkCoverage3d() throw(Exception)
     {
        QuadraticMesh<3> mesh;
