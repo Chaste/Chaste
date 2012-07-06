@@ -308,6 +308,7 @@ public:
     }
     void TestConstructFromMeshReader2DWithPetscSupport() throw (Exception)
     {
+        EXIT_IF_SEQUENTIAL;
         if (!PetscTools::HasParMetis())
         {
             std::cout << "\n\nWarning: PETSc support for ParMetis is not installed. Mesh partitioning not tested." << std::endl;

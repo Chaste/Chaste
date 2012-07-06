@@ -426,7 +426,8 @@ bool PetscTools::HasParMetis()
 #else
     PetscErrorCode parmetis_installed_error = MatPartitioningSetType(part,MATPARTITIONINGPARMETIS);
 #endif
-
+    // Note that this method probably leaks memory inside PETSc because if MatPartitioningCreate fails
+    // then there isn't a proper handle to destroy.
     MatPartitioningDestroy(PETSC_DESTROY_PARAM(part));
     return (parmetis_installed_error == 0);
 }
