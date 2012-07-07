@@ -42,8 +42,10 @@ extern void METIS_NodeND(int*, int*, int*, int*, int*, int*, int*);
 #include <cxxtest/TestSuite.h>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+
 #include "QuadraticMesh.hpp"
 #include "OutputFileHandler.hpp"
+#include "FileComparison.hpp"
 #include "ArchiveOpener.hpp"
 #include "Warnings.hpp"
 #include "PetscMatTools.hpp"
@@ -425,9 +427,10 @@ public:
         // Write the computed quadratic boundary elements
         mesh1.WriteBoundaryElementFile("TestQuadraticMesh","generated2d.edge");
 
-        OutputFileHandler handler("TestQuadraticMesh", false);
-        std::string file = handler.GetOutputDirectoryFullPath() + "/generated2d.edge";
-        TS_ASSERT_EQUALS(system(("diff " + file + " mesh/test/data/square_128_elements_fully_quadratic.edge").c_str()), 0);
+        FileFinder generated("TestQuadraticMesh/generated2d.edge",RelativeTo::ChasteTestOutput);
+        FileFinder reference("mesh/test/data/square_128_elements_fully_quadratic.edge",RelativeTo::ChasteSourceRoot);
+        FileComparison comparer(generated,reference);
+        TS_ASSERT(comparer.CompareFiles());
 
         // Read in the same quadratic mesh with /quadratic/ boundary elements
         QuadraticMesh<2> mesh2;
@@ -484,9 +487,10 @@ public:
         // Write the computed quadratic boundary elements
         mesh1.WriteBoundaryElementFile("TestQuadraticMesh","generated3d.face");
 
-        OutputFileHandler handler("TestQuadraticMesh", false);
-        std::string file = handler.GetOutputDirectoryFullPath() + "/generated3d.face";
-        TS_ASSERT_EQUALS(system(("diff " + file + " mesh/test/data/cube_1626_elements_fully_quadratic.face").c_str()), 0);
+        FileFinder generated("TestQuadraticMesh/generated3d.face",RelativeTo::ChasteTestOutput);
+        FileFinder reference("mesh/test/data/cube_1626_elements_fully_quadratic.face",RelativeTo::ChasteSourceRoot);
+        FileComparison comparer(generated,reference);
+        TS_ASSERT(comparer.CompareFiles());
 
         // Read in the same quadratic mesh with /quadratic/ boundary elements
         QuadraticMesh<3> mesh2;

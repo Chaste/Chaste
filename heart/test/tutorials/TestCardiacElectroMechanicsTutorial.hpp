@@ -112,6 +112,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NobleVargheseKohlNoble1998WithSac.hpp"
 #include "Hdf5ToMeshalyzerConverter.hpp"
 #include "ZeroStimulusCellFactory.hpp"
+#include "FileComparison.hpp"
 
 /*
  * == IMPORTANT: using HYPRE ==
@@ -308,17 +309,13 @@ public:
 
         /* The final position of the nodes can be obtained as follows (same interface in described in the solid mechanics tutorials). */
         TS_ASSERT_DELTA(problem.rGetDeformedPosition()[5](0), 0.090464, 1e-4);
+
         /* Ignore these tests, they are they to check nothing has changed in this tutorial */
-        std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
-        std::string command = "diff " + test_output_directory
-                              + "/TestCardiacElectroMechanicsExample/deformation/solution_40.nodes "
-                              + test_output_directory
-                              + "/TestCardiacElectroMechanicsExample2/deformation/solution_40.nodes ";
-        TS_ASSERT_EQUALS(system(command.c_str()), 0);
-
+        FileFinder finder1("TestCardiacElectroMechanicsExample/deformation/solution_40.nodes", RelativeTo::ChasteTestOutput);
+        FileFinder finder2("TestCardiacElectroMechanicsExample2/deformation/solution_40.nodes", RelativeTo::ChasteTestOutput);
+        FileComparison comparer(finder1,finder2);
+        TS_ASSERT(comparer.CompareFiles());
     }
-
-
 
     /* == Twisting cube: 3d example with varying fibre directions ==
      *

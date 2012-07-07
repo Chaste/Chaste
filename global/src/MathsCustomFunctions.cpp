@@ -128,9 +128,9 @@ double SafeDivide(double number, double divisor)
 
 bool CompareDoubles::WithinRelativeTolerance(double number1, double number2, double tolerance)
 {
-    double diff = fabs(number1 - number2);
-    double d1 = SafeDivide(diff, fabs(number1));
-    double d2 = SafeDivide(diff, fabs(number2));
+    double difference = fabs(number1 - number2);
+    double d1 = SafeDivide(difference, fabs(number1));
+    double d2 = SafeDivide(difference, fabs(number2));
 
     return d1 <= tolerance && d2 <= tolerance;
 }
@@ -180,9 +180,9 @@ double CompareDoubles::Difference(double number1, double number2, bool tolerance
     }
     else
     {
-        double diff = fabs(number1 - number2);
-        double d1 = SafeDivide(diff, fabs(number1));
-        double d2 = SafeDivide(diff, fabs(number2));
+        double difference = fabs(number1 - number2);
+        double d1 = SafeDivide(difference, fabs(number1));
+        double d2 = SafeDivide(difference, fabs(number2));
         return d1 > d2 ? d1 : d2;
     }
 }

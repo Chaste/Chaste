@@ -628,16 +628,16 @@ double TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetAngleBetweenNodes(unsigned in
     assert(SPACE_DIM == 2);
     assert(SPACE_DIM == ELEMENT_DIM);
 
-    double x_diff = this->mNodes[indexB]->rGetLocation()[0] - this->mNodes[indexA]->rGetLocation()[0];
-    double y_diff = this->mNodes[indexB]->rGetLocation()[1] - this->mNodes[indexA]->rGetLocation()[1];
+    double x_difference = this->mNodes[indexB]->rGetLocation()[0] - this->mNodes[indexA]->rGetLocation()[0];
+    double y_difference = this->mNodes[indexB]->rGetLocation()[1] - this->mNodes[indexA]->rGetLocation()[1];
 
-    if (x_diff == 0)
+    if (x_difference == 0)
     {
-        if (y_diff > 0)
+        if (y_difference > 0)
         {
             return M_PI/2.0;
         }
-        else if (y_diff < 0)
+        else if (y_difference < 0)
         {
             return -M_PI/2.0;
         }
@@ -647,7 +647,7 @@ double TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetAngleBetweenNodes(unsigned in
         }
     }
 
-    double angle = atan2(y_diff,x_diff);
+    double angle = atan2(y_difference,x_difference);
     return angle;
 }
 

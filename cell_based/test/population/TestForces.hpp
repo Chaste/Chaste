@@ -61,6 +61,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WildTypeCellMutationState.hpp"
 #include "CellLabel.hpp"
 #include "SmartPointers.hpp"
+#include "FileComparison.hpp"
 
 class TestForces : public AbstractCellBasedTestSuite
 {
@@ -430,8 +431,13 @@ public:
         linear_force.OutputForceParameters(linear_force_parameter_file);
         linear_force_parameter_file->close();
 
-        std::string linear_force_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + linear_force_results_dir + "linear_results.parameters cell_based/test/data/TestForces/linear_results.parameters").c_str()), 0);
+        {
+            FileFinder generated_file = output_file_handler.FindFile("linear_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestForces/linear_results.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file,reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
 
         // Test with ChemotacticForce
         ChemotacticForce<2> chemotactic_force;
@@ -441,8 +447,13 @@ public:
         chemotactic_force.OutputForceParameters(chemotactic_force_parameter_file);
         chemotactic_force_parameter_file->close();
 
-        std::string chemotactic_force_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + chemotactic_force_results_dir + "chemotactic_results.parameters cell_based/test/data/TestForces/chemotactic_results.parameters").c_str()), 0);
+        {
+            FileFinder generated_file = output_file_handler.FindFile("chemotactic_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestForces/chemotactic_results.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file,reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
 
         // Test with RepulsionForce
         RepulsionForce<2> repulsion_force;
@@ -452,8 +463,13 @@ public:
         repulsion_force.OutputForceParameters(repulsion_force_parameter_file);
         repulsion_force_parameter_file->close();
 
-        std::string repulsion_force_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + repulsion_force_results_dir + "repulsion_results.parameters cell_based/test/data/TestForces/repulsion_results.parameters").c_str()), 0);
+        {
+            FileFinder generated_file = output_file_handler.FindFile("repulsion_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestForces/repulsion_results.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file,reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
 
         // Test with NagaiHondaForce
         NagaiHondaForce<2> nagai_force;
@@ -463,8 +479,13 @@ public:
         nagai_force.OutputForceParameters(nagai_force_parameter_file);
         nagai_force_parameter_file->close();
 
-        std::string nagai_force_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + nagai_force_results_dir + "nagai_results.parameters cell_based/test/data/TestForces/nagai_results.parameters").c_str()), 0);
+        {
+            FileFinder generated_file = output_file_handler.FindFile("nagai_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestForces/nagai_results.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file,reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
 
         // Test with NagaiHondaDifferentialAdhesionForce
         NagaiHondaDifferentialAdhesionForce<2> nagai_da_force;
@@ -474,8 +495,13 @@ public:
         nagai_da_force.OutputForceParameters(nagai_force_parameter_file);
         nagai_da_force_parameter_file->close();
 
-        std::string nagai_da_force_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + nagai_da_force_results_dir + "nagai_da_results.parameters cell_based/test/data/TestForces/nagai_da_results.parameters").c_str()), 0);
+        {
+            FileFinder generated_file = output_file_handler.FindFile("nagai_da_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestForces/nagai_da_results.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file,reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
 
         // Test with WelikyOsterForce
         WelikyOsterForce<2> weliky_force;
@@ -485,8 +511,13 @@ public:
         weliky_force.OutputForceParameters(weliky_force_parameter_file);
         weliky_force_parameter_file->close();
 
-        std::string weliky_force_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + weliky_force_results_dir + "weliky_results.parameters cell_based/test/data/TestForces/weliky_results.parameters").c_str()), 0);
+        {
+            FileFinder generated_file = output_file_handler.FindFile("weliky_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestForces/weliky_results.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file,reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
 
         // Test with DiffusionForce
 		DiffusionForce<2> diffusion_force;
@@ -496,8 +527,13 @@ public:
 		diffusion_force.OutputForceParameters(diffusion_force_parameter_file);
 		diffusion_force_parameter_file->close();
 
-		std::string diffusion_force_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-		TS_ASSERT_EQUALS(system(("diff " + diffusion_force_results_dir + "diffusion_results.parameters cell_based/test/data/TestForces/diffusion_results.parameters").c_str()), 0);
+		{
+            FileFinder generated_file = output_file_handler.FindFile("diffusion_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestForces/diffusion_results.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file,reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
     }
 
     void TestGeneralisedLinearSpringForceArchiving() throw (Exception)

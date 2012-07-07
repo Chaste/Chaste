@@ -59,6 +59,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OdeThirdOrder.hpp"
 #include "ParameterisedOde.hpp"
 
+#include "FileComparison.hpp"
 #include "NumericFileComparison.hpp"
 
 #include "PetscTools.hpp"
@@ -198,9 +199,10 @@ public:
 
         TS_ASSERT(comparer.CompareFiles(1e-6));
         //The info file should now contain the ODE solver (EulerIvpOdeSolver) identifier
-        TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" " + OutputFileHandler::GetChasteTestOutputDirectory() + "OdeSolution/Ode2_4.info"
-                 + "  ode/test/data/Ode2_4.info").c_str()), 0);
-
+        FileFinder generated_file("OdeSolution/Ode2_4.info", RelativeTo::ChasteTestOutput);
+        FileFinder reference_file("ode/test/data/Ode2_4.info", RelativeTo::ChasteSourceRoot);
+        FileComparison file_comparer(generated_file, reference_file);
+        TS_ASSERT(file_comparer.CompareFiles());
     }
 
     void TestEulerSolver() throw (Exception)
@@ -398,12 +400,25 @@ public:
         solutions_rk4.WriteToFile("OdeSolution", "RungeKutta4", "time", 1, false, 4, true);
         solutions_euler.WriteToFile("OdeSolution", "Euler", "time", 1, false, 4, true);
         PetscTools::Barrier("TestGlobalError"); // Ensure files exist
-        TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" " + OutputFileHandler::GetChasteTestOutputDirectory() + "OdeSolution/RungeKutta2.info"
-                 + "  ode/test/data/RungeKutta2.info").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" " + OutputFileHandler::GetChasteTestOutputDirectory() + "OdeSolution/RungeKutta4.info"
-                 + "  ode/test/data/RungeKutta4.info").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" " + OutputFileHandler::GetChasteTestOutputDirectory() + "OdeSolution/Euler.info"
-                 + "  ode/test/data/Euler.info").c_str()), 0);
+
+        {
+            FileFinder generated_file("OdeSolution/RungeKutta2.info", RelativeTo::ChasteTestOutput);
+            FileFinder reference_file("ode/test/data/RungeKutta2.info", RelativeTo::ChasteSourceRoot);
+            FileComparison file_comparer(generated_file, reference_file);
+            TS_ASSERT(file_comparer.CompareFiles());
+        }
+        {
+            FileFinder generated_file("OdeSolution/RungeKutta4.info", RelativeTo::ChasteTestOutput);
+            FileFinder reference_file("ode/test/data/RungeKutta4.info", RelativeTo::ChasteSourceRoot);
+            FileComparison file_comparer(generated_file, reference_file);
+            TS_ASSERT(file_comparer.CompareFiles());
+        }
+        {
+            FileFinder generated_file("OdeSolution/Euler.info", RelativeTo::ChasteTestOutput);
+            FileFinder reference_file("ode/test/data/Euler.info", RelativeTo::ChasteSourceRoot);
+            FileComparison file_comparer(generated_file, reference_file);
+            TS_ASSERT(file_comparer.CompareFiles());
+        }
     }
 
     void TestGlobalErrorSystemOf2Equations()

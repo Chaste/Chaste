@@ -684,11 +684,19 @@ public:
         TS_ASSERT(comparer2.CompareFiles());
 
         //...and a couple of data files as examples
-        TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" " + results_dir + "/axi3d_61.exnode heart/test/data/CmguiData/bidomain/bidomain3dValidData61.exnode").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" " + results_dir + "/axi3d_100.exnode heart/test/data/CmguiData/bidomain/bidomain3dValidData100.exnode").c_str()), 0);
+        FileComparison comparer3(results_dir + "/axi3d_61.exnode",
+                "heart/test/data/CmguiData/bidomain/bidomain3dValidData61.exnode");
+        TS_ASSERT(comparer3.CompareFiles());
+
+        FileComparison comparer4(results_dir + "/axi3d_100.exnode",
+                "heart/test/data/CmguiData/bidomain/bidomain3dValidData100.exnode");
+        TS_ASSERT(comparer4.CompareFiles());
 
         //info file
-        TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" " + results_dir + "/axi3d_times.info heart/test/data/CmguiData/bidomain/axi3d_times.info").c_str()), 0);
+        FileComparison comparer5(results_dir + "/axi3d_times.info",
+                "heart/test/data/CmguiData/bidomain/axi3d_times.info");
+        TS_ASSERT(comparer5.CompareFiles());
+
         //HeartConfig XML
         TS_ASSERT(FileFinder(results_dir + "ChasteParameters.xml").Exists());
 
@@ -936,8 +944,10 @@ public:
         OutputFileHandler handler("BidomainUnpermuted1d/output", false);
 
         //Mesh
-        TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" " + handler.GetOutputDirectoryFullPath()
-                                + "/BidomainLR91_1d_mesh.pts   heart/test/data/BidomainUnpermuted1d/BidomainLR91_1d_mesh.pts").c_str() ), 0);
+        FileComparison comparer(handler.GetOutputDirectoryFullPath() + "/BidomainLR91_1d_mesh.pts",
+                "heart/test/data/BidomainUnpermuted1d/BidomainLR91_1d_mesh.pts");
+        TS_ASSERT(comparer.CompareFiles());
+
         //Transmembrane
         std::string file1=handler.GetOutputDirectoryFullPath()+ "/BidomainLR91_1d_V.dat";
         std::string file2="heart/test/data/BidomainUnpermuted1d/BidomainLR91_1d_V.dat";

@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshReader.hpp"
 #include "Warnings.hpp"
 #include "NumericFileComparison.hpp"
-
+#include "FileComparison.hpp"
 
 /*
  *  HOW_TO_TAG Continuum mechanics
@@ -283,7 +283,9 @@ public:
 
         solver.WriteCurrentPressureSolution(10);
 
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "/pressure_10.txt " + results_dir + "/pressure.txt").c_str()), 0);
+        FileComparison comparer(results_dir + "/pressure_10.txt", results_dir + "/pressure.txt");
+        TS_ASSERT(comparer.CompareFiles());
+
         NumericFileComparison comp3(results_dir + "/pressure_10.txt", results_dir + "/pressure.txt");
         TS_ASSERT(comp3.CompareFiles(1e-17));
     }
@@ -453,29 +455,29 @@ public:
 
                 double diff_x = fabs(solver.rGetVelocities()[i](0) - exact_flow_x);
                 double diff_y = fabs(solver.rGetVelocities()[i](1) - exact_flow_y);
-                double max_diff = std::max(diff_x,diff_y);
-                L_inf_error_flow[run] = std::max(L_inf_error_flow[run], max_diff);
+                double max_difference = std::max(diff_x,diff_y);
+                L_inf_error_flow[run] = std::max(L_inf_error_flow[run], max_difference);
             }
 
             //Calculate the constant offset between the true solution and the numerical solution.
             std::vector<double>& r_pressures = solver.rGetPressures();
 
-            double pressure_diff = 0.0;
+            double pressure_difference = 0.0;
             for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {
                 double x = mesh.GetNode(i)->rGetLocation()[0];
                 double y = mesh.GetNode(i)->rGetLocation()[1];
                 double exact_pressure = 60.0*x*x*y -20.0*y*y*y;
-                pressure_diff += r_pressures[i] - exact_pressure;
+                pressure_difference += r_pressures[i] - exact_pressure;
             }
-            pressure_diff /= mesh.GetNumVertices();
+            pressure_difference /= mesh.GetNumVertices();
 
             for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {
                 double x = mesh.GetNode(i)->rGetLocation()[0];
                 double y = mesh.GetNode(i)->rGetLocation()[1];
                 double exact_pressure = 60.0*x*x*y -20.0*y*y*y;
-                L_inf_error_p[run] = std::max(L_inf_error_p[run], fabs(r_pressures[i] - exact_pressure - pressure_diff));
+                L_inf_error_p[run] = std::max(L_inf_error_p[run], fabs(r_pressures[i] - exact_pressure - pressure_difference));
             }
         }
 

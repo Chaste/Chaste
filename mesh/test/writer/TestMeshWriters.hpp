@@ -252,7 +252,10 @@ public:
         TS_ASSERT_EQUALS(mesh_reader2.GetNumFaces(), 2u);
 
         // Test for connectivity
-        TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" " + output_dir + "/1dMeshIn2dSpace.ncl mesh/test/data/1dMeshIn2dSpace.ncl").c_str()), 0);
+        FileFinder generated_file(output_dir + "/1dMeshIn2dSpace.ncl");
+        FileFinder reference_file("mesh/test/data/1dMeshIn2dSpace.ncl",RelativeTo::ChasteSourceRoot);
+        FileComparison comparer(generated_file,reference_file);
+        TS_ASSERT(comparer.CompareFiles());
     }
 
     void TestTriangles1DMeshIn2DSpaceWithDeletedNode() throw (Exception)
@@ -533,7 +536,10 @@ public:
 
         std::string results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "TestCmguiDeformedSolutionsWriter";
 
-        TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" " + results_dir + "/solution_0.exnode " + results_dir + "/some_other_name.exnode").c_str()), 0);
+        {
+            FileComparison comparer(results_dir + "/solution_0.exnode", results_dir + "/some_other_name.exnode");
+            TS_ASSERT(comparer.CompareFiles());
+        }
         // we shouldn't really have called WriteInitialMesh() twice on the same writer. If we had used different writers
         // we could also check the exelem files are the same here (the second one isn't created due to WriteInitialMesh
         // being called twice
@@ -760,7 +766,9 @@ public:
         FileComparison comparer4(elem_file1,elem_file2);
         TS_ASSERT(comparer4.CompareFiles());
 
-        TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" " + results_dir + "/LoadSolutions.com mesh/test/data/TestCmguiDeformedSolutionsWriter/LoadSolutions.com").c_str()), 0);
+        FileComparison comparer5(results_dir + "/LoadSolutions.com","mesh/test/data/TestCmguiDeformedSolutionsWriter/LoadSolutions.com");
+        TS_ASSERT(comparer5.CompareFiles());
+
         // throws as is incomplete
         TS_ASSERT_THROWS_CONTAINS(writer.ConvertOutput("mesh/test/data/TestCmguiDeformedSolutionsWriter", "bad_myoldsolution", 1), "Error occurred when reading file");
     }
@@ -858,16 +866,27 @@ public:
         writer_from_mesh.WriteFilesUsingMesh(mesh);
         std::string results_dir = writer_from_mesh.GetOutputDirectory();
 
-        TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" " + results_dir + "/simple_cube_binary_from_reader.node mesh/test/data/simple_cube_binary.node").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" " + results_dir + "/simple_cube_binary_from_reader.ele mesh/test/data/simple_cube_binary.ele").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" " + results_dir + "/simple_cube_binary_from_reader.face mesh/test/data/simple_cube_binary.face").c_str()), 0);
+        std::vector<std::string> files_to_compare;
+        files_to_compare.push_back("simple_cube_binary_from_reader");
+        files_to_compare.push_back("simple_cube_binary_from_mesh");
+        std::vector<std::string> types_to_compare;
+        types_to_compare.push_back("node");
+        types_to_compare.push_back("ele");
+        types_to_compare.push_back("face");
 
-        TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" " + results_dir + "/simple_cube_binary_from_mesh.node mesh/test/data/simple_cube_binary.node").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" " + results_dir + "/simple_cube_binary_from_mesh.ele mesh/test/data/simple_cube_binary.ele").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" " + results_dir + "/simple_cube_binary_from_mesh.face mesh/test/data/simple_cube_binary.face").c_str()), 0);
+        for(unsigned i=0; i<files_to_compare.size(); i++)
+        {
+            for (unsigned j=0; j<types_to_compare.size(); j++)
+            {
+                FileComparison comparer(results_dir + "/" + files_to_compare[i] + "." + types_to_compare[j],
+                                        "mesh/test/data/simple_cube_binary." + types_to_compare[j]);
+                TS_ASSERT(comparer.CompareFiles());
+            }
+        }
 
         // Test for connectivity
-        TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" " + results_dir + "/simple_cube_binary_from_mesh.ncl mesh/test/data/simple_cube_binary.ncl").c_str()), 0);
+        FileComparison comparer(results_dir + "/simple_cube_binary_from_mesh.ncl","mesh/test/data/simple_cube_binary.ncl");
+        TS_ASSERT(comparer.CompareFiles());
 
         /* Looking for beginning of provenance line: "#Created by Chaste"
          *          Ascii   Binary

@@ -378,8 +378,8 @@ public:
         centre_of_coarse_pde_mesh /= p_coarse_mesh->GetNumNodes();
 
         // Test that the two centres match
-        c_vector<double,2> centre_diff = centre_of_cell_population - centre_of_coarse_pde_mesh;
-        TS_ASSERT_DELTA(norm_2(centre_diff), 0.0, 1e-4);
+        c_vector<double,2> centre_difference = centre_of_cell_population - centre_of_coarse_pde_mesh;
+        TS_ASSERT_DELTA(norm_2(centre_difference), 0.0, 1e-4);
 
         // Test that UseCoarsePdeMesh()  throws an exception if the wrong type of PDE is specified
         SimpleUniformSourcePde<2> pde2(-0.1);

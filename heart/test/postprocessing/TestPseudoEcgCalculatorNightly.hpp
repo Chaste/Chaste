@@ -48,6 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshReader.hpp"
 #include "HeartConfig.hpp"
 #include "PetscSetupAndFinalize.hpp"
+#include "FileComparison.hpp"
 
 class TestPseudoEcgCalculatorNightly : public CxxTest::TestSuite
 {
@@ -79,9 +80,9 @@ public:
         //now compare it with a valid pseudo-ecg file (see above).
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
 
-        std::string command_second_time_step = "diff -a -I \"Created by Chaste\" " + test_output_directory + pseudo_ecg_output_dir + "/output/PseudoEcgFromElectrodeAt_2.2_6_1.85.dat"
-                                     + " heart/test/data/PseudoEcg/ValidPseudoEcg.dat";
-        TS_ASSERT_EQUALS(system(command_second_time_step.c_str()), 0);
+        FileComparison comparer(test_output_directory + pseudo_ecg_output_dir + "/output/PseudoEcgFromElectrodeAt_2.2_6_1.85.dat",
+                                "heart/test/data/PseudoEcg/ValidPseudoEcg.dat");
+        TS_ASSERT(comparer.CompareFiles());
     }
 
     void TestCalculatorRealistic3DNotDistributed() throw (Exception)
@@ -110,9 +111,9 @@ public:
         //now compare it with a valid pseudo-ecg file (see above).
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
 
-        std::string command_second_time_step = "diff -a -I \"Created by Chaste\" " + test_output_directory + pseudo_ecg_output_dir + "/output/PseudoEcgFromElectrodeAt_2.2_6_1.85.dat"
-                                     + " heart/test/data/PseudoEcg/ValidPseudoEcg.dat";
-        TS_ASSERT_EQUALS(system(command_second_time_step.c_str()), 0);
+        FileComparison comparer(test_output_directory + pseudo_ecg_output_dir + "/output/PseudoEcgFromElectrodeAt_2.2_6_1.85.dat",
+                                "heart/test/data/PseudoEcg/ValidPseudoEcg.dat");
+        TS_ASSERT(comparer.CompareFiles());
     }
 
 };

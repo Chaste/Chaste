@@ -51,6 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileFinder.hpp"
 #include "MeshalyzerMeshWriter.hpp"
 #include "CmguiMeshWriter.hpp"
+#include "FileComparison.hpp"
 
 #include "RandomNumberGenerator.hpp"
 
@@ -1732,9 +1733,20 @@ public:
 
         std::string output_dir = mesh_writer1.GetOutputDirectory();
 
-        TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" " + output_dir + "/par_cube_2mm_12_elements.node "+ output_dir + "/seq_cube_2mm_12_elements.node").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" " + output_dir + "/par_cube_2mm_12_elements.ele "+ output_dir + "/seq_cube_2mm_12_elements.ele").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" " + output_dir + "/par_cube_2mm_12_elements.face "+ output_dir + "/seq_cube_2mm_12_elements.face").c_str()), 0);
+        std::vector<std::string> files_to_compare;
+        files_to_compare.push_back("node");
+        files_to_compare.push_back("ele");
+        files_to_compare.push_back("face");
+
+        for (unsigned i=0; i<files_to_compare.size(); i++)
+        {
+            std::cout << "Comparing ." << files_to_compare[i] << std::endl;
+            FileFinder generated_parallel(output_dir + "/par_cube_2mm_12_elements." + files_to_compare[i]);
+            FileFinder generated_sequential(output_dir + "/seq_cube_2mm_12_elements." + files_to_compare[i]);
+            FileComparison comparer(generated_parallel,generated_sequential);
+            TS_ASSERT(comparer.CompareFiles());
+        }
+
     }
 
     void TestEfficientParallelWriting3D()
@@ -1764,13 +1776,29 @@ public:
 
         std::string output_dir = mesh_writer.GetOutputDirectory();
 
-        TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" " + output_dir + "/par_efficient_cube_2mm_12_elements.pts "+ output_dir + "/seq_cube_2mm_12_elements.pts").c_str()), 0);
+        {
+            FileFinder parallel(output_dir + "/par_efficient_cube_2mm_12_elements.pts");
+            FileFinder sequential(output_dir + "/seq_cube_2mm_12_elements.pts");
+            FileComparison comparer(parallel,sequential);
+            TS_ASSERT(comparer.CompareFiles());
+        }
 
         // cg output is indexed from 1, but the pts file doesn't have indices
-        TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" " + output_dir + "/par_efficient_cube_2mm_12_elements_cg.pts "+ output_dir + "/seq_cube_2mm_12_elements_cg.pts").c_str()), 0);
+        {
+            FileFinder parallel(output_dir + "/par_efficient_cube_2mm_12_elements_cg.pts");
+            FileFinder sequential(output_dir + "/seq_cube_2mm_12_elements_cg.pts");
+            FileComparison comparer(parallel,sequential);
+            TS_ASSERT(comparer.CompareFiles());
+        }
 
         //cmgui
-        TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" -I \"Group name:\" " + output_dir + "/par_efficient_cube_2mm_12_elements_cmgui.exnode "+ output_dir + "/seq_cube_2mm_12_elements_cmgui.exnode").c_str()), 0);
+        {
+            FileFinder parallel(output_dir + "/par_efficient_cube_2mm_12_elements_cmgui.exnode");
+            FileFinder sequential(output_dir + "/seq_cube_2mm_12_elements_cmgui.exnode");
+            FileComparison comparer(parallel,sequential);
+            comparer.SetIgnoreLinesBeginningWith("Group name:");
+            TS_ASSERT(comparer.CompareFiles());
+        }
 
         // Master process sorts element and face file and the rest wait before comparing.
         if (PetscTools::AmMaster())
@@ -1793,8 +1821,19 @@ public:
         }
         PetscTools::Barrier();
 
-        TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" " + output_dir + "seq_sorted.tetras " + output_dir + "par_eff_sorted.tetras").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" " + output_dir + "seq_sorted.tri " + output_dir + "par_eff_sorted.tri").c_str()), 0);
+        {
+            FileFinder parallel(output_dir + "/par_eff_sorted.tetras");
+            FileFinder sequential(output_dir + "/seq_sorted.tetras");
+            FileComparison comparer(parallel,sequential);
+            TS_ASSERT(comparer.CompareFiles());
+        }
+
+        {
+            FileFinder parallel(output_dir + "/par_eff_sorted.tri");
+            FileFinder sequential(output_dir + "/seq_sorted.tri");
+            FileComparison comparer(parallel,sequential);
+            TS_ASSERT(comparer.CompareFiles());
+        }
 
         //compare the cmgui elements, one element file at a time.
         for (unsigned elem_index = 1; elem_index<=sequential_mesh.GetNumAllElements(); elem_index++)
@@ -1802,7 +1841,11 @@ public:
             std::stringstream ss;
             ss << elem_index;
             std::string elem_string(ss.str());
-            TS_ASSERT_EQUALS(system(("diff " + output_dir + "element_" + elem_string + "_efficient " + output_dir + "element_" + elem_string + "_sequential").c_str()), 0);
+
+            FileFinder parallel(output_dir + "element_" + elem_string + "_efficient");
+            FileFinder sequential(output_dir + "element_" + elem_string + "_sequential");
+            FileComparison comparer(parallel,sequential);
+            TS_ASSERT(comparer.CompareFiles());
         }
     }
 
@@ -1966,7 +2009,11 @@ public:
 
         // Test for connectivity
         ///\todo #1621 use the mesh reader when it's written
-        TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" " + output_dir + "3dDistributedMesh.ncl mesh/test/data/cube_2mm_152_elements_binary_v2.ncl").c_str()), 0);
+        FileFinder generated(output_dir + "3dDistributedMesh.ncl");
+        FileFinder reference("mesh/test/data/cube_2mm_152_elements_binary_v2.ncl",RelativeTo::ChasteSourceRoot);
+        FileComparison comparer(generated,reference);
+        TS_ASSERT(comparer.CompareFiles());
+
     }
 
     void TestCheckOutwardNormals() throw (Exception)

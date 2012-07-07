@@ -81,7 +81,12 @@ public:
         // Here we examine the header lines, find a difference and get a failure
         TS_ASSERT_EQUALS(file_comparer.CompareFiles(0,false), false);
 
-        // Here we ignore the header line and test passes.
+        // In a second file comparer make this pass by using SetIgnoreLinesBeginningWith();
+        FileComparison file_comparer2(base_file, changed_file);
+        file_comparer2.SetIgnoreLinesBeginningWith("header");
+        TS_ASSERT_EQUALS(file_comparer2.CompareFiles(0,false), true);
+
+        // Here we ignore the first line and test passes.
         TS_ASSERT_EQUALS(file_comparer.CompareFiles(1), true);
 
         file_comparer.SetIgnoreCommentLines(false);

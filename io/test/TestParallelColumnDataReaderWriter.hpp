@@ -45,6 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DistributedVector.hpp"
 #include "DistributedVectorFactory.hpp"
 #include <petsc.h>
+#include "FileComparison.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
 class TestParallelColumnDataReaderWriter : public CxxTest::TestSuite
@@ -165,13 +166,19 @@ public:
         delete mpParallelWriter;
 
         PetscTools::Barrier("TestParallelColumnWriter2");
-        TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" "+output_dir+"ParallelColumnWriter.info io/test/data/ColumnWriter.info").c_str()), 0);
 
-        TS_ASSERT_EQUALS(system(("diff "+output_dir+"ParallelColumnWriter_000000.dat io/test/data/ColumnWriter_000000.dat").c_str()), 0);
+        std::vector<std::string> files_to_compare;
+        files_to_compare.push_back("ColumnWriter.info");
+        files_to_compare.push_back("ColumnWriter_000000.dat");
+        files_to_compare.push_back("ColumnWriter_000001.dat");
+        files_to_compare.push_back("ColumnWriter_unlimited.dat");
 
-        TS_ASSERT_EQUALS(system(("diff "+output_dir+"ParallelColumnWriter_000001.dat io/test/data/ColumnWriter_000001.dat").c_str()), 0);
-
-        TS_ASSERT_EQUALS(system(("diff "+output_dir+"ParallelColumnWriter_unlimited.dat io/test/data/ColumnWriter_unlimited.dat").c_str()), 0);
+        for (unsigned i=0; i<files_to_compare.size(); i++)
+        {
+            FileComparison comparer(output_dir+ "Parallel" + files_to_compare[i],
+                                    "io/test/data/" + files_to_compare[i]);
+            TS_ASSERT(comparer.CompareFiles());
+        }
 
         PetscTools::Destroy(var1);
         PetscTools::Destroy(var2);
@@ -216,9 +223,16 @@ public:
         // Check file
         PetscTools::Barrier("TestPutSlice2");
 
-        TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" "+output_dir+"Stripe.info io/test/data/Stripe.info").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff "+output_dir+"Stripe_000000.dat io/test/data/Stripe_000000.dat").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff "+output_dir+"Stripe_unlimited.dat io/test/data/Stripe_unlimited.dat").c_str()), 0);
+        std::vector<std::string> files_to_compare;
+        files_to_compare.push_back("Stripe.info");
+        files_to_compare.push_back("Stripe_000000.dat");
+        files_to_compare.push_back("Stripe_unlimited.dat");
+
+        for (unsigned i=0; i<files_to_compare.size(); i++)
+        {
+            FileComparison comparer(output_dir+files_to_compare[i], "io/test/data/" + files_to_compare[i]);
+            TS_ASSERT(comparer.CompareFiles());
+        }
 
         PetscTools::Destroy(striped);
         delete p_parallel_writer;

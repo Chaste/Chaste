@@ -45,8 +45,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class FileComparison : public AbstractFileComparison
 {
 private:
-	/**Whether or not we should ignore lines starting with '#'. True by default.*/
+	/** Whether or not we should ignore lines starting with '#'. True by default.*/
     bool mIgnoreCommentLines;
+
+    /**
+     * A list of strings, if found at the beginning of lines when
+     * mIgnoreCommentLines is true, differences in these lines
+     * are ignored.
+     */
+    std::vector<std::string> mCommentLineStarts;
 public:
 
     /**
@@ -60,6 +67,7 @@ public:
        AbstractFileComparison(fileName1,fileName2),
        mIgnoreCommentLines(true)
     {
+        SetupCommentLines();
     }
 
     /**
@@ -73,6 +81,19 @@ public:
        AbstractFileComparison(rFileName1,rFileName2),
        mIgnoreCommentLines(true)
     {
+        SetupCommentLines();
+    }
+
+    /**
+     * Set some line starts that define comments in the files.
+     *
+     * These are ignored by default and when mIgnoreCommentLines = true.
+     */
+    void SetupCommentLines()
+    {
+        mCommentLineStarts.push_back("#");
+        mCommentLineStarts.push_back("!");
+        mCommentLineStarts.push_back("Created by Chaste");
     }
 
     /**
@@ -82,6 +103,18 @@ public:
     void SetIgnoreCommentLines(bool ignore=true)
     {
         mIgnoreCommentLines = ignore;
+    }
+
+    /**
+     * Set a line start which should be treated as a comment and ignored
+     * (and therefore switch on mIgnoreCommentLines = true)
+     *
+     * @param rLineStart  The beginning of a line which should be treated as a comment
+     */
+    void SetIgnoreLinesBeginningWith(std::string lineStart)
+    {
+        mIgnoreCommentLines = true;
+        mCommentLineStarts.push_back(lineStart);
     }
 
     /**
@@ -111,17 +144,18 @@ public:
 
             if (mIgnoreCommentLines)
             {
-                // Check for lines starting with "#"
-                size_t found1 = buffer1.find("#");
-                size_t found2 = buffer2.find("#");
-                if (found1 == 0 && found2 == 0)
+                bool skip_this_line = false;
+                for (unsigned i=0; i<mCommentLineStarts.size(); i++)
                 {
-                    continue;
+                    // Check for lines starting with "#"
+                    size_t found1 = buffer1.find(mCommentLineStarts[i]);
+                    size_t found2 = buffer2.find(mCommentLineStarts[i]);
+                    if (found1 == 0 && found2 == 0)
+                    {
+                        skip_this_line = true;
+                    }
                 }
-                // Check for lines starting with "!"
-                found1 = buffer1.find("!");
-                found2 = buffer2.find("!");
-                if (found1 == 0 && found2 == 0)
+                if (skip_this_line)
                 {
                     continue;
                 }

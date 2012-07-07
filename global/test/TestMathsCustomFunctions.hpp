@@ -53,8 +53,8 @@ public:
             //Note the following should be within DBL_EPSILON on a 64-bit machine.  However,
             //32-bit floating point accumulated errors push both SmallPow and pow away from integer values.
             //There also seems to be 32-bit issue within TS_ASSERT_DELTA...
-            double diff = SmallPow(75.0, i) - pow(75.0, double(i));
-            TS_ASSERT_EQUALS(diff, 0.0);
+            double difference = SmallPow(75.0, i) - pow(75.0, double(i));
+            TS_ASSERT_EQUALS(difference, 0.0);
         }
     }
 

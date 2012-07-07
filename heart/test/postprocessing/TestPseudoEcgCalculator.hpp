@@ -52,6 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TetrahedralMesh.hpp"
 #include "HeartConfig.hpp"
 #include "PetscSetupAndFinalize.hpp"
+#include "FileComparison.hpp"
 
 class TestPseudoEcgCalculator : public CxxTest::TestSuite
 {
@@ -137,10 +138,9 @@ public:
         calculator.WritePseudoEcg();
 
         std::string output_dir = "ChasteResults/output";//default value
-        std::string command;
-        command = "diff -a -I \"Created by Chaste\" " + OutputFileHandler::GetChasteTestOutputDirectory() + output_dir + "/PseudoEcgFromElectrodeAt_15_0_0.dat "
-                  + "heart/test/data/ValidPseudoEcg1D.dat";
-        TS_ASSERT_EQUALS(system(command.c_str()), 0);
+        FileComparison comparer(OutputFileHandler::GetChasteTestOutputDirectory() + output_dir + "/PseudoEcgFromElectrodeAt_15_0_0.dat",
+                "heart/test/data/ValidPseudoEcg1D.dat");
+        TS_ASSERT(comparer.CompareFiles());
 
         ChastePoint<1> bad_probe_electrode(0.0021132486540519);
         PseudoEcgCalculator<1,1,1> bad_calculator (mesh, bad_probe_electrode, "hdf5", "gradient_V");

@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NonlinearElasticityTools.hpp"
 #include "MooneyRivlinMaterialLaw.hpp"
 #include "CompressibleExponentialLaw.hpp"
+#include "FileComparison.hpp"
 
 /*
  * All these are for the MyBodyForce and MySurfaceTraction functions below.
@@ -253,12 +254,12 @@ public:
                         TS_ASSERT_DELTA(analytic_matrix_val, numerical_matrix_val, 1e-4);
                     }
 
-//                    double diff =  analytic_matrix_val - numerical_matrix_val;
-//                    if(fabs(diff)<1e-6)
+//                    double difference =  analytic_matrix_val - numerical_matrix_val;
+//                    if(fabs(difference)<1e-6)
 //                    {
-//                        diff = 0.0;
+//                        difference = 0.0;
 //                    }
-//                    std::cout << diff << " ";
+//                    std::cout << difference << " ";
                 }
             }
 //            std::cout << "\n";
@@ -312,13 +313,13 @@ public:
                         TS_ASSERT_DELTA(analytic_matrix_val, numerical_matrix_val, 1e-4);
                     }
 
-//                    double diff =  analytic_matrix_val - numerical_matrix_val;
+//                    double difference =  analytic_matrix_val - numerical_matrix_val;
 //
-//                    if(fabs(diff)<1e-5)
+//                    if(fabs(difference)<1e-5)
 //                    {
-//                        diff = 0.0;
+//                        difference = 0.0;
 //                    }
-//                    std::cout << diff << " ";
+//                    std::cout << difference << " ";
                 }
             }
 //            std::cout << "\n";
@@ -986,10 +987,10 @@ public:
 
         solver.WriteCurrentDeformationGradients("shear_2d",0);
 
-        std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
-        std::string command = "diff " + test_output_directory
-                              + "/TestWritingStrain/shear_2d_0.strain continuum_mechanics/test/data/shear_2d_0.strain";
-        TS_ASSERT_EQUALS(system(command.c_str()), 0);
+        FileFinder generated_file("TestWritingStrain/shear_2d_0.strain", RelativeTo::ChasteTestOutput);
+        FileFinder reference_file("continuum_mechanics/test/data/shear_2d_0.strain", RelativeTo::ChasteSourceRoot);
+        FileComparison comparer(generated_file,reference_file);
+        TS_ASSERT(comparer.CompareFiles());
     }
 
     void TestWritingStrain3d() throw(Exception)
@@ -1149,10 +1150,10 @@ public:
 
         solver.WriteCurrentAverageElementStresses("some_stresses_3d",10);
 
-        std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
-        std::string command = "diff " + test_output_directory
-                              + "/TestWritingStress/some_stresses_3d_10.stress continuum_mechanics/test/data/some_stresses_3d_10.stress";
-        TS_ASSERT_EQUALS(system(command.c_str()), 0);
+        FileFinder generated_file("TestWritingStress/some_stresses_3d_10.stress", RelativeTo::ChasteTestOutput);
+        FileFinder reference_file("continuum_mechanics/test/data/some_stresses_3d_10.stress", RelativeTo::ChasteSourceRoot);
+        FileComparison comparer(generated_file,reference_file);
+        TS_ASSERT(comparer.CompareFiles());
     }
 
     // quick 2d test that complements above test

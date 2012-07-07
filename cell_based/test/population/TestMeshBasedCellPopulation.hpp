@@ -57,6 +57,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellId.hpp"
 #include "CellPropertyRegistry.hpp"
 #include "SmartPointers.hpp"
+#include "FileComparison.hpp"
 
 class TestMeshBasedCellPopulation : public AbstractCellBasedTestSuite
 {
@@ -710,18 +711,6 @@ public:
         cell_population.WriteResultsToFiles();
         cell_population.CloseOutputFiles();
 
-        // Compare output with saved files of what they should look like
-        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
-
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizelements   cell_based/test/data/TestCellPopulationWritersIn2d/results.vizelements").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.viznodes      cell_based/test/data/TestCellPopulationWritersIn2d/results.viznodes").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizcelltypes  cell_based/test/data/TestCellPopulationWritersIn2d/results.vizcelltypes").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellpopulationareas.dat       cell_based/test/data/TestCellPopulationWritersIn2d/cellpopulationareas.dat").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellareas.dat         cell_based/test/data/TestCellPopulationWritersIn2d/cellareas.dat").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellmutationstates.dat         cell_based/test/data/TestCellPopulationWritersIn2d/cellmutationstates.dat").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "voronoi.dat           cell_based/test/data/TestCellPopulationWritersIn2d/voronoi.dat").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizancestors   cell_based/test/data/TestCellPopulationWritersIn2d/results.vizancestors").c_str()), 0);
-
         // Test the GetCellMutationStateCount function
         std::vector<unsigned> cell_mutation_states = cell_population.GetCellMutationStateCount();
         TS_ASSERT_EQUALS(cell_mutation_states.size(), 4u);
@@ -744,8 +733,25 @@ public:
         cell_population.OutputCellPopulationParameters(parameter_file);
         parameter_file->close();
 
+        std::vector<std::string> files_to_compare;
+        files_to_compare.push_back("results.vizelements");
+        files_to_compare.push_back("results.viznodes");
+        files_to_compare.push_back("results.vizcelltypes");
+        files_to_compare.push_back("cellpopulationareas.dat");
+        files_to_compare.push_back("cellareas.dat");
+        files_to_compare.push_back("cellmutationstates.dat");
+        files_to_compare.push_back("voronoi.dat");
+        files_to_compare.push_back("results.vizancestors");
+        files_to_compare.push_back("results.parameters");
+
         // Compare output with saved files of what they should look like
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.parameters         cell_based/test/data/TestCellPopulationWritersIn2d/results.parameters").c_str()), 0);
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+        for (unsigned i=0; i<files_to_compare.size(); i++)
+        {
+            FileComparison comparer(results_dir + files_to_compare[i],"cell_based/test/data/TestCellPopulationWritersIn2d/" + files_to_compare[i]);
+            TS_ASSERT(comparer.CompareFiles());
+        }
     }
 
     void TestCellPopulationWritersIn3d()
@@ -808,18 +814,6 @@ public:
         cell_population.WriteResultsToFiles();
         cell_population.CloseOutputFiles();
 
-        // Compare output with saved files of what they should look like
-        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
-
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizelements   cell_based/test/data/TestCellPopulationWritersIn3d/results.vizelements").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.viznodes      cell_based/test/data/TestCellPopulationWritersIn3d/results.viznodes").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizcelltypes  cell_based/test/data/TestCellPopulationWritersIn3d/results.vizcelltypes").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellpopulationareas.dat       cell_based/test/data/TestCellPopulationWritersIn3d/cellpopulationareas.dat").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellareas.dat         cell_based/test/data/TestCellPopulationWritersIn3d/cellareas.dat").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellmutationstates.dat         cell_based/test/data/TestCellPopulationWritersIn3d/cellmutationstates.dat").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "voronoi.dat           cell_based/test/data/TestCellPopulationWritersIn3d/voronoi.dat").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizancestors   cell_based/test/data/TestCellPopulationWritersIn3d/results.vizancestors").c_str()), 0);
-
         // Test the GetCellMutationStateCount function
         std::vector<unsigned> cell_mutation_states = cell_population.GetCellMutationStateCount();
         TS_ASSERT_EQUALS(cell_mutation_states.size(), 4u);
@@ -834,6 +828,25 @@ public:
         TS_ASSERT_EQUALS(cell_types[0], 5u);
         TS_ASSERT_EQUALS(cell_types[1], 0u);
         TS_ASSERT_EQUALS(cell_types[2], 0u);
+
+        std::vector<std::string> files_to_compare;
+        files_to_compare.push_back("results.vizelements");
+        files_to_compare.push_back("results.viznodes");
+        files_to_compare.push_back("results.vizcelltypes");
+        files_to_compare.push_back("cellpopulationareas.dat");
+        files_to_compare.push_back("cellareas.dat");
+        files_to_compare.push_back("cellmutationstates.dat");
+        files_to_compare.push_back("voronoi.dat");
+        files_to_compare.push_back("results.vizancestors");
+
+        // Compare output with saved files of what they should look like
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+        for (unsigned i=0; i<files_to_compare.size(); i++)
+        {
+            FileComparison comparer(results_dir + files_to_compare[i],"cell_based/test/data/TestCellPopulationWritersIn3d/" + files_to_compare[i]);
+            TS_ASSERT(comparer.CompareFiles());
+        }
     }
 
     void TestGetLocationOfCellCentreAndGetNodeCorrespondingToCellAndGetWidth() throw (Exception)

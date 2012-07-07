@@ -41,6 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexMeshWriter.hpp"
 #include "MutableVertexMesh.hpp"
 
+#include "FileComparison.hpp"
 #include "Warnings.hpp"
 
 class TestMutableVertexMeshReMesh : public CxxTest::TestSuite
@@ -1227,9 +1228,10 @@ public:
         std::string results_file1 = handler.GetOutputDirectoryFullPath() + "vertex_remesh_T1.node";
         std::string results_file2 = handler.GetOutputDirectoryFullPath() + "vertex_remesh_T1.cell";
 
-        // To ignore the provenance data we only go as far as
-        TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" " + results_file1 + " cell_based/test/data/TestMutableVertexMesh/vertex_remesh_T1_after_remesh.node").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" " + results_file2 + " cell_based/test/data/TestMutableVertexMesh/vertex_remesh_T1_after_remesh.cell").c_str()), 0);
+        FileComparison comparer1(results_file1, "cell_based/test/data/TestMutableVertexMesh/vertex_remesh_T1_after_remesh.node");
+        TS_ASSERT(comparer1.CompareFiles());
+        FileComparison comparer2(results_file2, "cell_based/test/data/TestMutableVertexMesh/vertex_remesh_T1_after_remesh.cell");
+        TS_ASSERT(comparer2.CompareFiles());
     }
 
     void TestReMeshExceptions() throw(Exception)
@@ -2270,9 +2272,10 @@ public:
         std::string results_file1 = handler.GetOutputDirectoryFullPath() + "vertex_remesh_T3.node";
         std::string results_file2 = handler.GetOutputDirectoryFullPath() + "vertex_remesh_T3.cell";
 
-        // To ignore the provenance data we only go as far as
-        TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" " + results_file1 + " cell_based/test/data/TestMutableVertexMesh/vertex_remesh_T3_after_remesh.node").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" " + results_file2 + " cell_based/test/data/TestMutableVertexMesh/vertex_remesh_T3_after_remesh.cell").c_str()), 0);
+        FileComparison comparer1(results_file1, "cell_based/test/data/TestMutableVertexMesh/vertex_remesh_T3_after_remesh.node");
+        TS_ASSERT(comparer1.CompareFiles());
+        FileComparison comparer2(results_file2, "cell_based/test/data/TestMutableVertexMesh/vertex_remesh_T3_after_remesh.cell");
+        TS_ASSERT(comparer2.CompareFiles());
     }
 
     void TestReMeshForRemovingVoids() throw(Exception)

@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FibreWriter.hpp"
 #include "PetscTools.hpp"
 #include "UblasIncludes.hpp"
-
+#include "FileComparison.hpp"
 
 class TestFibreWriter : public CxxTest::TestSuite
 {
@@ -62,9 +62,10 @@ public:
         fibre_writer.WriteAllAxi(fibre_vector);
 
         std::string results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "TestFibreWriter/";
-        TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" " + results_dir + "/SimpleAxisymmetric2.axi heart/test/data/fibre_tests/SimpleAxisymmetric2.axi").c_str()), 0);
-
+        FileComparison comparer(results_dir + "/SimpleAxisymmetric2.axi","heart/test/data/fibre_tests/SimpleAxisymmetric2.axi");
+        TS_ASSERT(comparer.CompareFiles());
     }
+
     void TestAxiWriterBinary()
     {
         FileFinder file_finder("heart/test/data/fibre_tests/SimpleAxisymmetric2.axi", RelativeTo::ChasteSourceRoot);
@@ -78,7 +79,8 @@ public:
         fibre_writer.WriteAllAxi(fibre_vector);
 
         std::string results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "TestFibreWriter/";
-        TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" " + results_dir + "/SimpleAxisymmetric2Bin.axi heart/test/data/fibre_tests/SimpleAxisymmetric2Bin.axi").c_str()), 0);
+        FileComparison comparer(results_dir + "/SimpleAxisymmetric2Bin.axi","heart/test/data/fibre_tests/SimpleAxisymmetric2Bin.axi");
+        TS_ASSERT(comparer.CompareFiles());
     }
 
     void TestOrthoWriterAscii() throw (Exception)
@@ -95,7 +97,9 @@ public:
         fibre_writer.WriteAllOrtho(fibres, second, third);
 
         std::string results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "TestFibreWriter/";
-        TS_ASSERT_EQUALS(system(("diff -I \"Created by Chaste\" " + results_dir + "/Orthotropic3D.ortho heart/test/data/fibre_tests/Orthotropic3D.ortho").c_str()), 0);
+
+        FileComparison comparer(results_dir + "/Orthotropic3D.ortho","heart/test/data/fibre_tests/Orthotropic3D.ortho");
+        TS_ASSERT(comparer.CompareFiles());
     }
 
     void TestOrthoWriterBinary() throw (Exception)
@@ -113,7 +117,8 @@ public:
         fibre_writer.WriteAllOrtho(fibres, second, third);
 
         std::string results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "TestFibreWriter/";
-        TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" " + results_dir + "/Orthotropic3DBin.ortho heart/test/data/fibre_tests/Orthotropic3DBin.ortho").c_str()), 0);
+        FileComparison comparer(results_dir + "/Orthotropic3DBin.ortho","heart/test/data/fibre_tests/Orthotropic3DBin.ortho");
+        TS_ASSERT(comparer.CompareFiles());
     }
 
 

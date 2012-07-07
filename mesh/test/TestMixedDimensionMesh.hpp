@@ -43,6 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshReader.hpp"
 #include "TrianglesMeshWriter.hpp"
 #include "OutputFileHandler.hpp"
+#include "FileComparison.hpp"
 #include "Exception.hpp"
 #include "ArchiveOpener.hpp"
 #include "PetscSetupAndFinalize.hpp"
@@ -209,9 +210,10 @@ public:
 
         mesh_writer.WriteFilesUsingMesh(mesh);
 
-        std::string results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "TestMixedDimensionMesh/";
-        TS_ASSERT_EQUALS(system(("diff -aw -I \"Created by Chaste\" " + results_dir + "/CableMesh.cable mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements.cable").c_str()), 0);
-
+        FileFinder generated("TestMixedDimensionMesh/CableMesh.cable",RelativeTo::ChasteTestOutput);
+        FileFinder reference("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements.cable", RelativeTo::ChasteSourceRoot);
+        FileComparison comparer(generated,reference);
+        TS_ASSERT(comparer.CompareFiles());
     }
 
 
@@ -224,9 +226,10 @@ public:
         mesh_writer.WriteFilesUsingMeshReader(reader);
         PetscTools::Barrier("TestWritingCableFilesUsingMeshReader");
 
-        std::string results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "TestMixedDimensionMesh/";
-        TS_ASSERT_EQUALS(system(("diff -aw -I \"Created by Chaste\" " + results_dir + "/CableMeshFromReader.cable mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements.cable").c_str()), 0);
-
+        FileFinder generated("TestMixedDimensionMesh/CableMeshFromReader.cable",RelativeTo::ChasteTestOutput);
+        FileFinder reference("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements.cable", RelativeTo::ChasteSourceRoot);
+        FileComparison comparer(generated,reference);
+        TS_ASSERT(comparer.CompareFiles());
     }
 
     void TestWritingBinaryFormat()
@@ -277,7 +280,10 @@ public:
         writer_from_mesh.WriteFilesUsingMesh(original_mesh);
 
         //Compare the binary written from the reader to the binary written from the mesh
-        TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" " + results_dir + "/CableMeshBinary.cable " + results_dir + "/CableMeshBinaryFromMesh.cable").c_str()), 0);
+        FileFinder generated(results_dir + "/CableMeshBinary.cable");
+        FileFinder reference(results_dir + "/CableMeshBinaryFromMesh.cable");
+        FileComparison comparer(generated,reference);
+        TS_ASSERT(comparer.CompareFiles());
     }
 
 

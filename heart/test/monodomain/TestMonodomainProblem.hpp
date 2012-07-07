@@ -632,8 +632,6 @@ public:
         TS_ASSERT_DELTA( times[1], 0.10, 1e-12);
         TS_ASSERT_DELTA( times[2], 0.20, 1e-12);
         TS_ASSERT_DELTA( times[3], 0.30, 1e-12);
-
-
     }
 
 
@@ -702,29 +700,23 @@ public:
             }
             else
             {
-                std::string compare_command = "diff --ignore-matching-lines=\"<cp:ChasteParameters\" --ignore-matching-lines=\"# \" ";
-                compare_command += handler.GetOutputDirectoryFullPath()+"/"+test_file_names[i];
-                compare_command += " ";
-                compare_command += "heart/test/data/Monodomain2d/";
-                compare_command += test_file_names[i];
+                std::string file_1 = handler.GetOutputDirectoryFullPath()+"/"+test_file_names[i];
+                std::string file_2 = "heart/test/data/Monodomain2d/" + test_file_names[i];
 
-                // Compare the new test file with one from the repository
-                unsigned diff_result = system(compare_command.c_str());
+                FileComparison comparer(file_1, file_2);
+                comparer.SetIgnoreLinesBeginningWith("<cp:ChasteParameters");
 
-                /* In case of failure, compare with known working alternative.
-                 * This is for backward compatibility with XSD 2-3, in which case the
-                 * above failure will be a little bit noisy (diff output goes to the screen)
-                 * but we can live with that if the XSD 2-3 users can.
-                 */
+                bool result = comparer.CompareFiles(0,false); // Don't throw a TS_ASSERT
 
-                if ((diff_result != 0) && (i == 3))
+                if (!result && (i == 3))
                 {
-                    compare_command += "_alt";
-                    TS_ASSERT_EQUALS(system(compare_command.c_str()), 0);
+                    FileComparison comparer2(file_1, file_2 + "_alt");
+                    comparer2.SetIgnoreLinesBeginningWith("<cp:ChasteParameters");
+                    TS_ASSERT(comparer2.CompareFiles());
                 }
                 else
                 {
-                    TS_ASSERT_EQUALS(diff_result, 0U);
+                    TS_ASSERT(comparer.CompareFiles());
                 }
             }
         }
@@ -858,12 +850,14 @@ public:
         FileComparison comparer2(elem_file1,elem_file2);
         TS_ASSERT(comparer2.CompareFiles());
 
-        //TS_ASSERT_EQUALS(system(("cmp " + results_dir + "/monodomain3d.exelem heart/test/data/CmguiData/monodomain/monodomain3dValid.exelem").c_str()), 0);
-        //TS_ASSERT_EQUALS(system(("cmp " + results_dir + "/monodomain3d.exnode heart/test/data/CmguiData/monodomain/monodomain3dValid.exnode").c_str()), 0);
         //...and one data file as example
-        TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" " + results_dir + "/monodomain3d_43.exnode heart/test/data/CmguiData/monodomain/monodomain3dValidData.exnode").c_str()), 0);
+        FileComparison comparer3(results_dir + "/monodomain3d_43.exnode","heart/test/data/CmguiData/monodomain/monodomain3dValidData.exnode");
+        TS_ASSERT(comparer3.CompareFiles());
+
         //Info file
-        TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" " + results_dir + "/monodomain3d_times.info heart/test/data/CmguiData/monodomain/monodomain3dValidData_times.info").c_str()), 0);
+        FileComparison comparer4(results_dir + "/monodomain3d_times.info","heart/test/data/CmguiData/monodomain/monodomain3dValidData_times.info");
+        TS_ASSERT(comparer4.CompareFiles());
+
         //HeartConfig XML
         TS_ASSERT(FileFinder(results_dir + "ChasteParameters.xml").Exists());
 
@@ -1191,8 +1185,10 @@ public:
          * Meshalyzer format
          */
         //Mesh
-        TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" " + handler.GetOutputDirectoryFullPath()
-                                + "/output/MonodomainLR91_2d_mesh.pts   heart/test/data/MonoProblem2dOriginalPermutation/MonodomainLR91_2d_mesh.pts").c_str() ), 0);
+        FileComparison comparer(handler.GetOutputDirectoryFullPath() + "/output/MonodomainLR91_2d_mesh.pts",
+                       "heart/test/data/MonoProblem2dOriginalPermutation/MonodomainLR91_2d_mesh.pts");
+        TS_ASSERT(comparer.CompareFiles());
+
         //Transmembrane
         std::string file1=handler.GetOutputDirectoryFullPath()+ "/output/MonodomainLR91_2d_V.dat";
         std::string file2="heart/test/data/MonoProblem2dOriginalPermutation/MonodomainLR91_2d_V.dat";
@@ -1203,8 +1199,10 @@ public:
          * Cmgui format
          */
         //Mesh
-        TS_ASSERT_EQUALS(system(("diff -a -I \"Created by Chaste\" " + handler.GetOutputDirectoryFullPath()
-                                + "/cmgui_output/MonodomainLR91_2d.exnode  heart/test/data/MonoProblem2dOriginalPermutation/MonodomainLR91_2d.exnode").c_str() ), 0);
+        FileComparison comparer2(handler.GetOutputDirectoryFullPath() + "/cmgui_output/MonodomainLR91_2d.exnode",
+                       "heart/test/data/MonoProblem2dOriginalPermutation/MonodomainLR91_2d.exnode");
+        TS_ASSERT(comparer2.CompareFiles());
+
         //Transmembrane
         file1=handler.GetOutputDirectoryFullPath()+ "/cmgui_output/MonodomainLR91_2d_50.exnode";
         file2="heart/test/data/MonoProblem2dOriginalPermutation/MonodomainLR91_2d_50.exnode";

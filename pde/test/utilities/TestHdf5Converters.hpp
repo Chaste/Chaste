@@ -44,6 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscTools.hpp"
 #include "OutputFileHandler.hpp"
 #include "FileFinder.hpp"
+#include "FileComparison.hpp"
 #include "TetrahedralMesh.hpp"
 #include "DistributedTetrahedralMesh.hpp"
 #include "TrianglesMeshReader.hpp"
@@ -264,28 +265,21 @@ public:
         // Convert
         Hdf5ToTxtConverter<3,3> converter(working_directory, "cube_2mm_12_elements", &mesh);
 
-        // Compare the voltage file with a correct version
-        std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
-        std::string command = "diff -a -I \"Created by Chaste\" " + test_output_directory
-                                              + working_directory +"/txt_output/cube_2mm_12_elements_V_0.txt"
-                                              + " pde/test/data/cube_2mm_12_elements_V_0.txt";
-        TS_ASSERT_EQUALS(system(command.c_str()), 0);
+        std::vector<std::string> files_to_compare;
+        files_to_compare.push_back("cube_2mm_12_elements_V_0.txt");
+        files_to_compare.push_back("cube_2mm_12_elements_V_1.txt");
+        files_to_compare.push_back("cube_2mm_12_elements_Phi_e_0.txt");
+        files_to_compare.push_back("cube_2mm_12_elements_Phi_e_1.txt");
 
-        command = "diff -a -I \"Created by Chaste\" " + test_output_directory
-                                              + working_directory +"/txt_output/cube_2mm_12_elements_V_1.txt"
-                                              + " pde/test/data/cube_2mm_12_elements_V_1.txt";
-        TS_ASSERT_EQUALS(system(command.c_str()), 0);
-
-        command = "diff -a -I \"Created by Chaste\" " + test_output_directory
-                                              + working_directory +"/txt_output/cube_2mm_12_elements_Phi_e_0.txt"
-                                              + " pde/test/data/cube_2mm_12_elements_Phi_e_0.txt";
-        TS_ASSERT_EQUALS(system(command.c_str()), 0);
-
-        command = "diff -a -I \"Created by Chaste\" " + test_output_directory
-                                              + working_directory +"/txt_output/cube_2mm_12_elements_Phi_e_1.txt"
-                                              + " pde/test/data/cube_2mm_12_elements_Phi_e_1.txt";
-        TS_ASSERT_EQUALS(system(command.c_str()), 0);
-}
+        for (unsigned i=0; i<files_to_compare.size(); i++)
+        {
+            std::cout << "Comparing generated and reference " << files_to_compare[i] << std::endl;
+            FileFinder generated_file(working_directory +"/txt_output/" + files_to_compare[i], RelativeTo::ChasteTestOutput);
+            FileFinder reference_file("pde/test/data/" + files_to_compare[i], RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file, reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
+    }
 };
 
 #endif /*TESTHDF5CONVERTERS_HPP_*/
