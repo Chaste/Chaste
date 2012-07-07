@@ -52,6 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WildTypeCellMutationState.hpp"
 #include "MutableMesh.hpp"
 #include "SmartPointers.hpp"
+#include "FileComparison.hpp"
 
 class TestPeriodicForces : public AbstractCellBasedTestSuite
 {
@@ -64,12 +65,12 @@ private:
         /*          _ _ _ _ _
          *        /        /|
          *       /        / |
-         *         /_ _ _ _ /  | depth
-         *        |         |  |
+         *      /_ _ _ _ /  | depth
+         *     |         |  |
          *     |         |  |
          *     |         |  /
          *     |         | / height
-         *        |_ _ _ _ _|/
+         *     |_ _ _ _ _|/
          *        width
          */
 
@@ -500,8 +501,10 @@ public:
         force.OutputForceParameters(force_parameter_file);
         force_parameter_file->close();
 
-        std::string force_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + force_results_dir + "periodic_results.parameters notforrelease_cell_based/test/data/TestPeriodicForces/periodic_results.parameters").c_str()), 0);
+        FileFinder generated_file = output_file_handler.FindFile("periodic_results.parameters");
+        FileFinder reference_file("notforrelease_cell_based/test/data/TestPeriodicForces/periodic_results.parameters",RelativeTo::ChasteSourceRoot);
+        FileComparison comparer(generated_file,reference_file);
+        TS_ASSERT(comparer.CompareFiles());
     }
 };
 
