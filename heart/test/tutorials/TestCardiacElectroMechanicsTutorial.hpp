@@ -1,4 +1,3 @@
-
 /*
 
 Copyright (c) 2005-2012, University of Oxford.
