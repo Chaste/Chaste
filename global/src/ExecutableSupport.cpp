@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <iostream>
 #include <sstream>
+#include <cassert>
 #include <sys/utsname.h> // For uname
 #include <hdf5.h>
 
@@ -48,7 +49,6 @@ typedef std::pair<std::string, std::string> StringPair;
 #include "PetscTools.hpp"
 #include "PetscException.hpp"
 #include "Version.hpp"
-#include "OutputFileHandler.hpp"
 #include "ChasteSerialization.hpp"
 
 #ifdef CHASTE_VTK
@@ -61,11 +61,18 @@ typedef std::pair<std::string, std::string> StringPair;
 #endif
 //#include <xsd/cxx/version.hxx>
 
-std::string ExecutableSupport::mOutputDirectory;
+FileFinder ExecutableSupport::mOutputDirectory;
 
 void ExecutableSupport::SetOutputDirectory(const std::string& rOutputDirectory)
 {
-    mOutputDirectory = rOutputDirectory;
+    if (FileFinder::IsAbsolutePath(rOutputDirectory))
+    {
+        mOutputDirectory.SetPath(rOutputDirectory, RelativeTo::Absolute);
+    }
+    else
+    {
+        mOutputDirectory.SetPath(rOutputDirectory, RelativeTo::ChasteTestOutput);
+    }
 }
 
 void ExecutableSupport::InitializePetsc(int* pArgc, char*** pArgv)
@@ -75,6 +82,11 @@ void ExecutableSupport::InitializePetsc(int* pArgc, char*** pArgv)
     CommandLineArguments::Instance()->p_argv = pArgv;
     // Initialise PETSc
     PETSCEXCEPT(PetscInitialize(pArgc, pArgv, PETSC_NULL, PETSC_NULL));
+    // Set default output folder
+    if (!mOutputDirectory.IsPathSet())
+    {
+        mOutputDirectory.SetPath("", RelativeTo::ChasteTestOutput);
+    }
 }
 
 void ExecutableSupport::ShowCopyright()
@@ -109,6 +121,7 @@ void ExecutableSupport::ShowParallelLaunching()
 
 void ExecutableSupport::WriteMachineInfoFile(std::string fileBaseName)
 {
+    assert(mOutputDirectory.IsPathSet());
     OutputFileHandler out_file_handler(mOutputDirectory, false);
     std::stringstream file_name;
     file_name << fileBaseName << "_" << PetscTools::GetMyRank() << ".txt";
@@ -156,6 +169,7 @@ void ExecutableSupport::WriteMachineInfoFile(std::string fileBaseName)
 
 void ExecutableSupport::WriteProvenanceInfoFile()
 {
+    assert(mOutputDirectory.IsPathSet());
     OutputFileHandler out_file_handler(mOutputDirectory, false);
     out_stream out_file = out_file_handler.OpenOutputFile("provenance_info_", PetscTools::GetMyRank(), ".txt");
 
@@ -249,6 +263,7 @@ void ExecutableSupport::PrintError(const std::string& rMessage, bool masterOnly)
     }
 
     // Write the error message to file
+    assert(mOutputDirectory.IsPathSet());
     OutputFileHandler out_file_handler(mOutputDirectory, false);
     out_stream out_file = out_file_handler.OpenOutputFile("chaste_errors_", PetscTools::GetMyRank(), ".txt", std::ios::out | std::ios::app);
     *out_file << rMessage << std::endl;

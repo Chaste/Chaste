@@ -37,7 +37,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define EXECUTABLESUPPORT_HPP_
 
 #include <string>
-#include "OutputFileHandler.hpp"
+#include "FileFinder.hpp"
+#include "OutputFileHandler.hpp" // For out_stream
 
 /**
  * Various helpful static methods for people writing their own executables
@@ -50,7 +51,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class ExecutableSupport
 {
 public:
-
     /**
      * Initialise PETSc from the command line arguments.
      *
@@ -147,9 +147,8 @@ public:
     static const int EXIT_BAD_ARGUMENTS = 2;
 
 private:
-
     /** The output directory to put machine provenance information into. */
-    static std::string mOutputDirectory;
+    static FileFinder mOutputDirectory;
 };
 
 #endif /* EXECUTABLESUPPORT_HPP_ */
