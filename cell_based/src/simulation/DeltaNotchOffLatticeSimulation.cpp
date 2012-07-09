@@ -119,6 +119,11 @@ void DeltaNotchOffLatticeSimulation<DIM>::UpdateCellData()
             }
             cell_iter->GetCellData()->SetItem("mean delta", mean_delta);
         }
+        else
+        {
+            //If simulation trips at this assertion it is because at least one of the cells has no neighbours (as defined by mesh/population/interaction distance)
+            NEVER_REACHED;
+        }
 //        else
 //        {
 //            double this_delta = cell_iter->GetCellData()->GetItem("delta");

@@ -367,11 +367,11 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
             // Get the location of this node
             c_vector<double, DIM> node_j_location = this->GetNode((*iter))->rGetLocation();
 
-            // Get the unit vector parallel to the line joining the two nodes (assuming no periodicities etc.)
-            c_vector<double, DIM> unit_vector = node_i_location - node_j_location;
+            // Get the vector the two nodes (assuming no periodicities etc.)
+            c_vector<double, DIM> node_to_node_vector = node_i_location - node_j_location;
 
             // Calculate the distance between the two nodes
-            double distance_between_nodes = norm_2(unit_vector);
+            double distance_between_nodes = norm_2(node_to_node_vector);
 
             // Get the radius of the cell corresponding to this node
             double radius_of_cell_j = mpNodesOnlyMesh->GetCellRadius((*iter));
@@ -384,7 +384,7 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
             {
                 EXCEPTION("mMechanicsCutOffLength is smaller than the sum of radius of cell " << index << " (" << radius_of_cell_i << ") and cell " << (*iter) << " (" << radius_of_cell_j <<"). Make the cut-off larger to avoid errors.");
             }
-            if (distance_between_nodes < max_interaction_distance)
+            if (distance_between_nodes <= max_interaction_distance)// + DBL_EPSILSON) //Assumes that max_interaction_distance is of over 1
             {
                 // ...then add this node index to the set of neighbouring node indices
                 neighbouring_node_indices.insert((*iter));
