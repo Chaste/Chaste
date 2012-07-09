@@ -46,8 +46,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * = In this tutorial we show how Chaste can be used to solve an ODE system =
  *
- * EMPTYLINE
- *
  * The following header files need to be included.
  * First we include the header needed to define this class as a test suite. */
 #include <cxxtest/TestSuite.h>
@@ -72,8 +70,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "OdeSystemInformation.hpp"
 /*
- * EMPTYLINE
- *
  * == Defining the ODE classes ==
  *
  * Let us solve the ODE dy/dt = y^2^+t^2^, with y(0) = 1. To do so, we have to define
@@ -211,11 +207,7 @@ void OdeSystemInformation<My2dOde>::Initialise()
 }
 
 /*
- * EMPTYLINE
- *
  * == The Tests ==
- *
- * EMPTYLINE
  *
  * === Standard ODE solving ===
  *
@@ -277,8 +269,6 @@ public:
     }
 
     /*
-     * EMPTYLINE
-     *
      * === ODE solving using state variables ===
      *
      * In this second test, we show how to do an alternative version of ODE solving, which
@@ -306,8 +296,6 @@ public:
     }
 
     /*
-     * EMPTYLINE
-     *
      * === Solving n-dimensional ODEs ===
      *
      * Finally, here's a simple test showing how to solve a 2d ODE using the first method.
