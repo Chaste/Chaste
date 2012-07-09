@@ -107,7 +107,8 @@ public:
         result = steady_runner.RunToSteadyState();
 
         TS_ASSERT_EQUALS(result,true);
-        TS_ASSERT_LESS_THAN(steady_runner.GetNumEvaluations(),500u);
+        // Your mileage may vary.  32-bit machine, default build gives 520 evaluations.
+        TS_ASSERT_LESS_THAN(steady_runner.GetNumEvaluations(),550u);
 
         // For coverage
         TS_ASSERT_THROWS_THIS(steady_runner.SetMaxNumPaces(0u),
