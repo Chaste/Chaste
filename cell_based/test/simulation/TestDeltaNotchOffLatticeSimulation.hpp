@@ -95,7 +95,6 @@ public:
         std::vector<double> initial_conditions;
         initial_conditions.push_back(1.0);
         initial_conditions.push_back(1.0);
-        initial_conditions.push_back(0.0);
 
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
@@ -160,7 +159,6 @@ public:
         std::vector<double> starter_conditions;
         starter_conditions.push_back(0.9);
         starter_conditions.push_back(0.5);
-        starter_conditions.push_back(0.5);
 
         // Establish a DNCCM for each of the cells
         DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
@@ -180,7 +178,6 @@ public:
         // Create a vector of initial conditions
         std::vector<double> starter_conditions_2;
         starter_conditions_2.push_back(0.19);
-        starter_conditions_2.push_back(0.5);
         starter_conditions_2.push_back(0.5);
 
         // Establish a DNCCM for each of the cells
@@ -256,7 +253,6 @@ public:
         std::vector<double> starter_conditions;
         starter_conditions.push_back(0.9);
         starter_conditions.push_back(0.5);
-        starter_conditions.push_back(0.5);
 
         // Establish a DNCCM for each of the cells
         DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
@@ -276,7 +272,6 @@ public:
         // Create a vector of initial conditions
         std::vector<double> starter_conditions_2;
         starter_conditions_2.push_back(0.9);
-        starter_conditions_2.push_back(0.5);
         starter_conditions_2.push_back(0.5);
 
         // Establish a DNCCM for each of the cells

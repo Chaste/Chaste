@@ -216,12 +216,10 @@ public:
         DeltaNotchCellCycleModel* p_model= new DeltaNotchCellCycleModel;
 
         // Set ODE system
-        double mean_delta=1.0;
         std::vector<double> state_variables;
         state_variables.push_back(1.0);
         state_variables.push_back(1.0);
-        state_variables.push_back(1.0);
-        p_model->SetOdeSystem(new DeltaNotchOdeSystem(mean_delta, state_variables));
+        p_model->SetOdeSystem(new DeltaNotchOdeSystem(state_variables));
 
         // Set model parameters.
         p_model->SetBirthTime(2.0);

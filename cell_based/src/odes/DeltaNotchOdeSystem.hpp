@@ -78,7 +78,7 @@ public:
      * @param meanDelta the average of the levels of Delta in the surrounding cells (defaults to zero)
      * @param stateVariables optional initial conditions for state variables (only used in archiving)
      */
-    DeltaNotchOdeSystem(double meanDelta=0.0, std::vector<double> stateVariables=std::vector<double>());
+    DeltaNotchOdeSystem(std::vector<double> stateVariables=std::vector<double>());
 
     /**
      * Destructor.
@@ -128,7 +128,7 @@ inline void load_construct_data(
     ar & state_variables;
 
     // Invoke inplace constructor to initialise instance
-    ::new(t)DeltaNotchOdeSystem(0.0, state_variables);
+    ::new(t)DeltaNotchOdeSystem(state_variables);
 }
 }
 } // namespace ...

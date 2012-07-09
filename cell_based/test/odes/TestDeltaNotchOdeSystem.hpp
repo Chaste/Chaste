@@ -52,6 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BackwardEulerIvpOdeSolver.hpp"
 #include "CvodeAdaptor.hpp"
 
+
 class TestDeltaNotchOdeSystem : public CxxTest::TestSuite
 {
 public:
@@ -60,8 +61,7 @@ public:
     {
 //        EXIT_IF_PARALLEL;
 #ifdef CHASTE_CVODE
-        double mean_delta = 0.5;
-        DeltaNotchOdeSystem ode_system(mean_delta);
+        DeltaNotchOdeSystem ode_system;
 
         double h_value = 0.0001;
         CvodeAdaptor cvode_solver;
@@ -71,7 +71,6 @@ public:
 
         TS_ASSERT_DELTA(initial_conditions[0], 1.0, 1e-6);
         TS_ASSERT_DELTA(initial_conditions[1], 1.0, 1e-6);
-        TS_ASSERT_DELTA(initial_conditions[2], 0.5, 1e-6);
 
         double start_time = std::clock();
         solutions = cvode_solver.Solve(&ode_system, initial_conditions, 0.0, 100.0, h_value, h_value);
@@ -87,7 +86,6 @@ public:
         // Decent results
         TS_ASSERT_DELTA(solutions.rGetSolutions()[end][0], 0.9615, 1e-4);
         TS_ASSERT_DELTA(solutions.rGetSolutions()[end][1], 0.0107, 1e-4);
-        TS_ASSERT_DELTA(solutions.rGetSolutions()[end][2], mean_delta, 1e-4);
 #else
         std::cout << "CVODE is not enabled. " << std::endl;
         std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
@@ -102,16 +100,20 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "delta_notch_ode.arch";
 
         {
-            double mean_delta = 0.6;
-            DeltaNotchOdeSystem ode_system(mean_delta);
+            std::vector<double> state_variables;
+            state_variables.push_back(3.0);
+            state_variables.push_back(4.0);
+
+            DeltaNotchOdeSystem ode_system(state_variables);
 
             std::vector<double> initial_conditions = ode_system.GetInitialConditions();
-            TS_ASSERT_EQUALS(initial_conditions.size(), 3u);
+
+            // These are the initial conditions hard-coded in the constructor.
+            TS_ASSERT_EQUALS(initial_conditions.size(), 2u);
             TS_ASSERT_DELTA(initial_conditions[0], 1.0, 1e-6);
             TS_ASSERT_DELTA(initial_conditions[1], 1.0, 1e-6);
 
-            // TODO #1995 this should really be 0.6 see line above.
-            TS_ASSERT_DELTA(initial_conditions[2], 0.5, 1e-6);
+            ode_system.SetParameter("Mean Delta", 10.0);
 
             // Create an output archive
             std::ofstream ofs(archive_filename.c_str());
@@ -134,12 +136,21 @@ public:
 
             // Check that archiving worked correctly
             std::vector<double> initial_conditions = p_ode_system->GetInitialConditions();
-            TS_ASSERT_EQUALS(initial_conditions.size(), 3u);
+
+            TS_ASSERT_EQUALS(initial_conditions.size(), 2u);
             TS_ASSERT_DELTA(initial_conditions[0], 1.0, 1e-6);
             TS_ASSERT_DELTA(initial_conditions[1], 1.0, 1e-6);
 
-            // TODO #1995 this should really be 0.6.
-            TS_ASSERT_DELTA(initial_conditions[2], 0.5, 1e-6);
+            double mean_delta = p_ode_system->GetParameter("Mean Delta");
+
+            TS_ASSERT_DELTA(mean_delta, 10.0, 1e-3);
+
+            // Get state variables
+            double var1 = p_ode_system->GetStateVariable(0);
+            double var2 = p_ode_system->GetStateVariable(1);
+
+            TS_ASSERT_DELTA(var1, 3.0, 1e-3);
+            TS_ASSERT_DELTA(var2, 4.0, 1e-3);
 
             // Tidy up
             delete p_ode_system;
@@ -155,12 +166,10 @@ public:
         std::vector<double> state_vars;
         state_vars.push_back(0.0);
         state_vars.push_back(1.0);
-        state_vars.push_back(2.0);
-        DeltaNotchOdeSystem ode_system(0.5,state_vars);
+        DeltaNotchOdeSystem ode_system(state_vars);
 
         TS_ASSERT_EQUALS(ode_system.GetStateVariable(0),0.0);
         TS_ASSERT_EQUALS(ode_system.GetStateVariable(1),1.0);
-        TS_ASSERT_EQUALS(ode_system.GetStateVariable(2),2.0);
 
 #endif //CHASTE_CVODE
    }

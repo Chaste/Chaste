@@ -36,8 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DeltaNotchOdeSystem.hpp"
 #include "CellwiseOdeSystemInformation.hpp"
 
-DeltaNotchOdeSystem::DeltaNotchOdeSystem(double meanDelta, std::vector<double> stateVariables)
-    : AbstractOdeSystem(3)
+DeltaNotchOdeSystem::DeltaNotchOdeSystem(std::vector<double> stateVariables)
+    : AbstractOdeSystem(2)
 {
     mpSystemInfo.reset(new CellwiseOdeSystemInformation<DeltaNotchOdeSystem>);
 
@@ -46,7 +46,6 @@ DeltaNotchOdeSystem::DeltaNotchOdeSystem(double meanDelta, std::vector<double> s
      *
      * 0 - Notch concentration for this cell
      * 1 - Delta concentration for this cell
-     * 2 - average Delta concentration for this cell's immediate neighbours
      *
      * We store the last state variable so that it can be written
      * to file at each time step alongside the others, and visualized.
@@ -55,10 +54,7 @@ DeltaNotchOdeSystem::DeltaNotchOdeSystem(double meanDelta, std::vector<double> s
     SetDefaultInitialCondition(0, 1.0); // soon overwritten
     SetDefaultInitialCondition(1, 1.0); // soon overwritten
 
-
-    // TODO #1995 this should relly be the correct line but this causes a poorly written archiving test to fail.
-    //SetDefaultInitialCondition(2, meanDelta);
-    SetDefaultInitialCondition(2, 0.5);
+    this->mParameters.push_back(0.5);
 
     if (stateVariables != std::vector<double>())
     {
@@ -74,7 +70,7 @@ void DeltaNotchOdeSystem::EvaluateYDerivatives(double time, const std::vector<do
 {
     double notch = rY[0];
     double delta = rY[1];
-    double mean_delta = rY[2];
+    double mean_delta = this->GetParameter("Mean Delta");
 
     // The next two lines define the ODE system by Collier et al. (1996)
     double dx1 = mean_delta*mean_delta/(0.01 + mean_delta*mean_delta) - notch;
@@ -82,7 +78,6 @@ void DeltaNotchOdeSystem::EvaluateYDerivatives(double time, const std::vector<do
 
     rDY[0] = dx1;
     rDY[1] = dx2;
-    rDY[2] = 0.0; // don't change the mean Delta level over the course of the mechanics time step
 }
 
 template<>
@@ -96,9 +91,8 @@ void CellwiseOdeSystemInformation<DeltaNotchOdeSystem>::Initialise()
     this->mVariableUnits.push_back("non-dim");
     this->mInitialConditions.push_back(0.0); // will be filled in later
 
-    this->mVariableNames.push_back("Mean Delta");
-    this->mVariableUnits.push_back("non-dim");
-    this->mInitialConditions.push_back(0.0); // will be filled in later
+    this->mParameterNames.push_back("Mean Delta");
+    this->mParameterUnits.push_back("non-dim");
 
     this->mInitialised = true;
 }

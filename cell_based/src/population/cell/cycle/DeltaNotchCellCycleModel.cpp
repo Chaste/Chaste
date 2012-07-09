@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 
 
+
 DeltaNotchCellCycleModel::DeltaNotchCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : CellCycleModelOdeHandler(DOUBLE_UNSET, pOdeSolver)
 {
@@ -65,7 +66,8 @@ AbstractCellCycleModel* DeltaNotchCellCycleModel::CreateCellCycleModel()
 
     // Create the new cell-cycle model's ODE system
     double mean_neighbouring_delta = GetMeanNeighbouringDelta();
-    p_model->SetOdeSystem(new DeltaNotchOdeSystem(mean_neighbouring_delta));
+    p_model->SetOdeSystem(new DeltaNotchOdeSystem);
+    p_model->GetOdeSystem()->SetParameter("Mean Delta", mean_neighbouring_delta);
 
     // Use the current values of the state variables in mpOdeSystem as an initial condition for the new cell-cycle model's ODE system
     assert(mpOdeSystem);
@@ -112,7 +114,7 @@ void DeltaNotchCellCycleModel::Initialise()
 
 void DeltaNotchCellCycleModel::SetInitialConditions(std::vector<double> initialConditions)
 {
-    assert(initialConditions.size() == 3);
+    assert(initialConditions.size() == 2);
     mInitialConditions = initialConditions;
 }
 
@@ -122,7 +124,7 @@ void DeltaNotchCellCycleModel::UpdateDeltaNotch()
     assert(mpCell != NULL);
 
     double mean_delta = mpCell->GetCellData()->GetItem("mean delta");
-    mpOdeSystem->rGetStateVariables()[2] = mean_delta;
+    mpOdeSystem->SetParameter("Mean Delta", mean_delta);
 }
 
 double DeltaNotchCellCycleModel::GetNotch()

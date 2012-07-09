@@ -284,6 +284,8 @@ public:
     /**
      * Overridden GetNeighbouringNodeIndices() method.
      *
+     * Only returns nodes that are strictly touching each other.
+     *
      * @param index the node index
      * @return the set of neighbouring node indices.
      */
