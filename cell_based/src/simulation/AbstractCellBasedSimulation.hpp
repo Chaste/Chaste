@@ -60,7 +60,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Subclasses use one or more Force laws or update rules (Which are passed
  * to the child class object) to define the mechanical properties of the CellPopulation.
  */
-template<unsigned DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
 class AbstractCellBasedSimulation : public Identifiable
 {
     // Allow tests to access private members, in order to test computation of private functions e.g. DoCellBirth()
@@ -109,7 +109,7 @@ protected:
     double mEndTime;
 
     /** Facade encapsulating cells in the cell population being simulated. */
-    AbstractCellPopulation<DIM>& mrCellPopulation;
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& mrCellPopulation;
 
     /** Whether to delete the cell population in the destructor. */
     bool mDeleteCellPopulationInDestructor;
@@ -139,7 +139,7 @@ protected:
     unsigned mNumDeaths;
 
     /** List of cell killers. */
-    std::vector<boost::shared_ptr<AbstractCellKiller<DIM> > > mCellKillers;
+    std::vector<boost::shared_ptr<AbstractCellKiller<SPACE_DIM> > > mCellKillers;
 
     /**
      * The ratio of the number of actual timesteps to the number
@@ -150,7 +150,7 @@ protected:
     /**
      * Pointer to a CellBasedPdeHandler object.
      */
-    CellBasedPdeHandler<DIM>* mpCellBasedPdeHandler;
+    CellBasedPdeHandler<SPACE_DIM>* mpCellBasedPdeHandler;
 
     /**
      * Writes out special information about the mesh to the visualizer.
@@ -179,7 +179,7 @@ protected:
      *
      * @return a vector containing information on cell division.
      */
-    virtual c_vector<double, DIM> CalculateCellDivisionVector(CellPtr pParentCell)=0;
+    virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell)=0;
 
     /**
      * During a simulation time step, process any cell sloughing or death
@@ -257,7 +257,7 @@ public:
      *     free up memory (defaults to false)
      * @param initialiseCells Whether to initialise cells (defaults to true; set to false when loading from an archive)
      */
-    AbstractCellBasedSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
+    AbstractCellBasedSimulation(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation,
                                 bool deleteCellPopulationInDestructor=false,
                                 bool initialiseCells=true);
 
@@ -273,12 +273,12 @@ public:
      *
      * @param pCellBasedPdeHandler pointer to a CellBasedPdeHandler object
      */
-    void SetCellBasedPdeHandler(CellBasedPdeHandler<DIM>* pCellBasedPdeHandler);
+    void SetCellBasedPdeHandler(CellBasedPdeHandler<SPACE_DIM>* pCellBasedPdeHandler);
 
     /**
      * @return mpCellBasedPdeHandler
      */
-    CellBasedPdeHandler<DIM>* GetCellBasedPdeHandler();
+    CellBasedPdeHandler<SPACE_DIM>* GetCellBasedPdeHandler();
 
     /**
      * Get a node's location (ONLY FOR TESTING).
@@ -356,7 +356,7 @@ public:
      *
      * @param pCellKiller pointer to a cell killer
      */
-    void AddCellKiller(boost::shared_ptr<AbstractCellKiller<DIM> > pCellKiller);
+    void AddCellKiller(boost::shared_ptr<AbstractCellKiller<SPACE_DIM> > pCellKiller);
 
     /**
      * Method to remove all the cell killers
@@ -378,12 +378,12 @@ public:
     /**
      * @return reference to the cell population.
      */
-    AbstractCellPopulation<DIM>& rGetCellPopulation();
+    AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rGetCellPopulation();
 
     /**
      * @return const reference to the cell population (used in archiving).
      */
-    const AbstractCellPopulation<DIM>& rGetCellPopulation() const;
+    const AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rGetCellPopulation() const;
 
     /**
      * Outputs simulation parameters to file

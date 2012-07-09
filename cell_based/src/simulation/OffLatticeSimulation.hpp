@@ -65,8 +65,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * may die, and one or more CellPopulationBoundaryConditions to specify
  * regions in space beyond which Cells may not move.
  */
-template<unsigned DIM>
-class OffLatticeSimulation : public AbstractCellBasedSimulation<DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
+class OffLatticeSimulation : public AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>
 {
 private:
 
@@ -82,7 +82,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractCellBasedSimulation<DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM> >(*this);
         archive & mForceCollection;
         archive & mBoundaryConditions;
         archive & mOutputNodeVelocities;
@@ -91,10 +91,10 @@ private:
 protected:
 
     /** The mechanics used to determine the new location of the cells, a list of the forces. */
-    std::vector<boost::shared_ptr<AbstractForce<DIM> > > mForceCollection;
+    std::vector<boost::shared_ptr<AbstractForce<SPACE_DIM> > > mForceCollection;
 
     /** List of boundary conditions. */
-    std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<DIM> > > mBoundaryConditions;
+    std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<SPACE_DIM> > > mBoundaryConditions;
 
     /** Whether to write the node velocities to a file. */
     bool mOutputNodeVelocities;
@@ -116,7 +116,7 @@ protected:
      *
      * @param rNodeForces the forces on nodes
      */
-    virtual void UpdateNodePositions(const std::vector< c_vector<double, DIM> >& rNodeForces);
+    virtual void UpdateNodePositions(const std::vector< c_vector<double, SPACE_DIM> >& rNodeForces);
 
     /**
      * Overridden SetupSolve() method to setup the node velocities file.
@@ -144,7 +144,7 @@ protected:
      *
      * @return a vector containing information on cell division.
      */
-    virtual c_vector<double, DIM> CalculateCellDivisionVector(CellPtr pParentCell);
+    virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell);
 
     /**
      * Overridden WriteVisualizerSetupFile() method.
@@ -162,7 +162,7 @@ public:
      * @param initialiseCells Whether to initialise cells (defaults to true, set to false when loading
      *     from an archive)
      */
-    OffLatticeSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
+    OffLatticeSimulation(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation,
                          bool deleteCellPopulationInDestructor=false,
                          bool initialiseCells=true);
 
@@ -171,7 +171,7 @@ public:
      *
      * @param pForce pointer to a force law
      */
-    void AddForce(boost::shared_ptr<AbstractForce<DIM> > pForce);
+    void AddForce(boost::shared_ptr<AbstractForce<SPACE_DIM> > pForce);
 
     /**
      * Method to remove all the Forces
@@ -183,7 +183,7 @@ public:
      *
      * @param pBoundaryCondition pointer to a boundary condition
      */
-    void AddCellPopulationBoundaryCondition(boost::shared_ptr<AbstractCellPopulationBoundaryCondition<DIM> >  pBoundaryCondition);
+    void AddCellPopulationBoundaryCondition(boost::shared_ptr<AbstractCellPopulationBoundaryCondition<SPACE_DIM> >  pBoundaryCondition);
 
     /**
      * Method to remove all the cell population boundary conditions
@@ -232,29 +232,29 @@ namespace serialization
 /**
  * Serialize information required to construct an OffLatticeSimulation.
  */
-template<class Archive, unsigned DIM>
+template<class Archive, unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 inline void save_construct_data(
-    Archive & ar, const OffLatticeSimulation<DIM> * t, const BOOST_PFTO unsigned int file_version)
+    Archive & ar, const OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM> * t, const BOOST_PFTO unsigned int file_version)
 {
     // Save data required to construct instance
-    const AbstractCellPopulation<DIM>* p_cell_population = &(t->rGetCellPopulation());
+    const AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>* p_cell_population = &(t->rGetCellPopulation());
     ar & p_cell_population;
 }
 
 /**
  * De-serialize constructor parameters and initialise an OffLatticeSimulation.
  */
-template<class Archive, unsigned DIM>
+template<class Archive, unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 inline void load_construct_data(
-    Archive & ar, OffLatticeSimulation<DIM> * t, const unsigned int file_version)
+    Archive & ar, OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM> * t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
-    AbstractCellPopulation<DIM>* p_cell_population;
+    AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>* p_cell_population;
     ar >> p_cell_population;
 
     // Invoke inplace constructor to initialise instance, last two variables set extra
     // member variables to be deleted as they are loaded from archive and to not initialise sells.
-    ::new(t)OffLatticeSimulation<DIM>(*p_cell_population, true, false);
+    ::new(t)OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>(*p_cell_population, true, false);
 }
 }
 } // namespace

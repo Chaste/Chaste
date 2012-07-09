@@ -47,8 +47,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 #include <typeinfo>
 
-template<unsigned DIM>
-AbstractCellBasedSimulation<DIM>::AbstractCellBasedSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::AbstractCellBasedSimulation(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation,
                                               bool deleteCellPopulationInDestructor,
                                               bool initialiseCells)
     : mDt(DOUBLE_UNSET),
@@ -74,8 +74,8 @@ AbstractCellBasedSimulation<DIM>::AbstractCellBasedSimulation(AbstractCellPopula
     }
 }
 
-template<unsigned DIM>
-AbstractCellBasedSimulation<DIM>::~AbstractCellBasedSimulation()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::~AbstractCellBasedSimulation()
 {
     if (mDeleteCellPopulationInDestructor)
     {
@@ -84,20 +84,20 @@ AbstractCellBasedSimulation<DIM>::~AbstractCellBasedSimulation()
     }
 }
 
-template<unsigned DIM>
-void AbstractCellBasedSimulation<DIM>::SetCellBasedPdeHandler(CellBasedPdeHandler<DIM>* pCellBasedPdeHandler)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::SetCellBasedPdeHandler(CellBasedPdeHandler<SPACE_DIM>* pCellBasedPdeHandler)
 {
     mpCellBasedPdeHandler = pCellBasedPdeHandler;
 }
 
-template<unsigned DIM>
-CellBasedPdeHandler<DIM>* AbstractCellBasedSimulation<DIM>::GetCellBasedPdeHandler()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+CellBasedPdeHandler<SPACE_DIM>* AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::GetCellBasedPdeHandler()
 {
     return mpCellBasedPdeHandler;
 }
 
-template<unsigned DIM>
-unsigned AbstractCellBasedSimulation<DIM>::DoCellBirth()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::DoCellBirth()
 {
     if (mNoBirth)
     {
@@ -107,7 +107,7 @@ unsigned AbstractCellBasedSimulation<DIM>::DoCellBirth()
     unsigned num_births_this_step = 0;
 
     // Iterate over all cells, seeing if each one can be divided
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = mrCellPopulation.Begin();
+    for (typename AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::Iterator cell_iter = mrCellPopulation.Begin();
          cell_iter != mrCellPopulation.End();
          ++cell_iter)
     {
@@ -122,7 +122,7 @@ unsigned AbstractCellBasedSimulation<DIM>::DoCellBirth()
                     CellPtr p_new_cell = cell_iter->Divide();
 
                     // Call method that determines how cell division occurs and returns a vector
-                    c_vector<double, DIM> new_location = CalculateCellDivisionVector(*cell_iter);
+                    c_vector<double, SPACE_DIM> new_location = CalculateCellDivisionVector(*cell_iter);
 
                     // Add new cell to the cell population
                     mrCellPopulation.AddCell(p_new_cell, new_location, *cell_iter);
@@ -140,8 +140,8 @@ unsigned AbstractCellBasedSimulation<DIM>::DoCellBirth()
     return num_births_this_step;
 }
 
-template<unsigned DIM>
-unsigned AbstractCellBasedSimulation<DIM>::DoCellRemoval()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::DoCellRemoval()
 {
     unsigned num_deaths_this_step = 0;
 
@@ -149,7 +149,7 @@ unsigned AbstractCellBasedSimulation<DIM>::DoCellRemoval()
      * This labels cells as dead or apoptosing. It does not actually remove the cells,
      * mrCellPopulation.RemoveDeadCells() needs to be called for this.
      */
-    for (typename std::vector<boost::shared_ptr<AbstractCellKiller<DIM> > >::iterator killer_iter = mCellKillers.begin();
+    for (typename std::vector<boost::shared_ptr<AbstractCellKiller<SPACE_DIM> > >::iterator killer_iter = mCellKillers.begin();
          killer_iter != mCellKillers.end();
          ++killer_iter)
     {
@@ -161,107 +161,107 @@ unsigned AbstractCellBasedSimulation<DIM>::DoCellRemoval()
     return num_deaths_this_step;
 }
 
-template<unsigned DIM>
-void AbstractCellBasedSimulation<DIM>::SetDt(double dt)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::SetDt(double dt)
 {
     assert(dt > 0);
     mDt = dt;
 }
 
-template<unsigned DIM>
-double AbstractCellBasedSimulation<DIM>::GetDt()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::GetDt()
 {
     return mDt;
 }
 
-template<unsigned DIM>
-unsigned AbstractCellBasedSimulation<DIM>::GetNumBirths()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::GetNumBirths()
 {
     return mNumBirths;
 }
 
-template<unsigned DIM>
-unsigned AbstractCellBasedSimulation<DIM>::GetNumDeaths()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::GetNumDeaths()
 {
     return mNumDeaths;
 }
 
-template<unsigned DIM>
-void AbstractCellBasedSimulation<DIM>::SetEndTime(double endTime)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::SetEndTime(double endTime)
 {
     assert(endTime > 0);
     mEndTime = endTime;
 }
 
-template<unsigned DIM>
-void AbstractCellBasedSimulation<DIM>::SetOutputDirectory(std::string outputDirectory)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::SetOutputDirectory(std::string outputDirectory)
 {
     mOutputDirectory = outputDirectory;
     mSimulationOutputDirectory = mOutputDirectory;
 }
 
-template<unsigned DIM>
-std::string AbstractCellBasedSimulation<DIM>::GetOutputDirectory()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::string AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::GetOutputDirectory()
 {
     return mOutputDirectory;
 }
 
-template<unsigned DIM>
-void AbstractCellBasedSimulation<DIM>::SetSamplingTimestepMultiple(unsigned samplingTimestepMultiple)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::SetSamplingTimestepMultiple(unsigned samplingTimestepMultiple)
 {
     assert(samplingTimestepMultiple > 0);
     mSamplingTimestepMultiple = samplingTimestepMultiple;
 }
 
-template<unsigned DIM>
-AbstractCellPopulation<DIM>& AbstractCellBasedSimulation<DIM>::rGetCellPopulation()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::rGetCellPopulation()
 {
     return mrCellPopulation;
 }
 
-template<unsigned DIM>
-const AbstractCellPopulation<DIM>& AbstractCellBasedSimulation<DIM>::rGetCellPopulation() const
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+const AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::rGetCellPopulation() const
 {
     return mrCellPopulation;
 }
 
-template<unsigned DIM>
-void AbstractCellBasedSimulation<DIM>::SetUpdateCellPopulationRule(bool updateCellPopulation)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::SetUpdateCellPopulationRule(bool updateCellPopulation)
 {
     mUpdateCellPopulation = updateCellPopulation;
 }
 
-template<unsigned DIM>
-void AbstractCellBasedSimulation<DIM>::SetNoBirth(bool noBirth)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::SetNoBirth(bool noBirth)
 {
     mNoBirth = noBirth;
 }
 
-template<unsigned DIM>
-void AbstractCellBasedSimulation<DIM>::AddCellKiller(boost::shared_ptr<AbstractCellKiller<DIM> > pCellKiller)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::AddCellKiller(boost::shared_ptr<AbstractCellKiller<SPACE_DIM> > pCellKiller)
 {
     mCellKillers.push_back(pCellKiller);
 }
 
-template<unsigned DIM>
-void AbstractCellBasedSimulation<DIM>::RemoveAllCellKillers()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::RemoveAllCellKillers()
 {
 	mCellKillers.clear();
 }
 
-template<unsigned DIM>
-std::vector<double> AbstractCellBasedSimulation<DIM>::GetNodeLocation(const unsigned& rNodeIndex)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::vector<double> AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::GetNodeLocation(const unsigned& rNodeIndex)
 {
     std::vector<double> location;
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i=0; i<SPACE_DIM; i++)
     {
         location.push_back(mrCellPopulation.GetNode(rNodeIndex)->rGetLocation()[i]);
     }
     return location;
 }
 
-template<unsigned DIM>
-void AbstractCellBasedSimulation<DIM>::Solve()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
 {
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::EVERYTHING);
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::SETUP);
@@ -338,7 +338,7 @@ void AbstractCellBasedSimulation<DIM>::Solve()
     // Age the cells to the correct time. Note that cells are created with
     // negative birth times so that some are initially almost ready to divide.
     LOG(1, "Setting up cells...");
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = mrCellPopulation.Begin();
+    for (typename AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::Iterator cell_iter = mrCellPopulation.Begin();
          cell_iter != mrCellPopulation.End();
          ++cell_iter)
     {
@@ -424,14 +424,14 @@ void AbstractCellBasedSimulation<DIM>::Solve()
     CellBasedEventHandler::EndEvent(CellBasedEventHandler::EVERYTHING);
 }
 
-template<unsigned DIM>
-bool AbstractCellBasedSimulation<DIM>::StoppingEventHasOccurred()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::StoppingEventHasOccurred()
 {
     return false;
 }
 
-template<unsigned DIM>
-void AbstractCellBasedSimulation<DIM>::UpdateCellPopulation()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellPopulation()
 {
     // Remove dead cells
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::DEATH);
@@ -465,8 +465,8 @@ void AbstractCellBasedSimulation<DIM>::UpdateCellPopulation()
     CellBasedEventHandler::EndEvent(CellBasedEventHandler::UPDATECELLPOPULATION);
 }
 
-template<unsigned DIM>
-void AbstractCellBasedSimulation<DIM>::OutputSimulationSetup()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationSetup()
 {
     OutputFileHandler output_file_handler(this->mSimulationOutputDirectory + "/", false);
 
@@ -495,7 +495,7 @@ void AbstractCellBasedSimulation<DIM>::OutputSimulationSetup()
 
     // Loop over cell killers
     *parameter_file << "\n\t<CellKillers>\n";
-    for (typename std::vector<boost::shared_ptr<AbstractCellKiller<DIM> > >::iterator iter = mCellKillers.begin();
+    for (typename std::vector<boost::shared_ptr<AbstractCellKiller<SPACE_DIM> > >::iterator iter = mCellKillers.begin();
          iter != mCellKillers.end();
          ++iter)
     {
@@ -511,8 +511,8 @@ void AbstractCellBasedSimulation<DIM>::OutputSimulationSetup()
     parameter_file->close();
 }
 
-template<unsigned DIM>
-void AbstractCellBasedSimulation<DIM>::OutputSimulationParameters(out_stream& rParamsFile)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationParameters(out_stream& rParamsFile)
 {
     if (mpCellBasedPdeHandler != NULL)
     {
@@ -530,4 +530,5 @@ void AbstractCellBasedSimulation<DIM>::OutputSimulationParameters(out_stream& rP
 
 template class AbstractCellBasedSimulation<1>;
 template class AbstractCellBasedSimulation<2>;
+template class AbstractCellBasedSimulation<2,3>;
 template class AbstractCellBasedSimulation<3>;

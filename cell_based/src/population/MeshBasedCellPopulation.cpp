@@ -507,7 +507,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile()
 
     if (mWriteVtkAsPoints)
     {
-        VtkMeshWriter<ELEMENT_DIM,SPACE_DIM> mesh_writer(this->mDirPath, "results_"+time.str(), false);
+        VtkMeshWriter<SPACE_DIM,SPACE_DIM> mesh_writer(this->mDirPath, "results_"+time.str(), false);
 
         // Loop over cells
         for (typename AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::Iterator cell_iter = this->Begin();
@@ -959,6 +959,13 @@ void MeshBasedCellPopulation<2>::CreateVoronoiTessellation()
     mpVoronoiTessellation = new VertexMesh<2, 2>(static_cast<MutableMesh<2, 2> &>((this->mrMesh)), is_mesh_periodic);
 }
 
+template<>
+void MeshBasedCellPopulation<2,3>::CreateVoronoiTessellation()
+{
+	// We don't allow tessellation yet.
+	NEVER_REACHED;
+}
+
 /**
  * The cylindrical mesh is only defined in 2D, hence there is
  * a separate definition for this method in 3D, which doesn't have the capability
@@ -1251,6 +1258,7 @@ double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetRestLength(unsigned in
 
 template class MeshBasedCellPopulation<1>;
 template class MeshBasedCellPopulation<2>;
+template class MeshBasedCellPopulation<2,3>;
 template class MeshBasedCellPopulation<3>;
 
 // Serialization for Boost >= 1.36

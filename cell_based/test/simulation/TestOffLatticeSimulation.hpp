@@ -468,6 +468,40 @@ public:
 		TS_ASSERT_DELTA(simulator.GetNodeLocation(3)[1], 8.0, 1e-2);
 	}
 
+    /**
+     * see #2112 This tests running a simulation in 3d with a 2d mesh.
+     */
+//    void TestOffLatticeSimulationWith2dMeshIn3d() throw (Exception)
+//    {
+//    	// Load Mesh
+//        TrianglesMeshReader<2,3> mesh_reader("cell_based/test/data/Simple2dMeshIn3d/Simple2dMeshIn3d");
+//        MutableMesh<2,3> mesh;
+//        mesh.ConstructFromMeshReader(mesh_reader);
+//
+//          // Create cells
+//        std::vector<CellPtr> cells;
+//        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+//        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
+//
+//        // Create a cell population
+//        MeshBasedCellPopulation<2,3> cell_population(mesh, cells);
+//
+//        // Set up cell-based simulation
+//        OffLatticeSimulation<2,3> simulator(cell_population);
+//        simulator.SetOutputDirectory("TestOffLatticeSimulationWith2dMeshIn3d");
+//        simulator.SetEndTime(0.5);
+//
+//        // Create a force law and pass it to the simulation
+////        MAKE_PTR(GeneralisedLinearSpringForce<3>, p_force);
+////        p_force->SetCutOffLength(1.5);
+////        simulator.AddForce(p_force);
+//
+//        // Stops remeshing as not possible for 2d in 3d meshes
+//        simulator.SetUpdateCellPopulationRule(true);
+//
+//        simulator.Solve();
+//    }
+
 
     /**
      * Test a cell-based simulation with a periodic mesh.
