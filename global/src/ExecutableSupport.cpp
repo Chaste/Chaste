@@ -40,6 +40,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sys/utsname.h> // For uname
 #include <hdf5.h>
 
+#include <boost/foreach.hpp>
+typedef std::pair<std::string, std::string> StringPair;
+
 #include "CommandLineArguments.hpp"
 #include "Exception.hpp"
 #include "PetscTools.hpp"
@@ -170,7 +173,6 @@ void ExecutableSupport::WriteProvenanceInfoFile()
 
 void ExecutableSupport::WriteLibraryInfo( out_stream &outFile )
 {
-
     *outFile << "<ChasteBuildInfo>\n";
 
     *outFile << "\t<ProvenanceInfo>\n";
@@ -180,6 +182,13 @@ void ExecutableSupport::WriteLibraryInfo( out_stream &outFile )
     *outFile << "\t\t<BuildTime>"<< ChasteBuildInfo::GetBuildTime() << "</BuildTime>\n";
     *outFile << "\t\t<CurrentTime>"<< ChasteBuildInfo::GetCurrentTime() << "</CurrentTime>\n";
     *outFile << "\t\t<BuilderUnameInfo>"<< ChasteBuildInfo::GetBuilderUnameInfo() << "</BuilderUnameInfo>\n";
+    *outFile << "\t\t<Projects>\n";
+    BOOST_FOREACH(const StringPair& r_project_version, ChasteBuildInfo::rGetProjectVersions())
+    {
+        *outFile << "\t\t\t<Name>" << r_project_version.first << "</Name><Version>"
+                 << r_project_version.second << "</Version>\n";
+    }
+    *outFile << "\t\t</Projects>\n";
     *outFile << "\t</ProvenanceInfo>\n";
 
     *outFile << "\t<Compiler>\n";

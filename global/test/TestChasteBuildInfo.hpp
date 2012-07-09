@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 
 #include <iostream>
+#include <boost/foreach.hpp>
 
 #include "Version.hpp"
 
@@ -48,6 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 class TestChasteBuildInfo : public CxxTest::TestSuite
 {
+    typedef std::pair<std::string, std::string> StringPair;
 public:
     void TestShowInfo()
     {
@@ -66,6 +68,12 @@ public:
         std::cout << "Build machine: " << ChasteBuildInfo::GetBuilderUnameInfo() << std::endl;
         std::cout << "Build information: " << ChasteBuildInfo::GetBuildInformation() << std::endl;
         std::cout << "Provenance information: " << ChasteBuildInfo::GetProvenanceString() << std::endl;
+
+        std::cout << "Checked out projects:" << std::endl;
+        BOOST_FOREACH(const StringPair& r_project_version, ChasteBuildInfo::rGetProjectVersions())
+        {
+            std::cout << "\t" << r_project_version.first << ": " << r_project_version.second << std::endl;
+        }
     }
 };
 

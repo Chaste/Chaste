@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VERSION_HPP_
 
 #include <string>
+#include <map>
 
 /**
  * A class with static methods providing various information about this build of Chaste.
@@ -121,22 +122,27 @@ public:
     /**
      * Get the compiler type used to build (must be either 'intel' or 'gcc').
      */
-     static const char* GetCompilerType();
+    static const char* GetCompilerType();
 
     /**
      * Get the compiler version number.
      */
-     static const char* GetCompilerVersion();
+    static const char* GetCompilerVersion();
 
     /**
      * Get the compiler flags.
      */
-     static const char* GetCompilerFlags();
+    static const char* GetCompilerFlags();
 
-     /**
-      * Get the XSD binary version number.
-      */
-     static const char* GetXsdVersion();
+    /**
+     * Get the XSD binary version number.
+     */
+    static const char* GetXsdVersion();
+
+    /**
+     * Get the version numbers (i.e. revisions) of any checked-out projects.
+     */
+    static const std::map<std::string, std::string>& rGetProjectVersions();
 
     /**
      * Get a single-line string representation of the provenance information to be attached

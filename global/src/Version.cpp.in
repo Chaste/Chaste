@@ -126,6 +126,16 @@ const char* ChasteBuildInfo::GetCompilerFlags()
 	return "%(cc_flags)s";
 }
 
+const std::map<std::string, std::string>& ChasteBuildInfo::rGetProjectVersions()
+{
+    static std::map<std::string, std::string> versions;
+    if (versions.empty())
+    {
+        %(project_versions)s;
+    }
+    return versions;
+}
+
 std::string ChasteBuildInfo::GetProvenanceString()
 {
     std::stringstream prov;
@@ -138,6 +148,21 @@ std::string ChasteBuildInfo::GetProvenanceString()
     prov << "Chaste was built on " << GetBuildTime()
          << " by machine (uname) '" << GetBuilderUnameInfo()
          << "' using settings: " << GetBuildInformation();
+    const std::map<std::string, std::string>& r_project_versions = rGetProjectVersions();
+    for (std::map<std::string, std::string>::const_iterator iter = r_project_versions.begin();
+         iter != r_project_versions.end();
+         ++iter)
+    {
+        if (iter == r_project_versions.begin())
+        {
+            prov << ".  Checked-out project versions: ";
+        }
+        else
+        {
+            prov << "; ";
+        }
+        prov << iter->first << "=" << iter->second;
+    }
     prov << "." << std::endl;
     return prov.str();
 }

@@ -437,6 +437,39 @@ def ExeName(env, exePath):
     return os.path.join(dirpath, pre+name+suf)
 
 
+def GetPathRevision(path, asInt):
+    """Use svnversion to get the revision number of the given path.
+    
+    If asInt is set, then return the highest complete revision number in the string.
+    Returns a pair (revision, is_locally_modified).
+    """
+    version_pipe = os.popen("svnversion " + path)
+    revision = version_pipe.read().strip()
+    if version_pipe.close():
+        revision = 'Unknown'
+        modified = False
+    else:
+        modified = revision[-1] in 'MSP'
+    if asInt:
+        try:
+            # Extract upper end of range, and store modified flag
+            while revision[-1] in 'MSP':
+                revision = revision[:-1]
+            revision = int(revision[1+revision.rfind(':'):])
+        except:
+            revision = 'UINT_MAX'
+    return (revision, modified)
+
+def GetProjectVersions(projectsRoot):
+    """Return C++ code filling in the project versions map."""
+    code = ""
+    for entry in sorted(os.listdir(projectsRoot)):
+        entry_path = os.path.join(projectsRoot, entry)
+        if entry[0] != '.' and os.path.isdir(entry_path):
+            revision, _ = GetPathRevision(entry_path, False)
+            code += '%sversions["%s"] = "%s";\n' % (' '*8, entry, revision)
+    return code
+
 def GetVersionCpp(templateFilePath, env):
     """Return the contents of the Version.cpp source file."""
     chaste_root = Dir('#').abspath
@@ -447,16 +480,7 @@ def GetVersionCpp(templateFilePath, env):
         full_version = open(version_file).read().strip()
         chaste_revision = int(full_version[1+full_version.rfind('.'):])
     else:
-        version_pipe = os.popen("svnversion " + chaste_root)
-        chaste_revision = version_pipe.read().strip()
-        if version_pipe.close():
-            chaste_revision = 'UINT_MAX'
-        else:
-            # Extract upper end of range, and store modified flag
-            while chaste_revision[-1] in 'MSP':
-                wc_modified = True
-                chaste_revision = chaste_revision[:-1]
-            chaste_revision = int(chaste_revision[1+chaste_revision.rfind(':'):])
+        chaste_revision, wc_modified = GetPathRevision(chaste_root, True)
     time_format = "%a, %d %b %Y %H:%M:%S +0000"
     build_time = time.strftime(time_format, time.gmtime())
     compiler_type = env['build'].CompilerType()
@@ -479,6 +503,7 @@ def GetVersionCpp(templateFilePath, env):
              'chaste_root': chaste_root,
              'revision': chaste_revision,
              'wc_modified': str(wc_modified).lower(),
+             'project_versions': GetProjectVersions(os.path.join(chaste_root, 'projects')),
              'licence': licence,
              'time_format': time_format,
              'time_size': len(build_time)+1,
