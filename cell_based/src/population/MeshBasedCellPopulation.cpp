@@ -958,7 +958,9 @@ void MeshBasedCellPopulation<2>::CreateVoronoiTessellation()
 
     mpVoronoiTessellation = new VertexMesh<2, 2>(static_cast<MutableMesh<2, 2> &>((this->mrMesh)), is_mesh_periodic);
 }
-
+/**
+ *
+ */
 template<>
 void MeshBasedCellPopulation<2,3>::CreateVoronoiTessellation()
 {
