@@ -102,6 +102,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /*
+ * HOW_TO_TAG Continuum Mechanics
+ * Solve nonlinear elasticity problems
+ */
+
+/*
  *
  * == Simple incompressible deformation: 2D shape hanging under gravity ==
  *

@@ -73,6 +73,12 @@ c_vector<double,2> MyTraction(c_vector<double,2>& rX, double time)
     return traction;
 }
 
+/*
+ * HOW_TO_TAG Continuum Mechanics
+ * Specify more complicated boundary conditions in elasticity problems
+ */
+
+
 class TestSolvingMoreElasticityProblemsTutorials : public CxxTest::TestSuite
 {
 public:

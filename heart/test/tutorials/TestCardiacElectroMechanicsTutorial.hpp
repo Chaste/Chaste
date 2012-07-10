@@ -115,6 +115,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileFinder.hpp"
 
 /*
+ * HOW_TO_TAG Cardiac/Electro-mechanics
+ * Run basic electro-mechanics simulations; specify different models, boundary conditions, fibres
+ */
+
+/*
  * == IMPORTANT: using HYPRE ==
  *
  * Mechanics solves being nonlinear are expensive, so it is recommended you also use `build=GccOpt_ndebug` (when running scons)
@@ -198,6 +203,9 @@ public:
          * Mtlab-readable files, and a cmgui output directory. The latter has a script for automatically loading
          * all the results.
          *
+         * HOW_TO_TAG Cardiac/Electro-mechanics
+         * Visualise results in cmgui (very brief description)
+         *
          * Visualise the results by calling `cmgui LoadSolutions.com` in the directory
          * `TestCardiacElectroMechanicsExample/deformation/cmgui` . The electrics data can be visualised on the
          * deforming mesh by using the Scene and Spectrum Editors. (See cmgui website for information on how
@@ -268,12 +276,12 @@ public:
          * and call solve. The first template parameter (2) is the dimension of the space, the second one is the number of unknowns
          * in the electrics problem (1 for MONODOMAIN, 2 for BIDOMAIN)*/
         CardiacElectroMechanicsProblem<2,1> problem(INCOMPRESSIBLE,
-												  MONODOMAIN,
-                                                  &electrics_mesh,
-                                                  &mechanics_mesh,
-                                                  &cell_factory,
-                                                  &problem_defn,
-                                                  "TestCardiacElectroMechanicsExample2");
+                                                    MONODOMAIN,
+                                                    &electrics_mesh,
+                                                    &mechanics_mesh,
+                                                    &cell_factory,
+                                                    &problem_defn,
+                                                    "TestCardiacElectroMechanicsExample2");
 
         problem.Solve();
         /* Visualise as above.
@@ -414,13 +422,12 @@ public:
 
         /* Create the problem object */
         CardiacElectroMechanicsProblem<3,1> problem(COMPRESSIBLE,
-												  MONODOMAIN,
-                                                  &electrics_mesh,
-                                                  &mechanics_mesh,
-                                                  &cell_factory,
-                                                  &problem_defn,
-                                                  "TestCardiacElectroMech3dTwistingCube");
-
+                                                    MONODOMAIN,
+                                                    &electrics_mesh,
+                                                    &mechanics_mesh,
+                                                    &cell_factory,
+                                                    &problem_defn,
+                                                    "TestCardiacElectroMech3dTwistingCube");
 
 
         /* Now call `Solve`. This will take a while to run, so watch progress using the log file to estimate when

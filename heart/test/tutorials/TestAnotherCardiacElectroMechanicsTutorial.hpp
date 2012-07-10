@@ -46,6 +46,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTANOTHERCARDIACELECTROMECHANICSTUTORIAL_HPP_
 
 
+
+
 /*
  * = Cardiac Electro-mechanical Problems (cont.) =
  *
@@ -97,6 +99,11 @@ public:
 class TestAnotherCardiacElectroMechanicsTutorial : public CxxTest::TestSuite
 {
 public:
+    /*
+     * HOW_TO_TAG Cardiac/Electro-mechanics
+     * Run basic electro-mechanics with mechano-electric feedback
+     */
+
     /* == Mechano-electric feedback, and alternative boundary conditions ==
      *
      * Let us now run a simulation with mechano-electric feedback (MEF), and with different boundary conditions.
@@ -214,12 +221,12 @@ public:
         HeartConfig::Instance()->SetSimulationDuration(50.0);
 
         CardiacElectroMechanicsProblem<2,1> problem(INCOMPRESSIBLE,
-												  MONODOMAIN,
-                                                  &electrics_mesh,
-                                                  &mechanics_mesh,
-                                                  &cell_factory,
-                                                  &problem_defn,
-                                                  "TestCardiacElectroMechanicsWithMef");
+                                                    MONODOMAIN,
+                                                    &electrics_mesh,
+                                                    &mechanics_mesh,
+                                                    &cell_factory,
+                                                    &problem_defn,
+                                                    "TestCardiacElectroMechanicsWithMef");
         problem.Solve();
 
         /* Nothing exciting happens in the simulation as it is currently written. To get some interesting occurring,
@@ -260,6 +267,11 @@ public:
         }
         PetscTools::Destroy(voltage);
     }
+
+    /*
+     * HOW_TO_TAG Cardiac/Electro-mechanics
+     * Run basic electro-mechanics with inflation pressures
+     */
 
     /* == Internal pressures ==
      *
@@ -342,12 +354,12 @@ public:
         problem_defn.SetNumIncrementsForInitialDeformation(3);
 
         CardiacElectroMechanicsProblem<2,1> problem(COMPRESSIBLE,
-												  MONODOMAIN,
-                                                  &electrics_mesh,
-                                                  &mechanics_mesh,
-                                                  &cell_factory,
-                                                  &problem_defn,
-                                                  "TestAnnulusWithInternalPressure");
+                                                    MONODOMAIN,
+                                                    &electrics_mesh,
+                                                    &mechanics_mesh,
+                                                    &cell_factory,
+                                                    &problem_defn,
+                                                    "TestAnnulusWithInternalPressure");
 
         /* If we want stresses and strains output, we can do the following. The deformation gradients and 2nd PK stresses
          * for each element will be written at the requested times. This currently only works in sequential simulations. */

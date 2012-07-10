@@ -99,8 +99,6 @@ public:
         HeartConfig::Reset();
     }
 
-    // first test doesn't use matrix based assembly..
-    //
     // NOTE: This test uses NON-PHYSIOLOGICAL parameters values (conductivities,
     // surface-area-to-volume ratio, capacitance, stimulus amplitude). Essentially,
     // the equations have been divided through by the surface-area-to-volume ratio.
@@ -129,6 +127,9 @@ public:
         bidomain_problem.SetFixedExtracellularPotentialNodes(pinned_nodes);
         TS_ASSERT_THROWS_THIS( bidomain_problem.Solve(), "Fixed node number must be less than total number nodes" );
 
+        /* HOW_TO_TAG Cardiac/Problem definition
+         * Fix phi_e at particular nodes (note: this is not required)
+         */
         // Pin extracellular potential of node 100 to 0
         pinned_nodes.clear();
         pinned_nodes.push_back(100);
@@ -420,11 +421,6 @@ public:
     }
 
 
-
-    /* HOW_TO_TAG Cardiac/Output
-     * Only output data for particular nodes
-     */
-
     ///////////////////////////////////////////////////////////////////
     // Solve a simple simulation and check the output was only
     // printed out at the correct times
@@ -444,6 +440,10 @@ public:
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
         BidomainProblem<1>* p_bidomain_problem = new BidomainProblem<1>( &cell_factory );
 
+
+        /* HOW_TO_TAG Cardiac/Output
+         * Only output data for particular nodes
+         */
         //Restrict the number of nodes
         std::vector<unsigned> nodes_to_be_output;
         nodes_to_be_output.push_back(0);
