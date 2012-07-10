@@ -58,6 +58,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM>
 class CompressibleExponentialLaw : public AbstractCompressibleMaterialLaw<DIM>
 {
+friend class TestCompressibleLawTransverselyIsotropic; // note: this law is not transversely isotropic with the default parameters
+
 private:
 
     /** Parameter a. (kPa) */
