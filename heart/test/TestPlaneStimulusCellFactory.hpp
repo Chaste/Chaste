@@ -136,7 +136,7 @@ public:
         {
             double x = mesh.GetNode(index)->rGetLocation()[0];
             TS_ASSERT_EQUALS(info.CalculateRelativeWallPosition(index),(5.0-x)/5.0);
-            TS_ASSERT_EQUALS(info.CalculateRelativeWallPosition(index),p_info_from_cell_factory->CalculateRelativeWallPosition(index));
+            TS_ASSERT_DELTA(info.CalculateRelativeWallPosition(index),p_info_from_cell_factory->CalculateRelativeWallPosition(index), 1e-15);
             TS_ASSERT_EQUALS(info.rGetDistanceMapEpicardium()[index],x);
             TS_ASSERT_EQUALS(info.rGetDistanceMapEpicardium()[index],p_info_from_cell_factory->rGetDistanceMapEpicardium()[index]);
             TS_ASSERT_EQUALS(info.rGetDistanceMapEndocardium()[index],(5.0-x));

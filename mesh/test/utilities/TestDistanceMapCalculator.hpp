@@ -156,7 +156,7 @@ public:
             //If they differ, then allow the in-mesh distance to be in between
             double error_bound = (manhattan_distance - euclidean_distance)/2.0;
             //If they don't differ, then we expect the in-mesh distance to be similar
-            if (error_bound == 0.0)
+            if (error_bound < 1e-15)
             {
                 error_bound = 1e-15;
             }

@@ -541,10 +541,9 @@ public:
 
         NumericFileComparison comp_ele(results_dir + "/results.vizelements", "crypt/test/data/Crypt2DCylindricalMultipleDivisions/results.vizelements");
         TS_ASSERT(comp_ele.CompareFiles());
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "/results.vizelements crypt/test/data/Crypt2DCylindricalMultipleDivisions/results.vizelements").c_str()), 0);
-
+        
         NumericFileComparison comp_nodes(results_dir + "/results.viznodes", "crypt/test/data/Crypt2DCylindricalMultipleDivisions/results.viznodes");
-        TS_ASSERT(comp_nodes.CompareFiles(1e-15));
+        TS_ASSERT(comp_nodes.CompareFiles(1e-13));
 
         NumericFileComparison comp_celltypes(results_dir + "/results.vizcelltypes", "crypt/test/data/Crypt2DCylindricalMultipleDivisions/results.vizcelltypes");
         TS_ASSERT(comp_celltypes.CompareFiles(1e-15));
