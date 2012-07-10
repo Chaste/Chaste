@@ -70,14 +70,11 @@ void DeltaNotchOdeSystem::EvaluateYDerivatives(double time, const std::vector<do
 {
     double notch = rY[0];
     double delta = rY[1];
-    double mean_delta = this->GetParameter("Mean Delta");
+    double mean_delta = this->mParameters[0]; // Shorthand for "this->mParameter("Mean Delta");"
 
     // The next two lines define the ODE system by Collier et al. (1996)
-    double dx1 = mean_delta*mean_delta/(0.01 + mean_delta*mean_delta) - notch;
-    double dx2 = 1.0/(1.0 + 100.0*notch*notch) - delta;
-
-    rDY[0] = dx1;
-    rDY[1] = dx2;
+    rDY[0] = mean_delta*mean_delta/(0.01 + mean_delta*mean_delta) - notch;  // d[Notch]/dt
+    rDY[1] = 1.0/(1.0 + 100.0*notch*notch) - delta;                   // d[Delta]/dt
 }
 
 template<>
@@ -91,6 +88,8 @@ void CellwiseOdeSystemInformation<DeltaNotchOdeSystem>::Initialise()
     this->mVariableUnits.push_back("non-dim");
     this->mInitialConditions.push_back(0.0); // will be filled in later
 
+    // If this is ever not the first parameter change the line
+    // double mean_delta = this->mParameters[0]; in EvaluateYDerivatives().
     this->mParameterNames.push_back("Mean Delta");
     this->mParameterUnits.push_back("non-dim");
 

@@ -196,7 +196,7 @@ public :
      * @param outputDirectory the output directory
      */
     CardiacElectroMechanicsProblem(CompressibilityType compressibilityType,
-								   ElectricsProblemType electricsProblemType,
+                                   ElectricsProblemType electricsProblemType,
                                    TetrahedralMesh<DIM,DIM>* pElectricsMesh,
                                    QuadraticMesh<DIM>* pMechanicsMesh,
                                    AbstractCardiacCellFactory<DIM>* pCellFactory,
