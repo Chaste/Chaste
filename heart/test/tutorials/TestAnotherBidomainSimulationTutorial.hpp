@@ -135,6 +135,7 @@ public:
 
         /* HOW_TO_TAG Cardiac/Problem definition
          * Specify output formats (for different visualisers)
+         */
 
         /* The output will be written to /tmp/USER_NAME/testoutput/BidomainTutorial
          * in hdf5 format, and converted to meshalyzer format at the end of the simulation.
