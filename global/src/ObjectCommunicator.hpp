@@ -108,7 +108,11 @@ public:
         MPI_Recv(&recv_string, string_length, MPI_CHAR, sourceProcess , tag, PETSC_COMM_WORLD, &status);
 
         // Make it into a string
-        std::string rcv_msg(recv_string);
+        std::string rcv_msg;
+        for(unsigned i=0; i<string_length; i++)
+        {
+            rcv_msg.push_back(recv_string[i]);
+        }
 
         // Save
         std::stringstream ss;
