@@ -100,6 +100,10 @@ class TestMonodomain3dExample : public CxxTest::TestSuite
 public:
     void TestMonodomain3d() throw(Exception)
     {
+        /* HOW_TO_TAG Cardiac/Problem definition
+         * Generate a slab (cuboid) mesh rather than read a mesh in, and pass it to solver
+         */
+
         /* We will auto-generate a mesh this time, and pass it in, rather than
          * provide a mesh file name. This is how to generate a cuboid mesh with
          * a given spatial stepsize h */

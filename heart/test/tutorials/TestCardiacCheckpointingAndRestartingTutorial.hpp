@@ -45,6 +45,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #ifndef TESTCARDIACCHECKPOINTINGANDRESTARTINGTUTORIAL_HPP_
 #define TESTCARDIACCHECKPOINTINGANDRESTARTINGTUTORIAL_HPP_
+
+/* HOW_TO_TAG Cardiac/Problem definition
+ * Save ('checkpoint') and reload simulations
+
 /*
  * = Checkpointing and restarting cardiac simulations =
  *
@@ -120,9 +124,9 @@ public:
 
 /* == Notes ==
  *
- * * Note that making a checkpoint does add a significant overhead at present, in particular because the mesh is
+ * * Making a checkpoint does add a significant overhead at present, in particular because the mesh is
  *   written out to disk at each checkpoint. This is to ensure that each checkpoint directory contains everything
- *   needed to resume the simulation. Note that the mesh written out will be in permuted form if it was
+ *   needed to resume the simulation. The mesh written out will be in permuted form if it was
  *   partitioned for a parallel simulation.
  * * Meshes written in checkpoints use a binary form of the Triangle/Tetgen mesh format. This makes checkpoints
  *   significantly smaller but will cause portability problems if checkpoints are moved between little-endian systems

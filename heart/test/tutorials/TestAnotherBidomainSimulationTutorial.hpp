@@ -87,6 +87,9 @@ public:
         HeartConfig::Instance()->SetOutputDirectory("BidomainFibresTutorial");
         HeartConfig::Instance()->SetOutputFilenamePrefix("results");
 
+        /* HOW_TO_TAG Cardiac/Problem definition
+         * Specify fibre directions
+         */
         /* Define a mesh to be read, saying that we also want to read fibres. The extra part can either be
          * `cp::media_type::Orthotropic`, in which case `2D_0_to_1mm_800_elements.ortho` will also be read;
          * or `cp::media_type::Axisymmetric`, in which case `2D_0_to_1mm_800_elements.axi` will also be read.
@@ -129,6 +132,9 @@ public:
         double scale = 2;
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75*scale, 0.19*scale));
         HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(7.0*scale, 2.4*scale));
+
+        /* HOW_TO_TAG Cardiac/Problem definition
+         * Specify output formats (for different visualisers)
 
         /* The output will be written to /tmp/USER_NAME/testoutput/BidomainTutorial
          * in hdf5 format, and converted to meshalyzer format at the end of the simulation.

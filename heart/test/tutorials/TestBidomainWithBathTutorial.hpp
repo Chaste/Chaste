@@ -43,6 +43,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #ifndef TESTBIDOMAINWITHBATHTUTORIAL_HPP_
 #define TESTBIDOMAINWITHBATHTUTORIAL_HPP_
+
+/* HOW_TO_TAG Cardiac/Problem definition
+ * Run bidomain simulations with a perfusing bath, and apply shocks using electrodes
+ */
+
 /*
  * = An example showing how to run a bidomain simulation for tissue contained in a perfusing bath =
  *

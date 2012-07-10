@@ -57,6 +57,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 typedef Hdf5ToCmguiConverter<3,3> CMGUI_3D;
 typedef Hdf5ToMeshalyzerConverter<3,3> MESHA_3D;
 
+/* HOW_TO_TAG Cardiac/Post-processing
+ * Convert already generated simulation results to any of the visualiser formats
+ */
+
 class TestHdf5ToVisualizerConverters : public CxxTest::TestSuite
 {
 private:

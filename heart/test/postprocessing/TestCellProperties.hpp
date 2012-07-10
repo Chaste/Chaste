@@ -52,7 +52,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ColumnDataReader.hpp"
 
 
-
+/* HOW_TO_TAG Cardiac/Post-processing
+ * Compute action potential properties (APD50, APD90, max upstroke velocities, etc) given voltage traces.
+ */
 class TestCellProperties : public CxxTest::TestSuite
 {
 private:

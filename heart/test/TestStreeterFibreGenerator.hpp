@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 
 /*
- * HOW_TO_TAG Cardiac/Problem Definition
+ * HOW_TO_TAG Cardiac/Problem definition
  * Generate fibre field definitions for cardiac geometries using a mathematical rule approach
  *
  */

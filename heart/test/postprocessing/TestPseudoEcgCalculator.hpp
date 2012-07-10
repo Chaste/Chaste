@@ -54,6 +54,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 #include "FileComparison.hpp"
 
+/* HOW_TO_TAG Cardiac/Post-processing
+ * Compute pseudo-ECGs
+ */
 class TestPseudoEcgCalculator : public CxxTest::TestSuite
 {
 
