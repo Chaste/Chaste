@@ -102,7 +102,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /*
- * HOW_TO_TAG Continuum Mechanics
+ * HOW_TO_TAG Continuum mechanics
  * Solve nonlinear elasticity problems
  */
 

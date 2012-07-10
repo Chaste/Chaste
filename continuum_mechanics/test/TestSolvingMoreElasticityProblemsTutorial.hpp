@@ -74,7 +74,7 @@ c_vector<double,2> MyTraction(c_vector<double,2>& rX, double time)
 }
 
 /*
- * HOW_TO_TAG Continuum Mechanics
+ * HOW_TO_TAG Continuum mechanics
  * Specify more complicated boundary conditions in elasticity problems
  */
 
