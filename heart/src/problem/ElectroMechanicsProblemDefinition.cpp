@@ -100,10 +100,10 @@ void ElectroMechanicsProblemDefinition<DIM>::SetMechanicsSolveTimestep(double ti
 }
 
 template<unsigned DIM>
-void ElectroMechanicsProblemDefinition<DIM>::SetVariableFibreSheetDirectionsFile(std::string fibreSheetDirectionsFile, bool definedPerQuadraturePoint)
+void ElectroMechanicsProblemDefinition<DIM>::SetVariableFibreSheetDirectionsFile(const FileFinder& rFibreSheetDirectionsFile, bool definedPerQuadraturePoint)
 {
     mReadFibreSheetInformationFromFile = true;
-    mFibreSheetDirectionsFile = fibreSheetDirectionsFile;
+    mFibreSheetDirectionsFile = rFibreSheetDirectionsFile;
     mFibreSheetDirectionsDefinedPerQuadraturePoint = definedPerQuadraturePoint;
 }
 

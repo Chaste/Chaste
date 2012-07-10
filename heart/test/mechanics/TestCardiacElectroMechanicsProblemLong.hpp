@@ -98,7 +98,9 @@ public:
         problem_defn.SetUseDefaultCardiacMaterialLaw(INCOMPRESSIBLE);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
         problem_defn.SetMechanicsSolveTimestep(1.0);
-        problem_defn.SetVariableFibreSheetDirectionsFile("heart/test/data/fibre_tests/5by5mesh_curving_fibres.ortho", false);
+
+        FileFinder finder("heart/test/data/fibre_tests/5by5mesh_curving_fibres.ortho",RelativeTo::ChasteSourceRoot);
+        problem_defn.SetVariableFibreSheetDirectionsFile(finder, false);
 
         HeartConfig::Instance()->SetSimulationDuration(125.0);
 
@@ -202,7 +204,8 @@ public:
         problem_defn.SetUseDefaultCardiacMaterialLaw(INCOMPRESSIBLE);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
         problem_defn.SetMechanicsSolveTimestep(1.0);
-        problem_defn.SetVariableFibreSheetDirectionsFile("heart/test/data/fibre_tests/5by5by5_fibres_by_quadpt.orthoquad", true);
+        FileFinder finder("heart/test/data/fibre_tests/5by5by5_fibres_by_quadpt.orthoquad",RelativeTo::ChasteSourceRoot);
+        problem_defn.SetVariableFibreSheetDirectionsFile(finder, true);
 
         CardiacElectroMechanicsProblem<3,1> problem(INCOMPRESSIBLE,
 												  MONODOMAIN,
@@ -364,7 +367,8 @@ public:
         std::vector<c_vector<double,3> > r_deformed_position_fibres_alongX;
         {
             HeartConfig::Instance()->SetSimulationDuration(20.0);
-            problem_defn.SetVariableFibreSheetDirectionsFile("heart/test/data/fibre_tests/alongX.ortho", false);
+            FileFinder finder("heart/test/data/fibre_tests/alongX.ortho", RelativeTo::ChasteSourceRoot);
+            problem_defn.SetVariableFibreSheetDirectionsFile(finder, false);
 
             CardiacElectroMechanicsProblem<3,1> problem(COMPRESSIBLE,
 													  MONODOMAIN,
@@ -408,7 +412,8 @@ public:
         std::vector<c_vector<double,3> > r_deformed_position_fibres_alongY1;
         {
             HeartConfig::Instance()->SetSimulationDuration(20.0);
-            problem_defn.SetVariableFibreSheetDirectionsFile("heart/test/data/fibre_tests/alongY1.ortho", false);
+            FileFinder finder("heart/test/data/fibre_tests/alongY1.ortho", RelativeTo::ChasteSourceRoot);
+            problem_defn.SetVariableFibreSheetDirectionsFile(finder, false);
 
             CardiacElectroMechanicsProblem<3,1> problem(COMPRESSIBLE,
 													  MONODOMAIN,
@@ -471,7 +476,8 @@ public:
         std::vector<c_vector<double,3> > r_deformed_position_fibres_alongZ;
         {
             HeartConfig::Instance()->SetSimulationDuration(20.0);
-            problem_defn.SetVariableFibreSheetDirectionsFile("heart/test/data/fibre_tests/alongZ.ortho", false);
+            FileFinder finder("heart/test/data/fibre_tests/alongZ.ortho", RelativeTo::ChasteSourceRoot);
+            problem_defn.SetVariableFibreSheetDirectionsFile(finder, false);
 
             CardiacElectroMechanicsProblem<3,1> problem(COMPRESSIBLE,
 													  MONODOMAIN,

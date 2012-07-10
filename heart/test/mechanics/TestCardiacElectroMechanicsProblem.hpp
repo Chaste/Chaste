@@ -334,7 +334,8 @@ public:
         problem_defn.SetMechanicsSolveTimestep(1.0);
 
         // coverage, this file is just X-direction fibres
-        problem_defn.SetVariableFibreSheetDirectionsFile("heart/test/data/fibre_tests/2by2mesh_fibres.ortho", false);
+        FileFinder fibre_file("heart/test/data/fibre_tests/2by2mesh_fibres.ortho", RelativeTo::ChasteSourceRoot);
+        problem_defn.SetVariableFibreSheetDirectionsFile(fibre_file, false);
 
         HeartConfig::Instance()->SetSimulationDuration(10.0);
 

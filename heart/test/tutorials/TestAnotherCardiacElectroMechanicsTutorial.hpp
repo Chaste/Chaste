@@ -64,6 +64,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NobleVargheseKohlNoble1998WithSac.hpp"
 #include "Hdf5ToMeshalyzerConverter.hpp"
 #include "ZeroStimulusCellFactory.hpp"
+#include "FileFinder.hpp"
 
 /* A cell factory used in one of the tests */
 class PointStimulus2dCellFactory : public AbstractCardiacCellFactory<2>
@@ -301,7 +302,8 @@ public:
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
         problem_defn.SetMechanicsSolveTimestep(1.0);
 
-        problem_defn.SetVariableFibreSheetDirectionsFile("heart/test/data/fibre_tests/circular_annulus_960_elements.ortho", false);
+        FileFinder finder("heart/test/data/fibre_tests/circular_annulus_960_elements.ortho",RelativeTo::ChasteSourceRoot);
+        problem_defn.SetVariableFibreSheetDirectionsFile(finder, false);
 
         /* The elasticity solvers have two nonlinear solvers implemented, one hand-coded and one which uses PETSc's SNES
          * solver. The latter is not the default but can be more robust (and will probably be the default in later

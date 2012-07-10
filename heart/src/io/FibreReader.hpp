@@ -102,7 +102,7 @@ public:
      * @param rFileFinder  the path to the fibre direction file
      * @param fibreFileType AXISYM or ORTHO depending on type of file to be read
      */
-    FibreReader(FileFinder& rFileFinder, FibreFileType fibreFileType);
+    FibreReader(const FileFinder& rFileFinder, FibreFileType fibreFileType);
 
     /**
      *  Destructor closes file.

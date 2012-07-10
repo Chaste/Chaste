@@ -126,7 +126,8 @@ public:
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
         problem_defn.SetMechanicsSolveTimestep(1.0);
 
-        problem_defn.SetVariableFibreSheetDirectionsFile("heart/test/data/fibre_tests/circular_annulus_960_elements.ortho", false);
+        FileFinder finder("heart/test/data/fibre_tests/circular_annulus_960_elements.ortho", RelativeTo::ChasteSourceRoot);
+        problem_defn.SetVariableFibreSheetDirectionsFile(finder, false);
 
         // The snes solver seems more robust...
         problem_defn.SetSolveUsingSnes();
@@ -220,7 +221,8 @@ public:
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
         problem_defn.SetMechanicsSolveTimestep(1.0);
 
-        problem_defn.SetVariableFibreSheetDirectionsFile("heart/test/data/fibre_tests/circular_annulus_960_elements.ortho", false);
+        FileFinder finder("heart/test/data/fibre_tests/circular_annulus_960_elements.ortho", RelativeTo::ChasteSourceRoot);
+        problem_defn.SetVariableFibreSheetDirectionsFile(finder, false);
 
         // The snes solver seems more robust...
         problem_defn.SetSolveUsingSnes();

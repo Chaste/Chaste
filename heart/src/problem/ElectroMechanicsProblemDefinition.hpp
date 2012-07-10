@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ContractionModelName.hpp"
 #include "NashHunterPoleZeroLaw.hpp"
 #include "CompressibleExponentialLaw.hpp"
+#include "FileFinder.hpp"
 
 /**
  *  Subclass of SolidMechanicsProblemDefinition with some cardiac-electro-mechanics-specific
@@ -86,7 +87,7 @@ private:
      * .ortho/.orthoquad file from which to read element-wise, or quadrature-point-wise
      * fibre-sheet-normal-directions
      */
-    std::string mFibreSheetDirectionsFile;
+    FileFinder mFibreSheetDirectionsFile;
 
     /**
      * Whether the mFibreSheetDirectionsFile file gives the fibre-sheet info for each element
@@ -175,7 +176,7 @@ public:
      *  @param definedPerQuadPoint whether the fibre-sheet definitions are for each quadrature point in the mesh
      *   (if not, one for each element is assumed).
      */
-    void SetVariableFibreSheetDirectionsFile(std::string fibreSheetDirectionsFile, bool definedPerQuadPoint);
+    void SetVariableFibreSheetDirectionsFile(const FileFinder& rFibreSheetDirectionsFile, bool definedPerQuadPoint);
 
 
     /**
@@ -234,10 +235,10 @@ public:
     /**
      *  Get the fibre-sheet file (should only be called if ReadFibreSheetDirectionsFromFile() returns true).
      */
-    std::string GetFibreSheetDirectionsFile()
+    FileFinder GetFibreSheetDirectionsFile()
     {
         assert(mReadFibreSheetInformationFromFile);
-        assert(mFibreSheetDirectionsFile!="");
+        assert(mFibreSheetDirectionsFile.GetAbsolutePath()!="");
         return mFibreSheetDirectionsFile;
     }
 

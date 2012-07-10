@@ -112,6 +112,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Hdf5ToMeshalyzerConverter.hpp"
 #include "ZeroStimulusCellFactory.hpp"
 #include "FileComparison.hpp"
+#include "FileFinder.hpp"
 
 /*
  * == IMPORTANT: using HYPRE ==
@@ -404,10 +405,12 @@ public:
         p_file2->close();
 
 
-        /* In user code you could now copy the files from CHASTE_TEST_OUTPUT into the main Chaste directory (eg by doing
-         * `system("cp ...");`). These fibre files have already been copied into the repository. Let's load the `.orthoquad` file.
+        /*
+         * We use the `FileFinder` class to identify locations of files.
+         * `OutputFileHandler` has a handy method called `FindFile()` which returns a `FileFinder` to a file in the folder it points to.
          */
-        problem_defn.SetVariableFibreSheetDirectionsFile("heart/test/data/fibre_tests/5by5by5_fibres.orthoquad", true);
+        FileFinder finder = handler.FindFile("5by5by5_fibres.orthoquad");
+        problem_defn.SetVariableFibreSheetDirectionsFile(finder, true);
 
         /* Create the problem object */
         CardiacElectroMechanicsProblem<3,1> problem(COMPRESSIBLE,

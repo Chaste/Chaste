@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 
 template<unsigned DIM>
-FibreReader<DIM>::FibreReader(FileFinder& rFileFinder, FibreFileType fibreFileType)
+FibreReader<DIM>::FibreReader(const FileFinder& rFileFinder, FibreFileType fibreFileType)
    : mFileIsBinary(false), // overwritten by ReadNumLinesOfDataFromFile() if applicable.
      mNextIndex(0u)
 {

@@ -235,7 +235,8 @@ public:
         problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, -1.0);
         problem_defn.SetNumIncrementsForInitialDeformation(7);
 
-        problem_defn.SetVariableFibreSheetDirectionsFile("heart/test/data/fibre_tests/ellipsoid_8225_elements.ortho", false);
+        FileFinder finder("heart/test/data/fibre_tests/ellipsoid_8225_elements.ortho",RelativeTo::ChasteSourceRoot);
+        problem_defn.SetVariableFibreSheetDirectionsFile(finder, false);
 
 
 

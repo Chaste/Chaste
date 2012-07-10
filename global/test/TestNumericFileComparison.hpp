@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTNUMERICFILECOMPARISON_HPP_
 
 #include <cxxtest/TestSuite.h>
-#include "OutputFileHandler.hpp"
 #include "NumericFileComparison.hpp"
 
 class TestNumericFileComparison : public CxxTest::TestSuite

@@ -84,14 +84,16 @@ public:
         TS_ASSERT_EQUALS(problem_defn.GetDeformationAffectsCellModels(), true);
 
         TS_ASSERT_EQUALS(problem_defn.ReadFibreSheetDirectionsFromFile(), false);
-        problem_defn.SetVariableFibreSheetDirectionsFile("some_file.ortho", false);
+        FileFinder ortho_finder("some_file.ortho",RelativeTo::ChasteSourceRoot);
+        problem_defn.SetVariableFibreSheetDirectionsFile(ortho_finder, false);
         TS_ASSERT_EQUALS(problem_defn.ReadFibreSheetDirectionsFromFile(), true);
-        TS_ASSERT_EQUALS(problem_defn.GetFibreSheetDirectionsFile(), "some_file.ortho");
+        TS_ASSERT_EQUALS(problem_defn.GetFibreSheetDirectionsFile().GetLeafName(), "some_file.ortho");
         TS_ASSERT_EQUALS(problem_defn.GetFibreSheetDirectionsDefinedPerQuadraturePoint(), false);
 
-        problem_defn.SetVariableFibreSheetDirectionsFile("some_file.orthoquad", true);
+        FileFinder orthoquad_finder("some_file.orthoquad",RelativeTo::ChasteSourceRoot);
+        problem_defn.SetVariableFibreSheetDirectionsFile(orthoquad_finder, true);
         TS_ASSERT_EQUALS(problem_defn.ReadFibreSheetDirectionsFromFile(), true);
-        TS_ASSERT_EQUALS(problem_defn.GetFibreSheetDirectionsFile(), "some_file.orthoquad");
+        TS_ASSERT_EQUALS(problem_defn.GetFibreSheetDirectionsFile().GetLeafName(), "some_file.orthoquad");
         TS_ASSERT_EQUALS(problem_defn.GetFibreSheetDirectionsDefinedPerQuadraturePoint(), true);
 
         TS_ASSERT_EQUALS(problem_defn.GetNumIncrementsForInitialDeformation(), 1u);

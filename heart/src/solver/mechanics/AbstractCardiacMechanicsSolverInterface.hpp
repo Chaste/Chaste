@@ -102,12 +102,11 @@ public:
      *  In the first case, the file should be a .ortho file (ie each line has the fibre dir, sheet dir, normal dir
      *  for that element), in the second it should have .orthoquad as the format.
      *
-     *  @param orthoFile the file containing the fibre/sheet directions
+     *  @param rOrthoFile the file containing the fibre/sheet directions
      *  @param definedPerQuadraturePoint whether the fibre-sheet definitions are for each quadrature point in the mesh
      *   (if not, one for each element is assumed).
      */
-    virtual void SetVariableFibreSheetDirections(std::string orthoFile, bool definedPerQuadraturePoint)=0;
-
+    virtual void SetVariableFibreSheetDirections(const FileFinder& rOrthoFile, bool definedPerQuadraturePoint)=0;
 
 
     /**

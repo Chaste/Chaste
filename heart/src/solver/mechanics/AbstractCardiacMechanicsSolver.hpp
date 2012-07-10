@@ -269,13 +269,11 @@ public:
      *  In the first case, the file should be a .ortho file (ie each line has the fibre dir, sheet dir, normal dir
      *  for that element), in the second it should have .orthoquad as the format.
      *
-     *  @param orthoFile the file containing the fibre/sheet directions
+     *  @param rOrthoFile the file containing the fibre/sheet directions
      *  @param definedPerQuadraturePoint whether the fibre-sheet definitions are for each quadrature point in the mesh
      *   (if not, one for each element is assumed).
      */
-    void SetVariableFibreSheetDirections(std::string orthoFile, bool definedPerQuadraturePoint);
-
-
+    void SetVariableFibreSheetDirections(const FileFinder& rOrthoFile, bool definedPerQuadraturePoint);
 
     /**
      *  Set the intracellular Calcium concentrations and voltages at each quad point. Pure.
@@ -604,25 +602,26 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ComputeDeformationGr
 
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
-void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetVariableFibreSheetDirections(std::string orthoFile, bool definedPerQuadraturePoint)
+void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetVariableFibreSheetDirections(const FileFinder& rOrthoFile, bool definedPerQuadraturePoint)
 {
     mFibreSheetDirectionsDefinedByQuadraturePoint = definedPerQuadraturePoint;
 
-    FileFinder finder(orthoFile, RelativeTo::ChasteSourceRoot);
-    FibreReader<DIM> reader(finder, ORTHO);
+    FibreReader<DIM> reader(rOrthoFile, ORTHO);
 
     unsigned num_entries = reader.GetNumLinesOfData();
 
-    if(!mFibreSheetDirectionsDefinedByQuadraturePoint && (num_entries!=this->mrQuadMesh.GetNumElements()) )
+    if (!mFibreSheetDirectionsDefinedByQuadraturePoint && (num_entries!=this->mrQuadMesh.GetNumElements()) )
     {
-        EXCEPTION("Number of entries defined at top of file " << orthoFile << " does not match number of elements in the mesh, "
-           << "found " <<  num_entries << ", expected " << this->mrQuadMesh.GetNumElements());
+        EXCEPTION("Number of entries defined at top of file " << rOrthoFile.GetAbsolutePath() <<
+                  " does not match number of elements in the mesh, " << "found " <<  num_entries <<
+                  ", expected " << this->mrQuadMesh.GetNumElements());
     }
 
-    if(mFibreSheetDirectionsDefinedByQuadraturePoint && (num_entries!=mTotalQuadPoints) )
+    if (mFibreSheetDirectionsDefinedByQuadraturePoint && (num_entries!=mTotalQuadPoints) )
     {
-        EXCEPTION("Number of entries defined at top of file " << orthoFile << " does not match number of quadrature points defined, "
-           << "found " <<  num_entries << ", expected " << mTotalQuadPoints);
+        EXCEPTION("Number of entries defined at top of file " << rOrthoFile.GetAbsolutePath() <<
+                  " does not match number of quadrature points defined, " << "found " <<  num_entries <<
+                  ", expected " << mTotalQuadPoints);
     }
 
     mpVariableFibreSheetDirections = new std::vector<c_matrix<double,DIM,DIM> >(num_entries, zero_matrix<double>(DIM,DIM));

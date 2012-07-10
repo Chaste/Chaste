@@ -366,8 +366,11 @@ public:
             }
             else
             {
-                TS_ASSERT_THROWS_CONTAINS(solver.SetVariableFibreSheetDirections("heart/test/data/fibre_tests/badheader_4by4mesh_fibres.ortho", false), "found 32342, expected 32");
-                solver.SetVariableFibreSheetDirections("heart/test/data/fibre_tests/4by4mesh_fibres.ortho", false);
+                FileFinder bad_file("heart/test/data/fibre_tests/badheader_4by4mesh_fibres.ortho", RelativeTo::ChasteSourceRoot);
+                TS_ASSERT_THROWS_CONTAINS(solver.SetVariableFibreSheetDirections(bad_file, false),
+                                          "found 32342, expected 32");
+                FileFinder good_file("heart/test/data/fibre_tests/4by4mesh_fibres.ortho", RelativeTo::ChasteSourceRoot);
+                solver.SetVariableFibreSheetDirections(good_file, false);
             }
 
             QuadraturePointsGroup<2> quad_points(mesh, *(solver.GetQuadratureRule()));
@@ -577,8 +580,12 @@ public:
         ///////////////////////////////////////////////////////////////////////////
         solver.Initialise();
 
-        TS_ASSERT_THROWS_CONTAINS( solver.SetVariableFibreSheetDirections("heart/test/data/fibre_tests/badheader_4by4mesh_fibres.orthoquad", true), "found 45430, expected 288");
-        solver.SetVariableFibreSheetDirections("heart/test/data/fibre_tests/4by4mesh_fibres.orthoquad", true);
+        FileFinder bad_file("heart/test/data/fibre_tests/badheader_4by4mesh_fibres.orthoquad", RelativeTo::ChasteSourceRoot);
+        TS_ASSERT_THROWS_CONTAINS(solver.SetVariableFibreSheetDirections(bad_file, true),
+                                  "found 45430, expected 288");
+
+        FileFinder good_file("heart/test/data/fibre_tests/4by4mesh_fibres.orthoquad", RelativeTo::ChasteSourceRoot);
+        solver.SetVariableFibreSheetDirections(good_file, true);
 
         QuadraturePointsGroup<2> quad_points(mesh, *(solver.GetQuadratureRule()));
         std::vector<double> calcium_conc(solver.GetTotalNumQuadPoints());
