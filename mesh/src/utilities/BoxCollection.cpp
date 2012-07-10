@@ -34,7 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "BoxCollection.hpp"
 #include "Exception.hpp"
-
+#include "Debug.hpp"
 /////////////////////////////////////////////////////////////////////////////
 // Box methods
 /////////////////////////////////////////////////////////////////////////////
@@ -106,7 +106,7 @@ BoxCollection<DIM>::BoxCollection(double boxWidth, c_vector<double, 2*DIM> domai
 
     for (unsigned i=0; i<DIM; i++)
     {
-        mNumBoxesEachDirection(i) = floor((domainSize(2*i+1) - domainSize(2*i))/boxWidth) + 1;
+        mNumBoxesEachDirection(i) = floor((domainSize(2*i+1) - domainSize(2*i))/boxWidth + mFudge) + 1;
         num_boxes *= mNumBoxesEachDirection(i);
         coefficients.push_back(coefficients[i]*mNumBoxesEachDirection(i));
     }
@@ -188,7 +188,7 @@ unsigned BoxCollection<DIM>::CalculateContainingBox(c_vector<double, DIM>& rLoca
     c_vector<unsigned, DIM> containing_box_indices;
     for (unsigned i=0; i<DIM; i++)
     {
-        containing_box_indices[i] = (unsigned) floor((rLocation[i] - mDomainSize(2*i))/mBoxWidth);
+        containing_box_indices[i] = (unsigned) floor((rLocation[i] - mDomainSize(2*i) + mFudge)/mBoxWidth);
     }
 
     // Use these to compute the index of the containing box

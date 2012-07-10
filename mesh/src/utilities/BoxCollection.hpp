@@ -120,6 +120,9 @@ private:
 
     /** The boxes local (itself and nearest neighbour) to a given box. */
     std::vector< std::set<unsigned> > mLocalBoxes;
+    
+    /** A fudge (box swelling) factor to deal with 32-bit floating point issues. */
+    const static double mFudge = 5e-14;
 
 public:
 
