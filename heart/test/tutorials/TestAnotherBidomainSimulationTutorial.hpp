@@ -158,8 +158,6 @@ public:
         /* The results can now be visualised - the effect of the fibres changing direction at x=0.05
          * on the wave should be very clear.
          *
-         * EMPTYLINE
-         *
          * We described in the previous tutorial how to access the latest voltage vector using
          * `ReplicatableVector`, here we illustrate how to access the voltage values using the
          * {{{DistributedVector}}} class, which can be used to only iterate over the values
