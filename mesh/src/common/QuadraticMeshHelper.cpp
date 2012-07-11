@@ -112,31 +112,10 @@ void QuadraticMeshHelper<DIM>::AddInternalNodesToBoundaryElements(AbstractTetrah
         // If the data is on disk our job is easy
         if (pMeshReader->GetOrderOfBoundaryElements() == 2u)
         {
-            pMeshReader->Reset();
-            SeekToBoundaryElement(*pMeshReader, (*pMesh->GetBoundaryElementIteratorBegin())->GetIndex());
-
-            for (typename AbstractTetrahedralMesh<DIM,DIM>::BoundaryElementIterator iter
-                     = pMesh->GetBoundaryElementIteratorBegin();
-                 iter != pMesh->GetBoundaryElementIteratorEnd();
-                 ++iter)
-            {
-                std::vector<unsigned> nodes = pMeshReader->GetNextFaceData().NodeIndices;
-
-                if ( (*iter)->GetNumNodes()==DIM*(DIM+1)/2)
-                {
-                    //The Distributed mesh has constructed faces from the file already
-                    return;
-                    ///\todo #1930 but the Tet mesh hasn't...
-                }
-                assert((*iter)->GetNumNodes()==DIM); // so far just the vertices are in the boundary element
-                assert(nodes.size()==DIM*(DIM+1)/2); // check the reader has enough data
-
-                for (unsigned j=DIM; j<DIM*(DIM+1)/2; j++)
-                {
-                    Node<DIM> *p_internal_node = pMesh->GetNodeOrHaloNode(nodes[j]);
-                    AddNodeToBoundaryElement(pMesh, *iter, p_internal_node);
-                }
-            }
+            // The work should have been done in the linear constructor, but let's check
+            // that the first face has more than DIM nodes.
+            assert((*pMesh->GetBoundaryElementIteratorBegin())->GetNumNodes()==DIM*(DIM+1)/2);
+            return;
         }
         else
         {

@@ -248,63 +248,59 @@ public:
         }
 
     private:
-       friend class boost::iterator_core_access;
+        friend class boost::iterator_core_access;
 
-       /**
-        * Read the pointed-at item data (if we're pointing at anything) and cache it
-        * within the iterator, for use in dereference.
-        *
-        * @param index  the item to read
-        * @param firstRead  Set to true in the constructor.  This ensures that the line 0 is always read
-        */
-       void CacheData(unsigned index, bool firstRead = false);
+        /**
+         * Read the pointed-at item data (if we're pointing at anything) and cache it
+         * within the iterator, for use in dereference.
+         *
+         * @param index  the item to read
+         * @param firstRead  Set to true in the constructor.  This ensures that the line 0 is always read
+         */
+        void CacheData(unsigned index, bool firstRead = false);
 
-       /**
-        * Increment the iterator to point at the next item in the file.
-        */
-       void increment();
+        /**
+         * Increment the iterator to point at the next item in the file.
+         */
+        void increment();
 
-       /**
-        * Test whether two iterators point at the same item.
-        * @param rOther  the other iterator
-        */
-       bool equal(const ElementIterator& rOther) const
-       {
-           return mIndex == rOther.mIndex;
-       }
+        /**
+         * Test whether two iterators point at the same item.
+         * @param rOther  the other iterator
+         */
+        bool equal(const ElementIterator& rOther) const
+        {
+            return mIndex == rOther.mIndex;
+        }
 
-       /**
-        * Dereference this iterator to get the data for the item pointed at.
-        *
-        * Note that the returned reference is only valid for as long as this iterator
-        * is pointing at the item.
-        */
-       const ElementData& dereference() const
-       {
-           assert(mpReader);
-           assert(mIndex < mpReader->GetNumElements());
-           // This was cached in increment()
-           return mLastDataRead;
-       }
+        /**
+         * Dereference this iterator to get the data for the item pointed at.
+         *
+         * Note that the returned reference is only valid for as long as this iterator
+         * is pointing at the item.
+         */
+        const ElementData& dereference() const
+        {
+            assert(mpReader);
+            assert(mIndex < mpReader->GetNumElements());
+            // This was cached in increment()
+            return mLastDataRead;
+        }
 
-       /** The index of the item pointed at. */
-       unsigned mIndex;
+        /** The index of the item pointed at. */
+        unsigned mIndex;
 
-       /** The set which we're iterating over, if we are iterating over a subset of the items. */
-       const std::set<unsigned>* mpIndices;
+        /** The set which we're iterating over, if we are iterating over a subset of the items. */
+        const std::set<unsigned>* mpIndices;
 
-       /** Iterator over the indices in that subset. */
-       std::set<unsigned>::const_iterator mIndicesIterator;
+        /** Iterator over the indices in that subset. */
+        std::set<unsigned>::const_iterator mIndicesIterator;
 
+        /** The mesh reader we're iterating over. */
+        AbstractMeshReader* mpReader;
 
-
-       /** The mesh reader we're iterating over. */
-       AbstractMeshReader* mpReader;
-
-       /** Data for the last item read. */
-       ElementData mLastDataRead;
-
-
+        /** Data for the last item read. */
+        ElementData mLastDataRead;
     };
 
     /**
@@ -331,6 +327,144 @@ public:
      * Return an iterator to (one past the) end of the element data.
      */
     ElementIterator GetElementIteratorEnd();
+
+
+    /**
+     * An iterator class for node data.
+     */
+     
+    ///\todo #1930.  We could roll most iterator functionality into a base class here     
+    class NodeIterator : public boost::iterator_facade<NodeIterator, const std::vector<double>,
+                                                       boost::single_pass_traversal_tag>
+    {
+    public:
+        /**
+         * Default constructor for an iterator that doesn't point to anything.
+         */
+        NodeIterator()
+            : mIndex(UNSIGNED_UNSET),
+              mpIndices(NULL),
+              mpReader(NULL)
+        {
+        }
+
+        /**
+         * Constructor for pointing to a specific item.
+         *
+         * Note that, in the case of an ASCII mesh file, this will actually
+         * start wherever the file pointer currently is.  The user is responsible
+         * for resetting the reader prior to creating an iterator.
+         *
+         * @param index  the index of the item to point at
+         * @param pReader  the mesh reader to iterate over
+         */
+        explicit NodeIterator(unsigned index,
+                                 AbstractMeshReader* pReader)
+            : mIndex(index),
+              mpIndices(NULL),
+              mpReader(pReader)
+        {
+            CacheData(mIndex, true);
+        }
+
+        /**
+         * Constructor for iterating over a subset of the items in the mesh.
+         *
+         * @param rIndices  a set of item indices over which to iterate
+         * @param pReader  the mesh reader to iterate over
+         *
+         */
+        NodeIterator(const std::set<unsigned>& rIndices,
+                        AbstractMeshReader* pReader);
+
+        /**
+         * Get the index of the item pointed at.
+         */
+        unsigned GetIndex() const
+        {
+            return mIndex;
+        }
+
+    private:
+        friend class boost::iterator_core_access;
+
+        /**
+         * Read the pointed-at item data (if we're pointing at anything) and cache it
+         * within the iterator, for use in dereference.
+         *
+         * @param index  the item to read
+         * @param firstRead  Set to true in the constructor.  This ensures that the line 0 is always read
+         */
+        void CacheData(unsigned index, bool firstRead = false);
+
+        /**
+         * Increment the iterator to point at the next item in the file.
+         */
+        void increment();
+
+        /**
+         * Test whether two iterators point at the same item.
+         * @param rOther  the other iterator
+         */
+        bool equal(const NodeIterator& rOther) const
+        {
+            return mIndex == rOther.mIndex;
+        }
+
+        /**
+         * Dereference this iterator to get the data for the item pointed at.
+         *
+         * Note that the returned reference is only valid for as long as this iterator
+         * is pointing at the item.
+         */
+        const std::vector<double>& dereference() const
+        {
+            assert(mpReader);
+            assert(mIndex < mpReader->GetNumNodes());
+            // This was cached in increment()
+            return mLastDataRead;
+        }
+
+        /** The index of the item pointed at. */
+        unsigned mIndex;
+
+        /** The set which we're iterating over, if we are iterating over a subset of the items. */
+        const std::set<unsigned>* mpIndices;
+
+        /** Iterator over the indices in that subset. */
+        std::set<unsigned>::const_iterator mIndicesIterator;
+
+        /** The mesh reader we're iterating over. */
+        AbstractMeshReader* mpReader;
+
+        /** Data for the last item read. */
+        std::vector<double> mLastDataRead;
+    };
+
+    /**
+     * Return an iterator to the first node in the file.
+     *
+     * Note that, in the case of an ASCII mesh file, for efficiency this will actually
+     * start wherever the file pointer currently is.  The user is responsible
+     * for resetting the reader prior to calling GetNodeIteratorBegin().
+     */
+    NodeIterator GetNodeIteratorBegin();
+
+    /**
+     * Return an iterator over a set of nodes whose indices are given
+     *
+     * @param rIndices  subset of indices
+     *
+     * Note that, in the case of an ASCII mesh file, for efficiency this will actually
+     * start wherever the file pointer currently is.  The user is responsible
+     * for resetting the reader prior to calling GetNodeIteratorBegin().
+     */
+    NodeIterator GetNodeIteratorBegin(const std::set<unsigned>& rIndices);
+
+    /**
+     * Return an iterator to (one past the) end of the node data.
+     */
+    NodeIterator GetNodeIteratorEnd();
 };
 
 #endif //_ABSTRACTMESHREADER_HPP_

@@ -246,6 +246,104 @@ void AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::ElementIterator::CacheData(unsi
     mIndex = index;
 }
 
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+typename AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::NodeIterator
+    AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNodeIteratorBegin()
+{
+    return NodeIterator(0u, this);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+typename AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::NodeIterator
+    AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNodeIteratorBegin(const std::set<unsigned>& rIndices)
+{
+    return NodeIterator(rIndices, this);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+typename AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::NodeIterator
+    AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNodeIteratorEnd()
+{
+    return NodeIterator(GetNumNodes(), this);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::NodeIterator::NodeIterator(const std::set<unsigned>& rIndices,
+                                                                             AbstractMeshReader* pReader)
+    : mpIndices(&rIndices),
+      mpReader(pReader)
+{
+    if (mpIndices->empty())
+    {
+        mIndex = mpReader->GetNumNodes();
+    }
+    else
+    {
+        mIndicesIterator = mpIndices->begin();
+        mIndex = 0;
+        CacheData(*mIndicesIterator, true);
+    }
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::NodeIterator::increment()
+{
+    unsigned next_index;
+    if (mpIndices)
+    {
+        // Iterating over a subset
+        ++mIndicesIterator;
+        if (mIndicesIterator != mpIndices->end())
+        {
+            next_index = *mIndicesIterator;
+        }
+        else
+        {
+            // The subset is complete so skip to the end of the items so that we can be
+            // compared to GetNodeIteratorEnd
+            next_index = mpReader->GetNumNodes();
+        }
+    }
+    else
+    {
+        // Iterating over all items
+        next_index = mIndex + 1;
+    }
+    CacheData(next_index);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::NodeIterator::CacheData(unsigned index, bool firstRead)
+{
+    assert(mpReader);
+    assert(mIndex < index || mIndex == 0u || index == mpReader->GetNumNodes());
+    if (index < mpReader->GetNumNodes())
+    {
+        if (mpReader->IsFileFormatBinary())
+        {
+            mLastDataRead = mpReader->GetNode(index);
+        }
+        else
+        {
+            if (firstRead)
+            {
+                assert(mIndex == 0u);
+                //ASCII at construction - do an initial read to make sure the line mIndex is read
+                mLastDataRead = mpReader->GetNextNode();
+            }
+            //ASCII generic case, where we might need to skip some unread items
+            while (mIndex < index)
+            {
+                mLastDataRead = mpReader->GetNextNode();
+                mIndex++;
+            }
+        }
+    }
+    mIndex = index;
+}
+
+
 /////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////////////

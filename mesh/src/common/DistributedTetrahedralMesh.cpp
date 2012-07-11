@@ -240,13 +240,17 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
 
     if ( rMeshReader.IsFileFormatBinary() )
     {
+        ///\todo #1930 We should use a reader set iterator for this bit now.
+        ///\todo #1730 and we should be able to combine ASCII branch
         std::vector<double> coords;
         // Binary : load only the nodes which are needed
-        for (std::set<unsigned>::const_iterator it=nodes_owned.begin(); it!=nodes_owned.end(); it++)
+        for (typename AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_it = rMeshReader.GetNodeIteratorBegin(nodes_owned);
+                      node_it != rMeshReader.GetNodeIteratorEnd();
+                      ++node_it)
         {
             //Loop over wholly-owned nodes
-            unsigned global_node_index = *it;
-            coords = rMeshReader.GetNode(global_node_index);
+            unsigned global_node_index = node_it.GetIndex();
+            coords = *node_it;
             RegisterNode(global_node_index);
             Node<SPACE_DIM>* p_node = new Node<SPACE_DIM>(global_node_index, coords, false);
 
@@ -259,11 +263,13 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
 
             this->mNodes.push_back(p_node);
         }
-        for (std::set<unsigned>::const_iterator it=halo_nodes_owned.begin(); it!=halo_nodes_owned.end(); it++)
+        for (typename AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_it = rMeshReader.GetNodeIteratorBegin(halo_nodes_owned);
+                      node_it != rMeshReader.GetNodeIteratorEnd();
+                      ++node_it)
         {
             //Loop over halo-owned nodes
-            unsigned global_node_index=*it;
-            coords = rMeshReader.GetNode(global_node_index);
+            unsigned global_node_index = node_it.GetIndex();
+            coords = *node_it;
             RegisterHaloNode(global_node_index);
             mHaloNodes.push_back(new Node<SPACE_DIM>(global_node_index, coords, false));
         }
@@ -271,6 +277,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
     else
     {
         // Ascii : Sequentially load all the nodes and store those owned (or halo-owned) by the process
+        ///\todo #1930 We should use a reader set iterator for this bit now.
         for (unsigned node_index=0; node_index < mTotalNumNodes; node_index++)
         {
             std::vector<double> coords;

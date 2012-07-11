@@ -561,6 +561,107 @@ public:
                 TS_ASSERT_DELTA(ascii_location[1],binary_location[1],1e-12);
                 TS_ASSERT_DELTA(ascii_location[2],binary_location[2],1e-12);
             }
+            
+            // Now with the ASCII node iterator
+            unsigned count = 0u;
+            mesh_reader_ascii.Reset();
+            mesh_reader.Reset();
+            for (AbstractMeshReader<3,3>::NodeIterator node_it = mesh_reader_ascii.GetNodeIteratorBegin();
+                    node_it != mesh_reader_ascii.GetNodeIteratorEnd();
+                    ++node_it)
+            {
+                TS_ASSERT_EQUALS(count, node_it.GetIndex());
+                binary_location = mesh_reader.GetNode(count);
+                ascii_location = *node_it;
+                TS_ASSERT_DELTA(ascii_location[0],binary_location[0],1e-12);
+                TS_ASSERT_DELTA(ascii_location[1],binary_location[1],1e-12);
+                TS_ASSERT_DELTA(ascii_location[2],binary_location[2],1e-12);
+                count++;
+            }
+            TS_ASSERT_EQUALS(count, mesh_reader.GetNumNodes());
+            // Now, again with the binary node iterator
+            count = 0u;
+            mesh_reader_ascii.Reset();
+            mesh_reader.Reset();
+            for (AbstractMeshReader<3,3>::NodeIterator node_it = mesh_reader.GetNodeIteratorBegin();
+                    node_it != mesh_reader.GetNodeIteratorEnd();
+                    ++node_it)
+            {
+                TS_ASSERT_EQUALS(count, node_it.GetIndex());
+                ascii_location = mesh_reader_ascii.GetNextNode();
+                binary_location = *node_it;
+                TS_ASSERT_DELTA(ascii_location[0],binary_location[0],1e-12);
+                TS_ASSERT_DELTA(ascii_location[1],binary_location[1],1e-12);
+                TS_ASSERT_DELTA(ascii_location[2],binary_location[2],1e-12);
+                count++;
+            }
+            TS_ASSERT_EQUALS(count, mesh_reader.GetNumNodes());
+
+            // Now we test iterating the binary mesh reader over a subset of nodes only
+            std::set<unsigned> even_indices;
+            for (unsigned i=0; i<mesh_reader.GetNumNodes(); i += 2)
+            {
+                even_indices.insert(i);
+            }
+            mesh_reader_ascii.Reset();
+            count = 0u;
+            for (AbstractMeshReader<3,3>::NodeIterator node_it = mesh_reader.GetNodeIteratorBegin(even_indices);
+                    node_it != mesh_reader.GetNodeIteratorEnd();
+                    ++node_it)
+            {
+                TS_ASSERT_EQUALS(count*2u, node_it.GetIndex());
+                count++;
+                binary_location = *node_it;
+                ascii_location = mesh_reader_ascii.GetNextNode();
+                TS_ASSERT_DELTA(ascii_location[0],binary_location[0],1e-12);
+                TS_ASSERT_DELTA(ascii_location[1],binary_location[1],1e-12);
+                TS_ASSERT_DELTA(ascii_location[2],binary_location[2],1e-12);
+                // Skip odd elements
+                if (count <= mesh_reader_ascii.GetNumNodes() / 2u)
+                {
+                    mesh_reader_ascii.GetNextNode();
+                }
+            }
+            TS_ASSERT_EQUALS(count, mesh_reader_ascii.GetNumNodes() / 2u + 1);
+
+            // Also test iterating the ASCII mesh reader over a subset of nodes only
+            std::set<unsigned> odd_indices;
+            for (unsigned i=1; i<mesh_reader.GetNumNodes(); i += 2)
+            {
+                odd_indices.insert(i);
+            }
+            mesh_reader_ascii.Reset();
+            mesh_reader.Reset();  //Because we aren't going to do random access for this part of the test
+            count = 0u;
+            for (AbstractMeshReader<3,3>::NodeIterator node_it = mesh_reader_ascii.GetNodeIteratorBegin(odd_indices);
+                    node_it != mesh_reader_ascii.GetNodeIteratorEnd();
+                    ++node_it)
+            {
+                TS_ASSERT_EQUALS(count*2+1, node_it.GetIndex());
+                count++;
+                ascii_location = *node_it;
+                // Skip even elements
+                mesh_reader.GetNextNode();
+                binary_location = mesh_reader.GetNextNode();
+                TS_ASSERT_DELTA(ascii_location[0],binary_location[0],1e-12);
+                TS_ASSERT_DELTA(ascii_location[1],binary_location[1],1e-12);
+                TS_ASSERT_DELTA(ascii_location[2],binary_location[2],1e-12);
+            }
+            TS_ASSERT_EQUALS(count, mesh_reader_ascii.GetNumNodes() / 2u);
+
+            // Also test iterating the ASCII mesh reader with empty set
+            std::set<unsigned> no_indices;
+            mesh_reader_ascii.Reset();
+            mesh_reader.Reset();  //Because we aren't going to do random access for this part of the test
+            count = 0u;
+            for (AbstractMeshReader<3,3>::NodeIterator node_it = mesh_reader_ascii.GetNodeIteratorBegin(no_indices);
+                    node_it != mesh_reader_ascii.GetNodeIteratorEnd();
+                    ++node_it)
+            {
+                count++;
+            }
+            TS_ASSERT_EQUALS(count, 0u);
+            
         }
 
         /*
@@ -595,7 +696,7 @@ public:
                 TS_ASSERT_EQUALS(ascii_node_indices.AttributeValue,binary_node_indices.AttributeValue);
             }
 
-            // Now test using the iterator for the ASCII mesh
+            // Now test using the iterators for the ASCII mesh
             mesh_reader_ascii.Reset();
             mesh_reader.Reset();
             unsigned count = 0u;
@@ -614,6 +715,7 @@ public:
                 TS_ASSERT_EQUALS(ascii_node_indices.AttributeValue,binary_node_indices.AttributeValue);
             }
             TS_ASSERT_EQUALS(count, mesh_reader.GetNumElements());
+
             // Now test using the iterator for the binary mesh
             mesh_reader_ascii.Reset();
             count = 0u;
