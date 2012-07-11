@@ -60,12 +60,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  and how to write solver classes which ''use'' assemblers to create and solve the FEM
  *  linear system.
  *
- *  EMPTYLINE
- *
  *  We will take as the test problem the heat equation, `u_t = u_{xx}`, with Dirichlet
  *  BCs `u = u*` on `Gamma1` and `du/dn = g` on `Gamma2`.
- *
- *  EMPTYLINE
  *
  *  We write a solver which uses an '''explicit''' time-discretisation (as opposed to the implicit
  *  discretisations used throughout the rest of the code). The FEM linear system that needs to be set up is
@@ -77,14 +73,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  ie `c_i = integral_over_Gamma2 (g * phi_i dS)`. (This can be compared with an
  *  implicit time-discretisation, for which we solve `(M - dt K) U^{n+1} = M U^{n} + c`).
  *
- *  EMPTYLINE
- *
  *  Let us call `M + dt*K` the 'RHS matrix'. We will write a solver, inheriting from
  *  `AbstractDynamicLinearPdeSolver`, which is going to ''use'' three assemblers: (i) an assembler of
  *  the mass matrix (already written); (ii) an assembler of the RHS matrix (we have to write this ourselves);
  *  and (iii) an assembler of surface term, c (already written).
- *
- *  EMPTYLINE
  *
  *  Firstly, include `AbstractFeVolumeIntegralAssembler` which the assembler we write will inherit from,
  *  and `AbstractDynamicLinearPdeSolver`, which the solver we write will inherit from.
@@ -106,8 +98,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* == Writing assemblers ==
  *
  * We need to write an assembler for setting up the matrix `M + dt K`.
- *
- * EMPTYLINE
  *
  * Any new assembler should inherit from `AbstractFeVolumeIntegralAssembler`, which deals with looping over
  * elements, looping over quadrature points, etc. Concrete classes need to provide the integrand for the matrix
@@ -173,8 +163,6 @@ public:
     }
 };
 /* That's the assembler written. The following solver class will show how to use it.
- *
- * EMPTYLINE
  *
  * == Writing the solver class ==
  *
@@ -266,8 +254,6 @@ public:
     }
 };
 /* That's all that needs to be written to write your own solver using the solver hierarchy
- *
- * EMPTYLINE
  *
  * = A test using the solver =
  *

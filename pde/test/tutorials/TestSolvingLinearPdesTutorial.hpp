@@ -44,6 +44,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTSOLVINGLINEARPDESTUTORIAL_HPP_
 #define TESTSOLVINGLINEARPDESTUTORIAL_HPP_
 
+/* HOW_TO_TAG Pde
+ * Define and solve linear elliptic or parabolic PDEs
+ */
+
 /*
  * = Examples showing how to solve linear elliptic and parabolic PDEs =
  *
@@ -86,8 +90,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * D is the diffusion tensor (2 0; 0 1) (ie D11=2, D12=D21=0, D22=1), on a square
  * domain, with boundary conditions u=0 on x=0 or y=0, and (D grad u).n = 0 on x=1 and y=1,
  * where n is the surface normal.
- *
- * EMPTYLINE
  *
  * We need to create a class representing the PDE we want to solve, which will be
  * passed into the solver. The PDE we are solving is of the type
@@ -211,13 +213,9 @@ public:
          * function, ''not'' something like du/dn=g(x). Hence the boundary condition we are specifying is
          * (D grad u).n = 0.
          *
-         * EMPTYLINE
-         *
          * '''Important note for 1D:''' This means that if we were solving 2u,,xx,,=f(x) in 1D, and
          * wanted to specify du/dx=1 on the LHS boundary, the Neumann boundary value we have to specify is
          * -2, as n=-1 (outward facing normal) so (D gradu).n = -2 when du/dx=1.
-         *
-         * EMPTYLINE
          *
          * To define Neumann bcs, we reuse the zero boundary condition object defined above, but apply it
          * at surface elements.  We loop over these using another iterator provided by the mesh class.
@@ -338,6 +336,12 @@ public:
         double dt = 0.01;
         solver.SetTimes(t_start, t_end);
         solver.SetTimeStep(dt);
+
+
+        /* HOW_TO_TAG Pde
+         * Output results to file for time-dependent PDE solvers
+         */
+
 
         /* When we call Solve() below we will just get the solution at the final time. If we want
          * to have intermediate solutions written to file, we do the following. We start by

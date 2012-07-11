@@ -49,6 +49,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTSOLVINGNONLINEARPDESTUTORIAL_HPP_
 #define TESTSOLVINGNONLINEARPDESTUTORIAL_HPP_
 
+/* HOW_TO_TAG Pde
+ * Define and solve nonlinear elliptic
+ */
+
+
 /*
  * = An example showing how to solve a nonlinear elliptic PDE. Also includes function-based boundary conditions. =
  *
@@ -57,16 +62,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * conditions u=0 on y=0; and Neumann boundary conditions: (u grad u).n = 0 on x=0 and x=1;
  * and (u grad u).n = y on y=1.
  *
- * EMPTYLINE
- *
  * For nonlinear PDEs, the finite element equations are of the form F(U)=0, where
  * U=(U,,1,, , ... , U,,N,,) is a vector of the unknowns at each node, and F is some
  * non-linear vector valued function. To solve this, a nonlinear solver is required.
  * Chaste can solve this with Newton's method, or (default) use PETSc's nonlinear solvers.
  * Solvers of such nonlinear problems usually require the Jacobian of the problem, i.e. the
  * matrix A = dF/dU, or at least an approximation of the Jacobian.
- *
- * EMPTYLINE
  *
  * The following header files need to be included, as in the linear PDEs tutorial.
  */
@@ -208,8 +209,6 @@ public:
          * y=0. This is OK, as Dirichlet boundary conditions are applied to the finite
          * element matrix after Neumman boundary conditions, where the appropriate rows
          * in the matrix are overwritten.
-         *
-         * EMPTYLINE
          *
          * This is the solver for solving nonlinear problems, which, as usual,
          * takes in the mesh, the PDE, and the boundary conditions. */

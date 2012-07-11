@@ -101,7 +101,7 @@ class TestAnotherCardiacElectroMechanicsTutorial : public CxxTest::TestSuite
 public:
     /*
      * HOW_TO_TAG Cardiac/Electro-mechanics
-     * Run basic electro-mechanics with mechano-electric feedback
+     * Run electro-mechanics with mechano-electric feedback
      */
 
     /* == Mechano-electric feedback, and alternative boundary conditions ==
@@ -270,7 +270,7 @@ public:
 
     /*
      * HOW_TO_TAG Cardiac/Electro-mechanics
-     * Run basic electro-mechanics with inflation pressures
+     * Run electro-mechanics with inflation pressures
      */
 
     /* == Internal pressures ==
