@@ -48,6 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* HOW_TO_TAG Cardiac/Problem definition
  * Save ('checkpoint') and reload simulations
+ */
 
 /*
  * = Checkpointing and restarting cardiac simulations =

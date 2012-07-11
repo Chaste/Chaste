@@ -89,8 +89,8 @@ public:
 
         /* HOW_TO_TAG Cardiac/Problem definition
          * Specify fibre directions
-         */
-        /* Define a mesh to be read, saying that we also want to read fibres. The extra part can either be
+         *
+         * Define a mesh to be read, saying that we also want to read fibres. The extra part can either be
          * `cp::media_type::Orthotropic`, in which case `2D_0_to_1mm_800_elements.ortho` will also be read;
          * or `cp::media_type::Axisymmetric`, in which case `2D_0_to_1mm_800_elements.axi` will also be read.
          * See the file formats documentation for full descriptions of these formats, but basically .axi
@@ -135,9 +135,8 @@ public:
 
         /* HOW_TO_TAG Cardiac/Problem definition
          * Specify output formats (for different visualisers)
-         */
-
-        /* The output will be written to /tmp/USER_NAME/testoutput/BidomainTutorial
+         *
+         * The output will be written to /tmp/USER_NAME/testoutput/BidomainTutorial
          * in hdf5 format, and converted to meshalyzer format at the end of the simulation.
          * To adjust this, or convert to Cmgui or VTK format as well, use methods in
          * `HeartConfig`,  e.g.
