@@ -50,8 +50,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * showing (i) an example using one of the source cell factories, (ii) how to define
  * and use fibre directions, and (iii) mentioning how to write other output file formats.
  *
- * EMPTYLINE
- *
  * The first thing to do is to include the headers as before.
  */
 #include <cxxtest/TestSuite.h>
