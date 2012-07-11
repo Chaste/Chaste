@@ -198,8 +198,11 @@ void ExecutableSupport::WriteLibraryInfo( out_stream &outFile )
     *outFile << "\t\t<Projects>\n";
     BOOST_FOREACH(const StringPair& r_project_version, ChasteBuildInfo::rGetProjectVersions())
     {
+#define COVERAGE_IGNORE
+        // No projects are checked out for continuous builds normally!
         *outFile << "\t\t\t<Name>" << r_project_version.first << "</Name><Version>"
                  << r_project_version.second << "</Version>\n";
+#undef COVERAGE_IGNORE
     }
     *outFile << "\t\t</Projects>\n";
     *outFile << "\t</ProvenanceInfo>\n";

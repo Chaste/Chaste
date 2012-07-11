@@ -172,7 +172,7 @@ public:
      *  If this method is not called, the default fibre-sheet directions are used - ie fibres parallel to
      *  X-axis, sheets parallel to Y-axis.
      *
-     *  @param fibreSheetDirectionsFile the file containing the fibre/sheet directions
+     *  @param rFibreSheetDirectionsFile the file containing the fibre/sheet directions
      *  @param definedPerQuadPoint whether the fibre-sheet definitions are for each quadrature point in the mesh
      *   (if not, one for each element is assumed).
      */

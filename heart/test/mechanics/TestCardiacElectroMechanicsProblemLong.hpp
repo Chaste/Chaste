@@ -435,16 +435,16 @@ public:
         std::vector<c_vector<double,3> > r_deformed_position_fibres_alongY2;
         {
             HeartConfig::Instance()->SetSimulationDuration(20.0);
-            problem_defn.SetVariableFibreSheetDirectionsFile("heart/test/data/fibre_tests/alongY2.ortho", false);
+            FileFinder fibres_file("heart/test/data/fibre_tests/alongY2.ortho", RelativeTo::ChasteSourceRoot);
+            problem_defn.SetVariableFibreSheetDirectionsFile(fibres_file, false);
 
             CardiacElectroMechanicsProblem<3,1> problem(COMPRESSIBLE,
-												      MONODOMAIN,
-                                                      &electrics_mesh,
-                                                      &mechanics_mesh,
-                                                      &cell_factory,
-                                                      &problem_defn,
-                                                      "TestCardiacEmFibreRead");
-
+                                                        MONODOMAIN,
+                                                        &electrics_mesh,
+                                                        &mechanics_mesh,
+                                                        &cell_factory,
+                                                        &problem_defn,
+                                                        "TestCardiacEmFibreRead");
 
             problem.Solve();
             r_deformed_position_fibres_alongY2 = problem.rGetDeformedPosition();

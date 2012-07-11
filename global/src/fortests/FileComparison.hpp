@@ -109,7 +109,7 @@ public:
      * Set a line start which should be treated as a comment and ignored
      * (and therefore switch on mIgnoreCommentLines = true)
      *
-     * @param rLineStart  The beginning of a line which should be treated as a comment
+     * @param lineStart  The beginning of a line which should be treated as a comment
      */
     void SetIgnoreLinesBeginningWith(std::string lineStart)
     {
