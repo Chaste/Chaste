@@ -593,13 +593,15 @@ public:
          * is given by sqrt((3*sqrt(3)/2)/pi).
          */
 
-        // Work out where the previous test wrote its files
+
         OutputFileHandler handler("TestSpheroidStatistics", false);
+        
         std::string areas_results_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/cellpopulationareas.dat";
         TS_ASSERT_EQUALS(system(("diff " + areas_results_file + " cell_based/test/data/TestSpheroidStatistics/cellpopulationareas.dat").c_str()), 0);
 
-        std::string dist_results_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/radial_dist.dat";
-        TS_ASSERT_EQUALS(system(("diff " + dist_results_file + " cell_based/test/data/TestSpheroidStatistics/radial_dist.dat").c_str()), 0);
+        std::string results_dir = handler.GetOutputDirectoryFullPath() + "results_from_time_0/";
+        NumericFileComparison comparison(results_dir + "/radial_dist.dat", "cell_based/test/data/TestSpheroidStatistics/radial_dist.dat");
+        TS_ASSERT(comparison.CompareFiles(5e-3));
 
         // Coverage
         TS_ASSERT_THROWS_NOTHING(pde_handler.WriteAverageRadialPdeSolution(SimulationTime::Instance()->GetTime()));
