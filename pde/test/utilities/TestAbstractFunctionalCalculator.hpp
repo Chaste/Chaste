@@ -46,6 +46,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 #include "DistributedVector.hpp"
 
+/* HOW_TO_TAG Pde
+ * Evaluate integrals (using a solution from a PDE solve say) over a finite element mesh
+ */
+
 /*
  * Returns 1.0 everywhere so that the total integral over the mesh of
  * this integrand is just the volume of the mesh. For testing.

@@ -51,7 +51,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ZeroStimulusCellFactory.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
-
+/* HOW_TO_TAG Cardiac/Problem definition
+ * Use a genuinely Neumann intracellular stimulus, rather than default volume stimulus
+ */
 class TestNeumannStimulus : public CxxTest::TestSuite
 {
 public:

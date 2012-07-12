@@ -52,7 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTWRITINGPDESOLVERSTUTORIAL_HPP_
 
 /* HOW_TO_TAG Pde
- * Write new PDE solvers (especially for coupled elliptic/parabolic systems)
+ * Write new PDE solvers (especially for linear coupled elliptic/parabolic systems)
  */
 
 

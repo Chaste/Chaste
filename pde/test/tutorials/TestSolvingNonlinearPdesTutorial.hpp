@@ -50,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTSOLVINGNONLINEARPDESTUTORIAL_HPP_
 
 /* HOW_TO_TAG Pde
- * Define and solve nonlinear elliptic
+ * Define and solve nonlinear elliptic PDEs
  */
 
 

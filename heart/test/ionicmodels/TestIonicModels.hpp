@@ -944,7 +944,7 @@ public:
         CompareCellModelResults("MahajanForward", "MahajanBackwardEuler", 0.03, true);
 
         std::cout << "Run times:\n\tForward: " << forward << "\n\tBackward: "
-          << backward << std::endl;
+                  << backward << std::endl;
     }
 
     void TestMaleckar(void) throw (Exception)

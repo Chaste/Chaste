@@ -60,8 +60,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include "BidomainProblem.hpp"
 #include "PlaneStimulusCellFactory.hpp"
-#include "LuoRudy1991BackwardEuler.hpp"
 
+/* HOW_TO_TAG Cardiac/Solver
+ * Using specialised Backward Euler implementation to solve the cell models (allows for much larger timesteps)
+ */
+
+/* Cell models can be solved using a specialised (for cardiac cell models) Backward Euler
+ * implementation, with again the code being automatically generated from the cellml files.
+ * Backward Euler allows  much greater ODE timesteps to be used. Using Backward Euler is
+ * easy, just change the .hpp included as follows, and the class name as below.
+ *
+ */
+#include "LuoRudy1991BackwardEuler.hpp"
 #include "PetscSetupAndFinalize.hpp"
 /* This test will show how to load a mesh in the test and pass it into the problem,
  * for which the following includes are needed */

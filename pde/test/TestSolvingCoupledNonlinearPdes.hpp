@@ -50,6 +50,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NonlinearEquationPde.hpp"
 #include "SimpleNewtonNonlinearSolver.hpp"
 
+/* HOW_TO_TAG Pde
+ * Write a solver for coupled nonlinear PDEs (advanced)
+ */
+
 /**
  * A solver to solve the 'coupled' 2-unknown problem
  *    div.(u grad u) + 1  = 0,
