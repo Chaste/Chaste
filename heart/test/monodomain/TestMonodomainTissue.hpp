@@ -156,7 +156,8 @@ public:
         }
     }
 
-    AbstractCardiacCell* CreatePurkinjeCellForTissueNode(unsigned node)
+    AbstractCardiacCell* CreatePurkinjeCellForTissueNode(unsigned node,
+                                                         AbstractCardiacCell* pCardiacCell)
     {
         return new CellDiFrancescoNoble1985FromCellML(mpSolver, mpZeroStimulus);
     }

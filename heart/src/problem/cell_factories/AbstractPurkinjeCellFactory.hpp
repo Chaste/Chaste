@@ -54,11 +54,23 @@ protected:
 
     /** A set of local purkinje node indices */
     std::set<unsigned> mLocalPurkinjeNodes;
+
     /**
      * Must be overridden by subclasses to return a Purkinje cell object for the given node.
-     * @param nodeIndex  Global node index.
+     * @param nodeIndex  global node index.
+     * @param pCardiacCell  the cardiac cell that has already been created at this node
      */
-    virtual AbstractCardiacCell* CreatePurkinjeCellForTissueNode(unsigned nodeIndex)=0;
+    virtual AbstractCardiacCell* CreatePurkinjeCellForTissueNode(unsigned nodeIndex,
+                                                                 AbstractCardiacCell* pCardiacCell)=0;
+
+    /**
+     * Create a purkinje-ventricular junction between the two cells provided.
+     *
+     * @param pPurkinjeCell  the Purkinje cell
+     * @param pCardiacCell  the ventricular cell
+     * @param resistance  the junction resistance, in kilo-Ohms
+     */
+    void CreateJunction(AbstractCardiacCell* pPurkinjeCell, AbstractCardiacCell* pCardiacCell, double resistance);
 
 public:
 
@@ -77,9 +89,11 @@ public:
      * case it calls CreatePurkinjeCellForTissueNode (which must be defined by subclasses),
      * otherwise it returns a pointer to a (unique) fake cell
      *
-     * @param nodeIndex  Global node index.
+     * @param nodeIndex  global node index.
+     * @param pCardiacCell  the cardiac cell that has already been created at this node
      */
-    AbstractCardiacCell* CreatePurkinjeCellForNode(unsigned nodeIndex);
+    AbstractCardiacCell* CreatePurkinjeCellForNode(unsigned nodeIndex,
+                                                   AbstractCardiacCell* pCardiacCell);
 
     /**
      * May be overridden by subclasses to perform any necessary work after all Purkinje cells

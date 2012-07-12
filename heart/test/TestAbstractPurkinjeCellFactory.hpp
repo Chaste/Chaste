@@ -73,7 +73,8 @@ public:
         }
     }
 
-    AbstractCardiacCell* CreatePurkinjeCellForTissueNode(unsigned node)
+    AbstractCardiacCell* CreatePurkinjeCellForTissueNode(unsigned node,
+                                                         AbstractCardiacCell* pCardiacCell)
     {
         return new CellDiFrancescoNoble1985FromCellML(mpSolver, mpZeroStimulus);
     }
@@ -99,7 +100,7 @@ public:
              ++current_node)
         {
             unsigned index = current_node->GetIndex();
-            AbstractCardiacCell* p_cell = cell_factory.CreatePurkinjeCellForNode(index);
+            AbstractCardiacCell* p_cell = cell_factory.CreatePurkinjeCellForNode(index, NULL);
             double y = current_node->rGetLocation()[1];
 
             // cable nodes are on y=0.05 (we don't test by index because indices may be permuted in parallel).

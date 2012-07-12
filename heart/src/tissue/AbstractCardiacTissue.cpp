@@ -93,7 +93,8 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacTissue(
 
             if (mHasPurkinje)
             {
-                mPurkinjeCellsDistributed[local_index] = p_purkinje_cell_factory->CreatePurkinjeCellForNode(global_index);
+                mPurkinjeCellsDistributed[local_index]
+                    = p_purkinje_cell_factory->CreatePurkinjeCellForNode(global_index, mCellsDistributed[local_index]);
                 mPurkinjeCellsDistributed[local_index]->SetUsedInTissueSimulation();
             }
         }

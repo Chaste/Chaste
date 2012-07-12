@@ -35,6 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "AbstractPurkinjeCellFactory.hpp"
+#include "PurkinjeVentricularJunctionStimulus.hpp"
+#include "MultiStimulus.hpp"
 
 
 
@@ -43,6 +45,33 @@ AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::AbstractPurkinjeCellFactory(
     : AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>(),
       mpMixedDimensionMesh(NULL)
 {
+}
+
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::CreateJunction(AbstractCardiacCell* pPurkinjeCell,
+                                                                        AbstractCardiacCell* pCardiacCell,
+                                                                        double resistance)
+{
+    // Create the junction stimuli, and associate them with the cells
+    boost::shared_ptr<PurkinjeVentricularJunctionStimulus> p_pvj_ventricular_stim(new PurkinjeVentricularJunctionStimulus(resistance));
+    boost::shared_ptr<PurkinjeVentricularJunctionStimulus> p_pvj_purkinje_stim(new PurkinjeVentricularJunctionStimulus(resistance));
+    p_pvj_purkinje_stim->SetAppliedToPurkinjeCellModel();
+    p_pvj_ventricular_stim->SetVentricularCellModel(pCardiacCell);
+    p_pvj_ventricular_stim->SetPurkinjeCellModel(pPurkinjeCell);
+    p_pvj_purkinje_stim->SetVentricularCellModel(pCardiacCell);
+    p_pvj_purkinje_stim->SetPurkinjeCellModel(pPurkinjeCell);
+
+    // Create new combined stimuli which add the junction stimuli to those already in the cells
+    boost::shared_ptr<MultiStimulus> p_multi_stim_ventricular(new MultiStimulus);
+    p_multi_stim_ventricular->AddStimulus(p_pvj_ventricular_stim);
+    p_multi_stim_ventricular->AddStimulus(pCardiacCell->GetStimulusFunction());
+    pCardiacCell->SetStimulusFunction(p_multi_stim_ventricular);
+
+    boost::shared_ptr<MultiStimulus> p_multi_stim_purkinje(new MultiStimulus);
+    p_multi_stim_purkinje->AddStimulus(p_pvj_purkinje_stim);
+    p_multi_stim_purkinje->AddStimulus(pPurkinjeCell->GetStimulusFunction());
+    pPurkinjeCell->SetStimulusFunction(p_multi_stim_purkinje);
 }
 
 
@@ -68,11 +97,12 @@ void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::SetMesh(AbstractTetrahe
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCardiacCell*  AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::CreatePurkinjeCellForNode(
-    unsigned nodeIndex)
+        unsigned nodeIndex,
+        AbstractCardiacCell* pCardiacCell)
 {
-    if(mLocalPurkinjeNodes.count(nodeIndex)>0)
+    if (mLocalPurkinjeNodes.count(nodeIndex)>0)
     {
-        return CreatePurkinjeCellForTissueNode(nodeIndex);
+        return CreatePurkinjeCellForTissueNode(nodeIndex, pCardiacCell);
     }
     else
     {
