@@ -58,10 +58,9 @@ void PurkinjeVentricularJunctionStimulus::SetAppliedToPurkinjeCellModel()
 
 double PurkinjeVentricularJunctionStimulus::GetStimulus(double time)
 {
-    ///\todo #1900 Check the sign
     double current_to_ventricular = -(mpPurkinjeCellModel->GetVoltage() - mpVentricularCellModel->GetVoltage())/mJunctionResistance;
 
-    if(mAppliedToVentricularCellModel)
+    if (mAppliedToVentricularCellModel)
     {
         return current_to_ventricular;
     }
