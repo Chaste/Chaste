@@ -106,7 +106,7 @@ public:
      */
     ExplicitCardiacMechanicsSolver(ContractionModelName contractionModelName,
                                    QuadraticMesh<DIM>& rQuadMesh,
-                                   SolidMechanicsProblemDefinition<DIM>& rProblemDefinition,
+                                   ElectroMechanicsProblemDefinition<DIM>& rProblemDefinition,
                                    std::string outputDirectory);
 
 

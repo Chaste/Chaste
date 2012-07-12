@@ -46,6 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FineCoarseMeshPair.hpp"
 #include "AbstractCardiacMechanicsSolverInterface.hpp"
 #include "HeartRegionCodes.hpp"
+#include "ElectroMechanicsProblemDefinition.hpp"
 
 
 /**
@@ -134,6 +135,18 @@ protected:
     /** The fibre direction for the current element being assembled on */
     c_vector<double,DIM> mCurrentElementFibreDirection;
 
+    /** The sheet direction for the current element being assembled on */
+    c_vector<double,DIM> mCurrentElementSheetDirection;
+
+    /** The sheet normal direction for the current element being assembled on */
+    c_vector<double,DIM> mCurrentElementSheetNormalDirection;
+
+
+    /**
+     *  This class contains all the information about the electro mechanics problem (except the material law)
+     */
+    ElectroMechanicsProblemDefinition<DIM>& mrElectroMechanicsProblemDefinition;
+
     /**
      *  Whether the solver is implicit or not (ie whether the contraction model depends on lambda (and depends on
      *  lambda at the current time)). For whether dTa_dLam dependent terms need to be added to the Jacbobian
@@ -216,7 +229,7 @@ public:
      */
     AbstractCardiacMechanicsSolver(QuadraticMesh<DIM>& rQuadMesh,
 								   ContractionModelName contractionModelName,
-                                   SolidMechanicsProblemDefinition<DIM>& rProblemDefinition,
+                                   ElectroMechanicsProblemDefinition<DIM>& rProblemDefinition,
                                    std::string outputDirectory);
 
     /**
@@ -328,7 +341,7 @@ public:
 template<class ELASTICITY_SOLVER,unsigned DIM>
 AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AbstractCardiacMechanicsSolver(QuadraticMesh<DIM>& rQuadMesh,
 																					  ContractionModelName contractionModelName,
-                                                                                      SolidMechanicsProblemDefinition<DIM>& rProblemDefinition,
+                                                                                      ElectroMechanicsProblemDefinition<DIM>& rProblemDefinition,
                                                                                       std::string outputDirectory)
    : ELASTICITY_SOLVER(rQuadMesh,
                        rProblemDefinition,
@@ -337,7 +350,8 @@ AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AbstractCardiacMechanicsS
      mpMeshPair(NULL),
      mCurrentTime(DBL_MAX),
      mNextTime(DBL_MAX),
-     mOdeTimestep(DBL_MAX)
+     mOdeTimestep(DBL_MAX),
+     mrElectroMechanicsProblemDefinition(rProblemDefinition)
 {
 
 }
@@ -523,6 +537,52 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndSt
                     }
                 }
             }
+        }
+    }
+
+    ///\todo #2180 The code below applies a cross fibre tension in the 2D case. Things that need doing:
+    // * Refactor the common code between the block below and the block above to avoid duplication.
+    // * Handle the 3D case.
+    if(this->mrElectroMechanicsProblemDefinition.GetApplyCrossFibreTension() && DIM > 1)
+    {
+        double cross_fraction = mrElectroMechanicsProblemDefinition.GetCrossFibreTensionFraction();
+
+        for(unsigned i=0; i<DIM; i++)
+        {
+            mCurrentElementSheetDirection(i) = this->mChangeOfBasisMatrix(i,1);
+        }
+
+        double I4_s = inner_prod(mCurrentElementSheetDirection, prod(rC, mCurrentElementSheetDirection));
+        double lambda_s = sqrt(I4_s);
+
+        // amend the stress and dTdE using the active tension
+        double dTdE_coeff_s = -2*cross_fraction*active_tension/(I4_s*I4_s); // note: I4*I4 = lam^4
+        if(IsImplicitSolver())
+        {
+           double dt = mNextTime-mCurrentTime;
+           dTdE_coeff += (d_act_tension_dlam + d_act_tension_d_dlamdt/dt)/(lambda_s*I4_s); // note: I4*lam = lam^3
+        }
+
+        rT += cross_fraction*(active_tension/I4_s)*outer_prod(mCurrentElementSheetDirection,mCurrentElementSheetDirection);
+
+        if(addToDTdE)
+        {
+           for (unsigned M=0; M<DIM; M++)
+           {
+               for (unsigned N=0; N<DIM; N++)
+               {
+                   for (unsigned P=0; P<DIM; P++)
+                   {
+                       for (unsigned Q=0; Q<DIM; Q++)
+                       {
+                           rDTdE(M,N,P,Q) +=  dTdE_coeff_s * mCurrentElementSheetDirection(M)
+                                                         * mCurrentElementSheetDirection(N)
+                                                         * mCurrentElementSheetDirection(P)
+                                                         * mCurrentElementSheetDirection(Q);
+                       }
+                   }
+               }
+           }
         }
     }
 }

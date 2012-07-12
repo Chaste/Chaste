@@ -44,7 +44,8 @@ ElectroMechanicsProblemDefinition<DIM>::ElectroMechanicsProblemDefinition(Quadra
       mDeformationAffectsCellModels(false),
       mpDefaultMaterialLaw(NULL),
       mReadFibreSheetInformationFromFile(false),
-      mNumIncrementsForInitialDeformation(1)
+      mNumIncrementsForInitialDeformation(1),
+      mApplyCrossFibreTension(false)
 {
 }
 
@@ -105,6 +106,13 @@ void ElectroMechanicsProblemDefinition<DIM>::SetVariableFibreSheetDirectionsFile
     mReadFibreSheetInformationFromFile = true;
     mFibreSheetDirectionsFile = rFibreSheetDirectionsFile;
     mFibreSheetDirectionsDefinedPerQuadraturePoint = definedPerQuadraturePoint;
+}
+
+template<unsigned DIM>
+void ElectroMechanicsProblemDefinition<DIM>::SetApplyCrossFibreTension(bool applyCrossFibreTension, double crossFibreTensionFraction)
+{
+    mApplyCrossFibreTension = applyCrossFibreTension;
+    mCrossFibreTensionFraction = crossFibreTensionFraction;
 }
 
 template<unsigned DIM>

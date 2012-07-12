@@ -47,6 +47,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NonlinearElasticityTools.hpp"
 #include "ReplicatableVector.hpp"
 
+#include "Debug.hpp"
+
 
 // some useful typedefs
 typedef ExplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2>,2> IncompressibleExplicitSolver2d;
@@ -63,9 +65,11 @@ public:
         std::vector<unsigned> fixed_nodes
           = NonlinearElasticityTools<2>::GetNodesByComponentValue(mesh,0,0.0);
 
-        SolidMechanicsProblemDefinition<2> problem_defn(mesh);
+        ElectroMechanicsProblemDefinition<2> problem_defn(mesh);
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+        problem_defn.SetContractionModel(NONPHYSIOL1,0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+        problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
 
         // NONPHYSIOL1 => NonphysiologicalContractionModel 1
         IncompressibleExplicitSolver2d solver(NONPHYSIOL1,mesh,problem_defn,"TestExplicitCardiacMech");
@@ -116,9 +120,11 @@ public:
         std::vector<unsigned> fixed_nodes
           = NonlinearElasticityTools<2>::GetNodesByComponentValue(mesh,0,0.0);
 
-        SolidMechanicsProblemDefinition<2> problem_defn(mesh);
+        ElectroMechanicsProblemDefinition<2> problem_defn(mesh);
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+        problem_defn.SetContractionModel(NONPHYSIOL1,0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+        problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
 
         //The following lines are not relevant to this test but need to be there
         TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
@@ -171,9 +177,11 @@ public:
         std::vector<unsigned> fixed_nodes
           = NonlinearElasticityTools<2>::GetNodesByComponentValue(mesh,0,0.0);
 
-        SolidMechanicsProblemDefinition<2> problem_defn(mesh);
+        ElectroMechanicsProblemDefinition<2> problem_defn(mesh);
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+        problem_defn.SetContractionModel(NONPHYSIOL1,0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+        problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
 
         //The following lines are not relevant to this test but need to be there
         TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
@@ -257,9 +265,11 @@ public:
         std::vector<unsigned> fixed_nodes
           = NonlinearElasticityTools<2>::GetNodesByComponentValue(mesh,0,0.0);
 
-        SolidMechanicsProblemDefinition<2> problem_defn(mesh);
+        ElectroMechanicsProblemDefinition<2> problem_defn(mesh);
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+        problem_defn.SetContractionModel(NONPHYSIOL1,0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+        problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
 
         TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();
         p_fine_mesh->ConstructRegularSlabMesh(1.0, 1.0, 1.0);
@@ -299,6 +309,87 @@ public:
 		delete p_coarse_mesh_big;
 		delete p_pair_wrong;
     }
+
+    void TestCrossFibreTensionWithSimpleContractionModel() throw(Exception)
+    {
+        QuadraticMesh<2> mesh(0.25, 1.0, 1.0);
+        MooneyRivlinMaterialLaw<2> law(1);
+
+        std::vector<unsigned> fixed_nodes
+        = NonlinearElasticityTools<2>::GetNodesByComponentValue(mesh,0,0.0);
+
+        ElectroMechanicsProblemDefinition<2> problem_defn(mesh);
+        problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
+        problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+        problem_defn.SetContractionModel(NONPHYSIOL1,0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+        problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+
+        //Cross fibre tension fractions to be tested
+        c_vector<double, 4> tension_fractions;
+        tension_fractions[0] = 0.0;
+        tension_fractions[1] = 0.1;
+        tension_fractions[2] = 0.5;
+        tension_fractions[3] = 1.0;
+
+        //Expected resulting deformed location of Node 4.
+        c_vector<double, 4> x;
+        c_vector<double, 4> y;
+        x[0] = 0.8730;
+        x[1] = 0.8855;
+        x[2] = 0.9356;
+        x[3] = 1.0; //Note, for cross_tension == 1.0 there should be no deformation of the tissue square (tensions balance)
+        y[0] = -0.0867;
+        y[1] = -0.0774;
+        y[2] = -0.0412;
+        y[3] = 0.0;
+
+        for(unsigned i=0; i < tension_fractions.size();i++)
+        {
+            problem_defn.SetApplyCrossFibreTension(true,tension_fractions[i]);
+
+            TS_ASSERT_EQUALS(problem_defn.GetApplyCrossFibreTension(), true);
+            TS_ASSERT_DELTA(problem_defn.GetCrossFibreTensionFraction(),tension_fractions[i], 1e-6);
+
+            // NONPHYSIOL1 => NonphysiologicalContractionModel 1
+            IncompressibleExplicitSolver2d solver(NONPHYSIOL1,mesh,problem_defn,"TestExplicitCardiacMech");
+
+            //The following lines are not relevant to this test but need to be there
+            TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
+            p_fine_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0);
+            TetrahedralMesh<2,2>* p_coarse_mesh = new TetrahedralMesh<2,2>();//unused in this test
+            p_coarse_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0);
+            FineCoarseMeshPair<2>* p_pair = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh);//also unused in this test
+            p_pair->SetUpBoxesOnFineMesh();
+            p_pair->ComputeFineElementsAndWeightsForCoarseQuadPoints(*(solver.GetQuadratureRule()), false);
+            p_pair->DeleteFineBoxCollection();
+            solver.SetFineCoarseMeshPair(p_pair);
+            ///////////////////////////////////////////////////////////////////////////
+            solver.Initialise();
+
+            // coverage
+            QuadraturePointsGroup<2> quad_points(mesh, *(solver.GetQuadratureRule()));
+
+            std::vector<double> calcium_conc(solver.GetTotalNumQuadPoints(), 0.0);
+            std::vector<double> voltages(solver.GetTotalNumQuadPoints(), 0.0);
+
+            solver.SetCalciumAndVoltage(calcium_conc, voltages);
+
+            // solve UP TO t=0. So Ta(lam_n,t_{n+1})=5*sin(0)=0, ie no deformation
+            solver.Solve(-0.01,0.0,0.01);
+            TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(),0u);
+
+            solver.Solve(0.24,0.25,0.01);
+
+            TS_ASSERT_DELTA(solver.rGetDeformedPosition()[4](0),  x[i], 1e-3);
+            TS_ASSERT_DELTA(solver.rGetDeformedPosition()[4](1), y[i], 1e-3);
+
+            //in need of deletion even if all these 3 have no influence at all on this test
+            delete p_fine_mesh;
+            delete p_coarse_mesh;
+            delete p_pair;
+        }
+    }
+
 };
 
 #endif /*TESTEXPLICITCARDIACMECHANICSSOLVER_HPP_*/

@@ -43,7 +43,7 @@ template<class ELASTICITY_SOLVER,unsigned DIM>
 ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ImplicitCardiacMechanicsSolver(
                                   ContractionModelName contractionModelName,
                                   QuadraticMesh<DIM>& rQuadMesh,
-                                  SolidMechanicsProblemDefinition<DIM>& rProblemDefinition,
+                                  ElectroMechanicsProblemDefinition<DIM>& rProblemDefinition,
                                   std::string outputDirectory)
     : AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>(rQuadMesh,
 															contractionModelName,

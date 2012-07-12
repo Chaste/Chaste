@@ -71,9 +71,11 @@ public:
         std::vector<unsigned> fixed_nodes
           = NonlinearElasticityTools<2>::GetNodesByComponentValue(mesh,0,0.0);
 
-        SolidMechanicsProblemDefinition<2> problem_defn(mesh);
+        ElectroMechanicsProblemDefinition<2> problem_defn(mesh);
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+        problem_defn.SetContractionModel(NONPHYSIOL1,0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+        problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
 
         IncompressibleImplicitSolver2d solver(NHS,mesh,problem_defn,"");
 
@@ -166,9 +168,11 @@ public:
         std::vector<unsigned> fixed_nodes
           = NonlinearElasticityTools<2>::GetNodesByComponentValue(mesh,0,0.0);
 
-        SolidMechanicsProblemDefinition<2> problem_defn(mesh);
+        ElectroMechanicsProblemDefinition<2> problem_defn(mesh);
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+        problem_defn.SetContractionModel(NONPHYSIOL1,0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+        problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
 
         IncompressibleImplicitSolver2d solver(NHS,mesh,problem_defn,"ImplicitCardiacMech/ZeroActiveTension");
 
@@ -217,9 +221,11 @@ public:
         fixed_nodes[0] = 0;
         fixed_nodes[1] = 5;
 
-        SolidMechanicsProblemDefinition<2> problem_defn(mesh);
+        ElectroMechanicsProblemDefinition<2> problem_defn(mesh);
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+        problem_defn.SetContractionModel(NONPHYSIOL1,0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+        problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
 
         IncompressibleImplicitSolver2d solver(NHS,mesh,problem_defn,"ImplicitCardiacMech/SpecifiedCaCompression");
         QuadraturePointsGroup<2> quad_points(mesh, *(solver.GetQuadratureRule()));
@@ -333,9 +339,11 @@ public:
             fixed_nodes[0] = 0;
             fixed_nodes[1] = 1; // was 5 in the above test, {0,1}=small part of X=0 surface, {0,5}=small part of Y=0 surface
 
-            SolidMechanicsProblemDefinition<2> problem_defn(mesh);
+            ElectroMechanicsProblemDefinition<2> problem_defn(mesh);
             problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
             problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+            problem_defn.SetContractionModel(NONPHYSIOL1,0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+            problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
 
             IncompressibleImplicitSolver2d solver(NHS,mesh,problem_defn,"ImplicitCardiacMech/FibresInYDirection");
 
@@ -421,9 +429,11 @@ public:
         std::vector<unsigned> fixed_nodes
           = NonlinearElasticityTools<2>::GetNodesByComponentValue(mesh,0,0.0);
 
-        SolidMechanicsProblemDefinition<2> problem_defn(mesh);
+        ElectroMechanicsProblemDefinition<2> problem_defn(mesh);
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+        problem_defn.SetContractionModel(NONPHYSIOL1,0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+        problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
 
         //The following lines are not relevant to this test but need to be there
         TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
@@ -460,9 +470,11 @@ public:
         std::vector<unsigned> fixed_nodes
           = NonlinearElasticityTools<2>::GetNodesByComponentValue(mesh,0,0.0);
 
-        SolidMechanicsProblemDefinition<2> problem_defn(mesh);
+        ElectroMechanicsProblemDefinition<2> problem_defn(mesh);
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+        problem_defn.SetContractionModel(NONPHYSIOL1,0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+        problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
 
         IncompressibleImplicitSolver2d solver(KERCHOFFS2003,mesh,problem_defn,"");
 
@@ -561,9 +573,11 @@ public:
         fixed_nodes[0] = 0;
         fixed_nodes[1] = 1;
 
-        SolidMechanicsProblemDefinition<2> problem_defn(mesh);
+        ElectroMechanicsProblemDefinition<2> problem_defn(mesh);
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+        problem_defn.SetContractionModel(NONPHYSIOL1,0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+        problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
 
         IncompressibleImplicitSolver2d solver(NHS, mesh, problem_defn, "ImplicitCardiacMech/FibresInYDirectionDefinePerQuadPoint");
 

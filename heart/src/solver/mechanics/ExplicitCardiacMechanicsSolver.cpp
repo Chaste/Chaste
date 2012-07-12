@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<class ELASTICITY_SOLVER,unsigned DIM>
 ExplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ExplicitCardiacMechanicsSolver(ContractionModelName contractionModelName,
                                                                                       QuadraticMesh<DIM>& rQuadMesh,
-                                                                                      SolidMechanicsProblemDefinition<DIM>& rProblemDefinition,
+                                                                                      ElectroMechanicsProblemDefinition<DIM>& rProblemDefinition,
                                                                                       std::string outputDirectory)
     : AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>(rQuadMesh,
 															contractionModelName,

@@ -102,6 +102,14 @@ private:
 	 */
     unsigned mNumIncrementsForInitialDeformation;
 
+    /**
+     * Whether to apply active tension in the cross-fibre direction.
+     */
+    bool mApplyCrossFibreTension;
+
+    /** The fraction of the fibre tension to apply in the cross-fibre direction. */
+    double mCrossFibreTensionFraction;
+
 public:
     /**
      * Constructor
@@ -177,6 +185,19 @@ public:
      *   (if not, one for each element is assumed).
      */
     void SetVariableFibreSheetDirectionsFile(const FileFinder& rFibreSheetDirectionsFile, bool definedPerQuadPoint);
+
+
+    /**
+     * Set if active tension should be applied in the cross-fibre direction.
+     *
+     * By default active tension is only applied in the fibre direction. This method allows the user to specify
+     * that a proportion of the active tension should also be applied in the cross-fibre direction. The fraction of
+     * the active tension that is applied in the cross-fibre direction can also be specified.
+     *
+     * @param  applyCrossFibreTension active tension is applied in the cross-fibre direction if set to true.
+     * @param  crossFibreTensionFraction The fraction of the active tension to apply in the cross-fibre direction.
+     */
+    void SetApplyCrossFibreTension(bool applyCrossFibreTension, double crossFibreTensionFraction);
 
 
     /**
@@ -276,6 +297,23 @@ public:
     {
         return mNumIncrementsForInitialDeformation;
     }
+
+    /**
+     * Returns true if cross-fibre tension is applied.
+     */
+    double GetApplyCrossFibreTension()
+    {
+        return mApplyCrossFibreTension;
+    }
+
+    /**
+     * Returns the value of the cross-fibre tension fraction.
+     */
+    double GetCrossFibreTensionFraction()
+    {
+        return mCrossFibreTensionFraction;
+    }
+
 
     /**
      * Check all variables are set appropriately. Exceptions are thrown if any are not.
