@@ -106,10 +106,16 @@ public:
             CheckReadyToDivideAndPhaseIsUpdated(p_diff_model, 132);  // any old number
         }
 
-        // Coverage of Get / Set Methods
+        // Coverage of Get Methods
         TS_ASSERT_DELTA(p_diff_model->GetNotch(), 0.0, 1e-4);
         TS_ASSERT_DELTA(p_diff_model->GetDelta(), 1.0, 1e-4);
         TS_ASSERT_DELTA(p_diff_model->GetMeanNeighbouringDelta(), 0.0, 1e-4);
+
+        // Setting mean delta via cell
+        p_diff_cell->GetCellData()->SetItem("mean delta", 4.2);
+        p_diff_model->UpdateDeltaNotch();
+        TS_ASSERT_DELTA(p_diff_model->GetMeanNeighbouringDelta(), 4.2, 1e-4);
+
 
     }
 

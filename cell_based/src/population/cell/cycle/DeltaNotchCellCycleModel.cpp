@@ -144,7 +144,7 @@ double DeltaNotchCellCycleModel::GetDelta()
 double DeltaNotchCellCycleModel::GetMeanNeighbouringDelta()
 {
     assert(mpOdeSystem != NULL);
-    double mean_neighbouring_delta = mpOdeSystem->rGetStateVariables()[2];
+    double mean_neighbouring_delta = mpOdeSystem->GetParameter("Mean Delta");
     return mean_neighbouring_delta;
 }
 
