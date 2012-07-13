@@ -1396,7 +1396,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
             self.class_inheritance += ', public AbstractDynamicallyLoadableEntity'
         if self.use_protocol:
             self.writeln_hpp('#include "AbstractSystemWithOutputs.hpp"')
-            self.class_inheritance += ', public AbstractSystemWithOutputs<' + self.TYPE_VECTOR + '>'
+            self.class_inheritance += ', public AbstractTemplatedSystemWithOutputs<' + self.TYPE_VECTOR + '>'
         self.writeln('#include "Exception.hpp"')
         self.writeln('#include "OdeSystemInformation.hpp"')
         self.writeln('#include "RegularStimulus.hpp"')
@@ -1856,6 +1856,10 @@ class CellMLToChasteTranslator(CellMLTranslator):
                 for alias in cellml_metadata.get_targets(self.model, source, prop):
                     name = self.var_display_name(var)
                     self.writeln('this->mNameMap["', alias, '"] = "', name, '";')
+            #2178 - set up model outputs environment from above info
+            self.writeln()
+            self.writeln('ProcessOutputsInfo();')
+            self.writeln()
         # Lookup table generation, if not in a singleton
         if self.use_lookup_tables and not self.separate_lut_class:
             self.output_lut_generation()
