@@ -339,9 +339,7 @@ void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopula
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////
 
-template class AbstractCentreBasedCellPopulation<1,1>;
-template class AbstractCentreBasedCellPopulation<1,2>;
-template class AbstractCentreBasedCellPopulation<1,3>;
-template class AbstractCentreBasedCellPopulation<2,2>;
+template class AbstractCentreBasedCellPopulation<1>;
+template class AbstractCentreBasedCellPopulation<2>;
 template class AbstractCentreBasedCellPopulation<2,3>;
-template class AbstractCentreBasedCellPopulation<3,3>;
+template class AbstractCentreBasedCellPopulation<3>;

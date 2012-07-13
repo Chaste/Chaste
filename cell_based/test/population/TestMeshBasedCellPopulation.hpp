@@ -63,23 +63,23 @@ class TestMeshBasedCellPopulation : public AbstractCellBasedTestSuite
 {
 private:
 
-    template<unsigned DIM>
+    template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
     void TestSmallMeshBasedCellPopulation(std::string meshFilename)
     {
         // Create a simple mesh
-        TrianglesMeshReader<DIM,DIM> mesh_reader(meshFilename);
-        MutableMesh<DIM,DIM> mesh;
+        TrianglesMeshReader<ELEMENT_DIM,SPACE_DIM> mesh_reader(meshFilename);
+        MutableMesh<ELEMENT_DIM,SPACE_DIM> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Set up cells, one for each node. Give each a birth time of -node_index,
         // so the age = node_index
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, DIM> generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, SPACE_DIM> generator;
         generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Create the cell population
         unsigned num_cells = cells.size();
-        MeshBasedCellPopulation<DIM> cell_population(mesh, cells);
+        MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM> cell_population(mesh, cells);
 
         TS_ASSERT_EQUALS(cell_population.rGetMesh().GetNumNodes(), mesh.GetNumNodes());
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), num_cells);
@@ -96,7 +96,7 @@ private:
         cell_population.SetMeinekeDivisionSeparation(0.5);
 
         unsigned counter = 0;
-        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = cell_population.Begin();
+        for (typename AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -117,9 +117,16 @@ public:
     // Test construction, accessors and Iterator
     void TestSmallMeshBasedCellPopulation1d2d3d() throw(Exception)
     {
-        TestSmallMeshBasedCellPopulation<1>("mesh/test/data/1D_0_to_1_10_elements");
-        TestSmallMeshBasedCellPopulation<2>("mesh/test/data/square_4_elements");
-        TestSmallMeshBasedCellPopulation<3>("mesh/test/data/cube_136_elements");
+        TestSmallMeshBasedCellPopulation<1,1>("mesh/test/data/1D_0_to_1_10_elements");
+        TestSmallMeshBasedCellPopulation<2,2>("mesh/test/data/square_4_elements");
+        TestSmallMeshBasedCellPopulation<3,3>("mesh/test/data/cube_136_elements");
+    }
+
+    // Test construction, accessors and Iterator
+    void TestSmallMeshBasedCellPopulation2dIn3d() throw(Exception)
+    {
+        TestSmallMeshBasedCellPopulation<2,3>("cell_based/test/data/Simple2dMeshIn3d/Simple2dMeshIn3d");
+        TestSmallMeshBasedCellPopulation<2,3>("mesh/test/data/disk_in_3d");
     }
 
     // Test get centroid

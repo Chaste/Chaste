@@ -1004,9 +1004,7 @@ c_vector<double,SPACE_DIM> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetSi
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////
 
-template class AbstractCellPopulation<1,1>;
-template class AbstractCellPopulation<1,2>;
-template class AbstractCellPopulation<1,3>;
-template class AbstractCellPopulation<2,2>;
+template class AbstractCellPopulation<1>;
+template class AbstractCellPopulation<2>;
 template class AbstractCellPopulation<2,3>;
-template class AbstractCellPopulation<3,3>;
+template class AbstractCellPopulation<3>;
