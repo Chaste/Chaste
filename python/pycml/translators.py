@@ -1395,7 +1395,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
             self.writeln_hpp('#include "AbstractDynamicallyLoadableEntity.hpp"')
             self.class_inheritance += ', public AbstractDynamicallyLoadableEntity'
         if self.use_protocol:
-            self.writeln_hpp('#include "AbstractSystemWithOutputs.hpp"')
+            self.writeln_hpp('#include "AbstractTemplatedSystemWithOutputs.hpp"')
             self.class_inheritance += ', public AbstractTemplatedSystemWithOutputs<' + self.TYPE_VECTOR + '>'
         self.writeln('#include "Exception.hpp"')
         self.writeln('#include "OdeSystemInformation.hpp"')

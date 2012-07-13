@@ -907,7 +907,7 @@ def DoDynamicallyLoadableModules(otherVars):
         dyn_objs = dyn_env.SharedObject(source=s)
         for o in dyn_objs:
             so_lib = dyn_env.OriginalSharedLibrary(source=o)
-            so_dir = os.path.join(curdir, '..', '..', os.path.dirname(s))
+            so_dir = os.path.join(curdir, os.pardir, os.pardir, os.path.dirname(s))
             dyn_libs.append(dyn_env.Install(so_dir, so_lib))
             if otherVars['dyn_libs_only']:
                 if os.path.realpath(so_dir).startswith(os.path.realpath(otherVars['dyn_folder'])):
