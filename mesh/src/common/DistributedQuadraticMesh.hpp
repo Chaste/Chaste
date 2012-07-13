@@ -82,11 +82,9 @@ public:
     /**
      * Constructor.
      *
-     * \todo Change default partitioningMethod to PETSC_MAT_PARTITION when this class is complete
-     *
-     * @param partitioningMethod  defaults to DUMB, Nb: This is in contrast to the default behaviour of DistributedTetrahedralMesh, which defaults to METIS_LIBRARY
+     * @param partitioningMethod  defaults to PARMETIS_LIBRARY, Nb: This is in contrast to the default behaviour of DistributedTetrahedralMesh, which defaults to METIS_LIBRARY
      */
-    DistributedQuadraticMesh(DistributedTetrahedralMeshPartitionType::type partitioningMethod=DistributedTetrahedralMeshPartitionType::DUMB);
+    DistributedQuadraticMesh(DistributedTetrahedralMeshPartitionType::type partitioningMethod=DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
 
     /**
      * Destructor.

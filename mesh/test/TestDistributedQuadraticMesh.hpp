@@ -212,7 +212,7 @@ public:
          *  - edge file doesn't say which element the edge belongs too
          */
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic", 2, 1, false);
-        DistributedQuadraticMesh<2> mesh(DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
+        DistributedQuadraticMesh<2> mesh; //PARMETIS_LIBRARY
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Check we have the right number of nodes & elements
@@ -342,7 +342,7 @@ public:
          *  - face file does say which element the face belongs too
          */
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_152_elements_v3", 2, 1, true);
-        DistributedQuadraticMesh<3> mesh(DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
+        DistributedQuadraticMesh<3> mesh;// PARMETIS_LIBRARY
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Check we have the right number of nodes & elements
@@ -364,7 +364,7 @@ public:
     void TestConstructFromMeshReader3DFullyQuadratic() throw(Exception)
     {
         // Read in the same quadratic mesh with /quadratic/ boundary elements
-        DistributedQuadraticMesh<3> mesh(DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
+        DistributedQuadraticMesh<3> mesh; // PARMETIS_LIBRARY
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_1626_elements_fully_quadratic",2,2,false);
         mesh.ConstructFromMeshReader(mesh_reader);
 
@@ -384,6 +384,15 @@ public:
         TS_ASSERT_EQUALS(p_face->GetNumNodes(), 6u);
     }
 
+    void TestConstructFromLinearMeshReaderException() throw(Exception)
+    {
+        // Read in the same quadratic mesh with /quadratic/ boundary elements
+        DistributedQuadraticMesh<3> mesh; // PARMETIS_LIBRARY
+        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/l_shape3d");
+        TS_ASSERT_THROWS_THIS(mesh.ConstructFromMeshReader(mesh_reader),
+                              "Cannot convert a (linear) tetrahedral mesh directly to a DistributedQuadraticMesh.  Please convert to QuadraticMesh and save in that format first.");
+        
+    }
 };
 
 

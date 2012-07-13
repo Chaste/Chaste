@@ -62,14 +62,11 @@ void DistributedQuadraticMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<D
         order_of_elements = p_mesh_reader->GetOrderOfElements();
     }
 
-    assert(order_of_elements == 2);
     // If it is a linear TrianglesMeshReader or any other reader (which are all linear)
-//    if (order_of_elements == 1)
-//    {
-//        WARNING("Reading a (linear) tetrahedral mesh and converting it to a DistributedQuadraticMesh.  This involves making an external library call to Triangle/Tetgen in order to compute internal nodes");
-//        ConstructFromLinearMeshReader(rAbsMeshReader);
-//        return;
-//    }
+    if (order_of_elements == 1)
+    {
+        EXCEPTION("Cannot convert a (linear) tetrahedral mesh directly to a DistributedQuadraticMesh.  Please convert to QuadraticMesh and save in that format first.");
+    }
     DistributedTetrahedralMesh<DIM,DIM>::ConstructFromMeshReader(*p_mesh_reader);
     assert(this->GetNumBoundaryElements() > 0u);
     QuadraticMeshHelper<DIM>::AddInternalNodesToElements(this, p_mesh_reader);

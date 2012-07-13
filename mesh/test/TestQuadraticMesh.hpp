@@ -726,6 +726,9 @@ public:
         TS_ASSERT_EQUALS(quad_mesh.GetSurfaceArea(), 8.0);
     }
 
+    /* HOW_TO_TAG Mesh
+     * Convert a linear tetrahedral mesh to quadratic and write back to file.
+     */
     void TestLinearToQuadraticMeshConversion3d() throw(Exception)
     {
         QuadraticMesh<3> quad_mesh;
