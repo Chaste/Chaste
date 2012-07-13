@@ -553,7 +553,6 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndSt
         }
 
         double I4_s = inner_prod(mCurrentElementSheetDirection, prod(rC, mCurrentElementSheetDirection));
-        double lambda_s = sqrt(I4_s);
 
         // amend the stress and dTdE using the active tension
         double dTdE_coeff_s = -2*cross_fraction*active_tension/(I4_s*I4_s); // note: I4*I4 = lam^4
@@ -561,6 +560,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndSt
         ///\todo #2180 The code below is specific to the implicit cardiac mechanics solver. Currently
         // the cross-fibre code is only tested using the explicit solver so the code below fails coverage.
         // This will need to be added back in once an implicit test is in place.
+        //double lambda_s = sqrt(I4_s);
         //if(IsImplicitSolver())
         //{
         //   double dt = mNextTime-mCurrentTime;
