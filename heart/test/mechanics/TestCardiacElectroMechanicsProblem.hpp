@@ -108,7 +108,6 @@ public:
         }
         catch (Exception e)
         {
-            std::cout << e.GetMessage() << std::endl;
             TS_ASSERT_EQUALS(e.GetShortMessage(), "The second template parameter should be 1 when a monodomain problem is chosen");
         }
 
@@ -124,7 +123,6 @@ public:
         }
         catch (Exception e)
         {
-            std::cout << e.GetMessage() << std::endl;
             TS_ASSERT_EQUALS(e.GetShortMessage(), "The second template parameter should be 2 when a bidomain problem is chosen");
         }
     }

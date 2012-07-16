@@ -50,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NonlinearEquationPde.hpp"
 #include "SimpleNewtonNonlinearSolver.hpp"
 
-/* HOW_TO_TAG Pde
+/* HOW_TO_TAG PDE
  * Write a solver for coupled nonlinear PDEs (advanced)
  */
 

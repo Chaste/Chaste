@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTSOLVINGLINEARPDESTUTORIAL_HPP_
 #define TESTSOLVINGLINEARPDESTUTORIAL_HPP_
 
-/* HOW_TO_TAG Pde
+/* HOW_TO_TAG PDE
  * Define and solve linear elliptic or parabolic PDEs
  */
 
@@ -338,7 +338,7 @@ public:
         solver.SetTimeStep(dt);
 
 
-        /* HOW_TO_TAG Pde
+        /* HOW_TO_TAG PDE
          * Output results to file for time-dependent PDE solvers
          */
 

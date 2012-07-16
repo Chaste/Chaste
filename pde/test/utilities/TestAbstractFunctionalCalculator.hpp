@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 #include "DistributedVector.hpp"
 
-/* HOW_TO_TAG Pde
+/* HOW_TO_TAG PDE
  * Evaluate integrals (using a solution from a PDE solve say) over a finite element mesh
  */
 
