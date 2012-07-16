@@ -74,41 +74,25 @@ QuadraticMesh<DIM>::QuadraticMesh(double spaceStep, double width, double height,
 template<unsigned DIM>
 void QuadraticMesh<DIM>::ConstructLinearMesh(unsigned numElemX)
 {
-    this->mNodes.resize(2*numElemX+1);
+    AbstractTetrahedralMesh<DIM,DIM>::ConstructLinearMesh(numElemX);
+    assert (this->mNodes.size() == numElemX+1);
     mNumVertices = numElemX+1;
-
-    // create the left-most node
-    Node<DIM>* p_edge_node = new Node<DIM>(0, true, 0.0);
-    this->mNodes[0] = p_edge_node; // create nodes
-    this->mBoundaryNodes.push_back(p_edge_node);
-    this->mBoundaryElements.push_back(new BoundaryElement<DIM-1,DIM>(0, p_edge_node) );
-
+    this->mNodes.resize(2*numElemX+1);
+    
     for (unsigned element_index=0; element_index<numElemX; element_index++)
     {
-        unsigned right_node_index = element_index+1;
         unsigned mid_node_index = mNumVertices + element_index;
+        double x_value_mid_node = element_index+0.5;
 
-        double x_value_right_x = right_node_index;
-        double x_value_mid_node = x_value_right_x-0.5;
-
-        bool is_boundary = (element_index+1==numElemX);
-        Node<DIM>* p_right_node = new Node<DIM>(right_node_index, is_boundary, x_value_right_x);
+        //Make internal node
         Node<DIM>* p_mid_node   = new Node<DIM>(mid_node_index, false, x_value_mid_node);
-
-        this->mNodes[right_node_index] = p_right_node;
+        p_mid_node->MarkAsInternal();
+        //Put in mesh
         this->mNodes[mid_node_index] = p_mid_node;
-
-        if (element_index+1==numElemX) // right boundary
-        {
-            this->mBoundaryNodes.push_back(p_right_node);
-            this->mBoundaryElements.push_back(new BoundaryElement<DIM-1,DIM>(1, p_right_node) );
-        }
-
-        std::vector<Node<DIM>*> nodes;
-        nodes.push_back(this->mNodes[right_node_index-1]);
-        nodes.push_back(this->mNodes[right_node_index]);
-        nodes.push_back(this->mNodes[mid_node_index]);
-        this->mElements.push_back(new Element<DIM,DIM>(element_index, nodes) );
+        //Put in element and cross-reference
+        this->mElements[element_index]->AddNode(p_mid_node);
+        p_mid_node->AddElement(element_index);
+        
     }
 
     this->RefreshMesh();

@@ -107,7 +107,7 @@ public:
         }
         for (unsigned i=0; i<mesh.GetNumElements(); i++)
         {
-            // Check internal nodes have corrent element associated with them
+            // Check internal nodes have correct element associated with them
             std::set<unsigned> internal_node_elems;
             internal_node_elems.insert(mesh.GetElement(i)->GetIndex());
             TS_ASSERT_EQUALS(internal_node_elems,mesh.GetElement(i)->GetNode(2)->rGetContainingElementIndices());
@@ -937,7 +937,7 @@ public:
         double global_error_sum = 0;
         MPI_Allreduce( &error_sum, &global_error_sum, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
 
-        std::cout << "Error sum = " << global_error_sum << "\n";
+//        std::cout << "Error sum = " << global_error_sum << "\n";
 
         return global_hist;
     }
@@ -973,7 +973,7 @@ public:
 
         idxtype *xadj=new idxtype[num_local_nodes+1];
         idxtype* adjncy = new idxtype[local_num_nz];
-        //PRINT_2_VARIABLES(num_local_nodes+1, local_num_nz);
+
         PetscInt row_num_nz;
         const PetscInt* column_indices;
 
@@ -993,10 +993,8 @@ public:
         }
 
         PetscTools::Destroy(connectivity_matrix);
-        //PRINT_3_VARIABLES(xadj[0],xadj[288],xadj[289])
-        ///\todo Get this bit to work in parallel
+
         EXIT_IF_PARALLEL;
-        ///\todo Get this bit to work in serial!
 //        idxtype vtxdist[2]; //PetscTools::GetNumProcs()
 //        vtxdist[0]=0;
 //        vtxdist[1]=connectivity_matrix_hi;
@@ -1030,26 +1028,8 @@ public:
         delete [] xadj;
         delete [] adjncy;
 
-        ///\todo #2106 Do some good permuting, not bad permuting.
-        //quad_mesh.PermuteNodes(permutation);
         quad_mesh.PermuteNodes(ipermutation);
         std::vector<unsigned> upper_hist_metis = CalculateMatrixFill(quad_mesh);
-
-        OutputFileHandler handler("TestQuadraticMesh", false);
-        if (PetscTools::AmMaster())
-        {
-            out_stream p_file_stream;
-            p_file_stream = handler.OpenOutputFile("hist.txt");
-            for (unsigned i = 0 ; i< quad_mesh.GetNumNodes(); i++)
-
-            {
-                *p_file_stream<<i<<"\t"<<upper_hist[i]<<"\t"<<upper_hist_random[i]<<"\t"<<upper_hist_metis[i]<<"\n";
-            }
-            p_file_stream->close();
-        }
-        //TrianglesMeshWriter<2,2> mesh_writer("TestQuadraticMesh", "square_reordered", false);
-        //mesh_writer.WriteFilesUsingMesh(quad_mesh);
-
 
 
     }
