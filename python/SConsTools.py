@@ -170,7 +170,8 @@ def FasterSharedLibrary(env, library, sources, **args):
         Copy('$TARGET', str(catLib[0])))
     envContentSig.Depends(catLink, catIF)
     # Record the library to link against
-    env['CHASTE_LIBRARIES'][library[0]] = catLink[0]
+    prefix = args.get('libIdPrefix', '')
+    env['CHASTE_LIBRARIES'][prefix+library[0]] = catLink[0]
 
     return cat
 
@@ -292,16 +293,22 @@ def DetermineLibraryDependencies(env, partialGraph):
     """
     if env['build'].debug:
         print "Initial component dependencies:", partialGraph
+        print "Chaste libraries:", env['CHASTE_LIBRARIES']
     WHITE, GRAY, BLACK = 0, 1, 2
+    PROJECT_PREFIX = 'projects/'
     full_graph = {}
-    def get_lib(comp, projectOnly=False):
+    def get_lib(comp, linkArg=False):
         """Get the library node for a component."""
         if not isinstance(comp, type('')):
             lib = comp # It's already a library node
         elif comp == 'core':
             lib = None # Not a real library
-        elif projectOnly and not comp.startswith('projects'):
-            lib = comp # We should link components with -lcomp, not linklib/libcomp.so
+        elif linkArg:
+            # Link with -lNAME, not linklib/libNAME.so
+            if comp.startswith(PROJECT_PREFIX):
+                lib = comp[len(PROJECT_PREFIX):]
+            else:
+                lib = comp
         else:
             lib = env['CHASTE_LIBRARIES'][comp]
         return lib
@@ -323,7 +330,7 @@ def DetermineLibraryDependencies(env, partialGraph):
         colours[node] = BLACK
         gray_stack.pop()
         if node is not root:
-            node_lib = get_lib(node, projectOnly=True)
+            node_lib = get_lib(node, linkArg=True)
             if node_lib:
                 full_graph[root].append(node_lib)
         else:
@@ -344,10 +351,8 @@ def DetermineLibraryDependencies(env, partialGraph):
     if scons_ver < (1,0,0):
         for comp in full_graph:
             for i, dep in enumerate(full_graph[comp]):
-                if isinstance(dep, type('')):
-                    full_graph[comp][i] = '-l' + dep
-                else:
-                    raise ValueError("Unable to use projects as dependencies with this version of SCons")
+                assert isinstance(dep, type(''))
+                full_graph[comp][i] = '-l' + dep
     if env['build'].debug:
         print "Complete component dependencies:", full_graph
     # Transfer results to partialGraph
@@ -800,7 +805,7 @@ def RunAcceptanceTests(build, env, appsPath, testsPath, exes, otherVars):
     if otherVars['test_summary']:
         env.Alias('test_summary_dependencies', dummy)
 
-def BuildExes(build, env, appsPath, components, otherVars, project=None):
+def BuildExes(build, env, appsPath, components, otherVars):
     """Build 'standalone' executables (i.e. with their own main(), not using cxxtest).
     
     apps_path should refer to a directory structure containing folders:
@@ -808,9 +813,6 @@ def BuildExes(build, env, appsPath, components, otherVars, project=None):
       texttest/chaste - definitions for acceptance tests, optional
     
     components gives the Chaste libraries that these executables link against.
-    
-    project, if given, means we're building executables for that project, and hence
-    need to link against its library too.
     """
     env = CloneEnv(env)
     src_path = os.path.join(appsPath, 'src')
@@ -823,19 +825,12 @@ def BuildExes(build, env, appsPath, components, otherVars, project=None):
     else:
         libpath = '#linklib'
     env.Replace(LIBPATH=[libpath] + otherVars['other_libpaths'])
-    if project:
-        env.Prepend(LIBPATH=os.path.join(appsPath, '..', 'build', build.build_dir))
     env.Prepend(CPPPATH=src_path)
     env.Replace(LIBS=components + otherVars['other_libs'])
-    if project:
-        env.Prepend(LIBS=project)
 
     exes = []
     for main_cpp in glob.glob(os.path.join(src_path, '*.cpp')):
         exes.append(env.Program(main_cpp))
-    #if project:
-    #    # Don't hide the executables in the build dir
-    #    env.Install(src_path, exes)
 
     if not otherVars['compile_only']:
         # Run acceptance tests if present
@@ -924,7 +919,7 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
         import os
         Import("*")
         project_name = os.path.basename(os.path.dirname(os.path.dirname(os.getcwd())))
-        chaste_libs_used = comp_deps['core'] # or ['heart'], ['cell_based', 'crypt'], etc.
+        chaste_libs_used = ['core'] # or ['heart'], ['cell_based', 'crypt'], etc.
         result = SConsTools.DoProjectSConscript(project_name, chaste_libs_used, globals())
         Return("result")
     """
@@ -975,14 +970,20 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
     # Build any dynamically loadable modules
     dyn_libs = DoDynamicallyLoadableModules(otherVars)
 
-    # Libraries to link against (TODO: only add project libs if sources exist)
-    chaste_libs = ["${CHASTE_COMP_DEPS['%s']}" % project_path]
-    all_libs = ['test'+projectName, projectName] + chaste_libs + otherVars['other_libs']
-
+    # Build and install the library for this project
+    set_env_chaste_libs = True
     if use_chaste_libs:
-        # Build the library for this project
-        project_lib = env.StaticLibrary(projectName, files)[0]
-        
+        if otherVars['static_libs']:
+            project_lib = env.StaticLibrary(projectName, files)
+            libpath = '#lib'
+            project_lib = env.Install(libpath, project_lib)[0]
+        else:
+            if files:
+                project_lib = env.SharedLibrary(projectName, files, libIdPrefix='projects/')[0]
+                set_env_chaste_libs = False # Done by FasterSharedLibrary
+            else:
+                project_lib = None
+            libpath = '#linklib'
         # Build the test library for this project
         test_lib = env.StaticLibrary('test'+projectName, testsource)[0]
     else:
@@ -992,11 +993,20 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
             objs = env.StaticObject(source_file)
             key = os.path.join(project_path, source_file)
             RegisterObjects(env, key, objs)
-    env['CHASTE_LIBRARIES'][project_path] = project_lib
+    if set_env_chaste_libs:
+        env['CHASTE_LIBRARIES'][project_path] = project_lib
+
+    # Libraries to link against
+    chaste_libs = ["${CHASTE_COMP_DEPS['%s']}" % project_path]
+    if project_lib:
+        chaste_libs[0:0] = [projectName]
+    all_libs = ['test'+projectName] + chaste_libs + otherVars['other_libs']
 
     # Make test output depend on shared libraries, so if implementation changes then tests are re-run.
-    lib_deps = [project_lib, test_lib] # only this project's libraries
+    lib_deps = [test_lib] # Source code used by our tests
     #lib_deps.extend(map(lambda lib: '#lib/lib%s.so' % lib, chasteLibsUsed)) # all Chaste libs used
+    if project_lib:
+        lib_deps.append(project_lib)
 
     # Collect a list of test log files to use as dependencies for the test summary generation
     test_log_files = []
@@ -1009,7 +1019,7 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
             env['TestBuilder'] = lambda target, source: env.Program(target, source, **overrides)
         else:
             overrides = {'LIBS': all_libs,
-                         'LIBPATH': ['#/lib', '.'] + otherVars['other_libpaths']}
+                         'LIBPATH': [libpath, '.'] + otherVars['other_libpaths']}
     for testfile in testfiles:
         prefix = os.path.splitext(testfile)[0]
         #print projectName, 'test', prefix
@@ -1034,8 +1044,7 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
         if os.path.isdir(apps_path):
             BuildExes(otherVars['build'], env, apps_path,
                       components=chaste_libs,
-                      otherVars=otherVars,
-                      project=projectName)
+                      otherVars=otherVars)
     
     return test_log_files
 
@@ -1120,6 +1129,7 @@ def DoComponentSConscript(component, otherVars):
     special_objects = CheckForSpecialFiles(env, component, files, otherVars)
     
     # Build and install the library for this component
+    set_env_chaste_libs = True
     if use_chaste_libs:
         if otherVars['static_libs']:
             lib = env.StaticLibrary(component, files + special_objects)
@@ -1127,44 +1137,44 @@ def DoComponentSConscript(component, otherVars):
             # so this library and its tests will be re-linked if they change
             env.Depends(lib, map(lambda lib: '#lib/lib%s.a' % lib,
                                  env['CHASTE_COMP_DEPS'][component]))
-            lib = env.Install('#lib', lib)
+            lib = env.Install('#lib', lib)[0]
             libpath = '#lib'
-            env['CHASTE_LIBRARIES'][component] = lib[0]
         else:
             if files:
                 lib = env.SharedLibrary(component, files + special_objects)
+                set_env_chaste_libs = False # Done by FasterSharedLibrary
             else:
                 lib = None
-                env['CHASTE_LIBRARIES'][component] = lib
             libpath = '#linklib'
-            # env['CHASTE_LIBRARIES'][component] is set by fasterSharedLibrary
         # Build the test library for this component
-        env.StaticLibrary('test'+component, testsource)
+        test_lib = env.StaticLibrary('test'+component, testsource)
         # Install libraries?
         if lib and otherVars['install_prefix']:
             t = env.Install(os.path.join(otherVars['install_prefix'], 'lib'), lib)
             env.Alias('install', t)
     else:
         # Don't build libraries - tests will link against object files directly
-        lib = None
+        lib = test_lib = None
         for source_file in files + testsource:
             objs = env.StaticObject(source_file)
             key = os.path.join(component, str(source_file))
             RegisterObjects(env, key, objs)
+    if set_env_chaste_libs:
+        env['CHASTE_LIBRARIES'][component] = lib
     
     # Determine libraries to link against.
     # Note that order does matter!
+    chaste_libs = ["${CHASTE_COMP_DEPS['%s']}" % component]
     if lib:
-        chaste_libs = [component] + ["${CHASTE_COMP_DEPS['%s']}" % component]
-    else:
-        chaste_libs = ["${CHASTE_COMP_DEPS['%s']}" % component]
+        chaste_libs = [component] + chaste_libs
     all_libs = ['test'+component] + chaste_libs + otherVars['other_libs']
     
     # Make test output depend on shared libraries, so if implementation changes
-    # then tests are re-run.  Choose which line according to taste.
-    #lib_deps = map(lambda lib: '#lib/lib%s.so' % lib, chaste_libs) # all libs
-    lib_deps = lib # only this lib
-    #linklib_deps = map(lambda lib: '#linklib/lib%s.so' % lib, chaste_libs)
+    # then tests are re-run.
+    lib_deps = [test_lib] # Source code used by our tests
+    #lib_deps.extend(map(lambda lib: '#lib/lib%s.so' % lib, chaste_libs)) # all Chaste libs used
+    if lib:
+        lib_deps.append(lib)
 
     # Collect a list of test log files to use as dependencies for the test
     # summary generation
