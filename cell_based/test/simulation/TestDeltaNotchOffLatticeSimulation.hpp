@@ -118,6 +118,7 @@ public:
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDeltaNotchNodeBasedUpdateAtEndOfTimeStep");
         simulator.SetEndTime(0.01);
+        simulator.SetOutputNodeVelocities(true);
 
         // Set up force law and add to simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
@@ -198,8 +199,9 @@ public:
 
         // Set up the simulation
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("DeltaNotchTwoCellTest_heterogee");
+        simulator.SetOutputDirectory("TestDeltaNotchTwoCell_heterogee");
         simulator.SetEndTime(10.0);
+        simulator.SetOutputNodeVelocities(true);
 
         // Define the radius of interaction as we're dealing with a node-based simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
@@ -292,8 +294,9 @@ public:
 
         // Set up the simulation
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("DeltaNotchTwoCellTest_homgee");
+        simulator.SetOutputDirectory("TestDeltaNotchTwoCell_homgee");
         simulator.SetEndTime(10.0);
+        simulator.SetOutputNodeVelocities(true);
 
         // Define the radius of interaction as we're dealing with a node-based simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
@@ -354,6 +357,7 @@ public:
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDeltaNotchVertex2D");
         simulator.SetEndTime(0.01);
+        simulator.SetOutputNodeVelocities(true);
 
         // Create force law and add to simulation
         MAKE_PTR(NagaiHondaForce<2>, p_force);
@@ -402,6 +406,7 @@ public:
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDeltaNotchMeshBasedUpdateAtEndOfTimeStep");
         simulator.SetEndTime(0.02);
+        simulator.SetOutputNodeVelocities(true);
 
         // Set up force law and add to simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
@@ -452,6 +457,7 @@ public:
         simulator.SetOutputDirectory("TestDeltaNotchOffLatticeSimulationSaveAndLoad");
         double end_time=0.01;
         simulator.SetEndTime(end_time);
+        simulator.SetOutputNodeVelocities(true);
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
