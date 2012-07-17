@@ -235,6 +235,15 @@ public:
     virtual bool IsParticle(unsigned index);
 
     /**
+     * Method to return the connected nodes in  a centre based simulation.
+     *
+     * Overridden in sub classes to have correct functionality.
+     *
+     * @return Node pairs for force calculation.
+     */
+    virtual std::set< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > >& rGetNodePairs()=0;
+
+    /**
      * @return mMeinekeDivisionSeparation
      */
     double GetMeinekeDivisionSeparation();

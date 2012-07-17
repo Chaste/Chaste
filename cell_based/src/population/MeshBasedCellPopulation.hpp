@@ -158,6 +158,9 @@ protected:
     /** Whether springs have variable rest lengths. */
     bool mHasVariableRestLength;
 
+    /** Node pairs for force calculations. */
+    std::set< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > > mNodePairs;
+
 #undef COVERAGE_IGNORE // Avoid prototypes being treated as code by gcov
 
     /**
@@ -535,6 +538,13 @@ public:
     void SetOutputCellPopulationVolumes(bool outputCellPopulationVolumes);
 
     /**
+     * Overridden rGetNodePairs method which uses the Delaunay triangulatiuon
+     *
+     * @return Node pairs for force calculation.
+     */
+    std::set< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > >& rGetNodePairs();
+
+    /**
      * Outputs CellPopulation parameters to file
      *
      * @param rParamsFile the file stream to which the parameters are output
@@ -577,7 +587,7 @@ public:
 #undef COVERAGE_IGNORE // Avoid prototypes being treated as code by gcov
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(MeshBasedCellPopulation)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(MeshBasedCellPopulation)
 
 namespace boost
 {

@@ -425,7 +425,7 @@ public:
         // Test with GeneralisedLinearSpringForce
         GeneralisedLinearSpringForce<2> linear_force;
         linear_force.SetCutOffLength(1.5);
-        TS_ASSERT_EQUALS(linear_force.GetIdentifier(), "GeneralisedLinearSpringForce-2");
+        TS_ASSERT_EQUALS(linear_force.GetIdentifier(), "GeneralisedLinearSpringForce-2-2");
 
         out_stream linear_force_parameter_file = output_file_handler.OpenOutputFile("linear_results.parameters");
         linear_force.OutputForceParameters(linear_force_parameter_file);

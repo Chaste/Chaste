@@ -244,6 +244,8 @@ public:
     BoxCollection<DIM>* GetBoxCollection();
 
     /**
+     * Overridden rGetNodePairs method
+     *
      * @return Node pairs for force calculation.
      */
     std::set< std::pair<Node<DIM>*, Node<DIM>* > >& rGetNodePairs();

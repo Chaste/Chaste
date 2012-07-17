@@ -61,8 +61,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Length is scaled by natural length.
  * Time is in hours.
  */
-template<unsigned DIM>
-class GeneralisedLinearSpringForce : public AbstractTwoBodyInteractionForce<DIM>
+template<unsigned  ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
+class GeneralisedLinearSpringForce : public AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>
 {
     friend class TestForces;
 
@@ -79,7 +79,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractTwoBodyInteractionForce<DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM> >(*this);
         archive & mMeinekeSpringStiffness;
         archive & mMeinekeDivisionRestingSpringLength;
         archive & mMeinekeSpringGrowthDuration;
@@ -140,7 +140,7 @@ public:
      */
     virtual double VariableSpringConstantMultiplicationFactor(unsigned nodeAGlobalIndex,
                                                               unsigned nodeBGlobalIndex,
-                                                              AbstractCellPopulation<DIM>& rCellPopulation,
+                                                              AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation,
                                                               bool isCloserThanRestLength);
 
     /**
@@ -153,12 +153,11 @@ public:
      * @param nodeAGlobalIndex index of one neighbouring node
      * @param nodeBGlobalIndex index of the other neighbouring node
      * @param rCellPopulation the cell population
-     *
      * @return The force exerted on Node A by Node B.
      */
-    c_vector<double, DIM> CalculateForceBetweenNodes(unsigned nodeAGlobalIndex,
+    c_vector<double, SPACE_DIM> CalculateForceBetweenNodes(unsigned nodeAGlobalIndex,
                                                      unsigned nodeBGlobalIndex,
-                                                     AbstractCellPopulation<DIM>& rCellPopulation);
+                                                     AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation);
     /**
      * @return mMeinekeSpringStiffness
      */
@@ -204,6 +203,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(GeneralisedLinearSpringForce)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(GeneralisedLinearSpringForce)
 
 #endif /*GENERALISEDLINEARSPRINGFORCE_HPP_*/

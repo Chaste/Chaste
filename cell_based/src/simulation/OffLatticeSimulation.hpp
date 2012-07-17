@@ -91,7 +91,7 @@ private:
 protected:
 
     /** The mechanics used to determine the new location of the cells, a list of the forces. */
-    std::vector<boost::shared_ptr<AbstractForce<SPACE_DIM> > > mForceCollection;
+    std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > > mForceCollection;
 
     /** List of boundary conditions. */
     std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<SPACE_DIM> > > mBoundaryConditions;
@@ -171,7 +171,7 @@ public:
      *
      * @param pForce pointer to a force law
      */
-    void AddForce(boost::shared_ptr<AbstractForce<SPACE_DIM> > pForce);
+    void AddForce(boost::shared_ptr<AbstractForce<ELEMENT_DIM,SPACE_DIM> > pForce);
 
     /**
      * Method to remove all the Forces
@@ -223,7 +223,7 @@ public:
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(OffLatticeSimulation)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(OffLatticeSimulation)
 
 namespace boost
 {

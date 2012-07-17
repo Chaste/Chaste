@@ -673,7 +673,7 @@ public:
         // Create cell population
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
-        TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "MeshBasedCellPopulation-2");
+        TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "MeshBasedCellPopulation-2-2");
 
         // Test set/get methods
         TS_ASSERT_EQUALS(cell_population.GetOutputVoronoiData(), false);
@@ -788,7 +788,7 @@ public:
         // Create cell population
         MeshBasedCellPopulation<3> cell_population(mesh, cells);
 
-        TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "MeshBasedCellPopulation-3");
+        TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "MeshBasedCellPopulation-3-3");
 
         // Coverage of writing CellData to VTK
         for (AbstractCellPopulation<3>::Iterator cell_iter = cell_population.Begin();

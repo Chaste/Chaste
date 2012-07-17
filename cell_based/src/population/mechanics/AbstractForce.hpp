@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * An abstract force class, for use in cell-based simulations.
  */
-template<unsigned DIM>
+template<unsigned  ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
 class AbstractForce : public Identifiable
 {
     /** Needed for serialization. */
@@ -81,8 +81,8 @@ public:
      * @param rForces reference to vector of forces on nodes
      * @param rCellPopulation reference to the cell population
      */
-    virtual void AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
-                                      AbstractCellPopulation<DIM>& rCellPopulation)=0;
+    virtual void AddForceContribution(std::vector<c_vector<double, SPACE_DIM> >& rForces,
+                                      AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation)=0;
 
     /**
      * Outputs force used in the simulation to file and then calls OutputForceParameters to output all relevant parameters.
@@ -102,6 +102,6 @@ public:
     virtual void OutputForceParameters(out_stream& rParamsFile)=0;
 };
 
-TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractForce)
+TEMPLATED_CLASS_IS_ABSTRACT_2_UNSIGNED(AbstractForce)
 
 #endif /*ABSTRACTFORCE_HPP_*/

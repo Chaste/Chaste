@@ -71,7 +71,7 @@ OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OffLatticeSimulation(AbstractCellPo
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::AddForce(boost::shared_ptr<AbstractForce<SPACE_DIM> > pForce)
+void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::AddForce(boost::shared_ptr<AbstractForce<ELEMENT_DIM,SPACE_DIM> > pForce)
 {
     mForceCollection.push_back(pForce);
 }
@@ -119,7 +119,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
 //    }
 
     // Now add force contributions from each AbstractForce
-    for (typename std::vector<boost::shared_ptr<AbstractForce<SPACE_DIM> > >::iterator iter = mForceCollection.begin();
+    for (typename std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mForceCollection.begin();
          iter != mForceCollection.end();
          ++iter)
     {
@@ -214,10 +214,12 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::WriteVisualizerSetupFile()
 	{
 		for (unsigned i=0; i<this->mForceCollection.size(); i++)
 		{
-			boost::shared_ptr<AbstractForce<SPACE_DIM> > p_force = this->mForceCollection[i];
-			if (boost::dynamic_pointer_cast<AbstractTwoBodyInteractionForce<SPACE_DIM> >(p_force))
+			// THis causes the thing to noc compile prob due to AbstractTwoBodyInteractionForce not HAVING 2 TEMPLATES
+
+			boost::shared_ptr<AbstractForce<ELEMENT_DIM,SPACE_DIM> > p_force = this->mForceCollection[i];
+			if (boost::dynamic_pointer_cast<AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM> >(p_force))
 			{
-				double cutoff = (boost::static_pointer_cast<AbstractTwoBodyInteractionForce<SPACE_DIM> >(p_force))->GetCutOffLength();
+				double cutoff = (boost::static_pointer_cast<AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM> >(p_force))->GetCutOffLength();
 				*(this->mpVizSetupFile) << "Cutoff\t" << cutoff << "\n";
 			}
 		}
@@ -364,7 +366,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OutputAdditionalSimulationSetu
 {
     // Loop over forces
     *rParamsFile << "\n\t<Forces>\n";
-    for (typename std::vector<boost::shared_ptr<AbstractForce<SPACE_DIM> > >::iterator iter = mForceCollection.begin();
+    for (typename std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM,SPACE_DIM> > >::iterator iter = mForceCollection.begin();
          iter != mForceCollection.end();
          ++iter)
     {
@@ -410,11 +412,13 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationParameters(out
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////
 
-template class OffLatticeSimulation<1>;
-template class OffLatticeSimulation<2>;
-//template class OffLatticeSimulation<2,3>;
-template class OffLatticeSimulation<3>;
+template class OffLatticeSimulation<1,1>;
+template class OffLatticeSimulation<1,2>;
+template class OffLatticeSimulation<2,2>;
+template class OffLatticeSimulation<1,3>;
+template class OffLatticeSimulation<2,3>;
+template class OffLatticeSimulation<3,3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(OffLatticeSimulation)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(OffLatticeSimulation)

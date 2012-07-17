@@ -69,14 +69,16 @@ std::string Identifiable::TidyTemplatedExportIdentifier(std::string identifier) 
     // Then replace "," with "-" to account for multiple template parameters
     const std::string s_comma = ",";
     i = identifier.find(s_comma);
-    assert( i == identifier.npos ); /// #1453 There are currently no identifiables with multiple template parameters...
 
-    /**\todo #1453 - implement the following if needed
     if (i != identifier.npos)
     {
         identifier.replace(i, s_comma.length(), s_dash);
     }
-    */
+
+    // Check at most one comma
+    i = identifier.find(s_comma);
+    assert( i == identifier.npos ); /// #1453 There are currently no identifiables with more than two template parameters. i.e only one comma.
+
 
     // Finally remove ">)>::type", so that identifier now takes the form "NameOfDerivedType-DIM"
     const std::string s_end = ">)>::type";

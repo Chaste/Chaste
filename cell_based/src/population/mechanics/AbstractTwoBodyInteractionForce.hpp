@@ -42,8 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * An abstract class for two-body force laws.
  */
-template<unsigned DIM>
-class AbstractTwoBodyInteractionForce : public AbstractForce<DIM>
+template<unsigned  ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
+class AbstractTwoBodyInteractionForce : public AbstractForce<ELEMENT_DIM, SPACE_DIM>
 {
 private:
 
@@ -58,7 +58,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractForce<DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractForce<ELEMENT_DIM,SPACE_DIM> >(*this);
         archive & mUseCutOffLength;
         archive & mMechanicsCutOffLength;
     }
@@ -111,7 +111,7 @@ public:
      *
      * @return The force exerted on Node A by Node B.
      */
-    virtual c_vector<double, DIM> CalculateForceBetweenNodes(unsigned nodeAGlobalIndex, unsigned nodeBGlobalIndex, AbstractCellPopulation<DIM>& rCellPopulation)=0;
+    virtual c_vector<double, SPACE_DIM> CalculateForceBetweenNodes(unsigned nodeAGlobalIndex, unsigned nodeBGlobalIndex, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation)=0;
 
     /**
      * Overridden AddForceContribution() method.
@@ -119,8 +119,8 @@ public:
      * @param rForces reference to vector of forces on nodes
      * @param rCellPopulation reference to the cell population
      */
-    void AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
-                              AbstractCellPopulation<DIM>& rCellPopulation);
+    void AddForceContribution(std::vector<c_vector<double, SPACE_DIM> >& rForces,
+                              AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation);
 
     /**
      * Overridden OutputForceParameters() method.

@@ -811,7 +811,7 @@ public:
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetEndTime(0.5);
-        TS_ASSERT_EQUALS(simulator.GetIdentifier(), "OffLatticeSimulation-2");
+        TS_ASSERT_EQUALS(simulator.GetIdentifier(), "OffLatticeSimulation-2-2");
 
         //#1453 should have forces and cell killer included here to make it a better test.
 

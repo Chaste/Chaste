@@ -327,7 +327,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::Update(bool hasHadBirthsOrD
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::TessellateIfNeeded()
 {
-    if (SPACE_DIM==2 || SPACE_DIM==3)
+	 if ((SPACE_DIM==2 || SPACE_DIM==3)&&(ELEMENT_DIM==SPACE_DIM))
     {
         CellBasedEventHandler::BeginEvent(CellBasedEventHandler::TESSELLATION);
         if (mUseAreaBasedDampingConstant || mOutputVoronoiData || mOutputCellPopulationVolumes || this->mOutputCellVolumes)
@@ -432,7 +432,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteResultsToFiles()
         bool element_contains_dead_cells_or_deleted_nodes = false;
 
         // Hack that covers the case where the element contains a node that is associated with a cell that has just been killed (#1129)
-        for (unsigned i=0; i<SPACE_DIM+1; i++)
+        for (unsigned i=0; i<ELEMENT_DIM+1; i++)
         {
             unsigned node_index = elem_iter->GetNodeGlobalIndex(i);
 
@@ -452,7 +452,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteResultsToFiles()
         }
         if (!element_contains_dead_cells_or_deleted_nodes)
         {
-            for (unsigned i=0; i<SPACE_DIM+1; i++)
+            for (unsigned i=0; i<ELEMENT_DIM+1; i++)
             {
                 *mpVizElementsFile << elem_iter->GetNodeGlobalIndex(i) << " ";
             }
@@ -958,8 +958,9 @@ void MeshBasedCellPopulation<2>::CreateVoronoiTessellation()
 
     mpVoronoiTessellation = new VertexMesh<2, 2>(static_cast<MutableMesh<2, 2> &>((this->mrMesh)), is_mesh_periodic);
 }
+
 /**
- *
+ * Can't tessellate 2d meshes in 3d space yet.
  */
 template<>
 void MeshBasedCellPopulation<2,3>::CreateVoronoiTessellation()
@@ -985,7 +986,29 @@ void MeshBasedCellPopulation<3>::CreateVoronoiTessellation()
  * are two definitions to this method (one templated and one not).
  */
 template<>
-void MeshBasedCellPopulation<1>::CreateVoronoiTessellation()
+void MeshBasedCellPopulation<1, 1>::CreateVoronoiTessellation()
+{
+    // No 1D Voronoi tessellation
+    NEVER_REACHED;
+}
+
+/**
+ * The VoronoiTessellation class is only defined in 2D or 3D, hence there
+ * are two definitions to this method (one templated and one not).
+ */
+template<>
+void MeshBasedCellPopulation<1, 2>::CreateVoronoiTessellation()
+{
+    // No 1D Voronoi tessellation
+    NEVER_REACHED;
+}
+
+/**
+ * The VoronoiTessellation class is only defined in 2D or 3D, hence there
+ * are two definitions to this method (one templated and one not).
+ */
+template<>
+void MeshBasedCellPopulation<1, 3>::CreateVoronoiTessellation()
 {
     // No 1D Voronoi tessellation
     NEVER_REACHED;
@@ -1148,6 +1171,14 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetOutputCellPopulationVolu
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::set< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > >& MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::rGetNodePairs()
+{
+	//mNodePairs.Clear();
+    NEVER_REACHED;
+	return mNodePairs;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t<UseAreaBasedDampingConstant>" << mUseAreaBasedDampingConstant << "</UseAreaBasedDampingConstant>\n";
@@ -1258,11 +1289,13 @@ double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetRestLength(unsigned in
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////
 
-template class MeshBasedCellPopulation<1>;
-template class MeshBasedCellPopulation<2>;
+template class MeshBasedCellPopulation<1,1>;
+template class MeshBasedCellPopulation<1,2>;
+template class MeshBasedCellPopulation<2,2>;
+template class MeshBasedCellPopulation<1,3>;
 template class MeshBasedCellPopulation<2,3>;
-template class MeshBasedCellPopulation<3>;
+template class MeshBasedCellPopulation<3,3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(MeshBasedCellPopulation)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(MeshBasedCellPopulation)

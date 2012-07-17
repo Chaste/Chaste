@@ -114,7 +114,7 @@ public:
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
-        TS_ASSERT_EQUALS(simulator.GetIdentifier(), "OffLatticeSimulation-2");
+        TS_ASSERT_EQUALS(simulator.GetIdentifier(), "OffLatticeSimulation-2-2");
         simulator.SetOutputDirectory("OffLatticeSimulationWritingProteins");
         simulator.SetEndTime(0.5);
 
