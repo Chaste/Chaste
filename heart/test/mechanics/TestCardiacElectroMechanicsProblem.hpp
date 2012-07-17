@@ -293,6 +293,10 @@ public:
         }
 
         TS_ASSERT_EQUALS(problem.mpElectricsProblem->GetHasBath(), false);
+
+        //test the functionality of having phi_e on the mechanics mesh (values are tested somewhere else)
+        Hdf5DataReader data_reader("TestCardiacEmHomogeneousEverythingCompressibleBidomain/electrics","voltage_mechanics_mesh");
+        TS_ASSERT_THROWS_NOTHING(data_reader.GetVariableOverTime("Phi_e",0u));
     }
 
     // This test is virtually identical to the above test, except it uses

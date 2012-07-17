@@ -63,17 +63,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM>
 class VoltageInterpolaterOntoMechanicsMesh
 {
+
 public:
     /**
      *  Constructor, also the main method of the class
      *
      *  @param rElectricsMesh The electrics mesh
      *  @param rMechanicsMesh The mechanics mesh
+     *  @param rVariableNames vector of names of variables contained in the input h5 file and
+     *                        that you want to be interpolated.
      *  @param directory Directory the voltage file is in
      *  @param inputFileNamePrefix Filename (without ".h5") of the electrics solution HDF5 file
+     *
      */
     VoltageInterpolaterOntoMechanicsMesh(TetrahedralMesh<DIM,DIM>& rElectricsMesh,
                                          QuadraticMesh<DIM>& rMechanicsMesh,
+                                         std::vector<std::string>& rVariableNames,
                                          std::string directory,
                                          std::string inputFileNamePrefix);
 };

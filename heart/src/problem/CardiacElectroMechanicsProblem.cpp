@@ -541,6 +541,8 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
 
     CmguiDeformedSolutionsWriter<DIM>* p_cmgui_writer = NULL;
 
+    std::vector<std::string> variable_names;
+
     if (mWriteOutput)
     {
         mpMechanicsSolver->SetWriteOutput();
@@ -550,20 +552,19 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
                                                                "solution",
                                                                *(this->mpMechanicsMesh),
                                                                WRITE_QUADRATIC_MESH);
-        std::vector<std::string> fields;
-        fields.push_back("V");
+        variable_names.push_back("V");
         if(ELEC_PROB_DIM==2)
         {
-        	fields.push_back("Phi_e");
+        	variable_names.push_back("Phi_e");
         	if (mHasBath==true)
         	{
-                std::vector<std::string> names;
-                names.push_back("tissue");
-                names.push_back("bath");
-                p_cmgui_writer->SetRegionNames(names);
+                std::vector<std::string> regions;
+                regions.push_back("tissue");
+                regions.push_back("bath");
+                p_cmgui_writer->SetRegionNames(regions);
         	}
         }
-        p_cmgui_writer->SetAdditionalFieldNames(fields);
+        p_cmgui_writer->SetAdditionalFieldNames(variable_names);
         p_cmgui_writer->WriteInitialMesh("undeformed");
     }
 
@@ -925,7 +926,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
         // Note: this calculates the data on ALL nodes of the mechanics mesh (incl internal,
         // non-vertex ones), which won't be used if linear CMGUI visualisation
         // of the mechanics solution is used.
-        VoltageInterpolaterOntoMechanicsMesh<DIM> converter(*mpElectricsMesh,*mpMechanicsMesh,input_dir,"voltage");
+        VoltageInterpolaterOntoMechanicsMesh<DIM> converter(*mpElectricsMesh,*mpMechanicsMesh,variable_names,input_dir,"voltage");
 
         // reset to the default value
         HeartConfig::Instance()->SetOutputDirectory(config_directory);

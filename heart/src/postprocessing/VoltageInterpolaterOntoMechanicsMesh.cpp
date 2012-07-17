@@ -39,6 +39,7 @@ template<unsigned DIM>
 VoltageInterpolaterOntoMechanicsMesh<DIM>::VoltageInterpolaterOntoMechanicsMesh(
                                      TetrahedralMesh<DIM,DIM>& rElectricsMesh,
                                      QuadraticMesh<DIM>& rMechanicsMesh,
+                                     std::vector<std::string>& rVariableNames,
                                      std::string directory,
                                      std::string inputFileNamePrefix)
 {
@@ -58,57 +59,68 @@ VoltageInterpolaterOntoMechanicsMesh<DIM>::VoltageInterpolaterOntoMechanicsMesh(
                                                   directory,
                                                   "voltage_mechanics_mesh",
                                                   false, //don't clean
-                                                  false);
+											      false);
 
-    p_writer->DefineFixedDimension( rMechanicsMesh.GetNumNodes() );
-    int voltage_column_id = p_writer->DefineVariable("V","mV");
-    p_writer->DefineUnlimitedDimension("Time","msecs");
-    p_writer->EndDefineMode();
-
-    // set up a vector to read into
-    DistributedVectorFactory factory(rElectricsMesh.GetNumNodes());
-    Vec voltage = factory.CreateVec();
-    std::vector<double> interpolated_voltages(rMechanicsMesh.GetNumNodes());
-    Vec voltage_coarse = NULL;
-
-    for(unsigned time_step=0; time_step<num_timesteps; time_step++)
+	std::vector<int> columns_id;
+    for (unsigned var_index = 0; var_index < rVariableNames.size(); var_index++)
     {
-        // read
-        reader.GetVariableOverNodes(voltage, "V", time_step);
-        ReplicatableVector voltage_repl(voltage);
-
-        // interpolate
-        for(unsigned i=0; i<mesh_pair.rGetElementsAndWeights().size(); i++)
-        {
-            double interpolated_voltage = 0;
-
-            Element<DIM,DIM>& element = *(rElectricsMesh.GetElement(mesh_pair.rGetElementsAndWeights()[i].ElementNum));
-            for(unsigned node_index = 0; node_index<element.GetNumNodes(); node_index++)
-            {
-                unsigned global_node_index = element.GetNodeGlobalIndex(node_index);
-                interpolated_voltage += voltage_repl[global_node_index]*mesh_pair.rGetElementsAndWeights()[i].Weights(node_index);
-            }
-
-            interpolated_voltages[i] = interpolated_voltage;
-        }
-
-        if(voltage_coarse!=NULL)
-        {
-            PetscTools::Destroy(voltage_coarse);
-        }
-        voltage_coarse = PetscTools::CreateVec(interpolated_voltages);
-
-        // write
-        p_writer->PutUnlimitedVariable(time_step);
-        p_writer->PutVector(voltage_column_id, voltage_coarse);
-        p_writer->AdvanceAlongUnlimitedDimension();
+    	std::string var_name = rVariableNames[var_index];
+    	columns_id.push_back( p_writer->DefineVariable(var_name,"mV") );
     }
 
-    if(voltage_coarse!=NULL)
-    {
-        PetscTools::Destroy(voltage);
-        PetscTools::Destroy(voltage_coarse);
-    }
+	p_writer->DefineUnlimitedDimension("Time","msecs");
+	p_writer->DefineFixedDimension( rMechanicsMesh.GetNumNodes() );
+	p_writer->EndDefineMode();
+
+	assert(columns_id.size() == rVariableNames.size());
+
+	// set up a vector to read into
+	DistributedVectorFactory factory(rElectricsMesh.GetNumNodes());
+	Vec voltage = factory.CreateVec();
+	std::vector<double> interpolated_voltages(rMechanicsMesh.GetNumNodes());
+	Vec voltage_coarse = NULL;
+
+	for(unsigned time_step=0; time_step<num_timesteps; time_step++)
+	{
+		for (unsigned var_index = 0; var_index < rVariableNames.size(); var_index++)
+		{
+			std::string var_name = rVariableNames[var_index];
+			// read
+			reader.GetVariableOverNodes(voltage, var_name, time_step);
+			ReplicatableVector voltage_repl(voltage);
+
+			// interpolate
+			for(unsigned i=0; i<mesh_pair.rGetElementsAndWeights().size(); i++)
+			{
+				double interpolated_voltage = 0;
+
+				Element<DIM,DIM>& element = *(rElectricsMesh.GetElement(mesh_pair.rGetElementsAndWeights()[i].ElementNum));
+				for(unsigned node_index = 0; node_index<element.GetNumNodes(); node_index++)
+				{
+					unsigned global_node_index = element.GetNodeGlobalIndex(node_index);
+					interpolated_voltage += voltage_repl[global_node_index]*mesh_pair.rGetElementsAndWeights()[i].Weights(node_index);
+				}
+
+				interpolated_voltages[i] = interpolated_voltage;
+			}
+
+			if(voltage_coarse!=NULL)
+			{
+				PetscTools::Destroy(voltage_coarse);
+			}
+			voltage_coarse = PetscTools::CreateVec(interpolated_voltages);
+			// write
+			p_writer->PutVector(columns_id[var_index], voltage_coarse);
+		}
+		p_writer->PutUnlimitedVariable(time_step);
+		p_writer->AdvanceAlongUnlimitedDimension();
+	}
+
+	if(voltage_coarse!=NULL)
+	{
+		PetscTools::Destroy(voltage);
+		PetscTools::Destroy(voltage_coarse);
+	}
 
     // delete to flush
     delete p_writer;

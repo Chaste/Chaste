@@ -75,8 +75,12 @@ public:
         // 0.10 and 0.11
         mech_mesh.GetNode(1)->rGetModifiableLocation()[0] = 0.103;
 
+        std::vector<std::string> variable_names;
+        variable_names.push_back("V");
+
         VoltageInterpolaterOntoMechanicsMesh<1> interpolater(mesh,
                                                              mech_mesh,
+                                                             variable_names,
                                                              "TestVoltageInterpolater1d",
                                                              "MonodomainLR91_1d");
 
@@ -138,8 +142,11 @@ public:
 
         QuadraticMesh<2> mech_mesh(0.05, 0.05, 0.05);
 
+        std::vector<std::string> variable_names;
+        variable_names.push_back("V");
         VoltageInterpolaterOntoMechanicsMesh<2> interpolater(mesh,
                                                              mech_mesh,
+                                                             variable_names,
                                                              "TestVoltageInterpolater2d",
                                                              "Monodomain2d");
 
@@ -166,6 +173,96 @@ public:
         PetscTools::Destroy(voltage_coarse);
         PetscTools::Destroy(voltage_fine);
     }
+
+    void TestWithMultipleVariables1D() throw (Exception)
+	{
+        // firstly, copy .h5 file to CHASTE_TEST_OUTPUT/TestWithMultipleVariables1D,
+        // as that is where the interpolater reads and writes to
+        CopyToTestOutputDirectory("heart/test/data/CmguiData/bidomain/1D_0_to_1_100_elements.h5",
+                                  "TestWithMultipleVariables1D");
+
+
+        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_100_elements");
+        TetrahedralMesh<1,1> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        QuadraticMesh<1> mech_mesh;
+        TrianglesMeshReader<1,1> mesh_reader2("mesh/test/data/1D_0_to_1_10_elements_quadratic",2,1,false);
+        mech_mesh.ConstructFromMeshReader(mesh_reader2);
+
+        std::vector<std::string> variable_names;
+        variable_names.push_back("V");
+        variable_names.push_back("Phi_e");
+        VoltageInterpolaterOntoMechanicsMesh<1> interpolater(mesh,
+                                                             mech_mesh,
+                                                             variable_names,
+                                                             "TestWithMultipleVariables1D",
+                                                             "1D_0_to_1_100_elements");
+
+
+        Hdf5DataReader fine_reader("TestWithMultipleVariables1D","1D_0_to_1_100_elements");
+        DistributedVectorFactory factory1(mesh.GetNumNodes());
+        Vec voltage_fine = factory1.CreateVec();
+        Vec phi_e_fine = factory1.CreateVec();
+
+        Hdf5DataReader coarse_reader("TestWithMultipleVariables1D","voltage_mechanics_mesh");
+        DistributedVectorFactory factory2(mech_mesh.GetNumNodes());
+        Vec voltage_coarse = factory2.CreateVec();
+        Vec phi_e_coarse = factory2.CreateVec();
+
+        bool invalid_1 = true;//see below
+        bool invalid_2 = true;//see below
+
+        TS_ASSERT_EQUALS(fine_reader.GetUnlimitedDimensionValues().size(), 101u);
+        for(unsigned i=1; i<fine_reader.GetUnlimitedDimensionValues().size(); i++)
+        {
+            fine_reader.GetVariableOverNodes(voltage_fine, "V", i);
+            fine_reader.GetVariableOverNodes(phi_e_fine, "Phi_e", i);
+            ReplicatableVector fine_repl(voltage_fine);
+            ReplicatableVector fine_repl_phi_e(phi_e_fine);
+
+            coarse_reader.GetVariableOverNodes(voltage_coarse, "V", i);
+            coarse_reader.GetVariableOverNodes(phi_e_coarse, "Phi_e", i);
+            ReplicatableVector coarse_repl(voltage_coarse);
+            ReplicatableVector coarse_repl_phi_e(phi_e_coarse);
+
+
+            TS_ASSERT_EQUALS(coarse_repl.GetSize(), mech_mesh.GetNumNodes());
+            TS_ASSERT_EQUALS(coarse_repl_phi_e.GetSize(), mech_mesh.GetNumNodes());
+            TS_ASSERT_EQUALS(fine_repl.GetSize(), mesh.GetNumNodes());
+            TS_ASSERT_EQUALS(fine_repl_phi_e.GetSize(), mesh.GetNumNodes());
+
+            //first node
+            TS_ASSERT_DELTA(fine_repl[0], coarse_repl[0], 1e-4);
+            TS_ASSERT_DELTA(fine_repl_phi_e[0], coarse_repl_phi_e[0], 1e-4);
+
+            //last node
+            TS_ASSERT_DELTA(fine_repl[fine_repl.GetSize()-1], coarse_repl[coarse_repl.GetSize()-1], 1e-4);
+            TS_ASSERT_DELTA(fine_repl_phi_e[fine_repl_phi_e.GetSize()-1], coarse_repl_phi_e[coarse_repl_phi_e.GetSize()-1], 1e-4);
+
+            // Check that the value at a node that is not matching is interpolated correctly
+            TS_ASSERT_DELTA(coarse_repl[1], fine_repl[10]*0.7 + 0.3*fine_repl[11], 1e-4);
+            TS_ASSERT_DELTA(coarse_repl_phi_e[1], fine_repl_phi_e[10]*0.7 + 0.3*fine_repl_phi_e[11], 1e-4);
+
+            // check fine_repl[10] != fine_repl[11] *for some time*, else the above
+            // check is invalid
+            if( (fabs(fine_repl[10] - fine_repl[11]) > 1e-6) )
+            {
+                invalid_1 = false;
+            }
+            if (fabs(fine_repl_phi_e[10] - fine_repl_phi_e[11]) > 1e-6)
+            {
+            	invalid_2 = false;
+            }
+        }
+        TS_ASSERT_EQUALS(invalid_1, false);
+        TS_ASSERT_EQUALS(invalid_2, false);
+
+        PetscTools::Destroy(voltage_coarse);
+        PetscTools::Destroy(voltage_fine);
+        PetscTools::Destroy(phi_e_coarse);
+        PetscTools::Destroy(phi_e_fine);
+	}
 };
 
 
