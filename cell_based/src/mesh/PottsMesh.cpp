@@ -41,7 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned DIM>
 PottsMesh<DIM>::PottsMesh(std::vector<Node<DIM>*> nodes,
-                          std::vector<MutableElement<DIM>*> pottsElements,
+                          std::vector<PottsElement<DIM>*> pottsElements,
                           std::vector< std::set<unsigned> > vonNeumannNeighbouringNodeIndices,
                           std::vector< std::set<unsigned> > mooreNeighbouringNodeIndices)
 {
@@ -65,14 +65,14 @@ PottsMesh<DIM>::PottsMesh(std::vector<Node<DIM>*> nodes,
     }
     for (unsigned elem_index=0; elem_index<pottsElements.size(); elem_index++)
     {
-        MutableElement<DIM>* p_temp_element = pottsElements[elem_index];
+        PottsElement<DIM>* p_temp_element = pottsElements[elem_index];
         mElements.push_back(p_temp_element);
     }
 
     // Register elements with nodes
     for (unsigned index=0; index<mElements.size(); index++)
     {
-        MutableElement<DIM>* p_element = mElements[index];
+        PottsElement<DIM>* p_element = mElements[index];
 
         unsigned element_index = p_element->GetIndex();
         unsigned num_nodes_in_element = p_element->GetNumNodes();
@@ -162,7 +162,7 @@ unsigned PottsMesh<DIM>::GetNumAllElements() const
 }
 
 template<unsigned DIM>
-MutableElement<DIM>* PottsMesh<DIM>::GetElement(unsigned index) const
+PottsElement<DIM>* PottsMesh<DIM>::GetElement(unsigned index) const
 {
     assert(index < mElements.size());
     return mElements[index];
@@ -171,7 +171,7 @@ MutableElement<DIM>* PottsMesh<DIM>::GetElement(unsigned index) const
 template<unsigned DIM>
 c_vector<double, DIM> PottsMesh<DIM>::GetCentroidOfElement(unsigned index)
 {
-    MutableElement<DIM>* p_element = GetElement(index);
+    PottsElement<DIM>* p_element = GetElement(index);
     unsigned num_nodes_in_element = p_element->GetNumNodes();
 
     ///\todo This should probably be returning the nearest node
@@ -199,7 +199,7 @@ c_vector<double, DIM> PottsMesh<DIM>::GetVectorFromAtoB(const c_vector<double, D
 template<unsigned DIM>
 double PottsMesh<DIM>::GetVolumeOfElement(unsigned index)
 {
-    MutableElement<DIM>* p_element = GetElement(index);
+    PottsElement<DIM>* p_element = GetElement(index);
     double element_volume = (double) p_element->GetNumNodes();
 
     return element_volume;
@@ -212,7 +212,7 @@ double PottsMesh<DIM>::GetSurfaceAreaOfElement(unsigned index)
     assert(DIM==2 || DIM==3);
 
     // Get pointer to this element
-    MutableElement<DIM>* p_element = GetElement(index);
+    PottsElement<DIM>* p_element = GetElement(index);
 
     double surface_area = 0.0;
     for (unsigned node_index=0; node_index< p_element->GetNumNodes(); node_index++)
@@ -260,7 +260,7 @@ void PottsMesh<DIM>::DeleteElement(unsigned index)
 }
 
 template<unsigned DIM>
-unsigned PottsMesh<DIM>::DivideElement(MutableElement<DIM>* pElement,
+unsigned PottsMesh<DIM>::DivideElement(PottsElement<DIM>* pElement,
                                   bool placeOriginalElementBelow)
 {
     /// Not implemented in 1d
@@ -295,7 +295,7 @@ unsigned PottsMesh<DIM>::DivideElement(MutableElement<DIM>* pElement,
     }
 
     // Add the new element to the mesh
-    AddElement(new MutableElement<DIM>(new_element_index, nodes_elem));
+    AddElement(new PottsElement<DIM>(new_element_index, nodes_elem));
 
     /**
      * Remove the correct nodes from each element. If placeOriginalElementBelow is true,
@@ -387,7 +387,7 @@ unsigned PottsMesh<DIM>::DivideElement(MutableElement<DIM>* pElement,
 }
 
 template<unsigned DIM>
-unsigned PottsMesh<DIM>::AddElement(MutableElement<DIM>* pNewElement)
+unsigned PottsMesh<DIM>::AddElement(PottsElement<DIM>* pNewElement)
 {
     unsigned new_element_index = pNewElement->GetIndex();
 
@@ -446,7 +446,7 @@ void PottsMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& rMesh
         }
 
         // Use nodes and index to construct this element
-        MutableElement<DIM>* p_element = new MutableElement<DIM>(elem_index, nodes);
+        PottsElement<DIM>* p_element = new PottsElement<DIM>(elem_index, nodes);
         mElements.push_back(p_element);
 
         if (rMeshReader.GetNumElementAttributes() > 0)

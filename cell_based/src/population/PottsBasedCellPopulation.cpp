@@ -127,7 +127,7 @@ const PottsMesh<DIM>& PottsBasedCellPopulation<DIM>::rGetMesh() const
 }
 
 template<unsigned DIM>
-MutableElement<DIM>* PottsBasedCellPopulation<DIM>::GetElement(unsigned elementIndex)
+PottsElement<DIM>* PottsBasedCellPopulation<DIM>::GetElement(unsigned elementIndex)
 {
     return mpPottsMesh->GetElement(elementIndex);
 }
@@ -157,7 +157,7 @@ c_vector<double, DIM> PottsBasedCellPopulation<DIM>::GetLocationOfCellCentre(Cel
 }
 
 template<unsigned DIM>
-MutableElement<DIM>* PottsBasedCellPopulation<DIM>::GetElementCorrespondingToCell(CellPtr pCell)
+PottsElement<DIM>* PottsBasedCellPopulation<DIM>::GetElementCorrespondingToCell(CellPtr pCell)
 {
     return mpPottsMesh->GetElement(this->GetLocationIndexUsingCell(pCell));
 }
@@ -166,7 +166,7 @@ template<unsigned DIM>
 CellPtr PottsBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell)
 {
     // Get the element associated with this cell
-    MutableElement<DIM>* p_element = GetElementCorrespondingToCell(pParentCell);
+    PottsElement<DIM>* p_element = GetElementCorrespondingToCell(pParentCell);
 
     // Divide the element
     unsigned new_element_index = mpPottsMesh->DivideElement(p_element, true); // new element will be below the existing element
@@ -370,11 +370,11 @@ void PottsBasedCellPopulation<DIM>::WriteResultsToFiles()
         // Write node data to file
         if (!(GetElement(elem_index)->IsDeleted()) && !elem_corresponds_to_dead_cell)
         {
-            MutableElement<DIM>* p_element = mpPottsMesh->GetElement(elem_index);
+            PottsElement<DIM>* p_element = mpPottsMesh->GetElement(elem_index);
 
             unsigned num_nodes_in_element = p_element->GetNumNodes();
 
-            // First write the number of Nodes belonging to this MutableElement
+            // First write the number of Nodes belonging to this PottsElement
             *mpVizElementsFile << num_nodes_in_element << " ";
 
             // Then write the global index of each Node in this element

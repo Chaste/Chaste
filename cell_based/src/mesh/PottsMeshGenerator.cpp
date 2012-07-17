@@ -50,7 +50,7 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
     assert(numElementsDeep*elementDepth <= numNodesDeep);
 
     std::vector<Node<DIM>*> nodes;
-    std::vector<MutableElement<DIM>*>  elements;
+    std::vector<PottsElement<DIM>*>  elements;
     std::vector<std::set<unsigned> > moore_neighbours;
     std::vector<std::set<unsigned> > von_neumann_neighbours;
 
@@ -133,7 +133,7 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
                 }
 
                 element_index = n*numElementsAcross*numElementsUp + j*numElementsAcross + i;
-                MutableElement<DIM>* p_element = new MutableElement<DIM>(element_index, element_nodes);
+                PottsElement<DIM>* p_element = new PottsElement<DIM>(element_index, element_nodes);
                 elements.push_back(p_element);
             }
         }

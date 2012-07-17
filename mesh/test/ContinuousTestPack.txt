@@ -19,7 +19,6 @@ utilities/TestBoxCollection.hpp
 utilities/TestDistanceMapCalculator.hpp
 vertex/TestMutableVertexMesh.hpp
 vertex/TestMutableVertexMeshReMesh.hpp
-vertex/TestMutableElement.hpp
 vertex/TestVertexElement.hpp
 vertex/TestVertexMesh.hpp
 vertex/TestVertexMeshReader.hpp

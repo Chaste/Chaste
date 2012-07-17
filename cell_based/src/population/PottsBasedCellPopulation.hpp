@@ -137,7 +137,7 @@ private:
 
     /**
      * Check the consistency of internal data structures.
-     * Each MutableElement must have a CellPtr associated with it.
+     * Each PottsElement must have a CellPtr associated with it.
      */
     void Validate();
 
@@ -151,7 +151,7 @@ public:
     /**
      * Create a new cell population facade from a mesh and collection of cells.
      *
-     * There must be precisely one CellPtr for each MutableElement in
+     * There must be precisely one CellPtr for each PottsElement in
      * the mesh.
      *
      * @param rMesh reference to a PottsMesh
@@ -190,16 +190,16 @@ public:
     const PottsMesh<DIM>& rGetMesh() const;
 
     /**
-     * Get a particular MutableElement.
+     * Get a particular PottsElement.
      *
-     * @param elementIndex the global index of the MutableElement
+     * @param elementIndex the global index of the PottsElement
      *
-     * @return a pointer to the MutableElement.
+     * @return a pointer to the PottsElement.
      */
-    MutableElement<DIM>* GetElement(unsigned elementIndex);
+    PottsElement<DIM>* GetElement(unsigned elementIndex);
 
     /**
-     * @return the number of MutableElements in the cell population.
+     * @return the number of PottsElements in the cell population.
      */
     unsigned GetNumElements();
 
@@ -236,7 +236,7 @@ public:
      *
      * @return pointer to the element.
      */
-    MutableElement<DIM>* GetElementCorrespondingToCell(CellPtr pCell);
+    PottsElement<DIM>* GetElementCorrespondingToCell(CellPtr pCell);
 
     /**
      * Overridden AddCell() method.
@@ -277,7 +277,7 @@ public:
     bool IsCellAssociatedWithADeletedLocation(CellPtr pCell);
 
     /**
-     * Remove the MutableElements which have been marked as deleted, and update the correspondence
+     * Remove the PottsElements which have been marked as deleted, and update the correspondence
      * with CellPtrs.
      *
      * @param hasHadBirthsOrDeaths - a bool saying whether cell population has had Births Or Deaths

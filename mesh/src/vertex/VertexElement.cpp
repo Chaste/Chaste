@@ -42,7 +42,7 @@ VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
                                                      const std::vector<VertexElement<ELEMENT_DIM-1,SPACE_DIM>*>& rFaces,
                                                      const std::vector<bool>& rOrientations,
                                                      const std::vector<Node<SPACE_DIM>*>& rNodes)
-    : AbstractElement<ELEMENT_DIM, SPACE_DIM>(index, rNodes),
+    : MutableElement<ELEMENT_DIM, SPACE_DIM>(index, rNodes),
       mFaces(rFaces),
       mOrientations(rOrientations)
 {
@@ -55,7 +55,7 @@ VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
     if (SPACE_DIM == ELEMENT_DIM)
     {
         // Register element with nodes
-        RegisterWithNodes();
+        this->RegisterWithNodes();
     }
 }
 
@@ -63,7 +63,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
                                                      const std::vector<VertexElement<ELEMENT_DIM-1,SPACE_DIM>*>& rFaces,
                                                      const std::vector<bool>& rOrientations)
-    : AbstractElement<ELEMENT_DIM, SPACE_DIM>(index),
+    : MutableElement<ELEMENT_DIM, SPACE_DIM>(index),
       mFaces(rFaces),
       mOrientations(rOrientations)
 {
@@ -89,24 +89,20 @@ VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
     }
 
     // Register element with nodes
-    RegisterWithNodes();
+    this->RegisterWithNodes();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index)
-    : AbstractElement<ELEMENT_DIM, SPACE_DIM>(index)
+    : MutableElement<ELEMENT_DIM, SPACE_DIM>(index)
 {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
                                                      const std::vector<Node<SPACE_DIM>*>& rNodes)
-    : AbstractElement<ELEMENT_DIM, SPACE_DIM>(index, rNodes)
+    : MutableElement<ELEMENT_DIM, SPACE_DIM>(index, rNodes)
 {
-    if (SPACE_DIM == ELEMENT_DIM)
-    {
-        RegisterWithNodes();
-    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -118,94 +114,6 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned VertexElement<ELEMENT_DIM, SPACE_DIM>::GetNumFaces() const
 {
     return mFaces.size();
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexElement<ELEMENT_DIM, SPACE_DIM>::RegisterWithNodes()
-{
-    for (unsigned i=0; i<this->mNodes.size(); i++)
-    {
-        this->mNodes[i]->AddElement(this->mIndex);
-    }
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexElement<ELEMENT_DIM, SPACE_DIM>::MarkAsDeleted()
-{
-    // Mark element as deleted
-    this->mIsDeleted = true;
-
-    // Update nodes in the element so they know they are not contained by it
-    for (unsigned i=0; i<this->GetNumNodes(); i++)
-    {
-        this->mNodes[i]->RemoveElement(this->mIndex);
-    }
-}
-
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexElement<ELEMENT_DIM, SPACE_DIM>::ResetIndex(unsigned index)
-{
-    for (unsigned i=0; i<this->GetNumNodes(); i++)
-    {
-       this->mNodes[i]->RemoveElement(this->mIndex);
-    }
-    this->mIndex = index;
-    RegisterWithNodes();
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexElement<ELEMENT_DIM, SPACE_DIM>::UpdateNode(const unsigned& rIndex, Node<SPACE_DIM>* pNode)
-{
-    assert(rIndex < this->mNodes.size());
-
-    // Remove it from the node at this location
-    this->mNodes[rIndex]->RemoveElement(this->mIndex);
-
-    // Update the node at this location
-    this->mNodes[rIndex] = pNode;
-
-    // Add element to this node
-    this->mNodes[rIndex]->AddElement(this->mIndex);
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexElement<ELEMENT_DIM, SPACE_DIM>::DeleteNode(const unsigned& rIndex)
-{
-    assert(rIndex < this->mNodes.size());
-
-    // Remove element from the node at this location
-    this->mNodes[rIndex]->RemoveElement(this->mIndex);
-
-    // Remove the node at rIndex (removes node from element)
-    this->mNodes.erase(this->mNodes.begin() + rIndex);
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexElement<ELEMENT_DIM, SPACE_DIM>::AddNode(const unsigned& rIndex, Node<SPACE_DIM>* pNode)
-{
-    /**
-     * When constructing a VertexMesh as the Voronoi dual to a Delaunay mesh,
-     * each VertexElement is initially constructed without nodes. We therefore
-     * require the two cases below.
-     */
-    if (this->mNodes.empty())
-    {
-        // Populate mNodes with pNode
-        this->mNodes.push_back(pNode);
-
-        // Add element to this node
-        this->mNodes[0]->AddElement(this->mIndex);
-    }
-    else
-    {
-        assert(rIndex < this->mNodes.size());
-
-        // Add pNode to rIndex+1 element of mNodes pushing the others up
-        this->mNodes.insert(this->mNodes.begin() + rIndex+1,  pNode);
-
-        // Add element to this node
-        this->mNodes[rIndex+1]->AddElement(this->mIndex);
-    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -237,20 +145,6 @@ void VertexElement<ELEMENT_DIM, SPACE_DIM>::AddFace(VertexElement<ELEMENT_DIM-1,
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned VertexElement<ELEMENT_DIM, SPACE_DIM>::GetNodeLocalIndex(unsigned globalIndex) const
-{
-    unsigned local_index = UINT_MAX;
-    for (unsigned i=0; i<this->mNodes.size(); i++)
-    {
-        if (this->GetNodeGlobalIndex(i) == globalIndex)
-        {
-            local_index = i;
-        }
-    }
-    return local_index;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexElement<ELEMENT_DIM-1,  SPACE_DIM>* VertexElement<ELEMENT_DIM, SPACE_DIM>::GetFace(unsigned index) const
 {
     assert(index < mFaces.size());
@@ -262,21 +156,6 @@ bool VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceIsOrientatedClockwise(unsigned i
 {
     assert(index < mOrientations.size());
     return mOrientations[index];
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool VertexElement<ELEMENT_DIM, SPACE_DIM>::IsElementOnBoundary() const
-{
-    bool is_element_on_boundary = false;
-    for (unsigned i=0; i<this->mNodes.size(); i++)
-    {
-        if (this->GetNode(i)->IsBoundaryNode())
-        {
-            is_element_on_boundary = true;
-            break;
-        }
-    }
-    return is_element_on_boundary;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -291,15 +170,7 @@ bool VertexElement<ELEMENT_DIM, SPACE_DIM>::IsElementOnBoundary() const
  */
 template<unsigned SPACE_DIM>
 VertexElement<1, SPACE_DIM>::VertexElement(unsigned index, const std::vector<Node<SPACE_DIM>*>& rNodes)
-    : AbstractElement<1, SPACE_DIM>(index, rNodes)
-{
-    // Sanity checking
-    assert(this->mNodes.size() == 2);
-    assert(SPACE_DIM > 0);
-}
-
-template<unsigned SPACE_DIM>
-VertexElement<1, SPACE_DIM>::~VertexElement()
+    : MutableElement<1, SPACE_DIM>(index, rNodes)
 {
 }
 
@@ -307,92 +178,6 @@ template<unsigned SPACE_DIM>
 unsigned VertexElement<1, SPACE_DIM>::GetNumFaces() const
 {
     return 0;
-}
-
-template<unsigned SPACE_DIM>
-void VertexElement<1, SPACE_DIM>::RegisterWithNodes()
-{
-    for (unsigned i=0; i<this->mNodes.size(); i++)
-    {
-        this->mNodes[i]->AddElement(this->mIndex);
-    }
-}
-
-template<unsigned SPACE_DIM>
-void VertexElement<1, SPACE_DIM>::MarkAsDeleted()
-{
-    // Mark element as deleted
-    this->mIsDeleted = true;
-
-    // Update nodes in the element so they know they are not contained by it
-    for (unsigned i=0; i<this->GetNumNodes(); i++)
-    {
-        this->mNodes[i]->RemoveElement(this->mIndex);
-    }
-}
-
-template <unsigned SPACE_DIM>
-void VertexElement<1, SPACE_DIM>::ResetIndex(unsigned index)
-{
-    for (unsigned i=0; i<this->GetNumNodes(); i++)
-    {
-       this->mNodes[i]->RemoveElement(this->mIndex);
-    }
-    this->mIndex = index;
-    RegisterWithNodes();
-}
-
-template<unsigned SPACE_DIM>
-void VertexElement<1, SPACE_DIM>::UpdateNode(const unsigned& rIndex, Node<SPACE_DIM>* pNode)
-{
-    assert(rIndex < this->mNodes.size());
-
-    // Remove it from the node at this location
-    this->mNodes[rIndex]->RemoveElement(this->mIndex);
-
-    // Update the node at this location
-    this->mNodes[rIndex] = pNode;
-
-    // Add element to this node
-    this->mNodes[rIndex]->AddElement(this->mIndex);
-}
-
-template<unsigned SPACE_DIM>
-void VertexElement<1, SPACE_DIM>::DeleteNode(const unsigned& rIndex)
-{
-    assert(rIndex < this->mNodes.size());
-
-    // Remove element from the node at this location
-    this->mNodes[rIndex]->RemoveElement(this->mIndex);
-
-    // Remove the node at rIndex (removes node from element)
-    this->mNodes.erase(this->mNodes.begin() + rIndex);
-}
-
-template<unsigned SPACE_DIM>
-void VertexElement<1, SPACE_DIM>::AddNode(const unsigned& rIndex, Node<SPACE_DIM>* pNode)
-{
-    assert(rIndex < this->mNodes.size());
-
-    // Add pNode to rIndex+1 element of mNodes pushing the others up
-    this->mNodes.insert(this->mNodes.begin() + rIndex+1,  pNode);
-
-    // Add element to this node
-    this->mNodes[rIndex+1]->AddElement(this->mIndex);
-}
-
-template<unsigned SPACE_DIM>
-unsigned VertexElement<1, SPACE_DIM>::GetNodeLocalIndex(unsigned globalIndex) const
-{
-    unsigned local_index = UINT_MAX;
-    for (unsigned i=0; i<this->mNodes.size(); i++)
-    {
-        if (this->GetNodeGlobalIndex(i) == globalIndex)
-        {
-            local_index = i;
-        }
-    }
-    return local_index;
 }
 
 template<unsigned SPACE_DIM>
@@ -406,23 +191,6 @@ bool VertexElement<1, SPACE_DIM>::FaceIsOrientatedClockwise(unsigned index) cons
 {
     return false;
 }
-
-template<unsigned SPACE_DIM>
-bool VertexElement<1, SPACE_DIM>::IsElementOnBoundary() const
-{
-    bool is_element_on_boundary = false;
-    for (unsigned i=0; i<this->mNodes.size(); i++)
-    {
-        if (this->GetNode(i)->IsBoundaryNode())
-        {
-            is_element_on_boundary = true;
-            break;
-        }
-    }
-    return is_element_on_boundary;
-}
-
-
 
 
 /////////////////////////////////////////////////////////////////////////////////////

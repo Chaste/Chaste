@@ -45,9 +45,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * Helper structure that stores the nodes and any attribute value
- * associated with a MutableElement.
+ * associated with a PottsElement.
  */
-struct MutableElementData
+struct PottsElementData
 {
     std::vector<unsigned> NodeIndices; /**< Vector of Node indices owned by the element. */
     std::vector<bool> Orientations; /**< Vector of face orientations (only used in 3D). */

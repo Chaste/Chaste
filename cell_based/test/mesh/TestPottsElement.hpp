@@ -38,19 +38,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
-#include "MutableElement.hpp"
+#include "PottsElement.hpp"
 
-class TestMutableElement : public CxxTest::TestSuite
+class TestPottsElement : public CxxTest::TestSuite
 {
 public:
 
-    void Test1dMutableElement()
+    void Test1dPottsElement()
     {
         std::vector<Node<1>*> nodes;
         nodes.push_back(new Node<1>(0, true, 0.0));
         nodes.push_back(new Node<1>(1, false, 1.0));
 
-        MutableElement<1> element(0, nodes);
+        PottsElement<1> element(0, nodes);
 
         // Test RegisterWithNodes()
         element.RegisterWithNodes();
@@ -114,13 +114,13 @@ public:
         delete p_node_3;
     }
 
-    void Test2dMutableElement()
+    void Test2dPottsElement()
     {
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
         nodes.push_back(new Node<2>(1, false, 0.0, 1.0));
 
-        MutableElement<2> element(0, nodes);
+        PottsElement<2> element(0, nodes);
 
         // Test RegisterWithNodes()
         element.RegisterWithNodes();
@@ -184,13 +184,13 @@ public:
         delete p_node_3;
     }
 
-    void Test3dMutableElement()
+    void Test3dPottsElement()
     {
         std::vector<Node<3>*> nodes;
         nodes.push_back(new Node<3>(0, true, 0.0, 0.0, 0.0));
         nodes.push_back(new Node<3>(1, false, 0.0, 1.0, 0.0));
 
-        MutableElement<3> element(0, nodes);
+        PottsElement<3> element(0, nodes);
 
         // Test RegisterWithNodes()
         element.RegisterWithNodes();

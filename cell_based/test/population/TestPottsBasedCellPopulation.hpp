@@ -175,7 +175,7 @@ public:
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Check correspondence between elements and cells
-        for (PottsMesh<2>::MutableElementIterator iter = p_mesh->GetElementIteratorBegin();
+        for (PottsMesh<2>::PottsElementIterator iter = p_mesh->GetElementIteratorBegin();
              iter != p_mesh->GetElementIteratorEnd();
              ++iter)
         {
@@ -190,7 +190,7 @@ public:
             std::set<unsigned> actual_node_indices;
             unsigned elem_index = iter->GetIndex();
             CellPtr p_cell = cell_population.GetCellUsingLocationIndex(elem_index);
-            MutableElement<2>* p_actual_element = cell_population.GetElementCorrespondingToCell(p_cell);
+            PottsElement<2>* p_actual_element = cell_population.GetElementCorrespondingToCell(p_cell);
             unsigned actual_index = p_actual_element->GetIndex();
 
             for (unsigned i=0; i<p_actual_element->GetNumNodes(); i++)
@@ -491,7 +491,7 @@ public:
         // Test GetElement()
         for (unsigned index=0; index<cell_population.GetNumElements(); index++)
         {
-            MutableElement<2>* p_element = cell_population.GetElement(index);
+            PottsElement<2>* p_element = cell_population.GetElement(index);
             TS_ASSERT_EQUALS(p_element->GetIndex(), index);
 
             TS_ASSERT_EQUALS(p_element->GetNumNodes(), 4u);

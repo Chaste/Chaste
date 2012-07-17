@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MutableMesh.hpp"
 #include "PottsMesh.hpp"
 #include "PottsMeshGenerator.hpp"
-#include "MutableElement.hpp"
+#include "PottsElement.hpp"
 #include "PottsMeshReader.hpp"
 #include "PottsMeshWriter.hpp"
 #include "VtkMeshWriter.hpp"
