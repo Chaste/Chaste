@@ -473,7 +473,7 @@ public:
         // Here we just have a hardcoded test to check nothing has changed.
         // The effect of the weak region is small but noticeable, compared to a simulation
         // with stiff law everywhere - the weak region contracts a tiny bit more.
-        TS_ASSERT_DELTA(r_deformed_position[5](0),  0.0916, 1e-4);
+        TS_ASSERT_DELTA(r_deformed_position[5](0),  0.0917, 1e-4);
         TS_ASSERT_DELTA(r_deformed_position[5](1), -0.0002, 1e-4);
     }
 };

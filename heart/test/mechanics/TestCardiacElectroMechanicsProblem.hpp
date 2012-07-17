@@ -106,7 +106,7 @@ public:
 					&problem_defn,
 					"blahblah");
         }
-        catch (Exception e)
+        catch (Exception& e)
         {
             TS_ASSERT_EQUALS(e.GetShortMessage(), "The second template parameter should be 1 when a monodomain problem is chosen");
         }
@@ -121,11 +121,13 @@ public:
 					&problem_defn,
 					"blahblah");
         }
-        catch (Exception e)
+        catch (Exception& e)
         {
             TS_ASSERT_EQUALS(e.GetShortMessage(), "The second template parameter should be 2 when a bidomain problem is chosen");
         }
     }
+
+
     // In this test all nodes are stimulated at the same time, hence
     // exactly the same active tension is generated at all nodes,
     // so the internal force in entirely homogeneous.
@@ -668,8 +670,9 @@ public:
     //  the search direction in the end doesn't decrease the residual), and also with ILU if you increase
     //  the number of elements (whether LR91 or N98 is used). Probably the active tension is too high.
     //
+    //  Now removed
     //
-    void TestExplicitSolverWithNash2004() throw(Exception)
+    void removedTestExplicitSolverWithNash2004() throw(Exception)
     {
 #ifdef MECH_USE_HYPRE
         TS_FAIL("This test is known to fail with HYPRE - see comments in test");

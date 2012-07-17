@@ -510,18 +510,24 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndSt
     GetActiveTensionAndTensionDerivs(lambda, currentQuadPointGlobalIndex, addToDTdE,
                                      active_tension, d_act_tension_dlam, d_act_tension_d_dlamdt);
 
+
+    double detF = sqrt(Determinant(rC));
+    rT += (active_tension*detF/I4)*outer_prod(mCurrentElementFibreDirection,mCurrentElementFibreDirection);
+
     // amend the stress and dTdE using the active tension
-    double dTdE_coeff = -2*active_tension/(I4*I4); // note: I4*I4 = lam^4
+    double dTdE_coeff1 = -2*active_tension*detF/(I4*I4); // note: I4*I4 = lam^4
     if(IsImplicitSolver())
     {
         double dt = mNextTime-mCurrentTime;
-        dTdE_coeff += (d_act_tension_dlam + d_act_tension_d_dlamdt/dt)/(lambda*I4); // note: I4*lam = lam^3
+        dTdE_coeff1 += (d_act_tension_dlam + d_act_tension_d_dlamdt/dt)*detF/(lambda*I4); // note: I4*lam = lam^3
     }
 
-    rT += (active_tension/I4)*outer_prod(mCurrentElementFibreDirection,mCurrentElementFibreDirection);
+    double dTdE_coeff2 = active_tension*detF/I4;
 
     if(addToDTdE)
     {
+        c_matrix<double,DIM,DIM> invC = Inverse(rC);
+
         for (unsigned M=0; M<DIM; M++)
         {
             for (unsigned N=0; N<DIM; N++)
@@ -530,10 +536,14 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndSt
                 {
                     for (unsigned Q=0; Q<DIM; Q++)
                     {
-                        rDTdE(M,N,P,Q) +=  dTdE_coeff * mCurrentElementFibreDirection(M)
-                                                      * mCurrentElementFibreDirection(N)
-                                                      * mCurrentElementFibreDirection(P)
-                                                      * mCurrentElementFibreDirection(Q);
+                        rDTdE(M,N,P,Q) +=   dTdE_coeff1 * mCurrentElementFibreDirection(M)
+                                                        * mCurrentElementFibreDirection(N)
+                                                        * mCurrentElementFibreDirection(P)
+                                                        * mCurrentElementFibreDirection(Q)
+
+                                         +  dTdE_coeff2 * mCurrentElementFibreDirection(M)
+                                                        * mCurrentElementFibreDirection(N)
+                                                        * invC(P,Q);
                     }
                 }
             }
@@ -580,9 +590,9 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndSt
                        for (unsigned Q=0; Q<DIM; Q++)
                        {
                            rDTdE(M,N,P,Q) +=  dTdE_coeff_s * mCurrentElementSheetDirection(M)
-                                                         * mCurrentElementSheetDirection(N)
-                                                         * mCurrentElementSheetDirection(P)
-                                                         * mCurrentElementSheetDirection(Q);
+                                                           * mCurrentElementSheetDirection(N)
+                                                           * mCurrentElementSheetDirection(P)
+                                                           * mCurrentElementSheetDirection(Q);
                        }
                    }
                }

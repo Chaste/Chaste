@@ -63,12 +63,12 @@ double NonPhysiologicalContractionModel::GetActiveTension()
 {
     if(mOption==1)
     {
-        // implicit and explicit are identical as they should be
-        return fabs(5*sin(mTime));
+        // If solving mechanics problem, results using implicit and explicit solvers are identical, as they should be
+        return fabs(sin(mTime));
     }
     else if(mOption==2)
     {
-        // small error between them at lowest dt
+        // small error between implicit and explicit at lowest dt
         // next dt, small difference between explicit at lowest dt, mostly due to first timestep
         // largest dt (1ms) completely wrong after first timestep => solution translated across
         return fabs(5*mStretch*sin(mTime));

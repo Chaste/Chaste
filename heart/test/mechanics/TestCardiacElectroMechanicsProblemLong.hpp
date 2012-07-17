@@ -467,7 +467,7 @@ public:
 
         // hardcoded test to check nothing changes
         TS_ASSERT_DELTA(r_deformed_position_fibres_alongY1[7](1), 0.0486, 1e-4);
-        TS_ASSERT_DELTA(r_deformed_position_fibres_alongY1[7](0), 0.0505, 1e-4);
+        TS_ASSERT_DELTA(r_deformed_position_fibres_alongY1[7](0), 0.0506, 1e-4);
 
 
         //////////////////////////////////////////////////////////////////

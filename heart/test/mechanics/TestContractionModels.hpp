@@ -112,7 +112,7 @@ public :
         model2.RunDoNotUpdate(0,1,0.1);
         model3.RunDoNotUpdate(0,1,0.1);
 
-        TS_ASSERT_DELTA(model1.GetActiveTension(), 5*sin(1.0), 1e-6);
+        TS_ASSERT_DELTA(model1.GetActiveTension(), sin(1.0), 1e-6);
         TS_ASSERT_DELTA(model2.GetActiveTension(), 4*sin(1.0), 1e-6);
         TS_ASSERT_DELTA(model3.GetActiveTension(), 5*exp(0.2)*sin(1.0), 1e-6);
     }

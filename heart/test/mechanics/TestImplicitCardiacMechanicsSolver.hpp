@@ -408,7 +408,7 @@ public:
             std::map<unsigned,DataAtQuadraturePoint>::iterator iter = solver.rGetQuadPointToDataAtQuadPointMap().find(34);
             if(iter != solver.rGetQuadPointToDataAtQuadPointMap().end()) //ie because some processes won't own this in parallel
             {
-                TS_ASSERT_DELTA(iter->second.Stretch, 0.9693, 1e-3);  // ** different value to previous test - attributing the difference in results to the fact mesh isn't rotation-invariant
+                TS_ASSERT_DELTA(iter->second.Stretch, 0.9682, 1e-3);  // ** different value to previous test - attributing the difference in results to the fact mesh isn't rotation-invariant
             }
 
             //in need of deletion even if all these 3 have no influence at all on this test
@@ -627,7 +627,7 @@ public:
         std::map<unsigned,DataAtQuadraturePoint>::iterator iter = solver.rGetQuadPointToDataAtQuadPointMap().find(34);
         if(iter != solver.rGetQuadPointToDataAtQuadPointMap().end()) //ie because some processes won't own this in parallel
         {
-            TS_ASSERT_DELTA(iter->second.Stretch, 0.9693, 1e-3);
+            TS_ASSERT_DELTA(iter->second.Stretch, 0.9682, 1e-3);
         }
 
         //in need of deletion even if all these 3 have no influence at all on this test
