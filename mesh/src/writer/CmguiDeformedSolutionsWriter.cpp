@@ -187,7 +187,10 @@ void CmguiDeformedSolutionsWriter<DIM>::WriteCmguiScript(std::string fieldBaseNa
 
     if(undeformedBaseName != "")
     {
-        *p_script_file << "gfx read ele " << undeformedBaseName << "\n";
+		for (unsigned region_index=0; region_index<this->mRegionNames.size(); region_index++)
+		{
+			*p_script_file << "gfx read ele " << this->mRegionNames[region_index] << "\n";
+		}
     }
     else
     {

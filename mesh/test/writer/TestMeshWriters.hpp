@@ -604,6 +604,33 @@ public:
 
         FileComparison comparer6(results_dir + "/LoadSolutions.com","mesh/test/data/TestCmguiDeformedSolutionsWriter/LoadSolutions_MyField.com");
         TS_ASSERT(comparer6.CompareFiles());
+
+        //create another writer, this time we will set multiple regions and check the script
+        CmguiDeformedSolutionsWriter<2> writer_with_regions("TestCmguiDeformedSolutionsWriter_with_regions",
+                                               	   	   	   "solution",
+                                               	   	   	   	mesh,
+                                               	   	   	   	WRITE_LINEAR_MESH);
+        std::vector<std::string> regions;
+        regions.push_back("region_number_1");
+        regions.push_back("region_number_2");
+        writer_with_regions.SetRegionNames(regions);
+
+        writer_with_regions.WriteInitialMesh("init");
+        // set up a deformed positions vector
+        std::vector<c_vector<double,2> > deformed_positions_2(mesh.GetNumNodes(), zero_vector<double>(2));
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        {
+            deformed_positions_2[i](0) = 2*mesh.GetNode(i)->rGetLocation()[0];
+            deformed_positions_2[i](1) = 3*mesh.GetNode(i)->rGetLocation()[1];
+        }
+        writer_with_regions.WriteDeformationPositions(deformed_positions_2, 0);
+        writer_with_regions.WriteDeformationPositions(deformed_positions_2, 1);
+        writer_with_regions.WriteCmguiScript("", "init");
+
+        results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "TestCmguiDeformedSolutionsWriter_with_regions";
+
+        FileComparison comparer_reg(results_dir + "/LoadSolutions.com", "mesh/test/data/TestCmguiDeformedSolutionsWriter/LoadSolutions_regions.com");
+        TS_ASSERT(comparer_reg.CompareFiles());
     }
 
     void TestCmguiDeformedSolutionsWriter2dQuadraticViz() throw(Exception)
