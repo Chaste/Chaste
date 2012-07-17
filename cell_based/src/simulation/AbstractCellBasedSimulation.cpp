@@ -62,6 +62,7 @@ AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::AbstractCellBasedSimulation(
       mSimulationOutputDirectory(mOutputDirectory),
       mNumBirths(0),
       mNumDeaths(0),
+      mOutputDivisionLocations(false),
       mSamplingTimestepMultiple(1),
       mpCellBasedPdeHandler(NULL)
 {
@@ -123,6 +124,16 @@ unsigned AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::DoCellBirth()
 
                     // Call method that determines how cell division occurs and returns a vector
                     c_vector<double, SPACE_DIM> new_location = CalculateCellDivisionVector(*cell_iter);
+                    // If required output this location to file
+                    if(mOutputDivisionLocations)
+                    {
+						*mpDivisionLocationFile << SimulationTime::Instance()->GetTime() << "\t";
+						for (unsigned i=0; i<SPACE_DIM; i++)
+						{
+							*mpDivisionLocationFile << new_location[i] << "\t";
+						}
+						*mpDivisionLocationFile << "\n";
+                    }
 
                     // Add new cell to the cell population
                     mrCellPopulation.AddCell(p_new_cell, new_location, *cell_iter);
@@ -318,6 +329,11 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
 
     mrCellPopulation.CreateOutputFiles(results_directory+"/", false);
 
+    if (mOutputDivisionLocations)
+    {
+        mpDivisionLocationFile = output_file_handler.OpenOutputFile("divisions.dat");
+    }
+
     if(PetscTools::AmMaster())
     {
     	mpVizSetupFile = output_file_handler.OpenOutputFile("results.vizsetup");
@@ -414,6 +430,11 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
 
     mrCellPopulation.CloseOutputFiles();
 
+    if (mOutputDivisionLocations)
+    {
+    	mpDivisionLocationFile->close();
+    }
+
     if(PetscTools::AmMaster())
     {
     	*mpVizSetupFile << "Complete\n";
@@ -463,6 +484,18 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellPopulation()
         EXCEPTION("CellPopulation has had births or deaths but mUpdateCellPopulation is set to false, please set it to true.");
     }
     CellBasedEventHandler::EndEvent(CellBasedEventHandler::UPDATECELLPOPULATION);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::GetOutputDivisionLocations()
+{
+    return mOutputDivisionLocations;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::SetOutputDivisionLocations(bool outputDivisionLocations)
+{
+	mOutputDivisionLocations = outputDivisionLocations;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -522,6 +555,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationParamet
     *rParamsFile << "\t\t<Dt>" << mDt << "</Dt>\n";
     *rParamsFile << "\t\t<EndTime>" << mEndTime << "</EndTime>\n";
     *rParamsFile << "\t\t<SamplingTimestepMultiple>" << mSamplingTimestepMultiple << "</SamplingTimestepMultiple>\n";
+    *rParamsFile << "\t\t<OutputDivisionLocations>" << mOutputDivisionLocations << "</OutputDivisionLocations>\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////

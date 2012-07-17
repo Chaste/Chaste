@@ -2,3 +2,4 @@
 		<Dt>0.00833333</Dt>
 		<EndTime>0.5</EndTime>
 		<SamplingTimestepMultiple>1</SamplingTimestepMultiple>
+		<OutputDivisionLocations>0</OutputDivisionLocations>

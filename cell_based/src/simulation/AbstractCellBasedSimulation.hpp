@@ -138,6 +138,12 @@ protected:
     /** Counts the number of deaths during the simulation. */
     unsigned mNumDeaths;
 
+    /** Whether to output the locations of division events (defaults to false).*/
+    bool mOutputDivisionLocations;
+
+    /** Output file for location of division events. */
+    out_stream mpDivisionLocationFile;
+
     /** List of cell killers. */
     std::vector<boost::shared_ptr<AbstractCellKiller<SPACE_DIM> > > mCellKillers;
 
@@ -384,6 +390,18 @@ public:
      * @return const reference to the cell population (used in archiving).
      */
     const AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rGetCellPopulation() const;
+
+    /**
+     * @return mOutputDivisionLocations
+     */
+    bool GetOutputDivisionLocations();
+
+    /**
+     * Set mOutputDivisionLocations.
+     *
+     * @param outputDivisionLocations the new value of mOutputDivisionLocations
+     */
+    void SetOutputDivisionLocations(bool outputDivisionLocations);
 
     /**
      * Outputs simulation parameters to file
