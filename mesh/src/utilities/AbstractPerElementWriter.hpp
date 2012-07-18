@@ -1,0 +1,156 @@
+/*
+
+Copyright (c) 2005-2012, University of Oxford.
+All rights reserved.
+
+University of Oxford means the Chancellor, Masters and Scholars of the
+University of Oxford, having an administrative office at Wellington
+Square, Oxford OX1 2JD, UK.
+
+This file is part of Chaste.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+ * Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+ * Neither the name of the University of Oxford nor the names of its
+   contributors may be used to endorse or promote products derived from this
+   software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+*/
+#ifndef ABSTRACTPERELEMENTWRITER_HPP_
+#define ABSTRACTPERELEMENTWRITER_HPP_
+
+#include "AbstractTetrahedralMesh.hpp"
+#include "UblasCustomFunctions.hpp"
+#include "OutputFileHandler.hpp"
+#include "Version.hpp"
+#include "PetscSetupAndFinalize.hpp"
+
+#include "Debug.hpp"
+/**
+ * An abstract writer class for writing stuff on a "per element" basis.
+ * This class will "visit" all the locally owned elements and concentrate
+ * data back to the master.
+ */
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned DATA_SIZE>
+class AbstractPerElementWriter
+{
+private:
+    AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* mpMesh; /**< The mesh.  Set by the public method WriteData. */
+    out_stream mpMasterFile; /**< The output file (only valid on master process).   Set by the public method WriteData and used by WriteElementOnMaster*/
+protected:
+    /**
+     * How to associate an element with some data
+     * Must be over-ridden by the derived class.
+     * 
+     * @param pElement  a locally-owned element for which to calculate or lookup some data
+     * @param rData  the double-precision data to write to file (output from the method)
+     */
+    virtual void Visit(Element<ELEMENT_DIM, SPACE_DIM>* pElement, c_vector<double, DATA_SIZE>& rData)=0;
+
+    /**
+     * How to write an element's worth of data to the file.
+     * By default writes tab-separated data to a single line, but can be over-ridden.
+     * This is only called by the master process.
+     * 
+     * @param rData  the double-precision data to write to file
+     */
+    virtual void WriteElementOnMaster(const c_vector<double, DATA_SIZE>& rData)
+    {
+        for (unsigned i=0; i<DATA_SIZE; i++)
+        {
+            (*mpMasterFile)<<rData[i]<<"\t";
+        }
+        (*mpMasterFile)<<"\n";
+    }       
+
+public:
+    
+    /**
+     * Writes data about each element in parallel
+     * Data about each element is retrieved by the Visit() method.
+     * Writing is done by the master process using the WriteElement() method.
+     * Any element not owned by the master is communicated by the unique designated owner.
+     * 
+     * @param rHandler  specify the directory in which to place the output file
+     * @param rFileName  the file name
+     * @param pMesh the mesh, the elements of which are to be iterated over
+     */
+    void WriteData(OutputFileHandler& rHandler, const std::string& rFileName, AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh)
+    {
+        mpMesh = pMesh;
+        c_vector<double, DATA_SIZE> data;
+        if (PetscTools::AmMaster())
+        {
+            mpMasterFile = rHandler.OpenOutputFile(rFileName);
+            MPI_Status status;
+            status.MPI_ERROR = MPI_SUCCESS; //For MPICH2
+            
+            for (unsigned element_index=0; element_index<mpMesh->GetNumElements();element_index++)
+            {
+                if (mpMesh->CalculateDesignatedOwnershipOfElement(element_index))
+                {
+                    //Master owns this process and can write it directly    
+                    Visit(mpMesh->GetElement(element_index), data);
+                }
+                else
+                {
+                    //Data must come from a remote process
+                    MPI_Recv(&data[0], DATA_SIZE, MPI_DOUBLE, MPI_ANY_SOURCE, element_index, PETSC_COMM_WORLD, &status);
+                }
+                WriteElementOnMaster(data);
+            }
+            *mpMasterFile << "# "<<ChasteBuildInfo::GetProvenanceString();
+            mpMasterFile->close();
+        }
+        else
+        {
+            //Not master process
+            unsigned previous_index = 0u; //Used to check that the indices are monotone
+            for (typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator iter = mpMesh->GetElementIteratorBegin();
+                          iter != mpMesh->GetElementIteratorEnd();
+                          ++iter)
+            {
+                unsigned element_index = iter->GetIndex();
+                //Check monotonicity
+                if (previous_index>0u)
+                {
+                    assert(element_index > previous_index);
+                }
+                previous_index = element_index;
+                if (mpMesh->CalculateDesignatedOwnershipOfElement(element_index))
+                {
+                    //The master needs to know about this one
+                    Visit(&(*iter), data);
+                    MPI_Send(&data[0], DATA_SIZE, MPI_DOUBLE, 0, element_index, PETSC_COMM_WORLD);//Tag with element_index
+                }
+            }
+             
+        }
+    }
+    
+    /**
+     * Empty virtual destructor for abstract class
+     */
+    virtual ~AbstractPerElementWriter()
+    {
+    }
+};
+
+
+#endif /*ABSTRACTPERELEMENTWRITER_HPP_*/

@@ -17,6 +17,7 @@ reader/TestTrianglesMeshReader.hpp
 reader/TestVtkMeshReader.hpp
 utilities/TestBoxCollection.hpp
 utilities/TestDistanceMapCalculator.hpp
+utilities/TestPerElementWriter.hpp
 vertex/TestMutableVertexMesh.hpp
 vertex/TestMutableVertexMeshReMesh.hpp
 vertex/TestVertexElement.hpp
