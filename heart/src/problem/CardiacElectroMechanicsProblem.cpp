@@ -785,10 +785,10 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
 
             for(unsigned node_index = 0; node_index<element.GetNumNodes(); node_index++)
             {
-                unsigned global_node_index = element.GetNodeGlobalIndex(node_index);
-                double CaI_at_node =  calcium_repl[global_node_index];
+                unsigned global_index_of_solution = element.GetNodeGlobalIndex(node_index) * ELEC_PROB_DIM;//assumes interleaved solution
+                double CaI_at_node =  calcium_repl[global_index_of_solution];
                 interpolated_CaI += CaI_at_node*mpMeshPair->rGetElementsAndWeights()[i].Weights(node_index);
-                interpolated_voltage += voltage_repl[global_node_index]*mpMeshPair->rGetElementsAndWeights()[i].Weights(node_index);
+                interpolated_voltage += voltage_repl[global_index_of_solution]*mpMeshPair->rGetElementsAndWeights()[i].Weights(node_index);
             }
 
             interpolated_calcium_concs[i] = interpolated_CaI;
