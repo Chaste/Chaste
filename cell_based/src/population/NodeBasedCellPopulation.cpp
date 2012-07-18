@@ -407,8 +407,6 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////Method to approximate  cell volume  //////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    assert(cell_radius==0.5); // Currently all cells have radius 0.5
-
     double averaged_cell_radius = 0.0;
     unsigned num_cells = 0;
 
@@ -427,18 +425,20 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
 		c_vector<double, DIM> node_j_location = GetNode(*iter)->rGetLocation();
 
 		double neighbouring_cell_radius = mpNodesOnlyMesh->GetCellRadius( *iter);
-		assert(neighbouring_cell_radius==0.5); // Currently all cells have radius 0.5
+
+		// If this throws then you may not be considering all cell interactions use a larger cut off length
+		assert(cell_radius+neighbouring_cell_radius<mMechanicsCutOffLength);
 
 		// Calculate the distance between the two nodes and add to cell radius
 		double seperation = norm_2(node_j_location - node_i_location);
 
 		if(seperation< cell_radius+neighbouring_cell_radius)
 		{
-			averaged_cell_radius = averaged_cell_radius + seperation/2.0;
+			// The effective radius is the mid point of the overlap
+			averaged_cell_radius = averaged_cell_radius + cell_radius - (cell_radius+neighbouring_cell_radius-seperation)/2.0;
 			num_cells++;
 		}
 	}
-
 	if (num_cells == 0)
 	{
 		averaged_cell_radius =  cell_radius;

@@ -601,6 +601,8 @@ public:
 
 	        // Create cell population
 	        NodeBasedCellPopulationWithParticles<3> cell_population(*p_mesh, cells, location_indices);
+	        cell_population.SetMechanicsCutOffLength(1.5);
+	        cell_population.Update(); // so cell neighbours are calculated when outputting volume
 
 	        TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "NodeBasedCellPopulationWithParticles-3");
 

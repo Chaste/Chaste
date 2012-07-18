@@ -690,7 +690,7 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create a simple mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
         TetrahedralMesh<2,2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
@@ -706,12 +706,14 @@ public:
         // Create a cell population
         NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
 
-        // For coverage of GetVolumeOfCell()
+        // For coverage of GetVolumeOfCell() when cells are relaxed
+        node_based_cell_population.SetMechanicsCutOffLength(1.5);
+        node_based_cell_population.Update(); // so cell neighbours are calculated
         for (AbstractCellPopulation<2>::Iterator cell_iter = node_based_cell_population.Begin();
              cell_iter != node_based_cell_population.End();
              ++cell_iter)
         {
-            TS_ASSERT_DELTA(node_based_cell_population.GetVolumeOfCell(*cell_iter), M_PI*pow(node_based_cell_population.rGetMesh().GetCellRadius(node_based_cell_population.GetNodeCorrespondingToCell(*cell_iter)->GetIndex()),2), 1e-6);
+            TS_ASSERT_DELTA(node_based_cell_population.GetVolumeOfCell(*cell_iter), M_PI*0.5*0.5, 1e-6);
         }
 
         // For coverage of WriteResultsToFiles()
@@ -728,10 +730,10 @@ public:
         node_based_cell_population.GetCellUsingLocationIndex(1)->SetMutationState(p_apc1);
         node_based_cell_population.GetCellUsingLocationIndex(2)->SetMutationState(p_apc2);
         node_based_cell_population.GetCellUsingLocationIndex(3)->SetMutationState(p_bcat1);
-        node_based_cell_population.GetCellUsingLocationIndex(4)->AddCellProperty(p_apoptotic_state);
+        node_based_cell_population.GetCellUsingLocationIndex(3)->AddCellProperty(p_apoptotic_state);
 
-        node_based_cell_population.rGetMesh().SetCellRadius(0, 3.0);
-        node_based_cell_population.rGetMesh().SetCellRadius(1, 2.0);
+        node_based_cell_population.rGetMesh().SetCellRadius(0, 0.6); // Default is 0.5
+        node_based_cell_population.Update(); //  To recalculate cell neighbours
 
         TS_ASSERT_EQUALS(node_based_cell_population.GetOutputCellIdData(), false);
         node_based_cell_population.SetOutputCellIdData(true);
@@ -779,7 +781,7 @@ public:
         // Test the GetCellMutationStateCount function
         std::vector<unsigned> cell_mutation_states = node_based_cell_population.GetCellMutationStateCount();
         TS_ASSERT_EQUALS(cell_mutation_states.size(), 4u);
-        TS_ASSERT_EQUALS(cell_mutation_states[0], 2u);
+        TS_ASSERT_EQUALS(cell_mutation_states[0], 1u);
         TS_ASSERT_EQUALS(cell_mutation_states[1], 1u);
         TS_ASSERT_EQUALS(cell_mutation_states[2], 1u);
         TS_ASSERT_EQUALS(cell_mutation_states[3], 1u);
@@ -787,7 +789,7 @@ public:
         // Test the GetCellProliferativeTypeCount function
         std::vector<unsigned> cell_types = node_based_cell_population.rGetCellProliferativeTypeCount();
         TS_ASSERT_EQUALS(cell_types.size(), 3u);
-        TS_ASSERT_EQUALS(cell_types[0], 3u);
+        TS_ASSERT_EQUALS(cell_types[0], 2u);
         TS_ASSERT_EQUALS(cell_types[1], 1u);
         TS_ASSERT_EQUALS(cell_types[2], 1u);
 
@@ -830,6 +832,8 @@ public:
 
         // Create a cell population
         NodeBasedCellPopulation<3> cell_population(mesh, cells);
+        cell_population.SetMechanicsCutOffLength(1.5);
+        cell_population.Update(); // so cell neighbours are calculated when outputting volume
 
         TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "NodeBasedCellPopulation-3");
 

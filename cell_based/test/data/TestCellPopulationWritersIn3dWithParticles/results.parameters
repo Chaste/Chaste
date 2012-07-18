@@ -1,4 +1,4 @@
-		<MechanicsCutOffLength>1.79769e+308</MechanicsCutOffLength>
+		<MechanicsCutOffLength>1.5</MechanicsCutOffLength>
 		<MeinekeDivisionSeparation>0.3</MeinekeDivisionSeparation>
 		<DampingConstantNormal>1</DampingConstantNormal>
 		<DampingConstantMutant>1</DampingConstantMutant>
