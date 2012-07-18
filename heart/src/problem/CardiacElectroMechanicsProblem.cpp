@@ -527,7 +527,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
        = mpElectricsProblem->CreateSolver();
 
     // set up initial voltage etc
-    Vec voltage=NULL; //This will be set and used later
+    Vec electrics_solution=NULL; //This will be set and used later
     Vec initial_voltage = mpElectricsProblem->CreateInitialCondition();
 
     unsigned num_quad_points = mpCardiacMechSolver->GetTotalNumQuadPoints();
@@ -727,11 +727,11 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
             p_electrics_solver->SetTimes(current_time, next_time);
             p_electrics_solver->SetInitialCondition( initial_voltage );
 
-            voltage = p_electrics_solver->Solve();
+            electrics_solution = p_electrics_solver->Solve();
 
             PetscReal min_voltage, max_voltage;
-            VecMax(voltage,PETSC_NULL,&max_voltage); //the second param is where the index would be returned
-            VecMin(voltage,PETSC_NULL,&min_voltage);
+            VecMax(electrics_solution,PETSC_NULL,&max_voltage); //the second param is where the index would be returned
+            VecMin(electrics_solution,PETSC_NULL,&min_voltage);
             if(i==0)
             {
                 LOG(2, "  minimum and maximum voltage is " << min_voltage <<", "<<max_voltage);
@@ -742,7 +742,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
             }
 
             PetscTools::Destroy(initial_voltage);
-            initial_voltage = voltage;
+            initial_voltage = electrics_solution;
         }
 
         if(mpProblemDefinition->GetDeformationAffectsConductivity())
@@ -761,13 +761,13 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
         // electrics element the quad point is in. Then set Ca_I on the mechanics solver
         LOG(2, "  Interpolating Ca_I and voltage");
 
-        ReplicatableVector voltage_repl(voltage);
+        ReplicatableVector electrics_solution_repl(electrics_solution);
 
         // collect all the calcium concentrations (from the cells, which are
         // distributed) in one (replicated) vector
         ReplicatableVector calcium_repl(ELEC_PROB_DIM*mpElectricsMesh->GetNumNodes());
         PetscInt lo, hi;
-        VecGetOwnershipRange(voltage, &lo, &hi);
+        VecGetOwnershipRange(electrics_solution, &lo, &hi);
         for(int index=lo; index<hi; index = index + ELEC_PROB_DIM)
         {
         	unsigned actual_index = (unsigned) index / ELEC_PROB_DIM;
@@ -788,7 +788,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
                 unsigned global_index_of_solution = element.GetNodeGlobalIndex(node_index) * ELEC_PROB_DIM;//assumes interleaved solution
                 double CaI_at_node =  calcium_repl[global_index_of_solution];
                 interpolated_CaI += CaI_at_node*mpMeshPair->rGetElementsAndWeights()[i].Weights(node_index);
-                interpolated_voltage += voltage_repl[global_index_of_solution]*mpMeshPair->rGetElementsAndWeights()[i].Weights(node_index);
+                interpolated_voltage += electrics_solution_repl[global_index_of_solution]*mpMeshPair->rGetElementsAndWeights()[i].Weights(node_index);
             }
 
             interpolated_calcium_concs[i] = interpolated_CaI;
@@ -873,12 +873,12 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
             if(!mNoElectricsOutput)
             {
                 mpElectricsProblem->mpWriter->AdvanceAlongUnlimitedDimension();
-                mpElectricsProblem->WriteOneStep(stepper.GetTime(), voltage);
+                mpElectricsProblem->WriteOneStep(stepper.GetTime(), electrics_solution);
             }
 
             if(mIsWatchedLocation)
             {
-                WriteWatchedLocationData(stepper.GetTime(), voltage);
+                WriteWatchedLocationData(stepper.GetTime(), electrics_solution);
             }
             OnEndOfTimeStep(counter);
 
@@ -944,7 +944,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
         }
         delete p_cmgui_writer;
     }
-    PetscTools::Destroy(voltage);
+    PetscTools::Destroy(electrics_solution);
     delete p_electrics_solver;
 
     MechanicsEventHandler::EndEvent(MechanicsEventHandler::ALL);
