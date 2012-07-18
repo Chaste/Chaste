@@ -211,7 +211,16 @@ public:
             }
         }
 
-        // sometimes the solver fails to converge during repolarisation (ie if this value is increased to 400 say). To be investigated..
+        // NOTE: sometimes the solver fails to converge (nonlinear solver failing to find a solution) during repolarisation.
+        // This occurs with this test (on some configurations?) when the end time is set to 400ms. This needs to be
+        // investigated - often surprisingly large numbers of newton iterations are needed in part of the repolarisation stage, and
+        // then nonlinear solve failure occurs. Sometimes the solver can get past this if the mechanics timestep is decreased.
+        //
+        // See ticket #2193
+        //
+        // For this 2D test is probably doesn't help that with one fixed point, the deformation is only defined up to a rotation.
+
+
         HeartConfig::Instance()->SetSimulationDuration(320.0);
 
         ElectroMechanicsProblemDefinition<2> problem_defn(mechanics_mesh);
