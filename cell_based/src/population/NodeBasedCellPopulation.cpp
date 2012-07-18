@@ -404,7 +404,56 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
     // Get cell radius
     double cell_radius = mpNodesOnlyMesh->GetCellRadius(node_index);
 
-    // Get cell volume from radius
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////Method to approximate  cell volume  //////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    assert(cell_radius=0.5); // Currently all cells have radius 0.5
+
+    double averaged_cell_radius = 0.0;
+    unsigned num_cells = 0;
+
+    // Get the location of this node
+	c_vector<double, DIM> node_i_location = GetNode(node_index)->rGetLocation();
+
+	// Get the set of node indices corresponding to this cell's neighbours
+	std::set<unsigned> neighbouring_node_indices = GetNeighbouringNodeIndices(node_index);
+
+	// Loop over this set
+	for (std::set<unsigned>::iterator iter = neighbouring_node_indices.begin();
+		 iter != neighbouring_node_indices.end();
+		 ++iter)
+	{
+		// Get the location of the neighbouring node
+		c_vector<double, DIM> node_j_location = GetNode(*iter)->rGetLocation();
+
+		double neighbouring_cell_radius = mpNodesOnlyMesh->GetCellRadius( *iter);
+		assert(neighbouring_cell_radius=0.5); // Currently all cells have radius 0.5
+
+		// Calculate the distance between the two nodes and add to cell radius
+		double seperation = norm_2(node_j_location - node_i_location);
+
+		if(seperation< cell_radius+neighbouring_cell_radius)
+		{
+			averaged_cell_radius = averaged_cell_radius + seperation/2.0;
+			num_cells++;
+		}
+	}
+
+	if (num_cells == 0)
+	{
+		averaged_cell_radius =  cell_radius;
+	}
+	else
+	{
+		averaged_cell_radius /= num_cells;
+	}
+	assert(averaged_cell_radius<mMechanicsCutOffLength/2.0);
+
+	cell_radius = averaged_cell_radius;
+
+    ////////////////////////////////////////////////////////////////////////////////////////
+
+    // Calculate cell volume from radius of cell
     double cell_volume = 0.0;
     if (DIM == 2)
     {
@@ -506,6 +555,16 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         if (this->mOutputCellMutationStates)
         {
             double mutation_state = cell_iter->GetMutationState()->GetColour();
+
+            CellPropertyCollection collection = cell_iter->rGetCellPropertyCollection();
+		   CellPropertyCollection label_collection = collection.GetProperties<CellLabel>();
+
+		   if (label_collection.GetSize()==1 )
+			{
+				boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(label_collection.GetProperty());
+				mutation_state = p_label->GetColour();
+			}
+
             cell_mutation_states[node_index] = mutation_state;
         }
         if (this->mOutputCellAges)

@@ -68,6 +68,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombMeshGenerator.hpp"
 
 #include "MeshBasedCellPopulation.hpp"
+#include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
 
@@ -97,19 +98,21 @@ public:
             ContactInhibitionCellCycleModel* p_cycle_model = new ContactInhibitionCellCycleModel();
             p_cycle_model->SetDimension(2);
             p_cycle_model->SetBirthTime(-10.0);
-            p_cycle_model->SetQuiescentVolumeFraction(0.7);
-            p_cycle_model->SetEquilibriumVolume(1.0);
+            p_cycle_model->SetQuiescentVolumeFraction(0.9);
+            p_cycle_model->SetEquilibriumVolume(0.7854); //pi *(0.5)^2
             p_cycle_model->SetStemCellG1Duration(0.1);
             p_cycle_model->SetTransitCellG1Duration(0.1);
 
             CellPtr p_cell(new Cell(p_state, p_cycle_model));
-            p_cell->SetCellProliferativeType(STEM);
+            p_cell->SetCellProliferativeType(TRANSIT);
             cells.push_back(p_cell);
         }
 
         // Create a node-based cell population
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
         cell_population.SetMechanicsCutOffLength(1.5);
+        cell_population.SetOutputCellMutationStates(true);
+        cell_population.SetOutputCellVolumes(true);
 
         // Create a contact inhibition simulator
         VolumeTrackedOffLatticeSimulation<2> simulator(cell_population);
@@ -118,10 +121,15 @@ public:
         TS_ASSERT_EQUALS(simulator.GetDt(), 1.0/120.0); //Default for off-lattice
         simulator.SetEndTime(simulator.GetDt()/2.0);
 
+        // Create a force law
+		MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+		p_force->SetCutOffLength(1.5);
+		simulator.AddForce(p_force);
+
         // Run simulation
         simulator.Solve();
 
-        // Test that the volumes of the cells are correct in CellData
+        // Test that the volumes of the cells are correct in CellData at the first timestep
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
@@ -129,18 +137,21 @@ public:
             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), cell_iter->GetCellData()->GetItem("volume"), 1e-4);
         }
 
-        simulator.SetEndTime(1.0);
+        simulator.SetEndTime(2.0);
 
         // Run simulation
         simulator.Solve();
 
-        // Test that the volumes of the cells are correct in CellData
+        // Test that the volumes of the cells are correct in CellData at the end time
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), cell_iter->GetCellData()->GetItem("volume"), 1e-4);
         }
+
+        //Check that the correct number of cells are labelled (i.e. experiencing contact inhibition)
+        TS_ASSERT_EQUALS(CellPropertyRegistry::Instance()->Get<CellLabel>()->GetCellCount(),9u);
     }
 
     void TestMeshBasedSimulationWithContactInhibition()
@@ -157,33 +168,35 @@ public:
             ContactInhibitionCellCycleModel* p_cycle_model = new ContactInhibitionCellCycleModel();
             p_cycle_model->SetDimension(2);
             p_cycle_model->SetBirthTime(-10.0);
-            p_cycle_model->SetQuiescentVolumeFraction(0.7);
-            p_cycle_model->SetEquilibriumVolume(1.0);
+            p_cycle_model->SetQuiescentVolumeFraction(0.9);
+            p_cycle_model->SetEquilibriumVolume(0.866); //sqrt(3)/2
             p_cycle_model->SetStemCellG1Duration(0.1);
             p_cycle_model->SetTransitCellG1Duration(0.1);
 
             CellPtr p_cell(new Cell(p_state, p_cycle_model));
-            p_cell->SetCellProliferativeType(STEM);
+            p_cell->SetCellProliferativeType(TRANSIT);
             cells.push_back(p_cell);
         }
 
         // Create a cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-
-        // Create a force law
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
-        p_force->SetCutOffLength(1.5);
+        cell_population.SetOutputCellMutationStates(true);
+        cell_population.SetOutputCellVolumes(true);
 
         // Create a contact inhibition simulator
         VolumeTrackedOffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestMeshBasedSimulationWithVolumeTracked");
-        simulator.AddForce(p_force);
         simulator.SetEndTime(simulator.GetDt()/2.0);
 
-         // Run simulation
+        // Create a force law
+        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        p_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_force);
+
+        // Run simulation
          simulator.Solve();
 
-         // Test that the volumes of the cells are correct in CellData
+         // Test that the volumes of the cells are correct in CellData at the first timestep
          for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
               cell_iter != cell_population.End();
               ++cell_iter)
@@ -191,18 +204,90 @@ public:
              TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
          }
 
-         simulator.SetEndTime(1.0);
+         simulator.SetEndTime(2.0);
 
          // Run simulation
          simulator.Solve();
 
-         // Test that the volumes of the cells are correct in CellData
+         // Test that the volumes of the cells are correct in CellData at the end time
          for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
               cell_iter != cell_population.End();
               ++cell_iter)
          {
              TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
          }
+
+         //Check that the correct number of cells are labelled (i.e. experiencing contact inhibition)
+         TS_ASSERT_EQUALS(CellPropertyRegistry::Instance()->Get<CellLabel>()->GetCellCount(),14u);
+    }
+
+    void TestMeshBasedSimulationWithGhostNodesAndContactInhibition()
+    {
+        // Create a simple mesh
+        HoneycombMeshGenerator generator(3, 3,2);
+        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+
+        std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
+
+        // Create cells
+        MAKE_PTR(WildTypeCellMutationState, p_state);
+        std::vector<CellPtr> cells;
+        for (unsigned i=0; i<location_indices.size(); i++)
+        {
+            ContactInhibitionCellCycleModel* p_cycle_model = new ContactInhibitionCellCycleModel();
+            p_cycle_model->SetDimension(2);
+            p_cycle_model->SetBirthTime(-10.0);
+            p_cycle_model->SetQuiescentVolumeFraction(0.9);
+            p_cycle_model->SetEquilibriumVolume(0.866); //sqrt(3)/2
+            p_cycle_model->SetStemCellG1Duration(0.1);
+            p_cycle_model->SetTransitCellG1Duration(0.1);
+
+            CellPtr p_cell(new Cell(p_state, p_cycle_model));
+            p_cell->SetCellProliferativeType(TRANSIT);
+            cells.push_back(p_cell);
+        }
+
+        // Create a cell population
+        MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells,location_indices);
+        cell_population.SetOutputCellMutationStates(true);
+        cell_population.SetOutputCellVolumes(true);
+
+        // Create a contact inhibition simulator
+        VolumeTrackedOffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestMeshBasedSimulationWithGhostNodesAndVolumeTracked");
+        simulator.SetEndTime(simulator.GetDt()/2.0);
+
+        // Create a force law
+        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        p_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_force);
+
+        // Run simulation
+         simulator.Solve();
+
+         // Test that the volumes of the cells are correct in CellData at the first timestep
+         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+              cell_iter != cell_population.End();
+              ++cell_iter)
+         {
+             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
+         }
+
+         simulator.SetEndTime(2.0);
+
+         // Run simulation
+         simulator.Solve();
+
+         // Test that the volumes of the cells are correct in CellData at the end time
+         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+              cell_iter != cell_population.End();
+              ++cell_iter)
+         {
+             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
+         }
+
+         //Check that the correct number of cells are labelled (i.e. experiencing contact inhibition)
+         TS_ASSERT_EQUALS(CellPropertyRegistry::Instance()->Get<CellLabel>()->GetCellCount(),4u);
     }
 
     void TestVertexBasedSimulationWithContactInhibition()
@@ -220,18 +305,20 @@ public:
             ContactInhibitionCellCycleModel* p_cycle_model = new ContactInhibitionCellCycleModel();
             p_cycle_model->SetDimension(2);
             p_cycle_model->SetBirthTime(-10.0);
-            p_cycle_model->SetQuiescentVolumeFraction(0.7);
-            p_cycle_model->SetEquilibriumVolume(1.0);
+            p_cycle_model->SetQuiescentVolumeFraction(0.99); // Very high as cells are not that compressed, as low in number and want to check that contact inhibition works.
+            p_cycle_model->SetEquilibriumVolume(1.0); // Target vol in NagaiHonda force
             p_cycle_model->SetStemCellG1Duration(0.1);
             p_cycle_model->SetTransitCellG1Duration(0.1);
 
             CellPtr p_cell(new Cell(p_state, p_cycle_model));
-            p_cell->SetCellProliferativeType(STEM);
+            p_cell->SetCellProliferativeType(TRANSIT);
             cells.push_back(p_cell);
         }
 
         // Create cell population
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.SetOutputCellMutationStates(true);
+        cell_population.SetOutputCellVolumes(true);
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
@@ -246,7 +333,7 @@ public:
          // Run simulation
          simulator.Solve();
 
-         // Test that the volumes of the cells are correct in CellData
+         // Test that the volumes of the cells are correct in CellData at the first timestep
          for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
               cell_iter != cell_population.End();
               ++cell_iter)
@@ -254,18 +341,21 @@ public:
              TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
          }
 
-         simulator.SetEndTime(1.0);
+         simulator.SetEndTime(2.0);
 
          // Run simulation
          simulator.Solve();
 
-         // Test that the volumes of the cells are correct in CellData
+         // Test that the volumes of the cells are correct in CellData at the end time
          for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
               cell_iter != cell_population.End();
               ++cell_iter)
          {
              TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
          }
+
+         //Check that the correct number of cells are labelled (i.e. experiencing contact inhibition)
+         TS_ASSERT_EQUALS(CellPropertyRegistry::Instance()->Get<CellLabel>()->GetCellCount(),8u);
     }
 
     void TestVolumeTrackedOffLatticeSimulationArchiving() throw (Exception)
