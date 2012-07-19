@@ -39,6 +39,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include "OutputFileHandler.hpp"
 #include "FileComparison.hpp"
+#include "PetscTools.hpp"
+#include "PetscSetupAndFinalize.hpp"
 
 class TestFileComparison : public CxxTest::TestSuite
 {
@@ -56,7 +58,21 @@ public:
         // Comparing two different files gives a failure.
         FileComparison different_data(base_file, noised_file);
 
-        TS_ASSERT_EQUALS(different_data.CompareFiles(0,false), false);
+        bool expected_fail_result = !PetscTools::AmMaster();
+        TS_ASSERT_EQUALS(different_data.CompareFiles(0,false), expected_fail_result);
+    }
+
+    // By default the class expects to be used collectively, so only the master does file operations,
+    // and there's a barrier before opening the files.  This case is "tested" in the other
+    // tests - it's working if they don't deadlock!  Here we test the ability to be used non-collectively.
+    void TestParallelOperation() throw(Exception)
+    {
+        if (PetscTools::AmMaster())
+        {
+            std::string base_file = "./global/test/data/random_data.txt";
+            FileComparison same_data(base_file, base_file, false);
+            TS_ASSERT(same_data.CompareFiles());
+        }
     }
 
     void TestFileFinderInterface() throw(Exception)
@@ -66,9 +82,9 @@ public:
         FileFinder noised_file("global/test/data/same_random_data_with_1e-4_noise.txt",
                                RelativeTo::ChasteSourceRoot);
 
-        // Comparing identical files shows no difference
         FileComparison same_data(base_file, noised_file);
-        TS_ASSERT_EQUALS(same_data.CompareFiles(0,false), false);
+        bool expected_fail_result = !PetscTools::AmMaster();
+        TS_ASSERT_EQUALS(same_data.CompareFiles(0,false), expected_fail_result);
     }
 
     void TestIgnoreHeader() throw(Exception)
@@ -79,7 +95,8 @@ public:
         FileComparison file_comparer(base_file, changed_file);
 
         // Here we examine the header lines, find a difference and get a failure
-        TS_ASSERT_EQUALS(file_comparer.CompareFiles(0,false), false);
+        bool expected_fail_result = !PetscTools::AmMaster();
+        TS_ASSERT_EQUALS(file_comparer.CompareFiles(0,false), expected_fail_result);
 
         // In a second file comparer make this pass by using SetIgnoreLinesBeginningWith();
         FileComparison file_comparer2(base_file, changed_file);
@@ -89,11 +106,9 @@ public:
         // Here we ignore the first line and test passes.
         TS_ASSERT_EQUALS(file_comparer.CompareFiles(1), true);
 
+        // Comment line differs so comparison fails
         file_comparer.SetIgnoreCommentLines(false);
-
-        // Here we ignore the header line and test passes.
-        TS_ASSERT_EQUALS(file_comparer.CompareFiles(1,false), false);
-
+        TS_ASSERT_EQUALS(file_comparer.CompareFiles(1,false), expected_fail_result);
     }
 };
 

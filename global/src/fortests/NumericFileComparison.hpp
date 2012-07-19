@@ -48,8 +48,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 class NumericFileComparison : public AbstractFileComparison
 {
-private:
-
 public:
 
     /**
@@ -58,9 +56,10 @@ public:
      *
      * @param fileName1  first file
      * @param fileName2  second file
+     * @param calledCollectively  If true there will be a barrier before opening files, and only master compares contents.
      */
-    NumericFileComparison(std::string fileName1, std::string fileName2):
-       AbstractFileComparison(fileName1,fileName2)
+    NumericFileComparison(std::string fileName1, std::string fileName2, bool calledCollectively=true)
+        : AbstractFileComparison(fileName1,fileName2,calledCollectively)
     {
     }
 
@@ -70,9 +69,10 @@ public:
      *
      * @param rFileName1  first file
      * @param rFileName2  second file
+     * @param calledCollectively  If true there will be a barrier before opening files, and only master compares contents.
      */
-    NumericFileComparison(const FileFinder& rFileName1, const FileFinder& rFileName2):
-       AbstractFileComparison(rFileName1,rFileName2)
+    NumericFileComparison(const FileFinder& rFileName1, const FileFinder& rFileName2, bool calledCollectively=true)
+        : AbstractFileComparison(rFileName1,rFileName2,calledCollectively)
     {
     }
 
@@ -90,6 +90,13 @@ public:
     bool CompareFiles(double absTol=DBL_EPSILON, unsigned ignoreFirstFewLines=0,
                       double relTol=DBL_EPSILON, bool doTsAssert=true)
     {
+
+        // Usually only the master process does the checking, this can be switched off in the constructor.
+        if (mCalledCollectively && !PetscTools::AmMaster())
+        {
+            return true;
+        }
+
         double data1;
         double data2;
         unsigned failures = 0;

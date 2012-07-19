@@ -62,10 +62,11 @@ public:
      *
      * @param fileName1  first file
      * @param fileName2  second file
+     * @param calledCollectively  If true there will be a barrier before opening files, and only master compares contents.
      */
-    FileComparison(std::string fileName1, std::string fileName2):
-       AbstractFileComparison(fileName1,fileName2),
-       mIgnoreCommentLines(true)
+    FileComparison(std::string fileName1, std::string fileName2, bool calledCollectively=true)
+        : AbstractFileComparison(fileName1, fileName2, calledCollectively),
+          mIgnoreCommentLines(true)
     {
         SetupCommentLines();
     }
@@ -76,10 +77,11 @@ public:
      *
      * @param rFileName1  first file finder
      * @param rFileName2  second file finder
+     * @param calledCollectively  If true there will be a barrier before opening files, and only master compares contents.
      */
-    FileComparison(const FileFinder& rFileName1, const FileFinder& rFileName2):
-       AbstractFileComparison(rFileName1,rFileName2),
-       mIgnoreCommentLines(true)
+    FileComparison(const FileFinder& rFileName1, const FileFinder& rFileName2, bool calledCollectively=true)
+        : AbstractFileComparison(rFileName1, rFileName2, calledCollectively),
+          mIgnoreCommentLines(true)
     {
         SetupCommentLines();
     }
@@ -127,6 +129,12 @@ public:
      */
     bool CompareFiles(unsigned ignoreFirstFewLines=0, bool doTsAssert=true)
     {
+        // Usually only the master process does the checking, this can be switched off in the constructor.
+        if (mCalledCollectively && !PetscTools::AmMaster())
+        {
+            return true;
+        }
+
         std::string data1;
         std::string data2;
         unsigned failures = 0;

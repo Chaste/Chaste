@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include "FileFinder.hpp"
 #include "OutputFileHandler.hpp"
+#include "PetscTools.hpp"
 
 /**
  * Abstract class for comparing two files, looking for differences in tests.
@@ -53,10 +54,12 @@ public:
      *
      * @param rFileFinder1  first file
      * @param rFileFinder2  second file
+     * @param calledCollectively  If true there will be a barrier before opening files, and only master compares contents.
      */
-    AbstractFileComparison(const FileFinder& rFileFinder1, const FileFinder& rFileFinder2):
+    AbstractFileComparison(const FileFinder& rFileFinder1, const FileFinder& rFileFinder2, bool calledCollectively):
         mFilename1(rFileFinder1.GetAbsolutePath()),
-        mFilename2(rFileFinder2.GetAbsolutePath())
+        mFilename2(rFileFinder2.GetAbsolutePath()),
+        mCalledCollectively(calledCollectively)
     {
         Setup();
     }
@@ -67,10 +70,12 @@ public:
      *
      * @param fileName1  first file
      * @param fileName2  second file
+     * @param calledCollectively  If true there will be a barrier before opening files, and only master compares contents.
      */
-    AbstractFileComparison(std::string fileName1, std::string fileName2):
+    AbstractFileComparison(std::string fileName1, std::string fileName2, bool calledCollectively):
         mFilename1(fileName1),
-        mFilename2(fileName2)
+        mFilename2(fileName2),
+        mCalledCollectively(calledCollectively)
     {
         Setup();
     }
@@ -83,13 +88,13 @@ public:
         if (mpFile1)
         {
             mpFile1->close();
+            delete mpFile1;
         }
         if (mpFile2)
         {
             mpFile2->close();
+            delete mpFile2;
         }
-        delete mpFile1;
-        delete mpFile2;
     }
 
 protected:
@@ -102,17 +107,22 @@ protected:
 
     unsigned mLineNum; /**< Counter for the line number we are on (in FileComparision) */
 
+    bool mCalledCollectively; /**< If true there will be a barrier before opening files, and only master compares contents. */
+
     /**
      * This method closes and reopens files so that another CompareFiles() command can be run on the same object.
      */
     void ResetFiles()
     {
-        // We want to reset the files to allow this method to be called again, with different tolerances for instance.
-        mpFile1->close();
-        mpFile2->close();
-        mpFile1->open(mFilename1.c_str());
-        mpFile2->open(mFilename2.c_str());
-        mLineNum = 1u;
+        if (!mCalledCollectively || PetscTools::AmMaster())
+        {
+            // We want to reset the files to allow this method to be called again, with different tolerances for instance.
+            mpFile1->close();
+            mpFile2->close();
+            mpFile1->open(mFilename1.c_str());
+            mpFile2->open(mFilename2.c_str());
+            mLineNum = 1u;
+        }
     }
 
     /**
@@ -121,14 +131,17 @@ protected:
      */
     void SkipHeaderLines(unsigned numLinesToSkip)
     {
-        for (unsigned line_number=0; line_number<numLinesToSkip; line_number++)
+        if (!mCalledCollectively || PetscTools::AmMaster())
         {
-            char buffer[1024];
-            mpFile1->getline(buffer, 1024);
-            mpFile2->getline(buffer, 1024);
-            TS_ASSERT(!mpFile1->fail()); // Here we assume there are at least "ignoreFirstFewLines" lines...
-            TS_ASSERT(!mpFile2->fail()); // ...and that they are lines of no more than 1024 characters
-            mLineNum++;
+            for (unsigned line_number=0; line_number<numLinesToSkip; line_number++)
+            {
+                char buffer[1024];
+                mpFile1->getline(buffer, 1024);
+                mpFile2->getline(buffer, 1024);
+                TS_ASSERT(!mpFile1->fail()); // Here we assume there are at least "ignoreFirstFewLines" lines...
+                TS_ASSERT(!mpFile2->fail()); // ...and that they are lines of no more than 1024 characters
+                mLineNum++;
+            }
         }
     }
 
@@ -138,30 +151,42 @@ private:
      */
     void Setup()
     {
-        mpFile1 = new std::ifstream(mFilename1.c_str());
-
-        // If it doesn't exist - throw exception
-        if (!mpFile1->is_open())
+        if (mCalledCollectively)
         {
-            delete mpFile1;
-            mpFile1 = NULL;
-            EXCEPTION("Couldn't open file: " + mFilename1);
+            PetscTools::Barrier("AbstractFileComparison::Setup");
         }
-
-        mpFile2 = new std::ifstream(mFilename2.c_str());
-
-        // If it doesn't exist - throw exception
-        if (!mpFile2->is_open())
+        if (!mCalledCollectively || PetscTools::AmMaster())
         {
-            mpFile1->close();
-            delete mpFile1;
+            mpFile1 = new std::ifstream(mFilename1.c_str());
+
+            // If it doesn't exist - throw exception
+            if (!mpFile1->is_open())
+            {
+                delete mpFile1;
+                mpFile1 = NULL;
+                EXCEPTION("Couldn't open file: " + mFilename1);
+            }
+
+            mpFile2 = new std::ifstream(mFilename2.c_str());
+
+            // If it doesn't exist - throw exception
+            if (!mpFile2->is_open())
+            {
+                mpFile1->close();
+                delete mpFile1;
+                mpFile1 = NULL;
+                delete mpFile2;
+                mpFile2 = NULL;
+                EXCEPTION("Couldn't open file: " + mFilename2);
+            }
+
+            mLineNum = 1u;
+        }
+        else
+        {
             mpFile1 = NULL;
-            delete mpFile2;
             mpFile2 = NULL;
-            EXCEPTION("Couldn't open file: " + mFilename2);
         }
-
-        mLineNum = 1u;
     }
 
 };
