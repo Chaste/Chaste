@@ -627,8 +627,9 @@ def CreateXsdBuilder(build, buildenv, fakeIt=False):
         XsdAction = buildenv.Action(RunXsd)
     def XsdEmitter(target, source, env):
         hpp = os.path.splitext(str(target[0]))[0] + '.hpp'
-        t = env.Install(os.path.join(env['INSTALL_PREFIX'], 'include'), hpp)
-        env.Alias('install', t)
+        if env['INSTALL_FILES']:
+            t = env.Install(os.path.join(env['INSTALL_PREFIX'], 'include'), hpp)
+            env.Alias('install', t)
         target = target + [hpp]
         env.Precious(target)
         return (target, source)
@@ -717,7 +718,7 @@ def CreatePyCmlBuilder(build, buildenv):
         pycml_code = filter(lambda path: not path.endswith('.pyc'), pycml_code)
         env.Depends(target, pycml_code)
         # Install headers if requested
-        if not IsDynamicSource(source):
+        if not IsDynamicSource(source) and env['INSTALL_FILES']:
             headers = [t for t in target if t.endswith('.hpp')]
             t = env.Install(os.path.join(env['INSTALL_PREFIX'], 'include'), headers)
             env.Alias('install', t)
@@ -1101,7 +1102,7 @@ def DoComponentSConscript(component, otherVars):
                                                ignoreDirs=['data'],
                                                includeRoot=True)
     # Install headers?
-    if otherVars['install_prefix']:
+    if env['INSTALL_FILES']:
         headers, _ = FindSourceFiles(env, 'src', sourceExts=['.hpp'])
         t = env.Install(os.path.join(otherVars['install_prefix'], 'include'), headers)
         env.Alias('install', t)
@@ -1149,7 +1150,7 @@ def DoComponentSConscript(component, otherVars):
         # Build the test library for this component
         test_lib = env.StaticLibrary('test'+component, testsource)
         # Install libraries?
-        if lib and otherVars['install_prefix']:
+        if lib and env['INSTALL_FILES']:
             t = env.Install(os.path.join(otherVars['install_prefix'], 'lib'), lib)
             env.Alias('install', t)
     else:

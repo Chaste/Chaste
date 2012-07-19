@@ -172,7 +172,8 @@ Export('texttest_suite')
 # libraries and headers.
 install_prefix = ARGUMENTS.get('install_prefix', '/usr/local')
 Export('install_prefix')
-if 'install' in BUILD_TARGETS:
+install_files = 'install' in BUILD_TARGETS
+if install_files:
     assert use_chaste_libs, "Cannot install unless building Chaste libraries"
 
 # Check for an easy mistake, where the user forgets the 'test_suite='.
@@ -277,6 +278,7 @@ env.Replace(CXX = build.tools['mpicxx'])
 env.Replace(AR = build.tools['ar'])
 env.Replace(CXXFILESUFFIX = '.cpp')
 env['INSTALL_PREFIX'] = install_prefix
+env['INSTALL_FILES'] = install_files
 
 if int(ARGUMENTS.get('br', ARGUMENTS.get('brief', 0))):
     env.Replace(CXXCOMSTR = '$CXX -o $TARGET -c <flags etc. omitted> $SOURCES')
@@ -424,8 +426,7 @@ if not isinstance(build, BuildTypes.DoxygenCoverage):
         if not os.path.exists(os.path.join(project, 'SConscript')):
             print >>sys.stderr, "Unexpected folder", project, "in projects folder."
             continue
-        if ('install' in BUILD_TARGETS and not
-            (project in BUILD_TARGETS or project+os.sep in BUILD_TARGETS)):
+        if install_files and not (project in BUILD_TARGETS or project+os.sep in BUILD_TARGETS):
             # Only install projects if explicitly requested
             continue
         bld_dir = os.path.join(project, 'build', build_dir)
