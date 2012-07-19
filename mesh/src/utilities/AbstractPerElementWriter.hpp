@@ -52,8 +52,8 @@ class AbstractPerElementWriter
 {
 private:
     AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* mpMesh; /**< The mesh.  Set by the public method WriteData. */
-    out_stream mpMasterFile; /**< The output file (only valid on master process).   Set by the public method WriteData and used by WriteElementOnMaster*/
 protected:
+    out_stream mpMasterFile; /**< The output file (only valid on master process).   Set by the public method WriteData and used by WriteElementOnMaster*/
     /**
      * How to associate an element with some data
      * Must be over-ridden by the derived class.
@@ -79,6 +79,16 @@ protected:
         (*mpMasterFile)<<"\n";
     }       
 
+    /**
+     * How to write the header information to the file.
+     * By default writes nothing.
+     * This is only called by the master process.
+     *
+     */
+    virtual void WriteHeaderOnMaster()
+    {
+    }
+
 public:
     
     /**
@@ -100,7 +110,7 @@ public:
             mpMasterFile = rHandler.OpenOutputFile(rFileName);
             MPI_Status status;
             status.MPI_ERROR = MPI_SUCCESS; //For MPICH2
-            
+            WriteHeaderOnMaster();
             for (unsigned element_index=0; element_index<mpMesh->GetNumElements();element_index++)
             {
                 if (mpMesh->CalculateDesignatedOwnershipOfElement(element_index))

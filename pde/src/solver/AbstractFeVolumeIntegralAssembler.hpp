@@ -436,6 +436,10 @@ void AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_
 
             // Allow the concrete version of the assembler to interpolate any desired quantities
             this->IncrementInterpolatedQuantities(phi(i), p_node);
+            if ( this->mAssembleMatrix || INTERPOLATION_LEVEL==NONLINEAR )
+            {
+                this->IncrementInterpolatedGradientQuantities(grad_phi, i, p_node);
+            }
         }
 
         double wJ = jacobian_determinant * mpQuadRule->GetWeight(quad_index);

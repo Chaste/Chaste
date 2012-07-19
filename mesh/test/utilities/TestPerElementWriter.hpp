@@ -51,8 +51,36 @@ class CentroidWriter : public AbstractPerElementWriter<3,3,3>
     {
         rData = pElement->CalculateCentroid();
     }
+
 };
 
+class CentroidWithIndexWriter : public AbstractPerElementWriter<3,3,4>
+{
+    void Visit(Element<3,3>* pElement, c_vector<double, 4>& rData)
+    {
+        c_vector<double,3> centroid = pElement->CalculateCentroid();
+        rData[0] = pElement->GetIndex();
+        for (unsigned i=0; i<3; i++)
+        {
+            rData[i+1] = centroid[i];
+        }
+    }
+    void WriteElementOnMaster(const c_vector<double, 4>& rData)
+    {
+        //Put square bracket on the first piece of data
+        (*mpMasterFile)<<"["<<rData[0]<<"]\t";
+        for (unsigned i=1; i<4; i++)
+        {
+            (*mpMasterFile)<<rData[i]<<"\t";
+        }
+        (*mpMasterFile)<<"\n";
+    }
+
+    void WriteHeaderOnMaster()
+    {
+        (*mpMasterFile)<<"This one has indices\n";
+    }
+};
 
 class TestPerElementWriter : public CxxTest::TestSuite
 {
@@ -61,15 +89,19 @@ public:
 
     void TestPerElement() throw (Exception)
     {
-        CentroidWriter writer;
         DistributedTetrahedralMesh<3,3> mesh;
         mesh.ConstructCuboid(2, 3, 4);
         OutputFileHandler handler("TestPerElementWriter");
+
+        CentroidWriter writer;
         writer.WriteData(handler, "centroid.dat", &mesh);
-        
-        PetscTools::Barrier();
-        NumericFileComparison comparison(handler.GetOutputDirectoryFullPath() + "/centroid.dat", "mesh/test/data/TestUtilities/centroid.dat");
-        comparison.CompareFiles();
+        NumericFileComparison(handler.GetOutputDirectoryFullPath() + "/centroid.dat",
+                              "mesh/test/data/TestUtilities/centroid.dat").CompareFiles();
+
+        CentroidWithIndexWriter indexed_writer;
+        indexed_writer.WriteData(handler, "centroid_indexed.dat", &mesh);
+        NumericFileComparison(handler.GetOutputDirectoryFullPath() + "/centroid_indexed.dat",
+                              "mesh/test/data/TestUtilities/centroid_indexed.dat").CompareFiles();
     }
 
 };

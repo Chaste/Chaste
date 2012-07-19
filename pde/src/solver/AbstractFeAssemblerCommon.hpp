@@ -105,10 +105,33 @@ protected:
      * if there are some quantities which need to be computed at each Gauss point.
      * They are called in AssembleOnElement().
      *
+     * Note that this method is called over assembly of elements, surface elements and cables.
+     *
      * @param phiI
      * @param pNode pointer to a node
      */
     virtual void IncrementInterpolatedQuantities(double phiI, const Node<SPACE_DIM>* pNode)
+    {}
+
+    /**
+     * The concrete subclass can overload this and ResetInterpolatedQuantities()
+     * if there are some gradient dependent quantities which need to be computed at each Gauss point.
+     * A matrix of all the basis function gradients at the quad point is passed for efficiency reasons.
+     * To access the gradient vector use of the current basis function use rGradPhi(:, phi_index);
+     * They are called in AssembleOnElement().
+     *
+     * Note that this method is ONLY called during assembly of elements. NOT during assembly of surface elements or cables.
+     *
+     * \todo #2075 Allow other cases where interpolated gradients are needed in righthand-side assembly:
+     * Further, it is ONLY called in the cases where rGradPhi has been computed.  Currently these cases are
+     *     - When mAssembleMatrix is set
+     *  or - When INTERPOLATION_LEVEL==NONLINEAR
+     *
+     * @param rGradPhi A matrix containing the gradient of all the basis functions at this Gauss point.
+     * @param phiIndex The index of the current basis function in the rGradPhi matrix.
+     * @param pNode pointer to the node associated with the current basis function
+     */
+    virtual void IncrementInterpolatedGradientQuantities(const c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>& rGradPhi, unsigned phiIndex, const Node<SPACE_DIM>* pNode)
     {}
 public:
 

@@ -89,6 +89,71 @@ public:
     }
 };
 
+/*
+ * Subclass of LinearParabolicSolver used to check that the IncrementInterpolatedQuantities and related methods are called correctly.
+ */
+class InterpolatedQuantitiesLinearParabolicSolver2d : public SimpleLinearParabolicSolver<2,2>
+{
+public:
+
+    unsigned numResetCalled;
+    unsigned numIncrementInterpolatedCalled;
+    unsigned numIncrementInterpolatedGradientCalled;
+
+
+    double totalPhiI;
+
+    InterpolatedQuantitiesLinearParabolicSolver2d(AbstractTetrahedralMesh<2,2>* pMesh,
+                                                AbstractLinearParabolicPde<2,2>* pPde,
+                                                BoundaryConditionsContainer<2,2,1>* pBoundaryConditions,
+                                                unsigned numQuadPoints = 2) : SimpleLinearParabolicSolver<2,2>(pMesh,
+                                                                                                              pPde,
+                                                                                                              pBoundaryConditions,
+                                                                                                              numQuadPoints),
+                                                                              numResetCalled(0),
+                                                                              numIncrementInterpolatedCalled(0),
+                                                                              numIncrementInterpolatedGradientCalled(0),
+                                                                              totalPhiI(1.0)
+    {}
+
+    void ResetInterpolatedQuantities()
+    {
+        ++numResetCalled;
+
+        TS_ASSERT_EQUALS(totalPhiI, 1.0);
+        totalPhiI = 0.0;
+    }
+
+    void IncrementInterpolatedQuantities(double phiI, const Node<2>* pNode)
+    {
+        ++numIncrementInterpolatedCalled;
+
+        TS_ASSERT_LESS_THAN(phiI, 1.0);
+        TS_ASSERT_LESS_THAN(0.0, phiI);
+
+        totalPhiI += phiI;
+    }
+
+    void IncrementInterpolatedGradientQuantities(const c_matrix<double, 2, 3>& rGradPhi, unsigned phiIndex, const Node<2>* pNode)
+    {
+        if (numIncrementInterpolatedGradientCalled%12 == 0u)
+        {
+            //Assume that this is called 4x3 times per element and we get the same rGradPhi for each element
+            //Check the rows sum to 0
+            for (unsigned row=0; row<2; row++)
+            {
+                double sum=0.0;
+                for (unsigned col=0; col<3; col++)
+                {
+                    sum += rGradPhi(row, col);
+                }
+                TS_ASSERT_DELTA(sum, 0.0, 1e-14);
+            }
+        }
+        ++numIncrementInterpolatedGradientCalled;
+    }
+};
+
 class TestSimpleLinearParabolicSolver : public CxxTest::TestSuite
 {
 public:
@@ -272,7 +337,9 @@ public:
         bcc.DefineZeroDirichletOnMeshBoundary(&mesh);
 
         // Create PDE solver
-        SimpleLinearParabolicSolver<2,2> solver(&mesh,&pde,&bcc);
+        //InterpolatedQuantitiesLinearParabolicSolver is identical to SimpleLinearParabolicPdeSolver, but is instrumented
+        //to count calls to the IncrementInterpolatedQuantities and related methods.
+        InterpolatedQuantitiesLinearParabolicSolver2d solver(&mesh,&pde,&bcc);
 
         // Set start and end times and timestep
         double t_end = 0.1;
@@ -312,9 +379,26 @@ public:
 
         solver.SetOutputDirectoryAndPrefix("TestSimpleLinearParabolicSolver2DZeroDirich","results");
 
+        TS_ASSERT_EQUALS(solver.numResetCalled, 0u);
+        TS_ASSERT_EQUALS(solver.numIncrementInterpolatedCalled, 0u);
+        TS_ASSERT_EQUALS(solver.numIncrementInterpolatedGradientCalled, 0u);
+
         // Solve PDE and store solution
         Vec result = solver.Solve();
         ReplicatableVector result_repl(result);
+
+        //Reset is called for each quad point, four are used for a 2D triangle using the default quadrature rule
+        unsigned expected_resets = 100u*(4u*mesh.GetNumElements());
+        TS_ASSERT_EQUALS(solver.numResetCalled, expected_resets);
+
+        //IncrementInterpolatedQuantities is called for each quad point, taking contributions for each of the basis functions.
+        //For a linear 2D triangle using the default quadrature rule this gives four quad points * 3 nodes/basis functions
+        unsigned expected_interpolates = 100u*(4u*3u*mesh.GetNumElements());
+        TS_ASSERT_EQUALS(solver.numIncrementInterpolatedCalled, expected_interpolates);
+
+        //\todo #2075
+        //Note that the IncrementInterpolatedGradientCalled method is *only* called on matrix assembly, i.e. at the first time-step
+        TS_ASSERT_EQUALS(solver.numIncrementInterpolatedGradientCalled, 4u*3u*mesh.GetNumElements());
 
         // Check solution is u = e^{-2*t*pi*pi} sin(x*pi)*sin(y*pi), t=1
         for (unsigned i=0; i<result_repl.GetSize(); i++)
