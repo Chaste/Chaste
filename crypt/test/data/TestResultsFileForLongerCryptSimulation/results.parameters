@@ -7,9 +7,10 @@
 		<Dt>0.00833333</Dt>
 		<EndTime>20</EndTime>
 		<SamplingTimestepMultiple>10</SamplingTimestepMultiple>
+		<OutputDivisionLocations>0</OutputDivisionLocations>
 	</CryptSimulation2d>
 
-	<MeshBasedCellPopulation-2>
+	<MeshBasedCellPopulation-2-2>
 		<UseAreaBasedDampingConstant>0</UseAreaBasedDampingConstant>
 		<AreaBasedDampingConstantParameter>0.1</AreaBasedDampingConstantParameter>
 		<OutputVoronoiData>0</OutputVoronoiData>
@@ -25,7 +26,7 @@
 		<OutputCellCyclePhases>0</OutputCellCyclePhases>
 		<OutputCellAges>0</OutputCellAges>
 		<OutputCellVolumes>0</OutputCellVolumes>
-	</MeshBasedCellPopulation-2>
+	</MeshBasedCellPopulation-2-2>
 
 	<CellCycleModels>
 		<SimpleWntCellCycleModel>
@@ -50,13 +51,13 @@
 	</CellKillers>
 
 	<Forces>
-		<GeneralisedLinearSpringForce-2>
+		<GeneralisedLinearSpringForce-2-2>
 			<MeinekeSpringStiffness>30</MeinekeSpringStiffness>
 			<MeinekeDivisionRestingSpringLength>0.5</MeinekeDivisionRestingSpringLength>
 			<MeinekeSpringGrowthDuration>0.72</MeinekeSpringGrowthDuration>
 			<UseCutOffLength>0</UseCutOffLength>
 			<CutOffLength>1.79769e+308</CutOffLength>
-		</GeneralisedLinearSpringForce-2>
+		</GeneralisedLinearSpringForce-2-2>
 	</Forces>
 
 	<CellPopulationBoundaryConditions>
