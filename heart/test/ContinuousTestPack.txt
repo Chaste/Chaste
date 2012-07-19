@@ -36,6 +36,7 @@ monodomain/TestMonodomainTissue.hpp
 monodomain/TestMonodomainWithSvi.hpp
 monodomain/TestMonodomainWithTimeAdaptivity.hpp
 monodomain/TestOperatorSplittingMonodomainSolver.hpp
+performance/Test1dMonodomainShannonCvodeBenchmarks.hpp
 postprocessing/TestCellProperties.hpp
 postprocessing/TestHdf5ToVisualizerConverters.hpp
 postprocessing/TestPostProcessingWriter.hpp
