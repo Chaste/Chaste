@@ -80,7 +80,7 @@ void RepulsionForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM>
         if (norm_2(unit_difference) < rest_length)
         {
             // Calculate the force between nodes
-            c_vector<double, DIM> force = CalculateForceBetweenNodes(node_a_index, node_b_index, rCellPopulation);
+            c_vector<double, DIM> force = this->CalculateForceBetweenNodes(node_a_index, node_b_index, rCellPopulation);
             for (unsigned j=0; j<DIM; j++)
             {
                 assert(!std::isnan(force[j]));

@@ -571,7 +571,7 @@ bool BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Validate(Ab
                 // Check for Dirichlet conditions on this element's nodes
                 for (unsigned i=0; i<(*elt_iter)->GetNumNodes(); i++)
                 {
-                    if (!HasDirichletBoundaryCondition((*elt_iter)->GetNode(i)))
+                    if (!this->HasDirichletBoundaryCondition((*elt_iter)->GetNode(i)))
                     {
                         valid = false;
                     }

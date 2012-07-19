@@ -559,7 +559,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMeshR
         AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
 {
     WriteNclFile(rMesh, true);
-    WriteFilesUsingMeshReader(rMeshReader);
+    this->WriteFilesUsingMeshReader(rMeshReader);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

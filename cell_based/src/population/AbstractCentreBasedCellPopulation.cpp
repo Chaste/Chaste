@@ -70,7 +70,7 @@ CellPtr AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCell(CellP
 {
     // Create a new node
     Node<SPACE_DIM>* p_new_node = new Node<SPACE_DIM>(this->GetNumNodes(), rCellDivisionVector, false);   // never on boundary
-    unsigned new_node_index = AddNode(p_new_node); // use copy constructor so it doesn't matter that new_node goes out of scope
+    unsigned new_node_index = this->AddNode(p_new_node); // use copy constructor so it doesn't matter that new_node goes out of scope
 
     // Update cells vector
     this->mCells.push_back(pNewCell);
@@ -241,7 +241,7 @@ void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResu
             }
             else
             {
-            	GenerateCellResults(this->GetCellUsingLocationIndex(node_index),cell_type_counter,cell_cycle_phase_counter);
+            	this->GenerateCellResults(this->GetCellUsingLocationIndex(node_index),cell_type_counter,cell_cycle_phase_counter);
             }
         }
     }

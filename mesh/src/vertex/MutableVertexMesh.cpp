@@ -274,7 +274,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
     assert(ELEMENT_DIM == SPACE_DIM);
 
     // Get the centroid of the element
-    c_vector<double, SPACE_DIM> centroid = GetCentroidOfElement(pElement->GetIndex());
+    c_vector<double, SPACE_DIM> centroid = this->GetCentroidOfElement(pElement->GetIndex());
 
     // Create a vector perpendicular to the axis of division
     c_vector<double, SPACE_DIM> perp_axis;
@@ -290,8 +290,8 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
     std::vector<unsigned> intersecting_nodes;
     for (unsigned i=0; i<num_nodes; i++)
     {
-        bool is_current_node_on_left = (inner_prod(GetVectorFromAtoB(pElement->GetNodeLocation(i), centroid), perp_axis) >= 0);
-        bool is_next_node_on_left = (inner_prod(GetVectorFromAtoB(pElement->GetNodeLocation((i+1)%num_nodes), centroid), perp_axis) >= 0);
+        bool is_current_node_on_left = (inner_prod(this->GetVectorFromAtoB(pElement->GetNodeLocation(i), centroid), perp_axis) >= 0);
+        bool is_next_node_on_left = (inner_prod(this->GetVectorFromAtoB(pElement->GetNodeLocation((i+1)%num_nodes), centroid), perp_axis) >= 0);
 
         if (is_current_node_on_left != is_next_node_on_left)
         {
@@ -327,7 +327,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
 
         c_vector<double, SPACE_DIM> position_a = p_node_A->rGetLocation();
         c_vector<double, SPACE_DIM> position_b = p_node_B->rGetLocation();
-        c_vector<double, SPACE_DIM> a_to_b = GetVectorFromAtoB(position_a, position_b);
+        c_vector<double, SPACE_DIM> a_to_b = this->GetVectorFromAtoB(position_a, position_b);
 
         c_vector<double, SPACE_DIM> intersection;
 
@@ -342,7 +342,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
             // Find the location of the intersection
             double determinant = a_to_b[0]*axisOfDivision[1] - a_to_b[1]*axisOfDivision[0];
 
-            c_vector<double, SPACE_DIM> moved_centroid = position_a + GetVectorFromAtoB(position_a, centroid); // allow for periodicity and other metrics
+            c_vector<double, SPACE_DIM> moved_centroid = position_a + this->GetVectorFromAtoB(position_a, centroid); // allow for periodicity and other metrics
 
             double alpha = (moved_centroid[0]*a_to_b[1] - position_a[0]*a_to_b[1]
                             -moved_centroid[1]*a_to_b[0] + position_a[1]*a_to_b[0])/determinant;
@@ -447,7 +447,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongShortAxis(
     assert(ELEMENT_DIM == SPACE_DIM);
 
     // Find the short axis of the element
-    c_vector<double, SPACE_DIM> short_axis = GetShortAxisOfElement(pElement->GetIndex());
+    c_vector<double, SPACE_DIM> short_axis = this->GetShortAxisOfElement(pElement->GetIndex());
 
     unsigned new_element_index = DivideElementAlongGivenAxis(pElement, short_axis, placeOriginalElementBelow);
     return new_element_index;
@@ -644,7 +644,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideEdge(Node<SPACE_DIM>* pNod
     Node<SPACE_DIM>* p_new_node = new Node<SPACE_DIM>(GetNumNodes(), is_boundary_node, 0.0, 0.0);
 
     // Update the node location
-    c_vector<double, SPACE_DIM> new_node_position = pNodeA->rGetLocation() + 0.5*GetVectorFromAtoB(pNodeA->rGetLocation(), pNodeB->rGetLocation());
+    c_vector<double, SPACE_DIM> new_node_position = pNodeA->rGetLocation() + 0.5*this->GetVectorFromAtoB(pNodeA->rGetLocation(), pNodeB->rGetLocation());
     ChastePoint<SPACE_DIM> point(new_node_position);
     p_new_node->SetPoint(new_node_position);
 
@@ -878,7 +878,7 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForT2Swaps(VertexElementMap
              * Perform T2 swaps where necessary
              * Check there are only 3 nodes and the element is small enough
              */
-            if (GetVolumeOfElement(elem_iter->GetIndex()) < GetT2Threshold())
+            if (this->GetVolumeOfElement(elem_iter->GetIndex()) < GetT2Threshold())
             {
                 PerformT2Swap(*elem_iter);
 
@@ -916,7 +916,7 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForIntersections()
                     // Check that the node is not part of this element.
                     if (node_iter->rGetContainingElementIndices().count(elem_index) == 0)
                     {
-                        if (ElementIncludesPoint(node_iter->rGetLocation(), elem_index))
+                        if (this->ElementIncludesPoint(node_iter->rGetLocation(), elem_index))
                         {
                             PerformT3Swap(&(*node_iter), elem_index);
                             return true;
@@ -945,7 +945,7 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForIntersections()
                 // Check that the node is not part of this element.
                 if (node_iter->rGetContainingElementIndices().count(elem_index) == 0)
                 {
-                    if (ElementIncludesPoint(node_iter->rGetLocation(), elem_index))
+                    if (this->ElementIncludesPoint(node_iter->rGetLocation(), elem_index))
                     {
                         PerformIntersectionSwap(&(*node_iter), elem_index);
                         return true;
@@ -1636,7 +1636,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPA
         element_4_index = element_a_index;
     }
 
-    unsigned intersected_edge = GetLocalIndexForElementEdgeClosestToPoint(pNode->rGetLocation(), elementIndex);
+    unsigned intersected_edge = this->GetLocalIndexForElementEdgeClosestToPoint(pNode->rGetLocation(), elementIndex);
 
     unsigned node_A_local_index_in_1 = this->GetElement(element_1_index)->GetNodeLocalIndex(node_A_index);
 
@@ -1734,7 +1734,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEM
     }
 
     // Create new node at centroid of element which will be a boundary node if any of the existing nodes was on the boundary.
-    c_vector<double, SPACE_DIM> new_node_location = GetCentroidOfElement(rElement.GetIndex());
+    c_vector<double, SPACE_DIM> new_node_location = this->GetCentroidOfElement(rElement.GetIndex());
     unsigned new_node_global_index = this->AddNode(new Node<SPACE_DIM>(GetNumNodes(), new_node_location, is_node_on_boundary));
     Node<SPACE_DIM>* p_new_node = this->GetNode(new_node_global_index);
 
@@ -1801,7 +1801,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
     std::set<unsigned> elements_containing_intersecting_node = pNode->rGetContainingElementIndices();
 
     // Get the local index of the node in the intersected element after which the new node is to be added
-    unsigned node_A_local_index = GetLocalIndexForElementEdgeClosestToPoint(pNode->rGetLocation(), elementIndex);
+    unsigned node_A_local_index = this->GetLocalIndexForElementEdgeClosestToPoint(pNode->rGetLocation(), elementIndex);
 
     // Get current node location
     c_vector<double, SPACE_DIM> node_location = pNode->rGetModifiableLocation();

@@ -335,7 +335,7 @@ void VertexBasedCellPopulation<DIM>::Validate()
          cell_iter != this->End();
          ++cell_iter)
     {
-        unsigned elem_index = GetLocationIndexUsingCell(*cell_iter);
+        unsigned elem_index = this->GetLocationIndexUsingCell(*cell_iter);
         validated_element[elem_index]++;
     }
 

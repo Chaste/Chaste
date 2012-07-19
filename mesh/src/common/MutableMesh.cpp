@@ -164,7 +164,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::SetNode(unsigned index,
             {
                 try
                 {
-                    GetElement(*it)->CalculateInverseJacobian(this->mElementJacobians[ (*it) ],
+                    this->GetElement(*it)->CalculateInverseJacobian(this->mElementJacobians[ (*it) ],
                                                               this->mElementJacobianDeterminants[ (*it) ],
                                                               this->mElementInverseJacobians[ (*it) ]);
                 }
@@ -177,7 +177,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::SetNode(unsigned index,
             {
                 c_vector<double,SPACE_DIM> previous_direction = this->mElementWeightedDirections[ (*it) ];
 
-                GetElement(*it)->CalculateWeightedDirection(this->mElementWeightedDirections[ (*it) ],
+                this->GetElement(*it)->CalculateWeightedDirection(this->mElementWeightedDirections[ (*it) ],
                                                             this->mElementJacobianDeterminants[ (*it) ]);
 
                 if ( inner_prod(previous_direction, this->mElementWeightedDirections[ (*it) ]) < 0)
@@ -193,7 +193,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::SetNode(unsigned index,
         {
             try
             {
-                GetBoundaryElement(*it)->CalculateWeightedDirection(this->mBoundaryElementWeightedDirections[ (*it) ],
+                this->GetBoundaryElement(*it)->CalculateWeightedDirection(this->mBoundaryElementWeightedDirections[ (*it) ],
                                                                     this->mBoundaryElementJacobianDeterminants[ (*it) ]);
             }
             catch (Exception e)
@@ -217,7 +217,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::DeleteNode(unsigned index)
          !found_target && it != this->mNodes[index]->ContainingElementsEnd();
          ++it)
     {
-        Element <ELEMENT_DIM,SPACE_DIM>* p_element = GetElement(*it);
+        Element <ELEMENT_DIM,SPACE_DIM>* p_element = this->GetElement(*it);
         for (unsigned i=0; i<=ELEMENT_DIM && !found_target; i++)
         {
             target_index = p_element->GetNodeGlobalIndex(i);

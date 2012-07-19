@@ -163,7 +163,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::Validate()
 
     for (typename AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::Iterator cell_iter=this->Begin(); cell_iter!=this->End(); ++cell_iter)
     {
-        unsigned node_index = GetLocationIndexUsingCell(*cell_iter);
+        unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
         validated_node[node_index] = true;
     }
 
