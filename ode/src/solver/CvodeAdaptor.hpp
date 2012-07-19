@@ -142,6 +142,9 @@ private:
     /** Whether to automatically reset CVODE on each Solve call. */
     bool mAutoReset;
 
+    /** Whether to ignore changes in the state variables when deciding whether to reset. */
+    bool mForceMinimalReset;
+
     /**
      * Record where the last solve got to so we know whether to re-initialise.
      * @param stopTime  the finishing time
@@ -228,6 +231,15 @@ public:
      * @param autoReset  whether to reset on every Solve
      */
     void SetAutoReset(bool autoReset);
+
+    /**
+     * Set whether to reduce the checking done when guessing when re-initialisation
+     * is needed, so it ignores changes in the state variables.  If call with true
+     * argument, will call SetAutoReset(false).
+     *
+     * @param minimalReset  whether to avoid checking for changes in state variables
+     */
+    void SetMinimalReset(bool minimalReset);
 
     /**
      * Successive calls to Solve will attempt to intelligently determine whether

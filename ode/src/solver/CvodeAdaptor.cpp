@@ -196,7 +196,7 @@ void CvodeAdaptor::SetupCvode(AbstractOdeSystem* pOdeSystem,
 
     // Find out if we need to (re-)initialise
     bool reinit = !mpCvodeMem || mAutoReset || !mLastSolutionState || !CompareDoubles::WithinAnyTolerance(startTime, mLastSolutionTime);
-    if (!reinit)
+    if (!reinit && !mForceMinimalReset)
     {
         const unsigned size = GetVectorSize(rInitialY);
         for (unsigned i=0; i<size; i++)
@@ -299,7 +299,17 @@ void CvodeAdaptor::SetAutoReset(bool autoReset)
     mAutoReset = autoReset;
     if (mAutoReset)
     {
+        SetMinimalReset(false);
         ResetSolver();
+    }
+}
+
+void CvodeAdaptor::SetMinimalReset(bool minimalReset)
+{
+    mForceMinimalReset = minimalReset;
+    if (mForceMinimalReset)
+    {
+        SetAutoReset(false);
     }
 }
 
@@ -437,7 +447,8 @@ CvodeAdaptor::CvodeAdaptor(double relTol, double absTol)
       mCheckForRoots(false),
       mLastSolutionState(NULL),
       mLastSolutionTime(0.0),
-      mAutoReset(true)
+      mAutoReset(true),
+      mForceMinimalReset(false)
 {
 }
 

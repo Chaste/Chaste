@@ -405,6 +405,8 @@ public:
         // Coverage
         cvode_cell.SetVoltageDerivativeToZero();
         cvode_cell.ResetToInitialConditions();
+        // Upon a reset to initial conditions, when SetVoltageDerivativeToZero has been called we need to do the following line:
+        cvode_cell.SetFixedVoltage(cvode_cell.GetVoltage());
         cvode_cell.Solve(0.0, i_ionic_end_time, max_dt);
         TS_ASSERT_DELTA(cvode_cell.GetIIonic(), 0.0, 1e-1); // Cell should be at rest
         cvode_cell.SetVoltageDerivativeToZero(false);

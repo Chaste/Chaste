@@ -488,13 +488,12 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
              index != dist_solution.End();
              ++index)
         {
-            // overwrite the voltage with the input value
             mCellsDistributed[index.Local]->SetVoltage( voltage[index] );
 
-            if(!updateVoltage)
+            if (!updateVoltage)
             {
                 // solve
-                // Note: Voltage is not be updated. The voltage is updated in the PDE solve.
+                // Note: Voltage is not being updated. The voltage is updated in the PDE solve.
                 mCellsDistributed[index.Local]->ComputeExceptVoltage(time, nextTime);
             }
             else
@@ -508,7 +507,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
             UpdateCaches(index.Global, index.Local, nextTime);
         }
 
-        if(updateVoltage)
+        if (updateVoltage)
         {
             dist_solution.Restore();
         }
@@ -522,7 +521,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
     /////////////////////////////////////////////////////////////
     // Solve purkinje cell models
     /////////////////////////////////////////////////////////////
-    if(mHasPurkinje)
+    if (mHasPurkinje)
     {
         DistributedVector::Stripe purkinje_voltage(dist_solution, 1);
         try
@@ -535,7 +534,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
                 mPurkinjeCellsDistributed[index.Local]->SetVoltage( purkinje_voltage[index] );
 
                 // solve
-                // Note: Voltage is not be updated. The voltage is updated in the PDE solve.
+                // Note: Voltage is not being updated. The voltage is updated in the PDE solve.
                 mPurkinjeCellsDistributed[index.Local]->ComputeExceptVoltage(time, nextTime);
 
                 // update the Iionic and stimulus caches

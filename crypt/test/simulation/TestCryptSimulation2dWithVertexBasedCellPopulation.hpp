@@ -671,7 +671,7 @@ public:
         MAKE_PTR_ARGS(SloughingCellKiller<2>, p_killer, (&crypt, crypt_length));
         simulator.AddCellKiller(p_killer);
 
-        std::string output_directory = "TestCryptSimulation2dOutputParameters";
+        std::string output_directory = "TestVertexCryptSimulation2dOutputParameters";
         OutputFileHandler output_file_handler(output_directory, false);
         out_stream parameter_file = output_file_handler.OpenOutputFile("vertex_crypt_sim_2d_results.parameters");
         simulator.OutputSimulationParameters(parameter_file);

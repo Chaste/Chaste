@@ -101,6 +101,7 @@ void AbstractCardiacCell::ComputeExceptVoltage(double tStart, double tEnd)
 void AbstractCardiacCell::SetVoltage(double voltage)
 {
     SetAnyVariable(mVoltageIndex, voltage);
+    SetFixedVoltage(voltage);
 }
 
 double AbstractCardiacCell::GetVoltage()

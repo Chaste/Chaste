@@ -53,8 +53,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TetrahedralMesh.hpp"
 #include "HeartFileFinder.hpp"
 #include "Warnings.hpp"
+#include "FileComparison.hpp"
 
-#include "Debug.hpp"
 
 class TestHeartConfig : public CxxTest::TestSuite
 {
@@ -1422,11 +1422,8 @@ public:
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
             HeartConfig* p_heart_config = HeartConfig::Instance();
-            MARK;
             HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersResumeSimulationWrongDimension.xml");
-            MARK;
             TS_ASSERT_THROWS_THIS(input_arch >> (*p_heart_config), "Problem type and space dimension should match when restarting a simulation.");
-            MARK;
         }
 
         {
@@ -2020,7 +2017,9 @@ public:
         HeartConfig::Instance()->Write(false, dir1);
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteEmpty.xml");
         HeartConfig::Instance()->Write(false, dir2);
-        EXPECT0(system, "diff " + base + dir1 + file_name + " " + base + dir2 + file_name);
+
+        FileComparison comparer(base + dir1 + file_name,base + dir2 + file_name);
+        TS_ASSERT(comparer.CompareFiles());
 
         // Reading in a parameters file that specifies everything should give you that file
         HeartConfig::Instance()->Reset();
@@ -2031,7 +2030,9 @@ public:
         // We need to read & then write the reference file, to avoid whitespace and namespace prefix differences
         WriteParamsFile(HeartConfig::Instance()->ReadFile("heart/test/data/xml/ChasteParametersFullFormat.xml"),
                         "ChasteResults/" + dir2, file_name);
-        EXPECT0(system, "diff " + base + dir1 + file_name + " " + base + dir2 + file_name);
+
+        FileComparison comparer2(base + dir1 + file_name, base + dir2 + file_name);
+        TS_ASSERT(comparer2.CompareFiles());
 
         // Check we deal with resuming too
         HeartConfig::Instance()->Reset();
@@ -2042,7 +2043,9 @@ public:
         // We need to read & then write the reference file, to avoid whitespace and namespace prefix differences
         WriteParamsFile(HeartConfig::Instance()->ReadFile("heart/test/data/xml/ChasteParametersResumeSimulationFullFormat.xml"),
                         "ChasteResults/" + dir2, file_name);
-        EXPECT0(system, "diff " + base + dir1 + file_name + " " + base + dir2 + file_name);
+
+        FileComparison comparer3(base + dir1 + file_name, base + dir2 + file_name);
+        TS_ASSERT(comparer3.CompareFiles());
     }
 
 };

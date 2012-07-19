@@ -120,6 +120,10 @@ public:
         TS_ASSERT_DELTA(mpRushLarsenCell->GetIIonic(), reference_model.GetIIonic(), 1e-12);
         TS_ASSERT_DELTA(mpRushLarsenCellOpt->GetIIonic(), reference_model_opt.GetIIonic(), 1e-12);
 
+        // The ComputeExceptVoltage method assumes voltage derivative is set to zero,
+        // and the uses a new member variable to get fixed voltage (see #2116).
+        // This is usually set by AbstractCardiacTissue, but we do it here manually for testing.
+        mpRushLarsenCell->SetFixedVoltage(mpRushLarsenCell->GetVoltage());
 
         // Test non-stimulated cell (using ComputeExceptVoltage)
         mpRushLarsenCell->ComputeExceptVoltage(0.0, 1.0);

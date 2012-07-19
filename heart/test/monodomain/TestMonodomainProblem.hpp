@@ -691,8 +691,9 @@ public:
             {
                 /*
                  * Since we started using bjacobi as the default preconditioner, parallel and sequential tests
-                 * may return different results (always accurate to the tolerance requested). "diff" is unable
-                 * to take this consideration into account.
+                 * may return different results (always accurate to the tolerance requested).
+                 * A straight FileComparison is unable to take this consideration into account.
+                 * \\\ /todo can we use a NumericFileComparison then?
                  *
                  * We will test that the file exists though.
                  */

@@ -304,8 +304,8 @@ public:
 //            std::string file = handler.GetOutputDirectoryFullPath() + "/hdf5_test_multi_column.h5";
 //            std::string new_file = handler.GetOutputDirectoryFullPath() + "/hdf5_test_multi_column_dumped.txt";
 //            system( ("h5dump "+file+" | sed 1d > "+new_file).c_str() );
-//
-//            TS_ASSERT_EQUALS(system(("diff " + new_file + " io/test/data/hdf5_test_multi_column_dumped.txt").c_str()), 0);
+//            FileComparison comparer(new_file, "io/test/data/hdf5_test_multi_column_dumped.txt");
+//            TS_ASSERT(comparer.CompareFiles());
 //        }
 
         TS_ASSERT(CompareFilesViaHdf5DataReader("hdf5", "hdf5_test_multi_column", true,
@@ -383,8 +383,8 @@ public:
 //            std::string file = handler.GetOutputDirectoryFullPath() + "/hdf5_test_multi_column.h5";
 //            std::string new_file = handler.GetOutputDirectoryFullPath() + "/hdf5_test_multi_column_dumped.txt";
 //            system( ("h5dump "+file+" | sed 1d > "+new_file).c_str() );
-//
-//            TS_ASSERT_EQUALS(system(("diff " + new_file + " io/test/data/hdf5_test_multi_column_dumped.txt").c_str()), 0);
+//            FileComparison comparer(new_file, "io/test/data/hdf5_test_multi_column_dumped.txt");
+//            TS_ASSERT(comparer.CompareFiles());
 //        }
 
         TS_ASSERT(CompareFilesViaHdf5DataReader("hdf5", "hdf5_non_even_row_dist", true,
@@ -460,8 +460,9 @@ public:
 //            std::string file = handler.GetOutputDirectoryFullPath() + "/hdf5_test_full_format_incomplete.h5";
 //            std::string new_file = handler.GetOutputDirectoryFullPath() + "/hdf5_test_full_format_incomplete_dumped.txt";
 //            system( ("h5dump "+file+" | sed 1d > "+new_file).c_str() );
+//            FileComparison comparer(new_file, "io/test/data/hdf5_test_full_format_incomplete_dumped.txt");
+//            TS_ASSERT(comparer.CompareFiles());
 //
-//            TS_ASSERT_EQUALS(system(("diff " + new_file + " io/test/data/hdf5_test_full_format_incomplete_dumped.txt").c_str()), 0);
 //        }
 
         TS_ASSERT(CompareFilesViaHdf5DataReader("hdf5", "hdf5_test_full_format_incomplete", true,
@@ -539,8 +540,8 @@ public:
 //            std::string file = handler.GetOutputDirectoryFullPath() + "/hdf5_test_full_format.h5";
 //            std::string new_file = handler.GetOutputDirectoryFullPath() + "/hdf5_test_full_format_dumped.txt";
 //            system( ("h5dump "+file+" | sed 1d > "+new_file).c_str() );
-//
-//            TS_ASSERT_EQUALS(system(("diff " + new_file + " io/test/data/hdf5_test_full_format_dumped.txt").c_str()), 0);
+//            FileComparison comparer(new_file, "io/test/data/hdf5_test_full_format_dumped.txt");
+//            TS_ASSERT(comparer.CompareFiles());
 //        }
          TS_ASSERT(CompareFilesViaHdf5DataReader("hdf5", "hdf5_test_full_format", true,
                                                  "io/test/data", "hdf5_test_full_format", false));
@@ -624,8 +625,8 @@ public:
 //            std::string file = handler.GetOutputDirectoryFullPath() + "/hdf5_test_full_format_striped.h5";
 //            std::string new_file = handler.GetOutputDirectoryFullPath() + "/hdf5_test_full_format_striped_dumped.txt";
 //            system( ("h5dump "+file+" | sed 1d > "+new_file).c_str() );
-//
-//            TS_ASSERT_EQUALS(system(("diff " + new_file + " io/test/data/hdf5_test_full_format_striped_dumped.txt").c_str()), 0);
+//            FileComparison comparer(new_file, "io/test/data/hdf5_test_full_format_striped_dumped.txt");
+//            TS_ASSERT(comparer.CompareFiles());
 //        }
 //
 
@@ -750,8 +751,8 @@ public:
 //            std::string file = handler.GetOutputDirectoryFullPath() + "/hdf5_test_full_format_striped_incomplete.h5";
 //            std::string new_file = handler.GetOutputDirectoryFullPath() + "/hdf5_test_full_format_striped_incomplete_dumped.txt";
 //            system( ("h5dump "+file+" | sed 1d > "+new_file).c_str() );
-//
-//            TS_ASSERT_EQUALS(system(("diff " + new_file + " io/test/data/hdf5_test_full_format_striped_incomplete_dumped.txt").c_str()), 0);
+//            FileComparison comparer(new_file, "io/test/data/hdf5_test_full_format_striped_incomplete_dumped.txt");
+//            TS_ASSERT(comparer.CompareFiles());
 //        }
 
         TS_ASSERT(CompareFilesViaHdf5DataReader("hdf5", "hdf5_test_full_format_striped_incomplete", true,

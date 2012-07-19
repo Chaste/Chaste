@@ -70,6 +70,7 @@ void AbstractCvodeCell::SetVoltage(double voltage)
 {
     assert(mStateVariables);
     SetAnyVariable(mVoltageIndex, voltage);
+    SetFixedVoltage(voltage);
 }
 
 
@@ -113,8 +114,8 @@ void AbstractCvodeCell::SetVoltageDerivativeToZero(bool clamp)
     if (clamp != mSetVoltageDerivativeToZero)
     {
         ResetSolver();
-        mSetVoltageDerivativeToZero = clamp;
     }
+    AbstractCardiacCellInterface::SetVoltageDerivativeToZero(clamp);
 }
 
 

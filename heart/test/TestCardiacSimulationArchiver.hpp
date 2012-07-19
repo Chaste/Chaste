@@ -63,6 +63,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Electrodes.hpp"
 #include "SimpleBathProblemSetup.hpp"
 
+#include "FileComparison.hpp"
 #include "NumericFileComparison.hpp"
 
 /// For checkpoint migration tests
@@ -854,7 +855,8 @@ private:
 //        {
             // If we're loading on 1 process, then the archives will differ in one digit:
             // DistributedTetrahedralMesh::mMetisPartitioning !
-            EXPECT0(system, "diff " + ref_archive + " " + my_archive);
+            FileComparison comparer(ref_archive, my_archive, false);
+            TS_ASSERT(comparer.CompareFiles());
 //        }
         if (!isConstructedMesh || PetscTools::GetNumProcs() < 4)
         {
@@ -865,8 +867,7 @@ private:
             std::stringstream proc_id;
             proc_id << PetscTools::GetMyRank();
             std::string suffix = "." + proc_id.str();
-            // We can't do a straight diff:
-            //EXPECT0(system, "diff -I 'serialization::archive' " + ref_archive + suffix + " " + my_archive + suffix);
+            // We can't do a straight FileComparison:
             // because we may have done a little simulation already, so there may be differences
             // between serial and parallel results, below the numerical solver tolerance.
 

@@ -2095,6 +2095,9 @@ class CellMLToChasteTranslator(CellMLTranslator):
                 if self.options.protocol:
                     value = check_bound(low_prop, '<', var, value)
                     value = check_bound(high_prop, '>', var, value)
+                #2116 - use supplied fixed voltage if we're clamping
+                if var is self.v_variable:
+                    value = '(mSetVoltageDerivativeToZero ? this->mFixedVoltage : %s)' % value
                 self.writeln(self.TYPE_DOUBLE, self.code_name(var),
                              self.EQ_ASSIGN, value, self.STMT_END)
                 self.writeln(self.COMMENT_START, 'Units: ', var.units,

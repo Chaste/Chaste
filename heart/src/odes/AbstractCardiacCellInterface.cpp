@@ -49,7 +49,8 @@ AbstractCardiacCellInterface::AbstractCardiacCellInterface(
       mpIntracellularStimulus(pIntracellularStimulus),
       mSetVoltageDerivativeToZero(false),
       mIsUsedInTissue(false),
-      mHasDefaultStimulusFromCellML(false)
+      mHasDefaultStimulusFromCellML(false),
+      mFixedVoltage(DOUBLE_UNSET)
 {
 }
 
@@ -139,6 +140,13 @@ const boost::shared_ptr<AbstractIvpOdeSolver> AbstractCardiacCellInterface::GetS
 void AbstractCardiacCellInterface::SetVoltageDerivativeToZero(bool clamp)
 {
     mSetVoltageDerivativeToZero = clamp;
+    if (mFixedVoltage == DOUBLE_UNSET)
+    {
+        mFixedVoltage = GetVoltage();
+    }
 }
 
-
+void AbstractCardiacCellInterface::SetFixedVoltage(double voltage)
+{
+    mFixedVoltage = voltage;
+}

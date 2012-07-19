@@ -145,19 +145,19 @@ public:
      */
     virtual double GetIIonic(const std::vector<double>* pStateVariables=NULL)=0;
 
-    /** Set the transmembrane potential
+    /**
+     * Set the cellular transmembrane potential.
      * @param voltage  new value
      */
     virtual void SetVoltage(double voltage)=0;
 
     /**
-     * Get the current value of the transmembrane potential, as given
-     * in our state variable vector.
+     * Get the current value of the cellular transmembrane potential.
      */
     virtual double GetVoltage()=0;
 
     /**
-     * Get the index of the transmembrane potential within this system.
+     * Get the index of the cellular transmembrane potential within this system.
      * Usually it will be an index into the state variable vector, but this is not guaranteed.
      * It will however always be suitable for use with AbstractParameterisedSystem::GetAnyVariable
      * and OdeSolution::GetVariableAtIndex.
@@ -264,6 +264,15 @@ public:
      */
     virtual void SetVoltageDerivativeToZero(bool clamp=true);
 
+    /**
+     * When the voltage derivative has been set to zero by SetVoltageDerivativeToZero,
+     * this method sets the transmembrane potential to use when computing the other
+     * derivatives and total ionic current.
+     *
+     * @param voltage  the value of the transmembrane potential
+     */
+    void SetFixedVoltage(double voltage);
+
 protected:
     /**
      * The index of the voltage within this system.
@@ -289,8 +298,11 @@ protected:
     /** Whether this cell exists in a tissue, or is an isolated cell. */
     bool mIsUsedInTissue;
 
-    /** Whether this cell has a default stimulus specified by CellML metadata */
+    /** Whether this cell has a default stimulus specified by CellML metadata. */
     bool mHasDefaultStimulusFromCellML;
+
+    /** The value of the fixed voltage if #mSetVoltageDerivativeToZero is set. */
+    double mFixedVoltage;
 
 private:
     /** Needed for serialization. */
