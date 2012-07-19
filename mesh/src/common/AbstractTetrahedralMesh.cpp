@@ -124,6 +124,11 @@ unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNumCableElements() 
 {
     return 0u;
 }
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNumVertices() const
+{
+    return this->GetNumNodes();
+}
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 Element<ELEMENT_DIM, SPACE_DIM>* AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetElement(unsigned index) const

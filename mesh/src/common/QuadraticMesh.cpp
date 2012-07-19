@@ -199,7 +199,7 @@ void QuadraticMesh<DIM>::ConstructCuboid(unsigned numElemX, unsigned numElemY, u
 
 
 template<unsigned DIM>
-unsigned QuadraticMesh<DIM>::GetNumVertices()
+unsigned QuadraticMesh<DIM>::GetNumVertices() const
 {
     return mNumVertices;
 }
@@ -283,55 +283,6 @@ void QuadraticMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& r
     QuadraticMeshHelper<DIM>::AddInternalNodesToBoundaryElements(this, p_mesh_reader);
     QuadraticMeshHelper<DIM>::CheckBoundaryElements(this);
 }
-
-
-template<unsigned DIM>
-void QuadraticMesh<DIM>::WriteBoundaryElementFile(std::string directory, std::string fileName)
-{
-    OutputFileHandler handler(directory, false);
-    out_stream p_file = handler.OpenOutputFile(fileName);
-
-    unsigned expected_num_nodes;
-    assert(DIM > 1);
-    if (DIM == 2)
-    {
-        expected_num_nodes = 3;
-    }
-    else if (DIM == 3)
-    {
-        expected_num_nodes = 6;
-    }
-
-    unsigned num_elements = 0;
-
-    for (typename TetrahedralMesh<DIM,DIM>::BoundaryElementIterator iter
-          = this->GetBoundaryElementIteratorBegin();
-          iter != this->GetBoundaryElementIteratorEnd();
-          ++iter)
-    {
-        assert((*iter)->GetNumNodes()==expected_num_nodes);
-        num_elements++;
-    }
-
-    *p_file << num_elements << " 0\n";
-
-    unsigned counter = 0;
-    for (typename TetrahedralMesh<DIM,DIM>::BoundaryElementIterator iter
-          = this->GetBoundaryElementIteratorBegin();
-          iter != this->GetBoundaryElementIteratorEnd();
-          ++iter)
-    {
-        *p_file << counter++ << " ";
-        for (unsigned i=0; i<(*iter)->GetNumNodes(); i++)
-        {
-            *p_file << (*iter)->GetNodeGlobalIndex(i) << " ";
-        }
-        *p_file << "\n";
-    }
-
-    p_file->close();
-}
-
 
 /////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation

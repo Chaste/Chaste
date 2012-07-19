@@ -154,20 +154,10 @@ public:
      */
     void ConstructFromLinearMeshReader(AbstractMeshReader<DIM, DIM>& rMeshReader);
 
-
-    /**
-     *  Write the boundary elements to file (in case the boundary elements were linear when read and the
-     *  quadratic versions have been computed.
-     *
-     *  @param directory Directory relative to CHASTE_TEST_OUTPUT. Not cleaned
-     *  @param fileName Boundary element file name.
-     */
-    void WriteBoundaryElementFile(std::string directory, std::string fileName);
-
     /**
      *  Get the number of vertices, ie non-internal (non-quadratic), nodes.
      */
-    unsigned GetNumVertices();
+    unsigned GetNumVertices() const;
 };
 
 #include "SerializationExportWrapper.hpp"

@@ -362,6 +362,12 @@ public:
     virtual unsigned GetNumCableElements() const;
 
     /**
+     * Get the number of vertices (nodes which are also corners of elements).  For a linear mesh all nodes are vertices,
+     * so this method is a synonym for GetNumNodes.  However, it is over-ridden in quadratic meshes.
+     */
+    virtual unsigned GetNumVertices() const;
+
+    /**
      * Get the element with a given index in the mesh.
      *
      * @param index the global index of the element
