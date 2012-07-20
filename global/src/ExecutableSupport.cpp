@@ -283,7 +283,6 @@ void ExecutableSupport::Print(const std::string& rMessage)
 
 void ExecutableSupport::FinalizePetsc()
 {
-    PetscOptionsSetValue("-options_left",PETSC_NULL);
-    ///\todo #1994 Causes memory failure (and seg fault) in PETSc 3.2
+    // Causes memory failure (and seg fault) in PETSc 3.2 with MPICH-1
     PetscFinalize();
 }

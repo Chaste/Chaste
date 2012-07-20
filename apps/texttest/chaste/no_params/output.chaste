@@ -31,5 +31,3 @@ This version of Chaste was compiled on:
 Fri, 13 Jul 2012 12:05:15 +0000 by Linux chaste-bob 2.6.24-27-server #1 SMP Fri Mar 12 01:23:09 UTC 2010 x86_64 (uname)
 from revision number 16139 with build type GccOpt, shared libraries.
 
-OptionTable: -options_left
-There are no unused options.

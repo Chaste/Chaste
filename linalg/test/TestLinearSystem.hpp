@@ -941,10 +941,9 @@ public:
             Vec new_vec;
 
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 2)
-            ///\todo #1994 review this
-            VecCreate(PETSC_COMM_WORLD,&new_vec);
-            VecSetType(new_vec,PETSC_NULL);
-            VecLoad(new_vec,vec_viewer);
+            VecCreate(PETSC_COMM_WORLD, &new_vec);
+            VecSetType(new_vec, PETSC_NULL);
+            VecLoad(new_vec, vec_viewer);
 #else
             VecLoad(vec_viewer, PETSC_NULL, &new_vec);
 #endif
@@ -972,10 +971,9 @@ public:
             Mat new_mat;
 
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 2)
-            ///\todo #1994 review this
-            MatCreate(PETSC_COMM_WORLD,&new_mat);
-            MatSetType(new_mat,PETSC_NULL);
-            MatLoad(new_mat,mat_viewer);
+            MatCreate(PETSC_COMM_WORLD, &new_mat);
+            MatSetType(new_mat, PETSC_NULL);
+            MatLoad(new_mat, mat_viewer);
 #else
             MatLoad(mat_viewer, PETSC_NULL, &new_mat);
 #endif
@@ -1136,8 +1134,9 @@ public:
             delete p_linear_system;
         }
     }
-    ///\todo #1994 This test causes test-suite to exit abnormally with PETSc 3.2
-    /// Note: it's on the LDU solve.  Investigate Hypre.
+    // This test causes test-suite to exit abnormally with PETSc 3.2
+    // and with MPICH-1.
+    // Note: it's on the LDU solve.  Investigate Hypre.
     void TestConsecutiveSolvesDifferentPreconditioner()
     {
         unsigned num_nodes = 1331;

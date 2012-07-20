@@ -28,11 +28,8 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 This version of Chaste was compiled on:
-Fri, 13 Jul 2012 12:05:15 +0000 by Linux chaste-bob 2.6.24-27-server #1 SMP Fri Mar 12 01:23:09 UTC 2010 x86_64 (uname)
-from revision number 16139 with build type GccOpt, shared libraries.
+Tue, 06 Mar 2012 10:26:06 +0000 by Linux userpc58.cs.ox.ac.uk 2.6.32-38-generic #83-Ubuntu SMP Wed Jan 4 11:12:07 UTC 2012 x86_64 (uname)
+from revision number 15076 with build type GccOptNative, shared libraries.
 
          InMesh             Init           AssSys              Ode            Comms           AssRhs           NeuBCs           DirBCs              Ksp           Output   DataConversion         PostProc            User1            User2            User3            Total  
-   0.018 (  0%)     0.110 (  3%)     0.048 (  1%)     2.524 ( 66%)     0.003 (  0%)     0.002 (  0%)     0.000 (  0%)     0.000 (  0%)     0.042 (  1%)     0.665 ( 17%)     0.413 ( 11%)     0.000 (  0%)     0.000 (  0%)     0.000 (  0%)     0.000 (  0%)     3.830 (100%)  (seconds) 
-OptionTable: -ksp_max_it 1000
-OptionTable: -options_left
-There are no unused options.
+   0.013 (  0%)     0.143 (  3%)     0.060 (  1%)     3.479 ( 81%)     0.004 (  0%)     0.003 (  0%)     0.000 (  0%)     0.000 (  0%)     0.055 (  1%)     0.215 (  5%)     0.267 (  6%)     0.000 (  0%)     0.000 (  0%)     0.000 (  0%)     0.000 (  0%)     4.310 (100%)  (seconds) 
