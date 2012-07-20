@@ -91,6 +91,8 @@ public:
 
 };
 
+#ifdef CHASTE_CVODE
+
 /**
  *
  * Cell Factory defining Shannon cells for 1d chain.
@@ -138,6 +140,7 @@ public:
     }
 
 };
+#endif // CHASTE_CVODE
 
 /**
  * This class tests that a CVODE tissue simulation gets comparable results to those
@@ -243,6 +246,7 @@ public:
 //            TS_ASSERT(CompareBenchmarkResults(fe_node_100, be_node_100, 1.1)); // More than a milliVolt of difference with B.E.
 //        }
 
+#ifdef CHASTE_CVODE
         {
             HeartConfig::Instance()->SetOutputDirectory("ShannonBenchmark/cvode");
             HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(pde_time_step,pde_time_step,printing_time_step);
@@ -267,6 +271,7 @@ public:
         {
             /// \todo #2116 Native CVODE timings.
         }
+#endif // CHASTE_CVODE
 
     }
 
