@@ -785,7 +785,9 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
 
             for(unsigned node_index = 0; node_index<element.GetNumNodes(); node_index++)
             {
-                unsigned global_index_of_solution = element.GetNodeGlobalIndex(node_index) * ELEC_PROB_DIM;//assumes interleaved solution
+                unsigned global_index_of_solution = element.GetNodeGlobalIndex(node_index);// * ELEC_PROB_DIM;//assumes interleaved solution
+                ///\todo Memory testing shows that the ELEC_PROB_DIM above may be an error.
+                ///Can we make sure that there is a proper test for the value of interpolated_calcium_concs?
                 double CaI_at_node =  calcium_repl[global_index_of_solution];
                 interpolated_CaI += CaI_at_node*mpMeshPair->rGetElementsAndWeights()[i].Weights(node_index);
                 interpolated_voltage += electrics_solution_repl[global_index_of_solution]*mpMeshPair->rGetElementsAndWeights()[i].Weights(node_index);
