@@ -2316,17 +2316,6 @@ class CellMLToChasteTranslator(CellMLTranslator):
         self.close_block()
         self.use_modifiers = use_modifiers
 
-    def output_protocol_solve_method(self):
-        """Output a Solve method used if we have an associated protocol."""
-        if self.use_protocol:
-            self.output_method_start('SolveModel', [self.TYPE_DOUBLE + 'endPoint'], 'void',
-                                     access='public')
-            self.open_block()
-            if self.state_vars:
-                self.writeln('SolveAndUpdateState(this->mFreeVariable, endPoint);')
-                self.writeln('this->mFreeVariable = endPoint;')
-            self.close_block()
-
     def output_evaluate_y_derivatives(self, method_name='EvaluateYDerivatives'):
         """Output the EvaluateYDerivatives method."""
         # Start code output
@@ -2658,7 +2647,6 @@ class CellMLToChasteTranslator(CellMLTranslator):
         End class definition, output ODE system information (to .cpp) and
         serialization code (to .hpp), and end the file.
         """
-        self.output_protocol_solve_method()
         # End main class
         self.set_indent(offset=-1)
         self.writeln_hpp('};\n\n')
