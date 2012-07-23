@@ -224,7 +224,7 @@ public:
     void TestMeshBasedSimulationWithGhostNodesAndContactInhibition()
     {
         // Create a simple mesh
-        HoneycombMeshGenerator generator(3, 3,2);
+        HoneycombMeshGenerator generator(3, 3, 3);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
 
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
@@ -287,7 +287,7 @@ public:
          }
 
          //Check that the correct number of cells are labelled (i.e. experiencing contact inhibition)
-         TS_ASSERT_EQUALS(CellPropertyRegistry::Instance()->Get<CellLabel>()->GetCellCount(),4u);
+         TS_ASSERT_EQUALS(CellPropertyRegistry::Instance()->Get<CellLabel>()->GetCellCount(), 8u);
     }
 
     void TestVertexBasedSimulationWithContactInhibition()
