@@ -380,6 +380,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
 
     CellBasedEventHandler::EndEvent(CellBasedEventHandler::SETUP);
 
+
     // Enter main time loop
     while (!( p_simulation_time->IsFinished() || StoppingEventHasOccurred() ) )
     {
@@ -400,7 +401,9 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
         }
 
         // Call UpdateAtEndOfTimeStep(), which may be implemented by child classes
+        CellBasedEventHandler::BeginEvent(CellBasedEventHandler::UPDATESIMULATION);
         UpdateAtEndOfTimeStep();
+        CellBasedEventHandler::EndEvent(CellBasedEventHandler::UPDATESIMULATION);
 
         // Increment simulation time here, so results files look sensible
         p_simulation_time->IncrementTimeOneStep();
@@ -426,7 +429,9 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
         mpCellBasedPdeHandler->CloseResultsFiles();
     }
 
+    CellBasedEventHandler::BeginEvent(CellBasedEventHandler::UPDATESIMULATION);
     UpdateAtEndOfSolve();
+    CellBasedEventHandler::EndEvent(CellBasedEventHandler::UPDATESIMULATION);
 
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::OUTPUT);
 
