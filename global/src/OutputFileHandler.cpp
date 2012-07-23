@@ -92,14 +92,18 @@ OutputFileHandler::OutputFileHandler(const std::string& rDirectory,
 OutputFileHandler::OutputFileHandler(const FileFinder& rDirectory,
                                      bool cleanOutputDirectory)
 {
-    std::string chaste_test_output = GetChasteTestOutputDirectory();
-    std::string abs_path = rDirectory.GetAbsolutePath();
-    if (abs_path.substr(0, chaste_test_output.length()) != chaste_test_output)
+    FileFinder output_root("", RelativeTo::ChasteTestOutput);
+    std::string relative_path;
+    try
+    {
+        relative_path = rDirectory.GetRelativePath(output_root);
+    }
+    catch (const Exception& e)
     {
         EXCEPTION("The location provided to OutputFileHandler must be inside CHASTE_TEST_OUTPUT; '"
-                  << abs_path << "' is not under '" << chaste_test_output << "'.");
+                  << rDirectory.GetAbsolutePath() << "' is not under '"
+                  << output_root.GetAbsolutePath() << "'.");
     }
-    std::string relative_path = abs_path.substr(chaste_test_output.length());
     CommonConstructor(relative_path, cleanOutputDirectory);
 }
 

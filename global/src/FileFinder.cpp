@@ -230,6 +230,18 @@ FileFinder FileFinder::GetParent() const
 }
 
 
+std::string FileFinder::GetRelativePath(const FileFinder& rBasePath) const
+{
+    const std::string base_path = rBasePath.GetAbsolutePath();
+    const std::string our_path = GetAbsolutePath();
+    if (our_path.substr(0, base_path.length()) != base_path)
+    {
+        EXCEPTION("The path '" << our_path << "' is not relative to '" << base_path << "'.");
+    }
+    return our_path.substr(base_path.length());
+}
+
+
 FileFinder FileFinder::CopyTo(const FileFinder& rDest) const
 {
     if (!Exists())

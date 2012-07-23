@@ -192,6 +192,13 @@ public:
     FileFinder GetParent() const;
 
     /**
+     * Get the relative path to this finder from another.  Throws if this is not found under rBasePath.
+     *
+     * @param rBasePath  where the returned path should be relative to
+     */
+    std::string GetRelativePath(const FileFinder& rBasePath) const;
+
+    /**
      * Copy this file to the given destination.
      * The destination may be a folder, or destination file name.  Only single files may be
      * copied, not whole folders.

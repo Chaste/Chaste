@@ -217,6 +217,11 @@ public:
         // Finding children also works
         FileFinder child("src", dir);
         TS_ASSERT_EQUALS(child.GetAbsolutePath(), abs_path + "src/");
+
+        // We can also compute relative paths
+        TS_ASSERT_EQUALS(child.GetRelativePath(dir), "src/");
+        TS_ASSERT_EQUALS(FileFinder("SConscript", dir).GetRelativePath(dir), "SConscript");
+        TS_ASSERT_THROWS_CONTAINS(child.GetRelativePath(new_dir), "' is not relative to '");
     }
 
     void TestHandyFilenameOperations()
