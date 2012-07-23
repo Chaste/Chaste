@@ -452,6 +452,10 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
     mpCardiacMechSolver->SetFineCoarseMeshPair(mpMeshPair);
     mpCardiacMechSolver->Initialise();
 
+    unsigned num_quad_points = mpCardiacMechSolver->GetTotalNumQuadPoints();
+    mInterpolatedCalciumConcs.assign(num_quad_points, 0.0);
+    mInterpolatedVoltages.assign(num_quad_points, 0.0);
+
     if(mpProblemDefinition->ReadFibreSheetDirectionsFromFile())
     {
        mpCardiacMechSolver->SetVariableFibreSheetDirections(mpProblemDefinition->GetFibreSheetDirectionsFile(),
@@ -528,11 +532,8 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
 
     // set up initial voltage etc
     Vec electrics_solution=NULL; //This will be set and used later
+    Vec calcium_data=NULL;//this will be used and filled in later
     Vec initial_voltage = mpElectricsProblem->CreateInitialCondition();
-
-    unsigned num_quad_points = mpCardiacMechSolver->GetTotalNumQuadPoints();
-    std::vector<double> interpolated_calcium_concs(num_quad_points, 0.0);
-    std::vector<double> interpolated_voltages(num_quad_points, 0.0);
 
     // write the initial position
     unsigned counter = 0;
@@ -761,21 +762,23 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
         // electrics element the quad point is in. Then set Ca_I on the mechanics solver
         LOG(2, "  Interpolating Ca_I and voltage");
 
-        ReplicatableVector electrics_solution_repl(electrics_solution);
-
-        // collect all the calcium concentrations (from the cells, which are
-        // distributed) in one (replicated) vector
-        ReplicatableVector calcium_repl(ELEC_PROB_DIM*mpElectricsMesh->GetNumNodes());
-        PetscInt lo, hi;
-        VecGetOwnershipRange(electrics_solution, &lo, &hi);
-        for(int index=lo; index<hi; index = index + ELEC_PROB_DIM)
+        //Collect the distributed calcium data into one Vec to be later replicated
+        calcium_data = mpElectricsMesh->GetDistributedVectorFactory()->CreateVec();
+        for(unsigned node_index = 0; node_index<mpElectricsMesh->GetNumNodes(); node_index++)
         {
-        	unsigned actual_index = (unsigned) index / ELEC_PROB_DIM;
-            calcium_repl[actual_index] = mpElectricsProblem->GetTissue()->GetCardiacCell(actual_index)->GetIntracellularCalciumConcentration();
+        	if (mpElectricsMesh->GetDistributedVectorFactory()->IsGlobalIndexLocal(node_index))
+        	{
+            	double calcium_value = mpElectricsProblem->GetTissue()->GetCardiacCell(node_index)->GetIntracellularCalciumConcentration();
+        		VecSetValue(calcium_data, node_index ,calcium_value, INSERT_VALUES);
+        	}
         }
-        PetscTools::Barrier();
-        calcium_repl.Replicate(lo,hi);
+        PetscTools::Barrier();//not sure this is needed
 
+        //Replicate electrics solution and calcium (replication is inside this constructor of ReplicatableVector)
+        ReplicatableVector electrics_solution_repl(electrics_solution);//size=(number of electrics nodes)*ELEC_PROB_DIM
+        ReplicatableVector calcium_repl(calcium_data);//size = number of electrics nodes
+
+        //interpolate values onto mechanics mesh
         for(unsigned i=0; i<mpMeshPair->rGetElementsAndWeights().size(); i++)
         {
             double interpolated_CaI = 0;
@@ -785,25 +788,26 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
 
             for(unsigned node_index = 0; node_index<element.GetNumNodes(); node_index++)
             {
-                unsigned global_index_of_solution = element.GetNodeGlobalIndex(node_index);// * ELEC_PROB_DIM;//assumes interleaved solution
-                ///\todo Memory testing shows that the ELEC_PROB_DIM above may be an error.
-                ///Can we make sure that there is a proper test for the value of interpolated_calcium_concs?
-                double CaI_at_node =  calcium_repl[global_index_of_solution];
+                unsigned global_index = element.GetNodeGlobalIndex(node_index);
+                double CaI_at_node =  calcium_repl[global_index];
                 interpolated_CaI += CaI_at_node*mpMeshPair->rGetElementsAndWeights()[i].Weights(node_index);
-                interpolated_voltage += electrics_solution_repl[global_index_of_solution]*mpMeshPair->rGetElementsAndWeights()[i].Weights(node_index);
+                //the following line assumes interleaved solution for ELEC_PROB_DIM>1 (e.g, [Vm_0, phi_e_0, Vm1, phi_e_1...])
+                interpolated_voltage += electrics_solution_repl[global_index*ELEC_PROB_DIM]*mpMeshPair->rGetElementsAndWeights()[i].Weights(node_index);
             }
 
-            interpolated_calcium_concs[i] = interpolated_CaI;
-            interpolated_voltages[i] = interpolated_voltage;
+            assert(i<mInterpolatedCalciumConcs.size());
+            assert(i<mInterpolatedVoltages.size());
+            mInterpolatedCalciumConcs[i] = interpolated_CaI;
+            mInterpolatedVoltages[i] = interpolated_voltage;
         }
 
-        LOG(2, "  Setting Ca_I. max value = " << Max(interpolated_calcium_concs));
+        LOG(2, "  Setting Ca_I. max value = " << Max(mInterpolatedCalciumConcs));
 
         // NOTE IF NHS: HERE WE SHOULD PERHAPS CHECK WHETHER THE CELL MODELS HAVE Ca_Trop
         // AND UPDATE FROM NHS TO CELL_MODEL, BUT NOT SURE HOW TO DO THIS.. (esp for implicit)
 
         // set [Ca], V, t
-        mpCardiacMechSolver->SetCalciumAndVoltage(interpolated_calcium_concs, interpolated_voltages);
+        mpCardiacMechSolver->SetCalciumAndVoltage(mInterpolatedCalciumConcs, mInterpolatedVoltages);
         MechanicsEventHandler::EndEvent(MechanicsEventHandler::NON_MECH);
 
 
@@ -947,6 +951,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
         delete p_cmgui_writer;
     }
     PetscTools::Destroy(electrics_solution);
+    PetscTools::Destroy(calcium_data);
     delete p_electrics_solver;
 
     MechanicsEventHandler::EndEvent(MechanicsEventHandler::ALL);

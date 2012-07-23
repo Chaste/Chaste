@@ -260,7 +260,7 @@ public:
 
         HeartConfig::Instance()->SetSimulationDuration(10.0);
         HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(1500,1500,1500));
-        //creates the EM problem with ELEC_PROB_SIM=2
+        //creates the EM problem with ELEC_PROB_DIM=2
         CardiacElectroMechanicsProblem<2,2> problem(COMPRESSIBLE,
 												    BIDOMAIN,
                                                     &electrics_mesh,
@@ -294,6 +294,24 @@ public:
             TS_ASSERT_DELTA( r_deformed_position[i](1), Y * Y_scale_factor, 1e-6);
         }
 
+        //check interpolated voltages and calcium
+
+        unsigned quad_points = problem.mpCardiacMechSolver->GetTotalNumQuadPoints();
+        TS_ASSERT_EQUALS(problem.mInterpolatedVoltages.size(), quad_points);
+        TS_ASSERT_EQUALS(problem.mInterpolatedCalciumConcs.size(), quad_points);
+
+        //two hardcoded values
+        TS_ASSERT_DELTA(problem.mInterpolatedVoltages[0],9.267,1e-3);
+        TS_ASSERT_DELTA(problem.mInterpolatedCalciumConcs[0],0.001464,1e-6);
+
+        //for the rest, we check that, at the end of this simulation, all quad nodes have V and Ca above a certain threshold
+        for(unsigned i = 0; i < quad_points; i++)
+        {
+        	TS_ASSERT_LESS_THAN(9.2,problem.mInterpolatedVoltages[i]);
+        	TS_ASSERT_LESS_THAN(0.0014,problem.mInterpolatedCalciumConcs[i]);
+        }
+
+        //check default value of whether there is a bath or not
         TS_ASSERT_EQUALS(problem.mpElectricsProblem->GetHasBath(), false);
 
         //test the functionality of having phi_e on the mechanics mesh (values are tested somewhere else)
@@ -301,8 +319,8 @@ public:
         TS_ASSERT_THROWS_NOTHING(data_reader.GetVariableOverTime("Phi_e",0u));
     }
 
-    // This test is virtually identical to the above test, except it uses
-    // incompressible solid mechanics. Since the solution should be
+    // This test is virtually identical to one of the the above tests (TestWithHomogeneousEverythingCompressible),
+    // except it uses incompressible solid mechanics. Since the solution should be
     // x=alpha*X, y=beta*Y for some alpha, beta (see comments for above test),
     // we also test that alpha*beta = 1.0
     void TestWithHomogeneousEverythingIncompressible() throw(Exception)
@@ -472,8 +490,7 @@ public:
         }
     }
 
-
-    //This test is identical to the test above, just that we use a model that
+    //This test is identical to the test above, just that we use a model that requires an explicit solver
     void TestMechanicsWithBidomainAndBathExplicit() throw(Exception)
     {
         EntirelyStimulatedTissueCellFactory cell_factory;

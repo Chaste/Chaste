@@ -116,6 +116,17 @@ protected :
     /** The number of electrics timesteps per mechanics timestep */
     unsigned mNumElecTimestepsPerMechTimestep;
 
+    /**
+     * A cache for the interpolated calcium concentrations from electrics to mechanics mesh.
+     * Memory is allocated within Initialise(). Filled in during Solve() and passed on to the mechanics solver
+     */
+    std::vector<double> mInterpolatedCalciumConcs;
+
+    /**
+     * A cache for the interpolated voltages from electrics to mechanics mesh.
+     * Memory is allocated within Initialise(). Filled in during Solve() and passed on to the mechanics solver
+     */
+    std::vector<double> mInterpolatedVoltages;
 
     /** The mesh for the electrics */
     TetrahedralMesh<DIM,DIM>* mpElectricsMesh;
