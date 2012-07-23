@@ -120,8 +120,6 @@ unsigned AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::DoCellBirth()
                 try
                 {
                     // Create a new cell
-                	double cell_age = cell_iter->GetAge();
-
                     CellPtr p_new_cell = cell_iter->Divide();
 
                     // Call method that determines how cell division occurs and returns a vector
@@ -129,12 +127,12 @@ unsigned AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::DoCellBirth()
                     // If required output this location to file
                     if(mOutputDivisionLocations)
                     {
-						*mpDivisionLocationFile << SimulationTime::Instance()->GetTime() << "\t";
-						for (unsigned i=0; i<SPACE_DIM; i++)
-						{
-							*mpDivisionLocationFile << new_location[i] << "\t";
-						}
-						*mpDivisionLocationFile << "\t" << cell_age << "\n";
+                        *mpDivisionLocationFile << SimulationTime::Instance()->GetTime() << "\t";
+                        for (unsigned i=0; i<SPACE_DIM; i++)
+                        {
+                            *mpDivisionLocationFile << new_location[i] << "\t";
+                        }
+                        *mpDivisionLocationFile << "\t" << cell_iter->GetAge() << "\n";
                     }
 
                     // Add new cell to the cell population
@@ -145,7 +143,12 @@ unsigned AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::DoCellBirth()
                 }
                 catch (Exception& e)
                 {
-                    // Don't do anything
+                    if (!(e.GetShortMessage()=="No free space to divide."))
+                    {
+                        NEVER_REACHED;
+                        // If you do reach here, then uncomment the following line to see why.
+                        //throw e;
+                    }
                 }
             }
         }
