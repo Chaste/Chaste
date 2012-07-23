@@ -291,12 +291,18 @@ def DetermineLibraryDependencies(env, partialGraph):
     on a topological sort, with each component listed prior to its dependencies, and
     so determines the linker command line.
     """
+    library_mapping = env['CHASTE_LIBRARIES']
     if env['build'].debug:
         print "Initial component dependencies:", partialGraph
-        print "Chaste libraries:", env['CHASTE_LIBRARIES']
+        print "Chaste libraries:", library_mapping
     WHITE, GRAY, BLACK = 0, 1, 2
     PROJECT_PREFIX = 'projects/'
     full_graph = {}
+    # As well as projects/<name> mapping to the project library, add a mapping for plain <name>,
+    # since that's what will be used for linking.
+    for name in library_mapping.keys():
+        if name.startswith(PROJECT_PREFIX):
+            library_mapping[name[len(PROJECT_PREFIX):]] = library_mapping[name]
     def get_lib(comp, linkArg=False):
         """Get the library node for a component."""
         if not isinstance(comp, type('')):
@@ -310,7 +316,7 @@ def DetermineLibraryDependencies(env, partialGraph):
             else:
                 lib = comp
         else:
-            lib = env['CHASTE_LIBRARIES'][comp]
+            lib = library_mapping[comp]
         return lib
     def process_comp(node, root, colours={}, gray_stack=[]):
         """Sort the dependencies for a single component."""
