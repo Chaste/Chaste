@@ -120,6 +120,8 @@ unsigned AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::DoCellBirth()
                 try
                 {
                     // Create a new cell
+                	double cell_age = cell_iter->GetAge();
+
                     CellPtr p_new_cell = cell_iter->Divide();
 
                     // Call method that determines how cell division occurs and returns a vector
@@ -132,7 +134,7 @@ unsigned AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::DoCellBirth()
 						{
 							*mpDivisionLocationFile << new_location[i] << "\t";
 						}
-						*mpDivisionLocationFile << "\n";
+						*mpDivisionLocationFile << "\t" << cell_age << "\n";
                     }
 
                     // Add new cell to the cell population
