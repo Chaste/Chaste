@@ -1813,8 +1813,7 @@ double AbstractNonlinearElasticitySolver<DIM>::UpdateSolutionUsingLineSearch(Vec
         // Have to use an assert/exit here as the following exception causes a seg fault (in cardiac mech problems?)
         // Don't know why
         std::cout << "CHASTE ERROR: (AbstractNonlinearElasticitySolver.hpp): Residual does not appear to decrease in newton direction, quitting.\n" << std::flush;
-        exit(0);
-        //EXCEPTION("Residual does not appear to decrease in newton direction, quitting");
+        EXCEPTION("Residual does not appear to decrease in newton direction, quitting");
         #undef COVERAGE_IGNORE
     }
 
