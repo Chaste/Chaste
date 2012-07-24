@@ -532,7 +532,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
 
     // set up initial voltage etc
     Vec electrics_solution=NULL; //This will be set and used later
-    Vec calcium_data=NULL;//this will be used and filled in later
+    Vec calcium_data= mpElectricsMesh->GetDistributedVectorFactory()->CreateVec();
     Vec initial_voltage = mpElectricsProblem->CreateInitialCondition();
 
     // write the initial position
@@ -763,7 +763,6 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
         LOG(2, "  Interpolating Ca_I and voltage");
 
         //Collect the distributed calcium data into one Vec to be later replicated
-        calcium_data = mpElectricsMesh->GetDistributedVectorFactory()->CreateVec();
         for(unsigned node_index = 0; node_index<mpElectricsMesh->GetNumNodes(); node_index++)
         {
         	if (mpElectricsMesh->GetDistributedVectorFactory()->IsGlobalIndexLocal(node_index))
