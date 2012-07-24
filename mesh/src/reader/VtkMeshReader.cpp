@@ -92,7 +92,7 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::CommonConstructor()
     mNumNodes = mpVtkUnstructuredGrid->GetNumberOfPoints();
     unsigned num_cells = mpVtkUnstructuredGrid->GetNumberOfCells();
 
-    if (SPACE_DIM == 2)
+    if (ELEMENT_DIM == 2)
     {
         mNodesPerElement = 3;
         mVtkCellType = VTK_TRIANGLE;
