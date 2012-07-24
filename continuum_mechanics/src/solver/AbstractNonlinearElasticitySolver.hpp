@@ -232,7 +232,7 @@ protected:
     
     /**
      * If the stresses for each element (averaged over quadrature point stresses)
-     * are two be stored, they are stored in this variable.
+     * are to be stored, they are stored in this variable.
      * Note to save memory we just don't store the lower half of the stress,
      * as the stress is symmetric, hence this is a vector of 6 (in 3d) variables
      * rather than a 3d matrix.

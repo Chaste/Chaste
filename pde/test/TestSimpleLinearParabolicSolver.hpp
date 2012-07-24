@@ -388,18 +388,27 @@ public:
         ReplicatableVector result_repl(result);
 
         //Reset is called for each quad point, four are used for a 2D triangle using the default quadrature rule
-        unsigned expected_resets = 100u*(4u*mesh.GetNumElements());
-        TS_ASSERT_EQUALS(solver.numResetCalled, expected_resets);
+        unsigned expected_resets = 100u*(4u*mesh.GetNumLocalElements());
 
         //IncrementInterpolatedQuantities is called for each quad point, taking contributions for each of the basis functions.
         //For a linear 2D triangle using the default quadrature rule this gives four quad points * 3 nodes/basis functions
-        unsigned expected_interpolates = 100u*(4u*3u*mesh.GetNumElements());
-        TS_ASSERT_EQUALS(solver.numIncrementInterpolatedCalled, expected_interpolates);
-
-        //\todo #2075
-        //Note that the IncrementInterpolatedGradientCalled method is *only* called on matrix assembly, i.e. at the first time-step
-        TS_ASSERT_EQUALS(solver.numIncrementInterpolatedGradientCalled, 4u*3u*mesh.GetNumElements());
-
+        unsigned expected_interpolates = 100u*(4u*3u*mesh.GetNumLocalElements());
+        if (PetscTools::IsSequential())
+        {
+            //In parallel elements may be evaluated lazily (see below)
+            TS_ASSERT_EQUALS(solver.numResetCalled, expected_resets);
+            TS_ASSERT_EQUALS(solver.numIncrementInterpolatedCalled, expected_interpolates);
+            //Note that the IncrementInterpolatedGradientCalled method is *only* called on matrix assembly, i.e. at the first time-step
+            TS_ASSERT_EQUALS(solver.numIncrementInterpolatedGradientCalled, 4u*3u*mesh.GetNumLocalElements());
+        }
+        else
+        {
+            //In parallel elements may be evaluated lazily
+            TS_ASSERT_LESS_THAN_EQUALS(solver.numResetCalled, expected_resets);
+            TS_ASSERT_LESS_THAN_EQUALS(solver.numIncrementInterpolatedCalled, expected_interpolates);
+            //Note that the IncrementInterpolatedGradientCalled method is *only* called on matrix assembly, i.e. at the first time-step
+            TS_ASSERT_LESS_THAN_EQUALS(solver.numIncrementInterpolatedGradientCalled, 4u*3u*mesh.GetNumLocalElements());
+        }
         // Check solution is u = e^{-2*t*pi*pi} sin(x*pi)*sin(y*pi), t=1
         for (unsigned i=0; i<result_repl.GetSize(); i++)
         {

@@ -122,10 +122,11 @@ protected:
      *
      * Note that this method is ONLY called during assembly of elements. NOT during assembly of surface elements or cables.
      *
-     * \todo #2075 Allow other cases where interpolated gradients are needed in righthand-side assembly:
      * Further, it is ONLY called in the cases where rGradPhi has been computed.  Currently these cases are
      *     - When mAssembleMatrix is set
      *  or - When INTERPOLATION_LEVEL==NONLINEAR
+     * If there are use-cases, then allow other cases where interpolated gradients are needed in righthand-side assembly
+     * (see #2075)
      *
      * @param rGradPhi A matrix containing the gradient of all the basis functions at this Gauss point.
      * @param phiIndex The index of the current basis function in the rGradPhi matrix.
