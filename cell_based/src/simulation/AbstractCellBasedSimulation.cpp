@@ -119,6 +119,9 @@ unsigned AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::DoCellBirth()
             {
                 try
                 {
+                	// Store age before division
+                	double cell_age =cell_iter->GetAge();
+
                     // Create a new cell
                     CellPtr p_new_cell = cell_iter->Divide();
 
@@ -132,7 +135,7 @@ unsigned AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::DoCellBirth()
                         {
                             *mpDivisionLocationFile << new_location[i] << "\t";
                         }
-                        *mpDivisionLocationFile << "\t" << cell_iter->GetAge() << "\n";
+                        *mpDivisionLocationFile << "\t" << cell_age << "\n";
                     }
 
                     // Add new cell to the cell population
