@@ -12,6 +12,7 @@ TestFileFinder.hpp
 TestFileComparison.hpp
 TestGenericEventHandler.hpp
 TestHeartEventHandler.hpp
+TestHelloWorld.hpp
 TestLogFile.hpp
 TestMathsCustomFunctions.hpp
 TestNumericFileComparison.hpp
