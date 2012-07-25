@@ -41,6 +41,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 #include "CommandLineArguments.hpp"
 
+/* HOW_TO_TAG General
+ * Read and use parameters from the command line
+ *
+ * If your want to use parameters that are supplied in the command line, then
+ *  (i) add lines such as "double x = CommandLineArguments::Instance()->GetDoubleCorrespondingToOption("-myparam");" below
+ *  (ii) use scons to compile but not run the test (see ChasteGuides/RunningBinariesFromCommandLine)
+ *  (iii) run the compiled executable from the command line (see ChasteGuides/RunningBinariesFromCommandLine), with your parameter
+ *
+ *  Eg:
+ *  scons co=1 ts=projects/you/TestBlah.hpp
+ *  ./projects/you/build/debug/TestBlahRunner -myparam 10.4
+ *
+ * Note: error messages such as
+ *   WARNING! There are options you set that were not used!
+ *   WARNING! could be spelling mistake, etc!
+ * are due to Petsc thinking the parameter must have been for it.
+ *
+ */
 
 class TestCommandLineArguments : public CxxTest::TestSuite
 {
