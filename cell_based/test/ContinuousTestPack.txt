@@ -23,6 +23,7 @@ mesh/TestPottsMeshGenerator.hpp
 mesh/TestPottsMeshWriter.hpp
 mesh/TestPottsMeshReader.hpp
 mesh/TestPottsElement.hpp
+mesh/TestSemMesh.hpp
 odes/TestAlarcon2004OxygenBasedCellCycleOdeSystem.hpp
 odes/TestDeltaNotchOdeSystem.hpp
 odes/TestTysonNovak2001OdeSystem.hpp
