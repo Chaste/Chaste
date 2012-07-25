@@ -1206,6 +1206,7 @@ class cellml_model(element_base):
                                       " from the dictionary of standard units or be the name of a"
                                       " user-defined unit in the current component or model (5.4.2.2)."
                                       " Units '%s' are not defined." % u.units)
+                continue
             if v.get_colour() == DFS.White:
                 self._check_unit_cycles(v)
             elif v.get_colour() == DFS.Gray:
