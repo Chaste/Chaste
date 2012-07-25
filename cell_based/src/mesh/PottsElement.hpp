@@ -95,7 +95,7 @@ public:
      *
      * @param pNode is a pointer to the new node
      */
-    void AddNode(Node<DIM>* pNode);
+    void AddNode(Node<DIM>* pNode,  const unsigned& rIndex = UINT_MAX);
 };
 
 #endif /*POTTSELEMENT_HPP_*/

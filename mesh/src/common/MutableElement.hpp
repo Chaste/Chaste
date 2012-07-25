@@ -138,7 +138,7 @@ public:
      * @param rIndex the local index of the node after which the new node is added
      * @param pNode a pointer to the new node
      */
-    void AddNode(const unsigned& rIndex, Node<SPACE_DIM>* pNode);
+    void AddNode(Node<SPACE_DIM>* pNode, const unsigned& rIndex);
 
     /**
      * Calculate the local index of a node given a global index
@@ -238,7 +238,7 @@ public:
      * @param rIndex the local index of the node after which the new node is added
      * @param pNode a pointer to the new node
      */
-    void AddNode(const unsigned& rIndex, Node<SPACE_DIM>* pNode);
+    void AddNode(Node<SPACE_DIM>* pNode, const unsigned& rIndex);
 
     /**
      * Calculate the local index of a node given a global index

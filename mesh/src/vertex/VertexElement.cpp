@@ -138,7 +138,7 @@ void VertexElement<ELEMENT_DIM, SPACE_DIM>::AddFace(VertexElement<ELEMENT_DIM-1,
         if (node_indices.find(global_index) == node_indices.end())
         {
             // ... then add it to the element (and vice versa)
-            this->AddNode(end_index, pFace->GetNode(local_index));
+            this->AddNode(pFace->GetNode(local_index), end_index);
             end_index++;
         }
     }

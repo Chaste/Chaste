@@ -48,8 +48,9 @@ template<unsigned DIM>
 PottsElement<DIM>::~PottsElement()
 {
 }
+
 template<unsigned DIM>
-void PottsElement<DIM>::AddNode(Node<DIM>* pNode)
+void PottsElement<DIM>::AddNode(Node<DIM>* pNode,  const unsigned& rIndex)
 {
     // Add element to this node
     pNode->AddElement(this->mIndex);

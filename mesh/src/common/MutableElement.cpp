@@ -120,7 +120,7 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::DeleteNode(const unsigned& rIndex)
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MutableElement<ELEMENT_DIM, SPACE_DIM>::AddNode(const unsigned& rIndex, Node<SPACE_DIM>* pNode)
+void MutableElement<ELEMENT_DIM, SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNode, const unsigned& rIndex)
 {
     /**
      * When constructing a VertexMesh as the Voronoi dual to a Delaunay mesh,
@@ -261,7 +261,7 @@ void MutableElement<1, SPACE_DIM>::DeleteNode(const unsigned& rIndex)
 }
 
 template<unsigned SPACE_DIM>
-void MutableElement<1, SPACE_DIM>::AddNode(const unsigned& rIndex, Node<SPACE_DIM>* pNode)
+void MutableElement<1, SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNode, const unsigned& rIndex)
 {
     assert(rIndex < this->mNodes.size());
 

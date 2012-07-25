@@ -424,7 +424,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
                 index = local_indexA;
             }
             // Add new node to this element
-            this->GetElement(*iter)->AddNode(index, this->GetNode(new_node_global_index));
+            this->GetElement(*iter)->AddNode(this->GetNode(new_node_global_index), index);
         }
         // Store index of new node
         division_node_global_indices.push_back(new_node_global_index);
@@ -674,7 +674,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideEdge(Node<SPACE_DIM>* pNod
             index = local_indexA;
         }
         // Add new node to this element
-        this->GetElement(*iter)->AddNode(index, p_new_node);
+        this->GetElement(*iter)->AddNode(p_new_node, index);
     }
 }
 
@@ -1434,7 +1434,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
             unsigned nodeB_local_index = this->mElements[*it]->GetNodeLocalIndex(pNodeB->GetIndex());
             assert(nodeB_local_index < UINT_MAX); // this element should contain node B
 
-            this->mElements[*it]->AddNode(nodeB_local_index, pNodeA);
+            this->mElements[*it]->AddNode(pNodeA, nodeB_local_index);
         }
         else if (nodeB_elem_indices.find(*it) == nodeB_elem_indices.end()) // not in nodeB_elem_indices so element 1
         {
@@ -1449,7 +1449,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
              */
             unsigned nodeA_local_index = this->mElements[*it]->GetNodeLocalIndex(pNodeA->GetIndex());
             assert(nodeA_local_index < UINT_MAX); // this element should contain node A
-            this->mElements[*it]->AddNode(nodeA_local_index, pNodeB);
+            this->mElements[*it]->AddNode(pNodeB, nodeA_local_index);
         }
         else
         {
@@ -1657,8 +1657,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPA
          * Remove node B from element 2
          * Remove node A from element 4
          */
-        this->mElements[element_1_index]->AddNode(node_A_local_index_in_1, this->mNodes[node_B_index]);
-        this->mElements[element_3_index]->AddNode(node_B_local_index_in_3, this->mNodes[node_A_index]);
+        this->mElements[element_1_index]->AddNode(this->mNodes[node_B_index], node_A_local_index_in_1);
+        this->mElements[element_3_index]->AddNode(this->mNodes[node_A_index], node_B_local_index_in_3);
 
         this->mElements[element_2_index]->DeleteNode(node_B_local_index_in_2);
         this->mElements[element_4_index]->DeleteNode(node_A_local_index_in_4);
@@ -1677,8 +1677,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPA
         unsigned node_before_A_in_1 = (node_A_local_index_in_1 - 1)%this->GetElement(element_1_index)->GetNumNodes();
         unsigned node_before_B_in_3 = (node_B_local_index_in_3 - 1)%this->GetElement(element_3_index)->GetNumNodes();
 
-        this->mElements[element_1_index]->AddNode(node_before_A_in_1, this->mNodes[node_B_index]);
-        this->mElements[element_3_index]->AddNode(node_before_B_in_3, this->mNodes[node_A_index]);
+        this->mElements[element_1_index]->AddNode(this->mNodes[node_B_index], node_before_A_in_1);
+        this->mElements[element_3_index]->AddNode(this->mNodes[node_A_index], node_before_B_in_3);
 
         this->mElements[element_2_index]->DeleteNode(node_A_local_index_in_2);
         this->mElements[element_4_index]->DeleteNode(node_B_local_index_in_4);
@@ -1980,7 +1980,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                 pNode->rGetModifiableLocation() = intersection;
 
                 // Add the moved nodes to the element (this also updates the node)
-                this->GetElement(elementIndex)->AddNode(node_A_local_index, pNode);
+                this->GetElement(elementIndex)->AddNode(pNode, node_A_local_index);
 
                 // Check the nodes are updated correctly
                 assert(pNode->GetNumContainingElements() == 2);
@@ -2047,11 +2047,11 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
             unsigned new_node_global_index = this->AddNode(new Node<SPACE_DIM>(0, true, new_node_location[0], new_node_location[1]));
 
             // Add the moved and new nodes to the element (this also updates the node)
-            this->GetElement(elementIndex)->AddNode(node_A_local_index, pNode);
-            this->GetElement(elementIndex)->AddNode(node_A_local_index, this->mNodes[new_node_global_index]);
+            this->GetElement(elementIndex)->AddNode(pNode, node_A_local_index);
+            this->GetElement(elementIndex)->AddNode(this->mNodes[new_node_global_index], node_A_local_index);
 
             // Add the new node to the original element containing pNode (this also updates the node)
-            this->GetElement(intersecting_element_index)->AddNode(this->GetElement(intersecting_element_index)->GetNodeLocalIndex(pNode->GetIndex()), this->mNodes[new_node_global_index]);
+            this->GetElement(intersecting_element_index)->AddNode(this->mNodes[new_node_global_index], this->GetElement(intersecting_element_index)->GetNodeLocalIndex(pNode->GetIndex()));
 
             // Check the nodes are updated correctly
             assert(pNode->GetNumContainingElements() == 2);
@@ -2100,7 +2100,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
             pNode->SetAsBoundaryNode(false);
 
             // Add pNode to the intersected element
-            this->GetElement(elementIndex)->AddNode(node_A_local_index, pNode);
+            this->GetElement(elementIndex)->AddNode(pNode, node_A_local_index);
 
             // Remove VertexA from elements
             std::set<unsigned> elements_containing_vertex_A = this->mNodes[vertexA_index]->rGetContainingElementIndices();
@@ -2184,19 +2184,19 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                     unsigned new_node_global_index = this->AddNode(new Node<SPACE_DIM>(0, true, new_node_location[0], new_node_location[1]));
 
                     // Add the moved nodes to the element (this also updates the node)
-                    this->GetElement(elementIndex)->AddNode(node_A_local_index, this->mNodes[new_node_global_index]);
-                    this->GetElement(elementIndex)->AddNode(node_A_local_index, pNode);
+                    this->GetElement(elementIndex)->AddNode(this->mNodes[new_node_global_index], node_A_local_index);
+                    this->GetElement(elementIndex)->AddNode(pNode, node_A_local_index);
 
                     // Add the new nodes to the original elements containing pNode (this also updates the node)
                     if (next_node_1 == previous_node_2)
                     {
-                        p_element_intersection_1->AddNode((local_index_1 + p_element_intersection_1->GetNumNodes() - 1)%(p_element_intersection_1->GetNumNodes()), this->mNodes[new_node_global_index]);
+                        p_element_intersection_1->AddNode(this->mNodes[new_node_global_index], (local_index_1 + p_element_intersection_1->GetNumNodes() - 1)%(p_element_intersection_1->GetNumNodes()));
                     }
                     else
                     {
                         assert(next_node_2 == previous_node_1);
 
-                        p_element_intersection_2->AddNode((local_index_2 + p_element_intersection_2->GetNumNodes() - 1)%(p_element_intersection_2->GetNumNodes()), this->mNodes[new_node_global_index]);
+                        p_element_intersection_2->AddNode(this->mNodes[new_node_global_index], (local_index_2 + p_element_intersection_2->GetNumNodes() - 1)%(p_element_intersection_2->GetNumNodes()));
                     }
 
                     // Check the nodes are updated correctly
@@ -2229,19 +2229,19 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                     unsigned new_node_global_index = this->AddNode(new Node<SPACE_DIM>(0, true, new_node_location[0], new_node_location[1]));
 
                     // Add the moved nodes to the element (this also updates the node)
-                    this->GetElement(elementIndex)->AddNode(node_A_local_index, this->mNodes[new_node_global_index]);
-                    this->GetElement(elementIndex)->AddNode(node_A_local_index, pNode);
+                    this->GetElement(elementIndex)->AddNode(this->mNodes[new_node_global_index], node_A_local_index);
+                    this->GetElement(elementIndex)->AddNode(pNode, node_A_local_index);
 
                     // Add the new nodes to the original elements containing pNode (this also updates the node)
                     if (next_node_1 == previous_node_2)
                     {
-                        p_element_intersection_1->AddNode((local_index_1 + p_element_intersection_1->GetNumNodes() - 1)%(p_element_intersection_1->GetNumNodes()), this->mNodes[new_node_global_index]);
+                        p_element_intersection_1->AddNode(this->mNodes[new_node_global_index], (local_index_1 + p_element_intersection_1->GetNumNodes() - 1)%(p_element_intersection_1->GetNumNodes()));
                     }
                     else
                     {
                         assert(next_node_2 == previous_node_1);
 
-                        p_element_intersection_2->AddNode((local_index_2 + p_element_intersection_2->GetNumNodes() - 1)%(p_element_intersection_2->GetNumNodes()), this->mNodes[new_node_global_index]);
+                        p_element_intersection_2->AddNode(this->mNodes[new_node_global_index], (local_index_2 + p_element_intersection_2->GetNumNodes() - 1)%(p_element_intersection_2->GetNumNodes()));
                     }
 
                     // Remove VertexA from the mesh
@@ -2314,19 +2314,19 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                     unsigned new_node_global_index = this->AddNode(new Node<SPACE_DIM>(0, true, new_node_location[0], new_node_location[1]));
 
                     // Add the moved nodes to the element (this also updates the node)
-                    this->GetElement(elementIndex)->AddNode(node_A_local_index, pNode);
-                    this->GetElement(elementIndex)->AddNode(node_A_local_index, this->mNodes[new_node_global_index]);
+                    this->GetElement(elementIndex)->AddNode(pNode, node_A_local_index);
+                    this->GetElement(elementIndex)->AddNode(this->mNodes[new_node_global_index], node_A_local_index);
 
                     // Add the new nodes to the original elements containing pNode (this also updates the node)
                     if (next_node_1 == previous_node_2)
                     {
-                        p_element_intersection_2->AddNode(local_index_2, this->mNodes[new_node_global_index]);
+                        p_element_intersection_2->AddNode(this->mNodes[new_node_global_index], local_index_2);
                     }
                     else
                     {
                         assert(next_node_2 == previous_node_1);
 
-                        p_element_intersection_1->AddNode(local_index_1, this->mNodes[new_node_global_index]);
+                        p_element_intersection_1->AddNode(this->mNodes[new_node_global_index], local_index_1);
                     }
 
                     // Check the nodes are updated correctly
@@ -2359,19 +2359,19 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                     unsigned new_node_global_index = this->AddNode(new Node<SPACE_DIM>(0, true, new_node_location[0], new_node_location[1]));
 
                     // Add the moved nodes to the element (this also updates the node)
-                    this->GetElement(elementIndex)->AddNode(node_A_local_index, pNode);
-                    this->GetElement(elementIndex)->AddNode(node_A_local_index, this->mNodes[new_node_global_index]);
+                    this->GetElement(elementIndex)->AddNode(pNode, node_A_local_index);
+                    this->GetElement(elementIndex)->AddNode(this->mNodes[new_node_global_index], node_A_local_index);
 
                     // Add the new nodes to the original elements containing pNode (this also updates the node)
                     if (next_node_1 == previous_node_2)
                     {
-                        p_element_intersection_2->AddNode(local_index_2, this->mNodes[new_node_global_index]);
+                        p_element_intersection_2->AddNode(this->mNodes[new_node_global_index], local_index_2);
                     }
                     else
                     {
                         assert(next_node_2 == previous_node_1);
 
-                        p_element_intersection_1->AddNode(local_index_1, this->mNodes[new_node_global_index]);
+                        p_element_intersection_1->AddNode(this->mNodes[new_node_global_index], local_index_1);
                     }
 
                     // Remove VertexB from the mesh
@@ -2417,22 +2417,22 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                 unsigned new_node_2_global_index = this->AddNode(new Node<SPACE_DIM>(0, true, new_node_2_location[0], new_node_2_location[1]));
 
                 // Add the moved and new nodes to the element (this also updates the node)
-                this->GetElement(elementIndex)->AddNode(node_A_local_index, this->mNodes[new_node_2_global_index]);
-                this->GetElement(elementIndex)->AddNode(node_A_local_index, pNode);
-                this->GetElement(elementIndex)->AddNode(node_A_local_index, this->mNodes[new_node_1_global_index]);
+                this->GetElement(elementIndex)->AddNode(this->mNodes[new_node_2_global_index], node_A_local_index);
+                this->GetElement(elementIndex)->AddNode(pNode, node_A_local_index);
+                this->GetElement(elementIndex)->AddNode(this->mNodes[new_node_1_global_index], node_A_local_index);
 
                 // Add the new nodes to the original elements containing pNode (this also updates the node)
                 if (next_node_1 == previous_node_2)
                 {
-                    p_element_intersection_1->AddNode((local_index_1 + p_element_intersection_1->GetNumNodes() - 1)%(p_element_intersection_1->GetNumNodes()), this->mNodes[new_node_2_global_index]);
-                    p_element_intersection_2->AddNode(local_index_2, this->mNodes[new_node_1_global_index]);
+                    p_element_intersection_1->AddNode(this->mNodes[new_node_2_global_index], (local_index_1 + p_element_intersection_1->GetNumNodes() - 1)%(p_element_intersection_1->GetNumNodes()));
+                    p_element_intersection_2->AddNode(this->mNodes[new_node_1_global_index], local_index_2);
                 }
                 else
                 {
                     assert(next_node_2 == previous_node_1);
 
-                    p_element_intersection_1->AddNode(local_index_1, this->mNodes[new_node_1_global_index]);
-                    p_element_intersection_2->AddNode((local_index_2 + p_element_intersection_2->GetNumNodes() - 1)%(p_element_intersection_2->GetNumNodes()), this->mNodes[new_node_2_global_index]);
+                    p_element_intersection_1->AddNode(this->mNodes[new_node_1_global_index], local_index_1);
+                    p_element_intersection_2->AddNode(this->mNodes[new_node_2_global_index], (local_index_2 + p_element_intersection_2->GetNumNodes() - 1)%(p_element_intersection_2->GetNumNodes()));
                 }
 
                 // Check the nodes are updated correctly

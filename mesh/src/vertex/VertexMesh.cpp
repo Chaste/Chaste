@@ -188,7 +188,7 @@ VertexMesh<2,2>::VertexMesh(TetrahedralMesh<2,2>& rMesh, bool isPeriodic)
             unsigned num_nodes_in_elem = mElements[elem_index]->GetNumNodes();
             unsigned end_index = num_nodes_in_elem>0 ? num_nodes_in_elem-1 : 0;
 
-            mElements[elem_index]->AddNode(end_index, this->mNodes[i]);
+            mElements[elem_index]->AddNode(this->mNodes[i], end_index);
         }
     }
 
@@ -222,7 +222,7 @@ VertexMesh<2,2>::VertexMesh(TetrahedralMesh<2,2>& rMesh, bool isPeriodic)
         for (unsigned count = 0; count < index_angle_list.size(); count++)
         {
             unsigned local_index = count>1 ? count-1 : 0;
-            p_new_element->AddNode(local_index, mNodes[index_angle_list[count].second]);
+            p_new_element->AddNode(mNodes[index_angle_list[count].second], local_index);
 
         }
 
@@ -325,7 +325,7 @@ VertexMesh<3,3>::VertexMesh(TetrahedralMesh<3,3>& rMesh)
             for (unsigned count = 0; count < index_angle_list.size(); count++)
             {
                 unsigned local_index = count>1 ? count-1 : 0;
-                p_face->AddNode(local_index, mNodes[index_angle_list[count].second]);
+                p_face->AddNode(mNodes[index_angle_list[count].second], local_index);
             }
 
             // Add face to list of faces

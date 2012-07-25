@@ -93,7 +93,7 @@ public:
         TS_ASSERT_EQUALS(element.GetNumNodes(), 1u);
 
         Node<2>* p_node_3 = new Node<2>(3, false, 0.1, 0.4);
-        element.AddNode(0, p_node_3);
+        element.AddNode( p_node_3, 0);
         TS_ASSERT_EQUALS(element.GetNumNodes(), 2u);
 
         TS_ASSERT_DELTA(element.GetNode(0)->rGetLocation()[0], 1.2, 1e-12);
@@ -318,7 +318,7 @@ public:
 
         // Add new node
         Node<2>* p_new_node = new Node<2>(4, false, 0.0, 0.0);
-        vertex_element.AddNode(3, p_new_node); // Add node at (0,0) between nodes 3 and 0
+        vertex_element.AddNode(p_new_node, 3); // Add node at (0,0) between nodes 3 and 0
 
         // Test node is added
         TS_ASSERT_EQUALS(vertex_element.GetNumNodes(), 5u);
