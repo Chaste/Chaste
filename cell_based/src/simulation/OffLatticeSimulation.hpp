@@ -218,7 +218,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputSimulationParameters(out_stream& rParamsFile);
+    virtual void OutputSimulationParameters(out_stream& rParamsFile);
 };
 
 // Serialization for Boost >= 1.36
