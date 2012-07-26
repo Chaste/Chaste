@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include "SimpleDataWriter.hpp"
 #include "OutputFileHandler.hpp"
+#include "FileComparison.hpp"
 
 class TestSimpleDataWriter : public CxxTest::TestSuite
 {
@@ -90,9 +91,9 @@ public:
 
         // Do the testing now so that to also check the directory wasn't cleaned in the second write
         std::string results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "SimpleDataWriter/";
-        TS_ASSERT_EQUALS(system(("cmp " + results_dir + "std_vecs1.dat  io/test/data/good_std_vec1.dat").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("cmp " + results_dir + "std_vecs2.dat  io/test/data/good_std_vec2.dat").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("cmp " + results_dir + "std_vecs3.dat  io/test/data/good_std_vec3.dat").c_str()), 0);
+        FileComparison(results_dir + "std_vecs1.dat", "io/test/data/good_std_vec1.dat").CompareFiles();
+        FileComparison(results_dir + "std_vecs2.dat", "io/test/data/good_std_vec2.dat").CompareFiles();
+        FileComparison(results_dir + "std_vecs3.dat", "io/test/data/good_std_vec3.dat").CompareFiles();
     }
 };
 

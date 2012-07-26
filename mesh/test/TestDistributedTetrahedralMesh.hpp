@@ -1650,15 +1650,10 @@ public:
         mesh_writer2.WriteFilesUsingMesh(*p_distributed_mesh);
 
         std::string output_dir = mesh_writer1.GetOutputDirectory();
-        /* Compare
-          grep -ab "#" /tmp/chaste/testoutput/TestDistributedMeshWriter/seq_line_10_elements.node
-         219:# Created by Chaste version 1.1.8525 on Wed, 31 Mar 2010 14:13:58 +0000.  Chaste was built on Wed, 31 Mar 2010 14:10:35 +0000 by machine (uname) 'Linux userpc59.comlab.ox.ac.uk 2.6.24-27-generic #1 SMP Fri Mar 12 00:52:19 UTC 2010 x86_64' using settings: default, shared libraries.
-         grep -ab "#" /tmp/$USER/testoutput/TestDistributedMeshWriter/seq_line_10_elements.node
-         i.e. Bytes after 219 are provenance data and will change -- one second clock difference will be spotted
-         grep -ab "#" /tmp/$USER/testoutput/TestDistributedMeshWriter/seq_line_10_elements.ele
-         */
-        TS_ASSERT_EQUALS(system(("cmp -n 219 " + output_dir + "/par_line_10_elements.node "+ output_dir + "/seq_line_10_elements.node").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("cmp -n 88 " + output_dir + "/par_line_10_elements.ele "+ output_dir + "/seq_line_10_elements.ele").c_str()), 0);
+        FileComparison(output_dir + "par_line_10_elements.node",
+        		       output_dir + "seq_line_10_elements.node").CompareFiles();
+        FileComparison(output_dir + "par_line_10_elements.ele",
+        		       output_dir + "seq_line_10_elements.ele").CompareFiles();
     }
 
     void TestNodeExchange()

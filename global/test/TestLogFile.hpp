@@ -36,10 +36,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTLOGFILE_HPP_
 #define TESTLOGFILE_HPP_
 
+#include <fstream>
 #include <cxxtest/TestSuite.h>
 #include "LogFile.hpp"
 #include "Exception.hpp"
-#include <fstream>
+#include "FileComparison.hpp"
 
 class TestLogFile : public CxxTest::TestSuite
 {
@@ -98,7 +99,7 @@ public:
         LogFile::Close();
 
         std::string results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "TestLogFile/";
-        TS_ASSERT_EQUALS(system(("cmp " + results_dir + "log2.txt  global/test/data/good_log2.txt").c_str()), 0);
+        FileComparison(results_dir + "log2.txt", "global/test/data/good_log2.txt").CompareFiles();
     }
 
     void TestWritingToNoFile()
@@ -120,8 +121,8 @@ public:
         (*p_log_file) << "data";
 
         std::string results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "TestLogFile/";
-        TS_ASSERT_EQUALS(system(("cmp " + results_dir + "log.txt  global/test/data/good_log.txt").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("cmp " + results_dir + "log3.txt  global/test/data/good_log.txt").c_str()), 0);
+        FileComparison(results_dir + "log.txt",  "global/test/data/good_log.txt").CompareFiles();
+        FileComparison(results_dir + "log3.txt", "global/test/data/good_log.txt").CompareFiles();
 
         LogFile::Close();
     }
@@ -144,7 +145,8 @@ public:
         std::string results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "TestLogFile/";
 
         // This will fail if optimised (and should fail) since the NDEBUG flag currently forces NO LOGGING
-        TS_ASSERT_EQUALS(system(("cmp " + results_dir + "log4.txt  global/test/data/good_log4.txt").c_str()), 0);
+        FileComparison(results_dir + "log4.txt", "global/test/data/good_log4.txt").CompareFiles();
+
         LogFile::Close();
     }
 

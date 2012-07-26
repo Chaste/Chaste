@@ -39,11 +39,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include "Warnings.hpp"
 #include "LogFile.hpp"
+#include "FileComparison.hpp"
 
 class TestWarnings: public CxxTest::TestSuite
 {
 private:
-
     void ThrowWarning()
     {
         WARN_ONCE_ONLY("Ozzy is Hungry.");
@@ -69,11 +69,11 @@ public:
         LogFile* p_log_file = LogFile::Instance();
         p_log_file->Set(1, "TestLogFile", "log_warnings.txt");
 
-        WARNING("This one goes into a log file");
+        WARNING("This one goes into a log file"); //The line number for this WARNING is important since it gets written to the log file
 
         LogFile::Close();
         std::string results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "TestLogFile/";
-        TS_ASSERT_EQUALS(system(("cmp " + results_dir + "log_warnings.txt  global/test/data/log_warnings.txt").c_str()), 0);
+        FileComparison(results_dir + "log_warnings.txt", "global/test/data/log_warnings.txt").CompareFiles();
         Warnings::QuietDestroy();
     }
 

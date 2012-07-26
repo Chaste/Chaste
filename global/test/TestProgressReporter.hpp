@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 #include "ProgressReporter.hpp"
+#include "FileComparison.hpp"
 
 class TestProgressReporter : public CxxTest::TestSuite
 {
@@ -60,7 +61,8 @@ public:
         }
 
         std::string results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "ProgressReporter/";
-        TS_ASSERT_EQUALS(system(("cmp " + results_dir + "progress_status.txt  global/test/data/good_progress_status.txt").c_str()), 0);
+        FileComparison(results_dir + "progress_status.txt", "global/test/data/good_progress_status.txt").CompareFiles();
+
     }
 
     void TestBarCleansFilesUpAfterException()
@@ -86,7 +88,7 @@ public:
 
         // File should now be closed since  progress_bar is out of scope
         std::string results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "ProgressReporterException/";
-        TS_ASSERT_EQUALS(system(("cmp " + results_dir + "progress_status.txt  global/test/data/bad_progress_status.txt").c_str()), 0);
+        FileComparison(results_dir + "progress_status.txt", "global/test/data/bad_progress_status.txt").CompareFiles();
     }
 };
 

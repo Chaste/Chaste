@@ -110,6 +110,23 @@ public:
         file_comparer.SetIgnoreCommentLines(false);
         TS_ASSERT_EQUALS(file_comparer.CompareFiles(1,false), expected_fail_result);
     }
+
+    void TestBinaryFiles() throw(Exception)
+    {
+    	std::string base_file = "./mesh/test/data/simple_cube_binary.node";
+    	FileComparison(base_file, base_file).CompareFiles();
+
+    	//A file which is the same for data purposes, but has the provenance line altered
+ 	 	std::string copy_file = "./global/test/data/simple_cube_binary_copy.node";
+    	FileComparison(base_file, copy_file).CompareFiles();
+
+    	//A file which has a single byte of data inserted
+    	///\todo #1002 The amount of trace which this non-failing test is producing is a little alarming for users
+    	std::string modified_file = "./global/test/data/simple_cube_binary_modified.node";
+    	TS_ASSERT_EQUALS(FileComparison(base_file, modified_file).CompareFiles(0, false), false);
+    }
+
+
 };
 
 #endif /*TESTFILECOMPARISON_HPP_*/
