@@ -50,6 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WildTypeCellMutationState.hpp"
 #include "OutputFileHandler.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
+#include "FileComparison.hpp"
 
 class TestSloughingCellKillers : public AbstractCellBasedTestSuite
 {
@@ -399,7 +400,7 @@ public:
        sloughing_cell_killer_parameter_file->close();
 
        std::string sloughing_cell_killer_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-       TS_ASSERT_EQUALS(system(("diff " + sloughing_cell_killer_results_dir + "sloughing_results.parameters crypt/test/data/TestSloughingCellKillers/sloughing_results.parameters").c_str()), 0);
+       FileComparison( sloughing_cell_killer_results_dir + "sloughing_results.parameters", "crypt/test/data/TestSloughingCellKillers/sloughing_results.parameters").CompareFiles();
 
        // Test with RadialSloughingCellKiller
        c_vector<double,2> centre(2);
@@ -414,7 +415,7 @@ public:
        radial_cell_killer_parameter_file->close();
 
        std::string radial_cell_killer_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-       TS_ASSERT_EQUALS(system(("diff " + radial_cell_killer_results_dir + "radial_results.parameters crypt/test/data/TestSloughingCellKillers/radial_results.parameters").c_str()), 0);
+       FileComparison( radial_cell_killer_results_dir + "radial_results.parameters", "crypt/test/data/TestSloughingCellKillers/radial_results.parameters").CompareFiles();
    }
 
 

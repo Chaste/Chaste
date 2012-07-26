@@ -54,6 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WntCellCycleModel.hpp"
 #include "SimpleWntCellCycleModel.hpp"
 #include "SmartPointers.hpp"
+#include "FileComparison.hpp"
 
 class TestCryptSimulationAnother2dNightly : public AbstractCellBasedTestSuite
 {
@@ -289,7 +290,7 @@ public:
 
         NumericFileComparison comp_ele(results_dir + "/results.vizelements", "crypt/test/data/TestResultsFileForLongerCryptSimulation/results.vizelements");
         TS_ASSERT(comp_ele.CompareFiles());
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "/results.vizelements crypt/test/data/TestResultsFileForLongerCryptSimulation/results.vizelements").c_str()), 0);
+        FileComparison( results_dir + "/results.vizelements", "crypt/test/data/TestResultsFileForLongerCryptSimulation/results.vizelements").CompareFiles();
 
         NumericFileComparison comp_nodes(results_dir + "/results.viznodes", "crypt/test/data/TestResultsFileForLongerCryptSimulation/results.viznodes");
         TS_ASSERT(comp_nodes.CompareFiles(1e-15));
@@ -297,8 +298,8 @@ public:
         NumericFileComparison comp_celltypes(results_dir + "/results.vizcelltypes", "crypt/test/data/TestResultsFileForLongerCryptSimulation/results.vizcelltypes");
         TS_ASSERT(comp_celltypes.CompareFiles(1e-15));
 
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "/results.vizsetup crypt/test/data/TestResultsFileForLongerCryptSimulation/results.vizsetup").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "/results.parameters crypt/test/data/TestResultsFileForLongerCryptSimulation/results.parameters").c_str()), 0);
+        FileComparison( results_dir + "/results.vizsetup", "crypt/test/data/TestResultsFileForLongerCryptSimulation/results.vizsetup").CompareFiles();
+        FileComparison( results_dir + "/results.parameters", "crypt/test/data/TestResultsFileForLongerCryptSimulation/results.parameters").CompareFiles();
 
         // Tidy up
         WntConcentration<2>::Destroy();

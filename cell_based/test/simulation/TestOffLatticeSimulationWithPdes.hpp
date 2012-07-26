@@ -65,6 +65,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AveragedSourcePde.hpp"
 #include "VolumeDependentAveragedSourcePde.hpp"
 #include "SmartPointers.hpp"
+#include "FileComparison.hpp"
 
 
 class SimplePdeForTesting : public AbstractLinearEllipticPde<2,2>
@@ -316,7 +317,7 @@ public:
         NumericFileComparison comp_celltypes(results_dir + "/results.vizcelltypes", "cell_based/test/data/OffLatticeSimulationWithOxygen/results.vizcelltypes");
         TS_ASSERT(comp_celltypes.CompareFiles(1e-15));
 
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "/results.vizsetup cell_based/test/data/OffLatticeSimulationWithOxygen/results.vizsetup").c_str()), 0);
+        FileComparison( results_dir + "/results.vizsetup", "cell_based/test/data/OffLatticeSimulationWithOxygen/results.vizsetup").CompareFiles();
     }
 
     void TestWithPointwiseSource() throw(Exception)
@@ -597,7 +598,7 @@ public:
         OutputFileHandler handler("TestSpheroidStatistics", false);
         
         std::string areas_results_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/cellpopulationareas.dat";
-        TS_ASSERT_EQUALS(system(("diff " + areas_results_file + " cell_based/test/data/TestSpheroidStatistics/cellpopulationareas.dat").c_str()), 0);
+        FileComparison( areas_results_file, "cell_based/test/data/TestSpheroidStatistics/cellpopulationareas.dat").CompareFiles();
 
         std::string results_dir = handler.GetOutputDirectoryFullPath() + "results_from_time_0/";
         NumericFileComparison comparison(results_dir + "/radial_dist.dat", "cell_based/test/data/TestSpheroidStatistics/radial_dist.dat");
@@ -1199,7 +1200,7 @@ public:
         parameter_file->close();
 
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cell_based_sim_with_pde_results.parameters  cell_based/test/data/TestOffLatticeSimulationOutputParameters/cell_based_sim_with_pde_results.parameters").c_str()), 0);
+        FileComparison( results_dir + "cell_based_sim_with_pde_results.parameters", "cell_based/test/data/TestOffLatticeSimulationOutputParameters/cell_based_sim_with_pde_results.parameters").CompareFiles();
 
         ///\todo check output of simulator.OutputSimulationSetup();
     }

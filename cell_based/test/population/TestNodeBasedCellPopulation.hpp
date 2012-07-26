@@ -55,6 +55,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellLabel.hpp"
 #include "CellPropertyRegistry.hpp"
 #include "SmartPointers.hpp"
+#include "FileComparison.hpp"
 
 class TestNodeBasedCellPopulation : public AbstractCellBasedTestSuite
 {
@@ -771,12 +772,12 @@ public:
         // Compare output with saved files of what they should look like
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.viznodes     cell_based/test/data/TestNodeBasedCellPopulationWriters2d/results.viznodes").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizcelltypes     cell_based/test/data/TestNodeBasedCellPopulationWriters2d/results.vizcelltypes").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizancestors     cell_based/test/data/TestNodeBasedCellPopulationWriters2d/results.vizancestors").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellmutationstates.dat     cell_based/test/data/TestNodeBasedCellPopulationWriters2d/cellmutationstates.dat").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellages.dat     cell_based/test/data/TestNodeBasedCellPopulationWriters2d/cellages.dat").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellareas.dat         cell_based/test/data/TestNodeBasedCellPopulationWriters2d/cellareas.dat").c_str()), 0);
+        FileComparison( results_dir + "results.viznodes", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/results.viznodes").CompareFiles();
+        FileComparison( results_dir + "results.vizcelltypes", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/results.vizcelltypes").CompareFiles();
+        FileComparison( results_dir + "results.vizancestors", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/results.vizancestors").CompareFiles();
+        FileComparison( results_dir + "cellmutationstates.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/cellmutationstates.dat").CompareFiles();
+        FileComparison( results_dir + "cellages.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/cellages.dat").CompareFiles();
+        FileComparison( results_dir + "cellareas.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/cellareas.dat").CompareFiles();
 
         // Test the GetCellMutationStateCount function
         std::vector<unsigned> cell_mutation_states = node_based_cell_population.GetCellMutationStateCount();
@@ -808,7 +809,7 @@ public:
         parameter_file->close();
 
         // Compare output with saved files of what they should look like
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.parameters         cell_based/test/data/TestNodeBasedCellPopulationWriters2d/results.parameters").c_str()), 0);
+        FileComparison( results_dir + "results.parameters", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/results.parameters").CompareFiles();
     }
 
     void TestNodeBasedCellPopulationOutputWriters3d()
@@ -859,12 +860,12 @@ public:
         // Compare output with saved files of what they should look like
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.viznodes     cell_based/test/data/TestNodeBasedCellPopulationWriters3d/results.viznodes").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizcelltypes     cell_based/test/data/TestNodeBasedCellPopulationWriters3d/results.vizcelltypes").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizancestors     cell_based/test/data/TestNodeBasedCellPopulationWriters3d/results.vizancestors").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellmutationstates.dat     cell_based/test/data/TestNodeBasedCellPopulationWriters3d/cellmutationstates.dat").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellages.dat     cell_based/test/data/TestNodeBasedCellPopulationWriters3d/cellages.dat").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellareas.dat         cell_based/test/data/TestNodeBasedCellPopulationWriters3d/cellareas.dat").c_str()), 0);
+        FileComparison( results_dir + "results.viznodes", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/results.viznodes").CompareFiles();
+        FileComparison( results_dir + "results.vizcelltypes", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/results.vizcelltypes").CompareFiles();
+        FileComparison( results_dir + "results.vizancestors", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/results.vizancestors").CompareFiles();
+        FileComparison( results_dir + "cellmutationstates.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/cellmutationstates.dat").CompareFiles();
+        FileComparison( results_dir + "cellages.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/cellages.dat").CompareFiles();
+        FileComparison( results_dir + "cellareas.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/cellareas.dat").CompareFiles();
     }
 
     void TestWritingCellCyclePhases()

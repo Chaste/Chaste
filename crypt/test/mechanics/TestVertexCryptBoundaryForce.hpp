@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulation.hpp"
 #include "VertexCryptBoundaryForce.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
+#include "FileComparison.hpp"
 
 
 class TestVertexCryptBoundaryForce : public AbstractCellBasedTestSuite
@@ -67,7 +68,7 @@ public:
         boundary_force_parameter_file->close();
 
         std::string boundary_force_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + boundary_force_results_dir + "boundary_results.parameters crypt/test/data/TestForcesForCrypt/boundary_results.parameters").c_str()), 0);
+        FileComparison( boundary_force_results_dir + "boundary_results.parameters", "crypt/test/data/TestForcesForCrypt/boundary_results.parameters").CompareFiles();
 
     }
 

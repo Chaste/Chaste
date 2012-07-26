@@ -58,6 +58,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MeshBasedCellPopulation.hpp"
 
 #include "AbstractCellBasedTestSuite.hpp"
+#include "FileComparison.hpp"
 
 class TestCryptProjectionForce : public AbstractCellBasedTestSuite
 {
@@ -548,7 +549,7 @@ public:
         projection_force_parameter_file->close();
 
         std::string projection_force_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + projection_force_results_dir + "projection_results.parameters crypt/test/data/TestForcesForCrypt/projection_results.parameters").c_str()), 0);
+        FileComparison( projection_force_results_dir + "projection_results.parameters", "crypt/test/data/TestForcesForCrypt/projection_results.parameters").CompareFiles();
     }
 
     void TestCryptProjectionForceWithNodeBasedCellPopulation() throw (Exception)

@@ -50,6 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CryptSimulation2d.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "SmartPointers.hpp"
+#include "FileComparison.hpp"
 
 class TestLinearSpringWithVariableSpringConstantsForce : public AbstractCellBasedTestSuite
 {
@@ -571,7 +572,7 @@ public:
         variable_force_parameter_file->close();
 
         std::string variable_force_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + variable_force_results_dir + "variable_results.parameters  crypt/test/data/TestForcesForCrypt/variable_results.parameters").c_str()), 0);
+        FileComparison( variable_force_results_dir + "variable_results.parameters", "crypt/test/data/TestForcesForCrypt/variable_results.parameters").CompareFiles();
     }
 
     void TestLinearSpringWithVariableSpringConstantsForceArchiving() throw (Exception)

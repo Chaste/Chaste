@@ -48,6 +48,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TetrahedralMesh.hpp"
 #include "DistributedTetrahedralMesh.hpp"
 #include "TrianglesMeshReader.hpp"
+#include "FileComparison.hpp"
+
 
 #ifdef CHASTE_VTK
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
@@ -91,17 +93,10 @@ public:
 
         // Compare the voltage file with a correct version
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
-        std::string command = "diff -a -I \"Created by Chaste\" " + test_output_directory
-                              + "/TestHdf5ToMeshalyzerConverter/output/MonodomainLR91_1d_V.dat "
-                              + "heart/test/data/Monodomain1d/MonodomainLR91_1d_V.dat";
-
-        TS_ASSERT_EQUALS(system(command.c_str()), 0);
-
-        command = "diff -a -I \"Created by Chaste\" " + test_output_directory
-                  + "/TestHdf5ToMeshalyzerConverter/output/MonodomainLR91_1d_times.info "
-                  + "heart/test/data/Monodomain1d/MonodomainLR91_1d_times.info";
-
-        TS_ASSERT_EQUALS(system(command.c_str()), 0);
+        FileComparison(test_output_directory + "TestHdf5ToMeshalyzerConverter/output/MonodomainLR91_1d_V.dat",
+        		       "heart/test/data/Monodomain1d/MonodomainLR91_1d_V.dat").CompareFiles();
+        FileComparison(test_output_directory + "TestHdf5ToMeshalyzerConverter/output/MonodomainLR91_1d_times.info",
+        		       "heart/test/data/Monodomain1d/MonodomainLR91_1d_times.info").CompareFiles();
     }
 
     void TestBidomainMeshalyzerConversion() throw(Exception)
@@ -122,22 +117,16 @@ public:
 
         // Compare the voltage file
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
-        std::string command = "diff -a -I \"Created by Chaste\" " + test_output_directory
-                              + "/TestHdf5ToMeshalyzerConverter/output/bidomain_V.dat "
-                              + "heart/test/data/Bidomain1d/bidomain_V.dat";
-        TS_ASSERT_EQUALS(system(command.c_str()), 0);
+        FileComparison(test_output_directory + "TestHdf5ToMeshalyzerConverter/output/bidomain_V.dat",
+        		       "heart/test/data/Bidomain1d/bidomain_V.dat").CompareFiles();
 
         // Compare the Phi_e file
-        command = "diff -a -I \"Created by Chaste\" " + test_output_directory
-                  + "/TestHdf5ToMeshalyzerConverter/output/bidomain_Phi_e.dat "
-                  + "heart/test/data/Bidomain1d/bidomain_Phi_e.dat";
-        TS_ASSERT_EQUALS(system(command.c_str()), 0);
+        FileComparison(test_output_directory + "TestHdf5ToMeshalyzerConverter/output/bidomain_Phi_e.dat",
+        		       "heart/test/data/Bidomain1d/bidomain_Phi_e.dat").CompareFiles();
 
         // Compare the time information file
-        command = "diff -a -I \"Created by Chaste\" " + test_output_directory
-                  + "/TestHdf5ToMeshalyzerConverter/output/bidomain_times.info "
-                  + "heart/test/data/Bidomain1d/bidomain_times.info";
-        TS_ASSERT_EQUALS(system(command.c_str()), 0);
+        FileComparison(test_output_directory + "TestHdf5ToMeshalyzerConverter/output/bidomain_times.info",
+        		       "heart/test/data/Bidomain1d/bidomain_times.info").CompareFiles();
     }
 
     // This test covers the case when the hdf5 file contains 3 variables (e.g., after solving a problem with PROBLEM_DIM=3)
@@ -159,29 +148,20 @@ public:
 
         // Compare the first voltage file
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
-        std::string command = "diff -a -I \"Created by Chaste\" " + test_output_directory
-                              + "/TestMeshalyzerConversion3Variables/output/3_vars_Vm_1.dat "
-                              + "heart/test/data/three_variables/extended_bidomain_Vm_1.dat";
-        TS_ASSERT_EQUALS(system(command.c_str()), 0);
+        FileComparison(test_output_directory + "TestMeshalyzerConversion3Variables/output/3_vars_Vm_1.dat",
+        		       "heart/test/data/three_variables/extended_bidomain_Vm_1.dat").CompareFiles();
 
         // Compare the second voltage file
-
-        command = "diff -a -I \"Created by Chaste\" " + test_output_directory
-                  + "/TestMeshalyzerConversion3Variables/output/3_vars_Vm_2.dat "
-                  + "heart/test/data/three_variables/extended_bidomain_Vm_2.dat";
-        TS_ASSERT_EQUALS(system(command.c_str()), 0);
+        FileComparison(test_output_directory + "TestMeshalyzerConversion3Variables/output/3_vars_Vm_2.dat",
+        		       "heart/test/data/three_variables/extended_bidomain_Vm_2.dat").CompareFiles();
 
         // Compare the Phi_e file
-        command = "diff -a -I \"Created by Chaste\" " + test_output_directory
-                  + "/TestMeshalyzerConversion3Variables/output/3_vars_Phi_e.dat "
-                  + "heart/test/data/three_variables/extended_bidomain_Phi_e.dat";
-        TS_ASSERT_EQUALS(system(command.c_str()), 0);
+        FileComparison(test_output_directory + "TestMeshalyzerConversion3Variables/output/3_vars_Phi_e.dat",
+        		       "heart/test/data/three_variables/extended_bidomain_Phi_e.dat").CompareFiles();
 
         // Compare the time information file
-        command = "diff -a -I \"Created by Chaste\" " + test_output_directory
-                  + "/TestMeshalyzerConversion3Variables/output/3_vars_times.info "
-                  + "heart/test/data/three_variables/extended_bidomain_times.info";
-        TS_ASSERT_EQUALS(system(command.c_str()), 0);
+        FileComparison(test_output_directory + "TestMeshalyzerConversion3Variables/output/3_vars_times.info",
+        		       "heart/test/data/three_variables/extended_bidomain_times.info").CompareFiles();
     }
 
     // This test covers the case when the hdf5 file contains more than 3 variables
@@ -212,21 +192,18 @@ public:
         variable_names.push_back("I_Na_tot");
 
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
-        std::string command;
         for (unsigned i=0; i<variable_names.size(); i++)
         {
             // Compare the results files
-            command = "diff -a -I \"Created by Chaste\" " + test_output_directory + "/" + output_dir
-                      + "/output/many_variables_" + variable_names[i] + ".dat "
-                      + "heart/test/data/many_variables/many_variables_" + variable_names[i] + ".dat";
-            TS_ASSERT_EQUALS(system(command.c_str()), 0);
+            FileComparison(test_output_directory + "/" + output_dir + "/output/many_variables_"
+            		       + variable_names[i] + ".dat",
+            		       "heart/test/data/many_variables/many_variables_"
+            		       + variable_names[i] + ".dat").CompareFiles();
         }
 
         // Compare the time information file
-        command = "diff -a -I \"Created by Chaste\" " + test_output_directory + output_dir
-                  + "/output/many_variables_times.info "
-                  + "heart/test/data/many_variables/many_variables_times.info";
-        TS_ASSERT_EQUALS(system(command.c_str()), 0);
+        FileComparison(test_output_directory + output_dir + "/output/many_variables_times.info",
+        		       "heart/test/data/many_variables/many_variables_times.info").CompareFiles();
     }
 
     // This test covers the case when the hdf5 file contains more than 3 variables
@@ -251,16 +228,13 @@ public:
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
 
         // Compare the results files
-        std::string command = "diff -a -I \"Created by Chaste\" " + test_output_directory + "/" + output_dir
-                              + "/cmgui_output/many_variables_0.exnode "
-                              + "heart/test/data/many_variables/many_variables_0.exnode";
-        TS_ASSERT_EQUALS(system(command.c_str()), 0);
+        FileComparison(test_output_directory + output_dir + "/cmgui_output/many_variables_0.exnode",
+        		       "heart/test/data/many_variables/many_variables_0.exnode").CompareFiles();
 
         // Check validity of cmgui script
-        std::string command_script = "diff -a -I \"Created by Chaste\" " + test_output_directory + output_dir
-                                     +"/cmgui_output/LoadSolutions.com"
-                                     + " heart/test/data/many_variables/CmguiValidScript.com";
-        TS_ASSERT_EQUALS(system(command_script.c_str()), 0);
+        // Note that FileComparison ignored *all* comment lines (including the ones which are informative to the end-user)
+        FileComparison(test_output_directory + output_dir + "/cmgui_output/LoadSolutions.com",
+        		       "heart/test/data/many_variables/CmguiValidScript.com").CompareFiles();
     }
 
     void TestMonodomainCmguiConversion3D() throw(Exception)
@@ -283,21 +257,15 @@ public:
 
         // Compare the voltage file with a correct version
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
-        std::string command_first_time_step = "diff -a -I \"Created by Chaste\" " + test_output_directory
-                                              + working_directory +"/cmgui_output/cube_2mm_12_elements_0.exnode"
-                                              + " heart/test/data/CmguiData/monodomain/cube_2mm_12_elements_0.exnode";
-        TS_ASSERT_EQUALS(system(command_first_time_step.c_str()), 0);
+        FileComparison(test_output_directory + working_directory + "/cmgui_output/cube_2mm_12_elements_0.exnode",
+        		       "heart/test/data/CmguiData/monodomain/cube_2mm_12_elements_0.exnode").CompareFiles();
 
-        std::string command_second_time_step = "diff -a -I \"Created by Chaste\" " + test_output_directory
-                                               + working_directory +"/cmgui_output/cube_2mm_12_elements_1.exnode"
-                                               + " heart/test/data/CmguiData/monodomain/cube_2mm_12_elements_1.exnode";
-        TS_ASSERT_EQUALS(system(command_second_time_step.c_str()), 0);
+        FileComparison(test_output_directory + working_directory + "/cmgui_output/cube_2mm_12_elements_1.exnode",
+        		       "heart/test/data/CmguiData/monodomain/cube_2mm_12_elements_1.exnode").CompareFiles();
 
         // Check validity of cmgui script
-        std::string command_script = "diff -a -I \"Created by Chaste\" " + test_output_directory
-                                     + working_directory +"/cmgui_output/LoadSolutions.com"
-                                     + " heart/test/data/CmguiData/monodomain/monodomain3dValidScript.com";
-        TS_ASSERT_EQUALS(system(command_script.c_str()), 0);
+        FileComparison(test_output_directory + working_directory + "/cmgui_output/LoadSolutions.com",
+                		       "heart/test/data/CmguiData/monodomain/monodomain3dValidScript.com").CompareFiles();
     }
 
     void TestBidomainCmguiConversion3D() throw(Exception)
@@ -320,15 +288,11 @@ public:
 
         // Compare the voltage file with a correct version that is known to visualize correctly in Cmgui
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
-        std::string command_first_time_step = "diff -a -I \"Created by Chaste\" " + test_output_directory
-                                              + working_directory +"/cmgui_output/cube_2mm_12_elements_0.exnode"
-                                              + " heart/test/data/CmguiData/bidomain/cube_2mm_12_elements_0.exnode";
-        TS_ASSERT_EQUALS(system(command_first_time_step.c_str()), 0);
+        FileComparison(test_output_directory + working_directory + "/cmgui_output/cube_2mm_12_elements_0.exnode",
+                		       "heart/test/data/CmguiData/bidomain/cube_2mm_12_elements_0.exnode").CompareFiles();
 
-        std::string command_second_time_step = "diff -a -I \"Created by Chaste\" " + test_output_directory
-                                               + working_directory +"/cmgui_output/cube_2mm_12_elements_1.exnode"
-                                               + " heart/test/data/CmguiData/bidomain/cube_2mm_12_elements_1.exnode";
-        TS_ASSERT_EQUALS(system(command_second_time_step.c_str()), 0);
+        FileComparison(test_output_directory + working_directory + "/cmgui_output/cube_2mm_12_elements_1.exnode",
+                		       "heart/test/data/CmguiData/bidomain/cube_2mm_12_elements_1.exnode").CompareFiles();
     }
 
     void TestBidomainWithBathCmguiConversion1D() throw(Exception)
@@ -355,31 +319,21 @@ public:
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
 
         // Mesh file first, one exnode, one for bath and one for tissue
-        std::string command_node_file = "diff -a -I \"Created by Chaste\" " + test_output_directory
-                                        + working_directory +"/cmgui_output/bidomain_with_bath_1d.exnode"
-                                        + " heart/test/data/CmguiData/bidomain_with_bath/bidomain_with_bath_1d.exnode";
-        TS_ASSERT_EQUALS(system(command_node_file.c_str()), 0);
+        FileComparison(test_output_directory + working_directory + "/cmgui_output/bidomain_with_bath_1d.exnode",
+                        		       "heart/test/data/CmguiData/bidomain_with_bath/bidomain_with_bath_1d.exnode").CompareFiles();
 
-        std::string command_tissue_element_file = "diff -a -I \"Created by Chaste\" " + test_output_directory
-                                                  + working_directory +"/cmgui_output/tissue.exelem"
-                                                  + " heart/test/data/CmguiData/bidomain_with_bath/tissue.exelem";
-        TS_ASSERT_EQUALS(system(command_tissue_element_file.c_str()), 0);
+        FileComparison(test_output_directory + working_directory + "/cmgui_output/tissue.exelem",
+                                		       "heart/test/data/CmguiData/bidomain_with_bath/tissue.exelem").CompareFiles();
 
-        std::string command_bath_element_file = "diff -a -I \"Created by Chaste\" " + test_output_directory
-                                                + working_directory +"/cmgui_output/bath.exelem"
-                                                + " heart/test/data/CmguiData/bidomain_with_bath/bath.exelem";
-        TS_ASSERT_EQUALS(system(command_bath_element_file.c_str()), 0);
+        FileComparison(test_output_directory + working_directory + "/cmgui_output/bath.exelem",
+                                		       "heart/test/data/CmguiData/bidomain_with_bath/bath.exelem").CompareFiles();
 
         // Then the data file
-        std::string command_first_time_step = "diff -a -I \"Created by Chaste\" " + test_output_directory
-                                              + working_directory +"/cmgui_output/bidomain_with_bath_1d_0.exnode"
-                                              + " heart/test/data/CmguiData/bidomain_with_bath/bidomain_with_bath_1d_0.exnode";
-        TS_ASSERT_EQUALS(system(command_first_time_step.c_str()), 0);
+        FileComparison(test_output_directory + working_directory + "/cmgui_output/bidomain_with_bath_1d_0.exnode",
+                                		       "heart/test/data/CmguiData/bidomain_with_bath/bidomain_with_bath_1d_0.exnode").CompareFiles();
 
-        std::string command_second_time_step = "diff -a -I \"Created by Chaste\" " + test_output_directory
-                                               + working_directory +"/cmgui_output/bidomain_with_bath_1d_1.exnode"
-                                               + " heart/test/data/CmguiData/bidomain_with_bath/bidomain_with_bath_1d_1.exnode";
-        TS_ASSERT_EQUALS(system(command_second_time_step.c_str()), 0);
+        FileComparison(test_output_directory + working_directory + "/cmgui_output/bidomain_with_bath_1d_1.exnode",
+                                		       "heart/test/data/CmguiData/bidomain_with_bath/bidomain_with_bath_1d_1.exnode").CompareFiles();
     }
 
     void TestMonodomainCmguiConversion2D() throw(Exception)
@@ -404,15 +358,11 @@ public:
 
         // Compare the voltage file with a correct version that visualizes Vm correctly in cmgui
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
-        std::string command_first_time_step = "diff -a -I \"Created by Chaste\"  " + test_output_directory
-                                              + working_directory +"/cmgui_output/2D_0_to_1mm_400_elements_0.exnode"
-                                              + " heart/test/data/CmguiData/monodomain/2D_0_to_1mm_400_elements_0.exnode";
-        TS_ASSERT_EQUALS(system(command_first_time_step.c_str()), 0);
+        FileComparison(test_output_directory + working_directory + "/cmgui_output/2D_0_to_1mm_400_elements_0.exnode",
+                                		       "heart/test/data/CmguiData/monodomain/2D_0_to_1mm_400_elements_0.exnode").CompareFiles();
 
-        std::string command_second_time_step = "diff -a -I \"Created by Chaste\" " + test_output_directory
-                                               + working_directory +"/cmgui_output/2D_0_to_1mm_400_elements_1.exnode"
-                                               + " heart/test/data/CmguiData/monodomain/2D_0_to_1mm_400_elements_1.exnode";
-        TS_ASSERT_EQUALS(system(command_second_time_step.c_str()), 0);
+        FileComparison(test_output_directory + working_directory + "/cmgui_output/2D_0_to_1mm_400_elements_1.exnode",
+                                		       "heart/test/data/CmguiData/monodomain/2D_0_to_1mm_400_elements_1.exnode").CompareFiles();
     }
 
     void TestBidomainCmguiConversion1D() throw(Exception)
@@ -436,15 +386,11 @@ public:
 
         // Compare the voltage file with a correct version that visualizes both Vm and Phie correctly in cmgui
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
-        std::string command_first_time_step = "diff -a -I \"Created by Chaste\" " + test_output_directory
-                                              + working_directory +"/cmgui_output/1D_0_to_1_100_elements_0.exnode"
-                                              + " heart/test/data/CmguiData/bidomain/1D_0_to_1_100_elements_0.exnode";
-        TS_ASSERT_EQUALS(system(command_first_time_step.c_str()), 0);
+        FileComparison(test_output_directory + working_directory + "/cmgui_output/1D_0_to_1_100_elements_0.exnode",
+                                		       "heart/test/data/CmguiData/bidomain/1D_0_to_1_100_elements_0.exnode").CompareFiles();
 
-        std::string command_second_time_step = "diff -a -I \"Created by Chaste\" " + test_output_directory
-                                               + working_directory +"/cmgui_output/1D_0_to_1_100_elements_1.exnode"
-                                               + " heart/test/data/CmguiData/bidomain/1D_0_to_1_100_elements_1.exnode";
-        TS_ASSERT_EQUALS(system(command_second_time_step.c_str()), 0);
+        FileComparison(test_output_directory + working_directory + "/cmgui_output/1D_0_to_1_100_elements_1.exnode",
+                                		       "heart/test/data/CmguiData/bidomain/1D_0_to_1_100_elements_1.exnode").CompareFiles();
     }
 
     void TestCmguiConversion1DWith3Variables() throw(Exception)
@@ -470,27 +416,21 @@ public:
         // Compare the voltage file with a correct version that visualizes both Vs and Phie correctly in cmgui
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
 
-        std::string command_node_mesh_file = "diff -a -I \"Created by Chaste\" " + test_output_directory
-                                             + working_directory +"/cmgui_output/3_vars.exnode"
-                                             + " heart/test/data/CmguiData/extended_bidomain/3_vars.exnode";
-        TS_ASSERT_EQUALS(system(command_node_mesh_file.c_str()), 0);
+        FileComparison(test_output_directory + working_directory + "/cmgui_output/3_vars.exnode",
+                                		       "heart/test/data/CmguiData/extended_bidomain/3_vars.exnode").CompareFiles();
 
-        std::string command_element_mesh_file = "diff -a -I \"Created by Chaste\" " + test_output_directory
-                                                + working_directory +"/cmgui_output/3_vars.exelem"
-                                                + " heart/test/data/CmguiData/extended_bidomain/3_vars.exelem";
-        TS_ASSERT_EQUALS(system(command_node_mesh_file.c_str()), 0);
+        FileComparison(test_output_directory + working_directory + "/cmgui_output/3_vars.exelem",
+                                		       "heart/test/data/CmguiData/extended_bidomain/3_vars.exelem").CompareFiles();
 
-        std::string command_data_file= "diff -a -I \"Created by Chaste\" " + test_output_directory
-                                       + working_directory +"/cmgui_output/3_vars_25.exnode"
-                                       + " heart/test/data/CmguiData/extended_bidomain/3_vars_25.exnode";
-        TS_ASSERT_EQUALS(system(command_data_file.c_str()), 0);
+        FileComparison(test_output_directory + working_directory + "/cmgui_output/3_vars_25.exnode",
+                                		       "heart/test/data/CmguiData/extended_bidomain/3_vars_25.exnode").CompareFiles();
     }
 
     void TestExceptions() throw(Exception)
     {
         std::string directory = "TestHdf5ConverterExceptions";
 
-         // Not used until the number of nodes is checked
+        // Not used until the number of nodes is checked
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
         TetrahedralMesh<3,3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);

@@ -52,6 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WildTypeCellMutationState.hpp"
 #include "CellLabel.hpp"
 #include "SmartPointers.hpp"
+#include "FileComparison.hpp"
 
 /**
  * Note that all these tests call setUp() and tearDown() before running,
@@ -236,10 +237,10 @@ public:
         // ... and checking visualization of labelled cells against previous run
         OutputFileHandler handler(output_directory, false);
         std::string results_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/results.viznodes";
-        TS_ASSERT_EQUALS(system(("diff " + results_file + " crypt/test/data/MakeMeinekeGraphs/results.viznodes").c_str()), 0);
+        FileComparison( results_file, "crypt/test/data/MakeMeinekeGraphs/results.viznodes").CompareFiles();
 
         std::string results_file2 = handler.GetOutputDirectoryFullPath() + "results_from_time_0/results.vizcelltypes";
-        TS_ASSERT_EQUALS(system(("diff " + results_file2 + " crypt/test/data/MakeMeinekeGraphs/results.vizcelltypes").c_str()), 0);
+        FileComparison( results_file2, "crypt/test/data/MakeMeinekeGraphs/results.vizcelltypes").CompareFiles();
 
         // TEST crypt_statistics::LabelSPhaseCells
 
@@ -479,7 +480,7 @@ public:
         // ... and checking visualization of labelled cells against previous run
         OutputFileHandler handler(output_directory, false);
         std::string results_file = handler.GetOutputDirectoryFullPath() + "percentage_of_labelled_cells.dat";
-        TS_ASSERT_EQUALS(system(("diff " + results_file + " crypt/test/data/MakeMoreMeinekeGraphs/percentage_of_labelled_cells.dat").c_str()), 0);
+        FileComparison( results_file, "crypt/test/data/MakeMoreMeinekeGraphs/percentage_of_labelled_cells.dat").CompareFiles();
 
         RandomNumberGenerator::Destroy();
     }

@@ -56,6 +56,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodesOnlyMesh.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "SmartPointers.hpp"
+#include "FileComparison.hpp"
 
 class TestPottsUpdateRules : public AbstractCellBasedTestSuite
 {
@@ -840,7 +841,7 @@ public:
         volume_constraint_parameter_file->close();
 
         std::string volume_constraint_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + volume_constraint_results_dir + "volume_constraint_results.parameters cell_based/test/data/TestPottsUpdateRules/volume_constraint_results.parameters").c_str()), 0);
+        FileComparison( volume_constraint_results_dir + "volume_constraint_results.parameters", "cell_based/test/data/TestPottsUpdateRules/volume_constraint_results.parameters").CompareFiles();
 
         // Test with SurfaceAreaConstraintPottsUpdateRule
         SurfaceAreaConstraintPottsUpdateRule<2> surface_area_constraint;
@@ -854,7 +855,7 @@ public:
         surface_area_constraint_parameter_file->close();
 
         std::string surface_area_constraint_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + surface_area_constraint_results_dir + "surface_area_constraint_results.parameters cell_based/test/data/TestPottsUpdateRules/surface_area_constraint_results.parameters").c_str()), 0);
+        FileComparison( surface_area_constraint_results_dir + "surface_area_constraint_results.parameters", "cell_based/test/data/TestPottsUpdateRules/surface_area_constraint_results.parameters").CompareFiles();
 
         // Test with AdhesionPottsUpdateRule
         AdhesionPottsUpdateRule<2> adhesion_update;
@@ -868,7 +869,7 @@ public:
         adhesion_update_parameter_file->close();
 
         std::string adhesion_update_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + adhesion_update_results_dir + "adhesion_update_results.parameters cell_based/test/data/TestPottsUpdateRules/adhesion_update_results.parameters").c_str()), 0);
+        FileComparison( adhesion_update_results_dir + "adhesion_update_results.parameters", "cell_based/test/data/TestPottsUpdateRules/adhesion_update_results.parameters").CompareFiles();
 
         // Test with DifferentialAdhesionPottsUpdateRule
         DifferentialAdhesionPottsUpdateRule<2> differential_adhesion_update;
@@ -885,7 +886,8 @@ public:
         differential_adhesion_update_parameter_file->close();
 
         std::string differential_adhesion_update_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + differential_adhesion_update_results_dir + "differential_adhesion_update_results.parameters cell_based/test/data/TestPottsUpdateRules/differential_adhesion_update_results.parameters").c_str()), 0);
+        FileComparison(differential_adhesion_update_results_dir + "differential_adhesion_update_results.parameters",
+        		       "cell_based/test/data/TestPottsUpdateRules/differential_adhesion_update_results.parameters").CompareFiles();
 
         // Test with DifferentialAdhesionPottsUpdateRule
         ChemotaxisPottsUpdateRule<2> chemotaxis_update;
@@ -897,7 +899,8 @@ public:
         chemotaxis_update_parameter_file->close();
 
         std::string chemotaxis_update_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + chemotaxis_update_results_dir + "chemotaxis_update_results.parameters cell_based/test/data/TestPottsUpdateRules/chemotaxis_update_results.parameters").c_str()), 0);
+        FileComparison(chemotaxis_update_results_dir + "chemotaxis_update_results.parameters",
+        		       "cell_based/test/data/TestPottsUpdateRules/chemotaxis_update_results.parameters").CompareFiles();
     }
 };
 

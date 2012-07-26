@@ -53,6 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BetaCateninOneHitCellMutationState.hpp"
 #include "CellLabel.hpp"
 #include "SmartPointers.hpp"
+#include "FileComparison.hpp"
 
 class TestVertexBasedCellPopulation : public AbstractCellBasedTestSuite
 {
@@ -823,15 +824,15 @@ public:
         // Compare output with saved files of what they should look like
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.viznodes       cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/results.viznodes").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizelements    cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/results.vizelements").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizcelltypes   cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/results.vizcelltypes").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizancestors   cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/results.vizancestors").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellmutationstates.dat cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/cellmutationstates.dat").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellages.dat           cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/cellages.dat").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellcyclephases.dat    cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/cellcyclephases.dat").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "celltypes.dat          cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/celltypes.dat").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellareas.dat          cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/cellareas.dat").c_str()), 0);
+        FileComparison( results_dir + "results.viznodes", "cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/results.viznodes").CompareFiles();
+        FileComparison( results_dir + "results.vizelements", "cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/results.vizelements").CompareFiles();
+        FileComparison( results_dir + "results.vizcelltypes", "cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/results.vizcelltypes").CompareFiles();
+        FileComparison( results_dir + "results.vizancestors", "cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/results.vizancestors").CompareFiles();
+        FileComparison( results_dir + "cellmutationstates.dat", "cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/cellmutationstates.dat").CompareFiles();
+        FileComparison( results_dir + "cellages.dat", "cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/cellages.dat").CompareFiles();
+        FileComparison( results_dir + "cellcyclephases.dat", "cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/cellcyclephases.dat").CompareFiles();
+        FileComparison( results_dir + "celltypes.dat", "cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/celltypes.dat").CompareFiles();
+        FileComparison( results_dir + "cellareas.dat", "cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/cellareas.dat").CompareFiles();
 
         // Test the GetCellMutationStateCount function
         std::vector<unsigned> cell_mutation_states = cell_population.GetCellMutationStateCount();
@@ -859,7 +860,7 @@ public:
         parameter_file->close();
 
         // Compare output with saved files of what they should look like
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.parameters cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/results.parameters").c_str()), 0);
+        FileComparison( results_dir + "results.parameters", "cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/results.parameters").CompareFiles();
     }
 
     void TestArchiving2dVertexBasedCellPopulation() throw(Exception)

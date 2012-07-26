@@ -51,6 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BetaCateninOneHitCellMutationState.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "CellLabel.hpp"
+#include "FileComparison.hpp"
 
 class TestSingleOdeWntCellCycleModel : public AbstractCellBasedTestSuite
 {
@@ -376,7 +377,7 @@ public:
         single_ode_wnt_parameter_file->close();
 
         std::string single_ode_wnt_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + single_ode_wnt_results_dir + "single_ode_wnt_results.parameters crypt/test/data/TestCellCycleModels/single_ode_wnt_results.parameters").c_str()), 0);
+        FileComparison( single_ode_wnt_results_dir + "single_ode_wnt_results.parameters", "crypt/test/data/TestCellCycleModels/single_ode_wnt_results.parameters").CompareFiles();
     }
 };
 

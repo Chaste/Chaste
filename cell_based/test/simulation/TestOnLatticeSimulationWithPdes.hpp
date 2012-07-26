@@ -67,6 +67,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 #include "SmartPointers.hpp"
 #include "AbstractCellPopulation.hpp"
+#include "FileComparison.hpp"
 
 
 class SimplePdeForTesting : public AbstractLinearEllipticPde<2,2>
@@ -472,7 +473,7 @@ public:
 
         NumericFileComparison comp_nut(results_dir + "/results.vizcoarsepdesolution", "cell_based/test/data/TestPottsBasedCellPopulationWithPdes/results.vizcoarsepdesolution");
         TS_ASSERT(comp_nut.CompareFiles());
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "/results.vizcoarsepdesolution cell_based/test/data/TestPottsBasedCellPopulationWithPdes/results.vizcoarsepdesolution").c_str()), 0);
+        FileComparison( results_dir + "/results.vizcoarsepdesolution", "cell_based/test/data/TestPottsBasedCellPopulationWithPdes/results.vizcoarsepdesolution").CompareFiles();
     }
 
 

@@ -60,6 +60,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WildTypeCellMutationState.hpp"
 #include "OffLatticeSimulationWithMyStoppingEvent.hpp"
 #include "SmartPointers.hpp"
+#include "FileComparison.hpp"
 
 
 class TestOffLatticeSimulation : public AbstractCellBasedTestSuite
@@ -556,7 +557,7 @@ public:
         std::string output_directory = "TestOffLatticeSimulationWithPeriodicMesh/results_from_time_0/";
         OutputFileHandler output_file_handler(output_directory, false);
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizsetup  cell_based/test/data/TestOffLatticeSimulationWithPeriodicMesh/results.vizsetup").c_str()), 0);
+        FileComparison( results_dir + "results.vizsetup", "cell_based/test/data/TestOffLatticeSimulationWithPeriodicMesh/results.vizsetup").CompareFiles();
     }
 
     /**
@@ -837,12 +838,13 @@ public:
         parameter_file->close();
 
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cell_based_sim_results.parameters  cell_based/test/data/TestOffLatticeSimulationOutputParameters/cell_based_sim_results.parameters").c_str()), 0);
+        FileComparison( results_dir + "cell_based_sim_results.parameters", "cell_based/test/data/TestOffLatticeSimulationOutputParameters/cell_based_sim_results.parameters").CompareFiles();
 
         simulator.SetOutputDirectory("TestOffLatticeSimulationOutputParameters");
         simulator.OutputSimulationSetup();
+        ///\todo #1002
         ///\todo #1453 This is to do with the pre Boost 1.37 problem ---
-        //TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.parameters  cell_based/test/data/TestOffLatticeSimulationOutputParameters/results.parameters").c_str()), 0);
+        //TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.parameters  cell_based/test/data/TestOffLatticeSimulationOutputParameters/results.parameters").CompareFiles();
         TS_ASSERT_EQUALS(system(("diff --ignore-matching-lines=\"CellPopulation\" " + results_dir + "results.parameters  cell_based/test/data/TestOffLatticeSimulationOutputParameters/results.parameters").c_str()), 0);
 
         // Check that the files which we don't want to compare actually exist

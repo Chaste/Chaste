@@ -53,6 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BetaCateninOneHitCellMutationState.hpp"
 #include "CellLabel.hpp"
 #include "SmartPointers.hpp"
+#include "FileComparison.hpp"
 
 class TestCryptSimulation1d : public AbstractCellBasedTestSuite
 {
@@ -117,13 +118,13 @@ public:
         OutputFileHandler handler("Crypt1dWithNoBirthAndNoDeath", false);
 
         std::string node_results_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/results.viznodes";
-        TS_ASSERT_EQUALS(system(("diff " + node_results_file + " crypt/test/data/Crypt1dWithNoBirthAndNoDeath/results.viznodes").c_str()), 0);
+        FileComparison( node_results_file, "crypt/test/data/Crypt1dWithNoBirthAndNoDeath/results.viznodes").CompareFiles();
 
         std::string cell_type_results_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/results.vizcelltypes";
-        TS_ASSERT_EQUALS(system(("diff " + cell_type_results_file + " crypt/test/data/Crypt1dWithNoBirthAndNoDeath/results.vizcelltypes").c_str()), 0);
+        FileComparison( cell_type_results_file, "crypt/test/data/Crypt1dWithNoBirthAndNoDeath/results.vizcelltypes").CompareFiles();
 
         std::string elem_results_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/results.vizelements";
-        TS_ASSERT_EQUALS(system(("diff " + elem_results_file + " crypt/test/data/Crypt1dWithNoBirthAndNoDeath/results.vizelements").c_str()), 0);
+        FileComparison( elem_results_file, "crypt/test/data/Crypt1dWithNoBirthAndNoDeath/results.vizelements").CompareFiles();
     }
 
 
@@ -180,13 +181,13 @@ public:
         OutputFileHandler handler("Crypt1dWithDeathButNoBirth", false);
 
         std::string node_results_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/results.viznodes";
-        TS_ASSERT_EQUALS(system(("diff " + node_results_file + " crypt/test/data/Crypt1dWithDeathButNoBirth/results.viznodes").c_str()), 0);
+        FileComparison( node_results_file, "crypt/test/data/Crypt1dWithDeathButNoBirth/results.viznodes").CompareFiles();
 
         std::string cell_type_results_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/results.vizcelltypes";
-        TS_ASSERT_EQUALS(system(("diff " + cell_type_results_file + " crypt/test/data/Crypt1dWithDeathButNoBirth/results.vizcelltypes").c_str()), 0);
+        FileComparison( cell_type_results_file, "crypt/test/data/Crypt1dWithDeathButNoBirth/results.vizcelltypes").CompareFiles();
 
         std::string elem_results_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/results.vizelements";
-        TS_ASSERT_EQUALS(system(("diff " + elem_results_file + " crypt/test/data/Crypt1dWithDeathButNoBirth/results.vizelements").c_str()), 0);
+        FileComparison( elem_results_file, "crypt/test/data/Crypt1dWithDeathButNoBirth/results.vizelements").CompareFiles();
     }
 
 
@@ -267,13 +268,13 @@ public:
         OutputFileHandler handler("Crypt1dWithCells", false);
 
         std::string node_results_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/results.viznodes";
-        TS_ASSERT_EQUALS(system(("diff " + node_results_file + " crypt/test/data/Crypt1dWithCells/results.viznodes").c_str()), 0);
+        FileComparison( node_results_file, "crypt/test/data/Crypt1dWithCells/results.viznodes").CompareFiles();
 
         std::string cell_type_results_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/results.vizcelltypes";
-        TS_ASSERT_EQUALS(system(("diff " + cell_type_results_file + " crypt/test/data/Crypt1dWithCells/results.vizcelltypes").c_str()), 0);
+        FileComparison( cell_type_results_file, "crypt/test/data/Crypt1dWithCells/results.vizcelltypes").CompareFiles();
 
         std::string elem_results_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/results.vizelements";
-        TS_ASSERT_EQUALS(system(("diff " + elem_results_file + " crypt/test/data/Crypt1dWithCells/results.vizelements").c_str()), 0);
+        FileComparison( elem_results_file, "crypt/test/data/Crypt1dWithCells/results.vizelements").CompareFiles();
     }
 
 
@@ -427,13 +428,13 @@ public:
         OutputFileHandler output_file_handler("Crypt1dWithCellsAndGrowth", false);
 
         std::string node_results_file = output_file_handler.GetOutputDirectoryFullPath() + "results_from_time_0/results.viznodes";
-        TS_ASSERT_EQUALS(system(("diff " + node_results_file + " crypt/test/data/Crypt1dWithCellsAndGrowth/results.viznodes").c_str()), 0);
+        FileComparison( node_results_file , "crypt/test/data/Crypt1dWithCellsAndGrowth/results.viznodes").CompareFiles();
 
         std::string cell_type_results_file = output_file_handler.GetOutputDirectoryFullPath() + "results_from_time_0/results.vizcelltypes";
-        TS_ASSERT_EQUALS(system(("diff " + cell_type_results_file + " crypt/test/data/Crypt1dWithCellsAndGrowth/results.vizcelltypes").c_str()), 0);
+        FileComparison( cell_type_results_file, "crypt/test/data/Crypt1dWithCellsAndGrowth/results.vizcelltypes").CompareFiles();
 
         std::string elem_results_file = output_file_handler.GetOutputDirectoryFullPath() + "results_from_time_0/results.vizelements";
-        TS_ASSERT_EQUALS(system(("diff " + elem_results_file + " crypt/test/data/Crypt1dWithCellsAndGrowth/results.vizelements").c_str()), 0);
+        FileComparison( elem_results_file, "crypt/test/data/Crypt1dWithCellsAndGrowth/results.vizelements").CompareFiles();
     }
 
 
@@ -965,7 +966,7 @@ public:
         parameter_file->close();
 
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "crypt_sim_1d_results.parameters  crypt/test/data/TestCryptSimulationOutputParameters/crypt_sim_1d_results.parameters").c_str()), 0);
+        FileComparison( results_dir + "crypt_sim_1d_results.parameters", "crypt/test/data/TestCryptSimulationOutputParameters/crypt_sim_1d_results.parameters").CompareFiles();
 
         ///\todo check output of simulator.OutputSimulationSetup();
     }

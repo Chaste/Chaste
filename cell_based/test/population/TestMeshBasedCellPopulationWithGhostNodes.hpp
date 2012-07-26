@@ -50,6 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WildTypeCellMutationState.hpp"
 #include "SmartPointers.hpp"
 #include "CellId.hpp"
+#include "FileComparison.hpp"
 
 class TestMeshBasedCellPopulationWithGhostNodes : public AbstractCellBasedTestSuite
 {
@@ -812,13 +813,13 @@ public:
         // Compare output with saved files of what they should look like
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizelements   cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/results.vizelements").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.viznodes      cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/results.viznodes").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizcelltypes  cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/results.vizcelltypes").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellpopulationareas.dat       cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/cellpopulationareas.dat").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellareas.dat         cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/cellareas.dat").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "voronoi.dat           cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/voronoi.dat").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizancestors   cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/results.vizancestors").c_str()), 0);
+        FileComparison( results_dir + "results.vizelements", "cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/results.vizelements").CompareFiles();
+        FileComparison( results_dir + "results.viznodes", "cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/results.viznodes").CompareFiles();
+        FileComparison( results_dir + "results.vizcelltypes", "cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/results.vizcelltypes").CompareFiles();
+        FileComparison( results_dir + "cellpopulationareas.dat", "cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/cellpopulationareas.dat").CompareFiles();
+        FileComparison( results_dir + "cellareas.dat", "cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/cellareas.dat").CompareFiles();
+        FileComparison( results_dir + "voronoi.dat", "cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/voronoi.dat").CompareFiles();
+        FileComparison( results_dir + "results.vizancestors", "cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/results.vizancestors").CompareFiles();
 
         // Test the GetCellMutationStateCount function: there should only be healthy cells
         std::vector<unsigned> cell_mutation_states = cell_population.GetCellMutationStateCount();
@@ -843,7 +844,7 @@ public:
         parameter_file->close();
 
         // Compare output with saved files of what they should look like
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.parameters         cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/results.parameters").c_str()), 0);
+        FileComparison( results_dir + "results.parameters", "cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/results.parameters").CompareFiles();
     }
 
     void TestVoronoiAreasAndPerimetersWithGhostNodes() throw (Exception)

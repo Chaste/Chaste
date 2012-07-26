@@ -52,6 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WildTypeCellMutationState.hpp"
 #include "SmartPointers.hpp"
 #include "CellLabel.hpp"
+#include "FileComparison.hpp"
 
 class TestMultipleCaBasedCellPopulation : public AbstractCellBasedTestSuite
 {
@@ -335,13 +336,13 @@ public:
         // Compare output with saved files of what they should look like
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.viznodes     cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/results.viznodes").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizlocations     cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/results.vizlocations").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizcelltypes     cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/results.vizcelltypes").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.vizancestors     cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/results.vizancestors").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellmutationstates.dat     cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/cellmutationstates.dat").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellages.dat     cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/cellages.dat").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "cellareas.dat     cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/cellareas.dat").c_str()), 0);
+        FileComparison( results_dir + "results.viznodes", "cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/results.viznodes").CompareFiles();
+        FileComparison( results_dir + "results.vizlocations", "cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/results.vizlocations").CompareFiles();
+        FileComparison( results_dir + "results.vizcelltypes", "cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/results.vizcelltypes").CompareFiles();
+        FileComparison( results_dir + "results.vizancestors", "cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/results.vizancestors").CompareFiles();
+        FileComparison( results_dir + "cellmutationstates.dat", "cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/cellmutationstates.dat").CompareFiles();
+        FileComparison( results_dir + "cellages.dat", "cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/cellages.dat").CompareFiles();
+        FileComparison( results_dir + "cellareas.dat", "cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/cellareas.dat").CompareFiles();
 
         // Test that the cell population parameters are output correctly
         out_stream parameter_file = output_file_handler.OpenOutputFile("results.parameters");
@@ -351,7 +352,7 @@ public:
         parameter_file->close();
 
         // Compare output with saved files of what they should look like
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.parameters    cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/results.parameters").c_str()), 0);
+        FileComparison( results_dir + "results.parameters", "cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/results.parameters").CompareFiles();
 #ifdef CHASTE_VTK
         //Test that VTK writer has produced a file
         FileFinder vtk_file(results_dir + "results_0.vtu", RelativeTo::Absolute);

@@ -54,6 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellBasedEventHandler.hpp"
 #include "Warnings.hpp"
 #include "SmartPointers.hpp"
+#include "FileComparison.hpp"
 
 class TestCryptSimulation2dWithVertexBasedCellPopulation : public AbstractCellBasedTestSuite
 {
@@ -678,7 +679,7 @@ public:
         parameter_file->close();
 
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + results_dir + "vertex_crypt_sim_2d_results.parameters  crypt/test/data/TestVertexCryptSimulationOutputParameters/vertex_crypt_sim_2d_results.parameters").c_str()), 0);
+        FileComparison( results_dir + "vertex_crypt_sim_2d_results.parameters", "crypt/test/data/TestVertexCryptSimulationOutputParameters/vertex_crypt_sim_2d_results.parameters").CompareFiles();
 
         ///\todo check output of simulator.OutputSimulationSetup()
     }
@@ -843,8 +844,8 @@ public:
         std::string ancestor_results_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/results.vizancestors";
         std::string results_setup_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/results.vizsetup";
 
-        TS_ASSERT_EQUALS(system(("diff " + ancestor_results_file + " crypt/test/data/VertexCryptBetaCatenin/results.vizancestors").c_str()), 0);
-        TS_ASSERT_EQUALS(system(("diff " + results_setup_file + " crypt/test/data/VertexCryptBetaCatenin/results.vizsetup").c_str()), 0);
+        FileComparison( ancestor_results_file, "crypt/test/data/VertexCryptBetaCatenin/results.vizancestors").CompareFiles();
+        FileComparison( results_setup_file, "crypt/test/data/VertexCryptBetaCatenin/results.vizsetup").CompareFiles();
 
         // Tidy up
         WntConcentration<2>::Destroy();

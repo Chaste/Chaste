@@ -48,6 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
+#include "FileComparison.hpp"
 
 class TestCryptSimulationBoundaryCondition : public AbstractCellBasedTestSuite
 {
@@ -122,14 +123,14 @@ public:
         boundary_condition_parameter_file->close();
 
         std::string boundary_condition_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + boundary_condition_results_dir + "results1d.parameters crypt/test/data/TestCryptSimulationBoundaryCondition/results1d.parameters").c_str()), 0);
+        FileComparison( boundary_condition_results_dir + "results1d.parameters", "crypt/test/data/TestCryptSimulationBoundaryCondition/results1d.parameters").CompareFiles();
 
         // Test OutputCellPopulationBoundaryConditionInfo() method
         out_stream boundary_condition_info_file = output_file_handler.OpenOutputFile("results1d.info");
         boundary_condition.OutputCellPopulationBoundaryConditionInfo(boundary_condition_info_file);
         boundary_condition_info_file->close();
 
-        TS_ASSERT_EQUALS(system(("diff " + boundary_condition_results_dir + "results1d.info crypt/test/data/TestCryptSimulationBoundaryCondition/results1d.info").c_str()), 0);
+        FileComparison( boundary_condition_results_dir + "results1d.info", "crypt/test/data/TestCryptSimulationBoundaryCondition/results1d.info").CompareFiles();
     }
 
     void TestOutputParameters2d() throw(Exception)
@@ -145,14 +146,14 @@ public:
         boundary_condition_parameter_file->close();
 
         std::string boundary_condition_results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        TS_ASSERT_EQUALS(system(("diff " + boundary_condition_results_dir + "results2d.parameters crypt/test/data/TestCryptSimulationBoundaryCondition/results2d.parameters").c_str()), 0);
+        FileComparison( boundary_condition_results_dir + "results2d.parameters", "crypt/test/data/TestCryptSimulationBoundaryCondition/results2d.parameters").CompareFiles();
 
         // Test OutputCellPopulationBoundaryConditionInfo() method
         out_stream boundary_condition_info_file = output_file_handler.OpenOutputFile("results2d.info");
         boundary_condition.OutputCellPopulationBoundaryConditionInfo(boundary_condition_info_file);
         boundary_condition_info_file->close();
 
-        TS_ASSERT_EQUALS(system(("diff " + boundary_condition_results_dir + "results2d.info crypt/test/data/TestCryptSimulationBoundaryCondition/results2d.info").c_str()), 0);
+        FileComparison( boundary_condition_results_dir + "results2d.info", "crypt/test/data/TestCryptSimulationBoundaryCondition/results2d.info").CompareFiles();
     }
 
     void TestImposeBoundaryConditionWithNoWnt1d() throw(Exception)
