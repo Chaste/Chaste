@@ -77,6 +77,31 @@ public:
          */
         TS_ASSERT_EQUALS(mesh.GetNumCableElements(), 10u);
 
+        if (mesh.GetDistributedVectorFactory()->IsGlobalIndexLocal(55u))
+        {
+            // Should be a single cable; number 0
+            MixedDimensionMesh<2,2>::CableRangeAtNode cable_range = mesh.GetCablesAtNode(mesh.GetNode(55u));
+            MixedDimensionMesh<2,2>::NodeCableIterator iter = cable_range.first;
+            iter++;
+            TS_ASSERT(iter == cable_range.second);
+            TS_ASSERT_EQUALS(cable_range.first->second->GetIndex(), 0u);
+        }
+        if (mesh.GetDistributedVectorFactory()->IsGlobalIndexLocal(56u))
+        {
+            // Should be two cables; numbers 0 & 1
+            MixedDimensionMesh<2,2>::CableRangeAtNode cable_range = mesh.GetCablesAtNode(mesh.GetNode(56u));
+            MixedDimensionMesh<2,2>::NodeCableIterator iter = cable_range.first;
+            iter++;
+            iter++;
+            TS_ASSERT(iter == cable_range.second);
+            std::set<unsigned> indices;
+            indices.insert(cable_range.first->second->GetIndex());
+            indices.insert((++cable_range.first)->second->GetIndex());
+            TS_ASSERT_EQUALS(indices.size(), 2u);
+            TS_ASSERT(indices.find(0u) != indices.end());
+            TS_ASSERT(indices.find(1u) != indices.end());
+        }
+
         if (PetscTools::IsSequential())
         {
             TS_ASSERT_EQUALS(mesh.GetNumLocalCableElements(), 10u);

@@ -114,6 +114,11 @@ void MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader(Abstrac
             Element<1u, SPACE_DIM>* p_element = new Element<1u,SPACE_DIM>(element_index, nodes, false);
             RegisterCableElement(element_index);
             this->mCableElements.push_back(p_element);
+            for (unsigned node_index=0; node_index<p_element->GetNumNodes(); ++node_index)
+            {
+                mNodeToCablesMapping.insert(std::pair<Node<SPACE_DIM>*, Element<1u, SPACE_DIM>*>(
+                        p_element->GetNode(node_index), p_element));
+            }
 
             if (rMeshReader.GetNumCableElementAttributes() > 0)
             {
@@ -183,6 +188,12 @@ bool MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::CalculateDesignatedOwnershipOfC
     }
 }
 
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+typename MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::CableRangeAtNode MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::GetCablesAtNode(const Node<SPACE_DIM>* pNode)
+{
+    return mNodeToCablesMapping.equal_range(pNode);
+}
 
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

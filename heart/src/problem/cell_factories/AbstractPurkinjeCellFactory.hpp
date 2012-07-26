@@ -66,11 +66,15 @@ protected:
     /**
      * Create a purkinje-ventricular junction between the two cells provided.
      *
+     * @param pNode  the node in the mesh at which this junction is located
      * @param pPurkinjeCell  the Purkinje cell
      * @param pCardiacCell  the ventricular cell
      * @param resistance  the junction resistance, in kilo-Ohms
      */
-    void CreateJunction(AbstractCardiacCell* pPurkinjeCell, AbstractCardiacCell* pCardiacCell, double resistance);
+    void CreateJunction(const Node<SPACE_DIM>* pNode,
+                        AbstractCardiacCell* pPurkinjeCell,
+                        AbstractCardiacCell* pCardiacCell,
+                        double resistance);
 
 public:
 

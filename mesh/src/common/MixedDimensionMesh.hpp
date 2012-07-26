@@ -105,14 +105,29 @@ public:
      */
      bool CalculateDesignatedOwnershipOfCableElement( unsigned globalElementIndex );
 
+     /** Iterator type over #mNodeToCablesMapping. */
+     typedef typename std::multimap<const Node<SPACE_DIM>*, Element<1u, SPACE_DIM>*>::iterator NodeCableIterator;
+
+     /** The type returned by GetCablesAtNode. */
+     typedef std::pair<NodeCableIterator, NodeCableIterator> CableRangeAtNode;
+
+     /**
+      * Get the cables that are attached to the given node.
+      */
+     CableRangeAtNode GetCablesAtNode(const Node<SPACE_DIM>* pNode);
 
 private:
     /** The elements making up the 1D cables */
     std::vector<Element<1u, SPACE_DIM>*> mCableElements;
+
     /** The global number of cables over all processes*/
     unsigned mNumCableElements;
+
     /** A map from global cable index to local index used by this process. */
     std::map<unsigned, unsigned> mCableElementsMapping;
+
+    /** Records which cables are attached to each node. */
+    std::multimap<const Node<SPACE_DIM>*, Element<1u, SPACE_DIM>*> mNodeToCablesMapping;
 
     /** Needed for serialization.*/
     friend class boost::serialization::access;

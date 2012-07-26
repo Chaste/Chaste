@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractPurkinjeCellFactory.hpp"
 #include "PurkinjeVentricularJunctionStimulus.hpp"
 #include "MultiStimulus.hpp"
+#include "HeartConfig.hpp"
 
 
 
@@ -49,10 +50,28 @@ AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::AbstractPurkinjeCellFactory(
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::CreateJunction(AbstractCardiacCell* pPurkinjeCell,
+void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::CreateJunction(const Node<SPACE_DIM>* pNode,
+                                                                        AbstractCardiacCell* pPurkinjeCell,
                                                                         AbstractCardiacCell* pCardiacCell,
                                                                         double resistance)
 {
+    // Figure out the effective resistance for this mesh, in kOhm.cm^3
+    if (pNode) // Should always be provided apart from low-level tests!
+    {
+        assert(mpMixedDimensionMesh);
+        typedef typename MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>::CableRangeAtNode CableRangeAtNode;
+        CableRangeAtNode cable_range = mpMixedDimensionMesh->GetCablesAtNode(pNode);
+        double total_cross_sectional_area = 0.0;
+        for (typename MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>::NodeCableIterator iter=cable_range.first;
+             iter != cable_range.second;
+             ++iter)
+        {
+            Element<1u,SPACE_DIM>* p_cable = iter->second;
+            double cable_radius = p_cable->GetAttribute();
+            total_cross_sectional_area += M_PI*cable_radius*cable_radius;
+        }
+        resistance *= total_cross_sectional_area / HeartConfig::Instance()->GetPurkinjeSurfaceAreaToVolumeRatio();
+    }
     // Create the junction stimuli, and associate them with the cells
     boost::shared_ptr<PurkinjeVentricularJunctionStimulus> p_pvj_ventricular_stim(new PurkinjeVentricularJunctionStimulus(resistance));
     boost::shared_ptr<PurkinjeVentricularJunctionStimulus> p_pvj_purkinje_stim(new PurkinjeVentricularJunctionStimulus(resistance));
