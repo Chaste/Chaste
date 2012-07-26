@@ -334,13 +334,13 @@ public:
         //Expected resulting deformed location of Node 4.
         c_vector<double, 4> x;
         c_vector<double, 4> y;
-        x[0] = 0.8730;
-        x[1] = 0.8855;
-        x[2] = 0.9356;
+        x[0] = 0.9732;
+        x[1] = 0.9759;
+        x[2] = 0.9865;
         x[3] = 1.0; //Note, for cross_tension == 1.0 there should be no deformation of the tissue square (tensions balance)
-        y[0] = -0.0867;
-        y[1] = -0.0774;
-        y[2] = -0.0412;
+        y[0] = -0.0156;
+        y[1] = -0.0140;
+        y[2] = -0.0077;
         y[3] = 0.0;
 
         for(unsigned i=0; i < tension_fractions.size();i++)
@@ -353,12 +353,11 @@ public:
             // NONPHYSIOL1 => NonphysiologicalContractionModel 1
             IncompressibleExplicitSolver2d solver(NONPHYSIOL1,mesh,problem_defn,"TestExplicitCardiacMech");
 
-            //The following lines are not relevant to this test but need to be there
-            TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
+            // The following lines are not relevant to this test but need to be there
+            // as the solver is expecting an electrics node to be paired up with each mechanics node.
+            TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//electrics ignored in this test
             p_fine_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0);
-            TetrahedralMesh<2,2>* p_coarse_mesh = new TetrahedralMesh<2,2>();//unused in this test
-            p_coarse_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0);
-            FineCoarseMeshPair<2>* p_pair = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh);//also unused in this test
+            FineCoarseMeshPair<2>* p_pair = new FineCoarseMeshPair<2>(*p_fine_mesh, mesh);
             p_pair->SetUpBoxesOnFineMesh();
             p_pair->ComputeFineElementsAndWeightsForCoarseQuadPoints(*(solver.GetQuadratureRule()), false);
             p_pair->DeleteFineBoxCollection();
@@ -381,12 +380,11 @@ public:
             solver.Solve(0.24,0.25,0.01);
 
 //// These fail due to changes from #2185 but no point fixing as these numbers will change later anyway (#2180)
-//            TS_ASSERT_DELTA(solver.rGetDeformedPosition()[4](0),  x[i], 1e-3);
-//            TS_ASSERT_DELTA(solver.rGetDeformedPosition()[4](1), y[i], 1e-3);
+            TS_ASSERT_DELTA(solver.rGetDeformedPosition()[4](0), x[i], 1e-3);
+            TS_ASSERT_DELTA(solver.rGetDeformedPosition()[4](1), y[i], 1e-3);
 
             //in need of deletion even if all these 3 have no influence at all on this test
             delete p_fine_mesh;
-            delete p_coarse_mesh;
             delete p_pair;
         }
     }

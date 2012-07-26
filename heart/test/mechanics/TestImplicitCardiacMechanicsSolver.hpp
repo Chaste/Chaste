@@ -636,6 +636,90 @@ public:
         delete p_pair;
     }
 
+    void TestCrossFibreTensionWithSimpleContractionModel() throw(Exception)
+    {
+        QuadraticMesh<2> mesh(0.25, 1.0, 1.0);
+        MooneyRivlinMaterialLaw<2> law(1);
+
+        std::vector<unsigned> fixed_nodes
+        = NonlinearElasticityTools<2>::GetNodesByComponentValue(mesh,0,0.0);
+
+        ElectroMechanicsProblemDefinition<2> problem_defn(mesh);
+        problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
+        problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+        problem_defn.SetContractionModel(NHS,0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+        problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+
+
+        //Cross fibre tension fractions to be tested
+        c_vector<double, 4> tension_fractions;
+        tension_fractions[0] = 0.0;
+        tension_fractions[1] = 0.1;
+        tension_fractions[2] = 0.5;
+        tension_fractions[3] = 1.0;
+
+        //Expected resulting deformed location of Node 4.
+        c_vector<double, 4> x;
+        c_vector<double, 4> y;
+        x[0] = 0.9984;
+        x[1] = 0.9985;
+        x[2] = 0.9990;
+        x[3] = 1.0; //Note, for cross_tension == 1.0 there should be no deformation of the tissue square (tensions balance)
+        y[0] = -0.0013;
+        y[1] = -0.0013;
+        y[2] = -0.0008;
+        y[3] = 0.0;
+
+        for(unsigned i=0; i < tension_fractions.size();i++)
+        {
+            problem_defn.SetApplyCrossFibreTension(true,tension_fractions[i]);
+
+            TS_ASSERT_EQUALS(problem_defn.GetApplyCrossFibreTension(), true);
+            TS_ASSERT_DELTA(problem_defn.GetCrossFibreTensionFraction(),tension_fractions[i], 1e-6);
+
+            // NONPHYSIOL1 => NonphysiologicalContractionModel 1
+            IncompressibleImplicitSolver2d solver(NHS,mesh,problem_defn,"TestImplicitCardiacMech");
+
+            // The following lines are not relevant to this test but need to be there
+            // as the solver is expecting an electrics node to be paired up with each mechanics node.
+            TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//electrics ignored in this test
+            p_fine_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0);
+            FineCoarseMeshPair<2>* p_pair = new FineCoarseMeshPair<2>(*p_fine_mesh, mesh);
+            p_pair->SetUpBoxesOnFineMesh();
+            p_pair->ComputeFineElementsAndWeightsForCoarseQuadPoints(*(solver.GetQuadratureRule()), false);
+            p_pair->DeleteFineBoxCollection();
+            solver.SetFineCoarseMeshPair(p_pair);
+            ///////////////////////////////////////////////////////////////////////////
+            solver.Initialise();
+
+            // Set up a voltage and calcium level at each quadrature point.
+            QuadraturePointsGroup<2> quad_points(mesh, *(solver.GetQuadratureRule()));
+            std::vector<double> calcium_conc(solver.GetTotalNumQuadPoints());
+            for(unsigned j=0; j<calcium_conc.size(); j++)
+            {
+                double X = quad_points.Get(j)(0);
+                // 0.0002 is the initial Ca conc in Lr91, 0.001 is the greatest Ca conc
+                // value in one of the Lr91 TestIonicModel tests
+                calcium_conc[j] = 0.0005 + 0.001*X;
+            }
+            std::vector<double> voltages(solver.GetTotalNumQuadPoints(), 0.0);
+            solver.SetCalciumAndVoltage(calcium_conc, voltages);
+
+            // solve UP TO t=0. So Ta(lam_n,t_{n+1})=5*sin(0)=0, ie no deformation
+            solver.Solve(-0.01,0.0,0.01);
+            TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(),0u);
+
+            //solver.Solve(0.24,0.25,0.01);
+            solver.Solve(0.0,2,0.01);
+//// These fail due to changes from #2185 but no point fixing as these numbers will change later anyway (#2180)
+            TS_ASSERT_DELTA(solver.rGetDeformedPosition()[4](0),  x[i], 1e-3);
+            TS_ASSERT_DELTA(solver.rGetDeformedPosition()[4](1), y[i], 1e-3);
+
+            // clean up memory
+            delete p_fine_mesh;
+            delete p_pair;
+        }
+    }
 
 
 //    //
