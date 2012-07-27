@@ -402,7 +402,7 @@ private:
         OutputFileHandler handler(rNewArchiveDir, false);
         std::string ref_archive = handler.GetChasteTestOutputDirectory() + rRefArchiveDir + "/archive.arch";
         std::string my_archive = handler.GetOutputDirectoryFullPath() + "archive.arch";
-        FileComparison(ref_archive, my_archive).CompareFiles();
+        TS_ASSERT(FileComparison(ref_archive, my_archive).CompareFiles());
         //THIS WON'T WORK WITH DIFFERENT VERSIONS OF BOOST:
 #ifndef BOOST_VERSION
         TS_FAIL("This test needs to know the version of Boost with which it was compiled.");
@@ -426,7 +426,9 @@ cp /tmp/$USER/testoutput/TestMigrateAfterSolve/archive.arch.0 ./heart/test/data/
 scons test_suite=heart/test/TestCardiacSimulationArchiver.hpp
 cp /tmp/$USER/testoutput/TestLoadAsSequentialWithBathAndDistributedMesh/archive.arch.0 ./heart/test/data/checkpoint_migration_with_bath_and_distributed_mesh/reference_0_archive
              */
-            FileComparison(rArchiveDirectory.GetAbsolutePath() + "reference_0_archive ", my_archive + ".0").CompareFiles();
+            //Not a collective call in general, but we only do this one in serial
+            FileComparison comp(rArchiveDirectory.GetAbsolutePath() + "reference_0_archive", my_archive + ".0");
+            TS_ASSERT(comp.CompareFiles());
         }
 #endif
 
