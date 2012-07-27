@@ -77,10 +77,7 @@ private:
 
     /**
      * The cell differentiates when the beta-catenin level drops
-     * below this value. It is hard coded in
-     * Initialise() because there are so many constructors.
-     *
-     * Set and Get methods are also provided.
+     * below this value. Initialised to a Magic Number!
      */
     double mBetaCateninDivisionThreshold;
 

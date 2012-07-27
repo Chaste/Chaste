@@ -37,7 +37,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SingleOdeWntCellCycleModel.hpp"
 
 SingleOdeWntCellCycleModel::SingleOdeWntCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
-    : CellCycleModelOdeHandler(DOUBLE_UNSET, pOdeSolver)
+    : CellCycleModelOdeHandler(DOUBLE_UNSET, pOdeSolver),
+      mBetaCateninDivisionThreshold(100)// MAGIC NUMBER!
 {
     if (mpOdeSolver == boost::shared_ptr<AbstractCellCycleModelOdeSolver>())
     {
@@ -116,7 +117,7 @@ void SingleOdeWntCellCycleModel::Initialise()
     mpOdeSystem->SetStateVariables(mpOdeSystem->GetInitialConditions());
 
     // MAGIC NUMBER!
-    mBetaCateninDivisionThreshold = 100.0;
+    //mBetaCateninDivisionThreshold = 100.0;
 
     // This call actually sets up the G1 phase to something sensible (random number generated)
     SimpleWntCellCycleModel::Initialise();
