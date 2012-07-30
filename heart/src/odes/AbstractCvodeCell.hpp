@@ -70,12 +70,6 @@ private:
     /** The maximum timestep to use. */
     double mMaxDt;
 
-    /** A standard vector of state variables for use with tissue assemblers */
-    std::vector<double> mStdVecStateVariables;
-
-    /** A method to update the std::vector of state variables from the internal N_Vector */
-    void UpdateStdVectorStateVars();
-
 public:
     /**
      * Create a new cardiac cell.
