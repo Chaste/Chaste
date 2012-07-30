@@ -63,7 +63,7 @@ AbstractCvodeCell::~AbstractCvodeCell()
 double AbstractCvodeCell::GetVoltage()
 {
     assert(mStateVariables);
-    return GetAnyVariable(mVoltageIndex);
+    return AbstractCvodeSystem::GetAnyVariable(mVoltageIndex);
 }
 
 void AbstractCvodeCell::SetVoltage(double voltage)
@@ -116,6 +116,59 @@ void AbstractCvodeCell::SetVoltageDerivativeToZero(bool clamp)
         ResetSolver();
     }
     AbstractCardiacCellInterface::SetVoltageDerivativeToZero(clamp);
+}
+
+unsigned AbstractCvodeCell::GetNumberOfStateVariables() const
+{
+    return AbstractCvodeSystem::GetNumberOfStateVariables();
+}
+
+unsigned AbstractCvodeCell::GetNumberOfParameters() const
+{
+    return AbstractCvodeSystem::GetNumberOfParameters();
+}
+
+std::vector<double> AbstractCvodeCell::GetStdVecStateVariables()
+{
+    std::vector<double> state_variables(GetNumberOfStateVariables());
+    CopyToStdVector(AbstractCvodeSystem::rGetStateVariables(), state_variables);
+    return state_variables;
+}
+
+void AbstractCvodeCell::SetStateVariables(const std::vector<double>& rVariables)
+{
+    N_Vector vars = MakeNVector(rVariables);
+    AbstractCvodeSystem::SetStateVariables(vars);
+}
+
+void AbstractCvodeCell::SetStateVariables(const N_Vector& rVariables)
+{
+    AbstractCvodeSystem::SetStateVariables(rVariables);
+}
+
+double AbstractCvodeCell::GetAnyVariable(const std::string& rName, double time)
+{
+    return AbstractCvodeSystem::GetAnyVariable(rName,time);
+}
+
+double AbstractCvodeCell::GetParameter(const std::string& rParameterName)
+{
+    return AbstractCvodeSystem::GetParameter(rParameterName);
+}
+
+double AbstractCvodeCell::GetParameter(unsigned parameterIndex)
+{
+    return AbstractCvodeSystem::GetParameter(parameterIndex);
+}
+
+void AbstractCvodeCell::SetParameter(const std::string& rParameterName, double value)
+{
+    AbstractCvodeSystem::SetParameter(rParameterName,value);
+}
+
+void AbstractCvodeCell::SetParameter(unsigned parameterIndex, double value)
+{
+    AbstractCvodeSystem::SetParameter(parameterIndex,value);
 }
 
 

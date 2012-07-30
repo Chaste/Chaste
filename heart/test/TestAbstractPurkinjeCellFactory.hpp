@@ -59,7 +59,7 @@ public:
     {
     }
 
-    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned node)
+    AbstractCardiacCellInterface* CreateCardiacCellForTissueNode(unsigned node)
     {
         ChastePoint<2> location = GetMesh()->GetNode(node)->GetPoint();
 
@@ -73,8 +73,8 @@ public:
         }
     }
 
-    AbstractCardiacCell* CreatePurkinjeCellForTissueNode(unsigned node,
-                                                         AbstractCardiacCell* pCardiacCell)
+    AbstractCardiacCellInterface* CreatePurkinjeCellForTissueNode(unsigned node,
+                                                         AbstractCardiacCellInterface* pCardiacCell)
     {
         return new CellDiFrancescoNoble1985FromCellML(mpSolver, mpZeroStimulus);
     }
@@ -100,7 +100,7 @@ public:
              ++current_node)
         {
             unsigned index = current_node->GetIndex();
-            AbstractCardiacCell* p_cell = cell_factory.CreatePurkinjeCellForNode(index, NULL);
+            AbstractCardiacCellInterface* p_cell = cell_factory.CreatePurkinjeCellForNode(index, NULL);
             double y = current_node->rGetLocation()[1];
 
             // cable nodes are on y=0.05 (we don't test by index because indices may be permuted in parallel).

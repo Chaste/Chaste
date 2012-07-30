@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FakeBathCell.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractCardiacCell*  AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>::CreateCardiacCellForNode(
+AbstractCardiacCellInterface*  AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>::CreateCardiacCellForNode(
     unsigned nodeIndex)
 {
     if (HeartRegionCode::IsRegionBath( mpMesh->GetNodeOrHaloNode(nodeIndex)->GetRegion() ))
@@ -52,7 +52,7 @@ AbstractCardiacCell*  AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>::CreateC
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>::FinaliseCellCreation(
-    std::vector< AbstractCardiacCell* >* pCellsDistributed,
+    std::vector< AbstractCardiacCellInterface* >* pCellsDistributed,
     unsigned lo,
     unsigned hi)
 {

@@ -707,11 +707,9 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::WriteExtraVariab
              index!= distributed_var_data.End();
              ++index)
         {
-            // Find the variable in the cell model
-            AbstractCardiacCell* p_cell = this->mpCardiacTissue->GetCardiacCell(index.Global);
-            unsigned cell_id = p_cell->GetAnyVariableIndex(output_variables[var_index]);
-            // Store its value
-            distributed_var_data[index] = p_cell->GetAnyVariable(cell_id, mCurrentTime);
+            // Find the variable in the cell model and store its value
+            distributed_var_data[index] = this->mpCardiacTissue->GetCardiacCell(index.Global)->
+                                                GetAnyVariable(output_variables[var_index], mCurrentTime);
         }
         distributed_var_data.Restore();
 

@@ -140,7 +140,7 @@ private:
     ReplicatableVector mIntracellularStimulusCacheReplicatedSecondCell;
 
     /** The vector of cells (the second one). Distributed. */
-    std::vector< AbstractCardiacCell* > mCellsDistributedSecondCell;
+    std::vector< AbstractCardiacCellInterface* > mCellsDistributedSecondCell;
 
     /** The vector of stimuli for the extracellular stimulus. Distributed. */
     std::vector<boost::shared_ptr<AbstractStimulusFunction> > mExtracellularStimuliDistributed;
@@ -224,7 +224,7 @@ public:
      * @param pMesh  a pointer to the AbstractTetrahedral mesh (recovered from archive).
      * @param intracellularConductivitiesSecondCell a vector with the orthotropic conductivities for the second cell (this is needed because the second cell values may not be taken from HeartConfig as the the ones for the first cell are).
      */
-    ExtendedBidomainTissue(std::vector<AbstractCardiacCell*> & rCellsDistributed, std::vector<AbstractCardiacCell*> & rSecondCellsDistributed, std::vector<boost::shared_ptr<AbstractStimulusFunction> > & rExtraStimuliDistributed, std::vector<double>& rGgapsDistributed, AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>* pMesh, c_vector<double, SPACE_DIM>  intracellularConductivitiesSecondCell);
+    ExtendedBidomainTissue(std::vector<AbstractCardiacCellInterface*> & rCellsDistributed, std::vector<AbstractCardiacCellInterface*> & rSecondCellsDistributed, std::vector<boost::shared_ptr<AbstractStimulusFunction> > & rExtraStimuliDistributed, std::vector<double>& rGgapsDistributed, AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>* pMesh, c_vector<double, SPACE_DIM>  intracellularConductivitiesSecondCell);
 
     /**
      * Destructor
@@ -243,7 +243,7 @@ public:
      *
      * @param globalIndex the global index in the mesh
      */
-    AbstractCardiacCell* GetCardiacSecondCell( unsigned globalIndex );
+    AbstractCardiacCellInterface* GetCardiacSecondCell( unsigned globalIndex );
 
 
     /**
@@ -256,7 +256,7 @@ public:
     /**
      *  Returns a reference to the vector of distributed cells (second cell). Needed for archiving.
      */
-    const std::vector<AbstractCardiacCell*>& rGetSecondCellsDistributed() const;
+    const std::vector<AbstractCardiacCellInterface*>& rGetSecondCellsDistributed() const;
 
     /**
      *  Returns a reference to the vector of distributed values of Ggaps. Needed for archiving.
@@ -420,8 +420,8 @@ public:
      void SaveExtendedBidomainCells(Archive & archive, const unsigned int version) const
      {
          Archive& r_archive = *ProcessSpecificArchive<Archive>::Get();
-         const std::vector<AbstractCardiacCell*> & r_cells_distributed = this->rGetCellsDistributed();
-         const std::vector<AbstractCardiacCell*> & r_cells_distributed_second_cell = rGetSecondCellsDistributed();
+         const std::vector<AbstractCardiacCellInterface*> & r_cells_distributed = this->rGetCellsDistributed();
+         const std::vector<AbstractCardiacCellInterface*> & r_cells_distributed_second_cell = rGetSecondCellsDistributed();
          const std::vector<double> & r_ggaps_distributed = rGetGapsDistributed();
 
          r_archive & this->mpDistributedVectorFactory; // Needed when loading
@@ -463,8 +463,8 @@ public:
       */
      template<class Archive>
      static void LoadExtendedBidomainCells(Archive & archive, const unsigned int version,
-                                  std::vector<AbstractCardiacCell*>& rCells,
-                                  std::vector<AbstractCardiacCell*>& rSecondCells,
+                                  std::vector<AbstractCardiacCellInterface*>& rCells,
+                                  std::vector<AbstractCardiacCellInterface*>& rSecondCells,
                                   std::vector<double>& rGgaps,
                                   AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>* pMesh)
      {
@@ -518,8 +518,8 @@ public:
  #endif // CHASTE_CAN_CHECKPOINT_DLLS
              }
 
-             AbstractCardiacCell* p_cell;
-             AbstractCardiacCell* p_second_cell;
+             AbstractCardiacCellInterface* p_cell;
+             AbstractCardiacCellInterface* p_second_cell;
              double g_gap;
              archive & p_cell;
              archive & p_second_cell;
@@ -670,8 +670,8 @@ public:
      }
 
 
-     std::vector<AbstractCardiacCell*> cells_distributed;
-     std::vector<AbstractCardiacCell*> cells_distributed_second_cell;
+     std::vector<AbstractCardiacCellInterface*> cells_distributed;
+     std::vector<AbstractCardiacCellInterface*> cells_distributed_second_cell;
      std::vector<boost::shared_ptr<AbstractStimulusFunction> > extra_stim;
      std::vector<double> g_gaps;
      AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>* p_mesh;

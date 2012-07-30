@@ -157,7 +157,7 @@ public:
     }
 
     AbstractCardiacCell* CreatePurkinjeCellForTissueNode(unsigned node,
-                                                         AbstractCardiacCell* pCardiacCell)
+                                                         AbstractCardiacCellInterface* pCardiacCell)
     {
         return new CellDiFrancescoNoble1985FromCellML(mpSolver, mpZeroStimulus);
     }
@@ -293,13 +293,13 @@ public:
 
         if (mesh.GetDistributedVectorFactory()->IsGlobalIndexLocal(0))
         {
-            AbstractCardiacCell* cell = monodomain_tissue.GetCardiacCell(0);
+            AbstractCardiacCellInterface* cell = monodomain_tissue.GetCardiacCell(0);
             TS_ASSERT_DELTA(cell->GetStimulus(0.001),-80,1e-10);
         }
 
         if (mesh.GetDistributedVectorFactory()->IsGlobalIndexLocal(1))
         {
-            AbstractCardiacCell* cell = monodomain_tissue.GetCardiacCell(1);
+            AbstractCardiacCellInterface* cell = monodomain_tissue.GetCardiacCell(1);
             TS_ASSERT_DELTA(cell->GetStimulus(0.001),0,1e-10);
         }
     }
@@ -411,14 +411,14 @@ public:
                 it != mesh.GetHaloNodeIteratorEnd();
                 ++it)
         {
-            AbstractCardiacCell* cell = monodomain_tissue.GetCardiacCellOrHaloCell( (*it)->GetIndex() );
+            AbstractCardiacCellInterface* cell = monodomain_tissue.GetCardiacCellOrHaloCell( (*it)->GetIndex() );
             TS_ASSERT_DELTA(cell->GetStimulus(0.001),0,1e-10);
         }
 
         if ( PetscTools::AmMaster() )
         {
             // Master owns node 0
-            AbstractCardiacCell* cell = monodomain_tissue.GetCardiacCellOrHaloCell(0);
+            AbstractCardiacCellInterface* cell = monodomain_tissue.GetCardiacCellOrHaloCell(0);
             TS_ASSERT_DELTA(cell->GetStimulus(0.001), -80.0, 1e-10);
         }
         else
@@ -544,7 +544,7 @@ public:
             tensor_before_archiving = monodomain_tissue.rGetIntracellularConductivityTensor(1);
 
             // Get some info about the first cell on this process (if any)
-            const std::vector<AbstractCardiacCell*>& r_cells = monodomain_tissue.rGetCellsDistributed();
+            const std::vector<AbstractCardiacCellInterface*>& r_cells = monodomain_tissue.rGetCellsDistributed();
             has_cell = !r_cells.empty();
             if (has_cell)
             {
@@ -584,7 +584,7 @@ public:
             TS_ASSERT_DIFFERS(saved_printing_timestep, default_printing_timestep); // Test we are testing something in case default changes
 
             // Test cardiac cells have also been archived
-            const std::vector<AbstractCardiacCell*>& r_cells = p_monodomain_tissue->rGetCellsDistributed();
+            const std::vector<AbstractCardiacCellInterface*>& r_cells = p_monodomain_tissue->rGetCellsDistributed();
             TS_ASSERT_EQUALS(has_cell, !r_cells.empty());
             if (has_cell)
             {
@@ -619,7 +619,7 @@ public:
              ++current_node)
         {
             unsigned global_index = current_node->GetIndex();
-            AbstractCardiacCell* p_purkinje_cell = tissue.GetPurkinjeCell(global_index);
+            AbstractCardiacCellInterface* p_purkinje_cell = tissue.GetPurkinjeCell(global_index);
             double y = current_node->rGetLocation()[1];
 
             // cable nodes are on y=0.05 (we don't test by index because indices may be permuted in parallel).
@@ -672,7 +672,7 @@ public:
                  ++current_node)
             {
                 unsigned global_index = current_node->GetIndex();
-                AbstractCardiacCell* p_purkinje_cell = p_tissue->GetPurkinjeCell(global_index);
+                AbstractCardiacCellInterface* p_purkinje_cell = p_tissue->GetPurkinjeCell(global_index);
                 double y = current_node->rGetLocation()[1];
 
                 // cable nodes are on y=0.05 (we don't test by index because indices may be permuted in parallel).

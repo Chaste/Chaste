@@ -70,7 +70,7 @@ public:
      * @param node  The global index of a node
      * @return  A cardiac cell which corresponds to this node.
      */
-    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned node)
+    AbstractCardiacCellInterface* CreateCardiacCellForTissueNode(unsigned node)
     {
         double x = this->GetMesh()->GetNode(node)->GetPoint()[0];
 

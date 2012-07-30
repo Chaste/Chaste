@@ -108,7 +108,7 @@ HeartConfigRelatedCellFactory<SPACE_DIM>::~HeartConfigRelatedCellFactory()
 }
 
 template<unsigned SPACE_DIM>
-AbstractCardiacCell* HeartConfigRelatedCellFactory<SPACE_DIM>::CreateCellWithIntracellularStimulus(
+AbstractCardiacCellInterface* HeartConfigRelatedCellFactory<SPACE_DIM>::CreateCellWithIntracellularStimulus(
         boost::shared_ptr<AbstractStimulusFunction> intracellularStimulus,
         unsigned nodeIndex)
 {
@@ -125,7 +125,7 @@ AbstractCardiacCell* HeartConfigRelatedCellFactory<SPACE_DIM>::CreateCellWithInt
         }
     }
 
-    AbstractCardiacCell* p_cell = NULL;
+    AbstractCardiacCellInterface* p_cell = NULL;
 
     if (ionic_model.Dynamic().present())
     {
@@ -137,11 +137,10 @@ AbstractCardiacCell* HeartConfigRelatedCellFactory<SPACE_DIM>::CreateCellWithInt
 #endif // CHASTE_CAN_CHECKPOINT_DLLS
         // Load model from shared library
         DynamicCellModelLoaderPtr p_loader = LoadDynamicModel(ionic_model, false);
-        AbstractCardiacCellInterface* p_loaded_cell = p_loader->CreateCell(this->mpSolver, intracellularStimulus);
-        p_cell = dynamic_cast<AbstractCardiacCell*>(p_loaded_cell);
-        if (!p_cell)
+        p_cell = p_loader->CreateCell(this->mpSolver, intracellularStimulus);
+        if (!dynamic_cast<AbstractCardiacCell*>(p_cell))
         {
-            delete p_loaded_cell;
+            delete p_cell;
             EXCEPTION("CVODE cannot be used as a cell model solver in tissue simulations: do not use the --cvode flag.");
         }
     }
@@ -254,7 +253,7 @@ AbstractCardiacCell* HeartConfigRelatedCellFactory<SPACE_DIM>::CreateCellWithInt
 
 
 template<unsigned SPACE_DIM>
-void HeartConfigRelatedCellFactory<SPACE_DIM>::SetCellParameters(AbstractCardiacCell* pCell,
+void HeartConfigRelatedCellFactory<SPACE_DIM>::SetCellParameters(AbstractCardiacCellInterface* pCell,
                                                                  unsigned nodeIndex)
 {
     // Special case for backwards-compatibility: scale factors
@@ -287,7 +286,7 @@ void HeartConfigRelatedCellFactory<SPACE_DIM>::SetCellParameters(AbstractCardiac
              ++it)
         {
             const std::string param_name = it->first + "_conductance";
-            if (pCell->HasParameter(param_name))
+            if (dynamic_cast<AbstractUntemplatedParameterisedSystem*>(pCell)->HasParameter(param_name))
             {
                 const double original_conductance = pCell->GetParameter(param_name);
                 const double ic50 = it->second.first;
@@ -313,8 +312,7 @@ void HeartConfigRelatedCellFactory<SPACE_DIM>::SetCellParameters(AbstractCardiac
                  param_it != mParameterSettings[ht_index].end();
                  ++param_it)
             {
-                unsigned param_index = pCell->GetParameterIndex(param_it->first);
-                pCell->SetParameter(param_index, param_it->second);
+                pCell->SetParameter(param_it->first, param_it->second);
             }
         }
     }
@@ -322,7 +320,7 @@ void HeartConfigRelatedCellFactory<SPACE_DIM>::SetCellParameters(AbstractCardiac
 
 
 template<unsigned SPACE_DIM>
-void HeartConfigRelatedCellFactory<SPACE_DIM>::SetCellIntracellularStimulus(AbstractCardiacCell* pCell,
+void HeartConfigRelatedCellFactory<SPACE_DIM>::SetCellIntracellularStimulus(AbstractCardiacCellInterface* pCell,
                                                                             unsigned nodeIndex)
 {
     boost::shared_ptr<MultiStimulus> node_specific_stimulus(new MultiStimulus());
@@ -341,7 +339,7 @@ void HeartConfigRelatedCellFactory<SPACE_DIM>::SetCellIntracellularStimulus(Abst
 
 
 template<unsigned SPACE_DIM>
-AbstractCardiacCell* HeartConfigRelatedCellFactory<SPACE_DIM>::CreateCardiacCellForTissueNode(unsigned nodeIndex)
+AbstractCardiacCellInterface* HeartConfigRelatedCellFactory<SPACE_DIM>::CreateCardiacCellForTissueNode(unsigned nodeIndex)
 {
     boost::shared_ptr<MultiStimulus> node_specific_stimulus(new MultiStimulus());
 

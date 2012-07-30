@@ -52,7 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileFinder.hpp"
 #include "PetscTools.hpp"
 #include "HeartEventHandler.hpp"
-#include "AbstractCardiacCell.hpp"
+#include "AbstractCardiacCellInterface.hpp"
 #include "DistributedVectorFactory.hpp"
 #include "Warnings.hpp"
 #include "CellMLToSharedLibraryConverter.hpp"
@@ -113,7 +113,7 @@ public:
                  node_global_index < p_vector_factory->GetHigh();
                  node_global_index++)
             {
-                AbstractCardiacCell* p_cell = p_mono_problem->GetTissue()->GetCardiacCell(node_global_index);
+                AbstractCardiacCellInterface* p_cell = p_mono_problem->GetTissue()->GetCardiacCell(node_global_index);
                 TS_ASSERT_DELTA(p_cell->GetParameter("membrane_fast_sodium_current_conductance"), 23 * 0.99937539038101175, 1e-6);
                 TS_ASSERT_DELTA(p_cell->GetParameter("membrane_rapid_delayed_rectifier_potassium_current_conductance"), 0.282/3.0, 1e-6);
             }
@@ -370,7 +370,7 @@ public:
         CardiacSimulation simulation(rParametersFileName);
     }
 
-    void checkParameter(AbstractCardiacCell* pCell, unsigned globalIndex)
+    void checkParameter(AbstractCardiacCellInterface* pCell, unsigned globalIndex)
     {
         // Check parameter has been set in the central region
         TS_ASSERT_EQUALS(pCell->GetNumberOfParameters(), 2u);
@@ -429,7 +429,7 @@ public:
                  node_global_index < p_vector_factory->GetHigh();
                  node_global_index++)
             {
-                AbstractCardiacCell* p_cell = p_mono_problem->GetTissue()->GetCardiacCell(node_global_index);
+                AbstractCardiacCellInterface* p_cell = p_mono_problem->GetTissue()->GetCardiacCell(node_global_index);
                 checkParameter(p_cell, node_global_index);
             }
             // compare the files, using the CompareFilesViaHdf5DataReader() method

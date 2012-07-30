@@ -132,7 +132,7 @@ class TestPyCml : public CxxTest::TestSuite
         else
         {
             TS_ASSERT_THROWS_THIS(rCell.GetIntracellularCalciumConcentration(),
-                                  "AbstractCardiacCell::GetIntracellularCalciumConcentration() called. Either model has no [Ca_i] or method has not been implemented yet");
+                                  "AbstractCardiacCellInterface::GetIntracellularCalciumConcentration() called. Either model has no [Ca_i] or method has not been implemented yet");
         }
     }
 

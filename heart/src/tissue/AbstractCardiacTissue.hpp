@@ -50,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/split_member.hpp>
 
-#include "AbstractCardiacCell.hpp"
+#include "AbstractCardiacCellInterface.hpp"
 #include "FakeBathCell.hpp"
 #include "AbstractCardiacCellFactory.hpp"
 #include "AbstractConductivityTensors.hpp"
@@ -239,10 +239,10 @@ protected:
     AbstractConductivityTensors<ELEMENT_DIM,SPACE_DIM>* mpIntracellularConductivityTensors;
 
     /** The vector of cells. Distributed. */
-    std::vector< AbstractCardiacCell* > mCellsDistributed;
+    std::vector< AbstractCardiacCellInterface* > mCellsDistributed;
 
     /** The vector of the purkinje cells. Distributed. Empty unless a AbstractPurkinjeCellFactory is given to the constructor. */
-    std::vector< AbstractCardiacCell* > mPurkinjeCellsDistributed;
+    std::vector< AbstractCardiacCellInterface* > mPurkinjeCellsDistributed;
 
     /**
      *  Cache containing all the ionic currents for each node,
@@ -322,7 +322,7 @@ protected:
     std::vector<unsigned> mHaloNodes;
 
     /** The vector of halo cells. Distributed. */
-    std::vector< AbstractCardiacCell* > mHaloCellsDistributed;
+    std::vector< AbstractCardiacCellInterface* > mHaloCellsDistributed;
 
     /** Map of global to local indices for halo nodes. */
     std::map<unsigned, unsigned> mHaloGlobalToLocalIndexMap;
@@ -418,7 +418,7 @@ public:
      *
      * @param globalIndex  global node index for which to retrieve a cell
      */
-    AbstractCardiacCell* GetCardiacCell( unsigned globalIndex );
+    AbstractCardiacCellInterface* GetCardiacCell( unsigned globalIndex );
 
     /**
      * Get a pointer to a Purkinje cell, indexed by the global node index.
@@ -428,7 +428,7 @@ public:
      *
      * @param globalIndex  global node index for which to retrieve a cell
      */
-    AbstractCardiacCell* GetPurkinjeCell( unsigned globalIndex );
+    AbstractCardiacCellInterface* GetPurkinjeCell( unsigned globalIndex );
 
     /**
      * Get a pointer to a halo cell, indexed by the global node index.
@@ -438,7 +438,7 @@ public:
      *
      * @param globalIndex  global node index for which to retrieve a cell
      */
-    AbstractCardiacCell* GetCardiacCellOrHaloCell( unsigned globalIndex );
+    AbstractCardiacCellInterface* GetCardiacCellOrHaloCell( unsigned globalIndex );
 
     /**
      * Integrate the cell ODEs and update ionic current etc for each of the
@@ -490,12 +490,12 @@ public:
     /**
      *  Returns a reference to the vector of distributed cells. Needed for archiving.
      */
-    const std::vector<AbstractCardiacCell*>& rGetCellsDistributed() const;
+    const std::vector<AbstractCardiacCellInterface*>& rGetCellsDistributed() const;
 
     /**
      *  Returns a reference to the vector of distributed Purkinje cells. Needed for archiving.
      */
-    const std::vector<AbstractCardiacCell*>& rGetPurkinjeCellsDistributed() const;
+    const std::vector<AbstractCardiacCellInterface*>& rGetPurkinjeCellsDistributed() const;
 
     /**
      *  Returns a pointer to the mesh object
@@ -525,7 +525,7 @@ public:
     template<class Archive>
     void SaveCardiacCells(Archive & archive, const unsigned int version) const
     {
-        const std::vector<AbstractCardiacCell*> & r_cells_distributed = rGetCellsDistributed();
+        const std::vector<AbstractCardiacCellInterface*> & r_cells_distributed = rGetCellsDistributed();
         archive & mpDistributedVectorFactory; // Needed when loading
         const unsigned num_cells = r_cells_distributed.size();
         archive & num_cells;
@@ -647,9 +647,9 @@ public:
                 NEVER_REACHED;
 #endif // CHASTE_CAN_CHECKPOINT_DLLS
             }
-            AbstractCardiacCell* p_cell;
+            AbstractCardiacCellInterface* p_cell;
             archive & p_cell;
-            AbstractCardiacCell* p_purkinje_cell = NULL;
+            AbstractCardiacCellInterface* p_purkinje_cell = NULL;
             if (mHasPurkinje)
             {
                 archive & p_purkinje_cell;

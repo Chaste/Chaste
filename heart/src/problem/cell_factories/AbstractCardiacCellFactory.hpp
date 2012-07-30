@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/shared_ptr.hpp>
 
-#include "AbstractCardiacCell.hpp"
+#include "AbstractCardiacCellInterface.hpp"
 #include "AbstractTetrahedralMesh.hpp"
 #include "AbstractIvpOdeSolver.hpp"
 #include "EulerIvpOdeSolver.hpp"
@@ -90,14 +90,14 @@ public:
      *
      * @param nodeIndex  Global node index.
      */
-    virtual AbstractCardiacCell* CreateCardiacCellForNode(unsigned nodeIndex);
+    virtual AbstractCardiacCellInterface* CreateCardiacCellForNode(unsigned nodeIndex);
 
     /**
      * Must be overridden by subclasses to return a cell object for the given node.
      *
      * @param nodeIndex  Global node index.
      */
-    virtual AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned nodeIndex)=0;
+    virtual AbstractCardiacCellInterface* CreateCardiacCellForTissueNode(unsigned nodeIndex)=0;
 
     /**
      * May be overridden by subclasses to perform any necessary work after all cells
@@ -107,7 +107,7 @@ public:
      * @param lo  Lowest index owned by this process.
      * @param hi  Highest index owned by this process.
      */
-    virtual void FinaliseCellCreation(std::vector< AbstractCardiacCell* >* pCellsDistributed,
+    virtual void FinaliseCellCreation(std::vector< AbstractCardiacCellInterface* >* pCellsDistributed,
                                       unsigned lo, unsigned hi);
 
     /**

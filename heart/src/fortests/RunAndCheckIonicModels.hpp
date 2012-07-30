@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCardiacCell.hpp"
 #include "HeartConfig.hpp"
 
-void RunOdeSolverWithIonicModel(AbstractCardiacCell* pOdeSystem,
+void RunOdeSolverWithIonicModel(AbstractCardiacCellInterface* pOdeSystem,
                                 double endTime,
                                 std::string filename,
                                 int stepPerRow=100,
@@ -73,7 +73,7 @@ void CompareCellModelResults(std::string baseResultsFilename1, std::string baseR
 
 #include <cmath>
 
-void RunOdeSolverWithIonicModel(AbstractCardiacCell* pOdeSystem,
+void RunOdeSolverWithIonicModel(AbstractCardiacCellInterface* pOdeSystem,
                                 double endTime,
                                 std::string filename,
                                 int stepPerRow,
@@ -85,7 +85,7 @@ void RunOdeSolverWithIonicModel(AbstractCardiacCell* pOdeSystem,
     if (doComputeExceptVoltage)
     {
         // Store the current system state
-        std::vector<double> state_variables_copy = pOdeSystem->rGetStateVariables();
+        std::vector<double> state_variables_copy = pOdeSystem->GetStdVecStateVariables();
 
         // Test ComputeExceptVoltage
         double v_init = pOdeSystem->GetVoltage();

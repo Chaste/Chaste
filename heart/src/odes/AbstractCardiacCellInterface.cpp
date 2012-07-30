@@ -150,3 +150,11 @@ void AbstractCardiacCellInterface::SetFixedVoltage(double voltage)
 {
     mFixedVoltage = voltage;
 }
+
+double AbstractCardiacCellInterface::GetIntracellularCalciumConcentration()
+{
+    EXCEPTION("AbstractCardiacCellInterface::GetIntracellularCalciumConcentration() called. "
+              "Either model has no [Ca_i] or method has not been implemented yet");
+}
+
+

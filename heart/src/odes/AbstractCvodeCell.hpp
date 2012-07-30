@@ -45,6 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractIvpOdeSolver.hpp"
 #include "AbstractCvodeSystem.hpp"
 #include "AbstractCardiacCellInterface.hpp"
+#include "VectorHelperFunctions.hpp"
 
 
 /**
@@ -68,6 +69,12 @@ class AbstractCvodeCell : public AbstractCardiacCellInterface, public AbstractCv
 private:
     /** The maximum timestep to use. */
     double mMaxDt;
+
+    /** A standard vector of state variables for use with tissue assemblers */
+    std::vector<double> mStdVecStateVariables;
+
+    /** A method to update the std::vector of state variables from the internal N_Vector */
+    void UpdateStdVectorStateVars();
 
 public:
     /**
@@ -150,6 +157,114 @@ public:
      * @param clamp  whether to clamp
      */
     void SetVoltageDerivativeToZero(bool clamp=true);
+
+    /**
+     * This just returns the number of state variables in the cell model.
+     *
+     * It is here because we seem to need to specify explicitly
+     * which method in the parent classes we intend to implement
+     * to take care of the pure definition in AbstractCardiacCellInterface
+     *
+     * @return the number of state variables
+     */
+    unsigned GetNumberOfStateVariables() const;
+
+    /**
+     * This just returns the number of parameters in the cell model.
+     *
+     * It is here because we seem to need to specify explicitly
+     * which method in the parent classes we intend to implement
+     * to take care of the pure definition in AbstractCardiacCellInterface
+     *
+     * @return the number of parameters
+     */
+    unsigned GetNumberOfParameters() const;
+
+    /**
+     * This just returns the state variables in the cell model.
+     *
+     * It is here (despite being inherited) because we seem to need to specify explicitly
+     * which method in the parent classes we intend to implement
+     * to take care of the pure definition in AbstractCardiacCellInterface.
+     *
+     * @return the state variables
+     */
+    std::vector<double> GetStdVecStateVariables();
+
+
+    /**
+     * This just sets the state variables in the cell model.
+     *
+     * It is here (despite being inherited) because we seem to need to specify explicitly
+     * which method in the parent classes we intend to implement
+     * to take care of the pure definition in AbstractCardiacCellInterface.
+     *
+     * @param rVariables  the state variables (to take a copy of).
+     */
+    void SetStateVariables(const std::vector<double>& rVariables);
+
+    /**
+     * This is also needed now just to show there is an alternative to the above method!
+     * @param rVariables  the state variables (to take a copy of).
+     */
+    void SetStateVariables(const N_Vector& rVariables);
+
+    /**
+     * This just calls the method AbstractCvodeSystem::GetAnyVariable
+     *
+     * It is here (despite being inherited) because we seem to need to specify explicitly
+     * which method in the parent classes we intend to implement
+     * to take care of the pure definition in AbstractCardiacCellInterface.
+     *
+     * @param rName variable name
+     * @param time  the time at which to evaluate variable (only needed for derived quantities).
+     * @return value of the variable at that time
+     */
+    double GetAnyVariable(const std::string& rName, double time=0.0);
+
+    /**
+     * This just calls AbstractCvodeSystem::GetParameter
+     *
+     * It is here (despite being inherited) because we seem to need to specify explicitly
+     * which method in the parent classes we intend to implement
+     * to take care of the pure definition in AbstractCardiacCellInterface.
+     *
+     * @param rParameterName  the name of a parameter to get the value of,
+     * @return  the parameter's value.
+     */
+    double GetParameter(const std::string& rParameterName);
+
+    /**
+     * This is just here to show there is an alternative to the above!
+     *
+     * It just calls the base class method.
+     *
+     * @param parameterIndex  the index of the parameter vector entry to return
+     * @return the parameter value
+     */
+    double GetParameter(unsigned parameterIndex);
+
+    /**
+     * This just calls AbstractCvodeSystem::SetParameter
+     *
+     * It is here (despite being inherited) because we seem to need to specify explicitly
+     * which method in the parent classes we intend to implement
+     * to take care of the pure definition in AbstractCardiacCellInterface.
+     *
+     * @param rParameterName  the parameter name to set the value of,
+     * @param value  value to set it to.
+     */
+    void SetParameter(const std::string& rParameterName, double value);
+
+    /**
+     * This is just here to show there is an alternative to the above!
+     *
+     * It just calls the base class method.
+     *
+     * @param parameterIndex  the index of the parameter vector to alter
+     * @param value  the value the parameter should take
+     */
+    void SetParameter(unsigned parameterIndex, double value);
 
 };
 

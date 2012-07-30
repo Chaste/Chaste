@@ -117,7 +117,7 @@ public:
      *
      * @param node Global node index
      */
-    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned node)
+    AbstractCardiacCellInterface* CreateCardiacCellForTissueNode(unsigned node)
     {
         double x = this->GetMesh()->GetNode(node)->GetPoint()[0];
         double d_level = x/mStepSize;

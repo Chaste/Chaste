@@ -51,8 +51,8 @@ AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::AbstractPurkinjeCellFactory(
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::CreateJunction(const Node<SPACE_DIM>* pNode,
-                                                                        AbstractCardiacCell* pPurkinjeCell,
-                                                                        AbstractCardiacCell* pCardiacCell,
+                                                                        AbstractCardiacCellInterface* pPurkinjeCell,
+                                                                        AbstractCardiacCellInterface* pCardiacCell,
                                                                         double resistance)
 {
     // Figure out the effective resistance for this mesh, in kOhm.cm^3
@@ -115,9 +115,9 @@ void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::SetMesh(AbstractTetrahe
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractCardiacCell*  AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::CreatePurkinjeCellForNode(
+AbstractCardiacCellInterface*  AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::CreatePurkinjeCellForNode(
         unsigned nodeIndex,
-        AbstractCardiacCell* pCardiacCell)
+        AbstractCardiacCellInterface* pCardiacCell)
 {
     if (mLocalPurkinjeNodes.count(nodeIndex)>0)
     {

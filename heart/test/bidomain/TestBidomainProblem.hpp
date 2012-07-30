@@ -158,7 +158,7 @@ public:
             TS_ASSERT_LESS_THAN_EQUALS( voltage[index], Ena +  30);
             TS_ASSERT_LESS_THAN_EQUALS(-voltage[index] + (Ek-30), 0);
 
-            std::vector<double>& r_ode_vars = bidomain_problem.GetBidomainTissue()->GetCardiacCell(index.Global)->rGetStateVariables();
+            std::vector<double> r_ode_vars = bidomain_problem.GetBidomainTissue()->GetCardiacCell(index.Global)->GetStdVecStateVariables();
             for (int j=0; j<8; j++)
             {
                 // if not voltage or calcium ion conc, test whether between 0 and 1
@@ -254,7 +254,7 @@ public:
                 TS_ASSERT_LESS_THAN_EQUALS( voltage[index], Ena +  30);
                 TS_ASSERT_LESS_THAN_EQUALS(-voltage[index] + (Ek-30), 0);
 
-                std::vector<double>& r_ode_vars = bidomain_problem.GetBidomainTissue()->GetCardiacCell(index.Global)->rGetStateVariables();
+                std::vector<double> r_ode_vars = bidomain_problem.GetBidomainTissue()->GetCardiacCell(index.Global)->GetStdVecStateVariables();
                 for (int j=0; j<8; j++)
                 {
                     // if not voltage or calcium ion conc, test whether between 0 and 1
@@ -793,8 +793,8 @@ public:
             // Check the last values match the cells' state
             if (bidomain_problem.rGetMesh().GetDistributedVectorFactory()->IsGlobalIndexLocal(global_index))
             {
-                AbstractCardiacCell* p_cell = bidomain_problem.GetTissue()->GetCardiacCell(global_index);
-                TS_ASSERT_DELTA(values.back(), p_cell->GetAnyVariable(p_cell->GetAnyVariableIndex(output_variables[i])), 1e-12);
+                AbstractCardiacCellInterface* p_cell = bidomain_problem.GetTissue()->GetCardiacCell(global_index);
+                TS_ASSERT_DELTA(values.back(), p_cell->GetAnyVariable(output_variables[i],0), 1e-12);
             }
         }
     }

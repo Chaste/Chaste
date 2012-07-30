@@ -62,7 +62,7 @@ c_vector<double,1*(ELEM_DIM+1)> MonodomainCorrectionTermAssembler<ELEM_DIM,SPACE
     // interpolated state variables, and a random choice of cell (all
     // should be the same)
     unsigned node_global_index = pElement->GetNodeGlobalIndex(0);
-    AbstractCardiacCell* p_any_cell = this->mpCardiacTissue->GetCardiacCellOrHaloCell(node_global_index);
+    AbstractCardiacCellInterface* p_any_cell = this->mpCardiacTissue->GetCardiacCellOrHaloCell(node_global_index);
     double ionic_sv_interp = p_any_cell->GetIIonic(&(this->mStateVariablesAtQuadPoint));
 
     // add on the SVI ionic current, and take away the original ICI (linearly

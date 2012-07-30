@@ -43,8 +43,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HeartEventHandler.hpp"
 
 template <unsigned SPACE_DIM>
-ExtendedBidomainTissue<SPACE_DIM>::ExtendedBidomainTissue(
-            AbstractCardiacCellFactory<SPACE_DIM>* pCellFactory, AbstractCardiacCellFactory<SPACE_DIM>* pCellFactorySecondCell, AbstractStimulusFactory<SPACE_DIM>* pExtracellularStimulusFactory)
+ExtendedBidomainTissue<SPACE_DIM>::ExtendedBidomainTissue(AbstractCardiacCellFactory<SPACE_DIM>* pCellFactory,
+                                                          AbstractCardiacCellFactory<SPACE_DIM>* pCellFactorySecondCell,
+                                                          AbstractStimulusFactory<SPACE_DIM>* pExtracellularStimulusFactory)
     : AbstractCardiacTissue<SPACE_DIM>(pCellFactory),
       mpIntracellularConductivityTensorsSecondCell(NULL),
       mUserSuppliedExtracellularStimulus(false)
@@ -87,7 +88,7 @@ ExtendedBidomainTissue<SPACE_DIM>::ExtendedBidomainTissue(
         // Should really do this for other processes too, but this is all we need
         // to get memory testing to pass, and leaking when we're about to die isn't
         // that bad! Delete second cells
-        for (std::vector<AbstractCardiacCell*>::iterator cell_iterator = mCellsDistributedSecondCell.begin();
+        for (std::vector<AbstractCardiacCellInterface*>::iterator cell_iterator = mCellsDistributedSecondCell.begin();
              cell_iterator != mCellsDistributedSecondCell.end();
              ++cell_iterator)
         {
@@ -111,7 +112,12 @@ ExtendedBidomainTissue<SPACE_DIM>::ExtendedBidomainTissue(
 
 //archiving constructor
 template <unsigned SPACE_DIM>
-ExtendedBidomainTissue<SPACE_DIM>::ExtendedBidomainTissue(std::vector<AbstractCardiacCell*> & rCellsDistributed, std::vector<AbstractCardiacCell*> & rSecondCellsDistributed, std::vector<boost::shared_ptr<AbstractStimulusFunction> > & rExtraStimuliDistributed, std::vector<double> & rGgapsDistributed, AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>* pMesh,c_vector<double, SPACE_DIM>  intracellularConductivitiesSecondCell)
+ExtendedBidomainTissue<SPACE_DIM>::ExtendedBidomainTissue(std::vector<AbstractCardiacCellInterface*> & rCellsDistributed,
+                                                          std::vector<AbstractCardiacCellInterface*> & rSecondCellsDistributed,
+                                                          std::vector<boost::shared_ptr<AbstractStimulusFunction> > & rExtraStimuliDistributed,
+                                                          std::vector<double> & rGgapsDistributed,
+                                                          AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>* pMesh,
+                                                          c_vector<double, SPACE_DIM>  intracellularConductivitiesSecondCell)
         :   AbstractCardiacTissue<SPACE_DIM>(pMesh),
             mpIntracellularConductivityTensorsSecondCell(NULL),
             mIntracellularConductivitiesSecondCell(intracellularConductivitiesSecondCell),
@@ -136,7 +142,8 @@ ExtendedBidomainTissue<SPACE_DIM>::ExtendedBidomainTissue(std::vector<AbstractCa
 
 
 template <unsigned SPACE_DIM>
-void ExtendedBidomainTissue<SPACE_DIM>::SetGgapHeterogeneities ( std::vector<boost::shared_ptr<AbstractChasteRegion<SPACE_DIM> > >& rGgapHeterogeneityRegions, std::vector<double> rGgapValues)
+void ExtendedBidomainTissue<SPACE_DIM>::SetGgapHeterogeneities(std::vector<boost::shared_ptr<AbstractChasteRegion<SPACE_DIM> > >& rGgapHeterogeneityRegions,
+                                                               std::vector<double> rGgapValues)
 {
     assert( rGgapHeterogeneityRegions.size() == rGgapValues.size() );//problem class (which calls this method should have thrown otherwise)
     mGgapHeterogeneityRegions = rGgapHeterogeneityRegions;
@@ -263,7 +270,7 @@ void ExtendedBidomainTissue<SPACE_DIM>::SetUserSuppliedExtracellularStimulus(boo
 }
 
 template <unsigned SPACE_DIM>
-const std::vector<AbstractCardiacCell*>& ExtendedBidomainTissue<SPACE_DIM>::rGetSecondCellsDistributed() const
+const std::vector<AbstractCardiacCellInterface*>& ExtendedBidomainTissue<SPACE_DIM>::rGetSecondCellsDistributed() const
 {
     return mCellsDistributedSecondCell;
 }
@@ -354,7 +361,7 @@ template <unsigned SPACE_DIM>
 ExtendedBidomainTissue<SPACE_DIM>::~ExtendedBidomainTissue()
 {
     // Delete (second) cells
-    for (std::vector<AbstractCardiacCell*>::iterator cell_iterator = mCellsDistributedSecondCell.begin();
+    for (std::vector<AbstractCardiacCellInterface*>::iterator cell_iterator = mCellsDistributedSecondCell.begin();
          cell_iterator != mCellsDistributedSecondCell.end();
          ++cell_iterator)
     {
@@ -402,7 +409,7 @@ const c_matrix<double, SPACE_DIM, SPACE_DIM>& ExtendedBidomainTissue<SPACE_DIM>:
 }
 
 template <unsigned SPACE_DIM>
-AbstractCardiacCell* ExtendedBidomainTissue<SPACE_DIM>::GetCardiacSecondCell( unsigned globalIndex )
+AbstractCardiacCellInterface* ExtendedBidomainTissue<SPACE_DIM>::GetCardiacSecondCell( unsigned globalIndex )
 {
     return mCellsDistributedSecondCell[globalIndex - this->mpDistributedVectorFactory->GetLow()];
 }

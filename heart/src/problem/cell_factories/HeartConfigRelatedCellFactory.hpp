@@ -162,7 +162,7 @@ public:
      * @param intracellularStimulus is computed in CreateCardiacCellForTissueNode determined by the list of stimulation regions
      * @param nodeIndex is the global index within the mesh
      */
-    AbstractCardiacCell* CreateCellWithIntracellularStimulus(
+    AbstractCardiacCellInterface* CreateCellWithIntracellularStimulus(
             boost::shared_ptr<AbstractStimulusFunction> intracellularStimulus,
             unsigned nodeIndex);
 
@@ -173,7 +173,7 @@ public:
      * determined in the CreateCellWithIntracellularStimulus method
      * @param nodeIndex is the global index within the mesh
      */
-    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned nodeIndex);
+    AbstractCardiacCellInterface* CreateCardiacCellForTissueNode(unsigned nodeIndex);
 
     /**
      * Helper method to calculate and fill in the heterogeneities areas (mCellHeterogeneityAreas)
@@ -186,7 +186,7 @@ public:
      * @param pCell  the cell to set parameters of
      * @param nodeIndex  the index of the node corresponding to this cell in the mesh
      */
-    void SetCellParameters(AbstractCardiacCell* pCell, unsigned nodeIndex);
+    void SetCellParameters(AbstractCardiacCellInterface* pCell, unsigned nodeIndex);
 
     /**
      * Set the intracellular stimulus for a cell based on the definitions in HeartConfig.
@@ -194,7 +194,7 @@ public:
      * @param pCell  the cell to set stimulus of
      * @param nodeIndex  the index of the node corresponding to this cell in the mesh
      */
-    void SetCellIntracellularStimulus(AbstractCardiacCell* pCell, unsigned nodeIndex);
+    void SetCellIntracellularStimulus(AbstractCardiacCellInterface* pCell, unsigned nodeIndex);
 };
 
 

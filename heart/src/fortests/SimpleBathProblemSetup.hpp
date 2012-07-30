@@ -77,7 +77,7 @@ public:
      * Create a new cell.
      * @param node  where to put the cell
      */
-    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned node)
+    AbstractCardiacCellInterface* CreateCardiacCellForTissueNode(unsigned node)
     {
         // paranoia - check this is really a tissue node
         assert(HeartRegionCode::IsRegionTissue( this->GetMesh()->GetNode(node)->GetRegion() ));

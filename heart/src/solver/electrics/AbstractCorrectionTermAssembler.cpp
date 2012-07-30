@@ -53,13 +53,13 @@ AbstractCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AbstractCorr
         if (r_element.GetOwnership())
         {
             unsigned node_zero = r_element.GetNodeGlobalIndex(0);
-            AbstractCardiacCell* p_cell_zero = this->mpCardiacTissue->GetCardiacCellOrHaloCell(node_zero);
+            AbstractCardiacCellInterface* p_cell_zero = this->mpCardiacTissue->GetCardiacCellOrHaloCell(node_zero);
             const std::type_info& r_zero_info = typeid(*p_cell_zero);
             // Check the other nodes match
             for (unsigned local_index=1; local_index<r_element.GetNumNodes(); local_index++)
             {
                 unsigned global_index = r_element.GetNodeGlobalIndex(local_index);
-                AbstractCardiacCell* p_cell = this->mpCardiacTissue->GetCardiacCellOrHaloCell(global_index);
+                AbstractCardiacCellInterface* p_cell = this->mpCardiacTissue->GetCardiacCellOrHaloCell(global_index);
                 const std::type_info& r_info = typeid(*p_cell);
                 if (r_zero_info != r_info)
                 {
@@ -88,14 +88,14 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 void AbstractCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::IncrementInterpolatedQuantities(
             double phiI, const Node<SPACE_DIM>* pNode)
 {
-    // interpolate ionic current, and state variables
-
+    // interpolate ionic current
     unsigned node_global_index = pNode->GetIndex();
-
     mIionicInterp  += phiI * this->mpCardiacTissue->rGetIionicCacheReplicated()[ node_global_index ];
+    // and state variables
+    std::vector<double> state_vars = this->mpCardiacTissue->GetCardiacCellOrHaloCell(node_global_index)->GetStdVecStateVariables();
     for (unsigned i=0; i<mStateVariablesAtQuadPoint.size(); i++)
     {
-        mStateVariablesAtQuadPoint[i] += phiI * this->mpCardiacTissue->GetCardiacCellOrHaloCell(node_global_index)->rGetStateVariables()[i];
+        mStateVariablesAtQuadPoint[i] += phiI * state_vars[i];
     }
 }
 
@@ -135,7 +135,7 @@ bool AbstractCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Element
     if (will_assemble)
     {
         unsigned any_node = rElement.GetNodeGlobalIndex(0);
-        mStateVariablesAtQuadPoint.resize(this->mpCardiacTissue->GetCardiacCellOrHaloCell(any_node)->rGetStateVariables().size());
+        mStateVariablesAtQuadPoint.resize(this->mpCardiacTissue->GetCardiacCellOrHaloCell(any_node)->GetNumberOfStateVariables() );
     }
 
     return will_assemble;

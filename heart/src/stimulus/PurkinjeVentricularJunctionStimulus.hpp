@@ -69,12 +69,12 @@ private:
     /**
      * Pointer to the cell model on the ventricular side of the junction
      */
-    AbstractCardiacCell* mpVentricularCellModel;
+    AbstractCardiacCellInterface* mpVentricularCellModel;
 
     /**
      * Pointer to the cell model on the Purkinje side of the junction
      */
-    AbstractCardiacCell* mpPurkinjeCellModel;
+    AbstractCardiacCellInterface* mpPurkinjeCellModel;
 
 public:
 
@@ -93,14 +93,14 @@ public:
      *
      * @param pVentricularModel Pointer to the ventricular cell model
      */
-    void SetVentricularCellModel(AbstractCardiacCell* pVentricularModel);
+    void SetVentricularCellModel(AbstractCardiacCellInterface* pVentricularModel);
 
     /**
      * Sets the pointer to the cell model on the Purkinje side of the junction
      *
      * @param pPurkinjeModel Pointer to the Purkinje cell model
      */
-    void SetPurkinjeCellModel(AbstractCardiacCell* pPurkinjeModel);
+    void SetPurkinjeCellModel(AbstractCardiacCellInterface* pPurkinjeModel);
 
     /**
      * Sets the Purkinje ventricular junction to generate stimuli for Purkinje cell models instead of

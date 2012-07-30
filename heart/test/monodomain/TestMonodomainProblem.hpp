@@ -95,7 +95,7 @@ public:
         }
     }
 
-    void FinaliseCellCreation(std::vector<AbstractCardiacCell* >* pCellsDistributed, unsigned lo, unsigned hi)
+    void FinaliseCellCreation(std::vector<AbstractCardiacCellInterface* >* pCellsDistributed, unsigned lo, unsigned hi)
     {
         unsigned found_middle_point_reduced;
         MPI_Allreduce(&mFoundMiddlePoint, &found_middle_point_reduced, 1, MPI_UNSIGNED, MPI_SUM, PETSC_COMM_WORLD);

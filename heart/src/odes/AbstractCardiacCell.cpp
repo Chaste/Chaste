@@ -106,15 +106,53 @@ void AbstractCardiacCell::SetVoltage(double voltage)
 
 double AbstractCardiacCell::GetVoltage()
 {
-    return GetAnyVariable(mVoltageIndex);
+    return AbstractOdeSystem::GetAnyVariable(mVoltageIndex);
 }
 
-double AbstractCardiacCell::GetIntracellularCalciumConcentration()
+unsigned AbstractCardiacCell::GetNumberOfStateVariables() const
 {
-    EXCEPTION("AbstractCardiacCell::GetIntracellularCalciumConcentration() called. Either model has no [Ca_i] or method has not been implemented yet");
+    return AbstractOdeSystem::GetNumberOfStateVariables();
 }
 
+unsigned AbstractCardiacCell::GetNumberOfParameters() const
+{
+    return AbstractOdeSystem::GetNumberOfParameters();
+}
 
+std::vector<double> AbstractCardiacCell::GetStdVecStateVariables()
+{
+    return AbstractOdeSystem::GetStateVariables();
+}
+
+void AbstractCardiacCell::SetStateVariables(const std::vector<double>& rVariables)
+{
+    AbstractOdeSystem::SetStateVariables(rVariables);
+}
+
+double AbstractCardiacCell::GetAnyVariable(const std::string& rName, double time)
+{
+    return AbstractOdeSystem::GetAnyVariable(rName, time);
+}
+
+double AbstractCardiacCell::GetParameter(const std::string& rParameterName)
+{
+    return AbstractOdeSystem::GetParameter(rParameterName);
+}
+
+double AbstractCardiacCell::GetParameter(unsigned parameterIndex)
+{
+    return AbstractOdeSystem::GetParameter(parameterIndex);
+}
+
+void AbstractCardiacCell::SetParameter(const std::string& rParameterName, double value)
+{
+    AbstractOdeSystem::SetParameter(rParameterName,value);
+}
+
+void AbstractCardiacCell::SetParameter(unsigned parameterIndex, double value)
+{
+    AbstractOdeSystem::SetParameter(parameterIndex,value);
+}
 
 #include "LuoRudy1991.hpp"
 #include "LuoRudy1991BackwardEuler.hpp"

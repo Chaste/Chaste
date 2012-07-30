@@ -471,6 +471,20 @@ inline std::vector<double> MakeStdVec(N_Vector v)
     return sv;
 }
 
+/**
+ * Make an N_Vector from a standard vector
+ *
+ * @param rSrc a std::vector to copy the entries from
+ * @return an N_Vector of the entries from the std::vector.
+ */
+inline N_Vector MakeNVector(const std::vector<double>& rSrc)
+{
+    N_Vector nv;
+    CreateVectorIfEmpty(nv, rSrc.size());
+    CopyFromStdVector(rSrc,nv);
+    return nv;
+}
+
 #endif // CHASTE_CVODE
 
 // End of helper functions

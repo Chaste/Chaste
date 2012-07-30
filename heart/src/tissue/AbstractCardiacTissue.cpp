@@ -120,7 +120,7 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacTissue(
         // Should really do this for other processes too, but this is all we need
         // to get memory testing to pass, and leaking when we're about to die isn't
         // that bad!
-        for (std::vector<AbstractCardiacCell*>::iterator cell_iterator = mCellsDistributed.begin();
+        for (std::vector<AbstractCardiacCellInterface*>::iterator cell_iterator = mCellsDistributed.begin();
              cell_iterator != mCellsDistributed.end();
              ++cell_iterator)
         {
@@ -178,7 +178,7 @@ template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
 AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::~AbstractCardiacTissue()
 {
     // Delete cells
-    for (std::vector<AbstractCardiacCell*>::iterator iter = mCellsDistributed.begin();
+    for (std::vector<AbstractCardiacCellInterface*>::iterator iter = mCellsDistributed.begin();
          iter != mCellsDistributed.end();
          ++iter)
     {
@@ -186,7 +186,7 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::~AbstractCardiacTissue()
     }
 
     // Delete cells for halo nodes
-    for (std::vector<AbstractCardiacCell*>::iterator iter = mHaloCellsDistributed.begin();
+    for (std::vector<AbstractCardiacCellInterface*>::iterator iter = mHaloCellsDistributed.begin();
          iter != mHaloCellsDistributed.end();
          ++iter)
     {
@@ -196,7 +196,7 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::~AbstractCardiacTissue()
     delete mpIntracellularConductivityTensors;
 
     // Delete Purkinje cells
-    for (std::vector<AbstractCardiacCell*>::iterator iter = mPurkinjeCellsDistributed.begin();
+    for (std::vector<AbstractCardiacCellInterface*>::iterator iter = mPurkinjeCellsDistributed.begin();
          iter != mPurkinjeCellsDistributed.end();
          ++iter)
     {
@@ -362,7 +362,7 @@ const c_matrix<double, SPACE_DIM, SPACE_DIM>& AbstractCardiacTissue<ELEMENT_DIM,
 }
 
 template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
-AbstractCardiacCell* AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::GetCardiacCell( unsigned globalIndex )
+AbstractCardiacCellInterface* AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::GetCardiacCell( unsigned globalIndex )
 {
     assert(mpDistributedVectorFactory->GetLow() <= globalIndex &&
            globalIndex < mpDistributedVectorFactory->GetHigh());
@@ -370,7 +370,7 @@ AbstractCardiacCell* AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::GetCardiacCel
 }
 
 template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
-AbstractCardiacCell* AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::GetPurkinjeCell( unsigned globalIndex )
+AbstractCardiacCellInterface* AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::GetPurkinjeCell( unsigned globalIndex )
 {
     assert(mpDistributedVectorFactory->GetLow() <= globalIndex &&
            globalIndex < mpDistributedVectorFactory->GetHigh());
@@ -379,7 +379,7 @@ AbstractCardiacCell* AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::GetPurkinjeCe
 }
 
 template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
-AbstractCardiacCell* AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::GetCardiacCellOrHaloCell( unsigned globalIndex )
+AbstractCardiacCellInterface* AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::GetCardiacCellOrHaloCell( unsigned globalIndex )
 {
     std::map<unsigned, unsigned>::const_iterator node_position;
     // First search the halo
@@ -447,7 +447,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SetUpHaloCells(AbstractCardia
             // Should really do this for other processes too, but this is all we need
             // to get memory testing to pass, and leaking when we're about to die isn't
             // that bad!
-            for (std::vector<AbstractCardiacCell*>::iterator cell_iterator = mHaloCellsDistributed.begin();
+            for (std::vector<AbstractCardiacCellInterface*>::iterator cell_iterator = mHaloCellsDistributed.begin();
                  cell_iterator != mHaloCellsDistributed.end();
                  ++cell_iterator)
             {
@@ -587,8 +587,8 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
                 for (unsigned cell = 0; cell < number_of_cells_to_send; cell++)
                 {
                     unsigned global_cell_index = mNodesToSendPerProcess[send_to][cell];
-                    AbstractCardiacCell* p_cell = mCellsDistributed[global_cell_index - mpDistributedVectorFactory->GetLow()];
-                    std::vector<double>& cell_data = p_cell->rGetStateVariables();
+                    AbstractCardiacCellInterface* p_cell = mCellsDistributed[global_cell_index - mpDistributedVectorFactory->GetLow()];
+                    std::vector<double> cell_data = p_cell->GetStdVecStateVariables();
                     const unsigned num_state_vars = p_cell->GetNumberOfStateVariables();
                     for (unsigned state_variable = 0; state_variable < num_state_vars; state_variable++)
                     {
@@ -634,10 +634,10 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
                 unsigned receive_index = 0;
                 for ( unsigned cell = 0; cell < number_of_cells_to_receive; cell++ )
                 {
-                    AbstractCardiacCell* p_cell = mHaloCellsDistributed[mHaloGlobalToLocalIndexMap[mNodesToReceivePerProcess[receive_from][cell]]];
-                    std::vector<double> cell_data;
-                    cell_data.resize(p_cell->GetNumberOfStateVariables());
+                    AbstractCardiacCellInterface* p_cell = mHaloCellsDistributed[mHaloGlobalToLocalIndexMap[mNodesToReceivePerProcess[receive_from][cell]]];
                     const unsigned number_of_state_variables = p_cell->GetNumberOfStateVariables();
+
+                    std::vector<double> cell_data(number_of_state_variables);
                     for (unsigned state_variable = 0; state_variable < number_of_state_variables; state_variable++)
                     {
                         cell_data[state_variable] = receive_data[receive_index++];
@@ -715,13 +715,13 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::ReplicateCaches()
 }
 
 template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
-const std::vector<AbstractCardiacCell*>& AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::rGetCellsDistributed() const
+const std::vector<AbstractCardiacCellInterface*>& AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::rGetCellsDistributed() const
 {
     return mCellsDistributed;
 }
 
 template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
-const std::vector<AbstractCardiacCell*>& AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::rGetPurkinjeCellsDistributed() const
+const std::vector<AbstractCardiacCellInterface*>& AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::rGetPurkinjeCellsDistributed() const
 {
     EXCEPT_IF_NOT(mHasPurkinje);
     return mPurkinjeCellsDistributed;

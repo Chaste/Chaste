@@ -60,8 +60,8 @@ protected:
      * @param nodeIndex  global node index.
      * @param pCardiacCell  the cardiac cell that has already been created at this node
      */
-    virtual AbstractCardiacCell* CreatePurkinjeCellForTissueNode(unsigned nodeIndex,
-                                                                 AbstractCardiacCell* pCardiacCell)=0;
+    virtual AbstractCardiacCellInterface* CreatePurkinjeCellForTissueNode(unsigned nodeIndex,
+                                                                          AbstractCardiacCellInterface* pCardiacCell)=0;
 
     /**
      * Create a purkinje-ventricular junction between the two cells provided.
@@ -72,8 +72,8 @@ protected:
      * @param resistance  the junction resistance, in kilo-Ohms
      */
     void CreateJunction(const Node<SPACE_DIM>* pNode,
-                        AbstractCardiacCell* pPurkinjeCell,
-                        AbstractCardiacCell* pCardiacCell,
+                        AbstractCardiacCellInterface* pPurkinjeCell,
+                        AbstractCardiacCellInterface* pCardiacCell,
                         double resistance);
 
 public:
@@ -96,8 +96,8 @@ public:
      * @param nodeIndex  global node index.
      * @param pCardiacCell  the cardiac cell that has already been created at this node
      */
-    AbstractCardiacCell* CreatePurkinjeCellForNode(unsigned nodeIndex,
-                                                   AbstractCardiacCell* pCardiacCell);
+    AbstractCardiacCellInterface* CreatePurkinjeCellForNode(unsigned nodeIndex,
+                                                            AbstractCardiacCellInterface* pCardiacCell);
 
     /**
      * May be overridden by subclasses to perform any necessary work after all Purkinje cells
@@ -107,7 +107,7 @@ public:
      * @param lo  Lowest index owned by this process.
      * @param hi  Highest index owned by this process.
      */
-    virtual void FinalisePurkinjeCellCreation(std::vector< AbstractCardiacCell* >* pPurkinjeCellsDistributed,
+    virtual void FinalisePurkinjeCellCreation(std::vector< AbstractCardiacCellInterface* >* pPurkinjeCellsDistributed,
                                               unsigned lo, unsigned hi)
     {
     }

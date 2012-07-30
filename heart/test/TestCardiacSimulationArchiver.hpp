@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DistributedVectorFactory.hpp"
 #include "ArchiveOpener.hpp"
 
-#include "AbstractCardiacCell.hpp"
+#include "AbstractCardiacCellInterface.hpp"
 #include "PlaneStimulusCellFactory.hpp"
 #include "ZeroStimulusCellFactory.hpp"
 #include "LuoRudy1991.hpp"
@@ -377,7 +377,7 @@ private:
             std::vector<double> inits;
             for (unsigned i=p_factory->GetLow(); i<p_factory->GetHigh(); i++)
             {
-                AbstractCardiacCell* p_cell = p_problem->GetTissue()->GetCardiacCell(i);
+                AbstractCardiacCell* p_cell = static_cast<AbstractCardiacCell*>(p_problem->GetTissue()->GetCardiacCell(i));
                 FakeBathCell* p_fake_cell = dynamic_cast<FakeBathCell*>(p_cell);
                 if (p_fake_cell == NULL)
                 {
@@ -385,11 +385,11 @@ private:
                     {
                         inits = p_cell->GetInitialConditions();
                     }
-                    std::vector<double>& r_state = p_cell->rGetStateVariables();
-                    TS_ASSERT_EQUALS(r_state.size(), inits.size());
-                    for (unsigned j=0; j<r_state.size(); j++)
+                    std::vector<double> state = p_cell->GetStateVariables();
+                    TS_ASSERT_EQUALS(state.size(), inits.size());
+                    for (unsigned j=0; j<state.size(); j++)
                     {
-                        TS_ASSERT_DELTA(r_state[j], inits[j], 1e-10);
+                        TS_ASSERT_DELTA(state[j], inits[j], 1e-10);
                     }
                 }
             }
@@ -603,7 +603,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForLoadAsSequential/?* ./heart/test/da
         DistributedVectorFactory* p_factory = p_problem->rGetMesh().GetDistributedVectorFactory();
         for (unsigned i=p_factory->GetLow(); i<p_factory->GetHigh(); i++)
         {
-            AbstractCardiacCell* p_cell = p_problem->GetTissue()->GetCardiacCell(i);
+            AbstractCardiacCellInterface* p_cell = p_problem->GetTissue()->GetCardiacCell(i);
             double x = p_problem->rGetMesh().GetNode(i)->GetPoint()[0];
 
             if (x*x < 1e-10)
@@ -707,7 +707,7 @@ cp  /tmp/$USER/testoutput/TestCreateArchiveForLoadAsSequentialWithBathAndDistrib
         DistributedVectorFactory* p_factory = p_problem->rGetMesh().GetDistributedVectorFactory();
         for (unsigned i=p_factory->GetLow(); i<p_factory->GetHigh(); i++)
         {
-            AbstractCardiacCell* p_cell = p_problem->GetTissue()->GetCardiacCell(i);
+            AbstractCardiacCellInterface* p_cell = p_problem->GetTissue()->GetCardiacCell(i);
             AbstractStimulusFunction* p_stim = p_cell->GetStimulusFunction().get();
             ZeroStimulus* p_zero_stim = dynamic_cast<ZeroStimulus*>(p_stim);
             TS_ASSERT(p_zero_stim != NULL);
@@ -826,19 +826,19 @@ private:
                 std::vector<double> inits;
                 for (unsigned i=p_factory->GetLow(); i<p_factory->GetHigh(); i++)
                 {
-                    AbstractCardiacCell* p_cell = p_problem->GetTissue()->GetCardiacCell(i);
+                    AbstractCardiacCellInterface* p_cell = p_problem->GetTissue()->GetCardiacCell(i);
                     FakeBathCell* p_fake_cell = dynamic_cast<FakeBathCell*>(p_cell);
                     if (p_fake_cell == NULL)
                     {
                         if (inits.empty())
                         {
-                            inits = p_cell->GetInitialConditions();
+                            inits = static_cast<AbstractCardiacCell*>(p_cell)->GetInitialConditions();
                         }
-                        std::vector<double>& r_state = p_cell->rGetStateVariables();
-                        TS_ASSERT_EQUALS(r_state.size(), inits.size());
-                        for (unsigned j=0; j<r_state.size(); j++)
+                        std::vector<double> state = p_cell->GetStdVecStateVariables();
+                        TS_ASSERT_EQUALS(state.size(), inits.size());
+                        for (unsigned j=0; j<state.size(); j++)
                         {
-                            TS_ASSERT_DELTA(r_state[j], inits[j], 1e-10);
+                            TS_ASSERT_DELTA(state[j], inits[j], 1e-10);
                         }
                     }
                 }
@@ -929,7 +929,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForLoadFromSequential/?* ./heart/test/
         DistributedVectorFactory* p_factory = p_problem->rGetMesh().GetDistributedVectorFactory();
         for (unsigned i=p_factory->GetLow(); i<p_factory->GetHigh(); i++)
         {
-            AbstractCardiacCell* p_cell = p_problem->GetTissue()->GetCardiacCell(i);
+            AbstractCardiacCellInterface* p_cell = p_problem->GetTissue()->GetCardiacCell(i);
             double x = p_problem->rGetMesh().GetNode(i)->GetPoint()[0];
 
             if (x*x < 1e-10)
@@ -1015,7 +1015,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForLoadFromSequentialWithBath/?* ./hea
         DistributedVectorFactory* p_factory = p_problem->rGetMesh().GetDistributedVectorFactory();
         for (unsigned i=p_factory->GetLow(); i<p_factory->GetHigh(); i++)
         {
-            AbstractCardiacCell* p_cell = p_problem->GetTissue()->GetCardiacCell(i);
+            AbstractCardiacCellInterface* p_cell = p_problem->GetTissue()->GetCardiacCell(i);
             AbstractStimulusFunction* p_stim = p_cell->GetStimulusFunction().get();
             ZeroStimulus* p_zero_stim = dynamic_cast<ZeroStimulus*>(p_stim);
             TS_ASSERT(p_zero_stim != NULL);

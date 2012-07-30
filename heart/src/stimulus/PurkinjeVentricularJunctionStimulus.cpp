@@ -41,12 +41,12 @@ PurkinjeVentricularJunctionStimulus::PurkinjeVentricularJunctionStimulus(const d
 {
 }
 
-void PurkinjeVentricularJunctionStimulus::SetVentricularCellModel(AbstractCardiacCell* pVentricularCellModel)
+void PurkinjeVentricularJunctionStimulus::SetVentricularCellModel(AbstractCardiacCellInterface* pVentricularCellModel)
 {
     mpVentricularCellModel = pVentricularCellModel;
 }
 
-void PurkinjeVentricularJunctionStimulus::SetPurkinjeCellModel(AbstractCardiacCell* pPurkinjeCellModel)
+void PurkinjeVentricularJunctionStimulus::SetPurkinjeCellModel(AbstractCardiacCellInterface* pPurkinjeCellModel)
 {
     mpPurkinjeCellModel = pPurkinjeCellModel;
 }

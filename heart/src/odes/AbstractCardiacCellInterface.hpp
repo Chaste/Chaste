@@ -88,6 +88,94 @@ public:
     virtual void SetTimestep(double dt)=0;
 
     /**
+     * All subclasses must implement this method to get the number of state variables.
+     *
+     * This needs to be declared here as AbstractCorrectionTermAssembler uses it.
+     *
+     * @return the number of state variables.
+     */
+    virtual unsigned GetNumberOfStateVariables() const=0;
+
+    /**
+     * All subclasses must implement this method to get the number of parameters
+     *
+     * @return the number of parameters in the cell model ODE system
+     */
+    virtual unsigned GetNumberOfParameters() const=0;
+
+    /**
+     * All subclasses must implement a method that returns state variables as a
+     * std::vector (even if they work with another format), for compatibility
+     * with the PDE solvers.
+     *
+     * This needs to be declared here as AbstractCorrectionTermAssembler uses it.
+     *
+     * @return the cell models' internal state variables
+     */
+    virtual std::vector<double> GetStdVecStateVariables()=0;
+
+    /**
+     * All subclasses must implement this method to set the state variables.
+     *
+     * This needs to be declared here as AbstractCardiacTissue uses it.
+     *
+     * @param rVariables the state variables to take a copy of.
+     */
+    virtual void SetStateVariables(const std::vector<double>& rVariables)=0;
+
+    /**
+     * All subclasses must implement a method that returns a state variable value
+     *
+     * This needs to be declared here as AbstractCardiacProblem uses it.
+     *
+     * @param rName variable name
+     * @param time  the time at which to get the variable (only needed when evaluating derived quantities).
+     * @return value of the variable at the current time
+     */
+    virtual double GetAnyVariable(const std::string& rName, double time)=0;
+
+    /**
+     * All subclasses must implement a method that returns a parameter value.
+     *
+     * This needs to be declared here as HeartConfigCellFactory uses it.
+     *
+     * @param rParameterName  the name of a parameter to get the value of,
+     * @return  the parameter's value.
+     */
+    virtual double GetParameter(const std::string& rParameterName)=0;
+
+    /**
+     * All subclasses must implement a method that returns a parameter value.
+     *
+     * This needs to be declared here as HeartConfigCellFactory uses it.
+     *
+     * @param rParameterName  the index of a parameter to get the value of,
+     * @return  the parameter's value.
+     */
+    virtual double GetParameter(unsigned parameterIndex)=0;
+
+    /**
+     * All subclasses must implement a method that sets a parameter value.
+     *
+     * This needs to be declared here as HeartConfigCellFactory uses it.
+     *
+     * @param rParameterName  the parameter name to set the value of,
+     * @param value  value to set it to.
+     */
+    virtual void SetParameter(const std::string& rParameterName, double value)=0;
+
+    /**
+     * All subclasses must implement a method that sets a parameter value.
+     *
+     * This needs to be declared here to avoid confusion with the above method.ns
+     *
+     * @param parameterIdx  the index of the parameter to set the value of,
+     * @param value  value to set it to.
+     */
+    virtual void SetParameter(unsigned parameterIdx, double value)=0;
+
+
+    /**
      * Simulate this cell's behaviour between the time interval [tStart, tEnd],
      * updating the internal state variable values.
      * The timestep used will depend on the subclass implementation.
@@ -272,6 +360,26 @@ public:
      * @param voltage  the value of the transmembrane potential
      */
     void SetFixedVoltage(double voltage);
+
+    /**
+     *  In electromechanics problems, the stretch is passed back to cell-model in case
+     *  mechano-electric feedback has been modelled. We define an empty method here.
+     *  Stretch-dependent cell models should overload this method to use the input
+     *  stretch accordingly.
+     *  @param stretch the stretch of the cell in the axial direction
+     */
+    virtual void SetStretch(double stretch)
+    {
+    }
+
+    /**
+     *  [Ca_i] is needed for mechanics, so we explicitly have a Get method (rather than
+     *  use a get by name type method, to avoid inefficiency when using different
+     *  types of cells). This method by default throws an exception, so should be
+     *  implemented in the concrete class if intracellular (cytosolic) calcium concentration is
+     *  one of the state variables.
+     */
+    virtual double GetIntracellularCalciumConcentration();
 
 protected:
     /**

@@ -264,8 +264,8 @@ public:
             // Check the last values match the cells' state
             if (ext_problem.rGetMesh().GetDistributedVectorFactory()->IsGlobalIndexLocal(global_index))
             {
-                AbstractCardiacCell* p_cell = ext_problem.GetTissue()->GetCardiacCell(global_index);
-                TS_ASSERT_DELTA(values.back(), p_cell->GetAnyVariable(p_cell->GetAnyVariableIndex(output_variables[i])), 1e-12);
+                AbstractCardiacCellInterface* p_cell = ext_problem.GetTissue()->GetCardiacCell(global_index);
+                TS_ASSERT_DELTA(values.back(), p_cell->GetAnyVariable(output_variables[i],0), 1e-12);
             }
 
             //check the extra files for extra variables are there (the content is tested in the converter's tests)

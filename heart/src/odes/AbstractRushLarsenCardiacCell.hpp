@@ -52,7 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *      other state variables.
  *  \li Update the transmembrane potential, either from solving an external PDE,
  *      or using a forward Euler step.
- *  \li Update any elligible gating variables (or similar) with Rush-Larsen scheme.
+ *  \li Update any eligible gating variables (or similar) with Rush-Larsen scheme.
  *  \li Update the remaining state variables using a forward Euler step.
  */
 class AbstractRushLarsenCardiacCell : public AbstractCardiacCell

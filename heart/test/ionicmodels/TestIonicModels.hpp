@@ -334,7 +334,7 @@ public:
 
         // fhn has no [Ca_i]
         TS_ASSERT_THROWS_THIS(fhn61_ode_system.GetIntracellularCalciumConcentration(),
-                "AbstractCardiacCell::GetIntracellularCalciumConcentration() called. "
+                "AbstractCardiacCellInterface::GetIntracellularCalciumConcentration() called. "
                 "Either model has no [Ca_i] or method has not been implemented yet");
 
         // Solve and write to file
