@@ -63,7 +63,7 @@ public:
         return new CellLuoRudy1991FromCellML(mpSolver, mpZeroStimulus);
     }
 
-    void FinaliseCellCreation(std::vector<AbstractCardiacCell* >* pCellsDistributed, unsigned lo, unsigned hi)
+    void FinaliseCellCreation(std::vector<AbstractCardiacCellInterface* >* pCellsDistributed, unsigned lo, unsigned hi)
     {
         /*
          * Here's the list of stimulated cells from the original mesh file with tetgen numbering:
