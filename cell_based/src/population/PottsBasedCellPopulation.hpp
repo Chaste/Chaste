@@ -418,8 +418,6 @@ public:
 #include "SerializationExportWrapper.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(PottsBasedCellPopulation)
 
-// No archiving yet so untested
-#define COVERAGE_IGNORE
 namespace boost
 {
 namespace serialization
@@ -453,6 +451,5 @@ inline void load_construct_data(
 }
 }
 } // namespace ...
-#undef COVERAGE_IGNORE
 
 #endif /*POTTSBASEDCELLPOPULATION_HPP_*/
