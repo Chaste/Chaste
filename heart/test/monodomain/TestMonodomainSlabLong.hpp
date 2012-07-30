@@ -64,7 +64,7 @@ public:
         return new CellLuoRudy1991FromCellML(mpSolver, mpZeroStimulus);
     }
 
-    void FinaliseCellCreation(std::vector<AbstractCardiacCell* >* pCellsDistributed, unsigned lo, unsigned hi)
+    void FinaliseCellCreation(std::vector<AbstractCardiacCellInterface* >* pCellsDistributed, unsigned lo, unsigned hi)
     {
         unsigned stimulated_cells[] = { 0, 1, 11, 121 };
 
