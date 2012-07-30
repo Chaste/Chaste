@@ -82,11 +82,12 @@ AbstractCvodeSystem::AbstractCvodeSystem(unsigned numberOfStateVariables)
       mLastSolutionState(NULL),
       mLastSolutionTime(0.0),
       mAutoReset(true),
+      mForceMinimalReset(false),
       mUseAnalyticJacobian(false),
       mpCvodeMem(NULL),
       mMaxSteps(0)
 {
-    SetTolerances();
+    SetTolerances(); // Set the tolerances to the defaults.
 }
 
 void AbstractCvodeSystem::Init()
@@ -243,6 +244,15 @@ void AbstractCvodeSystem::SetAutoReset(bool autoReset)
     }
 }
 
+void AbstractCvodeSystem::SetMinimalReset(bool minimalReset)
+{
+    mForceMinimalReset = minimalReset;
+    if (mForceMinimalReset)
+    {
+        SetAutoReset(false);
+    }
+}
+
 
 void AbstractCvodeSystem::ResetSolver()
 {
@@ -258,8 +268,9 @@ void AbstractCvodeSystem::SetupCvode(N_Vector initialConditions,
     assert(maxDt >= 0.0);
 
     // Find out if we need to (re-)initialise
+    //std::cout << "!mpCvodeMem = " << !mpCvodeMem << ", mAutoReset = " << mAutoReset << ", !mLastSolutionState = " << !mLastSolutionState << ", comp doubles = " << !CompareDoubles::WithinAnyTolerance(tStart, mLastSolutionTime) << "\n";
     bool reinit = !mpCvodeMem || mAutoReset || !mLastSolutionState || !CompareDoubles::WithinAnyTolerance(tStart, mLastSolutionTime);
-    if (!reinit)
+    if (!reinit && !mForceMinimalReset)
     {
         const unsigned size = GetNumberOfStateVariables();
         for (unsigned i=0; i<size; i++)
@@ -275,7 +286,10 @@ void AbstractCvodeSystem::SetupCvode(N_Vector initialConditions,
     if (!mpCvodeMem)
     {
         mpCvodeMem = CVodeCreate(CV_BDF, CV_NEWTON);
-        if (mpCvodeMem == NULL) EXCEPTION("Failed to SetupCvode CVODE");
+        if (mpCvodeMem == NULL)
+        {
+            EXCEPTION("Failed to SetupCvode CVODE");
+        }
         // Set error handler
         CVodeSetErrHandlerFn(mpCvodeMem, CvodeErrorHandler, NULL);
         // Set the user data

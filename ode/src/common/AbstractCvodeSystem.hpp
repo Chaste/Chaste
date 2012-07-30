@@ -85,6 +85,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Also, subclasses may define a condition at which ODE solvers should stop
  * prematurely. For this class CVODE solvers are being used, so
  * CalculateRootFunction() should be used to detect the stopping time.
+ *
+ * Note that the default tolerances for the solver are set by
+ * SetTolerances(), these can make quite a difference to the time it takes
+ * to solve the ODE system.
  */
 class AbstractCvodeSystem : public AbstractParameterisedSystem<N_Vector>
 {
@@ -125,6 +129,9 @@ private:
 
     /** Whether to automatically reset CVODE on each Solve call. */
     bool mAutoReset;
+
+    /** Whether to ignore changes in the state variables when deciding whether to reset. */
+    bool mForceMinimalReset;
 
 protected:
 
@@ -188,6 +195,15 @@ public:
      * @param autoReset  whether to reset on every Solve
      */
     void SetAutoReset(bool autoReset);
+
+    /**
+     * Set whether to reduce the checking done when guessing when re-initialisation
+     * is needed, so it ignores changes in the state variables.  If call with true
+     * argument, will call SetAutoReset(false).
+     *
+     * @param minimalReset  whether to avoid checking for changes in state variables
+     */
+    void SetMinimalReset(bool minimalReset);
 
     /**
      * Successive calls to Solve will attempt to intelligently determine whether

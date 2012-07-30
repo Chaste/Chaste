@@ -209,6 +209,15 @@ public:
      */
     unsigned GetNumberOfStateVariables() const;
 
+    /**
+     * This just returns the number of parameters in the cell model.
+     *
+     * It is here because we seem to need to specify explicitly
+     * which method in the parent classes we intend to implement
+     * to take care of the pure definition in AbstractCardiacCellInterface
+     *
+     * @return the number of parameters
+     */
     unsigned GetNumberOfParameters() const;
 
     /**
@@ -223,6 +232,18 @@ public:
     std::vector<double> GetStdVecStateVariables();
 
     /**
+     * Just calls AbstractOdeSystem::rGetStateVariableNames().
+     *
+     * It is here (despite being inherited) because we seem to need to specify explicitly
+     * which method in the parent classes we intend to implement
+     * to take care of the pure definition in AbstractCardiacCellInterface.
+     *
+     * @return the state variable names in the cell's ODE system.
+     */
+    const std::vector<std::string>& rGetStateVariableNames() const;
+
+
+    /**
      * This just sets the state variables in the cell model.
      *
      * It is here (despite being inherited) because we seem to need to specify explicitly
@@ -232,6 +253,30 @@ public:
      * @param rVariables  the state variables (to take a copy of).
      */
     void SetStateVariables(const std::vector<double>& rVariables);
+
+    /**
+     * This just calls the method AbstractOdeSystem::SetStateVariable
+     *
+     * It is here (despite being inherited) because we seem to need to specify explicitly
+     * which method in the parent classes we intend to implement
+     * to take care of the pure definition in AbstractCardiacCellInterface.
+     *
+     * @param index index of the state variable to be set
+     * @param newValue new value of the state variable
+     */
+    void SetStateVariable(unsigned index, double newValue);
+
+    /**
+     * This just calls the method AbstractOdeSystem::SetStateVariable
+     *
+     * It is here (despite being inherited) because we seem to need to specify explicitly
+     * which method in the parent classes we intend to implement
+     * to take care of the pure definition in AbstractCardiacCellInterface.
+     *
+     * @param rName name of the state variable to be set
+     * @param newValue new value of the state variable
+     */
+    void SetStateVariable(const std::string& rName, double newValue);
 
     /**
      * This just calls the method AbstractOdeSystem::GetAnyVariable
@@ -265,7 +310,7 @@ public:
      * which method in the parent classes we intend to implement
      * to take care of the pure definition in AbstractCardiacCellInterface.
      *
-     * @param rParameterName  the index of a parameter to get the value of,
+     * @param parameterIndex  the index of a parameter to get the value of,
      * @return  the parameter's value.
      */
     double GetParameter(unsigned parameterIndex);

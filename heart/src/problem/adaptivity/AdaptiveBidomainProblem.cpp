@@ -128,7 +128,7 @@ void AdaptiveBidomainProblem::AddCurrentSolutionToAdaptiveMesh( Vec solution )
                  it != mpMesh->GetNodeIteratorEnd();
                  ++it)
             {
-                variable_for_vtk[it->GetIndex()] = mpBidomainTissue->GetCardiacCell(it->GetIndex())->rGetStateVariables()[variable];
+                variable_for_vtk[it->GetIndex()] = mpBidomainTissue->GetCardiacCell(it->GetIndex())->GetStdVecStateVariables()[variable];
             }
             mpAdaptiveMesh->AddPointData(state_variable_names[variable], variable_for_vtk);
         }

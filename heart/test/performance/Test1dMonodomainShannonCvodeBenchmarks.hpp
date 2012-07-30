@@ -44,6 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MonodomainProblem.hpp"
 #include "RegularStimulus.hpp"
 #include "Shannon2004.hpp"
+#include "Shannon2004Cvode.hpp"
 //#include "Shannon2004BackwardEuler.hpp"
 #include "AbstractCardiacCellFactory.hpp"
 #include "HeartConfig.hpp"
@@ -97,16 +98,16 @@ public:
  *
  * Cell Factory defining Shannon cells for 1d chain.
  *
- * In this version each node has its own Cvode solver
+ * In this version each node has its own Cvode adaptor solver
  */
-class ShannonCvodeCellFactory : public AbstractCardiacCellFactory<1>
+class ShannonCvodeAdaptorCellFactory : public AbstractCardiacCellFactory<1>
 {
 private:
 
     boost::shared_ptr<RegularStimulus> mpStimulus;
 
 public:
-    ShannonCvodeCellFactory()
+    ShannonCvodeAdaptorCellFactory()
     : AbstractCardiacCellFactory<1>(),
       mpStimulus(new RegularStimulus(-250000,5,2000,1))
       {
@@ -118,27 +119,73 @@ public:
 
         /*
          * HOW_TO_TAG Cardiac/Problem definition
-         * Use a CVODE solver in a tissue simulation
+         * Use a CVODE adaptor solver in a tissue simulation
          */
 
         // Here we add a new Cvode Adaptor solver for every node.
-        boost::shared_ptr<CvodeAdaptor> cvode_solver(new CvodeAdaptor());
-        cvode_solver->SetMinimalReset(true);
-
+        boost::shared_ptr<CvodeAdaptor> p_cvode_solver(new CvodeAdaptor());
+        p_cvode_solver->SetMinimalReset(true);
+        p_cvode_solver->SetTolerances(1e-4,1e-6);// NB These defaulted to different values in AbstractCvodeSystem.
         if (this->GetMesh()->GetNode(node)->GetPoint()[0] == 0.0)
         {
-            p_cell = new CellShannon2004FromCellML(cvode_solver,
+            p_cell = new CellShannon2004FromCellML(p_cvode_solver,
                                                    mpStimulus);
         }
         else
         {
-            p_cell = new CellShannon2004FromCellML(cvode_solver,
+            p_cell = new CellShannon2004FromCellML(p_cvode_solver,
                                                    this->mpZeroStimulus);
         }
 
         return p_cell;
     }
+};
 
+/**
+ *
+ * Cell Factory defining Shannon cells for 1d chain.
+ *
+ * In this version each node has its own native Cvode solver
+ */
+class ShannonCvodeNativeCellFactory : public AbstractCardiacCellFactory<1>
+{
+private:
+
+    boost::shared_ptr<RegularStimulus> mpStimulus;
+
+public:
+    ShannonCvodeNativeCellFactory()
+    : AbstractCardiacCellFactory<1>(),
+      mpStimulus(new RegularStimulus(-250000,5,2000,1))
+      {
+      }
+
+    AbstractCvodeCell* CreateCardiacCellForTissueNode(unsigned node)
+    {
+        AbstractCvodeCell* p_cell;
+
+        /*
+         * HOW_TO_TAG Cardiac/Problem definition
+         * Use a native CVODE cell in a tissue simulation
+         */
+
+        // Here we add a native Cvode cell (which includes its own solver) at every node.
+        boost::shared_ptr<AbstractIvpOdeSolver> p_empty_solver;
+
+        if (this->GetMesh()->GetNode(node)->GetPoint()[0] == 0.0)
+        {
+            p_cell = new CellShannon2004FromCellMLCvode(p_empty_solver,
+                                                        mpStimulus);
+        }
+        else
+        {
+            p_cell = new CellShannon2004FromCellMLCvode(p_empty_solver,
+                                                        this->mpZeroStimulus);
+        }
+        p_cell->SetMinimalReset(true);
+        p_cell->SetTolerances(1e-4,1e-6); // NB These defaulted to different values in CvodeAdaptor.
+        return p_cell;
+    }
 };
 #endif // CHASTE_CVODE
 
@@ -212,6 +259,7 @@ public:
             times = data_reader.GetUnlimitedDimensionValues();
             fe_node_0 = data_reader.GetVariableOverTime("V", 0);
             fe_node_100 = data_reader.GetVariableOverTime("V", 100);
+
         }
 
         /*
@@ -247,15 +295,20 @@ public:
 //        }
 
 #ifdef CHASTE_CVODE
+        // First test a CVODE adaptor
+        // The ODE system remains the same (std::vectors) and standard vectors are converted into N_Vectors
+        // every time CVODE talks to the ODE system.
         {
-            HeartConfig::Instance()->SetOutputDirectory("ShannonBenchmark/cvode");
+            HeartConfig::Instance()->SetOutputDirectory("ShannonBenchmark/cvode_adaptor");
             HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(pde_time_step,pde_time_step,printing_time_step);
-            ShannonCvodeCellFactory cell_factory;
+            ShannonCvodeAdaptorCellFactory cell_factory;
             MonodomainProblem<1> monodomain_problem( &cell_factory );
 
             monodomain_problem.Initialise();
             double start_time = std::clock();
+            //std::cout << "Start clock\n";
             monodomain_problem.Solve();
+            //std::cout << "Stop clock\n";
             double end_time = std::clock();
             double elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
             std::cout << "2. CVODE adaptor elapsed time = " << elapsed_time << " secs for " << duration << " ms\n";
@@ -268,8 +321,31 @@ public:
             TS_ASSERT(CompareBenchmarkResults(fe_node_100, cvode_node_100, 0.4)); // Only 0.2 -- 0.4mV difference with CVODE
         }
 
+
+        // Now test a native CVODE cell
+        // The ODE system uses N_Vectors, and interacts with CVODE optimally.
+        // When Chaste needs to talk to the system, it converts to std::vector.
         {
-            /// \todo #2116 Native CVODE timings.
+            HeartConfig::Instance()->SetOutputDirectory("ShannonBenchmark/cvode_native");
+            HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(pde_time_step,pde_time_step,printing_time_step);
+            ShannonCvodeNativeCellFactory cell_factory;
+            MonodomainProblem<1> monodomain_problem( &cell_factory );
+
+            monodomain_problem.Initialise();
+            double start_time = std::clock();
+            //std::cout << "Start clock\n";
+            monodomain_problem.Solve();
+            //std::cout << "Stop clock\n";
+            double end_time = std::clock();
+            double elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
+            std::cout << "3. CVODE native elapsed time = " << elapsed_time << " secs for " << duration << " ms\n";
+
+            Hdf5DataReader data_reader = monodomain_problem.GetDataReader();
+            std::vector<double> cvode_node_0 = data_reader.GetVariableOverTime("V", 0);
+            std::vector<double> cvode_node_100 = data_reader.GetVariableOverTime("V", 100);
+
+            TS_ASSERT(CompareBenchmarkResults(fe_node_0, cvode_node_0, 0.4));     // Only 0.2 -- 0.4mV difference with CVODE
+            TS_ASSERT(CompareBenchmarkResults(fe_node_100, cvode_node_100, 0.4)); // Only 0.2 -- 0.4mV difference with CVODE
         }
 #endif // CHASTE_CVODE
 

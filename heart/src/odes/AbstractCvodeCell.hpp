@@ -185,6 +185,16 @@ public:
      */
     std::vector<double> GetStdVecStateVariables();
 
+    /**
+     * Just calls AbstractCvodeSystem::rGetStateVariableNames().
+     *
+     * It is here (despite being inherited) because we seem to need to specify explicitly
+     * which method in the parent classes we intend to implement
+     * to take care of the pure definition in AbstractCardiacCellInterface.
+     *
+     * @return the state variable names in the cell's ODE system.
+     */
+    const std::vector<std::string>& rGetStateVariableNames() const;
 
     /**
      * This just sets the state variables in the cell model.
@@ -202,6 +212,30 @@ public:
      * @param rVariables  the state variables (to take a copy of).
      */
     void SetStateVariables(const N_Vector& rVariables);
+
+    /**
+     * This just calls the method AbstractCvodeSystem::SetStateVariable
+     *
+     * It is here (despite being inherited) because we seem to need to specify explicitly
+     * which method in the parent classes we intend to implement
+     * to take care of the pure definition in AbstractCardiacCellInterface.
+     *
+     * @param index index of the state variable to be set
+     * @param newValue new value of the state variable
+     */
+    void SetStateVariable(unsigned index, double newValue);
+
+    /**
+     * This just calls the method AbstractCvodeSystem::SetStateVariable
+     *
+     * It is here (despite being inherited) because we seem to need to specify explicitly
+     * which method in the parent classes we intend to implement
+     * to take care of the pure definition in AbstractCardiacCellInterface.
+     *
+     * @param rName name of the state variable to be set
+     * @param newValue new value of the state variable
+     */
+    void SetStateVariable(const std::string& rName, double newValue);
 
     /**
      * This just calls the method AbstractCvodeSystem::GetAnyVariable

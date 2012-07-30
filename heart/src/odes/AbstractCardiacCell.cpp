@@ -124,9 +124,24 @@ std::vector<double> AbstractCardiacCell::GetStdVecStateVariables()
     return AbstractOdeSystem::GetStateVariables();
 }
 
+const std::vector<std::string>& AbstractCardiacCell::rGetStateVariableNames() const
+{
+    return AbstractOdeSystem::rGetStateVariableNames();
+}
+
 void AbstractCardiacCell::SetStateVariables(const std::vector<double>& rVariables)
 {
     AbstractOdeSystem::SetStateVariables(rVariables);
+}
+
+void AbstractCardiacCell::SetStateVariable(unsigned index, double newValue)
+{
+    AbstractOdeSystem::SetStateVariable(index, newValue);
+}
+
+void AbstractCardiacCell::SetStateVariable(const std::string& rName, double newValue)
+{
+    AbstractOdeSystem::SetStateVariable(rName, newValue);
 }
 
 double AbstractCardiacCell::GetAnyVariable(const std::string& rName, double time)

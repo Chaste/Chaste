@@ -115,6 +115,16 @@ public:
     virtual std::vector<double> GetStdVecStateVariables()=0;
 
     /**
+     * All subclasses must implement this method to get variable names.
+     *
+     * Needs to be declared here as AdaptiveBidomainProblem uses it.
+     *
+     * @return the state variable names in the cell's ODE system.
+     */
+    virtual const std::vector<std::string>& rGetStateVariableNames() const=0;
+
+
+    /**
      * All subclasses must implement this method to set the state variables.
      *
      * This needs to be declared here as AbstractCardiacTissue uses it.
@@ -122,6 +132,27 @@ public:
      * @param rVariables the state variables to take a copy of.
      */
     virtual void SetStateVariables(const std::vector<double>& rVariables)=0;
+
+    /**
+     * Set the value of a single state variable in the ODE system.
+     *
+     * This needs to be declared here as AdaptiveBidomainProblem uses it.
+     *
+     * @param index index of the state variable to be set
+     * @param newValue new value of the state variable
+     */
+    virtual void SetStateVariable(unsigned index, double newValue)=0;
+
+    /**
+     * Set the value of a single state variable in the ODE system.
+     *
+     * This needs to be declared here as AdaptiveBidomainProblem uses the above,
+     * to avoid compiler confusion...!
+     *
+     * @param rName name of the state variable to be set
+     * @param newValue new value of the state variable
+     */
+    virtual void SetStateVariable(const std::string& rName, double newValue)=0;
 
     /**
      * All subclasses must implement a method that returns a state variable value
@@ -149,7 +180,7 @@ public:
      *
      * This needs to be declared here as HeartConfigCellFactory uses it.
      *
-     * @param rParameterName  the index of a parameter to get the value of,
+     * @param parameterIndex  the index of a parameter to get the value of,
      * @return  the parameter's value.
      */
     virtual double GetParameter(unsigned parameterIndex)=0;

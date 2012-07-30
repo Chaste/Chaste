@@ -105,7 +105,19 @@ OdeSolution AbstractCvodeCell::Compute(double tStart, double tEnd, double tSamp)
 
 void AbstractCvodeCell::ComputeExceptVoltage(double tStart, double tEnd)
 {
-    EXCEPTION("This method is not yet implemented for CVODE cells.");
+    double saved_voltage = GetVoltage();
+
+    AbstractCardiacCellInterface::SetVoltageDerivativeToZero(true);
+    SolveAndUpdateState(tStart, tEnd);
+    AbstractCardiacCellInterface::SetVoltageDerivativeToZero(false);
+
+    SetVoltage(saved_voltage); // In case of naughty models
+
+#ifndef NDEBUG
+    //Note that tests which rely on this throwing  (e.g. such-and-such a variable is out of range)
+    //ought to be anotated with the NDEBUG macro
+    VerifyStateVariables();
+#endif // NDEBUG
 }
 
 
@@ -135,6 +147,11 @@ std::vector<double> AbstractCvodeCell::GetStdVecStateVariables()
     return state_variables;
 }
 
+const std::vector<std::string>& AbstractCvodeCell::rGetStateVariableNames() const
+{
+    return AbstractCvodeSystem::rGetStateVariableNames();
+}
+
 void AbstractCvodeCell::SetStateVariables(const std::vector<double>& rVariables)
 {
     N_Vector vars = MakeNVector(rVariables);
@@ -144,6 +161,16 @@ void AbstractCvodeCell::SetStateVariables(const std::vector<double>& rVariables)
 void AbstractCvodeCell::SetStateVariables(const N_Vector& rVariables)
 {
     AbstractCvodeSystem::SetStateVariables(rVariables);
+}
+
+void AbstractCvodeCell::SetStateVariable(unsigned index, double newValue)
+{
+    AbstractCvodeSystem::SetStateVariable(index, newValue);
+}
+
+void AbstractCvodeCell::SetStateVariable(const std::string& rName, double newValue)
+{
+    AbstractCvodeSystem::SetStateVariable(rName, newValue);
 }
 
 double AbstractCvodeCell::GetAnyVariable(const std::string& rName, double time)

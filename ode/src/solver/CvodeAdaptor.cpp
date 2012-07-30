@@ -211,9 +211,11 @@ void CvodeAdaptor::SetupCvode(AbstractOdeSystem* pOdeSystem,
 
     if (!mpCvodeMem) // First run of this solver, set up CVODE memory
     {
-        //std::cout << "First Run\n" << std::flush;
         mpCvodeMem = CVodeCreate(CV_BDF, CV_NEWTON);
-        if (mpCvodeMem == NULL) EXCEPTION("Failed to SetupCvode CVODE");
+        if (mpCvodeMem == NULL)
+        {
+            EXCEPTION("Failed to SetupCvode CVODE");
+        }
         // Set error handler
         CVodeSetErrHandlerFn(mpCvodeMem, CvodeErrorHandler, NULL);
         // Set the user data
@@ -248,7 +250,6 @@ void CvodeAdaptor::SetupCvode(AbstractOdeSystem* pOdeSystem,
     }
     else if (reinit) // Could be new ODE system, or new Y values
     {
-        //std::cout << "Re-initialise\n" << std::flush;
         // Set the user data
         mData.pSystem = pOdeSystem; // stays the same on a re-initialize
         mData.pY = &rInitialY; // changes on a re-initialize

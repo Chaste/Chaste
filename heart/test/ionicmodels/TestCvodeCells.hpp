@@ -184,10 +184,9 @@ public:
         OdeSolution solution_cvode_2 = lr91_cvode_system.Compute(start_time, end_time);
         solution_cvode_2.WriteToFile("TestCvodeCells","lr91_cvode_2","ms",1,clean_dir);
         CompareCellModelResults("lr91_cvode_2", "lr91_cvode", 1e-8, voltage_only, "TestCvodeCells");
-        TS_ASSERT_THROWS_THIS(lr91_cvode_system.ComputeExceptVoltage(start_time, end_time),
-                              "This method is not yet implemented for CVODE cells.");
-        lr91_cvode_system.ResetToInitialConditions();
         lr91_cvode_system.SetMaxSteps(10000); // Needed since we're not sampling
+
+        lr91_cvode_system.ResetToInitialConditions();
         TS_ASSERT_EQUALS(lr91_cvode_system.GetMaxSteps(), 10000);
         lr91_cvode_system.SetTimestep(DOUBLE_UNSET); // Use default (set from HeartConfig)
         lr91_cvode_system.SolveAndUpdateState(start_time, end_time);
@@ -260,6 +259,13 @@ public:
         // This should work now that metadata has been added to the LuoRudy1991 cellML.
         TS_ASSERT_EQUALS(lr91_cvode_system.HasCellMLDefaultStimulus(), true);
         lr91_cvode_system.UseCellMLDefaultStimulus();
+
+        {
+            lr91_cvode_system.SetMaxSteps(10000);
+            double voltage_was = lr91_cvode_system.GetAnyVariable("membrane_voltage");
+            lr91_cvode_system.ComputeExceptVoltage(start_time, end_time);
+            TS_ASSERT_EQUALS(lr91_cvode_system.GetAnyVariable("membrane_voltage"), voltage_was);
+        }
 #else
         std::cout << "Cvode is not enabled.\n";
 #endif // CHASTE_CVODE
