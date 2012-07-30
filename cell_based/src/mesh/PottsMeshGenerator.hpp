@@ -103,15 +103,15 @@ public:
     virtual ~PottsMeshGenerator();
 
     /**
-     * Helper method to calculate the Noore and Von Neumann Neighbourhoods of all nodes
+     * Helper method to calculate the Moore and Von Neumann Neighbourhoods of all nodes
      *
-     * @param isPeriodicInX  If true then the mesh is periodic in the x dimnension
+     * @param isPeriodicInX  If true then the mesh is periodic in the x dimension
      */
     void CaclulateNeighbouringNodeIndices(bool isPeriodicInX);
 
 
     /**
-     * @return a Cubouid or rectangulr Potts mesh.
+     * @return a Cuboid or rectangular Potts mesh.
      */
     virtual PottsMesh<DIM>* GetMesh();
 };
