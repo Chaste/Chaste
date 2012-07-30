@@ -243,19 +243,6 @@ public:
      * @param index  the global index of a specified Potts element
      */
     void DeleteElement(unsigned index);
-//
-//    /**
-//     * Divide an element by assigning half the nodes to each new element in numerical order.
-//     * If an odd number of nodes then the existing element has one more node than the new element.
-//     *
-//     *
-//     * @param pElement the element to divide
-//     * @param placeOriginalElementBelow whether to place the original element below (in the y direction) the new element (defaults to false)
-//     *
-//     * @return the index of the new element
-//     */
-//    unsigned DivideElement(PottsElement<DIM>* pElement,
-//                           bool placeOriginalElementBelow=false);
 
     /**
      * Add an element to the mesh.
