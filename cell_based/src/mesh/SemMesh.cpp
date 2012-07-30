@@ -42,6 +42,9 @@ template<unsigned DIM>
 SemMesh<DIM>::SemMesh( std::vector<Node<DIM>*> nodes,
                         std::vector<PottsElement<DIM>*> pottsElements)
 {
+    // SEM model only defined in 2 and 3D
+    assert(DIM > 1);
+
     // Reset member variables and clear mNodes, mElements.
     Clear();
 
@@ -78,6 +81,7 @@ SemMesh<DIM>::SemMesh( std::vector<Node<DIM>*> nodes,
 template<unsigned DIM>
 SemMesh<DIM>::SemMesh()
 {
+    assert(DIM > 1);
     this->mMeshChangesDuringSimulation = true;
     Clear();
 }
