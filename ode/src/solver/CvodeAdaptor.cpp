@@ -211,11 +211,9 @@ void CvodeAdaptor::SetupCvode(AbstractOdeSystem* pOdeSystem,
 
     if (!mpCvodeMem) // First run of this solver, set up CVODE memory
     {
+        // Set up CVODE's memory.
         mpCvodeMem = CVodeCreate(CV_BDF, CV_NEWTON);
-        if (mpCvodeMem == NULL)
-        {
-            EXCEPTION("Failed to SetupCvode CVODE");
-        }
+        if (mpCvodeMem == NULL) EXCEPTION("Failed to SetupCvode CVODE"); // In one line to avoid coverage problem!
         // Set error handler
         CVodeSetErrHandlerFn(mpCvodeMem, CvodeErrorHandler, NULL);
         // Set the user data
@@ -270,10 +268,6 @@ void CvodeAdaptor::SetupCvode(AbstractOdeSystem* pOdeSystem,
         // Attach a linear solver for Newton iteration
         CVDense(mpCvodeMem, rInitialY.size());
     }
-//    else
-//    {
-//        std::cout << "No CVODE RESET\n"<<std::flush;
-//    }
 
     CVodeSetMaxStep(mpCvodeMem, maxStep);
     // Change max steps if wanted

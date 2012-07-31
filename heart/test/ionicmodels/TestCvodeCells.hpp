@@ -205,6 +205,7 @@ public:
         TS_ASSERT_EQUALS(lr91_cvode_system.GetParameterIndex("membrane_fast_sodium_current_conductance"), 0u);
         TS_ASSERT_EQUALS(lr91_cvode_system.GetParameterUnits(0u), "milliS_per_cm2");
         TS_ASSERT_EQUALS(lr91_cvode_system.GetParameter(0u), 23.0);
+        TS_ASSERT_EQUALS(lr91_cvode_system.GetParameter("membrane_fast_sodium_current_conductance"), 23.0);
         lr91_cvode_system.SetParameter(0u, 10.0);
         TS_ASSERT_EQUALS(lr91_cvode_system.GetParameter(0u), 10.0);
         lr91_cvode_system.SetParameter(0u, 23.0);
@@ -223,15 +224,37 @@ public:
         TS_ASSERT_EQUALS(lr91_cvode_system.GetStateVariableIndex("membrane_voltage"),
                          lr91_cvode_system.GetVoltageIndex());
         TS_ASSERT_EQUALS(lr91_cvode_system.GetStateVariable(0),lr91_cvode_system.GetVoltage());
+        TS_ASSERT_EQUALS(lr91_cvode_system.GetStateVariable("membrane_voltage"),lr91_cvode_system.GetVoltage());
         TS_ASSERT_EQUALS(lr91_cvode_system.GetStateVariableUnits(0), "millivolt");
 
         TS_ASSERT_DELTA(lr91_cvode_system.GetRelativeTolerance(), 1e-5, 1e-10);
         TS_ASSERT_DELTA(lr91_cvode_system.GetAbsoluteTolerance(), 1e-7, 1e-10);
         TS_ASSERT_DELTA(lr91_cvode_system.GetLastStepSize(), 1.0, 1e-4);
+
         double old_v = lr91_cvode_system.GetVoltage();
         const double new_v = -1000.0;
         lr91_cvode_system.SetVoltage(new_v);
         TS_ASSERT_DELTA(lr91_cvode_system.GetVoltage(), new_v, 1e-12);
+        lr91_cvode_system.SetVoltage(old_v);
+
+        lr91_cvode_system.SetStateVariable("membrane_voltage", new_v);
+        TS_ASSERT_DELTA(lr91_cvode_system.GetVoltage(), new_v, 1e-12);
+        lr91_cvode_system.SetVoltage(old_v);
+
+        std::vector<double> s_state_vars = lr91_cvode_system.GetStdVecStateVariables();
+        N_Vector n_state_vars = lr91_cvode_system.GetStateVariables();
+        TS_ASSERT_EQUALS(GetVectorSize(n_state_vars), GetVectorSize(s_state_vars));
+        TS_ASSERT_EQUALS(GetVectorSize(n_state_vars), lr91_cvode_system.GetNumberOfStateVariables());
+        for (unsigned i=0; i<s_state_vars.size(); i++)
+        {
+            TS_ASSERT_DELTA(GetVectorComponent(n_state_vars,i), s_state_vars[i], 1e-9);
+        }
+        s_state_vars[0] = -1000; // Alter one of the variables to check the below method works...
+        lr91_cvode_system.SetStateVariables(s_state_vars);
+        for (unsigned i=0; i<s_state_vars.size(); i++)
+        {
+            TS_ASSERT_DELTA(lr91_cvode_system.GetStateVariable(i), s_state_vars[i], 1e-9);
+        }
         lr91_cvode_system.SetVoltage(old_v);
 
         // Cover errors

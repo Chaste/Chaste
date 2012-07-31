@@ -479,7 +479,7 @@ inline std::vector<double> MakeStdVec(N_Vector v)
  */
 inline N_Vector MakeNVector(const std::vector<double>& rSrc)
 {
-    N_Vector nv;
+    N_Vector nv = NULL;
     CreateVectorIfEmpty(nv, rSrc.size());
     CopyFromStdVector(rSrc,nv);
     return nv;

@@ -146,6 +146,11 @@ public:
         TS_ASSERT_DELTA(p_stim->GetPeriod(), 1000, 1e-7);
         TS_ASSERT_DELTA(p_stim->GetStartTime(), 100, 1e-7);
         TS_ASSERT_DELTA(p_stim->GetDuration(), 3, 1e-7);
+
+        // Coverage of some helper methods
+        double new_value =  -128.73;
+        n98_ode_system.SetStateVariable("membrane_voltage", new_value);
+        TS_ASSERT_DELTA(n98_ode_system.GetStateVariable("membrane_voltage"),new_value,1e-9);
     }
 
     void TestSolveForNoble98WithSacWithSimpleStimulus(void)

@@ -320,6 +320,20 @@ public:
         TS_ASSERT_EQUALS(state, "Test 2.\nState:\n\tVariable_1:0\n\tVariable_2:1\n");
 
         DeleteVector(rY);
+
+        // For coverage of a vector helper function that makes an N_Vector from a std::vector.
+        std::vector<double> std_vec;
+        std_vec.push_back(1.0);
+        std_vec.push_back(3.0);
+        std_vec.push_back(8.0);
+
+        N_Vector n_vec = MakeNVector(std_vec);
+
+        TS_ASSERT_EQUALS(GetVectorSize(n_vec),GetVectorSize(std_vec));
+        for (unsigned i=0; i<GetVectorSize(n_vec); i++)
+        {
+            TS_ASSERT_DELTA(GetVectorComponent(n_vec,i),GetVectorComponent(std_vec,i),1e-9);
+        }
 #else
         std::cout << "Cvode is not enabled.\n";
 #endif // CHASTE_CVODE
