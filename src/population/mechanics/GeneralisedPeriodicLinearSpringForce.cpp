@@ -78,7 +78,7 @@ c_vector<double, DIM> GeneralisedPeriodicLinearSpringForce<DIM>::CalculateForceB
     c_vector<double, DIM> node_a_location = this->mpExtendedMesh->GetNode(nodeAGlobalIndex)->rGetLocation();
     c_vector<double, DIM> node_b_location = this->mpExtendedMesh->GetNode(nodeBGlobalIndex)->rGetLocation();
 
-    /*
+    /**
      * Get the unit vector parallel to the line joining the two nodes.
      *
      * We use the mesh method GetVectorFromAtoB() to compute the direction of the
@@ -86,7 +86,7 @@ c_vector<double, DIM> GeneralisedPeriodicLinearSpringForce<DIM>::CalculateForceB
      * their positions, because this method can be overloaded (e.g. to enforce a
      * periodic boundary in Cylindrical2dMesh).
      *
-     * todo: Though, if this is a periodic force class, we won't be overloading this method?
+     * \todo: Though, if this is a periodic force class, we won't be overloading this method?
      */
     c_vector<double, DIM> unit_difference = this->mpExtendedMesh->GetVectorFromAtoB(node_a_location, node_b_location);
 
