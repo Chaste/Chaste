@@ -259,6 +259,10 @@ public:
      * Chaste's value for C_m can be obtained from HeartConfig::Instance()->GetCapacitance()
      * and is measured in uF/cm^2.
      *
+     * For state-variable interpolation (SVI) we need to interpolate state variables at nodes onto
+     * quadrature points and then pass these into this method (see optional argument). Otherwise
+     * for ionic-current interpolation (ICI) we use the cell's internal state variables.
+     *
      * @param pStateVariables  optionally can be supplied to evaluate the ionic current at the
      *     given state; by default the cell's internal state will be used.
      */

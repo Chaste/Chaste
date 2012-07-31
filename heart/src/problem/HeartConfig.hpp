@@ -949,15 +949,40 @@ public:
     void SetCapacitance(double capacitance);
 
     // Numerical
-    /** Set the configuration to use ode, pde and printing times of given values
-     * Calls CheckTimeSteps to ensure compatibility
+    /**
+     * Set the configuration to use ode, pde and printing times of given values
+     *
+     * The ODE step is used by explicit solver schemes such as ForwardEuler
+     * to evolve the ODE system at each node in the mesh.
+     * AbstractCardiacCells set their internal timestep to this value
+     * in their constructors. (AbstractCvodeCells will ignore this setting
+     * and use an adaptive time step scheme between PDE or sampling times.)
+     *
+     * The PDE time step dictates how long a PDE solve should run before re-evaluating
+     * the ODE and cell model states and recalculating current contributions.
+     * The ODE time step should be a subdivision of this PDE timestep.
+     *
+     * The sampling timestep should be a multiple of the PDE timestep, and dictates
+     * how frequently the output to file of results should occur.
+     *
+     * This method calls CheckTimeSteps() to ensure the above compatibility
+     * conditions are met.
+     *
      * @param odeTimeStep  ode value to use
      * @param pdeTimeStep  pde value to use
      * @param printingTimeStep  printing value to use
      */
     void SetOdePdeAndPrintingTimeSteps(double odeTimeStep, double pdeTimeStep, double printingTimeStep);
 
-    /** Set the configuration to use ode time of given value
+    /**
+     * Set the configuration to use ode time step of given value,
+     * for explicit solver schemes such as ForwardEuler.
+     * AbstractCardiacCells set their internal timestep to this
+     * in their constructors.
+     *
+     * AbstractCvodeCells will ignore this setting and use an
+     * adaptive time step scheme between PDE or sampling times.
+     *
      * Calls CheckTimeSteps via SetOdePdeAndPrintingTimeSteps
      * @param odeTimeStep  the value to use
      */

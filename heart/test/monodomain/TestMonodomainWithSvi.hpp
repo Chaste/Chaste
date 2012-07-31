@@ -47,8 +47,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscTools.hpp"
 #include "PropagationPropertiesCalculator.hpp"
 #include "AbstractCardiacCellFactory.hpp"
+#include "AbstractCvodeCell.hpp"
 #include "ZeroStimulusCellFactory.hpp"
 #include "LuoRudy1991.hpp"
+#include "LuoRudy1991Cvode.hpp"
 #include "TenTusscher2006Epi.hpp"
 #include "Mahajan2008.hpp"
 #include "PetscSetupAndFinalize.hpp"
@@ -86,6 +88,46 @@ public:
         {
             return new CellLuoRudy1991FromCellML(this->mpSolver, this->mpZeroStimulus);
         }
+    }
+};
+
+// stimulate a block of cells (an interval in 1d, a block in a corner in 2d)
+template<unsigned DIM>
+class BlockCellFactoryCvode : public AbstractCardiacCellFactory<DIM>
+{
+private:
+    boost::shared_ptr<SimpleStimulus> mpStimulus;
+
+public:
+    BlockCellFactoryCvode()
+        : AbstractCardiacCellFactory<DIM>(),
+          mpStimulus(new SimpleStimulus(-1000000.0, 0.5))
+    {
+        assert(DIM<3);
+    }
+
+    AbstractCvodeCell* CreateCardiacCellForTissueNode(unsigned nodeIndex)
+    {
+        double x = this->GetMesh()->GetNodeOrHaloNode(nodeIndex)->rGetLocation()[0];
+        double y;
+        if(DIM==2)
+        {
+            y = this->GetMesh()->GetNodeOrHaloNode(nodeIndex)->rGetLocation()[1];
+        }
+
+        AbstractCvodeCell* p_cell;
+        if (    (DIM==1 && fabs(x)<0.02+1e-6)
+             || (DIM==2 && fabs(x)<0.02+1e-6 && fabs(y)<0.02+1e-6) )
+        {
+            p_cell =  new CellLuoRudy1991FromCellMLCvode(this->mpSolver, this->mpStimulus);
+        }
+        else
+        {
+            p_cell =  new CellLuoRudy1991FromCellMLCvode(this->mpSolver, this->mpZeroStimulus);
+        }
+        p_cell->SetMinimalReset(true);
+        p_cell->SetTolerances(1e-5,1e-7);
+        return p_cell;
     }
 };
 
@@ -270,6 +312,7 @@ public:
 
         ReplicatableVector final_voltage_ici;
         ReplicatableVector final_voltage_svi;
+        ReplicatableVector final_voltage_svi_cvode;
         ReplicatableVector final_voltage_svit;
 
         HeartConfig::Instance()->SetSimulationDuration(5.0); //ms
@@ -278,11 +321,11 @@ public:
         // much lower conductivity in cross-fibre direction - ICI will struggle
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75, 0.17));
 
+        TetrahedralMesh<2,2> mesh;
+        mesh.ConstructRegularSlabMesh(0.02 /*h*/, 0.5, 0.3);
+
         // ICI - nodal current interpolation - the default
         {
-            TetrahedralMesh<2,2> mesh;
-            mesh.ConstructRegularSlabMesh(0.02 /*h*/, 0.5, 0.3);
-
             HeartConfig::Instance()->SetOutputDirectory("MonodomainNci2d");
             HeartConfig::Instance()->SetOutputFilenamePrefix("results");
 
@@ -299,9 +342,6 @@ public:
 
         // SVI - state variable interpolation
         {
-            TetrahedralMesh<2,2> mesh;
-            mesh.ConstructRegularSlabMesh(0.02 /*h*/, 0.5, 0.3);
-
             HeartConfig::Instance()->SetOutputDirectory("MonodomainSvi2d");
             HeartConfig::Instance()->SetOutputFilenamePrefix("results");
 
@@ -317,10 +357,25 @@ public:
             final_voltage_svi.ReplicatePetscVector(monodomain_problem.GetSolution());
         }
 
+        // SVI - state variable interpolation with CVODE cells
+        {
+            HeartConfig::Instance()->SetOutputDirectory("MonodomainSvi2dCvode");
+            HeartConfig::Instance()->SetOutputFilenamePrefix("results");
+
+            HeartConfig::Instance()->SetUseStateVariableInterpolation();
+
+            BlockCellFactoryCvode<2> cell_factory;
+            MonodomainProblem<2> monodomain_problem( &cell_factory );
+            monodomain_problem.SetMesh(&mesh);
+            monodomain_problem.Initialise();
+
+            monodomain_problem.Solve();
+
+            final_voltage_svi_cvode.ReplicatePetscVector(monodomain_problem.GetSolution());
+        }
+
         // SVIT - state variable interpolation on non-distributed tetrahedral mesh
         {
-            TetrahedralMesh<2,2> mesh;
-            mesh.ConstructRegularSlabMesh(0.02 /*h*/, 0.5, 0.3);
 
             HeartConfig::Instance()->SetOutputDirectory("MonodomainSviTet2d");
             HeartConfig::Instance()->SetOutputFilenamePrefix("results");
@@ -344,15 +399,28 @@ public:
         // 3. CV in cross fibre direction: (i) h=0.01, faster for ICI; h=0.02 slower for ICI.
         // (Matches results in paper)
 
+        double ici_30 = -17.1939; // These numbers are from a solve with ODE timestep of 0.0005,
+        double svi_30 = -63.5676; // i.e. ten times smaller than that used in the test at present
+        double ici_130 = 15.4282; // (for speed), hence large tolerances below.
+        double svi_130 = 30.6249; // The tolerances are still nowhere near overlapping - i.e. ICI different to SVI
+
         // node 20 (for h=0.02) is on the x-axis (fibre direction), SVI CV is slower
-        ///\todo #1462 Check that these nodes are where expected
-        TS_ASSERT_DELTA(final_voltage_ici[20], -9.2270,  8e-3);  //These tolerances show difference in parallel - note that SVI is more stable in the presence of multicore...
-        TS_ASSERT_DELTA(final_voltage_svi[20], -60.8510, 4e-3);
-        TS_ASSERT_DELTA(final_voltage_svit[20], -60.8510, 4e-3);
+        TS_ASSERT_DELTA(mesh.GetNode(20)->rGetLocation()[0],  0.4, 1e-9);
+        TS_ASSERT_DELTA(mesh.GetNode(20)->rGetLocation()[1],  0.0, 1e-9);
+
+        TS_ASSERT_DELTA(final_voltage_ici[20], ici_30, 8.0);  // These tolerances show difference in parallel,
+        TS_ASSERT_DELTA(final_voltage_svi[20], svi_30, 3.0);  // note that SVI is more stable in the presence of multicore...
+        TS_ASSERT_DELTA(final_voltage_svi_cvode[20], svi_30, 3.0);
+        TS_ASSERT_DELTA(final_voltage_svit[20], svi_30, 3.0);
+
         // node 130 (for h=0.02) is on the y-axis (cross-fibre direction), ICI CV is slower
-        TS_ASSERT_DELTA(final_voltage_ici[130], 14.7918, 1e-3);
-        TS_ASSERT_DELTA(final_voltage_svi[130], 30.5281, 1e-3);
-        TS_ASSERT_DELTA(final_voltage_svit[130], 30.5281, 1e-3);
+        TS_ASSERT_DELTA(mesh.GetNode(130)->rGetLocation()[0], 0.0, 1e-9);
+        TS_ASSERT_DELTA(mesh.GetNode(130)->rGetLocation()[1], 0.1, 1e-9);
+
+        TS_ASSERT_DELTA(final_voltage_ici[130], ici_130, 1.0);
+        TS_ASSERT_DELTA(final_voltage_svi[130], svi_130, 0.2);
+        TS_ASSERT_DELTA(final_voltage_svi_cvode[130], svi_130, 0.2);
+        TS_ASSERT_DELTA(final_voltage_svit[130], svi_130, 0.2);
     }
 
     void TestCoverage3d() throw(Exception)
