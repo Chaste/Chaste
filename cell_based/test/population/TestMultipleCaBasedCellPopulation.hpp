@@ -81,8 +81,8 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), location_indices.size());
 
 
-        //TODO this doesnt do anything as
-        TS_ASSERT_EQUALS(cells.size(),0u);
+        ///\todo this doesnt do anything as there aren't any cells!
+        TS_ASSERT_EQUALS(cells.size(), 0u);
         AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
         for (unsigned i=0; i<cells.size(); i++)
         {

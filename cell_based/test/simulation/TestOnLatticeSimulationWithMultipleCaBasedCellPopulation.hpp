@@ -238,7 +238,7 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
 
-        // TODO Check that its moving correctly
+        ///\todo Check that it is moving correctly
         double probability_of_occupation[9];
 
         for (unsigned i=0; i<9; i++)
@@ -257,8 +257,7 @@ public:
         TS_ASSERT_DELTA(probability_of_occupation[7],diffusion_parameter*delta_t/2.0, 1e-2);
         TS_ASSERT_DELTA(probability_of_occupation[8],diffusion_parameter*delta_t/4.0, 1e-2);
         
-        
-        //For coverage
+        // For coverage
         simulator.RemoveAllMultipleCaUpdateRules();
 
     }
