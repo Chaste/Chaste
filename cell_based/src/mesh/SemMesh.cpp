@@ -134,6 +134,61 @@ void SemMesh<DIM>::Clear()
 }
 
 template<unsigned DIM>
+void SemMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& rMeshReader)
+{
+    // Store numbers of nodes and elements
+    unsigned num_nodes = rMeshReader.GetNumNodes();
+    unsigned num_elements = rMeshReader.GetNumElements();
+
+    // Reserve memory for nodes
+    this->mNodes.reserve(num_nodes);
+
+    rMeshReader.Reset();
+
+    // Add nodes
+    std::vector<double> node_data;
+    for (unsigned i=0; i<num_nodes; i++)
+    {
+        node_data = rMeshReader.GetNextNode();
+        unsigned is_boundary_node = (unsigned) node_data[DIM];
+        node_data.pop_back();
+        this->mNodes.push_back(new Node<DIM>(i, node_data, is_boundary_node));
+    }
+
+    rMeshReader.Reset();
+
+    // Reserve memory for nodes
+    mElements.reserve(rMeshReader.GetNumElements());
+
+    // Add elements
+    for (unsigned elem_index=0; elem_index<num_elements; elem_index++)
+    {
+     // Get the data for this element
+     ElementData element_data = rMeshReader.GetNextElementData();
+
+     // Get the nodes owned by this element
+     std::vector<Node<DIM>*> nodes;
+     unsigned num_nodes_in_element = element_data.NodeIndices.size();
+     for (unsigned j=0; j<num_nodes_in_element; j++)
+     {
+         assert(element_data.NodeIndices[j] < this->mNodes.size());
+         nodes.push_back(this->mNodes[element_data.NodeIndices[j]]);
+     }
+
+     // Use nodes and index to construct this element
+     PottsElement<DIM>* p_element = new PottsElement<DIM>(elem_index, nodes);
+     mElements.push_back(p_element);
+
+     if (rMeshReader.GetNumElementAttributes() > 0)
+     {
+         assert(rMeshReader.GetNumElementAttributes() == 1);
+         unsigned attribute_value = element_data.AttributeValue;
+         p_element->SetAttribute(attribute_value);
+     }
+    }
+}
+
+template<unsigned DIM>
 unsigned SemMesh<DIM>::GetNumNodes() const
 {
     return this->mNodes.size() - mDeletedNodeIndices.size();
@@ -274,71 +329,6 @@ unsigned SemMesh<DIM>::AddElement(PottsElement<DIM>* pNewElement, std::vector<No
     return pNewElement->GetIndex();
 }
 
-//template<unsigned DIM>
-//void SemMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& rMeshReader)
-//{
-//    // Store numbers of nodes and elements
-//    unsigned num_nodes = rMeshReader.GetNumNodes();
-//    unsigned num_elements = rMeshReader.GetNumElements();
-//
-//    // Reserve memory for nodes
-//    this->mNodes.reserve(num_nodes);
-//
-//    rMeshReader.Reset();
-//
-//    // Add nodes
-//    std::vector<double> node_data;
-//    for (unsigned i=0; i<num_nodes; i++)
-//    {
-//        node_data = rMeshReader.GetNextNode();
-//        unsigned is_boundary_node = (unsigned) node_data[DIM];
-//        node_data.pop_back();
-//        this->mNodes.push_back(new Node<DIM>(i, node_data, is_boundary_node));
-//    }
-//
-//    rMeshReader.Reset();
-//
-//    // Reserve memory for nodes
-//    mElements.reserve(rMeshReader.GetNumElements());
-//
-//    // Add elements
-//    for (unsigned elem_index=0; elem_index<num_elements; elem_index++)
-//    {
-//        // Get the data for this element
-//        ElementData element_data = rMeshReader.GetNextElementData();
-//
-//        // Get the nodes owned by this element
-//        std::vector<Node<DIM>*> nodes;
-//        unsigned num_nodes_in_element = element_data.NodeIndices.size();
-//        for (unsigned j=0; j<num_nodes_in_element; j++)
-//        {
-//            assert(element_data.NodeIndices[j] < this->mNodes.size());
-//            nodes.push_back(this->mNodes[element_data.NodeIndices[j]]);
-//        }
-//
-//        // Use nodes and index to construct this element
-//        PottsElement<DIM>* p_element = new PottsElement<DIM>(elem_index, nodes);
-//        mElements.push_back(p_element);
-//
-//        if (rMeshReader.GetNumElementAttributes() > 0)
-//        {
-//            assert(rMeshReader.GetNumElementAttributes() == 1);
-//            unsigned attribute_value = element_data.AttributeValue;
-//            p_element->SetAttribute(attribute_value);
-//        }
-//    }
-//
-//    // If just using mesh reader then there is no neighbour information see #1932
-//    if (mVonNeumannNeighbouringNodeIndices.size()==0)
-//    {
-//        mVonNeumannNeighbouringNodeIndices.resize(num_nodes);
-//    }
-//    if (mMooreNeighbouringNodeIndices.size()==0)
-//    {
-//        mMooreNeighbouringNodeIndices.resize(num_nodes);
-//    }
-//}
-
 /////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////////////
@@ -347,6 +337,6 @@ template class SemMesh<1>;
 template class SemMesh<2>;
 template class SemMesh<3>;
 
-//// Serialization for Boost >= 1.36
-//#include "SerializationExportWrapperForCpp.hpp"
-//EXPORT_TEMPLATE_CLASS_SAME_DIMS(SemMesh)
+// Serialization for Boost >= 1.36
+#include "SerializationExportWrapperForCpp.hpp"
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(SemMesh)

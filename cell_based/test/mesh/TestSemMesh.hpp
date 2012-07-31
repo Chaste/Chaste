@@ -43,6 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "SemMesh.hpp"
 #include "ArchiveOpener.hpp"
+#include "SemMeshGenerator.hpp"
 
 class TestSemMesh : public CxxTest::TestSuite
 {
@@ -268,6 +269,15 @@ public:
             TS_ASSERT_EQUALS(mesh.GetNode(node_index)->rGetContainingElementIndices().size(), 1u);
             TS_ASSERT_EQUALS((*mesh.GetNode(node_index)->rGetContainingElementIndices().begin()), 6u);
         }
+
+        // For coverage over-write an element
+        std::vector<Node<2>* > new_nodes2;
+        new_nodes2.push_back(new Node<2>(2, 0.0, 0.0));
+
+        PottsElement<2>* new_element2 = new PottsElement<2>(0, new_nodes2);
+        mesh.AddElement(new_element2, new_nodes2);
+
+        TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNumNodes(), 1u);
     }
 
     void TestDeleteElementAndRemesh() throw (Exception)
@@ -327,6 +337,123 @@ public:
            TS_ASSERT(p_element->GetNode(i)->GetIndex() > 299);
            TS_ASSERT(p_element->GetNode(i)->GetIndex() < 400);
        }
+    }
+
+    void TestArchive2dSemMesh() throw (Exception)
+    {
+        FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
+        std::string archive_file = "sem_mesh_2d.arch";
+        ArchiveLocationInfo::SetMeshFilename("sem_mesh");
+
+        // Create 2D mesh
+        SemMeshGenerator<2> generator(5, 5);
+        AbstractMesh<2,2>* const p_mesh = generator.GetMesh();
+
+        /*
+         * You need the const above to stop a BOOST_STATIC_ASSERTION failure.
+         * This is because the serialization library only allows you to save tracked
+         * objects while the compiler considers them const, to prevent the objects
+         * changing during the save, and so object tracking leading to wrong results.
+         *
+         * E.g. A is saved once via pointer, then changed, then saved again. The second
+         * save notes that A was saved before, so doesn't write its data again, and the
+         * change is lost.
+         */
+
+        // Create an output archive
+        {
+            TS_ASSERT_EQUALS((static_cast<SemMesh<2>*>(p_mesh))->GetNumNodes(), 2500u);
+            TS_ASSERT_EQUALS((static_cast<SemMesh<2>*>(p_mesh))->GetNumElements(), 25u);
+
+            // Create output archive
+            ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
+
+            // We have to serialize via a pointer here, or the derived class information is lost
+            (*p_arch) << p_mesh;
+        }
+
+        {
+            // De-serialize and compare
+            AbstractMesh<2,2>* p_mesh2;
+
+            // Create an input archive
+            ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
+
+            // Restore from the archive
+            (*p_arch) >> p_mesh2;
+
+            SemMesh<2>* p_mesh_original = static_cast<SemMesh<2>*>(p_mesh);
+            SemMesh<2>* p_mesh_loaded = static_cast<SemMesh<2>*>(p_mesh2);
+
+            // Compare the loaded mesh against the original
+
+            TS_ASSERT_EQUALS(p_mesh_original->GetNumNodes(), p_mesh_loaded->GetNumNodes());
+
+            for (unsigned node_index=0; node_index<p_mesh_original->GetNumNodes(); node_index++)
+            {
+                Node<2>* p_node = p_mesh_original->GetNode(node_index);
+                Node<2>* p_node2 = p_mesh2->GetNode(node_index);
+
+                TS_ASSERT_EQUALS(p_node->IsDeleted(), p_node2->IsDeleted());
+                TS_ASSERT_EQUALS(p_node->GetIndex(), p_node2->GetIndex());
+
+                TS_ASSERT_EQUALS(p_node->IsBoundaryNode(), p_node2->IsBoundaryNode());
+
+                for (unsigned dimension=0; dimension<2; dimension++)
+                {
+                    TS_ASSERT_DELTA(p_node->rGetLocation()[dimension], p_node2->rGetLocation()[dimension], 1e-4);
+                }
+            }
+
+            TS_ASSERT_EQUALS(p_mesh_original->GetNumElements(), p_mesh_loaded->GetNumElements());
+
+            for (unsigned elem_index=0; elem_index < p_mesh_original->GetNumElements(); elem_index++)
+            {
+                TS_ASSERT_EQUALS(p_mesh_original->GetElement(elem_index)->GetNumNodes(),
+                                 p_mesh_loaded->GetElement(elem_index)->GetNumNodes());
+
+                for (unsigned local_index=0; local_index<p_mesh_original->GetElement(elem_index)->GetNumNodes(); local_index++)
+                {
+                    TS_ASSERT_EQUALS(p_mesh_original->GetElement(elem_index)->GetNodeGlobalIndex(local_index),
+                                     p_mesh_loaded->GetElement(elem_index)->GetNodeGlobalIndex(local_index));
+                }
+            }
+
+            // Tidy up
+            delete p_mesh2;
+        }
+    }
+
+    void TestMeshConstructionFromMeshReader()
+    {
+        // Create mesh
+        SemMeshReader<2> mesh_reader("cell_based/test/data/TestSemMeshReader2d/sem_mesh_2d");
+        SemMesh<2> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        // Check we have the right number of nodes and elements
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 200u);
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), 2u);
+
+        // Check some node co-ordinates
+        TS_ASSERT_DELTA(mesh.GetNode(0)->GetPoint()[0], 0.0, 1e-6);
+        TS_ASSERT_DELTA(mesh.GetNode(0)->GetPoint()[1], 0.0, 1e-6);
+        TS_ASSERT_DELTA(mesh.GetNode(2)->GetPoint()[0], 0.380925, 1e-6);
+        TS_ASSERT_DELTA(mesh.GetNode(2)->GetPoint()[1], 0.0, 1e-6);
+
+        // Check second element has the right nodes
+        TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNumNodes(), 100u);
+        TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(0), 100u);
+        TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(1), 101u);
+        TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(2), 102u);
+        TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(3), 103u);
+        TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNode(1), mesh.GetNode(101));
+
+        // Check element attributes
+        TS_ASSERT_EQUALS(mesh.GetElement(0)->GetAttribute(), 97u);
+        TS_ASSERT_EQUALS(mesh.GetElement(1)->GetAttribute(), 98u);
     }
 };
 

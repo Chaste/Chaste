@@ -71,7 +71,7 @@ public:
      *
      * @param numCellsAcross the number of cells in the x-direction
      * @param numCellsUp the number of cells in the y-direction defaults to one for a string of cells.
-     * @param numCellDeep the number of cells in the z-direction. defaults to one for a flat plane of cells.
+     * @param numCellsDeep the number of cells in the z-direction. defaults to one for a flat plane of cells.
      * @param numSubCellularElementsPerCellAcross the number of subcellular elements per cell along the x-axis, represented by Nodes defaults to 10
      * @param numSubCellularElementsPerCellUp the number of subcellular elements per cell along the y-axis, represented by Nodes defaults to 10
      * @param numSubCellularElementsPerCellDeep the number of subcellular elements per cell along the z-axis, represented by Nodes defaults to 0 for 2D.

@@ -36,9 +36,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SEMMESH_HPP_
 #define SEMMESH_HPP_
 
-//// Forward declaration prevents circular include chain
-//template<unsigned DIM>
-//class SemMeshWriter;
+// Forward declaration prevents circular include chain
+template<unsigned DIM>
+class SemMeshWriter;
 
 #include <iostream>
 #include <map>
@@ -52,8 +52,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractMesh.hpp"
 #include "ArchiveLocationInfo.hpp"
-//#include "SemMeshReader.hpp"
-//#include "SemMeshWriter.hpp"
+#include "SemMeshReader.hpp"
+#include "SemMeshWriter.hpp"
 #include "PottsElement.hpp"
 
 /**
@@ -123,11 +123,11 @@ protected:
         archive & mDeletedNodeIndices;
         archive & boost::serialization::base_object<AbstractMesh<DIM, DIM> >(*this);
 
-//        // Create a mesh writer pointing to the correct file and directory
-//        SemMeshWriter<DIM> mesh_writer(ArchiveLocationInfo::GetArchiveRelativePath(),
-//                                         ArchiveLocationInfo::GetMeshFilename(),
-//                                         false);
-//        mesh_writer.WriteFilesUsingMesh(*(const_cast<SemMesh<DIM>*>(this)));
+        // Create a mesh writer pointing to the correct file and directory
+        SemMeshWriter<DIM> mesh_writer(ArchiveLocationInfo::GetArchiveRelativePath(),
+                                         ArchiveLocationInfo::GetMeshFilename(),
+                                         false);
+        mesh_writer.WriteFilesUsingMesh(*(const_cast<SemMesh<DIM>*>(this)));
     }
 
     /**
@@ -144,10 +144,10 @@ protected:
         archive & mDeletedNodeIndices;
         archive & boost::serialization::base_object<AbstractMesh<DIM, DIM> >(*this);
 
-//        SemMeshReader<DIM> mesh_reader(ArchiveLocationInfo::GetArchiveDirectory() + ArchiveLocationInfo::GetMeshFilename());
-//        this->ConstructFromMeshReader(mesh_reader);
+        SemMeshReader<DIM> mesh_reader(ArchiveLocationInfo::GetArchiveDirectory() + ArchiveLocationInfo::GetMeshFilename());
+        this->ConstructFromMeshReader(mesh_reader);
     }
-//    BOOST_SERIALIZATION_SPLIT_MEMBER()
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
 
 public:
 
@@ -177,6 +177,7 @@ public:
     /**
      * Default constructor.
      *
+     * @param nodes a vector of all the nodes contained in all elements
      * @param pottsElements vector of pointers to PottsElements
      */
     SemMesh( std::vector<Node<DIM>*> nodes,
@@ -224,7 +225,7 @@ public:
      *
      * @param rMeshReader the mesh reader
      */
-    //void ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& rMeshReader);
+    void ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& rMeshReader);
 
     /**
      * Delete mNodes and mElements.
@@ -325,8 +326,8 @@ public:
     };
 };
 
-//#include "SerializationExportWrapper.hpp"
-//EXPORT_TEMPLATE_CLASS_SAME_DIMS(SemMesh)
+#include "SerializationExportWrapper.hpp"
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(SemMesh)
 
 //////////////////////////////////////////////////////////////////////////////
 // SemElementIterator class implementation - most methods are inlined     //

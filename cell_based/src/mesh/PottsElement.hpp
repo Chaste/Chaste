@@ -94,6 +94,7 @@ public:
      * element so just add it to the end of the mNodes vector.
      *
      * @param pNode is a pointer to the new node
+     * @param rIndex the location in this->mNodes to place node. Defaults to the end.
      */
     void AddNode(Node<DIM>* pNode,  const unsigned& rIndex = UINT_MAX);
 };
