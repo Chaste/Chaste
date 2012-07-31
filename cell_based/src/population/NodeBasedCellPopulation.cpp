@@ -45,7 +45,7 @@ NodeBasedCellPopulation<DIM>::NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh,
     : AbstractCentreBasedCellPopulation<DIM>(rMesh, rCells, locationIndices),
       mDeleteMesh(deleteMesh),
       mMechanicsCutOffLength(DBL_MAX),
-      mUseVariableRadi(false)
+      mUseVariableRadii(false)
 {
 	mpNodesOnlyMesh = static_cast<NodesOnlyMesh<DIM>* >(&(this->mrMesh));
 	if (validate)
@@ -59,7 +59,7 @@ NodeBasedCellPopulation<DIM>::NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh)
     : AbstractCentreBasedCellPopulation<DIM>(rMesh),
       mDeleteMesh(true),
       mMechanicsCutOffLength(DBL_MAX), // will be set by serialize() method
-      mUseVariableRadi(false) // will be set by serialize() method
+      mUseVariableRadii(false) // will be set by serialize() method
 {
 	mpNodesOnlyMesh = static_cast<NodesOnlyMesh<DIM>* >(&(this->mrMesh));
     // No Validate() because the cells are not associated with the cell population yet in archiving
@@ -239,9 +239,9 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
     mpNodesOnlyMesh->CalculateNodePairs(mNodePairs, mNodeNeighbours);
 
     /*
-     * Update Cell radi based on CellData
+     * Update cell radii based on CellData
      */
-    if (mUseVariableRadi)
+    if (mUseVariableRadii)
     {
         for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
              cell_iter != this->End();
@@ -251,9 +251,7 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
             unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
             mpNodesOnlyMesh->SetCellRadius(node_index, cell_radius);
         }
-
     }
-
 }
 
 template<unsigned DIM>
@@ -340,15 +338,15 @@ double NodeBasedCellPopulation<DIM>::GetMechanicsCutOffLength()
 }
 
 template<unsigned DIM>
-bool NodeBasedCellPopulation<DIM>::GetUseVariableRadi()
+bool NodeBasedCellPopulation<DIM>::GetUseVariableRadii()
 {
-    return mUseVariableRadi;
+    return mUseVariableRadii;
 }
 
 template<unsigned DIM>
-void NodeBasedCellPopulation<DIM>::SetUseVariableRadi(bool useVariableRadi)
+void NodeBasedCellPopulation<DIM>::SetUseVariableRadii(bool useVariableRadii)
 {
-    mUseVariableRadi = useVariableRadi;
+    mUseVariableRadi = useVariableRadii;
 }
 
 template<unsigned DIM>

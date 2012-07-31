@@ -135,7 +135,7 @@ public:
     /**
      * Create a simulation of a NodeBasedCellPopulation with different cell radii
      */
-    void TestSimpleMonolayerWithDifferentRadi() throw (Exception)
+    void TestSimpleMonolayerWithDifferentRadii() throw (Exception)
     {
         // Creates nodes and mesh
         std::vector<Node<2>*> nodes;
@@ -185,9 +185,9 @@ public:
     }
 
     /**
-    * Create a simulation of a NodeBasedCellPopulation with variable cell radi
-    */
-    void TestSimpleMonolayerWithVariableRadi() throw (Exception)
+     * Create a simulation of a NodeBasedCellPopulation with variable cell radii
+     */
+    void TestSimpleMonolayerWithVariableRadii() throw (Exception)
     {
         // Creates nodes and mesh
         std::vector<Node<2>*> nodes;
@@ -202,14 +202,13 @@ public:
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(),TRANSIT);
 
         // Store the radius of the cells in Cell Data
-        cells[0]->GetCellData()->SetItem("Radius",1.0);
-        cells[1]->GetCellData()->SetItem("Radius",2.0);
-
+        cells[0]->GetCellData()->SetItem("Radius", 1.0);
+        cells[1]->GetCellData()->SetItem("Radius", 2.0);
 
         // Create a node-based cell population
         NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
         node_based_cell_population.SetMechanicsCutOffLength(5.0); // Different as bigger cells
-        node_based_cell_population.SetUseVariableRadi(true);
+        node_based_cell_population.SetUseVariableRadii(true);
         node_based_cell_population.SetOutputCellVolumes(true);
         node_based_cell_population.Update();
 

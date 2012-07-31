@@ -1,5 +1,5 @@
 		<MechanicsCutOffLength>1.2</MechanicsCutOffLength>
-		<UseVariableRadi>0</UseVariableRadi>
+		<UseVariableRadii>0</UseVariableRadii>
 		<MeinekeDivisionSeparation>0.3</MeinekeDivisionSeparation>
 		<DampingConstantNormal>1</DampingConstantNormal>
 		<DampingConstantMutant>1</DampingConstantMutant>
