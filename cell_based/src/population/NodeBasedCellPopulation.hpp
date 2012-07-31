@@ -79,6 +79,11 @@ private:
      */
     double mMechanicsCutOffLength;
 
+    /**
+     * Whether or not to have cell radii updated from CellData defaults to false.
+     */
+    bool mUseVariableRadi;
+
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
@@ -95,6 +100,7 @@ private:
     {
         archive & boost::serialization::base_object<AbstractCentreBasedCellPopulation<DIM> >(*this);
         archive & mMechanicsCutOffLength;
+        archive & mUseVariableRadi;
 
         this->Validate();
     }
@@ -271,6 +277,18 @@ public:
      * @param mechanicsCutOffLength  the new value of mMechanicsCutOffLength
      */
     void SetMechanicsCutOffLength(double mechanicsCutOffLength);
+
+    /**
+     * @return mUseVariableRadi
+     */
+    bool GetUseVariableRadi();
+
+    /**
+     * Set mUseVariableRadi.
+     *
+     * @param useVariableRadi the new value of mUseVariableRadi
+     */
+    void SetUseVariableRadi(bool mUseVariableRadi);
 
     /**
      * Overridden GetWidth() method.

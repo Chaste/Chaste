@@ -978,6 +978,7 @@ public:
             }
 
             p_cell_population->SetMechanicsCutOffLength(1.5);
+            p_cell_population->SetUseVariableRadi(true);
 
             // Create an output archive
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -1028,8 +1029,6 @@ public:
             // Check the cell population has been restored
             TS_ASSERT_EQUALS(p_cell_population->rGetCells().size(), 5u);
 
-            TS_ASSERT_DELTA(p_cell_population->GetMechanicsCutOffLength(), 1.5, 1e-6);
-
             // Check number of nodes
             TS_ASSERT_EQUALS(p_cell_population->GetNumNodes(), 5u);
 
@@ -1044,6 +1043,7 @@ public:
 
             // Check the member variables have been restored
             TS_ASSERT_DELTA(p_cell_population->GetMechanicsCutOffLength(), 1.5, 1e-9);
+            TS_ASSERT(p_cell_population->GetUseVariableRadi());
 
             // Tidy up
             delete p_cell_population;

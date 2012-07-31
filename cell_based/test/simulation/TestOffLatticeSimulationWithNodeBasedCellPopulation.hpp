@@ -156,10 +156,12 @@ public:
         // Create a node-based cell population
         NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
         node_based_cell_population.SetMechanicsCutOffLength(5.0); // Different as bigger cells
+        node_based_cell_population.SetOutputCellVolumes(true);
+        node_based_cell_population.Update();
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(node_based_cell_population);
-        simulator.SetOutputDirectory("TestOffLatticeSimulationWithNodeBasedCellPopulationAndVariableRadi");
+        simulator.SetOutputDirectory("TestOffLatticeSimulationWithNodeBasedCellPopulationAndDifferentRadi");
         simulator.SetSamplingTimestepMultiple(12);
         simulator.SetEndTime(12.0);
 
@@ -180,6 +182,83 @@ public:
         TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(1)->rGetLocation()), 3.0, 1e-1);
         TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(2)->rGetLocation()), 3.0, 1e-1);
         TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(3)->rGetLocation()), 2.0, 1e-1);
+    }
+
+    /**
+    * Create a simulation of a NodeBasedCellPopulation with variable cell radi
+    */
+    void TestSimpleMonolayerWithVariableRadi() throw (Exception)
+    {
+        // Creates nodes and mesh
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0,  false,  0.0, 0.0));
+        nodes.push_back(new Node<2>(1,  false,  1.0, 0.0));
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(),TRANSIT);
+
+        // Store the radius of the cells in Cell Data
+        cells[0]->GetCellData()->SetItem("Radius",1.0);
+        cells[1]->GetCellData()->SetItem("Radius",2.0);
+
+
+        // Create a node-based cell population
+        NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
+        node_based_cell_population.SetMechanicsCutOffLength(5.0); // Different as bigger cells
+        node_based_cell_population.SetUseVariableRadi(true);
+        node_based_cell_population.SetOutputCellVolumes(true);
+        node_based_cell_population.Update();
+
+        // Set up cell-based simulation
+        OffLatticeSimulation<2> simulator(node_based_cell_population);
+        simulator.SetOutputDirectory("TestOffLatticeSimulationWithNodeBasedCellPopulationAndVariableRadi");
+        simulator.SetSamplingTimestepMultiple(12);
+        simulator.SetEndTime(10.0);
+
+        // Create a force law and pass it to the simulation
+        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        p_linear_force->SetCutOffLength(5.0); // Different as bigger cells
+        simulator.AddForce(p_linear_force);
+
+        simulator.Solve();
+
+        // Check the Radi of all the cells are correct cell 0 divided into 0 and 3 and cell 1 divided into 1 and 2.
+        TS_ASSERT_DELTA(mesh.GetCellRadius(0),1.0,1e-6);
+        TS_ASSERT_DELTA(mesh.GetCellRadius(1),2.0,1e-6);
+        TS_ASSERT_DELTA(mesh.GetCellRadius(2),2.0,1e-6);
+        TS_ASSERT_DELTA(mesh.GetCellRadius(3),1.0,1e-6);
+
+        // Check the separation of some node pairs
+        TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(1)->rGetLocation()), 3.0, 1e-1);
+        TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(2)->rGetLocation()), 3.0, 1e-1);
+        TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(3)->rGetLocation()), 2.0, 1e-1);
+
+        // Now set all the Radi to 0.5 Note this could be done inside a cell cycle model.
+        for (AbstractCellPopulation<2>::Iterator cell_iter = simulator.rGetCellPopulation().Begin();
+             cell_iter != simulator.rGetCellPopulation().End();
+             ++cell_iter)
+        {
+            cell_iter->GetCellData()->SetItem("Radius",2.0);
+        }
+
+        simulator.SetEndTime(12.0);
+        simulator.Solve();
+
+
+        for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+        {
+            TS_ASSERT_DELTA(mesh.GetCellRadius(i),2.0,1e-6);
+        }
+
+        // Check the separation of some node pairs
+        TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(1)->rGetLocation()), 4.0, 1e-3);
+        TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(2)->rGetLocation()), 4.0, 1e-3);
+        TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(3)->rGetLocation()), 4.0, 1e-3);
+
     }
 
     void TestSimulationWithBoxes() throw (Exception)

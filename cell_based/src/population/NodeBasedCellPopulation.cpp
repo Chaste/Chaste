@@ -44,7 +44,8 @@ NodeBasedCellPopulation<DIM>::NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh,
                                       bool validate)
     : AbstractCentreBasedCellPopulation<DIM>(rMesh, rCells, locationIndices),
       mDeleteMesh(deleteMesh),
-      mMechanicsCutOffLength(DBL_MAX)
+      mMechanicsCutOffLength(DBL_MAX),
+      mUseVariableRadi(false)
 {
 	mpNodesOnlyMesh = static_cast<NodesOnlyMesh<DIM>* >(&(this->mrMesh));
 	if (validate)
@@ -57,7 +58,8 @@ template<unsigned DIM>
 NodeBasedCellPopulation<DIM>::NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh)
     : AbstractCentreBasedCellPopulation<DIM>(rMesh),
       mDeleteMesh(true),
-      mMechanicsCutOffLength(DBL_MAX) // will be set by serialize() method
+      mMechanicsCutOffLength(DBL_MAX), // will be set by serialize() method
+      mUseVariableRadi(false) // will be set by serialize() method
 {
 	mpNodesOnlyMesh = static_cast<NodesOnlyMesh<DIM>* >(&(this->mrMesh));
     // No Validate() because the cells are not associated with the cell population yet in archiving
@@ -235,29 +237,46 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
     mpNodesOnlyMesh->SetUpBoxCollection(mMechanicsCutOffLength, domain_size);
 
     mpNodesOnlyMesh->CalculateNodePairs(mNodePairs, mNodeNeighbours);
+
+    /*
+     * Update Cell radi based on CellData
+     */
+    if (mUseVariableRadi)
+    {
+        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+             cell_iter != this->End();
+             ++cell_iter)
+        {
+            double cell_radius = cell_iter->GetCellData()->GetItem("Radius");
+            unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
+            mpNodesOnlyMesh->SetCellRadius(node_index, cell_radius);
+        }
+
+    }
+
 }
 
 template<unsigned DIM>
 unsigned NodeBasedCellPopulation<DIM>::RemoveDeadCells()
 {
     unsigned num_removed = 0;
-    for (std::list<CellPtr>::iterator it = this->mCells.begin();
-         it != this->mCells.end();
-         ++it)
+    for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
+         cell_iter != this->mCells.end();
+         ++cell_iter)
     {
-        if ((*it)->IsDead())
+        if ((*cell_iter)->IsDead())
         {
             // Remove the node from the mesh
             num_removed++;
-            mpNodesOnlyMesh->DeleteNodePriorToReMesh(this->GetLocationIndexUsingCell((*it)));
+            mpNodesOnlyMesh->DeleteNodePriorToReMesh(this->GetLocationIndexUsingCell((*cell_iter)));
 
             // Update mappings between cells and location indices
-            unsigned location_index_of_removed_node = this->GetLocationIndexUsingCell((*it));
-            this->RemoveCellUsingLocationIndex(location_index_of_removed_node, (*it));
+            unsigned location_index_of_removed_node = this->GetLocationIndexUsingCell((*cell_iter));
+            this->RemoveCellUsingLocationIndex(location_index_of_removed_node, (*cell_iter));
 
             // Update vector of cells
-            it = this->mCells.erase(it);
-            --it;
+            cell_iter = this->mCells.erase(cell_iter);
+            --cell_iter;
         }
     }
 
@@ -301,6 +320,7 @@ template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t<MechanicsCutOffLength>" << mMechanicsCutOffLength << "</MechanicsCutOffLength>\n";
+    *rParamsFile << "\t\t<UseVariableRadi>" << mUseVariableRadi << "</UseVariableRadi>\n";
 
     // Call method on direct parent class
     AbstractCentreBasedCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);
@@ -317,6 +337,18 @@ template<unsigned DIM>
 double NodeBasedCellPopulation<DIM>::GetMechanicsCutOffLength()
 {
     return mMechanicsCutOffLength;
+}
+
+template<unsigned DIM>
+bool NodeBasedCellPopulation<DIM>::GetUseVariableRadi()
+{
+    return mUseVariableRadi;
+}
+
+template<unsigned DIM>
+void NodeBasedCellPopulation<DIM>::SetUseVariableRadi(bool useVariableRadi)
+{
+    mUseVariableRadi = useVariableRadi;
 }
 
 template<unsigned DIM>
