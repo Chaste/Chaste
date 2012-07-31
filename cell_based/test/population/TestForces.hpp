@@ -692,7 +692,7 @@ public:
 
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
         cell_population.SetMechanicsCutOffLength(100.0);
-        cell_population.Update(); //Needs to be called seperately as not in a simulation
+        cell_population.Update(); //Needs to be called separately as not in a simulation
 
         RepulsionForce<2> repulsion_force;
 
@@ -707,7 +707,7 @@ public:
         repulsion_force.AddForceContribution(node_forces, cell_population);
 
         /*
-         * First two cells repel each other and second 2 cells are too far appart.
+         * First two cells repel each other and second 2 cells are too far apart.
          * The radius of the cells is the default value, 0.5.
          */
         TS_ASSERT_DELTA(node_forces[0][0], -34.5387, 1e-4);

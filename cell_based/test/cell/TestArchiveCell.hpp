@@ -55,7 +55,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 
 /*
- * This test is seperate from TestCell.hpp to avoid strange errors with the
+ * This test is separate from TestCell.hpp to avoid strange errors with the
  * intel compiler - see #1569
  */
 class TestArchiveCell: public AbstractCellBasedTestSuite

@@ -277,7 +277,7 @@ public:
 
         node_based_cell_population.AddCell(p_cell2, cell2_location, p_cell0);
 
-        // Check the Radi of all the cells are correct cell 0 divided into 0 and 2.
+        // Check the radii of all the cells are correct (cell 0 divided into 0 and 2)
         TS_ASSERT_DELTA(mesh.GetCellRadius(0),0.1,1e-6);
         TS_ASSERT_DELTA(mesh.GetCellRadius(1),0.2,1e-6);
         TS_ASSERT_DELTA(mesh.GetCellRadius(2),0.1,1e-6);

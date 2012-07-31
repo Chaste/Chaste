@@ -512,7 +512,7 @@ public:
 
         simulator.Solve();
 
-        //Check that nodes are all sat at resting length  (1.0) appart.
+        //Check that nodes are all sat at resting length  (1.0) apart.
         TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(1)->rGetLocation()),1.0,1e-5);
         TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(1)->rGetLocation()-simulator.rGetCellPopulation().GetNode(2)->rGetLocation()),1.0,1e-5);
         TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(2)->rGetLocation()-simulator.rGetCellPopulation().GetNode(0)->rGetLocation()),1.0,1e-5);

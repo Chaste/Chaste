@@ -133,7 +133,7 @@ public:
 
 
     /**
-     * Create a simulation of a NodeBasedCellPopulation with different cell radi
+     * Create a simulation of a NodeBasedCellPopulation with different cell radii
      */
     void TestSimpleMonolayerWithDifferentRadi() throw (Exception)
     {
@@ -144,7 +144,7 @@ public:
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(nodes);
 
-        // Modify the radi of the cells
+        // Modify the radii of the cells
         mesh.SetCellRadius(0,1.0);
         mesh.SetCellRadius(1,2.0);
 
@@ -170,7 +170,7 @@ public:
 
         simulator.Solve();
 
-        // Check the Radi of all the cells are correct cell 0 divided into 0 and 3 and cell 1 divided into 1 and 2.
+        // Check that the radii of all the cells are correct (cell 0 divided into 0 and 3 and cell 1 divided into 1 and 2)
         TS_ASSERT_DELTA(mesh.GetCellRadius(0),1.0,1e-6);
         TS_ASSERT_DELTA(mesh.GetCellRadius(1),2.0,1e-6);
         TS_ASSERT_DELTA(mesh.GetCellRadius(2),2.0,1e-6);

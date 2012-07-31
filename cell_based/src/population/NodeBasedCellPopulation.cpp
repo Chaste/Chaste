@@ -430,12 +430,12 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
 		assert(cell_radius+neighbouring_cell_radius<mMechanicsCutOffLength);
 
 		// Calculate the distance between the two nodes and add to cell radius
-		double seperation = norm_2(node_j_location - node_i_location);
+		double separation = norm_2(node_j_location - node_i_location);
 
-		if(seperation< cell_radius+neighbouring_cell_radius)
+		if(separation< cell_radius+neighbouring_cell_radius)
 		{
 			// The effective radius is the mid point of the overlap
-			averaged_cell_radius = averaged_cell_radius + cell_radius - (cell_radius+neighbouring_cell_radius-seperation)/2.0;
+			averaged_cell_radius = averaged_cell_radius + cell_radius - (cell_radius+neighbouring_cell_radius-separation)/2.0;
 			num_cells++;
 		}
 	}
