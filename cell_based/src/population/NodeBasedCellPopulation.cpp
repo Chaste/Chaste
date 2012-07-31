@@ -318,7 +318,8 @@ template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t<MechanicsCutOffLength>" << mMechanicsCutOffLength << "</MechanicsCutOffLength>\n";
-    *rParamsFile << "\t\t<UseVariableRadi>" << mUseVariableRadi << "</UseVariableRadi>\n";
+    *rParamsFile << "\t\t<UseVariableRadii>" << mUseVariableRadii << 
+"</UseVariableRadii>\n";
 
     // Call method on direct parent class
     AbstractCentreBasedCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);
@@ -346,7 +347,7 @@ bool NodeBasedCellPopulation<DIM>::GetUseVariableRadii()
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::SetUseVariableRadii(bool useVariableRadii)
 {
-    mUseVariableRadi = useVariableRadii;
+    mUseVariableRadii = useVariableRadii;
 }
 
 template<unsigned DIM>
@@ -617,7 +618,6 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         {
             cellwise_data[var][node_index] = cell_iter->GetCellData()->GetItem(cell_data_names[var]); 
         }
-
     }
 
     if (this->mOutputCellProliferativeTypes)
