@@ -90,14 +90,14 @@ public:
             TS_ASSERT_LESS_THAN_EQUALS( voltage[index] , Ena +  30);
             TS_ASSERT_LESS_THAN_EQUALS(-voltage[index] + (Ek-30), 0);
 
-            std::vector<double>& r_ode_vars = bidomain_problem.GetBidomainTissue()->GetCardiacCell(index.Global)->GetStdVecStateVariables();
+            std::vector<double> ode_vars = bidomain_problem.GetBidomainTissue()->GetCardiacCell(index.Global)->GetStdVecStateVariables();
             for (int j=0; j<8; j++)
             {
                 // if not voltage or calcium ion conc, test whether between 0 and 1
                 if ((j!=0) && (j!=7))
                 {
-                    TS_ASSERT_LESS_THAN_EQUALS( r_ode_vars[j], 1.0);
-                    TS_ASSERT_LESS_THAN_EQUALS(-r_ode_vars[j], 0.0);
+                    TS_ASSERT_LESS_THAN_EQUALS( ode_vars[j], 1.0);
+                    TS_ASSERT_LESS_THAN_EQUALS(-ode_vars[j], 0.0);
                 }
             }
 
