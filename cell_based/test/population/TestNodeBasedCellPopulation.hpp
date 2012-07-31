@@ -272,7 +272,7 @@ public:
         cell2_location[0] = 2.0;
         cell2_location[1] = 2.0;
 
-        node_based_cell_population.AddCell(p_cell2, cell2_location);
+        node_based_cell_population.AddCell(p_cell2, cell2_location, p_cell0);
 
         // Tidy up
         delete p_node0;
@@ -341,7 +341,9 @@ public:
         new_cell_location[0] = 2.0;
         new_cell_location[1] = 2.0;
 
-        node_based_cell_population.AddCell(p_cell, new_cell_location);
+        CellPtr p_parent_cell = node_based_cell_population.GetCellUsingLocationIndex(1u);
+
+        node_based_cell_population.AddCell(p_cell, new_cell_location,p_parent_cell);
 
         // CellPopulation should have updated nodes and cells
         TS_ASSERT_EQUALS(node_based_cell_population.GetNumNodes(), old_num_nodes+1);
@@ -479,7 +481,10 @@ public:
         c_vector<double,2> new_location;
         new_location[0] = 0.3433453454443;
         new_location[1] = 0.3435346344234;
-        node_based_cell_population.AddCell(p_new_cell, new_location);
+
+        CellPtr p_parent_cell = node_based_cell_population.GetCellUsingLocationIndex(0u);
+
+        node_based_cell_population.AddCell(p_new_cell, new_location,p_parent_cell);
 
         // Test that the numbers of nodes and cells has been updated
         TS_ASSERT_EQUALS(node_based_cell_population.GetNumNodes(), 82u);
@@ -505,7 +510,8 @@ public:
         c_vector<double,2> new_location2;
         new_location2[0] = 0.6433453454443;
         new_location2[1] = 0.6435346344234;
-        node_based_cell_population.AddCell(p_new_cell2, new_location2);
+
+        node_based_cell_population.AddCell(p_new_cell2, new_location2, p_parent_cell); // Use same parent cell
 
         // Test that the numbers of nodes and cells has been updated
         TS_ASSERT_EQUALS(node_based_cell_population.GetNumNodes(), 82u);

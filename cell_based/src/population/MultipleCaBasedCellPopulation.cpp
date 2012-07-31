@@ -551,13 +551,17 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile()
 
             c_vector<double, DIM> coords = GetLocationOfCellCentre(*iter);
 
-            // Move the coordinate slighly so can visualise all cells in a lattice site
-            RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
-
-            for( unsigned i=0; i<DIM; i++)
+            // Move the coordinate slighly so can visualise all cells in a lattice site if more than one per site
+            if(mLatticeCarryingCapacity>1)
             {
-                coords[i] += p_gen->ranf(); // This assumes all sites are 1 appart;
+                RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
+
+                for( unsigned i=0; i<DIM; i++)
+                {
+                    coords[i] += p_gen->ranf(); // This assumes all sites are 1 appart;
+                }
             }
+
             nodes.push_back(new Node<DIM>(cell, coords, false));
 
             if (this->mOutputCellAncestors)
