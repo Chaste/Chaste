@@ -419,7 +419,7 @@ public:
 
         TS_ASSERT_DELTA(final_voltage_ici[130], ici_130, 1.0);
         TS_ASSERT_DELTA(final_voltage_svi[130], svi_130, 0.2);
-        TS_ASSERT_DELTA(final_voltage_svi_cvode[130], svi_130, 0.2);
+        TS_ASSERT_DELTA(final_voltage_svi_cvode[130], svi_130, 0.3); // different CVODE versions = slightly different answer!
         TS_ASSERT_DELTA(final_voltage_svit[130], svi_130, 0.2);
     }
 
