@@ -42,36 +42,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VectorHelperFunctions.hpp"
 
 
-AbstractUntemplatedParameterisedSystem::AbstractUntemplatedParameterisedSystem(unsigned numberOfStateVariables)
-    : mNumberOfStateVariables(numberOfStateVariables)
-{
-}
-
-
 template<typename VECTOR>
 AbstractParameterisedSystem<VECTOR>::AbstractParameterisedSystem(unsigned numberOfStateVariables)
     : AbstractUntemplatedParameterisedSystem(numberOfStateVariables)
 {
     InitialiseEmptyVector(mParameters);
     InitialiseEmptyVector(mStateVariables);
-}
-
-
-AbstractUntemplatedParameterisedSystem::~AbstractUntemplatedParameterisedSystem()
-{
-}
-
-
-boost::shared_ptr<const AbstractOdeSystemInformation> AbstractUntemplatedParameterisedSystem::GetSystemInformation() const
-{
-    assert(mpSystemInfo);
-    return mpSystemInfo;
-}
-
-
-std::string AbstractUntemplatedParameterisedSystem::GetSystemName() const
-{
-    return GetSystemInformation()->GetSystemName();
 }
 
 template<typename VECTOR>
@@ -103,11 +79,6 @@ std::string AbstractParameterisedSystem<VECTOR>::GetStateMessage(const std::stri
 //
 // State variable methods
 //
-
-unsigned AbstractUntemplatedParameterisedSystem::GetNumberOfStateVariables() const
-{
-    return mNumberOfStateVariables;
-}
 
 template<typename VECTOR>
 VECTOR& AbstractParameterisedSystem<VECTOR>::rGetStateVariables()
@@ -168,31 +139,6 @@ void AbstractParameterisedSystem<VECTOR>::SetStateVariable(const std::string& rN
 }
 
 
-const std::vector<std::string>& AbstractUntemplatedParameterisedSystem::rGetStateVariableNames() const
-{
-    return GetSystemInformation()->rGetStateVariableNames();
-}
-
-const std::vector<std::string>& AbstractUntemplatedParameterisedSystem::rGetStateVariableUnits() const
-{
-    return GetSystemInformation()->rGetStateVariableUnits();
-}
-
-unsigned AbstractUntemplatedParameterisedSystem::GetStateVariableIndex(const std::string& rName) const
-{
-    return GetSystemInformation()->GetStateVariableIndex(rName);
-}
-
-bool AbstractUntemplatedParameterisedSystem::HasStateVariable(const std::string& rName) const
-{
-    return GetSystemInformation()->HasStateVariable(rName);
-}
-
-std::string AbstractUntemplatedParameterisedSystem::GetStateVariableUnits(unsigned index) const
-{
-    return GetSystemInformation()->GetStateVariableUnits(index);
-}
-
 //
 // Initial condition methods
 //
@@ -244,11 +190,6 @@ void AbstractParameterisedSystem<VECTOR>::ResetToInitialConditions()
 // Parameter methods
 //
 
-unsigned AbstractUntemplatedParameterisedSystem::GetNumberOfParameters() const
-{
-    return GetSystemInformation()->rGetParameterNames().size();
-}
-
 template<typename VECTOR>
 double AbstractParameterisedSystem<VECTOR>::GetParameter(unsigned index) const
 {
@@ -279,32 +220,6 @@ template<typename VECTOR>
 double AbstractParameterisedSystem<VECTOR>::GetParameter(const std::string& rName) const
 {
     return GetParameter(GetParameterIndex(rName));
-}
-
-
-const std::vector<std::string>& AbstractUntemplatedParameterisedSystem::rGetParameterNames() const
-{
-    return GetSystemInformation()->rGetParameterNames();
-}
-
-const std::vector<std::string>& AbstractUntemplatedParameterisedSystem::rGetParameterUnits() const
-{
-    return GetSystemInformation()->rGetParameterUnits();
-}
-
-unsigned AbstractUntemplatedParameterisedSystem::GetParameterIndex(const std::string& rName) const
-{
-    return GetSystemInformation()->GetParameterIndex(rName);
-}
-
-bool AbstractUntemplatedParameterisedSystem::HasParameter(const std::string& rName) const
-{
-    return GetSystemInformation()->HasParameter(rName);
-}
-
-std::string AbstractUntemplatedParameterisedSystem::GetParameterUnits(unsigned index) const
-{
-    return GetSystemInformation()->GetParameterUnits(index);
 }
 
 //
@@ -356,17 +271,6 @@ double AbstractParameterisedSystem<VECTOR>::GetAnyVariable(const std::string& rN
     return GetAnyVariable(GetAnyVariableIndex(rName), time, pDerivedQuantities);
 }
 
-
-unsigned AbstractUntemplatedParameterisedSystem::GetAnyVariableIndex(const std::string& rName) const
-{
-    return GetSystemInformation()->GetAnyVariableIndex(rName);
-}
-
-bool AbstractUntemplatedParameterisedSystem::HasAnyVariable(const std::string& rName) const
-{
-    return GetSystemInformation()->HasAnyVariable(rName);
-}
-
 template<typename VECTOR>
 void AbstractParameterisedSystem<VECTOR>::SetAnyVariable(unsigned index, double value)
 {
@@ -390,25 +294,9 @@ void AbstractParameterisedSystem<VECTOR>::SetAnyVariable(const std::string& rNam
     SetAnyVariable(GetAnyVariableIndex(rName), value);
 }
 
-
-std::string AbstractUntemplatedParameterisedSystem::GetAnyVariableUnits(unsigned index) const
-{
-    return GetSystemInformation()->GetAnyVariableUnits(index);
-}
-
-std::string AbstractUntemplatedParameterisedSystem::GetAnyVariableUnits(const std::string& rName) const
-{
-    return GetAnyVariableUnits(GetAnyVariableIndex(rName));
-}
-
 //
 // "Derived quantities" methods
 //
-
-unsigned AbstractUntemplatedParameterisedSystem::GetNumberOfDerivedQuantities() const
-{
-    return GetSystemInformation()->rGetDerivedQuantityNames().size();
-}
 
 template<typename VECTOR>
 VECTOR AbstractParameterisedSystem<VECTOR>::ComputeDerivedQuantities(double time,
@@ -422,49 +310,6 @@ VECTOR AbstractParameterisedSystem<VECTOR>::ComputeDerivedQuantitiesFromCurrentS
 {
     return this->ComputeDerivedQuantities(time, mStateVariables);
 }
-
-
-const std::vector<std::string>& AbstractUntemplatedParameterisedSystem::rGetDerivedQuantityNames() const
-{
-    return GetSystemInformation()->rGetDerivedQuantityNames();
-}
-
-const std::vector<std::string>& AbstractUntemplatedParameterisedSystem::rGetDerivedQuantityUnits() const
-{
-    return GetSystemInformation()->rGetDerivedQuantityUnits();
-}
-
-unsigned AbstractUntemplatedParameterisedSystem::GetDerivedQuantityIndex(const std::string& rName) const
-{
-    return GetSystemInformation()->GetDerivedQuantityIndex(rName);
-}
-
-bool AbstractUntemplatedParameterisedSystem::HasDerivedQuantity(const std::string& rName) const
-{
-    return GetSystemInformation()->HasDerivedQuantity(rName);
-}
-
-std::string AbstractUntemplatedParameterisedSystem::GetDerivedQuantityUnits(unsigned index) const
-{
-    return GetSystemInformation()->GetDerivedQuantityUnits(index);
-}
-
-
-unsigned AbstractUntemplatedParameterisedSystem::GetNumberOfAttributes() const
-{
-    return GetSystemInformation()->GetNumberOfAttributes();
-}
-
-bool AbstractUntemplatedParameterisedSystem::HasAttribute(const std::string& rName) const
-{
-    return GetSystemInformation()->HasAttribute(rName);
-}
-
-double AbstractUntemplatedParameterisedSystem::GetAttribute(const std::string& rName) const
-{
-    return GetSystemInformation()->GetAttribute(rName);
-}
-
 
 
 ////////////////////////////////////////////////////////////////////////////////////
