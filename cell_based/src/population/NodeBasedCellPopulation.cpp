@@ -642,7 +642,6 @@ CellPtr NodeBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_vector<d
     assert(p_created_cell == pNewCell);
 
     // Then set the new cell radius in the NodesOnlyMesh
-    ///\todo set the correct cell radius and properly test this (#1808)
     unsigned parent_node_index = this->GetLocationIndexUsingCell(pParentCell);
     unsigned new_node_index = this->GetLocationIndexUsingCell(p_created_cell);
     mpNodesOnlyMesh->SetCellRadius(new_node_index, mpNodesOnlyMesh->GetCellRadius(parent_node_index));

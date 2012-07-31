@@ -237,6 +237,9 @@ public:
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(nodes);
 
+        mesh.SetCellRadius(0,0.1);
+        mesh.SetCellRadius(1,0.2);
+
         // Create two cells
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         FixedDurationGenerationBasedCellCycleModel* p_model0 = new FixedDurationGenerationBasedCellCycleModel();
@@ -273,6 +276,11 @@ public:
         cell2_location[1] = 2.0;
 
         node_based_cell_population.AddCell(p_cell2, cell2_location, p_cell0);
+
+        // Check the Radi of all the cells are correct cell 0 divided into 0 and 2.
+        TS_ASSERT_DELTA(mesh.GetCellRadius(0),0.1,1e-6);
+        TS_ASSERT_DELTA(mesh.GetCellRadius(1),0.2,1e-6);
+        TS_ASSERT_DELTA(mesh.GetCellRadius(2),0.1,1e-6);
 
         // Tidy up
         delete p_node0;
