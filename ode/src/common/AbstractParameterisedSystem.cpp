@@ -76,6 +76,41 @@ std::string AbstractParameterisedSystem<VECTOR>::GetStateMessage(const std::stri
     return res.str();
 }
 
+template<typename VECTOR>
+void AbstractParameterisedSystem<VECTOR>::CheckParametersOnLoad(const std::vector<double>& rParameters, const std::vector<std::string>& rParameterNames)
+{
+    if (GetVectorSize(mParameters) != rGetParameterNames().size())
+    {
+        // Subclass constructor didn't give default values, so we need the archive to provide them all
+        if (rParameterNames.size() != rGetParameterNames().size())
+        {
+            EXCEPTION("Number of ODE parameters in archive does not match number in class.");
+        }
+        CreateVectorIfEmpty(mParameters,rGetParameterNames().size());
+    }
+
+    // Check whether the archive specifies parameters that don't appear in this class,
+    // and create a map from archive index to local index
+    std::vector<unsigned> index_map(rParameterNames.size());
+    for (unsigned i=0; i<rParameterNames.size(); ++i)
+    {
+        index_map[i] = find(rGetParameterNames().begin(), rGetParameterNames().end(), rParameterNames[i])
+                       - rGetParameterNames().begin();
+        if (index_map[i] == rGetParameterNames().size())
+        {
+            EXCEPTION("Archive specifies a parameter '" + rParameterNames[i] + "' which does not appear in this class.");
+        }
+    }
+
+    for (unsigned i=0; i<rParameterNames.size(); ++i)
+    {
+        SetVectorComponent(mParameters,index_map[i],rParameters[i]);
+    }
+
+    // Paranoia check
+    assert(GetVectorSize(mParameters) == rGetParameterNames().size());
+}
+
 //
 // State variable methods
 //

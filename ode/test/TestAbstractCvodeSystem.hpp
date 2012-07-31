@@ -39,8 +39,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cmath>
 #include <iostream>
-//#include <boost/archive/text_oarchive.hpp>
-//#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
 
 #include "Cvode1.hpp"
 #include "ParameterisedCvode.hpp"
@@ -49,6 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "OdeSolution.hpp"
 #include "VectorHelperFunctions.hpp"
+#include "OutputFileHandler.hpp"
 
 double tol = 1e-6;
 
@@ -411,6 +412,83 @@ public:
             ode.SetParameter("a", i); // dy/dx = i
             ode.SetAutoReset(true);
             ode.Solve(i, i+1.0, 1.0);
+        }
+#else
+        std::cout << "Cvode is not enabled.\n";
+#endif // CHASTE_CVODE
+    }
+
+    void TestArchiving() throw (Exception)
+    {
+#ifdef CHASTE_CVODE
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename;
+        archive_filename = handler.GetOutputDirectoryFullPath() + "parameterised_cvode.arch";
+
+        double param_value;
+        double var_value;
+        std::string param_name;
+        double answer_should_be = 45.0;
+
+        { // Save
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            AbstractCvodeSystem * const p_ode = new ParameterisedCvode;
+
+            TS_ASSERT_EQUALS(p_ode->GetNumberOfParameters(), 1u);
+            param_value = 999;
+            p_ode->SetParameter(0u, param_value);
+            var_value = 9999;
+            p_ode->SetStateVariable(0u, var_value);
+            param_name = p_ode->rGetParameterNames()[0];
+            output_arch << p_ode;
+
+            // We copy the above sequential solve test and straddle a checkpoint
+            // First solve with an automatic reset at each Solve call
+            AbstractCvodeSystem * const p_ode2 = new ParameterisedCvode;
+            for (unsigned i=0; i<5; i++)
+            {
+                p_ode2->SetParameter("a", i); // dy/dx = i
+                p_ode2->Solve(i, i+1.0, 1.0);
+            }
+            output_arch << p_ode2;
+            for (unsigned i=5; i<10; i++)
+            {
+                p_ode2->SetParameter("a", i); // dy/dx = i
+                p_ode2->Solve(i, i+1.0, 1.0);
+            }
+            TS_ASSERT_DELTA(p_ode2->GetStateVariable(0u), answer_should_be, 1e-12);
+
+            delete p_ode;
+            delete p_ode2;
+        }
+        { // Load
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+            AbstractCvodeSystem* p_ode;
+            input_arch >> p_ode;
+
+            TS_ASSERT_EQUALS(p_ode->GetSystemName(), "ParameterisedCvode");
+            TS_ASSERT_EQUALS(p_ode->GetParameter(0), param_value);
+            TS_ASSERT_EQUALS(p_ode->GetStateVariable(0), var_value);
+            TS_ASSERT_EQUALS(p_ode->rGetParameterNames()[0], param_name);
+            TS_ASSERT_EQUALS(p_ode->GetNumberOfParameters(), 1u);
+
+            AbstractCvodeSystem* p_ode2;
+            input_arch >> p_ode2;
+
+            // Run for a while after checkpoint, check it agrees with the above test and
+            // the ode system that was saved.
+            for (unsigned i=5; i<10; i++)
+            {
+              p_ode2->SetParameter("a", i); // dy/dx = i
+              p_ode2->Solve(i, i+1.0, 1.0);
+            }
+            TS_ASSERT_DELTA(p_ode2->GetStateVariable(0u), answer_should_be, 1e-12);
+
+            delete p_ode;
+            delete p_ode2;
         }
 #else
         std::cout << "Cvode is not enabled.\n";

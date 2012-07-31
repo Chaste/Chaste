@@ -44,6 +44,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 class ParameterisedCvode : public AbstractCvodeSystem
 {
+    friend class boost::serialization::access;
+
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+        archive & boost::serialization::base_object<AbstractCvodeSystem>(*this);
+    }
 
 public:
     ParameterisedCvode();
@@ -56,6 +63,10 @@ public:
     static bool fakeSecondParameter;
     static bool noParameterDefaults;
 };
+
+#include "SerializationExportWrapper.hpp"
+CHASTE_CLASS_EXPORT(ParameterisedCvode);
+
 #endif // CHASTE_CVODE
 
 #endif /*PARAMETERISEDCVODE_HPP_*/

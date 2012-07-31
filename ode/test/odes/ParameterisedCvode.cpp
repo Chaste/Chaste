@@ -71,6 +71,9 @@ N_Vector ParameterisedCvode::ComputeDerivedQuantities(double time,
     return derived_quantities;
 }
 
+#include "SerializationExportWrapperForCpp.hpp"
+CHASTE_CLASS_EXPORT(ParameterisedCvode);
+
 template<>
 void OdeSystemInformation<ParameterisedCvode>::Initialise()
 {

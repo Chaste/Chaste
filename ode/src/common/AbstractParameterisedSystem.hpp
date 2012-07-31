@@ -93,6 +93,18 @@ protected:
     std::string DumpState(const std::string& rMessage,
                           VECTOR Y);
 
+    /**
+     * This method is called by subclasses on completion of the load method of serialization.
+     *
+     * It checks that the parameters that were loaded match those that should be in the class, and fills in
+     * with default values any that are missing. Hence this method updates mParameters.
+     *
+     * @param rParameters  the parameters that were loaded.
+     * @param rParameterNames  the parameter names that were loaded.
+     */
+    void CheckParametersOnLoad(const std::vector<double>& rParameters,
+                               const std::vector<std::string>& rParameterNames);
+
 public:
     /**
      * Constructor.

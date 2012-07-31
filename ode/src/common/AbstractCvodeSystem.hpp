@@ -48,13 +48,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OdeSolution.hpp"
 #include "AbstractParameterisedSystem.hpp"
 #include "Exception.hpp"
+#include "VectorHelperFunctions.hpp"
 
 // Serialiazation
-//#include "ChasteSerialization.hpp"
-//#include <boost/serialization/split_member.hpp>
-//#include <boost/serialization/vector.hpp>
-//#include <boost/serialization/version.hpp>
-//#include "ClassIsAbstract.hpp"
+#include "ChasteSerialization.hpp"
+#include <boost/serialization/split_member.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/nvp.hpp>
+#include <boost/serialization/version.hpp>
+#include "ClassIsAbstract.hpp"
 
 // CVODE headers
 #include <nvector/nvector_serial.h>
@@ -89,10 +91,92 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Note that the default tolerances for the solver are set by
  * SetTolerances(), these can make quite a difference to the time it takes
  * to solve the ODE system.
+ *
+ * Repeated calls to Solve will set up and delete CVODE memory, unless
+ * the methods
+ *
+ *
  */
 class AbstractCvodeSystem : public AbstractParameterisedSystem<N_Vector>
 {
 private:
+
+    friend class boost::serialization::access;
+    /**
+     * Archive the member variables.
+     *
+     * @param archive the archive
+     * @param version the current version of this class
+     */
+    template<class Archive>
+    void save(Archive & archive, const unsigned int version) const
+    {
+        // Despite the fact that 3 of these variables actually live in our base class,
+        // we still archive them here to maintain backwards compatibility,
+        // this doesn't hurt
+        archive & mNumberOfStateVariables;
+        archive & mUseAnalyticJacobian;
+
+        // Convert from N_Vector to std::vector for serialization
+        const std::vector<double> state_vars = MakeStdVec(mStateVariables);
+        archive & state_vars;
+        const std::vector<double> params = MakeStdVec(mParameters);
+        archive & params;
+        archive & rGetParameterNames();
+
+        archive & mLastSolutionTime;
+        archive & mAutoReset;
+        archive & mForceMinimalReset;
+        archive & mRelTol;
+        archive & mAbsTol;
+        archive & mMaxSteps;
+        archive & mLastInternalStepSize;
+
+        // We don't bother archiving CVODE's internal data, because it is missing then we'll just
+        // get a new solver being initialised after a save/load.
+
+
+        // This is always set up by subclass constructors, and is essentially
+        // 'static' data, so shouldn't go in the archive.
+        //archive &mpSystemInfo;
+    }
+    /**
+     * Archive the member variables.
+     *
+     * @param archive the archive
+     * @param version the current version of this class
+     */
+    template<class Archive>
+    void load(Archive & archive, const unsigned int version)
+    {
+        archive & mNumberOfStateVariables;
+        archive & mUseAnalyticJacobian;
+
+        std::vector<double> state_vars;
+        archive & state_vars;
+        CopyFromStdVector(state_vars,mStateVariables);
+
+        std::vector<double> parameters;
+        archive & parameters;
+
+        std::vector<std::string> param_names;
+        archive & param_names;
+        archive & mLastSolutionTime;
+        archive & mAutoReset;
+        archive & mForceMinimalReset;
+        archive & mRelTol;
+        archive & mAbsTol;
+        archive & mMaxSteps;
+        archive & mLastInternalStepSize;
+
+        // We don't bother archiving CVODE's internal data, because it is missing then we'll just
+        // get a new solver being initialised after a save/load.
+
+        // Do some checking on the parameters
+        CheckParametersOnLoad(parameters,param_names);
+    }
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
+
     /**
      * Set up the CVODE data structures needed to solve the given system from a given point.
      *
@@ -189,8 +273,10 @@ public:
 
     /**
      * Set whether to automatically re-initialise CVODE on every call to Solve, or
-     * whether to attempt to guess when re-initialisation is needed.  See also
-     * ResetSolver.
+     * whether to attempt to guess when re-initialisation is needed. For example
+     * it will re-initialise if the time changes, or any state variables change.
+     *
+     * See also ResetSolver and SetMinimalReset
      *
      * @param autoReset  whether to reset on every Solve
      */
@@ -317,16 +403,9 @@ public:
 //     */
 //    bool GetUseAnalyticJacobian();
 
-//    /**
-//     * \todo move to AbstractParameterisedSystem? (1540)
-//     *
-//     * @return const reference to the state variables in the ODE system (used in archiving).
-//     */
-//    const std::vector<double>& rGetConstStateVariables() const;
-
 };
 
-//CLASS_IS_ABSTRACT(AbstractCvodeSystem)
+CLASS_IS_ABSTRACT(AbstractCvodeSystem)
 
 #endif //_ABSTRACTCVODESYSTEM_HPP_
 #endif // CHASTE_CVODE
