@@ -55,7 +55,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *  Gima K, Rudy Y Circ Res (2002) 90:889-896 (equation 1)
  *  Baher et al. Am J Physiol (2007) 292:H180-H189 (equation 5)
+ */
+/*
+ * NB I don't think that this class needs to be templated over PROBLEM_DIM,
+ *  since even when working with Bidomain we only integrate one thing at once,
+ *  and hence still need to call AbstractFunctionalCalculator<ELEMENT_DIM, SPACE_DIM, 1>.
+ *  See PostProcessingWriter.cpp line ~141. The fact that it is only explicitly
+ *  instantiated (at the bottom of the cpp) for cases with 1, would agree with this.
  *
+ *  But at the same time it probably isn't worth breaking users' code by changing it.
+ *  Might also make it easier to copy and paste for any new class that does a
+ *  fancier integral with more quantities.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 class PseudoEcgCalculator : public AbstractFunctionalCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>
@@ -83,8 +93,8 @@ private:
      * @param rGradU The gradient of the unknown as a matrix, rGradU(i,j) = d(u_i)/d(X_j)
      */
     double GetIntegrand(ChastePoint<SPACE_DIM>& rX,
-                                c_vector<double,PROBLEM_DIM>& rU,
-                                c_matrix<double,PROBLEM_DIM,SPACE_DIM>& rGradU);
+                        c_vector<double,PROBLEM_DIM>& rU,
+                        c_matrix<double,PROBLEM_DIM,SPACE_DIM>& rGradU);
 
 
     /**
@@ -95,6 +105,17 @@ private:
      *
      */
     double ComputePseudoEcgAtOneTimeStep(unsigned timeStep);
+
+    /**
+     * Whether we should not calculate the Pseudo ECG on this element.
+     *
+     * This method returns true if we are integrating voltage and the
+     * tissue element is in the bath.
+     *
+     * @param rElement  the element of interest
+     * @return  whether we should skip this element.
+     */
+    bool ShouldSkipThisElement(Element<ELEMENT_DIM,SPACE_DIM>& rElement);
 
 public:
 

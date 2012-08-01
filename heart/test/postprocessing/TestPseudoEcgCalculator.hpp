@@ -53,6 +53,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HeartConfig.hpp"
 #include "PetscSetupAndFinalize.hpp"
 #include "FileComparison.hpp"
+#include "SimpleBathProblemSetup.hpp"
+#include "BidomainWithBathProblem.hpp"
 
 /* HOW_TO_TAG Cardiac/Post-processing
  * Compute pseudo-ECGs
@@ -69,6 +71,14 @@ public:
         TrianglesMeshReader<1,1> reader("mesh/test/data/1D_0_to_1_100_elements");
         TetrahedralMesh<1,1> mesh;
         mesh.ConstructFromMeshReader(reader);
+
+        for (AbstractTetrahedralMesh<1,1>::ElementIterator it = mesh.GetElementIteratorBegin();
+             it != mesh.GetElementIteratorEnd();
+             ++it)
+        {
+            // A correct calculation depends on this not breaking!
+            TS_ASSERT(!HeartRegionCode::IsRegionBath((*it).GetAttribute()));
+        }
 
         ////////////////////////////////////////////////////
         //First we write an hdf5 file with a gradient of V
@@ -157,6 +167,14 @@ public:
         DistributedTetrahedralMesh<1,1> mesh;
         mesh.ConstructFromMeshReader(reader);
 
+        for (AbstractTetrahedralMesh<1,1>::ElementIterator it = mesh.GetElementIteratorBegin();
+             it != mesh.GetElementIteratorEnd();
+             ++it)
+        {
+            // A correct calculation depends on this not breaking!
+            TS_ASSERT(!HeartRegionCode::IsRegionBath((*it).GetAttribute()));
+        }
+
         ////////////////////////////////////////////////////
         //First we write an hdf5 file with V as a parabolic function of x
         // i.e. V(x) = x^2; We write 4 time steps.
@@ -241,6 +259,63 @@ public:
             TS_ASSERT_DELTA(pseudo_ecg, diff_coeff*expected_result,1e-6);
         }
 
+    }
+
+    /**
+     * Test for BidomainWithBath problems.
+     */
+    void TestBathEcgCalculations() throw (Exception)
+    {
+        HeartConfig::Instance()->SetSimulationDuration(2.0);  //ms - set to 500 to see whole AP trace.
+        HeartConfig::Instance()->SetOutputDirectory("BidomainBath1d_PseudoEcg");
+        HeartConfig::Instance()->SetOutputFilenamePrefix("bidomain_bath_1d");
+
+        c_vector<double,1> centre;
+        centre(0) = 0.5;
+        BathCellFactory<1> cell_factory(-1e6, centre); // stimulates x=0.5 node
+
+        BidomainWithBathProblem<1> bidomain_problem( &cell_factory );
+
+        TrianglesMeshReader<1,1> reader("mesh/test/data/1D_0_to_1_100_elements");
+        TetrahedralMesh<1,1> mesh;
+        mesh.ConstructFromMeshReader(reader);
+
+        // set the x<0.25 and x>0.75 regions as the bath region
+        for(unsigned i=0; i<mesh.GetNumElements(); i++)
+        {
+            double x = mesh.GetElement(i)->CalculateCentroid()[0];
+            if( (x<0.25) || (x>0.75) )
+            {
+                mesh.GetElement(i)->SetAttribute(HeartRegionCode::GetValidBathId());
+            }
+        }
+
+        bidomain_problem.SetMesh(&mesh);
+        bidomain_problem.Initialise();
+
+        bidomain_problem.Solve();
+
+        Vec sol = bidomain_problem.GetSolution();
+        ReplicatableVector sol_repl(sol);
+
+        // Test some Pseudo ECG calculation methods #2107
+        ChastePoint<1> point1(0.0); // Point at which to calculate a pseudo-ECG - this is allowed.
+        PseudoEcgCalculator<1,1,1>  ecg_calculator1(mesh, point1, "BidomainBath1d_PseudoEcg", "bidomain_bath_1d");
+
+        // At the beginning we should have zero as voltage is uniform (in the tissue, this failed before #2107)
+        double pseudo_ecg1_at_t_0 = ecg_calculator1.ComputePseudoEcgAtOneTimeStep(0);
+        TS_ASSERT_DELTA(pseudo_ecg1_at_t_0, 0.0, 1e-9);
+
+        ChastePoint<1> point2(0.3); // Point at which to calculate a pseudo-ECG - this should look decent
+        PseudoEcgCalculator<1,1,1> ecg_calculator2(mesh, point2, "BidomainBath1d_PseudoEcg", "bidomain_bath_1d");
+
+        // At the beginning we should have zero as voltage is uniform (in the tissue, this failed before #2107)
+        double pseudo_ecg2_at_t_0 = ecg_calculator2.ComputePseudoEcgAtOneTimeStep(0);
+        TS_ASSERT_DELTA(pseudo_ecg2_at_t_0, 0.0, 1e-9);
+
+        // For completeness
+        ecg_calculator1.WritePseudoEcg();
+        ecg_calculator2.WritePseudoEcg();
     }
 
  };

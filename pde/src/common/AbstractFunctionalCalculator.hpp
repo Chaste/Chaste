@@ -73,6 +73,14 @@ private:
                                 c_vector<double,PROBLEM_DIM>& rU,
                                 c_matrix<double,PROBLEM_DIM,SPACE_DIM>& rGradU)=0;
 
+    /**
+     * Whether we should not calculate the functional on this element for any reason
+     *
+     * @param rElement  the element of interest
+     * @return  whether we should skip this element.
+     */
+    virtual bool ShouldSkipThisElement(Element<ELEMENT_DIM,SPACE_DIM>& rElement);
+
 public:
 
     /**
@@ -187,7 +195,7 @@ double AbstractFunctionalCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Calcul
              iter != rMesh.GetElementIteratorEnd();
              ++iter)
         {
-            if (rMesh.CalculateDesignatedOwnershipOfElement((*iter).GetIndex()) == true)
+            if (rMesh.CalculateDesignatedOwnershipOfElement((*iter).GetIndex()) == true && !ShouldSkipThisElement(*iter))
             {
                 local_result += CalculateOnElement(*iter);
             }
@@ -203,6 +211,12 @@ double AbstractFunctionalCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Calcul
     double final_result;
     MPI_Allreduce(&local_result, &final_result, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
     return final_result;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+bool AbstractFunctionalCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::ShouldSkipThisElement(Element<ELEMENT_DIM,SPACE_DIM>& rElement)
+{
+    return false;
 }
 
 #endif /*ABSTRACTFUNCTIONALCALCULATOR_HPP_*/
