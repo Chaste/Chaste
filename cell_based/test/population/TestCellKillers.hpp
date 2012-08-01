@@ -677,7 +677,7 @@ public:
 
         {
             // Compare the generated file in test output with a reference copy in the source code.
-            FileFinder generated = output_file_handler.FindFile("oxygen_results.parameters");
+            FileFinder generated = output_file_handler.FindFile("apop_results.parameters");
             FileFinder reference("cell_based/test/data/TestCellKillers/apop_results.parameters",
                     RelativeTo::ChasteSourceRoot);
             FileComparison comparer(generated, reference);
