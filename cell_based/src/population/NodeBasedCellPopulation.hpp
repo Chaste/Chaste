@@ -288,7 +288,7 @@ public:
      *
      * @param useVariableRadii the new value of mUseVariableRadii
      */
-    void SetUseVariableRadii(bool mUseVariableRadii);
+    void SetUseVariableRadii(bool useVariableRadii=true);
 
     /**
      * Overridden GetWidth() method.
