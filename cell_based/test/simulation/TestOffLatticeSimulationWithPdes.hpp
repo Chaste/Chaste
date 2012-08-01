@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OffLatticeSimulation.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "HoneycombMeshGenerator.hpp"
-#include "OxygenBasedCellKiller.hpp"
+#include "ApoptoticCellKiller.hpp"
 #include "SimpleOxygenBasedCellCycleModel.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
@@ -191,7 +191,7 @@ public:
         simulator.AddForce(p_linear_force);
 
         // Set up cell killer and pass into simulation
-        MAKE_PTR_ARGS(OxygenBasedCellKiller<2>, p_killer, (&cell_population));
+        MAKE_PTR_ARGS(ApoptoticCellKiller<2>, p_killer, (&cell_population));
         simulator.AddCellKiller(p_killer);
 
         // Run cell-based simulation
@@ -283,7 +283,7 @@ public:
         simulator.AddForce(p_linear_force);
 
         // Set up cell killer and pass into simulation
-        MAKE_PTR_ARGS(OxygenBasedCellKiller<2>, p_killer, (&cell_population));
+        MAKE_PTR_ARGS(ApoptoticCellKiller<2>, p_killer, (&cell_population));
         simulator.AddCellKiller(p_killer);
 
         // Run cell-based simulation
@@ -390,7 +390,7 @@ public:
         simulator.AddForce(p_linear_force);
 
         // Set up cell killer and pass into simulation
-        MAKE_PTR_ARGS(OxygenBasedCellKiller<2>, p_killer, (&cell_population));
+        MAKE_PTR_ARGS(ApoptoticCellKiller<2>, p_killer, (&cell_population));
         simulator.AddCellKiller(p_killer);
 
         // Run cell-based simulation
@@ -482,7 +482,7 @@ public:
         simulator.AddForce(p_linear_force);
 
         // Set up cell killer and pass into simulation
-        MAKE_PTR_ARGS(OxygenBasedCellKiller<2>, p_killer, (&cell_population));
+        MAKE_PTR_ARGS(ApoptoticCellKiller<2>, p_killer, (&cell_population));
         simulator.AddCellKiller(p_killer);
 
         // Run cell-based simulation
@@ -563,7 +563,7 @@ public:
         simulator.AddForce(p_linear_force);
 
         // Add an oxygen-dependent cell killer to the cell-based simulation
-        MAKE_PTR_ARGS(OxygenBasedCellKiller<2>, p_killer, (&cell_population));
+        MAKE_PTR_ARGS(ApoptoticCellKiller<2>, p_killer, (&cell_population));
         simulator.AddCellKiller(p_killer);
 
         // Run the cell-based simulation for one timestep
@@ -677,7 +677,7 @@ public:
         simulator.AddForce(p_linear_force);
 
         // Set up cell killer and pass into simulation
-        MAKE_PTR_ARGS(OxygenBasedCellKiller<2>, p_killer, (&cell_population));
+        MAKE_PTR_ARGS(ApoptoticCellKiller<2>, p_killer, (&cell_population));
         simulator.AddCellKiller(p_killer);
 
         // Find centre of cell population
@@ -909,7 +909,7 @@ public:
         simulator.AddForce(p_linear_force);
 
         // Set up cell killer and pass into simulation
-        MAKE_PTR_ARGS(OxygenBasedCellKiller<2>, p_killer, (&cell_population));
+        MAKE_PTR_ARGS(ApoptoticCellKiller<2>, p_killer, (&cell_population));
         simulator.AddCellKiller(p_killer);
 
         // Run cell-based simulation
@@ -1076,7 +1076,7 @@ public:
         simulator.AddForce(p_linear_force);
 
         // Set up cell killer and pass into simulation
-        MAKE_PTR_ARGS(OxygenBasedCellKiller<3>, p_killer, (&cell_population));
+        MAKE_PTR_ARGS(ApoptoticCellKiller<3>, p_killer, (&cell_population));
         simulator.AddCellKiller(p_killer);
 
         // Run cell-based simulation

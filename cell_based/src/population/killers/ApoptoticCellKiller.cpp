@@ -33,17 +33,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "OxygenBasedCellKiller.hpp"
+#include "ApoptoticCellKiller.hpp"
 #include "ApoptoticCellProperty.hpp"
 
 template<unsigned SPACE_DIM>
-OxygenBasedCellKiller<SPACE_DIM>::OxygenBasedCellKiller(AbstractCellPopulation<SPACE_DIM>* pCellPopulation)
+ApoptoticCellKiller<SPACE_DIM>::ApoptoticCellKiller(AbstractCellPopulation<SPACE_DIM>* pCellPopulation)
     : AbstractCellKiller<SPACE_DIM>(pCellPopulation)
 {
 }
 
 template<unsigned SPACE_DIM>
-void OxygenBasedCellKiller<SPACE_DIM>::CheckAndLabelSingleCellForApoptosis(CellPtr pCell)
+void ApoptoticCellKiller<SPACE_DIM>::CheckAndLabelSingleCellForApoptosis(CellPtr pCell)
 {
     if (pCell->HasCellProperty<ApoptoticCellProperty>() && !(pCell->HasApoptosisBegun()))
     {
@@ -52,7 +52,7 @@ void OxygenBasedCellKiller<SPACE_DIM>::CheckAndLabelSingleCellForApoptosis(CellP
 }
 
 template<unsigned SPACE_DIM>
-void OxygenBasedCellKiller<SPACE_DIM>::CheckAndLabelCellsForApoptosisOrDeath()
+void ApoptoticCellKiller<SPACE_DIM>::CheckAndLabelCellsForApoptosisOrDeath()
 {
     for (typename AbstractCellPopulation<SPACE_DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
         cell_iter != this->mpCellPopulation->End();
@@ -63,11 +63,9 @@ void OxygenBasedCellKiller<SPACE_DIM>::CheckAndLabelCellsForApoptosisOrDeath()
 }
 
 template<unsigned DIM>
-void OxygenBasedCellKiller<DIM>::OutputCellKillerParameters(out_stream& rParamsFile)
+void ApoptoticCellKiller<DIM>::OutputCellKillerParameters(out_stream& rParamsFile)
 {
-    // No parameters to output
-
-    // Call method on direct parent class
+    // No parameters to output, so just call method on direct parent class
     AbstractCellKiller<DIM>::OutputCellKillerParameters(rParamsFile);
 }
 
@@ -75,10 +73,10 @@ void OxygenBasedCellKiller<DIM>::OutputCellKillerParameters(out_stream& rParamsF
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////
 
-template class OxygenBasedCellKiller<1>;
-template class OxygenBasedCellKiller<2>;
-template class OxygenBasedCellKiller<3>;
+template class ApoptoticCellKiller<1>;
+template class ApoptoticCellKiller<2>;
+template class ApoptoticCellKiller<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(OxygenBasedCellKiller)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(ApoptoticCellKiller)

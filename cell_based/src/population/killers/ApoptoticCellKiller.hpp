@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef OXYGENBASEDCELLKILLER_HPP_
-#define OXYGENBASEDCELLKILLER_HPP_
+#ifndef APOPTOTICCELLKILLER_HPP_
+#define APOPTOTICCELLKILLER_HPP_
 
 #include "AbstractCellKiller.hpp"
 
@@ -42,14 +42,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 /**
- *  Kills cells that have experienced a prolonged continuous period of hypoxia.
- *
- *  The non-dimensionalised oxygen concentration at which cells become
- *  hypoxic is optionally passed into the constructor.
+ * A cell killer object that kills cells that have been specified using the ApoptoticCellProperty.
  */
-
 template<unsigned SPACE_DIM>
-class OxygenBasedCellKiller : public AbstractCellKiller<SPACE_DIM>
+class ApoptoticCellKiller : public AbstractCellKiller<SPACE_DIM>
 {
 private:
 
@@ -67,21 +63,17 @@ public:
      *
      * @param pCellPopulation pointer to the cell population.
      */
-    OxygenBasedCellKiller(AbstractCellPopulation<SPACE_DIM>* pCellPopulation);
+    ApoptoticCellKiller(AbstractCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
-     * Starts apoptosis if the cell has has been hypoxic for longer than
-     * some critical period, and  it is currently hypoxic, and a random number
-     * is less than some probability of death (which scales linearly with the
-     * local oxygen concentration).
+     * Starts apoptosis if the cell has been given the ApoptoticCellProperty.
      *
      * @param pCell  the cell to test for apoptosis.
      */
     void CheckAndLabelSingleCellForApoptosis(CellPtr pCell);
 
     /**
-     * Loop over cells and start apoptosis if the cell has been undergone
-     * a prolonged period of hypoxia.
+     * Loop over cells and call CheckAndLabelSingleCellForApoptosis() on each cell.
      */
     virtual void CheckAndLabelCellsForApoptosisOrDeath();
 
@@ -94,19 +86,18 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(OxygenBasedCellKiller)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(ApoptoticCellKiller)
 
 namespace boost
 {
 namespace serialization
 {
 /**
- * Serialize information required to construct an OxygenBasedCellKiller.
+ * Serialize information required to construct an ApoptoticCellKiller.
  */
 template<class Archive, unsigned DIM>
 inline void save_construct_data(
-    Archive & ar, const OxygenBasedCellKiller<DIM> * t, const BOOST_PFTO unsigned int file_version)
+    Archive & ar, const ApoptoticCellKiller<DIM> * t, const BOOST_PFTO unsigned int file_version)
 {
     // Save data required to construct instance
     const AbstractCellPopulation<DIM>* const p_cell_population = t->GetCellPopulation();
@@ -114,20 +105,20 @@ inline void save_construct_data(
 }
 
 /**
- * De-serialize constructor parameters and initialise an OxygenBasedCellKiller.
+ * De-serialize constructor parameters and initialise an ApoptoticCellKiller.
  */
 template<class Archive, unsigned DIM>
 inline void load_construct_data(
-    Archive & ar, OxygenBasedCellKiller<DIM> * t, const unsigned int file_version)
+    Archive & ar, ApoptoticCellKiller<DIM> * t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
     AbstractCellPopulation<DIM>* p_cell_population;
     ar >> p_cell_population;
 
     // Invoke inplace constructor to initialise instance
-    ::new(t)OxygenBasedCellKiller<DIM>(p_cell_population);
+    ::new(t)ApoptoticCellKiller<DIM>(p_cell_population);
 }
 }
 } // namespace ...
 
-#endif /*OXYGENBASEDCELLKILLER_HPP_*/
+#endif /*APOPTOTICCELLKILLER_HPP_*/

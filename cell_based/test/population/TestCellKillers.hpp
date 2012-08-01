@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellsGenerator.hpp"
 #include "TargetedCellKiller.hpp"
 #include "RandomCellKiller.hpp"
-#include "OxygenBasedCellKiller.hpp"
+#include "ApoptoticCellKiller.hpp"
 #include "PlaneBasedCellKiller.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "TrianglesMeshReader.hpp"
@@ -239,7 +239,7 @@ public:
         TS_ASSERT(new_locations == old_locations);
     }
 
-    void TestOxygenBasedCellKiller() throw(Exception)
+    void TestApoptoticCellKiller() throw(Exception)
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         double end_time = 1.0;
@@ -269,7 +269,7 @@ public:
         // Create cell population
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
-        OxygenBasedCellKiller<2> bad_cell_killer(&cell_population);
+        ApoptoticCellKiller<2> bad_cell_killer(&cell_population);
 
         // Get a reference to the cells held in cell population
         std::list<CellPtr>& r_cells = cell_population.rGetCells();
@@ -282,8 +282,8 @@ public:
             cell_iter->SetCellProliferativeType(STEM);
         }
 
-        OxygenBasedCellKiller<2> oxygen_based_cell_killer(&cell_population);
-        TS_ASSERT_EQUALS(oxygen_based_cell_killer.GetIdentifier(), "OxygenBasedCellKiller-2");
+        ApoptoticCellKiller<2> oxygen_based_cell_killer(&cell_population);
+        TS_ASSERT_EQUALS(oxygen_based_cell_killer.GetIdentifier(), "ApoptoticCellKiller-2");
         oxygen_based_cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
         // Check that a single cell reaches apoptosis
@@ -549,20 +549,20 @@ public:
         }
     }
 
-    void TestArchivingOfOxygenBasedCellKiller() throw (Exception)
+    void TestArchivingOfApoptoticCellKiller() throw (Exception)
     {
         // Set up
         OutputFileHandler handler("archive", false);    // don't erase contents of folder
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "oxygen_based_killer.arch";
         {
             // Create an output archive
-            OxygenBasedCellKiller<2> cell_killer(NULL);
+            ApoptoticCellKiller<2> cell_killer(NULL);
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
             // Serialize via pointer
-            OxygenBasedCellKiller<2>* const p_cell_killer = &cell_killer;
+            ApoptoticCellKiller<2>* const p_cell_killer = &cell_killer;
 
             output_arch << p_cell_killer;
        }
@@ -572,7 +572,7 @@ public:
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
 
-            OxygenBasedCellKiller<2>* p_cell_killer;
+            ApoptoticCellKiller<2>* p_cell_killer;
 
             // Restore from the archive
             input_arch >> p_cell_killer;
@@ -667,18 +667,18 @@ public:
             TS_ASSERT(comparer.CompareFiles());
         }
 
-        // Test with OxygenBasedCellKiller
-        OxygenBasedCellKiller<2> oxygen_cell_killer(NULL);
-        TS_ASSERT_EQUALS(oxygen_cell_killer.GetIdentifier(), "OxygenBasedCellKiller-2");
+        // Test with ApoptoticCellKiller
+        ApoptoticCellKiller<2> apop_cell_killer(NULL);
+        TS_ASSERT_EQUALS(apop_cell_killer.GetIdentifier(), "ApoptoticCellKiller-2");
 
-        out_stream oxygen_cell_killer_parameter_file = output_file_handler.OpenOutputFile("oxygen_results.parameters");
-        oxygen_cell_killer.OutputCellKillerParameters(oxygen_cell_killer_parameter_file);
-        oxygen_cell_killer_parameter_file->close();
+        out_stream apop_cell_killer_parameter_file = output_file_handler.OpenOutputFile("apop_results.parameters");
+        apop_cell_killer.OutputCellKillerParameters(apop_cell_killer_parameter_file);
+        apop_cell_killer_parameter_file->close();
 
         {
             // Compare the generated file in test output with a reference copy in the source code.
             FileFinder generated = output_file_handler.FindFile("oxygen_results.parameters");
-            FileFinder reference("cell_based/test/data/TestCellKillers/oxygen_results.parameters",
+            FileFinder reference("cell_based/test/data/TestCellKillers/apop_results.parameters",
                     RelativeTo::ChasteSourceRoot);
             FileComparison comparer(generated, reference);
             TS_ASSERT(comparer.CompareFiles());
