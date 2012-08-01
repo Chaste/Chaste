@@ -451,21 +451,30 @@ private:
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
-     * This is needed to register the base-derived relationship between this class
-     * and AbstractCardiacCell; however, serialization of our members is done by
-     * AbstractCardiacCell in order to maintain archive backwards compatibility more
-     * easily, since we never archive AbstractCvodeCell s.
+     * Main boost serialization method, some member variables are handled by Save/Load constructs.
      *
-     * @param archive
-     * @param version
+     * @param archive  the archive file.
+     * @param version  the version of archiving, defined in the macro at the bottom of the class.
      */
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
+        // For version 0 these were archived by AbstractCardiacCell, now
+        // we have AbstractCvodeCells too, so doing it here.
+        if (version > 0)
+        {
+            archive & mSetVoltageDerivativeToZero;
+            archive & mIsUsedInTissue;
+            archive & mHasDefaultStimulusFromCellML;
+            // archive & mFixedVoltage; - this doesn't need archiving as it is reset every PDE time step if used.
+        }
+        // archive & mVoltageIndex; - always set by constructor - called by concrete class
+        // archive & mpOdeSolver; - always set by constructor - called by concrete class
+        // archive & mpIntracellularStimulus; - always set by constructor - called by concrete class
     }
 };
 
 CLASS_IS_ABSTRACT(AbstractCardiacCellInterface)
-
+BOOST_CLASS_VERSION(AbstractCardiacCellInterface, 1)
 
 #endif /*ABSTRACTCARDIACCELLINTERFACE_HPP_*/

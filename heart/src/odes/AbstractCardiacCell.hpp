@@ -91,22 +91,27 @@ private:
             archive & boost::serialization::base_object<AbstractCardiacCellInterface>(*this);
         }
         archive & mDt;
-        archive & this->mSetVoltageDerivativeToZero;
-        if (version > 0)
+
+        // For version 2 and above these move into AbstractCardiacCellInterface
+        // (AbstractCardiacCellInterface serialization moved to 1 at the same time as this moved to 2).
+        if (version <= 1)
         {
-            // Note that when loading a version 0 archive, this will be initialised to
-            // false by our constructor.  So we should get a consistent (wrong) answer
-            // with previous versions of Chaste when in tissue.
-            archive & this->mIsUsedInTissue;
-            archive & this->mHasDefaultStimulusFromCellML;
+            archive & this->mSetVoltageDerivativeToZero;
+            if (version > 0)
+            {
+                // Note that when loading a version 0 archive, this will be initialised to
+                // false by our constructor.  So we should get a consistent (wrong) answer
+                // with previous versions of Chaste when in tissue.
+                archive & this->mIsUsedInTissue;
+                archive & this->mHasDefaultStimulusFromCellML;
+            }
         }
-        // archive & mVoltageIndex; - always set by constructor - called by concrete class
-        // archive & mpOdeSolver; - always set by constructor - called by concrete class
-        // archive & mpIntracellularStimulus; - always set by constructor - called by concrete class
+
         if (version == 0)
         {
             CheckForArchiveFix();
         }
+
         // Paranoia check
         assert(this->mParameters.size() == this->rGetParameterNames().size());
     }
@@ -405,6 +410,6 @@ public:
 };
 
 CLASS_IS_ABSTRACT(AbstractCardiacCell)
-BOOST_CLASS_VERSION(AbstractCardiacCell, 1)
+BOOST_CLASS_VERSION(AbstractCardiacCell, 2)
 
 #endif /*ABSTRACTCARDIACCELL_HPP_*/

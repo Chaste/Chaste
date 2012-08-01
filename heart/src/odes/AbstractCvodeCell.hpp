@@ -37,7 +37,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _ABSTRACTCVODECELL_HPP_
 #define _ABSTRACTCVODECELL_HPP_
 
+// Serialization headers
+#include "ChasteSerialization.hpp"
+#include "ClassIsAbstract.hpp"
+#include <boost/serialization/base_object.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/serialization/shared_ptr.hpp>
 
 // Chaste headers
 #include "AbstractOdeSystemInformation.hpp"
@@ -50,23 +55,47 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * A cardiac cell that is designed to be simulated using CVODE.
- * It uses CVODE's vector type natively.
+ * It uses CVODE's vector type natively via AbstractCvodeSystem.
  *
  * Functionality is similar to that provided by AbstractCardiacCell and AbstractOdeSystem,
  * but not identical.  It also includes a direct interface to the CVODE solver, via the
- * Solve methods, since the CvodeAdaptor class doesn't work for us.
+ * Solve methods, since the CvodeAdaptor class may be a bit slower.
  *
  * Assumes that it will be solving stiff systems, so uses BDF/Newton.
  *
- * Note that a call to Solve will initialise the CVODE solver, and free its
- * working memory when done.  There is thus a non-trivial overhead involved.
+ * Various methods in this class just call methods on AbstractCvodeSystem, to
+ * reduce compiler confusion when working with things in an inheritance tree.
  *
- * \todo #890 Add an option to just initialise once, and assume subsequent Solve
- *   calls are continuing from where we left off.
+ * Any single cell work should generally use this class rather than AbstractCardiacCell.
+ *
+ * This class may also be faster for certain tissue problems (especially when using a
+ * relatively large PDE timestep (~0.1ms)). BUT it will come with a memory overhead
+ * as every node has to carry a CVODE solver object as it stores the internal
+ * state of the solver, not just the state variables as ForwardEuler solver does.
+ * So may not be appropriate for very large meshes.
+ *
  */
 class AbstractCvodeCell : public AbstractCardiacCellInterface, public AbstractCvodeSystem
 {
 private:
+    /** Needed for serialization. */
+    friend class boost::serialization::access;
+    /**
+     * Archive the member variables.
+     *
+     * @param archive
+     * @param version
+     */
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+        // This calls serialize on the base classes.
+        archive & boost::serialization::base_object<AbstractCvodeSystem>(*this);
+        archive & boost::serialization::base_object<AbstractCardiacCellInterface>(*this);
+        archive & mMaxDt;
+    }
+
+protected:
     /** The maximum timestep to use. */
     double mMaxDt;
 
@@ -296,6 +325,7 @@ public:
 
 };
 
+CLASS_IS_ABSTRACT(AbstractCvodeCell)
 
 #endif // _ABSTRACTCVODECELL_HPP_
 #endif // CHASTE_CVODE

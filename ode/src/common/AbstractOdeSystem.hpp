@@ -102,9 +102,9 @@ private:
     void save(Archive & archive, const unsigned int version) const
     {
         // Despite the fact that 3 of these variables actually live in our base class,
-        // we still archive them here to maintain backwards compatibility.  Since the
-        // N_Vector version of AbstractParameterisedSystem doesn't get checkpointed yet,
-        // this doesn't hurt.
+        // we still archive them here to maintain backwards compatibility.
+        // Since the N_Vector version of mStateVariables and mParameters needs converting
+        // to a standard vector before archiving, this doesn't hurt too much.
         archive & mNumberOfStateVariables;
         archive & mUseAnalyticJacobian;
         archive & mStateVariables;

@@ -1,0 +1,2 @@
+Time(ms) membrane_voltage(millivolt) fast_sodium_current_m_gate__m(dimensionless) fast_sodium_current_h_gate__h(dimensionless) fast_sodium_current_j_gate__j(dimensionless) slow_inward_current_d_gate__d(dimensionless) slow_inward_current_f_gate__f(dimensionless) time_dependent_potassium_current_X_gate__X(dimensionless) cytosolic_calcium_concentration(millimolar)
+  0.0000e+00  -8.3853e+01   1.8702e-03   9.8047e-01   9.8767e-01   3.1635e-03   9.9428e-01   1.6648e-01   2.0000e-04 

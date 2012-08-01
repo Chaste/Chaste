@@ -1070,8 +1070,8 @@ public:
             HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(time_step, time_step, time_step);
 
             // Check Standard
-            AbstractCardiacCell* const p_luo_rudy_cell = new CellLuoRudy1991FromCellML(p_solver, p_stimulus);
-            AbstractCardiacCell* const p_n98_with_sac = new CML_noble_varghese_kohl_noble_1998_basic_with_sac(p_solver, p_stimulus);
+            AbstractCardiacCellInterface* const p_luo_rudy_cell = new CellLuoRudy1991FromCellML(p_solver, p_stimulus);
+            AbstractCardiacCellInterface* const p_n98_with_sac = new CML_noble_varghese_kohl_noble_1998_basic_with_sac(p_solver, p_stimulus);
 
             p_n98_with_sac->SetStretch(1.1);
 
@@ -1094,10 +1094,10 @@ public:
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
 
-            AbstractCardiacCell* p_luo_rudy_cell;
+            AbstractCardiacCellInterface* p_luo_rudy_cell;
             input_arch >> p_luo_rudy_cell;
 
-            AbstractCardiacCell* p_n98_with_sac;
+            AbstractCardiacCellInterface* p_n98_with_sac;
             input_arch >> p_n98_with_sac;
 
             TS_ASSERT_EQUALS( p_luo_rudy_cell->GetNumberOfStateVariables(), 8U );
@@ -1138,7 +1138,7 @@ public:
             HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(time_step, time_step, time_step);
 
             // Check Standard
-            AbstractCardiacCell* const p_maleckar_cell = new CellMaleckar2008FromCellML(p_solver, p_stimulus);
+            AbstractCardiacCellInterface* const p_maleckar_cell = new CellMaleckar2008FromCellML(p_solver, p_stimulus);
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -1158,7 +1158,7 @@ public:
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
 
-            AbstractCardiacCell* p_maleckar_cell;
+            AbstractCardiacCellInterface* p_maleckar_cell;
             input_arch >> p_maleckar_cell;
 
             TS_ASSERT_EQUALS( p_maleckar_cell->GetNumberOfStateVariables(), 30U );
@@ -1202,11 +1202,11 @@ public:
             HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(time_step, time_step, time_step);
 
             boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
-            AbstractCardiacCell* const p_backward_cell1 = new CellLuoRudy1991FromCellMLBackwardEuler(p_solver, p_stimulus);
-            AbstractCardiacCell* const p_backward_cell2 = new CellFoxModel2002FromCellMLBackwardEuler(p_solver, p_stimulus);
-            AbstractCardiacCell* const p_backward_cell3 = new CellNobleVargheseKohlNoble1998aFromCellMLBackwardEuler(p_solver, p_noble_stimulus);
-            AbstractCardiacCell* const p_backward_cell4 = new CellMahajan2008FromCellMLBackwardEuler(p_solver, p_stimulus);
-            AbstractCardiacCell* const p_backward_cell5 = new CellTenTusscher2006EpiFromCellMLBackwardEuler(p_solver, p_stimulus);
+            AbstractCardiacCellInterface* const p_backward_cell1 = new CellLuoRudy1991FromCellMLBackwardEuler(p_solver, p_stimulus);
+            AbstractCardiacCellInterface* const p_backward_cell2 = new CellFoxModel2002FromCellMLBackwardEuler(p_solver, p_stimulus);
+            AbstractCardiacCellInterface* const p_backward_cell3 = new CellNobleVargheseKohlNoble1998aFromCellMLBackwardEuler(p_solver, p_noble_stimulus);
+            AbstractCardiacCellInterface* const p_backward_cell4 = new CellMahajan2008FromCellMLBackwardEuler(p_solver, p_stimulus);
+            AbstractCardiacCellInterface* const p_backward_cell5 = new CellTenTusscher2006EpiFromCellMLBackwardEuler(p_solver, p_stimulus);
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -1240,11 +1240,11 @@ public:
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
 
-            AbstractCardiacCell* p_backward_cell1;
-            AbstractCardiacCell* p_backward_cell2;
-            AbstractCardiacCell* p_backward_cell3;
-            AbstractCardiacCell* p_backward_cell4;
-            AbstractCardiacCell* p_backward_cell5;
+            AbstractCardiacCellInterface* p_backward_cell1;
+            AbstractCardiacCellInterface* p_backward_cell2;
+            AbstractCardiacCellInterface* p_backward_cell3;
+            AbstractCardiacCellInterface* p_backward_cell4;
+            AbstractCardiacCellInterface* p_backward_cell5;
             input_arch >> p_backward_cell1;
             input_arch >> p_backward_cell2;
             input_arch >> p_backward_cell3;
@@ -1314,9 +1314,9 @@ public:
             HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(time_step, time_step, time_step);
 
             // Check Standard
-            AbstractCardiacCell* const p_n98_cell = new CellNobleVargheseKohlNoble1998aFromCellML(p_solver, p_stimulus);
+            AbstractCardiacCellInterface* const p_n98_cell = new CellNobleVargheseKohlNoble1998aFromCellML(p_solver, p_stimulus);
             // and SAC
-            AbstractCardiacCell* const p_n98_sac = new CML_noble_varghese_kohl_noble_1998_basic_with_sac(p_solver, p_stimulus);
+            AbstractCardiacCellInterface* const p_n98_sac = new CML_noble_varghese_kohl_noble_1998_basic_with_sac(p_solver, p_stimulus);
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -1337,7 +1337,7 @@ public:
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
 
-            AbstractCardiacCell* p_n98_cell;
+            AbstractCardiacCellInterface* p_n98_cell;
             input_arch >> p_n98_cell;
 
             TS_ASSERT_EQUALS( p_n98_cell->GetNumberOfStateVariables(), 22U );
@@ -1347,7 +1347,7 @@ public:
                                        "N98AfterArchive");
 
             CheckCellModelResults("N98AfterArchive");
-            AbstractCardiacCell* p_n98_cell_sac;
+            AbstractCardiacCellInterface* p_n98_cell_sac;
             input_arch >> p_n98_cell_sac;
             TS_ASSERT_EQUALS( p_n98_cell_sac->GetNumberOfStateVariables(), 22U );
 

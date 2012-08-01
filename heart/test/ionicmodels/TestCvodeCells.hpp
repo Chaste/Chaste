@@ -36,6 +36,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTCVODECELLS_HPP_
 #define TESTCVODECELLS_HPP_
 
+#include <iostream>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+
 #include "AbstractCvodeCell.hpp"
 #include "LuoRudy1991Cvode.hpp"
 #include "LuoRudy1991.hpp"
@@ -434,6 +438,72 @@ public:
         solution_block = sh04_cvode_system.Solve(0.0, 100.0, max_timestep, sampling_time);
         solution_block.WriteToFile("TestCvodeCells","sh04_block_param","ms",1,clean_dir);
         CompareCellModelResults("sh04_block_param", "sh04_block_modifier", 1e-6, voltage_only, "TestCvodeCells");
+#else
+        std::cout << "Cvode is not enabled.\n";
+#endif // CHASTE_CVODE
+    }
+
+    void TestArchivingCvodeCells() throw(Exception)
+    {
+#ifdef CHASTE_CVODE
+        //Archive
+        OutputFileHandler handler("archive", false);
+        handler.SetArchiveDirectory();
+        std::string archive_filename =  ArchiveLocationInfo::GetProcessUniqueFilePath("lr91_cvode.arch");
+
+        const double magnitude_stimulus = -3;  // uA/cm2
+        const double duration_stimulus = 3;  // ms
+        const double period_stimulus = 1000; //ms
+        const double start_stimulus = 10.0;   // ms
+
+        // Save
+        {
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Set stimulus
+            boost::shared_ptr<RegularStimulus> p_stimulus(new RegularStimulus(magnitude_stimulus,
+                                                                              duration_stimulus,
+                                                                              period_stimulus,
+                                                                              start_stimulus));
+            boost::shared_ptr<AbstractIvpOdeSolver> p_solver;
+
+            // Check Standard
+            AbstractCardiacCellInterface* const p_luo_rudy_cell = new CellLuoRudy1991FromCellMLCvode(p_solver, p_stimulus);
+
+            output_arch <<  p_luo_rudy_cell;
+
+//            // These results are in the repository and should be replicated after the load below
+//            RunOdeSolverWithIonicModel(p_luo_rudy_cell,
+//                           50.0,
+//                           "LRCVODEAfterArchiveValidData");
+
+            delete p_luo_rudy_cell;
+        }
+        // Load
+        {
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            AbstractCardiacCellInterface* p_luo_rudy_cell;
+            input_arch >> p_luo_rudy_cell;
+
+            TS_ASSERT_EQUALS( p_luo_rudy_cell->GetNumberOfStateVariables(), 8U );
+            boost::shared_ptr<RegularStimulus> p_stimulus = boost::static_pointer_cast<RegularStimulus>(p_luo_rudy_cell->GetStimulusFunction());
+
+            TS_ASSERT_DELTA(p_stimulus->GetPeriod(),   period_stimulus,   1e-12);
+            TS_ASSERT_DELTA(p_stimulus->GetDuration(), duration_stimulus, 1e-12);
+            TS_ASSERT_DELTA(p_stimulus->GetMagnitude(),magnitude_stimulus,1e-12);
+            TS_ASSERT_DELTA(p_stimulus->GetStartTime(),start_stimulus,    1e-12);
+
+            RunOdeSolverWithIonicModel(p_luo_rudy_cell,
+                                       50.0,
+                                       "LR91CvodeAfterArchive");
+
+            CheckCellModelResults("LR91CvodeAfterArchive");
+
+            delete p_luo_rudy_cell;
+        }
 #else
         std::cout << "Cvode is not enabled.\n";
 #endif // CHASTE_CVODE

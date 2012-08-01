@@ -1488,7 +1488,21 @@ class CellMLToChasteTranslator(CellMLTranslator):
                              self.code_name(var), self.STMT_END)
             self.writeln('return dqs', self.STMT_END)
             self.close_block(blank_line=True)
-        
+    
+    def output_serialize_method(self):
+        """This method outputs the boost serialize method for the 
+        header files that need it."""
+        # Serialization
+        if self.include_serialization:
+            self.writeln_hpp('friend class boost::serialization::access;')
+            self.writeln_hpp('template<class Archive>')
+            self.writeln_hpp('void serialize(Archive & archive, const unsigned int version)')
+            self.open_block(subsidiary=True)
+            self.writeln_hpp('archive & boost::serialization::base_object<', self.base_class_name,
+                             ' >(*this);')
+            if self.dynamically_loadable:
+                self.writeln_hpp('archive & boost::serialization::base_object<AbstractDynamicallyLoadableEntity>(*this);')
+            self.close_block(subsidiary=True)
        
     def output_cell_parameters(self):
         """Output declarations, set & get methods for cell parameters.
@@ -1665,6 +1679,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         It also calls output_verify_state_variables.
         """
         self.include_serialization = not self.use_modifiers # TODO: Implement
+        
         # Check if we're generating a Backward Euler model
         if hasattr(self.model, u'solver_info') and hasattr(self.model.solver_info, u'jacobian'):
             self.use_backward_euler = True
@@ -1696,17 +1711,10 @@ class CellMLToChasteTranslator(CellMLTranslator):
         # Cell model class
         self.writeln_hpp('class ', self.class_name, self.class_inheritance)
         self.open_block(subsidiary=True)
-        # Serialization
-        if self.include_serialization:
-            self.writeln_hpp('friend class boost::serialization::access;')
-            self.writeln_hpp('template<class Archive>')
-            self.writeln_hpp('void serialize(Archive & archive, const unsigned int version)')
-            self.open_block(subsidiary=True)
-            self.writeln_hpp('archive & boost::serialization::base_object<', self.base_class_name,
-                             ' >(*this);')
-            if self.dynamically_loadable:
-                self.writeln_hpp('archive & boost::serialization::base_object<AbstractDynamicallyLoadableEntity>(*this);')
-            self.close_block(subsidiary=True)
+        
+        # Put the boost serialize() method in if requested.
+        self.output_serialize_method()
+
         # Parameter declarations, and set & get methods (#666)
         self.output_cell_parameters()
         # Constructor
@@ -2972,7 +2980,8 @@ class CellMLToCvodeTranslator(CellMLToChasteTranslator):
         # CVODE is optional in Chaste
         self.writeln("#ifdef CHASTE_CVODE")
         self.writeln_hpp("#ifdef CHASTE_CVODE")
-        self.include_serialization = False
+        
+        self.include_serialization = not self.use_modifiers # TODO: Implement
         self.use_backward_euler = False
         self.output_includes(base_class='AbstractCvodeCell')
         # Separate class for lookup tables?
@@ -2981,6 +2990,8 @@ class CellMLToCvodeTranslator(CellMLToChasteTranslator):
         # Start cell model class
         self.writeln_hpp('class ', self.class_name, self.class_inheritance)
         self.open_block(subsidiary=True)
+        # Serialization
+        self.output_serialize_method()
         # Parameter declarations, and set & get methods (#666)
         self.output_cell_parameters()
         # Constructor
