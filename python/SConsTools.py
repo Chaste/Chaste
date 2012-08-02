@@ -505,6 +505,8 @@ def GetVersionCpp(templateFilePath, env):
     command = env['build'].tools['xsd'] + ' version 2>&1'
     xsd_version_string = os.popen(command).readline().strip()
     xsd_version = xsd_version_string[-5:]
+    if xsd_version == "ctory": # "No such file or diectory" !!
+        xsd_version = "undetermined"
     
     from CheckForCopyrights import current_notice
     licence = current_notice.replace('\nThis file is part of Chaste.\n', '')
