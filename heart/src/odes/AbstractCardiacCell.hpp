@@ -87,11 +87,12 @@ private:
     {
         // This calls serialize on the base class.
         archive & boost::serialization::base_object<AbstractOdeSystem>(*this);
-        archive & mDt;
+
         if (version > 0)
         {
             archive & boost::serialization::base_object<AbstractCardiacCellInterface>(*this);
         }
+        archive & mDt;
 
         // For version 2 and above these move into AbstractCardiacCellInterface
         // (AbstractCardiacCellInterface serialization moved to 1 at the same time as this moved to 2).
