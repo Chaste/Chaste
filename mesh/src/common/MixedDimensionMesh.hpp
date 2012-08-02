@@ -113,6 +113,9 @@ public:
 
      /**
       * Get the cables that are attached to the given node.
+      *
+      * @param pNode a node to find the adjoining cables of
+      * @return the adjoining cables.
       */
      CableRangeAtNode GetCablesAtNode(const Node<SPACE_DIM>* pNode);
 
