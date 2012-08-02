@@ -54,7 +54,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/vector.hpp>
-#include <boost/serialization/version.hpp>
 #include "ClassIsAbstract.hpp"
 
 // CVODE headers

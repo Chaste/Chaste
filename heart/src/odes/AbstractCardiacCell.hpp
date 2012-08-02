@@ -37,11 +37,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define ABSTRACTCARDIACCELL_HPP_
 
 #include "ChasteSerialization.hpp"
+#include "ChasteSerializationVersion.hpp"
 #include "ClassIsAbstract.hpp"
 #include <boost/serialization/base_object.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/serialization/shared_ptr.hpp>
-#include <boost/serialization/version.hpp>
+
 
 // This is only needed to prevent compilation errors on PETSc 2.2/Boost 1.33.1 combo
 #include "UblasVectorInclude.hpp"
@@ -86,11 +87,11 @@ private:
     {
         // This calls serialize on the base class.
         archive & boost::serialization::base_object<AbstractOdeSystem>(*this);
+        archive & mDt;
         if (version > 0)
         {
             archive & boost::serialization::base_object<AbstractCardiacCellInterface>(*this);
         }
-        archive & mDt;
 
         // For version 2 and above these move into AbstractCardiacCellInterface
         // (AbstractCardiacCellInterface serialization moved to 1 at the same time as this moved to 2).
