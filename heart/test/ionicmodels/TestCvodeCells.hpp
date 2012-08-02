@@ -253,6 +253,8 @@ public:
         {
             TS_ASSERT_DELTA(GetVectorComponent(n_state_vars,i), s_state_vars[i], 1e-9);
         }
+        DeleteVector(n_state_vars); // We need to clean up CVODE vectors.
+
         s_state_vars[0] = -1000; // Alter one of the variables to check the below method works...
         lr91_cvode_system.SetStateVariables(s_state_vars);
         for (unsigned i=0; i<s_state_vars.size(); i++)

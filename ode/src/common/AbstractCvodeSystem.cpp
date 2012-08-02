@@ -85,7 +85,8 @@ AbstractCvodeSystem::AbstractCvodeSystem(unsigned numberOfStateVariables)
       mForceMinimalReset(false),
       mUseAnalyticJacobian(false),
       mpCvodeMem(NULL),
-      mMaxSteps(0)
+      mMaxSteps(0),
+      mLastInternalStepSize(0)
 {
     SetTolerances(); // Set the tolerances to the defaults.
 }

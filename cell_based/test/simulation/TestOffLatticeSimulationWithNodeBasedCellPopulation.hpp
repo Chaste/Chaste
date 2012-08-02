@@ -225,7 +225,7 @@ public:
 
         simulator.Solve();
 
-        // Check the Radi of all the cells are correct cell 0 divided into 0 and 3 and cell 1 divided into 1 and 2.
+        // Check the Radii of all the cells are correct cell 0 divided into 0 and 3 and cell 1 divided into 1 and 2.
         TS_ASSERT_DELTA(mesh.GetCellRadius(0),1.0,1e-6);
         TS_ASSERT_DELTA(mesh.GetCellRadius(1),2.0,1e-6);
         TS_ASSERT_DELTA(mesh.GetCellRadius(2),2.0,1e-6);

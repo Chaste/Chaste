@@ -2089,12 +2089,14 @@ class CellMLToChasteTranslator(CellMLTranslator):
                     self.writeln('const ', self.TYPE_VECTOR_REF, 'rY = *', pointer, self.STMT_END)
                 else:                    
                     self.writeln(self.TYPE_VECTOR_REF, 'rY;')
+                    self.writeln('bool made_new_cvode_vector = false;')
                     self.writeln('if (!%s)' % (pointer))                    
                     self.open_block()
                     self.writeln('rY = rGetStateVariables();')
                     self.close_block(False)
                     self.writeln('else')
                     self.open_block()
+                    self.writeln('made_new_cvode_vector = true;')
                     self.writeln('rY = MakeNVector(*%s);' % (pointer))
                     self.close_block()
             else:
@@ -2330,6 +2332,11 @@ class CellMLToChasteTranslator(CellMLTranslator):
             if self.doc._cml_config.i_ionic_negated:
                 self.writeln(')', nl=False, indent=False)
             self.writeln(self.STMT_END, indent=False)
+            if self.TYPE_VECTOR_REF == CellMLToCvodeTranslator.TYPE_VECTOR_REF:
+                self.writeln('if (made_new_cvode_vector)')
+                self.open_block()
+                self.writeln('DeleteVector(rY);')
+                self.close_block(False)
             self.writeln('EXCEPT_IF_NOT(!std::isnan(i_ionic));')
             self.writeln('return i_ionic', self.STMT_END)
         else:

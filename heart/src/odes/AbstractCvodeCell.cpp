@@ -156,6 +156,7 @@ void AbstractCvodeCell::SetStateVariables(const std::vector<double>& rVariables)
 {
     N_Vector vars = MakeNVector(rVariables);
     AbstractCvodeSystem::SetStateVariables(vars);
+    DeleteVector(vars);
 }
 
 void AbstractCvodeCell::SetStateVariables(const N_Vector& rVariables)
