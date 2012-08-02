@@ -69,6 +69,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /// For checkpoint migration tests
 #define ABS_TOL 1e-6
 
+/*
+ * NB There are some tests in here that are only run when the boost version is 1.34
+ * (i.e. on chaste-bob), so don't be too surprised if it fails there for just some
+ * of the builds and doesn't elsewhere.
+ *
+ * If you intended to change the archive format, then you should have incremented the
+ * BOOST_CLASS_VERSION(SomeClass, 1) to maintain backwards compatibility if possible.
+ * You can then scroll down to lines ~426 and follow the instructions to generate some
+ * new reference archives for the current version of the classes.
+ */
 class TestCardiacSimulationArchiver : public CxxTest::TestSuite
 {
 private:
