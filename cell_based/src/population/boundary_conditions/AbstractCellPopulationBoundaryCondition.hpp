@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * An abstract cell population boundary condition class, for use in cell-based simulations.
  */
-template<unsigned DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
 class AbstractCellPopulationBoundaryCondition : public Identifiable
 {
     friend class TestCellPopulationBoundaryConditions;
@@ -68,7 +68,7 @@ private:
 protected:
 
     /** The cell population. */
-    AbstractCellPopulation<DIM>* mpCellPopulation;
+    AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>* mpCellPopulation;
 
 public:
 
@@ -77,7 +77,7 @@ public:
      *
      * @param pCellPopulation pointer to the cell population.
      */
-    AbstractCellPopulationBoundaryCondition(AbstractCellPopulation<DIM>* pCellPopulation);
+    AbstractCellPopulationBoundaryCondition(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>* pCellPopulation);
 
     /**
      * Destructor.
@@ -92,7 +92,7 @@ public:
      *
      * @param rOldLocations the node locations before any boundary conditions are applied
      */
-    virtual void ImposeBoundaryCondition(const std::vector< c_vector<double, DIM> >& rOldLocations)=0;
+    virtual void ImposeBoundaryCondition(const std::vector< c_vector<double, SPACE_DIM> >& rOldLocations)=0;
 
     /**
      * Pure method which should verify the boundary condition has been applied.
@@ -111,7 +111,7 @@ public:
      *
      * @return A const pointer to the mpCellPopulation
      */
-    const AbstractCellPopulation<DIM>* GetCellPopulation() const;
+    const AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>* GetCellPopulation() const;
 
     /**
      * Output cell population boundary condition used in the simulation to file and then call
@@ -132,6 +132,6 @@ public:
     virtual void OutputCellPopulationBoundaryConditionParameters(out_stream& rParamsFile)=0;
 };
 
-TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractCellPopulationBoundaryCondition)
+TEMPLATED_CLASS_IS_ABSTRACT_2_UNSIGNED(AbstractCellPopulationBoundaryCondition)
 
 #endif /*ABSTRACTCELLPOPULATIONBOUNDARYCONDITION_HPP_*/

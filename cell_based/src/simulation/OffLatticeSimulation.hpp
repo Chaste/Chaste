@@ -94,7 +94,7 @@ protected:
     std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > > mForceCollection;
 
     /** List of boundary conditions. */
-    std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<SPACE_DIM> > > mBoundaryConditions;
+    std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > > mBoundaryConditions;
 
     /** Whether to write the node velocities to a file. */
     bool mOutputNodeVelocities;
@@ -183,7 +183,7 @@ public:
      *
      * @param pBoundaryCondition pointer to a boundary condition
      */
-    void AddCellPopulationBoundaryCondition(boost::shared_ptr<AbstractCellPopulationBoundaryCondition<SPACE_DIM> >  pBoundaryCondition);
+    void AddCellPopulationBoundaryCondition(boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> >  pBoundaryCondition);
 
     /**
      * Method to remove all the cell population boundary conditions

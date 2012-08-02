@@ -402,7 +402,7 @@ public:
 
 		// Create a cell population
 		MeshBasedCellPopulation<2> cell_population(mesh, cells);
-		// Calculate the rest lengths of the spings assuming that the current configuration is in equilibrium.
+		// Calculate the rest lengths of the springs assuming that the current configuration is in equilibrium.
 		cell_population.CalculateRestLengths();
 
 		// Set up cell-based simulation

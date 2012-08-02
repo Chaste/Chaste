@@ -35,25 +35,25 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCellPopulationBoundaryCondition.hpp"
 
-template<unsigned DIM>
-AbstractCellPopulationBoundaryCondition<DIM>::AbstractCellPopulationBoundaryCondition(AbstractCellPopulation<DIM>* pCellPopulation)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::AbstractCellPopulationBoundaryCondition(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>* pCellPopulation)
         : mpCellPopulation(pCellPopulation)
 {
 }
 
-template<unsigned DIM>
-AbstractCellPopulationBoundaryCondition<DIM>::~AbstractCellPopulationBoundaryCondition()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::~AbstractCellPopulationBoundaryCondition()
 {
 }
 
-template<unsigned DIM>
-const AbstractCellPopulation<DIM>* AbstractCellPopulationBoundaryCondition<DIM>::GetCellPopulation() const
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+const AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>* AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::GetCellPopulation() const
 {
     return mpCellPopulation;
 }
 
-template<unsigned DIM>
-void AbstractCellPopulationBoundaryCondition<DIM>::OutputCellPopulationBoundaryConditionInfo(out_stream& rParamsFile)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::OutputCellPopulationBoundaryConditionInfo(out_stream& rParamsFile)
 {
     std::string cell_killer_type = GetIdentifier();
 
@@ -62,8 +62,8 @@ void AbstractCellPopulationBoundaryCondition<DIM>::OutputCellPopulationBoundaryC
     *rParamsFile << "\t\t</" << cell_killer_type << ">\n";
 }
 
-template<unsigned DIM>
-void AbstractCellPopulationBoundaryCondition<DIM>::OutputCellPopulationBoundaryConditionParameters(out_stream& rParamsFile)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::OutputCellPopulationBoundaryConditionParameters(out_stream& rParamsFile)
 {
     // No parameters to output
 }
@@ -72,6 +72,9 @@ void AbstractCellPopulationBoundaryCondition<DIM>::OutputCellPopulationBoundaryC
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////
 
-template class AbstractCellPopulationBoundaryCondition<1>;
-template class AbstractCellPopulationBoundaryCondition<2>;
-template class AbstractCellPopulationBoundaryCondition<3>;
+template class AbstractCellPopulationBoundaryCondition<1,1>;
+template class AbstractCellPopulationBoundaryCondition<1,2>;
+template class AbstractCellPopulationBoundaryCondition<2,2>;
+template class AbstractCellPopulationBoundaryCondition<1,3>;
+template class AbstractCellPopulationBoundaryCondition<2,3>;
+template class AbstractCellPopulationBoundaryCondition<3,3>;

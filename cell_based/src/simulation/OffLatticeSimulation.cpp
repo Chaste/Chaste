@@ -83,7 +83,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::RemoveAllForces()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::AddCellPopulationBoundaryCondition(boost::shared_ptr<AbstractCellPopulationBoundaryCondition<SPACE_DIM> > pBoundaryCondition)
+void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::AddCellPopulationBoundaryCondition(boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > pBoundaryCondition)
 {
     mBoundaryConditions.push_back(pBoundaryCondition);
 }
@@ -262,7 +262,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateNodePositions(const std:
     static_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&(this->mrCellPopulation))->UpdateNodeLocations(rNodeForces, this->mDt);
 
     // Apply any boundary conditions
-    for (typename std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<SPACE_DIM> > >::iterator bcs_iter = mBoundaryConditions.begin();
+    for (typename std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > >::iterator bcs_iter = mBoundaryConditions.begin();
          bcs_iter != mBoundaryConditions.end();
          ++bcs_iter)
     {
@@ -270,7 +270,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateNodePositions(const std:
     }
 
     // Verify that each boundary condition is now satisfied
-    for (typename std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<SPACE_DIM> > >::iterator bcs_iter = mBoundaryConditions.begin();
+    for (typename std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > >::iterator bcs_iter = mBoundaryConditions.begin();
          bcs_iter != mBoundaryConditions.end();
          ++bcs_iter)
     {
@@ -377,7 +377,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OutputAdditionalSimulationSetu
 
     // Loop over cell population boundary conditions
     *rParamsFile << "\n\t<CellPopulationBoundaryConditions>\n";
-    for (typename std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<SPACE_DIM> > >::iterator iter = mBoundaryConditions.begin();
+    for (typename std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > >::iterator iter = mBoundaryConditions.begin();
          iter != mBoundaryConditions.end();
          ++iter)
     {
