@@ -42,8 +42,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscTools.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
+/*
+ * NB - If copying and pasting a file comparison out of here then you should not include
+ * the last argument to the constructor which suppresses its output,
+ * and is not very useful for seeing what the difference in files is,
+ * but it makes the output of this test much nicer.
+ */
 class TestFileComparison : public CxxTest::TestSuite
 {
+private:
+    bool CalledCollectively;
+    bool SuppressOutput;
+
 public:
 
     void TestBasicFunctionality() throw(Exception)
@@ -51,12 +61,16 @@ public:
         std::string base_file = "./global/test/data/random_data.txt";
         std::string noised_file = "./global/test/data/same_random_data_with_1e-4_noise.txt";
 
+        CalledCollectively = true;
+        SuppressOutput = true;
+
         // Comparing identical files shows no difference
-        FileComparison same_data(base_file, base_file);
+        // NB Last two arguments can generally take their defaults (true and false)
+        FileComparison same_data(base_file, base_file, CalledCollectively, SuppressOutput);
         TS_ASSERT(same_data.CompareFiles());
 
         // Comparing two different files gives a failure.
-        FileComparison different_data(base_file, noised_file);
+        FileComparison different_data(base_file, noised_file, CalledCollectively, SuppressOutput);
 
         bool expected_fail_result = !PetscTools::AmMaster();
         TS_ASSERT_EQUALS(different_data.CompareFiles(0,false), expected_fail_result);
@@ -67,12 +81,14 @@ public:
     // tests - it's working if they don't deadlock!  Here we test the ability to be used non-collectively.
     void TestParallelOperation() throw(Exception)
     {
+        CalledCollectively = false;
         if (PetscTools::AmMaster())
         {
             std::string base_file = "./global/test/data/random_data.txt";
-            FileComparison same_data(base_file, base_file, false);
+            FileComparison same_data(base_file, base_file, CalledCollectively);
             TS_ASSERT(same_data.CompareFiles());
         }
+        CalledCollectively = true;
     }
 
     void TestFileFinderInterface() throw(Exception)
@@ -82,7 +98,7 @@ public:
         FileFinder noised_file("global/test/data/same_random_data_with_1e-4_noise.txt",
                                RelativeTo::ChasteSourceRoot);
 
-        FileComparison same_data(base_file, noised_file);
+        FileComparison same_data(base_file, noised_file, CalledCollectively, SuppressOutput);
         bool expected_fail_result = !PetscTools::AmMaster();
         TS_ASSERT_EQUALS(same_data.CompareFiles(0,false), expected_fail_result);
     }
@@ -92,14 +108,14 @@ public:
         std::string base_file = "./global/test/data/random_data.txt";
         std::string changed_file = "./global/test/data/same_random_data_with_different_header.txt";
 
-        FileComparison file_comparer(base_file, changed_file);
+        FileComparison file_comparer(base_file, changed_file, CalledCollectively, SuppressOutput);
 
         // Here we examine the header lines, find a difference and get a failure
         bool expected_fail_result = !PetscTools::AmMaster();
         TS_ASSERT_EQUALS(file_comparer.CompareFiles(0,false), expected_fail_result);
 
         // In a second file comparer make this pass by using SetIgnoreLinesBeginningWith();
-        FileComparison file_comparer2(base_file, changed_file);
+        FileComparison file_comparer2(base_file, changed_file, CalledCollectively, SuppressOutput);
         file_comparer2.SetIgnoreLinesBeginningWith("header");
         TS_ASSERT_EQUALS(file_comparer2.CompareFiles(0,false), true);
 
@@ -114,16 +130,17 @@ public:
     void TestBinaryFiles() throw(Exception)
     {
     	std::string base_file = "./mesh/test/data/simple_cube_binary.node";
-    	FileComparison(base_file, base_file).CompareFiles();
+    	TS_ASSERT(FileComparison(base_file, base_file, CalledCollectively, SuppressOutput).CompareFiles());
 
     	//A file which is the same for data purposes, but has the provenance line altered
  	 	std::string copy_file = "./global/test/data/simple_cube_binary_copy.node";
-    	FileComparison(base_file, copy_file).CompareFiles();
+    	TS_ASSERT(FileComparison(base_file, copy_file, CalledCollectively, SuppressOutput).CompareFiles());
 
     	//A file which has a single byte of data inserted
-    	///\todo #1002 The amount of trace which this non-failing test is producing is a little alarming for users
     	std::string modified_file = "./global/test/data/simple_cube_binary_modified.node";
-    	TS_ASSERT_EQUALS(FileComparison(base_file, modified_file).CompareFiles(0, false), false);
+
+    	bool expected_fail_result = !PetscTools::AmMaster();
+    	TS_ASSERT_EQUALS(FileComparison(base_file, modified_file, CalledCollectively, SuppressOutput).CompareFiles(0, false), expected_fail_result);
     }
 
 

@@ -48,6 +48,9 @@ private:
 	/** Whether or not we should ignore lines starting with '#'. True by default.*/
     bool mIgnoreCommentLines;
 
+    /** Whether we should suppress output from this class, just for a clean looking test */
+    bool mSuppressOutput;
+
     /**
      * A list of strings, if found at the beginning of lines when
      * mIgnoreCommentLines is true, differences in these lines
@@ -64,9 +67,10 @@ public:
      * @param fileName2  second file
      * @param calledCollectively  If true there will be a barrier before opening files, and only master compares contents.
      */
-    FileComparison(std::string fileName1, std::string fileName2, bool calledCollectively=true)
+    FileComparison(std::string fileName1, std::string fileName2, bool calledCollectively=true, bool suppressOutput = false)
         : AbstractFileComparison(fileName1, fileName2, calledCollectively),
-          mIgnoreCommentLines(true)
+          mIgnoreCommentLines(true),
+          mSuppressOutput(suppressOutput)
     {
         SetupCommentLines();
     }
@@ -79,9 +83,10 @@ public:
      * @param rFileName2  second file finder
      * @param calledCollectively  If true there will be a barrier before opening files, and only master compares contents.
      */
-    FileComparison(const FileFinder& rFileName1, const FileFinder& rFileName2, bool calledCollectively=true)
+    FileComparison(const FileFinder& rFileName1, const FileFinder& rFileName2, bool calledCollectively=true, bool suppressOutput = false)
         : AbstractFileComparison(rFileName1, rFileName2, calledCollectively),
-          mIgnoreCommentLines(true)
+          mIgnoreCommentLines(true),
+          mSuppressOutput(suppressOutput)
     {
         SetupCommentLines();
     }
@@ -176,9 +181,12 @@ public:
                     // Display error
                     std::stringstream message;
                     message << "Line " << mLineNum << " differs in files " << mFilename1 << " and " << mFilename2;
-                    TS_TRACE(message.str());
-                    TS_TRACE( buffer1 );
-                    TS_TRACE( buffer2 );
+                    if (!mSuppressOutput)
+                    {
+                        TS_TRACE(message.str());
+                        TS_TRACE( buffer1 );
+                        TS_TRACE( buffer2 );
+                    }
                 }
             }
             mLineNum++;
@@ -195,7 +203,10 @@ public:
             {
 #define COVERAGE_IGNORE
                 // Report the paths to the files
-                TS_TRACE("Files " + mFilename1 + " and " + mFilename2 + " differ.");
+                if (!mSuppressOutput)
+                {
+                    TS_TRACE("Files " + mFilename1 + " and " + mFilename2 + " differ.");
+                }
 #undef COVERAGE_IGNORE
             }
         }
