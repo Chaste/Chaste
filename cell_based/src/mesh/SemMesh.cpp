@@ -314,6 +314,7 @@ unsigned SemMesh<DIM>::AddElement(PottsElement<DIM>* pNewElement, std::vector<No
     }
     else
     {
+        delete this->mElements[new_element_index];
         this->mElements[new_element_index] = pNewElement;
     }
 
