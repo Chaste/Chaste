@@ -88,7 +88,7 @@ private:
 
 public:
 
-    void TestPottsCrypt() throw (Exception)
+    void TestPottsCryptWithSimpleWntCellCycleModel() throw (Exception)
     {
         double crypt_length = 40;
 
@@ -112,7 +112,7 @@ public:
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestPottsCrypt");
+        simulator.SetOutputDirectory("TestPottsWntBasedCrypt");
         simulator.SetDt(0.1);
         simulator.SetSamplingTimestepMultiple(1);
         simulator.SetEndTime(10.0);
@@ -138,6 +138,53 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 11u);
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 6u);
     }
+
+    void TestPottsCryptWithGenerationBasedCellCycleModel() throw (Exception)
+    {
+        double crypt_length = 40;
+
+        // Create a simple 2D PottsMesh
+        PottsMeshGenerator<2> generator(20, 5, 4, 45, 10, 4, 1, 1, 1, true);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
+        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 2.5, 8.0, 16.0, 36);
+
+        // Create cell population
+        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.SetOutputCellVolumes(true);
+
+        // Set up cell-based simulation
+        OnLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestPottsGenerationBasedCrypt");
+        simulator.SetDt(0.1);
+        simulator.SetSamplingTimestepMultiple(1);
+        simulator.SetEndTime(10.0);
+        simulator.SetOutputCellVelocities(true);
+
+        // Create cell killer and pass in to simulation
+        MAKE_PTR_ARGS(SloughingCellKiller<2>, p_killer, (&cell_population, crypt_length));
+        simulator.AddCellKiller(p_killer);
+
+        // Create update rules and pass to the simulation
+        MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
+        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
+        MAKE_PTR(AdhesionPottsUpdateRule<2>, p_adhesion_update_rule);
+        simulator.AddPottsUpdateRule(p_adhesion_update_rule);
+
+        // Run simulation
+        simulator.Solve();
+
+        // Check the number of cells
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 64u);
+
+        // Test number of births or deaths
+        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 32u);
+        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 18u);
+    }
+
 };
 
 #endif /*TESTPOTTSBASEDCRYPTSIMULATION_HPP_*/

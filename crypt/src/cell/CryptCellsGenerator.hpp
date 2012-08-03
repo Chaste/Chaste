@@ -45,6 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellPropertyRegistry.hpp"
 #include "TetrahedralMesh.hpp"
 #include "VertexMesh.hpp"
+#include "PottsMesh.hpp"
 
 #include "StochasticDurationGenerationBasedCellCycleModel.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
@@ -135,6 +136,11 @@ void CryptCellsGenerator<CELL_CYCLE_MODEL>::Generate(
         unsigned num_cells = locationIndices.empty() ? pMesh->GetNumNodes() : locationIndices.size();
         rCells.reserve(num_cells);
     }
+    else if (dynamic_cast<PottsMesh<2>*>(pMesh))
+    {
+        mesh_size = static_cast<PottsMesh<2>*>(pMesh)->GetNumElements();
+        rCells.reserve(mesh_size);
+    }
     else
     {
         /*
@@ -168,6 +174,10 @@ void CryptCellsGenerator<CELL_CYCLE_MODEL>::Generate(
             {
                 y = pMesh->GetNode(i)->GetPoint().rGetLocation()[1];
             }
+        }
+        else if (dynamic_cast<PottsMesh<2>*>(pMesh))
+        {
+            y = dynamic_cast<PottsMesh<2>*>(pMesh)->GetCentroidOfElement(i)[1];
         }
         else
         {
