@@ -681,7 +681,7 @@ public:
                 TS_ASSERT_EQUALS(ascii_node_indices.NodeIndices[1],binary_node_indices.NodeIndices[1]);
                 TS_ASSERT_EQUALS(ascii_node_indices.NodeIndices[2],binary_node_indices.NodeIndices[2]);
                 TS_ASSERT_EQUALS(ascii_node_indices.NodeIndices[3],binary_node_indices.NodeIndices[3]);
-                TS_ASSERT_EQUALS(ascii_node_indices.AttributeValue,binary_node_indices.AttributeValue);
+                TS_ASSERT_DELTA(ascii_node_indices.AttributeValue,binary_node_indices.AttributeValue,1e-12);
             }
             mesh_reader_ascii.Reset(); // You wouldn't believe how important this line is.
             for (unsigned i=0; i<mesh_reader.GetNumElements(); i++)
@@ -693,7 +693,7 @@ public:
                 TS_ASSERT_EQUALS(ascii_node_indices.NodeIndices[1],binary_node_indices.NodeIndices[1]);
                 TS_ASSERT_EQUALS(ascii_node_indices.NodeIndices[2],binary_node_indices.NodeIndices[2]);
                 TS_ASSERT_EQUALS(ascii_node_indices.NodeIndices[3],binary_node_indices.NodeIndices[3]);
-                TS_ASSERT_EQUALS(ascii_node_indices.AttributeValue,binary_node_indices.AttributeValue);
+                TS_ASSERT_DELTA(ascii_node_indices.AttributeValue,binary_node_indices.AttributeValue,1e-12);
             }
 
             // Now test using the iterators for the ASCII mesh
@@ -712,7 +712,7 @@ public:
                 TS_ASSERT_EQUALS(ascii_node_indices.NodeIndices[1],binary_node_indices.NodeIndices[1]);
                 TS_ASSERT_EQUALS(ascii_node_indices.NodeIndices[2],binary_node_indices.NodeIndices[2]);
                 TS_ASSERT_EQUALS(ascii_node_indices.NodeIndices[3],binary_node_indices.NodeIndices[3]);
-                TS_ASSERT_EQUALS(ascii_node_indices.AttributeValue,binary_node_indices.AttributeValue);
+                TS_ASSERT_DELTA(ascii_node_indices.AttributeValue,binary_node_indices.AttributeValue,1e-12);
             }
             TS_ASSERT_EQUALS(count, mesh_reader.GetNumElements());
 
@@ -731,7 +731,7 @@ public:
                 TS_ASSERT_EQUALS(ascii_node_indices.NodeIndices[1],binary_node_indices.NodeIndices[1]);
                 TS_ASSERT_EQUALS(ascii_node_indices.NodeIndices[2],binary_node_indices.NodeIndices[2]);
                 TS_ASSERT_EQUALS(ascii_node_indices.NodeIndices[3],binary_node_indices.NodeIndices[3]);
-                TS_ASSERT_EQUALS(ascii_node_indices.AttributeValue,binary_node_indices.AttributeValue);
+                TS_ASSERT_DELTA(ascii_node_indices.AttributeValue,binary_node_indices.AttributeValue,1e-12);
             }
             TS_ASSERT_EQUALS(count, mesh_reader_ascii.GetNumElements());
 
@@ -755,7 +755,7 @@ public:
                 TS_ASSERT_EQUALS(ascii_node_indices.NodeIndices[1],binary_node_indices.NodeIndices[1]);
                 TS_ASSERT_EQUALS(ascii_node_indices.NodeIndices[2],binary_node_indices.NodeIndices[2]);
                 TS_ASSERT_EQUALS(ascii_node_indices.NodeIndices[3],binary_node_indices.NodeIndices[3]);
-                TS_ASSERT_EQUALS(ascii_node_indices.AttributeValue,binary_node_indices.AttributeValue);
+                TS_ASSERT_DELTA(ascii_node_indices.AttributeValue,binary_node_indices.AttributeValue,1e-12);
                 // Skip odd elements
                 mesh_reader_ascii.GetNextElementData();
             }
@@ -784,7 +784,7 @@ public:
                 TS_ASSERT_EQUALS(ascii_node_indices.NodeIndices[1],binary_node_indices.NodeIndices[1]);
                 TS_ASSERT_EQUALS(ascii_node_indices.NodeIndices[2],binary_node_indices.NodeIndices[2]);
                 TS_ASSERT_EQUALS(ascii_node_indices.NodeIndices[3],binary_node_indices.NodeIndices[3]);
-                TS_ASSERT_EQUALS(ascii_node_indices.AttributeValue,binary_node_indices.AttributeValue);
+                TS_ASSERT_DELTA(ascii_node_indices.AttributeValue, binary_node_indices.AttributeValue,1e-12);
             }
             TS_ASSERT_EQUALS(count, mesh_reader_ascii.GetNumElements() / 2u);
 
@@ -819,7 +819,7 @@ public:
                 TS_ASSERT_EQUALS(ascii_node_indices.NodeIndices[0],binary_node_indices.NodeIndices[0]);
                 TS_ASSERT_EQUALS(ascii_node_indices.NodeIndices[1],binary_node_indices.NodeIndices[1]);
                 TS_ASSERT_EQUALS(ascii_node_indices.NodeIndices[2],binary_node_indices.NodeIndices[2]);
-                TS_ASSERT_EQUALS(ascii_node_indices.AttributeValue,binary_node_indices.AttributeValue);
+                TS_ASSERT_DELTA(ascii_node_indices.AttributeValue,binary_node_indices.AttributeValue,1e-12);
             }
             mesh_reader_ascii.Reset(); // You wouldn't believe how important this line is.
             for (unsigned i=0; i<mesh_reader.GetNumFaces(); i++)
@@ -830,7 +830,7 @@ public:
                 TS_ASSERT_EQUALS(ascii_node_indices.NodeIndices[0],binary_node_indices.NodeIndices[0]);
                 TS_ASSERT_EQUALS(ascii_node_indices.NodeIndices[1],binary_node_indices.NodeIndices[1]);
                 TS_ASSERT_EQUALS(ascii_node_indices.NodeIndices[2],binary_node_indices.NodeIndices[2]);
-                TS_ASSERT_EQUALS(ascii_node_indices.AttributeValue,binary_node_indices.AttributeValue);
+                TS_ASSERT_DELTA(ascii_node_indices.AttributeValue,binary_node_indices.AttributeValue,1e-12);
             }
         }
 

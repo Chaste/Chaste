@@ -210,7 +210,7 @@ ElementData TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextElementData()
     GetNextItemFromStream(mElementsFile, mElementsRead, element_data.NodeIndices, mNumElementAttributes, element_attributes);
     if (mNumElementAttributes > 0)
     {
-        element_data.AttributeValue = (unsigned) element_attributes[0];///only one element attribute registered for the moment
+        element_data.AttributeValue = (double) element_attributes[0];///only one element attribute registered for the moment
     }
 
     EnsureIndexingFromZero(element_data.NodeIndices);
@@ -284,16 +284,15 @@ ElementData TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextFaceData()
         {
             face_data.AttributeValue = 1.0; // If an attribute is not read this stays as one, otherwise overwritten.
 
-            std::vector<double> face_attributes; //will store face attributes, if any
+            std::vector<unsigned> face_attributes; //will store face attributes, if any
             if (mReadContainingElementOfBoundaryElement)
             {
                 assert(mNumFaceAttributes == 0);
-                GetNextItemFromStream(mFacesFile, mFacesRead, ret_indices, 1,
-                                        face_attributes);
+                GetNextItemFromStream(mFacesFile, mFacesRead, ret_indices, 1, face_attributes);
 
                 if (face_attributes.size() > 0)
                 {
-                    face_data.ContainingElement = (unsigned) face_attributes[0];// only one face attribute registered for the moment
+                    face_data.ContainingElement = face_attributes[0];// only one face attribute registered for the moment
                 }
 
             }
@@ -304,7 +303,7 @@ ElementData TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextFaceData()
 
                 if (mNumFaceAttributes > 0)
                 {
-                    face_data.AttributeValue = (unsigned) face_attributes[0];//only one face attribute registered for the moment
+                    face_data.AttributeValue = (double) face_attributes[0]; //only one face attribute registered for the moment
                 }
             }
 

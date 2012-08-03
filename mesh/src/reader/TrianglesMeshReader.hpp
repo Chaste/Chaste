@@ -316,7 +316,8 @@ private:
      */
     template<class T_DATA, class T_ATTR>
     void GetNextItemFromStream(std::ifstream& rFileStream, unsigned expectedItemNumber,
-                               std::vector<T_DATA>& rDataPacket, const unsigned& rNumAttributes, std::vector<T_ATTR>& rAttributes);
+                               std::vector<T_DATA>& rDataPacket, const unsigned& rNumAttributes,
+                               std::vector<T_ATTR>& rAttributes);
 
     /** Get method for mFilesBaseName. */
     std::string GetMeshFileBaseName();
