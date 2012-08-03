@@ -84,7 +84,7 @@ bool PseudoEcgCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::ShouldSkipThisEle
     if (mVariableName=="V")
     {
         // If we are integrating voltage and this element is in the bath then skip it.
-        result = HeartRegionCode::IsRegionBath(rElement.GetAttribute());
+        result = HeartRegionCode::IsRegionBath(rElement.GetUnsignedAttribute());
     }
     return result;
 }

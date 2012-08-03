@@ -77,7 +77,7 @@ public:
              ++it)
         {
             // A correct calculation depends on this not breaking!
-            TS_ASSERT(!HeartRegionCode::IsRegionBath((*it).GetAttribute()));
+            TS_ASSERT(!HeartRegionCode::IsRegionBath((*it).GetUnsignedAttribute()));
         }
 
         ////////////////////////////////////////////////////
@@ -172,7 +172,7 @@ public:
              ++it)
         {
             // A correct calculation depends on this not breaking!
-            TS_ASSERT(!HeartRegionCode::IsRegionBath((*it).GetAttribute()));
+            TS_ASSERT(!HeartRegionCode::IsRegionBath((*it).GetUnsignedAttribute()));
         }
 
         ////////////////////////////////////////////////////

@@ -204,7 +204,7 @@ ElementData TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextElementData()
 {
     ElementData element_data;
     element_data.NodeIndices.resize(mNodesPerElement);
-    element_data.AttributeValue = 0; // If an attribute is not read this stays as zero, otherwise overwritten.
+    element_data.AttributeValue = 0.0; // If an attribute is not read this stays as zero, otherwise overwritten.
 
     std::vector<unsigned> element_attributes;
     GetNextItemFromStream(mElementsFile, mElementsRead, element_data.NodeIndices, mNumElementAttributes, element_attributes);
@@ -282,9 +282,9 @@ ElementData TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextFaceData()
         assert(ELEMENT_DIM != 0); //Covered in earlier exception, but needed in loop guard here.
         do
         {
-            face_data.AttributeValue = 1u; // If an attribute is not read this stays as one, otherwise overwritten.
+            face_data.AttributeValue = 1.0; // If an attribute is not read this stays as one, otherwise overwritten.
 
-            std::vector<unsigned> face_attributes;//will store face attributes, if any
+            std::vector<double> face_attributes; //will store face attributes, if any
             if (mReadContainingElementOfBoundaryElement)
             {
                 assert(mNumFaceAttributes == 0);
@@ -867,7 +867,7 @@ void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextItemFromStream(std::ifs
                 buffer_stream >> attribute;
                 if (buffer_stream.fail())
                 {
-                    EXCEPTION("Error in reading attributes in one of the files in " << mFilesBaseName);
+                    EXCEPTION("Error in reading attribute index " << i << " (out of " << rNumAttributes << ") in one of the files in " << mFilesBaseName);
                 }
                 rAttributes.push_back(attribute);
             }

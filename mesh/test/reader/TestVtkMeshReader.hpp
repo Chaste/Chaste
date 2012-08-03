@@ -529,7 +529,7 @@ public:
                      iter != mesh.GetCableElementIteratorEnd();
                      ++iter)
         {
-            TS_ASSERT_EQUALS((*iter)->GetAttribute(), 2.0);
+            TS_ASSERT_DELTA((*iter)->GetAttribute(), 2.0, 1e-9);
         }
 #else
         std::cout << "This test was not run, as VTK is not enabled." << std::endl;

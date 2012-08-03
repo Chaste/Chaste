@@ -361,7 +361,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
             }
 
             // Determine if this is a boundary face
-            std::set<unsigned> containing_element_indices; // Elements that contain this face
+            //std::set<unsigned> containing_element_indices; // Elements that contain this face
             std::vector<Node<SPACE_DIM>*> nodes;
 
             for (unsigned node_index=0; node_index<node_indices.size(); node_index++)
@@ -398,8 +398,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
             if (rMeshReader.GetNumFaceAttributes() > 0)
             {
                 assert(rMeshReader.GetNumFaceAttributes() == 1);
-                double attribute_value = face_data.AttributeValue;
-                p_boundary_element->SetAttribute(attribute_value);
+                p_boundary_element->SetAttribute(face_data.AttributeValue);
             }
         }
     }

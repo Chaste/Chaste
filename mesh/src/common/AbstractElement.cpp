@@ -188,6 +188,18 @@ double AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetAttribute()
     return mAttribute;
 }
 
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetUnsignedAttribute()
+{
+    double double_attr = GetAttribute();
+    unsigned unsigned_attr = (unsigned) double_attr;
+    if (fabs(double_attr-((double)(unsigned_attr)))>1e-9)
+    {
+        EXCEPTION("Element attribute '"<< double_attr <<"' cannot be converted to an unsigned.");
+    }
+    return unsigned_attr;
+}
+
 
 /////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation

@@ -452,8 +452,8 @@ public:
         TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNode(1), mesh.GetNode(101));
 
         // Check element attributes
-        TS_ASSERT_EQUALS(mesh.GetElement(0)->GetAttribute(), 97u);
-        TS_ASSERT_EQUALS(mesh.GetElement(1)->GetAttribute(), 98u);
+        TS_ASSERT_EQUALS(mesh.GetElement(0)->GetUnsignedAttribute(), 97u);
+        TS_ASSERT_EQUALS(mesh.GetElement(1)->GetUnsignedAttribute(), 98u);
     }
 };
 

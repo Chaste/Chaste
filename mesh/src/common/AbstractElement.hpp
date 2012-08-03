@@ -223,7 +223,7 @@ public:
     /**
      * Set an attribute (a value associated with the element)
      *
-     * @param attribute the attribute
+     * @param attribute the value of an attribute
      */
     void SetAttribute(double attribute);
 
@@ -231,6 +231,14 @@ public:
      * Get the element's attribute value
      */
     double GetAttribute();
+
+    /**
+     * This method converts the attribute (stored as a double) to an
+     * unsigned, and throws an exception if this is not sensible.
+     *
+     * @return an unsigned attribute value.
+     */
+    unsigned GetUnsignedAttribute();
 };
 
 #endif /*ABSTRACTELEMENT_HPP_*/

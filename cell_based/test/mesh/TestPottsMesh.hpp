@@ -1829,8 +1829,8 @@ public:
         TS_ASSERT_EQUALS(mesh2.GetElement(1)->GetNode(1), mesh2.GetNode(4));
 
         // Check element attributes
-        TS_ASSERT_EQUALS(mesh2.GetElement(0)->GetAttribute(), 97u);
-        TS_ASSERT_EQUALS(mesh2.GetElement(1)->GetAttribute(), 152u);
+        TS_ASSERT_EQUALS(mesh2.GetElement(0)->GetUnsignedAttribute(), 97u);
+        TS_ASSERT_EQUALS(mesh2.GetElement(1)->GetUnsignedAttribute(), 152u);
     }
 };
 

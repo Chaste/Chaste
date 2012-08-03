@@ -1575,7 +1575,7 @@ public:
 
         for (unsigned i=0; i<mesh.GetNumElements(); i++)
         {
-            TS_ASSERT_EQUALS(mesh.GetElement(i)->GetAttribute(), i%5+1);
+            TS_ASSERT_EQUALS(mesh.GetElement(i)->GetUnsignedAttribute(), i%5+1);
         }
     }
 
@@ -1589,7 +1589,7 @@ public:
 
         for (unsigned i=0; i<mesh.GetNumElements(); i++)
         {
-            TS_ASSERT_EQUALS(mesh.GetElement(i)->GetAttribute(), (i+1)%3+1);
+            TS_ASSERT_EQUALS(mesh.GetElement(i)->GetUnsignedAttribute(), (i+1)%3+1);
         }
 
        TS_ASSERT_EQUALS(mesh_reader.GetNumFaceAttributes(), 1u);
@@ -1597,11 +1597,11 @@ public:
         bool read_zero_attribute = false;
         for (unsigned i=0; i<mesh.GetNumBoundaryElements(); i++)
         {
-            if (mesh.GetBoundaryElement(i)->GetAttribute()==0U)
+            if (mesh.GetBoundaryElement(i)->GetUnsignedAttribute()==0u)
             {
                 read_zero_attribute = true;
             }
-            TS_ASSERT_LESS_THAN(mesh.GetBoundaryElement(i)->GetAttribute(), 4u);
+            TS_ASSERT_LESS_THAN(mesh.GetBoundaryElement(i)->GetAttribute(), 4.0);
         }
         TS_ASSERT(read_zero_attribute);
     }
@@ -1616,7 +1616,7 @@ public:
 
         for (unsigned i=0; i<mesh.GetNumElements(); i++)
         {
-            TS_ASSERT_EQUALS(mesh.GetElement(i)->GetAttribute(), 0u);
+            TS_ASSERT_DELTA(mesh.GetElement(i)->GetAttribute(), 0u, 1e-12);
         }
 
         TS_ASSERT_EQUALS(mesh_reader.GetNumFaceAttributes(), 1u);
@@ -1629,11 +1629,11 @@ public:
         {
             if (i==99)
             {
-                TS_ASSERT_EQUALS(mesh.GetBoundaryElement(i)->GetAttribute(), 2u);
+                TS_ASSERT_EQUALS(mesh.GetBoundaryElement(i)->GetUnsignedAttribute(), 2u);
             }
             else
             {
-                TS_ASSERT_EQUALS(mesh.GetBoundaryElement(i)->GetAttribute(), 1u);
+                TS_ASSERT_EQUALS(mesh.GetBoundaryElement(i)->GetUnsignedAttribute(), 1u);
             }
         }
     }

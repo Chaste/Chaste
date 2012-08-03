@@ -286,7 +286,7 @@ public:
         {
             try
             {
-                unsigned region = mesh.GetElement(i)->GetAttribute();
+                unsigned region = mesh.GetElement(i)->GetUnsignedAttribute();
                 TS_ASSERT_EQUALS(region, i%5+1);
                 TS_ASSERT_EQUALS(i, mesh.GetElement(i)->GetIndex());
             }
@@ -824,7 +824,7 @@ public:
         {
             try
             {
-                unsigned region = mesh.GetElement(i)->GetAttribute();
+                unsigned region = mesh.GetElement(i)->GetUnsignedAttribute();
                 TS_ASSERT_EQUALS(region, (i+1)%3+1);
             }
             catch(Exception& e)
@@ -839,7 +839,7 @@ public:
         {
             try
             {
-                unsigned region = mesh.GetBoundaryElement(i)->GetAttribute();
+                unsigned region = mesh.GetBoundaryElement(i)->GetUnsignedAttribute();
                 TS_ASSERT_LESS_THAN(region, 4u);
             }
             catch(Exception& e)

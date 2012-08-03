@@ -491,8 +491,29 @@ public:
             delete nodes_the_same[i];
         }
 
+        // Test attribute setting and conversion to unsigned intergers
+
         element.SetAttribute(3);
-        TS_ASSERT_EQUALS(element.GetAttribute(), 3u);
+        TS_ASSERT_DELTA(fabs(element.GetAttribute()-3.0), 0, 1e-9);
+
+        element.SetAttribute(3.0);
+        TS_ASSERT_EQUALS(element.GetUnsignedAttribute(), 3u);
+
+        element.SetAttribute(3.1);
+        TS_ASSERT_THROWS_THIS(element.GetUnsignedAttribute(),
+                              "Element attribute '3.1' cannot be converted to an unsigned.");
+
+        element.SetAttribute(0);
+        TS_ASSERT_EQUALS(element.GetUnsignedAttribute(), 0u);
+
+        element.SetAttribute(-1.0);
+        TS_ASSERT_THROWS_THIS(element.GetUnsignedAttribute(),
+                              "Element attribute '-1' cannot be converted to an unsigned.");
+
+        element.SetAttribute(-1.2);
+        TS_ASSERT_THROWS_THIS(element.GetUnsignedAttribute(),
+                              "Element attribute '-1.2' cannot be converted to an unsigned.");
+
     }
 
     void TestCircum1d()
@@ -1011,7 +1032,7 @@ public:
         TS_ASSERT_SAME_DATA(indices_2, expected_indices_2, 6*sizeof(unsigned));
 
         p_element->SetAttribute(3);
-        TS_ASSERT_EQUALS(p_element->GetAttribute(), 3u);
+        TS_ASSERT_EQUALS(p_element->GetUnsignedAttribute(), 3u);
     }
 
 };

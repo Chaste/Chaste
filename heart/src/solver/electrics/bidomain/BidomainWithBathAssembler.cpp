@@ -46,7 +46,7 @@ c_matrix<double,2*(ELEMENT_DIM+1),2*(ELEMENT_DIM+1)>
             c_matrix<double, 2, SPACE_DIM> &rGradU /* not used */,
             Element<ELEMENT_DIM,SPACE_DIM>* pElement)
 {
-    if (!HeartRegionCode::IsRegionBath( pElement->GetAttribute() )) // ie if a tissue element
+    if (!HeartRegionCode::IsRegionBath( pElement->GetUnsignedAttribute() )) // ie if a tissue element
     {
         return BidomainAssembler<ELEMENT_DIM,SPACE_DIM>::ComputeMatrixTerm(rPhi,rGradPhi,rX,rU,rGradU,pElement);
     }

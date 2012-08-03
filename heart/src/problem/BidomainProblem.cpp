@@ -65,7 +65,7 @@ void BidomainProblem<DIM>::AnalyseMeshForBath()
         {
             Element<DIM, DIM>& r_element = *it;
 
-            if (HeartRegionCode::IsRegionTissue( r_element.GetAttribute() ))
+            if (HeartRegionCode::IsRegionTissue( r_element.GetUnsignedAttribute() ))
             {
                 for (unsigned j=0; j<r_element.GetNumNodes(); j++)
                 {
@@ -74,7 +74,7 @@ void BidomainProblem<DIM>::AnalyseMeshForBath()
             }
             else
             {
-                assert(HeartRegionCode::IsRegionBath( r_element.GetAttribute() ));
+                assert(HeartRegionCode::IsRegionBath( r_element.GetUnsignedAttribute() ));
                 any_bath_element_found = true;
             }
         }

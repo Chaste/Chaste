@@ -49,7 +49,7 @@ c_matrix<double,3*(DIM+1),3*(DIM+1)> ExtendedBidomainMassMatrixAssembler<DIM>::C
 
     c_matrix<double,3*(DIM+1),3*(DIM+1)> ret = zero_matrix<double>(3*(DIM+1),3*(DIM+1));
 
-    if (!HeartRegionCode::IsRegionBath( pElement->GetAttribute() )) // ie if a tissue element
+    if (!HeartRegionCode::IsRegionBath( pElement->GetUnsignedAttribute() )) // ie if a tissue element
     {
         c_matrix<double, DIM+1, DIM+1> basis_outer_prod = outer_prod(rPhi, rPhi);
 

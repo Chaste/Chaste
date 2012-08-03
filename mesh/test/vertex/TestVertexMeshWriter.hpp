@@ -299,8 +299,8 @@ public:
         // Construct the mesh
         VertexMesh<2,2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
-        TS_ASSERT_EQUALS(mesh.GetElement(0)->GetAttribute(), 97u);
-        TS_ASSERT_EQUALS(mesh.GetElement(1)->GetAttribute(), 152u);
+        TS_ASSERT_EQUALS(mesh.GetElement(0)->GetUnsignedAttribute(), 97u);
+        TS_ASSERT_EQUALS(mesh.GetElement(1)->GetUnsignedAttribute(), 152u);
 
         // Write the mesh to file
         VertexMeshWriter<2,2> mesh_writer("TestReadingAndWritingElementAttributes", "vertex_mesh_with_element_attributes");
@@ -315,8 +315,8 @@ public:
         // Construct the mesh again
         VertexMesh<2,2> mesh2;
         mesh2.ConstructFromMeshReader(mesh_reader);
-        TS_ASSERT_EQUALS(mesh2.GetElement(0)->GetAttribute(), 97u);
-        TS_ASSERT_EQUALS(mesh2.GetElement(1)->GetAttribute(), 152u);
+        TS_ASSERT_EQUALS(mesh2.GetElement(0)->GetUnsignedAttribute(), 97u);
+        TS_ASSERT_EQUALS(mesh2.GetElement(1)->GetUnsignedAttribute(), 152u);
 
         // For coverage, repeat this test for a vertex mesh whose elements have faces
         VertexMeshReader<3,3> mesh_reader3d("mesh/test/data/TestVertexMeshWriter/vertex_mesh_3d_with_faces_and_attributes");
@@ -326,7 +326,7 @@ public:
         // Construct the mesh
         VertexMesh<3,3> mesh3d;
         mesh3d.ConstructFromMeshReader(mesh_reader3d);
-        TS_ASSERT_EQUALS(mesh3d.GetElement(0)->GetAttribute(), 49u);
+        TS_ASSERT_EQUALS(mesh3d.GetElement(0)->GetUnsignedAttribute(), 49u);
 
         // Write the mesh to file
         VertexMeshWriter<3,3> mesh_writer3d("TestReadingAndWritingElementAttributes", "vertex_mesh_3d_with_faces_and_attributes");
@@ -341,7 +341,7 @@ public:
         // Construct the mesh again
         VertexMesh<3,3> mesh3d2;
         mesh3d2.ConstructFromMeshReader(mesh_reader3d);
-        TS_ASSERT_EQUALS(mesh3d2.GetElement(0)->GetAttribute(), 49u);
+        TS_ASSERT_EQUALS(mesh3d2.GetElement(0)->GetUnsignedAttribute(), 49u);
     }
 };
 

@@ -600,7 +600,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
                         raw_indices[j] = it->GetNodeGlobalIndex(j);
                     }
                     // Attribute value
-                    raw_indices[mNodesPerElement] = it->GetAttribute();
+                    raw_indices[mNodesPerElement] = it->GetUnsignedAttribute();
 
                     MPI_Send(raw_indices, mNodesPerElement+1, MPI_UNSIGNED, 0,
                              this->mNumNodes + index, //Elements sent with tags offset

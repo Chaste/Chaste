@@ -376,7 +376,8 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
     // Write the element header
     unsigned num_elements = this->GetNumElements();
 
-    unsigned first_elem_attribute_value = (*(mpIters->pElemIter))->GetAttribute();
+    ///\todo #2146 - bug in the making? If this attribute is supposed to be zero we will assume there isn't one!
+    double first_elem_attribute_value = (*(mpIters->pElemIter))->GetAttribute();
     if (first_elem_attribute_value != 0)
     {
         num_attr = 1;

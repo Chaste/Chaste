@@ -121,8 +121,8 @@ public:
         // Construct the mesh
         PottsMesh<2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
-        TS_ASSERT_EQUALS(mesh.GetElement(0)->GetAttribute(), 97u);
-        TS_ASSERT_EQUALS(mesh.GetElement(1)->GetAttribute(), 152u);
+        TS_ASSERT_EQUALS(mesh.GetElement(0)->GetUnsignedAttribute(), 97u);
+        TS_ASSERT_EQUALS(mesh.GetElement(1)->GetUnsignedAttribute(), 152u);
 
         // Write the mesh to file
         PottsMeshWriter<2> mesh_writer("TestReadingAndWritingElementAttributes", "potts_mesh_with_element_attributes");
@@ -137,8 +137,8 @@ public:
         // Construct the mesh again
         PottsMesh<2> mesh2;
         mesh2.ConstructFromMeshReader(mesh_reader);
-        TS_ASSERT_EQUALS(mesh2.GetElement(0)->GetAttribute(), 97u);
-        TS_ASSERT_EQUALS(mesh2.GetElement(1)->GetAttribute(), 152u);
+        TS_ASSERT_EQUALS(mesh2.GetElement(0)->GetUnsignedAttribute(), 97u);
+        TS_ASSERT_EQUALS(mesh2.GetElement(1)->GetUnsignedAttribute(), 152u);
     }
 };
 
