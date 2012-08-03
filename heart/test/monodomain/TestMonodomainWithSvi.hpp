@@ -92,6 +92,7 @@ public:
 };
 
 // stimulate a block of cells (an interval in 1d, a block in a corner in 2d)
+#ifdef CHASTE_CVODE
 template<unsigned DIM>
 class BlockCellFactoryCvode : public AbstractCardiacCellFactory<DIM>
 {
@@ -130,7 +131,7 @@ public:
         return p_cell;
     }
 };
-
+#endif // CVODE
 
 // non-identical cell models
 class HeterogeneousCellFactory : public AbstractCardiacCellFactory<1>
