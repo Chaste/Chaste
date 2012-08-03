@@ -53,7 +53,7 @@ class TestFileComparison : public CxxTest::TestSuite
 private:
     bool CalledCollectively;
     bool SuppressOutput;
-
+    bool expected_fail_result;
 public:
 
     void TestBasicFunctionality() throw(Exception)
@@ -63,6 +63,7 @@ public:
 
         CalledCollectively = true;
         SuppressOutput = true;
+        expected_fail_result = !PetscTools::AmMaster();
 
         // Comparing identical files shows no difference
         // NB Last two arguments can generally take their defaults (true and false)
@@ -72,7 +73,6 @@ public:
         // Comparing two different files gives a failure.
         FileComparison different_data(base_file, noised_file, CalledCollectively, SuppressOutput);
 
-        bool expected_fail_result = !PetscTools::AmMaster();
         TS_ASSERT_EQUALS(different_data.CompareFiles(0,false), expected_fail_result);
     }
 
@@ -99,7 +99,6 @@ public:
                                RelativeTo::ChasteSourceRoot);
 
         FileComparison same_data(base_file, noised_file, CalledCollectively, SuppressOutput);
-        bool expected_fail_result = !PetscTools::AmMaster();
         TS_ASSERT_EQUALS(same_data.CompareFiles(0,false), expected_fail_result);
     }
 
@@ -111,7 +110,6 @@ public:
         FileComparison file_comparer(base_file, changed_file, CalledCollectively, SuppressOutput);
 
         // Here we examine the header lines, find a difference and get a failure
-        bool expected_fail_result = !PetscTools::AmMaster();
         TS_ASSERT_EQUALS(file_comparer.CompareFiles(0,false), expected_fail_result);
 
         // In a second file comparer make this pass by using SetIgnoreLinesBeginningWith();
@@ -139,7 +137,6 @@ public:
     	//A file which has a single byte of data inserted
     	std::string modified_file = "./global/test/data/simple_cube_binary_modified.node";
 
-    	bool expected_fail_result = !PetscTools::AmMaster();
     	TS_ASSERT_EQUALS(FileComparison(base_file, modified_file, CalledCollectively, SuppressOutput).CompareFiles(0, false), expected_fail_result);
     }
 

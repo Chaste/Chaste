@@ -57,9 +57,10 @@ public:
      * @param fileName1  first file
      * @param fileName2  second file
      * @param calledCollectively  If true there will be a barrier before opening files, and only master compares contents.
+     * @param suppressOutput  If true then no errors will go to TS_TRACE(). Should only be set for the test of this class.
      */
-    NumericFileComparison(std::string fileName1, std::string fileName2, bool calledCollectively=true)
-        : AbstractFileComparison(fileName1,fileName2,calledCollectively)
+    NumericFileComparison(std::string fileName1, std::string fileName2, bool calledCollectively=true, bool suppressOutput = false)
+        : AbstractFileComparison(fileName1,fileName2,calledCollectively,suppressOutput)
     {
     }
 
@@ -70,9 +71,10 @@ public:
      * @param rFileName1  first file
      * @param rFileName2  second file
      * @param calledCollectively  If true there will be a barrier before opening files, and only master compares contents.
+     * @param suppressOutput  If true then no errors will go to TS_TRACE(). Should only be set for the test of this class.
      */
-    NumericFileComparison(const FileFinder& rFileName1, const FileFinder& rFileName2, bool calledCollectively=true)
-        : AbstractFileComparison(rFileName1,rFileName2,calledCollectively)
+    NumericFileComparison(const FileFinder& rFileName1, const FileFinder& rFileName2, bool calledCollectively=true, bool suppressOutput = false)
+        : AbstractFileComparison(rFileName1,rFileName2,calledCollectively,suppressOutput)
     {
     }
 
@@ -150,7 +152,7 @@ public:
             bool ok = CompareDoubles::WithinAnyTolerance(data1, data2, relTol, absTol);
             if (!ok)
             {
-                if (failures++ < max_display_failures)
+                if (failures++ < max_display_failures && !mSuppressOutput)
                 {
                     // Display error
                     CompareDoubles::WithinAnyTolerance(data1, data2, relTol, absTol, true);
@@ -164,7 +166,7 @@ public:
             // Force CxxTest error if there were any major differences
             TS_ASSERT_EQUALS(failures, 0u);
             // If that assertion tripped...
-            if (failures > 0u)
+            if (failures > 0u && !mSuppressOutput)
             {
 #define COVERAGE_IGNORE
                 // Report the paths to the files

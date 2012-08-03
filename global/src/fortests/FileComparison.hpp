@@ -48,9 +48,6 @@ private:
 	/** Whether or not we should ignore lines starting with '#'. True by default.*/
     bool mIgnoreCommentLines;
 
-    /** Whether we should suppress output from this class, just for a clean looking test */
-    bool mSuppressOutput;
-
     /**
      * A list of strings, if found at the beginning of lines when
      * mIgnoreCommentLines is true, differences in these lines
@@ -66,11 +63,11 @@ public:
      * @param fileName1  first file
      * @param fileName2  second file
      * @param calledCollectively  If true there will be a barrier before opening files, and only master compares contents.
+     * @param suppressOutput  If true then no errors will go to TS_TRACE(). Should only be set for the test of this class.
      */
     FileComparison(std::string fileName1, std::string fileName2, bool calledCollectively=true, bool suppressOutput = false)
-        : AbstractFileComparison(fileName1, fileName2, calledCollectively),
-          mIgnoreCommentLines(true),
-          mSuppressOutput(suppressOutput)
+        : AbstractFileComparison(fileName1, fileName2, calledCollectively,suppressOutput),
+          mIgnoreCommentLines(true)
     {
         SetupCommentLines();
     }
@@ -82,11 +79,11 @@ public:
      * @param rFileName1  first file finder
      * @param rFileName2  second file finder
      * @param calledCollectively  If true there will be a barrier before opening files, and only master compares contents.
+     * @param suppressOutput  If true then no errors will go to TS_TRACE(). Should only be set for the test of this class.
      */
     FileComparison(const FileFinder& rFileName1, const FileFinder& rFileName2, bool calledCollectively=true, bool suppressOutput = false)
-        : AbstractFileComparison(rFileName1, rFileName2, calledCollectively),
-          mIgnoreCommentLines(true),
-          mSuppressOutput(suppressOutput)
+        : AbstractFileComparison(rFileName1, rFileName2, calledCollectively,suppressOutput),
+          mIgnoreCommentLines(true)
     {
         SetupCommentLines();
     }
@@ -176,17 +173,15 @@ public:
 
             if (!(buffer1==buffer2) && !files_empty)
             {
-                if (failures++ < max_display_failures)
+                if (failures++ < max_display_failures && !mSuppressOutput)
                 {
                     // Display error
                     std::stringstream message;
                     message << "Line " << mLineNum << " differs in files " << mFilename1 << " and " << mFilename2;
-                    if (!mSuppressOutput)
-                    {
-                        TS_TRACE(message.str());
-                        TS_TRACE( buffer1 );
-                        TS_TRACE( buffer2 );
-                    }
+
+                    TS_TRACE(message.str());
+                    TS_TRACE( buffer1 );
+                    TS_TRACE( buffer2 );
                 }
             }
             mLineNum++;
@@ -199,14 +194,10 @@ public:
             // Force CxxTest error if there were any major differences
             TS_ASSERT_EQUALS(failures, 0u);
             // If that assertion tripped...
-            if (failures > 0u)
+            if (failures > 0u && !mSuppressOutput)
             {
 #define COVERAGE_IGNORE
-                // Report the paths to the files
-                if (!mSuppressOutput)
-                {
-                    TS_TRACE("Files " + mFilename1 + " and " + mFilename2 + " differ.");
-                }
+                TS_TRACE("Files " + mFilename1 + " and " + mFilename2 + " differ.");
 #undef COVERAGE_IGNORE
             }
         }

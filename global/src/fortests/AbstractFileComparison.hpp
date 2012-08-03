@@ -55,11 +55,13 @@ public:
      * @param rFileFinder1  first file
      * @param rFileFinder2  second file
      * @param calledCollectively  If true there will be a barrier before opening files, and only master compares contents.
+     * @param suppressOutput  If true then no errors will go to TS_TRACE(). Should only be set for the test of this class.
      */
-    AbstractFileComparison(const FileFinder& rFileFinder1, const FileFinder& rFileFinder2, bool calledCollectively):
+    AbstractFileComparison(const FileFinder& rFileFinder1, const FileFinder& rFileFinder2, bool calledCollectively, bool suppressOutput):
         mFilename1(rFileFinder1.GetAbsolutePath()),
         mFilename2(rFileFinder2.GetAbsolutePath()),
-        mCalledCollectively(calledCollectively)
+        mCalledCollectively(calledCollectively),
+        mSuppressOutput(suppressOutput)
     {
         Setup();
     }
@@ -71,11 +73,13 @@ public:
      * @param fileName1  first file
      * @param fileName2  second file
      * @param calledCollectively  If true there will be a barrier before opening files, and only master compares contents.
+     * @param suppressOutput  If true then no errors will go to TS_TRACE(). Should only be set for the test of this class.
      */
-    AbstractFileComparison(std::string fileName1, std::string fileName2, bool calledCollectively):
+    AbstractFileComparison(std::string fileName1, std::string fileName2, bool calledCollectively, bool suppressOutput):
         mFilename1(fileName1),
         mFilename2(fileName2),
-        mCalledCollectively(calledCollectively)
+        mCalledCollectively(calledCollectively),
+        mSuppressOutput(suppressOutput)
     {
         Setup();
     }
@@ -108,6 +112,9 @@ protected:
     unsigned mLineNum; /**< Counter for the line number we are on (in FileComparision) */
 
     bool mCalledCollectively; /**< If true there will be a barrier before opening files, and only master compares contents. */
+
+    /** Whether we should suppress output from this class, just for a clean looking test */
+    bool mSuppressOutput;
 
     /**
      * This method closes and reopens files so that another CompareFiles() command can be run on the same object.

@@ -41,23 +41,36 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PetscSetupAndFinalize.hpp"
 
+/*
+ * NB - If copying and pasting a file comparison out of here then you should not include
+ * the last argument to the constructor which suppresses its output,
+ * as it is not very useful for seeing what the difference in files is.
+ * But it makes the output of this test much nicer.
+ */
 class TestNumericFileComparison : public CxxTest::TestSuite
 {
+private:
+    bool CalledCollectively;
+    bool SuppressOutput;
+    bool expected_fail_result;
 public:
 
     void TestBasicFunctionality() throw(Exception)
     {
+        CalledCollectively = true;
+        SuppressOutput = true;
+        expected_fail_result = !PetscTools::AmMaster();
+
         std::string base_file = "./global/test/data/random_data.txt";
         std::string noised_file = "./global/test/data/same_random_data_with_1e-4_noise.txt";
 
-        NumericFileComparison same_data(base_file, base_file);
+        NumericFileComparison same_data(base_file, base_file, CalledCollectively, SuppressOutput);
         TS_ASSERT(same_data.CompareFiles());
 
-        NumericFileComparison different_data(base_file, noised_file);
+        NumericFileComparison different_data(base_file, noised_file, CalledCollectively, SuppressOutput);
         TS_ASSERT(different_data.CompareFiles(1e-4));
 
-        bool expected_fail_result = !PetscTools::AmMaster();
-        TS_ASSERT_EQUALS(different_data.CompareFiles(1e-9,0,1e-9,false), expected_fail_result);
+        TS_ASSERT_EQUALS(different_data.CompareFiles(1e-9, 0, 1e-9, false), expected_fail_result);
     }
 
     void TestIgnoreHeader() throw(Exception)
@@ -65,11 +78,10 @@ public:
         std::string boost_33_file = "./global/test/data/fake_archive_boost_1_33.txt";
         std::string boost_34_file = "./global/test/data/fake_archive_boost_1_34.txt";
 
-        NumericFileComparison same_data(boost_33_file, boost_34_file);
+        NumericFileComparison same_data(boost_33_file, boost_34_file, CalledCollectively, SuppressOutput);
         TS_ASSERT(same_data.CompareFiles(5.1e-6, 1));
 
-        bool expected_fail_result = !PetscTools::AmMaster();
-        TS_ASSERT_EQUALS(same_data.CompareFiles(1e-9, 1,1e-9,false),expected_fail_result);
+        TS_ASSERT_EQUALS(same_data.CompareFiles(1e-9, 1, 1e-9, false), expected_fail_result);
     }
 
     void TestIgnoreProvenanceComment() throw(Exception)
@@ -77,8 +89,9 @@ public:
         std::string v1_file = "./global/test/data/fake_v_day_one.txt";
         std::string v2_file = "./global/test/data/fake_v_day_two.txt";
 
-        NumericFileComparison same_data(v1_file, v2_file);
-        //TS_ASSERT(same_data.CompareFiles(5e-4)); // Fails due to difference after comment
+        NumericFileComparison same_data(v1_file, v2_file, CalledCollectively, SuppressOutput);
+
+        TS_ASSERT_EQUALS(same_data.CompareFiles(5e-4, 1, 1e-9, false), expected_fail_result); // Fails due to difference after comment
         TS_ASSERT(same_data.CompareFiles(5e-3)); // Difference after comment is below this tolerance
     }
 
@@ -86,10 +99,19 @@ public:
     {
         std::string base_file = "./global/test/data/random_data.txt";
         std::string noised_file = "./global/test/data/same_random_data_with_1e-4_noise.txt";
+        NumericFileComparison different_data(base_file, noised_file, CalledCollectively, SuppressOutput);
 
         // Lower bound on data is 1e-2 so 1e-4 absolute noise is within 1e-2 relative tolerance
-        NumericFileComparison different_data(base_file, noised_file);
-        TS_ASSERT(different_data.CompareFiles(1e-2, 0, false));
+
+        // Here we would fail absolute and pass relative -> pass.
+        TS_ASSERT(different_data.CompareFiles(1e-5, 0, 1e-2, false));
+
+        // Here we should pass absolute and fail relative -> pass
+        TS_ASSERT(different_data.CompareFiles(1e-3, 0, 1e-9, false));
+
+        // Here we should fail both -> fail
+        TS_ASSERT_EQUALS(different_data.CompareFiles(1e-5, 0, 1e-3, false), expected_fail_result);
+
     }
 };
 
