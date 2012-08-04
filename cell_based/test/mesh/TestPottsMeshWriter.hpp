@@ -108,7 +108,6 @@ public:
                     "cell_based/test/data/TestPottsMeshWriter/potts_mesh_3d.cell");
             TS_ASSERT(comparer.CompareFiles());
         }
-
     }
 
     void TestReadingAndWritingElementAttributes() throw(Exception)

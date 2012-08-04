@@ -94,7 +94,7 @@ void TysonNovakCellCycleModel::InitialiseDaughterCell()
 {
     if (mpCell->GetCellProliferativeType() == STEM)
     {
-    	mpCell->SetCellProliferativeType(TRANSIT);
+        mpCell->SetCellProliferativeType(TRANSIT);
     }
 }
 
@@ -183,7 +183,6 @@ double TysonNovakCellCycleModel::GetAverageStemCellCycleTime()
     return 1.25;
 }
 
-
 bool TysonNovakCellCycleModel::CanCellTerminallyDifferentiate()
 {
     return false;
@@ -191,9 +190,7 @@ bool TysonNovakCellCycleModel::CanCellTerminallyDifferentiate()
 
 void TysonNovakCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
-    // No new parameters to output
-
-    // Call method on direct parent class
+    // No new parameters to output, so just call method on direct parent class
     AbstractOdeBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 

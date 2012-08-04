@@ -1199,7 +1199,6 @@ public:
         }
     }
 
-
     void TestUpdateNodeLocations() throw (Exception)
     {
         // Create a simple 2D VertexMesh

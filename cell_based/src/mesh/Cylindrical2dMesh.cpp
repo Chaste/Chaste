@@ -628,9 +628,7 @@ void Cylindrical2dMesh::CorrectNonPeriodicMesh()
     }
     else
     {
-//        assert(temp_right_hand_side_elements.size() == 2 && temp_left_hand_side_elements.size() == 2);
-
-        if(temp_right_hand_side_elements.size() == 2 && temp_left_hand_side_elements.size() == 2)
+        if (temp_right_hand_side_elements.size() == 2 && temp_left_hand_side_elements.size() == 2)
         {
 
             if (temp_right_hand_side_elements.size() == 2)

@@ -134,7 +134,6 @@ public:
         SimulationTime::Destroy();
     }
 
-
     void TestGeneralisedLinearSpringForceWithSpringConstantsForIngeBCatCells()
     {
         double crypt_length = 1.1*12.0*sqrt(3)/2.0;

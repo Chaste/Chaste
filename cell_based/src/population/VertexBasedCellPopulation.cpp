@@ -46,7 +46,7 @@ VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM,
     : AbstractOffLatticeCellPopulation<DIM>(rMesh, rCells, locationIndices),
       mDeleteMesh(deleteMesh)
 {
-	mpMutableVertexMesh = static_cast<MutableVertexMesh<DIM, DIM>* >(&(this->mrMesh));
+    mpMutableVertexMesh = static_cast<MutableVertexMesh<DIM, DIM>* >(&(this->mrMesh));
 
     // Check the mesh contains boundary nodes
     bool contains_boundary_nodes = false;
@@ -78,7 +78,7 @@ VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM,
     : AbstractOffLatticeCellPopulation<DIM>(rMesh),
       mDeleteMesh(true)
 {
-	mpMutableVertexMesh = static_cast<MutableVertexMesh<DIM, DIM>* >(&(this->mrMesh));
+    mpMutableVertexMesh = static_cast<MutableVertexMesh<DIM, DIM>* >(&(this->mrMesh));
 }
 
 template<unsigned DIM>
@@ -165,7 +165,7 @@ unsigned VertexBasedCellPopulation<DIM>::AddNode(Node<DIM>* pNewNode)
 template<unsigned DIM>
 void VertexBasedCellPopulation<DIM>::SetNode(unsigned nodeIndex, ChastePoint<DIM>& rNewLocation)
 {
-	mpMutableVertexMesh->SetNode(nodeIndex, rNewLocation);
+    mpMutableVertexMesh->SetNode(nodeIndex, rNewLocation);
 }
 
 template<unsigned DIM>
@@ -594,7 +594,7 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile()
     {
         for (unsigned var=0; var<cellwise_data.size(); var++)
         {
-            mesh_writer.AddCellData(cell_data_names[var], cellwise_data[var]); 
+            mesh_writer.AddCellData(cell_data_names[var], cellwise_data[var]);
         }
     }
 

@@ -119,16 +119,17 @@ unsigned AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::DoCellBirth()
             {
                 try
                 {
-                	// Store age before division
-                	double cell_age =cell_iter->GetAge();
+                    // Store age before division
+                    double cell_age =cell_iter->GetAge();
 
                     // Create a new cell
                     CellPtr p_new_cell = cell_iter->Divide();
 
                     // Call method that determines how cell division occurs and returns a vector
                     c_vector<double, SPACE_DIM> new_location = CalculateCellDivisionVector(*cell_iter);
-                    // If required output this location to file
-                    if(mOutputDivisionLocations)
+
+                    // If required, output this location to file
+                    if (mOutputDivisionLocations)
                     {
                         *mpDivisionLocationFile << SimulationTime::Instance()->GetTime() << "\t";
                         for (unsigned i=0; i<SPACE_DIM; i++)
@@ -265,7 +266,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::AddCellKiller(boost::sh
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::RemoveAllCellKillers()
 {
-	mCellKillers.clear();
+    mCellKillers.clear();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -308,7 +309,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
     }
     else
     {
-        if(p_simulation_time->IsEndTimeAndNumberOfTimeStepsSetUp())
+        if (p_simulation_time->IsEndTimeAndNumberOfTimeStepsSetUp())
         {
             EXCEPTION("End time and number of timesteps already setup. You should not use SimulationTime::SetEndTimeAndNumberOfTimeSteps in cell-based tests.");
         }
@@ -342,18 +343,18 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
         mpDivisionLocationFile = output_file_handler.OpenOutputFile("divisions.dat");
     }
 
-    if(PetscTools::AmMaster())
+    if (PetscTools::AmMaster())
     {
-    	mpVizSetupFile = output_file_handler.OpenOutputFile("results.vizsetup");
+        mpVizSetupFile = output_file_handler.OpenOutputFile("results.vizsetup");
     }
 
     // If any PDEs have been defined, set up results files to store their solution
     if (mpCellBasedPdeHandler != NULL)
     {
         mpCellBasedPdeHandler->OpenResultsFiles(this->mSimulationOutputDirectory);
-        if(PetscTools::AmMaster())
+        if (PetscTools::AmMaster())
         {
-        	*this->mpVizSetupFile << "PDE \n";
+            *this->mpVizSetupFile << "PDE \n";
         }
     }
 
@@ -375,7 +376,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
     // Write initial conditions to file for the visualizer
     WriteVisualizerSetupFile();
 
-    if(PetscTools::AmMaster())
+    if (PetscTools::AmMaster())
     {
         *mpVizSetupFile << std::flush;
     }
@@ -445,13 +446,13 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
 
     if (mOutputDivisionLocations)
     {
-    	mpDivisionLocationFile->close();
+        mpDivisionLocationFile->close();
     }
 
-    if(PetscTools::AmMaster())
+    if (PetscTools::AmMaster())
     {
-    	*mpVizSetupFile << "Complete\n";
-    	mpVizSetupFile->close();
+        *mpVizSetupFile << "Complete\n";
+        mpVizSetupFile->close();
     }
 
     CellBasedEventHandler::EndEvent(CellBasedEventHandler::OUTPUT);
@@ -508,7 +509,7 @@ bool AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::GetOutputDivisionLocati
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::SetOutputDivisionLocations(bool outputDivisionLocations)
 {
-	mOutputDivisionLocations = outputDivisionLocations;
+    mOutputDivisionLocations = outputDivisionLocations;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

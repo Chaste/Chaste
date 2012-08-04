@@ -41,7 +41,7 @@ unsigned CellId::mMaxCellId = 0;
 CellId::CellId()
     : AbstractCellProperty()
 {
-	mCellId = UNSIGNED_UNSET;
+    mCellId = UNSIGNED_UNSET;
 }
 
 CellId::~CellId()
@@ -50,26 +50,26 @@ CellId::~CellId()
 
 void CellId::AssignCellId()
 {
-	mCellId = mMaxCellId;
-	mMaxCellId++;
+    mCellId = mMaxCellId;
+    mMaxCellId++;
 }
 
 unsigned CellId::GetCellId() const
 {
-	if (mCellId==UNSIGNED_UNSET)
-	{
-		EXCEPTION("AssignCellId must be called before using the CellID");
-	}
+    if (mCellId==UNSIGNED_UNSET)
+    {
+        EXCEPTION("AssignCellId must be called before using the CellID");
+    }
     return mCellId;
 }
 
 unsigned CellId::GetMaxCellId() const
 {
-	if (mCellId==UNSIGNED_UNSET)
-	{
-		EXCEPTION("AssignCellId must be called before using the CellID");
-	}
-	return mMaxCellId;
+    if (mCellId==UNSIGNED_UNSET)
+    {
+        EXCEPTION("AssignCellId must be called before using the CellID");
+    }
+    return mMaxCellId;
 }
 
 void CellId::ResetMaxCellId()

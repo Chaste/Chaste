@@ -82,7 +82,7 @@ PottsBasedCellPopulation<DIM>::PottsBasedCellPopulation(PottsMesh<DIM>& rMesh,
       mTemperature(0.1),
       mNumSweepsPerTimestep(1)
 {
-	mpPottsMesh = static_cast<PottsMesh<DIM>* >(&(this->mrMesh));
+    mpPottsMesh = static_cast<PottsMesh<DIM>* >(&(this->mrMesh));
     // Check each element has only one cell associated with it
     if (validate)
     {
@@ -98,7 +98,7 @@ PottsBasedCellPopulation<DIM>::PottsBasedCellPopulation(PottsMesh<DIM>& rMesh)
       mTemperature(0.1),
       mNumSweepsPerTimestep(1)
 {
-	mpPottsMesh = static_cast<PottsMesh<DIM>* >(&(this->mrMesh));
+    mpPottsMesh = static_cast<PottsMesh<DIM>* >(&(this->mrMesh));
 }
 
 template<unsigned DIM>
@@ -222,7 +222,7 @@ void PottsBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
     if (this->mIterateRandomlyOverUpdateRuleCollection)
     {
         // Randomly permute mUpdateRuleCollection
-    	p_gen->Shuffle(mUpdateRuleCollection);
+        p_gen->Shuffle(mUpdateRuleCollection);
     }
 
     for (unsigned i=0; i<num_nodes*mNumSweepsPerTimestep; i++)
@@ -491,7 +491,7 @@ void PottsBasedCellPopulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractPott
 template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::RemoveAllUpdateRules()
 {
-	mUpdateRuleCollection.clear();
+    mUpdateRuleCollection.clear();
 }
 
 template<unsigned DIM>

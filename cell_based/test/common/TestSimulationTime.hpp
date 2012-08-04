@@ -137,9 +137,7 @@ public:
         TS_ASSERT_EQUALS(p_simulation_time->GetTime(), 10);
 
         SimulationTime::Destroy();
-
     }
-
 
     void TestResetTime()
     {

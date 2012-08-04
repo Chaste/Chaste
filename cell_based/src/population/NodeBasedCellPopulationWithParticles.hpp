@@ -111,14 +111,14 @@ public:
      */
     NodeBasedCellPopulationWithParticles(NodesOnlyMesh<DIM>& rMesh);
 
-	/**
-	 * Update particle positions.
-	 *
-	 * @param rNodeForces
-	 * @param dt
-	 */
-	void UpdateParticlePositions(const std::vector< c_vector<double, DIM> >& rNodeForces,
-					  			 double dt);
+    /**
+     * Update particle positions.
+     *
+     * @param rNodeForces
+     * @param dt
+     */
+    void UpdateParticlePositions(const std::vector< c_vector<double, DIM> >& rNodeForces,
+                                   double dt);
 
     /**
      * Update mIsParticle if required by a remesh.
@@ -140,54 +140,54 @@ public:
     void UpdateNodeLocations(const std::vector< c_vector<double, DIM> >& rNodeForces, double dt);
 
     /**
-	 * @return mIsParticle, a vector that stores which nodes are particles.
-	 */
-	std::vector<bool>& rGetParticles();
+     * @return mIsParticle, a vector that stores which nodes are particles.
+     */
+    std::vector<bool>& rGetParticles();
 
-	/**
-	 * IsParticle() method.
-	 *
-	 * Find if a given node is a particle
-	 *
-	 * @param index the global index of a specified node
-	 *
-	 * @return whether the node is a particle
-	 */
-	bool IsParticle(unsigned index);
+    /**
+     * IsParticle() method.
+     *
+     * Find if a given node is a particle
+     *
+     * @param index the global index of a specified node
+     *
+     * @return whether the node is a particle
+     */
+    bool IsParticle(unsigned index);
 
-	/**
-	 * @return the indices of those nodes that are particles.
-	 */
-	std::set<unsigned> GetParticleIndices();
+    /**
+     * @return the indices of those nodes that are particles.
+     */
+    std::set<unsigned> GetParticleIndices();
 
 
-	/**
-	 * Overridden AddCell() method.
-	 *
-	 * Add a new cell to the cell population and update mIsParticle.
-	 *
-	 * @param pNewCell  the cell to add
-	 * @param rCellDivisionVector  the position in space at which to put it
-	 * @param pParentCell pointer to a parent cell  - this is required for
-	 *  mesh-based cell populations
-	 * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
-	 */
-	CellPtr AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell);
+    /**
+     * Overridden AddCell() method.
+     *
+     * Add a new cell to the cell population and update mIsParticle.
+     *
+     * @param pNewCell  the cell to add
+     * @param rCellDivisionVector  the position in space at which to put it
+     * @param pParentCell pointer to a parent cell  - this is required for
+     *  mesh-based cell populations
+     * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
+     */
+    CellPtr AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell);
 
-	/**
-	 * Overridden WriteVtkResultsToFile method.
-	 */
-	void WriteVtkResultsToFile();
+    /**
+     * Overridden WriteVtkResultsToFile method.
+     */
+    void WriteVtkResultsToFile();
 
-	/**
-	 * Outputs CellPopulation parameters to file
-	 *
-	 * As this method is pure virtual, it must be overridden
-	 * in subclasses.
-	 *
-	 * @param rParamsFile the file stream to which the parameters are output
-	 */
-	void OutputCellPopulationParameters(out_stream& rParamsFile);
+    /**
+     * Outputs CellPopulation parameters to file
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
+     * @param rParamsFile the file stream to which the parameters are output
+     */
+    void OutputCellPopulationParameters(out_stream& rParamsFile);
 
 };
 

@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractOffLatticeCellPopulation( AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
-																	std::vector<CellPtr>& rCells,
+                                                                    std::vector<CellPtr>& rCells,
                                                                     const std::vector<unsigned> locationIndices)
     : AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>(rMesh, rCells, locationIndices),
       mDampingConstantNormal(1.0),
@@ -48,7 +48,7 @@ AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractOffLatticeCell
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractOffLatticeCellPopulation(AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
-	: AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>(rMesh)
+    : AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>(rMesh)
 {
 }
 

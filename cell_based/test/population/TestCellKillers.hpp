@@ -379,7 +379,6 @@ public:
         }
     }
 
-
     void TestPlaneBasedCellKillerIn2d() throw(Exception)
     {
         // Create mesh
@@ -472,8 +471,6 @@ public:
             TS_ASSERT_LESS_THAN_EQUALS(z, 0.0);
         }
     }
-
-
 
     void TestArchivingOfTargetedCellKiller() throw (Exception)
     {

@@ -108,7 +108,6 @@ public:
                     "cell_based/test/data/TestSemMeshWriter/sem_mesh_3d.cell");
             TS_ASSERT(comparer.CompareFiles());
         }
-
     }
 
     void TestReadingAndWritingElementAttributes() throw(Exception)

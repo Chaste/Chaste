@@ -230,7 +230,7 @@ public:
         TS_ASSERT_THROWS_NOTHING(crypt_projection_simulator.Solve());
 
         // These cells just divided and have been gradually moving apart.
-        // This is happening around (4, -1).  The exact spring length is slightly 
+        // This is happening around (4, -1).  The exact spring length is slightly
         // compiler/architecture dependent.
         // These results are from time 0.25.
         std::vector<double> node_a_location = crypt_projection_simulator.GetNodeLocation(257);

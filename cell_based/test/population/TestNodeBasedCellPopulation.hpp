@@ -144,8 +144,8 @@ public:
         c_vector<double, 4> domainSize;
         for (unsigned i=0; i< 2 ;i++)
         {
-        	domainSize[2*i] = -10.0;
-        	domainSize[2*i+1] = 10.0;
+            domainSize[2*i] = -10.0;
+            domainSize[2*i+1] = 10.0;
         }
         node_based_cell_population.SplitUpIntoBoxes(1.2, domainSize);
 
@@ -213,7 +213,6 @@ public:
         cell_population.SetMechanicsCutOffLength(1e-3);
         cell_population.Update();
         TS_ASSERT(cell_population.rGetNodePairs().empty());
-
     }
 
     void TestAddCell()
@@ -566,9 +565,9 @@ public:
         TS_ASSERT_THROWS_THIS(node_based_cell_population.GetNeighbouringNodeIndices(0), "mMechanicsCutOffLength is smaller than twice the radius of cell 0 (0.1) so interactions may be missed. Make the cut-off larger to avoid errors.");
 
         node_based_cell_population.SetMechanicsCutOffLength(0.5);
-		node_based_cell_population.Update();
+        node_based_cell_population.Update();
 
-		TS_ASSERT_THROWS_THIS(node_based_cell_population.GetNeighbouringNodeIndices(0), "mMechanicsCutOffLength is smaller than the sum of radius of cell 0 (0.1) and cell 4 (0.55). Make the cut-off larger to avoid errors.");
+        TS_ASSERT_THROWS_THIS(node_based_cell_population.GetNeighbouringNodeIndices(0), "mMechanicsCutOffLength is smaller than the sum of radius of cell 0 (0.1) and cell 4 (0.55). Make the cut-off larger to avoid errors.");
 
 
 
@@ -584,14 +583,14 @@ public:
         TS_ASSERT_EQUALS(node_0_neighbours, std::set<unsigned>());
 
         //Test another corner node
-		std::set<unsigned> node_1_neighbours = node_based_cell_population.GetNeighbouringNodeIndices(1);
+        std::set<unsigned> node_1_neighbours = node_based_cell_population.GetNeighbouringNodeIndices(1);
 
-		std::set<unsigned> expected_node_1_neighbours;
-		expected_node_1_neighbours.insert(2);
-		expected_node_1_neighbours.insert(4);
+        std::set<unsigned> expected_node_1_neighbours;
+        expected_node_1_neighbours.insert(2);
+        expected_node_1_neighbours.insert(4);
 
-		TS_ASSERT_EQUALS(node_1_neighbours.size(), expected_node_1_neighbours.size());
-		TS_ASSERT_EQUALS(node_1_neighbours, expected_node_1_neighbours);
+        TS_ASSERT_EQUALS(node_1_neighbours.size(), expected_node_1_neighbours.size());
+        TS_ASSERT_EQUALS(node_1_neighbours, expected_node_1_neighbours);
 
         //Test Centre node
         std::set<unsigned> node_4_neighbours = node_based_cell_population.GetNeighbouringNodeIndices(4);
@@ -603,8 +602,6 @@ public:
 
         TS_ASSERT_EQUALS(node_4_neighbours.size(), expected_node_4_neighbours.size());
         TS_ASSERT_EQUALS(node_4_neighbours, expected_node_4_neighbours);
-
-
     }
 
     void TestSettingCellAncestors() throw (Exception)
@@ -696,7 +693,6 @@ public:
         c_vector<double, 2> size_of_pop = node_based_cell_population.GetSizeOfCellPopulation();
         TS_ASSERT_DELTA(size_of_pop[0], 0.5, 1e-4);
         TS_ASSERT_DELTA(size_of_pop[0], 0.5, 1e-4);
-
     }
 
     void TestNodeBasedCellPopulationOutputWriters2d()
@@ -762,7 +758,6 @@ public:
             cell_iter->GetCellData()->SetItem("var0", 0.0);
             cell_iter->GetCellData()->SetItem("var1", 3.0);
         }
-
 
         // Test set methods
         std::string output_directory = "TestNodeBasedCellPopulationWriters2d";

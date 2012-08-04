@@ -466,7 +466,7 @@ public:
 
     void TestPdeOutput() throw(Exception)
     {
-    	EXIT_IF_PARALLEL;
+        EXIT_IF_PARALLEL;
 
         OutputFileHandler handler("TestPottsBasedCellPopulationWithPdes", false);
         std::string results_dir = handler.GetOutputDirectoryFullPath() + "results_from_time_0";
@@ -475,8 +475,6 @@ public:
         TS_ASSERT(comp_nut.CompareFiles());
         FileComparison( results_dir + "/results.vizcoarsepdesolution", "cell_based/test/data/TestPottsBasedCellPopulationWithPdes/results.vizcoarsepdesolution").CompareFiles();
     }
-
-
 };
 
 #endif /*TESTOFFLATTICESIMULATIONWITHPDES_HPP_*/

@@ -38,16 +38,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned SPACE_DIM>
 NodesOnlyMesh<SPACE_DIM>::NodesOnlyMesh()
-		: MutableMesh<SPACE_DIM, SPACE_DIM>(),
-		  mpBoxCollection(NULL)
+        : MutableMesh<SPACE_DIM, SPACE_DIM>(),
+          mpBoxCollection(NULL)
 {
 }
 
 template<unsigned SPACE_DIM>
 NodesOnlyMesh<SPACE_DIM>::~NodesOnlyMesh()
 {
-	Clear();
-	ClearBoxCollection();
+    Clear();
+    ClearBoxCollection();
 }
 
 template<unsigned SPACE_DIM>
@@ -101,26 +101,26 @@ void NodesOnlyMesh<SPACE_DIM>::SetCellRadius(unsigned index, double radius)
 template<unsigned SPACE_DIM>
 BoxCollection<SPACE_DIM>* NodesOnlyMesh<SPACE_DIM>::GetBoxCollection()
 {
-	return mpBoxCollection;
+    return mpBoxCollection;
 }
 
 template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::ClearBoxCollection()
 {
-	if(mpBoxCollection != NULL)
-	{
-		delete mpBoxCollection;
-	}
-	mpBoxCollection = NULL;
+    if (mpBoxCollection != NULL)
+    {
+        delete mpBoxCollection;
+    }
+    mpBoxCollection = NULL;
 }
 
 template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize)
 {
-	mpBoxCollection = new BoxCollection<SPACE_DIM>(cutOffLength, domainSize);
-	mpBoxCollection->SetupLocalBoxesHalfOnly();
+    mpBoxCollection = new BoxCollection<SPACE_DIM>(cutOffLength, domainSize);
+    mpBoxCollection->SetupLocalBoxesHalfOnly();
 
-	//Put the nodes in the boxes.
+    //Put the nodes in the boxes.
     for (unsigned i=0; i< this->GetNumNodes(); i++)
     {
         unsigned box_index = mpBoxCollection->CalculateContainingBox(this->GetNode(i));
@@ -131,14 +131,14 @@ void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength, c_vector<
 template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::SetMaximumInteractionDistance(double maximumInteractionDistance)
 {
-	mMaximumInteractionDistance = maximumInteractionDistance;
+    mMaximumInteractionDistance = maximumInteractionDistance;
 }
 
 template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::CalculateNodePairs(std::set<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
 {
-	assert(mpBoxCollection != NULL);
-	mpBoxCollection->CalculateNodePairs(this->mNodes, rNodePairs, rNodeNeighbours);
+    assert(mpBoxCollection != NULL);
+    mpBoxCollection->CalculateNodePairs(this->mNodes, rNodePairs, rNodeNeighbours);
 }
 
 template<unsigned SPACE_DIM>

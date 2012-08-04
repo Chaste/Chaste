@@ -167,12 +167,12 @@ template<unsigned DIM>
 void NagaiHondaDifferentialAdhesionForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
     // Output member variables
-	*rParamsFile << "\t\t\t<NagaiHondaLabelledCellLabelledCellAdhesionEnergyParameter>" << mNagaiHondaLabelledCellLabelledCellAdhesionEnergyParameter << "</NagaiHondaLabelledCellLabelledCellAdhesionEnergyParameter> \n";
-	*rParamsFile << "\t\t\t<NagaiHondaLabelledCellCellAdhesionEnergyParameter>" << mNagaiHondaLabelledCellCellAdhesionEnergyParameter << "</NagaiHondaLabelledCellCellAdhesionEnergyParameter> \n";
-	*rParamsFile << "\t\t\t<NagaiHondaLabelledCellBoundaryAdhesionEnergyParameter>" << mNagaiHondaLabelledCellBoundaryAdhesionEnergyParameter << "</NagaiHondaLabelledCellBoundaryAdhesionEnergyParameter> \n";
+    *rParamsFile << "\t\t\t<NagaiHondaLabelledCellLabelledCellAdhesionEnergyParameter>" << mNagaiHondaLabelledCellLabelledCellAdhesionEnergyParameter << "</NagaiHondaLabelledCellLabelledCellAdhesionEnergyParameter> \n";
+    *rParamsFile << "\t\t\t<NagaiHondaLabelledCellCellAdhesionEnergyParameter>" << mNagaiHondaLabelledCellCellAdhesionEnergyParameter << "</NagaiHondaLabelledCellCellAdhesionEnergyParameter> \n";
+    *rParamsFile << "\t\t\t<NagaiHondaLabelledCellBoundaryAdhesionEnergyParameter>" << mNagaiHondaLabelledCellBoundaryAdhesionEnergyParameter << "</NagaiHondaLabelledCellBoundaryAdhesionEnergyParameter> \n";
 
-	// Call method on direct parent class
-	NagaiHondaForce<DIM>::OutputForceParameters(rParamsFile);
+    // Call method on direct parent class
+    NagaiHondaForce<DIM>::OutputForceParameters(rParamsFile);
 }
 
 /////////////////////////////////////////////////////////////////////////////

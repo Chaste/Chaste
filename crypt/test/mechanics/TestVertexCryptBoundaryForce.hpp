@@ -69,7 +69,6 @@ public:
 
         std::string boundary_force_results_dir = output_file_handler.GetOutputDirectoryFullPath();
         FileComparison( boundary_force_results_dir + "boundary_results.parameters", "crypt/test/data/TestForcesForCrypt/boundary_results.parameters").CompareFiles();
-
     }
 
     void TestVertexCryptBoundaryForceMethods() throw (Exception)

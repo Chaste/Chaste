@@ -44,7 +44,6 @@ SimpleWntCellCycleModel::SimpleWntCellCycleModel()
 {
 }
 
-
 AbstractCellCycleModel* SimpleWntCellCycleModel::CreateCellCycleModel()
 {
     // Create a new cell-cycle model
@@ -78,12 +77,10 @@ AbstractCellCycleModel* SimpleWntCellCycleModel::CreateCellCycleModel()
     return p_model;
 }
 
-
 void SimpleWntCellCycleModel::SetUseCellProliferativeTypeDependentG1Duration(bool useCellProliferativeTypeDependentG1Duration)
 {
     mUseCellProliferativeTypeDependentG1Duration = useCellProliferativeTypeDependentG1Duration;
 }
-
 
 void SimpleWntCellCycleModel::SetG1Duration()
 {
@@ -121,7 +118,6 @@ void SimpleWntCellCycleModel::SetG1Duration()
     }
 }
 
-
 double SimpleWntCellCycleModel::GetWntLevel()
 {
     assert(mpCell != NULL);
@@ -153,7 +149,6 @@ double SimpleWntCellCycleModel::GetWntLevel()
     return level;
 }
 
-
 WntConcentrationType SimpleWntCellCycleModel::GetWntType()
 {
     WntConcentrationType wnt_type;
@@ -182,7 +177,6 @@ WntConcentrationType SimpleWntCellCycleModel::GetWntType()
     }
     return wnt_type;
 }
-
 
 void SimpleWntCellCycleModel::UpdateCellCyclePhase()
 {
@@ -238,7 +232,7 @@ void SimpleWntCellCycleModel::UpdateCellCyclePhase()
     else
     {
         // The cell is DIFFERENTIATED and so in G0 phase
-    	mpCell->SetCellProliferativeType(DIFFERENTIATED);
+        mpCell->SetCellProliferativeType(DIFFERENTIATED);
     }
     AbstractSimpleCellCycleModel::UpdateCellCyclePhase();
 }
@@ -249,7 +243,7 @@ void SimpleWntCellCycleModel::InitialiseDaughterCell()
 
     if (wnt_type == RADIAL)
     {
-    	mpCell->SetCellProliferativeType(TRANSIT);
+        mpCell->SetCellProliferativeType(TRANSIT);
     }
 
     AbstractSimpleCellCycleModel::InitialiseDaughterCell();

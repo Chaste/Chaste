@@ -67,8 +67,8 @@ void RepulsionForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM>
         c_vector<double, DIM> node_b_location =  rCellPopulation.GetNode(node_b_index)->rGetLocation();
 
         // Get the node radii
-		double node_a_radius = dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation)->rGetMesh().GetCellRadius(node_a_index);
-		double node_b_radius = dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation)->rGetMesh().GetCellRadius(node_b_index);
+        double node_a_radius = dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation)->rGetMesh().GetCellRadius(node_a_index);
+        double node_b_radius = dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation)->rGetMesh().GetCellRadius(node_b_index);
 
         // Get the unit vector parallel to the line joining the two nodes
         c_vector<double, DIM> unit_difference;

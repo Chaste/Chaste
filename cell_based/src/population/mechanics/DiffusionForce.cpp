@@ -68,7 +68,7 @@ double DiffusionForce<DIM>::GetCutOffLength()
 template<unsigned DIM>
 void DiffusionForce<DIM>::SetDiffusionConstant(double diffusionConstant)
 {
-	assert(diffusionConstant > 0.0);
+    assert(diffusionConstant > 0.0);
     mDiffusionConstant = diffusionConstant;
 }
 
@@ -81,7 +81,7 @@ double DiffusionForce<DIM>::GetDiffusionConstant()
 template<unsigned DIM>
 void DiffusionForce<DIM>::SetAbsoluteTemperature(double newValue)
 {
-	assert(newValue > 0.0);
+    assert(newValue > 0.0);
     mAbsoluteTemperature = newValue;
 }
 
@@ -94,7 +94,7 @@ double DiffusionForce<DIM>::GetAbsoluteTemperature()
 template<unsigned DIM>
 void DiffusionForce<DIM>::SetViscosity(double newValue)
 {
-	assert(newValue > 0.0);
+    assert(newValue > 0.0);
     mViscosity = newValue;
 }
 
@@ -115,7 +115,7 @@ void DiffusionForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM>
          cell_iter != rCellPopulation.End();
          ++cell_iter)
     {
-    	// Get the radius, damping constant and node index associated with this cell
+        // Get the radius, damping constant and node index associated with this cell
         unsigned node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
         double nu = dynamic_cast<AbstractOffLatticeCellPopulation<DIM>*>(&rCellPopulation)->GetDampingConstant(node_index);
         double cell_radius = dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation)->rGetMesh().GetCellRadius(node_index);
@@ -144,7 +144,7 @@ void DiffusionForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM>
              *
              * where W is a standard normal random variable.
              */
-        	double xi = RandomNumberGenerator::Instance()->StandardNormalRandomDeviate();
+            double xi = RandomNumberGenerator::Instance()->StandardNormalRandomDeviate();
 
             force_contribution[i] = (nu*sqrt(2.0*diffusion_constant*dt)/dt)*xi;
         }

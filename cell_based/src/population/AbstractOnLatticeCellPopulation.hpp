@@ -87,7 +87,7 @@ protected:
 
     /**
      * Constructor that just takes in a mesh.
-     * 
+     *
      * @param rMesh the mesh for the cell population.
      */
     AbstractOnLatticeCellPopulation(AbstractMesh<DIM, DIM>& rMesh);
@@ -104,7 +104,7 @@ public:
      *            (defaults to false)
      */
     AbstractOnLatticeCellPopulation(AbstractMesh<DIM, DIM>& rMesh,
-									std::vector<CellPtr>& rCells,
+                                    std::vector<CellPtr>& rCells,
                                     const std::vector<unsigned> locationIndices=std::vector<unsigned>(),
                                     bool deleteMesh=false);
 

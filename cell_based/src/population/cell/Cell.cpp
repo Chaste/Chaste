@@ -85,10 +85,10 @@ Cell::Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
 
     if (!mCellPropertyCollection.HasPropertyType<CellId>())
     {
-		// Set cell identifier this will be called all the time unless the constructor is called through archiving
-		MAKE_PTR(CellId, p_cell_id);
-		p_cell_id->AssignCellId();
-		mCellPropertyCollection.AddProperty(p_cell_id);
+        // Set cell identifier this will be called all the time unless the constructor is called through archiving
+        MAKE_PTR(CellId, p_cell_id);
+        p_cell_id->AssignCellId();
+        mCellPropertyCollection.AddProperty(p_cell_id);
     }
 
     if (!pMutationState->IsSubType<AbstractCellMutationState>())
@@ -107,7 +107,7 @@ Cell::Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
         MAKE_PTR(CellData, p_cell_data);
         mCellPropertyCollection.AddProperty(p_cell_data);
     }
-    
+
     if (!archiving)
     {
         // Increment cell count for each cell property in mCellPropertyCollection
@@ -215,7 +215,6 @@ boost::shared_ptr<CellData> Cell::GetCellData() const
 
     return boost::static_pointer_cast<CellData>(cell_data_collection.GetProperty());
 }
-
 
 CellPropertyCollection& Cell::rGetCellPropertyCollection()
 {
@@ -326,23 +325,23 @@ void Cell::Kill()
 
 void Cell::SetAncestor(boost::shared_ptr<AbstractCellProperty> pCellAncestor)
 {
-	if (!pCellAncestor->IsSubType<CellAncestor>())
-	{
-		EXCEPTION("Attempting to give cell a cell ancestor which is not a CellAncestor");
-	}
+    if (!pCellAncestor->IsSubType<CellAncestor>())
+    {
+        EXCEPTION("Attempting to give cell a cell ancestor which is not a CellAncestor");
+    }
 
-	// You can only set ancestors once.
-	CellPropertyCollection ancestor_collection = mCellPropertyCollection.GetPropertiesType<CellAncestor>();
-	if(ancestor_collection.GetSize() == 0)
-	{
-	    AddCellProperty(pCellAncestor);
-	}
-	else
-	{
-	    // Over-write the CellAncestor.
-	    RemoveCellProperty<CellAncestor>();
-	    AddCellProperty(pCellAncestor);
-	}
+    // You can only set ancestors once
+    CellPropertyCollection ancestor_collection = mCellPropertyCollection.GetPropertiesType<CellAncestor>();
+    if (ancestor_collection.GetSize() == 0)
+    {
+        AddCellProperty(pCellAncestor);
+    }
+    else
+    {
+        // Over-write the CellAncestor
+        RemoveCellProperty<CellAncestor>();
+        AddCellProperty(pCellAncestor);
+    }
 
 }
 
@@ -353,8 +352,8 @@ unsigned Cell::GetAncestor() const
     assert(ancestor_collection.GetSize() <= 1);
     if (ancestor_collection.GetSize() == 0)
     {
-    	return UNSIGNED_UNSET;
-    	//EXCEPTION("SetAncestor must be called before GetAncestor. You may want to call SetCellAncestorsToLocationIndices on the cell population.");
+        return UNSIGNED_UNSET;
+        //EXCEPTION("SetAncestor must be called before GetAncestor. You may want to call SetCellAncestorsToLocationIndices on the cell population.");
     }
 
     boost::shared_ptr<CellAncestor> p_ancestor = boost::static_pointer_cast<CellAncestor>(ancestor_collection.GetProperty());
@@ -364,13 +363,13 @@ unsigned Cell::GetAncestor() const
 
 unsigned Cell::GetCellId() const
 {
-	CellPropertyCollection cell_id_collection = mCellPropertyCollection.GetPropertiesType<CellId>();
+    CellPropertyCollection cell_id_collection = mCellPropertyCollection.GetPropertiesType<CellId>();
 
-	assert(cell_id_collection.GetSize() == 1);
+    assert(cell_id_collection.GetSize() == 1);
 
-	boost::shared_ptr<CellId> p_cell_id = boost::static_pointer_cast<CellId>(cell_id_collection.GetProperty());
+    boost::shared_ptr<CellId> p_cell_id = boost::static_pointer_cast<CellId>(cell_id_collection.GetProperty());
 
-	return p_cell_id->GetCellId();
+    return p_cell_id->GetCellId();
 }
 
 bool Cell::ReadyToDivide()

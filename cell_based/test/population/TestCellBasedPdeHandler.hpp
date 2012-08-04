@@ -507,8 +507,8 @@ public:
         c_vector<double,2> centre_of_cuboid = 0.5*(lower.rGetLocation() + upper.rGetLocation());
 
         TS_ASSERT_DELTA(norm_2(centre_of_cuboid - centre_of_coarse_mesh), 0.0,  1e-4);
-
     }
+
     void TestInitialiseCellPdeElementMapAndFindCoarseElementContainingCell() throw(Exception)
     {
         EXIT_IF_PARALLEL;

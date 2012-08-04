@@ -55,13 +55,13 @@ double ChemotaxisPottsUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned 
     c_vector<double, DIM> current_location = rCellPopulation.GetNode(currentNodeIndex)->rGetLocation();
     c_vector<double, DIM> target_location = rCellPopulation.GetNode(targetNodeIndex)->rGetLocation();
 
-    for (unsigned dimension = 0; dimension < DIM; dimension++)
+    for (unsigned dimension=0; dimension<DIM; dimension++)
     {
-        if(target_location[dimension] > current_location[dimension])
+        if (target_location[dimension] > current_location[dimension])
         {
             delta_H -= 0.2;
         }
-        else if(target_location[dimension] < current_location[dimension])
+        else if (target_location[dimension] < current_location[dimension])
         {
             delta_H += 0.2;
         }

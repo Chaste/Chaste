@@ -62,32 +62,31 @@ public:
         // Resetting the Maximum cell Id to zero (to account for previous tests)
         CellId::ResetMaxCellId();
 
-       	MAKE_PTR(CellId, p_cell_id);
+           MAKE_PTR(CellId, p_cell_id);
 
         TS_ASSERT_THROWS_THIS(p_cell_id->GetCellId(), "AssignCellId must be called before using the CellID");
         TS_ASSERT_THROWS_THIS(p_cell_id->GetMaxCellId(), "AssignCellId must be called before using the CellID");
 
         // The ID is not assigned until this method is called.
-    	p_cell_id->AssignCellId();
+        p_cell_id->AssignCellId();
 
         TS_ASSERT_EQUALS(p_cell_id->GetCellId(), 0u);
         TS_ASSERT_EQUALS(p_cell_id->GetMaxCellId(), 1u);
-
     }
 
     void TestArchiveCellId() throw(Exception)
     {
-    	/* In this test the Max Cell Id starts at 2 as continues from previous test.
-    	 * If you add more tests this will fail.
-    	 */
+        /* In this test the Max Cell Id starts at 2 as continues from previous test.
+         * If you add more tests this will fail.
+         */
 
-    	OutputFileHandler handler("archive", false);
+        OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "mutation.arch";
 
         // Archive Cell ID
         {
-        	CellId* p_cell_id = new CellId();
-        	p_cell_id->AssignCellId();
+            CellId* p_cell_id = new CellId();
+            p_cell_id->AssignCellId();
 
             TS_ASSERT_EQUALS(p_cell_id->GetCellId(), 1u);
             TS_ASSERT_EQUALS(p_cell_id->GetMaxCellId(), 2u);
@@ -127,7 +126,7 @@ public:
     void TestCellDataMethods() throw(Exception)
     {
         MAKE_PTR(CellData, p_cell_data);
-        
+
         TS_ASSERT_THROWS_THIS(p_cell_data->GetItem("thing1"), "The item thing1 is not stored");
 
         p_cell_data->SetItem("thing1", 1.0);

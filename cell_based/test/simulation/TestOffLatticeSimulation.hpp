@@ -305,8 +305,8 @@ public:
         // Add cell killers
         c_vector<double,2> x_normal = zero_vector<double>(2);
         x_normal[0] = -1.0;
-		MAKE_PTR_ARGS(PlaneBasedCellKiller<2>, p_killer_2, (&cell_population, zero_vector<double>(2), x_normal) ); // x<0
-		simulator.AddCellKiller(p_killer_2);
+        MAKE_PTR_ARGS(PlaneBasedCellKiller<2>, p_killer_2, (&cell_population, zero_vector<double>(2), x_normal) ); // x<0
+        simulator.AddCellKiller(p_killer_2);
 
         simulator.SetUpdateCellPopulationRule(true);
         simulator.Solve();
@@ -324,7 +324,6 @@ public:
         simulator.Solve();
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 7u);
     }
-
 
     /**
      * Test a cell-based simulation with multiple forces.
@@ -381,108 +380,108 @@ public:
 
         simulator.Solve();
 
-		// Check that the number of nodes is equal to the number of cells
-		TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), simulator.rGetCellPopulation().GetNumRealCells());
+        // Check that the number of nodes is equal to the number of cells
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), simulator.rGetCellPopulation().GetNumRealCells());
     }
 
     /**
-	 * Test a cell-based simulation with multiple forces.
-	 */
-	void TestOffLatticeSimulationWithVariableRestLengths() throw (Exception)
-	{
-		TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
-		MutableMesh<2,2> mesh;
-		mesh.ConstructFromMeshReader(mesh_reader);
-		mesh.Scale(8,8);
+     * Test a cell-based simulation with multiple forces.
+     */
+    void TestOffLatticeSimulationWithVariableRestLengths() throw (Exception)
+    {
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
+        MutableMesh<2,2> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+        mesh.Scale(8,8);
 
-		// Create cells
-		std::vector<CellPtr> cells;
-		CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-		cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(),DIFFERENTIATED);
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(),DIFFERENTIATED);
 
-		// Create a cell population
-		MeshBasedCellPopulation<2> cell_population(mesh, cells);
-		// Calculate the rest lengths of the springs assuming that the current configuration is in equilibrium.
-		cell_population.CalculateRestLengths();
+        // Create a cell population
+        MeshBasedCellPopulation<2> cell_population(mesh, cells);
+        // Calculate the rest lengths of the springs assuming that the current configuration is in equilibrium.
+        cell_population.CalculateRestLengths();
 
-		// Set up cell-based simulation
-		OffLatticeSimulation<2> simulator(cell_population);
-		simulator.SetOutputDirectory("TestOffLatticeSimulationWithVariableRestLengths");
-		simulator.SetEndTime(0.5);
-		// Turn off remeshing so we only have the same mesh connectivity over time this is needed to use the variable rest length
-		simulator.SetUpdateCellPopulationRule(false);
+        // Set up cell-based simulation
+        OffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestOffLatticeSimulationWithVariableRestLengths");
+        simulator.SetEndTime(0.5);
+        // Turn off remeshing so we only have the same mesh connectivity over time this is needed to use the variable rest length
+        simulator.SetUpdateCellPopulationRule(false);
 
-		// Create some force laws and pass them to the simulation
-		MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
-		simulator.AddForce(p_linear_force);
+        // Create some force laws and pass them to the simulation
+        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        simulator.AddForce(p_linear_force);
 
-		simulator.Solve();
+        simulator.Solve();
 
-		// Check nothing has moved
-		TS_ASSERT_DELTA(simulator.GetNodeLocation(0)[0], 0.0, 1e-6);
-		TS_ASSERT_DELTA(simulator.GetNodeLocation(0)[0], 0.0, 1e-6);
+        // Check nothing has moved
+        TS_ASSERT_DELTA(simulator.GetNodeLocation(0)[0], 0.0, 1e-6);
+        TS_ASSERT_DELTA(simulator.GetNodeLocation(0)[0], 0.0, 1e-6);
 
-		TS_ASSERT_DELTA(simulator.GetNodeLocation(1)[0], 8.0, 1e-6);
-		TS_ASSERT_DELTA(simulator.GetNodeLocation(1)[1], 0.0, 1e-6);
+        TS_ASSERT_DELTA(simulator.GetNodeLocation(1)[0], 8.0, 1e-6);
+        TS_ASSERT_DELTA(simulator.GetNodeLocation(1)[1], 0.0, 1e-6);
 
-		TS_ASSERT_DELTA(simulator.GetNodeLocation(2)[0], 8.0, 1e-6);
-		TS_ASSERT_DELTA(simulator.GetNodeLocation(2)[1], 8.0, 1e-6);
+        TS_ASSERT_DELTA(simulator.GetNodeLocation(2)[0], 8.0, 1e-6);
+        TS_ASSERT_DELTA(simulator.GetNodeLocation(2)[1], 8.0, 1e-6);
 
-		TS_ASSERT_DELTA(simulator.GetNodeLocation(3)[0], 0.0, 1e-6);
-		TS_ASSERT_DELTA(simulator.GetNodeLocation(3)[1], 8.0, 1e-6);
+        TS_ASSERT_DELTA(simulator.GetNodeLocation(3)[0], 0.0, 1e-6);
+        TS_ASSERT_DELTA(simulator.GetNodeLocation(3)[1], 8.0, 1e-6);
 
-		// Create some boundary conditions and pass them to the simulation
-		c_vector<double,2> point = zero_vector<double>(2);
-		c_vector<double,2> normal = zero_vector<double>(2);
-		normal(1) = -1.0;
-		MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc1, (&cell_population, point, normal)); // y>0
-		simulator.AddCellPopulationBoundaryCondition(p_bc1);
-		point(1) = 7.5;
-		normal(1) = 1.0;
-		MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc2, (&cell_population, point, normal)); // y<7.5
-		simulator.AddCellPopulationBoundaryCondition(p_bc2);
+        // Create some boundary conditions and pass them to the simulation
+        c_vector<double,2> point = zero_vector<double>(2);
+        c_vector<double,2> normal = zero_vector<double>(2);
+        normal(1) = -1.0;
+        MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc1, (&cell_population, point, normal)); // y>0
+        simulator.AddCellPopulationBoundaryCondition(p_bc1);
+        point(1) = 7.5;
+        normal(1) = 1.0;
+        MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc2, (&cell_population, point, normal)); // y<7.5
+        simulator.AddCellPopulationBoundaryCondition(p_bc2);
 
-		simulator.SetEndTime(1.0);
-		simulator.Solve();
+        simulator.SetEndTime(1.0);
+        simulator.Solve();
 
-		// Check top has shifted down
-		TS_ASSERT_DELTA(simulator.GetNodeLocation(0)[0], -0.0207, 1e-3);
-		TS_ASSERT_DELTA(simulator.GetNodeLocation(0)[1], 0.0, 1e-6);
+        // Check top has shifted down
+        TS_ASSERT_DELTA(simulator.GetNodeLocation(0)[0], -0.0207, 1e-3);
+        TS_ASSERT_DELTA(simulator.GetNodeLocation(0)[1], 0.0, 1e-6);
 
-		TS_ASSERT_DELTA(simulator.GetNodeLocation(1)[0], 8.0207, 1e-3);
-		TS_ASSERT_DELTA(simulator.GetNodeLocation(1)[1], 0.0, 1e-6);
+        TS_ASSERT_DELTA(simulator.GetNodeLocation(1)[0], 8.0207, 1e-3);
+        TS_ASSERT_DELTA(simulator.GetNodeLocation(1)[1], 0.0, 1e-6);
 
-		TS_ASSERT_DELTA(simulator.GetNodeLocation(2)[0], 8.1097, 1e-3);
-		TS_ASSERT_DELTA(simulator.GetNodeLocation(2)[1], 7.5, 1e-6);
+        TS_ASSERT_DELTA(simulator.GetNodeLocation(2)[0], 8.1097, 1e-3);
+        TS_ASSERT_DELTA(simulator.GetNodeLocation(2)[1], 7.5, 1e-6);
 
-		TS_ASSERT_DELTA(simulator.GetNodeLocation(3)[0], -0.1097, 1e-3);
-		TS_ASSERT_DELTA(simulator.GetNodeLocation(3)[1], 7.5, 1e-6);
+        TS_ASSERT_DELTA(simulator.GetNodeLocation(3)[0], -0.1097, 1e-3);
+        TS_ASSERT_DELTA(simulator.GetNodeLocation(3)[1], 7.5, 1e-6);
 
-		simulator.RemoveAllCellPopulationBoundaryConditions();
-		simulator.AddCellPopulationBoundaryCondition(p_bc1);
-		simulator.SetEndTime(10.0);
-		simulator.Solve();
+        simulator.RemoveAllCellPopulationBoundaryConditions();
+        simulator.AddCellPopulationBoundaryCondition(p_bc1);
+        simulator.SetEndTime(10.0);
+        simulator.Solve();
 
-		// Check has relaxed back to original shape
-		TS_ASSERT_DELTA(simulator.GetNodeLocation(0)[0], 0.0, 1e-3);
-		TS_ASSERT_DELTA(simulator.GetNodeLocation(0)[1], 0.0, 1e-3);
+        // Check has relaxed back to original shape
+        TS_ASSERT_DELTA(simulator.GetNodeLocation(0)[0], 0.0, 1e-3);
+        TS_ASSERT_DELTA(simulator.GetNodeLocation(0)[1], 0.0, 1e-3);
 
-		TS_ASSERT_DELTA(simulator.GetNodeLocation(1)[0], 8.0, 1e-3);
-		TS_ASSERT_DELTA(simulator.GetNodeLocation(1)[1], 0.0, 1e-3);
+        TS_ASSERT_DELTA(simulator.GetNodeLocation(1)[0], 8.0, 1e-3);
+        TS_ASSERT_DELTA(simulator.GetNodeLocation(1)[1], 0.0, 1e-3);
 
-		TS_ASSERT_DELTA(simulator.GetNodeLocation(2)[0], 8.0, 1e-3);
-		TS_ASSERT_DELTA(simulator.GetNodeLocation(2)[1], 8.0, 1e-2);
+        TS_ASSERT_DELTA(simulator.GetNodeLocation(2)[0], 8.0, 1e-3);
+        TS_ASSERT_DELTA(simulator.GetNodeLocation(2)[1], 8.0, 1e-2);
 
-		TS_ASSERT_DELTA(simulator.GetNodeLocation(3)[0], 0.0, 1e-3);
-		TS_ASSERT_DELTA(simulator.GetNodeLocation(3)[1], 8.0, 1e-2);
-	}
+        TS_ASSERT_DELTA(simulator.GetNodeLocation(3)[0], 0.0, 1e-3);
+        TS_ASSERT_DELTA(simulator.GetNodeLocation(3)[1], 8.0, 1e-2);
+    }
 
     /**
      * This tests running a simulation in 3d with a 2d mesh (see #2112)
      */
     void TestOffLatticeSimulationWith2dMeshIn3d() throw (Exception)
     {
-    	// Load Mesh
+        // Load Mesh
         TrianglesMeshReader<2,3> mesh_reader("cell_based/test/data/Simple2dMeshIn3d/Simple2dMeshIn3d");
         MutableMesh<2,3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
@@ -517,7 +516,6 @@ public:
         TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(1)->rGetLocation()-simulator.rGetCellPopulation().GetNode(2)->rGetLocation()),1.0,1e-5);
         TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(2)->rGetLocation()-simulator.rGetCellPopulation().GetNode(0)->rGetLocation()),1.0,1e-5);
     }
-
 
     /**
      * Test a cell-based simulation with a periodic mesh.
@@ -935,8 +933,6 @@ public:
         TS_ASSERT_THROWS_THIS(simulator.Solve(),
                 "End time and number of timesteps already setup. You should not use SimulationTime::SetEndTimeAndNumberOfTimeSteps in cell-based tests.");
     }
-
-
 };
 
 #endif /*TESTOFFLATTICESIMULATION_HPP_*/

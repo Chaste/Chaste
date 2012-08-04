@@ -139,7 +139,7 @@ bool SimulationTime::IsStartTimeSetUp() const
 
 bool SimulationTime::IsEndTimeAndNumberOfTimeStepsSetUp() const
 {
-    if(mpTimeStepper)
+    if (mpTimeStepper)
     {
         return true;
     }

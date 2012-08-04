@@ -58,7 +58,7 @@ MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::MeshBasedCellPopulation(MutableM
       mWriteVtkAsPoints(false),
       mHasVariableRestLength(false)
 {
-	mpMutableMesh = static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>* >(&(this->mrMesh));
+    mpMutableMesh = static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>* >(&(this->mrMesh));
     // This must always be true
     assert(this->mCells.size() <= this->mrMesh.GetNumNodes());
 
@@ -72,7 +72,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::MeshBasedCellPopulation(MutableMesh<ELEMENT_DIM,SPACE_DIM>& rMesh)
     : AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>(rMesh)
 {
-	mpMutableMesh = static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>* >(&(this->mrMesh));
+    mpMutableMesh = static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>* >(&(this->mrMesh));
     mpVoronoiTessellation = NULL;
     mDeleteMesh = true;
 }
@@ -110,7 +110,7 @@ unsigned MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AddNode(Node<SPACE_DIM>
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetNode(unsigned nodeIndex, ChastePoint<SPACE_DIM>& rNewLocation)
 {
-	static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>&>((this->mrMesh)).SetNode(nodeIndex, rNewLocation, false);
+    static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>&>((this->mrMesh)).SetNode(nodeIndex, rNewLocation, false);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -129,7 +129,7 @@ double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetDampingConstant(unsign
          * is the damping constant if not using mUseAreaBasedDampingConstant
          */
 
-    	assert(SPACE_DIM==2);
+        assert(SPACE_DIM==2);
 
         double rest_length = 1.0;
         double d0 = mAreaBasedDampingConstantParameter;
@@ -327,7 +327,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::Update(bool hasHadBirthsOrD
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::TessellateIfNeeded()
 {
-	 if ((SPACE_DIM==2 || SPACE_DIM==3)&&(ELEMENT_DIM==SPACE_DIM))
+     if ((SPACE_DIM==2 || SPACE_DIM==3)&&(ELEMENT_DIM==SPACE_DIM))
     {
         CellBasedEventHandler::BeginEvent(CellBasedEventHandler::TESSELLATION);
         if (mUseAreaBasedDampingConstant || mOutputVoronoiData || mOutputCellPopulationVolumes || this->mOutputCellVolumes)
@@ -783,7 +783,7 @@ double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetVolumeOfCell(CellPtr p
 
     // Get the element index of the Voronoi tessellation corresponding to this node index
     unsigned element_index = mpVoronoiTessellation->GetVoronoiElementIndexCorrespondingToDelaunayNodeIndex(node_index);
-    
+
     // Get the cell's volume from the Voronoi tessellation
     double cell_volume = mpVoronoiTessellation->GetVolumeOfElement(element_index);
 
@@ -965,8 +965,8 @@ void MeshBasedCellPopulation<2>::CreateVoronoiTessellation()
 template<>
 void MeshBasedCellPopulation<2,3>::CreateVoronoiTessellation()
 {
-	// We don't allow tessellation yet.
-	NEVER_REACHED;
+    // We don't allow tessellation yet.
+    NEVER_REACHED;
 }
 
 /**
@@ -1173,9 +1173,9 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetOutputCellPopulationVolu
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::set< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > >& MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::rGetNodePairs()
 {
-	//mNodePairs.Clear();
+    //mNodePairs.Clear();
     NEVER_REACHED;
-	return mNodePairs;
+    return mNodePairs;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -1230,16 +1230,16 @@ std::set<unsigned> MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetNeighbouri
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::CalculateRestLengths()
 {
-	mSpringRestLengths.clear();
+    mSpringRestLengths.clear();
 
     // Iterate over all springs and add calculate separation of adjacent  node pairs
     for (SpringIterator spring_iterator = SpringsBegin();
          spring_iterator != SpringsEnd();
          ++spring_iterator)
     {
-    	// Note that nodeA_global_index is always less than nodeB_global_index
-    	Node<SPACE_DIM>* p_nodeA = spring_iterator.GetNodeA();
-    	Node<SPACE_DIM>* p_nodeB = spring_iterator.GetNodeB();
+        // Note that nodeA_global_index is always less than nodeB_global_index
+        Node<SPACE_DIM>* p_nodeA = spring_iterator.GetNodeA();
+        Node<SPACE_DIM>* p_nodeB = spring_iterator.GetNodeB();
 
         unsigned nodeA_global_index = p_nodeA->GetIndex();
         unsigned nodeB_global_index = p_nodeB->GetIndex();
@@ -1254,7 +1254,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::CalculateRestLengths()
 
        mSpringRestLengths[node_pair]= separation;
     }
-	mHasVariableRestLength = true;
+    mHasVariableRestLength = true;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -1262,25 +1262,25 @@ double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetRestLength(unsigned in
 {
     if (mHasVariableRestLength)
     {
-    	std::pair<unsigned,unsigned> node_pair (indexA, indexB) ;
+        std::pair<unsigned,unsigned> node_pair (indexA, indexB) ;
 
-    	std::map<std::pair<unsigned,unsigned>, double>::const_iterator  iter = mSpringRestLengths.find(node_pair);
+        std::map<std::pair<unsigned,unsigned>, double>::const_iterator  iter = mSpringRestLengths.find(node_pair);
 
-    	if (iter != mSpringRestLengths.end() )
-    	{
-    		// Return the stored rest length.
-    		return iter->second;
-    	}
-    	else
-    	{
-    		NEVER_REACHED;
+        if (iter != mSpringRestLengths.end() )
+        {
+            // Return the stored rest length.
+            return iter->second;
+        }
+        else
+        {
+            NEVER_REACHED;
             ///\todo #2110 This code is not covered by any tests
             //EXCEPTION("Tried to get a rest length of an edge that doesn't exist. You can only use variable rest lengths if SetUpdateCellPopulationRule is set on the simulation.");
-    	}
+        }
     }
     else
     {
-    	return 1.0;
+        return 1.0;
     }
 }
 

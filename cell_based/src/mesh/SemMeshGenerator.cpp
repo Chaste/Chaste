@@ -45,22 +45,22 @@ SemMeshGenerator<DIM>::SemMeshGenerator(unsigned numCellsAcross,
 {
     mTotalSubcellularElementsPerCell = numSubCellularElementsPerCellAcross + numSubCellularElementsPerCellUp + numSubCellularElementsPerCellDeep;
 
-    // Check input is of correct type.
-    if(numCellsAcross == 0)
+    // Check input is of correct type
+    if (numCellsAcross == 0)
     {
         EXCEPTION("An SemMeshGenerator must have numCellsAcross > 0");
     }
-    if(numSubCellularElementsPerCellAcross == 0)
+    if (numSubCellularElementsPerCellAcross == 0)
     {
         EXCEPTION("An SemMeshGenerator must have more than 1 subcellular element per cell. Set numSubCellularElementsPerCell > 0");
     }
 
-    // Make sure the dimensions match the number of cells up / deep.
-    if(DIM == 1)
+    // Make sure the dimensions match the number of cells up/deep
+    if (DIM == 1)
     {
         EXCEPTION("Trying to create a 1D mesh, SemMesh only defined for 2 and 3D");
     }
-    if(numCellsDeep > 1 && DIM < 3)
+    if (numCellsDeep > 1 && DIM < 3)
     {
         EXCEPTION("Trying to create a 3D SemMesh with DIM < 3");
     }

@@ -213,9 +213,9 @@ protected:
     virtual void WriteVtkResultsToFile()=0;
 
     /**
-	 * Constructor that just takes in a mesh.
-	 *
-	 * @param rMesh the mesh for the population.
+     * Constructor that just takes in a mesh.
+     *
+     * @param rMesh the mesh for the population.
      */
     AbstractCellPopulation(AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh);
 
@@ -233,7 +233,7 @@ public:
      * @param locationIndices an optional vector of location indices that correspond to real cells
      */
     AbstractCellPopulation( AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
-							std::vector<CellPtr>& rCells,
+                            std::vector<CellPtr>& rCells,
                             const std::vector<unsigned> locationIndices=std::vector<unsigned>());
 
     /**
@@ -245,7 +245,7 @@ public:
      * Initialise each cell's cell-cycle model.
      */
     void InitialiseCells();
-    
+
     /**
      * Add an item of cell data to every cell in the population
      * @param dataName is the name associated with the data

@@ -149,7 +149,6 @@ public:
             TS_ASSERT_THROWS_NOTHING(next_node = mesh_reader.GetNextNode());
         }
 
-
         TS_ASSERT_THROWS_THIS(next_node = mesh_reader.GetNextNode(),
                 "Cannot get the next line from node or element file due to incomplete data");
     }

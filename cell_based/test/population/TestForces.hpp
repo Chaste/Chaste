@@ -520,14 +520,14 @@ public:
         }
 
         // Test with DiffusionForce
-		DiffusionForce<2> diffusion_force;
-		TS_ASSERT_EQUALS(diffusion_force.GetIdentifier(), "DiffusionForce-2");
+        DiffusionForce<2> diffusion_force;
+        TS_ASSERT_EQUALS(diffusion_force.GetIdentifier(), "DiffusionForce-2");
 
-		out_stream diffusion_force_parameter_file = output_file_handler.OpenOutputFile("diffusion_results.parameters");
-		diffusion_force.OutputForceParameters(diffusion_force_parameter_file);
-		diffusion_force_parameter_file->close();
+        out_stream diffusion_force_parameter_file = output_file_handler.OpenOutputFile("diffusion_results.parameters");
+        diffusion_force.OutputForceParameters(diffusion_force_parameter_file);
+        diffusion_force_parameter_file->close();
 
-		{
+        {
             FileFinder generated_file = output_file_handler.FindFile("diffusion_results.parameters");
             FileFinder reference_file("cell_based/test/data/TestForces/diffusion_results.parameters",
                                       RelativeTo::ChasteSourceRoot);
@@ -607,7 +607,7 @@ public:
             double x = p_mesh->GetNode(i)->rGetLocation()[0];
             CellPtr p_cell = cell_population.GetCellUsingLocationIndex(p_mesh->GetNode(i)->GetIndex());
             p_cell->GetCellData()->SetItem("nutrient", x/50.0);
- 
+
         }
 
         ChemotacticForce<2> chemotactic_force;
@@ -730,37 +730,37 @@ public:
 
         repulsion_force.AddForceContribution(node_forces, cell_population);
 
-		// All cells repel each other
-		TS_ASSERT_DELTA(node_forces[0][0], 15.0 * 20.0 * log(1 - 19.9/20)+15.0 * 20.0 * log(1 - 17.0/20), 1e-4);
-		TS_ASSERT_DELTA(node_forces[0][1], 0.0, 1e-4);
-		TS_ASSERT_DELTA(node_forces[1][0], -15.0 * 20.0 * log(1 - 19.9/20)+15.0 * 20.0 * log(1 - 17.1/20), 1e-4);
-		TS_ASSERT_DELTA(node_forces[1][1], 0.0, 1e-4);
-		TS_ASSERT_DELTA(node_forces[2][0], -15.0 * 20.0 * log(1 - 17.1/20)-15.0 * 20.0 * log(1 - 17.0/20), 1e-4);
-		TS_ASSERT_DELTA(node_forces[2][1], 0.0, 1e-4);
+        // All cells repel each other
+        TS_ASSERT_DELTA(node_forces[0][0], 15.0 * 20.0 * log(1 - 19.9/20)+15.0 * 20.0 * log(1 - 17.0/20), 1e-4);
+        TS_ASSERT_DELTA(node_forces[0][1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(node_forces[1][0], -15.0 * 20.0 * log(1 - 19.9/20)+15.0 * 20.0 * log(1 - 17.1/20), 1e-4);
+        TS_ASSERT_DELTA(node_forces[1][1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(node_forces[2][0], -15.0 * 20.0 * log(1 - 17.1/20)-15.0 * 20.0 * log(1 - 17.0/20), 1e-4);
+        TS_ASSERT_DELTA(node_forces[2][1], 0.0, 1e-4);
 
-		// Tests the calculation of the force with different cell radii
-		mesh.SetCellRadius(0u,0.2);
-		mesh.SetCellRadius(1u,0.2);
-		mesh.SetCellRadius(2u,0.2);
+        // Tests the calculation of the force with different cell radii
+        mesh.SetCellRadius(0u,0.2);
+        mesh.SetCellRadius(1u,0.2);
+        mesh.SetCellRadius(2u,0.2);
 
-		// Reset the vector of node forces
-		for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
-		{
-			node_forces[i]=zero_vector<double>(2);
-		}
+        // Reset the vector of node forces
+        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        {
+            node_forces[i]=zero_vector<double>(2);
+        }
 
-		repulsion_force.AddForceContribution(node_forces, cell_population);
+        repulsion_force.AddForceContribution(node_forces, cell_population);
 
-		/*
-		 * First two cells repel each other and second 2 cells are too far apart.
-		 * The overlap is -0.3 and the spring stiffness is the default value 15.0.
-		 */
-		TS_ASSERT_DELTA(node_forces[0][0], 15.0 * 0.4 * log(1 -0.3/0.4), 1e-4);
-		TS_ASSERT_DELTA(node_forces[0][1], 0.0, 1e-4);
-		TS_ASSERT_DELTA(node_forces[1][0], -15.0 * 0.4 * log(1 -0.3/0.4), 1e-4);
-		TS_ASSERT_DELTA(node_forces[1][1], 0.0, 1e-4);
-		TS_ASSERT_DELTA(node_forces[2][0], 0.0, 1e-4);
-		TS_ASSERT_DELTA(node_forces[2][1], 0.0, 1e-4);
+        /*
+         * First two cells repel each other and second 2 cells are too far apart.
+         * The overlap is -0.3 and the spring stiffness is the default value 15.0.
+         */
+        TS_ASSERT_DELTA(node_forces[0][0], 15.0 * 0.4 * log(1 -0.3/0.4), 1e-4);
+        TS_ASSERT_DELTA(node_forces[0][1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(node_forces[1][0], -15.0 * 0.4 * log(1 -0.3/0.4), 1e-4);
+        TS_ASSERT_DELTA(node_forces[1][1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(node_forces[2][0], 0.0, 1e-4);
+        TS_ASSERT_DELTA(node_forces[2][1], 0.0, 1e-4);
 
         // When the mesh goes out of scope, then it's a different set of nodes that get destroyed
         for (unsigned i=0; i<nodes.size(); i++)
@@ -1522,7 +1522,7 @@ public:
         }
 
         double correct_diffusion_coefficient =
-        		1.3806488e-23 * force.GetAbsoluteTemperature() / (6 * M_PI * force.GetViscosity() * cell_population.rGetMesh().GetCellRadius(0) );
+                1.3806488e-23 * force.GetAbsoluteTemperature() / (6 * M_PI * force.GetViscosity() * cell_population.rGetMesh().GetCellRadius(0) );
         unsigned dim = 2;
         variance /= num_iterations*2*dim*correct_diffusion_coefficient*SimulationTime::Instance()->GetTimeStep();
         TS_ASSERT_DELTA(variance, 1.0, 1e-1)
@@ -1591,7 +1591,7 @@ public:
         }
 
         double correct_diffusion_coefficient =
-                		1.3806488e-23 * force.GetAbsoluteTemperature() / (6 * M_PI * force.GetViscosity() * cell_population.rGetMesh().GetCellRadius(0) );
+                        1.3806488e-23 * force.GetAbsoluteTemperature() / (6 * M_PI * force.GetViscosity() * cell_population.rGetMesh().GetCellRadius(0) );
         unsigned dim = 3;
         variance /= num_iterations*2*dim*correct_diffusion_coefficient*SimulationTime::Instance()->GetTimeStep();
         TS_ASSERT_DELTA(variance, 1.0, 1e-1)
@@ -1608,41 +1608,41 @@ public:
     }
 
     void TestDiffusionForceArchiving() throw (Exception)
-	{
-		OutputFileHandler handler("archive", false);
-		std::string archive_filename = handler.GetOutputDirectoryFullPath() + "DiffusionForce.arch";
+    {
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "DiffusionForce.arch";
 
-		{
-			DiffusionForce<2> force;
+        {
+            DiffusionForce<2> force;
 
-			std::ofstream ofs(archive_filename.c_str());
-			boost::archive::text_oarchive output_arch(ofs);
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
 
-			// Serialize via pointer to most abstract class possible
-			AbstractForce<2>* const p_force = &force;
-			output_arch << p_force;
-		}
+            // Serialize via pointer to most abstract class possible
+            AbstractForce<2>* const p_force = &force;
+            output_arch << p_force;
+        }
 
-		{
-			AbstractForce<2>* p_force;
+        {
+            AbstractForce<2>* p_force;
 
-			// Create an input archive
-			std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
-			boost::archive::text_iarchive input_arch(ifs);
+            // Create an input archive
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
 
-			// Restore from the archive
-			input_arch >> p_force;
+            // Restore from the archive
+            input_arch >> p_force;
 
-			// Test member variables
-			TS_ASSERT_DELTA((static_cast<DiffusionForce<2>*>(p_force))->GetCutOffLength(), 10.0, 1e-6);
-			TS_ASSERT_DELTA((static_cast<DiffusionForce<2>*>(p_force))->GetDiffusionConstant(), 0.01, 1e-6);
-			TS_ASSERT_DELTA((static_cast<DiffusionForce<2>*>(p_force))->GetAbsoluteTemperature(), 296.0, 1e-6);
-			TS_ASSERT_DELTA((static_cast<DiffusionForce<2>*>(p_force))->GetViscosity(), 3.204e-6, 1e-6);
+            // Test member variables
+            TS_ASSERT_DELTA((static_cast<DiffusionForce<2>*>(p_force))->GetCutOffLength(), 10.0, 1e-6);
+            TS_ASSERT_DELTA((static_cast<DiffusionForce<2>*>(p_force))->GetDiffusionConstant(), 0.01, 1e-6);
+            TS_ASSERT_DELTA((static_cast<DiffusionForce<2>*>(p_force))->GetAbsoluteTemperature(), 296.0, 1e-6);
+            TS_ASSERT_DELTA((static_cast<DiffusionForce<2>*>(p_force))->GetViscosity(), 3.204e-6, 1e-6);
 
-			// Tidy up
-			delete p_force;
-		}
-	}
+            // Tidy up
+            delete p_force;
+        }
+    }
 };
 
 #endif /*TESTFORCES_HPP_*/

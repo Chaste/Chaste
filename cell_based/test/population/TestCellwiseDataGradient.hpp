@@ -91,7 +91,6 @@ public:
         }
     }
 
-
     void TestCellwiseDataGradientFineMesh() throw(Exception)
     {
         // Create a mesh: [0,2]x[0,2]
@@ -109,7 +108,7 @@ public:
         // C(x,y) = const
         //////////////////////////////////
         cell_population.SetDataOnAllCells("const", 1.0);
-        
+
         CellwiseDataGradient<2> gradient;
         gradient.SetupGradients(cell_population, "const");
 
@@ -143,7 +142,6 @@ public:
             TS_ASSERT_DELTA(gradient.rGetGradient(i)(1), -1.0, 1e-9);
         }
 
-
         // Check gradient - here there is some numerical error
         gradient.SetupGradients(cell_population, "x^2 - y^2");
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
@@ -160,9 +158,9 @@ public:
             TS_ASSERT_DELTA(gradient.rGetGradient(i)(0),  2*x, tol);
             TS_ASSERT_DELTA(gradient.rGetGradient(i)(1), -2*y, tol);
         }
-
     }
 
+///\todo uncomment this test or remove it
 //    void TestCellwiseDataGradientWithGhostNodes() throw(Exception)
 //    {
 //        // Create a mesh: [0,2]x[0,2]
@@ -266,7 +264,6 @@ public:
 //
 //        CellwiseData<2>::Destroy();
 //    }
-
 };
 
 #endif /*TESTCELLWISEDATAGRADIENT_HPP_*/

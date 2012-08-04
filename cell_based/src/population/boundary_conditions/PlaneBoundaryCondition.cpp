@@ -74,7 +74,7 @@ void PlaneBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::vector< c_v
 
     if (DIM != 1)
     {
-        if(dynamic_cast<AbstractCentreBasedCellPopulation<DIM>*>(this->mpCellPopulation))
+        if (dynamic_cast<AbstractCentreBasedCellPopulation<DIM>*>(this->mpCellPopulation))
         {
             for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
                  cell_iter != this->mpCellPopulation->End();
@@ -117,7 +117,6 @@ void PlaneBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::vector< c_v
                 }
             }
         }
-
     }
     else
     {

@@ -96,7 +96,7 @@ TetrahedralMesh<DIM,DIM>* CellBasedPdeHandler<DIM>::GetCoarsePdeMesh()
 template<unsigned DIM>
 void CellBasedPdeHandler<DIM>::AddPdeAndBc(PdeAndBoundaryConditions<DIM>* pPdeAndBc)
 {
-    if(!mPdeAndBcCollection.empty() && (pPdeAndBc->rGetDependentVariableName()==""))
+    if (!mPdeAndBcCollection.empty() && (pPdeAndBc->rGetDependentVariableName()==""))
     {
         EXCEPTION("When adding more than one PDE to CellBasedPdeHandler set the dependent variable name using SetDependentVariableName(name).");
     }
@@ -113,7 +113,7 @@ void CellBasedPdeHandler<DIM>::AddPdeAndBc(PdeAndBoundaryConditions<DIM>* pPdeAn
 template<unsigned DIM>
 Vec CellBasedPdeHandler<DIM>::GetPdeSolution(const std::string& rName)
 {
-    if(rName != "")
+    if (rName != "")
     {
         for (unsigned i=0; i<mPdeAndBcCollection.size(); i++)
         {
@@ -256,7 +256,7 @@ void CellBasedPdeHandler<DIM>::UseCoarsePdeMesh(double stepSize, ChasteCuboid<DI
             NEVER_REACHED;
     }
 
-    if(centreOnCellPopulation)
+    if (centreOnCellPopulation)
     {
         // Find the centre of the coarse PDE mesh
         c_vector<double,DIM> centre_of_coarse_mesh = zero_vector<double>(DIM);

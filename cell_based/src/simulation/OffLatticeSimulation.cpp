@@ -79,7 +79,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::AddForce(boost::shared_ptr<Abs
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::RemoveAllForces()
 {
-	mForceCollection.clear();
+    mForceCollection.clear();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -91,7 +91,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::AddCellPopulationBoundaryCondi
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::RemoveAllCellPopulationBoundaryConditions()
 {
-	mBoundaryConditions.clear();
+    mBoundaryConditions.clear();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -210,36 +210,37 @@ c_vector<double, SPACE_DIM> OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::Calcula
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::WriteVisualizerSetupFile()
 {
-	if(PetscTools::AmMaster())
-	{
-		for (unsigned i=0; i<this->mForceCollection.size(); i++)
-		{
-			// THis causes the thing to noc compile prob due to AbstractTwoBodyInteractionForce not HAVING 2 TEMPLATES
+    if (PetscTools::AmMaster())
+    {
+        for (unsigned i=0; i<this->mForceCollection.size(); i++)
+        {
+            // This may cause compilation problems, probably due to AbstractTwoBodyInteractionForce not having two template parameters
+            ///\todo Check whether this comment is still valid
 
-			boost::shared_ptr<AbstractForce<ELEMENT_DIM,SPACE_DIM> > p_force = this->mForceCollection[i];
-			if (boost::dynamic_pointer_cast<AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM> >(p_force))
-			{
-				double cutoff = (boost::static_pointer_cast<AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM> >(p_force))->GetCutOffLength();
-				*(this->mpVizSetupFile) << "Cutoff\t" << cutoff << "\n";
-			}
-		}
+            boost::shared_ptr<AbstractForce<ELEMENT_DIM,SPACE_DIM> > p_force = this->mForceCollection[i];
+            if (boost::dynamic_pointer_cast<AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM> >(p_force))
+            {
+                double cutoff = (boost::static_pointer_cast<AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM> >(p_force))->GetCutOffLength();
+                *(this->mpVizSetupFile) << "Cutoff\t" << cutoff << "\n";
+            }
+        }
 
-		// This is a quick and dirty check to see if the mesh is periodic
-		if (dynamic_cast<MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&this->mrCellPopulation))
-		{
-		   if (dynamic_cast<Cylindrical2dMesh*>(&(dynamic_cast<MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&(this->mrCellPopulation))->rGetMesh())))
-		   {
-			   *this->mpVizSetupFile << "MeshWidth\t" << this->mrCellPopulation.GetWidth(0) << "\n";
-		   }
-		}
-		else if (dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(&this->mrCellPopulation))
-		{
-		   if (dynamic_cast<Cylindrical2dVertexMesh*>(&(dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(&(this->mrCellPopulation))->rGetMesh())))
-		   {
-			   *this->mpVizSetupFile << "MeshWidth\t" << this->mrCellPopulation.GetWidth(0) << "\n";
-		   }
-		}
-	}
+        // This is a quick and dirty check to see if the mesh is periodic
+        if (dynamic_cast<MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&this->mrCellPopulation))
+        {
+           if (dynamic_cast<Cylindrical2dMesh*>(&(dynamic_cast<MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&(this->mrCellPopulation))->rGetMesh())))
+           {
+               *this->mpVizSetupFile << "MeshWidth\t" << this->mrCellPopulation.GetWidth(0) << "\n";
+           }
+        }
+        else if (dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(&this->mrCellPopulation))
+        {
+           if (dynamic_cast<Cylindrical2dVertexMesh*>(&(dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(&(this->mrCellPopulation))->rGetMesh())))
+           {
+               *this->mpVizSetupFile << "MeshWidth\t" << this->mrCellPopulation.GetWidth(0) << "\n";
+           }
+        }
+    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -284,61 +285,61 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateNodePositions(const std:
     if (mOutputNodeVelocities)
     {
         OutputFileHandler output_file_handler2(this->mSimulationOutputDirectory+"/", false);
-    	PetscTools::BeginRoundRobin();
-    	{
-            if(!PetscTools::AmMaster() || SimulationTime::Instance()->GetTimeStepsElapsed()!=0)
+        PetscTools::BeginRoundRobin();
+        {
+            if (!PetscTools::AmMaster() || SimulationTime::Instance()->GetTimeStepsElapsed()!=0)
             {
-            	mpNodeVelocitiesFile = output_file_handler2.OpenOutputFile("nodevelocities.dat", std::ios::app);
+                mpNodeVelocitiesFile = output_file_handler2.OpenOutputFile("nodevelocities.dat", std::ios::app);
             }
 
-			if (SimulationTime::Instance()->GetTimeStepsElapsed()%this->mSamplingTimestepMultiple == 0)
-			{
-				*mpNodeVelocitiesFile << SimulationTime::Instance()->GetTime() << "\t";
+            if (SimulationTime::Instance()->GetTimeStepsElapsed()%this->mSamplingTimestepMultiple == 0)
+            {
+                *mpNodeVelocitiesFile << SimulationTime::Instance()->GetTime() << "\t";
 
-				for (unsigned node_index=0; node_index<num_nodes; node_index++)
-				{
-					// We should never encounter deleted nodes due to where this method is called by Solve()
-					assert(!this->mrCellPopulation.GetNode(node_index)->IsDeleted());
+                for (unsigned node_index=0; node_index<num_nodes; node_index++)
+                {
+                    // We should never encounter deleted nodes due to where this method is called by Solve()
+                    assert(!this->mrCellPopulation.GetNode(node_index)->IsDeleted());
 
-					// Check that results should be written for this node
-					bool is_real_node = true;
+                    // Check that results should be written for this node
+                    bool is_real_node = true;
 
-					if (dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&this->mrCellPopulation))
-					{
-						if (static_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&(this->mrCellPopulation))->IsGhostNode(node_index))
-						{
-							// If this node is a ghost node then don't record its velocity
-							is_real_node = false;
-						}
-						else
-						{
-							// We should never encounter nodes associated with dead cells due to where this method is called by Solve()
-							assert(!this->mrCellPopulation.GetCellUsingLocationIndex(node_index)->IsDead());
-						}
-					}
+                    if (dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&this->mrCellPopulation))
+                    {
+                        if (static_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&(this->mrCellPopulation))->IsGhostNode(node_index))
+                        {
+                            // If this node is a ghost node then don't record its velocity
+                            is_real_node = false;
+                        }
+                        else
+                        {
+                            // We should never encounter nodes associated with dead cells due to where this method is called by Solve()
+                            assert(!this->mrCellPopulation.GetCellUsingLocationIndex(node_index)->IsDead());
+                        }
+                    }
 
-					// Write node data to file
-					if (is_real_node)
-					{
-						const c_vector<double,SPACE_DIM>& position = this->mrCellPopulation.GetNode(node_index)->rGetLocation();
-						double damping_constant = static_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&(this->mrCellPopulation))->GetDampingConstant(node_index);
-						c_vector<double, SPACE_DIM> velocity = this->mDt * rNodeForces[node_index] / damping_constant;
+                    // Write node data to file
+                    if (is_real_node)
+                    {
+                        const c_vector<double,SPACE_DIM>& position = this->mrCellPopulation.GetNode(node_index)->rGetLocation();
+                        double damping_constant = static_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&(this->mrCellPopulation))->GetDampingConstant(node_index);
+                        c_vector<double, SPACE_DIM> velocity = this->mDt * rNodeForces[node_index] / damping_constant;
 
-						*mpNodeVelocitiesFile << node_index  << " ";
-						for (unsigned i=0; i<SPACE_DIM; i++)
-						{
-							*mpNodeVelocitiesFile << position[i] << " ";
-						}
-						for (unsigned i=0; i<SPACE_DIM; i++)
-						{
-							*mpNodeVelocitiesFile << velocity[i] << " ";
-						}
-					}
-				}
-				*mpNodeVelocitiesFile << "\n";
-			}
-			mpNodeVelocitiesFile->close();
-    	}
+                        *mpNodeVelocitiesFile << node_index  << " ";
+                        for (unsigned i=0; i<SPACE_DIM; i++)
+                        {
+                            *mpNodeVelocitiesFile << position[i] << " ";
+                        }
+                        for (unsigned i=0; i<SPACE_DIM; i++)
+                        {
+                            *mpNodeVelocitiesFile << velocity[i] << " ";
+                        }
+                    }
+                }
+                *mpNodeVelocitiesFile << "\n";
+            }
+            mpNodeVelocitiesFile->close();
+        }
     }
 }
 

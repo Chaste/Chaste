@@ -202,7 +202,7 @@ public:
         /*
          * Here we use the {{{CellData}}} class, which stores the
          * value of the current nutrient concentration for each cell. We have to
-         * tell the {{{CellData}}} class that there is one variable per cell, namely the oxygen 
+         * tell the {{{CellData}}} class that there is one variable per cell, namely the oxygen
          * concentration.  We initialise the oxygen concentration for each node (to 1.0), by
          * calling {{{SetItem}}}.
          */

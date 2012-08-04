@@ -186,16 +186,16 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
                 bool on_west_edge = (node_index%numNodesAcross == 0);
                 bool on_east_edge = (node_index%numNodesAcross == numNodesAcross - 1);
 
-                if(isPeriodicInX)
+                if (isPeriodicInX)
                 {
-                    if(on_west_edge)
+                    if (on_west_edge)
                     {
                         moore_neighbour_indices_vector[1] = node_index + 2*numNodesAcross - 1;
                         moore_neighbour_indices_vector[2] = node_index + numNodesAcross - 1;
                         moore_neighbour_indices_vector[3] = node_index - 1;
                     }
 
-                    if(on_east_edge)
+                    if (on_east_edge)
                     {
                         moore_neighbour_indices_vector[5] = node_index - 2*numNodesAcross + 1;
                         moore_neighbour_indices_vector[6] = node_index - numNodesAcross + 1;
@@ -203,48 +203,47 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
                     }
                 }
 
-                if(isPeriodicInY)
+                if (isPeriodicInY)
                 {
-                    if(on_north_edge)
+                    if (on_north_edge)
                     {
                         moore_neighbour_indices_vector[0] = node_index - numNodesAcross*(numNodesUp-1);
                         moore_neighbour_indices_vector[1] = moore_neighbour_indices_vector[0] - 1;
                         moore_neighbour_indices_vector[7] = moore_neighbour_indices_vector[0] + 1;
 
-                        if(on_west_edge)
+                        if (on_west_edge)
                         {
                             moore_neighbour_indices_vector[1] = moore_neighbour_indices_vector[1] + numNodesAcross;
                         }
-                        if(on_east_edge)
+                        if (on_east_edge)
                         {
                             moore_neighbour_indices_vector[7] = moore_neighbour_indices_vector[7] - numNodesAcross;
                         }
                     }
 
-                    if(on_south_edge)
+                    if (on_south_edge)
                     {
                         moore_neighbour_indices_vector[4] = node_index + numNodesAcross*(numNodesUp-1);
                         moore_neighbour_indices_vector[3] = moore_neighbour_indices_vector[4] - 1;
                         moore_neighbour_indices_vector[5] = moore_neighbour_indices_vector[4] + 1;
 
-                        if(on_west_edge)
+                        if (on_west_edge)
                         {
                             moore_neighbour_indices_vector[3] = moore_neighbour_indices_vector[3] + numNodesAcross;
                         }
-                        if(on_east_edge)
+                        if (on_east_edge)
                         {
                             moore_neighbour_indices_vector[5] = moore_neighbour_indices_vector[5] - numNodesAcross;
                         }
                     }
                 }
 
-
-                if(isPeriodicInX)
+                if (isPeriodicInX)
                 {
                     on_east_edge = false;
                     on_west_edge = false;
                 }
-                if(isPeriodicInY)
+                if (isPeriodicInY)
                 {
                     on_south_edge = false;
                     on_north_edge = false;
@@ -300,7 +299,7 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
                 moore_neighbour_indices_vector[6] += 1;
                 moore_neighbour_indices_vector[7] += numNodesAcross + 1;
                 moore_neighbour_indices_vector[8] -= numNodesAcross*numNodesUp;
-                for( unsigned i=9; i<17; i++)
+                for (unsigned i=9; i<17; i++)
                 {
                     moore_neighbour_indices_vector[i] = moore_neighbour_indices_vector[i-9]-numNodesAcross*numNodesUp;
                 }
@@ -318,9 +317,9 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
                 bool on_front_edge = (node_index < numNodesAcross*numNodesUp);
                 bool on_back_edge = (node_index > numNodesAcross*numNodesUp*(numNodesDeep-1)-1);
 
-                if(isPeriodicInX)
+                if (isPeriodicInX)
                 {
-                    if(on_west_edge)
+                    if (on_west_edge)
                     {
                         moore_neighbour_indices_vector[1] = node_index + 2*numNodesAcross - 1;
                         moore_neighbour_indices_vector[2] = node_index + numNodesAcross - 1;
@@ -335,7 +334,7 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
                         moore_neighbour_indices_vector[21] = moore_neighbour_indices_vector[3] + numNodesAcross*numNodesUp;
                     }
 
-                    if(on_east_edge)
+                    if (on_east_edge)
                     {
                         moore_neighbour_indices_vector[5] = node_index - 2*numNodesAcross + 1;
                         moore_neighbour_indices_vector[6] = node_index - numNodesAcross + 1;
@@ -351,9 +350,9 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
                     }
                 }
 
-                if(isPeriodicInY)
+                if (isPeriodicInY)
                 {
-                    if(on_north_edge)
+                    if (on_north_edge)
                     {
                         moore_neighbour_indices_vector[0] = node_index - numNodesAcross*(numNodesUp-1);
                         moore_neighbour_indices_vector[1] = moore_neighbour_indices_vector[0] - 1;
@@ -367,13 +366,13 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
                         moore_neighbour_indices_vector[18] = moore_neighbour_indices_vector[0] + numNodesAcross*numNodesUp;
                         moore_neighbour_indices_vector[25] = moore_neighbour_indices_vector[7] + numNodesAcross*numNodesUp;
 
-                        if(on_west_edge)
+                        if (on_west_edge)
                         {
                             moore_neighbour_indices_vector[1] = moore_neighbour_indices_vector[1] + numNodesAcross;
                             moore_neighbour_indices_vector[10] = moore_neighbour_indices_vector[10] + numNodesAcross;
                             moore_neighbour_indices_vector[19] = moore_neighbour_indices_vector[19] + numNodesAcross;
                         }
-                        if(on_east_edge)
+                        if (on_east_edge)
                         {
                             moore_neighbour_indices_vector[7] = moore_neighbour_indices_vector[7] - numNodesAcross;
                             moore_neighbour_indices_vector[16] = moore_neighbour_indices_vector[16] - numNodesAcross;
@@ -381,7 +380,7 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
                         }
                     }
 
-                    if(on_south_edge)
+                    if (on_south_edge)
                     {
                         moore_neighbour_indices_vector[4] = node_index + numNodesAcross*(numNodesUp-1);
                         moore_neighbour_indices_vector[3] = moore_neighbour_indices_vector[4] - 1;
@@ -395,13 +394,13 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
                         moore_neighbour_indices_vector[22] = moore_neighbour_indices_vector[4] + numNodesAcross*numNodesUp;
                         moore_neighbour_indices_vector[23] = moore_neighbour_indices_vector[5] + numNodesAcross*numNodesUp;
 
-                        if(on_west_edge)
+                        if (on_west_edge)
                         {
                             moore_neighbour_indices_vector[3] = moore_neighbour_indices_vector[3] + numNodesAcross;
                             moore_neighbour_indices_vector[12] = moore_neighbour_indices_vector[12] + numNodesAcross;
                             moore_neighbour_indices_vector[21] = moore_neighbour_indices_vector[21] + numNodesAcross;
                         }
-                        if(on_east_edge)
+                        if (on_east_edge)
                         {
                             moore_neighbour_indices_vector[5] = moore_neighbour_indices_vector[5] - numNodesAcross;
                             moore_neighbour_indices_vector[14] = moore_neighbour_indices_vector[14] - numNodesAcross;
@@ -410,9 +409,9 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
                     }
                 }
 
-                if(isPeriodicInZ)
+                if (isPeriodicInZ)
                 {
-                    if(on_back_edge)
+                    if (on_back_edge)
                     {
                         moore_neighbour_indices_vector[17] = node_index - numNodesAcross*numNodesUp*(numNodesDeep-1);
                         moore_neighbour_indices_vector[20] = moore_neighbour_indices_vector[17] - 1;
@@ -426,27 +425,27 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
                         moore_neighbour_indices_vector[18] = moore_neighbour_indices_vector[17] + numNodesAcross;
                         moore_neighbour_indices_vector[25] = moore_neighbour_indices_vector[24] + numNodesAcross;
 
-                        if(on_west_edge)
+                        if (on_west_edge)
                         {
                             moore_neighbour_indices_vector[19] = moore_neighbour_indices_vector[19] + numNodesAcross;
                             moore_neighbour_indices_vector[20] = moore_neighbour_indices_vector[20] + numNodesAcross;
                             moore_neighbour_indices_vector[21] = moore_neighbour_indices_vector[21] + numNodesAcross;
                         }
-                        if(on_east_edge)
+                        if (on_east_edge)
                         {
                             moore_neighbour_indices_vector[23] = moore_neighbour_indices_vector[23] - numNodesAcross;
                             moore_neighbour_indices_vector[24] = moore_neighbour_indices_vector[24] - numNodesAcross;
                             moore_neighbour_indices_vector[25] = moore_neighbour_indices_vector[25] - numNodesAcross;
                         }
 
-                        if(on_south_edge)
+                        if (on_south_edge)
                         {
                             moore_neighbour_indices_vector[21] = moore_neighbour_indices_vector[21] + numNodesAcross*numNodesUp;
                             moore_neighbour_indices_vector[22] = moore_neighbour_indices_vector[22] + numNodesAcross*numNodesUp;
                             moore_neighbour_indices_vector[23] = moore_neighbour_indices_vector[23] + numNodesAcross*numNodesUp;
                         }
 
-                        if(on_north_edge)
+                        if (on_north_edge)
                         {
                             moore_neighbour_indices_vector[18] = moore_neighbour_indices_vector[18] - numNodesAcross*numNodesUp;
                             moore_neighbour_indices_vector[19] = moore_neighbour_indices_vector[19] - numNodesAcross*numNodesUp;
@@ -454,7 +453,7 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
                         }
                     }
 
-                    if(on_front_edge)
+                    if (on_front_edge)
                     {
                         moore_neighbour_indices_vector[8] = node_index + numNodesAcross*numNodesUp*(numNodesDeep-1);
                         moore_neighbour_indices_vector[11] = moore_neighbour_indices_vector[8] - 1;
@@ -468,53 +467,50 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
                         moore_neighbour_indices_vector[9] = moore_neighbour_indices_vector[8] + numNodesAcross;
                         moore_neighbour_indices_vector[16] = moore_neighbour_indices_vector[15] + numNodesAcross;
 
-                        if(on_west_edge)
+                        if (on_west_edge)
                         {
                             moore_neighbour_indices_vector[10] = moore_neighbour_indices_vector[10] + numNodesAcross;
                             moore_neighbour_indices_vector[11] = moore_neighbour_indices_vector[11] + numNodesAcross;
                             moore_neighbour_indices_vector[12] = moore_neighbour_indices_vector[12] + numNodesAcross;
                         }
-                        if(on_east_edge)
+                        if (on_east_edge)
                         {
                             moore_neighbour_indices_vector[14] = moore_neighbour_indices_vector[14] - numNodesAcross;
                             moore_neighbour_indices_vector[15] = moore_neighbour_indices_vector[15] - numNodesAcross;
                             moore_neighbour_indices_vector[16] = moore_neighbour_indices_vector[16] - numNodesAcross;
                         }
 
-                        if(on_south_edge)
+                        if (on_south_edge)
                         {
                             moore_neighbour_indices_vector[12] = moore_neighbour_indices_vector[12] + numNodesAcross*numNodesUp;
                             moore_neighbour_indices_vector[13] = moore_neighbour_indices_vector[13] + numNodesAcross*numNodesUp;
                             moore_neighbour_indices_vector[14] = moore_neighbour_indices_vector[14] + numNodesAcross*numNodesUp;
                         }
 
-                        if(on_north_edge)
+                        if (on_north_edge)
                         {
                             moore_neighbour_indices_vector[9] = moore_neighbour_indices_vector[9] - numNodesAcross*numNodesUp;
                             moore_neighbour_indices_vector[10] = moore_neighbour_indices_vector[10] - numNodesAcross*numNodesUp;
                             moore_neighbour_indices_vector[16] = moore_neighbour_indices_vector[16] - numNodesAcross*numNodesUp;
                         }
                     }
-
-
                 }
 
-                if(isPeriodicInX)
+                if (isPeriodicInX)
                 {
                     on_east_edge = false;
                     on_west_edge = false;
                 }
-                if(isPeriodicInY)
+                if (isPeriodicInY)
                 {
                     on_south_edge = false;
                     on_north_edge = false;
                 }
-                if(isPeriodicInZ)
+                if (isPeriodicInZ)
                 {
                     on_front_edge = false;
                     on_back_edge = false;
                 }
-
 
                 // Create a vector of booleans for which neighbours are available
                 // Use the order N, NW, W, SW, S, SE, E, NE
@@ -585,32 +581,30 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
                 bool on_west_edge = (node_index%numNodesAcross == 0);
                 bool on_east_edge = (node_index%numNodesAcross == numNodesAcross - 1);
 
-
-
-                if(isPeriodicInX)
+                if (isPeriodicInX)
                 {
-                    if(on_west_edge)
+                    if (on_west_edge)
                     {
                         von_neumann_neighbour_indices_vector[1] = node_index + numNodesAcross - 1;
                         on_west_edge = false;
                     }
 
-                    if(on_east_edge)
+                    if (on_east_edge)
                     {
                         von_neumann_neighbour_indices_vector[3] = node_index - numNodesAcross + 1;
                         on_east_edge = false;
                     }
                 }
 
-                if(isPeriodicInY)
+                if (isPeriodicInY)
                 {
-                    if(on_north_edge)
+                    if (on_north_edge)
                     {
                         von_neumann_neighbour_indices_vector[0] = node_index - numNodesAcross*(numNodesUp-1);
                         on_north_edge = false;
                     }
 
-                    if(on_south_edge)
+                    if (on_south_edge)
                     {
                         von_neumann_neighbour_indices_vector[2] = node_index + numNodesAcross*(numNodesUp-1);
                         on_south_edge = false;
@@ -668,54 +662,50 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
                 bool on_front_edge = (node_index < numNodesAcross*numNodesUp);
                 bool on_back_edge = (node_index > numNodesAcross*numNodesUp*(numNodesDeep-1)-1);
 
-
-                if(isPeriodicInX)
+                if (isPeriodicInX)
                 {
-                    if(on_west_edge)
+                    if (on_west_edge)
                     {
                         von_neumann_neighbour_indices_vector[1] = node_index + numNodesAcross - 1;
                         on_west_edge = false;
                     }
 
-                    if(on_east_edge)
+                    if (on_east_edge)
                     {
                         von_neumann_neighbour_indices_vector[3] = node_index - numNodesAcross + 1;
                         on_east_edge = false;
                     }
                 }
 
-                if(isPeriodicInY)
+                if (isPeriodicInY)
                 {
-                    if(on_north_edge)
+                    if (on_north_edge)
                     {
                         von_neumann_neighbour_indices_vector[0] = node_index - numNodesAcross*(numNodesUp-1);
                         on_north_edge = false;
                     }
 
-                    if(on_south_edge)
+                    if (on_south_edge)
                     {
                         von_neumann_neighbour_indices_vector[2] = node_index + numNodesAcross*(numNodesUp-1);
                         on_south_edge = false;
                     }
                 }
 
-                if(isPeriodicInZ)
+                if (isPeriodicInZ)
                 {
-                    if(on_front_edge)
+                    if (on_front_edge)
                     {
                         von_neumann_neighbour_indices_vector[4] = node_index + numNodesAcross*numNodesUp*(numNodesDeep-1);
                         on_front_edge = false;
                     }
 
-                    if(on_back_edge)
+                    if (on_back_edge)
                     {
                         von_neumann_neighbour_indices_vector[5] = node_index - numNodesAcross*numNodesUp*(numNodesDeep-1);
                         on_back_edge = false;
                     }
                 }
-
-
-
 
                 // Create a vector of booleans for which neighbours are available
                 // Use the order N, W, S, E, F, B
@@ -742,7 +732,6 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
                 NEVER_REACHED;
         }
     }
-
 
     mpMesh = new PottsMesh<DIM>(nodes, elements, von_neumann_neighbours, moore_neighbours);
 }

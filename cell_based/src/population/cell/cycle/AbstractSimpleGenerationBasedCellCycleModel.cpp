@@ -78,7 +78,7 @@ void AbstractSimpleGenerationBasedCellCycleModel::InitialiseDaughterCell()
     mpCell->SetCellProliferativeType(TRANSIT);
     if (mGeneration > mMaxTransitGenerations)
     {
-    	mpCell->SetCellProliferativeType(DIFFERENTIATED);
+        mpCell->SetCellProliferativeType(DIFFERENTIATED);
     }
     AbstractSimpleCellCycleModel::InitialiseDaughterCell();
 }

@@ -77,7 +77,7 @@ void VolumeTrackedOffLatticeSimulation<DIM>::UpdateCellData()
      * (while existing) is out-of-date. Thus, if we did not regenerate the Voronoi
      * tessellation here, an assertion may trip as we try to access a Voronoi element
      * whose index exceeds the number of elements in the out-of-date tessellation.
-     * 
+     *
      * \todo work out how to properly fix this (#1986)
      */
     if (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))

@@ -60,9 +60,9 @@ public:
 
     void TestDiffusionMultipleCaUpdateRuleIn2d() throw (Exception)
     {
-    	// timestep and size of domain to let us calculate the probabilities of movement.
-    	double delta_t = 1;
-    	double delta_x = 1;
+        // timestep and size of domain to let us calculate the probabilities of movement.
+        double delta_t = 1;
+        double delta_x = 1;
         double diffusion_parameter = 0.1;
 
         // Create an update law system
@@ -156,7 +156,7 @@ public:
            location_indices.push_back(1u);
 
            // Then other cells are added to the lattice to check if the probabilities are still the same
-           for(unsigned i = 4u; i < 10u; i++)
+           for (unsigned i=4; i<10; i++)
            {
                location_indices.push_back(i);
            }
@@ -184,7 +184,6 @@ public:
            TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(24,19,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/2.0,1e-6);
            TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(24,18,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/4.0,1e-6);
            TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(24,23,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/2.0,1e-6);
-
     }
 
     void TestArchiveDiffusionMultipleCaUpdateRule() throw(Exception)
@@ -193,7 +192,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "DiffusionMultipleCaUpdateRule.arch";
 
         {
-        	DiffusionMultipleCaUpdateRule<2> update_rule;
+            DiffusionMultipleCaUpdateRule<2> update_rule;
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);

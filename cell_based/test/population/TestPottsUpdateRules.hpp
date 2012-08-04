@@ -119,7 +119,6 @@ public:
         // Current site in cell 0; target site in cell 1
         contribution = volume_constraint.EvaluateHamiltonianContribution(5, 9, cell_population);
         TS_ASSERT_DELTA(contribution, 2.0*alpha, 1e-6);
-
     }
 
     void TestVolumeConstraintPottsUpdateRuleIn3d() throw (Exception)
@@ -171,7 +170,6 @@ public:
         // Current site in cell 0; target site in cell 1
         contribution = volume_constraint.EvaluateHamiltonianContribution(9, 10, cell_population);
         TS_ASSERT_DELTA(contribution, 2.0*alpha, 1e-6);
-
     }
 
     void TestArchiveVolumeConstraintPottsUpdateRule() throw(Exception)
@@ -502,8 +500,6 @@ public:
         TS_ASSERT_DELTA(contribution, 2.0*gamma_cell_cell, 1e-6);
     }
 
-
-
     void TestArchiveAdhesionPottsUpdateRule() throw(Exception)
     {
         OutputFileHandler handler("archive", false);
@@ -702,7 +698,6 @@ public:
         TS_ASSERT_DELTA(contribution, 2.0*gamma_cell_0_cell_1 - gamma_cell_0_cell_0 + gamma_cell_1_boundary - gamma_cell_0_boundary, 1e-6);
     }
 
-
     void TestArchiveDifferentialAdhesionPottsUpdateRule() throw(Exception)
     {
         OutputFileHandler handler("archive", false);
@@ -748,7 +743,6 @@ public:
         }
     }
 
-
     void TestChemotaxisPottsUpdateRuleIn2d() throw (Exception)
     {
         // Create a simple 2D PottsMesh with 2 elements
@@ -783,7 +777,6 @@ public:
         // target site diagonally above current site (to left)
         contribution = chemotaxis_update.EvaluateHamiltonianContribution(10, 13, cell_population);
         TS_ASSERT_DELTA(contribution, 0.0, 1e-6);
-
     }
 
     void TestArchiveChemotaxisPottsUpdateRule() throw(Exception)
@@ -822,7 +815,6 @@ public:
             delete p_update_rule;
         }
     }
-
 
     void TestUpdateRuleOutputUpdateRuleInfo()
     {
@@ -887,7 +879,7 @@ public:
 
         std::string differential_adhesion_update_results_dir = output_file_handler.GetOutputDirectoryFullPath();
         FileComparison(differential_adhesion_update_results_dir + "differential_adhesion_update_results.parameters",
-        		       "cell_based/test/data/TestPottsUpdateRules/differential_adhesion_update_results.parameters").CompareFiles();
+                       "cell_based/test/data/TestPottsUpdateRules/differential_adhesion_update_results.parameters").CompareFiles();
 
         // Test with DifferentialAdhesionPottsUpdateRule
         ChemotaxisPottsUpdateRule<2> chemotaxis_update;
@@ -900,7 +892,7 @@ public:
 
         std::string chemotaxis_update_results_dir = output_file_handler.GetOutputDirectoryFullPath();
         FileComparison(chemotaxis_update_results_dir + "chemotaxis_update_results.parameters",
-        		       "cell_based/test/data/TestPottsUpdateRules/chemotaxis_update_results.parameters").CompareFiles();
+                       "cell_based/test/data/TestPottsUpdateRules/chemotaxis_update_results.parameters").CompareFiles();
     }
 };
 

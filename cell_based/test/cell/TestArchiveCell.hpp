@@ -113,7 +113,7 @@ public:
             for (CellPropertyCollection::Iterator it = final_collection.Begin(); it != final_collection.End(); ++it)
             {
                 TS_ASSERT_EQUALS(final_collection.HasProperty(*it), true);
-                TS_ASSERT((*it)->IsType<WildTypeCellMutationState>() || (*it)->IsType<CellLabel>() 
+                TS_ASSERT((*it)->IsType<WildTypeCellMutationState>() || (*it)->IsType<CellLabel>()
                           || (*it)->IsType<CellAncestor>() || (*it)->IsType<CellId>() || (*it)->IsType<CellData>());
             }
 

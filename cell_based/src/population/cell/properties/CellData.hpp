@@ -102,7 +102,7 @@ public:
 
     /**
      * Get number of data items
-     * 
+     *
      */
     unsigned GetNumItems() const;
     /**

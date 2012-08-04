@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCentreBasedCellPopulation( AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
-																	std::vector<CellPtr>& rCells,
+                                                                    std::vector<CellPtr>& rCells,
                                                                   const std::vector<unsigned> locationIndices)
     : AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>(rMesh, rCells, locationIndices),
       mMeinekeDivisionSeparation(0.3) // educated guess
@@ -231,17 +231,17 @@ void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResu
 
         // Write cell data to file
         if (!(this->GetNode(node_index)->IsDeleted())
-        		&& !node_corresponds_to_dead_cell
-        		&& !(this->IsParticle(node_index)))
+                && !node_corresponds_to_dead_cell
+                && !(this->IsParticle(node_index)))
         {
 
-        	if (IsGhostNode(node_index) == true)
+            if (IsGhostNode(node_index) == true)
             {
                 *(this->mpVizCellProliferativeTypesFile) << INVISIBLE_COLOUR << " ";
             }
             else
             {
-            	this->GenerateCellResults(this->GetCellUsingLocationIndex(node_index),cell_type_counter,cell_cycle_phase_counter);
+                this->GenerateCellResults(this->GetCellUsingLocationIndex(node_index),cell_type_counter,cell_cycle_phase_counter);
             }
         }
     }
@@ -256,58 +256,58 @@ void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteTimeAndNode
 
     PetscTools::BeginRoundRobin();
     {
-		if(!PetscTools::AmMaster() || SimulationTime::Instance()->GetTimeStepsElapsed()!=0)
-		{
-			this->mpVizNodesFile = output_file_handler.OpenOutputFile("results.viznodes", std::ios::app);
-			this->mpVizBoundaryNodesFile = output_file_handler.OpenOutputFile("results.vizboundarynodes", std::ios::app);
-		}
-		if(PetscTools::AmMaster())
-		{
-			double time = SimulationTime::Instance()->GetTime();
+        if (!PetscTools::AmMaster() || SimulationTime::Instance()->GetTimeStepsElapsed()!=0)
+        {
+            this->mpVizNodesFile = output_file_handler.OpenOutputFile("results.viznodes", std::ios::app);
+            this->mpVizBoundaryNodesFile = output_file_handler.OpenOutputFile("results.vizboundarynodes", std::ios::app);
+        }
+        if (PetscTools::AmMaster())
+        {
+            double time = SimulationTime::Instance()->GetTime();
 
-			*this->mpVizNodesFile << time << "\t";
-			*this->mpVizBoundaryNodesFile << time << "\t";
-		}
+            *this->mpVizNodesFile << time << "\t";
+            *this->mpVizBoundaryNodesFile << time << "\t";
+        }
 
 
-		// Write node data to file
-		for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
-				node_iter != this->mrMesh.GetNodeIteratorEnd();
-				++node_iter)
-		{
+        // Write node data to file
+        for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
+                node_iter != this->mrMesh.GetNodeIteratorEnd();
+                ++node_iter)
+        {
 
-		    /*
-			 * Hack that covers the case where the node in an AbstractCentreBasedCellPopulation
-			 * is associated with a cell that has just been killed (#1129). This breaks the
-			 * vertex visualizer when apoptotic cells are involved.
-			 */
-			bool node_corresponds_to_dead_cell = false;
-			if (this->IsCellAttachedToLocationIndex(node_iter->GetIndex()))
-			{
-				node_corresponds_to_dead_cell = this->GetCellUsingLocationIndex(node_iter->GetIndex())->IsDead();
-			}
+            /*
+             * Hack that covers the case where the node in an AbstractCentreBasedCellPopulation
+             * is associated with a cell that has just been killed (#1129). This breaks the
+             * vertex visualizer when apoptotic cells are involved.
+             */
+            bool node_corresponds_to_dead_cell = false;
+            if (this->IsCellAttachedToLocationIndex(node_iter->GetIndex()))
+            {
+                node_corresponds_to_dead_cell = this->GetCellUsingLocationIndex(node_iter->GetIndex())->IsDead();
+            }
 
-			// Write node data to file
-			if (!(node_iter->IsDeleted()) && !node_corresponds_to_dead_cell)
-			{
-				const c_vector<double,SPACE_DIM>& position = node_iter->rGetLocation();
+            // Write node data to file
+            if (!(node_iter->IsDeleted()) && !node_corresponds_to_dead_cell)
+            {
+                const c_vector<double,SPACE_DIM>& position = node_iter->rGetLocation();
 
-				for (unsigned i=0; i<SPACE_DIM; i++)
-				{
-					*this->mpVizNodesFile << position[i] << " ";
-				}
-				*this->mpVizBoundaryNodesFile << node_iter->IsBoundaryNode() << " ";
-			}
-		}
+                for (unsigned i=0; i<SPACE_DIM; i++)
+                {
+                    *this->mpVizNodesFile << position[i] << " ";
+                }
+                *this->mpVizBoundaryNodesFile << node_iter->IsBoundaryNode() << " ";
+            }
+        }
 
-		if(PetscTools::AmTopMost())
-		{
-			*this->mpVizNodesFile << "\n";
-			*this->mpVizBoundaryNodesFile << "\n";
-		}
+        if (PetscTools::AmTopMost())
+        {
+            *this->mpVizNodesFile << "\n";
+            *this->mpVizBoundaryNodesFile << "\n";
+        }
 
-		this->mpVizNodesFile->close();
-		this->mpVizBoundaryNodesFile->close();
+        this->mpVizNodesFile->close();
+        this->mpVizBoundaryNodesFile->close();
     }
     PetscTools::EndRoundRobin();
 }

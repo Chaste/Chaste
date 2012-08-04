@@ -90,7 +90,7 @@ protected:
 
     /**
      * Constructor that just takes in a mesh.
-     * 
+     *
      * @param rMesh the mesh for the cell population.
      */
     AbstractOffLatticeCellPopulation(AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh);
@@ -105,7 +105,7 @@ public:
      * @param locationIndices an optional vector of location indices that correspond to real cells
      */
     AbstractOffLatticeCellPopulation( AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
-									std::vector<CellPtr>& rCells,
+                                    std::vector<CellPtr>& rCells,
                                     const std::vector<unsigned> locationIndices=std::vector<unsigned>());
 
     /**

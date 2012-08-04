@@ -95,7 +95,7 @@ template<unsigned DIM>
 MultipleCaBasedCellPopulation<DIM>::~MultipleCaBasedCellPopulation()
 {
 
-	// This is not needed unles we are de-serializing the cell population
+    // This is not needed unles we are de-serializing the cell population
 //    if (this->mDeleteMesh)
 //    {
 //        delete &this->mrMesh;
@@ -154,22 +154,22 @@ Node<DIM>* MultipleCaBasedCellPopulation<DIM>::GetNodeCorrespondingToCell(CellPt
 template<unsigned DIM>
 void MultipleCaBasedCellPopulation<DIM>::AddCellUsingLocationIndex(unsigned index, CellPtr pCell)
 {
-	if (mAvailableSpaces[index]==0u)
-	{
+    if (mAvailableSpaces[index]==0u)
+    {
         EXCEPTION("No available spaces at location index " << index << ".");
-	}
-	mAvailableSpaces[index]--;
-	AbstractCellPopulation<DIM,DIM>::AddCellUsingLocationIndex(index, pCell);
+    }
+    mAvailableSpaces[index]--;
+    AbstractCellPopulation<DIM,DIM>::AddCellUsingLocationIndex(index, pCell);
 }
 
 template<unsigned DIM>
 void MultipleCaBasedCellPopulation<DIM>::RemoveCellUsingLocationIndex(unsigned index, CellPtr pCell)
 {
-	AbstractCellPopulation<DIM,DIM>::RemoveCellUsingLocationIndex(index, pCell);
+    AbstractCellPopulation<DIM,DIM>::RemoveCellUsingLocationIndex(index, pCell);
 
-	mAvailableSpaces[index]++;
+    mAvailableSpaces[index]++;
 
-	assert(mAvailableSpaces[index]<=mLatticeCarryingCapacity);
+    assert(mAvailableSpaces[index]<=mLatticeCarryingCapacity);
 }
 
 template<unsigned DIM>
@@ -210,14 +210,14 @@ CellPtr MultipleCaBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_ve
         }
         else
         {
-        	neighbour_iter++;
+            neighbour_iter++;
 
-        	if (neighbour_iter == neighbouring_node_indices.end())
-        	{
-        		neighbour_iter = neighbouring_node_indices.begin();
-        	}
+            if (neighbour_iter == neighbouring_node_indices.end())
+            {
+                neighbour_iter = neighbouring_node_indices.begin();
+            }
 
-        	count++;
+            count++;
         }
     }
 
@@ -264,30 +264,30 @@ unsigned MultipleCaBasedCellPopulation<DIM>::RemoveDeadCells()
 template<unsigned DIM>
 void MultipleCaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
 {
-	/*
-	 * Iterate over cells \todo make this sweep random
-	 */
-	for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
-	         cell_iter != this->mCells.end();
-	         ++cell_iter)
-	{
+    /*
+     * Iterate over cells \todo make this sweep random
+     */
+    for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
+             cell_iter != this->mCells.end();
+             ++cell_iter)
+    {
 
-		/*
-		 * Loop over neighbours and calculate probability of moving (make sure all probabilities are <1)
-		 */
-		unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
+        /*
+         * Loop over neighbours and calculate probability of moving (make sure all probabilities are <1)
+         */
+        unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
 
-		// Find a random available neighbouring node to overwrite current site
-		std::set<unsigned> neighbouring_node_indices = static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetMooreNeighbouringNodeIndices(node_index);
-		std::vector<double> neighbouring_node_propensities;
-		std::vector<double> neighbouring_node_indices_vector;
+        // Find a random available neighbouring node to overwrite current site
+        std::set<unsigned> neighbouring_node_indices = static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetMooreNeighbouringNodeIndices(node_index);
+        std::vector<double> neighbouring_node_propensities;
+        std::vector<double> neighbouring_node_indices_vector;
 
-		if (!neighbouring_node_indices.empty())
-		{
-	        //neighbouring_node_indices_list.sort();
-		    unsigned num_neighbours = neighbouring_node_indices.size();
-		    double probability_of_not_moving = 1.0;
-			double probability_of_moving = 0.0;
+        if (!neighbouring_node_indices.empty())
+        {
+            //neighbouring_node_indices_list.sort();
+            unsigned num_neighbours = neighbouring_node_indices.size();
+            double probability_of_not_moving = 1.0;
+            double probability_of_moving = 0.0;
 
             for (std::set<unsigned>::iterator iter = neighbouring_node_indices.begin();
                  iter != neighbouring_node_indices.end();
@@ -296,14 +296,14 @@ void MultipleCaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                 neighbouring_node_indices_vector.push_back(*iter);
 
                 if (IsSiteAvailable(*iter))
-            	{
+                {
                     // Iterating over the update rule
                     for (typename std::vector<boost::shared_ptr<AbstractMultipleCaUpdateRule<DIM> > >::iterator iterRule = mUpdateRuleCollection.begin();
                          iterRule != mUpdateRuleCollection.end();
                          ++iterRule)
                     {
                         probability_of_moving = (*iterRule)->EvaluateProbability(node_index, *iter, *this, dt, 1);
-                    	if (probability_of_moving < 0)
+                        if (probability_of_moving < 0)
                         {
                             EXCEPTION("The probability of cellular movement is smaller than zero. In order to prevent it from happening you should change your time step and parameters");
                         }
@@ -316,25 +316,25 @@ void MultipleCaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
 
                     probability_of_not_moving -= probability_of_moving;
                     neighbouring_node_propensities.push_back(probability_of_moving);
-            	}
-            	else
-            	{
-            		neighbouring_node_propensities.push_back(0.0);
-            	}
-			}
+                }
+                else
+                {
+                    neighbouring_node_propensities.push_back(0.0);
+                }
+            }
             if (probability_of_not_moving < 0)
             {
                 EXCEPTION("The probability of the cell not moving is smaller than zero. In order to prevent it from happening you should change your time step and parameters");
             }
 
-        	/*
-        	 * Sample random number to specify which move to make
-        	 */
+            /*
+             * Sample random number to specify which move to make
+             */
             RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
             double random_number = p_gen->ranf();
 
             double total_probability = 0.0;
-            for(unsigned counter = 0; counter<num_neighbours; counter++)
+            for (unsigned counter=0; counter<num_neighbours; counter++)
             {
                 total_probability += neighbouring_node_propensities[counter];
                 if (total_probability >= random_number)
@@ -346,15 +346,15 @@ void MultipleCaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                 }
             }
             //If loop completes with total_probability < random_number then stay in the same location
-		}
-		else
-		{
-			// Each node in the mesh must have at least one neighbour
-			NEVER_REACHED;
-		}
+        }
+        else
+        {
+            // Each node in the mesh must have at least one neighbour
+            NEVER_REACHED;
+        }
 
 
-	}
+    }
 }
 
 template<unsigned DIM>
@@ -491,13 +491,13 @@ double MultipleCaBasedCellPopulation<DIM>::GetWidth(const unsigned& rDimension)
 template<unsigned DIM>
 void MultipleCaBasedCellPopulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractMultipleCaUpdateRule<DIM> > pUpdateRule)
 {
-	mUpdateRuleCollection.push_back(pUpdateRule);
+    mUpdateRuleCollection.push_back(pUpdateRule);
 }
 
 template<unsigned DIM>
 void MultipleCaBasedCellPopulation<DIM>::RemoveAllUpdateRules()
 {
-	mUpdateRuleCollection.clear();
+    mUpdateRuleCollection.clear();
 }
 
 template<unsigned DIM>
@@ -552,11 +552,11 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile()
             c_vector<double, DIM> coords = GetLocationOfCellCentre(*iter);
 
             // Move the coordinate slightly so that we can visualise all cells in a lattice site if there is more than one per site
-            if(mLatticeCarryingCapacity>1)
+            if (mLatticeCarryingCapacity > 1)
             {
                 RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
 
-                for( unsigned i=0; i<DIM; i++)
+                for (unsigned i=0; i<DIM; i++)
                 {
                     coords[i] += p_gen->ranf(); // This assumes that all sites are 1 apart
                 }

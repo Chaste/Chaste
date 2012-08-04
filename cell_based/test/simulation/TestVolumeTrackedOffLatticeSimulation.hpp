@@ -122,9 +122,9 @@ public:
         simulator.SetEndTime(simulator.GetDt()/2.0);
 
         // Create a force law
-		MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
-		p_force->SetCutOffLength(1.5);
-		simulator.AddForce(p_force);
+        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        p_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_force);
 
         // Run simulation
         simulator.Solve();

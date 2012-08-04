@@ -61,7 +61,6 @@ PottsMesh<DIM>::PottsMesh(std::vector<Node<DIM>*> nodes,
     {
         Node<DIM>* p_temp_node = nodes[node_index];
         this->mNodes.push_back(p_temp_node);
-
     }
     for (unsigned elem_index=0; elem_index<pottsElements.size(); elem_index++)
     {

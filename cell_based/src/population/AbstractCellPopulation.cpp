@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulation( AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
-									std::vector<CellPtr>& rCells,
+                                    std::vector<CellPtr>& rCells,
                                     const std::vector<unsigned> locationIndices)
     : mrMesh(rMesh),
       mCells(rCells.begin(), rCells.end()),
@@ -71,10 +71,10 @@ AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulation( Abstract
     }
 
     // Set up the map between location indices and cells
-	mLocationCellMap.clear();
-	mCellLocationMap.clear();
+    mLocationCellMap.clear();
+    mCellLocationMap.clear();
 
-	std::list<CellPtr>::iterator it = mCells.begin();
+    std::list<CellPtr>::iterator it = mCells.begin();
     for (unsigned i=0; it != mCells.end(); ++it, ++i)
     {
         unsigned index = locationIndices.empty() ? i : locationIndices[i]; // assume that the ordering matches
@@ -109,7 +109,7 @@ AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulation( Abstract
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulation(AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
-			: mrMesh(rMesh)
+            : mrMesh(rMesh)
 {
 }
 
@@ -166,7 +166,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetCellAncestorsToLocationI
 {
     for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter=this->Begin(); cell_iter!=this->End(); ++cell_iter)
     {
-    	MAKE_PTR_ARGS(CellAncestor, p_cell_ancestor, (mCellLocationMap[(*cell_iter).get()]));
+        MAKE_PTR_ARGS(CellAncestor, p_cell_ancestor, (mCellLocationMap[(*cell_iter).get()]));
         cell_iter->SetAncestor(p_cell_ancestor);
     }
 }
@@ -241,7 +241,7 @@ CellPtr AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellUsingLocationInde
     }
     if (cells.size()==0)
     {
-    	EXCEPTION("Location index input argument does not correspond to a Cell");
+        EXCEPTION("Location index input argument does not correspond to a Cell");
     }
     else
     {
@@ -276,14 +276,9 @@ bool AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsCellAttachedToLocationInd
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetCellUsingLocationIndex(unsigned index, CellPtr pCell)
 {
-    // If the location map has already been set we need to clear it.
-    //if(mLocationCellMap[index].size()!=0 || mCellLocationMap.find(pCell.get())!=mCellLocationMap.end())
-    {
-    	// Clear the maps
-    	mLocationCellMap[index].clear();
-
-    	mCellLocationMap.erase(pCell.get());
-    }
+    // Clear the maps
+    mLocationCellMap[index].clear();
+       mCellLocationMap.erase(pCell.get());
 
     // Replace with new cell
     mLocationCellMap[index].insert(pCell);
@@ -382,61 +377,61 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::CreateOutputFiles(const std
 
     if(PetscTools::AmMaster())
     {
-		mpVizNodesFile = output_file_handler.OpenOutputFile("results.viznodes");
-		mpVizBoundaryNodesFile = output_file_handler.OpenOutputFile("results.vizboundarynodes");
-		mpVizCellProliferativeTypesFile = output_file_handler.OpenOutputFile("results.vizcelltypes");
+        mpVizNodesFile = output_file_handler.OpenOutputFile("results.viznodes");
+        mpVizBoundaryNodesFile = output_file_handler.OpenOutputFile("results.vizboundarynodes");
+        mpVizCellProliferativeTypesFile = output_file_handler.OpenOutputFile("results.vizcelltypes");
 
-		if (mOutputCellAncestors)
-		{
-			mpVizCellAncestorsFile = output_file_handler.OpenOutputFile("results.vizancestors");
-		}
-		if (mOutputCellMutationStates)
-		{
-			// An ordering must be specified for cell mutation states
-			SetDefaultMutationStateOrdering();
+        if (mOutputCellAncestors)
+        {
+            mpVizCellAncestorsFile = output_file_handler.OpenOutputFile("results.vizancestors");
+        }
+        if (mOutputCellMutationStates)
+        {
+            // An ordering must be specified for cell mutation states
+            SetDefaultMutationStateOrdering();
 
-			mpCellMutationStatesFile = output_file_handler.OpenOutputFile("cellmutationstates.dat");
+            mpCellMutationStatesFile = output_file_handler.OpenOutputFile("cellmutationstates.dat");
 
-			*mpCellMutationStatesFile << "Time\t ";
+            *mpCellMutationStatesFile << "Time\t ";
 
-			const std::vector<boost::shared_ptr<AbstractCellProperty> >& r_cell_properties =
-				mpCellPropertyRegistry->rGetAllCellProperties();
+            const std::vector<boost::shared_ptr<AbstractCellProperty> >& r_cell_properties =
+                mpCellPropertyRegistry->rGetAllCellProperties();
 
-			std::vector<unsigned> cell_mutation_state_count;
-			for (unsigned i=0; i<r_cell_properties.size(); i++)
-			{
-				if (r_cell_properties[i]->IsSubType<AbstractCellMutationState>())
-				{
-					*mpCellMutationStatesFile << r_cell_properties[i]->GetIdentifier() << "\t ";
-				}
-			}
-			*mpCellMutationStatesFile << "\n";
-		}
-		if (mOutputCellProliferativeTypes)
-		{
-			mpCellProliferativeTypesFile = output_file_handler.OpenOutputFile("celltypes.dat");
-		}
-		if (mOutputCellVariables)
-		{
-			mpCellVariablesFile = output_file_handler.OpenOutputFile("cellvariables.dat");
-		}
-		if (mOutputCellCyclePhases)
-		{
-			mpCellCyclePhasesFile = output_file_handler.OpenOutputFile("cellcyclephases.dat");
-			mpVizCellProliferativePhasesFile = output_file_handler.OpenOutputFile("results.vizcellphases");
-		}
-		if (mOutputCellAges)
-		{
-			mpCellAgesFile = output_file_handler.OpenOutputFile("cellages.dat");
-		}
-		if (mOutputCellIdData)
-		{
-			mpCellIdFile = output_file_handler.OpenOutputFile("loggedcell.dat");
-		}
-		if (this->mOutputCellVolumes)
-		{
-			mpCellVolumesFile = output_file_handler.OpenOutputFile("cellareas.dat");
-		}
+            std::vector<unsigned> cell_mutation_state_count;
+            for (unsigned i=0; i<r_cell_properties.size(); i++)
+            {
+                if (r_cell_properties[i]->IsSubType<AbstractCellMutationState>())
+                {
+                    *mpCellMutationStatesFile << r_cell_properties[i]->GetIdentifier() << "\t ";
+                }
+            }
+            *mpCellMutationStatesFile << "\n";
+        }
+        if (mOutputCellProliferativeTypes)
+        {
+            mpCellProliferativeTypesFile = output_file_handler.OpenOutputFile("celltypes.dat");
+        }
+        if (mOutputCellVariables)
+        {
+            mpCellVariablesFile = output_file_handler.OpenOutputFile("cellvariables.dat");
+        }
+        if (mOutputCellCyclePhases)
+        {
+            mpCellCyclePhasesFile = output_file_handler.OpenOutputFile("cellcyclephases.dat");
+            mpVizCellProliferativePhasesFile = output_file_handler.OpenOutputFile("results.vizcellphases");
+        }
+        if (mOutputCellAges)
+        {
+            mpCellAgesFile = output_file_handler.OpenOutputFile("cellages.dat");
+        }
+        if (mOutputCellIdData)
+        {
+            mpCellIdFile = output_file_handler.OpenOutputFile("loggedcell.dat");
+        }
+        if (this->mOutputCellVolumes)
+        {
+            mpCellVolumesFile = output_file_handler.OpenOutputFile("cellareas.dat");
+        }
     }
 
     mDirPath = rDirectory;
@@ -451,48 +446,48 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::CreateOutputFiles(const std
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::CloseOutputFiles()
 {
-	// In parallel all files are closed after writing
-	if(PetscTools::IsSequential())
-	{
-		mpVizNodesFile->close();
-		mpVizBoundaryNodesFile->close();
-		mpVizCellProliferativeTypesFile->close();
+    // In parallel all files are closed after writing
+    if(PetscTools::IsSequential())
+    {
+        mpVizNodesFile->close();
+        mpVizBoundaryNodesFile->close();
+        mpVizCellProliferativeTypesFile->close();
 
 
-		if (mOutputCellMutationStates)
-		{
-			mpCellMutationStatesFile->close();
-		}
-		if (mOutputCellProliferativeTypes)
-		{
-			mpCellProliferativeTypesFile->close();
-		}
-		if (mOutputCellVariables)
-		{
-			mpCellVariablesFile->close();
-		}
-		if (mOutputCellCyclePhases)
-		{
-			mpCellCyclePhasesFile->close();
-			mpVizCellProliferativePhasesFile->close();
-		}
-		if (mOutputCellAncestors)
-		{
-			mpVizCellAncestorsFile->close();
-		}
-		if (mOutputCellAges)
-		{
-			mpCellAgesFile->close();
-		}
-		if (mOutputCellIdData)
-		{
-			mpCellIdFile->close();
-		}
-		if (this->mOutputCellVolumes)
-		{
-			mpCellVolumesFile->close();
-		}
-	}
+        if (mOutputCellMutationStates)
+        {
+            mpCellMutationStatesFile->close();
+        }
+        if (mOutputCellProliferativeTypes)
+        {
+            mpCellProliferativeTypesFile->close();
+        }
+        if (mOutputCellVariables)
+        {
+            mpCellVariablesFile->close();
+        }
+        if (mOutputCellCyclePhases)
+        {
+            mpCellCyclePhasesFile->close();
+            mpVizCellProliferativePhasesFile->close();
+        }
+        if (mOutputCellAncestors)
+        {
+            mpVizCellAncestorsFile->close();
+        }
+        if (mOutputCellAges)
+        {
+            mpCellAgesFile->close();
+        }
+        if (mOutputCellIdData)
+        {
+            mpCellIdFile->close();
+        }
+        if (this->mOutputCellVolumes)
+        {
+            mpCellVolumesFile->close();
+        }
+    }
 #ifdef CHASTE_VTK
     *mpVtkMetaFile << "    </Collection>\n";
     *mpVtkMetaFile << "</VTKFile>\n";
@@ -505,7 +500,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResults(CellPtr
                                               std::vector<unsigned>& rCellProliferativeTypeCounter,
                                               std::vector<unsigned>& rCellCyclePhaseCounter)
 {
-	unsigned location_index = this->GetLocationIndexUsingCell(pCell);
+    unsigned location_index = this->GetLocationIndexUsingCell(pCell);
 
     unsigned colour = STEM_COLOUR;
 
@@ -700,42 +695,42 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteTimeAndNodeResultsToFi
 
     PetscTools::BeginRoundRobin();
     {
-		if(!PetscTools::AmMaster() || SimulationTime::Instance()->IsEndTimeAndNumberOfTimeStepsSetUp())
-		{
-			mpVizNodesFile = output_file_handler.OpenOutputFile("results.viznodes", std::ios::app);
-			mpVizBoundaryNodesFile = output_file_handler.OpenOutputFile("results.vizboundarynodes", std::ios::app);
-		}
-		if(PetscTools::AmMaster())
-		{
-			double time = SimulationTime::Instance()->GetTime();
+        if(!PetscTools::AmMaster() || SimulationTime::Instance()->IsEndTimeAndNumberOfTimeStepsSetUp())
+        {
+            mpVizNodesFile = output_file_handler.OpenOutputFile("results.viznodes", std::ios::app);
+            mpVizBoundaryNodesFile = output_file_handler.OpenOutputFile("results.vizboundarynodes", std::ios::app);
+        }
+        if(PetscTools::AmMaster())
+        {
+            double time = SimulationTime::Instance()->GetTime();
 
-			*mpVizNodesFile << time << "\t";
-			*mpVizBoundaryNodesFile << time << "\t";
-		}
-		// Write node data to file
-		for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = mrMesh.GetNodeIteratorBegin();
-				node_iter != mrMesh.GetNodeIteratorEnd();
-				++node_iter)
-		{
-			if (!node_iter->IsDeleted())
-			{
-				const c_vector<double,SPACE_DIM>& position = node_iter->rGetLocation();
+            *mpVizNodesFile << time << "\t";
+            *mpVizBoundaryNodesFile << time << "\t";
+        }
+        // Write node data to file
+        for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = mrMesh.GetNodeIteratorBegin();
+                node_iter != mrMesh.GetNodeIteratorEnd();
+                ++node_iter)
+        {
+            if (!node_iter->IsDeleted())
+            {
+                const c_vector<double,SPACE_DIM>& position = node_iter->rGetLocation();
 
-				for (unsigned i=0; i<SPACE_DIM; i++)
-				{
-					*mpVizNodesFile << position[i] << " ";
-				}
-				*mpVizBoundaryNodesFile << node_iter->IsBoundaryNode() << " ";
-			}
-		}
-		if(PetscTools::AmTopMost())
-		{
-			*mpVizNodesFile << "\n";
-			*mpVizBoundaryNodesFile << "\n";
-		}
+                for (unsigned i=0; i<SPACE_DIM; i++)
+                {
+                    *mpVizNodesFile << position[i] << " ";
+                }
+                *mpVizBoundaryNodesFile << node_iter->IsBoundaryNode() << " ";
+            }
+        }
+        if(PetscTools::AmTopMost())
+        {
+            *mpVizNodesFile << "\n";
+            *mpVizBoundaryNodesFile << "\n";
+        }
 
-		mpVizNodesFile->close();
-		mpVizBoundaryNodesFile->close();
+        mpVizNodesFile->close();
+        mpVizBoundaryNodesFile->close();
     }
 }
 

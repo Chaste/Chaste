@@ -40,12 +40,14 @@ void CellData::SetItem(const std::string& variableName, double data)
     mCellData[variableName] = data;
 }
 
-
 double CellData::GetItem(const std::string& variableName) const
 {
-    //Note that mCellData[variableName] is not const.
-    //If variableName is not a key, then mCellData[variableName] will create a new item in the map
-    //and increase the size by one.  Using a const_iterator ensures that the map remains const.
+    /*
+     * Note that mCellData[variableName] is not const. If variableName is not
+     * a key, then mCellData[variableName] will create a new item in the map
+     * and increase the size by one.  Using a const_iterator ensures that the
+     * map remains const.
+     */
     std::map<std::string, double>::const_iterator it = mCellData.find(variableName);
     if (it == mCellData.end())
     {
@@ -66,7 +68,7 @@ unsigned CellData::GetNumItems() const
 std::vector<std::string> CellData::GetKeys() const
 {
     std::vector<std::string> keys;
-    //Note: Does the order of the keys matter?  If so, then sort the vector + Doxygen
+    ///\todo Note: Does the order of the keys matter?  If so, then sort the vector + Doxygen
     for (std::map<std::string, double>::const_iterator it = mCellData.begin(); it != mCellData.end(); ++it)
     {
         keys.push_back(it->first);
@@ -75,7 +77,6 @@ std::vector<std::string> CellData::GetKeys() const
     // We assume that the iterator is returning sorted keys sort(keys.begin(), keys.end());
     return keys;
 }
-
 
 #include "SerializationExportWrapperForCpp.hpp"
 // Declare identifier for the serializer

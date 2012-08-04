@@ -221,7 +221,7 @@ public:
         // Create a two Potts elements containing 100 nodes each.
         unsigned num_elements = 6;
         std::vector<std::vector<Node<2>* > > element_nodes;
-        for(unsigned elem_index=0; elem_index < num_elements; elem_index++)
+        for (unsigned elem_index=0; elem_index<num_elements; elem_index++)
         {
             std::vector<Node<2>* > nodes;
             for (unsigned i=0;i<10; i++)
@@ -236,7 +236,7 @@ public:
 
         std::vector<PottsElement<2>* > elements;
         std::vector<Node<2>* > all_nodes;
-        for(unsigned i=0; i<num_elements; i++)
+        for (unsigned i=0; i<num_elements; i++)
         {
             elements.push_back(new PottsElement<2>(i, element_nodes[i]));
             all_nodes.insert(all_nodes.end(), element_nodes[i].begin(), element_nodes[i].end());
@@ -255,7 +255,8 @@ public:
                 new_nodes.push_back(new Node<2>(100*6 + 10*i +j, 1.01*6 + j/9.0, i/9.0));
             }
         }
-        // Create a new potts element.
+
+        // Create a new potts element
         PottsElement<2>* new_element = new PottsElement<2>(6, new_nodes);
 
         mesh.AddElement(new_element, new_nodes);
@@ -264,7 +265,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 7u);
 
         // Make sure the new nodes are associated with the correct element
-        for(unsigned node_index=600; node_index<700; node_index++)
+        for (unsigned node_index=600; node_index<700; node_index++)
         {
             TS_ASSERT_EQUALS(mesh.GetNode(node_index)->rGetContainingElementIndices().size(), 1u);
             TS_ASSERT_EQUALS((*mesh.GetNode(node_index)->rGetContainingElementIndices().begin()), 6u);
@@ -283,60 +284,60 @@ public:
     void TestDeleteElementAndRemesh() throw (Exception)
     {
         // Create a two Potts elements containing 100 nodes each.
-       unsigned num_elements = 6;
-       std::vector<std::vector<Node<2>* > > element_nodes;
-       for(unsigned elem_index=0; elem_index < num_elements; elem_index++)
-       {
-           std::vector<Node<2>* > nodes;
-           for (unsigned i=0;i<10; i++)
-           {
-               for (unsigned j=0; j<10; j++)
-               {
-                   nodes.push_back(new Node<2>(100*elem_index + 10*i +j, 1.01*elem_index + j/9.0, i/9.0));
-               }
-           }
-           element_nodes.push_back(nodes);
-       }
+        unsigned num_elements = 6;
+        std::vector<std::vector<Node<2>* > > element_nodes;
+        for (unsigned elem_index=0; elem_index<num_elements; elem_index++)
+        {
+            std::vector<Node<2>* > nodes;
+            for (unsigned i=0; i<10; i++)
+            {
+                for (unsigned j=0; j<10; j++)
+                {
+                    nodes.push_back(new Node<2>(100*elem_index + 10*i +j, 1.01*elem_index + j/9.0, i/9.0));
+                }
+            }
+            element_nodes.push_back(nodes);
+        }
 
-       std::vector<PottsElement<2>* > elements;
-       std::vector<Node<2>* > all_nodes;
-       for(unsigned i=0; i<num_elements; i++)
-       {
-           elements.push_back(new PottsElement<2>(i, element_nodes[i]));
-           all_nodes.insert(all_nodes.end(), element_nodes[i].begin(), element_nodes[i].end());
-       }
+        std::vector<PottsElement<2>* > elements;
+        std::vector<Node<2>* > all_nodes;
+        for (unsigned i=0; i<num_elements; i++)
+        {
+            elements.push_back(new PottsElement<2>(i, element_nodes[i]));
+            all_nodes.insert(all_nodes.end(), element_nodes[i].begin(), element_nodes[i].end());
+        }
 
-       SemMesh<2> mesh(all_nodes, elements);
+        SemMesh<2> mesh(all_nodes, elements);
 
-       // Delete Element from the end.
-       mesh.DeleteElement(2);
+        // Delete element from the end
+        mesh.DeleteElement(2);
 
-       TS_ASSERT_EQUALS(mesh.GetNumElements(), 5u);
-       TS_ASSERT_EQUALS(mesh.GetNumNodes(), 500u);
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), 5u);
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 500u);
 
-       TS_ASSERT_EQUALS(mesh.GetNumAllElements(), 6u);
-       TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), 600u);
+        TS_ASSERT_EQUALS(mesh.GetNumAllElements(), 6u);
+        TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), 600u);
 
-       mesh.ReMesh();
+        mesh.ReMesh();
 
-       TS_ASSERT_EQUALS(mesh.GetNumAllElements(), 5u);
-       TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), 500u);
+        TS_ASSERT_EQUALS(mesh.GetNumAllElements(), 5u);
+        TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), 500u);
 
-       /**
-        *   New configuration should look like
-        *
-        *   Old: 0  1   2   3   4   5
-        *   New: 0  1   *   2   3   4
-        */
+        /**
+         *   New configuration should look like
+         *
+         *   Old: 0  1   2   3   4   5
+         *   New: 0  1   *   2   3   4
+         */
 
-       // Check the elements have been re-shuffled correctly.
-       PottsElement<2>* p_element = mesh.GetElement(2);
+        // Check the elements have been re-shuffled correctly.
+        PottsElement<2>* p_element = mesh.GetElement(2);
 
-       for(unsigned i=0; i<p_element->GetNumNodes(); i++)
-       {
-           TS_ASSERT(p_element->GetNode(i)->GetIndex() > 299);
-           TS_ASSERT(p_element->GetNode(i)->GetIndex() < 400);
-       }
+        for (unsigned i=0; i<p_element->GetNumNodes(); i++)
+        {
+            TS_ASSERT(p_element->GetNode(i)->GetIndex() > 299);
+            TS_ASSERT(p_element->GetNode(i)->GetIndex() < 400);
+        }
     }
 
     void TestArchive2dSemMesh() throw (Exception)

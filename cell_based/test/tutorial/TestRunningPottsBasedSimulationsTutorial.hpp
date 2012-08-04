@@ -144,7 +144,6 @@ public:
          */
         cell_population.SetNumSweepsPerTimestep(1);
 
-
         /* We then pass in the cell population into an {{{OnLatticeSimulation}}},
          * and set the output directory and end time.*/
         OnLatticeSimulation<2> simulator(cell_population);
@@ -367,7 +366,6 @@ public:
 
         /* To run the simulation, we call {{{Solve()}}}. */
         simulator.Solve();
-
     }
     /*
      * EMPTYLINE

@@ -222,7 +222,6 @@ public:
         }
     }
 
-
     void TestPottsMeshGenerator3dFromBottomLeft() throw(Exception)
     {
         PottsMeshGenerator<3> generator(4, 2, 2, 4, 2, 2, 6, 2, 2, true); // last bool makes elements start in bottom left

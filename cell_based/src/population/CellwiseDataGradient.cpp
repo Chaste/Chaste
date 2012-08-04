@@ -74,7 +74,7 @@ void CellwiseDataGradient<DIM>::SetupGradients(AbstractCellPopulation<DIM>& rCel
         LinearBasisFunction<DIM>::ComputeTransformedBasisFunctionDerivatives(zero_point, inverse_jacobian, grad_phi);
 
         bool is_ghost_element = false;
-                
+
         for (unsigned node_index=0; node_index<DIM+1; node_index++)
         {
             unsigned node_global_index = r_elem.GetNodeGlobalIndex(node_index);
@@ -91,7 +91,7 @@ void CellwiseDataGradient<DIM>::SetupGradients(AbstractCellPopulation<DIM>& rCel
             // If no ghost element, get PDE solution
             CellPtr p_cell = pCellPopulation->GetCellUsingLocationIndex(node_global_index);
             double pde_solution = p_cell->GetCellData()->GetItem(rItemName);
- 
+
             // Interpolate gradient
             for (unsigned i=0; i<DIM; i++)
             {

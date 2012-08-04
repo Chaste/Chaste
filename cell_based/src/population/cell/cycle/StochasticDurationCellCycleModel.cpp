@@ -94,12 +94,9 @@ void StochasticDurationCellCycleModel::SetG1Duration()
     }
 }
 
-
 void StochasticDurationCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
-    // No new parameters to output
-
-    // Call method on direct parent class
+    // No new parameters to output, so just call method on direct parent class
     AbstractSimpleCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 

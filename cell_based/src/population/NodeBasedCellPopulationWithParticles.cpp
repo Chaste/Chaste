@@ -43,34 +43,34 @@ NodeBasedCellPopulationWithParticles<DIM>::NodeBasedCellPopulationWithParticles(
                                       bool deleteMesh)
     : NodeBasedCellPopulation<DIM>(rMesh, rCells, locationIndices, deleteMesh, false)
 {
-	if (!locationIndices.empty())
-		{
-			// Create a set of node indices corresponding to particles
-			std::set<unsigned> node_indices;
-			std::set<unsigned> location_indices;
-			std::set<unsigned> particle_indices;
+    if (!locationIndices.empty())
+        {
+            // Create a set of node indices corresponding to particles
+            std::set<unsigned> node_indices;
+            std::set<unsigned> location_indices;
+            std::set<unsigned> particle_indices;
 
-			for (unsigned i=0; i<this->GetNumNodes(); i++)
-			{
-				node_indices.insert(this->GetNode(i)->GetIndex());
-			}
-			for (unsigned i=0; i<locationIndices.size(); i++)
-			{
-				location_indices.insert(locationIndices[i]);
-			}
+            for (unsigned i=0; i<this->GetNumNodes(); i++)
+            {
+                node_indices.insert(this->GetNode(i)->GetIndex());
+            }
+            for (unsigned i=0; i<locationIndices.size(); i++)
+            {
+                location_indices.insert(locationIndices[i]);
+            }
 
-			std::set_difference(node_indices.begin(), node_indices.end(),
-								location_indices.begin(), location_indices.end(),
-								std::inserter(particle_indices, particle_indices.begin()));
+            std::set_difference(node_indices.begin(), node_indices.end(),
+                                location_indices.begin(), location_indices.end(),
+                                std::inserter(particle_indices, particle_indices.begin()));
 
-			// This method finishes and then calls Validate()
-			SetParticles(particle_indices);
-		}
-		else
-		{
-			this->mIsParticle = std::vector<bool>(this->GetNumNodes(), false);
-			NodeBasedCellPopulationWithParticles::Validate();
-		}
+            // This method finishes and then calls Validate()
+            SetParticles(particle_indices);
+        }
+        else
+        {
+            this->mIsParticle = std::vector<bool>(this->GetNumNodes(), false);
+            NodeBasedCellPopulationWithParticles::Validate();
+        }
 }
 
 template<unsigned DIM>
@@ -123,7 +123,7 @@ void NodeBasedCellPopulationWithParticles<DIM>::SetParticles(const std::set<unsi
 
 template<unsigned DIM>
 void NodeBasedCellPopulationWithParticles<DIM>::UpdateParticlePositions(const std::vector< c_vector<double, DIM> >& rNodeForces,
-																		double dt)
+                                                                        double dt)
 {
     // Initialise vector of forces on particles
     std::vector<c_vector<double, DIM> > drdt(this->GetNumNodes());
@@ -278,61 +278,61 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile()
 
         if (!this->IsParticle(node_index))
         {
-        	CellPtr cell_iter = this->GetCellUsingLocationIndex(node_index);
-        	if (this->mOutputCellAncestors)
-			{
-				double ancestor_index = (cell_iter->GetAncestor() == UNSIGNED_UNSET) ? (-1.0) : (double)cell_iter->GetAncestor();
-				cell_ancestors[node_index] = ancestor_index;
-			}
-			if (this->mOutputCellProliferativeTypes)
-			{
-				double cell_type = cell_iter->GetCellProliferativeType();
-				cell_types[node_index] = cell_type;
-			}
-			if (this->mOutputCellMutationStates)
-			{
-				double mutation_state = cell_iter->GetMutationState()->GetColour();
-				cell_mutation_states[node_index] = mutation_state;
-			}
-			if (this->mOutputCellAges)
-			{
-				double age = cell_iter->GetAge();
-				cell_ages[node_index] = age;
-			}
-			if (this->mOutputCellCyclePhases)
-			{
-				double cycle_phase = cell_iter->GetCellCycleModel()->GetCurrentCellCyclePhase();
-				cell_cycle_phases[node_index] = cycle_phase;
-			}
-			if (this->mOutputCellVolumes)
-			{
-				double cell_radius = static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).GetCellRadius(node_index);
-				cell_radii[node_index] = cell_radius;
-			}
+            CellPtr cell_iter = this->GetCellUsingLocationIndex(node_index);
+            if (this->mOutputCellAncestors)
+            {
+                double ancestor_index = (cell_iter->GetAncestor() == UNSIGNED_UNSET) ? (-1.0) : (double)cell_iter->GetAncestor();
+                cell_ancestors[node_index] = ancestor_index;
+            }
+            if (this->mOutputCellProliferativeTypes)
+            {
+                double cell_type = cell_iter->GetCellProliferativeType();
+                cell_types[node_index] = cell_type;
+            }
+            if (this->mOutputCellMutationStates)
+            {
+                double mutation_state = cell_iter->GetMutationState()->GetColour();
+                cell_mutation_states[node_index] = mutation_state;
+            }
+            if (this->mOutputCellAges)
+            {
+                double age = cell_iter->GetAge();
+                cell_ages[node_index] = age;
+            }
+            if (this->mOutputCellCyclePhases)
+            {
+                double cycle_phase = cell_iter->GetCellCycleModel()->GetCurrentCellCyclePhase();
+                cell_cycle_phases[node_index] = cycle_phase;
+            }
+            if (this->mOutputCellVolumes)
+            {
+                double cell_radius = static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).GetCellRadius(node_index);
+                cell_radii[node_index] = cell_radius;
+            }
         }
         else
         {
-        	particles[node_index] = (double)(this->IsParticle(node_index));
-			if (this->mOutputCellAncestors)
-			{
-				cell_ancestors[node_index] = -2.0;
-			}
-			if (this->mOutputCellProliferativeTypes)
-			{
-				cell_types[node_index] = -2.0;
-			}
-			if (this->mOutputCellMutationStates)
-			{
-				cell_mutation_states[node_index] = -2.0;
-			}
-			if (this->mOutputCellAges)
-			{
-				cell_ages[node_index] = -2.0;
-			}
-			if (this->mOutputCellCyclePhases)
-			{
-				cell_cycle_phases[node_index] = -2.0;
-			}
+            particles[node_index] = (double)(this->IsParticle(node_index));
+            if (this->mOutputCellAncestors)
+            {
+                cell_ancestors[node_index] = -2.0;
+            }
+            if (this->mOutputCellProliferativeTypes)
+            {
+                cell_types[node_index] = -2.0;
+            }
+            if (this->mOutputCellMutationStates)
+            {
+                cell_mutation_states[node_index] = -2.0;
+            }
+            if (this->mOutputCellAges)
+            {
+                cell_ages[node_index] = -2.0;
+            }
+            if (this->mOutputCellCyclePhases)
+            {
+                cell_cycle_phases[node_index] = -2.0;
+            }
         }
        }
 

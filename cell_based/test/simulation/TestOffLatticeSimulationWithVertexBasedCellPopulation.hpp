@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StochasticDurationGenerationBasedCellCycleModel.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "NagaiHondaForce.hpp"
+#include "NagaiHondaDifferentialAdhesionForce.hpp"
 #include "WelikyOsterForce.hpp"
 #include "AbstractCellKiller.hpp"
 #include "TargetedCellKiller.hpp"
@@ -418,7 +419,7 @@ public:
      */
     void TestVertexMonolayerWithTwoMutationTypes() throw (Exception)
     {
-        // Create a simple 2D MutableVertexMesh with only four cells
+        // Create a simple 2D MutableVertexMesh with four cells
         HoneycombVertexMeshGenerator generator(2, 2);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
@@ -432,7 +433,7 @@ public:
             cells[i]->SetBirthTime(-2.0);
         }
 
-        MAKE_PTR(CellLabel, p_label);
+        boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
         cells[0]->AddCellProperty(p_label);
         cells[2]->AddCellProperty(p_label);
 
@@ -454,7 +455,66 @@ public:
 
         ///\todo test against a saved simulation or something similar, i.e check the positions of some vertices.
         TS_ASSERT_EQUALS(p_mesh->GetNode(13)->IsBoundaryNode(), true);
-        TS_ASSERT_EQUALS(p_mesh->GetNumElements(),4u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 4u);
+        TS_ASSERT_EQUALS(cells[0]->HasCellProperty<CellLabel>(), true);
+
+        // Test Warnings
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted so the motion has been restricted. Use a smaller timestep to avoid these warnings.");
+        Warnings::QuietDestroy();
+    }
+
+    /*
+     * This illustrates how the force class NagaiHondaDifferentialAdhesionForce
+     * may be configured and used in a vertex-based simulation. See also the
+     * tutorial TestRunningDifferentialAdhesionSimulationsTutorial.hpp.
+     */
+    void TestVertexMonolayerWithDifferentialAdhesion() throw (Exception)
+    {
+        // Create a simple 2D MutableVertexMesh with four cells
+        HoneycombVertexMeshGenerator generator(2, 2);
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        p_mesh->SetCellRearrangementThreshold(0.1);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), DIFFERENTIATED);
+
+        for (unsigned i=0; i<cells.size(); i++)
+        {
+            cells[i]->SetBirthTime(-2.0);
+        }
+
+        boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
+        cells[0]->AddCellProperty(p_label);
+        cells[2]->AddCellProperty(p_label);
+
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.SetOutputCellMutationStates(true);
+
+        // Set up cell-based simulation
+        OffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestVertexMonolayerWithDifferentialAdhesion");
+        simulator.SetEndTime(1.0);
+
+        // Set up force law and pass it to the simulation
+        MAKE_PTR(NagaiHondaDifferentialAdhesionForce<2>, p_force);
+        p_force->SetNagaiHondaDeformationEnergyParameter(55.0);
+        p_force->SetNagaiHondaMembraneSurfaceEnergyParameter(0.0);
+        p_force->SetNagaiHondaCellCellAdhesionEnergyParameter(1.0);
+        p_force->SetNagaiHondaLabelledCellCellAdhesionEnergyParameter(6.0);
+        p_force->SetNagaiHondaLabelledCellLabelledCellAdhesionEnergyParameter(3.0);
+        p_force->SetNagaiHondaCellBoundaryAdhesionEnergyParameter(12.0);
+        p_force->SetNagaiHondaLabelledCellBoundaryAdhesionEnergyParameter(40.0);
+        simulator.AddForce(p_force);
+
+        // Run simulation
+        simulator.Solve();
+
+        ///\todo test against a saved simulation or something similar, i.e check the positions of some vertices.
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 4u);
         TS_ASSERT_EQUALS(cells[0]->HasCellProperty<CellLabel>(), true);
 
         // Test Warnings

@@ -280,7 +280,7 @@ void CryptSimulation2d::SetBottomCellAncestors()
     {
         if (mrCellPopulation.GetLocationOfCellCentre(*cell_iter)[1] < threshold_height)
         {
-        	MAKE_PTR_ARGS(CellAncestor, p_cell_ancestor, (index++));
+            MAKE_PTR_ARGS(CellAncestor, p_cell_ancestor, (index++));
             cell_iter->SetAncestor(p_cell_ancestor);
         }
     }

@@ -178,7 +178,6 @@ public:
         TS_ASSERT_EQUALS(cell_population.rGetGhostNodes().size(), p_mesh->GetNumNodes());
     }
 
-
     void TestCellPopulationIteratorWithNoCells()
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();

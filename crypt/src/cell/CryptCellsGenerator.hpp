@@ -71,7 +71,6 @@ bool ClassesAreSame()
     return  (selector_t()==1);
 }
 
-
 /**
  * A subclass of CellsGenerator that generates cells for crypt simulations.
  *

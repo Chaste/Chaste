@@ -60,17 +60,17 @@ double AdhesionPottsUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned cu
     bool target_node_contained = !new_location_containing_elements.empty();
 
 
-    // Every node must each be in at most one element.
+    // Every node must each be in at most one element
     assert(new_location_containing_elements.size() < 2);
 
-    if(!current_node_contained && !target_node_contained)
+    if (!current_node_contained && !target_node_contained)
     {
         EXCEPTION("At least one of the current node or target node must be in an element.");
     }
 
     if (current_node_contained && target_node_contained)
     {
-        if(*(new_location_containing_elements.begin()) == *(containing_elements.begin()))
+        if (*(new_location_containing_elements.begin()) == *(containing_elements.begin()))
         {
             EXCEPTION("The current node and target node must not be in the same element.");
         }

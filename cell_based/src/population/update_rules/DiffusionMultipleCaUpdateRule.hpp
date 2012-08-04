@@ -76,7 +76,7 @@ private:
     /**
      * The timestep (units?) for this probability
      * \todo #2066
-     */ 
+     */
     double mDt;
 
     friend class boost::serialization::access;

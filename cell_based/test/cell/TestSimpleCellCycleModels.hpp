@@ -231,7 +231,6 @@ public:
         }
     }
 
-
     void TestStochasticDurationCellCycleModel() throw(Exception)
     {
         TS_ASSERT_THROWS_NOTHING(StochasticDurationCellCycleModel cell_model3);
@@ -290,7 +289,6 @@ public:
         }
     }
 
-
     void TestSimpleOxygenBasedCellCycleModel() throw(Exception)
     {
         // Check that mCurrentHypoxiaOnsetTime and mCurrentHypoxicDuration are updated correctly
@@ -310,7 +308,7 @@ public:
 
         // Set up oxygen_concentration
         double lo_oxygen_concentration=0.0;
-        double hi_oxygen_concentration=1.0;      
+        double hi_oxygen_concentration=1.0;
         p_cell->GetCellData()->SetItem("oxygen", lo_oxygen_concentration);
 
         p_model->ReadyToDivide();
@@ -423,7 +421,6 @@ public:
         // Test that the cell is updated to be apoptotic
         TS_ASSERT_EQUALS(p_apoptotic_cell->HasCellProperty<ApoptoticCellProperty>(), true);
         TS_ASSERT_EQUALS(p_cell_model->GetCurrentHypoxicDuration(), 2.04);
-
     }
 
     void TestContactInhibitionCellCycleModel() throw(Exception)
@@ -496,7 +493,7 @@ public:
         p_hepa_one_cell->SetCellProliferativeType(STEM);
 
         // Set up cell volume
-        p_hepa_one_cell->GetCellData()->SetItem("volume", hi_volume);       
+        p_hepa_one_cell->GetCellData()->SetItem("volume", hi_volume);
         p_hepa_one_cell->InitialiseCellCycleModel();
 
         ContactInhibitionCellCycleModel* p_diff_model = new ContactInhibitionCellCycleModel;

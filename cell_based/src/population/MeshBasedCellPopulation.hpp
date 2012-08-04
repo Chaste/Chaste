@@ -367,7 +367,7 @@ public:
 
     /**
      * Overridden GetVolumeOfCell() method.
-     * 
+     *
      * @param pCell boost shared pointer to a cell
      */
     double GetVolumeOfCell(CellPtr pCell);
@@ -391,7 +391,7 @@ public:
      * e.g. if a node is a ghost node or corresponds to a Voronoi face.
      *
      * \todo This method is somewhat redundant following the introduction of the method GetVolumeOfCell() (see #1985).
-     * 
+     *
      * @param index a node global index
      */
     double GetVolumeOfVoronoiElement(unsigned index);

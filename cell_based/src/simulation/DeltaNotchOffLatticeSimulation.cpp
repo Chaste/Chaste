@@ -55,14 +55,14 @@ DeltaNotchOffLatticeSimulation<DIM>::~DeltaNotchOffLatticeSimulation()
 template<unsigned DIM>
 void DeltaNotchOffLatticeSimulation<DIM>::SetupSolve()
 {
-	OffLatticeSimulation<DIM>::SetupSolve();
+    OffLatticeSimulation<DIM>::SetupSolve();
     UpdateCellData();
 }
 
 template<unsigned DIM>
 void DeltaNotchOffLatticeSimulation<DIM>::UpdateAtEndOfTimeStep()
 {
-	OffLatticeSimulation<DIM>::UpdateAtEndOfTimeStep();
+    OffLatticeSimulation<DIM>::UpdateAtEndOfTimeStep();
     UpdateCellData();
 }
 
@@ -94,7 +94,7 @@ void DeltaNotchOffLatticeSimulation<DIM>::UpdateCellData()
         // Get the location index corresponding to this cell
         unsigned index = this->mrCellPopulation.GetLocationIndexUsingCell(*cell_iter);
 
-        // Get the set of neighbouring location indices            
+        // Get the set of neighbouring location indices
         std::set<unsigned> neighbour_indices;
         if (dynamic_cast<AbstractCentreBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
         {
@@ -121,16 +121,9 @@ void DeltaNotchOffLatticeSimulation<DIM>::UpdateCellData()
         }
         else
         {
-            //If simulation trips at this assertion it is because at least one of the cells has no neighbours (as defined by mesh/population/interaction distance)
+            // If simulation trips at this assertion it is because at least one of the cells has no neighbours (as defined by mesh/population/interaction distance)
             NEVER_REACHED;
         }
-//        else
-//        {
-//            double this_delta = cell_iter->GetCellData()->GetItem("delta");
-//
-//            cell_iter->GetCellData()->SetItem("mean delta", mean_delta);
-//        }
-
     }
 }
 

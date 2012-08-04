@@ -446,7 +446,6 @@ public:
         CellBasedEventHandler::Reset(); // otherwise event handler left in bad state after throw
     }
 
-
     void Test2DCylindricalMultipleDivisions() throw (Exception)
     {
         // Create a log of this test
@@ -542,7 +541,7 @@ public:
 
         NumericFileComparison comp_ele(results_dir + "/results.vizelements", "crypt/test/data/Crypt2DCylindricalMultipleDivisions/results.vizelements");
         TS_ASSERT(comp_ele.CompareFiles());
-        
+
         NumericFileComparison comp_nodes(results_dir + "/results.viznodes", "crypt/test/data/Crypt2DCylindricalMultipleDivisions/results.viznodes");
         TS_ASSERT(comp_nodes.CompareFiles(1e-13));
 
@@ -552,11 +551,12 @@ public:
         FileComparison( results_dir + "/results.vizsetup", "crypt/test/data/Crypt2DCylindricalMultipleDivisions/results.vizsetup").CompareFiles();
     }
 
-
-    // This is a rubbish test - all cells start at birthTime = 0.
-    // So bizarrely the crypt shrinks as the rest lengths are shortened!
-    // But at least it uses Wnt cell cycle and runs reasonably quickly...
-    // For a better test with more randomly distributed cell ages see the Nightly test pack.
+    /*
+     * This is a rubbish test - all cells start at birthTime = 0.
+     * So bizarrely the crypt shrinks as the rest lengths are shortened!
+     * But at least it uses Wnt cell cycle and runs reasonably quickly...
+     * For a better test with more randomly distributed cell ages see the Nightly test pack.
+     */
     void TestWithWntDependentCells() throw (Exception)
     {
         // Create mesh
@@ -1038,7 +1038,6 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-
     void TestCellIdOutput() throw (Exception)
     {
         // Resetting the Maximum cell Id to zero (to account for previous tests)
@@ -1197,7 +1196,6 @@ public:
         TS_ASSERT_EQUALS(num_deaths, 11u);
     }
 
-
     void TestCalculateCellDivisionVectorConfMesh() throw (Exception)
     {
         // Make a parent node
@@ -1233,7 +1231,6 @@ public:
         c_vector<double, 2> parent_to_daughter = conf_mesh.GetVectorFromAtoB(new_parent_location, daughter_location);
         TS_ASSERT_DELTA(norm_2(parent_to_daughter), conf_crypt.GetMeinekeDivisionSeparation(), 1e-7);
     }
-
 
     void TestCalculateCellDivisionVectorConfMeshStemCell() throw (Exception)
     {
@@ -1276,7 +1273,6 @@ public:
        }
     }
 
-
     void TestCalculateCellDivisionVectorCylindricalMesh() throw (Exception)
     {
         // Make a mesh
@@ -1305,7 +1301,6 @@ public:
         c_vector<double, 2> parent_to_daughter = cyl_mesh.GetVectorFromAtoB(new_parent_location, daughter_location);
         TS_ASSERT_DELTA(norm_2(parent_to_daughter), cyl_crypt.GetMeinekeDivisionSeparation(), 1e-7);
     }
-
 
     void TestCalculateCellDivisionVectorCylindricalMeshStemCell() throw (Exception)
     {
@@ -1340,7 +1335,6 @@ public:
         TS_ASSERT_LESS_THAN_EQUALS(location[1], daughter_location[1]);
         TS_ASSERT_DELTA(norm_2(parent_to_daughter), cyl_crypt.GetMeinekeDivisionSeparation(), 1e-7);
     }
-
 
     // Short test which sets mNoBirth for coverage
     void TestNoBirth() throw (Exception)
@@ -1398,7 +1392,6 @@ public:
         TS_ASSERT_EQUALS(number_of_nodes, number_of_cells+thickness_of_ghost_layer*2*cells_across);
     }
 
-
     // Test death on a non-periodic mesh. Note that birth does occur too.
     void TestRandomDeathOnNonPeriodicCrypt() throw (Exception)
     {
@@ -1441,7 +1434,6 @@ public:
         // There should be no cells left at this time
         TS_ASSERT_EQUALS(crypt.GetNumRealCells(), 1u);
     }
-
 
     void TestUsingJiggledBottomSurface()
     {

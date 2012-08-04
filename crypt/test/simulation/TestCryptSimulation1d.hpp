@@ -127,7 +127,6 @@ public:
         FileComparison( elem_results_file, "crypt/test/data/Crypt1dWithNoBirthAndNoDeath/results.vizelements").CompareFiles();
     }
 
-
     /**
      * In this test, we pass a sloughing cell killer into the simulation, and
      * check that a cell starting at the end of the crypt is sloughed off.
@@ -189,7 +188,6 @@ public:
         std::string elem_results_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/results.vizelements";
         FileComparison( elem_results_file, "crypt/test/data/Crypt1dWithDeathButNoBirth/results.vizelements").CompareFiles();
     }
-
 
     /**
      * In this test, we allow cells to proliferate.
@@ -277,7 +275,6 @@ public:
         FileComparison( elem_results_file, "crypt/test/data/Crypt1dWithCells/results.vizelements").CompareFiles();
     }
 
-
     /**
      * In this test, we check that the daughters of a cell that has just divided
      * are put in the correct positions.
@@ -341,7 +338,6 @@ public:
         TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(2)->rGetLocation()[0], 2.0, 1e-3);
         TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(3)->rGetLocation()[0], 3.0, 1e-3);
     }
-
 
     /**
      * In this test, we include cell birth and cell death.
@@ -437,7 +433,6 @@ public:
         FileComparison( elem_results_file, "crypt/test/data/Crypt1dWithCellsAndGrowth/results.vizelements").CompareFiles();
     }
 
-
     void Test1DChainWithTysonNovakCellsAndNoDeath() throw (Exception)
     {
         // Get pointers to singleton objects
@@ -520,7 +515,6 @@ public:
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), num_cells_at_start + 23u);
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 2*num_cells_at_start);
     }
-
 
     /**
      * Create a crypt containing a single stem cell and all other cells differentiated.
@@ -733,7 +727,6 @@ public:
         WntConcentration<1>::Destroy();
     }
 
-
     /**
      * Test saving a CryptSimulation1d object.
      */
@@ -812,7 +805,6 @@ public:
         // Save the results
         CellBasedSimulationArchiver<1, CryptSimulation1d>::Save(&simulator);
     }
-
 
     /**
      * Test loading a CryptSimulation1d object.

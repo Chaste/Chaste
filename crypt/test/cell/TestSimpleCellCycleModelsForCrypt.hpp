@@ -533,7 +533,6 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-
     void TestCellCycleModelOutputParameters()
     {
         std::string output_directory = "TestCellCycleModelOutputParameters";

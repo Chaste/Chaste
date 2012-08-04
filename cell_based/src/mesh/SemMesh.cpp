@@ -53,7 +53,6 @@ SemMesh<DIM>::SemMesh( std::vector<Node<DIM>*> nodes,
     {
         Node<DIM>* p_temp_node = nodes[node_index];
         this->mNodes.push_back(p_temp_node);
-
     }
     for (unsigned elem_index=0; elem_index<pottsElements.size(); elem_index++)
     {
@@ -227,11 +226,11 @@ void SemMesh<DIM>::ReMesh()
     std::vector< std::vector<c_vector<double, DIM> > > old_element_node_location;
 
     // For each element either note that it was deleted, or store the information needed to re-construct it, i.e. index and nodes.
-    for(typename std::vector<PottsElement<DIM>* >::iterator element_iterator = this->mElements.begin();
-            element_iterator != this->mElements.end();
-            ++element_iterator)
+    for (typename std::vector<PottsElement<DIM>* >::iterator element_iterator = this->mElements.begin();
+         element_iterator != this->mElements.end();
+         ++element_iterator)
     {
-        if((*element_iterator)->IsDeleted())
+        if ((*element_iterator)->IsDeleted())
         {
             // Marked as deleted - don't store the nodes.
         }
@@ -260,7 +259,7 @@ void SemMesh<DIM>::ReMesh()
     for (unsigned index=0; index < old_element_indices.size(); index++)
     {
         std::vector<Node<DIM>* > new_element_nodes;
-        for(unsigned node=0; node < old_element_node_indices[index].size(); node++)
+        for (unsigned node=0; node < old_element_node_indices[index].size(); node++)
         {
             c_vector<double, DIM> new_location = old_element_node_location[index][node];
             unsigned new_index = old_element_node_indices[index][node];
@@ -290,8 +289,8 @@ void SemMesh<DIM>::ReMesh()
 template<unsigned DIM>
 void SemMesh<DIM>::DeleteElement(unsigned index)
 {
-    // Delete the nodes.
-    for(unsigned node_index = 0; node_index < this->mElements[index]->GetNumNodes(); node_index++)
+    // Delete the nodes
+    for (unsigned node_index=0; node_index<this->mElements[index]->GetNumNodes(); node_index++)
     {
         Node<DIM>* p_node = this->mElements[index]->GetNode(node_index);
         p_node->MarkAsDeleted();
@@ -319,7 +318,7 @@ unsigned SemMesh<DIM>::AddElement(PottsElement<DIM>* pNewElement, std::vector<No
     }
 
     // Add the nodes
-    for(unsigned index=0; index<newNodes.size(); index++)
+    for (unsigned index=0; index<newNodes.size(); index++)
     {
         // Set index of the node correctly
         newNodes[index]->SetIndex(this->mNodes.size());

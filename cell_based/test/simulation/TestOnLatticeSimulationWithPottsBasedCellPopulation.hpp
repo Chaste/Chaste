@@ -303,8 +303,8 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), DIFFERENTIATED);
 
         // Randomly label some cells
-		boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
-		RandomlyLabelCells(cells, p_label, 0.5);
+        boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
+        RandomlyLabelCells(cells, p_label, 0.5);
 
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
@@ -430,7 +430,6 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
     }
 
-
     void TestRandomIterationOverUpdateRules() throw (Exception)
     {
         // Create a simple 2D PottsMesh
@@ -486,8 +485,8 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), DIFFERENTIATED);
 
         // Randomly label some cells
-		boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
-		RandomlyLabelCells(cells, p_label, 0.5);
+        boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
+        RandomlyLabelCells(cells, p_label, 0.5);
 
         // Create cell population
         PottsBasedCellPopulation<3> cell_population(*p_mesh, cells);

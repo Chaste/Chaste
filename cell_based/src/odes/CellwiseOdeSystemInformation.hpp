@@ -94,5 +94,4 @@ void CellwiseOdeSystemInformation<ODE_SYSTEM>::Initialise()
 {
 }
 
-
 #endif /*CELLWISEODESYSTEMINFORMATION_HPP_*/

@@ -170,7 +170,7 @@ public:
         }
 
         /* We are now in a position to create and configure the cell-based simulation object, pass a force law to it,
-         * and run the simulation. We can make the simulation run for longer to see more paterning by changing the end time. */
+         * and run the simulation. We can make the simulation run for longer to see more patterning by increasing the end time. */
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestVertexBasedMonolayerWithDeltaNotch");
         simulator.SetSamplingTimestepMultiple(10);

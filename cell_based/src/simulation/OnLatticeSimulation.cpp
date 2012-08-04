@@ -70,10 +70,10 @@ void OnLatticeSimulation<DIM>::AddMultipleCaUpdateRule(boost::shared_ptr<Abstrac
 template<unsigned DIM>
 void OnLatticeSimulation<DIM>::RemoveAllMultipleCaUpdateRules()
 {
-	if (dynamic_cast<MultipleCaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
-	{
-		static_cast<MultipleCaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->RemoveAllUpdateRules();
-	}
+    if (dynamic_cast<MultipleCaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
+    {
+        static_cast<MultipleCaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->RemoveAllUpdateRules();
+    }
 }
 
 template<unsigned DIM>
@@ -88,10 +88,10 @@ void OnLatticeSimulation<DIM>::AddPottsUpdateRule(boost::shared_ptr<AbstractPott
 template<unsigned DIM>
 void OnLatticeSimulation<DIM>::RemoveAllPottsUpdateRules()
 {
-	if (dynamic_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
-	{
-		static_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->RemoveAllUpdateRules();
-	}
+    if (dynamic_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
+    {
+        static_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->RemoveAllUpdateRules();
+    }
 }
 
 template<unsigned DIM>
@@ -200,7 +200,6 @@ void OnLatticeSimulation<DIM>::SetOutputCellVelocities(bool outputCellVelocities
     mOutputCellVelocities = outputCellVelocities;
 }
 
-
 template<unsigned DIM>
 void OnLatticeSimulation<DIM>::UpdateCellPopulation()
 {
@@ -261,7 +260,7 @@ void OnLatticeSimulation<DIM>::OutputAdditionalSimulationSetup(out_stream& rPara
     }
     else
     {
-    	//\todo define the method for `MultipleCaBasedCellPopulation`
+        //\todo define the method for `MultipleCaBasedCellPopulation`
     }
     *rParamsFile << "\t</UpdateRules>\n";
 }

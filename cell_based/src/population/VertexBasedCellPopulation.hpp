@@ -306,7 +306,7 @@ public:
 
     /**
      * Overridden GetVolumeOfCell() method.
-     * 
+     *
      * @param pCell boost shared pointer to a cell
      */
     double GetVolumeOfCell(CellPtr pCell);

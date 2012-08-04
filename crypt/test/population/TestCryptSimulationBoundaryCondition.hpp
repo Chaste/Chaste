@@ -363,7 +363,6 @@ public:
         WntConcentration<1>::Destroy();
     }
 
-
     void TestImposeBoundaryConditionWithWntButNoJiggling() throw(Exception)
     {
         // Create a cell population

@@ -65,17 +65,17 @@ double SurfaceAreaConstraintPottsUpdateRule<DIM>::EvaluateHamiltonianContributio
     bool current_node_contained = !containing_elements.empty();
     bool target_node_contained = !new_location_containing_elements.empty();
 
-    // Every node must each be in at most one element.
+    // Every node must each be in at most one element
     assert(new_location_containing_elements.size() < 2);
 
-    if(!current_node_contained && !target_node_contained)
+    if (!current_node_contained && !target_node_contained)
     {
         EXCEPTION("At least one of the current node or target node must be in an element.");
     }
 
     if (current_node_contained && target_node_contained)
     {
-        if(*(new_location_containing_elements.begin()) == *(containing_elements.begin()))
+        if (*(new_location_containing_elements.begin()) == *(containing_elements.begin()))
         {
             EXCEPTION("The current node and target node must not be in the same element.");
         }
@@ -116,7 +116,7 @@ double SurfaceAreaConstraintPottsUpdateRule<DIM>::EvaluateHamiltonianContributio
         }
     }
 
-    if(DIM == 2)
+    if (DIM == 2)
     {
         assert(neighbours_in_same_element_as_current_node<5);
         assert(neighbours_in_same_element_as_target_node<5);
@@ -142,10 +142,10 @@ double SurfaceAreaConstraintPottsUpdateRule<DIM>::EvaluateHamiltonianContributio
             delta_H += mDeformationEnergyParameter*(target_surface_area_difference_after_switch*target_surface_area_difference_after_switch - target_surface_area_difference*target_surface_area_difference);
         }
     }
-    else if(DIM==3)
+    else if (DIM==3)
     {
-        assert(neighbours_in_same_element_as_current_node<7);
-        assert(neighbours_in_same_element_as_target_node<7);
+        assert(neighbours_in_same_element_as_current_node < 7);
+        assert(neighbours_in_same_element_as_target_node < 7);
 
         double change_in_surface_area[7] = {6,4,2,0,-2,-4,-6};
 
@@ -167,7 +167,6 @@ double SurfaceAreaConstraintPottsUpdateRule<DIM>::EvaluateHamiltonianContributio
 
             delta_H += mDeformationEnergyParameter*(target_surface_area_difference_after_switch*target_surface_area_difference_after_switch - target_surface_area_difference*target_surface_area_difference);
         }
-
     }
 
     return delta_H;

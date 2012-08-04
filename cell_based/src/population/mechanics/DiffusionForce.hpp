@@ -57,16 +57,16 @@ private :
     double mDiffusionConstant;
 
     /**
-	 * Absolute temperature (in Kelvin).
-	 */
-	double mAbsoluteTemperature;
+     * Absolute temperature (in Kelvin).
+     */
+    double mAbsoluteTemperature;
 
-	/**
-	 * Viscosity of media. We assume that this is measured in units of
-	 * kg microns^(-1) h^(-1), and that cell diameters are scaled with
-	 * a characteristic length of 1 micron.
-	 */
-	double mViscosity;
+    /**
+     * Viscosity of media. We assume that this is measured in units of
+     * kg microns^(-1) h^(-1), and that cell diameters are scaled with
+     * a characteristic length of 1 micron.
+     */
+    double mViscosity;
 
     /**
      * Mechanics cut off length.
@@ -138,17 +138,17 @@ public :
     double GetDiffusionConstant();
 
     /**
-	 * Get the absolute temperature.
-	 *
-	 * @return mAbsoluteTemperature
-	 */
+     * Get the absolute temperature.
+     *
+     * @return mAbsoluteTemperature
+     */
     double GetAbsoluteTemperature();
 
     /**
- 	 * Get the viscosity.
- 	 *
- 	 * @return mViscosity
- 	 */
+      * Get the viscosity.
+      *
+      * @return mViscosity
+      */
     double GetViscosity();
 
     /**

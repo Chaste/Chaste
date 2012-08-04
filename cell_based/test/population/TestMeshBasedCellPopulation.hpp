@@ -910,18 +910,18 @@ public:
 
         // Create a cell population
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
-        
+
         cell_population.SetDataOnAllCells("variable", 100.0);
-        
+
         //Check that the data made it there and that copies of the data are independent
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
                  cell_iter != cell_population.End();
                  ++cell_iter)
-        {   
+        {
             TS_ASSERT_EQUALS(cell_iter->GetCellData()->GetItem("variable"), 100.0);
             cell_iter->GetCellData()->SetItem("variable", 1.0);
         }
-        
+
 
         cell_population.SetDataOnAllCells("added variable", 200.0);
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
@@ -967,13 +967,13 @@ public:
 
             // Create the cell population
             MeshBasedCellPopulation<2>* const p_cell_population = new MeshBasedCellPopulation<2>(mesh, cells);
-            
+
             //Add cell data
             p_cell_population->SetDataOnAllCells("nothing", DOUBLE_UNSET);
 
             TS_ASSERT_THROWS_THIS(p_cell_population->Begin()->GetCellData()->GetItem("nothing"),
                                 "The item nothing has not yet been set");
-            
+
             // Cells have been given birth times of 0, -1, -2, -3, -4.
             // loop over them to run to time 0.0;
             unsigned index_for_data = 0;
@@ -1165,7 +1165,7 @@ public:
              ++cell_iter)
         {
             // Set all cells to have the same ancestor
-        	MAKE_PTR_ARGS(CellAncestor, p_cell_ancestor, (1u));
+            MAKE_PTR_ARGS(CellAncestor, p_cell_ancestor, (1u));
             cell_iter->SetAncestor(p_cell_ancestor);
         }
 

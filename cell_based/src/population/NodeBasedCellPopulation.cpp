@@ -47,11 +47,11 @@ NodeBasedCellPopulation<DIM>::NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh,
       mMechanicsCutOffLength(DBL_MAX),
       mUseVariableRadii(false)
 {
-	mpNodesOnlyMesh = static_cast<NodesOnlyMesh<DIM>* >(&(this->mrMesh));
-	if (validate)
-	{
+    mpNodesOnlyMesh = static_cast<NodesOnlyMesh<DIM>* >(&(this->mrMesh));
+    if (validate)
+    {
         Validate();
-	}
+    }
 }
 
 template<unsigned DIM>
@@ -61,7 +61,7 @@ NodeBasedCellPopulation<DIM>::NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh)
       mMechanicsCutOffLength(DBL_MAX), // will be set by serialize() method
       mUseVariableRadii(false) // will be set by serialize() method
 {
-	mpNodesOnlyMesh = static_cast<NodesOnlyMesh<DIM>* >(&(this->mrMesh));
+    mpNodesOnlyMesh = static_cast<NodesOnlyMesh<DIM>* >(&(this->mrMesh));
     // No Validate() because the cells are not associated with the cell population yet in archiving
 }
 
@@ -120,7 +120,7 @@ void NodeBasedCellPopulation<DIM>::Validate()
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::SplitUpIntoBoxes(double cutOffLength, c_vector<double, 2*DIM> domainSize)
 {
-	mpNodesOnlyMesh->SetUpBoxCollection(cutOffLength, domainSize);
+    mpNodesOnlyMesh->SetUpBoxCollection(cutOffLength, domainSize);
 }
 
 template<unsigned DIM>
@@ -170,7 +170,7 @@ Node<DIM>* NodeBasedCellPopulation<DIM>::GetNode(unsigned index)
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::SetNode(unsigned nodeIndex, ChastePoint<DIM>& rNewLocation)
 {
-	mpNodesOnlyMesh->GetNode(nodeIndex)->SetPoint(rNewLocation);
+    mpNodesOnlyMesh->GetNode(nodeIndex)->SetPoint(rNewLocation);
 }
 
 template<unsigned DIM>
@@ -181,10 +181,10 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 
     if (!map.IsIdentityMap())
     {
-    	UpdateParticlesAfterReMesh(map);
+        UpdateParticlesAfterReMesh(map);
 
         // Update the mappings between cells and location indices
-    	///\todo we want to make mCellLocationMap private - we need to find a better way of doing this
+        ///\todo we want to make mCellLocationMap private - we need to find a better way of doing this
         std::map<Cell*, unsigned> old_map = this->mCellLocationMap;
 
         // Remove any dead pointers from the maps (needed to avoid archiving errors)
@@ -318,7 +318,7 @@ template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t<MechanicsCutOffLength>" << mMechanicsCutOffLength << "</MechanicsCutOffLength>\n";
-    *rParamsFile << "\t\t<UseVariableRadii>" << mUseVariableRadii << 
+    *rParamsFile << "\t\t<UseVariableRadii>" << mUseVariableRadii <<
 "</UseVariableRadii>\n";
 
     // Call method on direct parent class
@@ -365,8 +365,8 @@ double NodeBasedCellPopulation<DIM>::GetWidth(const unsigned& rDimension)
 template<unsigned DIM>
 std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsigned index)
 {
-    // Check the mNodeNeighbours has been set up correctly.
-    if(mNodeNeighbours.empty())
+    // Check the mNodeNeighbours has been set up correctly
+    if (mNodeNeighbours.empty())
     {
         EXCEPTION("mNodeNeighbours not set up. Call Update() before GetNeighbouringNodeIndices()");
     }
@@ -378,10 +378,10 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
     double radius_of_cell_i = mpNodesOnlyMesh->GetCellRadius(index);
 
     // Make sure that the max_interaction distance is smaller than the box collection size
-	if(!(radius_of_cell_i * 2.0 < mMechanicsCutOffLength))
-	{
-		EXCEPTION("mMechanicsCutOffLength is smaller than twice the radius of cell " << index << " (" << radius_of_cell_i << ") so interactions may be missed. Make the cut-off larger to avoid errors.");
-	}
+    if (!(radius_of_cell_i * 2.0 < mMechanicsCutOffLength))
+    {
+        EXCEPTION("mMechanicsCutOffLength is smaller than twice the radius of cell " << index << " (" << radius_of_cell_i << ") so interactions may be missed. Make the cut-off larger to avoid errors.");
+    }
 
 
     // Get set of 'candidate' neighbours.
@@ -411,7 +411,7 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
             double max_interaction_distance = radius_of_cell_i + radius_of_cell_j;
 
             // Make sure that the max_interaction distance is smaller than the box collection size
-            if(!(max_interaction_distance < mMechanicsCutOffLength))
+            if (!(max_interaction_distance < mMechanicsCutOffLength))
             {
                 EXCEPTION("mMechanicsCutOffLength is smaller than the sum of radius of cell " << index << " (" << radius_of_cell_i << ") and cell " << (*iter) << " (" << radius_of_cell_j <<"). Make the cut-off larger to avoid errors.");
             }
@@ -435,54 +435,52 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
     // Get cell radius
     double cell_radius = mpNodesOnlyMesh->GetCellRadius(node_index);
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////Method to approximate  cell volume  //////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Begin code to approximate cell volume
     double averaged_cell_radius = 0.0;
     unsigned num_cells = 0;
 
     // Get the location of this node
-	c_vector<double, DIM> node_i_location = GetNode(node_index)->rGetLocation();
+    c_vector<double, DIM> node_i_location = GetNode(node_index)->rGetLocation();
 
-	// Get the set of node indices corresponding to this cell's neighbours
-	std::set<unsigned> neighbouring_node_indices = GetNeighbouringNodeIndices(node_index);
+    // Get the set of node indices corresponding to this cell's neighbours
+    std::set<unsigned> neighbouring_node_indices = GetNeighbouringNodeIndices(node_index);
 
-	// Loop over this set
-	for (std::set<unsigned>::iterator iter = neighbouring_node_indices.begin();
-		 iter != neighbouring_node_indices.end();
-		 ++iter)
-	{
-		// Get the location of the neighbouring node
-		c_vector<double, DIM> node_j_location = GetNode(*iter)->rGetLocation();
+    // Loop over this set
+    for (std::set<unsigned>::iterator iter = neighbouring_node_indices.begin();
+         iter != neighbouring_node_indices.end();
+         ++iter)
+    {
+        // Get the location of the neighbouring node
+        c_vector<double, DIM> node_j_location = GetNode(*iter)->rGetLocation();
 
-		double neighbouring_cell_radius = mpNodesOnlyMesh->GetCellRadius( *iter);
+        double neighbouring_cell_radius = mpNodesOnlyMesh->GetCellRadius( *iter);
 
-		// If this throws then you may not be considering all cell interactions use a larger cut off length
-		assert(cell_radius+neighbouring_cell_radius<mMechanicsCutOffLength);
+        // If this throws then you may not be considering all cell interactions use a larger cut off length
+        assert(cell_radius+neighbouring_cell_radius<mMechanicsCutOffLength);
 
-		// Calculate the distance between the two nodes and add to cell radius
-		double separation = norm_2(node_j_location - node_i_location);
+        // Calculate the distance between the two nodes and add to cell radius
+        double separation = norm_2(node_j_location - node_i_location);
 
-		if(separation< cell_radius+neighbouring_cell_radius)
-		{
-			// The effective radius is the mid point of the overlap
-			averaged_cell_radius = averaged_cell_radius + cell_radius - (cell_radius+neighbouring_cell_radius-separation)/2.0;
-			num_cells++;
-		}
-	}
-	if (num_cells == 0)
-	{
-		averaged_cell_radius =  cell_radius;
-	}
-	else
-	{
-		averaged_cell_radius /= num_cells;
-	}
-	assert(averaged_cell_radius<mMechanicsCutOffLength/2.0);
+        if (separation < cell_radius+neighbouring_cell_radius)
+        {
+            // The effective radius is the mid point of the overlap
+            averaged_cell_radius = averaged_cell_radius + cell_radius - (cell_radius+neighbouring_cell_radius-separation)/2.0;
+            num_cells++;
+        }
+    }
+    if (num_cells == 0)
+    {
+        averaged_cell_radius =  cell_radius;
+    }
+    else
+    {
+        averaged_cell_radius /= num_cells;
+    }
+    assert(averaged_cell_radius<mMechanicsCutOffLength/2.0);
 
-	cell_radius = averaged_cell_radius;
+    cell_radius = averaged_cell_radius;
 
-    ////////////////////////////////////////////////////////////////////////////////////////
+    // End code to approximate cell volume
 
     // Calculate cell volume from radius of cell
     double cell_volume = 0.0;
@@ -588,13 +586,13 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
             double mutation_state = cell_iter->GetMutationState()->GetColour();
 
             CellPropertyCollection collection = cell_iter->rGetCellPropertyCollection();
-		   CellPropertyCollection label_collection = collection.GetProperties<CellLabel>();
+           CellPropertyCollection label_collection = collection.GetProperties<CellLabel>();
 
-		   if (label_collection.GetSize()==1 )
-			{
-				boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(label_collection.GetProperty());
-				mutation_state = p_label->GetColour();
-			}
+           if (label_collection.GetSize()==1 )
+            {
+                boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(label_collection.GetProperty());
+                mutation_state = p_label->GetColour();
+            }
 
             cell_mutation_states[node_index] = mutation_state;
         }
@@ -616,7 +614,7 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
 
         for (unsigned var=0; var<num_cell_data_items; var++)
         {
-            cellwise_data[var][node_index] = cell_iter->GetCellData()->GetItem(cell_data_names[var]); 
+            cellwise_data[var][node_index] = cell_iter->GetCellData()->GetItem(cell_data_names[var]);
         }
     }
 

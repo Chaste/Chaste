@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned DIM>
 AbstractOnLatticeCellPopulation<DIM>::AbstractOnLatticeCellPopulation(AbstractMesh<DIM, DIM>& rMesh,
-																	std::vector<CellPtr>& rCells,
+                                                                    std::vector<CellPtr>& rCells,
                                                                   const std::vector<unsigned> locationIndices,
                                                                   bool deleteMesh)
     : AbstractCellPopulation<DIM>(rMesh, rCells, locationIndices),
@@ -49,7 +49,7 @@ AbstractOnLatticeCellPopulation<DIM>::AbstractOnLatticeCellPopulation(AbstractMe
 
 template<unsigned DIM>
 AbstractOnLatticeCellPopulation<DIM>::AbstractOnLatticeCellPopulation(AbstractMesh<DIM, DIM>& rMesh)
-	: AbstractCellPopulation<DIM>(rMesh),
+    : AbstractCellPopulation<DIM>(rMesh),
       mDeleteMesh(true),
       mUpdateNodesInRandomOrder(true),
       mIterateRandomlyOverUpdateRuleCollection(false)

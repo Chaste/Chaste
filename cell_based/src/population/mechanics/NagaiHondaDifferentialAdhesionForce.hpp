@@ -45,14 +45,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * A force class for use in vertex-based simulations, based on a model
- * model proposed by T. Nagai and H. Honda ("A dynamic cell model for 
- * the formation of epithelial tissues", Philosophical Magazine Part B 
- * 81:699-719) to include differential adhesion between normal and 
- * labelled cells. To include differntial adhesion we override the 
+ * model proposed by T. Nagai and H. Honda ("A dynamic cell model for
+ * the formation of epithelial tissues", Philosophical Magazine Part B
+ * 81:699-719) to include differential adhesion between normal and
+ * labelled cells. To include differntial adhesion we override the
  * GetAdhesionParameter() method.
- * 
- * Each of the model parameter member variables are rescaled such that 
- * mDampingConstantNormal takes the default value 1, whereas Nagai and 
+ *
+ * Each of the model parameter member variables are rescaled such that
+ * mDampingConstantNormal takes the default value 1, whereas Nagai and
  * Honda (who denote the parameter by nu) take the value 0.01.
  */
 template<unsigned DIM>
@@ -75,7 +75,7 @@ private:
     double mNagaiHondaLabelledCellCellAdhesionEnergyParameter;
 
     /**
-     * Cell-boundary adhesion energy parameter for labelled cells. 
+     * Cell-boundary adhesion energy parameter for labelled cells.
      * Has units of kg (cell size at equilibrium rest length)^2 s^-2.
      * Takes the default value 1.0.
      */
@@ -141,14 +141,14 @@ public:
 
     /**
      * Set mNagaiHondaLabelledCellLabelledCellAdhesionEnergyParameter.
-     * 
+     *
      * @param labelledCellLabelledCellAdhesionEnergyParameter the new value of mNagaiHondaLabelledCellLabelledCellAdhesionEnergyParameter
      */
     void SetNagaiHondaLabelledCellLabelledCellAdhesionEnergyParameter(double labelledCellLabelledCellAdhesionEnergyParameter);
 
     /**
      * Set mNagaiHondaLabelledCellBoundaryAdhesionEnergyParameter.
-     * 
+     *
      * @param labelledCellBoundaryAdhesionEnergyParameter the new value of mNagaiHondaLabelledCellBoundaryAdhesionEnergyParameter
      */
     void SetNagaiHondaLabelledCellBoundaryAdhesionEnergyParameter(double labelledCellBoundaryAdhesionEnergyParameter);

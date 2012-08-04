@@ -596,7 +596,7 @@ public:
 
 
         OutputFileHandler handler("TestSpheroidStatistics", false);
-        
+
         std::string areas_results_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/cellpopulationareas.dat";
         FileComparison( areas_results_file, "cell_based/test/data/TestSpheroidStatistics/cellpopulationareas.dat").CompareFiles();
 
@@ -1446,7 +1446,6 @@ public:
             // Test that PDE solver is working correctly
             TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient"), analytic_solution, 1e-2);
         }
-
 
         // Test FindCoarseElementContainingCell() and initialisation of mCellPdeElementMap
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();

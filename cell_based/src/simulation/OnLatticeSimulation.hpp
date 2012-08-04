@@ -152,9 +152,9 @@ public:
      */
     void AddPottsUpdateRule(boost::shared_ptr<AbstractPottsUpdateRule<DIM> > pUpdateRule);
 
-	/**
-	 * Method to remove all the PottsUpdateRules
-	 */
+    /**
+     * Method to remove all the PottsUpdateRules
+     */
     void RemoveAllPottsUpdateRules();
 
     /**

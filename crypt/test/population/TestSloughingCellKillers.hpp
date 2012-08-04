@@ -417,8 +417,6 @@ public:
        std::string radial_cell_killer_results_dir = output_file_handler.GetOutputDirectoryFullPath();
        FileComparison( radial_cell_killer_results_dir + "radial_results.parameters", "crypt/test/data/TestSloughingCellKillers/radial_results.parameters").CompareFiles();
    }
-
-
 };
 
 #endif /*TESTSLOUGHINGCELLKILLER_HPP_*/

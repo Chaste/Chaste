@@ -131,7 +131,6 @@ public:
         TS_ASSERT(min_distance_between_cells > 0.999);
     }
 
-
     /**
      * Create a simulation of a NodeBasedCellPopulation with different cell radii
      */
@@ -183,7 +182,7 @@ public:
         TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(2)->rGetLocation()), 3.0, 1e-1);
         TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(3)->rGetLocation()), 2.0, 1e-1);
 
-        for(unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i=0; i<nodes.size(); i++)
         {
             delete nodes[i];
         }
@@ -263,7 +262,7 @@ public:
         TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(2)->rGetLocation()), 4.0, 1e-3);
         TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(3)->rGetLocation()), 4.0, 1e-3);
 
-        for(unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i=0; i<nodes.size(); i++)
         {
             delete nodes[i];
         }

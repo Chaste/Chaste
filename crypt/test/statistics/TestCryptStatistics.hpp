@@ -164,7 +164,6 @@ public:
         }
     }
 
-
     void TestMakeMeinekeGraphs() throw (Exception)
     {
         std::string output_directory = "MakeMeinekeGraphs";
@@ -340,7 +339,6 @@ public:
         }
         RandomNumberGenerator::Destroy();
     }
-
 
     /**
      * This test runs multiple crypt simulations and records whether

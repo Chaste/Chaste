@@ -115,8 +115,6 @@ public:
         p_diff_cell->GetCellData()->SetItem("mean delta", 4.2);
         p_diff_model->UpdateDeltaNotch();
         TS_ASSERT_DELTA(p_diff_model->GetMeanNeighbouringDelta(), 4.2, 1e-4);
-
-
     }
 
     ///\todo test archiving of ODE system and state variables

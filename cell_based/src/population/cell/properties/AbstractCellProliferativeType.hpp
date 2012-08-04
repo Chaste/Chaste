@@ -44,14 +44,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Base class for cell proliferative types.
  *
- * Each Cell has a (shared pointer to a) proliferative type instance, which will be 
- * an instance of a subclass of this class.  When setting up a CellBasedSimulation, 
- * the user must specify a list of AbstractCellProliferativeType instances, which 
- * represent the possible proliferative types that can occur in the simulation. This 
- * provides a registry of available proliferative types, and cells will point to one 
+ * Each Cell has a (shared pointer to a) proliferative type instance, which will be
+ * an instance of a subclass of this class.  When setting up a CellBasedSimulation,
+ * the user must specify a list of AbstractCellProliferativeType instances, which
+ * represent the possible proliferative types that can occur in the simulation. This
+ * provides a registry of available proliferative types, and cells will point to one
  * of these objects.
  *
- * The proliferative type objects keep track of the number of cells with a proliferative 
+ * The proliferative type objects keep track of the number of cells with a proliferative
  * type, as well as what colour should be used by the visualizer to display cells
  * with each proliferative type.
  */
