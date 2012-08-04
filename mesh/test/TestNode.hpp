@@ -237,25 +237,25 @@ public:
         OutputFileHandler handler("TestNode", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "node.arch";
 
-    	{
-        	// Create an output archive
-			std::ofstream ofs(archive_filename.c_str());
-			boost::archive::text_oarchive output_arch(ofs);
+        {
+            // Create an output archive
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
 
             Node<3>* const p_node = new Node<3>(0, true, 0.0, 1.0, 2.0);
             Node<1>* const p_node_1d = new Node<1>(0, false, 100.0);
 
-//			p_node->AddNodeAttribute(5.0);
+//            p_node->AddNodeAttribute(5.0);
             p_node->SetRegion(7);
 
-			// Write the nodes to file
+            // Write the nodes to file
             output_arch << p_node;
             output_arch << p_node_1d;
             delete p_node;
             delete p_node_1d;
-    	}
+        }
 
-    	{
+        {
             // Restore the nodes
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
@@ -273,14 +273,14 @@ public:
             TS_ASSERT_EQUALS(p_node_1d->rGetLocation()[0], 100.0);
             TS_ASSERT_EQUALS(p_node_1d->IsBoundaryNode(), false);
             TS_ASSERT_EQUALS(p_node_1d->GetRegion(), 0u);
-            
+
 //
 //
 //            TS_ASSERT_EQUALS(p_node->rGetNodeAttributes()[0], 5.0);
 //
             delete p_node;
             delete p_node_1d;
-    	}
+        }
     }
 
 };

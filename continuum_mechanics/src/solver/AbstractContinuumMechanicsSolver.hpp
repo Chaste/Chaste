@@ -530,11 +530,11 @@ void AbstractContinuumMechanicsSolver<DIM>::CreateVtkOutput(std::string spatialS
 #ifdef CHASTE_VTK
     VtkMeshWriter<DIM, DIM> mesh_writer(this->mOutputDirectory + "/vtk", "solution", true);
 
-	mesh_writer.AddPointData(spatialSolutionName, this->rGetSpatialSolution());
+    mesh_writer.AddPointData(spatialSolutionName, this->rGetSpatialSolution());
 
     if (mCompressibilityType==INCOMPRESSIBLE)
     {
-    	mesh_writer.AddPointData("Pressure", rGetPressures());
+        mesh_writer.AddPointData("Pressure", rGetPressures());
     }
 
     //Output the element attribute as cell data.
@@ -588,32 +588,32 @@ void AbstractContinuumMechanicsSolver<DIM>::RemovePressureDummyValuesThroughLine
          iter != mrQuadMesh.GetElementIteratorEnd();
          ++iter)
     {
-    	for(unsigned i=0; i<num_internal_nodes_per_element; i++)
-    	{
-    		unsigned global_index;
-    		double left_val;
-    		double right_val;
+        for(unsigned i=0; i<num_internal_nodes_per_element; i++)
+        {
+            unsigned global_index;
+            double left_val;
+            double right_val;
 
-    		if(DIM==2)
-    		{
-				global_index = iter->GetNodeGlobalIndex( internal_nodes_2d[i] );
-				unsigned vertex_0_global_index =iter->GetNodeGlobalIndex( neighbouring_vertices_2d[i][0] );
-				unsigned vertex_1_global_index =iter->GetNodeGlobalIndex( neighbouring_vertices_2d[i][1] );
-				left_val = mCurrentSolution[mProblemDimension*vertex_0_global_index + DIM];
-				right_val = mCurrentSolution[mProblemDimension*vertex_1_global_index + DIM];
-    		}
-    		else
-    		{
-				global_index = iter->GetNodeGlobalIndex( internal_nodes_3d[i] );
-				unsigned vertex_0_global_index =iter->GetNodeGlobalIndex( neighbouring_vertices_3d[i][0] );
-				unsigned vertex_1_global_index =iter->GetNodeGlobalIndex( neighbouring_vertices_3d[i][1] );
-				left_val = mCurrentSolution[mProblemDimension*vertex_0_global_index + DIM];
-				right_val = mCurrentSolution[mProblemDimension*vertex_1_global_index + DIM];
-    		}
+            if(DIM==2)
+            {
+                global_index = iter->GetNodeGlobalIndex( internal_nodes_2d[i] );
+                unsigned vertex_0_global_index =iter->GetNodeGlobalIndex( neighbouring_vertices_2d[i][0] );
+                unsigned vertex_1_global_index =iter->GetNodeGlobalIndex( neighbouring_vertices_2d[i][1] );
+                left_val = mCurrentSolution[mProblemDimension*vertex_0_global_index + DIM];
+                right_val = mCurrentSolution[mProblemDimension*vertex_1_global_index + DIM];
+            }
+            else
+            {
+                global_index = iter->GetNodeGlobalIndex( internal_nodes_3d[i] );
+                unsigned vertex_0_global_index =iter->GetNodeGlobalIndex( neighbouring_vertices_3d[i][0] );
+                unsigned vertex_1_global_index =iter->GetNodeGlobalIndex( neighbouring_vertices_3d[i][1] );
+                left_val = mCurrentSolution[mProblemDimension*vertex_0_global_index + DIM];
+                right_val = mCurrentSolution[mProblemDimension*vertex_1_global_index + DIM];
+            }
 
-    		// this line assumes the internal node is midway between the two vertices
-    		mCurrentSolution[mProblemDimension*global_index + DIM] =  0.5 * (left_val + right_val);
-    	}
+            // this line assumes the internal node is midway between the two vertices
+            mCurrentSolution[mProblemDimension*global_index + DIM] =  0.5 * (left_val + right_val);
+        }
     }
 }
 

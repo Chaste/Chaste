@@ -254,7 +254,7 @@ public:
         }
         if (problemType == BIDOMAIN_WITH_BATH)
         {
-        	return new BidomainProblem<DIM>(pCellFactory, true);// true-> bath
+            return new BidomainProblem<DIM>(pCellFactory, true);// true-> bath
         }
         EXCEPTION("The second template parameter should be 1 when a monodomain problem is chosen");
     }
@@ -311,7 +311,7 @@ CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::CardiacElectroMechanicsProble
 
     if (electricsProblemType == BIDOMAIN_WITH_BATH)
     {
-    	mHasBath = true;
+        mHasBath = true;
     }
     // check whether output is required
     mWriteOutput = (outputDirectory!="");
@@ -556,14 +556,14 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
         variable_names.push_back("V");
         if(ELEC_PROB_DIM==2)
         {
-        	variable_names.push_back("Phi_e");
-        	if (mHasBath==true)
-        	{
+            variable_names.push_back("Phi_e");
+            if (mHasBath==true)
+            {
                 std::vector<std::string> regions;
                 regions.push_back("tissue");
                 regions.push_back("bath");
                 p_cmgui_writer->SetRegionNames(regions);
-        	}
+            }
         }
         p_cmgui_writer->SetAdditionalFieldNames(variable_names);
         p_cmgui_writer->WriteInitialMesh("undeformed");
@@ -765,11 +765,11 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
         //Collect the distributed calcium data into one Vec to be later replicated
         for(unsigned node_index = 0; node_index<mpElectricsMesh->GetNumNodes(); node_index++)
         {
-        	if (mpElectricsMesh->GetDistributedVectorFactory()->IsGlobalIndexLocal(node_index))
-        	{
-            	double calcium_value = mpElectricsProblem->GetTissue()->GetCardiacCell(node_index)->GetIntracellularCalciumConcentration();
-        		VecSetValue(calcium_data, node_index ,calcium_value, INSERT_VALUES);
-        	}
+            if (mpElectricsMesh->GetDistributedVectorFactory()->IsGlobalIndexLocal(node_index))
+            {
+                double calcium_value = mpElectricsProblem->GetTissue()->GetCardiacCell(node_index)->GetIntracellularCalciumConcentration();
+                VecSetValue(calcium_data, node_index ,calcium_value, INSERT_VALUES);
+            }
         }
         PetscTools::Barrier();//not sure this is needed
 

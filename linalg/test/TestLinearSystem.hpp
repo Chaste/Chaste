@@ -1550,6 +1550,6 @@ public:
         TS_ASSERT( strcmp(pc,"jacobi")==0 );
     }
     // The above test should be last in the suite
-    
+
 };
 #endif //_TESTLINEARSYSTEM_HPP_

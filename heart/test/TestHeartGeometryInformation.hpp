@@ -267,7 +267,7 @@ public:
             //...and in the rv.
             else if (x>=5)
             {
-            	TS_ASSERT_DELTA(info.CalculateRelativeWallPosition(index),(x-5.0)/3.0,1e-12);
+                TS_ASSERT_DELTA(info.CalculateRelativeWallPosition(index),(x-5.0)/3.0,1e-12);
             }
         }
 

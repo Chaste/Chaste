@@ -48,13 +48,13 @@ FineCoarseMeshPair<DIM>::FineCoarseMeshPair(TetrahedralMesh<DIM,DIM>& rFineMesh,
 template<unsigned DIM>
 const TetrahedralMesh<DIM,DIM>& FineCoarseMeshPair<DIM>::GetFineMesh() const
 {
-	return  mrFineMesh;
+    return  mrFineMesh;
 }
 
 template<unsigned DIM>
 const TetrahedralMesh<DIM,DIM>& FineCoarseMeshPair<DIM>::GetCoarseMesh() const
 {
-	return  mrCoarseMesh;
+    return  mrCoarseMesh;
 }
 
 template<unsigned DIM>

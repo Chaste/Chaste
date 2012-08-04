@@ -49,7 +49,7 @@ class Box
 {
 private:
 
-	/** Coordinates of the box, in the form (for 2D) (xmin, xmax, ymin, ymax) (etc). */
+    /** Coordinates of the box, in the form (for 2D) (xmin, xmax, ymin, ymax) (etc). */
     c_vector<double, 2*DIM> mMinAndMaxValues;
 
     /** Nodes contained in this box. */
@@ -120,7 +120,7 @@ private:
 
     /** The boxes local (itself and nearest neighbour) to a given box. */
     std::vector< std::set<unsigned> > mLocalBoxes;
-    
+
     /** A fudge (box swelling) factor to deal with 32-bit floating point issues. */
     const static double mFudge = 5e-14;
 

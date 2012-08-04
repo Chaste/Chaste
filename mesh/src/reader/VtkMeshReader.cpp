@@ -351,7 +351,7 @@ ElementData VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextFaceData()
 
     if (SPACE_DIM == 3)
     {
-        while (mpVtkGeometryFilter->GetOutput()->GetCellType(mBoundaryFacesRead + mBoundaryFacesSkipped) == VTK_LINE) 
+        while (mpVtkGeometryFilter->GetOutput()->GetCellType(mBoundaryFacesRead + mBoundaryFacesSkipped) == VTK_LINE)
         {
             mBoundaryFacesSkipped++;
         }

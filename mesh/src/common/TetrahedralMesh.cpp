@@ -141,10 +141,10 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader(
         std::vector<unsigned> node_indices = face_data.NodeIndices;
 
         /*
-         * NOTE: unlike the above where we just read element *vertices* from mesh reader, here we are 
+         * NOTE: unlike the above where we just read element *vertices* from mesh reader, here we are
          * going to read a quadratic mesh with internal elements.
          * (There are only a few meshes with internals in the face file that we might as well use them.)
-         * 
+         *
          */
         std::vector<Node<SPACE_DIM>*> nodes;
         for (unsigned node_index=0; node_index<node_indices.size(); node_index++)

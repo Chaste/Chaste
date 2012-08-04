@@ -234,13 +234,13 @@ public:
         TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(), 4u);
     }
     /* ''Exercise'': convert to a compressible solver and compare the resultant deformations.
-	 * The next tutorial describes how to solve for a compressible deformation,
-	 * but the changes are essentially trivial: `IncompressibleNonlinearElasticitySolver` needs to be changed to
-	 * `CompressibleNonlinearElasticitySolver`, the line `problem_defn.SetMaterialLaw(..)` needs changing, and
-	 * the material law itself should be of type `AbstractCompressibleMaterialLaw`. An example is
-	 * `CompressibleMooneyRivlinMaterialLaw`. Also `solver.rGetPressures()` doesn't exist (or make sense)
-	 * when the solver is an `CompressibleNonlinearElasticitySolver`.
-	 */
+     * The next tutorial describes how to solve for a compressible deformation,
+     * but the changes are essentially trivial: `IncompressibleNonlinearElasticitySolver` needs to be changed to
+     * `CompressibleNonlinearElasticitySolver`, the line `problem_defn.SetMaterialLaw(..)` needs changing, and
+     * the material law itself should be of type `AbstractCompressibleMaterialLaw`. An example is
+     * `CompressibleMooneyRivlinMaterialLaw`. Also `solver.rGetPressures()` doesn't exist (or make sense)
+     * when the solver is an `CompressibleNonlinearElasticitySolver`.
+     */
 
     /* == Incompressible deformation: 2D shape hanging under gravity with a balancing traction ==
      *
@@ -312,7 +312,7 @@ public:
          */
         if(PetscTools::IsSequential()) // see #2084
         {
-        	solver.SetComputeAverageStressPerElementDuringSolve();
+            solver.SetComputeAverageStressPerElementDuringSolve();
         }
 
         /* Call `Solve()` */
@@ -329,7 +329,7 @@ public:
          */
         if(PetscTools::IsSequential()) // see #2084
         {
-        	solver.WriteCurrentAverageElementStresses("2nd_PK_stress");
+            solver.WriteCurrentAverageElementStresses("2nd_PK_stress");
         }
 
         /* Another quick check */

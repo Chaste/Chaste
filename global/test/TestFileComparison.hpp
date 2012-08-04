@@ -127,17 +127,17 @@ public:
 
     void TestBinaryFiles() throw(Exception)
     {
-    	std::string base_file = "./mesh/test/data/simple_cube_binary.node";
-    	TS_ASSERT(FileComparison(base_file, base_file, CalledCollectively, SuppressOutput).CompareFiles());
+        std::string base_file = "./mesh/test/data/simple_cube_binary.node";
+        TS_ASSERT(FileComparison(base_file, base_file, CalledCollectively, SuppressOutput).CompareFiles());
 
-    	//A file which is the same for data purposes, but has the provenance line altered
- 	 	std::string copy_file = "./global/test/data/simple_cube_binary_copy.node";
-    	TS_ASSERT(FileComparison(base_file, copy_file, CalledCollectively, SuppressOutput).CompareFiles());
+        //A file which is the same for data purposes, but has the provenance line altered
+          std::string copy_file = "./global/test/data/simple_cube_binary_copy.node";
+        TS_ASSERT(FileComparison(base_file, copy_file, CalledCollectively, SuppressOutput).CompareFiles());
 
-    	//A file which has a single byte of data inserted
-    	std::string modified_file = "./global/test/data/simple_cube_binary_modified.node";
+        //A file which has a single byte of data inserted
+        std::string modified_file = "./global/test/data/simple_cube_binary_modified.node";
 
-    	TS_ASSERT_EQUALS(FileComparison(base_file, modified_file, CalledCollectively, SuppressOutput).CompareFiles(0, false), expected_fail_result);
+        TS_ASSERT_EQUALS(FileComparison(base_file, modified_file, CalledCollectively, SuppressOutput).CompareFiles(0, false), expected_fail_result);
     }
 
 

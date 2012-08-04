@@ -95,11 +95,11 @@ private:
      */
     bool mFibreSheetDirectionsDefinedPerQuadraturePoint;
 
-	/** 
-	 *  The first deformation (to find the equilibrium state given the loading)
-	 *  may require the loading to be incremented, in order for the Solve() to
-	 *  converge - this stores the number of increments to be used (initialised to 1)
-	 */
+    /**
+     *  The first deformation (to find the equilibrium state given the loading)
+     *  may require the loading to be incremented, in order for the Solve() to
+     *  converge - this stores the number of increments to be used (initialised to 1)
+     */
     unsigned mNumIncrementsForInitialDeformation;
 
     /**
@@ -274,12 +274,12 @@ public:
         return mFibreSheetDirectionsDefinedPerQuadraturePoint;
     }
 
-	/** 
-	 *  The first deformation (to find the equilibrium state given the loading)
-	 *  may require the loading to be incremented, in order for the Solve() to
-	 *  converge. Set the number of increments to be used. 
-	 *  @param numIncrements number of increments
-	 */
+    /**
+     *  The first deformation (to find the equilibrium state given the loading)
+     *  may require the loading to be incremented, in order for the Solve() to
+     *  converge. Set the number of increments to be used.
+     *  @param numIncrements number of increments
+     */
     void SetNumIncrementsForInitialDeformation(unsigned numIncrements)
     {
         if(numIncrements==0)
@@ -289,10 +289,10 @@ public:
         mNumIncrementsForInitialDeformation = numIncrements;
     }
 
-	/** 
-	 *  Get the number of increments to be used in the initial deformation
-	 *  (see SetNumIncrementsForInitialDeformation() for more details).
-	 */
+    /**
+     *  Get the number of increments to be used in the initial deformation
+     *  (see SetNumIncrementsForInitialDeformation() for more details).
+     */
     unsigned GetNumIncrementsForInitialDeformation()
     {
         return mNumIncrementsForInitialDeformation;

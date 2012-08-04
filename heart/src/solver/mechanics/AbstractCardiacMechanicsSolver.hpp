@@ -228,7 +228,7 @@ public:
      * @param outputDirectory The output directory, relative to TEST_OUTPUT
      */
     AbstractCardiacMechanicsSolver(QuadraticMesh<DIM>& rQuadMesh,
-								   ContractionModelName contractionModelName,
+                                   ContractionModelName contractionModelName,
                                    ElectroMechanicsProblemDefinition<DIM>& rProblemDefinition,
                                    std::string outputDirectory);
 
@@ -340,7 +340,7 @@ public:
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
 AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AbstractCardiacMechanicsSolver(QuadraticMesh<DIM>& rQuadMesh,
-																					  ContractionModelName contractionModelName,
+                                                                                      ContractionModelName contractionModelName,
                                                                                       ElectroMechanicsProblemDefinition<DIM>& rProblemDefinition,
                                                                                       std::string outputDirectory)
    : ELASTICITY_SOLVER(rQuadMesh,
@@ -384,14 +384,14 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Initialise()
                 data_at_quad_point.Stretch = 1.0;
                 data_at_quad_point.StretchLastTimeStep = 1.0;
 
-               	if (mpMeshPair->GetFineMesh().GetElement(fine_elements[quad_pt_global_index].ElementNum)->GetUnsignedAttribute() == HeartRegionCode::GetValidBathId())
-				{
-            		data_at_quad_point.Active = false;//bath
-            	}
-            	else
-            	{
-            		data_at_quad_point.Active = true;//tissue
-            	}
+                   if (mpMeshPair->GetFineMesh().GetElement(fine_elements[quad_pt_global_index].ElementNum)->GetUnsignedAttribute() == HeartRegionCode::GetValidBathId())
+                {
+                    data_at_quad_point.Active = false;//bath
+                }
+                else
+                {
+                    data_at_quad_point.Active = true;//tissue
+                }
                 mQuadPointToDataAtQuadPointMap[quad_pt_global_index] = data_at_quad_point;
             }
         }
@@ -415,12 +415,12 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Initialise()
 template<class ELASTICITY_SOLVER,unsigned DIM>
 void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetFineCoarseMeshPair(FineCoarseMeshPair<DIM>* pMeshPair)
 {
-	assert(pMeshPair!=NULL);
-	if (pMeshPair->GetCoarseMesh().GetNumElements() != this->mrQuadMesh.GetNumElements())
-	{
-		EXCEPTION("When setting a mesh pair into the solver, the coarse mesh of the mesh pair must be the same as the quadratic mesh");
-	}
-	mpMeshPair = pMeshPair;
+    assert(pMeshPair!=NULL);
+    if (pMeshPair->GetCoarseMesh().GetNumElements() != this->mrQuadMesh.GetNumElements())
+    {
+        EXCEPTION("When setting a mesh pair into the solver, the coarse mesh of the mesh pair must be the same as the quadratic mesh");
+    }
+    mpMeshPair = pMeshPair;
 }
 
 template<class ELASTICITY_SOLVER,unsigned DIM>

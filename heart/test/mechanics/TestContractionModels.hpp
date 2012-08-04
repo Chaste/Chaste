@@ -711,7 +711,7 @@ public :
 
     void TestFakeBathContractionModel() throw(Exception)
     {
-    	FakeBathContractionModel model1;
+        FakeBathContractionModel model1;
         ContractionModelInputParameters input_parameters;
         model1.SetInputParameters(input_parameters);
         model1.SetStretchAndStretchRate(1.0, 0.0);

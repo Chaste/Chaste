@@ -81,7 +81,7 @@ void DistributedVector::Restore()
     VecRestoreArray(mVec, &mpVec);
 
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
-    /** 
+    /**
      * mpVec is NULL after this function call
      */
     VecGetArray(mVec, &mpVec);

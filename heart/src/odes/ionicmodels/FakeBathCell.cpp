@@ -67,7 +67,7 @@ void FakeBathCell::ComputeExceptVoltage(double tStart, double tEnd)
 
 double FakeBathCell::GetIntracellularCalciumConcentration()
 {
-	return 0.0;
+    return 0.0;
 }
 
 template<>

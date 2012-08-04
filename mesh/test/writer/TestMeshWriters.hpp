@@ -607,9 +607,9 @@ public:
 
         //create another writer, this time we will set multiple regions and check the script
         CmguiDeformedSolutionsWriter<2> writer_with_regions("TestCmguiDeformedSolutionsWriter_with_regions",
-                                               	   	   	   "solution",
-                                               	   	   	   	mesh,
-                                               	   	   	   	WRITE_LINEAR_MESH);
+                                                                    "solution",
+                                                                        mesh,
+                                                                        WRITE_LINEAR_MESH);
         std::vector<std::string> regions;
         regions.push_back("region_number_1");
         regions.push_back("region_number_2");

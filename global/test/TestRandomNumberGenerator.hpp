@@ -295,28 +295,28 @@ public:
     void TestGenericShuffle()
     {
         const unsigned test_size = 10;
-    	RandomNumberGenerator* p_gen= RandomNumberGenerator::Instance();
+        RandomNumberGenerator* p_gen= RandomNumberGenerator::Instance();
 
         p_gen->Reseed(0);
         //Make an empty vector and put it through the unsigned version of shuffle
-    	std::vector<unsigned> empty_perm_for_shuffle;
+        std::vector<unsigned> empty_perm_for_shuffle;
         p_gen->Shuffle(test_size, empty_perm_for_shuffle);
 
         p_gen->Reseed(0);
         //Make an identity permutation vector and put it through the generic version of shuffle
-		std::vector<boost::shared_ptr<unsigned> > identity_perm_for_shuffle(test_size);
-		for (unsigned i=0; i<test_size; i++)
-	    {
-			boost::shared_ptr<unsigned> p_i(new unsigned(i));
-			identity_perm_for_shuffle[i] = p_i;
-	    }
-		p_gen->Shuffle(identity_perm_for_shuffle);
+        std::vector<boost::shared_ptr<unsigned> > identity_perm_for_shuffle(test_size);
+        for (unsigned i=0; i<test_size; i++)
+        {
+            boost::shared_ptr<unsigned> p_i(new unsigned(i));
+            identity_perm_for_shuffle[i] = p_i;
+        }
+        p_gen->Shuffle(identity_perm_for_shuffle);
 
 
 
         for (unsigned i=0; i<test_size; i++)
         {
-        	TS_ASSERT_EQUALS(empty_perm_for_shuffle[i], *identity_perm_for_shuffle[i]);
+            TS_ASSERT_EQUALS(empty_perm_for_shuffle[i], *identity_perm_for_shuffle[i]);
         }
 
         //Cover null case

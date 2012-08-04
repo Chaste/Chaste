@@ -68,13 +68,13 @@ PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::PostProcessingWriter(AbstractTetra
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WritePostProcessingFiles()
 {
-	//Check that post-processing is really needed
-	assert(HeartConfig::Instance()->IsPostProcessingRequested());
-	//Check that it's safe to send the results to the (hard-coded) subfolder for Meshalyzer/CMGui
-	assert(HeartConfig::Instance()->GetVisualizeWithMeshalyzer() || HeartConfig::Instance()->GetVisualizeWithCmgui());
+    //Check that post-processing is really needed
+    assert(HeartConfig::Instance()->IsPostProcessingRequested());
+    //Check that it's safe to send the results to the (hard-coded) subfolder for Meshalyzer/CMGui
+    assert(HeartConfig::Instance()->GetVisualizeWithMeshalyzer() || HeartConfig::Instance()->GetVisualizeWithCmgui());
 
-	// Please note that only the master processor should write to file.
-	// Each of the private methods called here takes care of checking.
+    // Please note that only the master processor should write to file.
+    // Each of the private methods called here takes care of checking.
 
     if (HeartConfig::Instance()->IsApdMapsRequested())
     {
@@ -340,52 +340,52 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteGenericFile(std::vector<std::vector<double> >& rDataPayload, const std::string& rFileName)
 {
 
-	if(HeartConfig::Instance()->GetVisualizeWithMeshalyzer())
-	{
-		WriteGenericFileToMeshalyzer(rDataPayload, "output", rFileName);
-	}
-	if(HeartConfig::Instance()->GetVisualizeWithCmgui())
-	{
-		//Special case use of the wrong method - \todo #1660 need to change the format of this data
-		WriteGenericFileToMeshalyzer(rDataPayload, "cmgui_output", rFileName);
-	}
+    if(HeartConfig::Instance()->GetVisualizeWithMeshalyzer())
+    {
+        WriteGenericFileToMeshalyzer(rDataPayload, "output", rFileName);
+    }
+    if(HeartConfig::Instance()->GetVisualizeWithCmgui())
+    {
+        //Special case use of the wrong method - \todo #1660 need to change the format of this data
+        WriteGenericFileToMeshalyzer(rDataPayload, "cmgui_output", rFileName);
+    }
 
 
 }
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteGenericFileToMeshalyzer(std::vector<std::vector<double> >& rDataPayload, const std::string& rFolder, const std::string& rFileName)
 {
-	OutputFileHandler output_file_handler(HeartConfig::Instance()->GetOutputDirectory() + "/" + rFolder, false);
+    OutputFileHandler output_file_handler(HeartConfig::Instance()->GetOutputDirectory() + "/" + rFolder, false);
     PetscTools::BeginRoundRobin();
-	{
-		out_stream p_file=out_stream(NULL);
-		//Open file
-		if (PetscTools::AmMaster())
-		{
-			//Open the file for the first time
-			p_file = output_file_handler.OpenOutputFile(rFileName);
-			//write provenance info
-			std::string comment = "# " + ChasteBuildInfo::GetProvenanceString();
-			*p_file << comment;
-		}
-		else
-		{
-			//Append to the existing file
-			p_file = output_file_handler.OpenOutputFile(rFileName, std::ios::app);
-		}
-		//Write data
-		for (unsigned line_number=0; line_number<rDataPayload.size(); line_number++)
-		{
-			for (unsigned i = 0; i < rDataPayload[line_number].size(); i++)
-			{
-				*p_file << rDataPayload[line_number][i] << "\t";
-			}
-			*p_file << std::endl;
-		}
-		p_file->close();
-	}
-	//There's a barrier included here: Process i+1 waits for process i to close the file
-	PetscTools::EndRoundRobin();
+    {
+        out_stream p_file=out_stream(NULL);
+        //Open file
+        if (PetscTools::AmMaster())
+        {
+            //Open the file for the first time
+            p_file = output_file_handler.OpenOutputFile(rFileName);
+            //write provenance info
+            std::string comment = "# " + ChasteBuildInfo::GetProvenanceString();
+            *p_file << comment;
+        }
+        else
+        {
+            //Append to the existing file
+            p_file = output_file_handler.OpenOutputFile(rFileName, std::ios::app);
+        }
+        //Write data
+        for (unsigned line_number=0; line_number<rDataPayload.size(); line_number++)
+        {
+            for (unsigned i = 0; i < rDataPayload[line_number].size(); i++)
+            {
+                *p_file << rDataPayload[line_number][i] << "\t";
+            }
+            *p_file << std::endl;
+        }
+        p_file->close();
+    }
+    //There's a barrier included here: Process i+1 waits for process i to close the file
+    PetscTools::EndRoundRobin();
 }
 
 /////////////////////////////////////////////////////////////////////

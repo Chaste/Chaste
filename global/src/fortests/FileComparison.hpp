@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class FileComparison : public AbstractFileComparison
 {
 private:
-	/** Whether or not we should ignore lines starting with '#'. True by default.*/
+    /** Whether or not we should ignore lines starting with '#'. True by default.*/
     bool mIgnoreCommentLines;
 
     /**

@@ -85,14 +85,14 @@ private:
     /** Stokes' flow problem definition */
     StokesFlowProblemDefinition<DIM>* mpProblemDefinition;
 
-	/** This variable is initialised to 1.0 and almost never changed, and is used in the spatial-spatial matrix term.
-	 *  One test (see TestStokesFlowAssembler)
-	 *  sets it to 0.0 before assembling the matrix. Basically, a different weak form USED to be implemented here (corresponding to
-	 *  one kind of Neumann boundary condition), and the matrix for that weak form was compared against exact solutions in this test.
-	 *  mScaleFactor = 0.0 corresponds to old weak form, mScaleFactor = 1 corresponds to new weak form as documented in fem implementations
-	 *  pdf.
-	 */
-	double mScaleFactor;
+    /** This variable is initialised to 1.0 and almost never changed, and is used in the spatial-spatial matrix term.
+     *  One test (see TestStokesFlowAssembler)
+     *  sets it to 0.0 before assembling the matrix. Basically, a different weak form USED to be implemented here (corresponding to
+     *  one kind of Neumann boundary condition), and the matrix for that weak form was compared against exact solutions in this test.
+     *  mScaleFactor = 0.0 corresponds to old weak form, mScaleFactor = 1 corresponds to new weak form as documented in fem implementations
+     *  pdf.
+     */
+    double mScaleFactor;
 
 
     /**
@@ -130,7 +130,7 @@ private:
                 unsigned node_index2 = (index2-spatial_dim2)/DIM;
 
                 ret(index1,index2) +=   mu
-                		              * mScaleFactor // virtually always 1, see doxygen for this variable
+                                      * mScaleFactor // virtually always 1, see doxygen for this variable
                                       * rGradQuadPhi(spatial_dim1, node_index2)
                                       * rGradQuadPhi(spatial_dim2, node_index1);
 

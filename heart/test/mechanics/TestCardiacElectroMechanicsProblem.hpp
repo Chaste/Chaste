@@ -98,13 +98,13 @@ public:
         // there are 3 arguments and it is expecting 2
         try
         {
-			CardiacElectroMechanicsProblem<2,2> problem (COMPRESSIBLE,
-					MONODOMAIN,
-					&electrics_mesh,
-					&mechanics_mesh,
-					&cell_factory,
-					&problem_defn,
-					"blahblah");
+            CardiacElectroMechanicsProblem<2,2> problem (COMPRESSIBLE,
+                    MONODOMAIN,
+                    &electrics_mesh,
+                    &mechanics_mesh,
+                    &cell_factory,
+                    &problem_defn,
+                    "blahblah");
         }
         catch (Exception& e)
         {
@@ -113,13 +113,13 @@ public:
 
         try
         {
-			CardiacElectroMechanicsProblem<2,1> problem (COMPRESSIBLE,
-					BIDOMAIN,
-					&electrics_mesh,
-					&mechanics_mesh,
-					&cell_factory,
-					&problem_defn,
-					"blahblah");
+            CardiacElectroMechanicsProblem<2,1> problem (COMPRESSIBLE,
+                    BIDOMAIN,
+                    &electrics_mesh,
+                    &mechanics_mesh,
+                    &cell_factory,
+                    &problem_defn,
+                    "blahblah");
         }
         catch (Exception& e)
         {
@@ -179,12 +179,12 @@ public:
         HeartConfig::Instance()->SetSimulationDuration(10.0);
 
         CardiacElectroMechanicsProblem<2,1>   problem(COMPRESSIBLE,
-													  MONODOMAIN,
-													  &electrics_mesh,
-													  &mechanics_mesh,
-													  &cell_factory,
-													  &problem_defn,
-													  "TestCardiacEmHomogeneousEverythingCompressible");
+                                                      MONODOMAIN,
+                                                      &electrics_mesh,
+                                                      &mechanics_mesh,
+                                                      &cell_factory,
+                                                      &problem_defn,
+                                                      "TestCardiacEmHomogeneousEverythingCompressible");
         problem.Solve();
         std::vector<c_vector<double,2> >& r_deformed_position = problem.rGetDeformedPosition();
 
@@ -262,7 +262,7 @@ public:
         HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(1500,1500,1500));
         //creates the EM problem with ELEC_PROB_DIM=2
         CardiacElectroMechanicsProblem<2,2> problem(COMPRESSIBLE,
-												    BIDOMAIN,
+                                                    BIDOMAIN,
                                                     &electrics_mesh,
                                                     &mechanics_mesh,
                                                     &cell_factory,
@@ -307,8 +307,8 @@ public:
         //for the rest, we check that, at the end of this simulation, all quad nodes have V and Ca above a certain threshold
         for(unsigned i = 0; i < quad_points; i++)
         {
-        	TS_ASSERT_LESS_THAN(9.2,problem.mInterpolatedVoltages[i]);
-        	TS_ASSERT_LESS_THAN(0.0014,problem.mInterpolatedCalciumConcs[i]);
+            TS_ASSERT_LESS_THAN(9.2,problem.mInterpolatedVoltages[i]);
+            TS_ASSERT_LESS_THAN(0.0014,problem.mInterpolatedCalciumConcs[i]);
         }
 
         //check default value of whether there is a bath or not
@@ -362,7 +362,7 @@ public:
         HeartConfig::Instance()->SetSimulationDuration(10.0);
 
         CardiacElectroMechanicsProblem<2,1> problem(INCOMPRESSIBLE,
-												  MONODOMAIN,
+                                                  MONODOMAIN,
                                                   &electrics_mesh,
                                                   &mechanics_mesh,
                                                   &cell_factory,
@@ -434,9 +434,9 @@ public:
         c_vector<double,2> pos = zero_vector<double>(2);
         for(unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
         {
-        	pos(0) = mechanics_mesh.GetNode(i)->rGetLocation()[0];
-        	pos(1) = mechanics_mesh.GetNode(i)->rGetLocation()[1];
-        	original_node_position.push_back(pos);
+            pos(0) = mechanics_mesh.GetNode(i)->rGetLocation()[0];
+            pos(1) = mechanics_mesh.GetNode(i)->rGetLocation()[1];
+            original_node_position.push_back(pos);
         }
 
         std::vector<unsigned> fixed_nodes;
@@ -469,7 +469,7 @@ public:
         HeartConfig::Instance()->SetSimulationDuration(10.0);
         HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(1500,1500,1500));
         CardiacElectroMechanicsProblem<2,2> problem(COMPRESSIBLE,
-												  BIDOMAIN_WITH_BATH,
+                                                  BIDOMAIN_WITH_BATH,
                                                   &electrics_mesh,
                                                   &mechanics_mesh,
                                                   &cell_factory,
@@ -521,9 +521,9 @@ public:
         c_vector<double,2> pos = zero_vector<double>(2);
         for(unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
         {
-        	pos(0) = mechanics_mesh.GetNode(i)->rGetLocation()[0];
-        	pos(1) = mechanics_mesh.GetNode(i)->rGetLocation()[1];
-        	original_node_position.push_back(pos);
+            pos(0) = mechanics_mesh.GetNode(i)->rGetLocation()[0];
+            pos(1) = mechanics_mesh.GetNode(i)->rGetLocation()[1];
+            original_node_position.push_back(pos);
         }
 
         std::vector<unsigned> fixed_nodes;
@@ -556,7 +556,7 @@ public:
         HeartConfig::Instance()->SetSimulationDuration(10.0);
         HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(1500,1500,1500));
         CardiacElectroMechanicsProblem<2,2> problem(INCOMPRESSIBLE,
-												  BIDOMAIN_WITH_BATH,
+                                                  BIDOMAIN_WITH_BATH,
                                                   &electrics_mesh,
                                                   &mechanics_mesh,
                                                   &cell_factory,
@@ -602,7 +602,7 @@ public:
         if(PetscTools::IsSequential()) // #2084
         {
             TS_ASSERT_THROWS_CONTAINS(problem.SetOutputDeformationGradientsAndStress(3.4),"not a multiple");
-        	problem.SetOutputDeformationGradientsAndStress(3.0);
+            problem.SetOutputDeformationGradientsAndStress(3.0);
         }
         problem.Solve();
 
@@ -620,7 +620,7 @@ public:
 
         if(PetscTools::IsSequential())
         {
-        	// check electrics output was written
+            // check electrics output was written
             TS_ASSERT(handler.FindFile("deformation/deformation_gradient_0.strain").Exists());
             TS_ASSERT(handler.FindFile("deformation/deformation_gradient_3.strain").Exists());
             TS_ASSERT(handler.FindFile("deformation/deformation_gradient_6.strain").Exists());

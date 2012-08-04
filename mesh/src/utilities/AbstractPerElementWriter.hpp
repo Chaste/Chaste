@@ -57,7 +57,7 @@ protected:
     /**
      * How to associate an element with some data
      * Must be over-ridden by the derived class.
-     * 
+     *
      * @param pElement  a locally-owned element for which to calculate or lookup some data
      * @param rData  the double-precision data to write to file (output from the method)
      */
@@ -67,7 +67,7 @@ protected:
      * How to write an element's worth of data to the file.
      * By default writes tab-separated data to a single line, but can be over-ridden.
      * This is only called by the master process.
-     * 
+     *
      * @param rData  the double-precision data to write to file
      */
     virtual void WriteElementOnMaster(const c_vector<double, DATA_SIZE>& rData)
@@ -77,7 +77,7 @@ protected:
             (*mpMasterFile)<<rData[i]<<"\t";
         }
         (*mpMasterFile)<<"\n";
-    }       
+    }
 
     /**
      * How to write the header information to the file.
@@ -90,13 +90,13 @@ protected:
     }
 
 public:
-    
+
     /**
      * Writes data about each element in parallel
      * Data about each element is retrieved by the Visit() method.
      * Writing is done by the master process using the WriteElement() method.
      * Any element not owned by the master is communicated by the unique designated owner.
-     * 
+     *
      * @param rHandler  specify the directory in which to place the output file
      * @param rFileName  the file name
      * @param pMesh the mesh, the elements of which are to be iterated over
@@ -115,7 +115,7 @@ public:
             {
                 if (mpMesh->CalculateDesignatedOwnershipOfElement(element_index))
                 {
-                    //Master owns this process and can write it directly    
+                    //Master owns this process and can write it directly
                     Visit(mpMesh->GetElement(element_index), data);
                 }
                 else
@@ -150,10 +150,10 @@ public:
                     MPI_Send(&data[0], DATA_SIZE, MPI_DOUBLE, 0, element_index, PETSC_COMM_WORLD);//Tag with element_index
                 }
             }
-             
+
         }
     }
-    
+
     /**
      * Empty virtual destructor for abstract class
      */

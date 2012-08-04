@@ -101,15 +101,15 @@ public:
 
         {
             //NOTE: Interleaved test
-            
+
             // Show that trying to write .pvtu files from a TetrahedralMesh gives a warning (but writes anyway)
             CopyToTestOutputDirectory("pde/test/data/cube_2mm_12_elements.h5",
                                   working_directory2);
             Hdf5ToVtkConverter<3,3> converter2(working_directory2, "cube_2mm_12_elements", &mesh, true, true);
-            
+
             //The reading part of this test is below
         }
-            
+
         /*
          * Note that VTK is not thread-safe. The master process has spawned
          * a child to write the mesh and may still be writing! This barrier

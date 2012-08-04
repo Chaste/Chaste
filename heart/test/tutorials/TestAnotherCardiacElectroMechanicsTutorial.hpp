@@ -279,7 +279,7 @@ public:
      */
     void TestAnnulusWithInternalPressure() throw (Exception)
     {
-    	/* The following should require little explanation now */
+        /* The following should require little explanation now */
         TetrahedralMesh<2,2> electrics_mesh;
         QuadraticMesh<2> mechanics_mesh;
 
@@ -365,7 +365,7 @@ public:
          * for each element will be written at the requested times. This currently only works in sequential simulations. */
         if(PetscTools::IsSequential()) // #2084
         {
-        	problem.SetOutputDeformationGradientsAndStress(10.0 /*how often (in ms) to write - should be a multiple of mechanics timestep*/);
+            problem.SetOutputDeformationGradientsAndStress(10.0 /*how often (in ms) to write - should be a multiple of mechanics timestep*/);
         }
 
         /* Since this test involves a large deformation at t=0, several Newton iterations are required. To see how the nonlinear

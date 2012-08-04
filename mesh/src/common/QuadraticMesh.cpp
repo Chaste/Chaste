@@ -78,7 +78,7 @@ void QuadraticMesh<DIM>::ConstructLinearMesh(unsigned numElemX)
     assert (this->mNodes.size() == numElemX+1);
     mNumVertices = numElemX+1;
     this->mNodes.resize(2*numElemX+1);
-    
+
     for (unsigned element_index=0; element_index<numElemX; element_index++)
     {
         unsigned mid_node_index = mNumVertices + element_index;
@@ -92,7 +92,7 @@ void QuadraticMesh<DIM>::ConstructLinearMesh(unsigned numElemX)
         //Put in element and cross-reference
         this->mElements[element_index]->AddNode(p_mid_node);
         p_mid_node->AddElement(element_index);
-        
+
     }
 
     this->RefreshMesh();

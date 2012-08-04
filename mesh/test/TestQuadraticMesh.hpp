@@ -832,7 +832,7 @@ public:
             MatRestoreRow(matrix, row, &num_entries, &column_indices, &values);
         }
         PetscTools::Destroy(matrix);
-        
+
         std::vector<unsigned> global_hist(rMesh.GetNumNodes());
         MPI_Allreduce( &upper_hist[0], &global_hist[0], rMesh.GetNumNodes(), MPI_UNSIGNED, MPI_SUM, PETSC_COMM_WORLD);
 
@@ -913,7 +913,7 @@ public:
         idxtype* perm=new idxtype[3*num_local_nodes];
         idxtype* iperm=new idxtype[3*num_local_nodes];
         METIS_NodeND(&num_local_nodes, xadj, adjncy, &numflag, options, perm, iperm);
-        
+
         std::vector<unsigned> permutation;
         std::vector<unsigned> ipermutation;
         for (int i=0; i<num_local_nodes; i++)

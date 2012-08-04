@@ -691,11 +691,11 @@ void BoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNodes, std
     // Create an empty set of neighbours for each node
     for (unsigned node_index=0; node_index<rNodes.size(); node_index++)
     {
-    	rNodeNeighbours[node_index] = std::set<unsigned>();
+        rNodeNeighbours[node_index] = std::set<unsigned>();
     }
 
-	for (unsigned node_index=0; node_index<rNodes.size(); node_index++)
-		{
+    for (unsigned node_index=0; node_index<rNodes.size(); node_index++)
+        {
         // Get the box containing this node
         unsigned box_index = CalculateContainingBox(rNodes[node_index]);
 

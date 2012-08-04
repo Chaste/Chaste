@@ -62,8 +62,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
 typedef PetscBool PetscTruth;
 /**
- * This macro is for converting a pre-PETSc3.2 "Destroy" function call (which involves an object, such as 
- * PetscViewerDestroy(VecView view) ) to a PETSc3.2 destroy via pointer call. 
+ * This macro is for converting a pre-PETSc3.2 "Destroy" function call (which involves an object, such as
+ * PetscViewerDestroy(VecView view) ) to a PETSc3.2 destroy via pointer call.
  * Note that we only use this macro for calls which appear rarely in the code.  Please destroy Vec and Mat objects
  * via the overloaded PetscTools::Destroy methods.
  * @param x The object to destroy
@@ -71,8 +71,8 @@ typedef PetscBool PetscTruth;
 #define PETSC_DESTROY_PARAM(x) &x
 #else
 /**
- * This macro is for converting a pre-PETSc3.2 "Destroy" function call (which involves an object, such as 
- * PetscViewerDestroy(VecView view) ) to a PETSc3.2 destroy via pointer call. 
+ * This macro is for converting a pre-PETSc3.2 "Destroy" function call (which involves an object, such as
+ * PetscViewerDestroy(VecView view) ) to a PETSc3.2 destroy via pointer call.
  * Note that we only use this macro for calls which appear rarely in the code.  Please destroy Vec and Mat objects
  * via the overloaded PetscTools::Destroy methods.
  * @param x The object to destroy
@@ -297,7 +297,7 @@ public:
      * Destroy method
      * Note that PETSc 3.1 and previous destroy based on a PETSc object
      * but PETSc 3.2 and later destroy based on a pointer to a PETSc object
-     * 
+     *
      * @param rVec a reference to the PETSc object
      */
      static inline void Destroy(Vec& rVec)
@@ -306,14 +306,14 @@ public:
         VecDestroy(&rVec);
 #else
         VecDestroy(rVec);
-#endif   
+#endif
      }
-     
+
     /**
      * Destroy method
      * Note that PETSc 3.1 and previous destroy based on a PETSc object
      * but PETSc 3.2 and later destroy based on a pointer to a PETSc object
-     * 
+     *
      * @param rMat a reference to the PETSc object
      */
      static inline void Destroy(Mat& rMat)
@@ -322,7 +322,7 @@ public:
         MatDestroy(&rMat);
 #else
         MatDestroy(rMat);
-#endif   
+#endif
      }
 };
 

@@ -130,7 +130,7 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AddPeriodic
     // to take in the index of the unknown
     for(unsigned i=0; i<PROBLEM_DIM; i++)
     {
-    	(*(this->mpPeriodicBcMap[i]))[pNode1] = pNode2;
+        (*(this->mpPeriodicBcMap[i]))[pNode1] = pNode2;
     }
 }
 

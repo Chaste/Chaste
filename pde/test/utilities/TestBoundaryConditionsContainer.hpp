@@ -300,10 +300,10 @@ public:
 
             if(row==SIZE-1)
             {
-            	for (int column=0; column<SIZE; column++)
-            	{
-            		TS_ASSERT_EQUALS(system.GetMatrixElement(row,column), 1);
-            	}
+                for (int column=0; column<SIZE; column++)
+                {
+                    TS_ASSERT_EQUALS(system.GetMatrixElement(row,column), 1);
+                }
             }
         }
 
@@ -889,32 +889,32 @@ public:
         PetscMatTools::GetOwnershipRange(r_mat, lo, hi);
         for(int i=lo; i<hi; i++)
         {
-        	if(i==0 || i==1 || i==4 || i==5)
-        	{
-        		unsigned col_one = i;
-        		unsigned col_minus_one = i+2;
+            if(i==0 || i==1 || i==4 || i==5)
+            {
+                unsigned col_one = i;
+                unsigned col_minus_one = i+2;
 
-        		for(unsigned j=0; j<2*SIZE; j++)
-        		{
-        			double val = 0.0;
-        			if(j==col_one)
-        			{
-        				val = 1.0;
-        			}
-        			if(j==col_minus_one)
-        			{
-        				val = -1.0;
-        			}
-        			TS_ASSERT_DELTA( PetscMatTools::GetElement(r_mat, i, j), val, 1e-12);
-        		}
-        	}
-        	else
-        	{
-        		for(unsigned j=0; j<2*SIZE; j++)
-        		{
-        			TS_ASSERT_DELTA( PetscMatTools::GetElement(r_mat, i, j), 2.0, 1e-12);
-        		}
-        	}
+                for(unsigned j=0; j<2*SIZE; j++)
+                {
+                    double val = 0.0;
+                    if(j==col_one)
+                    {
+                        val = 1.0;
+                    }
+                    if(j==col_minus_one)
+                    {
+                        val = -1.0;
+                    }
+                    TS_ASSERT_DELTA( PetscMatTools::GetElement(r_mat, i, j), val, 1e-12);
+                }
+            }
+            else
+            {
+                for(unsigned j=0; j<2*SIZE; j++)
+                {
+                    TS_ASSERT_DELTA( PetscMatTools::GetElement(r_mat, i, j), 2.0, 1e-12);
+                }
+            }
         }
 
         for (unsigned i=0; i<SIZE-1; i++)

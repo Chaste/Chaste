@@ -224,12 +224,12 @@ protected:
     */
     bool mIncludeActiveTension;
 
-	/** 
-	 * The user may request that the stress for each element (averaged over quadrature point stresses)
-	 * are saved during the Solve; this bool states this (defaults to false).
-	 */
+    /**
+     * The user may request that the stress for each element (averaged over quadrature point stresses)
+     * are saved during the Solve; this bool states this (defaults to false).
+     */
     bool mSetComputeAverageStressPerElement;
-    
+
     /**
      * If the stresses for each element (averaged over quadrature point stresses)
      * are to be stored, they are stored in this variable.
@@ -238,11 +238,11 @@ protected:
      * rather than a 3d matrix.
      */
     std::vector<c_vector<double,DIM*(DIM+1)/2> > mAverageStressesPerElement;
-    
+
     /**
      *  Add the given stress tensor to the store of average stresses.
      *  mSetComputeAverageStressPerElement must be true
-     * 
+     *
      *  @param rT 2nd PK stress (matrix is assumed symmetric)
      *  @param elementIndex element index
      */
@@ -626,9 +626,9 @@ public:
      * @param setComputeAverageStressPerElement whether to compute stresses (defaults to true)
      */
     void SetComputeAverageStressPerElementDuringSolve(bool setComputeAverageStressPerElement = true);
-    
+
     /**
-     * If SetComputeAverageStressPerElementDuringSolve() was called before the Solve(), then 
+     * If SetComputeAverageStressPerElementDuringSolve() was called before the Solve(), then
      * this method can be used to print the average stresses to file)
      *
      * Each line of the output file corresponds to one element: the DIM*DIM matrix will be written
@@ -655,10 +655,10 @@ public:
     std::vector<c_vector<double,DIM> >& rGetDeformedPosition();
 
     /**
-     * If SetComputeAverageStressPerElementDuringSolve() was called before the Solve(), then 
+     * If SetComputeAverageStressPerElementDuringSolve() was called before the Solve(), then
      * this method can be used to get the average stress for a particular
      * element.
-     * 
+     *
      * @param elementIndex elementIndex
      */
     c_matrix<double,DIM,DIM> GetAverageStressPerElement(unsigned elementIndex);
@@ -1417,11 +1417,11 @@ void AbstractNonlinearElasticitySolver<DIM>::Solve(double tol)
     }
 
     // Remove pressure dummy values (P=0 at internal nodes, which should have been
-    // been the result of the solve above), by linear interpolating from vertices of 
+    // been the result of the solve above), by linear interpolating from vertices of
     // edges to the internal node of the edge
     if(this->mCompressibilityType==INCOMPRESSIBLE)
     {
-    	this->RemovePressureDummyValuesThroughLinearInterpolation();
+        this->RemovePressureDummyValuesThroughLinearInterpolation();
     }
 
     // Write the final solution
@@ -1454,7 +1454,7 @@ void AbstractNonlinearElasticitySolver<DIM>::SetKspSolverAndPcType(KSP solver)
 //regression testing.  If a name changes, then the behaviour of the code changes
 //because it won't recognise the old name.  However, it won't fail to compile/run.
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 1) //PETSc 3.1 or later
-            PetscOptionsSetValue("-pc_factor_shift_type", "positive_definite");            
+            PetscOptionsSetValue("-pc_factor_shift_type", "positive_definite");
 #else
             PetscOptionsSetValue("-pc_factor_shift_positive_definite", "");
 #endif
@@ -1978,7 +1978,7 @@ void AbstractNonlinearElasticitySolver<DIM>::SolveSnes()
     SNESSetFromOptions(snes);
 
 #if (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 2) //PETSc 2.2
-    //int ierr = 
+    //int ierr =
     SNESSolve(snes, initial_guess);
 #else
     SNESSolve(snes, PETSC_NULL, initial_guess);

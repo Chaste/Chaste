@@ -55,6 +55,6 @@ void FakeBathContractionModel::SetStretchAndStretchRate(double stretch, double s
 
 double FakeBathContractionModel::GetActiveTension()
 {
-	return 0.0;
+    return 0.0;
 }
 

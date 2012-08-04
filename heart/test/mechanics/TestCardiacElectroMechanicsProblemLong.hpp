@@ -105,7 +105,7 @@ public:
         HeartConfig::Instance()->SetSimulationDuration(125.0);
 
         CardiacElectroMechanicsProblem<2,1> problem(INCOMPRESSIBLE,
-												  MONODOMAIN,
+                                                  MONODOMAIN,
                                                   &electrics_mesh,
                                                   &mechanics_mesh,
                                                   &cell_factory,
@@ -165,7 +165,7 @@ public:
         problem_defn.SetMechanicsSolveTimestep(1.0);
 
         CardiacElectroMechanicsProblem<3,1> problem(INCOMPRESSIBLE,
-												  MONODOMAIN,
+                                                  MONODOMAIN,
                                                   &electrics_mesh,
                                                   &mechanics_mesh,
                                                   &cell_factory,
@@ -208,7 +208,7 @@ public:
         problem_defn.SetVariableFibreSheetDirectionsFile(finder, true);
 
         CardiacElectroMechanicsProblem<3,1> problem(INCOMPRESSIBLE,
-												  MONODOMAIN,
+                                                  MONODOMAIN,
                                                   &electrics_mesh,
                                                   &mechanics_mesh,
                                                   &cell_factory,
@@ -349,7 +349,7 @@ public:
             HeartConfig::Instance()->SetSimulationDuration(20.0);
 
             CardiacElectroMechanicsProblem<3,1> problem(COMPRESSIBLE,
-													  MONODOMAIN,
+                                                      MONODOMAIN,
                                                       &electrics_mesh,
                                                       &mechanics_mesh,
                                                       &cell_factory,
@@ -371,7 +371,7 @@ public:
             problem_defn.SetVariableFibreSheetDirectionsFile(finder, false);
 
             CardiacElectroMechanicsProblem<3,1> problem(COMPRESSIBLE,
-													  MONODOMAIN,
+                                                      MONODOMAIN,
                                                       &electrics_mesh,
                                                       &mechanics_mesh,
                                                       &cell_factory,
@@ -416,7 +416,7 @@ public:
             problem_defn.SetVariableFibreSheetDirectionsFile(finder, false);
 
             CardiacElectroMechanicsProblem<3,1> problem(COMPRESSIBLE,
-													  MONODOMAIN,
+                                                      MONODOMAIN,
                                                       &electrics_mesh,
                                                       &mechanics_mesh,
                                                       &cell_factory,
@@ -480,7 +480,7 @@ public:
             problem_defn.SetVariableFibreSheetDirectionsFile(finder, false);
 
             CardiacElectroMechanicsProblem<3,1> problem(COMPRESSIBLE,
-													  MONODOMAIN,
+                                                      MONODOMAIN,
                                                       &electrics_mesh,
                                                       &mechanics_mesh,
                                                       &cell_factory,

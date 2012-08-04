@@ -45,7 +45,7 @@ ExplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ExplicitCardiacMechanicsS
                                                                                       ElectroMechanicsProblemDefinition<DIM>& rProblemDefinition,
                                                                                       std::string outputDirectory)
     : AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>(rQuadMesh,
-															contractionModelName,
+                                                            contractionModelName,
                                                             rProblemDefinition,
                                                             outputDirectory)
 {
@@ -65,40 +65,40 @@ void ExplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::InitialiseContractio
 
         if (iter->second.Active == true)
         {
-			//tissue node
-			switch(contractionModelName)
-			{
-				case NONPHYSIOL1:
-				case NONPHYSIOL2:
-				case NONPHYSIOL3:
-				{
-					unsigned option = (contractionModelName==NONPHYSIOL1 ? 1 : (contractionModelName==NONPHYSIOL2? 2 : 3));
-					p_contraction_model = new NonPhysiologicalContractionModel(option);
-					break;
-				}
-				case NASH2004: //stretch dependent, will this work with explicit??
-				{
-					p_contraction_model = new Nash2004ContractionModel;
-					break;
-				}
-				case KERCHOFFS2003: //stretch dependent, will this work with explicit? Answer: can be unstable
-				{
-					p_contraction_model = new Kerchoffs2003ContractionModel;
-					break;
-				}
-				default:
-				{
-					EXCEPTION("Unknown or stretch-rate-dependent contraction model");
-				}
-			}
+            //tissue node
+            switch(contractionModelName)
+            {
+                case NONPHYSIOL1:
+                case NONPHYSIOL2:
+                case NONPHYSIOL3:
+                {
+                    unsigned option = (contractionModelName==NONPHYSIOL1 ? 1 : (contractionModelName==NONPHYSIOL2? 2 : 3));
+                    p_contraction_model = new NonPhysiologicalContractionModel(option);
+                    break;
+                }
+                case NASH2004: //stretch dependent, will this work with explicit??
+                {
+                    p_contraction_model = new Nash2004ContractionModel;
+                    break;
+                }
+                case KERCHOFFS2003: //stretch dependent, will this work with explicit? Answer: can be unstable
+                {
+                    p_contraction_model = new Kerchoffs2003ContractionModel;
+                    break;
+                }
+                default:
+                {
+                    EXCEPTION("Unknown or stretch-rate-dependent contraction model");
+                }
+            }
 
-        	iter->second.ContractionModel = p_contraction_model;
+            iter->second.ContractionModel = p_contraction_model;
         }
         else
         {
-        	//bath
-        	p_contraction_model = new FakeBathContractionModel;
-        	iter->second.ContractionModel = p_contraction_model;
+            //bath
+            p_contraction_model = new FakeBathContractionModel;
+            iter->second.ContractionModel = p_contraction_model;
         }
     }
 }

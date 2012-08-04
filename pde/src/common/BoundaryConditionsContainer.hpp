@@ -228,7 +228,7 @@ public:
      *  unknown and the other node.
      *
      *  The entry in the RHS vector is zeroed.
-     * 
+     *
      *  @param rLinearSystem Linear system on which to apply boundary conditions
      *
      *  @param applyToMatrix This optional parameter can be set as false to

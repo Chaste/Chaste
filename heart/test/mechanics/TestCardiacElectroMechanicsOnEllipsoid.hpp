@@ -246,7 +246,7 @@ public:
         //
         ////////////////////////////////////////////////////////////////////////////////
         CardiacElectroMechanicsProblem<3,1> problem(COMPRESSIBLE,
-												  MONODOMAIN,
+                                                  MONODOMAIN,
                                                   &electrics_mesh,
                                                   &mechanics_mesh,
                                                   &cell_factory,

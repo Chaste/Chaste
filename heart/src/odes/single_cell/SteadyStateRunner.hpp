@@ -51,10 +51,10 @@ class SteadyStateRunner: public AbstractSteadyStateRunner
 {
 private:
     /** whether we should do two paces at once (should detect steady alternans as well as single paces) */
-	bool mTwoPaceScan;
+    bool mTwoPaceScan;
 
 protected:
-	/**
+    /**
      * Run the cell model to steady state
      *
      * Here we don't do anything clever - we just gradually drift to the steady state,

@@ -231,7 +231,7 @@ public:
          * 3       [86,  92]        [49, 65]            [77, 95]            [63, 128]
          * 4       [60,  94]        [39, 47]            [46, 74]            [49, 128]
          * 5       [50,  68]        [30, 52]            [35, 64]            [39, 128]
-         * 
+         *
          */
         // Check that it is not a dumb partition.
         // (Dumb partitions with few processes require ownership of all the mesh by at least one process
@@ -391,7 +391,7 @@ public:
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/l_shape3d");
         TS_ASSERT_THROWS_THIS(mesh.ConstructFromMeshReader(mesh_reader),
                               "Cannot convert a (linear) tetrahedral mesh directly to a DistributedQuadraticMesh.  Please convert to QuadraticMesh and save in that format first.");
-        
+
     }
 };
 

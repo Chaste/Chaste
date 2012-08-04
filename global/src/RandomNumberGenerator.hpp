@@ -182,9 +182,9 @@ public:
         unsigned num = rValues.size();
         if (num == 0)
         {
-        	return;
+            return;
         }
-    	for (unsigned end=num-1; end>0; end--)
+        for (unsigned end=num-1; end>0; end--)
         {
             // Pick a random integer from {0,..,end}
             unsigned k = RandomNumberGenerator::Instance()->randMod(end+1);

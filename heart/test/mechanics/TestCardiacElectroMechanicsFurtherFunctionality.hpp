@@ -359,7 +359,7 @@ public:
             HeartConfig::Instance()->SetSimulationDuration(5.0);
 
             CardiacElectroMechanicsProblem<2,1> problem(INCOMPRESSIBLE,
-													  MONODOMAIN,
+                                                      MONODOMAIN,
                                                       &electrics_mesh,
                                                       &mechanics_mesh,
                                                       &cell_factory,

@@ -94,9 +94,9 @@ public:
         // Compare the voltage file with a correct version
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
         FileComparison(test_output_directory + "TestHdf5ToMeshalyzerConverter/output/MonodomainLR91_1d_V.dat",
-        		       "heart/test/data/Monodomain1d/MonodomainLR91_1d_V.dat").CompareFiles();
+                       "heart/test/data/Monodomain1d/MonodomainLR91_1d_V.dat").CompareFiles();
         FileComparison(test_output_directory + "TestHdf5ToMeshalyzerConverter/output/MonodomainLR91_1d_times.info",
-        		       "heart/test/data/Monodomain1d/MonodomainLR91_1d_times.info").CompareFiles();
+                       "heart/test/data/Monodomain1d/MonodomainLR91_1d_times.info").CompareFiles();
     }
 
     void TestBidomainMeshalyzerConversion() throw(Exception)
@@ -118,15 +118,15 @@ public:
         // Compare the voltage file
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
         FileComparison(test_output_directory + "TestHdf5ToMeshalyzerConverter/output/bidomain_V.dat",
-        		       "heart/test/data/Bidomain1d/bidomain_V.dat").CompareFiles();
+                       "heart/test/data/Bidomain1d/bidomain_V.dat").CompareFiles();
 
         // Compare the Phi_e file
         FileComparison(test_output_directory + "TestHdf5ToMeshalyzerConverter/output/bidomain_Phi_e.dat",
-        		       "heart/test/data/Bidomain1d/bidomain_Phi_e.dat").CompareFiles();
+                       "heart/test/data/Bidomain1d/bidomain_Phi_e.dat").CompareFiles();
 
         // Compare the time information file
         FileComparison(test_output_directory + "TestHdf5ToMeshalyzerConverter/output/bidomain_times.info",
-        		       "heart/test/data/Bidomain1d/bidomain_times.info").CompareFiles();
+                       "heart/test/data/Bidomain1d/bidomain_times.info").CompareFiles();
     }
 
     // This test covers the case when the hdf5 file contains 3 variables (e.g., after solving a problem with PROBLEM_DIM=3)
@@ -149,19 +149,19 @@ public:
         // Compare the first voltage file
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
         FileComparison(test_output_directory + "TestMeshalyzerConversion3Variables/output/3_vars_Vm_1.dat",
-        		       "heart/test/data/three_variables/extended_bidomain_Vm_1.dat").CompareFiles();
+                       "heart/test/data/three_variables/extended_bidomain_Vm_1.dat").CompareFiles();
 
         // Compare the second voltage file
         FileComparison(test_output_directory + "TestMeshalyzerConversion3Variables/output/3_vars_Vm_2.dat",
-        		       "heart/test/data/three_variables/extended_bidomain_Vm_2.dat").CompareFiles();
+                       "heart/test/data/three_variables/extended_bidomain_Vm_2.dat").CompareFiles();
 
         // Compare the Phi_e file
         FileComparison(test_output_directory + "TestMeshalyzerConversion3Variables/output/3_vars_Phi_e.dat",
-        		       "heart/test/data/three_variables/extended_bidomain_Phi_e.dat").CompareFiles();
+                       "heart/test/data/three_variables/extended_bidomain_Phi_e.dat").CompareFiles();
 
         // Compare the time information file
         FileComparison(test_output_directory + "TestMeshalyzerConversion3Variables/output/3_vars_times.info",
-        		       "heart/test/data/three_variables/extended_bidomain_times.info").CompareFiles();
+                       "heart/test/data/three_variables/extended_bidomain_times.info").CompareFiles();
     }
 
     // This test covers the case when the hdf5 file contains more than 3 variables
@@ -196,14 +196,14 @@ public:
         {
             // Compare the results files
             FileComparison(test_output_directory + "/" + output_dir + "/output/many_variables_"
-            		       + variable_names[i] + ".dat",
-            		       "heart/test/data/many_variables/many_variables_"
-            		       + variable_names[i] + ".dat").CompareFiles();
+                           + variable_names[i] + ".dat",
+                           "heart/test/data/many_variables/many_variables_"
+                           + variable_names[i] + ".dat").CompareFiles();
         }
 
         // Compare the time information file
         FileComparison(test_output_directory + output_dir + "/output/many_variables_times.info",
-        		       "heart/test/data/many_variables/many_variables_times.info").CompareFiles();
+                       "heart/test/data/many_variables/many_variables_times.info").CompareFiles();
     }
 
     // This test covers the case when the hdf5 file contains more than 3 variables
@@ -229,12 +229,12 @@ public:
 
         // Compare the results files
         FileComparison(test_output_directory + output_dir + "/cmgui_output/many_variables_0.exnode",
-        		       "heart/test/data/many_variables/many_variables_0.exnode").CompareFiles();
+                       "heart/test/data/many_variables/many_variables_0.exnode").CompareFiles();
 
         // Check validity of cmgui script
         // Note that FileComparison ignored *all* comment lines (including the ones which are informative to the end-user)
         FileComparison(test_output_directory + output_dir + "/cmgui_output/LoadSolutions.com",
-        		       "heart/test/data/many_variables/CmguiValidScript.com").CompareFiles();
+                       "heart/test/data/many_variables/CmguiValidScript.com").CompareFiles();
     }
 
     void TestMonodomainCmguiConversion3D() throw(Exception)
@@ -258,14 +258,14 @@ public:
         // Compare the voltage file with a correct version
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
         FileComparison(test_output_directory + working_directory + "/cmgui_output/cube_2mm_12_elements_0.exnode",
-        		       "heart/test/data/CmguiData/monodomain/cube_2mm_12_elements_0.exnode").CompareFiles();
+                       "heart/test/data/CmguiData/monodomain/cube_2mm_12_elements_0.exnode").CompareFiles();
 
         FileComparison(test_output_directory + working_directory + "/cmgui_output/cube_2mm_12_elements_1.exnode",
-        		       "heart/test/data/CmguiData/monodomain/cube_2mm_12_elements_1.exnode").CompareFiles();
+                       "heart/test/data/CmguiData/monodomain/cube_2mm_12_elements_1.exnode").CompareFiles();
 
         // Check validity of cmgui script
         FileComparison(test_output_directory + working_directory + "/cmgui_output/LoadSolutions.com",
-                		       "heart/test/data/CmguiData/monodomain/monodomain3dValidScript.com").CompareFiles();
+                               "heart/test/data/CmguiData/monodomain/monodomain3dValidScript.com").CompareFiles();
     }
 
     void TestBidomainCmguiConversion3D() throw(Exception)
@@ -289,10 +289,10 @@ public:
         // Compare the voltage file with a correct version that is known to visualize correctly in Cmgui
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
         FileComparison(test_output_directory + working_directory + "/cmgui_output/cube_2mm_12_elements_0.exnode",
-                		       "heart/test/data/CmguiData/bidomain/cube_2mm_12_elements_0.exnode").CompareFiles();
+                               "heart/test/data/CmguiData/bidomain/cube_2mm_12_elements_0.exnode").CompareFiles();
 
         FileComparison(test_output_directory + working_directory + "/cmgui_output/cube_2mm_12_elements_1.exnode",
-                		       "heart/test/data/CmguiData/bidomain/cube_2mm_12_elements_1.exnode").CompareFiles();
+                               "heart/test/data/CmguiData/bidomain/cube_2mm_12_elements_1.exnode").CompareFiles();
     }
 
     void TestBidomainWithBathCmguiConversion1D() throw(Exception)
@@ -320,20 +320,20 @@ public:
 
         // Mesh file first, one exnode, one for bath and one for tissue
         FileComparison(test_output_directory + working_directory + "/cmgui_output/bidomain_with_bath_1d.exnode",
-                        		       "heart/test/data/CmguiData/bidomain_with_bath/bidomain_with_bath_1d.exnode").CompareFiles();
+                                       "heart/test/data/CmguiData/bidomain_with_bath/bidomain_with_bath_1d.exnode").CompareFiles();
 
         FileComparison(test_output_directory + working_directory + "/cmgui_output/tissue.exelem",
-                                		       "heart/test/data/CmguiData/bidomain_with_bath/tissue.exelem").CompareFiles();
+                                               "heart/test/data/CmguiData/bidomain_with_bath/tissue.exelem").CompareFiles();
 
         FileComparison(test_output_directory + working_directory + "/cmgui_output/bath.exelem",
-                                		       "heart/test/data/CmguiData/bidomain_with_bath/bath.exelem").CompareFiles();
+                                               "heart/test/data/CmguiData/bidomain_with_bath/bath.exelem").CompareFiles();
 
         // Then the data file
         FileComparison(test_output_directory + working_directory + "/cmgui_output/bidomain_with_bath_1d_0.exnode",
-                                		       "heart/test/data/CmguiData/bidomain_with_bath/bidomain_with_bath_1d_0.exnode").CompareFiles();
+                                               "heart/test/data/CmguiData/bidomain_with_bath/bidomain_with_bath_1d_0.exnode").CompareFiles();
 
         FileComparison(test_output_directory + working_directory + "/cmgui_output/bidomain_with_bath_1d_1.exnode",
-                                		       "heart/test/data/CmguiData/bidomain_with_bath/bidomain_with_bath_1d_1.exnode").CompareFiles();
+                                               "heart/test/data/CmguiData/bidomain_with_bath/bidomain_with_bath_1d_1.exnode").CompareFiles();
     }
 
     void TestMonodomainCmguiConversion2D() throw(Exception)
@@ -359,10 +359,10 @@ public:
         // Compare the voltage file with a correct version that visualizes Vm correctly in cmgui
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
         FileComparison(test_output_directory + working_directory + "/cmgui_output/2D_0_to_1mm_400_elements_0.exnode",
-                                		       "heart/test/data/CmguiData/monodomain/2D_0_to_1mm_400_elements_0.exnode").CompareFiles();
+                                               "heart/test/data/CmguiData/monodomain/2D_0_to_1mm_400_elements_0.exnode").CompareFiles();
 
         FileComparison(test_output_directory + working_directory + "/cmgui_output/2D_0_to_1mm_400_elements_1.exnode",
-                                		       "heart/test/data/CmguiData/monodomain/2D_0_to_1mm_400_elements_1.exnode").CompareFiles();
+                                               "heart/test/data/CmguiData/monodomain/2D_0_to_1mm_400_elements_1.exnode").CompareFiles();
     }
 
     void TestBidomainCmguiConversion1D() throw(Exception)
@@ -387,10 +387,10 @@ public:
         // Compare the voltage file with a correct version that visualizes both Vm and Phie correctly in cmgui
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
         FileComparison(test_output_directory + working_directory + "/cmgui_output/1D_0_to_1_100_elements_0.exnode",
-                                		       "heart/test/data/CmguiData/bidomain/1D_0_to_1_100_elements_0.exnode").CompareFiles();
+                                               "heart/test/data/CmguiData/bidomain/1D_0_to_1_100_elements_0.exnode").CompareFiles();
 
         FileComparison(test_output_directory + working_directory + "/cmgui_output/1D_0_to_1_100_elements_1.exnode",
-                                		       "heart/test/data/CmguiData/bidomain/1D_0_to_1_100_elements_1.exnode").CompareFiles();
+                                               "heart/test/data/CmguiData/bidomain/1D_0_to_1_100_elements_1.exnode").CompareFiles();
     }
 
     void TestCmguiConversion1DWith3Variables() throw(Exception)
@@ -417,13 +417,13 @@ public:
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
 
         FileComparison(test_output_directory + working_directory + "/cmgui_output/3_vars.exnode",
-                                		       "heart/test/data/CmguiData/extended_bidomain/3_vars.exnode").CompareFiles();
+                                               "heart/test/data/CmguiData/extended_bidomain/3_vars.exnode").CompareFiles();
 
         FileComparison(test_output_directory + working_directory + "/cmgui_output/3_vars.exelem",
-                                		       "heart/test/data/CmguiData/extended_bidomain/3_vars.exelem").CompareFiles();
+                                               "heart/test/data/CmguiData/extended_bidomain/3_vars.exelem").CompareFiles();
 
         FileComparison(test_output_directory + working_directory + "/cmgui_output/3_vars_25.exnode",
-                                		       "heart/test/data/CmguiData/extended_bidomain/3_vars_25.exnode").CompareFiles();
+                                               "heart/test/data/CmguiData/extended_bidomain/3_vars_25.exnode").CompareFiles();
     }
 
     void TestExceptions() throw(Exception)

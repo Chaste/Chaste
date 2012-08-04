@@ -250,10 +250,10 @@ public:
         TS_ASSERT_DELTA(mesh.GetNode(4)->rGetLocation()[0], 1.0, 1e-12);
         TS_ASSERT_LESS_THAN(impl_solver.rGetDeformedPosition()[4](0), 0.9);
 
-		//in need of deletion even if all these 3 have no influence at all on this test
-		delete p_fine_mesh;
-		delete p_coarse_mesh;
-		delete p_pair;
+        //in need of deletion even if all these 3 have no influence at all on this test
+        delete p_fine_mesh;
+        delete p_coarse_mesh;
+        delete p_pair;
     }
 
     // cover all other contraction model options which are allowed but not been used in a test so far
@@ -299,15 +299,15 @@ public:
         // bad contraction model
         IncompressibleExplicitSolver2d solver(NHS,mesh,problem_defn,"");
         TS_ASSERT_THROWS_THIS(solver.SetFineCoarseMeshPair(p_pair_wrong),
-        		"When setting a mesh pair into the solver, the coarse mesh of the mesh pair must be the same as the quadratic mesh");
+                "When setting a mesh pair into the solver, the coarse mesh of the mesh pair must be the same as the quadratic mesh");
         solver.SetFineCoarseMeshPair(p_pair);
         TS_ASSERT_THROWS_THIS(solver.Initialise(), "Unknown or stretch-rate-dependent contraction model");
 
-		delete p_fine_mesh;
-		delete p_coarse_mesh;
-		delete p_pair;
-		delete p_coarse_mesh_big;
-		delete p_pair_wrong;
+        delete p_fine_mesh;
+        delete p_coarse_mesh;
+        delete p_pair;
+        delete p_coarse_mesh_big;
+        delete p_pair_wrong;
     }
 
     void TestCrossFibreTensionWithSimpleContractionModel() throw(Exception)

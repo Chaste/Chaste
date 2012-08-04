@@ -181,7 +181,7 @@ private:
         unsigned the_node = 0; //corner node
         for(unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-         
+
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
             double z = mesh.GetNode(i)->rGetLocation()[2];
@@ -189,7 +189,7 @@ private:
             {
                 the_node = i;
             }
-        } 
+        }
 
         std::vector<double> activation_times(mesh.GetNumNodes(), -1.0);
         std::vector<double> last_negative_voltage(mesh.GetNumNodes(), 1.0);
@@ -206,7 +206,7 @@ private:
                     double old = last_negative_voltage[i];
                     assert(old < 0);
                     activation_times[i] = (timestep-V/(V-old))*printing_dt;
-                } 
+                }
                 else if (V<=0)
                 {
                     last_negative_voltage[i]=V;
@@ -225,7 +225,7 @@ private:
         if (PetscTools::AmMaster())
         {
             out_stream p_file = handler.OpenOutputFile(output_file.str());
-    
+
             for(unsigned i=0; i<activation_times.size(); i++)
             {
                 *p_file << activation_times[i] << "\n";
@@ -263,10 +263,10 @@ public:
         std::string results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "ActivationMaps";
         std::string output_file = results_dir + "/activation_h0.05_dt0.01.dat";
         std::string base_file = "heart/test/data/benchmark_data_orig/activation_time_h0.05_dt0.01.dat";
-   
+
         NumericFileComparison num_comp(output_file, base_file);
         TS_ASSERT(num_comp.CompareFiles(1.5e-3)); //Absolute difference of 1.5 microsecond is tolerated
-         
+
     }
 };
 

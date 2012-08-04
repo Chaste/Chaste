@@ -279,10 +279,10 @@ public:
         // Check result
         for (unsigned i=0; i<answer_repl.GetSize(); i++)
         {
-        	// note: 2.0*(exp(-x)-x*exp(-1.0) is always >= 0 for these values of x,
-        	// however when x=1, 2.0*(exp(-x)-x*exp(-1.0) should be
-        	// zero but can end up very slightly negative (-1e-17, for example), hence
-        	// the need for the fabs before the sqrt.
+            // note: 2.0*(exp(-x)-x*exp(-1.0) is always >= 0 for these values of x,
+            // however when x=1, 2.0*(exp(-x)-x*exp(-1.0) should be
+            // zero but can end up very slightly negative (-1e-17, for example), hence
+            // the need for the fabs before the sqrt.
             double x = mesh.GetNode(i)->GetPoint()[0];
             double u = sqrt(fabs(2.0*(exp(-x)-x*exp(-1.0))));
             TS_ASSERT_DELTA(answer_repl[i], u, 0.001);

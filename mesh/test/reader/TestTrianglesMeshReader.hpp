@@ -561,7 +561,7 @@ public:
                 TS_ASSERT_DELTA(ascii_location[1],binary_location[1],1e-12);
                 TS_ASSERT_DELTA(ascii_location[2],binary_location[2],1e-12);
             }
-            
+
             // Now with the ASCII node iterator
             unsigned count = 0u;
             mesh_reader_ascii.Reset();
@@ -661,7 +661,7 @@ public:
                 count++;
             }
             TS_ASSERT_EQUALS(count, 0u);
-            
+
         }
 
         /*

@@ -123,7 +123,7 @@ public:
             std::vector<double>& r_pressures = solver.rGetPressures();
             for (unsigned i=0; i<r_pressures.size(); i++)
             {
-            	// solution is in finite element space, so FEM solution will be exact,
+                // solution is in finite element space, so FEM solution will be exact,
                 // apart from linear solver errors
                 TS_ASSERT_DELTA(r_pressures[i], 20.0, 1e-6);
             }
@@ -140,61 +140,61 @@ public:
     void TestStokesExactSolutionLessSimple() throw(Exception)
     {
         // Set up a mesh on [0 1]x[0 1]
-		unsigned num_elem = 3;
-		QuadraticMesh<2> mesh(1.0/num_elem, 1.0, 1.0);
+        unsigned num_elem = 3;
+        QuadraticMesh<2> mesh(1.0/num_elem, 1.0, 1.0);
 
-		// Dynamic viscosity
-		double mu = 10.0;
+        // Dynamic viscosity
+        double mu = 10.0;
 
-		// Boundary flow
-		std::vector<unsigned> dirichlet_nodes;
-		std::vector<c_vector<double,2> > dirichlet_flow;
-		for (unsigned i=0; i<mesh.GetNumNodes(); i++)
-		{
-			double x = mesh.GetNode(i)->rGetLocation()[0];
-			double y = mesh.GetNode(i)->rGetLocation()[1];
+        // Boundary flow
+        std::vector<unsigned> dirichlet_nodes;
+        std::vector<c_vector<double,2> > dirichlet_flow;
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        {
+            double x = mesh.GetNode(i)->rGetLocation()[0];
+            double y = mesh.GetNode(i)->rGetLocation()[1];
 
-			// Only apply on top and left boundaries (zero stress BCs on others)
-			if (x == 0.0 || y == 0.0)
-			{
-				dirichlet_nodes.push_back(i);
-				c_vector<double,2> flow = zero_vector<double>(2);
+            // Only apply on top and left boundaries (zero stress BCs on others)
+            if (x == 0.0 || y == 0.0)
+            {
+                dirichlet_nodes.push_back(i);
+                c_vector<double,2> flow = zero_vector<double>(2);
 
-				flow(0) = y;
-				flow(1) = -x;
-				dirichlet_flow.push_back(flow);
-			}
-		}
+                flow(0) = y;
+                flow(1) = -x;
+                dirichlet_flow.push_back(flow);
+            }
+        }
 
-		StokesFlowProblemDefinition<2> problem_defn(mesh);
-		problem_defn.SetViscosity(mu);
-		problem_defn.SetPrescribedFlowNodes(dirichlet_nodes, dirichlet_flow);
+        StokesFlowProblemDefinition<2> problem_defn(mesh);
+        problem_defn.SetViscosity(mu);
+        problem_defn.SetPrescribedFlowNodes(dirichlet_nodes, dirichlet_flow);
 
-		StokesFlowSolver<2> solver(mesh, problem_defn, "LessSimpleStokesFlow");
+        StokesFlowSolver<2> solver(mesh, problem_defn, "LessSimpleStokesFlow");
 
-		solver.SetKspAbsoluteTolerance(1e-12);
+        solver.SetKspAbsoluteTolerance(1e-12);
 
-		solver.Solve();
+        solver.Solve();
 
-		for (unsigned i=0; i<mesh.GetNumNodes(); i++)
-		{
-			double x = mesh.GetNode(i)->rGetLocation()[0];
-			double y = mesh.GetNode(i)->rGetLocation()[1];
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        {
+            double x = mesh.GetNode(i)->rGetLocation()[0];
+            double y = mesh.GetNode(i)->rGetLocation()[1];
 
-			// solution is in finite element space, so FEM solution will be exact,
-			// apart from linear solver errors
-			TS_ASSERT_DELTA(solver.rGetVelocities()[i](0),  y, 1e-8);
-			TS_ASSERT_DELTA(solver.rGetVelocities()[i](1), -x, 1e-8);
-		}
+            // solution is in finite element space, so FEM solution will be exact,
+            // apart from linear solver errors
+            TS_ASSERT_DELTA(solver.rGetVelocities()[i](0),  y, 1e-8);
+            TS_ASSERT_DELTA(solver.rGetVelocities()[i](1), -x, 1e-8);
+        }
 
-		// test the pressures
-		std::vector<double>& r_pressures = solver.rGetPressures();
-		for (unsigned i=0; i<r_pressures.size(); i++)
-		{
-			// solution is in finite element space, so FEM solution will be exact,
-			// apart from linear solver errors
-			TS_ASSERT_DELTA(r_pressures[i], 0.0, 1e-6);
-		}
+        // test the pressures
+        std::vector<double>& r_pressures = solver.rGetPressures();
+        for (unsigned i=0; i<r_pressures.size(); i++)
+        {
+            // solution is in finite element space, so FEM solution will be exact,
+            // apart from linear solver errors
+            TS_ASSERT_DELTA(r_pressures[i], 0.0, 1e-6);
+        }
     }
 
 
@@ -267,7 +267,7 @@ public:
         for (unsigned i=1; i<r_pressures.size(); i++)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
-          	double exact_pressure = 2*(1-x) + constant;
+              double exact_pressure = 2*(1-x) + constant;
             // solution is in finite element space, so FEM solution will be exact,
             // apart from linear solver errors
             TS_ASSERT_DELTA(r_pressures[i], exact_pressure, 1e-8);
@@ -298,91 +298,91 @@ public:
     void TestStokesExactSolutionNonzeroNeumann() throw(Exception)
     {
         // Set up a mesh on [0 1]x[0 1]
-		unsigned num_elem = 3;
-		QuadraticMesh<2> mesh(1.0/num_elem, 1.0, 1.0);
+        unsigned num_elem = 3;
+        QuadraticMesh<2> mesh(1.0/num_elem, 1.0, 1.0);
 
-		// Dynamic viscosity
-		double mu = 10.0;
+        // Dynamic viscosity
+        double mu = 10.0;
 
-		// Boundary flow
-		std::vector<unsigned> dirichlet_nodes;
-		std::vector<c_vector<double,2> > dirichlet_flow;
-		for (unsigned i=0; i<mesh.GetNumNodes(); i++)
-		{
-			double x = mesh.GetNode(i)->rGetLocation()[0];
-			double y = mesh.GetNode(i)->rGetLocation()[1];
+        // Boundary flow
+        std::vector<unsigned> dirichlet_nodes;
+        std::vector<c_vector<double,2> > dirichlet_flow;
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        {
+            double x = mesh.GetNode(i)->rGetLocation()[0];
+            double y = mesh.GetNode(i)->rGetLocation()[1];
 
-			// Only apply on top and left boundaries
-			if (x == 0.0 || y == 0.0)
-			{
-				dirichlet_nodes.push_back(i);
-				c_vector<double,2> flow = zero_vector<double>(2);
+            // Only apply on top and left boundaries
+            if (x == 0.0 || y == 0.0)
+            {
+                dirichlet_nodes.push_back(i);
+                c_vector<double,2> flow = zero_vector<double>(2);
 
-				flow(0) = y;
-				flow(1) = -x;
-				dirichlet_flow.push_back(flow);
-			}
-		}
+                flow(0) = y;
+                flow(1) = -x;
+                dirichlet_flow.push_back(flow);
+            }
+        }
 
         // apply non-zero Neumann BCs on right and top sides
-		std::vector<BoundaryElement<1,2>*> boundary_elems;
-		std::vector<c_vector<double,2> > stresses;
+        std::vector<BoundaryElement<1,2>*> boundary_elems;
+        std::vector<c_vector<double,2> > stresses;
 
-		for (TetrahedralMesh<2,2>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
-			 iter != mesh.GetBoundaryElementIteratorEnd();
-			 ++iter)
-		{
-			if (fabs((*iter)->CalculateCentroid()[0] - 1.0) < 1e-4)
-			{
-				BoundaryElement<1,2>* p_element = *iter;
-				boundary_elems.push_back(p_element);
+        for (TetrahedralMesh<2,2>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
+             iter != mesh.GetBoundaryElementIteratorEnd();
+             ++iter)
+        {
+            if (fabs((*iter)->CalculateCentroid()[0] - 1.0) < 1e-4)
+            {
+                BoundaryElement<1,2>* p_element = *iter;
+                boundary_elems.push_back(p_element);
 
-				c_vector<double,2> stress = zero_vector<double>(2);
-				stress(0) = 3.0; // stress = (3,0) = 3*normal
-				stresses.push_back(stress);
-			}
-			else if (fabs((*iter)->CalculateCentroid()[1] - 1.0) < 1e-4)
-			{
-				BoundaryElement<1,2>* p_element = *iter;
-				boundary_elems.push_back(p_element);
+                c_vector<double,2> stress = zero_vector<double>(2);
+                stress(0) = 3.0; // stress = (3,0) = 3*normal
+                stresses.push_back(stress);
+            }
+            else if (fabs((*iter)->CalculateCentroid()[1] - 1.0) < 1e-4)
+            {
+                BoundaryElement<1,2>* p_element = *iter;
+                boundary_elems.push_back(p_element);
 
-				c_vector<double,2> stress = zero_vector<double>(2);
-				stress(1) = 3.0; // stress = (0,3) = 3*normal
-				stresses.push_back(stress);
-			}
-		}
-		assert(boundary_elems.size() == 2*num_elem);
+                c_vector<double,2> stress = zero_vector<double>(2);
+                stress(1) = 3.0; // stress = (0,3) = 3*normal
+                stresses.push_back(stress);
+            }
+        }
+        assert(boundary_elems.size() == 2*num_elem);
 
-		StokesFlowProblemDefinition<2> problem_defn(mesh);
-		problem_defn.SetViscosity(mu);
-		problem_defn.SetPrescribedFlowNodes(dirichlet_nodes, dirichlet_flow);
-		problem_defn.SetTractionBoundaryConditions(boundary_elems, stresses);
+        StokesFlowProblemDefinition<2> problem_defn(mesh);
+        problem_defn.SetViscosity(mu);
+        problem_defn.SetPrescribedFlowNodes(dirichlet_nodes, dirichlet_flow);
+        problem_defn.SetTractionBoundaryConditions(boundary_elems, stresses);
 
-		StokesFlowSolver<2> solver(mesh, problem_defn, "StokesFlowNonZeroNeumann");
+        StokesFlowSolver<2> solver(mesh, problem_defn, "StokesFlowNonZeroNeumann");
 
-		solver.SetKspAbsoluteTolerance(1e-12);
+        solver.SetKspAbsoluteTolerance(1e-12);
 
-		solver.Solve();
+        solver.Solve();
 
-		for (unsigned i=0; i<mesh.GetNumNodes(); i++)
-		{
-			double x = mesh.GetNode(i)->rGetLocation()[0];
-			double y = mesh.GetNode(i)->rGetLocation()[1];
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        {
+            double x = mesh.GetNode(i)->rGetLocation()[0];
+            double y = mesh.GetNode(i)->rGetLocation()[1];
 
-			// solution is in finite element space, so FEM solution will be exact,
-			// apart from linear solver errors
-			TS_ASSERT_DELTA(solver.rGetVelocities()[i](0),  y, 1e-8);
-			TS_ASSERT_DELTA(solver.rGetVelocities()[i](1), -x, 1e-8);
-		}
+            // solution is in finite element space, so FEM solution will be exact,
+            // apart from linear solver errors
+            TS_ASSERT_DELTA(solver.rGetVelocities()[i](0),  y, 1e-8);
+            TS_ASSERT_DELTA(solver.rGetVelocities()[i](1), -x, 1e-8);
+        }
 
-		// test the pressures
-		std::vector<double>& r_pressures = solver.rGetPressures();
-		for (unsigned i=0; i<r_pressures.size(); i++)
-		{
-			// solution is in finite element space, so FEM solution will be exact,
-			// apart from linear solver errors
-			TS_ASSERT_DELTA(r_pressures[i], -3.0, 1e-6);
-		}
+        // test the pressures
+        std::vector<double>& r_pressures = solver.rGetPressures();
+        for (unsigned i=0; i<r_pressures.size(); i++)
+        {
+            // solution is in finite element space, so FEM solution will be exact,
+            // apart from linear solver errors
+            TS_ASSERT_DELTA(r_pressures[i], -3.0, 1e-6);
+        }
     }
 
 
@@ -558,9 +558,9 @@ public:
 
         solver.CreateVtkOutput("Velocity");
 #ifdef CHASTE_VTK
-		//Check the VTK file exists
-		FileFinder vtk_file("LidDrivenCavityStokesFlow/vtk/solution.vtu", RelativeTo::ChasteTestOutput);
-		TS_ASSERT(vtk_file.Exists());
+        //Check the VTK file exists
+        FileFinder vtk_file("LidDrivenCavityStokesFlow/vtk/solution.vtu", RelativeTo::ChasteTestOutput);
+        TS_ASSERT(vtk_file.Exists());
 #endif
 
 
@@ -677,17 +677,17 @@ public:
         for (unsigned i=0; i<r_pressures.size(); i++)
         {
             if(first)
-			{
-				value = r_pressures[i];
-				first = false;
-			}
-			else
-			{
-				TS_ASSERT_DELTA(r_pressures[i], value, 5e-5);
-			}
+            {
+                value = r_pressures[i];
+                first = false;
+            }
+            else
+            {
+                TS_ASSERT_DELTA(r_pressures[i], value, 5e-5);
+            }
         }
     }
-    
+
     void TestStokesWithLidDrivenCavity3d() throw(Exception)
     {
         unsigned num_elem = 5;
@@ -731,9 +731,9 @@ public:
         solver.Solve();
         solver.CreateVtkOutput("Velocity");
 #ifdef CHASTE_VTK
-		//Check the VTK file exists
-		FileFinder vtk_file("LidDrivenCavityStokesFlow3d/vtk/solution.vtu", RelativeTo::ChasteTestOutput);
-		TS_ASSERT(vtk_file.Exists());
+        //Check the VTK file exists
+        FileFinder vtk_file("LidDrivenCavityStokesFlow3d/vtk/solution.vtu", RelativeTo::ChasteTestOutput);
+        TS_ASSERT(vtk_file.Exists());
 #endif
 
         std::vector<c_vector<double,3> >& r_solution = solver.rGetVelocities();

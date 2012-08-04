@@ -266,7 +266,7 @@ void StokesFlowSolver<DIM>::Solve()
     }
 
     // Remove pressure dummy values (P=0 at internal nodes, which should have been
-    // been the result of the solve above), by linear interpolating from vertices of 
+    // been the result of the solve above), by linear interpolating from vertices of
     // edges to the internal node
     this->RemovePressureDummyValuesThroughLinearInterpolation();
 

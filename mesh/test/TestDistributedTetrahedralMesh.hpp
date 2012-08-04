@@ -647,23 +647,23 @@ public:
             int destination_rank = (my_rank + 1) % num_procs;
             int my_tag;
             int source_tag;
-    
+
             MPI_Status status;
-    
+
             for (unsigned element_number = 0; element_number < num_elts; element_number++)
             {
                 unsigned my_entry = random_order[element_number];
-    
+
                 my_tag = my_rank + num_elts*element_number;
                 source_tag = source_rank + num_elts*element_number;
-    
+
                 //This may not work sequentially on some versions of MPI (MPICH2)
                 MPI_Send( &my_entry, 1, MPI_UNSIGNED, destination_rank, my_tag, PETSC_COMM_WORLD );
 
                 unsigned neighbours_entry;
                 MPI_Recv( &neighbours_entry, 1, MPI_UNSIGNED, source_rank, source_tag, PETSC_COMM_WORLD, &status );
                 PetscTools::Barrier();
-    
+
                 TS_ASSERT_EQUALS( my_entry, neighbours_entry );
             }
         }
@@ -1651,9 +1651,9 @@ public:
 
         std::string output_dir = mesh_writer1.GetOutputDirectory();
         FileComparison(output_dir + "par_line_10_elements.node",
-        		       output_dir + "seq_line_10_elements.node").CompareFiles();
+                       output_dir + "seq_line_10_elements.node").CompareFiles();
         FileComparison(output_dir + "par_line_10_elements.ele",
-        		       output_dir + "seq_line_10_elements.ele").CompareFiles();
+                       output_dir + "seq_line_10_elements.ele").CompareFiles();
     }
 
     void TestNodeExchange()

@@ -389,9 +389,9 @@ void PetscTools::ReadPetscObject(Vec& rVec, const std::string& rOutputFileFullPa
     if (rParallelLayout == NULL)
     {
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
-    	VecCreate(PETSC_COMM_WORLD,&rVec);
-    	VecSetType(rVec,VECMPI);
-    	VecLoad(rVec,view);
+        VecCreate(PETSC_COMM_WORLD,&rVec);
+        VecSetType(rVec,VECMPI);
+        VecLoad(rVec,view);
 #else
         VecLoad(view, VECMPI, &rVec);
 #endif
@@ -411,13 +411,13 @@ void PetscTools::ReadPetscObject(Vec& rVec, const std::string& rOutputFileFullPa
 bool PetscTools::HasParMetis()
 {
 #ifdef __INTEL_COMPILER
-    //Old versions of the intel compiler can result in a PETSC ERROR and the program aborting if parmetis is checked for before 
+    //Old versions of the intel compiler can result in a PETSC ERROR and the program aborting if parmetis is checked for before
     //some other calls to Petsc are made. This nasty hack ensures that the HasParMetis method always works on Intel
     Mat mat;
     PetscTools::SetupMat(mat, 1, 1, 1);
     PetscTools::Destroy(mat);
 #endif
-    
+
     MatPartitioning part;
     MatPartitioningCreate(PETSC_COMM_WORLD, &part);
 

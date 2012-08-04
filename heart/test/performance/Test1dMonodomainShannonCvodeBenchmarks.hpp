@@ -63,32 +63,32 @@ class ShannonCardiacCellFactory : public AbstractCardiacCellFactory<1>
 {
 private:
 
-	boost::shared_ptr<RegularStimulus> mpStimulus;
+    boost::shared_ptr<RegularStimulus> mpStimulus;
 
 public:
-	ShannonCardiacCellFactory()
-	: AbstractCardiacCellFactory<1>(),
-	  mpStimulus(new RegularStimulus(-250000,5,2000,1))
-	  {
-	  }
+    ShannonCardiacCellFactory()
+    : AbstractCardiacCellFactory<1>(),
+      mpStimulus(new RegularStimulus(-250000,5,2000,1))
+      {
+      }
 
-	AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned node)
-	{
-		CELL_MODEL *p_cell;
+    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned node)
+    {
+        CELL_MODEL *p_cell;
 
-		if (this->GetMesh()->GetNode(node)->GetPoint()[0] == 0.0)
-		{
-			p_cell = new CELL_MODEL(this->mpSolver,
-					                mpStimulus);
-		}
-		else
-		{
-			p_cell = new CELL_MODEL(this->mpSolver,
-					                this->mpZeroStimulus);
-		}
+        if (this->GetMesh()->GetNode(node)->GetPoint()[0] == 0.0)
+        {
+            p_cell = new CELL_MODEL(this->mpSolver,
+                                    mpStimulus);
+        }
+        else
+        {
+            p_cell = new CELL_MODEL(this->mpSolver,
+                                    this->mpZeroStimulus);
+        }
 
-		return p_cell;
-	}
+        return p_cell;
+    }
 
 };
 

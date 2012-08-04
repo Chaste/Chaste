@@ -79,7 +79,7 @@ public:
 
         // Test that the output directory and the .info file was created
         FileFinder info_file(output_dir+"ParallelColumnWriter.info", RelativeTo::Absolute);
-		TS_ASSERT(info_file.Exists());
+        TS_ASSERT(info_file.Exists());
 
         // Set up some data in PETSc vectors
         Vec var1=PetscTools::CreateVec(num_nodes);

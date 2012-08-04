@@ -175,7 +175,7 @@ public:
     }
 
     void TestWithMultipleVariables1D() throw (Exception)
-	{
+    {
         // firstly, copy .h5 file to CHASTE_TEST_OUTPUT/TestWithMultipleVariables1D,
         // as that is where the interpolater reads and writes to
         CopyToTestOutputDirectory("heart/test/data/CmguiData/bidomain/1D_0_to_1_100_elements.h5",
@@ -252,7 +252,7 @@ public:
             }
             if (fabs(fine_repl_phi_e[10] - fine_repl_phi_e[11]) > 1e-6)
             {
-            	invalid_2 = false;
+                invalid_2 = false;
             }
         }
         TS_ASSERT_EQUALS(invalid_1, false);
@@ -262,7 +262,7 @@ public:
         PetscTools::Destroy(voltage_fine);
         PetscTools::Destroy(phi_e_coarse);
         PetscTools::Destroy(phi_e_fine);
-	}
+    }
 };
 
 
