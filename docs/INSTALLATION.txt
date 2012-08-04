@@ -6,6 +6,7 @@ dependencies.  Other guides can be found on the developer wiki at
 https://chaste.cs.ox.ac.uk/cgi-bin/trac.cgi/wiki/DeveloperInstallGuide
 For a guest login, use the username "anonymous", and your email address as
 the password.
+Anyone can register an account with the Chaste wiki to view and comment on public tickets.
 
 There are many dependencies, so if you are running the Ubuntu Linux
 distribution we strongly recommend using our Ubuntu package of Chaste.
