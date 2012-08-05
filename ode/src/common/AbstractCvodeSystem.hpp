@@ -91,8 +91,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * to solve the ODE system.
  *
  * Repeated calls to Solve will set up and delete CVODE memory, unless
- * the methods
+ * the following methods are called:
  *
+ * SetAutoReset(false) - try not to reset unless time or state variables change
+ *
+ * SetMinimalReset(true) - calls SetAutoReset(false) and also ignores changes in state vars.
  *
  */
 class AbstractCvodeSystem : public AbstractParameterisedSystem<N_Vector>
