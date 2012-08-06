@@ -66,7 +66,7 @@ try:
 except ImportError:
     psutil = None
 
-def help():
+def usage():
     print "Usage:",sys.argv[0],\
         "<test exe> <.log file> <build type> [run time flags] [--no-stdout]"
 
@@ -98,6 +98,26 @@ def kill_test(pid=None, exe=None):
                     kill_test(proc.pid)
             except (psutil.NoSuchProcess, psutil.AccessDenied, OSError):
                 pass
+
+
+def GetTestNameFromLogFilePath(logFilePath):
+    """Figure out what name to display for a test suite based on the results log path.
+    
+    Except for special infrastructure tests, the log file will always live at
+    <component>/build/<build_dir>/<relative_path>.log.  We return the test name
+    <component>/test/<relative_path>, with all occurrences of os.sep replaced by '-'. 
+    """
+    #We used to do: os.path.splitext(os.path.basename(logfile))[0]
+    path_no_ext = os.path.splitext(logFilePath)[0]
+    parts = path_no_ext.split(os.sep)
+    try:
+        build_idx = parts.index('build')
+        test_name = os.sep.join(parts[:build_idx] + ['test'] + parts[build_idx+2:])
+        test_name = test_name.replace(os.sep, '-')
+    except ValueError:
+        test_name = os.path.basename(path_no_ext)
+    return test_name
+
 
 def run_test(exefile, logfile, build, run_time_flags='', echo=True, time_limit=0):
     """Actually run the given test."""
@@ -147,7 +167,7 @@ def run_test(exefile, logfile, build, run_time_flags='', echo=True, time_limit=0
         if not os.path.isdir(test_dir):
             print test_dir, "is not a directory; unable to copy output."
             sys.exit(1)
-        test_name = os.path.splitext(os.path.basename(logfile))[0]
+        test_name = GetTestNameFromLogFilePath(logfile)
         log_fp = open(logfile, 'r')
         status = build.EncodeStatus(exit_code, log_fp)
         log_fp.close()
@@ -174,7 +194,7 @@ if __name__ == '__main__':
 
     if len(sys.argv) < 4:
         print "Syntax error: insufficient arguments."
-        help()
+        usage()
         sys.exit(1)
 
     exefile, logfile, build_type = sys.argv[1:4]

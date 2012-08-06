@@ -605,6 +605,7 @@ def _profileHistory(req, n=20):
                           _linkSummary(machine, 'nightly', rev, machine, bt))
     output.append('  </tr>\n')
     # Display the run times
+    _handle_renamed_test_suites(run_times)
     test_suites = run_times.keys()
     test_suites.sort()
     for test_suite in test_suites:
@@ -654,6 +655,34 @@ def _profileHistory(req, n=20):
     
     return ''.join(output)
 
+def _handle_renamed_test_suites(runTimes):
+    """Cope with the test result naming convention change in #2195.
+    
+    Test suite results files used to be named after just the leaf name of the test file.  They
+    now use the full path.  In an attempt to make the history display still useful across this
+    change, we change test suite names that have no path info to match one with the same leaf
+    name but full path info.
+    """
+    name_map = {}
+    for suite_name in runTimes.iterkeys():
+        if '-' in suite_name:
+            leaf_name = suite_name[1+suite_name.rfind('-'):]
+            if not leaf_name in name_map and leaf_name in runTimes:
+                name_map[leaf_name] = suite_name
+    for leaf_name, full_name in name_map.iteritems():
+        runTimes[full_name].update(runTimes[leaf_name])
+        del runTimes[leaf_name]
+
+def _test_suite_name_aliases(suiteName):
+    """Cope with the test result naming convention change in #2195.
+    
+    If the given suiteName has path info, return it and its leaf name.  Otherwise just return
+    suiteName.
+    """
+    if '-' in suiteName:
+        return (suiteName, suiteName[1+suiteName.rfind('-'):])
+    return (suiteName,)
+
 def profileHistoryGraph(req, buildType, machine, testSuite, data='', n=''):
     """Show runtime graph for a specific testSuite in a profile build."""
     # Extract run-time data
@@ -663,9 +692,11 @@ def profileHistoryGraph(req, buildType, machine, testSuite, data='', n=''):
             return _error('Not enough data to plot, or no database available.')
         db = _db_module.TestResultsDatabase('nightly', verbose=False)
         db.FastUpdate()
-        cur = db.conn.execute('select revision, run_time from details where build_type=? and machine=? and suite_name=?'
-                              ' order by revision desc limit ?',
-                              (buildType, machine, testSuite, n))
+        aliases = _test_suite_name_aliases(testSuite)
+        suite_test = 'suite_name in (%s)' % ','.join(['?'] * len(aliases))
+        cur = db.conn.execute('select revision, run_time from details where build_type=? and machine=? and '
+                              + suite_test + ' order by revision desc limit ?',
+                              (buildType, machine) + aliases + (n,))
         run_times = [(row['revision'], row['run_time']) for row in cur]
         run_times.reverse()
     else:
