@@ -634,6 +634,10 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
             // inside HeartConfig to estimate total number of timesteps, so make
             // sure this is set to what we will use.
             HeartConfig::Instance()->SetPrintingTimeStep(mpProblemDefinition->GetMechanicsSolveTimestep());
+
+            // When we consider archiving these simulations we will need to get a bool back from the following
+            // command to decide whether or not the file is being extended, and hence whether to write the
+            // initial conditions into the .h5 file.
             mpElectricsProblem->InitialiseWriter();
             mpElectricsProblem->WriteOneStep(stepper.GetTime(), initial_voltage);
         }
