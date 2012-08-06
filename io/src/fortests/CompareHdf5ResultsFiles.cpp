@@ -89,7 +89,7 @@ bool CompareFilesViaHdf5DataReader(std::string pathname1, std::string filename1,
 
     if (times1.size() != times2.size())
     {
-        std::cout << "Time step sizes " << times1.size()
+        std::cout << "Number of time steps " << times1.size()
                   << " and " << times2.size() << " don't match\n";
         return false;
     }

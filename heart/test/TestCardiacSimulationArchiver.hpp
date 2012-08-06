@@ -97,6 +97,8 @@ public:
      */
     void TestSimpleBidomain1D() throw(Exception)
     {
+        OutputFileHandler handler("BidomainSimple1d",true); // This test was accruing output - true to wipe directory.
+
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
         HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(0.0005));
         HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
@@ -134,6 +136,7 @@ public:
     void TestArchivingWithHelperClass()
     {
         std::string archive_dir("bidomain_problem_archive_helper");
+
         // Save
         {
             HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
@@ -155,7 +158,50 @@ public:
             CardiacSimulationArchiver<BidomainProblem<1> >::Save(bidomain_problem, archive_dir, false);
         }
 
-        // Load
+        // Load and run, outputting to a different directory.
+        {
+            OutputFileHandler handler("BidomainSimple1d_moved",true); // This test was accruing output - true to wipe directory.
+
+            BidomainProblem<1> *p_bidomain_problem;
+            p_bidomain_problem = CardiacSimulationArchiver<BidomainProblem<1> >::Load(archive_dir);
+
+            HeartConfig::Instance()->SetSimulationDuration(2.0); //ms
+            HeartConfig::Instance()->SetOutputDirectory("BidomainSimple1d_moved");
+            p_bidomain_problem->Solve();
+
+            // check some voltages
+            ReplicatableVector solution_replicated(p_bidomain_problem->GetSolution());
+            TS_ASSERT_EQUALS(solution_replicated.GetSize(), mSolutionReplicated1d2ms.size()); //This in to make sure that the first test in the suite has been run!
+            for (unsigned index=0; index<solution_replicated.GetSize(); index++)
+            {
+                // Shouldn't differ from the original run at all
+                TS_ASSERT_DELTA(solution_replicated[index], mSolutionReplicated1d2ms[index],  5e-11);
+            }
+
+            Hdf5DataReader reader("BidomainSimple1d_moved", "BidomainLR91_1d", true);
+            // This new file should go from 1.0 to 2.0, in printing time steps of 0.1.
+            std::vector<double> times = reader.GetUnlimitedDimensionValues();
+            TS_ASSERT_EQUALS(times.size(),11u);
+            for (unsigned i=0; i<times.size(); i++)
+            {
+                TS_ASSERT_DELTA(times[i], 1.0 + 0.1*(double)(i), 1e-9);
+            }
+
+            // The last entry of the .h5 file over time should be the solution at present time.
+            // There are 11 nodes in this mesh.
+            for (unsigned node_idx = 0; node_idx < solution_replicated.GetSize()/2; node_idx++) // solution is V and phi_e
+            {
+                std::vector<double> v_over_time = reader.GetVariableOverTime("V", node_idx);
+                std::vector<double> phi_over_time = reader.GetVariableOverTime("Phi_e", node_idx);
+                TS_ASSERT_DELTA(v_over_time[v_over_time.size()-1u], solution_replicated[2*node_idx], 1e-4);
+                TS_ASSERT_DELTA(phi_over_time[phi_over_time.size()-1u], solution_replicated[2*node_idx+1], 1e-4);
+            }
+
+            // Free memory
+            delete p_bidomain_problem;
+        }
+
+        // Load and run, outputting to the same directory
         {
             BidomainProblem<1> *p_bidomain_problem;
             p_bidomain_problem = CardiacSimulationArchiver<BidomainProblem<1> >::Load(archive_dir);
@@ -165,17 +211,7 @@ public:
 
             // check some voltages
             ReplicatableVector solution_replicated(p_bidomain_problem->GetSolution());
-            double atol=5e-3;
-            TS_ASSERT_DELTA(solution_replicated[1], -16.4861, atol);
-            TS_ASSERT_DELTA(solution_replicated[2], 22.8117, atol);
-            TS_ASSERT_DELTA(solution_replicated[3], -16.4893, atol);
-            TS_ASSERT_DELTA(solution_replicated[5], -16.5617, atol);
-            TS_ASSERT_DELTA(solution_replicated[7], -16.6761, atol);
-            TS_ASSERT_DELTA(solution_replicated[9], -16.8344, atol);
-            TS_ASSERT_DELTA(solution_replicated[10], 25.3148, atol);
-
             TS_ASSERT_EQUALS(solution_replicated.GetSize(), mSolutionReplicated1d2ms.size()); //This in to make sure that the first test in the suite has been run!
-
             for (unsigned index=0; index<solution_replicated.GetSize(); index++)
             {
                 //Shouldn't differ from the original run at all
@@ -184,6 +220,21 @@ public:
             // check output file contains results for the whole simulation
             TS_ASSERT(CompareFilesViaHdf5DataReader("BiProblemArchiveHelper", "BidomainLR91_1d", true,
                                                     "BidomainSimple1d", "BidomainLR91_1d", true));
+
+            // Free memory
+            delete p_bidomain_problem;
+        }
+
+        // Check we get an error if we try and extend the same h5 file again with results that aren't
+        // consistent in time - original file went 0->1, block above extended it 0->2,
+        // now we are asking for it to go 0->2,1->2 which doesn't make sense.
+        {
+            BidomainProblem<1> *p_bidomain_problem;
+            p_bidomain_problem = CardiacSimulationArchiver<BidomainProblem<1> >::Load(archive_dir);
+
+            HeartConfig::Instance()->SetSimulationDuration(2.0); //ms
+            TS_ASSERT_THROWS_CONTAINS(p_bidomain_problem->Solve(),
+                                  "with results from time = 1, but it already contains results up to time = 2.");
 
             // Free memory
             delete p_bidomain_problem;

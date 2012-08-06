@@ -625,8 +625,13 @@ public:
      * It creates and initialises the hdf writer from the Hdf5DataWriter class.
      * It passes the output directory and file name to it.
      * It is called by Solve(), if the output needs to be generated.
+     *
+     * This method will try to open an existing .h5 file for extension if
+     * we are loading from an archive and one is present.
+     *
+     * @return whether the writer is outputting to an existing file.
      */
-    void InitialiseWriter();
+    bool InitialiseWriter();
 
     /**
      * Specifies which nodes in the mesh to output.

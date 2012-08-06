@@ -398,9 +398,10 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Solve()
     if (mPrintOutput)
     {
         HeartEventHandler::BeginEvent(HeartEventHandler::WRITE_OUTPUT);
+        bool extending_file = false;
         try
         {
-            InitialiseWriter();
+            extending_file = InitialiseWriter();
         }
         catch (Exception& e)
         {
@@ -422,11 +423,12 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Solve()
         }
 
         /*
-         * If we are resuming a simulation (i.e. mSolution already exists) there's no need
-         * to write the initial timestep, since it was already written as the last timestep
-         * of the previous run.
+         * If we are resuming a simulation (i.e. mSolution already exists) and
+         * we are extending a .h5 file that already exists then there is no need
+         * to write the initial condition to file - it is already there as the
+         * final solution of the previous run.
          */
-        if (!mSolution)
+        if (!(mSolution && extending_file))
         {
             WriteOneStep(stepper.GetTime(), initial_condition);
             mpWriter->AdvanceAlongUnlimitedDimension();
@@ -721,7 +723,7 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::WriteExtraVariab
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
-void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::InitialiseWriter()
+bool AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::InitialiseWriter()
 {
     bool extend_file = (mSolution != NULL);
 
@@ -741,6 +743,20 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::InitialiseWriter
         if (!h5_file.Exists())
         {
             extend_file = false;
+        }
+        else // if it does exist check that it is sensible to extend it by running from the archive we loaded.
+        {
+            Hdf5DataReader reader(HeartConfig::Instance()->GetOutputDirectory(),
+                                  HeartConfig::Instance()->GetOutputFilenamePrefix(),
+                                  true);
+            std::vector<double> times = reader.GetUnlimitedDimensionValues();
+            if (times.back() > mCurrentTime)
+            {
+                EXCEPTION("Attempting to extend " << h5_file.GetAbsolutePath() <<
+                          " with results from time = " << mCurrentTime <<
+                          ", but it already contains results up to time = " << times.back() << "."
+                          " Calling HeartConfig::Instance()->SetOutputDirectory() before Solve() will direct results elsewhere.");
+            }
         }
         PetscTools::Barrier("InitialiseWriter::Extension check");
     }
@@ -769,6 +785,8 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::InitialiseWriter
     {
         mpWriter->EndDefineMode();
     }
+
+    return extend_file;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
