@@ -2081,16 +2081,16 @@ class CellMLToChasteTranslator(CellMLTranslator):
                 and (nodeset is None or var in nodeset)):
                 used_vars.add(var)
         if assign_rY and used_vars:
-            if pointer and (self.TYPE_VECTOR_REF == CellMLToChasteTranslator.TYPE_VECTOR_REF or self.TYPE_VECTOR_REF == CellMLToCvodeTranslator.TYPE_VECTOR_REF):                 
+            if pointer:
                 self.output_comment('For state variable interpolation (SVI) we read in interpolated state variables,')
                 self.output_comment('otherwise for ionic current interpolation (ICI) we use the state variables of this model (node).')
                 if self.TYPE_VECTOR_REF == CellMLToChasteTranslator.TYPE_VECTOR_REF:
                     self.writeln('if (!%s) %s = &rGetStateVariables();' % (pointer, pointer))
                     self.writeln('const ', self.TYPE_VECTOR_REF, 'rY = *', pointer, self.STMT_END)
-                else:                    
+                else:
                     self.writeln(self.TYPE_VECTOR_REF, 'rY;')
                     self.writeln('bool made_new_cvode_vector = false;')
-                    self.writeln('if (!%s)' % (pointer))                    
+                    self.writeln('if (!%s)' % (pointer))
                     self.open_block()
                     self.writeln('rY = rGetStateVariables();')
                     self.close_block(False)

@@ -42,7 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCardiacTissue.hpp"
 
 /**
- * A parent class for MonodomainCorrectionTermAssembler and BidomainCorrectionTermAssembler
+ * A parent class for MonodomainCorrectionTermAssembler and BidomainCorrectionTermAssembler,
+ * used for state variable interpolation (SVI).
  */
 template<unsigned ELEM_DIM,unsigned SPACE_DIM,unsigned PROBLEM_DIM>
 class AbstractCorrectionTermAssembler
