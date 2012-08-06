@@ -196,8 +196,8 @@ public:
         nodes.push_back(new Node<3>(3u,  false,  0.0, -0.5, 0.0));
         /* Finally a {{{NodesOnlyMesh}}} is created and the vector of nodes is passed to
          * the {{{ConstructNodesWithoutMesh}}} method. */
-        NodesOnlyMesh<3> mesh;
-        mesh.ConstructNodesWithoutMesh(nodes);
+        NodesOnlyMesh<3>* p_mesh = new NodesOnlyMesh<3>;
+        p_mesh->ConstructNodesWithoutMesh(nodes);
 
         /*
          * Having created a mesh, we now create a {{{std::vector}}} of {{{CellPtr}}}s.
@@ -205,11 +205,11 @@ public:
          */
         std::vector<CellPtr> cells;
         CellsGenerator<StochasticDurationCellCycleModel, 3> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(),TRANSIT);
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(),TRANSIT);
 
         /* We make a {{{NodeBasedCellPopulation}}} (this time with dimension 3) as before and define the cut off length.
          */
-        NodeBasedCellPopulation<3> cell_population(mesh, cells);
+        NodeBasedCellPopulation<3> cell_population(*p_mesh, cells);
         cell_population.SetMechanicsCutOffLength(1.5);
 
         /* We then pass in the cell population into an {{{OffLatticeSimulation}}},
@@ -231,6 +231,8 @@ public:
         {
             delete nodes[i];
         }
+        delete p_mesh;
+
     }
 
     /*
@@ -262,14 +264,14 @@ public:
         nodes.push_back(new Node<3>(1u,  false,  -0.5, 0.0, 0.0));
         nodes.push_back(new Node<3>(2u,  false,  0.0, 0.5, 0.0));
         nodes.push_back(new Node<3>(3u,  false,  0.0, -0.5, 0.0));
-        NodesOnlyMesh<3> mesh;
-        mesh.ConstructNodesWithoutMesh(nodes);
+        NodesOnlyMesh<3>* p_mesh = new NodesOnlyMesh<3>;
+        p_mesh->ConstructNodesWithoutMesh(nodes);
 
         std::vector<CellPtr> cells;
         CellsGenerator<StochasticDurationCellCycleModel, 3> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(),TRANSIT);
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(),TRANSIT);
 
-        NodeBasedCellPopulation<3> cell_population(mesh, cells);
+        NodeBasedCellPopulation<3> cell_population(*p_mesh, cells);
         cell_population.SetMechanicsCutOffLength(1.5);
 
         OffLatticeSimulation<3> simulator(cell_population);
@@ -309,6 +311,7 @@ public:
         {
             delete nodes[i];
         }
+        delete p_mesh;
     }
     /*
      * EMPTYLINE
