@@ -103,7 +103,7 @@ public:
             p_model->SetMaxTransitGenerations(UINT_MAX);
             CellPtr p_cell(new Cell(p_state, p_model));
             p_cell->SetCellProliferativeType(DIFFERENTIATED);
-            double birth_time = -RandomNumberGenerator::Instance()->ranf()*12.0;
+            double birth_time = 0.0;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
         }
@@ -127,14 +127,13 @@ public:
         // Run simulation
         simulator.Solve();
 
-///\todo #1995
-//        // Check levels in cell 0
-//        double notch = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetNotch();
-//        TS_ASSERT_DELTA(notch, 0.9384, 1e-04);
-//        double delta = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetDelta();
-//        TS_ASSERT_DELTA(delta, 0.9990, 1e-04);
-//        double mean_delta = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetMeanNeighbouringDelta();
-//        TS_ASSERT_DELTA(mean_delta, 0.9588, 1e-04);
+        // Check levels in cell 0
+        double notch = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetNotch();
+        TS_ASSERT_DELTA(notch, 0.9999, 1e-04);
+        double delta = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetDelta();
+        TS_ASSERT_DELTA(delta, 0.9901, 1e-04);
+        double mean_delta = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetMeanNeighbouringDelta();
+        TS_ASSERT_DELTA(mean_delta, 1.0000, 1e-04);
     }
 
     void TestHeterogeneousDeltaNotchOnUntetheredTwoCellSystem()
@@ -344,7 +343,7 @@ public:
 
             CellPtr p_cell(new Cell(p_state, p_model));
             p_cell->SetCellProliferativeType(DIFFERENTIATED);
-            double birth_time = -RandomNumberGenerator::Instance()->ranf()*12.0;
+            double birth_time = 0.0;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
         }
@@ -365,14 +364,13 @@ public:
         // Run simulation
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
 
-///\todo #1995
-//        // Check levels in cell 0
-//        double notch = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetNotch();
-//        TS_ASSERT_DELTA(notch, 0.9386, 5e-04);
-//        double delta = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetDelta();
-//        TS_ASSERT_DELTA(delta, 0.9990, 5e-04);
-//        double mean_delta = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetMeanNeighbouringDelta();
-//        TS_ASSERT_DELTA(mean_delta, 0.9589, 5e-04);
+        // Check levels in cell 0
+        double notch = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetNotch();
+        TS_ASSERT_DELTA(notch, 0.9999, 1e-04);
+        double delta = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetDelta();
+        TS_ASSERT_DELTA(delta, 0.9901, 1e-04);
+        double mean_delta = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetMeanNeighbouringDelta();
+        TS_ASSERT_DELTA(mean_delta, 0.9921, 1e-04);
     }
 
     void TestUpdateAtEndOfTimeStepMeshBased() throw (Exception)
@@ -393,7 +391,7 @@ public:
 
             CellPtr p_cell(new Cell(p_state, p_model));
             p_cell->SetCellProliferativeType(DIFFERENTIATED);
-            double birth_time = -RandomNumberGenerator::Instance()->ranf()*12.0;
+            double birth_time = 0.0;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
         }
@@ -404,7 +402,7 @@ public:
         // Create and configure cell-based simulation
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDeltaNotchMeshBasedUpdateAtEndOfTimeStep");
-        simulator.SetEndTime(0.02);
+        simulator.SetEndTime(0.01);
         simulator.SetOutputNodeVelocities(true);
 
         // Set up force law and add to simulation
@@ -415,14 +413,13 @@ public:
         // Run simulation
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
 
-///\todo #1995
-//        // Check levels in cell 0
-//        double notch = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetNotch();
-//        TS_ASSERT_DELTA(notch, 0.9384, 5e-04);
-//        double delta = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetDelta();
-//        TS_ASSERT_DELTA(delta, 0.9990, 5e-04);
-//        double mean_delta = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetMeanNeighbouringDelta();
-//        TS_ASSERT_DELTA(mean_delta, 0.9588, 5e-04);
+        // Check levels in cell 0
+        double notch = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetNotch();
+        TS_ASSERT_DELTA(notch, 0.9999, 1e-04);
+        double delta = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetDelta();
+        TS_ASSERT_DELTA(delta, 0.9901, 1e-04);
+        double mean_delta = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetMeanNeighbouringDelta();
+        TS_ASSERT_DELTA(mean_delta, 1.0000, 1e-04);
     }
 
     void TestArchiving() throw (Exception)
