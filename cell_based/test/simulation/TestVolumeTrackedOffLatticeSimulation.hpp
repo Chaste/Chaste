@@ -286,8 +286,10 @@ public:
              TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
          }
 
-         //Check that the correct number of cells are labelled (i.e. experiencing contact inhibition)
-         TS_ASSERT_EQUALS(CellPropertyRegistry::Instance()->Get<CellLabel>()->GetCellCount(), 8u);
+         // Check that the correct number of cells are labelled (i.e. experiencing contact inhibition)
+         // 8 on 64-bit, 7 on 32-bit...
+         TS_ASSERT_LESS_THAN_EQUALS(CellPropertyRegistry::Instance()->Get<CellLabel>()->GetCellCount(), 8u);
+         TS_ASSERT_LESS_THAN_EQUALS(7u, CellPropertyRegistry::Instance()->Get<CellLabel>()->GetCellCount());
     }
 
     void TestVertexBasedSimulationWithContactInhibition()
