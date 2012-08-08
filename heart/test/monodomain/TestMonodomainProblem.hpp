@@ -188,7 +188,8 @@ public:
         std::vector<std::string> output_variables;
         /*
          * HOW_TO_TAG Cardiac/Output
-         * Calculating and outputting ionic currents ('derived quantities') in a tissue simulation using `HeartConfig` - see also [wiki:ChasteGuides/CodeGenerationFromCellML#Derivedquantities this page].
+         * Calculating and outputting ionic currents ('derived quantities') in a tissue simulation using
+         * class:HeartConfig - see also [wiki:ChasteGuides/CodeGenerationFromCellML#Derivedquantities this page].
          */
         // This is how to output an additional state variable
         output_variables.push_back("cytosolic_calcium_concentration");
