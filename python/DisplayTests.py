@@ -515,6 +515,7 @@ def _profileHistory(req, n=20):
     tests_dir = os.path.join(_tests_dir, 'nightly')
     if not os.path.isdir(tests_dir):
         return _error('No nightly tests found')
+    output = []
 
     # These are the build types representing profile builds
     build_types = ['Profile_ndebug', 'GoogleProfile_ndebug']
@@ -539,6 +540,7 @@ def _profileHistory(req, n=20):
     # Find the appropriate builds for these revisions: map from (revision, build_type) -> [machine]
     builds = {}
     run_times = {}
+    inf_test_names = ['Copyrights', 'DuplicateFileNames', 'OrphanedTests', 'Schemas']
     if _db_module:
         cur = db.conn.execute('select revision, machine, build_type, suite_name, suite_status, run_time from details'
                               ' where build_type in (?,?) and revision between ? and ?',
@@ -550,7 +552,7 @@ def _profileHistory(req, n=20):
                 builds[k] = set()
             builds[k].add(row['machine'])
             # The run_times dictionary
-            if row['suite_name'][:4] == 'Test':
+            if row['suite_name'] not in inf_test_names:
                 if not row['suite_name'] in run_times:
                     run_times[row['suite_name']] = {}
                 k = (row['revision'], row['build_type'], row['machine'])
@@ -577,14 +579,17 @@ def _profileHistory(req, n=20):
                     d = _testResultsDir('nightly', revision, machine, build_type)
                     statuses, _, _, runtimes, _ = _getTestStatus(d, build)
                     for test_suite in statuses.keys():
-                        if test_suite[:4] == 'Test':
+                        if test_suite not in inf_test_names:
                             if not run_times.has_key(test_suite):
                                 run_times[test_suite] = {}
                             run_times[test_suite][k] = (runtimes[test_suite],
                                                         statuses[test_suite])
+    output.append('\n\n<!-- Raw data:\n\n%s\n\n%s\n\n-->\n\n'
+                  % (str(builds).replace(', (', ',\n ('),
+                     str(run_times).replace('}, u', '},\n u')))
 
     # Display table headings
-    output = ['<table border="1">\n  <tr><th>Revision</th>\n']
+    output.append('<table border="1">\n  <tr><th>Revision</th>\n')
     revbts = []
     for revision in revisions:
         cols = sum(map(lambda bt: len(builds.get((revision, bt), [])), build_types))
