@@ -186,7 +186,16 @@ public:
         HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_1d");
         // Set extra variable (to cover extension of HDF5 with named variables) in a later test
         std::vector<std::string> output_variables;
+        /*
+         * HOW_TO_TAG Cardiac/Output
+         * Calculating and outputting ionic currents ('derived quantities') in a tissue simulation using `HeartConfig` - see also [wiki:ChasteGuides/CodeGenerationFromCellML#Derivedquantities this page].
+         */
+        // This is how to output an additional state variable
         output_variables.push_back("cytosolic_calcium_concentration");
+        // or indeed an additional parameter or derived quantity. In the CellML
+        // the variable 'potassium_currents' (sum of potassium currents) is annotated as a
+        // derived quantity to be calculated.
+        output_variables.push_back("potassium_currents");
         HeartConfig::Instance()->SetOutputVariables( output_variables );
 
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
@@ -1018,9 +1027,10 @@ public:
             HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_1d");
             HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
             HeartConfig::Instance()->SetCapacitance(1.0);
-            // Set extra variable (to cover extension of HDF5 with named variables) - in a later test
+            // Set extra variables (to cover extension of HDF5 with named variables) - in a later test
             std::vector<std::string> output_variables;
             output_variables.push_back("cytosolic_calcium_concentration");
+            output_variables.push_back("potassium_currents");
             HeartConfig::Instance()->SetOutputVariables( output_variables );
 
             PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
@@ -1100,9 +1110,10 @@ public:
         HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
         HeartConfig::Instance()->SetCapacitance(1.0);
 
-        // Set extra variable (to cover extension of HDF5 with named variables)
+        // Set extra variables (to cover extension of HDF5 with named variables)
         std::vector<std::string> output_variables;
         output_variables.push_back("cytosolic_calcium_concentration");
+        output_variables.push_back("potassium_currents");
         HeartConfig::Instance()->SetOutputVariables( output_variables );
 
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
