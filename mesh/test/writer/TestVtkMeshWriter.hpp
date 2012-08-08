@@ -401,7 +401,7 @@ public:
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
-        TrianglesMeshReader<3,3> reader("heart/test/data/HeartDecimation_173nodes");
+        TrianglesMeshReader<3,3> reader("heart/test/data/UCSD_heart_decimated_173nodes");
         TetrahedralMesh<3,3> mesh;
         mesh.ConstructFromMeshReader(reader);
 

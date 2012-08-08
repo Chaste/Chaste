@@ -7,7 +7,6 @@ convergence/TestConvergenceNightly.hpp
 TestCardiacSimulationNightly.hpp
 ionicmodels/TestIonicModelsLong.hpp
 monodomain/TestMonodomainProblemLong.hpp
-monodomain/TestMonodomainHeartApex.hpp
 monodomain/TestMonodomainNoStimulus.hpp
 monodomain/TestMonodomainSlab.hpp
 monodomain/TestMonodomainExactSolution.hpp

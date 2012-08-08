@@ -129,7 +129,7 @@ public:
         HeartConfig::Instance()->SetPdeTimeStep(pde_time_step);
         HeartConfig::Instance()->SetOdeTimeStep(pde_time_step/4.0);
         HeartConfig::Instance()->SetSimulationDuration(end_time); //ms
-        HeartConfig::Instance()->SetMeshFileName("heart/test/data/heart"); // note that this is the full heart mesh (not fifthheart)
+        HeartConfig::Instance()->SetMeshFileName("heart/test/data/UCSD_heart"); // note that this is the full heart mesh (not fifthheart)
         HeartConfig::Instance()->SetOutputDirectory("MonoDg0Heart");
         HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_Heart");
 

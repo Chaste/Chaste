@@ -83,7 +83,7 @@ public:
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01,0.1,0.1);
 
         double spatial_step = 0.05;
-        HeartConfig::Instance()->SetMeshFileName("heart/test/data/heart");
+        HeartConfig::Instance()->SetMeshFileName("heart/test/data/UCSD_heart");
 
         /*
          *  Standard solve

@@ -150,7 +150,7 @@ public:
     void TestAddPointDataAndWriteToSequentialFile(void) throw(Exception)
     {
 #ifdef CHASTE_ADAPTIVITY
-        TrianglesMeshReader<3,3> reader("heart/test/data/halfheart");
+        TrianglesMeshReader<3,3> reader("heart/test/data/scaled_UCSD_heart");
         TetrahedralMesh<3,3> mesh;
         mesh.ConstructFromMeshReader(reader);
 
@@ -169,7 +169,7 @@ public:
         }
         adaptive_mesh.AddPointData("Distance from origin", distance);
 
-        adaptive_mesh.WriteMeshToFile( output_directory, "halfheart_with_data.vtu" );
+        adaptive_mesh.WriteMeshToFile( output_directory, "scaled_UCSD_heart_with_data.vtu" );
 #endif
     }
 

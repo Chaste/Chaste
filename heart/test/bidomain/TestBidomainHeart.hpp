@@ -102,7 +102,7 @@ public:
     {
         SetParameters();
 
-        HeartConfig::Instance()->SetMeshFileName("heart/test/data/halfheart");
+        HeartConfig::Instance()->SetMeshFileName("heart/test/data/scaled_UCSD_heart");
         HeartConfig::Instance()->SetOutputDirectory("BiDg0Heart");
 
         PointStimulusHeartCellFactory cell_factory;
