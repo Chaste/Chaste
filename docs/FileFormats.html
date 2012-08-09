@@ -202,7 +202,7 @@
   </dd>
    <dt>.vizancestors</dt>
   <dd>
-    The ancestor index of each cell at each time step in a <tt>TissueSimulation</tt>. Each line has the form <tt>time ancestor_1 ancestor_2 ... ancestor_n</tt>.
+    The ancestor index of each cell at each time step in a <tt>CellBasedSimulation</tt>. Each line has the form <tt>time ancestor_1 ancestor_2 ... ancestor_n</tt>.
   </dd>
    <dt>.vizbetacatenin</dt>
   <dd>
@@ -212,23 +212,39 @@
   </dd>
    <dt>.vizboundarynodes</dt>
   <dd>
-    Whether each node at each time step in a <tt>TissueSimulation</tt> is a boundary node. Each line has the form <tt>time bool_1 bool_2 ... bool_n</tt>.
+    Whether each node at each time step in a <tt>CellBasedSimulation</tt> is a boundary node. Each line has the form <tt>time bool_1 bool_2 ... bool_n</tt>.
   </dd>
    <dt>.vizcelltypes</dt>
   <dd>
-    The cell type of each cell at each time step in a <tt>TissueSimulation</tt>. Each line has the form <tt>time c_1 c_2 ... c_n</tt>.
+    The cell type of each cell at each time step in a <tt>CellBasedSimulation</tt>. Each line has the form <tt>time c_1 c_2 ... c_n</tt>.
   </dd>
-   <dt>.vizelements</dt>
+  <dt>.vizcoarsepdesolution</dt>
   <dd>
-    The nodes associated with each element at each time step in a <tt>TissueSimulation</tt>. Each line has the form <tt>time element1_node1 element1_node2 element1_node3 ... elementn_node1 elementn_node2 elementn_node3</tt>.
+    The solution to a PDE, associated with a <tt>CellBasedSimulation</tt>, which is solved on a 'coarse' mesh for efficiency. In 2D, each line has the form <tt>time coarse_mesh_node_index_1 coarse_mesh_node_x_1 coarse_mesh_node_y_1 solution_at_coarse_mesh_node_1 ... coarse_mesh_node_index_n coarse_mesh_node_x_n coarse_mesh_node_y_n solution_at_coarse_mesh_node_n</tt>.
+  </dd>
+  <dt>.vizelements</dt>
+  <dd>
+    The nodes associated with each element at each time step in a <tt>CellBasedSimulation</tt>. Each line has the form <tt>time element1_node1 element1_node2 element1_node3 ... elementn_node1 elementn_node2 elementn_node3</tt>.
+  </dd>
+  <dt>.vizlocations</dt>
+  <dd>
+    The location of each cell each time step in a <tt>MultipleCaBasedCellPopulation</tt>, which allows for multiple occupancy of lattice sites. Each line has the form <tt>time location_index_1 ... location_index_n</tt>.
   </dd>
   <dt>.viznodes</dt>
   <dd>
-    The position of each node at each time step in a <tt>TissueSimulation</tt>. Each line has the form <tt>time x_1 ... x_n</tt> in 1D, <tt>time x_1 y_1 ... x_n y_n</tt> in 2D and <tt>time x_1 y_1 z_1... x_n y_n z_n</tt> in 3D.
+    The position of each node at each time step in a <tt>CellBasedSimulation</tt>. Each line has the form <tt>time x_1 ... x_n</tt> in 1D, <tt>time x_1 y_1 ... x_n y_n</tt> in 2D and <tt>time x_1 y_1 z_1... x_n y_n z_n</tt> in 3D.
+  </dd>
+  <dt>.vizpdesolution</dt>
+  <dd>
+    The solution to a PDE, associated with a <tt>CellBasedSimulation</tt>, which is solved on a 'coarse' mesh for efficiency. In 2D, each line has the form <tt>time location_index_1 x_1 y_1 solution_1 ... location_index_n x_n y_n  solution_n</tt>.
   </dd>
   <dt>.vizsetup</dt>
   <dd>
 	The <tt>cell_based</tt> visualiser setup file. This contains such things as <tt>mesh_width</tt> for periodic simulations.
+  </dd>
+  <dt>.vizstress</dt>
+  <dd>
+    The stress distribution in a <tt>MeshBasedCellPopulation</tt>, measured by the extremal normal forces on each cell. Each line has the form <tt>time location_index_1 x_1 y_1 minimum_normal_force_1 maximum_normal_force_1 ... location_index_n x_n y_n minimum_normal_force_n maximum_normal_force_n</tt>.
   </dd>
 </dl>
 
