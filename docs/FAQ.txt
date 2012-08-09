@@ -1,8 +1,6 @@
 This file is very sparse at present.  More useful information can be found
 on the Chaste developers' wiki at
 https://chaste.cs.ox.ac.uk/cgi-bin/trac.cgi/wiki/ChasteGuides/TroubleShooting
-For a guest login, use the username "anonymous", and your email address as
-the password.
 
 
 Q: I have problems compiling some libraries, the error looks to be caused by HDF5/MPI
