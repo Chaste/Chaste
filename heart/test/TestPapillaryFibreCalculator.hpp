@@ -147,6 +147,11 @@ public:
         // Nightly test TestPapillaryFibreCalculatorLong.hpp is a better one if you want to understand it!
 
         ///\todo There may still be a sign issue between flapack and MKL
+        ///\todo THIS TEST IS KNOWN TO STALL IN LAPACK (dgeev_) 
+        //       ON THIS CONFIGURATION :
+        //  * 32-bit virtual machine on Ubuntu 8.04 LTS
+        //  * build=GccOpt
+        //  * PETSc: petsc-2.3.2-p10 with f2cblaslapack
         TS_ASSERT_DELTA(fabs(fibre_orientations[0](0)), 0.7056, 1e-4);
         TS_ASSERT_DELTA(fabs(fibre_orientations[0](1)), 0.0641, 1e-4);
         TS_ASSERT_DELTA(fabs(fibre_orientations[0](2)), 0.7056, 1e-4);
