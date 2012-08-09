@@ -487,6 +487,8 @@ public:
 
     void TestArchivingWithoutSolution() throw(Exception)
     {
+        EXIT_IF_PARALLEL; // Avoid all processes writing the same archive and hence potential race condition
+
         OutputFileHandler handler("archive", false);
         handler.SetArchiveDirectory();
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "PdeAndBoundaryConditions.arch";
@@ -534,6 +536,8 @@ public:
 
     void TestArchivingWithSolution() throw(Exception)
     {
+        EXIT_IF_PARALLEL; // Avoid all processes writing the same archive and hence potential race condition
+
         OutputFileHandler handler("archive", false);
         handler.SetArchiveDirectory();
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "PdeAndBoundaryConditions.arch";
