@@ -7,6 +7,142 @@
 
 <h1>Chaste Release Notes</h1>
 
+
+
+
+<h2>Release 3.1 (changes since Release 3.0)</h2>
+
+<p>
+Release 3.1 is a minor release, which brings support for newer versions of libraries and a small number of new capabilities and bug fixes. It provides access to a release version of Chaste under the BSD licence (rather than the LGPL licence), to make it easier to use Chaste in industrial settings.
+</p>
+
+<h3>Headline features</h3>
+
+<h4>General</h4>
+
+<ul>
+<li>Chaste is now released under the BSD licence, this is one of the major reasons for this release: <a href="http://opensource.org/licenses/BSD-3-Clause">http://opensource.org/licenses/BSD-3-Clause</a>.
+</li><li>The Ubuntu package now also supports Precise Pangolin (12.04 Long-Term Support edition).
+</li><li>Support for PETSc version 3.2 has been added.  Some previously supported versions have been dropped so that the minimum required version of PETSc is now 2.3.2.  The minimum version of Boost is now 1.34.
+</li><li>Support for up to GCC 4.7.0 and Intel 12.1 compilers.
+</li>
+</ul>
+
+<h4>Cardiac</h4>
+
+<ul>
+<li>Cardiac electro-mechanics now works with bidomain as well as monodomain simulations.
+</li><li>Cardiac cell models in tissue can now be solved using <tt>CVODE</tt> (versions 2.5-2.7), this can provide large speed-ups for problems that are small enough to get all the Cvode solvers in memory.
+</li>
+</ul>
+
+<h4>Cell-based</h4>
+
+<ul>
+<li>The global singleton <tt>CellWiseData</tt> has been replaced by a much more general <tt>CellData</tt> component in each cell.
+</li><li>The cell property hierarchy is now used much more extensively throughout the code.
+</li><li>A new cell population class has been introduced to enable the simulation of cellular automata with multiple site occupancy.
+</li>
+</ul>
+
+<h3>Major new functionality &amp; code changes</h3>
+
+<h4>General</h4>
+
+<ul>
+<li>Chaste is now beginning to use the Boost Filesystem library for low-level file management. This means an extra third-party dependency; your builds will fail if the library is not installed. Updating to the latest version of the chaste-dependencies Ubuntu package will ensure the library is installed; many systems will have it anyway. Your <tt>hostconfig</tt> file may require editing to link against <tt>boost_system</tt> as well as <tt>boost_filesystem</tt> if using recent Boost versions. (Boost &gt;= 1.34 is now required.)
+</li>
+</ul>
+
+<h4>Cardiac</h4>
+
+<ul>
+<li>A <tt>CellMLLoader</tt> class is available which makes the dynamic loading of CellML files into (almost) a one line call.
+</li><li>The Cmgui script that helps the user to load the simulation data has been adapted to Cmgui version 2.8 or later. It is still compatible with previous Cmgui versions 2.7 and 2.6. The name of the script is now LoadSolutions.com in both the undeformed and deformed cases. 
+</li><li>A CellML project has been created containing many annotated CellML files for use with Chaste. See the Chaste wiki (<a class="wiki" href="https://chaste.cs.ox.ac.uk/cgi-bin/trac.cgi/wiki/ChasteGuides/CodeGenerationFromCellML">ChasteGuides/CodeGenerationFromCellML</a>) for details of how to access it.
+</li>
+</ul>
+
+<h4>Cell-based</h4>
+
+<ul>
+<li>The global singleton <tt>CellWiseData</tt> has been replaced by a <tt>CellData</tt> component in each cell.  These data are scalable and are accessed by name rather than index.  There is a helper method on cell populations for visiting all cells and setting constant data (<tt>SetDataOnAllCells()</tt>).  When using nutrient-dependent cell-cycle models or PDEs the <tt>CellData</tt> name must match with the name used in the class.
+</li><li>Cell-based simulations, populations, forces and cell killers can now all be templated over element dimension as well as space dimension; this currently allows for mesh-based simulations of 2D surfaces in 3D space without cell division.
+</li><li>Two serious bugs fixed in Delta-Notch code (the number of times that the ODE is solved and which variables get updated in the <tt>CellData</tt>).
+</li><li>A new cell-population class, <tt>MultipleCaBasedCellPopulation</tt>, has replaced <tt>CaBasedCellPopulation</tt>. This enables cellular automata to be simulated which allow multiple site occupancy (more than one cell model at each lattice site).
+</li><li>Centre-based simulations now have a movement threshold in order to check for numerical stability. You will need to manually call <tt>SetAbsoluteMovementThreshold()</tt> in simulations where large cell movements are typical.
+</li>
+</ul>
+
+<h3>Minor new functionality and code changes, which may still require changes to user code</h3>
+
+<h4>General</h4>
+
+<ul>
+<li>The <tt>testoutput</tt> directory in the main trunk has been renamed <tt>test_summary</tt> to avoid confusion. For each build, it contains a generated webpage with a summary of test results and links to their console output, your actual test output goes elsewhere. This means you need to update any browser bookmarks to the test results summary.
+</li><li>The method <tt>AbstractElement::SetRegion</tt> has been renamed to <tt>SetAttribute</tt>. Similarly, <tt>GetRegion</tt> has been renamed to <tt>GetAttribute</tt>.
+</li><li>It is now possible to run Electromechanics problems where the electrical problem is a bidomain problem. The interface of <tt>CardiacElectroMechanicsProblem</tt> has changed. You now need to pass the electrics problem type as second parameter to the constructor (e.g., MONODOMAIN, BIDOMAIN) and the electrics problem dimension as second template (defaults to 1).
+</li><li>We now pass fibre file names around using a <tt>FileFinder</tt> rather than a string, to allow loading from a wider variety of locations. 
+</li><li>A local.py settings file may be placed in python/hostconfig to be used in preference to any other hostconfig settings. 
+</li>
+</ul>
+
+<h4>Cardiac</h4>
+
+<ul>
+<li>Most of the heart solvers and cell factories now use <tt>AbstractCardiacCellInterface</tt>, not <tt>AbstractCardiacCell</tt> (to enable the use of CVODE solvers).
+</li><li>In the version 3.1 XML parameters file, the <tt>ConductivityHeterogeneities</tt> element has been moved from inside <tt>&lt;Simulation&gt;</tt> to inside <tt>&lt;Physiological&gt;</tt>. New files written to this version of the schema will need to reflect this; old files still using a previous version can still be used unchanged. 
+</li><li>For simulations with <i>compressible</i> material laws, the electro-mechanics solver should have been scaling the active tension returned by the contraction model, by the determinant of the deformation gradient. This has now been fixed. (See <a class="wiki" href="https://chaste.cs.ox.ac.uk/cgi-bin/trac.cgi/wiki/ChasteGuides/FiniteElementImplementations">ChasteGuides/FiniteElementImplementations</a> for the (corrected) equations). Results using the compressible material law in the repository have barely changed, since this material law is nearly incompressible. However, simulation results with any user-defined highly compressible law might change. 
+</li><li>Pseudo ECG calculations for Bidomain-with-Bath simulations have been changed, as pointed out on the mailing list, these had a bug that meant the integral was performed over the whole mesh (including bath) instead of just cardiac tissue.
+</li><li>Fixed a small bug in cardiac checkpointing, when loading and running a simulation from an archive to a new output folder the voltage at the final time step in the .h5 file was spuriously reported as "0".
+</li><li><tt>FibreReader::GetNextFibreVector(vec)</tt> has been changed to <tt>FibreReader::GetFibreVector(index,vec)</tt> and <tt>GetNextFibreSheetAndNormalMatrix(mat)</tt> to <tt>GetFibreSheetAndNormalMatrix(index,mat)</tt>.
+</li><li>The <tt>HeartConfig</tt> class has undergone an extensive refactor internally. This shouldn't impact users (although you might notice that a <tt>ChasteDefaults.xml</tt> file is no longer written to checkpoints), but some "nonsensical" calls to Get methods may now return different or new errors. 
+</li><li>There have been changes the interface of the <tt>VoltageInterpolaterOntoMechanicsMesh</tt> class. Now you need to pass in the names of the electrics variables you want to interpolate onto the mechanics mesh (variable 'V' used to be hardcoded as the only one to be interpolated).
+</li>
+</ul>
+
+<h4>Cell-based</h4>
+
+<ul>
+<li>Renamed the <tt>AbstractCellBasedSimulation</tt> methods <tt>PostSolve()</tt> and <tt>AfterSolve()</tt> to <tt>UpdateAtEndOfTimeStep()</tt> and <tt>UpdateAtEndOfSolve()</tt> respectively; also moved the code out of the existing <tt>AbstractCellBasedSimulation</tt> methods into the main <tt>Solve()</tt> method, so that these methods don't have to be called by every overridden version.
+</li><li>Corrected the implementation of <tt>StochasticDurationGenerationBasedCellCycleModel</tt> by making use of parameters <tt>mStemCellG1Duration</tt> and <tt>mTransitCellG1Duration</tt> in the method <tt>SetG1Duration()</tt>. This won't break user projects, but may change results.
+</li><li>Created a new <tt>AbstractCellPopulation</tt> method <tt>GetVolumeOfCell()</tt>, which is overridden in concrete subclasses; this method is now used in <tt>VolumeTrackedOffLatticeSimulation</tt>, which hence now works with any off-lattice cell-based population.
+</li><li>Corrected initialisation of <tt>CellwiseData</tt> (now <tt>CellData</tt>; see above) in <tt>VolumeTrackedOffLatticeSimulation</tt>; it is now populated automatically when a simulation is set up, rather than having to be manually initialized.
+</li><li>VTK output has been enabled for cell-based simulations that use a <tt>MultipleCaBasedCellPopulation</tt> or <tt>PottsBasedCellPopulation</tt>.
+</li><li>Moved <tt>mpBoxCollection</tt> from <tt>NodeBasedCellPopulation</tt> to <tt>NodesOnlyMesh</tt>.
+</li><li>Made <tt>CellId</tt> a concrete <tt>CellProperty</tt> to exploit the functionality of this class hierarchy.
+</li><li>Created the class <tt>CellAncestor</tt>, which inherits from <tt>AbstractCellProperty</tt> and stores the unsigned variable associated with each ancestor. The <tt>Cell</tt> method <tt>SetAncestor()</tt> now takes a shared pointer to a <tt>CellAncestor</tt> rather than an unsigned.
+</li><li>Extended the class <tt>SurfaceAreaConstraintUpdateRule</tt> and the <tt>PottsMesh</tt> method <tt>DivideElement()</tt> to work in 3D
+</li><li>In node-based simulations cell radii are now inherited from parent cells; before this was hard-coded to 0.5. Also enabled updating of cells radii through <tt>CellData</tt>. This won't break user projects, but may change results. 
+</li><li>The <tt>HoneycombMeshGenerator</tt> was producing slightly irregular cell-cell spring lengths due to floating point truncation. This has been fixed, which means that all simulations using <tt>HoneycombMeshGenerator</tt> now give slightly different results, and monolayer simulations surrounded by layers of ghosts nodes pull the convex hull of the ghost nodes to a circle more rapidly than before. This won't break user projects, but may change results.
+</li><li>We have renamed the cell killer methods <tt>TestAndLabelSingleCellForApoptosis()</tt> and <tt>TestAndLabelCellsForApoptosisOrDeath()</tt> to <tt>CheckAndLabelSingleCellForApoptosis()</tt> and <tt>CheckAndLabelCellsForApoptosisOrDeath()</tt> respectively, since it is not ideal to have a method with the prefix Test- outside a test suite.
+</li><li><tt>OxygenBasedCellKiller</tt> has been renamed <tt>ApoptoticCellKiller</tt> to more accurately reflect its functionality.
+</li><li><tt>CryptCellsGenerator</tt> now works with a <tt>PottsBasedCellPopulation</tt>.
+</li><li>Refactored <tt>VertexElement</tt> and <tt>PottsElement</tt> to both inherit from a new class, <tt>MutableElement</tt>, and moved appropriate functionality up into this parent class. Also changed the order of the parameters in <tt>MutableElement::AddNode()</tt> so that <tt>rIndex</tt> can default in child classes. This will particularly affect <tt>VertexElement</tt> where users will need to change the order of the parameters, switching <tt>pNode</tt> and <tt>rIndex</tt>.
+</li><li>The <tt>divisions.dat</tt> data file, if output, now includes an extra column containing the age of the parent cell just prior to division. 
+</li><li>Moved <tt>mCellProliferativeType</tt> from <tt>AbstractCellCycleModel</tt> back into <tt>Cell</tt>.
+</li><li>Forces in node-based populations may now be made dependent on cell radii.
+</li><li>Added a new force class, <tt>NagaiHondaDifferentialAdhesionForce</tt>, and associated tutorial <tt>TestRunningDifferentialAdhesionSimulationsTutorial</tt>. This class inherits from <tt>NagaiHondaForce</tt> and allows for different interaction energies depending on which (if any) of a pair of interacting cells have the property <tt>CellLabel</tt>.
+</li><li>Removed an exception in <tt>NodeBasedCellPopulation</tt> that had prohibited a simulation from having a single cell.
+</li><li>Added a new force class <tt>DiffusionForce</tt> to the trunk for simulating random movement.
+</li><li>Added several 'removal' methods: <tt>RemoveAllUpdateRules()</tt> to <tt>MultipleCaBasedCellPopulation</tt> and <tt>PottsBasedCellPopulation</tt>; <tt>RemoveAllCellKillers()</tt> to <tt>AbstractCellBasedSimulation</tt>; <tt>RemoveAllForces()</tt> to <tt>OffLatticeSimulation</tt>; and <tt>RemoveAllMultipleCaUpdateRules()</tt> and <tt>RemoveAllPottsUpdateRules()</tt> to <tt>OnLatticeSimulation</tt>.
+</li><li>The <tt>CellBasedPdeHandler</tt> method <tt>UseCoarseMesh()</tt> now takes a <tt>ChasteCuboid</tt> defining both the size and location of the coarse mesh to use, so that the user can specify the exact location of the coarse mesh rather than it defaulting to centering on the centre of the cell population. The user should either ensure this contains the population or set the extra flag to true to automatically centre this mesh on the centre of the cell population.
+</li><li>In order to allow more than one cell per location index in <tt>MultipleCaBasedCellPopulation</tt>, the <tt>GetCellResults()</tt> method in <tt>AbstractCellPopulation</tt> has been modified to take in a <tt>CellPtr</tt> rather than a location index.
+</li>
+
+
+
+
+
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr />
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+
+
+
+
 <h2>Release 3.0 (changes since Release 2.3)</h2>
 
 <h3>Headline features</h3>
