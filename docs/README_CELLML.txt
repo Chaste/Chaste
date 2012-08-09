@@ -15,5 +15,5 @@ For a guest login, use the username "anonymous", and your email address as
 the password.
 
 Static versions of the guide accompanying Chaste releases are also available.  See
-https://chaste.cs.ox.ac.uk/chaste/tutorials/release_3.0/ChasteGuides/CodeGenerationFromCellML.html
-for release 3.0.
+https://chaste.cs.ox.ac.uk/chaste/tutorials/release_3.1/ChasteGuides/CodeGenerationFromCellML.html
+for release 3.1.
