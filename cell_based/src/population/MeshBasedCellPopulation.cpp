@@ -972,7 +972,7 @@ void MeshBasedCellPopulation<2,3>::CreateVoronoiTessellation()
 /**
  * The cylindrical mesh is only defined in 2D, hence there is
  * a separate definition for this method in 3D, which doesn't have the capability
- * of dealing with periodic boundaries in 3D. This is /todo #1374.
+ * of dealing with periodic boundaries in 3D. This is \todo #1374.
  */
 template<>
 void MeshBasedCellPopulation<3>::CreateVoronoiTessellation()

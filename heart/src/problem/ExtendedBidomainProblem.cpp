@@ -284,7 +284,7 @@ void ExtendedBidomainProblem<DIM>::SetIntracellularConductivitiesForSecondCell(c
 template<unsigned DIM>
 void ExtendedBidomainProblem<DIM>::SetFixedExtracellularPotentialNodes(std::vector<unsigned> nodes)
 {
-    assert(mFixedExtracellularPotentialNodes.size() == 0); //TODO turn this into an exception if the user calls this twice...
+    assert(mFixedExtracellularPotentialNodes.size() == 0); ///\todo turn this into an exception if the user calls this twice...
     mFixedExtracellularPotentialNodes.resize(nodes.size());
     for (unsigned i=0; i<nodes.size(); i++)
     {

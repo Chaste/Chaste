@@ -625,7 +625,7 @@ public:
             TS_ASSERT_EQUALS(vtk_reader.GetNumNodes(), mesh.GetNumNodes());
             TS_ASSERT_EQUALS(vtk_reader.GetNumElements(), mesh.GetNumElements());
 
-            //TODO: The reader can open a quadratic vtu file, but not construct a QuadraticMesh
+            ///\todo: The reader can open a quadratic vtu file, but not construct a QuadraticMesh
             //further tests of the written output should be made once this is supported.
         }
 #else
