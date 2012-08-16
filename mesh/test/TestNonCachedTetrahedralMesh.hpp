@@ -53,8 +53,9 @@ private:
     unsigned GetMemoryUsage()
     {
 #ifdef __linux__
-        OutputFileHandler handler("");
-        std::string file_name = handler.GetOutputDirectoryFullPath() + "memusage.tmp";
+
+        FileFinder memory_usage_temp_file("memusage.tmp", RelativeTo::ChasteTestOutput);
+        std::string file_name = memory_usage_temp_file.GetAbsolutePath();
         if (PetscTools::AmMaster())
         {
             std::stringstream ps_command;
@@ -73,8 +74,7 @@ private:
         PetscTools::Barrier("GetMemoryUsage-2");
         if (PetscTools::AmMaster())
         {
-            std::string rm_command = "rm -rf " + file_name;
-            ABORT_IF_NON0(system, rm_command.c_str());
+            memory_usage_temp_file.Remove(true);
         }
 
         return vsize;

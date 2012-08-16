@@ -517,12 +517,9 @@ cp /tmp/$USER/testoutput/TestLoadAsSequentialWithBathAndDistributedMesh/archive.
             HeartConfig::Instance()->SetSimulationDuration(endTime);
             // Also need to copy the old results into the new output folder
             OutputFileHandler handler2(output_dir, false); // must be collective
-            if (PetscTools::AmMaster())
-            {
-                std::string prev_results_path = rDirToCopyFrom.GetAbsolutePath() + "simulation.h5";
-                std::string new_path = handler2.GetOutputDirectoryFullPath() + "simulation.h5";
-                ABORT_IF_NON0(system, "cp " + prev_results_path + " " + new_path);
-            }
+
+            FileFinder original_file(rDirToCopyFrom.GetAbsolutePath() + "simulation.h5", RelativeTo::Absolute);
+            handler2.CopyFileTo(original_file); // must be collective.
         }
     }
 
@@ -1281,10 +1278,12 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForMigrateAfterSolve/archive/?* ./hear
 
         // Copy the simulation.h5 file into the archive folder, for convenience
         OutputFileHandler handler(directory, false);
+
         if (PetscTools::AmMaster())
         {
-            std::string path = handler.GetOutputDirectoryFullPath();
-            ABORT_IF_NON0(system, "cp " + path + "simulation.h5 " + path + "archive/");
+            FileFinder source_file = handler.FindFile("simulation.h5");
+            FileFinder destination(handler.GetOutputDirectoryFullPath() + "archive/", RelativeTo::Absolute);
+            source_file.CopyTo(destination);
         }
     }
 

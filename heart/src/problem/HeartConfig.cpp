@@ -359,8 +359,8 @@ void HeartConfig::CopySchema(const std::string& rToDirectory)
         }
         if (schema_location.Exists())
         {
-            // Called by master only so use this instead of EXPECT0
-            ABORT_IF_NON0(system,("cp " + schema_location.GetAbsolutePath() + " " + rToDirectory).c_str());
+            FileFinder output_directory(rToDirectory, RelativeTo::Absolute);
+            schema_location.CopyTo(output_directory);
         }
     }
 }

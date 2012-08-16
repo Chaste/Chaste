@@ -177,23 +177,20 @@ public:
             CardiacSimulationArchiver<MonodomainProblem<2> >::Save(*p_monodomain_problem, archive_dir_current, false);
             std::cout << "Archived to " << archive_dir_current << "\n" << std::flush;
 
-            if (PetscTools::AmMaster()) // Best to have only the master processor messing with files
-            {
-                // Copy the postprocessing results into the archive folders so they aren't wiped.
-                std::vector<std::string> files;
-                files.push_back("Apd_90_-30_Map");
+            // Copy the postprocessing results into the archive folders so they aren't wiped.
+            std::vector<std::string> files;
+            files.push_back("Apd_90_-30_Map");
 //                files.push_back("MaxUpstrokeVelocityMap_-30");
 //                files.push_back("UpstrokeTimeMap_-30");
-                for (unsigned i=0; i<files.size(); i++)
-                {
-                    std::string command = "mv " +  OutputFileHandler::GetChasteTestOutputDirectory() + HeartConfig::Instance()->GetOutputDirectory() + "/output/" + files[i] + ".dat "
-                                          + OutputFileHandler::GetChasteTestOutputDirectory() + archive_dir_current + "/" + files[i] + ".dat";
 
-                    // If we are in an PetscTools::AmMaster() block we need to use this instead of EXPECT0.
-                    ABORT_IF_NON0(system, command);
-                }
+            OutputFileHandler archive_directory(archive_dir_current, false);
+
+            for (unsigned i=0; i<files.size(); i++)
+            {
+                FileFinder file_to_copy(HeartConfig::Instance()->GetOutputDirectory() + "/output/" + files[i] + ".dat", RelativeTo::ChasteTestOutput);
+                TS_ASSERT(file_to_copy.IsFile());
+                archive_directory.CopyFileTo(file_to_copy);
             }
-            PetscTools::Barrier();
         }// close for loop
     }//close void Test2dSimulations
 

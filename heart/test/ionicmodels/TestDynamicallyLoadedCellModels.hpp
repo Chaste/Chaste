@@ -127,15 +127,6 @@ private:
         return p_cell;
     }
 
-    void DeleteFile(FileFinder& rFile)
-    {
-        if (PetscTools::AmMaster())
-        {
-            ABORT_IF_NON0(system, "rm " + rFile.GetAbsolutePath()); // Make sure the conversion is re-run
-        }
-        PetscTools::Barrier("TestCellmlConverter_DeleteFile");
-    }
-
     mode_t ResetMode(FileFinder& rFile, mode_t mode)
     {
         struct stat our_stats;
@@ -272,7 +263,7 @@ public:
         TS_ASSERT_THROWS_THIS(converter.Convert(unsupp_ext), "Unsupported extension '.hpp' of file '"
                               + unsupp_ext.GetAbsolutePath() + "'; must be .so or .cellml");
 
-        DeleteFile(so_file);
+        so_file.Remove();
         TS_ASSERT_THROWS_THIS(converter.Convert(cellml_file, false),
                               "Unable to convert .cellml to .so unless called collectively, due to possible race conditions.");
 

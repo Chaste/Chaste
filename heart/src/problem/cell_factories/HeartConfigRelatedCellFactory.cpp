@@ -138,11 +138,6 @@ AbstractCardiacCellInterface* HeartConfigRelatedCellFactory<SPACE_DIM>::CreateCe
         // Load model from shared library
         DynamicCellModelLoaderPtr p_loader = LoadDynamicModel(ionic_model, false);
         p_cell = p_loader->CreateCell(this->mpSolver, intracellularStimulus);
-        if (!dynamic_cast<AbstractCardiacCell*>(p_cell))
-        {
-            delete p_cell;
-            EXCEPTION("CVODE cannot be used as a cell model solver in tissue simulations: do not use the --cvode flag.");
-        }
     }
     else
     {
@@ -247,6 +242,11 @@ AbstractCardiacCellInterface* HeartConfigRelatedCellFactory<SPACE_DIM>::CreateCe
     }
     // Generate lookup tables if present
     p_cell->GetLookupTableCollection();
+
+    if (dynamic_cast<AbstractCvodeCell*>(p_cell))
+    {
+        static_cast<AbstractCvodeCell*>(p_cell)->SetMinimalReset(true);
+    }
 
     return p_cell;
 }

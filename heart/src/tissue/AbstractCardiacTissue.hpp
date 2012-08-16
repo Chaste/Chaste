@@ -118,7 +118,7 @@ private:
 
                     if (PetscTools::AmMaster())
                     {
-                        ABORT_IF_NON0(system,"cp " + source_file.GetAbsolutePath() + " " + dest_file.GetAbsolutePath());
+                        source_file.CopyTo(dest_file);
                     }
                     PetscTools::Barrier();
                     break;
@@ -128,11 +128,12 @@ private:
                 {
                     FileFinder source_file(mFibreFilePathNoExtension + ".axi", RelativeTo::AbsoluteOrCwd);
                     assert(source_file.Exists());
-                    FileFinder dest_file(ArchiveLocationInfo::GetArchiveRelativePath() + ArchiveLocationInfo::GetMeshFilename() + ".axi", RelativeTo::ChasteTestOutput);
+                    FileFinder dest_file(ArchiveLocationInfo::GetArchiveRelativePath()
+                                       + ArchiveLocationInfo::GetMeshFilename() + ".axi", RelativeTo::ChasteTestOutput);
 
                     if (PetscTools::AmMaster())
                     {
-                        ABORT_IF_NON0(system,"cp " + source_file.GetAbsolutePath() + " " + dest_file.GetAbsolutePath());
+                        source_file.CopyTo(dest_file);
                     }
                     PetscTools::Barrier();
 

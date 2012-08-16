@@ -611,6 +611,7 @@ public:
         {
             p_conv_info_file->close();
 
+            /// \todo #1002 - remove this 'cat' call.
             std::cout << "Results: " << std::endl;
             ABORT_IF_NON0(system, "cat " + conv_info_handler.GetOutputDirectoryFullPath() + nameOfTest + "_info.csv");
         }
@@ -623,10 +624,10 @@ public:
         double scaling = mMeshWidth/(double) num_ele_across;
 
         std::cout<<"================================================================================"<<std::endl;
-        std::cout<<"Solving in "<<DIM<<"D\t";
-        std::cout<<"Space step "<< scaling << " cm (mesh " << this->MeshNum << ")" << "\n";
-        std::cout<<"PDE step "<<this->PdeTimeStep<<" ms"<<"\t";
-        std::cout<<"ODE step "<<this->OdeTimeStep<<" ms"<<"\t";
+        std::cout<<"Solving in " << DIM << "D\t";
+        std::cout<<"Space step " << scaling << " cm (mesh " << this->MeshNum << ")" << "\n";
+        std::cout<<"PDE step " << this->PdeTimeStep << " ms" << "\t";
+        std::cout<<"ODE step " << this->OdeTimeStep << " ms" << "\t";
         if (HeartConfig::Instance()->GetUseAbsoluteTolerance())
         {
             std::cout<<"KSP absolute "<<HeartConfig::Instance()->GetAbsoluteTolerance()<<"\t";
