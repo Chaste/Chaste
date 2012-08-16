@@ -243,10 +243,12 @@ AbstractCardiacCellInterface* HeartConfigRelatedCellFactory<SPACE_DIM>::CreateCe
     // Generate lookup tables if present
     p_cell->GetLookupTableCollection();
 
+#ifdef CHASTE_CVODE
     if (dynamic_cast<AbstractCvodeCell*>(p_cell))
     {
         static_cast<AbstractCvodeCell*>(p_cell)->SetMinimalReset(true);
     }
+#endif // CHASTE_CVODE
 
     return p_cell;
 }
