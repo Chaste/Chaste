@@ -64,7 +64,7 @@ private:
     c_vector <double, SPACE_DIM> mApexToBase; /**< Normalised direction from apex to base */
 
     /**
-     * Compute the wallthickness of a given node based on a
+     * Compute the wall thickness of a given node based on a
      * neighbourhood average of its thickness and of those in the forward star.
      *
      * @param nodeIndex  The index of the node in question
@@ -94,7 +94,7 @@ public:
     ~StreeterFibreGenerator();
 
     /**
-     * Uses the names of files defining the diferent surfaces of the mesh to construct the geometry information class
+     * Uses the names of files defining the different surfaces of the mesh to construct the geometry information class
      * File format: list of triangles
      *
      * @param rEpicardiumFile Epicardium surface
@@ -115,7 +115,7 @@ public:
      * Generates an orthotropic fibre orientation model of the ventricular mesh provided. Assumes that the base-apex axis is x. Based on Streeter 1969 and Potse 2006
      *
      * File format: The first line indicates the number of elements. Each of the following lines contain SPACE_DIM vectors of SPACE_DIM elements for the
-     * direction of the myofibre, the transverse to it in the plane of the myocite laminae and the normal to this laminae.
+     * direction of the myofibre, the transverse to it in the plane of the myocyte laminae and the normal to this laminae.
      *
      * @param outputDirectory Output directory
      * @param fibreOrientationFile Output file

@@ -42,17 +42,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  *
- *  This class provides an abstraction for the definition of constant/non-constant difussion tensors
+ * This class provides an abstraction for the definition of constant/non-constant diffusion tensors
  * associated to the different elements of the mesh.
  *
- *  After instantiating the class any of SetFibreOrientationFile() or SetNonConstantConductivities()
+ * After instantiating the class any of SetFibreOrientationFile() or SetNonConstantConductivities()
  * (or both) can be called to implement fibre orientation or heterogeneous conductivity into the
  * tensors, respectively. If none of them is called a constant tensor (with constant conductivities)
  * will be generated for all the elements of the mesh.
  *
- *  Init() should be called to actually create the tensors.
+ * Init() should be called to actually create the tensors.
  *
- *  Initial values for conductivity from "Laminar Arrangement of Ventricular Myocytes Influences Electrical
+ * Initial values for conductivity from "Laminar Arrangement of Ventricular Myocytes Influences Electrical
  * Behavior of the Heart", Hooks et al. 2007
  *
  */
