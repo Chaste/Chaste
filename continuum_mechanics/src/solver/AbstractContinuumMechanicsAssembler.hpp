@@ -37,7 +37,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define ABSTRACTCONTINUUMMECHANICSASSEMBLER_HPP_
 
 #include "AbstractFeAssemblerInterface.hpp"
+#include "AbstractTetrahedralMesh.hpp"
 #include "QuadraticMesh.hpp"
+#include "DistributedQuadraticMesh.hpp"
 #include "LinearBasisFunction.hpp"
 #include "QuadraticBasisFunction.hpp"
 #include "ReplicatableVector.hpp"
@@ -105,7 +107,7 @@ class AbstractContinuumMechanicsAssembler : public AbstractFeAssemblerInterface<
 
 protected:
     /** The quadratic mesh */
-    QuadraticMesh<DIM>* mpMesh;
+    AbstractTetrahedralMesh<DIM,DIM>* mpMesh;
 
     /** Quadrature rule for volume integrals */
     GaussianQuadratureRule<DIM>* mpQuadRule;
@@ -289,11 +291,21 @@ public:
     /** Constructor
      *  @param pMesh Pointer to the mesh
      *  @param numQuadPoints Number of quadrature points in each direction, defaults to 3 */
-    AbstractContinuumMechanicsAssembler(QuadraticMesh<DIM>* pMesh, unsigned numQuadPoints = 3)
+    AbstractContinuumMechanicsAssembler(AbstractTetrahedralMesh<DIM, DIM>* pMesh, unsigned numQuadPoints = 3)
         : AbstractFeAssemblerInterface<CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MATRIX>(),
           mpMesh(pMesh)
     {
         assert(pMesh);
+
+        //Check that the mesh is Quadratic
+        QuadraticMesh<DIM>* p_quad_mesh = dynamic_cast<QuadraticMesh<DIM>* >(pMesh);
+        DistributedQuadraticMesh<DIM>* p_distributed_quad_mesh = dynamic_cast<DistributedQuadraticMesh<DIM>* >(pMesh);
+
+        if(p_quad_mesh == NULL && p_distributed_quad_mesh == NULL)
+        {
+            EXCEPTION("Continuum mechanics assemblers require a quadratic mesh");
+        }
+
         mpQuadRule = new GaussianQuadratureRule<DIM>(numQuadPoints);
     }
 

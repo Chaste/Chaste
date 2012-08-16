@@ -805,6 +805,21 @@ public:
         TS_ASSERT_THROWS_CONTAINS(writer.ConvertOutput("mesh/test/data/TestCmguiDeformedSolutionsWriter", "bad_myoldsolution", 1), "Error occurred when reading file");
     }
 
+    void TestCmguiDeformedSolutionsMeshType() throw (Exception)
+    {
+        TetrahedralMesh<2,2> mesh;
+        mesh.ConstructRegularSlabMesh(1.0, 1.0, 1.0);
+
+        TS_ASSERT_THROWS_CONTAINS(CmguiDeformedSolutionsWriter<2>("TestCmguiDeformedSolutionsMeshType", "solution", mesh, WRITE_LINEAR_MESH),
+                                  "CmguiDeformedSolutionsWriter only supports use of a QuadraticMesh");
+
+        TetrahedralMesh<3,3> mesh3d;
+        mesh3d.ConstructRegularSlabMesh(1.0, 1.0, 1.0, 1.0);
+
+        TS_ASSERT_THROWS_CONTAINS(CmguiDeformedSolutionsWriter<3>("TestCmguiDeformedSolutionsMeshType", "solution", mesh3d, WRITE_LINEAR_MESH),
+                                  "CmguiDeformedSolutionsWriter only supports use of a QuadraticMesh");
+    }
+
     /**
      * This test is based on TestTrianglesMeshReader.hpp TestReadingElementAttributes.
      */

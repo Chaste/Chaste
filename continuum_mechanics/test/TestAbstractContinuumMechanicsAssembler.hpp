@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 #include "AbstractContinuumMechanicsAssembler.hpp"
+#include "TetrahedralMesh.hpp"
 #include "PetscSetupAndFinalize.hpp"
 #include "PetscMatTools.hpp"
 #include "ReplicatableVector.hpp"
@@ -197,7 +198,7 @@ private:
     static const unsigned PRESSURE_BLOCK_SIZE_ELEMENTAL = NUM_VERTICES_PER_ELEMENT;
 
 public:
-    MyMatrixAssembler(QuadraticMesh<DIM>* pMesh)
+    MyMatrixAssembler(AbstractTetrahedralMesh<DIM,DIM>* pMesh)
         : AbstractContinuumMechanicsAssembler<DIM,false,true>(pMesh)
     {
     }
@@ -520,6 +521,17 @@ public:
 
         PetscTools::Destroy(mat1);
         PetscTools::Destroy(mat2);
+    }
+
+    void TestAbstractContinuumMechanicsAssemblerMeshType() throw(Exception)
+    {
+        TetrahedralMesh<2,2> mesh;
+        TS_ASSERT_THROWS_CONTAINS(MyMatrixAssembler<2> assembler2d(&mesh),
+                                  "Continuum mechanics assemblers require a quadratic mesh");
+
+        TetrahedralMesh<3,3> mesh3d;
+        TS_ASSERT_THROWS_CONTAINS(MyMatrixAssembler<3> assembler3d(&mesh3d),
+                                  "Continuum mechanics assemblers require a quadratic mesh");
     }
 };
 

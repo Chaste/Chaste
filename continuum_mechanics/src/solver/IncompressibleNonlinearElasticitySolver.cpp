@@ -604,7 +604,7 @@ void IncompressibleNonlinearElasticitySolver<DIM>::FormInitialGuess()
 
 template<size_t DIM>
 IncompressibleNonlinearElasticitySolver<DIM>::IncompressibleNonlinearElasticitySolver(
-        QuadraticMesh<DIM>& rQuadMesh,
+        AbstractTetrahedralMesh<DIM,DIM>& rQuadMesh,
         SolidMechanicsProblemDefinition<DIM>& rProblemDefinition,
         std::string outputDirectory)
     : AbstractNonlinearElasticitySolver<DIM>(rQuadMesh,

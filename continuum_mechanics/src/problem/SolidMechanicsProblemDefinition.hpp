@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define SOLIDMECHANICSPROBLEMDEFINITION_HPP_
 
 #include "ContinuumMechanicsProblemDefinition.hpp"
+#include "QuadraticMesh.hpp"
 
 /**
  *  A class for specifying various parts of a solid mechanics problem, in particular the material
@@ -88,7 +89,7 @@ public:
      * Constructor. Note body force initialised to zero and density to 1.0
      * @param rMesh Tesh being solved on
      */
-    SolidMechanicsProblemDefinition(QuadraticMesh<DIM>& rMesh);
+    SolidMechanicsProblemDefinition(AbstractTetrahedralMesh<DIM,DIM>& rMesh);
 
     /** Destructor */
     virtual ~SolidMechanicsProblemDefinition()

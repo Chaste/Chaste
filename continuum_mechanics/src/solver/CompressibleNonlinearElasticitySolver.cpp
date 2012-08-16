@@ -457,7 +457,7 @@ void CompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
 
 
 template<size_t DIM>
-CompressibleNonlinearElasticitySolver<DIM>::CompressibleNonlinearElasticitySolver(QuadraticMesh<DIM>& rQuadMesh,
+CompressibleNonlinearElasticitySolver<DIM>::CompressibleNonlinearElasticitySolver(AbstractTetrahedralMesh<DIM,DIM>& rQuadMesh,
                                                                                   SolidMechanicsProblemDefinition<DIM>& rProblemDefinition,
                                                                                   std::string outputDirectory)
     : AbstractNonlinearElasticitySolver<DIM>(rQuadMesh,

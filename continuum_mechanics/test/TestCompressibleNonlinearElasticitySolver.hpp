@@ -1200,6 +1200,22 @@ public:
         }
     }
 
+    //Covers exceptions that are thrown in AbstractContinuumMechanicsSolver if used with a non-quadratic mesh
+    void TestAbstractContinuumMechanicsSolverMeshType() throw(Exception)
+    {
+        TetrahedralMesh<2,2> mesh;
+        SolidMechanicsProblemDefinition<2> problem_defn(mesh);
+
+        TS_ASSERT_THROWS_CONTAINS(CompressibleNonlinearElasticitySolver<2> solver(mesh, problem_defn, ""),
+                                  "Continuum mechanics solvers require a quadratic mesh");
+
+        TetrahedralMesh<3,3> mesh3d;
+        SolidMechanicsProblemDefinition<3> problem_defn3d(mesh3d);
+
+        TS_ASSERT_THROWS_CONTAINS(CompressibleNonlinearElasticitySolver<3> solver3d(mesh3d, problem_defn3d, ""),
+                                  "Continuum mechanics solvers require a quadratic mesh");
+
+    }
 };
 
 #endif /* TESTCOMPRESSIBLENONLINEARELASTICITYSOLVER_HPP_ */

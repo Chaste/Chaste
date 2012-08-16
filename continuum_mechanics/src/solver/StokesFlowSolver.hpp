@@ -96,7 +96,7 @@ public:
      * @param rProblemDefinition Problem definition
      * @param outputDirectory the output directory to use
      */
-    StokesFlowSolver(QuadraticMesh<DIM>& rQuadMesh,
+    StokesFlowSolver(AbstractTetrahedralMesh<DIM,DIM>& rQuadMesh,
                      StokesFlowProblemDefinition<DIM>& rProblemDefinition,
                      std::string outputDirectory);
 
@@ -138,7 +138,7 @@ public:
 
 
 template<unsigned DIM>
-StokesFlowSolver<DIM>::StokesFlowSolver(QuadraticMesh<DIM>& rQuadMesh,
+StokesFlowSolver<DIM>::StokesFlowSolver(AbstractTetrahedralMesh<DIM,DIM>& rQuadMesh,
                                         StokesFlowProblemDefinition<DIM>& rProblemDefinition,
                                         std::string outputDirectory)
     : AbstractContinuumMechanicsSolver<DIM>(rQuadMesh, rProblemDefinition, outputDirectory, INCOMPRESSIBLE),

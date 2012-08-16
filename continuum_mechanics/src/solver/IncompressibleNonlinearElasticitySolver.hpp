@@ -146,7 +146,7 @@ public:
      * @param rProblemDefinition an object defining in particular the body force and boundary conditions
      * @param outputDirectory The output directory
      */
-    IncompressibleNonlinearElasticitySolver(QuadraticMesh<DIM>& rQuadMesh,
+    IncompressibleNonlinearElasticitySolver(AbstractTetrahedralMesh<DIM,DIM>& rQuadMesh,
                                             SolidMechanicsProblemDefinition<DIM>& rProblemDefinition,
                                             std::string outputDirectory);
 

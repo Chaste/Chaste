@@ -39,12 +39,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM>
 CmguiDeformedSolutionsWriter<DIM>::CmguiDeformedSolutionsWriter(std::string outputDirectory,
                                                                 std::string baseName,
-                                                                QuadraticMesh<DIM>& rQuadraticMesh,
+                                                                AbstractTetrahedralMesh<DIM,DIM>& rQuadraticMesh,
                                                                 CmguiMeshWriteType writeType)
     : CmguiMeshWriter<DIM, DIM>(outputDirectory, baseName),
       mpQuadraticMesh(&rQuadraticMesh),
       mFinalCounter(0)
 {
+
+    QuadraticMesh<DIM>* p_quad_mesh = dynamic_cast<QuadraticMesh<DIM>* >(&rQuadraticMesh);
+
+    if(p_quad_mesh == NULL)
+    {
+        EXCEPTION("CmguiDeformedSolutionsWriter only supports use of a QuadraticMesh");
+    }
 
     mNumNodesToUse = mpQuadraticMesh->GetNumVertices();
 

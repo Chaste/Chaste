@@ -218,6 +218,21 @@ public:
 
         PetscTools::Destroy(vec);
     }
+
+    void TestAssemblerMeshType()
+    {
+        TetrahedralMesh<2,2> mesh;
+        ContinuumMechanicsProblemDefinition<2> problem_defn(mesh);
+
+        TS_ASSERT_THROWS_CONTAINS(ContinuumMechanicsNeumannBcsAssembler<2>(&mesh, &problem_defn),
+                                  "Continuum mechanics solvers require a quadratic mesh");
+
+        TetrahedralMesh<3,3> mesh3d;
+        ContinuumMechanicsProblemDefinition<3> problem_defn3d(mesh3d);
+
+        TS_ASSERT_THROWS_CONTAINS(ContinuumMechanicsNeumannBcsAssembler<3>(&mesh3d, &problem_defn3d),
+                                  "Continuum mechanics solvers require a quadratic mesh");
+    }
 };
 
 

@@ -245,7 +245,7 @@ public:
      * @param pMesh
      * @param pProblemDefinition
      */
-    StokesFlowAssembler(QuadraticMesh<DIM>* pMesh,
+    StokesFlowAssembler(AbstractTetrahedralMesh<DIM,DIM>* pMesh,
                         StokesFlowProblemDefinition<DIM>* pProblemDefinition)
         : AbstractContinuumMechanicsAssembler<DIM,true,true>(pMesh),
           mpProblemDefinition(pProblemDefinition),

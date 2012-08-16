@@ -41,7 +41,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LinearSystem.hpp"
 #include "OutputFileHandler.hpp"
 #include "ReplicatableVector.hpp"
+#include "AbstractTetrahedralMesh.hpp"
 #include "QuadraticMesh.hpp"
+#include "DistributedQuadraticMesh.hpp"
 #include "Warnings.hpp"
 #include "PetscException.hpp"
 #include "GaussianQuadratureRule.hpp"
@@ -86,7 +88,7 @@ protected:
      * The mesh to be solved on. Requires 6 nodes per triangle (or 10 per tetrahedron)
      * as quadratic bases are used.
      */
-    QuadraticMesh<DIM>& mrQuadMesh;
+    AbstractTetrahedralMesh<DIM, DIM>& mrQuadMesh;
 
     /** Problem definition class - contains info on boundary conditions, etc */
     ContinuumMechanicsProblemDefinition<DIM>& mrProblemDefinition;
@@ -287,7 +289,7 @@ public:
      *  @param outputDirectory output directory name
      *  @param compressibilityType 'INCOMPRESSIBLE' or 'COMPRESSIBLE'
      */
-    AbstractContinuumMechanicsSolver(QuadraticMesh<DIM>& rQuadMesh,
+    AbstractContinuumMechanicsSolver(AbstractTetrahedralMesh<DIM, DIM>& rQuadMesh,
                                      ContinuumMechanicsProblemDefinition<DIM>& rProblemDefinition,
                                      std::string outputDirectory,
                                      CompressibilityType compressibilityType);
@@ -364,7 +366,7 @@ public:
 
 
 template<unsigned DIM>
-AbstractContinuumMechanicsSolver<DIM>::AbstractContinuumMechanicsSolver(QuadraticMesh<DIM>& rQuadMesh,
+AbstractContinuumMechanicsSolver<DIM>::AbstractContinuumMechanicsSolver(AbstractTetrahedralMesh<DIM, DIM>& rQuadMesh,
                                                                         ContinuumMechanicsProblemDefinition<DIM>& rProblemDefinition,
                                                                         std::string outputDirectory,
                                                                         CompressibilityType compressibilityType)
@@ -380,6 +382,16 @@ AbstractContinuumMechanicsSolver<DIM>::AbstractContinuumMechanicsSolver(Quadrati
       mPreconditionMatrix(NULL)
 {
     assert(DIM==2 || DIM==3);
+
+    //Check that the mesh is Quadratic
+    QuadraticMesh<DIM>* p_quad_mesh = dynamic_cast<QuadraticMesh<DIM>* >(&rQuadMesh);
+    DistributedQuadraticMesh<DIM>* p_distributed_quad_mesh = dynamic_cast<DistributedQuadraticMesh<DIM>* >(&rQuadMesh);
+
+    if(p_quad_mesh == NULL && p_distributed_quad_mesh == NULL)
+    {
+        EXCEPTION("Continuum mechanics solvers require a quadratic mesh");
+    }
+
 
     mVerbose = (mrProblemDefinition.GetVerboseDuringSolve() ||
                 CommandLineArguments::Instance()->OptionExists("-mech_verbose") ||

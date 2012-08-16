@@ -38,7 +38,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CMGUIDEFORMEDSOLUTIONSWRITER_HPP_
 
 #include "CmguiMeshWriter.hpp"
+#include "AbstractTetrahedralMesh.hpp"
 #include "QuadraticMesh.hpp"
+#include "DistributedQuadraticMesh.hpp"
 
 /**
  *  Small enumeration for representing whether we want linear
@@ -67,7 +69,7 @@ private:
      *  The quadratic mesh used in the mechanics simulation. solution_0.exnode and solution_0.exelem
      *  (the only exelem file written) will be written using this mesh
      */
-    QuadraticMesh<DIM>* mpQuadraticMesh;
+    AbstractTetrahedralMesh<DIM,DIM>* mpQuadraticMesh;
 
     /**
      *  A counter is given whenever WriteDeformationPositions() is called, this variable
@@ -103,7 +105,7 @@ public:
      */
     CmguiDeformedSolutionsWriter(std::string outputDirectory,
                                  std::string baseName,
-                                 QuadraticMesh<DIM>& rQuadraticMesh,
+                                 AbstractTetrahedralMesh<DIM,DIM>& rQuadraticMesh,
                                  CmguiMeshWriteType writeType);
 
     /**

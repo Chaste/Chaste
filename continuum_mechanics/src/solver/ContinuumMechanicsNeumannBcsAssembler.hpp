@@ -37,7 +37,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CONTINUUMMECHANICSNEUMANNBCSASSEMBLER_HPP_
 
 #include "AbstractFeAssemblerInterface.hpp"
+#include "AbstractTetrahedralMesh.hpp"
 #include "QuadraticMesh.hpp"
+#include "DistributedQuadraticMesh.hpp"
 #include "LinearBasisFunction.hpp"
 #include "QuadraticBasisFunction.hpp"
 #include "ReplicatableVector.hpp"
@@ -83,7 +85,7 @@ class ContinuumMechanicsNeumannBcsAssembler : public AbstractFeAssemblerInterfac
 
 protected:
     /** The quadratic mesh */
-    QuadraticMesh<DIM>* mpMesh;
+    AbstractTetrahedralMesh<DIM,DIM>* mpMesh;
 
     /** Problem definition, containing the boundary conditions */
     ContinuumMechanicsProblemDefinition<DIM>* mpProblemDefinition;
@@ -117,7 +119,7 @@ public:
      *  @param pMesh Pointer to the mesh
      *  @param pProblemDefinition Pointer to the problem definition object
      *  @param numQuadPoints Number of quadrature points in each direction, defaults to 2 */
-    ContinuumMechanicsNeumannBcsAssembler(QuadraticMesh<DIM>* pMesh,
+    ContinuumMechanicsNeumannBcsAssembler(AbstractTetrahedralMesh<DIM,DIM>* pMesh,
                                           ContinuumMechanicsProblemDefinition<DIM>* pProblemDefinition,
                                           unsigned numQuadPoints = 2)
         : AbstractFeAssemblerInterface<true,false>(),
@@ -126,6 +128,16 @@ public:
     {
         assert(pMesh);
         assert(pProblemDefinition);
+
+        //Check that the mesh is Quadratic
+        QuadraticMesh<DIM>* p_quad_mesh = dynamic_cast<QuadraticMesh<DIM>* >(pMesh);
+        DistributedQuadraticMesh<DIM>* p_distributed_quad_mesh = dynamic_cast<DistributedQuadraticMesh<DIM>* >(pMesh);
+
+        if(p_quad_mesh == NULL && p_distributed_quad_mesh == NULL)
+        {
+            EXCEPTION("Continuum mechanics solvers require a quadratic mesh");
+        }
+
         mpQuadRule = new GaussianQuadratureRule<DIM-1>(numQuadPoints);
     }
 

@@ -44,7 +44,7 @@ template<unsigned DIM>
 const double ContinuumMechanicsProblemDefinition<DIM>::FREE = std::numeric_limits<double>::max();
 
 template<unsigned DIM>
-ContinuumMechanicsProblemDefinition<DIM>::ContinuumMechanicsProblemDefinition(QuadraticMesh<DIM>& rMesh)
+ContinuumMechanicsProblemDefinition<DIM>::ContinuumMechanicsProblemDefinition(AbstractTetrahedralMesh<DIM,DIM>& rMesh)
     : mrMesh(rMesh),
       mDensity(1.0),
       mBodyForceType(CONSTANT_BODY_FORCE),

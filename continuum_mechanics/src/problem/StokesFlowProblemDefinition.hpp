@@ -56,7 +56,7 @@ public:
      * Constructor (initialises viscosity to -1 so can check if it is unset
      * @param rMesh Quadratic mesh
      */
-    StokesFlowProblemDefinition(QuadraticMesh<DIM>& rMesh)
+    StokesFlowProblemDefinition(AbstractTetrahedralMesh<DIM,DIM>& rMesh)
         : ContinuumMechanicsProblemDefinition<DIM>(rMesh),
           mMu(-1.0)
     {

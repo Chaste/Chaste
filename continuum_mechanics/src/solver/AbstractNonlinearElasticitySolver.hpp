@@ -527,7 +527,7 @@ public:
      *   (depending on which concrete class is inheriting from this) and is only used in computing mNumDofs and allocating
      *   matrix memory.
      */
-    AbstractNonlinearElasticitySolver(QuadraticMesh<DIM>& rQuadMesh,
+    AbstractNonlinearElasticitySolver(AbstractTetrahedralMesh<DIM,DIM>& rQuadMesh,
                                       SolidMechanicsProblemDefinition<DIM>& rProblemDefinition,
                                       std::string outputDirectory,
                                       CompressibilityType compressibilityType);
@@ -669,7 +669,7 @@ public:
 ///////////////////////////////////////////////////////////////////////////////////
 
 template<unsigned DIM>
-AbstractNonlinearElasticitySolver<DIM>::AbstractNonlinearElasticitySolver(QuadraticMesh<DIM>& rQuadMesh,
+AbstractNonlinearElasticitySolver<DIM>::AbstractNonlinearElasticitySolver(AbstractTetrahedralMesh<DIM,DIM>& rQuadMesh,
                                                                           SolidMechanicsProblemDefinition<DIM>& rProblemDefinition,
                                                                           std::string outputDirectory,
                                                                           CompressibilityType compressibilityType)

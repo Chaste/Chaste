@@ -103,7 +103,7 @@ public:
      * @param pMesh mesh
      * @param pProblemDefinition problem definition
      */
-    StokesFlowPreconditionerAssembler(QuadraticMesh<DIM>* pMesh,
+    StokesFlowPreconditionerAssembler(AbstractTetrahedralMesh<DIM,DIM>* pMesh,
                                       StokesFlowProblemDefinition<DIM>* pProblemDefinition)
         : StokesFlowAssembler<DIM>(pMesh,pProblemDefinition)
     {

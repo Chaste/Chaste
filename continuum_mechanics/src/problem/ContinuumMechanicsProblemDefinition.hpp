@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CONTINUUMMECHANICSPROBLEMDEFINITION_HPP_
 #define CONTINUUMMECHANICSPROBLEMDEFINITION_HPP_
 
-#include "QuadraticMesh.hpp"
+#include "AbstractTetrahedralMesh.hpp"
 #include "UblasCustomFunctions.hpp"
 #include "AbstractIncompressibleMaterialLaw.hpp"
 #include "AbstractCompressibleMaterialLaw.hpp"
@@ -80,7 +80,7 @@ public:
 
 protected:
     /** The mesh being solved on */
-    QuadraticMesh<DIM>& mrMesh;
+    AbstractTetrahedralMesh<DIM,DIM>& mrMesh;
 
     /** Density of the body (constant throughout body) */
     double mDensity;
@@ -147,7 +147,7 @@ public:
      * Constructor initialises the body force to zero and density to 1.0
      * @param rMesh  is the mesh being solved on
      */
-    ContinuumMechanicsProblemDefinition(QuadraticMesh<DIM>& rMesh);
+    ContinuumMechanicsProblemDefinition(AbstractTetrahedralMesh<DIM,DIM>& rMesh);
 
     /** Destructor */
     virtual ~ContinuumMechanicsProblemDefinition()
