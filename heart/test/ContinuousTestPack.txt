@@ -12,7 +12,6 @@ extended_bidomain/TestStimulusFactory.hpp
 extended_bidomain/TestGIModifiedModels.hpp
 convergence/TestConvergenceTester.hpp
 ionicmodels/TestCvodeCells.hpp
-ionicmodels/TestCvodeWithJacobian.hpp
 ionicmodels/TestDynamicallyLoadedCellModels.hpp
 ionicmodels/TestHodgkinHuxleySquidAxon1952OriginalOdeSystem.hpp
 ionicmodels/TestIonicModels.hpp
