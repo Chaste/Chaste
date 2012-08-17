@@ -263,7 +263,13 @@ public:
         TS_ASSERT_THROWS_THIS(converter.Convert(unsupp_ext), "Unsupported extension '.hpp' of file '"
                               + unsupp_ext.GetAbsolutePath() + "'; must be .so or .cellml");
 
-        so_file.Remove();
+
+        if (PetscTools::AmMaster())
+        {
+            so_file.Remove();
+        }
+        PetscTools::Barrier("TestCellmlConverter_remove");
+
         TS_ASSERT_THROWS_THIS(converter.Convert(cellml_file, false),
                               "Unable to convert .cellml to .so unless called collectively, due to possible race conditions.");
 

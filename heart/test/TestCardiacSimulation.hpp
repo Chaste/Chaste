@@ -508,9 +508,12 @@ public:
         TS_ASSERT_THROWS_THIS(CardiacSimulation simulation("heart/test/data/xml/dynamic_checkpoint.xml"),
                               "Checkpointing is not compatible with dynamically loaded cell models on Boost<1.37.");
 #endif
+    }
+
+    void TestDynamicallyLoadingCvodeCell() throw (Exception)
+    {
         // Coverage - using native CVODE cells should no longer throw
 #ifdef CHASTE_CVODE
-
         OutputFileHandler handler_cvode("DynamicallyLoadedModelCvode");
         FileFinder cellml_file("heart/dynamic/luo_rudy_1991_dyn.cellml", RelativeTo::ChasteSourceRoot);
         handler_cvode.CopyFileTo(cellml_file);
@@ -520,6 +523,8 @@ public:
 
         CellMLToSharedLibraryConverter::CreateOptionsFile(handler_cvode, "luo_rudy_1991_dyn", args);
         CardiacSimulation simulation("heart/test/data/xml/dynamic_cvode_model.xml");
+#else
+        std::cout << "CVODE is not enabled.\n";
 #endif
     }
 };
