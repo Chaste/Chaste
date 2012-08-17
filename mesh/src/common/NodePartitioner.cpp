@@ -93,7 +93,6 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::MetisLibraryPartitioning(AbstractM
 
     assert(ELEMENT_DIM==2 || ELEMENT_DIM==3); // Metis works with triangles and tetras
 
-    //Metis 4.0 cannot partition second order meshes, see #1930
     TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>* p_mesh_reader=dynamic_cast<TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>*>(&rMeshReader);
 
     unsigned order_of_elements = 1;
@@ -106,6 +105,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::MetisLibraryPartitioning(AbstractM
     // If it is a quadratic TrianglesMeshReader
     if (order_of_elements == 2)
     {
+        //Metis 4.0 cannot partition second order meshes
         EXCEPTION("Metis cannot partition a quadratic mesh.");
     }
 
@@ -218,10 +218,9 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
 
     if(!PetscTools::HasParMetis()) //We must have ParMetis support compiled into Petsc
     {
-        #define COVERAGE_IGNORE
-        ///\todo (#1930)  Should this be stronger?
-        WARNING("Petsc had not been installed with ParMetis support.");
-        #undef COVERAGE_IGNORE
+#define COVERAGE_IGNORE
+        WARNING("PETSc support for ParMetis is not installed.");
+#undef COVERAGE_IGNORE
     }
 
     unsigned num_nodes = rMeshReader.GetNumNodes();

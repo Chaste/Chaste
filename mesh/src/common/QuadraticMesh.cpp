@@ -33,13 +33,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <map>
+//#include <pair>
+
 #include "QuadraticMesh.hpp"
 #include "OutputFileHandler.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "Warnings.hpp"
 #include "QuadraticMeshHelper.hpp"
 
-//Jonathan Shewchuk's triangle and Hang Si's tetgen
+//Jonathan Shewchuk's Triangle and Hang Si's TetGen
 #define REAL double
 #define VOID void
 #include "triangle.h"
@@ -48,12 +51,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #undef VOID
 
 template<unsigned DIM>
-void QuadraticMesh<DIM>::CountAndCheckVertices()
+void QuadraticMesh<DIM>::CountVertices()
 {
-    // count the number of vertices, and also check all vertices come before the
-    // rest of the nodes (as this is assumed in
-    // AbstractNonlinearElasticitySolver<DIM>::AllocateMatrixMemory() )
-    //
     mNumVertices = 0;
     for (unsigned i=0; i<this->GetNumNodes(); i++)
     {
@@ -100,7 +99,6 @@ void QuadraticMesh<DIM>::ConstructLinearMesh(unsigned numElemX)
 
 
 
-
 template<unsigned DIM>
 void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned numElemY, bool unused)
 {
@@ -144,11 +142,141 @@ void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned nu
 
     this->ImportFromMesher(mesher_output, mesher_output.numberoftriangles, mesher_output.trianglelist, mesher_output.numberofedges, mesher_output.edgelist, mesher_output.edgemarkerlist);
 
-    CountAndCheckVertices();
+    CountVertices();
     QuadraticMeshHelper<DIM>::AddNodesToBoundaryElements(this, NULL);
 
     this->FreeTriangulateIo(mesher_input);
     this->FreeTriangulateIo(mesher_output);
+}
+
+
+template<unsigned DIM>
+void QuadraticMesh<DIM>::ConstructRectangularMeshNewImp(unsigned numElemX, unsigned numElemY, bool unused)
+{
+    assert(DIM==2);
+
+    assert(numElemX > 0);
+    assert(numElemY > 0);
+    assert(unused);
+    ///\todo #2224 The call looks like it is going to apply a stagger, but it does not.
+    AbstractTetrahedralMesh<DIM,DIM>::ConstructRectangularMesh(numElemX, numElemY, false);
+
+    this->mMeshIsLinear=false;
+    //Make the internal nodes in y-order.  This is important for the distributed case, since we want the top and bottom
+    //layers to have predictable numbers
+    std::map<std::pair<unsigned, unsigned>, unsigned> edge_to_internal_map;
+    
+    unsigned node_index = this->GetNumNodes();
+    for (unsigned j=0; j<numElemY+1; j++)
+    {
+        bool boundary = (j==0) || (j==numElemY);
+        //Add mid-way nodes to horizontal edges in this slice
+        for (unsigned i=0; i<numElemX; i++)
+        {
+            unsigned left_index = j*(numElemX+1) + i;
+            std::pair<unsigned,unsigned> edge(left_index, left_index+1 ) ;
+            edge_to_internal_map[edge] = node_index;
+            Node<DIM>* p_mid_node   = new Node<DIM>(node_index++, boundary, i+0.5, j);
+            p_mid_node->MarkAsInternal();
+            //Put in mesh
+            this->mNodes.push_back(p_mid_node);
+            if (boundary)
+            {
+                this->mBoundaryNodes.push_back(p_mid_node);
+            }
+            
+        }
+        
+        if (j < numElemY)
+        {
+            //Add the vertical and diagonal nodes to the mid-way above the last set of horizontal edges
+            for (unsigned i=0; i<numElemX+1; i++)
+            {
+                unsigned left_index = j*(numElemX+1) + i;
+                std::pair<unsigned,unsigned> edge(left_index, left_index+(numElemX+1) ) ;
+                edge_to_internal_map[edge] = node_index;
+                boundary = (i==0) || (i==numElemX);
+                Node<DIM>* p_mid_node   = new Node<DIM>(node_index++, boundary, i, j+0.5);
+                p_mid_node->MarkAsInternal();
+                //Put in mesh
+                this->mNodes.push_back(p_mid_node);
+                if (boundary)
+                {
+                    this->mBoundaryNodes.push_back(p_mid_node);
+                }
+                if (i < numElemX)
+                {
+//                    unsigned parity=(i+(numElemY-j))%2;
+//                    if (parity==1)
+                    {
+                        //backslash
+                        std::pair<unsigned,unsigned> edge(left_index+1, left_index+(numElemX+1) ) ;
+                        edge_to_internal_map[edge] = node_index;
+                    }
+//                    else
+//                    {
+//                        //foward slash
+//                        std::pair<unsigned,unsigned> edge(left_index, left_index+(numElemX+1)+1 ) ;
+//                        edge_to_internal_map[edge] = node_index;
+//                    }
+                    Node<DIM>* p_mid_node   = new Node<DIM>(node_index++, false, i+0.5, j+0.5);
+                    p_mid_node->MarkAsInternal();
+                    //Put in mesh
+                    this->mNodes.push_back(p_mid_node);
+                }
+            }
+        }
+    }
+    CountVertices();
+    for (typename AbstractTetrahedralMesh<DIM,DIM>::ElementIterator iter = this->GetElementIteratorBegin();
+         iter != this->GetElementIteratorEnd();
+         ++iter)
+    {
+        unsigned local_index1=0;
+        for (unsigned index=0; index<=DIM; index++)
+        {
+            local_index1 = (local_index1+1)%(DIM+1);
+            unsigned local_index2 = (local_index1+1)%(DIM+1);
+            unsigned global_index1 =  iter->GetNodeGlobalIndex(local_index1);
+            unsigned global_index2 =  iter->GetNodeGlobalIndex(local_index2);
+            if (global_index1 > global_index2)
+            {
+                unsigned tmp=global_index1;
+                global_index1=global_index2;
+                global_index2=tmp;
+            }
+            unsigned node_index = edge_to_internal_map[std::pair<unsigned,unsigned>(global_index1, global_index2)];
+            iter->AddNode(this->mNodes[node_index]);
+            this->mNodes[node_index]->AddElement(iter->GetIndex());
+        }        
+    }
+
+    for (typename AbstractTetrahedralMesh<DIM,DIM>::BoundaryElementIterator iter = this->GetBoundaryElementIteratorBegin();
+         iter != this->GetBoundaryElementIteratorEnd();
+         ++iter)
+    {
+        unsigned global_index1 =  (*iter)->GetNodeGlobalIndex(0);
+        unsigned global_index2 =  (*iter)->GetNodeGlobalIndex(1);
+        if (global_index1 > global_index2)
+        {
+            unsigned tmp=global_index1;
+            global_index1=global_index2;
+            global_index2=tmp;
+        }
+        unsigned node_index = edge_to_internal_map[std::pair<unsigned,unsigned>(global_index1, global_index2)];
+        (*iter)->AddNode(this->mNodes[node_index]);
+        this->mNodes[node_index]->AddBoundaryElement((*iter)->GetIndex());
+    }
+    
+//    //Dump the map
+//    for (std::map<std::pair<unsigned,unsigned>, unsigned>::const_iterator iter=edge_to_internal_map.begin();
+//        iter!=edge_to_internal_map.end();
+//        ++iter)
+//    {
+//        std::cout<<iter->first.first<<" -- "<<iter->second<<" -- "<<iter->first.second<<"\n";
+//    }
+            
+
 }
 
 
@@ -193,7 +321,7 @@ void QuadraticMesh<DIM>::ConstructCuboid(unsigned numElemX, unsigned numElemY, u
 
     this->ImportFromMesher(mesher_output, mesher_output.numberoftetrahedra, mesher_output.tetrahedronlist, mesher_output.numberoftrifaces, mesher_output.trifacelist, NULL);
 
-    CountAndCheckVertices();
+    CountVertices();
     QuadraticMeshHelper<DIM>::AddNodesToBoundaryElements(this, NULL);
 }
 
@@ -229,7 +357,7 @@ void QuadraticMesh<DIM>::ConstructFromLinearMeshReader(AbstractMeshReader<DIM, D
         triangulate((char*)"Qzero2", &mesher_input, &mesher_output, NULL);
 
         this->ImportFromMesher(mesher_output, mesher_output.numberoftriangles, mesher_output.trianglelist, mesher_output.numberofedges, mesher_output.edgelist, mesher_output.edgemarkerlist);
-        CountAndCheckVertices();
+        CountVertices();
         QuadraticMeshHelper<DIM>::AddNodesToBoundaryElements(this, NULL);
 
         //Tidy up triangle
@@ -249,7 +377,7 @@ void QuadraticMesh<DIM>::ConstructFromLinearMeshReader(AbstractMeshReader<DIM, D
         tetgen::tetrahedralize((char*)"Qzro2", &mesher_input, &mesher_output);
 
         this->ImportFromMesher(mesher_output, mesher_output.numberoftetrahedra, mesher_output.tetrahedronlist, mesher_output.numberoftrifaces, mesher_output.trifacelist, NULL);
-        CountAndCheckVertices();
+        CountVertices();
         QuadraticMeshHelper<DIM>::AddNodesToBoundaryElements(this, NULL);
     }
 }
@@ -279,7 +407,7 @@ void QuadraticMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& r
     assert(this->GetNumBoundaryElements() > 0);
 
     QuadraticMeshHelper<DIM>::AddInternalNodesToElements(this, p_mesh_reader);
-    CountAndCheckVertices();
+    CountVertices();
     QuadraticMeshHelper<DIM>::AddInternalNodesToBoundaryElements(this, p_mesh_reader);
     QuadraticMeshHelper<DIM>::CheckBoundaryElements(this);
 }

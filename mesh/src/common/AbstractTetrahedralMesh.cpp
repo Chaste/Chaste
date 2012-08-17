@@ -601,7 +601,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRegularSlabMesh(d
             this->ConstructLinearMesh(num_elem_x);
             break;
         case 2:
-            this->ConstructRectangularMesh(num_elem_x, num_elem_y, true); // Stagger=true
+            this->ConstructRectangularMesh(num_elem_x, num_elem_y); // Stagger=default value
             break;
         default:
         case 3:
