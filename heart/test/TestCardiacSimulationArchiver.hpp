@@ -1279,12 +1279,11 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForMigrateAfterSolve/archive/?* ./hear
         // Copy the simulation.h5 file into the archive folder, for convenience
         OutputFileHandler handler(directory, false);
 
-        if (PetscTools::AmMaster())
-        {
+        TRY_IF_MASTER(
             FileFinder source_file = handler.FindFile("simulation.h5");
             FileFinder destination(handler.GetOutputDirectoryFullPath() + "archive/", RelativeTo::Absolute);
             source_file.CopyTo(destination);
-        }
+        );
     }
 
     void TestMigrateAfterSolve() throw (Exception)

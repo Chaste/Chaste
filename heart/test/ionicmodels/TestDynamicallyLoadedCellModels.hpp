@@ -264,11 +264,7 @@ public:
                               + unsupp_ext.GetAbsolutePath() + "'; must be .so or .cellml");
 
 
-        if (PetscTools::AmMaster())
-        {
-            so_file.Remove();
-        }
-        PetscTools::Barrier("TestCellmlConverter_remove");
+        TRY_IF_MASTER( so_file.Remove() );
 
         TS_ASSERT_THROWS_THIS(converter.Convert(cellml_file, false),
                               "Unable to convert .cellml to .so unless called collectively, due to possible race conditions.");

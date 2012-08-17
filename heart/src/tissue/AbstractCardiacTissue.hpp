@@ -116,11 +116,7 @@ private:
                     assert(source_file.Exists());
                     FileFinder dest_file(ArchiveLocationInfo::GetArchiveRelativePath() + ArchiveLocationInfo::GetMeshFilename() + ".ortho", RelativeTo::ChasteTestOutput);
 
-                    if (PetscTools::AmMaster())
-                    {
-                        source_file.CopyTo(dest_file);
-                    }
-                    PetscTools::Barrier();
+                    TRY_IF_MASTER(source_file.CopyTo(dest_file));
                     break;
                 }
 
@@ -131,12 +127,7 @@ private:
                     FileFinder dest_file(ArchiveLocationInfo::GetArchiveRelativePath()
                                        + ArchiveLocationInfo::GetMeshFilename() + ".axi", RelativeTo::ChasteTestOutput);
 
-                    if (PetscTools::AmMaster())
-                    {
-                        source_file.CopyTo(dest_file);
-                    }
-                    PetscTools::Barrier();
-
+                    TRY_IF_MASTER(source_file.CopyTo(dest_file));
                     break;
                 }
 

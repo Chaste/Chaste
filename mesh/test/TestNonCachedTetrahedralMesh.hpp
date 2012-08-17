@@ -72,10 +72,7 @@ private:
         mem_file >> vsize;
 
         PetscTools::Barrier("GetMemoryUsage-2");
-        if (PetscTools::AmMaster())
-        {
-            memory_usage_temp_file.Remove(true);
-        }
+        TRY_IF_MASTER(memory_usage_temp_file.Remove(true));
 
         return vsize;
 #else

@@ -341,8 +341,7 @@ void HeartConfig::LoadFromCheckpoint()
 
 void HeartConfig::CopySchema(const std::string& rToDirectory)
 {
-    if (PetscTools::AmMaster())
-    {
+    TRY_IF_MASTER(
         std::string schema_name("ChasteParameters_3_1.xsd");
         FileFinder schema_location("heart/src/io/" + schema_name, RelativeTo::ChasteSourceRoot);
         if (!schema_location.Exists())
@@ -362,7 +361,7 @@ void HeartConfig::CopySchema(const std::string& rToDirectory)
             FileFinder output_directory(rToDirectory, RelativeTo::Absolute);
             schema_location.CopyTo(output_directory);
         }
-    }
+    );
 }
 
 void HeartConfig::SetDefaultSchemaLocations()

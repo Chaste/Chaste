@@ -81,6 +81,26 @@ typedef PetscBool PetscTruth;
 #endif
 
 /**
+ * A macro to allow code to be attempted by just the master process,
+ * but to replicate any exceptions that occur to other processes.
+ * Useful for file access.
+ *
+ * @note MUST be called collectively, as it contains a barrier.
+ *
+ * @param method  a command or block of code to run if master process
+ */
+#define TRY_IF_MASTER(method) {      \
+    if (PetscTools::AmMaster())              \
+    { try {                                  \
+        method;                              \
+    } catch (Exception& e) {                 \
+        PetscTools::ReplicateException(true);\
+        throw(e);                            \
+    } }                                      \
+    PetscTools::ReplicateException(false);   \
+    }
+
+/**
  * A helper class of static methods.
  */
 class PetscTools
