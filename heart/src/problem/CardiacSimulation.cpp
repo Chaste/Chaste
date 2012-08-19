@@ -88,7 +88,8 @@ void CardiacSimulation::CreateResumeXmlFile(const std::string& rOutputDirectory,
         (*p_file) << "</ChasteParameters>" << std::endl;
         p_file->close();
     }
-    HeartConfig::Instance()->CopySchema(handler.GetOutputDirectoryFullPath());
+
+    TRY_IF_MASTER(HeartConfig::Instance()->CopySchema(handler.GetOutputDirectoryFullPath()));
 }
 
 CardiacSimulation::CardiacSimulation(std::string parameterFileName,

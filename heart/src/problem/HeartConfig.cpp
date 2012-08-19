@@ -252,46 +252,44 @@ void HeartConfig::Write(bool useArchiveLocationInfo, std::string subfolderName)
         OutputFileHandler handler(GetOutputDirectory() + "/" + subfolderName, false);
         output_dirname = handler.GetOutputDirectoryFullPath();
     }
-    if (!PetscTools::AmMaster())
-    {
-        //Only the master process is writing the configuration files
-        return;
-    }
-    out_stream p_parameters_file( new std::ofstream( (output_dirname+"ChasteParameters.xml").c_str() ) );
 
-    if (!p_parameters_file->is_open())
-    {
-        EXCEPTION("Could not open XML file in HeartConfig");
-    }
+    TRY_IF_MASTER(
+        out_stream p_parameters_file( new std::ofstream( (output_dirname+"ChasteParameters.xml").c_str() ) );
 
-    //Schema map
-    //Note - this location is relative to where we are storing the xml
-    ::xml_schema::namespace_infomap map;
-    // Release 1.1 (and earlier) didn't use a namespace
-    map[""].schema = "ChasteParameters_1_1.xsd";
-    // Later releases use namespaces of the form https://chaste.comlab.ox.ac.uk/nss/parameters/N_M
-    map["cp20"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/2_0";
-    map["cp20"].schema = "ChasteParameters_2_0.xsd";
-    map["cp21"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/2_1";
-    map["cp21"].schema = "ChasteParameters_2_1.xsd";
-    map["cp22"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/2_2";
-    map["cp22"].schema = "ChasteParameters_2_2.xsd";
-    map["cp23"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/2_3";
-    map["cp23"].schema = "ChasteParameters_2_3.xsd";
-    map["cp30"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/3_0";
-    map["cp30"].schema = "ChasteParameters_3_0.xsd";
-    // We use 'cp' as prefix for the latest version to avoid having to change saved
-    // versions for comparison at every release.
-    map["cp"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/3_1";
-    map["cp"].schema = "ChasteParameters_3_1.xsd";
+        if (!p_parameters_file->is_open())
+        {
+            EXCEPTION("Could not open XML file in HeartConfig");
+        }
 
-    cp::ChasteParameters(*p_parameters_file, *mpParameters, map);
+        //Schema map
+        //Note - this location is relative to where we are storing the xml
+        ::xml_schema::namespace_infomap map;
+        // Release 1.1 (and earlier) didn't use a namespace
+        map[""].schema = "ChasteParameters_1_1.xsd";
+        // Later releases use namespaces of the form https://chaste.comlab.ox.ac.uk/nss/parameters/N_M
+        map["cp20"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/2_0";
+        map["cp20"].schema = "ChasteParameters_2_0.xsd";
+        map["cp21"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/2_1";
+        map["cp21"].schema = "ChasteParameters_2_1.xsd";
+        map["cp22"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/2_2";
+        map["cp22"].schema = "ChasteParameters_2_2.xsd";
+        map["cp23"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/2_3";
+        map["cp23"].schema = "ChasteParameters_2_3.xsd";
+        map["cp30"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/3_0";
+        map["cp30"].schema = "ChasteParameters_3_0.xsd";
+        // We use 'cp' as prefix for the latest version to avoid having to change saved
+        // versions for comparison at every release.
+        map["cp"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/3_1";
+        map["cp"].schema = "ChasteParameters_3_1.xsd";
 
-    // If we're archiving, try to save a copy of the latest schema too
-    if (useArchiveLocationInfo)
-    {
-        CopySchema(output_dirname);
-    }
+        cp::ChasteParameters(*p_parameters_file, *mpParameters, map);
+
+        // If we're archiving, try to save a copy of the latest schema too
+        if (useArchiveLocationInfo)
+        {
+            CopySchema(output_dirname);
+        }
+    );
 }
 
 void HeartConfig::LoadFromCheckpoint()
@@ -341,27 +339,29 @@ void HeartConfig::LoadFromCheckpoint()
 
 void HeartConfig::CopySchema(const std::string& rToDirectory)
 {
-    TRY_IF_MASTER(
-        std::string schema_name("ChasteParameters_3_1.xsd");
-        FileFinder schema_location("heart/src/io/" + schema_name, RelativeTo::ChasteSourceRoot);
+    // N.B. This method should only be called by the master process,
+    // in a situation where it can handle EXCEPTION()s nicely, e.g.
+    // TRY_IF_MASTER(CopySchema(...));
+
+    std::string schema_name("ChasteParameters_3_1.xsd");
+    FileFinder schema_location("heart/src/io/" + schema_name, RelativeTo::ChasteSourceRoot);
+    if (!schema_location.Exists())
+    {
+        // Try a relative path instead
+        schema_location.SetPath(schema_name, RelativeTo::CWD);
         if (!schema_location.Exists())
         {
-            // Try a relative path instead
-            schema_location.SetPath(schema_name, RelativeTo::CWD);
-            if (!schema_location.Exists())
-            {
-                // Warn the user
-                std::string message("Unable to locate schema file " + schema_name +
-                                    ". You will need to ensure it is available when resuming from the checkpoint.");
-                WARN_ONCE_ONLY(message);
-            }
+            // Warn the user
+            std::string message("Unable to locate schema file " + schema_name +
+                                ". You will need to ensure it is available when resuming from the checkpoint.");
+            WARN_ONCE_ONLY(message);
         }
-        if (schema_location.Exists())
-        {
-            FileFinder output_directory(rToDirectory, RelativeTo::Absolute);
-            schema_location.CopyTo(output_directory);
-        }
-    );
+    }
+    if (schema_location.Exists())
+    {
+        FileFinder output_directory(rToDirectory, RelativeTo::Absolute);
+        schema_location.CopyTo(output_directory);
+    }
 }
 
 void HeartConfig::SetDefaultSchemaLocations()
