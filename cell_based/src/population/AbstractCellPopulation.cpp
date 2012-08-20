@@ -375,7 +375,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::CreateOutputFiles(const std
 {
     OutputFileHandler output_file_handler(rDirectory, cleanOutputDirectory);
 
-    if(PetscTools::AmMaster())
+    if (PetscTools::AmMaster())
     {
         mpVizNodesFile = output_file_handler.OpenOutputFile("results.viznodes");
         mpVizBoundaryNodesFile = output_file_handler.OpenOutputFile("results.vizboundarynodes");
@@ -447,7 +447,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::CloseOutputFiles()
 {
     // In parallel all files are closed after writing
-    if(PetscTools::IsSequential())
+    if (PetscTools::IsSequential())
     {
         mpVizNodesFile->close();
         mpVizBoundaryNodesFile->close();
@@ -695,12 +695,12 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteTimeAndNodeResultsToFi
 
     PetscTools::BeginRoundRobin();
     {
-        if(!PetscTools::AmMaster() || SimulationTime::Instance()->IsEndTimeAndNumberOfTimeStepsSetUp())
+        if (!PetscTools::AmMaster() || SimulationTime::Instance()->IsEndTimeAndNumberOfTimeStepsSetUp())
         {
             mpVizNodesFile = output_file_handler.OpenOutputFile("results.viznodes", std::ios::app);
             mpVizBoundaryNodesFile = output_file_handler.OpenOutputFile("results.vizboundarynodes", std::ios::app);
         }
-        if(PetscTools::AmMaster())
+        if (PetscTools::AmMaster())
         {
             double time = SimulationTime::Instance()->GetTime();
 
@@ -723,7 +723,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteTimeAndNodeResultsToFi
                 *mpVizBoundaryNodesFile << node_iter->IsBoundaryNode() << " ";
             }
         }
-        if(PetscTools::AmTopMost())
+        if (PetscTools::AmTopMost())
         {
             *mpVizNodesFile << "\n";
             *mpVizBoundaryNodesFile << "\n";

@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_iarchive.hpp>
 
 #include "AbstractCellProliferativeType.hpp"
+#include "DefaultCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
@@ -224,6 +225,51 @@ public:
             DifferentiatedCellProliferativeType* p_real_state = dynamic_cast<DifferentiatedCellProliferativeType*>(p_type);
             TS_ASSERT(p_real_state != NULL);
             TS_ASSERT_EQUALS(p_real_state->GetColour(), 2u);
+
+            // Tidy up
+            delete p_type;
+        }
+    }
+
+    void TestArchiveDefaultCellProliferativeType() throw(Exception)
+    {
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "DefaultCellProliferativeType.arch";
+
+        // Archive a cell proliferative type
+        {
+        	DefaultCellProliferativeType* p_type = new DefaultCellProliferativeType();
+            p_type->IncrementCellCount();
+
+            TS_ASSERT_EQUALS(p_type->GetCellCount(), 1u);
+            TS_ASSERT_EQUALS(p_type->GetColour(), 0u);
+
+            // Create an output archive
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Write the cell to the archive
+            const AbstractCellProperty* const p_const_state = p_type;
+            output_arch << p_const_state;
+
+            delete p_type;
+        }
+
+        // Restore cell proliferative type
+        {
+            AbstractCellProperty* p_type;
+
+            // Restore the mutation state
+            std::ifstream ifs(archive_filename.c_str());
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_type;
+
+            TS_ASSERT_EQUALS(p_type->GetCellCount(), 1u);
+
+            DefaultCellProliferativeType* p_real_state = dynamic_cast<DefaultCellProliferativeType*>(p_type);
+            TS_ASSERT(p_real_state != NULL);
+            TS_ASSERT_EQUALS(p_real_state->GetColour(), 0u);
 
             // Tidy up
             delete p_type;
