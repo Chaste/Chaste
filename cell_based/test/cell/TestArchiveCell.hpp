@@ -52,6 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellLabel.hpp"
 #include "ApcTwoHitCellMutationState.hpp"
 #include "ApcOneHitCellMutationState.hpp"
+#include "DefaultCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
 
 /*
@@ -99,7 +100,7 @@ public:
 
             // Check properties set correctly
             CellPropertyCollection& final_collection = p_cell->rGetCellPropertyCollection();
-            TS_ASSERT_EQUALS(final_collection.GetSize(), 5u);
+            TS_ASSERT_EQUALS(final_collection.GetSize(), 6u);
             TS_ASSERT_EQUALS(final_collection.HasProperty<WildTypeCellMutationState>(), true);
             TS_ASSERT_EQUALS(final_collection.HasProperty<ApcOneHitCellMutationState>(), false);
             TS_ASSERT_EQUALS(final_collection.HasProperty<ApcTwoHitCellMutationState>(), false);
@@ -113,8 +114,16 @@ public:
             for (CellPropertyCollection::Iterator it = final_collection.Begin(); it != final_collection.End(); ++it)
             {
                 TS_ASSERT_EQUALS(final_collection.HasProperty(*it), true);
-                TS_ASSERT((*it)->IsType<WildTypeCellMutationState>() || (*it)->IsType<CellLabel>()
-                          || (*it)->IsType<CellAncestor>() || (*it)->IsType<CellId>() || (*it)->IsType<CellData>());
+
+                bool is_wildtype = (*it)->IsType<WildTypeCellMutationState>();
+                bool is_label = (*it)->IsType<CellLabel>();
+                bool is_ancestor = (*it)->IsType<CellAncestor>();
+                bool is_cellid = (*it)->IsType<CellId>();
+                bool is_data = (*it)->IsType<CellData>();
+                bool is_default = (*it)->IsType<DefaultCellProliferativeType>();
+
+                bool is_any_of_above = is_wildtype || is_label || is_ancestor || is_cellid || is_data || is_default;
+                TS_ASSERT_EQUALS(is_any_of_above, true);
             }
 
             // Create an output archive
@@ -161,7 +170,7 @@ public:
             TS_ASSERT_EQUALS(p_model->GetCell(), p_cell);
 
             CellPropertyCollection& collection = p_cell->rGetCellPropertyCollection();
-            TS_ASSERT_EQUALS(collection.GetSize(), 5u);
+            TS_ASSERT_EQUALS(collection.GetSize(), 6u);
             TS_ASSERT_EQUALS(collection.HasProperty<WildTypeCellMutationState>(), true);
             TS_ASSERT_EQUALS(collection.HasProperty<ApcOneHitCellMutationState>(), false);
             TS_ASSERT_EQUALS(collection.HasProperty<ApcTwoHitCellMutationState>(), false);
@@ -175,8 +184,16 @@ public:
             for (CellPropertyCollection::Iterator it = collection.Begin(); it != collection.End(); ++it)
             {
                 TS_ASSERT_EQUALS(collection.HasProperty(*it), true);
-                TS_ASSERT((*it)->IsType<WildTypeCellMutationState>() || (*it)->IsType<CellLabel>() ||
-                          (*it)->IsType<CellAncestor>() || (*it)->IsType<CellId>() || (*it)->IsType<CellData>());
+
+                bool is_wildtype = (*it)->IsType<WildTypeCellMutationState>();
+                bool is_label = (*it)->IsType<CellLabel>();
+                bool is_ancestor = (*it)->IsType<CellAncestor>();
+                bool is_cellid = (*it)->IsType<CellId>();
+                bool is_data = (*it)->IsType<CellData>();
+                bool is_default = (*it)->IsType<DefaultCellProliferativeType>();
+
+                bool is_any_of_above = is_wildtype || is_label || is_ancestor || is_cellid || is_data || is_default;
+                TS_ASSERT_EQUALS(is_any_of_above, true);
             }
         }
     }

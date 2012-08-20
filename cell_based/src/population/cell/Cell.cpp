@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Cell.hpp"
 #include "ApoptoticCellProperty.hpp"
+#include "DefaultCellProliferativeType.hpp"
 
 /**
  * null_deleter means "doesn't delete" rather than "deletes nulls".
@@ -93,7 +94,7 @@ Cell::Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
 
     if (!pMutationState->IsSubType<AbstractCellMutationState>())
     {
-        EXCEPTION("Attempting to create cell with a cell mutation state is not a subtype of AbstractCellMutationState");
+        EXCEPTION("Attempting to create cell with a cell mutation state that is not a subtype of AbstractCellMutationState");
     }
 
     if (!mCellPropertyCollection.HasProperty(pMutationState))
@@ -106,6 +107,11 @@ Cell::Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
         // Add empty cell data
         MAKE_PTR(CellData, p_cell_data);
         mCellPropertyCollection.AddProperty(p_cell_data);
+    }
+
+    if (!mCellPropertyCollection.HasPropertyType<AbstractCellProliferativeType>())
+    {
+        mCellPropertyCollection.AddProperty(CellPropertyRegistry::Instance()->Get<DefaultCellProliferativeType>());
     }
 
     if (!archiving)
@@ -178,7 +184,7 @@ void Cell::SetMutationState(boost::shared_ptr<AbstractCellProperty> pMutationSta
 {
     if (!pMutationState->IsSubType<AbstractCellMutationState>())
     {
-        EXCEPTION("Attempting to give cell a cell mutation state is not a subtype of AbstractCellMutationState");
+        EXCEPTION("Attempting to give cell a cell mutation state that is not a subtype of AbstractCellMutationState");
     }
 
     boost::shared_ptr<AbstractCellMutationState> p_old_mutation_state = GetMutationState();

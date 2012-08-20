@@ -113,7 +113,7 @@ public:
         TS_ASSERT_EQUALS(static_cast<FixedDurationGenerationBasedCellCycleModel*>(p_cell->GetCellCycleModel())->GetGeneration(), 0u);
 
         // Test cell property collection
-        TS_ASSERT_EQUALS(p_cell->rGetCellPropertyCollection().GetSize(), 4u);
+        TS_ASSERT_EQUALS(p_cell->rGetCellPropertyCollection().GetSize(), 5u);
         TS_ASSERT_EQUALS(p_cell->rGetCellPropertyCollection().HasProperty(p_wild_type), true);
         TS_ASSERT_EQUALS(p_cell->rGetCellPropertyCollection().HasProperty(p_label), true);
         TS_ASSERT_EQUALS(p_cell->rGetCellPropertyCollection().HasProperty(p_apc2_mutation), false);
@@ -174,7 +174,7 @@ public:
         TS_ASSERT_DELTA(p_daughter_cell->GetAge(), 0.0, 1e-9);
 
         // Test cell property collection has been inherited correctly during division
-        TS_ASSERT_EQUALS(p_daughter_cell->rGetCellPropertyCollection().GetSize(), 4u);
+        TS_ASSERT_EQUALS(p_daughter_cell->rGetCellPropertyCollection().GetSize(), 5u);
 
         TS_ASSERT_EQUALS(p_daughter_cell->rGetCellPropertyCollection().HasProperty(p_wild_type), true);
         TS_ASSERT_EQUALS(p_daughter_cell->rGetCellPropertyCollection().HasProperty(p_apc2_mutation), false);
@@ -236,14 +236,14 @@ public:
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
 
         TS_ASSERT_THROWS_THIS(CellPtr p_another_bad_cell(new Cell(p_label, &fixed_model)),
-                              "Attempting to create cell with a cell mutation state is not a subtype of AbstractCellMutationState");
+                              "Attempting to create cell with a cell mutation state that is not a subtype of AbstractCellMutationState");
 
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_model));
         p_stem_cell->SetCellProliferativeType(STEM);
         p_stem_cell->InitialiseCellCycleModel();
 
         TS_ASSERT_THROWS_THIS(p_stem_cell->SetMutationState(p_label),
-                              "Attempting to give cell a cell mutation state is not a subtype of AbstractCellMutationState");
+                              "Attempting to give cell a cell mutation state that is not a subtype of AbstractCellMutationState");
 
         // Cell was created - count should be one
         TS_ASSERT_EQUALS(p_healthy_state->GetCellCount(), 1u);

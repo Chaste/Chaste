@@ -162,7 +162,7 @@ public:
     /**
      * Set method for #mCellProliferativeType.
      *
-     * @param cellType the cell's type
+     * @param cellType the cell's new proliferative type
      */
     void SetCellProliferativeType(CellProliferativeType cellType);
 
