@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TetrahedralMesh.hpp"
 #include "BoxCollection.hpp"
 #include "TrianglesMeshReader.hpp"
-
+#include "Debug.hpp"
 class TestBoxCollection : public CxxTest::TestSuite
 {
 public:
@@ -146,6 +146,7 @@ public:
         TS_ASSERT_THROWS_CONTAINS(box_collection.CalculateContainingBox(miles_away), "The point provided is outside all of the boxes");
     }
 
+
     // very simple test
     void TestAddElement() throw(Exception)
     {
@@ -223,6 +224,77 @@ public:
         TS_ASSERT_EQUALS(local_boxes_to_box_10, correct_answer_10);
     }
 
+
+    void TestSetupAllLocalBoxes2dPeriodic() throw(Exception)
+    {
+        double width = 1.0;
+
+        c_vector<double, 2*2> domain_size;
+        domain_size(0) = 0;
+        domain_size(1) = 4-0.01;
+        domain_size(2) = 0;
+        domain_size(3) = 3-0.01;
+
+        BoxCollection<2> box_collection(width, domain_size, true); // So periodic in X
+
+        assert(box_collection.GetNumBoxes()==12); // 4 * 3 boxes altogether
+
+        box_collection.SetupAllLocalBoxes();
+
+        std::set<unsigned> local_boxes_to_box_0 = box_collection.GetLocalBoxes(0);
+
+        std::set<unsigned> correct_answer_0;
+        correct_answer_0.insert(0);
+        correct_answer_0.insert(1);
+        correct_answer_0.insert(3);
+        correct_answer_0.insert(4);
+        correct_answer_0.insert(5);
+        correct_answer_0.insert(7);
+        TS_ASSERT_EQUALS(local_boxes_to_box_0, correct_answer_0);
+
+        std::set<unsigned> local_boxes_to_box_3 = box_collection.GetLocalBoxes(3);
+        std::set<unsigned> correct_answer_3;
+        correct_answer_3.insert(0);
+        correct_answer_3.insert(2);
+        correct_answer_3.insert(3);
+        correct_answer_3.insert(4);
+        correct_answer_3.insert(6);
+        correct_answer_3.insert(7);
+        TS_ASSERT_EQUALS(local_boxes_to_box_3, correct_answer_3);
+
+        std::set<unsigned> local_boxes_to_box_5 = box_collection.GetLocalBoxes(5);
+        std::set<unsigned> correct_answer_5;
+        correct_answer_5.insert(0);
+        correct_answer_5.insert(1);
+        correct_answer_5.insert(2);
+        correct_answer_5.insert(4);
+        correct_answer_5.insert(5);
+        correct_answer_5.insert(6);
+        correct_answer_5.insert(8);
+        correct_answer_5.insert(9);
+        correct_answer_5.insert(10);
+        TS_ASSERT_EQUALS(local_boxes_to_box_5, correct_answer_5);
+
+        std::set<unsigned> local_boxes_to_box_10 = box_collection.GetLocalBoxes(10);
+        std::set<unsigned> correct_answer_10;
+        correct_answer_10.insert(5);
+        correct_answer_10.insert(6);
+        correct_answer_10.insert(7);
+        correct_answer_10.insert(9);
+        correct_answer_10.insert(10);
+        correct_answer_10.insert(11);
+        TS_ASSERT_EQUALS(local_boxes_to_box_10, correct_answer_10);
+
+        std::set<unsigned> local_boxes_to_box_11 = box_collection.GetLocalBoxes(11);
+        std::set<unsigned> correct_answer_11;
+        correct_answer_11.insert(4);
+        correct_answer_11.insert(6);
+        correct_answer_11.insert(7);
+        correct_answer_11.insert(8);
+        correct_answer_11.insert(10);
+        correct_answer_11.insert(11);
+        TS_ASSERT_EQUALS(local_boxes_to_box_11, correct_answer_11);
+    }
 
 
     void TestSetupAllLocalBoxes3d() throw(Exception)
@@ -514,6 +586,7 @@ public:
         TS_ASSERT_EQUALS(box_collection.CalculateContainingBox(probe), 1002000u);
 
     }
+
     void TestPairsReturned2d() throw (Exception)
     {
         std::vector< ChastePoint<2>* > points(10);
@@ -538,9 +611,9 @@ public:
 
         c_vector<double, 2*2> domain_size;
         domain_size(0) = 0.0;
-        domain_size(1) = 4.0;
+        domain_size(1) = 4.0-0.01;
         domain_size(2) = 0.0;
-        domain_size(3) = 4.0;
+        domain_size(3) = 4.0-0.01; // so 4*4 boxes
 
         BoxCollection<2> box_collection(cut_off_length, domain_size);
 
@@ -622,6 +695,146 @@ public:
         pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[6],nodes[8]));
         pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[7],nodes[8]));
 
+        TS_ASSERT_EQUALS(pairs_should_be, pairs_returned);
+
+        for (unsigned i=0; i<points.size(); i++)
+        {
+            delete nodes[i];
+            delete points[i];
+        }
+    }
+
+    void TestPairsReturned2dPeriodic() throw (Exception)
+    {
+        std::vector< ChastePoint<2>* > points(10);
+        points[0] = new ChastePoint<2>(0.2, 3.7);
+        points[1] = new ChastePoint<2>(0.5, 3.2);
+        points[2] = new ChastePoint<2>(1.1, 1.99);
+        points[3] = new ChastePoint<2>(1.3, 0.8);
+        points[4] = new ChastePoint<2>(1.3, 0.3);
+        points[5] = new ChastePoint<2>(2.2, 0.6);
+        points[6] = new ChastePoint<2>(3.5, 0.2);
+        points[7] = new ChastePoint<2>(2.6, 1.4);
+        points[8] = new ChastePoint<2>(2.4, 1.5);
+        points[9] = new ChastePoint<2>(3.3, 3.6);
+
+        std::vector<Node<2>* > nodes;
+        for (unsigned i=0; i<points.size(); i++)
+        {
+            nodes.push_back(new Node<2>(i, *(points[i]), false));
+        }
+
+        double cut_off_length = 1.0;
+
+        c_vector<double, 2*2> domain_size;
+        domain_size(0) = 0.0;
+        domain_size(1) = 4.0-0.01;
+        domain_size(2) = 0.0;
+        domain_size(3) = 4.0-0.01;// so 4*4 boxes
+
+        BoxCollection<2> box_collection(cut_off_length, domain_size, true); // Periodic in X
+
+        box_collection.SetupLocalBoxesHalfOnly();
+
+
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            unsigned box_index = box_collection.CalculateContainingBox(nodes[i]);
+            box_collection.rGetBox(box_index).AddNode(nodes[i]);
+        }
+
+        std::set< std::pair<Node<2>*, Node<2>* > > pairs_returned;
+        std::map<unsigned, std::set<unsigned> > neighbours_returned;
+
+        box_collection.CalculateNodePairs(nodes,pairs_returned, neighbours_returned);
+
+        std::map<unsigned, std::set<unsigned> > neighbours_should_be;
+
+        neighbours_should_be[0].insert(1);
+        neighbours_should_be[0].insert(9);
+
+        neighbours_should_be[1].insert(0);
+        neighbours_should_be[1].insert(9);
+
+        neighbours_should_be[2].insert(3);
+        neighbours_should_be[2].insert(4);
+        neighbours_should_be[2].insert(5);
+        neighbours_should_be[2].insert(7);
+        neighbours_should_be[2].insert(8);
+
+        neighbours_should_be[3].insert(2);
+        neighbours_should_be[3].insert(4);
+        neighbours_should_be[3].insert(5);
+        neighbours_should_be[3].insert(7);
+        neighbours_should_be[3].insert(8);
+
+        neighbours_should_be[4].insert(2);
+        neighbours_should_be[4].insert(3);
+        neighbours_should_be[4].insert(5);
+        neighbours_should_be[4].insert(7);
+        neighbours_should_be[4].insert(8);
+
+        neighbours_should_be[5].insert(2);
+        neighbours_should_be[5].insert(3);
+        neighbours_should_be[5].insert(4);
+        neighbours_should_be[5].insert(6);
+        neighbours_should_be[5].insert(7);
+        neighbours_should_be[5].insert(8);
+
+        neighbours_should_be[6].insert(5);
+        neighbours_should_be[6].insert(7);
+        neighbours_should_be[6].insert(8);
+
+        neighbours_should_be[7].insert(2);
+        neighbours_should_be[7].insert(3);
+        neighbours_should_be[7].insert(4);
+        neighbours_should_be[7].insert(5);
+        neighbours_should_be[7].insert(6);
+        neighbours_should_be[7].insert(8);
+
+        neighbours_should_be[8].insert(2);
+        neighbours_should_be[8].insert(3);
+        neighbours_should_be[8].insert(4);
+        neighbours_should_be[8].insert(5);
+        neighbours_should_be[8].insert(6);
+        neighbours_should_be[8].insert(7);
+
+        neighbours_should_be[9].insert(0);
+        neighbours_should_be[9].insert(1);
+
+        TS_ASSERT_EQUALS(neighbours_should_be, neighbours_returned);
+
+        std::set< std::pair<Node<2>*, Node<2>* > > pairs_should_be;
+        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[0],nodes[1]));
+
+        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[2],nodes[7]));
+        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[2],nodes[8]));
+
+        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[4]));
+        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[5]));
+        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[7]));
+        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[8]));
+        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[2]));
+
+        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[4],nodes[5]));
+        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[4],nodes[7]));
+        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[4],nodes[8]));
+        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[4],nodes[2]));
+
+        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[5],nodes[6]));
+        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[5],nodes[7]));
+        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[5],nodes[8]));
+        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[5],nodes[2]));
+
+        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[6],nodes[7]));
+        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[6],nodes[8]));
+
+        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[7],nodes[8]));
+
+        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[9],nodes[0]));
+        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[9],nodes[1]));
+
+        TS_ASSERT_EQUALS(pairs_should_be.size(), pairs_returned.size());
         TS_ASSERT_EQUALS(pairs_should_be, pairs_returned);
 
         for (unsigned i=0; i<points.size(); i++)

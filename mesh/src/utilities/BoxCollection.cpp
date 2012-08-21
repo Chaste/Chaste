@@ -89,10 +89,17 @@ std::set< Element<DIM,DIM>* >& Box<DIM>::rGetElementsContained()
 
 
 template<unsigned DIM>
-BoxCollection<DIM>::BoxCollection(double boxWidth, c_vector<double, 2*DIM> domainSize)
+BoxCollection<DIM>::BoxCollection(double boxWidth, c_vector<double, 2*DIM> domainSize, bool isPeriodicInX)
     : mDomainSize(domainSize),
-      mBoxWidth(boxWidth)
+      mBoxWidth(boxWidth),
+      mIsPeriodicInX(isPeriodicInX)
 {
+    // Periodicity only works in 2d
+    if (isPeriodicInX)
+    {
+        assert(DIM==2);
+    }
+
     /*
      * Start by calculating the number of boxes in each direction and total number of boxes.
      * Also create a helper vector of coefficients, whose first entry is 1 and whose i-th
@@ -268,6 +275,12 @@ void BoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                     {
                         local_boxes.insert(box_index + mNumBoxesEachDirection(0) - 1);
                     }
+                    // If we're on the left edge but its periodic include the box on the far right
+                    else if ( (box_index % mNumBoxesEachDirection(0) == 0) && (mIsPeriodicInX) )
+                    {
+                        local_boxes.insert(box_index + 2* mNumBoxesEachDirection(0) - 1);
+                    }
+
                 }
                 // If we're not on the right-most column, then insert the box to the right
                 if (box_index % mNumBoxesEachDirection(0) != mNumBoxesEachDirection(0)-1)
@@ -278,6 +291,16 @@ void BoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                     if (box_index < mBoxes.size() - mNumBoxesEachDirection(0))
                     {
                         local_boxes.insert(box_index + mNumBoxesEachDirection(0) + 1);
+                    }
+                }
+                // If we're on the right edge but it's periodic include the box on the far left of the domain
+                else if ( (box_index % mNumBoxesEachDirection(0) == mNumBoxesEachDirection(0)-1) && (mIsPeriodicInX) )
+                {
+                    local_boxes.insert(box_index - mNumBoxesEachDirection(0) + 1);
+                    // If we're also not on the top-most row, then insert the box above- on the far left of the domain
+                    if (box_index < mBoxes.size() - mNumBoxesEachDirection(0))
+                    {
+                        local_boxes.insert(box_index + 1);
                     }
                 }
 
@@ -445,11 +468,25 @@ void BoxCollection<DIM>::SetupAllLocalBoxes()
                 {
                     local_boxes.insert(i-1);
                 }
+                else // Add Periodic Box if needed
+                {
+                    if(mIsPeriodicInX)
+                    {
+                        local_boxes.insert(i+M-1);
+                    }
+                }
 
                 // add the box to the right
                 if (!is_xmax[i])
                 {
                     local_boxes.insert(i+1);
+                }
+                else // Add Periodic Box if needed
+                {
+                    if(mIsPeriodicInX)
+                    {
+                        local_boxes.insert(i-M+1);
+                    }
                 }
 
                 // add the one below
@@ -470,20 +507,38 @@ void BoxCollection<DIM>::SetupAllLocalBoxes()
                 {
                     local_boxes.insert(i-1-M);
                 }
-
                 if ( (!is_xmin[i]) && (!is_ymax[i]) )
                 {
                     local_boxes.insert(i-1+M);
                 }
-
                 if ( (!is_xmax[i]) && (!is_ymin[i]) )
                 {
                     local_boxes.insert(i+1-M);
                 }
-
                 if ( (!is_xmax[i]) && (!is_ymax[i]) )
                 {
                     local_boxes.insert(i+1+M);
+                }
+
+                // Add Periodic Corner Boxes if needed
+                if(mIsPeriodicInX)
+                {
+                    if( (is_xmin[i]) && (!is_ymin[i]) )
+                    {
+                        local_boxes.insert(i-1);
+                    }
+                    if ( (is_xmin[i]) && (!is_ymax[i]) )
+                    {
+                        local_boxes.insert(i-1+2*M);
+                    }
+                    if ( (is_xmax[i]) && (!is_ymin[i]) )
+                    {
+                        local_boxes.insert(i+1-2*M);
+                    }
+                    if ( (is_xmax[i]) && (!is_ymax[i]) )
+                    {
+                        local_boxes.insert(i+1);
+                    }
                 }
 
                 mLocalBoxes.push_back(local_boxes);

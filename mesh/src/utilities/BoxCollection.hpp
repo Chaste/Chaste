@@ -124,6 +124,9 @@ private:
     /** A fudge (box swelling) factor to deal with 32-bit floating point issues. */
     const static double mFudge = 5e-14;
 
+    /** Whether the domain is periodic in the X dimension Note this currently only works for DIM=2.*/
+    bool mIsPeriodicInX;
+
 public:
 
     /**
@@ -131,8 +134,9 @@ public:
      *
      * @param boxWidth the width of each box (cut-off length in NodeBasedCellPopulation simulations)
      * @param domainSize the size of the domain, in the form (xmin, xmax, ymin, ymax) (etc)
+     * @param isPeriodicInX whether the domain is peiodic in the x direction
      */
-    BoxCollection(double boxWidth, c_vector<double, 2*DIM> domainSize);
+    BoxCollection(double boxWidth, c_vector<double, 2*DIM> domainSize, bool isPeriodicInX = false);
 
     /**
      * Calculate which box this node is contained in.
