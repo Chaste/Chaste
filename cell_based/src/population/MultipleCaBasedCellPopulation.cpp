@@ -287,12 +287,13 @@ void MultipleCaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
             //neighbouring_node_indices_list.sort();
             unsigned num_neighbours = neighbouring_node_indices.size();
             double probability_of_not_moving = 1.0;
-            double probability_of_moving = 0.0;
 
             for (std::set<unsigned>::iterator iter = neighbouring_node_indices.begin();
                  iter != neighbouring_node_indices.end();
                  ++iter)
             {
+                double probability_of_moving = 0.0;
+
                 neighbouring_node_indices_vector.push_back(*iter);
 
                 if (IsSiteAvailable(*iter))
