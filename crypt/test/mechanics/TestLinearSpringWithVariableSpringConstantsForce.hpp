@@ -202,9 +202,7 @@ public:
 
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            unsigned generation;
             double y = 0.0;
-
             if (std::find(location_indices.begin(), location_indices.end(), i) != location_indices.end())
             {
                 y = p_mesh->GetNode(i)->GetPoint().rGetLocation()[1];
@@ -216,6 +214,23 @@ public:
             double typical_transit_cycle_time = p_cell_cycle_model->GetAverageTransitCellCycleTime();
             double typical_stem_cycle_time = p_cell_cycle_model->GetAverageStemCellCycleTime();
 
+            unsigned generation = 4;
+            if (y <= 0.3)
+            {
+                generation = 0;
+            }
+            else if (y < 2.0)
+            {
+                generation = 1;
+            }
+            else if (y < 3.0)
+            {
+                generation = 2;
+            }
+            else if (y < 4.0)
+            {
+                generation = 3;
+            }
             p_cell_cycle_model->SetGeneration(generation);
 
             boost::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
