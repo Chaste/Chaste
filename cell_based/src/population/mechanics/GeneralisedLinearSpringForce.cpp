@@ -86,20 +86,14 @@ c_vector<double, SPACE_DIM> GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>:
 
     // Get the unit vector parallel to the line joining the two nodes
     c_vector<double, SPACE_DIM> unit_difference;
-    if (dynamic_cast<MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation))
-    {
-        /*
-         * We use the mesh method GetVectorFromAtoB() to compute the direction of the
-         * unit vector along the line joining the two nodes, rather than simply subtract
-         * their positions, because this method can be overloaded (e.g. to enforce a
-         * periodic boundary in Cylindrical2dMesh).
-         */
-        unit_difference = (static_cast<MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation))->rGetMesh().GetVectorFromAtoB(node_a_location, node_b_location);
-    }
-    else
-    {
-        unit_difference = node_b_location - node_a_location;
-    }
+    /*
+     * We use the mesh method GetVectorFromAtoB() to compute the direction of the
+     * unit vector along the line joining the two nodes, rather than simply subtract
+     * their positions, because this method can be overloaded (e.g. to enforce a
+     * periodic boundary in Cylindrical2dMesh).
+     */
+    unit_difference = rCellPopulation.rGetMesh().GetVectorFromAtoB(node_a_location, node_b_location);
+
 
     // Calculate the distance between the two nodes
     double distance_between_nodes = norm_2(unit_difference);

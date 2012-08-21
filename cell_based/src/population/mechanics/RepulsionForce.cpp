@@ -73,10 +73,11 @@ void RepulsionForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM>
         // Get the unit vector parallel to the line joining the two nodes
         c_vector<double, DIM> unit_difference;
 
-        unit_difference = node_b_location - node_a_location;
+        unit_difference = (static_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation))->rGetMesh().GetVectorFromAtoB(node_a_location, node_b_location);
 
         // Calculate the value of the rest length
         double rest_length = node_a_radius+node_b_radius;
+
         if (norm_2(unit_difference) < rest_length)
         {
             // Calculate the force between nodes
