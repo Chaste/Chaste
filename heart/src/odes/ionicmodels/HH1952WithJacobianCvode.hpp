@@ -47,7 +47,13 @@ public:
     double GetIIonic(const std::vector<double>* pStateVariables=NULL);
     void EvaluateYDerivatives(double var_chaste_interface__environment__time, const N_Vector rY, N_Vector rDY);
     N_Vector ComputeDerivedQuantities(double var_chaste_interface__environment__time, const N_Vector & rY);
-    void EvaluateAnalyticJacobian(int N, realtype time, N_Vector rY, N_Vector rDY, DlsMat J, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+    void EvaluateAnalyticJacobian(long int N, realtype time, N_Vector rY, N_Vector rDY,
+#if CHASTE_SUNDIALS_VERSION >= 20400
+                                          DlsMat Jacobian,
+#else
+                                          DenseMat Jacobian,
+#endif
+            N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
 };
 
 

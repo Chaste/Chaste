@@ -77,17 +77,31 @@ int AbstractCvodeSystemRhsAdaptor(realtype t, N_Vector y, N_Vector ydot, void *p
     return 0;
 }
 
-// NB First Argument changes to a long int in SUNDIALS 2.5.0
 
-int AbstractCvodeSystemJacAdaptor(int N, realtype t,
-        N_Vector y, N_Vector ydot, DlsMat J, void *pData,
-        N_Vector tmp1, N_Vector tmp2, N_Vector tmp3)
+/*
+ * Absolute chaos here with three different possible interfaces to the jacobian.
+ */
+#if CHASTE_SUNDIALS_VERSION >= 20500
+    // Sundials 2.5
+    int AbstractCvodeSystemJacAdaptor(long int N, realtype t, N_Vector y, N_Vector ydot, DlsMat jacobian,
+#elif CHASTE_SUNDIALS_VERSION >= 20400
+    // Sundials 2.4
+    int AbstractCvodeSystemJacAdaptor(int N, realtype t, N_Vector y, N_Vector ydot, DlsMat jacobian,
+#else
+    // Sundials 2.3 and below (not sure how far below, but this is 2006 so old enough).
+    int AbstractCvodeSystemJacAdaptor(long int N, DenseMat jacobian, realtype t, N_Vector y, N_Vector ydot,
+#endif
+    void *pData, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3)
 {
     assert(pData != NULL);
     AbstractCvodeSystem* p_ode_system = (AbstractCvodeSystem*) pData;
     try
     {
-        p_ode_system->EvaluateAnalyticJacobian(N, t, y, ydot, J, tmp1, tmp2, tmp3);
+#if CHASTE_SUNDIALS_VERSION == 20400
+        p_ode_system->EvaluateAnalyticJacobian((long)(N), t, y, ydot, jacobian, tmp1, tmp2, tmp3);
+#else
+        p_ode_system->EvaluateAnalyticJacobian(N, t, y, ydot, jacobian, tmp1, tmp2, tmp3);
+#endif
     }
     catch (const Exception &e)
     {
@@ -351,7 +365,11 @@ void AbstractCvodeSystem::SetupCvode(N_Vector initialConditions,
 
         if (mUseAnalyticJacobian)
         {
+#if CHASTE_SUNDIALS_VERSION >= 20400
             CVDlsSetDenseJacFn(mpCvodeMem, AbstractCvodeSystemJacAdaptor);
+#else
+            CVDenseSetJacFn(mpCvodeMem, AbstractCvodeSystemJacAdaptor, (void*)(this));
+#endif
         }
     }
     else if (reinit)

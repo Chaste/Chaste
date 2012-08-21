@@ -49,8 +49,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestCvodeWithJacobian : public CxxTest::TestSuite
 {
 public:
-    void TestTimingsWithoutJacobian() throw (Exception)
+    void TestTimingsWithAndWithoutJacobian() throw (Exception)
     {
+#ifdef CHASTE_CVODE
         // Set up a default solver and a stimulus
         boost::shared_ptr<AbstractIvpOdeSolver> p_solver(new EulerIvpOdeSolver());
         boost::shared_ptr<CvodeAdaptor> p_cvode_adaptor(new CvodeAdaptor());
@@ -82,7 +83,7 @@ public:
         elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
         std::cout << "2. CVODE native, elapsed time = " << elapsed_time << " secs for " << simulation_duration << " ms\n";
 
-// Not yet implemented (it would work, but wouldn't use a Jacobian).
+/// \todo # Not yet implemented (it would work, but wouldn't use a Jacobian).
 //        // A jacobian CVODE adaptor solve
 //        p_cvode_adaptor_jacobian->SetMaxSteps(1e10);
 //        start_time = std::clock();
@@ -98,6 +99,9 @@ public:
         end_time = std::clock();
         elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
         std::cout << "4. CVODE native with Jacobian, elapsed time = " << elapsed_time << " secs for " << simulation_duration << " ms\n";
+#else
+        std::cout << "CVODE is not installed or Chaste hostconfig is not using it." << std::endl;
+#endif
     }
 };
 

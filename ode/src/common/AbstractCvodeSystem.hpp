@@ -273,8 +273,14 @@ public:
                                       N_Vector y,
                                       N_Vector ydot)=0;
 
-    virtual void EvaluateAnalyticJacobian(int N, realtype time, N_Vector y, N_Vector ydot,
-                                          DlsMat J, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3)
+
+    virtual void EvaluateAnalyticJacobian(long int N, realtype time, N_Vector y, N_Vector ydot,
+#if CHASTE_SUNDIALS_VERSION >= 20400
+                                          DlsMat jacobian,
+#else
+                                          DenseMat jacobian,
+#endif
+                                          N_Vector tmp1, N_Vector tmp2, N_Vector tmp3)
     {
         EXCEPTION("No analytic Jacobian has been defined for this system.");
     }

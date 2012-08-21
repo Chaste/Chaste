@@ -145,8 +145,13 @@
         NV_Ith_S(rDY, 3) = d_dt_chaste_interface__potassium_channel_n_gate__n;
     }
     
-    void HH1952WithJacobianCvode::EvaluateAnalyticJacobian(int N, realtype time, N_Vector rY, N_Vector rDy,
-                                  DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3)
+    void HH1952WithJacobianCvode::EvaluateAnalyticJacobian(long int N, realtype time, N_Vector rY, N_Vector rDY,
+#if CHASTE_SUNDIALS_VERSION >= 20400
+                                          DlsMat Jac,
+#else
+                                          DenseMat Jac,
+#endif
+            N_Vector tmp1, N_Vector tmp2, N_Vector tmp3)
     {
         double var_chaste_interface__membrane__V = (mSetVoltageDerivativeToZero ? this->mFixedVoltage : NV_Ith_S(rY, 0));
         double var_chaste_interface__sodium_channel_m_gate__m = NV_Ith_S(rY, 1);
