@@ -388,7 +388,7 @@ public:
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, 40, p_diff_type);
 
-        // Specify where cells lie 4 cells in the first ten sites
+        // Specify where cells lie: four cells in each of the first ten sites
         std::vector<unsigned> location_indices;
         for (unsigned index=0; index<10; index++)
         {
@@ -433,7 +433,7 @@ public:
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, 40, p_diff_type);
 
-        // Specify where cells lie 4 cells in the first ten sites
+        // Specify where cells lie: four cells in each of the first ten sites
         std::vector<unsigned> location_indices;
         for (unsigned index=0; index<10u; index++)
         {
@@ -601,6 +601,114 @@ public:
                 TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetCellsUsingLocationIndex(i).size(),0u);
             }
         }
+    }
+
+    void TestStandardResultForArchivingTestsBelow() throw (Exception)
+    {
+		PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
+		PottsMesh<2>* p_mesh = generator.GetMesh();
+
+		std::vector<CellPtr> cells;
+		MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+		CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+		cells_generator.GenerateBasicRandom(cells, 10, p_diff_type);
+
+		std::vector<unsigned> location_indices;
+		for (unsigned index=0; index<10; index++)
+		{
+			location_indices.push_back(index);
+		}
+
+		MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 4);
+
+        // Set up cell-based simulation
+        OnLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestOnLatticeSimulationWithMultipleCaBasedCellPopulationStandardResult");
+        simulator.SetDt(1);
+        simulator.SetEndTime(20);
+
+        // Add update rule
+        MAKE_PTR(DiffusionMultipleCaUpdateRule<2>, p_diffusion_update_rule);
+        p_diffusion_update_rule->SetDiffusionParameter(0.1);
+        simulator.AddMultipleCaUpdateRule(p_diffusion_update_rule);
+
+        // Run simulation
+        simulator.Solve();
+
+        // Check some results
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 10u);
+
+        CellPtr p_cell = *(simulator.rGetCellPopulation().Begin());
+        c_vector<double, 2> cell_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(p_cell);
+		TS_ASSERT_DELTA(cell_location[0], 1.0, 1e-4);
+		TS_ASSERT_DELTA(cell_location[1], 2.0, 1e-4);
+    }
+
+    void TestSave() throw (Exception)
+    {
+		PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
+		PottsMesh<2>* p_mesh = generator.GetMesh();
+
+		std::vector<CellPtr> cells;
+		MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+		CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+		cells_generator.GenerateBasicRandom(cells, 10, p_diff_type);
+
+		std::vector<unsigned> location_indices;
+		for (unsigned index=0; index<10; index++)
+		{
+			location_indices.push_back(index);
+		}
+
+		MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 4);
+
+        // Set up cell-based simulation
+        OnLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestOnLatticeSimulationWithMultipleCaBasedCellPopulationSaveAndLoad");
+        simulator.SetDt(1);
+        simulator.SetEndTime(10);
+
+        // Add update rule
+        MAKE_PTR(DiffusionMultipleCaUpdateRule<2>, p_diffusion_update_rule);
+        p_diffusion_update_rule->SetDiffusionParameter(0.1);
+        simulator.AddMultipleCaUpdateRule(p_diffusion_update_rule);
+
+        // Run simulation
+        simulator.Solve();
+
+        // Save the results
+        CellBasedSimulationArchiver<2, OnLatticeSimulation<2> >::Save(&simulator);
+    }
+
+    ///\todo make the following test pass - see #2066 and comment in OnLatticeSimulation::UpdateCellPopulation()
+    void DONOTTestLoad() throw (Exception)
+    {
+        // Load the simulation from the TestSave() method above and run it from time 10 to 15
+        OnLatticeSimulation<2>* p_simulator1;
+        p_simulator1 = CellBasedSimulationArchiver<2, OnLatticeSimulation<2> >::Load("TestOnLatticeSimulationWithMultipleCaBasedCellPopulationSaveAndLoad", 10.0);
+
+        p_simulator1->SetEndTime(15);
+        p_simulator1->Solve();
+
+        // Save, then reload and run from time 15 to 20
+        CellBasedSimulationArchiver<2, OnLatticeSimulation<2> >::Save(p_simulator1);
+        OnLatticeSimulation<2>* p_simulator2
+            = CellBasedSimulationArchiver<2, OnLatticeSimulation<2> >::Load("TestOnLatticeSimulationWithMultipleCaBasedCellPopulationSaveAndLoad", 15.0);
+
+        p_simulator2->SetEndTime(20);
+        p_simulator2->Solve();
+
+        // These results are from time 20 in TestStandardResultForArchivingTestsBelow()
+        TS_ASSERT_EQUALS(p_simulator2->rGetCellPopulation().GetNumRealCells(), 10u);
+
+        CellPtr p_cell = *(p_simulator2->rGetCellPopulation().Begin());
+        c_vector<double, 2> cell_location = static_cast <MultipleCaBasedCellPopulation<2>*>(&p_simulator2->rGetCellPopulation())->GetLocationOfCellCentre(p_cell);
+		TS_ASSERT_DELTA(cell_location[0], 1.0, 1e-4);
+		TS_ASSERT_DELTA(cell_location[1], 2.0, 1e-4);
+
+        // Tidy up
+        delete p_simulator1;
+        delete p_simulator2;
     }
 };
 

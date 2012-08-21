@@ -52,7 +52,7 @@ class NodesOnlyMesh: public MutableMesh<SPACE_DIM, SPACE_DIM>
 protected:
     /**
      * A pointer to a box collection. Used to calculate neighbourhood information
-     * for nodes in the mesh
+     * for nodes in the mesh.
      */
     BoxCollection<SPACE_DIM>* mpBoxCollection;
 
@@ -167,7 +167,7 @@ public:
     void ClearBoxCollection();
 
     /**
-     * Set up the box collection. Overriden in subclasses to implement periodicity.
+     * Set up the box collection. Overridden in subclasses to implement periodicity.
      *
      * @param cutOffLength the cut off length for node neighbours
      * @param domainSize the size of the domain containing the nodes.

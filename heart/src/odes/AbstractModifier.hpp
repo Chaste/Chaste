@@ -64,7 +64,7 @@ class AbstractModifier
     }
 
     /**
-     * Pure virtual function which must be overriden in subclasses to actually
+     * Pure virtual function which must be overridden in subclasses to actually
      * perform the modification.
      *
      * @param param  the current value of the quantity which is being modified

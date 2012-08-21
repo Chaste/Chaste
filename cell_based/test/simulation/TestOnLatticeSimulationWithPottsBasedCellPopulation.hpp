@@ -628,8 +628,7 @@ public:
 
     void TestLoad() throw (Exception)
     {
-        // Load the simulation from the TestSave method above and
-        // run it from 10.0 to 15.0
+        // Load the simulation from the TestSave() method above and run it from 10.0 to 15.0
         OnLatticeSimulation<2>* p_simulator1;
         p_simulator1 = CellBasedSimulationArchiver<2, OnLatticeSimulation<2> >::Load("TestOnLatticeSimulationWithPottsBasedCellPopulationSaveAndLoad", 10.0);
 

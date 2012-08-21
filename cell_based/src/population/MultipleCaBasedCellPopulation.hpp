@@ -71,7 +71,7 @@ class MultipleCaBasedCellPopulation : public AbstractOnLatticeCellPopulation<DIM
 
 private:
 
-    /** The carying capacity (number of cells allowed per site). */
+    /** The carrying capacity (number of cells allowed per site). */
     unsigned mLatticeCarryingCapacity;
 
     /** Results file for cell locations. */
@@ -258,11 +258,6 @@ public:
      * @return number of cells removed
      */
     unsigned RemoveDeadCells();
-
-//    /**
-//     * Calculated the probability of a cell moving based on the calculations provided by Owen et. al 2011
-//     */
-//    double CalculateProbabilityOfMoving(unsigned node_index, unsigned node_neighbour_index, double dt);
 
     /**
      * Overridden UpdateCellLocations() method.

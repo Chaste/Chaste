@@ -306,7 +306,7 @@ public:
                                      unsigned indexOfUnknown = 0);
 
     /**
-     * @return whether there are any non-zero Neuman boundary conditions
+     * @return whether there are any non-zero Neumann boundary conditions
      */
     bool AnyNonZeroNeumannConditions();
 

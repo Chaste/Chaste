@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TetrahedralMesh.hpp"
 #include "BoxCollection.hpp"
 #include "TrianglesMeshReader.hpp"
-#include "Debug.hpp"
+
 class TestBoxCollection : public CxxTest::TestSuite
 {
 public:

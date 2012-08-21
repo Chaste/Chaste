@@ -74,10 +74,10 @@ protected:
      */
     std::vector<unsigned> mDeletedElementIndices;
 
-    /** Vector of set of VonNeuman Neighbours for each node. */
+    /** Vector of set of Von Neumann neighbours for each node. */
     std::vector< std::set<unsigned> > mVonNeumannNeighbouringNodeIndices;
 
-    /** Vector of set of Moore Neighbours for each node. */
+    /** Vector of set of Moore neighbours for each node. */
     std::vector< std::set<unsigned> > mMooreNeighbouringNodeIndices;
 
     /**
@@ -128,6 +128,7 @@ protected:
                                          ArchiveLocationInfo::GetMeshFilename(),
                                          false);
         mesh_writer.WriteFilesUsingMesh(*(const_cast<PottsMesh<DIM>*>(this)));
+
     }
 
     /**
@@ -180,8 +181,8 @@ public:
      *
      * @param nodes vector of pointers to nodes
      * @param pottsElements vector of pointers to PottsElements
-     * @param vonNeumannNeighbouringNodeIndices vector of set of Moore Neighbours for each node
-     * @param mooreNeighbouringNodeIndices vector of set of VonNeuman Neighbours for each node
+     * @param vonNeumannNeighbouringNodeIndices vector of set of Moore neighbours for each node
+     * @param mooreNeighbouringNodeIndices vector of set of Von Neumann neighbours for each node
      */
     PottsMesh(std::vector<Node<DIM>*> nodes,
               std::vector<PottsElement<DIM>*> pottsElements,

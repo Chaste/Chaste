@@ -510,7 +510,7 @@ public:
         TS_ASSERT_EQUALS(true, cell_population.GetUpdateNodesInRandomOrder());
         cell_population.SetUpdateNodesInRandomOrder(false);
 
-        // Create a multiplce Ca update rule and pass to the population
+        // Create a multiple CA update rule and pass to the population
         MAKE_PTR(DiffusionMultipleCaUpdateRule<2u>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(1.0);
         cell_population.AddUpdateRule(p_diffusion_update_rule);
@@ -528,7 +528,7 @@ public:
     // For coverage try move when all neighbours are occupied
     void TestUpdateCellLocationsWhenFull()
     {
-        // Create a simple 2D PottsMesh enitrely populated with cells
+        // Create a simple 2D PottsMesh entirely populated with cells
         PottsMeshGenerator<2> generator(3, 0, 0, 3, 0, 0);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
@@ -590,7 +590,7 @@ public:
         cell_population.SetUpdateNodesInRandomOrder(true);
         cell_population.SetIterateRandomlyOverUpdateRuleCollection(true);
 
-        // Create a multiplce CA update rule and pass to the population
+        // Create a multiple CA update rule and pass to the population
         MAKE_PTR(DiffusionMultipleCaUpdateRule<2u>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(1.0);
         cell_population.AddUpdateRule(p_diffusion_update_rule);
@@ -603,6 +603,124 @@ public:
         TS_ASSERT_THROWS_THIS(cell_population.UpdateCellLocations(1.0),
             "The probability of the cell not moving is smaller than zero. In order to prevent it from happening you should change your time step and parameters");
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 1u);
+    }
+
+    void TestArchiving() throw(Exception)
+    {
+        FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
+        std::string archive_file = "MultipleCaBasedCellPopulation-2.arch";
+
+        // The following line is required because the loading of a cell population
+        // is usually called by the method CellBasedSimulation::Load()
+        ArchiveLocationInfo::SetMeshFilename("potts_mesh_2d");
+
+        // Archive cell population
+        {
+            // Need to set up time
+            unsigned num_steps = 10;
+            SimulationTime* p_simulation_time = SimulationTime::Instance();
+            p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, num_steps+1);
+
+            // Create a multiple CA cell population object
+            PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
+            PottsMesh<2>* p_mesh = generator.GetMesh();
+
+            std::vector<CellPtr> cells;
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, 40, p_diff_type);
+
+            std::vector<unsigned> location_indices;
+            for (unsigned index=0; index<10; index++)
+            {
+                location_indices.push_back(index);
+                location_indices.push_back(index);
+                location_indices.push_back(index);
+                location_indices.push_back(index);
+            }
+
+            AbstractCellPopulation<2>* const p_cell_population =
+                new MultipleCaBasedCellPopulation<2>(*p_mesh, cells, location_indices, 4);
+
+            // Run each cell to time 0
+            for (AbstractCellPopulation<2>::Iterator cell_iter = p_cell_population->Begin();
+                 cell_iter != p_cell_population->End();
+                 ++cell_iter)
+            {
+                cell_iter->ReadyToDivide();
+            }
+
+            // Create an update rule and pass to the population
+            MAKE_PTR(DiffusionMultipleCaUpdateRule<2u>, p_diffusion_update_rule);
+            p_diffusion_update_rule->SetDiffusionParameter(1.0);
+            static_cast<MultipleCaBasedCellPopulation<2>*>(p_cell_population)->AddUpdateRule(p_diffusion_update_rule);
+
+            // Set member variables in order to test that they are archived correctly
+            static_cast<MultipleCaBasedCellPopulation<2>*>(p_cell_population)->SetUpdateNodesInRandomOrder(false);
+            static_cast<MultipleCaBasedCellPopulation<2>*>(p_cell_population)->SetIterateRandomlyOverUpdateRuleCollection(true);
+
+            // Create output archive
+            ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
+
+            // Archive the cell population
+            (*p_arch) << static_cast<const SimulationTime&>(*p_simulation_time);
+            (*p_arch) << p_cell_population;
+
+            // Tidy up
+            SimulationTime::Destroy();
+            delete p_cell_population;
+        }
+
+        // Restore cell population
+        {
+            // Need to set up time
+            unsigned num_steps = 10;
+            SimulationTime* p_simulation_time = SimulationTime::Instance();
+            p_simulation_time->SetStartTime(0.0);
+            p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, num_steps+1);
+            p_simulation_time->IncrementTimeOneStep();
+
+            AbstractCellPopulation<2>* p_cell_population;
+
+            // Create an input archive
+            ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
+
+            // Restore the cell population
+            (*p_arch) >> *p_simulation_time;
+            (*p_arch) >> p_cell_population;
+
+            // Test that the member variables have been archived correctly
+            MultipleCaBasedCellPopulation<2>* p_static_population = static_cast<MultipleCaBasedCellPopulation<2>*>(p_cell_population);
+
+            TS_ASSERT_EQUALS(p_static_population->GetNumNodes(), 100u);
+
+            std::vector<unsigned> available_space = p_static_population->rGetAvailableSpaces();
+            for (unsigned i=0; i<10; i++)
+            {
+                TS_ASSERT_EQUALS(available_space[i], 0u);
+            }
+            for (unsigned i=10; i<100; i++)
+            {
+                TS_ASSERT_EQUALS(available_space[i], 4u);
+            }
+
+            c_vector<double, 2> cell_location = p_static_population->GetLocationOfCellCentre(*(p_cell_population->Begin()));
+            TS_ASSERT_DELTA(cell_location[0], 0.0, 1e-4);
+            TS_ASSERT_DELTA(cell_location[1], 0.0, 1e-4);
+
+            TS_ASSERT_EQUALS(p_static_population->GetUpdateNodesInRandomOrder(), false);
+            TS_ASSERT_EQUALS(p_static_population->GetIterateRandomlyOverUpdateRuleCollection(), true);
+
+            // Test that the update rule has been archived correctly
+            std::vector<boost::shared_ptr<AbstractMultipleCaUpdateRule<2> > > update_rule_collection = p_static_population->rGetUpdateRuleCollection();
+            TS_ASSERT_EQUALS(update_rule_collection.size(), 1u);
+            TS_ASSERT_EQUALS((*update_rule_collection[0]).GetIdentifier(), "DiffusionMultipleCaUpdateRule-2");
+
+            // Tidy up
+            delete p_cell_population;
+        }
     }
 };
 

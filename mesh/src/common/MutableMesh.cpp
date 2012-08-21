@@ -415,7 +415,7 @@ unsigned MutableMesh<ELEMENT_DIM, SPACE_DIM>::RefineElement(
     // Add a new node from the point that is passed to RefineElement
     unsigned new_node_index = AddNode(new Node<SPACE_DIM>(0, point.rGetLocation()));
     // Note: the first argument is the index of the node, which is going to be
-    //       overriden by AddNode, so it can safely be ignored
+    //       overridden by AddNode, so it can safely be ignored
 
     // This loop constructs the extra elements which are going to fill the space
     for (unsigned i = 0; i < ELEMENT_DIM; i++)

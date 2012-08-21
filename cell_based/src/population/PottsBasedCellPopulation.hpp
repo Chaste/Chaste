@@ -123,7 +123,7 @@ private:
 
         /*
          * In its current form the code does not allow the direct serialization
-         * of the VertexMesh class, so instead we delete mpVoronoiTessellation.
+         * of the PottsMesh class, so instead we delete mpVoronoiTessellation.
          */
         delete mpElementTessellation;
         mpElementTessellation = NULL;
