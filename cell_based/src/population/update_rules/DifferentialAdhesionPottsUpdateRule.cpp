@@ -49,7 +49,6 @@ DifferentialAdhesionPottsUpdateRule<DIM>::~DifferentialAdhesionPottsUpdateRule()
 {
 }
 
-
 template<unsigned DIM>
 double DifferentialAdhesionPottsUpdateRule<DIM>::GetCellCellAdhesionEnergy(CellPtr pCellA, CellPtr pCellB)
 {
@@ -70,7 +69,7 @@ double DifferentialAdhesionPottsUpdateRule<DIM>::GetCellCellAdhesionEnergy(CellP
 template<unsigned DIM>
 double DifferentialAdhesionPottsUpdateRule<DIM>::GetCellBoundaryAdhesionEnergy(CellPtr pCell)
 {
-    if ( pCell->HasCellProperty<CellLabel>() )
+    if (pCell->HasCellProperty<CellLabel>())
     {
         return GetLabelledCellBoundaryAdhesionEnergyParameter();
     }
@@ -79,7 +78,6 @@ double DifferentialAdhesionPottsUpdateRule<DIM>::GetCellBoundaryAdhesionEnergy(C
         return this->GetCellBoundaryAdhesionEnergyParameter();
     }
 }
-
 
 template<unsigned DIM>
 double DifferentialAdhesionPottsUpdateRule<DIM>::GetLabelledCellLabelledCellAdhesionEnergyParameter()
@@ -116,7 +114,6 @@ void DifferentialAdhesionPottsUpdateRule<DIM>::SetLabelledCellBoundaryAdhesionEn
 {
     mLabelledCellBoundaryAdhesionEnergyParameter = labelledCellBoundaryAdhesionEnergyParameter;
 }
-
 
 template<unsigned DIM>
 void DifferentialAdhesionPottsUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)

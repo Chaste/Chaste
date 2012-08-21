@@ -82,7 +82,6 @@ protected:
     void Initialise();
 };
 
-
 template<class ODE_SYSTEM>
 CellwiseOdeSystemInformation<ODE_SYSTEM>::CellwiseOdeSystemInformation()
 {

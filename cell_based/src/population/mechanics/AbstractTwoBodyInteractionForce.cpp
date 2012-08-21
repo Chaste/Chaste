@@ -73,7 +73,7 @@ void AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::AddForceContributio
         EXCEPTION("Subclasses of AbstractTwoBodyInteractionForce are to be used with subclasses of AbstractCentreBasedCellPopulation only");
     }
 
-    ///\todo this could be tidied by using the rGetNodePairs for all populatioins and moving the below calculation into the MutableMesh.
+    ///\todo this could be tidied by using the rGetNodePairs for all populations and moving the below calculation into the MutableMesh.
     if (dynamic_cast<MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation))
     {
         MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>* p_static_cast_cell_population = static_cast<MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation);

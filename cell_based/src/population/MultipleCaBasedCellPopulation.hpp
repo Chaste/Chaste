@@ -53,8 +53,7 @@ template<unsigned DIM>
 class AbstractMultipleCaUpdateRule; // Circular definition
 
 /**
- * \todo This description is pasted from Potts.  Please change it.
- *
+ * \todo This description is pasted from Potts and needs to be changed (#2066)
  *
  * A facade class encapsulating a cell population under the Cellular
  * Potts Model framework.
@@ -72,8 +71,7 @@ class MultipleCaBasedCellPopulation : public AbstractOnLatticeCellPopulation<DIM
 
 private:
 
-
-    /** The carying capacity (number of cells allowed per site) */
+    /** The carying capacity (number of cells allowed per site). */
     unsigned mLatticeCarryingCapacity;
 
     /** Results file for cell locations. */
@@ -112,7 +110,6 @@ private:
         archive & mLatticeCarryingCapacity;
         archive & mUpdateRuleCollection;
         archive & mAvailableSpaces;
-
 #undef COVERAGE_IGNORE
     }
 
@@ -175,7 +172,6 @@ public:
      * @return whether the node is an empty site
      */
     bool IsSiteAvailable(unsigned index);
-
 
     /**
      * @return reference to #mrMesh.
@@ -346,7 +342,6 @@ public:
      * @param pUpdateRule pointer to an update rule
      */
     void AddUpdateRule(boost::shared_ptr<AbstractMultipleCaUpdateRule<DIM> > pUpdateRule);
-
 
     /**
      * Method to remove all the update rules

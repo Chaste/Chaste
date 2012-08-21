@@ -58,7 +58,6 @@ void DiffusionForce<DIM>::SetCutOffLength(double cutOffLength)
     mMechanicsCutOffLength=cutOffLength;
 }
 
-
 template<unsigned DIM>
 double DiffusionForce<DIM>::GetCutOffLength()
 {

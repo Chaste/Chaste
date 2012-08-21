@@ -42,7 +42,6 @@ c_vector<double, DIM>& CellwiseDataGradient<DIM>::rGetGradient(unsigned nodeInde
     return mGradients[nodeIndex];
 }
 
-
 template<unsigned DIM>
 void CellwiseDataGradient<DIM>::SetupGradients(AbstractCellPopulation<DIM>& rCellPopulation, const std::string& rItemName)
 {
