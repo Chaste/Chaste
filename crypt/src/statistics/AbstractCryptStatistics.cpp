@@ -58,7 +58,13 @@ void AbstractCryptStatistics::LabelSPhaseCells()
             // Label this cell
             if (!cell_iter->HasCellProperty<CellLabel>())
             {
-                cell_iter->AddCellProperty(CellPropertyRegistry::Instance()->Get<CellLabel>());
+                /*
+                 * This method is usually called after mrCrypt has called CellPropertyRegistry::TakeOwnership().
+                 * This means that were we to call CellPropertyRegistry::Instance() here when adding the CellLabel,
+                 * we would be creating a new CellPropertyRegistry. In this case the CellLabel's cell count would
+                 * be incorrect. We therefore access the CellLabel via mrCrypt.GetCellPropertyRegistry().
+                 */
+                cell_iter->AddCellProperty(mrCrypt.GetCellPropertyRegistry()->Get<CellLabel>());
             }
         }
     }
@@ -70,7 +76,7 @@ void AbstractCryptStatistics::LabelAllCellsAsHealthy()
          cell_iter != mrCrypt.End();
          ++cell_iter)
     {
-        cell_iter->SetMutationState(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        cell_iter->SetMutationState(mrCrypt.GetCellPropertyRegistry()->Get<WildTypeCellMutationState>());
         cell_iter->RemoveCellProperty<CellLabel>();
     }
 }

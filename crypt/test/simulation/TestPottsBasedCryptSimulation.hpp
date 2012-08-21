@@ -98,8 +98,9 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<SimpleWntCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), TRANSIT);
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
 
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);

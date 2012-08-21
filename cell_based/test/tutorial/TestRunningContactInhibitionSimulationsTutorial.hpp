@@ -99,6 +99,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MeshBasedCellPopulation.hpp"
 #include "StochasticDurationCellCycleModel.hpp"
 #include "WildTypeCellMutationState.hpp"
+#include "TransitCellProliferativeType.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "OutputFileHandler.hpp"
@@ -133,6 +134,7 @@ public:
         /* We then define the mutation state of the cells we are working with. We will just consider
          * wild type mutations here. */
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
 
         /* We now create a cell-cycle (only contact inhibited) model for these cells and loop over the
          * nodes of the mesh to create as many elements in the vector of cell pointers as there are
@@ -146,7 +148,7 @@ public:
             p_cycle_model->SetEquilibriumVolume(1.0);
 
             CellPtr p_cell(new Cell(p_state, p_cycle_model));
-            p_cell->SetCellProliferativeType(TRANSIT);
+            p_cell->SetCellProliferativeType(p_transit_type);
             p_cell->InitialiseCellCycleModel();
 
             cells.push_back(p_cell);
@@ -237,6 +239,8 @@ public:
         /* We again create the cells. The difference here is that one of the cells is not contact-inhibited, but rather
          * is defined by a {{{StochasticDurationCellCycleModel}}}. */
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
@@ -247,7 +251,7 @@ public:
                 p_cycle_model->SetStemCellG1Duration(1.0);
 
                 CellPtr p_cell(new Cell(p_state, p_cycle_model));
-                p_cell->SetCellProliferativeType(STEM);
+                p_cell->SetCellProliferativeType(p_stem_type);
                 p_cell->SetBirthTime(0.0);
                 cells.push_back(p_cell);
             }
@@ -260,7 +264,7 @@ public:
                 p_cycle_model->SetEquilibriumVolume(1.0);
 
                 CellPtr p_cell(new Cell(p_state, p_cycle_model));
-                p_cell->SetCellProliferativeType(TRANSIT);
+                p_cell->SetCellProliferativeType(p_transit_type);
                 p_cell->InitialiseCellCycleModel();
                 cells.push_back(p_cell);
             }
@@ -344,6 +348,7 @@ public:
          * We then create cells as before, only this time we need one per element. We also create the cell population (a {{{VertexBasedCellPopulation}}}).
          */
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<p_mesh->GetNumElements(); i++)
         {
@@ -354,7 +359,7 @@ public:
             p_cycle_model->SetEquilibriumVolume(1.0);
 
             CellPtr p_cell(new Cell(p_state, p_cycle_model));
-            p_cell->SetCellProliferativeType(TRANSIT);
+            p_cell->SetCellProliferativeType(p_transit_type);
             p_cell->InitialiseCellCycleModel();
             cells.push_back(p_cell);
         }

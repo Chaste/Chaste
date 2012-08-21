@@ -79,7 +79,6 @@ NodeBasedCellPopulationWithParticles<DIM>::NodeBasedCellPopulationWithParticles(
 {
 }
 
-
 template<unsigned DIM>
 std::vector<bool>& NodeBasedCellPopulationWithParticles<DIM>::rGetParticles()
 {
@@ -286,7 +285,7 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile()
             }
             if (this->mOutputCellProliferativeTypes)
             {
-                double cell_type = cell_iter->GetCellProliferativeType();
+                double cell_type = cell_iter->GetCellProliferativeType()->GetColour();
                 cell_types[node_index] = cell_type;
             }
             if (this->mOutputCellMutationStates)

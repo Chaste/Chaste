@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WntConcentration.hpp"
 #include "AbstractCentreBasedCellPopulation.hpp"
 #include "RandomNumberGenerator.hpp"
+#include "StemCellProliferativeType.hpp"
 
 template<unsigned DIM>
 CryptSimulationBoundaryCondition<DIM>::CryptSimulationBoundaryCondition(AbstractCellPopulation<DIM>* pCellPopulation)
@@ -81,7 +82,7 @@ void CryptSimulationBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::v
                  * If WntConcentration is not set up then stem cells must be pinned,
                  * so we reset the location of each stem cell.
                  */
-                if (cell_iter->GetCellProliferativeType() == STEM)
+                if (cell_iter->GetCellProliferativeType()->template IsType<StemCellProliferativeType>())
                 {
                     // Get old node location
                     c_vector<double, DIM> old_node_location = rOldLocations[node_index];

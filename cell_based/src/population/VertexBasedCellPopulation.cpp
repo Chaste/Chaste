@@ -537,7 +537,7 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         }
         if (this->mOutputCellProliferativeTypes)
         {
-            double cell_type = p_cell->GetCellProliferativeType();
+            double cell_type = p_cell->GetCellProliferativeType()->GetColour();
             cell_types[elem_index] = cell_type;
         }
         if (this->mOutputCellMutationStates)
@@ -630,14 +630,6 @@ void VertexBasedCellPopulation<DIM>::CloseOutputFiles()
 template<unsigned DIM>
 void VertexBasedCellPopulation<DIM>::GenerateCellResultsAndWriteToFiles()
 {
-    // Set up cell type counter
-    unsigned num_cell_types = this->mCellProliferativeTypeCount.size();
-    std::vector<unsigned> cell_type_counter(num_cell_types);
-    for (unsigned i=0; i<num_cell_types; i++)
-    {
-        cell_type_counter[i] = 0;
-    }
-
     // Set up cell cycle phase counter
     unsigned num_cell_cycle_phases = this->mCellCyclePhaseCount.size();
     std::vector<unsigned> cell_cycle_phase_counter(num_cell_cycle_phases);
@@ -650,10 +642,10 @@ void VertexBasedCellPopulation<DIM>::GenerateCellResultsAndWriteToFiles()
          cell_iter != this->End();
          ++cell_iter)
     {
-        this->GenerateCellResults(*cell_iter, cell_type_counter, cell_cycle_phase_counter);
+        this->GenerateCellResults(*cell_iter, cell_cycle_phase_counter);
     }
 
-    this->WriteCellResultsToFiles(cell_type_counter, cell_cycle_phase_counter);
+    this->WriteCellResultsToFiles(cell_cycle_phase_counter);
 }
 
 template<unsigned DIM>

@@ -94,14 +94,7 @@ MultipleCaBasedCellPopulation<DIM>::MultipleCaBasedCellPopulation(PottsMesh<DIM>
 template<unsigned DIM>
 MultipleCaBasedCellPopulation<DIM>::~MultipleCaBasedCellPopulation()
 {
-
-    // This is not needed unles we are de-serializing the cell population
-//    if (this->mDeleteMesh)
-//    {
-//        delete &this->mrMesh;
-//    }
 }
-
 
 template<unsigned DIM>
 std::vector<unsigned>& MultipleCaBasedCellPopulation<DIM>::rGetAvailableSpaces()
@@ -169,7 +162,7 @@ void MultipleCaBasedCellPopulation<DIM>::RemoveCellUsingLocationIndex(unsigned i
 
     mAvailableSpaces[index]++;
 
-    assert(mAvailableSpaces[index]<=mLatticeCarryingCapacity);
+    assert(mAvailableSpaces[index] <= mLatticeCarryingCapacity);
 }
 
 template<unsigned DIM>
@@ -264,17 +257,13 @@ unsigned MultipleCaBasedCellPopulation<DIM>::RemoveDeadCells()
 template<unsigned DIM>
 void MultipleCaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
 {
-    /*
-     * Iterate over cells \todo make this sweep random
-     */
+    // Iterate over cells
+    ///\todo make this sweep random
     for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
-             cell_iter != this->mCells.end();
-             ++cell_iter)
+         cell_iter != this->mCells.end();
+         ++cell_iter)
     {
-
-        /*
-         * Loop over neighbours and calculate probability of moving (make sure all probabilities are <1)
-         */
+        // Loop over neighbours and calculate probability of moving (make sure all probabilities are <1)
         unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
 
         // Find a random available neighbouring node to overwrite current site
@@ -284,7 +273,6 @@ void MultipleCaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
 
         if (!neighbouring_node_indices.empty())
         {
-            //neighbouring_node_indices_list.sort();
             unsigned num_neighbours = neighbouring_node_indices.size();
             double probability_of_not_moving = 1.0;
 
@@ -328,9 +316,7 @@ void MultipleCaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                 EXCEPTION("The probability of the cell not moving is smaller than zero. In order to prevent it from happening you should change your time step and parameters");
             }
 
-            /*
-             * Sample random number to specify which move to make
-             */
+            // Sample random number to specify which move to make
             RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
             double random_number = p_gen->ranf();
 
@@ -346,15 +332,13 @@ void MultipleCaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                     break;
                 }
             }
-            //If loop completes with total_probability < random_number then stay in the same location
+            // If loop completes with total_probability < random_number then stay in the same location
         }
         else
         {
             // Each node in the mesh must have at least one neighbour
             NEVER_REACHED;
         }
-
-
     }
 }
 
@@ -388,7 +372,6 @@ void MultipleCaBasedCellPopulation<DIM>::CloseOutputFiles()
 template<unsigned DIM>
 void MultipleCaBasedCellPopulation<DIM>::WriteResultsToFiles()
 {
-
     AbstractCellPopulation<DIM>::WriteResultsToFiles();
 
     SimulationTime* p_time = SimulationTime::Instance();
@@ -407,7 +390,6 @@ void MultipleCaBasedCellPopulation<DIM>::WriteResultsToFiles()
         *mpVizLocationsFile << node_index << " ";
     }
     *mpVizLocationsFile << "\n";
-
 }
 
 template<unsigned DIM>
@@ -447,21 +429,12 @@ template<unsigned DIM>
 double MultipleCaBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
 {
     double cell_volume = 1.0;
-
     return cell_volume;
 }
 
 template<unsigned DIM>
 void MultipleCaBasedCellPopulation<DIM>::GenerateCellResultsAndWriteToFiles()
 {
-    // Set up cell type counter
-    unsigned num_cell_types = this->mCellProliferativeTypeCount.size();
-    std::vector<unsigned> cell_type_counter(num_cell_types);
-    for (unsigned i=0; i<num_cell_types; i++)
-    {
-        cell_type_counter[i] = 0;
-    }
-
     // Set up cell cycle phase counter
     unsigned num_cell_cycle_phases = this->mCellCyclePhaseCount.size();
     std::vector<unsigned> cell_cycle_phase_counter(num_cell_cycle_phases);
@@ -474,18 +447,16 @@ void MultipleCaBasedCellPopulation<DIM>::GenerateCellResultsAndWriteToFiles()
          cell_iter != this->End();
          ++cell_iter)
     {
-        this->GenerateCellResults(*cell_iter, cell_type_counter, cell_cycle_phase_counter);
+        this->GenerateCellResults(*cell_iter, cell_cycle_phase_counter);
     }
 
-    this->WriteCellResultsToFiles(cell_type_counter, cell_cycle_phase_counter);
+    this->WriteCellResultsToFiles(cell_cycle_phase_counter);
 }
 
 template<unsigned DIM>
 double MultipleCaBasedCellPopulation<DIM>::GetWidth(const unsigned& rDimension)
 {
-    // Call GetWidth() on the mesh
     double width = this->mrMesh.GetWidth(rDimension);
-
     return width;
 }
 
@@ -541,58 +512,58 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile()
     std::vector<double> cell_cycle_phases(num_cells, -1.0);
     std::vector<Node<DIM>*> nodes;
 
-    unsigned cell = 0u;
+    unsigned cell = 0;
 
     for (std::list<CellPtr>::iterator iter = this->mCells.begin();
-            iter != this->mCells.end();
-            ++iter)
+         iter != this->mCells.end();
+         ++iter)
     {
-            CellPtr cell_ptr = *iter;
-            cell_ids[cell] = cell_ptr->GetCellId();
+        CellPtr cell_ptr = *iter;
+        cell_ids[cell] = cell_ptr->GetCellId();
 
-            c_vector<double, DIM> coords = GetLocationOfCellCentre(*iter);
+        c_vector<double, DIM> coords = GetLocationOfCellCentre(*iter);
 
-            // Move the coordinate slightly so that we can visualise all cells in a lattice site if there is more than one per site
-            if (mLatticeCarryingCapacity > 1)
+        // Move the coordinate slightly so that we can visualise all cells in a lattice site if there is more than one per site
+        if (mLatticeCarryingCapacity > 1)
+        {
+            RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
+
+            for (unsigned i=0; i<DIM; i++)
             {
-                RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
+                coords[i] += p_gen->ranf(); // This assumes that all sites are 1 apart
+            }
+        }
 
-                for (unsigned i=0; i<DIM; i++)
-                {
-                    coords[i] += p_gen->ranf(); // This assumes that all sites are 1 apart
-                }
-            }
+        nodes.push_back(new Node<DIM>(cell, coords, false));
 
-            nodes.push_back(new Node<DIM>(cell, coords, false));
+        if (this->mOutputCellAncestors)
+        {
+            double ancestor_index = (cell_ptr->GetAncestor() == UNSIGNED_UNSET) ? (-1.0) : (double)cell_ptr->GetAncestor();
+            cell_ancestors[cell] = ancestor_index;
+        }
+        if (this->mOutputCellProliferativeTypes)
+        {
+            cell_types[cell] = cell_ptr->GetCellProliferativeType()->GetColour();
+        }
+        if (this->mOutputCellMutationStates)
+        {
+            cell_mutation_states[cell] = cell_ptr->GetMutationState()->GetColour();
+        }
+        if (this->mOutputCellAges)
+        {
+            cell_ages[cell] = cell_ptr->GetAge();
+        }
+        if (this->mOutputCellCyclePhases)
+        {
+            cell_cycle_phases[cell] = cell_ptr->GetCellCycleModel()->GetCurrentCellCyclePhase();
+        }
 
-            if (this->mOutputCellAncestors)
-            {
-                double ancestor_index = (cell_ptr->GetAncestor() == UNSIGNED_UNSET) ? (-1.0) : (double)cell_ptr->GetAncestor();
-                cell_ancestors[cell] = ancestor_index;
-            }
-            if (this->mOutputCellProliferativeTypes)
-            {
-                cell_types[cell] =  cell_ptr->GetCellProliferativeType();
-            }
-            if (this->mOutputCellMutationStates)
-            {
-                cell_mutation_states[cell] = cell_ptr->GetMutationState()->GetColour();
-            }
-            if (this->mOutputCellAges)
-            {
-                cell_ages[cell] = cell_ptr->GetAge();
-            }
-            if (this->mOutputCellCyclePhases)
-            {
-                cell_cycle_phases[cell] = cell_ptr->GetCellCycleModel()->GetCurrentCellCyclePhase();
-            }
+        cell ++;
 
-            cell ++;
-
-            ///\todo #2032 Add CellData
+        ///\todo #2032 Add CellData
     }
 
-    //Cell IDs can be used to threshold out the empty lattice sites (which have ID=-1)
+    // Cell IDs can be used to threshold out the empty lattice sites (which have ID=-1)
     mesh_writer.AddPointData("Cell ids", cell_ids);
 
     if (this->mOutputCellProliferativeTypes)
@@ -615,7 +586,6 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile()
     {
         mesh_writer.AddPointData("Cycle phases", cell_cycle_phases);
     }
-
     if (this->mOutputCellMutationStates)
     {
         mesh_writer.AddPointData("Mutation states", cell_mutation_states);

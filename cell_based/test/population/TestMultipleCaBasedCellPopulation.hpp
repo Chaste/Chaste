@@ -123,8 +123,9 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, 3, DIFFERENTIATED);
+        cells_generator.GenerateBasicRandom(cells, 3, p_diff_type);
 
         std::vector<unsigned> location_indices;
 
@@ -132,7 +133,7 @@ public:
         TS_ASSERT_THROWS_THIS(MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 2),
             "No location indices being passed. Specify where cells lie before creating the cell population.");
 
-        cells_generator.GenerateBasicRandom(cells, 3, DIFFERENTIATED);
+        cells_generator.GenerateBasicRandom(cells, 3, p_diff_type);
 
         // Specify where cells lie
         location_indices.push_back(0);
@@ -143,7 +144,7 @@ public:
         TS_ASSERT_THROWS_THIS(MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 2),
             "One of the lattice sites has more cells than the carrying capacity. Check the initial cell locations.");
 
-        cells_generator.GenerateBasicRandom(cells, 3, DIFFERENTIATED);
+        cells_generator.GenerateBasicRandom(cells, 3, p_diff_type);
 
            // Change the initial cell location to avoid the above exception
         location_indices[2] = 1u;
@@ -152,7 +153,7 @@ public:
         TS_ASSERT_THROWS_THIS(MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 2, false, true),
             "There is no validation for MultipleCaBasedCellPopulation.");
 
-        cells_generator.GenerateBasicRandom(cells, 3, DIFFERENTIATED);
+        cells_generator.GenerateBasicRandom(cells, 3, p_diff_type);
 
         // Create cell population
         MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 2);
@@ -417,9 +418,10 @@ public:
 
         // Create a new cell
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_new_cell(new Cell(p_state, p_model));
-        p_new_cell->SetCellProliferativeType(STEM);
+        p_new_cell->SetCellProliferativeType(p_stem_type);
 
         // Add new cell to the cell population by dividing the cell
         AbstractCellPopulation<2>::Iterator cell_iter_1 = cell_population.Begin();
@@ -475,9 +477,10 @@ public:
 
         // Create a new cell
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_new_cell(new Cell(p_state, p_model));
-        p_new_cell->SetCellProliferativeType(STEM);
+        p_new_cell->SetCellProliferativeType(p_stem_type);
 
         // Add new cell to the cell population by dividing the cell
         AbstractCellPopulation<2>::Iterator cell_iter_1 = cell_population.Begin();

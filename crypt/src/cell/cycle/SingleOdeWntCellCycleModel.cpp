@@ -35,6 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "UblasIncludes.hpp"
 #include "SingleOdeWntCellCycleModel.hpp"
+#include "TransitCellProliferativeType.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 
 SingleOdeWntCellCycleModel::SingleOdeWntCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : CellCycleModelOdeHandler(DOUBLE_UNSET, pOdeSolver),
@@ -141,13 +143,27 @@ void SingleOdeWntCellCycleModel::ChangeCellProliferativeTypeDueToCurrentBetaCate
     assert(mpOdeSystem != NULL);
     assert(mpCell != NULL);
 
-    CellProliferativeType cell_type = TRANSIT;
     if (GetBetaCateninConcentration() < GetBetaCateninDivisionThreshold())
     {
-        cell_type = DIFFERENTIATED;
+        /*
+         * This method is usually called within a CellBasedSimulation, after the CellPopulation
+         * has called CellPropertyRegistry::TakeOwnership(). This means that were we to call
+         * CellPropertyRegistry::Instance() here when setting the CellProliferativeType, we
+         * would be creating a new CellPropertyRegistry. In this case the cell proliferative
+         * type counts, as returned by AbstractCellPopulation::GetCellProliferativeTypeCount(),
+         * would be incorrect. We must therefore access the CellProliferativeType via the cell's
+         * CellPropertyCollection.
+         */
+        boost::shared_ptr<AbstractCellProperty> p_diff_type =
+            mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<DifferentiatedCellProliferativeType>();
+        mpCell->SetCellProliferativeType(p_diff_type);
     }
-
-    mpCell->SetCellProliferativeType(cell_type);
+    else
+    {
+        boost::shared_ptr<AbstractCellProperty> p_transit_type =
+            mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<TransitCellProliferativeType>();
+        mpCell->SetCellProliferativeType(p_transit_type);
+    }
 }
 
 double SingleOdeWntCellCycleModel::GetBetaCateninConcentration()

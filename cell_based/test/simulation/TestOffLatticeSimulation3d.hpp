@@ -225,6 +225,8 @@ public:
         std::vector<unsigned> location_indices;
 
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
+
         for (unsigned i=0; i<num_nodes; i++)
         {
             c_vector<double, 3> node_location = p_mesh->GetNode(i)->rGetLocation();
@@ -249,7 +251,7 @@ public:
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetGeneration(0);
             CellPtr p_cell(new Cell(p_state, p_model));
-            p_cell->SetCellProliferativeType(STEM);
+            p_cell->SetCellProliferativeType(p_stem_type);
             p_cell->SetBirthTime(-RandomNumberGenerator::Instance()->ranf()*
                                  (p_model->GetStemCellG1Duration() + p_model->GetSG2MDuration()));
 

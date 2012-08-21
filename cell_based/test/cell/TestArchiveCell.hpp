@@ -53,6 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ApcTwoHitCellMutationState.hpp"
 #include "ApcOneHitCellMutationState.hpp"
 #include "DefaultCellProliferativeType.hpp"
+#include "StemCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
 
 /*
@@ -75,6 +76,7 @@ public:
 
             // Create mutation state
             boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+            boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
 
             // Create cell-cycle model
             FixedDurationGenerationBasedCellCycleModel* p_cell_model = new FixedDurationGenerationBasedCellCycleModel();
@@ -86,7 +88,7 @@ public:
 
             // Create cell
             CellPtr p_cell(new Cell(p_healthy_state, p_cell_model, false, collection));
-            p_cell->SetCellProliferativeType(STEM);
+            p_cell->SetCellProliferativeType(p_type);
             p_cell->InitialiseCellCycleModel();
             p_simulation_time->IncrementTimeOneStep();
 
@@ -120,9 +122,9 @@ public:
                 bool is_ancestor = (*it)->IsType<CellAncestor>();
                 bool is_cellid = (*it)->IsType<CellId>();
                 bool is_data = (*it)->IsType<CellData>();
-                bool is_default = (*it)->IsType<DefaultCellProliferativeType>();
+                bool is_stem = (*it)->IsType<StemCellProliferativeType>();
 
-                bool is_any_of_above = is_wildtype || is_label || is_ancestor || is_cellid || is_data || is_default;
+                bool is_any_of_above = is_wildtype || is_label || is_ancestor || is_cellid || is_data || is_stem;
                 TS_ASSERT_EQUALS(is_any_of_above, true);
             }
 
@@ -164,7 +166,7 @@ public:
 
             TS_ASSERT_EQUALS(p_cell->GetAge(), 0.5);
             TS_ASSERT_EQUALS(static_cast<FixedDurationGenerationBasedCellCycleModel*>(p_cell->GetCellCycleModel())->GetGeneration(), 0u);
-            TS_ASSERT_EQUALS(p_cell->GetCellProliferativeType(), STEM);
+            TS_ASSERT_EQUALS(p_cell->GetCellProliferativeType()->IsType<StemCellProliferativeType>(), true);
 
             AbstractCellCycleModel* p_model = p_cell->GetCellCycleModel();
             TS_ASSERT_EQUALS(p_model->GetCell(), p_cell);
@@ -190,9 +192,9 @@ public:
                 bool is_ancestor = (*it)->IsType<CellAncestor>();
                 bool is_cellid = (*it)->IsType<CellId>();
                 bool is_data = (*it)->IsType<CellData>();
-                bool is_default = (*it)->IsType<DefaultCellProliferativeType>();
+                bool is_stem = (*it)->IsType<StemCellProliferativeType>();
 
-                bool is_any_of_above = is_wildtype || is_label || is_ancestor || is_cellid || is_data || is_default;
+                bool is_any_of_above = is_wildtype || is_label || is_ancestor || is_cellid || is_data || is_stem;
                 TS_ASSERT_EQUALS(is_any_of_above, true);
             }
         }

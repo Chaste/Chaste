@@ -86,6 +86,7 @@ public:
         // Create some cells
         std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
@@ -99,7 +100,7 @@ public:
             {
                 p_cell->SetBirthTime(-10.0);
             }
-            p_cell->SetCellProliferativeType(STEM);
+            p_cell->SetCellProliferativeType(p_stem_type);
             cells.push_back(p_cell);
         }
 
@@ -268,11 +269,12 @@ public:
         // Create some cells
         std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             CellPtr p_cell(new Cell(p_state, p_model));
-            p_cell->SetCellProliferativeType(STEM);
+            p_cell->SetCellProliferativeType(p_stem_type);
             p_cell->SetBirthTime(-10.0);
             cells.push_back(p_cell);
         }
@@ -350,12 +352,13 @@ public:
 
             std::vector<CellPtr> cells;
             boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+            boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
             for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {
                 FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
                 CellPtr p_cell(new Cell(p_state, p_model));
-                p_cell->SetCellProliferativeType(STEM);
+                p_cell->SetCellProliferativeType(p_stem_type);
                 p_cell->SetBirthTime(-50.0);
                 cells.push_back(p_cell);
             }
@@ -410,6 +413,8 @@ private:
     {
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         boost::shared_ptr<AbstractCellMutationState> p_apc2(new ApcTwoHitCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
+
         for (unsigned i=0; i<rLocationIndices.size(); i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
@@ -424,7 +429,7 @@ private:
                 p_cell.reset(new Cell(p_state, p_model));
             }
             p_cell->SetBirthTime(-10);
-            p_cell->SetCellProliferativeType(STEM);
+            p_cell->SetCellProliferativeType(p_stem_type);
             rCells.push_back(p_cell);
         }
     }

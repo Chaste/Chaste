@@ -136,11 +136,12 @@ public:
         std::set<unsigned> ghost_indices = crypt.GetGhostNodeIndices();
         TS_ASSERT_EQUALS(number_of_cells + ghost_indices.size(), number_of_nodes);
 
-        std::vector<unsigned> cell_type_count = crypt.rGetCellProliferativeTypeCount();
-        TS_ASSERT_EQUALS(cell_type_count.size(), 3u);
+        std::vector<unsigned> cell_type_count = crypt.GetCellProliferativeTypeCount();
+        TS_ASSERT_EQUALS(cell_type_count.size(), 4u);
         TS_ASSERT_EQUALS(cell_type_count[0], 6u);   // Stem
         TS_ASSERT_EQUALS(cell_type_count[1], 23u);  // Transit
         TS_ASSERT_EQUALS(cell_type_count[2], 34u);  // Differentiated
+        TS_ASSERT_EQUALS(cell_type_count[3], 0u);   // Default
     }
 
     void TestMonolayer() throw (Exception)
@@ -189,11 +190,12 @@ public:
         std::set<unsigned> ghost_indices = crypt.GetGhostNodeIndices();
         TS_ASSERT_EQUALS(number_of_cells + ghost_indices.size(), number_of_nodes);
 
-        std::vector<unsigned> cell_type_count = crypt.rGetCellProliferativeTypeCount();
-        TS_ASSERT_EQUALS(cell_type_count.size(), 3u);
+        std::vector<unsigned> cell_type_count = crypt.GetCellProliferativeTypeCount();
+        TS_ASSERT_EQUALS(cell_type_count.size(), 4u);
         TS_ASSERT_EQUALS(cell_type_count[0], 0u);   // Stem
         TS_ASSERT_EQUALS(cell_type_count[1], 32u);  // Transit
         TS_ASSERT_EQUALS(cell_type_count[2], 36u);  // Differentiated
+        TS_ASSERT_EQUALS(cell_type_count[3], 0u);   // Default
 
         TS_ASSERT_EQUALS(crypt.GetVoronoiTessellation()->GetNumElements(), number_of_nodes);
         TS_ASSERT_EQUALS(crypt.GetVoronoiTessellation()->GetNumNodes(), 278u);
@@ -225,36 +227,34 @@ public:
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<num_cells; i++)
         {
-            CellProliferativeType cell_type;
-            unsigned generation;
-            double birth_time;
-
-            if (location_indices[i]==27) // middle of bottom row of cells
-            {
-                cell_type = STEM;
-                generation = 0;
-                birth_time = -1;
-            }
-            else
-            {
-                cell_type = DIFFERENTIATED;
-                generation = 4;
-                birth_time = -1; //hours
-            }
-
             MAKE_PTR(WildTypeCellMutationState, p_state);
+            MAKE_PTR(StemCellProliferativeType, p_stem_type);
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+
+            unsigned generation = 4;
+            if (location_indices[i] == 27) // middle of bottom row of cells
+            {
+                generation = 0;
+            }
             p_model->SetGeneration(generation);
 
-            // Check the stem cell cycle time is still 24 hrs, otherwise
-            // this test might not pass
+            // Check the stem cell cycle time is still 24 hrs, otherwise this test might not pass
             //TS_ASSERT_DELTA(p_model->GetStemCellG1Duration(), 14, 1e-12); //These lines may trip up the Intel compiler with heavy optimization - don't know why?
             //TS_ASSERT_DELTA(p_model->GetTransitCellG1Duration(), 2, 1e-12);
             TS_ASSERT_DELTA(p_model->GetSG2MDuration(), 10, 1e-12);
 
             CellPtr p_cell(new Cell(p_state, p_model));
-            p_cell->SetCellProliferativeType(cell_type);
-            p_cell->SetBirthTime(birth_time);
+
+            p_cell->SetCellProliferativeType(p_diff_type);
+            if (location_indices[i] == 27) // middle of bottom row of cells
+            {
+                p_cell->SetCellProliferativeType(p_stem_type);
+            }
+
+            p_cell->SetBirthTime(-1.0);
+
             cells.push_back(p_cell);
         }
 
@@ -286,17 +286,15 @@ public:
              cell_iter != crypt.End();
              ++cell_iter)
         {
-            CellProliferativeType type = cell_iter->GetCellProliferativeType();
-
-            if (type==STEM)
+            if (cell_iter->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
             {
                 num_stem++;
             }
-            else if (type==TRANSIT)
+            else if (cell_iter->GetCellProliferativeType()->IsType<TransitCellProliferativeType>())
             {
                 num_transit++;
             }
-            else if (type==DIFFERENTIATED)
+            else if (cell_iter->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>())
             {
                 num_differentiated++;
             }

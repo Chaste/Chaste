@@ -34,6 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "TysonNovakCellCycleModel.hpp"
+#include "StemCellProliferativeType.hpp"
+#include "TransitCellProliferativeType.hpp"
 
 TysonNovakCellCycleModel::TysonNovakCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : AbstractOdeBasedCellCycleModel(SimulationTime::Instance()->GetTime(), pOdeSolver)
@@ -92,9 +94,20 @@ void TysonNovakCellCycleModel::ResetForDivision()
 
 void TysonNovakCellCycleModel::InitialiseDaughterCell()
 {
-    if (mpCell->GetCellProliferativeType() == STEM)
+    if (mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
     {
-        mpCell->SetCellProliferativeType(TRANSIT);
+        /*
+         * This method is usually called within a CellBasedSimulation, after the CellPopulation
+         * has called CellPropertyRegistry::TakeOwnership(). This means that were we to call
+         * CellPropertyRegistry::Instance() here when setting the CellProliferativeType, we
+         * would be creating a new CellPropertyRegistry. In this case the cell proliferative
+         * type counts, as returned by AbstractCellPopulation::GetCellProliferativeTypeCount(),
+         * would be incorrect. We must therefore access the CellProliferativeType via the cell's
+         * CellPropertyCollection.
+         */
+        boost::shared_ptr<AbstractCellProperty> p_transit_type =
+            mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<TransitCellProliferativeType>();
+        mpCell->SetCellProliferativeType(p_transit_type);
     }
 }
 

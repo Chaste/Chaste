@@ -69,8 +69,8 @@ public:
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
-        mesh.SetCellRadius(0u,1.0);
-        mesh.SetCellRadius(1u,1.0);
+        mesh.SetCellRadius(0, 1.0);
+        mesh.SetCellRadius(1, 1.0);
 
         // Create cells
         std::vector<CellPtr> cells;

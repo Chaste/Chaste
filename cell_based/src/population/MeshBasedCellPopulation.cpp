@@ -527,7 +527,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile()
             }
             if (this->mOutputCellProliferativeTypes)
             {
-                cell_types[node_index] = cell_iter->GetCellProliferativeType();
+                cell_types[node_index] = cell_iter->GetCellProliferativeType()->GetColour();
             }
             if (this->mOutputCellMutationStates)
             {
@@ -627,7 +627,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile()
             }
             if (this->mOutputCellProliferativeTypes)
             {
-                cell_types[elem_index] = p_cell->GetCellProliferativeType();
+                cell_types[elem_index] = p_cell->GetCellProliferativeType()->GetColour();
             }
             if (this->mOutputCellMutationStates)
             {
@@ -1283,7 +1283,6 @@ double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetRestLength(unsigned in
         return 1.0;
     }
 }
-
 
 /////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation

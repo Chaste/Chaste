@@ -58,7 +58,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NumericFileComparison.hpp"
 #include "CellBasedEventHandler.hpp"
 #include "WildTypeCellMutationState.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 #include "OffLatticeSimulationWithMyStoppingEvent.hpp"
+#include "TransitCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
 
@@ -91,8 +93,9 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), TRANSIT);
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_transit_type);
 
         // Create a cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
@@ -133,7 +136,7 @@ public:
         NumericFileComparison division_locations(division_locations_file, "cell_based/test/data/TestOutputNodeVelocitiesAndDivisionLocations/divisions.dat");
         TS_ASSERT(division_locations.CompareFiles(1e-2));
 
-        // Test vtk files exist.
+        // Test vtk files exist
 #ifdef CHASTE_VTK
         std::string results_dir = handler.GetOutputDirectoryFullPath();
 
@@ -158,8 +161,9 @@ public:
 
         // Create a differentiated cell for each non-ghost node
         std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, location_indices.size(), location_indices, DIFFERENTIATED);
+        cells_generator.GenerateBasic(cells, location_indices.size(), location_indices, p_diff_type);
 
         for (unsigned i=0; i<cells.size(); i++)
         {
@@ -280,8 +284,9 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(),TRANSIT);
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_transit_type);
 
         // Create a cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
@@ -396,8 +401,9 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(),DIFFERENTIATED);
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_diff_type);
 
         // Create a cell population
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
@@ -632,7 +638,6 @@ public:
 
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            CellProliferativeType cell_type;
             unsigned generation;
             double y = 0.0;
 
@@ -647,46 +652,54 @@ public:
             double typical_transit_cycle_time = p_cell_cycle_model->GetAverageTransitCellCycleTime();
             double typical_stem_cycle_time = p_cell_cycle_model->GetAverageStemCellCycleTime();
 
-            double birth_time = 0.0;
-            birth_time = -p_random_num_gen->ranf();
+            boost::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+            boost::shared_ptr<AbstractCellProperty> p_stem_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+            boost::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
+            boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
+
+            CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
+
+            double birth_time = -p_random_num_gen->ranf();
 
             if (y <= 0.3)
             {
-                cell_type = STEM;
+                p_cell->SetCellProliferativeType(p_stem_type);
                 generation = 0;
                 birth_time *= typical_stem_cycle_time; // hours
             }
             else if (y < 2.0)
             {
-                cell_type = TRANSIT;
+                p_cell->SetCellProliferativeType(p_transit_type);
                 generation = 1;
                 birth_time *= typical_transit_cycle_time; // hours
             }
             else if (y < 3.0)
             {
-                cell_type = TRANSIT;
+                p_cell->SetCellProliferativeType(p_transit_type);
                 generation = 2;
                 birth_time *= typical_transit_cycle_time; // hours
             }
             else if (y < 4.0)
             {
-                cell_type = TRANSIT;
+                p_cell->SetCellProliferativeType(p_transit_type);
                 generation = 3;
                 birth_time *= typical_transit_cycle_time; // hours
             }
             else
             {
-                cell_type = p_cell_cycle_model->CanCellTerminallyDifferentiate() ? DIFFERENTIATED : TRANSIT;
+                if (p_cell_cycle_model->CanCellTerminallyDifferentiate())
+                {
+                    p_cell->SetCellProliferativeType(p_diff_type);
+                }
+                else
+                {
+                    p_cell->SetCellProliferativeType(p_transit_type);
+                }
                 generation = 4;
                 birth_time *= typical_transit_cycle_time; // hours
             }
 
             p_cell_cycle_model->SetGeneration(generation);
-
-            boost::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-
-            CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
-            p_cell->SetCellProliferativeType(cell_type);
             p_cell->SetBirthTime(birth_time);
 
             if (std::find(location_indices.begin(), location_indices.end(), i) != location_indices.end())
@@ -730,8 +743,9 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, location_indices.size(), TRANSIT);
+        cells_generator.GenerateBasicRandom(cells, location_indices.size(), p_transit_type);
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
@@ -917,8 +931,9 @@ public:
 
         // Create some cells
         std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), DIFFERENTIATED);
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_diff_type);
 
         // Create a mesh-based cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
@@ -932,6 +947,85 @@ public:
         simulator.SetEndTime(1.0);
         TS_ASSERT_THROWS_THIS(simulator.Solve(),
                 "End time and number of timesteps already setup. You should not use SimulationTime::SetEndTimeAndNumberOfTimeSteps in cell-based tests.");
+    }
+
+    void TestCellProliferativeTypeCounts() throw(Exception)
+    {
+        // Create a simple mesh
+        HoneycombMeshGenerator generator(5, 5, 0);
+        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes());
+
+        // Create a cell population
+        MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.SetOutputCellMutationStates(true);
+        cell_population.SetOutputCellProliferativeTypes(true);
+
+        // Test we have the correct cell mutation state counts
+        CellPropertyRegistry* p_registry_before_solve = cell_population.Begin()->rGetCellPropertyCollection().GetCellPropertyRegistry();
+        TS_ASSERT_EQUALS(p_registry_before_solve->Get<WildTypeCellMutationState>()->GetCellCount(), 25u);
+        TS_ASSERT_EQUALS(p_registry_before_solve->Get<ApcOneHitCellMutationState>()->GetCellCount(), 0u);
+        TS_ASSERT_EQUALS(p_registry_before_solve->Get<ApcTwoHitCellMutationState>()->GetCellCount(), 0u);
+        TS_ASSERT_EQUALS(p_registry_before_solve->Get<BetaCateninOneHitCellMutationState>()->GetCellCount(), 0u);
+
+        std::vector<unsigned> mutation_state_count_before_solve = cell_population.GetCellMutationStateCount();
+        TS_ASSERT_EQUALS(mutation_state_count_before_solve.size(), 4u);
+        TS_ASSERT_EQUALS(mutation_state_count_before_solve[0], 25u);
+        TS_ASSERT_EQUALS(mutation_state_count_before_solve[1], 0u);
+        TS_ASSERT_EQUALS(mutation_state_count_before_solve[2], 0u);
+        TS_ASSERT_EQUALS(mutation_state_count_before_solve[3], 0u);
+
+        // Test we have the correct cell proliferative type counts
+        TS_ASSERT_EQUALS(p_registry_before_solve->Get<StemCellProliferativeType>()->GetCellCount(), 25u);
+        TS_ASSERT_EQUALS(p_registry_before_solve->Get<TransitCellProliferativeType>()->GetCellCount(), 0u);
+        TS_ASSERT_EQUALS(p_registry_before_solve->Get<DifferentiatedCellProliferativeType>()->GetCellCount(), 0u);
+        TS_ASSERT_EQUALS(p_registry_before_solve->Get<DefaultCellProliferativeType>()->GetCellCount(), 0u);
+
+        std::vector<unsigned> prolif_type_count_before_solve = cell_population.GetCellProliferativeTypeCount();
+        TS_ASSERT_EQUALS(prolif_type_count_before_solve.size(), 4u);
+        TS_ASSERT_EQUALS(prolif_type_count_before_solve[0], 25u);
+        TS_ASSERT_EQUALS(prolif_type_count_before_solve[1], 0u);
+        TS_ASSERT_EQUALS(prolif_type_count_before_solve[2], 0u);
+        TS_ASSERT_EQUALS(prolif_type_count_before_solve[3], 0u);
+
+        // Set up simulation
+        OffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestCellProliferativeTypeCounts");
+        simulator.SetEndTime(0.5);
+
+        // Run simulation
+        simulator.Solve();
+
+        // Test we still have the correct cell mutation state counts
+        CellPropertyRegistry* p_registry_after_solve = cell_population.Begin()->rGetCellPropertyCollection().GetCellPropertyRegistry();
+        TS_ASSERT_EQUALS(p_registry_after_solve->Get<WildTypeCellMutationState>()->GetCellCount(), 25u);
+        TS_ASSERT_EQUALS(p_registry_after_solve->Get<ApcOneHitCellMutationState>()->GetCellCount(), 0u);
+        TS_ASSERT_EQUALS(p_registry_after_solve->Get<ApcTwoHitCellMutationState>()->GetCellCount(), 0u);
+        TS_ASSERT_EQUALS(p_registry_after_solve->Get<BetaCateninOneHitCellMutationState>()->GetCellCount(), 0u);
+
+        std::vector<unsigned> mutation_state_count_after_solve = simulator.rGetCellPopulation().GetCellMutationStateCount();
+        TS_ASSERT_EQUALS(mutation_state_count_after_solve.size(), 4u);
+        TS_ASSERT_EQUALS(mutation_state_count_after_solve[0], 25u);
+        TS_ASSERT_EQUALS(mutation_state_count_after_solve[1], 0u);
+        TS_ASSERT_EQUALS(mutation_state_count_after_solve[2], 0u);
+        TS_ASSERT_EQUALS(mutation_state_count_after_solve[3], 0u);
+
+        // Test we still have the correct cell proliferative type counts
+        TS_ASSERT_EQUALS(p_registry_after_solve->Get<StemCellProliferativeType>()->GetCellCount(), 25u);
+        TS_ASSERT_EQUALS(p_registry_after_solve->Get<TransitCellProliferativeType>()->GetCellCount(), 0u);
+        TS_ASSERT_EQUALS(p_registry_after_solve->Get<DifferentiatedCellProliferativeType>()->GetCellCount(), 0u);
+        TS_ASSERT_EQUALS(p_registry_after_solve->Get<DefaultCellProliferativeType>()->GetCellCount(), 0u);
+
+        std::vector<unsigned> prolif_type_count_after_solve = simulator.rGetCellPopulation().GetCellProliferativeTypeCount();
+        TS_ASSERT_EQUALS(prolif_type_count_after_solve.size(), 4u);
+        TS_ASSERT_EQUALS(prolif_type_count_after_solve[0], 25u);
+        TS_ASSERT_EQUALS(prolif_type_count_after_solve[1], 0u);
+        TS_ASSERT_EQUALS(prolif_type_count_after_solve[2], 0u);
+        TS_ASSERT_EQUALS(prolif_type_count_after_solve[3], 0u);
     }
 };
 

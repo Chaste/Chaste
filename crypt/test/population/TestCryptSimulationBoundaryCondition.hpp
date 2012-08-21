@@ -179,7 +179,7 @@ public:
         AbstractCellPopulation<1>::Iterator cell_iter = crypt.Begin();
 
         // Check is a stem cell
-        TS_ASSERT_EQUALS(cell_iter->GetCellProliferativeType(), STEM);
+        TS_ASSERT_EQUALS(cell_iter->GetCellProliferativeType()->IsType<StemCellProliferativeType>(), true);
 
         // Check initially at x=0
         TS_ASSERT_DELTA(crypt.GetLocationOfCellCentre(*cell_iter)[0], 0.0, 1e-6);
@@ -272,6 +272,7 @@ public:
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         std::vector<CellPtr> cells;
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
@@ -290,9 +291,9 @@ public:
 
         // Also move the second cell (which should be on y=0, and we make a transit cell)
         ++cell_iter;
-        TS_ASSERT_EQUALS(cell_iter->GetCellProliferativeType(), STEM);
-        cell_iter->SetCellProliferativeType(TRANSIT);
-        TS_ASSERT_EQUALS(cell_iter->GetCellProliferativeType(), TRANSIT);
+        TS_ASSERT_EQUALS(cell_iter->GetCellProliferativeType()->IsType<StemCellProliferativeType>(), true);
+        cell_iter->SetCellProliferativeType(p_transit_type);
+        TS_ASSERT_EQUALS(cell_iter->GetCellProliferativeType()->IsType<TransitCellProliferativeType>(), true);
         TS_ASSERT_DELTA(crypt.GetLocationOfCellCentre(*cell_iter)[1], 0.0, 1e-6);
         crypt.GetNode(1)->rGetModifiableLocation()[1] = -0.1;
         TS_ASSERT_LESS_THAN(crypt.GetLocationOfCellCentre(*cell_iter)[1], 0.0);

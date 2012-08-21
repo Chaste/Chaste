@@ -35,6 +35,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractSimpleCellCycleModel.hpp"
 #include "Exception.hpp"
+#include "StemCellProliferativeType.hpp"
+#include "TransitCellProliferativeType.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 
 AbstractSimpleCellCycleModel::AbstractSimpleCellCycleModel()
 {
@@ -59,19 +62,21 @@ void AbstractSimpleCellCycleModel::SetG1Duration()
 {
     assert(mpCell != NULL);
 
-    switch (mpCell->GetCellProliferativeType())
+    if (mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
     {
-        case STEM:
-            mG1Duration = GetStemCellG1Duration();
-            break;
-        case TRANSIT:
-            mG1Duration = GetTransitCellG1Duration();
-            break;
-        case DIFFERENTIATED:
-            mG1Duration = DBL_MAX;
-            break;
-        default:
-            NEVER_REACHED;
+        mG1Duration = GetStemCellG1Duration();
+    }
+    else if (mpCell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>())
+    {
+        mG1Duration = GetTransitCellG1Duration();
+    }
+    else if (mpCell->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>())
+    {
+        mG1Duration = DBL_MAX;
+    }
+    else
+    {
+        NEVER_REACHED;
     }
 }
 
@@ -87,7 +92,7 @@ void AbstractSimpleCellCycleModel::UpdateCellCyclePhase()
     double time_since_birth = GetAge();
     assert(time_since_birth >= 0);
 
-    if (mpCell->GetCellProliferativeType() == DIFFERENTIATED)
+    if (mpCell->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>())
     {
         mCurrentCellCyclePhase = G_ZERO_PHASE;
     }

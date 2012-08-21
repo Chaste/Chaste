@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ContactInhibitionCellCycleModel.hpp"
 #include "CellLabel.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 
 ContactInhibitionCellCycleModel::ContactInhibitionCellCycleModel()
     : AbstractSimpleCellCycleModel(),
@@ -69,7 +70,17 @@ void ContactInhibitionCellCycleModel::UpdateCellCyclePhase()
             // Update the duration of the current period of contact inhibition.
             mCurrentQuiescentDuration = SimulationTime::Instance()->GetTime() - mCurrentQuiescentOnsetTime;
             mG1Duration += dt;
-            mpCell->AddCellProperty(CellPropertyRegistry::Instance()->Get<CellLabel>());
+
+            /*
+             * This method is usually called within a CellBasedSimulation, after the CellPopulation
+             * has called CellPropertyRegistry::TakeOwnership(). This means that were we to call
+             * CellPropertyRegistry::Instance() here when adding the CellLabel, we would be creating
+             * a new CellPropertyRegistry. In this case the CellLabel's cell count would be incorrect.
+             * We must therefore access the CellLabel via the cell's CellPropertyCollection.
+             */
+            boost::shared_ptr<AbstractCellProperty> p_label =
+                mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<CellLabel>();
+            mpCell->AddCellProperty(p_label);
         }
         else
         {
@@ -82,7 +93,7 @@ void ContactInhibitionCellCycleModel::UpdateCellCyclePhase()
     double time_since_birth = GetAge();
     assert(time_since_birth >= 0);
 
-    if (mpCell->GetCellProliferativeType()==DIFFERENTIATED)
+    if (mpCell->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>())
     {
         mCurrentCellCyclePhase = G_ZERO_PHASE;
     }

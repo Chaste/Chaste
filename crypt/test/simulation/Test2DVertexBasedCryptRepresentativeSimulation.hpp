@@ -79,6 +79,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
             SimpleWntCellCycleModel* p_model = new SimpleWntCellCycleModel;
@@ -89,7 +90,7 @@ public:
                                                 + p_model->GetSG2MDuration() );
 
             CellPtr p_cell(new Cell(p_state, p_model));
-            p_cell->SetCellProliferativeType(TRANSIT);
+            p_cell->SetCellProliferativeType(p_transit_type);
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
         }

@@ -84,6 +84,7 @@ public:
 
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         for (unsigned i=0; i<location_indices.size(); i++)
         {
             SimpleWntCellCycleModel* p_model = new SimpleWntCellCycleModel;
@@ -91,7 +92,7 @@ public:
             p_model->SetWntStemThreshold(0.95);
 
             CellPtr p_cell(new Cell(p_state, p_model));
-            p_cell->SetCellProliferativeType(TRANSIT);
+            p_cell->SetCellProliferativeType(p_transit_type);
 
             p_cell->InitialiseCellCycleModel();
             double birth_time = - RandomNumberGenerator::Instance()->ranf()*

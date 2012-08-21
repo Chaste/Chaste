@@ -137,7 +137,17 @@ void SimpleOxygenBasedCellCycleModel::UpdateHypoxicDuration()
         double prob_of_death = 0.9 - 0.5*(oxygen_concentration/mHypoxicConcentration);
         if (mCurrentHypoxicDuration > mCriticalHypoxicDuration && RandomNumberGenerator::Instance()->ranf() < prob_of_death)
         {
-            mpCell->AddCellProperty(CellPropertyRegistry::Instance()->Get<ApoptoticCellProperty>());
+            /*
+             * This method is usually called within a CellBasedSimulation, after the CellPopulation
+             * has called CellPropertyRegistry::TakeOwnership(). This means that were we to call
+             * CellPropertyRegistry::Instance() here when adding the ApoptoticCellProperty, we would
+             * be creating a new CellPropertyRegistry. In this case the ApoptoticCellProperty cell
+             * count would be incorrect. We must therefore access the ApoptoticCellProperty via the
+             * cell's CellPropertyCollection.
+             */
+            boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
+                mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
+            mpCell->AddCellProperty(p_apoptotic_property);
         }
     }
     else

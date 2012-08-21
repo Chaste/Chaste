@@ -74,6 +74,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Chaste tutorials. */
 #include "CellsGenerator.hpp"
 #include "OffLatticeSimulation.hpp"
+#include "TransitCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
 /* The next header file defines the cell cycle model. */
 #include "StochasticDurationCellCycleModel.hpp"
@@ -123,10 +124,11 @@ public:
         * and the dimension. We create an empty vector of cells and pass this into the
         * method along with the mesh. The second argument represents the size of that the vector
         * {{{cells}}} should become - one cell for each element, the third argument specifies
-        * the proliferative type of the cell STEM, TRANSIT or DIFFERENTIATED. */
+        * the proliferative type of the cell. */
         std::vector<CellPtr> cells;
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(),TRANSIT);
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
 
         /* Now we have a mesh and a set of cells to go with it, we can create a {{{CellPopulation}}}.
         * In general, this class associates a collection of cells with a mesh.
@@ -198,8 +200,9 @@ public:
         /* Having created a mesh, we now create a {{{std::vector}}} of {{{CellPtr}}}s.
         * This is exactly the same as the above test. */
         std::vector<CellPtr> cells;
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(),TRANSIT);
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
 
         /* Now we have a mesh and a set of cells to go with it, we can create a {{{CellPopulation}}}.
          * This is also the same as in the above test.

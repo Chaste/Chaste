@@ -166,11 +166,12 @@ public:
         // so the age = node_index
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
         for (unsigned i=0; i<mesh.GetNumNodes()-1; i++)
         {
             AbstractCellCycleModel* p_cell_cycle_model = new FixedDurationGenerationBasedCellCycleModel();
             CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
-            p_cell->SetCellProliferativeType(STEM);
+            p_cell->SetCellProliferativeType(p_stem_type);
             double birth_time = 0.0 - i;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
@@ -184,7 +185,7 @@ public:
         // Add another cell
         AbstractCellCycleModel* p_cell_cycle_model = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
-        p_cell->SetCellProliferativeType(STEM);
+        p_cell->SetCellProliferativeType(p_stem_type);
         double birth_time = -4.0;
         p_cell->SetBirthTime(birth_time);
         cells.push_back(p_cell);
@@ -357,10 +358,11 @@ public:
 
         // Create a new cell, DON'T set the node index, set birth time=-1
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
 
         FixedDurationGenerationBasedCellCycleModel* p_cell_cycle_model = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
-        p_cell->SetCellProliferativeType(STEM);
+        p_cell->SetCellProliferativeType(p_stem_type);
         p_cell->SetBirthTime(-1);
         c_vector<double,2> new_cell_location;
         new_cell_location[0] = 2;
@@ -704,7 +706,6 @@ public:
         cell_population.SetOutputCellProliferativeTypes(true);
         cell_population.SetOutputCellAges(true);
         cell_population.SetOutputCellCyclePhases(true);
-
         cell_population.SetCellAncestorsToLocationIndices();
         cell_population.SetOutputCellAncestors(true);
 
@@ -726,12 +727,13 @@ public:
         TS_ASSERT_EQUALS(cell_mutation_states[2], 1u);
         TS_ASSERT_EQUALS(cell_mutation_states[3], 1u);
 
-        // Test the GetCellProliferativeTypeCount function - we should have 4 stem cells and 1 dead cell (for coverage)
-        std::vector<unsigned> cell_types = cell_population.rGetCellProliferativeTypeCount();
-        TS_ASSERT_EQUALS(cell_types.size(), 3u);
+        // Test the GetCellProliferativeTypeCount() function - we should have five stem cells
+        std::vector<unsigned> cell_types = cell_population.GetCellProliferativeTypeCount();
+        TS_ASSERT_EQUALS(cell_types.size(), 4u);
         TS_ASSERT_EQUALS(cell_types[0], 5u);
         TS_ASSERT_EQUALS(cell_types[1], 0u);
         TS_ASSERT_EQUALS(cell_types[2], 0u);
+        TS_ASSERT_EQUALS(cell_types[3], 0u);
 
         // Test that the cell population parameters are output correctly
         out_stream parameter_file = output_file_handler.OpenOutputFile("results.parameters");
@@ -830,10 +832,11 @@ public:
         TS_ASSERT_EQUALS(cell_mutation_states[3], 0u);
 
         // Test the GetCellProliferativeTypeCount function
-        std::vector<unsigned> cell_types = cell_population.rGetCellProliferativeTypeCount();
-        TS_ASSERT_EQUALS(cell_types.size(), 3u);
+        std::vector<unsigned> cell_types = cell_population.GetCellProliferativeTypeCount();
+        TS_ASSERT_EQUALS(cell_types.size(), 4u);
         TS_ASSERT_EQUALS(cell_types[0], 5u);
         TS_ASSERT_EQUALS(cell_types[1], 0u);
+        TS_ASSERT_EQUALS(cell_types[2], 0u);
         TS_ASSERT_EQUALS(cell_types[2], 0u);
 
         std::vector<std::string> files_to_compare;

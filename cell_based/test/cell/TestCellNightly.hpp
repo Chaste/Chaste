@@ -51,6 +51,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ApcOneHitCellMutationState.hpp"
 #include "ApcTwoHitCellMutationState.hpp"
 #include "BetaCateninOneHitCellMutationState.hpp"
+#include "StemCellProliferativeType.hpp"
+#include "TransitCellProliferativeType.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "SmartPointers.hpp"
 
@@ -67,10 +69,10 @@ public:
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(end_time, time_steps);
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
-
+        MAKE_PTR(StemCellProliferativeType, p_type);
         TysonNovakCellCycleModel* p_model = new TysonNovakCellCycleModel();
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_model));
-        p_stem_cell->SetCellProliferativeType(STEM);
+        p_stem_cell->SetCellProliferativeType(p_type);
         p_stem_cell->InitialiseCellCycleModel();
 
         TS_ASSERT_EQUALS(p_stem_cell->ReadyToDivide(), false);
@@ -99,10 +101,11 @@ public:
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(end_time, time_steps);
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
+        MAKE_PTR(StemCellProliferativeType, p_type);
 
         TysonNovakCellCycleModel* p_model = new TysonNovakCellCycleModel();
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_model));
-        p_stem_cell->SetCellProliferativeType(STEM);
+        p_stem_cell->SetCellProliferativeType(p_type);
         p_stem_cell->InitialiseCellCycleModel();
 
         std::vector<CellPtr> cells;
@@ -146,22 +149,20 @@ public:
             cell_iterator = cells.begin();
             while (cell_iterator < cells.end())
             {
-                switch ((*cell_iterator)->GetCellProliferativeType())
+                if ((*cell_iterator)->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
                 {
-                    case STEM:
-                        stem_cells[i]++;
-                        break;
-                    case TRANSIT:
-                        transit_cells[i]++;
-                        break;
-                    default:
-                        differentiated_cells[i]++;
-                        break;
+                    stem_cells[i]++;
                 }
-
+                else if ((*cell_iterator)->GetCellProliferativeType()->IsType<TransitCellProliferativeType>())
+                {
+                    transit_cells[i]++;
+                }
+                else
+                {
+                    differentiated_cells[i]++;
+                }
                 ++cell_iterator;
             }
-
             i++;
         }
 

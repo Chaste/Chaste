@@ -274,12 +274,12 @@ public:
         // Get a reference to the cells held in cell population
         std::list<CellPtr>& r_cells = cell_population.rGetCells();
 
-        // Reset cell types to STEM
+        // Reset each cell to have a StemCellProliferativeType
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
-            cell_iter->SetCellProliferativeType(STEM);
+            cell_iter->SetCellProliferativeType(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
         }
 
         ApoptoticCellKiller<2> oxygen_based_cell_killer(&cell_population);

@@ -78,11 +78,12 @@ public:
         // Set up cells
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
-            p_cell->SetCellProliferativeType(DIFFERENTIATED);
+            p_cell->SetCellProliferativeType(p_diff_type);
             double birth_time = 0.0 - node_index;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
@@ -142,11 +143,12 @@ public:
         // Set up cells
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
-            p_cell->SetCellProliferativeType(DIFFERENTIATED);
+            p_cell->SetCellProliferativeType(p_diff_type);
             double birth_time = 0.0 - node_index;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
@@ -201,44 +203,62 @@ public:
         MutableMesh<1,1> mesh;
         mesh.ConstructLinearMesh(22);
 
+        MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+
         // Set up cells by iterating through the nodes
         std::vector<CellPtr> cells;
-        MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             StochasticDurationGenerationBasedCellCycleModel* p_model = new StochasticDurationGenerationBasedCellCycleModel();
 
-            CellProliferativeType cell_type;
-            unsigned generation;
-            double birth_time;
+            double birth_time = 0;
             if (i == 0)
             {
-                cell_type = STEM;
-                generation = 0;
-                birth_time = -p_rand_gen->ranf()*(p_model->GetStemCellG1Duration()
-                                                  + p_model->GetSG2MDuration()); // hours - doesn't matter for stem cell
+                birth_time = -p_rand_gen->ranf()*(p_model->GetStemCellG1Duration() + p_model->GetSG2MDuration()); // hours - doesn't matter for stem cell
             }
             else if (i < 15)
             {
-                cell_type = TRANSIT;
-                generation = 1 + (i - 1) / 5;
-                birth_time = -p_rand_gen->ranf()*(p_model->GetTransitCellG1Duration()
-                                                    + p_model->GetSG2MDuration()); // hours
+                birth_time = -p_rand_gen->ranf()*(p_model->GetTransitCellG1Duration() + p_model->GetSG2MDuration()); // hours
             }
-            else
-            {
-                cell_type = DIFFERENTIATED;
-                generation = 4;
-                birth_time = 0; // hours
-            }
+
             // Do this here due to fixing #1972 and not wanting to change saved results
             p_model->SetStemCellG1Duration(1.0);
             p_model->SetTransitCellG1Duration(1.0);
+
+            // Set the cell-cycle model's generation
+            unsigned generation = 4;
+            if (i == 0)
+            {
+                generation = 0;
+            }
+            else if (i < 15)
+            {
+                generation = 1 + (i - 1) / 5;
+            }
             p_model->SetGeneration(generation);
 
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
-            p_cell->SetCellProliferativeType(cell_type);
+
+            // Set the cell proliferative type
+            if (i == 0)
+            {
+                p_cell->SetCellProliferativeType(p_stem_type);
+            }
+            else if (i < 15)
+            {
+                p_cell->SetCellProliferativeType(p_transit_type);
+            }
+            else
+            {
+                p_cell->SetCellProliferativeType(p_diff_type);
+            }
+
             p_cell->InitialiseCellCycleModel();
+
+            // Set the cell's birth time
             p_cell->SetBirthTime(birth_time);
 
             cells.push_back(p_cell);
@@ -288,6 +308,7 @@ public:
         // Set up cells by iterating through the nodes
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
+        boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             double birth_time;
@@ -303,7 +324,7 @@ public:
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
 
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
-            p_cell->SetCellProliferativeType(STEM);
+            p_cell->SetCellProliferativeType(p_stem_type);
             p_cell->SetBirthTime(birth_time);
 
             cells.push_back(p_cell);
@@ -354,32 +375,37 @@ public:
         mesh.ConstructLinearMesh(22);
 
         // Set up cells by iterating through the nodes
-        std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+
+        std::vector<CellPtr> cells;
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             StochasticDurationGenerationBasedCellCycleModel* p_model = new StochasticDurationGenerationBasedCellCycleModel();
 
-            CellProliferativeType cell_type;
+            CellPtr p_cell(new Cell(p_healthy_state, p_model));
+
             unsigned generation;
             double birth_time;
             if (i == 0)
             {
-                cell_type = STEM;
+                p_cell->SetCellProliferativeType(p_stem_type);
                 generation = 0;
                 birth_time = -p_rand_gen->ranf()*(p_model->GetStemCellG1Duration()
                                                   + p_model->GetSG2MDuration()); // hours - doesn't matter for stem cell
             }
             else if (i < 15)
             {
-                cell_type = TRANSIT;
+                p_cell->SetCellProliferativeType(p_transit_type);
                 generation = 1 + (i - 1) / 5;
                 birth_time = -p_rand_gen->ranf()*(p_model->GetTransitCellG1Duration()
                                                     + p_model->GetSG2MDuration()); // hours
             }
             else
             {
-                cell_type = DIFFERENTIATED;
+                p_cell->SetCellProliferativeType(p_diff_type);
                 generation = 4;
                 birth_time = 0; // hours
             }
@@ -387,11 +413,8 @@ public:
             // Do this here due to fixing #1972 and not wanting to change saved results
             p_model->SetStemCellG1Duration(1.0);
             p_model->SetTransitCellG1Duration(1.0);
-
             p_model->SetGeneration(generation);
 
-            CellPtr p_cell(new Cell(p_healthy_state, p_model));
-            p_cell->SetCellProliferativeType(cell_type);
             p_cell->InitialiseCellCycleModel();
             p_cell->SetBirthTime(birth_time);
 
@@ -443,9 +466,14 @@ public:
         mesh.ConstructLinearMesh(22);
 
         // Set up cells by iterating through the nodes
+        MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+
         unsigned num_cells_at_start = mesh.GetNumNodes();
         std::vector<CellPtr> cells;
-        MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
+
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             TysonNovakCellCycleModel* p_model = new TysonNovakCellCycleModel();
@@ -457,28 +485,26 @@ public:
             p_model->SetG2Duration(0.01);
             p_model->SetMDuration(0.01);
 
-            CellProliferativeType cell_type;
+            CellPtr p_cell(new Cell(p_healthy_state, p_model));
+
             double birth_time;
             if (i == 0)
             {
-                cell_type = STEM;
+                p_cell->SetCellProliferativeType(p_stem_type);
                 birth_time = -p_rand_gen->ranf()*(p_model->GetStemCellG1Duration()
                                                   + p_model->GetSG2MDuration());
             }
             else if (i < 15)
             {
-                cell_type = TRANSIT;
+                p_cell->SetCellProliferativeType(p_transit_type);
                 birth_time = -p_rand_gen->ranf()*(p_model->GetTransitCellG1Duration()
                                                     + p_model->GetSG2MDuration());
             }
             else
             {
-                cell_type = DIFFERENTIATED;
+                p_cell->SetCellProliferativeType(p_diff_type);
                 birth_time = 0;
             }
-
-            CellPtr p_cell(new Cell(p_healthy_state, p_model));
-            p_cell->SetCellProliferativeType(cell_type);
             p_cell->SetBirthTime(birth_time);
 
             cells.push_back(p_cell);
@@ -535,39 +561,38 @@ public:
         mesh.SetNode(0, shifted_point);
 
         // Set up cells by iterating through the nodes
+        MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
+
         unsigned num_cells = mesh.GetNumNodes();
         std::vector<CellPtr> cells;
-        MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
         for (unsigned i=0; i<num_cells; i++)
         {
-            CellProliferativeType cell_type = DIFFERENTIATED;
+            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            CellPtr p_cell(new Cell(p_healthy_state, p_model));
+
             unsigned generation = 4;
-            double birth_time = 0;
             if (i == 0)
             {
-                cell_type = STEM;
                 generation = 0;
-                birth_time = 0;
+            }
+            p_model->SetGeneration(generation);
+
+            if (i == 0)
+            {
+                p_cell->SetCellProliferativeType(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
             }
             else
             {
-                cell_type = DIFFERENTIATED;
-                generation = 4;
-                birth_time = 0;
+                p_cell->SetCellProliferativeType(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
             }
-
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-            p_model->SetGeneration(generation);
 
             // The stem cell cycle time must still be 24 h, otherwise this test may not pass
             //TS_ASSERT_DELTA(p_model->GetStemCellG1Duration(), 14.0, 1e-12);//These lines may trip up the Intel compiler with heavy optimization - don't know why?
             //TS_ASSERT_DELTA(p_model->GetTransitCellG1Duration(), 2.0, 1e-12);
             TS_ASSERT_DELTA(p_model->GetSG2MDuration(), 10.0, 1e-12);
 
-            CellPtr p_cell(new Cell(p_healthy_state, p_model));
-            p_cell->SetCellProliferativeType(cell_type);
             p_cell->InitialiseCellCycleModel();
-            p_cell->SetBirthTime(birth_time);
+            p_cell->SetBirthTime(0);
 
             cells.push_back(p_cell);
         }
@@ -601,11 +626,12 @@ public:
         TS_ASSERT_EQUALS(num_cells_at_end, 6u);
 
         // Check we have the correct number of each cell type
-        std::vector<unsigned> cell_type_count = simulator.rGetCellPopulation().rGetCellProliferativeTypeCount();
-        TS_ASSERT_EQUALS(cell_type_count.size(), 3u);
+        std::vector<unsigned> cell_type_count = simulator.rGetCellPopulation().GetCellProliferativeTypeCount();
+        TS_ASSERT_EQUALS(cell_type_count.size(), 4u);
         TS_ASSERT_EQUALS(cell_type_count[0], 1u);
         TS_ASSERT_EQUALS(cell_type_count[1], 2u);
         TS_ASSERT_EQUALS(cell_type_count[2], 3u);
+        TS_ASSERT_EQUALS(cell_type_count[3], 0u);
 
         for (AbstractCellPopulation<1>::Iterator cell_iter = simulator.rGetCellPopulation().Begin();
              cell_iter != simulator.rGetCellPopulation().End();
@@ -616,15 +642,15 @@ public:
 
             if (fabs(x) < 1e-2)
             {
-                TS_ASSERT_EQUALS(cell_iter->GetCellProliferativeType(), STEM);
+                TS_ASSERT_EQUALS(cell_iter->GetCellProliferativeType()->IsType<StemCellProliferativeType>(), true);
             }
             else if ((fabs(x-1) < 1e-2) || (fabs(x-2) < 1e-2))
             {
-                TS_ASSERT_EQUALS(cell_iter->GetCellProliferativeType(), TRANSIT);
+                TS_ASSERT_EQUALS(cell_iter->GetCellProliferativeType()->IsType<TransitCellProliferativeType>(), true);
             }
             else
             {
-                TS_ASSERT_EQUALS(cell_iter->GetCellProliferativeType(), DIFFERENTIATED);
+                TS_ASSERT_EQUALS(cell_iter->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>(), true);
             }
         }
     }
@@ -657,7 +683,7 @@ public:
 
             p_cell_cycle_model1->SetDimension(1);
             CellPtr p_cell(new Cell(p_healthy_state, p_cell_cycle_model1));
-            p_cell->SetCellProliferativeType(TRANSIT);
+            p_cell->SetCellProliferativeType(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
             p_cell->SetBirthTime(0.0);
             cells.push_back(p_cell);
         }
@@ -717,11 +743,12 @@ public:
         TS_ASSERT_EQUALS(cell_mutation_state_count[2], 0u); // No APC two hit
         TS_ASSERT_EQUALS(cell_mutation_state_count[3], 1u);
 
-        std::vector<unsigned> cell_type_count = simulator.rGetCellPopulation().rGetCellProliferativeTypeCount();
-        TS_ASSERT_EQUALS(cell_type_count.size(), 3u);
+        std::vector<unsigned> cell_type_count = simulator.rGetCellPopulation().GetCellProliferativeTypeCount();
+        TS_ASSERT_EQUALS(cell_type_count.size(), 4u);
         TS_ASSERT_EQUALS(cell_type_count[0], 0u);
         TS_ASSERT_EQUALS(cell_type_count[1], 4u);
         TS_ASSERT_EQUALS(cell_type_count[2], 0u);
+        TS_ASSERT_EQUALS(cell_type_count[3], 0u);
 
         // Tidy up
         WntConcentration<1>::Destroy();
@@ -742,40 +769,41 @@ public:
         mesh.ConstructLinearMesh(22);
 
         // Set up cells by iterating through the nodes
-        std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+
+        std::vector<CellPtr> cells;
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
 
-            CellProliferativeType cell_type;
+            CellPtr p_cell(new Cell(p_healthy_state, p_model));
+
             unsigned generation;
             double birth_time;
             if (i == 0)
             {
-                cell_type = STEM;
+                p_cell->SetCellProliferativeType(p_stem_type);
                 generation = 0;
                 birth_time = -p_rand_gen->ranf()*(p_model->GetStemCellG1Duration()
                                                   + p_model->GetSG2MDuration());
             }
             else if (i < 15)
             {
-                cell_type = TRANSIT;
+                p_cell->SetCellProliferativeType(p_transit_type);
                 generation = 1 + (i - 1)/5;
                 birth_time = -p_rand_gen->ranf()*(p_model->GetTransitCellG1Duration()
                                                     + p_model->GetSG2MDuration());
             }
             else
             {
-                cell_type = DIFFERENTIATED;
+                p_cell->SetCellProliferativeType(p_diff_type);
                 generation = 4;
                 birth_time = 0;
             }
-
             p_model->SetGeneration(generation);
-
-            CellPtr p_cell(new Cell(p_healthy_state, p_model));
-            p_cell->SetCellProliferativeType(cell_type);
             p_cell->SetBirthTime(birth_time);
 
             cells.push_back(p_cell);
@@ -890,40 +918,41 @@ public:
         mesh.ConstructLinearMesh(22);
 
         // Set up cells by iterating through the nodes
-        std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+
+        std::vector<CellPtr> cells;
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             StochasticDurationGenerationBasedCellCycleModel* p_model = new StochasticDurationGenerationBasedCellCycleModel();
+            CellPtr p_cell(new Cell(p_healthy_state, p_model));
 
-            CellProliferativeType cell_type;
             unsigned generation;
             double birth_time;
             if (i == 0)
             {
-                cell_type = STEM;
+                p_cell->SetCellProliferativeType(p_stem_type);
                 generation = 0;
                 birth_time = -p_rand_gen->ranf()*(p_model->GetStemCellG1Duration()
                                                   + p_model->GetSG2MDuration()); // hours - doesn't matter for stem cell
             }
             else if (i < 15)
             {
-                cell_type = TRANSIT;
+                p_cell->SetCellProliferativeType(p_transit_type);
                 generation = 1 + (i - 1) / 5;
                 birth_time = -p_rand_gen->ranf()*(p_model->GetTransitCellG1Duration()
                                                     + p_model->GetSG2MDuration()); // hours
             }
             else
             {
-                cell_type = DIFFERENTIATED;
+                p_cell->SetCellProliferativeType(p_diff_type);
                 generation = 4;
                 birth_time = 0; // hours
             }
 
             p_model->SetGeneration(generation);
-
-            CellPtr p_cell(new Cell(p_healthy_state, p_model));
-            p_cell->SetCellProliferativeType(cell_type);
             p_cell->InitialiseCellCycleModel();
             p_cell->SetBirthTime(birth_time);
 

@@ -65,38 +65,41 @@ public:
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(200, 20);
         boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_stem_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+        boost::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
 
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_model));
-        p_stem_cell->SetCellProliferativeType(STEM);
+        p_stem_cell->SetCellProliferativeType(p_stem_type);
         p_stem_cell->InitialiseCellCycleModel();
         p_stem_cell->ReadyToDivide();
 
-        TS_ASSERT_EQUALS(p_stem_cell->GetCellProliferativeType(),STEM);
+        TS_ASSERT_EQUALS(p_stem_cell->GetCellProliferativeType()->IsType<StemCellProliferativeType>(), true);
 
-        p_stem_cell->SetCellProliferativeType(TRANSIT);
+        p_stem_cell->SetCellProliferativeType(p_transit_type);
 
         p_stem_cell->ReadyToDivide();
 
-        TS_ASSERT_EQUALS(p_stem_cell->GetCellProliferativeType(),TRANSIT);
+        TS_ASSERT_EQUALS(p_stem_cell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>(), true);
 
         // Test a Wnt dependent cell
         WntConcentration<2>::Instance()->SetConstantWntValueForTesting(0.0);
 
         WntCellCycleModel* p_cell_cycle_model1 = new WntCellCycleModel();
         p_cell_cycle_model1->SetDimension(2);
-        CellPtr p_wnt_cell(new Cell(p_healthy_state, p_cell_cycle_model1));
-        p_wnt_cell->SetCellProliferativeType(TRANSIT);
 
-        TS_ASSERT_EQUALS(p_wnt_cell->GetCellProliferativeType(),TRANSIT);
+        CellPtr p_wnt_cell(new Cell(p_healthy_state, p_cell_cycle_model1));
+        p_wnt_cell->SetCellProliferativeType(p_transit_type);
+
+        TS_ASSERT_EQUALS(p_wnt_cell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>(), true);
 
         p_wnt_cell->InitialiseCellCycleModel();
 
-        TS_ASSERT_EQUALS(p_wnt_cell->GetCellProliferativeType(),DIFFERENTIATED);
+        TS_ASSERT_EQUALS(p_wnt_cell->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>(), true);
 
         p_wnt_cell->ReadyToDivide();
 
-        TS_ASSERT_EQUALS(p_wnt_cell->GetCellProliferativeType(),DIFFERENTIATED);
+        TS_ASSERT_EQUALS(p_wnt_cell->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>(), true);
 
         WntConcentration<2>::Instance()->SetConstantWntValueForTesting(1.0);
 
@@ -108,7 +111,7 @@ public:
 
         p_wnt_cell->ReadyToDivide();
 
-        TS_ASSERT_EQUALS(p_wnt_cell->GetCellProliferativeType(),TRANSIT);
+        TS_ASSERT_EQUALS(p_wnt_cell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>(), true);
 
         // Tidy up
         WntConcentration<2>::Destroy();
@@ -130,11 +133,12 @@ public:
         double wnt_stimulus = 1.0;
         WntConcentration<2>::Instance()->SetConstantWntValueForTesting(wnt_stimulus);
         boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
 
         WntCellCycleModel* p_cell_cycle_model1 = new WntCellCycleModel();
         p_cell_cycle_model1->SetDimension(2);
         CellPtr p_wnt_cell(new Cell(p_healthy_state, p_cell_cycle_model1));
-        p_wnt_cell->SetCellProliferativeType(TRANSIT);
+        p_wnt_cell->SetCellProliferativeType(p_transit_type);
         p_wnt_cell->InitialiseCellCycleModel();
 
         double SG2MDuration = p_cell_cycle_model1->GetSG2MDuration();
@@ -218,11 +222,12 @@ public:
         WntConcentration<2>::Instance()->SetConstantWntValueForTesting(wnt_stimulus);
 
         boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
 
         StochasticWntCellCycleModel* p_cell_model = new StochasticWntCellCycleModel();
         p_cell_model->SetDimension(2);
         CellPtr p_wnt_cell(new Cell(p_healthy_state, p_cell_model));
-        p_wnt_cell->SetCellProliferativeType(TRANSIT);
+        p_wnt_cell->SetCellProliferativeType(p_transit_type);
         p_wnt_cell->InitialiseCellCycleModel();
 
         // These are the first three normal random with mean of usual G2 Duration (4hrs), s.d. 0.9 and this seed (0)
@@ -310,23 +315,24 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_apc_two_hit_state(CellPropertyRegistry::Instance()->Get<ApcTwoHitCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_bcat_one_hit_state(CellPropertyRegistry::Instance()->Get<BetaCateninOneHitCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
+        boost::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
 
         WntCellCycleModel* p_cell_cycle_model1 = new WntCellCycleModel();
         p_cell_cycle_model1->SetDimension(2);
         CellPtr p_wnt_cell(new Cell(p_apc_one_hit_state, p_cell_cycle_model1));
-        p_wnt_cell->SetCellProliferativeType(TRANSIT);
+        p_wnt_cell->SetCellProliferativeType(p_transit_type);
         p_wnt_cell->InitialiseCellCycleModel();
 
         WntCellCycleModel* p_cell_cycle_model2 = new WntCellCycleModel();
         p_cell_cycle_model2->SetDimension(2);
         CellPtr p_wnt_cell2(new Cell(p_bcat_one_hit_state, p_cell_cycle_model2));
-        p_wnt_cell2->SetCellProliferativeType(TRANSIT);
+        p_wnt_cell2->SetCellProliferativeType(p_transit_type);
         p_wnt_cell2->InitialiseCellCycleModel();
 
         WntCellCycleModel* p_cell_cycle_model3 = new WntCellCycleModel();
         p_cell_cycle_model3->SetDimension(2);
         CellPtr p_wnt_cell3(new Cell(p_apc_two_hit_state, p_cell_cycle_model3));
-        p_wnt_cell3->SetCellProliferativeType(TRANSIT);
+        p_wnt_cell3->SetCellProliferativeType(p_transit_type);
         p_wnt_cell3->InitialiseCellCycleModel();
 
         WntCellCycleModel* p_cell_cycle_model4 = new WntCellCycleModel();
@@ -334,7 +340,7 @@ public:
         CellPropertyCollection collection;
         collection.AddProperty(p_label);
         CellPtr p_wnt_cell4(new Cell(p_wt_state, p_cell_cycle_model4, false, collection));
-        p_wnt_cell4->SetCellProliferativeType(TRANSIT);
+        p_wnt_cell4->SetCellProliferativeType(p_transit_type);
         p_wnt_cell4->InitialiseCellCycleModel();
 
         TS_ASSERT_EQUALS(p_wnt_cell->ReadyToDivide(), false);

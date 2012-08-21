@@ -158,9 +158,10 @@ public:
                 "Element 3 does not appear to have a cell associated with it");
 
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_cell(new Cell(p_state, p_model));
-        p_cell->SetCellProliferativeType(STEM);
+        p_cell->SetCellProliferativeType(p_stem_type);
 
         double birth_time = 0.0 - p_mesh->GetNumElements()-1;
         p_cell->SetBirthTime(birth_time);
@@ -272,9 +273,10 @@ public:
 
         // Create a new cell
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_new_cell(new Cell(p_state, p_model));
-        p_new_cell->SetCellProliferativeType(STEM);
+        p_new_cell->SetCellProliferativeType(p_stem_type);
 
         // Add new cell to the cell population by dividing the cell
         AbstractCellPopulation<2>::Iterator cell_iter_1 = cell_population.Begin();

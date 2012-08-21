@@ -66,12 +66,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MutableMesh.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "HoneycombMeshGenerator.hpp"
-
 #include "MeshBasedCellPopulation.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
-
 #include "NodesOnlyMesh.hpp"
 #include "MutableVertexMesh.hpp"
 #include "CellsGenerator.hpp"
@@ -92,6 +90,7 @@ public:
 
         // Create cells
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
@@ -104,7 +103,7 @@ public:
             p_cycle_model->SetTransitCellG1Duration(0.1);
 
             CellPtr p_cell(new Cell(p_state, p_cycle_model));
-            p_cell->SetCellProliferativeType(TRANSIT);
+            p_cell->SetCellProliferativeType(p_transit_type);
             cells.push_back(p_cell);
         }
 
@@ -150,8 +149,8 @@ public:
             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), cell_iter->GetCellData()->GetItem("volume"), 1e-4);
         }
 
-        //Check that the correct number of cells are labelled (i.e. experiencing contact inhibition)
-        TS_ASSERT_EQUALS(CellPropertyRegistry::Instance()->Get<CellLabel>()->GetCellCount(),9u);
+        // Check that the correct number of cells are labelled (i.e. experiencing contact inhibition)
+        TS_ASSERT_EQUALS(cell_population.GetCellPropertyRegistry()->Get<CellLabel>()->GetCellCount(),9u);
     }
 
     void TestMeshBasedSimulationWithContactInhibition()
@@ -162,6 +161,7 @@ public:
 
         // Create cells
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
@@ -174,7 +174,7 @@ public:
             p_cycle_model->SetTransitCellG1Duration(0.1);
 
             CellPtr p_cell(new Cell(p_state, p_cycle_model));
-            p_cell->SetCellProliferativeType(TRANSIT);
+            p_cell->SetCellProliferativeType(p_transit_type);
             cells.push_back(p_cell);
         }
 
@@ -194,31 +194,31 @@ public:
         simulator.AddForce(p_force);
 
         // Run simulation
-         simulator.Solve();
+        simulator.Solve();
 
-         // Test that the volumes of the cells are correct in CellData at the first timestep
-         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-              cell_iter != cell_population.End();
-              ++cell_iter)
-         {
-             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
-         }
+        // Test that the volumes of the cells are correct in CellData at the first timestep
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
+        }
 
-         simulator.SetEndTime(2.0);
+        simulator.SetEndTime(2.0);
 
-         // Run simulation
-         simulator.Solve();
+        // Run simulation
+        simulator.Solve();
 
-         // Test that the volumes of the cells are correct in CellData at the end time
-         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-              cell_iter != cell_population.End();
-              ++cell_iter)
-         {
-             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
-         }
+        // Test that the volumes of the cells are correct in CellData at the end time
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
+        }
 
-         //Check that the correct number of cells are labelled (i.e. experiencing contact inhibition)
-         TS_ASSERT_EQUALS(CellPropertyRegistry::Instance()->Get<CellLabel>()->GetCellCount(),14u);
+        // Check that the correct number of cells are labelled (i.e. experiencing contact inhibition)
+        TS_ASSERT_EQUALS(cell_population.GetCellPropertyRegistry()->Get<CellLabel>()->GetCellCount(),14u);
     }
 
     void TestMeshBasedSimulationWithGhostNodesAndContactInhibition()
@@ -231,6 +231,7 @@ public:
 
         // Create cells
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<location_indices.size(); i++)
         {
@@ -243,7 +244,7 @@ public:
             p_cycle_model->SetTransitCellG1Duration(0.1);
 
             CellPtr p_cell(new Cell(p_state, p_cycle_model));
-            p_cell->SetCellProliferativeType(TRANSIT);
+            p_cell->SetCellProliferativeType(p_transit_type);
             cells.push_back(p_cell);
         }
 
@@ -288,8 +289,8 @@ public:
 
          // Check that the correct number of cells are labelled (i.e. experiencing contact inhibition)
          // 8 on 64-bit, 7 on 32-bit...
-         TS_ASSERT_LESS_THAN_EQUALS(CellPropertyRegistry::Instance()->Get<CellLabel>()->GetCellCount(), 8u);
-         TS_ASSERT_LESS_THAN_EQUALS(7u, CellPropertyRegistry::Instance()->Get<CellLabel>()->GetCellCount());
+         TS_ASSERT_LESS_THAN_EQUALS(cell_population.GetCellPropertyRegistry()->Get<CellLabel>()->GetCellCount(), 8u);
+         TS_ASSERT_LESS_THAN_EQUALS(7u, cell_population.GetCellPropertyRegistry()->Get<CellLabel>()->GetCellCount());
     }
 
     void TestVertexBasedSimulationWithContactInhibition()
@@ -300,6 +301,7 @@ public:
 
         // Create cell state
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         std::vector<CellPtr> cells;
 
         for (unsigned i=0; i<p_mesh->GetNumElements(); i++)
@@ -308,12 +310,12 @@ public:
             p_cycle_model->SetDimension(2);
             p_cycle_model->SetBirthTime(-10.0);
             p_cycle_model->SetQuiescentVolumeFraction(0.99); // Very high as cells are not that compressed, as low in number and want to check that contact inhibition works.
-            p_cycle_model->SetEquilibriumVolume(1.0); // Target vol in NagaiHonda force
+            p_cycle_model->SetEquilibriumVolume(1.0); // Target volume in NagaiHonda force
             p_cycle_model->SetStemCellG1Duration(0.1);
             p_cycle_model->SetTransitCellG1Duration(0.1);
 
             CellPtr p_cell(new Cell(p_state, p_cycle_model));
-            p_cell->SetCellProliferativeType(TRANSIT);
+            p_cell->SetCellProliferativeType(p_transit_type);
             cells.push_back(p_cell);
         }
 
@@ -356,8 +358,8 @@ public:
              TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
          }
 
-         //Check that the correct number of cells are labelled (i.e. experiencing contact inhibition)
-         TS_ASSERT_EQUALS(CellPropertyRegistry::Instance()->Get<CellLabel>()->GetCellCount(),8u);
+         // Check that the correct number of cells are labelled (i.e. experiencing contact inhibition)
+         TS_ASSERT_EQUALS(cell_population.GetCellPropertyRegistry()->Get<CellLabel>()->GetCellCount(),8u);
     }
 
     void TestVolumeTrackedOffLatticeSimulationArchiving() throw (Exception)
@@ -370,6 +372,7 @@ public:
 
         // Create cell state
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
         std::vector<CellPtr> cells;
 
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
@@ -383,7 +386,7 @@ public:
             p_cycle_model->SetTransitCellG1Duration(0.1);
 
             CellPtr p_cell(new Cell(p_state, p_cycle_model));
-            p_cell->SetCellProliferativeType(STEM);
+            p_cell->SetCellProliferativeType(p_stem_type);
             p_cell->InitialiseCellCycleModel();
 
             cells.push_back(p_cell);

@@ -144,6 +144,7 @@ bool CellCycleModelOdeSolver<CELL_CYCLE_MODEL, ODE_SOLVER>::IsAdaptive()
     return AbstractCellCycleModelOdeSolver::IsAdaptive();
 }
 
+
 /**
  * Specialization for BackwardEulerIvpOdeSolver, whose constructor requires
  * an argument.

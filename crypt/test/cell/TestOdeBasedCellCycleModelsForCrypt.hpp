@@ -94,8 +94,9 @@ public:
         TS_ASSERT_EQUALS(p_cell_model->CanCellTerminallyDifferentiate(), false);
 
         boost::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_cell_model));
-        p_stem_cell->SetCellProliferativeType(STEM);
+        p_stem_cell->SetCellProliferativeType(p_stem_type);
         p_stem_cell->InitialiseCellCycleModel();
 
         /*
@@ -103,7 +104,7 @@ public:
          * proliferative type is updated to transit or differentiated, depending on the Wnt
          * concentration, when InitialiseCellCycleModel() is called.
          */
-        TS_ASSERT_EQUALS(p_stem_cell->GetCellProliferativeType(), TRANSIT);
+        TS_ASSERT_EQUALS(p_stem_cell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>(), true);
 
         /*
          * For coverage, we create another cell-cycle model that is identical except that we
@@ -127,7 +128,7 @@ public:
         p_other_cell_model->SetDimension(2);
 
         CellPtr p_other_stem_cell(new Cell(p_healthy_state, p_other_cell_model));
-        p_other_stem_cell->SetCellProliferativeType(STEM);
+        p_other_stem_cell->SetCellProliferativeType(p_stem_type);
         p_other_stem_cell->InitialiseCellCycleModel();
 
         // Progress both cells through the cell cycle
@@ -190,9 +191,9 @@ public:
 
         // Test that, since the cell now experiences a low Wnt concentration,
         // it has indeed changed cell type to differentiated
-        TS_ASSERT_EQUALS(p_stem_cell->GetCellProliferativeType(), DIFFERENTIATED);
+        TS_ASSERT_EQUALS(p_stem_cell->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>(), true);
 
-        TS_ASSERT_EQUALS(p_other_stem_cell->GetCellProliferativeType(), DIFFERENTIATED);
+        TS_ASSERT_EQUALS(p_other_stem_cell->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>(), true);
 
         double diff = 1.0;
         test_results[6] = test_results[6] + diff;
@@ -226,15 +227,16 @@ public:
 
         // Test that member variables are set correctly
         boost::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_cell_model));
-        p_stem_cell->SetCellProliferativeType(STEM);
+        p_stem_cell->SetCellProliferativeType(p_stem_type);
         p_stem_cell->InitialiseCellCycleModel();
 
         // When using a WntCellCycleModel, there is no such thing as
         // a 'stem cell'. Cell type is changed to transit or
         // differentiated, depending on the Wnt concentration, when
         // InitialiseCellCycleModel() is called.
-        TS_ASSERT_EQUALS(p_stem_cell->GetCellProliferativeType(), TRANSIT);
+        TS_ASSERT_EQUALS(p_stem_cell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>(), true);
 
         WntConcentration<2>::Instance()->SetConstantWntValueForTesting(1.0);
 
@@ -379,7 +381,7 @@ public:
 
         // Test that, since the cell now experiences a low Wnt concentration,
         // it has indeed changed cell type to differentiated
-        TS_ASSERT_EQUALS(p_stem_cell->GetCellProliferativeType(), DIFFERENTIATED);
+        TS_ASSERT_EQUALS(p_stem_cell->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>(), true);
 
         // Test beta catenin levels
 
@@ -407,7 +409,7 @@ public:
         TS_ASSERT_EQUALS(p_cell_model_1d->GetDimension(), 1u);
 
         CellPtr p_stem_cell_1d(new Cell(p_healthy_state, p_cell_model_1d));
-        p_stem_cell_1d->SetCellProliferativeType(STEM);
+        p_stem_cell_1d->SetCellProliferativeType(p_stem_type);
         p_stem_cell_1d->InitialiseCellCycleModel();
 
         SimulationTime::Destroy();
@@ -425,7 +427,7 @@ public:
         TS_ASSERT_EQUALS(p_cell_model_3d->GetDimension(), 3u);
 
         CellPtr p_stem_cell_3d(new Cell(p_healthy_state, p_cell_model_3d));
-        p_stem_cell_3d->SetCellProliferativeType(STEM);
+        p_stem_cell_3d->SetCellProliferativeType(p_stem_type);
         p_stem_cell_3d->InitialiseCellCycleModel();
 
         SimulationTime::Destroy();
@@ -457,8 +459,9 @@ public:
         p_cell_model->SetDimension(2);
 
         boost::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_cell_model));
-        p_stem_cell->SetCellProliferativeType(STEM);
+        p_stem_cell->SetCellProliferativeType(p_stem_type);
         p_stem_cell->InitialiseCellCycleModel();
 
         /*
@@ -466,7 +469,7 @@ public:
          * cell proliferative type is changed to transit or differentiated, depending on the
          * Wnt concentration, when InitialiseCellCycleModel() is called.
          */
-        TS_ASSERT_EQUALS(p_stem_cell->GetCellProliferativeType(), TRANSIT);
+        TS_ASSERT_EQUALS(p_stem_cell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>(), true);
 
         WntConcentration<2>::Instance()->SetConstantWntValueForTesting(1.0);
 
@@ -525,9 +528,10 @@ public:
         p_cell_model->SetDimension(2);
 
         boost::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_cell_model));
-        p_stem_cell->SetCellProliferativeType(STEM);
+        p_stem_cell->SetCellProliferativeType(p_stem_type);
         p_stem_cell->InitialiseCellCycleModel();
 
         double SG2M_duration = p_cell_model->GetSG2MDuration();
@@ -540,7 +544,7 @@ public:
         boost::shared_ptr<AbstractCellMutationState> p_mutation(new ApcOneHitCellMutationState);
 
         CellPtr p_stem_cell_1(new Cell(p_mutation, p_cell_model_1));
-        p_stem_cell_1->SetCellProliferativeType(STEM);
+        p_stem_cell_1->SetCellProliferativeType(p_stem_type);
         p_stem_cell_1->InitialiseCellCycleModel();
 
         // Run the Wnt model for a full constant Wnt stimulus for 20 hours.
@@ -591,9 +595,10 @@ public:
         p_cell_model->SetDimension(2);
 
         boost::shared_ptr<AbstractCellMutationState> p_mutation(new BetaCateninOneHitCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
         CellPtr p_stem_cell(new Cell(p_mutation, p_cell_model));
-        p_stem_cell->SetCellProliferativeType(STEM);
+        p_stem_cell->SetCellProliferativeType(p_stem_type);
         p_stem_cell->InitialiseCellCycleModel();
 
         TS_ASSERT_THROWS_NOTHING(WntCellCycleModel cell_model_3());
@@ -602,7 +607,7 @@ public:
         WntCellCycleModel* p_cell_model_1 = new WntCellCycleModel();
         p_cell_model_1->SetDimension(2);
         CellPtr p_stem_cell_1(new Cell(p_mutation, p_cell_model_1));
-        p_stem_cell_1->SetCellProliferativeType(STEM);
+        p_stem_cell_1->SetCellProliferativeType(p_stem_type);
         p_stem_cell_1->InitialiseCellCycleModel();
 
         // Run the Wnt model for a full constant Wnt stimulus for 20 hours.
@@ -654,9 +659,10 @@ public:
         p_cell_model_1->SetDimension(2);
 
         boost::shared_ptr<AbstractCellMutationState> p_mutation(new ApcTwoHitCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
         CellPtr p_stem_cell_1(new Cell(p_mutation, p_cell_model_1));
-        p_stem_cell_1->SetCellProliferativeType(STEM);
+        p_stem_cell_1->SetCellProliferativeType(p_stem_type);
         p_stem_cell_1->InitialiseCellCycleModel();
 
         // Create another cell-cycle model and associated cell
@@ -664,7 +670,7 @@ public:
         p_cell_model_2->SetDimension(2);
 
         CellPtr p_stem_cell_2(new Cell(p_mutation, p_cell_model_2));
-        p_stem_cell_2->SetCellProliferativeType(STEM);
+        p_stem_cell_2->SetCellProliferativeType(p_stem_type);
         p_stem_cell_2->InitialiseCellCycleModel();
 
         // Run the Wnt model for a full constant Wnt stimulus for 20 hours.
@@ -718,9 +724,10 @@ public:
         p_cell_model_1->SetDimension(2);
 
         boost::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
         CellPtr p_stem_cell_1(new Cell(p_healthy_state, p_cell_model_1));
-        p_stem_cell_1->SetCellProliferativeType(STEM);
+        p_stem_cell_1->SetCellProliferativeType(p_stem_type);
         p_stem_cell_1->InitialiseCellCycleModel();
 
         // Create another cell-cycle model and associated cell
@@ -728,7 +735,7 @@ public:
         p_cell_model_2->SetDimension(2);
 
         CellPtr p_stem_cell_2(new Cell(p_healthy_state, p_cell_model_2));
-        p_stem_cell_2->SetCellProliferativeType(STEM);
+        p_stem_cell_2->SetCellProliferativeType(p_stem_type);
         p_stem_cell_2->InitialiseCellCycleModel();
 
         // Run the Wnt model for a full constant Wnt stimulus for 20 hours.
@@ -781,9 +788,10 @@ public:
         p_cell_model->SetDimension(2);
 
         boost::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_cell_model));
-        p_stem_cell->SetCellProliferativeType(STEM);
+        p_stem_cell->SetCellProliferativeType(p_stem_type);
         p_stem_cell->InitialiseCellCycleModel();
 
         // A WntCellCycleModel does this:
@@ -819,7 +827,7 @@ public:
         p_cell_model2->SetMinimumGapDuration(1e20);
 
         CellPtr p_cell2(new Cell(p_healthy_state, p_cell_model2));
-        p_cell2->SetCellProliferativeType(STEM);
+        p_cell2->SetCellProliferativeType(p_stem_type);
         p_cell2->InitialiseCellCycleModel();
 
         TS_ASSERT_DELTA(p_cell_model2->GetG2Duration(), 1e20, 1e-4);
@@ -845,9 +853,10 @@ public:
             p_cell_model->SetDimension(3);
 
             boost::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
+            boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
             CellPtr p_stem_cell(new Cell(p_healthy_state, p_cell_model));
-            p_stem_cell->SetCellProliferativeType(STEM);
+            p_stem_cell->SetCellProliferativeType(p_stem_type);
             p_stem_cell->InitialiseCellCycleModel();
 
             p_simulation_time->IncrementTimeOneStep();
@@ -920,9 +929,10 @@ public:
             p_cell_model->SetDimension(2);
 
             boost::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
+            boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
             CellPtr p_stem_cell(new Cell(p_healthy_state, p_cell_model));
-            p_stem_cell->SetCellProliferativeType(STEM);
+            p_stem_cell->SetCellProliferativeType(p_stem_type);
             p_stem_cell->InitialiseCellCycleModel();
 
             p_simulation_time->IncrementTimeOneStep();
@@ -990,9 +1000,10 @@ public:
             p_cell_model->SetDimension(2);
 
             boost::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
+            boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
             CellPtr p_stem_cell(new Cell(p_healthy_state, p_cell_model));
-            p_stem_cell->SetCellProliferativeType(STEM);
+            p_stem_cell->SetCellProliferativeType(p_stem_type);
             p_stem_cell->InitialiseCellCycleModel();
 
             p_simulation_time->IncrementTimeOneStep();
@@ -1066,9 +1077,10 @@ public:
             p_stoc_model->SetDimension(2);
 
             boost::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
+            boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
             CellPtr p_stoc_cell(new Cell(p_healthy_state, p_stoc_model));
-            p_stoc_cell->SetCellProliferativeType(STEM);
+            p_stoc_cell->SetCellProliferativeType(p_stem_type);
             p_stoc_cell->InitialiseCellCycleModel();
 
             // Create another cell-cycle model and associated cell
@@ -1076,7 +1088,7 @@ public:
             p_wnt_model->SetDimension(2);
 
             CellPtr p_wnt_cell(new Cell(p_healthy_state, p_wnt_model));
-            p_wnt_cell->SetCellProliferativeType(STEM);
+            p_wnt_cell->SetCellProliferativeType(p_stem_type);
             p_wnt_cell->InitialiseCellCycleModel();
 
             p_simulation_time->IncrementTimeOneStep(); // 5.5

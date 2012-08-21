@@ -156,7 +156,7 @@ c_vector<double, 2> CryptSimulation2d::CalculateCellDivisionVector(CellPtr pPare
         if (!is_wnt_included)
         {
             WntConcentration<2>::Destroy();
-            if (pParentCell->GetCellProliferativeType() == STEM)
+            if (pParentCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
             {
                 axis_of_division(0) = 1.0;
                 axis_of_division(1) = 0.0;

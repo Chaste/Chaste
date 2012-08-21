@@ -515,7 +515,7 @@ public:
              cell_iter != crypt.End();
              ++cell_iter)
         {
-             TS_ASSERT(cell_iter->GetCellProliferativeType() != DIFFERENTIATED);
+             TS_ASSERT_EQUALS(cell_iter->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>(), false);
         }
 
         // Close the log file opened in this test
@@ -995,13 +995,13 @@ public:
                               "Call SetOutputCellMutationStates(true) before using this function");
         simulator.rGetCellPopulation().SetOutputCellMutationStates(true);
 
-        TS_ASSERT_THROWS_THIS(simulator.rGetCellPopulation().rGetCellProliferativeTypeCount(),
+        TS_ASSERT_THROWS_THIS(simulator.rGetCellPopulation().GetCellProliferativeTypeCount(),
                               "Call SetOutputCellProliferativeTypes(true) before using this function");
         simulator.rGetCellPopulation().SetOutputCellProliferativeTypes(true);
 
         TS_ASSERT_THROWS_THIS(simulator.rGetCellPopulation().rGetCellCyclePhaseCount(),
                               "Call SetOutputCellCyclePhases(true) before using this function");
-        crypt.SetOutputCellCyclePhases(true);
+        simulator.rGetCellPopulation().SetOutputCellCyclePhases(true);
 
         // Run simulation
         simulator.Solve();
@@ -1021,11 +1021,12 @@ public:
         TS_ASSERT_EQUALS(cell_mutation_state_count[2], 0u); // No APC two hit
         TS_ASSERT_EQUALS(cell_mutation_state_count[3], 1u);
 
-        std::vector<unsigned> cell_type_count = simulator.rGetCellPopulation().rGetCellProliferativeTypeCount();
-        TS_ASSERT_EQUALS(cell_type_count.size(), 3u);
+        std::vector<unsigned> cell_type_count = simulator.rGetCellPopulation().GetCellProliferativeTypeCount();
+        TS_ASSERT_EQUALS(cell_type_count.size(), 4u);
         TS_ASSERT_EQUALS(cell_type_count[0], 0u);
         TS_ASSERT_EQUALS(cell_type_count[1], 4u);
         TS_ASSERT_EQUALS(cell_type_count[2], 0u);
+        TS_ASSERT_EQUALS(cell_type_count[3], 0u);
 
         // Check writing of Voronoi data
         OutputFileHandler handler("Crypt2DWntMatureCells", false);
@@ -1530,11 +1531,12 @@ public:
         TS_ASSERT_EQUALS(p_registry->Get<CellLabel>()->GetCellCount(), 1u);
         TS_ASSERT_EQUALS(p_registry->Get<ApoptoticCellProperty>()->GetCellCount(), 0u);
 
-        std::vector<unsigned> cell_type_count1 = crypt.rGetCellProliferativeTypeCount();
-        TS_ASSERT_EQUALS(cell_type_count1.size(), 3u);
-        TS_ASSERT_EQUALS(cell_type_count1[0], 0u);
-        TS_ASSERT_EQUALS(cell_type_count1[1], 0u);
+        std::vector<unsigned> cell_type_count1 = crypt.GetCellProliferativeTypeCount();
+        TS_ASSERT_EQUALS(cell_type_count1.size(), 4u);
+        TS_ASSERT_EQUALS(cell_type_count1[0], 4u);
+        TS_ASSERT_EQUALS(cell_type_count1[1], 12u);
         TS_ASSERT_EQUALS(cell_type_count1[2], 0u);
+        TS_ASSERT_EQUALS(cell_type_count1[3], 0u);
 
         std::vector<unsigned> cell_cycle_phase_count1 = crypt.rGetCellCyclePhaseCount();
         TS_ASSERT_EQUALS(cell_cycle_phase_count1.size(), 5u);
@@ -1574,11 +1576,12 @@ public:
         TS_ASSERT_EQUALS(p_registry->Get<CellLabel>()->GetCellCount(), 1u);
         TS_ASSERT_EQUALS(p_registry->Get<ApoptoticCellProperty>()->GetCellCount(), 0u);
 
-        std::vector<unsigned> cell_type_count3 = crypt.rGetCellProliferativeTypeCount();
-        TS_ASSERT_EQUALS(cell_type_count3.size(), 3u);
+        std::vector<unsigned> cell_type_count3 = crypt.GetCellProliferativeTypeCount();
+        TS_ASSERT_EQUALS(cell_type_count3.size(), 4u);
         TS_ASSERT_EQUALS(cell_type_count3[0], 4u);
         TS_ASSERT_EQUALS(cell_type_count3[1], 13u);
         TS_ASSERT_EQUALS(cell_type_count3[2], 0u);
+        TS_ASSERT_EQUALS(cell_type_count3[3], 0u);
 
         std::vector<unsigned> cell_cycle_phase_count3 = crypt.rGetCellCyclePhaseCount();
         TS_ASSERT_EQUALS(cell_cycle_phase_count3.size(), 5u);
@@ -1630,11 +1633,12 @@ public:
         TS_ASSERT_EQUALS(p_registry->Get<CellLabel>()->GetCellCount(), 1u);
         TS_ASSERT_EQUALS(p_registry->Get<ApoptoticCellProperty>()->GetCellCount(), 0u);
 
-        std::vector<unsigned> cell_type_count4 = crypt.rGetCellProliferativeTypeCount();
-        TS_ASSERT_EQUALS(cell_type_count4.size(), 3u);
+        std::vector<unsigned> cell_type_count4 = crypt.GetCellProliferativeTypeCount();
+        TS_ASSERT_EQUALS(cell_type_count4.size(), 4u);
         TS_ASSERT_EQUALS(cell_type_count4[0], 4u);
         TS_ASSERT_EQUALS(cell_type_count4[1], 13u);
         TS_ASSERT_EQUALS(cell_type_count4[2], 0u);
+        TS_ASSERT_EQUALS(cell_type_count4[3], 0u);
 
         std::vector<unsigned> cell_cycle_phase_count4 = crypt.rGetCellCyclePhaseCount();
         TS_ASSERT_EQUALS(cell_cycle_phase_count4.size(), 5u);
@@ -1664,10 +1668,11 @@ public:
         TS_ASSERT_EQUALS(crypt.GetCellPropertyRegistry()->Get<CellLabel>()->GetCellCount(), 1u);
         TS_ASSERT_EQUALS(p_registry->Get<ApoptoticCellProperty>()->GetCellCount(), 0u);
 
-        std::vector<unsigned> cell_type_count5 = p_simulator->rGetCellPopulation().rGetCellProliferativeTypeCount();
-        TS_ASSERT_EQUALS(cell_type_count5.size(), 3u);
+        std::vector<unsigned> cell_type_count5 = p_simulator->rGetCellPopulation().GetCellProliferativeTypeCount();
+        TS_ASSERT_EQUALS(cell_type_count5.size(), 4u);
         TS_ASSERT_EQUALS(cell_type_count5[0], 4u);
-        TS_ASSERT_EQUALS(cell_type_count5[1], 16u);
+        TS_ASSERT_EQUALS(cell_type_count5[1], 13u);
+        TS_ASSERT_EQUALS(cell_type_count5[2], 0u);
         TS_ASSERT_EQUALS(cell_type_count5[2], 0u);
 
         std::vector<unsigned> cell_cycle_phase_count5 = p_simulator->rGetCellPopulation().rGetCellCyclePhaseCount();

@@ -51,6 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BuskeElasticForce.hpp"
 #include "BuskeCompressionForce.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
 
 class TestOffLatticeSimulationWithBuskeForces : public AbstractCellBasedTestSuite
@@ -202,8 +203,9 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), TRANSIT);
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type);
 
         // Create a node-based cell population
         NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
@@ -257,8 +259,9 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), TRANSIT);
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type);
 
         // Create a node-based cell population
         NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
@@ -298,8 +301,9 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells_buske;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator_buske;
-        cells_generator_buske.GenerateBasicRandom(cells_buske, mesh_buske.GetNumNodes(), DIFFERENTIATED);
+        cells_generator_buske.GenerateBasicRandom(cells_buske, mesh_buske.GetNumNodes(), p_diff_type);
 
         // Create a node-based cell population
         NodeBasedCellPopulation<2> node_based_cell_population_buske(mesh_buske, cells_buske);

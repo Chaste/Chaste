@@ -52,6 +52,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ApcOneHitCellMutationState.hpp"
 #include "ApcTwoHitCellMutationState.hpp"
 #include "BetaCateninOneHitCellMutationState.hpp"
+#include "StemCellProliferativeType.hpp"
+#include "TransitCellProliferativeType.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 
 #include "OutputFileHandler.hpp"
 #include "CheckReadyToDivideAndPhaseIsUpdated.hpp"
@@ -83,8 +86,10 @@ public:
         TS_ASSERT_EQUALS(p_cell_model->CanCellTerminallyDifferentiate(), false);
 
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
+
         CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
-        p_cell->SetCellProliferativeType(STEM);
+        p_cell->SetCellProliferativeType(p_stem_type);
         p_cell->InitialiseCellCycleModel();
 
         /*
@@ -105,7 +110,7 @@ public:
         p_other_cell_model->SetDt(0.1/60.0);
 
         CellPtr p_other_cell(new Cell(p_healthy_state, p_other_cell_model));
-        p_other_cell->SetCellProliferativeType(STEM);
+        p_other_cell->SetCellProliferativeType(p_stem_type);
         p_other_cell->InitialiseCellCycleModel();
 
         // Test the cell is ready to divide at the right time
@@ -156,7 +161,7 @@ public:
         MAKE_PTR(ApcOneHitCellMutationState, p_mutation);
 
         CellPtr p_stem_cell_2(new Cell(p_mutation, p_cell_model2));
-        p_stem_cell_2->SetCellProliferativeType(STEM);
+        p_stem_cell_2->SetCellProliferativeType(p_stem_type);
 
         // Test the cell is ready to divide at the right time
         for (unsigned i=0; i<num_timesteps/2; i++)
@@ -209,9 +214,10 @@ public:
         TysonNovakCellCycleModel* p_repeating_cell_model = new TysonNovakCellCycleModel;
 
         MAKE_PTR(ApcOneHitCellMutationState, p_mutation);
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
 
         CellPtr p_tyson_novak_cell(new Cell(p_mutation, p_repeating_cell_model));
-        p_tyson_novak_cell->SetCellProliferativeType(STEM);
+        p_tyson_novak_cell->SetCellProliferativeType(p_stem_type);
         p_tyson_novak_cell->InitialiseCellCycleModel();
 
         // Run through the cell-cycle model for a certain duration
@@ -272,19 +278,20 @@ public:
 
         // Create cells
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
 
         CellPtr p_cell_1d(new Cell(p_state, p_model_1d));
-        p_cell_1d->SetCellProliferativeType(STEM);
+        p_cell_1d->SetCellProliferativeType(p_stem_type);
         p_cell_1d->GetCellData()->SetItem("oxygen", oxygen_concentration);
         p_cell_1d->InitialiseCellCycleModel();
 
         CellPtr p_cell_2d(new Cell(p_state, p_model_2d));
-        p_cell_2d->SetCellProliferativeType(STEM);
+        p_cell_2d->SetCellProliferativeType(p_stem_type);
         p_cell_2d->GetCellData()->SetItem("oxygen", oxygen_concentration);
         p_cell_2d->InitialiseCellCycleModel();
 
         CellPtr p_cell_3d(new Cell(p_state, p_model_3d));
-        p_cell_3d->SetCellProliferativeType(STEM);
+        p_cell_3d->SetCellProliferativeType(p_stem_type);
         p_cell_3d->GetCellData()->SetItem("oxygen", oxygen_concentration);
         p_cell_3d->InitialiseCellCycleModel();
 
@@ -297,7 +304,7 @@ public:
         p_other_model_2d->SetDimension(2);
 
         CellPtr p_other_cell_2d(new Cell(p_state, p_other_model_2d));
-        p_other_cell_2d->SetCellProliferativeType(STEM);
+        p_other_cell_2d->SetCellProliferativeType(p_stem_type);
         p_other_cell_2d->GetCellData()->SetItem("oxygen", oxygen_concentration);
         p_other_cell_2d->InitialiseCellCycleModel();
 
@@ -311,17 +318,17 @@ public:
         // Divide the cells
         Alarcon2004OxygenBasedCellCycleModel* p_model_1d_2 = static_cast<Alarcon2004OxygenBasedCellCycleModel*> (p_model_1d->CreateCellCycleModel());
         CellPtr p_cell_1d_2(new Cell(p_state, p_model_1d_2));
-        p_cell_1d_2->SetCellProliferativeType(STEM);
+        p_cell_1d_2->SetCellProliferativeType(p_stem_type);
         p_cell_1d_2->GetCellData()->SetItem("oxygen", oxygen_concentration);
 
         Alarcon2004OxygenBasedCellCycleModel* p_model_2d_2 = static_cast<Alarcon2004OxygenBasedCellCycleModel*> (p_model_2d->CreateCellCycleModel());
         CellPtr p_cell_2d_2(new Cell(p_state, p_model_2d_2));
-        p_cell_2d_2->SetCellProliferativeType(STEM);
+        p_cell_2d_2->SetCellProliferativeType(p_stem_type);
         p_cell_2d_2->GetCellData()->SetItem("oxygen", oxygen_concentration);
 
         Alarcon2004OxygenBasedCellCycleModel* p_model_3d_2 = static_cast<Alarcon2004OxygenBasedCellCycleModel*> (p_model_3d->CreateCellCycleModel());
         CellPtr p_cell_3d_2(new Cell(p_state, p_model_3d_2));
-        p_cell_3d_2->SetCellProliferativeType(STEM);
+        p_cell_3d_2->SetCellProliferativeType(p_stem_type);
         p_cell_3d_2->GetCellData()->SetItem("oxygen", oxygen_concentration);
 
         p_simulation_time->IncrementTimeOneStep();
@@ -343,7 +350,7 @@ public:
         p_cell_model3->SetDimension(1);
 
         CellPtr p_cell3(new Cell(p_state, p_cell_model3));
-        p_cell3->SetCellProliferativeType(STEM);
+        p_cell3->SetCellProliferativeType(p_stem_type);
         p_cell3->GetCellData()->SetItem("oxygen", oxygen_concentration);
         p_cell3->InitialiseCellCycleModel();
 
@@ -372,8 +379,9 @@ public:
 
             // We must create a cell to be able to initialise the cell cycle model's ODE system
             MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
+            MAKE_PTR(StemCellProliferativeType, p_stem_type);
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
-            p_cell->SetCellProliferativeType(STEM);
+            p_cell->SetCellProliferativeType(p_stem_type);
             p_cell->InitialiseCellCycleModel();
 
             std::ofstream ofs(archive_filename.c_str());
@@ -435,8 +443,9 @@ public:
 
             // We must create a cell to be able to initialise the cell cycle model's ODE system
             MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
+            MAKE_PTR(StemCellProliferativeType, p_stem_type);
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
-            p_cell->SetCellProliferativeType(STEM);
+            p_cell->SetCellProliferativeType(p_stem_type);
             p_cell->GetCellData()->SetItem("oxygen", oxygen_concentration);
             p_cell->InitialiseCellCycleModel();
 

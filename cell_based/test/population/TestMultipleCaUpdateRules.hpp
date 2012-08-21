@@ -85,8 +85,9 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, 1u, DIFFERENTIATED);
+        cells_generator.GenerateBasicRandom(cells, 1u, p_diff_type);
 
         // Specify where cells lie here we have one cell on the bottom left site
         std::vector<unsigned> location_indices;
@@ -119,71 +120,73 @@ public:
 
     void TestDiffusionMultipleCaUpdateRuleIn2dWithMultipleCells() throw (Exception)
     {
-           // timestep and size of domain to let us calculate the probabilities of movement.
-           double delta_t = 1;
-           double delta_x = 1;
-           double diffusion_parameter = 0.1;
+        // timestep and size of domain to let us calculate the probabilities of movement.
+        double delta_t = 1;
+        double delta_x = 1;
+        double diffusion_parameter = 0.1;
 
-           // Create an update law system
-           DiffusionMultipleCaUpdateRule<2> diffusion_update_rule;
+        // Create an update law system
+        DiffusionMultipleCaUpdateRule<2> diffusion_update_rule;
 
-           // Test get/set methods
-           TS_ASSERT_DELTA(diffusion_update_rule.GetDiffusionParameter(), 0.5, 1e-12);
+        // Test get/set methods
+        TS_ASSERT_DELTA(diffusion_update_rule.GetDiffusionParameter(), 0.5, 1e-12);
 
-           diffusion_update_rule.SetDiffusionParameter(1.0);
+        diffusion_update_rule.SetDiffusionParameter(1.0);
 
-           TS_ASSERT_DELTA(diffusion_update_rule.GetDiffusionParameter(), 1.0, 1e-12);
+        TS_ASSERT_DELTA(diffusion_update_rule.GetDiffusionParameter(), 1.0, 1e-12);
 
-           diffusion_update_rule.SetDiffusionParameter(diffusion_parameter);
+        diffusion_update_rule.SetDiffusionParameter(diffusion_parameter);
 
-           // Test EvaluateProbability()
+        // Test EvaluateProbability()
 
-           // Create a simple 2D PottsMesh
-           PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
-           PottsMesh<2>* p_mesh = generator.GetMesh();
+        // Create a simple 2D PottsMesh
+        PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
 
-           // Create cells
-           std::vector<CellPtr> cells;
-           CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-           cells_generator.GenerateBasicRandom(cells, 10u, DIFFERENTIATED);
+        // Create cells
+        std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, 10u, p_diff_type);
 
-           // Specify where cells lie here we have one cell on the bottom left site
-           std::vector<unsigned> location_indices;
-           // Two cells will be added in locations 0 and 1
-           location_indices.push_back(0u);
-           location_indices.push_back(0u);
-           location_indices.push_back(1u);
-           location_indices.push_back(1u);
+        // Specify where cells lie here we have one cell on the bottom left site
+        std::vector<unsigned> location_indices;
 
-           // Then other cells are added to the lattice to check if the probabilities are still the same
-           for (unsigned i=4; i<10; i++)
-           {
-               location_indices.push_back(i);
-           }
+        // Two cells will be added in locations 0 and 1
+        location_indices.push_back(0u);
+        location_indices.push_back(0u);
+        location_indices.push_back(1u);
+        location_indices.push_back(1u);
 
-           // Create cell population
-           MultipleCaBasedCellPopulation<2u> cell_population(*p_mesh, cells, location_indices, 2);
+        // Then other cells are added to the lattice to check if the probabilities are still the same
+        for (unsigned i=4; i<10; i++)
+        {
+            location_indices.push_back(i);
+        }
 
-           TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(0,1,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/2.0,1e-6);
-           TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(0,6,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/4.0,1e-6);
-           TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(0,5,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/2.0,1e-6);
+        // Create cell population
+        MultipleCaBasedCellPopulation<2u> cell_population(*p_mesh, cells, location_indices, 2);
 
-           TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(5,1,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/4.0,1e-6);
-           TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(5,6,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/2.0,1e-6);
-           TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(5,10,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/2.0,1e-6);
-           TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(5,11,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/4.0,1e-6);
+        TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(0,1,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/2.0,1e-6);
+        TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(0,6,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/4.0,1e-6);
+        TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(0,5,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/2.0,1e-6);
 
-           TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(6,11,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/2.0,1e-6);
-           TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(7,11,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/4.0,1e-6);
-           TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(10,11,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/2.0,1e-6);
-           TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(12,11,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/2.0,1e-6);
-           TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(15,11,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/4.0,1e-6);
-           TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(16,11,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/2.0,1e-6);
-           TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(17,11,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/4.0,1e-6);
+        TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(5,1,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/4.0,1e-6);
+        TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(5,6,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/2.0,1e-6);
+        TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(5,10,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/2.0,1e-6);
+        TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(5,11,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/4.0,1e-6);
 
-           TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(24,19,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/2.0,1e-6);
-           TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(24,18,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/4.0,1e-6);
-           TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(24,23,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/2.0,1e-6);
+        TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(6,11,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/2.0,1e-6);
+        TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(7,11,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/4.0,1e-6);
+        TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(10,11,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/2.0,1e-6);
+        TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(12,11,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/2.0,1e-6);
+        TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(15,11,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/4.0,1e-6);
+        TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(16,11,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/2.0,1e-6);
+        TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(17,11,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/4.0,1e-6);
+
+        TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(24,19,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/2.0,1e-6);
+        TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(24,18,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/4.0,1e-6);
+        TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(24,23,cell_population, delta_t, delta_x),diffusion_parameter*delta_t/delta_x/delta_x/2.0,1e-6);
     }
 
     void TestArchiveDiffusionMultipleCaUpdateRule() throw(Exception)

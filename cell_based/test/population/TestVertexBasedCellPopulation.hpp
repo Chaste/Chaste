@@ -51,6 +51,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ApcOneHitCellMutationState.hpp"
 #include "ApcTwoHitCellMutationState.hpp"
 #include "BetaCateninOneHitCellMutationState.hpp"
+#include "TransitCellProliferativeType.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 #include "CellLabel.hpp"
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
@@ -176,9 +178,10 @@ public:
                 "Element 8 does not appear to have a cell associated with it");
 
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_cell(new Cell(p_state, p_model));
-        p_cell->SetCellProliferativeType(STEM);
+        p_cell->SetCellProliferativeType(p_stem_type);
 
         double birth_time = 0.0 - p_mesh->GetNumElements()-1;
         p_cell->SetBirthTime(birth_time);
@@ -387,10 +390,11 @@ public:
 
         CellPtr p_cell0 = cell_population.GetCellUsingLocationIndex(0);
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
 
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_temp_cell(new Cell(p_state, p_model));
-        p_temp_cell->SetCellProliferativeType(STEM);
+        p_temp_cell->SetCellProliferativeType(p_stem_type);
         p_temp_cell->SetBirthTime(-1);
 
         CellPtr p_new_cell = cell_population.AddCell(p_temp_cell, cell_division_vector, p_cell0);
@@ -468,9 +472,12 @@ public:
         // Create a cell
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
+
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_cell(new Cell(p_state, p_model));
-        p_cell->SetCellProliferativeType(DIFFERENTIATED);
+        p_cell->SetCellProliferativeType(p_diff_type);
         p_cell->SetBirthTime(-20.0);
         cells.push_back(p_cell);
 
@@ -489,7 +496,7 @@ public:
 
         FixedDurationGenerationBasedCellCycleModel* p_model2 = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_temp_cell(new Cell(p_state, p_model2));
-        p_temp_cell->SetCellProliferativeType(STEM);
+        p_temp_cell->SetCellProliferativeType(p_stem_type);
         p_temp_cell->SetBirthTime(-1.0);
 
         CellPtr p_new_cell = cell_population.AddCell(p_temp_cell, cell_division_axis, p_cell);
@@ -531,21 +538,27 @@ public:
         // a birth time of -elem_index, so its age is elem_index
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
-            CellProliferativeType cell_type = DIFFERENTIATED;
+            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            CellPtr p_cell(new Cell(p_state, p_model));
+
             double birth_time = 0.0 - elem_index;
 
             // Cell 4 should divide immediately
             if (elem_index==4)
             {
-                cell_type = TRANSIT; // As stem cells always divide horizontally
+                p_cell->SetCellProliferativeType(p_transit_type); // as stem cells always divide horizontally
                 birth_time = -50.0;
             }
+            else
+            {
+                p_cell->SetCellProliferativeType(p_diff_type);
+            }
 
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-            CellPtr p_cell(new Cell(p_state, p_model));
-            p_cell->SetCellProliferativeType(cell_type);
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
         }
@@ -770,8 +783,9 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
+        boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), DIFFERENTIATED);
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
 
         // Create cell population
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
@@ -785,16 +799,35 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_bcat1(cell_population.GetCellPropertyRegistry()->Get<BetaCateninOneHitCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_state(cell_population.GetCellPropertyRegistry()->Get<ApoptoticCellProperty>());
         boost::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
+        boost::shared_ptr<AbstractCellProperty> p_stem_type(cell_population.GetCellPropertyRegistry()->Get<StemCellProliferativeType>());
+        boost::shared_ptr<AbstractCellProperty> p_transit_type(cell_population.GetCellPropertyRegistry()->Get<TransitCellProliferativeType>());
 
-        cell_population.GetCellUsingLocationIndex(0)->SetCellProliferativeType(TRANSIT);
+        cell_population.GetCellUsingLocationIndex(0)->SetCellProliferativeType(p_transit_type);
         cell_population.GetCellUsingLocationIndex(0)->AddCellProperty(p_label);
-        cell_population.GetCellUsingLocationIndex(1)->SetCellProliferativeType(DIFFERENTIATED);
+        cell_population.GetCellUsingLocationIndex(1)->SetCellProliferativeType(p_diff_type);
         cell_population.GetCellUsingLocationIndex(1)->SetMutationState(p_apc1);
         cell_population.GetCellUsingLocationIndex(2)->SetMutationState(p_apc2);
         cell_population.GetCellUsingLocationIndex(3)->SetMutationState(p_bcat1);
         cell_population.GetCellUsingLocationIndex(4)->AddCellProperty(p_apoptotic_state);
-        cell_population.GetCellUsingLocationIndex(5)->SetCellProliferativeType(STEM);
+        cell_population.GetCellUsingLocationIndex(5)->SetCellProliferativeType(p_stem_type);
         cell_population.SetCellAncestorsToLocationIndices();
+
+        // Check that each cell has the correct proliferative type
+        for (unsigned i=0; i<cells.size(); i++)
+        {
+            if (i == 0)
+            {
+                TS_ASSERT_EQUALS(cells[i]->GetCellProliferativeType()->IsType<TransitCellProliferativeType>(), true);
+            }
+            else if (i == 1)
+            {
+                TS_ASSERT_EQUALS(cells[i]->GetCellProliferativeType()->IsType<StemCellProliferativeType>(), true);
+            }
+            else
+            {
+                TS_ASSERT_EQUALS(cells[i]->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>(), true);
+            }
+        }
 
         cell_population.SetOutputCellMutationStates(true);
         cell_population.SetOutputCellProliferativeTypes(true);
@@ -824,15 +857,15 @@ public:
         // Compare output with saved files of what they should look like
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-        FileComparison( results_dir + "results.viznodes", "cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/results.viznodes").CompareFiles();
-        FileComparison( results_dir + "results.vizelements", "cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/results.vizelements").CompareFiles();
-        FileComparison( results_dir + "results.vizcelltypes", "cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/results.vizcelltypes").CompareFiles();
-        FileComparison( results_dir + "results.vizancestors", "cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/results.vizancestors").CompareFiles();
-        FileComparison( results_dir + "cellmutationstates.dat", "cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/cellmutationstates.dat").CompareFiles();
-        FileComparison( results_dir + "cellages.dat", "cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/cellages.dat").CompareFiles();
-        FileComparison( results_dir + "cellcyclephases.dat", "cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/cellcyclephases.dat").CompareFiles();
-        FileComparison( results_dir + "celltypes.dat", "cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/celltypes.dat").CompareFiles();
-        FileComparison( results_dir + "cellareas.dat", "cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/cellareas.dat").CompareFiles();
+        FileComparison(results_dir + "results.viznodes", "cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/results.viznodes").CompareFiles();
+        FileComparison(results_dir + "results.vizelements", "cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/results.vizelements").CompareFiles();
+        FileComparison(results_dir + "results.vizcelltypes", "cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/results.vizcelltypes").CompareFiles();
+        FileComparison(results_dir + "results.vizancestors", "cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/results.vizancestors").CompareFiles();
+        FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/cellmutationstates.dat").CompareFiles();
+        FileComparison(results_dir + "cellages.dat", "cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/cellages.dat").CompareFiles();
+        FileComparison(results_dir + "cellcyclephases.dat", "cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/cellcyclephases.dat").CompareFiles();
+        FileComparison(results_dir + "celltypes.dat", "cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/celltypes.dat").CompareFiles();
+        FileComparison(results_dir + "cellareas.dat", "cell_based/test/data/TestVertexBasedCellPopulationOutputWriters/cellareas.dat").CompareFiles();
 
         // Test the GetCellMutationStateCount function
         std::vector<unsigned> cell_mutation_states = cell_population.GetCellMutationStateCount();
@@ -842,12 +875,13 @@ public:
         TS_ASSERT_EQUALS(cell_mutation_states[2], 1u);
         TS_ASSERT_EQUALS(cell_mutation_states[3], 1u);
 
-        // Test the GetCellProliferativeTypeCount function
-        std::vector<unsigned> cell_types = cell_population.rGetCellProliferativeTypeCount();
-        TS_ASSERT_EQUALS(cell_types.size(), 3u);
+        // Test the GetCellProliferativeTypeCount() function
+        std::vector<unsigned> cell_types = cell_population.GetCellProliferativeTypeCount();
+        TS_ASSERT_EQUALS(cell_types.size(), 4u);
         TS_ASSERT_EQUALS(cell_types[0], 1u);
         TS_ASSERT_EQUALS(cell_types[1], 1u);
         TS_ASSERT_EQUALS(cell_types[2], 22u);
+        TS_ASSERT_EQUALS(cell_types[3], 0u);
 
         // For coverage
         TS_ASSERT_THROWS_NOTHING(cell_population.WriteResultsToFiles());

@@ -35,6 +35,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "SimpleWntCellCycleModel.hpp"
 #include "Exception.hpp"
+#include "StemCellProliferativeType.hpp"
+#include "TransitCellProliferativeType.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 
 SimpleWntCellCycleModel::SimpleWntCellCycleModel()
     : mUseCellProliferativeTypeDependentG1Duration(false),
@@ -88,27 +91,29 @@ void SimpleWntCellCycleModel::SetG1Duration()
 
     RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
 
-    switch (mpCell->GetCellProliferativeType())
+    if (mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
     {
-        case STEM:
-            if (mUseCellProliferativeTypeDependentG1Duration)
-            {
-                mG1Duration = p_gen->NormalRandomDeviate(GetStemCellG1Duration(), 1.0);
-            }
-            else
-            {
-                // Normally stem cells should behave just like transit cells in a Wnt simulation
-                mG1Duration = p_gen->NormalRandomDeviate(GetTransitCellG1Duration(), 1.0);
-            }
-            break;
-        case TRANSIT:
+        if (mUseCellProliferativeTypeDependentG1Duration)
+        {
+            mG1Duration = p_gen->NormalRandomDeviate(GetStemCellG1Duration(), 1.0);
+        }
+        else
+        {
+            // Normally stem cells should behave just like transit cells in a Wnt simulation
             mG1Duration = p_gen->NormalRandomDeviate(GetTransitCellG1Duration(), 1.0);
-            break;
-        case DIFFERENTIATED:
-            mG1Duration = DBL_MAX;
-            break;
-        default:
-            NEVER_REACHED;
+        }
+    }
+    else if (mpCell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>())
+    {
+        mG1Duration = p_gen->NormalRandomDeviate(GetTransitCellG1Duration(), 1.0);
+    }
+    else if (mpCell->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>())
+    {
+        mG1Duration = DBL_MAX;
+    }
+    else
+    {
+        NEVER_REACHED;
     }
 
     // Check that the normal random deviate has not returned a small or negative G1 duration
@@ -216,23 +221,38 @@ void SimpleWntCellCycleModel::UpdateCellCyclePhase()
     double wnt_level = GetWntLevel();
     WntConcentrationType wnt_type = GetWntType();
 
-    // Set the cell type to TRANSIT if the Wnt stimulus exceeds wnt_division_threshold
+    // Set the cell type to TransitCellProliferativeType if the Wnt stimulus exceeds wnt_division_threshold
     if (wnt_level >= wnt_division_threshold)
     {
-        CellProliferativeType cell_type = TRANSIT;
-
-        // For a RADIAL Wnt type, override the cell type to STEM if the Wnt stimulus exceeds a higher threshold
+        // For a RADIAL Wnt type, override the cell type to StemCellProliferativeType if the Wnt stimulus exceeds a higher threshold
         if ((wnt_type == RADIAL) && (wnt_level > mWntStemThreshold))
         {
-            cell_type = STEM;
+            /*
+             * This method is usually called within a CellBasedSimulation, after the CellPopulation
+             * has called CellPropertyRegistry::TakeOwnership(). This means that were we to call
+             * CellPropertyRegistry::Instance() here when setting the CellProliferativeType, we
+             * would be creating a new CellPropertyRegistry. In this case the cell proliferative
+             * type counts, as returned by AbstractCellPopulation::GetCellProliferativeTypeCount(),
+             * would be incorrect. We must therefore access the CellProliferativeType via the cell's
+             * CellPropertyCollection.
+             */
+            boost::shared_ptr<AbstractCellProperty> p_stem_type =
+                mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<StemCellProliferativeType>();
+            mpCell->SetCellProliferativeType(p_stem_type);
         }
-
-        mpCell->SetCellProliferativeType(cell_type);
+        else
+        {
+            boost::shared_ptr<AbstractCellProperty> p_transit_type =
+                mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<TransitCellProliferativeType>();
+            mpCell->SetCellProliferativeType(p_transit_type);
+        }
     }
     else
     {
-        // The cell is DIFFERENTIATED and so in G0 phase
-        mpCell->SetCellProliferativeType(DIFFERENTIATED);
+        // The cell is set to have DifferentiatedCellProliferativeType and so in G0 phase
+        boost::shared_ptr<AbstractCellProperty> p_diff_type =
+            mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<DifferentiatedCellProliferativeType>();
+        mpCell->SetCellProliferativeType(p_diff_type);
     }
     AbstractSimpleCellCycleModel::UpdateCellCyclePhase();
 }
@@ -243,7 +263,9 @@ void SimpleWntCellCycleModel::InitialiseDaughterCell()
 
     if (wnt_type == RADIAL)
     {
-        mpCell->SetCellProliferativeType(TRANSIT);
+        boost::shared_ptr<AbstractCellProperty> p_transit_type =
+            mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<TransitCellProliferativeType>();
+        mpCell->SetCellProliferativeType(p_transit_type);
     }
 
     AbstractSimpleCellCycleModel::InitialiseDaughterCell();

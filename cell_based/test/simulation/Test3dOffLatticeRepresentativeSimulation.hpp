@@ -49,6 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
 
 
@@ -184,6 +185,7 @@ public:
 
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
 
         for (std::vector<unsigned>::iterator real_node_iter=real_node_indices.begin();
                                             real_node_iter != real_node_indices.end();
@@ -191,7 +193,7 @@ public:
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             CellPtr p_cell(new Cell(p_state, p_model));
-            p_cell->SetCellProliferativeType(DIFFERENTIATED);
+            p_cell->SetCellProliferativeType(p_diff_type);
             cells.push_back(p_cell);
         }
 

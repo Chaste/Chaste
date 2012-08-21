@@ -281,7 +281,7 @@ public:
         CylindricalHoneycombVertexMeshGenerator generator(4, 6);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
-        // Create cells, bottom row are STEM rest are DIFFERENTIATED.
+        // Create cells: the bottom row have StemCellProliferativeType and the rest have DifferentiatedCellProliferativeType
         std::vector<CellPtr> cells;
         CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 0.8, 0.8, 0.8, 0.8);
@@ -481,7 +481,7 @@ public:
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
-        // Create cells, bottom row are STEM rest are DIFFERENTIATED.
+        // Create cells: the bottom row have StemCellProliferativeType and the rest have DifferentiatedCellProliferativeType
         std::vector<CellPtr> cells;
         CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 0.8, 0.8, 0.8, 0.8);

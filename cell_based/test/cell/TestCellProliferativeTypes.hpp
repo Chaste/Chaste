@@ -238,7 +238,7 @@ public:
 
         // Archive a cell proliferative type
         {
-        	DefaultCellProliferativeType* p_type = new DefaultCellProliferativeType();
+            DefaultCellProliferativeType* p_type = new DefaultCellProliferativeType();
             p_type->IncrementCellCount();
 
             TS_ASSERT_EQUALS(p_type->GetCellCount(), 1u);

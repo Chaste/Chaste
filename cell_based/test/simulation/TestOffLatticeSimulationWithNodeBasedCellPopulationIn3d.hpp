@@ -88,8 +88,9 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<StochasticDurationGenerationBasedCellCycleModel, 3> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), TRANSIT);
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type);
 
         // Create a node-based cell population
         NodeBasedCellPopulation<3> node_based_cell_population(mesh, cells);
@@ -147,8 +148,9 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<StochasticDurationGenerationBasedCellCycleModel, 3> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), TRANSIT);
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type);
 
         // Create a node-based cell population
         NodeBasedCellPopulation<3> node_based_cell_population(mesh, cells);

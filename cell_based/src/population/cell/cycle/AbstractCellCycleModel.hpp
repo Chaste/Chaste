@@ -45,7 +45,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 
 #include "OutputFileHandler.hpp"
-#include "CellProliferativeTypes.hpp"
 #include "CellCyclePhases.hpp"
 #include "SimulationTime.hpp"
 #include "Cell.hpp"

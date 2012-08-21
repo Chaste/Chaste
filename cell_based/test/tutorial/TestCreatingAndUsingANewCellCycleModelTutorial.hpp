@@ -86,6 +86,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WildTypeCellMutationState.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "OffLatticeSimulation.hpp"
+#include "StemCellProliferativeType.hpp"
+#include "TransitCellProliferativeType.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 
 /*
  * == Defining the cell-cycle model class ==
@@ -140,19 +143,21 @@ private:
          * cell cycle, we set the G1 duration to {{{DBL_MAX}}}. */
         double uniform_random_number = RandomNumberGenerator::Instance()->ranf();
 
-        switch (mpCell->GetCellProliferativeType())
+        if (mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
         {
-            case STEM:
-                mG1Duration = -log(uniform_random_number)*GetStemCellG1Duration();
-                break;
-            case TRANSIT:
-                mG1Duration = -log(uniform_random_number)*GetTransitCellG1Duration();
-                break;
-            case DIFFERENTIATED:
-                mG1Duration = DBL_MAX;
-                break;
-            default:
-                NEVER_REACHED;
+            mG1Duration = -log(uniform_random_number)*GetStemCellG1Duration();
+        }
+        else if (mpCell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>())
+        {
+            mG1Duration = -log(uniform_random_number)*GetTransitCellG1Duration();
+        }
+        else if (mpCell->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>())
+        {
+            mG1Duration = DBL_MAX;
+        }
+        else
+        {
+            NEVER_REACHED;
         }
     }
 
@@ -247,11 +252,13 @@ public:
         unsigned num_cells = (unsigned) 1e5;
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         for (unsigned i=0; i<num_cells; i++)
         {
             MyCellCycleModel* p_cell_cycle_model = new MyCellCycleModel;
             CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
-            p_cell->SetCellProliferativeType(STEM);
+            p_cell->SetCellProliferativeType(p_stem_type);
             p_cell->InitialiseCellCycleModel();
             cells.push_back(p_cell);
         }
@@ -271,7 +278,7 @@ public:
         /* Now construct another {{{MyCellCycleModel}}} and associated cell. */
         MyCellCycleModel* p_my_model = new MyCellCycleModel;
         CellPtr p_my_cell(new Cell(p_state, p_my_model));
-        p_my_cell->SetCellProliferativeType(TRANSIT);
+        p_my_cell->SetCellProliferativeType(p_transit_type);
         p_my_cell->InitialiseCellCycleModel();
 
         /* Use the helper method {{{CheckReadyToDivideAndPhaseIsUpdated()}}} to
@@ -310,7 +317,7 @@ public:
             /* Create a cell with associated cell-cycle model. */
             MyCellCycleModel* p_model = new MyCellCycleModel;
             CellPtr p_cell(new Cell(p_state, p_model));
-            p_cell->SetCellProliferativeType(TRANSIT);
+            p_cell->SetCellProliferativeType(p_transit_type);
             p_cell->InitialiseCellCycleModel();
 
             /* Move forward two time steps. */
@@ -380,13 +387,14 @@ public:
          * We make use of the macro MAKE_PTR to do this: the first argument is the class and
          * the second argument is the name of the shared_ptr. */
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
         /* Then we loop over the nodes. */
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             /* For each node we create a cell with our cell-cycle model. */
             MyCellCycleModel* p_model = new MyCellCycleModel();
             CellPtr p_cell(new Cell(p_state, p_model));
-            p_cell->SetCellProliferativeType(STEM);
+            p_cell->SetCellProliferativeType(p_stem_type);
 
             /* Now, we define a random birth time, chosen from [-T,0], where
              * T = t,,1,, + t,,2,,, where t,,1,, is a parameter representing the G,,1,, duration

@@ -65,6 +65,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TransitCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "ApoptoticCellProperty.hpp"
+#include "DefaultCellProliferativeType.hpp"
+#include "StemCellProliferativeType.hpp"
+#include "TransitCellProliferativeType.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 #include "CellLabel.hpp"
 #include "CellData.hpp"
 #include "AbstractMesh.hpp"
@@ -95,7 +99,6 @@ private:
         archive & mCells;
         archive & mLocationCellMap;
         archive & mCellLocationMap;
-        archive & mCellProliferativeTypeCount;
         archive & mCellCyclePhaseCount;
         archive & mpCellPropertyRegistry;
         archive & mOutputCellIdData;
@@ -121,9 +124,6 @@ protected:
 
     /** List of cells */
     std::list<CellPtr> mCells;
-
-    /** Current cell type counts */
-    std::vector<unsigned> mCellProliferativeTypeCount;
 
     /** Current cell cycle phase counts */
     std::vector<unsigned> mCellCyclePhaseCount;
@@ -360,7 +360,7 @@ public:
     /**
      * Find out how many cells of each mutation state there are
      *
-     * @return The number of cells of each mutation state (evaluated at each visualizer output)
+     * @return The number of cells of each mutation state (evaluated at each visualizer output), with default ordering
      * [0] = healthy count
      * [1] = APC one hit
      * [2] = APC two hit
@@ -369,17 +369,18 @@ public:
     std::vector<unsigned> GetCellMutationStateCount();
 
     /**
-     * Find out how many cells of each type there are
+     * Find out how many cells of each type there are.
      *
-     * @return The number of cells of each type (evaluated at each visualizer output)
+     * @return The number of cells of each type (evaluated at each visualizer output), with default ordering
      * [0] = STEM
      * [1] = TRANSIT
      * [2] = DIFFERENTIATED
+     * [3] = DEFAULT
      */
-     const std::vector<unsigned>& rGetCellProliferativeTypeCount() const;
+    std::vector<unsigned> GetCellProliferativeTypeCount();
 
     /**
-     * Find out how many cells in each cell cycle phase there are
+     * Find out how many cells in each cell cycle phase there are.
      *
      * @return The number of cells of each phase (evaluated at each visualizer output)
      * [0] = G_ZERO_PHASE
@@ -499,10 +500,10 @@ public:
     boost::shared_ptr<CellPropertyRegistry> GetCellPropertyRegistry();
 
     /**
-     * Set a default ordering on mutation states, so that existing tests don't need to
-     * specify the old ordering explicitly.
+     * Set a default ordering on cell mutation states and cell proliferative types, so that
+     * existing tests don't need to specify the old ordering explicitly.
      */
-    void SetDefaultMutationStateOrdering();
+    void SetDefaultCellMutationStateAndProliferativeTypeOrdering();
 
     /**
      * Calculate the 'width' of any dimension of the cell population.
@@ -568,12 +569,9 @@ public:
      * Generate results for a given cell in the current cell population state to output files.
      *
      * @param pCell pointer to the cell
-     * @param rCellProliferativeTypeCounter cell type counter
      * @param rCellCyclePhaseCounter cell cycle phase counter
      */
-    virtual void GenerateCellResults(CellPtr pCell,
-                             std::vector<unsigned>& rCellProliferativeTypeCounter,
-                             std::vector<unsigned>& rCellCyclePhaseCounter);
+    virtual void GenerateCellResults(CellPtr pCell, std::vector<unsigned>& rCellCyclePhaseCounter);
 
     /**
      * Write the current volume of each cell to file.
@@ -584,12 +582,10 @@ public:
 
     /**
      * Write the current state of each cell to output files.
-
-     * @param rCellProliferativeTypeCounter cell type counter
+     *
      * @param rCellCyclePhaseCounter cell cycle phase counter
      */
-    void WriteCellResultsToFiles(std::vector<unsigned>& rCellProliferativeTypeCounter,
-                                 std::vector<unsigned>& rCellCyclePhaseCounter);
+    void WriteCellResultsToFiles(std::vector<unsigned>& rCellCyclePhaseCounter);
 
     /**
      * Close any output files.
@@ -889,6 +885,5 @@ typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator AbstractCellPo
 {
     return Iterator(*this, this->mCells.end());
 }
-
 
 #endif /*ABSTRACTCELLPOPULATION_HPP_*/

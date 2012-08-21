@@ -114,8 +114,9 @@ public:
          * the three lines below in a straightforward manner to incorporate cell proliferation and investigate
          * the effect of this on the cell sorting process. */
         std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), DIFFERENTIATED);
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
 
         /* Using the vertex mesh and cells, we create a cell-based population object, and specify which results to
          * output to file. */

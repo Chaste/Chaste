@@ -94,6 +94,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "SimpleOxygenBasedCellCycleModel.hpp"
 #include "WildTypeCellMutationState.hpp"
+#include "StemCellProliferativeType.hpp"
 /*
  * The next three header files define: a PDE that describes how oxygen is transported via through the
  * domain via diffusion and is consumed by live cells; a constant-valued boundary condition to
@@ -153,6 +154,7 @@ public:
          * `WildTypeCellMutationState` (i.e. 'healthy'):
          */
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
 
         /*
          * Now we loop over the nodes...
@@ -161,14 +163,12 @@ public:
         {
             /*
              * ...then create a cell, giving it a {{{SimpleOxygenBasedCellCycleModel}}}.
-             * The spatial dimension (1, 2 or 3) and
-             * cell proliferative type (STEM, TRANSIT or DIFFERENTIATED) needs to be
-             * set on the cell-cycle model before it is passed to the cell.
+             * The spatial dimension (1, 2 or 3) needs to be set on the cell-cycle model before it is passed to the cell.
              */
             SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel;
             p_model->SetDimension(2);
             CellPtr p_cell(new Cell(p_state, p_model));
-            p_cell->SetCellProliferativeType(STEM);
+            p_cell->SetCellProliferativeType(p_stem_type);
 
             /*
              * We also alter the default cell-cycle times.

@@ -181,7 +181,6 @@ namespace boost
     }
 }
 
-
 /*
  * This completes the code for {{{MyCellKiller}}}. Note that usually this code
  * would be separated out into a separate declaration in a .hpp file and definition

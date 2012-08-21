@@ -85,6 +85,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "GeneralisedLinearSpringForce.hpp"
 #include "NagaiHondaForce.hpp"
 #include "OffLatticeSimulation.hpp"
+#include "TransitCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
 
 /* Next, we define the test class, which inherits from {{{AbstractCellBasedTestSuite}}}
@@ -114,8 +115,9 @@ public:
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         std::vector<CellPtr> cells;
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, location_indices.size(), TRANSIT);
+        cells_generator.GenerateBasicRandom(cells, location_indices.size(), p_transit_type);
 
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
 

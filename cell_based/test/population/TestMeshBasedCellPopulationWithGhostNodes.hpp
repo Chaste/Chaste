@@ -48,6 +48,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
+#include "StemCellProliferativeType.hpp"
+#include "TransitCellProliferativeType.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
 #include "CellId.hpp"
 #include "FileComparison.hpp"
@@ -258,7 +261,6 @@ public:
 
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            CellProliferativeType cell_type;
             unsigned generation;
             double y = 0.0;
 
@@ -273,46 +275,53 @@ public:
             double typical_transit_cycle_time = p_cell_cycle_model->GetAverageTransitCellCycleTime();
             double typical_stem_cycle_time = p_cell_cycle_model->GetAverageStemCellCycleTime();
 
-            double birth_time = 0.0;
-            birth_time = -p_random_num_gen->ranf();
+            boost::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+            boost::shared_ptr<AbstractCellProperty> p_stem_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+            boost::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
+            boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
 
+            CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
+
+            double birth_time = -p_random_num_gen->ranf();
             if (y <= 0.3)
             {
-                cell_type = STEM;
+                p_cell->SetCellProliferativeType(p_stem_type);
                 generation = 0;
                 birth_time *= typical_stem_cycle_time; // hours
             }
             else if (y < 2.0)
             {
-                cell_type = TRANSIT;
+                p_cell->SetCellProliferativeType(p_transit_type);
                 generation = 1;
                 birth_time *= typical_transit_cycle_time; // hours
             }
             else if (y < 3.0)
             {
-                cell_type = TRANSIT;
+                p_cell->SetCellProliferativeType(p_transit_type);
                 generation = 2;
                 birth_time *= typical_transit_cycle_time; // hours
             }
             else if (y < 4.0)
             {
-                cell_type = TRANSIT;
+                p_cell->SetCellProliferativeType(p_transit_type);
                 generation = 3;
                 birth_time *= typical_transit_cycle_time; // hours
             }
             else
             {
-                cell_type = p_cell_cycle_model->CanCellTerminallyDifferentiate() ? DIFFERENTIATED : TRANSIT;
+                if (p_cell_cycle_model->CanCellTerminallyDifferentiate())
+                {
+                    p_cell->SetCellProliferativeType(p_diff_type);
+                }
+                else
+                {
+                    p_cell->SetCellProliferativeType(p_transit_type);
+                }
                 generation = 4;
                 birth_time *= typical_transit_cycle_time; // hours
             }
 
             p_cell_cycle_model->SetGeneration(generation);
-
-            boost::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-
-            CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
-            p_cell->SetCellProliferativeType(cell_type);
             p_cell->SetBirthTime(birth_time);
 
             if (std::find(location_indices.begin(), location_indices.end(), i) != location_indices.end())
@@ -465,10 +474,11 @@ public:
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 70u);
 
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
 
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_new_cell(new Cell(p_state, p_model));
-        p_new_cell->SetCellProliferativeType(STEM);
+        p_new_cell->SetCellProliferativeType(p_stem_type);
         p_new_cell->SetBirthTime(0);
 
         c_vector<double,2> new_location;
@@ -489,7 +499,7 @@ public:
 
         FixedDurationGenerationBasedCellCycleModel* p_model2 = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_new_cell2(new Cell(p_state, p_model2));
-        p_new_cell2->SetCellProliferativeType(STEM);
+        p_new_cell2->SetCellProliferativeType(p_stem_type);
         p_new_cell2->SetBirthTime(0);
 
         c_vector<double,2> new_location2;
@@ -518,7 +528,6 @@ public:
 
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            CellProliferativeType cell_type;
             unsigned generation;
             double y = 0.0;
 
@@ -533,46 +542,54 @@ public:
             double typical_transit_cycle_time = p_cell_cycle_model->GetAverageTransitCellCycleTime();
             double typical_stem_cycle_time = p_cell_cycle_model->GetAverageStemCellCycleTime();
 
-            double birth_time = 0.0;
-            birth_time = -p_random_num_gen->ranf();
+            boost::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+            boost::shared_ptr<AbstractCellProperty> p_stem_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+            boost::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
+            boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
+
+            CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
+
+            double birth_time = -p_random_num_gen->ranf();
 
             if (y <= 0.3)
             {
-                cell_type = STEM;
+                p_cell->SetCellProliferativeType(p_stem_type);
                 generation = 0;
                 birth_time *= typical_stem_cycle_time; // hours
             }
             else if (y < 2.0)
             {
-                cell_type = TRANSIT;
+                p_cell->SetCellProliferativeType(p_transit_type);
                 generation = 1;
                 birth_time *= typical_transit_cycle_time; // hours
             }
             else if (y < 3.0)
             {
-                cell_type = TRANSIT;
+                p_cell->SetCellProliferativeType(p_transit_type);
                 generation = 2;
                 birth_time *= typical_transit_cycle_time; // hours
             }
             else if (y < 4.0)
             {
-                cell_type = TRANSIT;
+                p_cell->SetCellProliferativeType(p_transit_type);
                 generation = 3;
                 birth_time *= typical_transit_cycle_time; // hours
             }
             else
             {
-                cell_type = p_cell_cycle_model->CanCellTerminallyDifferentiate() ? DIFFERENTIATED : TRANSIT;
+                if (p_cell_cycle_model->CanCellTerminallyDifferentiate())
+                {
+                    p_cell->SetCellProliferativeType(p_diff_type);
+                }
+                else
+                {
+                    p_cell->SetCellProliferativeType(p_transit_type);
+                }
                 generation = 4;
                 birth_time *= typical_transit_cycle_time; // hours
             }
 
             p_cell_cycle_model->SetGeneration(generation);
-
-            boost::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-
-            CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
-            p_cell->SetCellProliferativeType(cell_type);
             p_cell->SetBirthTime(birth_time);
 
             if (std::find(location_indices.begin(), location_indices.end(), i) != location_indices.end())
@@ -828,12 +845,13 @@ public:
         TS_ASSERT_EQUALS(cell_mutation_states[2], 0u);
         TS_ASSERT_EQUALS(cell_mutation_states[3], 0u);
 
-        // Test the GetCellProliferativeTypeCount function - we should have 4 stem cells and 1 dead cell (for coverage)
-        std::vector<unsigned> cell_types = cell_population.rGetCellProliferativeTypeCount();
-        TS_ASSERT_EQUALS(cell_types.size(), 3u);
+        // Test the GetCellProliferativeTypeCount() function - we should have 4 stem cells and 1 dead cell (for coverage)
+        std::vector<unsigned> cell_types = cell_population.GetCellProliferativeTypeCount();
+        TS_ASSERT_EQUALS(cell_types.size(), 4u);
         TS_ASSERT_EQUALS(cell_types[0], 5u);
         TS_ASSERT_EQUALS(cell_types[1], 0u);
         TS_ASSERT_EQUALS(cell_types[2], 0u);
+        TS_ASSERT_EQUALS(cell_types[3], 0u);
 
         // Test that the cell population parameters are output correctly
         out_stream parameter_file = output_file_handler.OpenOutputFile("results.parameters");
@@ -897,6 +915,7 @@ public:
         std::vector<CellPtr> cells;
         std::vector<unsigned> location_indices;
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
 
         // Loop over nodes
         for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
@@ -907,7 +926,7 @@ public:
             {
                 FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
                 CellPtr p_cell(new Cell(p_state, p_model));
-                p_cell->SetCellProliferativeType(TRANSIT);
+                p_cell->SetCellProliferativeType(p_transit_type);
                 p_cell->SetBirthTime(-1.0);
 
                 cells.push_back(p_cell);
@@ -956,6 +975,7 @@ public:
         std::vector<CellPtr> cells;
         std::vector<unsigned> location_indices;
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
 
         // Loop over nodes
         for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
@@ -967,7 +987,7 @@ public:
                 FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
 
                 CellPtr p_cell(new Cell(p_state, p_model));
-                p_cell->SetCellProliferativeType(TRANSIT);
+                p_cell->SetCellProliferativeType(p_transit_type);
                 p_cell->SetBirthTime(-1.0);
 
                 cells.push_back(p_cell);

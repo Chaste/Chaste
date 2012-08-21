@@ -7,6 +7,7 @@ cell/TestCellProliferativeTypes.hpp
 cell/TestCellPropertyCollection.hpp
 cell/TestCellPropertyRegistry.hpp
 cell/TestCellsGenerator.hpp
+cell/TestDeltaNotchCellCycleModel.hpp
 cell/TestOdeBasedCellCycleModels.hpp
 cell/TestSimpleCellCycleModels.hpp
 common/TestSimulationTime.hpp
@@ -35,7 +36,6 @@ population/TestCellBasedPdes.hpp
 population/TestCellPopulationBoundaryConditions.hpp
 population/TestCellKillers.hpp
 population/TestCellwiseDataGradient.hpp
-population/TestDeltaNotchCellCycleModel.hpp
 population/TestDiscreteSystemForceCalculator.hpp
 population/TestForces.hpp
 population/TestBuskeForces.hpp

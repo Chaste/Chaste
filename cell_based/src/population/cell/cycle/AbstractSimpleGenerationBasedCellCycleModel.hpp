@@ -73,7 +73,7 @@ private:
 
 protected:
 
-    /** The generation of this cell (STEM cells have a generation of 0) */
+    /** The generation of this cell (cells with a StemCellProliferativeType have a generation of 0) */
     unsigned mGeneration;
 
     /** How many generations a transit cell lives for before becoming fully differentiated. */

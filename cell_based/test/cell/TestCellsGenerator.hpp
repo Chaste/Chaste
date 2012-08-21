@@ -46,6 +46,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshReader.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
+#include "TransitCellProliferativeType.hpp"
+#include "SmartPointers.hpp"
 
 class TestCellsGenerator : public AbstractCellBasedTestSuite
 {
@@ -109,7 +111,7 @@ public:
         }
     }
 
-    void TestGenerateBasicRandomWithFixedDurationGenerationBasedCellCycleModel() throw(Exception)
+    void TestGenerateBasicRandomWithNoSpecifiedProliferativeCellType() throw(Exception)
     {
         // Create mesh
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
@@ -119,7 +121,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), TRANSIT);
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
         // Test that cells were generated correctly
         TS_ASSERT_EQUALS(cells.size(), mesh.GetNumNodes());
@@ -130,7 +132,33 @@ public:
             TS_ASSERT_LESS_THAN_EQUALS(cells[i]->GetBirthTime(), 0.0);
             TS_ASSERT_LESS_THAN_EQUALS(-24.0, cells[i]->GetBirthTime());
             TS_ASSERT_EQUALS(cells[i]->GetCellCycleModel()->GetDimension(), 2u);
-            TS_ASSERT_EQUALS(cells[i]->GetCellProliferativeType(),TRANSIT);
+            TS_ASSERT_EQUALS(cells[i]->GetCellProliferativeType()->IsType<StemCellProliferativeType>(), true);
+        }
+    }
+
+    void TestGenerateBasicRandomWithFixedDurationGenerationBasedCellCycleModel() throw(Exception)
+    {
+        // Create mesh
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
+        TetrahedralMesh<2,2> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        // Create cells
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type);
+
+        // Test that cells were generated correctly
+        TS_ASSERT_EQUALS(cells.size(), mesh.GetNumNodes());
+
+        for (unsigned i=0; i<cells.size(); i++)
+        {
+            // Should lie between -24 and 0
+            TS_ASSERT_LESS_THAN_EQUALS(cells[i]->GetBirthTime(), 0.0);
+            TS_ASSERT_LESS_THAN_EQUALS(-24.0, cells[i]->GetBirthTime());
+            TS_ASSERT_EQUALS(cells[i]->GetCellCycleModel()->GetDimension(), 2u);
+            TS_ASSERT_EQUALS(cells[i]->GetCellProliferativeType(), p_transit_type);
         }
 
         // Test exact random numbers as test re-seeds random number generator.
@@ -147,8 +175,9 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), TRANSIT);
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
 
         // Test that cells were generated correctly
         TS_ASSERT_EQUALS(cells.size(), p_mesh->GetNumElements());
@@ -159,7 +188,7 @@ public:
             TS_ASSERT_LESS_THAN_EQUALS(cells[i]->GetBirthTime(), 0.0);
             TS_ASSERT_LESS_THAN_EQUALS(-24.0, cells[i]->GetBirthTime());
             TS_ASSERT_EQUALS(cells[i]->GetCellCycleModel()->GetDimension(), 2u);
-            TS_ASSERT_EQUALS(cells[i]->GetCellProliferativeType(),TRANSIT);
+            TS_ASSERT_EQUALS(cells[i]->GetCellProliferativeType(), p_transit_type);
         }
 
         // Test exact random numbers as test re-seeds random number generator.

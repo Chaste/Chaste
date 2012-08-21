@@ -103,9 +103,10 @@ public:
         p_cycle_model->SetWntLabelledThreshold(0.65);
 
         boost::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
         CellPtr p_cell(new Cell(p_healthy_state, p_cycle_model));
-        p_cell->SetCellProliferativeType(STEM);
+        p_cell->SetCellProliferativeType(p_stem_type);
         p_cell->InitialiseCellCycleModel();
 
         for (unsigned i=0; i<num_timesteps/3; i++)
@@ -118,7 +119,7 @@ public:
         }
 
         // Stem cell should have been changed into a transit cell by wnt cell-cycle model
-        TS_ASSERT_EQUALS(p_cell->GetCellProliferativeType(), TRANSIT);
+        TS_ASSERT_EQUALS(p_cell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>(), true);
 
         // Divide the cell
         TS_ASSERT_EQUALS(p_cell->ReadyToDivide(), true);
@@ -143,8 +144,8 @@ public:
             CheckReadyToDivideAndPhaseIsUpdated(p_cycle_model2, new_g1_duration2);
         }
 
-        TS_ASSERT_EQUALS(p_cell->GetCellProliferativeType(), TRANSIT);
-        TS_ASSERT_EQUALS(p_cell2->GetCellProliferativeType(), TRANSIT);
+        TS_ASSERT_EQUALS(p_cell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>(), true);
+        TS_ASSERT_EQUALS(p_cell2->GetCellProliferativeType()->IsType<TransitCellProliferativeType>(), true);
 
         p_cycle_model->ResetForDivision();
         p_cycle_model2->ResetForDivision();
@@ -180,22 +181,22 @@ public:
             CheckReadyToDivideAndPhaseIsUpdated(p_cycle_model2, new_g1_duration2);
         }
 
-        TS_ASSERT_EQUALS(p_cell->GetCellProliferativeType(), DIFFERENTIATED);
-        TS_ASSERT_EQUALS(p_cell2->GetCellProliferativeType(), TRANSIT);
+        TS_ASSERT_EQUALS(p_cell->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>(), true);
+        TS_ASSERT_EQUALS(p_cell2->GetCellProliferativeType()->IsType<TransitCellProliferativeType>(), true);
 
         // For coverage...
         SimpleWntCellCycleModel* p_cycle_model1 = new SimpleWntCellCycleModel;
         p_cycle_model1->SetDimension(2);
 
         CellPtr p_cell1(new Cell(p_healthy_state, p_cycle_model1));
-        p_cell1->SetCellProliferativeType(DIFFERENTIATED);
+        p_cell1->SetCellProliferativeType(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
         p_cell1->InitialiseCellCycleModel();
 
         SimpleWntCellCycleModel* p_another_cycle_model = new SimpleWntCellCycleModel;
         p_another_cycle_model->SetDimension(2);
 
         CellPtr p_another_cell(new Cell(p_healthy_state, p_another_cycle_model));
-        p_another_cell->SetCellProliferativeType(STEM);
+        p_another_cell->SetCellProliferativeType(p_stem_type);
         p_another_cell->InitialiseCellCycleModel();
         // ...end of coverage
 
@@ -214,7 +215,7 @@ public:
         p_cycle_model4->SetDimension(2);
 
         CellPtr p_cell4(new Cell(p_healthy_state,  p_cycle_model4));
-        p_cell4->SetCellProliferativeType(STEM);
+        p_cell4->SetCellProliferativeType(p_stem_type);
         p_cell4->InitialiseCellCycleModel();
 
         // Test the GetCurrentCellCyclePhase() and ReadyToDivide() methods
@@ -229,14 +230,14 @@ public:
         }
 
         // We should still have a stem cell since the WntConcentration exceeds mRadialWntThreshold
-        TS_ASSERT_EQUALS(p_cell4->GetCellProliferativeType(), STEM);
+        TS_ASSERT_EQUALS(p_cell4->GetCellProliferativeType()->IsType<StemCellProliferativeType>(), true);
 
         // Divide the cell
         TS_ASSERT_EQUALS(p_cell4->ReadyToDivide(), true);
-        TS_ASSERT_EQUALS(p_cell4->GetCellProliferativeType(), STEM);
+        TS_ASSERT_EQUALS(p_cell4->GetCellProliferativeType()->IsType<StemCellProliferativeType>(), true);
         CellPtr p_cell5 = p_cell4->Divide();
-        TS_ASSERT_EQUALS(p_cell4->GetCellProliferativeType(), STEM);
-        TS_ASSERT_EQUALS(p_cell5->GetCellProliferativeType(), TRANSIT);
+        TS_ASSERT_EQUALS(p_cell4->GetCellProliferativeType()->IsType<StemCellProliferativeType>(), true);
+        TS_ASSERT_EQUALS(p_cell5->GetCellProliferativeType()->IsType<TransitCellProliferativeType>(), true);
 
         p_cell2->AddCellProperty(p_label);
 
@@ -254,8 +255,8 @@ public:
         }
 
         TS_ASSERT_DELTA(WntConcentration<2>::Instance()->GetWntLevel(p_cell4), wnt_level, 1e-12);
-        TS_ASSERT_EQUALS(p_cell4->GetCellProliferativeType(), TRANSIT);
-        TS_ASSERT_EQUALS(p_cell5->GetCellProliferativeType(), TRANSIT);
+        TS_ASSERT_EQUALS(p_cell4->GetCellProliferativeType()->IsType<TransitCellProliferativeType>(), true);
+        TS_ASSERT_EQUALS(p_cell5->GetCellProliferativeType()->IsType<TransitCellProliferativeType>(), true);
 
         // Coverage of 1D
 
@@ -271,7 +272,7 @@ public:
         TS_ASSERT_EQUALS(p_cell_model_1d->GetDimension(), 1u);
 
         CellPtr p_stem_cell_1d(new Cell(p_healthy_state, p_cell_model_1d));
-        p_stem_cell_1d->SetCellProliferativeType(STEM);
+        p_stem_cell_1d->SetCellProliferativeType(p_stem_type);
         p_stem_cell_1d->InitialiseCellCycleModel();
 
         SimulationTime::Instance()->IncrementTimeOneStep();
@@ -294,7 +295,7 @@ public:
         TS_ASSERT_EQUALS(p_cell_model_3d->GetDimension(), 3u);
 
         CellPtr p_stem_cell_3d(new Cell(p_healthy_state, p_cell_model_3d));
-        p_stem_cell_3d->SetCellProliferativeType(STEM);
+        p_stem_cell_3d->SetCellProliferativeType(p_stem_type);
         p_stem_cell_3d->InitialiseCellCycleModel();
 
         SimulationTime::Instance()->IncrementTimeOneStep();
@@ -344,9 +345,10 @@ public:
 
             // Set up associated cell
             boost::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
+            boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
             CellPtr p_stem_cell(new Cell(p_healthy_state, p_cell_model));
-            p_stem_cell->SetCellProliferativeType(STEM);
+            p_stem_cell->SetCellProliferativeType(p_stem_type);
             p_stem_cell->InitialiseCellCycleModel();
 
             while (p_cell_model->GetAge() < g1_duration + p_cell_model->GetSG2MDuration()
@@ -357,7 +359,7 @@ public:
             }
 
             // Wnt should change this to a transit cell
-            TS_ASSERT_EQUALS(p_stem_cell->GetCellProliferativeType(), TRANSIT);
+            TS_ASSERT_EQUALS(p_stem_cell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>(), true);
             TS_ASSERT_EQUALS(p_stem_cell->GetCellCycleModel()->ReadyToDivide(), false);
             TS_ASSERT_EQUALS(p_stem_cell->GetCellCycleModel()->GetCurrentCellCyclePhase(), G_TWO_PHASE);
 
@@ -451,9 +453,10 @@ public:
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(end_time, num_timesteps);
 
             boost::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
+            boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
             CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
-            p_cell->SetCellProliferativeType(STEM);
+            p_cell->SetCellProliferativeType(p_stem_type);
             p_cell->InitialiseCellCycleModel();
 
             // Run to division age minus one time step to match birth time
@@ -465,7 +468,7 @@ public:
             }
 
             // Wnt should change this to a transit cell
-            TS_ASSERT_EQUALS(p_cell->GetCellProliferativeType(), TRANSIT);
+            TS_ASSERT_EQUALS(p_cell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>(), true);
             TS_ASSERT_EQUALS(p_cell->GetCellCycleModel()->ReadyToDivide(), false);
             TS_ASSERT_EQUALS(p_cell->GetCellCycleModel()->GetCurrentCellCyclePhase(), G_TWO_PHASE);
 
@@ -511,12 +514,12 @@ public:
             TS_ASSERT_EQUALS(p_cell, p_cell_model->GetCell());
 
             TS_ASSERT_EQUALS(p_cell_model->ReadyToDivide(), false);
-            TS_ASSERT_EQUALS(p_cell->GetCellProliferativeType(), TRANSIT);
+            TS_ASSERT_EQUALS(p_cell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>(), true);
 
             p_simulation_time->IncrementTimeOneStep();
 
             TS_ASSERT_EQUALS(p_cell_model->ReadyToDivide(), true);
-            TS_ASSERT_EQUALS(p_cell->GetCellProliferativeType(), TRANSIT);
+            TS_ASSERT_EQUALS(p_cell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>(), true);
 
             TS_ASSERT_DELTA(p_cell_model->GetBirthTime(), -1.0, 1e-12);
             TS_ASSERT_DELTA(p_cell_model->GetSG2MDuration(), 10.0, 1e-12);

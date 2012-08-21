@@ -47,6 +47,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "CheckReadyToDivideAndPhaseIsUpdated.hpp"
 #include "WildTypeCellMutationState.hpp"
+#include "StemCellProliferativeType.hpp"
+#include "TransitCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
 
@@ -75,19 +77,22 @@ public:
         p_diff_model->SetDimension(1);
 
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
 
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_stem_model));
-        p_stem_cell->SetCellProliferativeType(STEM);
+        p_stem_cell->SetCellProliferativeType(p_stem_type);
         p_stem_cell->GetCellData()->SetItem("mean delta", 0.0);
         p_stem_cell->InitialiseCellCycleModel();
 
         CellPtr p_transit_cell(new Cell(p_healthy_state, p_transit_model));
-        p_transit_cell->SetCellProliferativeType(TRANSIT);
+        p_transit_cell->SetCellProliferativeType(p_transit_type);
         p_transit_cell->GetCellData()->SetItem("mean delta", 0.0);
         p_transit_cell->InitialiseCellCycleModel();
 
         CellPtr p_diff_cell(new Cell(p_healthy_state, p_diff_model));
-        p_diff_cell->SetCellProliferativeType(DIFFERENTIATED);
+        p_diff_cell->SetCellProliferativeType(p_diff_type);
         p_diff_cell->GetCellData()->SetItem("mean delta", 0.0);
         p_diff_cell->InitialiseCellCycleModel();
 
@@ -134,9 +139,10 @@ public:
             p_model->SetDimension(2);
 
             MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
+            MAKE_PTR(TransitCellProliferativeType, p_transit_type);
 
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
-            p_cell->SetCellProliferativeType(TRANSIT);
+            p_cell->SetCellProliferativeType(p_transit_type);
             p_cell->GetCellData()->SetItem("mean delta", 0.0);
             p_cell->InitialiseCellCycleModel();
             p_cell->SetBirthTime(-1.1);

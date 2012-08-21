@@ -166,17 +166,16 @@ public:
 
     void TestMakeMeinekeGraphs() throw (Exception)
     {
+    	// Specify output directory
         std::string output_directory = "MakeMeinekeGraphs";
 
-        double crypt_length = 22.0;
-
         // Create mesh
+        double crypt_length = 22.0;
         unsigned cells_across = 13;
         unsigned cells_up = 25;
         double crypt_width = 12.1;
         unsigned thickness_of_ghost_layer = 3;
-
-        CylindricalHoneycombMeshGenerator generator(cells_across, cells_up,thickness_of_ghost_layer, crypt_width/cells_across);
+        CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer, crypt_width/cells_across);
         Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Get location indices corresponding to real cells
@@ -200,34 +199,29 @@ public:
         // Set cell population to output cell types
         crypt.SetOutputCellMutationStates(true);
 
+        // Create and configure simulation
         CryptSimulation2d simulator(crypt, false, false);
-
         simulator.SetOutputDirectory(output_directory);
-        double time_of_each_run = simulator.GetDt(); // for each run
 
-        // Set length of simulation here
+        double time_of_each_run = simulator.GetDt(); // for each run
         simulator.SetEndTime(time_of_each_run);
 
-        // Create a force laws and pass it to the simulation
+        // Create a force law and cell killer and pass then to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
         p_linear_force->SetMeinekeSpringStiffness(30.0); // normally 15.0;
         simulator.AddForce(p_linear_force);
-
         MAKE_PTR_ARGS(SloughingCellKiller<2>, p_killer, (&simulator.rGetCellPopulation(), crypt_length));
         simulator.AddCellKiller(p_killer);
 
-        // UNUSUAL SET UP HERE /////////////////////////////////////
+        // Specify unusual set up
         simulator.UseJiggledBottomCells();
-        // END OF UNUSUAL SET UP! //////////////////////////////////
 
-        // TEST CryptStatistics::GetCryptSectionPeriodic by labelling a column of cells...
+        // Test CryptStatistics::GetCryptSectionPeriodic() by labelling a column of cells...
         CryptStatistics crypt_statistics(crypt);
         std::vector<CellPtr> test_section = crypt_statistics.GetCryptSectionPeriodic(crypt_length + 2.0, 8.0, 8.0);
-
-        MAKE_PTR(CellLabel, p_label);
         for (unsigned i=0; i<test_section.size(); i++)
         {
-            test_section[i]->AddCellProperty(p_label);
+            test_section[i]->AddCellProperty(crypt.GetCellPropertyRegistry()->Get<CellLabel>());
         }
 
         simulator.Solve();
@@ -241,16 +235,13 @@ public:
         std::string results_file2 = handler.GetOutputDirectoryFullPath() + "results_from_time_0/results.vizcelltypes";
         FileComparison( results_file2, "crypt/test/data/MakeMeinekeGraphs/results.vizcelltypes").CompareFiles();
 
-        // TEST crypt_statistics::LabelSPhaseCells
-
-        // First remove labels
+        // Next, test LabelSPhaseCells()
         for (AbstractCellPopulation<2>::Iterator cell_iter = crypt.Begin();
              cell_iter != crypt.End();
              ++cell_iter)
         {
             cell_iter->RemoveCellProperty<CellLabel>();
         }
-
         crypt_statistics.LabelSPhaseCells();
 
         // Iterate over cells checking for correct labels
@@ -328,7 +319,7 @@ public:
         // only the first cell had been labelled
         for (unsigned vector_index=0; vector_index<labelled.size(); vector_index++)
         {
-            if (vector_index == 0u)
+            if (vector_index == 0)
             {
                 TS_ASSERT_EQUALS(labelled[vector_index], true);
             }

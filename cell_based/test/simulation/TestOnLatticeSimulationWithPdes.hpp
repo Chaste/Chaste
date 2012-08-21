@@ -64,6 +64,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DifferentialAdhesionPottsUpdateRule.hpp"
 #include "ChemotaxisPottsUpdateRule.hpp"
 #include "OnLatticeSimulation.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 #include "Warnings.hpp"
 #include "SmartPointers.hpp"
 #include "AbstractCellPopulation.hpp"
@@ -128,8 +129,9 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), DIFFERENTIATED);
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
@@ -184,8 +186,9 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), DIFFERENTIATED);
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
@@ -405,8 +408,9 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), DIFFERENTIATED);
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
@@ -418,7 +422,6 @@ public:
         OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestPottsBasedCellPopulationWithTwoPdes");
         simulator.SetEndTime(0.1);
-
 
         // Set up PDE and pass to simulation via handler (zero uptake to check analytic solution)
         AveragedSourcePde<2> pde_1(cell_population, 0.0);

@@ -81,6 +81,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * simulation test. The first defines a helper class for generating a suitable collection
  * of cells. */
 #include "CellsGenerator.hpp"
+#include "TransitCellProliferativeType.hpp"
 /* The next header file defines a stochastic cell-cycle model class. */
 #include "StochasticDurationCellCycleModel.hpp"
 /* The next header file defines a helper class for generating a suitable mesh. */
@@ -136,10 +137,11 @@ public:
          * We create an empty vector of cells and pass this into the
          * method along with the mesh. The second argument represents the size of that the vector
          * {{{cells}}} should become - one cell for each node, the third argument specifies
-         * the proliferative type of the cell STEM, TRANSIT or DIFFERENTIATED. */
+         * the proliferative type of the cell. */
         std::vector<CellPtr> cells;
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), TRANSIT);
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_transit_type);
 
         /* Now we have a mesh and a set of cells to go with it, we can create a {{{CellPopulation}}}.
          * In general, this class associates a collection of cells with a mesh.
@@ -247,10 +249,11 @@ public:
         /* Having created a mesh, we now create a {{{std::vector}}} of {{{CellPtr}}}s.
          * To do this, we the `CellsGenerator` helper class again. This time the second
          * argument is different and is the number of real nodes in the mesh.
-         * As before all cells are TRANSIT cells. */
+         * As before all cells have {{{TransitCellProliferativeType}}}. */
         std::vector<CellPtr> cells;
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, location_indices.size(), TRANSIT);
+        cells_generator.GenerateBasicRandom(cells, location_indices.size(), p_transit_type);
 
         /* Now we have a mesh and a set of cells to go with it, we can create a {{{CellPopulation}}}.
          * In general, this class associates a collection of cells with a set of elements or a mesh.

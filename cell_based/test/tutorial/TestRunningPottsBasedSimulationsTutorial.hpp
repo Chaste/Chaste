@@ -73,6 +73,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * simulation test. We have encountered some of these header files in previous cell-based
  * Chaste tutorials. */
 #include "CellsGenerator.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
 #include "StochasticDurationCellCycleModel.hpp"
 /* The next header file defines a helper class for generating a suitable mesh. */
@@ -85,6 +86,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VolumeConstraintPottsUpdateRule.hpp"
 #include "AdhesionPottsUpdateRule.hpp"
 #include "DifferentialAdhesionPottsUpdateRule.hpp"
+#include "TransitCellProliferativeType.hpp"
 
 /*
  * Next, we define the test class, which inherits from {{{AbstractCellBasedTestSuite}}}
@@ -123,8 +125,9 @@ public:
          * {{{cells}}} should become - one cell for each element. Third argument makes all cells
          * proliferate.*/
         std::vector<CellPtr> cells;
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(),TRANSIT);
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
 
         /* Now we have a mesh and a set of cells to go with it, we can create a {{{CellPopulation}}}.
          * In general, this class associates a collection of cells with a mesh.
@@ -221,11 +224,12 @@ public:
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         /* Having created a mesh, we now create a {{{std::vector}}} of {{{CellPtr}}}s.
-         * To do this, we the `CellsGenerator` helper class, as before but this time the third argument is set to
-         * DIFFERENTIATED to make all cells non-proliferative. */
+         * To do this, we the `CellsGenerator` helper class, as before but this time
+         * the third argument is set to make all cells non-proliferative. */
         std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), DIFFERENTIATED);
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         /* Before we make a {{{CellPopulation}}} we make a boost shared pointer to a cell label and then assign this
          * label to some randomly chosen cells. */
@@ -308,11 +312,12 @@ public:
         PottsMesh<3>* p_mesh = generator.GetMesh();
 
         /* Having created a mesh, we now create a {{{std::vector}}} of {{{CellPtr}}}s.
-         * To do this, we the `CellsGenerator` helper class, as before but this time the third argument is set to
-         * DIFFERENTIATED to make all cells non-proliferative.*/
+         * To do this, we the `CellsGenerator` helper class, as before but this time
+         * the third argument is set to make all cells non-proliferative.*/
         std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<StochasticDurationCellCycleModel, 3> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), DIFFERENTIATED);
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         /* As for the 2D case before we make a {{{CellPopulation}}} we make a pointer to a cell label and then assign this
          * label to some randomly chosen cells. */

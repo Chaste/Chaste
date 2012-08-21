@@ -85,6 +85,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombMeshGenerator.hpp"
 #include "NodesOnlyMesh.hpp"
 #include "WildTypeCellMutationState.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "OffLatticeSimulation.hpp"
@@ -364,6 +365,7 @@ public:
         /* Next, we create some cells. We don't use a Generator as we want to give some cells the new cell property, therefore
          * we create the cells in a loop, as follows.*/
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
@@ -379,7 +381,7 @@ public:
             }
 
             CellPtr p_cell(new Cell(p_state, p_model, false, collection));
-            p_cell->SetCellProliferativeType(DIFFERENTIATED);
+            p_cell->SetCellProliferativeType(p_diff_type);
 
             /* Now, we define a random birth time, chosen from [-T,0], where
              * T = t,,1,, + t,,2,,, where t,,1,, is a parameter representing the G,,1,, duration

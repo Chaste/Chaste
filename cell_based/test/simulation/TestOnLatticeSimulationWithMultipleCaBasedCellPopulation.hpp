@@ -133,8 +133,9 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), DIFFERENTIATED);
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         // Create cell population
         PottsBasedCellPopulation<2> potts_based_cell_population(*p_mesh, cells);
@@ -160,8 +161,9 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, 1u, DIFFERENTIATED);
+        cells_generator.GenerateBasicRandom(cells, 1, p_diff_type);
 
         // Specify where cells lie
         std::vector<unsigned> location_indices;
@@ -241,8 +243,9 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, 2u, STEM);
+        cells_generator.GenerateBasicRandom(cells, 2, p_stem_type);
 
         // Specify where the cells lie
         std::vector<unsigned> location_indices;
@@ -311,8 +314,9 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), DIFFERENTIATED);
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_diff_type);
 
         // Specify where cells lie
         std::vector<unsigned> location_indices;
@@ -380,8 +384,9 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, 40, DIFFERENTIATED);
+        cells_generator.GenerateBasicRandom(cells, 40, p_diff_type);
 
         // Specify where cells lie 4 cells in the first ten sites
         std::vector<unsigned> location_indices;
@@ -424,8 +429,9 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, 40, DIFFERENTIATED);
+        cells_generator.GenerateBasicRandom(cells, 40, p_diff_type);
 
         // Specify where cells lie 4 cells in the first ten sites
         std::vector<unsigned> location_indices;
@@ -473,8 +479,9 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, 3u, STEM);
+        cells_generator.GenerateBasicRandom(cells, 3u, p_stem_type);
 
         // Specify where cells lie
         std::vector<unsigned> location_indices;
@@ -540,8 +547,9 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, 2*p_mesh->GetNumNodes(), DIFFERENTIATED);
+        cells_generator.GenerateBasicRandom(cells, 2*p_mesh->GetNumNodes(), p_diff_type);
 
         // Specify where cells lie
         std::vector<unsigned> location_indices;

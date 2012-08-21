@@ -97,7 +97,7 @@ void DeltaNotchCellCycleModel::Initialise()
     assert(mpCell != NULL);
 
     mpOdeSystem = new DeltaNotchOdeSystem;
-    if (mInitialConditions == std::vector<double>())
+    if(mInitialConditions == std::vector<double>())
     {
         mpOdeSystem->SetStateVariables(mpOdeSystem->GetInitialConditions());
     }
@@ -110,6 +110,7 @@ void DeltaNotchCellCycleModel::Initialise()
 
     SetLastTime(mBirthTime);
 }
+
 
 void DeltaNotchCellCycleModel::SetInitialConditions(std::vector<double> initialConditions)
 {

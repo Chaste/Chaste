@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include <cmath>
 #include "AbstractCellCycleModel.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 
 /**
  * A helper method that is called in cell-cycle model tests
@@ -65,7 +66,7 @@ void CheckReadyToDivideAndPhaseIsUpdated(AbstractCellCycleModel* pModel,
     const double G1TOL = 1e-5; // how accurate the expected G1 duration is
 
     // If the G1 duration is incorrect, print out the mismatch
-    if ((pModel->GetCell()->GetCellProliferativeType() != DIFFERENTIATED) &&
+    if ((pModel->GetCell()->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>()) &&
         (age >= pModel->GetMDuration()) &&
         (pModel->GetG1Duration() != DOUBLE_UNSET) &&
         (fabs(pModel->GetG1Duration() - g1Duration) > G1TOL))
@@ -75,7 +76,7 @@ void CheckReadyToDivideAndPhaseIsUpdated(AbstractCellCycleModel* pModel,
                   << std::endl;
     }
 
-    if (pModel->GetCell()->GetCellProliferativeType()==DIFFERENTIATED)
+    if (pModel->GetCell()->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>())
     {
         // If the cell is differentiated, then it must be in G0 phase and must never divide
         TS_ASSERT_EQUALS(pModel->ReadyToDivide(), false);

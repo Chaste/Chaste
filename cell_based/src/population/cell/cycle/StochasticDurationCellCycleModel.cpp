@@ -35,6 +35,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "StochasticDurationCellCycleModel.hpp"
 #include "Exception.hpp"
+#include "StemCellProliferativeType.hpp"
+#include "TransitCellProliferativeType.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 
 StochasticDurationCellCycleModel::StochasticDurationCellCycleModel()
     :AbstractSimpleCellCycleModel()
@@ -78,19 +81,21 @@ void StochasticDurationCellCycleModel::SetG1Duration()
 {
     RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
 
-    switch (mpCell->GetCellProliferativeType())
+    if (mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
     {
-        case STEM:
-            mG1Duration = GetStemCellG1Duration() + 2*p_gen->ranf(); // U[0,2]
-            break;
-        case TRANSIT:
-            mG1Duration = GetTransitCellG1Duration() + 2*p_gen->ranf(); // U[0,2]
-            break;
-        case DIFFERENTIATED:
-            mG1Duration = DBL_MAX;
-            break;
-        default:
-            NEVER_REACHED;
+        mG1Duration = GetStemCellG1Duration() + 2*p_gen->ranf(); // U[0,2]
+    }
+    else if (mpCell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>())
+    {
+        mG1Duration = GetTransitCellG1Duration() + 2*p_gen->ranf(); // U[0,2]
+    }
+    else if (mpCell->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>())
+    {
+        mG1Duration = DBL_MAX;
+    }
+    else
+    {
+        NEVER_REACHED;
     }
 }
 

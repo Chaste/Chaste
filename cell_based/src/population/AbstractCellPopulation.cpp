@@ -88,18 +88,9 @@ AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulation( Abstract
      * Initialise cell counts to zero.
      *
      * Note: In its current form the code requires each cell-cycle model
-     * to comprise four phases (G1, S, G2, M) and requires a cell to have
-     * one of three possible proliferative types (STEM, TRANSIT and
-     * DIFFERENTIATED). This is reflected in the explicit use of the
-     * variables NUM_CELL_PROLIFERATIVE_TYPES and NUM_CELL_CYCLE_PHASES
-     * below.
+     * to comprise four phases (G1, S, G2, M). This is reflected in the
+     * explicit use of the variable NUM_CELL_CYCLE_PHASES below.
      */
-    mCellProliferativeTypeCount = std::vector<unsigned>(NUM_CELL_PROLIFERATIVE_TYPES);
-    for (unsigned i=0; i<mCellProliferativeTypeCount.size(); i++)
-    {
-        mCellProliferativeTypeCount[i] = 0;
-    }
-
     mCellCyclePhaseCount = std::vector<unsigned>(NUM_CELL_CYCLE_PHASES);
     for (unsigned i=0; i<mCellCyclePhaseCount.size(); i++)
     {
@@ -135,8 +126,6 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetDataOnAllCells(const std
         cell_iter->GetCellData()->SetItem(dataName, dataValue);
     }
 }
-
-
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractMesh<ELEMENT_DIM, SPACE_DIM>& AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::rGetMesh()
@@ -190,8 +179,8 @@ std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellMut
         EXCEPTION("Call SetOutputCellMutationStates(true) before using this function");
     }
 
-    // An ordering must have been specified for cell mutation states
-    SetDefaultMutationStateOrdering();
+    // An ordering must be specified for cell mutation states and cell proliferative types
+    SetDefaultCellMutationStateAndProliferativeTypeOrdering();
 
     const std::vector<boost::shared_ptr<AbstractCellProperty> >& r_cell_properties =
         mpCellPropertyRegistry->rGetAllCellProperties();
@@ -209,13 +198,29 @@ std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellMut
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-const std::vector<unsigned>& AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::rGetCellProliferativeTypeCount() const
+std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellProliferativeTypeCount()
 {
     if (!mOutputCellProliferativeTypes)
     {
         EXCEPTION("Call SetOutputCellProliferativeTypes(true) before using this function");
     }
-    return mCellProliferativeTypeCount;
+
+    // An ordering must be specified for cell mutation states and cell proliferative types
+    SetDefaultCellMutationStateAndProliferativeTypeOrdering();
+
+    const std::vector<boost::shared_ptr<AbstractCellProperty> >& r_cell_properties =
+        mpCellPropertyRegistry->rGetAllCellProperties();
+
+    std::vector<unsigned> cell_proliferative_type_count;
+    for (unsigned i=0; i<r_cell_properties.size(); i++)
+    {
+        if (r_cell_properties[i]->IsSubType<AbstractCellProliferativeType>())
+        {
+            cell_proliferative_type_count.push_back(r_cell_properties[i]->GetCellCount());
+        }
+    }
+
+    return cell_proliferative_type_count;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -323,7 +328,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::MoveCellInLocationMap(CellP
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetLocationIndexUsingCell(CellPtr pCell)
 {
-    // Check the cell is in the map.
+    // Check the cell is in the map
     assert(this->mCellLocationMap.find(pCell.get()) != this->mCellLocationMap.end());
 
     return mCellLocationMap[pCell.get()];
@@ -336,17 +341,20 @@ boost::shared_ptr<CellPropertyRegistry> AbstractCellPopulation<ELEMENT_DIM, SPAC
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetDefaultMutationStateOrdering()
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetDefaultCellMutationStateAndProliferativeTypeOrdering()
 {
     boost::shared_ptr<CellPropertyRegistry> p_registry = GetCellPropertyRegistry();
     if (!p_registry->HasOrderingBeenSpecified())
     {
-        std::vector<boost::shared_ptr<AbstractCellProperty> > mutations;
-        mutations.push_back(p_registry->Get<WildTypeCellMutationState>());
-        mutations.push_back(p_registry->Get<ApcOneHitCellMutationState>());
-        mutations.push_back(p_registry->Get<ApcTwoHitCellMutationState>());
-        mutations.push_back(p_registry->Get<BetaCateninOneHitCellMutationState>());
-        p_registry->SpecifyOrdering(mutations);
+        std::vector<boost::shared_ptr<AbstractCellProperty> > mutations_and_proliferative_types;
+        mutations_and_proliferative_types.push_back(p_registry->Get<WildTypeCellMutationState>());
+        mutations_and_proliferative_types.push_back(p_registry->Get<ApcOneHitCellMutationState>());
+        mutations_and_proliferative_types.push_back(p_registry->Get<ApcTwoHitCellMutationState>());
+        mutations_and_proliferative_types.push_back(p_registry->Get<BetaCateninOneHitCellMutationState>());
+        mutations_and_proliferative_types.push_back(p_registry->Get<StemCellProliferativeType>());
+        mutations_and_proliferative_types.push_back(p_registry->Get<TransitCellProliferativeType>());
+        mutations_and_proliferative_types.push_back(p_registry->Get<DifferentiatedCellProliferativeType>());
+        p_registry->SpecifyOrdering(mutations_and_proliferative_types);
     }
 }
 
@@ -387,8 +395,8 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::CreateOutputFiles(const std
         }
         if (mOutputCellMutationStates)
         {
-            // An ordering must be specified for cell mutation states
-            SetDefaultMutationStateOrdering();
+            // An ordering must be specified for cell mutation states and cell proliferative types
+            SetDefaultCellMutationStateAndProliferativeTypeOrdering();
 
             mpCellMutationStatesFile = output_file_handler.OpenOutputFile("cellmutationstates.dat");
 
@@ -496,9 +504,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::CloseOutputFiles()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResults(CellPtr pCell,
-                                              std::vector<unsigned>& rCellProliferativeTypeCounter,
-                                              std::vector<unsigned>& rCellCyclePhaseCounter)
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResults(CellPtr pCell, std::vector<unsigned>& rCellCyclePhaseCounter)
 {
     unsigned location_index = this->GetLocationIndexUsingCell(pCell);
 
@@ -543,33 +549,8 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResults(CellPtr
         *mpVizCellAncestorsFile << colour << " ";
     }
 
-    // Set colour dependent on cell type
-    switch (pCell->GetCellProliferativeType())
-    {
-        case STEM:
-            colour = STEM_COLOUR;
-            if (mOutputCellProliferativeTypes)
-            {
-                rCellProliferativeTypeCounter[0]++;
-            }
-            break;
-        case TRANSIT:
-            colour = TRANSIT_COLOUR;
-            if (mOutputCellProliferativeTypes)
-            {
-                rCellProliferativeTypeCounter[1]++;
-            }
-            break;
-        case DIFFERENTIATED:
-            colour = DIFFERENTIATED_COLOUR;
-            if (mOutputCellProliferativeTypes)
-            {
-                rCellProliferativeTypeCounter[2]++;
-            }
-            break;
-        default:
-            NEVER_REACHED;
-    }
+    // Set colour dependent on cell proliferative type
+    colour = pCell->GetCellProliferativeType()->GetColour();
 
     if (mOutputCellMutationStates)
     {
@@ -625,12 +606,10 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResults(CellPtr
     }
 
     *mpVizCellProliferativeTypesFile << colour << " ";
-
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteCellResultsToFiles(std::vector<unsigned>& rCellProliferativeTypeCounter,
-                                                  std::vector<unsigned>& rCellCyclePhaseCounter)
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteCellResultsToFiles(std::vector<unsigned>& rCellCyclePhaseCounter)
 {
     *mpVizCellProliferativeTypesFile << "\n";
 
@@ -651,13 +630,14 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteCellResultsToFiles(std
         *mpCellMutationStatesFile << "\n";
     }
 
-    // Write cell type data to file if required
+    // Write cell proliferative type data to file if required
     if (mOutputCellProliferativeTypes)
     {
-        for (unsigned i=0; i<mCellProliferativeTypeCount.size(); i++)
+        std::vector<unsigned> proliferative_type_count = GetCellProliferativeTypeCount();
+
+        for (unsigned i=0; i<proliferative_type_count.size(); i++)
         {
-            mCellProliferativeTypeCount[i] = rCellProliferativeTypeCounter[i];
-            *mpCellProliferativeTypesFile << rCellProliferativeTypeCounter[i] << "\t";
+            *mpCellProliferativeTypesFile << proliferative_type_count[i] << "\t";
         }
         *mpCellProliferativeTypesFile << "\n";
     }
@@ -821,7 +801,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationInfo(ou
     *rParamsFile << "\n";
     *rParamsFile << "\t<CellCycleModels>\n";
 
-    /*
+    /**
      * Loop over cells and generate a set of cell-cycle model classes
      * that are present in the population.
      *

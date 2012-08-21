@@ -50,15 +50,28 @@ void AbstractVanLeeuwen2009WntSwatCellCycleModel::ChangeCellProliferativeTypeDue
                                 + mpOdeSystem->rGetStateVariables()[18]
                                 + mpOdeSystem->rGetStateVariables()[19];
 
-    CellProliferativeType cell_type = TRANSIT;
-
     // For mitogenic stimulus of 1/25.0 in Wnt equations
     if (beta_catenin_level < 10.188)
     {
-        cell_type = DIFFERENTIATED;
+        /*
+         * This method is usually called within a CellBasedSimulation, after the CellPopulation
+         * has called CellPropertyRegistry::TakeOwnership(). This means that were we to call
+         * CellPropertyRegistry::Instance() here when setting the CellProliferativeType, we
+         * would be creating a new CellPropertyRegistry. In this case the cell proliferative
+         * type counts, as returned by AbstractCellPopulation::GetCellProliferativeTypeCount(),
+         * would be incorrect. We must therefore access the CellProliferativeType via the cell's
+         * CellPropertyCollection.
+         */
+        boost::shared_ptr<AbstractCellProperty> p_diff_type =
+            mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<DifferentiatedCellProliferativeType>();
+        mpCell->SetCellProliferativeType(p_diff_type);
     }
-
-    mpCell->SetCellProliferativeType(cell_type);
+    else
+    {
+        boost::shared_ptr<AbstractCellProperty> p_transit_type =
+            mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<TransitCellProliferativeType>();
+        mpCell->SetCellProliferativeType(p_transit_type);
+    }
 }
 
 void AbstractVanLeeuwen2009WntSwatCellCycleModel::Initialise()

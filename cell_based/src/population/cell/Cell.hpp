@@ -43,8 +43,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/shared_ptr.hpp>
 
-#include "CellProliferativeTypes.hpp"
 #include "AbstractCellMutationState.hpp"
+#include "AbstractCellProliferativeType.hpp"
+#include "DefaultCellProliferativeType.hpp"
 #include "CellLabel.hpp"
 #include "CellAncestor.hpp"
 #include "CellId.hpp"
@@ -91,7 +92,6 @@ private:
     {
         // These first four are also dealt with by {load,save}_construct_data
         archive & mCanDivide;
-        archive & mCellProliferativeType;
         archive & mpCellCycleModel;
         archive & mUndergoingApoptosis;
         archive & mDeathTime;
@@ -102,9 +102,6 @@ private:
     }
 
 protected:
-
-    /** The cell type - defined in CellProliferativeTypes.hpp. */
-    CellProliferativeType mCellProliferativeType;
 
     /** The cell's property collection. */
     CellPropertyCollection mCellPropertyCollection;
@@ -145,9 +142,9 @@ public:
      * @param cellPropertyCollection the cell property collection (defaults to NULL)
      */
     Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
-               AbstractCellCycleModel* pCellCycleModel,
-               bool archiving=false,
-               CellPropertyCollection cellPropertyCollection=CellPropertyCollection());
+         AbstractCellCycleModel* pCellCycleModel,
+         bool archiving=false,
+         CellPropertyCollection cellPropertyCollection=CellPropertyCollection());
 
     /**
      * Destructor, which frees the memory allocated for our cell-cycle model.
@@ -155,16 +152,16 @@ public:
     ~Cell();
 
     /**
-     * Get method for #mCellProliferativeType.
+     * Get the cell's proliferative type.
      */
-    CellProliferativeType GetCellProliferativeType() const;
+    boost::shared_ptr<AbstractCellProliferativeType> GetCellProliferativeType() const;
 
     /**
-     * Set method for #mCellProliferativeType.
+     * Set the cell's proliferative type.
      *
-     * @param cellType the cell's new proliferative type
+     * @param pProliferativeType the cell's new proliferative type
      */
-    void SetCellProliferativeType(CellProliferativeType cellType);
+    void SetCellProliferativeType(boost::shared_ptr<AbstractCellProperty> pProliferativeType);
 
     /**
      * Set the birth time of the cell - can be negative so that your cells have an age when a simulation begins
@@ -230,7 +227,7 @@ public:
     boost::shared_ptr<CellData> GetCellData() const;
 
     /**
-     * Set the cell's current mutation state.
+     * Set the cell's mutation state.
      *
      * @param pMutationState the cell's new mutation state
      */

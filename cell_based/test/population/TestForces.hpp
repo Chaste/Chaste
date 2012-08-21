@@ -59,6 +59,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ApcTwoHitCellMutationState.hpp"
 #include "BetaCateninOneHitCellMutationState.hpp"
 #include "WildTypeCellMutationState.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 #include "CellLabel.hpp"
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
@@ -206,8 +207,9 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 1> cells_generator;
-        cells_generator.GenerateBasic(cells, mesh.GetNumNodes(), std::vector<unsigned>(), DIFFERENTIATED);
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes(), std::vector<unsigned>(), p_diff_type);
 
         // Create cell population
         std::vector<CellPtr> cells_copy(cells);
@@ -833,10 +835,11 @@ public:
         // Set up the cell
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
 
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_cell(new Cell(p_state, p_model));
-        p_cell->SetCellProliferativeType(DIFFERENTIATED);
+        p_cell->SetCellProliferativeType(p_diff_type);
         p_cell->SetBirthTime(-1.0);
         cells.push_back(p_cell);
 
@@ -956,11 +959,12 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
-        cells[0]->SetCellProliferativeType(DIFFERENTIATED);
-        cells[4]->SetCellProliferativeType(DIFFERENTIATED);
+        cells[0]->SetCellProliferativeType(p_diff_type);
+        cells[4]->SetCellProliferativeType(p_diff_type);
         for (unsigned i=0; i<cells.size(); i++)
         {
             double birth_time = 0.0 - 2*i;
@@ -1232,10 +1236,11 @@ public:
         // Set up the cell
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
 
         CellPtr p_cell(new Cell(p_state, p_model));
-        p_cell->SetCellProliferativeType(DIFFERENTIATED);
+        p_cell->SetCellProliferativeType(p_diff_type);
         p_cell->SetBirthTime(-1.0);
         cells.push_back(p_cell);
 
@@ -1339,9 +1344,10 @@ public:
         // Create cell
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_cell(new Cell(p_state, p_model));
-        p_cell->SetCellProliferativeType(DIFFERENTIATED);
+        p_cell->SetCellProliferativeType(p_diff_type);
         p_cell->SetBirthTime(-1.0);
         cells.push_back(p_cell);
 
@@ -1429,8 +1435,9 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 1> cells_generator;
-        cells_generator.GenerateBasic(cells, mesh.GetNumNodes(), std::vector<unsigned>(), DIFFERENTIATED);
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes(), std::vector<unsigned>(), p_diff_type);
 
         // Create cell population
         std::vector<CellPtr> cells_copy(cells);

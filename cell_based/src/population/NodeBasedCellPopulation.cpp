@@ -411,7 +411,7 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
             double max_interaction_distance = radius_of_cell_i + radius_of_cell_j;
 
             // Make sure that the max_interaction distance is smaller than the box collection size
-            if (!(max_interaction_distance < mMechanicsCutOffLength))
+            if(!(max_interaction_distance < mMechanicsCutOffLength))
             {
                 EXCEPTION("mMechanicsCutOffLength is smaller than the sum of radius of cell " << index << " (" << radius_of_cell_i << ") and cell " << (*iter) << " (" << radius_of_cell_j <<"). Make the cut-off larger to avoid errors.");
             }
@@ -563,6 +563,7 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
     }
 
 
+
     // Loop over cells
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
          cell_iter != this->End();
@@ -578,7 +579,7 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         }
         if (this->mOutputCellProliferativeTypes)
         {
-            double cell_type = cell_iter->GetCellProliferativeType();
+            double cell_type = cell_iter->GetCellProliferativeType()->GetColour();
             cell_types[node_index] = cell_type;
         }
         if (this->mOutputCellMutationStates)
@@ -616,6 +617,7 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         {
             cellwise_data[var][node_index] = cell_iter->GetCellData()->GetItem(cell_data_names[var]);
         }
+
     }
 
     if (this->mOutputCellProliferativeTypes)

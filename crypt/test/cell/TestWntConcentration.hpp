@@ -245,12 +245,13 @@ public:
 
         std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             WntCellCycleModel* p_model = new WntCellCycleModel();
             p_model->SetDimension(2);
             CellPtr p_cell(new Cell(p_state, p_model));
-            p_cell->SetCellProliferativeType(STEM);
+            p_cell->SetCellProliferativeType(p_stem_type);
             double birth_time = 0.0 - i;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
@@ -428,12 +429,13 @@ public:
 
         std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             WntCellCycleModel* p_model = new WntCellCycleModel();
             p_model->SetDimension(2);
             CellPtr p_cell(new Cell(p_state, p_model));
-            p_cell->SetCellProliferativeType(STEM);
+            p_cell->SetCellProliferativeType(p_stem_type);
             double birth_time = 0.0 - i;
             p_cell->SetBirthTime(birth_time);
 

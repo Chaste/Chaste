@@ -94,13 +94,14 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         for (unsigned i=0; i<vertex_mesh.GetNumElements(); i++)
         {
             WntCellCycleModel* p_cell_cycle_model = new WntCellCycleModel;
             p_cell_cycle_model->SetDimension(2);
 
             CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
-            p_cell->SetCellProliferativeType(DIFFERENTIATED);
+            p_cell->SetCellProliferativeType(p_diff_type);
             double birth_time = 0.0 - i;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);

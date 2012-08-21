@@ -330,7 +330,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile()
                 }
                 if (this->mOutputCellProliferativeTypes)
                 {
-                    double cell_type = p_cell->GetCellProliferativeType();
+                    double cell_type = p_cell->GetCellProliferativeType()->GetColour();
                     cell_types[elem_index] = cell_type;
                 }
                 if (this->mOutputCellMutationStates)

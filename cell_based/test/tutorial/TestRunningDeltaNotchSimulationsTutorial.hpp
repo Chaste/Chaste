@@ -84,6 +84,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexBasedCellPopulation.hpp"
 #include "NagaiHondaForce.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
 /*
  * The next header file defines a simple stochastic cell-cycle model that includes the functionality
@@ -127,6 +128,7 @@ public:
          * so that no cell division occurs. */
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
 
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
@@ -134,7 +136,7 @@ public:
             p_model->SetDimension(2);
 
             CellPtr p_cell(new Cell(p_state, p_model));
-            p_cell->SetCellProliferativeType(DIFFERENTIATED);
+            p_cell->SetCellProliferativeType(p_diff_type);
             double birth_time = -RandomNumberGenerator::Instance()->ranf()*12.0;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
@@ -211,13 +213,14 @@ public:
 
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
             p_model->SetDimension(2);
 
             CellPtr p_cell(new Cell(p_state, p_model));
-            p_cell->SetCellProliferativeType(DIFFERENTIATED);
+            p_cell->SetCellProliferativeType(p_diff_type);
             double birth_time = -RandomNumberGenerator::Instance()->ranf()*12.0;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);

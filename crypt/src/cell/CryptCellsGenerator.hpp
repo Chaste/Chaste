@@ -56,11 +56,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VanLeeuwen2009WntSwatCellCycleModelHypothesisOne.hpp"
 #include "VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo.hpp"
 #include "Exception.hpp"
+#include "StemCellProliferativeType.hpp"
+#include "TransitCellProliferativeType.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 
 
 /**
- *  Small helper method, which returns whether the two classes given as the template parameters
- *  are identical or not
+ * Small helper method, which returns whether the two classes given as the template parameters
+ * are identical or not
  */
 template<class T1, class T2>
 bool ClassesAreSame()
@@ -109,7 +112,6 @@ public:
                   bool initialiseCells = false);
 };
 
-
 template<class CELL_CYCLE_MODEL>
 void CryptCellsGenerator<CELL_CYCLE_MODEL>::Generate(
                                       std::vector<CellPtr>& rCells,
@@ -122,11 +124,9 @@ void CryptCellsGenerator<CELL_CYCLE_MODEL>::Generate(
                                       double y3,
                                       bool initialiseCells)
 {
-    CellPropertyRegistry::Instance()->Clear();
+    rCells.clear();
 
     RandomNumberGenerator* p_random_num_gen = RandomNumberGenerator::Instance();
-
-    rCells.clear();
 
     unsigned mesh_size;
     if (dynamic_cast<TetrahedralMesh<2,2>*>(pMesh))
@@ -155,13 +155,13 @@ void CryptCellsGenerator<CELL_CYCLE_MODEL>::Generate(
         rCells.reserve(mesh_size);
     }
 
+    boost::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+
+    // Loop over the mesh and populate rCells
     for (unsigned i=0; i<mesh_size; i++)
     {
-        CellProliferativeType cell_type;
-        unsigned generation;
-
+        // Find the location of this cell
         double y = 0.0;
-
         if (dynamic_cast<TetrahedralMesh<2,2>*>(pMesh))
         {
             if (locationIndices.empty())
@@ -192,6 +192,7 @@ void CryptCellsGenerator<CELL_CYCLE_MODEL>::Generate(
             y = dynamic_cast<VertexMesh<2,2>*>(pMesh)->GetCentroidOfElement(i)[1];
         }
 
+        // Create a cell-cycle model and set the spatial dimension
         CELL_CYCLE_MODEL* p_cell_cycle_model = new CELL_CYCLE_MODEL;
         p_cell_cycle_model->SetDimension(2);
 
@@ -204,52 +205,61 @@ void CryptCellsGenerator<CELL_CYCLE_MODEL>::Generate(
             birth_time = -p_random_num_gen->ranf();
         }
 
+        // Set the cell-cycle model's generation if required
+        unsigned generation = 4;
         if (y <= y0)
         {
-            cell_type = STEM;
             generation = 0;
-            birth_time *= typical_stem_cycle_time; // hours
         }
         else if (y < y1)
         {
-            cell_type = TRANSIT;
             generation = 1;
-            birth_time *= typical_transit_cycle_time; // hours
         }
         else if (y < y2)
         {
-            cell_type = TRANSIT;
             generation = 2;
-            birth_time *= typical_transit_cycle_time; // hours
         }
         else if (y < y3)
         {
-            cell_type = TRANSIT;
             generation = 3;
-            birth_time *= typical_transit_cycle_time; // hours
         }
-        else
-        {
-            cell_type = p_cell_cycle_model->CanCellTerminallyDifferentiate() ? DIFFERENTIATED : TRANSIT;
-            generation = 4;
-            birth_time *= typical_transit_cycle_time; // hours
-        }
-
         if (dynamic_cast<AbstractSimpleGenerationBasedCellCycleModel*>(p_cell_cycle_model))
         {
             dynamic_cast<AbstractSimpleGenerationBasedCellCycleModel*>(p_cell_cycle_model)->SetGeneration(generation);
         }
 
-        boost::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-
+        // Create a cell
         CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
-        p_cell->SetCellProliferativeType(cell_type);
 
+        // Set the cell's proliferative type, dependent on its height up the crypt and whether it can terminally differentiate
+        if (y <= y0)
+        {
+            p_cell->SetCellProliferativeType(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+        }
+        else
+        {
+            p_cell->SetCellProliferativeType(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
+            if (y >= y3 && p_cell_cycle_model->CanCellTerminallyDifferentiate())
+            {
+                p_cell->SetCellProliferativeType(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
+            }
+        }
+
+        // Initialise the cell-cycle model if this is required
         if (initialiseCells)
         {
             p_cell->InitialiseCellCycleModel();
         }
 
+        // Set the cell's birth time
+        if (y <= y0)
+        {
+            birth_time *= typical_stem_cycle_time; // hours
+        }
+        else
+        {
+            birth_time *= typical_transit_cycle_time; // hours
+        }
         p_cell->SetBirthTime(birth_time);
 
         if (locationIndices.empty())

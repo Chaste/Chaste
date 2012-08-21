@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StochasticDurationGenerationBasedCellCycleModel.hpp"
 #include "RandomCellKiller.hpp"
 #include "WildTypeCellMutationState.hpp"
+#include "TransitCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
 
 /**
@@ -73,6 +74,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             StochasticDurationGenerationBasedCellCycleModel* p_model = new StochasticDurationGenerationBasedCellCycleModel();
@@ -85,7 +87,7 @@ public:
                                  + p_model->GetSG2MDuration() );
 
             CellPtr p_cell(new Cell(p_state, p_model));
-            p_cell->SetCellProliferativeType(TRANSIT);
+            p_cell->SetCellProliferativeType(p_transit_type);
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
         }

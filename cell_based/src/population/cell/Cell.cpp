@@ -34,8 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "Cell.hpp"
-#include "ApoptoticCellProperty.hpp"
-#include "DefaultCellProliferativeType.hpp"
 
 /**
  * null_deleter means "doesn't delete" rather than "deletes nulls".
@@ -83,7 +81,6 @@ Cell::Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
 
     mpCellCycleModel->SetCell(CellPtr(this, null_deleter()));
 
-
     if (!mCellPropertyCollection.HasPropertyType<CellId>())
     {
         // Set cell identifier this will be called all the time unless the constructor is called through archiving
@@ -109,6 +106,14 @@ Cell::Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
         mCellPropertyCollection.AddProperty(p_cell_data);
     }
 
+    /*
+     * If a cell proliferative type was not passed in via the input
+     * argument cellPropertyCollection (for example as in the case
+     * of a daughter cell being created following division) then add
+     * add a 'default' cell proliferative type to the cell property
+     * collection. This ensures that the method GetCellProliferativeType()
+     * always returns a valid proliferative type.
+     */
     if (!mCellPropertyCollection.HasPropertyType<AbstractCellProliferativeType>())
     {
         mCellPropertyCollection.AddProperty(CellPropertyRegistry::Instance()->Get<DefaultCellProliferativeType>());
@@ -135,14 +140,34 @@ Cell::~Cell()
     delete mpCellCycleModel;
 }
 
-void Cell::SetCellProliferativeType(CellProliferativeType cellType)
+void Cell::SetCellProliferativeType(boost::shared_ptr<AbstractCellProperty> pProliferativeType)
 {
-    mCellProliferativeType = cellType;
+    if (!pProliferativeType->IsSubType<AbstractCellProliferativeType>())
+    {
+        EXCEPTION("Attempting to give cell a cell proliferative type that is not a subtype of AbstractCellProliferativeType");
+    }
+
+    boost::shared_ptr<AbstractCellProliferativeType> p_old_proliferative_type = GetCellProliferativeType();
+
+    p_old_proliferative_type->DecrementCellCount();
+    mCellPropertyCollection.RemoveProperty(p_old_proliferative_type);
+
+    AddCellProperty(pProliferativeType);
 }
 
-CellProliferativeType Cell::GetCellProliferativeType() const
+boost::shared_ptr<AbstractCellProliferativeType> Cell::GetCellProliferativeType()  const
 {
-    return mCellProliferativeType;
+    CellPropertyCollection proliferative_type_collection = mCellPropertyCollection.GetPropertiesType<AbstractCellProliferativeType>();
+
+    /*
+     * Note: In its current form the code requires each cell to have exactly
+     * one proliferative type. This is reflected in the assertion below. If a user
+     * wishes to include cells with multiple proliferative types, each possible
+     * combination must be created as a separate proliferative type class.
+     */
+    assert(proliferative_type_collection.GetSize() == 1);
+
+    return boost::static_pointer_cast<AbstractCellProliferativeType>(proliferative_type_collection.GetProperty());
 }
 
 void Cell::SetCellCycleModel(AbstractCellCycleModel* pCellCycleModel)
@@ -344,11 +369,10 @@ void Cell::SetAncestor(boost::shared_ptr<AbstractCellProperty> pCellAncestor)
     }
     else
     {
-        // Over-write the CellAncestor
+        // Overwrite the CellAncestor
         RemoveCellProperty<CellAncestor>();
         AddCellProperty(pCellAncestor);
     }
-
 }
 
 unsigned Cell::GetAncestor() const
@@ -359,7 +383,6 @@ unsigned Cell::GetAncestor() const
     if (ancestor_collection.GetSize() == 0)
     {
         return UNSIGNED_UNSET;
-        //EXCEPTION("SetAncestor must be called before GetAncestor. You may want to call SetCellAncestorsToLocationIndices on the cell population.");
     }
 
     boost::shared_ptr<CellAncestor> p_ancestor = boost::static_pointer_cast<CellAncestor>(ancestor_collection.GetProperty());
@@ -409,19 +432,20 @@ CellPtr Cell::Divide()
 
     // Copy all cell data (note we create a new object not just copying the pointer)
     assert(daughter_property_collection.HasPropertyType<CellData>());
+
     // Get the existing copy of the cell data and remove it from the daughter cell
     boost::shared_ptr<CellData> p_cell_data = GetCellData();
     daughter_property_collection.RemoveProperty(p_cell_data);
+
     // Create a new cell data object using the copy constructor and add this to the daughter cell
     MAKE_PTR_ARGS(CellData, p_daughter_cell_data, (*p_cell_data));
     daughter_property_collection.AddProperty(p_daughter_cell_data);
 
     // Create daughter cell with modified cell property collection
     CellPtr p_new_cell(new Cell(GetMutationState(), mpCellCycleModel->CreateCellCycleModel(), false, daughter_property_collection));
-    // Initialise properties of daughter cell
-    p_new_cell->SetCellProliferativeType(mCellProliferativeType);
-    p_new_cell->GetCellCycleModel()->InitialiseDaughterCell();
 
+    // Initialise properties of daughter cell
+    p_new_cell->GetCellCycleModel()->InitialiseDaughterCell();
 
     return p_new_cell;
 }
