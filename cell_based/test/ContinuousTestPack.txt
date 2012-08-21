@@ -13,6 +13,7 @@ cell/TestSimpleCellCycleModels.hpp
 common/TestSimulationTime.hpp
 common/TestOdeLinearSystemSolver.hpp
 mesh/TestCylindrical2dMesh.hpp
+mesh/TestCylindrical2dNodesOnlyMesh.hpp
 mesh/TestCylindrical2dVertexMesh.hpp
 mesh/TestCylindricalHoneycombMeshGenerator.hpp
 mesh/TestCylindricalHoneycombVertexMeshGenerator.hpp

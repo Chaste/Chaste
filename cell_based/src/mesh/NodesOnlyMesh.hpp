@@ -48,6 +48,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned SPACE_DIM>
 class NodesOnlyMesh: public MutableMesh<SPACE_DIM, SPACE_DIM>
 {
+
+protected:
+    /**
+     * A pointer to a box collection. Used to calculate neighbourhood information
+     * for nodes in the mesh
+     */
+    BoxCollection<SPACE_DIM>* mpBoxCollection;
+
 private:
 
     /**
@@ -56,12 +64,6 @@ private:
      * ConstructNodesWithoutMesh()
      */
     std::vector<double> mCellRadii;
-
-    /**
-     * A pointer to a box collection. Used to calculate neighbourhood information
-     * for nodes in the mesh
-     */
-    BoxCollection<SPACE_DIM>* mpBoxCollection;
 
     /**
      * The maximum interaction distance for two nodes. Defines the maximum
@@ -165,12 +167,12 @@ public:
     void ClearBoxCollection();
 
     /**
-     * Set up the box collection
+     * Set up the box collection. Overriden in subclasses to implement periodicity.
      *
      * @param cutOffLength the cut off length for node neighbours
      * @param domainSize the size of the domain containing the nodes.
      */
-    void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize);
+    virtual void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize);
 
     /**
      * Set the maximum interaction distance between nodes
