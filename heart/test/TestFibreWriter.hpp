@@ -170,8 +170,9 @@ private:
             system(("ls -lh " + OutputFileHandler::GetChasteTestOutputDirectory()
                 + dir + "/" + baseName + "_bin.ortho " +
                 fullPath + "/" + baseName + ".ortho\n").c_str());
-            }
         }
+    }
+
     void ConvertToBinaryAxi(std::string fullPath, std::string baseName, bool output) throw (Exception)
     {
         FileFinder file_finder(fullPath+"/"+baseName+".axi", RelativeTo::ChasteSourceRoot);

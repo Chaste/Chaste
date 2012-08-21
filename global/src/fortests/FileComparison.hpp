@@ -66,7 +66,7 @@ public:
      * @param suppressOutput  If true then no errors will go to TS_TRACE(). Should only be set for the test of this class.
      */
     FileComparison(std::string fileName1, std::string fileName2, bool calledCollectively=true, bool suppressOutput = false)
-        : AbstractFileComparison(fileName1, fileName2, calledCollectively,suppressOutput),
+        : AbstractFileComparison(fileName1, fileName2, calledCollectively, suppressOutput),
           mIgnoreCommentLines(true)
     {
         SetupCommentLines();
@@ -82,7 +82,7 @@ public:
      * @param suppressOutput  If true then no errors will go to TS_TRACE(). Should only be set for the test of this class.
      */
     FileComparison(const FileFinder& rFileName1, const FileFinder& rFileName2, bool calledCollectively=true, bool suppressOutput = false)
-        : AbstractFileComparison(rFileName1, rFileName2, calledCollectively,suppressOutput),
+        : AbstractFileComparison(rFileName1, rFileName2, calledCollectively, suppressOutput),
           mIgnoreCommentLines(true)
     {
         SetupCommentLines();

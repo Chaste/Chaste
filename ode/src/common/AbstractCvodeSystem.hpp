@@ -58,6 +58,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // CVODE headers
 #include <nvector/nvector_serial.h>
+#include <sundials/sundials_dense.h> /* definitions DlsMat DENSE_ELEM */
 
 /**
  * Abstract OdeSystem class for Cvode systems (N_Vector instead of std::vector)
@@ -271,6 +272,12 @@ public:
     virtual void EvaluateYDerivatives(realtype time,
                                       N_Vector y,
                                       N_Vector ydot)=0;
+
+    virtual void EvaluateAnalyticJacobian(int N, realtype time, N_Vector y, N_Vector ydot,
+                                          DlsMat J, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3)
+    {
+        EXCEPTION("No analytic Jacobian has been defined for this system.");
+    }
 
     /**
      * Set whether to automatically re-initialise CVODE on every call to Solve, or

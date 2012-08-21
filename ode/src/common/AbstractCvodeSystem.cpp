@@ -77,6 +77,27 @@ int AbstractCvodeSystemRhsAdaptor(realtype t, N_Vector y, N_Vector ydot, void *p
     return 0;
 }
 
+// NB First Argument changes to a long int in SUNDIALS 2.5.0
+
+int AbstractCvodeSystemJacAdaptor(int N, realtype t,
+        N_Vector y, N_Vector ydot, DlsMat J, void *pData,
+        N_Vector tmp1, N_Vector tmp2, N_Vector tmp3)
+{
+    assert(pData != NULL);
+    AbstractCvodeSystem* p_ode_system = (AbstractCvodeSystem*) pData;
+    try
+    {
+        p_ode_system->EvaluateAnalyticJacobian(N, t, y, ydot, J, tmp1, tmp2, tmp3);
+    }
+    catch (const Exception &e)
+    {
+        std::cerr << "CVODE Jacobian Exception: " << e.GetMessage()
+                  << std::endl << std::flush;
+        return -1;
+    }
+    return 0;
+}
+
 AbstractCvodeSystem::AbstractCvodeSystem(unsigned numberOfStateVariables)
     : AbstractParameterisedSystem<N_Vector>(numberOfStateVariables),
       mLastSolutionState(NULL),
@@ -200,6 +221,26 @@ void AbstractCvodeSystem::Solve(realtype tStart,
 
     RecordStoppingPoint(cvode_stopped_at);
 
+//
+//    long int nst, nfe, nsetups, nje, nfeLS, nni, ncfn, netf, nge;
+//
+//
+//    CVodeGetNumSteps(mpCvodeMem, &nst);
+//    CVodeGetNumRhsEvals(mpCvodeMem, &nfe);
+//    CVodeGetNumLinSolvSetups(mpCvodeMem, &nsetups);
+//    CVodeGetNumErrTestFails(mpCvodeMem, &netf);
+//    CVodeGetNumNonlinSolvIters(mpCvodeMem, &nni);
+//    CVodeGetNumNonlinSolvConvFails(mpCvodeMem, &ncfn);
+//    CVDlsGetNumJacEvals(mpCvodeMem, &nje);
+//    CVDlsGetNumRhsEvals(mpCvodeMem, &nfeLS);
+//    CVodeGetNumGEvals(mpCvodeMem, &nge);
+//
+//    printf("\nFinal Statistics:\n");
+//    printf("nst = %-6ld nfe  = %-6ld nsetups = %-6ld nfeLS = %-6ld nje = %ld\n",
+//       nst, nfe, nsetups, nfeLS, nje);
+//    printf("nni = %-6ld ncfn = %-6ld netf = %-6ld nge = %ld\n \n",
+//       nni, ncfn, netf, nge);
+//    std::cout << std::flush;
     VerifyStateVariables();
 }
 
@@ -307,6 +348,11 @@ void AbstractCvodeSystem::SetupCvode(N_Vector initialConditions,
 #endif
         // Attach a linear solver for Newton iteration
         CVDense(mpCvodeMem, NV_LENGTH_S(initialConditions));
+
+        if (mUseAnalyticJacobian)
+        {
+            CVDlsSetDenseJacFn(mpCvodeMem, AbstractCvodeSystemJacAdaptor);
+        }
     }
     else if (reinit)
     {
