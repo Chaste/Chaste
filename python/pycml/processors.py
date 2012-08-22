@@ -446,8 +446,9 @@ class ModelModifier(object):
     def remove_expr(self, expr):
         """Remove an expression (ODE or assignment) from its parent."""
         assert isinstance(expr, mathml_apply)
-        expr.xml_parent.safe_remove_child(expr)
-        expr.xml_parent = None # Not done by Amara...
+        if expr.xml_parent:
+            expr.xml_parent.safe_remove_child(expr)
+            expr.xml_parent = None # Not done by Amara...
         return expr
     
     def remove_definition(self, var, keep_initial_value=False):
