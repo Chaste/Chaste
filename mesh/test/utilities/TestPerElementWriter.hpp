@@ -43,20 +43,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractPerElementWriter.hpp"
 #include "DistributedTetrahedralMesh.hpp"
 #include "NumericFileComparison.hpp"
+#include "PetscSetupAndFinalize.hpp"
 
 
 class CentroidWriter : public AbstractPerElementWriter<3,3,3>
 {
-    void Visit(Element<3,3>* pElement, c_vector<double, 3>& rData)
+    void Visit(Element<3,3>* pElement, unsigned localElementIndex, c_vector<double, 3>& rData)
     {
         rData = pElement->CalculateCentroid();
+        //Check for a data invariant
+        TS_ASSERT_EQUALS(mpMesh->mElements[localElementIndex], pElement);
     }
 
 };
 
 class CentroidWithIndexWriter : public AbstractPerElementWriter<3,3,4>
 {
-    void Visit(Element<3,3>* pElement, c_vector<double, 4>& rData)
+    void Visit(Element<3,3>* pElement, unsigned localElementIndex, c_vector<double, 4>& rData)
     {
         c_vector<double,3> centroid = pElement->CalculateCentroid();
         rData[0] = pElement->GetIndex();
@@ -78,7 +81,7 @@ class CentroidWithIndexWriter : public AbstractPerElementWriter<3,3,4>
 
     void WriteHeaderOnMaster()
     {
-        (*mpMasterFile)<<"This one has indices\n";
+        *(this->mpMasterFile)<<"This one has indices\n";
     }
 };
 

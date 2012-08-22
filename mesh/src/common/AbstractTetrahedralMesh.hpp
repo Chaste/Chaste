@@ -71,7 +71,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class AbstractTetrahedralMesh : public AbstractMesh<ELEMENT_DIM, SPACE_DIM>
 {
     friend class AbstractConductivityTensors<ELEMENT_DIM, SPACE_DIM>; //A class which needs a global to local element mapping
-
+    friend class CentroidWriter; //A test class which needs access to mElements in order to check that local/global indices match
 protected:
     /**
      * Most tet meshes are linear (set to true).  Set to false in quadratics.

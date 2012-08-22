@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NonlinearElasticityTools.hpp"
 #include "MooneyRivlinMaterialLaw.hpp"
 #include "CompressibleExponentialLaw.hpp"
+#include "NumericFileComparison.hpp"
 #include "FileComparison.hpp"
 
 /*
@@ -1152,8 +1153,9 @@ public:
 
         FileFinder generated_file("TestWritingStress/some_stresses_3d_10.stress", RelativeTo::ChasteTestOutput);
         FileFinder reference_file("continuum_mechanics/test/data/some_stresses_3d_10.stress", RelativeTo::ChasteSourceRoot);
-        FileComparison comparer(generated_file,reference_file);
-        TS_ASSERT(comparer.CompareFiles());
+        NumericFileComparison comparison(generated_file, reference_file);
+        TS_ASSERT(comparison.CompareFiles());
+    
     }
 
     // quick 2d test that complements above test

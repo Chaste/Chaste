@@ -49,7 +49,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QuadraticBasisFunction.hpp"
 #include "SolidMechanicsProblemDefinition.hpp"
 #include "Timer.hpp"
+#include "AbstractPerElementWriter.hpp"
 #include "petscsnes.h"
+
 
 
 //#define MECH_USE_HYPRE    // uses HYPRE to solve linear systems, requires PETSc to be installed with HYPRE
@@ -98,6 +100,49 @@ PetscErrorCode AbstractNonlinearElasticitySolver_ComputeJacobian(SNES snes,
                                                                  Mat* pPreconditioner,
                                                                  MatStructure* pMatStructure,
                                                                  void* pContext);
+template <unsigned DIM>
+class  AbstractNonlinearElasticitySolver; //Forward declaration
+
+/**
+ * Helper class for dumping the stresses to file
+ * 
+ * Currently located here so that it's easy to feed a pointer to the main
+ * class AbstractNonlinearElasticitySolver
+ */
+template<unsigned DIM>
+class StressPerElementWriter : public AbstractPerElementWriter<DIM, DIM, DIM*DIM>
+{
+private:
+    AbstractNonlinearElasticitySolver<DIM>* mpSolver; /**< Pointer to the parent class, set in constructor*/
+public:    
+    
+    /** Constructor
+     * @param pSolver  A pointer to the parent class, used to access data
+     */
+    StressPerElementWriter(AbstractNonlinearElasticitySolver<DIM>* pSolver):
+        mpSolver(pSolver)
+    {
+    }
+    /**
+     * How to associate an element with the stress data
+     *
+     * @param pElement  a locally-owned element for which to calculate or lookup some data
+     * @param localIndex the index (in mElements) of pElement
+     * @param rData  the double-precision data to write to file (output from the method)
+     */
+    void Visit(Element<DIM, DIM>* pElement, unsigned localIndex, c_vector<double, DIM*DIM>& rData)
+    {
+        //Flatten the matrix
+        c_matrix<double, DIM, DIM> data = mpSolver->GetAverageStressPerElement(localIndex);
+        for (unsigned i=0; i<DIM; i++)
+        {
+            for (unsigned j=0; j<DIM; j++)
+            {
+                rData[i*DIM+j] = data(i,j);
+            }
+        }
+    }
+};
 
 
 /**
@@ -813,31 +858,10 @@ void AbstractNonlinearElasticitySolver<DIM>::WriteCurrentAverageElementStresses(
         file_name << "_" << counterToAppend;
     }
     file_name << ".stress";
-
-    out_stream p_file = this->mpOutputFileHandler->OpenOutputFile(file_name.str());
-
     assert(mAverageStressesPerElement.size()==this->mrQuadMesh.GetNumElements());
 
-    for(unsigned i=0; i<mAverageStressesPerElement.size(); i++)
-    {
-        c_matrix<double,DIM,DIM> stress = GetAverageStressPerElement(i);
-//        c_vector<double,DIM> centroid = this->mrQuadMesh.GetElement(i)->CalculateCentroid();
-//
-//        for(unsigned j=0; j<DIM; j++)
-//        {
-//            *p_file << centroid(j) << " ";
-//        }
-
-        for(unsigned j=0; j<DIM; j++)
-        {
-            for(unsigned k=0; k<DIM; k++)
-            {
-                *p_file << stress(j,k) << " ";
-            }
-        }
-        *p_file << "\n";
-    }
-    p_file->close();
+    StressPerElementWriter<DIM> stress_writer(this);
+    stress_writer.WriteData(*(this->mpOutputFileHandler), file_name.str(), &(this->mrQuadMesh));
 }
 
 

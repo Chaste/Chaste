@@ -39,9 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "UblasCustomFunctions.hpp"
 #include "OutputFileHandler.hpp"
 #include "Version.hpp"
-#include "PetscSetupAndFinalize.hpp"
 
-#include "Debug.hpp"
 /**
  * An abstract writer class for writing stuff on a "per element" basis.
  * This class will "visit" all the locally owned elements and concentrate
@@ -50,18 +48,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned DATA_SIZE>
 class AbstractPerElementWriter
 {
-private:
-    AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* mpMesh; /**< The mesh.  Set by the public method WriteData. */
 protected:
+    AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* mpMesh; /**< The mesh.  Set by the public method WriteData. */
+public:
     out_stream mpMasterFile; /**< The output file (only valid on master process).   Set by the public method WriteData and used by WriteElementOnMaster*/
     /**
      * How to associate an element with some data
      * Must be over-ridden by the derived class.
      *
      * @param pElement  a locally-owned element for which to calculate or lookup some data
+     * @param localElementIndex the index of pElement in the local vector.  Used in subclasses which look up data from a separate structure ordered by local indices
      * @param rData  the double-precision data to write to file (output from the method)
      */
-    virtual void Visit(Element<ELEMENT_DIM, SPACE_DIM>* pElement, c_vector<double, DATA_SIZE>& rData)=0;
+    virtual void Visit(Element<ELEMENT_DIM, SPACE_DIM>* pElement, unsigned localElementIndex, c_vector<double, DATA_SIZE>& rData)=0;
 
     /**
      * How to write an element's worth of data to the file.
@@ -111,17 +110,31 @@ public:
             MPI_Status status;
             status.MPI_ERROR = MPI_SUCCESS; //For MPICH2
             WriteHeaderOnMaster();
-            for (unsigned element_index=0; element_index<mpMesh->GetNumElements();element_index++)
+            // The master process needs to keep track of both the global element list
+            // (so that all elements are concentrated) and the local element list (so that
+            // a local element index can be applied
+            unsigned local_element_index=0u; //Data invariant associates iter with local_element_index
+            typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator iter = mpMesh->GetElementIteratorBegin();
+            
+            for (unsigned global_element_index=0; global_element_index<mpMesh->GetNumElements(); global_element_index++)
             {
-                if (mpMesh->CalculateDesignatedOwnershipOfElement(element_index))
+                if (mpMesh->CalculateDesignatedOwnershipOfElement(global_element_index))
                 {
+                    Element<ELEMENT_DIM,SPACE_DIM>* p_elem = mpMesh->GetElement(global_element_index);
+                    //Spool forward in the local vector of elements
+                    while (&(*iter) != p_elem)
+                    {
+                        ++iter;
+                        local_element_index++;
+                        assert(iter != mpMesh->GetElementIteratorEnd());
+                    }
                     //Master owns this process and can write it directly
-                    Visit(mpMesh->GetElement(element_index), data);
+                    Visit(p_elem, local_element_index, data);
                 }
                 else
                 {
                     //Data must come from a remote process
-                    MPI_Recv(&data[0], DATA_SIZE, MPI_DOUBLE, MPI_ANY_SOURCE, element_index, PETSC_COMM_WORLD, &status);
+                    MPI_Recv(&data[0], DATA_SIZE, MPI_DOUBLE, MPI_ANY_SOURCE, global_element_index, PETSC_COMM_WORLD, &status);
                 }
                 WriteElementOnMaster(data);
             }
@@ -132,9 +145,10 @@ public:
         {
             //Not master process
             unsigned previous_index = 0u; //Used to check that the indices are monotone
+            unsigned local_index = 0u;
             for (typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator iter = mpMesh->GetElementIteratorBegin();
                           iter != mpMesh->GetElementIteratorEnd();
-                          ++iter)
+                          ++iter, local_index++)
             {
                 unsigned element_index = iter->GetIndex();
                 //Check monotonicity
@@ -146,7 +160,7 @@ public:
                 if (mpMesh->CalculateDesignatedOwnershipOfElement(element_index))
                 {
                     //The master needs to know about this one
-                    Visit(&(*iter), data);
+                    Visit(&(*iter), local_index, data);
                     MPI_Send(&data[0], DATA_SIZE, MPI_DOUBLE, 0, element_index, PETSC_COMM_WORLD);//Tag with element_index
                 }
             }
