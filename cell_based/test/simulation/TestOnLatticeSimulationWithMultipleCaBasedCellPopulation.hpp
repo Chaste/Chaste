@@ -212,7 +212,6 @@ public:
 
         ///\todo Check that the cell is moving correctly
         double probability_of_occupation[9];
-
         for (unsigned i=0; i<9; i++)
         {
             probability_of_occupation[i] = (double) location_of_cell[i]/(double) num_runs;
@@ -262,10 +261,9 @@ public:
         simulator.SetDt(0.1);
         simulator.SetEndTime(40);
 
-        // Adding update rule(s).
+        // Adding update rule(s)
         MAKE_PTR(DiffusionMultipleCaUpdateRule<2u>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(0.5);
-
         simulator.AddMultipleCaUpdateRule(p_diffusion_update_rule);
 
         // Run simulation
@@ -437,10 +435,10 @@ public:
         std::vector<unsigned> location_indices;
         for (unsigned index=0; index<10u; index++)
         {
-           location_indices.push_back(index);
-           location_indices.push_back(index);
-           location_indices.push_back(index);
-           location_indices.push_back(index);
+            location_indices.push_back(index);
+            location_indices.push_back(index);
+            location_indices.push_back(index);
+            location_indices.push_back(index);
         }
 
         // Create cell population
@@ -466,7 +464,7 @@ public:
 
     /*
      * Cellular birth has been tested in TestMultipleCaSingleCellWithBirth for one cell per lattice site.
-     * This test  adds to the above by further testing cellular birth considering multiple cells per lattice site.
+     * This test adds to the above by further testing cellular birth considering multiple cells per lattice site.
      * A  two-lattice mesh was created and only one lattice had free space to add one daughter cell.
      */
     void TestMultipleCellsPerLatticeSiteWithBirth() throw (Exception)
@@ -481,7 +479,7 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, 3u, p_stem_type);
+        cells_generator.GenerateBasicRandom(cells, 3, p_stem_type);
 
         // Specify where cells lie
         std::vector<unsigned> location_indices;
@@ -489,44 +487,43 @@ public:
         location_indices.push_back(0);
         location_indices.push_back(1);
 
-         // Create cell population
-         MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 2);
+        // Create cell population
+        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 2);
 
-         // Set up cell-based simulation
-         OnLatticeSimulation<2> simulator(cell_population);
-         std::string output_directory = "TestMultipleCellsPerLatticeSiteWithBirth";
-         simulator.SetOutputDirectory(output_directory);
-         simulator.SetDt(0.1);
-         simulator.SetEndTime(40);
+        // Set up cell-based simulation
+        OnLatticeSimulation<2> simulator(cell_population);
+        std::string output_directory = "TestMultipleCellsPerLatticeSiteWithBirth";
+        simulator.SetOutputDirectory(output_directory);
+        simulator.SetDt(0.1);
+        simulator.SetEndTime(40);
 
-         // Add update rule
-         MAKE_PTR(DiffusionMultipleCaUpdateRule<2u>, p_diffusion_update_rule);
-         p_diffusion_update_rule->SetDiffusionParameter(0.5);
+        // Add update rule
+        MAKE_PTR(DiffusionMultipleCaUpdateRule<2u>, p_diffusion_update_rule);
+        p_diffusion_update_rule->SetDiffusionParameter(0.5);
+        simulator.AddMultipleCaUpdateRule(p_diffusion_update_rule);
 
-         simulator.AddMultipleCaUpdateRule(p_diffusion_update_rule);
+        // Run simulation
+        simulator.Solve();
 
-         // Run simulation
-         simulator.Solve();
+        // Check the number of cells
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 4u);
 
-         // Check the number of cells
-         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 4u);
-
-         // Test no deaths and some births
-         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 1u);
-         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
+        // Test no deaths and some births
+        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 1u);
+        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
 
 #ifdef CHASTE_VTK
-         //Test that VTK writer has produced a file
-         OutputFileHandler output_file_handler(output_directory, false);
-         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+        // Test that VTK writer has produced a file
+        OutputFileHandler output_file_handler(output_directory, false);
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-         // Initial condition file
-         FileFinder vtk_file(results_dir + "results_from_time_0/results_0.vtu", RelativeTo::Absolute);
-         TS_ASSERT(vtk_file.Exists());
+        // Initial condition file
+        FileFinder vtk_file(results_dir + "results_from_time_0/results_0.vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtk_file.Exists());
 
-         // Final file
-         FileFinder vtk_file2(results_dir + "results_from_time_0/results_400.vtu", RelativeTo::Absolute);
-         TS_ASSERT(vtk_file2.Exists());
+        // Final file
+        FileFinder vtk_file2(results_dir + "results_from_time_0/results_400.vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtk_file2.Exists());
 #endif //CHASTE_VTK
     }
 

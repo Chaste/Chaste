@@ -712,6 +712,14 @@ public:
     c_vector<double,SPACE_DIM> GetSizeOfCellPopulation();
 
     /**
+     * Method for determining whether there is room into which a given cell may divide.
+     * Returns true by default, but may be overridden in subclasses.
+     *
+     * @param pCell pointer to a cell
+     */
+    virtual bool IsRoomToDivide(CellPtr pCell);
+
+    /**
      * Iterator class allows one to iterate over cells in the cell population.
      * Dereferencing the iterator will give you the current cell.
      * There are also methods to get the node representing this cell,

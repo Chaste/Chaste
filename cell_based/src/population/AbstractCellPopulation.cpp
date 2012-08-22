@@ -949,6 +949,12 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetOutputCellVolumes(bool o
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsRoomToDivide(CellPtr pCell)
+{
+    return true;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double,SPACE_DIM> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetSizeOfCellPopulation()
 {
     // Compute the centre of mass of the cell population

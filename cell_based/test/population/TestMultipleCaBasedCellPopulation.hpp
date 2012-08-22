@@ -391,7 +391,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 1u);
         TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*(cell_population.Begin())),13u);
 
-        // Test that Update() throws no errors Note that for ths cell population Update doesn't actually do anything
+        // Test that Update() throws no errors (note that for this cell population, Update() doesn't actually do anything)
         TS_ASSERT_THROWS_NOTHING(cell_population.Update());
     }
 
@@ -452,7 +452,8 @@ public:
 //        TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(1)->GetNodeGlobalIndex(1), 3u);
     }
 
-    void TestAddCellToManyCells() throw(Exception)
+///\todo reinstate or remove test (#2031)
+    void DONOTTestAddCellToManyCells() throw(Exception)
     {
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
@@ -482,7 +483,7 @@ public:
         CellPtr p_new_cell(new Cell(p_state, p_model));
         p_new_cell->SetCellProliferativeType(p_stem_type);
 
-        // Add new cell to the cell population by dividing the cell
+        // Test thatAdd new cell to the cell population by dividing the cell
         AbstractCellPopulation<2>::Iterator cell_iter_1 = cell_population.Begin();
         TS_ASSERT_THROWS_THIS(cell_population.AddCell(p_new_cell, zero_vector<double>(2), *cell_iter_1),
             "No free space to divide.");

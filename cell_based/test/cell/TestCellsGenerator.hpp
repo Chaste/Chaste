@@ -48,6 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WildTypeCellMutationState.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 
 class TestCellsGenerator : public AbstractCellBasedTestSuite
 {
@@ -96,7 +97,7 @@ public:
         HoneycombMeshGenerator mesh_generator(6, 7, 2);
         std::vector<unsigned> location_indices = mesh_generator.GetCellLocationIndices();
 
-        // Create cells again with basic
+        // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         TS_ASSERT_THROWS_THIS(cells_generator.GenerateBasic(cells, 83511u, location_indices),
@@ -108,6 +109,29 @@ public:
         {
             TS_ASSERT_DELTA(cells[i]->GetBirthTime(), -(double)(location_indices[i]), 1e-9);
             TS_ASSERT_EQUALS(cells[i]->GetCellCycleModel()->GetDimension(), 2u);
+        }
+    }
+
+    void TestGenerateGivenLocationIndicesWithSpecifiedCellProliferativeType() throw(Exception)
+    {
+        // Use a mesh generator to generate some location indices corresponding to real cells
+        HoneycombMeshGenerator mesh_generator(6, 7, 2);
+        std::vector<unsigned> location_indices = mesh_generator.GetCellLocationIndices();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+
+        cells_generator.GenerateGivenLocationIndices(cells,
+                                                     location_indices,
+                                                     CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
+
+        // Test that cells were generated correctly
+        for (unsigned i=0; i<cells.size(); i++)
+        {
+            TS_ASSERT_DELTA(cells[i]->GetBirthTime(), -(double)(location_indices[i]), 1e-9);
+            TS_ASSERT_EQUALS(cells[i]->GetCellCycleModel()->GetDimension(), 2u);
+            TS_ASSERT_EQUALS(cells[i]->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>(), true);
         }
     }
 

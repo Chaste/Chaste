@@ -72,7 +72,7 @@ MultipleCaBasedCellPopulation<DIM>::MultipleCaBasedCellPopulation(PottsMesh<DIM>
         // Create a set of node indices corresponding to empty sites
         for (unsigned i=0; i<locationIndices.size(); i++)
         {
-            if (mAvailableSpaces[locationIndices[i]] == 0u)
+            if (!IsSiteAvailable(locationIndices[i]))
             {
                 EXCEPTION("One of the lattice sites has more cells than the carrying capacity. Check the initial cell locations.");
             }
@@ -105,7 +105,7 @@ std::vector<unsigned>& MultipleCaBasedCellPopulation<DIM>::rGetAvailableSpaces()
 template<unsigned DIM>
 bool MultipleCaBasedCellPopulation<DIM>::IsSiteAvailable(unsigned index)
 {
-    return (mAvailableSpaces[index]>0u);
+    return (mAvailableSpaces[index] != 0);
 }
 
 template<unsigned DIM>
@@ -147,7 +147,7 @@ Node<DIM>* MultipleCaBasedCellPopulation<DIM>::GetNodeCorrespondingToCell(CellPt
 template<unsigned DIM>
 void MultipleCaBasedCellPopulation<DIM>::AddCellUsingLocationIndex(unsigned index, CellPtr pCell)
 {
-    if (mAvailableSpaces[index]==0u)
+    if (!IsSiteAvailable(index))
     {
         EXCEPTION("No available spaces at location index " << index << ".");
     }
@@ -166,6 +166,32 @@ void MultipleCaBasedCellPopulation<DIM>::RemoveCellUsingLocationIndex(unsigned i
 }
 
 template<unsigned DIM>
+bool MultipleCaBasedCellPopulation<DIM>::IsRoomToDivide(CellPtr pCell)
+{
+    bool is_room = false;
+
+    // Get node index corresponding to this cell
+    unsigned node_index = this->GetLocationIndexUsingCell(pCell);
+
+    // Get the set of neighbouring node indices
+    std::set<unsigned> neighbouring_node_indices = static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetMooreNeighbouringNodeIndices(node_index);
+
+    // Iterate through the neighbours to see if there are any available sites
+    for (std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
+         neighbour_iter != neighbouring_node_indices.end();
+         ++neighbour_iter)
+    {
+        if (IsSiteAvailable(*neighbour_iter))
+        {
+            is_room = true;
+            break;
+        }
+    }
+
+    return is_room;
+}
+
+template<unsigned DIM>
 CellPtr MultipleCaBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell)
 {
     // Get node index corresponding to the parent cell
@@ -173,24 +199,27 @@ CellPtr MultipleCaBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_ve
 
     // Get the set of neighbouring node indices
     std::set<unsigned> neighbouring_node_indices = static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetMooreNeighbouringNodeIndices(parent_node_index);
-
-    assert(!neighbouring_node_indices.empty());
-
     unsigned num_neighbours = neighbouring_node_indices.size();
 
-//    double prob_dividing_into_this_site = GetProbabilityOfDivisionIntoTargetSite(parent_node_index, ??, num_neighbours);
+    // Each node must have at least one neighbour
+    assert(!neighbouring_node_indices.empty());
 
+    // Randomly choose one of the neighbouring node indices
     RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
     unsigned chosen_start = p_gen->randMod(num_neighbours);
     std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
-
     for (unsigned i=0; i<chosen_start; i++)
     {
         neighbour_iter++;
     }
 
+    /*
+     * Iterate through the neighbours until the first available site is found.
+     * Note that at least one such site is guaranteed, since this method is called
+     * within AbstractCellBasedSimulation::DoCellBirth() only if IsRoomToDivide()
+     * returns true for the parent cell.
+     */
     unsigned daughter_node_index = UNSIGNED_UNSET;
-
     unsigned count = 0;
     while (count < num_neighbours)
     {
@@ -214,10 +243,7 @@ CellPtr MultipleCaBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_ve
         }
     }
 
-    if (daughter_node_index == UNSIGNED_UNSET)
-    {
-        EXCEPTION("No free space to divide.");
-    }
+    assert(daughter_node_index != UNSIGNED_UNSET);
 
     // Associate the new cell with the element
     this->mCells.push_back(pNewCell);

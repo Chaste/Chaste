@@ -112,15 +112,16 @@ unsigned AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::DoCellBirth()
          cell_iter != mrCellPopulation.End();
          ++cell_iter)
     {
-        // Check if this cell is ready to divide - if so create a new cell etc.
+        // Check if this cell is ready to divide
         if (cell_iter->GetAge() > 0.0)
         {
             if (cell_iter->ReadyToDivide())
             {
-                try
+                // Check if there is room into which the cell may divide
+                if (mrCellPopulation.IsRoomToDivide(*cell_iter))
                 {
                     // Store age before division
-                    double cell_age =cell_iter->GetAge();
+                    double cell_age = cell_iter->GetAge();
 
                     // Create a new cell
                     CellPtr p_new_cell = cell_iter->Divide();
@@ -144,15 +145,6 @@ unsigned AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::DoCellBirth()
 
                     // Update counter
                     num_births_this_step++;
-                }
-                catch (Exception& e)
-                {
-                    if (!(e.GetShortMessage()=="No free space to divide."))
-                    {
-                        NEVER_REACHED;
-                        // If you do reach here, then uncomment the following line to see why.
-                        //throw e;
-                    }
                 }
             }
         }

@@ -165,7 +165,7 @@ public:
     std::vector<unsigned>& rGetAvailableSpaces();
 
     /**
-     * Find if a given node Has space available.
+     * Find if a given node has space available.
      *
      * @param index the global index of a specified node
      *
@@ -370,6 +370,16 @@ public:
      * @return the set of neighbouring node indices.
      */
     std::set<unsigned> GetNeighbouringNodeIndices(unsigned index);
+
+    /**
+     * Overridden IsRoomToDivide() method.
+     * Returns whether there are any available neighbouring sites to the
+     * one occupied by a given cell.
+     *
+     * @param pCell pointer to a cell
+     * @return whether the cell has any free neighbouring sites
+     */
+    bool IsRoomToDivide(CellPtr pCell);
 };
 
 #include "SerializationExportWrapper.hpp"
