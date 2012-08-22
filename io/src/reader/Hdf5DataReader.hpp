@@ -47,26 +47,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 
 #include "FileFinder.hpp"
+#include "AbstractHdf5Access.hpp"
 
 const unsigned MAX_STRING_SIZE = 100; /// \todo: magic number
 
 /**
  * A concrete HDF5 data reader class.
  */
-class Hdf5DataReader
+class Hdf5DataReader : public AbstractHdf5Access
 {
 private:
 
-    static const unsigned MAX_DATASET_RANK = 3;             /**< Defined in HDF5 writer too. \todo: define it once */
-
     std::string mDirectory;                                 /**< Directory output files will be stored in (absolute path). */
-    std::string mBaseName;                                  /**< The base name for the output data files. */
-
     hid_t mFileId;                                          /**< The data file ID. */
 
     hid_t mVariablesDatasetId;                              /**< The variables data set ID. */
     unsigned mVariablesDatasetRank;                         /**< The rank of the variables data set. */
-    hsize_t mVariablesDatasetSizes[MAX_DATASET_RANK];       /**< The sizes of each variable data set. */
+    hsize_t mVariablesDatasetSizes[AbstractHdf5Access::DATASET_DIMS];       /**< The sizes of each variable data set. */
 
     bool mIsUnlimitedDimensionSet;                          /**< Is the unlimited dimension set */
     hid_t mTimeDatasetId;                                   /**< The time data set ID. */
@@ -85,10 +82,8 @@ private:
      * Contains functionality common to both constructors.
      *
      * @param rDirectory  The directory the files are stored in
-     * @param rBaseName  The base name of the files to read (i.e. without the extensions)
      */
-    void CommonConstructor(const FileFinder& rDirectory,
-                           const std::string& rBaseName);
+    void CommonConstructor(const FileFinder& rDirectory);
 
 public:
 

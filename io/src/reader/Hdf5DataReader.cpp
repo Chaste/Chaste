@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 Hdf5DataReader::Hdf5DataReader(const std::string& rDirectory,
                                const std::string& rBaseName,
                                bool makeAbsolute)
-    : mBaseName(rBaseName),
+    : AbstractHdf5Access(rBaseName, "Data"),
       mIsUnlimitedDimensionSet(false),
       mNumberTimesteps(1),
       mIsDataComplete(true),
@@ -60,21 +60,21 @@ Hdf5DataReader::Hdf5DataReader(const std::string& rDirectory,
         relative_to = RelativeTo::Absolute;
     }
     FileFinder directory(rDirectory, relative_to);
-    CommonConstructor(directory, rBaseName);
+    CommonConstructor(directory);
 }
 
 Hdf5DataReader::Hdf5DataReader(const FileFinder& rDirectory,
                                const std::string& rBaseName)
-    : mBaseName(rBaseName),
+    : AbstractHdf5Access(rBaseName, "Data"),
       mIsUnlimitedDimensionSet(false),
       mNumberTimesteps(1),
       mIsDataComplete(true),
       mClosed(false)
 {
-    CommonConstructor(rDirectory, rBaseName);
+    CommonConstructor(rDirectory);
 }
 
-void Hdf5DataReader::CommonConstructor(const FileFinder& rDirectory, const std::string& rBaseName)
+void Hdf5DataReader::CommonConstructor(const FileFinder& rDirectory)
 {
     std::string results_dir = rDirectory.GetAbsolutePath();
     if (!rDirectory.IsDir() || !rDirectory.Exists())
@@ -101,16 +101,16 @@ void Hdf5DataReader::CommonConstructor(const FileFinder& rDirectory, const std::
                   " , H5Fopen error code = " << mFileId);
     }
 
-    mVariablesDatasetId = H5Dopen(mFileId, "Data");
+    mVariablesDatasetId = H5Dopen(mFileId, mDatasetName.c_str());
 
     hid_t variables_dataspace = H5Dget_space(mVariablesDatasetId);
     mVariablesDatasetRank = H5Sget_simple_extent_ndims(variables_dataspace);
 
     // Get the dataset/dataspace dimensions
-    hsize_t dataset_max_sizes[MAX_DATASET_RANK];
+    hsize_t dataset_max_sizes[AbstractHdf5Access::DATASET_DIMS];
     H5Sget_simple_extent_dims(variables_dataspace, mVariablesDatasetSizes, dataset_max_sizes);
 
-    for (unsigned i=1; i<MAX_DATASET_RANK; i++)  // Zero is excluded since it may be unlimited
+    for (unsigned i=1; i<AbstractHdf5Access::DATASET_DIMS; i++)  // Zero is excluded since it may be unlimited
     {
         assert(mVariablesDatasetSizes[i] == dataset_max_sizes[i]);
     }

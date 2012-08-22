@@ -52,9 +52,9 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
                                const std::string& rBaseName,
                                bool cleanDirectory,
                                bool extendData)
-    : mrVectorFactory(rVectorFactory),
+    : AbstractHdf5Access(rBaseName, "Data"),
+      mrVectorFactory(rVectorFactory),
       mDirectory(rDirectory),
-      mBaseName(rBaseName),
       mCleanDirectory(cleanDirectory),
       mIsInDefineMode(true),
       mIsFixedDimensionSet(false),
@@ -111,7 +111,7 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
         }
 
         // Open the main dataset, and figure out its size/shape
-        mDatasetId = H5Dopen(mFileId, "Data");
+        mDatasetId = H5Dopen(mFileId, mDatasetName.c_str());
         hid_t variables_dataspace = H5Dget_space(mDatasetId);
         //unsigned variables_dataset_rank = H5Sget_simple_extent_ndims(variables_dataspace);
         hsize_t dataset_max_sizes[DATASET_DIMS];

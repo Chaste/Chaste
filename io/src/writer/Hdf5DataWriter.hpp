@@ -42,18 +42,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Hdf5DataReader.hpp" //For common definitions
 #include "DataWriterVariable.hpp"
 #include "DistributedVectorFactory.hpp"
-
+#include "AbstractHdf5Access.hpp"
 /**
  * A concrete HDF5 data writer class.
  */
-class Hdf5DataWriter//  : public AbstractDataWriter
+class Hdf5DataWriter : public AbstractHdf5Access //: public AbstractDataWriter
 {
 private:
 
     /** The factory to use in creating PETSc Vec and DistributedVector objects. */
     DistributedVectorFactory& mrVectorFactory;
     std::string mDirectory; /**< Directory output files will be stored in. */
-    std::string mBaseName; /**< The base name for the output data files. */
     bool mCleanDirectory;   /**< Whether to wipe the output directory */
     bool mIsInDefineMode; /**< Is the DataWriter in define mode or not */
     bool mIsFixedDimensionSet; /**< Is the fixed dimension set */
@@ -80,8 +79,7 @@ private:
 
     long mCurrentTimeStep; /**< The current time step. */
 
-    static const unsigned DATASET_DIMS=3; /**< Defined in HDF5 reader too. \todo: define it once */
-    hsize_t mDatasetDims[DATASET_DIMS]; /**< The sizes of each variable data set. */
+    hsize_t mDatasetDims[AbstractHdf5Access::DATASET_DIMS]; /**< The sizes of each variable data set. */
 
     Mat mSinglePermutation; /**< Stores a permutation as a matrix */
     Mat mDoublePermutation;/**< Stores a permutation of a striped structure (u_0 v_0 u_1 v_1) as a matrix */
