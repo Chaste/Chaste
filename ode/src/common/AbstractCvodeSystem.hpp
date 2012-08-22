@@ -274,6 +274,22 @@ public:
                                       N_Vector ydot)=0;
 
 
+    /**
+     * This method is called by AbstractCvodeSystemJacAdaptor method in the .cpp file.
+     *
+     * It provides an interface between the methods different versions of CVODE are expecting and the
+     * Jacobians provided by Chaste CVODE systems.
+     *
+     * @param N  the size of the ODE system
+     * @param time  the current time (used by ODE systems like y' = f(t,y) only I guess)
+     * @param y  the current state variables y for y' = f(t,y)
+     * @param ydot  the current set of derivatives y' = f(t,y)
+     * @param jacobian  a pointer to a jacobian, populated by this method.
+     * @param tmp1  working memory of the correct size provided by CVODE for temporary calculations
+     * @param tmp2  working memory of the correct size provided by CVODE for temporary calculations
+     * @param tmp3  working memory of the correct size provided by CVODE for temporary calculations
+     *
+     */
     virtual void EvaluateAnalyticJacobian(long int N, realtype time, N_Vector y, N_Vector ydot,
 #if CHASTE_SUNDIALS_VERSION >= 20400
                                           DlsMat jacobian,

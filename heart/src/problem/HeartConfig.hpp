@@ -199,7 +199,7 @@ public:
      * Try to copy the latest version of the schema to the given directory.
      * If we can't find the latest version of the schema, generate a warning.
      *
-     * @NOTE Must be called by the master only, preferably in a TRY_IF_MASTER()
+     * @note Must be called by the master only, preferably in a TRY_IF_MASTER()
      * in case of failure, to handle exceptions nicely.
      *
      * @param rToDirectory  directory to copy to
