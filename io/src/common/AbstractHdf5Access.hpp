@@ -38,6 +38,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <string>
 
+/**
+ * An abstract class to get common code for reading and writing HDF5 files into one place.
+ */
 class AbstractHdf5Access
 {
 protected:
@@ -46,6 +49,12 @@ protected:
     static const unsigned DATASET_DIMS=3;                   /**< The dimensions of each dataset (variable, node, time) */
 
 public:
+    /**
+     * Constructor
+     *
+     * @param rBaseName  The base name of the HDF5 file (with no extension)
+     * @param datasetName  The dataset name - default is "Data" for voltage and extracellular potential.
+     */
     AbstractHdf5Access(const std::string& rBaseName,
                        std::string datasetName)
      : mBaseName(rBaseName),
@@ -53,6 +62,9 @@ public:
     {
     }
 
+    /**
+     * Destructor.
+     */
     virtual ~AbstractHdf5Access(){};
 };
 
