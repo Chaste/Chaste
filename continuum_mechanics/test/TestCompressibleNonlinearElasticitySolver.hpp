@@ -528,9 +528,18 @@ public:
 		assert(solver.mAverageStressesPerElement.size()==mesh.GetNumElements());
 		for (unsigned i=0; i<mesh.GetNumElements(); i++)
 		{
-			if (mesh.CalculateDesignatedOwnershipOfElement(i))
+			//if (mesh.CalculateDesignatedOwnershipOfElement(i)) ///\todo #2223 This is correct for a distributed mesh
+			if (mesh.GetElement(i)->GetOwnership()) // For a shared mesh (not distributed) this is a larger set than the commented line above
 			{
 				TS_ASSERT_DELTA((solver.GetAverageStressPerElement(i)(0,0)*alpha - traction_value)/traction_value, 0.0, 5e-4);
+				TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(1,0), 0.0, 5e-4);
+				TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,1), 0.0, 5e-4);
+				TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,1), 0.0, 5e-4);
+			}
+			else
+			{
+				//The element was ignored by the assembler and thus the stress is unchanged from its initial value
+				TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,0), 0.0, 5e-4);
 				TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(1,0), 0.0, 5e-4);
 				TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,1), 0.0, 5e-4);
 				TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,1), 0.0, 5e-4);
@@ -681,8 +690,6 @@ public:
 
     void TestCheckPositiveDefinitenessOfJacobianMatrix() throw(Exception)
     {
-        EXIT_IF_PARALLEL; // deadlocks for some reason.. Fix if possible, but given nature of test not a problem if only runs in sequential
-
         unsigned num_elem = 10;
 
         QuadraticMesh<2> mesh(1.0/num_elem, 1.0, 1.0);
@@ -713,20 +720,21 @@ public:
         int lo, hi;
         VecGetOwnershipRange(test_vec, &lo, &hi);
 
+        // Note: this test was failing because there the inequality below was wrong and because the processes
+        // were attempting to do an unequal amount of MatMult and VecDot operations.  (These are collective operations.)
         for(unsigned i=0; i<N; i++)
         {
-            if(int(i)<=lo && int(i)<hi)
+        	if(lo<=int(i) && int(i)<hi)
             {
                 PetscVecTools::SetElement(test_vec, i, 1.0);
-
-                MatMult(solver.mrJacobianMatrix,test_vec,product_vec);
-                double vT_J_v = 0.0;
-                VecDot(product_vec, test_vec, &vT_J_v);
-                //std::cout << vT_J_v << " ";
-                TS_ASSERT_LESS_THAN(0.0, vT_J_v);
-
-                PetscVecTools::SetElement(test_vec, i, 0.0);
             }
+			MatMult(solver.mrJacobianMatrix,test_vec,product_vec);
+			double vT_J_v = 0.0;
+			VecDot(product_vec, test_vec, &vT_J_v);
+			//std::cout << vT_J_v << " ";
+			TS_ASSERT_LESS_THAN(0.0, vT_J_v);
+
+			PetscVecTools::SetElement(test_vec, i, 0.0);
         }
 
         PetscTools::Destroy(test_vec);
@@ -1062,8 +1070,6 @@ public:
 
     void TestWritingStress3dAndExceptions() throw(Exception)
     {
-       // EXIT_IF_PARALLEL;
-
         QuadraticMesh<3> mesh(1.0, 1.0, 1.0, 1.0);
 
         CompressibleMooneyRivlinMaterialLaw<3> law(1.0, 1.0);
@@ -1168,8 +1174,6 @@ public:
     // quick 2d test that complements above test
     void TestWritingStress2d() throw(Exception)
     {
-        EXIT_IF_PARALLEL;
-
         QuadraticMesh<2> mesh(1.0, 1.0, 1.0);
         CompressibleMooneyRivlinMaterialLaw<2> law(1.0, 1.0);
 
