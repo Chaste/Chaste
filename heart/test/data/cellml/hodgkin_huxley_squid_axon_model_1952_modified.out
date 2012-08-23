@@ -1,9 +1,10 @@
-    |\^/|     Maple 12 (SUN SPARC SOLARIS)
-._|\|   |/|_. Copyright (c) Maplesoft, a division of Waterloo Maple Inc. 2008
+    |\^/|     Maple 15 (X86 64 LINUX)
+._|\|   |/|_. Copyright (c) Maplesoft, a division of Waterloo Maple Inc. 2011
  \  MAPLE  /  All rights reserved. Maple is a trademark of
  <____ ____>  Waterloo Maple Inc.
       |       Type ? for help.
 1
+"FULL JACOBIAN"
 var_membrane__time := var_environment__time
 var_sodium_channel__h := var_sodium_channel_h_gate__h
 var_sodium_channel__m := var_sodium_channel_m_gate__m
@@ -64,4 +65,52 @@ var_sodium_channel_h_gate__h
 d_dt_potassium_channel_n_gate__n := -.1e-1*(var_membrane__V+65)/(exp(-1/10*
 var_membrane__V-13/2)-1)*(1-var_potassium_channel_n_gate__n)-.125*exp(1/80*
 var_membrane__V+15/16)*var_potassium_channel_n_gate__n
-memory used=0.5MB, alloc=0.4MB, time=0.14
+"--var_membrane__V/var_membrane__V--"
+(-var_sodium_channel__g_Na*var_sodium_channel_m_gate__m^3*
+var_sodium_channel_h_gate__h-var_potassium_channel__g_K*
+var_potassium_channel_n_gate__n^4-var_leakage_current__g_L)/var_membrane__Cm
+"--var_membrane__V/var_sodium_channel_m_gate__m--"
+-3*var_sodium_channel__g_Na*var_sodium_channel_m_gate__m^2*
+var_sodium_channel_h_gate__h*(var_membrane__V-var_membrane__E_R-115)/
+var_membrane__Cm
+"--var_membrane__V/var_sodium_channel_h_gate__h--"
+-var_sodium_channel__g_Na*var_sodium_channel_m_gate__m^3*(var_membrane__V-
+var_membrane__E_R-115)/var_membrane__Cm
+"--var_membrane__V/var_potassium_channel_n_gate__n--"
+-4*var_potassium_channel__g_K*var_potassium_channel_n_gate__n^3*(
+var_membrane__V-var_membrane__E_R+12)/var_membrane__Cm
+"--var_sodium_channel_m_gate__m/var_membrane__V--"
+-.1/(exp(-1/10*var_membrane__V-5)-1)*(1-var_sodium_channel_m_gate__m)-.\
+1000000000e-1*(var_membrane__V+50)/(exp(-1/10*var_membrane__V-5)-1)^2*(1-
+var_sodium_channel_m_gate__m)*exp(-1/10*var_membrane__V-5)+2/9*exp(-1/18*
+var_membrane__V-25/6)*var_sodium_channel_m_gate__m
+"--var_sodium_channel_m_gate__m/var_sodium_channel_m_gate__m--"
+.1*(var_membrane__V+50)/(exp(-1/10*var_membrane__V-5)-1)-4*exp(-1/18*
+var_membrane__V-25/6)
+"--var_sodium_channel_m_gate__m/var_sodium_channel_h_gate__h--"
+0
+"--var_sodium_channel_m_gate__m/var_potassium_channel_n_gate__n--"
+0
+"--var_sodium_channel_h_gate__h/var_membrane__V--"
+-.3500000000e-2*exp(-1/20*var_membrane__V-15/4)*(1-var_sodium_channel_h_gate__h
+)-1/10/(exp(-1/10*var_membrane__V-9/2)+1)^2*var_sodium_channel_h_gate__h*exp(-1
+/10*var_membrane__V-9/2)
+"--var_sodium_channel_h_gate__h/var_sodium_channel_m_gate__m--"
+0
+"--var_sodium_channel_h_gate__h/var_sodium_channel_h_gate__h--"
+-.7e-1*exp(-1/20*var_membrane__V-15/4)-1/(exp(-1/10*var_membrane__V-9/2)+1)
+"--var_sodium_channel_h_gate__h/var_potassium_channel_n_gate__n--"
+0
+"--var_potassium_channel_n_gate__n/var_membrane__V--"
+-.1e-1/(exp(-1/10*var_membrane__V-13/2)-1)*(1-var_potassium_channel_n_gate__n)-
+.1000000000e-2*(var_membrane__V+65)/(exp(-1/10*var_membrane__V-13/2)-1)^2*(1-
+var_potassium_channel_n_gate__n)*exp(-1/10*var_membrane__V-13/2)-.1562500000e-2
+*exp(1/80*var_membrane__V+15/16)*var_potassium_channel_n_gate__n
+"--var_potassium_channel_n_gate__n/var_sodium_channel_m_gate__m--"
+0
+"--var_potassium_channel_n_gate__n/var_sodium_channel_h_gate__h--"
+0
+"--var_potassium_channel_n_gate__n/var_potassium_channel_n_gate__n--"
+.1e-1*(var_membrane__V+65)/(exp(-1/10*var_membrane__V-13/2)-1)-.125*exp(1/80*
+var_membrane__V+15/16)
+memory used=1.3MB, alloc=1.4MB, time=0.04

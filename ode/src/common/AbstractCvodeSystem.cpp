@@ -97,11 +97,7 @@ int AbstractCvodeSystemRhsAdaptor(realtype t, N_Vector y, N_Vector ydot, void *p
     AbstractCvodeSystem* p_ode_system = (AbstractCvodeSystem*) pData;
     try
     {
-#if CHASTE_SUNDIALS_VERSION == 20400
         p_ode_system->EvaluateAnalyticJacobian((long)(N), t, y, ydot, jacobian, tmp1, tmp2, tmp3);
-#else
-        p_ode_system->EvaluateAnalyticJacobian(N, t, y, ydot, jacobian, tmp1, tmp2, tmp3);
-#endif
     }
     catch (const Exception &e)
     {

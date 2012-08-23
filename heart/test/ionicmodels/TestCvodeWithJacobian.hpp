@@ -57,7 +57,7 @@ public:
         boost::shared_ptr<CvodeAdaptor> p_cvode_adaptor(new CvodeAdaptor());
         boost::shared_ptr<CvodeAdaptor> p_cvode_adaptor_jacobian(new CvodeAdaptor());
         boost::shared_ptr<AbstractStimulusFunction> p_stimulus(new RegularStimulus(-25,5,1000,1));
-        double simulation_duration = 100000;
+        double simulation_duration = 10000;
 
         boost::shared_ptr<AbstractCardiacCell> hh_1952_cvode_adaptor(new CellHodgkinHuxley1952FromCellML(p_cvode_adaptor,p_stimulus));
         boost::shared_ptr<AbstractCvodeCell> hh_1952_cvode(new CellHodgkinHuxley1952FromCellMLCvode(p_solver,p_stimulus));

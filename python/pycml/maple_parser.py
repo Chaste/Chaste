@@ -497,7 +497,11 @@ class MapleParser(object):
         curr_key = None
         s = "" # Current 'line' contents
         in_header = False
+        full_jacobian = False
         for line in stream:
+            if line.strip() == '"FULL JACOBIAN"':
+                full_jacobian = True
+                continue
             if line.startswith('bytes used') or line.startswith('memory used'):
                 # Maple footer
                 if curr_key and s:
@@ -544,6 +548,21 @@ class MapleParser(object):
 #            print "Filtered temporaries", len(temps)
 #            for t in temps:
 #                print t, MExpression._cache_uses[t]
+        if full_jacobian:
+            for key, expr in results.iteritems():
+                new_expr = None
+                if key[0] == key[1]:
+                    # 1 on the diagonal
+                    new_expr = MNumber(['1'])
+                if not (isinstance(expr, MNumber) and str(expr) == '0'):
+                    # subtract delta_t * expr
+                    args = []
+                    if new_expr:
+                        args.append(new_expr)
+                    args.append(MOperator([MVariable(['delta_t']), expr], 'prod', 'times'))
+                    new_expr = MOperator(args, '', 'minus')
+                if new_expr:
+                    results[key] = new_expr
         if debug:
             return results, debug_res
         else:

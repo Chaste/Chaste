@@ -3097,6 +3097,8 @@ class CellMLToMapleTranslator(CellMLTranslator):
         self.output_comment(version_comment(self.add_timestamp))
         self.writeln()
         self.writeln('interface(prettyprint=0);\n')
+        if self.compute_full_jacobian:
+            self.writeln('print("FULL JACOBIAN");')
         return
 
     def output_bottom_boilerplate(self):
@@ -5360,6 +5362,13 @@ def run():
         lin = optimize.LinearityAnalyser()
         lin.analyse_for_jacobian(doc, V=config.V_variable)
         lin.rearrange_linear_odes(doc)
+        # Remove jacobian entries that don't correspond to nonlinear state variables
+        nonlinear_vars = set([v.get_source_variable(recurse=True) for v in doc.model._cml_nonlinear_system_variables])
+        def gv(vname):
+            return cellml_variable.get_variable_object(doc.model, vname).get_source_variable(recurse=True)
+        for var_i, var_j in doc.model._cml_jacobian.keys():
+            if gv(var_i) not in nonlinear_vars or gv(var_j) not in nonlinear_vars:
+                del doc.model._cml_jacobian[(var_i, var_j)]
         # Add info as XML
         solver_info.add_all_info()
         # Analyse the XML, adding cellml_variable references, etc.
