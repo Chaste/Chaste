@@ -453,14 +453,9 @@ public:
         // Coverage
         solver.SetKspAbsoluteTolerance(1e-10);
 
-        if(PetscTools::IsSequential()) // see #2084
-        {
-            solver.SetComputeAverageStressPerElementDuringSolve();
-        }
-        else
-        {
-            TS_ASSERT_THROWS_THIS(solver.SetComputeAverageStressPerElementDuringSolve(), "SetComputeAverageStressPerElementDuringSolve() is not yet implemented for parallel simulations");
-        }
+
+        solver.SetComputeAverageStressPerElementDuringSolve();
+
 
         /////////////////////////////////////////////////////////////////
         // Provide the exact solution as the initial guess and check
@@ -484,19 +479,21 @@ public:
 
         TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(), 0u); // initial guess was solution
 
-        if(PetscTools::IsSequential()) // see #2084
-        {
-            // test stresses. The 1st PK stress should satisfy S = [s(0) 0 ; 0 0], where s is the
-            // applied traction. This has to be multiplied by F^{-T} to get the 2nd PK stress.
-            assert(solver.mAverageStressesPerElement.size()==mesh.GetNumElements());
-            for (unsigned i=0; i<mesh.GetNumElements(); i++)
-            {
-                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,0), traction(0)/alpha, 1e-8);
-                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(1,0), 0.0, 1e-8);
-                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,1), 0.0, 1e-8);
-                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(1,1), 0.0, 1e-8);
-            }
-        }
+
+		// test stresses. The 1st PK stress should satisfy S = [s(0) 0 ; 0 0], where s is the
+		// applied traction. This has to be multiplied by F^{-T} to get the 2nd PK stress.
+		assert(solver.mAverageStressesPerElement.size()==mesh.GetNumElements());
+		for (unsigned i=0; i<mesh.GetNumElements(); i++)
+		{
+			if (mesh.CalculateDesignatedOwnershipOfElement(i))
+			{
+				TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,0), traction(0)/alpha, 1e-8);
+				TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(1,0), 0.0, 1e-8);
+				TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,1), 0.0, 1e-8);
+				TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(1,1), 0.0, 1e-8);
+			}
+		}
+
 
 
         ///////////////////////////////////////////////////////////////////////////
@@ -524,20 +521,30 @@ public:
             TS_ASSERT_DELTA( r_solution[i](1), exact_y, 1e-5 );
         }
 
-        if(PetscTools::IsSequential()) // see #2084
-        {
-            // check the stresses (averaged over each quad point). The alpha below is for converting
-            // from 1st PK stress (for which we have SN=s => S(0,0) = traction_value) to 2nd PK stress,
-            // using T = SF^{-T}
-            assert(solver.mAverageStressesPerElement.size()==mesh.GetNumElements());
-            for (unsigned i=0; i<mesh.GetNumElements(); i++)
-            {
-                TS_ASSERT_DELTA((solver.GetAverageStressPerElement(i)(0,0)*alpha - traction_value)/traction_value, 0.0, 5e-4);
-                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(1,0), 0.0, 5e-4);
-                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,1), 0.0, 5e-4);
-                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,1), 0.0, 5e-4);
-            }
-        }
+
+		// check the stresses (averaged over each quad point). The alpha below is for converting
+		// from 1st PK stress (for which we have SN=s => S(0,0) = traction_value) to 2nd PK stress,
+		// using T = SF^{-T}
+		assert(solver.mAverageStressesPerElement.size()==mesh.GetNumElements());
+		for (unsigned i=0; i<mesh.GetNumElements(); i++)
+		{
+			if (mesh.CalculateDesignatedOwnershipOfElement(i))
+			{
+				TS_ASSERT_DELTA((solver.GetAverageStressPerElement(i)(0,0)*alpha - traction_value)/traction_value, 0.0, 5e-4);
+				TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(1,0), 0.0, 5e-4);
+				TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,1), 0.0, 5e-4);
+				TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,1), 0.0, 5e-4);
+			}
+		}
+
+
+        // write the stresses
+		solver.WriteCurrentAverageElementStresses("solution");
+
+		// check the written stresses
+		std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
+		NumericFileComparison comparison(test_output_directory + "/comp_nonlin_compMR_simple/solution.stress", "continuum_mechanics/test/data/nonlin_comp.stress");
+		TS_ASSERT(comparison.CompareFiles(2e-4));
 
         MechanicsEventHandler::Headings();
         MechanicsEventHandler::Report();
@@ -1055,7 +1062,7 @@ public:
 
     void TestWritingStress3dAndExceptions() throw(Exception)
     {
-        EXIT_IF_PARALLEL;
+       // EXIT_IF_PARALLEL;
 
         QuadraticMesh<3> mesh(1.0, 1.0, 1.0, 1.0);
 

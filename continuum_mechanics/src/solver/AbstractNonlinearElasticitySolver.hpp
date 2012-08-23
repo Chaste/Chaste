@@ -132,6 +132,10 @@ public:
      */
     void Visit(Element<DIM, DIM>* pElement, unsigned localIndex, c_vector<double, DIM*DIM>& rData)
     {
+        ///\todo #2223 Note that the localIndex is intended for DistributedQuadraticMesh, but we might need a map instead.
+        /// For now, make sure that it's not a distributed mesh i.e. GetNumLocalElements == GetNumElements
+        /// and the indexing is always global
+        assert(localIndex == pElement->GetIndex()); //Will fail when we move to DistributedQuadraticMesh
         //Flatten the matrix
         c_matrix<double, DIM, DIM> data = mpSolver->GetAverageStressPerElement(localIndex);
         for (unsigned i=0; i<DIM; i++)
@@ -887,11 +891,6 @@ void AbstractNonlinearElasticitySolver<DIM>::CreateCmguiOutput()
 template<unsigned DIM>
 void AbstractNonlinearElasticitySolver<DIM>::SetComputeAverageStressPerElementDuringSolve(bool setComputeAverageStressPerElement)
 {
-    if(setComputeAverageStressPerElement && PetscTools::IsParallel())
-    {
-        EXCEPTION("SetComputeAverageStressPerElementDuringSolve() is not yet implemented for parallel simulations");
-    }
-
     mSetComputeAverageStressPerElement = setComputeAverageStressPerElement;
     if(setComputeAverageStressPerElement && mAverageStressesPerElement.size()==0)
     {

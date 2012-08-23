@@ -251,7 +251,7 @@ public:
          * a non-physical (or not very physical) situation, or just because the current guess is quite far
          * from the solution and the solver can't find the solution (this can occur in nonlinear elasticity
          * problems if the loading is large, for example). Current work in progress is on making the solver
-         * more robust, and also on parallelising the solver. Once option when a solve fails is to decrease the
+         * more robust, and also on parallelising the solver. One option when a solve fails is to decrease the
          * mechanics timestep.
          */
 
@@ -362,11 +362,9 @@ public:
                                                     "TestAnnulusWithInternalPressure");
 
         /* If we want stresses and strains output, we can do the following. The deformation gradients and 2nd PK stresses
-         * for each element will be written at the requested times. This currently only works in sequential simulations. */
-        if(PetscTools::IsSequential()) // #2084
-        {
-            problem.SetOutputDeformationGradientsAndStress(10.0 /*how often (in ms) to write - should be a multiple of mechanics timestep*/);
-        }
+         * for each element will be written at the requested times.  */
+        problem.SetOutputDeformationGradientsAndStress(10.0 /*how often (in ms) to write - should be a multiple of mechanics timestep*/);
+
 
         /* Since this test involves a large deformation at t=0, several Newton iterations are required. To see how the nonlinear
          * solve is progressing, you can run from the binary from the command line with the command line argument "-mech_verbose".

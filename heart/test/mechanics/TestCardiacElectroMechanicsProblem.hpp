@@ -599,11 +599,11 @@ public:
 
         problem.SetWatchedPosition(pos);
 
-        if(PetscTools::IsSequential()) // #2084
-        {
-            TS_ASSERT_THROWS_CONTAINS(problem.SetOutputDeformationGradientsAndStress(3.4),"not a multiple");
-            problem.SetOutputDeformationGradientsAndStress(3.0);
-        }
+
+
+		TS_ASSERT_THROWS_CONTAINS(problem.SetOutputDeformationGradientsAndStress(3.4),"not a multiple");
+		problem.SetOutputDeformationGradientsAndStress(3.0);
+
         problem.Solve();
 
         // test by checking the length of the tissue against hardcoded value
@@ -618,16 +618,15 @@ public:
         FileFinder electrics_dir = handler.FindFile("electrics");
         TS_ASSERT(electrics_dir.IsDir());
 
-        if(PetscTools::IsSequential())
-        {
-            // check electrics output was written
-            TS_ASSERT(handler.FindFile("deformation/deformation_gradient_0.strain").Exists());
-            TS_ASSERT(handler.FindFile("deformation/deformation_gradient_3.strain").Exists());
-            TS_ASSERT(handler.FindFile("deformation/deformation_gradient_6.strain").Exists());
-            TS_ASSERT(handler.FindFile("deformation/second_PK_0.stress").Exists());
-            TS_ASSERT(handler.FindFile("deformation/second_PK_3.stress").Exists());
-            TS_ASSERT(handler.FindFile("deformation/second_PK_6.stress").Exists());
-        }
+
+        // check electrics output was written
+        TS_ASSERT(handler.FindFile("deformation/deformation_gradient_0.strain").Exists());
+        TS_ASSERT(handler.FindFile("deformation/deformation_gradient_3.strain").Exists());
+        TS_ASSERT(handler.FindFile("deformation/deformation_gradient_6.strain").Exists());
+        TS_ASSERT(handler.FindFile("deformation/second_PK_0.stress").Exists());
+        TS_ASSERT(handler.FindFile("deformation/second_PK_3.stress").Exists());
+        TS_ASSERT(handler.FindFile("deformation/second_PK_6.stress").Exists());
+
 
 
         // coverage
