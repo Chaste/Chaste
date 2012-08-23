@@ -717,21 +717,14 @@ public:
         PetscVecTools::Zero(test_vec);
         PetscVecTools::Zero(product_vec);
 
-        int lo, hi;
-        VecGetOwnershipRange(test_vec, &lo, &hi);
-
-        // Note: this test was failing because there the inequality below was wrong and because the processes
-        // were attempting to do an unequal amount of MatMult and VecDot operations.  (These are collective operations.)
         for(unsigned i=0; i<N; i++)
         {
-        	if(lo<=int(i) && int(i)<hi)
-            {
-                PetscVecTools::SetElement(test_vec, i, 1.0);
-            }
+			PetscVecTools::SetElement(test_vec, i, 1.0);
+
 			MatMult(solver.mrJacobianMatrix,test_vec,product_vec);
 			double vT_J_v = 0.0;
 			VecDot(product_vec, test_vec, &vT_J_v);
-			//std::cout << vT_J_v << " ";
+			// vT_J_v is the i-th term on the diagonal of the Jacobian matrix (and should be positive)
 			TS_ASSERT_LESS_THAN(0.0, vT_J_v);
 
 			PetscVecTools::SetElement(test_vec, i, 0.0);
