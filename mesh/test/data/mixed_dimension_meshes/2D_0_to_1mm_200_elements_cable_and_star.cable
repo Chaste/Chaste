@@ -1,0 +1,14 @@
+10	2	1
+	0	55	56	0.005
+	1	56	57	0.005
+	2	57	58	0.005
+	3	58	59	0.005
+	4	59	60	0.005
+	5	60	49	0.002
+	6	60	50	0.002
+	7	60	61	0.002
+	8	60	71	0.002
+	9	60	70	0.002
+# Cables 5-9 are the forward star from node 60 to the surrounding cables (not including node 59)
+# Please check radii of star
+# Created by Chaste (not really!)
