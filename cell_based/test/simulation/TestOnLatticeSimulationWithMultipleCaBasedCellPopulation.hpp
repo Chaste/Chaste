@@ -602,6 +602,8 @@ public:
 
     void TestStandardResultForArchivingTestsBelow() throw (Exception)
     {
+        EXIT_IF_PARALLEL;
+
 		PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
 		PottsMesh<2>* p_mesh = generator.GetMesh();
 
@@ -643,6 +645,8 @@ public:
 
     void TestSave() throw (Exception)
     {
+        EXIT_IF_PARALLEL;
+
 		PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
 		PottsMesh<2>* p_mesh = generator.GetMesh();
 
@@ -680,6 +684,8 @@ public:
     ///\todo make the following test pass - see #2066 and comment in OnLatticeSimulation::UpdateCellPopulation()
     void DONOTTestLoad() throw (Exception)
     {
+        EXIT_IF_PARALLEL;
+
         // Load the simulation from the TestSave() method above and run it from time 10 to 15
         OnLatticeSimulation<2>* p_simulator1;
         p_simulator1 = CellBasedSimulationArchiver<2, OnLatticeSimulation<2> >::Load("TestOnLatticeSimulationWithMultipleCaBasedCellPopulationSaveAndLoad", 10.0);
