@@ -101,8 +101,7 @@ int AbstractCvodeSystemRhsAdaptor(realtype t, N_Vector y, N_Vector ydot, void *p
     }
     catch (const Exception &e)
     {
-        std::cerr << "CVODE Jacobian Exception: " << e.GetMessage()
-                  << std::endl << std::flush;
+        std::cerr << "CVODE Jacobian Exception: " << e.GetMessage() << std::endl << std::flush;
         return -1;
     }
     return 0;

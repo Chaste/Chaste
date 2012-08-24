@@ -102,6 +102,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class AbstractCvodeSystem : public AbstractParameterisedSystem<N_Vector>
 {
 private:
+    friend class TestAbstractCvodeSystem;
 
     friend class boost::serialization::access;
     /**

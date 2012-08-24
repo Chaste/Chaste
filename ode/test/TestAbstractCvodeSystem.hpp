@@ -93,6 +93,8 @@ public:
         TS_ASSERT_THROWS_THIS(ode.SetStateVariables(v),
                 "The size of the passed in vector must be that of the number of state variables.");
 
+
+
         DeleteVector(v);
 #else
         std::cout << "Cvode is not enabled.\n";
@@ -363,6 +365,16 @@ public:
         double global_error = 1e-3;
 
         TS_ASSERT_DELTA(testvalue, exact_solution, global_error);
+
+        ode_system.mUseAnalyticJacobian = true;
+        ode_system.mpCvodeMem = NULL; // Force a re-set
+
+        // Here Chaste throws the error "No analytic Jacobian has been defined for this system."
+        // which CVODE then re-throws with its own 'headline':
+        // This covers both cases in the code.
+        TS_ASSERT_THROWS_CONTAINS(ode_system.Solve(0.0, 2.0, h_value, 0.1),
+                                  "CVODE failed to solve system");
+
 #else
         std::cout << "Cvode is not enabled.\n";
 #endif // CHASTE_CVODE

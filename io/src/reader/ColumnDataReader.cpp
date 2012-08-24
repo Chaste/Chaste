@@ -54,7 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Variables read in from the data file are initialised to the
  * following constant so one can check if they were read correctly.
  */
-const int NOT_READ = -999;
+const int NOT_READ = UNSIGNED_UNSET;
 
 ColumnDataReader::ColumnDataReader(const std::string& rDirectory,
                                    const std::string& rBaseName,
