@@ -205,7 +205,7 @@ public:
         new_index = p_mesh->AddNode(p_node2);
         TS_ASSERT_EQUALS(new_index, 14u);
 
-        delete p_node;
+        delete p_mesh;
     }
 
     // NB This checks that periodicity is maintained through archiving...
