@@ -94,6 +94,10 @@ MultipleCaBasedCellPopulation<DIM>::MultipleCaBasedCellPopulation(PottsMesh<DIM>
 template<unsigned DIM>
 MultipleCaBasedCellPopulation<DIM>::~MultipleCaBasedCellPopulation()
 {
+    if (this->mDeleteMesh)
+    {
+        delete &this->mrMesh;
+    }
 }
 
 template<unsigned DIM>
