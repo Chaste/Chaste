@@ -411,7 +411,7 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
             double max_interaction_distance = radius_of_cell_i + radius_of_cell_j;
 
             // Make sure that the max_interaction distance is smaller than the box collection size
-            if(!(max_interaction_distance < mMechanicsCutOffLength))
+            if (!(max_interaction_distance < mMechanicsCutOffLength))
             {
                 EXCEPTION("mMechanicsCutOffLength is smaller than the sum of radius of cell " << index << " (" << radius_of_cell_i << ") and cell " << (*iter) << " (" << radius_of_cell_j <<"). Make the cut-off larger to avoid errors.");
             }

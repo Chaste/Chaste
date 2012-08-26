@@ -72,20 +72,20 @@ private:
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<DIM> mesh;
-        mesh.ConstructNodesWithoutMesh(generating_mesh);
+        NodesOnlyMesh<DIM>* p_mesh = new NodesOnlyMesh<DIM>;
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
 
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, DIM> cells_generator;
-        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
         unsigned num_cells = cells.size();
 
         // Create the cell population
-        NodeBasedCellPopulation<DIM> node_based_cell_population(mesh, cells);
+        NodeBasedCellPopulation<DIM> node_based_cell_population(*p_mesh, cells);
 
         // Test we have the correct numbers of nodes and cells
-        TS_ASSERT_EQUALS(node_based_cell_population.GetNumNodes(), mesh.GetNumNodes());
+        TS_ASSERT_EQUALS(node_based_cell_population.GetNumNodes(), p_mesh->GetNumNodes());
         TS_ASSERT_EQUALS(node_based_cell_population.rGetCells().size(), num_cells);
         TS_ASSERT_EQUALS(cells.size(), 0u);
 
@@ -109,6 +109,9 @@ private:
         }
 
         TS_ASSERT_EQUALS(counter, node_based_cell_population.GetNumRealCells());
+
+        // Avoid memory leak
+        delete p_mesh;
     }
 
 public:
@@ -129,8 +132,8 @@ public:
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(generating_mesh);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -140,7 +143,7 @@ public:
         // Create the cell population
         unsigned num_cells = cells.size();
         std::vector<CellPtr> cells_copy(cells);
-        NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> node_based_cell_population(*p_mesh, cells);
 
         // Check box collection gets setup properly.
         c_vector<double, 4> domainSize;
@@ -153,7 +156,7 @@ public:
 
         TS_ASSERT_EQUALS(node_based_cell_population.GetBoxCollection()->GetNumBoxes(), 289u);
 
-        TS_ASSERT_EQUALS(node_based_cell_population.GetNumNodes(), mesh.GetNumNodes());
+        TS_ASSERT_EQUALS(node_based_cell_population.GetNumNodes(), p_mesh->GetNumNodes());
         TS_ASSERT_EQUALS(node_based_cell_population.rGetCells().size(), num_cells);
 
         // For coverage, test that cell population constructor with 3rd argument locationIndices throws
@@ -163,8 +166,11 @@ public:
         location_indices.push_back(1);
         location_indices.push_back(2);
 
-        TS_ASSERT_THROWS_THIS(NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells_copy, location_indices),
+        TS_ASSERT_THROWS_THIS(NodeBasedCellPopulation<2> node_based_cell_population(*p_mesh, cells_copy, location_indices),
                               "There is not a one-one correspondence between cells and location indices");
+
+        // Avoid memory leak
+        delete p_mesh;
     }
 
     void TestValidateNodeBasedCellPopulation()
@@ -175,17 +181,17 @@ public:
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(generating_mesh);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
 
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, mesh.GetNumNodes()-1);
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes()-1);
 
         // Fails as no cell corresponding to node 4
         std::vector<CellPtr> cells_copy(cells);
-        TS_ASSERT_THROWS_THIS(NodeBasedCellPopulation<2> cell_population(mesh, cells_copy),
+        TS_ASSERT_THROWS_THIS(NodeBasedCellPopulation<2> cell_population(*p_mesh, cells_copy),
                               "Node 4 does not appear to have a cell associated with it");
 
         // Add another cell
@@ -198,7 +204,7 @@ public:
         p_cell->SetBirthTime(birth_time);
         cells.push_back(p_cell);
 
-        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 5u);
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 5u);
 
@@ -212,10 +218,12 @@ public:
         std::set< std::pair<Node<2>*, Node<2>* > >& r_node_pairs = cell_population.rGetNodePairs();
         r_node_pairs.clear();
 
-
         cell_population.SetMechanicsCutOffLength(1e-3);
         cell_population.Update();
         TS_ASSERT(cell_population.rGetNodePairs().empty());
+
+        // Avoid memory leak
+        delete p_mesh;
     }
 
     void TestAddCell()
@@ -236,11 +244,11 @@ public:
         nodes.push_back(p_node1);
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(nodes);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(nodes);
 
-        mesh.SetCellRadius(0,0.1);
-        mesh.SetCellRadius(1,0.2);
+        p_mesh->SetCellRadius(0, 0.1);
+        p_mesh->SetCellRadius(1, 0.2);
 
         // Create two cells
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
@@ -261,10 +269,10 @@ public:
         cells.push_back(p_cell1);
 
         // Create a cell population
-        NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> node_based_cell_population(*p_mesh, cells);
 
         // For coverage
-        for (unsigned i=0; i<mesh.GetNumAllNodes(); i++)
+        for (unsigned i=0; i<p_mesh->GetNumAllNodes(); i++)
         {
             TS_ASSERT_EQUALS(node_based_cell_population.IsParticle(i), false);
         }
@@ -282,11 +290,12 @@ public:
         node_based_cell_population.AddCell(p_cell2, cell2_location, p_cell0);
 
         // Check the radii of all the cells are correct (cell 0 divided into 0 and 2)
-        TS_ASSERT_DELTA(mesh.GetCellRadius(0),0.1,1e-6);
-        TS_ASSERT_DELTA(mesh.GetCellRadius(1),0.2,1e-6);
-        TS_ASSERT_DELTA(mesh.GetCellRadius(2),0.1,1e-6);
+        TS_ASSERT_DELTA(p_mesh->GetCellRadius(0), 0.1, 1e-6);
+        TS_ASSERT_DELTA(p_mesh->GetCellRadius(1), 0.2, 1e-6);
+        TS_ASSERT_DELTA(p_mesh->GetCellRadius(2), 0.1, 1e-6);
 
-        // Tidy up
+        // Avoid memory leak
+        delete p_mesh;
         delete p_node0;
         delete p_node1;
     }
@@ -299,16 +308,16 @@ public:
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(generating_mesh);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
 
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         // Create a cell population
-        NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> node_based_cell_population(*p_mesh, cells);
 
         // Test SetNode() by moving node 0 by a small amount
         AbstractCellPopulation<2>::Iterator cell_iter = node_based_cell_population.Begin();
@@ -370,6 +379,9 @@ public:
         // Check the index of the new cell
         CellPtr& new_cell = node_based_cell_population.rGetCells().back();
         TS_ASSERT_EQUALS(node_based_cell_population.GetLocationIndexUsingCell(new_cell), old_num_nodes);
+
+        // Avoid memory leak
+        delete p_mesh;
     }
 
     void TestRemoveDeadCellsAndUpdate()
@@ -383,19 +395,19 @@ public:
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(generating_mesh);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
 
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         // Make one cell start apoptosis
         cells[27]->StartApoptosis();
 
         // Create a cell population
-        NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> node_based_cell_population(*p_mesh, cells);
 
         // Test we have the right numbers of nodes and cells
         TS_ASSERT_EQUALS(node_based_cell_population.GetNumNodes(), 81u);
@@ -424,6 +436,9 @@ public:
             TS_ASSERT_EQUALS(node_based_cell_population.GetLocationIndexUsingCell(*cell_iter), index);
             index++;
         }
+
+        // Avoid memory leak
+        delete p_mesh;
     }
 
     void TestAddAndRemoveAndAddWithOutRemovingDeletedNodes()
@@ -437,23 +452,23 @@ public:
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(generating_mesh);
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
+        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            mesh.SetCellRadius(i, 0.1);
+            p_mesh->SetCellRadius(i, 0.1);
         }
 
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         // Make one cell start apoptosis
         cells[27]->StartApoptosis();
 
         // Create a cell population
-        NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> node_based_cell_population(*p_mesh, cells);
 
         // Test we have the right numbers of nodes and cells
         TS_ASSERT_EQUALS(node_based_cell_population.GetNumNodes(), 81u);
@@ -530,6 +545,9 @@ public:
         // Test that the numbers of nodes and cells has been updated
         TS_ASSERT_EQUALS(node_based_cell_population.GetNumNodes(), 82u);
         TS_ASSERT_EQUALS(node_based_cell_population.GetNumRealCells(), 82u);
+
+        // Avoid memory leak
+        delete p_mesh;
     }
 
     void TestGetNeighbouringNodeIndices()
@@ -541,23 +559,24 @@ public:
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
         TetrahedralMesh<2,2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(generating_mesh);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
 
-        for (unsigned i=1; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=1; i<p_mesh->GetNumNodes(); i++)
         {
-            mesh.SetCellRadius(i, 0.55);
+            p_mesh->SetCellRadius(i, 0.55);
         }
+
         // Make cell 0 smaller
-        mesh.SetCellRadius(0, 0.1);
+        p_mesh->SetCellRadius(0, 0.1);
 
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         // Create a cell population
-        NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> node_based_cell_population(*p_mesh, cells);
 
         // Test we have the right numbers of nodes and cells
         TS_ASSERT_EQUALS(node_based_cell_population.GetNumNodes(), 5u);
@@ -575,8 +594,6 @@ public:
         node_based_cell_population.Update();
 
         TS_ASSERT_THROWS_THIS(node_based_cell_population.GetNeighbouringNodeIndices(0), "mMechanicsCutOffLength is smaller than the sum of radius of cell 0 (0.1) and cell 4 (0.55). Make the cut-off larger to avoid errors.");
-
-
 
         node_based_cell_population.SetMechanicsCutOffLength(1.2);
         node_based_cell_population.Update();
@@ -609,6 +626,9 @@ public:
 
         TS_ASSERT_EQUALS(node_4_neighbours.size(), expected_node_4_neighbours.size());
         TS_ASSERT_EQUALS(node_4_neighbours, expected_node_4_neighbours);
+
+        // Avoid memory leak
+        delete p_mesh;
     }
 
     void TestSettingCellAncestors() throw (Exception)
@@ -617,14 +637,14 @@ public:
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
         TetrahedralMesh<2,2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(generating_mesh);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
-        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Test that the cell population makes each cell fix the corresponding node index as its ancestor
         cell_population.SetCellAncestorsToLocationIndices();
@@ -656,6 +676,9 @@ public:
         // Test that the cell population now shares a common ancestor
         remaining_ancestors = cell_population.GetCellAncestors();
         TS_ASSERT_EQUALS(remaining_ancestors.size(), 1u);
+
+        // Avoid memory leak
+        delete p_mesh;
     }
 
     void TestGetLocationOfCellCentreAndGetWidth() throw (Exception)
@@ -666,16 +689,16 @@ public:
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(generating_mesh);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
 
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         // Create a cell population
-        NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> node_based_cell_population(*p_mesh, cells);
 
         // Loop over nodes
         for (AbstractCellPopulation<2>::Iterator cell_iter = node_based_cell_population.Begin();
@@ -700,6 +723,9 @@ public:
         c_vector<double, 2> size_of_pop = node_based_cell_population.GetSizeOfCellPopulation();
         TS_ASSERT_DELTA(size_of_pop[0], 0.5, 1e-4);
         TS_ASSERT_DELTA(size_of_pop[0], 0.5, 1e-4);
+
+        // Avoid memory leak
+        delete p_mesh;
     }
 
     void TestNodeBasedCellPopulationOutputWriters2d()
@@ -713,16 +739,16 @@ public:
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(generating_mesh);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
 
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         // Create a cell population
-        NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> node_based_cell_population(*p_mesh, cells);
 
         // For coverage of GetVolumeOfCell() when cells are relaxed
         node_based_cell_population.SetMechanicsCutOffLength(1.5);
@@ -789,12 +815,12 @@ public:
         // Compare output with saved files of what they should look like
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-        FileComparison( results_dir + "results.viznodes", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/results.viznodes").CompareFiles();
-        FileComparison( results_dir + "results.vizcelltypes", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/results.vizcelltypes").CompareFiles();
-        FileComparison( results_dir + "results.vizancestors", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/results.vizancestors").CompareFiles();
-        FileComparison( results_dir + "cellmutationstates.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/cellmutationstates.dat").CompareFiles();
-        FileComparison( results_dir + "cellages.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/cellages.dat").CompareFiles();
-        FileComparison( results_dir + "cellareas.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/cellareas.dat").CompareFiles();
+        FileComparison(results_dir + "results.viznodes", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/results.viznodes").CompareFiles();
+        FileComparison(results_dir + "results.vizcelltypes", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/results.vizcelltypes").CompareFiles();
+        FileComparison(results_dir + "results.vizancestors", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/results.vizancestors").CompareFiles();
+        FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/cellmutationstates.dat").CompareFiles();
+        FileComparison(results_dir + "cellages.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/cellages.dat").CompareFiles();
+        FileComparison(results_dir + "cellareas.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/cellareas.dat").CompareFiles();
 
         // Test the GetCellMutationStateCount function
         std::vector<unsigned> cell_mutation_states = node_based_cell_population.GetCellMutationStateCount();
@@ -827,7 +853,10 @@ public:
         parameter_file->close();
 
         // Compare output with saved files of what they should look like
-        FileComparison( results_dir + "results.parameters", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/results.parameters").CompareFiles();
+        FileComparison(results_dir + "results.parameters", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/results.parameters").CompareFiles();
+
+        // Avoid memory leak
+        delete p_mesh;
     }
 
     void TestNodeBasedCellPopulationOutputWriters3d()
@@ -841,16 +870,16 @@ public:
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<3> mesh;
-        mesh.ConstructNodesWithoutMesh(generating_mesh);
+        NodesOnlyMesh<3>* p_mesh = new NodesOnlyMesh<3>;
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
 
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
-        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         // Create a cell population
-        NodeBasedCellPopulation<3> cell_population(mesh, cells);
+        NodeBasedCellPopulation<3> cell_population(*p_mesh, cells);
         cell_population.SetMechanicsCutOffLength(1.5);
         cell_population.Update(); // so cell neighbours are calculated when outputting volume
 
@@ -878,12 +907,15 @@ public:
         // Compare output with saved files of what they should look like
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-        FileComparison( results_dir + "results.viznodes", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/results.viznodes").CompareFiles();
-        FileComparison( results_dir + "results.vizcelltypes", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/results.vizcelltypes").CompareFiles();
-        FileComparison( results_dir + "results.vizancestors", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/results.vizancestors").CompareFiles();
-        FileComparison( results_dir + "cellmutationstates.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/cellmutationstates.dat").CompareFiles();
-        FileComparison( results_dir + "cellages.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/cellages.dat").CompareFiles();
-        FileComparison( results_dir + "cellareas.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/cellareas.dat").CompareFiles();
+        FileComparison(results_dir + "results.viznodes", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/results.viznodes").CompareFiles();
+        FileComparison(results_dir + "results.vizcelltypes", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/results.vizcelltypes").CompareFiles();
+        FileComparison(results_dir + "results.vizancestors", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/results.vizancestors").CompareFiles();
+        FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/cellmutationstates.dat").CompareFiles();
+        FileComparison(results_dir + "cellages.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/cellages.dat").CompareFiles();
+        FileComparison(results_dir + "cellareas.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/cellareas.dat").CompareFiles();
+
+        // Avoid memory leak
+        delete p_mesh;
     }
 
     void TestWritingCellCyclePhases()
@@ -897,14 +929,14 @@ public:
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(generating_mesh);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
 
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         cells[0]->SetBirthTime(-23.5);
         cells[1]->SetBirthTime(-0.5);
@@ -914,7 +946,7 @@ public:
         cells[0]->SetCellProliferativeType(p_diff_type);
 
         // Create a cell population
-        NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> node_based_cell_population(*p_mesh, cells);
 
         TS_ASSERT_EQUALS(node_based_cell_population.GetIdentifier(), "NodeBasedCellPopulation-2");
 
@@ -935,13 +967,16 @@ public:
         node_based_cell_population.WriteResultsToFiles();
         node_based_cell_population.CloseOutputFiles();
 
-        // Test the rGetCellCyclePhaseCount function
+        // Test the rGetCellCyclePhaseCount() function
         std::vector<unsigned> cell_cycle_phases = node_based_cell_population.rGetCellCyclePhaseCount();
         TS_ASSERT_EQUALS(cell_cycle_phases[0], 1u);
         TS_ASSERT_EQUALS(cell_cycle_phases[1], 3u);
         TS_ASSERT_EQUALS(cell_cycle_phases[2], 0u);
         TS_ASSERT_EQUALS(cell_cycle_phases[3], 0u);
         TS_ASSERT_EQUALS(cell_cycle_phases[4], 1u);
+
+        // Avoid memory leak
+        delete p_mesh;
     }
 
     void TestArchivingCellPopulation() throw (Exception)
@@ -962,16 +997,16 @@ public:
             generating_mesh.ConstructFromMeshReader(mesh_reader);
 
             // Convert this to a NodesOnlyMesh
-            NodesOnlyMesh<2> mesh;
-            mesh.ConstructNodesWithoutMesh(generating_mesh);
+            NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+            p_mesh->ConstructNodesWithoutMesh(generating_mesh);
 
             // Create cells
             std::vector<CellPtr> cells;
             CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-            cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+            cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
             // Create a cell population
-            NodeBasedCellPopulation<2>* const p_cell_population = new NodeBasedCellPopulation<2>(mesh, cells);
+            NodeBasedCellPopulation<2>* const p_cell_population = new NodeBasedCellPopulation<2>(*p_mesh, cells);
 
             // Cells have been given birth times of 0, -1, -2, -3, -4.
             // loop over them to run to time 0.0;
@@ -993,7 +1028,8 @@ public:
             (*p_arch) << static_cast<const SimulationTime&>(*p_simulation_time);
             (*p_arch) << p_cell_population;
 
-            // Tidy up
+            // Avoid memory leak
+            delete p_mesh;
             SimulationTime::Destroy();
             delete p_cell_population;
         }

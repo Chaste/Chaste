@@ -87,16 +87,16 @@ public:
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
 
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes());
 
         // Create a node-based cell population
-        NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> node_based_cell_population(*p_mesh, cells);
         node_based_cell_population.SetMechanicsCutOffLength(1.5);
 
         // Set up cell-based simulation
@@ -127,6 +127,9 @@ public:
         }
 
         TS_ASSERT_LESS_THAN_EQUALS(1e-3, min_distance_between_cells);
+
+        // Avoid memory leak
+        delete p_mesh;
     }
 
     /**
@@ -142,16 +145,16 @@ public:
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
 
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes());
 
         // Create a node-based cell population
-        NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> node_based_cell_population(*p_mesh, cells);
         node_based_cell_population.SetMechanicsCutOffLength(1.5);
 
         // Set up cell-based simulation
@@ -181,6 +184,9 @@ public:
         }
 
         TS_ASSERT_LESS_THAN_EQUALS(1e-3, min_distance_between_cells);
+
+        // Avoid memory leak
+        delete p_mesh;
     }
 
     /**
@@ -198,17 +204,17 @@ public:
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
 
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type);
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_transit_type);
 
         // Create a node-based cell population
-        NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> node_based_cell_population(*p_mesh, cells);
         node_based_cell_population.SetMechanicsCutOffLength(1.5);
 
         // Set up cell-based simulation
@@ -239,6 +245,9 @@ public:
         }
 
         TS_ASSERT(min_distance_between_cells > 1e-3);
+
+        // Avoid memory leak
+        delete p_mesh;
     }
 
     /**
@@ -254,17 +263,17 @@ public:
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
 
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type);
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_transit_type);
 
         // Create a node-based cell population
-        NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> node_based_cell_population(*p_mesh, cells);
         node_based_cell_population.SetMechanicsCutOffLength(1.5);
 
         // Set up cell-based simulation
@@ -282,6 +291,9 @@ public:
         simulator.AddForce(p_buske_adhesive_force);
 
         simulator.Solve();
+
+        // Avoid memory leak
+        delete p_mesh;
     }
 
     /**
@@ -289,24 +301,24 @@ public:
      */
     void TestBuskeRelaxationForces() throw (Exception)
     {
-        EXIT_IF_PARALLEL; // HoneycombMeshGenerator doesn't work in parallel
+        EXIT_IF_PARALLEL;
 
         // Create a simple mesh with two nodes
-        HoneycombMeshGenerator generator_buske(2, 1, 0, 0.9);
-        TetrahedralMesh<2,2>* p_generating_mesh_buske = generator_buske.GetMesh();
+        HoneycombMeshGenerator generator(2, 1, 0, 0.9);
+        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2> mesh_buske;
-        mesh_buske.ConstructNodesWithoutMesh(*p_generating_mesh_buske);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
 
         // Create cells
-        std::vector<CellPtr> cells_buske;
+        std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator_buske;
-        cells_generator_buske.GenerateBasicRandom(cells_buske, mesh_buske.GetNumNodes(), p_diff_type);
+        cells_generator_buske.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_diff_type);
 
         // Create a node-based cell population
-        NodeBasedCellPopulation<2> node_based_cell_population_buske(mesh_buske, cells_buske);
+        NodeBasedCellPopulation<2> node_based_cell_population_buske(*p_mesh, cells);
         node_based_cell_population_buske.SetMechanicsCutOffLength(1.5);
 
         // Set up cell-based simulation
@@ -328,6 +340,9 @@ public:
         // The nodes should be about 0.85 apart as this is the minimum of the sum of the energies.
         TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()[0], 0.0155,  1e-4);
         TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(1)->rGetLocation()[0], 0.8844,  1e-4);
+
+        // Avoid memory leak
+        delete p_mesh;
     }
 };
 

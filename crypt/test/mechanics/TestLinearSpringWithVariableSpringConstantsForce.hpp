@@ -698,14 +698,14 @@ public:
         }
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(nodes);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(nodes);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, num_nodes);
 
-        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Create a vector forces on nodes
         std::vector<c_vector<double, 2> > node_forces;
@@ -720,7 +720,8 @@ public:
         TS_ASSERT_THROWS_THIS(spring_force.AddForceContribution(node_forces, cell_population),
                 "LinearSpringWithVariableSpringConstantsForce is to be used with a subclass of MeshBasedCellPopulation only");
 
-        // When the node-only mesh goes out of scope, then it's a different set of nodes that get destroyed
+        // Avoid memory leak
+        delete p_mesh;
         for (unsigned i=0; i<nodes.size(); i++)
         {
             delete nodes[i];

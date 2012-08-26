@@ -82,10 +82,9 @@ public:
 
         // Create a small population
         HoneycombMeshGenerator generator(2, 2, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
-
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(*p_mesh);
+        MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
 
         // Create some cells, each with a cell-cycle model that incorporates a Delta-Notch ODE system
         std::vector<CellPtr> cells;
@@ -111,7 +110,7 @@ public:
         }
 
         // Create cell population
-        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetMechanicsCutOffLength(1.5);
         cell_population.SetCellAncestorsToLocationIndices();
 
@@ -136,6 +135,9 @@ public:
         TS_ASSERT_DELTA(delta, 0.9901, 1e-04);
         double mean_delta = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetMeanNeighbouringDelta();
         TS_ASSERT_DELTA(mean_delta, 1.0000, 1e-04);
+
+        // Avoid memory leaks
+        delete p_mesh;
     }
 
     void TestHeterogeneousDeltaNotchOnUntetheredTwoCellSystem()
@@ -147,8 +149,8 @@ public:
         nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
         nodes.push_back(new Node<2>(1, false, 0.5, 0.0));
 
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(nodes);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(nodes);
 
         // Establish a CCM for the cells and randomise the birth times
         std::vector<CellPtr> cells;
@@ -196,7 +198,7 @@ public:
         cells.push_back(p_cell_2);
 
         // Create the cell population
-        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Set up the simulation
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
@@ -227,7 +229,8 @@ public:
         double delta_1b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_1b->GetCellCycleModel())->GetDelta();
         TS_ASSERT_DELTA(delta_1b, 0.8151536, 1e-02);  //Default solution at t=10
 
-        // Tidy up
+        // Avoid memory leaks
+        delete p_mesh;
         for (unsigned i=0; i<nodes.size(); i++)
         {
             delete nodes[i];
@@ -243,8 +246,8 @@ public:
         nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
         nodes.push_back(new Node<2>(1, false, 0.5, 0.0));
 
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(nodes);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(nodes);
 
         // Establish a CCM for the cells and randomise the birth times
         std::vector<CellPtr> cells;
@@ -292,7 +295,7 @@ public:
         cells.push_back(p_cell_2);
 
         // Create the cell population
-        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Set up the simulation
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
@@ -322,7 +325,8 @@ public:
         double delta_1b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_1b->GetCellCycleModel())->GetDelta();
         TS_ASSERT_DELTA(delta_1b, 0.0740040, 1e-04);  //Default solution at t=10
 
-        // Tidy up
+        // Avoid memory leaks
+        delete p_mesh;
         for (unsigned i=0; i<nodes.size(); i++)
         {
             delete nodes[i];

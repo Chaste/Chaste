@@ -394,9 +394,9 @@ public:
         // Now move a cell into another element
         c_vector<double,2>& r_location = cell_population.rGetMesh().GetNode(0)->rGetModifiableLocation();
         c_vector<double,2> shift;
-        shift[0]=90.0;
-        shift[1]=90.0;
-        r_location+=shift;
+        shift[0] = 90.0;
+        shift[1] = 90.0;
+        r_location += shift;
 
         pde_and_bc.SetUpSourceTermsForAveragedSourcePde(&coarse_mesh);
     }
@@ -407,15 +407,16 @@ public:
         EXIT_IF_PARALLEL; //HoneycombMeshGenerator doesn't work in parallel
 
         HoneycombMeshGenerator generator(5, 5, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
+
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
+        cells_generator.GenerateBasic(cells, p_generating_mesh->GetNumNodes());
 
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(*p_mesh);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
 
-        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Create a coarse mesh - element 1 contains all the cells,
         // element 0 contains none
@@ -424,7 +425,7 @@ public:
         coarse_mesh.ConstructRegularSlabMesh(100, 100, 100);
 
         // Set up PDE
-        double cell_weight=1.0/pow(cell_population.rGetMesh().GetCellRadius(1u),2);
+        double cell_weight=1.0/pow(cell_population.rGetMesh().GetCellRadius(1), 2);
         VolumeDependentAveragedSourcePde<2> pde(cell_population, -cell_weight);
         pde.SetupSourceTerms(coarse_mesh);
 
@@ -483,6 +484,9 @@ public:
         r_location += shift;
 
         pde_and_bc.SetUpSourceTermsForAveragedSourcePde(&coarse_mesh);
+
+        // Avoid memory leak
+        delete p_mesh;
     }
 
     void TestArchivingWithoutSolution() throw(Exception)

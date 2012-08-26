@@ -85,14 +85,14 @@ public:
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
 
         // Create cells
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             ContactInhibitionCellCycleModel* p_cycle_model = new ContactInhibitionCellCycleModel();
             p_cycle_model->SetDimension(2);
@@ -108,7 +108,7 @@ public:
         }
 
         // Create a node-based cell population
-        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetMechanicsCutOffLength(1.5);
         cell_population.SetOutputCellMutationStates(true);
         cell_population.SetOutputCellVolumes(true);
@@ -150,7 +150,10 @@ public:
         }
 
         // Check that the correct number of cells are labelled (i.e. experiencing contact inhibition)
-        TS_ASSERT_EQUALS(cell_population.GetCellPropertyRegistry()->Get<CellLabel>()->GetCellCount(),9u);
+        TS_ASSERT_EQUALS(cell_population.GetCellPropertyRegistry()->Get<CellLabel>()->GetCellCount(), 9u);
+
+        // Avoid memory leaks
+        delete p_mesh;
     }
 
     void TestMeshBasedSimulationWithContactInhibition()

@@ -112,14 +112,14 @@ public:
         // Create a cell population
         HoneycombMeshGenerator generator(2, 2, 0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
-        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Create a PDE handler object using this cell population
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -131,6 +131,9 @@ public:
         TS_ASSERT_EQUALS(pde_handler.GetImposeBcsOnCoarseBoundary(), true);
         TS_ASSERT_EQUALS(pde_handler.GetNumRadialIntervals(), UNSIGNED_UNSET);
         TS_ASSERT(pde_handler.GetCoarsePdeMesh() == NULL);
+
+        // Avoid memory leak
+        delete p_mesh;
     }
 
     void TestSetMethods() throw(Exception)
@@ -140,14 +143,14 @@ public:
         // Create a cell population
         HoneycombMeshGenerator generator(2, 2, 0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
-        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Create a PDE handler object using this cell population
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -174,7 +177,7 @@ public:
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("averaged quantity");
 
-        unsigned num_nodes = mesh.GetNumNodes();
+        unsigned num_nodes = p_mesh->GetNumNodes();
         std::vector<double> data(num_nodes);
         for (unsigned i=0; i<num_nodes; i++)
         {
@@ -196,6 +199,9 @@ public:
         {
             TS_ASSERT_DELTA(solution[i], i + 0.45, 1e-4);
         }
+
+        // Avoid memory leak
+        delete p_mesh;
     }
 
     void TestCellBasedPdeHandlerOutputParameters() throw(Exception)
@@ -208,14 +214,14 @@ public:
         // Create a cell population
         HoneycombMeshGenerator generator(2, 2, 0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
-        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Create a PDE handler object using this cell population
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -235,6 +241,9 @@ public:
             FileComparison comparer(generated, reference);
             TS_ASSERT(comparer.CompareFiles());
         }
+
+        // Avoid memory leak
+        delete p_mesh;
     }
 
     void TestArchiving() throw(Exception)
@@ -249,14 +258,14 @@ public:
             // Create a cell population
             HoneycombMeshGenerator generator(2, 2, 0);
             MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
-            NodesOnlyMesh<2> mesh;
-            mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
+            NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+            p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
 
             std::vector<CellPtr> cells;
             CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-            cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+            cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
-            NodeBasedCellPopulation<2> cell_population(mesh, cells);
+            NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
             // Create a PDE handler object using this cell population
             CellBasedPdeHandler<2>* const p_pde_handler = new CellBasedPdeHandler<2>(&cell_population);
@@ -291,6 +300,7 @@ public:
             // Tidy up
             SimulationTime::Destroy();
             delete p_pde_handler;
+            delete p_mesh;
         }
 
         {
@@ -332,14 +342,14 @@ public:
         // Create a cell population
         HoneycombMeshGenerator generator(4, 4, 0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
-        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetMechanicsCutOffLength(1.5);
 
         // Create a PDE handler object using this cell population
@@ -395,14 +405,14 @@ public:
         std::vector<Node<1>*> nodes_1d;
         nodes_1d.push_back(new Node<1>(0, true,  0.0));
 
-        NodesOnlyMesh<1> mesh_1d;
-        mesh_1d.ConstructNodesWithoutMesh(nodes_1d);
+        NodesOnlyMesh<1>* p_mesh_1d = new NodesOnlyMesh<1>;
+        p_mesh_1d->ConstructNodesWithoutMesh(nodes_1d);
 
         std::vector<CellPtr> cells_1d;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 1> cells_generator_1d;
-        cells_generator_1d.GenerateBasic(cells_1d, mesh_1d.GetNumNodes());
+        cells_generator_1d.GenerateBasic(cells_1d, p_mesh_1d->GetNumNodes());
 
-        NodeBasedCellPopulation<1> cell_population_1d(mesh_1d, cells_1d);
+        NodeBasedCellPopulation<1> cell_population_1d(*p_mesh_1d, cells_1d);
         cell_population_1d.SetMechanicsCutOffLength(1.5);
 
         CellBasedPdeHandler<1> pde_handler_1d(&cell_population_1d);
@@ -426,14 +436,14 @@ public:
         std::vector<Node<3>*> nodes_3d;
         nodes_3d.push_back(new Node<3>(0, true,  0.0));
 
-        NodesOnlyMesh<3> mesh_3d;
-        mesh_3d.ConstructNodesWithoutMesh(nodes_3d);
+        NodesOnlyMesh<3>* p_mesh_3d = new NodesOnlyMesh<3>;
+        p_mesh_3d->ConstructNodesWithoutMesh(nodes_3d);
 
         std::vector<CellPtr> cells_3d;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator_3d;
-        cells_generator_3d.GenerateBasic(cells_3d, mesh_3d.GetNumNodes());
+        cells_generator_3d.GenerateBasic(cells_3d, p_mesh_3d->GetNumNodes());
 
-        NodeBasedCellPopulation<3> cell_population_3d(mesh_3d, cells_3d);
+        NodeBasedCellPopulation<3> cell_population_3d(*p_mesh_3d, cells_3d);
         cell_population_3d.SetMechanicsCutOffLength(1.5);
 
         CellBasedPdeHandler<3> pde_handler_3d(&cell_population_3d);
@@ -454,7 +464,10 @@ public:
         TS_ASSERT_EQUALS(p_coarse_mesh_3d->GetNumNodes(), 64u);
         TS_ASSERT_EQUALS(p_coarse_mesh_3d->GetNumElements(), 162u);
 
-        // Tidy up
+        // Avoid memory leak
+        delete p_mesh;
+        delete p_mesh_1d;
+        delete p_mesh_3d;
         for (unsigned i=0; i<nodes_1d.size(); i++)
         {
             delete nodes_1d[i];
@@ -469,14 +482,14 @@ public:
         // Create a cell population
         HoneycombMeshGenerator generator(4, 4, 0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
-        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetMechanicsCutOffLength(1.5);
 
         // Create a PDE handler object using this cell population
@@ -507,6 +520,9 @@ public:
         c_vector<double,2> centre_of_cuboid = 0.5*(lower.rGetLocation() + upper.rGetLocation());
 
         TS_ASSERT_DELTA(norm_2(centre_of_cuboid - centre_of_coarse_mesh), 0.0,  1e-4);
+
+        // Avoid memory leak
+        delete p_mesh;
     }
 
     void TestInitialiseCellPdeElementMapAndFindCoarseElementContainingCell() throw(Exception)
@@ -516,14 +532,14 @@ public:
         // Create a cell population
         HoneycombMeshGenerator generator(4, 4, 0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
-        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetMechanicsCutOffLength(1.5);
 
         // Create a PDE handler object using this cell population
@@ -560,6 +576,9 @@ public:
             TS_ASSERT_LESS_THAN(containing_element_index, pde_handler.GetCoarsePdeMesh()->GetNumElements());
             TS_ASSERT_EQUALS(containing_element_index, pde_handler.FindCoarseElementContainingCell(*cell_iter));
         }
+
+        // Avoid memory leak
+        delete p_mesh;
     }
 
     void TestWritingToFile() throw(Exception)
@@ -571,14 +590,14 @@ public:
         // Create a cell population
         HoneycombMeshGenerator generator(4, 4, 0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
-        TS_ASSERT_EQUALS(cells.size(), mesh.GetNumNodes());
-        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
+        TS_ASSERT_EQUALS(cells.size(), p_mesh->GetNumNodes());
+        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetMechanicsCutOffLength(1.5);
 
         cell_population.SetDataOnAllCells("variable", 1.0);
@@ -638,6 +657,9 @@ public:
         TS_ASSERT(file_finder3.IsFile());
 
         pde_handler2.CloseResultsFiles();
+
+        // Avoid memory leak
+        delete p_mesh;
     }
 
     void TestWriteAverageRadialPdeSolution() throw(Exception)
@@ -654,7 +676,7 @@ public:
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        //Put random data on the cells
+        // Put random data on the cells
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)

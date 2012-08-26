@@ -83,17 +83,17 @@ public:
         nodes.push_back(new Node<3>(1u,  false,  -0.5, 0.0, 0.0));
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<3> mesh;
-        mesh.ConstructNodesWithoutMesh(nodes);
+        NodesOnlyMesh<3>* p_mesh = new NodesOnlyMesh<3>;
+        p_mesh->ConstructNodesWithoutMesh(nodes);
 
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<StochasticDurationGenerationBasedCellCycleModel, 3> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type);
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_transit_type);
 
         // Create a node-based cell population
-        NodeBasedCellPopulation<3> node_based_cell_population(mesh, cells);
+        NodeBasedCellPopulation<3> node_based_cell_population(*p_mesh, cells);
         node_based_cell_population.SetMechanicsCutOffLength(1.5);
         node_based_cell_population.SetOutputCellProliferativeTypes(true);
 
@@ -128,7 +128,8 @@ public:
             TS_ASSERT_DELTA(norm_2(node_location-centre), radius, 1e-3);
         }
 
-        // clean up
+        // Avoid memory leak
+        delete p_mesh;
         for (unsigned i=0; i<nodes.size(); i++)
         {
             delete nodes[i];
@@ -143,17 +144,17 @@ public:
         nodes.push_back(new Node<3>(1u,  false,  -1.0, 0.0, 0.0));
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<3> mesh;
-        mesh.ConstructNodesWithoutMesh(nodes);
+        NodesOnlyMesh<3>* p_mesh = new NodesOnlyMesh<3>;
+        p_mesh->ConstructNodesWithoutMesh(nodes);
 
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<StochasticDurationGenerationBasedCellCycleModel, 3> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type);
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_transit_type);
 
         // Create a node-based cell population
-        NodeBasedCellPopulation<3> node_based_cell_population(mesh, cells);
+        NodeBasedCellPopulation<3> node_based_cell_population(*p_mesh, cells);
         node_based_cell_population.SetMechanicsCutOffLength(1.5);
         node_based_cell_population.SetOutputCellProliferativeTypes(true);
 
@@ -173,13 +174,15 @@ public:
         c_vector<double,3> normal_to_plane = zero_vector<double>(3);
         point_on_plane(0) = 0.5;
         normal_to_plane(0) = 1.0;
-        //Restrict to x<1/2
+
+        // Restrict to x<1/2
         MAKE_PTR_ARGS(PlaneBoundaryCondition<3>, p_boundary_condition, (&node_based_cell_population, point_on_plane, normal_to_plane));
         simulator.AddCellPopulationBoundaryCondition(p_boundary_condition);
 
         point_on_plane(0) = -0.5;
         normal_to_plane(0) = -1.0;
-        //Restrict to x>-1/2
+
+        // Restrict to x>-1/2
         MAKE_PTR_ARGS(PlaneBoundaryCondition<3>, p_boundary_condition2, (&node_based_cell_population, point_on_plane, normal_to_plane));
         simulator.AddCellPopulationBoundaryCondition(p_boundary_condition2);
 
@@ -187,10 +190,9 @@ public:
         simulator.Solve();
 
         // Check some results
-
         for (AbstractCellPopulation<3>::Iterator cell_iter = simulator.rGetCellPopulation().Begin();
-                      cell_iter != simulator.rGetCellPopulation().End();
-                      ++cell_iter)
+             cell_iter != simulator.rGetCellPopulation().End();
+             ++cell_iter)
         {
             c_vector<double,3> node_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(*cell_iter);
 
@@ -198,7 +200,8 @@ public:
             TS_ASSERT_LESS_THAN(node_location[0], 0.5);
         }
 
-        // clean up
+        // Avoid memory leak
+        delete p_mesh;
         for (unsigned i=0; i<nodes.size(); i++)
         {
             delete nodes[i];

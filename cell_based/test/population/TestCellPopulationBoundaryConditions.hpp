@@ -73,16 +73,16 @@ public:
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
 
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         // Create cell population
-        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetMechanicsCutOffLength(1.5);
 
         // Set up cell population boundary condition
@@ -133,6 +133,9 @@ public:
         PlaneBoundaryCondition<1> plane_boundary_condition_1d(NULL, zero_vector<double>(1), unit_vector<double>(1,0));
         TS_ASSERT_THROWS_THIS(plane_boundary_condition_1d.VerifyBoundaryCondition(),
                               "PlaneBoundaryCondition is not implemented in 1D");
+
+        // Avoid memory leak
+        delete p_mesh;
     }
 
     void TestPlaneBoundaryConditionWithVertexBasedCellPopulation() throw(Exception)
@@ -233,14 +236,14 @@ public:
         TetrahedralMesh<1,1> generating_mesh_1d;
         generating_mesh_1d.ConstructFromMeshReader(mesh_reader_1d);
 
-        NodesOnlyMesh<1> mesh_1d;
-        mesh_1d.ConstructNodesWithoutMesh(generating_mesh_1d);
+        NodesOnlyMesh<1>* p_mesh_1d = new NodesOnlyMesh<1>;
+        p_mesh_1d->ConstructNodesWithoutMesh(generating_mesh_1d);
 
         std::vector<CellPtr> cells_1d;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 1> cells_generator_1d;
-        cells_generator_1d.GenerateBasic(cells_1d, mesh_1d.GetNumNodes());
+        cells_generator_1d.GenerateBasic(cells_1d, p_mesh_1d->GetNumNodes());
 
-        NodeBasedCellPopulation<1> population_1d(mesh_1d, cells_1d);
+        NodeBasedCellPopulation<1> population_1d(*p_mesh_1d, cells_1d);
 
         c_vector<double,1> centre_1d = zero_vector<double>(1);
 
@@ -268,14 +271,14 @@ public:
         TetrahedralMesh<3,3> generating_mesh_3d;
         generating_mesh_3d.ConstructFromMeshReader(mesh_reader_3d);
 
-        NodesOnlyMesh<3> mesh_3d;
-        mesh_3d.ConstructNodesWithoutMesh(generating_mesh_3d);
+        NodesOnlyMesh<3>* p_mesh_3d = new NodesOnlyMesh<3>;
+        p_mesh_3d->ConstructNodesWithoutMesh(generating_mesh_3d);
 
         std::vector<CellPtr> cells_3d;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator_3d;
-        cells_generator_3d.GenerateBasic(cells_3d, mesh_3d.GetNumNodes());
+        cells_generator_3d.GenerateBasic(cells_3d, p_mesh_3d->GetNumNodes());
 
-        NodeBasedCellPopulation<3> population_3d(mesh_3d, cells_3d);
+        NodeBasedCellPopulation<3> population_3d(*p_mesh_3d, cells_3d);
 
         c_vector<double,3> centre_3d = zero_vector<double>(3);
 
@@ -303,6 +306,10 @@ public:
 
         // Test that the boundary condition was imposed correctly
         TS_ASSERT_EQUALS(bc_3d.VerifyBoundaryCondition(), true);
+
+        // Avoid memory leak
+        delete p_mesh_1d;
+        delete p_mesh_3d;
     }
 
     void TestArchivingOfPlaneBoundaryCondition() throw (Exception)
@@ -359,14 +366,14 @@ public:
         generating_mesh.ConstructFromMeshReader(mesh_reader);
         ArchiveLocationInfo::SetMeshFilename("mesh");
 
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(generating_mesh);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
-        NodeBasedCellPopulation<2> population(mesh, cells);
+        NodeBasedCellPopulation<2> population(*p_mesh, cells);
 
         c_vector<double,2> centre = zero_vector<double>(2);
         centre(0) = 0.5;
@@ -406,7 +413,10 @@ public:
             // Tidy up
             delete p_bc->mpCellPopulation;
             delete p_bc;
-       }
+        }
+
+        // Avoid memory leak
+        delete p_mesh;
     }
 
     void TestCellBoundaryConditionsOutputParameters()
@@ -435,14 +445,14 @@ public:
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
         TetrahedralMesh<2,2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(generating_mesh);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
-        NodeBasedCellPopulation<2> population(mesh, cells);
+        NodeBasedCellPopulation<2> population(*p_mesh, cells);
         c_vector<double,2> centre = zero_vector<double>(2);
 
         SphereGeometryBoundaryCondition<2> sphere_boundary_condition(&population, centre, 0.56, 1e-3);
@@ -474,6 +484,9 @@ public:
             FileComparison comparer(generated, reference);
             TS_ASSERT(comparer.CompareFiles());
         }
+
+        // Avoid memory leak
+        delete p_mesh;
     }
 };
 

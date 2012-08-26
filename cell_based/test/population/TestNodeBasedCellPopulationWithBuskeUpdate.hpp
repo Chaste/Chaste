@@ -65,15 +65,15 @@ public:
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(generating_mesh);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         // Create a cell population, with no ghost nodes at the moment
-        NodeBasedCellPopulationWithBuskeUpdate<2> cell_population(mesh, cells);
+        NodeBasedCellPopulationWithBuskeUpdate<2> cell_population(*p_mesh, cells);
 
         TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "NodeBasedCellPopulationWithBuskeUpdate-2");
 
@@ -124,6 +124,9 @@ public:
                 RelativeTo::ChasteSourceRoot);
         FileComparison comparer(generated, reference);
         TS_ASSERT(comparer.CompareFiles());
+
+        // Avoid memory leak
+        delete p_mesh;
     }
 
     void TestArchivingCellPopulation() throw (Exception)
@@ -144,16 +147,16 @@ public:
             generating_mesh.ConstructFromMeshReader(mesh_reader);
 
             // Convert this to a NodesOnlyMesh
-            NodesOnlyMesh<2> mesh;
-            mesh.ConstructNodesWithoutMesh(generating_mesh);
+            NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+            p_mesh->ConstructNodesWithoutMesh(generating_mesh);
 
             // Create cells
             std::vector<CellPtr> cells;
             CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-            cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+            cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
             // Create a cell population
-            NodeBasedCellPopulationWithBuskeUpdate<2>* const p_cell_population = new NodeBasedCellPopulationWithBuskeUpdate<2>(mesh, cells);
+            NodeBasedCellPopulationWithBuskeUpdate<2>* const p_cell_population = new NodeBasedCellPopulationWithBuskeUpdate<2>(*p_mesh, cells);
 
             // Cells have been given birth times of 0, -1, -2, -3, -4.
             // loop over them to run to time 0.0;
@@ -174,7 +177,8 @@ public:
             (*p_arch) << static_cast<const SimulationTime&>(*p_simulation_time);
             (*p_arch) << p_cell_population;
 
-            // Tidy up
+            // Avoid memory leak
+            delete p_mesh;
             SimulationTime::Destroy();
             delete p_cell_population;
         }

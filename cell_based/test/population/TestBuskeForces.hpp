@@ -67,18 +67,18 @@ public:
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
-        mesh.SetCellRadius(0, 1.0);
-        mesh.SetCellRadius(1, 1.0);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        p_mesh->SetCellRadius(0, 1.0);
+        p_mesh->SetCellRadius(1, 1.0);
 
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes());
 
         // Create a node-based cell population
-        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetMechanicsCutOffLength(2.5);
         cell_population.Update();
 
@@ -134,6 +134,9 @@ public:
             TS_ASSERT_DELTA(node_forces[1][0], -analytical_force_magnitude, 1e-4);
             TS_ASSERT_DELTA(node_forces[1][1], 0.0, 1e-4);
         }
+
+        // Avoid memory leak
+        delete p_mesh;
     }
 
     void TestBuskeElasticForceMethods() throw (Exception)
@@ -147,18 +150,18 @@ public:
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
-        mesh.SetCellRadius(0u,1.0);
-        mesh.SetCellRadius(1u,1.0);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        p_mesh->SetCellRadius(0, 1.0);
+        p_mesh->SetCellRadius(1, 1.0);
 
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes());
 
         // Create a node-based cell population
-        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetMechanicsCutOffLength(2.5);
         cell_population.Update();
 
@@ -215,6 +218,9 @@ public:
             TS_ASSERT_DELTA(node_forces[1][0], -analytical_force_magnitude, 1e-4);
             TS_ASSERT_DELTA(node_forces[1][1], 0.0, 1e-4);
         }
+
+        // Avoid memory leak
+        delete p_mesh;
     }
 
     void TestBuskeMixedForceMethods() throw (Exception)
@@ -228,18 +234,18 @@ public:
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
-        mesh.SetCellRadius(0u,1.0);
-        mesh.SetCellRadius(1u,1.0);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        p_mesh->SetCellRadius(0, 1.0);
+        p_mesh->SetCellRadius(1, 1.0);
 
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes());
 
         // Create a node-based cell population
-        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // This is because cells have radius 1.0.
         cell_population.SetMechanicsCutOffLength(2.5);
@@ -285,6 +291,9 @@ public:
             // Test forces
             ///\todo test something!
         }
+
+        // Avoid memory leak
+        delete p_mesh;
     }
 
     void TestBuskeCompressionForceMethods() throw (Exception)
@@ -298,18 +307,18 @@ public:
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
-        mesh.SetCellRadius(0u,1.0);
-        mesh.SetCellRadius(1u,1.0);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        p_mesh->SetCellRadius(0, 1.0);
+        p_mesh->SetCellRadius(1, 1.0);
 
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes());
 
         // Create a node-based cell population
-        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetMechanicsCutOffLength(2.5);
         cell_population.Update();
 
@@ -358,6 +367,9 @@ public:
             TS_ASSERT_DELTA(node_forces[1][0], analytical_force_magnitude, 1e-4);
             TS_ASSERT_DELTA(node_forces[1][1], 0.0, 1e-4);
         }
+
+        // Avoid memory leak
+        delete p_mesh;
     }
 
     void TestBuskeCompressionForceWithMultipleCells() throw (Exception)
@@ -370,19 +382,19 @@ public:
         nodes.push_back(new Node<2>(1, true, 1.0, -1.0));
         nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
 
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(nodes);
-        mesh.SetCellRadius(0u,1.0);
-        mesh.SetCellRadius(1u,1.0);
-        mesh.SetCellRadius(2u,1.0);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(nodes);
+        p_mesh->SetCellRadius(0, 1.0);
+        p_mesh->SetCellRadius(1, 1.0);
+        p_mesh->SetCellRadius(2, 1.0);
 
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes());
 
         // Create a node-based cell population
-        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetMechanicsCutOffLength(2.5);
         cell_population.Update();
 
@@ -409,6 +421,9 @@ public:
         TS_ASSERT_DELTA(node_forces[1][1], -0.2894, 1e-4);
         TS_ASSERT_DELTA(node_forces[2][0], 0.2894, 1e-4);
         TS_ASSERT_DELTA(node_forces[2][1], 0.2894, 1e-4);
+
+        // Avoid memory leak
+        delete p_mesh;
 
         // When the node-only mesh goes out of scope, then it's a different set of nodes that get destroyed
         for (unsigned i=0; i<nodes.size(); i++)

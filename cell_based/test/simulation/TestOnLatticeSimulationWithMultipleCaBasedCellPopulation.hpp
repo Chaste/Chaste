@@ -107,20 +107,23 @@ public:
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(*p_generating_mesh);
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
 
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes());
 
         // Create a node-based cell population
-        NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
+        NodeBasedCellPopulation<2> node_based_cell_population(*p_mesh, cells);
         node_based_cell_population.SetMechanicsCutOffLength(1.5);
 
         TS_ASSERT_THROWS_THIS(OnLatticeSimulation<2> simulator(node_based_cell_population),
             "OnLatticeSimulations require a subclass of AbstractOnLatticeCellPopulation.");
+
+        // Avoid memory leaks
+        delete p_mesh;
     }
 
     void TestMoreOnLatticeSimulationExceptions()

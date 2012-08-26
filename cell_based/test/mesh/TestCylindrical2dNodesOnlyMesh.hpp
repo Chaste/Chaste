@@ -77,6 +77,7 @@ public:
         TS_ASSERT_DELTA(width, 4, 1e-4);
         TS_ASSERT_DELTA(height, 3.0*0.5*sqrt(3), 1e-4);
 
+        // Avoid memory leak
         delete p_mesh;
     }
 
@@ -118,6 +119,7 @@ public:
         TS_ASSERT_DELTA(vector[0], -1.5, 1e-4);
         TS_ASSERT_DELTA(vector[1], -0.5*sqrt(3.0), 1e-4);
 
+        // Avoid memory leak
         delete p_mesh;
     }
 
@@ -155,6 +157,7 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetNode(7u)->rGetLocation()[0], 0.1, 1e-4);
         TS_ASSERT_DELTA(p_mesh->GetNode(7u)->rGetLocation()[1], 3.0*0.5/sqrt(3), 1e-4);
 
+        // Avoid memory leak
         delete p_mesh;
     }
 
@@ -205,6 +208,7 @@ public:
         new_index = p_mesh->AddNode(p_node2);
         TS_ASSERT_EQUALS(new_index, 14u);
 
+        // Avoid memory leak
         delete p_mesh;
     }
 
@@ -287,10 +291,11 @@ public:
                     TS_ASSERT_DELTA(p_node->rGetLocation()[j], p_node2->rGetLocation()[j], 1e-4);
                 }
             }
-            // Tidy up
+            // Avoid memory leak
             delete p_loaded_mesh;
         }
-        // Tidy up
+
+        // Avoid memory leak
         delete p_mesh;
     }
 };
