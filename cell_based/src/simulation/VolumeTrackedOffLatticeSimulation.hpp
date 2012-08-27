@@ -42,8 +42,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscTools.hpp"
 
 /**
- * Subclass of OffLatticeSimulation in which the volume of the cells is used in
- * a CellData structure for contact inhibition below a threshold volume.
+ * Subclass of OffLatticeSimulation in which the volume of each cell is stored in
+ * a CellData structure in order to allow for contact inhibition of cell division 
+ * below a threshold volume.
  */
 template<unsigned DIM>
 class VolumeTrackedOffLatticeSimulation : public OffLatticeSimulation<DIM>

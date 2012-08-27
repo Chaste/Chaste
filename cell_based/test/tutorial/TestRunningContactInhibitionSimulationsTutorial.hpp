@@ -50,15 +50,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * == Introduction ==
  *
- * In this tutorial, we will show how to use a simple implementation of the contact inhibition cell-cycle mode,
- * that stops cell division when the volume of the cell is smaller than a critical value.
+ * In this tutorial, we will show how to use a simple implementation of the contact inhibition cell-cycle model,
+ * which prevents a cell from undergoing division when its volume is smaller than a critical value.
  *
- * Firstly, we consider two mesh-based populations in 2-D with cells trapped in a square box. In the first population,
+ * We first consider two mesh-based populations in 2D with cells trapped in a square box. In the first population,
  * all the cells are contact inhibited and we study the effect of the critical volume upon the global cell density. In the
- * second population, we consider a mix of normal cells (contact inhibited) and tumour cells (not inhibited) and study the growth of the
+ * second population, we consider a mix of 'normal' cells (contact inhibited) and 'tumour' cells (not inhibited) and study the growth of the
  * tumour cells within the box.
  *
- * Secondly, we look at the behaviour of a vertex-based population in a box and the effect of contact inhibition.
+ * We then go on to consider the behaviour of a vertex-based population in a box that experiences contact inhibition.
  *
  * == Including header files ==
  *
@@ -67,32 +67,35 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CheckpointArchiveTypes.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 
-/* These two headers need to be includes here to ensure archiving of {{{CelwiseData}}} works on all Boost versions*/
+/* These two headers need to be included here to ensure archiving of {{{CelwiseData}}} works on all Boost versions. */
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
-/* The next header includes the Boost shared_ptr smart pointer, and defines some useful
+/* The next header includes the Boost {{{shared_ptr}}} smart pointer, and defines some useful
  * macros to save typing when using it. */
 #include "SmartPointers.hpp"
-/* The next header include the NEVER_REACHED macro, used in one of the methods below. */
+/* The next header include the {{{NEVER_REACHED}}} macro, which is used in one of the methods below. */
 #include "Exception.hpp"
 
 /*
  * The next header file defines the contact inhibition cell-cycle model that inherits from {{{AbstractSimpleCellCycleModel}}}.
- * The duration of the G1 phase depends on the deviation from a target volume (or area/length in 2D/1D): if the volume is
- * lower than a given fraction of the target volume, the G1 phase continues. The target volume and the critical fraction
- * are indicated in the user's Test file, and compared to the real volumes stored in {{{CellData}}}, a singleton class.
- * This model allows for quiescence imposed by transient periods of high stress, followed by relaxation. Note that
+ * The duration of the G1 phase depends on the deviation from a 'target' volume (or area/length in 2D/1D): if a cell's volume is
+ * lower than a given fraction of its target volume, the G1 phase continues. 
+ * This model of cell-cycle progression allows for quiescence imposed by transient periods of high stress, followed by relaxation. Note that
  * in this cell cycle model, quiescence is implemented only by extending the G1 phase. Therefore, if a cell
  * is compressed during G2 or S phases then it will still divide, and thus cells whose volumes are smaller
- * than the given threshold may still divide.
+ * than the given threshold may still divide. 
+ * 
+ * The target volume and the critical fraction are specified using the methods {{{SetEquilibriumVolume()}}} and {{{SetQuiescentVolumeFraction()}}} respectively. 
+ * Within the {{{ContactInhibitionCellCycleModel}}}'s {{{UpdateCellCyclePhase()}}} method these parameters are compared to the actual cell volumes, which are stored 
+ * using the cell property {{{CellData}}}.
  */
 #include "ContactInhibitionCellCycleModel.hpp"
 
 /*
- * The next header is the simulation class corresponding to the contact inhibition cell-cycle model.
- * The essential difference with other simulation classes is that {{{CellData}}} are updated with the
- * volumes each cell (either the volume of the Voronoi elements or vertex element depending on population type).
+ * The next header defines the simulation class corresponding to the contact inhibition cell-cycle model.
+ * The essential difference with other simulation classes is that the {{{CellData}}} cell property is updated at each timestep with the
+ * volume of each cell.
  */
 #include "VolumeTrackedOffLatticeSimulation.hpp"
 /* The remaining header files define classes that will be also be used and are presented in other tutorials. */
@@ -180,31 +183,31 @@ public:
         simulator.AddForce(p_force);
 
         /*
-         * To study the behaviour of the cells with varying volume, we trap them in a box, i.e., between
-         *  4 plane boundary conditions. These planes are indicated by a point and a normal and then passed
-         *  to the {{{VolumeTrackedOffLatticeSimulation}}}. The boundaries chosen are to make the test run
-         *  in a short amount of time, if you can make the box larger then the test will take longer to run.
+         * To study the behaviour of the cells with varying volume, we trap them in the square domain [0,2.5]x[0,2.5]. 
+         * This is implemented using four {{{PlaneBoundaryCondition}}} objects. 
+         * These planes are indicated by a point and a normal and then passed to the {{{VolumeTrackedOffLatticeSimulation}}}. 
+         * The domain is chosen to be quite small so as to make the test run in a short amount of time.
          */
 
-        /* First we impose x>0 */
+        /* First we impose a wall at x=0: */
         c_vector<double,2> point = zero_vector<double>(2);
         c_vector<double,2> normal = zero_vector<double>(2);
         normal(0) = -1.0;
         MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc1, (&cell_population, point, normal));
         simulator.AddCellPopulationBoundaryCondition(p_bc1);
-        /* Then we impose x<2.5 */
+        /* Then we impose a wall at x<=2.5: */
         point(0) = 2.5;
         normal(0) = 1.0;
         MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc2, (&cell_population, point, normal));
         simulator.AddCellPopulationBoundaryCondition(p_bc2);
-        /* Then we impose y>0 */
+        /* Then we impose a wall at y>0: */
         point(0) = 0.0;
         point(1) = 0.0;
         normal(0) = 0.0;
         normal(1) = -1.0;
         MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc3, (&cell_population, point, normal));
         simulator.AddCellPopulationBoundaryCondition(p_bc3);
-        /* Finally we impose y<2.5 */
+        /* Finally we impose a wall at y<2.5: */
         point(1) = 2.5;
         normal(1) = 1.0;
         MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc4, (&cell_population, point, normal));
@@ -291,32 +294,31 @@ public:
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
 
-        /*
-         *  Again we trap cells in a box. First we impose x>0 */
+        /* As in the previous test, we trap the cells in the square domain [0,2.5]x[0,2.5]: */
         c_vector<double,2> point = zero_vector<double>(2);
         c_vector<double,2> normal = zero_vector<double>(2);
         normal(0) = -1.0;
         MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc1, (&cell_population, point, normal));
         simulator.AddCellPopulationBoundaryCondition(p_bc1);
-        /* Then we impose x<2.5 */
+
         point(0) = 2.5;
         normal(0) = 1.0;
         MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc2, (&cell_population, point, normal));
         simulator.AddCellPopulationBoundaryCondition(p_bc2);
-        /* Then we impose y>0 */
+
         point(0) = 0.0;
         point(1) = 0.0;
         normal(0) = 0.0;
         normal(1) = -1.0;
         MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc3, (&cell_population, point, normal));
         simulator.AddCellPopulationBoundaryCondition(p_bc3);
-        /* Finally we impose y<2.5 */
+
         point(1) = 2.5;
         normal(1) = 1.0;
         MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc4, (&cell_population, point, normal));
         simulator.AddCellPopulationBoundaryCondition(p_bc4);
 
-        /* To run the simulation, we call {{{Solve()}}}. */
+        /* Finally, to run the simulation, we call {{{Solve()}}}. */
         simulator.Solve();
     }
     /*
@@ -392,7 +394,7 @@ public:
      * java executable.
      *
      * You will notice that once the healthy cells (yellow) are below a certain size they no longer proliferate and turn dark blue in the visualisation.
-     * If you run the simulation for a long time these Cells occur primarily towards the centre of the monolayer.
+     * If you run the simulation for a long time these cells occur primarily towards the centre of the monolayer.
      *
      * EMPTYLINE
      */
