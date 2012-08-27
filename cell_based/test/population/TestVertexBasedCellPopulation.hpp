@@ -1273,6 +1273,85 @@ public:
             TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetLocation()[1], old_posns[i][1] + 2*i*0.01*0.01, 1e-9);
         }
     }
+
+    ///\todo create test (#2221)
+    void TestGetTetrahedralMeshUsingVertexMesh() throw (Exception)
+    {
+        // Create a simple VertexMesh comprising two VertexElements
+        std::vector<Node<2>*> vertex_nodes;
+        vertex_nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        vertex_nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+        vertex_nodes.push_back(new Node<2>(2, true, 1.5, 1.0));
+        vertex_nodes.push_back(new Node<2>(3, true, 1.0, 2.0));
+        vertex_nodes.push_back(new Node<2>(4, true, 0.0, 1.0));
+        vertex_nodes.push_back(new Node<2>(5, true, 2.0, 0.0));
+        vertex_nodes.push_back(new Node<2>(6, true, 2.0, 3.0));
+
+        std::vector<std::vector<Node<2>*> > nodes_elements(2);
+        nodes_elements[0].push_back(vertex_nodes[0]);
+        nodes_elements[0].push_back(vertex_nodes[1]);
+        nodes_elements[0].push_back(vertex_nodes[2]);
+        nodes_elements[0].push_back(vertex_nodes[3]);
+        nodes_elements[0].push_back(vertex_nodes[4]);
+        nodes_elements[1].push_back(vertex_nodes[2]);
+        nodes_elements[1].push_back(vertex_nodes[5]);
+        nodes_elements[1].push_back(vertex_nodes[6]);
+
+        std::vector<VertexElement<2,2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elements[0]));
+        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elements[1]));
+
+        MutableVertexMesh<2,2>* p_vertex_mesh = new MutableVertexMesh<2,2>(vertex_nodes, vertex_elements);
+
+        // Create cells to correspond with VertexElements
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_vertex_mesh->GetNumElements());
+
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(*p_vertex_mesh, cells);
+
+        // Test GetTetrahedralMeshUsingVertexMesh() method
+        TetrahedralMesh<2,2>* p_tetrahedral_mesh = cell_population.GetTetrahedralMeshUsingVertexMesh();
+
+        // The VertexMesh has 7 Nodes and 2 VertexElements, so the TetrahedralMesh has 7+2=9 Nodes
+        TS_ASSERT_EQUALS(p_tetrahedral_mesh->GetNumNodes(), 9u);
+
+        // The VertexElements comprise 5 and 3 Nodes respectively, so the TetrahedralMesh has 5+3=8 Elements
+        TS_ASSERT_EQUALS(p_tetrahedral_mesh->GetNumElements(), 8u);
+
+        // The first 7 Nodes of the TetrahedralMesh should overlap with those of the VertexMesh
+        for (unsigned i=0; i<7; i++)
+        {
+            Node<2>* p_tetrahedral_node = p_tetrahedral_mesh->GetNode(i);
+            Node<2>* p_vertex_node = p_vertex_mesh->GetNode(i);
+
+            TS_ASSERT_EQUALS(p_tetrahedral_node->GetIndex(), p_vertex_node->GetIndex());
+            TS_ASSERT_DELTA(p_tetrahedral_node->rGetLocation()[0], p_vertex_node->rGetLocation()[0], 1e-3);
+            TS_ASSERT_DELTA(p_tetrahedral_node->rGetLocation()[1], p_vertex_node->rGetLocation()[1], 1e-3);
+        }
+
+        // The last 2 Nodes of the TetrahedralMesh should be located at the centroids of the 2 VertexElements
+        for (unsigned i=0; i<2; i++)
+        {
+            c_vector<double,2> tetrahedral_node_location = p_tetrahedral_mesh->GetNode(i+7)->rGetLocation();
+            c_vector<double,2> vertex_element_centroid = p_vertex_mesh->GetCentroidOfElement(i);
+
+            TS_ASSERT_DELTA(tetrahedral_node_location[0], vertex_element_centroid[0], 1e-3);
+            TS_ASSERT_DELTA(tetrahedral_node_location[1], vertex_element_centroid[1], 1e-3);
+        }
+
+        // The first Element of the TetrahedralMesh should contain the following Nodes
+        Element<2,2>* p_element_0 = p_tetrahedral_mesh->GetElement(0);
+
+        TS_ASSERT_EQUALS(p_element_0->GetNodeGlobalIndex(0), 0u);
+        TS_ASSERT_EQUALS(p_element_0->GetNodeGlobalIndex(1), 1u);
+        TS_ASSERT_EQUALS(p_element_0->GetNodeGlobalIndex(2), 7u);
+
+        // Avoid memory leak
+        delete p_vertex_mesh;
+        delete p_tetrahedral_mesh;
+    }
 };
 
 #endif /*TESTVERTEXBASEDCELLPOPULATION_HPP_*/

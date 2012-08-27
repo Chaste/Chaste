@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "VertexBasedCellPopulation.hpp"
+#include <boost/foreach.hpp>
 #include "VertexMeshWriter.hpp"
 #include "Warnings.hpp"
 
@@ -442,7 +443,7 @@ double VertexBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
 template<unsigned DIM>
 void VertexBasedCellPopulation<DIM>::WriteCellVolumeResultsToFile()
 {
-    assert(DIM==2);
+    assert(DIM == 2);
 
     // Write time to file
     *(this->mpCellVolumesFile) << SimulationTime::Instance()->GetTime() << " ";
@@ -672,6 +673,147 @@ template<unsigned DIM>
 std::set<unsigned> VertexBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsigned index)
 {
     return mpMutableVertexMesh->GetNeighbouringNodeIndices(index);
+}
+
+template<unsigned DIM>
+TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshUsingVertexMesh()
+{
+    // This method only works in 2D sequential
+    assert(DIM == 2);
+    assert(PetscTools::IsSequential());
+
+    unsigned num_vertex_nodes = mpMutableVertexMesh->GetNumNodes();
+    unsigned num_vertex_elements = mpMutableVertexMesh->GetNumElements();
+
+    // Get a unique mesh filename
+    std::stringstream pid;
+    pid << getpid();
+    std::string mesh_file_name = "2D_temporary_tetrahedral_mesh_" + pid.str();
+
+    OutputFileHandler output_file_handler("");
+    std::string output_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+    // Compute the number of nodes in the TetrahedralMesh
+    unsigned num_tetrahedral_nodes = num_vertex_nodes + num_vertex_elements;
+
+    // Write node file
+    out_stream p_node_file = output_file_handler.OpenOutputFile(mesh_file_name+".node");
+    (*p_node_file) << std::scientific;
+    (*p_node_file) << std::setprecision(20);
+    (*p_node_file) << num_tetrahedral_nodes << "\t2\t0\t1" << std::endl;
+
+    // Begin by writing each node in the VertexMesh
+    for (unsigned node_index=0; node_index<num_vertex_nodes; node_index++)
+    {
+        Node<DIM>* p_node = mpMutableVertexMesh->GetNode(node_index);
+
+        ///\todo will the nodes in mpMutableVertexMesh always have indices 0,1,2,...? (#2221)
+        unsigned index = p_node->GetIndex();
+
+        c_vector<double, DIM> location = p_node->rGetLocation();
+
+        ///\todo we do not yet consider boundaryness in vertex meshes (see #1558)
+        unsigned is_boundary_node = p_node->IsBoundaryNode() ? 1 : 0;
+
+        (*p_node_file) << index << "\t" << location[0] << "\t" << location[1] << "\t" << is_boundary_node << std::endl;
+    }
+
+    // Now write an additional node at each VertexElement's centroid
+    unsigned num_tetrahedral_elements = 0;
+    for (unsigned vertex_elem_index=0; vertex_elem_index<num_vertex_elements; vertex_elem_index++)
+    {
+        unsigned index = num_vertex_nodes + vertex_elem_index;
+
+        c_vector<double, DIM> location = mpMutableVertexMesh->GetCentroidOfElement(vertex_elem_index);
+
+        // Any node located at a VertexElement's centroid will not be a boundary node
+        unsigned is_boundary_node = 0;
+        (*p_node_file) << index << "\t" << location[0] << "\t" << location[1] << "\t" << is_boundary_node << std::endl;
+
+        // Also keep track of how many tetrahedral elements there will be
+        num_tetrahedral_elements += mpMutableVertexMesh->GetElement(vertex_elem_index)->GetNumNodes();
+    }
+    p_node_file->close();
+
+    // Write element file
+    out_stream p_elem_file = output_file_handler.OpenOutputFile(mesh_file_name+".ele");
+    (*p_elem_file) << std::scientific;
+    (*p_elem_file) << num_tetrahedral_elements << "\t3\t0" << std::endl;
+
+    std::set<std::pair<unsigned, unsigned> > tetrahedral_edges;
+
+    unsigned tetrahedral_elem_index = 0;
+    for (unsigned vertex_elem_index=0; vertex_elem_index<num_vertex_elements; vertex_elem_index++)
+    {
+        VertexElement<DIM, DIM>* p_vertex_element = mpMutableVertexMesh->GetElement(vertex_elem_index);
+
+        // Iterate over nodes owned by this VertexElement
+        unsigned num_nodes_in_vertex_element = p_vertex_element->GetNumNodes();
+        for (unsigned local_index=0; local_index<num_nodes_in_vertex_element; local_index++)
+        {
+            unsigned node_0_index = p_vertex_element->GetNodeGlobalIndex(local_index);
+            unsigned node_1_index = p_vertex_element->GetNodeGlobalIndex((local_index+1)%num_nodes_in_vertex_element);
+            unsigned node_2_index = num_vertex_nodes + vertex_elem_index;
+
+            (*p_elem_file) << tetrahedral_elem_index++ << "\t" << node_0_index << "\t" << node_1_index << "\t" << node_2_index << std::endl;
+
+            // Add edges to the set if they are not already present
+            std::pair<unsigned, unsigned> edge_0;
+            bool node_0_index_lower_than_node_1_index = (node_0_index < node_1_index);
+            edge_0.first = node_0_index_lower_than_node_1_index ? node_0_index : node_1_index;
+            edge_0.second = node_0_index_lower_than_node_1_index ? node_1_index : node_0_index;
+
+            std::pair<unsigned, unsigned> edge_1;
+            bool node_1_index_lower_than_node_2_index = (node_1_index < node_2_index);
+            edge_1.first = node_1_index_lower_than_node_2_index ? node_1_index : node_2_index;
+            edge_1.second = node_1_index_lower_than_node_2_index ? node_2_index : node_1_index;
+
+            std::pair<unsigned, unsigned> edge_2;
+            bool node_2_index_lower_than_node_0_index = (node_2_index < node_0_index);
+            edge_2.first = node_2_index_lower_than_node_0_index ? node_2_index : node_0_index;
+            edge_2.second = node_2_index_lower_than_node_0_index ? node_0_index : node_2_index;
+
+            tetrahedral_edges.insert(edge_0);
+            tetrahedral_edges.insert(edge_1);
+            tetrahedral_edges.insert(edge_2);
+        }
+    }
+    p_elem_file->close();
+
+    // Write edge file
+    out_stream p_edge_file = output_file_handler.OpenOutputFile(mesh_file_name+".edge");
+    (*p_node_file) << std::scientific;
+    (*p_edge_file) << tetrahedral_edges.size() << "\t1" << std::endl;
+
+    unsigned edge_index = 0;
+    for (std::set<std::pair<unsigned, unsigned> >::iterator edge_iter = tetrahedral_edges.begin();
+         edge_iter != tetrahedral_edges.end();
+         ++edge_iter)
+    {
+        std::pair<unsigned, unsigned> this_edge;
+        
+        ///\todo we do not yet consider boundaryness in vertex meshes (see #1558)
+        (*p_edge_file) << edge_index++ << "\t" << this_edge.first << "\t" << this_edge.second << "\t" << 0 << std::endl;
+    }
+    p_edge_file->close();
+
+    // Having written the mesh to file, now construct it using TrianglesMeshReader
+    TrianglesMeshReader<DIM, DIM> mesh_reader(output_dir + mesh_file_name);
+    TetrahedralMesh<DIM, DIM>* p_mesh = new TetrahedralMesh<DIM, DIM>;
+    p_mesh->ConstructFromMeshReader(mesh_reader);
+
+    // Delete the temporary files
+    FileFinder output_dir_finder(output_dir);
+    std::vector<FileFinder> mesh_files = output_dir_finder.FindMatches(mesh_file_name + ".*");
+    BOOST_FOREACH(const FileFinder& r_temp_file, mesh_files)
+    {
+        r_temp_file.Remove(true);
+    }
+
+    // The original files have been deleted, it is better if the mesh object forgets about them
+    p_mesh->SetMeshHasChangedSinceLoading();
+
+    return p_mesh;
 }
 
 /////////////////////////////////////////////////////////////////////////////

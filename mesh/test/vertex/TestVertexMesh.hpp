@@ -274,7 +274,7 @@ public:
         basic_nodes.push_back(new Node<2>(5, false, 2.0, 0.0));
         basic_nodes.push_back(new Node<2>(6, false, 2.0, 3.0));
 
-        // Make two triangular elements out of these nodes
+        // Make two elements out of these nodes
         std::vector<std::vector<Node<2>*> > nodes_elements(2);
         for (unsigned i=0; i<5; i++)
         {

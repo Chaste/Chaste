@@ -66,7 +66,7 @@ private:
     bool mDeleteMesh;
 
     /**
-     * A static cast of the Abstract mesh from `AbstractCellPopulation`
+     * A static cast of the AbstractMesh from AbstractCellPopulation
      * for use in this class
      */
     MutableVertexMesh<DIM, DIM>* mpMutableVertexMesh;
@@ -317,10 +317,7 @@ public:
     virtual void GenerateCellResultsAndWriteToFiles();
 
     /**
-     * Outputs CellPopulation parameters to file
-     *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * Overridden OutputCellPopulationParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
@@ -344,6 +341,13 @@ public:
      * @return the set of neighbouring node indices.
      */
     std::set<unsigned> GetNeighbouringNodeIndices(unsigned index);
+
+    /**
+     * @return a tetrahedral mesh using the nodes in the VertexMesh
+     * as well as an additional node at the centre of each VertexElement.
+     * This method only works in 2D.
+     */
+    TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshUsingVertexMesh();
 };
 
 #include "SerializationExportWrapper.hpp"
