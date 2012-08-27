@@ -37,8 +37,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Cylindrical2dNodesOnlyMesh.hpp"
 
 Cylindrical2dNodesOnlyMesh::Cylindrical2dNodesOnlyMesh(double width)
-		: NodesOnlyMesh<2>(),
-		  mWidth(width)
+        : NodesOnlyMesh<2>(),
+          mWidth(width)
 {
     assert(width > 0.0);
 }
@@ -49,10 +49,10 @@ Cylindrical2dNodesOnlyMesh::~Cylindrical2dNodesOnlyMesh()
 
 void Cylindrical2dNodesOnlyMesh::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*2> domainSize)
 {
-	this->mpBoxCollection = new BoxCollection<2>(cutOffLength, domainSize, true); // Only difference is that this "true" makes the boxes periodic.
-	this->mpBoxCollection->SetupLocalBoxesHalfOnly();
+    this->mpBoxCollection = new BoxCollection<2>(cutOffLength, domainSize, true); // Only difference is that this "true" makes the boxes periodic.
+    this->mpBoxCollection->SetupLocalBoxesHalfOnly();
 
-	//Put the nodes in the boxes.
+    // Put the nodes in the boxes
     for (unsigned i=0; i< this->GetNumNodes(); i++)
     {
         unsigned box_index = this->mpBoxCollection->CalculateContainingBox(this->GetNode(i));

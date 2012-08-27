@@ -177,8 +177,17 @@ c_vector<double, SPACE_DIM> OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::Calcula
             }
             case 3:
             {
-                double random_zenith_angle = M_PI*RandomNumberGenerator::Instance()->ranf(); // phi
-                double random_azimuth_angle = 2*M_PI*RandomNumberGenerator::Instance()->ranf(); // theta
+                /*
+                 * Note that to pick a random point on the surface of a sphere, it is incorrect
+                 * to select spherical coordinates from uniform distributions on [0, 2*pi) and 
+                 * [0, pi) respectively, since points picked in this way will be 'bunched' near 
+                 * the poles. See #2230.
+                 */
+                double u = RandomNumberGenerator::Instance()->ranf();
+                double v = RandomNumberGenerator::Instance()->ranf();
+
+                double random_azimuth_angle = 2*M_PI*u;
+                double random_zenith_angle = std::acos(2*v - 1);
 
                 random_vector(0) = 0.5*separation*cos(random_azimuth_angle)*sin(random_zenith_angle);
                 random_vector(1) = 0.5*separation*sin(random_azimuth_angle)*sin(random_zenith_angle);

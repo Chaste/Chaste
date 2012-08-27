@@ -214,48 +214,48 @@ void PottsMeshWriter<SPACE_DIM>::WriteFiles()
      * a PottsMesh to have no elements, particularly in when it is being used in
      * the context of a MultipleCaBasedCellPopulation.
      */
-    if (num_elements > 0)
+    if (num_elements != 0)
     {
-		/// \todo  #2146 - this looks like a bug in the making - what if the attribute IS zero!?!?
-		double first_elem_attribute_value = (*(mpIters->pElemIter))->GetAttribute();
-		if (first_elem_attribute_value != 0)
-		{
-			num_attr = 1;
-		}
-		*p_element_file << num_attr << "\n";
-	}
-	else
-	{
-	    *p_element_file << 0 << "\n";
-	}
+        /// \todo  #2146 - this looks like a bug in the making - what if the attribute IS zero!?!?
+        double first_elem_attribute_value = (*(mpIters->pElemIter))->GetAttribute();
+        if (first_elem_attribute_value != 0)
+        {
+            num_attr = 1;
+        }
+        *p_element_file << num_attr << "\n";
+    }
+    else
+    {
+        *p_element_file << 0 << "\n";
+    }
 
-	// Write each element's data
-	for (unsigned item_num=0; item_num<num_elements; item_num++)
-	{
-		// Get data for this element
-		ElementData elem_data = this->GetNextElement();
+    // Write each element's data
+    for (unsigned item_num=0; item_num<num_elements; item_num++)
+    {
+        // Get data for this element
+        ElementData elem_data = this->GetNextElement();
 
-		// Get the node indices owned by this element
-		std::vector<unsigned> node_indices = elem_data.NodeIndices;
+        // Get the node indices owned by this element
+        std::vector<unsigned> node_indices = elem_data.NodeIndices;
 
-		// Write this element's index and the number of nodes owned by it to file
-		*p_element_file << item_num <<  "\t" << node_indices.size();
+        // Write this element's index and the number of nodes owned by it to file
+        *p_element_file << item_num <<  "\t" << node_indices.size();
 
-		// Write the node indices owned by this element to file
-		for (unsigned i=0; i<node_indices.size(); i++)
-		{
-			*p_element_file << "\t" << node_indices[i];
-		}
+        // Write the node indices owned by this element to file
+        for (unsigned i=0; i<node_indices.size(); i++)
+        {
+            *p_element_file << "\t" << node_indices[i];
+        }
 
-		// Write the element attribute if necessary
-		if (elem_data.AttributeValue != 0)
-		{
-			*p_element_file << "\t" << elem_data.AttributeValue;
-		}
+        // Write the element attribute if necessary
+        if (elem_data.AttributeValue != 0)
+        {
+            *p_element_file << "\t" << elem_data.AttributeValue;
+        }
 
-		// New line
-		*p_element_file << "\n";
-	}
+        // New line
+        *p_element_file << "\n";
+    }
 
     *p_element_file << comment << "\n";
     p_element_file->close();

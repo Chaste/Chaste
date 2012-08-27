@@ -101,7 +101,6 @@ public:
      * @return  a standard vector of booleans which states whether a labelled cell is present at a corresponding position.
      */
     std::vector<bool> AreCryptSectionCellsLabelled(std::vector<CellPtr>& rCryptSection);
-
 };
 
 #endif /*ABSTRACTCRYPTSTATISTICS_HPP_*/

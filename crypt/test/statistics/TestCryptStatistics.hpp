@@ -166,7 +166,7 @@ public:
 
     void TestMakeMeinekeGraphs() throw (Exception)
     {
-    	// Specify output directory
+        // Specify output directory
         std::string output_directory = "MakeMeinekeGraphs";
 
         // Create mesh

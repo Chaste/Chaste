@@ -189,7 +189,6 @@ public:
      * @return the name
      */
     std::string& rGetDependentVariableName();
-
 };
 
 #include "SerializationExportWrapper.hpp"

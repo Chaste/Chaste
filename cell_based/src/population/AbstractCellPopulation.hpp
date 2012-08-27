@@ -797,7 +797,6 @@ public:
      * @return iterator pointing to one past the last cell in the cell population
      */
     Iterator End();
-
 };
 
 enum cell_colours

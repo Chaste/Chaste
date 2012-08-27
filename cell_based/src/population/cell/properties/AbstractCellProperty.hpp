@@ -140,7 +140,6 @@ public:
      * Get #mCellCount
      */
     unsigned GetCellCount() const;
-
 };
 
 #endif /* ABSTRACTCELLPROPERTY_HPP_ */

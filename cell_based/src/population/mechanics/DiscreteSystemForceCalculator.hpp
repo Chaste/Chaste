@@ -132,6 +132,6 @@ public:
      * @param simulationOutputDirectory the output directory, relative to where Chaste output is stored
      */
     void WriteResultsToFile(std::string simulationOutputDirectory);
-
 };
+
 #endif /*DISCRETESYSTEMFORCECALCULATOR_HPP_*/

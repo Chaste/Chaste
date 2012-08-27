@@ -135,6 +135,7 @@ public:
             delete nodes[i];
         }
     }
+
     void Test3dNodeBasedPlaneBoundary() throw (Exception)
     {
         // Create mesh
@@ -196,8 +197,8 @@ public:
         {
             c_vector<double,3> node_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(*cell_iter);
 
-            TS_ASSERT_LESS_THAN(-0.5, node_location[0]);
-            TS_ASSERT_LESS_THAN(node_location[0], 0.5);
+            TS_ASSERT_LESS_THAN_EQUALS(-0.5, node_location[0]);
+            TS_ASSERT_LESS_THAN_EQUALS(node_location[0], 0.5);
         }
 
         // Avoid memory leak

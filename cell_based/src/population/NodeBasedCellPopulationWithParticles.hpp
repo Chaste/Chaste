@@ -188,7 +188,6 @@ public:
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputCellPopulationParameters(out_stream& rParamsFile);
-
 };
 
 #include "SerializationExportWrapper.hpp"

@@ -150,9 +150,9 @@ public:
 
         simulator.Solve();
 
-        // Start with a single 3D tetrahedron, add one node get two tetrahedral elements.
+        // Start with a single 3D tetrahedron, add one node get three tetrahedral elements
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 5u);
-        TS_ASSERT_EQUALS(mesh.GetNumElements(), 2u);
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), 3u);
 
         TrianglesMeshWriter<3,3> mesh_writer2("Test3DCellBirth", "EndMesh", false);
         mesh_writer2.WriteFilesUsingMesh(mesh);

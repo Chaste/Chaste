@@ -92,7 +92,6 @@ public:
     void GenerateGivenLocationIndices(std::vector<CellPtr>& rCells,
                                       const std::vector<unsigned> locationIndices,
                                       boost::shared_ptr<AbstractCellProperty> pCellProliferativeType=boost::shared_ptr<AbstractCellProperty>());
-
 };
 
 template<class CELL_CYCLE_MODEL, unsigned DIM>

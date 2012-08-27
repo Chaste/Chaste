@@ -607,21 +607,21 @@ public:
     {
         EXIT_IF_PARALLEL;
 
-		PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
-		PottsMesh<2>* p_mesh = generator.GetMesh();
+        PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
 
-		std::vector<CellPtr> cells;
-		MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-		CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-		cells_generator.GenerateBasicRandom(cells, 10, p_diff_type);
+        std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, 10, p_diff_type);
 
-		std::vector<unsigned> location_indices;
-		for (unsigned index=0; index<10; index++)
-		{
-			location_indices.push_back(index);
-		}
+        std::vector<unsigned> location_indices;
+        for (unsigned index=0; index<10; index++)
+        {
+            location_indices.push_back(index);
+        }
 
-		MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 4);
+        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 4);
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
@@ -642,29 +642,29 @@ public:
 
         CellPtr p_cell = *(simulator.rGetCellPopulation().Begin());
         c_vector<double, 2> cell_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(p_cell);
-		TS_ASSERT_DELTA(cell_location[0], 1.0, 1e-4);
-		TS_ASSERT_DELTA(cell_location[1], 2.0, 1e-4);
+        TS_ASSERT_DELTA(cell_location[0], 1.0, 1e-4);
+        TS_ASSERT_DELTA(cell_location[1], 2.0, 1e-4);
     }
 
     void TestSave() throw (Exception)
     {
         EXIT_IF_PARALLEL;
 
-		PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
-		PottsMesh<2>* p_mesh = generator.GetMesh();
+        PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
 
-		std::vector<CellPtr> cells;
-		MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-		CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-		cells_generator.GenerateBasicRandom(cells, 10, p_diff_type);
+        std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, 10, p_diff_type);
 
-		std::vector<unsigned> location_indices;
-		for (unsigned index=0; index<10; index++)
-		{
-			location_indices.push_back(index);
-		}
+        std::vector<unsigned> location_indices;
+        for (unsigned index=0; index<10; index++)
+        {
+            location_indices.push_back(index);
+        }
 
-		MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 4);
+        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 4);
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
@@ -709,8 +709,8 @@ public:
 
         CellPtr p_cell = *(p_simulator2->rGetCellPopulation().Begin());
         c_vector<double, 2> cell_location = static_cast <MultipleCaBasedCellPopulation<2>*>(&p_simulator2->rGetCellPopulation())->GetLocationOfCellCentre(p_cell);
-		TS_ASSERT_DELTA(cell_location[0], 1.0, 1e-4);
-		TS_ASSERT_DELTA(cell_location[1], 2.0, 1e-4);
+        TS_ASSERT_DELTA(cell_location[0], 1.0, 1e-4);
+        TS_ASSERT_DELTA(cell_location[1], 2.0, 1e-4);
 
         // Tidy up
         delete p_simulator1;

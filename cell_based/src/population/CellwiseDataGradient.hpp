@@ -73,7 +73,6 @@ public:
      * @return the gradient at the node.
      */
     c_vector<double, DIM>& rGetGradient(unsigned nodeIndex);
-
 };
 
 #endif /*CELLWISEDATAGRADIENT_HPP_*/
