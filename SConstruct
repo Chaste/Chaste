@@ -133,7 +133,13 @@ Export('compile_only')
 # To run a specific test suite only, give the path (relative to the Chaste root) as the test_suite=<path> argument.
 # This will force the test suite to be run even if the source is unchanged.
 # To run multiple tests in this way, separate the paths by commas.
+# Also allow test .hpp files to be given as normal targets.
 requested_tests = filter(None, ARGUMENTS.get('test_suite', ARGUMENTS.get('ts', '')).split(','))
+for target in COMMAND_LINE_TARGETS[:]:
+    if target.endswith('.hpp'):
+        requested_tests.append(target)
+        COMMAND_LINE_TARGETS.remove(target)
+        BUILD_TARGETS.remove(target)
 for test_idx, test_path in enumerate(requested_tests):
     parts = test_path.split(os.path.sep)
     if len(parts) < 3:
@@ -175,12 +181,6 @@ Export('install_prefix')
 install_files = 'install' in BUILD_TARGETS
 if install_files:
     assert use_chaste_libs, "Cannot install unless building Chaste libraries"
-
-# Check for an easy mistake, where the user forgets the 'test_suite='.
-for target in BUILD_TARGETS:
-    if target.endswith('.hpp'):
-        raise ValueError('Unexpected target ' + target +
-                         '; did you forget "test_suite="?')
 
 # To run tests of only a single component, specify it with the
 # test_component=<component> argument (deprecated).
@@ -542,3 +542,8 @@ if build_exes:
     SConsTools.BuildExes(build, env, 'apps',
                          components=['heart']+comp_deps['heart'],
                          otherVars=globals())
+
+# Finally, tidy up the build targets if we modified the command-line list
+# to do 'nice' test suite specification
+if not BUILD_TARGETS:
+    BUILD_TARGETS.extend(DEFAULT_TARGETS)
