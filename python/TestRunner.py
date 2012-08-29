@@ -70,7 +70,7 @@ def usage():
     print "Usage:",sys.argv[0],\
         "<test exe> <.log file> <build type> [run time flags] [--no-stdout]"
 
-def kill_test(pid=None, exe=None):
+def KillTest(pid=None, exe=None):
     """Kill off a running test, specified either by pid or by name, or both.
     
     First, recursively kill pid and all its children.  Then check all running
@@ -79,23 +79,23 @@ def kill_test(pid=None, exe=None):
     
     Requires 'easy_install psutil' to function.
     """
-    # Recursive kill of pid
+    # Recursive kill of pid and its children, killing innermost first
     if pid:
         try:
             for proc in psutil.process_iter():
                 if proc.ppid == pid:
-                    kill_test(proc.pid)
+                    KillTest(proc.pid)
             print "Killing", pid
             os.kill(pid, signal.SIGTERM)
         except (psutil.NoSuchProcess, OSError):
             pass
-    # Kill by name
+    # Kill by name - figure out pid and call ourselves with that
     if exe:
         #print "Killing", exe
         for proc in psutil.process_iter():
             try:
                 if proc.exe == exe:
-                    kill_test(proc.pid)
+                    KillTest(proc.pid)
             except (psutil.NoSuchProcess, psutil.AccessDenied, OSError):
                 pass
 
@@ -119,6 +119,49 @@ def GetTestNameFromLogFilePath(logFilePath):
     return test_name
 
 
+class TestKillerTimer(object):
+    """A specialised timer creator for killing running tests if they take too long."""
+    def __init__(self, timeLimit, pid, exe, log):
+        """Create a new timer."""
+        self.timeLimit = timeLimit
+        self.pid = pid
+        self.exe = exe
+        self.log = log
+        self.extraTimer = None
+        self.mainTimer = threading.Timer(timeLimit, self.MaybeDoKill)
+        self.mainTimer.start()
+
+    def Stop(self):
+        """Cancel the timer (if it hasn't already fired) and wait for it to stop fully."""
+        self.mainTimer.cancel()
+        if self.extraTimer:
+            self.extraTimer.cancel()
+            # Wait for it to finish
+            self.extraTimer.join()
+        # Wait for the main timer to finish
+        self.mainTimer.join()
+
+    def MaybeDoKill(self):
+        """Only kill the test if it has consumed a reasonable amount of CPU, otherwise wait a bit longer."""
+        try:
+            test_proc = psutil.Process(self.pid)
+            cpu_times = sum(test_proc.get_cpu_times())
+            if cpu_times < 0.5 * self.timeLimit:
+                # The machine is probably loaded, or code generation & compiling is taking a while.
+                # Allow some extra grace time.
+                self.extraTimer = threading.Timer(self.timeLimit * 5, self.DoKill)
+                self.extraTimer.start()
+        except:
+            self.DoKill()
+
+    def DoKill(self):
+        """Really kill off the test and its children."""
+        KillTest(self.pid, self.exe)
+        msg = '\n\nTest killed due to exceeding time limit of %d seconds\n\n' % self.timeLimit
+        self.log.write(msg)
+        print msg
+
+
 def run_test(exefile, logfile, build, run_time_flags='', echo=True, time_limit=0):
     """Actually run the given test."""
     # Find out how we're supposed to run tests under this build type
@@ -137,13 +180,7 @@ def run_test(exefile, logfile, build, run_time_flags='', echo=True, time_limit=0
     test_proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
     if time_limit and psutil:
         # Set a Timer to kill the test if it runs too long
-        def do_kill(pid=test_proc.pid, exe=os.path.abspath(exefile)):
-            kill_test(pid, exe)
-            msg = '\n\nTest killed due to exceeding time limit of %d seconds\n\n' % time_limit
-            log_fp.write(msg)
-            print msg
-        kill_timer = threading.Timer(time_limit, do_kill)
-        kill_timer.start()
+        kill_timer = TestKillerTimer(time_limit, test_proc.pid, os.path.abspath(exefile), log_fp)
     for line in test_proc.stdout:
         log_fp.write(line)
         if echo:
@@ -151,9 +188,7 @@ def run_test(exefile, logfile, build, run_time_flags='', echo=True, time_limit=0
     exit_code = test_proc.wait()
     end_time = time.time()
     if time_limit and psutil:
-        kill_timer.cancel()
-        # Make sure we don't close the log file before the killer writes to it (if it does)
-        kill_timer.join()
+        kill_timer.Stop()
     log_fp.close()
 
     #print "Time",end_time,start_time
