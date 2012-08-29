@@ -36,34 +36,38 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FILECOMPARISON_HPP_
 
 #include "AbstractFileComparison.hpp"
+#include <vector>
+#include <boost/foreach.hpp>
 
 /**
  * Compare files to check for any differences (in numeric and/or string values).
  *
- * By Default this class ignores all lines which (in both files) start with '#'.
+ * By default this class ignores all lines which (in both files) start with '#' or '!'.
  */
 class FileComparison : public AbstractFileComparison
 {
 private:
-    /** Whether or not we should ignore lines starting with '#'. True by default.*/
+    /** Whether or not we should ignore comment lines. True by default. */
     bool mIgnoreCommentLines;
 
     /**
-     * A list of strings, if found at the beginning of lines when
-     * mIgnoreCommentLines is true, differences in these lines
-     * are ignored.
+     * A list of strings, which if found at the beginning of lines when
+     * #mIgnoreCommentLines is true, differences in these lines are ignored.
      */
     std::vector<std::string> mCommentLineStarts;
-public:
 
+    /** Any lines which (in both files) contain one of these strings will be ignored. */
+    std::vector<std::string> mIgnorableContent;
+
+public:
     /**
      * Specify two files to compare, and open them for reading.
      * Actual comparison is done by calling CompareFiles.
      *
      * @param fileName1  first file
      * @param fileName2  second file
-     * @param calledCollectively  If true there will be a barrier before opening files, and only master compares contents.
-     * @param suppressOutput  If true then no errors will go to TS_TRACE(). Should only be set for the test of this class.
+     * @param calledCollectively  if true there will be a barrier before opening files, and only master compares contents.
+     * @param suppressOutput  if true then no errors will go to TS_TRACE(). Should only be set for the test of this class.
      */
     FileComparison(std::string fileName1, std::string fileName2, bool calledCollectively=true, bool suppressOutput = false)
         : AbstractFileComparison(fileName1, fileName2, calledCollectively, suppressOutput),
@@ -78,8 +82,8 @@ public:
      *
      * @param rFileName1  first file finder
      * @param rFileName2  second file finder
-     * @param calledCollectively  If true there will be a barrier before opening files, and only master compares contents.
-     * @param suppressOutput  If true then no errors will go to TS_TRACE(). Should only be set for the test of this class.
+     * @param calledCollectively  if true there will be a barrier before opening files, and only master compares contents.
+     * @param suppressOutput  if true then no errors will go to TS_TRACE(). Should only be set for the test of this class.
      */
     FileComparison(const FileFinder& rFileName1, const FileFinder& rFileName2, bool calledCollectively=true, bool suppressOutput = false)
         : AbstractFileComparison(rFileName1, rFileName2, calledCollectively, suppressOutput),
@@ -91,7 +95,7 @@ public:
     /**
      * Set some line starts that define comments in the files.
      *
-     * These are ignored by default and when mIgnoreCommentLines = true.
+     * These are ignored by default and when #mIgnoreCommentLines is explicitly set to true.
      */
     void SetupCommentLines()
     {
@@ -101,8 +105,9 @@ public:
     }
 
     /**
-     * Whether or not we should ignore lines starting with '#'
-     * @param ignore  whether to ignore these lines (defaults to true)
+     * Whether or not we should ignore lines starting with a comment symbol
+     * (the default symbols are '#' and '!').
+     * @param ignore  whether to ignore these lines
      */
     void SetIgnoreCommentLines(bool ignore=true)
     {
@@ -110,10 +115,10 @@ public:
     }
 
     /**
-     * Set a line start which should be treated as a comment and ignored
-     * (and therefore switch on mIgnoreCommentLines = true)
+     * Set an additional line start which should be treated as a comment and ignored
+     * (and therefore switch on #mIgnoreCommentLines = true).
      *
-     * @param lineStart  The beginning of a line which should be treated as a comment
+     * @param lineStart  the beginning of a line which should be treated as a comment
      */
     void SetIgnoreLinesBeginningWith(std::string lineStart)
     {
@@ -122,12 +127,23 @@ public:
     }
 
     /**
+     * Add the given string to #mIgnorableContent, and hence ignore differences in lines
+     * which contain that text in both files.
+     *
+     * @param rIgnorableText  the text indicating lines to ignore
+     */
+    void IgnoreLinesContaining(const std::string& rIgnorableText)
+    {
+        mIgnorableContent.push_back(rIgnorableText);
+    }
+
+    /**
      * Compare the files under both relative and absolute tolerances.
      * The comparison only fails if neither tolerance holds.  The
      * default settings effectively require numbers to match exactly.
      *
      * @param ignoreFirstFewLines  how many lines to ignore from the comparison
-     * @param doTsAssert  Whether to throw a TS_ASSERT internally (switched off for testing only)
+     * @param doTsAssert  whether to throw a TS_ASSERT internally (switched off for testing only)
      */
     bool CompareFiles(unsigned ignoreFirstFewLines=0, bool doTsAssert=true)
     {
@@ -157,12 +173,33 @@ public:
                 bool skip_this_line = false;
                 for (unsigned i=0; i<mCommentLineStarts.size(); i++)
                 {
-                    // Check for lines starting with "#"
+                    // Check for lines starting with a comment symbol
                     size_t found1 = buffer1.find(mCommentLineStarts[i]);
                     size_t found2 = buffer2.find(mCommentLineStarts[i]);
                     if (found1 == 0 && found2 == 0)
                     {
                         skip_this_line = true;
+                        break;
+                    }
+                }
+                if (skip_this_line)
+                {
+                    continue;
+                }
+            }
+
+            // Check for lines containing ignorable text
+            if (!mIgnorableContent.empty())
+            {
+                bool skip_this_line = false;
+                BOOST_FOREACH(const std::string& rText, mIgnorableContent)
+                {
+                    size_t found1 = buffer1.find(rText);
+                    size_t found2 = buffer2.find(rText);
+                    if (found1 != std::string::npos && found2 != std::string::npos)
+                    {
+                        skip_this_line = true;
+                        break;
                     }
                 }
                 if (skip_this_line)
