@@ -40,16 +40,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define H5_USE_16_API 1
 #endif
 
-#include <hdf5.h>
 #include <petscvec.h>
-#include <string>
 #include <vector>
 #include <map>
 
-#include "FileFinder.hpp"
 #include "AbstractHdf5Access.hpp"
-
-const unsigned MAX_STRING_SIZE = 100; /// \todo: magic number
 
 /**
  * A concrete HDF5 data reader class.
@@ -58,32 +53,20 @@ class Hdf5DataReader : public AbstractHdf5Access
 {
 private:
 
-    std::string mDirectory;                                 /**< Directory output files will be stored in (absolute path). */
-    hid_t mFileId;                                          /**< The data file ID. */
-
-    hid_t mVariablesDatasetId;                              /**< The variables data set ID. */
     unsigned mVariablesDatasetRank;                         /**< The rank of the variables data set. */
-    hsize_t mVariablesDatasetSizes[AbstractHdf5Access::DATASET_DIMS];       /**< The sizes of each variable data set. */
 
-    bool mIsUnlimitedDimensionSet;                          /**< Is the unlimited dimension set */
-    hid_t mTimeDatasetId;                                   /**< The time data set ID. */
     hsize_t mNumberTimesteps;                               /**< The number of time steps recorded in the data file. */
 
     std::vector<std::string> mVariableNames;                /**< The variable names. */
     std::map<std::string, unsigned> mVariableToColumnIndex; /**< Map between variable names and data column numbers. */
     std::map<std::string, std::string> mVariableToUnit;     /**< Map between variable names and variable units. */
 
-    bool mIsDataComplete;                                   /**< Whether the data file is complete. */
-    std::vector<unsigned> mIncompleteNodeIndices;           /**< Vector of node indices for which the data file does not contain data. */
-
     bool mClosed;                                           /**< Whether we've already closed the file. */
 
     /**
      * Contains functionality common to both constructors.
-     *
-     * @param rDirectory  The directory the files are stored in
      */
-    void CommonConstructor(const FileFinder& rDirectory);
+    void CommonConstructor();
 
 public:
 
@@ -94,19 +77,23 @@ public:
      * @param rBaseName  The base name of the files to read (i.e. without the extensions)
      * @param makeAbsolute  Whether to convert directory to an absolute path using the
      *                      OutputFileHandler (defaults to true)
+     * @param datasetName The name of the HDF5 dataset to write, defaults to "Data".
      */
     Hdf5DataReader(const std::string& rDirectory,
                    const std::string& rBaseName,
-                   bool makeAbsolute=true);
+                   bool makeAbsolute=true,
+                   std::string datasetName="Data");
 
     /**
      * Alternative constructor taking a FileFinder to specify the directory.
      *
      * @param rDirectory  The directory the files are stored in
      * @param rBaseName  The base name of the files to read (i.e. without the extensions)
+     * @param datasetName The name of the HDF5 dataset to write, defaults to "Data".
      */
     Hdf5DataReader(const FileFinder& rDirectory,
-                   const std::string& rBaseName);
+                   const std::string& rBaseName,
+                   std::string datasetName="Data");
 
     /**
      * Get the values of a given variable at each time step at a given node.
@@ -158,16 +145,6 @@ public:
      * @param rVariableName  name of a variable in the data file
      */
     std::string GetUnit(const std::string& rVariableName);
-
-    /**
-     * Get method for mIsDataComplete.
-     */
-    bool IsDataComplete();
-
-    /**
-     * Get method for mIncompleteNodeIndices.
-     */
-    std::vector<unsigned> GetIncompleteNodeMap();
 
     /**
      * Close any open files.

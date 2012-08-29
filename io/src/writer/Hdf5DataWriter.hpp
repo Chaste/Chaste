@@ -36,13 +36,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef HDF5DATAWRITER_HPP_
 #define HDF5DATAWRITER_HPP_
 
-#include <string>
 #include <vector>
 
-#include "Hdf5DataReader.hpp" //For common definitions
+#include "AbstractHdf5Access.hpp"
 #include "DataWriterVariable.hpp"
 #include "DistributedVectorFactory.hpp"
-#include "AbstractHdf5Access.hpp"
+
 /**
  * A concrete HDF5 data writer class.
  */
@@ -52,43 +51,35 @@ private:
 
     /** The factory to use in creating PETSc Vec and DistributedVector objects. */
     DistributedVectorFactory& mrVectorFactory;
-    std::string mDirectory; /**< Directory output files will be stored in. */
-    bool mCleanDirectory;   /**< Whether to wipe the output directory */
-    bool mIsInDefineMode; /**< Is the DataWriter in define mode or not */
-    bool mIsFixedDimensionSet; /**< Is the fixed dimension set */
-    bool mIsUnlimitedDimensionSet; /**< Is the unlimited dimension set */
-    std::string mUnlimitedDimensionName; /**< The name of the unlimited dimension. */
-    std::string mUnlimitedDimensionUnit; /**< The physical units of the unlimited dimension. */
-    unsigned mEstimatedUnlimitedLength; /**<An estimate of the unlimited dimension length for performance reasons. */
-    unsigned mFileFixedDimensionSize; /**< The size of the fixed dimension (number of rows)*/
-    unsigned mDataFixedDimensionSize; /**< The size of the fixed dimension (size of the vector of nodes)*/
-    unsigned mLo; /**< Local ownership of a PETSc vector of size #mFileFixedDimensionSize*/
-    unsigned mHi; /**< Local ownership of a PETSc vector of size #mFileFixedDimensionSize*/
-    unsigned mNumberOwned; /**< mNumberOwned=#mHi-#mLo; except with incomplete data*/
-    unsigned mOffset; /**< mOffset=#mLo; except with incomplete data*/
-    bool mIsDataComplete; /**< Whether the data file is complete. */
-    bool mNeedExtend; /**< Used so that the data set is only extended when data is written*/
-    std::vector<unsigned> mIncompleteNodeIndices; /**< Vector of node indices for which the data file does contain data. */
-    bool mUseMatrixForIncompleteData; /**< Whether to use a matrix format for incomplete data */
 
-    std::vector<DataWriterVariable> mVariables; /**< The data variables */
+    bool mCleanDirectory;                           /**< Whether to wipe the output directory */
+    bool mIsInDefineMode;                           /**< Is the DataWriter in define mode or not */
+    bool mIsFixedDimensionSet;                      /**< Is the fixed dimension set */
+    std::string mUnlimitedDimensionName;            /**< The name of the unlimited dimension. */
+    std::string mUnlimitedDimensionUnit;            /**< The physical units of the unlimited dimension. */
+    unsigned mEstimatedUnlimitedLength;             /**< An estimate of the unlimited dimension length for performance reasons. */
+    unsigned mFileFixedDimensionSize;               /**< The size of the fixed dimension (number of rows)*/
+    unsigned mDataFixedDimensionSize;               /**< The size of the fixed dimension (size of the vector of nodes)*/
+    unsigned mLo;                                   /**< Local ownership of a PETSc vector of size #mFileFixedDimensionSize*/
+    unsigned mHi;                                   /**< Local ownership of a PETSc vector of size #mFileFixedDimensionSize*/
+    unsigned mNumberOwned;                          /**< mNumberOwned=#mHi-#mLo; except with incomplete data*/
+    unsigned mOffset;                               /**< mOffset=#mLo; except with incomplete data*/
 
-    hid_t mFileId; /**< The data file ID. */
-    hid_t mDatasetId; /**< The variables data set ID. */
-    hid_t mTimeDatasetId; /**< The time data set ID. */
+    bool mNeedExtend;                               /**< Used so that the data set is only extended when data is written*/
+    bool mUseMatrixForIncompleteData;               /**< Whether to use a matrix format for incomplete data */
 
-    long mCurrentTimeStep; /**< The current time step. */
+    std::vector<DataWriterVariable> mVariables;     /**< The data variables */
 
-    hsize_t mDatasetDims[AbstractHdf5Access::DATASET_DIMS]; /**< The sizes of each variable data set. */
+    long mCurrentTimeStep;                          /**< The current time step. */
 
-    Mat mSinglePermutation; /**< Stores a permutation as a matrix */
-    Mat mDoublePermutation;/**< Stores a permutation of a striped structure (u_0 v_0 u_1 v_1) as a matrix */
+    Mat mSinglePermutation;                         /**< Stores a permutation as a matrix */
+    Mat mDoublePermutation;                         /**< Stores a permutation of a striped structure (u_0 v_0 u_1 v_1) as a matrix */
 
-    Mat mSingleIncompleteOutputMatrix; /**< Stores nodes to be output as a matrix */
-    Mat mDoubleIncompleteOutputMatrix; /**< Stores striped nodes to be output as a matrix */
+    Mat mSingleIncompleteOutputMatrix;              /**< Stores nodes to be output as a matrix */
+    Mat mDoubleIncompleteOutputMatrix;              /**< Stores striped nodes to be output as a matrix */
 
-    bool mUseOptimalChunkSizeAlgorithm; /**< Whether to use the built-in algorithm for optimal chunk size */
-    unsigned mFixedChunkSize; /**< User-provided chunk size */
+    bool mUseOptimalChunkSizeAlgorithm;             /**< Whether to use the built-in algorithm for optimal chunk size */
+    unsigned mFixedChunkSize;                       /**< User-provided chunk size */
 
     /**
      * Check name of variable is allowed, i.e. contains only alphanumeric & _, and isn't blank.
@@ -119,6 +110,7 @@ public:
      * @param rBaseName  the name of the file in which to write the data
      * @param cleanDirectory  whether to clean the directory (defaults to true)
      * @param extendData  whether to try opening an existing file and appending to it.
+     * @param datasetName The name of the HDF5 dataset to write, defaults to "Data".
      *
      * The extendData parameter allows us to add to an existing dataset.  It only really makes
      * sense if the existing file has an unlimited dimension which we can extend.  It also only
@@ -128,7 +120,8 @@ public:
                    const std::string& rDirectory,
                    const std::string& rBaseName,
                    bool cleanDirectory=true,
-                   bool extendData=false);
+                   bool extendData=false,
+                   std::string datasetName="Data");
 
     /**
      * Destructor.

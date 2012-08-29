@@ -43,49 +43,34 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 Hdf5DataReader::Hdf5DataReader(const std::string& rDirectory,
                                const std::string& rBaseName,
-                               bool makeAbsolute)
-    : AbstractHdf5Access(rBaseName, "Data"),
-      mIsUnlimitedDimensionSet(false),
+                               bool makeAbsolute,
+                               std::string datasetName)
+    : AbstractHdf5Access(rDirectory, rBaseName, datasetName, makeAbsolute),
       mNumberTimesteps(1),
-      mIsDataComplete(true),
       mClosed(false)
 {
-    RelativeTo::Value relative_to;
-    if (makeAbsolute)
-    {
-        relative_to = RelativeTo::ChasteTestOutput;
-    }
-    else
-    {
-        relative_to = RelativeTo::Absolute;
-    }
-    FileFinder directory(rDirectory, relative_to);
-    CommonConstructor(directory);
+    CommonConstructor();
 }
 
 Hdf5DataReader::Hdf5DataReader(const FileFinder& rDirectory,
-                               const std::string& rBaseName)
-    : AbstractHdf5Access(rBaseName, "Data"),
-      mIsUnlimitedDimensionSet(false),
+                               const std::string& rBaseName,
+                               std::string datasetName)
+    : AbstractHdf5Access(rDirectory, rBaseName, datasetName),
       mNumberTimesteps(1),
-      mIsDataComplete(true),
       mClosed(false)
 {
-    CommonConstructor(rDirectory);
+    CommonConstructor();
 }
 
-void Hdf5DataReader::CommonConstructor(const FileFinder& rDirectory)
+void Hdf5DataReader::CommonConstructor()
 {
-    std::string results_dir = rDirectory.GetAbsolutePath();
-    if (!rDirectory.IsDir() || !rDirectory.Exists())
+    if (!mDirectory.IsDir() || !mDirectory.Exists())
     {
-        EXCEPTION("Directory does not exist: " + results_dir);
+        EXCEPTION("Directory does not exist: " + mDirectory.GetAbsolutePath());
     }
-    mDirectory = results_dir;
-    assert(*(mDirectory.end()-1) == '/'); // paranoia
 
-    std::string file_name = results_dir + mBaseName + ".h5";
-    FileFinder h5_file(file_name,RelativeTo::Absolute);
+    std::string file_name = mDirectory.GetAbsolutePath() + mBaseName + ".h5";
+    FileFinder h5_file(file_name, RelativeTo::Absolute);
 
     if (!h5_file.Exists())
     {
@@ -108,11 +93,11 @@ void Hdf5DataReader::CommonConstructor(const FileFinder& rDirectory)
 
     // Get the dataset/dataspace dimensions
     hsize_t dataset_max_sizes[AbstractHdf5Access::DATASET_DIMS];
-    H5Sget_simple_extent_dims(variables_dataspace, mVariablesDatasetSizes, dataset_max_sizes);
+    H5Sget_simple_extent_dims(variables_dataspace, mDatasetDims, dataset_max_sizes);
 
     for (unsigned i=1; i<AbstractHdf5Access::DATASET_DIMS; i++)  // Zero is excluded since it may be unlimited
     {
-        assert(mVariablesDatasetSizes[i] == dataset_max_sizes[i]);
+        assert(mDatasetDims[i] == dataset_max_sizes[i]);
     }
 
     // Check if an unlimited dimension has been defined
@@ -237,7 +222,7 @@ std::vector<double> Hdf5DataReader::GetVariableOverTime(const std::string& rVari
             EXCEPTION("The incomplete file does not contain info of node " << nodeIndex);
         }
     }
-    if (actual_node_index >= mVariablesDatasetSizes[1])
+    if (actual_node_index >= mDatasetDims[1])
     {
         EXCEPTION("The file doesn't contain info of node " << actual_node_index);
     }
@@ -251,15 +236,15 @@ std::vector<double> Hdf5DataReader::GetVariableOverTime(const std::string& rVari
 
     // Define hyperslab in the dataset.
     hsize_t offset[3] = {0, actual_node_index, column_index};
-    hsize_t count[3]  = {mVariablesDatasetSizes[0], 1, 1};
+    hsize_t count[3]  = {mDatasetDims[0], 1, 1};
     hid_t variables_dataspace = H5Dget_space(mVariablesDatasetId);
     H5Sselect_hyperslab(variables_dataspace, H5S_SELECT_SET, offset, NULL, count, NULL);
 
     // Define a simple memory dataspace
-    hid_t memspace = H5Screate_simple(1, &mVariablesDatasetSizes[0] ,NULL);
+    hid_t memspace = H5Screate_simple(1, &mDatasetDims[0] ,NULL);
 
     // Data buffer to return
-    std::vector<double> ret(mVariablesDatasetSizes[0]);
+    std::vector<double> ret(mDatasetDims[0]);
 
     // Read data from hyperslab in the file into the hyperslab in memory
     H5Dread(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, variables_dataspace, H5P_DEFAULT, &ret[0]);
@@ -284,7 +269,7 @@ std::vector<std::vector<double> > Hdf5DataReader::GetVariableOverTimeOverMultipl
         EXCEPTION("GetVariableOverTimeOverMultipleNodes() cannot be called using incomplete data sets (those for which data was only written for certain nodes)");
     }
 
-    if (upperIndex > mVariablesDatasetSizes[1])
+    if (upperIndex > mDatasetDims[1])
     {
        EXCEPTION("The file doesn't contain info for node " << upperIndex-1);
     }
@@ -298,17 +283,17 @@ std::vector<std::vector<double> > Hdf5DataReader::GetVariableOverTimeOverMultipl
 
     // Define hyperslab in the dataset.
     hsize_t offset[3] = {0, lowerIndex, column_index};
-    hsize_t count[3]  = {mVariablesDatasetSizes[0], upperIndex-lowerIndex, 1};
+    hsize_t count[3]  = {mDatasetDims[0], upperIndex-lowerIndex, 1};
     hid_t variables_dataspace = H5Dget_space(mVariablesDatasetId);
     H5Sselect_hyperslab(variables_dataspace, H5S_SELECT_SET, offset, NULL, count, NULL);
 
     // Define a simple memory dataspace
     hsize_t data_dimensions[2];
-    data_dimensions[0] = mVariablesDatasetSizes[0];
+    data_dimensions[0] = mDatasetDims[0];
     data_dimensions[1] = upperIndex-lowerIndex;
     hid_t memspace = H5Screate_simple(2, data_dimensions, NULL);
 
-    double* data_read = new double[mVariablesDatasetSizes[0]*(upperIndex-lowerIndex)];
+    double* data_read = new double[mDatasetDims[0]*(upperIndex-lowerIndex)];
 
     // Read data from hyperslab in the file into the hyperslab in memory
     H5Dread(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, variables_dataspace, H5P_DEFAULT, data_read);
@@ -318,7 +303,7 @@ std::vector<std::vector<double> > Hdf5DataReader::GetVariableOverTimeOverMultipl
 
     // Data buffer to return
     unsigned num_nodes_read = upperIndex-lowerIndex;
-    unsigned num_timesteps = mVariablesDatasetSizes[0];
+    unsigned num_timesteps = mDatasetDims[0];
 
     std::vector<std::vector<double> > ret(num_nodes_read);
 
@@ -364,7 +349,7 @@ void Hdf5DataReader::GetVariableOverNodes(Vec data,
 
     int lo, hi, size;
     VecGetSize(data, &size);
-    if ((unsigned)size != mVariablesDatasetSizes[1])
+    if ((unsigned)size != mDatasetDims[1])
     {
         EXCEPTION("Could not read data because Vec is the wrong size");
     }
@@ -443,7 +428,7 @@ Hdf5DataReader::~Hdf5DataReader()
 
 unsigned Hdf5DataReader::GetNumberOfRows()
 {
-    return mVariablesDatasetSizes[1];
+    return mDatasetDims[1];
 }
 
 std::vector<std::string> Hdf5DataReader::GetVariableNames()
@@ -456,12 +441,4 @@ std::string Hdf5DataReader::GetUnit(const std::string& rVariableName)
     return mVariableToUnit[rVariableName];
 }
 
-bool Hdf5DataReader::IsDataComplete()
-{
-    return mIsDataComplete;
-}
 
-std::vector<unsigned> Hdf5DataReader::GetIncompleteNodeMap()
-{
-    return mIncompleteNodeIndices;
-}

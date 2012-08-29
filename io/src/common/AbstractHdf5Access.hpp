@@ -36,29 +36,79 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTHDF5ACCESS_HPP_
 #define ABSTRACTHDF5ACCESS_HPP_
 
+#include <hdf5.h>
 #include <string>
+#include "FileFinder.hpp"
+
+const unsigned MAX_STRING_SIZE = 100; /// \todo: magic number
 
 /**
  * An abstract class to get common code for reading and writing HDF5 files into one place.
+ *
+ * It doesn't do very much, but provides common member variables.
  */
 class AbstractHdf5Access
 {
+
 protected:
-    std::string mBaseName;                                  /**< The base name for the output data files. */
-    std::string mDatasetName;                               /**< The base name for the dataset we are reading. */
-    static const unsigned DATASET_DIMS=3;                   /**< The dimensions of each dataset (variable, node, time) */
+    std::string mBaseName;                          /**< The base name for the data files. */
+    std::string mDatasetName;                       /**< The base name for the dataset we are reading/writing. */
+    FileFinder mDirectory;                          /**< Directory HDF5 file will be, or is, stored in. */
+    static const unsigned DATASET_DIMS=3;           /**< The dimensions of each dataset (variable, node, time). */
+
+    bool mIsDataComplete;                           /**< Whether the data file is complete. */
+    bool mIsUnlimitedDimensionSet;                  /**< Is the unlimited dimension set */
+    std::vector<unsigned> mIncompleteNodeIndices;   /**< Vector of node indices for which the data file does not contain data. */
+
+    hid_t mFileId;                                  /**< The data file ID. */
+    hid_t mTimeDatasetId;                           /**< The time dataset ID. */
+    hid_t mVariablesDatasetId;                      /**< The variables dataset ID. */
+    hsize_t mDatasetDims[DATASET_DIMS];             /**< The sizes of each dimension of the dataset (variable, node, time). */
 
 public:
     /**
-     * Constructor
+     * Constructor for directory given as string
      *
+     * @param rDirectory  the directory in which to read/write the data to file
      * @param rBaseName  The base name of the HDF5 file (with no extension)
-     * @param datasetName  The dataset name - default is "Data" for voltage and extracellular potential.
+     * @param rDatasetName  The dataset name - default is "Data" for voltage and extracellular potential.
+     * @param makeAbsolute Whether the dataset is relative to chaste test output at present.
      */
-    AbstractHdf5Access(const std::string& rBaseName,
-                       std::string datasetName)
+    AbstractHdf5Access(const std::string& rDirectory,
+                       const std::string& rBaseName,
+                       const std::string& rDatasetName,
+                       bool makeAbsolute = true)
      : mBaseName(rBaseName),
-       mDatasetName(datasetName)
+       mDatasetName(rDatasetName),
+       mIsDataComplete(true),
+       mIsUnlimitedDimensionSet(false)
+    {
+        RelativeTo::Value relative_to;
+        if (makeAbsolute)
+        {
+            relative_to = RelativeTo::ChasteTestOutput;
+        }
+        else
+        {
+            relative_to = RelativeTo::Absolute;
+        }
+        mDirectory.SetPath(rDirectory, relative_to);
+    }
+
+    /**
+     * Constructor for directory given as FileFinder
+     *
+     * @param rDirectory  the directory in which to read/write the data to file
+     * @param rBaseName  The base name of the HDF5 file (with no extension)
+     * @param rDatasetName  The dataset name - default is "Data" for voltage and extracellular potential.
+     */
+    AbstractHdf5Access(const FileFinder& rDirectory,
+                       const std::string& rBaseName,
+                       const std::string& rDatasetName)
+     : mBaseName(rBaseName),
+       mDatasetName(rDatasetName),
+       mDirectory(rDirectory),
+       mIsDataComplete(true)
     {
     }
 
@@ -66,6 +116,24 @@ public:
      * Destructor.
      */
     virtual ~AbstractHdf5Access(){};
+
+    /**
+     * Get method for mIsDataComplete.
+     *
+     * @return #mIsDataComplete.
+     */
+    bool IsDataComplete()
+    {
+        return mIsDataComplete;
+    }
+
+    /**
+     * Get method for mIncompleteNodeIndices.
+     */
+    std::vector<unsigned> GetIncompleteNodeMap()
+    {
+        return mIncompleteNodeIndices;
+    }
 };
 
 #endif // ABSTRACTHDF5ACCESS_HPP_
