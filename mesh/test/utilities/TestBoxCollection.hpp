@@ -704,6 +704,46 @@ public:
         }
     }
 
+    ///\todo #2234
+//    void TestFailingPairsReturned3d() throw (Exception)
+//    {
+//        // Test to ensure that pair calculation is independent of box size.
+//
+//        // 3D cube of nodes.
+//        std::vector<Node<3>* > nodes;
+//        nodes.push_back(new Node<3>(0, false, 2.9, 2.9 ,2.9));
+//        nodes.push_back(new Node<3>(1, false, 2.9, 2.9 ,3.1));
+//
+//        // They definitely should be a pair
+//        TS_ASSERT_LESS_THAN(norm_2(nodes[0]->rGetLocation() - nodes[1]->rGetLocation()), 1.5);
+//
+//        double cut_off_length = 1.5;
+//
+//        c_vector<double, 2*3> domain_size;  // 3x3x3 boxes
+//        domain_size(0) = 0.0;
+//        domain_size(1) = 4.4;
+//        domain_size(2) = 0.0;
+//        domain_size(3) = 4.4;
+//        domain_size(4) = 0.0;
+//        domain_size(5) = 4.4;
+//
+//        BoxCollection<3> box_collection(cut_off_length, domain_size);
+//        box_collection.SetupLocalBoxesHalfOnly();
+//
+//        for (unsigned i=0; i<nodes.size(); i++)
+//        {
+//            unsigned box_index = box_collection.CalculateContainingBox(nodes[i]);
+//            box_collection.rGetBox(box_index).AddNode(nodes[i]);
+//        }
+//
+//        std::set< std::pair<Node<3>*, Node<3>* > > pairs_returned;
+//        std::map<unsigned, std::set<unsigned> > neighbours_returned;
+//
+//        box_collection.CalculateNodePairs(nodes,pairs_returned, neighbours_returned);
+//
+//        TS_ASSERT_EQUALS(pairs_returned.size(), 1u);
+//    }
+
     void TestPairsReturned2dPeriodic() throw (Exception)
     {
         std::vector< ChastePoint<2>* > points(10);
