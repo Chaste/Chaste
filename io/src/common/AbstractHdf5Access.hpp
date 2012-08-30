@@ -40,6 +40,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include "FileFinder.hpp"
 
+#ifndef H5_USE_16_API
+#define H5_USE_16_API 1
+#endif
+
 const unsigned MAX_STRING_SIZE = 100; /// \todo: magic number
 
 /**

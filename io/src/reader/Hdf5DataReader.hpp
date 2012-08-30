@@ -36,9 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef HDF5DATAREADER_HPP_
 #define HDF5DATAREADER_HPP_
 
-#ifndef H5_USE_16_API
-#define H5_USE_16_API 1
-#endif
+
 
 #include <petscvec.h>
 #include <vector>
