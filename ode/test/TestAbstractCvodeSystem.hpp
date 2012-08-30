@@ -367,7 +367,7 @@ public:
         TS_ASSERT_DELTA(testvalue, exact_solution, global_error);
 
         ode_system.mUseAnalyticJacobian = true;
-        ode_system.mpCvodeMem = NULL; // Force a re-set
+        ode_system.FreeCvodeMemory(); // Force a re-set
 
         // Here Chaste throws the error "No analytic Jacobian has been defined for this system."
         // which CVODE then re-throws with its own 'headline':

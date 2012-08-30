@@ -132,8 +132,9 @@ public:
         FileFinder absent_dir("absent_dir", RelativeTo::ChasteTestOutput);
         TS_ASSERT_THROWS_CONTAINS(mpTestReader = new ColumnDataReader(absent_dir, "file"), "Directory does not exist: ");
 
-        // Folder is defined with trailing /
-        TS_ASSERT_THROWS_NOTHING(mpTestReader = new ColumnDataReader("io/test/data/", "testunlimitednegative2", false ));
+        // Folder is defined with trailing '/' - check this runs OK.
+        mpTestReader = new ColumnDataReader("io/test/data/", "testunlimitednegative2", false );
+        delete mpTestReader;
     }
 
     void TestDetermineFieldWidth() throw(Exception)
