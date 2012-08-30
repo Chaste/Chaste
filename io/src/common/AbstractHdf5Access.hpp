@@ -36,13 +36,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTHDF5ACCESS_HPP_
 #define ABSTRACTHDF5ACCESS_HPP_
 
+#ifndef H5_USE_16_API
+#define H5_USE_16_API 1
+#endif
+
 #include <hdf5.h>
 #include <string>
 #include "FileFinder.hpp"
 
-#ifndef H5_USE_16_API
-#define H5_USE_16_API 1
-#endif
 
 const unsigned MAX_STRING_SIZE = 100; /// \todo: magic number
 
