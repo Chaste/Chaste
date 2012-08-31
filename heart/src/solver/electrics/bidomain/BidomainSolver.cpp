@@ -205,8 +205,7 @@ BidomainSolver<ELEMENT_DIM,SPACE_DIM>::BidomainSolver(
         bool bathSimulation,
         AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
         BidomainTissue<SPACE_DIM>* pTissue,
-        BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,2>* pBoundaryConditions,
-        unsigned numQuadPoints)
+        BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,2>* pBoundaryConditions)
     : AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>(bathSimulation,pMesh,pTissue,pBoundaryConditions)
 {
     // Tell tissue there's no need to replicate ionic caches
@@ -216,11 +215,11 @@ BidomainSolver<ELEMENT_DIM,SPACE_DIM>::BidomainSolver(
     // create assembler
     if(bathSimulation)
     {
-        mpBidomainAssembler = new BidomainWithBathAssembler<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,this->mpBidomainTissue,this->mNumQuadPoints);
+        mpBidomainAssembler = new BidomainWithBathAssembler<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,this->mpBidomainTissue);
     }
     else
     {
-        mpBidomainAssembler = new BidomainAssembler<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,this->mpBidomainTissue,this->mNumQuadPoints);
+        mpBidomainAssembler = new BidomainAssembler<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,this->mpBidomainTissue);
     }
 
 
@@ -229,7 +228,7 @@ BidomainSolver<ELEMENT_DIM,SPACE_DIM>::BidomainSolver(
     if(HeartConfig::Instance()->GetUseStateVariableInterpolation())
     {
         mpBidomainCorrectionTermAssembler
-            = new BidomainCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,this->mpBidomainTissue,this->mNumQuadPoints);
+            = new BidomainCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,this->mpBidomainTissue);
         //We are going to need those caches after all
         pTissue->SetCacheReplication(true);
     }

@@ -171,18 +171,16 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>::OperatorSplittingMonodomainSolver(
             AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
             MonodomainTissue<ELEMENT_DIM,SPACE_DIM>* pTissue,
-            BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,1>* pBoundaryConditions,
-            unsigned numQuadPoints)
+            BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,1>* pBoundaryConditions)
     : AbstractDynamicLinearPdeSolver<ELEMENT_DIM,SPACE_DIM,1>(pMesh),
       mpBoundaryConditions(pBoundaryConditions),
-      mpMonodomainTissue(pTissue),
-      mNumQuadPoints(numQuadPoints)
+      mpMonodomainTissue(pTissue)
 {
     assert(pTissue);
     assert(pBoundaryConditions);
     this->mMatrixIsConstant = true;
 
-    mpMonodomainAssembler = new MonodomainAssembler<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,this->mpMonodomainTissue,this->mNumQuadPoints);
+    mpMonodomainAssembler = new MonodomainAssembler<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,this->mpMonodomainTissue);
     mpNeumannSurfaceTermsAssembler = new NaturalNeumannSurfaceTermAssembler<ELEMENT_DIM,SPACE_DIM,1>(pMesh,pBoundaryConditions);
 
     // Tell tissue there's no need to replicate ionic caches

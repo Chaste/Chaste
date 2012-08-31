@@ -64,12 +64,6 @@ protected:
     BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,3>* mpBoundaryConditions;
 
     /**
-     *  Number of quadrature points per dimension (only saved so it can be
-     *  passed to the assembler)
-     */
-    unsigned mNumQuadPoints;
-
-    /**
      *  The extended bidomain assembler, used to set up the LHS matrix,
      *  (but not used to set uo the RHS)
      */
@@ -156,13 +150,11 @@ public:
      * @param pMesh pointer to the mesh
      * @param pTissue pointer to the PDE
      * @param pBcc pointer to the boundary conditions container
-     * @param numQuadPoints number of quadrature points (defaults to 2)
      */
     AbstractExtendedBidomainSolver(bool bathSimulation,
                          AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
                          ExtendedBidomainTissue<SPACE_DIM>* pTissue,
-                         BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, 3>* pBcc,
-                         unsigned numQuadPoints = 2);
+                         BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, 3>* pBcc);
 
     /**
      * Destructor.

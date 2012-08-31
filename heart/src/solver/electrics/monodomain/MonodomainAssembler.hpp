@@ -105,11 +105,9 @@ public:
      *
      * @param pMesh pointer to the mesh
      * @param pTissue pointer to the tissue
-     * @param numQuadPoints number of quadrature points (defaults to 2)
      */
     MonodomainAssembler(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                        MonodomainTissue<ELEMENT_DIM,SPACE_DIM>* pTissue,
-                        unsigned numQuadPoints = 2);
+                        MonodomainTissue<ELEMENT_DIM,SPACE_DIM>* pTissue);
 };
 
 #endif /*MONODOMAINASSEMBLER_HPP_*/

@@ -108,12 +108,10 @@ public:
      * @param pMesh pointer to the mesh
      * @param pPde pointer to the PDE
      * @param pBoundaryConditions pointer to the boundary conditions
-     * @param numQuadPoints number of quadrature points in each dimension to use per element (defaults to 2)
      */
     SimpleNonlinearEllipticSolver(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
                                   AbstractNonlinearEllipticPde<SPACE_DIM>* pPde,
-                                  BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, 1>* pBoundaryConditions,
-                                  unsigned numQuadPoints=2);
+                                  BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, 1>* pBoundaryConditions);
 };
 
 #endif /*SIMPLENONLINEARELLIPTICSOLVER_HPP_*/

@@ -102,9 +102,8 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 SimpleNonlinearEllipticSolver<ELEMENT_DIM,SPACE_DIM>::SimpleNonlinearEllipticSolver(
                               AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
                               AbstractNonlinearEllipticPde<SPACE_DIM>* pPde,
-                              BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, 1>* pBoundaryConditions,
-                              unsigned numQuadPoints)
-    :  AbstractNonlinearAssemblerSolverHybrid<ELEMENT_DIM,SPACE_DIM,1>(pMesh,pBoundaryConditions,numQuadPoints),
+                              BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, 1>* pBoundaryConditions)
+    :  AbstractNonlinearAssemblerSolverHybrid<ELEMENT_DIM,SPACE_DIM,1>(pMesh,pBoundaryConditions),
        mpNonlinearEllipticPde(pPde)
 {
     assert(pPde!=NULL);

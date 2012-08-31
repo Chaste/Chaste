@@ -75,12 +75,10 @@ public:
      *
      * @param pMesh pointer to the mesh
      * @param pTissue pointer to the tissue
-     * @param numQuadPoints number of quadrature points (defaults to 2)
      */
     BidomainWithBathAssembler(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                              BidomainTissue<SPACE_DIM>* pTissue,
-                              unsigned numQuadPoints = 2)
-      : BidomainAssembler<ELEMENT_DIM,SPACE_DIM>(pMesh,pTissue,numQuadPoints)
+                              BidomainTissue<SPACE_DIM>* pTissue)
+      : BidomainAssembler<ELEMENT_DIM,SPACE_DIM>(pMesh,pTissue)
     {
     }
 

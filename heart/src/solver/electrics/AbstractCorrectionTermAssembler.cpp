@@ -39,9 +39,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 AbstractCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AbstractCorrectionTermAssembler(
         AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-        AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>* pTissue,
-        unsigned numQuadPoints)
-    : AbstractCardiacFeVolumeIntegralAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM,true,false,CARDIAC>(pMesh,pTissue,numQuadPoints)
+        AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>* pTissue)
+    : AbstractCardiacFeVolumeIntegralAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM,true,false,CARDIAC>(pMesh,pTissue)
 {
     // Work out which elements have the same cell at every node, and hence can have SVI done
     mElementsHasIdenticalCellModels.resize(pMesh->GetNumElements(), true);

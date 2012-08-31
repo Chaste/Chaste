@@ -122,12 +122,10 @@ public:
      * @param pMesh pointer to the mesh
      * @param pPde pointer to the PDE
      * @param pBoundaryConditions pointer to the boundary conditions
-     * @param numQuadPoints number of quadrature points in each dimension to use per element (defaults to 2)
      */
     SimpleLinearParabolicSolver(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
                                 AbstractLinearParabolicPde<ELEMENT_DIM,SPACE_DIM>* pPde,
-                                BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,1>* pBoundaryConditions,
-                                unsigned numQuadPoints = 2);
+                                BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,1>* pBoundaryConditions);
 };
 
 #endif /*SIMPLELINEARPARABOLICSOLVER_HPP_*/

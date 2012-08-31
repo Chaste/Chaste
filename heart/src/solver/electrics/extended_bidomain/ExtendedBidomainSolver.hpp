@@ -105,13 +105,11 @@ public:
      * @param pMesh pointer to the mesh
      * @param pTissue pointer to the PDE
      * @param pBoundaryConditions pointer to the boundary conditions
-     * @param numQuadPoints number of quadrature points (defaults to 2)
      */
     ExtendedBidomainSolver(bool bathSimulation,
                               AbstractTetrahedralMesh<ELEM_DIM,SPACE_DIM>* pMesh,
                               ExtendedBidomainTissue<SPACE_DIM>* pTissue,
-                              BoundaryConditionsContainer<ELEM_DIM,SPACE_DIM,3>* pBoundaryConditions,
-                              unsigned numQuadPoints = 2);
+                              BoundaryConditionsContainer<ELEM_DIM,SPACE_DIM,3>* pBoundaryConditions);
 
     /**
      * Destructor

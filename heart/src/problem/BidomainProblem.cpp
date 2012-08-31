@@ -135,8 +135,7 @@ AbstractDynamicLinearPdeSolver<DIM, DIM, 2>* BidomainProblem<DIM>::CreateSolver(
     mpSolver = new BidomainSolver<DIM,DIM>(mHasBath,
                                            this->mpMesh,
                                            mpBidomainTissue,
-                                           this->mpBoundaryConditionsContainer.get(),
-                                           2);
+                                           this->mpBoundaryConditionsContainer.get());
 
     try
     {

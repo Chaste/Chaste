@@ -163,8 +163,22 @@ GaussianQuadratureRule<2>::GaussianQuadratureRule(unsigned numPointsInEachDimens
 {
     mNumQuadPoints = numPointsInEachDimension * numPointsInEachDimension;
 
+//    mNumQuadPoints = 3;
+
     mWeights.reserve(mNumQuadPoints);
     mPoints.reserve(mNumQuadPoints);
+
+//   mWeights.push_back(1.0/6.0);
+//    mWeights.push_back(1.0/6.0);
+//    mWeights.push_back(1.0/6.0);
+//
+//    mPoints.push_back(ChastePoint<2>(2.0/3.0, 1.0/6.0));
+//    mPoints.push_back(ChastePoint<2>(1.0/6.0, 2.0/3.0));
+//    mPoints.push_back(ChastePoint<2>(1.0/6.0, 1.0/6.0));
+//
+//return;
+
+
 
     switch (numPointsInEachDimension)
     {
@@ -438,9 +452,29 @@ GaussianQuadratureRule<3>::GaussianQuadratureRule(unsigned numPointsInEachDimens
 {
     mNumQuadPoints = numPointsInEachDimension * numPointsInEachDimension * numPointsInEachDimension;
 
+//    mNumQuadPoints = 4;
+
+
     mWeights.reserve(mNumQuadPoints);
     mPoints.reserve(mNumQuadPoints);
 
+//    double a = 0.585410196624969;
+//    double b = 0.138196601125011;
+//    double w = .0416666666666666666666666666666666666666666667;
+//
+//
+//    mWeights.push_back(w);
+//    mWeights.push_back(w);
+//    mWeights.push_back(w);
+//    mWeights.push_back(w);
+//
+//    mPoints.push_back(ChastePoint<3>(a,b,b));
+//    mPoints.push_back(ChastePoint<3>(b,a,b));
+//    mPoints.push_back(ChastePoint<3>(b,b,a));
+//    mPoints.push_back(ChastePoint<3>(b,b,b));
+//
+//
+//return;
     switch (numPointsInEachDimension)
     {
         case 1: //3d, 1 point per dimension

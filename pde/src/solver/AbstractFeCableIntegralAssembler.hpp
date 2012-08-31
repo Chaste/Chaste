@@ -198,10 +198,8 @@ public:
      * Constructor.
      *
      * @param pMesh The mesh
-     * @param numQuadPoints The number of quadratures points (in each dimension) to use
-     *  per element. Defaults to 2.
      */
-    AbstractFeCableIntegralAssembler(MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* pMesh, unsigned numQuadPoints=2);
+    AbstractFeCableIntegralAssembler(MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* pMesh);
 
     /**
      * Destructor.
@@ -216,15 +214,14 @@ public:
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM, bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX, InterpolationLevel INTERPOLATION_LEVEL>
 AbstractFeCableIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_ASSEMBLE_VECTOR, CAN_ASSEMBLE_MATRIX, INTERPOLATION_LEVEL>::AbstractFeCableIntegralAssembler(
-            MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* pMesh, unsigned numQuadPoints)
+            MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* pMesh)
     : AbstractFeAssemblerCommon<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_ASSEMBLE_VECTOR, CAN_ASSEMBLE_MATRIX, INTERPOLATION_LEVEL>(),
       mpMesh(pMesh)
 {
     assert(pMesh);
-    assert(numQuadPoints > 0);
     assert(CAN_ASSEMBLE_VECTOR || CAN_ASSEMBLE_MATRIX);
 
-    mpCableQuadRule = new GaussianQuadratureRule<CABLE_ELEMENT_DIM>(numQuadPoints);
+    mpCableQuadRule = new GaussianQuadratureRule<CABLE_ELEMENT_DIM>(2);
 
     // Not supporting this yet - if a nonlinear assembler on cable elements is required, uncomment code
     // in AssembleOnCableElement below (search for NONLINEAR)

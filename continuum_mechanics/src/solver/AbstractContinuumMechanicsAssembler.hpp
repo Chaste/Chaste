@@ -290,8 +290,8 @@ protected:
 public:
     /** Constructor
      *  @param pMesh Pointer to the mesh
-     *  @param numQuadPoints Number of quadrature points in each direction, defaults to 3 */
-    AbstractContinuumMechanicsAssembler(AbstractTetrahedralMesh<DIM, DIM>* pMesh, unsigned numQuadPoints = 3)
+     */
+    AbstractContinuumMechanicsAssembler(AbstractTetrahedralMesh<DIM, DIM>* pMesh)
         : AbstractFeAssemblerInterface<CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MATRIX>(),
           mpMesh(pMesh)
     {
@@ -306,7 +306,7 @@ public:
             EXCEPTION("Continuum mechanics assemblers require a quadratic mesh");
         }
 
-        mpQuadRule = new GaussianQuadratureRule<DIM>(numQuadPoints);
+        mpQuadRule = new GaussianQuadratureRule<DIM>(3);
     }
 
 

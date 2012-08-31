@@ -206,13 +206,11 @@ AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::AbstractExtendedBidomainS
         bool bathSimulation,
         AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
         ExtendedBidomainTissue<SPACE_DIM>* pTissue,
-        BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, 3>* pBcc,
-        unsigned numQuadPoints)
+        BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, 3>* pBcc)
     : AbstractDynamicLinearPdeSolver<ELEMENT_DIM,SPACE_DIM,3>(pMesh),
               mBathSimulation(bathSimulation),
               mpExtendedBidomainTissue(pTissue),
-              mpBoundaryConditions(pBcc),
-              mNumQuadPoints(numQuadPoints)
+              mpBoundaryConditions(pBcc)
 {
     assert(pTissue != NULL);
     assert(pBcc != NULL);

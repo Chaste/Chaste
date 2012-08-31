@@ -189,8 +189,7 @@ ExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::ExtendedBidomainSolver(
         bool bathSimulation,
         AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
         ExtendedBidomainTissue<SPACE_DIM>* pTissue,
-        BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,3>* pBoundaryConditions,
-        unsigned numQuadPoints)
+        BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,3>* pBoundaryConditions)
     : AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>(bathSimulation,pMesh,pTissue,pBoundaryConditions)
 {
     // Tell Tissue there's no need to replicate ionic caches
@@ -200,12 +199,12 @@ ExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::ExtendedBidomainSolver(
     // create assembler
     if(this->mBathSimulation)
     {
-        //this->mpExtendedExtendedBidomainAssembler = new ExtendedExtendedBidomainWithBathAssembler<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,this->mpExtendedExtendedBidomainTissue,this->mDt,this->mNumQuadPoints);
+        //this->mpExtendedExtendedBidomainAssembler = new ExtendedExtendedBidomainWithBathAssembler<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,this->mpExtendedExtendedBidomainTissue,this->mDt);
         EXCEPTION("Bath simulations are not yet supported for extended bidomain problems");
     }
     else
     {
-        mpExtendedBidomainAssembler = new ExtendedBidomainAssembler<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,this->mpExtendedBidomainTissue,this->mNumQuadPoints);
+        mpExtendedBidomainAssembler = new ExtendedBidomainAssembler<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,this->mpExtendedBidomainTissue);
     }
 
     mpExtendedBidomainNeumannSurfaceTermAssembler = new ExtendedBidomainNeumannSurfaceTermAssembler<ELEMENT_DIM,SPACE_DIM>(pMesh,pBoundaryConditions);

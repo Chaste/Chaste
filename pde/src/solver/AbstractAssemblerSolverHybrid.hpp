@@ -74,12 +74,10 @@ public:
      *
      * @param pMesh pointer to the mesh
      * @param pBoundaryConditions pointer to the boundary conditions.
-     * @param numQuadPoints number of quadrature points in each dimension to use per element (defaults to 2)
      */
     AbstractAssemblerSolverHybrid(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                                  BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>* pBoundaryConditions,
-                                  unsigned numQuadPoints=2)
-        : AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, true, true, INTERPOLATION_LEVEL>(pMesh,numQuadPoints),
+                                  BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>* pBoundaryConditions)
+        : AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, true, true, INTERPOLATION_LEVEL>(pMesh),
           mNaturalNeumannSurfaceTermAssembler(pMesh,pBoundaryConditions),
           mpBoundaryConditions(pBoundaryConditions)
     {

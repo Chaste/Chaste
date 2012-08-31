@@ -82,11 +82,9 @@ public:
      *
      * @param pMesh pointer to the mesh
      * @param pTissue pointer to the PDE
-     * @param numQuadPoints number of quadrature points (defaults to 2)
      */
     BidomainCorrectionTermAssembler(AbstractTetrahedralMesh<ELEM_DIM,SPACE_DIM>* pMesh,
-                                    BidomainTissue<SPACE_DIM>* pTissue,
-                                    unsigned numQuadPoints = 2);
+                                    BidomainTissue<SPACE_DIM>* pTissue);
 };
 
 

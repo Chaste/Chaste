@@ -105,15 +105,14 @@ public:
 
     InterpolatedQuantitiesLinearParabolicSolver2d(AbstractTetrahedralMesh<2,2>* pMesh,
                                                 AbstractLinearParabolicPde<2,2>* pPde,
-                                                BoundaryConditionsContainer<2,2,1>* pBoundaryConditions,
-                                                unsigned numQuadPoints = 2) : SimpleLinearParabolicSolver<2,2>(pMesh,
-                                                                                                              pPde,
-                                                                                                              pBoundaryConditions,
-                                                                                                              numQuadPoints),
-                                                                              numResetCalled(0),
-                                                                              numIncrementInterpolatedCalled(0),
-                                                                              numIncrementInterpolatedGradientCalled(0),
-                                                                              totalPhiI(1.0)
+                                                BoundaryConditionsContainer<2,2,1>* pBoundaryConditions)
+        : SimpleLinearParabolicSolver<2,2>(pMesh,
+                                           pPde,
+                                           pBoundaryConditions),
+          numResetCalled(0),
+          numIncrementInterpolatedCalled(0),
+          numIncrementInterpolatedGradientCalled(0),
+          totalPhiI(1.0)
     {}
 
     void ResetInterpolatedQuantities()

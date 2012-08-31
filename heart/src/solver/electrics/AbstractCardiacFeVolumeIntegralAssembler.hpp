@@ -53,20 +53,6 @@ protected:
     AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>* mpCardiacTissue;
 
 public:
-    /**
-     *  Constructor
-     *  @param pMesh the mesh
-     *  @param pTissue  pointer to the tissue used for getting conductivity values
-     *  @param numQuadPoints  The number of quadrature points to use (other constructor takes none and uses default specified in AbstractFeVolumeIntegralAssembler).
-     */
-    AbstractCardiacFeVolumeIntegralAssembler(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                                             AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>* pTissue,
-                                             unsigned numQuadPoints)
-        : AbstractFeVolumeIntegralAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MATRIX,INTERPOLATION_LEVEL>(pMesh, numQuadPoints),
-          mpCardiacTissue(pTissue)
-    {
-        assert(pTissue);
-    }
 
     /**
      *  Constructor

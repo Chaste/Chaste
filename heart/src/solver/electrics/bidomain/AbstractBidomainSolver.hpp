@@ -58,12 +58,6 @@ protected:
     /** Boundary conditions */
     BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,2>* mpBoundaryConditions;
 
-    /**
-     *  Number of quadrature points per dimension (only saved so it can be
-     *  passed to the assembler)
-     */
-    unsigned mNumQuadPoints;
-
     /** Used when intialising null-space solver to resolve singularity*/
     bool mNullSpaceCreated;
 
@@ -161,13 +155,11 @@ public:
      * @param pMesh  pointer to the mesh
      * @param pTissue  pointer to the tissue
      * @param pBoundaryConditions  pointer to the boundary conditions container
-     * @param numQuadPoints  number of Gaussian quadrature points in each dimension
      */
     AbstractBidomainSolver(bool bathSimulation,
                            AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
                            BidomainTissue<SPACE_DIM>* pTissue,
-                           BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,2>* pBoundaryConditions,
-                           unsigned numQuadPoints = 2);
+                           BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,2>* pBoundaryConditions);
 
     /**
      *  Destructor

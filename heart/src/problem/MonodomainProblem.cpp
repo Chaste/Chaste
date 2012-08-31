@@ -66,15 +66,13 @@ AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, 1>* MonodomainProblem<ELE
     {
         return new OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,
                                                                             mpMonodomainTissue,
-                                                                            this->mpBoundaryConditionsContainer.get(),
-                                                                            2);
+                                                                            this->mpBoundaryConditionsContainer.get());
     }
     else
     {
         return new MonodomainSolver<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,
                                                            mpMonodomainTissue,
-                                                           this->mpBoundaryConditionsContainer.get(),
-                                                           2);
+                                                           this->mpBoundaryConditionsContainer.get());
     }
 }
 

@@ -122,12 +122,10 @@ public:
      * @param pMesh pointer to the mesh
      * @param pPde pointer to the PDE
      * @param pBoundaryConditions pointer to the boundary conditions
-     * @param numQuadPoints number of quadrature points (defaults to 2)
      */
     SimpleLinearEllipticSolver(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
                                AbstractLinearEllipticPde<ELEMENT_DIM,SPACE_DIM>* pPde,
-                               BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,1>* pBoundaryConditions,
-                               unsigned numQuadPoints = 2);
+                               BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,1>* pBoundaryConditions);
 
     /**
      * Overloaded InitaliseForSolve() which just calls the base class but also

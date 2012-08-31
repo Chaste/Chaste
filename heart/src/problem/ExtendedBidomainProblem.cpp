@@ -244,8 +244,7 @@ AbstractDynamicLinearPdeSolver<DIM, DIM, 3>* ExtendedBidomainProblem<DIM>::Creat
     mpSolver = new ExtendedBidomainSolver<DIM,DIM>( mHasBath,
                                                     this->mpMesh,
                                                     mpExtendedBidomainTissue,
-                                                    this->mpBoundaryConditionsContainer.get(),
-                                                    2);//2 is number of quad points
+                                                    this->mpBoundaryConditionsContainer.get());
 
 
     try

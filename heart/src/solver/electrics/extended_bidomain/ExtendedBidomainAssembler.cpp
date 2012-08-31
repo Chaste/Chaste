@@ -133,9 +133,8 @@ c_matrix<double,3*(ELEMENT_DIM+1),3*(ELEMENT_DIM+1)>
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ExtendedBidomainAssembler<ELEMENT_DIM,SPACE_DIM>::ExtendedBidomainAssembler(
                                 AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                                ExtendedBidomainTissue<SPACE_DIM>* pTissue,
-                                unsigned numQuadPoints)
-    : AbstractCardiacFeVolumeIntegralAssembler<ELEMENT_DIM,SPACE_DIM,3,true,true,NORMAL>(pMesh,pTissue,numQuadPoints),
+                                ExtendedBidomainTissue<SPACE_DIM>* pTissue)
+    : AbstractCardiacFeVolumeIntegralAssembler<ELEMENT_DIM,SPACE_DIM,3,true,true,NORMAL>(pMesh,pTissue),
               mpExtendedBidomainTissue(pTissue)
 {
     assert(pTissue != NULL);

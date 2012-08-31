@@ -122,11 +122,9 @@ public:
      *
      * @param pMesh The mesh
      * @param pBoundaryConditions The boundary conditions container
-     * @param numQuadPoints Number of quad points (per dimension) to use
      */
     AbstractFeSurfaceIntegralAssembler(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                                       BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>* pBoundaryConditions,
-                                       unsigned numQuadPoints = 2);
+                                       BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>* pBoundaryConditions);
 
     /**
      * Destructor
@@ -148,17 +146,15 @@ public:
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 AbstractFeSurfaceIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::AbstractFeSurfaceIntegralAssembler(
             AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-            BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>* pBoundaryConditions,
-            unsigned numQuadPoints)
+            BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>* pBoundaryConditions)
     : AbstractFeAssemblerCommon<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM,true,false,NORMAL>(),
       mpMesh(pMesh),
       mpBoundaryConditions(pBoundaryConditions)
 {
     assert(pMesh);
     assert(pBoundaryConditions);
-    assert(numQuadPoints > 0);
 
-    mpSurfaceQuadRule = new GaussianQuadratureRule<ELEMENT_DIM-1>(numQuadPoints);
+    mpSurfaceQuadRule = new GaussianQuadratureRule<ELEMENT_DIM-1>(2);
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>

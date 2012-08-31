@@ -85,12 +85,6 @@ private:
     /** Assembler for surface integrals coming from any non-zero Neumann boundary conditions */
     NaturalNeumannSurfaceTermAssembler<ELEMENT_DIM,SPACE_DIM,1>* mpNeumannSurfaceTermsAssembler;
 
-    /**
-     *  Number of quadrature points per dimension (only saved so it can be
-     *  passed to the assembler
-     */
-    unsigned mNumQuadPoints;
-
     /** The mass matrix, used to computing the RHS vector*/
     Mat mMassMatrix;
 
@@ -141,12 +135,10 @@ public:
      * @param pMesh pointer to the mesh
      * @param pTissue pointer to the tissue
      * @param pBoundaryConditions pointer to the boundary conditions
-     * @param numQuadPoints number of quadrature points (defaults to 2)
      */
     OperatorSplittingMonodomainSolver(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
                                       MonodomainTissue<ELEMENT_DIM,SPACE_DIM>* pTissue,
-                                      BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,1>* pBoundaryConditions,
-                                      unsigned numQuadPoints = 2);
+                                      BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,1>* pBoundaryConditions);
 
     /**
      *  Destructor

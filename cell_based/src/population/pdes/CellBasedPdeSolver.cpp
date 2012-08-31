@@ -41,9 +41,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM>
 CellBasedPdeSolver<DIM>::CellBasedPdeSolver(TetrahedralMesh<DIM,DIM>* pMesh,
                               AbstractLinearEllipticPde<DIM,DIM>* pPde,
-                              BoundaryConditionsContainer<DIM,DIM,1>* pBoundaryConditions,
-                              unsigned numQuadPoints) :
-        SimpleLinearEllipticSolver<DIM, DIM>(pMesh, pPde, pBoundaryConditions, numQuadPoints)
+                              BoundaryConditionsContainer<DIM,DIM,1>* pBoundaryConditions)
+     : SimpleLinearEllipticSolver<DIM, DIM>(pMesh, pPde, pBoundaryConditions)
 {
 }
 

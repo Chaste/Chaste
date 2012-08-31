@@ -133,13 +133,11 @@ public:
      * @param pMesh pointer to the mesh
      * @param pTissue pointer to the tissue
      * @param pBoundaryConditions pointer to the boundary conditions
-     * @param numQuadPoints number of quadrature points (defaults to 2)
      */
     BidomainSolver(bool bathSimulation,
                    AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
                    BidomainTissue<SPACE_DIM>* pTissue,
-                   BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,2>* pBoundaryConditions,
-                   unsigned numQuadPoints = 2);
+                   BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,2>* pBoundaryConditions);
 
     ~BidomainSolver();
 };

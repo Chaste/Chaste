@@ -39,9 +39,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEM_DIM, unsigned SPACE_DIM>
 MonodomainCorrectionTermAssembler<ELEM_DIM,SPACE_DIM>::MonodomainCorrectionTermAssembler(
         AbstractTetrahedralMesh<ELEM_DIM,SPACE_DIM>* pMesh,
-        MonodomainTissue<ELEM_DIM,SPACE_DIM>* pTissue,
-        unsigned numQuadPoints)
-    : AbstractCorrectionTermAssembler<ELEM_DIM,SPACE_DIM,1>(pMesh,pTissue,numQuadPoints)
+        MonodomainTissue<ELEM_DIM,SPACE_DIM>* pTissue)
+    : AbstractCorrectionTermAssembler<ELEM_DIM,SPACE_DIM,1>(pMesh,pTissue)
 {
     mpConfig = HeartConfig::Instance();
     assert(mpConfig->GetUseStateVariableInterpolation());

@@ -75,9 +75,8 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 SimpleLinearEllipticSolver<ELEMENT_DIM,SPACE_DIM>::SimpleLinearEllipticSolver(
                                   AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
                                   AbstractLinearEllipticPde<ELEMENT_DIM,SPACE_DIM>* pPde,
-                                  BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,1>* pBoundaryConditions,
-                                  unsigned numQuadPoints)
-        : AbstractAssemblerSolverHybrid<ELEMENT_DIM,SPACE_DIM,1,NORMAL>(pMesh,pBoundaryConditions,numQuadPoints),
+                                  BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,1>* pBoundaryConditions)
+        : AbstractAssemblerSolverHybrid<ELEMENT_DIM,SPACE_DIM,1,NORMAL>(pMesh,pBoundaryConditions),
           AbstractStaticLinearPdeSolver<ELEMENT_DIM,SPACE_DIM,1>(pMesh)
 {
     mpEllipticPde = pPde;

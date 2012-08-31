@@ -76,12 +76,6 @@ private:
     /** Monodomain tissue class (collection of cells, and conductivities) */
     MonodomainTissue<ELEMENT_DIM,SPACE_DIM>* mpMonodomainTissue;
 
-    /**
-     *  Number of quadrature points per dimension (only saved so it can be
-     *  passed to the assembler)
-     */
-    unsigned mNumQuadPoints;
-
     /** Boundary conditions */
     BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,1>* mpBoundaryConditions;
 
@@ -138,12 +132,10 @@ public:
      * @param pMesh pointer to the mesh
      * @param pTissue pointer to the tissue
      * @param pBoundaryConditions pointer to the boundary conditions
-     * @param numQuadPoints number of quadrature points (defaults to 2)
      */
     MonodomainSolver(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
                      MonodomainTissue<ELEMENT_DIM,SPACE_DIM>* pTissue,
-                     BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,1>* pBoundaryConditions,
-                     unsigned numQuadPoints = 2);
+                     BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,1>* pBoundaryConditions);
 
     /**
      *  Destructor

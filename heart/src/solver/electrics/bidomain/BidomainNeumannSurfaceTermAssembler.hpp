@@ -78,12 +78,10 @@ public:
      *
      * @param pMesh The mesh
      * @param pBoundaryConditions The boundary conditions container
-     * @param numQuadPoints Number of quad points (per dimension) to use
      */
     BidomainNeumannSurfaceTermAssembler(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                                        BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,2>* pBoundaryConditions,
-                                        unsigned numQuadPoints = 2)
-        : AbstractFeSurfaceIntegralAssembler<ELEMENT_DIM,SPACE_DIM,2>(pMesh, pBoundaryConditions, numQuadPoints)
+                                        BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,2>* pBoundaryConditions)
+        : AbstractFeSurfaceIntegralAssembler<ELEMENT_DIM,SPACE_DIM,2>(pMesh, pBoundaryConditions)
     {
     }
 };

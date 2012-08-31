@@ -118,10 +118,9 @@ public:
     /** Constructor
      *  @param pMesh Pointer to the mesh
      *  @param pProblemDefinition Pointer to the problem definition object
-     *  @param numQuadPoints Number of quadrature points in each direction, defaults to 2 */
+     */
     ContinuumMechanicsNeumannBcsAssembler(AbstractTetrahedralMesh<DIM,DIM>* pMesh,
-                                          ContinuumMechanicsProblemDefinition<DIM>* pProblemDefinition,
-                                          unsigned numQuadPoints = 2)
+                                          ContinuumMechanicsProblemDefinition<DIM>* pProblemDefinition)
         : AbstractFeAssemblerInterface<true,false>(),
           mpMesh(pMesh),
           mpProblemDefinition(pProblemDefinition)
@@ -138,7 +137,7 @@ public:
             EXCEPTION("Continuum mechanics solvers require a quadratic mesh");
         }
 
-        mpQuadRule = new GaussianQuadratureRule<DIM-1>(numQuadPoints);
+        mpQuadRule = new GaussianQuadratureRule<DIM-1>(2); // why was this 2 not 3? #2232
     }
 
 

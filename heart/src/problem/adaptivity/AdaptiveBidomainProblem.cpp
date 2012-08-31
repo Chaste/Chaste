@@ -410,7 +410,7 @@ void AdaptiveBidomainProblem::Solve()
     }
 
     mpSolver = new BidomainSolver<3,3>(false, mpMesh, mpBidomainTissue,
-                                       mpBoundaryConditionsContainer.get(), 2);
+                                       mpBoundaryConditionsContainer.get());
     mSolution = CreateInitialCondition();
 
     TimeStepper stepper(0.0, HeartConfig::Instance()->GetSimulationDuration(),

@@ -83,11 +83,9 @@ public:
      *
      * @param pMesh  pointer to the mesh
      * @param pTissue  pointer to the cardiac tissue
-     * @param numQuadPoints  number of quadrature points
      */
     MonodomainCorrectionTermAssembler(AbstractTetrahedralMesh<ELEM_DIM,SPACE_DIM>* pMesh,
-                                      MonodomainTissue<ELEM_DIM,SPACE_DIM>* pTissue,
-                                      unsigned numQuadPoints = 2);
+                                      MonodomainTissue<ELEM_DIM,SPACE_DIM>* pTissue);
 };
 
 

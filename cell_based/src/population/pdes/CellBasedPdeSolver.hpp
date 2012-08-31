@@ -130,12 +130,10 @@ public:
      * @param pMesh pointer to the mesh
      * @param pPde pointer to the PDE
      * @param pBoundaryConditions pointer to the boundary conditions
-     * @param numQuadPoints number of quadrature points (defaults to 2)
      */
     CellBasedPdeSolver(TetrahedralMesh<DIM,DIM>* pMesh,
                                        AbstractLinearEllipticPde<DIM,DIM>* pPde,
-                                       BoundaryConditionsContainer<DIM,DIM,1>* pBoundaryConditions,
-                                       unsigned numQuadPoints=2);
+                                       BoundaryConditionsContainer<DIM,DIM,1>* pBoundaryConditions);
 
     /**
      * Destructor.

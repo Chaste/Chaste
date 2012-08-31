@@ -175,11 +175,9 @@ public:
      *
      * @param pMesh The mesh
      * @param pBoundaryConditions The boundary conditions to apply
-     * @param numQuadPoints number of quadrature points (defaults to 2)
      */
     AbstractNonlinearAssemblerSolverHybrid(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
-                                           BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>* pBoundaryConditions,
-                                           unsigned numQuadPoints = 2);
+                                           BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>* pBoundaryConditions);
 
     /**
      * Destructor.
@@ -225,9 +223,8 @@ public:
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 AbstractNonlinearAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::AbstractNonlinearAssemblerSolverHybrid(
             AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
-            BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>* pBoundaryConditions,
-            unsigned numQuadPoints)
-    :  AbstractFeVolumeIntegralAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM,true,true,NONLINEAR>(pMesh,numQuadPoints),
+            BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>* pBoundaryConditions)
+    :  AbstractFeVolumeIntegralAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM,true,true,NONLINEAR>(pMesh),
        mpMesh(pMesh),
        mpBoundaryConditions(pBoundaryConditions)
 {
@@ -239,13 +236,12 @@ AbstractNonlinearAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Abs
     assert(pMesh!=NULL);
     assert(pBoundaryConditions!=NULL);
 
-   // mpAssembler = new SimpleNonlinearEllipticPdeAssembler<ELEMENT_DIM,SPACE_DIM>(mpMesh,pPde,numQuadPoints);
     mpSolver = new SimplePetscNonlinearSolver;
     mWeAllocatedSolverMemory = true;
 
     assert(mpMesh->GetNumNodes() == mpMesh->GetDistributedVectorFactory()->GetProblemSize());
 
-    mpNeumannSurfaceTermsAssembler = new NaturalNeumannSurfaceTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>(pMesh,pBoundaryConditions,numQuadPoints);
+    mpNeumannSurfaceTermsAssembler = new NaturalNeumannSurfaceTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>(pMesh,pBoundaryConditions);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>

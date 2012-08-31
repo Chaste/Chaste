@@ -183,7 +183,7 @@ public:
         bcc.AddNeumannBoundaryCondition(*iter, p_boundary_condition);
 
         // Nonlinear solver to use
-        SimpleNonlinearEllipticSolver<1,1> solver(&mesh, &pde, &bcc, 3);
+        SimpleNonlinearEllipticSolver<1,1> solver(&mesh, &pde, &bcc);
 
         // Set up initial Guess
         Vec initial_guess = PetscTools::CreateAndSetVec(mesh.GetNumNodes(),0.25);
@@ -263,7 +263,7 @@ public:
         p_boundary_condition = new ConstBoundaryCondition<1>(0.0);
         bcc.AddDirichletBoundaryCondition(mesh.GetNode(10), p_boundary_condition);
 
-        SimpleNonlinearEllipticSolver<1,1> solver(&mesh, &pde, &bcc,3);
+        SimpleNonlinearEllipticSolver<1,1> solver(&mesh, &pde, &bcc);
 
         // Set up initial Guess
         Vec initial_guess = PetscTools::CreateVec(mesh.GetNumNodes());
