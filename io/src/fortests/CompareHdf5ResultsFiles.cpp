@@ -43,10 +43,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 bool CompareFilesViaHdf5DataReader(std::string pathname1, std::string filename1, bool makeAbsolute1,
                                    std::string pathname2, std::string filename2, bool makeAbsolute2,
-                                   double tol)
+                                   double tol, std::string datasetName)
 {
-    Hdf5DataReader reader1(pathname1, filename1, makeAbsolute1);
-    Hdf5DataReader reader2(pathname2, filename2, makeAbsolute2);
+    Hdf5DataReader reader1(pathname1, filename1, makeAbsolute1, datasetName);
+    Hdf5DataReader reader2(pathname2, filename2, makeAbsolute2, datasetName);
 
     unsigned number_nodes1 = reader1.GetNumberOfRows();
     unsigned number_nodes2 = reader2.GetNumberOfRows();
@@ -197,10 +197,10 @@ bool CompareFilesViaHdf5DataReader(std::string pathname1, std::string filename1,
 
 bool CompareFilesViaHdf5DataReaderGlobalNorm(std::string pathname1, std::string filename1, bool makeAbsolute1,
                                              std::string pathname2, std::string filename2, bool makeAbsolute2,
-                                             double tol)
+                                             double tol, std::string datasetName)
 {
-    Hdf5DataReader reader1(pathname1, filename1, makeAbsolute1);
-    Hdf5DataReader reader2(pathname2, filename2, makeAbsolute2);
+    Hdf5DataReader reader1(pathname1, filename1, makeAbsolute1, datasetName);
+    Hdf5DataReader reader2(pathname2, filename2, makeAbsolute2, datasetName);
 
     unsigned number_nodes1 = reader1.GetNumberOfRows();
     bool is_the_same = true;

@@ -83,16 +83,26 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
 
     if (mUseExistingFile)
     {
-        // Where to find the file
-        assert(mCleanDirectory==false);
+        // Variables should already be defined if we are extending.
+        mIsInDefineMode = false;
 
+        // If the file exists already, open it - this call will check it exists.
         OpenFile();
 
-        /// \todo #2220 remove this assert and let it cope with a new dataset.
-        assert(DoesDatasetExist(mDatasetName));
-
-        if (DoesDatasetExist(mDatasetName))
+        // If the dataset we are interested in doesn't exist then close the file
+        // We will go on to define variables and open the file as usual (except for it pre-existing).
+        if (!DoesDatasetExist(mDatasetName))
         {
+            //std::cout << "Dataset: " << mDatasetName << " doesn't exist in the file.\n";
+            H5Fclose(mFileId);
+            mIsInDefineMode = true;
+        }
+        // If dataset does exist then leave file open and try to extend it.
+        else
+        {
+            // Where to find the file
+            assert(mCleanDirectory==false);
+
             mVariablesDatasetId = H5Dopen(mFileId, mDatasetName.c_str());
             hid_t variables_dataspace = H5Dget_space(mVariablesDatasetId);
             //unsigned variables_dataset_rank = H5Sget_simple_extent_ndims(variables_dataspace);
@@ -154,9 +164,7 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
             H5Aclose(attribute_id);
 
             // Now deal with time
-            mUnlimitedDimensionName = "Time"; // Assumed by the reader...
-            mTimeDatasetId = H5Dopen(mFileId, mUnlimitedDimensionName.c_str());
-            mUnlimitedDimensionUnit = "ms"; // Assumed by Chaste...
+            SetTimeDatasetId();
 
             // How many time steps have been written so far?
             hid_t timestep_dataspace = H5Dget_space(mTimeDatasetId);
@@ -225,7 +233,6 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
             }
 
             // Done
-            mIsInDefineMode = false;
             AdvanceAlongUnlimitedDimension();
         }
     }
@@ -635,7 +642,7 @@ void Hdf5DataWriter::EndDefineMode()
         hid_t time_filespace = H5Screate_simple(1, time_dataset_dims, time_dataset_max_dims);
 
         // Create the dataset
-        mTimeDatasetId = H5Dcreate(mFileId, mUnlimitedDimensionName.c_str(), H5T_NATIVE_DOUBLE, time_filespace, time_cparms);
+        mTimeDatasetId = H5Dcreate(mFileId, (mDatasetName + "_" + mUnlimitedDimensionName).c_str(), H5T_NATIVE_DOUBLE, time_filespace, time_cparms);
 
         // Create the dataspace for the attribute
         hsize_t one = 1;
@@ -1148,11 +1155,3 @@ void Hdf5DataWriter::SetFixedChunkSize(unsigned chunkSize)
     mFixedChunkSize = chunkSize;
 }
 
-bool Hdf5DataWriter::DoesDatasetExist(const std::string& rDatasetName)
-{
-    bool result;
-    hid_t dataset_status = H5Dopen(mFileId, rDatasetName.c_str());
-    result = (dataset_status>0);
-    H5Dclose(dataset_status);
-    return result;
-}

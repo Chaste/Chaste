@@ -36,6 +36,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef HDF5DATAWRITER_HPP_
 #define HDF5DATAWRITER_HPP_
 
+
+// Not sure why this seems to need to be included here as well as in AbstractHdf5Access.hpp,
+// but it does on some of the build machines.
+#ifndef H5_USE_16_API
+#define H5_USE_16_API 1
+#endif
+
 #include <vector>
 
 #include "AbstractHdf5Access.hpp"
@@ -56,8 +63,7 @@ private:
     bool mUseExistingFile;                          /**< Whether we are using an existing file (for extending existing dataset, or adding a new one)*/
     bool mIsInDefineMode;                           /**< Is the DataWriter in define mode or not */
     bool mIsFixedDimensionSet;                      /**< Is the fixed dimension set */
-    std::string mUnlimitedDimensionName;            /**< The name of the unlimited dimension. */
-    std::string mUnlimitedDimensionUnit;            /**< The physical units of the unlimited dimension. */
+
     unsigned mEstimatedUnlimitedLength;             /**< An estimate of the unlimited dimension length for performance reasons. */
     unsigned mFileFixedDimensionSize;               /**< The size of the fixed dimension (number of rows)*/
     unsigned mDataFixedDimensionSize;               /**< The size of the fixed dimension (size of the vector of nodes)*/
@@ -114,7 +120,7 @@ public:
      * Constructor.
      *
      * @param rVectorFactory the factory to use in creating PETSc Vec and DistributedVector objects.
-     * @param rDirectory  the directory in which to write the data to file
+     * @param rDirectory  the directory in which to write the data to file, relative to chaste test output.
      * @param rBaseName  the name of the file in which to write the data
      * @param cleanDirectory  whether to clean the directory (defaults to true)
      * @param extendData  whether to try opening an existing file and appending to it.
@@ -250,13 +256,7 @@ public:
      */
     void SetFixedChunkSize(unsigned chunkSize);
 
-    /**
-     * Check for the existence of a dataset in an HDF5 file.
-     *
-     * @param rDatasetName  the name of the dataset.
-     * @return whether or not the dataset already exists in the file.
-     */
-    bool DoesDatasetExist(const std::string& rDatasetName);
+
 };
 
 #endif /*HDF5DATAWRITER_HPP_*/

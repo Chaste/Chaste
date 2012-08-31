@@ -37,18 +37,39 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <string>
 
+/**
+ * Method to compare datasets (and associated unlimited variables) from two HDF5 files.
+ *
+ * @param pathname1  Path to first file
+ * @param filename1  Filename of first file
+ * @param makeAbsolute1  Whether the h5 file should be treated as relative to Chaste test output, otherwise treated as CWD or absolute.
+ * @param pathname2  Path to second file
+ * @param filename2  Filename of second file
+ * @param makeAbsolute2  Whether the h5 file should be treated as relative to Chaste test output, otherwise treated as CWD or absolute.
+ * @param tol  Numerical tolerance to use when comparing data values
+ * @param datasetName  the dataset to compare (defaults to "Data")
+ * @return True if the file contents are the same, False if they differ.
+ */
 bool CompareFilesViaHdf5DataReader(std::string pathname1, std::string filename1, bool makeAbsolute1,
                                    std::string pathname2, std::string filename2, bool makeAbsolute2,
-                                   double tol=1e-10);
+                                   double tol=1e-10, std::string datasetName = "Data");
 
 /**
  * Alternative, weaker, method for comparing two files. It computes the global norms of the two data
  * vectors and checks whether the difference is less than 1e-10
  *
+ * @param pathname1  Path to first file
+ * @param filename1  Filename of first file
+ * @param makeAbsolute1  Whether the h5 file should be treated as relative to Chaste test output, otherwise treated as CWD or absolute.
+ * @param pathname2  Path to second file
+ * @param filename2  Filename of second file
+ * @param makeAbsolute2  Whether the h5 file should be treated as relative to Chaste test output, otherwise treated as CWD or absolute.
+ * @param tol  Numerical tolerance to use when comparing data values
+ * @param datasetName  the dataset to compare (defaults to "Data")
  * @return true if the global norms differ by less than 1e-10 for each time step
  * */
 bool CompareFilesViaHdf5DataReaderGlobalNorm(std::string pathname1, std::string filename1, bool makeAbsolute1,
                                              std::string pathname2, std::string filename2, bool makeAbsolute2,
-                                             double tol=1e-10);
+                                             double tol=1e-10, std::string datasetName = "Data");
 
 #endif /*COMPAREHDF5RESULTSFILES_HPP_*/

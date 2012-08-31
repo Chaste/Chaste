@@ -62,6 +62,8 @@ protected:
     static const unsigned DATASET_DIMS=3;           /**< The dimensions of each dataset (variable, node, time). */
 
     bool mIsDataComplete;                           /**< Whether the data file is complete. */
+    std::string mUnlimitedDimensionName;            /**< The name of the unlimited dimension. */
+    std::string mUnlimitedDimensionUnit;            /**< The physical units of the unlimited dimension. */
     bool mIsUnlimitedDimensionSet;                  /**< Is the unlimited dimension set */
     std::vector<unsigned> mIncompleteNodeIndices;   /**< Vector of node indices for which the data file does not contain data. */
 
@@ -70,6 +72,26 @@ protected:
     hid_t mVariablesDatasetId;                      /**< The variables dataset ID. */
     hsize_t mDatasetDims[DATASET_DIMS];             /**< The sizes of each dimension of the dataset (variable, node, time). */
 
+    /**
+     * Check for the existence of a dataset in an HDF5 file.
+     *
+     * @param rDatasetName  the name of the dataset.
+     * @return whether or not the dataset already exists in the file.
+     */
+    bool DoesDatasetExist(const std::string& rDatasetName);
+
+    /**
+     * This method sets #mTimeDatasetId, the unlimited dataset ID. It does this
+     * by looking for a given unlimited dataset name in the file.
+     *
+     * Either one of the new format of [#mDatasetName + "_" + #mUnlimitedDimensionName],
+     * or one of the old format of [#mUnlimitedDimensionName].
+     *
+     * At present this only works when #mUnlimitedDimensionName=="Time".
+     */
+    void SetTimeDatasetId();
+
+
 public:
     /**
      * Constructor for directory given as string
@@ -77,28 +99,12 @@ public:
      * @param rDirectory  the directory in which to read/write the data to file
      * @param rBaseName  The base name of the HDF5 file (with no extension)
      * @param rDatasetName  The dataset name - default is "Data" for voltage and extracellular potential.
-     * @param makeAbsolute Whether the dataset is relative to chaste test output at present.
+     * @param makeAbsolute Whether the h5 file should be treated as relative to Chaste test output, otherwise treated as CWD or absolute.
      */
     AbstractHdf5Access(const std::string& rDirectory,
                        const std::string& rBaseName,
                        const std::string& rDatasetName,
-                       bool makeAbsolute = true)
-     : mBaseName(rBaseName),
-       mDatasetName(rDatasetName),
-       mIsDataComplete(true),
-       mIsUnlimitedDimensionSet(false)
-    {
-        RelativeTo::Value relative_to;
-        if (makeAbsolute)
-        {
-            relative_to = RelativeTo::ChasteTestOutput;
-        }
-        else
-        {
-            relative_to = RelativeTo::Absolute;
-        }
-        mDirectory.SetPath(rDirectory, relative_to);
-    }
+                       bool makeAbsolute = true);
 
     /**
      * Constructor for directory given as FileFinder
@@ -109,36 +115,24 @@ public:
      */
     AbstractHdf5Access(const FileFinder& rDirectory,
                        const std::string& rBaseName,
-                       const std::string& rDatasetName)
-     : mBaseName(rBaseName),
-       mDatasetName(rDatasetName),
-       mDirectory(rDirectory),
-       mIsDataComplete(true)
-    {
-    }
+                       const std::string& rDatasetName);
 
     /**
      * Destructor.
      */
-    virtual ~AbstractHdf5Access(){};
+    virtual ~AbstractHdf5Access();
 
     /**
      * Get method for mIsDataComplete.
      *
      * @return #mIsDataComplete.
      */
-    bool IsDataComplete()
-    {
-        return mIsDataComplete;
-    }
+    bool IsDataComplete();
 
     /**
      * Get method for mIncompleteNodeIndices.
      */
-    std::vector<unsigned> GetIncompleteNodeMap()
-    {
-        return mIncompleteNodeIndices;
-    }
+    std::vector<unsigned> GetIncompleteNodeMap();
 };
 
 #endif // ABSTRACTHDF5ACCESS_HPP_
