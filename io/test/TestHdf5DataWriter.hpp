@@ -1111,12 +1111,68 @@ public:
         Hdf5DataWriter writer(factory, "hdf5", "empty", false);
         writer.DefineVariable("Node","dimensionless");
         writer.DefineFixedDimension(number_nodes);
-        TS_ASSERT_THROWS_CONTAINS(writer.EndDefineMode(),  "Hdf5DataWriter could not create");
+        TS_ASSERT_THROWS_CONTAINS(writer.EndDefineMode(), "Hdf5DataWriter could not create");
         writer.Close();
 
         // Re-instate permission to overwrite file
         system(("chmod u+w "+ handler.GetOutputDirectoryFullPath()+"empty.h5").c_str());
     }
+
+    /// \todo #2220 a test to get working.
+//    /**
+//     * Test the functionality for adding further data to an existing file.
+//     *
+//     * This test must come after TestHdf5DataWriterFullFormat and TestHdf5DataWriterFullFormatStripedIncomplete,
+//     * as we extend their files.
+//     */
+//    void TestWriteNewDatasetToExistingFile(void)
+//    {
+//        int number_nodes = 100;
+//        DistributedVectorFactory factory(number_nodes);
+//
+//        // Open the real file
+//        Hdf5DataWriter writer(factory, "hdf5", "hdf5_test_full_format", false, true, "Postprocessing");
+//
+//        // Define what the new dataset is going to look like.
+//        {
+//            writer.DefineFixedDimension(number_nodes);
+//            writer.DefineVariable("Phase", "dimensionless");
+//            writer.DefineUnlimitedDimension("Time", "msec", 10);
+//
+//            // Suggested unlimited dimension size above (10) is smaller than the minimum chunk size, you can save some memory here...
+//            writer.SetFixedChunkSize(10);
+//
+//            writer.EndDefineMode();
+//        }
+//
+//        // Get IDs for the variables in the file
+//        int phase_id = writer.GetVariableByName("Phase");
+//
+//        // Create some extra test data
+//        Vec phase_petsc = factory.CreateVec();
+//        DistributedVector phase_data = factory.CreateDistributedVector(phase_petsc);
+//
+//        for (unsigned time_step=0; time_step<10; time_step++)
+//        {
+//            // Fill in data
+//            for (DistributedVector::Iterator index = phase_data.Begin();
+//                 index != phase_data.End();
+//                 ++index)
+//            {
+//                phase_data[index] = index.Global + 0.5;
+//            }
+//            phase_data.Restore();
+//
+//            // Write to file
+//            writer.PutVector(phase_id, phase_petsc);
+//            writer.PutUnlimitedVariable(time_step);
+//            writer.AdvanceAlongUnlimitedDimension();
+//        }
+//
+//        // Close and test
+//        writer.Close();
+//        PetscTools::Destroy(phase_petsc);
+//    }
 
     /**
      * Test the functionality for adding further data to an existing file.

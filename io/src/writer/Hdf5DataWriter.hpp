@@ -53,6 +53,7 @@ private:
     DistributedVectorFactory& mrVectorFactory;
 
     bool mCleanDirectory;                           /**< Whether to wipe the output directory */
+    bool mUseExistingFile;                          /**< Whether we are using an existing file (for extending existing dataset, or adding a new one)*/
     bool mIsInDefineMode;                           /**< Is the DataWriter in define mode or not */
     bool mIsFixedDimensionSet;                      /**< Is the fixed dimension set */
     std::string mUnlimitedDimensionName;            /**< The name of the unlimited dimension. */
@@ -99,6 +100,13 @@ private:
      * Compute #mOffset and #mNumberOwned from #mIncompleteNodeIndices when we have incomplete data.
      */
     void ComputeIncompleteOffset();
+
+    /**
+     * Opens an existing file or creates a new file, depending on #mUseExistingFile.
+     *
+     * This method sets #mFileId.
+     */
+    void OpenFile();
 
 public:
 
@@ -241,6 +249,14 @@ public:
      * @param chunkSize user provided chunk size
      */
     void SetFixedChunkSize(unsigned chunkSize);
+
+    /**
+     * Check for the existence of a dataset in an HDF5 file.
+     *
+     * @param rDatasetName  the name of the dataset.
+     * @return whether or not the dataset already exists in the file.
+     */
+    bool DoesDatasetExist(const std::string& rDatasetName);
 };
 
 #endif /*HDF5DATAWRITER_HPP_*/

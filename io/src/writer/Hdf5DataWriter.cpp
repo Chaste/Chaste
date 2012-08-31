@@ -56,6 +56,7 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
     : AbstractHdf5Access(rDirectory, rBaseName, datasetName),
       mrVectorFactory(rVectorFactory),
       mCleanDirectory(cleanDirectory),
+      mUseExistingFile(extendData),
       mIsInDefineMode(true),
       mIsFixedDimensionSet(false),
       mEstimatedUnlimitedLength(1u),
@@ -75,173 +76,158 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
       mUseOptimalChunkSizeAlgorithm(true),
       mFixedChunkSize(0)
 {
-    if (extendData && cleanDirectory)
+    if (mUseExistingFile && mCleanDirectory)
     {
         EXCEPTION("You are asking to delete a file and then extend it, change arguments to constructor.");
     }
 
-    if (extendData)
+    if (mUseExistingFile)
     {
         // Where to find the file
-        OutputFileHandler output_file_handler(mDirectory, false);
-        std::string file_name = mDirectory.GetAbsolutePath() + mBaseName + ".h5";
+        assert(mCleanDirectory==false);
 
-        FileFinder h5_file(file_name,RelativeTo::Absolute);
-        if (!h5_file.Exists())
+        OpenFile();
+
+        /// \todo #2220 remove this assert and let it cope with a new dataset.
+        assert(DoesDatasetExist(mDatasetName));
+
+        if (DoesDatasetExist(mDatasetName))
         {
-            EXCEPTION("Hdf5DataWriter could not open " + file_name + " , as it does not exist.");
-        }
+            mVariablesDatasetId = H5Dopen(mFileId, mDatasetName.c_str());
+            hid_t variables_dataspace = H5Dget_space(mVariablesDatasetId);
+            //unsigned variables_dataset_rank = H5Sget_simple_extent_ndims(variables_dataspace);
+            hsize_t dataset_max_sizes[DATASET_DIMS];
+            H5Sget_simple_extent_dims(variables_dataspace, mDatasetDims, dataset_max_sizes);
+            H5Sclose(variables_dataspace);
 
-        // Set up a property list saying how we'll open the file
-        hid_t property_list_id = H5Pcreate(H5P_FILE_ACCESS);
-        H5Pset_fapl_mpiposix(property_list_id, PETSC_COMM_WORLD, 0);
+            // Check that an unlimited dimension is defined
+            if (dataset_max_sizes[0] != H5S_UNLIMITED)
+            {
+                H5Dclose(mVariablesDatasetId);
+                H5Fclose(mFileId);
+                EXCEPTION("Tried to open a datafile for extending which doesn't have an unlimited dimension.");
+            }
+            mIsUnlimitedDimensionSet = true;
 
-        // Open the file and free the property list
-        mFileId = H5Fopen(file_name.c_str(), H5F_ACC_RDWR, property_list_id);
-        H5Pclose(property_list_id);
+            // Sanity check other dimension sizes
+            for (unsigned i=1; i<DATASET_DIMS; i++)  // Zero is excluded since it is unlimited
+            {
+                assert(mDatasetDims[i] == dataset_max_sizes[i]);
+            }
+            mFileFixedDimensionSize = mDatasetDims[1];
+            mIsFixedDimensionSet = true;
+            mVariables.reserve(mDatasetDims[2]);
 
-        if (mFileId < 0)
-        {
-            mVariablesDatasetId = 0;
-            EXCEPTION("Hdf5DataWriter could not open " << file_name <<
-                      " , H5Fopen error code = " << mFileId);
-        }
+            // Figure out what the variables are
+            hid_t attribute_id = H5Aopen_name(mVariablesDatasetId, "Variable Details");
+            hid_t attribute_type  = H5Aget_type(attribute_id);
+            hid_t attribute_space = H5Aget_space(attribute_id);
+            hsize_t attr_dataspace_dim;
+            H5Sget_simple_extent_dims(attribute_space, &attr_dataspace_dim, NULL);
+            unsigned num_columns = H5Sget_simple_extent_npoints(attribute_space);
+            assert(num_columns == mDatasetDims[2]); // I think...
 
-        // Open the main dataset, and figure out its size/shape
-        mVariablesDatasetId = H5Dopen(mFileId, mDatasetName.c_str());
-        hid_t variables_dataspace = H5Dget_space(mVariablesDatasetId);
-        //unsigned variables_dataset_rank = H5Sget_simple_extent_ndims(variables_dataspace);
-        hsize_t dataset_max_sizes[DATASET_DIMS];
-        H5Sget_simple_extent_dims(variables_dataspace, mDatasetDims, dataset_max_sizes);
-        H5Sclose(variables_dataspace);
+            char* string_array = (char *)malloc(sizeof(char)*MAX_STRING_SIZE*(int)num_columns);
+            H5Aread(attribute_id, attribute_type, string_array);
 
-        // Check that an unlimited dimension is defined
-        if (dataset_max_sizes[0] != H5S_UNLIMITED)
-        {
-            H5Dclose(mVariablesDatasetId);
-            H5Fclose(mFileId);
-            EXCEPTION("Tried to open a datafile for extending which doesn't have an unlimited dimension.");
-        }
-        mIsUnlimitedDimensionSet = true;
+            // Loop over columns/variables
+            for (unsigned index=0; index<num_columns; index++)
+            {
+                // Read the string from the raw vector
+                std::string column_name_unit(&string_array[MAX_STRING_SIZE*index]);
 
-        // Sanity check other dimension sizes
-        for (unsigned i=1; i<DATASET_DIMS; i++)  // Zero is excluded since it is unlimited
-        {
-            assert(mDatasetDims[i] == dataset_max_sizes[i]);
-        }
-        mFileFixedDimensionSize = mDatasetDims[1];
-        mIsFixedDimensionSet = true;
-        mVariables.reserve(mDatasetDims[2]);
+                // Find location of unit name
+                size_t name_length = column_name_unit.find('(');
+                size_t unit_length = column_name_unit.find(')') - name_length - 1;
 
-        // Figure out what the variables are
-        hid_t attribute_id = H5Aopen_name(mVariablesDatasetId, "Variable Details");
-        hid_t attribute_type  = H5Aget_type(attribute_id);
-        hid_t attribute_space = H5Aget_space(attribute_id);
-        hsize_t attr_dataspace_dim;
-        H5Sget_simple_extent_dims(attribute_space, &attr_dataspace_dim, NULL);
-        unsigned num_columns = H5Sget_simple_extent_npoints(attribute_space);
-        assert(num_columns == mDatasetDims[2]); // I think...
+                // Create the variable
+                DataWriterVariable var;
+                var.mVariableName = column_name_unit.substr(0, name_length);
+                var.mVariableUnits = column_name_unit.substr(name_length+1, unit_length);
+                mVariables.push_back(var);
+            }
 
-        char* string_array = (char *)malloc(sizeof(char)*MAX_STRING_SIZE*(int)num_columns);
-        H5Aread(attribute_id, attribute_type, string_array);
-
-        // Loop over columns/variables
-        for (unsigned index=0; index<num_columns; index++)
-        {
-            // Read the string from the raw vector
-            std::string column_name_unit(&string_array[MAX_STRING_SIZE*index]);
-
-            // Find location of unit name
-            size_t name_length = column_name_unit.find('(');
-            size_t unit_length = column_name_unit.find(')') - name_length - 1;
-
-            // Create the variable
-            DataWriterVariable var;
-            var.mVariableName = column_name_unit.substr(0, name_length);
-            var.mVariableUnits = column_name_unit.substr(name_length+1, unit_length);
-            mVariables.push_back(var);
-        }
-
-        // Free memory, release ids
-        free(string_array);
-        H5Tclose(attribute_type);
-        H5Sclose(attribute_space);
-        H5Aclose(attribute_id);
-
-        // Now deal with time
-        mUnlimitedDimensionName = "Time"; // Assumed by the reader...
-        mTimeDatasetId = H5Dopen(mFileId, mUnlimitedDimensionName.c_str());
-        mUnlimitedDimensionUnit = "ms"; // Assumed by Chaste...
-
-        // How many time steps have been written so far?
-        hid_t timestep_dataspace = H5Dget_space(mTimeDatasetId);
-        hsize_t num_timesteps;
-        H5Sget_simple_extent_dims(timestep_dataspace, &num_timesteps, NULL);
-        H5Sclose(timestep_dataspace);
-        mCurrentTimeStep = (long)num_timesteps - 1;
-
-        // Incomplete data?
-        attribute_id = H5Aopen_name(mVariablesDatasetId, "IsDataComplete");
-        if (attribute_id < 0)
-        {
-#define COVERAGE_IGNORE
-            // Old format, before we added the attribute.
-            EXCEPTION("Extending old-format files isn't supported.");
-#undef COVERAGE_IGNORE
-        }
-        else
-        {
-            attribute_type = H5Aget_type(attribute_id);
-            attribute_space = H5Aget_space(attribute_id);
-            unsigned is_data_complete;
-            H5Aread(attribute_id, H5T_NATIVE_UINT, &is_data_complete);
-            mIsDataComplete = (is_data_complete == 1) ? true : false;
-            H5Tclose(attribute_type);
-            H5Sclose(attribute_space);
-            H5Aclose(attribute_id);
-        }
-        if (mIsDataComplete)
-        {
-            mNumberOwned = mrVectorFactory.GetLocalOwnership();
-            mOffset = mLo;
-            mDataFixedDimensionSize = mFileFixedDimensionSize;
-        }
-        else
-        {
-            // Read which nodes appear in the file (mIncompleteNodeIndices)
-            attribute_id = H5Aopen_name(mVariablesDatasetId, "NodeMap");
-            attribute_type  = H5Aget_type(attribute_id);
-            attribute_space = H5Aget_space(attribute_id);
-
-            // Get the dataset/dataspace dimensions
-            unsigned num_node_indices = H5Sget_simple_extent_npoints(attribute_space);
-
-            // Read data from hyperslab in the file into the hyperslab in memory
-            mIncompleteNodeIndices.clear();
-            mIncompleteNodeIndices.resize(num_node_indices);
-            H5Aread(attribute_id, H5T_NATIVE_UINT, &mIncompleteNodeIndices[0]);
-
-            // Release ids
+            // Free memory, release ids
+            free(string_array);
             H5Tclose(attribute_type);
             H5Sclose(attribute_space);
             H5Aclose(attribute_id);
 
-            // Set up what data we can
-            mNumberOwned = mrVectorFactory.GetLocalOwnership();
-            ComputeIncompleteOffset();
-            /// \todo 1300 We can't set mDataFixedDimensionSize, because the information isn't
-            /// in the input file.  This means that checking the size of input vectors in PutVector
-            /// and PutStripedVector is impossible.
-            mDataFixedDimensionSize = UINT_MAX;
-            H5Dclose(mVariablesDatasetId);
-            H5Dclose(mTimeDatasetId);
-            H5Fclose(mFileId);
-            EXCEPTION("Unable to extend an incomplete data file at present.");
-        }
+            // Now deal with time
+            mUnlimitedDimensionName = "Time"; // Assumed by the reader...
+            mTimeDatasetId = H5Dopen(mFileId, mUnlimitedDimensionName.c_str());
+            mUnlimitedDimensionUnit = "ms"; // Assumed by Chaste...
 
-        // Done
-        mIsInDefineMode = false;
-        AdvanceAlongUnlimitedDimension();
+            // How many time steps have been written so far?
+            hid_t timestep_dataspace = H5Dget_space(mTimeDatasetId);
+            hsize_t num_timesteps;
+            H5Sget_simple_extent_dims(timestep_dataspace, &num_timesteps, NULL);
+            H5Sclose(timestep_dataspace);
+            mCurrentTimeStep = (long)num_timesteps - 1;
+
+            // Incomplete data?
+            attribute_id = H5Aopen_name(mVariablesDatasetId, "IsDataComplete");
+            if (attribute_id < 0)
+            {
+    #define COVERAGE_IGNORE
+                // Old format, before we added the attribute.
+                EXCEPTION("Extending old-format files isn't supported.");
+    #undef COVERAGE_IGNORE
+            }
+            else
+            {
+                attribute_type = H5Aget_type(attribute_id);
+                attribute_space = H5Aget_space(attribute_id);
+                unsigned is_data_complete;
+                H5Aread(attribute_id, H5T_NATIVE_UINT, &is_data_complete);
+                mIsDataComplete = (is_data_complete == 1) ? true : false;
+                H5Tclose(attribute_type);
+                H5Sclose(attribute_space);
+                H5Aclose(attribute_id);
+            }
+            if (mIsDataComplete)
+            {
+                mNumberOwned = mrVectorFactory.GetLocalOwnership();
+                mOffset = mLo;
+                mDataFixedDimensionSize = mFileFixedDimensionSize;
+            }
+            else
+            {
+                // Read which nodes appear in the file (mIncompleteNodeIndices)
+                attribute_id = H5Aopen_name(mVariablesDatasetId, "NodeMap");
+                attribute_type  = H5Aget_type(attribute_id);
+                attribute_space = H5Aget_space(attribute_id);
+
+                // Get the dataset/dataspace dimensions
+                unsigned num_node_indices = H5Sget_simple_extent_npoints(attribute_space);
+
+                // Read data from hyperslab in the file into the hyperslab in memory
+                mIncompleteNodeIndices.clear();
+                mIncompleteNodeIndices.resize(num_node_indices);
+                H5Aread(attribute_id, H5T_NATIVE_UINT, &mIncompleteNodeIndices[0]);
+
+                // Release ids
+                H5Tclose(attribute_type);
+                H5Sclose(attribute_space);
+                H5Aclose(attribute_id);
+
+                // Set up what data we can
+                mNumberOwned = mrVectorFactory.GetLocalOwnership();
+                ComputeIncompleteOffset();
+                /// \todo 1300 We can't set mDataFixedDimensionSize, because the information isn't
+                /// in the input file.  This means that checking the size of input vectors in PutVector
+                /// and PutStripedVector is impossible.
+                mDataFixedDimensionSize = UINT_MAX;
+                H5Dclose(mVariablesDatasetId);
+                H5Dclose(mTimeDatasetId);
+                H5Fclose(mFileId);
+                EXCEPTION("Unable to extend an incomplete data file at present.");
+            }
+
+            // Done
+            mIsInDefineMode = false;
+            AdvanceAlongUnlimitedDimension();
+        }
     }
 }
 
@@ -264,6 +250,46 @@ Hdf5DataWriter::~Hdf5DataWriter()
     if (mDoubleIncompleteOutputMatrix)
     {
         PetscTools::Destroy(mDoubleIncompleteOutputMatrix);
+    }
+}
+
+void Hdf5DataWriter::OpenFile()
+{
+    OutputFileHandler output_file_handler(mDirectory, mCleanDirectory);
+    std::string file_name = mDirectory.GetAbsolutePath() + mBaseName + ".h5";
+
+    if (mUseExistingFile)
+    {
+        FileFinder h5_file(file_name, RelativeTo::Absolute);
+        if (!h5_file.Exists())
+        {
+            EXCEPTION("Hdf5DataWriter could not open " + file_name + " , as it does not exist.");
+        }
+    }
+
+    // Set up a property list saying how we'll open the file
+    hid_t property_list_id = H5Pcreate(H5P_FILE_ACCESS);
+    H5Pset_fapl_mpiposix(property_list_id, PETSC_COMM_WORLD, 0);
+
+    // Open the file and free the property list
+    std::string attempting_to;
+    if (mUseExistingFile)
+    {
+        mFileId = H5Fopen(file_name.c_str(), H5F_ACC_RDWR, property_list_id);
+        attempting_to = "open";
+    }
+    else
+    {
+        mFileId = H5Fcreate(file_name.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, property_list_id);
+        attempting_to = "create";
+    }
+    H5Pclose(property_list_id);
+
+    if (mFileId < 0)
+    {
+        mVariablesDatasetId = 0;
+        EXCEPTION("Hdf5DataWriter could not " << attempting_to << " " << file_name <<
+                  " , H5F" << attempting_to << " error code = " << mFileId);
     }
 }
 
@@ -463,21 +489,8 @@ void Hdf5DataWriter::EndDefineMode()
         EXCEPTION("Cannot end define mode. One fixed dimension should be defined.");
     }
 
-    OutputFileHandler output_file_handler(mDirectory, mCleanDirectory);
-    std::string file_name = mDirectory.GetAbsolutePath() + mBaseName + ".h5";
+    OpenFile();
 
-    // Set up a property list saying how we'll open the file
-    hid_t property_list_id = H5Pcreate(H5P_FILE_ACCESS);
-    H5Pset_fapl_mpiposix(property_list_id, PETSC_COMM_WORLD, 0);
-
-    // Create a file (collectively) and free the property list
-    mFileId = H5Fcreate(file_name.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, property_list_id);
-    H5Pclose(property_list_id);
-    if (mFileId < 0)
-    {
-        EXCEPTION("Hdf5DataWriter could not create " << file_name <<
-                  " , H5Fcreate error code = " << mFileId);
-    }
     mIsInDefineMode = false;
 
     /*
@@ -547,7 +560,7 @@ void Hdf5DataWriter::EndDefineMode()
     hid_t filespace = H5Screate_simple(DATASET_DIMS, mDatasetDims, max_dims);
 
     // Create the dataset and close filespace
-    mVariablesDatasetId = H5Dcreate(mFileId, "Data", H5T_NATIVE_DOUBLE, filespace, cparms);
+    mVariablesDatasetId = H5Dcreate(mFileId, mDatasetName.c_str(), H5T_NATIVE_DOUBLE, filespace, cparms);
     H5Sclose(filespace);
 
     // Create dataspace for the name, unit attribute
@@ -1133,4 +1146,13 @@ void Hdf5DataWriter::SetFixedChunkSize(unsigned chunkSize)
 
     mUseOptimalChunkSizeAlgorithm = false;
     mFixedChunkSize = chunkSize;
+}
+
+bool Hdf5DataWriter::DoesDatasetExist(const std::string& rDatasetName)
+{
+    bool result;
+    hid_t dataset_status = H5Dopen(mFileId, rDatasetName.c_str());
+    result = (dataset_status>0);
+    H5Dclose(dataset_status);
+    return result;
 }
