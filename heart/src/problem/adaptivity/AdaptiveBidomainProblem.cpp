@@ -253,7 +253,7 @@ void AdaptiveBidomainProblem::AdaptMesh()
         delete mpSolver;
         BidomainSolver<3,3>* p_new_solver;
         p_new_solver = new BidomainSolver<3,3>(false, mpMesh, mpBidomainTissue,
-                                               mpBoundaryConditionsContainer.get(), 2);
+                                               mpBoundaryConditionsContainer.get());
         mpSolver = p_new_solver;
         mpSolver->SetTimeStep(HeartConfig::Instance()->GetPdeTimeStep());
 
