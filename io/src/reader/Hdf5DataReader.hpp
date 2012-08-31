@@ -36,6 +36,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef HDF5DATAREADER_HPP_
 #define HDF5DATAREADER_HPP_
 
+// Not sure why this seems to need to be included here as well as in AbstractHdf5Access.hpp, but it does on some of the build machines.
+#ifndef H5_USE_16_API
+#define H5_USE_16_API 1
+#endif
+
 #include <petscvec.h>
 #include <vector>
 #include <map>
