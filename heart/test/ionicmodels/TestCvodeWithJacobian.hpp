@@ -68,7 +68,7 @@ public:
         double start_time, end_time, elapsed_time = 0.0;
 
         // A standard CVODE adaptor solve
-        p_cvode_adaptor->SetMaxSteps(1e10);
+        p_cvode_adaptor->SetMaxSteps(0xffffffff);
         start_time = std::clock();
         hh_1952_cvode_adaptor->SolveAndUpdateState(0, simulation_duration);
         end_time = std::clock();
@@ -76,7 +76,7 @@ public:
         std::cout << "1. CVODE adaptor, elapsed time = " << elapsed_time << " secs for " << simulation_duration << " ms\n";
 
         // A standard native CVODE solve
-        hh_1952_cvode->SetMaxSteps(1e10);
+        hh_1952_cvode->SetMaxSteps(0xffffffff);
         start_time = std::clock();
         hh_1952_cvode->SolveAndUpdateState(0, simulation_duration);
         end_time = std::clock();
@@ -93,7 +93,7 @@ public:
 //        std::cout << "3. CVODE adaptor with Jacobian, elapsed time = " << elapsed_time << " secs for " << simulation_duration << " ms\n";
 
         // A jacobian native CVODE solve
-        hh_1952_cvode_jacobian->SetMaxSteps(1e10);
+        hh_1952_cvode_jacobian->SetMaxSteps(0xffffffff);
         start_time = std::clock();
         hh_1952_cvode_jacobian->SolveAndUpdateState(0, simulation_duration);
         end_time = std::clock();
