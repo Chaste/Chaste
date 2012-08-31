@@ -371,11 +371,9 @@ void BoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                         }
                     }
                 }
-                // If we're not on the bottom face (z min), then insert the box above
+                // If we're not on the bottom face (z min), then DON'T insert the box above - this will lead to duplicate pairs.
                 if (box_index >= num_boxes_xy)
                 {
-                    local_boxes.insert(box_index - num_boxes_xy);
-
                     // If we're also not on the far face (y max), then insert the below-far box
                     if (box_index % num_boxes_xy < num_boxes_xy - mNumBoxesEachDirection(0))
                     {

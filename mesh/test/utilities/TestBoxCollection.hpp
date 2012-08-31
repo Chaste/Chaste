@@ -704,45 +704,114 @@ public:
         }
     }
 
-    ///\todo #2234
-//    void TestFailingPairsReturned3d() throw (Exception)
-//    {
-//        // Test to ensure that pair calculation is independent of box size.
-//
-//        // 3D cube of nodes.
-//        std::vector<Node<3>* > nodes;
-//        nodes.push_back(new Node<3>(0, false, 2.9, 2.9 ,2.9));
-//        nodes.push_back(new Node<3>(1, false, 2.9, 2.9 ,3.1));
-//
-//        // They definitely should be a pair
-//        TS_ASSERT_LESS_THAN(norm_2(nodes[0]->rGetLocation() - nodes[1]->rGetLocation()), 1.5);
-//
-//        double cut_off_length = 1.5;
-//
-//        c_vector<double, 2*3> domain_size;  // 3x3x3 boxes
-//        domain_size(0) = 0.0;
-//        domain_size(1) = 4.4;
-//        domain_size(2) = 0.0;
-//        domain_size(3) = 4.4;
-//        domain_size(4) = 0.0;
-//        domain_size(5) = 4.4;
-//
-//        BoxCollection<3> box_collection(cut_off_length, domain_size);
-//        box_collection.SetupLocalBoxesHalfOnly();
-//
-//        for (unsigned i=0; i<nodes.size(); i++)
-//        {
-//            unsigned box_index = box_collection.CalculateContainingBox(nodes[i]);
-//            box_collection.rGetBox(box_index).AddNode(nodes[i]);
-//        }
-//
-//        std::set< std::pair<Node<3>*, Node<3>* > > pairs_returned;
-//        std::map<unsigned, std::set<unsigned> > neighbours_returned;
-//
-//        box_collection.CalculateNodePairs(nodes,pairs_returned, neighbours_returned);
-//
-//        TS_ASSERT_EQUALS(pairs_returned.size(), 1u);
-//    }
+    void TestPairsReturned3d() throw (Exception)
+    {
+        // 3D cube of nodes, set up so that there is one node in each of the 3x3x3 boxes.
+        std::vector<Node<3>* > nodes;
+        for (unsigned k=0; k<3; k++)
+        {
+            for (unsigned j=0; j<3; j++)
+            {
+                for (unsigned i=0; i<3; i++)
+                {
+                    nodes.push_back(new Node<3>(i + 3*j + 9*k, false, 0.75 + 1.5*i, 0.75 + 1.5*j , 0.75 + 1.5*k));
+                }
+            }
+        }
+
+        double cut_off_length = 1.5;
+
+        c_vector<double, 2*3> domain_size;  // 3x3x3 boxes
+        domain_size(0) = 0.0;
+        domain_size(1) = 4.4;
+        domain_size(2) = 0.0;
+        domain_size(3) = 4.4;
+        domain_size(4) = 0.0;
+        domain_size(5) = 4.4;
+
+        BoxCollection<3> box_collection(cut_off_length, domain_size);
+        box_collection.SetupLocalBoxesHalfOnly();
+
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            unsigned box_index = box_collection.CalculateContainingBox(nodes[i]);
+            box_collection.rGetBox(box_index).AddNode(nodes[i]);
+        }
+
+        // Make sure there is exactly one node in each box.
+        for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
+        {
+            TS_ASSERT_EQUALS(box_collection.rGetBox(i).rGetNodesContained().size(), 1u)
+        }
+
+        // Calculate which pairs of node should be pairs
+        std::map<unsigned, std::set<unsigned> > neighbours_should_be;
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            for (unsigned j=0; j<nodes.size(); j++)
+            {
+                if((i < j) && norm_2(nodes[i]->rGetLocation() - nodes[j]->rGetLocation()) < 2.6)    // sqrt ( 1.5^2 + 1.5^2 + 1.5^2) rounded up.
+                {
+                    neighbours_should_be[i].insert(j);
+                    neighbours_should_be[j].insert(i);
+                }
+            }
+        }
+
+        std::set< std::pair<Node<3>*, Node<3>* > > pairs_returned;
+        std::map<unsigned, std::set<unsigned> > neighbours_returned;
+
+        box_collection.CalculateNodePairs(nodes,pairs_returned, neighbours_returned);
+
+        // Check that the correct pairs of node 13 (central node) are in the pairs
+        std::vector<unsigned> pairs_of_13;
+        pairs_of_13.push_back(5);
+        pairs_of_13.push_back(6);
+        pairs_of_13.push_back(7);
+        pairs_of_13.push_back(8);
+        pairs_of_13.push_back(14);
+        pairs_of_13.push_back(15);
+        pairs_of_13.push_back(16);
+        pairs_of_13.push_back(17);
+        pairs_of_13.push_back(22);
+        pairs_of_13.push_back(23);
+        pairs_of_13.push_back(24);
+        pairs_of_13.push_back(25);
+        pairs_of_13.push_back(26);
+
+        for(unsigned i=0;i<pairs_of_13.size(); i++)
+        {
+            std::pair<Node<3>*, Node<3>* > pair(nodes[13], nodes[pairs_of_13[i]]);
+            TS_ASSERT(pairs_returned.find(pair) != pairs_returned.end());
+        }
+        // And check that others are not pairs
+        std::vector<unsigned> not_pairs_of_13;
+        not_pairs_of_13.push_back(0);
+        not_pairs_of_13.push_back(1);
+        not_pairs_of_13.push_back(2);
+        not_pairs_of_13.push_back(3);
+        not_pairs_of_13.push_back(4);
+        not_pairs_of_13.push_back(9);
+        not_pairs_of_13.push_back(10);
+        not_pairs_of_13.push_back(11);
+        not_pairs_of_13.push_back(13);
+        not_pairs_of_13.push_back(18);
+        not_pairs_of_13.push_back(19);
+        not_pairs_of_13.push_back(20);
+        not_pairs_of_13.push_back(21);
+
+        for(unsigned i=0;i<not_pairs_of_13.size(); i++)
+        {
+            std::pair<Node<3>*, Node<3>* > pair(nodes[13], nodes[not_pairs_of_13[i]]);
+            TS_ASSERT(pairs_returned.find(pair) == pairs_returned.end());
+        }
+
+        // Check the neighbour lists
+        for(unsigned i=0; i<nodes.size(); i++)
+        {
+            TS_ASSERT_EQUALS(neighbours_should_be[i], neighbours_returned[i]);
+        }
+    }
 
     void TestPairsReturned2dPeriodic() throw (Exception)
     {
@@ -952,7 +1021,6 @@ public:
 
         std::set<unsigned> local_boxes_to_box_13 = box_collection.GetLocalBoxes(13);
         std::set<unsigned> correct_answer_13;
-        correct_answer_13.insert(4);
         correct_answer_13.insert(5);
         correct_answer_13.insert(6);
         correct_answer_13.insert(7);
@@ -971,7 +1039,6 @@ public:
 
         std::set<unsigned> local_boxes_to_box_34 = box_collection.GetLocalBoxes(34);
         std::set<unsigned> correct_answer_34;
-        correct_answer_34.insert(25);
         correct_answer_34.insert(26);
         correct_answer_34.insert(34);
         correct_answer_34.insert(35);
@@ -979,7 +1046,6 @@ public:
 
         std::set<unsigned> local_boxes_to_box_35 = box_collection.GetLocalBoxes(35);
         std::set<unsigned> correct_answer_35;
-        correct_answer_35.insert(26);
         correct_answer_35.insert(35);
         TS_ASSERT_EQUALS(local_boxes_to_box_35, correct_answer_35);
     }
