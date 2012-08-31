@@ -96,8 +96,9 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 Hdf5ToMeshalyzerConverter<ELEMENT_DIM,SPACE_DIM>::Hdf5ToMeshalyzerConverter(std::string inputDirectory,
                                                                             std::string fileBaseName,
                                                                             AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                                                                            bool usingOriginalNodeOrdering)
-    : AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>(inputDirectory, fileBaseName, pMesh, "output")
+                                                                            bool usingOriginalNodeOrdering,
+                                                                            std::string datasetName)
+    : AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>(inputDirectory, fileBaseName, pMesh, "output", datasetName)
 {
     std::vector<std::string> variable_names = this->mpReader->GetVariableNames();
     for (unsigned i=0; i<variable_names.size(); i++)

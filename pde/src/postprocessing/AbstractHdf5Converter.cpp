@@ -40,13 +40,14 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>::AbstractHdf5Converter(std::string inputDirectory,
                                                                      std::string fileBaseName,
                                                                      AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
-                                                                     std::string subdirectoryName)
+                                                                     std::string subdirectoryName,
+                                                                     std::string datasetName)
     : mFileBaseName(fileBaseName),
       mpMesh(pMesh),
       mRelativeSubdirectory(subdirectoryName)
 {
     // Store directory, mesh and filenames and create the reader
-    mpReader = new Hdf5DataReader(inputDirectory, mFileBaseName);
+    mpReader = new Hdf5DataReader(inputDirectory, mFileBaseName, true, datasetName);
 
     // Create new directory in which to store everything
     mpOutputFileHandler = new OutputFileHandler(inputDirectory + "/" + mRelativeSubdirectory, false);

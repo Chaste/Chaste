@@ -76,17 +76,19 @@ public:
     /**
      * Constructor, which does the conversion and writes the .info file.
      *
-     * @note This method is collective, and must be called by al processes.
+     * @note This method is collective, and must be called by all processes.
      *
      * @param inputDirectory The input directory, relative to CHASTE_TEST_OUTPUT, where the .h5 file has been written
      * @param fileBaseName The base name of the data file.
      * @param pMesh Pointer to the mesh.
      * @param subdirectoryName name for the output directory to be created (relative to inputDirectory)
+     * @param datasetName  The name of the dataset to convert, defaults to "Data" which gives the PDE variables.
      */
     AbstractHdf5Converter(std::string inputDirectory,
                           std::string fileBaseName,
                           AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                          std::string subdirectoryName);
+                          std::string subdirectoryName,
+                          std::string datasetName = "Data");
 
     /**
      * Destructor.
