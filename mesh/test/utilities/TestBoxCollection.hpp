@@ -779,11 +779,12 @@ public:
         pairs_of_13.push_back(25);
         pairs_of_13.push_back(26);
 
-        for(unsigned i=0;i<pairs_of_13.size(); i++)
+        for (unsigned i=0; i<pairs_of_13.size(); i++)
         {
             std::pair<Node<3>*, Node<3>* > pair(nodes[13], nodes[pairs_of_13[i]]);
             TS_ASSERT(pairs_returned.find(pair) != pairs_returned.end());
         }
+
         // And check that others are not pairs
         std::vector<unsigned> not_pairs_of_13;
         not_pairs_of_13.push_back(0);
@@ -800,16 +801,22 @@ public:
         not_pairs_of_13.push_back(20);
         not_pairs_of_13.push_back(21);
 
-        for(unsigned i=0;i<not_pairs_of_13.size(); i++)
+        for (unsigned i=0; i<not_pairs_of_13.size(); i++)
         {
             std::pair<Node<3>*, Node<3>* > pair(nodes[13], nodes[not_pairs_of_13[i]]);
             TS_ASSERT(pairs_returned.find(pair) == pairs_returned.end());
         }
 
         // Check the neighbour lists
-        for(unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i=0; i<nodes.size(); i++)
         {
             TS_ASSERT_EQUALS(neighbours_should_be[i], neighbours_returned[i]);
+        }
+
+        // Avoid memory leak
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
         }
     }
 
