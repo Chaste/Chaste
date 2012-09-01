@@ -479,7 +479,7 @@ GROUP "/" {
          }
       }
    }
-   DATASET "Time" {
+   DATASET "Data_Time" {
       DATATYPE  H5T_IEEE_F64LE
       DATASPACE  SIMPLE { ( 1 ) / ( H5S_UNLIMITED ) }
       DATA {
