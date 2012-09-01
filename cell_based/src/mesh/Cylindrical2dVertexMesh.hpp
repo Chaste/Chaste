@@ -90,7 +90,7 @@ public:
      * @param width the width (circumference) of the mesh
      * @param nodes vector of pointers to nodes
      * @param vertexElements vector of pointers to VertexElements
-     * @param cellRearrangementThreshold the minimum threshold distance for element rearrangment (defaults to 0.01)
+     * @param cellRearrangementThreshold the minimum threshold distance for element rearrangement (defaults to 0.01)
      * @param t2Threshold the maximum threshold distance for Type 2 swaps (defaults to 0.001)
      */
     Cylindrical2dVertexMesh(double width,

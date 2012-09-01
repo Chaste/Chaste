@@ -255,10 +255,10 @@ public:
      *
      * @param nodes vector of pointers to nodes
      * @param vertexElements vector of pointers to VertexElements
-     * @param cellRearrangementThreshold the minimum threshold distance for element rearrangment (defaults to 0.01)
+     * @param cellRearrangementThreshold the minimum threshold distance for element rearrangement (defaults to 0.01)
      * @param t2Threshold the maximum threshold distance for Type 2 swaps (defaults to 0.001)
      * @param cellRearrangementRatio ratio between the minimum threshold distance for element
-     *                                rearrangment node separation after remeshing (defaults to 1.5)
+     *                                rearrangement node separation after remeshing (defaults to 1.5)
      */
     MutableVertexMesh(std::vector<Node<SPACE_DIM>*> nodes,
                       std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*> vertexElements,

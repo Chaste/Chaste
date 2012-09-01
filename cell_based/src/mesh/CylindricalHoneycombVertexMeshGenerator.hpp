@@ -59,7 +59,7 @@ public:
      * @param numElementsAcross  The number of columns of elements in the mesh
      * @param numElementsUp  The number of rows of elements in the mesh
      * @param isFlatBottom  Whether to enforce a flat bottom to the mesh (defaults to false; only used if isCylindrical is true)
-     * @param cellRearrangementThreshold the minimum threshold distance for element rearrangment (defaults to 0.01)
+     * @param cellRearrangementThreshold the minimum threshold distance for element rearrangement (defaults to 0.01)
      * @param t2Threshold the maximum threshold distance for Type 2 swaps (defaults to 0.001)
      */
     CylindricalHoneycombVertexMeshGenerator(unsigned numElementsAcross,
