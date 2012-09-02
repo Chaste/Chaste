@@ -448,9 +448,9 @@ public:
 
     void TestCylindricalElementIncludesPointAndGetLocalIndexForElementEdgeClosestToPoint()
     {
-        // Set up a simple cylindrical mesh with one triangular element
+        // Set up a simple cylindrical mesh with one rectangular element
 
-        // Make 3 nodes
+        // Make four nodes
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, false, 9.0, 2.0));
         nodes.push_back(new Node<2>(1, false, 9.0, 0.0));

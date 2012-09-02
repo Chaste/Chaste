@@ -174,7 +174,8 @@ double Toroidal2dVertexMesh::GetVolumeOfElement(unsigned index)
                              - transformed_anticlockwise_node[0]*transformed_current_node[1]);
     }
 
-    return element_area;
+    // We take the absolute value just in case the nodes were really oriented clockwise
+    return fabs(element_area);
 }
 
 c_vector<double, 2> Toroidal2dVertexMesh::GetCentroidOfElement(unsigned index)

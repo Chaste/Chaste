@@ -176,11 +176,22 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetNode(8)->rGetLocation()[0], 0.1, 1e-4);
         TS_ASSERT_DELTA(p_mesh->GetNode(8)->rGetLocation()[1], 3.0*0.5/sqrt(3), 1e-4);
 
-        // This node was on the top and is now near the bottom ///\todo #2236
+        // This node was on the top and is now near the bottom
+        new_point.SetCoordinate(0, 3.5);
+        new_point.SetCoordinate(1, 6.0/sqrt(3)+0.1);
+        p_mesh->SetNode(31, new_point);
+        TS_ASSERT_DELTA(p_mesh->GetNode(31)->rGetLocation()[0], 3.5, 1e-4);
+        TS_ASSERT_DELTA(p_mesh->GetNode(31)->rGetLocation()[1], 0.1, 1e-4);
+
+        // This node was on the bottom and is now near the top
+        new_point.SetCoordinate(0, 2.5);
+        new_point.SetCoordinate(1, -0.1);
+        p_mesh->SetNode(2, new_point);
+        TS_ASSERT_DELTA(p_mesh->GetNode(2)->rGetLocation()[0], 2.5, 1e-4);
+        TS_ASSERT_DELTA(p_mesh->GetNode(2)->rGetLocation()[1], 6.0/sqrt(3) - 0.1, 1e-4);
     }
 
-    ///\todo fix failing test (#2236)
-    void DONOTTestAddNodeAndReMesh() throw (Exception)
+    void TestAddNodeAndReMesh() throw (Exception)
     {
         // Create mesh
         ToroidalHoneycombVertexMeshGenerator generator(6, 6);
@@ -213,13 +224,39 @@ public:
         TS_ASSERT_EQUALS(map.IsIdentityMap(), true);
 
         // Check that the mesh is updated
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 85u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 73u);
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 36u);
 
         TS_ASSERT_DELTA(p_mesh->GetNode(new_index)->rGetLocation()[0], 5.99, 1e-4);
-        TS_ASSERT_DELTA(p_mesh->GetNode(new_index)->rGetLocation()[1], 4.5000, 1e-4);
+        TS_ASSERT_DELTA(p_mesh->GetNode(new_index)->rGetLocation()[1], 4.0*0.5/sqrt(3), 1e-4);
 
-        // Choose a node on the left boundary ///\todo #2236
+        // Repeat this with a node on the top boundary
+        point = p_mesh->GetNode(70)->GetPoint();
+        TS_ASSERT_DELTA(point[0], 4.5, 1e-4);
+        TS_ASSERT_DELTA(point[1], 8.0/sqrt(3), 1e-4);
+
+        // Create a new node close to this node
+        point.SetCoordinate(0, 4.5);
+        point.SetCoordinate(1, 9.0/sqrt(3)+0.01);
+        p_node = new Node<2>(p_mesh->GetNumNodes(), point);
+
+        old_num_nodes = p_mesh->GetNumNodes();
+        new_index = p_mesh->AddNode(p_node);
+        TS_ASSERT_EQUALS(new_index, old_num_nodes);
+
+        // Call ReMesh() to update correspondences
+        VertexElementMap map2(p_mesh->GetNumElements());
+        p_mesh->ReMesh(map2);
+
+        TS_ASSERT_EQUALS(map2.Size(), p_mesh->GetNumElements());
+        TS_ASSERT_EQUALS(map2.IsIdentityMap(), true);
+
+        // Check that the mesh is updated
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 74u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 36u);
+
+        TS_ASSERT_DELTA(p_mesh->GetNode(new_index)->rGetLocation()[0], 4.5, 1e-4);
+        TS_ASSERT_DELTA(p_mesh->GetNode(new_index)->rGetLocation()[1], 0.01, 1e-4);
 
         // Now test AddNode() when mDeletedNodeIndices is populated
 
@@ -274,9 +311,9 @@ public:
         {
             moments = p_mesh->CalculateMomentsOfElement(i);
 
-            TS_ASSERT_DELTA(moments(0), 5*sqrt(3)/16/9, 1e-6);    // Ixx
-            TS_ASSERT_DELTA(moments(1), 5*sqrt(3)/16/9, 1e-6);    // Iyy
-            TS_ASSERT_DELTA(moments(2), 0.0, 1e-6);    // Ixy
+            TS_ASSERT_DELTA(moments(0), 5*sqrt(3)/16/9, 1e-6); // Ixx
+            TS_ASSERT_DELTA(moments(1), 5*sqrt(3)/16/9, 1e-6); // Iyy
+            TS_ASSERT_DELTA(moments(2), 0.0, 1e-6);            // Ixy
         }
     }
 
@@ -302,11 +339,9 @@ public:
 
         TS_ASSERT_DELTA(p_mesh->GetNode(32)->rGetLocation()[0], 2.8660, 1e-4);
         TS_ASSERT_DELTA(p_mesh->GetNode(32)->rGetLocation()[1], 0.9433, 1e-4);
-
         TS_ASSERT_DELTA(p_mesh->GetNode(33)->rGetLocation()[0], 2.1339, 1e-4);
         TS_ASSERT_DELTA(p_mesh->GetNode(33)->rGetLocation()[1], 0.2113, 1e-4);
 
-        // Test new elements have correct nodes
         TS_ASSERT_EQUALS(p_mesh->GetElement(2)->GetNumNodes(), 5u);
         TS_ASSERT_EQUALS(p_mesh->GetElement(2)->GetNode(0)->GetIndex(), 2u);
         TS_ASSERT_EQUALS(p_mesh->GetElement(2)->GetNode(1)->GetIndex(), 7u);
@@ -334,7 +369,6 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetNode(35)->rGetLocation()[0], 3.1339, 1e-4);
         TS_ASSERT_DELTA(p_mesh->GetNode(35)->rGetLocation()[1], 0.2113, 1e-4);
 
-        // Test new elements have correct nodes
         TS_ASSERT_EQUALS(p_mesh->GetElement(3)->GetNumNodes(), 5u);
         TS_ASSERT_EQUALS(p_mesh->GetElement(3)->GetNode(0)->GetIndex(), 3u);
         TS_ASSERT_EQUALS(p_mesh->GetElement(3)->GetNode(1)->GetIndex(), 4u);
@@ -350,7 +384,31 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetElement(17)->GetNode(4)->GetIndex(), 35u);
 
         // Divide periodic element (top to bottom)
-        ///\todo #2236
+        new_element_index = p_mesh->DivideElementAlongGivenAxis(p_mesh->GetElement(13), axis_of_division, true);
+
+        TS_ASSERT_EQUALS(new_element_index, 18u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 19u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 38u);
+
+        TS_ASSERT_DELTA(p_mesh->GetNode(36)->rGetLocation()[0], 2.3660, 1e-4);
+        TS_ASSERT_DELTA(p_mesh->GetNode(36)->rGetLocation()[1], 0.0773, 1e-4);
+        TS_ASSERT_DELTA(p_mesh->GetNode(37)->rGetLocation()[0], 1.6339, 1e-4);
+        TS_ASSERT_DELTA(p_mesh->GetNode(37)->rGetLocation()[1], 2.8094, 1e-4);
+
+        TS_ASSERT_EQUALS(p_mesh->GetElement(13)->GetNumNodes(), 6u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(13)->GetNode(0)->GetIndex(), 36u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(13)->GetNode(1)->GetIndex(), 33u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(13)->GetNode(2)->GetIndex(), 6u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(13)->GetNode(3)->GetIndex(), 1u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(13)->GetNode(4)->GetIndex(), 29u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(13)->GetNode(5)->GetIndex(), 37u);
+
+        TS_ASSERT_EQUALS(p_mesh->GetElement(18)->GetNumNodes(), 5u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(18)->GetNode(0)->GetIndex(), 26u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(18)->GetNode(1)->GetIndex(), 30u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(18)->GetNode(2)->GetIndex(), 2u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(18)->GetNode(3)->GetIndex(), 36u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(18)->GetNode(4)->GetIndex(), 37u);
     }
 
     void TestArchiving() throw (Exception)
@@ -447,8 +505,7 @@ public:
         }
     }
 
-    ///\todo fix failing test (#2236)
-    void DONOTTestToroidalReMesh() throw (Exception)
+    void TestToroidalReMesh() throw (Exception)
     {
         // Create mesh
         unsigned num_cells_across = 6;
@@ -456,7 +513,7 @@ public:
         ToroidalHoneycombVertexMeshGenerator generator(num_cells_across, num_cells_up);
         Toroidal2dVertexMesh* p_mesh = generator.GetToroidalMesh();
 
-        // Remesh
+        // Call Remesh()
         VertexElementMap map(p_mesh->GetNumElements());
         p_mesh->ReMesh(map);
 
@@ -467,8 +524,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), num_cells_across*num_cells_up);
     }
 
-    ///\todo fix failing test (#2236)
-    void DONOTTestToroidalReMeshAfterDelete() throw (Exception)
+    void TestToroidalReMeshAfterDelete() throw (Exception)
     {
         // Create mesh
         unsigned num_cells_across = 6;
@@ -482,7 +538,7 @@ public:
         // Delete a node
         p_mesh->DeleteElementPriorToReMesh(8);
 
-        // Remesh
+        // Call Remesh()
         VertexElementMap map(p_mesh->GetNumElements());
         p_mesh->ReMesh(map);
 
@@ -494,12 +550,11 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), num_old_elements-1);
     }
 
-    ///\todo fix failing test (#2236)
-    void DONOTTestToroidalElementIncludesPointAndGetLocalIndexForElementEdgeClosestToPoint()
+    void TestToroidalElementIncludesPointAndGetLocalIndexForElementEdgeClosestToPoint()
     {
-        // Set up a simple toroidal mesh with one triangular element
+        // Set up a simple toroidal mesh with one rectangular element
 
-        // Make 3 nodes
+        // Make four nodes
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, false, 9.0, 2.0));
         nodes.push_back(new Node<2>(1, false, 9.0, 0.0));
@@ -513,7 +568,11 @@ public:
         // Make mesh
         Toroidal2dVertexMesh mesh(10.0, 3.0, nodes, elements);
 
-        TS_ASSERT_DELTA(mesh.GetVolumeOfElement(0), 4.0, 1e-10);
+        /*
+         * The area of the element, taking periodicity into account,
+         * should be equal to |((9-1) - 10)|*|((2-0) - 3)| = 2*1 = 2.
+         */
+        TS_ASSERT_DELTA(mesh.GetVolumeOfElement(0), 2.0, 1e-10);
 
         // Make some test points and test ElementIncludesPoint()
 
@@ -521,33 +580,34 @@ public:
         c_vector<double, 2> test_point1;
         test_point1[0] = -1.0;
         test_point1[1] = -1.0;
-
         TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(test_point1, 0), false);
 
         // A point outside the element due to periodicity
         c_vector<double, 2> test_point2;
         test_point1[0] = 3.0;
         test_point1[1] = 1.0;
-
         TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(test_point1, 0), false);
 
-        // A point far inside the element
+        // Another point outside the element due to periodicity
+        // (note that this point would be inside the element if we had a Cylindrical2dVertexMesh)
         c_vector<double, 2> test_point3;
         test_point3[0] = 9.5;
         test_point3[1] = 1.0;
-
-        TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(test_point3, 0), true);
-        TS_ASSERT_EQUALS(mesh.GetLocalIndexForElementEdgeClosestToPoint(test_point3, 0), 0u);
+        TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(test_point3, 0), false);
 
         // A point far inside the element as periodic
         c_vector<double, 2> test_point4;
-        test_point4[0] = 0.5;
-        test_point4[1] = 1.0;
-
+        test_point4[0] = 0.9;
+        test_point4[1] = -0.2;
         TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(test_point4, 0), true);
         TS_ASSERT_EQUALS(mesh.GetLocalIndexForElementEdgeClosestToPoint(test_point4, 0), 2u);
 
-        ///\todo top-bottom periodicity #2236
+        // Another point far inside the element as periodic
+        c_vector<double, 2> test_point5;
+        test_point5[0] = 9.99;
+        test_point5[1] = 2.1;
+        TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(test_point5, 0), true);
+        TS_ASSERT_EQUALS(mesh.GetLocalIndexForElementEdgeClosestToPoint(test_point5, 0), 3u);
     }
 };
 
