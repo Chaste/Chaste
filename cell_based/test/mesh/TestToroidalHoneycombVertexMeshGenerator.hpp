@@ -82,21 +82,16 @@ public:
         TS_ASSERT_EQUALS(p_element5->GetNodeGlobalIndex(4), 17u);
         TS_ASSERT_EQUALS(p_element5->GetNodeGlobalIndex(5), 13u);
 
-        /**
-         * Note that the indices of the 'boundary' elements created by the ToroidalHoneycombVertexMeshGenerator
-         * are relabelled when ReMesh() is called in the Toroidal2dVertexMesh constructor.
-         * \todo check why this occurs and if it matters (#2236)
-         */
-        VertexElement<2,2>* p_element13 = p_mesh->GetElement(13);
-        TS_ASSERT_EQUALS(p_element13->GetNumNodes(), 6u);
-        TS_ASSERT_EQUALS(p_element13->GetNodeGlobalIndex(0), 8u);
-        TS_ASSERT_EQUALS(p_element13->GetNodeGlobalIndex(1), 12u);
-        TS_ASSERT_EQUALS(p_element13->GetNodeGlobalIndex(2), 16u);
-        TS_ASSERT_EQUALS(p_element13->GetNodeGlobalIndex(3), 20u);
-        TS_ASSERT_EQUALS(p_element13->GetNodeGlobalIndex(4), 19u);
-        TS_ASSERT_EQUALS(p_element13->GetNodeGlobalIndex(5), 15u);
+        VertexElement<2,2>* p_element7 = p_mesh->GetElement(7);
+        TS_ASSERT_EQUALS(p_element7->GetNumNodes(), 6u);
+        TS_ASSERT_EQUALS(p_element7->GetNodeGlobalIndex(0), 8u);
+        TS_ASSERT_EQUALS(p_element7->GetNodeGlobalIndex(1), 12u);
+        TS_ASSERT_EQUALS(p_element7->GetNodeGlobalIndex(2), 16u);
+        TS_ASSERT_EQUALS(p_element7->GetNodeGlobalIndex(3), 20u);
+        TS_ASSERT_EQUALS(p_element7->GetNodeGlobalIndex(4), 19u);
+        TS_ASSERT_EQUALS(p_element7->GetNodeGlobalIndex(5), 15u);
 
-        VertexElement<2,2>* p_element12 = p_mesh->GetElement(3);
+        VertexElement<2,2>* p_element12 = p_mesh->GetElement(12);
         TS_ASSERT_EQUALS(p_element12->GetNumNodes(), 6u);
         TS_ASSERT_EQUALS(p_element12->GetNodeGlobalIndex(0), 25u);
         TS_ASSERT_EQUALS(p_element12->GetNodeGlobalIndex(1), 29u);

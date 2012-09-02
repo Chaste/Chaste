@@ -74,9 +74,9 @@ ToroidalHoneycombVertexMeshGenerator::ToroidalHoneycombVertexMeshGenerator(unsig
      * Create the elements. The array node_indices contains the
      * global node indices from bottom, going anticlockwise.
      */
-    for (unsigned i=0; i<numElementsAcross; i++)
+    for (unsigned j=0; j<numElementsUp; j++)
     {
-        for (unsigned j=0; j<numElementsUp; j++)
+        for (unsigned i=0; i<numElementsAcross; i++)
         {
             element_index = j*numElementsAcross + i;
 

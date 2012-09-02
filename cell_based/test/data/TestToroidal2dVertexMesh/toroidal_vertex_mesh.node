@@ -31,5 +31,5 @@
 29	1.5	2.88675	0
 30	2.5	2.88675	0
 31	3.5	2.88675	0
-# Created by Chaste version 3.1.16748 (with uncommitted modifications) on Sun, 02 Sep 2012 10:15:35 +0000.  Chaste was built on Sun, 02 Sep 2012 10:15:22 +0000 by machine (uname) 'Linux csu6835 3.2.0-23-generic #36-Ubuntu SMP Tue Apr 10 20:39:51 UTC 2012 x86_64' using settings: default, no Chaste libraries.  Checked-out project versions: AlexF=16536; CellBasedComparison=16536; CryptInvasion=16624; VertexComparison2012=16536; ocisb=16727.
+# Created by Chaste version 3.1.16751 (with uncommitted modifications) on Sun, 02 Sep 2012 17:21:58 +0000.  Chaste was built on Sun, 02 Sep 2012 17:21:50 +0000 by machine (uname) 'Linux csu6835 3.2.0-23-generic #36-Ubuntu SMP Tue Apr 10 20:39:51 UTC 2012 x86_64' using settings: Coverage, no Chaste libraries.  Checked-out project versions: AlexF=16536; CellBasedComparison=16536; CryptInvasion=16624; VertexComparison2012=16536; ocisb=16727.
 
