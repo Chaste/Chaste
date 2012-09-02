@@ -33,94 +33,117 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "Cylindrical2dVertexMesh.hpp"
+#include "Toroidal2dVertexMesh.hpp"
 
-Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(double width,
-                                                 std::vector<Node<2>*> nodes,
-                                                 std::vector<VertexElement<2, 2>*> vertexElements,
-                                                 double cellRearrangementThreshold,
-                                                 double t2Threshold)
+Toroidal2dVertexMesh::Toroidal2dVertexMesh(double width,
+                                           double height,
+                                           std::vector<Node<2>*> nodes,
+                                           std::vector<VertexElement<2, 2>*> vertexElements,
+                                           double cellRearrangementThreshold,
+                                           double t2Threshold)
     : MutableVertexMesh<2,2>(nodes, vertexElements, cellRearrangementThreshold, t2Threshold),
-      mWidth(width)
+      mWidth(width),
+      mHeight(height)
 {
-    // ReMesh to remove any deleted nodes and relabel
+    // Call ReMesh() to remove any deleted nodes and relabel
     ReMesh();
 }
 
-Cylindrical2dVertexMesh::Cylindrical2dVertexMesh()
+Toroidal2dVertexMesh::Toroidal2dVertexMesh()
 {
 }
 
-Cylindrical2dVertexMesh::~Cylindrical2dVertexMesh()
+Toroidal2dVertexMesh::~Toroidal2dVertexMesh()
 {
 }
 
-c_vector<double, 2> Cylindrical2dVertexMesh::GetVectorFromAtoB(const c_vector<double, 2>& rLocation1, const c_vector<double, 2>& rLocation2)
+c_vector<double, 2> Toroidal2dVertexMesh::GetVectorFromAtoB(const c_vector<double, 2>& rLocation1, const c_vector<double, 2>& rLocation2)
 {
     assert(mWidth > 0.0);
+    assert(mHeight > 0.0);
 
     c_vector<double, 2> vector = rLocation2 - rLocation1;
     vector[0] = fmod(vector[0], mWidth);
+    vector[1] = fmod(vector[1], mHeight);
 
-    // If the points are more than halfway around the cylinder apart, measure the other way
-    if (vector[0] > mWidth/2.0)
+    // If the points are more than halfway across the domain, measure the other way
+    if (vector[0] > 0.5*mWidth)
     {
         vector[0] -= mWidth;
     }
-    else if (vector[0] < -mWidth/2.0)
+    else if (vector[0] < -0.5*mWidth)
     {
         vector[0] += mWidth;
+    }
+
+    // If the points are more than halfway up the domain, measure the other way
+    if (vector[1] > 0.5*mHeight)
+    {
+        vector[1] -= mHeight;
+    }
+    else if (vector[1] < -0.5*mHeight)
+    {
+        vector[1] += mHeight;
     }
     return vector;
 }
 
-void Cylindrical2dVertexMesh::SetNode(unsigned nodeIndex, ChastePoint<2> point)
+void Toroidal2dVertexMesh::SetNode(unsigned nodeIndex, ChastePoint<2> point)
 {
     double x_coord = point.rGetLocation()[0];
+    double y_coord = point.rGetLocation()[1];
 
     // Perform a periodic movement if necessary
     if (x_coord >= mWidth)
     {
-        // Move point to the left
+        // Move point left
         point.SetCoordinate(0, x_coord - mWidth);
     }
     else if (x_coord < 0.0)
     {
-        // Move point to the right
+        // Move point right
         point.SetCoordinate(0, x_coord + mWidth);
+    }
+    if (y_coord >= mHeight)
+    {
+        // Move point down
+        point.SetCoordinate(1, y_coord - mHeight);
+    }
+    else if (y_coord < 0.0)
+    {
+        // Move point up
+        point.SetCoordinate(1, y_coord + mHeight);
     }
 
     // Update the node's location
     MutableVertexMesh<2,2>::SetNode(nodeIndex, point);
 }
 
-double Cylindrical2dVertexMesh::GetWidth(const unsigned& rDimension) const
+double Toroidal2dVertexMesh::GetWidth(const unsigned& rDimension) const
 {
-    double width = 0.0;
     assert(rDimension==0 || rDimension==1);
-    if (rDimension==0)
+
+    double width = mWidth;
+    if (rDimension == 1)
     {
-        width = mWidth;
+        width = mHeight;
     }
-    else
-    {
-        width = VertexMesh<2,2>::GetWidth(rDimension);
-    }
+
     return width;
 }
 
-unsigned Cylindrical2dVertexMesh::AddNode(Node<2>* pNewNode)
+unsigned Toroidal2dVertexMesh::AddNode(Node<2>* pNewNode)
 {
     unsigned node_index = MutableVertexMesh<2,2>::AddNode(pNewNode);
 
-    // If necessary move it to be back on the cylinder
+    // If necessary move it to be back onto the torus
     ChastePoint<2> new_node_point = pNewNode->GetPoint();
     SetNode(node_index, new_node_point);
 
     return node_index;
 }
 
-double Cylindrical2dVertexMesh::GetVolumeOfElement(unsigned index)
+double Toroidal2dVertexMesh::GetVolumeOfElement(unsigned index)
 {
     VertexElement<2, 2>* p_element = GetElement(index);
 
@@ -144,18 +167,17 @@ double Cylindrical2dVertexMesh::GetVolumeOfElement(unsigned index)
          * In order to calculate the area we map the origin to (x[0],y[0])
          * then use GetVectorFromAtoB() to get node coordinates
          */
-
         transformed_current_node = GetVectorFromAtoB(first_node, current_node);
         transformed_anticlockwise_node = GetVectorFromAtoB(first_node, anticlockwise_node);
 
         element_area += 0.5*(transformed_current_node[0]*transformed_anticlockwise_node[1]
-                           - transformed_anticlockwise_node[0]*transformed_current_node[1]);
+                             - transformed_anticlockwise_node[0]*transformed_current_node[1]);
     }
 
     return element_area;
 }
 
-c_vector<double, 2> Cylindrical2dVertexMesh::GetCentroidOfElement(unsigned index)
+c_vector<double, 2> Toroidal2dVertexMesh::GetCentroidOfElement(unsigned index)
 {
     VertexElement<2, 2>* p_element = GetElement(index);
 
@@ -203,4 +225,4 @@ c_vector<double, 2> Cylindrical2dVertexMesh::GetCentroidOfElement(unsigned index
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-CHASTE_CLASS_EXPORT(Cylindrical2dVertexMesh)
+CHASTE_CLASS_EXPORT(Toroidal2dVertexMesh)

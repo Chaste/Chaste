@@ -33,19 +33,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "CylindricalHoneycombVertexMeshGenerator.hpp"
+#include "ToroidalHoneycombVertexMeshGenerator.hpp"
 
-CylindricalHoneycombVertexMeshGenerator::CylindricalHoneycombVertexMeshGenerator(unsigned numElementsAcross,
-                                                           unsigned numElementsUp,
-                                                           bool isFlatBottom,
-                                                           double cellRearrangementThreshold,
-                                                           double t2Threshold)
+ToroidalHoneycombVertexMeshGenerator::ToroidalHoneycombVertexMeshGenerator(unsigned numElementsAcross,
+   unsigned numElementsUp,
+   double cellRearrangementThreshold,
+   double t2Threshold)
 {
-    // numElementsAcross must be even for cylindrical meshes
+    // numElementsAcross and numElementsUp must be even for toroidal meshes
     assert(numElementsAcross > 1);
+    assert(numElementsUp > 1);
     assert(numElementsAcross%2 == 0);
+    assert(numElementsUp%2 == 0);
 
-    assert(numElementsUp > 0);
     assert(cellRearrangementThreshold > 0.0);
     assert(t2Threshold > 0.0);
 
@@ -57,44 +57,26 @@ CylindricalHoneycombVertexMeshGenerator::CylindricalHoneycombVertexMeshGenerator
     unsigned element_index;
 
     // Create the nodes
-    for (unsigned j=0; j<=2*numElementsUp+1; j++)
+    for (unsigned j=0; j<2*numElementsUp; j++)
     {
-        if (isFlatBottom && (j==1))
-        {
-            // Flat bottom to cylindrical mesh
-            for (unsigned i=0; i<=numElementsAcross-1; i++)
-            {
-                Node<2>* p_node = new Node<2>(node_index, true, i, 0.0);
-                nodes.push_back(p_node);
-                node_index++;
-            }
-        }
-        /*
-         * On each interior row we have numElementsAcross+1 nodes. All nodes on the first, second,
-         * penultimate and last rows are boundary nodes. On other rows no nodes are boundary nodes.
-         */
-        else
-        {
-            for (unsigned i=0; i<=numElementsAcross-1; i++)
-            {
-                double x_coord = ((j%4 == 0)||(j%4 == 3)) ? i+0.5 : i;
-                double y_coord = (1.5*j - 0.5*(j%2))*0.5/sqrt(3);
-                bool is_boundary_node = (j==0 || j==1 || j==2*numElementsUp || j==2*numElementsUp+1) ? true : false;
+    	for (unsigned i=0; i<numElementsAcross; i++)
+		{
+			double x_coord = ((j%4 == 0)||(j%4 == 3)) ? i+0.5 : i;
+			double y_coord = (1.5*j - 0.5*(j%2))*0.5/sqrt(3);
 
-                Node<2>* p_node = new Node<2>(node_index, is_boundary_node , x_coord, y_coord);
-                nodes.push_back(p_node);
-                node_index++;
-            }
-        }
+            Node<2>* p_node = new Node<2>(node_index, false , x_coord, y_coord);
+			nodes.push_back(p_node);
+			node_index++;
+		}
     }
 
     /*
      * Create the elements. The array node_indices contains the
      * global node indices from bottom, going anticlockwise.
      */
-    for (unsigned j=0; j<numElementsUp; j++)
+    for (unsigned i=0; i<numElementsAcross; i++)
     {
-        for (unsigned i=0; i<numElementsAcross; i++)
+        for (unsigned j=0; j<numElementsUp; j++)
         {
             element_index = j*numElementsAcross + i;
 
@@ -105,12 +87,18 @@ CylindricalHoneycombVertexMeshGenerator::CylindricalHoneycombVertexMeshGenerator
             node_indices[4] = node_indices[0] + 2*numElementsAcross - 1*(j%2==1);
             node_indices[5] = node_indices[0] + numElementsAcross - 1*(j%2==1);
 
-            if (i==numElementsAcross-1) // on far right
+            if (i == numElementsAcross-1) // on far right
             {
                 node_indices[0] -= numElementsAcross*(j%2==1);
                 node_indices[1] -= numElementsAcross;
                 node_indices[2] -= numElementsAcross;
                 node_indices[3] -= numElementsAcross*(j%2==1);
+            }
+            if (j == numElementsUp-1) // on far top
+            {
+                node_indices[2] -= 2*numElementsAcross*numElementsUp;
+                node_indices[3] -= 2*numElementsAcross*numElementsUp;
+                node_indices[4] -= 2*numElementsAcross*numElementsUp;
             }
 
             std::vector<Node<2>*> element_nodes;
@@ -123,24 +111,19 @@ CylindricalHoneycombVertexMeshGenerator::CylindricalHoneycombVertexMeshGenerator
         }
     }
 
-    // If imposing a flat bottom, delete unnecessary nodes from the mesh
-    if (isFlatBottom)
-    {
-        for (unsigned i=0; i<numElementsAcross; i++)
-        {
-            nodes[i]->SetPoint(nodes[i+numElementsAcross]->GetPoint());
-        }
-    }
-    mpMesh = new Cylindrical2dVertexMesh(numElementsAcross, nodes, elements, cellRearrangementThreshold, t2Threshold);
+    double mesh_width = numElementsAcross;
+    double mesh_height = 1.5*numElementsUp/sqrt(3);
+
+    mpMesh = new Toroidal2dVertexMesh(mesh_width, mesh_height, nodes, elements, cellRearrangementThreshold, t2Threshold);
 }
 
-MutableVertexMesh<2,2>* CylindricalHoneycombVertexMeshGenerator::GetMesh()
+MutableVertexMesh<2,2>* ToroidalHoneycombVertexMeshGenerator::GetMesh()
 {
-    EXCEPTION("A cylindrical mesh was created but a normal mesh is being requested.");
+    EXCEPTION("A toroidal mesh was created but a normal mesh is being requested.");
     return mpMesh; // Not really
 }
 
-Cylindrical2dVertexMesh* CylindricalHoneycombVertexMeshGenerator::GetCylindricalMesh()
+Toroidal2dVertexMesh* ToroidalHoneycombVertexMeshGenerator::GetToroidalMesh()
 {
-    return (Cylindrical2dVertexMesh*) mpMesh;
+    return (Toroidal2dVertexMesh*) mpMesh;
 }

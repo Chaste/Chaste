@@ -33,23 +33,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef CYLINDRICALHONEYCOMBVERTEXMESHGENERATOR_HPP_
-#define CYLINDRICALHONEYCOMBVERTEXMESHGENERATOR_HPP_
+#ifndef TOROIDALHONEYCOMBVERTEXMESHGENERATOR_HPP_
+#define TOROIDALHONEYCOMBVERTEXMESHGENERATOR_HPP_
 
 #include <cmath>
 #include <vector>
 
-#include "Cylindrical2dVertexMesh.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
+#include "Toroidal2dVertexMesh.hpp"
 
 /**
- * Honeycomb mesh generator that creates a 2D "cylindrical" mesh (one in which
- * periodicity is imposed on the left and right boundaries) for use in vertex
- * simulations.
+ * Honeycomb mesh generator that creates a 2D "toroidal" mesh (one in which
+ * periodicity is imposed on the left and right and top and bottom boundaries)
+ * for use with vertex-based simulations.
  *
  * NOTE: the user should delete the mesh after use to manage memory.
  */
-class CylindricalHoneycombVertexMeshGenerator : HoneycombVertexMeshGenerator
+class ToroidalHoneycombVertexMeshGenerator : HoneycombVertexMeshGenerator
 {
 public:
 
@@ -58,24 +58,22 @@ public:
      *
      * @param numElementsAcross  The number of columns of elements in the mesh
      * @param numElementsUp  The number of rows of elements in the mesh
-     * @param isFlatBottom  Whether to enforce a flat bottom to the mesh (defaults to false)
      * @param cellRearrangementThreshold the minimum threshold distance for element rearrangement (defaults to 0.01)
      * @param t2Threshold the maximum threshold distance for Type 2 swaps (defaults to 0.001)
      */
-    CylindricalHoneycombVertexMeshGenerator(unsigned numElementsAcross,
-                                 unsigned numElementsUp,
-                                 bool isFlatBottom=false,
-                                 double cellRearrangementThreshold=0.01,
-                                 double t2Threshold=0.001);
+    ToroidalHoneycombVertexMeshGenerator(unsigned numElementsAcross,
+										 unsigned numElementsUp,
+										 double cellRearrangementThreshold=0.01,
+										 double t2Threshold=0.001);
     /**
      * @return a 2D honeycomb mesh
      */
     MutableVertexMesh<2,2>* GetMesh();
 
     /**
-     * @return a 2D honeycomb mesh with periodic left/right boundaries
+     * @return a 2D honeycomb mesh with periodic left/right and top/bottom boundaries
      */
-    Cylindrical2dVertexMesh* GetCylindricalMesh();
+    Toroidal2dVertexMesh* GetToroidalMesh();
 };
 
-#endif /*CYLINDRICALHONEYCOMBVERTEXMESHGENERATOR_HPP_*/
+#endif /*TOROIDALHONEYCOMBVERTEXMESHGENERATOR_HPP_*/

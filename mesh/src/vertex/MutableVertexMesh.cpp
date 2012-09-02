@@ -191,12 +191,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNumElements() const
     return this->mElements.size() - mDeletedElementIndices.size();
 }
 
-//\todo deal with boundary elements in vertex meshes #1392.
-//template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-//unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNumBoundaryElements() const
-//{
-//    return mBoundaryElements.size();
-//}
+///\todo deal with boundary elements in vertex meshes (see #1392)
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector< c_vector<double, SPACE_DIM> > MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocationsOfT1Swaps()
@@ -423,9 +418,11 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
             {
                 index = local_indexA;
             }
+
             // Add new node to this element
             this->GetElement(*iter)->AddNode(this->GetNode(new_node_global_index), index);
         }
+
         // Store index of new node
         division_node_global_indices.push_back(new_node_global_index);
     }
@@ -465,7 +462,6 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(VertexElement<
 
     // Sort nodeA and nodeB such that nodeBIndex > nodeAindex
     assert(nodeBIndex != nodeAIndex);
-
     unsigned node1_index = (nodeAIndex < nodeBIndex) ? nodeAIndex : nodeBIndex; // low index
     unsigned node2_index = (nodeAIndex < nodeBIndex) ? nodeBIndex : nodeAIndex; // high index
 
@@ -631,7 +627,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideEdge(Node<SPACE_DIM>* pNod
     assert(!shared_elements.empty());
     assert(!shared_elements.size()<=2);
 
-    // Specifiy if its a boundary node
+    // Specify if it's a boundary node
     bool is_boundary_node = false;
     if (shared_elements.size()==1)
     {
@@ -673,6 +669,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideEdge(Node<SPACE_DIM>* pNod
         {
             index = local_indexA;
         }
+
         // Add new node to this element
         this->GetElement(*iter)->AddNode(p_new_node, index);
     }
@@ -774,11 +771,11 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
             }
         }
 
-        //Check for element intersections.
+        // Check for element intersections
         recheck_mesh = true;
         while (recheck_mesh == true)
         {
-            //Check mesh for intersections, and perform T3Swaps where required
+            // Check mesh for intersections, and perform T3Swaps where required
             recheck_mesh = CheckForIntersections();
         }
 

@@ -29,6 +29,8 @@ mesh/TestSemMesh.hpp
 mesh/TestSemMeshGenerator.hpp
 mesh/TestSemMeshReader.hpp
 mesh/TestSemMeshWriter.hpp
+mesh/TestToroidal2dVertexMesh.hpp
+mesh/TestToroidalHoneycombVertexMeshGenerator.hpp
 odes/TestAlarcon2004OxygenBasedCellCycleOdeSystem.hpp
 odes/TestDeltaNotchOdeSystem.hpp
 odes/TestTysonNovak2001OdeSystem.hpp
