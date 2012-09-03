@@ -343,18 +343,18 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetNode(33)->rGetLocation()[1], 0.2113, 1e-4);
 
         TS_ASSERT_EQUALS(p_mesh->GetElement(2)->GetNumNodes(), 5u);
-        TS_ASSERT_EQUALS(p_mesh->GetElement(2)->GetNode(0)->GetIndex(), 2u);
-        TS_ASSERT_EQUALS(p_mesh->GetElement(2)->GetNode(1)->GetIndex(), 7u);
-        TS_ASSERT_EQUALS(p_mesh->GetElement(2)->GetNode(2)->GetIndex(), 11u);
-        TS_ASSERT_EQUALS(p_mesh->GetElement(2)->GetNode(3)->GetIndex(), 32u);
-        TS_ASSERT_EQUALS(p_mesh->GetElement(2)->GetNode(4)->GetIndex(), 33u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(2)->GetNodeGlobalIndex(0), 2u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(2)->GetNodeGlobalIndex(1), 7u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(2)->GetNodeGlobalIndex(2), 11u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(2)->GetNodeGlobalIndex(3), 32u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(2)->GetNodeGlobalIndex(4), 33u);
 
         TS_ASSERT_EQUALS(p_mesh->GetElement(16)->GetNumNodes(), 5u);
-        TS_ASSERT_EQUALS(p_mesh->GetElement(16)->GetNode(0)->GetIndex(), 32u);
-        TS_ASSERT_EQUALS(p_mesh->GetElement(16)->GetNode(1)->GetIndex(), 14u);
-        TS_ASSERT_EQUALS(p_mesh->GetElement(16)->GetNode(2)->GetIndex(), 10u);
-        TS_ASSERT_EQUALS(p_mesh->GetElement(16)->GetNode(3)->GetIndex(), 6u);
-        TS_ASSERT_EQUALS(p_mesh->GetElement(16)->GetNode(4)->GetIndex(), 33u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(16)->GetNodeGlobalIndex(0), 32u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(16)->GetNodeGlobalIndex(1), 14u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(16)->GetNodeGlobalIndex(2), 10u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(16)->GetNodeGlobalIndex(3), 6u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(16)->GetNodeGlobalIndex(4), 33u);
 
         // Divide periodic element (left to right)
         new_element_index = p_mesh->DivideElementAlongGivenAxis(p_mesh->GetElement(3), axis_of_division, true);
@@ -370,18 +370,18 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetNode(35)->rGetLocation()[1], 0.2113, 1e-4);
 
         TS_ASSERT_EQUALS(p_mesh->GetElement(3)->GetNumNodes(), 5u);
-        TS_ASSERT_EQUALS(p_mesh->GetElement(3)->GetNode(0)->GetIndex(), 3u);
-        TS_ASSERT_EQUALS(p_mesh->GetElement(3)->GetNode(1)->GetIndex(), 4u);
-        TS_ASSERT_EQUALS(p_mesh->GetElement(3)->GetNode(2)->GetIndex(), 8u);
-        TS_ASSERT_EQUALS(p_mesh->GetElement(3)->GetNode(3)->GetIndex(), 34u);
-        TS_ASSERT_EQUALS(p_mesh->GetElement(3)->GetNode(4)->GetIndex(), 35u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(3)->GetNodeGlobalIndex(0), 3u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(3)->GetNodeGlobalIndex(1), 4u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(3)->GetNodeGlobalIndex(2), 8u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(3)->GetNodeGlobalIndex(3), 34u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(3)->GetNodeGlobalIndex(4), 35u);
 
         TS_ASSERT_EQUALS(p_mesh->GetElement(17)->GetNumNodes(), 5u);
-        TS_ASSERT_EQUALS(p_mesh->GetElement(17)->GetNode(0)->GetIndex(), 34u);
-        TS_ASSERT_EQUALS(p_mesh->GetElement(17)->GetNode(1)->GetIndex(), 15u);
-        TS_ASSERT_EQUALS(p_mesh->GetElement(17)->GetNode(2)->GetIndex(), 11u);
-        TS_ASSERT_EQUALS(p_mesh->GetElement(17)->GetNode(3)->GetIndex(), 7u);
-        TS_ASSERT_EQUALS(p_mesh->GetElement(17)->GetNode(4)->GetIndex(), 35u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(17)->GetNodeGlobalIndex(0), 34u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(17)->GetNodeGlobalIndex(1), 15u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(17)->GetNodeGlobalIndex(2), 11u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(17)->GetNodeGlobalIndex(3), 7u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(17)->GetNodeGlobalIndex(4), 35u);
 
         // Divide periodic element (top to bottom)
         new_element_index = p_mesh->DivideElementAlongGivenAxis(p_mesh->GetElement(13), axis_of_division, true);
@@ -396,19 +396,19 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetNode(37)->rGetLocation()[1], 2.8094, 1e-4);
 
         TS_ASSERT_EQUALS(p_mesh->GetElement(13)->GetNumNodes(), 6u);
-        TS_ASSERT_EQUALS(p_mesh->GetElement(13)->GetNode(0)->GetIndex(), 36u);
-        TS_ASSERT_EQUALS(p_mesh->GetElement(13)->GetNode(1)->GetIndex(), 33u);
-        TS_ASSERT_EQUALS(p_mesh->GetElement(13)->GetNode(2)->GetIndex(), 6u);
-        TS_ASSERT_EQUALS(p_mesh->GetElement(13)->GetNode(3)->GetIndex(), 1u);
-        TS_ASSERT_EQUALS(p_mesh->GetElement(13)->GetNode(4)->GetIndex(), 29u);
-        TS_ASSERT_EQUALS(p_mesh->GetElement(13)->GetNode(5)->GetIndex(), 37u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(13)->GetNodeGlobalIndex(0), 36u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(13)->GetNodeGlobalIndex(1), 33u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(13)->GetNodeGlobalIndex(2), 6u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(13)->GetNodeGlobalIndex(3), 1u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(13)->GetNodeGlobalIndex(4), 29u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(13)->GetNodeGlobalIndex(5), 37u);
 
         TS_ASSERT_EQUALS(p_mesh->GetElement(18)->GetNumNodes(), 5u);
-        TS_ASSERT_EQUALS(p_mesh->GetElement(18)->GetNode(0)->GetIndex(), 26u);
-        TS_ASSERT_EQUALS(p_mesh->GetElement(18)->GetNode(1)->GetIndex(), 30u);
-        TS_ASSERT_EQUALS(p_mesh->GetElement(18)->GetNode(2)->GetIndex(), 2u);
-        TS_ASSERT_EQUALS(p_mesh->GetElement(18)->GetNode(3)->GetIndex(), 36u);
-        TS_ASSERT_EQUALS(p_mesh->GetElement(18)->GetNode(4)->GetIndex(), 37u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(18)->GetNodeGlobalIndex(0), 26u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(18)->GetNodeGlobalIndex(1), 30u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(18)->GetNodeGlobalIndex(2), 2u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(18)->GetNodeGlobalIndex(3), 36u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(18)->GetNodeGlobalIndex(4), 37u);
     }
 
     void TestArchiving() throw (Exception)
@@ -608,6 +608,72 @@ public:
         test_point5[1] = 2.1;
         TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(test_point5, 0), true);
         TS_ASSERT_EQUALS(mesh.GetLocalIndexForElementEdgeClosestToPoint(test_point5, 0), 3u);
+    }
+
+    void TestGetMeshForVtk()
+    {
+        // Create mesh
+        ToroidalHoneycombVertexMeshGenerator generator(4, 4);
+        Toroidal2dVertexMesh* p_mesh = generator.GetToroidalMesh();
+
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 32u); // 2*4*4
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 16u); // 4*4
+
+        // Test GetMeshForVtk() method
+        MutableVertexMesh<2, 2>* p_mesh_for_vtk = p_mesh->GetMeshForVtk();
+
+        // The mesh for VTK should have the same number of elements, but 16 extra nodes
+        TS_ASSERT_EQUALS(p_mesh_for_vtk->GetNumElements(), 16u);
+        TS_ASSERT_EQUALS(p_mesh_for_vtk->GetNumNodes(), 48u);
+
+        // Every element in the mesh for VTK should have 6 nodes
+        for (unsigned elem_index=0; elem_index<p_mesh_for_vtk->GetNumElements(); elem_index++)
+        {
+            TS_ASSERT_EQUALS(p_mesh_for_vtk->GetElement(elem_index)->GetNumNodes(), 6u);
+        }
+
+        VertexElement<2, 2>* p_element0 = p_mesh_for_vtk->GetElement(0);
+        TS_ASSERT_EQUALS(p_element0->GetNodeGlobalIndex(0), 0u);
+        TS_ASSERT_EQUALS(p_element0->GetNodeGlobalIndex(1), 5u);
+        TS_ASSERT_EQUALS(p_element0->GetNodeGlobalIndex(2), 9u);
+        TS_ASSERT_EQUALS(p_element0->GetNodeGlobalIndex(3), 12u);
+        TS_ASSERT_EQUALS(p_element0->GetNodeGlobalIndex(4), 8u);
+        TS_ASSERT_EQUALS(p_element0->GetNodeGlobalIndex(5), 4u);
+
+        VertexElement<2, 2>* p_element3 = p_mesh_for_vtk->GetElement(3);
+        TS_ASSERT_EQUALS(p_element3->GetNodeGlobalIndex(0), 3u);
+        TS_ASSERT_EQUALS(p_element3->GetNodeGlobalIndex(1), 36u);
+        TS_ASSERT_EQUALS(p_element3->GetNodeGlobalIndex(2), 40u);
+        TS_ASSERT_EQUALS(p_element3->GetNodeGlobalIndex(3), 15u);
+        TS_ASSERT_EQUALS(p_element3->GetNodeGlobalIndex(4), 11u);
+        TS_ASSERT_EQUALS(p_element3->GetNodeGlobalIndex(5), 7u);
+
+        VertexElement<2, 2>* p_element7 = p_mesh_for_vtk->GetElement(7);
+        TS_ASSERT_EQUALS(p_element7->GetNodeGlobalIndex(0), 40u);
+        TS_ASSERT_EQUALS(p_element7->GetNodeGlobalIndex(1), 44u);
+        TS_ASSERT_EQUALS(p_element7->GetNodeGlobalIndex(2), 48u);
+        TS_ASSERT_EQUALS(p_element7->GetNodeGlobalIndex(3), 52u);
+        TS_ASSERT_EQUALS(p_element7->GetNodeGlobalIndex(4), 19u);
+        TS_ASSERT_EQUALS(p_element7->GetNodeGlobalIndex(5), 15u);
+
+        VertexElement<2, 2>* p_element12 = p_mesh_for_vtk->GetElement(12);
+        TS_ASSERT_EQUALS(p_element12->GetNodeGlobalIndex(0), 25u);
+        TS_ASSERT_EQUALS(p_element12->GetNodeGlobalIndex(1), 29u);
+        TS_ASSERT_EQUALS(p_element12->GetNodeGlobalIndex(2), 65u);
+        TS_ASSERT_EQUALS(p_element12->GetNodeGlobalIndex(3), 69u);
+        TS_ASSERT_EQUALS(p_element12->GetNodeGlobalIndex(4), 64u);
+        TS_ASSERT_EQUALS(p_element12->GetNodeGlobalIndex(5), 28u);
+
+        VertexElement<2, 2>* p_element15 = p_mesh_for_vtk->GetElement(15);
+        TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(0), 56u);
+        TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(1), 60u);
+        TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(2), 96u);
+        TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(3), 100u);
+        TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(4), 67u);
+        TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(5), 31u);
+
+        // Avoid memory leak
+        delete p_mesh_for_vtk;
     }
 };
 

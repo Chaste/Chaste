@@ -172,6 +172,15 @@ public:
      * @return (centroid_x,centroid_y).
      */
      c_vector<double, 2> GetCentroidOfElement(unsigned index);
+
+    /**
+     * Return a pointer to an extended mesh that is a 'non-periodic'
+     * version of our mesh. This can then be used when writing to
+     * VTK.
+     * 
+     * @return a non-periodic vertex mesh
+     */
+     MutableVertexMesh<2, 2>* GetMeshForVtk();
 };
 
 #include "SerializationExportWrapper.hpp"

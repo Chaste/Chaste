@@ -224,6 +224,92 @@ c_vector<double, 2> Toroidal2dVertexMesh::GetCentroidOfElement(unsigned index)
     return centroid;
 }
 
+MutableVertexMesh<2, 2>* Toroidal2dVertexMesh::GetMeshForVtk()
+{
+    unsigned num_nodes = GetNumNodes();
+
+    std::vector<Node<2>*> temp_nodes(4*num_nodes);
+    std::vector<VertexElement<2, 2>*> elements;
+
+    // Create four copies of each node
+    for (unsigned index=0; index<num_nodes; index++)
+    {
+        c_vector<double, 2> location = GetNode(index)->rGetLocation();
+
+        // Node copy at original location
+        Node<2>* p_node = new Node<2>(index, false, location[0], location[1]);
+        temp_nodes[index] = p_node;
+
+        // Node copy shifted right
+        p_node = new Node<2>(num_nodes + index, false, location[0] + mWidth, location[1]);
+        temp_nodes[num_nodes + index] = p_node;
+
+        // Node copy shifted up
+        p_node = new Node<2>(2*num_nodes + index, false, location[0], location[1] + mHeight);
+        temp_nodes[2*num_nodes + index] = p_node;
+
+        // Node copy shifted right and up
+        p_node = new Node<2>(3*num_nodes + index, false, location[0] + mWidth, location[1] + mHeight);
+        temp_nodes[3*num_nodes + index] = p_node;
+    }
+
+    // Iterate over elements
+    for (VertexMesh<2,2>::VertexElementIterator elem_iter = GetElementIteratorBegin();
+         elem_iter != GetElementIteratorEnd();
+         ++elem_iter)
+    {
+        unsigned elem_index = elem_iter->GetIndex();
+        unsigned num_nodes_in_elem = elem_iter->GetNumNodes();
+
+        std::vector<Node<2>*> elem_nodes;
+
+        // Iterate over nodes contained in this element
+        c_vector<double, 2> this_node_location = elem_iter->GetNode(num_nodes_in_elem-1)->rGetLocation();
+        for (unsigned local_index=0; local_index<num_nodes_in_elem; local_index++)
+        {
+            c_vector<double, 2> next_node_location = elem_iter->GetNode(local_index)->rGetLocation();
+
+            unsigned next_node_index = elem_iter->GetNodeGlobalIndex(local_index);
+
+            // Work out whether to use one of the new nodes
+            c_vector<double, 2> vector = next_node_location - this_node_location;
+            if (vector[0] < -0.5*mWidth)
+            {
+                next_node_index += num_nodes;
+            }
+            if (vector[1] < -0.5*mHeight)
+            {
+                next_node_index += 2*num_nodes;
+            }
+
+            elem_nodes.push_back(temp_nodes[next_node_index]);
+            this_node_location = temp_nodes[next_node_index]->rGetLocation();
+        }
+
+        VertexElement<2,2>* p_element = new VertexElement<2,2>(elem_index, elem_nodes);
+        elements.push_back(p_element);
+    }
+
+    // Now delete any nodes from the mesh for VTK that are not contained in any elements
+    std::vector<Node<2>*> nodes;
+    for (unsigned index=0; index<temp_nodes.size(); index++)
+    {
+        unsigned num_elems_containing_this_node = temp_nodes[index]->rGetContainingElementIndices().size();
+
+        if (num_elems_containing_this_node == 0)
+        {
+            // Avoid memory leak
+            delete temp_nodes[index];
+        }
+        else
+        {
+            nodes.push_back(temp_nodes[index]);
+        }
+    }
+    MutableVertexMesh<2, 2>* p_mesh = new MutableVertexMesh<2,2>(nodes, elements, mCellRearrangementThreshold, mT2Threshold);
+    return p_mesh;
+}
+
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
 CHASTE_CLASS_EXPORT(Toroidal2dVertexMesh)
