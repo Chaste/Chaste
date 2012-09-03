@@ -89,10 +89,14 @@ def index(req):
                       (_our_url, tests_type, tests_type))
     output.append("""</ul>
     
-    <a href="%s/profileHistory">Run time variation of profiled tests.</a>
+    <p>
+    <a href="%s/profileHistory?n=100">Run time variation of profiled tests.</a>
+    <br />
+    <a href="%s/profileHistory?n=100&buildTypes=IntelProductionParallel4_onlytests_Weekly&buildTypes=IntelProduction_onlytests_Weekly">Run time variation of weekly tests.</a>
+    </p>
     
     <h2>Latest continuous build</h2>
-""" % _our_url)
+""" % (_our_url, _our_url))
 
     # Look for the latest revision present.
     type = 'continuous'
@@ -503,14 +507,14 @@ class FakeBuildType(object):
             return 'red'
 
 
-def profileHistory(req, n=20):
+def profileHistory(req, n=20, buildTypes=None):
     """Show runtimes for the last n profile builds."""
     page_body = """
     <h1>Profile History</h1>
-""" +  _profileHistory(req, int(n))
+""" +  _profileHistory(req, int(n), buildTypes)
     return _header('Profile History') + page_body + _footer()
 
-def _profileHistory(req, n=20):
+def _profileHistory(req, n=20, buildTypes=None):
     """Show runtimes for the last n profile builds."""
     tests_dir = os.path.join(_tests_dir, 'nightly')
     if not os.path.isdir(tests_dir):
@@ -518,15 +522,19 @@ def _profileHistory(req, n=20):
     output = []
 
     # These are the build types representing profile builds
-    build_types = ['Profile_ndebug', 'GoogleProfile_ndebug']
+    if not buildTypes:
+        buildTypes = ['Profile_ndebug', 'GoogleProfile_ndebug']
+    if not isinstance(buildTypes, list):
+        buildTypes = [buildTypes]
+    qmarks = ','.join(['?'] * len(buildTypes))
 
     # Find the last n revisions
     if _db_module and not req.form.getfirst('nocache', False):
         db = _db_module.TestResultsDatabase('nightly', verbose=False)
         db.FastUpdate()
         cur = db.conn.execute('select distinct revision from summary '
-                              'where build_type in (?,?) order by revision desc limit ?',
-                              tuple(build_types + [n]))
+                              'where build_type in (%s) order by revision desc limit ?' % qmarks,
+                              tuple(buildTypes + [n]))
         revisions = [row[0] for row in cur]
         revisions.reverse()
     else:
@@ -543,8 +551,8 @@ def _profileHistory(req, n=20):
     inf_test_names = ['Copyrights', 'DuplicateFileNames', 'OrphanedTests', 'Schemas']
     if _db_module:
         cur = db.conn.execute('select revision, machine, build_type, suite_name, suite_status, run_time from details'
-                              ' where build_type in (?,?) and revision between ? and ?',
-                              tuple(build_types + [revisions[0], revisions[-1]]))
+                              ' where build_type in (%s) and revision between ? and ?' % qmarks,
+                              tuple(buildTypes + [revisions[0], revisions[-1]]))
         for row in cur:
             # The builds dictionary
             k = (row['revision'], row['build_type'])
@@ -565,7 +573,7 @@ def _profileHistory(req, n=20):
             rev_dir = os.path.join(tests_dir, str(revision))
             for machine_and_build_type in os.listdir(rev_dir):
                 machine, build_type = _extractDotSeparatedPair(machine_and_build_type)
-                if build_type in build_types:
+                if build_type in buildTypes:
                     k = (revision, build_type)
                     if not builds.has_key(k):
                         builds[k] = []
@@ -573,7 +581,7 @@ def _profileHistory(req, n=20):
     
         build = FakeBuildType()
         for revision in revisions:
-            for build_type in build_types:
+            for build_type in buildTypes:
                 for machine in builds.get((revision, build_type), []):
                     k = (revision, build_type, machine)
                     d = _testResultsDir('nightly', revision, machine, build_type)
@@ -592,11 +600,11 @@ def _profileHistory(req, n=20):
     output.append('<table border="1">\n  <tr><th>Revision</th>\n')
     revbts = []
     for revision in revisions:
-        cols = sum(map(lambda bt: len(builds.get((revision, bt), [])), build_types))
+        cols = sum(map(lambda bt: len(builds.get((revision, bt), [])), buildTypes))
         if cols > 0:
             output.append('    <th colspan="%d">%s</th>\n'
                           % (cols, _linkChangeset(revision)))
-        for bt in build_types:
+        for bt in buildTypes:
             revbts.append((revision, bt))
     output.append('  </tr>\n  <tr><th>Build</th>\n')
     for rev, bt in revbts:
@@ -641,7 +649,7 @@ def _profileHistory(req, n=20):
         machines.update(ms)
     gurl = '%s/profileHistoryGraph' % _our_url
     for machine in machines:
-        for build_type in build_types:
+        for build_type in buildTypes:
             for test_suite in test_suites:
                 # Graph plots run time against revision, and needs a list of (rev,time) pairs
                 graph_data = []
