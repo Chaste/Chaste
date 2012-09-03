@@ -642,34 +642,34 @@ public:
 
         VertexElement<2, 2>* p_element3 = p_mesh_for_vtk->GetElement(3);
         TS_ASSERT_EQUALS(p_element3->GetNodeGlobalIndex(0), 3u);
-        TS_ASSERT_EQUALS(p_element3->GetNodeGlobalIndex(1), 36u);
-        TS_ASSERT_EQUALS(p_element3->GetNodeGlobalIndex(2), 40u);
+        TS_ASSERT_EQUALS(p_element3->GetNodeGlobalIndex(1), 32u);
+        TS_ASSERT_EQUALS(p_element3->GetNodeGlobalIndex(2), 33u);
         TS_ASSERT_EQUALS(p_element3->GetNodeGlobalIndex(3), 15u);
         TS_ASSERT_EQUALS(p_element3->GetNodeGlobalIndex(4), 11u);
         TS_ASSERT_EQUALS(p_element3->GetNodeGlobalIndex(5), 7u);
 
         VertexElement<2, 2>* p_element7 = p_mesh_for_vtk->GetElement(7);
-        TS_ASSERT_EQUALS(p_element7->GetNodeGlobalIndex(0), 40u);
-        TS_ASSERT_EQUALS(p_element7->GetNodeGlobalIndex(1), 44u);
-        TS_ASSERT_EQUALS(p_element7->GetNodeGlobalIndex(2), 48u);
-        TS_ASSERT_EQUALS(p_element7->GetNodeGlobalIndex(3), 52u);
+        TS_ASSERT_EQUALS(p_element7->GetNodeGlobalIndex(0), 33u);
+        TS_ASSERT_EQUALS(p_element7->GetNodeGlobalIndex(1), 34u);
+        TS_ASSERT_EQUALS(p_element7->GetNodeGlobalIndex(2), 35u);
+        TS_ASSERT_EQUALS(p_element7->GetNodeGlobalIndex(3), 36u);
         TS_ASSERT_EQUALS(p_element7->GetNodeGlobalIndex(4), 19u);
         TS_ASSERT_EQUALS(p_element7->GetNodeGlobalIndex(5), 15u);
 
         VertexElement<2, 2>* p_element12 = p_mesh_for_vtk->GetElement(12);
         TS_ASSERT_EQUALS(p_element12->GetNodeGlobalIndex(0), 25u);
         TS_ASSERT_EQUALS(p_element12->GetNodeGlobalIndex(1), 29u);
-        TS_ASSERT_EQUALS(p_element12->GetNodeGlobalIndex(2), 65u);
-        TS_ASSERT_EQUALS(p_element12->GetNodeGlobalIndex(3), 69u);
-        TS_ASSERT_EQUALS(p_element12->GetNodeGlobalIndex(4), 64u);
+        TS_ASSERT_EQUALS(p_element12->GetNodeGlobalIndex(2), 40u);
+        TS_ASSERT_EQUALS(p_element12->GetNodeGlobalIndex(3), 43u);
+        TS_ASSERT_EQUALS(p_element12->GetNodeGlobalIndex(4), 39u);
         TS_ASSERT_EQUALS(p_element12->GetNodeGlobalIndex(5), 28u);
 
         VertexElement<2, 2>* p_element15 = p_mesh_for_vtk->GetElement(15);
-        TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(0), 56u);
-        TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(1), 60u);
-        TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(2), 96u);
-        TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(3), 100u);
-        TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(4), 67u);
+        TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(0), 37u);
+        TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(1), 38u);
+        TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(2), 46u);
+        TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(3), 47u);
+        TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(4), 42u);
         TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(5), 31u);
 
         // Avoid memory leak

@@ -319,12 +319,12 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMesh<ELEMENT_DI
         }
         vtkIdList* p_cell_id_list = p_cell->GetPointIds();
         p_cell_id_list->SetNumberOfIds(iter->GetNumNodes());
-        for (unsigned j = 0; j < iter->GetNumNodes(); ++j)
+        for (unsigned j=0; j<iter->GetNumNodes(); ++j)
         {
             p_cell_id_list->SetId(j, iter->GetNodeGlobalIndex(j));
         }
         mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
-        p_cell->Delete(); //Reference counted
+        p_cell->Delete(); // Reference counted
     }
 #endif //CHASTE_VTK
 }

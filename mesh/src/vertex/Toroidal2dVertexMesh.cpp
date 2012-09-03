@@ -292,6 +292,7 @@ MutableVertexMesh<2, 2>* Toroidal2dVertexMesh::GetMeshForVtk()
 
     // Now delete any nodes from the mesh for VTK that are not contained in any elements
     std::vector<Node<2>*> nodes;
+    unsigned count = 0;
     for (unsigned index=0; index<temp_nodes.size(); index++)
     {
         unsigned num_elems_containing_this_node = temp_nodes[index]->rGetContainingElementIndices().size();
@@ -303,7 +304,9 @@ MutableVertexMesh<2, 2>* Toroidal2dVertexMesh::GetMeshForVtk()
         }
         else
         {
+            temp_nodes[index]->SetIndex(count);
             nodes.push_back(temp_nodes[index]);
+            count++;
         }
     }
     MutableVertexMesh<2, 2>* p_mesh = new MutableVertexMesh<2,2>(nodes, elements, mCellRearrangementThreshold, mT2Threshold);
