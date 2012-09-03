@@ -159,10 +159,15 @@ private:
                   double tableTestV=-1000,
                   bool warningsOk=true)
     {
-        OutputFileHandler handler(rOutputDirName); // Clear folder
+        OutputFileHandler handler(rOutputDirName); // Clear folder (collective)
+        PetscTools::IsolateProcesses(true); // Simple parallelism
         std::vector<std::string> failures;
         for (unsigned i=0; i<rModels.size(); ++i)
         {
+            if (PetscTools::IsParallel() && i % PetscTools::GetNumProcs() != PetscTools::GetMyRank())
+            {
+                continue; // Let someone else do this model
+            }
             try
             {
                 RunTest(rOutputDirName, rModels[i], rArgs, testLookupTables, tableTestV);
@@ -178,6 +183,9 @@ private:
             }
             Warnings::NoisyDestroy(); // Print out any warnings now, not at program exit
         }
+        // Wait for all simulations to finish before printing summary of failures
+        PetscTools::IsolateProcesses(false);
+        PetscTools::Barrier("RunTests");
 
         if (!failures.empty())
         {
