@@ -74,6 +74,16 @@ public:
         TS_ASSERT_EQUALS(Divides(0.01, 0.00),  false);
     }
 
+    void TestSignum() throw(Exception)
+    {
+        TS_ASSERT_EQUALS(Signum(0.0), 0.0);
+        TS_ASSERT_EQUALS(Signum(0.01), 1.0);
+        TS_ASSERT_EQUALS(Signum(-0.01), -1.0);
+        TS_ASSERT_EQUALS(Signum(DBL_MAX), 1.0);
+        TS_ASSERT_EQUALS(Signum(-DBL_MAX), -1.0);
+        TS_ASSERT_EQUALS(Signum(DBL_EPSILON), 1.0);
+    }
+
     void TestCompareDoubles() throw (Exception)
     {
         TS_ASSERT(CompareDoubles::IsNearZero(DBL_EPSILON, 2*DBL_EPSILON));

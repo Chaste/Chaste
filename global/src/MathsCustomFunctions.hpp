@@ -64,6 +64,13 @@ double SmallPow(double x, unsigned exponent);
 bool Divides(double smallerNumber, double largerNumber);
 
 /**
+ * Returns the sign of the argument, i.e. -1 if value<0, 0 if value=0, or +1 if value>0.
+ *
+ * @param value  the argument value
+ */
+double Signum(double value);
+
+/**
  * Utility static methods for comparing floating point numbers, based on
  * boost/test/floating_point_comparison.hpp.
  */

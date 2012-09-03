@@ -98,6 +98,11 @@ bool Divides(double smallerNumber, double largerNumber)
     return false;
 }
 
+double Signum(double value)
+{
+    return (0.0 < value) - (value < 0.0);
+}
+
 bool CompareDoubles::IsNearZero(double number, double tolerance)
 {
     return fabs(number) <= fabs(tolerance);

@@ -725,6 +725,7 @@ def CreatePyCmlBuilder(build, buildenv):
         pycml_code = glob.glob(os.path.join(Dir('#/python/pycml').abspath, '*'))
         pycml_code = filter(lambda path: not path.endswith('.pyc'), pycml_code)
         env.Depends(target, pycml_code)
+        env.Depends(target, script)
         # Install headers if requested
         if not IsDynamicSource(source) and env['INSTALL_FILES']:
             headers = [t for t in target if t.endswith('.hpp')]
