@@ -14,11 +14,8 @@ common/TestSimulationTime.hpp
 common/TestOdeLinearSystemSolver.hpp
 mesh/TestCylindrical2dMesh.hpp
 mesh/TestCylindrical2dNodesOnlyMesh.hpp
-mesh/TestCylindrical2dVertexMesh.hpp
 mesh/TestCylindricalHoneycombMeshGenerator.hpp
-mesh/TestCylindricalHoneycombVertexMeshGenerator.hpp
 mesh/TestHoneycombMeshGenerator.hpp
-mesh/TestHoneycombVertexMeshGenerator.hpp
 mesh/TestNodesOnlyMesh.hpp
 mesh/TestPottsMesh.hpp
 mesh/TestPottsMeshGenerator.hpp
@@ -29,8 +26,6 @@ mesh/TestSemMesh.hpp
 mesh/TestSemMeshGenerator.hpp
 mesh/TestSemMeshReader.hpp
 mesh/TestSemMeshWriter.hpp
-mesh/TestToroidal2dVertexMesh.hpp
-mesh/TestToroidalHoneycombVertexMeshGenerator.hpp
 odes/TestAlarcon2004OxygenBasedCellCycleOdeSystem.hpp
 odes/TestDeltaNotchOdeSystem.hpp
 odes/TestTysonNovak2001OdeSystem.hpp

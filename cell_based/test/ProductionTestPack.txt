@@ -5,7 +5,6 @@ common/TestSimulationTime.hpp
 mesh/TestCylindrical2dMesh.hpp
 mesh/TestCylindricalHoneycombMeshGenerator.hpp
 mesh/TestHoneycombMeshGenerator.hpp
-mesh/TestHoneycombVertexMeshGenerator.hpp
 odes/TestAlarcon2004OxygenBasedCellCycleOdeSystem.hpp
 odes/TestTysonNovak2001OdeSystem.hpp
 simulation/TestOffLatticeSimulation3d.hpp

@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexMeshWriter.hpp"
 #include "VtkMeshWriter.hpp"
 #include "VertexMeshReader.hpp"
-
+#include "ToroidalHoneycombVertexMeshGenerator.hpp"
 #include "FileComparison.hpp"
 
 #ifdef CHASTE_VTK
@@ -126,7 +126,67 @@ public:
             FileFinder vtk_file(results_file3, RelativeTo::Absolute);
             TS_ASSERT(vtk_file.Exists());
         }
+#else
+        std::cout << "This test ran, but did not test VTK-dependent functions as VTK visualization is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
+#endif //CHASTE_VTK
+    }
 
+    void TestVertexMeshWriterWithToroidalMesh() throw(Exception)
+    {
+        // Create toroidal mesh (i.e. one that is periodic in both directions)
+        ToroidalHoneycombVertexMeshGenerator generator(4, 4);
+        Toroidal2dVertexMesh* p_mesh = generator.GetToroidalMesh();
+
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 32u); // 2*4*4
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 16u); // 4*4
+
+        // Create a vertex mesh writer
+        VertexMeshWriter<2,2> vertex_mesh_writer("TestVertexMeshWriterWithToroidalMesh", "tor_vertex_mesh_2d");
+
+        // Test files are written correctly
+        vertex_mesh_writer.WriteFilesUsingMesh(*p_mesh);
+
+        OutputFileHandler handler("TestVertexMeshWriterWithToroidalMesh", false);
+        std::string results_file1 = handler.GetOutputDirectoryFullPath() + "tor_vertex_mesh_2d.node";
+        std::string results_file2 = handler.GetOutputDirectoryFullPath() + "tor_vertex_mesh_2d.cell";
+
+        FileComparison comparer1(results_file1,"mesh/test/data/TestVertexMeshWriterWithToroidalMesh/tor_vertex_mesh_2d.node");
+        TS_ASSERT(comparer1.CompareFiles());
+
+        FileComparison comparer2(results_file2,"mesh/test/data/TestVertexMeshWriterWithToroidalMesh/tor_vertex_mesh_2d.cell");
+        TS_ASSERT(comparer2.CompareFiles());
+
+#ifdef CHASTE_VTK
+        MutableVertexMesh<2, 2>* p_mesh_for_vtk = p_mesh->GetMeshForVtk();
+        std::vector<double> cell_ids;
+        for (unsigned i=0; i<p_mesh_for_vtk->GetNumElements(); i++)
+        {
+            double this_cell_id = (double) i;
+            cell_ids.push_back(this_cell_id);
+        }
+
+        vertex_mesh_writer.AddCellData("Cell IDs", cell_ids);
+
+        // Add distance from origin into the node "point" data
+        std::vector<double> distance;
+        for (unsigned i=0; i<p_mesh_for_vtk->GetNumNodes(); i++)
+        {
+            distance.push_back(norm_2(p_mesh_for_vtk->GetNode(i)->rGetLocation()));
+        }
+        vertex_mesh_writer.AddPointData("Distance from origin", distance);
+
+        vertex_mesh_writer.WriteVtkUsingMesh(*p_mesh);
+
+        {
+            ///\todo #1076.  We need a way to test the contents of the VTK file
+            std::string results_file3 = handler.GetOutputDirectoryFullPath() + "tor_vertex_mesh_2d.vtu";
+            FileFinder vtk_file(results_file3, RelativeTo::Absolute);
+            TS_ASSERT(vtk_file.Exists());
+        }
+
+        // Avoid memory leak
+        delete p_mesh_for_vtk;
 #else
         std::cout << "This test ran, but did not test VTK-dependent functions as VTK visualization is not enabled." << std::endl;
         std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
@@ -192,7 +252,6 @@ public:
             FileFinder vtk_file(results_file3, RelativeTo::Absolute);
             TS_ASSERT(vtk_file.Exists());
         }
-
 #else
         std::cout << "This test ran, but did not test VTK-dependent functions as VTK visualization is not enabled." << std::endl;
         std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
@@ -252,7 +311,6 @@ public:
             FileFinder vtk_file(results_file3, RelativeTo::Absolute);
             TS_ASSERT(vtk_file.Exists());
         }
-
 #else
         std::cout << "This test ran, but did not test VTK-dependent functions as VTK visualization is not enabled." << std::endl;
         std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;

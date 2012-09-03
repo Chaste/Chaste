@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "VertexMeshWriter.hpp"
 #include "Version.hpp"
+#include "Toroidal2dVertexMesh.hpp"
 
 /**
  * Convenience collection of iterators, primarily to get compilation to happen.
@@ -206,8 +207,86 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh, std::string stamp)
 {
 #ifdef CHASTE_VTK
-    //Make the Vtk mesh
     assert(SPACE_DIM==3 || SPACE_DIM == 2);
+
+    // Create VTK mesh
+    MakeVtkMesh(rMesh);
+
+    // Now write VTK mesh to file
+    assert(mpVtkUnstructedMesh->CheckAttributes() == 0);
+    vtkXMLUnstructuredGridWriter* p_writer = vtkXMLUnstructuredGridWriter::New();
+    p_writer->SetInput(mpVtkUnstructedMesh);
+    // Uninitialised stuff arises (see #1079), but you can remove valgrind problems by removing compression:
+    // **** REMOVE WITH CAUTION *****
+    p_writer->SetCompressor(NULL);
+    // **** REMOVE WITH CAUTION *****
+
+    std::string vtk_file_name = this->mpOutputFileHandler->GetOutputDirectoryFullPath() + this->mBaseName;
+    if (stamp != "")
+    {
+        vtk_file_name += "_" + stamp;
+    }
+    vtk_file_name += ".vtu";
+
+    p_writer->SetFileName(vtk_file_name.c_str());
+    //p_writer->PrintSelf(std::cout, vtkIndent());
+    p_writer->Write();
+    p_writer->Delete(); // Reference counted
+#endif //CHASTE_VTK
+}
+
+/**
+ * Write VTK file using a mesh.
+ *
+ * @param rMesh reference to the vertex-based mesh
+ * @param stamp is an optional stamp (like a time-stamp) to put into the name of the file
+ */
+template<>
+void VertexMeshWriter<2, 2>::WriteVtkUsingMesh(VertexMesh<2, 2>& rMesh, std::string stamp)
+{
+#ifdef CHASTE_VTK
+    // Create VTK mesh
+    if (dynamic_cast<Toroidal2dVertexMesh*>(&rMesh))
+    {
+        MutableVertexMesh<2, 2>* p_mesh_for_vtk = static_cast<Toroidal2dVertexMesh*>(&rMesh)->GetMeshForVtk();
+        MakeVtkMesh(*p_mesh_for_vtk);
+
+        // Avoid memory leak
+        delete p_mesh_for_vtk;
+    }
+    else
+    {
+        MakeVtkMesh(rMesh);
+    }
+
+    // Now write VTK mesh to file
+    assert(mpVtkUnstructedMesh->CheckAttributes() == 0);
+    vtkXMLUnstructuredGridWriter* p_writer = vtkXMLUnstructuredGridWriter::New();
+    p_writer->SetInput(mpVtkUnstructedMesh);
+    // Uninitialised stuff arises (see #1079), but you can remove valgrind problems by removing compression:
+    // **** REMOVE WITH CAUTION *****
+    p_writer->SetCompressor(NULL);
+    // **** REMOVE WITH CAUTION *****
+
+    std::string vtk_file_name = this->mpOutputFileHandler->GetOutputDirectoryFullPath() + this->mBaseName;
+    if (stamp != "")
+    {
+        vtk_file_name += "_" + stamp;
+    }
+    vtk_file_name += ".vtu";
+
+    p_writer->SetFileName(vtk_file_name.c_str());
+    //p_writer->PrintSelf(std::cout, vtkIndent());
+    p_writer->Write();
+    p_writer->Delete(); // Reference counted
+#endif //CHASTE_VTK
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
+{
+#ifdef CHASTE_VTK
+    // Make the Vtk mesh
     vtkPoints* p_pts = vtkPoints::New(VTK_DOUBLE);
     p_pts->GetData()->SetName("Vertex positions");
     for (unsigned node_num=0; node_num<rMesh.GetNumNodes(); node_num++)
@@ -247,27 +326,6 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(VertexMesh<ELEM
         mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
         p_cell->Delete(); //Reference counted
     }
-
-    // Vtk mesh is now made
-    assert(mpVtkUnstructedMesh->CheckAttributes() == 0);
-    vtkXMLUnstructuredGridWriter* p_writer = vtkXMLUnstructuredGridWriter::New();
-    p_writer->SetInput(mpVtkUnstructedMesh);
-    // Uninitialised stuff arises (see #1079), but you can remove valgrind problems by removing compression:
-    // **** REMOVE WITH CAUTION *****
-    p_writer->SetCompressor(NULL);
-    // **** REMOVE WITH CAUTION *****
-
-    std::string vtk_file_name = this->mpOutputFileHandler->GetOutputDirectoryFullPath() + this->mBaseName;
-    if (stamp != "")
-    {
-        vtk_file_name += "_" + stamp;
-    }
-    vtk_file_name += ".vtu";
-
-    p_writer->SetFileName(vtk_file_name.c_str());
-    //p_writer->PrintSelf(std::cout, vtkIndent());
-    p_writer->Write();
-    p_writer->Delete(); // Reference counted
 #endif //CHASTE_VTK
 }
 
@@ -309,7 +367,6 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddPointData(std::string dataName
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(VertexMesh<ELEMENT_DIM,SPACE_DIM>& rMesh)
 {
-
     this->mpMeshReader = NULL;
     mpMesh = &rMesh;
 

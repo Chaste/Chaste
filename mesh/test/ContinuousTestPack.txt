@@ -18,8 +18,13 @@ reader/TestVtkMeshReader.hpp
 utilities/TestBoxCollection.hpp
 utilities/TestDistanceMapCalculator.hpp
 utilities/TestPerElementWriter.hpp
+vertex/TestCylindrical2dVertexMesh.hpp
+vertex/TestCylindricalHoneycombVertexMeshGenerator.hpp
+vertex/TestHoneycombVertexMeshGenerator.hpp
 vertex/TestMutableVertexMesh.hpp
 vertex/TestMutableVertexMeshReMesh.hpp
+vertex/TestToroidal2dVertexMesh.hpp
+vertex/TestToroidalHoneycombVertexMeshGenerator.hpp
 vertex/TestVertexElement.hpp
 vertex/TestVertexMesh.hpp
 vertex/TestVertexMeshReader.hpp

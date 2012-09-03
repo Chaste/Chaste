@@ -126,6 +126,14 @@ public:
     void WriteVtkUsingMesh(VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh, std::string stamp="");
 
     /**
+     * Populate mpVtkUnstructedMesh using a vertex-based mesh.
+     * Called by WriteVtkUsingMesh().
+     *
+     * @param rMesh reference to the vertex-based mesh
+     */
+    void MakeVtkMesh(VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh);
+
+    /**
      * Add data to a future VTK file.
      *
      * @param dataName a tag to go into the VTK file
