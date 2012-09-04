@@ -437,7 +437,7 @@ class TestProtocol(unittest.TestCase):
                         Cai.get_ode_dependency(time),
                         Var(c_sic, 'V'), Var(c_sic, 'Cai'),
                         Var(c_sic, 'time'), Var(c_sic, 'V'), Var(c_sic, 'E_si'),
-                        VarDefn(c_sic, 'E_si'), VarDefn(c_sic, 'i_si'),
+                        VarDefn(c_sic, 'E_si'), VarDefn(c_sic, 'i_si'), VarDefn(c_sic, 'P_si'),
                         Var(c_sic, 'd'), Var(c_sic, 'f'), Var(c_sic, 'i_si'),
                         Var(c_sicd, 'time'), Var(c_sicd, 'V'), Var(c_sicd, 'd'),
                         Var(c_sicd, 'alpha_d'), Var(c_sicd, 'beta_d'),
