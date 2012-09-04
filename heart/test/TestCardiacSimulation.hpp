@@ -372,8 +372,8 @@ public:
 
     void checkParameter(AbstractCardiacCellInterface* pCell, unsigned globalIndex)
     {
-        // Check parameter has been set in the central region
-        TS_ASSERT_EQUALS(pCell->GetNumberOfParameters(), 2u);
+        // Check one of the parameters has been set in the central region
+        TS_ASSERT_EQUALS(pCell->GetNumberOfParameters(), 3u);
         double expected_value;
         if (globalIndex <= 4 || globalIndex >= 16)
         {
@@ -383,8 +383,10 @@ public:
         {
             expected_value = 0.0;
         }
-        double actual_value = pCell->GetParameter(0);
-        TS_ASSERT_EQUALS(actual_value, expected_value);
+        TS_ASSERT_DELTA(pCell->GetParameter("membrane_fast_sodium_current_conductance"), expected_value, 1e-12);
+        TS_ASSERT_DELTA(pCell->GetParameter("membrane_rapid_delayed_rectifier_potassium_current_conductance"), 0.282, 1e-12);
+        TS_ASSERT_DELTA(pCell->GetParameter("membrane_L_type_calcium_current_conductance"), 0.09, 1e-12);
+
         // Check stimulus has been replaced.  It started as 0-1ms at x<=0.02, and should now be 600-601ms at x<=0.02
         if (globalIndex < 3)
         {

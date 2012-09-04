@@ -793,7 +793,21 @@ The breakdown of the model into components and the definition of encapsulation a
       </math>
    </component>
    <component name="slow_inward_current">
-      <variable units="microA_per_cm2" public_interface="out" cmeta:id="slow_inward_current_i_si" name="i_si"/>
+	  <variable name="i_si" units="microA_per_cm2" public_interface="out" cmeta:id="membrane_L_type_calcium_current">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#membrane_L_type_calcium_current">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_L_type_calcium_current"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
+ 	  <variable name="P_si" units="milliS_per_cm2" initial_value="0.09" cmeta:id="membrane_L_type_calcium_current_conductance">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#membrane_L_type_calcium_current_conductance">
+               <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_L_type_calcium_current_conductance"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
       <variable units="millivolt" name="E_si"/>
       <variable units="millisecond" public_interface="in" private_interface="out" name="time"/>
       <variable units="millivolt" public_interface="in" private_interface="out" name="V"/>
@@ -826,7 +840,7 @@ The breakdown of the model into components and the definition of encapsulation a
             <ci>i_si</ci>
             <apply>
                <times/>
-               <cn cellml:units="milliS_per_cm2">0.09</cn>
+               <ci>P_si</ci>
                <ci>d</ci>
                <ci>f</ci>
                <apply>

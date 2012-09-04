@@ -98,13 +98,14 @@ class TestPyCml : public CxxTest::TestSuite
     template<typename VECTOR_TYPE>
     void CheckParameter(AbstractParameterisedSystem<VECTOR_TYPE>& rCell)
     {
-        TS_ASSERT_EQUALS(rCell.GetNumberOfParameters(), 2u);
-        TS_ASSERT_EQUALS(rCell.GetParameterIndex("membrane_fast_sodium_current_conductance"), 0u);
-        TS_ASSERT_EQUALS(rCell.GetParameterUnits(0u), "milliS_per_cm2");
-        TS_ASSERT_EQUALS(rCell.GetParameter(0u), 23.0);
-        rCell.SetParameter(0u, 0.1);
-        TS_ASSERT_EQUALS(rCell.GetParameter(0u), 0.1);
-        rCell.SetParameter(0u, 23.0);
+        TS_ASSERT_EQUALS(rCell.GetNumberOfParameters(), 3u);
+        TS_ASSERT_EQUALS(rCell.GetParameterIndex("membrane_fast_sodium_current_conductance"), 1u);
+        TS_ASSERT_EQUALS(rCell.GetParameterUnits(1u), "milliS_per_cm2");
+        TS_ASSERT_EQUALS(rCell.GetParameter(1u), 23.0);
+        rCell.SetParameter(1u, 0.1);
+        TS_ASSERT_EQUALS(rCell.GetParameter(1u), 0.1);
+        TS_ASSERT_EQUALS(rCell.GetParameter("membrane_fast_sodium_current_conductance"), 0.1);
+        rCell.SetParameter(1u, 23.0);
     }
 
     template<typename VECTOR_TYPE>
@@ -342,7 +343,7 @@ public:
         }
 
         // With zero g_Na
-        normal.SetParameter(0u, 0.0);
+        normal.SetParameter("membrane_fast_sodium_current_conductance", 0.0);
         normal.ResetToInitialConditions();
         RunOdeSolverWithIonicModel(&normal,
                                    end_time,
@@ -385,7 +386,7 @@ public:
         TS_ASSERT_DELTA( be.GetIIonic(), i_ionic, 1e-3);
 
         // With zero g_Na
-        be.SetParameter(0u, 0.0);
+        be.SetParameter("membrane_fast_sodium_current_conductance", 0.0);
         be.ResetToInitialConditions();
         RunOdeSolverWithIonicModel(&be,
                                    end_time,
