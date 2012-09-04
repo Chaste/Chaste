@@ -102,6 +102,7 @@ void QuadraticMesh<DIM>::ConstructLinearMesh(unsigned numElemX)
 template<unsigned DIM>
 void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned numElemY, bool unused)
 {
+    //#2224 ConstructRectangularMeshNewImp(numElemX, numElemY, unused);return;
     assert(DIM==2);
 
     assert(numElemX > 0);

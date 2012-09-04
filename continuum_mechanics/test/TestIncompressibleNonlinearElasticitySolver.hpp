@@ -443,10 +443,14 @@ public:
         // Recall variables in the solution vector are ordered
         // [U0 V0 P0 U1 V1 P1 .. Un Vn Pn]
         // with P_i a dummy pressure variable if node i is not a vertex
-        // pressure for node 0 (in elem 0)
-        TS_ASSERT_DELTA(solver.rGetCurrentSolution()[2], 2.0, 1e-6);
-        // pressure for node 3 (in elem 1)
-        TS_ASSERT_DELTA(solver.rGetCurrentSolution()[11], 10.0, 1e-6);
+        // pressure for node 0 at (0,0) in element 0 (c1=1.0 above)
+        TS_ASSERT_DELTA(mesh.GetNode(0)->rGetLocation()[0], 0.0, 1e-6);
+        TS_ASSERT_DELTA(mesh.GetNode(0)->rGetLocation()[1], 0.0, 1e-6);
+        TS_ASSERT_DELTA(solver.rGetCurrentSolution()[2], 2.0, 1e-6); //0*3+2
+        // pressure for node 3 at (1,1) in element 1 (c1=5.0 above)
+        TS_ASSERT_DELTA(mesh.GetNode(3)->rGetLocation()[0], 1.0, 1e-6);
+        TS_ASSERT_DELTA(mesh.GetNode(3)->rGetLocation()[1], 1.0, 1e-6);
+        TS_ASSERT_DELTA(solver.rGetCurrentSolution()[11], 10.0, 1e-6); //3*3+2
     }
 
     void TestSolve() throw(Exception)
