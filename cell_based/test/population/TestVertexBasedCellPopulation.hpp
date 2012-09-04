@@ -121,40 +121,6 @@ public:
         }
     }
 
-    // Test that exception is thrown if no boundary nodes are defined in the mesh.
-    void TestExceptions() throw (Exception)
-    {
-        // Create a simple 2D VertexMesh
-        // Make four nodes all non boundary nodes to assign to one elements
-        std::vector<Node<2>*> basic_nodes;
-        basic_nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
-        basic_nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
-        basic_nodes.push_back(new Node<2>(2, false, 1.0, 1.0));
-        basic_nodes.push_back(new Node<2>(3, false, 0.0, 1.0));
-
-        // Make one square elements out of these nodes
-        std::vector<Node<2>*> element_nodes;
-        for (unsigned i=0; i<4; i++)
-        {
-            element_nodes.push_back(basic_nodes[i]);
-        }
-
-        std::vector<VertexElement<2,2>*> basic_vertex_elements;
-        basic_vertex_elements.push_back(new VertexElement<2,2>(0, element_nodes));
-
-        // Make a vertex mesh with no boundary nodes
-        MutableVertexMesh<2,2> basic_vertex_mesh(basic_nodes, basic_vertex_elements);
-
-        // Create cells
-        std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, basic_vertex_mesh.GetNumElements());
-
-        // Create cell population
-        TS_ASSERT_THROWS_THIS(VertexBasedCellPopulation<2> cell_population(basic_vertex_mesh, cells),
-                "No boundary nodes are defined in the supplied vertex mesh which are needed for vertex based simulations.");
-    }
-
     void TestValidate() throw (Exception)
     {
         // Create a simple vertex-based mesh
