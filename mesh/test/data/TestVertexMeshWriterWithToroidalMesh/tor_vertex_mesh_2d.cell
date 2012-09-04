@@ -1,0 +1,19 @@
+16	0
+0	6	0	5	9	12	8	4
+1	6	1	6	10	13	9	5
+2	6	2	7	11	14	10	6
+3	6	3	4	8	15	11	7
+4	6	9	13	17	21	16	12
+5	6	10	14	18	22	17	13
+6	6	11	15	19	23	18	14
+7	6	8	12	16	20	19	15
+8	6	16	21	25	28	24	20
+9	6	17	22	26	29	25	21
+10	6	18	23	27	30	26	22
+11	6	19	20	24	31	27	23
+12	6	25	29	1	5	0	28
+13	6	26	30	2	6	1	29
+14	6	27	31	3	7	2	30
+15	6	24	28	0	4	3	31
+# Created by Chaste version 3.1.16768 (with uncommitted modifications) on Tue, 04 Sep 2012 08:11:08 +0000.  Chaste was built on Tue, 04 Sep 2012 08:10:11 +0000 by machine (uname) 'Linux roley 3.2.0-29-generic #46-Ubuntu SMP Fri Jul 27 17:03:23 UTC 2012 x86_64' using settings: default, no Chaste libraries.  Checked-out project versions: AlexF=16754M; CellBasedComparison=16536; CryptInvasion=16624; VertexComparison2012=16536; ocisb=16727.
+
