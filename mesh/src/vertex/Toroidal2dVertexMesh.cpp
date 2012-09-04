@@ -263,27 +263,56 @@ MutableVertexMesh<2, 2>* Toroidal2dVertexMesh::GetMeshForVtk()
 
         std::vector<Node<2>*> elem_nodes;
 
-        // Iterate over nodes contained in this element
-        c_vector<double, 2> this_node_location = elem_iter->GetNode(num_nodes_in_elem-1)->rGetLocation();
+        // Compute whether the element straddles either periodic boundary
+        bool element_straddles_left_right_boundary = false;
+        bool element_straddles_top_bottom_boundary = false;
+
+        c_vector<double, 2> this_node_location = elem_iter->GetNode(0)->rGetLocation();
         for (unsigned local_index=0; local_index<num_nodes_in_elem; local_index++)
         {
-            c_vector<double, 2> next_node_location = elem_iter->GetNode(local_index)->rGetLocation();
-
-            unsigned next_node_index = elem_iter->GetNodeGlobalIndex(local_index);
-
-            // Work out whether to use one of the new nodes
+            c_vector<double, 2> next_node_location = elem_iter->GetNode((local_index+1)%num_nodes_in_elem)->rGetLocation();
             c_vector<double, 2> vector = next_node_location - this_node_location;
-            if (vector[0] < -0.5*mWidth)
+
+            if (fabs(vector[0]) > 0.5*mWidth)
             {
-                next_node_index += num_nodes;
+                element_straddles_left_right_boundary = true;
             }
-            if (vector[1] < -0.5*mHeight)
+            if (fabs(vector[1]) > 0.5*mHeight)
             {
-                next_node_index += 2*num_nodes;
+                element_straddles_top_bottom_boundary = true;
+            }
+        }
+
+        // Use the above information when duplicating the element
+        for (unsigned local_index=0; local_index<num_nodes_in_elem; local_index++)
+        {
+            unsigned this_node_index = elem_iter->GetNodeGlobalIndex(local_index);
+
+            // If the element straddles the left/right periodic boundary...
+            if (element_straddles_left_right_boundary)
+            {
+                // ...and this node is located to the left of the centre of the mesh...
+                bool node_is_right_of_centre = (elem_iter->GetNode(local_index)->rGetLocation()[0] - 0.5*mWidth > 0);
+                if (!node_is_right_of_centre)
+                {
+                    // ...then choose the equivalent node to the right
+                    this_node_index += num_nodes;
+                }
+            }
+                
+            // If the element straddles the top/bottom periodic boundary...
+            if (element_straddles_top_bottom_boundary)
+            {
+                // ...and this node is located below the centre of the mesh...
+                bool node_is_above_centre = (elem_iter->GetNode(local_index)->rGetLocation()[1] - 0.5*mHeight > 0);
+                if (!node_is_above_centre)
+                {
+                    // ...then choose the equivalent node above
+                    this_node_index += 2*num_nodes;
+                }
             }
 
-            elem_nodes.push_back(temp_nodes[next_node_index]);
-            this_node_location = temp_nodes[next_node_index]->rGetLocation();
+            elem_nodes.push_back(temp_nodes[this_node_index]);
         }
 
         VertexElement<2,2>* p_element = new VertexElement<2,2>(elem_index, elem_nodes);
