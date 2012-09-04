@@ -118,11 +118,11 @@ public:
         std::string results_file2 = handler_1.GetOutputDirectoryFullPath() + "toroidal_vertex_mesh.cell";
 
         {
-            FileComparison comparer(results_file1, "cell_based/test/data/TestToroidal2dVertexMesh/toroidal_vertex_mesh.node");
+            FileComparison comparer(results_file1, "mesh/test/data/TestToroidal2dVertexMesh/toroidal_vertex_mesh.node");
             TS_ASSERT(comparer.CompareFiles());
         }
         {
-            FileComparison comparer(results_file2, "cell_based/test/data/TestToroidal2dVertexMesh/toroidal_vertex_mesh.cell");
+            FileComparison comparer(results_file2, "mesh/test/data/TestToroidal2dVertexMesh/toroidal_vertex_mesh.cell");
             TS_ASSERT(comparer.CompareFiles());
         }
     }

@@ -72,11 +72,11 @@ public:
         std::string results_file2 = handler_1.GetOutputDirectoryFullPath() + "cylindrical_vertex_mesh.cell";
 
         {
-            FileComparison comparer(results_file1, "cell_based/test/data/TestCylindrical2dVertexMesh/cylindrical_vertex_mesh.node");
+            FileComparison comparer(results_file1, "mesh/test/data/TestCylindrical2dVertexMesh/cylindrical_vertex_mesh.node");
             TS_ASSERT(comparer.CompareFiles());
         }
         {
-            FileComparison comparer(results_file2, "cell_based/test/data/TestCylindrical2dVertexMesh/cylindrical_vertex_mesh.cell");
+            FileComparison comparer(results_file2, "mesh/test/data/TestCylindrical2dVertexMesh/cylindrical_vertex_mesh.cell");
             TS_ASSERT(comparer.CompareFiles());
         }
 
@@ -103,11 +103,11 @@ public:
         results_file1 = handler_2.GetOutputDirectoryFullPath() + "flat_cylindrical_vertex_mesh.node";
         results_file2 = handler_2.GetOutputDirectoryFullPath() + "flat_cylindrical_vertex_mesh.cell";
         {
-            FileComparison comparer(results_file1, "cell_based/test/data/TestFlatCylindrical2dVertexMesh/flat_cylindrical_vertex_mesh.node");
+            FileComparison comparer(results_file1, "mesh/test/data/TestFlatCylindrical2dVertexMesh/flat_cylindrical_vertex_mesh.node");
             TS_ASSERT(comparer.CompareFiles());
         }
         {
-            FileComparison comparer(results_file2, "cell_based/test/data/TestFlatCylindrical2dVertexMesh/flat_cylindrical_vertex_mesh.cell");
+            FileComparison comparer(results_file2, "mesh/test/data/TestFlatCylindrical2dVertexMesh/flat_cylindrical_vertex_mesh.cell");
             TS_ASSERT(comparer.CompareFiles());
         }
     }
