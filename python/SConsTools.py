@@ -908,14 +908,17 @@ def DoDynamicallyLoadableModules(otherVars):
     else:
         dyn_env = otherVars['dynenv']
     for s in dyn_source:
-        # Note: if building direct from CellML, there will be more than 1 target
-        dyn_objs = dyn_env.SharedObject(source=s)
-        for o in dyn_objs:
-            so_lib = dyn_env.OriginalSharedLibrary(source=o)
-            so_dir = os.path.join(curdir, os.pardir, os.pardir, os.path.dirname(s))
-            dyn_libs.append(dyn_env.Install(so_dir, so_lib))
-            if otherVars['dyn_libs_only']:
-                if os.path.realpath(so_dir).startswith(os.path.realpath(otherVars['dyn_folder'])):
+        # Figure out if this is the single requested source, if there is one
+        so_dir = os.path.join(curdir, os.pardir, os.pardir, os.path.dirname(s))
+        this_dyn_only = (otherVars['dyn_libs_only'] and
+                         os.path.realpath(so_dir).startswith(os.path.realpath(otherVars['dyn_folder'])))
+        if this_dyn_only or not otherVars['dyn_libs_only']:
+            # Note: if building direct from CellML, there will be more than 1 target
+            dyn_objs = dyn_env.SharedObject(source=s)
+            for o in dyn_objs:
+                so_lib = dyn_env.OriginalSharedLibrary(source=o)
+                dyn_libs.append(dyn_env.Install(so_dir, so_lib))
+                if this_dyn_only:
                     # Force dependency on installed version, even if project is a symlink
                     dyn_env.Depends(otherVars['dyn_folder'], dyn_libs[-1])
     return dyn_libs
@@ -935,6 +938,10 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
     """
     if otherVars['debug']:
         print "Executing SConscript for project", projectName
+    if otherVars['dyn_libs_only']:
+        # Short-circuit most stuff, and just build the requested .so
+        DoDynamicallyLoadableModules(otherVars)
+        return []
     # Commonly used variables
     env = otherVars['env']
     use_chaste_libs = otherVars['use_chaste_libs']
@@ -1094,6 +1101,10 @@ def DoComponentSConscript(component, otherVars):
     """
     if otherVars['debug']:
         print "Executing SConscript for component", component
+    if otherVars['dyn_libs_only']:
+        # Short-circuit most stuff, and just build the requested .so
+        DoDynamicallyLoadableModules(otherVars)
+        return []
     # Commonly used variables
     env = otherVars['env']
     use_chaste_libs = otherVars['use_chaste_libs']

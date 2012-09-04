@@ -87,9 +87,9 @@ public:
      * @param rExtraXml  any extra XML to go in the config file (e.g. LT settings)
      */
     static void CreateOptionsFile(const OutputFileHandler& rHandler,
-                           const std::string& rModelName,
-                           const std::vector<std::string>& rArgs,
-                           const std::string& rExtraXml="");
+                                  const std::string& rModelName,
+                                  const std::vector<std::string>& rArgs,
+                                  const std::string& rExtraXml="");
 
 private:
     /**

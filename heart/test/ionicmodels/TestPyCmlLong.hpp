@@ -170,7 +170,7 @@ private:
             }
             try
             {
-                RunTest(rOutputDirName, rModels[i], rArgs, testLookupTables, tableTestV);
+                RunTest(rOutputDirName + "/" + rModels[i], rModels[i], rArgs, testLookupTables, tableTestV);
             }
             catch (const Exception& e)
             {
@@ -204,7 +204,7 @@ private:
                  double tableTestV=-1000)
     {
         // Copy CellML file (and .out if present) into output dir
-        OutputFileHandler handler(rOutputDirName, false);
+        OutputFileHandler handler(rOutputDirName, true);
         FileFinder cellml_file("heart/test/data/cellml/" + rModelName + ".cellml", RelativeTo::ChasteSourceRoot);
         handler.CopyFileTo(cellml_file);
         FileFinder out_file("heart/test/data/cellml/" + rModelName + ".out", RelativeTo::ChasteSourceRoot);
@@ -313,7 +313,7 @@ private:
 public:
     void TestNormalCells() throw (Exception)
     {
-        std::cout << "Search for ': ***', 'Error', or 'Failed' to find problems." << std::endl;
+        std::cout << "Search for 'Failure', ': ***', 'Error', or 'Failed' to find problems." << std::endl;
 
         std::string dirname("TestPyCmlNightlyNormal");
         std::vector<std::string> args;
