@@ -181,7 +181,7 @@ void SemMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& rMeshRe
      if (rMeshReader.GetNumElementAttributes() > 0)
      {
          assert(rMeshReader.GetNumElementAttributes() == 1);
-         unsigned attribute_value = element_data.AttributeValue;
+         double attribute_value = element_data.AttributeValue;
          p_element->SetAttribute(attribute_value);
      }
     }
