@@ -2476,14 +2476,9 @@ class CellMLToChasteTranslator(CellMLTranslator):
             i = self.nonlinear_system_vars.index(self.varobj(var_i))
             j = self.nonlinear_system_vars.index(self.varobj(var_j))
             self.writeln('rJacobian[', i, '][', j, '] = ', nl=False)
-            if hasattr(entry.math, u'apply'):
-                self.output_expr(entry.math.apply, False)
-            elif hasattr(entry.math, u'cn'):
-                self.output_expr(entry.math.cn, False)
-            elif hasattr(entry.math, u'ci'):
-                self.output_expr(entry.math.ci, False)
-            else:
-                raise ValueError('Unexpected entry: ' + entry.xml())
+            entry_content = list(entry.math.xml_element_children())
+            assert len(entry_content) == 1, "Malformed Jacobian matrix entry: " + entry.xml()
+            self.output_expr(entry_content[0], False)
             self.writeln(self.STMT_END, indent=False)
         self.close_block()
         # The other methods are protected
@@ -3954,10 +3949,9 @@ class CellMLToMatlabTranslator(CellMLTranslator):
             i = state_var_names.index(var_i) + 1
             j = state_var_names.index(var_j) + 1
             self.writeln('J(', j, ',', i, ') = ', nl=False)
-            if hasattr(entry.math, u'apply'):
-                self.output_expr(entry.math.apply, False)
-            else:
-                self.output_expr(entry.math.cn, False)
+            entry_content = list(entry.math.xml_element_children())
+            assert len(entry_content) == 1
+            self.output_expr(entry_content[0], False)
             self.writeln(self.STMT_END, indent=False)
         self.set_indent(offset=-1)
         self.writeln('end')
@@ -4240,15 +4234,13 @@ class SolverInfo(object):
         # Jacobian
         if hasattr(solver_info, u'jacobian'):
             for entry in solver_info.jacobian.entry:
-                for elt in entry.math.xml_children:
-                    if getattr(elt, 'nodeType', None) == Node.ELEMENT_NODE:
-                        func(elt)
+                for elt in entry.math.xml_element_children():
+                    func(elt)
         # Linearised ODEs
         if hasattr(solver_info, u'linear_odes'):
             for math in solver_info.linear_odes.math:
-                for elt in math.xml_children:
-                    if getattr(elt, 'nodeType', None) == Node.ELEMENT_NODE:
-                        func(elt)
+                for elt in math.xml_element_children():
+                    func(elt)
     
     def has_modifiable_mathematics(self):
         """Check if the solver info blocks contain any modifiable mathematics."""
@@ -4261,7 +4253,7 @@ class SolverInfo(object):
     def get_modifiable_mathematics(self):
         """Get an iterable over mathematical constructs in the solver info blocks that can be changed.
         
-        Returned elements will be mathml_apply, mathml_ci or mathml_cn instances.
+        Returned elements will be mathml_piecewise, mathml_apply, mathml_ci or mathml_cn instances.
         """
         solver_info = self._solver_info
         # Jacobian - entry definitions can be changed

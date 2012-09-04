@@ -184,7 +184,7 @@ def make_xml_binder():
                        'diff', 'plus', 'minus', 'times', 'divide',
                        'exp', 'ln', 'log', 'abs', 'power', 'root',
                        'leq', 'geq', 'lt', 'gt', 'eq', 'neq',
-                       'ci', 'cn', 'apply', 'piecewise']:
+                       'ci', 'cn', 'apply', 'piecewise', 'piece']:
         exec "binder.set_binding_class(NSS[u'm'], '%s', mathml_%s)" % \
              (mathml_elt, mathml_elt)
     binder.set_binding_class(NSS[u'm'], "and_",
@@ -3932,6 +3932,36 @@ class mathml(element_base):
                 elt._cml_complexity += (new - old)
             elt = getattr(elt, 'xml_parent', None)
         return
+    
+    def classify_child_variables(self, elt, **kwargs):
+        """Classify variables in the given expression according to how they are used.
+        
+        In the process, compute and return a set of variables on which that expression depends.
+
+        If dependencies_only then the variable classification will not be
+        done, only dependencies will be analysed.  This is useful for doing
+        a 'light' re-analysis if the dependency set has been reduced; if the
+        set has increased then the topological sort of equations may need to
+        be redone.
+        
+        The function needs_special_treatment may be supplied to override the
+        default recursion into sub-trees.  It takes a single sub-tree as
+        argument, and should either return the dependency set for that
+        sub-tree, or None to use the default recursion.  This is used when
+        re-analysing dependencies after applying lookup tables, since table
+        lookups only depend on the keying variable.
+        """
+        if hasattr(elt, 'classify_variables'):
+            dependencies = elt.classify_variables(**kwargs)
+        else:
+            dependencies = set()
+            needs_special_treatment = kwargs.get('needs_special_treatment', lambda e: None)
+            for e in elt.xml_element_children():
+                child_deps = needs_special_treatment(e)
+                if child_deps is None:
+                    child_deps = self.classify_child_variables(e, **kwargs)
+                dependencies.update(child_deps)
+        return dependencies
 
 class mathml_math(mathml):
     def __init__(self):
@@ -4288,6 +4318,19 @@ class mathml_ci(mathml, mathml_units_mixin_tokens):
             elif defn is not None:
                 raise ValueError("Unexpected variable definition: " + defn.xml())
         return
+    
+    def classify_variables(self, dependencies_only=False,
+                           needs_special_treatment=lambda n: None):
+        """Classify variables in this expression according to how they are used.
+        
+        For ci elements we just return a set containing the referenced variable
+        as the single dependency.  If dependencies_only is False, we also mark
+        the variable as used.
+        """
+        var = self.variable
+        if not dependencies_only:
+            var._used()
+        return set([var])
 
     @staticmethod
     def create_new(elt, variable_name):
@@ -4828,20 +4871,8 @@ class mathml_apply(Colourable, mathml_constructor, mathml_units_mixin):
 
             # Consider operands other than the LHS of an assignment
             for oper in opers:
-                # TODO: What about elements like root which could have a ci in degree?
-                if isinstance(oper, (mathml_apply, mathml_piecewise)):
-                    # Recurse
-                    child_deps = needs_special_treatment(oper)
-                    if child_deps is None:
-                        child_deps = oper.classify_variables(dependencies_only=dependencies_only,
-                                                             needs_special_treatment=needs_special_treatment)
-                    dependencies.update(child_deps)
-                elif oper.localName == u'ci':
-                    # We have a straightforward dependency
-                    var = oper.variable
-                    dependencies.add(var)
-                    if not dependencies_only:
-                        var._used()
+                dependencies.update(self.classify_child_variables(oper, dependencies_only=dependencies_only,
+                                                                  needs_special_treatment=needs_special_treatment))
 
         if ode_indep_var:
             # ODEs should depend on their independent variable.
@@ -5177,20 +5208,8 @@ class mathml_piecewise(mathml_constructor, mathml_units_mixin):
         if hasattr(self, u'otherwise'):
             pieces.append(self.otherwise)
         for piece in pieces:
-            for e in self.xml_element_children(piece):
-                if isinstance(e, (mathml_apply, mathml_piecewise)):
-                    # Recurse
-                    child_deps = needs_special_treatment(e)
-                    if child_deps is None:
-                        child_deps = e.classify_variables(dependencies_only=dependencies_only,
-                                                          needs_special_treatment=needs_special_treatment)
-                    dependencies.update(child_deps)
-                elif e.localName == u'ci':
-                    # We have a straightforward dependency
-                    var = e.variable
-                    dependencies.add(var)
-                    if not dependencies_only:
-                        var._used()
+            dependencies.update(self.classify_child_variables(piece, dependencies_only=dependencies_only,
+                                                              needs_special_treatment=needs_special_treatment))
         return dependencies
 
     def evaluate(self):
@@ -6164,6 +6183,13 @@ class mathml_degree(mathml, mathml_units_mixin_container):
 
 class mathml_otherwise(mathml):
     """Class representing the MathML <otherwise> element.
+    
+    Only defined to make it inherit from mathml.
+    """
+    pass
+
+class mathml_piece(mathml):
+    """Class representing the MathML <piece> element.
     
     Only defined to make it inherit from mathml.
     """
