@@ -455,6 +455,10 @@ public:
         // Missing dir
         FileFinder absent_dir("absent_dir", RelativeTo::ChasteSourceRoot);
         TS_ASSERT_THROWS_CONTAINS(Hdf5DataReader(absent_dir, "base"), "Directory does not exist: ");
+
+        std::cout << "Testing an HDF5 exception is handled properly:" << std::endl << std::flush;
+        TS_ASSERT_THROWS_CONTAINS(Hdf5DataReader("hdf5_reader", "hdf5_test_overtime_exceptions", true, "Postprocessing"),
+                "but could not find the dataset 'Postprocessing',");
     }
 
     void TestMultiStepExceptions() throw (Exception)

@@ -88,6 +88,13 @@ void Hdf5DataReader::CommonConstructor()
 
     mVariablesDatasetId = H5Dopen(mFileId, mDatasetName.c_str());
 
+    if (mVariablesDatasetId <= 0)
+    {
+        H5Fclose(mFileId);
+        EXCEPTION("Hdf5DataReader opened " << file_name << " but could not find the dataset '" <<
+                  mDatasetName.c_str() << "', H5Dopen error code = " << mVariablesDatasetId);
+    }
+
     hid_t variables_dataspace = H5Dget_space(mVariablesDatasetId);
     mVariablesDatasetRank = H5Sget_simple_extent_ndims(variables_dataspace);
 
@@ -105,24 +112,11 @@ void Hdf5DataReader::CommonConstructor()
     {
         mIsUnlimitedDimensionSet = true;
 
+        // Files are always assumed to have an unlimited dimension called "Time" (even though writer can vary this!).
+        // Files pre - r16738 use "Time" for "Data"'s unlimited variable.
+        // Files post - r16738 use "<DatasetName>_Time" for "<DatasetName>"'s unlimited variable, if this is missing we look
+        // for simply "Time".
         SetTimeDatasetId();
-
-//        // Files are always assumed to have an unlimited dimension called "Time" (even though writer can vary this!).
-//        // Files pre - r16738 use "Time" for "Data"'s unlimited variable.
-//        // Files post - r16738 use "<DatasetName>_Time" for "<DatasetName>"'s unlimited variable, if this is missing we look
-//        // for simply "Time".
-//        if (DoesDatasetExist(mDatasetName + "_Time"))
-//        {
-//            mTimeDatasetId = H5Dopen(mFileId, (mDatasetName + "_Time").c_str());
-//        }
-//        else if (DoesDatasetExist("Time"))
-//        {
-//            mTimeDatasetId = H5Dopen(mFileId, "Time");
-//        }
-//        else
-//        {
-//            NEVER_REACHED;
-//        }
 
         hid_t timestep_dataspace = H5Dget_space(mTimeDatasetId);
 
