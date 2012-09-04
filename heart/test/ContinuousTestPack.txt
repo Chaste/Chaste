@@ -43,6 +43,7 @@ postprocessing/TestHdf5ToVisualizerConverters.hpp
 postprocessing/TestPostProcessingWriter.hpp
 postprocessing/TestPropagationPropertiesCalculator.hpp
 postprocessing/TestPseudoEcgCalculator.hpp
+postprocessing/TestSpiralWaveAndPhase.hpp
 postprocessing/TestVoltageInterpolaterOntoMechanicsMesh.hpp
 TestAbstractPurkinjeCellFactory.hpp
 TestAdaptiveTetrahedralMesh.hpp
