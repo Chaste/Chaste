@@ -49,18 +49,6 @@ VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM,
 {
     mpMutableVertexMesh = static_cast<MutableVertexMesh<DIM, DIM>* >(&(this->mrMesh));
 
-    // Check the mesh contains boundary nodes
-    bool contains_boundary_nodes = false;
-    for (typename MutableVertexMesh<DIM,DIM>::NodeIterator node_iter = mpMutableVertexMesh->GetNodeIteratorBegin();
-         node_iter != mpMutableVertexMesh->GetNodeIteratorEnd();
-         ++node_iter)
-    {
-        if (node_iter->IsBoundaryNode())
-        {
-            contains_boundary_nodes = true;
-        }
-    }
-
     // Check each element has only one cell attached
     if (validate)
     {
