@@ -41,14 +41,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
+#include "ArchiveOpener.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "CellsGenerator.hpp"
 #include "TargetedCellKiller.hpp"
 #include "RandomCellKiller.hpp"
 #include "ApoptoticCellKiller.hpp"
 #include "PlaneBasedCellKiller.hpp"
+#include "IsolatedLabelledCellKiller.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "TrianglesMeshReader.hpp"
+#include "HoneycombVertexMeshGenerator.hpp"
+#include "VertexBasedCellPopulation.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "FileComparison.hpp"
@@ -185,7 +189,7 @@ public:
         // Check that some of the vector of cells reach apotosis
         random_cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
-        std::set< double > old_locations;
+        std::set<double> old_locations;
 
         bool apoptosis_cell_found = false;
         std::list<CellPtr>::iterator cell_it = r_cells.begin();
@@ -472,6 +476,83 @@ public:
         }
     }
 
+    void TestIsolatedLabelledCellKiller() throw(Exception)
+    {
+        // Create a non-vertex based cell population
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
+        MutableMesh<2,2> non_vertex_mesh;
+        non_vertex_mesh.ConstructFromMeshReader(mesh_reader);
+
+        std::vector<CellPtr> non_vertex_cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> non_vertex_cells_generator;
+        non_vertex_cells_generator.GenerateBasic(non_vertex_cells, non_vertex_mesh.GetNumNodes());
+
+        MeshBasedCellPopulation<2> non_vertex_cell_population(non_vertex_mesh, non_vertex_cells);
+
+        // Test that the correct exception is thrown when trying to create cell killer without a vertex-based cell population
+        TS_ASSERT_THROWS_THIS(IsolatedLabelledCellKiller<2> cell_killer(&non_vertex_cell_population),
+                              "IsolatedLabelledCellKiller only works with a VertexBasedCellPopulation.");
+
+        // Create a vertex-based cell population
+        HoneycombVertexMeshGenerator generator(4, 3);
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Label cells 0 and 1 (which are neighbours) and 3 (which is isolated
+        boost::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
+        cell_population.GetCellUsingLocationIndex(0)->AddCellProperty(p_label);
+        cell_population.GetCellUsingLocationIndex(1)->AddCellProperty(p_label);
+        cell_population.GetCellUsingLocationIndex(3)->AddCellProperty(p_label);
+        TS_ASSERT_EQUALS(cell_population.GetCellPropertyRegistry()->Get<CellLabel>()->GetCellCount(), 3u);
+
+        // Create cell killer
+        IsolatedLabelledCellKiller<2> cell_killer(&cell_population);
+
+        // No cells should yet have been killed
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            TS_ASSERT_EQUALS(cell_iter->IsDead(), false);
+        }
+
+        // Kill any isolated labelled cells
+        cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
+
+        // Cell 3 should have been killed
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            bool should_be_dead = (cell_population.GetLocationIndexUsingCell(*cell_iter) == 3);
+
+            TS_ASSERT_EQUALS(cell_iter->IsDead(), should_be_dead);
+        }
+
+        // Remove the dead cell
+        cell_population.RemoveDeadCells();
+
+        // Remove the label from cell 1
+        cell_population.GetCellUsingLocationIndex(1)->RemoveCellProperty<CellLabel>();
+        TS_ASSERT_EQUALS(cell_population.GetCellPropertyRegistry()->Get<CellLabel>()->GetCellCount(), 1u);
+
+        // Again kill any isolated labelled cells
+        cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
+
+        // Although isolated, cell 0 should not have been killed, since it is the only labelled cell
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            TS_ASSERT_EQUALS(cell_iter->IsDead(), false);
+        }
+    }
+
     void TestArchivingOfTargetedCellKiller() throw (Exception)
     {
         // Set up singleton classes
@@ -625,6 +706,56 @@ public:
         }
     }
 
+    void TestArchivingOfIsolatedLabelledCellKiller() throw (Exception)
+    {
+        // Set up singleton classes
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "isolated_killer.arch";
+
+        FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
+        std::string archive_file = "isolated_killer.arch";
+        ArchiveLocationInfo::SetMeshFilename("vertex_mesh");
+
+        {
+            HoneycombVertexMeshGenerator generator(4,4);
+            MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        
+            std::vector<CellPtr> cells;
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
+
+            VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+            IsolatedLabelledCellKiller<2> cell_killer(&cell_population);
+
+            // Create an output archive
+            ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
+
+            // Serialize via pointer
+            IsolatedLabelledCellKiller<2>* const p_cell_killer = &cell_killer;
+            (*p_arch) << p_cell_killer;
+        }
+
+        {
+            // Create an input archive
+            ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
+
+            IsolatedLabelledCellKiller<2>* p_cell_killer;
+
+            // Restore from the archive
+            (*p_arch) >> p_cell_killer;
+
+            TS_ASSERT(p_cell_killer != NULL);
+            TS_ASSERT(p_cell_killer->GetCellPopulation() != NULL);
+
+            // Tidy up
+            delete p_cell_killer;
+        }
+    }
+
     void TestCellKillersOutputParameters()
     {
         std::string output_directory = "TestCellKillersOutputParameters";
@@ -639,7 +770,7 @@ public:
         targeted_cell_killer_parameter_file->close();
 
         {
-            // Compare the generated file in test output with a reference copy in the source code.
+            // Compare the generated file in test output with a reference copy in the source code
             FileFinder generated = output_file_handler.FindFile("targeted_results.parameters");
             FileFinder reference("cell_based/test/data/TestCellKillers/targeted_results.parameters",
                     RelativeTo::ChasteSourceRoot);
@@ -673,10 +804,9 @@ public:
         apop_cell_killer_parameter_file->close();
 
         {
-            // Compare the generated file in test output with a reference copy in the source code.
+            // Compare the generated file in test output with a reference copy in the source code
             FileFinder generated = output_file_handler.FindFile("apop_results.parameters");
-            FileFinder reference("cell_based/test/data/TestCellKillers/apop_results.parameters",
-                    RelativeTo::ChasteSourceRoot);
+            FileFinder reference("cell_based/test/data/TestCellKillers/apop_results.parameters", RelativeTo::ChasteSourceRoot);
             FileComparison comparer(generated, reference);
             TS_ASSERT(comparer.CompareFiles());
         }
@@ -690,15 +820,37 @@ public:
         region_cell_killer_parameter_file->close();
 
         {
-            // Compare the generated file in test output with a reference copy in the source code.
+            // Compare the generated file in test output with a reference copy in the source code
             FileFinder generated = output_file_handler.FindFile("region_results.parameters");
-            FileFinder reference("cell_based/test/data/TestCellKillers/region_results.parameters",
-                    RelativeTo::ChasteSourceRoot);
+            FileFinder reference("cell_based/test/data/TestCellKillers/region_results.parameters", RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated, reference);
+            TS_ASSERT(comparer.CompareFiles());
+        }
+
+        // Test with IsolatedLabelledCellKiller
+        HoneycombVertexMeshGenerator generator(4,4);
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        IsolatedLabelledCellKiller<2> isolated_labelled_cell_killer(&cell_population);
+        TS_ASSERT_EQUALS(isolated_labelled_cell_killer.GetIdentifier(), "IsolatedLabelledCellKiller-2");
+
+        out_stream isolated_labelled_cell_killer_parameter_file = output_file_handler.OpenOutputFile("isolated_labelled_results.parameters");
+        isolated_labelled_cell_killer.OutputCellKillerParameters(isolated_labelled_cell_killer_parameter_file);
+        isolated_labelled_cell_killer_parameter_file->close();
+
+        {
+            // Compare the generated file in test output with a reference copy in the source code
+            FileFinder generated = output_file_handler.FindFile("isolated_labelled_results.parameters");
+            FileFinder reference("cell_based/test/data/TestCellKillers/isolated_labelled_results.parameters", RelativeTo::ChasteSourceRoot);
             FileComparison comparer(generated, reference);
             TS_ASSERT(comparer.CompareFiles());
         }
     }
-
 };
 
 #endif /*TESTCELLKILLERS_HPP_*/
