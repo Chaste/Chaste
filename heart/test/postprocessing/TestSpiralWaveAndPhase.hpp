@@ -43,6 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LuoRudySpiralWaveCellFactory.hpp"
 #include "PetscSetupAndFinalize.hpp"
 #include "FileFinder.hpp"
+#include "FileComparison.hpp"
 #include "Hdf5ToMeshalyzerConverter.hpp"
 
 class TestSpiralWaveAndPhase : public CxxTest::TestSuite
@@ -74,6 +75,9 @@ public:
 
     /**
      * You just need to run this once to get a spiral wave .h5 file.
+     * It is put into
+     * <CHASTE_TEST_OUTPUT>/SpiralWaveAndPhaseContinued/results.h5
+     *
      * This file is now stored in the repository at
      * heart/test/data/PhasePostprocessing/results.h5
      * and is used by the subsequent tests.
@@ -92,7 +96,11 @@ public:
             monodomain_problem.SetMesh(mpMesh);
             monodomain_problem.SetWriteInfo();
             monodomain_problem.Initialise();
+            monodomain_problem.Solve();
 
+            // Get a shorter results file that is all 'spiral wave'.
+            HeartConfig::Instance()->SetOutputDirectory("SpiralWaveAndPhaseContinued");
+            HeartConfig::Instance()->SetSimulationDuration(110); //ms
             monodomain_problem.Solve();
         }
 
@@ -168,7 +176,7 @@ public:
         unsigned first_index = 0u;
         for (unsigned i=0; i<times.size(); i++)
         {
-            if (times[i] >= tau)
+            if (times[i] >= tau + times[0])
             {
                 first_index = i;
                 break;
@@ -209,8 +217,12 @@ public:
         // Write out postprocessed quantities too (in dataset "Postprocessing")
         Hdf5ToMeshalyzerConverter<2,2> converter2("SpiralWaveAndPhase", "results", mpMesh, true, "Postprocessing");
 
-        FileFinder meshalyzer_phase_file("SpiralWaveAndPhase/output/results_Phase.dat",RelativeTo::ChasteTestOutput);
+        FileFinder meshalyzer_phase_file("SpiralWaveAndPhase/output/results_Phase.dat", RelativeTo::ChasteTestOutput);
         TS_ASSERT(meshalyzer_phase_file.IsFile());
+        FileFinder reference_file("heart/test/data/PhasePostprocessing/results_Phase.dat", RelativeTo::ChasteSourceRoot);
+
+        FileComparison comparer(meshalyzer_phase_file, reference_file);
+        TS_ASSERT(comparer.CompareFiles());
     }
 };
 

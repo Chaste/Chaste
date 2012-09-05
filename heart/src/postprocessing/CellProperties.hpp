@@ -51,7 +51,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *   Cycle lengths (time between onset of APs)
  *
  */
-
 class CellProperties
 {
 private:

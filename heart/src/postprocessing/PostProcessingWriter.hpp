@@ -191,6 +191,7 @@ private:
      * @param distancesFromOriginNode - Distance map from originNode to all the nodes in the simulation. Typically calculated with DistanceMapCalculator
      */
     void WriteConductionVelocityMap(unsigned originNode, std::vector<double> distancesFromOriginNode);
+
     /**
      * Method for investigating HeartConfig and opening file in Meshalyzer/Cmgui postprocessing subfolder
      * Calls lower-level method(s) for actually writing data in a specific format
