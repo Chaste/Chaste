@@ -938,10 +938,6 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
     """
     if otherVars['debug']:
         print "Executing SConscript for project", projectName
-    if otherVars['dyn_libs_only']:
-        # Short-circuit most stuff, and just build the requested .so
-        DoDynamicallyLoadableModules(otherVars)
-        return []
     # Commonly used variables
     env = otherVars['env']
     use_chaste_libs = otherVars['use_chaste_libs']
@@ -969,6 +965,11 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
             extra_cpppath.extend(map(lambda s: os.path.join(Dir('#').abspath, s), proj_dirs))
     # Move back to the build dir
     os.chdir(curdir)
+
+    if otherVars['dyn_libs_only']:
+        # Short-circuit most stuff, and just build the requested .so
+        DoDynamicallyLoadableModules(otherVars)
+        return []
 
     # Look for files containing a test suite
     # A list of test suites to run will be found in a test/<name>TestPack.txt file, one per line.
