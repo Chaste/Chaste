@@ -42,10 +42,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BoxCollection.hpp"
 #include "NodesOnlyMesh.hpp"
 
-/**
- *
- */
 
+/**
+ * A subclass of NodesOnlyMesh<2> for a rectangular mesh with
+ * periodic left and right boundaries, representing a cylindrical geometry.
+ *
+ * The class works by overriding calls such as ReMesh() and
+ * GetVectorFromAtoB() so that simulation classes can treat this
+ * class in exactly the same way as a NodesOnlyMesh<2>.
+ */
 class Cylindrical2dNodesOnlyMesh: public NodesOnlyMesh<2>
 {
 private:
