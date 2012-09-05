@@ -1,4 +1,3 @@
-# Created by Chaste version 2.1.12280 (with uncommitted modifications) on Tue, 05 Apr 2011 03:28:08 +0000.  Chaste was built on Tue, 05 Apr 2011 03:27:09 +0000 by machine (uname) 'Linux compphys11 2.6.32-30-generic #59-Ubuntu SMP Tue Mar 1 21:30:46 UTC 2011 x86_64' using settings: default, no Chaste libraries.
 0	0	
 -0.000273674	2.10694e-05	
 -0.000487107	4.19169e-05	
@@ -200,3 +199,4 @@
 -0.00105328	-0.00108769	
 -0.00101175	-0.00104594	
 -0.000969962	-0.00100393	
+# Created by Chaste ...

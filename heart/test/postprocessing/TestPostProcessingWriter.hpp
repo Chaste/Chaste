@@ -127,7 +127,7 @@ public:
         writer.WriteApdMapFile(90.0, -30.0);
 
         std::string file1 = FileFinder("Apd_90_-30_Map.dat", output_dir).GetAbsolutePath();
-        std::string file2 = "heart/test/data/101_zeroes.dat";
+        std::string file2 = "heart/test/data/PostProcessorWriter/101_zeroes.dat";
         NumericFileComparison comp(file1, file2);
         TS_ASSERT(comp.CompareFiles(1e-12));
     }
@@ -177,12 +177,12 @@ public:
         writer.WriteAboveThresholdDepolarisationFile(-40.0);
 
         std::string file1 = FileFinder("Apd_80_-30_Map.dat", output_dir).GetAbsolutePath();
-        std::string file2 = "heart/test/data/101_zeroes.dat";
+        std::string file2 = "heart/test/data/PostProcessorWriter/101_zeroes.dat";
         NumericFileComparison comp1(file1, file2);
         TS_ASSERT(comp1.CompareFiles(1e-12));
 
         file1 = FileFinder("Apd_90_-20_Map.dat", output_dir).GetAbsolutePath();
-        file2 = "heart/test/data/101_zeroes.dat";
+        file2 = "heart/test/data/PostProcessorWriter/101_zeroes.dat";
         NumericFileComparison comp2(file1, file2);
         TS_ASSERT(comp2.CompareFiles(1e-12));
 

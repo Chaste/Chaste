@@ -362,18 +362,15 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteGenericFileToMeshalyzer(
         //Open file
         if (PetscTools::AmMaster())
         {
-            //Open the file for the first time
+            // Open the file for the first time
             p_file = output_file_handler.OpenOutputFile(rFileName);
-            //write provenance info
-            std::string comment = "# " + ChasteBuildInfo::GetProvenanceString();
-            *p_file << comment;
         }
         else
         {
-            //Append to the existing file
+            // Append data to the existing file opened by master
             p_file = output_file_handler.OpenOutputFile(rFileName, std::ios::app);
         }
-        //Write data
+        // Write data
         for (unsigned line_number=0; line_number<rDataPayload.size(); line_number++)
         {
             for (unsigned i = 0; i < rDataPayload[line_number].size(); i++)
@@ -381,6 +378,13 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteGenericFileToMeshalyzer(
                 *p_file << rDataPayload[line_number][i] << "\t";
             }
             *p_file << std::endl;
+        }
+
+        // Last processor appends comment line
+        if (PetscTools::AmTopMost())
+        {
+            std::string comment = "# " + ChasteBuildInfo::GetProvenanceString();
+            *p_file << comment;
         }
         p_file->close();
     }
