@@ -88,7 +88,7 @@ class PartialEvaluator(object):
         if isinstance(elt, mathml_ci):
             func(elt)
         else:
-            for e in self.doc.model.xml_element_children(elt):
+            for e in elt.xml_element_children():
                 self._process_ci_elts(e, func)
     
     def _rename_var(self, elt):
@@ -115,17 +115,14 @@ class PartialEvaluator(object):
         del self.doc.model._pe_repeat
     
     def _reduce_evaluate_expression(self, expr):
-        """Reduce or evaluate a single expression.
-        
-        expr must be an instance of mathml_apply, mathml_ci or mathml_cn.
-        """
+        """Reduce or evaluate a single expression."""
         if hasattr(expr, '_pe_process'):
             # This expression has been reduced or evaluated already, but needs further
             # processing later so hasn't been removed yet.
             return
         if expr._get_binding_time() is BINDING_TIMES.static:
             # Evaluate
-            value = expr.evaluate()
+            value = expr.evaluate() # Needed here for the is_assignment case
             self._debug("Evaluated", self._describe_expr(expr), "to", value)
             if isinstance(expr, mathml_apply):
                 if expr.is_ode():
@@ -143,17 +140,15 @@ class PartialEvaluator(object):
                     new_elt = expr._eval_self()
                     expr.xml_parent.xml_insert_after(expr, new_elt)
                     expr.xml_parent.xml_remove_child(expr)
-            elif isinstance(expr, mathml_ci):
+            else:
                 # Replace the expression with a <cn> element giving the value
                 expr._reduce()
-            # Update variable usage counts
+            # Update variable usage counts for the top-level apply case
             if isinstance(expr, mathml_apply):
                 if expr.is_ode() or expr.is_assignment():
                     expr._update_usage_counts(expr.eq.rhs, remove=True)
                 else:
                     expr._update_usage_counts(expr, remove=True)
-            elif isinstance(expr, mathml_ci):
-                expr.variable._decrement_usage_count()
         else:
             # Reduce
             expr._reduce()
