@@ -106,25 +106,32 @@ Hdf5ToMeshalyzerConverter<ELEMENT_DIM,SPACE_DIM>::Hdf5ToMeshalyzerConverter(std:
         Write(variable_names[i]);
     }
 
-    // Write mesh in a suitable form for meshalyzer
+    // Now we might call this class more than once, so we don't always need to write the mesh out.
+    // so check to see if it is there already.
     std::string output_directory = inputDirectory + "/" + this->mRelativeSubdirectory;
-    MeshalyzerMeshWriter<ELEMENT_DIM,SPACE_DIM> mesh_writer(output_directory, fileBaseName+"_mesh", false);
+    FileFinder mesh_file(output_directory + "/" + fileBaseName +"_mesh.pts", RelativeTo::ChasteTestOutput);
 
-    // Normal case is that the in-memory mesh is converted
-    if (!usingOriginalNodeOrdering || !this->mpMesh->IsMeshOnDisk())
+    if (!mesh_file.IsFile())
     {
-        // The second argument tells the writer to not follow original element ordering for performance reasons.
-        mesh_writer.WriteFilesUsingMesh(*(this->mpMesh), false);
-    }
-    else
-    {
-        // In this case we expect the mesh to have been read in from file
-        ///\todo What if the mesh has been scaled, translated or rotated?
-        // Note that the next line will throw if the mesh has not been read from file
-        std::string original_file = this->mpMesh->GetMeshFileBaseName();
-        std::auto_ptr<AbstractMeshReader<ELEMENT_DIM, SPACE_DIM> > p_original_mesh_reader
-            = GenericMeshReader<ELEMENT_DIM, SPACE_DIM>(original_file);
-        mesh_writer.WriteFilesUsingMeshReader(*p_original_mesh_reader);
+        // Write mesh in a suitable form for meshalyzer
+        MeshalyzerMeshWriter<ELEMENT_DIM,SPACE_DIM> mesh_writer(output_directory, fileBaseName+"_mesh", false);
+
+        // Normal case is that the in-memory mesh is converted
+        if (!usingOriginalNodeOrdering || !this->mpMesh->IsMeshOnDisk())
+        {
+            // The second argument tells the writer to not follow original element ordering for performance reasons.
+            mesh_writer.WriteFilesUsingMesh(*(this->mpMesh), false);
+        }
+        else
+        {
+            // In this case we expect the mesh to have been read in from file
+            ///\todo What if the mesh has been scaled, translated or rotated?
+            // Note that the next line will throw if the mesh has not been read from file
+            std::string original_file = this->mpMesh->GetMeshFileBaseName();
+            std::auto_ptr<AbstractMeshReader<ELEMENT_DIM, SPACE_DIM> > p_original_mesh_reader
+                = GenericMeshReader<ELEMENT_DIM, SPACE_DIM>(original_file);
+            mesh_writer.WriteFilesUsingMeshReader(*p_original_mesh_reader);
+        }
     }
     PetscTools::Barrier("Hdf5ToMeshalyzerConverter");
 }

@@ -43,11 +43,12 @@ AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>::AbstractHdf5Converter(std::string
                                                                      std::string subdirectoryName,
                                                                      std::string datasetName)
     : mFileBaseName(fileBaseName),
+      mDatasetName(datasetName),
       mpMesh(pMesh),
       mRelativeSubdirectory(subdirectoryName)
 {
     // Store directory, mesh and filenames and create the reader
-    mpReader = new Hdf5DataReader(inputDirectory, mFileBaseName, true, datasetName);
+    mpReader = new Hdf5DataReader(inputDirectory, mFileBaseName, true, mDatasetName);
 
     // Create new directory in which to store everything
     mpOutputFileHandler = new OutputFileHandler(inputDirectory + "/" + mRelativeSubdirectory, false);
@@ -63,11 +64,28 @@ AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>::AbstractHdf5Converter(std::string
         EXCEPTION("Mesh and HDF5 file have a different number of nodes");
     }
 
-    // Write an info file
+    WriteInfoFile();
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>::WriteInfoFile()
+{
+    // Note that we don't want the child processes to write info files
     if (PetscTools::AmMaster())
     {
-        // Note that we don't want the child processes to write info files
-        out_stream p_file = mpOutputFileHandler->OpenOutputFile(mFileBaseName + "_times.info");
+        std::string time_info_filename;
+
+        // If the dataset is just "Data" then we will leave the original filename as it is (to avoid confusion!)
+        // If the dataset is a new variant like "Postprocessing" then we will put the dataset name in the output.
+        if (mDatasetName=="Data")
+        {
+           time_info_filename = mFileBaseName + "_times.info";
+        }
+        else
+        {
+           time_info_filename = mFileBaseName + "_" + mDatasetName + "_times.info";
+        }
+        out_stream p_file = mpOutputFileHandler->OpenOutputFile(time_info_filename);
 
         std::vector<double> time_values = mpReader->GetUnlimitedDimensionValues();
         unsigned num_timesteps = time_values.size();

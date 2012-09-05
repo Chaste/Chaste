@@ -97,8 +97,17 @@ public:
 };
 
 /**
- * Base class for cardiac problems; contains code generic to both mono- and bidomain.
+ * Base class for cardiac problems;
+ * contains code generic to mono-/bi-domain and bidomain-with-bath.
  *
+ * This class contains the tissue (PDEs and 'cells' ODEs),
+ * boundary conditions, and postprocessing/results writers.
+ *
+ * It is called by CardiacSimulation, which is the outer wrapper class
+ * for running a cardiac simulation, used by the executable.
+ *
+ * Many non-standard simulations will use this class directly,
+ * and this is the preferred method for non-executable users.
  * See tutorials for usage.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
@@ -444,6 +453,7 @@ protected:
      */
     template<unsigned DIM, unsigned ELEC_PROB_DIM>
     friend class CardiacElectroMechanicsProblem;
+
     /**
      * The object to use to write results to disk.
      */

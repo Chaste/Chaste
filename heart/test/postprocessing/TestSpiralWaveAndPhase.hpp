@@ -166,7 +166,7 @@ public:
         double tau = 2.0; // Time of delay (ms).
 
         DistributedVectorFactory factory(mpMesh->GetNumNodes());
-        Hdf5DataWriter writer(factory, results_folder_name, results_file_name, false, true, "Postprocessing"); // false to wiping, true to extending
+        Hdf5DataWriter writer(factory, results_folder_name, results_file_name, false, true, "Phase"); // false to wiping, true to extending
         int phase_id = writer.DefineVariable("Phase","radians");
         writer.DefineFixedDimension(mpMesh->GetNumNodes());
         writer.DefineUnlimitedDimension("Time", "msec");
@@ -215,7 +215,7 @@ public:
         Hdf5ToMeshalyzerConverter<2,2> converter1("SpiralWaveAndPhase", "results", mpMesh, true);
 
         // Write out postprocessed quantities too (in dataset "Postprocessing")
-        Hdf5ToMeshalyzerConverter<2,2> converter2("SpiralWaveAndPhase", "results", mpMesh, true, "Postprocessing");
+        Hdf5ToMeshalyzerConverter<2,2> converter2("SpiralWaveAndPhase", "results", mpMesh, true, "Phase");
 
         FileFinder meshalyzer_phase_file("SpiralWaveAndPhase/output/results_Phase.dat", RelativeTo::ChasteTestOutput);
         TS_ASSERT(meshalyzer_phase_file.IsFile());

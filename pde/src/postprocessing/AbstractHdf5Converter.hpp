@@ -59,6 +59,13 @@ protected:
     /** Base name for the files: [basename].vtu, [basename].dat etc.*/
     std::string mFileBaseName;
 
+    /**
+     * The dataset that we are working with,
+     * 'Data' is a special case and handled slightly
+     * differently as all variables use the same 'time'.
+     */
+    std::string mDatasetName;
+
     /** Pointer to a mesh. */
     AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* mpMesh;
 
@@ -89,6 +96,12 @@ public:
                           AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
                           std::string subdirectoryName,
                           std::string datasetName = "Data");
+
+
+    /**
+     * Wrtie the unlimited dimension information to file.
+     */
+    void WriteInfoFile();
 
     /**
      * Destructor.
