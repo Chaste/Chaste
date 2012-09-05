@@ -48,12 +48,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestSpiralWaveAndPhase : public CxxTest::TestSuite
 {
 private:
-    DistributedTetrahedralMesh<2,2>* mpMesh; /** The mesh to use for all these tests. */
-    double mMeshWidth;
-
-public:
-
-    void TestGenerateMesh() throw(Exception)
+    /**
+     * Overridden setUp() method. Initialises mesh to be used by any of the tests.
+     */
+    void setUp()
     {
         mpMesh = new DistributedTetrahedralMesh<2,2>();
         double node_spacing_in_mesh = 0.015;
@@ -61,10 +59,25 @@ public:
         mpMesh->ConstructRegularSlabMesh(node_spacing_in_mesh, mMeshWidth /*length*/, mMeshWidth /*width*/);
     }
 
-    // You just need to run this once to get a spiral wave .h5 file.
-    // This file is now stored in the repository at
-    // heart/test/data/PhasePostprocessing/results.h5
-    // and is used by the subsequent tests.
+    /**
+     * Overridden teardown() method. Clears up mesh.
+     */
+    void tearDown()
+    {
+        delete mpMesh;
+    }
+
+    DistributedTetrahedralMesh<2,2>* mpMesh; /** The mesh to use for all these tests. */
+    double mMeshWidth; /** The width of the mesh */
+
+public:
+
+    /**
+     * You just need to run this once to get a spiral wave .h5 file.
+     * This file is now stored in the repository at
+     * heart/test/data/PhasePostprocessing/results.h5
+     * and is used by the subsequent tests.
+     */
     void xTestSpiralWaveSimulationWithPhaseCalculations() throw (Exception)
     {
         // Run a simulation to generate a spiral wave in an h5 file.
@@ -193,13 +206,12 @@ public:
         // Write out voltage
         Hdf5ToMeshalyzerConverter<2,2> converter1("SpiralWaveAndPhase", "results", mpMesh, true);
 
-        // Write out postprocessed quantities too (in dataset "Postprocessing"
+        // Write out postprocessed quantities too (in dataset "Postprocessing")
         Hdf5ToMeshalyzerConverter<2,2> converter2("SpiralWaveAndPhase", "results", mpMesh, true, "Postprocessing");
 
         FileFinder meshalyzer_phase_file("SpiralWaveAndPhase/output/results_Phase.dat",RelativeTo::ChasteTestOutput);
         TS_ASSERT(meshalyzer_phase_file.IsFile());
     }
-
 };
 
 #endif /*TESTPHASECALCULATIONS_HPP_*/
