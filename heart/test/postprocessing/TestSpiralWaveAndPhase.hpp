@@ -211,18 +211,33 @@ public:
      */
     void TestMeshalyzerPhasePlot() throw (Exception)
     {
-        // Write out voltage
+        // Write out voltage (just for fun, to compare with phase plot).
         Hdf5ToMeshalyzerConverter<2,2> converter1("SpiralWaveAndPhase", "results", mpMesh, true);
 
-        // Write out postprocessed quantities too (in dataset "Postprocessing")
+        // Write out postprocessed quantities too (in dataset "Phase")
         Hdf5ToMeshalyzerConverter<2,2> converter2("SpiralWaveAndPhase", "results", mpMesh, true, "Phase");
 
-        FileFinder meshalyzer_phase_file("SpiralWaveAndPhase/output/results_Phase.dat", RelativeTo::ChasteTestOutput);
-        TS_ASSERT(meshalyzer_phase_file.IsFile());
-        FileFinder reference_file("heart/test/data/PhasePostprocessing/results_Phase.dat", RelativeTo::ChasteSourceRoot);
+        // Check the phase file is written correctly.
+        {
+            FileFinder meshalyzer_phase_file("SpiralWaveAndPhase/output/results_Phase.dat", RelativeTo::ChasteTestOutput);
+            TS_ASSERT(meshalyzer_phase_file.IsFile());
+            FileFinder reference_file("heart/test/data/PhasePostprocessing/results_Phase.dat", RelativeTo::ChasteSourceRoot);
 
-        FileComparison comparer(meshalyzer_phase_file, reference_file);
-        TS_ASSERT(comparer.CompareFiles());
+            FileComparison comparer(meshalyzer_phase_file, reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
+
+        // Check the times info file is generated correctly.
+        {
+            FileFinder generated_file("SpiralWaveAndPhase/output/results_Phase_times.info", RelativeTo::ChasteTestOutput);
+            TS_ASSERT(generated_file.IsFile());
+            FileFinder reference_file("heart/test/data/PhasePostprocessing/results_Phase_times.info", RelativeTo::ChasteSourceRoot);
+
+            FileComparison comparer(generated_file, reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
+
+
     }
 };
 
