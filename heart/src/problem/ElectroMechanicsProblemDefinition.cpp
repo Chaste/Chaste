@@ -45,7 +45,9 @@ ElectroMechanicsProblemDefinition<DIM>::ElectroMechanicsProblemDefinition(Quadra
       mpDefaultMaterialLaw(NULL),
       mReadFibreSheetInformationFromFile(false),
       mNumIncrementsForInitialDeformation(1),
-      mApplyCrossFibreTension(false)
+      mApplyCrossFibreTension(false),
+      mSheetTensionFraction(DOUBLE_UNSET),
+      mSheetNormalTensionFraction(DOUBLE_UNSET)
 {
 }
 
@@ -109,10 +111,23 @@ void ElectroMechanicsProblemDefinition<DIM>::SetVariableFibreSheetDirectionsFile
 }
 
 template<unsigned DIM>
-void ElectroMechanicsProblemDefinition<DIM>::SetApplyCrossFibreTension(bool applyCrossFibreTension, double crossFibreTensionFraction)
+void ElectroMechanicsProblemDefinition<DIM>::SetApplyIsotropicCrossFibreTension(bool applyCrossFibreTension, double crossFibreTensionFraction)
 {
     mApplyCrossFibreTension = applyCrossFibreTension;
-    mCrossFibreTensionFraction = crossFibreTensionFraction;
+    mSheetTensionFraction = crossFibreTensionFraction;
+    mSheetNormalTensionFraction = crossFibreTensionFraction;
+}
+
+template<unsigned DIM>
+void ElectroMechanicsProblemDefinition<DIM>::SetApplyAnisotropicCrossFibreTension(bool applyCrossFibreTension, double sheetTensionFraction, double sheetNormalTensionFraction)
+{
+    if (DIM!=3)
+    {
+        EXCEPTION("You can only apply anisotropic cross fibre tensions in a 3D simulation.");
+    }
+    mApplyCrossFibreTension = applyCrossFibreTension;
+    mSheetTensionFraction = sheetTensionFraction;
+    mSheetNormalTensionFraction = sheetNormalTensionFraction;
 }
 
 template<unsigned DIM>

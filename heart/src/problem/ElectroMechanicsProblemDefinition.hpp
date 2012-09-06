@@ -103,12 +103,19 @@ private:
     unsigned mNumIncrementsForInitialDeformation;
 
     /**
-     * Whether to apply active tension in the cross-fibre direction.
+     * Whether to apply active tension in the cross-fibre directions (either iso- or aniso-tropic).
      */
     bool mApplyCrossFibreTension;
 
-    /** The fraction of the fibre tension to apply in the cross-fibre direction. */
-    double mCrossFibreTensionFraction;
+    /**
+     * The fraction of the fibre tension to apply in the sheet direction.
+     */
+    double mSheetTensionFraction;
+
+    /**
+     * The fraction of the fibre tension to apply in the sheet-normal direction.
+     */
+    double mSheetNormalTensionFraction;
 
 public:
     /**
@@ -188,17 +195,30 @@ public:
 
 
     /**
-     * Set if active tension should be applied in the cross-fibre direction.
+     * Set if active tension should be applied in the cross-fibre directions. This can be done in 2D or 3D.
      *
      * By default active tension is only applied in the fibre direction. This method allows the user to specify
-     * that a proportion of the active tension should also be applied in the cross-fibre direction. The fraction of
-     * the active tension that is applied in the cross-fibre direction can also be specified.
+     * that a proportion of the active tension should also be applied in the cross-fibre directions (both
+     * in the sheet and sheet-normal directions equally).
+     * The fraction of the active tension that is applied in the cross-fibre direction should be specified.
      *
-     * @param  applyCrossFibreTension active tension is applied in the cross-fibre direction if set to true.
-     * @param  crossFibreTensionFraction The fraction of the active tension to apply in the cross-fibre direction.
+     * @param  applyCrossFibreTension active tension is applied in the cross-fibre directions if set to true.
+     * @param  crossFibreTensionFraction The fraction of the active tension to apply in the cross-fibre directions.
      */
-    void SetApplyCrossFibreTension(bool applyCrossFibreTension, double crossFibreTensionFraction);
+    void SetApplyIsotropicCrossFibreTension(bool applyCrossFibreTension, double crossFibreTensionFraction);
 
+    /**
+     * Set if active tension should be applied in the cross-fibre directions. This only makes sense in 3D.
+     *
+     * By default active tension is only applied in the fibre direction. This method allows the user to specify
+     * that a proportion of the active tension should also be applied in the cross-fibre directions.
+     * The fraction of the active tension that is applied in the two cross-fibre direction should be specified.
+     *
+     * @param applyCrossFibreTension  active tension is applied in the cross-fibre directions if set to true.
+     * @param sheetTensionFraction  The fraction of the active tension to apply in the sheet direction.
+     * @param sheetNormalTensionFraction The fraction of the active tension to apply in the sheet-normal direction.
+     */
+    void SetApplyAnisotropicCrossFibreTension(bool applyCrossFibreTension, double sheetTensionFraction, double sheetNormalTensionFraction);
 
     /**
      *  Get the contraction model
@@ -307,11 +327,19 @@ public:
     }
 
     /**
-     * Returns the value of the cross-fibre tension fraction.
+     * Returns the value of the cross-fibre sheet tension fraction.
      */
-    double GetCrossFibreTensionFraction()
+    double GetSheetTensionFraction()
     {
-        return mCrossFibreTensionFraction;
+        return mSheetTensionFraction;
+    }
+
+    /**
+     * Returns the value of the cross-fibre sheet-normal tension fraction.
+     */
+    double GetSheetNormalTensionFraction()
+    {
+        return mSheetNormalTensionFraction;
     }
 
 

@@ -517,9 +517,12 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndSt
     // amend the stress and dTdE using the active tension
     double dTdE_coeff1 = -2*active_tension*detF/(I4_fibre*I4_fibre); // note: I4_fibre*I4_fibre = lam^4
     double dTdE_coeff2 = active_tension*detF/I4_fibre;
-    double dTdE_coeff_s1 = 0.0; // only set non-zero if we apply cross fibre tension
-    double dTdE_coeff_s2 = 0.0; // only set non-zero if we apply cross fibre tension
-    double dTdE_coeff_s3 = 0.0; // only set non-zero if we apply cross fibre tension and implicit
+    double dTdE_coeff_s1 = 0.0; // only set non-zero if we apply cross fibre tension (in 2/3D)
+    double dTdE_coeff_s2 = 0.0; // only set non-zero if we apply cross fibre tension (in 2/3D)
+    double dTdE_coeff_s3 = 0.0; // only set non-zero if we apply cross fibre tension and implicit (in 2/3D)
+    double dTdE_coeff_n1 = 0.0; // only set non-zero if we apply cross fibre tension in 3D
+    double dTdE_coeff_n2 = 0.0; // only set non-zero if we apply cross fibre tension in 3D
+    double dTdE_coeff_n3 = 0.0; // only set non-zero if we apply cross fibre tension in 3D and implicit
 
     if(IsImplicitSolver())
     {
@@ -531,7 +534,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndSt
     bool apply_cross_fibre_tension = (this->mrElectroMechanicsProblemDefinition.GetApplyCrossFibreTension()) && (DIM > 1);
     if(apply_cross_fibre_tension)
     {
-        double cross_fraction = mrElectroMechanicsProblemDefinition.GetCrossFibreTensionFraction();
+        double sheet_cross_fraction = mrElectroMechanicsProblemDefinition.GetSheetTensionFraction();
 
         for(unsigned i=0; i<DIM; i++)
         {
@@ -541,17 +544,39 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndSt
         double I4_sheet = inner_prod(mCurrentElementSheetDirection, prod(rC, mCurrentElementSheetDirection));
 
         // amend the stress and dTdE using the active tension
-        dTdE_coeff_s1 = -2*cross_fraction*detF*active_tension/(I4_sheet*I4_sheet); // note: I4*I4 = lam^4
+        dTdE_coeff_s1 = -2*sheet_cross_fraction*detF*active_tension/(I4_sheet*I4_sheet); // note: I4*I4 = lam^4
 
+        double dt;
         if(IsImplicitSolver())
         {
-           double dt = mNextTime-mCurrentTime;
-           dTdE_coeff_s3 = cross_fraction*(d_act_tension_dlam + d_act_tension_d_dlamdt/dt)*detF/(lambda_fibre*I4_sheet); // note: I4*lam = lam^3
+           dt = mNextTime-mCurrentTime;
+           dTdE_coeff_s3 = sheet_cross_fraction*(d_act_tension_dlam + d_act_tension_d_dlamdt/dt)*detF/(lambda_fibre*I4_sheet); // note: I4*lam = lam^3
         }
 
-        rT += cross_fraction*(active_tension*detF/I4_sheet)*outer_prod(mCurrentElementSheetDirection,mCurrentElementSheetDirection);
+        rT += sheet_cross_fraction*(active_tension*detF/I4_sheet)*outer_prod(mCurrentElementSheetDirection,mCurrentElementSheetDirection);
 
-        dTdE_coeff_s2 = active_tension*cross_fraction*detF/I4_sheet;
+        dTdE_coeff_s2 = active_tension*sheet_cross_fraction*detF/I4_sheet;
+
+        if (DIM>2)
+        {
+            double sheet_normal_cross_fraction = mrElectroMechanicsProblemDefinition.GetSheetNormalTensionFraction();
+            for(unsigned i=0; i<DIM; i++)
+            {
+                mCurrentElementSheetNormalDirection(i) = this->mChangeOfBasisMatrix(i,2);
+            }
+
+            double I4_sheet_normal = inner_prod(mCurrentElementSheetNormalDirection, prod(rC, mCurrentElementSheetNormalDirection));
+
+            dTdE_coeff_n1 =-2*sheet_normal_cross_fraction*detF*active_tension/(I4_sheet_normal*I4_sheet_normal); // note: I4*I4 = lam^4
+
+            rT += sheet_normal_cross_fraction*(active_tension*detF/I4_sheet_normal)*outer_prod(mCurrentElementSheetNormalDirection,mCurrentElementSheetNormalDirection);
+
+            dTdE_coeff_n2 = active_tension*sheet_normal_cross_fraction*detF/I4_sheet_normal;
+            if(IsImplicitSolver())
+            {
+                dTdE_coeff_n3 = sheet_normal_cross_fraction*(d_act_tension_dlam + d_act_tension_d_dlamdt/dt)*detF/(lambda_fibre*I4_sheet_normal); // note: I4*lam = lam^3
+            }
+        }
     }
 
 
@@ -590,6 +615,22 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndSt
                                                            * mCurrentElementSheetDirection(N)
                                                            * mCurrentElementFibreDirection(P)
                                                            * mCurrentElementFibreDirection(Q);
+                            if (DIM>2)
+                            {
+                                rDTdE(M,N,P,Q) += dTdE_coeff_n1 * mCurrentElementSheetNormalDirection(M)
+                                                                * mCurrentElementSheetNormalDirection(N)
+                                                                * mCurrentElementSheetNormalDirection(P)
+                                                                * mCurrentElementSheetNormalDirection(Q)
+
+                                                + dTdE_coeff_n2 * mCurrentElementSheetNormalDirection(M)
+                                                                * mCurrentElementSheetNormalDirection(N)
+                                                                * invC(P,Q)
+
+                                                + dTdE_coeff_n3 * mCurrentElementSheetNormalDirection(M)
+                                                                * mCurrentElementSheetNormalDirection(N)
+                                                                * mCurrentElementFibreDirection(P)
+                                                                * mCurrentElementFibreDirection(Q);
+                            }
                         }
                     }
                 }
@@ -602,7 +643,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndSt
 //    // * Handle the 3D case.
 //    if(this->mrElectroMechanicsProblemDefinition.GetApplyCrossFibreTension() && DIM > 1)
 //    {
-//        double cross_fraction = mrElectroMechanicsProblemDefinition.GetCrossFibreTensionFraction();
+//        double sheet_cross_fraction = mrElectroMechanicsProblemDefinition.GetSheetTensionFraction();
 //
 //        for(unsigned i=0; i<DIM; i++)
 //        {
@@ -612,7 +653,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndSt
 //        double I4_sheet = inner_prod(mCurrentElementSheetDirection, prod(rC, mCurrentElementSheetDirection));
 //
 //        // amend the stress and dTdE using the active tension
-//        double dTdE_coeff_s1 = -2*cross_fraction*detF*active_tension/(I4_sheet*I4_sheet); // note: I4*I4 = lam^4
+//        double dTdE_coeff_s1 = -2*sheet_cross_fraction*detF*active_tension/(I4_sheet*I4_sheet); // note: I4*I4 = lam^4
 //
 //        ///\todo #2180 The code below is specific to the implicit cardiac mechanics solver. Currently
 //        // the cross-fibre code is only tested using the explicit solver so the code below fails coverage.
@@ -624,7 +665,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndSt
 //           dTdE_coeff_s1 += (d_act_tension_dlam + d_act_tension_d_dlamdt/dt)/(lambda_sheet*I4_sheet); // note: I4*lam = lam^3
 //        }
 //
-//        rT += cross_fraction*(active_tension*detF/I4_sheet)*outer_prod(mCurrentElementSheetDirection,mCurrentElementSheetDirection);
+//        rT += sheet_cross_fraction*(active_tension*detF/I4_sheet)*outer_prod(mCurrentElementSheetDirection,mCurrentElementSheetDirection);
 //
 //        double dTdE_coeff_s2 = active_tension*detF/I4_sheet;
 //        if(addToDTdE)

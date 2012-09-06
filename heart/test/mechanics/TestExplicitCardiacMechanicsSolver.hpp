@@ -52,6 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // some useful typedefs
 typedef ExplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2>,2> IncompressibleExplicitSolver2d;
+typedef ExplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<3>,3> IncompressibleExplicitSolver3d;
 typedef ImplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2>,2> IncompressibleImplicitSolver2d;
 
 class TestExplicitCardiacMechanicsSolver : public CxxTest::TestSuite
@@ -271,6 +272,9 @@ public:
         problem_defn.SetContractionModel(NONPHYSIOL1,0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
         problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
 
+        TS_ASSERT_THROWS_THIS(problem_defn.SetApplyAnisotropicCrossFibreTension(true,1.0,1.0),
+                              "You can only apply anisotropic cross fibre tensions in a 3D simulation.");
+
         TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();
         p_fine_mesh->ConstructRegularSlabMesh(1.0, 1.0, 1.0);
         TetrahedralMesh<2,2>* p_coarse_mesh = new TetrahedralMesh<2,2>();
@@ -345,10 +349,11 @@ public:
 
         for(unsigned i=0; i < tension_fractions.size();i++)
         {
-            problem_defn.SetApplyCrossFibreTension(true,tension_fractions[i]);
+            problem_defn.SetApplyIsotropicCrossFibreTension(true,tension_fractions[i]);
 
             TS_ASSERT_EQUALS(problem_defn.GetApplyCrossFibreTension(), true);
-            TS_ASSERT_DELTA(problem_defn.GetCrossFibreTensionFraction(),tension_fractions[i], 1e-6);
+            TS_ASSERT_DELTA(problem_defn.GetSheetTensionFraction(),tension_fractions[i], 1e-6);
+            TS_ASSERT_DELTA(problem_defn.GetSheetNormalTensionFraction(),tension_fractions[i], 1e-6);
 
             // NONPHYSIOL1 => NonphysiologicalContractionModel 1
             IncompressibleExplicitSolver2d solver(NONPHYSIOL1,mesh,problem_defn,"TestExplicitCardiacMech");
@@ -387,6 +392,190 @@ public:
             delete p_fine_mesh;
             delete p_pair;
         }
+    }
+
+    /**
+     * Here we apply the same tension in the fibre direction,
+     * and in both sheet and sheet-normal (cross fibre) directions.
+     *
+     * Therefore nothing should happen!
+     */
+    void TestIsotropicCrossFibreTensions() throw(Exception)
+    {
+        /*
+         * Expected resulting deformed location of Nodes 4, 24, 104, 124:
+         * 4: 1, 0, 0
+         * 24: 1, 1, 0
+         * 104: 1, 0, 1
+         * 124: 1, 1, 1
+         */
+        c_vector<double, 4> x;
+        c_vector<double, 4> y;
+        c_vector<double, 4> z;
+        x[0] = 1;
+        x[1] = 1;
+        x[2] = 1;
+        x[3] = 1;
+        y[0] = 0;
+        y[1] = 1;
+        y[2] = 0;
+        y[3] = 1;
+        z[0] = 0;
+        z[1] = 0;
+        z[2] = 1;
+        z[3] = 1;
+
+        QuadraticMesh<3> mesh(0.25, 1.0, 1.0, 1.0);
+        MooneyRivlinMaterialLaw<3> law(1,1);
+
+        std::vector<unsigned> fixed_nodes
+        = NonlinearElasticityTools<3>::GetNodesByComponentValue(mesh,0,0.0);
+
+        ElectroMechanicsProblemDefinition<3> problem_defn(mesh);
+        problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
+        problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+        problem_defn.SetContractionModel(NONPHYSIOL1,0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+        problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+        double tension_fraction=1;
+        problem_defn.SetApplyIsotropicCrossFibreTension(true,tension_fraction);
+
+        // NONPHYSIOL1 => NonphysiologicalContractionModel 1
+        IncompressibleExplicitSolver3d solver(NONPHYSIOL1,mesh,problem_defn,"TestIsotropicCrossFibreExplicit");
+
+        // The following lines are not relevant to this test but need to be there
+        // as the solver is expecting an electrics node to be paired up with each mechanics node.
+        TetrahedralMesh<3,3>* p_fine_mesh = new TetrahedralMesh<3,3>();//electrics ignored in this test
+        p_fine_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0, 1.0);
+        FineCoarseMeshPair<3>* p_pair = new FineCoarseMeshPair<3>(*p_fine_mesh, mesh);
+        p_pair->SetUpBoxesOnFineMesh();
+        p_pair->ComputeFineElementsAndWeightsForCoarseQuadPoints(*(solver.GetQuadratureRule()), false);
+        p_pair->DeleteFineBoxCollection();
+        solver.SetFineCoarseMeshPair(p_pair);
+        ///////////////////////////////////////////////////////////////////////////
+        solver.Initialise();
+
+        // coverage
+        QuadraturePointsGroup<3> quad_points(mesh, *(solver.GetQuadratureRule()));
+
+        std::vector<double> calcium_conc(solver.GetTotalNumQuadPoints(), 0.0);
+        std::vector<double> voltages(solver.GetTotalNumQuadPoints(), 0.0);
+
+        solver.SetCalciumAndVoltage(calcium_conc, voltages);
+
+        // solve UP TO t=0. So Ta(lam_n,t_{n+1})=5*sin(0)=0, ie no deformation
+        solver.Solve(-0.01,0.0,0.01);
+        TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(),0u);
+
+        solver.Solve(0,0.01,0.01);
+
+        std::vector<unsigned> nodes;
+        nodes.push_back(4);
+        nodes.push_back(24);
+        nodes.push_back(104);
+        nodes.push_back(124);
+
+        for (unsigned node=0; node<4; node++)
+        {
+            std::cout << "Node: " << nodes[node] << "\n";
+            TS_ASSERT_DELTA(solver.rGetDeformedPosition()[nodes[node]](0), x[node], 1e-4);
+            TS_ASSERT_DELTA(solver.rGetDeformedPosition()[nodes[node]](1), y[node], 1e-4);
+            TS_ASSERT_DELTA(solver.rGetDeformedPosition()[nodes[node]](2), z[node], 1e-4);
+        }
+        //in need of deletion even if all these 3 have no influence at all on this test
+        delete p_fine_mesh;
+        delete p_pair;
+    }
+
+    /**
+     * This time we will make x (fibres) and z (sheet-normal) contract,
+     * and y will not contract (so nodes will expand out for y, shrink in for x,z).
+     */
+    void TestAnisotropicCrossFibreTensions() throw(Exception)
+    {
+        /*
+         * Expected resulting deformed location of Nodes 4, 24, 104, 124:
+         * 4: 1, 0, 0
+         * 24: 1, 1, 0
+         * 104: 1, 0, 1
+         * 124: 1, 1, 1
+         */
+        c_vector<double, 4> x;
+        c_vector<double, 4> y;
+        c_vector<double, 4> z;
+        x[0] = 0.9905;
+        x[1] = 0.9908;
+        x[2] = 0.9904;
+        x[3] = 0.9907;
+        y[0] = -0.0113;
+        y[1] = 1.0105;
+        y[2] = -0.0113;
+        y[3] = 1.0105;
+        z[0] = 0.0056;
+        z[1] = 0.0056;
+        z[2] = 0.9946;
+        z[3] = 0.9946;
+
+        QuadraticMesh<3> mesh(0.25, 1.0, 1.0, 1.0);
+        MooneyRivlinMaterialLaw<3> law(1,1);
+
+        std::vector<unsigned> fixed_nodes
+        = NonlinearElasticityTools<3>::GetNodesByComponentValue(mesh,0,0.0);
+
+        ElectroMechanicsProblemDefinition<3> problem_defn(mesh);
+        problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
+        problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+        problem_defn.SetContractionModel(NONPHYSIOL1,0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+        problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+        double sheet_tension_fraction=0;
+        double sheet_normal_tension_fraction=1;
+        problem_defn.SetApplyAnisotropicCrossFibreTension(true,sheet_tension_fraction, sheet_normal_tension_fraction);
+
+        // NONPHYSIOL1 => NonphysiologicalContractionModel 1
+        IncompressibleExplicitSolver3d solver(NONPHYSIOL1,mesh,problem_defn,"TestAnisotropicCrossFibreExplicit");
+
+        // The following lines are not relevant to this test but need to be there
+        // as the solver is expecting an electrics node to be paired up with each mechanics node.
+        TetrahedralMesh<3,3>* p_fine_mesh = new TetrahedralMesh<3,3>();//electrics ignored in this test
+        p_fine_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0, 1.0);
+        FineCoarseMeshPair<3>* p_pair = new FineCoarseMeshPair<3>(*p_fine_mesh, mesh);
+        p_pair->SetUpBoxesOnFineMesh();
+        p_pair->ComputeFineElementsAndWeightsForCoarseQuadPoints(*(solver.GetQuadratureRule()), false);
+        p_pair->DeleteFineBoxCollection();
+        solver.SetFineCoarseMeshPair(p_pair);
+        ///////////////////////////////////////////////////////////////////////////
+        solver.Initialise();
+
+        // coverage
+        QuadraturePointsGroup<3> quad_points(mesh, *(solver.GetQuadratureRule()));
+
+        std::vector<double> calcium_conc(solver.GetTotalNumQuadPoints(), 0.0);
+        std::vector<double> voltages(solver.GetTotalNumQuadPoints(), 0.0);
+
+        solver.SetCalciumAndVoltage(calcium_conc, voltages);
+
+        // solve UP TO t=0. So Ta(lam_n,t_{n+1})=5*sin(0)=0, ie no deformation
+        solver.Solve(-0.01,0.0,0.01);
+        TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(),0u);
+
+        solver.Solve(0.24,0.25,0.01);
+
+        std::vector<unsigned> nodes;
+        nodes.push_back(4);
+        nodes.push_back(24);
+        nodes.push_back(104);
+        nodes.push_back(124);
+
+        for (unsigned node=0; node<4; node++)
+        {
+            std::cout << "Node: " << nodes[node] << "\n";
+            TS_ASSERT_DELTA(solver.rGetDeformedPosition()[nodes[node]](0), x[node], 1e-3);
+            TS_ASSERT_DELTA(solver.rGetDeformedPosition()[nodes[node]](1), y[node], 1e-3);
+            TS_ASSERT_DELTA(solver.rGetDeformedPosition()[nodes[node]](2), z[node], 1e-3);
+        }
+
+        // tidy up memory
+        delete p_fine_mesh;
+        delete p_pair;
     }
 
 };
