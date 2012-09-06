@@ -210,12 +210,8 @@ public:
         TS_ASSERT_EQUALS(lr91_cvode_system.GetParameterUnits(1u), "milliS_per_cm2");
         TS_ASSERT_EQUALS(lr91_cvode_system.GetParameter(1u), 23.0);
         TS_ASSERT_EQUALS(lr91_cvode_system.GetParameter("membrane_fast_sodium_current_conductance"), 23.0);
-        lr91_cvode_system.SetParameter(1u, 10.0);
-        TS_ASSERT_EQUALS(lr91_cvode_system.GetParameter(1u), 10.0);
-        lr91_cvode_system.SetParameter(1u, 23.0);
 
         // Parameter exceptions
-        TS_ASSERT_THROWS_THIS(lr91_cvode_system.SetParameter(3u, -1), "The index passed in must be less than the number of parameters.");
         TS_ASSERT_THROWS_THIS(lr91_cvode_system.GetParameterIndex("b"), "No parameter named 'b'.");
         TS_ASSERT_THROWS_THIS(lr91_cvode_system.GetParameter(3u), "The index passed in must be less than the number of parameters.");
         TS_ASSERT_THROWS_THIS(lr91_cvode_system.GetParameterUnits(3u), "The index passed in must be less than the number of parameters.");

@@ -197,17 +197,6 @@ public:
     virtual void SetParameter(const std::string& rParameterName, double value)=0;
 
     /**
-     * All subclasses must implement a method that sets a parameter value.
-     *
-     * This needs to be declared here to avoid confusion with the above method.ns
-     *
-     * @param parameterIdx  the index of the parameter to set the value of,
-     * @param value  value to set it to.
-     */
-    virtual void SetParameter(unsigned parameterIdx, double value)=0;
-
-
-    /**
      * Simulate this cell's behaviour between the time interval [tStart, tEnd],
      * updating the internal state variable values.
      * The timestep used will depend on the subclass implementation.

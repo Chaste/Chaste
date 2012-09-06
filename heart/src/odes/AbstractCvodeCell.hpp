@@ -313,16 +313,6 @@ public:
      */
     void SetParameter(const std::string& rParameterName, double value);
 
-    /**
-     * This is just here to show there is an alternative to the above!
-     *
-     * It just calls the base class method.
-     *
-     * @param parameterIndex  the index of the parameter vector to alter
-     * @param value  the value the parameter should take
-     */
-    void SetParameter(unsigned parameterIndex, double value);
-
 };
 
 CLASS_IS_ABSTRACT(AbstractCvodeCell)

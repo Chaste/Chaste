@@ -194,10 +194,4 @@ void AbstractCvodeCell::SetParameter(const std::string& rParameterName, double v
     AbstractCvodeSystem::SetParameter(rParameterName,value);
 }
 
-void AbstractCvodeCell::SetParameter(unsigned parameterIndex, double value)
-{
-    AbstractCvodeSystem::SetParameter(parameterIndex,value);
-}
-
-
 #endif // CHASTE_CVODE
