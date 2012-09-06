@@ -334,18 +334,6 @@ public:
      */
     void SetParameter(const std::string& rParameterName, double value);
 
-    /**
-     * This just calls AbstractOdeSystem::SetParameter
-     *
-     * It is here (despite being inherited) because we seem to need to specify explicitly
-     * which method in the parent classes we intend to implement
-     * to take care of the pure definition in AbstractCardiacCellInterface.
-     *
-     * @param parameterIndex  the parameter to set the value of,
-     * @param value  value to set it to.
-     */
-    void SetParameter(unsigned parameterIndex, double value);
-
     ////////////////////////////////////////////////////////////////////////
     //  METHODS NEEDED BY FAST CARDIAC CELLS
     ////////////////////////////////////////////////////////////////////////

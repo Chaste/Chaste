@@ -164,11 +164,6 @@ void AbstractCardiacCell::SetParameter(const std::string& rParameterName, double
     AbstractOdeSystem::SetParameter(rParameterName,value);
 }
 
-void AbstractCardiacCell::SetParameter(unsigned parameterIndex, double value)
-{
-    AbstractOdeSystem::SetParameter(parameterIndex,value);
-}
-
 #include "LuoRudy1991.hpp"
 #include "LuoRudy1991BackwardEuler.hpp"
 void AbstractCardiacCell::CheckForArchiveFix()
