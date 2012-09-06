@@ -651,6 +651,21 @@ public :
         TS_ASSERT_DELTA(active_tensions[250], 3.3597,  1e-2);
 
         TS_ASSERT_DELTA(active_tensions.back(), 0.0,  1e-2);
+
+        ///\todo #2244 Split the stuff below into another test and check that the results are different
+        //  Test that parameters can be altered
+        //Default values
+        TS_ASSERT_DELTA(kerchoffs_model.GetParameter("td"), 75.0, 1e-15);
+        TS_ASSERT_DELTA(kerchoffs_model.GetParameter("tr"), 75.0, 1e-15);
+        TS_ASSERT_DELTA(kerchoffs_model.GetParameter("b"), 150.0, 1e-15);
+
+        //Alter tr
+        kerchoffs_model.SetParameter("tr", 65.0);
+
+        //tr is altered, but the rest have their defaults
+        TS_ASSERT_DELTA(kerchoffs_model.GetParameter("td"), 75.0, 1e-15);
+        TS_ASSERT_DELTA(kerchoffs_model.GetParameter("tr"), 65.0, 1e-15);
+        TS_ASSERT_DELTA(kerchoffs_model.GetParameter("b"), 150.0, 1e-15);
     }
 
 

@@ -45,9 +45,6 @@ const double Kerchoffs2003ContractionModel::T0 = 180; // kPa
 const double Kerchoffs2003ContractionModel::Ea = 20;  // 1/um
 const double Kerchoffs2003ContractionModel::v0 = 0.0075; // um/ms
 const double Kerchoffs2003ContractionModel::ls0 = 1.9; // um
-const double Kerchoffs2003ContractionModel::tr = 75; // ms
-const double Kerchoffs2003ContractionModel::td = 75; // ms
-const double Kerchoffs2003ContractionModel::b = 150; // ms/um
 const double Kerchoffs2003ContractionModel::ld = -0.4; // um
 
 Kerchoffs2003ContractionModel::Kerchoffs2003ContractionModel()
@@ -63,6 +60,11 @@ Kerchoffs2003ContractionModel::Kerchoffs2003ContractionModel()
     mElectricallyUnactivated = true;
     mActivationTime = 0.0;
     mTime = 0.0;
+
+    this->mParameters.resize(3);
+    SetParameter("tr", 75.0); // ms
+    SetParameter("td", 75.0); // ms
+    SetParameter("b", 150.0); // ms/um
 }
 
 
@@ -111,6 +113,7 @@ double Kerchoffs2003ContractionModel::GetActiveTension(double lc)
     }
 
     double f_twitch = 0;
+    double b = this->GetParameter("b");
     double t_max = b*(mSarcomereLength - ld);
     if(mIsActivated)
     {
@@ -118,7 +121,9 @@ double Kerchoffs2003ContractionModel::GetActiveTension(double lc)
 
         if(t_a < t_max)
         {
-            f_twitch = pow( tanh(t_a/tr)*tanh((t_max-t_a)/td), 2);
+        	double tr = this->GetParameter("tr");
+        	double td = this->GetParameter("td");
+        	f_twitch = pow( tanh(t_a/tr)*tanh((t_max-t_a)/td), 2);
         }
         else if(mElectricallyUnactivated)
         {
@@ -149,5 +154,13 @@ void OdeSystemInformation<Kerchoffs2003ContractionModel>::Initialise()
 {
     this->mVariableNames.push_back("lc");
     this->mVariableUnits.push_back("um");
+
+    this->mParameterNames.push_back("tr");
+    this->mParameterUnits.push_back("ms");
+    this->mParameterNames.push_back("td");
+    this->mParameterUnits.push_back("ms");
+    this->mParameterNames.push_back("b");
+    this->mParameterUnits.push_back("ms/um");
+
     this->mInitialised = true;
 }

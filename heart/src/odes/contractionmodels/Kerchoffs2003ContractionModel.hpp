@@ -56,9 +56,9 @@ private:
     static const double Ea;  /**< See reference. 20 um^{-1} */
     static const double v0;  /**< See reference. 0.0075 um/ms */
     static const double ls0; /**< See reference. 1.9 um */
-    static const double tr;  /**< See reference. 75 ms */
-    static const double td;  /**< See reference. 75 ms */
-    static const double b;   /**< See reference. 150 ms/um */
+    //static const double tr;  /*< See reference. 75 ms.  Is now a parameter*/
+    //static const double td;  /*< See reference. 75 ms.  Is now a parameter */
+    //static const double b;   /*< See reference. 150 ms/um.  Is now a parameter */
     static const double ld;  /**< See reference. -0.4 um */
 
     /**Voltage threshold above which the cell is activated (mV) - note hysteresis*/
