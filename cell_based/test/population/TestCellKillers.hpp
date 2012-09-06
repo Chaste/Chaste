@@ -752,6 +752,7 @@ public:
             TS_ASSERT(p_cell_killer->GetCellPopulation() != NULL);
 
             // Tidy up
+            delete p_cell_killer->mpCellPopulation;
             delete p_cell_killer;
         }
     }

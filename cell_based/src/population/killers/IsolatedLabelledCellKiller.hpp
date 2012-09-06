@@ -53,6 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM>
 class IsolatedLabelledCellKiller : public AbstractCellKiller<DIM>
 {
+    friend class TestCellKillers;
 private:
 
     /** Needed for serialization. */
