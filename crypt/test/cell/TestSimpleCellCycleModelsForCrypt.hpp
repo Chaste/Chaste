@@ -171,7 +171,7 @@ public:
 
         // The numbers for the G1 durations are taken from
         // the first two random numbers generated
-        new_g1_duration = 1.22037;
+        new_g1_duration = 2.64101;
         new_g1_duration2 = 1.28792;
 
         for (unsigned i=0; i<num_timesteps/3; i++)
