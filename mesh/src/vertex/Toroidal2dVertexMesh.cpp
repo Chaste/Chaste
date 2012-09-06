@@ -143,87 +143,6 @@ unsigned Toroidal2dVertexMesh::AddNode(Node<2>* pNewNode)
     return node_index;
 }
 
-double Toroidal2dVertexMesh::GetVolumeOfElement(unsigned index)
-{
-    VertexElement<2, 2>* p_element = GetElement(index);
-
-    c_vector<double, 2> first_node = p_element->GetNodeLocation(0);
-    c_vector<double, 2> current_node;
-    c_vector<double, 2> anticlockwise_node;
-    c_vector<double, 2> transformed_current_node;
-    c_vector<double, 2> transformed_anticlockwise_node;
-
-    unsigned num_nodes_in_element = p_element->GetNumNodes();
-
-    double element_area = 0;
-
-    for (unsigned local_index=0; local_index<num_nodes_in_element; local_index++)
-    {
-        // Find locations of current node and anticlockwise node
-        current_node = p_element->GetNodeLocation(local_index);
-        anticlockwise_node = p_element->GetNodeLocation((local_index+1)%num_nodes_in_element);
-
-        /*
-         * In order to calculate the area we map the origin to (x[0],y[0])
-         * then use GetVectorFromAtoB() to get node coordinates
-         */
-        transformed_current_node = GetVectorFromAtoB(first_node, current_node);
-        transformed_anticlockwise_node = GetVectorFromAtoB(first_node, anticlockwise_node);
-
-        element_area += 0.5*(transformed_current_node[0]*transformed_anticlockwise_node[1]
-                             - transformed_anticlockwise_node[0]*transformed_current_node[1]);
-    }
-
-    // We take the absolute value just in case the nodes were really oriented clockwise
-    return fabs(element_area);
-}
-
-c_vector<double, 2> Toroidal2dVertexMesh::GetCentroidOfElement(unsigned index)
-{
-    VertexElement<2, 2>* p_element = GetElement(index);
-
-    c_vector<double, 2> centroid;
-    c_vector<double, 2> transformed_centroid = zero_vector<double>(2);
-    c_vector<double, 2> first_node = p_element->GetNodeLocation(0);
-    c_vector<double, 2> current_node_location;
-    c_vector<double, 2> next_node_location;
-    c_vector<double, 2> transformed_current_node;
-    c_vector<double, 2> transformed_anticlockwise_node;
-
-    double temp_centroid_x = 0;
-    double temp_centroid_y = 0;
-
-    unsigned num_nodes_in_element = p_element->GetNumNodes();
-
-    for (unsigned local_index=0; local_index<num_nodes_in_element; local_index++)
-    {
-        // Find locations of current node and anticlockwise node
-        current_node_location = p_element->GetNodeLocation(local_index);
-        next_node_location = p_element->GetNodeLocation((local_index+1)%num_nodes_in_element);
-
-        /*
-         * In order to calculate the centroid we map the origin to (x[0],y[0])
-         * then use  GetVectorFromAtoB() to get node coordinates
-         */
-
-        transformed_current_node = GetVectorFromAtoB(first_node, current_node_location);
-        transformed_anticlockwise_node = GetVectorFromAtoB(first_node, next_node_location);
-
-        temp_centroid_x += (transformed_current_node[0]+transformed_anticlockwise_node[0])*(transformed_current_node[0]*transformed_anticlockwise_node[1]-transformed_current_node[1]*transformed_anticlockwise_node[0]);
-        temp_centroid_y += (transformed_current_node[1]+transformed_anticlockwise_node[1])*(transformed_current_node[0]*transformed_anticlockwise_node[1]-transformed_current_node[1]*transformed_anticlockwise_node[0]);
-    }
-
-    double vertex_area = GetVolumeOfElement(index);
-    double centroid_coefficient = 1.0/(6.0*vertex_area);
-
-    transformed_centroid(0) = centroid_coefficient*temp_centroid_x;
-    transformed_centroid(1) = centroid_coefficient*temp_centroid_y;
-
-    centroid = transformed_centroid + first_node;
-
-    return centroid;
-}
-
 MutableVertexMesh<2, 2>* Toroidal2dVertexMesh::GetMeshForVtk()
 {
     unsigned num_nodes = GetNumNodes();
@@ -338,6 +257,7 @@ MutableVertexMesh<2, 2>* Toroidal2dVertexMesh::GetMeshForVtk()
             count++;
         }
     }
+
     MutableVertexMesh<2, 2>* p_mesh = new MutableVertexMesh<2,2>(nodes, elements, mCellRearrangementThreshold, mT2Threshold);
     return p_mesh;
 }

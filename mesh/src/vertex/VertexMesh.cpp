@@ -631,10 +631,14 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetCentroidOfEle
             centroid = 0.5*(p_element->GetNodeLocation(0) + p_element->GetNodeLocation(1));
         }
         break;
-        case 2: ///\todo Why isn't this just the centre of mass? (#1075)
+        case 2:
         {
-            c_vector<double, SPACE_DIM> current_node;
-            c_vector<double, SPACE_DIM> anticlockwise_node;
+            c_vector<double, 2> transformed_centroid = zero_vector<double>(2);
+            c_vector<double, 2> first_node_location = p_element->GetNodeLocation(0);
+            c_vector<double, SPACE_DIM> this_node_location;
+            c_vector<double, SPACE_DIM> next_node_location;
+            c_vector<double, 2> this_transformed_node_location;
+            c_vector<double, 2> next_transformed_node_location;
 
             double temp_centroid_x = 0;
             double temp_centroid_y = 0;
@@ -642,18 +646,32 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetCentroidOfEle
             for (unsigned local_index=0; local_index<num_nodes_in_element; local_index++)
             {
                 // Find locations of current node and anticlockwise node
-                current_node = p_element->GetNodeLocation(local_index);
-                anticlockwise_node = p_element->GetNodeLocation((local_index+1)%num_nodes_in_element);
+                this_node_location = p_element->GetNodeLocation(local_index);
+                next_node_location = p_element->GetNodeLocation((local_index+1)%num_nodes_in_element);
 
-                temp_centroid_x += (current_node[0]+anticlockwise_node[0])*(current_node[0]*anticlockwise_node[1]-current_node[1]*anticlockwise_node[0]);
-                temp_centroid_y += (current_node[1]+anticlockwise_node[1])*(current_node[0]*anticlockwise_node[1]-current_node[1]*anticlockwise_node[0]);
+                /*
+                 * In order to calculate the centroid we map the origin to (x[0],y[0])
+                 * then use GetVectorFromAtoB() to get node coordinates
+                 */
+                this_transformed_node_location = GetVectorFromAtoB(first_node_location, this_node_location);
+                next_transformed_node_location = GetVectorFromAtoB(first_node_location, next_node_location);
+
+                double this_x = this_transformed_node_location[0];
+                double this_y = this_transformed_node_location[1];
+                double next_x = next_transformed_node_location[0];
+                double next_y = next_transformed_node_location[1];
+
+                temp_centroid_x += (this_x + next_x)*(this_x*next_y - this_y*next_x);
+                temp_centroid_y += (this_y + next_y)*(this_x*next_y - this_y*next_x);
             }
 
             double vertex_area = GetVolumeOfElement(index);
             double centroid_coefficient = 1.0/(6.0*vertex_area);
 
-            centroid(0) = centroid_coefficient*temp_centroid_x;
-            centroid(1) = centroid_coefficient*temp_centroid_y;
+            transformed_centroid(0) = centroid_coefficient*temp_centroid_x;
+            transformed_centroid(1) = centroid_coefficient*temp_centroid_y;
+        
+            centroid = transformed_centroid + first_node_location;
         }
         break;
         case 3:
@@ -1006,25 +1024,29 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVolumeOfElement(unsigned index)
     double element_volume = 0.0;
     if (SPACE_DIM == 2)
     {
-        c_vector<double, SPACE_DIM> first_node = p_element->GetNodeLocation(0);
+        c_vector<double, SPACE_DIM> first_node_location = p_element->GetNodeLocation(0);
 
         unsigned num_nodes_in_element = p_element->GetNumNodes();
 
         for (unsigned local_index=0; local_index<num_nodes_in_element; local_index++)
         {
             // Find locations of current node and anticlockwise node
-            c_vector<double, SPACE_DIM> current_node = p_element->GetNodeLocation(local_index);
-            c_vector<double, SPACE_DIM> anticlockwise_node = p_element->GetNodeLocation((local_index+1)%num_nodes_in_element);
+            c_vector<double, SPACE_DIM> this_node_location = p_element->GetNodeLocation(local_index);
+            c_vector<double, SPACE_DIM> next_node_location = p_element->GetNodeLocation((local_index+1)%num_nodes_in_element);
 
             /*
              * In order to calculate the area we map the origin to (x[0],y[0])
              * then use GetVectorFromAtoB() to get node coordiantes
              */
-            c_vector<double, SPACE_DIM> transformed_current_node = GetVectorFromAtoB(first_node, current_node);
-            c_vector<double, SPACE_DIM> transformed_anticlockwise_node = GetVectorFromAtoB(first_node, anticlockwise_node);
+            c_vector<double, SPACE_DIM> this_transformed_node_location = GetVectorFromAtoB(first_node_location, this_node_location);
+            c_vector<double, SPACE_DIM> next_transformed_node_location = GetVectorFromAtoB(first_node_location, next_node_location);
 
-            element_volume += 0.5*(transformed_current_node[0]*transformed_anticlockwise_node[1]
-                                   - transformed_anticlockwise_node[0]*transformed_current_node[1]);
+            double this_x = this_transformed_node_location[0];
+            double this_y = this_transformed_node_location[1];
+            double next_x = next_transformed_node_location[0];
+            double next_y = next_transformed_node_location[1];
+
+            element_volume += 0.5*(this_x*next_y - next_x*this_y);
         }
     }
     else
@@ -1050,6 +1072,8 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVolumeOfElement(unsigned index)
             element_volume += face_area * perpendicular_distance / 3;
         }
     }
+
+    // We take the absolute value just in case the nodes were really oriented clockwise
     return fabs(element_volume);
 }
 
@@ -1069,10 +1093,10 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetSurfaceAreaOfElement(unsigned inde
         for (unsigned local_index=0; local_index<num_nodes_in_element; local_index++)
         {
             // Find locations of current node and anticlockwise node
-            unsigned current_node_index = p_element->GetNodeGlobalIndex(local_index);
-            unsigned anticlockwise_node_index = p_element->GetNodeGlobalIndex((local_index+1)%num_nodes_in_element);
+            unsigned this_node_index = p_element->GetNodeGlobalIndex(local_index);
+            unsigned next_node_index = p_element->GetNodeGlobalIndex((local_index+1)%num_nodes_in_element);
 
-            surface_area += this->GetDistanceBetweenNodes(current_node_index, anticlockwise_node_index);
+            surface_area += this->GetDistanceBetweenNodes(this_node_index, next_node_index);
         }
     }
     else
@@ -1340,10 +1364,10 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetPreviousEdgeG
     // We add an extra localIndex-1 in the line below as otherwise this term can be negative, which breaks the % operator
     unsigned previous_local_index = (num_nodes_in_element+localIndex-1)%num_nodes_in_element;
 
-    unsigned current_global_index = pElement->GetNodeGlobalIndex(localIndex);
+    unsigned this_global_index = pElement->GetNodeGlobalIndex(localIndex);
     unsigned previous_global_index = pElement->GetNodeGlobalIndex(previous_local_index);
 
-    double previous_edge_length = this->GetDistanceBetweenNodes(current_global_index, previous_global_index);
+    double previous_edge_length = this->GetDistanceBetweenNodes(this_global_index, previous_global_index);
     assert(previous_edge_length > DBL_EPSILON);
 
     c_vector<double, SPACE_DIM> previous_edge_gradient = this->GetVectorFromAtoB(pElement->GetNodeLocation(previous_local_index), pElement->GetNodeLocation(localIndex))/previous_edge_length;
@@ -1359,10 +1383,10 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNextEdgeGradi
 
     unsigned next_local_index = (localIndex+1)%(pElement->GetNumNodes());
 
-    unsigned current_global_index = pElement->GetNodeGlobalIndex(localIndex);
+    unsigned this_global_index = pElement->GetNodeGlobalIndex(localIndex);
     unsigned next_global_index = pElement->GetNodeGlobalIndex(next_local_index);
 
-    double next_edge_length = this->GetDistanceBetweenNodes(current_global_index, next_global_index);
+    double next_edge_length = this->GetDistanceBetweenNodes(this_global_index, next_global_index);
     assert(next_edge_length > DBL_EPSILON);
 
     c_vector<double, SPACE_DIM> next_edge_gradient = this->GetVectorFromAtoB(pElement->GetNodeLocation(next_local_index), pElement->GetNodeLocation(localIndex))/next_edge_length;
@@ -1444,8 +1468,8 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetAreaOfFace(VertexElement<ELEMENT_D
     }
 
     // Compute area of the 2D projection
-    c_vector<double, SPACE_DIM-1> current_vertex;
-    c_vector<double, SPACE_DIM-1> anticlockwise_vertex;
+    c_vector<double, SPACE_DIM-1> this_vertex;
+    c_vector<double, SPACE_DIM-1> next_vertex;
 
     unsigned num_nodes_in_face = pFace->GetNumNodes();
 
@@ -1456,13 +1480,13 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetAreaOfFace(VertexElement<ELEMENT_D
     for (unsigned local_index=0; local_index<num_nodes_in_face; local_index++)
     {
         // Find locations of current vertex and anticlockwise vertex
-        current_vertex[0] = pFace->GetNodeLocation(local_index, dim1);
-        current_vertex[1] = pFace->GetNodeLocation(local_index, dim2);
-        anticlockwise_vertex[0] = pFace->GetNodeLocation((local_index+1)%num_nodes_in_face, dim1);
-        anticlockwise_vertex[1] = pFace->GetNodeLocation((local_index+1)%num_nodes_in_face, dim2);
+        this_vertex[0] = pFace->GetNodeLocation(local_index, dim1);
+        this_vertex[1] = pFace->GetNodeLocation(local_index, dim2);
+        next_vertex[0] = pFace->GetNodeLocation((local_index+1)%num_nodes_in_face, dim1);
+        next_vertex[1] = pFace->GetNodeLocation((local_index+1)%num_nodes_in_face, dim2);
 
         // It doesn't matter if the face is oriented clockwise or not, since we area only interested in the area
-        face_area += 0.5*(current_vertex[0]*anticlockwise_vertex[1] - anticlockwise_vertex[0]*current_vertex[1]);
+        face_area += 0.5*(this_vertex[0]*next_vertex[1] - next_vertex[0]*this_vertex[1]);
     }
 
     // Scale to get area before projection

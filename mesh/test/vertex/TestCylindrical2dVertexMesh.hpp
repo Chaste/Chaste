@@ -498,6 +498,72 @@ public:
         TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(test_point4, 0), true);
         TS_ASSERT_EQUALS(mesh.GetLocalIndexForElementEdgeClosestToPoint(test_point4, 0), 2u);
     }
+
+    void TestGetMeshForVtk()
+    {
+        // Create mesh
+        CylindricalHoneycombVertexMeshGenerator generator(4, 4);
+        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 40u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 16u);
+
+        // Test GetMeshForVtk() method
+        MutableVertexMesh<2, 2>* p_mesh_for_vtk = p_mesh->GetMeshForVtk();
+
+        // The mesh for VTK should have the same number of elements, but 16 extra nodes
+        TS_ASSERT_EQUALS(p_mesh_for_vtk->GetNumElements(), 16u);
+        TS_ASSERT_EQUALS(p_mesh_for_vtk->GetNumNodes(), 48u);
+
+        // Every element in the mesh for VTK should have 6 nodes
+        for (unsigned elem_index=0; elem_index<p_mesh_for_vtk->GetNumElements(); elem_index++)
+        {
+            TS_ASSERT_EQUALS(p_mesh_for_vtk->GetElement(elem_index)->GetNumNodes(), 6u);
+        }
+
+        VertexElement<2, 2>* p_element0 = p_mesh_for_vtk->GetElement(0);
+        TS_ASSERT_EQUALS(p_element0->GetNodeGlobalIndex(0), 0u);
+        TS_ASSERT_EQUALS(p_element0->GetNodeGlobalIndex(1), 5u);
+        TS_ASSERT_EQUALS(p_element0->GetNodeGlobalIndex(2), 9u);
+        TS_ASSERT_EQUALS(p_element0->GetNodeGlobalIndex(3), 12u);
+        TS_ASSERT_EQUALS(p_element0->GetNodeGlobalIndex(4), 8u);
+        TS_ASSERT_EQUALS(p_element0->GetNodeGlobalIndex(5), 4u);
+
+        VertexElement<2, 2>* p_element3 = p_mesh_for_vtk->GetElement(3);
+        TS_ASSERT_EQUALS(p_element3->GetNodeGlobalIndex(0), 3u);
+        TS_ASSERT_EQUALS(p_element3->GetNodeGlobalIndex(1), 39u);
+        TS_ASSERT_EQUALS(p_element3->GetNodeGlobalIndex(2), 40u);
+        TS_ASSERT_EQUALS(p_element3->GetNodeGlobalIndex(3), 15u);
+        TS_ASSERT_EQUALS(p_element3->GetNodeGlobalIndex(4), 11u);
+        TS_ASSERT_EQUALS(p_element3->GetNodeGlobalIndex(5), 7u);
+
+        VertexElement<2, 2>* p_element7 = p_mesh_for_vtk->GetElement(7);
+        TS_ASSERT_EQUALS(p_element7->GetNodeGlobalIndex(0), 40u);
+        TS_ASSERT_EQUALS(p_element7->GetNodeGlobalIndex(1), 41u);
+        TS_ASSERT_EQUALS(p_element7->GetNodeGlobalIndex(2), 42u);
+        TS_ASSERT_EQUALS(p_element7->GetNodeGlobalIndex(3), 43u);
+        TS_ASSERT_EQUALS(p_element7->GetNodeGlobalIndex(4), 19u);
+        TS_ASSERT_EQUALS(p_element7->GetNodeGlobalIndex(5), 15u);
+
+        VertexElement<2, 2>* p_element12 = p_mesh_for_vtk->GetElement(12);
+        TS_ASSERT_EQUALS(p_element12->GetNodeGlobalIndex(0), 25u);
+        TS_ASSERT_EQUALS(p_element12->GetNodeGlobalIndex(1), 29u);
+        TS_ASSERT_EQUALS(p_element12->GetNodeGlobalIndex(2), 33u);
+        TS_ASSERT_EQUALS(p_element12->GetNodeGlobalIndex(3), 36u);
+        TS_ASSERT_EQUALS(p_element12->GetNodeGlobalIndex(4), 32u);
+        TS_ASSERT_EQUALS(p_element12->GetNodeGlobalIndex(5), 28u);
+
+        VertexElement<2, 2>* p_element15 = p_mesh_for_vtk->GetElement(15);
+        TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(0), 44u);
+        TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(1), 45u);
+        TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(2), 46u);
+        TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(3), 47u);
+        TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(4), 35u);
+        TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(5), 31u);
+
+        // Avoid memory leak
+        delete p_mesh_for_vtk;
+    }
 };
 
 #endif /*TESTCYLINDRICAL2DVERTEXMESH_HPP_*/

@@ -120,85 +120,98 @@ unsigned Cylindrical2dVertexMesh::AddNode(Node<2>* pNewNode)
     return node_index;
 }
 
-double Cylindrical2dVertexMesh::GetVolumeOfElement(unsigned index)
+MutableVertexMesh<2, 2>* Cylindrical2dVertexMesh::GetMeshForVtk()
 {
-    VertexElement<2, 2>* p_element = GetElement(index);
+    unsigned num_nodes = GetNumNodes();
 
-    c_vector<double, 2> first_node = p_element->GetNodeLocation(0);
-    c_vector<double, 2> current_node;
-    c_vector<double, 2> anticlockwise_node;
-    c_vector<double, 2> transformed_current_node;
-    c_vector<double, 2> transformed_anticlockwise_node;
+    std::vector<Node<2>*> temp_nodes(2*num_nodes);
+    std::vector<VertexElement<2, 2>*> elements;
 
-    unsigned num_nodes_in_element = p_element->GetNumNodes();
-
-    double element_area = 0;
-
-    for (unsigned local_index=0; local_index<num_nodes_in_element; local_index++)
+    // Create four copies of each node
+    for (unsigned index=0; index<num_nodes; index++)
     {
-        // Find locations of current node and anticlockwise node
-        current_node = p_element->GetNodeLocation(local_index);
-        anticlockwise_node = p_element->GetNodeLocation((local_index+1)%num_nodes_in_element);
+        c_vector<double, 2> location = GetNode(index)->rGetLocation();
 
-        /*
-         * In order to calculate the area we map the origin to (x[0],y[0])
-         * then use GetVectorFromAtoB() to get node coordinates
-         */
+        // Node copy at original location
+        Node<2>* p_node = new Node<2>(index, false, location[0], location[1]);
+        temp_nodes[index] = p_node;
 
-        transformed_current_node = GetVectorFromAtoB(first_node, current_node);
-        transformed_anticlockwise_node = GetVectorFromAtoB(first_node, anticlockwise_node);
-
-        element_area += 0.5*(transformed_current_node[0]*transformed_anticlockwise_node[1]
-                           - transformed_anticlockwise_node[0]*transformed_current_node[1]);
+        // Node copy shifted right
+        p_node = new Node<2>(num_nodes + index, false, location[0] + mWidth, location[1]);
+        temp_nodes[num_nodes + index] = p_node;
     }
 
-    return element_area;
-}
-
-c_vector<double, 2> Cylindrical2dVertexMesh::GetCentroidOfElement(unsigned index)
-{
-    VertexElement<2, 2>* p_element = GetElement(index);
-
-    c_vector<double, 2> centroid;
-    c_vector<double, 2> transformed_centroid = zero_vector<double>(2);
-    c_vector<double, 2> first_node = p_element->GetNodeLocation(0);
-    c_vector<double, 2> current_node_location;
-    c_vector<double, 2> next_node_location;
-    c_vector<double, 2> transformed_current_node;
-    c_vector<double, 2> transformed_anticlockwise_node;
-
-    double temp_centroid_x = 0;
-    double temp_centroid_y = 0;
-
-    unsigned num_nodes_in_element = p_element->GetNumNodes();
-
-    for (unsigned local_index=0; local_index<num_nodes_in_element; local_index++)
+    // Iterate over elements
+    for (VertexMesh<2,2>::VertexElementIterator elem_iter = GetElementIteratorBegin();
+         elem_iter != GetElementIteratorEnd();
+         ++elem_iter)
     {
-        // Find locations of current node and anticlockwise node
-        current_node_location = p_element->GetNodeLocation(local_index);
-        next_node_location = p_element->GetNodeLocation((local_index+1)%num_nodes_in_element);
+        unsigned elem_index = elem_iter->GetIndex();
+        unsigned num_nodes_in_elem = elem_iter->GetNumNodes();
 
-        /*
-         * In order to calculate the centroid we map the origin to (x[0],y[0])
-         * then use  GetVectorFromAtoB() to get node coordinates
-         */
+        std::vector<Node<2>*> elem_nodes;
 
-        transformed_current_node = GetVectorFromAtoB(first_node, current_node_location);
-        transformed_anticlockwise_node = GetVectorFromAtoB(first_node, next_node_location);
+        // Compute whether the element straddles either periodic boundary
+        bool element_straddles_left_right_boundary = false;
 
-        temp_centroid_x += (transformed_current_node[0]+transformed_anticlockwise_node[0])*(transformed_current_node[0]*transformed_anticlockwise_node[1]-transformed_current_node[1]*transformed_anticlockwise_node[0]);
-        temp_centroid_y += (transformed_current_node[1]+transformed_anticlockwise_node[1])*(transformed_current_node[0]*transformed_anticlockwise_node[1]-transformed_current_node[1]*transformed_anticlockwise_node[0]);
+        c_vector<double, 2> this_node_location = elem_iter->GetNode(0)->rGetLocation();
+        for (unsigned local_index=0; local_index<num_nodes_in_elem; local_index++)
+        {
+            c_vector<double, 2> next_node_location = elem_iter->GetNode((local_index+1)%num_nodes_in_elem)->rGetLocation();
+            c_vector<double, 2> vector = next_node_location - this_node_location;
+
+            if (fabs(vector[0]) > 0.5*mWidth)
+            {
+                element_straddles_left_right_boundary = true;
+            }
+        }
+
+        // Use the above information when duplicating the element
+        for (unsigned local_index=0; local_index<num_nodes_in_elem; local_index++)
+        {
+            unsigned this_node_index = elem_iter->GetNodeGlobalIndex(local_index);
+
+            // If the element straddles the left/right periodic boundary...
+            if (element_straddles_left_right_boundary)
+            {
+                // ...and this node is located to the left of the centre of the mesh...
+                bool node_is_right_of_centre = (elem_iter->GetNode(local_index)->rGetLocation()[0] - 0.5*mWidth > 0);
+                if (!node_is_right_of_centre)
+                {
+                    // ...then choose the equivalent node to the right
+                    this_node_index += num_nodes;
+                }
+            }
+
+            elem_nodes.push_back(temp_nodes[this_node_index]);
+        }
+
+        VertexElement<2,2>* p_element = new VertexElement<2,2>(elem_index, elem_nodes);
+        elements.push_back(p_element);
     }
 
-    double vertex_area = GetVolumeOfElement(index);
-    double centroid_coefficient = 1.0/(6.0*vertex_area);
+    // Now delete any nodes from the mesh for VTK that are not contained in any elements
+    std::vector<Node<2>*> nodes;
+    unsigned count = 0;
+    for (unsigned index=0; index<temp_nodes.size(); index++)
+    {
+        unsigned num_elems_containing_this_node = temp_nodes[index]->rGetContainingElementIndices().size();
 
-    transformed_centroid(0) = centroid_coefficient*temp_centroid_x;
-    transformed_centroid(1) = centroid_coefficient*temp_centroid_y;
+        if (num_elems_containing_this_node == 0)
+        {
+            // Avoid memory leak
+            delete temp_nodes[index];
+        }
+        else
+        {
+            temp_nodes[index]->SetIndex(count);
+            nodes.push_back(temp_nodes[index]);
+            count++;
+        }
+    }
 
-    centroid = transformed_centroid + first_node;
-
-    return centroid;
+    MutableVertexMesh<2, 2>* p_mesh = new MutableVertexMesh<2,2>(nodes, elements, mCellRearrangementThreshold, mT2Threshold);
+    return p_mesh;
 }
 
 // Serialization for Boost >= 1.36

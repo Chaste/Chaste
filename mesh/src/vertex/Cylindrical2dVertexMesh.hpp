@@ -148,22 +148,13 @@ public:
     unsigned AddNode(Node<2>* pNewNode);
 
     /**
-     * Overridden GetVolumeOfElement() method.
-     *
-     * @param index  the global index of a specified vertex element
-     *
-     * @return the area of the element
+     * Return a pointer to an extended mesh that is a 'non-periodic'
+     * version of our mesh. This can then be used when writing to
+     * VTK.
+     * 
+     * @return a non-periodic vertex mesh
      */
-    double GetVolumeOfElement(unsigned index);
-
-    /**
-     * Overridden GetCentroidOfElement() method.
-     *
-     * @param index  the global index of a specified vertex element
-     *
-     * @return (centroid_x,centroid_y).
-     */
-     c_vector<double, 2> GetCentroidOfElement(unsigned index);
+     MutableVertexMesh<2, 2>* GetMeshForVtk();
 };
 
 #include "SerializationExportWrapper.hpp"

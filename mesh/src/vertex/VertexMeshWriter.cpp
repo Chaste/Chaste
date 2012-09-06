@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "VertexMeshWriter.hpp"
 #include "Version.hpp"
+#include "Cylindrical2dVertexMesh.hpp"
 #include "Toroidal2dVertexMesh.hpp"
 
 /**
@@ -249,6 +250,14 @@ void VertexMeshWriter<2, 2>::WriteVtkUsingMesh(VertexMesh<2, 2>& rMesh, std::str
     if (dynamic_cast<Toroidal2dVertexMesh*>(&rMesh))
     {
         MutableVertexMesh<2, 2>* p_mesh_for_vtk = static_cast<Toroidal2dVertexMesh*>(&rMesh)->GetMeshForVtk();
+        MakeVtkMesh(*p_mesh_for_vtk);
+
+        // Avoid memory leak
+        delete p_mesh_for_vtk;
+    }
+    else if (dynamic_cast<Cylindrical2dVertexMesh*>(&rMesh))
+    {
+        MutableVertexMesh<2, 2>* p_mesh_for_vtk = static_cast<Cylindrical2dVertexMesh*>(&rMesh)->GetMeshForVtk();
         MakeVtkMesh(*p_mesh_for_vtk);
 
         // Avoid memory leak
