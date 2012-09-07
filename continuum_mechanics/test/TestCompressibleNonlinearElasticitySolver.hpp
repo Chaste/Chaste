@@ -946,8 +946,6 @@ public:
     void TestWritingStrain() throw(Exception)
     {
         QuadraticMesh<2> mesh(1.0, 1.0, 1.0);
-        TrianglesMeshWriter<2,2> mesh_writer("Joe", "Joe");
-        mesh_writer.WriteFilesUsingMesh(mesh);
  
         CompressibleMooneyRivlinMaterialLaw<2> law(1.0, 1.0);
 
