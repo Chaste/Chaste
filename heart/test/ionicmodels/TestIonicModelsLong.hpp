@@ -249,12 +249,10 @@ public:
         const std::string LQT_file = "TT_LQT";
 
         CellTenTusscher2006EpiFromCellML TT_model_epi(p_solver, p_stimulus);
-        unsigned param_ito = TT_model_epi.GetParameterIndex("ScaleFactorIto");
-        unsigned param_gkr = TT_model_epi.GetParameterIndex("ScaleFactorGkr");
-        unsigned param_gks = TT_model_epi.GetParameterIndex("ScaleFactorGks");
-        TT_model_epi.SetParameter(param_ito, 1.0);
-        TT_model_epi.SetParameter(param_gkr, 1.0);
-        TT_model_epi.SetParameter(param_gks, 1.0);
+
+        TT_model_epi.SetParameter("ScaleFactorIto", 1.0);
+        TT_model_epi.SetParameter("ScaleFactorGkr", 1.0);
+        TT_model_epi.SetParameter("ScaleFactorGks", 1.0);
         //run the model
         RunOdeSolverWithIonicModel(&TT_model_epi,
                                    simulation_end,
@@ -263,9 +261,9 @@ public:
                                    false);
 
         CellTenTusscher2006EpiFromCellML TT_model_mid(p_solver, p_stimulus);
-        TT_model_mid.SetParameter(param_ito, 1.0);
-        TT_model_mid.SetParameter(param_gkr, 1.0);
-        TT_model_mid.SetParameter(param_gks, 0.25);
+        TT_model_mid.SetParameter("ScaleFactorIto", 1.0);
+        TT_model_mid.SetParameter("ScaleFactorGkr", 1.0);
+        TT_model_mid.SetParameter("ScaleFactorGks", 0.25);
 
         RunOdeSolverWithIonicModel(&TT_model_mid,
                                    simulation_end,
@@ -274,9 +272,9 @@ public:
                                    false);
 
         CellTenTusscher2006EpiFromCellML TT_model_endo(p_solver, p_stimulus);
-        TT_model_endo.SetParameter(param_ito, 0.165);
-        TT_model_endo.SetParameter(param_gkr, 1.0);
-        TT_model_endo.SetParameter(param_gks, 0.66);
+        TT_model_endo.SetParameter("ScaleFactorIto", 0.165);
+        TT_model_endo.SetParameter("ScaleFactorGkr", 1.0);
+        TT_model_endo.SetParameter("ScaleFactorGks", 0.66);
 
         RunOdeSolverWithIonicModel(&TT_model_endo,
                                    simulation_end,
@@ -285,9 +283,9 @@ public:
                                    false);
 
         CellTenTusscher2006EpiFromCellML TT_model_LQT(p_solver, p_stimulus);
-        TT_model_LQT.SetParameter(param_ito, 1.0);
-        TT_model_LQT.SetParameter(param_gkr, 0.0);
-        TT_model_LQT.SetParameter(param_gks, 1.0);
+        TT_model_LQT.SetParameter("ScaleFactorIto", 1.0);
+        TT_model_LQT.SetParameter("ScaleFactorGkr", 0.0);
+        TT_model_LQT.SetParameter("ScaleFactorGks", 1.0);
 
         RunOdeSolverWithIonicModel(&TT_model_LQT,
                                    simulation_end,
