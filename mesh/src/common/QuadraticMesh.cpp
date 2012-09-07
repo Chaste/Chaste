@@ -99,60 +99,10 @@ void QuadraticMesh<DIM>::ConstructLinearMesh(unsigned numElemX)
 
 
 
+
+
 template<unsigned DIM>
 void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned numElemY, bool unused)
-{
-    //#2224 ConstructRectangularMeshNewImp(numElemX, numElemY, unused);return;
-    assert(DIM==2);
-
-    assert(numElemX > 0);
-    assert(numElemY > 0);
-    assert(unused);
-
-    this->mMeshIsLinear=false;
-    unsigned num_nodes=(numElemX+1)*(numElemY+1);
-    struct triangulateio mesher_input;
-
-    this->InitialiseTriangulateIo(mesher_input);
-    mesher_input.pointlist = (double *) malloc( num_nodes * DIM * sizeof(double));
-    mesher_input.numberofpoints = num_nodes;
-
-    unsigned new_index = 0;
-    for (unsigned j=0; j<=numElemY; j++)
-    {
-        double y = j;
-        for (unsigned i=0; i<=numElemX; i++)
-        {
-            double x = i;
-
-            mesher_input.pointlist[DIM*new_index] = x;
-            mesher_input.pointlist[DIM*new_index + 1] = y;
-            new_index++;
-        }
-    }
-
-    // Make structure for output
-    struct triangulateio mesher_output;
-
-    this->InitialiseTriangulateIo(mesher_output);
-
-    // Library call
-    triangulate((char*)"Qzeo2", &mesher_input, &mesher_output, NULL);
-
-    assert(mesher_output.numberofcorners == (DIM+1)*(DIM+2)/2);//Nodes per element (including internals, one per edge)
-
-    this->ImportFromMesher(mesher_output, mesher_output.numberoftriangles, mesher_output.trianglelist, mesher_output.numberofedges, mesher_output.edgelist, mesher_output.edgemarkerlist);
-
-    CountVertices();
-    QuadraticMeshHelper<DIM>::AddNodesToBoundaryElements(this, NULL);
-
-    this->FreeTriangulateIo(mesher_input);
-    this->FreeTriangulateIo(mesher_output);
-}
-
-
-template<unsigned DIM>
-void QuadraticMesh<DIM>::ConstructRectangularMeshNewImp(unsigned numElemX, unsigned numElemY, bool unused)
 {
     assert(DIM==2);
 

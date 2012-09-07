@@ -946,7 +946,9 @@ public:
     void TestWritingStrain() throw(Exception)
     {
         QuadraticMesh<2> mesh(1.0, 1.0, 1.0);
-
+        TrianglesMeshWriter<2,2> mesh_writer("Joe", "Joe");
+        mesh_writer.WriteFilesUsingMesh(mesh);
+ 
         CompressibleMooneyRivlinMaterialLaw<2> law(1.0, 1.0);
 
         std::vector<unsigned> fixed_nodes;
@@ -975,8 +977,8 @@ public:
         solver.mCurrentSolution[4]  = alpha;
         solver.mCurrentSolution[16] = alpha;
         solver.mCurrentSolution[6]  = alpha;
-        // move the nodes on Y=0.5, nodes, 4, 6, 7, across to the right by half as much
-        solver.mCurrentSolution[8]  = alpha/2.0;
+        // move the nodes on Y=0.5, nodes, 5, 6, 7, across to the right by half as much
+        solver.mCurrentSolution[10]  = alpha/2.0;
         solver.mCurrentSolution[12] = alpha/2.0;
         solver.mCurrentSolution[14] = alpha/2.0;
 

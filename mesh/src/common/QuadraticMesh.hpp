@@ -100,16 +100,7 @@ protected:
      */
     void ConstructRectangularMesh(unsigned numElemX, unsigned numElemY, bool unused=true);
 
-public:
-    /**
-     * Create a quadratic mesh on a rectangle from (0,0) to (numElemX,numElemY)
-     * with that number of elements in each direction. 
-     * @param numElemX Number of elements in x-direction (also, the width of the final mesh)
-     * @param numElemY Number of elements in y-direction (also, the height of the final mesh)
-     * @param unused (defaults to true; must always be true) is for compatibility of the
-     *   interface of this method with same name in AbstractTetrahedralMesh.
-     */
-    void ConstructRectangularMeshNewImp(unsigned numElemX, unsigned numElemY, bool unused=true);
+
 protected:
     /**
      * Create a quadratic mesh on a cuobid from (0,0,0) to (numElemX,numElemY,numElemZ)

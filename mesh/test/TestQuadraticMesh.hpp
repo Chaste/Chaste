@@ -587,7 +587,7 @@ public:
             //Two-dimensional single square
             TetrahedralMesh<2,2> mesh;
             bool stagger=false; ///\todo #2224
-//            mesh.ConstructRegularSlabMesh(1.0, width, height, stagger);
+            //mesh.ConstructRegularSlabMesh(1.0, width, height, stagger);
             mesh.ConstructRectangularMesh((unsigned)width, (unsigned)height, stagger);
             TrianglesMeshWriter<2,2> mesh_writer("TestQuadraticMesh", "SingleGrid2d", false);
             mesh_writer.WriteFilesUsingMesh(mesh);
@@ -598,12 +598,14 @@ public:
             quad_mesh_read_back.ConstructFromLinearMeshReader(quadratic_mesh_reader);
             
             {
-                TrianglesMeshWriter<2,2> mesh_writer2("TestQuadraticMesh", "SingleGrid2dQuad", false);
+                TrianglesMeshWriter<2,2> mesh_writer2("TestQuadraticMesh", "SingleGrid2dRead", false);
                 mesh_writer2.WriteFilesUsingMesh(quad_mesh_read_back);
             }
-            ///\todo #2224
-            //quad_mesh_constructed.ConstructRegularSlabMesh(1.0, width, height);
-            quad_mesh_constructed.ConstructRectangularMeshNewImp((unsigned)width, (unsigned)height, true); //Actually false at present...
+            quad_mesh_constructed.ConstructRegularSlabMesh(1.0, width, height);
+            {
+                TrianglesMeshWriter<2,2> mesh_writer2("TestQuadraticMesh", "SingleGrid2dConst", false);
+                mesh_writer2.WriteFilesUsingMesh(quad_mesh_constructed);
+            }
         }
         TS_ASSERT_EQUALS(quad_mesh_constructed.GetNumNodes(), quad_mesh_read_back.GetNumNodes());
         TS_ASSERT_EQUALS(quad_mesh_constructed.GetNumVertices(), quad_mesh_read_back.GetNumVertices());
@@ -630,15 +632,6 @@ public:
             BoundaryElement<1,2>* p_b_elem_constructed =  quad_mesh_constructed.GetBoundaryElement(b_elem);
             BoundaryElement<1,2>* p_b_elem_read_back =  quad_mesh_read_back.GetBoundaryElement(b_elem);
             TS_ASSERT_EQUALS(p_b_elem_constructed->GetNumNodes(), p_b_elem_read_back->GetNumNodes());
-//            for (unsigned i = 0; i < p_b_elem_constructed->GetNumNodes(); i++)
-//            {
-//                c_vector<double, 2> loc_read_back = p_b_elem_read_back->GetNode(i)->rGetLocation();
-//                c_vector<double, 2> loc_constructed = p_b_elem_constructed->GetNode(i)->rGetLocation();
-//                TS_ASSERT_DELTA(loc_read_back[0], loc_constructed[0], 1e-10);
-//                TS_ASSERT_DELTA(loc_read_back[1], loc_constructed[1], 1e-10);
-//                
-//                TS_ASSERT_EQUALS(p_b_elem_read_back->GetNode(i)->IsBoundaryNode(), p_b_elem_read_back->GetNode(i)->IsBoundaryNode()); 
-//            }
         }
                             
     }

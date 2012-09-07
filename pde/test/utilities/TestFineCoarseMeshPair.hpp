@@ -405,7 +405,7 @@ public:
         mesh_pair.ComputeCoarseElementsForFineNodes(true);
 
         //Check that the indices of the coarse mesh elements are as expected
-        unsigned lower_left_element_index=0u;
+        unsigned lower_left_element_index=1u;
         ChastePoint<2> lower_left(0.25, 0.25);
         TS_ASSERT_EQUALS(coarse_mesh.GetContainingElementIndex(lower_left), lower_left_element_index);
         ChastePoint<2> lower_left1(0.1, 0.25); //Double check that there is a `backslash`
@@ -413,7 +413,7 @@ public:
         TS_ASSERT_EQUALS(coarse_mesh.GetContainingElementIndex(lower_left1), lower_left_element_index);
         TS_ASSERT_EQUALS(coarse_mesh.GetContainingElementIndex(lower_left2), lower_left_element_index);
 
-        unsigned upper_right_element_index=1u;
+        unsigned upper_right_element_index=0u;
         ChastePoint<2> upper_right(0.75, 0.75);
         TS_ASSERT_EQUALS(coarse_mesh.GetContainingElementIndex(upper_right), upper_right_element_index);
 
@@ -433,7 +433,7 @@ public:
             else // x=1-y, so in both elements, result could be either. However, it should find 0 first
             {
                 //TS_ASSERT_LESS_THAN(mesh_pair.rGetCoarseElementsForFineNodes()[i], 2u);
-                TS_ASSERT_EQUALS(mesh_pair.rGetCoarseElementsForFineNodes()[i], lower_left_element_index);
+                TS_ASSERT_EQUALS(mesh_pair.rGetCoarseElementsForFineNodes()[i], 0u);
             }
         }
 
@@ -481,11 +481,11 @@ public:
         mesh_pair.ComputeCoarseElementsForFineElementCentroids(true);
 
         //Check that the indices of the coarse mesh elements are as expected
-        unsigned lower_left_element_index=0u;
+        unsigned lower_left_element_index=1u;
         ChastePoint<2> lower_left(0.25, 0.25);
         TS_ASSERT_EQUALS(coarse_mesh.GetContainingElementIndex(lower_left), lower_left_element_index);
 
-        unsigned upper_right_element_index=1u;
+        unsigned upper_right_element_index=0u;
         ChastePoint<2> upper_right(0.75, 0.75);
         TS_ASSERT_EQUALS(coarse_mesh.GetContainingElementIndex(upper_right), upper_right_element_index);
 

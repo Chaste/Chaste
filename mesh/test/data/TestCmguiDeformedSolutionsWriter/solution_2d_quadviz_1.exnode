@@ -1,4 +1,4 @@
-! Created by Chaste version 2.0.9534 (with uncommitted modifications) on Wed, 14 Jul 2010 18:47:43 +0000.  Chaste was built on Wed, 14 Jul 2010 18:47:34 +0000 by machine (uname) 'Linux userpc60.comlab.ox.ac.uk 2.6.24-28-generic #1 SMP Wed May 26 23:34:09 UTC 2010 x86_64' using settings: default, no Chaste libraries.
+! Created by Chaste version 3.0.16515 (with uncommitted modifications) on Tue, 04 Sep 2012 20:45:24 +0000.  Chaste was built on Thu, 09 Aug 2012 09:28:49 +0000 by machine (uname) 'Linux chaste-bob 2.6.24-27-server #1 SMP Fri Mar 12 01:23:09 UTC 2010 x86_64' using settings: _3, shared libraries.  Checked-out project versions: Eikonal=24:32M; QTpredict=12626; jmpf=15136M; papers=15773:16502.
 Group name: solution_2d_quadviz
  #Fields=1
  1) coordinates, coordinate, rectangular cartesian, #Components=2
@@ -20,32 +20,32 @@ Node:	13	0	6
 Node:	14	1	6	
 Node:	15	2	6	
 Node:	16	0.54	0.06	
-Node:	17	0.54	0.81	
+Node:	17	1.54	0.06	
 Node:	18	0.04	0.81	
-Node:	19	1.04	0.81	
-Node:	20	0.54	1.56	
-Node:	21	0.54	3.81	
-Node:	22	0.04	3.81	
-Node:	23	0.54	3.06	
-Node:	24	1.04	2.31	
-Node:	25	0.54	2.31	
-Node:	26	0.54	4.56	
-Node:	27	0.54	5.31	
-Node:	28	0.04	5.31	
-Node:	29	0.04	2.31	
-Node:	30	1.54	0.06	
-Node:	31	1.54	0.81	
-Node:	32	1.54	1.56	
-Node:	33	1.54	2.31	
-Node:	34	2.04	0.81	
-Node:	35	2.04	2.31	
-Node:	36	1.54	3.06	
-Node:	37	2.04	3.81	
-Node:	38	1.54	3.81	
-Node:	39	1.04	5.31	
-Node:	40	0.54	6.06	
-Node:	41	1.54	4.56	
+Node:	19	0.54	0.81	
+Node:	20	1.04	0.81	
+Node:	21	1.54	0.81	
+Node:	22	2.04	0.81	
+Node:	23	0.54	1.56	
+Node:	24	1.54	1.56	
+Node:	25	0.04	2.31	
+Node:	26	0.54	2.31	
+Node:	27	1.04	2.31	
+Node:	28	1.54	2.31	
+Node:	29	2.04	2.31	
+Node:	30	0.54	3.06	
+Node:	31	1.54	3.06	
+Node:	32	0.04	3.81	
+Node:	33	0.54	3.81	
+Node:	34	1.04	3.81	
+Node:	35	1.54	3.81	
+Node:	36	2.04	3.81	
+Node:	37	0.54	4.56	
+Node:	38	1.54	4.56	
+Node:	39	0.04	5.31	
+Node:	40	0.54	5.31	
+Node:	41	1.04	5.31	
 Node:	42	1.54	5.31	
 Node:	43	2.04	5.31	
-Node:	44	1.54	6.06	
-Node:	45	1.04	3.81	
+Node:	44	0.54	6.06	
+Node:	45	1.54	6.06	
