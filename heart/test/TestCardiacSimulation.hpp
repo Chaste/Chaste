@@ -96,6 +96,13 @@ public:
         CardiacSimulation simulation("heart/test/data/xml/monodomain1d_small.xml", true);
         TS_ASSERT( CompareFilesViaHdf5DataReader("heart/test/data/cardiac_simulations", "mono_1d_small", false,
                                                  "SaveMono1D", "SimulationResults", true, 1e-6));
+
+        /* If the above fails, and you are happy the new results are correct, uncomment the following line,
+         * run the test, and then do
+         cp /tmp/$USER/testoutput/SaveMono1D/SimulationResults.h5 heart/test/data/cardiac_simulations/mono_1d_small.h5
+         */
+        //assert(0);
+
         CardiacSimulation simulation2("heart/test/data/xml/monodomain1d_resume.xml", true);
     }
 
@@ -258,6 +265,11 @@ public:
         FileFinder file(foldername + "_checkpoints/0.2ms/" + foldername + "_0.2ms/archive.arch.0",
                         RelativeTo::ChasteTestOutput);
         TS_ASSERT(file.Exists());
+        /* If you want to update the .h5 results for this test for any reason, you need to stop the following test adding to them.
+         * So uncomment the assert(), run the test, and then do:
+         cp /tmp/chaste/testoutput/SaveBidomainShort/SimulationResults.h5 heart/test/data/cardiac_simulations/save_bidomain_short_results.h5
+         */
+        //assert(0);
     }
 
     // requires TestCardiacSimulationArchiveBidomain() to have been run
@@ -290,6 +302,11 @@ public:
         FileFinder file(foldername + "_checkpoints/0.2ms/" + foldername + "_0.2ms/archive.arch.0",
                         RelativeTo::ChasteTestOutput);
         TS_ASSERT(file.Exists());
+        /* If you want to update the .h5 results for this test for any reason, you need to stop the following test adding to them.
+         * So uncomment the assert(), run the test, and then do:
+         cp /tmp/chaste/testoutput/SaveMonodomainShort/SimulationResults.h5 heart/test/data/cardiac_simulations/save_monodomain_short_results.h5
+         */
+        //assert(0);
     }
 
     // requires TestCardiacSimulationArchiveMonodomain() to have been run
@@ -322,6 +339,12 @@ public:
                         RelativeTo::ChasteTestOutput);
         TS_ASSERT(file.Exists());
 
+        /* If you want to update the .h5 results for this test for any reason, you need to stop the following lines adding to them.
+         * So uncomment the assert(), run the test, and then do:
+         cp /tmp/chaste/testoutput/SaveMonodomainDynamic/SimulationResults.h5 heart/test/data/cardiac_simulations/save_monodomain_dynamic.h5
+         */
+        //assert(0);
+
         //resume the simulation
         {
             CardiacSimulation simulation("heart/test/data/xml/resume_monodomain_dynamic.xml");
@@ -330,6 +353,7 @@ public:
         // compare the files, using the CompareFilesViaHdf5DataReader() method
         TS_ASSERT( CompareFilesViaHdf5DataReader("heart/test/data/cardiac_simulations", "resume_monodomain_dynamic", false,
                    foldername, "SimulationResults", true));
+
 #endif // CHASTE_CAN_CHECKPOINT_DLLS
     }
 
