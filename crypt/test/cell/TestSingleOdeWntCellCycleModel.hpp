@@ -59,7 +59,7 @@ private:
     static const double mFirstRandomNumber = 3.11227;
     static const double mSecondRandomNumber = 1.65468;
     static const double mThirdRandomNumber = 2.60806;
-    static const double mFourthRandomNumber = 1.22037;
+    static const double mFourthRandomNumber = 2.64101;
     static const double mFifthRandomNumber = 1.28792;
 
 public:
