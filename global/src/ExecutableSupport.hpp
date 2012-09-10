@@ -93,12 +93,11 @@ public:
     static void WriteProvenanceInfoFile();
 
     /**
-     * Write information about library and compiler versions to the provenance_info.txt
-     * output file.
+     * Get information about library and compiler versions in XML-like format.
      *
-     * @param outFile the provenance_info.txt file.
+     * @param rInfo a string to populate with library info.
      */
-    static void WriteLibraryInfo( out_stream &outFile );
+    static void GetBuildInfo(std::string& rInfo);
 
     /**
      * Call InitializePetsc, ShowCopyright, then ShowParallelLaunching.

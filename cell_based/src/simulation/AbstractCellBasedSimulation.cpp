@@ -514,7 +514,9 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationSetup()
 
     // Output Chaste provenance information
     out_stream build_info_file = output_file_handler.OpenOutputFile("build.info");
-    ExecutableSupport::WriteLibraryInfo(build_info_file);
+    std::string build_info;
+    ExecutableSupport::GetBuildInfo(build_info);
+    *build_info_file << build_info;
     build_info_file->close();
 
     // Output simulation parameter and setup details

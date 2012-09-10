@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 #include <sys/utsname.h> // For uname
 #include <hdf5.h>
+#include <parmetis.h>
 
 #include <boost/foreach.hpp>
 typedef std::pair<std::string, std::string> StringPair;
@@ -179,74 +180,83 @@ void ExecutableSupport::WriteProvenanceInfoFile()
     provenance_msg << "from revision number " << ChasteBuildInfo::GetRevisionNumber() << " with build type " << ChasteBuildInfo::GetBuildInformation() << ".\n\n";
     *out_file << provenance_msg.str();
 
-    WriteLibraryInfo( out_file );
+    std::string output;
+    GetBuildInfo(output);
+    *out_file << output;
 
     out_file->close();
 }
 
-void ExecutableSupport::WriteLibraryInfo( out_stream &outFile )
+void ExecutableSupport::GetBuildInfo(std::string& rInfo)
 {
-    *outFile << "<ChasteBuildInfo>\n";
+    std::stringstream output;
+    output << "<ChasteBuildInfo>\n";
 
-    *outFile << "\t<ProvenanceInfo>\n";
-    *outFile << "\t\t<VersionString>"<< ChasteBuildInfo::GetVersionString() << "</VersionString> <!-- build specific -->\n";
-    *outFile << "\t\t<IsWorkingCopyModified>"<< ChasteBuildInfo::IsWorkingCopyModified() << "</IsWorkingCopyModified>\n";
-    *outFile << "\t\t<BuildInformation>"<< ChasteBuildInfo::GetBuildInformation() << "</BuildInformation>\n";
-    *outFile << "\t\t<BuildTime>"<< ChasteBuildInfo::GetBuildTime() << "</BuildTime>\n";
-    *outFile << "\t\t<CurrentTime>"<< ChasteBuildInfo::GetCurrentTime() << "</CurrentTime>\n";
-    *outFile << "\t\t<BuilderUnameInfo>"<< ChasteBuildInfo::GetBuilderUnameInfo() << "</BuilderUnameInfo>\n";
-    *outFile << "\t\t<Projects>\n";
+    output << "\t<ProvenanceInfo>\n";
+    output << "\t\t<VersionString>"<< ChasteBuildInfo::GetVersionString() << "</VersionString> <!-- build specific -->\n";
+    output << "\t\t<IsWorkingCopyModified>"<< ChasteBuildInfo::IsWorkingCopyModified() << "</IsWorkingCopyModified>\n";
+    output << "\t\t<BuildInformation>"<< ChasteBuildInfo::GetBuildInformation() << "</BuildInformation>\n";
+    output << "\t\t<BuildTime>"<< ChasteBuildInfo::GetBuildTime() << "</BuildTime>\n";
+    output << "\t\t<CurrentTime>"<< ChasteBuildInfo::GetCurrentTime() << "</CurrentTime>\n";
+    output << "\t\t<BuilderUnameInfo>"<< ChasteBuildInfo::GetBuilderUnameInfo() << "</BuilderUnameInfo>\n";
+    output << "\t\t<Projects>\n";
     BOOST_FOREACH(const StringPair& r_project_version, ChasteBuildInfo::rGetProjectVersions())
     {
 #define COVERAGE_IGNORE
         // No projects are checked out for continuous builds normally!
-        *outFile << "\t\t\t<Name>" << r_project_version.first << "</Name><Version>"
+        output<< "\t\t\t<Name>" << r_project_version.first << "</Name><Version>"
                  << r_project_version.second << "</Version>\n";
 #undef COVERAGE_IGNORE
     }
-    *outFile << "\t\t</Projects>\n";
-    *outFile << "\t</ProvenanceInfo>\n";
+    output << "\t\t</Projects>\n";
+    output << "\t</ProvenanceInfo>\n";
 
-    *outFile << "\t<Compiler>\n";
-    *outFile << "\t\t<NameAndVersion>" << ChasteBuildInfo::GetCompilerType() << ", version " << ChasteBuildInfo::GetCompilerVersion() << "</NameAndVersion>\n" ;
-    *outFile << "\t\t<Flags>" << ChasteBuildInfo::GetCompilerFlags() << "</Flags>\n" ;
-    *outFile << "\t</Compiler>\n";
+    output << "\t<Compiler>\n";
+    output << "\t\t<NameAndVersion>" << ChasteBuildInfo::GetCompilerType() << ", version " << ChasteBuildInfo::GetCompilerVersion() << "</NameAndVersion>\n" ;
+    output << "\t\t<Flags>" << ChasteBuildInfo::GetCompilerFlags() << "</Flags>\n" ;
+    output << "\t</Compiler>\n";
 
-    *outFile << "\t<Libraries>\n";
+    output << "\t<Libraries>\n";
 
-    *outFile << "\t\t<CompiledIn>\n";
-    *outFile << "\t\t\t<PETSc>" << PETSC_VERSION_MAJOR << "." << PETSC_VERSION_MINOR << "." << PETSC_VERSION_SUBMINOR << "</PETSc>\n";
-    *outFile << "\t\t\t<Boost>" << BOOST_VERSION  / 100000 << "." << BOOST_VERSION / 100 % 1000 << "." << BOOST_VERSION % 100 << "</Boost>\n";
-    *outFile << "\t\t\t<HDF5>" << H5_VERS_MAJOR <<  "." << H5_VERS_MINOR << "." << H5_VERS_RELEASE << "</HDF5>\n";
-    *outFile << "\t\t</CompiledIn>\n";
+    output << "\t\t<CompiledIn>\n";
+    output << "\t\t\t<PETSc>" << PETSC_VERSION_MAJOR << "." << PETSC_VERSION_MINOR << "." << PETSC_VERSION_SUBMINOR << "</PETSc>\n";
+    output << "\t\t\t<Boost>" << BOOST_VERSION  / 100000 << "." << BOOST_VERSION / 100 % 1000 << "." << BOOST_VERSION % 100 << "</Boost>\n";
+    output << "\t\t\t<HDF5>" << H5_VERS_MAJOR <<  "." << H5_VERS_MINOR << "." << H5_VERS_RELEASE << "</HDF5>\n";
+    output << "\t\t\t<Parmetis>" << PARMETIS_MAJOR_VERSION << "." << PARMETIS_MINOR_VERSION;
+#ifdef PARMETIS_SUBMINOR_VERSION // they only added this in v4.? !!
+    output << "." << PARMETIS_SUBMINOR_VERSION;
+#endif
+    output << "</Parmetis>" << std::endl;
+    output << "\t\t</CompiledIn>\n";
 
-    *outFile << "\t\t<Binaries>\n";
-    *outFile << "\t\t\t<XSD>" <<  ChasteBuildInfo::GetXsdVersion() << "</XSD>\n";
-    *outFile << "\t\t</Binaries>\n";
+    output << "\t\t<Binaries>\n";
+    output << "\t\t\t<XSD>" <<  ChasteBuildInfo::GetXsdVersion() << "</XSD>\n";
+    output << "\t\t</Binaries>\n";
 
-    *outFile << "\t\t<Optional>\n";
+    output << "\t\t<Optional>\n";
 #ifdef CHASTE_VTK
-    *outFile << "\t\t\t<VTK>" << VTK_MAJOR_VERSION << "." << VTK_MINOR_VERSION << "</VTK>\n";
+    output << "\t\t\t<VTK>" << VTK_MAJOR_VERSION << "." << VTK_MINOR_VERSION << "</VTK>\n";
 #else
-    *outFile << "\t\t\t<VTK>no</VTK>\n";
+    output << "\t\t\t<VTK>no</VTK>\n";
 #endif
 
 #ifdef CHASTE_CVODE
-    *outFile << "\t\t\t<SUNDIALS>" << SUNDIALS_PACKAGE_VERSION << "</SUNDIALS> <!-- includes Cvode of a different version number --> \n";
+    output << "\t\t\t<SUNDIALS>" << SUNDIALS_PACKAGE_VERSION << "</SUNDIALS> <!-- includes Cvode of a different version number --> \n";
 #else
-    *outFile << "\t\t\t<SUNDIALS>no</SUNDIALS>\n";
+    output << "\t\t\t<SUNDIALS>no</SUNDIALS>\n";
 #endif
 
 #ifdef CHASTE_ADAPTIVITY
-    *outFile << "\t\t\t<Adaptivity>yes</Adaptivity>\n";
+    output << "\t\t\t<Adaptivity>yes</Adaptivity>\n";
 #else
-    *outFile << "\t\t\t<Adaptivity>no</Adaptivity>\n";
+    output << "\t\t\t<Adaptivity>no</Adaptivity>\n";
 #endif
-    *outFile << "\t\t</Optional>\n";
+    output << "\t\t</Optional>\n";
 
-    *outFile << "\t</Libraries>\n";
+    output << "\t</Libraries>\n";
 
-    *outFile << "</ChasteBuildInfo>\n";
+    output << "</ChasteBuildInfo>" << std::endl;
+    rInfo = output.str();
 }
 
 void ExecutableSupport::StandardStartup(int* pArgc, char*** pArgv)

@@ -38,25 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
-#include <iostream>
-#include <boost/foreach.hpp>
-#include <hdf5.h>
-#include <parmetis.h>
-
-#include "Exception.hpp"
-#include "PetscTools.hpp"
-#include "PetscException.hpp"
-#include "Version.hpp"
-#include "ChasteSerialization.hpp"
-
-#ifdef CHASTE_VTK
-#define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
-#include <vtkVersion.h>
-#endif
-
-#ifdef CHASTE_CVODE
-#include <sundials/sundials_config.h>
-#endif
+#include "ExecutableSupport.hpp"
 
 /**
  * The ChasteBuildInfo class isn't really amenable to testing.
@@ -64,70 +46,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 class TestChasteBuildInfo : public CxxTest::TestSuite
 {
-    typedef std::pair<std::string, std::string> StringPair;
 public:
     void TestShowInfo()
     {
-        std::cout << "Information on Chaste build." << std::endl;
-        std::cout << "Chaste root directory: " << ChasteBuildInfo::GetRootDir() << std::endl;
-        std::cout << "Chaste version (multiple methods): " << ChasteBuildInfo::GetMajorReleaseNumber()
-                  << "." << ChasteBuildInfo::GetMinorReleaseNumber()
-                  << "." << ChasteBuildInfo::GetRevisionNumber() << std::endl;
-        std::cout << "Chaste version (single method): " << ChasteBuildInfo::GetVersionString() << std::endl;
-        if (ChasteBuildInfo::IsWorkingCopyModified())
-        {
-            std::cout << "  Built from a modified working copy." << std::endl;
-        }
-        std::cout << "Built on " << ChasteBuildInfo::GetBuildTime() << std::endl;
-        std::cout << "Current time: " << ChasteBuildInfo::GetCurrentTime() << std::endl;
-        std::cout << "Build machine: " << ChasteBuildInfo::GetBuilderUnameInfo() << std::endl;
-        std::cout << "Build information: " << ChasteBuildInfo::GetBuildInformation() << std::endl;
-        std::cout << "Provenance information: " << ChasteBuildInfo::GetProvenanceString() << std::endl;
-
-        std::cout << "Checked out projects:" << std::endl;
-        BOOST_FOREACH(const StringPair& r_project_version, ChasteBuildInfo::rGetProjectVersions())
-        {
-            std::cout << "\t" << r_project_version.first << ": " << r_project_version.second << std::endl;
-        }
-
-        // The following is stolen from the ExecutableSupport() file, to log this info in test results.
-        std::cout << std::endl << "Library versions:" << std::endl;
-
-        std::cout << "<CompiledIn>" << std::endl;
-        std::cout << "\t<PETSc>" << PETSC_VERSION_MAJOR << "." << PETSC_VERSION_MINOR << "." << PETSC_VERSION_SUBMINOR << "</PETSc>" << std::endl;
-        std::cout << "\t<Boost>" << BOOST_VERSION  / 100000 << "." << BOOST_VERSION / 100 % 1000 << "." << BOOST_VERSION % 100 << "</Boost>" << std::endl;
-        std::cout << "\t<HDF5>" << H5_VERS_MAJOR <<  "." << H5_VERS_MINOR << "." << H5_VERS_RELEASE << "</HDF5>" << std::endl;
-        std::cout << "\t<Parmetis>" << PARMETIS_MAJOR_VERSION << "." << PARMETIS_MINOR_VERSION;
-    #ifdef PARMETIS_SUBMINOR_VERSION // they only added this in v4.? !!
-        std::cout << "." << PARMETIS_SUBMINOR_VERSION;
-    #endif
-        std::cout << "</Parmetis>" << std::endl;
-        std::cout << "</CompiledIn>" << std::endl;
-
-        std::cout << "<Binaries>" << std::endl;
-        std::cout << "\t<XSD>" <<  ChasteBuildInfo::GetXsdVersion() << "</XSD>" << std::endl;
-        std::cout << "</Binaries>" << std::endl;
-
-        std::cout << "<Optional>" << std::endl;
-    #ifdef CHASTE_VTK
-        std::cout << "\t<VTK>" << VTK_MAJOR_VERSION << "." << VTK_MINOR_VERSION << "</VTK>" << std::endl;
-    #else
-        std::cout << "\t<VTK>no</VTK>" << std::endl;
-    #endif
-
-    #ifdef CHASTE_CVODE
-        std::cout << "\t<SUNDIALS>" << SUNDIALS_PACKAGE_VERSION << "</SUNDIALS> <!-- includes Cvode of a different version number! --> " << std::endl;
-    #else
-        std::cout << "\t<SUNDIALS>no</SUNDIALS>" << std::endl;
-    #endif
-
-    #ifdef CHASTE_ADAPTIVITY
-        std::cout << "\t<Adaptivity>yes</Adaptivity>" << std::endl;
-    #else
-        std::cout << "\t<Adaptivity>no</Adaptivity>" << std::endl;
-    #endif
-        std::cout << "</Optional>" << std::endl << std::flush;
-
+        std::string info;
+        ExecutableSupport::GetBuildInfo(info);
+        std::cout << info << std::flush;
     }
 };
 
