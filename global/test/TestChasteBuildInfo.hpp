@@ -97,7 +97,11 @@ public:
         std::cout << "\t<PETSc>" << PETSC_VERSION_MAJOR << "." << PETSC_VERSION_MINOR << "." << PETSC_VERSION_SUBMINOR << "</PETSc>" << std::endl;
         std::cout << "\t<Boost>" << BOOST_VERSION  / 100000 << "." << BOOST_VERSION / 100 % 1000 << "." << BOOST_VERSION % 100 << "</Boost>" << std::endl;
         std::cout << "\t<HDF5>" << H5_VERS_MAJOR <<  "." << H5_VERS_MINOR << "." << H5_VERS_RELEASE << "</HDF5>" << std::endl;
-        std::cout << "\t<Parmetis>" << PARMETIS_MAJOR_VERSION << "." << PARMETIS_MINOR_VERSION << "." << PARMETIS_SUBMINOR_VERSION << "</Parmetis>" << std::endl;
+        std::cout << "\t<Parmetis>" << PARMETIS_MAJOR_VERSION << "." << PARMETIS_MINOR_VERSION;
+    #ifdef PARMETIS_SUBMINOR_VERSION // they only added this in v4.? !!
+        std::cout << "." << PARMETIS_SUBMINOR_VERSION;
+    #endif
+        std::cout << "</Parmetis>" << std::endl;
         std::cout << "</CompiledIn>" << std::endl;
 
         std::cout << "<Binaries>" << std::endl;
