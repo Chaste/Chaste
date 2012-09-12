@@ -485,10 +485,12 @@ public:
             TS_ASSERT_EQUALS(p_node->GetIndex(), index);
 
             c_vector<double, 2> node_location = p_node->rGetLocation();
-            double expected_x = (double)(index%4);
-            double expected_y = (double)(index>3) + (double)(index>7) + (double)(index>11);
-            ///\todo Breaks Intel 10 TS_ASSERT_DELTA(node_location[0], expected_x, 1e-3);
-            TS_ASSERT_DELTA(node_location[1], expected_y, 1e-3);
+            c_vector<double, 2> expected;
+            expected(0) = (double)(index%4);
+            expected(1) = (double)(index>3) + (double)(index>7) + (double)(index>11);
+            
+            double drift = norm_2(node_location-expected);
+            TS_ASSERT_LESS_THAN(drift, 1e-6);
         }
 
         // Test GetElement()
@@ -534,13 +536,14 @@ public:
 
         for (unsigned i=0; i<4; i++)
         {
-            c_vector<double, 2> cell_1_location = cell_population.GetLocationOfCellCentre(*cell_iter);
+            c_vector<double, 2> cell_location = cell_population.GetLocationOfCellCentre(*cell_iter);
 
-            double x = 0.5 + 2*(i%2 != 0);
-            double y = 0.5 + 2*(i > 1);
-
-            ///\todo Breaks Intel 10 TS_ASSERT_DELTA(cell_1_location[0], x, 1e-6);
-            TS_ASSERT_DELTA(cell_1_location[1], y, 1e-6);
+            c_vector<double, 2> expected;
+            expected(0) = 0.5 + 2*(i%2 != 0);
+            expected(1) = 0.5 + 2*(i > 1);
+            
+            double drift = norm_2(cell_location-expected);
+            TS_ASSERT_LESS_THAN(drift, 1e-6);
 
             ++cell_iter;
         }
