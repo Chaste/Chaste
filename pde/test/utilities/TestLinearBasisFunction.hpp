@@ -59,7 +59,7 @@ public:
         TS_ASSERT_DELTA(basis_function_vector[0], 1.0, 1e-12);
 
         // Check link with 0d quad rule works ok
-        GaussianQuadratureRule<0>  quad_rule(1);
+        GaussianQuadratureRule<0>  quad_rule(1,0);
         const ChastePoint<0>& quad_point = quad_rule.rGetQuadPoint(0);
 
         c_vector<double, 1> basis_function_vector2;

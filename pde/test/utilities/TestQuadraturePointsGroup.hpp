@@ -51,7 +51,7 @@ public:
         TetrahedralMesh<1,1> mesh;
         mesh.ConstructFromMeshReader(reader);
 
-        GaussianQuadratureRule<1> quad_rule(2);
+        GaussianQuadratureRule<1> quad_rule(2, 3);
 
         QuadraturePointsGroup<1> group(mesh,quad_rule);
 
@@ -84,7 +84,7 @@ public:
         TetrahedralMesh<2,2> mesh;
         mesh.ConstructFromMeshReader(reader);
 
-        GaussianQuadratureRule<2> quad_rule(2);
+        GaussianQuadratureRule<2> quad_rule(2,2);
 
         QuadraturePointsGroup<2> group(mesh,quad_rule);
 

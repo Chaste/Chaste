@@ -38,7 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "SimpleLinearEllipticSolver.hpp"
 #include "TetrahedralMesh.hpp"
-#include "GaussianQuadratureRule.hpp"
 
 /**
  * A purpose-made elliptic solver that interpolates the source terms from node onto

@@ -137,7 +137,7 @@ public:
             EXCEPTION("Continuum mechanics solvers require a quadratic mesh");
         }
 
-        mpQuadRule = new GaussianQuadratureRule<DIM-1>(2); // why was this 2 not 3? #2232
+        mpQuadRule = new GaussianQuadratureRule<DIM-1>(2,2); // #2232 Is a second order Gauss quadrature rule appropriate here?
     }
 
 

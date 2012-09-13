@@ -36,7 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellBasedPdeSolver.hpp"
 #include "TetrahedralMesh.hpp"
 #include "SimpleLinearEllipticSolver.hpp"
-#include "GaussianQuadratureRule.hpp"
 
 template<unsigned DIM>
 CellBasedPdeSolver<DIM>::CellBasedPdeSolver(TetrahedralMesh<DIM,DIM>* pMesh,

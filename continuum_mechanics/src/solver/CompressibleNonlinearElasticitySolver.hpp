@@ -50,7 +50,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractNonlinearElasticitySolver.hpp"
 #include "AbstractCompressibleMaterialLaw.hpp"
 #include "QuadraticMesh.hpp"
-#include "GaussianQuadratureRule.hpp"
 
 /**
  * Finite elasticity solver. Solves static *compressible* nonlinear elasticity

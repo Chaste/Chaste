@@ -38,7 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 #include "QuadraticBasisFunction.hpp"
-#include "GaussianQuadratureRule.hpp"
 #include "BasisFunctionsCheckers.hpp"
 #include "Element.hpp"
 #include <vector>

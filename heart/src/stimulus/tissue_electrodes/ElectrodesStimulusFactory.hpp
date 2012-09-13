@@ -128,7 +128,8 @@ protected:
      * The loops over elements and gauss points mimicks the ones in AssembleOnElement.
      * Interpolation is done for the value of the magnitude of the electrode.
      *
-     * NOTE that this method assumes the use of a GaussianQuadratureRule with 2 Gauss points (the default value of Chaste FE assemblers).
+     * NOTE that this method assumes the use of a 2nd order Gauss quadrature rule (the default value of Chaste FE assemblers).
+     * ///\todo #2232 2nd order is currently the default Chaste FE assembler Gauss quadrature order but may change
      *
      * @param pRegion  the electrode
      * @param stimulusMagnitude the stimulus magnitude

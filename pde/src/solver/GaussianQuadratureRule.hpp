@@ -69,8 +69,9 @@ public:
      * parameters.
      *
      * @param numPointsInEachDimension  number of Gauss points in each dimension
+     * @param quadratureOrder The minimum polynomial order that the rule can integrate exactly
      */
-    GaussianQuadratureRule(unsigned numPointsInEachDimension);
+    GaussianQuadratureRule(unsigned numPointsInEachDimension, unsigned quadratureOrder);
 
     /**
      * Get a quadrature point.

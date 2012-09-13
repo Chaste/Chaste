@@ -398,7 +398,8 @@ public:
          * fibre file, which we name similarly to the above but change the extension. */
         out_stream p_file2 = handler.OpenOutputFile("5by5by5_fibres.orthoquad");
 
-        GaussianQuadratureRule<3> quad_rule(3); // the second 3 is is the number of quad points in each direction
+        ///\todo Check if a third order rule is appropriate or whether a lower order rule could be used.
+        GaussianQuadratureRule<3> quad_rule(3,3); // the second 3 is is the number of quad points in each direction, the third 3 is the order of the rule
         QuadraturePointsGroup<3> quad_points(mechanics_mesh, quad_rule);
 
         *p_file2 << quad_points.Size() << "\n";

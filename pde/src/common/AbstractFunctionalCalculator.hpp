@@ -119,7 +119,7 @@ double AbstractFunctionalCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Calcul
 {
     double result_on_element = 0;
 
-    GaussianQuadratureRule<ELEMENT_DIM> quad_rule(2);
+    GaussianQuadratureRule<ELEMENT_DIM> quad_rule(2,1); ///\todo #2232 Check that a 1st order quadrature rule is appropriate here
 
     /// NOTE: This assumes that the Jacobian is constant on an element, ie
     /// no curvilinear bases were used for position

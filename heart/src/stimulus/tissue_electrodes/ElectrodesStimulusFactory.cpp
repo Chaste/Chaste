@@ -184,8 +184,8 @@ boost::shared_ptr<AbstractStimulusFunction> ElectrodesStimulusFactory<DIM>::Crea
 template<unsigned DIM>
 double ElectrodesStimulusFactory<DIM>::ComputeElectrodeTotalFlux(AbstractChasteRegion<DIM>* pRegion, double stimulusMagnitude)
 {
-        //assume 2 gauss points
-        GaussianQuadratureRule<DIM>* pQuadRule = new GaussianQuadratureRule<DIM>(2u);
+        //assume 2nd order
+        GaussianQuadratureRule<DIM>* pQuadRule = new GaussianQuadratureRule<DIM>(2u,2u);
 
         //the basis functions
         c_vector<double, DIM+1> phi;

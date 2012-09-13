@@ -39,7 +39,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DistributedTetrahedralMesh.hpp"
 #include "IsNan.hpp"
 #include "HeartConfig.hpp"
-#include "GaussianQuadratureRule.hpp"
 
 template<unsigned DIM>
 ZeroNetChargeElectrodes<DIM>::ZeroNetChargeElectrodes(std::vector<std::pair<AbstractChasteRegion<DIM>*, AbstractChasteRegion<DIM>*> >& rElectrodePairs,

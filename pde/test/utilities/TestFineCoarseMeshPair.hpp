@@ -62,7 +62,7 @@ public:
         FineCoarseMeshPair<2> mesh_pair(fine_mesh,coarse_mesh);
 
         mesh_pair.SetUpBoxesOnFineMesh();
-        GaussianQuadratureRule<2> quad_rule(3);
+        GaussianQuadratureRule<2> quad_rule(3,4);
         mesh_pair.ComputeFineElementsAndWeightsForCoarseQuadPoints(quad_rule, true);
 
         //test get methods
@@ -133,7 +133,7 @@ public:
             }
         }
 
-        GaussianQuadratureRule<3> quad_rule(3);
+        GaussianQuadratureRule<3> quad_rule(3,3);
         mesh_pair.ComputeFineElementsAndWeightsForCoarseQuadPoints(quad_rule, true);
 
         // All coarse quadrature points should have been found in the fine mesh
@@ -188,7 +188,7 @@ public:
 
         //TS_ASSERT_EQUALS(mesh_pair.mIdenticalMeshes, false);
 
-        GaussianQuadratureRule<3> quad_rule(3);
+        GaussianQuadratureRule<3> quad_rule(3,3);
 
         // Need to call SetUpBoxesOnFineMesh first
         TS_ASSERT_THROWS_CONTAINS(mesh_pair.ComputeFineElementsAndWeightsForCoarseQuadPoints(quad_rule, true), "Call");
@@ -247,7 +247,7 @@ public:
 //        FineCoarseMeshPair<1> mesh_pair(fine_mesh,coarse_mesh);
 //        TS_ASSERT_EQUALS(mesh_pair.mIdenticalMeshes, true);
 //
-//        GaussianQuadratureRule<1> quad_rule(1);
+//        GaussianQuadratureRule<1> quad_rule(1,0);
 //        mesh_pair.SetUpBoxesOnFineMesh(0.3);
 //
 //        // Covers the mIdenticalMeshes=true part of this method. Would throw exception if can't find
@@ -311,7 +311,7 @@ public:
         coarse_mesh.Scale(1.03, 1.0, 1.0);
 
         FineCoarseMeshPair<3> mesh_pair(fine_mesh,coarse_mesh);
-        GaussianQuadratureRule<3> quad_rule(3);
+        GaussianQuadratureRule<3> quad_rule(3,3);
 
         // Call SetUpBoxesOnFineMesh() without providing a width
         mesh_pair.SetUpBoxesOnFineMesh();
@@ -374,7 +374,7 @@ public:
         fine_mesh.Rotate(rotation_mat);
         coarse_mesh.Rotate(rotation_mat);
 
-        GaussianQuadratureRule<2> quad_rule(3);
+        GaussianQuadratureRule<2> quad_rule(3,4);
 
         FineCoarseMeshPair<2> mesh_pair(fine_mesh,coarse_mesh);
         mesh_pair.SetUpBoxesOnFineMesh();

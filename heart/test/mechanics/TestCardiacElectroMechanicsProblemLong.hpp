@@ -216,7 +216,7 @@ public:
 
 
 /////// Use the following to set up the fibres file
-////        GaussianQuadratureRule<3> quad_rule(3);
+////        GaussianQuadratureRule<3> quad_rule(3,3);
 ////        QuadraturePointsGroup<3> quad_points(mechanics_mesh, quad_rule);
 ////        std::cout << quad_points.Size() << "\n";
 ////        for(unsigned i=0; i<quad_points.Size(); i++)

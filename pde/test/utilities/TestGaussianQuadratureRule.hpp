@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "GaussianQuadratureRule.hpp"
 #include "Node.hpp"
 #include "Element.hpp"
+#include "Debug.hpp"
 
 class TestGaussianQuadratureRule : public CxxTest::TestSuite
 {
@@ -51,33 +52,33 @@ public:
     void TestTheGaussianQuadratureRule()
     {
         // 0d
-        GaussianQuadratureRule<0> quad_rule1(1);
+        GaussianQuadratureRule<0> quad_rule1(1, 0);
         TS_ASSERT_EQUALS(quad_rule1.GetNumQuadPoints(),1U);
 
-        GaussianQuadratureRule<0> quad_rule2(2);
+        GaussianQuadratureRule<0> quad_rule2(2, 1);
         TS_ASSERT_EQUALS(quad_rule2.GetNumQuadPoints(),1U);
 
         TS_ASSERT_DELTA(quad_rule1.GetWeight(0),1,1e-12);
 
         // 1d
-        for (int number_of_points=1; number_of_points<4; number_of_points++)
+        for (unsigned order=0; order<3; order++)
         {
-            GaussianQuadratureRule<1> quad_rule(number_of_points);
+            GaussianQuadratureRule<1> quad_rule(order + 1, order);
 
             for (unsigned i=0; i<quad_rule.GetNumQuadPoints(); i++)
             {
                 TS_ASSERT_LESS_THAN_EQUALS( quad_rule.GetWeight(i),1);
-                TS_ASSERT_LESS_THAN_EQUALS(-quad_rule.GetWeight(i),0);
+                TS_ASSERT_LESS_THAN_EQUALS(0, quad_rule.GetWeight(i));
 
-                TS_ASSERT_LESS_THAN( quad_rule.rGetQuadPoint(i)[0],1); // x<1
-                TS_ASSERT_LESS_THAN(-quad_rule.rGetQuadPoint(i)[0],0); // x>0
+                TS_ASSERT_LESS_THAN(quad_rule.rGetQuadPoint(i)[0], 1); // x<1
+                TS_ASSERT_LESS_THAN(0, quad_rule.rGetQuadPoint(i)[0]); // x>0
             }
         }
 
         // 2d
-        for (int number_of_points=1; number_of_points<4; number_of_points++)
+        for (unsigned order=0; order<3; order++)
         {
-            GaussianQuadratureRule<2> quad_rule(number_of_points);
+            GaussianQuadratureRule<2> quad_rule(UNSIGNED_UNSET, order);
 
             for (unsigned i=0; i<quad_rule.GetNumQuadPoints(); i++)
             {
@@ -92,9 +93,9 @@ public:
         }
 
         // 3d
-        for (int number_of_points=1; number_of_points<5; number_of_points++)
+        for (unsigned order=0; order<4; order++)
         {
-            GaussianQuadratureRule<3> quad_rule(number_of_points);
+            GaussianQuadratureRule<3> quad_rule(UNSIGNED_UNSET, order);
 
             for (unsigned i=0; i<quad_rule.GetNumQuadPoints(); i++)
             {
@@ -111,14 +112,14 @@ public:
         }
 
         // Exceptions (unsupported cases)
-        TS_ASSERT_THROWS_THIS(GaussianQuadratureRule<1> quad_rule(4),
-                "Number of gauss points per dimension not supported.");
-        TS_ASSERT_THROWS_THIS(GaussianQuadratureRule<2> quad_rule(4),
-                "Number of gauss points per dimension not supported.");
-        TS_ASSERT_THROWS_THIS(GaussianQuadratureRule<3> quad_rule(5),
-                "Number of gauss points per dimension not supported.");
-        TS_ASSERT_THROWS_THIS(GaussianQuadratureRule<4> quad_rule(1),
-                "Gauss points not available for this dimension.");
+        TS_ASSERT_THROWS_THIS(GaussianQuadratureRule<1> quad_rule(4, 6),
+        		"Gauss quadrature order not supported.");
+        TS_ASSERT_THROWS_THIS(GaussianQuadratureRule<2> quad_rule(4, 5),
+        		"Gauss quadrature order not supported.");
+        TS_ASSERT_THROWS_THIS(GaussianQuadratureRule<3> quad_rule(5, 4),
+        		"Gauss quadrature order not supported.");
+        TS_ASSERT_THROWS_THIS(GaussianQuadratureRule<4> quad_rule(1, UNSIGNED_UNSET),
+        		"Gauss quadrature rule not available for this dimension.");
     }
 
     /**
@@ -127,11 +128,12 @@ public:
      */
     void TestGaussianQuadratureRuleIntegralOneD()
     {
-        for (int num_quad_points=1; num_quad_points<4; num_quad_points++)
+        for (unsigned order=0; order<6; order++)
         {
-            GaussianQuadratureRule<1> quad_rule(num_quad_points);
+            GaussianQuadratureRule<1> quad_rule(order + 1, order);
 
-            for (int poly_degree=0; poly_degree<2*num_quad_points; poly_degree++)
+            //Test that the rule can be used to integrate the polynomials 0, x, x^2, x^3 ... on the interval [1,3]
+            for (unsigned poly_degree=0; poly_degree<=order; poly_degree++)
             {
                 std::vector<Node<1>*> nodes2;
                 nodes2.push_back(new Node<1>(0, false, 1.0));
@@ -159,7 +161,11 @@ public:
                                *quad_rule.GetWeight(quad_index);
                 }
 
-                TS_ASSERT_DELTA(integral, 1.0/(poly_degree+1.0)*(pow(3,poly_degree+1)-1), 1e-7);
+                //The analytic solution is
+                //
+                // \int_0^3 x^p dx = [(1/(p+1))*x^(p+1)]_1^3
+                //
+                TS_ASSERT_DELTA(integral, 1.0/(poly_degree+1.0)*(pow(3,poly_degree+1)-1), 1e-14);
 
                 delete nodes2[0];
                 delete nodes2[1];
@@ -182,16 +188,16 @@ public:
                                   {1.0/20, 1.0/120, 0,      0, 0},
                                   {1.0/30, 0,       0,      0, 0} };
 
-        for (int num_quad_points=1; num_quad_points<4; num_quad_points++)
+        for (unsigned order=0; order<4; order++)
         {
-            GaussianQuadratureRule<2> quad_rule(num_quad_points);
+            GaussianQuadratureRule<2> quad_rule(UNSIGNED_UNSET, order);
 
-            for (int poly_degree_x=0; poly_degree_x<2*num_quad_points-1;
+            for (unsigned poly_degree_x=0; poly_degree_x<=order;
                  poly_degree_x++)
             {
 
-                for (int poly_degree_y=0;
-                     poly_degree_y<2*num_quad_points-1-poly_degree_x;
+                for (unsigned poly_degree_y=0;
+                     poly_degree_y<=order-poly_degree_x;
                      poly_degree_y++)
                 {
                     double integral = 0.0;
@@ -209,7 +215,7 @@ public:
 
                     TS_ASSERT_DELTA(integral,
                                     expected[poly_degree_x][poly_degree_y],
-                                    1e-7);
+                                    1e-11);
                 }
             }
         }
@@ -265,21 +271,22 @@ public:
             };
 
         // Test 2 and 3 quadrature points per dimension in 3D
-        for (int num_quad_points=2; num_quad_points<4; num_quad_points++)
+        for (unsigned order=0; order<4; order++)
         {
-            GaussianQuadratureRule<3> quad_rule(num_quad_points);
+            GaussianQuadratureRule<3> quad_rule(UNSIGNED_UNSET, order);
 
-            for (int poly_degree_x=0; poly_degree_x<2*num_quad_points-1;
+            for (unsigned poly_degree_x=0;
+                 poly_degree_x<=order;
                  poly_degree_x++)
             {
 
-                for (int poly_degree_y=0;
-                     poly_degree_y<2*num_quad_points-1/*-poly_degree_x*/;
+                for (unsigned poly_degree_y=0;
+                     poly_degree_y<=order-poly_degree_x;
                      poly_degree_y++)
                 {
 
-                    for (int poly_degree_z=0;
-                         poly_degree_z<2*num_quad_points-1/*-poly_degree_y*/;
+                    for (unsigned poly_degree_z=0;
+                         poly_degree_z<=order-poly_degree_x-poly_degree_y;
                          poly_degree_z++)
                     {
                         double integral = 0.0;
@@ -291,13 +298,13 @@ public:
                             const ChastePoint<3>& quad_point = quad_rule.rGetQuadPoint(quad_index);
 
                             integral += pow(quad_point[0], poly_degree_x)
-                                       * pow(quad_point[1], poly_degree_y)
-                                       * pow(quad_point[2], poly_degree_z)
-                                        *quad_rule.GetWeight(quad_index);
+                                        * pow(quad_point[1], poly_degree_y)
+                                        * pow(quad_point[2], poly_degree_z)
+                                        * quad_rule.GetWeight(quad_index);
                         }
 
                         TS_ASSERT_DELTA(integral, expected[poly_degree_x][poly_degree_y][poly_degree_z],
-                                        0.01);
+                                        1e-11);
                     }
                 }
             }
