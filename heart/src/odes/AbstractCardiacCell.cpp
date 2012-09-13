@@ -170,7 +170,8 @@ void AbstractCardiacCell::CheckForArchiveFix()
 {
     if (dynamic_cast<CellLuoRudy1991FromCellML*>(this) || dynamic_cast<CellLuoRudy1991FromCellMLBackwardEuler*>(this))
     {
-        NEVER_REACHED; // If you do reach this, then you can try un-commenting the below, but you would be better re-generating your archive with a new version of Chaste.
+    	// If you do reach this, then you can try un-commenting the below, but you would be better re-generating your archive with a new version of Chaste.
+        NEVER_REACHED;
 //        // The LR91 model saved in previous Chaste versions had a different ordering of state variables...
 //        // Old is h, j, m, CaI, V, d, f, x
 //        // New is V, m, h, j, d, f, X, [Ca]

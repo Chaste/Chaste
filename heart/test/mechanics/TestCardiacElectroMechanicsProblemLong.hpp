@@ -113,16 +113,15 @@ public:
                                                   "TestCardiacEmVaryingFibres");
 
 
-        // fibres going from (1,0) at X=0 to (1,1)-direction at X=1
-        /* the fibres file was created with the code (inside a class that owns a mesh)
-        for(unsigned elem_index=0; elem_index<this->mpQuadMesh->GetNumElements(); elem_index++)
-        {
-            double X = this->mpQuadMesh->GetElement(elem_index)->CalculateCentroid()[0];
-            double theta = M_PI*X/4;
-            std::cout << cos(theta) << " " << sin(theta) << " " << -sin(theta) << " " << cos(theta) << "\n" << std::flush;
-        }
-        assert(0);
-        */
+//        // fibres going from (1,0) at X=0 to (1,1)-direction at X=1
+//        // the fibres file was created with the code (inside a class that owns a mesh)
+//        for(unsigned elem_index=0; elem_index<mechanics_mesh.GetNumElements(); elem_index++)
+//        {
+//            double X = mechanics_mesh.GetElement(elem_index)->CalculateCentroid()[0];
+//            double theta = M_PI*X/4;
+//            std::cout << cos(theta) << " " << sin(theta) << " " << -sin(theta) << " " << cos(theta) << "\n" << std::flush;
+//        }
+//        assert(0);
 
         // problem.SetNoElectricsOutput();
         problem.Solve();
@@ -132,7 +131,7 @@ public:
         // visualised, looks good - contracts in X-direction near the fixed surface,
         // but on the other side the fibres are in the (1,1) direction, so contraction
         // pulls the tissue downward a bit
-        TS_ASSERT_DELTA(r_deformed_position[5](0), 0.9019, 2e-3);
+        TS_ASSERT_DELTA(r_deformed_position[5](0), 0.8988, 2e-3); ///\todo  #2224 Verify screenshot in ticket
         //IntelProduction differs by about 1.6e-3...
 
         MechanicsEventHandler::Headings();

@@ -49,15 +49,17 @@ Cylindrical2dNodesOnlyMesh::~Cylindrical2dNodesOnlyMesh()
 
 void Cylindrical2dNodesOnlyMesh::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*2> domainSize)
 {
-    this->mpBoxCollection = new BoxCollection<2>(cutOffLength, domainSize, true); // Only difference is that this "true" makes the boxes periodic.
-    this->mpBoxCollection->SetupLocalBoxesHalfOnly();
-
-    // Put the nodes in the boxes
-    for (unsigned i=0; i< this->GetNumNodes(); i++)
-    {
-        unsigned box_index = this->mpBoxCollection->CalculateContainingBox(this->GetNode(i));
-        this->mpBoxCollection->rGetBox(box_index).AddNode(this->GetNode(i));
-    }
+	///\todo #2229 #2230 This method is never called.  Is it calling the method in the base class in error?
+	NEVER_REACHED;
+//    this->mpBoxCollection = new BoxCollection<2>(cutOffLength, domainSize, true); // Only difference is that this "true" makes the boxes periodic.
+//    this->mpBoxCollection->SetupLocalBoxesHalfOnly();
+//
+//    // Put the nodes in the boxes
+//    for (unsigned i=0; i< this->GetNumNodes(); i++)
+//    {
+//        unsigned box_index = this->mpBoxCollection->CalculateContainingBox(this->GetNode(i));
+//        this->mpBoxCollection->rGetBox(box_index).AddNode(this->GetNode(i));
+//    }
 }
 
 double Cylindrical2dNodesOnlyMesh::GetWidth(const unsigned& rDimension) const
