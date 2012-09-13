@@ -170,22 +170,23 @@ void AbstractCardiacCell::CheckForArchiveFix()
 {
     if (dynamic_cast<CellLuoRudy1991FromCellML*>(this) || dynamic_cast<CellLuoRudy1991FromCellMLBackwardEuler*>(this))
     {
-        // The LR91 model saved in previous Chaste versions had a different ordering of state variables...
-        // Old is h, j, m, CaI, V, d, f, x
-        // New is V, m, h, j, d, f, X, [Ca]
-        assert(GetNumberOfStateVariables() == 8);
-        unsigned var_index_map[8] = {2, 3, 1, 7, 0, 4, 5, 6};
-        std::vector<double> old_state(this->mStateVariables);
-        for (unsigned i=0; i<8; i++)
-        {
-            this->mStateVariables[var_index_map[i]] = old_state[i];
-        }
-        // It also didn't use to have parameters...
-        this->mParameters.resize(this->rGetParameterNames().size());
-        assert(this->mParameters.size() == 3u);
-        this->mParameters[0] = 0.09;
-        this->mParameters[1] = 23.0;
-        this->mParameters[2] = 0.282;
+        NEVER_REACHED; // If you do reach this, then you can try un-commenting the below, but you would be better re-generating your archive with a new version of Chaste.
+//        // The LR91 model saved in previous Chaste versions had a different ordering of state variables...
+//        // Old is h, j, m, CaI, V, d, f, x
+//        // New is V, m, h, j, d, f, X, [Ca]
+//        assert(GetNumberOfStateVariables() == 8);
+//        unsigned var_index_map[8] = {2, 3, 1, 7, 0, 4, 5, 6};
+//        std::vector<double> old_state(this->mStateVariables);
+//        for (unsigned i=0; i<8; i++)
+//        {
+//            this->mStateVariables[var_index_map[i]] = old_state[i];
+//        }
+//        // It also didn't used to have parameters...
+//        this->mParameters.resize(this->rGetParameterNames().size());
+//        assert(this->mParameters.size() == 3u);
+//        this->mParameters[0] = 0.09;
+//        this->mParameters[1] = 23.0;
+//        this->mParameters[2] = 0.282;
     }
 }
 

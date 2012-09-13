@@ -120,7 +120,13 @@ private:
 
     /**
      * The Luo-Rudy 1991 model saved in previous Chaste versions had a different ordering of state variables.
-     * If we're loading that model, we'll need to permute the state vector.
+     *
+     * It also didn't save mParameters.
+     *
+     * Gary: Any changes to other cell models won't work anyway, and as the comment above says,
+     * these cells won't work in tissue. So I think we should retire this conversion with a NEVER_REACHED.
+     *
+     * If we're loading that model, we could permute the state vector.
      * This can't (easily) be done in the LR91 code itself, since that is auto-generated!
      */
     void CheckForArchiveFix();
