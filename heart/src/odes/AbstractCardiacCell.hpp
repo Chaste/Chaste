@@ -124,7 +124,8 @@ private:
      * It also didn't save mParameters.
      *
      * Gary: Any changes to other cell models won't work anyway, and as the comment above says,
-     * these cells won't work in tissue. So I think we should retire this conversion with a NEVER_REACHED.
+     * these cells won't work in tissue. We also don't seem to have been checking for optimised cell models.
+     * So I think we should retire this conversion with a NEVER_REACHED.
      *
      * If we're loading that model, we could permute the state vector.
      * This can't (easily) be done in the LR91 code itself, since that is auto-generated!
