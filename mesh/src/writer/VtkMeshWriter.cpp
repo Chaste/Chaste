@@ -68,8 +68,6 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::MakeVtkMesh()
 {
     assert(SPACE_DIM==3 || SPACE_DIM == 2);
-    assert(SPACE_DIM==ELEMENT_DIM);
-
 
     //Construct nodes aka as Points
     vtkPoints* p_pts = vtkPoints::New(VTK_DOUBLE);
@@ -110,6 +108,10 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::MakeVtkMesh()
         else if (SPACE_DIM == 2 && current_element.size() == 6)
         {
             p_cell = vtkQuadraticTriangle::New();
+        }
+        else if(ELEMENT_DIM == 1)
+        {
+            p_cell = vtkLine::New();
         }
 
         //Set the linear nodes
@@ -521,7 +523,6 @@ void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
     {
         //Make the local mesh into a VtkMesh
         assert(SPACE_DIM==3 || SPACE_DIM == 2);
-        assert(SPACE_DIM==ELEMENT_DIM);
         vtkPoints* p_pts = vtkPoints::New(VTK_DOUBLE);
         p_pts->GetData()->SetName("Vertex positions");
 

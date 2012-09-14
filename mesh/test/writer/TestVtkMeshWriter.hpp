@@ -633,6 +633,31 @@ public:
         std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
 #endif //CHASTE_VTK
     }
+
+    //Test that the vtk mesh writer can output a 1D mesh embedded in 3D space
+    void TestVtkMeshWriter1Din3D() throw(Exception)
+    {
+#ifdef CHASTE_VTK
+        TrianglesMeshReader<1,3> reader("mesh/test/data/branched_1d_in_3d_mesh");
+        TetrahedralMesh<1,3> mesh;
+        mesh.ConstructFromMeshReader(reader);
+
+        VtkMeshWriter<1,3> writer("TestVtkMeshWriter", "branched_1d_in_3d_mesh", false);
+
+        TS_ASSERT_THROWS_NOTHING(writer.WriteFilesUsingMesh(mesh));
+
+        {
+            // Check that the reader can see it
+            VtkMeshReader<1,3> vtk_reader(OutputFileHandler::GetChasteTestOutputDirectory() + "TestVtkMeshWriter/branched_1d_in_3d_mesh.vtu");
+            TS_ASSERT_EQUALS(vtk_reader.GetNumNodes(), mesh.GetNumNodes());
+            TS_ASSERT_EQUALS(vtk_reader.GetNumElements(), mesh.GetNumElements());
+        }
+
+#else
+        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
+#endif //CHASTE_VTK
+    }
 };
 
 #endif //_TESTVTKMESHWRITER_HPP_
