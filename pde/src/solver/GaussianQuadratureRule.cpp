@@ -93,12 +93,14 @@ GaussianQuadratureRule<1>::GaussianQuadratureRule(unsigned numPointsInEachDimens
         case 3: // 1d, 3rd order
             mWeights.push_back(0.5);
             mWeights.push_back(0.5);
-
-            {
-            	double sqrt_one_third = sqrt(1.0/3.0);
-            	mPoints.push_back(ChastePoint<1>((-sqrt_one_third+1.0)/2.0));
-            	mPoints.push_back(ChastePoint<1>((sqrt_one_third+1.0)/2.0));
-            }
+            mPoints.push_back(ChastePoint<1>(0.21132486540519));
+            mPoints.push_back(ChastePoint<1>(0.78867513459481));
+            ///\todo #2232 Best quadrature causes pre-conditioning to fail
+//            {
+//            	double sqrt_one_third = sqrt(1.0/3.0);
+//            	mPoints.push_back(ChastePoint<1>((-sqrt_one_third+1.0)/2.0));
+//            	mPoints.push_back(ChastePoint<1>((sqrt_one_third+1.0)/2.0));
+//            }
             break;
         case 4:
         case 5: // 1d, 5th order
