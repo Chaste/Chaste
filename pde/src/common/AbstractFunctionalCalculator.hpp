@@ -39,7 +39,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LinearBasisFunction.hpp"
 #include "GaussianQuadratureRule.hpp"
 #include "AbstractTetrahedralMesh.hpp"
-#include "GaussianQuadratureRule.hpp"
 #include "ReplicatableVector.hpp"
 
 /**

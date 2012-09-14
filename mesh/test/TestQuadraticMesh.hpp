@@ -577,35 +577,27 @@ public:
 
     }
 
-    void TestConstructionConversionVersusConstruction()
+    void TestConstructionConversionVersusConstruction2d()
     {
         QuadraticMesh<2> quad_mesh_read_back;
         QuadraticMesh<2> quad_mesh_constructed;
         double width  = 1.0;
         double height = 2.0;
         {
-            //Two-dimensional single square
+            //Two-dimensional two squares
             TetrahedralMesh<2,2> mesh;
             bool stagger=false; ///\todo #2224
             //mesh.ConstructRegularSlabMesh(1.0, width, height, stagger);
             mesh.ConstructRectangularMesh((unsigned)width, (unsigned)height, stagger);
-            TrianglesMeshWriter<2,2> mesh_writer("TestQuadraticMesh", "SingleGrid2d", false);
+            TrianglesMeshWriter<2,2> mesh_writer("TestQuadraticMesh", "TempGrid2d", false);
             mesh_writer.WriteFilesUsingMesh(mesh);
 
             //Convert to quadratic
             std::string output_dir = mesh_writer.GetOutputDirectory();
-            TrianglesMeshReader<2,2> quadratic_mesh_reader(output_dir + "SingleGrid2d");
+            TrianglesMeshReader<2,2> quadratic_mesh_reader(output_dir + "TempGrid2d");
             quad_mesh_read_back.ConstructFromLinearMeshReader(quadratic_mesh_reader);
             
-            {
-                TrianglesMeshWriter<2,2> mesh_writer2("TestQuadraticMesh", "SingleGrid2dRead", false);
-                mesh_writer2.WriteFilesUsingMesh(quad_mesh_read_back);
-            }
             quad_mesh_constructed.ConstructRegularSlabMesh(1.0, width, height);
-            {
-                TrianglesMeshWriter<2,2> mesh_writer2("TestQuadraticMesh", "SingleGrid2dConst", false);
-                mesh_writer2.WriteFilesUsingMesh(quad_mesh_constructed);
-            }
         }
         TS_ASSERT_EQUALS(quad_mesh_constructed.GetNumNodes(), quad_mesh_read_back.GetNumNodes());
         TS_ASSERT_EQUALS(quad_mesh_constructed.GetNumVertices(), quad_mesh_read_back.GetNumVertices());
@@ -625,7 +617,7 @@ public:
                 TS_ASSERT_EQUALS(p_elem_read_back->GetNode(i)->IsBoundaryNode(), p_elem_constructed->GetNode(i)->IsBoundaryNode()); 
             }
         }
-        // Can't do this because the linear to quadratic converter doesn't send any boundary information to the
+        // Can't check edges exactly because the linear to quadratic converter doesn't send any boundary information to the
         // external mesher.  (So the edges come back in a different order.)
         for (unsigned b_elem=0; b_elem<quad_mesh_constructed.GetNumBoundaryElements(); b_elem++)
         {
@@ -633,6 +625,69 @@ public:
             BoundaryElement<1,2>* p_b_elem_read_back =  quad_mesh_read_back.GetBoundaryElement(b_elem);
             TS_ASSERT_EQUALS(p_b_elem_constructed->GetNumNodes(), p_b_elem_read_back->GetNumNodes());
         }
+                            
+    }
+   void TestConstructionConversionVersusConstruction3d()
+    {
+        QuadraticMesh<3> quad_mesh_read_back;
+        QuadraticMesh<3> quad_mesh_constructed;
+        double width  = 1.0;
+        double height = 1.0;
+        double depth  = 1.0;
+        {
+            //Two-dimensional two squares
+            TetrahedralMesh<3,3> mesh;
+            mesh.ConstructRegularSlabMesh(1.0, width, height, depth);
+            TrianglesMeshWriter<3,3> mesh_writer("TestQuadraticMesh", "TempGrid3d", false);
+            mesh_writer.WriteFilesUsingMesh(mesh);
+
+            //Convert to quadratic
+            std::string output_dir = mesh_writer.GetOutputDirectory();
+            TrianglesMeshReader<3,3> quadratic_mesh_reader(output_dir + "TempGrid3d");
+            quad_mesh_read_back.ConstructFromLinearMeshReader(quadratic_mesh_reader);
+            
+            {
+                TrianglesMeshWriter<3,3> mesh_writer2("TestQuadraticMesh", "SingleGrid2dRead", false);
+                mesh_writer2.WriteFilesUsingMesh(quad_mesh_read_back);
+            }
+            //quad_mesh_constructed.ConstructRegularSlabMesh(1.0, width, height, depth);
+            //quad_mesh_constructed.ConstructCuboid(width, height, depth);
+            quad_mesh_constructed.ConstructCuboidNewImp(width, height, depth);
+            {
+                TrianglesMeshWriter<3,3> mesh_writer2("TestQuadraticMesh", "SingleGrid2dConst", false);
+                mesh_writer2.WriteFilesUsingMesh(quad_mesh_constructed);
+            }
+        }
+        ///\todo #2224
+        TS_ASSERT_EQUALS(quad_mesh_constructed.GetNumNodes(),  quad_mesh_read_back.GetNumVertices());
+        //TS_ASSERT_EQUALS(quad_mesh_constructed.GetNumNodes(), quad_mesh_read_back.GetNumNodes());
+        //TS_ASSERT_EQUALS(quad_mesh_constructed.GetNumVertices(), quad_mesh_read_back.GetNumVertices());
+        TS_ASSERT_EQUALS(quad_mesh_constructed.GetNumElements(), quad_mesh_read_back.GetNumElements());
+        TS_ASSERT_EQUALS(quad_mesh_constructed.GetNumBoundaryElements(), quad_mesh_read_back.GetNumBoundaryElements());
+        
+        for (unsigned elem=0; elem<quad_mesh_constructed.GetNumElements(); elem++)
+        {
+            Element<3,3>* p_elem_constructed =  quad_mesh_constructed.GetElement(elem);
+            Element<3,3>* p_elem_read_back =  quad_mesh_read_back.GetElement(elem);
+            ///\todo #2224 TS_ASSERT_EQUALS(p_elem_constructed->GetNumNodes(), p_elem_read_back->GetNumNodes());
+            for (unsigned i = 0; i < p_elem_constructed->GetNumNodes(); i++)
+            {
+                c_vector<double, 3> loc_read_back = p_elem_read_back->GetNode(i)->rGetLocation();
+                c_vector<double, 3> loc_constructed = p_elem_constructed->GetNode(i)->rGetLocation();
+                TS_ASSERT_DELTA(loc_read_back[0], loc_constructed[0], 1e-10);
+                TS_ASSERT_DELTA(loc_read_back[1], loc_constructed[1], 1e-10);
+                TS_ASSERT_DELTA(loc_read_back[2], loc_constructed[2], 1e-10);
+                
+                TS_ASSERT_EQUALS(p_elem_read_back->GetNode(i)->IsBoundaryNode(), p_elem_constructed->GetNode(i)->IsBoundaryNode()); 
+            }
+        }
+
+//        for (unsigned b_elem=0; b_elem<quad_mesh_constructed.GetNumBoundaryElements(); b_elem++)
+//        {
+//            BoundaryElement<2,3>* p_b_elem_constructed =  quad_mesh_constructed.GetBoundaryElement(b_elem);
+//            BoundaryElement<2,3>* p_b_elem_read_back =  quad_mesh_read_back.GetBoundaryElement(b_elem);
+//            ///\todo #2224 TS_ASSERT_EQUALS(p_b_elem_constructed->GetNumNodes(), p_b_elem_read_back->GetNumNodes());
+//        }
                             
     }
 

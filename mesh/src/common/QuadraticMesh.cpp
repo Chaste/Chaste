@@ -219,6 +219,24 @@ void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned nu
         this->mNodes[node_index]->AddBoundaryElement((*iter)->GetIndex());
     }
     
+            
+
+}
+
+
+
+template<unsigned DIM>
+void QuadraticMesh<DIM>::ConstructCuboidNewImp(unsigned numElemX, unsigned numElemY, unsigned numElemZ)
+{
+    assert(DIM==3);
+
+    assert(numElemX > 0);
+    assert(numElemY > 0);
+    assert(numElemZ > 0);
+
+    AbstractTetrahedralMesh<DIM,DIM>::ConstructCuboid(numElemX, numElemY, numElemZ);
+
+    this->mMeshIsLinear=false;
 //    //Dump the map
 //    for (std::map<std::pair<unsigned,unsigned>, unsigned>::const_iterator iter=edge_to_internal_map.begin();
 //        iter!=edge_to_internal_map.end();
@@ -226,11 +244,7 @@ void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned nu
 //    {
 //        std::cout<<iter->first.first<<" -- "<<iter->second<<" -- "<<iter->first.second<<"\n";
 //    }
-            
-
 }
-
-
 
 template<unsigned DIM>
 void QuadraticMesh<DIM>::ConstructCuboid(unsigned numElemX, unsigned numElemY, unsigned numElemZ)

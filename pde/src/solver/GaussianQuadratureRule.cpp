@@ -62,13 +62,13 @@ unsigned GaussianQuadratureRule<ELEMENT_DIM>::GetNumQuadPoints() const
 /**
  * Constructor specialization for 0d.
  *
- * @param numPointsInEachDimension  number of Gauss points in each dimension
- * @param quadratureOrder The minimum polynomial order that the rule can integrate exactly
+ * @param numPointsInEachDimension  deprecated
+ * @param quadratureOrder The minimum polynomial order that the rule can integrate exactly (ignored in 0-d case)
  */
 template<>
 GaussianQuadratureRule<0>::GaussianQuadratureRule(unsigned numPointsInEachDimension, unsigned quadratureOrder)
 {
-    mNumQuadPoints = 1; // numPointsInEachDimension^0
+    mNumQuadPoints = 1;
     mWeights.push_back(1);
     mPoints.push_back(ChastePoint<0>());
 }
@@ -76,7 +76,7 @@ GaussianQuadratureRule<0>::GaussianQuadratureRule(unsigned numPointsInEachDimens
 /**
  * Constructor specialization for 1d.
  *
- * @param numPointsInEachDimension  number of Gauss points in each dimension
+ * @param numPointsInEachDimension  deprecated
  * @param quadratureOrder The minimum polynomial order that the rule can integrate exactly
  */
 template<>
@@ -166,32 +166,13 @@ GaussianQuadratureRule<1>::GaussianQuadratureRule(unsigned numPointsInEachDimens
 /**
  * Constructor specialization for 2d.
  *
- * @param numPointsInEachDimension  number of Gauss points in each dimension
+ * @param numPointsInEachDimension  deprecated
  * @param quadratureOrder The minimum polynomial order that the rule can integrate exactly
  *
  */
 template<>
 GaussianQuadratureRule<2>::GaussianQuadratureRule(unsigned numPointsInEachDimension, unsigned quadratureOrder)
 {
-    //mNumQuadPoints = numPointsInEachDimension * numPointsInEachDimension;
-
-//    mNumQuadPoints = 3;
-
-    //mWeights.reserve(mNumQuadPoints);
-    //mPoints.reserve(mNumQuadPoints);
-
-//   mWeights.push_back(1.0/6.0);
-//    mWeights.push_back(1.0/6.0);
-//    mWeights.push_back(1.0/6.0);
-//
-//    mPoints.push_back(ChastePoint<2>(2.0/3.0, 1.0/6.0));
-//    mPoints.push_back(ChastePoint<2>(1.0/6.0, 2.0/3.0));
-//    mPoints.push_back(ChastePoint<2>(1.0/6.0, 1.0/6.0));
-//
-//return;
-
-
-
     switch (quadratureOrder)
     {
         case 0: // 2d, 0th order
@@ -464,7 +445,7 @@ GaussianQuadratureRule<2>::GaussianQuadratureRule(unsigned numPointsInEachDimens
 /**
  * Constructor specialization for 3d.
  *
- * @param numPointsInEachDimension  number of Gauss points in each dimension
+ * @param numPointsInEachDimension  deprecated
  * @param quadratureOrder The minimum polynomial order that the rule can integrate exactly
  */
 template<>

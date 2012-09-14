@@ -40,7 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "GaussianQuadratureRule.hpp"
 #include "Node.hpp"
 #include "Element.hpp"
-#include "Debug.hpp"
 
 class TestGaussianQuadratureRule : public CxxTest::TestSuite
 {
@@ -183,23 +182,20 @@ public:
     void TestGaussianQuadratureRuleIntegralTwoD()
     {
         // Expected answers [degree_x][degree_y]
-        double expected[5][5] = { {1.0/2,  1.0/6,  1.0/12, 1.0/20, 1.0/30},
-                                  {1.0/6,  1.0/24, 1.0/60, 1.0/120, 0},
-                                  {1.0/12, 1.0/60, 1.0/180, 0, 0},
+        double expected[5][5] = { {1.0/2,  1.0/6,   1.0/12, 1.0/20, 1.0/30},
+                                  {1.0/6,  1.0/24,  1.0/60, 1.0/120, 0},
+                                  {1.0/12, 1.0/60,  1.0/180, 0, 0},
                                   {1.0/20, 1.0/120, 0,      0, 0},
-                                  {1.0/30, 0,       0,      0, 0} };
+                                  {1.0/30, 0.0, 0.0, 0.0, 0.0} };
 
-        for (unsigned order=0; order<4; order++)
+        for (unsigned order=0; order<5; order++)
         {
             GaussianQuadratureRule<2> quad_rule(UNSIGNED_UNSET, order);
 
-            for (unsigned poly_degree_x=0; poly_degree_x<=order;
-                 poly_degree_x++)
+            for (unsigned poly_degree_x=0; poly_degree_x<=order; poly_degree_x++)
             {
 
-                for (unsigned poly_degree_y=0;
-                     poly_degree_y<=order-poly_degree_x;
-                     poly_degree_y++)
+                for (unsigned poly_degree_y=0; poly_degree_y<=order-poly_degree_x; poly_degree_y++)
                 {
                     double integral = 0.0;
 
@@ -223,14 +219,14 @@ public:
     }
 
     /**
-     * Test by integrating polynomials up to degree 2p-2, where p is the no. of
-     * points in each dimension. This is the 3d case.
+     * Test by integrating polynomials up to degree p=3. This is the 3d case.
      *
      * We integrate things like x, y, z, x^2, y^2, z^2, xy, xz, yz...
      */
     void TestGaussianQuadratureRuleIntegralThreeD()
     {
         // Expected answers [degree_x][degree_y][degree_z]
+        // Final row/column/thing is unused (we can't yet do order 4)
         double expected[5][5][5]
         =
             {
@@ -271,7 +267,7 @@ public:
                 }
             };
 
-        // Test 2 and 3 quadrature points per dimension in 3D
+        // Test up to order 3 in 3D
         for (unsigned order=0; order<4; order++)
         {
             GaussianQuadratureRule<3> quad_rule(UNSIGNED_UNSET, order);
