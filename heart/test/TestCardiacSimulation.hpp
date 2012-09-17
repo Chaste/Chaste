@@ -176,7 +176,6 @@ public:
 
     void TestBi1dSmall() throw(Exception)
     {
-///\todo #2232 Fails with "[0]PETSC ERROR: Detected zero pivot in Cholesky factorization", need to investigate cause of failure
         { CardiacSimulation simulation("heart/test/data/xml/bidomain1d_small.xml"); }
         { CardiacSimulation simulation2("heart/test/data/xml/bidomain1d_resume.xml"); }
         {

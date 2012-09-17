@@ -800,11 +800,29 @@ public:
 
     void TestGetSetKSP() throw (Exception)
     {
+        {
+            // Test that small systems don't have preconditioning
+#if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x.x
+            const PCType pc_small;
+#else
+            PCType pc_small;
+#endif
+            LinearSystem ls_small = LinearSystem(6);
+            ls_small.SetPcType("jacobi"); //Will be over-ridden because the system is small
+            ls_small.AssembleFinalLinearSystem();
+            Vec solution_vector_small;
+            solution_vector_small = ls_small.Solve();
+            PetscTools::Destroy(solution_vector_small);
+            PC prec_small;
+            KSPGetPC(ls_small.mKspSolver, &prec_small);
+            PCGetType(prec_small, &pc_small);
+            TS_ASSERT( strcmp(pc_small,"none")==0 );
+        }        
         // Set relative tolerance before first solve
-        LinearSystem ls = LinearSystem(5);
+        LinearSystem ls = LinearSystem(7); 
         ls.SetRelativeTolerance(1e-3);
         ls.SetKspType("cg");
-        ls.SetPcType("jacobi");
+        ls.SetPcType("jacobi"); //Will not be over-ridden because the system is larger...
         ls.AssembleFinalLinearSystem();
         Vec solution_vector;
         solution_vector = ls.Solve();

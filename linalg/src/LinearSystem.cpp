@@ -722,7 +722,7 @@ Vec LinearSystem::Solve(Vec lhsGuess)
         KSPGetPC(mKspSolver, &prec);
 
         // Turn off pre-conditioning if the system size is very small
-        if (mSize <= 4)
+        if (mSize <= 6) ///\todo This is a magic number.  Do we want a warning here?
         {
             PCSetType(prec, PCNONE);
         }

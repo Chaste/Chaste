@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshReader.hpp"
 #include "HeartConfig.hpp"
 #include "PetscSetupAndFinalize.hpp"
-#include "FileComparison.hpp"
+#include "NumericFileComparison.hpp"
 
 class TestPseudoEcgCalculatorNightly : public CxxTest::TestSuite
 {
@@ -80,7 +80,7 @@ public:
         //now compare it with a valid pseudo-ecg file (see above).
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
 
-        FileComparison comparer(test_output_directory + pseudo_ecg_output_dir + "/output/PseudoEcgFromElectrodeAt_2.2_6_1.85.dat",
+        NumericFileComparison comparer(test_output_directory + pseudo_ecg_output_dir + "/output/PseudoEcgFromElectrodeAt_2.2_6_1.85.dat",
                                 "heart/test/data/PseudoEcg/ValidPseudoEcg.dat");
         TS_ASSERT(comparer.CompareFiles());
     }
@@ -111,7 +111,7 @@ public:
         //now compare it with a valid pseudo-ecg file (see above).
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
 
-        FileComparison comparer(test_output_directory + pseudo_ecg_output_dir + "/output/PseudoEcgFromElectrodeAt_2.2_6_1.85.dat",
+        NumericFileComparison comparer(test_output_directory + pseudo_ecg_output_dir + "/output/PseudoEcgFromElectrodeAt_2.2_6_1.85.dat",
                                 "heart/test/data/PseudoEcg/ValidPseudoEcg.dat");
         TS_ASSERT(comparer.CompareFiles());
     }

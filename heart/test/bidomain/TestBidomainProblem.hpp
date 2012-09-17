@@ -102,7 +102,6 @@ public:
     //This test reproduces the problem size of heart/test/data/xml/bidomain1d_small.xml
     void TestBidomainSmallestMesh()
     {
-///\todo #2232 Fails with "[0]PETSC ERROR: Detected zero pivot in Cholesky factorization", need to investigate cause of failure
         HeartConfig::Instance()->SetSimulationDuration(1.0);  //ms
         HeartConfig::Instance()->SetFibreLength(0.1, 0.05);
         HeartConfig::Instance()->SetSpaceDimension(1u);
