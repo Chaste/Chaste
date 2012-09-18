@@ -112,47 +112,6 @@ GaussianQuadratureRule<1>::GaussianQuadratureRule(unsigned numPointsInEachDimens
 				mPoints.push_back(ChastePoint<1>((sqrt_three_fifths+1.0)/2.0));
             }
             break;
-///// these should work but aren't tested yet
-//        case 4: // 1d, 4 points
-//            mWeights.push_back(  0.17392732255);
-//            mWeights.push_back(  0.32607267745);
-//            mWeights.push_back(  0.32607267745);
-//            mWeights.push_back(  0.17392732255);
-//            mPoints.push_back(ChastePoint<1>(   0.0694318417));
-//            mPoints.push_back(ChastePoint<1>(   0.3300094782));
-//            mPoints.push_back(ChastePoint<1>(   0.6699905218));
-//            mPoints.push_back(ChastePoint<1>(   0.9305681583));
-//            break;
-//        case 5: // 1d, 5 points
-//            mWeights.push_back(   0.1184634425);
-//            mWeights.push_back(  0.23931433525);
-//            mWeights.push_back(  0.28444444445);
-//            mWeights.push_back(  0.23931433525);
-//            mWeights.push_back(   0.1184634425);
-//            mPoints.push_back(ChastePoint<1>(  0.04691007705));
-//            mPoints.push_back(ChastePoint<1>(  0.23076534495));
-//            mPoints.push_back(ChastePoint<1>(            0.5));
-//            mPoints.push_back(ChastePoint<1>(  0.76923465505));
-//            mPoints.push_back(ChastePoint<1>(  0.95308992295));
-//            break;
-//        case 8: // 1d, 8 points
-//            mWeights.push_back(  0.05061426815);
-//            mWeights.push_back(  0.11119051725);
-//            mWeights.push_back(  0.15685332295);
-//            mWeights.push_back(   0.1813418917);
-//            mWeights.push_back(   0.1813418917);
-//            mWeights.push_back(  0.15685332295);
-//            mWeights.push_back(  0.11119051725);
-//            mWeights.push_back(  0.05061426815);
-//            mPoints.push_back(ChastePoint<1>(  0.01985507175));
-//            mPoints.push_back(ChastePoint<1>(   0.1016667613));
-//            mPoints.push_back(ChastePoint<1>(  0.23723379505));
-//            mPoints.push_back(ChastePoint<1>(  0.40828267875));
-//            mPoints.push_back(ChastePoint<1>(  0.59171732125));
-//            mPoints.push_back(ChastePoint<1>(  0.76276620495));
-//            mPoints.push_back(ChastePoint<1>(   0.8983332387));
-//            mPoints.push_back(ChastePoint<1>(  0.98014492825));
-//            break;
          default:
             EXCEPTION("Gauss quadrature order not supported.");
     }
@@ -173,12 +132,16 @@ GaussianQuadratureRule<2>::GaussianQuadratureRule(unsigned numPointsInEachDimens
     switch (quadratureOrder)
     {
         case 0: // 2d, 0th order
-        	mNumQuadPoints = 1;
-            mWeights.push_back(0.5);
-            mPoints.push_back(ChastePoint<2>(0.25,0.5));
+        case 1: // 2d, 1st order
+        	//This is now order 1
+            mNumQuadPoints = 1;
+            {
+                double one_third = 1.0/3.0;
+                mWeights.push_back(0.5);
+                mPoints.push_back(ChastePoint<2>(one_third, one_third));
+            }
             break;
 
-        case 1:
         case 2: // 2d, 2nd order
         	mNumQuadPoints = 4;
             mWeights.push_back(0.19716878364870);
