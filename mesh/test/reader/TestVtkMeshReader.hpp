@@ -563,6 +563,33 @@ public:
 #endif //CHASTE_VTK
     }
 
+
+    /**
+     * Check that we can build a 1D in 3D Mesh using the VTK mesh reader.
+     */
+    void TestLoading1Din3DMeshFromVtkMeshReader(void) throw(Exception)
+    {
+#ifdef CHASTE_VTK
+        VtkMeshReader<1,3> mesh_reader("mesh/test/data/branched_1d_in_3d_mesh.vtu");
+        TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 30u);
+        TS_ASSERT_EQUALS(mesh_reader.GetNumNodes(), 31u);
+        TS_ASSERT_EQUALS(mesh_reader.GetNumEdges(), 3u);
+        TS_ASSERT_EQUALS(mesh_reader.GetNumCableElements(), 0u);
+        TS_ASSERT_EQUALS(mesh_reader.GetNumCableElementAttributes(), 0u);
+
+        TetrahedralMesh<1,3> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        // Check we have the right number of nodes & elements
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), mesh_reader.GetNumNodes());
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), mesh_reader.GetNumElements());
+        TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), mesh_reader.GetNumEdges());
+        TS_ASSERT_EQUALS(mesh.GetNumCableElements(), 0u);
+#else
+        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
+#endif //CHASTE_VTK
+    }
 };
 
 #endif /*TESTVTKMESHREADER_*/

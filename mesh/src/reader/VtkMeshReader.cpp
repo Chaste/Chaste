@@ -97,6 +97,11 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::CommonConstructor()
         mNodesPerElement = 3;
         mVtkCellType = VTK_TRIANGLE;
     }
+    else if (ELEMENT_DIM == 1)
+    {
+        mNodesPerElement = 2;
+        mVtkCellType = VTK_LINE;
+    }
 
     //Determine if we have multiple cell types - such as cable elements in addition to tets/triangles
     vtkCellTypes* cell_types = vtkCellTypes::New();
@@ -162,9 +167,24 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::CommonConstructor()
             }
         }
     }
+    else if (ELEMENT_DIM == 1)
+    {
+        mNumFaces = 0;
+        vtkSmartPointer<vtkIdList> enclosing_cells = vtkSmartPointer<vtkIdList>::New();
+
+        for (unsigned point_index = 0; point_index < mpVtkUnstructuredGrid->GetNumberOfPoints(); ++point_index)
+        {
+            mpVtkUnstructuredGrid->GetPointCells(point_index, enclosing_cells);
+
+            if (enclosing_cells->GetNumberOfIds() == 1)
+            {
+                mNumFaces++;
+            }
+        }
+    }
     else
     {
-        ///\todo ELEMENT_DIM == 1
+        NEVER_REACHED;
     }
 }
 
@@ -363,14 +383,34 @@ ElementData VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextFaceData()
             next_face_data.NodeIndices.push_back(mpVtkGeometryFilter->GetOutput()->GetCell(mBoundaryFacesRead + mBoundaryFacesSkipped)->GetPointId(i));
         }
     }
-    else
+    else if (ELEMENT_DIM == 2)
     {
-        // (ELEMENT_DIM == 2) (ELEMENT_DIM == 1)
         for (unsigned i = 0; i < (mNodesPerElement-1); i++)
         {
             next_face_data.NodeIndices.push_back(mpVtkFilterEdges->GetOutput()->GetCell(mBoundaryFacesRead)->GetPointId(i));
         }
     }
+    else if (ELEMENT_DIM == 1)
+    {
+        vtkSmartPointer<vtkIdList> enclosing_cells = vtkSmartPointer<vtkIdList>::New();
+
+        for (unsigned point_index = mBoundaryFacesSkipped; point_index < mpVtkUnstructuredGrid->GetNumberOfPoints(); ++point_index)
+        {
+            mBoundaryFacesSkipped++;
+            mpVtkUnstructuredGrid->GetPointCells(point_index, enclosing_cells);
+
+            if (enclosing_cells->GetNumberOfIds() == 1)
+            {
+                next_face_data.NodeIndices.push_back(point_index);
+                break;
+            }
+        }
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
+
     mBoundaryFacesRead++;
     return next_face_data;
 }

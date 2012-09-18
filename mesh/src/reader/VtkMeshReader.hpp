@@ -65,6 +65,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkDataCompressor.h>
 #include <vtkFeatureEdges.h>
 #include <vtkDataSetSurfaceFilter.h>
+#include <vtkSmartPointer.h>
 
 
 #include "UblasVectorInclude.hpp"
@@ -82,7 +83,7 @@ class VtkMeshReader : public AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>
 private:
 
     /** vtkUnstructuredGrid object: the rest of the class acts as an interface to this */
-    vtkUnstructuredGrid* mpVtkUnstructuredGrid;
+    vtkSmartPointer<vtkUnstructuredGrid> mpVtkUnstructuredGrid; //This is a smart pointer to keep Vtk from deleting the object in the 1D case
 
     /** VTK geometry filter object to extract the surface elements */
     vtkGeometryFilter* mpVtkGeometryFilter;

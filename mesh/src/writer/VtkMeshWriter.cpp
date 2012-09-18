@@ -109,7 +109,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::MakeVtkMesh()
         {
             p_cell = vtkQuadraticTriangle::New();
         }
-        else if(ELEMENT_DIM == 1)
+        else if (ELEMENT_DIM == 1)
         {
             p_cell = vtkLine::New();
         }
