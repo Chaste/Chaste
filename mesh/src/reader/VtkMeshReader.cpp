@@ -92,12 +92,12 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::CommonConstructor()
     mNumNodes = mpVtkUnstructuredGrid->GetNumberOfPoints();
     unsigned num_cells = mpVtkUnstructuredGrid->GetNumberOfCells();
 
-    if (ELEMENT_DIM == 2)
+    if (ELEMENT_DIM == 2u)
     {
         mNodesPerElement = 3;
         mVtkCellType = VTK_TRIANGLE;
     }
-    else if (ELEMENT_DIM == 1)
+    else if (ELEMENT_DIM == 1u)
     {
         mNodesPerElement = 2;
         mVtkCellType = VTK_LINE;
@@ -137,7 +137,7 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::CommonConstructor()
 
 
     // Extract the surface faces
-    if (ELEMENT_DIM == 2)
+    if (ELEMENT_DIM == 2u)
     {
         vtkDataSetSurfaceFilter* p_surface = vtkDataSetSurfaceFilter::New();
         p_surface->SetInput(mpVtkUnstructuredGrid);
@@ -147,7 +147,7 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::CommonConstructor()
         mNumFaces = mpVtkFilterEdges->GetOutput()->GetNumberOfCells();
         p_surface->Delete();
     }
-    else if (ELEMENT_DIM == 3)
+    else if (ELEMENT_DIM == 3u)
     {
         mpVtkGeometryFilter = vtkGeometryFilter::New();
         mpVtkGeometryFilter->SetInput(mpVtkUnstructuredGrid);
@@ -167,7 +167,7 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::CommonConstructor()
             }
         }
     }
-    else if (ELEMENT_DIM == 1)
+    else if (ELEMENT_DIM == 1u)
     {
         mNumFaces = 0;
         vtkSmartPointer<vtkIdList> enclosing_cells = vtkSmartPointer<vtkIdList>::New();
@@ -215,11 +215,11 @@ VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::VtkMeshReader(vtkUnstructuredGrid* p_vtkUn
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::~VtkMeshReader()
 {
-    if (ELEMENT_DIM == 3)
+    if (ELEMENT_DIM == 3u)
     {
         mpVtkGeometryFilter->Delete();
     }
-    else if (ELEMENT_DIM == 2)
+    else if (ELEMENT_DIM == 2u)
     {
         mpVtkFilterEdges->Delete();
     }
@@ -372,7 +372,7 @@ ElementData VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextFaceData()
 
     ElementData next_face_data;
 
-    if (ELEMENT_DIM == 3)
+    if (ELEMENT_DIM == 3u)
     {
         while (mpVtkGeometryFilter->GetOutput()->GetCellType(mBoundaryFacesRead + mBoundaryFacesSkipped) == VTK_LINE)
         {
@@ -383,14 +383,14 @@ ElementData VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextFaceData()
             next_face_data.NodeIndices.push_back(mpVtkGeometryFilter->GetOutput()->GetCell(mBoundaryFacesRead + mBoundaryFacesSkipped)->GetPointId(i));
         }
     }
-    else if (ELEMENT_DIM == 2)
+    else if (ELEMENT_DIM == 2u)
     {
         for (unsigned i = 0; i < (mNodesPerElement-1); i++)
         {
             next_face_data.NodeIndices.push_back(mpVtkFilterEdges->GetOutput()->GetCell(mBoundaryFacesRead)->GetPointId(i));
         }
     }
-    else if (ELEMENT_DIM == 1)
+    else if (ELEMENT_DIM == 1u)
     {
         vtkSmartPointer<vtkIdList> enclosing_cells = vtkSmartPointer<vtkIdList>::New();
 
