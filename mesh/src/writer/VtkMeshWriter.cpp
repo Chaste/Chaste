@@ -93,19 +93,19 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::MakeVtkMesh()
         assert((current_element.size() == ELEMENT_DIM + 1) || (current_element.size() == (ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2));
 
         vtkCell* p_cell=NULL;
-        if (SPACE_DIM == 3 && current_element.size() == 4)
+        if (ELEMENT_DIM == 3 && current_element.size() == 4)
         {
             p_cell = vtkTetra::New();
         }
-        else if(SPACE_DIM == 3 && current_element.size() == 10)
+        else if(ELEMENT_DIM == 3 && current_element.size() == 10)
         {
             p_cell = vtkQuadraticTetra::New();
         }
-        else if (SPACE_DIM == 2 && current_element.size() == 3)
+        else if (ELEMENT_DIM == 2 && current_element.size() == 3)
         {
             p_cell = vtkTriangle::New();
         }
-        else if (SPACE_DIM == 2 && current_element.size() == 6)
+        else if (ELEMENT_DIM == 2 && current_element.size() == 6)
         {
             p_cell = vtkQuadraticTriangle::New();
         }

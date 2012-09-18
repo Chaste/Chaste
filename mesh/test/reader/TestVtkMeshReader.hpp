@@ -538,13 +538,14 @@ public:
     }
 
     /**
-     * Check that we can build a 3D MixedDimensionMesh using the VTK mesh reader.
+     * Check that we can build a 2D in 3D mesh using the VTK mesh reader.
      */
     void TestLoadingSurfaceMeshFromVtkMeshReader(void) throw(Exception)
     {
 #ifdef CHASTE_VTK
         VtkMeshReader<2,3> mesh_reader("mesh/test/data/cylinder.vtu");
-        TS_ASSERT_EQUALS(mesh_reader.GetNumFaces(), 1632u);
+        TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 1632u);
+        TS_ASSERT_EQUALS(mesh_reader.GetNumFaces(), 32u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumCableElements(), 0u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumCableElementAttributes(), 0u);
 
@@ -554,7 +555,7 @@ public:
         // Check we have the right number of nodes & elements
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 832u);
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 1632u);
-        TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 1632u);
+        TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 32u);
         TS_ASSERT_EQUALS(mesh.GetNumCableElements(), 0u);
 #else
         std::cout << "This test was not run, as VTK is not enabled." << std::endl;

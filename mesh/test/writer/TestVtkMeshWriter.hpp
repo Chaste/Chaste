@@ -651,6 +651,9 @@ public:
             VtkMeshReader<1,3> vtk_reader(OutputFileHandler::GetChasteTestOutputDirectory() + "TestVtkMeshWriter/branched_1d_in_3d_mesh.vtu");
             TS_ASSERT_EQUALS(vtk_reader.GetNumNodes(), mesh.GetNumNodes());
             TS_ASSERT_EQUALS(vtk_reader.GetNumElements(), mesh.GetNumElements());
+///\todo There should be 3 terminals (boundary nodes/elements)
+//            TS_ASSERT_EQUALS(vtk_reader.GetNumEdges(), reader.GetNumEdges());
+//            TS_ASSERT_EQUALS(vtk_reader.GetNumEdges(), mesh.GetNumBoundaryElements());
         }
 
 #else
