@@ -589,7 +589,7 @@ public:
 
                 }
 
-                if (!this->PopulatedResult)
+                if (!this->PopulatedResult && time_series.size() != 1u)
                 {
                     this->PopulatedResult=true;
 
