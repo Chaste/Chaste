@@ -176,7 +176,7 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::CommonConstructor()
         {
             mpVtkUnstructuredGrid->GetPointCells(point_index, enclosing_cells);
 
-            if (enclosing_cells->GetNumberOfIds() == 1)
+            if (enclosing_cells->GetNumberOfIds() == 1u)
             {
                 mNumFaces++;
             }
@@ -399,7 +399,7 @@ ElementData VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextFaceData()
             mBoundaryFacesSkipped++;
             mpVtkUnstructuredGrid->GetPointCells(point_index, enclosing_cells);
 
-            if (enclosing_cells->GetNumberOfIds() == 1)
+            if (enclosing_cells->GetNumberOfIds() == 1u)
             {
                 next_face_data.NodeIndices.push_back(point_index);
                 break;
