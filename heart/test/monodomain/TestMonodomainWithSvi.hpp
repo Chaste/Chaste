@@ -178,7 +178,7 @@ public:
         double h[3] = {0.001,0.01,0.02};
         unsigned probe_node_index[3] = {300, 30, 15};
         unsigned number_of_nodes[3] = {1001, 101, 51};
-        std::vector<double> conduction_vel_nci(3);
+        std::vector<double> conduction_vel_ici(3);
         std::vector<double> conduction_vel_svi(3);
 
         ReplicatableVector final_voltage_ici;
@@ -227,8 +227,8 @@ public:
 //                unsigned node_at_0_40 = (unsigned)round(0.40/h[i]);
 //                assert(fabs(mesh.GetNode(node_at_0_04)->rGetLocation()[0]-0.04)<1e-6);
 //                assert(fabs(mesh.GetNode(node_at_0_40)->rGetLocation()[0]-0.40)<1e-6);
-//                conduction_vel_nci[i] = ppc.CalculateConductionVelocity(node_at_0_04,node_at_0_40,0.36);
-//                std::cout << "conduction_vel_nci = " << conduction_vel_nci[i] << "\n";
+//                conduction_vel_ici[i] = ppc.CalculateConductionVelocity(node_at_0_04,node_at_0_40,0.36);
+//                std::cout << "conduction_vel_ici = " << conduction_vel_ici[i] << "\n";
             }
 
             // SVI - state variable interpolation
@@ -326,7 +326,7 @@ public:
 
         // ICI - nodal current interpolation - the default
         {
-            HeartConfig::Instance()->SetOutputDirectory("MonodomainNci2d");
+            HeartConfig::Instance()->SetOutputDirectory("MonodomainIci2d");
             HeartConfig::Instance()->SetOutputFilenamePrefix("results");
 
             HeartConfig::Instance()->SetUseStateVariableInterpolation(false);
@@ -402,8 +402,8 @@ public:
         // 3. CV in cross fibre direction: (i) h=0.01, faster for ICI; h=0.02 slower for ICI.
         // (Matches results in paper)
 
-        double ici_30 = -17.1939; // These numbers are from a solve with ODE timestep of 0.0005,
-        double svi_30 = -63.5676; // i.e. ten times smaller than that used in the test at present
+        double ici_20 = -17.1939; // These numbers are from a solve with ODE timestep of 0.0005,
+        double svi_20 = -63.5676; // i.e. ten times smaller than that used in the test at present
         double ici_130 = 15.4282; // (for speed), hence large tolerances below.
         double svi_130 = 30.6249; // The tolerances are still nowhere near overlapping - i.e. ICI different to SVI
 
@@ -411,12 +411,12 @@ public:
         TS_ASSERT_DELTA(mesh.GetNode(20)->rGetLocation()[0],  0.4, 1e-9);
         TS_ASSERT_DELTA(mesh.GetNode(20)->rGetLocation()[1],  0.0, 1e-9);
 
-        TS_ASSERT_DELTA(final_voltage_ici[20], ici_30, 8.0);  // These tolerances show difference in parallel,
-        TS_ASSERT_DELTA(final_voltage_svi[20], svi_30, 3.0);  // note that SVI is more stable in the presence of multicore...
+        TS_ASSERT_DELTA(final_voltage_ici[20], ici_20, 8.0);  // These tolerances show difference in parallel,
+        TS_ASSERT_DELTA(final_voltage_svi[20], svi_20, 3.0);  // note that SVI is more stable in the presence of multicore...
 #ifdef CHASTE_CVODE
-        TS_ASSERT_DELTA(final_voltage_svi_cvode[20], svi_30, 3.0);
+        TS_ASSERT_DELTA(final_voltage_svi_cvode[20], svi_20, 3.0);
 #endif //Cvode
-        TS_ASSERT_DELTA(final_voltage_svit[20], svi_30, 3.0);
+        TS_ASSERT_DELTA(final_voltage_svit[20], svi_20, 3.0);
 
         // node 130 (for h=0.02) is on the y-axis (cross-fibre direction), ICI CV is slower
         TS_ASSERT_DELTA(mesh.GetNode(130)->rGetLocation()[0], 0.0, 1e-9);
