@@ -406,7 +406,7 @@ def OptionalLibraryDefines():
     Work out what optional libraries have been asked for,
     and return the appropriate #define names, as a list.
     """
-    possible_flags = {'cvode': 'CHASTE_CVODE', 'vtk': 'CHASTE_VTK', 'adaptivity': 'CHASTE_ADAPTIVITY'}
+    possible_flags = {'cvode': 'CHASTE_CVODE', 'vtk': 'CHASTE_VTK', 'adaptivity': 'CHASTE_ADAPTIVITY', 'gmsh': 'CHASTE_GMSH'}
     actual_flags = []
     if getattr(conf, 'use_cvode', False):
         # Need to set a define for CVODE version.  Assume 2.3.0 if not specified.
