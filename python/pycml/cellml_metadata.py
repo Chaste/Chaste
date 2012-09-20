@@ -140,6 +140,9 @@ METADATA_NAMES = frozenset(
         'membrane_slow_transient_outward_current',    
            'membrane_slow_transient_outward_current_conductance',       
         'membrane_transient_outward_current_time_independent_rectification_gate_constant',
+     # I katp
+     'membrane_atp_dependent_potassium_current',
+        'membrane_atp_dependent_potassium_current_conductance',        
      # ========================================================================
      # CALCIUM CURRENTS
      # ========================================================================
