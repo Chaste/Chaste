@@ -274,10 +274,10 @@ public:
 
         // node 20 (for h=0.02) is on the x-axis (fibre direction)
         TS_ASSERT_DELTA(final_voltage_ici[20*2], 22.1924, 1e-3);
-        TS_ASSERT_DELTA(final_solution_svi[20*2], 14.7526, 1e-3);
+        TS_ASSERT_DELTA(final_solution_svi[20*2], 15.0183, 1e-3);
         // node 234 (for h=0.02) is on the y-axis (cross-fibre direction)
         TS_ASSERT_DELTA(final_voltage_ici[234*2], 19.5676, 1e-3);
-        TS_ASSERT_DELTA(final_solution_svi[234*2], 13.6111, 1e-3);
+        TS_ASSERT_DELTA(final_solution_svi[234*2], 9.2833, 1e-3);
     }
 };
 

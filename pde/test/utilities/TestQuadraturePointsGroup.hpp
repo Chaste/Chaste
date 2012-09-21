@@ -88,9 +88,9 @@ public:
 
         QuadraturePointsGroup<2> group(mesh,quad_rule);
 
-        TS_ASSERT_EQUALS(quad_rule.GetNumQuadPoints(), 4u);
+        TS_ASSERT_EQUALS(quad_rule.GetNumQuadPoints(), 3u);
         TS_ASSERT_EQUALS(group.GetNumElements(), 2u);
-        TS_ASSERT_EQUALS(group.GetNumQuadPointsPerElement(), 4u);
+        TS_ASSERT_EQUALS(group.GetNumQuadPointsPerElement(), 3u);
         for (unsigned quad_index=0; quad_index<quad_rule.GetNumQuadPoints(); quad_index++)
         {
             c_vector<double,2> X = group.Get(0, quad_index);
@@ -100,11 +100,11 @@ public:
             TS_ASSERT_LESS_THAN(1.0, X(0)+X(1)); // quad point in elem 0, so x+y>1
         }
 
-        TS_ASSERT_EQUALS(group.Size(), 8u);
+        TS_ASSERT_EQUALS(group.Size(), 6u);
         for (unsigned index=0; index<group.Size(); index++)
         {
-            TS_ASSERT_LESS_THAN(group.Get(index)[0], 0.8);
-            TS_ASSERT_LESS_THAN(0.2, group.Get(index)[0]);
+            TS_ASSERT_LESS_THAN_EQUALS(group.Get(index)[0], 5.0/6.0);
+            TS_ASSERT_LESS_THAN_EQUALS(1.0/6.0, group.Get(index)[0]);
         }
     }
 };

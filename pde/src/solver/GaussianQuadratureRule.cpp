@@ -129,30 +129,28 @@ GaussianQuadratureRule<1>::GaussianQuadratureRule(unsigned numPointsInEachDimens
 template<>
 GaussianQuadratureRule<2>::GaussianQuadratureRule(unsigned numPointsInEachDimension, unsigned quadratureOrder)
 {
+    double one_third = 1.0/3.0;
+    double one_sixth = 1.0/6.0;
+    double two_thirds = 2.0/3.0;
     switch (quadratureOrder)
     {
         case 0: // 2d, 0th order
         case 1: // 2d, 1st order
         	//This is now order 1
             mNumQuadPoints = 1;
-            {
-                double one_third = 1.0/3.0;
-                mWeights.push_back(0.5);
-                mPoints.push_back(ChastePoint<2>(one_third, one_third));
-            }
+            mWeights.push_back(0.5);
+            mPoints.push_back(ChastePoint<2>(one_third, one_third));
             break;
 
         case 2: // 2d, 2nd order
-        	mNumQuadPoints = 4;
-            mWeights.push_back(0.19716878364870);
-            mWeights.push_back(0.19716878364870);
-            mWeights.push_back(0.05283121635130);
-            mWeights.push_back(0.05283121635130);
-
-            mPoints.push_back(ChastePoint<2>(0.16666666666667,0.21132486540519));
-            mPoints.push_back(ChastePoint<2>(0.62200846792815,0.21132486540519));
-            mPoints.push_back(ChastePoint<2>(0.04465819873852,0.78867513459481));
-            mPoints.push_back(ChastePoint<2>(0.16666666666667,0.78867513459481));
+        	mNumQuadPoints = 3;
+            mWeights.push_back(one_sixth);
+            mWeights.push_back(one_sixth);
+            mWeights.push_back(one_sixth);
+            
+            mPoints.push_back(ChastePoint<2>(two_thirds, one_sixth));
+            mPoints.push_back(ChastePoint<2>(one_sixth,  one_sixth));
+            mPoints.push_back(ChastePoint<2>(one_sixth,  two_thirds));
             break;
 
         case 3:
@@ -178,228 +176,11 @@ GaussianQuadratureRule<2>::GaussianQuadratureRule(unsigned numPointsInEachDimens
             mPoints.push_back(ChastePoint<2>(0.05635083270000,0.88729833460000));
             mPoints.push_back(ChastePoint<2>(0.10000000001607,0.88729833460000));
             break;
-///// these should work but aren't tested yet
-//        case 4: // 2d, 4 points per dimension
-//            mWeights.push_back(0.0281503507763256);
-//            mWeights.push_back(0.0527752633353762);
-//            mWeights.push_back(0.0527752633353762);
-//            mWeights.push_back(0.0281503507763256);
-//            mWeights.push_back(0.0379971374528828);
-//            mWeights.push_back(0.0712356642018415);
-//            mWeights.push_back(0.0712356642018415);
-//            mWeights.push_back(0.0379971374528828);
-//            mWeights.push_back(0.0187158102927055);
-//            mWeights.push_back(0.0350877267775703);
-//            mWeights.push_back(0.0350877267775703);
-//            mWeights.push_back(0.0187158102927055);
-//            mWeights.push_back(0.00210036275308617);
-//            mWeights.push_back(0.00393768441021206);
-//            mWeights.push_back(0.00393768441021206);
-//            mWeights.push_back(0.00210036275308617);
-//            mPoints.push_back(ChastePoint<2>(0.0646110610581461,   0.0694318417));
-//            mPoints.push_back(ChastePoint<2>(0.307096312350118,    0.0694318417));
-//            mPoints.push_back(ChastePoint<2>(0.623471845949882,    0.0694318417));
-//            mPoints.push_back(ChastePoint<2>(0.865957097241854,    0.0694318417));
-//            mPoints.push_back(ChastePoint<2>(0.046518675850118,    0.3300094782));
-//            mPoints.push_back(ChastePoint<2>(0.221103222498164,    0.3300094782));
-//            mPoints.push_back(ChastePoint<2>(0.448887299301836,    0.3300094782));
-//            mPoints.push_back(ChastePoint<2>(0.623471845949882,    0.3300094782));
-//            mPoints.push_back(ChastePoint<2>(0.022913165849882,    0.6699905218));
-//            mPoints.push_back(ChastePoint<2>(0.108906255701836,    0.6699905218));
-//            mPoints.push_back(ChastePoint<2>(0.221103222498164,    0.6699905218));
-//            mPoints.push_back(ChastePoint<2>(0.307096312350118,    0.6699905218));
-//            mPoints.push_back(ChastePoint<2>(0.00482078064185386,  0.9305681583));
-//            mPoints.push_back(ChastePoint<2>(0.022913165849882,    0.9305681583));
-//            mPoints.push_back(ChastePoint<2>(0.046518675850118,    0.9305681583));
-//            mPoints.push_back(ChastePoint<2>(0.0646110610581462,   0.9305681583));
-//            break;
-//        case 5:
-//            mWeights.push_back(0.013375270551691);
-//            mWeights.push_back(0.0270200993092602);
-//            mWeights.push_back(0.0321155735571689);
-//            mWeights.push_back(0.0270200993092602);
-//            mWeights.push_back(0.013375270551691);
-//            mWeights.push_back(0.0218078024655245);
-//            mWeights.push_back(0.0440551079739245);
-//            mWeights.push_back(0.0523630592364514);
-//            mWeights.push_back(0.0440551079739245);
-//            mWeights.push_back(0.0218078024655245);
-//            mWeights.push_back(0.0168481340447735);
-//            mWeights.push_back(0.0340358165695537);
-//            mWeights.push_back(0.0404543209892346);
-//            mWeights.push_back(0.0340358165695537);
-//            mWeights.push_back(0.0168481340447735);
-//            mWeights.push_back(0.00654219752778963);
-//            mWeights.push_back(0.0132162430822249);
-//            mWeights.push_back(0.0157085739026559);
-//            mWeights.push_back(0.0132162430822249);
-//            mWeights.push_back(0.00654219752778963);
-//            mWeights.push_back(0.000658316657259778);
-//            mWeights.push_back(0.00132990068405387);
-//            mWeights.push_back(0.00158069453237811);
-//            mWeights.push_back(0.00132990068405387);
-//            mWeights.push_back(0.000658316657259778);
-//            mPoints.push_back(ChastePoint<2>(0.0447095217211631,  0.04691007705));
-//            mPoints.push_back(ChastePoint<2>( 0.219940124837926,  0.04691007705));
-//            mPoints.push_back(ChastePoint<2>(    0.476544961475,  0.04691007705));
-//            mPoints.push_back(ChastePoint<2>( 0.733149798112074,  0.04691007705));
-//            mPoints.push_back(ChastePoint<2>( 0.908380401228837,  0.04691007705));
-//            mPoints.push_back(ChastePoint<2>(0.0360848569379257,  0.23076534495));
-//            mPoints.push_back(ChastePoint<2>( 0.177512700520108,  0.23076534495));
-//            mPoints.push_back(ChastePoint<2>(    0.384617327525,  0.23076534495));
-//            mPoints.push_back(ChastePoint<2>( 0.591721954529893,  0.23076534495));
-//            mPoints.push_back(ChastePoint<2>( 0.733149798112074,  0.23076534495));
-//            mPoints.push_back(ChastePoint<2>(    0.023455038525,            0.5));
-//            mPoints.push_back(ChastePoint<2>(    0.115382672475,            0.5));
-//            mPoints.push_back(ChastePoint<2>(              0.25,            0.5));
-//            mPoints.push_back(ChastePoint<2>(    0.384617327525,            0.5));
-//            mPoints.push_back(ChastePoint<2>(    0.476544961475,            0.5));
-//            mPoints.push_back(ChastePoint<2>(0.0108252201120743,  0.76923465505));
-//            mPoints.push_back(ChastePoint<2>(0.0532526444298925,  0.76923465505));
-//            mPoints.push_back(ChastePoint<2>(    0.115382672475,  0.76923465505));
-//            mPoints.push_back(ChastePoint<2>( 0.177512700520108,  0.76923465505));
-//            mPoints.push_back(ChastePoint<2>( 0.219940124837926,  0.76923465505));
-//            mPoints.push_back(ChastePoint<2>(0.00220055532883694,  0.95308992295));
-//            mPoints.push_back(ChastePoint<2>(0.0108252201120743,  0.95308992295));
-//            mPoints.push_back(ChastePoint<2>(    0.023455038525,  0.95308992295));
-//            mPoints.push_back(ChastePoint<2>(0.0360848569379257,  0.95308992295));
-//            mPoints.push_back(ChastePoint<2>(0.0447095217211631,  0.95308992295));
-//            break;
-//        case 8:
-//            mWeights.push_back(0.00251093933534381);
-//            mWeights.push_back(0.00551608575378066);
-//            mWeights.push_back(0.0077813864127667);
-//            mWeights.push_back(0.0089962476127433);
-//            mWeights.push_back(0.0089962476127433);
-//            mWeights.push_back(0.0077813864127667);
-//            mWeights.push_back(0.00551608575378066);
-//            mWeights.push_back(0.00251093933534381);
-//            mWeights.push_back(0.00505566374657279);
-//            mWeights.push_back(0.0111063912918299);
-//            mWeights.push_back(0.015667472579425);
-//            mWeights.push_back(0.018113541124127);
-//            mWeights.push_back(0.018113541124127);
-//            mWeights.push_back(0.015667472579425);
-//            mWeights.push_back(0.0111063912918299);
-//            mWeights.push_back(0.00505566374657279);
-//            mWeights.push_back(0.00605561321825424);
-//            mWeights.push_back(0.0133031018843967);
-//            mWeights.push_back(0.018766310182895);
-//            mWeights.push_back(0.0216961816606203);
-//            mWeights.push_back(0.0216961816606203);
-//            mWeights.push_back(0.018766310182895);
-//            mWeights.push_back(0.0133031018843967);
-//            mWeights.push_back(0.00605561321825424);
-//            mWeights.push_back(0.00543106981966284);
-//            mWeights.push_back(0.0119310914598135);
-//            mWeights.push_back(0.0168308538189853);
-//            mWeights.push_back(0.0194585541004693);
-//            mWeights.push_back(0.0194585541004693);
-//            mWeights.push_back(0.0168308538189853);
-//            mWeights.push_back(0.0119310914598135);
-//            mWeights.push_back(0.00543106981966284);
-//            mWeights.push_back(0.00374741731366922);
-//            mWeights.push_back(0.00823240727740299);
-//            mWeights.push_back(0.0116132244841987);
-//            mWeights.push_back(0.0134263275848652);
-//            mWeights.push_back(0.0134263275848652);
-//            mWeights.push_back(0.0116132244841987);
-//            mWeights.push_back(0.00823240727740299);
-//            mWeights.push_back(0.00374741731366922);
-//            mWeights.push_back(0.00188340292975561);
-//            mWeights.push_back(0.00413750022679507);
-//            mWeights.push_back(0.00583665473756204);
-//            mWeights.push_back(0.00674789664256371);
-//            mWeights.push_back(0.00674789664256371);
-//            mWeights.push_back(0.00583665473756204);
-//            mWeights.push_back(0.00413750022679507);
-//            mWeights.push_back(0.00188340292975561);
-//            mWeights.push_back(0.000572162909255913);
-//            mWeights.push_back(0.00125693983449269);
-//            mWeights.push_back(0.00177312953176681);
-//            mWeights.push_back(0.00204995761308944);
-//            mWeights.push_back(0.00204995761308944);
-//            mWeights.push_back(0.00177312953176681);
-//            mWeights.push_back(0.00125693983449269);
-//            mWeights.push_back(0.000572162909255913);
-//            mWeights.push_back(5.0864805016297e-05);
-//            mWeights.push_back(0.000111740902048041);
-//            mWeights.push_back(0.000157629735243144);
-//            mWeights.push_back(0.00018223952058876);
-//            mWeights.push_back(0.00018223952058876);
-//            mWeights.push_back(0.000157629735243144);
-//            mWeights.push_back(0.000111740902048041);
-//            mWeights.push_back(5.0864805016297e-05);
-//            mPoints.push_back(ChastePoint<2>(0.0194608478758024,  0.01985507175));
-//            mPoints.push_back(ChastePoint<2>(0.0996481604597984,  0.01985507175));
-//            mPoints.push_back(ChastePoint<2>(0.232523501027757,  0.01985507175));
-//            mPoints.push_back(ChastePoint<2>(0.400176196869137,  0.01985507175));
-//            mPoints.push_back(ChastePoint<2>(0.579968731380863,  0.01985507175));
-//            mPoints.push_back(ChastePoint<2>(0.747621427222243,  0.01985507175));
-//            mPoints.push_back(ChastePoint<2>(0.880496767790202,  0.01985507175));
-//            mPoints.push_back(ChastePoint<2>(0.960684080374198,  0.01985507175));
-//            mPoints.push_back(ChastePoint<2>(0.0178364709097984,   0.1016667613));
-//            mPoints.push_back(ChastePoint<2>(0.0913306309467688,   0.1016667613));
-//            mPoints.push_back(ChastePoint<2>(0.213115003436359,   0.1016667613));
-//            mPoints.push_back(ChastePoint<2>(0.366773901106599,   0.1016667613));
-//            mPoints.push_back(ChastePoint<2>(0.531559337593401,   0.1016667613));
-//            mPoints.push_back(ChastePoint<2>(0.685218235263642,   0.1016667613));
-//            mPoints.push_back(ChastePoint<2>(0.807002607753231,   0.1016667613));
-//            mPoints.push_back(ChastePoint<2>(0.880496767790202,   0.1016667613));
-//            mPoints.push_back(ChastePoint<2>(0.0151447777277575,  0.23723379505));
-//            mPoints.push_back(ChastePoint<2>(0.0775479696863585,  0.23723379505));
-//            mPoints.push_back(ChastePoint<2>(0.180953921536175,  0.23723379505));
-//            mPoints.push_back(ChastePoint<2>(0.311424229416958,  0.23723379505));
-//            mPoints.push_back(ChastePoint<2>(0.451341975533043,  0.23723379505));
-//            mPoints.push_back(ChastePoint<2>(0.581812283413825,  0.23723379505));
-//            mPoints.push_back(ChastePoint<2>(0.685218235263642,  0.23723379505));
-//            mPoints.push_back(ChastePoint<2>(0.747621427222243,  0.23723379505));
-//            mPoints.push_back(ChastePoint<2>(0.0117485898691365,  0.40828267875));
-//            mPoints.push_back(ChastePoint<2>(0.0601579836565992,  0.40828267875));
-//            mPoints.push_back(ChastePoint<2>(0.140375345716958,  0.40828267875));
-//            mPoints.push_back(ChastePoint<2>(0.241587932982724,  0.40828267875));
-//            mPoints.push_back(ChastePoint<2>(0.350129388267276,  0.40828267875));
-//            mPoints.push_back(ChastePoint<2>(0.451341975533043,  0.40828267875));
-//            mPoints.push_back(ChastePoint<2>(0.531559337593401,  0.40828267875));
-//            mPoints.push_back(ChastePoint<2>(0.579968731380863,  0.40828267875));
-//            mPoints.push_back(ChastePoint<2>(0.00810648188086345,  0.59171732125));
-//            mPoints.push_back(ChastePoint<2>(0.0415087776434008,  0.59171732125));
-//            mPoints.push_back(ChastePoint<2>(0.0968584493330425,  0.59171732125));
-//            mPoints.push_back(ChastePoint<2>(0.166694745767276,  0.59171732125));
-//            mPoints.push_back(ChastePoint<2>(0.241587932982724,  0.59171732125));
-//            mPoints.push_back(ChastePoint<2>(0.311424229416958,  0.59171732125));
-//            mPoints.push_back(ChastePoint<2>(0.366773901106599,  0.59171732125));
-//            mPoints.push_back(ChastePoint<2>(0.400176196869137,  0.59171732125));
-//            mPoints.push_back(ChastePoint<2>(0.00471029402224254,  0.76276620495));
-//            mPoints.push_back(ChastePoint<2>(0.0241187916136415,  0.76276620495));
-//            mPoints.push_back(ChastePoint<2>(0.0562798735138254,  0.76276620495));
-//            mPoints.push_back(ChastePoint<2>(0.0968584493330425,  0.76276620495));
-//            mPoints.push_back(ChastePoint<2>(0.140375345716957,  0.76276620495));
-//            mPoints.push_back(ChastePoint<2>(0.180953921536175,  0.76276620495));
-//            mPoints.push_back(ChastePoint<2>(0.213115003436359,  0.76276620495));
-//            mPoints.push_back(ChastePoint<2>(0.232523501027757,  0.76276620495));
-//            mPoints.push_back(ChastePoint<2>(0.00201860084020162,   0.8983332387));
-//            mPoints.push_back(ChastePoint<2>(0.0103361303532312,   0.8983332387));
-//            mPoints.push_back(ChastePoint<2>(0.0241187916136415,   0.8983332387));
-//            mPoints.push_back(ChastePoint<2>(0.0415087776434008,   0.8983332387));
-//            mPoints.push_back(ChastePoint<2>(0.0601579836565991,   0.8983332387));
-//            mPoints.push_back(ChastePoint<2>(0.0775479696863585,   0.8983332387));
-//            mPoints.push_back(ChastePoint<2>(0.0913306309467688,   0.8983332387));
-//            mPoints.push_back(ChastePoint<2>(0.0996481604597983,   0.8983332387));
-//            mPoints.push_back(ChastePoint<2>(0.000394223874197648,  0.98014492825));
-//            mPoints.push_back(ChastePoint<2>(0.00201860084020162,  0.98014492825));
-//            mPoints.push_back(ChastePoint<2>(0.00471029402224255,  0.98014492825));
-//            mPoints.push_back(ChastePoint<2>(0.00810648188086345,  0.98014492825));
-//            mPoints.push_back(ChastePoint<2>(0.0117485898691366,  0.98014492825));
-//            mPoints.push_back(ChastePoint<2>(0.0151447777277575,  0.98014492825));
-//            mPoints.push_back(ChastePoint<2>(0.0178364709097984,  0.98014492825));
-//            mPoints.push_back(ChastePoint<2>(0.0194608478758024,  0.98014492825));
-//            break;
         default:
             EXCEPTION("Gauss quadrature order not supported.");
     }
     assert(mPoints.size() == mWeights.size());
-    mNumQuadPoints = mPoints.size();
+    assert(mNumQuadPoints == mPoints.size());
 }
 
 /**

@@ -316,6 +316,7 @@ public:
         ReplicatableVector final_voltage_svit;
 
         HeartConfig::Instance()->SetSimulationDuration(5.0); //ms
+        //HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0005, 0.01, 0.01); //See comment below
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.01, 0.01);
 
         // much lower conductivity in cross-fibre direction - ICI will struggle
@@ -403,9 +404,9 @@ public:
         // (Matches results in paper)
 
         double ici_20 = -17.1939; // These numbers are from a solve with ODE timestep of 0.0005,
-        double svi_20 = -63.5676; // i.e. ten times smaller than that used in the test at present
+        double svi_20 = -62.6336; // i.e. ten times smaller than that used in the test at present
         double ici_130 = 15.4282; // (for speed), hence large tolerances below.
-        double svi_130 = 30.6249; // The tolerances are still nowhere near overlapping - i.e. ICI different to SVI
+        double svi_130 = 30.7389; // The tolerances are still nowhere near overlapping - i.e. ICI different to SVI
 
         // node 20 (for h=0.02) is on the x-axis (fibre direction), SVI CV is slower
         TS_ASSERT_DELTA(mesh.GetNode(20)->rGetLocation()[0],  0.4, 1e-9);
