@@ -257,7 +257,7 @@ Export("other_libpaths", "other_libs")
 
 # Set up the environment to use for building.
 other_libpaths.append(os.path.abspath('lib'))
-if os.environ.get('XTPE_COMPILE_TARGET', ''):
+if os.environ.get('CHASTE_LOAD_ENV', ''):
     env = Environment(ENV = os.environ)
 else:
     env = Environment(
