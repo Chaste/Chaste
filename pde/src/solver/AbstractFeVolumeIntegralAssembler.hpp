@@ -248,16 +248,16 @@ AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_ASSEM
     switch (ELEMENT_DIM)
 	{
 	case 0:
-		mpQuadRule = new GaussianQuadratureRule<ELEMENT_DIM>(0,0);
+		mpQuadRule = new GaussianQuadratureRule<ELEMENT_DIM>(UNSIGNED_UNSET, 2);
 		break;
 	case 1:
-		mpQuadRule = new GaussianQuadratureRule<ELEMENT_DIM>(2,3);
+		mpQuadRule = new GaussianQuadratureRule<ELEMENT_DIM>(UNSIGNED_UNSET, 2); ///\todo #2232 Changed from 3 to 2
 		break;
 	case 2:
-		mpQuadRule = new GaussianQuadratureRule<ELEMENT_DIM>(2,2);
+		mpQuadRule = new GaussianQuadratureRule<ELEMENT_DIM>(UNSIGNED_UNSET, 2);
 		break;
 	case 3:
-		mpQuadRule = new GaussianQuadratureRule<ELEMENT_DIM>(2,1);
+		mpQuadRule = new GaussianQuadratureRule<ELEMENT_DIM>(UNSIGNED_UNSET, 1);///\todo #2232  Looks like under-quadrature
 		break;
 	default:
 		NEVER_REACHED;

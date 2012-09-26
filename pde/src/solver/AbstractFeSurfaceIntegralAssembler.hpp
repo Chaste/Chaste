@@ -159,13 +159,13 @@ AbstractFeSurfaceIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Abstrac
     switch (ELEMENT_DIM-1)
     {
     case 0:
-        mpSurfaceQuadRule = new GaussianQuadratureRule<ELEMENT_DIM-1>(0,0);
+        mpSurfaceQuadRule = new GaussianQuadratureRule<ELEMENT_DIM-1>(UNSIGNED_UNSET, 2);
         break;
     case 1:
-        mpSurfaceQuadRule = new GaussianQuadratureRule<ELEMENT_DIM-1>(2,3);
+        mpSurfaceQuadRule = new GaussianQuadratureRule<ELEMENT_DIM-1>(UNSIGNED_UNSET, 2); ///\todo #2232 Down from 3 to 2
         break;
     case 2:
-        mpSurfaceQuadRule = new GaussianQuadratureRule<ELEMENT_DIM-1>(2,2);
+        mpSurfaceQuadRule = new GaussianQuadratureRule<ELEMENT_DIM-1>(UNSIGNED_UNSET, 2);
         break;
     default:
         NEVER_REACHED;

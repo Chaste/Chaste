@@ -68,10 +68,10 @@ public:
      * An exception is thrown if data is not available for the requested
      * parameters.
      *
-     * @param numPointsInEachDimension  deprecated
+     * @param deprecated  deprecated
      * @param quadratureOrder The minimum polynomial order that the rule can integrate exactly
      */
-    GaussianQuadratureRule(unsigned numPointsInEachDimension, unsigned quadratureOrder);
+    GaussianQuadratureRule(unsigned deprecated, unsigned quadratureOrder);
 
     /**
      * Get a quadrature point.

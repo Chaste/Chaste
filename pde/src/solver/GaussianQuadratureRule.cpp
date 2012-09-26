@@ -62,11 +62,11 @@ unsigned GaussianQuadratureRule<ELEMENT_DIM>::GetNumQuadPoints() const
 /**
  * Constructor specialization for 0d.
  *
- * @param numPointsInEachDimension  deprecated
+ * @param deprecated  deprecated
  * @param quadratureOrder The minimum polynomial order that the rule can integrate exactly (ignored in 0-d case)
  */
 template<>
-GaussianQuadratureRule<0>::GaussianQuadratureRule(unsigned numPointsInEachDimension, unsigned quadratureOrder)
+GaussianQuadratureRule<0>::GaussianQuadratureRule(unsigned deprecated, unsigned quadratureOrder)
 {
     mNumQuadPoints = 1;
     mWeights.push_back(1);
@@ -76,11 +76,11 @@ GaussianQuadratureRule<0>::GaussianQuadratureRule(unsigned numPointsInEachDimens
 /**
  * Constructor specialization for 1d.
  *
- * @param numPointsInEachDimension  deprecated
+ * @param deprecated  deprecated
  * @param quadratureOrder The minimum polynomial order that the rule can integrate exactly
  */
 template<>
-GaussianQuadratureRule<1>::GaussianQuadratureRule(unsigned numPointsInEachDimension, unsigned quadratureOrder)
+GaussianQuadratureRule<1>::GaussianQuadratureRule(unsigned deprecated, unsigned quadratureOrder)
 {
     switch (quadratureOrder)
     {
@@ -122,12 +122,12 @@ GaussianQuadratureRule<1>::GaussianQuadratureRule(unsigned numPointsInEachDimens
 /**
  * Constructor specialization for 2d.
  *
- * @param numPointsInEachDimension  deprecated
+ * @param deprecated  deprecated
  * @param quadratureOrder The minimum polynomial order that the rule can integrate exactly
  *
  */
 template<>
-GaussianQuadratureRule<2>::GaussianQuadratureRule(unsigned numPointsInEachDimension, unsigned quadratureOrder)
+GaussianQuadratureRule<2>::GaussianQuadratureRule(unsigned deprecated, unsigned quadratureOrder)
 {
     double one_third = 1.0/3.0;
     double one_sixth = 1.0/6.0;
@@ -186,31 +186,12 @@ GaussianQuadratureRule<2>::GaussianQuadratureRule(unsigned numPointsInEachDimens
 /**
  * Constructor specialization for 3d.
  *
- * @param numPointsInEachDimension  deprecated
+ * @param deprecated  deprecated
  * @param quadratureOrder The minimum polynomial order that the rule can integrate exactly
  */
 template<>
-GaussianQuadratureRule<3>::GaussianQuadratureRule(unsigned numPointsInEachDimension, unsigned quadratureOrder)
+GaussianQuadratureRule<3>::GaussianQuadratureRule(unsigned deprecated, unsigned quadratureOrder)
 {
-//    mNumQuadPoints = 4;
-
-//    double a = 0.585410196624969;
-//    double b = 0.138196601125011;
-//    double w = .0416666666666666666666666666666666666666666667;
-//
-//
-//    mWeights.push_back(w);
-//    mWeights.push_back(w);
-//    mWeights.push_back(w);
-//    mWeights.push_back(w);
-//
-//    mPoints.push_back(ChastePoint<3>(a,b,b));
-//    mPoints.push_back(ChastePoint<3>(b,a,b));
-//    mPoints.push_back(ChastePoint<3>(b,b,a));
-//    mPoints.push_back(ChastePoint<3>(b,b,b));
-//
-//
-//return;
     switch (quadratureOrder)
     {
         case 0: // 3d, 0th order
@@ -238,7 +219,25 @@ GaussianQuadratureRule<3>::GaussianQuadratureRule(unsigned numPointsInEachDimens
             mPoints.push_back(ChastePoint<3>(0.16666666666667,   0.78867513459481,   0.03522081090086));
             break;
 
-        case 2:
+        case 2: //2nd order 4 point rule
+            {    
+                double sqrt_fifth = 1.0/sqrt(5.0);
+                double a = (1.0 + 3.0*sqrt_fifth)/4.0; //0.585410196624969;
+                double b = (1.0 - sqrt_fifth)/4.0; //0.138196601125011;
+                double w = 1.0/24.0;
+            
+                mWeights.push_back(w);
+                mWeights.push_back(w);
+                mWeights.push_back(w);
+                mWeights.push_back(w);
+            
+                mPoints.push_back(ChastePoint<3>(a,b,b));
+                mPoints.push_back(ChastePoint<3>(b,a,b));
+                mPoints.push_back(ChastePoint<3>(b,b,a));
+                mPoints.push_back(ChastePoint<3>(b,b,b));
+            }
+            break;
+        
         case 3: // 3d, 3rd order
             mWeights.push_back(0.01497274736603);
             mWeights.push_back(0.01349962850795);
@@ -296,139 +295,6 @@ GaussianQuadratureRule<3>::GaussianQuadratureRule(unsigned numPointsInEachDimens
             mPoints.push_back(ChastePoint<3>(0.05635083270000,   0.88729833460000,   0.05000000000803));
             mPoints.push_back(ChastePoint<3>(0.10000000001607,   0.88729833460000,   0.01127016654181));
             break;
-
-// Should be a valid quadrature rule, but not tested and the order of the rule is unknown.
-//        case 4: //Doesn't appear to be order 4
-//            mWeights.push_back(0.00423982561968);
-//            mWeights.push_back(0.00572288385156);
-//            mWeights.push_back(0.00281885467361);
-//            mWeights.push_back(0.00031634320391);
-//            mWeights.push_back(0.00412036229051);
-//            mWeights.push_back(0.00556163317318);
-//            mWeights.push_back(0.00273942929295);
-//            mWeights.push_back(0.00030742976838);
-//            mWeights.push_back(0.00099965677330);
-//            mWeights.push_back(0.00134932898618);
-//            mWeights.push_back(0.00066462336430);
-//            mWeights.push_back(0.00007458670588);
-//            mWeights.push_back(0.00002360309872);
-//            mWeights.push_back(0.00003185928022);
-//            mWeights.push_back(0.00001569255698);
-//            mWeights.push_back(0.00000176108183);
-//            mWeights.push_back(0.00794866986669);
-//            mWeights.push_back(0.01072905315027);
-//            mWeights.push_back(0.00528468555374);
-//            mWeights.push_back(0.00059306865848);
-//            mWeights.push_back(0.00772470439029);
-//            mWeights.push_back(0.01042674628127);
-//            mWeights.push_back(0.00513578175757);
-//            mWeights.push_back(0.00057635807584);
-//            mWeights.push_back(0.00187411992466);
-//            mWeights.push_back(0.00252967258912);
-//            mWeights.push_back(0.00124601155388);
-//            mWeights.push_back(0.00013983242583);
-//            mWeights.push_back(0.00004425022545);
-//            mWeights.push_back(0.00005972861231);
-//            mWeights.push_back(0.00002941983138);
-//            mWeights.push_back(0.00000330161175);
-//            mWeights.push_back(0.00794866986669);
-//            mWeights.push_back(0.01072905315027);
-//            mWeights.push_back(0.00528468555374);
-//            mWeights.push_back(0.00059306865848);
-//            mWeights.push_back(0.00772470439029);
-//            mWeights.push_back(0.01042674628127);
-//            mWeights.push_back(0.00513578175757);
-//            mWeights.push_back(0.00057635807584);
-//            mWeights.push_back(0.00187411992466);
-//            mWeights.push_back(0.00252967258912);
-//            mWeights.push_back(0.00124601155388);
-//            mWeights.push_back(0.00013983242583);
-//            mWeights.push_back(0.00004425022545);
-//            mWeights.push_back(0.00005972861231);
-//            mWeights.push_back(0.00002941983138);
-//            mWeights.push_back(0.00000330161175);
-//            mWeights.push_back(0.00423982561968);
-//            mWeights.push_back(0.00572288385156);
-//            mWeights.push_back(0.00281885467361);
-//            mWeights.push_back(0.00031634320391);
-//            mWeights.push_back(0.00412036229051);
-//            mWeights.push_back(0.00556163317318);
-//            mWeights.push_back(0.00273942929295);
-//            mWeights.push_back(0.00030742976838);
-//            mWeights.push_back(0.00099965677330);
-//            mWeights.push_back(0.00134932898618);
-//            mWeights.push_back(0.00066462336430);
-//            mWeights.push_back(0.00007458670588);
-//            mWeights.push_back(0.00002360309872);
-//            mWeights.push_back(0.00003185928022);
-//            mWeights.push_back(0.00001569255698);
-//            mWeights.push_back(0.00000176108183);
-//
-//            mPoints.push_back(ChastePoint<3>(0.06461106321099,   0.06943184420000,   0.06012499793653));
-//            mPoints.push_back(ChastePoint<3>(0.30709631152509,   0.06943184420000,   0.04328879995478));
-//            mPoints.push_back(ChastePoint<3>(0.62347184427491,   0.06943184420000,   0.02132226325621));
-//            mPoints.push_back(ChastePoint<3>(0.86595709258901,   0.06943184420000,   0.00448606527446));
-//            mPoints.push_back(ChastePoint<3>(0.04651867752509,   0.33000947820000,   0.04328879995478));
-//            mPoints.push_back(ChastePoint<3>(0.22110322249816,   0.33000947820000,   0.03116707302848));
-//            mPoints.push_back(ChastePoint<3>(0.44888729930184,   0.33000947820000,   0.01535160449661));
-//            mPoints.push_back(ChastePoint<3>(0.62347184427491,   0.33000947820000,   0.00322987757031));
-//            mPoints.push_back(ChastePoint<3>(0.02291316667491,   0.66999052180000,   0.02132226325621));
-//            mPoints.push_back(ChastePoint<3>(0.10890625570184,   0.66999052180000,   0.01535160449661));
-//            mPoints.push_back(ChastePoint<3>(0.22110322249816,   0.66999052180000,   0.00756156217830));
-//            mPoints.push_back(ChastePoint<3>(0.30709631152509,   0.66999052180000,   0.00159090341870));
-//            mPoints.push_back(ChastePoint<3>(0.00482078098901,   0.93056815580000,   0.00448606527446));
-//            mPoints.push_back(ChastePoint<3>(0.02291316667491,   0.93056815580000,   0.00322987757031));
-//            mPoints.push_back(ChastePoint<3>(0.04651867752509,   0.93056815580000,   0.00159090341870));
-//            mPoints.push_back(ChastePoint<3>(0.06461106321099,   0.93056815580000,   0.00033471571455));
-//            mPoints.push_back(ChastePoint<3>(0.06461106321099,   0.06943184420000,   0.28577404826889));
-//            mPoints.push_back(ChastePoint<3>(0.30709631152509,   0.06943184420000,   0.20575161800155));
-//            mPoints.push_back(ChastePoint<3>(0.62347184427491,   0.06943184420000,   0.10134469352354));
-//            mPoints.push_back(ChastePoint<3>(0.86595709258901,   0.06943184420000,   0.02132226325621));
-//            mPoints.push_back(ChastePoint<3>(0.04651867752509,   0.33000947820000,   0.20575161800155));
-//            mPoints.push_back(ChastePoint<3>(0.22110322249816,   0.33000947820000,   0.14813706341321));
-//            mPoints.push_back(ChastePoint<3>(0.44888729930184,   0.33000947820000,   0.07296615908496));
-//            mPoints.push_back(ChastePoint<3>(0.62347184427491,   0.33000947820000,   0.01535160449661));
-//            mPoints.push_back(ChastePoint<3>(0.02291316667491,   0.66999052180000,   0.10134469352354));
-//            mPoints.push_back(ChastePoint<3>(0.10890625570184,   0.66999052180000,   0.07296615908496));
-//            mPoints.push_back(ChastePoint<3>(0.22110322249816,   0.66999052180000,   0.03594009661688));
-//            mPoints.push_back(ChastePoint<3>(0.30709631152509,   0.66999052180000,   0.00756156217830));
-//            mPoints.push_back(ChastePoint<3>(0.00482078098901,   0.93056815580000,   0.02132226325621));
-//            mPoints.push_back(ChastePoint<3>(0.02291316667491,   0.93056815580000,   0.01535160449661));
-//            mPoints.push_back(ChastePoint<3>(0.04651867752509,   0.93056815580000,   0.00756156217830));
-//            mPoints.push_back(ChastePoint<3>(0.06461106321099,   0.93056815580000,   0.00159090341870));
-//            mPoints.push_back(ChastePoint<3>(0.06461106321099,   0.06943184420000,   0.58018304432012));
-//            mPoints.push_back(ChastePoint<3>(0.30709631152509,   0.06943184420000,   0.41772022627335));
-//            mPoints.push_back(ChastePoint<3>(0.62347184427491,   0.06943184420000,   0.20575161800155));
-//            mPoints.push_back(ChastePoint<3>(0.86595709258901,   0.06943184420000,   0.04328879995478));
-//            mPoints.push_back(ChastePoint<3>(0.04651867752509,   0.33000947820000,   0.41772022627335));
-//            mPoints.push_back(ChastePoint<3>(0.22110322249816,   0.33000947820000,   0.30075023588863));
-//            mPoints.push_back(ChastePoint<3>(0.44888729930184,   0.33000947820000,   0.14813706341321));
-//            mPoints.push_back(ChastePoint<3>(0.62347184427491,   0.33000947820000,   0.03116707302848));
-//            mPoints.push_back(ChastePoint<3>(0.02291316667491,   0.66999052180000,   0.20575161800155));
-//            mPoints.push_back(ChastePoint<3>(0.10890625570184,   0.66999052180000,   0.14813706341321));
-//            mPoints.push_back(ChastePoint<3>(0.22110322249816,   0.66999052180000,   0.07296615908496));
-//            mPoints.push_back(ChastePoint<3>(0.30709631152509,   0.66999052180000,   0.01535160449661));
-//            mPoints.push_back(ChastePoint<3>(0.00482078098901,   0.93056815580000,   0.04328879995478));
-//            mPoints.push_back(ChastePoint<3>(0.02291316667491,   0.93056815580000,   0.03116707302848));
-//            mPoints.push_back(ChastePoint<3>(0.04651867752509,   0.93056815580000,   0.01535160449661));
-//            mPoints.push_back(ChastePoint<3>(0.06461106321099,   0.93056815580000,   0.00322987757031));
-//            mPoints.push_back(ChastePoint<3>(0.06461106321099,   0.06943184420000,   0.80583209465249));
-//            mPoints.push_back(ChastePoint<3>(0.30709631152509,   0.06943184420000,   0.58018304432012));
-//            mPoints.push_back(ChastePoint<3>(0.62347184427491,   0.06943184420000,   0.28577404826889));
-//            mPoints.push_back(ChastePoint<3>(0.86595709258901,   0.06943184420000,   0.06012499793653));
-//            mPoints.push_back(ChastePoint<3>(0.04651867752509,   0.33000947820000,   0.58018304432012));
-//            mPoints.push_back(ChastePoint<3>(0.22110322249816,   0.33000947820000,   0.41772022627335));
-//            mPoints.push_back(ChastePoint<3>(0.44888729930184,   0.33000947820000,   0.20575161800155));
-//            mPoints.push_back(ChastePoint<3>(0.62347184427491,   0.33000947820000,   0.04328879995478));
-//            mPoints.push_back(ChastePoint<3>(0.02291316667491,   0.66999052180000,   0.28577404826889));
-//            mPoints.push_back(ChastePoint<3>(0.10890625570184,   0.66999052180000,   0.20575161800155));
-//            mPoints.push_back(ChastePoint<3>(0.22110322249816,   0.66999052180000,   0.10134469352354));
-//            mPoints.push_back(ChastePoint<3>(0.30709631152509,   0.66999052180000,   0.02132226325621));
-//            mPoints.push_back(ChastePoint<3>(0.00482078098901,   0.93056815580000,   0.06012499793653));
-//            mPoints.push_back(ChastePoint<3>(0.02291316667491,   0.93056815580000,   0.04328879995478));
-//            mPoints.push_back(ChastePoint<3>(0.04651867752509,   0.93056815580000,   0.02132226325621));
-//            mPoints.push_back(ChastePoint<3>(0.06461106321099,   0.93056815580000,   0.00448606527446));
-//            break;
 
         default:
             EXCEPTION("Gauss quadrature order not supported.");

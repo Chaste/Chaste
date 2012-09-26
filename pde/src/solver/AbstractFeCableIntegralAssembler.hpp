@@ -221,7 +221,7 @@ AbstractFeCableIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_ASSEMB
     assert(pMesh);
     assert(CAN_ASSEMBLE_VECTOR || CAN_ASSEMBLE_MATRIX);
 
-    mpCableQuadRule = new GaussianQuadratureRule<CABLE_ELEMENT_DIM>(2,3);
+    mpCableQuadRule = new GaussianQuadratureRule<CABLE_ELEMENT_DIM>(UNSIGNED_UNSET, 2); ///\todo #2232 Down from 3 to 2 
 
     // Not supporting this yet - if a nonlinear assembler on cable elements is required, uncomment code
     // in AssembleOnCableElement below (search for NONLINEAR)
