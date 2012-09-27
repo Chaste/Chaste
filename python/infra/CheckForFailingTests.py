@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+
+
 """Copyright (c) 2005-2012, University of Oxford.
 All rights reserved.
 
@@ -30,25 +32,30 @@ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
 LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
-import os,sys
 
-if len(sys.argv) < 2:
-  sys.exit(1)
+"""
+Check whether there are any tests listed in the Failing test pack.
 
-pref = sys.argv[1]
-eles = 20
-nodes = eles+1
+This is intended to be run as a script from the root of the Chaste
+distribution.
+"""
 
-f=file(pref+'.node', 'w')
-f.write("%d\t1\t0\t1\n" % (nodes))
-for i in range(0,nodes):
-  b = 0
-  if i == 0 or i == nodes: b=1
-  f.write("%d %f %d\n" % (i, 1.0*i/eles, b))
-f.close()
+import glob
+import sys
 
-f=file(pref+'.ele', 'w')
-f.write("%d\t2\t0\n" % (eles))
-for i in range(0, eles):
-  f.write("%d %d %d\n" % (i, i, i+1))
-f.close()
+sys.path[0:0] = ['python/infra']
+import BuildTools
+
+failing_tests = BuildTools.set()
+for test_dir in glob.glob('*/test') + glob.glob('projects/*/test'):
+    failing_tests.update(BuildTools.GetTestsInTestPacks(test_dir, ['Failing']))
+
+# Display results
+if failing_tests:
+    print "Failing tests found:"
+    for test in sorted(failing_tests):
+        print "   ", test
+    print "The next line is for the benefit of the test summary scripts."
+    print "Failed", len(failing_tests), "of", len(failing_tests), "tests"
+else:
+    print "Infrastructure test passed ok."

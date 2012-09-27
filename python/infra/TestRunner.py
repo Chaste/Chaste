@@ -165,10 +165,10 @@ class TestKillerTimer(object):
 def run_test(exefile, logfile, build, run_time_flags='', echo=True, time_limit=0):
     """Actually run the given test."""
     # Find out how we're supposed to run tests under this build type
-    if exefile.startswith("python/CheckFor"):
+    if exefile.startswith("python/infra/Check"):
         command = exefile + ' 2>&1'
     elif exefile.startswith('python/test/Test'):
-        command = './python/TestPythonCode.py ' + exefile + ' 2>&1'
+        command = './python/infra/TestPythonCode.py ' + exefile + ' 2>&1'
     else:
         command = build.GetTestRunnerCommand(exefile, '2>&1 ' + run_time_flags)
 

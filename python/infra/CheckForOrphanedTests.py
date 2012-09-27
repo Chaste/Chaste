@@ -43,7 +43,7 @@ import os
 import re
 import sys
 
-sys.path[0:0] = ['python']
+sys.path[0:0] = ['python/infra']
 import BuildTools
 set = BuildTools.set
 

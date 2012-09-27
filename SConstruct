@@ -70,7 +70,7 @@ import time
 
 import SCons
 
-sys.path[0:0] = ['python', 'python/hostconfig']
+sys.path[0:0] = ['python', 'python/infra', 'python/hostconfig']
 import BuildTypes
 import SConsTools
 Export('SConsTools')
@@ -374,17 +374,17 @@ if run_infrastructure_tests and not GetOption('clean'):
         print "Running infrastructure tests..."
     # Check for orphaned test files
     out = File(build.GetTestReportDir() + 'OrphanedTests.log')
-    os.system('python/TestRunner.py python/CheckForOrphanedTests.py ' +
+    os.system('python/TestRunner.py python/infra/CheckForOrphanedTests.py ' +
               str(out) + ' ' + build_type + ' --no-stdout')
     test_log_files.append(out)
     # Check for duplicate file names in multiple directories
     out = File(build.GetTestReportDir() + 'DuplicateFileNames.log')
-    os.system('python/TestRunner.py python/CheckForDuplicateFileNames.py ' +
+    os.system('python/TestRunner.py python/infra/CheckForDuplicateFileNames.py ' +
               str(out) + ' ' + build_type + ' --no-stdout')
     test_log_files.append(out)
     # Check for duplicate file names in multiple directories
     out = File(build.GetTestReportDir() + 'Copyrights.log')
-    os.system('python/TestRunner.py python/CheckForCopyrights.py ' +
+    os.system('python/TestRunner.py python/infra/CheckForCopyrights.py ' +
               str(out) + ' ' + build_type + ' --no-stdout')
     test_log_files.append(out)
     ## Do not check for stale semaphores - it's only important on MPICH with Gnu Linux
@@ -394,12 +394,12 @@ if run_infrastructure_tests and not GetOption('clean'):
     #test_log_files.append(out)
     # Check for stray schemas
     out = File(build.GetTestReportDir() + 'Schemas.log')
-    os.system('python/TestRunner.py python/CheckSchemas.py ' +
+    os.system('python/TestRunner.py python/infra/CheckSchemas.py ' +
               str(out) + ' ' + build_type + ' --no-stdout')
     test_log_files.append(out)
 if check_failing_tests:
     out = File(build.GetTestReportDir() + 'FailingTests.log')
-    os.system('python/TestRunner.py python/CheckForFailingTests.py ' +
+    os.system('python/TestRunner.py python/infra/CheckForFailingTests.py ' +
               str(out) + ' ' + build_type + ' --no-stdout')
     test_log_files.append(out)
 
@@ -504,7 +504,7 @@ if test_summary and not compile_only:
                     if filename[-5:] == '.gcda' or filename[-4:] == '.log':
                         os.remove(os.path.join(dirpath, filename))
         # For a Coverage build, run gcov & summarise instead
-        summary_action = ('python python/DisplayCoverage.py ' + output_dir + ' ' + build_type
+        summary_action = ('python python/infra/DisplayCoverage.py ' + output_dir + ' ' + build_type
                           + ' ' + ' '.join(RequestedProjects()))
     elif isinstance(build, BuildTypes.DoxygenCoverage):
         # Run Doxygen and parse the output
@@ -516,7 +516,7 @@ if test_summary and not compile_only:
         build.ExtendDoxygenConfig(doxy_conf)
         cmd = ('( ' + ' ; '.join(doxy_conf) + ' ) '
                + '| doxygen - 2>doxygen-error.log 1>doxygen-output.log')
-        summary_action = cmd + '; python python/ParseDoxygen.py doxygen-output.log doxygen-error.log ' + output_dir
+        summary_action = cmd + '; python python/infra/ParseDoxygen.py doxygen-output.log doxygen-error.log ' + output_dir
     else:
         summary_action = 'python python/DisplayTests.py '+output_dir+' '+build_type
         show_output_folder = '@echo "Test output written to: ' + senv['ENV']['CHASTE_TEST_OUTPUT'] + '"'
