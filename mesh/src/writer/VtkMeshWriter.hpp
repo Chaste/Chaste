@@ -136,6 +136,26 @@ public:
     void AddCellData(std::string name, std::vector<c_vector<double, SPACE_DIM> > data);
 
     /**
+     * Add a symmetric tensor data field to each element (known as "cell" in VTK).
+     * @param name is a meaningful name with which to annotate the data
+     * @param data is the data which should appear in the same order as the element numbering
+     * The length of the data vector is assumed to match the number of elements in the mesh.
+     * The data vector represents the lower half of the tensor
+     * Checking cannot be done at this stage since the data is associated with an empty VTK mesh structure.
+     */
+    void AddTensorCellData(std::string name, std::vector<c_vector<double,SPACE_DIM*(SPACE_DIM+1)/2> > data);
+
+    /**
+     * Add a tensor data field to each element (known as "cell" in VTK).
+     * @param name is a meaningful name with which to annotate the data
+     * @param data is the data which should appear in the same order as the element numbering
+     * The length of the data vector is assumed to match the number of elements in the mesh.
+     * Checking cannot be done at this stage since the data is associated with an empty VTK mesh structure.
+     */
+    void AddTensorCellData(std::string name, std::vector<c_matrix<double,SPACE_DIM,SPACE_DIM> > data);
+
+
+    /**
      * Add a scalar data field to each node (known as "point" in VTK).
      * @param name is a meaningful name with which to annotate the data
      * @param data is the data which should appear in the same order as the node numbering

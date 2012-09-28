@@ -349,6 +349,28 @@ public:
         }
         writer.AddCellData("Centroid", centroid);
 
+        // Add Jacobian tensor cell data, covering both the symmetric and non-symmetric tensor methods
+        std::vector< c_matrix<double, 2, 2> > jacobian;
+        std::vector< c_vector<double, 3> > squared_jacobian;
+        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        {
+            c_matrix<double, 2, 2> element_jacobian;
+            double element_jacobian_determinant;
+            mesh.GetElement(i)->CalculateJacobian(element_jacobian, element_jacobian_determinant);
+            jacobian.push_back(element_jacobian);
+
+            c_matrix<double, 2, 2> squared_element_jacobian = prod(element_jacobian, element_jacobian);
+            c_vector<double, 3> tri_squared_element_jacobian;
+            //We store [T00 T01 T02 T11 T12 T22]
+            tri_squared_element_jacobian(0) = squared_element_jacobian(0, 0);
+            tri_squared_element_jacobian(1) = squared_element_jacobian(0, 1);
+            tri_squared_element_jacobian(2) = squared_element_jacobian(1, 1);
+
+            squared_jacobian.push_back(tri_squared_element_jacobian);
+        }
+        writer.AddTensorCellData("Jacobian", jacobian);
+        writer.AddTensorCellData("SquaredJacobian", squared_jacobian);
+
 
         writer.WriteFilesUsingMesh(mesh);
         //13K uncompressed, 3.7K compressed
@@ -390,6 +412,8 @@ public:
                     TS_ASSERT_EQUALS(centroid[i][j], centroid_read[i][j]);
                 }
             }
+
+            ///\todo #2254  Implement reading of tensor data & test.
         }
 #else
         std::cout << "This test was not run, as VTK is not enabled." << std::endl;
@@ -439,6 +463,31 @@ public:
         }
         writer.AddPointData("Location", location);
 
+        // Add Jacobian tensor cell data, covering both the symmetric and non-symmetric tensor methods
+        std::vector< c_matrix<double, 3, 3> > jacobian;
+        std::vector< c_vector<double, 6> > squared_jacobian;
+        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        {
+            c_matrix<double, 3, 3> element_jacobian;
+            double element_jacobian_determinant;
+            mesh.GetElement(i)->CalculateJacobian(element_jacobian, element_jacobian_determinant);
+            jacobian.push_back(element_jacobian);
+
+            c_matrix<double, 3, 3> squared_element_jacobian = prod(element_jacobian, element_jacobian);
+            c_vector<double, 6> tri_squared_element_jacobian;
+            //We store [T00 T01 T02 T11 T12 T22]
+            tri_squared_element_jacobian(0) = squared_element_jacobian(0, 0);
+            tri_squared_element_jacobian(1) = squared_element_jacobian(0, 1);
+            tri_squared_element_jacobian(2) = squared_element_jacobian(0, 2);
+            tri_squared_element_jacobian(3) = squared_element_jacobian(1, 1);
+            tri_squared_element_jacobian(4) = squared_element_jacobian(1, 2);
+            tri_squared_element_jacobian(5) = squared_element_jacobian(2, 2);
+
+            squared_jacobian.push_back(tri_squared_element_jacobian);
+        }
+        writer.AddTensorCellData("Jacobian", jacobian);
+        writer.AddTensorCellData("SquaredJacobian", squared_jacobian);
+
         writer.WriteFilesUsingMesh(mesh);
         //32K uncompressed, 19K compressed
 
@@ -467,6 +516,8 @@ public:
             vtk_reader.GetCellData("Centroid", centroid_read);
             TS_ASSERT_EQUALS(centroid_read.size(),centroid.size());
             ///\todo #1731 - need to read the tensors too.
+
+            ///\todo #2254  Implement reading of tensor data & test.
         }
 #else
         std::cout << "This test was not run, as VTK is not enabled." << std::endl;
