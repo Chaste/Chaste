@@ -70,7 +70,7 @@ import time
 
 import SCons
 
-sys.path[0:0] = ['python', 'python/infra', 'python/hostconfig']
+sys.path[0:0] = ['python/infra', 'python/hostconfig', 'python']
 import BuildTypes
 import SConsTools
 Export('SConsTools')
