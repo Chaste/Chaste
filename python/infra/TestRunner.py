@@ -241,6 +241,8 @@ if __name__ == '__main__':
         run_time_flags = ''
 
     # Get a build object for this build type
+    parent_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+    sys.path[0:0] = [parent_path]
     import BuildTypes
     build = BuildTypes.GetBuildType(build_type)
 

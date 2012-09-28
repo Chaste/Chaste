@@ -367,6 +367,10 @@ Export('env', 'dynenv')
 # Test log files to summarise
 test_log_files = []
 
+# 'Infrastructure' tests of the codebase layout etc.
+def run_infra(test, out):
+    os.system('python/infra/TestRunner.py python/infra/' + test + ' ' + str(out)
+              + ' ' + build_type + ' --no-stdout')
 if run_infrastructure_tests and not GetOption('clean'):
     if not os.path.exists(build.GetTestReportDir()):
         os.makedirs(build.GetTestReportDir())
@@ -374,33 +378,27 @@ if run_infrastructure_tests and not GetOption('clean'):
         print "Running infrastructure tests..."
     # Check for orphaned test files
     out = File(build.GetTestReportDir() + 'OrphanedTests.log')
-    os.system('python/TestRunner.py python/infra/CheckForOrphanedTests.py ' +
-              str(out) + ' ' + build_type + ' --no-stdout')
+    run_infra('CheckForOrphanedTests.py', out)
     test_log_files.append(out)
     # Check for duplicate file names in multiple directories
     out = File(build.GetTestReportDir() + 'DuplicateFileNames.log')
-    os.system('python/TestRunner.py python/infra/CheckForDuplicateFileNames.py ' +
-              str(out) + ' ' + build_type + ' --no-stdout')
+    run_infra('CheckForDuplicateFileNames.py', out)
     test_log_files.append(out)
     # Check for duplicate file names in multiple directories
     out = File(build.GetTestReportDir() + 'Copyrights.log')
-    os.system('python/TestRunner.py python/infra/CheckForCopyrights.py ' +
-              str(out) + ' ' + build_type + ' --no-stdout')
+    run_infra('CheckForCopyrights.py', out)
     test_log_files.append(out)
     ## Do not check for stale semaphores - it's only important on MPICH with Gnu Linux
     #out = File(build.GetTestReportDir() + 'Semaphores.log')
-    #os.system('python/TestRunner.py python/CheckSemaphores.py ' +
-    #          str(out) + ' ' + build_type + ' --no-stdout')
+    #run_infra('CheckSemaphores.py', out)
     #test_log_files.append(out)
     # Check for stray schemas
     out = File(build.GetTestReportDir() + 'Schemas.log')
-    os.system('python/TestRunner.py python/infra/CheckSchemas.py ' +
-              str(out) + ' ' + build_type + ' --no-stdout')
+    run_infra('CheckSchemas.py', out)
     test_log_files.append(out)
 if check_failing_tests:
     out = File(build.GetTestReportDir() + 'FailingTests.log')
-    os.system('python/TestRunner.py python/infra/CheckForFailingTests.py ' +
-              str(out) + ' ' + build_type + ' --no-stdout')
+    run_infra('CheckForFailingTests.py', out)
     test_log_files.append(out)
 
 build_dir = build.build_dir

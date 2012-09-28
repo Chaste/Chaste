@@ -42,10 +42,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #                an index page.
 #  <build_type>  The build type used; defaults to Coverage.
 
-import sys
+import itertools
 import glob
 import os
-import itertools
+import sys
+
+parent_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+sys.path[0:0] = [parent_path]
 import BuildTypes
 
 # Arguments to gcov
