@@ -562,7 +562,7 @@ public:
 
 
      /**
-      * Calculate the bounding box (width extremes for all dimensions of the mesh.
+      * Computes the minimum and maximum lengths of the edges in the mesh.
       * Overridden in Distributed case
       * \todo Should be const
       *
