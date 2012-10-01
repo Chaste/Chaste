@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractElement.hpp"
 
+#include "MathsCustomFunctions.hpp"
 #include "Exception.hpp"
 
 #include <cassert>
@@ -192,8 +193,9 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetUnsignedAttribute()
 {
     double double_attr = GetAttribute();
-    unsigned unsigned_attr = (unsigned) double_attr;
-    if (fabs(double_attr-((double)(unsigned_attr)))>1e-9)
+    unsigned unsigned_attr = (unsigned) (double_attr + 0.5);
+    
+    if( CompareDoubles::WithinAnyTolerance(double_attr, unsigned_attr) == false )
     {
         EXCEPTION("Element attribute '"<< double_attr <<"' cannot be converted to an unsigned.");
     }

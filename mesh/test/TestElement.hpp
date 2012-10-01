@@ -494,9 +494,13 @@ public:
         // Test attribute setting and conversion to unsigned intergers
 
         element.SetAttribute(3);
-        TS_ASSERT_DELTA(fabs(element.GetAttribute()-3.0), 0, 1e-9);
+        TS_ASSERT_DELTA(element.GetAttribute(), 3.00, 1e-9);
 
         element.SetAttribute(3.0);
+        TS_ASSERT_EQUALS(element.GetUnsignedAttribute(), 3u);
+        
+        //Check that rounding happens correctly
+        element.SetAttribute(2.99999999999999999);
         TS_ASSERT_EQUALS(element.GetUnsignedAttribute(), 3u);
 
         element.SetAttribute(3.1);
