@@ -47,7 +47,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ReplicatableVector.hpp"
 #include "TetrahedralMesh.hpp"
 
-
 // useful typedef
 typedef ImplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2>,2> IncompressibleImplicitSolver2d;
 typedef ImplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<3>,3> IncompressibleImplicitSolver3d;
@@ -199,7 +198,7 @@ public:
         ///////////////////////////////////////////////////////////////////////////
         solver.Initialise();
 
-        TS_ASSERT_EQUALS(solver.GetTotalNumQuadPoints(), mesh.GetNumElements()*9u);
+        TS_ASSERT_EQUALS(solver.GetTotalNumQuadPoints(), mesh.GetNumElements()*6u);
 
         // 0.0002 is the initial Ca conc in Lr91
         std::vector<double> calcium_conc(solver.GetTotalNumQuadPoints(), 0.0002);
@@ -316,11 +315,16 @@ public:
 //            }
 //
 //            //// don't delete:
-//            //std::cout << quad_points.Get(i)(0) << " " << quad_points.Get(i)(1) << " " << lambda[i] << "\n";
+//            std::cout << quad_points.Get(i)(0) << " " << quad_points.Get(i)(1) << " " << lambda[i] << "\n";
 //        }
 
         // hardcoded test
-        std::map<unsigned,DataAtQuadraturePoint>::iterator iter = solver.rGetQuadPointToDataAtQuadPointMap().find(34);
+        // Was quad point 34 = 3*9 + 7 (quad 7 in element 3) when there were 9 quads per element
+        // Investigate quad point 21 = 3*6 + 3 (quad 3 in element 3)
+
+        TS_ASSERT_EQUALS(mesh.GetContainingElementIndex(quad_points.Get(21)), 3u);
+
+        std::map<unsigned,DataAtQuadraturePoint>::iterator iter = solver.rGetQuadPointToDataAtQuadPointMap().find(19);
         if(iter != solver.rGetQuadPointToDataAtQuadPointMap().end()) //ie because some processes won't own this in parallel
         {
             TS_ASSERT_DELTA(iter->second.Stretch, 0.9737, 2e-3);
@@ -415,7 +419,10 @@ public:
             TS_ASSERT_DELTA( solver.rGetDeformedPosition()[24](1), 0.9429, 1e-2);
             TS_ASSERT_DELTA( solver.rGetDeformedPosition()[24](0), 1.0565, 1e-2);
 
-            std::map<unsigned,DataAtQuadraturePoint>::iterator iter = solver.rGetQuadPointToDataAtQuadPointMap().find(34);
+
+            // Was quad point 34 = 3*9 + 7 (quad 7 in element 3) when there were 9 quads per element
+            // Investigate quad point 19 = 3*6 + 1 (quad 3 in element 3)
+            std::map<unsigned,DataAtQuadraturePoint>::iterator iter = solver.rGetQuadPointToDataAtQuadPointMap().find(19);
             if(iter != solver.rGetQuadPointToDataAtQuadPointMap().end()) //ie because some processes won't own this in parallel
             {
                 TS_ASSERT_DELTA(iter->second.Stretch, 0.9682, 1e-3);  // ** different value to previous test - attributing the difference in results to the fact mesh isn't rotation-invariant
@@ -606,7 +613,7 @@ public:
 
         FileFinder bad_file("heart/test/data/fibre_tests/badheader_4by4mesh_fibres.orthoquad", RelativeTo::ChasteSourceRoot);
         TS_ASSERT_THROWS_CONTAINS(solver.SetVariableFibreSheetDirections(bad_file, true),
-                                  "found 45430, expected 288");
+                                  "found 45430, expected 192");
 
         FileFinder good_file("heart/test/data/fibre_tests/4by4mesh_fibres.orthoquad", RelativeTo::ChasteSourceRoot);
         solver.SetVariableFibreSheetDirections(good_file, true);
@@ -634,7 +641,7 @@ public:
         TS_ASSERT_DELTA( solver.rGetDeformedPosition()[24](1), 0.9429, 1e-2);
         TS_ASSERT_DELTA( solver.rGetDeformedPosition()[24](0), 1.0565, 1e-2);
 
-        std::map<unsigned,DataAtQuadraturePoint>::iterator iter = solver.rGetQuadPointToDataAtQuadPointMap().find(34);
+        std::map<unsigned,DataAtQuadraturePoint>::iterator iter = solver.rGetQuadPointToDataAtQuadPointMap().find(19);
         if(iter != solver.rGetQuadPointToDataAtQuadPointMap().end()) //ie because some processes won't own this in parallel
         {
             TS_ASSERT_DELTA(iter->second.Stretch, 0.9682, 1e-3);

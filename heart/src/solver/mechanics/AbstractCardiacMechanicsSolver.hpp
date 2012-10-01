@@ -384,7 +384,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Initialise()
                 data_at_quad_point.Stretch = 1.0;
                 data_at_quad_point.StretchLastTimeStep = 1.0;
 
-                   if (mpMeshPair->GetFineMesh().GetElement(fine_elements[quad_pt_global_index].ElementNum)->GetUnsignedAttribute() == HeartRegionCode::GetValidBathId())
+                if (mpMeshPair->GetFineMesh().GetElement(fine_elements[quad_pt_global_index].ElementNum)->GetUnsignedAttribute() == HeartRegionCode::GetValidBathId())
                 {
                     data_at_quad_point.Active = false;//bath
                 }

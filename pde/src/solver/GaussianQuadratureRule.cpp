@@ -153,7 +153,37 @@ GaussianQuadratureRule<2>::GaussianQuadratureRule(unsigned deprecated, unsigned 
             mPoints.push_back(ChastePoint<2>(one_sixth,  two_thirds));
             break;
 
-        case 3:
+        case 3: // 2d, 3rd order - derived by hand and using a Macsyma script to solve the cubic
+                //                60*x^3  - 60*x^2  + 15*x - 1; .
+            mNumQuadPoints = 6;
+            {
+                double w = 1.0/12.0;
+                mWeights.push_back(w);
+                mWeights.push_back(w);
+                mWeights.push_back(w);
+                mWeights.push_back(w);
+                mWeights.push_back(w);
+                mWeights.push_back(w);
+
+                double inverse_tan = atan(0.75);
+                double cos_third = cos(inverse_tan/3.0);
+                double sin_third = sin(inverse_tan/3.0);
+                // a = 0.23193336461755
+                double a =   sin_third/(2*sqrt(3.0)) - cos_third/6.0 + 1.0/3.0;
+                // b = 0.10903901046622
+                double b = - sin_third/(2*sqrt(3.0)) - cos_third/6.0 + 1.0/3.0;
+                // c = 0.659028
+                double c = cos_third/3.0 + 1.0/3.0;
+
+                mPoints.push_back(ChastePoint<2>(a, b));
+                mPoints.push_back(ChastePoint<2>(a, c));
+                mPoints.push_back(ChastePoint<2>(b, a));
+                mPoints.push_back(ChastePoint<2>(b, c));
+                mPoints.push_back(ChastePoint<2>(c, a));
+                mPoints.push_back(ChastePoint<2>(c, b));
+            }
+            break;
+        //case 3:
         case 4: // 2d, 4th order
         	mNumQuadPoints = 9;
             mWeights.push_back(0.06846437766975);
