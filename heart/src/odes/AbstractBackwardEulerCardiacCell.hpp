@@ -195,6 +195,9 @@ protected:
 };
 
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 /*
  * NOTE: Explicit instantiation is not used for this class, because the SIZE
  * template parameter could take arbitrary values.
@@ -315,6 +318,219 @@ void AbstractBackwardEulerCardiacCell<SIZE>::SolveAndUpdateState(double tStart, 
         stepper.AdvanceOneTimeStep();
     }
 }
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Specialization for the case where there are no non-linear ODEs in the model.
+ */
+template<>
+class AbstractBackwardEulerCardiacCell<0u> : public AbstractCardiacCell
+{
+private:
+    /** Needed for serialization. */
+    friend class boost::serialization::access;
+    /**
+     * Archive the member variables.
+     *
+     * @param archive
+     * @param version
+     */
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+        // This calls serialize on the base class.
+        archive & boost::serialization::base_object<AbstractCardiacCell>(*this);
+    }
+
+public:
+    /**
+     * Standard constructor for a cell.
+     *
+     * @param numberOfStateVariables  the size of the ODE system
+     * @param voltageIndex  the index of the variable representing the transmembrane
+     *     potential within the state variable vector
+     * @param pIntracellularStimulus  the intracellular stimulus function
+     */
+    AbstractBackwardEulerCardiacCell(unsigned numberOfStateVariables,
+                                     unsigned voltageIndex,
+                                     boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus)
+        : AbstractCardiacCell(boost::shared_ptr<AbstractIvpOdeSolver>(),
+                              numberOfStateVariables,
+                              voltageIndex,
+                              pIntracellularStimulus)
+    {}
+
+    /** Virtual destructor */
+    virtual ~AbstractBackwardEulerCardiacCell()
+    {}
+
+    /**
+     * Simulates this cell's behaviour between the time interval [tStart, tEnd],
+     * with timestep #mDt.  Uses a forward Euler step to update the transmembrane
+     * potential at each timestep.
+     *
+     * The length of the time interval must be a multiple of the timestep.
+     *
+     * @param tStart  beginning of the time interval to simulate
+     * @param tEnd  end of the time interval to simulate
+     * @param tSamp  sampling interval for returned results (defaults to #mDt)
+     * @return  the values of each state variable, at intervals of tSamp.
+     */
+    OdeSolution Compute(double tStart, double tEnd, double tSamp=0.0)
+    {
+        // In this method, we iterate over timesteps, doing the following for each:
+        //   - update V using a forward Euler step
+        //   - call ComputeExceptVoltage(t) to update the remaining state variables
+        //     using backward Euler
+
+        // Check length of time interval
+        if (tSamp < mDt)
+        {
+            tSamp = mDt;
+        }
+        double _n_steps = (tEnd - tStart) / tSamp;
+        const unsigned n_steps = (unsigned) floor(_n_steps+0.5);
+        assert(fabs(tStart+n_steps*tSamp - tEnd) < 1e-12);
+        const unsigned n_small_steps = (unsigned) floor(tSamp/mDt+0.5);
+        assert(fabs(mDt*n_small_steps - tSamp) < 1e-12);
+
+        // Initialise solution store
+        OdeSolution solutions;
+        solutions.SetNumberOfTimeSteps(n_steps);
+        solutions.rGetSolutions().push_back(rGetStateVariables());
+        solutions.rGetTimes().push_back(tStart);
+        solutions.SetOdeSystemInformation(this->mpSystemInfo);
+
+        // Loop over time
+        double curr_time = tStart;
+        for (unsigned i=0; i<n_steps; i++)
+        {
+            for (unsigned j=0; j<n_small_steps; j++)
+            {
+                curr_time = tStart + i*tSamp + j*mDt;
+
+                // Compute next value of V
+                UpdateTransmembranePotential(curr_time);
+
+                // Compute other state variables
+                ComputeOneStepExceptVoltage(curr_time);
+
+                // check gating variables are still in range
+                VerifyStateVariables();
+            }
+
+            // Update solutions
+            solutions.rGetSolutions().push_back(rGetStateVariables());
+            solutions.rGetTimes().push_back(curr_time+mDt);
+        }
+
+        return solutions;
+    }
+
+    /**
+     * Simulates this cell's behaviour between the time interval [tStart, tEnd],
+     * with timestep #mDt.  The transmembrane potential is kept fixed throughout.
+     *
+     * The length of the time interval must be a multiple of the timestep.
+     *
+     * @param tStart  beginning of the time interval to simulate
+     * @param tEnd  end of the time interval to simulate
+     */
+    void ComputeExceptVoltage(double tStart, double tEnd)
+    {
+        // This method iterates over timesteps, calling ComputeExceptVoltage(t) at
+        // each one, to update all state variables except for V, using backward Euler.
+
+        // Check length of time interval
+        unsigned n_steps = (unsigned)((tEnd - tStart) / mDt + 0.5);
+        assert(fabs(tStart + n_steps*mDt - tEnd) < 1e-12);
+
+        // Loop over time
+        double curr_time;
+        for (unsigned i=0; i<n_steps; i++)
+        {
+            curr_time = tStart + i*mDt;
+
+            // Compute other state variables
+            ComputeOneStepExceptVoltage(curr_time);
+
+#ifndef NDEBUG
+            // Check gating variables are still in range
+            VerifyStateVariables();
+#endif // NDEBUG
+        }
+    }
+
+    /**
+     * Simulate this cell's behaviour between the time interval [tStart, tEnd],
+     * with timestemp #mDt, updating the internal state variable values.
+     *
+     * @param tStart  beginning of the time interval to simulate
+     * @param tEnd  end of the time interval to simulate
+     */
+    void SolveAndUpdateState(double tStart, double tEnd)
+    {
+        TimeStepper stepper(tStart, tEnd, mDt);
+
+        while(!stepper.IsTimeAtEnd())
+        {
+            double time = stepper.GetTime();
+
+            // Compute next value of V
+            UpdateTransmembranePotential(time);
+
+            // Compute other state variables
+            ComputeOneStepExceptVoltage(time);
+
+            // check gating variables are still in range
+            VerifyStateVariables();
+
+            stepper.AdvanceOneTimeStep();
+        }
+    }
+
+private:
+#define COVERAGE_IGNORE
+    /**
+     * This function should never be called - the cell class incorporates its own solver.
+     *
+     * @param time
+     * @param rY
+     * @param rDY
+     */
+    void EvaluateYDerivatives(double time, const std::vector<double> &rY, std::vector<double> &rDY)
+    {
+        NEVER_REACHED;
+    }
+#undef COVERAGE_IGNORE
+
+protected:
+    /**
+     * Compute the values of all state variables, except the voltage, using backward Euler,
+     * for one timestep from tStart.
+     *
+     * \note This method must be provided by subclasses.
+     *
+     * @param tStart  start of this timestep
+     */
+    virtual void ComputeOneStepExceptVoltage(double tStart)=0;
+
+    /**
+     * Perform a forward Euler step to update the transmembrane potential.
+     *
+     * \note This method must be provided by subclasses.
+     *
+     * @param time  start of this timestep
+     */
+    virtual void UpdateTransmembranePotential(double time)=0;
+};
+
+
 
 
 TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractBackwardEulerCardiacCell)

@@ -1681,23 +1681,19 @@ class CellMLToChasteTranslator(CellMLTranslator):
         self.include_serialization = not self.use_modifiers # TODO: Implement
         
         # Check if we're generating a Backward Euler model
-        if hasattr(self.model, u'solver_info') and hasattr(self.model.solver_info, u'jacobian'):
-            self.use_backward_euler = True
+        self.use_backward_euler = self.model.get_option('backward_euler')
+        if self.use_backward_euler:
+            assert hasattr(self.model, u'solver_info')
             # Find the size of the nonlinear system
-            num_linear_odes = len(self.model.solver_info.xml_xpath(
-                u'solver:linear_odes/m:math/m:apply'))
+            num_linear_odes = len(self.model.solver_info.xml_xpath(u'solver:linear_odes/m:math/m:apply'))
             self.nonlinear_system_size = len(self.state_vars) - 1 - num_linear_odes
-            nonlinear_entries = self.model.solver_info.xml_xpath(
-                u'solver:jacobian/solver:entry/@var_j')
+            nonlinear_entries = self.model.solver_info.xml_xpath(u'solver:jacobian/solver:entry/@var_j')
             self.nonlinear_system_vars = map(self.varobj, nonlinear_entries[:self.nonlinear_system_size])
-        else:
-            self.use_backward_euler = False
         # Start output
         self.output_includes()
         
         if self.use_backward_euler or self.options.rush_larsen:
-            # Keep the same signature as forward cell models, but note that the solver
-            # isn't used
+            # Keep the same signature as forward cell models, but note that the solver isn't used
             solver1 = 'boost::shared_ptr<AbstractIvpOdeSolver> /* unused; should be empty */'
             solver2 = ''
             #solver1 = solver2 = ''
@@ -2420,67 +2416,68 @@ class CellMLToChasteTranslator(CellMLTranslator):
         """
         dt_name = 'mDt'
         #model_dt = self.varobj(self.model.solver_info.dt)
-        # Residual
-        ##########
-        argsize = '[' + str(self.nonlinear_system_size) + ']'
-        self.output_method_start('ComputeResidual',
-                                 [self.TYPE_DOUBLE + self.code_name(self.free_vars[0]),
-                                  self.TYPE_CONST_DOUBLE + 'rCurrentGuess' + argsize,
-                                  self.TYPE_DOUBLE + 'rResidual' + argsize],
-                                 'void', access='public')
-        self.open_block()
-        # Output mathematics for computing du/dt for each nonlinear state var u
-        nodes = map(lambda u: (u, self.free_vars[0]), self.nonlinear_system_vars)
-        nodeset = self.calculate_extended_dependencies(nodes, prune_deps=[self.doc._cml_config.i_stim_var])
-        self.output_state_assignments(exclude_nonlinear=True, nodeset=nodeset)
-        self.output_nonlinear_state_assignments(nodeset=nodeset)
-        if self.use_lookup_tables:
-            self.output_table_index_generation(nodeset=nodeset)
-        self.output_equations(nodeset)
-        self.writeln()
-        # Fill in residual
-        for i, var in enumerate(self.state_vars):
-            try:
-                j = self.nonlinear_system_vars.index(var)
-            except ValueError:
-                j = -1
-            if j != -1:
-                self.writeln('rResidual[', j, '] = rCurrentGuess[', j, '] - rY[', i, '] - ',
-                             dt_name, '*', self.code_name(var, ode=True), self.STMT_END)
-        self.close_block()
-        
-        # Jacobian
-        ##########
-        self.output_method_start('ComputeJacobian',
-                                 [self.TYPE_DOUBLE + self.code_name(self.free_vars[0]),
-                                  self.TYPE_CONST_DOUBLE + 'rCurrentGuess' + argsize,
-                                  self.TYPE_DOUBLE + 'rJacobian' + argsize + argsize],
-                                 'void', access='public')
-        self.open_block()
-        # Mathematics that the Jacobian depends on
-        used_vars = set()
-        for entry in self.model.solver_info.jacobian.entry:
-            used_vars.update(self._vars_in(entry.math))
-        nodeset = self.calculate_extended_dependencies(used_vars, prune_deps=[self.doc._cml_config.i_stim_var])
-        self.output_state_assignments(exclude_nonlinear=True, nodeset=nodeset)
-        self.output_nonlinear_state_assignments(nodeset=nodeset)
-        self.writeln(self.TYPE_CONST_DOUBLE, self.code_name(self.config.dt_variable), self.EQ_ASSIGN,
-                     dt_name, self.STMT_END, '\n');
-        if self.use_lookup_tables:
-            self.output_table_index_generation(nodeset=nodeset|set(map(lambda e: e.math, self.model.solver_info.jacobian.entry)))
-        self.output_equations(nodeset)
-        self.writeln()
-        # Jacobian entries
-        for entry in self.model.solver_info.jacobian.entry:
-            var_i, var_j = entry.var_i, entry.var_j
-            i = self.nonlinear_system_vars.index(self.varobj(var_i))
-            j = self.nonlinear_system_vars.index(self.varobj(var_j))
-            self.writeln('rJacobian[', i, '][', j, '] = ', nl=False)
-            entry_content = list(entry.math.xml_element_children())
-            assert len(entry_content) == 1, "Malformed Jacobian matrix entry: " + entry.xml()
-            self.output_expr(entry_content[0], False)
-            self.writeln(self.STMT_END, indent=False)
-        self.close_block()
+        if self.nonlinear_system_size > 0:
+            # Residual
+            ##########
+            argsize = '[' + str(self.nonlinear_system_size) + ']'
+            self.output_method_start('ComputeResidual',
+                                     [self.TYPE_DOUBLE + self.code_name(self.free_vars[0]),
+                                      self.TYPE_CONST_DOUBLE + 'rCurrentGuess' + argsize,
+                                      self.TYPE_DOUBLE + 'rResidual' + argsize],
+                                     'void', access='public')
+            self.open_block()
+            # Output mathematics for computing du/dt for each nonlinear state var u
+            nodes = map(lambda u: (u, self.free_vars[0]), self.nonlinear_system_vars)
+            nodeset = self.calculate_extended_dependencies(nodes, prune_deps=[self.doc._cml_config.i_stim_var])
+            self.output_state_assignments(exclude_nonlinear=True, nodeset=nodeset)
+            self.output_nonlinear_state_assignments(nodeset=nodeset)
+            if self.use_lookup_tables:
+                self.output_table_index_generation(nodeset=nodeset)
+            self.output_equations(nodeset)
+            self.writeln()
+            # Fill in residual
+            for i, var in enumerate(self.state_vars):
+                try:
+                    j = self.nonlinear_system_vars.index(var)
+                except ValueError:
+                    j = -1
+                if j != -1:
+                    self.writeln('rResidual[', j, '] = rCurrentGuess[', j, '] - rY[', i, '] - ',
+                                 dt_name, '*', self.code_name(var, ode=True), self.STMT_END)
+            self.close_block()
+            
+            # Jacobian
+            ##########
+            self.output_method_start('ComputeJacobian',
+                                     [self.TYPE_DOUBLE + self.code_name(self.free_vars[0]),
+                                      self.TYPE_CONST_DOUBLE + 'rCurrentGuess' + argsize,
+                                      self.TYPE_DOUBLE + 'rJacobian' + argsize + argsize],
+                                     'void', access='public')
+            self.open_block()
+            # Mathematics that the Jacobian depends on
+            used_vars = set()
+            for entry in self.model.solver_info.jacobian.entry:
+                used_vars.update(self._vars_in(entry.math))
+            nodeset = self.calculate_extended_dependencies(used_vars, prune_deps=[self.doc._cml_config.i_stim_var])
+            self.output_state_assignments(exclude_nonlinear=True, nodeset=nodeset)
+            self.output_nonlinear_state_assignments(nodeset=nodeset)
+            self.writeln(self.TYPE_CONST_DOUBLE, self.code_name(self.config.dt_variable), self.EQ_ASSIGN,
+                         dt_name, self.STMT_END, '\n');
+            if self.use_lookup_tables:
+                self.output_table_index_generation(nodeset=nodeset|set(map(lambda e: e.math, self.model.solver_info.jacobian.entry)))
+            self.output_equations(nodeset)
+            self.writeln()
+            # Jacobian entries
+            for entry in self.model.solver_info.jacobian.entry:
+                var_i, var_j = entry.var_i, entry.var_j
+                i = self.nonlinear_system_vars.index(self.varobj(var_i))
+                j = self.nonlinear_system_vars.index(self.varobj(var_j))
+                self.writeln('rJacobian[', i, '][', j, '] = ', nl=False)
+                entry_content = list(entry.math.xml_element_children())
+                assert len(entry_content) == 1, "Malformed Jacobian matrix entry: " + entry.xml()
+                self.output_expr(entry_content[0], False)
+                self.writeln(self.STMT_END, indent=False)
+            self.close_block()
         # The other methods are protected
         self.writeln_hpp('protected:', indent_offset=-1)
         
@@ -2542,29 +2539,30 @@ class CellMLToChasteTranslator(CellMLTranslator):
             self.writeln('rY[', j, ']', self.EQ_ASSIGN, nl=False)
             self.output_expr(update_eqns[id(u)], False)
             self.writeln(self.STMT_END, indent=False)
-        # Set up the Newton iteration
+        # Set up the Newton iteration, if needed
         self.writeln()
-        self.writeln('double _guess[', self.nonlinear_system_size, '] = {', nl=False)
-        comma = False
-        idx_map = [0] * self.nonlinear_system_size
-        for i, var in enumerate(self.state_vars):
-            try:
-                j = self.nonlinear_system_vars.index(var)
-                idx_map[j] = i
-            except ValueError:
-                pass
-        for i in idx_map:
-            if comma: self.write(',')
-            else: comma = True
-            self.write('rY[', i, ']')
-        self.writeln('};', indent=False)
-        # Solve
-        CNS = 'CardiacNewtonSolver<%d,%s>' % (self.nonlinear_system_size, self.class_name)
-        self.writeln(CNS, '* _p_solver = ', CNS, '::Instance();')
-        self.writeln('_p_solver->Solve(*this, ', self.code_name(self.free_vars[0]), ', _guess);')
-        # Update state
-        for j, i in enumerate(idx_map):
-            self.writeln('rY[', i, '] = _guess[', j, '];')
+        if self.nonlinear_system_size > 0:
+            self.writeln('double _guess[', self.nonlinear_system_size, '] = {', nl=False)
+            comma = False
+            idx_map = [0] * self.nonlinear_system_size
+            for i, var in enumerate(self.state_vars):
+                try:
+                    j = self.nonlinear_system_vars.index(var)
+                    idx_map[j] = i
+                except ValueError:
+                    pass
+            for i in idx_map:
+                if comma: self.write(',')
+                else: comma = True
+                self.write('rY[', i, ']')
+            self.writeln('};', indent=False)
+            # Solve
+            CNS = 'CardiacNewtonSolver<%d,%s>' % (self.nonlinear_system_size, self.class_name)
+            self.writeln(CNS, '* _p_solver = ', CNS, '::Instance();')
+            self.writeln('_p_solver->Solve(*this, ', self.code_name(self.free_vars[0]), ', _guess);')
+            # Update state
+            for j, i in enumerate(idx_map):
+                self.writeln('rY[', i, '] = _guess[', j, '];')
         self.close_block()
     
     def output_rush_larsen_mathematics(self):
@@ -2903,7 +2901,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
             # Oops!
             raise TranslationError('Time does not have dimensions of time')
         generator.add_input(t, ms)
-        if doc.model.get_option('maple_output'):
+        if doc.model.get_option('backward_euler'):
             # Backward Euler code generation requires access to the time step
             model_dt = solver_info.create_dt(generator, t.component, t.get_units())
             config.dt_variable = generator.add_input(model_dt, ms)
@@ -5077,14 +5075,17 @@ def get_options(args, default_options=None):
                       help="give a warning instead of an error for dimensional inconsistencies")
     parser.add_option('-j', '--maple-output',
                       metavar='FILENAME', default=None,
-                      help="file containing output from a Maple script "
-                      "generated using -J.  The generated code/CellML will "
-                      "then contain a symbolic Jacobian as computed by Maple.")
+                      help="file containing output from a Maple script generated using -J.  The generated"
+                      " code/CellML will then contain a symbolic Jacobian as computed by Maple.")
+    parser.add_option('--backward-euler',
+                      action='store_true', default=False,
+                      help="generate a specialised cell model that solves itself using a decoupled"
+                      " backward Euler method.  Not compatible with --rush-larsen.  Implies -t Chaste."
+                      "  Requires -j.")
     parser.add_option('--rush-larsen',
                       action='store_true', default=False,
                       help="use the Rush-Larsen method to solve Hodgkin-Huxley style gating variable"
-                      " equations.  Not compatible with the backward Euler transformation."
-                      " Implies -t Chaste.")
+                      " equations.  Not compatible with --backward-euler.  Implies -t Chaste.")
     # Settings tweaking the generated code
     parser.add_option('-c', '--class-name', default=None,
                       help="explicitly set the name of the generated class")
@@ -5100,9 +5101,6 @@ def get_options(args, default_options=None):
                       action='store_true', default=False,
                       help="experimental Jacobian analysis; implies -t Maple")
     # Options specific to Maple output
-#    parser.add_option('--omit-constants',
-#                      action='store_true', default=False,
-#                      help="when generating Maple code, don't include assignments of constants")
     parser.add_option('--dont-omit-constants',
                       dest='omit_constants', action='store_false', default=True,
                       help="when generating Maple code, include assignments of constants")
@@ -5220,10 +5218,14 @@ def get_options(args, default_options=None):
         options.debug = True
     if options.do_jacobian_analysis:
         options.translate_type = 'Maple'
-        options.maple_output = False # Just in case...!
-    if options.maple_output:
+        options.maple_output = False
         options.rush_larsen = False
-    if options.rush_larsen:
+        options.backward_euler = False
+    if options.backward_euler:
+        if not options.maple_output:
+            parser.error("Backward Euler code generation requires maple output (-j)")
+        options.rush_larsen = False
+    if options.rush_larsen or options.backward_euler:
         options.translate_type = 'Chaste'
 
     return options, args[0]
@@ -5322,7 +5324,7 @@ def run():
                 class_name += '_pe'
             if options.lut:
                 class_name += '_lut'
-            if options.maple_output:
+            if options.backward_euler:
                 class_name += '_be'
             if options.use_modifiers:
                 class_name += '_sens'

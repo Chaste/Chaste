@@ -310,10 +310,16 @@ def convert(model, output_dir):
                                     class_name + 'Opt', model_base, 'Opt')
         do_cmd(cmd, outputs)
     
+    maple_output = os.path.splitext(model)[0] + '.out'
+    maple_options = []
+    if os.path.exists(maple_output):
+        maple_options.extend(['-j', maple_output])
+
     if options.cvode:
         # For use with CVODE
         if not dyn_opt:
-            cmd, outputs = add_out_opts(command_base + ['-t', 'CVODE'], output_dir,
+            cmd, outputs = add_out_opts(command_base + ['-t', 'CVODE'],
+                                        output_dir,
                                         class_name + 'Cvode', model_base, 'Cvode')
             do_cmd(cmd, outputs)
 
@@ -326,8 +332,8 @@ def convert(model, output_dir):
             do_cmd(cmd, outputs)
     
     if options.backward_euler:
-        maple_output = os.path.splitext(model)[0] + '.out'
-        be_opts = ['-j', maple_output, '-p', '-l']
+        assert maple_options, "A Maple output file is required for Backward Euler code generation"
+        be_opts = maple_options + ['-p', '-l', '--backward-euler']
         cmd, outputs = add_out_opts(command_base + be_opts,
                                     output_dir,
                                     class_name + 'BackwardEuler',
