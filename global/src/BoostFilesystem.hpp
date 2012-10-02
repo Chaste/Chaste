@@ -40,11 +40,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * @file
  * Include the Boost Filesystem library headers,
  * and set up the 'fs' namespace alias.
- * This header also ensures that we use version 2 of the library.
+ * This header also ensures that we use version 2 of the library when available.
  */
 
+#include <boost/version.hpp>
+
+#if BOOST_VERSION <= 104900
 /** Which version of the library to use. */
 #define BOOST_FILESYSTEM_VERSION 2
+/** How to get a leafname as a string (in version 2). */
+#define PATH_LEAF_NAME(path) path.leaf()
+#else
+/** How to get a leafname as a string (in version 3). */
+#define PATH_LEAF_NAME(path) path.leaf().string()
+#endif
 
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>

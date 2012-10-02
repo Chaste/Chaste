@@ -68,7 +68,7 @@ void CleanFolder(const fs::path& rPath, bool isTop=true)
         else
         {
             const fs::path& r_item_path(dir_iter->path());
-            if (!isTop || r_item_path.leaf()[0] != '.')
+            if (!isTop || PATH_LEAF_NAME(r_item_path)[0] != '.')
             {
                 fs::remove(r_item_path);
             }

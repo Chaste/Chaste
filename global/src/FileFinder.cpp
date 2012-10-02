@@ -176,7 +176,7 @@ bool FileFinder::IsEmpty() const
         fs::directory_iterator end_iter;
         for (fs::directory_iterator dir_iter(mAbsPath); dir_iter != end_iter; ++dir_iter)
         {
-            if (dir_iter->path().leaf().substr(0, 1) != ".")
+            if (PATH_LEAF_NAME(dir_iter->path()).substr(0, 1) != ".")
             {
                 empty = false;
                 break;
@@ -208,7 +208,7 @@ bool FileFinder::IsNewerThan(const FileFinder& rOtherEntity) const
 
 std::string FileFinder::GetLeafName() const
 {
-    return fs::path(mAbsPath).leaf();
+    return PATH_LEAF_NAME(fs::path(mAbsPath));
 }
 
 std::string FileFinder::GetLeafNameNoExtension() const
@@ -369,7 +369,7 @@ std::vector<FileFinder> FileFinder::FindMatches(const std::string& rPattern) con
         fs::path our_path(mAbsPath);
         for (fs::directory_iterator dir_iter(our_path); dir_iter != end_iter; ++dir_iter)
         {
-            std::string leafname = dir_iter->path().leaf();
+            std::string leafname = PATH_LEAF_NAME(dir_iter->path());
             size_t leaf_len = leafname.length();
             if (leafname[0] != '.'  // Don't include hidden files
                 && leaf_len >= len) // Ignore stuff that can't match
