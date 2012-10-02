@@ -93,10 +93,11 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
     *p_node_file << std::setprecision(20);
 
     // Write each node's data
-    unsigned default_marker = UINT_MAX; ///\todo #1899 or #1949 Is this necessary?
     for (unsigned item_num=0; item_num<num_nodes; item_num++)
     {
-        WriteItem(p_node_file, item_num, this->GetNextNode(), default_marker);
+        //if(mpMesh) get the attributes and write, tag as a hack.
+
+        WriteItem(p_node_file, item_num, this->GetNextNode());
     }
     *p_node_file << comment << "\n";
     p_node_file->close();
@@ -158,6 +159,7 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
         }
 
         // Write each element's data
+        std::vector<unsigned> attribute_values(1);
         for (unsigned item_num=0; item_num<num_elements; item_num++)
         {
             /*
@@ -169,7 +171,8 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
                 element_data = this->GetNextElement();
             }
             //Note: Cable element has a double attribute for radius but regular element have always had an unsigned region marker
-            WriteItem(p_element_file, item_num, element_data.NodeIndices, (unsigned) element_data.AttributeValue);
+            attribute_values[0] = (unsigned) element_data.AttributeValue;
+            WriteItem(p_element_file, item_num, element_data.NodeIndices, attribute_values);
         }
         *p_element_file << comment << "\n";
         p_element_file->close();
@@ -211,7 +214,7 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
         }
 
         // Write each face's data
-        default_marker = UINT_MAX;
+        std::vector<int> default_marker(0);
         for (unsigned item_num=0; item_num<num_faces; item_num++)
         {
             ElementData face_data = this->GetNextBoundaryElement();
@@ -244,11 +247,13 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
             }
 
             // Write each element's data
+            std::vector<double> attribute_values(1);
             for (unsigned item_num=0; item_num<num_cable_elements; item_num++)
             {
                 ElementData cable_element_data = this->GetNextCableElement();
                 //Cable element has a double attribute for radius
-                WriteItem(p_cable_element_file, item_num, cable_element_data.NodeIndices, cable_element_data.AttributeValue);
+                attribute_values[0] = cable_element_data.AttributeValue;
+                WriteItem(p_cable_element_file, item_num, cable_element_data.NodeIndices, attribute_values);
             }
             *p_cable_element_file << comment;
             p_cable_element_file->close();
@@ -320,7 +325,7 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFacesAsEdges()
     unsigned num_faces = this->GetNumBoundaryFaces();
 
     unsigned max_bdy_marker = 0;
-    unsigned default_marker = UINT_MAX;
+    std::vector<int> default_marker(0);
 
     *p_face_file << num_faces << "\t";
     *p_face_file << max_bdy_marker;
@@ -351,14 +356,15 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteItem(out_stream &pFile, u
 {
     //Writing with no attribute
     //Instantiates the attribute variety with the attribute type set to unsigned
-    WriteItem(pFile, itemNumber, dataPacket, UINT_MAX);
+    WriteItem(pFile, itemNumber, dataPacket, std::vector<int>());
 }
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 template<class T_DATA, class T_ATTR>
 void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteItem(out_stream &pFile, unsigned itemNumber,
-                                                            const std::vector<T_DATA> &dataPacket, T_ATTR attribute)
+                                                            const std::vector<T_DATA> &dataPacket,
+                                                            const std::vector<T_ATTR> &rAttributes)
 {
     if (this->mFilesAreBinary)
     {
@@ -367,10 +373,7 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteItem(out_stream &pFile, u
         pFile->write((char*)&dataPacket[0], dataPacket.size()*sizeof(T_DATA));
 
         // Write raw attribute
-        if (attribute != (std::numeric_limits<T_ATTR>::max)())  //or attribute != UINT_MAX
-        {
-            pFile->write((char*) &attribute, sizeof(attribute));
-        }
+        pFile->write((char*)&rAttributes[0], rAttributes.size()*sizeof(T_ATTR));
     }
     else
     {
@@ -379,9 +382,9 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteItem(out_stream &pFile, u
         {
             *pFile << "\t" << dataPacket[i];
         }
-        if (attribute != (std::numeric_limits<T_ATTR>::max)())  //or attribute != UINT_MAX
+        for (unsigned i=0; i<rAttributes.size(); i++)
         {
-            *pFile << "\t" << attribute;
+            *pFile << "\t" << rAttributes[i];
         }
         *pFile << "\n";
     }
@@ -402,18 +405,30 @@ template class TrianglesMeshWriter<3,3>;
  * \cond
  * Get Doxygen to ignore, since it's confused by explicit instantiation of templated methods
  */
-template void TrianglesMeshWriter<1, 1>::WriteItem(out_stream &, unsigned, const std::vector<unsigned> &, double );
-template void TrianglesMeshWriter<1, 1>::WriteItem(out_stream &, unsigned, const std::vector<double>   &, double );
-template void TrianglesMeshWriter<1, 2>::WriteItem(out_stream &, unsigned, const std::vector<unsigned> &, double );
-template void TrianglesMeshWriter<1, 2>::WriteItem(out_stream &, unsigned, const std::vector<double>   &, double );
-template void TrianglesMeshWriter<1, 3>::WriteItem(out_stream &, unsigned, const std::vector<unsigned> &, double );
-template void TrianglesMeshWriter<1, 3>::WriteItem(out_stream &, unsigned, const std::vector<double>   &, double );
-template void TrianglesMeshWriter<2, 2>::WriteItem(out_stream &, unsigned, const std::vector<unsigned> &, double );
-template void TrianglesMeshWriter<2, 2>::WriteItem(out_stream &, unsigned, const std::vector<double>   &, double );
-template void TrianglesMeshWriter<2, 3>::WriteItem(out_stream &, unsigned, const std::vector<unsigned> &, double );
-template void TrianglesMeshWriter<2, 3>::WriteItem(out_stream &, unsigned, const std::vector<double>   &, double );
-template void TrianglesMeshWriter<3, 3>::WriteItem(out_stream &, unsigned, const std::vector<unsigned> &, double );
-template void TrianglesMeshWriter<3, 3>::WriteItem(out_stream &, unsigned, const std::vector<double>   &, double );
+template void TrianglesMeshWriter<1, 1>::WriteItem(out_stream &, unsigned, const std::vector<unsigned> &, const std::vector<unsigned> & );
+template void TrianglesMeshWriter<1, 1>::WriteItem(out_stream &, unsigned, const std::vector<unsigned> &, const std::vector<double>   & );
+template void TrianglesMeshWriter<1, 1>::WriteItem(out_stream &, unsigned, const std::vector<double>   &, const std::vector<unsigned> & );
+template void TrianglesMeshWriter<1, 1>::WriteItem(out_stream &, unsigned, const std::vector<double>   &, const std::vector<double>   & );
+template void TrianglesMeshWriter<1, 2>::WriteItem(out_stream &, unsigned, const std::vector<unsigned> &, const std::vector<unsigned> & );
+template void TrianglesMeshWriter<1, 2>::WriteItem(out_stream &, unsigned, const std::vector<unsigned> &, const std::vector<double>   & );
+template void TrianglesMeshWriter<1, 2>::WriteItem(out_stream &, unsigned, const std::vector<double>   &, const std::vector<unsigned> & );
+template void TrianglesMeshWriter<1, 2>::WriteItem(out_stream &, unsigned, const std::vector<double>   &, const std::vector<double>   & );
+template void TrianglesMeshWriter<1, 3>::WriteItem(out_stream &, unsigned, const std::vector<unsigned> &, const std::vector<unsigned> & );
+template void TrianglesMeshWriter<1, 3>::WriteItem(out_stream &, unsigned, const std::vector<unsigned> &, const std::vector<double>   & );
+template void TrianglesMeshWriter<1, 3>::WriteItem(out_stream &, unsigned, const std::vector<double>   &, const std::vector<unsigned> & );
+template void TrianglesMeshWriter<1, 3>::WriteItem(out_stream &, unsigned, const std::vector<double>   &, const std::vector<double>   & );
+template void TrianglesMeshWriter<2, 2>::WriteItem(out_stream &, unsigned, const std::vector<unsigned> &, const std::vector<unsigned> & );
+template void TrianglesMeshWriter<2, 2>::WriteItem(out_stream &, unsigned, const std::vector<unsigned> &, const std::vector<double>   & );
+template void TrianglesMeshWriter<2, 2>::WriteItem(out_stream &, unsigned, const std::vector<double>   &, const std::vector<unsigned> & );
+template void TrianglesMeshWriter<2, 2>::WriteItem(out_stream &, unsigned, const std::vector<double>   &, const std::vector<double>   & );
+template void TrianglesMeshWriter<2, 3>::WriteItem(out_stream &, unsigned, const std::vector<unsigned> &, const std::vector<unsigned> & );
+template void TrianglesMeshWriter<2, 3>::WriteItem(out_stream &, unsigned, const std::vector<unsigned> &, const std::vector<double>   & );
+template void TrianglesMeshWriter<2, 3>::WriteItem(out_stream &, unsigned, const std::vector<double>   &, const std::vector<unsigned> & );
+template void TrianglesMeshWriter<2, 3>::WriteItem(out_stream &, unsigned, const std::vector<double>   &, const std::vector<double>   & );
+template void TrianglesMeshWriter<3, 3>::WriteItem(out_stream &, unsigned, const std::vector<unsigned> &, const std::vector<unsigned> & );
+template void TrianglesMeshWriter<3, 3>::WriteItem(out_stream &, unsigned, const std::vector<unsigned> &, const std::vector<double>   & );
+template void TrianglesMeshWriter<3, 3>::WriteItem(out_stream &, unsigned, const std::vector<double>   &, const std::vector<unsigned> & );
+template void TrianglesMeshWriter<3, 3>::WriteItem(out_stream &, unsigned, const std::vector<double>   &, const std::vector<double>   & );
 /**
  * \endcond
  * Get Doxygen to ignore, since it's confused by explicit instantiation of templated methods
