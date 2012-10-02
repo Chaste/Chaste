@@ -1638,6 +1638,21 @@ public:
         }
     }
 
+    void Test1DIn3DBranchWithAttributes() throw(Exception)
+    {
+        TrianglesMeshReader<1,3> mesh_reader("mesh/test/data/y_branch_3d_mesh");
+        TetrahedralMesh<1,3> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+        
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 4u);
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), 3u);
+        TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 3u);
+        TS_ASSERT_EQUALS(mesh.GetNumBoundaryNodes(), 3u);
+        TS_ASSERT_EQUALS(mesh.GetElement(0)->GetAttribute(), 50.0);
+        TS_ASSERT_EQUALS(mesh.GetElement(1)->GetAttribute(), 25.0);
+        TS_ASSERT_EQUALS(mesh.GetElement(2)->GetAttribute(), 25.0);
+    }
+
     void TestCuboidMeshConstructors() throw(Exception)
     {
         CuboidMeshConstructor<1> constructor1;

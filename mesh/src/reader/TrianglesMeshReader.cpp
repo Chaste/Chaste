@@ -652,6 +652,11 @@ void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::ReadHeaders()
         element_header_line >> mNumElements >> mNumFaceAttributes;
 
         extra_attributes = mNumFaceAttributes;
+        
+        if (ELEMENT_DIM == 1)
+        {
+            mNumElementAttributes = mNumFaceAttributes;
+        }
 
         // Is there anything else on the header line?
         std::string element_extras;
