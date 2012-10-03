@@ -248,7 +248,8 @@ class PartialEvaluator(object):
         if solver_info.has_modifiable_mathematics():
             # Do BTA and reduce/eval of solver info section
             for expr in solver_info.get_modifiable_mathematics():
-                self._process_ci_elts(expr, lambda ci: ci.variable._used())
+                if not (isinstance(expr, mathml_apply) and expr.is_top_level()):
+                    self._process_ci_elts(expr, lambda ci: ci.variable._used())
                 self._process_ci_elts(expr, self._check_retargetting)
             solver_info.do_binding_time_analysis()
             self._do_reduce_eval_loop(solver_info.get_modifiable_mathematics)

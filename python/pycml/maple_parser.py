@@ -51,7 +51,9 @@ portions---only the marker lines will start with a double quote.
 PyParsing can then be used to process the Jacobian entries.
 """
 
+import copy
 import logging
+import re
 import sys
 
 from pyparsing import *
@@ -69,6 +71,7 @@ class MExpression(object):
     _cache = {}
     _cache_uses = {}
     _temporaries = {}
+    _op_and_func_names = set()
     def uniquify(self):
         """Ensure only one copy of this expression exists.
 
@@ -193,11 +196,133 @@ class MVariable(MExpression):
         else:
             return '<ci>' + self._name + '</ci>'
 
+class MPiecewise(MExpression):
+    """A piecewise expression."""
+    def __init__(self, s, loc, toklist):
+        self._children = []
+        for piece in toklist.piecewise.pieces:
+            self._children.extend(piece)
+    def __str__(self):
+        return 'piecewise<' + ', '.join(map(str, self._children)) + '>'
+    def __eq__(self, other):
+        return isinstance(other, MPiecewise) and (self._children == other._children)
+    def __hash__(self):
+        k = [self.__class__.__name__] + self._children
+        return hash(tuple(k))
+    
+    def is_complex(self):
+        return True
+    
+    _otherwise = MVariable(['otherwise'])
+    def _is_otherwise(self, cond):
+        """Determine if the given condition is an 'otherwise'."""
+        return cond == self._otherwise
+    
+    def normalize(self):
+        """Make this expression nicely tree-structured.
+        
+        Maple often doesn't supply a derivative at the discontinuity of a piecewise expression.
+        Code generation can't cope with this, so we arbitrarily pick the value from one side.
+        If one side has a result that's just a variable or number, we use that, otherwise we
+        use the first side that can have the condition changed to include the boundary point.
+        """
+        # Normalize our children
+        super(MPiecewise, self).normalize()
+        # Get a list of pieces
+        pieces = []
+        for i in range(len(self._children)/2):
+            result = self._children[2*i]
+            cond = self._children[2*i+1]
+            pieces.append([result, cond])
+        #print "Piecewise normalize:", len(self._children), len(pieces)
+        #print "Before", self
+        # Helper functions
+        undef = MVariable(['undefined'])
+        def is_undef(result):
+            """Test if a result is 'Float(undefined)' or 'undefined'."""
+            return ((isinstance(result, MFunction) and result._name == 'Float' and result._args[0] == undef)
+                    or result == undef)
+        def update_piece(piece):
+            """Change a piece so the condition includes equality."""
+            cond = piece[1]
+            if self._is_otherwise(cond):
+                return
+            if isinstance(cond, MVariable):
+                cond = copy.copy(MSequence.definitions[cond._name])
+                piece[1] = cond
+            assert isinstance(cond, MOperator)
+            if cond._operator == 'lt':
+                cond._operator = 'leq'
+            elif cond._operator == 'gt':
+                cond._operator = 'geq'
+            elif cond._operator in ['leq', 'geq']:
+                pass
+            elif is_undef(piece[0]):
+                pass # Two undefineds next to each other - don't bother changing the second!
+            else:
+                raise ValueError('Not a suitable operator!\t' + str(cond))
+        def is_nice(piece):
+            """Check if this is a piece that should definitely be modified,."""
+            result, cond = piece
+            return isinstance(result, (MNumber, MVariable)) or self._is_otherwise(cond)
+        def is_updateable(piece):
+            """Check if we can alter the condition in this piece."""
+            _, cond = piece
+            return isinstance(cond, MOperator) and cond._operator in ['lt', 'gt']
+        # Check for boundary pieces
+        num_pieces = len(pieces)
+        indices_to_delete = []
+        for i, piece in enumerate(pieces):
+            result, cond = piece
+            if is_undef(result):
+                # Delete this piece, and adjust one of its neighbours
+                indices_to_delete.append(i)
+                neighbours = []
+                if i > 0:
+                    neighbours.append(pieces[i-1])
+                if i < num_pieces - 1:
+                    neighbours.append(pieces[i+1])
+                for n in neighbours:
+                    if is_nice(n):
+                        update_piece(n)
+                        break
+                else:
+                    for n in neighbours:
+                        if is_updateable(n):
+                            update_piece(n)
+                            break
+                    else:
+                        update_piece(neighbours[0])
+        for i in reversed(indices_to_delete):
+            del pieces[i]
+        # Re-create our children from the remaining pieces
+        self._children = []
+        for piece in pieces:
+            self._children.extend(piece)
+        #print "After", self
+        return self
+        
+    def mathml(self):
+        """Return a serialised MathML representation of this expression."""
+        xml = ['<piecewise>']
+        for i in range(len(self._children)/2):
+            result = self._children[2*i]
+            cond = self._children[2*i+1]
+            if self._is_otherwise(cond):
+                xml.append('<otherwise>%s</otherwise>' % result.mathml())
+            else:
+                xml.append('<piece>%s%s</piece>' % (result.mathml(), cond.mathml()))
+        xml.append('</piecewise>')
+        return ''.join(xml)
+
 class MFunction(MExpression):
     """A function call."""
+    NAME_MAP = {'log10': 'log'}
     def __init__(self, toklist):
-        self._name = toklist.function.fn_name
-        self._args = list(toklist.function.fn_args) # Check if asList() needed
+        name = toklist.function.fn_name
+        self._name = self.NAME_MAP.get(name, name)
+        self._op_and_func_names.add(self._name)
+        self._args = list(toklist.function.fn_args)
         self._children = self._args
     def __str__(self):
         return self._name + '<' + ','.join(map(str, self._args)) + '>'
@@ -214,7 +339,7 @@ class MFunction(MExpression):
 
     def mathml(self):
         """Return a serialised MathML representation of this expression."""
-        if self._name == '`if`':
+        if self._name in ['`if`', 'piecewise']:
             # Generate a piecewise expression
             xml = ['<piecewise><piece>']
             xml.append(self._args[1].mathml()) # 'then' case
@@ -241,6 +366,7 @@ class MOperator(MExpression):
             self._toks = toklist[0].asList()
         if operator:
             self._operator = operator
+            self._op_and_func_names.add(operator)
             self._operands = self._children = toklist
         else:
             self._operator = '#'
@@ -290,6 +416,7 @@ class MOperator(MExpression):
             else:
                 # Unary minus
                 self._operator = 'minus'
+                self._op_and_func_names.add(self._operator)
                 self._children = self._operands = [self._toks[1].normalize()]
                 return self
         elif self._op_type in ['prod', 'plus', 'rel']:
@@ -304,6 +431,7 @@ class MOperator(MExpression):
         else:
             # Just normalize operands and set operator name
             self._operator = op_name(self._toks[1])
+            self._op_and_func_names.add(self._operator)
             self._children = self._operands = map(lambda op: op.normalize(), self._toks[::2])
             return self
 
@@ -343,18 +471,62 @@ class MDerivative(MExpression):
         xml.append('</apply>')
         return ''.join(xml)
 
-def dummy(cls):
-    def pa(s, l, t):
-        print "Creating a", cls.__name__
-        cls(t)
-    return pa
+class MSequence(MExpression):
+    """A computation sequence."""
+    def __init__(self, toklist):
+        names, children = [], []
+        for assignment in toklist[0]:
+            names.append(assignment[0])
+            children.append(assignment[1])
+        self._names = names
+        self._children = children
+
+    def __eq__(self, other):
+        return isinstance(other, MSequence) and (self._names == other._names) and (self._children == other._children)
+    def __hash__(self):
+        return hash(tuple(self._names) + tuple(self._children))
+    def __str__(self):
+        return '\n'.join([str(n) + ' = ' + str(self._children[i]) for i, n in enumerate(self._names)])
+    
+    def is_complex(self):
+        return True
+    
+    definitions = {}
+    def normalize(self):
+        """Normalize the expression, and record assignments for easy looking up."""
+        new_children = []
+        for i, child in enumerate(self._children):
+            new_child = child.normalize()
+            new_children.append(new_child)
+            self.definitions[self._names[i]] = new_child
+        self._children = new_children
+        return self
+    
+    def mathml(self):
+        """Return a serialised MathML representation of the temporary variable definitions."""
+        xml = []
+        for i, name in enumerate(self._names):
+            if isinstance(name, basestring):
+                value = self._children[i]
+                xml.append('<apply><eq/><ci>%s</ci>%s</apply>' % (name, value.mathml()))
+        return ''.join(xml)
+    
+    def get_jacobian_entries(self):
+        """Return a dictionary mapping (i,j) indices to Jacobian matrix entries."""
+        J = {}
+        for i, name in enumerate(self._names):
+            if not isinstance(name, basestring):
+                value = self._children[i]
+                index = (int(name[1]), int(name[2]))
+                J[index] = value
+        return J
+
 
 def make_moperator(op_type):
     def pa(s, l, t):
         #print "Creating an", op_type
         return MOperator(t, op_type)
     return pa
-
 
 
 # Necessary for reasonable speed
@@ -386,6 +558,17 @@ func = Group(fname + oparen + fargs + cparen).setResultsName('function')
 func.setName('Function')
 func.setParseAction(MFunction)
 
+# Piecewise
+osquare = Literal('[').suppress()
+csquare = Literal(']').suppress()
+piece = Group(osquare + expr + comma + expr + csquare).setResultsName('piece')
+piece.setName('Piece')
+pieces = Group(piece + ZeroOrMore(comma + piece)).setResultsName('pieces')
+pieces.setName('Pieces')
+piecewise = Group('PIECEWISE' + oparen + pieces + cparen).setResultsName('piecewise')
+piecewise.setName('Piecewise')
+piecewise.setParseAction(MPiecewise)
+
 # Numbers can be given in scientific notation, with an optional sign.
 real_re = Regex(r'([0-9]+\.?([0-9]+(e[-+]?[0-9]+)?)?)|(\.[0-9]+(e[-+]?[0-9]+)?)')
 real_re.setName('Number')
@@ -412,26 +595,11 @@ for op in ['fact', 'expt', 'sign', 'prod', 'plus', 'rel', 'not', 'and', 'or', 'x
     d = {'op': 'op_' + op}
     exec "%(op)s = %(op)s.setName('%(op)s').setResultsName('%(op)s')" % d
 
-# Base terms
-atom = func | var | real_re
+# Base terms, in order (hopefully) of speed of determining non-match
+atom = real_re | piecewise | func | var
 
-
-class OpParseResults(object):
-    def __init__(self, toks, op_type):
-        self.toks = toks[:]
-        self.op_type = op_type
-    def __str__(self):
-        return 'OP' + self.op_type + '<' + str(self.toks) + '>'
-    def __repr__(self):
-        return str(self)
-def make_op_action(op_type):
-    def parse_action(st, loc, toks):
-        pass
-        #return OpParseResults(toks, op_type)
-    return parse_action
-
-
-_prec = operatorPrecedence(atom, [
+# The main expression grammar
+expr << operatorPrecedence(atom, [
     (op_fact, 1, opAssoc.LEFT, make_moperator('fact')),
     (op_expt, 2, opAssoc.LEFT, make_moperator('expt')), # Fudge associativity
     (op_sign, 1, opAssoc.RIGHT, make_moperator('sign')),
@@ -443,9 +611,12 @@ _prec = operatorPrecedence(atom, [
     (op_or, 2, opAssoc.LEFT, make_moperator('or')),
     (op_xor, 2, opAssoc.LEFT, make_moperator('xor'))])
 
-expr << _prec
-
-
+# We can also see "computation sequences" of name=expr
+equals = Literal('=').suppress()
+#extended_ident = Regex(r'[a-zA-Z_][a-zA-Z0-9_]+( ?\[ ?[0-9]+ ?, ?[0-9]+ ?\])?')
+extended_ident = Group(Literal('jacobian') + osquare + Word(nums) + comma + Word(nums) + csquare) | ident
+assign = Group(extended_ident + equals + expr).setResultsName('assign')
+computation_seq = Group(assign + ZeroOrMore(comma + assign)).setParseAction(MSequence)
 
 
 
@@ -482,6 +653,57 @@ class MapleParser(object):
         """Reset the stack limit if it changed."""
         sys.setrecursionlimit(self._original_stack_limit)
     
+    def parse_full_jacobian(self, stream):
+        """Parse some Maple output containing a Jacobian for the full system.
+        
+        Input is a file-like object supporting the iterator protocol.
+        
+        Output is a pair (temporaries, J), where
+          temporaries is a MathML string containing a sequence of apply elements,
+          which represent definitions of common temporary variables
+          J is a dictionary, keyed by variable name ordered pairs; the entries
+          are the parsed Jacobian matrix entries.
+        """
+        state_var_names = {}
+        var_name_re = re.compile(r'"--([0-9]+)--(.+)--')
+        J = '' # The Maple code for the Jacobian
+        in_J = False
+        for line in stream:
+            if line[0] == '"':
+                # Tells us the index of a state variable: --%d--%d--
+                while line.rstrip()[-1] == '\\':
+                    # Explicit continuation
+                    line = line.rstrip() + stream.next()
+                m = var_name_re.match(line)
+                state_var_names[int(m.group(1))] = m.group(2)
+                continue
+            if line.startswith('bytes used') or line.startswith('memory used'):
+                # Maple footer, which sometimes appears in the middle...
+                continue
+            if line.startswith('J := '):
+                assert not in_J
+                in_J = True
+                line = line[5:] # Strip 'J := '
+            if in_J:
+                J += line.strip()
+                if J[-1] == '\\':
+                    # Explicit continuation: remove the backslash
+                    J = J[:-1]
+                else:
+                    # Potentially implicit continuation: add whitespace to replace the '\n'
+                    J += ' '
+        #print J
+        result = self._parse_sequence(J)
+        #print result
+        temporaries = result.xml()
+        jacobian = result.get_jacobian_entries()
+        # Change the indices from numbers to variable names
+        for i, j in jacobian.keys():
+            jacobian[(state_var_names[i], state_var_names[j])] = jacobian[(i,j)]
+            del jacobian[(i,j)]
+        #print jacobian
+        return (temporaries, jacobian)
+    
     def parse(self, stream, debug=False):
         """Parse some Maple output.
         
@@ -497,11 +719,11 @@ class MapleParser(object):
         curr_key = None
         s = "" # Current 'line' contents
         in_header = False
-        full_jacobian = False
+        self.JacobianWasFullSize = False
         for line in stream:
             if line.strip() == '"FULL JACOBIAN"':
-                full_jacobian = True
-                continue
+                self.JacobianWasFullSize = True
+                return self.parse_full_jacobian(stream)
             if line.startswith('bytes used') or line.startswith('memory used'):
                 # Maple footer
                 if curr_key and s:
@@ -548,33 +770,35 @@ class MapleParser(object):
 #            print "Filtered temporaries", len(temps)
 #            for t in temps:
 #                print t, MExpression._cache_uses[t]
-        if full_jacobian:
-            for key, expr in results.iteritems():
-                new_expr = None
-                if key[0] == key[1]:
-                    # 1 on the diagonal
-                    new_expr = MNumber(['1'])
-                if not (isinstance(expr, MNumber) and str(expr) == '0'):
-                    # subtract delta_t * expr
-                    args = []
-                    if new_expr:
-                        args.append(new_expr)
-                    args.append(MOperator([MVariable(['delta_t']), expr], 'prod', 'times'))
-                    new_expr = MOperator(args, '', 'minus')
-                if new_expr:
-                    results[key] = new_expr
+#        print "DEBUG: Operators and functions in Maple:", sorted(MExpression._op_and_func_names)
         if debug:
             return results, debug_res
         else:
             return results
+    
+    def _parse_sequence(self, seq_str):
+        """Parse a computation sequence, and return a list of (name, value) pairs."""
+        r = self._try_parse(seq_str, computation_seq)
+        n = r[0].normalize()
+        u = n.uniquify()
+        return u
 
     def _parse_expr(self, key, expr_str, results, debug_res):
         """Parse a single expression, and store the result under key."""
         self._debug("Parsing derivative", key)
+        r = self._try_parse(expr_str, expr)
+        n = r[0].normalize()
+        u = n.uniquify()
+        debug_res[key] = (expr_str, r, n)
+        results[key] = u
+        return
+
+    def _try_parse(self, string, grammar_rule):
+        """Try parsing a string with the given rule, repeating with a higher recursion limit if needed."""
         r = None
         while self._stack_limit_multiplier < 3: # Magic number!
             try:
-                r = expr.parseString(expr_str, parseAll=True)
+                r = grammar_rule.parseString(string, parseAll=True)
             except RuntimeError, msg:
                 self._debug("Got RuntimeError:", msg)
                 self._stack_limit_multiplier += 0.5
@@ -586,11 +810,7 @@ class MapleParser(object):
         if not r:
             raise RuntimeError("Failed to parse expression even with a recursion limit of %d; giving up!"
                                % (int(self._stack_limit_multiplier * self._original_stack_limit),))
-        n = r[0].normalize()
-        u = n.uniquify()
-        debug_res[key] = (expr_str, r, n)
-        results[key] = u
-        return
+        return r
 
     def set_debug(self, debug=True):
         """Turn debugging on or off."""

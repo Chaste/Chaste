@@ -318,14 +318,14 @@ def convert(model, output_dir):
     if options.cvode:
         # For use with CVODE
         if not dyn_opt:
-            cmd, outputs = add_out_opts(command_base + ['-t', 'CVODE'],
+            cmd, outputs = add_out_opts(command_base + ['-t', 'CVODE'],# + maple_options,
                                         output_dir,
                                         class_name + 'Cvode', model_base, 'Cvode')
             do_cmd(cmd, outputs)
 
         if options.opt:
             # With optimisation
-            cmd, outputs = add_out_opts(command_base + ['-p', '-l', '-t', 'CVODE'],
+            cmd, outputs = add_out_opts(command_base + ['-p', '-l', '-t', 'CVODE'],# + maple_options,
                                         output_dir,
                                         class_name + 'CvodeOpt',
                                         model_base, 'CvodeOpt')

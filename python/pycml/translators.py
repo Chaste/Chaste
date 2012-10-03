@@ -53,7 +53,7 @@ import optimize
 import processors
 import validator
 
-__version__ = "$Revision$"[11:-2]
+__version__ = "$Revision: 17001 $"[11:-2]
 
 def version_comment(note_time=True):
     """Generate a version comment, with optional time info."""
@@ -1403,6 +1403,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         self.writeln_hpp('#include "AbstractStimulusFunction.hpp"')
         self.writeln('#include "HeartConfig.hpp"')
         self.writeln('#include "IsNan.hpp"')
+        self.writeln('#include "MathsCustomFunctions.hpp"')
         self.writeln()
         self.writeln_hpp()
         
@@ -1867,8 +1868,13 @@ class CellMLToChasteTranslator(CellMLTranslator):
         # Lookup table generation, if not in a singleton
         if self.use_lookup_tables and not self.separate_lut_class:
             self.output_lut_generation()
+        self.output_extra_constructor_content()
         self.close_block()
         return
+    
+    def output_extra_constructor_content(self):
+        """Hook for subclasses to add further content to the constructor."""
+        pass
     
     def output_chaste_lut_methods(self):
         """
@@ -2792,6 +2798,17 @@ class CellMLToChasteTranslator(CellMLTranslator):
                 # Assume it's a suitable name
                 self.write(prefix + varname)
         return
+
+    def output_function(self, func_name, args, *posargs, **kwargs):
+        """Override base class method for special case of abs with 2 arguments.
+        
+        This comes from Maple's Jacobians, and should generate signum of the second argument.
+        """
+        args = list(args)
+        if func_name == 'fabs' and len(args) == 2:
+            super(CellMLToChasteTranslator, self).output_function('Signum', [args[1]], *posargs, **kwargs)
+        else:
+            super(CellMLToChasteTranslator, self).output_function(func_name, args, *posargs, **kwargs)
     
     @staticmethod
     def get_current_units_options(model):
@@ -3015,6 +3032,8 @@ class CellMLToCvodeTranslator(CellMLToChasteTranslator):
         """
         self.output_get_i_ionic()
         self.output_evaluate_y_derivatives(method_name='EvaluateYDerivatives')
+        if self.model.get_option('maple_output'):
+            self.output_jacobian()
         self.output_derived_quantities()
     
     def output_bottom_boilerplate(self):
@@ -3023,6 +3042,71 @@ class CellMLToCvodeTranslator(CellMLToChasteTranslator):
         # CVODE is optional in Chaste
         self.writeln("#endif // CHASTE_CVODE")
         self.writeln_hpp("#endif // CHASTE_CVODE")
+    
+    def output_extra_constructor_content(self):
+        """Tell the base class if we have an analytic Jacobian."""
+        if self.model.get_option('maple_output'):
+            self.writeln('mUseAnalyticJacobian = true;')
+    
+    def _count_operators(self, exprs, result=None):
+        if result is None: result = {}
+        for expr in exprs:
+            if isinstance(expr, mathml_apply):
+                op = expr.operator().localName
+                result[op] = 1 + result.get(op, 0)
+            children = expr.xml_element_children()
+            if children:
+                self._count_operators(children, result)
+        return result
+        
+    def output_jacobian(self):
+        """Output an analytic Jacobian for CVODE to use."""
+        self.output_method_start('EvaluateAnalyticJacobian',
+                                 ['long int N', self.TYPE_DOUBLE + self.code_name(self.free_vars[0]),
+                                  self.TYPE_VECTOR + 'rY', self.TYPE_VECTOR + 'rDY',
+                                  'CHASTE_CVODE_DENSE_MATRIX rJacobian',
+                                  self.TYPE_VECTOR + 'rTmp1', self.TYPE_VECTOR + 'rTmp2', self.TYPE_VECTOR + 'rTmp3'],
+                                 'void', access='public')
+        self.open_block()
+        # Mathematics that the Jacobian depends on
+        used_vars = set()
+        for entry in self.model.solver_info.jacobian.entry:
+            used_vars.update(self._vars_in(entry.math))
+        nodeset = self.calculate_extended_dependencies(used_vars, prune_deps=[self.doc._cml_config.i_stim_var])
+        self.output_state_assignments(nodeset=nodeset, assign_rY=False)
+        if self.use_lookup_tables:
+            self.output_table_index_generation(nodeset=nodeset|set(map(lambda e: e.math, self.model.solver_info.jacobian.entry)))
+        self.output_equations(nodeset)
+        self.writeln()
+        # Jacobian entries, sorted by index with rows varying fastest
+        self.output_comment('Matrix entries')
+        entries = []
+        def gv(vn):
+            return self.varobj(vn).get_source_variable(recurse=True)
+        for entry in self.model.solver_info.jacobian.entry:
+            var_i, var_j = gv(entry.var_i), gv(entry.var_j)
+            i = self.state_vars.index(var_i)
+            j = self.state_vars.index(var_j)
+            entry_content = list(entry.math.xml_element_children())
+            assert len(entry_content) == 1, "Malformed Jacobian entry: " + entry.xml()
+            entry = entry_content[0]
+            if not (isinstance(entry, mathml_cn) and entry.evaluate() == 0.0):
+                entries.append((j, i, var_i is self.v_variable, entry))
+        entries.sort()
+        for j, i, is_V, entry in entries:
+            self.writeln('DENSE_ELEM(rJacobian, ', i, ', ', j, ') = ', nl=False)
+            paren = False
+            if is_V:
+                self.write('mSetVoltageDerivativeToZero ? 0.0 : ')
+                paren = True
+            self.output_expr(entry, paren)
+            self.writeln(self.STMT_END, indent=False)
+        self.output_comment('Debugging!')
+        self.writeln('CheckAnalyticJacobian(', self.code_name(self.free_vars[0]),
+                     ', rY, rDY, rJacobian, rTmp1, rTmp2, rTmp3);')                                 
+        self.close_block()
+#        print "DEBUG:", self.model.name, "Operators in model:", self._count_operators(self.model.get_assignments())
+#        print "DEBUG:", self.model.name, "Operators in Jacobian:", self._count_operators([e[-1] for e in entries])
 
 class CellMLToMapleTranslator(CellMLTranslator):
     """Translate a CellML model to Maple code."""
@@ -3093,19 +3177,35 @@ class CellMLToMapleTranslator(CellMLTranslator):
         if self.compute_full_jacobian:
             self.writeln('print("FULL JACOBIAN");')
         return
+#
+#    def output_mathematics(self):
+#        if self.compute_full_jacobian:
+#            pass
+#        else:
+#            super(CellMLToMapleTranslator, self).output_mathematics()
 
     def output_bottom_boilerplate(self):
         """Output bottom boilerplate."""
         self.output_comment('\nJacobian calculation\n')
         if self.compute_full_jacobian:
-            # Jacobian calculation for the whole ODE system
-            # i.e. each df_i/du_j
-            for var_i in self.state_vars:
-                for var_j in self.state_vars:
-                    self.writeln('print("--', self.code_name(var_i), '/',
-                                 self.code_name(var_j), '--");')
-                    self.writeln('diff(', self.code_name(var_i, ode=True), ', ',
-                                 self.code_name(var_j), ');')
+            state_vars = self.state_vars
+            # Record the ordering of the state variables, since they're refered to by index below
+            for i, var in enumerate(state_vars):
+                self.writeln('print("--%d--%s--");' % (i+1, self.code_name(var)))
+            # Jacobian calculation for the whole ODE system, i.e. each df_i/du_j
+            state_var_names = map(self.code_name, state_vars)
+            self.writeln('jacobian', self.EQ_ASSIGN, 'array(')
+            self.write('[')
+            for var_i in state_vars:
+                if var_i is not state_vars[0]: self.write(',')
+                self.write('[')
+                for var_j in state_vars:
+                    if var_j is not state_vars[0]: self.write(',')
+                    self.write('diff(', self.code_name(var_i, ode=True), ',', self.code_name(var_j), ')')
+                self.write(']')
+            self.write(']);\n')
+            self.writeln('with(codegen):')
+            self.writeln('J', self.EQ_ASSIGN, 'optimize(jacobian);')
         elif hasattr(self.model, '_cml_nonlinear_system_variables'):
             # Jacobian calculation for Jon Whiteley's algorithm
             vars_text = self.model._cml_nonlinear_system_variables
@@ -3214,20 +3314,20 @@ class CellMLToMapleTranslator(CellMLTranslator):
 
         We use the if operator.
         """
-        num_ifs = 0
+        self.write('piecewise(')
+        need_comma = False
         for piece in getattr(expr, u'piece', []):
-            num_ifs += 1
-            self.write('`if`(')
+            if need_comma:
+                self.write(',')
             self.output_expr(child_i(piece, 2), False) # Condition
             self.write(',')
             self.output_expr(child_i(piece, 1), False) # Result
-            self.write(',')
+            need_comma = True
         if hasattr(expr, u'otherwise'):
+            if need_comma:
+                self.write(',')
             self.output_expr(child_i(expr.otherwise, 1), paren) # Default case
-        else:
-            self.write('FAIL') # If this is hit, things get ugly
-        for i in range(num_ifs):
-            self.close_paren(True)
+        self.write(')')
 
 class CellMLToHaskellTranslator(CellMLTranslator):
     """Translate a CellML model to a Haskell version.
@@ -4111,6 +4211,7 @@ class SolverInfo(object):
         
         Structure looks like:
         <jacobian>
+            [<math> assignments of common sub-terms </math>]
             <entry var_i='varname' var_j='varname'>
                 <math> apply|cn|ci ...</math>
             </entry>
@@ -4118,10 +4219,22 @@ class SolverInfo(object):
         """
         solver_info = self._solver_info
         model = self._model
-        if not hasattr(solver_info, u'jacobian') and model._cml_jacobian:
+        if model._cml_jacobian and model._cml_jacobian_full:
+            jac = model._cml_jacobian[1]
+        else:
+            # Old-style partial jacobian, or no jacobian
+            jac = model._cml_jacobian
+        if not hasattr(solver_info, u'jacobian') and jac:
             jac_elt = model.xml_create_element(u'jacobian', NSS[u'solver'])
             solver_info.xml_append(jac_elt)
-            jac_vars = model._cml_jacobian.keys()
+            
+            if model._cml_jacobian_full:
+                # There may be temporaries
+                temporaries = model._cml_jacobian[0]
+                if temporaries:
+                    jac_elt.xml_append(amara_parse_cellml(temporaries).math)
+
+            jac_vars = jac.keys()
             jac_vars.sort() # Will sort by variable name
             for v_i, v_j in jac_vars:
                 # Add (i,j)-th entry
@@ -4129,8 +4242,10 @@ class SolverInfo(object):
                          u'var_j': self._fix_jac_var_name(v_j)}
                 entry = model.xml_create_element(u'entry', NSS[u'solver'], attributes=attrs)
                 jac_elt.xml_append(entry)
-                entry_doc = amara_parse_cellml(model._cml_jacobian[(v_i, v_j)].xml())
+                entry_doc = amara_parse_cellml(jac[(v_i, v_j)].xml())
                 entry.xml_append(entry_doc.math)
+            # Ensure that the model has a special component
+            self._get_special_component()
         return
     
     def use_canonical_variable_names(self):
@@ -4215,6 +4330,14 @@ class SolverInfo(object):
         the model they refer to.
         """
         self._process_mathematics(self._add_variable_links)
+        #1795 - classify temporary variables for the Jacobian matrix, and append
+        # to the main list of assignments in the model
+        solver_info = self._solver_info
+        if hasattr(solver_info, u'jacobian') and hasattr(solver_info.jacobian, u'math'):
+            for elt in solver_info.jacobian.math.apply:
+                elt.classify_variables(root=True)
+            for elt in solver_info.jacobian.math.apply:
+                self._model.topological_sort(elt)
     
     def do_binding_time_analysis(self):
         """Do a binding time analysis on the additional mathematics.
@@ -4231,6 +4354,9 @@ class SolverInfo(object):
         solver_info = self._solver_info
         # Jacobian
         if hasattr(solver_info, u'jacobian'):
+            if hasattr(solver_info.jacobian, u'math'):
+                for elt in solver_info.jacobian.math.apply:
+                    func(elt)
             for entry in solver_info.jacobian.entry:
                 for elt in entry.math.xml_element_children():
                     func(elt)
@@ -4254,12 +4380,14 @@ class SolverInfo(object):
         Returned elements will be mathml_piecewise, mathml_apply, mathml_ci or mathml_cn instances.
         """
         solver_info = self._solver_info
-        # Jacobian - entry definitions can be changed
+        # Jacobian - entry definitions and temporaries can be changed
         if hasattr(solver_info, u'jacobian'):
+            if hasattr(solver_info.jacobian, u'math'):
+                for elt in solver_info.jacobian.math.apply:
+                    yield elt
             for entry in solver_info.jacobian.entry:
-                for elt in entry.math.xml_children:
-                    if getattr(elt, 'nodeType', None) == Node.ELEMENT_NODE:
-                        yield elt
+                for elt in entry.math.xml_element_children():
+                    yield elt
         # Linearised ODEs - only g & h can be changed
         if hasattr(solver_info, u'linear_odes'):
             for _, _, eqns in self.get_linearised_odes():
@@ -4307,12 +4435,15 @@ class SolverInfo(object):
             for child in elt.xml_children:
                 self._add_variable_links(child)
 
+    _jac_temp_re = re.compile(r't[0-9]+')
     def _get_variable(self, varname):
         """Return the variable in the model with name varname."""
         try:
             if varname == 'delta_t':
                 # Special case for the timestep in ComputeJacobian and elsewhere
                 var = self.get_dt()
+            elif self._jac_temp_re.match(varname):
+                var = self._get_special_variable(varname, VarTypes.Unknown)
             else:
                 var = cellml_variable.get_variable_object(self._model, varname)
         except KeyError:
@@ -5099,16 +5230,15 @@ def get_options(args, default_options=None):
                       help="don't add a timestamp comment to generated files")
     parser.add_option('-J', '--do-jacobian-analysis',
                       action='store_true', default=False,
-                      help="experimental Jacobian analysis; implies -t Maple")
+                      help="experimental Jacobian analysis for backward Euler; implies -t Maple")
     # Options specific to Maple output
     parser.add_option('--dont-omit-constants',
                       dest='omit_constants', action='store_false', default=True,
                       help="when generating Maple code, include assignments of constants")
-    parser.add_option('--compute-full-jacobian',
-                      action='store_true', default=False,
-                      help="make generated Maple code compute the full Jacobian"
-                      " matrix, rather than just that for the nonlinear portion"
-                      " of the ODE system")
+    parser.add_option('--compute-partial-jacobian', dest='compute_full_jacobian',
+                      action='store_false', default=True,
+                      help="make generated Maple code compute a Jacobian specific to a Newton solve"
+                      " of the nonlinear portion of the ODE system, rather than the full system Jacobian")
     # Options specific to Chaste output
     parser.add_option('-y', '--dll', '--dynamically-loadable',
                       dest='dynamically_loadable',
@@ -5351,18 +5481,47 @@ def run():
         mp = MapleParser()
         jacobian_file = file(options.maple_output) # TODO: Error checking
         doc.model._cml_jacobian = mp.parse(jacobian_file)
+        doc.model._cml_jacobian_full = mp.JacobianWasFullSize
         jacobian_file.close()
+        if not options.backward_euler:
+            # Add full jacobian to XML
+            assert doc.model._cml_jacobian_full, "Jacobian matrix is wrong size"
+            solver_info.add_jacobian_matrix()
+            solver_info.add_variable_links()
+
+    if options.backward_euler:
         # Rearrange linear ODEs
         lin = optimize.LinearityAnalyser()
         lin.analyse_for_jacobian(doc, V=config.V_variable)
         lin.rearrange_linear_odes(doc)
         # Remove jacobian entries that don't correspond to nonlinear state variables
+        jacobian = doc.model._cml_jacobian
+        if isinstance(jacobian, tuple):
+            assert doc.model._cml_jacobian_full
+            jacobian = jacobian[1]
         nonlinear_vars = set([v.get_source_variable(recurse=True) for v in doc.model._cml_nonlinear_system_variables])
         def gv(vname):
             return cellml_variable.get_variable_object(doc.model, vname).get_source_variable(recurse=True)
-        for var_i, var_j in doc.model._cml_jacobian.keys():
+        for var_i, var_j in jacobian.keys():
             if gv(var_i) not in nonlinear_vars or gv(var_j) not in nonlinear_vars:
-                del doc.model._cml_jacobian[(var_i, var_j)]
+                del jacobian[(var_i, var_j)]
+        if doc.model._cml_jacobian_full:
+            # Transform the Jacobian into the form needed by the Backward Euler code
+            import maple_parser
+            for key, expr in jacobian.iteritems():
+                new_expr = None
+                if key[0] == key[1]:
+                    # 1 on the diagonal
+                    new_expr = maple_parser.MNumber(['1'])
+                if not (isinstance(expr, maple_parser.MNumber) and str(expr) == '0'):
+                    # subtract delta_t * expr
+                    args = []
+                    if new_expr:
+                        args.append(new_expr)
+                    args.append(maple_parser.MOperator([maple_parser.MVariable(['delta_t']), expr], 'prod', 'times'))
+                    new_expr = maple_parser.MOperator(args, '', 'minus')
+                if new_expr:
+                    jacobian[key] = new_expr
         # Add info as XML
         solver_info.add_all_info()
         # Analyse the XML, adding cellml_variable references, etc.

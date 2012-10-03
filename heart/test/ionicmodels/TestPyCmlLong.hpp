@@ -39,6 +39,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 
 #include <iostream>
+#include <algorithm>
+#include <vector>
+#include <boost/foreach.hpp>
 
 #include "AbstractCardiacCell.hpp"
 #include "AbstractCardiacCellInterface.hpp"
@@ -69,16 +72,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestPyCmlNightly : public CxxTest::TestSuite
 {
 private:
-    template<typename VECTOR>
-    double GetAttribute(AbstractParameterisedSystem<VECTOR>* pSystem,
+    double GetAttribute(boost::shared_ptr<AbstractCardiacCellInterface> pCell,
                         const std::string& rAttrName,
                         double defaultValue)
     {
-        assert(pSystem);
+        AbstractUntemplatedParameterisedSystem* p_system
+            = dynamic_cast<AbstractUntemplatedParameterisedSystem*>(pCell.get());
+        assert(p_system);
         double attr_value;
-        if (pSystem->HasAttribute(rAttrName))
+        if (p_system->HasAttribute(rAttrName))
         {
-            attr_value = pSystem->GetAttribute(rAttrName);
+            attr_value = p_system->GetAttribute(rAttrName);
         }
         else
         {
@@ -87,26 +91,14 @@ private:
         return attr_value;
     }
 
-    double GetAttribute(boost::shared_ptr<AbstractCardiacCellInterface> pCell,
-                        const std::string& rAttrName,
-                        double defaultValue)
-    {
-        AbstractParameterisedSystem<std::vector<double> >* p_normal
-            = dynamic_cast<AbstractParameterisedSystem<std::vector<double> >*>(pCell.get());
-        if (p_normal)
-        {
-            return GetAttribute(p_normal, rAttrName, defaultValue);
-        }
+
 #ifdef CHASTE_CVODE
-        else
-        {
-            AbstractParameterisedSystem<N_Vector>* p_cvode
-                = dynamic_cast<AbstractParameterisedSystem<N_Vector>*>(pCell.get());
-            return GetAttribute(p_cvode, rAttrName, defaultValue);
-        }
-#endif
-        EXCEPTION("Unrecognised cell type.");
+    bool mUseCvodeJacobian;
+    void setUp()
+    {
+        mUseCvodeJacobian = true;
     }
+#endif
 
     void Simulate(const std::string& rOutputDirName,
                   const std::string& rModelName,
@@ -121,6 +113,13 @@ private:
                 pCell->SetTimestep(dt);
             }
         }
+#ifdef CHASTE_CVODE
+        // Numerical or analytic J for CVODE?
+        if (!mUseCvodeJacobian && dynamic_cast<AbstractCvodeSystem*>(pCell.get()))
+        {
+            dynamic_cast<AbstractCvodeSystem*>(pCell.get())->ForceUseOfNumericalJacobian();
+        }
+#endif
         double sampling_interval = 2.0; // ms
         OdeSolution solution = pCell->Compute(0.0, end_time, sampling_interval);
         const unsigned output_freq = 5; // Only output every N samples
@@ -337,13 +336,23 @@ public:
 
     void TestCvodeCells() throw (Exception)
     {
-        std::string dirname("TestPyCmlNightlyCvode");
+#ifdef CHASTE_CVODE
         std::vector<std::string> args;
         args.push_back("--Wu");
         args.push_back("--cvode");
         std::vector<std::string> models;
         AddAllModels(models);
+
+//        std::cout << "Analytical Jacobian" << std::endl;
+        mUseCvodeJacobian = true;
+        std::string dirname("TestPyCmlNightlyCvode");
         RunTests(dirname, models, args);
+
+//        std::cout << "Numerical Jacobian" << std::endl;
+//        mUseCvodeJacobian = false;
+//        dirname = "TestPyCmlNightlyCvodeNumericalJ";
+//        RunTests(dirname, models, args);
+#endif
     }
 
     void TestBackwardEulerCells() throw (Exception)
@@ -352,55 +361,37 @@ public:
         std::vector<std::string> args;
         args.push_back("--Wu");
         args.push_back("--backward-euler");
+
         std::vector<std::string> models;
+        AddAllModels(models);
 
-        models.push_back("aslanidi_model_2009");
-        models.push_back("beeler_reuter_model_1977");
-        models.push_back("bondarenko_model_2004_apex");
-        models.push_back("courtemanche_ramirez_nattel_model_1998");
-        models.push_back("demir_model_1994");
-        models.push_back("dokos_model_1996");
-        models.push_back("earm_noble_model_1990");
-        models.push_back("espinosa_model_1998_normal");
-        models.push_back("fink_noble_giles_model_2008");
-//        models.push_back("grandi2010ss");
-        models.push_back("hodgkin_huxley_squid_axon_model_1952_modified");
-        models.push_back("kurata_model_2002");
-        models.push_back("livshitz_rudy_2007");
-        models.push_back("matsuoka_model_2003");
-        models.push_back("noble_model_1991");
-        models.push_back("noble_model_1998");
-        models.push_back("noble_noble_SAN_model_1984");
-        models.push_back("noble_SAN_model_1989");
-        models.push_back("nygren_atrial_model_1998");
-        models.push_back("sakmann_model_2000_epi");
-        models.push_back("ten_tusscher_model_2006_epi");
-        models.push_back("zhang_SAN_model_2000_0D_capable");
-        models.push_back("zhang_SAN_model_2000_all");
-
-        /* The following models contained 'diff' in the .out file:
-            decker_2009
-            hilgemann_noble_model_1987
-            hund_rudy_2004_a
-            mahajan_2008
-            priebe_beuckelmann_model_1998
-            ten_tusscher_model_2004_endo
-            ten_tusscher_model_2004_epi
-            viswanathan_model_1999_epi
-            winslow_model_1999
-         */
+        std::vector<std::string> diff_models; // Models that need a smaller dt
+        diff_models.push_back("iyer_model_2004");
+        diff_models.push_back("iyer_model_2007");
+        diff_models.push_back("jafri_rice_winslow_model_1998");
+        diff_models.push_back("pandit_model_2001_epi");
+        diff_models.push_back("priebe_beuckelmann_model_1998");
+        diff_models.push_back("viswanathan_model_1999_epi");
+        diff_models.push_back("winslow_model_1999");
+        BOOST_FOREACH(std::string diff_model, diff_models)
+        {
+            models.erase(std::find(models.begin(), models.end(), diff_model));
+        }
+        models.erase(std::find(models.begin(), models.end(), "hund_rudy_2004_a"));
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
         RunTests(dirname, models, args, true);
 
         dirname = dirname + "-difficult";
-        models.clear();
-        models.push_back("iyer_model_2004");
-        models.push_back("iyer_model_2007");
-        models.push_back("jafri_rice_winslow_model_1998");
-        models.push_back("pandit_model_2001_epi");
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.001, 0.1, 1.0);
-        RunTests(dirname, models, args, true);
+        RunTests(dirname, diff_models, args, true);
+
+//        // Hund model is producing NANs, even with very small dt
+//        diff_models.clear();
+//        diff_models.push_back("hund_rudy_2004_a");
+//        dirname = dirname + "-crazy";
+//        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
+//        RunTests(dirname, diff_models, args, true);
     }
 
     void TestRushLarsenCells() throw (Exception)

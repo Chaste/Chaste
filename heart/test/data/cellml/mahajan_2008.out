@@ -2937,4 +2937,4 @@ jacobian[26,9] = 0, jacobian[26,10] = 0, jacobian[26,11] = 0, jacobian[26,12] =
 16] = 0, jacobian[26,17] = 0, jacobian[26,18] = 0, jacobian[26,19] = 0, 
 jacobian[26,20] = 0, jacobian[26,21] = 0, jacobian[26,22] = t1434, jacobian[26,
 23] = 0, jacobian[26,24] = 0, jacobian[26,25] = 0, jacobian[26,26] = -t1440
-memory used=63.1MB, alloc=52.8MB, time=1.01
+memory used=62.9MB, alloc=52.6MB, time=1.17

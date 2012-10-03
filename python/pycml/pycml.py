@@ -2144,7 +2144,7 @@ class cellml_variable(Colourable, element_base):
     def set_value(self, value, ode=None, follow_maps=True):
         """Set the value of this variable.
 
-        Expects a floating point value.
+        Expects a floating point or boolean value.
 
         If ode is given, it should be an instance of cellml_variable.
         In this case, we're setting the value of d(self)/d(ode).
@@ -2156,8 +2156,8 @@ class cellml_variable(Colourable, element_base):
         if follow_maps and self.get_type() == VarTypes.Mapped:
             self.get_source_variable().set_value(value, ode=ode)
         else:
-            assert type(value) == types.FloatType
-            self._cml_value[ode] = value
+            assert type(value) in [types.FloatType, types.BooleanType]
+            self._cml_value[ode] = float(value)
         return
     def unset_values(self):
         """Unset all values for this variable set with set_value."""
