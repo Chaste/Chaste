@@ -71,10 +71,10 @@ AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::AbstractTetrahedralMeshWr
                    const std::string &rBaseName,
                    const bool clearOutputDir)
     : AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>(rDirectory, rBaseName, clearOutputDir),
-      mpMesh(NULL),
       mpNodeMap(NULL),
       mNodesPerElement(ELEMENT_DIM+1),
       mNodesPerBoundaryElement(ELEMENT_DIM),
+      mpMesh(NULL),
       mpDistributedMesh(NULL),
       mpMixedMesh(NULL),
       mpIters(new MeshWriterIterators<ELEMENT_DIM,SPACE_DIM>),

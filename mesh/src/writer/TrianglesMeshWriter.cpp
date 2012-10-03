@@ -34,6 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "TrianglesMeshWriter.hpp"
+
+#include "AbstractTetrahedralMesh.hpp"
 #include "Version.hpp"
 
 #include <cassert>
@@ -73,6 +75,13 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
 
     // Write the node header
     unsigned num_attr = 0;
+
+    if(this->mpMesh) ///\todo #1949 Readers do not currently support reading of node attributes, so we cannot yet write them from a reader
+    {
+        //Assumes that all nodes have the same number of attributes as the first node in the mesh.
+        num_attr = this->mpMesh->GetNode(0)->rGetNodeAttributes().size();
+    }
+
     ///\todo #1949
     unsigned max_bdy_marker = 0;
     unsigned num_nodes = this->GetNumNodes();
@@ -95,9 +104,14 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
     // Write each node's data
     for (unsigned item_num=0; item_num<num_nodes; item_num++)
     {
-        //if(mpMesh) get the attributes and write, tag as a hack.
-
-        WriteItem(p_node_file, item_num, this->GetNextNode());
+        if(this->mpMesh) ///\todo #1949 Readers do not currently support reading of node attributes, so we cannot yet write them from a reader
+        {
+            WriteItem(p_node_file, item_num, this->GetNextNode(), this->mpMesh->GetNode(item_num)->rGetNodeAttributes());
+        }
+        else
+        {
+            WriteItem(p_node_file, item_num, this->GetNextNode());
+        }
     }
     *p_node_file << comment << "\n";
     p_node_file->close();
