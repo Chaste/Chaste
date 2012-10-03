@@ -117,7 +117,7 @@ private:
         // Numerical or analytic J for CVODE?
         if (!mUseCvodeJacobian && dynamic_cast<AbstractCvodeSystem*>(pCell.get()))
         {
-            dynamic_cast<AbstractCvodeSystem*>(pCell.get())->ForceUseOfNumericalJacobian();
+//            dynamic_cast<AbstractCvodeSystem*>(pCell.get())->ForceUseOfNumericalJacobian();
         }
 #endif
         double sampling_interval = 2.0; // ms
