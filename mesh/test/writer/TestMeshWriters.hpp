@@ -933,30 +933,6 @@ public:
             mesh_writer.WriteFilesUsingMesh(mesh);
         }
 
-        // Next, write using a mesh object in binary
-        {
-            TrianglesMeshReader<1,1> mesh_reader(source_mesh);
-            TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 10u);
-            TS_ASSERT_EQUALS(mesh_reader.GetNumElementAttributes(), 1u);
-
-            TetrahedralMesh<1,1> mesh;
-            mesh.ConstructFromMeshReader(mesh_reader);
-
-            //Add some node attributes to the mesh
-            double node_attribute = 11;
-            for(TetrahedralMesh<1,1>::NodeIterator iter = mesh.GetNodeIteratorBegin();
-                iter != mesh.GetNodeIteratorEnd();
-                ++iter)
-            {
-                iter->AddNodeAttribute(node_attribute--);
-                iter->AddNodeAttribute(-node_attribute);
-            }
-
-            TrianglesMeshWriter<1,1> mesh_writer(output_dir, file_from_mesh_bin, false);
-            mesh_writer.SetWriteFilesAsBinary();
-            mesh_writer.WriteFilesUsingMesh(mesh);
-        }
-
         ///\todo #1949 Check the written meshes, requires support for node attributes in the reader
     }
 
