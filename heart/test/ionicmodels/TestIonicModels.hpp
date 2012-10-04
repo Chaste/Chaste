@@ -1370,7 +1370,7 @@ public:
 
             AbstractCardiacCellInterface* p_hh52_be;
             input_arch >> p_hh52_be;
-            TS_ASSERT_EQUALS(p_hh52_be->GetNumberOfStateVariables(), 6u);
+            TS_ASSERT_EQUALS(p_hh52_be->GetNumberOfStateVariables(), 4u);
             TS_ASSERT(dynamic_cast<CellHodgkinHuxley1952FromCellMLBackwardEuler*>(p_hh52_be));
 
             delete p_n98_cell;
