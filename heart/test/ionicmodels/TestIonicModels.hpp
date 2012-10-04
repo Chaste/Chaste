@@ -63,6 +63,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellProperties.hpp"
 
 #include "HodgkinHuxley1952.hpp"
+#include "HodgkinHuxley1952BackwardEuler.hpp"
 #include "FitzHughNagumo1961OdeSystem.hpp"
 #include "LuoRudy1991.hpp"
 #include "LuoRudy1991BackwardEuler.hpp"
@@ -302,10 +303,9 @@ public:
         CellHodgkinHuxley1952FromCellML hh52_ode_system(p_solver, p_stimulus);
 
         // Solve and write to file
+        const double end_time = 150.0;
         ck_start = clock();
-        RunOdeSolverWithIonicModel(&hh52_ode_system,
-                                   150.0,
-                                   "HH52RegResult");
+        RunOdeSolverWithIonicModel(&hh52_ode_system, end_time, "HH52RegResult");
         ck_end = clock();
         double forward = (double)(ck_end - ck_start)/CLOCKS_PER_SEC;
         std::cout << "\n\tForward: " << forward << std::endl;
@@ -316,10 +316,21 @@ public:
         // by changing the EvaluateYDerivatives() code to call it, this verified
         // that GetIionic has no errors, therefore we can test here against
         // a hardcoded result
-        RunOdeSolverWithIonicModel(&hh52_ode_system,
-                                   15.0,
-                                   "HhGetIIonic");
-        TS_ASSERT_DELTA( hh52_ode_system.GetIIonic(), 40.6341, 1e-3);
+        RunOdeSolverWithIonicModel(&hh52_ode_system, 15.0, "HhGetIIonic");
+        TS_ASSERT_DELTA(hh52_ode_system.GetIIonic(), 40.6341, 1e-3);
+
+        // For coverage of the case where a cell model has no non-linear ODEs, we also test the backward Euler
+        // version of this model.
+        CellHodgkinHuxley1952FromCellMLBackwardEuler hh52_be(p_solver, p_stimulus);
+        RunOdeSolverWithIonicModel(&hh52_be, end_time, "HH52BackwardEuler", 1, true /* check ComputeExceptVoltage too */);
+        // Compare end result against using SolveAndUpdateState
+        std::vector<double> state_variables_copy = hh52_be.GetStdVecStateVariables();
+        hh52_be.ResetToInitialConditions();
+        hh52_be.SolveAndUpdateState(0.0, end_time);
+        for (unsigned i=0; i<hh52_be.GetNumberOfStateVariables(); i++)
+        {
+            TS_ASSERT_DELTA(hh52_be.GetStateVariable(i), state_variables_copy[i], 1e-6);
+        }
     }
 
 
@@ -1317,12 +1328,15 @@ public:
             AbstractCardiacCellInterface* const p_n98_cell = new CellNobleVargheseKohlNoble1998aFromCellML(p_solver, p_stimulus);
             // and SAC
             AbstractCardiacCellInterface* const p_n98_sac = new CML_noble_varghese_kohl_noble_1998_basic_with_sac(p_solver, p_stimulus);
+            // and "0d" backward Euler
+            AbstractCardiacCellInterface* const p_hh52_be = new CellHodgkinHuxley1952FromCellMLBackwardEuler(p_solver, p_stimulus);
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
-            output_arch <<  p_n98_cell;
-            output_arch <<  p_n98_sac;
+            output_arch << p_n98_cell;
+            output_arch << p_n98_sac;
+            output_arch << p_hh52_be;
 
             // These results are in the repository and should be replicated after the load below
 //            RunOdeSolverWithIonicModel(p_n98_cell,
@@ -1331,6 +1345,7 @@ public:
 
             delete p_n98_cell;
             delete p_n98_sac;
+            delete p_hh52_be;
         }
         // Load
         {
@@ -1341,6 +1356,7 @@ public:
             input_arch >> p_n98_cell;
 
             TS_ASSERT_EQUALS( p_n98_cell->GetNumberOfStateVariables(), 22U );
+            TS_ASSERT(dynamic_cast<CellNobleVargheseKohlNoble1998aFromCellML*>(p_n98_cell));
 
             RunOdeSolverWithIonicModel(p_n98_cell,
                                        50.0,
@@ -1350,6 +1366,12 @@ public:
             AbstractCardiacCellInterface* p_n98_cell_sac;
             input_arch >> p_n98_cell_sac;
             TS_ASSERT_EQUALS( p_n98_cell_sac->GetNumberOfStateVariables(), 22U );
+            TS_ASSERT(dynamic_cast<CML_noble_varghese_kohl_noble_1998_basic_with_sac*>(p_n98_cell_sac));
+
+            AbstractCardiacCellInterface* p_hh52_be;
+            input_arch >> p_hh52_be;
+            TS_ASSERT_EQUALS(p_hh52_be->GetNumberOfStateVariables(), 6u);
+            TS_ASSERT(dynamic_cast<CellHodgkinHuxley1952FromCellMLBackwardEuler*>(p_hh52_be));
 
             delete p_n98_cell;
             delete p_n98_cell_sac;
