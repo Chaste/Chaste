@@ -1012,7 +1012,7 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
         test_lib = env.StaticLibrary('test'+projectName, testsource)[0]
     else:
         # Build the object files for this project
-        project_lib = test_lib = None
+        project_lib = test_lib = libpath = None
         for source_file in files + testsource:
             objs = env.StaticObject(source_file)
             key = os.path.join(project_path, source_file)
@@ -1159,7 +1159,7 @@ def DoComponentSConscript(component, otherVars):
             env.Alias('install', t)
     else:
         # Don't build libraries - tests will link against object files directly
-        lib = test_lib = None
+        lib = test_lib = libpath = None
         for source_file in files + testsource:
             objs = env.StaticObject(source_file)
             key = os.path.join(component, str(source_file))
