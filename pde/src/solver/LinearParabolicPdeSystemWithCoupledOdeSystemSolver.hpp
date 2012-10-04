@@ -93,6 +93,12 @@ private:
     out_stream mpVtkMetaFile;
 
     /**
+     * Whether the output directory should be cleared before solve or not. False by default.
+     * Can be changed when setting the output directory
+     */
+    bool mClearOutputDirectory;
+
+    /**
      * Write the current results to mpVtkMetaFile.
      */
     void WriteVtkResultsToFile();
@@ -201,8 +207,10 @@ public:
      * Set mOutputDirectory.
      *
      * @param outputDirectory the output directory to use
+     * @param clearDirectory whether to clear outputDirectory or not. Note that the actual clearing happens when you call SolveAndWriteResultsToFile().
+     *                       False by default.
      */
-    void SetOutputDirectory(std::string outputDirectory);
+    void SetOutputDirectory(std::string outputDirectory, bool clearDirectory = false);
 
     /**
      * Set mSamplingTimeStep.
@@ -363,7 +371,8 @@ LinearParabolicPdeSystemWithCoupledOdeSystemSolver<ELEMENT_DIM, SPACE_DIM, PROBL
       mOdeSystemsAtNodes(odeSystemsAtNodes),
       mpOdeSolver(pOdeSolver),
       mSamplingTimeStep(DOUBLE_UNSET),
-      mOdeSystemsPresent(false)
+      mOdeSystemsPresent(false),
+      mClearOutputDirectory(false)
 {
     this->mpBoundaryConditions = pBoundaryConditions;
 
@@ -435,8 +444,9 @@ void LinearParabolicPdeSystemWithCoupledOdeSystemSolver<ELEMENT_DIM, SPACE_DIM, 
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
-void LinearParabolicPdeSystemWithCoupledOdeSystemSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetOutputDirectory(std::string outputDirectory)
+void LinearParabolicPdeSystemWithCoupledOdeSystemSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetOutputDirectory(std::string outputDirectory, bool clearDirectory)
 {
+    mClearOutputDirectory = clearDirectory;
     this->mOutputDirectory = outputDirectory;
 }
 
@@ -474,7 +484,7 @@ void LinearParabolicPdeSystemWithCoupledOdeSystemSolver<ELEMENT_DIM, SPACE_DIM, 
 
 #ifdef CHASTE_VTK
     // Create a .pvd output file
-    OutputFileHandler output_file_handler(this->mOutputDirectory, false);
+    OutputFileHandler output_file_handler(this->mOutputDirectory, mClearOutputDirectory);
     mpVtkMetaFile = output_file_handler.OpenOutputFile("results.pvd");
     *mpVtkMetaFile << "<?xml version=\"1.0\"?>\n";
     *mpVtkMetaFile << "<VTKFile type=\"Collection\" version=\"0.1\" byte_order=\"LittleEndian\" compressor=\"vtkZLibDataCompressor\">\n";
