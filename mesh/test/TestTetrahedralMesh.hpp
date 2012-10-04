@@ -208,6 +208,7 @@ public:
         TS_ASSERT_DELTA(mesh.GetNode(19)->GetPoint()[0], 0.75, 1e-6);
         TS_ASSERT_DELTA(mesh.GetNode(19)->GetPoint()[1], 0.25, 1e-6);
         TS_ASSERT_DELTA(mesh.GetNode(19)->GetPoint()[2], 0.0, 1e-6);
+        TS_ASSERT_EQUALS(mesh.GetNumNodeAttributes(), 0u);
     }
 
     void TestConstructionFromMeshReaderWithNodeAttributes() throw(Exception)
@@ -229,7 +230,7 @@ public:
         {
             TS_ASSERT_EQUALS(mesh.GetNode(node_index)->rGetNodeAttributes().size(), 2u);
         }
-
+        TS_ASSERT_EQUALS(mesh.GetNumNodeAttributes(), 2u);
         // Check some values
         unsigned probe_node_1 = 0u;
         unsigned probe_node_2 = 8u;

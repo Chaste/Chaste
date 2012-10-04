@@ -81,6 +81,15 @@ unsigned AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetNumAllNodes() const
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetNumNodeAttributes() const
+{
+	/* Note, this implementation assumes that all nodes have the same number of attributes
+	 * so that the first node in the container is indicative of the others.*/
+	assert(mNodes.size() != 0u);
+	return mNodes[0]->rGetNodeAttributes().size();
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 Node<SPACE_DIM>* AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetNode(unsigned index) const
 {
     unsigned local_index = SolveNodeMapping(index);

@@ -178,6 +178,13 @@ public:
     virtual unsigned GetNumAllNodes() const;
 
     /**
+     * Get the  number of attributes on each node.
+     * Note, this implementation assumes that all nodes have the same number of attributes
+     * so that the first node in the container is indicative of the others.
+     */
+    unsigned GetNumNodeAttributes() const;
+
+    /**
      * Get the node with a given index in the mesh.
      *
      * @param index the global index of the node
