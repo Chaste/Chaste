@@ -155,26 +155,25 @@ class ChasteTestLoader(unittest.TestLoader):
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         filepath = sys.argv[1]
-        if os.path.isfile(filepath):
-            # Load Python file and run its tests
-            dirpath = os.path.dirname(filepath)
-            base, ext = os.path.splitext(os.path.basename(filepath))
-            if ext != '.py':
-                raise ValueError(filepath + ' is not a Python source file')
-            (file, pathname, desc) = imp.find_module(base, [dirpath])
-            try:
-                module = imp.load_module(base, file, pathname, desc)
-            finally:
-                file.close()
-            if hasattr(module, 'MakeTestSuite') and callable(module.MakeTestSuite):
-                suite = module.MakeTestSuite()
-                result = ChasteTestRunner().run(suite)
-                sys.exit(not result.wasSuccessful())
-            else:
-                unittest.main(module=module, argv=[sys.argv[0]] + sys.argv[2:],
-                              testRunner=ChasteTestRunner(), testLoader=ChasteTestLoader())
-        else:
+        if not os.path.isfile(filepath):
             raise ValueError(filepath + ' is not a file')
+        base, ext = os.path.splitext(os.path.basename(filepath))
+        if ext != '.py':
+            raise ValueError(filepath + ' is not a Python source file')
+        # Load Python file and run its tests
+        dirpath = os.path.dirname(filepath)
+        (file, pathname, desc) = imp.find_module(base, [dirpath])
+        try:
+            module = imp.load_module(base, file, pathname, desc)
+        finally:
+            file.close()
+        if hasattr(module, 'MakeTestSuite') and callable(module.MakeTestSuite):
+            suite = module.MakeTestSuite()
+            result = ChasteTestRunner().run(suite)
+            sys.exit(not result.wasSuccessful())
+        else:
+            unittest.main(module=module, argv=[sys.argv[0]] + sys.argv[2:],
+                          testRunner=ChasteTestRunner(), testLoader=ChasteTestLoader())
     else:
         # Default test of this file
         unittest.main(testRunner=ChasteTestRunner(), testLoader=ChasteTestLoader())

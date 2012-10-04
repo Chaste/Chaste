@@ -30,45 +30,16 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-"""
-Specialised component build script for python code.
-"""
+# SCons build script for core Chaste components.
 
 import os
 
 Import("*")
 
-curdir = os.getcwd()
-# Look for source files within the <component> folder
-os.chdir('../..') # This is so .o files are built in <component>/build/<something>/
-pydirs = SConsTools.FindSourceFiles(env, '.', sourceExts=['.py'], ignoreDirs=['build', 'test'], dirsOnly=True)
-# Move back to the buid dir
-os.chdir(curdir)
+# Note that this script is executed from within the <component>/build/<something>/ folder
+# Get our top-level directory
+toplevel_dir = os.path.basename(os.path.dirname(os.path.dirname(os.getcwd())))
 
-# Look for files containing a test suite
-# A list of test suites to run will be found in a test/<name>TestPack.txt
-# file, one per line.
-# Alternatively, a single test suite may have been specified on the command line.
-testfiles = SConsTools.FindTestsToRun(env, build, BUILD_TARGETS, globals(), component='python')
-
-# Test runner for Python tests needs to use a source scanner
-# to find what Python files we depend on.
-runtest = Builder(action=env['BUILDERS']['RunTest'].action,
-                  source_scanner=SConsTools.PyScanner())
-env['BUILDERS']['PyRunTest'] = runtest
-
-# The list of paths to search for Python modules.
-env.Append(PYINCPATH=pydirs)
-
-test_log_files = []
-if not compile_only:
-    for testfile in testfiles:
-        prefix = os.path.splitext(testfile)[0]
-        log_file = env.File(prefix+'.log')
-        test_log_files.append(log_file)
-        env.PyRunTest(log_file, os.path.join('test', testfile))
-        if force_test_runs:
-            env.AlwaysBuild(log_file)
-    
-result = test_log_files
+# Do the build magic
+result = SConsTools.DoComponentSConscript(toplevel_dir, globals())
 Return("result")

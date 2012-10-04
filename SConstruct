@@ -325,10 +325,14 @@ def TestDescription(target, source, env):
     return "Running '%s'" % (source[0])
 test_action = Action(TestRunner.get_build_function(build, run_time_flags, test_time_limit),
                      TestDescription, varlist=['buildsig'])
-runtest = Builder(action=test_action)
 env['BUILDERS']['Test'] = test
-env['BUILDERS']['RunTest'] = runtest
+env['BUILDERS']['RunTest'] = Builder(action=test_action)
 env['BUILDERS']['BuildTest'] = Builder(action=SConsTools.BuildTest)
+
+# Test runner for Python tests needs to use a source scanner
+# to find what Python files the test depends on.
+env['BUILDERS']['PyRunTest'] = Builder(action=test_action,
+                                       source_scanner=SConsTools.PyScanner())
 
 # Faster builds of shared libraries
 env['BUILDERS']['OriginalSharedLibrary'] = env['BUILDERS']['SharedLibrary']

@@ -167,7 +167,7 @@ def run_test(exefile, logfile, build, run_time_flags='', echo=True, time_limit=0
     # Find out how we're supposed to run tests under this build type
     if exefile.startswith("python/infra/Check"):
         command = exefile + ' 2>&1'
-    elif exefile.startswith('python/test/Test'):
+    elif exefile.endswith('.py'):
         command = './python/infra/TestPythonCode.py ' + exefile + ' 2>&1'
     else:
         command = build.GetTestRunnerCommand(exefile, '2>&1 ' + run_time_flags)

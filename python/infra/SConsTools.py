@@ -952,6 +952,8 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
     os.chdir('../..') # This is so .o files are built in <project>/build/<something>/
     files, extra_cpppath = FindSourceFiles(env, 'src', ignoreDirs=['broken'], includeRoot=True)
     otherVars['extra_dyn_cpppath'] = extra_cpppath[:]
+    pydirs = FindSourceFiles(env, '.', sourceExts=['.py'],
+                             ignoreDirs=['build', 'test'], dirsOnly=True)
     # Look for source files that tests depend on under <project>/test/.
     testsource, test_cpppath = FindSourceFiles(env, 'test', ignoreDirs=['data'])
     extra_cpppath.extend(test_cpppath)
@@ -981,9 +983,13 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
         print "  Will run tests:", map(str, testfiles)
 
     # Add extra source and test folders to CPPPATH only for this project
-    if extra_cpppath:
+    if extra_cpppath or pydirs:
         env = CloneEnv(env)
+    if extra_cpppath:
         env.Prepend(CPPPATH=extra_cpppath)
+    # Similarly for folders containing Python source
+    if pydirs:
+        env.Append(PYINCPATH=pydirs)
     
     # Build any dynamically loadable modules
     dyn_libs = DoDynamicallyLoadableModules(otherVars)
@@ -1026,35 +1032,7 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
     if project_lib:
         lib_deps.append(project_lib)
 
-    # Collect a list of test log files to use as dependencies for the test summary generation
-    test_log_files = []
-
-    # Build and run tests of this project
-    if testfiles:
-        if not use_chaste_libs:
-            overrides = {'LIBS': otherVars['other_libs'],
-                         'LIBPATH': otherVars['other_libpaths']}
-            env['TestBuilder'] = lambda target, source: env.Program(target, source, **overrides)
-        else:
-            overrides = {'LIBS': all_libs,
-                         'LIBPATH': [libpath, '.'] + otherVars['other_libpaths']}
-    for testfile in testfiles:
-        prefix = os.path.splitext(testfile)[0]
-        #print projectName, 'test', prefix
-        (runner_exe, runner_dummy) = ScheduleTestBuild(env, overrides, testfile, prefix, use_chaste_libs)
-        if not otherVars['compile_only']:
-            log_file = env.File(prefix+'.log')
-            if use_chaste_libs:
-                env.Depends(log_file, lib_deps)
-            else:
-                env.Depends(log_file, runner_dummy)
-            if dyn_libs:
-                # All tests should depend on dynamically loadable modules, just in case
-                env.Depends(log_file, dyn_libs)
-            test_log_files.append(log_file)
-            env.RunTest(log_file, runner_exe)
-            if otherVars['force_test_runs']:
-                env.AlwaysBuild(log_file)
+    test_log_files = ScheduleTests(env, all_libs, dyn_libs, lib_deps, libpath, testfiles, otherVars)
     
     # Any executables to build?
     if otherVars['build_exes']:
@@ -1116,6 +1094,8 @@ def DoComponentSConscript(component, otherVars):
     # Look for source files within the <component>/src folder
     os.chdir('../..') # This is so .o files are built in <component>/build/<something>/
     files, _ = FindSourceFiles(env, 'src', ignoreDirs=['broken'])
+    pydirs = FindSourceFiles(env, '.', sourceExts=['.py'],
+                             ignoreDirs=['build', 'test'], dirsOnly=True)
     # Look for source files that tests depend on under test/.
     # We also need to add any subfolders to the CPPPATH, so they are searched
     # for #includes.
@@ -1140,10 +1120,13 @@ def DoComponentSConscript(component, otherVars):
     if otherVars['debug']:
         print "  Will run tests:", map(str, testfiles)
     
-    # Add test folders to CPPPATH only for this component
-    if test_cpppath:
+    # Add test folders to CPPPATH only for this component; similarly for folders containing Python source
+    if test_cpppath or pydirs:
         env = CloneEnv(env)
+    if test_cpppath:
         env.Prepend(CPPPATH=test_cpppath)
+    if pydirs:
+        env.Append(PYINCPATH=pydirs)
 
     # Build any dynamically loadable modules
     dyn_libs = DoDynamicallyLoadableModules(otherVars)
@@ -1191,42 +1174,50 @@ def DoComponentSConscript(component, otherVars):
         chaste_libs = [component] + chaste_libs
     all_libs = ['test'+component] + chaste_libs + otherVars['other_libs']
     
-    # Make test output depend on shared libraries, so if implementation changes
-    # then tests are re-run.
+    # Make test output depend on shared libraries, so if implementation changes then tests are re-run.
     lib_deps = [test_lib] # Source code used by our tests
     #lib_deps.extend(map(lambda lib: '#lib/lib%s.so' % lib, chaste_libs)) # all Chaste libs used
     if lib:
         lib_deps.append(lib)
+    
+    return ScheduleTests(env, all_libs, dyn_libs, lib_deps, libpath, testfiles, otherVars)
 
-    # Collect a list of test log files to use as dependencies for the test
-    # summary generation
+
+def ScheduleTests(env, allLibs, dynLibs, libDeps, libPath, testFiles, otherVars):
+    """Schedule the test builds & runs for this component/project."""
+    use_chaste_libs = otherVars['use_chaste_libs']
+    # Collect a list of test log files to use as dependencies for the test summary generation
     test_log_files = []
     
-    # Build and run tests of this component
-    if testfiles:
+    # Build and run tests of this component/project
+    if testFiles:
         if not use_chaste_libs:
             overrides = {'LIBS': otherVars['other_libs'],
                          'LIBPATH': otherVars['other_libpaths']}
             env['TestBuilder'] = lambda target, source: env.Program(target, source, **overrides)
         else:
-            overrides = {'LIBS': all_libs,
-                         'LIBPATH': [libpath, '.'] + otherVars['other_libpaths']}
+            overrides = {'LIBS': allLibs,
+                         'LIBPATH': [libPath, '.'] + otherVars['other_libpaths']}
     
-    for testfile in testfiles:
-        prefix = os.path.splitext(testfile)[0]
-        #print component, 'test', prefix
-        (runner_exe, runner_dummy) = ScheduleTestBuild(env, overrides, testfile, prefix, use_chaste_libs)
+    for testfile in testFiles:
+        prefix, ext = os.path.splitext(testfile)
+        is_py_test = ext == '.py'
+        if not is_py_test:
+            (runner_exe, runner_dummy) = ScheduleTestBuild(env, overrides, testfile, prefix, use_chaste_libs)
         if not otherVars['compile_only']:
             log_file = env.File(prefix+'.log')
-            if use_chaste_libs:
-                env.Depends(log_file, lib_deps)
-            else:
-                env.Depends(log_file, runner_dummy)
-            if dyn_libs:
-                # All tests should depend on dynamically loadable modules, just in case
-                env.Depends(log_file, dyn_libs)
             test_log_files.append(log_file)
-            env.RunTest(log_file, runner_exe)
+            if is_py_test:
+                env.PyRunTest(log_file, os.path.join('test', testfile))
+            else:
+                if use_chaste_libs:
+                    env.Depends(log_file, libDeps)
+                else:
+                    env.Depends(log_file, runner_dummy)
+                if dynLibs:
+                    # All tests should depend on dynamically loadable modules, just in case
+                    env.Depends(log_file, dynLibs)
+                env.RunTest(log_file, runner_exe)
             if otherVars['force_test_runs']:
                 env.AlwaysBuild(log_file)
     
