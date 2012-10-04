@@ -192,6 +192,7 @@ public:
 
     /**
      * Destructor.
+     * If an ODE system is present, the pointers to the ODE system objects are deleted here.
      */
     ~LinearParabolicPdeSystemWithCoupledOdeSystemSolver();
 
