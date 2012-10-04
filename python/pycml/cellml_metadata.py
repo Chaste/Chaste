@@ -279,6 +279,10 @@ def find_variables(cellml_model, property, value=None):
     _debug("find_variables(", property, ",", value, ")")
     return _wrapper.find_variables(cellml_model, property, value)
 
+def get_all_rdf(cellml_model):
+    """Return an iterator over all RDF triples in the model."""
+    return _wrapper.get_all_rdf(cellml_model)
+
 def namespace_member(node, nsuri, not_uri_ok=False, wrong_ns_ok=False):
     """Given a URI reference RDF node and namespace URI, return the local part.
     
@@ -401,6 +405,10 @@ class RdfWrapper(object):
     def find_variables(self, cellml_model, property, value=None):
         raise NotImplementedError
     find_variables.__doc__ = globals()['find_variables'].__doc__ + _must_provide
+    
+    def get_all_rdf(self, cellml_model):
+        raise NotImplementedError
+    get_all_rdf.__doc__ = globals()['get_all_rdf'].__doc__ + _must_provide
 
     def namespace_member(self, node, nsuri, not_uri_ok=False, wrong_ns_ok=False):
         raise NotImplementedError
@@ -540,6 +548,12 @@ class RedlandWrapper(RdfWrapper):
         return vars
     find_variables.__doc__ = globals()['find_variables'].__doc__
     
+    def get_all_rdf(self, cellml_model):
+        rdf_model = self.get_rdf_from_model(cellml_model)
+        for statement in rdf_model:
+            yield (statement.subject, statement.predicate, statement.object)
+    get_all_rdf.__doc__ = globals()['get_all_rdf'].__doc__
+
     def namespace_member(self, node, nsuri, not_uri_ok=False, wrong_ns_ok=False):
         if not node.is_resource():
             if not_uri_ok:
@@ -663,6 +677,12 @@ class RdflibWrapper(RdfWrapper):
             vars.append(var_objs[0])
         return vars
     find_variables.__doc__ = globals()['find_variables'].__doc__
+    
+    def get_all_rdf(self, cellml_model):
+        rdf_model = self.get_rdf_from_model(cellml_model)
+        for triple in rdf_model:
+            yield triple
+    get_all_rdf.__doc__ = globals()['get_all_rdf'].__doc__
 
     def namespace_member(self, node, nsuri, not_uri_ok=False, wrong_ns_ok=False):
         if not isinstance(node, self.URIRef):
