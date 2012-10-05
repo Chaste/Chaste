@@ -222,7 +222,8 @@ comp_deps = {'cell_based': ['pde', 'ode', 'mesh', 'linalg', 'io', 'global'],
              'linalg': ['global'],
              'ode': ['linalg', 'io', 'global'],
              'io': ['global'],
-             'global': []
+             'global': [],
+             'python': []
              }
 components = ['python', 'global', 'io', 'linalg', 'mesh', 'ode', 'pde', 'continuum_mechanics',
               'heart', 'cell_based', 'crypt', 
