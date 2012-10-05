@@ -121,10 +121,12 @@ void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength, c_vector<
     mpBoxCollection->SetupLocalBoxesHalfOnly();
 
     //Put the nodes in the boxes.
-    for (unsigned i=0; i< this->GetNumNodes(); i++)
+    for (typename AbstractMesh<SPACE_DIM, SPACE_DIM>::NodeIterator node_iter = this->GetNodeIteratorBegin();
+            node_iter != this->GetNodeIteratorEnd();
+            ++node_iter)
     {
-        unsigned box_index = mpBoxCollection->CalculateContainingBox(this->GetNode(i));
-        mpBoxCollection->rGetBox(box_index).AddNode(this->GetNode(i));
+        unsigned box_index = mpBoxCollection->CalculateContainingBox(&(*node_iter));
+        mpBoxCollection->rGetBox(box_index).AddNode(&(*node_iter));
     }
 }
 

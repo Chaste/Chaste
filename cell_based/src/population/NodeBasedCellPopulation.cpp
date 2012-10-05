@@ -96,23 +96,17 @@ void NodeBasedCellPopulation<DIM>::Clear()
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::Validate()
 {
-    std::vector<bool> validated_node(GetNumNodes());
-    for (unsigned i=0; i<validated_node.size(); i++)
+    for(typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
+            node_iter != this->mrMesh.GetNodeIteratorEnd();
+            ++node_iter)
     {
-        validated_node[i] = false;
-    }
-
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter=this->Begin(); cell_iter!=this->End(); ++cell_iter)
-    {
-        unsigned node_index = this->GetLocationIndexUsingCell((*cell_iter));
-        validated_node[node_index] = true;
-    }
-
-    for (unsigned i=0; i<validated_node.size(); i++)
-    {
-        if (!validated_node[i])
+        try
         {
-            EXCEPTION("Node " << i << " does not appear to have a cell associated with it");
+            this->GetCellUsingLocationIndex(node_iter->GetIndex());
+        }
+        catch (const Exception& e)
+        {
+            EXCEPTION("Node " << node_iter->GetIndex() << " does not appear to have a cell associated with it");
         }
     }
 }
