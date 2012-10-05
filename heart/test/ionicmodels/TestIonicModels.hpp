@@ -1375,6 +1375,7 @@ public:
 
             delete p_n98_cell;
             delete p_n98_cell_sac;
+            delete p_hh52_be;
         }
      }
 
