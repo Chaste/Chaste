@@ -102,7 +102,8 @@ public:
 
         // compare the files, using the CompareFilesViaHdf5DataReader() method
         TS_ASSERT( CompareFilesViaHdf5DataReader("heart/test/data/cardiac_simulations", "save_monodomain_results", false,
-                   foldername, "SimulationResults", true));
+                                                 foldername, "SimulationResults", true,
+                                                 1e-9 /*tol*/));
 
         FileFinder file(foldername + "_checkpoints/10ms/" + foldername + "_10ms/archive.arch.0",
                         RelativeTo::ChasteTestOutput);
