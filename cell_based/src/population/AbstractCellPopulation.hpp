@@ -101,6 +101,7 @@ private:
         archive & mCellLocationMap;
         archive & mCellCyclePhaseCount;
         archive & mpCellPropertyRegistry;
+        archive & mOutputResultsForChasteVisualizer;
         archive & mOutputCellIdData;
         archive & mOutputCellMutationStates;
         archive & mOutputCellAncestors;

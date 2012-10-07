@@ -795,6 +795,7 @@ public:
             }
         }
 
+        cell_population.SetOutputCellRearrangementLocations(true);
         cell_population.SetOutputCellMutationStates(true);
         cell_population.SetOutputCellProliferativeTypes(true);
         cell_population.SetOutputCellCyclePhases(true);

@@ -80,6 +80,9 @@ private:
     /** Results file for locations of T3Swaps. */
     out_stream mpT3SwapLocationsFile;
 
+    /** Whether to output the locations of T1Swaps and T3Swaps to files. Defaults to true. */
+    bool mOutputCellRearrangementLocations;
+
     /**
      * Overridden WriteVtkResultsToFile() method.
      */
@@ -101,6 +104,7 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractOffLatticeCellPopulation<DIM> >(*this);
+        archive & mOutputCellRearrangementLocations;
     }
 
     /**
@@ -315,6 +319,18 @@ public:
      * Overridden GenerateCellResultsAndWriteToFiles() method.
      */
     virtual void GenerateCellResultsAndWriteToFiles();
+
+    /**
+     * @return mOutputCellRearrangementLocations
+     */
+    bool GetOutputCellRearrangementLocations();
+
+    /**
+     * Set mOutputCellRearrangementLocations.
+     *
+     * @param outputCellRearrangementLocations the new value of mOutputCellRearrangementLocations
+     */
+    void SetOutputCellRearrangementLocations(bool outputCellRearrangementLocations);
 
     /**
      * Overridden OutputCellPopulationParameters() method.
