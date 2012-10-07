@@ -6,6 +6,7 @@
 		<MeinekeDivisionSeparation>0.3</MeinekeDivisionSeparation>
 		<DampingConstantNormal>1</DampingConstantNormal>
 		<DampingConstantMutant>1</DampingConstantMutant>
+		<OutputResultsForChasteVisualizer>1</OutputResultsForChasteVisualizer>
 		<OutputCellIdData>0</OutputCellIdData>
 		<OutputCellMutationStates>1</OutputCellMutationStates>
 		<OutputCellAncestors>1</OutputCellAncestors>

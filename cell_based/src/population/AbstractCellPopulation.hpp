@@ -176,6 +176,9 @@ protected:
     /** Cell property registry. */
     boost::shared_ptr<CellPropertyRegistry> mpCellPropertyRegistry;
 
+    /** Whether to write results to file for visualization using the Chaste java visualizer (defaults to true). */
+    bool mOutputResultsForChasteVisualizer;
+
     /** Whether to write cell ID data to file. */
     bool mOutputCellIdData;
 
@@ -610,6 +613,11 @@ public:
     virtual void OutputCellPopulationParameters(out_stream& rParamsFile)=0;
 
     /**
+     * @return mOutputResultsForChasteVisualizer
+     */
+    bool GetOutputResultsForChasteVisualizer();
+
+    /**
      * @return mOutputCellIdData
      */
     bool GetOutputCellIdData();
@@ -648,6 +656,13 @@ public:
      * @return mOutputCellVolumes
      */
     bool GetOutputCellVolumes();
+
+    /**
+     * Set mOutputResultsForChasteVisualizer.
+     *
+     * @param outputResultsForChasteVisualizer the new value of mOutputResultsForChasteVisualizer
+     */
+    void SetOutputResultsForChasteVisualizer(bool outputResultsForChasteVisualizer);
 
     /**
      * Set mOutputCellIdData.

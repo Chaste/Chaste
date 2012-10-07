@@ -228,7 +228,10 @@ void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResu
 
             if (IsGhostNode(node_index) == true)
             {
-                *(this->mpVizCellProliferativeTypesFile) << INVISIBLE_COLOUR << " ";
+                if (this->mOutputResultsForChasteVisualizer)
+                {
+                    *(this->mpVizCellProliferativeTypesFile) << INVISIBLE_COLOUR << " ";
+                }
             }
             else
             {
@@ -260,13 +263,11 @@ void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteTimeAndNode
             *this->mpVizBoundaryNodesFile << time << "\t";
         }
 
-
         // Write node data to file
         for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
-                node_iter != this->mrMesh.GetNodeIteratorEnd();
-                ++node_iter)
+             node_iter != this->mrMesh.GetNodeIteratorEnd();
+             ++node_iter)
         {
-
             /*
              * Hack that covers the case where the node in an AbstractCentreBasedCellPopulation
              * is associated with a cell that has just been killed (#1129). This breaks the

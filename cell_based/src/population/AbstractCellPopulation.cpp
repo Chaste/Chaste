@@ -46,6 +46,7 @@ AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulation( Abstract
       mCells(rCells.begin(), rCells.end()),
       mCentroid(zero_vector<double>(SPACE_DIM)),
       mpCellPropertyRegistry(CellPropertyRegistry::Instance()->TakeOwnership()),
+      mOutputResultsForChasteVisualizer(true),
       mOutputCellIdData(false),
       mOutputCellMutationStates(false),
       mOutputCellAncestors(false),
@@ -100,7 +101,7 @@ AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulation( Abstract
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulation(AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
-            : mrMesh(rMesh)
+    : mrMesh(rMesh)
 {
 }
 
@@ -385,10 +386,12 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::CreateOutputFiles(const std
 
     if (PetscTools::AmMaster())
     {
-        mpVizNodesFile = output_file_handler.OpenOutputFile("results.viznodes");
-        mpVizBoundaryNodesFile = output_file_handler.OpenOutputFile("results.vizboundarynodes");
-        mpVizCellProliferativeTypesFile = output_file_handler.OpenOutputFile("results.vizcelltypes");
-
+        if (mOutputResultsForChasteVisualizer)
+        {
+            mpVizNodesFile = output_file_handler.OpenOutputFile("results.viznodes");
+            mpVizBoundaryNodesFile = output_file_handler.OpenOutputFile("results.vizboundarynodes");
+            mpVizCellProliferativeTypesFile = output_file_handler.OpenOutputFile("results.vizcelltypes");
+        }
         if (mOutputCellAncestors)
         {
             mpVizCellAncestorsFile = output_file_handler.OpenOutputFile("results.vizancestors");
@@ -457,11 +460,12 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::CloseOutputFiles()
     // In parallel all files are closed after writing
     if (PetscTools::IsSequential())
     {
-        mpVizNodesFile->close();
-        mpVizBoundaryNodesFile->close();
-        mpVizCellProliferativeTypesFile->close();
-
-
+        if (mOutputResultsForChasteVisualizer)
+        {
+            mpVizNodesFile->close();
+            mpVizBoundaryNodesFile->close();
+            mpVizCellProliferativeTypesFile->close();
+        }
         if (mOutputCellMutationStates)
         {
             mpCellMutationStatesFile->close();
@@ -604,15 +608,19 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResults(CellPtr
         // Write cell age
         *mpCellAgesFile << pCell->GetAge() << " ";
     }
-
-    *mpVizCellProliferativeTypesFile << colour << " ";
+    if (mOutputResultsForChasteVisualizer)
+    {
+        *mpVizCellProliferativeTypesFile << colour << " ";
+    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteCellResultsToFiles(std::vector<unsigned>& rCellCyclePhaseCounter)
 {
-    *mpVizCellProliferativeTypesFile << "\n";
-
+    if (mOutputResultsForChasteVisualizer)
+    {
+        *mpVizCellProliferativeTypesFile << "\n";
+    }
     if (mOutputCellAncestors)
     {
         *mpVizCellAncestorsFile << "\n";
@@ -717,11 +725,17 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteTimeAndNodeResultsToFi
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles()
 {
-    WriteTimeAndNodeResultsToFiles();
+    if (mOutputResultsForChasteVisualizer)
+    {
+        WriteTimeAndNodeResultsToFiles();
+    }
+
     double time = SimulationTime::Instance()->GetTime();
 
-    *mpVizCellProliferativeTypesFile << time << "\t";
-
+    if (mOutputResultsForChasteVisualizer)
+    {
+        *mpVizCellProliferativeTypesFile << time << "\t";
+    }
     if (mOutputCellAncestors)
     {
         *mpVizCellAncestorsFile << time << "\t";
@@ -834,6 +848,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationInfo(ou
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
+    *rParamsFile << "\t\t<OutputResultsForChasteVisualizer>" << mOutputResultsForChasteVisualizer << "</OutputResultsForChasteVisualizer>\n";
     *rParamsFile << "\t\t<OutputCellIdData>" << mOutputCellIdData << "</OutputCellIdData>\n";
     *rParamsFile << "\t\t<OutputCellMutationStates>" << mOutputCellMutationStates << "</OutputCellMutationStates>\n";
     *rParamsFile << "\t\t<OutputCellAncestors>" << mOutputCellAncestors << "</OutputCellAncestors>\n";
@@ -847,6 +862,12 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationParamet
 ///////////////////////////////////////////////////////////////////////
 // Getter methods
 ///////////////////////////////////////////////////////////////////////
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetOutputResultsForChasteVisualizer()
+{
+    return mOutputResultsForChasteVisualizer;
+}
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetOutputCellIdData()
@@ -899,6 +920,12 @@ bool AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetOutputCellVolumes()
 ///////////////////////////////////////////////////////////////////////
 // Setter methods
 ///////////////////////////////////////////////////////////////////////
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetOutputResultsForChasteVisualizer(bool outputResultsForChasteVisualizer)
+{
+    mOutputResultsForChasteVisualizer = outputResultsForChasteVisualizer;
+}
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetOutputCellIdData(bool writeCellIdData)

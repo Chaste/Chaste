@@ -700,6 +700,7 @@ public:
         }
 
         // Test set methods
+        cell_population.SetOutputResultsForChasteVisualizer(true);
         cell_population.SetOutputCellPopulationVolumes(true);
         cell_population.SetOutputCellVolumes(true);
         cell_population.SetOutputCellMutationStates(true);
