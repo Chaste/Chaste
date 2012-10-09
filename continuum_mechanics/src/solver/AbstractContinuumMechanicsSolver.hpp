@@ -863,14 +863,18 @@ void AbstractContinuumMechanicsSolver<DIM>::AllocateMatrixMemory()
             num_non_zeros_each_row[i] = 0;
         }
 
-        for (unsigned i=0; i<mrQuadMesh.GetNumNodes(); i++)
+        for (typename AbstractMesh<DIM,DIM>::NodeIterator iter = mrQuadMesh.GetNodeIteratorBegin();
+             iter != mrQuadMesh.GetNodeIteratorEnd();
+             ++iter)
         {
             // this upper bound neglects the fact that two containing elements will share the same nodes..
             // 4 = max num dofs associated with this node
             // 30 = 3*9+3 = 3 dimensions x 9 other nodes on this element   +  3 vertices with a pressure unknown
-            unsigned num_non_zeros_upper_bound = 4 + 30*mrQuadMesh.GetNode(i)->GetNumContainingElements();
+            unsigned num_non_zeros_upper_bound = 4 + 30*iter->GetNumContainingElements();
 
             num_non_zeros_upper_bound = std::min(num_non_zeros_upper_bound, mNumDofs);
+
+            unsigned i = iter->GetIndex();
 
             num_non_zeros_each_row[mProblemDimension*i + 0] = num_non_zeros_upper_bound;
             num_non_zeros_each_row[mProblemDimension*i + 1] = num_non_zeros_upper_bound;
@@ -878,7 +882,7 @@ void AbstractContinuumMechanicsSolver<DIM>::AllocateMatrixMemory()
 
             if (mCompressibilityType==INCOMPRESSIBLE)
             {
-                if(!mrQuadMesh.GetNode(i)->IsInternal())
+                if(!iter->IsInternal())
                 {
                     num_non_zeros_each_row[mProblemDimension*i + 3] = num_non_zeros_upper_bound;
                 }

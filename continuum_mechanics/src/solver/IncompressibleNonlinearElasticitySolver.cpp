@@ -581,10 +581,13 @@ void IncompressibleNonlinearElasticitySolver<DIM>::FormInitialGuess()
 {
     this->mCurrentSolution.resize(this->mNumDofs, 0.0);
 
-    for (unsigned i=0; i<this->mrQuadMesh.GetNumElements(); i++)
+    for (typename AbstractTetrahedralMesh<DIM, DIM>::ElementIterator iter = this->mrQuadMesh.GetElementIteratorBegin();
+         iter != this->mrQuadMesh.GetElementIteratorEnd();
+         ++iter)
     {
+        ///\todo #2223 This is unlikely to work using DistributedQuadraticMesh with Non-homogeneous material laws
         double zero_strain_pressure
-           = this->mrProblemDefinition.GetIncompressibleMaterialLaw(i)->GetZeroStrainPressure();
+           = this->mrProblemDefinition.GetIncompressibleMaterialLaw(iter->GetIndex())->GetZeroStrainPressure();
 
 
         // Loop over vertices and set pressure solution to be zero-strain-pressure
@@ -592,7 +595,7 @@ void IncompressibleNonlinearElasticitySolver<DIM>::FormInitialGuess()
         {
             // We assume the vertices are the first num_vertices nodes in the list of nodes
             // in the element. Hence:
-            unsigned vertex_index = this->mrQuadMesh.GetElement(i)->GetNodeGlobalIndex(j);
+            unsigned vertex_index = iter->GetNodeGlobalIndex(j);
             // note: DIM+1 is the problem dimension (= this->mProblemDimension)
             this->mCurrentSolution[ (DIM+1)*vertex_index + DIM ] = zero_strain_pressure;
         }

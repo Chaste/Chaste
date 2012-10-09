@@ -1202,6 +1202,182 @@ public:
         }
     }
 
+    // same set up as SolveWithNonZeroBoundaryConditions, here we test
+    // that the simulation works fine with a DistributedQuadraticMesh
+    void TestSolveDistributedQuadraticMeshWithNonZeroBoundaryConditions() throw(Exception)
+    {
+        double lambda = 0.85;
+        double c1 = 1.0;
+
+        DistributedQuadraticMesh<2> mesh;
+
+        TrianglesMeshReader<2,2> reader("mesh/test/data/square_128_elements_quadratic_reordered",2,1,false);
+        mesh.ConstructFromMeshReader(reader);
+
+
+        MooneyRivlinMaterialLaw<2> law(c1);
+
+        std::vector<unsigned> fixed_nodes;
+        std::vector<c_vector<double,2> > locations;
+        for (AbstractTetrahedralMesh<2,2>::NodeIterator iter = mesh.GetNodeIteratorBegin();
+             iter != mesh.GetNodeIteratorEnd();
+             ++iter)
+        {
+            if ( fabs(iter->rGetLocation()[0])<1e-6)
+            {
+                fixed_nodes.push_back(iter->GetIndex());
+                c_vector<double,2> new_position;
+                new_position(0) = 0;
+                new_position(1) = lambda*iter->rGetLocation()[1];
+                locations.push_back(new_position);
+            }
+        }
+
+        std::vector<BoundaryElement<1,2>*> boundary_elems;
+        std::vector<c_vector<double,2> > tractions;
+        c_vector<double,2> traction;
+        traction(0) = 2*c1*(pow(lambda,-1) - lambda*lambda*lambda);
+        traction(1) = 0;
+        for (TetrahedralMesh<2,2>::BoundaryElementIterator iter
+              = mesh.GetBoundaryElementIteratorBegin();
+            iter != mesh.GetBoundaryElementIteratorEnd();
+            ++iter)
+        {
+            if (fabs((*iter)->CalculateCentroid()[0] - 1.0)<1e-4)
+            {
+                BoundaryElement<1,2>* p_element = *iter;
+                boundary_elems.push_back(p_element);
+                tractions.push_back(traction);
+            }
+        }
+
+        SolidMechanicsProblemDefinition<2> problem_defn(mesh);
+        problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
+        problem_defn.SetFixedNodes(fixed_nodes, locations);
+        problem_defn.SetTractionBoundaryConditions(boundary_elems, tractions);
+
+        IncompressibleNonlinearElasticitySolver<2> solver(mesh,
+                                                          problem_defn,
+                                                          "nonlin_elas_non_zero_bcs");
+
+        /////////////////////////////////////////////////////////////////
+        // Provide the exact solution as the initial guess and check
+        // residual is (nearly) exactly zero (as the solution is in
+        // the FEM space, the FEM solution, assuming the nonlinear
+        // system was solved exactly, is the exact solution
+        /////////////////////////////////////////////////////////////////
+
+        std::vector<double> old_current_soln = solver.rGetCurrentSolution();
+
+        for (AbstractTetrahedralMesh<2,2>::NodeIterator iter = mesh.GetNodeIteratorBegin();
+             iter != mesh.GetNodeIteratorEnd();
+             ++iter)
+        {
+            double exact_x = (1.0/lambda)*iter->rGetLocation()[0];
+            double exact_y = lambda*iter->rGetLocation()[1];
+
+            solver.rGetCurrentSolution()[3*iter->GetIndex()] = exact_x - iter->rGetLocation()[0];
+            solver.rGetCurrentSolution()[3*iter->GetIndex()+1] = exact_y - iter->rGetLocation()[1];
+
+            if(iter->IsInternal())
+            {
+                solver.rGetCurrentSolution()[3*iter->GetIndex()+2] =  0.0;
+            }
+            else
+            {
+                solver.rGetCurrentSolution()[3*iter->GetIndex()+2] =  2*c1*lambda*lambda;
+            }
+        }
+
+        /* HOW_TO_TAG Continuum mechanics
+         * Get or output stresses during a solve
+         */
+
+        // get the solver to save the stresses on each element (averaged over quad point stresses)
+        solver.SetComputeAverageStressPerElementDuringSolve();
+
+///\todo #2223 Trips exception  No Dirichlet boundary conditions` in `ContinuumMechanicsProblemDefinition`
+//        solver.Solve();
+//
+//        TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(), 0u); // initial guess was solution
+//
+//        // test stresses. The 1st PK stress should satisfy S = [s(0) 0 ; 0 0], where s is the
+//        // applied traction. This has to be multiplied by F^{-T} to get the 2nd PK stress.
+//        assert(solver.mAverageStressesPerElement.size()==mesh.GetNumElements()); //Will fail when we move to DistributedQuadraticMesh
+//        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+//        {
+//            if (mesh.CalculateDesignatedOwnershipOfElement(i))
+//            {
+//                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,0), lambda*traction(0), 1e-8);
+//                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(1,0), 0.0, 1e-8);
+//                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,1), 0.0, 1e-8);
+//                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(1,1), 0.0, 1e-8);
+//            }
+//        }
+//
+//
+//
+//        ///////////////////////////////////////////////////////////////////////////
+//        // Now solve properly
+//        ///////////////////////////////////////////////////////////////////////////
+//
+//        solver.rGetCurrentSolution() = old_current_soln;
+//        // coverage
+//        solver.SetKspAbsoluteTolerance(1e-10);
+//
+//        solver.Solve();
+//
+//        // write the stresses
+//        solver.WriteCurrentAverageElementStresses("solution");
+//
+//
+//        TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(), 3u); // 'hardcoded' answer, protects against Jacobian getting messed up
+//
+//        std::vector<c_vector<double,2> >& r_solution = solver.rGetDeformedPosition();
+//
+//        for (unsigned i=0; i<fixed_nodes.size(); i++)
+//        {
+//            unsigned index = fixed_nodes[i];
+//            TS_ASSERT_DELTA(r_solution[index](0), locations[i](0), 1e-8);
+//            TS_ASSERT_DELTA(r_solution[index](1), locations[i](1), 1e-8);
+//        }
+//
+//        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+//        {
+//            double exact_x = (1.0/lambda)*mesh.GetNode(i)->rGetLocation()[0];
+//            double exact_y = lambda*mesh.GetNode(i)->rGetLocation()[1];
+//
+//            TS_ASSERT_DELTA( r_solution[i](0), exact_x, 1e-5 );
+//            TS_ASSERT_DELTA( r_solution[i](1), exact_y, 1e-5 );
+//        }
+//
+//        std::vector<double>& r_pressures = solver.rGetPressures();
+//        TS_ASSERT_EQUALS(r_pressures.size(), mesh.GetNumNodes());
+//        for (unsigned i=0; i<r_pressures.size(); i++)
+//        {
+//            TS_ASSERT_DELTA(r_pressures[i], 2*c1*lambda*lambda, 1e-5);
+//        }
+//
+//        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+//        {
+//            if (mesh.CalculateDesignatedOwnershipOfElement(i))
+//            {
+//                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,0), lambda*traction(0), 1e-3);
+//                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(1,0), 0.0, 1e-3);
+//                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,1), 0.0, 1e-3);
+//                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(1,1), 0.0, 1e-3);
+//            }
+//        }
+//
+//        // check the written stresses
+//        std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
+//        NumericFileComparison comparison(test_output_directory + "/nonlin_elas_non_zero_bcs/solution.stress", "continuum_mechanics/test/data/exact.stress");
+//        TS_ASSERT(comparison.CompareFiles(2e-4));
+//
+//        MechanicsEventHandler::Headings();
+//        MechanicsEventHandler::Report();
+    }
+
     /* HOW_TO_TAG Continuum mechanics
      * Write VTK output (for Paraview visualiser)
      */
