@@ -348,10 +348,10 @@ public:
         problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, -1.0 /*1 KPa is about 8mmHg*/);
         /* The solver computes the equilibrium solution (given the pressure loading) before the first timestep.
          * As there is a big deformation from the undeformed state to this loaded state, the nonlinear solver may
-         * not converge. The following increments the loading (solves with p=-1/3, then p=-2/3, then p=-1), which
+         * not converge. The following increments the loading (solves with p=-1/5, then p=-2/5, ... then p=-1), which
          * allows convergence to occur.
          */
-        problem_defn.SetNumIncrementsForInitialDeformation(3);
+        problem_defn.SetNumIncrementsForInitialDeformation(5);
 
         CardiacElectroMechanicsProblem<2,1> problem(COMPRESSIBLE,
                                                     MONODOMAIN,
