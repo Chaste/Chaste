@@ -82,7 +82,7 @@ public:
     /**
      * Constructor.
      *
-     * @param partitioningMethod  defaults to PARMETIS_LIBRARY, Nb: This is in contrast to the default behaviour of DistributedTetrahedralMesh, which defaults to METIS_LIBRARY
+     * @param partitioningMethod  defaults to PARMETIS_LIBRARY, Nb: This is should have the same default behaviour as DistributedTetrahedralMesh
      */
     DistributedQuadraticMesh(DistributedTetrahedralMeshPartitionType::type partitioningMethod=DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
 

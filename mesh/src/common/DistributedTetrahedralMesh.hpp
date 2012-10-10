@@ -122,9 +122,9 @@ public:
     /**
      * Constructor.
      *
-     * @param partitioningMethod  defaults to METIS_LIBRARY, but in 1-D is always overridden in this constructor to be the DUMB partition
+     * @param partitioningMethod  defaults to PARMETIS_LIBRARY, but in 1-D is always overridden in this constructor to be the DUMB partition
      */
-    DistributedTetrahedralMesh(DistributedTetrahedralMeshPartitionType::type partitioningMethod=DistributedTetrahedralMeshPartitionType::METIS_LIBRARY);
+    DistributedTetrahedralMesh(DistributedTetrahedralMeshPartitionType::type partitioningMethod=DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
 
     /**
      * Destructor.

@@ -65,10 +65,14 @@ private:
     void CompareMeshes( DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh1,
                         DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh2 )
     {
+        // Check that the same partitioner was used
+        TS_ASSERT_EQUALS(rMesh1.mMetisPartitioning, rMesh2.mMetisPartitioning);
         // Check that we have the right number of nodes and elements
         TS_ASSERT_EQUALS(rMesh1.GetNumBoundaryElements(), rMesh2.GetNumBoundaryElements());
         TS_ASSERT_EQUALS(rMesh1.GetNumElements(), rMesh2.GetNumElements());
         TS_ASSERT_EQUALS(rMesh1.GetNumNodes(), rMesh2.GetNumNodes());
+        TS_ASSERT_EQUALS(rMesh1.GetNumLocalNodes(), rMesh2.GetNumLocalNodes());
+        TS_ASSERT_EQUALS(rMesh1.GetNumLocalElements(), rMesh2.GetNumLocalElements());
 
         // Check that the nodes and elements of each mesh are identical
         for (typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator iter = rMesh1.GetElementIteratorBegin();
@@ -582,13 +586,19 @@ public:
 
     void TestConstructFromMeshReaderWithBinaryFiles()
     {
+        /* Note that the PARMETIS_LIBRARY partitioning type is able to randomly permute element
+         * acess when using binary files (in order to avoid disk contention).  This means that a
+         * binary reader can give a different partition compared to the equivalent ascii reader
+         * 
+         * Here we select the METIS_LIBRARY partition in order to avoid such issues.
+         */
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements_binary");
         TrianglesMeshReader<3,3> mesh_reader_ascii("mesh/test/data/cube_136_elements");
 
-        DistributedTetrahedralMesh<3,3> mesh;
+        DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::METIS_LIBRARY);
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        DistributedTetrahedralMesh<3,3> mesh_from_ascii;
+        DistributedTetrahedralMesh<3,3> mesh_from_ascii(DistributedTetrahedralMeshPartitionType::METIS_LIBRARY);
         mesh_from_ascii.ConstructFromMeshReader(mesh_reader_ascii);
 
         CompareMeshes(mesh, mesh_from_ascii);
