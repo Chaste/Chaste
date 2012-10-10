@@ -147,6 +147,7 @@ private:
         (*ProcessSpecificArchive<Archive>::Get()) & mpDistributedVectorFactory;
 
         // Paranoia: check we agree with the mesh on who owns what
+        assert(mpDistributedVectorFactory == mpMesh->GetDistributedVectorFactory());
         assert(mpDistributedVectorFactory->GetLow()==mpMesh->GetDistributedVectorFactory()->GetLow());
         assert(mpDistributedVectorFactory->GetLocalOwnership()==mpMesh->GetDistributedVectorFactory()->GetLocalOwnership());
     }
@@ -206,6 +207,7 @@ private:
         (*ProcessSpecificArchive<Archive>::Get()) & mpDistributedVectorFactory;
 
         // Paranoia: check we agree with the mesh on who owns what
+        assert(mpDistributedVectorFactory == mpMesh->GetDistributedVectorFactory());
         assert(mpDistributedVectorFactory->GetLow()==mpMesh->GetDistributedVectorFactory()->GetLow());
         assert(mpDistributedVectorFactory->GetLocalOwnership()==mpMesh->GetDistributedVectorFactory()->GetLocalOwnership());
         // archive & mMeshUnarchived; Not archived since set to true when archiving constructor is called.
@@ -518,6 +520,7 @@ public:
     void SaveCardiacCells(Archive & archive, const unsigned int version) const
     {
         const std::vector<AbstractCardiacCellInterface*> & r_cells_distributed = rGetCellsDistributed();
+        assert(mpDistributedVectorFactory == this->mpMesh->GetDistributedVectorFactory());
         archive & mpDistributedVectorFactory; // Needed when loading
         const unsigned num_cells = r_cells_distributed.size();
         archive & num_cells;
@@ -558,6 +561,11 @@ public:
     template<class Archive>
     void LoadCardiacCells(Archive & archive, const unsigned int version)
     {
+        // Note that p_factory loaded from this archive might not be the same as our mesh's factory,
+        // since we're loading a process-specific archive that could have been written by any process.
+        // We therefore need to use p_mesh_factory to determine the partitioning in use for the resumed
+        // simulation, and p_factory to determine what the original partitioning was when the simulation
+        // was saved.
         DistributedVectorFactory* p_factory;
         DistributedVectorFactory* p_mesh_factory = this->mpMesh->GetDistributedVectorFactory();
         archive & p_factory;
@@ -565,7 +573,7 @@ public:
         archive & num_cells;
         if (mCellsDistributed.empty())
         {
-            mCellsDistributed.resize(p_factory->GetLocalOwnership());
+            mCellsDistributed.resize(p_mesh_factory->GetLocalOwnership());
 #ifndef NDEBUG
             // Paranoia
             for (unsigned i=0; i<mCellsDistributed.size(); i++)
@@ -582,7 +590,7 @@ public:
         {
             if (mPurkinjeCellsDistributed.empty())
             {
-                mPurkinjeCellsDistributed.resize(p_factory->GetLocalOwnership());
+                mPurkinjeCellsDistributed.resize(p_mesh_factory->GetLocalOwnership());
             }
             else
             {

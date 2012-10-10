@@ -133,25 +133,15 @@ public:
             }
         }
         //Check that archive which has just been produced can be read
-        //\todo #2249 At present we can't run this small simulation on 4 or processes because
-        //      the top-most process owns no cells 
-        if (PetscTools::GetNumProcs() < 4)
-        {
-            CardiacSimulation simulation2("heart/test/data/xml/monodomain2d_resume.xml");
-            Warnings::QuietDestroy();
-        }
+        CardiacSimulation simulation2("heart/test/data/xml/monodomain2d_resume.xml");
+        Warnings::QuietDestroy();
     }
 
     void TestMono3dSmall() throw(Exception)
     {
         CardiacSimulation simulation("heart/test/data/xml/monodomain3d_small.xml");
         //Check that archive which has just been produced can be read
-        //\todo #2249 At present we can't run this small simulation on 4 or processes because
-        //      the top-most process owns no cells 
-        if (PetscTools::GetNumProcs() < 4)
-        {
-            CardiacSimulation simulation2("heart/test/data/xml/monodomain3d_resume.xml");
-        }
+        CardiacSimulation simulation2("heart/test/data/xml/monodomain3d_resume.xml");
     }
 
     void TestMono1dSodiumBlockBySettingNamedParameter() throw(Exception)
@@ -190,23 +180,13 @@ public:
     {
         CardiacSimulation simulation("heart/test/data/xml/bidomain2d_small.xml");
         //Check that archive which has just been produced can be read
-        //\todo #2249 At present we can't run this small simulation on 4 or processes because
-        //      the top-most process owns no cells 
-        if (PetscTools::GetNumProcs() < 4)
-        {
-            CardiacSimulation simulation2("heart/test/data/xml/bidomain2d_resume.xml");
-        }
+        CardiacSimulation simulation2("heart/test/data/xml/bidomain2d_resume.xml");
     }
     void TestBi3dSmall() throw(Exception)
     {
         CardiacSimulation simulation("heart/test/data/xml/bidomain3d_small.xml");
         //Check that archive which has just been produced can be read
-        //\todo #2249 At present we can't run this small simulation on 4 or processes because
-        //      the top-most process owns no cells 
-        if (PetscTools::GetNumProcs() < 4)
-        {
-            CardiacSimulation simulation2("heart/test/data/xml/bidomain3d_resume.xml");
-        }
+        CardiacSimulation simulation2("heart/test/data/xml/bidomain3d_resume.xml");
     }
 
     void TestBiWithBath1dSmall() throw(Exception)
