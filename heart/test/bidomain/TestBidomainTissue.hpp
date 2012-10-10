@@ -187,7 +187,10 @@ public:
         HeartConfig::Instance()->SetMeshFileName("mesh/test/data/cube_2mm_12_elements", cp::media_type::NoFibreOrientation);
 
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
-        DistributedTetrahedralMesh<3,3> mesh;
+        
+        // METIS_LIBRARY partition ensures that we have never own all the elements (even when there are as few as 2 processes)
+        // DUMB and PARMETIS_LIBRARY may allow single process to see all the elements because it's a very small mesh
+        DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::METIS_LIBRARY);
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Check that if we're in parallel no single process owns every element (to ensure that the conductivities

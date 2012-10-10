@@ -237,6 +237,39 @@ void QuadraticMesh<DIM>::ConstructCuboidNewImp(unsigned numElemX, unsigned numEl
     AbstractTetrahedralMesh<DIM,DIM>::ConstructCuboid(numElemX, numElemY, numElemZ);
 
     this->mMeshIsLinear=false;
+    //Make the internal nodes in z-order.  This is important for the distributed case, since we want the top and bottom
+    //layers to have predictable numbers
+    std::map<std::pair<unsigned, unsigned>, unsigned> edge_to_internal_map;
+    
+//    unsigned node_index = this->GetNumNodes();
+//    for (unsigned k=0; k<numElemZ+1; k++)
+//    {
+//        for (unsigned j=0; j<numElemY+1; j++)
+//        {
+//            for (unsigned i=0; i<numElemX+1; i++)
+//            {
+//                bool is_boundary = false;
+//                if (i==0 || j==0 || k==0 || i==width || j==height || k==depth)
+//                {
+//                    is_boundary = true;
+//                }
+//                assert(node_index == (k*(height+1)+j)*(width+1)+i);
+//                Node<SPACE_DIM>* p_node = new Node<SPACE_DIM>(node_index++, is_boundary, i, j, k);
+//
+//                this->mNodes.push_back(p_node);
+//                if (is_boundary)
+//                {
+//                    this->mBoundaryNodes.push_back(p_node);
+//                }
+//            }
+//        }
+//    }
+//    for (unsigned j=0; j<numElemY+1; j++)
+//    {
+//        bool boundary = (j==0) || (j==numElemY);
+//        //Add mid-way nodes to horizontal edges in this slice
+//        for (unsigned i=0; i<numElemX; i++)
+//    
 //    //Dump the map
 //    for (std::map<std::pair<unsigned,unsigned>, unsigned>::const_iterator iter=edge_to_internal_map.begin();
 //        iter!=edge_to_internal_map.end();
