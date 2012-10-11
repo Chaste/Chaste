@@ -854,10 +854,12 @@ public:
 
         simulator.SetOutputDirectory("TestOffLatticeSimulationOutputParameters");
         simulator.OutputSimulationSetup();
-        ///\todo #1002
-        ///\todo #1453 This is to do with the pre Boost 1.37 problem ---
-        //TS_ASSERT_EQUALS(system(("diff " + results_dir + "results.parameters  cell_based/test/data/TestOffLatticeSimulationOutputParameters/results.parameters").CompareFiles();
-        TS_ASSERT_EQUALS(system(("diff --ignore-matching-lines=\"CellPopulation\" " + results_dir + "results.parameters  cell_based/test/data/TestOffLatticeSimulationOutputParameters/results.parameters").c_str()), 0);
+
+        FileFinder generated(results_dir + "results.parameters", RelativeTo::Absolute);
+        FileFinder reference("cell_based/test/data/TestOffLatticeSimulationOutputParameters/results.parameters", RelativeTo::ChasteSourceRoot);
+        FileComparison comparer(generated,reference);
+        comparer.IgnoreLinesContaining("CellPopulation");
+        TS_ASSERT(comparer.CompareFiles());
 
         // Check that the files which we don't want to compare actually exist
         std::ifstream machine_file;
