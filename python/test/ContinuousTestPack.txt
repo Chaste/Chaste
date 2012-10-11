@@ -2,3 +2,5 @@ TestDiskSpace.py
 TestExample.py
 TestProtocol.py
 TestRdfCopier.py
+TestAddVtuTimeAnnotations.py
+

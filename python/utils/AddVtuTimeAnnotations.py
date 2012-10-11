@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import fileinput
 import sys
 import re
+import shutil
 
 def getTimeSteps(fname):
    fname += '_times.info'
@@ -68,20 +69,20 @@ def getTimeSteps(fname):
    result['time_step_len']=1
    result['first']=0
    result['last']=result['time_step_cnt']-1
-   print result
+   #print result
    return result
 
 
-def fixVtuFile(fname,timestep_info):
+def AnnotateVtuFile(fname,timestep_info):
 # \todo #2245 We need to investigate RangeMin and RangeMax to get Paraview to automatically set the range for all time
     timevalues = range(timestep_info['first'],timestep_info['last']+1,timestep_info['time_step_len'])
     header_mode = True
-    for line in fileinput.input(fname+'.vtu', inplace=1):
+    for line in fileinput.input(fname, inplace=1):
         if (header_mode):
            if (line.find('<UnstructuredGrid>')>0):
               line = '<UnstructuredGrid TimeValues="' 
               for time in timevalues:
-                  line += '\n' + str(time)
+                  line += str(time)+ ' '
               line += '">\n'
            if (line.find('</UnstructuredGrid>')>0):
               header_mode = False
@@ -91,16 +92,29 @@ def fixVtuFile(fname,timestep_info):
               line = line.replace(v_str,'V')
               v_ind = int(v_str[2:])
               line = line.replace('Name="V"','Name="V" TimeStep="'+str(v_ind)+'" '  )
+        # possibly a debug line from A.Sadrieh
         sys.stdout.write(line)
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print >> sys.stderr, "Usage:", sys.argv[0], "<path_to_vtu>"
+    #Checking command line arguments
+    if len(sys.argv) != 3:
+        print >> sys.stderr, "Usage:", sys.argv[0], "<path_to_original_vtu> <output_file>"
         sys.exit(1)
+    #Reading in command line arguments
     fnameprefix = sys.argv[1]
-    #If name ends in .vtu then strip back to the prefix
+    output_name = sys.argv[2]
+    #If input name ends in .vtu then strip back to the prefix
     if (fnameprefix[-4:] == '.vtu'):
-        fnameprefix=fnameprefix[:-4]    
+        fnameprefix=fnameprefix[:-4]
+    #If output_name doesn't end in .vtu then add it
+    if (output_name[-4:] != '.vtu'):
+        output_name=output_name+'.vtu'
+        
+    print'Reading from', fnameprefix, 'and writing to', output_name
+    #Read _times.info file    
     tstepinfo  = getTimeSteps(fnameprefix)
-    fixVtuFile(fnameprefix,tstepinfo)
+    #Take copy of original file
+    shutil.copy(fnameprefix+'.vtu',output_name)
+    #Annotate the copy
+    AnnotateVtuFile(output_name,tstepinfo)
 
