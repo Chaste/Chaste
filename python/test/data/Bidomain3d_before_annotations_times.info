@@ -1,0 +1,5 @@
+Number of timesteps 101
+timestep 0.01
+First timestep 0
+Last timestep 1
+Created by Chaste version 3.1.17075 (with uncommitted modifications) on Thu, 11 Oct 2012 15:24:17 +0000.  Chaste was built on Thu, 11 Oct 2012 15:23:11 +0000 by machine (uname) 'Linux userpc59.cs.ox.ac.uk 2.6.32-44-generic #98-Ubuntu SMP Mon Sep 24 17:27:10 UTC 2012 x86_64' using settings: default, shared libraries.  Checked-out project versions: website=15353.

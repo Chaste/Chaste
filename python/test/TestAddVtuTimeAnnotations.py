@@ -53,4 +53,15 @@ class TestAddingVtuTimeAnnotations(unittest.TestCase):
         rc = os.system('python/utils/AddVtuTimeAnnotations.py ' + original_vtu2 + ' ' + output_vtu2)
         self.assertEqual(rc, 0)
         self.assertTrue(filecmp.cmp(output_vtu2,'python/test/data/Monodomain2d_after_annotations.vtu'))
+
+    def TestAddingVtuAnnotationsBidomain(self):
+        #without suffices (input and output file names)
+        original_vtu1 = 'python/test/data/Bidomain3d_before_annotations.vtu'
+        output_folder = os.getenv('CHASTE_TEST_OUTPUT', 'testoutput')
+        output_vtu1 = os.path.join(output_folder, 'BidomainAddingAnnotationsTest.vtu')
+        rc = os.system('python/utils/AddVtuTimeAnnotations.py ' + original_vtu1 + ' ' + output_vtu1)
+        self.assertEqual(rc, 0)
+        #\todo #2245 
+        #self.assertTrue(filecmp.cmp(output_vtu1,'python/test/data/Bidomain3d_after_annotations.vtu'))
+        
         

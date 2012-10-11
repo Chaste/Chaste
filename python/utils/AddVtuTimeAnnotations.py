@@ -73,8 +73,12 @@ def getTimeSteps(fname):
    return result
 
 
+"""\todo #2245 Make this code generic to look for 
+                 Name="some_name_with_possible_underscores_and_numbers_000000"
+             and make it have the TimeStep annotation
+ \todo #2245 We need to investigate RangeMin and RangeMax to get Paraview to automatically set the range for all time
+"""
 def AnnotateVtuFile(fname,timestep_info):
-# \todo #2245 We need to investigate RangeMin and RangeMax to get Paraview to automatically set the range for all time
     timevalues = range(timestep_info['first'],timestep_info['last']+1,timestep_info['time_step_len'])
     header_mode = True
     for line in fileinput.input(fname, inplace=1):
@@ -89,6 +93,8 @@ def AnnotateVtuFile(fname,timestep_info):
            if (line.find('DataArray type="Float64" Name="V_')>0):
               search_result = re.search('V_[0-9]{6}',line)
               v_str = search_result.group(0)
+#              match = re.search('_[0-9]{6}', line)
+#              print match.group(0), '--', match.group(0)  
               line = line.replace(v_str,'V')
               v_ind = int(v_str[2:])
               line = line.replace('Name="V"','Name="V" TimeStep="'+str(v_ind)+'" '  )
