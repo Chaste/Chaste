@@ -242,15 +242,43 @@ std::string FileFinder::GetRelativePath(const FileFinder& rBasePath) const
 }
 
 
+/**
+ * Helper function for FileFinder::CopyTo - recursively copy the given path.
+ * @param rFromPath
+ * @param rToPath
+ */
+void RecursiveCopy(const fs::path& rFromPath, const fs::path& rToPath)
+{
+    fs::path dest = rToPath;
+    // If rToPath is a folder, then we're copying to the source name *inside* this folder
+    if (fs::is_directory(dest))
+    {
+        dest /= rFromPath.leaf();
+    }
+    // If the source is a folder, it's complicated
+    if (fs::is_directory(rFromPath))
+    {
+        // Create the destination folder
+        EXCEPT_IF_NOT(!fs::exists(dest));
+        fs::create_directory(dest);
+        // Recursively copy our contents
+        fs::directory_iterator end_iter;
+        for (fs::directory_iterator dir_iter(rFromPath); dir_iter != end_iter; ++dir_iter)
+        {
+            RecursiveCopy(dir_iter->path(), dest);
+        }
+    }
+    else
+    {
+        fs::copy_file(rFromPath, dest); // Just copy!
+    }
+}
+
 FileFinder FileFinder::CopyTo(const FileFinder& rDest) const
 {
     if (!Exists())
     {
         EXCEPTION("Cannot copy '" << mAbsPath << "' as it does not exist.");
-    }
-    if (!IsFile())
-    {
-        EXCEPTION("Only single files may be copied; " << mAbsPath << " is not a file.");
     }
     fs::path from_path(mAbsPath);
     fs::path to_path(rDest.mAbsPath);
@@ -260,15 +288,22 @@ FileFinder FileFinder::CopyTo(const FileFinder& rDest) const
     }
     if (fs::exists(to_path))
     {
-        fs::remove(to_path);
+        if (IsFile())
+        {
+            fs::remove(to_path);
+        }
+        else
+        {
+            EXCEPTION("Cannot copy '" << mAbsPath << "' to '" << to_path << "' as it would overwrite an existing file.");
+        }
     }
-    fs::copy_file(from_path, to_path);
+    RecursiveCopy(from_path, to_path);
     return FileFinder(to_path);
 }
 
 
 /**
- * Recursively remove the given path.
+ * Helper function for FileFinder::Remove - recursively remove the given path.
  * @param rPath
  */
 void RemoveAll(const fs::path& rPath)

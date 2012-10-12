@@ -199,12 +199,16 @@ public:
     std::string GetRelativePath(const FileFinder& rBasePath) const;
 
     /**
-     * Copy this file to the given destination.
-     * The destination may be a folder, or destination file name.  Only single files may be
-     * copied, not whole folders.
+     * Copy this file or folder (recursively in the latter case) to the given destination.
+     * If the destination is a folder that exists, the source will be copied with the same
+     * name inside that folder.  Otherwise the source will be copied with the given destination
+     * name.
+     *
+     * If the source is a file and the destination is a file that exists it will be removed prior to copying.
+     * If the source is a folder and the destination is a file that exists then an error is thrown.
      *
      * @param rDest  where to copy to
-     * @return  a finder for the copied file
+     * @return  a finder for the copied entity
      */
     FileFinder CopyTo(const FileFinder& rDest) const;
 

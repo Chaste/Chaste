@@ -375,11 +375,46 @@ public:
         TS_ASSERT(dest.IsFile());
         TS_ASSERT_EQUALS(dest.GetAbsolutePath(), expected_dest.GetAbsolutePath());
 
+        // Recursive copy of a folder
+        // Firstly we create some sub-folders to copy
+        OutputFileHandler sub_handler1(dest_dir_name + "/sub1");
+        OutputFileHandler sub_handler2(dest_dir_name + "/sub1/sub2");
+        sub_handler2.OpenOutputFile("test.txt")->close();
+        // Then we copy
+        source = dest_dir;
+        OutputFileHandler copy_handler("TestFileFinder_TestCopyingFolders");
+        dest_dir = copy_handler.FindFile("");
+        TS_ASSERT(dest_dir.IsDir());
+        TS_ASSERT(!copy_handler.FindFile(dest_dir_name).Exists()); // We're copying into an empty folder
+        dest = source.CopyTo(dest_dir);
+        TS_ASSERT(copy_handler.FindFile(dest_dir_name).IsDir());
+        TS_ASSERT(copy_handler.FindFile(dest_dir_name + "/sub1").IsDir());
+        TS_ASSERT(copy_handler.FindFile(dest_dir_name + "/sub1/sub2").IsDir());
+        TS_ASSERT(copy_handler.FindFile(dest_dir_name + "/sub1/sub2/test.txt").IsFile());
+        TS_ASSERT(copy_handler.FindFile(dest_dir_name + "/TestFileFinder.hpp").IsFile());
+
+        // Copy the tree to a name that doesn't exist
+        dest_dir = copy_handler.FindFile("second_copy");
+        TS_ASSERT(!dest_dir.Exists());
+        dest = source.CopyTo(dest_dir);
+        TS_ASSERT(dest.IsDir());
+        TS_ASSERT_EQUALS(dest.GetLeafName(), "second_copy");
+        TS_ASSERT(FileFinder("TestFileFinder.hpp", dest).IsFile());
+        TS_ASSERT(FileFinder("sub1", dest).IsDir());
+
         // Error cases
-        TS_ASSERT_THROWS_CONTAINS(FileFinder("global", RelativeTo::ChasteSourceRoot).CopyTo(dest),
-                                  "Only single files may be copied");
         TS_ASSERT_THROWS_CONTAINS(FileFinder("global/no_file", RelativeTo::ChasteSourceRoot).CopyTo(dest),
                                   "as it does not exist.");
+        // Trying to overwrite a file with a folder
+        dest = handler.FindFile("new_name");
+        TS_ASSERT(dest.IsFile());
+        TS_ASSERT_THROWS_CONTAINS(source.CopyTo(dest), "as it would overwrite an existing file.");
+        // Trying to copy a folder that has already been copied
+        dest_dir = copy_handler.FindFile("second_copy");
+        dest_dir = copy_handler.FindFile("");
+        TS_ASSERT(dest_dir.IsDir());
+        TS_ASSERT(FileFinder(source.GetLeafName(), dest_dir).IsDir());
+        TS_ASSERT_THROWS_CONTAINS(source.CopyTo(dest_dir), "as it would overwrite an existing file.");
     }
 
     void TestDefaultConstructor() throw (Exception)
