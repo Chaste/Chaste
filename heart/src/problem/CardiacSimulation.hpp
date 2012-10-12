@@ -151,10 +151,14 @@ private:
                 // Put a copy of the partial results aside (in a subdirectory of checkpoint_dir_basename).
                 OutputFileHandler checkpoint_dir_basename_handler(checkpoint_dir_basename, false);
                 OutputFileHandler partial_output_dir_handler(HeartConfig::Instance()->GetOutputDirectory(), false);
-                if (PetscTools::AmMaster())
-                {
-                    ABORT_IF_NON0(system, "cp -r " + partial_output_dir_handler.GetOutputDirectoryFullPath() + " " + checkpoint_dir_basename_handler.GetOutputDirectoryFullPath());
-                }
+
+                TRY_IF_MASTER(
+                        partial_output_dir_handler.FindFile("").CopyTo(checkpoint_dir_basename_handler.FindFile(""));
+                );
+//                if (PetscTools::AmMaster())
+//                {
+//                    ABORT_IF_NON0(system, "cp -r " + partial_output_dir_handler.GetOutputDirectoryFullPath() + " " + checkpoint_dir_basename_handler.GetOutputDirectoryFullPath());
+//                }
 
                 // Create an XML file to help in resuming
                 CreateResumeXmlFile(checkpoint_dir_basename, archive_foldername.str());

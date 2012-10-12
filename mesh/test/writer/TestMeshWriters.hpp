@@ -197,11 +197,6 @@ public:
         meshalyzer_output_file >> num_nodes_from_file;
 
         TS_ASSERT_EQUALS(num_nodes, num_nodes_from_file);
-
-        // Nothing appears to be tested here, so commenting it out to remove a system call.
-//        std::string command = "wc -l " + filename;
-//        int result = system(command.c_str());
-//        std::cout<<result<<std::endl;
     }
 
     void TestTrianglesToCoolGraphicsViaMesh()

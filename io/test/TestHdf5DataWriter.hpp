@@ -47,6 +47,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CompareHdf5ResultsFiles.hpp"
 
+#include <sys/stat.h> // For chmod()
+
 class TestHdf5DataWriter : public CxxTest::TestSuite
 {
 private:
@@ -1105,8 +1107,10 @@ public:
         OutputFileHandler handler("hdf5", false);
 
         // Create file and remove permission to overwrite file
-        system(("touch "+ handler.GetOutputDirectoryFullPath()+"empty.h5").c_str());
-        system(("chmod u-w "+ handler.GetOutputDirectoryFullPath()+"empty.h5").c_str());
+        handler.OpenOutputFile("empty.h5")->close();
+        FileFinder empty = handler.FindFile("empty.h5");
+        TS_ASSERT(empty.Exists());
+        chmod(empty.GetAbsolutePath().c_str(), 0440);
 
         Hdf5DataWriter writer(factory, "hdf5", "empty", false);
         writer.DefineVariable("Node","dimensionless");
@@ -1115,7 +1119,7 @@ public:
         writer.Close();
 
         // Re-instate permission to overwrite file
-        system(("chmod u+w "+ handler.GetOutputDirectoryFullPath()+"empty.h5").c_str());
+        chmod(empty.GetAbsolutePath().c_str(), 0640);
     }
 
     /**
