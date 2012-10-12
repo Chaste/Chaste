@@ -587,7 +587,7 @@ public:
     void TestConstructFromMeshReaderWithBinaryFiles()
     {
         /* Note that the PARMETIS_LIBRARY partitioning type is able to randomly permute element
-         * acess when using binary files (in order to avoid disk contention).  This means that a
+         * access when using binary files (in order to avoid disk contention).  This means that a
          * binary reader can give a different partition compared to the equivalent ascii reader
          * 
          * Here we select the METIS_LIBRARY partition in order to avoid such issues.

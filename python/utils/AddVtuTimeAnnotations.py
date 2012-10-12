@@ -36,10 +36,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """Convert a .vtu file from a heart simulation to have time annotations.
    This changes lines like
    <DataArray type="Float64" Name="V_000019" ...
-   <DataArray type="Float64" Name="V_000020" ...
+   <DataArray type="Float64" Name="Phi_e_000020" ...
    to
    <DataArray type="Float64" Name="V" TimeStep="19" ...
-   <DataArray type="Float64" Name="V" TimeStep="20" ...
+   <DataArray type="Float64" Name="Phi_e" TimeStep="20" ...
    
    It also needs to add a TimeValues annotation to the <UnstructuredGrid> component:
    <UnstructuredGrid TimeValues="0 1 ..." > 
@@ -73,9 +73,7 @@ def getTimeSteps(fname):
    return result
 
 
-"""\todo #2245 Make this code generic to look for 
-                 Name="some_name_with_possible_underscores_and_numbers_000000"
-             and make it have the TimeStep annotation
+"""\todo #2245 Make it have the TimeStep annotation
  \todo #2245 We need to investigate RangeMin and RangeMax to get Paraview to automatically set the range for all time
 """
 def AnnotateVtuFile(fname,timestep_info):
@@ -90,15 +88,14 @@ def AnnotateVtuFile(fname,timestep_info):
               line += '">\n'
            if (line.find('</UnstructuredGrid>')>0):
               header_mode = False
-           if (line.find('DataArray type="Float64" Name="V_')>0):
-              search_result = re.search('V_[0-9]{6}',line)
-              v_str = search_result.group(0)
-#              match = re.search('_[0-9]{6}', line)
-#              print match.group(0), '--', match.group(0)  
-              line = line.replace(v_str,'V')
-              v_ind = int(v_str[2:])
-              line = line.replace('Name="V"','Name="V" TimeStep="'+str(v_ind)+'" '  )
-        # possibly a debug line from A.Sadrieh
+           match = re.search('Name=\"(.*)_([0-9]{6})\"', line)
+           if (match):
+             var_name = match.group(1)
+             time_step_name = match.group(2)
+             #Strip the prefix of zeros from the time_step
+             time_step = str(int(time_step_name))
+             line = line.replace(  '_'+time_step_name+'\"', '\" TimeStep=\"'+time_step+'\" ')
+        #Output goes to the new file
         sys.stdout.write(line)
 
 if __name__ == "__main__":

@@ -61,7 +61,6 @@ class TestAddingVtuTimeAnnotations(unittest.TestCase):
         output_vtu1 = os.path.join(output_folder, 'BidomainAddingAnnotationsTest.vtu')
         rc = os.system('python/utils/AddVtuTimeAnnotations.py ' + original_vtu1 + ' ' + output_vtu1)
         self.assertEqual(rc, 0)
-        #\todo #2245 
-        #self.assertTrue(filecmp.cmp(output_vtu1,'python/test/data/Bidomain3d_after_annotations.vtu'))
+        self.assertTrue(filecmp.cmp(output_vtu1,'python/test/data/Bidomain3d_after_annotations.vtu'))
         
         
