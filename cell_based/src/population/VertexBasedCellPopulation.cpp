@@ -530,7 +530,7 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile()
             boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(collection.GetProperty());
             cell_label = p_label->GetColour();
         }
-        cell_labels.push_back(cell_label);
+        cell_labels[elem_index] = cell_label;
 
         if (this->mOutputCellAncestors)
         {
