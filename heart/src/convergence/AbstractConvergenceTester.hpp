@@ -45,6 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <fstream>
 #include <cmath>
+#include <ctime>
 
 #include "AbstractTetrahedralMesh.hpp"
 #include "TrianglesMeshReader.hpp"
@@ -611,9 +612,14 @@ public:
         {
             p_conv_info_file->close();
 
-            /// \todo #1002 - remove this 'cat' call.
             std::cout << "Results: " << std::endl;
-            ABORT_IF_NON0(system, "cat " + conv_info_handler.GetOutputDirectoryFullPath() + nameOfTest + "_info.csv");
+            FileFinder info_finder = conv_info_handler.FindFile(nameOfTest + "_info.csv");
+            std::ifstream info_file(info_finder.GetAbsolutePath().c_str());
+            if (info_file)
+            {
+                std::cout << info_file.rdbuf();
+                info_file.close();
+            }
         }
 
     }
@@ -651,7 +657,10 @@ public:
             break;
 
         }
-        EXPECT0(system, "date");//To keep track of what Nightly things are doing
+        // Keep track of what Nightly things are doing
+        std::time_t rawtime;
+        std::time( &rawtime );
+        std::cout << std::ctime(&rawtime);
         ///\todo The UseAbsoluteStimulus is temporary, while we are sorting out
         ///3D stimulus.  It is to be removed later (along with StimulusConvergenceTester)
         if (this->UseAbsoluteStimulus)
