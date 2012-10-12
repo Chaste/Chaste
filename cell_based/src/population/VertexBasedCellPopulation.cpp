@@ -490,6 +490,7 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile()
 
     unsigned num_elements = mpMutableVertexMesh->GetNumElements();
     std::vector<double> cell_types(num_elements);
+    std::vector<double> cell_labels(num_elements);
     std::vector<double> cell_ancestors(num_elements);
     std::vector<double> cell_mutation_states(num_elements);
     std::vector<double> cell_ages(num_elements);
@@ -499,7 +500,8 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile()
 
     unsigned num_cell_data_items = 0;
     std::vector<std::string> cell_data_names;
-    //We assume that the first cell is representative of all cells
+
+    // We assume that the first cell is representative of all cells
     num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
     cell_data_names = this->Begin()->GetCellData()->GetKeys();
 
@@ -520,6 +522,15 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         // Get the cell corresponding to this element
         CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
         assert(p_cell);
+
+        double cell_label = 0.0;
+        if (p_cell->HasCellProperty<CellLabel>())
+        {
+            CellPropertyCollection collection = p_cell->rGetCellPropertyCollection().GetProperties<CellLabel>();
+            boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(collection.GetProperty());
+            cell_label = p_label->GetColour();
+        }
+        cell_labels.push_back(cell_label);
 
         if (this->mOutputCellAncestors)
         {
@@ -557,6 +568,7 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         }
     }
 
+    mesh_writer.AddCellData("Cell labels", cell_labels);
     if (this->mOutputCellProliferativeTypes)
     {
         mesh_writer.AddCellData("Cell types", cell_types);

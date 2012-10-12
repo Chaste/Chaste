@@ -464,13 +464,13 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
     }
     if (num_cells == 0)
     {
-        averaged_cell_radius =  cell_radius;
+        averaged_cell_radius = cell_radius;
     }
     else
     {
         averaged_cell_radius /= num_cells;
     }
-    assert(averaged_cell_radius<mMechanicsCutOffLength/2.0);
+    assert(averaged_cell_radius < mMechanicsCutOffLength/2.0);
 
     cell_radius = averaged_cell_radius;
 
@@ -546,7 +546,8 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
 
     unsigned num_cell_data_items = 0;
     std::vector<std::string> cell_data_names;
-    //We assume that the first cell is representative of all cells
+
+    // We assume that the first cell is representative of all cells
     num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
     cell_data_names = this->Begin()->GetCellData()->GetKeys();
 
@@ -555,8 +556,6 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         std::vector<double> cellwise_data_var(num_nodes);
         cellwise_data.push_back(cellwise_data_var);
     }
-
-
 
     // Loop over cells
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
@@ -581,9 +580,9 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
             double mutation_state = cell_iter->GetMutationState()->GetColour();
 
             CellPropertyCollection collection = cell_iter->rGetCellPropertyCollection();
-           CellPropertyCollection label_collection = collection.GetProperties<CellLabel>();
+            CellPropertyCollection label_collection = collection.GetProperties<CellLabel>();
 
-           if (label_collection.GetSize()==1 )
+            if (label_collection.GetSize() == 1)
             {
                 boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(label_collection.GetProperty());
                 mutation_state = p_label->GetColour();
@@ -611,7 +610,6 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         {
             cellwise_data[var][node_index] = cell_iter->GetCellData()->GetItem(cell_data_names[var]);
         }
-
     }
 
     if (this->mOutputCellProliferativeTypes)
