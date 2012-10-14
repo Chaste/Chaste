@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * methods for checking whether an option has been given or getting the
  * value(s) corresponding to a given option.
  *
- * Options are considered to be any argument starting witha '-' followed by a non-numeric character,
+ * Options are considered to be any argument starting with a '-' followed by a non-numeric character,
  * in order to distinguish between options and negative numbers.  Each option may have zero or more
  * values following it on the command line.  Examples:
  *
