@@ -100,7 +100,7 @@ public:
         // Create a cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Output Voronoi Data
+        // Output Voronoi data
         cell_population.SetOutputVoronoiData(true);
 
         // Set up simulation

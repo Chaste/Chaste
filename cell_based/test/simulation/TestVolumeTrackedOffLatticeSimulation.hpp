@@ -120,6 +120,8 @@ public:
         TS_ASSERT_EQUALS(simulator.GetDt(), 1.0/120.0); //Default for off-lattice
         simulator.SetEndTime(simulator.GetDt()/2.0);
 
+        simulator.SetOutputNodeVelocities(true);
+
         // Create a force law
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
         p_force->SetCutOffLength(1.5);
@@ -127,6 +129,11 @@ public:
 
         // Run simulation
         simulator.Solve();
+
+        // Test that the node velocities file exists
+        OutputFileHandler output_file_handler("TestNodeBasedSimulationWithVolumeTracked", false);
+        FileFinder generated = output_file_handler.FindFile("results_from_time_0/nodevelocities.dat");
+        TS_ASSERT(generated.Exists());
 
         // Test that the volumes of the cells are correct in CellData at the first timestep
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();

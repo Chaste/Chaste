@@ -128,6 +128,11 @@ public:
         // Run simulation
         simulator.Solve();
 
+        // Test that the node velocities file exists
+        OutputFileHandler output_file_handler("TestDeltaNotchNodeBasedUpdateAtEndOfTimeStep", false);
+        FileFinder generated = output_file_handler.FindFile("results_from_time_0/nodevelocities.dat");
+        TS_ASSERT(generated.Exists());
+
         // Check levels in cell 0
         double notch = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetNotch();
         TS_ASSERT_DELTA(notch, 0.9999, 1e-04);
@@ -462,7 +467,7 @@ public:
         // Create and configure cell-based simulation
         DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDeltaNotchOffLatticeSimulationSaveAndLoad");
-        double end_time=0.01;
+        double end_time = 0.01;
         simulator.SetEndTime(end_time);
         simulator.SetOutputNodeVelocities(true);
 

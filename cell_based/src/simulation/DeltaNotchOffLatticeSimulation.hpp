@@ -82,7 +82,7 @@ private :
 
 public:
 
-    /** The file that the values of beta catenin is written out to. */
+    /** The file to which the values of delta/notch are written. */
     out_stream mVizDeltaFile;
 
     /**

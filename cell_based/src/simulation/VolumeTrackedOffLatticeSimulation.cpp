@@ -56,12 +56,14 @@ void VolumeTrackedOffLatticeSimulation<DIM>::SetupSolve()
      * We must update CellData in SetupSolve(), otherwise it will not have been
      * fully initialised by the time we enter the main time loop.
      */
+    OffLatticeSimulation<DIM>::SetupSolve();
     UpdateCellData();
 }
 
 template<unsigned DIM>
 void VolumeTrackedOffLatticeSimulation<DIM>::UpdateAtEndOfTimeStep()
 {
+    OffLatticeSimulation<DIM>::UpdateAtEndOfTimeStep();
     UpdateCellData();
 }
 
