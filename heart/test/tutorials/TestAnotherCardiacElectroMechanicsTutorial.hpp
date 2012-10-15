@@ -293,14 +293,27 @@ public:
         PointStimulus2dCellFactory cell_factory;
 
         std::vector<unsigned> fixed_nodes;
+        std::vector<c_vector<double,2> > fixed_node_locations;
         for(unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
         {
             double x = mechanics_mesh.GetNode(i)->rGetLocation()[0];
             double y = mechanics_mesh.GetNode(i)->rGetLocation()[1];
 
-            if (fabs(x)<1e-6 && fabs(y+0.5)<1e-6)  // fixed point (0.0,-0.5)
+            if (fabs(x)<1e-6 && fabs(y+0.5)<1e-6)  // fixed point (0.0,-0.5) at bottom of mesh
             {
                 fixed_nodes.push_back(i);
+                c_vector<double,2> new_position;
+                new_position(0) = x;
+                new_position(1) = y;
+                fixed_node_locations.push_back(new_position);
+            }
+            if (fabs(x)<1e-6 && fabs(y-0.5)<1e-6)  // constrained point (0.0,0.5) at top of mesh
+            {
+                fixed_nodes.push_back(i);
+                c_vector<double,2> new_position;
+                new_position(0) = x;
+                new_position(1) = ElectroMechanicsProblemDefinition<2>::FREE;
+                fixed_node_locations.push_back(new_position);
             }
         }
 
@@ -311,7 +324,8 @@ public:
 
         problem_defn.SetContractionModel(KERCHOFFS2003,0.1);
         problem_defn.SetUseDefaultCardiacMaterialLaw(COMPRESSIBLE);
-        problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+        //problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+        problem_defn.SetFixedNodes(fixed_nodes, fixed_node_locations);
         problem_defn.SetMechanicsSolveTimestep(1.0);
 
         FileFinder finder("heart/test/data/fibre_tests/circular_annulus_960_elements.ortho",RelativeTo::ChasteSourceRoot);
@@ -348,10 +362,10 @@ public:
         problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, -1.0 /*1 KPa is about 8mmHg*/);
         /* The solver computes the equilibrium solution (given the pressure loading) before the first timestep.
          * As there is a big deformation from the undeformed state to this loaded state, the nonlinear solver may
-         * not converge. The following increments the loading (solves with p=-1/5, then p=-2/5, ... then p=-1), which
+         * not converge. The following increments the loading (solves with p=-1/3, then p=-2/3, then p=-1), which
          * allows convergence to occur.
          */
-        problem_defn.SetNumIncrementsForInitialDeformation(5);
+        problem_defn.SetNumIncrementsForInitialDeformation(3);
 
         CardiacElectroMechanicsProblem<2,1> problem(COMPRESSIBLE,
                                                     MONODOMAIN,
