@@ -37,6 +37,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "PottsBasedCellPopulation.hpp"
+#include "VertexBasedCellPopulation.hpp"
+#include "MultipleCaBasedCellPopulation.hpp"
 #include "BoundaryConditionsContainer.hpp"
 #include "SimpleLinearEllipticSolver.hpp"
 #include "CellBasedPdeSolver.hpp"
@@ -54,7 +56,7 @@ CellBasedPdeHandler<DIM>::CellBasedPdeHandler(AbstractCellPopulation<DIM>* pCell
       mpCoarsePdeMesh(NULL),
       mDeleteMemberPointersInDestructor(deleteMemberPointersInDestructor)
 {
-    // We must be using a NodeBasedCellPopulation or MeshBasedCellPopulation, with at least one cell
+    // We must be using a CellPopulation with at least one cell
     ///\todo change to exceptions (#1891)
     assert(mpCellPopulation->GetNumRealCells() != 0);
 }
@@ -170,7 +172,21 @@ void CellBasedPdeHandler<DIM>::UpdateCellPdeElementMap()
 template<unsigned DIM>
 void CellBasedPdeHandler<DIM>::OpenResultsFiles(std::string outputDirectory)
 {
-    // If using a NodeBasedCellPopulation or a PottsBasedCellPopulation, mpCoarsePdeMesh must be set up
+	//if appropriate make a coarse mesh which overlays (exactly) the lattice sites of a PottsMesh (used for all OnLattice simulations)
+	if((dynamic_cast<MultipleCaBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL) && mpCoarsePdeMesh==NULL)
+	{
+		assert(DIM ==2);
+		ChasteCuboid<DIM> cuboid = mpCellPopulation->rGetMesh().CalculateBoundingBox();
+		unsigned num_sites_up = cuboid.GetWidth(0);
+		unsigned num_sites_across = cuboid.GetWidth(1);
+		// Currently only works with square meshes
+		assert(num_sites_up == num_sites_across);
+
+		UseCoarsePdeMesh(1, cuboid, true);
+	}
+
+
+    // If using a NodeBasedCellPopulation a VertexBasedCellPopulation, a MultipleCABasedCellPopulation or a PottsBasedCellPopulation, mpCoarsePdeMesh must be set up
     if (PdeSolveNeedsCoarseMesh() && mpCoarsePdeMesh==NULL)
     {
         EXCEPTION("Trying to solve a PDE on a cell population that doesn't have a mesh. Try calling UseCoarsePdeMesh().");
@@ -740,7 +756,10 @@ void CellBasedPdeHandler<DIM>::OutputParameters(out_stream& rParamsFile)
 template<unsigned DIM>
 bool CellBasedPdeHandler<DIM>::PdeSolveNeedsCoarseMesh()
 {
-    return ((dynamic_cast<NodeBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL) || (dynamic_cast<PottsBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL));
+    return ((dynamic_cast<NodeBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL)
+    		|| (dynamic_cast<PottsBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL)
+    		|| (dynamic_cast<MultipleCaBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL)
+    		|| (dynamic_cast<VertexBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL));
 }
 
 // Serialization for Boost >= 1.36

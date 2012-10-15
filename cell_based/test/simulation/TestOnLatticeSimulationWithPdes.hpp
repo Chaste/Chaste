@@ -280,6 +280,83 @@ public:
         }
     }
 
+    void TestMultipleCaBasedWithoutCoarseMesh() throw(Exception)
+	{
+		EXIT_IF_PARALLEL;
+
+		// Create a simple 2D PottsMesh
+		PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
+		PottsMesh<2>* p_mesh = generator.GetMesh();
+
+		// Create cells
+		std::vector<CellPtr> cells;
+		CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+		cells_generator.GenerateBasic(cells, 1);
+
+		std::vector<unsigned> location_indices;
+		location_indices.push_back(12);
+
+		// Create cell population
+		MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+
+		// Initialize CellData
+		/*
+		 * Since values are first passed in to CellData before it is updated in UpdateAtEndOfTimeStep(),
+		 * we need to pass it some initial conditions.
+		 */
+		for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+			 cell_iter != cell_population.End();
+			 ++cell_iter)
+		{
+			cell_iter->GetCellData()->SetItem("nutrient", 0.0);
+		}
+
+		// Set up cell-based simulation
+		OnLatticeSimulation<2> simulator(cell_population);
+		simulator.SetOutputDirectory("TestMultipleCaBasedCellPopulationWithPdesOnNaturalMesh");
+		simulator.SetEndTime(0.1);
+
+
+		// Set up PDE and pass to simulation via handler (zero uptake to check analytic solution)
+		AveragedSourcePde<2> pde(cell_population, 0.0);
+		ConstBoundaryCondition<2> bc(1.0);
+		PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+		pde_and_bc.SetDependentVariableName("nutrient");
+
+        CellBasedPdeHandler<2> pde_handler(&cell_population);
+        pde_handler.AddPdeAndBc(&pde_and_bc);
+        pde_handler.SetImposeBcsOnCoarseBoundary(true);
+
+        simulator.SetCellBasedPdeHandler(&pde_handler);
+
+
+		// Create update rules and pass to the simulation
+		MAKE_PTR(DiffusionMultipleCaUpdateRule<2>, p_diffusion_update_rule);
+		p_diffusion_update_rule->SetDiffusionParameter(0.5);
+		simulator.AddMultipleCaUpdateRule(p_diffusion_update_rule);
+
+		// Solve the system
+		simulator.Solve();
+
+		// Test solution is constant
+		for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+			 cell_iter != cell_population.End();
+			 ++cell_iter)
+		{
+			double analytic_solution = 1.0;
+			// Test that PDE solver is working correctly
+			TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient"), analytic_solution, 1e-2);
+		}
+
+		//Test coarse mesh has the same nodes as the PottsMesh
+		TetrahedralMesh<2,2>* p_coarse_mesh = simulator.GetCellBasedPdeHandler()->GetCoarsePdeMesh();
+
+		TS_ASSERT_EQUALS(p_coarse_mesh->GetNumNodes(),p_mesh->GetNumNodes());
+		TS_ASSERT_DELTA(p_coarse_mesh->GetWidth(0),p_mesh->GetWidth(0),1e-8);
+		TS_ASSERT_DELTA(p_coarse_mesh->GetWidth(1),p_mesh->GetWidth(1),1e-8);
+	}
+
+
     void TestMultipleCaBasedWithCoarseMesh() throw(Exception)
     {
         EXIT_IF_PARALLEL;
@@ -308,7 +385,7 @@ public:
              cell_iter != cell_population.End();
              ++cell_iter)
         {
-            cell_iter->GetCellData()->SetItem("nutrient", cell_population.GetLocationIndexUsingCell(*cell_iter));
+            cell_iter->GetCellData()->SetItem("nutrient", 0.0);
         }
 
         // Set up cell-based simulation
