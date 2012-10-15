@@ -106,7 +106,7 @@ void CmguiMeshWriter<ELEMENT_DIM,SPACE_DIM>::WriteFiles()
         std::vector<double> current_item = this->GetNextNode();
 
         *p_node_file << "Node:\t" << item_num+1 << "\t";
-        for (unsigned i=0; i<ELEMENT_DIM; i++)
+        for (unsigned i=0; i<SPACE_DIM; i++)
         {
             *p_node_file << current_item[i] << "\t";
         }
@@ -311,7 +311,8 @@ void CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM>::AppendLocalDataToFiles()
     {
         const c_vector<double, SPACE_DIM>& r_current_item = iter->rGetLocation();
         *p_node_file << "Node:\t" << iter->GetIndex()+1 << "\t";
-        for (unsigned i=0; i<ELEMENT_DIM; i++)
+
+        for (unsigned i=0; i<SPACE_DIM; i++)
         {
             *p_node_file << r_current_item[i] << "\t";
         }
