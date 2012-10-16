@@ -643,7 +643,7 @@ public:
         CellPtr p_cell = *(simulator.rGetCellPopulation().Begin());
         c_vector<double, 2> cell_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(p_cell);
         TS_ASSERT_DELTA(cell_location[0], 1.0, 1e-4);
-        TS_ASSERT_DELTA(cell_location[1], 2.0, 1e-4);
+        TS_ASSERT_DELTA(cell_location[1], 0.0, 1e-4);
     }
 
     void TestSave() throw (Exception)
@@ -710,7 +710,7 @@ public:
         CellPtr p_cell = *(p_simulator2->rGetCellPopulation().Begin());
         c_vector<double, 2> cell_location = static_cast <MultipleCaBasedCellPopulation<2>*>(&p_simulator2->rGetCellPopulation())->GetLocationOfCellCentre(p_cell);
         TS_ASSERT_DELTA(cell_location[0], 1.0, 1e-4);
-        TS_ASSERT_DELTA(cell_location[1], 2.0, 1e-4);
+        TS_ASSERT_DELTA(cell_location[1], 0.0, 1e-4);
 
         // Tidy up
         delete p_simulator1;
