@@ -411,13 +411,13 @@ public:
         }
         centre_of_potts_mesh /= p_mesh->GetNumNodes();
         ChastePoint<2> lower(0.0, 0.0);
-        ChastePoint<2> upper(50.0, 50.0);
+        ChastePoint<2> upper(5.0, 5.0);
 
         c_vector<double, 2> translation = 0.5*(lower.rGetLocation() + upper.rGetLocation()) - centre_of_potts_mesh;
         lower.rGetLocation() -= translation;
         upper.rGetLocation() -= translation;
         ChasteCuboid<2> cuboid(lower, upper);
-        pde_handler.UseCoarsePdeMesh(10.0, cuboid);
+        pde_handler.UseCoarsePdeMesh(1.0, cuboid);
         pde_handler.SetImposeBcsOnCoarseBoundary(true);
 
         simulator.SetCellBasedPdeHandler(&pde_handler);
@@ -542,6 +542,109 @@ public:
             TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("quantity 1"), analytic_solution, 1e-2);
             TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("quantity 2"), analytic_solution, 1e-2);
         }
+    }
+
+    // Under construction: Test growth of a population of cells that consumes nutrient
+    void TestOnLatticeSpheroidWithNutrient() throw(Exception)
+    {
+        EXIT_IF_PARALLEL;
+
+        // Create a simple 2D PottsMesh
+        PottsMeshGenerator<2> generator(20, 0, 0, 20, 0, 0);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, 4);
+
+        std::vector<unsigned> location_indices;
+        location_indices.push_back(195);
+        location_indices.push_back(57);
+        location_indices.push_back(293);
+        location_indices.push_back(250);
+
+        // Create cell population
+        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+
+        // Initialize CellData
+        /*
+         * Since values are first passed in to CellData before it is updated in UpdateAtEndOfTimeStep(),
+         * we need to pass it some initial conditions.
+         */
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            cell_iter->GetCellData()->SetItem("nutrient", 0.0);
+        }
+
+        // Set up cell-based simulation
+        OnLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestOnLatticeSpheroidWithNutrient");
+        simulator.SetDt(0.1);
+        simulator.SetEndTime(20);
+
+        // Set up PDE and pass to simulation via handler (zero uptake to check analytic solution)
+        double nutrient_uptake_rate=0.1;
+        AveragedSourcePde<2> pde(cell_population, nutrient_uptake_rate);
+        ConstBoundaryCondition<2> bc(1.0);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        pde_and_bc.SetDependentVariableName("nutrient");
+
+        CellBasedPdeHandler<2> pde_handler(&cell_population);
+        pde_handler.AddPdeAndBc(&pde_and_bc);
+
+        // Create coarse mesh and centre it on the centre of the Potts Mesh
+        c_vector<double,2> centre_of_potts_mesh = zero_vector<double>(2);
+        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        {
+            centre_of_potts_mesh += p_mesh->GetNode(i)->rGetLocation();
+        }
+        centre_of_potts_mesh /= p_mesh->GetNumNodes();
+        ChastePoint<2> lower(0.0, 0.0);
+        ChastePoint<2> upper(20.0, 20.0);
+
+        c_vector<double, 2> translation = 0.5*(lower.rGetLocation() + upper.rGetLocation()) - centre_of_potts_mesh;
+        lower.rGetLocation() -= translation;
+        upper.rGetLocation() -= translation;
+        ChasteCuboid<2> cuboid(lower, upper);
+        pde_handler.UseCoarsePdeMesh(1.0, cuboid);
+        pde_handler.SetImposeBcsOnCoarseBoundary(true);
+
+        simulator.SetCellBasedPdeHandler(&pde_handler);
+
+        // Create update rules and pass to the simulation
+        MAKE_PTR(DiffusionMultipleCaUpdateRule<2>, p_diffusion_update_rule);
+        p_diffusion_update_rule->SetDiffusionParameter(0.5);
+        simulator.AddMultipleCaUpdateRule(p_diffusion_update_rule);
+
+        // Solve the system
+        simulator.Solve();
+
+        // Find centre of coarse PDE mesh
+        c_vector<double,2> centre_of_coarse_pde_mesh = zero_vector<double>(2);
+        TetrahedralMesh<2,2>* p_coarse_mesh = simulator.GetCellBasedPdeHandler()->GetCoarsePdeMesh();
+        for (unsigned i=0; i<p_coarse_mesh->GetNumNodes(); i++)
+        {
+            centre_of_coarse_pde_mesh += p_coarse_mesh->GetNode(i)->rGetLocation();
+        }
+        centre_of_coarse_pde_mesh /= p_coarse_mesh->GetNumNodes();
+        c_vector<double,2> centre_diff = centre_of_coarse_pde_mesh - centre_of_potts_mesh;
+
+        // Test that the two centres match
+        TS_ASSERT_DELTA(norm_2(centre_diff), 0.0, 1e-4);
+
+        // Test FindCoarseElementContainingCell() and initialisation of mCellPdeElementMap
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+            cell_iter != cell_population.End();
+            ++cell_iter)
+        {
+            unsigned containing_element_index = simulator.GetCellBasedPdeHandler()->mCellPdeElementMap[*cell_iter];
+            TS_ASSERT_LESS_THAN(containing_element_index, p_coarse_mesh->GetNumElements());
+            TS_ASSERT_EQUALS(containing_element_index, simulator.GetCellBasedPdeHandler()->FindCoarseElementContainingCell(*cell_iter));
+        }
+
     }
 
     void TestPdeOutput() throw(Exception)

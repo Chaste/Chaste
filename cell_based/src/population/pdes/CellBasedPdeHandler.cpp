@@ -43,6 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimpleLinearEllipticSolver.hpp"
 #include "CellBasedPdeSolver.hpp"
 #include "Exception.hpp"
+#include "VtkMeshWriter.hpp"
 
 template<unsigned DIM>
 CellBasedPdeHandler<DIM>::CellBasedPdeHandler(AbstractCellPopulation<DIM>* pCellPopulation,
@@ -222,6 +223,7 @@ void CellBasedPdeHandler<DIM>::OpenResultsFiles(std::string outputDirectory)
         }
     }
 
+    mDirPath = outputDirectory; // caching the path to the output directory for VTK
     double current_time = SimulationTime::Instance()->GetTime();
     WritePdeSolution(current_time);
 }
@@ -583,6 +585,27 @@ void CellBasedPdeHandler<DIM>::WritePdeSolution(double time)
             if (mpCoarsePdeMesh != NULL)
             {
                 PdeAndBoundaryConditions<DIM>* p_pde_and_bc = mPdeAndBcCollection[pde_index];
+
+				#ifdef CHASTE_VTK
+                if (p_pde_and_bc->GetSolution())
+				{
+                	ReplicatableVector solution_repl(p_pde_and_bc->GetSolution());
+                	std::vector<double> pde_solution;
+                	for (unsigned i=0; i<mpCoarsePdeMesh->GetNumNodes(); i++)
+						{
+                		pde_solution.push_back(solution_repl[i]);
+						}
+                	std::ostringstream time_string;
+                	time_string << SimulationTime::Instance()->GetTimeStepsElapsed()+1;
+
+                	std::string results_file = "pde_results_"+time_string.str();
+                	VtkMeshWriter<DIM,DIM> vtk_mesh_writer(mDirPath,results_file,false);
+					vtk_mesh_writer.AddPointData("Pde Solution",pde_solution);
+
+					vtk_mesh_writer.WriteFilesUsingMesh(*mpCoarsePdeMesh);
+				}
+
+				#endif //CHASTE_VTK
 
                 for (unsigned i=0; i<mpCoarsePdeMesh->GetNumNodes(); i++)
                 {

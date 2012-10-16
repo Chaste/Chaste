@@ -248,6 +248,7 @@ CellPtr MultipleCaBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_ve
     }
 
     assert(daughter_node_index != UNSIGNED_UNSET);
+    assert(daughter_node_index < this->mrMesh.GetNumNodes());
 
     // Associate the new cell with the element
     this->mCells.push_back(pNewCell);

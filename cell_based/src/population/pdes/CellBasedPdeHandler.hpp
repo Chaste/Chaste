@@ -92,6 +92,9 @@ protected:
     /** Vector of pointers to linear elliptic PDE objects with additional boundary condition information. */
     std::vector<PdeAndBoundaryConditions<DIM>*> mPdeAndBcCollection;
 
+    /** A cache of where the results are going (used for VTK writer). */
+    std::string mDirPath;
+
     /** File that the values of the PDE solution are written out to. */
     out_stream mpVizPdeSolutionResultsFile;
 
