@@ -61,8 +61,7 @@ class TestCopyingRdf(unittest.TestCase):
     def TestCopyingRdfOnLr91(self):
         original_model = 'heart/src/odes/cellml/LuoRudy1991.cellml'
         no_rdf_model = 'python/test/data/LuoRudy1991WithNoRdf.cellml'
-        output_folder = os.getenv('CHASTE_TEST_OUTPUT', 'testoutput')
-        output_model = os.path.join(output_folder, 'LuoRudy1991Output.cellml')
+        output_model = os.path.join(CHASTE_TEST_OUTPUT, 'LuoRudy1991Output.cellml')
         rc = os.system('python/pycml/copy_rdf.py ' + original_model + ' ' + no_rdf_model + ' ' + output_model)
         self.assertEqual(rc, 0)
         # Compare output to reference

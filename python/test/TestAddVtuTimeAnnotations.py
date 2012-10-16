@@ -41,15 +41,14 @@ class TestAddingVtuTimeAnnotations(unittest.TestCase):
     def TestAddingVtuAnnotationsMonodomain2d(self):
         #without suffices (input and output file names)
         original_vtu1 = 'python/test/data/Monodomain2d_before_annotations'
-        output_folder = os.getenv('CHASTE_TEST_OUTPUT', 'testoutput')
-        output_vtu1 = os.path.join(output_folder, 'MonodomainAddingAnnotationsTest')
+        output_vtu1 = os.path.join(CHASTE_TEST_OUTPUT, 'MonodomainAddingAnnotationsTest')
         rc = os.system('python/utils/AddVtuTimeAnnotations.py ' + original_vtu1 + ' ' + output_vtu1)
         self.assertEqual(rc, 0)
         self.assertTrue(filecmp.cmp(output_vtu1+'.vtu','python/test/data/Monodomain2d_after_annotations.vtu'))
         
         #with suffices
         original_vtu2 = 'python/test/data/Monodomain2d_before_annotations.vtu'
-        output_vtu2 = os.path.join(output_folder, 'MonodomainAddingAnnotationsTest2.vtu')
+        output_vtu2 = os.path.join(CHASTE_TEST_OUTPUT, 'MonodomainAddingAnnotationsTest2.vtu')
         rc = os.system('python/utils/AddVtuTimeAnnotations.py ' + original_vtu2 + ' ' + output_vtu2)
         self.assertEqual(rc, 0)
         self.assertTrue(filecmp.cmp(output_vtu2,'python/test/data/Monodomain2d_after_annotations.vtu'))
@@ -57,8 +56,7 @@ class TestAddingVtuTimeAnnotations(unittest.TestCase):
     def TestAddingVtuAnnotationsBidomain(self):
         #without suffices (input and output file names)
         original_vtu1 = 'python/test/data/Bidomain3d_before_annotations.vtu'
-        output_folder = os.getenv('CHASTE_TEST_OUTPUT', 'testoutput')
-        output_vtu1 = os.path.join(output_folder, 'BidomainAddingAnnotationsTest.vtu')
+        output_vtu1 = os.path.join(CHASTE_TEST_OUTPUT, 'BidomainAddingAnnotationsTest.vtu')
         rc = os.system('python/utils/AddVtuTimeAnnotations.py ' + original_vtu1 + ' ' + output_vtu1)
         self.assertEqual(rc, 0)
         self.assertTrue(filecmp.cmp(output_vtu1,'python/test/data/Bidomain3d_after_annotations.vtu'))

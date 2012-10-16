@@ -47,6 +47,9 @@ unittest.main.  For example, it can be 'MyTestCase' or
 
 If no arguments are supplied it will run the example tests defined in this
 module, class TestTest.
+
+The module-scope variable CHASTE_TEST_OUTPUT will be set in test source
+files to the path to the output folder, which is guaranteed to exist.
 """
 
 import imp
@@ -151,6 +154,13 @@ class ChasteTestLoader(unittest.TestLoader):
             test_names.sort(self.sortTestMethodsUsing)
         return test_names
 
+def SetTestOutput(module):
+    """Set the CHASTE_TEST_OUTPUT attribute in the given test module, and ensure the folder exists."""
+    module.CHASTE_TEST_OUTPUT = os.getenv('CHASTE_TEST_OUTPUT', 'testoutput')
+    try:
+        os.mkdir(module.CHASTE_TEST_OUTPUT)
+    except:
+        pass
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
@@ -167,6 +177,7 @@ if __name__ == '__main__':
             module = imp.load_module(base, file, pathname, desc)
         finally:
             file.close()
+        SetTestOutput(module)
         if hasattr(module, 'MakeTestSuite') and callable(module.MakeTestSuite):
             suite = module.MakeTestSuite()
             result = ChasteTestRunner().run(suite)
