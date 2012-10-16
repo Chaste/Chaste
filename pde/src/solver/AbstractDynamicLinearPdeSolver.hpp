@@ -177,7 +177,7 @@ public:
     void SetInitialCondition(Vec initialCondition);
 
     /** Dynamic solve method. */
-    Vec Solve();
+    virtual Vec Solve();
 
     /** Tell the solver to assemble the matrix again next timestep. */
     void SetMatrixIsNotAssembled();
