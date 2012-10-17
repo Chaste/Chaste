@@ -106,14 +106,27 @@ public:
         ZeroStimulusCellFactory<CellLuoRudy1991FromCellML,2> cell_factory;
 
         std::vector<unsigned> fixed_nodes;
+        std::vector<c_vector<double,2> > fixed_node_locations;
         for(unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
         {
             double x = mechanics_mesh.GetNode(i)->rGetLocation()[0];
             double y = mechanics_mesh.GetNode(i)->rGetLocation()[1];
 
-            if (fabs(x)<1e-6 && fabs(y+0.5)<1e-6)  // fixed point (0.0,-0.5)
+            if (fabs(x)<1e-6 && fabs(y+0.5)<1e-6)  // fixed point (0.0,-0.5) at bottom of mesh
             {
                 fixed_nodes.push_back(i);
+                c_vector<double,2> new_position;
+                new_position(0) = x;
+                new_position(1) = y;
+                fixed_node_locations.push_back(new_position);
+            }
+            if (fabs(x)<1e-6 && fabs(y-0.5)<1e-6)  // constrained point (0.0,0.5) at top of mesh
+            {
+                fixed_nodes.push_back(i);
+                c_vector<double,2> new_position;
+                new_position(0) = x;
+                new_position(1) = ElectroMechanicsProblemDefinition<2>::FREE;
+                fixed_node_locations.push_back(new_position);
             }
         }
 
@@ -123,7 +136,8 @@ public:
 
         problem_defn.SetContractionModel(KERCHOFFS2003,0.1);
         problem_defn.SetUseDefaultCardiacMaterialLaw(COMPRESSIBLE);
-        problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+        //problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+        problem_defn.SetFixedNodes(fixed_nodes, fixed_node_locations);
         problem_defn.SetMechanicsSolveTimestep(1.0);
 
         FileFinder finder("heart/test/data/fibre_tests/circular_annulus_960_elements.ortho", RelativeTo::ChasteSourceRoot);
@@ -163,21 +177,13 @@ public:
                                                     "TestEmOnAnnulusDiastolicFilling");
         problem.Solve();
 
-        // We don't really test anything, we mainly just want to verify it solves OK. Have visualised.
-        //
-        // Hardcoded test of deformed position of top node of the annulus, to check nothing has changed and that
+        // Hardcoded test of deformed position of (partially constrained) top node of the annulus, to check nothing has changed and that
         // different systems give the same result.
-        // HOWEVER, note that we can't just do something like:
-        //// TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](0), 0.0011, 1e-3);
-        //// TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](1), 0.6073, 1e-3);
-        // because different systems give different results, because we have only fixed one point, which means that
-        // the solution is only defined up to a rotation. On some systems a slightly rotated solution is found, for
-        // some reason. Look at the *distance* of the top node from the fixed point instead.
-
-        double x_top = problem.rGetDeformedPosition()[2](0);
-        double y_top = problem.rGetDeformedPosition()[2](1);
-        double dist_to_fixed_point = sqrt( (x_top-0.0)*(x_top-0.0) + (y_top + 0.5)*(y_top + 0.5) );
-        TS_ASSERT_DELTA(dist_to_fixed_point, 1.107, 1e-2);
+        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](0), 0.0, 1e-15);
+        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](1), 0.6073, 1e-4);
+        //Node 0 is on the righthand side, initially at x=0.5 y=0.0
+        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[0](0), 0.5536, 1e-4);
+        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[0](1), 0.0536, 1e-4);
 
         MechanicsEventHandler::Headings();
         MechanicsEventHandler::Report();
@@ -199,15 +205,28 @@ public:
 
         PointStimulus2dCellFactory cell_factory;
 
-        std::vector<unsigned> fixed_nodes;
+         std::vector<unsigned> fixed_nodes;
+        std::vector<c_vector<double,2> > fixed_node_locations;
         for(unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
         {
             double x = mechanics_mesh.GetNode(i)->rGetLocation()[0];
             double y = mechanics_mesh.GetNode(i)->rGetLocation()[1];
 
-            if (fabs(x)<1e-6 && fabs(y+0.5)<1e-6)  // fixed point (0.0,-0.5)
+            if (fabs(x)<1e-6 && fabs(y+0.5)<1e-6)  // fixed point (0.0,-0.5) at bottom of mesh
             {
                 fixed_nodes.push_back(i);
+                c_vector<double,2> new_position;
+                new_position(0) = x;
+                new_position(1) = y;
+                fixed_node_locations.push_back(new_position);
+            }
+            if (fabs(x)<1e-6 && fabs(y-0.5)<1e-6)  // constrained point (0.0,0.5) at top of mesh
+            {
+                fixed_nodes.push_back(i);
+                c_vector<double,2> new_position;
+                new_position(0) = x;
+                new_position(1) = ElectroMechanicsProblemDefinition<2>::FREE;
+                fixed_node_locations.push_back(new_position);
             }
         }
 
@@ -217,17 +236,15 @@ public:
         // then nonlinear solve failure occurs. Sometimes the solver can get past this if the mechanics timestep is decreased.
         //
         // See ticket #2193
-        //
-        // For this 2D test is probably doesn't help that with one fixed point, the deformation is only defined up to a rotation.
 
-
-        HeartConfig::Instance()->SetSimulationDuration(320.0);
+        HeartConfig::Instance()->SetSimulationDuration(400.0);
 
         ElectroMechanicsProblemDefinition<2> problem_defn(mechanics_mesh);
 
         problem_defn.SetContractionModel(KERCHOFFS2003,0.1);
         problem_defn.SetUseDefaultCardiacMaterialLaw(COMPRESSIBLE);
-        problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+        //problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+        problem_defn.SetFixedNodes(fixed_nodes, fixed_node_locations);
         problem_defn.SetMechanicsSolveTimestep(1.0);
 
         FileFinder finder("heart/test/data/fibre_tests/circular_annulus_960_elements.ortho", RelativeTo::ChasteSourceRoot);
@@ -272,21 +289,14 @@ public:
 
         // We don't really test anything, we mainly just want to verify it solves OK past the initial jump and through
         // the cycle. Have visualised.
-        //
-        // Hardcoded test of deformed position of top node of the annulus, to check nothing has changed and that
+        // Hardcoded test of deformed position of (partially constrained) top node of the annulus, to check nothing has changed and that
         // different systems give the same result.
-        // HOWEVER, note that we can't just do something like:
-        //// TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](0), 0.0014, 1e-3);
-        //// TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](1), 0.6020, 1e-3);
-        // because different systems give different results, because we have only fixed one point, which means that
-        // the solution is only defined up to a rotation. On some systems a slightly rotated solution is found, for
-        // some reason. Look at the *distance* of the top node from the fixed point instead.
-
-        double x_top = problem.rGetDeformedPosition()[2](0);
-        double y_top = problem.rGetDeformedPosition()[2](1);
-        double dist_to_fixed_point = sqrt( (x_top-0.0)*(x_top-0.0) + (y_top + 0.5)*(y_top + 0.5) );
-        TS_ASSERT_DELTA(dist_to_fixed_point, 0.9659, 1e-2);
-
+        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](0), 0.0, 1e-16);
+        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](1), 0.6021, 1e-4);
+        //Node 0 is on the righthand side, initially at x=0.5 y=0.0
+        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[0](0), 0.5508, 1e-4);
+        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[0](1), 0.0524, 1e-4);
+        
         MechanicsEventHandler::Headings();
         MechanicsEventHandler::Report();
     }
