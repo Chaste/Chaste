@@ -153,10 +153,14 @@ class PartialEvaluator(object):
             # Reduce
             expr._reduce()
     
-    def _get_assignment_exprs(self):
+    def _get_assignment_exprs(self, skip_solver_info=True):
         """Get an iterable over all assignments in the model that are mathml_apply instances."""
+        if not skip_solver_info:
+            skip = set()
+        else:
+            skip = set(self.solver_info.get_modifiable_mathematics())
         for e in self.doc.model.get_assignments():
-            if isinstance(e, mathml_apply):
+            if isinstance(e, mathml_apply) and e not in skip:
                 assert e.is_ode() or e.is_assignment()
                 yield e
 
@@ -237,6 +241,7 @@ class PartialEvaluator(object):
     def parteval(self, doc, solver_info, lookup_tables_analyser=None):
         """Do the partial evaluation."""
         self.doc = doc
+        self.solver_info = solver_info
         self.lookup_tables_analyser = lookup_tables_analyser
         if lookup_tables_analyser:
             lookup_tables_analyser.doc = doc
@@ -275,7 +280,7 @@ class PartialEvaluator(object):
                     lhs.xml_parent.xml_remove_child(lhs)
         
         # Use canonical variable names in all ci elements
-        for expr in list(self._get_assignment_exprs()):
+        for expr in list(self._get_assignment_exprs(False)):
             # If the assigned-to variable isn't used or kept, remove the assignment
             if isinstance(expr.eq.lhs, mathml_ci):
                 var = expr.eq.lhs.variable
@@ -356,7 +361,7 @@ class PartialEvaluator(object):
                     pass
 
         # Refresh expression dependency lists
-        for expr in self._get_assignment_exprs():
+        for expr in self._get_assignment_exprs(False):
             expr._cml_depends_on = list(expr.vars_in(expr.eq.rhs))
             if expr.is_ode():
                 # Add dependency on the independent variable
