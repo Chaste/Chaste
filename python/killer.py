@@ -84,8 +84,8 @@ for pid in test_pids:
         if len(cmdline) > 1 and 'scons' in cmdline[1]:
             print "SCons is running as PID", pid
             if not sim:
-                os.kill(int(pid), signal.SIGTERM)
-                print "  ** Killing (sent SIGTERM)"
+                os.kill(int(pid), signal.SIGKILL)
+                print "  ** Killing (sent SIGKILL)"
                 # Now sleep for a bit to let it die
                 time.sleep(10) # seconds
                 # Then re-check running proceses
