@@ -63,12 +63,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* HOW_TO_TAG Cardiac/Solver
  * Using specialised Backward Euler implementation to solve the cell models (allows for much larger timesteps)
- */
-
-/* Cell models can be solved using a specialised (for cardiac cell models) Backward Euler
+ *
+ * Cell models can be solved using a specialised (for cardiac cell models) Backward Euler
  * implementation, with again the code being automatically generated from the cellml files.
- * Backward Euler allows  much greater ODE timesteps to be used. Using Backward Euler is
- * easy, just change the .hpp included as follows, and the class name as below.
+ * Backward Euler allows much greater ODE timesteps to be used. For cellml models provided with Chaste,
+ * using Backward Euler is trivial: just change the .hpp included as follows, and the class name as below.
+ *
+ * If you want to use Backward Euler your own cellml file, there is an intermediate step - see
+ * https://chaste.cs.ox.ac.uk/cgi-bin/trac.cgi/wiki/ChasteGuides/CodeGenerationFromCellML#GeneratingBackwardEulercellmodels
+ * (note: requires Maple). (This step creates the .out files that are already present in heart/src/odes/cellml)
  *
  */
 #include "LuoRudy1991BackwardEuler.hpp"
