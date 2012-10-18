@@ -59,6 +59,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NumericFileComparison.hpp"
 #include "VtkMeshReader.hpp"
 #include "FileComparison.hpp"
+#include "Warnings.hpp"
 
 #include <sys/stat.h> // For chmod()
 
@@ -124,6 +125,7 @@ public:
     // (Historical reasons...)
     void TestMonodomainProblemSimplestMesh1D() throw(Exception)
     {
+    	TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
         DistributedTetrahedralMesh<1,1> mesh;
         //TrianglesMeshReader<1,1> reader("mesh/test/data/1D_0_to_1_1_element");
         mesh.ConstructLinearMesh(1);
@@ -158,7 +160,6 @@ public:
         HeartConfig::Instance()->SetCapacitance(10.0);
 
         monodomain_problem.Solve();
-
         // test whether voltages and gating variables are in correct ranges
         CheckMonoLr91Vars<1>(monodomain_problem);
 
@@ -169,6 +170,23 @@ public:
 
         TS_ASSERT_DELTA(voltage_replicated[0], -52.1698, atol);
         TS_ASSERT_DELTA(voltage_replicated[1], -83.8381, atol);
+
+        // Checking we only get warnings when no cells are allocated to processors with rank 2 or more
+        if (PetscTools::GetMyRank() < 2)
+        {
+        	// Rank is 0 or 1
+        	TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
+        }
+        else
+        {
+        	// Rank is 2 or more
+        	// There are only 2 nodes in this simulation so processors with rank 2 or more will have no nodes (and will through a warning)
+        	TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+        	std::stringstream str1;
+        	str1 << "No cells were assigned to process " << PetscTools::GetMyRank() << " in AbstractCardiacTissue constructor. Advice: Make total number of processors no greater than number of nodes in the mesh";
+        	TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), str1.str() );
+        }
+        Warnings::QuietDestroy();
     }
 
     // Solve on a 1D string of cells, 1mm long with a space step of 0.1mm.

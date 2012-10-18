@@ -94,6 +94,16 @@ public:
         Warnings::QuietDestroy();
     }
 
+    void TestPrintWarnings()
+    {
+
+    	WARNING("This warning is printed inside TestPrintWarnings().");
+    	TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+    	Warnings::PrintWarnings();
+    	TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+    	Warnings::QuietDestroy();
+    }
+
     void TestWarningOnlyOnceReset()
     {
         for (unsigned i=0; i<10; i++)
@@ -115,6 +125,7 @@ public:
         WARNING("This one will get printed " << one << " time");
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
     }
+
 };
 
 #endif //_TESTWARNINGS_HPP_

@@ -49,22 +49,8 @@ Warnings::Warnings()
 
 void Warnings::NoisyDestroy(void)
 {
-    if (mpInstance)
-    {
-        for (WarningsContainerType::iterator it = mpInstance->mWarningMessages.begin();
-             it != mpInstance->mWarningMessages.end();
-             ++it)
-        {
-            /*
-             * Look at my warnings please.
-             * First in pair is the context.
-             * Second in pair is that actual warning.
-             */
-            std::cout << it->first << it->second << std::endl;
-        }
-        delete mpInstance;
-        mpInstance = NULL;
-    }
+	PrintWarnings();
+	QuietDestroy();
 }
 
 void Warnings::QuietDestroy(void)
@@ -74,6 +60,24 @@ void Warnings::QuietDestroy(void)
         delete mpInstance;
         mpInstance = NULL;
     }
+}
+
+void Warnings::PrintWarnings(void)
+{
+	if (mpInstance)
+	{
+		for (WarningsContainerType::iterator it = mpInstance->mWarningMessages.begin();
+			 it != mpInstance->mWarningMessages.end();
+			 ++it)
+		{
+			/*
+			 * Look at my warnings please.
+			 * First in pair is the context.
+			 * Second in pair is that actual warning.
+			 */
+			std::cout << it->first << it->second << std::endl;
+		}
+	}
 }
 
 Warnings* Warnings::Instance()

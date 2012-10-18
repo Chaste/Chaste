@@ -85,6 +85,11 @@ public:
     static void QuietDestroy();
 
     /**
+     * Prints all warning messages to stdout without changing the state of the Warnings.
+     */
+    static void PrintWarnings();
+
+    /**
      * Make a warning with a message string and add it to the list.
      *
      * @param rMessage  the message
