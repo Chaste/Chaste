@@ -47,39 +47,35 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import fileinput
 import sys
 import re
-import shutil
 
-def getTimeSteps(fname):
-   fname += '_times.info'
-   filehandle = open (fname, 'r')
-   result =  {'time_step_cnt': 0, 'time_step_cnt': 0, 'first': 0, 'last': 0}
-   for line in filehandle:
-       temp = line.split()
-       if temp[0] == 'Number':
-          result['time_step_cnt']=(int(temp[3]))
-#       elif temp[0] == 'timestep':
-#          result['time_step_len']=(int(temp[1]))
-#       elif temp[0] == 'First':
-#          result['first']=(int(temp[2]))
-#       elif temp[0] == 'Last':
-#          result['last']=(int(temp[2]))
-
-# \todo #2245 This is a hack because the original assumption was that the actual times were going into the
-# .vtu rather than the timestep numbers.
-   result['time_step_len']=1
-   result['first']=0
-   result['last']=result['time_step_cnt']-1
-   #print result
-   return result
-
-
-"""\todo #2245 Make it have the TimeStep annotation
- \todo #2245 We need to investigate RangeMin and RangeMax to get Paraview to automatically set the range for all time
 """
-def AnnotateVtuFile(fname,timestep_info):
-    timevalues = range(timestep_info['first'],timestep_info['last']+1,timestep_info['time_step_len'])
+    Check that the time steps start at zero and are monotonically increasing by 1 each time
+    Note that there are likely to be multiple copies of each time step.  
+    We could count the number of copies and check that they're all the same...
+    
+    Returns the value of the final time step
+"""
+def QueryVtuFile(inputFileName, nameTimePair):
+    last_time = 0
+    for line in fileinput.input(inputFileName):
+       match = nameTimePair.search(line)
+       if (match):
+         time_step = int(match.group(2))
+         if ( time_step != last_time ):
+             assert( time_step == last_time + 1)
+             last_time = time_step
+    return time_step
+
+"""
+Convert from one .vtu file to another adding time step annotations
+nameTimePair is a regular expression
+lastTimeStep is calculated during an earlier pass (QueryVtuFile)
+"""
+def AnnotateVtuFile(inputFileName, nameTimePair, outputFileName, lastTimeStep):
+    timevalues = range(0, lastTimeStep+1, 1)
     header_mode = True
-    for line in fileinput.input(fname, inplace=1):
+    out_fp = file(outputFileName, 'w')
+    for line in fileinput.input(inputFileName):
         if (header_mode):
            if (line.find('<UnstructuredGrid>')>0):
               line = '<UnstructuredGrid TimeValues="' 
@@ -88,36 +84,39 @@ def AnnotateVtuFile(fname,timestep_info):
               line += '">\n'
            if (line.find('</UnstructuredGrid>')>0):
               header_mode = False
-           match = re.search('Name=\"(.*)_([0-9]{6})\"', line)
+           match = nameTimePair.search(line)
            if (match):
              var_name = match.group(1)
              time_step_name = match.group(2)
              #Strip the prefix of zeros from the time_step
              time_step = str(int(time_step_name))
              line = line.replace(  '_'+time_step_name+'\"', '\" TimeStep=\"'+time_step+'\" ')
-        #Output goes to the new file
-        sys.stdout.write(line)
+        # Line (possibly amended) gets written to the new file
+        out_fp.write(line)
 
 if __name__ == "__main__":
     #Checking command line arguments
     if len(sys.argv) != 3:
-        print >> sys.stderr, "Usage:", sys.argv[0], "<path_to_original_vtu> <output_file>"
+        print >> sys.stderr, "Usage:", sys.argv[0], "<input_vtu_file> <output_vtu_file>"
         sys.exit(1)
     #Reading in command line arguments
-    fnameprefix = sys.argv[1]
+    input_name = sys.argv[1]
     output_name = sys.argv[2]
-    #If input name ends in .vtu then strip back to the prefix
-    if (fnameprefix[-4:] == '.vtu'):
-        fnameprefix=fnameprefix[:-4]
+    #If input name doesn't end in .vtu then add it
+    if (input_name[-4:] != '.vtu'):
+        input_name = input_name+'.vtu'
     #If output_name doesn't end in .vtu then add it
     if (output_name[-4:] != '.vtu'):
         output_name=output_name+'.vtu'
         
-    print'Reading from', fnameprefix, 'and writing to', output_name
-    #Read _times.info file    
-    tstepinfo  = getTimeSteps(fnameprefix)
-    #Take copy of original file
-    shutil.copy(fnameprefix+'.vtu',output_name)
-    #Annotate the copy
-    AnnotateVtuFile(output_name,tstepinfo)
+    print'Reading from', input_name, 'and writing to', output_name
+    
+    #Regular expression for  ... Name="some_var_name_000020" ... as Chaste writes it.
+    name_time_pair = re.compile('Name=\"(.*)_([0-9]{6})\"')
+    
+    # Check the time steps in the vtu file and query for the final time step 
+    last_time_step = QueryVtuFile(input_name, name_time_pair)
+
+    #Write a copy of the file but with annotations
+    AnnotateVtuFile(input_name, name_time_pair, output_name, last_time_step)
 
