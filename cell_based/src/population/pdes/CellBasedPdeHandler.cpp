@@ -589,20 +589,23 @@ void CellBasedPdeHandler<DIM>::WritePdeSolution(double time)
 				#ifdef CHASTE_VTK
                 if (p_pde_and_bc->GetSolution())
 				{
-                	ReplicatableVector solution_repl(p_pde_and_bc->GetSolution());
-                	std::vector<double> pde_solution;
-                	for (unsigned i=0; i<mpCoarsePdeMesh->GetNumNodes(); i++)
-						{
-                		pde_solution.push_back(solution_repl[i]);
-						}
-                	std::ostringstream time_string;
-                	time_string << SimulationTime::Instance()->GetTimeStepsElapsed()+1;
+                	if (DIM>1)
+                	{
+						ReplicatableVector solution_repl(p_pde_and_bc->GetSolution());
+						std::vector<double> pde_solution;
+						for (unsigned i=0; i<mpCoarsePdeMesh->GetNumNodes(); i++)
+							{
+							pde_solution.push_back(solution_repl[i]);
+							}
+						std::ostringstream time_string;
+						time_string << SimulationTime::Instance()->GetTimeStepsElapsed()+1;
 
-                	std::string results_file = "pde_results_"+time_string.str();
-                	VtkMeshWriter<DIM,DIM> vtk_mesh_writer(mDirPath,results_file,false);
-					vtk_mesh_writer.AddPointData("Pde Solution",pde_solution);
+						std::string results_file = "pde_results_"+time_string.str();
+						VtkMeshWriter<DIM,DIM> vtk_mesh_writer(mDirPath,results_file,false);
+						vtk_mesh_writer.AddPointData("Pde Solution",pde_solution);
 
-					vtk_mesh_writer.WriteFilesUsingMesh(*mpCoarsePdeMesh);
+						vtk_mesh_writer.WriteFilesUsingMesh(*mpCoarsePdeMesh);
+                	}
 				}
 
 				#endif //CHASTE_VTK
