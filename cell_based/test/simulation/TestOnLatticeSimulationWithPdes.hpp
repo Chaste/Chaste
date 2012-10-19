@@ -583,7 +583,7 @@ public:
         OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestOnLatticeSpheroidWithNutrient");
         simulator.SetDt(0.1);
-        simulator.SetEndTime(40); //Runs to 400 fine
+        simulator.SetEndTime(1); //Runs to 400 fine
          // Set up PDE and pass to simulation via handler
         double nutrient_uptake_rate=-0.1;
         AveragedSourcePde<2> pde(cell_population, nutrient_uptake_rate);
