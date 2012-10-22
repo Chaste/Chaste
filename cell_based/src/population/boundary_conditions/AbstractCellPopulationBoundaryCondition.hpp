@@ -92,7 +92,7 @@ public:
      *
      * @param rOldLocations the node locations before any boundary conditions are applied
      */
-    virtual void ImposeBoundaryCondition(const std::vector< c_vector<double, SPACE_DIM> >& rOldLocations)=0;
+    virtual void ImposeBoundaryCondition(const std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> >& rOldLocations)=0;
 
     /**
      * Pure method which should verify the boundary condition has been applied.

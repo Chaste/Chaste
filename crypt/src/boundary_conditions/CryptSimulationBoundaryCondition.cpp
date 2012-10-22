@@ -47,7 +47,7 @@ CryptSimulationBoundaryCondition<DIM>::CryptSimulationBoundaryCondition(Abstract
 }
 
 template<unsigned DIM>
-void CryptSimulationBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::vector< c_vector<double, DIM> >& rOldLocations)
+void CryptSimulationBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::map<Node<DIM>*, c_vector<double, DIM> >& rOldLocations)
 {
     // We only allow jiggling of bottom cells in 2D
     if (DIM == 1)
@@ -85,7 +85,7 @@ void CryptSimulationBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::v
                 if (cell_iter->GetCellProliferativeType()->template IsType<StemCellProliferativeType>())
                 {
                     // Get old node location
-                    c_vector<double, DIM> old_node_location = rOldLocations[node_index];
+                    c_vector<double, DIM> old_node_location = rOldLocations.find(p_node)->second;
 
                     // Return node to old location
                     p_node->rGetModifiableLocation() = old_node_location;
@@ -127,7 +127,7 @@ void CryptSimulationBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::v
                  * If WntConcentration is not set up then stem cells must be pinned,
                  * so we reset the location of each node whose height was close to zero.
                  */
-                double node_height = rOldLocations[node_index][DIM-1];
+                double node_height = rOldLocations.find(p_node)->second[DIM-1];
                 if (node_height < DBL_EPSILON)
                 {
                     // Return node to its old height, but allow it to slide left or right

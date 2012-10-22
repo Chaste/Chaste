@@ -261,11 +261,13 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateNodePositions(const std:
      * Get the previous node positions (these may be needed when applying boundary conditions,
      * e.g. in the case of immotile cells)
      */
-    std::vector<c_vector<double, SPACE_DIM> > old_node_locations;
-    old_node_locations.reserve(num_nodes);
-    for (unsigned node_index=0; node_index<num_nodes; node_index++)
+    std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> > old_node_locations;
+
+    for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mrCellPopulation.rGetMesh().GetNodeIteratorBegin();
+            node_iter != this->mrCellPopulation.rGetMesh().GetNodeIteratorEnd();
+            ++node_iter)
     {
-        old_node_locations[node_index] = this->mrCellPopulation.GetNode(node_index)->rGetLocation();
+        old_node_locations[&(*node_iter)] = (node_iter)->rGetLocation();
     }
 
     // Update node locations

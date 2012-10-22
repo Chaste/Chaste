@@ -95,14 +95,13 @@ public:
         TS_ASSERT_EQUALS(boundary_condition.GetIdentifier(), "PlaneBoundaryCondition-2");
 
         // Impose boundary condition
-        std::vector<c_vector<double,2> > old_locations;
-        old_locations.reserve(cell_population.GetNumNodes());
+        std::map<Node<2>*, c_vector<double,2> > old_locations;
         for (std::list<CellPtr>::iterator cell_iter = cell_population.rGetCells().begin();
              cell_iter != cell_population.rGetCells().end();
              ++cell_iter)
         {
             Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
-            old_locations.push_back(p_node->rGetLocation());
+            old_locations[p_node] = p_node->rGetLocation();
         }
 
         boundary_condition.ImposeBoundaryCondition(old_locations);
@@ -114,15 +113,15 @@ public:
         {
             Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
             c_vector<double, 2> location = p_node->rGetLocation();
-            if (old_locations[p_node->GetIndex()][0] < 2.0)
+            if (old_locations[p_node][0] < 2.0)
             {
                 TS_ASSERT_DELTA(2.0, location[0], 1e-6);
-                TS_ASSERT_DELTA(location[1], old_locations[p_node->GetIndex()][1], 1e-6);
+                TS_ASSERT_DELTA(location[1], old_locations[p_node][1], 1e-6);
             }
             else
             {
-                TS_ASSERT_DELTA(location[0], old_locations[p_node->GetIndex()][0], 1e-6);
-                TS_ASSERT_DELTA(location[1], old_locations[p_node->GetIndex()][1], 1e-6);
+                TS_ASSERT_DELTA(location[0], old_locations[p_node][0], 1e-6);
+                TS_ASSERT_DELTA(location[1], old_locations[p_node][1], 1e-6);
             }
         }
 
@@ -163,14 +162,13 @@ public:
         TS_ASSERT_EQUALS(boundary_condition.GetIdentifier(), "PlaneBoundaryCondition-2");
 
         // Impose boundary condition
-        std::vector<c_vector<double,2> > old_locations;
-        old_locations.reserve(cell_population.GetNumNodes());
+        std::map<Node<2>*, c_vector<double,2> > old_locations;
 
         for (MutableVertexMesh<2,2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
                 node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
                 ++node_iter)
         {
-            old_locations.push_back(node_iter->rGetLocation());
+            old_locations[&(*node_iter)] = node_iter->rGetLocation();
         }
 
         boundary_condition.ImposeBoundaryCondition(old_locations);
@@ -181,15 +179,15 @@ public:
                 ++node_iter)
         {
             c_vector<double, 2> location = node_iter->rGetLocation();
-            if (old_locations[node_iter->GetIndex()][0] < 1.0)
+            if (old_locations[&(*node_iter)][0] < 1.0)
             {
                 TS_ASSERT_DELTA(1.0, location[0], 1e-6);
-                TS_ASSERT_DELTA(location[1], old_locations[node_iter->GetIndex()][1], 1e-6);
+                TS_ASSERT_DELTA(location[1], old_locations[&(*node_iter)][1], 1e-6);
             }
             else
             {
-                TS_ASSERT_DELTA(location[0], old_locations[node_iter->GetIndex()][0], 1e-6);
-                TS_ASSERT_DELTA(location[1], old_locations[node_iter->GetIndex()][1], 1e-6);
+                TS_ASSERT_DELTA(location[0], old_locations[&(*node_iter)][0], 1e-6);
+                TS_ASSERT_DELTA(location[1], old_locations[&(*node_iter)][1], 1e-6);
             }
         }
 
@@ -224,7 +222,7 @@ public:
         //TS_ASSERT_THROWS_THIS(PlaneBoundaryCondition<2> plane_boundary_condition(&potts_cell_population, point, normal),
         //    "PlaneBoundaryCondition require a subclass of AbstractOffLatticeCellPopulation.");
         PlaneBoundaryCondition<2> boundary_condition(&potts_cell_population, point, normal);
-        std::vector<c_vector<double,2> > old_locations;
+        std::map<Node<2>*, c_vector<double,2> > old_locations;
         TS_ASSERT_THROWS_THIS(boundary_condition.ImposeBoundaryCondition(old_locations),
             "PlaneBoundaryCondition requires a subclass of AbstractOffLatticeCellPopulation.");
     }
@@ -292,14 +290,16 @@ public:
         TS_ASSERT_EQUALS(bc_3d.VerifyBoundaryCondition(), false);
 
         // Store the location of each node prior to imposing the boundary condition
-        std::vector<c_vector<double,3> > old_locations;
-        old_locations.reserve(population_3d.GetNumNodes());
+        std::map<Node<3>*, c_vector<double,3> > old_locations;
+
         for (std::list<CellPtr>::iterator cell_iter = population_3d.rGetCells().begin();
              cell_iter != population_3d.rGetCells().end();
              ++cell_iter)
         {
             c_vector<double,3> location = population_3d.GetLocationOfCellCentre(*cell_iter);
-            old_locations.push_back(location);
+            unsigned index = population_3d.GetLocationIndexUsingCell(*cell_iter);
+            Node<3>* p_node = p_mesh_3d->GetNode(index);
+            old_locations[p_node] = location;
         }
 
         bc_3d.ImposeBoundaryCondition(old_locations);

@@ -72,7 +72,7 @@ double SphereGeometryBoundaryCondition<DIM>::GetRadiusOfSphere() const
 }
 
 template<unsigned DIM>
-void SphereGeometryBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::vector<c_vector<double, DIM> >& rOldLocations)
+void SphereGeometryBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::map<Node<DIM>*, c_vector<double, DIM> >& rOldLocations)
 {
     // Iterate over the cell population
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();

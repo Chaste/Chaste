@@ -169,10 +169,10 @@ public:
         MeshBasedCellPopulation<1> crypt(mesh, cells);
 
         // Store the node locations
-        std::vector<c_vector<double, 1> > node_locations_before(mesh.GetNumNodes());
+        std::map<Node<1>*, c_vector<double, 1> > node_locations_before;
         for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
         {
-            node_locations_before[node_index] = crypt.GetNode(node_index)->rGetLocation();
+            node_locations_before[crypt.GetNode(node_index)] = crypt.GetNode(node_index)->rGetLocation();
         }
 
         // Now move the first cell (which should be on x=0, and a stem cell) to the left a bit
@@ -202,15 +202,15 @@ public:
         TS_ASSERT_DELTA(0.0, crypt.GetLocationOfCellCentre(*cell_iter)[0], 1e-3);
 
         // The nodes should all now be at their original locations
-        std::vector<c_vector<double, 1> > node_locations_after(mesh.GetNumNodes());
+        std::map<Node<1>*, c_vector<double, 1> > node_locations_after;
         for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
         {
-            node_locations_after[node_index] = crypt.GetNode(node_index)->rGetLocation();
+            node_locations_after[crypt.GetNode(node_index)] = crypt.GetNode(node_index)->rGetLocation();
         }
 
         for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
         {
-            TS_ASSERT_DELTA(node_locations_before[node_index](0), node_locations_after[node_index](0), 1e-3);
+            TS_ASSERT_DELTA(node_locations_before[crypt.GetNode(node_index)](0), node_locations_after[crypt.GetNode(node_index)](0), 1e-3);
         }
     }
 
@@ -228,10 +228,10 @@ public:
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
 
         // Store the node locations
-        std::vector<c_vector<double, 2> > node_locations_before(p_mesh->GetNumNodes());
+        std::map<Node<2>*, c_vector<double, 2> > node_locations_before;
         for (unsigned node_index=0; node_index<p_mesh->GetNumNodes(); node_index++)
         {
-            node_locations_before[node_index] = crypt.GetNode(node_index)->rGetLocation();
+            node_locations_before[crypt.GetNode(node_index)] = crypt.GetNode(node_index)->rGetLocation();
         }
 
         // Now move the first cell (which should be on y=0) down a bit
@@ -251,16 +251,16 @@ public:
         TS_ASSERT_DELTA(crypt.GetLocationOfCellCentre(*cell_iter)[1], 0.0, 1e-4);
 
         // The nodes should all now be at their original locations
-        std::vector<c_vector<double, 2> > node_locations_after(p_mesh->GetNumNodes());
+        std::map<Node<2>*, c_vector<double, 2> > node_locations_after;
         for (unsigned node_index=0; node_index<p_mesh->GetNumNodes(); node_index++)
         {
-            node_locations_after[node_index] = crypt.GetNode(node_index)->rGetLocation();
+            node_locations_after[crypt.GetNode(node_index)] = crypt.GetNode(node_index)->rGetLocation();
         }
 
         for (unsigned node_index=0; node_index<p_mesh->GetNumNodes(); node_index++)
         {
-            TS_ASSERT_DELTA(node_locations_before[node_index](0), node_locations_after[node_index](0), 1e-3);
-            TS_ASSERT_DELTA(node_locations_before[node_index](1), node_locations_after[node_index](1), 1e-3);
+            TS_ASSERT_DELTA(node_locations_before[crypt.GetNode(node_index)](0), node_locations_after[crypt.GetNode(node_index)](0), 1e-3);
+            TS_ASSERT_DELTA(node_locations_before[crypt.GetNode(node_index)](1), node_locations_after[crypt.GetNode(node_index)](1), 1e-3);
         }
     }
 
@@ -279,10 +279,10 @@ public:
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
 
         // Store the node locations
-        std::vector<c_vector<double, 2> > node_locations_before(p_mesh->GetNumNodes());
+        std::map<Node<2>*, c_vector<double, 2> > node_locations_before;
         for (unsigned node_index=0; node_index<p_mesh->GetNumNodes(); node_index++)
         {
-            node_locations_before[node_index] = crypt.GetNode(node_index)->rGetLocation();
+            node_locations_before[crypt.GetNode(node_index)] = crypt.GetNode(node_index)->rGetLocation();
         }
 
         // Move the first cell (which should be on y=0, and is a stem cell) down a bit
@@ -337,10 +337,10 @@ public:
         TS_ASSERT_EQUALS(p_wnt->IsWntSetUp(), true);
 
         // Store the node locations
-        std::vector<c_vector<double, 1> > node_locations_before(mesh.GetNumNodes());
+        std::map<Node<1>*, c_vector<double, 1> > node_locations_before;
         for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
         {
-            node_locations_before[node_index] = crypt.GetNode(node_index)->rGetLocation();
+            node_locations_before[crypt.GetNode(node_index)] = crypt.GetNode(node_index)->rGetLocation();
         }
 
         // Now move the first cell (which should be on x=0) to the left a bit
@@ -378,10 +378,10 @@ public:
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
 
         // Store the node locations
-        std::vector<c_vector<double, 2> > node_locations_before(p_mesh->GetNumNodes());
+        std::map<Node<2>*, c_vector<double, 2> > node_locations_before;
         for (unsigned node_index=0; node_index<p_mesh->GetNumNodes(); node_index++)
         {
-            node_locations_before[node_index] = crypt.GetNode(node_index)->rGetLocation();
+            node_locations_before[crypt.GetNode(node_index)] = crypt.GetNode(node_index)->rGetLocation();
         }
 
         // Move the first cell (which should be on y=0) down a bit
@@ -435,10 +435,10 @@ public:
         TS_ASSERT_EQUALS(p_wnt->IsWntSetUp(), true);
 
         // Store the node locations
-        std::vector<c_vector<double, 1> > node_locations_before(mesh.GetNumNodes());
+        std::map<Node<1>*, c_vector<double, 1> > node_locations_before;
         for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
         {
-            node_locations_before[node_index] = crypt.GetNode(node_index)->rGetLocation();
+            node_locations_before[crypt.GetNode(node_index)] = crypt.GetNode(node_index)->rGetLocation();
         }
 
         // Now move the first cell (which should be on x=0) to the left
@@ -471,10 +471,10 @@ public:
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
 
         // Store the node locations
-        std::vector<c_vector<double, 2> > node_locations_before(p_mesh->GetNumNodes());
+        std::map<Node<2>*, c_vector<double, 2> > node_locations_before;
         for (unsigned node_index=0; node_index<p_mesh->GetNumNodes(); node_index++)
         {
-            node_locations_before[node_index] = crypt.GetNode(node_index)->rGetLocation();
+            node_locations_before[crypt.GetNode(node_index)] = crypt.GetNode(node_index)->rGetLocation();
         }
 
         // Now move the first cell (which should be on y=0) down a bit

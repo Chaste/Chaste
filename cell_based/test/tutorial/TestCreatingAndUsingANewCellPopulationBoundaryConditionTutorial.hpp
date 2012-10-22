@@ -135,7 +135,7 @@ public:
      * based population. If we were using a vertex-based population then each node
      * would correspond not to a cell centre but to a vertex.
      */
-    void ImposeBoundaryCondition(const std::vector< c_vector<double, 2> >& rOldLocations)
+    void ImposeBoundaryCondition(const std::map<Node<2>*, c_vector<double, 2> >& rOldLocations)
     {
         for (AbstractCellPopulation<2>::Iterator cell_iter = this->mpCellPopulation->Begin();
              cell_iter != this->mpCellPopulation->End();
@@ -277,11 +277,12 @@ public:
         bool population_satisfies_bc = bc.VerifyBoundaryCondition();
         TS_ASSERT_EQUALS(population_satisfies_bc, false);
 
-        std::vector<c_vector<double, 2> > old_node_locations;
-        old_node_locations.reserve(p_mesh->GetNumNodes());
-        for (unsigned node_index=0; node_index<p_mesh->GetNumNodes(); node_index++)
+        std::map<Node<2>*, c_vector<double, 2> > old_node_locations;
+        for (AbstractMesh<2,2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
+                node_iter != p_mesh->GetNodeIteratorEnd();
+                ++node_iter)
         {
-            old_node_locations[node_index] = cell_population.GetNode(node_index)->rGetLocation();
+            old_node_locations[&(*node_iter)] = node_iter->rGetLocation();
         }
 
         /* To test that we have implemented the cell population boundary condition correctly,

@@ -107,7 +107,7 @@ public:
      *
      * @param rOldLocations the node locations before any boundary conditions are applied
      */
-    void ImposeBoundaryCondition(const std::vector< c_vector<double, DIM> >& rOldLocations);
+    void ImposeBoundaryCondition(const std::map<Node<DIM>*, c_vector<double, DIM> >& rOldLocations);
 
     /**
      * Overridden VerifyBoundaryCondition() method.
