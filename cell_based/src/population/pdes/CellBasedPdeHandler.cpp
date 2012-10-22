@@ -178,14 +178,11 @@ void CellBasedPdeHandler<DIM>::OpenResultsFiles(std::string outputDirectory)
 	{
 		assert(DIM ==2);
 		ChasteCuboid<DIM> cuboid = mpCellPopulation->rGetMesh().CalculateBoundingBox();
-#ifndef NDEBUG
-		unsigned num_sites_up = cuboid.GetWidth(0);
-		unsigned num_sites_across = cuboid.GetWidth(1);
-		// Currently only works with square meshes
-		assert(num_sites_up == num_sites_across);
-#endif
 
-		UseCoarsePdeMesh(1, cuboid, true);
+		// Currently only works with square meshes
+		assert(cuboid.GetWidth(0) == cuboid.GetWidth(1));
+
+		UseCoarsePdeMesh(1, cuboid, false);
 	}
 
 
