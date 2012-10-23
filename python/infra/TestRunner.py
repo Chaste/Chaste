@@ -86,7 +86,7 @@ def KillTest(pid=None, exe=None):
                 if proc.ppid == pid:
                     KillTest(proc.pid)
             print "Killing", pid
-            os.kill(pid, signal.SIGTERM)
+            os.kill(pid, signal.SIGKILL)
         except (psutil.NoSuchProcess, OSError):
             pass
     # Kill by name - figure out pid and call ourselves with that
