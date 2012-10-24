@@ -32,8 +32,8 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-#ifndef DYNAMICRESTITUTIONSTIMULUS_HPP_
-#define DYNAMICRESTITUTIONSTIMULUS_HPP_
+#ifndef STEADYSTATERESTITUTIONSTIMULUS_HPP_
+#define STEADYSTATERESTITUTIONSTIMULUS_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -50,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * MultiStimulus.
  *
  */
-class DynamicRestitutionStimulus : public MultiStimulus
+class SteadyStateRestitutionStimulus : public MultiStimulus
 {
 private:
     /** Needed for serialization. */
@@ -71,7 +71,7 @@ private:
     /**
      * Private constructor - for archiving's eyes only.
      */
-    DynamicRestitutionStimulus(){};
+    SteadyStateRestitutionStimulus(){};
 
 public:
 
@@ -84,12 +84,12 @@ public:
      * @param pacingCycleLengths A vector containing the pacing cycle lengths (in ms) of each phase of the protocol
      * @param numberOfPulses  The number of pulses to perform at each pacing cycle length
      */
-    DynamicRestitutionStimulus(double magnitude, double stimulusDuration, double startTime, std::vector<double> pacingCycleLengths, unsigned numberOfPulses);
+    SteadyStateRestitutionStimulus(double magnitude, double stimulusDuration, double startTime, std::vector<double> pacingCycleLengths, unsigned numberOfPulses);
 
 };
 
 #include "SerializationExportWrapper.hpp"
 // Declare identifier for the serializer
-CHASTE_CLASS_EXPORT(DynamicRestitutionStimulus);
+CHASTE_CLASS_EXPORT(SteadyStateRestitutionStimulus);
 
-#endif /*DYNAMICRESTITUTIONSTIMULUS_HPP_*/
+#endif /*STEADYSTATERESTITUTIONSTIMULUS_HPP_*/

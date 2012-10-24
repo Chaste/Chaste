@@ -49,13 +49,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Exception.hpp"
 #include "S1S2Stimulus.hpp"
-#include "DynamicRestitutionStimulus.hpp"
+#include "SteadyStateRestitutionStimulus.hpp"
 #include "OutputFileHandler.hpp"
 
 class TestRestitutionStimuli : public CxxTest::TestSuite
 {
 private:
-    void DoesDynamicStimulusPerformCorrectly(DynamicRestitutionStimulus* pStimulus, double magnitude, double duration_of_stimulus,
+    void DoesSteadyStateStimulusPerformCorrectly(SteadyStateRestitutionStimulus* pStimulus, double magnitude, double duration_of_stimulus,
                                                 double startTime, std::vector<double> pacing_cycle_lengths, unsigned number_of_pulses)
     {
         double time = startTime;
@@ -134,7 +134,7 @@ public:
         TS_ASSERT_EQUALS(stimulus.GetNumS2FrequencyValues(),s2_periods.size());
     }
 
-    void TestDynamicRestitutionCellStimulusSetup(void) throw (Exception)
+    void TestSteadyStateRestitutionCellStimulusSetup(void) throw (Exception)
     {
         double magnitude = 50;
         double duration_of_stimulus = 5;
@@ -148,10 +148,10 @@ public:
 
         unsigned number_of_pulses = 10;
 
-        DynamicRestitutionStimulus stimulus(magnitude, duration_of_stimulus, startTime, pacing_cycle_lengths, number_of_pulses);
+        SteadyStateRestitutionStimulus stimulus(magnitude, duration_of_stimulus, startTime, pacing_cycle_lengths, number_of_pulses);
 
-        DoesDynamicStimulusPerformCorrectly(&stimulus, magnitude, duration_of_stimulus,
-                                            startTime, pacing_cycle_lengths, number_of_pulses);
+        DoesSteadyStateStimulusPerformCorrectly(&stimulus, magnitude, duration_of_stimulus,
+                                                startTime, pacing_cycle_lengths, number_of_pulses);
 
     }
 
@@ -202,7 +202,7 @@ public:
         }
     }
 
-    void TestArchivingDynamicStimulus(void) throw(Exception)
+    void TestArchivingSteadyStateStimulus(void) throw(Exception)
     {
         OutputFileHandler handler("archive",false);
         std::string archive_filename;
@@ -226,7 +226,7 @@ public:
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
-            AbstractStimulusFunction* const p_stimulus = new DynamicRestitutionStimulus(magnitude, duration_of_stimulus, startTime, pacing_cycle_lengths, number_of_pulses);
+            AbstractStimulusFunction* const p_stimulus = new SteadyStateRestitutionStimulus(magnitude, duration_of_stimulus, startTime, pacing_cycle_lengths, number_of_pulses);
 
             // Should always archive a pointer
             output_arch << p_stimulus;
@@ -243,9 +243,9 @@ public:
             AbstractStimulusFunction* p_loaded_stim;
             input_arch >> p_loaded_stim;
 
-            DoesDynamicStimulusPerformCorrectly(static_cast<DynamicRestitutionStimulus*>(p_loaded_stim),
-                                                magnitude, duration_of_stimulus, startTime,
-                                                pacing_cycle_lengths, number_of_pulses);
+            DoesSteadyStateStimulusPerformCorrectly(static_cast<SteadyStateRestitutionStimulus*>(p_loaded_stim),
+                                                    magnitude, duration_of_stimulus, startTime,
+                                                    pacing_cycle_lengths, number_of_pulses);
 
             delete p_loaded_stim;
         }

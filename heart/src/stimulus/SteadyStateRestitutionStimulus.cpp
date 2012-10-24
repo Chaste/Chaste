@@ -33,9 +33,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "DynamicRestitutionStimulus.hpp"
+#include "SteadyStateRestitutionStimulus.hpp"
 
-DynamicRestitutionStimulus::DynamicRestitutionStimulus(double magnitude, double stimulusDuration, double startTime, std::vector<double> pacingCycleLengths, unsigned numberOfPulses)
+SteadyStateRestitutionStimulus::SteadyStateRestitutionStimulus(double magnitude, double stimulusDuration, double startTime, std::vector<double> pacingCycleLengths, unsigned numberOfPulses)
     : MultiStimulus()
 {
     for (unsigned stim=0; stim < pacingCycleLengths.size() ; stim++)
@@ -49,6 +49,6 @@ DynamicRestitutionStimulus::DynamicRestitutionStimulus(double magnitude, double 
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-CHASTE_CLASS_EXPORT(DynamicRestitutionStimulus)
+CHASTE_CLASS_EXPORT(SteadyStateRestitutionStimulus)
 
 
