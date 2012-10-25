@@ -757,6 +757,161 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh()
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::vector<c_vector<Node<SPACE_DIM>*, 3> > MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitLongEdges(double cutoffLength)
+{
+    assert(ELEMENT_DIM == 2);
+    assert(SPACE_DIM == 3);
+
+	std::vector<c_vector<Node<SPACE_DIM>*, 3> > history;
+
+
+	bool long_edge_exists = true;
+
+    while(long_edge_exists)
+    {
+    	bool loop_over_elements_and_nodes = true;
+
+        // Loop over elements to check for Long edges
+		for (typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ElementIterator elem_iter = this->GetElementIteratorBegin();
+			 elem_iter != this->GetElementIteratorEnd() && loop_over_elements_and_nodes;
+			 ++elem_iter)
+		{
+
+			unsigned element_index = elem_iter->GetIndex();
+			unsigned num_nodes = ELEMENT_DIM+1;
+
+			// Loop over element vertices
+			for (unsigned local_index=0; local_index<num_nodes && loop_over_elements_and_nodes; local_index++)
+			{
+
+				// Find locations of current node (node a) and anticlockwise node (node b)
+			    Node<SPACE_DIM>* p_node_a = elem_iter->GetNode(local_index);
+				unsigned local_index_plus_one = (local_index+1)%num_nodes; /// \todo use iterators to tidy this up
+				Node<SPACE_DIM>* p_node_b = elem_iter->GetNode(local_index_plus_one);
+
+				// Find distance between nodes
+				double distance_between_nodes = this->GetDistanceBetweenNodes(p_node_a->GetIndex(), p_node_b->GetIndex());
+
+				if (distance_between_nodes > cutoffLength)
+				{
+				    std::set<unsigned> elements_of_node_a = p_node_a->rGetContainingElementIndices();
+					std::set<unsigned> elements_of_node_b = p_node_b->rGetContainingElementIndices();
+
+					std::set<unsigned> intersection_elements;
+					std::set_intersection(elements_of_node_a.begin(), elements_of_node_a.end(),
+										  elements_of_node_b.begin(), elements_of_node_b.end(),
+										  std::inserter(intersection_elements, intersection_elements.begin()));
+
+					// Create the new node
+					c_vector<double, SPACE_DIM> new_node_location = p_node_a->rGetLocation() + 0.5*this->GetVectorFromAtoB(p_node_a->rGetLocation(), p_node_b->rGetLocation());
+
+					bool is_boundary_node =  intersection_elements.size() == 1; // If only in one element then its on the boundary
+
+					Node<SPACE_DIM>* p_new_node = new Node<SPACE_DIM>(0u,new_node_location,is_boundary_node); // Index is rewritten once added to mesh
+
+					unsigned new_node_index = this->AddNode(p_new_node);
+
+					switch(intersection_elements.size())
+					{
+						case 2:
+						{
+							// TODO Refactor out this add element method, Also in the Refine element Method above.
+							assert(intersection_elements.count(element_index));
+							intersection_elements.erase (intersection_elements.find(element_index));
+
+							unsigned other_elem_index = *intersection_elements.begin();
+
+							Element<ELEMENT_DIM,SPACE_DIM>* p_other_element = this->GetElement(other_elem_index);
+
+							// First, make a copy of the current element making sure we update its index
+							unsigned new_elt_index;
+							if (mDeletedElementIndices.empty())
+							{
+								new_elt_index = this->mElements.size();
+							}
+							else
+							{
+								new_elt_index = mDeletedElementIndices.back();
+								mDeletedElementIndices.pop_back();
+							}
+
+							Element<ELEMENT_DIM,SPACE_DIM>* p_new_element=
+								new Element<ELEMENT_DIM,SPACE_DIM>(*p_other_element, new_elt_index);
+
+							// Second, update node a in the element with the new one
+							p_new_element->ReplaceNode(p_node_a, this->mNodes[new_node_index]);
+
+							// Third, add the new element to the set
+							if ((unsigned) new_elt_index == this->mElements.size())
+							{
+								this->mElements.push_back(p_new_element);
+							}
+							else
+							{
+								delete this->mElements[new_elt_index];
+								this->mElements[new_elt_index] = p_new_element;
+							}
+
+							// Lastly, update node b in the original element with the new one
+							p_other_element->ReplaceNode(p_node_b, this->mNodes[new_node_index]);
+						}
+						case 1:
+						{
+							Element<ELEMENT_DIM,SPACE_DIM>* p_element = this->GetElement(element_index);
+
+							// First, make a copy of the current element making sure we update its index
+							unsigned new_elt_index;
+							if (mDeletedElementIndices.empty())
+							{
+								new_elt_index = this->mElements.size();
+							}
+							else
+							{
+								new_elt_index = mDeletedElementIndices.back();
+								mDeletedElementIndices.pop_back();
+							}
+
+							Element<ELEMENT_DIM,SPACE_DIM>* p_new_element=
+								new Element<ELEMENT_DIM,SPACE_DIM>(*p_element, new_elt_index);
+
+							// Second, update node a in the element with the new one
+							p_new_element->ReplaceNode(p_node_a, this->mNodes[new_node_index]);
+
+							// Third, add the new element to the set
+							if ((unsigned) new_elt_index == this->mElements.size())
+							{
+								this->mElements.push_back(p_new_element);
+							}
+							else
+							{
+								delete this->mElements[new_elt_index];
+								this->mElements[new_elt_index] = p_new_element;
+							}
+
+							// Lastly, update node b in the original element with the new one
+							p_element->ReplaceNode(p_node_b, this->mNodes[new_node_index]);
+
+							// Reset the element and node loops to avoid messing with the itterator
+							loop_over_elements_and_nodes = false;
+
+							break;
+						}
+						default:
+							NEVER_REACHED;
+					}
+				}
+			}
+		}
+		if (loop_over_elements_and_nodes)
+		{
+			long_edge_exists = false;
+		}
+    }
+
+	return history;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool MutableMesh<ELEMENT_DIM, SPACE_DIM>::CheckIsVoronoi(Element<ELEMENT_DIM, SPACE_DIM>* pElement, double maxPenetration)
 {
     assert(ELEMENT_DIM == SPACE_DIM);

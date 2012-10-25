@@ -261,6 +261,13 @@ public:
     void ReMesh();
 #undef COVERAGE_IGNORE
 
+    /**
+     * Find edges in the mesh longer than the given cutoff length and split them creating new elements as required.
+     * @param cutoffLength cutoff length for edge splitting
+     * @return returns a vector of triples with pointers to the new node followed by pointers to the nodes defining the bisected edge.
+     */
+    std::vector<c_vector<Node<SPACE_DIM>*, 3> > SplitLongEdges(double cutoffLength);
+
 #define COVERAGE_IGNORE
     /**
      * Checks the entire mesh element by element and checks whether any neighbouring node
