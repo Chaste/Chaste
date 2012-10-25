@@ -215,13 +215,29 @@ public:
     /**
      * Recursively remove this file or folder.
      * Since this is a potentially very dangerous operation, only locations under the Chaste
-     * test output folder may be removed.  In addition, unless the optional parameter is true,
-     * only folders created by an OutputFileHandler, or the contents of such a folder, may be
-     * deleted.
+     * test output folder may be removed.
      *
-     * @param force  whether to allow deletion of content not created by an OutputFileHandler
+     * Only folders created by an OutputFileHandler, or the contents of such a folder, may be
+     * deleted (folders that have .chaste_deletable_folder present).
+     *
+     * If you need to delete a file or folder without .chaste_deletable_folder, then you have to use
+     * DangerousRemove().
+     *
      */
-    void Remove(bool force=false) const;
+    void Remove() const;
+
+    /**
+     * This method will allow you to remove any file from under either
+     *  * CHASTE_TEST_OUTPUT
+     *  or
+     *  * the source tree
+     * (but not elsewhere).
+     *
+     * For this reason it is a very dangerous operation and should not be used if Remove could be instead.
+     *
+     * BEWARE: if you have managed to set CHASTE_TEST_OUTPUT to "/" this could wipe your system!
+     */
+    void DangerousRemove() const;
 
     /**
      * Find files in this folder matching a simple glob pattern.
@@ -282,6 +298,16 @@ private:
 
     /** The fake value of the faked path. */
     static std::string msFakePath;
+
+    /**
+     * This is code common to Remove() and DangerousRemove(). Should remain private and not to be called from elsewhere.
+     * Remove() is only allowed to delete things with a .chaste_deletable_folder in the testoutput directory.
+     *
+     * DangerousRemove() is allowed to delete anything in the source or testoutput directories.
+     *
+     * @param dangerous  whether we are doing a dangerous remove.
+     */
+    void PrivateRemove(bool dangerous=false) const;
 };
 
 #endif /*FILEFINDER_HPP_*/

@@ -714,12 +714,12 @@ TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshUsi
     unsigned num_vertex_nodes = mpMutableVertexMesh->GetNumNodes();
     unsigned num_vertex_elements = mpMutableVertexMesh->GetNumElements();
 
-    // Get a unique mesh filename
+    std::string mesh_file_name = "mesh";
+
+    // Get a unique temporary foldername
     std::stringstream pid;
     pid << getpid();
-    std::string mesh_file_name = "2D_temporary_tetrahedral_mesh_" + pid.str();
-
-    OutputFileHandler output_file_handler("");
+    OutputFileHandler output_file_handler("2D_temporary_tetrahedral_mesh_" + pid.str());
     std::string output_dir = output_file_handler.GetOutputDirectoryFullPath();
 
     // Compute the number of nodes in the TetrahedralMesh
@@ -832,12 +832,7 @@ TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshUsi
     p_mesh->ConstructFromMeshReader(mesh_reader);
 
     // Delete the temporary files
-    FileFinder output_dir_finder(output_dir);
-    std::vector<FileFinder> mesh_files = output_dir_finder.FindMatches(mesh_file_name + ".*");
-    BOOST_FOREACH(const FileFinder& r_temp_file, mesh_files)
-    {
-        r_temp_file.Remove(true);
-    }
+    output_file_handler.FindFile("").Remove();
 
     // The original files have been deleted, it is better if the mesh object forgets about them
     p_mesh->SetMeshHasChangedSinceLoading();

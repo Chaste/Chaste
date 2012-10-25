@@ -149,7 +149,7 @@ public:
             // Erase it
             if (PetscTools::AmMaster())
             {
-                FileFinder(test_folder).Remove(true);
+                FileFinder(test_folder).DangerousRemove();
             }
         }
 
@@ -196,7 +196,9 @@ public:
         // Tidy up
         if (PetscTools::AmMaster())
         {
-            cannot_delete.Remove(true);
+            TS_ASSERT(cannot_delete.Exists());
+            cannot_delete.DangerousRemove();
+            TS_ASSERT(!cannot_delete.Exists());
         }
 
         // Now create a folder the proper way

@@ -293,10 +293,15 @@ public:
         TS_ASSERT_THROWS_CONTAINS(file.Remove(),
                                   "because the signature file '.chaste_deletable_folder' is not present.");
         TS_ASSERT(file.IsFile());
-        file.Remove(true);
+        file.DangerousRemove();
         TS_ASSERT(!file.Exists());
-        dir.Remove(true);
+        dir.DangerousRemove();
         TS_ASSERT(!dir.Exists());
+
+        FileFinder obscure_file("/TodayIsThe25thOfOctober2012AndWeLikedRafsCake.obscure", RelativeTo::Absolute);
+        TS_ASSERT_THROWS_CONTAINS(obscure_file.Remove(),
+                "as it is not located within the Chaste test output folder");
+        TS_ASSERT_THROWS_CONTAINS(obscure_file.DangerousRemove(), "or the Chaste source folder");
     }
 
     void TestFindMatches() throw (Exception)

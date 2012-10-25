@@ -52,6 +52,22 @@ std::string FileFinder::msFakePath = "";
 
 #define UNSET_PATH "UNSET!"
 
+/*
+ * This macro converts boost filesystem exceptions into Chaste Exceptions.
+ *
+ * It should be put round any calls in this class' public methods to
+ * either:
+ *  * boost filesystem
+ *  * or private methods of this class
+ *
+ * that are likely to throw.
+ */
+#define CONVERT_ERROR(code)                   \
+    try {                                     \
+        code;                                 \
+    } catch (const fs::filesystem_error& e) { \
+        EXCEPTION(e.what());                  \
+    }
 
 FileFinder::FileFinder()
     : mAbsPath(UNSET_PATH)
@@ -274,6 +290,7 @@ void RecursiveCopy(const fs::path& rFromPath, const fs::path& rToPath)
     }
 }
 
+
 FileFinder FileFinder::CopyTo(const FileFinder& rDest) const
 {
     if (!Exists())
@@ -290,14 +307,14 @@ FileFinder FileFinder::CopyTo(const FileFinder& rDest) const
     {
         if (IsFile())
         {
-            fs::remove(to_path);
+            CONVERT_ERROR(fs::remove(to_path));
         }
         else
         {
             EXCEPTION("Cannot copy '" << mAbsPath << "' to '" << to_path << "' as it would overwrite an existing file.");
         }
     }
-    RecursiveCopy(from_path, to_path);
+    CONVERT_ERROR(RecursiveCopy(from_path, to_path));
     return FileFinder(to_path);
 }
 
@@ -321,16 +338,35 @@ void RemoveAll(const fs::path& rPath)
     fs::remove(rPath);
 }
 
-void FileFinder::Remove(bool force) const
+
+
+void FileFinder::PrivateRemove(bool dangerous) const
 {
     // Test for bad paths
     const std::string test_output(OutputFileHandler::GetChasteTestOutputDirectory());
-    if (GetAbsolutePath().substr(0, test_output.length()) != test_output)
+    bool in_testoutput = (GetAbsolutePath().substr(0, test_output.length()) == test_output);
+
+    if (!in_testoutput)
     {
-        EXCEPTION("Cannot remove location '" << mAbsPath
-                  << "' as it is not located within the Chaste test output folder ("
-                  << test_output << ").");
+        if (dangerous)
+        {
+            const std::string source_folder(FileFinder("",RelativeTo::ChasteSourceRoot).GetAbsolutePath());
+            bool in_source = (GetAbsolutePath().substr(0, source_folder.length()) == source_folder);
+            if (!in_source)
+            {
+                EXCEPTION("Cannot remove location '" << mAbsPath
+                          << "' as it is not located within the Chaste test output folder ("
+                          << test_output << ") or the Chaste source folder (" << source_folder <<").");
+            }
+        }
+        else
+        {
+            EXCEPTION("Cannot remove location '" << mAbsPath
+                      << "' as it is not located within the Chaste test output folder ("
+                      << test_output << ").");
+        }
     }
+
     if (mAbsPath.find("..") != std::string::npos)
     {
         EXCEPTION("Cannot remove location '" << mAbsPath
@@ -338,7 +374,7 @@ void FileFinder::Remove(bool force) const
     }
     if (Exists())
     {
-        if (!force)
+        if (!dangerous)
         {
             fs::path sig_file(mAbsPath);
             if (IsFile())
@@ -354,8 +390,18 @@ void FileFinder::Remove(bool force) const
             }
         }
         // Do the removal
-        RemoveAll(mAbsPath);
+        CONVERT_ERROR(RemoveAll(mAbsPath));
     }
+}
+
+void FileFinder::Remove() const
+{
+    PrivateRemove();
+}
+
+void FileFinder::DangerousRemove() const
+{
+    PrivateRemove(true);
 }
 
 

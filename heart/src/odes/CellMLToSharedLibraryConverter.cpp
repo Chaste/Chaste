@@ -42,11 +42,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstring> // For strerror()
 #include <cerrno> // For errno
 
+#include <boost/foreach.hpp>
+
 #include "Exception.hpp"
 #include "ChasteBuildRoot.hpp"
 #include "PetscTools.hpp"
 #include "DynamicModelLoaderRegistry.hpp"
 #include "GetCurrentWorkingDirectory.hpp"
+
+#define IGNORE_EXCEPTIONS(code) \
+    try {                       \
+        code;                   \
+    } catch (...) {}
 
 CellMLToSharedLibraryConverter::CellMLToSharedLibraryConverter(bool preserveGeneratedSources,
                                                                std::string component)
@@ -88,7 +95,7 @@ DynamicCellModelLoaderPtr CellMLToSharedLibraryConverter::Convert(const FileFind
             {
                 EXCEPTION("Unable to convert .cellml to .so unless called collectively, due to possible race conditions.");
             }
-            ConvertCellmlToSo(absolute_path, folder, leaf);
+            ConvertCellmlToSo(absolute_path, folder);
         }
         // Load the .so
         p_loader = DynamicModelLoaderRegistry::Instance()->GetLoader(so_file);
@@ -107,13 +114,15 @@ DynamicCellModelLoaderPtr CellMLToSharedLibraryConverter::Convert(const FileFind
 }
 
 void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellmlFullPath,
-                                                       const std::string& rCellmlFolder,
-                                                       const std::string& rModelLeafName)
+                                                       const std::string& rCellmlFolder)
 {
-    std::string tmp_folder, build_folder;
+    FileFinder tmp_folder;
+    FileFinder build_folder;
+
     std::string old_cwd = GetCurrentWorkingDirectory();
     // Check that the Chaste source tree exists
     FileFinder chaste_root("", RelativeTo::ChasteSourceRoot);
+
     if (!chaste_root.IsDir())
     {
         EXCEPTION("No Chaste source tree found at '" << chaste_root.GetAbsolutePath()
@@ -134,57 +143,69 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
             // Create a temporary folder within heart/dynamic
             std::stringstream folder_name;
             folder_name << "dynamic/tmp_" << getpid() << "_" << time(NULL);
-            tmp_folder = component_dir.GetAbsolutePath() + "/" + folder_name.str();
-            build_folder = component_dir.GetAbsolutePath() + "/build/" + ChasteBuildDirName() + "/" + folder_name.str();
-            int ret = mkdir(tmp_folder.c_str(), 0700);
+
+            tmp_folder.SetPath(component_dir.GetAbsolutePath() + "/" + folder_name.str(), RelativeTo::Absolute);
+            build_folder.SetPath(component_dir.GetAbsolutePath() + "/build/" + ChasteBuildDirName() + "/" + folder_name.str(), RelativeTo::Absolute);
+            int ret = mkdir((tmp_folder.GetAbsolutePath()).c_str(), 0700);
             if (ret != 0)
             {
-                EXCEPTION("Failed to create temporary folder '" << tmp_folder << "' for CellML conversion: "
+                EXCEPTION("Failed to create temporary folder '" << tmp_folder.GetAbsolutePath() << "' for CellML conversion: "
                           << strerror(errno));
             }
+
             // Copy the .cellml file (and any relevant others) into the temporary folder
-            size_t dot_pos = rCellmlFullPath.rfind('.');
-            std::string cellml_base = rCellmlFullPath.substr(0, dot_pos);
-            EXPECT0(system, "cp " + cellml_base + "* " + tmp_folder);
-            // If there's a config file, copy that too
-            std::string config_path = rCellmlFullPath.substr(0, rCellmlFullPath.length() - 7) + "-conf.xml";
-            if (FileFinder(config_path, RelativeTo::Absolute).Exists())
+            FileFinder cellml_file(rCellmlFullPath, RelativeTo::Absolute);
+            FileFinder cellml_folder = cellml_file.GetParent();
+            std::string cellml_leaf_name = cellml_file.GetLeafNameNoExtension();
+            std::vector<FileFinder> cellml_files = cellml_folder.FindMatches(cellml_leaf_name + "*");
+
+            BOOST_FOREACH(const FileFinder& r_cellml_file, cellml_files)
             {
-                EXPECT0(system, "cp " + config_path + " " + tmp_folder);
+                r_cellml_file.CopyTo(tmp_folder);
             }
+
             // Change to Chaste source folder
             EXPECT0(chdir, ChasteBuildRootDir());
             // Run scons to generate C++ code and compile it to a .so
-            EXPECT0(system, "scons --warn=no-all dyn_libs_only=1 build=" + ChasteBuildType() + " " + tmp_folder);
-            EXCEPT_IF_NOT(FileFinder(tmp_folder + "/lib" + rModelLeafName + "so", RelativeTo::Absolute).Exists());
+            EXPECT0(system, "scons --warn=no-all dyn_libs_only=1 build=" + ChasteBuildType() + " " + tmp_folder.GetAbsolutePath());
+
+            FileFinder so_file(tmp_folder.GetAbsolutePath() + "/lib" + cellml_leaf_name + ".so", RelativeTo::Absolute);
+            EXCEPT_IF_NOT(so_file.Exists());
             // CD back
             EXPECT0(chdir, old_cwd);
+
             // Copy the .so to the same folder as the original .cellml file
-            EXPECT0(system, "cp " + tmp_folder + "/lib" + rModelLeafName + "so " + rCellmlFolder);
+            FileFinder destination_folder(rCellmlFolder, RelativeTo::Absolute);
+            so_file.CopyTo(destination_folder);
+
             if (mPreserveGeneratedSources)
             {
                 // Copy generated source code as well
-                EXPECT0(system, "cp " + build_folder + "/*.?pp " + rCellmlFolder);
+                std::vector<FileFinder> generated_files = build_folder.FindMatches("*.?pp");
+                BOOST_FOREACH(const FileFinder& r_generated_file, generated_files)
+                {
+                    r_generated_file.CopyTo(destination_folder);
+                }
             }
             // Delete the temporary folders
-            EXPECT0(system, "rm -r " + build_folder);
-            EXPECT0(system, "rm -r " + tmp_folder);
+            build_folder.DangerousRemove();
+            tmp_folder.DangerousRemove();
         }
     }
     catch (Exception& e)
     {
         PetscTools::ReplicateException(true);
-        if (FileFinder(tmp_folder, RelativeTo::Absolute).Exists())
+        if (tmp_folder.IsPathSet() && tmp_folder.Exists())
         {
             if (mPreserveGeneratedSources)
             {
                 // Copy any temporary files
-                IGNORE_RET(system, "cp -r " + build_folder + " " + rCellmlFolder + "/build/");
-                IGNORE_RET(system, "cp -r " + tmp_folder + " " + rCellmlFolder + "/tmp/");
+                IGNORE_EXCEPTIONS(build_folder.CopyTo(FileFinder(rCellmlFolder + "/build/", RelativeTo::Absolute)));
+                IGNORE_EXCEPTIONS(tmp_folder.CopyTo(FileFinder(rCellmlFolder + "/tmp/", RelativeTo::Absolute)));
             }
             // Delete the temporary folders
-            IGNORE_RET(system, "rm -rf " + build_folder); // -f because folder might not exist
-            IGNORE_RET(system, "rm -r " + tmp_folder);
+            IGNORE_EXCEPTIONS(build_folder.DangerousRemove()); // rm -r under source
+            IGNORE_EXCEPTIONS(tmp_folder.DangerousRemove()); // rm -r under source
         }
         IGNORE_RET(chdir, old_cwd);
         EXCEPTION("Conversion of CellML to Chaste shared object failed. Error was: " + e.GetMessage());

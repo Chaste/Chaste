@@ -45,6 +45,7 @@ CylindricalHoneycombMeshGenerator::CylindricalHoneycombMeshGenerator(unsigned nu
     mDomainWidth = numNodesAlongWidth*scaleFactor;
     mNumCellWidth = numNodesAlongWidth; //*1 because cells are considered to be size one
     mNumCellLength = numNodesAlongLength;
+    mMeshFilename = "mesh";
 
     // The code below won't work in parallel
     assert(PetscTools::IsSequential());
@@ -55,12 +56,11 @@ CylindricalHoneycombMeshGenerator::CylindricalHoneycombMeshGenerator(unsigned nu
     // Get a unique mesh filename
     std::stringstream pid;
     pid << getpid();
-    mMeshFilename = "2D_temporary_honeycomb_mesh_" + pid.str();
+
 
     mGhostNodeIndices.empty();
 
-    OutputFileHandler output_file_handler("");
-    std::string output_dir = output_file_handler.GetOutputDirectoryFullPath();
+    OutputFileHandler output_file_handler("2D_temporary_honeycomb_mesh_"+ pid.str());
 
     unsigned num_nodes_along_width = mNumCellWidth;
     unsigned num_nodes_along_length = mNumCellLength;
@@ -201,9 +201,8 @@ CylindricalHoneycombMeshGenerator::CylindricalHoneycombMeshGenerator(unsigned nu
     p_elem_file->close();
     p_edge_file->close();
 
-
     // Having written the mesh to file, now construct it using TrianglesMeshReader
-    TrianglesMeshReader<2,2> mesh_reader(output_dir + mMeshFilename);
+    TrianglesMeshReader<2,2> mesh_reader(output_file_handler.GetOutputDirectoryFullPath() + mMeshFilename);
     mpMesh = new Cylindrical2dMesh(mDomainWidth);
     mpMesh->ConstructFromMeshReader(mesh_reader);
 
@@ -211,11 +210,8 @@ CylindricalHoneycombMeshGenerator::CylindricalHoneycombMeshGenerator(unsigned nu
     mpMesh->ReMesh();
 
     // Delete the temporary files
-    FileFinder output_dir_finder(output_dir);
-    BOOST_FOREACH(FileFinder temp_file, output_dir_finder.FindMatches(mMeshFilename + ".*"))
-    {
-        temp_file.Remove(true);
-    }
+    FileFinder output_dir_finder(output_file_handler.GetOutputDirectoryFullPath());
+    output_dir_finder.Remove();
 
     // The original files have been deleted, it is better if the mesh object forgets about them
     mpMesh->SetMeshHasChangedSinceLoading();

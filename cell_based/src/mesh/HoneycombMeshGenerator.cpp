@@ -44,6 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 HoneycombMeshGenerator::HoneycombMeshGenerator(unsigned numNodesAlongWidth, unsigned numNodesAlongLength, unsigned ghosts, double scaleFactor)
   : mpMesh(NULL),
+    mMeshFilename("mesh"),
     mDomainWidth(numNodesAlongWidth*scaleFactor),
     mNumCellWidth(numNodesAlongWidth), //*1 because cells are considered to be size one
     mNumCellLength(numNodesAlongLength)
@@ -54,14 +55,12 @@ HoneycombMeshGenerator::HoneycombMeshGenerator(unsigned numNodesAlongWidth, unsi
     // An older version of the constructor might allow the wrong argument through to the scale factor
     assert(scaleFactor > 0.0);
 
-    // Get a unique mesh filename
-    std::stringstream pid;
-    pid << getpid();
-    mMeshFilename = "2D_temporary_honeycomb_mesh_" + pid.str();
-
     mGhostNodeIndices.empty();
 
-    OutputFileHandler output_file_handler("");
+    // Get a unique temporary foldername
+    std::stringstream pid;
+    pid << getpid();
+    OutputFileHandler output_file_handler("2D_temporary_honeycomb_mesh_" + pid.str());
     std::string output_dir = output_file_handler.GetOutputDirectoryFullPath();
 
     unsigned num_nodes_along_width = mNumCellWidth;
@@ -218,12 +217,8 @@ HoneycombMeshGenerator::HoneycombMeshGenerator(unsigned numNodesAlongWidth, unsi
     mpMesh = new MutableMesh<2,2>;
     mpMesh->ConstructFromMeshReader(mesh_reader);
 
-    // Delete the temporary files
-    FileFinder output_dir_finder(output_dir);
-    BOOST_FOREACH(FileFinder temp_file, output_dir_finder.FindMatches(mMeshFilename + ".*"))
-    {
-        temp_file.Remove(true);
-    }
+    // Delete the temporary folder
+    output_file_handler.FindFile("").Remove();
 
     // The original files have been deleted, it is better if the mesh object forgets about them
     mpMesh->SetMeshHasChangedSinceLoading();

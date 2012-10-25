@@ -99,11 +99,9 @@ private:
      *
      * @param rCellmlFullPath  full path to the .cellml file
      * @param rCellmlFolder  folder containing the CellML file, with trailing slash
-     * @param rModelLeafName  leaf name of the CellML file, minus extension (but including the .)
      */
     void ConvertCellmlToSo(const std::string& rCellmlFullPath,
-                           const std::string& rCellmlFolder,
-                           const std::string& rModelLeafName);
+                           const std::string& rCellmlFolder);
 
     /** Whether to save copies of generated C++ source files. */
     bool mPreserveGeneratedSources;
