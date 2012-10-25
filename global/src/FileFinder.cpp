@@ -52,7 +52,7 @@ std::string FileFinder::msFakePath = "";
 
 #define UNSET_PATH "UNSET!"
 
-/*
+/**
  * This macro converts boost filesystem exceptions into Chaste Exceptions.
  *
  * It should be put round any calls in this class' public methods to
@@ -61,6 +61,8 @@ std::string FileFinder::msFakePath = "";
  *  * or private methods of this class
  *
  * that are likely to throw.
+ *
+ * @param code some code that could throw a boost file system error
  */
 #define CONVERT_ERROR(code)                   \
     try {                                     \
