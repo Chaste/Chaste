@@ -55,8 +55,6 @@ HoneycombMeshGenerator::HoneycombMeshGenerator(unsigned numNodesAlongWidth, unsi
     // An older version of the constructor might allow the wrong argument through to the scale factor
     assert(scaleFactor > 0.0);
 
-    mGhostNodeIndices.empty();
-
     // Get a unique temporary foldername
     std::stringstream pid;
     pid << getpid();

@@ -46,7 +46,7 @@ CylindricalHoneycombMeshGenerator::CylindricalHoneycombMeshGenerator(unsigned nu
     mNumCellWidth = numNodesAlongWidth; //*1 because cells are considered to be size one
     mNumCellLength = numNodesAlongLength;
     mMeshFilename = "mesh";
-
+    mGhostNodeIndices.clear();
     // The code below won't work in parallel
     assert(PetscTools::IsSequential());
 
@@ -56,9 +56,6 @@ CylindricalHoneycombMeshGenerator::CylindricalHoneycombMeshGenerator(unsigned nu
     // Get a unique mesh filename
     std::stringstream pid;
     pid << getpid();
-
-
-    mGhostNodeIndices.empty();
 
     OutputFileHandler output_file_handler("2D_temporary_honeycomb_mesh_"+ pid.str());
 
