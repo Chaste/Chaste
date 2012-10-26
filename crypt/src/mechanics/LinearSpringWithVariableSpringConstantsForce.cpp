@@ -226,7 +226,7 @@ void LinearSpringWithVariableSpringConstantsForce<DIM>::AddForceContribution(std
         unsigned nodeA_global_index = spring_iterator.GetNodeA()->GetIndex();
         unsigned nodeB_global_index = spring_iterator.GetNodeB()->GetIndex();
 
-        c_vector<double, DIM> force = CalculateForceBetweenNodes(nodeA_global_index, nodeB_global_index, rCellPopulation);
+        c_vector<double, DIM> force = this->CalculateForceBetweenNodes(nodeA_global_index, nodeB_global_index, rCellPopulation);
 
         rForces[nodeB_global_index] -= force;
         rForces[nodeA_global_index] += force;

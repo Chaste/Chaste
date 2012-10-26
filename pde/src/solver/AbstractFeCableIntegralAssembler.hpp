@@ -417,7 +417,7 @@ void AbstractFeCableIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_A
             }
 
             // Allow the concrete version of the assembler to interpolate any desired quantities
-            IncrementInterpolatedQuantities(phi(i), p_node);
+            this->IncrementInterpolatedQuantities(phi(i), p_node);
         }
 
         double wJ = jacobian_determinant * mpCableQuadRule->GetWeight(quad_index);

@@ -92,7 +92,7 @@ void CompressibleExponentialLaw<DIM>::ComputeStressAndStressDerivative(c_matrix<
     // The transformed C for the fibre/sheet basis is C* = P^T C P.
     // We then compute T* = T*(C*), and then compute T = P T* P^T.
 
-    ComputeTransformedDeformationTensor(rC, rInvC, C_transformed, invC_transformed);
+    this->ComputeTransformedDeformationTensor(rC, rInvC, C_transformed, invC_transformed);
 
     // Compute T*
 

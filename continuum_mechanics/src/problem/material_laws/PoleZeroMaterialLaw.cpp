@@ -107,7 +107,7 @@ void PoleZeroMaterialLaw<DIM>::ComputeStressAndStressDerivative(c_matrix<double,
     // The transformed C for the fibre/sheet basis is C* = P^T C P.
     // We then compute T* = T*(C*), and then compute T = P T* P^T.
 
-    ComputeTransformedDeformationTensor(rC, rInvC, C_transformed, invC_transformed);
+    this->ComputeTransformedDeformationTensor(rC, rInvC, C_transformed, invC_transformed);
 
     // compute T*
 

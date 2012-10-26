@@ -111,7 +111,7 @@ protected:
      */
     void SetupLinearSystem(Vec currentSolution, bool computeMatrix)
     {
-        SetupGivenLinearSystem(currentSolution, computeMatrix, this->mpLinearSystem);
+        this->SetupGivenLinearSystem(currentSolution, computeMatrix, this->mpLinearSystem);
     }
 
 public:

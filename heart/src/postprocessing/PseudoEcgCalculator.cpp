@@ -111,7 +111,7 @@ double PseudoEcgCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::ComputePseudoEc
     double pseudo_ecg_at_one_timestep;
     try
     {
-        pseudo_ecg_at_one_timestep = Calculate(mrMesh, solution_at_one_time_step);
+        pseudo_ecg_at_one_timestep = this->Calculate(mrMesh, solution_at_one_time_step);
     }
     catch (Exception &e)
     {
