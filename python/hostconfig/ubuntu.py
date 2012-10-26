@@ -45,7 +45,10 @@ if ubuntu_ver == 'natty':
 else:
     ubuntu_ver = map(int, ubuntu_ver.split('.')[0:2]) 
 
-if ubuntu_ver >= [10,10]:
+if ubuntu_ver >= [12,10]:
+    petsc_ver = 3.2
+    petsc_path = '/usr/lib/petscdir/3.2/'
+elif ubuntu_ver >= [10,10]:
     petsc_ver = 3.1
     petsc_path = '/usr/lib/petscdir/3.1/'
 elif ubuntu_ver >= [9,10]:
