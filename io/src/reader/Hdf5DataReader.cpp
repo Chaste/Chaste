@@ -243,7 +243,7 @@ std::vector<double> Hdf5DataReader::GetVariableOverTime(const std::string& rVari
     {
         EXCEPTION("The file doesn't contain data for variable " + rVariableName);
     }
-    int column_index = (*col_iter).second;
+    unsigned column_index = (*col_iter).second;
 
     // Define hyperslab in the dataset.
     hsize_t offset[3] = {0, actual_node_index, column_index};
@@ -290,7 +290,7 @@ std::vector<std::vector<double> > Hdf5DataReader::GetVariableOverTimeOverMultipl
     {
         EXCEPTION("The file doesn't contain data for variable " + rVariableName);
     }
-    int column_index = (*col_iter).second;
+    unsigned column_index = (*col_iter).second;
 
     // Define hyperslab in the dataset.
     hsize_t offset[3] = {0, lowerIndex, column_index};
@@ -350,7 +350,7 @@ void Hdf5DataReader::GetVariableOverNodes(Vec data,
     {
         EXCEPTION("The file does not contain data for variable " + rVariableName);
     }
-    int column_index = (*col_iter).second;
+    unsigned column_index = (*col_iter).second;
 
     // Check for valid timestep
     if (timestep >= mNumberTimesteps)
@@ -370,12 +370,12 @@ void Hdf5DataReader::GetVariableOverNodes(Vec data,
     if (hi > lo) // i.e. we own some...
     {
         // Define a dataset in memory for this process
-        hsize_t v_size[1] = {hi-lo};
+        hsize_t v_size[1] = {(unsigned)(hi-lo)};
         hid_t memspace = H5Screate_simple(1, v_size, NULL);
 
         // Select hyperslab in the file.
-        hsize_t offset[3] = {timestep, lo, column_index};
-        hsize_t count[3]  = {1, hi-lo, 1};
+        hsize_t offset[3] = {timestep, (unsigned)(lo), column_index};
+        hsize_t count[3]  = {1, (unsigned)(hi-lo), 1};
         hid_t hyperslab_space = H5Dget_space(mVariablesDatasetId);
         H5Sselect_hyperslab(hyperslab_space, H5S_SELECT_SET, offset, NULL, count, NULL);
 

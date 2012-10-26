@@ -733,7 +733,7 @@ void Hdf5DataWriter::PutVector(int variableID, Vec petscVector)
 
     // Select hyperslab in the file
     hsize_t count[DATASET_DIMS] = {1, mNumberOwned, 1};
-    hsize_t offset_dims[DATASET_DIMS] = {mCurrentTimeStep, mOffset, variableID};
+    hsize_t offset_dims[DATASET_DIMS] = {mCurrentTimeStep, mOffset, (unsigned)(variableID)};
     hid_t file_dataspace = H5Dget_space(mVariablesDatasetId);
 
     // Create property list for collective dataset
@@ -804,7 +804,7 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
         EXCEPTION("The PutStripedVector method requires at least two variables ID. If only one is needed, use PutVector method instead");
     }
 
-    const int NUM_STRIPES=variableIDs.size();
+    const unsigned NUM_STRIPES=variableIDs.size();
 
     int firstVariableID=variableIDs[0];
 
@@ -854,7 +854,7 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
     }
 
     // Select hyperslab in the file
-    hsize_t start[DATASET_DIMS] = {mCurrentTimeStep, mOffset, firstVariableID};
+    hsize_t start[DATASET_DIMS] = {mCurrentTimeStep, mOffset, (unsigned)(firstVariableID)};
     hsize_t stride[DATASET_DIMS] = {1, 1, 1};//we are imposing contiguous variables, hence the stride is 1 (3rd component)
     hsize_t block_size[DATASET_DIMS] = {1, mNumberOwned, 1};
     hsize_t number_blocks[DATASET_DIMS] = {1, 1, NUM_STRIPES};

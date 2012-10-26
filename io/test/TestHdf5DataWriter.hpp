@@ -192,11 +192,11 @@ public:
         H5Sclose(filespace);
 
         // Define a dataset in memory for this process
-        hsize_t count[DIMS] = {hi-lo};
+        hsize_t count[DIMS] = {(unsigned)(hi-lo)};
         hid_t memspace = H5Screate_simple(DIMS, count, NULL);
 
         // Select hyperslab in the file.
-        hsize_t offset[DIMS] = {lo};
+        hsize_t offset[DIMS] = {(unsigned)(lo)};
         filespace = H5Dget_space(dset_id);
         H5Sselect_hyperslab(filespace, H5S_SELECT_SET, offset, NULL, count, NULL);
 
