@@ -112,6 +112,18 @@ protected:
      * @param numElemZ Number of elements in y-direction (also, the depth of the final mesh)
      */
     void ConstructCuboid(unsigned numElemX, unsigned numElemY, unsigned numElemZ);
+    
+    /** 
+     * A helper method used in the private structured mesh constructors (ConstructRectangularMesh etc).
+     * 
+     * Method uses top (and the zero vector) to calculate if the node should be designated as a boundary node.
+     * Method uses top to determine if the node is outside the cuboid -- this allows for simpler loops in the caller
+     * Method creates node, pushes node onto mNodes and marks it as an internal node.
+     * @param rIndex  is the index in the mesh which this node should take. Note: this method increments rIndex
+     * @param rLocation  the position of the node in space (coordinates should be integers or multiples of 1/2)
+     * @param rTop  the position of top-most node in the line/slab/cuboid
+     */
+    Node<DIM>* MakeNewInternalNode(unsigned& rIndex, c_vector<double, DIM>& rLocation, c_vector<double, DIM>& rTop); 
 public:
     /**
      * Hard-coded version

@@ -42,6 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 #include "QuadraticMeshHelper.hpp"
 
+#include "Debug.hpp"
+
 //Jonathan Shewchuk's Triangle and Hang Si's TetGen
 #define REAL double
 #define VOID void
@@ -76,22 +78,20 @@ void QuadraticMesh<DIM>::ConstructLinearMesh(unsigned numElemX)
     AbstractTetrahedralMesh<DIM,DIM>::ConstructLinearMesh(numElemX);
     assert (this->mNodes.size() == numElemX+1);
     mNumVertices = numElemX+1;
-    this->mNodes.resize(2*numElemX+1);
+    c_vector<double, DIM> top;
+    top[0] = numElemX;
 
+    unsigned mid_node_index=mNumVertices;
     for (unsigned element_index=0; element_index<numElemX; element_index++)
     {
-        unsigned mid_node_index = mNumVertices + element_index;
-        double x_value_mid_node = element_index+0.5;
+        c_vector<double, DIM> x_value_mid_node;
+        x_value_mid_node[0] = element_index+0.5;
 
-        //Make internal node
-        Node<DIM>* p_mid_node   = new Node<DIM>(mid_node_index, false, x_value_mid_node);
-        p_mid_node->MarkAsInternal();
-        //Put in mesh
-        this->mNodes[mid_node_index] = p_mid_node;
+        Node<DIM>* p_mid_node = MakeNewInternalNode(mid_node_index, x_value_mid_node, top);
+        
         //Put in element and cross-reference
         this->mElements[element_index]->AddNode(p_mid_node);
         p_mid_node->AddElement(element_index);
-
     }
 
     this->RefreshMesh();
@@ -118,8 +118,14 @@ void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned nu
     std::map<std::pair<unsigned, unsigned>, unsigned> edge_to_internal_map;
     
     unsigned node_index = this->GetNumNodes();
+    c_vector<double, DIM> top;
+    top[0]=numElemX;
+    top[1]=numElemY;
+    c_vector<double, DIM> node_pos;
+    
     for (unsigned j=0; j<numElemY+1; j++)
     {
+        node_pos[1]=j;
         bool boundary = (j==0) || (j==numElemY);
         //Add mid-way nodes to horizontal edges in this slice
         for (unsigned i=0; i<numElemX; i++)
@@ -127,55 +133,35 @@ void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned nu
             unsigned left_index = j*(numElemX+1) + i;
             std::pair<unsigned,unsigned> edge(left_index, left_index+1 ) ;
             edge_to_internal_map[edge] = node_index;
-            Node<DIM>* p_mid_node   = new Node<DIM>(node_index++, boundary, i+0.5, j);
-            p_mid_node->MarkAsInternal();
-            //Put in mesh
-            this->mNodes.push_back(p_mid_node);
-            if (boundary)
-            {
-                this->mBoundaryNodes.push_back(p_mid_node);
-            }
-            
+            node_pos[0]=i+0.5;
+            MakeNewInternalNode(node_index, node_pos, top);
         }
         
-        if (j < numElemY)
+        //Add the vertical and diagonal nodes to the mid-way above the last set of horizontal edges
+        node_pos[1] = j+0.5;
+        for (unsigned i=0; i<numElemX+1; i++)
         {
-            //Add the vertical and diagonal nodes to the mid-way above the last set of horizontal edges
-            for (unsigned i=0; i<numElemX+1; i++)
-            {
-                unsigned left_index = j*(numElemX+1) + i;
-                std::pair<unsigned,unsigned> edge(left_index, left_index+(numElemX+1) ) ;
-                edge_to_internal_map[edge] = node_index;
-                boundary = (i==0) || (i==numElemX);
-                Node<DIM>* p_mid_node   = new Node<DIM>(node_index++, boundary, i, j+0.5);
-                p_mid_node->MarkAsInternal();
-                //Put in mesh
-                this->mNodes.push_back(p_mid_node);
-                if (boundary)
-                {
-                    this->mBoundaryNodes.push_back(p_mid_node);
-                }
-                if (i < numElemX)
-                {
+            node_pos[0] = i;
+            unsigned left_index = j*(numElemX+1) + i;
+            std::pair<unsigned,unsigned> edge(left_index, left_index+(numElemX+1) ) ;
+            edge_to_internal_map[edge] = node_index;
+            boundary = (i==0) || (i==numElemX);
+            MakeNewInternalNode(node_index, node_pos, top);
 //                    unsigned parity=(i+(numElemY-j))%2;
 //                    if (parity==1)
-                    {
-                        //backslash
-                        std::pair<unsigned,unsigned> edge(left_index+1, left_index+(numElemX+1) ) ;
-                        edge_to_internal_map[edge] = node_index;
-                    }
+            {
+                //backslash
+                std::pair<unsigned,unsigned> edge(left_index+1, left_index+(numElemX+1) ) ;
+                edge_to_internal_map[edge] = node_index;
+            }
 //                    else
 //                    {
 //                        //foward slash
 //                        std::pair<unsigned,unsigned> edge(left_index, left_index+(numElemX+1)+1 ) ;
 //                        edge_to_internal_map[edge] = node_index;
 //                    }
-                    Node<DIM>* p_mid_node   = new Node<DIM>(node_index++, false, i+0.5, j+0.5);
-                    p_mid_node->MarkAsInternal();
-                    //Put in mesh
-                    this->mNodes.push_back(p_mid_node);
-                }
-            }
+            node_pos[0] = i+0.5;
+            MakeNewInternalNode(node_index, node_pos, top);
         }
     }
     CountVertices();
@@ -222,8 +208,34 @@ void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned nu
             
 
 }
-
-
+template<unsigned DIM>
+Node<DIM>* QuadraticMesh<DIM>::MakeNewInternalNode(unsigned& rIndex, c_vector<double, DIM>& rLocation, c_vector<double, DIM>& rTop) 
+{
+    bool boundary = false;
+    for (unsigned dim=0; dim<DIM; dim++)
+    {
+        if (rLocation[dim] > rTop[dim])
+        {
+            //Outside the box so don't do anything
+            return NULL;
+        }
+        if ( (rLocation[dim] == 0.0) || (rLocation[dim] == rTop[dim]) )
+        {
+            boundary = true;
+        }
+    }
+    //The caller needs to know that rIndex is in sync with what's in the mesh
+    assert(rIndex == this->mNodes.size());
+    Node<DIM>* p_node   = new Node<DIM>(rIndex++, rLocation, boundary);
+    p_node->MarkAsInternal();
+    //Put in mesh
+    this->mNodes.push_back(p_node);
+    if (boundary)
+    {
+        this->mBoundaryNodes.push_back(p_node);
+    }
+    return p_node;     
+}
 
 template<unsigned DIM>
 void QuadraticMesh<DIM>::ConstructCuboidNewImp(unsigned numElemX, unsigned numElemY, unsigned numElemZ)
@@ -235,35 +247,80 @@ void QuadraticMesh<DIM>::ConstructCuboidNewImp(unsigned numElemX, unsigned numEl
     assert(numElemZ > 0);
 
     AbstractTetrahedralMesh<DIM,DIM>::ConstructCuboid(numElemX, numElemY, numElemZ);
-
+    c_vector<double, 3> top;
+    top[0]=numElemX;
+    top[1]=numElemY;
+    top[2]=numElemZ; 
     this->mMeshIsLinear=false;
     //Make the internal nodes in z-order.  This is important for the distributed case, since we want the top and bottom
     //layers to have predictable numbers
     std::map<std::pair<unsigned, unsigned>, unsigned> edge_to_internal_map;
-    
-//    unsigned node_index = this->GetNumNodes();
-//    for (unsigned k=0; k<numElemZ+1; k++)
-//    {
-//        for (unsigned j=0; j<numElemY+1; j++)
-//        {
-//            for (unsigned i=0; i<numElemX+1; i++)
-//            {
-//                bool is_boundary = false;
-//                if (i==0 || j==0 || k==0 || i==width || j==height || k==depth)
-//                {
-//                    is_boundary = true;
-//                }
-//                assert(node_index == (k*(height+1)+j)*(width+1)+i);
-//                Node<SPACE_DIM>* p_node = new Node<SPACE_DIM>(node_index++, is_boundary, i, j, k);
-//
-//                this->mNodes.push_back(p_node);
-//                if (is_boundary)
-//                {
-//                    this->mBoundaryNodes.push_back(p_node);
-//                }
-//            }
-//        }
-//    }
+    unsigned node_index = this->GetNumNodes();
+    for (unsigned k=0; k<numElemZ+1; k++)
+    {
+        //Add a slice of the mid-points to the edges and faces at this z=level 
+        for (unsigned j=0; j<numElemY+1; j++)
+        {
+            //The midpoints along the horizontal (y fixed) edges
+            for (unsigned i=0; i<numElemX+1; i++)
+            {
+                bool is_boundary = (i==0 || j==0 || k==0 || i==numElemX || j==numElemY || k==numElemZ);
+                if (i != numElemX)
+                {
+                    Node<DIM>* p_node = new Node<DIM>(node_index++, is_boundary, i, j, k);
+                    this->mNodes.push_back(p_node);
+                    p_node->MarkAsInternal();
+                    if (is_boundary)
+                    {
+                        this->mBoundaryNodes.push_back(p_node);
+                    }
+                    
+                    PRINT_3_VARIABLES(i+.5, j, k)
+                }
+            }
+            //The midpoints and face centres between two horizontal (y-fixed) strips
+            if (j != numElemY)
+            {
+                for (unsigned i=0; i<numElemX+1; i++)
+                {
+                    
+                    bool is_boundary = (i==0 || k==0 || i==numElemX || k==numElemZ);
+                    Node<DIM>* p_node = new Node<DIM>(node_index++, is_boundary, i, j+0.5, k);
+                    this->mNodes.push_back(p_node);
+                    p_node->MarkAsInternal();
+                    if (is_boundary)
+                    {
+                        this->mBoundaryNodes.push_back(p_node);
+                    }
+                    PRINT_3_VARIABLES(i, j+.5, k)
+                    if (i!=numElemX)
+                    {
+                        //Centre of face node
+                        bool is_boundary = ( k==0 || k==numElemZ);
+                        Node<DIM>* p_node = new Node<DIM>(node_index++, is_boundary, i+0.5, j+0.5, k);
+                        this->mNodes.push_back(p_node);
+                        p_node->MarkAsInternal();
+                        if (is_boundary)
+                        {
+                            this->mBoundaryNodes.push_back(p_node);
+                        }
+                        PRINT_3_VARIABLES(i+.5, j+.5, k)
+                    }
+                    
+                }
+            }
+        }
+        //Add a slice of the mid-points to the edges and faces mid-way up the cube z=level 
+        if (k != numElemZ)
+        {
+            for (unsigned j=0; j<numElemY+1; j++)
+            {
+            TRACE("Add");
+            }
+        }
+        
+    }
+    CountVertices();
 //    for (unsigned j=0; j<numElemY+1; j++)
 //    {
 //        bool boundary = (j==0) || (j==numElemY);
