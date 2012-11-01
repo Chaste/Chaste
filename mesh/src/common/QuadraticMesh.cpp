@@ -224,6 +224,10 @@ Node<DIM>* QuadraticMesh<DIM>::MakeNewInternalNode(unsigned& rIndex, c_vector<do
             boundary = true;
         }
     }
+    if (DIM == 3)
+    {
+//        PRINT_4_VARIABLES(rIndex, rLocation[0], rLocation[1], rLocation[2]);
+    }
     //The caller needs to know that rIndex is in sync with what's in the mesh
     assert(rIndex == this->mNodes.size());
     Node<DIM>* p_node   = new Node<DIM>(rIndex++, rLocation, boundary);
@@ -247,10 +251,11 @@ void QuadraticMesh<DIM>::ConstructCuboidNewImp(unsigned numElemX, unsigned numEl
     assert(numElemZ > 0);
 
     AbstractTetrahedralMesh<DIM,DIM>::ConstructCuboid(numElemX, numElemY, numElemZ);
-    c_vector<double, 3> top;
+    c_vector<double, DIM> top;
     top[0]=numElemX;
     top[1]=numElemY;
-    top[2]=numElemZ; 
+    top[2]=numElemZ;
+    c_vector<double, DIM> node_pos;
     this->mMeshIsLinear=false;
     //Make the internal nodes in z-order.  This is important for the distributed case, since we want the top and bottom
     //layers to have predictable numbers
@@ -259,63 +264,51 @@ void QuadraticMesh<DIM>::ConstructCuboidNewImp(unsigned numElemX, unsigned numEl
     for (unsigned k=0; k<numElemZ+1; k++)
     {
         //Add a slice of the mid-points to the edges and faces at this z=level 
+        node_pos[2] = k;
         for (unsigned j=0; j<numElemY+1; j++)
         {
+            node_pos[1] = j;
+            
             //The midpoints along the horizontal (y fixed) edges
             for (unsigned i=0; i<numElemX+1; i++)
             {
-                bool is_boundary = (i==0 || j==0 || k==0 || i==numElemX || j==numElemY || k==numElemZ);
-                if (i != numElemX)
-                {
-                    Node<DIM>* p_node = new Node<DIM>(node_index++, is_boundary, i, j, k);
-                    this->mNodes.push_back(p_node);
-                    p_node->MarkAsInternal();
-                    if (is_boundary)
-                    {
-                        this->mBoundaryNodes.push_back(p_node);
-                    }
-                    
-                    PRINT_3_VARIABLES(i+.5, j, k)
-                }
+                node_pos[0] = i+0.5;
+                MakeNewInternalNode(node_index, node_pos, top);
             }
             //The midpoints and face centres between two horizontal (y-fixed) strips
-            if (j != numElemY)
+            node_pos[1] = j+0.5;
+            for (unsigned i=0; i<numElemX+1; i++)
             {
-                for (unsigned i=0; i<numElemX+1; i++)
-                {
-                    
-                    bool is_boundary = (i==0 || k==0 || i==numElemX || k==numElemZ);
-                    Node<DIM>* p_node = new Node<DIM>(node_index++, is_boundary, i, j+0.5, k);
-                    this->mNodes.push_back(p_node);
-                    p_node->MarkAsInternal();
-                    if (is_boundary)
-                    {
-                        this->mBoundaryNodes.push_back(p_node);
-                    }
-                    PRINT_3_VARIABLES(i, j+.5, k)
-                    if (i!=numElemX)
-                    {
-                        //Centre of face node
-                        bool is_boundary = ( k==0 || k==numElemZ);
-                        Node<DIM>* p_node = new Node<DIM>(node_index++, is_boundary, i+0.5, j+0.5, k);
-                        this->mNodes.push_back(p_node);
-                        p_node->MarkAsInternal();
-                        if (is_boundary)
-                        {
-                            this->mBoundaryNodes.push_back(p_node);
-                        }
-                        PRINT_3_VARIABLES(i+.5, j+.5, k)
-                    }
-                    
-                }
+                node_pos[0] = i;
+                MakeNewInternalNode(node_index, node_pos, top);
+                //Centre of face node
+                node_pos[0] = i+0.5;
+                MakeNewInternalNode(node_index, node_pos, top);
             }
         }
         //Add a slice of the mid-points to the edges and faces mid-way up the cube z=level 
-        if (k != numElemZ)
+        node_pos[2] = k+0.5;
+        for (unsigned j=0; j<numElemY+1; j++)
         {
-            for (unsigned j=0; j<numElemY+1; j++)
+            node_pos[1] = j;
+            
+            //The midpoints along the horizontal (y fixed) edges
+            for (unsigned i=0; i<numElemX+1; i++)
             {
-            TRACE("Add");
+                node_pos[0] = i;
+                MakeNewInternalNode(node_index, node_pos, top);
+                node_pos[0] = i+0.5;
+                MakeNewInternalNode(node_index, node_pos, top);
+            }
+            //The midpoints and face centres between two horizontal (y-fixed) strips
+            node_pos[1] = j+0.5;
+            for (unsigned i=0; i<numElemX+1; i++)
+            {
+                node_pos[0] = i;
+                MakeNewInternalNode(node_index, node_pos, top);
+                //Centre of face node
+                node_pos[0] = i+0.5;
+                MakeNewInternalNode(node_index, node_pos, top);
             }
         }
         

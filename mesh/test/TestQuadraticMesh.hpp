@@ -628,15 +628,15 @@ public:
         }
                             
     }
-   void donotTestConstructionConversionVersusConstruction3d()
+   void TestConstructionConversionVersusConstruction3d()
     {
         QuadraticMesh<3> quad_mesh_read_back;
         QuadraticMesh<3> quad_mesh_constructed;
-        double width  = 1.0;
-        double height = 1.0;
-        double depth  = 1.0;
+        double width  = 3.0;
+        double height = 3.0;
+        double depth  = 3.0;
         {
-            //Two-dimensional two squares
+            //Three-dimensional cubes
             TetrahedralMesh<3,3> mesh;
             mesh.ConstructRegularSlabMesh(1.0, width, height, depth);
             TrianglesMeshWriter<3,3> mesh_writer("TestQuadraticMesh", "TempGrid3d", false);
@@ -659,8 +659,7 @@ public:
                 mesh_writer2.WriteFilesUsingMesh(quad_mesh_constructed);
             }
         }
-        ///\todo #2224
-        //TS_ASSERT_EQUALS(quad_mesh_constructed.GetNumNodes(),  quad_mesh_read_back.GetNumVertices());
+
         TS_ASSERT_EQUALS(quad_mesh_constructed.GetNumNodes(), quad_mesh_read_back.GetNumNodes());
         TS_ASSERT_EQUALS(quad_mesh_constructed.GetNumBoundaryNodes(), quad_mesh_read_back.GetNumBoundaryNodes());
         TS_ASSERT_EQUALS(quad_mesh_constructed.GetNumVertices(), quad_mesh_read_back.GetNumVertices());
