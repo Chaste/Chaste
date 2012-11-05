@@ -51,6 +51,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCompressibleMaterialLaw.hpp"
 #include "QuadraticMesh.hpp"
 
+class TestStressRecoveror;
+
 /**
  * Finite elasticity solver. Solves static *compressible* nonlinear elasticity
  * problems with arbitrary (compressible) material laws and a body force.
@@ -62,6 +64,8 @@ template<size_t DIM>
 class CompressibleNonlinearElasticitySolver : public AbstractNonlinearElasticitySolver<DIM>
 {
     friend class TestCompressibleNonlinearElasticitySolver;
+    friend class TestStressRecoveror;
+
 protected:
 
     /** Number of nodes per element. */

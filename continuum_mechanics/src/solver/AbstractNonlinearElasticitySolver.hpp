@@ -148,7 +148,6 @@ public:
     }
 };
 
-
 /**
  * Abstract nonlinear elasticity solver. IncompressibleNonlinearElasticityAssembler and
  * CompressibleNonlinearElasticityAssembler inherit from this class.
@@ -163,6 +162,7 @@ public:
 template<unsigned DIM>
 class AbstractNonlinearElasticitySolver : public AbstractContinuumMechanicsSolver<DIM>
 {
+    friend class StressRecoveror<DIM>;
 protected:
 
     /** Number of vertices per element. */

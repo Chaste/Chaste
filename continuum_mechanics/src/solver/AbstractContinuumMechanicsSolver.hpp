@@ -65,6 +65,8 @@ typedef enum _ApplyDirichletBcsType
     NONLINEAR_PROBLEM_APPLY_TO_EVERYTHING,
 } ApplyDirichletBcsType;
 
+//forward declaration
+template<unsigned DIM> class StressRecoveror;
 
 /**
  *  General base class for continuum mechanics solvers. Deals with memory allocation,
@@ -83,6 +85,8 @@ typedef enum _ApplyDirichletBcsType
 template<unsigned DIM>
 class AbstractContinuumMechanicsSolver
 {
+    friend class StressRecoveror<DIM>;
+
 protected:
     /**
      * The mesh to be solved on. Requires 6 nodes per triangle (or 10 per tetrahedron)
